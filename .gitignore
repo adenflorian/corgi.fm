@@ -1,3 +1,7 @@
+secrets.*
+*.gz
+dist
+
 # Logs
 logs
 *.log

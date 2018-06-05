@@ -1,22 +1,28 @@
 {
   "name": "sha-mu",
   "version": "0.0.1",
-  "main": "index.js",
+  "main": "server.js",
   "license": "all rights reserved",
   "scripts": {
-    "start": "nodemon server/server.js",
+    "start": "nodemon src/server/server.js",
+    "start-prod": "pm2 start src/server/server.js",
+    "stop-prod": "pm2 stop src/server/server.js",
     "lint": "eslint .",
     "test": "mocha",
     "tdd": "mocha --watch --reporter dot",
-    "clean": "echo nothing to clean"
+    "clean": "echo nothing to clean",
+    "build": "bash scripts/build.sh",
+    "deploy": "yarn build && bash scripts/deploy.sh",
+    "setup-prod-server": "bash scripts/setup-prod-server.sh"
   },
   "dependencies": {
-    "eslint": "^4.19.1",
     "express": "^4.16.3",
     "socket.io": "^2.1.1"
   },
   "devDependencies": {
+    "eslint": "^4.19.1",
     "mocha": "^5.2.0",
-    "nodemon": "^1.17.5"
+    "nodemon": "^1.17.5",
+    "pm2": "^2.10.4"
   }
 }

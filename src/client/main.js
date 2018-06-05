@@ -1,5 +1,5 @@
 import {logger} from './logger.js'
-const socket = io('http://localhost')
+const socket = io('/')
 
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)()
 

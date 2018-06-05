@@ -12,7 +12,7 @@ app.get('/', (req, res) => {
 	res.sendFile(__dirname + '/index.html')
 })
 
-app.use(express.static('client'))
+app.use(express.static('src/client'))
 
 const clients = new Clients()
 
