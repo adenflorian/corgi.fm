@@ -1,5 +1,0 @@
-describe('getFrequency', () => {
-    it('should ', () => {
-
-    });
-});

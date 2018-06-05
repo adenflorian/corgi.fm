@@ -3,7 +3,15 @@
   "version": "0.0.1",
   "main": "index.js",
   "license": "all rights reserved",
-  "dependencies": {},
+  "scripts": {
+    "lint": "eslint .",
+    "test": "mocha",
+    "tdd": "mocha --watch --reporter dot",
+    "clean": "echo nothing to clean"
+  },
+  "dependencies": {
+    "eslint": "^4.19.1"
+  },
   "devDependencies": {
     "mocha": "^5.2.0"
   }
