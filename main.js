@@ -14,6 +14,22 @@ oscillator.start()
 
 gainNode.gain.value = offVolume
 
+window.addEventListener('keydown', (e) => {
+	const keyname = e.key
+
+	if (isMidiKey(keyname) === false) return
+
+	const halfSteps = halfStepMap[keyname]
+	const freq = getFrequencyUsingStepsFromA4(halfSteps)
+
+	changeOscillatorFrequency(freq)
+	changeGain(onVolume)
+})
+
+window.addEventListener('keyup', () => {
+	changeGain(offVolume)
+})
+
 const halfStepMap = {
 	a: 0,   // white
 	w: 1,   // black
@@ -46,18 +62,21 @@ function getFrequencyUsingStepsFromA4(steps) {
 	return fixedNoteFrequency * Math.pow(twelthRootOf2, steps)
 }
 
-window.addEventListener('keydown', (e) => {
-	const keyname = e.key
+/** @param {number} newFrequency */
+function changeOscillatorFrequency(newFrequency) {
+	oscillator.frequency.value = newFrequency
+	setFrequencyDivText(newFrequency)
+}
 
-	if (isMidiKey(keyname) === false) return
+/** @param {number} newFrequency */
+function changeGain(newGain) {
+	gainNode.gain.value = newGain
+	if (newGain === offVolume) {
+		setFrequencyDivText('')
+	}
+}
 
-	const halfSteps = halfStepMap[keyname]
-	const freq = getFrequencyUsingStepsFromA4(halfSteps)
-
-	oscillator.frequency.value = freq
-	gainNode.gain.value = onVolume
-})
-
-window.addEventListener('keyup', () => {
-	gainNode.gain.value = offVolume
-})
+/** @param {string} newText */
+function setFrequencyDivText(newText) {
+	document.querySelector('#frequency').textContent = newText
+}
