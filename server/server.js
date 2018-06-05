@@ -1,37 +1,51 @@
 const express = require('express')
+const http = require('http')
+const socketIO = require('socket.io')
+const {logger} = require('./logger')
+const {Clients} = require('./Clients')
+
 const app = express()
-const server = require('http').Server(app)
-const io = require('socket.io')(server)
-
-
+const server = http.Server(app)
+const io = socketIO(server)
 
 app.get('/', (req, res) => {
 	res.sendFile(__dirname + '/index.html')
 })
 
-app.use(express.static('public'))
+app.use(express.static('client'))
 
-let clients = {}
+const clients = new Clients()
 
 io.on('connection', (socket) => {
-	clients[socket.id] = {}
+	logger.log('new connection | ', socket.id)
 
-	io.local.emit('clients', {
-		clients: Object.keys(clients).map(x => ({id: x}))
-	})
+	clients.add(socket.id)
+
+	sendClients()
 
 	socket.on('note', (data) => {
-		console.log(`client: ${socket.id} | ${data.frequency}`)
+		logger.log(`client: ${socket.id} | ${data.frequency}`)
+		socket.broadcast.emit('note', {...data, clientId: socket.id})
 	})
 
 	socket.on('disconnect', () => {
-		delete clients[socket.id]
-		console.log(`disconnect: ${socket.id}`)
+		logger.log(`client disconnected: ${socket.id}`)
+		clients.remove(socket.id)
+		sendClients()
 	})
 })
+
+function sendClients() {
+	logger.debug('sending clients info to all clients')
+	io.local.emit('clients', {
+		clients: clients.toArray()
+	})
+}
 
 const port = 80
 
 server.listen(port)
 
-console.log('listening on port', port)
+logger.log('listening on port', port)
+
+

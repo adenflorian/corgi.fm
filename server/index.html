@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
     <script src="/socket.io/socket.io.js"></script>
-    <script src="js/main.js"></script>
+    <script src="main.js" type="module"></script>
     <style>
         body {
             font-family: Arial, Helvetica, sans-serif;
@@ -20,7 +20,7 @@
             color: #FFBEA4;
             font-weight: 600;
             padding: 80px;
-            line-height: 1.6em;
+            line-height: 1.2em;
         }
     </style>
 </head>
@@ -28,17 +28,24 @@
 <body>
     <div id="info">
     </div>
+
     <br />
-    <div>your client id:
+
+    <h2>you:</h2>
+
+    <div>
         <span id="clientId">
         </span>
+        <span id="frequency">
+            0
+        </span>
     </div>
+
     <br />
-    <div id="frequency">
-        0
-    </div>
-    <br />
-    <div id="clients">
+
+    <h2>other clients:</h2>
+
+    <div id="otherClients">
     </div>
 </body>
 

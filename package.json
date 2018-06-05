@@ -4,6 +4,7 @@
   "main": "index.js",
   "license": "all rights reserved",
   "scripts": {
+    "start": "nodemon server/server.js",
     "lint": "eslint .",
     "test": "mocha",
     "tdd": "mocha --watch --reporter dot",
@@ -15,6 +16,7 @@
     "socket.io": "^2.1.1"
   },
   "devDependencies": {
-    "mocha": "^5.2.0"
+    "mocha": "^5.2.0",
+    "nodemon": "^1.17.5"
   }
 }

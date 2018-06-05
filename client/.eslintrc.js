@@ -3,6 +3,9 @@ module.exports = {
         "browser": true,
         "es6": true
     },
+    "parserOptions": {
+        "sourceType": "module",
+    },
     "globals": {
         "io": true
     },
