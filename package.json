@@ -1,0 +1,10 @@
+{
+  "name": "sha-mu",
+  "version": "0.0.1",
+  "main": "index.js",
+  "license": "all rights reserved",
+  "dependencies": {},
+  "devDependencies": {
+    "mocha": "^5.2.0"
+  }
+}
