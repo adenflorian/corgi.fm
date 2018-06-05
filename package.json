@@ -10,7 +10,9 @@
     "clean": "echo nothing to clean"
   },
   "dependencies": {
-    "eslint": "^4.19.1"
+    "eslint": "^4.19.1",
+    "express": "^4.16.3",
+    "socket.io": "^2.1.1"
   },
   "devDependencies": {
     "mocha": "^5.2.0"
