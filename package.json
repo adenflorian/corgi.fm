@@ -4,25 +4,33 @@
   "main": "server.js",
   "license": "all rights reserved",
   "scripts": {
-    "start": "nodemon src/server/server.js",
-    "start-prod": "pm2 start src/server/server.js",
-    "stop-prod": "pm2 stop src/server/server.js",
+    "start": "yarn build && concurrently --names \"build,server\" \"yarn watch\" \"nodemon built/server/server.js\"",
+    "watch": "watch \"yarn build\" src",
+    "start-prod": "pm2 start server/server.js",
+    "stop-prod": "pm2 stop server/server.js",
     "lint": "eslint .",
     "test": "mocha",
     "tdd": "mocha --watch --reporter dot",
     "clean": "echo nothing to clean",
-    "build": "bash scripts/build.sh",
+    "build": "gulp build",
     "deploy": "yarn build && bash scripts/deploy.sh",
     "setup-prod-server": "bash scripts/setup-prod-server.sh"
   },
   "dependencies": {
+    "@types/socket.io": "^1.4.34",
     "express": "^4.16.3",
     "socket.io": "^2.1.1"
   },
   "devDependencies": {
+    "concurrently": "^3.5.1",
     "eslint": "^4.19.1",
+    "gulp": "^4.0.0",
+    "gulp-clean": "^0.4.0",
+    "gulp-typescript": "^4.0.2",
     "mocha": "^5.2.0",
     "nodemon": "^1.17.5",
-    "pm2": "^2.10.4"
+    "pm2": "^2.10.4",
+    "typescript": "^2.9.1",
+    "watch": "^1.0.2"
   }
 }

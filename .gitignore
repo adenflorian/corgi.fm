@@ -1,6 +1,6 @@
 secrets.*
 *.gz
-dist
+built
 
 # Logs
 logs

@@ -1,14 +1,21 @@
 import {logger} from './logger.js'
+import {Socket} from 'socket.io';
+
+declare var io: (x: string) => Socket
+
 const socket = io('/')
 
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)()
+// Might be needed for safari
+// const AudioContext = window.AudioContext || window.webkitAudioContext
+const audioContext = new AudioContext()
 
 class BasicInstrument {
+	oscillator = audioContext.createOscillator()
+	panNode = audioContext.createStereoPanner()
+
 	constructor(destination) {
-		this.oscillator = audioCtx.createOscillator()
 		this.oscillator.type = 'sawtooth'
 		this.oscillator.frequency.value = 0
-		this.panNode = audioCtx.createStereoPanner()
 
 		this.oscillator.connect(this.panNode)
 			.connect(destination)
@@ -17,14 +24,14 @@ class BasicInstrument {
 	}
 }
 
-const gainNode = audioCtx.createGain()
-gainNode.connect(audioCtx.destination)
+const gainNode = audioContext.createGain()
+gainNode.connect(audioContext.destination)
 
 const myInstrument = new BasicInstrument(gainNode)
-myInstrument.panNode.pan.setValueAtTime(-1, audioCtx.currentTime)
+myInstrument.panNode.pan.setValueAtTime(-1, audioContext.currentTime)
 
 const otherClientsInstrument = new BasicInstrument(gainNode)
-otherClientsInstrument.panNode.pan.setValueAtTime(1, audioCtx.currentTime)
+otherClientsInstrument.panNode.pan.setValueAtTime(1, audioContext.currentTime)
 
 const offVolume = 0.0
 const onVolume = 0.1
@@ -138,8 +145,8 @@ let myClientId
 	})
 
 	socket.on('reconnect_error', (error) => {
-		setInfo('reconnect_error: ' + JSON.stringify(error, 2))
-		logger.log('reconnect_error: ' + JSON.stringify(error, 2))
+		setInfo('reconnect_error: ' + JSON.stringify(error, null, 2))
+		logger.log('reconnect_error: ' + JSON.stringify(error, null, 2))
 	})
 
 	socket.on('reconnect_failed', () => {
@@ -168,13 +175,13 @@ let myClientId
 	})
 
 	socket.on('error', (error) => {
-		setInfo('error: ' + JSON.stringify(error, 2))
-		logger.log('error: ' + JSON.stringify(error, 2))
+		setInfo('error: ' + JSON.stringify(error, null, 2))
+		logger.log('error: ' + JSON.stringify(error, null, 2))
 	})
 
 	socket.on('connect_error', (error) => {
-		setInfo('connection error: ' + JSON.stringify(error, 2))
-		logger.log('connection error: ' + JSON.stringify(error, 2))
+		setInfo('connection error: ' + JSON.stringify(error, null, 2))
+		logger.log('connection error: ' + JSON.stringify(error, null, 2))
 	})
 
 	socket.on('clients', ({clients}) => {
