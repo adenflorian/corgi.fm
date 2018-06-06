@@ -1,10 +1,11 @@
 const gulp = require('gulp')
 const clean = require('gulp-clean')
 const ts = require('gulp-typescript')
+const sourcemaps = require('gulp-sourcemaps')
 
 gulp.task('html', () => {
-    return gulp.src('src/**/*.html')
-        .pipe(gulp.dest('built'))
+    return gulp.src('src/client/**/*.html')
+        .pipe(gulp.dest('built/client'))
 })
 
 gulp.task('clean', () => {
@@ -13,7 +14,7 @@ gulp.task('clean', () => {
 })
 
 gulp.task('typescript-client', () => {
-    return gulp.src('src/client/**/*')
+    return gulp.src('src/client/**/*s')
         .pipe(ts({
             outDir: './built/client',
             allowJs: true,
@@ -23,12 +24,17 @@ gulp.task('typescript-client', () => {
 });
 
 gulp.task('typescript-server', () => {
-    return gulp.src('src/server/**/*s')
+    return gulp.src('src/server/**/*')
+        .pipe(sourcemaps.init())
         .pipe(ts({
             outDir: './built/server',
             allowJs: true,
-            target: 'esnext'
+            target: 'esnext',
+            module: "CommonJS",
+            moduleResolution: 'Node',
+            sourceMap: true
         }))
+        .pipe(sourcemaps.write())
         .pipe(gulp.dest('built/server'));
 });
 

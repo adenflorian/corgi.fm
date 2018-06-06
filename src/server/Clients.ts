@@ -1,13 +1,11 @@
 module.exports.Clients = class {
-	constructor() {
-		this._clients = {}
-	}
+	_clients: object = {}
 
-	add(id) {
+	add(id: string) {
 		this._clients[id] = {}
 	}
 
-	remove(id) {
+	remove(id: string) {
 		delete this._clients[id]
 	}
 
@@ -18,4 +16,8 @@ module.exports.Clients = class {
 	getRawClientsObject() {
 		return this._clients
 	}
+}
+
+interface Client {
+	id: string
 }

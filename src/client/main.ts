@@ -24,19 +24,19 @@ class BasicInstrument {
 	}
 }
 
-const gainNode = audioContext.createGain()
-gainNode.connect(audioContext.destination)
+const masterVolume = audioContext.createGain()
+masterVolume.connect(audioContext.destination)
 
-const myInstrument = new BasicInstrument(gainNode)
+const myInstrument = new BasicInstrument(masterVolume)
 myInstrument.panNode.pan.setValueAtTime(-1, audioContext.currentTime)
 
-const otherClientsInstrument = new BasicInstrument(gainNode)
+const otherClientsInstrument = new BasicInstrument(masterVolume)
 otherClientsInstrument.panNode.pan.setValueAtTime(1, audioContext.currentTime)
 
 const offVolume = 0.0
 const onVolume = 0.1
 
-gainNode.gain.value = onVolume
+masterVolume.gain.value = onVolume
 
 const downKeys = {}
 
@@ -50,7 +50,7 @@ window.addEventListener('keydown', (e) => {
 	downKeys[keyname] = true
 
 	const halfSteps = halfStepMap[keyname]
-	const freq = getFrequencyUsingStepsFromA4(halfSteps)
+	const freq = getFrequencyUsingHalfStepsFromA4(halfSteps)
 
 	changeMyOscillatorFrequency(freq)
 
@@ -91,12 +91,12 @@ function isMidiKey(keyname) {
 	return halfStepMap[keyname.toLowerCase()] !== undefined
 }
 
-/** @param {number} steps */
-function getFrequencyUsingStepsFromA4(steps) {
+/** @param {number} halfSteps */
+function getFrequencyUsingHalfStepsFromA4(halfSteps) {
 	const fixedNoteFrequency = 440
 	const twelthRootOf2 = Math.pow(2, 1 / 12) // 1.059463094359...
 
-	return fixedNoteFrequency * Math.pow(twelthRootOf2, steps)
+	return fixedNoteFrequency * Math.pow(twelthRootOf2, halfSteps)
 }
 
 /** @param {number} newFrequency */
@@ -112,7 +112,7 @@ function changeOtherClientsOscillatorFrequency(newFrequency) {
 
 /** @param {number} newFrequency */
 function changeGain(newGain) {
-	gainNode.gain.value = newGain
+	masterVolume.gain.value = newGain
 }
 
 /** @param {string} newText */

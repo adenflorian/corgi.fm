@@ -1,5 +1,6 @@
-const express = require('express')
+const path = require('path')
 const http = require('http')
+const express = require('express')
 const socketIO = require('socket.io')
 const {logger} = require('./logger')
 const {Clients} = require('./Clients')
@@ -9,10 +10,10 @@ const server = http.Server(app)
 const io = socketIO(server)
 
 app.get('/', (req, res) => {
-	res.sendFile(__dirname + '/index.html')
+	res.sendFile(path.join(__dirname, '../client/index.html'))
 })
 
-app.use(express.static('client'))
+app.use(express.static(path.join(__dirname, '../client')))
 
 const clients = new Clients()
 
@@ -24,7 +25,7 @@ io.on('connection', (socket) => {
 	sendClients()
 
 	socket.on('note', (data) => {
-		logger.log(`client: ${socket.id} | ${data.frequency}`)
+		logger.debug(`client: ${socket.id} | ${data.frequency}`)
 		socket.broadcast.emit('note', {...data, clientId: socket.id})
 	})
 

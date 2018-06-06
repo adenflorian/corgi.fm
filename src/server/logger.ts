@@ -3,7 +3,7 @@ const logLevel = {
 	debug: false,
 }
 
-module.exports.logger = {
+export const logger = {
 	log: (...args) => {
 		if (logLevel.log) {
 			console.log(...args)
