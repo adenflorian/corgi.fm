@@ -1,0 +1,16 @@
+#keyboard .white {
+    background-color: white;
+    color: black;
+}
+
+#keyboard .black {
+    background-color: black;
+    color: white;
+}
+
+#keyboard * {
+    height: 64px;
+    width: 32px;
+    display: inline-block;
+    letter-spacing: normal;
+}

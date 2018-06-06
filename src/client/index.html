@@ -6,7 +6,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>sha-mu</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel=StyleSheet href="Keyboard.css" type="text/css" media=screen>
     <script src="/socket.io/socket.io.js"></script>
+    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/redux/4.0.0/redux.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-redux/5.0.7/react-redux.min.js"></script>
     <script src="main.js" type="module"></script>
     <style>
         body {
@@ -18,33 +23,14 @@
             background-color: #002270;
             color: #FFBEA4;
             font-weight: 600;
-            padding: 80px;
+            padding: 40px;
             line-height: 1.2em;
         }
     </style>
 </head>
 
 <body>
-    <div id="info">
-    </div>
-
-    <br />
-
-    <h2>you:</h2>
-
-    <div>
-        <span id="clientId">
-        </span>
-        <span id="frequency">
-            0
-        </span>
-    </div>
-
-    <br />
-
-    <h2>other clients:</h2>
-
-    <div id="otherClients">
+    <div id="react-app">
     </div>
 </body>
 

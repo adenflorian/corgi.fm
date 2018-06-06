@@ -1,5 +1,12 @@
+import {Socket} from 'socket.io'
 import {logger} from './logger.js'
-import {Socket} from 'socket.io';
+import {App} from './app.js';
+import {rootReducer} from './rootReducer.js';
+
+const store = Redux.createStore(
+	rootReducer,
+	__REDUX_DEVTOOLS_EXTENSION__ && __REDUX_DEVTOOLS_EXTENSION__()
+)
 
 declare var io: (x: string) => Socket
 
@@ -49,7 +56,7 @@ window.addEventListener('keydown', (e) => {
 	if (downKeys[keyname]) return
 	downKeys[keyname] = true
 
-	const halfSteps = halfStepMap[keyname]
+	const halfSteps = GetHalfStepsForKey(keyname)
 	const freq = getFrequencyUsingHalfStepsFromA4(halfSteps)
 
 	changeMyOscillatorFrequency(freq)
@@ -67,23 +74,33 @@ window.addEventListener('keyup', (e) => {
 	socket.emit('note', {frequency: 0})
 })
 
+function GetHalfStepsForKey(keyname) {
+	// Add 3 to A4 to get C4
+	// Subtract 12 to get to C3
+	return halfStepMap[keyname] + 3 - 12
+}
+
 const halfStepMap = {
-	a: 0,   // white
-	w: 1,   // black
-	s: 2,   // white
-	e: 3,   // black
-	d: 4,   // white
-	f: 5,   // white
-	t: 6,   // black
-	g: 7,   // white
-	y: 8,   // black
-	h: 9,   // white
-	u: 10,   // black
-	j: 11,   // white
-	k: 12,   // white
-	o: 13,   // black
-	l: 14,   // white
-	p: 15,   // black
+	a: 3,   // white C
+	w: 4,   // black C#
+	s: 5,   // white D
+	e: 6,   // black D#
+	d: 7,   // white E
+	f: 8,   // white F
+	t: 9,   // black F#
+	g: 10,   // white G
+	y: 11,   // black G#
+	h: 12,   // white A
+	u: 13,   // black A#
+	j: 14,   // white B
+	k: 15,   // white C
+	o: 16,   // black C#
+	l: 17,   // white D
+	p: 18,   // black D#
+	';': 19,   // white E
+	// stop at semi colon
+	// single quote opens a quick find box
+	// so we wouldn't want to sue that
 }
 
 /** @param {string} keyname */
@@ -211,6 +228,10 @@ let clients = []
 
 function setClients(newClients) {
 	clients = newClients
+	store.dispatch({
+		type: 'SET_CLIENTS',
+		clients: newClients
+	})
 	renderClients()
 }
 
@@ -229,5 +250,12 @@ function renderClients() {
 		clientsDiv.appendChild(newClientDiv)
 	})
 }
+
+ReactDOM.render(
+	<ReactRedux.Provider store={store}>
+		<App />
+	</ReactRedux.Provider>,
+	document.getElementById('react-app')
+);
 
 
