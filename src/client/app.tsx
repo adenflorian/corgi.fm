@@ -1,60 +1,70 @@
-import {ConnectedKeyboard} from './Keyboard.js';
+import * as React from 'react'
+import {Fragment} from 'react'
+import PropTypes from 'prop-types'
+import {connect} from 'react-redux';
+import {ConnectedKeyboard} from './Keyboard';
 
-export const App = ({otherClients}) => (
-    <React.Fragment>
-        <h2>sha-mu</h2>
-        <div id="info" />
+interface AppProps {
+    otherClients: Array<any>
+}
 
-        <br />
+class App extends React.Component<AppProps, {}> {
+    static defaultProps = {
+        otherClients: []
+    }
 
-        <h2>you:</h2>
+    render() {
+        const {otherClients} = this.props
 
-        <div>
-            <div id="clientId">
-            </div>
-            <div id="frequency">
-                000.00 Hz
-            </div>
-            <ConnectedKeyboard />
-        </div>
+        return (
+            <Fragment>
+                <h2>sha-mu</h2>
+                <div id="info" />
 
-        <br />
+                <br />
 
-        <h2>other clients:</h2>
+                <h2>you:</h2>
 
-        <div id="otherClients">
-        </div>
-
-        <div id="otherClients2">
-            {otherClients.map(client => {
-                return (
-                    <div>
-                        {client.id}
-                        <ConnectedKeyboard />
+                <div>
+                    <div id="clientId">
                     </div>
-                )
-            })}
-            {/* {clients.forEach(client => {
+                    <div id="frequency">
+                        000.00 Hz
+            </div>
+                    <ConnectedKeyboard />
+                </div>
+
+                <br />
+
+                <h2>other clients:</h2>
+
+                <div id="otherClients">
+                </div>
+
+                <div id="otherClients2">
+                    {otherClients.map(client => {
+                        return (
+                            <div key={client.id}>
+                                {client.id}
+                                <ConnectedKeyboard />
+                            </div>
+                        )
+                    })}
+                    {/* {clients.forEach(client => {
                 if (client.id === myClientId) return
                 const newClientDiv = document.createElement('div')
                 newClientDiv.textContent = client.id
                 newClientDiv.textContent += ` ${(clientNoteMap[client.id] && clientNoteMap[client.id].frequency) || 0}`
                 clientsDiv.appendChild(newClientDiv)
             })} */}
-        </div>
-    </React.Fragment>
-)
-
-App.propTypes = {
-    otherClients: PropTypes.array
-}
-
-App.defaultProps = {
-    otherClients: []
+                </div>
+            </Fragment>
+        )
+    }
 }
 
 const mapStateToProps = (state) => ({
     otherClients: state.otherClients
 })
 
-export const ConnectedApp = ReactRedux.connect(mapStateToProps)(App)
+export const ConnectedApp = connect(mapStateToProps)(App)

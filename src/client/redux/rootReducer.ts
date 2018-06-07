@@ -1,6 +1,7 @@
-import {notesReducer} from './notes-redux.js';
+import {combineReducers} from 'redux';
+import {notesReducer} from './notes-redux';
 
-export const rootReducer = Redux.combineReducers({
+export const rootReducer = combineReducers({
     otherClients: otherClientsReducer,
     keys: keysReducer,
     notes: notesReducer,

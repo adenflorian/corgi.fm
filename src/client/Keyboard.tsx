@@ -1,3 +1,7 @@
+import * as React from 'react'
+import {connect} from 'react-redux';
+import './Keyboard.css'
+
 const pianoKeys = Object.freeze({
     'C4': {color: 'white', keyboardKey: 'a'},
     'C#4': {color: 'black', keyboardKey: 'w'},
@@ -39,5 +43,5 @@ const mapStateToProps = (state) => ({
     pressedKeys: state.keys
 })
 
-export const ConnectedKeyboard = ReactRedux.connect(mapStateToProps)(Keyboard)
+export const ConnectedKeyboard = connect(mapStateToProps)(Keyboard)
 

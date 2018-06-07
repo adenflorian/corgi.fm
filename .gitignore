@@ -1,6 +1,8 @@
 secrets.*
 *.gz
 built
+dist
+.cache
 
 # Logs
 logs

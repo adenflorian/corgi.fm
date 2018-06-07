@@ -1,22 +1,19 @@
-import {Socket} from 'socket.io'
-import {logger} from './logger.js'
-import {ConnectedApp} from './app.js'
-import {rootReducer} from './redux/rootReducer.js'
-import {StoreCreator} from 'redux';
-import {selectPressedNotes} from './redux/notes-redux.js';
+import * as React from 'react'
+import ReactDOM from 'react-dom';
+import {createStore} from 'redux';
+import {Provider} from 'react-redux';
+import io from 'socket.io-client'
+import {logger} from './logger'
+import {ConnectedApp} from './app'
+import {rootReducer} from './redux/rootReducer'
+import {selectPressedNotes} from './redux/notes-redux';
 
-interface Redux {
-	createStore: StoreCreator
-}
+declare const __REDUX_DEVTOOLS_EXTENSION__: () => any
 
-declare const Redux: Redux, __REDUX_DEVTOOLS_EXTENSION__: () => any
-
-const store = Redux.createStore(
+const store = createStore(
 	rootReducer,
-	typeof __REDUX_DEVTOOLS_EXTENSION__ !== 'undefined' && __REDUX_DEVTOOLS_EXTENSION__()
+	typeof __REDUX_DEVTOOLS_EXTENSION__ !== 'undefined' && __REDUX_DEVTOOLS_EXTENSION__(),
 )
-
-declare var io: (x: string) => Socket
 
 const socket = io('/')
 
@@ -332,9 +329,9 @@ function renderClients() {
 }
 
 ReactDOM.render(
-	<ReactRedux.Provider store={store}>
+	<Provider store={store}>
 		<ConnectedApp />
-	</ReactRedux.Provider>,
+	</Provider>,
 	document.getElementById('react-app')
 );
 
