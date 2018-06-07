@@ -20,13 +20,16 @@ gulp.task('clean', () => {
 
 gulp.task('typescript-client', () => {
 	return gulp.src(['src/client/**/*.ts', 'src/client/**/*.tsx'])
+		.pipe(sourcemaps.init())
 		.pipe(ts({
 			outDir: './built/client',
 			allowJs: true,
 			target: 'esnext',
 			jsx: 'react',
 			moduleResolution: 'Node',
+			sourceMap: true,
 		}))
+		.pipe(sourcemaps.write())
 		.pipe(gulp.dest('built/client'))
 })
 

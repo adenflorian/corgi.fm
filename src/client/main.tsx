@@ -1,7 +1,15 @@
 import {Socket} from 'socket.io'
 import {logger} from './logger.js'
-import {App} from './app.js'
-import {rootReducer} from './rootReducer.js'
+import {ConnectedApp} from './app.js'
+import {rootReducer} from './redux/rootReducer.js'
+import {StoreCreator} from 'redux';
+import {selectPressedNotes} from './redux/notes-redux.js';
+
+interface Redux {
+	createStore: StoreCreator
+}
+
+declare const Redux: Redux, __REDUX_DEVTOOLS_EXTENSION__: () => any
 
 const store = Redux.createStore(
 	rootReducer,
@@ -49,23 +57,70 @@ const downKeys = {}
 
 const clientNoteMap = {}
 
+const keyToNoteMap = {
+	a: 'C',
+	w: 'C#',
+	s: 'D',
+	e: 'D#',
+	d: 'E',
+	f: 'F',
+	t: 'F#',
+	g: 'G',
+	y: 'G#',
+	h: 'A',
+	u: 'A#',
+	j: 'B',
+}
+
+const noteToHalfStepMap = {
+	'C': 3,
+	'C#': 4,
+	'D': 5,
+	'D#': 6,
+	'E': 7,
+	'F': 8,
+	'F#': 9,
+	'G': 10,
+	'G#': 11,
+	'A': 12,
+	'A#': 13,
+	'B': 14,
+}
+
+store.subscribe(() => {
+	const state: any = store.getState()
+	const pressedNotes = selectPressedNotes(state.notes)
+
+	if (pressedNotes.length === 0) {
+		changeMyOscillatorFrequency(0)
+		socket.emit('note', {frequency: 0})
+	} else {
+		const note = pressedNotes[0]
+		const halfSteps = noteToHalfStepMap[note]
+		const freq = getFrequencyUsingHalfStepsFromA4(halfSteps)
+
+		changeMyOscillatorFrequency(freq)
+
+		socket.emit('note', {frequency: freq})
+	}
+})
+
 window.addEventListener('keydown', (e) => {
 	store.dispatch({
 		type: 'KEY_DOWN',
 		key: e.key
 	})
+
 	const keyname = e.key
 
 	if (isMidiKey(keyname) === false) return
 	if (downKeys[keyname]) return
 	downKeys[keyname] = true
 
-	const halfSteps = GetHalfStepsForKey(keyname)
-	const freq = getFrequencyUsingHalfStepsFromA4(halfSteps)
-
-	changeMyOscillatorFrequency(freq)
-
-	socket.emit('note', {frequency: freq})
+	store.dispatch({
+		type: 'NOTE_PRESSED',
+		note: keyToNoteMap[keyname]
+	})
 })
 
 window.addEventListener('keyup', (e) => {
@@ -74,12 +129,14 @@ window.addEventListener('keyup', (e) => {
 		key: e.key
 	})
 	const keyname = e.key
+	if (isMidiKey(keyname) === false) return
 
 	downKeys[keyname] = false
 
-	changeMyOscillatorFrequency(0)
-
-	socket.emit('note', {frequency: 0})
+	store.dispatch({
+		type: 'NOTE_UP',
+		note: keyToNoteMap[keyname]
+	})
 })
 
 function GetHalfStepsForKey(keyname) {
@@ -87,6 +144,21 @@ function GetHalfStepsForKey(keyname) {
 	// Subtract 12 to get to C3
 	return halfStepMap[keyname] + 3 - 12
 }
+
+const pianoKeys = Object.freeze({
+	'C4': {color: 'white', keyboardKey: 'a'},
+	'C#4': {color: 'black', keyboardKey: 'w'},
+	'D4': {color: 'white', keyboardKey: 's'},
+	'D#4': {color: 'black', keyboardKey: 'e'},
+	'E4': {color: 'white', keyboardKey: 'd'},
+	'F4': {color: 'white', keyboardKey: 'f'},
+	'F#4': {color: 'black', keyboardKey: 't'},
+	'G4': {color: 'white', keyboardKey: 'g'},
+	'G#4': {color: 'black', keyboardKey: 'y'},
+	'A4': {color: 'white', keyboardKey: 'h'},
+	'A#4': {color: 'black', keyboardKey: 'u'},
+	'B4': {color: 'white', keyboardKey: 'j'},
+})
 
 const halfStepMap = {
 	a: 3,   // white C
@@ -261,7 +333,7 @@ function renderClients() {
 
 ReactDOM.render(
 	<ReactRedux.Provider store={store}>
-		<App />
+		<ConnectedApp />
 	</ReactRedux.Provider>,
 	document.getElementById('react-app')
 );

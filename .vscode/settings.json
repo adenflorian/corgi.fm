@@ -1,4 +1,6 @@
 {
     "eslint.autoFixOnSave": true,
-    "files.eol": "\n"
+    "files.eol": "\n",
+    "javascript.preferences.quoteStyle": "single",
+    "typescript.preferences.quoteStyle": "single"
 }

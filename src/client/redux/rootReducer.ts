@@ -1,9 +1,12 @@
+import {notesReducer} from './notes-redux.js';
+
 export const rootReducer = Redux.combineReducers({
     otherClients: otherClientsReducer,
     keys: keysReducer,
+    notes: notesReducer,
 })
 
-function otherClientsReducer(state = {}, action) {
+function otherClientsReducer(state = [], action) {
     switch (action.type) {
         case 'SET_CLIENTS':
             return action.clients

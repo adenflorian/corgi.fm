@@ -11,11 +11,11 @@ const pianoKeys = Object.freeze({
     'A4': {color: 'white', keyboardKey: 'h'},
     'A#4': {color: 'black', keyboardKey: 'u'},
     'B4': {color: 'white', keyboardKey: 'j'},
-    'C5': {color: 'white', keyboardKey: 'k'},
-    'C#5': {color: 'black', keyboardKey: 'o'},
-    'D5': {color: 'white', keyboardKey: 'l'},
-    'D#5': {color: 'black', keyboardKey: 'p'},
-    'E5': {color: 'white', keyboardKey: ';'},
+    // 'C5': {color: 'white', keyboardKey: 'k'},
+    // 'C#5': {color: 'black', keyboardKey: 'o'},
+    // 'D5': {color: 'white', keyboardKey: 'l'},
+    // 'D#5': {color: 'black', keyboardKey: 'p'},
+    // 'E5': {color: 'white', keyboardKey: ';'},
 })
 
 export const Keyboard = ({pressedKeys}) => (
