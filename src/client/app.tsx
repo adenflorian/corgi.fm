@@ -1,4 +1,4 @@
-import {Keyboard} from './Keyboard.js';
+import {ConnectedKeyboard} from './Keyboard.js';
 
 export const App = () => (
     <React.Fragment>
@@ -15,7 +15,7 @@ export const App = () => (
             <span id="frequency">
                 0
             </span>
-            <Keyboard />
+            <ConnectedKeyboard />
         </div>
 
         <br />

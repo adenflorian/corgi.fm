@@ -1,11 +1,11 @@
 import {Socket} from 'socket.io'
 import {logger} from './logger.js'
-import {App} from './app.js';
-import {rootReducer} from './rootReducer.js';
+import {App} from './app.js'
+import {rootReducer} from './rootReducer.js'
 
 const store = Redux.createStore(
 	rootReducer,
-	__REDUX_DEVTOOLS_EXTENSION__ && __REDUX_DEVTOOLS_EXTENSION__()
+	typeof __REDUX_DEVTOOLS_EXTENSION__ !== 'undefined' && __REDUX_DEVTOOLS_EXTENSION__()
 )
 
 declare var io: (x: string) => Socket
@@ -50,6 +50,10 @@ const downKeys = {}
 const clientNoteMap = {}
 
 window.addEventListener('keydown', (e) => {
+	store.dispatch({
+		type: 'KEY_DOWN',
+		key: e.key
+	})
 	const keyname = e.key
 
 	if (isMidiKey(keyname) === false) return
@@ -65,6 +69,10 @@ window.addEventListener('keydown', (e) => {
 })
 
 window.addEventListener('keyup', (e) => {
+	store.dispatch({
+		type: 'KEY_UP',
+		key: e.key
+	})
 	const keyname = e.key
 
 	downKeys[keyname] = false

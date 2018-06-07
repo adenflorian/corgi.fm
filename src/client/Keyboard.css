@@ -14,3 +14,7 @@
     display: inline-block;
     letter-spacing: normal;
 }
+
+#keyboard .pressed {
+    background-color: red;
+}

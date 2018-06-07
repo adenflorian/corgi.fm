@@ -4,7 +4,7 @@
   "main": "server.js",
   "license": "UNLICENSED",
   "scripts": {
-    "start": "yarn build && concurrently --names \"build,server\" \"yarn watch\" \"nodemon --inspect built/server/server.js\"",
+    "start": "yarn build && concurrently --names \"build,server\" \"yarn watch\" \"nodemon built/server/server.js\"",
     "watch": "watch \"yarn build\" src",
     "start-prod": "pm2 start server/server.js",
     "stop-prod": "pm2 stop server/server.js",
