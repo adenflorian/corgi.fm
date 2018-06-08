@@ -5,7 +5,11 @@ import {IOtherClient, otherClientsReducer} from './other-clients-redux'
 import {websocketMiddleware} from './websocket-middleware'
 import {IWebsocketState, websocketReducer} from './websocket-redux'
 
-declare const __REDUX_DEVTOOLS_EXTENSION__: () => () => any
+declare global {
+	interface Window {__REDUX_DEVTOOLS_EXTENSION_COMPOSE__: any}
+}
+
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
 
 export function configureStore() {
 	return createStore(
@@ -15,12 +19,11 @@ export function configureStore() {
 			notes: notesReducer,
 			websocket: websocketReducer,
 		}),
-		compose(
+		composeEnhancers(
 			applyMiddleware(
 				websocketMiddleware,
 				notesMiddleware,
 			),
-			typeof __REDUX_DEVTOOLS_EXTENSION__ === 'function' && __REDUX_DEVTOOLS_EXTENSION__(),
 		),
 	)
 }

@@ -38,7 +38,8 @@
             "allow-leading-underscore",
             "allow-pascal-case"
         ],
-        "no-unused-variable": true
+        "no-unused-variable": true,
+        "interface-name": false
     },
     "rulesDirectory": []
 }
