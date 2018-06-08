@@ -1,0 +1,12 @@
+{
+	"compilerOptions": {
+		"jsx": "react",
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"experimentalDecorators": true,
+		"sourceMap": true
+	},
+	"include": [
+		"src/**/*.ts*"
+	]
+}

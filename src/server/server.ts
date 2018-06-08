@@ -1,3 +1,4 @@
+import * as animal from 'animal-id'
 import * as express from 'express'
 import * as http from 'http'
 import * as path from 'path'
@@ -9,7 +10,7 @@ const app = express()
 const server = new http.Server(app)
 const io = socketIO(server)
 
-app.get('/', (req, res) => {
+app.get('/', (_, res) => {
 	res.sendFile(path.join(__dirname, '../client/index.html'))
 })
 
@@ -35,6 +36,12 @@ io.on('connection', socket => {
 		sendClients()
 	})
 })
+
+let nextId = 1
+
+io.engine.generateId = () => {
+	return animal.getId() + '-' + nextId++
+}
 
 function sendClients() {
 	logger.debug('sending clients info to all clients')

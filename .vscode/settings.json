@@ -1,18 +1,30 @@
 {
     "eslint.autoFixOnSave": true,
     "tslint.autoFixOnSave": [
-        "semicolon",
+        "array-type",
+        "arrow-parens",
+        "indent",
+        "no-consecutive-blank-lines",
+        "object-literal-key-quotes",
         "ordered-imports",
         "quotemark",
-        "indent",
-        "trailing-comma",
-        "object-literal-key-quotes",
-        "arrow-parens",
-        "no-consecutive-blank-lines",
-        "array-type"
+        "semicolon",
+        "space-before-function-paren",
+        "trailing-comma"
     ],
     "files.eol": "\n",
     "javascript.preferences.quoteStyle": "single",
     "typescript.preferences.quoteStyle": "single",
-    "editor.insertSpaces": false
+    "editor.insertSpaces": false,
+    "search.exclude": {
+        "**/node_modules": true,
+        "**/bower_components": true,
+        "built/**/*": true
+    },
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": true
+    },
+    "tslint.jsEnable": true,
+    "tslint.packageManager": "yarn",
+    "tslint.run": "onType"
 }

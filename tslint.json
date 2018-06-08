@@ -37,7 +37,8 @@
             "check-format",
             "allow-leading-underscore",
             "allow-pascal-case"
-        ]
+        ],
+        "no-unused-variable": true
     },
     "rulesDirectory": []
 }
