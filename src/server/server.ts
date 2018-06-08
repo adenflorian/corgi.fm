@@ -1,12 +1,12 @@
-const path = require('path')
-const http = require('http')
-const express = require('express')
-const socketIO = require('socket.io')
-const {logger} = require('./logger')
-const {Clients} = require('./Clients')
+import * as express from 'express'
+import * as http from 'http'
+import * as path from 'path'
+import * as socketIO from 'socket.io'
+import {Clients} from './Clients'
+import {logger} from './logger'
 
 const app = express()
-const server = http.Server(app)
+const server = new http.Server(app)
 const io = socketIO(server)
 
 app.get('/', (req, res) => {
@@ -17,14 +17,14 @@ app.use(express.static(path.join(__dirname, '../client')))
 
 const clients = new Clients()
 
-io.on('connection', (socket) => {
+io.on('connection', socket => {
 	logger.log('new connection | ', socket.id)
 
 	clients.add(socket.id)
 
 	sendClients()
 
-	socket.on('note', (data) => {
+	socket.on('note', data => {
 		logger.debug(`client: ${socket.id} | ${data.frequency}`)
 		socket.broadcast.emit('note', {...data, clientId: socket.id})
 	})
@@ -39,7 +39,7 @@ io.on('connection', (socket) => {
 function sendClients() {
 	logger.debug('sending clients info to all clients')
 	io.local.emit('clients', {
-		clients: clients.toArray()
+		clients: clients.toArray(),
 	})
 }
 
@@ -48,5 +48,3 @@ const port = 80
 server.listen(port)
 
 logger.log('listening on port', port)
-
-

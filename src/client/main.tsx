@@ -1,12 +1,12 @@
 import * as React from 'react'
-import ReactDOM from 'react-dom';
-import {createStore} from 'redux';
-import {Provider} from 'react-redux';
+import ReactDOM from 'react-dom'
+import {Provider} from 'react-redux'
+import {createStore} from 'redux'
 import io from 'socket.io-client'
-import {logger} from './logger'
 import {ConnectedApp} from './app'
+import {logger} from './logger'
+import {selectPressedNotes} from './redux/notes-redux'
 import {rootReducer} from './redux/rootReducer'
-import {selectPressedNotes} from './redux/notes-redux';
 
 declare const __REDUX_DEVTOOLS_EXTENSION__: () => any
 
@@ -22,8 +22,8 @@ const socket = io('/')
 const audioContext = new AudioContext()
 
 class BasicInstrument {
-	oscillator = audioContext.createOscillator()
-	panNode = audioContext.createStereoPanner()
+	public oscillator = audioContext.createOscillator()
+	public panNode = audioContext.createStereoPanner()
 
 	constructor(destination) {
 		this.oscillator.type = 'sawtooth'
@@ -96,16 +96,16 @@ store.subscribe(() => {
 		const halfSteps = noteToHalfStepMap[note]
 		const freq = getFrequencyUsingHalfStepsFromA4(halfSteps)
 
-		changeMyOscillatorFrequency(freq)
+		changeMyOscillatorFrequency(freq || 0)
 
 		socket.emit('note', {frequency: freq})
 	}
 })
 
-window.addEventListener('keydown', (e) => {
+window.addEventListener('keydown', e => {
 	store.dispatch({
 		type: 'KEY_DOWN',
-		key: e.key
+		key: e.key,
 	})
 
 	const keyname = e.key
@@ -116,14 +116,14 @@ window.addEventListener('keydown', (e) => {
 
 	store.dispatch({
 		type: 'NOTE_PRESSED',
-		note: keyToNoteMap[keyname]
+		note: keyToNoteMap[keyname],
 	})
 })
 
-window.addEventListener('keyup', (e) => {
+window.addEventListener('keyup', e => {
 	store.dispatch({
 		type: 'KEY_UP',
-		key: e.key
+		key: e.key,
 	})
 	const keyname = e.key
 	if (isMidiKey(keyname) === false) return
@@ -132,7 +132,7 @@ window.addEventListener('keyup', (e) => {
 
 	store.dispatch({
 		type: 'NOTE_UP',
-		note: keyToNoteMap[keyname]
+		note: keyToNoteMap[keyname],
 	})
 })
 
@@ -158,22 +158,22 @@ const pianoKeys = Object.freeze({
 })
 
 const halfStepMap = {
-	a: 3,   // white C
-	w: 4,   // black C#
-	s: 5,   // white D
-	e: 6,   // black D#
-	d: 7,   // white E
-	f: 8,   // white F
-	t: 9,   // black F#
-	g: 10,   // white G
-	y: 11,   // black G#
-	h: 12,   // white A
-	u: 13,   // black A#
-	j: 14,   // white B
-	k: 15,   // white C
-	o: 16,   // black C#
-	l: 17,   // white D
-	p: 18,   // black D#
+	'a': 3,   // white C
+	'w': 4,   // black C#
+	's': 5,   // white D
+	'e': 6,   // black D#
+	'd': 7,   // white E
+	'f': 8,   // white F
+	't': 9,   // black F#
+	'g': 10,   // white G
+	'y': 11,   // black G#
+	'h': 12,   // white A
+	'u': 13,   // black A#
+	'j': 14,   // white B
+	'k': 15,   // white C
+	'o': 16,   // black C#
+	'l': 17,   // white D
+	'p': 18,   // black D#
 	';': 19,   // white E
 	// stop at semi colon
 	// single quote opens a quick find box
@@ -223,22 +223,22 @@ let myClientId
 		setClientId(socket.id)
 	})
 
-	socket.on('disconnect', (reason) => {
+	socket.on('disconnect', reason => {
 		setInfo('disconnected: ' + reason)
 		logger.log('disconnected: ' + reason)
 	})
 
-	socket.on('reconnect_attempt', (attemptNumber) => {
+	socket.on('reconnect_attempt', attemptNumber => {
 		setInfo('reconnect_attempt: ' + attemptNumber)
 		logger.log('reconnect_attempt: ' + attemptNumber)
 	})
 
-	socket.on('reconnecting', (attemptNumber) => {
+	socket.on('reconnecting', attemptNumber => {
 		setInfo('reconnecting: ' + attemptNumber)
 		logger.log('reconnecting: ' + attemptNumber)
 	})
 
-	socket.on('reconnect_error', (error) => {
+	socket.on('reconnect_error', error => {
 		setInfo('reconnect_error: ' + JSON.stringify(error, null, 2))
 		logger.log('reconnect_error: ' + JSON.stringify(error, null, 2))
 	})
@@ -253,44 +253,43 @@ let myClientId
 		logger.log('ping')
 	})
 
-	socket.on('pong', (latency) => {
+	socket.on('pong', latency => {
 		setInfo('pong - latency: ' + latency)
 		logger.log('pong - latency: ' + latency)
 	})
 
-	socket.on('reconnect', (attemptNumber) => {
+	socket.on('reconnect', attemptNumber => {
 		setInfo('reconnected: ' + attemptNumber)
 		logger.log('reconnected: ' + attemptNumber)
 	})
 
-	socket.on('connect_timeout', (timeout) => {
+	socket.on('connect_timeout', timeout => {
 		setInfo('connect_timeout: ' + timeout)
 		logger.log('connect_timeout: ' + timeout)
 	})
 
-	socket.on('error', (error) => {
+	socket.on('error', error => {
 		setInfo('error: ' + JSON.stringify(error, null, 2))
 		logger.log('error: ' + JSON.stringify(error, null, 2))
 	})
 
-	socket.on('connect_error', (error) => {
+	socket.on('connect_error', error => {
 		setInfo('connection error: ' + JSON.stringify(error, null, 2))
 		logger.log('connection error: ' + JSON.stringify(error, null, 2))
 	})
 
-	socket.on('clients', ({clients}) => {
-		logger.log('clients: ', clients)
-		setClients(clients)
+	socket.on('clients', data => {
+		logger.log('clients: ', data.clients)
+		setClients(data.clients)
 	})
 
-	socket.on('note', (note) => {
+	socket.on('note', note => {
 		logger.debug('note: ', note)
 		clientNoteMap[note.clientId] = note
 		renderClients()
 		changeOtherClientsOscillatorFrequency(note.frequency)
 	})
 }
-
 
 function setInfo(newInfo) {
 	document.querySelector('#info').textContent = newInfo
@@ -307,7 +306,7 @@ function setClients(newClients) {
 	clients = newClients
 	store.dispatch({
 		type: 'SET_CLIENTS',
-		clients: newClients
+		clients: newClients,
 	})
 	renderClients()
 }
@@ -320,7 +319,7 @@ function renderClients() {
 	}
 
 	clients.forEach(client => {
-		if (client.id === myClientId) return
+		if (client.id === myClientId) {return }
 		const newClientDiv = document.createElement('div')
 		newClientDiv.textContent = client.id
 		newClientDiv.textContent += ` ${(clientNoteMap[client.id] && clientNoteMap[client.id].frequency) || 0}`
@@ -332,7 +331,5 @@ ReactDOM.render(
 	<Provider store={store}>
 		<ConnectedApp />
 	</Provider>,
-	document.getElementById('react-app')
-);
-
-
+	document.getElementById('react-app'),
+)

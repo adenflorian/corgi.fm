@@ -1,6 +1,18 @@
 {
     "eslint.autoFixOnSave": true,
+    "tslint.autoFixOnSave": [
+        "semicolon",
+        "ordered-imports",
+        "quotemark",
+        "indent",
+        "trailing-comma",
+        "object-literal-key-quotes",
+        "arrow-parens",
+        "no-consecutive-blank-lines",
+        "array-type"
+    ],
     "files.eol": "\n",
     "javascript.preferences.quoteStyle": "single",
-    "typescript.preferences.quoteStyle": "single"
+    "typescript.preferences.quoteStyle": "single",
+    "editor.insertSpaces": false
 }
