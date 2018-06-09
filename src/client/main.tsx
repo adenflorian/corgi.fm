@@ -60,7 +60,7 @@ store.subscribe(() => {
 // 	const state: IAppState = store.getState()
 // 	const pressedMidiNotes = state.otherClients.forEach(callbackfn)
 
-// 	myInstrument.setMidiNotes(pressedMidiNotes)
+// 	otherClientsInstrument.setMidiNotes(pressedMidiNotes)
 // })
 
 /** @param {number} newFrequency */

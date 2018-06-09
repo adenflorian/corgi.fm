@@ -1,3 +1,4 @@
+import {AnyAction, Dispatch, Store} from 'redux'
 import {IAppState} from './configureStore'
 import {midiKeyPressed, midiKeyUp} from './midi-redux'
 import {virtualKeyPressed, virtualKeyUp} from './virtual-keyboard-redux'
@@ -107,7 +108,7 @@ export const midiKeyToNote = Object.freeze({
 	12: 'B',
 })
 
-export const virtualMidiKeyboardMiddleware = store => next => action => {
+export const virtualMidiKeyboardMiddleware = (store: Store) => (next: Dispatch) => (action: AnyAction) => {
 	next(action)
 
 	if (action.type === KEY_DOWN) {
@@ -117,7 +118,7 @@ export const virtualMidiKeyboardMiddleware = store => next => action => {
 	}
 }
 
-function onKeyDown(e, store) {
+function onKeyDown(e, store: Store) {
 	if (e.repeat) return
 
 	const keyname = e.key

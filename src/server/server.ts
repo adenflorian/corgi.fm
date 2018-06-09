@@ -25,14 +25,12 @@ io.on('connection', socket => {
 
 	sendClients()
 
-	socket.on('note', data => {
-		logger.debug(`client: ${socket.id} | ${data.frequency}`)
-		socket.broadcast.emit('note', {...data, clientId: socket.id})
-	})
-
-	socket.on('notes', notes => {
-		logger.debug(`client: ${socket.id} | `, notes)
-		socket.broadcast.emit('notes', {notes, clientId: socket.id})
+	socket.on('notes', notespayload => {
+		logger.log(`client: ${socket.id} | `, notespayload)
+		socket.broadcast.emit('notes', {
+			notes: notespayload.notes,
+			clientId: socket.id,
+		})
 	})
 
 	socket.on('disconnect', () => {

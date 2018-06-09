@@ -7,6 +7,7 @@ import {IAppState} from './redux/configureStore'
 interface IAppProps {
 	myClientId: string
 	otherClients: any[]
+	info: string
 }
 
 class App extends React.Component<IAppProps, {}> {
@@ -29,9 +30,6 @@ class App extends React.Component<IAppProps, {}> {
 					<div>
 						{myClientId}
 					</div>
-					<div id="frequency">
-						000.00 Hz
-					</div>
 					<ConnectedKeyboard owner="me" />
 				</div>
 
@@ -44,9 +42,6 @@ class App extends React.Component<IAppProps, {}> {
 								<div key={client.id}>
 									<div>
 										{client.id}
-									</div>
-									<div>
-										{client.note ? client.note.frequency || 0 : 0}
 									</div>
 									<ConnectedKeyboard owner={client.id} />
 								</div>

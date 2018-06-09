@@ -1,7 +1,7 @@
 import * as io from 'socket.io-client'
 import {logger} from './logger'
 import {IMidiNote} from './MidiNote'
-import {OTHER_CLIENT_NOTE, OTHER_CLIENT_NOTES, SET_CLIENTS} from './redux/other-clients-redux'
+import {OTHER_CLIENT_NOTES, SET_CLIENTS} from './redux/other-clients-redux'
 import {SET_MY_CLIENT_ID, setInfo, setSocket} from './redux/websocket-redux'
 
 export function setupWebsocket(store, otherClientsInstrument) {
@@ -53,18 +53,8 @@ export function setupWebsocket(store, otherClientsInstrument) {
 		})
 	}
 
-	socket.on('note', note => {
-		logger.debug('note: ', note)
-
-		store.dispatch({
-			type: OTHER_CLIENT_NOTE,
-			note,
-			clientId: note.clientId,
-		})
-	})
-
 	socket.on('notes', (data: NotesPayload) => {
-		logger.debug('notes: ', data)
+		logger.log('notes: ', data)
 		setMidiForOtherClientsInstrument(data.notes)
 
 		store.dispatch({
