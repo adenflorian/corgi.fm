@@ -4,7 +4,7 @@ const ts = require('gulp-typescript')
 const sourcemaps = require('gulp-sourcemaps')
 
 gulp.task('clean', () => {
-	return gulp.src(['built', 'dist', '.cache'])
+	return gulp.src(['built', '.cache'])
 		.pipe(clean())
 })
 

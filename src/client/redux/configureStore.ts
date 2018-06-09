@@ -1,9 +1,21 @@
 import {applyMiddleware, combineReducers, compose, createStore} from 'redux'
-import {notesMiddleware} from './notes-middleware'
+import {inputMiddleware} from './input-middleware'
+import {keysReducer} from './keys-redux'
+import {IMidiState, midiReducer} from './midi-redux'
 import {notesReducer} from './notes-redux'
 import {IOtherClient, otherClientsReducer} from './other-clients-redux'
+import {virtualKeyboardsReducer} from './virtual-keyboard-redux'
+import {virtualMidiKeyboardMiddleware} from './virtual-midi-keyboard-middleware'
 import {websocketMiddleware} from './websocket-middleware'
 import {IWebsocketState, websocketReducer} from './websocket-redux'
+
+export interface IAppState {
+	otherClients: IOtherClient[]
+	keys: object
+	midi: IMidiState
+	notes: object
+	websocket: IWebsocketState
+}
 
 declare global {
 	interface Window {__REDUX_DEVTOOLS_EXTENSION_COMPOSE__: any}
@@ -16,39 +28,17 @@ export function configureStore() {
 		combineReducers({
 			otherClients: otherClientsReducer,
 			keys: keysReducer,
+			midi: midiReducer,
 			notes: notesReducer,
 			websocket: websocketReducer,
+			virtualKeyboards: virtualKeyboardsReducer,
 		}),
 		composeEnhancers(
 			applyMiddleware(
 				websocketMiddleware,
-				notesMiddleware,
+				inputMiddleware,
+				virtualMidiKeyboardMiddleware,
 			),
 		),
 	)
-}
-
-export interface IAppState {
-	otherClients: IOtherClient[]
-	keys: object
-	notes: object
-	websocket: IWebsocketState
-}
-
-export const rootReducer = combineReducers({
-	otherClients: otherClientsReducer,
-	keys: keysReducer,
-	notes: notesReducer,
-	websocket: websocketReducer,
-})
-
-function keysReducer(state = {}, action) {
-	switch (action.type) {
-		case 'KEY_DOWN':
-			return {...state, [action.e.key]: true}
-		case 'KEY_UP':
-			return {...state, [action.e.key]: false}
-		default:
-			return state
-	}
 }

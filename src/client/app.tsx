@@ -46,7 +46,7 @@ class App extends React.Component<IAppProps, {}> {
 										{client.id}
 									</div>
 									<div>
-										{client.note ? client.note.frequency : 0}
+										{client.note ? client.note.frequency || 0 : 0}
 									</div>
 									<ConnectedKeyboard owner={client.id} />
 								</div>

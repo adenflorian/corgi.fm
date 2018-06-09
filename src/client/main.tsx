@@ -1,67 +1,14 @@
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
+import {hot} from 'react-hot-loader'
 import {Provider} from 'react-redux'
-import io from 'socket.io-client'
 import {ConnectedApp} from './app'
-import {logger} from './logger'
+import {BasicInstrument} from './BasicInstrument'
 import {configureStore, IAppState} from './redux/configureStore'
-import {getFrequencyUsingHalfStepsFromA4, noteToHalfStepMap} from './redux/notes-middleware'
-import {selectPressedNotes} from './redux/notes-redux'
-import {OTHER_CLIENT_NOTE, SET_CLIENTS} from './redux/other-clients-redux'
-import {SET_MY_CLIENT_ID, setInfo, setSocket} from './redux/websocket-redux'
+import {selectPressedMidiNotes} from './redux/midi-redux'
+import {setupWebsocket} from './websocket'
 
 const store = configureStore()
-
-const socket = io('/')
-
-store.dispatch(setSocket(socket))
-
-// Might be needed for safari
-// const AudioContext = window.AudioContext || window.webkitAudioContext
-const audioContext = new AudioContext()
-
-const onVolume = 0.1
-
-class BasicInstrument {
-	public oscillator = audioContext.createOscillator()
-	public panNode = audioContext.createStereoPanner()
-
-	constructor(destination) {
-		this.oscillator.type = 'square'
-		this.oscillator.frequency.value = 0
-
-		this.oscillator.connect(this.panNode)
-			.connect(destination)
-
-		this.oscillator.start()
-	}
-}
-
-const masterVolume = audioContext.createGain()
-masterVolume.connect(audioContext.destination)
-
-const myInstrument = new BasicInstrument(masterVolume)
-myInstrument.panNode.pan.setValueAtTime(-1, audioContext.currentTime)
-
-const otherClientsInstrument = new BasicInstrument(masterVolume)
-otherClientsInstrument.panNode.pan.setValueAtTime(1, audioContext.currentTime)
-
-changeMasterVolume(onVolume)
-
-store.subscribe(() => {
-	const state: IAppState = store.getState()
-	const pressedNotes = selectPressedNotes(state.notes)
-
-	if (pressedNotes.length === 0) {
-		changeMyOscillatorFrequency(0)
-	} else {
-		const note = pressedNotes[0]
-		const halfSteps = noteToHalfStepMap[note]
-		const frequency = getFrequencyUsingHalfStepsFromA4(halfSteps)
-
-		changeMyOscillatorFrequency(frequency || 0)
-	}
-})
 
 window.addEventListener('keydown', e => {
 	if (e.repeat) return
@@ -79,125 +26,75 @@ window.addEventListener('keyup', e => {
 	})
 })
 
-/** @param {number} newFrequency */
-function changeMyOscillatorFrequency(newFrequency) {
-	myInstrument.oscillator.frequency.value = newFrequency
-	setFrequencyDivText(newFrequency)
-}
+// Might be needed for safari
+// const AudioContext = window.AudioContext || window.webkitAudioContext
+const audioContext = new AudioContext()
 
-/** @param {number} newFrequency */
-function changeOtherClientsOscillatorFrequency(newFrequency) {
-	otherClientsInstrument.oscillator.frequency.value = newFrequency
-}
+const onVolume = 0.1
+
+const masterVolume = audioContext.createGain()
+masterVolume.connect(audioContext.destination)
+
+const myInstrument = new BasicInstrument({
+	destination: masterVolume,
+	audioContext,
+})
+myInstrument.setPan(-1)
+
+const otherClientsInstrument = new BasicInstrument({
+	destination: masterVolume,
+	audioContext,
+})
+otherClientsInstrument.setPan(1)
+
+changeMasterVolume(onVolume)
+
+store.subscribe(() => {
+	const state: IAppState = store.getState()
+	const pressedMidiNotes = selectPressedMidiNotes(state.midi)
+
+	myInstrument.setMidiNotes(pressedMidiNotes)
+})
+
+// store.subscribe(() => {
+// 	const state: IAppState = store.getState()
+// 	const pressedMidiNotes = state.otherClients.forEach(callbackfn)
+
+// 	myInstrument.setMidiNotes(pressedMidiNotes)
+// })
 
 /** @param {number} newFrequency */
 function changeMasterVolume(newGain) {
 	masterVolume.gain.value = newGain
 }
 
-/** @param {string} newText */
-function setFrequencyDivText(newText) {
-	document.querySelector('#frequency').textContent = newText
+const socket = setupWebsocket(store, otherClientsInstrument)
+
+declare global {
+	interface NodeModule {
+		hot: {
+			dispose: (_: () => any) => any,
+			accept: (_: () => any) => any,
+		}
+	}
 }
 
-socket.on('connect', () => {
-	dispatchSetInfo('connected')
-	logger.log('connected')
-	setClientId(socket.id)
-})
-
-function setClientId(newClientId) {
-	store.dispatch({
-		type: SET_MY_CLIENT_ID,
-		id: newClientId,
+if (module.hot) {
+	module.hot.dispose(() => {
+		socket.disconnect()
 	})
 }
 
-socket.on('disconnect', reason => {
-	dispatchSetInfo('disconnected: ' + reason)
-	logger.log('disconnected: ' + reason)
-})
+renderApp()
 
-socket.on('reconnect_attempt', attemptNumber => {
-	dispatchSetInfo('reconnect_attempt: ' + attemptNumber)
-	logger.log('reconnect_attempt: ' + attemptNumber)
-})
+module.hot.accept(renderApp)
 
-socket.on('reconnecting', attemptNumber => {
-	dispatchSetInfo('reconnecting: ' + attemptNumber)
-	logger.log('reconnecting: ' + attemptNumber)
-})
-
-socket.on('reconnect_error', error => {
-	dispatchSetInfo('reconnect_error: ' + JSON.stringify(error, null, 2))
-	logger.log('reconnect_error: ' + JSON.stringify(error, null, 2))
-})
-
-socket.on('reconnect_failed', () => {
-	dispatchSetInfo('reconnect_failed')
-	logger.log('reconnect_failed')
-})
-
-socket.on('ping', () => {
-	dispatchSetInfo('ping')
-	logger.log('ping')
-})
-
-socket.on('pong', latency => {
-	dispatchSetInfo('pong - latency: ' + latency)
-	logger.log('pong - latency: ' + latency)
-})
-
-socket.on('reconnect', attemptNumber => {
-	dispatchSetInfo('reconnected: ' + attemptNumber)
-	logger.log('reconnected: ' + attemptNumber)
-})
-
-socket.on('connect_timeout', timeout => {
-	dispatchSetInfo('connect_timeout: ' + timeout)
-	logger.log('connect_timeout: ' + timeout)
-})
-
-socket.on('error', error => {
-	dispatchSetInfo('error: ' + JSON.stringify(error, null, 2))
-	logger.log('error: ' + JSON.stringify(error, null, 2))
-})
-
-socket.on('connect_error', error => {
-	dispatchSetInfo('connection error: ' + JSON.stringify(error, null, 2))
-	logger.log('connection error: ' + JSON.stringify(error, null, 2))
-})
-
-socket.on('clients', data => {
-	logger.log('clients: ', data.clients)
-	setClients(data.clients)
-})
-
-function setClients(newClients) {
-	store.dispatch({
-		type: SET_CLIENTS,
-		clients: newClients,
-	})
+function renderApp() {
+	const HotProvider = hot(module)(Provider)
+	ReactDOM.render(
+		<HotProvider store={store}>
+			<ConnectedApp />
+		</HotProvider>,
+		document.getElementById('react-app'),
+	)
 }
-
-socket.on('note', note => {
-	logger.debug('note: ', note)
-	changeOtherClientsOscillatorFrequency(note.frequency)
-
-	store.dispatch({
-		type: OTHER_CLIENT_NOTE,
-		note,
-		clientId: note.clientId,
-	})
-})
-
-function dispatchSetInfo(newInfo) {
-	store.dispatch(setInfo(newInfo))
-}
-
-ReactDOM.render(
-	<Provider store={store}>
-		<ConnectedApp />
-	</Provider>,
-	document.getElementById('react-app'),
-)

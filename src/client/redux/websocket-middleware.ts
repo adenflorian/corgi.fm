@@ -1,5 +1,6 @@
 import {IAppState} from './configureStore'
-import {getFrequencyUsingHalfStepsFromA4, noteToHalfStepMap} from './notes-middleware'
+import {getFrequencyUsingHalfStepsFromA4, noteToHalfStepMap} from './input-middleware'
+import {MIDI_KEY_PRESSED, MIDI_KEY_UP, selectPressedMidiNotes} from './midi-redux'
 import {NOTE_PRESSED, NOTE_UP, selectPressedNotes} from './notes-redux'
 
 export const websocketMiddleware = store => next => action => {
@@ -19,5 +20,13 @@ export const websocketMiddleware = store => next => action => {
 
 			socket.emit('note', {frequency, note})
 		}
+	}
+
+	if (action.type === MIDI_KEY_PRESSED || action.type === MIDI_KEY_UP) {
+		const state: IAppState = store.getState()
+		const pressedMidiNotes = selectPressedMidiNotes(state.midi)
+		const socket = state.websocket.socket
+
+		socket.emit('notes', {notes: pressedMidiNotes})
 	}
 }

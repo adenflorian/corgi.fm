@@ -1,4 +1,6 @@
-import {NOTE_UP, notePressed} from './notes-redux'
+import {IAppState} from './configureStore'
+import {midiKeyPressed, midiKeyUp} from './midi-redux'
+import {virtualKeyPressed, virtualKeyUp} from './virtual-keyboard-redux'
 
 export const KEY_DOWN = 'KEY_DOWN'
 export const KEY_UP = 'KEY_UP'
@@ -18,28 +20,25 @@ export const keyToNoteMap = {
 	j: 'B',
 }
 
-export const halfStepMap = {
-	'a': 3,   // white C
-	'w': 4,   // black C#
-	's': 5,   // white D
-	'e': 6,   // black D#
-	'd': 7,   // white E
-	'f': 8,   // white F
-	't': 9,   // black F#
-	'g': 10,   // white G
-	'y': 11,   // black G#
-	'h': 12,   // white A
-	'u': 13,   // black A#
-	'j': 14,   // white B
-	'k': 15,   // white C
-	'o': 16,   // black C#
-	'l': 17,   // white D
-	'p': 18,   // black D#
-	';': 19,   // white E
-	// stop at semi colon
-	// single quote opens a quick find box
-	// so we wouldn't want to sue that
-}
+const allowedKeysForMidi = [
+	'a',
+	'w',
+	's',
+	'e',
+	'd',
+	'f',
+	't',
+	'g',
+	'y',
+	'h',
+	'u',
+	'j',
+	'k',
+	'o',
+	'l',
+	'p',
+	';',
+]
 
 export const keyToMidiMap = {
 	a: 0,
@@ -53,7 +52,7 @@ export const keyToMidiMap = {
 	y: 8,
 	h: 9,
 	u: 10,
-	j: 12,
+	j: 11,
 }
 
 export const noteToHalfStepMap = Object.freeze({
@@ -108,7 +107,7 @@ export const midiKeyToNote = Object.freeze({
 	12: 'B',
 })
 
-export const notesMiddleware = store => next => action => {
+export const virtualMidiKeyboardMiddleware = store => next => action => {
 	next(action)
 
 	if (action.type === KEY_DOWN) {
@@ -125,12 +124,17 @@ function onKeyDown(e, store) {
 
 	if (isMidiKey(keyname) === false) return
 
-	const note = keyToNoteMap[e.key]
+	const midiKeyNumber = keyToMidiMap[keyname]
 
-	// const halfSteps = noteToHalfStepMap[note]
-	// const frequency = getFrequencyUsingHalfStepsFromA4(halfSteps)
+	const state: IAppState = store.getState()
 
-	store.dispatch(notePressed(note))
+	store.dispatch(virtualKeyPressed(state.websocket.myClientId, midiKeyNumber))
+
+	const octave = state.midi.octave
+
+	const midiKeyWithOctaveApplied = applyOctave(midiKeyNumber, octave)
+
+	store.dispatch(midiKeyPressed(midiKeyWithOctaveApplied))
 }
 
 function onKeyUp(e, store) {
@@ -138,16 +142,21 @@ function onKeyUp(e, store) {
 
 	if (isMidiKey(keyname) === false) return
 
-	const note = keyToNoteMap[e.key]
+	const midiKeyNumber = keyToMidiMap[keyname]
 
-	store.dispatch({
-		type: NOTE_UP,
-		note,
-	})
+	const state: IAppState = store.getState()
+
+	store.dispatch(virtualKeyUp(state.websocket.myClientId, midiKeyNumber))
+
+	const octave = state.midi.octave
+
+	const midiKeyWithOctaveApplied = applyOctave(midiKeyNumber, octave)
+
+	store.dispatch(midiKeyUp(midiKeyWithOctaveApplied))
 }
 
 export function isMidiKey(keyname: string) {
-	return halfStepMap[keyname.toLowerCase()] !== undefined
+	return allowedKeysForMidi.some(x => x === keyname.toLowerCase())
 }
 
 export function getFrequencyUsingHalfStepsFromA4(halfSteps: number) {

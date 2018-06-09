@@ -30,6 +30,11 @@ io.on('connection', socket => {
 		socket.broadcast.emit('note', {...data, clientId: socket.id})
 	})
 
+	socket.on('notes', notes => {
+		logger.debug(`client: ${socket.id} | `, notes)
+		socket.broadcast.emit('notes', {notes, clientId: socket.id})
+	})
+
 	socket.on('disconnect', () => {
 		logger.log(`client disconnected: ${socket.id}`)
 		clients.remove(socket.id)
@@ -39,7 +44,9 @@ io.on('connection', socket => {
 
 let nextId = 1
 
-io.engine.generateId = () => {
+const engine: any = io.engine
+
+engine.generateId = () => {
 	return animal.getId() + '-' + nextId++
 }
 
