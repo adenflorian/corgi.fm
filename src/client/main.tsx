@@ -4,27 +4,14 @@ import {hot} from 'react-hot-loader'
 import {Provider} from 'react-redux'
 import {ConnectedApp} from './App'
 import {BasicInstrument} from './BasicInstrument'
+import {setupInputEventListeners} from './input-events'
 import {configureStore, IAppState} from './redux/configureStore'
 import {selectPressedMidiNotes} from './redux/midi-redux'
 import {setupWebsocket} from './websocket'
 
 const store = configureStore()
 
-window.addEventListener('keydown', e => {
-	if (e.repeat) return
-
-	store.dispatch({
-		type: 'KEY_DOWN',
-		e,
-	})
-})
-
-window.addEventListener('keyup', e => {
-	store.dispatch({
-		type: 'KEY_UP',
-		e,
-	})
-})
+setupInputEventListeners(window, store)
 
 // Might be needed for safari
 // const AudioContext = window.AudioContext || window.webkitAudioContext
