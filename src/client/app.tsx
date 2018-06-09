@@ -29,7 +29,7 @@ class App extends React.Component<IAppProps, {}> {
 
 		return (
 			<Fragment>
-				<h2 id="title">sha-mu</h2>
+				<h1 id="title">sha-mu</h1>
 
 				<div id="info">{info}</div>
 

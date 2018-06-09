@@ -1,3 +1,16 @@
+body {
+	font-family: Arial, Helvetica, sans-serif;
+	letter-spacing: 8px;
+	text-transform: lowercase;
+	text-align: center;
+	font-size: 1.2em;
+	background-color: #121621;
+	color: #EA52A2;
+	font-weight: 600;
+	padding: 24px;
+	line-height: 1.2em;
+}
+
 .clientId {
 	margin: 4px;
 }
