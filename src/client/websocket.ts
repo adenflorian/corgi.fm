@@ -2,7 +2,7 @@ import {Store} from 'redux'
 import * as io from 'socket.io-client'
 import {logger} from './logger'
 import {IMidiNote} from './MidiNote'
-import {clientDisconnected, newClient, OTHER_CLIENT_NOTES, SET_CLIENTS} from './redux/other-clients-redux'
+import {CLIENT_NOTES, clientDisconnected, newClient, SET_CLIENTS} from './redux/clients-redux'
 import {setVirtualKeys} from './redux/virtual-keyboard-redux'
 import {SET_MY_CLIENT_ID, setInfo, setSocket} from './redux/websocket-redux'
 
@@ -72,7 +72,7 @@ export function setupWebsocket(store: Store, otherClientsInstrument) {
 		setMidiForOtherClientsInstrument(data.notes)
 
 		store.dispatch({
-			type: OTHER_CLIENT_NOTES,
+			type: CLIENT_NOTES,
 			...data,
 		})
 

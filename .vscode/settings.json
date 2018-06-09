@@ -26,5 +26,6 @@
     },
     "tslint.jsEnable": true,
     "tslint.packageManager": "yarn",
-    "tslint.run": "onType"
+    "tslint.run": "onType",
+    "typescript.tsdk": "node_modules\\typescript\\lib"
 }

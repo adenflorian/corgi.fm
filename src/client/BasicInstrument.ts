@@ -5,6 +5,7 @@ export class BasicInstrument {
 	private _panNode: StereoPannerNode
 	private _oscillator: OscillatorNode
 	private _audioContext: AudioContext
+	private _gain: GainNode
 
 	constructor({destination, audioContext}: {destination: any, audioContext: AudioContext}) {
 		this._audioContext = audioContext
@@ -12,10 +13,13 @@ export class BasicInstrument {
 		this._panNode = this._audioContext.createStereoPanner()
 
 		this._oscillator = this._audioContext.createOscillator()
-		this._oscillator.type = 'square'
+		this._oscillator.type = 'sawtooth'
 		this._oscillator.frequency.value = 0
 
+		this._gain = audioContext.createGain()
+
 		this._oscillator.connect(this._panNode)
+			.connect(this._gain)
 			.connect(destination)
 
 		this._oscillator.start()

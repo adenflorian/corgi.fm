@@ -6,6 +6,23 @@
     "configurations": [
         {
             "type": "node",
+            "request": "launch",
+            "name": "Mocha Tests",
+            "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+            "args": [
+                "-u",
+                "tdd",
+                "--timeout",
+                "999999",
+                "--colors",
+                "--require",
+                "ts-node/register",
+                "${workspaceFolder}/src/**/*.spec.ts*"
+            ],
+            "internalConsoleOptions": "openOnSessionStart"
+        },
+        {
+            "type": "node",
             "request": "attach",
             "name": "Attach",
             "port": 9229

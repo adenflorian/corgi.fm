@@ -1,48 +1,52 @@
 import * as React from 'react'
 import {Fragment} from 'react'
 import {connect} from 'react-redux'
+import './App.css'
 import {ConnectedKeyboard} from './Keyboard'
 import {IAppState} from './redux/configureStore'
 
 interface IAppProps {
 	myClientId: string
-	otherClients: any[]
+	clients: any[]
 	info: string
+}
+
+const ClientId = ({id}) => {
+	return (
+		<div className="clientId">
+			{id || '""'}
+		</div>
+	)
 }
 
 class App extends React.Component<IAppProps, {}> {
 	public static defaultProps = {
-		otherClients: [],
+		clients: [],
 	}
 
 	public render() {
-		const {info, myClientId, otherClients} = this.props
+		const {info, myClientId, clients} = this.props
 
 		return (
 			<Fragment>
-				<h2>sha-mu</h2>
+				<h2 id="title">sha-mu</h2>
 
-				<div>{info}</div>
+				<div id="info">{info}</div>
 
-				<h2>you:</h2>
-
-				<div>
-					<div>
-						{myClientId}
-					</div>
+				<div id="you">
+					<h2>you:</h2>
+					<ClientId id={myClientId} />
 					<ConnectedKeyboard ownerId={myClientId} />
 				</div>
 
-				<h2>others:</h2>
-
 				<div id="otherClients">
-					{otherClients.filter(x => x.id !== myClientId)
+					<h2>others:</h2>
+
+					{clients.filter(x => x.id !== myClientId)
 						.map(client => {
 							return (
 								<div key={client.id}>
-									<div>
-										{client.id}
-									</div>
+									<ClientId id={client.id} />
 									<ConnectedKeyboard ownerId={client.id} />
 								</div>
 							)
@@ -56,7 +60,7 @@ class App extends React.Component<IAppProps, {}> {
 
 const mapStateToProps = (state: IAppState) => ({
 	myClientId: state.websocket.myClientId,
-	otherClients: state.otherClients,
+	clients: state.clients,
 	info: state.websocket.info,
 })
 

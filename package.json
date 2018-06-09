@@ -11,7 +11,7 @@
     "start-prod": "pm2 start server/server.js",
     "stop-prod": "pm2 stop server/server.js",
     "lint": "eslint . && tslint src/client/**/*.ts* --project src/client/tsconfig.json && tslint src/server/**/*.ts* --project src/server/tsconfig.json ",
-    "test": "mocha --require ts-node/register src/**/*.spec.ts*",
+    "test": "mocha --inspect --require ts-node/register src/**/*.spec.ts*",
     "tdd": "mocha --watch src/**/*.ts* --reporter dot --require ts-node/register src/**/*.spec.ts*",
     "clean": "gulp clean",
     "build": "gulp build",
@@ -20,7 +20,9 @@
   },
   "dependencies": {
     "animal-id": "^0.0.1",
+    "color-hash": "^1.0.3",
     "express": "^4.16.3",
+    "hashbow": "^1.1.1",
     "prop-types": "^15.6.1",
     "react": "^16.4.0",
     "react-dom": "^16.4.0",

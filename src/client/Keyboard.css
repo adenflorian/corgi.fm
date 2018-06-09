@@ -1,20 +1,48 @@
-#keyboard .white {
-    background-color: white;
-    color: black;
-}
-
-#keyboard .black {
-    background-color: black;
-    color: white;
-}
-
-#keyboard * {
-    height: 64px;
-    width: 32px;
-    display: inline-block;
+.keyboard {
+    display: inline-flex;
+    margin-bottom: 16px;
+    background-color: #EBEBF6;
     letter-spacing: normal;
+    height: 80px;
 }
 
-#keyboard .pressed {
-    background-color: red;
+.keyboard .white {
+    background-color: #EBEBF6;
+    color: #282832;
+}
+
+.keyboard .black {
+    background-color: #282832;
+    color: #EBEBF6;
+    height: 64px;
+}
+
+.keyboard .key {
+    width: 32px;
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.keyboard .keyName {
+    text-transform: none;
+    font-weight: 100;
+    font-size: 0.8em;
+}
+
+.keyboard .white .keyName {
+    color: #a0a0ab;
+}
+
+.keyboard .black .keyName {
+    color: #8C8C99;
+}
+
+.keyboard .octave {
+    background-color: #282832;
+    display: inline-flex;
+    width: 48px;
+    align-items: center;
+    justify-content: center;
+    color: #EBEBF6
 }
