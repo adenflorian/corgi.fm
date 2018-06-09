@@ -5,12 +5,14 @@ import {Octave} from './midi-redux'
 export const VIRTUAL_KEY_PRESSED = 'VIRTUAL_KEY_PRESSED'
 export const VIRTUAL_KEY_UP = 'VIRTUAL_KEY_UP'
 export const VIRTUAL_OCTAVE = 'VIRTUAL_OCTAVE'
+export const SET_VIRTUAL_KEYS = 'SET_VIRTUAL_KEYS'
 
 export interface VirtualKeyAction {
 	type: string
 	ownerId: ClientId
 	number?: number
 	octave?: Octave
+	keys?: IMidiNote[]
 }
 
 export const virtualKeyPressed = (ownerId: ClientId, number: number) => {
@@ -37,6 +39,14 @@ export const virtualOctave = (ownerId: ClientId, octave: Octave) => {
 	}
 }
 
+export const setVirtualKeys = (ownerId: ClientId, keys: IMidiNote[]) => {
+	return {
+		type: SET_VIRTUAL_KEYS,
+		ownerId,
+		keys,
+	}
+}
+
 export interface VirtualKeyboardState {
 	[clientId: string]: {
 		pressedKeys: IMidiNote[],
@@ -60,6 +70,13 @@ export function virtualKeyboardsReducer(state: VirtualKeyboardState = {}, action
 				...state,
 				[action.ownerId]: {
 					pressedKeys: state[action.ownerId].pressedKeys.filter(x => x !== action.number),
+				},
+			}
+		case SET_VIRTUAL_KEYS:
+			return {
+				...state,
+				[action.ownerId]: {
+					pressedKeys: action.keys,
 				},
 			}
 		case VIRTUAL_OCTAVE:

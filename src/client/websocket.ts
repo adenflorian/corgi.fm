@@ -1,10 +1,12 @@
+import {Store} from 'redux'
 import * as io from 'socket.io-client'
 import {logger} from './logger'
 import {IMidiNote} from './MidiNote'
-import {OTHER_CLIENT_NOTES, SET_CLIENTS} from './redux/other-clients-redux'
+import {clientDisconnected, newClient, OTHER_CLIENT_NOTES, SET_CLIENTS} from './redux/other-clients-redux'
+import {setVirtualKeys} from './redux/virtual-keyboard-redux'
 import {SET_MY_CLIENT_ID, setInfo, setSocket} from './redux/websocket-redux'
 
-export function setupWebsocket(store, otherClientsInstrument) {
+export function setupWebsocket(store: Store, otherClientsInstrument) {
 	const socket = io.connect('/')
 
 	logger.log('socket connected')
@@ -34,6 +36,8 @@ export function setupWebsocket(store, otherClientsInstrument) {
 	setupDefaultEventListener('error')
 	setupDefaultEventListener('connect_error')
 	setupDefaultEventListener('pong', 'pong - latency')
+	setupDefaultEventListener('newClient')
+	setupDefaultEventListener('clientDisconnected')
 
 	function setupDefaultEventListener(eventName: string, friendlyName?: string) {
 		socket.on(eventName, data => {
@@ -44,6 +48,16 @@ export function setupWebsocket(store, otherClientsInstrument) {
 	socket.on('clients', data => {
 		logger.log('clients: ', data.clients)
 		setClients(data.clients)
+	})
+
+	socket.on('newClient', data => {
+		logger.log('newClient: ', data)
+		store.dispatch(newClient(data.id))
+	})
+
+	socket.on('clientDisconnected', data => {
+		logger.log('clientDisconnected: ', data)
+		store.dispatch(clientDisconnected(data.id))
 	})
 
 	function setClients(newClients) {
@@ -61,6 +75,8 @@ export function setupWebsocket(store, otherClientsInstrument) {
 			type: OTHER_CLIENT_NOTES,
 			...data,
 		})
+
+		store.dispatch(setVirtualKeys(data.clientId, data.notes))
 	})
 
 	function socketInfo(info: string) {

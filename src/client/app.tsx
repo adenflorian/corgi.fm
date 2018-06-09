@@ -30,7 +30,7 @@ class App extends React.Component<IAppProps, {}> {
 					<div>
 						{myClientId}
 					</div>
-					<ConnectedKeyboard owner="me" />
+					<ConnectedKeyboard ownerId={myClientId} />
 				</div>
 
 				<h2>others:</h2>
@@ -43,7 +43,7 @@ class App extends React.Component<IAppProps, {}> {
 									<div>
 										{client.id}
 									</div>
-									<ConnectedKeyboard owner={client.id} />
+									<ConnectedKeyboard ownerId={client.id} />
 								</div>
 							)
 						})

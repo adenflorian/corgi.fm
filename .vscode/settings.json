@@ -22,7 +22,7 @@
         "built/**/*": true
     },
     "editor.codeActionsOnSave": {
-        "source.organizeImports": true
+        "source.organizeImports": false
     },
     "tslint.jsEnable": true,
     "tslint.packageManager": "yarn",

@@ -18,7 +18,7 @@ export const setInfo = (info: string) => ({
 	info,
 })
 
-export function websocketReducer(state: IWebsocketState = {}, action): IWebsocketState {
+export function websocketReducer(state: IWebsocketState = {info: '_'}, action): IWebsocketState {
 	switch (action.type) {
 		case SET_MY_CLIENT_ID:
 			return {...state, myClientId: action.id}

@@ -23,7 +23,8 @@ io.on('connection', socket => {
 
 	clients.add(socket.id)
 
-	sendClients()
+	sendClientsToNewClient(socket)
+	sendNewClient(socket.id)
 
 	socket.on('notes', notespayload => {
 		logger.log(`client: ${socket.id} | `, notespayload)
@@ -36,7 +37,7 @@ io.on('connection', socket => {
 	socket.on('disconnect', () => {
 		logger.log(`client disconnected: ${socket.id}`)
 		clients.remove(socket.id)
-		sendClients()
+		sendClientDisconnected(socket.id)
 	})
 })
 
@@ -48,10 +49,31 @@ engine.generateId = () => {
 	return animal.getId() + '-' + nextId++
 }
 
-function sendClients() {
-	logger.debug('sending clients info to all clients')
-	io.local.emit('clients', {
+// function sendClients() {
+// 	logger.debug('sending clients info to all clients')
+// 	io.local.emit('clients', {
+// 		clients: clients.toArray(),
+// 	})
+// }
+
+function sendClientsToNewClient(newClientSocket) {
+	logger.debug('sending clients info to new client')
+	newClientSocket.emit('clients', {
 		clients: clients.toArray(),
+	})
+}
+
+function sendNewClient(id) {
+	logger.debug('sending new client info to all clients')
+	io.local.emit('newClient', {
+		id,
+	})
+}
+
+function sendClientDisconnected(id) {
+	logger.debug('sending clientDisconnected to all clients')
+	io.local.emit('clientDisconnected', {
+		id,
 	})
 }
 

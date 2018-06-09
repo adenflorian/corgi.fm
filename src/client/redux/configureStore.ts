@@ -15,6 +15,7 @@ export interface IAppState {
 	midi: IMidiState
 	notes: object
 	websocket: IWebsocketState
+	virtualKeyboards: any
 }
 
 declare global {
