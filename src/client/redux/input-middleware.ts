@@ -1,8 +1,3 @@
-import {IAppState} from './configureStore'
-import {NOTE_UP, notePressed} from './notes-redux'
-import {decreaseVirtualOctave, increaseVirtualOctave} from './virtual-keyboard-redux'
-import {isMidiKey} from './virtual-midi-keyboard-middleware'
-
 export const KEY_DOWN = 'KEY_DOWN'
 export const KEY_UP = 'KEY_UP'
 
@@ -74,27 +69,11 @@ export const noteToHalfStepMap = Object.freeze({
 	'B': 14,
 })
 
-// const octaves = [-1, 0, 1, 2, 3, 4, 5, 6, 7]
-
-// const midiNoteNumbersCount = 128
-// const midiNoteFirstNumber = 0
-// const notesPerOctave = 12
-
-// const centerNoteName = 'A4'
-// const centerNoteFrequency = 440
-// const centerNoteMidiNumber = 69
-// const centerNoteOctave = 69
-
-// const firstOctave = -1
-// const currentOctave = 4
-
 export function applyOctave(midiNumber: number, octave: number) {
 	if (octave === -1) return midiNumber
 
 	return midiNumber + (octave * 12) + 12
 }
-
-// keyboard key + octave => midi key => note name => frequency
 
 export const midiKeyToNote = Object.freeze({
 	0: 'C',
@@ -110,46 +89,6 @@ export const midiKeyToNote = Object.freeze({
 	10: 'A#',
 	12: 'B',
 })
-
-export const inputMiddleware = store => next => action => {
-	next(action)
-
-	if (action.type === KEY_DOWN) {
-		onKeyDown(action.e, store)
-	} else if (action.type === KEY_UP) {
-		onKeyUp(action.e, store)
-	}
-}
-
-function onKeyDown(e, store) {
-	if (e.repeat) return
-
-	const keyname = e.key
-
-	const state: IAppState = store.getState()
-
-	if (isMidiKey(keyname)) {
-		store.dispatch(notePressed(keyToNoteMap[e.key]))
-	} else if (keyname === 'x') {
-		store.dispatch(increaseVirtualOctave(state.websocket.myClientId))
-	} else if (keyname === 'z') {
-		store.dispatch(decreaseVirtualOctave(state.websocket.myClientId))
-	}
-}
-
-function onKeyUp(e, store) {
-	const keyname = e.key
-
-	if (isMidiKey(keyname) === false) return
-
-	const note = keyToNoteMap[e.key]
-
-	store.dispatch({
-		type: NOTE_UP,
-		note,
-	})
-	// store.dispatch(midiKeyUp(keyToMidiMap[keyname]))
-}
 
 export function getFrequencyUsingHalfStepsFromA4(halfSteps: number) {
 	const fixedNoteFrequency = 440

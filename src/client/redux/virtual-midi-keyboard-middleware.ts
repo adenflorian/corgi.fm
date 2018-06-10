@@ -1,6 +1,6 @@
 import {AnyAction, Dispatch, Store} from 'redux'
 import {IAppState} from './configureStore'
-import {virtualKeyPressed, virtualKeyUp} from './virtual-keyboard-redux'
+import {decreaseVirtualOctave, increaseVirtualOctave, virtualKeyPressed, virtualKeyUp} from './virtual-keyboard-redux'
 
 export const KEY_DOWN = 'KEY_DOWN'
 export const KEY_UP = 'KEY_UP'
@@ -127,13 +127,16 @@ function onKeyDown(e, store: Store) {
 
 	const keyname = e.key
 
-	if (isMidiKey(keyname) === false) return
-
-	const midiKeyNumber = keyToMidiMap[keyname]
-
 	const state: IAppState = store.getState()
 
-	store.dispatch(virtualKeyPressed(state.websocket.myClientId, midiKeyNumber))
+	if (isMidiKey(keyname)) {
+		const midiKeyNumber = keyToMidiMap[keyname]
+		store.dispatch(virtualKeyPressed(state.websocket.myClientId, midiKeyNumber))
+	} else if (keyname === 'x') {
+		store.dispatch(increaseVirtualOctave(state.websocket.myClientId))
+	} else if (keyname === 'z') {
+		store.dispatch(decreaseVirtualOctave(state.websocket.myClientId))
+	}
 }
 
 function onKeyUp(e, store) {
