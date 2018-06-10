@@ -79,9 +79,9 @@ function onMidiMessage(event) {
 
 	const data = event.data
 	// tslint:disable-next-line:no-bitwise
-	const cmd = data[0] >> 4
+	// const cmd = data[0] >> 4
 	// tslint:disable-next-line:no-bitwise
-	const channel = data[0] & 0xf
+	// const channel = data[0] & 0xf
 	// tslint:disable-next-line:no-bitwise
 	const type = data[0] & 0xf0 // channel agnostic message type. Thanks, Phil Burk.
 	const note = data[1]
