@@ -78,7 +78,14 @@ export interface VirtualKeyboardState {
 	octave: Octave
 }
 
-export function virtualKeyboardsReducer(state: VirtualKeyboardsState = {}, action: VirtualKeyAction | any) {
+const initialState: VirtualKeyboardsState = {
+	'track-1': {
+		octave: defaultOctave,
+		pressedKeys: [],
+	},
+}
+
+export function virtualKeyboardsReducer(state: VirtualKeyboardsState = initialState, action: VirtualKeyAction | any) {
 	switch (action.type) {
 		case VIRTUAL_KEY_PRESSED:
 			return {

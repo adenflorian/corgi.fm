@@ -1,9 +1,11 @@
 import classnames from 'classnames'
+import hashbow from 'hashbow'
 import * as React from 'react'
 import {Fragment} from 'react'
 import {connect} from 'react-redux'
 import './App.css'
 import './css-reset.css'
+import {Grid} from './Grid'
 import {ConnectedKeyboard} from './Keyboard'
 import {DummyClient, IClient} from './redux/clients-redux'
 import {IAppState} from './redux/configureStore'
@@ -15,7 +17,7 @@ interface IAppProps {
 	info: string
 }
 
-const ClientId = ({client: {id, color}}) => {
+const ClientId = ({id, color}) => {
 	return (
 		<div className="clientId" style={{color}}>
 			{id || '""'}
@@ -40,15 +42,26 @@ class App extends React.Component<IAppProps, {}> {
 
 				<ConnectedVolumeControl />
 
+				<Grid />
+
 				<div className="boardContainer">
 					<div id="you" className="board connected">
 						{/* {otherClients.length > 0 &&
 							<h2>you:</h2>
 						} */}
 						{otherClients.length > 0 &&
-							<ClientId client={myClient} />
+							<ClientId id={myClient.id} color={myClient.color} />
 						}
 						<ConnectedKeyboard ownerId={myClient.id} myKeyboard={true} />
+					</div>
+					<div id="track-1" className="board connected">
+						{/* {otherClients.length > 0 &&
+							<h2>you:</h2>
+						} */}
+						{/* {otherClients.length > 0 && */}
+						<ClientId id={'track-1'} color={hashbow('track-1')} />
+						{/* } */}
+						<ConnectedKeyboard ownerId={'track-1'} />
 					</div>
 
 					{/* <div id="otherClients" className="board"> */}
@@ -66,7 +79,7 @@ class App extends React.Component<IAppProps, {}> {
 									client.disconnecting ? 'disconnecting' : 'connected',
 								)}
 							>
-								<ClientId client={client} />
+								<ClientId id={client.id} color={client.color} />
 								<ConnectedKeyboard ownerId={client.id} />
 							</div>
 						)

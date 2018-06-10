@@ -6,6 +6,7 @@ import Reverb from 'soundbank-reverb'
 import {ConnectedApp} from './App'
 import {setupInputEventListeners} from './input-events'
 import {logger} from './logger'
+import {play} from './midi-player'
 import {configureStore, IAppState} from './redux/configureStore'
 import {setupMidiSupport} from './setup-midi-support'
 import {setupWebsocket} from './websocket'
@@ -78,6 +79,24 @@ preFx.gain.value = 0.5
 
 const socket = setupWebsocket(store)
 
+window.addEventListener('keydown', e => {
+	if (e.repeat) return
+	if (e.key !== ' ') return
+
+	return play(store.dispatch, [
+		[0],
+		[4],
+		[7],
+		[0],
+		[2],
+		[7],
+		[0],
+		[5],
+		[7],
+		[0, 4, 7, 12],
+	])
+})
+
 declare global {
 	interface NodeModule {
 		hot: {
@@ -90,6 +109,7 @@ declare global {
 if (module.hot) {
 	module.hot.dispose(() => {
 		socket.disconnect()
+		audioContext.close()
 	})
 }
 

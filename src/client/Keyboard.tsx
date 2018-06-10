@@ -1,10 +1,11 @@
+import hashbow from 'hashbow'
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {BasicInstrument} from './BasicInstrument'
 import './Keyboard.css'
 import {IMidiNote} from './MidiNote'
 import {Octave} from './music-types'
-import {DummyClient, IClient} from './redux/clients-redux'
+import {DummyClient} from './redux/clients-redux'
 import {IAppState} from './redux/configureStore'
 import {selectMidiOutput} from './redux/virtual-keyboard-redux'
 import {keyToMidiMap} from './redux/virtual-midi-keyboard-middleware'
@@ -47,10 +48,10 @@ interface IKeyboardProps {
 	ownerId: ClientId,
 	pressedMidiKeys?: any,
 	octave?: Octave
-	owner: IClient
 	actualMidiNotes: IMidiNote[]
 	audio: any
 	virtualMidiKeyboard: any
+	color: string
 }
 
 function boxShadow3dCss(size: number, color: string) {
@@ -94,12 +95,12 @@ export class Keyboard extends React.Component<IKeyboardProps> {
 	}
 
 	public render() {
-		const {actualMidiNotes, pressedMidiKeys, octave, owner, virtualMidiKeyboard} = this.props
+		const {actualMidiNotes, pressedMidiKeys, octave, color, virtualMidiKeyboard} = this.props
 
 		this.instrument.setMidiNotes(actualMidiNotes)
 
 		return (
-			<div className="keyboard" style={{boxShadow: boxShadow3dCss(8, owner.color)}}>
+			<div className="keyboard" style={{boxShadow: boxShadow3dCss(8, color)}}>
 				<div className="octave">
 					{octave}
 				</div>
@@ -110,7 +111,7 @@ export class Keyboard extends React.Component<IKeyboardProps> {
 						<div
 							key={index}
 							className={'key ' + value.color}
-							style={{backgroundColor: isKeyPressed ? owner.color : ''}}
+							style={{backgroundColor: isKeyPressed ? color : ''}}
 						>
 							<div className="noteName">
 								{value.name}
@@ -118,7 +119,6 @@ export class Keyboard extends React.Component<IKeyboardProps> {
 							<div className="keyName">
 								{value.keyName}
 							</div>
-
 						</div>
 					)
 				})}
@@ -133,11 +133,11 @@ const mapStateToProps = (state: IAppState, props) => {
 
 	return {
 		pressedMidiKeys: virtualKeyboard && virtualKeyboard.pressedKeys,
-		owner,
 		octave: virtualKeyboard && virtualKeyboard.octave,
 		audio: state.audio,
-		actualMidiNotes: owner ? selectMidiOutput(state, owner.id).notes : [],
+		actualMidiNotes: props.ownerId ? selectMidiOutput(state, props.ownerId).notes : [],
 		virtualMidiKeyboard: globalVirtualMidiKeyboard,
+		color: (owner && owner.color) || hashbow(props.ownerId),
 	}
 }
 
