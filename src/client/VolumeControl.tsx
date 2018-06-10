@@ -1,0 +1,61 @@
+import Slider from 'rc-slider'
+// We can just import Slider or Range to reduce bundle size
+// import Slider from 'rc-slider/lib/Slider';
+// import Range from 'rc-slider/lib/Range';
+import 'rc-slider/assets/index.css'
+import React = require('react')
+import {Component, Fragment} from 'react'
+import {connect} from 'react-redux'
+import {Dispatch} from 'redux'
+import {setMasterVolume} from './redux/audio-redux'
+import {selectOwner} from './redux/clients-redux'
+import {IAppState} from './redux/configureStore'
+
+interface IVolumeControlProps {
+	masterVolume: number,
+	changeMasterVolume: (number) => {type: any}
+	ownerColor: string
+}
+
+export class VolumeControl extends Component<IVolumeControlProps> {
+	public render() {
+		return (
+			<Fragment>
+				<Slider
+					min={0}
+					max={1}
+					step={0.001}
+					value={this.props.masterVolume}
+					onChange={this.props.changeMasterVolume}
+					style={{
+						padding: 0,
+					}}
+					railStyle={{
+						borderRadius: 0,
+						height: 8,
+						backgroundColor: '#282832',
+					}}
+					trackStyle={{
+						borderRadius: 0,
+						height: 8,
+						backgroundColor: this.props.ownerColor || 'rgb(120, 120, 120)',
+					}}
+					handleStyle={{
+						borderRadius: 0,
+						height: 8,
+						marginTop: 0,
+						border: 'none',
+						backgroundColor: 'rgb(120, 120, 120)',
+					}}
+				/>
+			</Fragment>
+		)
+	}
+}
+
+export const ConnectedVolumeControl = connect((state: IAppState) => ({
+	masterVolume: state.audio.masterVolume,
+	ownerColor: selectOwner(state).color,
+}), (dispatch: Dispatch) => ({
+	changeMasterVolume: volume => dispatch(setMasterVolume(volume)),
+}))(VolumeControl)

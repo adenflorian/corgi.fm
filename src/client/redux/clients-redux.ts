@@ -1,6 +1,7 @@
 import hashbow from 'hashbow'
 import {IMidiNote} from '../MidiNote'
 import {ClientId} from '../websocket'
+import {IAppState} from './configureStore'
 
 export const SET_CLIENTS = 'SET_CLIENTS'
 export const NEW_CLIENT = 'NEW_CLIENT'
@@ -85,4 +86,8 @@ export function clientsReducer(state: IClientsState = [], action) {
 		default:
 			return state
 	}
+}
+
+export function selectOwner(state: IAppState) {
+	return state.clients.find(x => x.id === state.websocket.myClientId) || new DummyClient()
 }

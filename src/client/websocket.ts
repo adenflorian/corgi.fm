@@ -69,7 +69,7 @@ export function setupWebsocket(store: Store) {
 	})
 
 	socket.on('notes', (data: NotesPayload) => {
-		logger.log('notes: ', data)
+		logger.debug('notes: ', data)
 		// setMidiForOtherClientsInstrument(data.notes)
 
 		// store.dispatch({

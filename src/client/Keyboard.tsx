@@ -84,7 +84,7 @@ export class Keyboard extends React.Component<IKeyboardProps> {
 		super(props)
 		this.instrument = new BasicInstrument({
 			audioContext: props.audio.context,
-			destination: props.audio.master,
+			destination: props.audio.preFx,
 		})
 		if (props.myKeyboard) {
 			this.instrument.setPan(-0.5)

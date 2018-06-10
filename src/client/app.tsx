@@ -7,6 +7,7 @@ import './css-reset.css'
 import {ConnectedKeyboard} from './Keyboard'
 import {DummyClient, IClient} from './redux/clients-redux'
 import {IAppState} from './redux/configureStore'
+import {ConnectedVolumeControl} from './VolumeControl'
 
 interface IAppProps {
 	myClient: IClient
@@ -36,6 +37,8 @@ class App extends React.Component<IAppProps, {}> {
 		return (
 			<Fragment>
 				{/* <h1 id="title">sha-mu</h1> */}
+
+				<ConnectedVolumeControl />
 
 				<div className="boardContainer">
 					<div id="you" className="board connected">
