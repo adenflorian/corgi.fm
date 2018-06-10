@@ -5,6 +5,7 @@ import {Provider} from 'react-redux'
 import Reverb from 'soundbank-reverb'
 import {ConnectedApp} from './App'
 import {setupInputEventListeners} from './input-events'
+import {logger} from './logger'
 import {configureStore, IAppState} from './redux/configureStore'
 import {setupMidiSupport} from './setup-midi-support'
 import {setupWebsocket} from './websocket'
@@ -36,7 +37,7 @@ function getMasterVolumeFromStorageOrDefault() {
 	return defaultMasterVolume
 }
 
-setupMidiSupport(store)
+setupMidiSupport(store, logger)
 
 let previousMasterVolume
 

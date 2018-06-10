@@ -9,9 +9,11 @@ declare global {
 }
 
 let _store: Store
+let _logger
 
-export function setupMidiSupport(store: Store) {
+export function setupMidiSupport(store: Store, logger) {
 	_store = store
+	_logger = logger
 
 	if (navigator.requestMIDIAccess) {
 		navigator.requestMIDIAccess({
@@ -24,25 +26,54 @@ export function setupMidiSupport(store: Store) {
 }
 
 function onMidiNotAvailable() {
-	console.log('No MIDI support in your browser.')
+	_logger.log('No MIDI support in your browser.')
 }
 
 function onMidiFailure() {
-	console.log('fail')
+	_logger.log('fail')
 }
 
 type MidiAccess = any
+type MIDIInput = any
 
 function onMidiSuccess(midiAccess: MidiAccess) {
-	console.log('success: ', midiAccess)
+	_logger.log('success: ', midiAccess)
 
 	for (const input of midiAccess.inputs.values()) {
+		_logger.log('input: ', input)
 		input.valueOf().onmidimessage = onMidiMessage
+	}
+
+	midiAccess.onstatechange = onStateChange
+}
+
+function onStateChange(event) {
+	_logger.log('midi state change: ', event)
+
+	if (event.port.type === 'input') {
+		onInputStateChange(event.port)
 	}
 }
 
+function onInputStateChange(input: MIDIInput) {
+	if (input.state === 'disconnected') {
+		onInputDisconnected(input)
+	} else if (input.state === 'connected') {
+		onInputConnected(input)
+	}
+}
+
+function onInputDisconnected(input: MIDIInput) {
+	_logger.log('input disconnected: ', input)
+}
+
+function onInputConnected(input: MIDIInput) {
+	_logger.log('input connected: ', input)
+	input.valueOf().onmidimessage = onMidiMessage
+}
+
 function onMidiMessage(event) {
-	console.log('MIDI MESSAGE!', event.data)
+	_logger.debug('MIDI MESSAGE!', event.data)
 	// const note = message.data[1]
 	// const velocity = message.data[0]
 
