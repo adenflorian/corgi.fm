@@ -21,6 +21,8 @@ const audioContext = new AudioContext()
 const onVolume = 0.1
 
 const reverb = Reverb(audioContext)
+reverb.time = 5
+reverb.cutoff.value = 1000
 
 const masterVolume = audioContext.createGain()
 
