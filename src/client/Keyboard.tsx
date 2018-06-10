@@ -1,7 +1,7 @@
-import hashbow from 'hashbow'
 import * as React from 'react'
 import {connect} from 'react-redux'
 import './Keyboard.css'
+import {DummyClient, IClient} from './redux/clients-redux'
 import {IAppState} from './redux/configureStore'
 import {Octave} from './redux/midi-redux'
 import {keyToMidiMap} from './redux/virtual-midi-keyboard-middleware'
@@ -44,6 +44,7 @@ interface IKeyboardProps {
 	ownerId: ClientId,
 	pressedMidiKeys?: any,
 	octave?: Octave
+	owner: IClient
 }
 
 function boxShadow3dCss(size: number, color: string) {
@@ -68,13 +69,13 @@ function boxShadow3dCss(size: number, color: string) {
 export class Keyboard extends React.Component<IKeyboardProps> {
 	public static defaultProps = {
 		pressedMidiKeys: [],
+		owner: new DummyClient(),
 	}
 
 	public render() {
-		const {pressedMidiKeys, octave, ownerId} = this.props
-		const specialColor = hashbow(ownerId, 60, 60)
+		const {pressedMidiKeys, octave, owner} = this.props
 		return (
-			<div className="keyboard" style={{boxShadow: boxShadow3dCss(8, specialColor)}}>
+			<div className="keyboard" style={{boxShadow: boxShadow3dCss(8, owner.color)}}>
 				<div className="octave">
 					{octave || '?'}
 				</div>
@@ -85,7 +86,7 @@ export class Keyboard extends React.Component<IKeyboardProps> {
 						<div
 							key={index}
 							className={'key ' + value.color}
-							style={{backgroundColor: isKeyPressed ? specialColor : ''}}
+							style={{backgroundColor: isKeyPressed ? owner.color : ''}}
 						>
 							<div className="noteName">
 								{value.name}
@@ -104,6 +105,7 @@ export class Keyboard extends React.Component<IKeyboardProps> {
 
 const mapStateToProps = (state: IAppState, props) => ({
 	pressedMidiKeys: state.virtualKeyboards[props.ownerId] && state.virtualKeyboards[props.ownerId].pressedKeys,
+	owner: state.clients.find(x => x.id === props.ownerId),
 })
 
 export const ConnectedKeyboard = connect(mapStateToProps)(Keyboard)

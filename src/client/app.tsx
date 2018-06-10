@@ -5,17 +5,18 @@ import {connect} from 'react-redux'
 import './App.css'
 import './css-reset.css'
 import {ConnectedKeyboard} from './Keyboard'
+import {DummyClient, IClient} from './redux/clients-redux'
 import {IAppState} from './redux/configureStore'
 
 interface IAppProps {
-	myClientId: string
+	myClient: IClient
 	clients: any[]
 	info: string
 }
 
-const ClientId = ({id}) => {
+const ClientId = ({client: {id, color}}) => {
 	return (
-		<div className="clientId">
+		<div className="clientId" style={{color}}>
 			{id || '""'}
 		</div>
 	)
@@ -24,12 +25,13 @@ const ClientId = ({id}) => {
 class App extends React.Component<IAppProps, {}> {
 	public static defaultProps = {
 		clients: [],
+		myClient: new DummyClient(),
 	}
 
 	public render() {
-		const {info, myClientId, clients} = this.props
+		const {info, myClient, clients} = this.props
 
-		const otherClients = clients.filter(x => x.id !== myClientId)
+		const otherClients = clients.filter(x => x.id !== myClient.id)
 
 		return (
 			<Fragment>
@@ -40,8 +42,8 @@ class App extends React.Component<IAppProps, {}> {
 						{/* {otherClients.length > 0 &&
 							<h2>you:</h2>
 						} */}
-						<ClientId id={myClientId} />
-						<ConnectedKeyboard ownerId={myClientId} />
+						<ClientId client={myClient} />
+						<ConnectedKeyboard ownerId={myClient.id} />
 					</div>
 
 					{/* <div id="otherClients" className="board"> */}
@@ -52,14 +54,15 @@ class App extends React.Component<IAppProps, {}> {
 					{otherClients.map(client => {
 						return (
 							<div
-								id="otherClients"
 								key={client.id}
-								className={classnames('board', client.disconnecting ? 'disconnecting' : 'connected')}
+								className={classnames(
+									'otherClient',
+									'board',
+									client.disconnecting ? 'disconnecting' : 'connected',
+								)}
 							>
-								<div>
-									<ClientId id={client.id} />
-									<ConnectedKeyboard ownerId={client.id} />
-								</div>
+								<ClientId client={client} />
+								<ConnectedKeyboard ownerId={client.id} />
 							</div>
 						)
 					})
@@ -76,8 +79,8 @@ class App extends React.Component<IAppProps, {}> {
 }
 
 const mapStateToProps = (state: IAppState) => ({
-	myClientId: state.websocket.myClientId,
 	clients: state.clients,
+	myClient: state.clients.find(x => x.id === state.websocket.myClientId),
 	info: state.websocket.info,
 })
 

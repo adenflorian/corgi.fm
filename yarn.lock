@@ -5729,6 +5729,10 @@ sort-keys@^1.0.0:
   dependencies:
     is-plain-obj "^1.0.0"
 
+soundbank-reverb@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/soundbank-reverb/-/soundbank-reverb-1.1.2.tgz#b81b29760b7907b8c8bae10c0d9133d8ec64fbf7"
+
 source-map-resolve@^0.5.0, source-map-resolve@^0.5.1:
   version "0.5.2"
   resolved "https://registry.yarnpkg.com/source-map-resolve/-/source-map-resolve-0.5.2.tgz#72e2cc34095543e43b2c62b2c4c10d4a9054f259"

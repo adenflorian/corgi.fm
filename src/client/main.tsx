@@ -2,6 +2,7 @@ import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 import {hot} from 'react-hot-loader'
 import {Provider} from 'react-redux'
+import Reverb from 'soundbank-reverb'
 import {ConnectedApp} from './App'
 import {BasicInstrument} from './BasicInstrument'
 import {setupInputEventListeners} from './input-events'
@@ -19,20 +20,24 @@ const audioContext = new AudioContext()
 
 const onVolume = 0.1
 
+const reverb = Reverb(audioContext)
+
 const masterVolume = audioContext.createGain()
-masterVolume.connect(audioContext.destination)
+
+masterVolume.connect(reverb)
+	.connect(audioContext.destination)
 
 const myInstrument = new BasicInstrument({
 	destination: masterVolume,
 	audioContext,
 })
-myInstrument.setPan(-1)
+myInstrument.setPan(-0.5)
 
 const otherClientsInstrument = new BasicInstrument({
 	destination: masterVolume,
 	audioContext,
 })
-otherClientsInstrument.setPan(1)
+otherClientsInstrument.setPan(0.5)
 
 changeMasterVolume(onVolume)
 

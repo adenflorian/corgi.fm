@@ -1,4 +1,4 @@
-import {CLIENT_DISCONNECTED, CLIENT_DISCONNECTING, clientDisconnecting} from './clients-redux'
+import {CLIENT_DISCONNECTED, clientDisconnecting} from './clients-redux'
 import {IAppState} from './configureStore'
 import {MIDI_KEY_PRESSED, MIDI_KEY_UP, selectPressedMidiNotes} from './midi-redux'
 

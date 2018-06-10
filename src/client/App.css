@@ -9,9 +9,30 @@ body {
 	text-transform: lowercase;
 	text-align: center;
 	font-size: 1.2em;
-	color: #EA52A2;
+	color: #CDCBE1;
 	font-weight: 600;
 	line-height: 1.2em;
+}
+
+#title {
+	text-align: center;
+	position: absolute;
+	margin: 24px 0px;
+	width: 100%;
+	font-size: 1.6em;
+	color: #CDCBE1;
+	animation-duration: 1s;
+	animation-name: title-slidedown;
+}
+
+@keyframes title-slidedown {
+  from {
+		top: -48px
+  }
+
+  to {
+		top: 0
+  }
 }
 
 .clientId {
@@ -24,10 +45,13 @@ body {
 	justify-content: center;
 	height: 100vh;
 	transition: all 0.5s ease;
+	flex-wrap: wrap;
+	align-content: center;
 }
 
 .board {
 	height: 128px;
+	margin: 0 24px;
 	animation-duration: 1s;
 	animation-name: slidein;
 }
@@ -38,17 +62,6 @@ body {
 	animation-name: slideout;
 }
 
-#title {
-	text-align: center;
-	position: absolute;
-	margin: 24px 0px;
-	width: 100%;
-	font-size: 1.6em;
-	color: #EA52A280;
-	animation-duration: 1s;
-	animation-name: slidein;
-}
-
 #info {
 	text-align: center;
 	position: absolute;
@@ -56,9 +69,19 @@ body {
 	width: 100%;
 	font-size: 0.8em;
 	bottom: 0px;
-	color: #EA52A280;
+	color: #CDCBE1;
 	animation-duration: 1s;
-	animation-name: slidein;
+	animation-name: info-slideup;
+}
+
+@keyframes info-slideup {
+  from {
+		bottom: -24px
+  }
+
+  to {
+		bottom: 0
+  }
 }
 
 @keyframes slidein {

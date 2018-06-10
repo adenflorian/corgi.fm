@@ -8,7 +8,6 @@ export class BasicInstrument {
 	private _gain: GainNode
 	private _delay: DelayNode
 	private _delayGain: GainNode
-	private _reverb: ConvolverNode
 	private _oscillators: OscillatorNode[] = []
 	private _voiceCount = 10
 
@@ -40,8 +39,6 @@ export class BasicInstrument {
 		this._delayGain.gain.setValueAtTime(0.5, audioContext.currentTime)
 
 		this._delay.delayTime.setValueAtTime(0.05, audioContext.currentTime)
-
-		this._reverb = audioContext.createConvolver()
 
 		this._oscillator.connect(this._panNode)
 		this._panNode.connect(this._delay)

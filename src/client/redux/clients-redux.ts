@@ -1,3 +1,5 @@
+import hashbow from 'hashbow'
+import {IMidiNote} from '../MidiNote'
 import {ClientId} from '../websocket'
 
 export const SET_CLIENTS = 'SET_CLIENTS'
@@ -29,10 +31,8 @@ export const clientDisconnecting = (id: ClientId) => {
 
 export interface IClient {
 	id: string,
-	note: {
-		frequency: number,
-		note: string,
-	}
+	notes: IMidiNote[]
+	color: string
 }
 
 export class Client implements IClient {
@@ -40,16 +40,20 @@ export class Client implements IClient {
 		return new Client(backEndClient.id)
 	}
 
-	public id: ClientId
-
-	public note: {
-		frequency: number,
-		note: string,
-	}
+	public id
+	public color
+	public notes
 
 	constructor(id: ClientId) {
 		this.id = id
+		this.color = hashbow(this.id)
 	}
+}
+
+export class DummyClient implements IClient {
+	public id
+	public color
+	public notes
 }
 
 export type IClientsState = IClient[]
