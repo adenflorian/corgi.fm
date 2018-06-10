@@ -22,12 +22,14 @@ io.on('connection', socket => {
 	logger.log('new connection | ', socket.id)
 
 	clients.add(socket.id)
+	console.log('clients: ', clients)
 
 	sendClientsToNewClient(socket)
-	sendNewClient(socket.id)
+	sendNewClientToOthers(socket, clients.get(socket.id))
 
 	socket.on('notes', notespayload => {
 		logger.log(`client: ${socket.id} | `, notespayload)
+		clients.setNotes(socket.id, notespayload.notes)
 		socket.broadcast.emit('notes', {
 			notes: notespayload.notes,
 			clientId: socket.id,
@@ -36,6 +38,7 @@ io.on('connection', socket => {
 
 	socket.on('octave', octavePayload => {
 		logger.log(`octave: ${socket.id} | `, octavePayload)
+		clients.setOctave(socket.id, octavePayload.octave)
 		socket.broadcast.emit('octave', {
 			octave: octavePayload.octave,
 			clientId: socket.id,
@@ -71,11 +74,9 @@ function sendClientsToNewClient(newClientSocket) {
 	})
 }
 
-function sendNewClient(id) {
+function sendNewClientToOthers(socket, client) {
 	logger.debug('sending new client info to all clients')
-	io.local.emit('newClient', {
-		id,
-	})
+	socket.broadcast.emit('newClient', client)
 }
 
 function sendClientDisconnected(id) {

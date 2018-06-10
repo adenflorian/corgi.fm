@@ -1,9 +1,10 @@
 import {IMidiNote} from '../MidiNote'
 import {ClientId} from '../websocket'
-import {NEW_CLIENT} from './clients-redux'
+import {NEW_CLIENT, SET_CLIENTS} from './clients-redux'
 import {IAppState} from './configureStore'
 import {Octave} from './midi-redux'
 import {applyOctave} from './virtual-midi-keyboard-middleware'
+import {SET_MY_CLIENT_ID} from './websocket-redux'
 
 export const VIRTUAL_KEY_PRESSED = 'VIRTUAL_KEY_PRESSED'
 export const VIRTUAL_KEY_UP = 'VIRTUAL_KEY_UP'
@@ -111,7 +112,7 @@ export function virtualKeyboardsReducer(state: VirtualKeyboardsState = {}, actio
 				...state,
 				[action.ownerId]: {
 					...state[action.ownerId],
-					octave: action.octave || defaultOctave,
+					octave: action.octave,
 				},
 			}
 		case INCREASE_VIRTUAL_OCTAVE:
@@ -131,6 +132,32 @@ export function virtualKeyboardsReducer(state: VirtualKeyboardsState = {}, actio
 				},
 			}
 		case NEW_CLIENT:
+			return {
+				...state,
+				[action.id]: {
+					octave: defaultOctave,
+					pressedKeys: [],
+				},
+			}
+		case SET_CLIENTS:
+			action.clients.reduce((all, client) => {
+				all[client.id] = {
+					octave: client.octave,
+					pressedKeys: client.notes,
+				}
+				return all
+			}, {})
+			return {
+				...state,
+				...action.clients.reduce((all, client) => {
+					all[client.id] = {
+						octave: client.octave,
+						pressedKeys: client.notes,
+					}
+					return all
+				}, {}),
+			}
+		case SET_MY_CLIENT_ID:
 			return {
 				...state,
 				[action.id]: {

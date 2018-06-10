@@ -9,13 +9,6 @@ import {
 
 export const websocketMiddleware = store => next => action => {
 	switch (action.type) {
-		// case MIDI_KEY_PRESSED:
-		// case MIDI_KEY_UP:
-		// 	next(action)
-		// 	const pressedMidiNotes = selectPressedMidiNotes(state.midi)
-
-		// 	socket.emit('notes', {notes: pressedMidiNotes})
-		// 	break
 		case VIRTUAL_KEY_PRESSED:
 		case VIRTUAL_KEY_UP:
 			return onVirtualKey(action, store, next)

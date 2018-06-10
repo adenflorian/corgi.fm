@@ -51,6 +51,13 @@ export function setupWebsocket(store: Store) {
 		setClients(data.clients)
 	})
 
+	function setClients(newClients) {
+		store.dispatch({
+			type: SET_CLIENTS,
+			clients: newClients,
+		})
+	}
+
 	socket.on('newClient', data => {
 		logger.log('newClient: ', data)
 		store.dispatch(newClient(data.id))
@@ -60,13 +67,6 @@ export function setupWebsocket(store: Store) {
 		logger.log('clientDisconnected: ', data)
 		store.dispatch(clientDisconnected(data.id))
 	})
-
-	function setClients(newClients) {
-		store.dispatch({
-			type: SET_CLIENTS,
-			clients: newClients,
-		})
-	}
 
 	socket.on('notes', (data: NotesPayload) => {
 		logger.log('notes: ', data)
