@@ -43,7 +43,7 @@ class App extends React.Component<IAppProps, {}> {
 							<h2>you:</h2>
 						} */}
 						<ClientId client={myClient} />
-						<ConnectedKeyboard ownerId={myClient.id} />
+						<ConnectedKeyboard ownerId={myClient.id} myKeyboard={true} />
 					</div>
 
 					{/* <div id="otherClients" className="board"> */}

@@ -86,13 +86,13 @@ body {
 
 @keyframes slidein {
   from {
-	height: 0;
-    margin-left: 100%;
+		height: 0;
+    margin-left: 200%;
     width: 300%;
   }
 
   to {
-	height: 128px;
+		height: 128px;
     margin-left: 0%;
     width: 100%;
   }
@@ -100,14 +100,14 @@ body {
 
 @keyframes slideout {
   from {
-	height: 128px;
-    margin-left: 0%;
-	width: 100%;
+		height: 128px;
+    margin-right: 0%;
+		width: 100%;
   }
 
   to {
-	height: 0;
-    margin-left: 100%;
-	width: 300%;
+		height: 0;
+    margin-right: 200%;
+		width: 300%;
   }
 }

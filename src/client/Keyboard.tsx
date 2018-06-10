@@ -1,9 +1,13 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
+import {audioContext, masterVolume} from './AudioContext'
+import {BasicInstrument} from './BasicInstrument'
 import './Keyboard.css'
+import {IMidiNote} from './MidiNote'
 import {DummyClient, IClient} from './redux/clients-redux'
 import {IAppState} from './redux/configureStore'
 import {Octave} from './redux/midi-redux'
+import {selectMidiOutput, selectPressedKeys} from './redux/virtual-keyboard-redux'
 import {keyToMidiMap} from './redux/virtual-midi-keyboard-middleware'
 import {ClientId} from './websocket'
 
@@ -45,6 +49,8 @@ interface IKeyboardProps {
 	pressedMidiKeys?: any,
 	octave?: Octave
 	owner: IClient
+	actualMidiNotes: IMidiNote[]
+	audioContext: any
 }
 
 function boxShadow3dCss(size: number, color: string) {
@@ -72,12 +78,27 @@ export class Keyboard extends React.Component<IKeyboardProps> {
 		owner: new DummyClient(),
 	}
 
+	private instrument: BasicInstrument
+
+	constructor(props) {
+		super(props)
+		this.instrument = new BasicInstrument({audioContext, destination: masterVolume})
+		if (props.myKeyboard) {
+			this.instrument.setPan(-0.5)
+		} else {
+			this.instrument.setPan(0.5)
+		}
+	}
+
 	public render() {
-		const {pressedMidiKeys, octave, owner} = this.props
+		const {actualMidiNotes, pressedMidiKeys, octave, owner} = this.props
+
+		this.instrument.setMidiNotes(actualMidiNotes)
+
 		return (
 			<div className="keyboard" style={{boxShadow: boxShadow3dCss(8, owner.color)}}>
 				<div className="octave">
-					{octave || '?'}
+					{octave}
 				</div>
 				{virtualMidiKeyboard.map((value, index) => {
 					const isKeyPressed = pressedMidiKeys.some(x => (x % 12) === index)
@@ -103,9 +124,17 @@ export class Keyboard extends React.Component<IKeyboardProps> {
 	}
 }
 
-const mapStateToProps = (state: IAppState, props) => ({
-	pressedMidiKeys: state.virtualKeyboards[props.ownerId] && state.virtualKeyboards[props.ownerId].pressedKeys,
-	owner: state.clients.find(x => x.id === props.ownerId),
-})
+const mapStateToProps = (state: IAppState, props) => {
+	const owner = state.clients.find(x => x.id === props.ownerId)
+	const virtualKeyboard = state.virtualKeyboards[props.ownerId]
+
+	return {
+		pressedMidiKeys: virtualKeyboard && virtualKeyboard.pressedKeys,
+		owner,
+		octave: virtualKeyboard && virtualKeyboard.octave,
+		audioContext,
+		actualMidiNotes: owner ? selectMidiOutput(state, owner.id).notes : [],
+	}
+}
 
 export const ConnectedKeyboard = connect(mapStateToProps)(Keyboard)

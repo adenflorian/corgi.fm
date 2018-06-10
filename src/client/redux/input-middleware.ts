@@ -1,4 +1,6 @@
+import {IAppState} from './configureStore'
 import {NOTE_UP, notePressed} from './notes-redux'
+import {decreaseVirtualOctave, increaseVirtualOctave} from './virtual-keyboard-redux'
 import {isMidiKey} from './virtual-midi-keyboard-middleware'
 
 export const KEY_DOWN = 'KEY_DOWN'
@@ -124,15 +126,15 @@ function onKeyDown(e, store) {
 
 	const keyname = e.key
 
-	if (isMidiKey(keyname) === false) return
+	const state: IAppState = store.getState()
 
-	const note = keyToNoteMap[e.key]
-
-	// const halfSteps = noteToHalfStepMap[note]
-	// const frequency = getFrequencyUsingHalfStepsFromA4(halfSteps)
-
-	store.dispatch(notePressed(note))
-	// store.dispatch(midiKeyPressed(keyToMidiMap[keyname]))
+	if (isMidiKey(keyname)) {
+		store.dispatch(notePressed(keyToNoteMap[e.key]))
+	} else if (keyname === 'x') {
+		store.dispatch(increaseVirtualOctave(state.websocket.myClientId))
+	} else if (keyname === 'z') {
+		store.dispatch(decreaseVirtualOctave(state.websocket.myClientId))
+	}
 }
 
 function onKeyUp(e, store) {

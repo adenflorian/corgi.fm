@@ -4,19 +4,14 @@ import {hot} from 'react-hot-loader'
 import {Provider} from 'react-redux'
 import Reverb from 'soundbank-reverb'
 import {ConnectedApp} from './App'
-import {BasicInstrument} from './BasicInstrument'
+import {audioContext, masterVolume} from './AudioContext'
 import {setupInputEventListeners} from './input-events'
-import {configureStore, IAppState} from './redux/configureStore'
-import {selectPressedMidiNotes} from './redux/midi-redux'
+import {configureStore} from './redux/configureStore'
 import {setupWebsocket} from './websocket'
 
 const store = configureStore()
 
 setupInputEventListeners(window, store)
-
-// Might be needed for safari
-// const AudioContext = window.AudioContext || window.webkitAudioContext
-const audioContext = new AudioContext()
 
 const onVolume = 0.1
 
@@ -24,31 +19,28 @@ const reverb = Reverb(audioContext)
 reverb.time = 5
 reverb.cutoff.value = 1000
 
-const masterVolume = audioContext.createGain()
-
 masterVolume.connect(reverb)
 	.connect(audioContext.destination)
 
-const myInstrument = new BasicInstrument({
-	destination: masterVolume,
-	audioContext,
-})
-myInstrument.setPan(-0.5)
+// const myInstrument = new BasicInstrument({
+// 	destination: masterVolume,
+// 	audioContext,
+// })
+// myInstrument.setPan(-0.5)
 
-const otherClientsInstrument = new BasicInstrument({
-	destination: masterVolume,
-	audioContext,
-})
-otherClientsInstrument.setPan(0.5)
+// const otherClientsInstrument = new BasicInstrument({
+// 	destination: masterVolume,
+// 	audioContext,
+// })
+// otherClientsInstrument.setPan(0.5)
 
 changeMasterVolume(onVolume)
 
-store.subscribe(() => {
-	const state: IAppState = store.getState()
-	const pressedMidiNotes = selectPressedMidiNotes(state.midi)
-
-	myInstrument.setMidiNotes(pressedMidiNotes)
-})
+// store.subscribe(() => {
+// 	const state: IAppState = store.getState()
+// 	const {notes} = selectMidiOutput(state, state.websocket.myClientId)
+// 	myInstrument.setMidiNotes(notes)
+// })
 
 // store.subscribe(() => {
 // 	const state: IAppState = store.getState()
@@ -62,7 +54,7 @@ function changeMasterVolume(newGain) {
 	masterVolume.gain.value = newGain
 }
 
-const socket = setupWebsocket(store, otherClientsInstrument)
+const socket = setupWebsocket(store)
 
 declare global {
 	interface NodeModule {

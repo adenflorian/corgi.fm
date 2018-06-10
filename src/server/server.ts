@@ -34,6 +34,14 @@ io.on('connection', socket => {
 		})
 	})
 
+	socket.on('octave', octavePayload => {
+		logger.log(`octave: ${socket.id} | `, octavePayload)
+		socket.broadcast.emit('octave', {
+			octave: octavePayload.octave,
+			clientId: socket.id,
+		})
+	})
+
 	socket.on('disconnect', () => {
 		logger.log(`client disconnected: ${socket.id}`)
 		clients.remove(socket.id)

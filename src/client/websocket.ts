@@ -2,11 +2,12 @@ import {Store} from 'redux'
 import * as io from 'socket.io-client'
 import {logger} from './logger'
 import {IMidiNote} from './MidiNote'
-import {CLIENT_NOTES, clientDisconnected, newClient, SET_CLIENTS} from './redux/clients-redux'
-import {setVirtualKeys} from './redux/virtual-keyboard-redux'
+import {clientDisconnected, newClient, SET_CLIENTS} from './redux/clients-redux'
+import {Octave} from './redux/midi-redux'
+import {setVirtualKeys, virtualOctave} from './redux/virtual-keyboard-redux'
 import {SET_MY_CLIENT_ID, setInfo, setSocket} from './redux/websocket-redux'
 
-export function setupWebsocket(store: Store, otherClientsInstrument) {
+export function setupWebsocket(store: Store) {
 	const socket = io.connect('/')
 
 	logger.log('socket connected')
@@ -69,14 +70,20 @@ export function setupWebsocket(store: Store, otherClientsInstrument) {
 
 	socket.on('notes', (data: NotesPayload) => {
 		logger.log('notes: ', data)
-		setMidiForOtherClientsInstrument(data.notes)
+		// setMidiForOtherClientsInstrument(data.notes)
 
-		store.dispatch({
-			type: CLIENT_NOTES,
-			...data,
-		})
+		// store.dispatch({
+		// 	type: CLIENT_NOTES,
+		// 	...data,
+		// })
 
 		store.dispatch(setVirtualKeys(data.clientId, data.notes))
+	})
+
+	socket.on('octave', (data: OctavePayload) => {
+		logger.log('octave: ', data)
+
+		store.dispatch(virtualOctave(data.clientId, data.octave))
 	})
 
 	function socketInfo(info: string) {
@@ -84,10 +91,10 @@ export function setupWebsocket(store: Store, otherClientsInstrument) {
 		logger.log(info)
 	}
 
-	/** @param {number} newFrequency */
-	function setMidiForOtherClientsInstrument(notes) {
-		otherClientsInstrument.setMidiNotes(notes)
-	}
+	// /** @param {number} newFrequency */
+	// function setMidiForOtherClientsInstrument(notes) {
+	// 	otherClientsInstrument.setMidiNotes(notes)
+	// }
 
 	return socket
 }
@@ -96,5 +103,10 @@ export type ClientId = string
 
 export interface NotesPayload {
 	notes: IMidiNote[]
+	clientId: ClientId
+}
+
+export interface OctavePayload {
+	octave: Octave
 	clientId: ClientId
 }
