@@ -26,9 +26,9 @@ const keyColors = Object.freeze({
 	11: {color: 'white', name: 'B'},
 })
 
-const defaultNumberOfKeys = 13
+const defaultNumberOfKeys = 17
 
-const virtualMidiKeyboard = createVirtualMidiKeyboard(defaultNumberOfKeys)
+const globalVirtualMidiKeyboard = createVirtualMidiKeyboard(defaultNumberOfKeys)
 
 function createVirtualMidiKeyboard(numberOfKeys: number) {
 	const newVirtualMidiKeyboard = []
@@ -51,6 +51,7 @@ interface IKeyboardProps {
 	owner: IClient
 	actualMidiNotes: IMidiNote[]
 	audioContext: any
+	virtualMidiKeyboard: any
 }
 
 function boxShadow3dCss(size: number, color: string) {
@@ -91,7 +92,7 @@ export class Keyboard extends React.Component<IKeyboardProps> {
 	}
 
 	public render() {
-		const {actualMidiNotes, pressedMidiKeys, octave, owner} = this.props
+		const {actualMidiNotes, pressedMidiKeys, octave, owner, virtualMidiKeyboard} = this.props
 
 		this.instrument.setMidiNotes(actualMidiNotes)
 
@@ -101,7 +102,7 @@ export class Keyboard extends React.Component<IKeyboardProps> {
 					{octave}
 				</div>
 				{virtualMidiKeyboard.map((value, index) => {
-					const isKeyPressed = pressedMidiKeys.some(x => (x % 12) === index)
+					const isKeyPressed = pressedMidiKeys.some(x => x === index)
 
 					return (
 						<div
@@ -134,6 +135,7 @@ const mapStateToProps = (state: IAppState, props) => {
 		octave: virtualKeyboard && virtualKeyboard.octave,
 		audioContext,
 		actualMidiNotes: owner ? selectMidiOutput(state, owner.id).notes : [],
+		virtualMidiKeyboard: globalVirtualMidiKeyboard,
 	}
 }
 
