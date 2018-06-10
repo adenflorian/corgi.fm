@@ -1,16 +1,90 @@
 body {
+	background-color: #121621;
+	overflow: hidden;
+}
+
+#react-app {
 	font-family: Arial, Helvetica, sans-serif;
 	letter-spacing: 8px;
 	text-transform: lowercase;
 	text-align: center;
 	font-size: 1.2em;
-	background-color: #121621;
 	color: #EA52A2;
 	font-weight: 600;
-	padding: 24px;
 	line-height: 1.2em;
 }
 
 .clientId {
 	margin: 4px;
+}
+
+.boardContainer {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	height: 100vh;
+	transition: all 0.5s ease;
+}
+
+.board {
+	height: 128px;
+	animation-duration: 1s;
+	animation-name: slidein;
+}
+
+.board.disconnecting {
+	animation-fill-mode: forwards;
+	animation-duration: 1s;
+	animation-name: slideout;
+}
+
+#title {
+	text-align: center;
+	position: absolute;
+	margin: 24px 0px;
+	width: 100%;
+	font-size: 1.6em;
+	color: #EA52A280;
+	animation-duration: 1s;
+	animation-name: slidein;
+}
+
+#info {
+	text-align: center;
+	position: absolute;
+	margin: 8px 0px;
+	width: 100%;
+	font-size: 0.8em;
+	bottom: 0px;
+	color: #EA52A280;
+	animation-duration: 1s;
+	animation-name: slidein;
+}
+
+@keyframes slidein {
+  from {
+	height: 0;
+    margin-left: 100%;
+    width: 300%;
+  }
+
+  to {
+	height: 128px;
+    margin-left: 0%;
+    width: 100%;
+  }
+}
+
+@keyframes slideout {
+  from {
+	height: 128px;
+    margin-left: 0%;
+	width: 100%;
+  }
+
+  to {
+	height: 0;
+    margin-left: 100%;
+	width: 300%;
+  }
 }

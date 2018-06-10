@@ -3,6 +3,7 @@ import {ClientId} from '../websocket'
 export const SET_CLIENTS = 'SET_CLIENTS'
 export const NEW_CLIENT = 'NEW_CLIENT'
 export const CLIENT_DISCONNECTED = 'CLIENT_DISCONNECTED'
+export const CLIENT_DISCONNECTING = 'CLIENT_DISCONNECTING'
 export const CLIENT_NOTES = 'CLIENT_NOTES'
 
 export const newClient = (id: ClientId) => {
@@ -15,6 +16,13 @@ export const newClient = (id: ClientId) => {
 export const clientDisconnected = (id: ClientId) => {
 	return {
 		type: CLIENT_DISCONNECTED,
+		id,
+	}
+}
+
+export const clientDisconnecting = (id: ClientId) => {
+	return {
+		type: CLIENT_DISCONNECTING,
 		id,
 	}
 }
@@ -57,6 +65,8 @@ export function clientsReducer(state: IClientsState = [], action) {
 			]
 		case CLIENT_DISCONNECTED:
 			return state.filter(x => x.id !== action.id)
+		case CLIENT_DISCONNECTING:
+			return state.map(x => x.id === action.id ? {...x, disconnecting: true} : x)
 		case CLIENT_NOTES:
 			return state.map(client => {
 				if (client.id === action.clientId) {
