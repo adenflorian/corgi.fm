@@ -148,10 +148,3 @@ function onKeyUp(e, store) {
 export function isMidiKey(keyname: string) {
 	return allowedKeysForMidi.some(x => x === keyname.toLowerCase())
 }
-
-export function getFrequencyUsingHalfStepsFromA4(halfSteps: number) {
-	const fixedNoteFrequency = 440
-	const twelthRootOf2 = Math.pow(2, 1 / 12) // 1.059463094359...
-
-	return fixedNoteFrequency * Math.pow(twelthRootOf2, halfSteps)
-}

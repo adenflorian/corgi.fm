@@ -1,5 +1,5 @@
 import {IMidiNote} from './MidiNote'
-import {getFrequencyUsingHalfStepsFromA4} from './redux/input-middleware'
+import {getFrequencyUsingHalfStepsFromA4} from './music-functions'
 
 export class BasicInstrument {
 	private _panNode: StereoPannerNode
