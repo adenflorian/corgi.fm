@@ -34,19 +34,18 @@ export class BasicInstrument {
 
 		this._gain = audioContext.createGain()
 
-		this._delay = audioContext.createDelay(10.0)
-		this._delayGain = audioContext.createGain()
-		this._delayGain.gain.setValueAtTime(0.5, audioContext.currentTime)
+		// this._delay = audioContext.createDelay(10.0)
+		// this._delayGain = audioContext.createGain()
+		// this._delayGain.gain.setValueAtTime(0.5, audioContext.currentTime)
 
-		this._delay.delayTime.setValueAtTime(0.05, audioContext.currentTime)
+		// this._delay.delayTime.setValueAtTime(0.05, audioContext.currentTime)
 
 		this._oscillator.connect(this._panNode)
-		this._panNode.connect(this._delay)
-		this._delay.connect(this._delayGain)
-			.connect(this._gain)
+		// this._panNode.connect(this._delay)
+		// this._delay.connect(this._delayGain)
+		// 	.connect(this._gain)
 
 		this._panNode.connect(this._gain)
-			// .connect(this._reverb)
 			.connect(destination)
 
 		this._oscillator.start()
@@ -59,6 +58,10 @@ export class BasicInstrument {
 	public setMidiNotes = (midiNotes: IMidiNote[]) => {
 		const frequency: number = this._getFrequencyFromMidiNotes(midiNotes) || 0
 		this._oscillator.frequency.value = frequency
+	}
+
+	public setOscillatorType = (type: OscillatorType) => {
+		this._oscillator.type = type
 	}
 
 	private _getFrequencyFromMidiNotes(midiNotes: IMidiNote[]): number {

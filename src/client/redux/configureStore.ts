@@ -1,5 +1,4 @@
 import {applyMiddleware, combineReducers, compose, createStore} from 'redux'
-import {audioContextReducer} from './audio-context-redux'
 import {clientsReducer, IClient} from './clients-redux'
 import {keysReducer} from './keys-redux'
 import {virtualKeyboardsReducer, VirtualKeyboardsState} from './virtual-keyboard-redux'
@@ -12,7 +11,7 @@ export interface IAppState {
 	keys: object
 	websocket: IWebsocketState
 	virtualKeyboards: VirtualKeyboardsState,
-	audioContext: any
+	audio: any
 }
 
 declare global {
@@ -21,15 +20,16 @@ declare global {
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
 
-export function configureStore() {
+export function configureStore(initialState: {}) {
 	return createStore(
 		combineReducers({
-			audioContext: audioContextReducer,
 			clients: clientsReducer,
 			keys: keysReducer,
 			websocket: websocketReducer,
 			virtualKeyboards: virtualKeyboardsReducer,
+			audio: (state = {}) => state,
 		}),
+		initialState,
 		composeEnhancers(
 			applyMiddleware(
 				websocketMiddleware,

@@ -1,6 +1,5 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
-import {audioContext, masterVolume} from './AudioContext'
 import {BasicInstrument} from './BasicInstrument'
 import './Keyboard.css'
 import {IMidiNote} from './MidiNote'
@@ -50,7 +49,7 @@ interface IKeyboardProps {
 	octave?: Octave
 	owner: IClient
 	actualMidiNotes: IMidiNote[]
-	audioContext: any
+	audio: any
 	virtualMidiKeyboard: any
 }
 
@@ -83,7 +82,10 @@ export class Keyboard extends React.Component<IKeyboardProps> {
 
 	constructor(props) {
 		super(props)
-		this.instrument = new BasicInstrument({audioContext, destination: masterVolume})
+		this.instrument = new BasicInstrument({
+			audioContext: props.audio.context,
+			destination: props.audio.master,
+		})
 		if (props.myKeyboard) {
 			this.instrument.setPan(-0.5)
 		} else {
@@ -133,7 +135,7 @@ const mapStateToProps = (state: IAppState, props) => {
 		pressedMidiKeys: virtualKeyboard && virtualKeyboard.pressedKeys,
 		owner,
 		octave: virtualKeyboard && virtualKeyboard.octave,
-		audioContext,
+		audio: state.audio,
 		actualMidiNotes: owner ? selectMidiOutput(state, owner.id).notes : [],
 		virtualMidiKeyboard: globalVirtualMidiKeyboard,
 	}

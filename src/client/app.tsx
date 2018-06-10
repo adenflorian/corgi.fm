@@ -35,14 +35,16 @@ class App extends React.Component<IAppProps, {}> {
 
 		return (
 			<Fragment>
-				<h1 id="title">sha-mu</h1>
+				{/* <h1 id="title">sha-mu</h1> */}
 
 				<div className="boardContainer">
 					<div id="you" className="board connected">
 						{/* {otherClients.length > 0 &&
 							<h2>you:</h2>
 						} */}
-						<ClientId client={myClient} />
+						{otherClients.length > 0 &&
+							<ClientId client={myClient} />
+						}
 						<ConnectedKeyboard ownerId={myClient.id} myKeyboard={true} />
 					</div>
 

@@ -4,12 +4,22 @@ import {hot} from 'react-hot-loader'
 import {Provider} from 'react-redux'
 import Reverb from 'soundbank-reverb'
 import {ConnectedApp} from './App'
-import {audioContext, masterVolume} from './AudioContext'
 import {setupInputEventListeners} from './input-events'
 import {configureStore} from './redux/configureStore'
 import {setupWebsocket} from './websocket'
 
-const store = configureStore()
+// Might be needed for safari
+// const AudioContext = window.AudioContext || window.webkitAudioContext
+const audioContext = new AudioContext()
+
+const masterVolume = audioContext.createGain()
+
+const store = configureStore({
+	audio: {
+		context: audioContext,
+		master: masterVolume,
+	},
+})
 
 setupInputEventListeners(window, store)
 
