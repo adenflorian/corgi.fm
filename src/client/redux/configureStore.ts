@@ -3,7 +3,6 @@ import {audioContextReducer} from './audio-context-redux'
 import {clientsReducer, IClient} from './clients-redux'
 import {inputMiddleware} from './input-middleware'
 import {keysReducer} from './keys-redux'
-import {IMidiState, midiReducer} from './midi-redux'
 import {notesReducer} from './notes-redux'
 import {virtualKeyboardsReducer, VirtualKeyboardsState} from './virtual-keyboard-redux'
 import {virtualMidiKeyboardMiddleware} from './virtual-midi-keyboard-middleware'
@@ -13,7 +12,6 @@ import {IWebsocketState, websocketReducer} from './websocket-redux'
 export interface IAppState {
 	clients: IClient[]
 	keys: object
-	midi: IMidiState
 	notes: object
 	websocket: IWebsocketState
 	virtualKeyboards: VirtualKeyboardsState,
@@ -32,7 +30,6 @@ export function configureStore() {
 			audioContext: audioContextReducer,
 			clients: clientsReducer,
 			keys: keysReducer,
-			midi: midiReducer,
 			notes: notesReducer,
 			websocket: websocketReducer,
 			virtualKeyboards: virtualKeyboardsReducer,

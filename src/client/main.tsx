@@ -22,35 +22,9 @@ reverb.cutoff.value = 1000
 masterVolume.connect(reverb)
 	.connect(audioContext.destination)
 
-// const myInstrument = new BasicInstrument({
-// 	destination: masterVolume,
-// 	audioContext,
-// })
-// myInstrument.setPan(-0.5)
-
-// const otherClientsInstrument = new BasicInstrument({
-// 	destination: masterVolume,
-// 	audioContext,
-// })
-// otherClientsInstrument.setPan(0.5)
-
 changeMasterVolume(onVolume)
 
-// store.subscribe(() => {
-// 	const state: IAppState = store.getState()
-// 	const {notes} = selectMidiOutput(state, state.websocket.myClientId)
-// 	myInstrument.setMidiNotes(notes)
-// })
-
-// store.subscribe(() => {
-// 	const state: IAppState = store.getState()
-// 	const pressedMidiNotes = state.otherClients.forEach(callbackfn)
-
-// 	otherClientsInstrument.setMidiNotes(pressedMidiNotes)
-// })
-
-/** @param {number} newFrequency */
-function changeMasterVolume(newGain) {
+function changeMasterVolume(newGain: number) {
 	masterVolume.gain.value = newGain
 }
 
