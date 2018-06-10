@@ -7,7 +7,7 @@ import {IMidiNote} from './MidiNote'
 import {DummyClient, IClient} from './redux/clients-redux'
 import {IAppState} from './redux/configureStore'
 import {Octave} from './redux/midi-redux'
-import {selectMidiOutput, selectPressedKeys} from './redux/virtual-keyboard-redux'
+import {selectMidiOutput} from './redux/virtual-keyboard-redux'
 import {keyToMidiMap} from './redux/virtual-midi-keyboard-middleware'
 import {ClientId} from './websocket'
 

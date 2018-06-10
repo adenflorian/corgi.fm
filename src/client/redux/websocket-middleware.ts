@@ -3,7 +3,6 @@ import {IAppState} from './configureStore'
 import {
 	DECREASE_VIRTUAL_OCTAVE,
 	INCREASE_VIRTUAL_OCTAVE,
-	selectMidiOutput,
 	VIRTUAL_KEY_PRESSED,
 	VIRTUAL_KEY_UP,
 } from './virtual-keyboard-redux'
