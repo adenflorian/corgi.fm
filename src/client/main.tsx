@@ -29,8 +29,13 @@ const reverb = Reverb(audioContext)
 reverb.time = 5
 reverb.cutoff.value = 1000
 
+const reverbLowAndLong = Reverb(audioContext)
+reverbLowAndLong.time = 30
+reverbLowAndLong.cutoff.value = 150
+
 masterVolume.connect(reverb)
-	.connect(audioContext.destination)
+reverb.connect(reverbLowAndLong)
+reverbLowAndLong.connect(audioContext.destination)
 
 changeMasterVolume(onVolume)
 

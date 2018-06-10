@@ -6,8 +6,6 @@ export class BasicInstrument {
 	private _oscillator: OscillatorNode
 	private _audioContext: AudioContext
 	private _gain: GainNode
-	private _delay: DelayNode
-	private _delayGain: GainNode
 	private _oscillators: OscillatorNode[] = []
 	private _voiceCount = 10
 
@@ -34,16 +32,7 @@ export class BasicInstrument {
 
 		this._gain = audioContext.createGain()
 
-		// this._delay = audioContext.createDelay(10.0)
-		// this._delayGain = audioContext.createGain()
-		// this._delayGain.gain.setValueAtTime(0.5, audioContext.currentTime)
-
-		// this._delay.delayTime.setValueAtTime(0.05, audioContext.currentTime)
-
 		this._oscillator.connect(this._panNode)
-		// this._panNode.connect(this._delay)
-		// this._delay.connect(this._delayGain)
-		// 	.connect(this._gain)
 
 		this._panNode.connect(this._gain)
 			.connect(destination)
