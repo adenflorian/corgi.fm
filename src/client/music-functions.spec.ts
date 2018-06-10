@@ -1,5 +1,5 @@
 import {expect} from 'chai'
-import {applyOctave} from './input-middleware'
+import {applyOctave} from './music-functions'
 
 declare const describe: (x, y) => any
 declare const it: (x, y) => any

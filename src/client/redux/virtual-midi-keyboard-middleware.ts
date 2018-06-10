@@ -89,12 +89,6 @@ export const noteToHalfStepMap = Object.freeze({
 // const firstOctave = -1
 // const currentOctave = 4
 
-export function applyOctave(midiNumber: number, octave: number) {
-	if (octave === -1) return midiNumber
-
-	return midiNumber + (octave * 12) + 12
-}
-
 // keyboard key + octave => midi key => note name => frequency
 
 export const midiKeyToNote = Object.freeze({

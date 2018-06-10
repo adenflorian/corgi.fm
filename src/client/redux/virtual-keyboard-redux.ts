@@ -1,9 +1,9 @@
 import {IMidiNote} from '../MidiNote'
+import {applyOctave} from '../music-functions'
 import {Octave} from '../music-types'
 import {ClientId} from '../websocket'
 import {NEW_CLIENT, SET_CLIENTS} from './clients-redux'
 import {IAppState} from './configureStore'
-import {applyOctave} from './virtual-midi-keyboard-middleware'
 import {SET_MY_CLIENT_ID} from './websocket-redux'
 
 export const VIRTUAL_KEY_PRESSED = 'VIRTUAL_KEY_PRESSED'
