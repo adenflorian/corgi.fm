@@ -2,7 +2,7 @@ import {IMidiNote} from '../MidiNote'
 import {applyOctave} from '../music-functions'
 import {Octave} from '../music-types'
 import {ClientId} from '../websocket'
-import {NEW_CLIENT, SET_CLIENTS} from './clients-redux'
+import {CLIENT_DISCONNECTED, NEW_CLIENT, SET_CLIENTS} from './clients-redux'
 import {IAppState} from './configureStore'
 import {SET_MY_CLIENT_ID} from './websocket-redux'
 
@@ -172,6 +172,10 @@ export function virtualKeyboardsReducer(state: VirtualKeyboardsState = initialSt
 					pressedKeys: [],
 				},
 			}
+		case CLIENT_DISCONNECTED:
+			const newState = {...state}
+			delete newState[action.id]
+			return newState
 		default:
 			return state
 	}

@@ -1,9 +1,7 @@
 import {applyMiddleware, combineReducers, compose, createStore} from 'redux'
 import {audioReducer, IAudioState} from './audio-redux'
 import {clientsReducer, IClient} from './clients-redux'
-import {keysReducer} from './keys-redux'
 import {virtualKeyboardsReducer, VirtualKeyboardsState} from './virtual-keyboard-redux'
-import {virtualMidiKeyboardMiddleware} from './virtual-midi-keyboard-middleware'
 import {websocketMiddleware} from './websocket-middleware'
 import {IWebsocketState, websocketReducer} from './websocket-redux'
 
@@ -25,7 +23,6 @@ export function configureStore(initialState: {}) {
 	return createStore(
 		combineReducers({
 			clients: clientsReducer,
-			keys: keysReducer,
 			websocket: websocketReducer,
 			virtualKeyboards: virtualKeyboardsReducer,
 			audio: audioReducer,
@@ -34,7 +31,6 @@ export function configureStore(initialState: {}) {
 		composeEnhancers(
 			applyMiddleware(
 				websocketMiddleware,
-				virtualMidiKeyboardMiddleware,
 			),
 		),
 	)
