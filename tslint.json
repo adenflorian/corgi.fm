@@ -42,5 +42,11 @@
         "interface-name": false,
         "max-classes-per-file": false
     },
-    "rulesDirectory": []
+    "rulesDirectory": [],
+    "linterOptions": {
+        "exclude": [
+            "gulpfile.js",
+            ".eslintrc.js"
+        ]
+    }
 }
