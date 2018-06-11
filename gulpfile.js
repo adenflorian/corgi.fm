@@ -8,11 +8,10 @@ gulp.task('clean', () => {
 		.pipe(clean())
 })
 
-gulp.task('typescript-server', () => {
+gulp.task('typescript-server-dev', () => {
 	return gulp.src(['src/server/**/*.ts'])
 		.pipe(sourcemaps.init())
 		.pipe(ts({
-			outDir: './built/server',
 			allowJs: true,
 			target: 'esnext',
 			module: 'CommonJS',
@@ -20,12 +19,54 @@ gulp.task('typescript-server', () => {
 			sourceMap: true,
 		}))
 		.pipe(sourcemaps.write())
-		.pipe(gulp.dest('built/server'))
+		.pipe(gulp.dest('built/dev/server'))
 })
 
-gulp.task('other', () => {
+gulp.task('other-dev', () => {
 	return gulp.src(['package.json', 'yarn.lock'])
-		.pipe(gulp.dest('built'))
+		.pipe(gulp.dest('built/dev'))
 })
 
-gulp.task('build', gulp.parallel('typescript-server', 'other'))
+gulp.task('build-dev', gulp.parallel('typescript-server-dev', 'other-dev'))
+
+gulp.task('typescript-server-test', () => {
+	return gulp.src(['src/server/**/*.ts'])
+		.pipe(sourcemaps.init())
+		.pipe(ts({
+			allowJs: true,
+			target: 'esnext',
+			module: 'CommonJS',
+			moduleResolution: 'Node',
+			sourceMap: true,
+		}))
+		.pipe(sourcemaps.write())
+		.pipe(gulp.dest('built/test/server'))
+})
+
+gulp.task('other-test', () => {
+	return gulp.src(['package.json', 'yarn.lock'])
+		.pipe(gulp.dest('built/test'))
+})
+
+gulp.task('build-test', gulp.parallel('typescript-server-test', 'other-test'))
+
+gulp.task('typescript-server-prod', () => {
+	return gulp.src(['src/server/**/*.ts'])
+		.pipe(sourcemaps.init())
+		.pipe(ts({
+			allowJs: true,
+			target: 'esnext',
+			module: 'CommonJS',
+			moduleResolution: 'Node',
+			sourceMap: true,
+		}))
+		.pipe(sourcemaps.write())
+		.pipe(gulp.dest('built/prod/server'))
+})
+
+gulp.task('other-prod', () => {
+	return gulp.src(['package.json', 'yarn.lock'])
+		.pipe(gulp.dest('built/prod'))
+})
+
+gulp.task('build-prod', gulp.parallel('typescript-server-prod', 'other-prod'))

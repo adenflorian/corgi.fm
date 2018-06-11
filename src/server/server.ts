@@ -28,7 +28,7 @@ io.on('connection', socket => {
 	sendNewClientToOthers(socket, clients.get(socket.id))
 
 	socket.on('notes', notespayload => {
-		logger.log(`client: ${socket.id} | `, notespayload)
+		logger.debug(`notes: ${socket.id} | `, notespayload)
 		clients.setNotes(socket.id, notespayload.notes)
 		socket.broadcast.emit('notes', {
 			notes: notespayload.notes,

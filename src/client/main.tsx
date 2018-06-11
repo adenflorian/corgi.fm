@@ -11,6 +11,8 @@ import {configureStore, IAppState} from './redux/configureStore'
 import {setupMidiSupport} from './setup-midi-support'
 import {setupWebsocket} from './websocket'
 
+logger.log('NODE_ENV: ', process.env.NODE_ENV)
+
 const defaultMasterVolume = 0.1
 
 // Might be needed for safari
