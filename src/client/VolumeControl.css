@@ -1,0 +1,14 @@
+.rc-slider.rc-slider-vertical {
+	animation-name: slider-slideout;
+	animation-duration: 2s;
+	animation-timing-function: linear;
+}
+
+@keyframes slider-slideout {
+	from {
+		left: -32px
+	}
+	to {
+		left: 0
+	}
+}

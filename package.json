@@ -19,10 +19,12 @@
     "setup-prod-server": "bash scripts/setup-prod-server.sh"
   },
   "dependencies": {
+    "adsr": "^1.0.1",
     "animal-id": "^0.0.1",
     "classnames": "^2.2.6",
     "color-hash": "^1.0.3",
     "express": "^4.16.3",
+    "filter": "web-audio-components/filter",
     "hashbow": "^1.1.1",
     "prop-types": "^15.6.1",
     "rc-slider": "^8.6.1",

@@ -197,6 +197,10 @@ add-dom-event-listener@1.x:
   dependencies:
     object-assign "4.x"
 
+adsr@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/adsr/-/adsr-1.0.1.tgz#a7bc08e5ef8a71e6364abc96fce7df1c44881cc3"
+
 after@0.8.2:
   version "0.8.2"
   resolved "https://registry.yarnpkg.com/after/-/after-0.8.2.tgz#fedb394f9f0e02aa9768e702bda23b505fae7e1f"
@@ -2661,6 +2665,10 @@ fill-range@^4.0.0:
     is-number "^3.0.0"
     repeat-string "^1.6.1"
     to-regex-range "^2.1.0"
+
+filter@web-audio-components/filter:
+  version "0.0.0"
+  resolved "https://codeload.github.com/web-audio-components/filter/tar.gz/dd432bcb4aed558d016a99b5d77c9ede38d7a197"
 
 finalhandler@1.1.1:
   version "1.1.1"

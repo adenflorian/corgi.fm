@@ -1,3 +1,5 @@
+// import ADSR from 'adsr'
+import Filter from 'filter'
 import {IMidiNote} from './MidiNote'
 import {getFrequencyUsingHalfStepsFromA4} from './music-functions'
 
@@ -7,6 +9,9 @@ export class BasicInstrument {
 	private _gain: GainNode
 	private _oscillators: OscillatorNode[] = []
 	private _voiceCount = 10
+	private _lowPassFilter: AudioNode | any
+	private _lfo: OscillatorNode
+	// private _adsr: AudioNode | any
 
 	constructor({destination, audioContext}: {destination: any, audioContext: AudioContext}) {
 		this._audioContext = audioContext
@@ -28,18 +33,28 @@ export class BasicInstrument {
 			})
 		}
 
-		// this._oscillator = this._audioContext.createOscillator()
-		// this._oscillator.type = 'sawtooth'
-		// this._oscillator.frequency.value = 0
+		this._lowPassFilter = Filter.Lowpass(this._audioContext, {frequency: 10000})
+
+		this._lfo = audioContext.createOscillator()
+		this._lfo.frequency.value = 2
+		const lfoGain = audioContext.createGain()
+		lfoGain.gain.value = 0.14
+
+		this._lfo.start()
 
 		this._gain = audioContext.createGain()
 
-		// this._oscillator.connect(this._panNode)
+		this._lfo.connect(lfoGain)
+			.connect(this._gain.gain)
 
-		this._panNode.connect(this._gain)
-			.connect(destination)
+		// this._adsr = ADSR(this._audioContext)
+		// this._adsr.attack = 3
+		// this._adsr.start(this._audioContext.currentTime)
+		// this._adsr.connect(this._gain.gain)
 
-		// this._oscillator.start()
+		this._panNode.connect(this._lowPassFilter.input)
+		this._lowPassFilter.connect(this._gain)
+		this._gain.connect(destination)
 	}
 
 	public setPan(pan: number) {
@@ -50,9 +65,16 @@ export class BasicInstrument {
 		// const frequency: number = this._getFrequencyFromMidiNotes(midiNotes) || 0
 		// this._oscillator.frequency.value = frequency
 
+		let highestFrequency = 0
+
 		this._oscillators.forEach((oscillator, index) => {
 			oscillator.frequency.value = midiNoteToFrequency(midiNotes[index])
+			if (oscillator.frequency.value > highestFrequency) {
+				highestFrequency = oscillator.frequency.value
+			}
 		})
+
+		this._lfo.frequency.value = (highestFrequency / 100) + 1
 
 		// let adjustedMidiNotes
 

@@ -10,6 +10,7 @@ import {Dispatch} from 'redux'
 import {setMasterVolume} from './redux/audio-redux'
 import {selectOwner} from './redux/clients-redux'
 import {IAppState} from './redux/configureStore'
+import './VolumeControl.css'
 
 interface IVolumeControlProps {
 	masterVolume: number,
@@ -22,6 +23,7 @@ export class VolumeControl extends Component<IVolumeControlProps> {
 		return (
 			<Fragment>
 				<Slider
+					vertical={true}
 					min={0}
 					max={1}
 					step={0.001}
@@ -29,21 +31,23 @@ export class VolumeControl extends Component<IVolumeControlProps> {
 					onChange={this.props.changeMasterVolume}
 					style={{
 						padding: 0,
+						position: 'absolute',
 					}}
 					railStyle={{
 						borderRadius: 0,
-						height: 8,
+						width: 16,
 						backgroundColor: '#282832',
 					}}
 					trackStyle={{
 						borderRadius: 0,
-						height: 8,
+						width: 16,
 						backgroundColor: this.props.ownerColor || 'rgb(120, 120, 120)',
+						left: 0,
 					}}
 					handleStyle={{
 						borderRadius: 0,
-						height: 8,
-						marginTop: 0,
+						width: 16,
+						marginLeft: 0,
 						border: 'none',
 						backgroundColor: 'rgb(120, 120, 120)',
 					}}
