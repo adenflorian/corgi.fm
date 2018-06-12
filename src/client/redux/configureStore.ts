@@ -1,6 +1,7 @@
 import {applyMiddleware, combineReducers, compose, createStore} from 'redux'
 import {audioReducer, IAudioState} from './audio-redux'
 import {clientsReducer, IClient} from './clients-redux'
+import {dawReducer} from './daw-redux'
 import {virtualKeyboardsReducer, VirtualKeyboardsState} from './virtual-keyboard-redux'
 import {websocketMiddleware} from './websocket-middleware'
 import {IWebsocketState, websocketReducer} from './websocket-redux'
@@ -10,6 +11,7 @@ export interface IAppState {
 	websocket: IWebsocketState
 	virtualKeyboards: VirtualKeyboardsState,
 	audio: IAudioState
+	daw: any
 }
 
 declare global {
@@ -25,6 +27,7 @@ export function configureStore(initialState: {}) {
 			websocket: websocketReducer,
 			virtualKeyboards: virtualKeyboardsReducer,
 			audio: audioReducer,
+			daw: dawReducer,
 		}),
 		initialState,
 		composeEnhancers(

@@ -1,0 +1,54 @@
+#tracks {
+	background-color: #282832;
+	margin-left: 16px;
+	color: #EBEBF6;
+}
+
+#tracks .track {
+	display: flex;
+	height: 256px;
+}
+
+.trackName {
+	width: 150px;
+}
+
+.noteLane {
+	height: 0.78125%;
+	background-color: #121621;
+	display: flex;
+}
+.noteLane:nth-child(even) {
+	height: 0.78125%;
+	background-color: #282832;
+	width: 100%;
+}
+.noteLane:hover {
+	background-color: #1f273d;
+}
+.noteLane:nth-child(even):hover {
+	background-color: #1f273d;
+}
+
+.notes {
+	width: 100%;
+	height: 100%;
+	overflow-y: scroll;
+}
+
+.notes .notesScrollable {
+	height: 1024px;
+}
+
+.note {
+	color: black;
+	display: inline-block;
+	background-color: rgb(117, 64, 191);
+	overflow: hidden;
+	height: 100%;
+	position: relative;
+}
+
+.note:hover {
+	background-color: rgb(113, 35, 223);
+}

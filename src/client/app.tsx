@@ -5,6 +5,7 @@ import {Fragment} from 'react'
 import {connect} from 'react-redux'
 import './App.css'
 import './css-reset.css'
+import {ConnectedDAW} from './DAW'
 import {ConnectedKeyboard} from './Keyboard'
 import {DummyClient, IClient} from './redux/clients-redux'
 import {IAppState} from './redux/configureStore'
@@ -41,7 +42,7 @@ class App extends React.Component<IAppProps, {}> {
 
 				<ConnectedVolumeControl />
 
-				{/* <Grid /> */}
+				<ConnectedDAW />
 
 				<div className="boardContainer">
 					<div id="you" className="board connected">
