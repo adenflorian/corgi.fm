@@ -37,6 +37,7 @@
     "react-dom": "^16.4.0",
     "react-hot-loader": "^4.3.0",
     "react-redux": "^5.0.7",
+    "react-rotary-knob": "^1.1.1",
     "redux": "^4.0.0",
     "socket.io": "^2.1.1",
     "soundbank-reverb": "^1.1.2"

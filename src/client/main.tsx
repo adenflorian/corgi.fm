@@ -4,6 +4,7 @@ import {hot} from 'react-hot-loader'
 import {Provider} from 'react-redux'
 import Reverb from 'soundbank-reverb'
 import {ConnectedApp} from './App'
+import {ConnectedDAW} from './DAW'
 import {setupInputEventListeners} from './input-events'
 import {logger} from './logger'
 import {play} from './midi-player'
@@ -180,8 +181,15 @@ function renderApp() {
 	const HotProvider = hot(module)(Provider)
 	ReactDOM.render(
 		<HotProvider store={store}>
-			<ConnectedApp />
+			{getComponentByPath()}
 		</HotProvider>,
 		document.getElementById('react-app'),
 	)
+}
+
+function getComponentByPath() {
+	switch (window.location.pathname) {
+		case '/daw': return <ConnectedDAW />
+		default: return <ConnectedApp />
+	}
 }

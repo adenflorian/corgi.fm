@@ -25,9 +25,9 @@ export class Track extends Component<ITrackProps> {
 					<div className="notesScrollable">
 						{noteLanes.map((_, index) => {
 							return (
-								<div className="noteLane">
+								<div key={index} className="noteLane">
 									{track.notes.filter(note => note.note === index)
-										.map(note => <Note note={note} />)
+										.map(note => <Note key={note.start} note={note} />)
 									}
 								</div>
 							)

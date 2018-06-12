@@ -29,11 +29,11 @@ export const keyToMidiMap = {
 
 export function setupInputEventListeners(window: Window, store: Store) {
 	window.addEventListener('keydown', e => {
-		onKeyDown(e.key, e.repeat)
+		onKeyDown(e.key.toLowerCase(), e.repeat)
 	})
 
 	window.addEventListener('keyup', e => {
-		onKeyUp(e.key)
+		onKeyUp(e.key.toLowerCase())
 	})
 
 	function onKeyDown(keyname, isRepeat: boolean) {

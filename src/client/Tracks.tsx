@@ -18,6 +18,7 @@ export class Tracks extends Component<ITracksProps> {
 				{tracks.map(track => {
 					return (
 						<Track
+							key={track.name}
 							track={track}
 						/>
 					)
