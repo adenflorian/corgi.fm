@@ -18,5 +18,5 @@ echo 'nvm' | ssh ${SSH_USER}@${SSH_HOST} '
     tar -xzvf shamu.tar.gz --directory shamu;
     cd shamu/built/prod;
     yarn;
-    NODE_ENV=PROD yarn start-prod;
+    NODE_ENV=PROD SHAMU_ENV=PROD yarn start-prod;
 '

@@ -7,7 +7,6 @@ import {IWebsocketState, websocketReducer} from './websocket-redux'
 
 export interface IAppState {
 	clients: IClient[]
-	keys: object
 	websocket: IWebsocketState
 	virtualKeyboards: VirtualKeyboardsState,
 	audio: IAudioState

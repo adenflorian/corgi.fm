@@ -16,7 +16,7 @@ echo 'nvm' | ssh ${SSH_USER_TEST}@${SSH_HOST_TEST} '
     rm -r shamu;
     mkdir shamu;
     tar -xzvf shamu.tar.gz --directory shamu;
-    cd shamu/built/dev;
+    cd shamu/built/test;
     yarn;
-    NODE_ENV=TEST yarn start-prod;
+    NODE_ENV=TEST SHAMU_ENV=TEST yarn start-prod;
 '
