@@ -1,7 +1,7 @@
 // import ADSR from 'adsr'
 import Filter from 'filter'
-import {IMidiNote} from './MidiNote'
-import {getFrequencyUsingHalfStepsFromA4} from './music-functions'
+import {IMidiNote} from '../midi/MidiNote'
+import {getFrequencyUsingHalfStepsFromA4} from '../music/music-functions'
 
 export class BasicInstrument {
 	private _panNode: StereoPannerNode

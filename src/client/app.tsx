@@ -5,11 +5,11 @@ import {Fragment} from 'react'
 import {connect} from 'react-redux'
 import './App.css'
 import './css-reset.css'
-import {ConnectedDAW} from './DAW'
-import {ConnectedKeyboard} from './Keyboard'
+import {ConnectedDAW} from './DAW/DAW'
+import {ConnectedKeyboard} from './Keyboard/Keyboard'
 import {DummyClient, IClient} from './redux/clients-redux'
 import {IAppState} from './redux/configureStore'
-import {ConnectedVolumeControl} from './VolumeControl'
+import {ConnectedVolumeControl} from './Volume/VolumeControl'
 
 interface IAppProps {
 	myClient: IClient

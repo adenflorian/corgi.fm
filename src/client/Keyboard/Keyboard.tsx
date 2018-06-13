@@ -1,15 +1,15 @@
 import hashbow from 'hashbow'
 import * as React from 'react'
 import {connect} from 'react-redux'
-import {BasicInstrument} from './BasicInstrument'
-import {keyToMidiMap} from './input-events'
+import {keyToMidiMap} from '../input-events'
+import {BasicInstrument} from '../Instruments/BasicInstrument'
+import {IMidiNote} from '../MIDI/MidiNote'
+import {Octave} from '../music/music-types'
+import {DummyClient} from '../redux/clients-redux'
+import {IAppState} from '../redux/configureStore'
+import {selectMidiOutput} from '../redux/virtual-keyboard-redux'
+import {ClientId} from '../websocket'
 import './Keyboard.css'
-import {IMidiNote} from './MidiNote'
-import {Octave} from './music-types'
-import {DummyClient} from './redux/clients-redux'
-import {IAppState} from './redux/configureStore'
-import {selectMidiOutput} from './redux/virtual-keyboard-redux'
-import {ClientId} from './websocket'
 
 const keyColors = Object.freeze({
 	0: {color: 'white', name: 'C'},

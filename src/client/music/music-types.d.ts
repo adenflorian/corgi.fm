@@ -1,4 +1,4 @@
-import {IMidiNote} from './MidiNote';
+import {IMidiNote} from '../MIDI/MidiNote';
 
 export type Octave = number
 

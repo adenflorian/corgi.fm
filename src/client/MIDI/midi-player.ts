@@ -1,6 +1,6 @@
 import {Dispatch} from 'redux'
-import {MidiNotes} from './music-types'
-import {virtualKeyPressed, virtualKeyUp} from './redux/virtual-keyboard-redux'
+import {MidiNotes} from '../music/music-types'
+import {virtualKeyPressed, virtualKeyUp} from '../redux/virtual-keyboard-redux'
 
 /**
  * Plays one note at a time 1 second apart, looping

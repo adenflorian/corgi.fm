@@ -1,6 +1,6 @@
 import {Store} from 'redux'
-import {IAppState} from './redux/configureStore'
-import {virtualKeyPressed, virtualKeyUp} from './redux/virtual-keyboard-redux'
+import {IAppState} from '../redux/configureStore'
+import {virtualKeyPressed, virtualKeyUp} from '../redux/virtual-keyboard-redux'
 
 declare global {
 	interface Navigator {

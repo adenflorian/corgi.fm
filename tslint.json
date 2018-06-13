@@ -46,7 +46,8 @@
     "linterOptions": {
         "exclude": [
             "gulpfile.js",
-            ".eslintrc.js"
+            ".eslintrc.js",
+            "built/**/*"
         ]
     }
 }
