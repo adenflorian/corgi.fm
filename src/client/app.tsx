@@ -42,7 +42,7 @@ class App extends React.Component<IAppProps, {}> {
 
 				<ConnectedVolumeControl />
 
-				<ConnectedDAW />
+				{/* <ConnectedDAW /> */}
 
 				<div className="boardContainer">
 					<div id="you" className="board connected">
