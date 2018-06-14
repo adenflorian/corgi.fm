@@ -1,13 +1,14 @@
 import hashbow from 'hashbow'
 import * as React from 'react'
 import {connect} from 'react-redux'
+import {Dispatch} from 'redux'
 import {keyToMidiMap} from '../input-events'
 import {BasicInstrument} from '../Instruments/BasicInstrument'
 import {IMidiNote} from '../MIDI/MidiNote'
 import {Octave} from '../music/music-types'
 import {DummyClient} from '../redux/clients-redux'
 import {IAppState} from '../redux/configureStore'
-import {selectMidiOutput} from '../redux/virtual-keyboard-redux'
+import {selectMidiOutput, virtualKeyPressed, virtualKeyUp} from '../redux/virtual-keyboard-redux'
 import {ClientId} from '../websocket'
 import './Keyboard.css'
 
@@ -52,25 +53,8 @@ interface IKeyboardProps {
 	audio: any
 	virtualMidiKeyboard: any
 	color: string
-}
-
-function boxShadow3dCss(size: number, color: string) {
-	let x = ''
-
-	for (let i = 0; i < size; i++) {
-		x += `${-i + 0}px ${i + 2}px ${color},`
-	}
-
-	return x.replace(/,$/, '')
-
-	/*
-	0px 1px #999,
-	-1px 2px #999,
-	-2px 3px #999,
-	-3px 4px #999,
-	-4px 5px #999,
-	-5px 6px #999;
-	*/
+	keyPressed: (index: number) => void
+	keyUp: (index: number) => void
 }
 
 export class Keyboard extends React.Component<IKeyboardProps> {
@@ -100,8 +84,11 @@ export class Keyboard extends React.Component<IKeyboardProps> {
 		this.instrument.setMidiNotes(actualMidiNotes)
 
 		return (
-			<div className="keyboard" style={{boxShadow: boxShadow3dCss(8, color)}}>
-				<div className="octave">
+			<div
+				className="keyboard"
+				style={{boxShadow: boxShadow3dCss(8, color)}}
+			>
+				<div className="octave unselectable">
 					{octave}
 				</div>
 				{virtualMidiKeyboard.map((value, index) => {
@@ -112,6 +99,10 @@ export class Keyboard extends React.Component<IKeyboardProps> {
 							key={index}
 							className={'key ' + value.color}
 							style={{backgroundColor: isKeyPressed ? color : ''}}
+							onMouseOver={e => this.handleMouseOver(e, index)}
+							onMouseOut={e => this.handleMouseOut(e, index)}
+							onMouseDown={e => this.handleMouseDown(e, index)}
+							onMouseUp={e => this.handleMouseUp(e, index)}
 						>
 							<div className="noteName unselectable">
 								{value.name}
@@ -125,6 +116,48 @@ export class Keyboard extends React.Component<IKeyboardProps> {
 			</div>
 		)
 	}
+
+	private handleMouseOver = (e, index) => {
+		if (isOnlyLeftMouseButtonDown(e.buttons)) {
+			this.props.keyPressed(index)
+		}
+	}
+
+	private handleMouseOut = (_, index) => {
+		this.props.keyUp(index)
+	}
+
+	private handleMouseDown = (_, index) => {
+		this.props.keyPressed(index)
+	}
+
+	private handleMouseUp = (_, index) => {
+		this.props.keyUp(index)
+	}
+}
+
+/** @param buttons The buttons property from a mouse event */
+function isOnlyLeftMouseButtonDown(buttons: number): boolean {
+	return buttons === 1
+}
+
+function boxShadow3dCss(size: number, color: string) {
+	let x = ''
+
+	for (let i = 0; i < size; i++) {
+		x += `${-i + 0}px ${i + 2}px ${color},`
+	}
+
+	return x.replace(/,$/, '')
+
+	/*
+	0px 1px #999,
+	-1px 2px #999,
+	-2px 3px #999,
+	-3px 4px #999,
+	-4px 5px #999,
+	-5px 6px #999;
+	*/
 }
 
 const mapStateToProps = (state: IAppState, props) => {
@@ -141,4 +174,11 @@ const mapStateToProps = (state: IAppState, props) => {
 	}
 }
 
-export const ConnectedKeyboard = connect(mapStateToProps)(Keyboard)
+const mapDispatchToProps = (dispatch: Dispatch, props: IKeyboardProps) => {
+	return {
+		keyPressed: index => dispatch(virtualKeyPressed(props.ownerId, index)),
+		keyUp: index => dispatch(virtualKeyUp(props.ownerId, index)),
+	}
+}
+
+export const ConnectedKeyboard = connect(mapStateToProps, mapDispatchToProps)(Keyboard)

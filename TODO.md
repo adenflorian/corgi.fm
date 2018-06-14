@@ -1,4 +1,5 @@
 - [ ] visual for instrument
 - [ ] visual for master volume amp thing
 - [ ] midi timeline thing
-- [ ] made virtual keyboard keys clickable
+- [√] made virtual keyboard keys clickable
+- [ ] maybe use automerge? https://github.com/automerge/automerge
