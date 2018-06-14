@@ -50,7 +50,7 @@ body {
 }
 
 .board {
-	height: 128px;
+	/* height: 128px; */
 	margin: 0 24px;
 	animation-duration: 1s;
 	animation-name: slidein;

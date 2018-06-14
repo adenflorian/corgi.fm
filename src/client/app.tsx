@@ -5,8 +5,8 @@ import {Fragment} from 'react'
 import {connect} from 'react-redux'
 import './App.css'
 import './css-reset.css'
-import {ConnectedDAW} from './DAW/DAW'
 import {BasicInstrumentView} from './Instruments/BasicInstrumentView'
+import {isProd} from './is-prod'
 import {ConnectedKeyboard} from './Keyboard/Keyboard'
 import {DummyClient, IClient} from './redux/clients-redux'
 import {IAppState} from './redux/configureStore'
@@ -55,18 +55,17 @@ class App extends React.Component<IAppProps, {}> {
 						}
 						<ConnectedKeyboard ownerId={myClient.id} myKeyboard={true} />
 					</div>
-					<div id="track-1" className="board connected">
-						{/* {otherClients.length > 0 &&
-							<h2>you:</h2>
-						} */}
-						{/* {otherClients.length > 0 && */}
-						<ClientId id={'track-1'} color={hashbow('track-1')} />
-						{/* } */}
-						<ConnectedKeyboard ownerId={'track-1'} />
-					</div>
-					<div className="board">
-						<BasicInstrumentView />
-					</div>
+					{isProd() === false &&
+						<div id="track-1" className="board connected">
+							<ClientId id={'track-1'} color={hashbow('track-1')} />
+							<ConnectedKeyboard ownerId={'track-1'} />
+						</div>
+					}
+					{isProd() === false &&
+						<div className="board">
+							<BasicInstrumentView />
+						</div>
+					}
 
 					{/* <div id="otherClients" className="board"> */}
 					{/* {otherClients.length > 0 &&

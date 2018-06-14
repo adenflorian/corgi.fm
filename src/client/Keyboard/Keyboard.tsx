@@ -55,6 +55,7 @@ interface IKeyboardProps {
 	color: string
 	keyPressed: (index: number) => void
 	keyUp: (index: number) => void
+	isLocal: boolean
 }
 
 export class Keyboard extends React.Component<IKeyboardProps> {
@@ -118,20 +119,24 @@ export class Keyboard extends React.Component<IKeyboardProps> {
 	}
 
 	private handleMouseOver = (e, index) => {
+		if (this.props.isLocal === false) return
 		if (isOnlyLeftMouseButtonDown(e.buttons)) {
 			this.props.keyPressed(index)
 		}
 	}
 
 	private handleMouseOut = (_, index) => {
+		if (this.props.isLocal === false) return
 		this.props.keyUp(index)
 	}
 
 	private handleMouseDown = (_, index) => {
+		if (this.props.isLocal === false) return
 		this.props.keyPressed(index)
 	}
 
 	private handleMouseUp = (_, index) => {
+		if (this.props.isLocal === false) return
 		this.props.keyUp(index)
 	}
 }
@@ -171,6 +176,7 @@ const mapStateToProps = (state: IAppState, props) => {
 		actualMidiNotes: props.ownerId ? selectMidiOutput(state, props.ownerId).notes : [],
 		virtualMidiKeyboard: globalVirtualMidiKeyboard,
 		color: (owner && owner.color) || hashbow(props.ownerId),
+		isLocal: state.websocket.myClientId === props.ownerId,
 	}
 }
 

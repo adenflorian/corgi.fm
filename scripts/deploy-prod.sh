@@ -4,8 +4,6 @@ source secrets.sh
 
 echo host: ${SSH_HOST} user: ${SSH_USER}
 
-rm -r built/prod
-
 tar -czvf built/prod/shamu.tar.gz built/prod
 
 scp built/prod/shamu.tar.gz ${SSH_USER}@${SSH_HOST}:shamu.tar.gz
