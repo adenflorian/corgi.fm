@@ -2,4 +2,5 @@
 - [ ] visual for master volume amp thing
 - [ ] midi timeline thing
 - [√] made virtual keyboard keys clickable
+- [ ] use shift to hold down keys when clicking keyboard
 - [ ] maybe use automerge? https://github.com/automerge/automerge
