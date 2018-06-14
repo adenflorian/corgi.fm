@@ -113,10 +113,10 @@ export class Keyboard extends React.Component<IKeyboardProps> {
 							className={'key ' + value.color}
 							style={{backgroundColor: isKeyPressed ? color : ''}}
 						>
-							<div className="noteName">
+							<div className="noteName unselectable">
 								{value.name}
 							</div>
-							<div className="keyName">
+							<div className="keyName unselectable">
 								{value.keyName}
 							</div>
 						</div>

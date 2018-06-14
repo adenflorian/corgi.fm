@@ -15,7 +15,7 @@ export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 		const {daw} = this.props
 
 		return (
-			<Tracks tracks={daw.tracks} />
+			<div>basic</div>
 		)
 	}
 }

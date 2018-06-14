@@ -6,6 +6,7 @@ import {connect} from 'react-redux'
 import './App.css'
 import './css-reset.css'
 import {ConnectedDAW} from './DAW/DAW'
+import {BasicInstrumentView} from './Instruments/BasicInstrumentView'
 import {ConnectedKeyboard} from './Keyboard/Keyboard'
 import {DummyClient, IClient} from './redux/clients-redux'
 import {IAppState} from './redux/configureStore'
@@ -62,6 +63,9 @@ class App extends React.Component<IAppProps, {}> {
 						<ClientId id={'track-1'} color={hashbow('track-1')} />
 						{/* } */}
 						<ConnectedKeyboard ownerId={'track-1'} />
+					</div>
+					<div className="board">
+						<BasicInstrumentView />
 					</div>
 
 					{/* <div id="otherClients" className="board"> */}

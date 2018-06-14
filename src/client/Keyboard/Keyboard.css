@@ -3,18 +3,27 @@
     margin-bottom: 16px;
     background-color: #EBEBF6;
     letter-spacing: normal;
-    height: 80px;
+    height: 64px;
 }
 
 .keyboard .white {
     background-color: #EBEBF6;
-    color: #282832;
+    color: #31313d;
+}
+
+.keyboard .white:hover {
+    background-color: rgb(198, 198, 223);
 }
 
 .keyboard .black {
     background-color: #282832;
-    color: #EBEBF6;
-    height: 64px;
+    color: rgba(235, 235, 246, 0.925);
+    /* height: 64px; */
+}
+
+.keyboard .black:hover {
+    background-color: #424258;
+    /* color: rgba(235, 235, 246, 0.925); */
 }
 
 .keyboard .key {
