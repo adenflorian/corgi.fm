@@ -45,20 +45,13 @@ export function setupAudioContext(store: Store) {
 
 	store.subscribe(() => {
 		const state: IAppState = store.getState()
-		const newVolume = state.audio.masterVolume
+		const newVolume = state.options.masterVolume
 		if (previousMasterVolume !== newVolume) {
-			master.gain.value = state.audio.masterVolume
-			window.localStorage.masterVolume = state.audio.masterVolume
+			master.gain.value = state.options.masterVolume
 		}
 		previousMasterVolume = newVolume
 	})
 
 	store.dispatch(setAudioContext(audioContext))
 	store.dispatch(setPreFx(preFx))
-
-	if (module.hot) {
-		module.hot.dispose(() => {
-			audioContext.close()
-		})
-	}
 }

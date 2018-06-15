@@ -12,6 +12,9 @@ body {
 	color: #CDCBE1;
 	font-weight: 600;
 	line-height: 1.2em;
+	height: 100vh;
+	display: flex;
+	flex-direction: column;
 }
 
 #title {
@@ -43,7 +46,7 @@ body {
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
-	height: 100vh;
+	height: 100%;
 	transition: all 0.5s ease;
 	flex-wrap: wrap;
 	align-content: center;

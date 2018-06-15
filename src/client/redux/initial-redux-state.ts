@@ -1,8 +1,5 @@
 export function getInitialReduxState() {
 	return {
-		audio: {
-			masterVolume: getMasterVolumeFromStorageOrDefault(),
-		},
 		daw: {
 			tracks: [
 				{
@@ -74,16 +71,4 @@ export function getInitialReduxState() {
 		// 	},
 		// ],
 	}
-}
-
-const defaultMasterVolume = 0.1
-
-function getMasterVolumeFromStorageOrDefault() {
-	if (window.localStorage.masterVolume) {
-		if (parseFloat(window.localStorage.masterVolume)) {
-			return parseFloat(window.localStorage.masterVolume)
-		}
-	}
-
-	return defaultMasterVolume
 }

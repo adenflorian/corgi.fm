@@ -56,12 +56,14 @@ interface IKeyboardProps {
 	keyPressed: (index: number) => void
 	keyUp: (index: number) => void
 	isLocal: boolean
+	showNoteNames: boolean
 }
 
 export class Keyboard extends React.Component<IKeyboardProps> {
 	public static defaultProps = {
 		pressedMidiKeys: [],
 		owner: new DummyClient(),
+		showNoteNames: true,
 	}
 
 	private instrument: BasicInstrument
@@ -79,8 +81,13 @@ export class Keyboard extends React.Component<IKeyboardProps> {
 		}
 	}
 
+	public componentWillUnmount() {
+		this.instrument.dispose()
+	}
+
 	public render() {
-		const {actualMidiNotes, pressedMidiKeys, octave, color, virtualMidiKeyboard} = this.props
+		const {actualMidiNotes, pressedMidiKeys, octave, color,
+			virtualMidiKeyboard, isLocal, showNoteNames} = this.props
 
 		this.instrument.setMidiNotes(actualMidiNotes)
 
@@ -106,11 +113,15 @@ export class Keyboard extends React.Component<IKeyboardProps> {
 							onMouseUp={e => this.handleMouseUp(e, index)}
 						>
 							<div className="noteName unselectable">
-								{value.name}
+								{showNoteNames &&
+									value.name
+								}
 							</div>
-							<div className="keyName unselectable">
-								{value.keyName}
-							</div>
+							{isLocal &&
+								<div className="keyName unselectable">
+									{value.keyName}
+								</div>
+							}
 						</div>
 					)
 				})}
@@ -177,6 +188,7 @@ const mapStateToProps = (state: IAppState, props) => {
 		virtualMidiKeyboard: globalVirtualMidiKeyboard,
 		color: (owner && owner.color) || hashbow(props.ownerId),
 		isLocal: state.websocket.myClientId === props.ownerId,
+		showNoteNames: state.options.showNoteNamesOnKeyboard,
 	}
 }
 

@@ -26,13 +26,6 @@ export class BasicInstrument {
 			this._oscillators[i].start()
 		}
 
-		if (module.hot) {
-			module.hot.dispose(() => {
-				this._oscillators.forEach(osc => osc.stop())
-				// this._oscillator.stop()
-			})
-		}
-
 		this._lowPassFilter = Filter.Lowpass(this._audioContext, {frequency: 10000})
 
 		this._lfo = audioContext.createOscillator()
@@ -55,6 +48,10 @@ export class BasicInstrument {
 		this._panNode.connect(this._lowPassFilter.input)
 		this._lowPassFilter.connect(this._gain)
 		this._gain.connect(destination)
+
+		if (module.hot) {
+			module.hot.dispose(this.dispose)
+		}
 	}
 
 	public setPan(pan: number) {
@@ -106,6 +103,11 @@ export class BasicInstrument {
 	// 		? 0
 	// 		: midiNoteToFrequency(midiNotes[midiNotes.length - 1])
 	// }
+
+	public dispose() {
+		this._oscillators.forEach(osc => osc.stop())
+		this._lfo.stop()
+	}
 }
 
 const A4 = 69

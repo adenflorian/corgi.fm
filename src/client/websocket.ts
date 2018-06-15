@@ -89,12 +89,6 @@ export function setupWebsocket(store: Store) {
 		logger.log(info)
 	}
 
-	if (module.hot) {
-		module.hot.dispose(() => {
-			socket.disconnect()
-		})
-	}
-
 	return socket
 }
 

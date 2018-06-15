@@ -1,6 +1,10 @@
+- [ ] only left click to play note
+- [ ] put z and x markings for octave
+- [√] don't show keyboard letters on the track or remote keyboards
+- [ ] use shift to hold down keys when clicking keyboard
+- [ ] make it so you have to click on keyboard first for the hold and play to work
 - [ ] visual for instrument
 - [ ] visual for master volume amp thing
 - [ ] midi timeline thing
 - [√] made virtual keyboard keys clickable
-- [ ] use shift to hold down keys when clicking keyboard
 - [ ] maybe use automerge? https://github.com/automerge/automerge

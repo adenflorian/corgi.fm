@@ -7,9 +7,9 @@ import React = require('react')
 import {Component, Fragment} from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
-import {setMasterVolume} from '../redux/audio-redux'
 import {selectOwner} from '../redux/clients-redux'
 import {IAppState} from '../redux/configureStore'
+import {setOptionMasterVolume} from '../redux/options-redux'
 import './VolumeControl.css'
 
 interface IVolumeControlProps {
@@ -58,8 +58,8 @@ export class VolumeControl extends Component<IVolumeControlProps> {
 }
 
 export const ConnectedVolumeControl = connect((state: IAppState) => ({
-	masterVolume: state.audio.masterVolume,
+	masterVolume: state.options.masterVolume,
 	ownerColor: selectOwner(state).color,
 }), (dispatch: Dispatch) => ({
-	changeMasterVolume: volume => dispatch(setMasterVolume(volume)),
+	changeMasterVolume: volume => dispatch(setOptionMasterVolume(volume)),
 }))(VolumeControl)

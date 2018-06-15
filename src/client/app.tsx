@@ -8,8 +8,10 @@ import './css-reset.css'
 import {BasicInstrumentView} from './Instruments/BasicInstrumentView'
 import {isProd} from './is-prod'
 import {ConnectedKeyboard} from './Keyboard/Keyboard'
+import {ConnectedOption} from './Option'
 import {DummyClient, IClient} from './redux/clients-redux'
 import {IAppState} from './redux/configureStore'
+import {AppOptions} from './redux/options-redux'
 import {ConnectedVolumeControl} from './Volume/VolumeControl'
 
 interface IAppProps {
@@ -42,6 +44,11 @@ class App extends React.Component<IAppProps, {}> {
 				{/* <h1 id="title">sha-mu</h1> */}
 
 				<ConnectedVolumeControl />
+
+				<ConnectedOption
+					option={AppOptions.showNoteNamesOnKeyboard}
+					label="show names on keyboard"
+				/>
 
 				{/* <ConnectedDAW /> */}
 
