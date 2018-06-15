@@ -26,19 +26,25 @@ export function setupWebsocket(store: Store) {
 		})
 	}
 
-	setupDefaultEventListener('disconnect')
-	setupDefaultEventListener('reconnect_attempt')
-	setupDefaultEventListener('reconnecting')
-	setupDefaultEventListener('reconnect_error')
-	setupDefaultEventListener('reconnect_failed')
-	setupDefaultEventListener('ping')
-	setupDefaultEventListener('reconnect')
-	setupDefaultEventListener('connect_timeout')
-	setupDefaultEventListener('error')
-	setupDefaultEventListener('connect_error')
-	setupDefaultEventListener('pong', 'pong - latency')
-	setupDefaultEventListener('newClient')
-	setupDefaultEventListener('clientDisconnected')
+	setupDefaultListeners([
+		['disconnect'],
+		['reconnect_attempt'],
+		['reconnecting'],
+		['reconnect_error'],
+		['reconnect_failed'],
+		['ping'],
+		['reconnect'],
+		['connect_timeout'],
+		['error'],
+		['connect_error'],
+		['pong', 'pong - latency'],
+		['newClient'],
+		['clientDisconnected'],
+	])
+
+	function setupDefaultListeners(events: Array<[string, string] | [string]>) {
+		events.forEach(event => setupDefaultEventListener(event[0], event[1]))
+	}
 
 	function setupDefaultEventListener(eventName: string, friendlyName?: string) {
 		socket.on(eventName, data => {
@@ -70,19 +76,11 @@ export function setupWebsocket(store: Store) {
 
 	socket.on('notes', (data: NotesPayload) => {
 		logger.debug('notes: ', data)
-		// setMidiForOtherClientsInstrument(data.notes)
-
-		// store.dispatch({
-		// 	type: CLIENT_NOTES,
-		// 	...data,
-		// })
-
 		store.dispatch(setVirtualKeys(data.clientId, data.notes))
 	})
 
 	socket.on('octave', (data: OctavePayload) => {
 		logger.log('octave: ', data)
-
 		store.dispatch(virtualOctave(data.clientId, data.octave))
 	})
 
@@ -91,10 +89,11 @@ export function setupWebsocket(store: Store) {
 		logger.log(info)
 	}
 
-	// /** @param {number} newFrequency */
-	// function setMidiForOtherClientsInstrument(notes) {
-	// 	otherClientsInstrument.setMidiNotes(notes)
-	// }
+	if (module.hot) {
+		module.hot.dispose(() => {
+			socket.disconnect()
+		})
+	}
 
 	return socket
 }

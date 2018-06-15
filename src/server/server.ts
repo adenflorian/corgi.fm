@@ -41,7 +41,7 @@ io.on('connection', socket => {
 	})
 
 	socket.on('octave', octavePayload => {
-		logger.log(`octave: ${socket.id} | `, octavePayload)
+		logger.debug(`octave: ${socket.id} | `, octavePayload)
 		clients.setOctave(socket.id, octavePayload.octave)
 		socket.broadcast.emit('octave', {
 			octave: octavePayload.octave,
