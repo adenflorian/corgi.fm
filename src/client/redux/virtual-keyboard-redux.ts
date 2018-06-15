@@ -8,6 +8,7 @@ import {SET_MY_CLIENT_ID} from './websocket-redux'
 
 export const VIRTUAL_KEY_PRESSED = 'VIRTUAL_KEY_PRESSED'
 export const VIRTUAL_KEY_UP = 'VIRTUAL_KEY_UP'
+export const VIRTUAL_KEY_FLIP = 'VIRTUAL_KEY_FLIP'
 export const VIRTUAL_OCTAVE = 'VIRTUAL_OCTAVE'
 export const INCREASE_VIRTUAL_OCTAVE = 'INCREASE_VIRTUAL_OCTAVE'
 export const DECREASE_VIRTUAL_OCTAVE = 'DECREASE_VIRTUAL_OCTAVE'
@@ -32,6 +33,14 @@ export const virtualKeyPressed = (ownerId: ClientId, number: number) => {
 export const virtualKeyUp = (ownerId: ClientId, number: number) => {
 	return {
 		type: VIRTUAL_KEY_UP,
+		ownerId,
+		number,
+	}
+}
+
+export const virtualKeyFlip = (ownerId: ClientId, number: number) => {
+	return {
+		type: VIRTUAL_KEY_FLIP,
 		ownerId,
 		number,
 	}
@@ -104,6 +113,17 @@ export function virtualKeyboardsReducer(state: VirtualKeyboardsState = initialSt
 				[action.ownerId]: {
 					...state[action.ownerId],
 					pressedKeys: state[action.ownerId].pressedKeys.filter(x => x !== action.number),
+				},
+			}
+		case VIRTUAL_KEY_FLIP:
+			return {
+				...state,
+				[action.ownerId]: {
+					...state[action.ownerId],
+					pressedKeys: flipKey(
+						state[action.ownerId] ? state[action.ownerId].pressedKeys : [],
+						action.number,
+					),
 				},
 			}
 		case SET_VIRTUAL_KEYS:
@@ -186,6 +206,14 @@ export function addIfNew(arr: any[], newElement: any) {
 		return arr
 	} else {
 		return [...arr, newElement]
+	}
+}
+
+export function flipKey(keys: any[], key: any) {
+	if (keys.some(x => x === key)) {
+		return keys.filter(x => x !== key)
+	} else {
+		return [...keys, key]
 	}
 }
 

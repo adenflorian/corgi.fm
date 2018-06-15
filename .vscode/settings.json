@@ -29,6 +29,16 @@
     "tslint.run": "onType",
     "typescript.tsdk": "node_modules\\typescript\\lib",
     "cSpell.words": [
-        "automerge"
+        "Unmount",
+        "automerge",
+        "callout",
+        "hashbow",
+        "keyframes",
+        "slidedown",
+        "slidein",
+        "slideout",
+        "slideup",
+        "unpress",
+        "unselectable"
     ]
 }

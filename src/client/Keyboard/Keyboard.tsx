@@ -8,7 +8,7 @@ import {IMidiNote} from '../MIDI/MidiNote'
 import {Octave} from '../music/music-types'
 import {DummyClient} from '../redux/clients-redux'
 import {IAppState} from '../redux/configureStore'
-import {selectMidiOutput, virtualKeyPressed, virtualKeyUp} from '../redux/virtual-keyboard-redux'
+import {selectMidiOutput, virtualKeyFlip, virtualKeyPressed, virtualKeyUp} from '../redux/virtual-keyboard-redux'
 import {ClientId} from '../websocket'
 import './Keyboard.css'
 
@@ -55,6 +55,7 @@ interface IKeyboardProps {
 	color: string
 	keyPressed: (index: number) => void
 	keyUp: (index: number) => void
+	keyFlip: (index: number) => void
 	isLocal: boolean
 	showNoteNames: boolean
 }
@@ -129,32 +130,45 @@ export class Keyboard extends React.Component<IKeyboardProps> {
 		)
 	}
 
-	private handleMouseOver = (e, index) => {
+	private handleMouseOver = (e: React.MouseEvent, index: number) => {
 		if (this.props.isLocal === false) return
-		if (isOnlyLeftMouseButtonDown(e.buttons)) {
+		if (isLeftMouseButtonDown(e.buttons)) {
 			this.props.keyPressed(index)
 		}
 	}
 
-	private handleMouseOut = (_, index) => {
+	private handleMouseOut = (e: React.MouseEvent, index: number) => {
 		if (this.props.isLocal === false) return
-		this.props.keyUp(index)
+		if (isLeftMouseButtonDown(e.buttons)) {
+			this.props.keyUp(index)
+		}
 	}
 
-	private handleMouseDown = (_, index) => {
+	private handleMouseDown = (e: React.MouseEvent, index: number) => {
 		if (this.props.isLocal === false) return
-		this.props.keyPressed(index)
+		if (e.button === 0) {
+			if (e.shiftKey) {
+				this.props.keyFlip(index)
+			} else {
+				this.props.keyPressed(index)
+			}
+		}
 	}
 
-	private handleMouseUp = (_, index) => {
+	private handleMouseUp = (e: React.MouseEvent, index: number) => {
 		if (this.props.isLocal === false) return
-		this.props.keyUp(index)
+		if (e.button === 0 && e.shiftKey === false) {
+			this.props.keyUp(index)
+		}
 	}
 }
 
 /** @param buttons The buttons property from a mouse event */
-function isOnlyLeftMouseButtonDown(buttons: number): boolean {
-	return buttons === 1
+function isLeftMouseButtonDown(buttons: number): boolean {
+	// buttons is not implemented in safari :(
+	if (buttons === undefined) return false
+
+	return buttons % 2 === 1
 }
 
 function boxShadow3dCss(size: number, color: string) {
@@ -196,6 +210,7 @@ const mapDispatchToProps = (dispatch: Dispatch, props: IKeyboardProps) => {
 	return {
 		keyPressed: index => dispatch(virtualKeyPressed(props.ownerId, index)),
 		keyUp: index => dispatch(virtualKeyUp(props.ownerId, index)),
+		keyFlip: index => dispatch(virtualKeyFlip(props.ownerId, index)),
 	}
 }
 

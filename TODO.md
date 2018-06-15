@@ -1,8 +1,9 @@
-- [ ] only left click to play note
+- [√] only left click to play note
 - [ ] put z and x markings for octave
 - [√] don't show keyboard letters on the track or remote keyboards
+- [√] only unpress note when mouse moves out if left mouse button is down
 - [ ] don't unnecessarily change osc freq when diff notes are set
-- [ ] use shift to hold down keys when clicking keyboard
+- [√] use shift to hold down keys when clicking keyboard
 - [ ] make it so you have to click on keyboard first for the hold and play to work
 - [ ] visual for instrument
 - [ ] visual for master volume amp thing
