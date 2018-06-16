@@ -7,8 +7,10 @@ import {clientDisconnected, newClient, SET_CLIENTS} from './redux/clients-redux'
 import {setVirtualKeys, virtualOctave} from './redux/virtual-keyboard-redux'
 import {SET_MY_CLIENT_ID, setInfo, setSocket} from './redux/websocket-redux'
 
+const port = 8080
+
 export function setupWebsocket(store: Store) {
-	const socket = io.connect('/')
+	const socket = io.connect(window.location.hostname + `:${port}/`)
 
 	logger.log('socket connected')
 

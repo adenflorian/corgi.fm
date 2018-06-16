@@ -30,14 +30,17 @@
     "typescript.tsdk": "node_modules\\typescript\\lib",
     "cSpell.words": [
         "Unmount",
+        "adsr",
         "automerge",
         "callout",
         "hashbow",
         "keyframes",
+        "localstorage",
         "slidedown",
         "slidein",
         "slideout",
         "slideup",
+        "soundbank",
         "unpress",
         "unselectable"
     ]

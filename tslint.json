@@ -47,7 +47,8 @@
         "exclude": [
             "gulpfile.js",
             ".eslintrc.js",
-            "built/**/*"
+            "built/**/*",
+            "node_modules/**/*"
         ]
     }
 }

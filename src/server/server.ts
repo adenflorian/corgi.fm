@@ -26,16 +26,16 @@ io.on('connection', socket => {
 	logger.log('new connection | ', socket.id)
 
 	clients.add(socket.id)
-	console.log('clients: ', clients)
+	logger.debug('clients: ', clients)
 
 	sendClientsToNewClient(socket)
 	sendNewClientToOthers(socket, clients.get(socket.id))
 
-	socket.on('notes', notespayload => {
-		logger.debug(`notes: ${socket.id} | `, notespayload)
-		clients.setNotes(socket.id, notespayload.notes)
+	socket.on('notes', notesPayload => {
+		logger.debug(`notes: ${socket.id} | `, notesPayload)
+		clients.setNotes(socket.id, notesPayload.notes)
 		socket.broadcast.emit('notes', {
-			notes: notespayload.notes,
+			notes: notesPayload.notes,
 			clientId: socket.id,
 		})
 	})
@@ -64,13 +64,6 @@ engine.generateId = () => {
 	return animal.getId() + '-' + nextId++
 }
 
-// function sendClients() {
-// 	logger.debug('sending clients info to all clients')
-// 	io.local.emit('clients', {
-// 		clients: clients.toArray(),
-// 	})
-// }
-
 function sendClientsToNewClient(newClientSocket) {
 	logger.debug('sending clients info to new client')
 	newClientSocket.emit('clients', {
@@ -90,7 +83,7 @@ function sendClientDisconnected(id) {
 	})
 }
 
-const port = 80
+const port = 8080
 
 server.listen(port)
 

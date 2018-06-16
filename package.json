@@ -6,10 +6,9 @@
   "scripts": {
     "start": "gulp build-dev && concurrently --names \"parcel,build,server\" \"yarn watch-parcel\" \"yarn watch\" \"yarn watch-server\"",
     "watch": "watch \"gulp build-dev\" src/server",
-    "watch-parcel": "parcel watch src/client/index.html --out-dir built/dev/client",
+    "watch-parcel": "parcel src/client/index.html --out-dir built/dev/client --open",
     "watch-server": "nodemon --watch built/dev/server built/dev/server/server.js",
     "start-prod": "pm2 start server/server.js",
-    "stop-prod": "pm2 stop server/server.js",
     "lint": "eslint . && tslint src/client/**/*.ts* --project src/client/tsconfig.json && tslint src/server/**/*.ts* --project src/server/tsconfig.json ",
     "test": "mocha --inspect --require ts-node/register src/**/*.spec.ts*",
     "tdd": "mocha --watch src/**/*.ts* --reporter dot --require ts-node/register src/**/*.spec.ts*",
