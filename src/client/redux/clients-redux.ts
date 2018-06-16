@@ -1,5 +1,5 @@
-import hashbow from 'hashbow'
 import {IMidiNote} from '../MIDI/MidiNote'
+import {hashbow} from '../utils'
 import {ClientId} from '../websocket'
 import {IAppState} from './configureStore'
 

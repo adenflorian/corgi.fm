@@ -1,7 +1,6 @@
 import classnames from 'classnames'
-import hashbow from 'hashbow'
-import * as React from 'react'
 import {Fragment} from 'react'
+import * as React from 'react'
 import {connect} from 'react-redux'
 import './App.css'
 import './css-reset.css'
@@ -12,6 +11,7 @@ import {ConnectedOption} from './Option'
 import {DummyClient, IClient} from './redux/clients-redux'
 import {IAppState} from './redux/configureStore'
 import {AppOptions} from './redux/options-redux'
+import {hashbow} from './utils'
 import {ConnectedVolumeControl} from './Volume/VolumeControl'
 
 interface IAppProps {
