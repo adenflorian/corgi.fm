@@ -83,7 +83,7 @@ function sendClientDisconnected(id) {
 	})
 }
 
-const port = 8080
+const port = 80
 
 server.listen(port)
 
