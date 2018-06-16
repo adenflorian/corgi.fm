@@ -1,5 +1,4 @@
 // import ADSR from 'adsr'
-import Filter from 'filter'
 import {IMidiNote} from '../midi/MidiNote'
 import {getFrequencyUsingHalfStepsFromA4} from '../music/music-functions'
 
@@ -9,7 +8,7 @@ export class BasicInstrument {
 	private _gain: GainNode
 	private _oscillators: OscillatorNode[] = []
 	private _voiceCount = 10
-	private _lowPassFilter: AudioNode | any
+	private _lowPassFilter: BiquadFilterNode
 	private _lfo: OscillatorNode
 	// private _adsr: AudioNode | any
 
@@ -26,7 +25,9 @@ export class BasicInstrument {
 			this._oscillators[i].start()
 		}
 
-		this._lowPassFilter = Filter.Lowpass(this._audioContext, {frequency: 10000})
+		this._lowPassFilter = this._audioContext.createBiquadFilter()
+		this._lowPassFilter.type = 'lowpass'
+		this._lowPassFilter.frequency.value = 10000
 
 		this._lfo = audioContext.createOscillator()
 		this._lfo.frequency.value = 2
@@ -45,7 +46,7 @@ export class BasicInstrument {
 		// this._adsr.start(this._audioContext.currentTime)
 		// this._adsr.connect(this._gain.gain)
 
-		this._panNode.connect(this._lowPassFilter.input)
+		this._panNode.connect(this._lowPassFilter)
 		this._lowPassFilter.connect(this._gain)
 		this._gain.connect(destination)
 
