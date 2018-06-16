@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {Component} from 'react'
 import {ITrack} from '../redux/daw-redux'
-import './DAW.css'
+import './DAW.less'
 import {Note} from './Note'
 
 interface ITrackProps {

@@ -4,7 +4,7 @@ import {connect} from 'react-redux'
 import {Tracks} from '../DAW/Tracks'
 import {IAppState} from '../redux/configureStore'
 import {IDawState} from '../redux/daw-redux'
-import './DAW.css'
+import './DAW.less'
 
 interface IDawProps {
 	daw: IDawState

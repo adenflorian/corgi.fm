@@ -10,7 +10,7 @@ import {Dispatch} from 'redux'
 import {selectOwner} from '../redux/clients-redux'
 import {IAppState} from '../redux/configureStore'
 import {setOptionMasterVolume} from '../redux/options-redux'
-import './VolumeControl.css'
+import './VolumeControl.less'
 
 interface IVolumeControlProps {
 	masterVolume: number,

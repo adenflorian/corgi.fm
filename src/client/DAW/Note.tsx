@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {Component} from 'react'
 import {IDawNote} from '../redux/daw-redux'
-import './DAW.css'
+import './DAW.less'
 
 interface INoteProps {
 	note: IDawNote

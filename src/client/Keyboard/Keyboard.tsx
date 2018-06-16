@@ -1,3 +1,4 @@
+import classnames from 'classnames'
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
@@ -10,7 +11,7 @@ import {IAppState} from '../redux/configureStore'
 import {selectMidiOutput, virtualKeyFlip, virtualKeyPressed, virtualKeyUp} from '../redux/virtual-keyboard-redux'
 import {hashbow} from '../utils'
 import {ClientId} from '../websocket'
-import './Keyboard.css'
+import './Keyboard.less'
 
 const keyColors = Object.freeze({
 	0: {color: 'white', name: 'C'},
@@ -94,15 +95,24 @@ export class Keyboard extends React.Component<IKeyboardProps> {
 
 		return (
 			<div
-				className="keyboard"
+				className={classnames([
+					'keyboard',
+					isLocal ? 'isLocal' : '',
+				])}
 				style={{boxShadow: boxShadow3dCss(8, color)}}
 			>
-				<div className="octave unselectable">
-					{octave}
+				<div className="octave black unselectable">
+					<div className="octaveNumber">
+						{octave}
+					</div>
+					{isLocal &&
+						<div className="octaveKeys smallText">
+							<span>z</span><span>x</span>
+						</div>
+					}
 				</div>
 				{virtualMidiKeyboard.map((value, index) => {
 					const isKeyPressed = pressedMidiKeys.some(x => x === index)
-
 					return (
 						<div
 							key={index}
@@ -119,7 +129,7 @@ export class Keyboard extends React.Component<IKeyboardProps> {
 								}
 							</div>
 							{isLocal &&
-								<div className="keyName unselectable">
+								<div className="unselectable smallText">
 									{value.keyName}
 								</div>
 							}
