@@ -1,52 +1,48 @@
 export function hashbow(input, saturation = 50, lightness = 50) {
-
-	let inputAsString
-	let sum
-
 	const greyValues = [null, undefined, [], {}, '']
 
 	if (greyValues.indexOf(input) !== -1) {
 		return hslToHex(0, 0, lightness)
 	}
 
+	const num = convertToNumber(input)
+
+	const squared = Math.abs(num * num)
+
+	return hslToHex(squared % 360, saturation, lightness)
+}
+
+function convertToNumber(input: any): number {
 	switch (input.constructor) {
 		case Function:
 		case RegExp:
-			inputAsString = input.toString()
-			break
+			return getNumberFromString(input.toString())
 		case Object:
 		case Array:
-			inputAsString = JSON.stringify(input)
-			break
+			return getNumberFromString(JSON.stringify(input))
 		case Number:
-			sum = input
-			break
+			return input
 		case Boolean:
-			return hslToHex(input ? 120 : 0, saturation, lightness)
+			return input ? 120 : 0
 		case String:
 		default:
-			inputAsString = input
+			return getNumberFromString(input)
 	}
-
-	if (sum === undefined) {
-		sum = 0
-		inputAsString.split('').forEach(letter => {
-			sum += letter.charCodeAt(0)
-		})
-	}
-
-	sum = Math.abs(sum * sum)
-
-	return hslToHex(sum % 360, saturation, lightness)
 }
+
+const getNumberFromString = (str: string) => str.split('').map(toCharCode).reduce(sum, 0)
+
+const sum = (a: number, b: number): number => a + b
+
+const toCharCode = (char: string): number => char.charCodeAt(0)
 
 function hslToHex(hue, saturation, luminosity) {
 	// resolve degrees to 0 - 359 range
 	hue = cycle(hue)
 
 	// enforce constraints
-	saturation = min(max(saturation, 100), 0)
-	luminosity = min(max(luminosity, 100), 0)
+	saturation = Math.max(Math.min(saturation, 100), 0)
+	luminosity = Math.max(Math.min(luminosity, 100), 0)
 
 	// convert to 0 to 1 range used by hsl-to-rgb-for-reals
 	saturation /= 100
@@ -65,18 +61,10 @@ function hslToHex(hue, saturation, luminosity) {
 		.join('')
 }
 
-function max(val, n) {
-	return (val > n) ? n : val
-}
-
-function min(val, n) {
-	return (val < n) ? n : val
-}
-
 function cycle(val) {
 	// for safety:
-	val = max(val, 1e7)
-	val = min(val, -1e7)
+	val = Math.min(val, 1e7)
+	val = Math.max(val, -1e7)
 	// cycle value:
 	while (val < 0) {val += 360}
 	while (val > 359) {val -= 360}

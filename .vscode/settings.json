@@ -43,5 +43,6 @@
         "soundbank",
         "unpress",
         "unselectable"
-    ]
+    ],
+    "editor.dragAndDrop": false
 }

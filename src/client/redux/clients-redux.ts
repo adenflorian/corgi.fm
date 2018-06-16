@@ -37,7 +37,7 @@ export interface IClient {
 }
 
 export class Client implements IClient {
-	public static frombackEndClient(backEndClient: any) {
+	public static fromBackEndClient(backEndClient: any) {
 		return new Client(backEndClient.id)
 	}
 
@@ -62,7 +62,7 @@ export type IClientsState = IClient[]
 export function clientsReducer(state: IClientsState = [], action) {
 	switch (action.type) {
 		case SET_CLIENTS:
-			return action.clients.map(x => Client.frombackEndClient(x))
+			return action.clients.map(x => Client.fromBackEndClient(x))
 		case NEW_CLIENT:
 			return [
 				...state.filter(x => x.id !== action.id),
