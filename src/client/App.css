@@ -53,16 +53,16 @@ body {
 }
 
 .board {
-	/* height: 128px; */
+	/* height: 80px; */
 	margin: 0 24px;
 	animation-duration: 1s;
-	animation-name: slidein;
+	animation-name: boardSlideIn;
 }
 
 .board.disconnecting {
 	animation-fill-mode: forwards;
 	animation-duration: 1s;
-	animation-name: slideout;
+	animation-name: boardSlideOut;
 }
 
 #info {
@@ -87,7 +87,7 @@ body {
   }
 }
 
-@keyframes slidein {
+@keyframes boardSlideIn {
   from {
 		height: 0;
     margin-left: 200%;
@@ -95,16 +95,12 @@ body {
   }
 
   to {
-		height: 128px;
-    margin-left: 0%;
     width: 100%;
   }
 }
 
-@keyframes slideout {
+@keyframes boardSlideOut {
   from {
-		height: 128px;
-    margin-right: 0%;
 		width: 100%;
   }
 
