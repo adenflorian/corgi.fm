@@ -12,10 +12,13 @@ export const stopSimpleTrack = makeActionCreator(STOP_SIMPLE_TRACK)
 export const RESTART_SIMPLE_TRACK = 'RESTART_SIMPLE_TRACK'
 export const restartSimpleTrack = makeActionCreator(RESTART_SIMPLE_TRACK)
 
+export const REFRESH_SIMPLE_TRACK_PLAYER_EVENTS = 'REFRESH_SIMPLE_TRACK_PLAYER_EVENTS'
+export const refreshSimpleTrackPlayerEvents = makeActionCreator(REFRESH_SIMPLE_TRACK_PLAYER_EVENTS)
+
 let simpleTrackPlayer: SimpleTrackPlayer
 
 export const trackPlayerMiddleware = store => next => action => {
-	const state: IAppState = store.getState()
+	let state: IAppState = store.getState()
 
 	switch (action.type) {
 		case PLAY_SIMPLE_TRACK:
@@ -39,14 +42,21 @@ export const trackPlayerMiddleware = store => next => action => {
 				simpleTrackPlayer.play(notesToEvents(selectSimpleTrackNotes(state)))
 			}
 			return next(action)
+		case REFRESH_SIMPLE_TRACK_PLAYER_EVENTS:
+			next(action)
+			state = store.getState()
+			if (simpleTrackPlayer === undefined) {
+				simpleTrackPlayer = new SimpleTrackPlayer(store.dispatch, state.audio.context)
+			}
+			simpleTrackPlayer.setEvents(notesToEvents(selectSimpleTrackNotes(state)))
+			return next(action)
 		default:
 			return next(action)
 	}
 }
 
 function notesToEvents(events: ISimpleTrackNote[]): ISimpleTrackEvent[] {
-	return events.reduce((foo, event, index) => {
-		if (event.notes.length === 0) return foo
+	const newEvents = events.reduce((foo, event, index) => {
 		foo.push({
 			time: index / 5,
 			action: SimpleTrackEventAction.playNote,
@@ -59,4 +69,8 @@ function notesToEvents(events: ISimpleTrackNote[]): ISimpleTrackEvent[] {
 		})
 		return foo
 	}, []).concat({time: events.length / 5, action: SimpleTrackEventAction.endTrack, notes: []})
+
+	console.log('notesToEvents: ', newEvents)
+
+	return newEvents
 }

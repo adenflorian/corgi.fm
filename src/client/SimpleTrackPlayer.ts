@@ -26,6 +26,7 @@ export class SimpleTrackPlayer {
 	private _events: ISimpleTrackEvent[]
 	private _startTime: number
 	private _inTick: boolean = false
+	private _tick: number = 0
 
 	constructor(dispatch: Dispatch, audioContext: AudioContext) {
 		this._dispatch = dispatch
@@ -40,10 +41,18 @@ export class SimpleTrackPlayer {
 		this._intervalId = window.setInterval(this._onTick, 10)
 	}
 
+	public setEvents = (events: ISimpleTrackEvent[]) => {
+		if (this._events && events.length !== this._events.length) {
+			throw new Error(`can't handle different events lengths yet in setEvents()`)
+		}
+		this._events = events
+	}
+
 	public stop = () => {
 		clearInterval(this._intervalId)
 		this._intervalId = undefined
 		this._index = 0
+		this._tick = 0
 		this._stopAllNotes()
 		this._dispatch(setSimpleTrackIndex(-1))
 	}
@@ -58,6 +67,7 @@ export class SimpleTrackPlayer {
 
 	private _onTick = () => {
 		logger.debug('tick')
+		this._tick++
 		if (this._inTick === false) {
 			this._inTick = true
 			this._doTick()
@@ -70,21 +80,24 @@ export class SimpleTrackPlayer {
 		const currentPlayTime = this.getCurrentPlayTime()
 		logger.debug('_doTick, currentPlayTime: ', currentPlayTime)
 		logger.debug('_doTick, nextEvent: ', nextEvent)
+		if (this._tick % 10 === 0) {
+			this._dispatch(setSimpleTrackIndex(Math.floor(currentPlayTime * 5)))
+		}
 
 		if (nextEvent.time <= currentPlayTime) {
 			if (nextEvent.action === SimpleTrackEventAction.endTrack) {
 				this._index = 0
+				this._tick = 0
 				this._startTime = this._audioContext.currentTime
 			} else {
 				this._doEvent(nextEvent)
 				this._index++
-				this._dispatch(setSimpleTrackIndex(Math.floor(currentPlayTime * 5)))
 			}
 		}
 	}
 
 	private _doEvent(event: ISimpleTrackEvent) {
-		logger.log('_doEvent, event: ', event)
+		logger.debug('_doEvent, event: ', event)
 		switch (event.action) {
 			case SimpleTrackEventAction.playNote: return this._playNotes(event.notes)
 			case SimpleTrackEventAction.stopNote: return this._stopAllNotes()

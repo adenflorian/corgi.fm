@@ -10,7 +10,12 @@ import {
 	selectSimpleTrackNotes,
 	setSimpleTrackNote,
 } from './redux/simple-track-redux'
-import {playSimpleTrack, restartSimpleTrack, stopSimpleTrack} from './redux/track-player-middleware'
+import {
+	playSimpleTrack,
+	refreshSimpleTrackPlayerEvents,
+	restartSimpleTrack,
+	stopSimpleTrack,
+} from './redux/track-player-middleware'
 import './SimpleTrack.less'
 
 interface ISimpleTrackProps {
@@ -98,7 +103,7 @@ const mapStateToProps = (state: IAppState) => ({
 const mapDispatchToProps = (dispatch: Dispatch) => ({
 	setNote: (index: number, enabled: boolean, note: IMidiNote) => {
 		dispatch(setSimpleTrackNote(index, enabled, note))
-		dispatch(restartSimpleTrack())
+		dispatch(refreshSimpleTrackPlayerEvents())
 	},
 	play: () => dispatch(playSimpleTrack()),
 	stop: () => dispatch(stopSimpleTrack()),
