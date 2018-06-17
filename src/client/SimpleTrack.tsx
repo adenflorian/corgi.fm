@@ -10,7 +10,7 @@ import {
 	selectSimpleTrackNotes,
 	setSimpleTrackNote,
 } from './redux/simple-track-redux'
-import {playSimpleTrack, stopSimpleTrack} from './redux/track-player-middleware'
+import {playSimpleTrack, restartSimpleTrack, stopSimpleTrack} from './redux/track-player-middleware'
 import './SimpleTrack.less'
 
 interface ISimpleTrackProps {
@@ -18,6 +18,7 @@ interface ISimpleTrackProps {
 	setNote: any
 	play: any
 	stop: any
+	restart: any
 	activeIndex: number
 }
 
@@ -38,23 +39,29 @@ export class SimpleTrack extends Component<ISimpleTrackProps> {
 	}
 
 	public render() {
-		const {events, setNote, play, stop, activeIndex} = this.props
+		const {events, setNote, play, stop, restart, activeIndex} = this.props
 
 		return (
 			<div className="simpleTrack">
 				<div>track</div>
 				<div className="controls">
 					<div
-						className="play"
+						className="play unselectable"
 						onClick={play}
 					>
 						play
 					</div>
 					<div
-						className="stop"
+						className="stop unselectable"
 						onClick={stop}
 					>
 						stop
+					</div>
+					<div
+						className="restart unselectable"
+						onClick={restart}
+					>
+						restart
 					</div>
 				</div>
 				<div className="events">
@@ -89,9 +96,13 @@ const mapStateToProps = (state: IAppState) => ({
 })
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-	setNote: (index: number, enabled: boolean, note: IMidiNote) => dispatch(setSimpleTrackNote(index, enabled, note)),
+	setNote: (index: number, enabled: boolean, note: IMidiNote) => {
+		dispatch(setSimpleTrackNote(index, enabled, note))
+		dispatch(restartSimpleTrack())
+	},
 	play: () => dispatch(playSimpleTrack()),
 	stop: () => dispatch(stopSimpleTrack()),
+	restart: () => dispatch(restartSimpleTrack()),
 })
 
 export const ConnectedSimpleTrack = connect(

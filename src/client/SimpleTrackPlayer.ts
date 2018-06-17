@@ -33,7 +33,7 @@ export class SimpleTrackPlayer {
 	}
 
 	public play = (events: ISimpleTrackEvent[]) => {
-		if (this._isPlaying()) return
+		if (this.isPlaying()) return
 		logger.log('play')
 		this._events = events
 		this._startTime = this._audioContext.currentTime
@@ -50,6 +50,10 @@ export class SimpleTrackPlayer {
 
 	public getCurrentPlayTime() {
 		return this._audioContext.currentTime - this._startTime
+	}
+
+	public isPlaying(): boolean {
+		return this._intervalId !== undefined
 	}
 
 	private _onTick = () => {
@@ -98,9 +102,5 @@ export class SimpleTrackPlayer {
 
 	private _stopAllNotes() {
 		this._dispatch(virtualAllKeysUp(TRACK_1))
-	}
-
-	private _isPlaying(): boolean {
-		return this._intervalId !== undefined
 	}
 }

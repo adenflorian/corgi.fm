@@ -2,7 +2,7 @@ import {WebSocketEvent} from '../../server/server-constants'
 import {CLIENT_DISCONNECTED, clientDisconnecting, selectOwner} from './clients-redux'
 import {IAppState} from './configureStore'
 import {SET_SIMPLE_TRACK_NOTE} from './simple-track-redux'
-import {PLAY_SIMPLE_TRACK, STOP_SIMPLE_TRACK} from './track-player-middleware'
+import {PLAY_SIMPLE_TRACK, RESTART_SIMPLE_TRACK, STOP_SIMPLE_TRACK} from './track-player-middleware'
 import {
 	DECREASE_VIRTUAL_OCTAVE,
 	INCREASE_VIRTUAL_OCTAVE,
@@ -41,6 +41,9 @@ export const websocketSenderMiddleware = store => next => action => {
 			return next(action)
 		case STOP_SIMPLE_TRACK:
 			socket.emit(WebSocketEvent.RepeatToOthers, {eventName: STOP_SIMPLE_TRACK})
+			return next(action)
+		case RESTART_SIMPLE_TRACK:
+			socket.emit(WebSocketEvent.RepeatToOthers, {eventName: RESTART_SIMPLE_TRACK})
 			return next(action)
 		default:
 			return next(action)

@@ -9,6 +9,9 @@ export const playSimpleTrack = makeActionCreator(PLAY_SIMPLE_TRACK)
 export const STOP_SIMPLE_TRACK = 'STOP_SIMPLE_TRACK'
 export const stopSimpleTrack = makeActionCreator(STOP_SIMPLE_TRACK)
 
+export const RESTART_SIMPLE_TRACK = 'RESTART_SIMPLE_TRACK'
+export const restartSimpleTrack = makeActionCreator(RESTART_SIMPLE_TRACK)
+
 let simpleTrackPlayer: SimpleTrackPlayer
 
 export const trackPlayerMiddleware = store => next => action => {
@@ -19,14 +22,22 @@ export const trackPlayerMiddleware = store => next => action => {
 			if (simpleTrackPlayer === undefined) {
 				simpleTrackPlayer = new SimpleTrackPlayer(store.dispatch, state.audio.context)
 			}
-			const notes = selectSimpleTrackNotes(state)
-			simpleTrackPlayer.play(notesToEvents(notes))
+			simpleTrackPlayer.play(notesToEvents(selectSimpleTrackNotes(state)))
 			return next(action)
 		case STOP_SIMPLE_TRACK:
 			if (simpleTrackPlayer === undefined) {
 				simpleTrackPlayer = new SimpleTrackPlayer(store.dispatch, state.audio.context)
 			}
 			simpleTrackPlayer.stop()
+			return next(action)
+		case RESTART_SIMPLE_TRACK:
+			if (simpleTrackPlayer === undefined) {
+				simpleTrackPlayer = new SimpleTrackPlayer(store.dispatch, state.audio.context)
+			}
+			if (simpleTrackPlayer.isPlaying()) {
+				simpleTrackPlayer.stop()
+				simpleTrackPlayer.play(notesToEvents(selectSimpleTrackNotes(state)))
+			}
 			return next(action)
 		default:
 			return next(action)
