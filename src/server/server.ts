@@ -64,7 +64,7 @@ io.on('connection', socket => {
 	})
 
 	socket.on('SET_TRACK_SIMPLE_TRACK_NOTE', action => {
-		logger.log(`SET_TRACK_SIMPLE_TRACK_NOTE: ${socket.id} | `, action)
+		logger.log(`SET_TRACK_SIMPLE_TRACK_NOTE: ${socket.id} | `)
 		simpleTrackEvents = handleSetSimpleNote({notes: simpleTrackEvents, index: 0}, action).notes
 		socket.broadcast.emit('SET_TRACK_SIMPLE_TRACK_NOTE', action)
 	})
@@ -135,7 +135,7 @@ function handleSetSimpleNote(state: ISimpleTrackState, action) {
 				} else {
 					return {
 						...event,
-						notes: event.notes.filter(x => x === action.note),
+						notes: event.notes.filter(x => x !== action.note),
 					}
 				}
 			} else {

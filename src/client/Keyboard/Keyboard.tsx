@@ -46,6 +46,12 @@ function createVirtualMidiKeyboard(numberOfKeys: number) {
 	return newVirtualMidiKeyboard
 }
 
+export function isWhiteKey(keyNumber: number) {
+	const baseNumber = keyNumber % 12
+
+	return keyColors[baseNumber].color === 'white'
+}
+
 interface IKeyboardProps {
 	ownerId: ClientId,
 	pressedMidiKeys?: any,

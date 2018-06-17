@@ -8,6 +8,8 @@ import {SET_SIMPLE_TRACK_NOTE} from './redux/simple-track-redux'
 import {
 	PLAY_SIMPLE_TRACK,
 	playSimpleTrack,
+	REFRESH_SIMPLE_TRACK_PLAYER_EVENTS,
+	refreshSimpleTrackPlayerEvents,
 	RESTART_SIMPLE_TRACK,
 	restartSimpleTrack,
 	STOP_SIMPLE_TRACK,
@@ -113,6 +115,11 @@ export function setupWebsocketAndListeners(store: Store) {
 	socket.on(RESTART_SIMPLE_TRACK, () => {
 		logger.log('RESTART_SIMPLE_TRACK: ')
 		store.dispatch({...restartSimpleTrack(), isRemote: true})
+	})
+
+	socket.on(REFRESH_SIMPLE_TRACK_PLAYER_EVENTS, () => {
+		logger.log('REFRESH_SIMPLE_TRACK_PLAYER_EVENTS: ')
+		store.dispatch({...refreshSimpleTrackPlayerEvents(), isRemote: true})
 	})
 
 	function socketInfo(info: string) {

@@ -2,6 +2,7 @@ import classnames from 'classnames'
 import * as React from 'react'
 import {Component} from 'react'
 import {connect, Dispatch} from 'react-redux'
+import {isWhiteKey} from './Keyboard/Keyboard'
 import {IMidiNote} from './MIDI/MidiNote'
 import {IAppState} from './redux/configureStore'
 import {
@@ -81,6 +82,7 @@ export class SimpleTrack extends Component<ISimpleTrackProps> {
 											className={classnames([
 												'note',
 												isEnabled ? 'on' : '',
+												isWhiteKey(i2) ? 'white' : 'black',
 											])}
 											onClick={() => setNote(index, !isEnabled, i2)}
 										/>

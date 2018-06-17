@@ -1,5 +1,5 @@
 @import "./colors.less";
-@borderGray: #55556B;
+@borderGray: rgb(65, 65, 77);
 .simpleTrack {
     margin: 16px 0;
     display: inline-flex;
@@ -22,7 +22,12 @@
             }
             .note {
                 height: 100%;
-                background-color: @keyDarkGray;
+                &.white {
+                    background-color: #31313d;
+                }
+                &.black {
+                    background-color: @keyDarkGray;
+                }
                 &:hover {
                     background-color: rgb(51, 80, 52);
                 }
