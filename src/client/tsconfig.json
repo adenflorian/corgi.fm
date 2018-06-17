@@ -9,6 +9,7 @@
 		"module": "commonjs"
 	},
 	"include": [
-		"**/*.ts*"
+		"**/*.ts*",
+		"../server/server-constants.ts"
 	]
 }

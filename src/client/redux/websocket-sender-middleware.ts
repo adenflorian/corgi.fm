@@ -1,3 +1,4 @@
+import {WebSocketEvent} from '../../server/server-constants'
 import {CLIENT_DISCONNECTED, clientDisconnecting, selectOwner} from './clients-redux'
 import {IAppState} from './configureStore'
 import {SET_TRACK_SIMPLE_TRACK_NOTE} from './simple-track-redux'
@@ -36,10 +37,10 @@ export const websocketSenderMiddleware = store => next => action => {
 			socket.emit('SET_TRACK_SIMPLE_TRACK_NOTE', action)
 			return next(action)
 		case PLAY_SIMPLE_TRACK:
-			socket.emit('PLAY_SIMPLE_TRACK')
+			socket.emit(WebSocketEvent.RepeatToOthers, {eventName: PLAY_SIMPLE_TRACK})
 			return next(action)
 		case STOP_SIMPLE_TRACK:
-			socket.emit('STOP_SIMPLE_TRACK')
+			socket.emit(WebSocketEvent.RepeatToOthers, {eventName: STOP_SIMPLE_TRACK})
 			return next(action)
 		default:
 			return next(action)

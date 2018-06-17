@@ -5,6 +5,7 @@ import * as path from 'path'
 import * as socketIO from 'socket.io'
 import {Clients} from './Clients'
 import {logger} from './logger'
+import {WebSocketEvent} from './server-constants'
 
 const app = express()
 const server = new http.Server(app)
@@ -58,14 +59,13 @@ io.on('connection', socket => {
 		socket.broadcast.emit('SET_TRACK_SIMPLE_TRACK_NOTE', action)
 	})
 
-	socket.on('PLAY_SIMPLE_TRACK', () => {
-		logger.log(`PLAY_SIMPLE_TRACK: ${socket.id} | `)
-		socket.broadcast.emit('PLAY_SIMPLE_TRACK')
-	})
+	interface RepeatToOthersPayload {
+		eventName: string
+	}
 
-	socket.on('STOP_SIMPLE_TRACK', () => {
-		logger.log(`STOP_SIMPLE_TRACK: ${socket.id} | `)
-		socket.broadcast.emit('STOP_SIMPLE_TRACK')
+	socket.on(WebSocketEvent.RepeatToOthers, (payload: RepeatToOthersPayload) => {
+		logger.log(`repeatToOthers: ${socket.id} | `, payload)
+		socket.broadcast.emit(payload.eventName)
 	})
 
 	socket.on('disconnect', () => {
