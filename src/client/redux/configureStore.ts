@@ -5,6 +5,7 @@ import {clientsReducer, IClient} from './clients-redux'
 import {dawReducer} from './daw-redux'
 import {IOptionsState, optionsReducer} from './options-redux'
 import {ISimpleTrackState, simpleTrackReducer} from './simple-track-redux'
+import {trackPlayerMiddleware} from './track-player-middleware'
 import {virtualKeyboardsReducer, VirtualKeyboardsState} from './virtual-keyboard-redux'
 import {websocketMiddleware} from './websocket-middleware'
 import {IWebsocketState, websocketReducer} from './websocket-redux'
@@ -40,6 +41,7 @@ export function configureStore(initialState: {}) {
 		composeEnhancers(
 			applyMiddleware(
 				websocketMiddleware,
+				trackPlayerMiddleware,
 			),
 			persistState('options'),
 		),

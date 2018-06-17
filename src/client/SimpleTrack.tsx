@@ -1,14 +1,16 @@
 import * as React from 'react'
 import {Component} from 'react'
 import {connect, Dispatch} from 'react-redux'
-import {logger} from './logger'
 import {IAppState} from './redux/configureStore'
-import {selectSimpleTrackState, setSimpleTrackNote} from './redux/simple-track-redux'
+import {selectSimpleTrackNotes, setSimpleTrackNote} from './redux/simple-track-redux'
+import {playSimpleTrack, stopSimpleTrack} from './redux/track-player-middleware'
 import './SimpleTrack.less'
 
 interface ISimpleTrackProps {
 	notes: boolean[]
 	setNote: any
+	play: any
+	stop: any
 }
 
 export class SimpleTrack extends Component<ISimpleTrackProps> {
@@ -17,7 +19,7 @@ export class SimpleTrack extends Component<ISimpleTrackProps> {
 	}
 
 	public render() {
-		const {notes, setNote} = this.props
+		const {notes, setNote, play, stop} = this.props
 
 		return (
 			<div className="simpleTrack">
@@ -25,13 +27,13 @@ export class SimpleTrack extends Component<ISimpleTrackProps> {
 				<div className="controls">
 					<div
 						className="play"
-						onClick={() => logger.log('play')}
+						onClick={play}
 					>
 						play
 					</div>
 					<div
 						className="stop"
-						onClick={() => logger.log('stop')}
+						onClick={stop}
 					>
 						stop
 					</div>
@@ -40,6 +42,7 @@ export class SimpleTrack extends Component<ISimpleTrackProps> {
 					{notes.map((note, index) => {
 						return (
 							<div
+								key={index}
 								className={`noteCell ${note ? 'on' : ''}`}
 								onClick={() => setNote(index, !note)}
 							/>
@@ -52,11 +55,13 @@ export class SimpleTrack extends Component<ISimpleTrackProps> {
 }
 
 const mapStateToProps = (state: IAppState) => ({
-	notes: selectSimpleTrackState(state),
+	notes: selectSimpleTrackNotes(state),
 })
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
 	setNote: (index: number, enabled: boolean) => dispatch(setSimpleTrackNote(index, enabled)),
+	play: () => dispatch(playSimpleTrack()),
+	stop: () => dispatch(stopSimpleTrack()),
 })
 
 export const ConnectedSimpleTrack = connect(

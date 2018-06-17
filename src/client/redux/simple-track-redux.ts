@@ -30,6 +30,6 @@ export function simpleTrackReducer(state: ISimpleTrackState = initialState, acti
 	}
 }
 
-export function selectSimpleTrackState(state: IAppState) {
+export function selectSimpleTrackNotes(state: IAppState) {
 	return state.simpleTrack
 }

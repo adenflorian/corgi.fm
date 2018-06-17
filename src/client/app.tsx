@@ -66,12 +66,12 @@ class App extends React.Component<IAppProps, {}> {
 						}
 						<ConnectedKeyboard ownerId={myClient.id} myKeyboard={true} />
 					</div>
-					{/* {isProd() === false &&
+					{isProd() === false &&
 						<div id="track-1" className="board connected">
 							<ClientId id={'track-1'} color={hashbow('track-1')} />
 							<ConnectedKeyboard ownerId={'track-1'} />
 						</div>
-					} */}
+					}
 					{/* {isProd() === false &&
 						<div className="board">
 							<BasicInstrumentView />

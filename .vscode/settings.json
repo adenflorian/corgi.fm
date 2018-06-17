@@ -29,6 +29,7 @@
     "tslint.run": "onType",
     "typescript.tsdk": "node_modules\\typescript\\lib",
     "cSpell.words": [
+        "DEVTOOLS",
         "Scrollable",
         "Unmount",
         "adsr",
