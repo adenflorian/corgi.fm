@@ -1,4 +1,5 @@
 import {Store} from 'redux'
+import {isProd} from './is-prod'
 import {play} from './MIDI/midi-player'
 import {IAppState} from './redux/configureStore'
 import {
@@ -37,15 +38,15 @@ export function setupInputEventListeners(window: Window, store: Store) {
 		onKeyUp(e.key.toLowerCase())
 	})
 
-	function onKeyDown(keyname, isRepeat: boolean) {
+	function onKeyDown(keyName, isRepeat: boolean) {
 		const state: IAppState = store.getState()
 		const myClientId = state.websocket.myClientId
 
-		if (isMidiKey(keyname) && !isRepeat) {
-			const midiKeyNumber = keyToMidiMap[keyname]
+		if (isMidiKey(keyName) && !isRepeat) {
+			const midiKeyNumber = keyToMidiMap[keyName]
 			store.dispatch(virtualKeyPressed(myClientId, midiKeyNumber))
 		} else {
-			switch (keyname) {
+			switch (keyName) {
 				case 'x': return store.dispatch(increaseVirtualOctave(myClientId))
 				case 'z': return store.dispatch(decreaseVirtualOctave(myClientId))
 				default: return
@@ -53,35 +54,37 @@ export function setupInputEventListeners(window: Window, store: Store) {
 		}
 	}
 
-	function onKeyUp(keyname) {
-		if (isMidiKey(keyname) === false) return
+	function onKeyUp(keyName) {
+		if (isMidiKey(keyName) === false) return
 
-		const midiKeyNumber = keyToMidiMap[keyname]
+		const midiKeyNumber = keyToMidiMap[keyName]
 
 		const state: IAppState = store.getState()
 
 		store.dispatch(virtualKeyUp(state.websocket.myClientId, midiKeyNumber))
 	}
 
-	window.addEventListener('keydown', e => {
-		if (e.repeat) return
-		if (e.key !== ' ') return
+	if (isProd() === false) {
+		window.addEventListener('keydown', e => {
+			if (e.repeat) return
+			if (e.key !== ' ') return
 
-		return play(store.dispatch, [
-			[0],
-			[4],
-			[7],
-			[0],
-			[2],
-			[7],
-			[0],
-			[5],
-			[7],
-			[0, 4, 7, 12],
-		])
-	})
+			return play(store.dispatch, [
+				[0],
+				[4],
+				[7],
+				[0],
+				[2],
+				[7],
+				[0],
+				[5],
+				[7],
+				[0, 4, 7, 12],
+			])
+		})
+	}
 }
 
-export function isMidiKey(keyname: string) {
-	return Object.keys(keyToMidiMap).some(x => x === keyname.toLowerCase())
+export function isMidiKey(keyName: string) {
+	return Object.keys(keyToMidiMap).some(x => x === keyName.toLowerCase())
 }

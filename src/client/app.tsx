@@ -11,6 +11,7 @@ import {ConnectedOption} from './Option'
 import {DummyClient, IClient} from './redux/clients-redux'
 import {IAppState} from './redux/configureStore'
 import {AppOptions} from './redux/options-redux'
+import {ConnectedSimpleTrack, SimpleTrack} from './SimpleTrack'
 import {hashbow} from './utils'
 import {ConnectedVolumeControl} from './Volume/VolumeControl'
 
@@ -53,6 +54,9 @@ class App extends React.Component<IAppProps, {}> {
 				{/* <ConnectedDAW /> */}
 
 				<div className="boardContainer">
+					<div className="board connected">
+						<ConnectedSimpleTrack />
+					</div>
 					<div id="you" className="board connected">
 						{/* {otherClients.length > 0 &&
 							<h2>you:</h2>
@@ -62,17 +66,17 @@ class App extends React.Component<IAppProps, {}> {
 						}
 						<ConnectedKeyboard ownerId={myClient.id} myKeyboard={true} />
 					</div>
-					{isProd() === false &&
+					{/* {isProd() === false &&
 						<div id="track-1" className="board connected">
 							<ClientId id={'track-1'} color={hashbow('track-1')} />
 							<ConnectedKeyboard ownerId={'track-1'} />
 						</div>
-					}
-					{isProd() === false &&
+					} */}
+					{/* {isProd() === false &&
 						<div className="board">
 							<BasicInstrumentView />
 						</div>
-					}
+					} */}
 
 					{/* <div id="otherClients" className="board"> */}
 					{/* {otherClients.length > 0 &&

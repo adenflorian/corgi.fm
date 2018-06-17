@@ -4,7 +4,7 @@
   "main": "server.js",
   "license": "UNLICENSED",
   "scripts": {
-    "start": "gulp build-dev && concurrently --names \"parcel,build,server\" \"yarn watch-parcel\" \"yarn watch\" \"yarn watch-server\"",
+    "start": "yarn clean && gulp build-dev && concurrently --names \"parcel,build,server\" \"yarn watch-parcel\" \"yarn watch\" \"yarn watch-server\"",
     "watch": "watch \"gulp build-dev\" src/server",
     "watch-parcel": "parcel src/client/index.html --out-dir built/dev/client --open",
     "watch-server": "nodemon --watch built/dev/server built/dev/server/server.js",

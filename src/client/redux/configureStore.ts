@@ -4,6 +4,7 @@ import {audioReducer, IAudioState} from './audio-redux'
 import {clientsReducer, IClient} from './clients-redux'
 import {dawReducer} from './daw-redux'
 import {IOptionsState, optionsReducer} from './options-redux'
+import {ISimpleTrackState, simpleTrackReducer} from './simple-track-redux'
 import {virtualKeyboardsReducer, VirtualKeyboardsState} from './virtual-keyboard-redux'
 import {websocketMiddleware} from './websocket-middleware'
 import {IWebsocketState, websocketReducer} from './websocket-redux'
@@ -13,7 +14,8 @@ export interface IAppState {
 	clients: IClient[]
 	daw: any
 	options: IOptionsState
-	virtualKeyboards: VirtualKeyboardsState,
+	simpleTrack: ISimpleTrackState
+	virtualKeyboards: VirtualKeyboardsState
 	websocket: IWebsocketState
 }
 
@@ -30,6 +32,7 @@ export function configureStore(initialState: {}) {
 			clients: clientsReducer,
 			daw: dawReducer,
 			options: optionsReducer,
+			simpleTrack: simpleTrackReducer,
 			virtualKeyboards: virtualKeyboardsReducer,
 			websocket: websocketReducer,
 		}),
