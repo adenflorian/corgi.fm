@@ -1,5 +1,5 @@
 - [√] only left click to play note
-- [ ] put z and x markings for octave
+- [√] put z and x markings for octave
 - [√] don't show keyboard letters on the track or remote keyboards
 - [√] only unpress note when mouse moves out if left mouse button is down
 - [ ] don't unnecessarily change osc freq when diff notes are set

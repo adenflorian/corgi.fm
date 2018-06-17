@@ -1,3 +1,4 @@
+@import "../colors.less";
 .keyboard {
     display: inline-flex;
     margin-bottom: 16px;
@@ -7,6 +8,9 @@
     .white {
         background-color: #EBEBF6;
         color: #31313d;
+    }
+    .white+.white {
+        border-left: 1px solid @frenchGray;
     }
     .black {
         background-color: #282832;
