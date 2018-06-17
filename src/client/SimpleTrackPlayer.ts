@@ -29,6 +29,7 @@ export class SimpleTrackPlayer {
 	}
 
 	public play = (events: SimpleTrackEvent[]) => {
+		if (this._isPlaying()) return
 		logger.log('play')
 		this._events = events
 		this._startTime = this._audioContext.currentTime
@@ -37,6 +38,7 @@ export class SimpleTrackPlayer {
 
 	public stop = () => {
 		clearInterval(this._intervalId)
+		this._intervalId = undefined
 		this._index = 0
 		this._stopNote()
 		this._dispatch(setSimpleTrackIndex(-1))
@@ -88,5 +90,9 @@ export class SimpleTrackPlayer {
 
 	private _stopNote() {
 		this._dispatch(virtualKeyUp('track-1', 0))
+	}
+
+	private _isPlaying(): boolean {
+		return this._intervalId !== undefined
 	}
 }
