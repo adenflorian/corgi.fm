@@ -66,13 +66,14 @@ export class BasicInstrument {
 		let highestFrequency = 0
 
 		this._oscillators.forEach((oscillator, index) => {
-			oscillator.frequency.value = midiNoteToFrequency(midiNotes[index])
+			oscillator.frequency
+				.linearRampToValueAtTime(midiNoteToFrequency(midiNotes[index]), this._audioContext.currentTime + 0.01)
 			if (oscillator.frequency.value > highestFrequency) {
 				highestFrequency = oscillator.frequency.value
 			}
 		})
 
-		this._lfo.frequency.value = (highestFrequency / 100) + 1
+		this._lfo.frequency.linearRampToValueAtTime((highestFrequency / 100) + 1, this._audioContext.currentTime + 0.01)
 
 		// let adjustedMidiNotes
 
