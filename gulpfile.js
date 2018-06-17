@@ -1,5 +1,5 @@
 const gulp = require('gulp')
-const clean = require('gulp-clean')
+const del = require('del')
 const ts = require('gulp-typescript')
 const sourcemaps = require('gulp-sourcemaps')
 
@@ -12,8 +12,10 @@ const tsconfig = Object.freeze({
 })
 
 gulp.task('clean', () => {
-	return gulp.src(['built', '.cache'])
-		.pipe(clean())
+	return del([
+		'built',
+		'.cache',
+	])
 })
 
 gulp.task('typescript-server-dev', () => {
