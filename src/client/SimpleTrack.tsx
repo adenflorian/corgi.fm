@@ -1,8 +1,9 @@
+import classnames from 'classnames'
 import * as React from 'react'
 import {Component} from 'react'
 import {connect, Dispatch} from 'react-redux'
 import {IAppState} from './redux/configureStore'
-import {selectSimpleTrackNotes, setSimpleTrackNote} from './redux/simple-track-redux'
+import {selectSimpleTrackIndex, selectSimpleTrackNotes, setSimpleTrackNote} from './redux/simple-track-redux'
 import {playSimpleTrack, stopSimpleTrack} from './redux/track-player-middleware'
 import './SimpleTrack.less'
 
@@ -11,6 +12,7 @@ interface ISimpleTrackProps {
 	setNote: any
 	play: any
 	stop: any
+	activeIndex: number
 }
 
 export class SimpleTrack extends Component<ISimpleTrackProps> {
@@ -19,7 +21,7 @@ export class SimpleTrack extends Component<ISimpleTrackProps> {
 	}
 
 	public render() {
-		const {notes, setNote, play, stop} = this.props
+		const {notes, setNote, play, stop, activeIndex} = this.props
 
 		return (
 			<div className="simpleTrack">
@@ -43,7 +45,11 @@ export class SimpleTrack extends Component<ISimpleTrackProps> {
 						return (
 							<div
 								key={index}
-								className={`noteCell ${note ? 'on' : ''}`}
+								className={classnames([
+									'noteCell',
+									note ? 'on' : '',
+									activeIndex === index ? 'active' : '',
+								])}
 								onClick={() => setNote(index, !note)}
 							/>
 						)
@@ -56,6 +62,7 @@ export class SimpleTrack extends Component<ISimpleTrackProps> {
 
 const mapStateToProps = (state: IAppState) => ({
 	notes: selectSimpleTrackNotes(state),
+	activeIndex: selectSimpleTrackIndex(state),
 })
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({

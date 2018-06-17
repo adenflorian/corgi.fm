@@ -22,7 +22,7 @@ app.use(express.static(path.join(__dirname, '../client')))
 
 const clients = new Clients()
 
-const simpleTrackNotes = [true, false, true, false]
+const simpleTrackNotes = [true, false, true, false, true, false, true, false]
 
 io.on('connection', socket => {
 	logger.log('new connection | ', socket.id)
@@ -53,9 +53,19 @@ io.on('connection', socket => {
 	})
 
 	socket.on('SET_TRACK_SIMPLE_TRACK_NOTE', action => {
-		logger.debug(`SET_TRACK_SIMPLE_TRACK_NOTE: ${socket.id} | `, action)
+		logger.log(`SET_TRACK_SIMPLE_TRACK_NOTE: ${socket.id} | `, action)
 		simpleTrackNotes[action.index] = action.enabled
 		socket.broadcast.emit('SET_TRACK_SIMPLE_TRACK_NOTE', action)
+	})
+
+	socket.on('PLAY_SIMPLE_TRACK', () => {
+		logger.log(`PLAY_SIMPLE_TRACK: ${socket.id} | `)
+		socket.broadcast.emit('PLAY_SIMPLE_TRACK')
+	})
+
+	socket.on('STOP_SIMPLE_TRACK', () => {
+		logger.log(`STOP_SIMPLE_TRACK: ${socket.id} | `)
+		socket.broadcast.emit('STOP_SIMPLE_TRACK')
 	})
 
 	socket.on('disconnect', () => {

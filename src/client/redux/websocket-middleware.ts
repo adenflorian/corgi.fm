@@ -1,11 +1,13 @@
-import {CLIENT_DISCONNECTED, clientDisconnecting} from './clients-redux'
+import {CLIENT_DISCONNECTED, clientDisconnecting, selectOwner} from './clients-redux'
 import {IAppState} from './configureStore'
 import {SET_TRACK_SIMPLE_TRACK_NOTE} from './simple-track-redux'
+import {PLAY_SIMPLE_TRACK, STOP_SIMPLE_TRACK} from './track-player-middleware'
 import {
 	DECREASE_VIRTUAL_OCTAVE,
 	INCREASE_VIRTUAL_OCTAVE,
 	VIRTUAL_KEY_PRESSED,
 	VIRTUAL_KEY_UP,
+	VirtualKeyAction,
 } from './virtual-keyboard-redux'
 
 export const websocketMiddleware = store => next => action => {
@@ -19,34 +21,45 @@ export const websocketMiddleware = store => next => action => {
 	switch (action.type) {
 		case VIRTUAL_KEY_PRESSED:
 		case VIRTUAL_KEY_UP:
-			return onVirtualKey(action, store, next, socket)
+			return onVirtualKey(action, store, next, socket, selectOwner(state))
 		case INCREASE_VIRTUAL_OCTAVE:
 		case DECREASE_VIRTUAL_OCTAVE:
-			return onOctave(action, store, next, socket)
+			return onOctave(action, store, next, socket, selectOwner(state))
 		case CLIENT_DISCONNECTED:
 			store.dispatch(clientDisconnecting(action.id))
 
 			setTimeout(() => {
 				next(action)
 			}, 2000)
-			break
+			return next(action)
 		case SET_TRACK_SIMPLE_TRACK_NOTE:
 			socket.emit('SET_TRACK_SIMPLE_TRACK_NOTE', action)
+			return next(action)
+		case PLAY_SIMPLE_TRACK:
+			socket.emit('PLAY_SIMPLE_TRACK')
+			return next(action)
+		case STOP_SIMPLE_TRACK:
+			socket.emit('STOP_SIMPLE_TRACK')
+			return next(action)
 		default:
 			return next(action)
 	}
 }
 
-function onVirtualKey(action, store, next, socket) {
+function onVirtualKey(action: VirtualKeyAction, store, next, socket, myClientId) {
 	next(action)
-	const state: IAppState = store.getState()
-	socket.emit('notes', {notes: state.virtualKeyboards[action.ownerId].pressedKeys})
+	if (action.ownerId === myClientId) {
+		const state: IAppState = store.getState()
+		socket.emit('notes', {notes: state.virtualKeyboards[action.ownerId].pressedKeys})
+	}
 }
 
-function onOctave(action, store, next, socket) {
+function onOctave(action, store, next, socket, myClientId) {
 	next(action)
-	const state: IAppState = store.getState()
-	if (action.ownerId === state.websocket.myClientId) {
-		socket.emit('octave', {octave: state.virtualKeyboards[action.ownerId].octave})
+	if (action.ownerId === myClientId) {
+		const state: IAppState = store.getState()
+		if (action.ownerId === state.websocket.myClientId) {
+			socket.emit('octave', {octave: state.virtualKeyboards[action.ownerId].octave})
+		}
 	}
 }

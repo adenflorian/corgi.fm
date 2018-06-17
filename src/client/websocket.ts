@@ -5,6 +5,7 @@ import {IMidiNote} from './MIDI/MidiNote'
 import {Octave} from './music/music-types'
 import {clientDisconnected, newClient, SET_CLIENTS} from './redux/clients-redux'
 import {SET_TRACK_SIMPLE_TRACK_NOTE} from './redux/simple-track-redux'
+import {PLAY_SIMPLE_TRACK, playSimpleTrack, STOP_SIMPLE_TRACK, stopSimpleTrack} from './redux/track-player-middleware'
 import {setVirtualKeys, virtualOctave} from './redux/virtual-keyboard-redux'
 import {SET_MY_CLIENT_ID, setInfo, setSocket} from './redux/websocket-redux'
 
@@ -90,6 +91,16 @@ export function setupWebsocket(store: Store) {
 	socket.on(SET_TRACK_SIMPLE_TRACK_NOTE, action => {
 		logger.log('SET_TRACK_SIMPLE_TRACK_NOTE: ', action)
 		store.dispatch({...action, isRemote: true})
+	})
+
+	socket.on(PLAY_SIMPLE_TRACK, () => {
+		logger.log('PLAY_SIMPLE_TRACK: ')
+		store.dispatch({...playSimpleTrack(), isRemote: true})
+	})
+
+	socket.on(STOP_SIMPLE_TRACK, () => {
+		logger.log('STOP_SIMPLE_TRACK: ')
+		store.dispatch({...stopSimpleTrack(), isRemote: true})
 	})
 
 	function socketInfo(info: string) {

@@ -1,5 +1,6 @@
 import {Dispatch} from 'redux'
 import {logger} from './logger'
+import {setSimpleTrackIndex} from './redux/simple-track-redux'
 import {virtualKeyPressed, virtualKeyUp} from './redux/virtual-keyboard-redux'
 
 export enum SimpleTrackEventAction {
@@ -28,7 +29,7 @@ export class SimpleTrackPlayer {
 	}
 
 	public play = (events: SimpleTrackEvent[]) => {
-		logger.log('playyyy')
+		logger.log('play')
 		this._events = events
 		this._startTime = this._audioContext.currentTime
 		this._intervalId = window.setInterval(this._onTick, 100)
@@ -38,6 +39,7 @@ export class SimpleTrackPlayer {
 		clearInterval(this._intervalId)
 		this._index = 0
 		this._stopNote()
+		this._dispatch(setSimpleTrackIndex(-1))
 	}
 
 	public getCurrentPlayTime() {
@@ -45,7 +47,7 @@ export class SimpleTrackPlayer {
 	}
 
 	private _onTick = () => {
-		logger.log('tick')
+		logger.debug('tick')
 		if (this._inTick === false) {
 			this._inTick = true
 			this._doTick()
@@ -56,8 +58,8 @@ export class SimpleTrackPlayer {
 	private _doTick() {
 		const nextEvent = this._events[this._index]
 		const currentPlayTime = this.getCurrentPlayTime()
-		logger.log('_doTick, currentPlayTime: ', currentPlayTime)
-		logger.log('_doTick, nextEvent: ', nextEvent)
+		logger.debug('_doTick, currentPlayTime: ', currentPlayTime)
+		logger.debug('_doTick, nextEvent: ', nextEvent)
 
 		if (nextEvent.time <= currentPlayTime) {
 			if (nextEvent.action === SimpleTrackEventAction.endTrack) {
@@ -66,6 +68,7 @@ export class SimpleTrackPlayer {
 			} else {
 				this._doEvent(nextEvent)
 				this._index++
+				this._dispatch(setSimpleTrackIndex(this._index - 1))
 			}
 		}
 	}
