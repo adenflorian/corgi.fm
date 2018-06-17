@@ -1,5 +1,6 @@
 import {CLIENT_DISCONNECTED, clientDisconnecting} from './clients-redux'
 import {IAppState} from './configureStore'
+import {SET_TRACK_SIMPLE_TRACK_NOTE} from './simple-track-redux'
 import {
 	DECREASE_VIRTUAL_OCTAVE,
 	INCREASE_VIRTUAL_OCTAVE,
@@ -8,13 +9,20 @@ import {
 } from './virtual-keyboard-redux'
 
 export const websocketMiddleware = store => next => action => {
+	const state: IAppState = store.getState()
+	const socket = state.websocket.socket
+
+	if (action.isRemote) {
+		return next(action)
+	}
+
 	switch (action.type) {
 		case VIRTUAL_KEY_PRESSED:
 		case VIRTUAL_KEY_UP:
-			return onVirtualKey(action, store, next)
+			return onVirtualKey(action, store, next, socket)
 		case INCREASE_VIRTUAL_OCTAVE:
 		case DECREASE_VIRTUAL_OCTAVE:
-			return onOctave(action, store, next)
+			return onOctave(action, store, next, socket)
 		case CLIENT_DISCONNECTED:
 			store.dispatch(clientDisconnecting(action.id))
 
@@ -22,25 +30,22 @@ export const websocketMiddleware = store => next => action => {
 				next(action)
 			}, 2000)
 			break
+		case SET_TRACK_SIMPLE_TRACK_NOTE:
+			socket.emit('SET_TRACK_SIMPLE_TRACK_NOTE', action)
 		default:
-			next(action)
-			break
+			return next(action)
 	}
 }
 
-function onVirtualKey(action, store, next) {
+function onVirtualKey(action, store, next, socket) {
 	next(action)
 	const state: IAppState = store.getState()
-	const socket = state.websocket.socket
-
 	socket.emit('notes', {notes: state.virtualKeyboards[action.ownerId].pressedKeys})
 }
 
-function onOctave(action, store, next) {
+function onOctave(action, store, next, socket) {
 	next(action)
 	const state: IAppState = store.getState()
-	const socket = state.websocket.socket
-
 	if (action.ownerId === state.websocket.myClientId) {
 		socket.emit('octave', {octave: state.virtualKeyboards[action.ownerId].octave})
 	}

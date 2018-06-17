@@ -1,6 +1,7 @@
 import * as React from 'react'
 import {Component} from 'react'
 import {connect, Dispatch} from 'react-redux'
+import {logger} from './logger'
 import {IAppState} from './redux/configureStore'
 import {selectSimpleTrackState, setSimpleTrackNote} from './redux/simple-track-redux'
 import './SimpleTrack.less'
@@ -21,6 +22,20 @@ export class SimpleTrack extends Component<ISimpleTrackProps> {
 		return (
 			<div className="simpleTrack">
 				<div>track</div>
+				<div className="controls">
+					<div
+						className="play"
+						onClick={() => logger.log('play')}
+					>
+						play
+					</div>
+					<div
+						className="stop"
+						onClick={() => logger.log('stop')}
+					>
+						stop
+					</div>
+				</div>
 				<div className="noteCells">
 					{notes.map((note, index) => {
 						return (

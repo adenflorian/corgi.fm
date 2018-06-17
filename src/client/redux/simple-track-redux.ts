@@ -13,10 +13,10 @@ export const setSimpleTrackNote = (index: number, enabled: boolean) => {
 export type ISimpleTrackState = boolean[]
 
 const initialState: ISimpleTrackState = [
-	true,
-	true,
 	false,
-	true,
+	false,
+	false,
+	false,
 ]
 
 export function simpleTrackReducer(state: ISimpleTrackState = initialState, action) {

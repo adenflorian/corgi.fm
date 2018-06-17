@@ -22,6 +22,8 @@ app.use(express.static(path.join(__dirname, '../client')))
 
 const clients = new Clients()
 
+const simpleTrackNotes = [true, false, true, false]
+
 io.on('connection', socket => {
 	logger.log('new connection | ', socket.id)
 
@@ -30,6 +32,7 @@ io.on('connection', socket => {
 
 	sendClientsToNewClient(socket)
 	sendNewClientToOthers(socket, clients.get(socket.id))
+	sendSimpleTrackNotesToNewClient(socket)
 
 	socket.on('notes', notesPayload => {
 		logger.debug(`notes: ${socket.id} | `, notesPayload)
@@ -47,6 +50,12 @@ io.on('connection', socket => {
 			octave: octavePayload.octave,
 			clientId: socket.id,
 		})
+	})
+
+	socket.on('SET_TRACK_SIMPLE_TRACK_NOTE', action => {
+		logger.debug(`SET_TRACK_SIMPLE_TRACK_NOTE: ${socket.id} | `, action)
+		simpleTrackNotes[action.index] = action.enabled
+		socket.broadcast.emit('SET_TRACK_SIMPLE_TRACK_NOTE', action)
 	})
 
 	socket.on('disconnect', () => {
@@ -74,6 +83,17 @@ function sendClientsToNewClient(newClientSocket) {
 function sendNewClientToOthers(socket, client) {
 	logger.debug('sending new client info to all clients')
 	socket.broadcast.emit('newClient', client)
+}
+
+function sendSimpleTrackNotesToNewClient(newClientSocket) {
+	logger.debug('sending simple track notes to new client')
+	simpleTrackNotes.forEach((note, index) => {
+		newClientSocket.emit('SET_TRACK_SIMPLE_TRACK_NOTE', {
+			type: 'SET_TRACK_SIMPLE_TRACK_NOTE',
+			index,
+			enabled: note,
+		})
+	})
 }
 
 function sendClientDisconnected(id) {

@@ -3,6 +3,8 @@
 - [√] don't show keyboard letters on the track or remote keyboards
 - [√] only unpress note when mouse moves out if left mouse button is down
 - [ ] four note track, only one possible note and length
+- [ ] setup redux for server
+- [ ] figure out how to share code between client and server
 - [ ] don't unnecessarily change osc freq when diff notes are set
 - [√] use shift to hold down keys when clicking keyboard
 - [ ] make it so you have to click on keyboard first for the hold and play to work
