@@ -2,6 +2,7 @@
 - [√] put z and x markings for octave
 - [√] don't show keyboard letters on the track or remote keyboards
 - [√] only unpress note when mouse moves out if left mouse button is down
+- [ ] four note track, only one possible note and length
 - [ ] don't unnecessarily change osc freq when diff notes are set
 - [√] use shift to hold down keys when clicking keyboard
 - [ ] make it so you have to click on keyboard first for the hold and play to work
@@ -10,3 +11,4 @@
 - [ ] midi timeline thing
 - [√] made virtual keyboard keys clickable
 - [ ] maybe use automerge? https://github.com/automerge/automerge
+- [ ] options view

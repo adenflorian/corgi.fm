@@ -65,6 +65,9 @@ export class BasicInstrument {
 
 		let highestFrequency = 0
 
+		// TODO: Find oscillator that's at desired freq and use it,
+		//   or store state of pressed midi notes and only do things for changed notes
+
 		this._oscillators.forEach((oscillator, index) => {
 			oscillator.frequency
 				.linearRampToValueAtTime(midiNoteToFrequency(midiNotes[index]), this._audioContext.currentTime + 0.01)

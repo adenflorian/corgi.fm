@@ -46,5 +46,15 @@
         "unpress",
         "unselectable"
     ],
-    "editor.dragAndDrop": false
+    "editor.dragAndDrop": false,
+    "cSpell.ignorePaths": [
+        "**/package-lock.json",
+        "**/node_modules/**",
+        "**/vscode-extension/**",
+        "**/.git/**",
+        ".vscode",
+        "typings",
+        "built/**/*",
+        ".cache"
+    ]
 }
