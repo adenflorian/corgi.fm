@@ -5,6 +5,7 @@ import * as path from 'path'
 import * as socketIO from 'socket.io'
 import {Clients} from './Clients'
 import {logger} from './logger'
+import {addIfNew} from './server-common'
 import {WebSocketEvent} from './server-constants'
 
 const app = express()
@@ -23,7 +24,16 @@ app.use(express.static(path.join(__dirname, '../client')))
 
 const clients = new Clients()
 
-const simpleTrackNotes = [true, false, true, false, true, true, false, false]
+let simpleTrackEvents = [
+	{notes: [1]},
+	{notes: []},
+	{notes: [3]},
+	{notes: []},
+	{notes: [6]},
+	{notes: []},
+	{notes: [10]},
+	{notes: []},
+]
 
 io.on('connection', socket => {
 	logger.log('new connection | ', socket.id)
@@ -33,7 +43,7 @@ io.on('connection', socket => {
 
 	sendClientsToNewClient(socket)
 	sendNewClientToOthers(socket, clients.get(socket.id))
-	sendSimpleTrackNotesToNewClient(socket)
+	sendSimpleTrackEventsToNewClient(socket)
 
 	socket.on('notes', notesPayload => {
 		logger.debug(`notes: ${socket.id} | `, notesPayload)
@@ -55,7 +65,7 @@ io.on('connection', socket => {
 
 	socket.on('SET_TRACK_SIMPLE_TRACK_NOTE', action => {
 		logger.log(`SET_TRACK_SIMPLE_TRACK_NOTE: ${socket.id} | `, action)
-		simpleTrackNotes[action.index] = action.enabled
+		simpleTrackEvents = handleSetSimpleNote({notes: simpleTrackEvents, index: 0}, action).notes
 		socket.broadcast.emit('SET_TRACK_SIMPLE_TRACK_NOTE', action)
 	})
 
@@ -95,16 +105,55 @@ function sendNewClientToOthers(socket, client) {
 	socket.broadcast.emit('newClient', client)
 }
 
-function sendSimpleTrackNotesToNewClient(newClientSocket) {
-	logger.debug('sending simple track notes to new client')
-	simpleTrackNotes.forEach((note, index) => {
-		newClientSocket.emit('SET_TRACK_SIMPLE_TRACK_NOTE', {
-			type: 'SET_TRACK_SIMPLE_TRACK_NOTE',
-			index,
-			enabled: note,
+function sendSimpleTrackEventsToNewClient(newClientSocket) {
+	logger.debug('sending simple track events to new client')
+	simpleTrackEvents.forEach((event, eventIndex) => {
+		event.notes.forEach(note => {
+			newClientSocket.emit('SET_TRACK_SIMPLE_TRACK_NOTE', {
+				type: 'SET_TRACK_SIMPLE_TRACK_NOTE',
+				index: eventIndex,
+				enabled: true,
+				note,
+			})
 		})
 	})
 }
+
+function handleSetSimpleNote(state: ISimpleTrackState, action) {
+	if (action.note === undefined) {
+		throw new Error('action.notes === undefined')
+	}
+	return {
+		...state,
+		notes: state.notes.map((event, eventIndex) => {
+			if (eventIndex === action.index) {
+				if (action.enabled) {
+					return {
+						...event,
+						notes: addIfNew(event.notes, action.note),
+					}
+				} else {
+					return {
+						...event,
+						notes: event.notes.filter(x => x === action.note),
+					}
+				}
+			} else {
+				return event
+			}
+		}),
+	}
+}
+
+export interface ISimpleTrackState {
+	notes: ISimpleTrackNote[]
+	index: number
+}
+
+export interface ISimpleTrackNote {
+	notes: IMidiNote[]
+}
+export type IMidiNote = number
 
 function sendClientDisconnected(id) {
 	logger.debug('sending clientDisconnected to all clients')

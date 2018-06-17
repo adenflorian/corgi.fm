@@ -1,7 +1,8 @@
 import {Dispatch} from 'redux'
 import {logger} from './logger'
+import {IMidiNote} from './MIDI/MidiNote'
 import {setSimpleTrackIndex} from './redux/simple-track-redux'
-import {virtualKeyPressed, virtualKeyUp} from './redux/virtual-keyboard-redux'
+import {virtualAllKeysUp, virtualKeyPressed, virtualKeyUp} from './redux/virtual-keyboard-redux'
 
 export enum SimpleTrackEventAction {
 	playNote,
@@ -12,7 +13,11 @@ export enum SimpleTrackEventAction {
 export interface ISimpleTrackEvent {
 	time: number
 	action: SimpleTrackEventAction
+	notes?: IMidiNote[]
 }
+
+const TRACK_1 = 'track-1'
+
 export class SimpleTrackPlayer {
 	private _audioContext: AudioContext
 	private _intervalId: number
@@ -32,14 +37,14 @@ export class SimpleTrackPlayer {
 		logger.log('play')
 		this._events = events
 		this._startTime = this._audioContext.currentTime
-		this._intervalId = window.setInterval(this._onTick, 100)
+		this._intervalId = window.setInterval(this._onTick, 10)
 	}
 
 	public stop = () => {
 		clearInterval(this._intervalId)
 		this._intervalId = undefined
 		this._index = 0
-		this._stopNote()
+		this._stopAllNotes()
 		this._dispatch(setSimpleTrackIndex(-1))
 	}
 
@@ -69,7 +74,7 @@ export class SimpleTrackPlayer {
 			} else {
 				this._doEvent(nextEvent)
 				this._index++
-				this._dispatch(setSimpleTrackIndex(this._index - 1))
+				this._dispatch(setSimpleTrackIndex(Math.floor(currentPlayTime * 5)))
 			}
 		}
 	}
@@ -77,18 +82,22 @@ export class SimpleTrackPlayer {
 	private _doEvent(event: ISimpleTrackEvent) {
 		logger.log('_doEvent, event: ', event)
 		switch (event.action) {
-			case SimpleTrackEventAction.playNote: return this._playNote()
-			case SimpleTrackEventAction.stopNote: return this._stopNote()
+			case SimpleTrackEventAction.playNote: return this._playNotes(event.notes)
+			case SimpleTrackEventAction.stopNote: return this._stopAllNotes()
 			default: return logger.warn('unknown event note action')
 		}
 	}
 
-	private _playNote() {
-		this._dispatch(virtualKeyPressed('track-1', 0))
+	private _playNotes(notes: IMidiNote[]) {
+		notes.forEach(note => this._dispatch(virtualKeyPressed(TRACK_1, note)))
 	}
 
-	private _stopNote() {
-		this._dispatch(virtualKeyUp('track-1', 0))
+	private _stopNotes(notes: IMidiNote[]) {
+		notes.forEach(note => this._dispatch(virtualKeyUp(TRACK_1, note)))
+	}
+
+	private _stopAllNotes() {
+		this._dispatch(virtualAllKeysUp(TRACK_1))
 	}
 
 	private _isPlaying(): boolean {

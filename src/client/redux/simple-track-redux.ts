@@ -1,11 +1,14 @@
+import {IMidiNote} from '../MIDI/MidiNote'
 import {IAppState} from './configureStore'
+import {addIfNew} from './virtual-keyboard-redux'
 
-export const SET_TRACK_SIMPLE_TRACK_NOTE = 'SET_TRACK_SIMPLE_TRACK_NOTE'
-export const setSimpleTrackNote = (index: number, enabled: boolean) => {
+export const SET_SIMPLE_TRACK_NOTE = 'SET_TRACK_SIMPLE_TRACK_NOTE'
+export const setSimpleTrackNote = (index: number, enabled: boolean, note: IMidiNote) => {
 	return {
-		type: SET_TRACK_SIMPLE_TRACK_NOTE,
+		type: SET_SIMPLE_TRACK_NOTE,
 		index,
 		enabled,
+		note,
 	}
 }
 
@@ -23,29 +26,49 @@ export interface ISimpleTrackState {
 }
 
 export interface ISimpleTrackNote {
-	enabled: boolean
+	notes: IMidiNote[]
 }
 
 const initialState: ISimpleTrackState = {
 	notes: [
-		{enabled: false},
-		{enabled: false},
-		{enabled: false},
-		{enabled: false},
-		{enabled: false},
-		{enabled: false},
-		{enabled: false},
-		{enabled: false},
+		{notes: []},
+		{notes: []},
+		{notes: []},
+		{notes: []},
+		{notes: []},
+		{notes: []},
+		{notes: []},
+		{notes: []},
 	],
 	index: -1,
 }
 
 export function simpleTrackReducer(state: ISimpleTrackState = initialState, action) {
 	switch (action.type) {
-		case SET_TRACK_SIMPLE_TRACK_NOTE:
-			const newNotes = state.notes.slice()
-			newNotes[action.index].enabled = action.enabled
-			return {...state, notes: newNotes}
+		case SET_SIMPLE_TRACK_NOTE:
+			if (action.note === undefined) {
+				throw new Error('action.notes === undefined')
+			}
+			return {
+				...state,
+				notes: state.notes.map((event, eventIndex) => {
+					if (eventIndex === action.index) {
+						if (action.enabled) {
+							return {
+								...event,
+								notes: addIfNew(event.notes, action.note),
+							}
+						} else {
+							return {
+								...event,
+								notes: event.notes.filter(x => x !== action.note),
+							}
+						}
+					} else {
+						return event
+					}
+				}),
+			}
 		case SET_SIMPLE_TRACK_INDEX:
 			return {...state, index: action.index}
 		default:

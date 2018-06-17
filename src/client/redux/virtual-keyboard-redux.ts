@@ -6,14 +6,6 @@ import {CLIENT_DISCONNECTED, NEW_CLIENT, SET_CLIENTS} from './clients-redux'
 import {IAppState} from './configureStore'
 import {SET_MY_CLIENT_ID} from './websocket-redux'
 
-export const VIRTUAL_KEY_PRESSED = 'VIRTUAL_KEY_PRESSED'
-export const VIRTUAL_KEY_UP = 'VIRTUAL_KEY_UP'
-export const VIRTUAL_KEY_FLIP = 'VIRTUAL_KEY_FLIP'
-export const VIRTUAL_OCTAVE = 'VIRTUAL_OCTAVE'
-export const INCREASE_VIRTUAL_OCTAVE = 'INCREASE_VIRTUAL_OCTAVE'
-export const DECREASE_VIRTUAL_OCTAVE = 'DECREASE_VIRTUAL_OCTAVE'
-export const SET_VIRTUAL_KEYS = 'SET_VIRTUAL_KEYS'
-
 export interface VirtualKeyAction {
 	type: string
 	ownerId: ClientId
@@ -22,6 +14,7 @@ export interface VirtualKeyAction {
 	keys?: IMidiNote[]
 }
 
+export const VIRTUAL_KEY_PRESSED = 'VIRTUAL_KEY_PRESSED'
 export const virtualKeyPressed = (ownerId: ClientId, number: number) => {
 	return {
 		type: VIRTUAL_KEY_PRESSED,
@@ -30,6 +23,7 @@ export const virtualKeyPressed = (ownerId: ClientId, number: number) => {
 	}
 }
 
+export const VIRTUAL_KEY_UP = 'VIRTUAL_KEY_UP'
 export const virtualKeyUp = (ownerId: ClientId, number: number) => {
 	return {
 		type: VIRTUAL_KEY_UP,
@@ -38,6 +32,15 @@ export const virtualKeyUp = (ownerId: ClientId, number: number) => {
 	}
 }
 
+export const VIRTUAL_ALL_KEYS_UP = 'VIRTUAL_ALL_KEYS_UP'
+export const virtualAllKeysUp = (ownerId: ClientId) => {
+	return {
+		type: VIRTUAL_ALL_KEYS_UP,
+		ownerId,
+	}
+}
+
+export const VIRTUAL_KEY_FLIP = 'VIRTUAL_KEY_FLIP'
 export const virtualKeyFlip = (ownerId: ClientId, number: number) => {
 	return {
 		type: VIRTUAL_KEY_FLIP,
@@ -46,6 +49,7 @@ export const virtualKeyFlip = (ownerId: ClientId, number: number) => {
 	}
 }
 
+export const VIRTUAL_OCTAVE = 'VIRTUAL_OCTAVE'
 export const virtualOctave = (ownerId: ClientId, octave: Octave) => {
 	return {
 		type: VIRTUAL_OCTAVE,
@@ -54,6 +58,7 @@ export const virtualOctave = (ownerId: ClientId, octave: Octave) => {
 	}
 }
 
+export const INCREASE_VIRTUAL_OCTAVE = 'INCREASE_VIRTUAL_OCTAVE'
 export const increaseVirtualOctave = (ownerId: ClientId) => {
 	return {
 		type: INCREASE_VIRTUAL_OCTAVE,
@@ -61,6 +66,7 @@ export const increaseVirtualOctave = (ownerId: ClientId) => {
 	}
 }
 
+export const DECREASE_VIRTUAL_OCTAVE = 'DECREASE_VIRTUAL_OCTAVE'
 export const decreaseVirtualOctave = (ownerId: ClientId) => {
 	return {
 		type: DECREASE_VIRTUAL_OCTAVE,
@@ -68,6 +74,7 @@ export const decreaseVirtualOctave = (ownerId: ClientId) => {
 	}
 }
 
+export const SET_VIRTUAL_KEYS = 'SET_VIRTUAL_KEYS'
 export const setVirtualKeys = (ownerId: ClientId, keys: IMidiNote[]) => {
 	return {
 		type: SET_VIRTUAL_KEYS,
@@ -113,6 +120,14 @@ export function virtualKeyboardsReducer(state: VirtualKeyboardsState = initialSt
 				[action.ownerId]: {
 					...state[action.ownerId],
 					pressedKeys: state[action.ownerId].pressedKeys.filter(x => x !== action.number),
+				},
+			}
+		case VIRTUAL_ALL_KEYS_UP:
+			return {
+				...state,
+				[action.ownerId]: {
+					...state[action.ownerId],
+					pressedKeys: [],
 				},
 			}
 		case VIRTUAL_KEY_FLIP:
@@ -201,14 +216,6 @@ export function virtualKeyboardsReducer(state: VirtualKeyboardsState = initialSt
 	}
 }
 
-export function addIfNew(arr: any[], newElement: any) {
-	if (arr.some(x => x === newElement)) {
-		return arr
-	} else {
-		return [...arr, newElement]
-	}
-}
-
 export function flipKey(keys: any[], key: any) {
 	if (keys.some(x => x === key)) {
 		return keys.filter(x => x !== key)
@@ -228,5 +235,13 @@ export function selectMidiOutput(state: IAppState, ownerId: ClientId): IMidi {
 
 	return {
 		notes: virtualKeyboardState.pressedKeys.map(x => applyOctave(x, virtualKeyboardState.octave)),
+	}
+}
+
+export function addIfNew(arr: any[], newElement: any) {
+	if (arr.some(x => x === newElement)) {
+		return arr
+	} else {
+		return [...arr, newElement]
 	}
 }

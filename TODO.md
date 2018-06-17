@@ -7,6 +7,7 @@
 - [√] figure out how to share code between client and server
 - [√] four note track, only one possible note and length
 - [ ] allow two different notes at once
+- [ ] need way to bypass virtual keyboard
 - [ ] fine grained note start times and lengths
 - [ ] setup redux for server
 - [ ] don't unnecessarily change osc freq when diff notes are set
