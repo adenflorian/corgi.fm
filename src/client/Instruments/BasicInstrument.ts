@@ -1,5 +1,5 @@
 // import ADSR from 'adsr'
-import {IMidiNote} from '../midi/MidiNote'
+import {IMidiNote} from '../MIDI/MidiNote'
 import {getFrequencyUsingHalfStepsFromA4} from '../music/music-functions'
 
 export class BasicInstrument {

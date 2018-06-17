@@ -10,7 +10,7 @@ import {DummyClient} from '../redux/clients-redux'
 import {IAppState} from '../redux/configureStore'
 import {selectMidiOutput, virtualKeyFlip, virtualKeyPressed, virtualKeyUp} from '../redux/virtual-keyboard-redux'
 import {hashbow} from '../utils'
-import {ClientId} from '../websocket'
+import {ClientId} from '../websocket-listeners'
 import './Keyboard.less'
 
 const keyColors = Object.freeze({

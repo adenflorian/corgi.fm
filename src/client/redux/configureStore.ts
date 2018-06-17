@@ -7,8 +7,8 @@ import {IOptionsState, optionsReducer} from './options-redux'
 import {ISimpleTrackState, simpleTrackReducer} from './simple-track-redux'
 import {trackPlayerMiddleware} from './track-player-middleware'
 import {virtualKeyboardsReducer, VirtualKeyboardsState} from './virtual-keyboard-redux'
-import {websocketMiddleware} from './websocket-middleware'
 import {IWebsocketState, websocketReducer} from './websocket-redux'
+import {websocketSenderMiddleware} from './websocket-sender-middleware'
 
 export interface IAppState {
 	audio: IAudioState
@@ -40,7 +40,7 @@ export function configureStore(initialState: {}) {
 		initialState,
 		composeEnhancers(
 			applyMiddleware(
-				websocketMiddleware,
+				websocketSenderMiddleware,
 				trackPlayerMiddleware,
 			),
 			persistState('options'),

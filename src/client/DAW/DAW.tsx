@@ -1,10 +1,10 @@
 import * as React from 'react'
 import {Component} from 'react'
 import {connect} from 'react-redux'
-import {Tracks} from '../DAW/Tracks'
 import {IAppState} from '../redux/configureStore'
 import {IDawState} from '../redux/daw-redux'
 import './DAW.less'
+import {Tracks} from './Tracks'
 
 interface IDawProps {
 	daw: IDawState

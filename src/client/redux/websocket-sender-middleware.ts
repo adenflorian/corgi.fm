@@ -10,7 +10,7 @@ import {
 	VirtualKeyAction,
 } from './virtual-keyboard-redux'
 
-export const websocketMiddleware = store => next => action => {
+export const websocketSenderMiddleware = store => next => action => {
 	const state: IAppState = store.getState()
 	const socket = state.websocket.socket
 

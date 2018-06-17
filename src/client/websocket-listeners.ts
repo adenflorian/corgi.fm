@@ -11,7 +11,7 @@ import {SET_MY_CLIENT_ID, setInfo, setSocket} from './redux/websocket-redux'
 
 const port = 80
 
-export function setupWebsocket(store: Store) {
+export function setupWebsocketAndListeners(store: Store) {
 	const socket = io.connect(window.location.hostname + `:${port}/`)
 
 	logger.log('socket connected')

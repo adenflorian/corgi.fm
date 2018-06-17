@@ -1,7 +1,7 @@
 import {IMidiNote} from '../MIDI/MidiNote'
 import {applyOctave} from '../music/music-functions'
 import {Octave} from '../music/music-types'
-import {ClientId} from '../websocket'
+import {ClientId} from '../websocket-listeners'
 import {CLIENT_DISCONNECTED, NEW_CLIENT, SET_CLIENTS} from './clients-redux'
 import {IAppState} from './configureStore'
 import {SET_MY_CLIENT_ID} from './websocket-redux'

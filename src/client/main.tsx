@@ -5,7 +5,7 @@ import {renderApp} from './react-main'
 import {configureStore, IAppState} from './redux/configureStore'
 import {getInitialReduxState} from './redux/initial-redux-state'
 import {setupAudioContext} from './setup-audio-context'
-import {setupWebsocket} from './websocket'
+import {setupWebsocketAndListeners} from './websocket-listeners'
 
 const store = configureStore(getInitialReduxState())
 
@@ -15,7 +15,7 @@ setupMidiSupport(store, logger)
 
 setupInputEventListeners(window, store)
 
-setupWebsocket(store)
+setupWebsocketAndListeners(store)
 
 renderApp(store)
 
