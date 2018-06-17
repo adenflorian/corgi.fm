@@ -18,20 +18,24 @@ export const setSimpleTrackIndex = (index: number) => {
 }
 
 export interface ISimpleTrackState {
-	notes: boolean[]
+	notes: ISimpleTrackNote[]
 	index: number
+}
+
+export interface ISimpleTrackNote {
+	enabled: boolean
 }
 
 const initialState: ISimpleTrackState = {
 	notes: [
-		false,
-		false,
-		false,
-		false,
-		false,
-		false,
-		false,
-		false,
+		{enabled: false},
+		{enabled: false},
+		{enabled: false},
+		{enabled: false},
+		{enabled: false},
+		{enabled: false},
+		{enabled: false},
+		{enabled: false},
 	],
 	index: -1,
 }
@@ -40,7 +44,7 @@ export function simpleTrackReducer(state: ISimpleTrackState = initialState, acti
 	switch (action.type) {
 		case SET_TRACK_SIMPLE_TRACK_NOTE:
 			const newNotes = state.notes.slice()
-			newNotes[action.index] = action.enabled
+			newNotes[action.index].enabled = action.enabled
 			return {...state, notes: newNotes}
 		case SET_SIMPLE_TRACK_INDEX:
 			return {...state, index: action.index}

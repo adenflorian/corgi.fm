@@ -9,17 +9,16 @@ export enum SimpleTrackEventAction {
 	endTrack,
 }
 
-export interface SimpleTrackEvent {
+export interface ISimpleTrackEvent {
 	time: number
 	action: SimpleTrackEventAction
 }
-
 export class SimpleTrackPlayer {
 	private _audioContext: AudioContext
 	private _intervalId: number
 	private _index: number = 0
 	private _dispatch: Dispatch
-	private _events: SimpleTrackEvent[]
+	private _events: ISimpleTrackEvent[]
 	private _startTime: number
 	private _inTick: boolean = false
 
@@ -28,7 +27,7 @@ export class SimpleTrackPlayer {
 		this._audioContext = audioContext
 	}
 
-	public play = (events: SimpleTrackEvent[]) => {
+	public play = (events: ISimpleTrackEvent[]) => {
 		if (this._isPlaying()) return
 		logger.log('play')
 		this._events = events
@@ -75,7 +74,7 @@ export class SimpleTrackPlayer {
 		}
 	}
 
-	private _doEvent(event: SimpleTrackEvent) {
+	private _doEvent(event: ISimpleTrackEvent) {
 		logger.log('_doEvent, event: ', event)
 		switch (event.action) {
 			case SimpleTrackEventAction.playNote: return this._playNote()

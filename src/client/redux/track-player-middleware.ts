@@ -1,7 +1,7 @@
 import {SimpleTrackEventAction, SimpleTrackPlayer} from '../SimpleTrackPlayer'
 import {IAppState} from './configureStore'
 import {makeActionCreator} from './redux-utils'
-import {selectSimpleTrackNotes} from './simple-track-redux'
+import {ISimpleTrackNote, selectSimpleTrackNotes} from './simple-track-redux'
 
 export const PLAY_SIMPLE_TRACK = 'PLAY_SIMPLE_TRACK'
 export const playSimpleTrack = makeActionCreator(PLAY_SIMPLE_TRACK)
@@ -33,11 +33,11 @@ export const trackPlayerMiddleware = store => next => action => {
 	}
 }
 
-function notesToEvents(notes: boolean[]) {
+function notesToEvents(notes: ISimpleTrackNote[]) {
 	return notes.map((note, index) => {
 		return {
 			time: index / 10,
-			action: note ? SimpleTrackEventAction.playNote : SimpleTrackEventAction.stopNote,
+			action: note.enabled ? SimpleTrackEventAction.playNote : SimpleTrackEventAction.stopNote,
 		}
 	}).concat({time: notes.length / 10, action: SimpleTrackEventAction.endTrack})
 }

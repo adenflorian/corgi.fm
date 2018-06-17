@@ -3,12 +3,17 @@ import * as React from 'react'
 import {Component} from 'react'
 import {connect, Dispatch} from 'react-redux'
 import {IAppState} from './redux/configureStore'
-import {selectSimpleTrackIndex, selectSimpleTrackNotes, setSimpleTrackNote} from './redux/simple-track-redux'
+import {
+	ISimpleTrackNote,
+	selectSimpleTrackIndex,
+	selectSimpleTrackNotes,
+	setSimpleTrackNote,
+} from './redux/simple-track-redux'
 import {playSimpleTrack, stopSimpleTrack} from './redux/track-player-middleware'
 import './SimpleTrack.less'
 
 interface ISimpleTrackProps {
-	notes: boolean[]
+	notes: ISimpleTrackNote[]
 	setNote: any
 	play: any
 	stop: any
@@ -17,7 +22,16 @@ interface ISimpleTrackProps {
 
 export class SimpleTrack extends Component<ISimpleTrackProps> {
 	public static defaultProps = {
-		notes: [false, false, false, false],
+		notes: [
+			{enabled: false},
+			{enabled: false},
+			{enabled: false},
+			{enabled: false},
+			{enabled: false},
+			{enabled: false},
+			{enabled: false},
+			{enabled: false},
+		],
 	}
 
 	public render() {
@@ -47,10 +61,10 @@ export class SimpleTrack extends Component<ISimpleTrackProps> {
 								key={index}
 								className={classnames([
 									'noteCell',
-									note ? 'on' : '',
+									note.enabled ? 'on' : '',
 									activeIndex === index ? 'active' : '',
 								])}
-								onClick={() => setNote(index, !note)}
+								onClick={() => setNote(index, !note.enabled)}
 							/>
 						)
 					})}
