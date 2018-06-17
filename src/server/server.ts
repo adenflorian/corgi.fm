@@ -46,7 +46,7 @@ io.on('connection', socket => {
 	sendSimpleTrackEventsToNewClient(socket)
 
 	socket.on('notes', notesPayload => {
-		logger.debug(`notes: ${socket.id} | `, notesPayload)
+		logger.log(`notes: ${socket.id} | `, notesPayload)
 		clients.setNotes(socket.id, notesPayload.notes)
 		socket.broadcast.emit('notes', {
 			notes: notesPayload.notes,

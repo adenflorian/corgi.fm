@@ -58,7 +58,7 @@ export const websocketSenderMiddleware = store => next => action => {
 
 function onVirtualKey(action: VirtualKeyAction, store, next, socket, myClientId) {
 	next(action)
-	if (action.ownerId === myClientId) {
+	if (action.ownerId === myClientId.id) {
 		const state: IAppState = store.getState()
 		socket.emit('notes', {notes: state.virtualKeyboards[action.ownerId].pressedKeys})
 	}
@@ -66,7 +66,7 @@ function onVirtualKey(action: VirtualKeyAction, store, next, socket, myClientId)
 
 function onOctave(action, store, next, socket, myClientId) {
 	next(action)
-	if (action.ownerId === myClientId) {
+	if (action.ownerId === myClientId.id) {
 		const state: IAppState = store.getState()
 		if (action.ownerId === state.websocket.myClientId) {
 			socket.emit('octave', {octave: state.virtualKeyboards[action.ownerId].octave})
