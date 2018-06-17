@@ -14,3 +14,8 @@
 - [√] made virtual keyboard keys clickable
 - [ ] maybe use automerge? https://github.com/automerge/automerge
 - [ ] options view
+- [ ] maybe use requestAnimationFrame()
+
+
+# References
+- https://github.com/grimmdude/MidiPlayerJS/blob/master/src/player.js

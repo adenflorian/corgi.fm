@@ -22,7 +22,7 @@ app.use(express.static(path.join(__dirname, '../client')))
 
 const clients = new Clients()
 
-const simpleTrackNotes = [true, false, true, false, true, false, true, false]
+const simpleTrackNotes = [true, false, true, false, true, true, false, false]
 
 io.on('connection', socket => {
 	logger.log('new connection | ', socket.id)

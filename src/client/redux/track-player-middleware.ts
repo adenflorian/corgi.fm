@@ -36,8 +36,8 @@ export const trackPlayerMiddleware = store => next => action => {
 function notesToEvents(notes: boolean[]) {
 	return notes.map((note, index) => {
 		return {
-			time: index,
+			time: index / 10,
 			action: note ? SimpleTrackEventAction.playNote : SimpleTrackEventAction.stopNote,
 		}
-	}).concat({time: notes.length, action: SimpleTrackEventAction.endTrack})
+	}).concat({time: notes.length / 10, action: SimpleTrackEventAction.endTrack})
 }

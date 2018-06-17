@@ -89,7 +89,7 @@ export interface VirtualKeyboardState {
 
 const initialState: VirtualKeyboardsState = {
 	'track-1': {
-		octave: defaultOctave,
+		octave: defaultOctave - 1,
 		pressedKeys: [],
 	},
 }
