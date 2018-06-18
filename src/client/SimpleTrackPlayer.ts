@@ -1,8 +1,8 @@
 import {Dispatch} from 'redux'
 import {logger} from '../common/logger'
-import {IMidiNote} from './MIDI/MidiNote'
-import {setSimpleTrackIndex} from './redux/simple-track-redux'
-import {virtualAllKeysUp, virtualKeyPressed} from './redux/virtual-keyboard-redux'
+import {IMidiNote} from '../common/MidiNote'
+import {setSimpleTrackIndex} from '../common/redux/simple-track-redux'
+import {virtualAllKeysUp, virtualKeyPressed} from '../common/redux/virtual-keyboard-redux'
 
 export enum SimpleTrackEventAction {
 	playNote,

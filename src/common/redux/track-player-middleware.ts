@@ -1,4 +1,4 @@
-import {ISimpleTrackEvent, SimpleTrackEventAction, SimpleTrackPlayer} from '../SimpleTrackPlayer'
+import {ISimpleTrackEvent, SimpleTrackEventAction, SimpleTrackPlayer} from '../../client/SimpleTrackPlayer'
 import {IAppState} from './configureStore'
 import {makeActionCreator} from './redux-utils'
 import {ISimpleTrackNote, selectSimpleTrackNotes} from './simple-track-redux'

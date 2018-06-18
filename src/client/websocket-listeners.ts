@@ -1,10 +1,9 @@
 import {Store} from 'redux'
 import * as io from 'socket.io-client'
 import {logger} from '../common/logger'
-import {IMidiNote} from './MIDI/MidiNote'
-import {Octave} from './music/music-types'
-import {clientDisconnected, newClient, SET_CLIENTS} from './redux/clients-redux'
-import {SET_SIMPLE_TRACK_NOTE} from './redux/simple-track-redux'
+import {IMidiNote} from '../common/MidiNote'
+import {clientDisconnected, newClient, SET_CLIENTS} from '../common/redux/clients-redux'
+import {SET_SIMPLE_TRACK_NOTE} from '../common/redux/simple-track-redux'
 import {
 	PLAY_SIMPLE_TRACK,
 	playSimpleTrack,
@@ -14,9 +13,10 @@ import {
 	restartSimpleTrack,
 	STOP_SIMPLE_TRACK,
 	stopSimpleTrack,
-} from './redux/track-player-middleware'
-import {setVirtualKeys, virtualOctave} from './redux/virtual-keyboard-redux'
-import {SET_MY_CLIENT_ID, setInfo, setSocket} from './redux/websocket-redux'
+} from '../common/redux/track-player-middleware'
+import {setVirtualKeys, virtualOctave} from '../common/redux/virtual-keyboard-redux'
+import {SET_MY_CLIENT_ID, setInfo, setSocket} from '../common/redux/websocket-redux'
+import {Octave} from './music/music-types'
 
 const port = 80
 

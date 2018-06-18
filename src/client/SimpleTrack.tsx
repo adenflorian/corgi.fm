@@ -2,21 +2,21 @@ import classnames from 'classnames'
 import * as React from 'react'
 import {Component} from 'react'
 import {connect, Dispatch} from 'react-redux'
-import {isWhiteKey} from './Keyboard/Keyboard'
-import {IMidiNote} from './MIDI/MidiNote'
-import {IAppState} from './redux/configureStore'
+import {IMidiNote} from '../common/MidiNote'
+import {IAppState} from '../common/redux/configureStore'
 import {
 	ISimpleTrackNote,
 	selectSimpleTrackIndex,
 	selectSimpleTrackNotes,
 	setSimpleTrackNote,
-} from './redux/simple-track-redux'
+} from '../common/redux/simple-track-redux'
 import {
 	playSimpleTrack,
 	refreshSimpleTrackPlayerEvents,
 	restartSimpleTrack,
 	stopSimpleTrack,
-} from './redux/track-player-middleware'
+} from '../common/redux/track-player-middleware'
+import {isWhiteKey} from './Keyboard/Keyboard'
 import './SimpleTrack.less'
 
 interface ISimpleTrackProps {

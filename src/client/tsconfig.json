@@ -13,5 +13,8 @@
 		"../server/server-constants.ts",
 		"../server/server-common.ts",
 		"../common/**/*.ts*"
+	],
+	"exclude": [
+		"../../node_modules"
 	]
 }

@@ -1,4 +1,4 @@
-import {WebSocketEvent} from '../../server/server-constants'
+import {WebSocketEvent} from '../../common/server-constants'
 import {CLIENT_DISCONNECTED, clientDisconnecting, selectOwner} from './clients-redux'
 import {IAppState} from './configureStore'
 import {SET_SIMPLE_TRACK_NOTE} from './simple-track-redux'

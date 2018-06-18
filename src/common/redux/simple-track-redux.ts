@@ -1,6 +1,6 @@
-import {IMidiNote} from '../MIDI/MidiNote'
+import {IMidiNote} from '../MidiNote'
+import {addIfNew} from '../server-common'
 import {IAppState} from './configureStore'
-import {addIfNew} from './virtual-keyboard-redux'
 
 export const SET_SIMPLE_TRACK_NOTE = 'SET_TRACK_SIMPLE_TRACK_NOTE'
 export const setSimpleTrackNote = (index: number, enabled: boolean, note: IMidiNote) => {

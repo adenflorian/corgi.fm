@@ -2,8 +2,8 @@ import * as React from 'react'
 import {Component} from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
-import {IAppState} from './redux/configureStore'
-import {setOption} from './redux/options-redux'
+import {IAppState} from '../common/redux/configureStore'
+import {setOption} from '../common/redux/options-redux'
 
 interface IOptionProps {
 	option: string

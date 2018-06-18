@@ -1,7 +1,7 @@
 import {Store} from 'redux'
 import Reverb from 'soundbank-reverb'
-import {setAudioContext, setPreFx} from './redux/audio-redux'
-import {IAppState} from './redux/configureStore'
+import {setAudioContext, setPreFx} from '../common/redux/audio-redux'
+import {IAppState} from '../common/redux/configureStore'
 
 declare global {
 	interface Window {

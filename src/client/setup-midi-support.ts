@@ -1,6 +1,6 @@
 import {Store} from 'redux'
-import {IAppState} from '../redux/configureStore'
-import {virtualKeyPressed, virtualKeyUp} from '../redux/virtual-keyboard-redux'
+import {IAppState} from '../common/redux/configureStore'
+import {virtualKeyPressed, virtualKeyUp} from '../common/redux/virtual-keyboard-redux'
 
 declare global {
 	interface Navigator {
@@ -83,7 +83,7 @@ function onMidiMessage(event) {
 	// tslint:disable-next-line:no-bitwise
 	// const channel = data[0] & 0xf
 	// tslint:disable-next-line:no-bitwise
-	const type = data[0] & 0xf0 // channel agnostic message type. Thanks, Phil Burk.
+	const type = data[0] & 0xf0
 	const note = data[1]
 	const velocity = data[2]
 

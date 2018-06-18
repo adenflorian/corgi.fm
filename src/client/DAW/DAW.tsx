@@ -1,8 +1,8 @@
 import * as React from 'react'
 import {Component} from 'react'
 import {connect} from 'react-redux'
-import {IAppState} from '../redux/configureStore'
-import {IDawState} from '../redux/daw-redux'
+import {IAppState} from '../../common/redux/configureStore'
+import {IDawState} from '../../common/redux/daw-redux'
 import './DAW.less'
 import {Tracks} from './Tracks'
 

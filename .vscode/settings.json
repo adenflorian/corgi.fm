@@ -39,11 +39,14 @@
         "keyframes",
         "localstorage",
         "lowpass",
+        "onmidimessage",
+        "onstatechange",
         "slidedown",
         "slidein",
         "slideout",
         "slideup",
         "soundbank",
+        "sysex",
         "unpress",
         "unselectable"
     ],
@@ -57,5 +60,17 @@
         "typings",
         "built/**/*",
         ".cache"
+    ],
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "node_modules": true
+    },
+    "tslint.exclude": "node_modules",
+    "cSpell.ignoreRegExpList": [
+        "node_modules"
     ]
 }

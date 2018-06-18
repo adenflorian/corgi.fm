@@ -2,11 +2,22 @@ import * as animal from 'animal-id'
 import * as express from 'express'
 import * as http from 'http'
 import * as path from 'path'
+import {combineReducers, createStore, Store} from 'redux'
 import * as socketIO from 'socket.io'
 import {logger} from '../common/logger'
+import {ISimpleTrackState, simpleTrackReducer} from '../common/redux/simple-track-redux'
+import {addIfNew} from '../common/server-common'
+import {WebSocketEvent} from '../common/server-constants'
 import {Clients} from './Clients'
-import {addIfNew} from './server-common'
-import {WebSocketEvent} from './server-constants'
+
+const initialState = {}
+
+const store: Store = createStore(
+	combineReducers({
+		simpleTrack: simpleTrackReducer,
+	}),
+	initialState,
+)
 
 const app = express()
 const server = new http.Server(app)
@@ -144,16 +155,6 @@ function handleSetSimpleNote(state: ISimpleTrackState, action) {
 		}),
 	}
 }
-
-export interface ISimpleTrackState {
-	notes: ISimpleTrackNote[]
-	index: number
-}
-
-export interface ISimpleTrackNote {
-	notes: IMidiNote[]
-}
-export type IMidiNote = number
 
 function sendClientDisconnected(id) {
 	logger.debug('sending clientDisconnected to all clients')

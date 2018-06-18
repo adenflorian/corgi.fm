@@ -1,7 +1,8 @@
-import {IMidiNote} from '../MIDI/MidiNote'
-import {applyOctave} from '../music/music-functions'
-import {Octave} from '../music/music-types'
-import {ClientId} from '../websocket-listeners'
+import {applyOctave} from '../../client/music/music-functions'
+import {Octave} from '../../client/music/music-types'
+import {ClientId} from '../../client/websocket-listeners'
+import {addIfNew} from '../../common/server-common'
+import {IMidiNote} from '../MidiNote'
 import {CLIENT_DISCONNECTED, NEW_CLIENT, SET_CLIENTS} from './clients-redux'
 import {IAppState} from './configureStore'
 import {SET_MY_CLIENT_ID} from './websocket-redux'
@@ -235,13 +236,5 @@ export function selectMidiOutput(state: IAppState, ownerId: ClientId): IMidi {
 
 	return {
 		notes: virtualKeyboardState.pressedKeys.map(x => applyOctave(x, virtualKeyboardState.octave)),
-	}
-}
-
-export function addIfNew(arr: any[], newElement: any) {
-	if (arr.some(x => x === newElement)) {
-		return arr
-	} else {
-		return [...arr, newElement]
 	}
 }

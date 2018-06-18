@@ -1,11 +1,11 @@
 import {Store} from 'redux'
-import {IAppState} from './redux/configureStore'
+import {IAppState} from '../common/redux/configureStore'
 import {
 	decreaseVirtualOctave,
 	increaseVirtualOctave,
 	virtualKeyPressed,
 	virtualKeyUp,
-} from './redux/virtual-keyboard-redux'
+} from '../common/redux/virtual-keyboard-redux'
 
 export const keyToMidiMap = {
 	'a': 0,

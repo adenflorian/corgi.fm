@@ -7,9 +7,9 @@ import React = require('react')
 import {Component, Fragment} from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
-import {selectOwner} from '../redux/clients-redux'
-import {IAppState} from '../redux/configureStore'
-import {setOptionMasterVolume} from '../redux/options-redux'
+import {selectOwner} from '../../common/redux/clients-redux'
+import {IAppState} from '../../common/redux/configureStore'
+import {setOptionMasterVolume} from '../../common/redux/options-redux'
 import './VolumeControl.less'
 
 interface IVolumeControlProps {

@@ -1,6 +1,6 @@
-import {IMidiNote} from '../MIDI/MidiNote'
-import {hashbow} from '../utils'
-import {ClientId} from '../websocket-listeners'
+import {hashbow} from '../../client/utils'
+import {ClientId} from '../../client/websocket-listeners'
+import {IMidiNote} from '../MidiNote'
 import {IAppState} from './configureStore'
 
 export const SET_CLIENTS = 'SET_CLIENTS'
