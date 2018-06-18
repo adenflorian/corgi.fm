@@ -1,6 +1,6 @@
 import {Store} from 'redux'
 import * as io from 'socket.io-client'
-import {logger} from './logger'
+import {logger} from '../common/logger'
 import {IMidiNote} from './MIDI/MidiNote'
 import {Octave} from './music/music-types'
 import {clientDisconnected, newClient, SET_CLIENTS} from './redux/clients-redux'

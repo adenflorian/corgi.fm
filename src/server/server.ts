@@ -3,8 +3,8 @@ import * as express from 'express'
 import * as http from 'http'
 import * as path from 'path'
 import * as socketIO from 'socket.io'
+import {logger} from '../common/logger'
 import {Clients} from './Clients'
-import {logger} from './logger'
 import {addIfNew} from './server-common'
 import {WebSocketEvent} from './server-constants'
 
@@ -46,7 +46,7 @@ io.on('connection', socket => {
 	sendSimpleTrackEventsToNewClient(socket)
 
 	socket.on('notes', notesPayload => {
-		logger.log(`notes: ${socket.id} | `, notesPayload)
+		logger.debug(`notes: ${socket.id} | `, notesPayload)
 		clients.setNotes(socket.id, notesPayload.notes)
 		socket.broadcast.emit('notes', {
 			notes: notesPayload.notes,

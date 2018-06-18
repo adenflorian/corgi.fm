@@ -1,6 +1,4 @@
 import {Store} from 'redux'
-import {isProd} from './is-prod'
-import {play} from './MIDI/midi-player'
 import {IAppState} from './redux/configureStore'
 import {
 	decreaseVirtualOctave,
@@ -62,26 +60,6 @@ export function setupInputEventListeners(window: Window, store: Store) {
 		const state: IAppState = store.getState()
 
 		store.dispatch(virtualKeyUp(state.websocket.myClientId, midiKeyNumber))
-	}
-
-	if (isProd() === false) {
-		window.addEventListener('keydown', e => {
-			if (e.repeat) return
-			if (e.key !== ' ') return
-
-			return play(store.dispatch, [
-				[0],
-				[4],
-				[7],
-				[0],
-				[2],
-				[7],
-				[0],
-				[5],
-				[7],
-				[0, 4, 7, 12],
-			])
-		})
 	}
 }
 

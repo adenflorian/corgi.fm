@@ -1,8 +1,8 @@
 import {Dispatch} from 'redux'
-import {logger} from './logger'
+import {logger} from '../common/logger'
 import {IMidiNote} from './MIDI/MidiNote'
 import {setSimpleTrackIndex} from './redux/simple-track-redux'
-import {virtualAllKeysUp, virtualKeyPressed, virtualKeyUp} from './redux/virtual-keyboard-redux'
+import {virtualAllKeysUp, virtualKeyPressed} from './redux/virtual-keyboard-redux'
 
 export enum SimpleTrackEventAction {
 	playNote,
@@ -109,9 +109,9 @@ export class SimpleTrackPlayer {
 		notes.forEach(note => this._dispatch(virtualKeyPressed(TRACK_1, note)))
 	}
 
-	private _stopNotes(notes: IMidiNote[]) {
-		notes.forEach(note => this._dispatch(virtualKeyUp(TRACK_1, note)))
-	}
+	// private _stopNotes(notes: IMidiNote[]) {
+	// 	notes.forEach(note => this._dispatch(virtualKeyUp(TRACK_1, note)))
+	// }
 
 	private _stopAllNotes() {
 		this._dispatch(virtualAllKeysUp(TRACK_1))

@@ -11,6 +11,7 @@
 	"include": [
 		"**/*.ts*",
 		"../server/server-constants.ts",
-		"../server/server-common.ts"
+		"../server/server-common.ts",
+		"../common/**/*.ts*"
 	]
 }

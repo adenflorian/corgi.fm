@@ -1,5 +1,5 @@
+import {logger} from '../common/logger'
 import {setupInputEventListeners} from './input-events'
-import {logger} from './logger'
 import {setupMidiSupport} from './MIDI/setup-midi-support'
 import {renderApp} from './react-main'
 import {configureStore, IAppState} from './redux/configureStore'

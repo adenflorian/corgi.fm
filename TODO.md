@@ -7,6 +7,7 @@
 - [√] figure out how to share code between client and server
 - [√] four note track, only one possible note and length
 - [ ] allow two different notes at once
+- [ ] have server keep track of play status and location
 - [ ] need way to bypass virtual keyboard
 - [ ] fine grained note start times and lengths
 - [ ] setup redux for server
