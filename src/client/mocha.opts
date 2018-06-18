@@ -1,2 +1,2 @@
 --require ts-node/register
-src/**/*.spec.ts*
+src/client/**/*.spec.ts*
