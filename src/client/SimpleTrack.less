@@ -1,45 +1,89 @@
 @import "./colors.less";
 @borderGray: rgb(65, 65, 77);
 .simpleTrack {
-    margin: 16px 0;
+    margin: 8px 0 16px 0;
     display: inline-flex;
     flex-direction: column;
-    .events {
-        background-color: @keyDarkGray;
+    .label {
+        margin-bottom: 8px;
+        color: @green;
+    }
+    .container {
         display: flex;
-        justify-content: space-between;
-        margin: 4px 0 16px 0;
-        max-width: 400px;
-        .event {
-            width: 80px;
-            height: 256px;
-            border: 2px solid @borderGray;
+        background-color: @keyDarkGray;
+        max-width: 512px;
+        box-shadow: @green 0px 2px, @green -1px 3px, @green -2px 4px, @green -3px 5px;
+        .controls {
+            width: 32px;
             margin: 8px;
             display: flex;
-            flex-direction: column-reverse;
-            &.active {
-                border-color: rgb(191, 83, 64);
-            }
-            .note {
-                height: 100%;
-                &.white {
-                    background-color: #31313d;
-                }
-                &.black {
-                    background-color: @keyDarkGray;
-                }
+            flex-direction: column;
+            justify-content: space-around;
+            letter-spacing: 0;
+            font-size: 24px;
+            .play {
                 &:hover {
-                    background-color: rgb(51, 80, 52);
+                    color: @green;
                 }
-                &.on {
-                    background-color: rgb(64, 191, 66);
+                &:active {
+                    color: @brightGreen;
                 }
-                &.on:hover {
-                    background-color: rgb(81, 158, 83);
+            }
+            .stop {
+                &:hover {
+                    color: @orange;
                 }
-                &:active,
-                &.on:active {
-                    background-color: rgb(54, 209, 62);
+                &:active {
+                    color: @brightOrange;
+                }
+            }
+            .restart {
+                &:hover {
+                    color: @purple;
+                }
+                &:active {
+                    color: @brightPurple;
+                }
+            }
+        }
+        .events {
+            display: flex;
+            justify-content: space-between;
+            max-width: 416px;
+            .event {
+                width: 80px;
+                height: 256px;
+                border: 2px solid @borderGray;
+                margin: 8px;
+                display: flex;
+                flex-direction: column-reverse;
+                &:first-child {
+                    margin-left: 0;
+                }
+                &.active {
+                    border-color: @orange;
+                }
+                .note {
+                    height: 100%;
+                    &.white {
+                        background-color: #31313d;
+                    }
+                    &.black {
+                        background-color: @keyDarkGray;
+                    }
+                    &:hover {
+                        background-color: rgb(51, 80, 52);
+                    }
+                    &.on {
+                        background-color: rgb(64, 191, 66);
+                    }
+                    &.on:hover {
+                        background-color: rgb(81, 158, 83);
+                    }
+                    &:active,
+                    &.on:active {
+                        background-color: rgb(54, 209, 62);
+                    }
                 }
             }
         }

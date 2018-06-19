@@ -49,48 +49,50 @@ export class SimpleTrack extends Component<ISimpleTrackProps> {
 
 		return (
 			<div className="simpleTrack">
-				<div>track</div>
-				<div className="controls">
-					<div
-						className="play unselectable"
-						onClick={play}
-					>
-						play
+				<div className="label">track-1</div>
+				<div className="container">
+					<div className="controls">
+						<div
+							className="play unselectable"
+							onClick={play}
+						>
+							▶
 					</div>
-					<div
-						className="stop unselectable"
-						onClick={stop}
-					>
-						stop
+						<div
+							className="stop unselectable"
+							onClick={stop}
+						>
+							◼
 					</div>
-					<div
-						className="restart unselectable"
-						onClick={restart}
-					>
-						restart
+						<div
+							className="restart unselectable"
+							onClick={restart}
+						>
+							↻
 					</div>
-				</div>
-				<div className="events">
-					{events.map((event, index) => {
-						return (
-							<div key={index} className={classnames(['event', activeIndex === index ? 'active' : ''])}>
-								{arr128.map((_, i2) => {
-									const isEnabled = event.notes.some(x => x === i2)
-									return (
-										<div
-											key={i2}
-											className={classnames([
-												'note',
-												isEnabled ? 'on' : '',
-												isWhiteKey(i2) ? 'white' : 'black',
-											])}
-											onClick={() => setNote(index, !isEnabled, i2)}
-										/>
-									)
-								})}
-							</div>
-						)
-					})}
+					</div>
+					<div className="events">
+						{events.map((event, index) => {
+							return (
+								<div key={index} className={classnames(['event', activeIndex === index ? 'active' : ''])}>
+									{arr128.map((_, i2) => {
+										const isEnabled = event.notes.some(x => x === i2)
+										return (
+											<div
+												key={i2}
+												className={classnames([
+													'note',
+													isEnabled ? 'on' : '',
+													isWhiteKey(i2) ? 'white' : 'black',
+												])}
+												onClick={() => setNote(index, !isEnabled, i2)}
+											/>
+										)
+									})}
+								</div>
+							)
+						})}
+					</div>
 				</div>
 			</div>
 		)

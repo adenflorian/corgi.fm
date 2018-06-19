@@ -52,10 +52,10 @@ class App extends React.Component<IAppProps, {}> {
 						/>
 					</div>
 					<div className="board connected">
-						<ConnectedSimpleTrack />
+						<ConnectedVolumeControl />
 					</div>
 					<div className="board connected">
-						<ConnectedVolumeControl />
+						<ConnectedSimpleTrack />
 					</div>
 					<div id="track-1" className="board connected">
 						<ClientId id={'track-1'} color={hashbow('track-1')} />

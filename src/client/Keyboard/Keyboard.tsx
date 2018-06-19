@@ -107,7 +107,7 @@ export class Keyboard extends React.Component<IKeyboardProps> {
 					'keyboard',
 					isLocal ? 'isLocal' : '',
 				])}
-				style={{boxShadow: boxShadow3dCss(8, color)}}
+				style={{boxShadow: boxShadow3dCss(4, color)}}
 			>
 				<div className="octave black unselectable">
 					<div className="octaveNumber">
