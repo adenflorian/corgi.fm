@@ -6,8 +6,17 @@
         width: 32px;
         height: 32px;
     }
+    &.readOnly .actualKnob {
+        background-color: #33333b;
+    }
     .mark {
         background-color: @green;
+        width: 4px;
+        height: 8px;
+        margin: auto;
+    }
+    &.readOnly .mark {
+        background-color: @darkGreen;
         width: 4px;
         height: 8px;
         margin: auto;

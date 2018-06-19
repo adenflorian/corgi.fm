@@ -49,7 +49,7 @@ export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 		return (
 			<div className="basicInstrument" style={{boxShadow: boxShadow3dCss(4, color)}}>
 				<div className="label">basic instrument</div>
-				<Knob min={-1} max={1} value={pan} label="pan" />
+				<Knob min={-1} max={1} value={pan} label="pan" readOnly={true} />
 			</div>
 		)
 	}

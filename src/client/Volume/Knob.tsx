@@ -1,3 +1,4 @@
+import classnames from 'classnames'
 import 'rc-slider/assets/index.css'
 import React = require('react')
 import {Component} from 'react'
@@ -10,6 +11,7 @@ interface IKnobProps {
 	onChange?: (newValue: number) => any
 	sensitivity?: number
 	value: number
+	readOnly?: boolean
 }
 
 interface IKnobState {
@@ -32,6 +34,7 @@ export class Knob extends Component<IKnobProps, IKnobState> {
 		min: 0,
 		max: 1,
 		sensitivity: 0.005,
+		readOnly: false,
 	}
 
 	public state: IKnobState = {
@@ -80,10 +83,10 @@ export class Knob extends Component<IKnobProps, IKnobState> {
 	}
 
 	public render() {
-		const {value, label, min, max} = this.props
+		const {value, label, min, max, readOnly} = this.props
 
 		return (
-			<div className="knob">
+			<div className={classnames(['knob', readOnly ? 'readOnly' : ''])}>
 				<div className="wedge">
 					<div
 						className="actualKnob"
@@ -93,7 +96,7 @@ export class Knob extends Component<IKnobProps, IKnobState> {
 						onMouseDown={this._handleMouseDown}
 					>
 						<div className="mark"></div>
-						<div className="label">{label}</div>
+						<div className="label unselectable">{label}</div>
 					</div>
 				</div>
 			</div>
