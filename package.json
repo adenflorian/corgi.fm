@@ -25,6 +25,7 @@
     "adsr": "^1.0.1",
     "animal-id": "^0.0.1",
     "classnames": "^2.2.6",
+    "color": "^3.0.0",
     "color-hash": "^1.0.3",
     "express": "^4.16.3",
     "parcel": "1.8.0",

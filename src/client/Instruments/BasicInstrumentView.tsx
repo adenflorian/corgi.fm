@@ -1,3 +1,5 @@
+import classnames from 'classnames'
+import Color from 'color'
 import * as React from 'react'
 import {Component} from 'react'
 import {connect} from 'react-redux'
@@ -18,6 +20,7 @@ interface IBasicInstrumentViewProps {
 	rawMidiNotes?: MidiNotes
 	ownerId: ClientId
 	pan?: number
+	isPlaying?: boolean
 }
 
 export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
@@ -42,12 +45,15 @@ export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 	}
 
 	public render() {
-		const {color, pan, rawMidiNotes} = this.props
+		const {color, isPlaying, pan, rawMidiNotes} = this.props
 
 		this.instrument.setMidiNotes(rawMidiNotes)
 
 		return (
-			<div className="basicInstrument" style={{boxShadow: boxShadow3dCss(4, color)}}>
+			<div
+				className={classnames(['basicInstrument', isPlaying ? 'isPlaying' : ''])}
+				style={{boxShadow: boxShadow3dCss(4, isPlaying ? Color(color).saturate(0.8).hsl().string() : color)}}
+			>
 				<div className="label">basic instrument</div>
 				<Knob min={-1} max={1} value={pan} label="pan" readOnly={true} />
 			</div>
@@ -55,7 +61,12 @@ export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 	}
 }
 
-export const ConnectedBasicInstrumentView = connect((state: IAppState, props: IBasicInstrumentViewProps) => ({
-	audio: state.audio,
-	rawMidiNotes: props.ownerId ? selectMidiOutput(state, props.ownerId).notes : [],
-}))(BasicInstrumentView)
+export const ConnectedBasicInstrumentView = connect((state: IAppState, props: IBasicInstrumentViewProps) => {
+	const rawMidiNotes = props.ownerId ? selectMidiOutput(state, props.ownerId).notes : []
+
+	return {
+		audio: state.audio,
+		rawMidiNotes,
+		isPlaying: rawMidiNotes.length > 0,
+	}
+})(BasicInstrumentView)
