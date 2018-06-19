@@ -75,9 +75,8 @@ class App extends React.Component<IAppProps, {}> {
 
 					{otherClients.map(client => {
 						return (
-							<Fragment>
+							<Fragment key={client.id}>
 								<div
-									key={client.id}
 									className={classnames(
 										'otherClient',
 										'board',

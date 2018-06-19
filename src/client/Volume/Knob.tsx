@@ -4,11 +4,12 @@ import {Component} from 'react'
 import './Knob.less'
 
 interface IKnobProps {
-	value: number
-	onChange: (newValue: number) => any
+	label?: string
 	min?: number
 	max?: number
+	onChange?: (newValue: number) => any
 	sensitivity?: number
+	value: number
 }
 
 interface IKnobState {
@@ -79,7 +80,7 @@ export class Knob extends Component<IKnobProps, IKnobState> {
 	}
 
 	public render() {
-		const {value} = this.props
+		const {value, label, min, max} = this.props
 
 		return (
 			<div className="knob">
@@ -87,11 +88,12 @@ export class Knob extends Component<IKnobProps, IKnobState> {
 					<div
 						className="actualKnob"
 						style={{
-							transform: `rotate(${this._getRotation(value)}deg)`,
+							transform: `rotate(${this._getRotation(value, min, max)}deg)`,
 						}}
 						onMouseDown={this._handleMouseDown}
 					>
 						<div className="mark"></div>
+						<div className="label">{label}</div>
 					</div>
 				</div>
 			</div>
@@ -108,10 +110,14 @@ export class Knob extends Component<IKnobProps, IKnobState> {
 		})
 	}
 
-	private _getRotation(input: number): number {
-		const min = 220
-		const max = 500
-		const range = max - min
-		return (input * range) + min
+	private _getRotation(input: number, min: number, max: number): number {
+		const minDegrees = 220
+		const maxDegrees = 500
+		const rangeDegrees = maxDegrees - minDegrees
+		const inputRange = Math.abs(max - min)
+		const inputDistanceFromMin = Math.abs(input - min)
+		const inputToRangeRatio = inputDistanceFromMin / inputRange
+		const amountOfDegreesToApply = rangeDegrees * inputToRangeRatio
+		return minDegrees + amountOfDegreesToApply
 	}
 }
