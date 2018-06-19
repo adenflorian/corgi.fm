@@ -48,7 +48,6 @@ body {
     justify-content: center;
     height: 100%;
     transition: all 0.5s ease;
-    flex-wrap: wrap;
     align-content: center;
 }
 
@@ -65,15 +64,11 @@ body {
 }
 
 #info {
-    text-align: center;
-    position: absolute;
-    margin: 8px 0px;
-    width: 100%;
     font-size: 0.8em;
-    bottom: 0px;
     color: @defaultGray;
     animation-duration: 1s;
     animation-name: info-slideup;
+    padding-top: 8px;
 }
 
 @keyframes info-slideup {

@@ -61,16 +61,4 @@
         "built/**/*",
         ".cache"
     ],
-    "files.exclude": {
-        "**/.git": true,
-        "**/.svn": true,
-        "**/.hg": true,
-        "**/CVS": true,
-        "**/.DS_Store": true,
-        "node_modules": true
-    },
-    "tslint.exclude": "node_modules",
-    "cSpell.ignoreRegExpList": [
-        "node_modules"
-    ]
 }

@@ -42,18 +42,20 @@ class App extends React.Component<IAppProps, {}> {
 			<Fragment>
 				{/* <h1 id="title">sha-mu</h1> */}
 
-				<ConnectedVolumeControl />
-
-				<ConnectedOption
-					option={AppOptions.showNoteNamesOnKeyboard}
-					label="show names on keyboard"
-				/>
-
 				{/* <ConnectedDAW /> */}
 
 				<div className="boardContainer">
+					<div className="board connected" style={{marginBottom: 'auto'}}>
+						<ConnectedOption
+							option={AppOptions.showNoteNamesOnKeyboard}
+							label="show names on keyboard"
+						/>
+					</div>
 					<div className="board connected">
 						<ConnectedSimpleTrack />
+					</div>
+					<div className="board connected">
+						<ConnectedVolumeControl />
 					</div>
 					<div id="track-1" className="board connected">
 						<ClientId id={'track-1'} color={hashbow('track-1')} />
@@ -94,11 +96,14 @@ class App extends React.Component<IAppProps, {}> {
 					})
 					}
 					{/* </div> */}
-				</div>
 
-				{otherClients.length > 0 &&
-					<div id="info">{info}</div>
-				}
+					<div
+						id="info"
+						style={{marginTop: 'auto'}}
+					>
+						{otherClients.length > 0 && info}
+					</div>
+				</div>
 			</Fragment>
 		)
 	}
