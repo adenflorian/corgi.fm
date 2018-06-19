@@ -193,7 +193,7 @@ function boxShadow3dCss(size: number, color: string) {
 	let x = ''
 
 	for (let i = 0; i < size; i++) {
-		x += `${-i + 0}px ${i + 2}px ${color},`
+		x += `${-i - 1}px ${i + 2}px ${color},`
 	}
 
 	return x.replace(/,$/, '')
