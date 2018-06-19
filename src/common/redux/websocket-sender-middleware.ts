@@ -1,11 +1,8 @@
+import {AnyAction} from 'redux'
 import {WebSocketEvent} from '../../common/server-constants'
 import {CLIENT_DISCONNECTED, clientDisconnecting, selectOwner} from './clients-redux'
 import {IAppState} from './configureStore'
 import {SET_SIMPLE_TRACK_NOTE} from './simple-track-redux'
-import {
-	PLAY_SIMPLE_TRACK,
-	REFRESH_SIMPLE_TRACK_PLAYER_EVENTS, RESTART_SIMPLE_TRACK, STOP_SIMPLE_TRACK,
-} from './track-player-middleware'
 import {
 	DECREASE_VIRTUAL_OCTAVE,
 	INCREASE_VIRTUAL_OCTAVE,
@@ -14,7 +11,13 @@ import {
 	VirtualKeyAction,
 } from './virtual-keyboard-redux'
 
-export const websocketSenderMiddleware = store => next => action => {
+export interface ShamuAction extends AnyAction {
+	isRemote?: boolean
+	shouldBroadcast?: boolean
+	alreadyBroadcasted?: boolean
+}
+
+export const websocketSenderMiddleware = store => next => (action: ShamuAction) => {
 	const state: IAppState = store.getState()
 	const socket = state.websocket.socket
 
@@ -22,10 +25,15 @@ export const websocketSenderMiddleware = store => next => action => {
 		return next(action)
 	}
 
+	if (action.shouldBroadcast && !action.alreadyBroadcasted) {
+		socket.emit(WebSocketEvent.RepeatToOthers, {eventName: action.type})
+		return next(action)
+	}
+
 	switch (action.type) {
 		case VIRTUAL_KEY_PRESSED:
 		case VIRTUAL_KEY_UP:
-			return onVirtualKey(action, store, next, socket, selectOwner(state))
+			return onVirtualKey(action as VirtualKeyAction, store, next, socket, selectOwner(state))
 		case INCREASE_VIRTUAL_OCTAVE:
 		case DECREASE_VIRTUAL_OCTAVE:
 			return onOctave(action, store, next, socket, selectOwner(state))
@@ -38,18 +46,6 @@ export const websocketSenderMiddleware = store => next => action => {
 			return next(action)
 		case SET_SIMPLE_TRACK_NOTE:
 			socket.emit('SET_TRACK_SIMPLE_TRACK_NOTE', action)
-			return next(action)
-		case PLAY_SIMPLE_TRACK:
-			socket.emit(WebSocketEvent.RepeatToOthers, {eventName: PLAY_SIMPLE_TRACK})
-			return next(action)
-		case STOP_SIMPLE_TRACK:
-			socket.emit(WebSocketEvent.RepeatToOthers, {eventName: STOP_SIMPLE_TRACK})
-			return next(action)
-		case RESTART_SIMPLE_TRACK:
-			socket.emit(WebSocketEvent.RepeatToOthers, {eventName: RESTART_SIMPLE_TRACK})
-			return next(action)
-		case REFRESH_SIMPLE_TRACK_PLAYER_EVENTS:
-			socket.emit(WebSocketEvent.RepeatToOthers, {eventName: REFRESH_SIMPLE_TRACK_PLAYER_EVENTS})
 			return next(action)
 		default:
 			return next(action)

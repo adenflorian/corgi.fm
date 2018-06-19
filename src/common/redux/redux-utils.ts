@@ -8,6 +8,10 @@ export function makeActionCreator(type, ...argNames) {
 	}
 }
 
+export function makeBroadcaster(actionCreator: any) {
+	return (...args) => ({...actionCreator(...args), shouldBroadcast: true})
+}
+
 export function createReducer(initialState, handlers) {
 	return function reducer(state = initialState, action) {
 		if (handlers.hasOwnProperty(action.type)) {

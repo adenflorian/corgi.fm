@@ -1,19 +1,19 @@
 import {ISimpleTrackEvent, SimpleTrackEventAction, SimpleTrackPlayer} from '../../client/SimpleTrackPlayer'
 import {IAppState} from './configureStore'
-import {makeActionCreator} from './redux-utils'
+import {makeActionCreator, makeBroadcaster} from './redux-utils'
 import {ISimpleTrackNote, selectSimpleTrackNotes} from './simple-track-redux'
 
 export const PLAY_SIMPLE_TRACK = 'PLAY_SIMPLE_TRACK'
-export const playSimpleTrack = makeActionCreator(PLAY_SIMPLE_TRACK)
+export const playSimpleTrack = makeBroadcaster(makeActionCreator(PLAY_SIMPLE_TRACK))
 
 export const STOP_SIMPLE_TRACK = 'STOP_SIMPLE_TRACK'
-export const stopSimpleTrack = makeActionCreator(STOP_SIMPLE_TRACK)
+export const stopSimpleTrack = makeBroadcaster(makeActionCreator(STOP_SIMPLE_TRACK))
 
 export const RESTART_SIMPLE_TRACK = 'RESTART_SIMPLE_TRACK'
-export const restartSimpleTrack = makeActionCreator(RESTART_SIMPLE_TRACK)
+export const restartSimpleTrack = makeBroadcaster(makeActionCreator(RESTART_SIMPLE_TRACK))
 
 export const REFRESH_SIMPLE_TRACK_PLAYER_EVENTS = 'REFRESH_SIMPLE_TRACK_PLAYER_EVENTS'
-export const refreshSimpleTrackPlayerEvents = makeActionCreator(REFRESH_SIMPLE_TRACK_PLAYER_EVENTS)
+export const refreshSimpleTrackPlayerEvents = makeBroadcaster(makeActionCreator(REFRESH_SIMPLE_TRACK_PLAYER_EVENTS))
 
 let simpleTrackPlayer: SimpleTrackPlayer
 
