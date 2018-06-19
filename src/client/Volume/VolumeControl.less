@@ -1,6 +1,22 @@
+@import '../colors.less';
 .volume {
-    input {
-        max-width: 512px;
-        width: 100%;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    background-color: @panelGray; // max-width: 256px;
+    margin: 8px auto;
+    box-shadow: @green -1px 2px, @green -2px 3px, @green -3px 4px, @green -4px 5px;
+    // .label {
+    //     // color: @green;
+    // }
+    // .knob {
+    //     // margin: 16px;
+    // }
+    &>* {
+        margin: 8px 0;
+        margin-left: 16px;
+        &:last-child {
+            margin-right: 16px;
+        }
     }
 }

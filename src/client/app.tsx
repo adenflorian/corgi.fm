@@ -10,7 +10,6 @@ import './css-reset.css'
 import {ConnectedKeyboard} from './Keyboard/Keyboard'
 import {ConnectedOption} from './Option'
 import {ConnectedSimpleTrack} from './SimpleTrack'
-import {hashbow} from './utils'
 import {ConnectedVolumeControl} from './Volume/VolumeControl'
 
 interface IAppProps {
@@ -58,8 +57,8 @@ class App extends React.Component<IAppProps, {}> {
 						<ConnectedSimpleTrack />
 					</div>
 					<div id="track-1" className="board connected">
-						<ClientId id={'track-1'} color={hashbow('track-1')} />
-						<ConnectedKeyboard ownerId={'track-1'} />
+						<ClientId id={'track-1'} color={'#40bf42'} />
+						<ConnectedKeyboard ownerId={'track-1'} color={'#40bf42'} />
 					</div>
 					<div id="you" className="board connected">
 						{/* {otherClients.length > 0 &&

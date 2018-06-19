@@ -218,7 +218,7 @@ const mapStateToProps = (state: IAppState, props) => {
 		audio: state.audio,
 		actualMidiNotes: props.ownerId ? selectMidiOutput(state, props.ownerId).notes : [],
 		virtualMidiKeyboard: globalVirtualMidiKeyboard,
-		color: (owner && owner.color) || hashbow(props.ownerId),
+		color: props.color || (owner && owner.color) || hashbow(props.ownerId),
 		isLocal: state.websocket.myClientId === props.ownerId,
 		showNoteNames: state.options.showNoteNamesOnKeyboard,
 	}

@@ -70,7 +70,5 @@ function notesToEvents(events: ISimpleTrackNote[]): ISimpleTrackEvent[] {
 		return foo
 	}, []).concat({time: events.length / 5, action: SimpleTrackEventAction.endTrack, notes: []})
 
-	console.log('notesToEvents: ', newEvents)
-
 	return newEvents
 }
