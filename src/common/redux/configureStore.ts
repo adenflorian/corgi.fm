@@ -3,7 +3,6 @@ import persistState from 'redux-localstorage'
 import {ISimpleTrackState, simpleTrackReducer} from '../../common/redux/simple-track-redux'
 import {audioReducer, IAudioState} from './audio-redux'
 import {clientsReducer, IClient} from './clients-redux'
-import {dawReducer} from './daw-redux'
 import {IOptionsState, optionsReducer} from './options-redux'
 import {trackPlayerMiddleware} from './track-player-middleware'
 import {virtualKeyboardsReducer, VirtualKeyboardsState} from './virtual-keyboard-redux'
@@ -13,7 +12,6 @@ import {websocketSenderMiddleware} from './websocket-sender-middleware'
 export interface IAppState {
 	audio: IAudioState
 	clients: IClient[]
-	daw: any
 	options: IOptionsState
 	simpleTrack: ISimpleTrackState
 	virtualKeyboards: VirtualKeyboardsState
@@ -31,7 +29,6 @@ export function configureStore(initialState: {}) {
 		combineReducers({
 			audio: audioReducer,
 			clients: clientsReducer,
-			daw: dawReducer,
 			options: optionsReducer,
 			simpleTrack: simpleTrackReducer,
 			virtualKeyboards: virtualKeyboardsReducer,

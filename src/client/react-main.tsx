@@ -4,7 +4,6 @@ import {hot} from 'react-hot-loader'
 import {Provider} from 'react-redux'
 import {Store} from 'redux'
 import {ConnectedApp} from './App'
-import {ConnectedDAW} from './DAW/DAW'
 
 export function renderApp(store: Store) {
 	const HotProvider = hot(module)(Provider)
@@ -18,7 +17,6 @@ export function renderApp(store: Store) {
 
 function getComponentByPath() {
 	switch (window.location.pathname) {
-		case '/daw': return <ConnectedDAW />
 		default: return <ConnectedApp />
 	}
 }

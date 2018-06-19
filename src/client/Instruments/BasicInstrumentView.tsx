@@ -13,5 +13,4 @@ export class BasicInstrumentView extends Component {
 }
 
 export const ConnectedBasicInstrumentView = connect((state: IAppState) => ({
-	daw: state.daw,
 }))(BasicInstrumentView)
