@@ -19,6 +19,8 @@ const store: Store = createStore(
 	initialState,
 )
 
+logger.log('store: ', store)
+
 const app = express()
 const server = new http.Server(app)
 const io = socketIO(server)

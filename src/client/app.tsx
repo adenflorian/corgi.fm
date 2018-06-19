@@ -1,12 +1,13 @@
 import classnames from 'classnames'
-import * as React from 'react'
 import {Fragment} from 'react'
+import * as React from 'react'
 import {connect} from 'react-redux'
 import {DummyClient, IClient} from '../common/redux/clients-redux'
 import {IAppState} from '../common/redux/configureStore'
 import {AppOptions} from '../common/redux/options-redux'
 import './App.less'
 import './css-reset.css'
+import {ConnectedBasicInstrumentView} from './Instruments/BasicInstrumentView'
 import {ConnectedKeyboard} from './Keyboard/Keyboard'
 import {ConnectedOption} from './Option'
 import {ConnectedSimpleTrack} from './SimpleTrack'
@@ -26,6 +27,9 @@ const ClientId = ({id, color}) => {
 	)
 }
 
+const TRACK_1 = 'track-1'
+const TRACK_1_COLOR = '#40bf42'
+
 class App extends React.Component<IAppProps, {}> {
 	public static defaultProps = {
 		clients: [],
@@ -41,8 +45,6 @@ class App extends React.Component<IAppProps, {}> {
 			<Fragment>
 				{/* <h1 id="title">sha-mu</h1> */}
 
-				{/* <ConnectedDAW /> */}
-
 				<div className="boardContainer">
 					<div className="board connected" style={{marginBottom: 'auto'}}>
 						<ConnectedOption
@@ -57,44 +59,40 @@ class App extends React.Component<IAppProps, {}> {
 						<ConnectedSimpleTrack />
 					</div>
 					<div id="track-1" className="board connected">
-						<ClientId id={'track-1'} color={'#40bf42'} />
-						<ConnectedKeyboard ownerId={'track-1'} color={'#40bf42'} />
+						<ClientId id={TRACK_1} color={TRACK_1_COLOR} />
+						<ConnectedKeyboard ownerId={TRACK_1} color={TRACK_1_COLOR} />
+					</div>
+					<div className="board">
+						<ConnectedBasicInstrumentView ownerId={TRACK_1} color={TRACK_1_COLOR} pan={0} />
 					</div>
 					<div id="you" className="board connected">
-						{/* {otherClients.length > 0 &&
-							<h2>you:</h2>
-						} */}
 						<ClientId id={myClient.id} color={myClient.color} />
 						<ConnectedKeyboard ownerId={myClient.id} myKeyboard={true} />
 					</div>
-					{/* {isProd() === false &&
-						<div className="board">
-							<BasicInstrumentView />
-						</div>
-					} */}
-
-					{/* <div id="otherClients" className="board"> */}
-					{/* {otherClients.length > 0 &&
-							<h2>others:</h2>
-						} */}
+					<div className="board">
+						<ConnectedBasicInstrumentView ownerId={myClient.id} color={myClient.color} pan={-0.5} />
+					</div>
 
 					{otherClients.map(client => {
 						return (
-							<div
-								key={client.id}
-								className={classnames(
-									'otherClient',
-									'board',
-									client.disconnecting ? 'disconnecting' : 'connected',
-								)}
-							>
-								<ClientId id={client.id} color={client.color} />
-								<ConnectedKeyboard ownerId={client.id} />
-							</div>
+							<Fragment>
+								<div
+									key={client.id}
+									className={classnames(
+										'otherClient',
+										'board',
+										client.disconnecting ? 'disconnecting' : 'connected',
+									)}
+								>
+									<ClientId id={client.id} color={client.color} />
+									<ConnectedKeyboard ownerId={client.id} />
+								</div>
+								<div className="board">
+									<ConnectedBasicInstrumentView ownerId={client.id} color={client.color} pan={0.5} />
+								</div>
+							</Fragment>
 						)
-					})
-					}
-					{/* </div> */}
+					})}
 
 					<div
 						id="info"

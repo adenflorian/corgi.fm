@@ -119,3 +119,18 @@ function hslToRgb(hue, saturation, lightness) {
 
 	return [Math.round(red * 255), Math.round(green * 255), Math.round(blue * 255)]
 }
+
+export const keyColors = Object.freeze({
+	0: {color: 'white', name: 'C'},
+	1: {color: 'black', name: 'C#'},
+	2: {color: 'white', name: 'D'},
+	3: {color: 'black', name: 'D#'},
+	4: {color: 'white', name: 'E'},
+	5: {color: 'white', name: 'F'},
+	6: {color: 'black', name: 'F#'},
+	7: {color: 'white', name: 'G'},
+	8: {color: 'black', name: 'G#'},
+	9: {color: 'white', name: 'A'},
+	10: {color: 'black', name: 'A#'},
+	11: {color: 'white', name: 'B'},
+})

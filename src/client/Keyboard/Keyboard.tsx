@@ -2,33 +2,16 @@ import classnames from 'classnames'
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
-import {IMidiNote} from '../../common/MidiNote'
 import {DummyClient} from '../../common/redux/clients-redux'
 import {IAppState} from '../../common/redux/configureStore'
 import {
-	selectMidiOutput, virtualKeyFlip, virtualKeyPressed, virtualKeyUp,
+	virtualKeyFlip, virtualKeyPressed, virtualKeyUp,
 } from '../../common/redux/virtual-keyboard-redux'
 import {keyToMidiMap} from '../input-events'
-import {BasicInstrument} from '../Instruments/BasicInstrument'
 import {Octave} from '../music/music-types'
-import {hashbow} from '../utils'
+import {hashbow, keyColors} from '../utils'
 import {ClientId} from '../websocket-listeners'
 import './Keyboard.less'
-
-const keyColors = Object.freeze({
-	0: {color: 'white', name: 'C'},
-	1: {color: 'black', name: 'C#'},
-	2: {color: 'white', name: 'D'},
-	3: {color: 'black', name: 'D#'},
-	4: {color: 'white', name: 'E'},
-	5: {color: 'white', name: 'F'},
-	6: {color: 'black', name: 'F#'},
-	7: {color: 'white', name: 'G'},
-	8: {color: 'black', name: 'G#'},
-	9: {color: 'white', name: 'A'},
-	10: {color: 'black', name: 'A#'},
-	11: {color: 'white', name: 'B'},
-})
 
 const defaultNumberOfKeys = 17
 
@@ -58,8 +41,6 @@ interface IKeyboardProps {
 	ownerId: ClientId,
 	pressedMidiKeys?: any,
 	octave?: Octave
-	actualMidiNotes: IMidiNote[]
-	audio: any
 	virtualMidiKeyboard: any
 	color: string
 	keyPressed: (index: number) => void
@@ -76,30 +57,13 @@ export class Keyboard extends React.Component<IKeyboardProps> {
 		showNoteNames: true,
 	}
 
-	private instrument: BasicInstrument
-
 	constructor(props) {
 		super(props)
-		this.instrument = new BasicInstrument({
-			audioContext: props.audio.context,
-			destination: props.audio.preFx,
-		})
-		if (props.myKeyboard) {
-			this.instrument.setPan(-0.5)
-		} else {
-			this.instrument.setPan(0.5)
-		}
-	}
-
-	public componentWillUnmount() {
-		this.instrument.dispose()
 	}
 
 	public render() {
-		const {actualMidiNotes, pressedMidiKeys, octave, color,
+		const {pressedMidiKeys, octave, color,
 			virtualMidiKeyboard, isLocal, showNoteNames} = this.props
-
-		this.instrument.setMidiNotes(actualMidiNotes)
 
 		return (
 			<div
@@ -189,7 +153,7 @@ function isLeftMouseButtonDown(buttons: number): boolean {
 	return buttons % 2 === 1
 }
 
-function boxShadow3dCss(size: number, color: string) {
+export function boxShadow3dCss(size: number, color: string) {
 	let x = ''
 
 	for (let i = 0; i < size; i++) {
@@ -215,8 +179,6 @@ const mapStateToProps = (state: IAppState, props) => {
 	return {
 		pressedMidiKeys: virtualKeyboard && virtualKeyboard.pressedKeys,
 		octave: virtualKeyboard && virtualKeyboard.octave,
-		audio: state.audio,
-		actualMidiNotes: props.ownerId ? selectMidiOutput(state, props.ownerId).notes : [],
 		virtualMidiKeyboard: globalVirtualMidiKeyboard,
 		color: props.color || (owner && owner.color) || hashbow(props.ownerId),
 		isLocal: state.websocket.myClientId === props.ownerId,
