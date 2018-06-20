@@ -1,5 +1,4 @@
 import classnames from 'classnames'
-import Color from 'color'
 import * as React from 'react'
 import {Component} from 'react'
 import {connect} from 'react-redux'
@@ -16,7 +15,8 @@ export type MidiNotes = IMidiNote[]
 
 interface IBasicInstrumentViewProps {
 	audio?: any
-	color: string
+	color?: string
+	brightColor?: string
 	rawMidiNotes?: MidiNotes
 	ownerId: ClientId
 	pan?: number
@@ -27,6 +27,8 @@ export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 	public static defaultProps = {
 		pan: 0,
 		rawMidiNotes: [],
+		color: 'gray',
+		brightColor: 'lightgray',
 	}
 
 	private instrument: BasicInstrument
@@ -45,14 +47,14 @@ export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 	}
 
 	public render() {
-		const {color, isPlaying, pan, rawMidiNotes} = this.props
+		const {color, brightColor, isPlaying, pan, rawMidiNotes} = this.props
 
 		this.instrument.setMidiNotes(rawMidiNotes)
 
 		return (
 			<div
 				className={classnames(['basicInstrument', isPlaying ? 'isPlaying' : ''])}
-				style={{boxShadow: boxShadow3dCss(4, isPlaying ? Color(color).saturate(0.8).hsl().string() : color)}}
+				style={{boxShadow: boxShadow3dCss(4, isPlaying ? brightColor : color)}}
 			>
 				<div className="label">basic instrument</div>
 				<Knob min={-1} max={1} value={pan} label="pan" readOnly={true} />

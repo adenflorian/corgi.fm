@@ -29,6 +29,7 @@ const ClientId = ({id, color}) => {
 
 const TRACK_1 = 'track-1'
 const TRACK_1_COLOR = '#40bf42'
+const TRACK_1_COLOR_BRIGHT = '#41ed44'
 
 class App extends React.Component<IAppProps, {}> {
 	public static defaultProps = {
@@ -63,14 +64,24 @@ class App extends React.Component<IAppProps, {}> {
 						<ConnectedKeyboard ownerId={TRACK_1} color={TRACK_1_COLOR} />
 					</div>
 					<div className="board">
-						<ConnectedBasicInstrumentView ownerId={TRACK_1} color={TRACK_1_COLOR} pan={0} />
+						<ConnectedBasicInstrumentView
+							ownerId={TRACK_1}
+							color={TRACK_1_COLOR}
+							brightColor={TRACK_1_COLOR_BRIGHT}
+							pan={0}
+						/>
 					</div>
 					<div id="you" className="board connected">
 						<ClientId id={myClient.id} color={myClient.color} />
 						<ConnectedKeyboard ownerId={myClient.id} myKeyboard={true} />
 					</div>
 					<div className="board">
-						<ConnectedBasicInstrumentView ownerId={myClient.id} color={myClient.color} pan={-0.5} />
+						<ConnectedBasicInstrumentView
+							ownerId={myClient.id}
+							color={myClient.color}
+							brightColor={myClient.brightColor}
+							pan={-0.5}
+						/>
 					</div>
 
 					{otherClients.map(client => {
@@ -87,7 +98,12 @@ class App extends React.Component<IAppProps, {}> {
 									<ConnectedKeyboard ownerId={client.id} />
 								</div>
 								<div className="board">
-									<ConnectedBasicInstrumentView ownerId={client.id} color={client.color} pan={0.5} />
+									<ConnectedBasicInstrumentView
+										ownerId={client.id}
+										color={client.color}
+										brightColor={client.brightColor}
+										pan={0.5}
+									/>
 								</div>
 							</Fragment>
 						)

@@ -1,3 +1,4 @@
+import Color from 'color'
 import {hashbow} from '../../client/utils'
 import {ClientId} from '../../client/websocket-listeners'
 import {IMidiNote} from '../MidiNote'
@@ -34,6 +35,7 @@ export interface IClient {
 	id: string,
 	notes: IMidiNote[]
 	color: string
+	brightColor: string
 }
 
 export class Client implements IClient {
@@ -43,17 +45,20 @@ export class Client implements IClient {
 
 	public id
 	public color
+	public brightColor
 	public notes
 
 	constructor(id: ClientId) {
 		this.id = id
 		this.color = hashbow(this.id)
+		this.brightColor = Color(this.color).saturate(0.8).hsl().string()
 	}
 }
 
 export class DummyClient implements IClient {
 	public id
 	public color
+	public brightColor
 	public notes
 }
 
