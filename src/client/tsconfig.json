@@ -8,13 +8,7 @@
 		"target": "es6",
 		"module": "commonjs"
 	},
-	"include": [
-		"**/*.ts*",
-		"../server/server-constants.ts",
-		"../server/server-common.ts",
-		"../common/**/*.ts*"
+	"files": [
+		"main.ts",
 	],
-	"exclude": [
-		"../../node_modules"
-	]
 }

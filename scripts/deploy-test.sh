@@ -4,11 +4,11 @@ source secrets.sh
 
 echo host: ${SSH_HOST_TEST} user: ${SSH_USER_TEST}
 
-tar -czvf built/test/shamu.tar.gz built/test
+tar -czvf built/shamu.tar.gz built
 
-scp built/test/shamu.tar.gz ${SSH_USER_TEST}@${SSH_HOST_TEST}:shamu.tar.gz
+scp built/shamu.tar.gz ${SSH_USER_TEST}@${SSH_HOST_TEST}:shamu.tar.gz
 
-rm built/test/shamu.tar.gz
+rm built/shamu.tar.gz
 
 echo 'nvm' | ssh ${SSH_USER_TEST}@${SSH_HOST_TEST} '
     . ~/.nvm/nvm.sh;
@@ -16,7 +16,7 @@ echo 'nvm' | ssh ${SSH_USER_TEST}@${SSH_HOST_TEST} '
     rm -r shamu;
     mkdir shamu;
     tar -xzvf shamu.tar.gz --directory shamu;
-    cd shamu/built/test;
+    cd shamu/built;
     yarn;
     yarn start-prod;
 '

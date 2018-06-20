@@ -2,13 +2,11 @@
 	"compilerOptions": {
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
-		"sourceMap": true
+		"sourceMap": false,
+		"target": "esnext",
+		"module": "commonjs"
 	},
-	"include": [
-		"**/*.ts*",
-		"../common/**/*.ts*"
-	],
-	"exclude": [
-		"../../node_modules"
+	"files": [
+		"server.ts"
 	]
 }

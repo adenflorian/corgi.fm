@@ -45,7 +45,6 @@
     "rulesDirectory": [],
     "linterOptions": {
         "exclude": [
-            "gulpfile.js",
             ".eslintrc.js",
             "built/**/*",
             "node_modules/**/*"
