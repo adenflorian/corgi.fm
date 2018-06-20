@@ -3,19 +3,10 @@ import * as io from 'socket.io-client'
 import {logger} from '../common/logger'
 import {IMidiNote} from '../common/MidiNote'
 import {clientDisconnected, newClient, SET_CLIENTS} from '../common/redux/clients-redux'
-import {SET_SIMPLE_TRACK_EVENTS, SET_SIMPLE_TRACK_NOTE} from '../common/redux/simple-track-redux'
-import {
-	PLAY_SIMPLE_TRACK,
-	playSimpleTrack,
-	REFRESH_SIMPLE_TRACK_PLAYER_EVENTS,
-	refreshSimpleTrackPlayerEvents,
-	RESTART_SIMPLE_TRACK,
-	restartSimpleTrack,
-	STOP_SIMPLE_TRACK,
-	stopSimpleTrack,
-} from '../common/redux/track-player-middleware'
 import {setVirtualKeys, virtualOctave} from '../common/redux/virtual-keyboard-redux'
 import {SET_MY_CLIENT_ID, setInfo, setSocket} from '../common/redux/websocket-redux'
+import {BroadcastAction} from '../common/redux/websocket-sender-middleware'
+import {WebSocketEvent} from '../common/server-constants'
 import {Octave} from './music/music-types'
 
 const port = 80
@@ -97,34 +88,9 @@ export function setupWebsocketAndListeners(store: Store) {
 		store.dispatch(virtualOctave(data.clientId, data.octave))
 	})
 
-	socket.on(SET_SIMPLE_TRACK_NOTE, action => {
-		logger.debug('SET_TRACK_SIMPLE_TRACK_NOTE: ', action)
-		store.dispatch({...action, isRemote: true})
-	})
-
-	socket.on(SET_SIMPLE_TRACK_EVENTS, action => {
-		logger.debug('SET_SIMPLE_TRACK_EVENTS: ', action)
-		store.dispatch({...action, isRemote: true})
-	})
-
-	socket.on(PLAY_SIMPLE_TRACK, () => {
-		logger.log('PLAY_SIMPLE_TRACK: ')
-		store.dispatch({...playSimpleTrack(), isRemote: true})
-	})
-
-	socket.on(STOP_SIMPLE_TRACK, () => {
-		logger.log('STOP_SIMPLE_TRACK: ')
-		store.dispatch({...stopSimpleTrack(), isRemote: true})
-	})
-
-	socket.on(RESTART_SIMPLE_TRACK, () => {
-		logger.log('RESTART_SIMPLE_TRACK: ')
-		store.dispatch({...restartSimpleTrack(), isRemote: true})
-	})
-
-	socket.on(REFRESH_SIMPLE_TRACK_PLAYER_EVENTS, () => {
-		logger.log('REFRESH_SIMPLE_TRACK_PLAYER_EVENTS: ')
-		store.dispatch({...refreshSimpleTrackPlayerEvents(), isRemote: true})
+	socket.on(WebSocketEvent.broadcast, (action: BroadcastAction) => {
+		logger.log(WebSocketEvent.broadcast)
+		store.dispatch({...action, alreadyBroadcasted: true})
 	})
 
 	function socketInfo(info: string) {

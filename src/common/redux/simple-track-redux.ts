@@ -1,16 +1,19 @@
 import {IMidiNote} from '../MidiNote'
 import {addIfNew} from '../server-common'
 import {IAppState} from './configureStore'
+import {makeBroadcaster, makeServerAction} from './redux-utils'
 
 export const SET_SIMPLE_TRACK_NOTE = 'SET_TRACK_SIMPLE_TRACK_NOTE'
-export const setSimpleTrackNote = (index: number, enabled: boolean, note: IMidiNote) => {
-	return {
-		type: SET_SIMPLE_TRACK_NOTE,
-		index,
-		enabled,
-		note,
-	}
-}
+export const setSimpleTrackNote = makeServerAction(makeBroadcaster(
+	(index: number, enabled: boolean, note: IMidiNote) => {
+		return {
+			type: SET_SIMPLE_TRACK_NOTE,
+			index,
+			enabled,
+			note,
+		}
+	},
+))
 
 export const SET_SIMPLE_TRACK_EVENTS = 'SET_SIMPLE_TRACK_EVENTS'
 export const setSimpleTrackEvents = (events: ISimpleTrackNote[]) => {

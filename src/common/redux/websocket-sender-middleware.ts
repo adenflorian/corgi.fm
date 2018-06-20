@@ -2,7 +2,6 @@ import {AnyAction} from 'redux'
 import {WebSocketEvent} from '../../common/server-constants'
 import {CLIENT_DISCONNECTED, clientDisconnecting, selectOwner} from './clients-redux'
 import {IAppState} from './configureStore'
-import {SET_SIMPLE_TRACK_NOTE} from './simple-track-redux'
 import {
 	DECREASE_VIRTUAL_OCTAVE,
 	INCREASE_VIRTUAL_OCTAVE,
@@ -17,6 +16,12 @@ export interface ShamuAction extends AnyAction {
 	alreadyBroadcasted?: boolean
 }
 
+export interface BroadcastAction extends AnyAction {
+	shouldBroadcast: boolean
+	alreadyBroadcasted: boolean
+	dispatchOnServer: boolean
+}
+
 export const websocketSenderMiddleware = store => next => (action: ShamuAction) => {
 	const state: IAppState = store.getState()
 	const socket = state.websocket.socket
@@ -26,7 +31,7 @@ export const websocketSenderMiddleware = store => next => (action: ShamuAction) 
 	}
 
 	if (action.shouldBroadcast && !action.alreadyBroadcasted) {
-		socket.emit(WebSocketEvent.broadcast, {eventName: action.type})
+		socket.emit(WebSocketEvent.broadcast, action)
 		return next(action)
 	}
 
@@ -43,9 +48,6 @@ export const websocketSenderMiddleware = store => next => (action: ShamuAction) 
 			setTimeout(() => {
 				next(action)
 			}, 2000)
-			return next(action)
-		case SET_SIMPLE_TRACK_NOTE:
-			socket.emit('SET_TRACK_SIMPLE_TRACK_NOTE', action)
 			return next(action)
 		default:
 			return next(action)

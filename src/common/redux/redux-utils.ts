@@ -12,6 +12,10 @@ export function makeBroadcaster(actionCreator: any) {
 	return (...args) => ({...actionCreator(...args), shouldBroadcast: true})
 }
 
+export function makeServerAction(actionCreator: any) {
+	return (...args) => ({...actionCreator(...args), dispatchOnServer: true})
+}
+
 export function createReducer(initialState, handlers) {
 	return function reducer(state = initialState, action) {
 		if (handlers.hasOwnProperty(action.type)) {

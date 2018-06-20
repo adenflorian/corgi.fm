@@ -53,33 +53,13 @@ export class Knob extends Component<IKnobProps, IKnobState> {
 
 	constructor(props: IKnobProps) {
 		super(props)
-		window.addEventListener('mousemove', (e: MouseEvent) => {
-			this.setState({
-				mouseX: e.screenX,
-				mouseY: e.screenY,
-				lastMousePosition: {
-					x: this.state.mouseX,
-					y: this.state.mouseY,
-				},
-			})
-			if (this.state.isMouseDown) {
-				const mouseXDelta = (this.state.mouseX - this.state.lastMousePosition.x) * this.props.sensitivity
-				const mouseYDelta = (this.state.mouseY - this.state.lastMousePosition.y) * this.props.sensitivity
+		window.addEventListener('mousemove', this._handleMouseMove)
+		window.addEventListener('mouseup', this._handleMouseUp)
+	}
 
-				const calculateNewVolume = (oldValue: number, mouseDeltaX: number, mouseDeltaY: number): number => {
-					const delta = mouseDeltaX - mouseDeltaY
-					const combined = oldValue + delta
-					return Math.max(this.props.min, Math.min(this.props.max, combined))
-				}
-
-				this.props.onChange(calculateNewVolume(this.props.value, mouseXDelta, mouseYDelta))
-			}
-		})
-		window.addEventListener('mouseup', () => {
-			this.setState({
-				isMouseDown: false,
-			})
-		})
+	public componentWillUnmount() {
+		window.removeEventListener('mousemove', this._handleMouseMove)
+		window.removeEventListener('mouseup', this._handleMouseUp)
 	}
 
 	public render() {
@@ -101,6 +81,35 @@ export class Knob extends Component<IKnobProps, IKnobState> {
 				</div>
 			</div>
 		)
+	}
+
+	private _handleMouseUp = () => {
+		this.setState({
+			isMouseDown: false,
+		})
+	}
+
+	private _handleMouseMove = (e: MouseEvent) => {
+		this.setState({
+			mouseX: e.screenX,
+			mouseY: e.screenY,
+			lastMousePosition: {
+				x: this.state.mouseX,
+				y: this.state.mouseY,
+			},
+		})
+		if (this.state.isMouseDown) {
+			const mouseXDelta = (this.state.mouseX - this.state.lastMousePosition.x) * this.props.sensitivity
+			const mouseYDelta = (this.state.mouseY - this.state.lastMousePosition.y) * this.props.sensitivity
+
+			const calculateNewVolume = (oldValue: number, mouseDeltaX: number, mouseDeltaY: number): number => {
+				const delta = mouseDeltaX - mouseDeltaY
+				const combined = oldValue + delta
+				return Math.max(this.props.min, Math.min(this.props.max, combined))
+			}
+
+			this.props.onChange(calculateNewVolume(this.props.value, mouseXDelta, mouseYDelta))
+		}
 	}
 
 	private _handleMouseDown = () => {
