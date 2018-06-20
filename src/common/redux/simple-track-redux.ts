@@ -2,6 +2,7 @@ import {IMidiNote} from '../MidiNote'
 import {addIfNew} from '../server-common'
 import {IAppState} from './configureStore'
 import {makeBroadcaster, makeServerAction} from './redux-utils'
+import {PLAY_SIMPLE_TRACK, STOP_SIMPLE_TRACK} from './track-player-middleware'
 
 export const SET_SIMPLE_TRACK_NOTE = 'SET_TRACK_SIMPLE_TRACK_NOTE'
 export const setSimpleTrackNote = makeServerAction(makeBroadcaster(
@@ -34,6 +35,7 @@ export const setSimpleTrackIndex = (index: number) => {
 export interface ISimpleTrackState {
 	notes: ISimpleTrackNote[]
 	index: number
+	isPlaying: boolean
 }
 
 export interface ISimpleTrackNote {
@@ -52,6 +54,7 @@ const initialState: ISimpleTrackState = {
 		{notes: []},
 	],
 	index: -1,
+	isPlaying: false,
 }
 
 export function simpleTrackReducer(state: ISimpleTrackState = initialState, action) {
@@ -87,6 +90,10 @@ export function simpleTrackReducer(state: ISimpleTrackState = initialState, acti
 			}
 		case SET_SIMPLE_TRACK_INDEX:
 			return {...state, index: action.index}
+		case PLAY_SIMPLE_TRACK:
+			return {...state, isPlaying: true}
+		case STOP_SIMPLE_TRACK:
+			return {...state, isPlaying: false}
 		default:
 			return state
 	}

@@ -6,9 +6,13 @@ export const setAudioContext = makeActionCreator(SET_AUDIO_CONTEXT, 'context')
 export const SET_PRE_FX = 'SET_PRE_FX'
 export const setPreFx = makeActionCreator(SET_PRE_FX, 'preFx')
 
+export const REPORT_LEVELS = 'REPORT_LEVELS'
+export const reportLevels = makeActionCreator(REPORT_LEVELS, 'master')
+
 export interface IAudioState {
 	context: AudioContext
 	preFx: GainNode
+	reportedMasterLevel: number
 }
 
 export const audioReducer = createReducer(
@@ -25,6 +29,12 @@ export const audioReducer = createReducer(
 			return {
 				...state,
 				preFx,
+			}
+		},
+		[REPORT_LEVELS]: (state: IAudioState, {master}) => {
+			return {
+				...state,
+				reportedMasterLevel: master,
 			}
 		},
 	},

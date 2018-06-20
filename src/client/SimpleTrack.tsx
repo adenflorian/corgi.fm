@@ -16,7 +16,7 @@ import {
 	restartSimpleTrack,
 	stopSimpleTrack,
 } from '../common/redux/track-player-middleware'
-import {isWhiteKey} from './Keyboard/Keyboard'
+import {boxShadow3dCss, isWhiteKey} from './Keyboard/Keyboard'
 import './SimpleTrack.less'
 
 interface ISimpleTrackProps {
@@ -26,56 +26,60 @@ interface ISimpleTrackProps {
 	stop: any
 	restart: any
 	activeIndex: number
+	isPlaying?: boolean
+	color?: string
+	brightColor?: string
 }
-
-const arr128 = Array.apply(0, new Array(36))
 
 export class SimpleTrack extends Component<ISimpleTrackProps> {
 	public static defaultProps = {
-		events: [
-			{enabled: false, notes: []},
-			{enabled: false, notes: []},
-			{enabled: false, notes: []},
-			{enabled: false, notes: []},
-			{enabled: false, notes: []},
-			{enabled: false, notes: []},
-			{enabled: false, notes: []},
-			{enabled: false, notes: []},
-		],
+		events: Array.apply({enabled: false, notes: []}, new Array(8)),
+		color: 'gray',
+		brightColor: 'lightgray',
 	}
 
 	public render() {
-		const {events, setNote, play, stop, restart, activeIndex} = this.props
+		const {color, brightColor, events, setNote, play, stop, restart, activeIndex, isPlaying} = this.props
 
 		return (
-			<div className="simpleTrack">
+			<div className={classnames(['simpleTrack', isPlaying ? 'isPlaying' : 'isNotPlaying'])}>
 				<div className="label">track-1</div>
-				<div className="container">
-					<div className="controls">
+				<div
+					className="container"
+					style={{boxShadow: boxShadow3dCss(4, isPlaying ? brightColor : color)}}
+				>
+					<div className="controls unselectable">
 						<div
-							className="play unselectable"
+							className="play colorTransition"
 							onClick={play}
 						>
 							▶
-					</div>
+						</div>
 						<div
-							className="stop unselectable"
+							className="stop colorTransition"
 							onClick={stop}
 						>
 							◼
-					</div>
+						</div>
 						<div
-							className="restart unselectable"
+							className="restart colorTransition"
 							onClick={restart}
 						>
 							↻
-					</div>
+						</div>
 					</div>
 					<div className="events">
 						{events.map((event, index) => {
+							const isActiveIndex = activeIndex === index
 							return (
-								<div key={index} className={classnames(['event', activeIndex === index ? 'active' : ''])}>
-									{arr128.map((_, i2) => {
+								<div
+									key={index}
+									className={classnames([
+										'event',
+										isActiveIndex ? 'active' : 'transitionAllColor',
+									])}
+								>
+									{Array.apply(0, new Array(36)).map((_, i2) => {
 										const isEnabled = event.notes.some(x => x === i2)
 										return (
 											<div
@@ -84,6 +88,7 @@ export class SimpleTrack extends Component<ISimpleTrackProps> {
 													'note',
 													isEnabled ? 'on' : '',
 													isWhiteKey(i2) ? 'white' : 'black',
+													isEnabled && isActiveIndex ? 'active' : '',
 												])}
 												onClick={() => setNote(index, !isEnabled, i2)}
 											/>
@@ -102,6 +107,7 @@ export class SimpleTrack extends Component<ISimpleTrackProps> {
 const mapStateToProps = (state: IAppState) => ({
 	events: selectSimpleTrackEvents(state),
 	activeIndex: selectSimpleTrackIndex(state),
+	isPlaying: state.simpleTrack.isPlaying,
 })
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({

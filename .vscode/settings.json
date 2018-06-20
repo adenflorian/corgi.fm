@@ -36,6 +36,7 @@
         "adsr",
         "automerge",
         "callout",
+        "desaturate",
         "hashbow",
         "keyframes",
         "localstorage",

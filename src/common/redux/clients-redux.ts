@@ -43,15 +43,15 @@ export class Client implements IClient {
 		return new Client(backEndClient.id)
 	}
 
-	public id
-	public color
-	public brightColor
+	public readonly id
+	public readonly color
+	public readonly brightColor
 	public notes
 
 	constructor(id: ClientId) {
 		this.id = id
-		this.color = hashbow(this.id)
-		this.brightColor = Color(this.color).saturate(0.8).hsl().string()
+		this.color = Color(hashbow(this.id)).desaturate(0.2).hsl().string()
+		this.brightColor = Color(hashbow(this.id)).saturate(0.6).hsl().string()
 	}
 }
 

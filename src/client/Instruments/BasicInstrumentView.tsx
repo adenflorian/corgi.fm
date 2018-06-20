@@ -53,7 +53,7 @@ export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 
 		return (
 			<div
-				className={classnames(['basicInstrument', isPlaying ? 'isPlaying' : ''])}
+				className={classnames(['basicInstrument', isPlaying ? 'isPlaying' : 'isNotPlaying'])}
 				style={{boxShadow: boxShadow3dCss(4, isPlaying ? brightColor : color)}}
 			>
 				<div className="label">basic instrument</div>

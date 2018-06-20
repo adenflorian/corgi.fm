@@ -1,6 +1,7 @@
 import classnames from 'classnames'
-import {Fragment} from 'react'
+import Color from 'color'
 import * as React from 'react'
+import {Fragment} from 'react'
 import {connect} from 'react-redux'
 import {DummyClient, IClient} from '../common/redux/clients-redux'
 import {IAppState} from '../common/redux/configureStore'
@@ -28,8 +29,9 @@ const ClientId = ({id, color}) => {
 }
 
 const TRACK_1 = 'track-1'
-const TRACK_1_COLOR = '#40bf42'
-const TRACK_1_COLOR_BRIGHT = '#41ed44'
+const TRACK_1_BASE_COLOR = '#40bf42'
+const TRACK_1_COLOR = Color(TRACK_1_BASE_COLOR).desaturate(0.4).hsl().string()
+const TRACK_1_COLOR_BRIGHT = Color(TRACK_1_BASE_COLOR).saturate(0.6).hsl().string()
 
 class App extends React.Component<IAppProps, {}> {
 	public static defaultProps = {
@@ -54,14 +56,14 @@ class App extends React.Component<IAppProps, {}> {
 						/>
 					</div>
 					<div className="board connected">
-						<ConnectedVolumeControl />
+						<ConnectedVolumeControl color={TRACK_1_COLOR} />
 					</div>
 					<div className="board connected">
-						<ConnectedSimpleTrack />
+						<ConnectedSimpleTrack color={TRACK_1_COLOR} brightColor={TRACK_1_COLOR_BRIGHT} />
 					</div>
 					<div id="track-1" className="board connected">
 						<ClientId id={TRACK_1} color={TRACK_1_COLOR} />
-						<ConnectedKeyboard ownerId={TRACK_1} color={TRACK_1_COLOR} />
+						<ConnectedKeyboard ownerId={TRACK_1} color={TRACK_1_COLOR} brightColor={TRACK_1_COLOR_BRIGHT} />
 					</div>
 					<div className="board">
 						<ConnectedBasicInstrumentView

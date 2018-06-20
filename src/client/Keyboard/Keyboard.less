@@ -5,12 +5,16 @@
     background-color: @keyWhite;
     letter-spacing: normal;
     height: 64px;
+    &.isNotPlaying {
+        transition: box-shadow 0.3s ease-out;
+    }
     .white {
         background-color: @keyWhite;
         color: #31313d;
     }
     .white+.white {
-        border-left: 1px solid @frenchGray;
+        // border-left: 1px solid @frenchGray;
+        box-shadow: inset 1px 0 0 #BDBDC660;
     }
     .black {
         background-color: @panelGray;
@@ -29,6 +33,9 @@
         display: inline-flex;
         flex-direction: column;
         justify-content: space-between;
+        &.notPressed {
+            transition: background-color 0.3s ease-out;
+        }
     }
     .octave {
         width: 48px;

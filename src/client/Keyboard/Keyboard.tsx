@@ -9,7 +9,7 @@ import {
 } from '../../common/redux/virtual-keyboard-redux'
 import {keyToMidiMap} from '../input-events'
 import {Octave} from '../music/music-types'
-import {hashbow, keyColors} from '../utils'
+import {keyColors} from '../utils'
 import {ClientId} from '../websocket-listeners'
 import './Keyboard.less'
 
@@ -43,11 +43,13 @@ interface IKeyboardProps {
 	octave?: Octave
 	virtualMidiKeyboard: any
 	color: string
+	brightColor: string
 	keyPressed: (index: number) => void
 	keyUp: (index: number) => void
 	keyFlip: (index: number) => void
 	isLocal: boolean
 	showNoteNames: boolean
+	isPlaying?: boolean
 }
 
 export class Keyboard extends React.Component<IKeyboardProps> {
@@ -62,7 +64,7 @@ export class Keyboard extends React.Component<IKeyboardProps> {
 	}
 
 	public render() {
-		const {pressedMidiKeys, octave, color,
+		const {pressedMidiKeys, octave, color, brightColor, isPlaying,
 			virtualMidiKeyboard, isLocal, showNoteNames} = this.props
 
 		return (
@@ -70,8 +72,9 @@ export class Keyboard extends React.Component<IKeyboardProps> {
 				className={classnames([
 					'keyboard',
 					isLocal ? 'isLocal' : '',
+					isPlaying === false ? 'isNotPlaying' : '',
 				])}
-				style={{boxShadow: boxShadow3dCss(4, color)}}
+				style={{boxShadow: boxShadow3dCss(4, isPlaying ? brightColor : color)}}
 			>
 				<div className="octave black unselectable">
 					<div className="octaveNumber">
@@ -88,8 +91,8 @@ export class Keyboard extends React.Component<IKeyboardProps> {
 					return (
 						<div
 							key={index}
-							className={'key ' + value.color}
-							style={{backgroundColor: isKeyPressed ? color : ''}}
+							className={classnames(['key', value.color, isKeyPressed ? 'pressed' : 'notPressed'])}
+							style={{backgroundColor: isKeyPressed ? brightColor : ''}}
 							onMouseOver={e => this.handleMouseOver(e, index)}
 							onMouseOut={e => this.handleMouseOut(e, index)}
 							onMouseDown={e => this.handleMouseDown(e, index)}
@@ -175,14 +178,17 @@ export function boxShadow3dCss(size: number, color: string) {
 const mapStateToProps = (state: IAppState, props) => {
 	const owner = state.clients.find(x => x.id === props.ownerId)
 	const virtualKeyboard = state.virtualKeyboards[props.ownerId]
+	const pressedMidiKeys = virtualKeyboard ? virtualKeyboard.pressedKeys : []
 
 	return {
-		pressedMidiKeys: virtualKeyboard && virtualKeyboard.pressedKeys,
+		pressedMidiKeys,
 		octave: virtualKeyboard && virtualKeyboard.octave,
 		virtualMidiKeyboard: globalVirtualMidiKeyboard,
-		color: props.color || (owner && owner.color) || hashbow(props.ownerId),
+		color: props.color || (owner && owner.color),
+		brightColor: props.brightColor || (owner && owner.brightColor),
 		isLocal: state.websocket.myClientId === props.ownerId,
 		showNoteNames: state.options.showNoteNamesOnKeyboard,
+		isPlaying: pressedMidiKeys.length > 0,
 	}
 }
 

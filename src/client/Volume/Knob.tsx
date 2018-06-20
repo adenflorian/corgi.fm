@@ -12,6 +12,7 @@ interface IKnobProps {
 	sensitivity?: number
 	value: number
 	readOnly?: boolean
+	markColor?: string
 }
 
 interface IKnobState {
@@ -35,6 +36,7 @@ export class Knob extends Component<IKnobProps, IKnobState> {
 		max: 1,
 		sensitivity: 0.005,
 		readOnly: false,
+		markColor: 'gray',
 	}
 
 	public state: IKnobState = {
@@ -63,7 +65,7 @@ export class Knob extends Component<IKnobProps, IKnobState> {
 	}
 
 	public render() {
-		const {value, label, min, max, readOnly} = this.props
+		const {value, label, min, max, readOnly, markColor} = this.props
 
 		return (
 			<div className={classnames(['knob', readOnly ? 'readOnly' : ''])}>
@@ -75,7 +77,7 @@ export class Knob extends Component<IKnobProps, IKnobState> {
 						}}
 						onMouseDown={this._handleMouseDown}
 					>
-						<div className="mark"></div>
+						<div className="mark" style={{backgroundColor: markColor}}></div>
 						<div className="label unselectable">{label}</div>
 					</div>
 				</div>

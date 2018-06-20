@@ -1,6 +1,6 @@
 import {Store} from 'redux'
 import Reverb from 'soundbank-reverb'
-import {setAudioContext, setPreFx} from '../common/redux/audio-redux'
+import {reportLevels, setAudioContext, setPreFx} from '../common/redux/audio-redux'
 import {IAppState} from '../common/redux/configureStore'
 
 declare global {
@@ -37,7 +37,30 @@ export function setupAudioContext(store: Store) {
 	preFx.connect(reverbLowAndLong)
 		.connect(master)
 
+	const analyser = audioContext.createAnalyser()
+	analyser.smoothingTimeConstant = 0.3
+	analyser.fftSize = 1024
+
+	const javascriptNode = audioContext.createScriptProcessor(2048, 1, 1)
+
+	javascriptNode.connect(audioContext.destination)
+
+	javascriptNode.onaudioprocess = () => {
+		const array = new Uint8Array(analyser.frequencyBinCount)
+		analyser.getByteFrequencyData(array)
+		const average = sumArray(array) / array.length
+
+		store.dispatch(reportLevels(average))
+	}
+
+	function sumArray(arr) {
+		return arr.reduce((sum, num) => {
+			return sum + num
+		})
+	}
+
 	master.connect(audioContext.destination)
+	master.connect(analyser)
 
 	preFx.gain.value = 0.5
 
