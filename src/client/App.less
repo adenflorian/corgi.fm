@@ -1,21 +1,22 @@
 @import "./colors.less";
 body {
     background-color: #121621;
-    overflow-x: hidden;
+    overflow: hidden;
+    overflow-y: auto;
 }
 
 #react-app {
-    font-family: Arial, Helvetica, sans-serif;
-    letter-spacing: 8px;
-    text-transform: uppercase;
-    text-align: center;
-    font-size: 1.2em;
-    color: @defaultGray;
-    font-weight: 600;
-    line-height: 1.2em;
     height: 100vh;
     display: flex;
     flex-direction: column;
+    color: @defaultGray;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 1em;
+    font-weight: 600;
+    line-height: 1.2em;
+    text-transform: uppercase;
+    text-align: center;
+    letter-spacing: 4px;
 }
 
 #title {
@@ -45,7 +46,6 @@ body {
 .boardContainer {
     display: flex;
     flex-direction: column;
-    justify-content: center;
     height: 100%;
     transition: all 0.5s ease;
     align-content: center;
