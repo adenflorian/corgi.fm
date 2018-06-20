@@ -1,3 +1,3 @@
 export enum WebSocketEvent {
-	RepeatToOthers = 'RepeatToOthers',
+	broadcast = 'RepeatToOthers',
 }

@@ -76,7 +76,7 @@ io.on('connection', socket => {
 	socket.on('SET_TRACK_SIMPLE_TRACK_NOTE', action => {
 		logger.log(`SET_TRACK_SIMPLE_TRACK_NOTE: ${socket.id} | `)
 		store.dispatch(action)
-		logger.log('state: ', JSON.stringify(store.getState(), null, 2))
+		logger.debug('state: ', JSON.stringify(store.getState(), null, 2))
 		socket.broadcast.emit('SET_TRACK_SIMPLE_TRACK_NOTE', action)
 	})
 
@@ -84,8 +84,8 @@ io.on('connection', socket => {
 		eventName: string
 	}
 
-	socket.on(WebSocketEvent.RepeatToOthers, (payload: RepeatToOthersPayload) => {
-		logger.log(`repeatToOthers: ${socket.id} | `, payload)
+	socket.on(WebSocketEvent.broadcast, (payload: RepeatToOthersPayload) => {
+		logger.log(`${WebSocketEvent.broadcast}: ${socket.id} | `, payload)
 		socket.broadcast.emit(payload.eventName)
 	})
 

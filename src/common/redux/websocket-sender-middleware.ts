@@ -26,7 +26,7 @@ export const websocketSenderMiddleware = store => next => (action: ShamuAction) 
 	}
 
 	if (action.shouldBroadcast && !action.alreadyBroadcasted) {
-		socket.emit(WebSocketEvent.RepeatToOthers, {eventName: action.type})
+		socket.emit(WebSocketEvent.broadcast, {eventName: action.type})
 		return next(action)
 	}
 
