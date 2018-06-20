@@ -1,7 +1,7 @@
 import {ISimpleTrackEvent, SimpleTrackEventAction, SimpleTrackPlayer} from '../../client/SimpleTrackPlayer'
 import {IAppState} from './configureStore'
 import {makeActionCreator, makeBroadcaster} from './redux-utils'
-import {ISimpleTrackNote, selectSimpleTrackNotes} from './simple-track-redux'
+import {ISimpleTrackNote, selectSimpleTrackEvents} from './simple-track-redux'
 
 export const PLAY_SIMPLE_TRACK = 'PLAY_SIMPLE_TRACK'
 export const playSimpleTrack = makeBroadcaster(makeActionCreator(PLAY_SIMPLE_TRACK))
@@ -25,7 +25,7 @@ export const trackPlayerMiddleware = store => next => action => {
 			if (simpleTrackPlayer === undefined) {
 				simpleTrackPlayer = new SimpleTrackPlayer(store.dispatch, state.audio.context)
 			}
-			simpleTrackPlayer.play(notesToEvents(selectSimpleTrackNotes(state)))
+			simpleTrackPlayer.play(notesToEvents(selectSimpleTrackEvents(state)))
 			return next(action)
 		case STOP_SIMPLE_TRACK:
 			if (simpleTrackPlayer === undefined) {
@@ -39,7 +39,7 @@ export const trackPlayerMiddleware = store => next => action => {
 			}
 			if (simpleTrackPlayer.isPlaying()) {
 				simpleTrackPlayer.stop()
-				simpleTrackPlayer.play(notesToEvents(selectSimpleTrackNotes(state)))
+				simpleTrackPlayer.play(notesToEvents(selectSimpleTrackEvents(state)))
 			}
 			return next(action)
 		case REFRESH_SIMPLE_TRACK_PLAYER_EVENTS:
@@ -48,7 +48,7 @@ export const trackPlayerMiddleware = store => next => action => {
 			if (simpleTrackPlayer === undefined) {
 				simpleTrackPlayer = new SimpleTrackPlayer(store.dispatch, state.audio.context)
 			}
-			simpleTrackPlayer.setEvents(notesToEvents(selectSimpleTrackNotes(state)))
+			simpleTrackPlayer.setEvents(notesToEvents(selectSimpleTrackEvents(state)))
 			return next(action)
 		default:
 			return next(action)

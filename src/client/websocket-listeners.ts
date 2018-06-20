@@ -3,7 +3,7 @@ import * as io from 'socket.io-client'
 import {logger} from '../common/logger'
 import {IMidiNote} from '../common/MidiNote'
 import {clientDisconnected, newClient, SET_CLIENTS} from '../common/redux/clients-redux'
-import {SET_SIMPLE_TRACK_NOTE} from '../common/redux/simple-track-redux'
+import {SET_SIMPLE_TRACK_EVENTS, SET_SIMPLE_TRACK_NOTE} from '../common/redux/simple-track-redux'
 import {
 	PLAY_SIMPLE_TRACK,
 	playSimpleTrack,
@@ -99,6 +99,11 @@ export function setupWebsocketAndListeners(store: Store) {
 
 	socket.on(SET_SIMPLE_TRACK_NOTE, action => {
 		logger.debug('SET_TRACK_SIMPLE_TRACK_NOTE: ', action)
+		store.dispatch({...action, isRemote: true})
+	})
+
+	socket.on(SET_SIMPLE_TRACK_EVENTS, action => {
+		logger.debug('SET_SIMPLE_TRACK_EVENTS: ', action)
 		store.dispatch({...action, isRemote: true})
 	})
 

@@ -2,15 +2,27 @@ import * as animal from 'animal-id'
 import * as express from 'express'
 import * as http from 'http'
 import * as path from 'path'
-import {combineReducers, createStore, Store} from 'redux'
+import {AnyAction, combineReducers, createStore, Store} from 'redux'
 import * as socketIO from 'socket.io'
 import {logger} from '../common/logger'
-import {ISimpleTrackState, simpleTrackReducer} from '../common/redux/simple-track-redux'
-import {addIfNew} from '../common/server-common'
+import {selectSimpleTrackEvents, setSimpleTrackEvents, simpleTrackReducer} from '../common/redux/simple-track-redux'
 import {WebSocketEvent} from '../common/server-constants'
 import {Clients} from './Clients'
 
-const initialState = {}
+const initialState = {
+	simpleTrack: {
+		notes: [
+			{notes: [1]},
+			{notes: []},
+			{notes: [3]},
+			{notes: []},
+			{notes: [6]},
+			{notes: []},
+			{notes: [10]},
+			{notes: []},
+		],
+	},
+}
 
 const store: Store = createStore(
 	combineReducers({
@@ -32,17 +44,6 @@ app.get('/', (_, res) => {
 app.use(express.static(path.join(__dirname, '../client')))
 
 const clients = new Clients()
-
-let simpleTrackEvents = [
-	{notes: [1]},
-	{notes: []},
-	{notes: [3]},
-	{notes: []},
-	{notes: [6]},
-	{notes: []},
-	{notes: [10]},
-	{notes: []},
-]
 
 io.on('connection', socket => {
 	logger.log('new connection | ', socket.id)
@@ -74,7 +75,8 @@ io.on('connection', socket => {
 
 	socket.on('SET_TRACK_SIMPLE_TRACK_NOTE', action => {
 		logger.log(`SET_TRACK_SIMPLE_TRACK_NOTE: ${socket.id} | `)
-		simpleTrackEvents = handleSetSimpleNote({notes: simpleTrackEvents, index: 0}, action).notes
+		store.dispatch(action)
+		logger.log('state: ', JSON.stringify(store.getState(), null, 2))
 		socket.broadcast.emit('SET_TRACK_SIMPLE_TRACK_NOTE', action)
 	})
 
@@ -116,42 +118,8 @@ function sendNewClientToOthers(socket, client) {
 
 function sendSimpleTrackEventsToNewClient(newClientSocket) {
 	logger.debug('sending simple track events to new client')
-	simpleTrackEvents.forEach((event, eventIndex) => {
-		event.notes.forEach(note => {
-			newClientSocket.emit('SET_TRACK_SIMPLE_TRACK_NOTE', {
-				type: 'SET_TRACK_SIMPLE_TRACK_NOTE',
-				index: eventIndex,
-				enabled: true,
-				note,
-			})
-		})
-	})
-}
-
-function handleSetSimpleNote(state: ISimpleTrackState, action) {
-	if (action.note === undefined) {
-		throw new Error('action.notes === undefined')
-	}
-	return {
-		...state,
-		notes: state.notes.map((event, eventIndex) => {
-			if (eventIndex === action.index) {
-				if (action.enabled) {
-					return {
-						...event,
-						notes: addIfNew(event.notes, action.note),
-					}
-				} else {
-					return {
-						...event,
-						notes: event.notes.filter(x => x !== action.note),
-					}
-				}
-			} else {
-				return event
-			}
-		}),
-	}
+	const action: AnyAction = setSimpleTrackEvents(selectSimpleTrackEvents(store.getState()))
+	newClientSocket.emit(action.type, action)
 }
 
 function sendClientDisconnected(id) {

@@ -6,8 +6,8 @@ import {IMidiNote} from '../common/MidiNote'
 import {IAppState} from '../common/redux/configureStore'
 import {
 	ISimpleTrackNote,
+	selectSimpleTrackEvents,
 	selectSimpleTrackIndex,
-	selectSimpleTrackNotes,
 	setSimpleTrackNote,
 } from '../common/redux/simple-track-redux'
 import {
@@ -100,7 +100,7 @@ export class SimpleTrack extends Component<ISimpleTrackProps> {
 }
 
 const mapStateToProps = (state: IAppState) => ({
-	events: selectSimpleTrackNotes(state),
+	events: selectSimpleTrackEvents(state),
 	activeIndex: selectSimpleTrackIndex(state),
 })
 

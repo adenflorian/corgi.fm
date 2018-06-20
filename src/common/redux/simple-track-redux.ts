@@ -12,6 +12,14 @@ export const setSimpleTrackNote = (index: number, enabled: boolean, note: IMidiN
 	}
 }
 
+export const SET_SIMPLE_TRACK_EVENTS = 'SET_SIMPLE_TRACK_EVENTS'
+export const setSimpleTrackEvents = (events: ISimpleTrackNote[]) => {
+	return {
+		type: SET_SIMPLE_TRACK_EVENTS,
+		events,
+	}
+}
+
 export const SET_SIMPLE_TRACK_INDEX = 'SET_SIMPLE_TRACK_INDEX'
 export const setSimpleTrackIndex = (index: number) => {
 	return {
@@ -69,6 +77,11 @@ export function simpleTrackReducer(state: ISimpleTrackState = initialState, acti
 					}
 				}),
 			}
+		case SET_SIMPLE_TRACK_EVENTS:
+			return {
+				...state,
+				notes: action.events,
+			}
 		case SET_SIMPLE_TRACK_INDEX:
 			return {...state, index: action.index}
 		default:
@@ -76,7 +89,7 @@ export function simpleTrackReducer(state: ISimpleTrackState = initialState, acti
 	}
 }
 
-export function selectSimpleTrackNotes(state: IAppState) {
+export function selectSimpleTrackEvents(state: IAppState) {
 	return state.simpleTrack.notes
 }
 
