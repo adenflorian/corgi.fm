@@ -43,6 +43,7 @@
         "lowpass",
         "onmidimessage",
         "onstatechange",
+        "reselect",
         "slidedown",
         "slidein",
         "slideout",
@@ -50,7 +51,8 @@
         "soundbank",
         "sysex",
         "unpress",
-        "unselectable"
+        "unselectable",
+        "uuidv"
     ],
     "editor.dragAndDrop": false,
     "cSpell.ignorePaths": [

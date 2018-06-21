@@ -1,12 +1,15 @@
 import classnames from 'classnames'
-import * as React from 'react'
 import {Component} from 'react'
+import * as React from 'react'
 import {connect} from 'react-redux'
 import ReactSVG from 'react-svg'
+import {Dispatch} from 'redux'
 import {IMidiNote} from '../../common/MidiNote'
+import {createBasicInstrument, selectInstrumentByOwner} from '../../common/redux/basic-instruments-redux'
 import {IAppState} from '../../common/redux/configureStore'
-import {selectMidiOutput} from '../../common/redux/virtual-keyboard-redux'
+import {makeGetMidiOutputByOwner} from '../../common/redux/virtual-keyboard-redux'
 import {boxShadow3dCss} from '../Keyboard/Keyboard'
+import {audioContext, preFx} from '../setup-audio-context'
 import {Knob} from '../Volume/Knob'
 import {ClientId} from '../websocket-listeners'
 import {BasicInstrument} from './BasicInstrument'
@@ -18,7 +21,6 @@ import SquareWave from './SquareWave.svg'
 export type MidiNotes = IMidiNote[]
 
 interface IBasicInstrumentViewProps {
-	audio?: any
 	color?: string
 	brightColor?: string
 	rawMidiNotes?: MidiNotes
@@ -26,6 +28,7 @@ interface IBasicInstrumentViewProps {
 	pan?: number
 	isPlaying?: boolean
 	oscillatorType?: OscillatorType
+	createBasicInstrument?: () => any
 }
 
 export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
@@ -34,16 +37,16 @@ export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 		rawMidiNotes: [],
 		color: 'gray',
 		brightColor: 'lightgray',
-		oscillatorType: 'square',
 	}
 
 	private instrument: BasicInstrument
 
 	constructor(props) {
 		super(props)
+		props.createBasicInstrument(props.ownerId)
 		this.instrument = new BasicInstrument({
-			audioContext: props.audio.context,
-			destination: props.audio.preFx,
+			audioContext,
+			destination: preFx,
 		})
 		this.instrument.setPan(props.pan)
 	}
@@ -66,21 +69,34 @@ export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 				<div className="label">basic instrument</div>
 				<Knob min={-1} max={1} value={pan} label="pan" readOnly={true} />
 				<div className="oscillatorTypes" style={{color: isPlaying ? brightColor : color}} >
-					<ReactSVG path={SineWave} />
-					<ReactSVG path={SquareWave} className="active" />
-					<ReactSVG path={SawWave} />
+					<ReactSVG path={SineWave} className={oscillatorType === 'sine' ? 'active' : ''} />
+					<ReactSVG path={SquareWave} className={oscillatorType === 'square' ? 'active' : ''} />
+					<ReactSVG path={SawWave} className={oscillatorType === 'sawtooth' ? 'active' : ''} />
 				</div>
 			</div >
 		)
 	}
 }
 
-export const ConnectedBasicInstrumentView = connect((state: IAppState, props: IBasicInstrumentViewProps) => {
-	const rawMidiNotes = props.ownerId ? selectMidiOutput(state, props.ownerId).notes : []
+const makeMapStateToProps = () => {
+	const getMidiOutputByOwner = makeGetMidiOutputByOwner()
 
-	return {
-		audio: state.audio,
-		rawMidiNotes,
-		isPlaying: rawMidiNotes.length > 0,
+	return (state: IAppState, props: IBasicInstrumentViewProps) => {
+		const rawMidiNotes = props.ownerId ? getMidiOutputByOwner(state, props) : []
+		const instrumentState = selectInstrumentByOwner(state, props.ownerId)
+
+		return {
+			rawMidiNotes,
+			isPlaying: rawMidiNotes.length > 0,
+			instrumentState: selectInstrumentByOwner(state, props.ownerId),
+			oscillatorType: instrumentState && instrumentState.oscillatorType,
+		}
 	}
-})(BasicInstrumentView)
+}
+
+export const ConnectedBasicInstrumentView = connect(
+	makeMapStateToProps,
+	(dispatch: Dispatch) => ({
+		createBasicInstrument: (ownerId: ClientId) => dispatch(createBasicInstrument(ownerId)),
+	}),
+)(BasicInstrumentView)

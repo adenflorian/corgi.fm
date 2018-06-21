@@ -69,10 +69,16 @@ export class BasicInstrument {
 		//   or store state of pressed midi notes and only do things for changed notes
 
 		this._oscillators.forEach((oscillator, index) => {
-			oscillator.frequency
-				.linearRampToValueAtTime(midiNoteToFrequency(midiNotes[index]), this._audioContext.currentTime + 0.01)
-			if (oscillator.frequency.value > highestFrequency) {
-				highestFrequency = oscillator.frequency.value
+			const newFrequency = midiNoteToFrequency(midiNotes[index])
+
+			// oscillator.frequency.linearRampToValueAtTime(newFrequency, this._audioContext.currentTime + 0.01)
+
+			if (oscillator.frequency.value !== newFrequency) {
+				oscillator.frequency.value = newFrequency
+			}
+
+			if (newFrequency > highestFrequency) {
+				highestFrequency = newFrequency
 			}
 		})
 
@@ -97,9 +103,10 @@ export class BasicInstrument {
 	}
 
 	public setOscillatorType = (type: OscillatorType) => {
-		// this._oscillator.type = type
 		this._oscillators.forEach(osc => {
-			osc.type = type
+			if (osc.type !== type) {
+				osc.type = type
+			}
 		})
 	}
 

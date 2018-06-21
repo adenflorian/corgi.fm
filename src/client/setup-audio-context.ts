@@ -10,12 +10,15 @@ declare global {
 	}
 }
 
+export let audioContext: AudioContext
+export let preFx: GainNode
+
 export function setupAudioContext(store: Store) {
 	// Might be needed for safari
 	const AudioContext = window.AudioContext || window.webkitAudioContext
-	const audioContext: AudioContext = new AudioContext()
+	audioContext = new AudioContext()
 
-	const preFx = audioContext.createGain()
+	preFx = audioContext.createGain()
 	const master = audioContext.createGain()
 
 	const reverbHigh = Reverb(audioContext)
@@ -45,12 +48,22 @@ export function setupAudioContext(store: Store) {
 
 	javascriptNode.connect(audioContext.destination)
 
-	javascriptNode.onaudioprocess = () => {
-		const array = new Uint8Array(analyser.frequencyBinCount)
-		analyser.getByteFrequencyData(array)
-		const average = sumArray(array) / array.length
+	const updateInterval = 100
+	let lastUpdateTime = Date.now()
 
-		store.dispatch(reportLevels(average))
+	javascriptNode.onaudioprocess = () => {
+
+		const timeSinceLastUpdate = Date.now() - lastUpdateTime
+
+		if (timeSinceLastUpdate >= updateInterval) {
+			const array = new Uint8Array(analyser.frequencyBinCount)
+			analyser.getByteFrequencyData(array)
+			const average = sumArray(array) / array.length
+			store.dispatch(reportLevels(average))
+			// store.dispatch(reportLevels(arrayMax(array) - 128))
+			// logger.log('array: ', array)
+			lastUpdateTime = Date.now()
+		}
 	}
 
 	function sumArray(arr) {
@@ -58,6 +71,12 @@ export function setupAudioContext(store: Store) {
 			return sum + num
 		})
 	}
+
+	// function arrayMax(arr) {
+	// 	return arr.reduce((max, num) => {
+	// 		return Math.max(max, num)
+	// 	}, 0)
+	// }
 
 	master.connect(audioContext.destination)
 	master.connect(analyser)

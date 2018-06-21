@@ -25,7 +25,7 @@ export class VolumeControl extends Component<IVolumeControlProps> {
 	public render() {
 		const {color, reportedMasterVolume} = this.props
 
-		const newColor = Color(color).saturate(reportedMasterVolume / 50).hsl().string()
+		const newColor = Color(color).saturate(reportedMasterVolume / 25).hsl().string()
 
 		return (
 			<div className="volume" style={{boxShadow: boxShadow3dCss(4, newColor)}}>

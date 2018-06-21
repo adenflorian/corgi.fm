@@ -2,6 +2,7 @@ import {applyMiddleware, combineReducers, compose, createStore} from 'redux'
 import persistState from 'redux-localstorage'
 import {ISimpleTrackState, simpleTrackReducer} from '../../common/redux/simple-track-redux'
 import {audioReducer, IAudioState} from './audio-redux'
+import {basicInstrumentsReducer, IBasicInstrumentsState} from './basic-instruments-redux'
 import {clientsReducer, IClient} from './clients-redux'
 import {IOptionsState, optionsReducer} from './options-redux'
 import {trackPlayerMiddleware} from './track-player-middleware'
@@ -11,6 +12,7 @@ import {websocketSenderMiddleware} from './websocket-sender-middleware'
 
 export interface IAppState {
 	audio: IAudioState
+	basicInstruments: IBasicInstrumentsState
 	clients: IClient[]
 	options: IOptionsState
 	simpleTrack: ISimpleTrackState
@@ -28,6 +30,7 @@ export function configureStore(initialState: {}) {
 	return createStore(
 		combineReducers({
 			audio: audioReducer,
+			basicInstruments: basicInstrumentsReducer,
 			clients: clientsReducer,
 			options: optionsReducer,
 			simpleTrack: simpleTrackReducer,

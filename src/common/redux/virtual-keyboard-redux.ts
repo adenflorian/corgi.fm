@@ -1,3 +1,4 @@
+import {createSelector} from 'reselect'
 import {applyOctave} from '../../client/music/music-functions'
 import {Octave} from '../../client/music/music-types'
 import {ClientId} from '../../client/websocket-listeners'
@@ -227,6 +228,15 @@ export function flipKey(keys: any[], key: any) {
 
 export interface IMidi {
 	notes: IMidiNote[]
+}
+
+const selectVirtualKeyboardByOwner = (state, {ownerId}) => state.virtualKeyboards[ownerId]
+
+export const makeGetMidiOutputByOwner = () => {
+	return createSelector(
+		selectVirtualKeyboardByOwner,
+		keyboard => keyboard === undefined ? [] : keyboard.pressedKeys.map(x => applyOctave(x, keyboard.octave)),
+	)
 }
 
 export function selectMidiOutput(state: IAppState, ownerId: ClientId): IMidi {

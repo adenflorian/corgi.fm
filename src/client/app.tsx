@@ -44,6 +44,8 @@ class App extends React.Component<IAppProps, {}> {
 
 		const otherClients = clients.filter(x => x.id !== myClient.id)
 
+		if (!myClient.id) return null
+
 		return (
 			<Fragment>
 				{/* <h1 id="title">sha-mu</h1> */}
