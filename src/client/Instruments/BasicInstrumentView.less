@@ -14,4 +14,20 @@
             margin-right: 16px;
         }
     }
+    .oscillatorTypes {
+        display: flex;
+        svg {
+            margin: 8px;
+            display: flex;
+            height: 1.5em;
+            width: 1.5em;
+            color: @defaultGray;
+            &:hover {
+                color: inherit;
+            }
+        }
+        .active svg {
+            color: inherit;
+        }
+    }
 }

@@ -10,5 +10,6 @@
 	},
 	"files": [
 		"main.ts",
+		"svg.d.ts"
 	],
 }

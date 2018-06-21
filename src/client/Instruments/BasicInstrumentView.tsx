@@ -2,6 +2,7 @@ import classnames from 'classnames'
 import * as React from 'react'
 import {Component} from 'react'
 import {connect} from 'react-redux'
+import ReactSVG from 'react-svg'
 import {IMidiNote} from '../../common/MidiNote'
 import {IAppState} from '../../common/redux/configureStore'
 import {selectMidiOutput} from '../../common/redux/virtual-keyboard-redux'
@@ -10,6 +11,9 @@ import {Knob} from '../Volume/Knob'
 import {ClientId} from '../websocket-listeners'
 import {BasicInstrument} from './BasicInstrument'
 import './BasicInstrumentView.less'
+import SawWave from './SawWave.svg'
+import SineWave from './SineWave.svg'
+import SquareWave from './SquareWave.svg'
 
 export type MidiNotes = IMidiNote[]
 
@@ -21,6 +25,7 @@ interface IBasicInstrumentViewProps {
 	ownerId: ClientId
 	pan?: number
 	isPlaying?: boolean
+	oscillatorType?: OscillatorType
 }
 
 export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
@@ -29,6 +34,7 @@ export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 		rawMidiNotes: [],
 		color: 'gray',
 		brightColor: 'lightgray',
+		oscillatorType: 'square',
 	}
 
 	private instrument: BasicInstrument
@@ -47,9 +53,10 @@ export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 	}
 
 	public render() {
-		const {color, brightColor, isPlaying, pan, rawMidiNotes} = this.props
+		const {color, brightColor, isPlaying, pan, rawMidiNotes, oscillatorType} = this.props
 
 		this.instrument.setMidiNotes(rawMidiNotes)
+		this.instrument.setOscillatorType(oscillatorType)
 
 		return (
 			<div
@@ -58,7 +65,12 @@ export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 			>
 				<div className="label">basic instrument</div>
 				<Knob min={-1} max={1} value={pan} label="pan" readOnly={true} />
-			</div>
+				<div className="oscillatorTypes" style={{color: isPlaying ? brightColor : color}} >
+					<ReactSVG path={SineWave} />
+					<ReactSVG path={SquareWave} className="active" />
+					<ReactSVG path={SawWave} />
+				</div>
+			</div >
 		)
 	}
 }
