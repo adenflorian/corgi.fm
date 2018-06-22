@@ -31,6 +31,12 @@ interface IBasicInstrumentViewProps {
 	createBasicInstrument?: () => any
 }
 
+const oscillatorTypes = [
+	{name: 'sine', svgPath: SineWave},
+	{name: 'square', svgPath: SquareWave},
+	{name: 'sawtooth', svgPath: SawWave},
+]
+
 export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 	public static defaultProps = {
 		pan: 0,
@@ -67,11 +73,13 @@ export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 				style={{boxShadow: boxShadow3dCss(4, isPlaying ? brightColor : color)}}
 			>
 				<div className="label">basic instrument</div>
+
 				<Knob min={-1} max={1} value={pan} label="pan" readOnly={true} />
+
 				<div className="oscillatorTypes" style={{color: isPlaying ? brightColor : color}} >
-					<ReactSVG path={SineWave} className={oscillatorType === 'sine' ? 'active' : ''} />
-					<ReactSVG path={SquareWave} className={oscillatorType === 'square' ? 'active' : ''} />
-					<ReactSVG path={SawWave} className={oscillatorType === 'sawtooth' ? 'active' : ''} />
+					{oscillatorTypes.map(({name, svgPath}) =>
+						<ReactSVG key={name} path={svgPath} className={oscillatorType === name ? 'active' : ''} />,
+					)}
 				</div>
 			</div >
 		)
