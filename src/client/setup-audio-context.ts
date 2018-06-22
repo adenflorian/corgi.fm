@@ -48,8 +48,11 @@ export function setupAudioContext(store: Store) {
 
 	javascriptNode.connect(audioContext.destination)
 
-	const updateInterval = 100
+	const updateInterval = 250
 	let lastUpdateTime = Date.now()
+
+	let lastReportedValue = -999
+	const deltaThreshold = 0.5
 
 	javascriptNode.onaudioprocess = () => {
 
@@ -59,9 +62,12 @@ export function setupAudioContext(store: Store) {
 			const array = new Uint8Array(analyser.frequencyBinCount)
 			analyser.getByteFrequencyData(array)
 			const average = sumArray(array) / array.length
-			store.dispatch(reportLevels(average))
-			// store.dispatch(reportLevels(arrayMax(array) - 128))
-			// logger.log('array: ', array)
+			if (Math.abs(average - lastReportedValue) > deltaThreshold) {
+				store.dispatch(reportLevels(average))
+				// store.dispatch(reportLevels(arrayMax(array) - 128))
+				// logger.log('array: ', array)
+				lastReportedValue = average
+			}
 			lastUpdateTime = Date.now()
 		}
 	}
