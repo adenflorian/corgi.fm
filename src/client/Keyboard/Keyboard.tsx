@@ -8,7 +8,6 @@ import {
 	virtualKeyFlip, virtualKeyPressed, virtualKeyUp,
 } from '../../common/redux/virtual-keyboard-redux'
 import {keyToMidiMap} from '../input-events'
-import {IsometricBoxShadow} from '../IsometricBoxShadow'
 import {Octave} from '../music/music-types'
 import {keyColors} from '../utils'
 import {ClientId} from '../websocket-listeners'
@@ -69,51 +68,51 @@ export class Keyboard extends React.Component<IKeyboardProps> {
 			virtualMidiKeyboard, isLocal, showNoteNames} = this.props
 
 		return (
-			<IsometricBoxShadow color={isPlaying ? brightColor : color}>
-				<div
-					className={classnames([
-						'keyboard',
-						isLocal ? 'isLocal' : '',
-						isPlaying === false ? 'isNotPlaying' : '',
-					])}
-				>
-					<div className="octave black unselectable">
-						<div className="octaveNumber">
-							{octave}
-						</div>
-						{isLocal &&
-							<div className="octaveKeys smallText">
-								<span>z</span><span>x</span>
-							</div>
-						}
+			<div
+				className={classnames([
+					'keyboard',
+					'isometricBoxShadow',
+					isLocal ? 'isLocal' : '',
+					isPlaying === false ? 'isNotPlaying' : '',
+				])}
+				style={{color: isPlaying ? brightColor : color}}
+			>
+				<div className="octave black unselectable">
+					<div className="octaveNumber">
+						{octave}
 					</div>
-					{virtualMidiKeyboard.map((value, index) => {
-						const isKeyPressed = pressedMidiKeys.some(x => x === index)
-						return (
-							<div
-								key={index}
-								className={classnames(['key', value.color, isKeyPressed ? 'pressed' : 'notPressed'])}
-								style={{backgroundColor: isKeyPressed ? brightColor : ''}}
-								onMouseOver={e => this.handleMouseOver(e, index)}
-								onMouseOut={e => this.handleMouseOut(e, index)}
-								onMouseDown={e => this.handleMouseDown(e, index)}
-								onMouseUp={e => this.handleMouseUp(e, index)}
-							>
-								<div className="noteName unselectable">
-									{showNoteNames &&
-										value.name
-									}
-								</div>
-								{isLocal &&
-									<div className="unselectable smallText">
-										{value.keyName}
-									</div>
+					{isLocal &&
+						<div className="octaveKeys smallText">
+							<span>z</span><span>x</span>
+						</div>
+					}
+				</div>
+				{virtualMidiKeyboard.map((value, index) => {
+					const isKeyPressed = pressedMidiKeys.some(x => x === index)
+					return (
+						<div
+							key={index}
+							className={classnames(['key', value.color, isKeyPressed ? 'pressed' : 'notPressed'])}
+							style={{backgroundColor: isKeyPressed ? brightColor : ''}}
+							onMouseOver={e => this.handleMouseOver(e, index)}
+							onMouseOut={e => this.handleMouseOut(e, index)}
+							onMouseDown={e => this.handleMouseDown(e, index)}
+							onMouseUp={e => this.handleMouseUp(e, index)}
+						>
+							<div className="noteName unselectable">
+								{showNoteNames &&
+									value.name
 								}
 							</div>
-						)
-					})}
-				</div>
-			</IsometricBoxShadow>
+							{isLocal &&
+								<div className="unselectable smallText">
+									{value.keyName}
+								</div>
+							}
+						</div>
+					)
+				})}
+			</div>
 		)
 	}
 

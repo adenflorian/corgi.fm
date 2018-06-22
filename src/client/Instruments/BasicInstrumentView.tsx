@@ -1,6 +1,6 @@
 import classnames from 'classnames'
-import * as React from 'react'
 import {Component} from 'react'
+import * as React from 'react'
 import {connect} from 'react-redux'
 import ReactSVG from 'react-svg'
 import {Dispatch} from 'redux'
@@ -10,7 +10,6 @@ import {
 } from '../../common/redux/basic-instruments-redux'
 import {IAppState} from '../../common/redux/configureStore'
 import {makeGetMidiOutputByOwner} from '../../common/redux/virtual-keyboard-redux'
-import {IsometricBoxShadow} from '../IsometricBoxShadow'
 import {audioContext, preFx} from '../setup-audio-context'
 import {Knob} from '../Volume/Knob'
 import {ClientId} from '../websocket-listeners'
@@ -31,7 +30,8 @@ interface IBasicInstrumentViewProps {
 	isPlaying?: boolean
 	oscillatorType?: OscillatorType
 	createBasicInstrument?: () => any
-	changeOscillatorType: (type) => any
+	changeOscillatorType: (ownerId, type) => any
+	dispatch: Dispatch
 }
 
 const oscillatorTypes = [
@@ -52,7 +52,7 @@ export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 
 	constructor(props) {
 		super(props)
-		props.createBasicInstrument(props.ownerId)
+		props.dispatch(createBasicInstrument(props.ownerId))
 		this.instrument = new BasicInstrument({
 			audioContext,
 			destination: preFx,
@@ -64,6 +64,18 @@ export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 		this.instrument.dispose()
 	}
 
+	public shouldComponentUpdate(nextProps) {
+		if (this.props.color !== nextProps.color) return true
+		if (this.props.brightColor !== nextProps.brightColor) return true
+		if (this.props.rawMidiNotes.length !== nextProps.rawMidiNotes.length) return true
+		if (this.props.rawMidiNotes.toString() !== nextProps.rawMidiNotes.toString()) return true
+		if (this.props.ownerId !== nextProps.ownerId) return true
+		if (this.props.pan !== nextProps.pan) return true
+		if (this.props.isPlaying !== nextProps.isPlaying) return true
+		if (this.props.oscillatorType !== nextProps.oscillatorType) return true
+		return false
+	}
+
 	public render() {
 		const {color, brightColor, isPlaying, pan, rawMidiNotes, oscillatorType} = this.props
 
@@ -71,29 +83,52 @@ export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 		this.instrument.setOscillatorType(oscillatorType)
 
 		return (
-			<IsometricBoxShadow color={isPlaying ? brightColor : color}>
+			<div className="isometricBoxShadow" style={{color: isPlaying ? brightColor : color}}>
 				<div className={classnames(['basicInstrument', isPlaying ? 'isPlaying' : 'isNotPlaying'])} >
 					<div className="label">basic instrument</div>
 
 					<Knob min={-1} max={1} value={pan} label="pan" readOnly={true} />
 
-					<div className="oscillatorTypes" style={{color: isPlaying ? brightColor : color}} >
-						{oscillatorTypes.map(({type, svgPath}) =>
-							<ReactSVG
-								key={type}
-								path={svgPath}
-								className={oscillatorType === type ? 'active' : undefined}
-								onClick={this._handleOscillatorTypeClicked.bind(undefined, type)}
-							/>,
-						)}
-					</div>
+					<BasicInstrumentOscillatorTypes
+						handleClick={this._handleOscillatorTypeClicked}
+						activeType={oscillatorType}
+					/>
 				</div >
-			</IsometricBoxShadow>
+			</div>
 		)
 	}
 
 	private _handleOscillatorTypeClicked = (type: OscillatorType) => {
-		this.props.changeOscillatorType(type)
+		this.props.dispatch(setBasicInstrumentOscillatorType(this.props.ownerId, type))
+	}
+}
+
+interface IBasicInstrumentOscillatorTypesProps {
+	handleClick: (type: OscillatorType) => void
+	activeType: OscillatorType
+}
+
+class BasicInstrumentOscillatorTypes extends Component<IBasicInstrumentOscillatorTypesProps> {
+	public shouldComponentUpdate(nextProps) {
+		if (this.props.activeType !== nextProps.activeType) return true
+		return false
+	}
+
+	public render() {
+		const {activeType, handleClick} = this.props
+
+		return (
+			<div className="oscillatorTypes">
+				{oscillatorTypes.map(({type, svgPath}) =>
+					<div key={type} onClick={handleClick.bind(undefined, type)}>
+						<ReactSVG
+							path={svgPath}
+							className={activeType === type ? 'active' : undefined}
+						/>
+					</div>,
+				)}
+			</div>
+		)
 	}
 }
 
@@ -107,18 +142,11 @@ const makeMapStateToProps = () => {
 		return {
 			rawMidiNotes,
 			isPlaying: rawMidiNotes.length > 0,
-			instrumentState: selectInstrumentByOwner(state, props.ownerId),
 			oscillatorType: instrumentState && instrumentState.oscillatorType,
 		}
 	}
 }
 
-const mapDispatchToProps = (dispatch: Dispatch, props: IBasicInstrumentViewProps) => ({
-	createBasicInstrument: (ownerId: ClientId) => dispatch(createBasicInstrument(ownerId)),
-	changeOscillatorType: type => dispatch(setBasicInstrumentOscillatorType(props.ownerId, type)),
-})
-
 export const ConnectedBasicInstrumentView = connect(
 	makeMapStateToProps,
-	mapDispatchToProps,
 )(BasicInstrumentView)
