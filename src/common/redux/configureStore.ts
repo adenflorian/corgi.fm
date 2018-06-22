@@ -1,4 +1,4 @@
-import {applyMiddleware, combineReducers, compose, createStore} from 'redux'
+import {applyMiddleware, combineReducers, compose, createStore, Store} from 'redux'
 import persistState from 'redux-localstorage'
 import {ISimpleTrackState, simpleTrackReducer} from '../../common/redux/simple-track-redux'
 import {audioReducer, IAudioState} from './audio-redux'
@@ -26,7 +26,7 @@ declare global {
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
 
-export function configureStore(initialState: {}) {
+export function configureStore(initialState: IAppState | any = {}): Store {
 	return createStore(
 		combineReducers({
 			audio: audioReducer,

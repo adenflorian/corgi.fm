@@ -1,5 +1,6 @@
-import {Store} from 'redux'
+import {AnyAction, Store} from 'redux'
 import {IAppState} from '../common/redux/configureStore'
+import {togglePlaySimpleTrack} from '../common/redux/track-player-middleware'
 import {
 	decreaseVirtualOctave,
 	increaseVirtualOctave,
@@ -27,6 +28,20 @@ export const keyToMidiMap = {
 	';': 16,
 }
 
+interface KeyBoardShortcuts {
+	[key: string]: {
+		action: AnyAction,
+		allowRepeat: boolean,
+	},
+}
+
+const keyboardShortcuts: KeyBoardShortcuts = {
+	' ': {
+		action: togglePlaySimpleTrack(),
+		allowRepeat: false,
+	},
+}
+
 export function setupInputEventListeners(window: Window, store: Store) {
 	window.addEventListener('keydown', e => {
 		onKeyDown(e.key.toLowerCase(), e.repeat)
@@ -37,17 +52,22 @@ export function setupInputEventListeners(window: Window, store: Store) {
 	})
 
 	function onKeyDown(keyName, isRepeat: boolean) {
-		const state: IAppState = store.getState()
-		const myClientId = state.websocket.myClientId
-
-		if (isMidiKey(keyName) && !isRepeat) {
-			const midiKeyNumber = keyToMidiMap[keyName]
-			store.dispatch(virtualKeyPressed(myClientId, midiKeyNumber))
+		const keyboardShortcut = keyboardShortcuts[keyName]
+		if (keyboardShortcut && keyboardShortcut.allowRepeat === isRepeat) {
+			store.dispatch(keyboardShortcut.action)
 		} else {
-			switch (keyName) {
-				case 'x': return store.dispatch(increaseVirtualOctave(myClientId))
-				case 'z': return store.dispatch(decreaseVirtualOctave(myClientId))
-				default: return
+			const state: IAppState = store.getState()
+			const myClientId = state.websocket.myClientId
+
+			if (isMidiKey(keyName) && !isRepeat) {
+				const midiKeyNumber = keyToMidiMap[keyName]
+				store.dispatch(virtualKeyPressed(myClientId, midiKeyNumber))
+			} else {
+				switch (keyName) {
+					case 'x': return store.dispatch(increaseVirtualOctave(myClientId))
+					case 'z': return store.dispatch(decreaseVirtualOctave(myClientId))
+					default: return
+				}
 			}
 		}
 	}

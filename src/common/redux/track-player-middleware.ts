@@ -1,3 +1,4 @@
+import {audioContext} from '../../client/setup-audio-context'
 import {ISimpleTrackEvent, SimpleTrackEventAction, SimpleTrackPlayer} from '../../client/SimpleTrackPlayer'
 import {IAppState} from './configureStore'
 import {makeActionCreator, makeBroadcaster} from './redux-utils'
@@ -8,6 +9,9 @@ export const playSimpleTrack = makeBroadcaster(makeActionCreator(PLAY_SIMPLE_TRA
 
 export const STOP_SIMPLE_TRACK = 'STOP_SIMPLE_TRACK'
 export const stopSimpleTrack = makeBroadcaster(makeActionCreator(STOP_SIMPLE_TRACK))
+
+export const TOGGLE_PLAY_SIMPLE_TRACK = 'TOGGLE_PLAY_SIMPLE_TRACK'
+export const togglePlaySimpleTrack = makeBroadcaster(makeActionCreator(TOGGLE_PLAY_SIMPLE_TRACK))
 
 export const RESTART_SIMPLE_TRACK = 'RESTART_SIMPLE_TRACK'
 export const restartSimpleTrack = makeBroadcaster(makeActionCreator(RESTART_SIMPLE_TRACK))
@@ -20,23 +24,27 @@ let simpleTrackPlayer: SimpleTrackPlayer
 export const trackPlayerMiddleware = store => next => action => {
 	let state: IAppState = store.getState()
 
+	if (simpleTrackPlayer === undefined) {
+		simpleTrackPlayer = new SimpleTrackPlayer(store.dispatch, audioContext)
+	}
+
 	switch (action.type) {
 		case PLAY_SIMPLE_TRACK:
-			if (simpleTrackPlayer === undefined) {
-				simpleTrackPlayer = new SimpleTrackPlayer(store.dispatch, state.audio.context)
-			}
 			simpleTrackPlayer.play(notesToEvents(selectSimpleTrackEvents(state)))
 			return next(action)
 		case STOP_SIMPLE_TRACK:
-			if (simpleTrackPlayer === undefined) {
-				simpleTrackPlayer = new SimpleTrackPlayer(store.dispatch, state.audio.context)
-			}
 			simpleTrackPlayer.stop()
 			return next(action)
-		case RESTART_SIMPLE_TRACK:
-			if (simpleTrackPlayer === undefined) {
-				simpleTrackPlayer = new SimpleTrackPlayer(store.dispatch, state.audio.context)
+		case TOGGLE_PLAY_SIMPLE_TRACK:
+			if (simpleTrackPlayer.isPlaying()) {
+				simpleTrackPlayer.stop()
+				next(stopSimpleTrack())
+			} else {
+				simpleTrackPlayer.play(notesToEvents(selectSimpleTrackEvents(state)))
+				next(playSimpleTrack())
 			}
+			return next(action)
+		case RESTART_SIMPLE_TRACK:
 			if (simpleTrackPlayer.isPlaying()) {
 				simpleTrackPlayer.stop()
 				simpleTrackPlayer.play(notesToEvents(selectSimpleTrackEvents(state)))
@@ -45,9 +53,6 @@ export const trackPlayerMiddleware = store => next => action => {
 		case REFRESH_SIMPLE_TRACK_PLAYER_EVENTS:
 			next(action)
 			state = store.getState()
-			if (simpleTrackPlayer === undefined) {
-				simpleTrackPlayer = new SimpleTrackPlayer(store.dispatch, state.audio.context)
-			}
 			simpleTrackPlayer.setEvents(notesToEvents(selectSimpleTrackEvents(state)))
 			return next(action)
 		default:
