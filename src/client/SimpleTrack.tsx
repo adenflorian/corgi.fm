@@ -1,6 +1,6 @@
 import classnames from 'classnames'
-import * as React from 'react'
 import {Component} from 'react'
+import * as React from 'react'
 import {connect, Dispatch} from 'react-redux'
 import {IMidiNote} from '../common/MidiNote'
 import {IAppState} from '../common/redux/configureStore'
@@ -16,7 +16,8 @@ import {
 	restartSimpleTrack,
 	stopSimpleTrack,
 } from '../common/redux/track-player-middleware'
-import {boxShadow3dCss, isWhiteKey} from './Keyboard/Keyboard'
+import {IsometricBoxShadow} from './IsometricBoxShadow'
+import {isWhiteKey} from './Keyboard/Keyboard'
 import './SimpleTrack.less'
 
 interface ISimpleTrackProps {
@@ -44,61 +45,60 @@ export class SimpleTrack extends Component<ISimpleTrackProps> {
 		return (
 			<div className={classnames(['simpleTrack', isPlaying ? 'isPlaying' : 'isNotPlaying'])}>
 				<div className="label">track-1</div>
-				<div
-					className="container"
-					style={{boxShadow: boxShadow3dCss(4, isPlaying ? brightColor : color)}}
-				>
-					<div className="controls unselectable">
-						<div
-							className="play colorTransition"
-							onClick={play}
-						>
-							▶
+				<IsometricBoxShadow color={isPlaying ? brightColor : color}>
+					<div className="container">
+						<div className="controls unselectable">
+							<div
+								className="play colorTransition"
+								onClick={play}
+							>
+								▶
 						</div>
-						<div
-							className="stop colorTransition"
-							onClick={stop}
-						>
-							◼
+							<div
+								className="stop colorTransition"
+								onClick={stop}
+							>
+								◼
 						</div>
-						<div
-							className="restart colorTransition"
-							onClick={restart}
-						>
-							↻
+							<div
+								className="restart colorTransition"
+								onClick={restart}
+							>
+								↻
+						</div>
+						</div>
+						<div className="events">
+							{events.map((event, index) => {
+								const isActiveIndex = activeIndex === index
+								return (
+									<div
+										key={index}
+										className={classnames([
+											'event',
+											isActiveIndex ? 'active' : 'transitionAllColor',
+										])}
+									>
+										{Array.apply(0, new Array(36)).map((_, i2) => {
+											const isEnabled = event.notes.some(x => x === i2)
+											return (
+												<div
+													key={i2}
+													className={classnames([
+														'note',
+														isEnabled ? 'on' : '',
+														isWhiteKey(i2) ? 'white' : 'black',
+														isEnabled && isActiveIndex ? 'active' : '',
+													])}
+													onClick={() => setNote(index, !isEnabled, i2)}
+												/>
+											)
+										})}
+									</div>
+								)
+							})}
 						</div>
 					</div>
-					<div className="events">
-						{events.map((event, index) => {
-							const isActiveIndex = activeIndex === index
-							return (
-								<div
-									key={index}
-									className={classnames([
-										'event',
-										isActiveIndex ? 'active' : 'transitionAllColor',
-									])}
-								>
-									{Array.apply(0, new Array(36)).map((_, i2) => {
-										const isEnabled = event.notes.some(x => x === i2)
-										return (
-											<div
-												key={i2}
-												className={classnames([
-													'note',
-													isEnabled ? 'on' : '',
-													isWhiteKey(i2) ? 'white' : 'black',
-													isEnabled && isActiveIndex ? 'active' : '',
-												])}
-												onClick={() => setNote(index, !isEnabled, i2)}
-											/>
-										)
-									})}
-								</div>
-							)
-						})}
-					</div>
-				</div>
+				</IsometricBoxShadow>
 			</div>
 		)
 	}

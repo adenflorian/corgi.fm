@@ -8,6 +8,7 @@ import {
 	virtualKeyFlip, virtualKeyPressed, virtualKeyUp,
 } from '../../common/redux/virtual-keyboard-redux'
 import {keyToMidiMap} from '../input-events'
+import {IsometricBoxShadow} from '../IsometricBoxShadow'
 import {Octave} from '../music/music-types'
 import {keyColors} from '../utils'
 import {ClientId} from '../websocket-listeners'
@@ -68,50 +69,51 @@ export class Keyboard extends React.Component<IKeyboardProps> {
 			virtualMidiKeyboard, isLocal, showNoteNames} = this.props
 
 		return (
-			<div
-				className={classnames([
-					'keyboard',
-					isLocal ? 'isLocal' : '',
-					isPlaying === false ? 'isNotPlaying' : '',
-				])}
-				style={{boxShadow: boxShadow3dCss(4, isPlaying ? brightColor : color)}}
-			>
-				<div className="octave black unselectable">
-					<div className="octaveNumber">
-						{octave}
-					</div>
-					{isLocal &&
-						<div className="octaveKeys smallText">
-							<span>z</span><span>x</span>
+			<IsometricBoxShadow color={isPlaying ? brightColor : color}>
+				<div
+					className={classnames([
+						'keyboard',
+						isLocal ? 'isLocal' : '',
+						isPlaying === false ? 'isNotPlaying' : '',
+					])}
+				>
+					<div className="octave black unselectable">
+						<div className="octaveNumber">
+							{octave}
 						</div>
-					}
-				</div>
-				{virtualMidiKeyboard.map((value, index) => {
-					const isKeyPressed = pressedMidiKeys.some(x => x === index)
-					return (
-						<div
-							key={index}
-							className={classnames(['key', value.color, isKeyPressed ? 'pressed' : 'notPressed'])}
-							style={{backgroundColor: isKeyPressed ? brightColor : ''}}
-							onMouseOver={e => this.handleMouseOver(e, index)}
-							onMouseOut={e => this.handleMouseOut(e, index)}
-							onMouseDown={e => this.handleMouseDown(e, index)}
-							onMouseUp={e => this.handleMouseUp(e, index)}
-						>
-							<div className="noteName unselectable">
-								{showNoteNames &&
-									value.name
+						{isLocal &&
+							<div className="octaveKeys smallText">
+								<span>z</span><span>x</span>
+							</div>
+						}
+					</div>
+					{virtualMidiKeyboard.map((value, index) => {
+						const isKeyPressed = pressedMidiKeys.some(x => x === index)
+						return (
+							<div
+								key={index}
+								className={classnames(['key', value.color, isKeyPressed ? 'pressed' : 'notPressed'])}
+								style={{backgroundColor: isKeyPressed ? brightColor : ''}}
+								onMouseOver={e => this.handleMouseOver(e, index)}
+								onMouseOut={e => this.handleMouseOut(e, index)}
+								onMouseDown={e => this.handleMouseDown(e, index)}
+								onMouseUp={e => this.handleMouseUp(e, index)}
+							>
+								<div className="noteName unselectable">
+									{showNoteNames &&
+										value.name
+									}
+								</div>
+								{isLocal &&
+									<div className="unselectable smallText">
+										{value.keyName}
+									</div>
 								}
 							</div>
-							{isLocal &&
-								<div className="unselectable smallText">
-									{value.keyName}
-								</div>
-							}
-						</div>
-					)
-				})}
-			</div>
+						)
+					})}
+				</div>
+			</IsometricBoxShadow>
 		)
 	}
 
@@ -154,25 +156,6 @@ function isLeftMouseButtonDown(buttons: number): boolean {
 	if (buttons === undefined) return false
 
 	return buttons % 2 === 1
-}
-
-export function boxShadow3dCss(size: number, color: string) {
-	let x = ''
-
-	for (let i = 0; i < size; i++) {
-		x += `${-i - 1}px ${i + 2}px ${color},`
-	}
-
-	return x.replace(/,$/, '')
-
-	/*
-	0px 1px #999,
-	-1px 2px #999,
-	-2px 3px #999,
-	-3px 4px #999,
-	-4px 5px #999,
-	-5px 6px #999;
-	*/
 }
 
 const mapStateToProps = (state: IAppState, props) => {

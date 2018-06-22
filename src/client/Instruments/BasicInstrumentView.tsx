@@ -1,6 +1,6 @@
 import classnames from 'classnames'
-import {Component} from 'react'
 import * as React from 'react'
+import {Component} from 'react'
 import {connect} from 'react-redux'
 import ReactSVG from 'react-svg'
 import {Dispatch} from 'redux'
@@ -8,7 +8,7 @@ import {IMidiNote} from '../../common/MidiNote'
 import {createBasicInstrument, selectInstrumentByOwner} from '../../common/redux/basic-instruments-redux'
 import {IAppState} from '../../common/redux/configureStore'
 import {makeGetMidiOutputByOwner} from '../../common/redux/virtual-keyboard-redux'
-import {boxShadow3dCss} from '../Keyboard/Keyboard'
+import {IsometricBoxShadow} from '../IsometricBoxShadow'
 import {audioContext, preFx} from '../setup-audio-context'
 import {Knob} from '../Volume/Knob'
 import {ClientId} from '../websocket-listeners'
@@ -68,20 +68,21 @@ export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 		this.instrument.setOscillatorType(oscillatorType)
 
 		return (
-			<div
-				className={classnames(['basicInstrument', isPlaying ? 'isPlaying' : 'isNotPlaying'])}
-				style={{boxShadow: boxShadow3dCss(4, isPlaying ? brightColor : color)}}
-			>
-				<div className="label">basic instrument</div>
+			<IsometricBoxShadow color={isPlaying ? brightColor : color}>
+				<div
+					className={classnames(['basicInstrument', isPlaying ? 'isPlaying' : 'isNotPlaying'])}
+				>
+					<div className="label">basic instrument</div>
 
-				<Knob min={-1} max={1} value={pan} label="pan" readOnly={true} />
+					<Knob min={-1} max={1} value={pan} label="pan" readOnly={true} />
 
-				<div className="oscillatorTypes" style={{color: isPlaying ? brightColor : color}} >
-					{oscillatorTypes.map(({name, svgPath}) =>
-						<ReactSVG key={name} path={svgPath} className={oscillatorType === name ? 'active' : ''} />,
-					)}
-				</div>
-			</div >
+					<div className="oscillatorTypes" style={{color: isPlaying ? brightColor : color}} >
+						{oscillatorTypes.map(({name, svgPath}) =>
+							<ReactSVG key={name} path={svgPath} className={oscillatorType === name ? 'active' : ''} />,
+						)}
+					</div>
+				</div >
+			</IsometricBoxShadow>
 		)
 	}
 }
@@ -102,9 +103,11 @@ const makeMapStateToProps = () => {
 	}
 }
 
+const mapDispatchToProps = (dispatch: Dispatch) => ({
+	createBasicInstrument: (ownerId: ClientId) => dispatch(createBasicInstrument(ownerId)),
+})
+
 export const ConnectedBasicInstrumentView = connect(
 	makeMapStateToProps,
-	(dispatch: Dispatch) => ({
-		createBasicInstrument: (ownerId: ClientId) => dispatch(createBasicInstrument(ownerId)),
-	}),
+	mapDispatchToProps,
 )(BasicInstrumentView)
