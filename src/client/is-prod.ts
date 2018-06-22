@@ -1,7 +1,7 @@
 import queryString from 'query-string'
 
 export function isProd() {
-	return window.location.host === 'shamu.adenflorian.com' || prodQueryParamExists()
+	return window.location.host.toLowerCase() === 'shamu.adenflorian.com' || prodQueryParamExists()
 }
 
 function prodQueryParamExists() {
