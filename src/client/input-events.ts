@@ -32,6 +32,7 @@ interface KeyBoardShortcuts {
 	[key: string]: {
 		action: AnyAction,
 		allowRepeat: boolean,
+		preventDefault: boolean,
 	},
 }
 
@@ -39,22 +40,27 @@ const keyboardShortcuts: KeyBoardShortcuts = {
 	' ': {
 		action: togglePlaySimpleTrack(),
 		allowRepeat: false,
+		preventDefault: true,
 	},
 }
 
 export function setupInputEventListeners(window: Window, store: Store) {
 	window.addEventListener('keydown', e => {
-		onKeyDown(e.key.toLowerCase(), e.repeat)
+		onKeyDown(e.key.toLowerCase(), e.repeat, e)
 	})
 
 	window.addEventListener('keyup', e => {
 		onKeyUp(e.key.toLowerCase())
 	})
 
-	function onKeyDown(keyName, isRepeat: boolean) {
+	function onKeyDown(keyName, isRepeat: boolean, event: Event) {
 		const keyboardShortcut = keyboardShortcuts[keyName]
+
 		if (keyboardShortcut && keyboardShortcut.allowRepeat === isRepeat) {
 			store.dispatch(keyboardShortcut.action)
+			if (keyboardShortcut.preventDefault) {
+				event.preventDefault()
+			}
 		} else {
 			const state: IAppState = store.getState()
 			const myClientId = state.websocket.myClientId
