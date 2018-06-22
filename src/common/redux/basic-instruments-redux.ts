@@ -2,19 +2,18 @@ import {AnyAction} from 'redux'
 import uuidv4 from 'uuid/v4'
 import {ClientId} from '../../client/websocket-listeners'
 import {IAppState} from './configureStore'
-import {makeActionCreator} from './redux-utils'
+import {makeActionCreator, makeBroadcaster} from './redux-utils'
 
 export const CREATE_BASIC_INSTRUMENT = 'CREATE_BASIC_INSTRUMENT'
 export const createBasicInstrument = makeActionCreator(CREATE_BASIC_INSTRUMENT, 'ownerId')
 
+export const SET_BASIC_INSTRUMENT_OSCILLATOR_TYPE = 'SET_BASIC_INSTRUMENT_OSCILLATOR_TYPE'
+export const setBasicInstrumentOscillatorType = makeBroadcaster(makeActionCreator(
+	SET_BASIC_INSTRUMENT_OSCILLATOR_TYPE, 'ownerId', 'oscillatorType',
+))
+
 export interface IBasicInstrumentsState {
 	instruments: IBasicInstrumentState[]
-}
-
-export interface IBasicInstrumentState {
-	oscillatorType: OscillatorType
-	id: string
-	ownerId: ClientId
 }
 
 const basicInstrumentsInitialState: IBasicInstrumentsState = {
@@ -28,7 +27,7 @@ export function basicInstrumentsReducer(state = basicInstrumentsInitialState, ac
 				...state,
 				instruments: [...state.instruments, new BasicInstrumentState(action.ownerId)],
 			}
-		case 'other action type thing here':
+		case SET_BASIC_INSTRUMENT_OSCILLATOR_TYPE:
 			return {
 				...state,
 				instruments: state.instruments.map(instrument => basicInstrumentReducer(instrument, action)),
@@ -36,6 +35,12 @@ export function basicInstrumentsReducer(state = basicInstrumentsInitialState, ac
 		default:
 			return state
 	}
+}
+
+export interface IBasicInstrumentState {
+	oscillatorType: OscillatorType
+	id: string
+	ownerId: ClientId
 }
 
 class BasicInstrumentState implements IBasicInstrumentState {
@@ -48,8 +53,18 @@ class BasicInstrumentState implements IBasicInstrumentState {
 	}
 }
 
-export function basicInstrumentReducer(state = {}, _action: AnyAction) {
-	return state
+function basicInstrumentReducer(instrument: IBasicInstrumentState, action: AnyAction) {
+	if (instrument.ownerId !== action.ownerId) return instrument
+
+	switch (action.type) {
+		case SET_BASIC_INSTRUMENT_OSCILLATOR_TYPE:
+			return {
+				...instrument,
+				oscillatorType: action.oscillatorType,
+			}
+		default:
+			return instrument
+	}
 }
 
 export function selectInstrumentByOwner(state: IAppState, ownerId: ClientId) {

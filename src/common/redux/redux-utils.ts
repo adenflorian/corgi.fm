@@ -1,4 +1,9 @@
 export function makeActionCreator(type, ...argNames) {
+	argNames.forEach(arg => {
+		if (arg === 'type') {
+			throw new Error(`can't make arg name *type*, because it's reserved for the action type`)
+		}
+	})
 	return (...args) => {
 		const action = {type}
 		argNames.forEach((arg, index) => {
