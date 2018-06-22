@@ -14,7 +14,7 @@ const app: express.Application = express()
 const server: http.Server = new http.Server(app)
 const io: socketIO.Server = socketIO(server)
 
-setupExpressApp(app)
+setupExpressApp(app, store)
 
 setupServerWebSocketListeners(io, store)
 

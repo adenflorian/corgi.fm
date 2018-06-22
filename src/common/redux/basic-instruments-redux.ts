@@ -2,14 +2,19 @@ import {AnyAction} from 'redux'
 import uuidv4 from 'uuid/v4'
 import {ClientId} from '../../client/websocket-listeners'
 import {IAppState} from './configureStore'
-import {makeActionCreator, makeBroadcaster} from './redux-utils'
+import {makeActionCreator, makeBroadcaster, makeServerAction} from './redux-utils'
 
 export const CREATE_BASIC_INSTRUMENT = 'CREATE_BASIC_INSTRUMENT'
 export const createBasicInstrument = makeActionCreator(CREATE_BASIC_INSTRUMENT, 'ownerId')
 
 export const SET_BASIC_INSTRUMENT_OSCILLATOR_TYPE = 'SET_BASIC_INSTRUMENT_OSCILLATOR_TYPE'
-export const setBasicInstrumentOscillatorType = makeBroadcaster(makeActionCreator(
+export const setBasicInstrumentOscillatorType = makeServerAction(makeBroadcaster(makeActionCreator(
 	SET_BASIC_INSTRUMENT_OSCILLATOR_TYPE, 'ownerId', 'oscillatorType',
+)))
+
+export const UPDATE_BASIC_INSTRUMENTS = 'UPDATE_BASIC_INSTRUMENTS'
+export const updateBasicInstruments = makeBroadcaster(makeActionCreator(
+	UPDATE_BASIC_INSTRUMENTS, 'instruments',
 ))
 
 export interface IBasicInstrumentsState {
@@ -31,6 +36,16 @@ export function basicInstrumentsReducer(state = basicInstrumentsInitialState, ac
 			return {
 				...state,
 				instruments: state.instruments.map(instrument => basicInstrumentReducer(instrument, action)),
+			}
+		case UPDATE_BASIC_INSTRUMENTS:
+			return {
+				...state,
+				instruments: state.instruments.map(stateInstrument => {
+					return {
+						...stateInstrument,
+						...(action.instruments.find(actionInstrument => actionInstrument.ownerId === stateInstrument.ownerId) || {}),
+					}
+				}),
 			}
 		default:
 			return state
@@ -67,6 +82,11 @@ function basicInstrumentReducer(instrument: IBasicInstrumentState, action: AnyAc
 	}
 }
 
+export function selectAllInstruments(state: IAppState) {
+	return state.basicInstruments.instruments
+}
+
 export function selectInstrumentByOwner(state: IAppState, ownerId: ClientId) {
-	return state.basicInstruments.instruments.find(x => x.ownerId === ownerId)
+	return selectAllInstruments(state)
+		.find(x => x.ownerId === ownerId)
 }

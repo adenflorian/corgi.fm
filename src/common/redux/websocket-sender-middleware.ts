@@ -14,6 +14,7 @@ export interface ShamuAction extends AnyAction {
 	isRemote?: boolean
 	shouldBroadcast?: boolean
 	alreadyBroadcasted?: boolean
+	dispatchOnServer?: boolean
 }
 
 export interface BroadcastAction extends AnyAction {
@@ -32,6 +33,9 @@ export const websocketSenderMiddleware = store => next => (action: ShamuAction) 
 
 	if (action.shouldBroadcast && !action.alreadyBroadcasted) {
 		socket.emit(WebSocketEvent.broadcast, action)
+		return next(action)
+	} else if (action.dispatchOnServer) {
+		socket.emit(WebSocketEvent.serverAction, action)
 		return next(action)
 	}
 

@@ -1,6 +1,8 @@
 import {AnyAction, Store} from 'redux'
-import {Server} from 'socket.io'
+import {Server, Socket} from 'socket.io'
 import {logger} from '../common/logger'
+import {selectAllInstruments, updateBasicInstruments} from '../common/redux/basic-instruments-redux'
+import {IAppState} from '../common/redux/configureStore'
 import {selectSimpleTrackEvents, setSimpleTrackEvents} from '../common/redux/simple-track-redux'
 import {BroadcastAction} from '../common/redux/websocket-sender-middleware'
 import {WebSocketEvent} from '../common/server-constants'
@@ -15,9 +17,8 @@ export function setupServerWebSocketListeners(io: Server, store: Store) {
 		clients.add(socket.id)
 		logger.debug('clients: ', clients)
 
-		sendClientsToNewClient(socket)
 		sendNewClientToOthers(socket, clients.get(socket.id))
-		sendSimpleTrackEventsToNewClient(socket, store)
+		syncState(socket, store)
 
 		socket.on('notes', notesPayload => {
 			logger.debug(`notes: ${socket.id} | `, notesPayload)
@@ -45,17 +46,16 @@ export function setupServerWebSocketListeners(io: Server, store: Store) {
 			socket.broadcast.emit(WebSocketEvent.broadcast, {...action, alreadyBroadcasted: true})
 		})
 
+		socket.on(WebSocketEvent.serverAction, (action: AnyAction) => {
+			logger.log(`${WebSocketEvent.serverAction}: ${socket.id} | `, action)
+			store.dispatch(action)
+		})
+
 		socket.on('disconnect', () => {
 			logger.log(`client disconnected: ${socket.id}`)
 			clients.remove(socket.id)
 			sendClientDisconnected(socket.id, io)
 		})
-	})
-}
-function sendClientsToNewClient(newClientSocket) {
-	logger.debug('sending clients info to new client')
-	newClientSocket.emit('clients', {
-		clients: clients.toArray(),
 	})
 }
 
@@ -64,15 +64,27 @@ function sendNewClientToOthers(socket, client) {
 	socket.broadcast.emit('newClient', client)
 }
 
-function sendSimpleTrackEventsToNewClient(newClientSocket, store: Store) {
-	logger.debug('sending simple track events to new client')
-	const action: AnyAction = setSimpleTrackEvents(selectSimpleTrackEvents(store.getState()))
-	newClientSocket.emit(WebSocketEvent.broadcast, {...action, alreadyBroadcasted: true})
-}
-
 function sendClientDisconnected(id, io: Server) {
 	logger.debug('sending clientDisconnected to all clients')
 	io.local.emit('clientDisconnected', {
 		id,
+	})
+}
+
+function syncState(newClientSocket: Socket, store: Store) {
+	newClientSocket.emit('clients', {
+		clients: clients.toArray(),
+	})
+
+	const state: IAppState = store.getState()
+
+	newClientSocket.emit(WebSocketEvent.broadcast, {
+		...setSimpleTrackEvents(selectSimpleTrackEvents(state)),
+		alreadyBroadcasted: true,
+	})
+
+	newClientSocket.emit(WebSocketEvent.broadcast, {
+		...updateBasicInstruments(selectAllInstruments(state)),
+		alreadyBroadcasted: true,
 	})
 }
