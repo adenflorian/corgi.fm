@@ -20,6 +20,8 @@
 - [ ] options view
 - [ ] maybe use requestAnimationFrame()
 - [ ] store index of simpleTrack on server for new clients
+- [ ] make use of `'` and `[` keys
+- [ ] add `+` and `-` for octave 
 
 
 # References
