@@ -82,7 +82,9 @@ export const setVirtualKeys = (ownerId: ClientId, keys: IMidiNote[]) => {
 const defaultOctave = 4
 
 export interface VirtualKeyboardsState {
-	[clientId: string]: VirtualKeyboardState
+	keyboards: {
+		[clientId: string]: VirtualKeyboardState,
+	}
 }
 
 export interface VirtualKeyboardState {
@@ -92,10 +94,12 @@ export interface VirtualKeyboardState {
 }
 
 const initialState: VirtualKeyboardsState = {
-	'track-1': {
-		octave: defaultOctave - 1,
-		pressedKeys: [],
-		id: 'track-123',
+	keyboards: {
+		'track-1': {
+			octave: defaultOctave - 1,
+			pressedKeys: [],
+			id: 'track-123',
+		},
 	},
 }
 
@@ -104,97 +108,127 @@ export function virtualKeyboardsReducer(state: VirtualKeyboardsState = initialSt
 		case VIRTUAL_KEY_PRESSED:
 			return {
 				...state,
-				[action.ownerId]: {
-					...state[action.ownerId],
-					pressedKeys: addIfNew(
-						state[action.ownerId] ? state[action.ownerId].pressedKeys : [],
-						action.number,
-					),
+				keyboards: {
+					...state.keyboards,
+					[action.ownerId]: {
+						...state.keyboards[action.ownerId],
+						pressedKeys: addIfNew(
+							state.keyboards[action.ownerId] ? state.keyboards[action.ownerId].pressedKeys : [],
+							action.number,
+						),
+					},
 				},
 			}
 		case VIRTUAL_KEY_UP:
 			return {
 				...state,
-				[action.ownerId]: {
-					...state[action.ownerId],
-					pressedKeys: state[action.ownerId].pressedKeys.filter(x => x !== action.number),
+				keyboards: {
+					...state.keyboards,
+					[action.ownerId]: {
+						...state.keyboards[action.ownerId],
+						pressedKeys: state.keyboards[action.ownerId].pressedKeys.filter(x => x !== action.number),
+					},
 				},
 			}
 		case VIRTUAL_ALL_KEYS_UP:
 			return {
 				...state,
-				[action.ownerId]: {
-					...state[action.ownerId],
-					pressedKeys: [],
+				keyboards: {
+					...state.keyboards,
+					[action.ownerId]: {
+						...state.keyboards[action.ownerId],
+						pressedKeys: [],
+					},
 				},
 			}
 		case VIRTUAL_KEY_FLIP:
 			return {
 				...state,
-				[action.ownerId]: {
-					...state[action.ownerId],
-					pressedKeys: flipKey(
-						state[action.ownerId] ? state[action.ownerId].pressedKeys : [],
-						action.number,
-					),
+				keyboards: {
+					...state.keyboards,
+					[action.ownerId]: {
+						...state.keyboards[action.ownerId],
+						pressedKeys: flipKey(
+							state.keyboards[action.ownerId] ? state.keyboards[action.ownerId].pressedKeys : [],
+							action.number,
+						),
+					},
 				},
 			}
 		case SET_VIRTUAL_KEYS:
 			return {
 				...state,
-				[action.ownerId]: {
-					...state[action.ownerId],
-					pressedKeys: action.keys,
+				keyboards: {
+					...state.keyboards,
+					[action.ownerId]: {
+						...state.keyboards[action.ownerId],
+						pressedKeys: action.keys,
+					},
 				},
 			}
 		case VIRTUAL_OCTAVE:
 			return {
 				...state,
-				[action.ownerId]: {
-					...state[action.ownerId],
-					octave: action.octave,
+				keyboards: {
+					...state.keyboards,
+					[action.ownerId]: {
+						...state.keyboards[action.ownerId],
+						octave: action.octave,
+					},
 				},
 			}
 		case VIRTUAL_OCTAVE_CHANGE:
 			return {
 				...state,
-				[action.ownerId]: {
-					...state[action.ownerId],
-					octave: state[action.ownerId].octave + action.delta,
+				keyboards: {
+					...state.keyboards,
+					[action.ownerId]: {
+						...state.keyboards[action.ownerId],
+						octave: state.keyboards[action.ownerId].octave + action.delta,
+					},
 				},
 			}
 		case NEW_CLIENT:
 			return {
 				...state,
-				[action.id]: {
-					octave: defaultOctave,
-					pressedKeys: [],
+				keyboards: {
+					...state.keyboards,
+					[action.id]: {
+						octave: defaultOctave,
+						pressedKeys: [],
+					},
 				},
 			}
 		case SET_CLIENTS:
 			return {
 				...state,
-				...action.clients.reduce((all, client) => {
-					all[client.id] = {
-						octave: client.octave,
-						pressedKeys: client.notes,
-						id: state[client.id] ? state[client.id].id : -1,
-					}
-					return all
-				}, {}),
+				keyboards: {
+					...state.keyboards,
+					...action.clients.reduce((all, client) => {
+						all[client.id] = {
+							octave: client.octave,
+							pressedKeys: client.notes,
+							id: state.keyboards[client.id] ? state.keyboards[client.id].id : -1,
+						}
+						return all
+					}, {}),
+				},
 			}
 		case SET_MY_CLIENT_ID:
 			return {
 				...state,
-				[action.id]: {
-					octave: defaultOctave,
-					pressedKeys: [],
-					id: action.id,
+				keyboards: {
+					...state.keyboards,
+					[action.id]: {
+						octave: defaultOctave,
+						pressedKeys: [],
+						id: action.id,
+					},
 				},
 			}
 		case CLIENT_DISCONNECTED:
 			const newState = {...state}
-			delete newState[action.id]
+			delete newState.keyboards[action.id]
 			return newState
 		default:
 			return state
@@ -213,7 +247,7 @@ export interface IMidi {
 	notes: IMidiNote[]
 }
 
-const selectVirtualKeyboardByOwner = (state, {ownerId}) => state.virtualKeyboards[ownerId]
+export const selectVirtualKeyboardByOwner = (state, {ownerId}) => state.virtualKeyboards.keyboards[ownerId]
 
 export const makeGetMidiOutputByOwner = () => {
 	return createSelector(
@@ -223,7 +257,7 @@ export const makeGetMidiOutputByOwner = () => {
 }
 
 export function selectMidiOutput(state: IAppState, ownerId: ClientId): IMidi {
-	const virtualKeyboardState = state.virtualKeyboards[ownerId]
+	const virtualKeyboardState = state.virtualKeyboards.keyboards[ownerId]
 
 	if (virtualKeyboardState === undefined) return {notes: []}
 
@@ -233,5 +267,9 @@ export function selectMidiOutput(state: IAppState, ownerId: ClientId): IMidi {
 }
 
 export function selectKeyboardIdByOwnerId(state: IAppState, ownerId: ClientId) {
-	return state.virtualKeyboards[ownerId].id
+	return state.virtualKeyboards.keyboards[ownerId].id
+}
+
+export function selectKeyboardPressedKeysByOwner(state: IAppState, ownerId: ClientId) {
+	return state.virtualKeyboards.keyboards[ownerId].pressedKeys
 }

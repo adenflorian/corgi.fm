@@ -3,6 +3,7 @@ import {WebSocketEvent} from '../../common/server-constants'
 import {CLIENT_DISCONNECTED, clientDisconnecting, selectLocalClient} from './clients-redux'
 import {IAppState} from './configureStore'
 import {
+	selectKeyboardPressedKeysByOwner,
 	VIRTUAL_KEY_PRESSED,
 	VIRTUAL_KEY_UP,
 	VirtualKeyAction,
@@ -54,6 +55,6 @@ function onVirtualKey(action: VirtualKeyAction, store, next, socket, myClientId)
 	next(action)
 	if (action.ownerId === myClientId.id) {
 		const state: IAppState = store.getState()
-		socket.emit('notes', {notes: state.virtualKeyboards[action.ownerId].pressedKeys})
+		socket.emit('notes', {notes: selectKeyboardPressedKeysByOwner(state, action.ownerId)})
 	}
 }

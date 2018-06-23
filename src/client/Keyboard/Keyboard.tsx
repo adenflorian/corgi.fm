@@ -6,7 +6,7 @@ import {DummyClient} from '../../common/redux/clients-redux'
 import {IAppState} from '../../common/redux/configureStore'
 import {addConnection, Connection} from '../../common/redux/connections-redux'
 import {
-	virtualKeyFlip, virtualKeyPressed, virtualKeyUp,
+	selectVirtualKeyboardByOwner, virtualKeyFlip, virtualKeyPressed, virtualKeyUp,
 } from '../../common/redux/virtual-keyboard-redux'
 import {keyToMidiMap} from '../input-events'
 import {Octave} from '../music/music-types'
@@ -162,7 +162,7 @@ function isLeftMouseButtonDown(buttons: number): boolean {
 
 const mapStateToProps = (state: IAppState, props) => {
 	const owner = state.clients.find(x => x.id === props.ownerId)
-	const virtualKeyboard = state.virtualKeyboards[props.ownerId]
+	const virtualKeyboard = selectVirtualKeyboardByOwner(state, props)
 	const pressedMidiKeys = virtualKeyboard ? virtualKeyboard.pressedKeys : []
 	const instrument = selectInstrumentByOwner(state, props.ownerId) || {} as IBasicInstrumentState
 
