@@ -20,13 +20,13 @@ const TRACK_1 = 'track-1'
 
 export class SimpleTrackPlayer {
 	private _audioContext: AudioContext
-	private _intervalId: number
 	private _index: number = 0
 	private _dispatch: Dispatch
 	private _events: ISimpleTrackEvent[]
 	private _startTime: number
 	private _inTick: boolean = false
 	private _tick: number = 0
+	private _isPlaying: boolean = false
 
 	constructor(dispatch: Dispatch, audioContext: AudioContext) {
 		this._dispatch = dispatch
@@ -38,7 +38,8 @@ export class SimpleTrackPlayer {
 		logger.log('play')
 		this._events = events
 		this._startTime = this._audioContext.currentTime
-		this._intervalId = window.setInterval(this._onTick, 10)
+		this._isPlaying = true
+		window.requestAnimationFrame(this._onTick)
 	}
 
 	public setEvents = (events: ISimpleTrackEvent[]) => {
@@ -49,11 +50,9 @@ export class SimpleTrackPlayer {
 	}
 
 	public stop = () => {
-		clearInterval(this._intervalId)
-		this._intervalId = undefined
+		this._isPlaying = false
 		this._index = 0
 		this._tick = 0
-		this._stopAllNotes()
 		this._dispatch(setSimpleTrackIndex(-1))
 	}
 
@@ -62,7 +61,7 @@ export class SimpleTrackPlayer {
 	}
 
 	public isPlaying(): boolean {
-		return this._intervalId !== undefined
+		return this._isPlaying
 	}
 
 	private _onTick = () => {
@@ -72,6 +71,11 @@ export class SimpleTrackPlayer {
 			this._inTick = true
 			this._doTick()
 			this._inTick = false
+		}
+		if (this._isPlaying) {
+			window.requestAnimationFrame(this._onTick)
+		} else {
+			this._stopAllNotes()
 		}
 	}
 
