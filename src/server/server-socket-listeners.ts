@@ -2,7 +2,7 @@ import {AnyAction, Store} from 'redux'
 import {Server, Socket} from 'socket.io'
 import {logger} from '../common/logger'
 import {
-	addBasicInstrument, BasicInstrumentState, selectAllInstruments, updateBasicInstruments,
+	selectAllInstruments, updateBasicInstruments,
 } from '../common/redux/basic-instruments-redux'
 import {IAppState} from '../common/redux/configureStore'
 import {
@@ -24,9 +24,6 @@ export function setupServerWebSocketListeners(io: Server, store: Store) {
 
 		sendNewClientToOthers(socket, clients.get(socket.id))
 		syncState(socket, store)
-		const newInstrument = new BasicInstrumentState(socket.id)
-		store.dispatch(addBasicInstrument(newInstrument))
-		io.local.emit(WebSocketEvent.broadcast, {...addBasicInstrument(newInstrument), source: 'server'})
 
 		socket.on('notes', notesPayload => {
 			logger.debug(`notes: ${socket.id} | `, notesPayload)

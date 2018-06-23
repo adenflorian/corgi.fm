@@ -5,10 +5,10 @@ import {IAppState} from './configureStore'
 import {makeActionCreator, makeBroadcaster, makeServerAction} from './redux-utils'
 
 export const ADD_BASIC_INSTRUMENT = 'ADD_BASIC_INSTRUMENT'
-export const addBasicInstrument = (instrument: IBasicInstrumentState) => ({
+export const addBasicInstrument = makeServerAction(makeBroadcaster((instrument: IBasicInstrumentState) => ({
 	type: ADD_BASIC_INSTRUMENT,
 	instrument,
-})
+})))
 
 export const SET_BASIC_INSTRUMENT_OSCILLATOR_TYPE = 'SET_BASIC_INSTRUMENT_OSCILLATOR_TYPE'
 export const setBasicInstrumentOscillatorType = makeServerAction(makeBroadcaster(

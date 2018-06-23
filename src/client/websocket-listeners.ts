@@ -2,9 +2,11 @@ import {Store} from 'redux'
 import * as io from 'socket.io-client'
 import {logger} from '../common/logger'
 import {IMidiNote} from '../common/MidiNote'
+import {addBasicInstrument, BasicInstrumentState} from '../common/redux/basic-instruments-redux'
 import {clientDisconnected, newClient, SET_CLIENTS} from '../common/redux/clients-redux'
+import {IAppState} from '../common/redux/configureStore'
 import {setVirtualKeys, virtualOctave} from '../common/redux/virtual-keyboard-redux'
-import {SET_MY_CLIENT_ID, setInfo, setSocket} from '../common/redux/websocket-redux'
+import {selectLocalClientId, SET_MY_CLIENT_ID, setInfo, setSocket} from '../common/redux/websocket-redux'
 import {BroadcastAction} from '../common/redux/websocket-sender-middleware'
 import {WebSocketEvent} from '../common/server-constants'
 import {Octave} from './music/music-types'
@@ -21,6 +23,7 @@ export function setupWebsocketAndListeners(store: Store) {
 	socket.on('connect', () => {
 		socketInfo('connected')
 		setClientId(socket.id)
+		createLocalStuff(store)
 	})
 
 	function setClientId(newClientId) {
@@ -111,4 +114,10 @@ export interface NotesPayload {
 export interface OctavePayload {
 	octave: Octave
 	clientId: ClientId
+}
+
+function createLocalStuff(store: Store) {
+	const state: IAppState = store.getState()
+	const newInstrument = new BasicInstrumentState(selectLocalClientId(state))
+	store.dispatch(addBasicInstrument(newInstrument))
 }
