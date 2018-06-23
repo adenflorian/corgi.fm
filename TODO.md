@@ -21,7 +21,8 @@
 - [ ] maybe use requestAnimationFrame()
 - [ ] store index of simpleTrack on server for new clients
 - [ ] make use of `'` and `[` keys
-- [ ] add `+` and `-` for octave 
+- [ ] add `+` and `-` for octave
+- [ ] persist keyboard state on server, and don't store notes and octaves on clients
 
 
 # References

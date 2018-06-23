@@ -1,8 +1,10 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
+import {IBasicInstrumentState, selectInstrumentByOwner} from '../../common/redux/basic-instruments-redux'
 import {DummyClient} from '../../common/redux/clients-redux'
 import {IAppState} from '../../common/redux/configureStore'
+import {addConnection, Connection} from '../../common/redux/connections-redux'
 import {
 	virtualKeyFlip, virtualKeyPressed, virtualKeyUp,
 } from '../../common/redux/virtual-keyboard-redux'
@@ -42,12 +44,12 @@ interface IKeyboardProps {
 	octave?: Octave
 	virtualMidiKeyboard: any
 	color: string
-	keyPressed: (index: number) => void
-	keyUp: (index: number) => void
-	keyFlip: (index: number) => void
 	isLocal: boolean
 	showNoteNames: boolean
 	isPlaying?: boolean
+	dispatch?: Dispatch
+	id?: string
+	instrumentId?: string
 }
 
 export class Keyboard extends React.Component<IKeyboardProps> {
@@ -57,8 +59,11 @@ export class Keyboard extends React.Component<IKeyboardProps> {
 		showNoteNames: true,
 	}
 
-	constructor(props) {
+	constructor(props: IKeyboardProps) {
 		super(props)
+		if (props.isLocal) {
+			props.dispatch(addConnection(new Connection(props.id, props.instrumentId)))
+		}
 	}
 
 	public render() {
@@ -117,14 +122,14 @@ export class Keyboard extends React.Component<IKeyboardProps> {
 	private handleMouseOver = (e: React.MouseEvent, index: number) => {
 		if (this.props.isLocal === false) return
 		if (isLeftMouseButtonDown(e.buttons)) {
-			this.props.keyPressed(index)
+			this.props.dispatch(virtualKeyPressed(this.props.ownerId, index))
 		}
 	}
 
 	private handleMouseOut = (e: React.MouseEvent, index: number) => {
 		if (this.props.isLocal === false) return
 		if (isLeftMouseButtonDown(e.buttons)) {
-			this.props.keyUp(index)
+			this.props.dispatch(virtualKeyUp(this.props.ownerId, index))
 		}
 	}
 
@@ -132,9 +137,9 @@ export class Keyboard extends React.Component<IKeyboardProps> {
 		if (this.props.isLocal === false) return
 		if (e.button === 0) {
 			if (e.shiftKey) {
-				this.props.keyFlip(index)
+				this.props.dispatch(virtualKeyFlip(this.props.ownerId, index))
 			} else {
-				this.props.keyPressed(index)
+				this.props.dispatch(virtualKeyPressed(this.props.ownerId, index))
 			}
 		}
 	}
@@ -142,7 +147,7 @@ export class Keyboard extends React.Component<IKeyboardProps> {
 	private handleMouseUp = (e: React.MouseEvent, index: number) => {
 		if (this.props.isLocal === false) return
 		if (e.button === 0 && e.shiftKey === false) {
-			this.props.keyUp(index)
+			this.props.dispatch(virtualKeyUp(this.props.ownerId, index))
 		}
 	}
 }
@@ -159,6 +164,7 @@ const mapStateToProps = (state: IAppState, props) => {
 	const owner = state.clients.find(x => x.id === props.ownerId)
 	const virtualKeyboard = state.virtualKeyboards[props.ownerId]
 	const pressedMidiKeys = virtualKeyboard ? virtualKeyboard.pressedKeys : []
+	const instrument = selectInstrumentByOwner(state, props.ownerId) || {} as IBasicInstrumentState
 
 	return {
 		pressedMidiKeys,
@@ -168,15 +174,9 @@ const mapStateToProps = (state: IAppState, props) => {
 		isLocal: state.websocket.myClientId === props.ownerId,
 		showNoteNames: state.options.showNoteNamesOnKeyboard,
 		isPlaying: pressedMidiKeys.length > 0,
+		id: virtualKeyboard.id,
+		instrumentId: instrument.id,
 	}
 }
 
-const mapDispatchToProps = (dispatch: Dispatch, props: IKeyboardProps) => {
-	return {
-		keyPressed: index => dispatch(virtualKeyPressed(props.ownerId, index)),
-		keyUp: index => dispatch(virtualKeyUp(props.ownerId, index)),
-		keyFlip: index => dispatch(virtualKeyFlip(props.ownerId, index)),
-	}
-}
-
-export const ConnectedKeyboard = connect(mapStateToProps, mapDispatchToProps)(Keyboard)
+export const ConnectedKeyboard = connect(mapStateToProps)(Keyboard)

@@ -5,6 +5,7 @@ import {ISimpleTrackState, simpleTrackReducer} from '../../common/redux/simple-t
 import {audioReducer, IAudioState} from './audio-redux'
 import {basicInstrumentsReducer, IBasicInstrumentsState} from './basic-instruments-redux'
 import {clientsReducer, IClient} from './clients-redux'
+import {connectionsReducer, IConnectionsState} from './connections-redux'
 import {localMiddleware} from './local-middleware'
 import {IOptionsState, optionsReducer} from './options-redux'
 import {trackPlayerMiddleware} from './track-player-middleware'
@@ -16,6 +17,7 @@ export interface IAppState {
 	audio: IAudioState
 	basicInstruments: IBasicInstrumentsState
 	clients: IClient[]
+	connections: IConnectionsState
 	options: IOptionsState
 	simpleTrack: ISimpleTrackState
 	virtualKeyboards: VirtualKeyboardsState
@@ -36,6 +38,7 @@ export function configureStore(initialState: IAppState | any = {}): Store {
 			audio: audioReducer,
 			basicInstruments: basicInstrumentsReducer,
 			clients: clientsReducer,
+			connections: connectionsReducer,
 			options: optionsReducer,
 			simpleTrack: simpleTrackReducer,
 			virtualKeyboards: virtualKeyboardsReducer,

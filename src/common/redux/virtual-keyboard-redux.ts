@@ -88,12 +88,14 @@ export interface VirtualKeyboardsState {
 export interface VirtualKeyboardState {
 	pressedKeys: IMidiNote[]
 	octave: Octave
+	id: string
 }
 
 const initialState: VirtualKeyboardsState = {
 	'track-1': {
 		octave: defaultOctave - 1,
 		pressedKeys: [],
+		id: 'track-123',
 	},
 }
 
@@ -170,19 +172,13 @@ export function virtualKeyboardsReducer(state: VirtualKeyboardsState = initialSt
 				},
 			}
 		case SET_CLIENTS:
-			action.clients.reduce((all, client) => {
-				all[client.id] = {
-					octave: client.octave,
-					pressedKeys: client.notes,
-				}
-				return all
-			}, {})
 			return {
 				...state,
 				...action.clients.reduce((all, client) => {
 					all[client.id] = {
 						octave: client.octave,
 						pressedKeys: client.notes,
+						id: state[client.id] ? state[client.id].id : -1,
 					}
 					return all
 				}, {}),
@@ -193,6 +189,7 @@ export function virtualKeyboardsReducer(state: VirtualKeyboardsState = initialSt
 				[action.id]: {
 					octave: defaultOctave,
 					pressedKeys: [],
+					id: action.id,
 				},
 			}
 		case CLIENT_DISCONNECTED:
@@ -233,4 +230,8 @@ export function selectMidiOutput(state: IAppState, ownerId: ClientId): IMidi {
 	return {
 		notes: virtualKeyboardState.pressedKeys.map(x => applyOctave(x, virtualKeyboardState.octave)),
 	}
+}
+
+export function selectKeyboardIdByOwnerId(state: IAppState, ownerId: ClientId) {
+	return state.virtualKeyboards[ownerId].id
 }
