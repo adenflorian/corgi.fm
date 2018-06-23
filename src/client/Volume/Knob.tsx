@@ -1,4 +1,3 @@
-import classnames from 'classnames'
 import 'rc-slider/assets/index.css'
 import React = require('react')
 import {Component} from 'react'
@@ -68,7 +67,9 @@ export class Knob extends Component<IKnobProps, IKnobState> {
 		const {value, label, min, max, readOnly, markColor} = this.props
 
 		return (
-			<div className={classnames(['knob', readOnly ? 'readOnly' : ''])}>
+			<div
+				className={`knob ${readOnly ? 'readOnly' : ''}`}
+			>
 				<div className="wedge">
 					<div
 						className="actualKnob"

@@ -1,4 +1,3 @@
-import classnames from 'classnames'
 import {Component} from 'react'
 import * as React from 'react'
 import {connect, Dispatch} from 'react-redux'
@@ -41,7 +40,7 @@ export class SimpleTrack extends Component<ISimpleTrackProps> {
 
 		return (
 			<div
-				className={classnames(['simpleTrack', isPlaying ? 'isPlaying saturate' : 'isNotPlaying'])}
+				className={`simpleTrack ${isPlaying ? 'isPlaying saturate' : 'isNotPlaying'}`}
 				style={{color}}
 			>
 				<div className="label transitionAllColor">track-1</div>
@@ -73,22 +72,14 @@ export class SimpleTrack extends Component<ISimpleTrackProps> {
 							return (
 								<div
 									key={index}
-									className={classnames([
-										'event',
-										isActiveIndex ? 'active' : 'transitionAllColor',
-									])}
+									className={`event ${isActiveIndex ? 'active' : 'transitionAllColor'}`}
 								>
 									{Array.apply(0, new Array(36)).map((_, i2) => {
 										const isEnabled = event.notes.some(x => x === i2)
 										return (
 											<div
 												key={i2}
-												className={classnames([
-													'note',
-													isEnabled ? 'on' : '',
-													isWhiteKey(i2) ? 'white' : 'black',
-													isEnabled && isActiveIndex ? 'active' : '',
-												])}
+												className={`note ${isEnabled ? 'on' : ''} ${isWhiteKey(i2) ? 'white' : 'black'}`}
 												onClick={() => setNote(index, !isEnabled, i2)}
 											/>
 										)

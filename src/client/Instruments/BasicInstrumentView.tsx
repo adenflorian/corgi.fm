@@ -1,4 +1,3 @@
-import classnames from 'classnames'
 import {Component} from 'react'
 import * as React from 'react'
 import {connect} from 'react-redux'
@@ -29,7 +28,7 @@ interface IBasicInstrumentViewProps {
 	isPlaying?: boolean
 	oscillatorType?: OscillatorType
 	dispatch?: Dispatch
-	instrumentId: string
+	instrumentId?: string
 }
 
 const oscillatorTypes = [
@@ -79,15 +78,13 @@ export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 
 		return (
 			<div
-				className={classnames([
-					'container',
-					'basicInstrument',
-					isPlaying ? 'isPlaying saturate' : 'isNotPlaying',
-				])}
+				className={`container basicInstrument ${isPlaying ? 'isPlaying saturate' : 'isNotPlaying'}`}
 				style={{color}}
 			>
 				<div className="isometricBoxShadow"></div>
-				<div className={classnames(['basicInstrument', isPlaying ? 'isPlaying' : 'isNotPlaying'])} >
+				<div
+					className="basicInstrument"
+				>
 					<div className="label colorize">basic instrument</div>
 
 					<Knob min={-1} max={1} value={pan} label="pan" readOnly={true} />

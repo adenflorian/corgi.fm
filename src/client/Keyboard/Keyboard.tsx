@@ -1,4 +1,3 @@
-import classnames from 'classnames'
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
@@ -69,11 +68,7 @@ export class Keyboard extends React.Component<IKeyboardProps> {
 		return (
 			<div
 				style={{color}}
-				className={classnames([
-					'keyboard',
-					isLocal ? 'isLocal' : '',
-					isPlaying === false ? 'isNotPlaying' : 'saturate',
-				])}
+				className={`keyboard ${isLocal ? 'isLocal' : ''} ${isPlaying ? 'saturate' : 'isNotPlaying'}`}
 			>
 				<div className="label clientId colorize">
 					{ownerId || '""'}
@@ -95,7 +90,7 @@ export class Keyboard extends React.Component<IKeyboardProps> {
 						return (
 							<div
 								key={index}
-								className={classnames(['key', value.color, isKeyPressed ? 'pressed' : 'notPressed'])}
+								className={`key ${value.color} ${isKeyPressed ? 'pressed' : 'notPressed'}`}
 								onMouseOver={e => this.handleMouseOver(e, index)}
 								onMouseOut={e => this.handleMouseOut(e, index)}
 								onMouseDown={e => this.handleMouseDown(e, index)}

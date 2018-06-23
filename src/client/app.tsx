@@ -1,4 +1,3 @@
-import classnames from 'classnames'
 import Color from 'color'
 import * as React from 'react'
 import {Fragment} from 'react'
@@ -79,11 +78,7 @@ class App extends React.Component<IAppProps, {}> {
 						return (
 							<Fragment key={client.id}>
 								<div
-									className={classnames(
-										'otherClient',
-										'board',
-										client.disconnecting ? 'disconnecting' : 'connected',
-									)}
+									className={`otherClient board ${client.disconnecting ? 'disconnecting' : 'connected'}`}
 								>
 									<ConnectedKeyboard ownerId={client.id} />
 								</div>
