@@ -70,24 +70,6 @@ export const virtualOctaveChange = makeBroadcaster((ownerId: ClientId, delta: nu
 	}
 })
 
-// TODO Delete
-export const INCREASE_VIRTUAL_OCTAVE = 'INCREASE_VIRTUAL_OCTAVE'
-export const increaseVirtualOctave = (ownerId: ClientId) => {
-	return {
-		type: INCREASE_VIRTUAL_OCTAVE,
-		ownerId,
-	}
-}
-
-// TODO Delete
-export const DECREASE_VIRTUAL_OCTAVE = 'DECREASE_VIRTUAL_OCTAVE'
-export const decreaseVirtualOctave = (ownerId: ClientId) => {
-	return {
-		type: DECREASE_VIRTUAL_OCTAVE,
-		ownerId,
-	}
-}
-
 export const SET_VIRTUAL_KEYS = 'SET_VIRTUAL_KEYS'
 export const setVirtualKeys = (ownerId: ClientId, keys: IMidiNote[]) => {
 	return {
@@ -177,22 +159,6 @@ export function virtualKeyboardsReducer(state: VirtualKeyboardsState = initialSt
 				[action.ownerId]: {
 					...state[action.ownerId],
 					octave: state[action.ownerId].octave + action.delta,
-				},
-			}
-		case INCREASE_VIRTUAL_OCTAVE:
-			return {
-				...state,
-				[action.ownerId]: {
-					...state[action.ownerId],
-					octave: state[action.ownerId].octave + 1,
-				},
-			}
-		case DECREASE_VIRTUAL_OCTAVE:
-			return {
-				...state,
-				[action.ownerId]: {
-					...state[action.ownerId],
-					octave: state[action.ownerId].octave - 1,
 				},
 			}
 		case NEW_CLIENT:

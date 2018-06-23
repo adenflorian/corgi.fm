@@ -3,8 +3,6 @@ import {WebSocketEvent} from '../../common/server-constants'
 import {CLIENT_DISCONNECTED, clientDisconnecting, selectLocalClient} from './clients-redux'
 import {IAppState} from './configureStore'
 import {
-	DECREASE_VIRTUAL_OCTAVE,
-	INCREASE_VIRTUAL_OCTAVE,
 	VIRTUAL_KEY_PRESSED,
 	VIRTUAL_KEY_UP,
 	VirtualKeyAction,
@@ -43,9 +41,6 @@ export const websocketSenderMiddleware = store => next => (action: ShamuAction) 
 		case VIRTUAL_KEY_PRESSED:
 		case VIRTUAL_KEY_UP:
 			return onVirtualKey(action as VirtualKeyAction, store, next, socket, selectLocalClient(state))
-		case INCREASE_VIRTUAL_OCTAVE:
-		case DECREASE_VIRTUAL_OCTAVE:
-			return onOctave(action, store, next, socket, selectLocalClient(state))
 		case CLIENT_DISCONNECTED:
 			store.dispatch(clientDisconnecting(action.id))
 
@@ -63,15 +58,5 @@ function onVirtualKey(action: VirtualKeyAction, store, next, socket, myClientId)
 	if (action.ownerId === myClientId.id) {
 		const state: IAppState = store.getState()
 		socket.emit('notes', {notes: state.virtualKeyboards[action.ownerId].pressedKeys})
-	}
-}
-
-function onOctave(action, store, next, socket, myClientId) {
-	next(action)
-	if (action.ownerId === myClientId.id) {
-		const state: IAppState = store.getState()
-		if (action.ownerId === state.websocket.myClientId) {
-			socket.emit('octave', {octave: state.virtualKeyboards[action.ownerId].octave})
-		}
 	}
 }
