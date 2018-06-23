@@ -7,18 +7,19 @@
 - [√] figure out how to share code between client and server
 - [√] four note track, only one possible note and length
 - [√] allow two different notes at once
-- [ ] setup redux for server
-- [ ] have server keep track of play status and location
+- [√] setup redux for server
+- [...] have server keep track of play status and location
 - [ ] need way to bypass virtual keyboard
 - [ ] fine grained note start times and lengths
 - [ ] don't unnecessarily change osc freq when diff notes are set
 - [ ] make it so you have to click on keyboard first for the hold and play to work
-- [ ] visual for instrument
-- [ ] visual for master volume amp thing
+- [√] visual for instrument
+- [√] visual for master volume amp thing
 - [ ] midi timeline thing
 - [ ] maybe use automerge? https://github.com/automerge/automerge
 - [ ] options view
 - [ ] maybe use requestAnimationFrame()
+- [ ] store index of simpleTrack on server for new clients
 
 
 # References
