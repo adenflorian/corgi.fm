@@ -23,15 +23,12 @@ export type MidiNotes = IMidiNote[]
 
 interface IBasicInstrumentViewProps {
 	color?: string
-	brightColor?: string
 	rawMidiNotes?: MidiNotes
 	ownerId: ClientId
 	pan?: number
 	isPlaying?: boolean
 	oscillatorType?: OscillatorType
-	createBasicInstrument?: () => any
-	changeOscillatorType: (ownerId, type) => any
-	dispatch: Dispatch
+	dispatch?: Dispatch
 }
 
 const oscillatorTypes = [
@@ -45,7 +42,6 @@ export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 		pan: 0,
 		rawMidiNotes: [],
 		color: 'gray',
-		brightColor: 'lightgray',
 	}
 
 	private instrument: BasicInstrument
@@ -66,7 +62,6 @@ export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 
 	public shouldComponentUpdate(nextProps) {
 		if (this.props.color !== nextProps.color) return true
-		if (this.props.brightColor !== nextProps.brightColor) return true
 		if (this.props.rawMidiNotes.length !== nextProps.rawMidiNotes.length) return true
 		if (this.props.rawMidiNotes.toString() !== nextProps.rawMidiNotes.toString()) return true
 		if (this.props.ownerId !== nextProps.ownerId) return true
@@ -77,15 +72,23 @@ export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 	}
 
 	public render() {
-		const {color, brightColor, isPlaying, pan, rawMidiNotes, oscillatorType} = this.props
+		const {color, isPlaying, pan, rawMidiNotes, oscillatorType} = this.props
 
 		this.instrument.setMidiNotes(rawMidiNotes)
 		this.instrument.setOscillatorType(oscillatorType)
 
 		return (
-			<div className="isometricBoxShadow" style={{color: isPlaying ? brightColor : color}}>
+			<div
+				className={classnames([
+					'container',
+					'basicInstrument',
+					isPlaying ? 'isPlaying saturate' : 'isNotPlaying',
+				])}
+				style={{color}}
+			>
+				<div className="isometricBoxShadow"></div>
 				<div className={classnames(['basicInstrument', isPlaying ? 'isPlaying' : 'isNotPlaying'])} >
-					<div className="label">basic instrument</div>
+					<div className="label colorize">basic instrument</div>
 
 					<Knob min={-1} max={1} value={pan} label="pan" readOnly={true} />
 
@@ -123,7 +126,7 @@ class BasicInstrumentOscillatorTypes extends Component<IBasicInstrumentOscillato
 					<div key={type} onClick={handleClick.bind(undefined, type)}>
 						<ReactSVG
 							path={svgPath}
-							className={activeType === type ? 'active' : undefined}
+							className={activeType === type ? 'active colorize' : undefined}
 						/>
 					</div>,
 				)}

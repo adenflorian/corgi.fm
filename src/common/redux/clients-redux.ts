@@ -35,7 +35,6 @@ export interface IClient {
 	id: string,
 	notes: IMidiNote[]
 	color: string
-	brightColor: string
 }
 
 export class Client implements IClient {
@@ -45,20 +44,17 @@ export class Client implements IClient {
 
 	public readonly id
 	public readonly color
-	public readonly brightColor
 	public notes
 
 	constructor(id: ClientId) {
 		this.id = id
 		this.color = Color(hashbow(this.id)).desaturate(0.2).hsl().string()
-		this.brightColor = Color(hashbow(this.id)).saturate(0.6).hsl().string()
 	}
 }
 
 export class DummyClient implements IClient {
 	public id
 	public color
-	public brightColor
 	public notes
 }
 

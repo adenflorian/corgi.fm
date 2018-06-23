@@ -20,18 +20,9 @@ interface IAppProps {
 	info: string
 }
 
-const ClientId = ({id, color}) => {
-	return (
-		<div className="clientId" style={{color}}>
-			{id || '""'}
-		</div>
-	)
-}
-
 const TRACK_1 = 'track-1'
-const TRACK_1_BASE_COLOR = '#40bf42'
+const TRACK_1_BASE_COLOR = '#4077bf'
 const TRACK_1_COLOR = Color(TRACK_1_BASE_COLOR).desaturate(0.4).hsl().string()
-const TRACK_1_COLOR_BRIGHT = Color(TRACK_1_BASE_COLOR).saturate(0.6).hsl().string()
 
 class App extends React.Component<IAppProps, {}> {
 	public static defaultProps = {
@@ -61,29 +52,25 @@ class App extends React.Component<IAppProps, {}> {
 						<ConnectedVolumeControl color={TRACK_1_COLOR} />
 					</div>
 					<div className="board connected">
-						<ConnectedSimpleTrack color={TRACK_1_COLOR} brightColor={TRACK_1_COLOR_BRIGHT} />
+						<ConnectedSimpleTrack color={TRACK_1_COLOR} />
 					</div>
 					<div id="track-1" className="board connected">
-						<ClientId id={TRACK_1} color={TRACK_1_COLOR} />
-						<ConnectedKeyboard ownerId={TRACK_1} color={TRACK_1_COLOR} brightColor={TRACK_1_COLOR_BRIGHT} />
+						<ConnectedKeyboard ownerId={TRACK_1} color={TRACK_1_COLOR} />
 					</div>
 					<div className="board">
 						<ConnectedBasicInstrumentView
 							ownerId={TRACK_1}
 							color={TRACK_1_COLOR}
-							brightColor={TRACK_1_COLOR_BRIGHT}
 							pan={0}
 						/>
 					</div>
 					<div id="you" className="board connected">
-						<ClientId id={myClient.id} color={myClient.color} />
 						<ConnectedKeyboard ownerId={myClient.id} myKeyboard={true} />
 					</div>
 					<div className="board">
 						<ConnectedBasicInstrumentView
 							ownerId={myClient.id}
 							color={myClient.color}
-							brightColor={myClient.brightColor}
 							pan={-0.5}
 						/>
 					</div>
@@ -98,14 +85,12 @@ class App extends React.Component<IAppProps, {}> {
 										client.disconnecting ? 'disconnecting' : 'connected',
 									)}
 								>
-									<ClientId id={client.id} color={client.color} />
 									<ConnectedKeyboard ownerId={client.id} />
 								</div>
 								<div className="board">
 									<ConnectedBasicInstrumentView
 										ownerId={client.id}
 										color={client.color}
-										brightColor={client.brightColor}
 										pan={0.5}
 									/>
 								</div>

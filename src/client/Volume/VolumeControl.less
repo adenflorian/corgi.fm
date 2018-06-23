@@ -1,10 +1,9 @@
 @import '../colors.less';
 .volume {
-    display: inline-flex;
     justify-content: center;
     align-items: center;
-    background-color: @panelGray; // max-width: 256px;
-    &>* {
+    .label,
+    .knob {
         margin: 8px 0;
         margin-left: 16px;
         &:last-child {

@@ -1,15 +1,12 @@
 @import "../colors.less";
 .keyboard {
     display: inline-flex;
-    background-color: @keyWhite;
-    letter-spacing: normal;
-    height: 64px;
+    flex-direction: column;
     &.isNotPlaying {
         transition: box-shadow 0.3s ease-out;
     }
     .white {
         background-color: @keyWhite;
-        color: #31313d;
     }
     .white+.white {
         // border-left: 1px solid @frenchGray;
@@ -17,7 +14,6 @@
     }
     .black {
         background-color: @panelGray;
-        color: rgba(235, 235, 246, 0.925);
     }
     &.isLocal {
         .white:hover {
@@ -28,12 +24,24 @@
         }
     }
     .key {
+        letter-spacing: normal;
         width: 32px;
         display: inline-flex;
         flex-direction: column;
         justify-content: space-between;
+        height: 64px;
+        &.pressed {
+            background-color: currentColor;
+            filter: saturate(200%)
+        }
         &.notPressed {
             transition: background-color 0.3s ease-out;
+        }
+        &.white .noteName {
+            color: #31313d;
+        }
+        &.black .noteName {
+            color: rgba(235, 235, 246, 0.925);
         }
     }
     .octave {

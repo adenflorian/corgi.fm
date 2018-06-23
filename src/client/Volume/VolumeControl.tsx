@@ -27,7 +27,8 @@ export class VolumeControl extends Component<IVolumeControlProps> {
 		const newColor = Color(color).saturate(reportedMasterVolume / 25).hsl().string()
 
 		return (
-			<div className="volume isometricBoxShadow" style={{color: newColor}}>
+			<div className="volume container" style={{color: newColor}}>
+				<div className="isometricBoxShadow"></div>
 				<div className="label">master volume</div>
 				<Knob
 					value={this.props.masterVolume}

@@ -43,7 +43,6 @@ interface IKeyboardProps {
 	octave?: Octave
 	virtualMidiKeyboard: any
 	color: string
-	brightColor: string
 	keyPressed: (index: number) => void
 	keyUp: (index: number) => void
 	keyFlip: (index: number) => void
@@ -64,54 +63,58 @@ export class Keyboard extends React.Component<IKeyboardProps> {
 	}
 
 	public render() {
-		const {pressedMidiKeys, octave, color, brightColor, isPlaying,
+		const {ownerId, pressedMidiKeys, octave, color, isPlaying,
 			virtualMidiKeyboard, isLocal, showNoteNames} = this.props
 
 		return (
 			<div
+				style={{color}}
 				className={classnames([
 					'keyboard',
-					'isometricBoxShadow',
 					isLocal ? 'isLocal' : '',
-					isPlaying === false ? 'isNotPlaying' : '',
+					isPlaying === false ? 'isNotPlaying' : 'saturate',
 				])}
-				style={{color: isPlaying ? brightColor : color}}
 			>
-				<div className="octave black unselectable">
-					<div className="octaveNumber">
-						{octave}
-					</div>
-					{isLocal &&
-						<div className="octaveKeys smallText">
-							<span>z</span><span>x</span>
-						</div>
-					}
+				<div className="label clientId colorize">
+					{ownerId || '""'}
 				</div>
-				{virtualMidiKeyboard.map((value, index) => {
-					const isKeyPressed = pressedMidiKeys.some(x => x === index)
-					return (
-						<div
-							key={index}
-							className={classnames(['key', value.color, isKeyPressed ? 'pressed' : 'notPressed'])}
-							style={{backgroundColor: isKeyPressed ? brightColor : ''}}
-							onMouseOver={e => this.handleMouseOver(e, index)}
-							onMouseOut={e => this.handleMouseOut(e, index)}
-							onMouseDown={e => this.handleMouseDown(e, index)}
-							onMouseUp={e => this.handleMouseUp(e, index)}
-						>
-							<div className="noteName unselectable">
-								{showNoteNames &&
-									value.name
+				<div className="container">
+					<div className="isometricBoxShadow"></div>
+					<div className="octave black unselectable">
+						<div className="octaveNumber">
+							{octave}
+						</div>
+						{isLocal &&
+							<div className="octaveKeys smallText">
+								<span>z</span><span>x</span>
+							</div>
+						}
+					</div>
+					{virtualMidiKeyboard.map((value, index) => {
+						const isKeyPressed = pressedMidiKeys.some(x => x === index)
+						return (
+							<div
+								key={index}
+								className={classnames(['key', value.color, isKeyPressed ? 'pressed' : 'notPressed'])}
+								onMouseOver={e => this.handleMouseOver(e, index)}
+								onMouseOut={e => this.handleMouseOut(e, index)}
+								onMouseDown={e => this.handleMouseDown(e, index)}
+								onMouseUp={e => this.handleMouseUp(e, index)}
+							>
+								<div className="noteName unselectable">
+									{showNoteNames &&
+										value.name
+									}
+								</div>
+								{isLocal &&
+									<div className="unselectable smallText">
+										{value.keyName}
+									</div>
 								}
 							</div>
-							{isLocal &&
-								<div className="unselectable smallText">
-									{value.keyName}
-								</div>
-							}
-						</div>
-					)
-				})}
+						)
+					})}
+				</div>
 			</div>
 		)
 	}
@@ -167,7 +170,6 @@ const mapStateToProps = (state: IAppState, props) => {
 		octave: virtualKeyboard && virtualKeyboard.octave,
 		virtualMidiKeyboard: globalVirtualMidiKeyboard,
 		color: props.color || (owner && owner.color),
-		brightColor: props.brightColor || (owner && owner.brightColor),
 		isLocal: state.websocket.myClientId === props.ownerId,
 		showNoteNames: state.options.showNoteNamesOnKeyboard,
 		isPlaying: pressedMidiKeys.length > 0,

@@ -28,23 +28,25 @@ interface ISimpleTrackProps {
 	activeIndex: number
 	isPlaying?: boolean
 	color?: string
-	brightColor?: string
 }
 
 export class SimpleTrack extends Component<ISimpleTrackProps> {
 	public static defaultProps = {
 		events: Array.apply({enabled: false, notes: []}, new Array(8)),
 		color: 'gray',
-		brightColor: 'lightgray',
 	}
 
 	public render() {
-		const {color, brightColor, events, setNote, play, stop, restart, activeIndex, isPlaying} = this.props
+		const {color, events, setNote, play, stop, restart, activeIndex, isPlaying} = this.props
 
 		return (
-			<div className={classnames(['simpleTrack', isPlaying ? 'isPlaying' : 'isNotPlaying'])}>
-				<div className="label">track-1</div>
-				<div className="container isometricBoxShadow" style={{color: isPlaying ? brightColor : color}}>
+			<div
+				className={classnames(['simpleTrack', isPlaying ? 'isPlaying saturate' : 'isNotPlaying'])}
+				style={{color}}
+			>
+				<div className="label transitionAllColor">track-1</div>
+				<div className="container">
+					<div className="isometricBoxShadow"></div>
 					<div className="controls unselectable">
 						<div
 							className="play colorTransition"

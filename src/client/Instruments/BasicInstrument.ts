@@ -32,7 +32,7 @@ export class BasicInstrument {
 		this._lfo = audioContext.createOscillator()
 		this._lfo.frequency.value = 2
 		const lfoGain = audioContext.createGain()
-		lfoGain.gain.value = 0.14
+		lfoGain.gain.value = 0.05
 
 		this._lfo.start()
 

@@ -5,9 +5,13 @@
     flex-direction: column;
     .label {
         margin-bottom: 4px;
-        color: @green;
+        color: currentColor;
+        .isPlaying& {
+            filter: saturate(200%);
+        }
     }
     .container {
+        position: relative;
         display: flex;
         background-color: @panelGray;
         max-width: 512px;
@@ -22,6 +26,7 @@
             justify-content: space-around;
             letter-spacing: 0;
             font-size: 24px;
+            color: @defaultGray;
             .play {
                 &:hover,
                 .isPlaying& {
@@ -54,16 +59,21 @@
             max-width: 416px;
             .event {
                 width: 80px;
-                height: 256px;
-                border: 1px solid @borderGray;
-                margin: 8px;
+                height: 256px; // border: 1px solid @borderGray;
+                margin: 0px 0;
                 display: flex;
                 flex-direction: column-reverse;
                 &:first-child {
                     margin-left: 0;
                 }
                 &.active {
-                    border-color: @green;
+                    filter: brightness(120%)
+                }
+                &.active:nth-child(odd) {
+                    filter: brightness(120%)
+                }
+                &:nth-child(odd) {
+                    filter: brightness(110%)
                 }
                 .note {
                     height: 100%;
@@ -74,18 +84,19 @@
                         background-color: @panelGray;
                     }
                     &:hover {
-                        background-color: rgb(51, 80, 52);
+                        background-color: currentColor;
+                        filter: brightness(60%)
                     }
                     &.on {
-                        background-color: rgb(64, 191, 66);
-                    }
-                    &.on:hover {
-                        background-color: rgb(81, 158, 83);
+                        background-color: currentColor;
+                        &:hover {
+                            filter: saturate(200%)
+                        }
                     }
                     &:active,
                     &.on:active,
                     &.active {
-                        background-color: rgb(54, 209, 62);
+                        filter: saturate(200%)
                     }
                 }
             }

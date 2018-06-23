@@ -1,20 +1,19 @@
 @import "../colors.less";
 .basicInstrument {
     display: inline-flex;
-    background-color: @panelGray;
     align-items: center;
     &.isNotPlaying {
         transition: box-shadow 0.3s ease-out;
     }
-    &>* {
+    .label,
+    .knob,
+    .oscillatorTypes {
         margin: 8px 0;
         margin-left: 16px;
-        &:last-child {
-            margin-right: 16px;
-        }
     }
     .oscillatorTypes {
         display: flex;
+        margin-right: 16px;
         svg {
             margin: 8px;
             display: flex;
