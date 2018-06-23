@@ -1,6 +1,6 @@
 import {Store} from 'redux'
 import Reverb from 'soundbank-reverb'
-import {reportLevels, setAudioContext, setPreFx} from '../common/redux/audio-redux'
+import {reportLevels} from '../common/redux/audio-redux'
 import {IAppState} from '../common/redux/configureStore'
 
 declare global {
@@ -99,7 +99,4 @@ export function setupAudioContext(store: Store) {
 		}
 		previousMasterVolume = newVolume
 	})
-
-	store.dispatch(setAudioContext(audioContext))
-	store.dispatch(setPreFx(preFx))
 }

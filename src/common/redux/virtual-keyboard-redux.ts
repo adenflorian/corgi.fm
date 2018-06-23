@@ -6,6 +6,7 @@ import {addIfNew} from '../../common/server-common'
 import {IMidiNote} from '../MidiNote'
 import {CLIENT_DISCONNECTED, NEW_CLIENT, SET_CLIENTS} from './clients-redux'
 import {IAppState} from './configureStore'
+import {makeBroadcaster} from './redux-utils'
 import {SET_MY_CLIENT_ID} from './websocket-redux'
 
 export interface VirtualKeyAction {
@@ -61,14 +62,15 @@ export const virtualOctave = (ownerId: ClientId, octave: Octave) => {
 }
 
 export const VIRTUAL_OCTAVE_CHANGE = 'VIRTUAL_OCTAVE_CHANGE'
-export const virtualOctaveChange = (ownerId: ClientId, delta: number) => {
+export const virtualOctaveChange = makeBroadcaster((ownerId: ClientId, delta: number) => {
 	return {
 		type: VIRTUAL_OCTAVE_CHANGE,
 		ownerId,
 		delta,
 	}
-}
+})
 
+// TODO Delete
 export const INCREASE_VIRTUAL_OCTAVE = 'INCREASE_VIRTUAL_OCTAVE'
 export const increaseVirtualOctave = (ownerId: ClientId) => {
 	return {
@@ -77,6 +79,7 @@ export const increaseVirtualOctave = (ownerId: ClientId) => {
 	}
 }
 
+// TODO Delete
 export const DECREASE_VIRTUAL_OCTAVE = 'DECREASE_VIRTUAL_OCTAVE'
 export const decreaseVirtualOctave = (ownerId: ClientId) => {
 	return {

@@ -6,7 +6,7 @@ import ReactSVG from 'react-svg'
 import {Dispatch} from 'redux'
 import {IMidiNote} from '../../common/MidiNote'
 import {
-	createBasicInstrument, selectInstrumentByOwner, setBasicInstrumentOscillatorType,
+	selectInstrumentByOwner, setBasicInstrumentOscillatorType,
 } from '../../common/redux/basic-instruments-redux'
 import {IAppState} from '../../common/redux/configureStore'
 import {makeGetMidiOutputByOwner} from '../../common/redux/virtual-keyboard-redux'
@@ -29,6 +29,7 @@ interface IBasicInstrumentViewProps {
 	isPlaying?: boolean
 	oscillatorType?: OscillatorType
 	dispatch?: Dispatch
+	instrumentId: string
 }
 
 const oscillatorTypes = [
@@ -48,7 +49,6 @@ export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 
 	constructor(props) {
 		super(props)
-		props.dispatch(createBasicInstrument(props.ownerId))
 		this.instrument = new BasicInstrument({
 			audioContext,
 			destination: preFx,
@@ -102,7 +102,7 @@ export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 	}
 
 	private _handleOscillatorTypeClicked = (type: OscillatorType) => {
-		this.props.dispatch(setBasicInstrumentOscillatorType(this.props.ownerId, type))
+		this.props.dispatch(setBasicInstrumentOscillatorType(this.props.instrumentId, type))
 	}
 }
 
@@ -146,6 +146,7 @@ const makeMapStateToProps = () => {
 			rawMidiNotes,
 			isPlaying: rawMidiNotes.length > 0,
 			oscillatorType: instrumentState && instrumentState.oscillatorType,
+			instrumentId: instrumentState && instrumentState.id,
 		}
 	}
 }
