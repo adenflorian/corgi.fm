@@ -9,7 +9,6 @@ import {
 } from './virtual-keyboard-redux'
 
 export interface ShamuAction extends AnyAction {
-	isRemote?: boolean
 	shouldBroadcast?: boolean
 	alreadyBroadcasted?: boolean
 	dispatchOnServer?: boolean
@@ -25,14 +24,12 @@ export const websocketSenderMiddleware = store => next => (action: ShamuAction) 
 	const state: IAppState = store.getState()
 	const socket = state.websocket.socket
 
-	if (action.isRemote) {
-		return next(action)
-	}
+	action.source = socket && socket.id
 
 	if (action.shouldBroadcast && !action.alreadyBroadcasted) {
 		socket.emit(WebSocketEvent.broadcast, action)
 		return next(action)
-	} else if (action.dispatchOnServer) {
+	} else if (action.dispatchOnServer && !action.alreadyBroadcasted) {
 		socket.emit(WebSocketEvent.serverAction, action)
 		return next(action)
 	}

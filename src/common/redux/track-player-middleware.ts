@@ -1,17 +1,17 @@
 import {audioContext} from '../../client/setup-audio-context'
 import {ISimpleTrackEvent, SimpleTrackEventAction, SimpleTrackPlayer} from '../../client/SimpleTrackPlayer'
 import {IAppState} from './configureStore'
-import {makeActionCreator, makeBroadcaster} from './redux-utils'
+import {makeActionCreator, makeBroadcaster, makeServerAction} from './redux-utils'
 import {ISimpleTrackNote, selectSimpleTrackEvents} from './simple-track-redux'
 
 export const PLAY_SIMPLE_TRACK = 'PLAY_SIMPLE_TRACK'
-export const playSimpleTrack = makeBroadcaster(makeActionCreator(PLAY_SIMPLE_TRACK))
+export const playSimpleTrack = makeServerAction(makeBroadcaster(makeActionCreator(PLAY_SIMPLE_TRACK)))
 
 export const STOP_SIMPLE_TRACK = 'STOP_SIMPLE_TRACK'
-export const stopSimpleTrack = makeBroadcaster(makeActionCreator(STOP_SIMPLE_TRACK))
+export const stopSimpleTrack = makeServerAction(makeBroadcaster(makeActionCreator(STOP_SIMPLE_TRACK)))
 
 export const TOGGLE_PLAY_SIMPLE_TRACK = 'TOGGLE_PLAY_SIMPLE_TRACK'
-export const togglePlaySimpleTrack = makeBroadcaster(makeActionCreator(TOGGLE_PLAY_SIMPLE_TRACK))
+export const togglePlaySimpleTrack = makeActionCreator(TOGGLE_PLAY_SIMPLE_TRACK)
 
 export const RESTART_SIMPLE_TRACK = 'RESTART_SIMPLE_TRACK'
 export const restartSimpleTrack = makeBroadcaster(makeActionCreator(RESTART_SIMPLE_TRACK))

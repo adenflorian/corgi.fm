@@ -45,8 +45,8 @@ export function configureStore(initialState: IAppState | any = {}): Store {
 		composeEnhancers(
 			applyMiddleware(
 				localMiddleware,
-				websocketSenderMiddleware,
 				trackPlayerMiddleware,
+				websocketSenderMiddleware,
 			),
 			persistState('options'),
 		),

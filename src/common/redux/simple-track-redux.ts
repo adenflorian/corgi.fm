@@ -106,3 +106,7 @@ export function selectSimpleTrackEvents(state: IAppState) {
 export function selectSimpleTrackIndex(state: IAppState) {
 	return state.simpleTrack.index
 }
+
+export function selectSimpleTrackIsPlaying(state: IAppState) {
+	return state.simpleTrack.isPlaying
+}

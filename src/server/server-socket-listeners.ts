@@ -5,7 +5,10 @@ import {
 	addBasicInstrument, BasicInstrumentState, selectAllInstruments, updateBasicInstruments,
 } from '../common/redux/basic-instruments-redux'
 import {IAppState} from '../common/redux/configureStore'
-import {selectSimpleTrackEvents, setSimpleTrackEvents} from '../common/redux/simple-track-redux'
+import {
+	selectSimpleTrackEvents, selectSimpleTrackIsPlaying, setSimpleTrackEvents,
+} from '../common/redux/simple-track-redux'
+import {playSimpleTrack} from '../common/redux/track-player-middleware'
 import {BroadcastAction} from '../common/redux/websocket-sender-middleware'
 import {WebSocketEvent} from '../common/server-constants'
 import {Clients} from './Clients'
@@ -23,7 +26,7 @@ export function setupServerWebSocketListeners(io: Server, store: Store) {
 		syncState(socket, store)
 		const newInstrument = new BasicInstrumentState(socket.id)
 		store.dispatch(addBasicInstrument(newInstrument))
-		io.local.emit(WebSocketEvent.broadcast, addBasicInstrument(newInstrument))
+		io.local.emit(WebSocketEvent.broadcast, {...addBasicInstrument(newInstrument), source: 'server'})
 
 		socket.on('notes', notesPayload => {
 			logger.debug(`notes: ${socket.id} | `, notesPayload)
@@ -86,10 +89,20 @@ function syncState(newClientSocket: Socket, store: Store) {
 	newClientSocket.emit(WebSocketEvent.broadcast, {
 		...setSimpleTrackEvents(selectSimpleTrackEvents(state)),
 		alreadyBroadcasted: true,
+		source: 'server',
 	})
+
+	if (selectSimpleTrackIsPlaying(state)) {
+		newClientSocket.emit(WebSocketEvent.broadcast, {
+			...playSimpleTrack(),
+			alreadyBroadcasted: true,
+			source: 'server',
+		})
+	}
 
 	newClientSocket.emit(WebSocketEvent.broadcast, {
 		...updateBasicInstruments(selectAllInstruments(state)),
 		alreadyBroadcasted: true,
+		source: 'server',
 	})
 }
