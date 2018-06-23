@@ -1,6 +1,6 @@
 import {AnyAction} from 'redux'
 import {WebSocketEvent} from '../../common/server-constants'
-import {CLIENT_DISCONNECTED, clientDisconnecting, selectOwner} from './clients-redux'
+import {CLIENT_DISCONNECTED, clientDisconnecting, selectLocalClient} from './clients-redux'
 import {IAppState} from './configureStore'
 import {
 	DECREASE_VIRTUAL_OCTAVE,
@@ -42,10 +42,10 @@ export const websocketSenderMiddleware = store => next => (action: ShamuAction) 
 	switch (action.type) {
 		case VIRTUAL_KEY_PRESSED:
 		case VIRTUAL_KEY_UP:
-			return onVirtualKey(action as VirtualKeyAction, store, next, socket, selectOwner(state))
+			return onVirtualKey(action as VirtualKeyAction, store, next, socket, selectLocalClient(state))
 		case INCREASE_VIRTUAL_OCTAVE:
 		case DECREASE_VIRTUAL_OCTAVE:
-			return onOctave(action, store, next, socket, selectOwner(state))
+			return onOctave(action, store, next, socket, selectLocalClient(state))
 		case CLIENT_DISCONNECTED:
 			store.dispatch(clientDisconnecting(action.id))
 

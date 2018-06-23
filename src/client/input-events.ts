@@ -1,12 +1,38 @@
 import {AnyAction, Store} from 'redux'
-import {IAppState} from '../common/redux/configureStore'
+import {localMidiKeyPress, localMidiKeyUp, localMidiOctaveChange} from '../common/redux/local-middleware'
 import {togglePlaySimpleTrack} from '../common/redux/track-player-middleware'
-import {
-	decreaseVirtualOctave,
-	increaseVirtualOctave,
-	virtualKeyPressed,
-	virtualKeyUp,
-} from '../common/redux/virtual-keyboard-redux'
+
+interface KeyBoardShortcuts {
+	[key: string]: KeyBoardShortcut
+}
+
+interface KeyBoardShortcut {
+	actionOnKeyDown?: AnyAction | keyboardActionCreator
+	actionOnKeyUp?: AnyAction | keyboardActionCreator
+	actionOnKeyPress?: AnyAction | keyboardActionCreator
+	allowRepeat: boolean
+	preventDefault: boolean
+}
+
+type keyboardActionCreator = (e: KeyboardEvent) => AnyAction
+
+const keyboardShortcuts: KeyBoardShortcuts = {
+	' ': {
+		actionOnKeyDown: togglePlaySimpleTrack(),
+		allowRepeat: false,
+		preventDefault: true,
+	},
+	'z': {
+		actionOnKeyDown: (e: KeyboardEvent) => localMidiOctaveChange(e.shiftKey ? -2 : -1),
+		allowRepeat: true,
+		preventDefault: true,
+	},
+	'x': {
+		actionOnKeyDown: (e: KeyboardEvent) => localMidiOctaveChange(e.shiftKey ? 2 : 1),
+		allowRepeat: true,
+		preventDefault: true,
+	},
+}
 
 export const keyToMidiMap = {
 	'a': 0,
@@ -28,67 +54,55 @@ export const keyToMidiMap = {
 	';': 16,
 }
 
-interface KeyBoardShortcuts {
-	[key: string]: {
-		action: AnyAction,
-		allowRepeat: boolean,
-		preventDefault: boolean,
-	},
-}
-
-const keyboardShortcuts: KeyBoardShortcuts = {
-	' ': {
-		action: togglePlaySimpleTrack(),
+Object.keys(keyToMidiMap).forEach(key => {
+	keyboardShortcuts[key] = {
+		actionOnKeyDown: localMidiKeyPress(keyToMidiMap[key]),
+		actionOnKeyUp: localMidiKeyUp(keyToMidiMap[key]),
 		allowRepeat: false,
 		preventDefault: true,
-	},
-}
+	}
+})
 
 export function setupInputEventListeners(window: Window, store: Store) {
 	window.addEventListener('keydown', e => {
-		onKeyDown(e.key.toLowerCase(), e.repeat, e)
+		foo(e)
 	})
 
 	window.addEventListener('keyup', e => {
-		onKeyUp(e.key.toLowerCase())
+		foo(e)
 	})
 
-	function onKeyDown(keyName, isRepeat: boolean, event: Event) {
-		const keyboardShortcut = keyboardShortcuts[keyName]
+	window.addEventListener('keypress', e => {
+		foo(e)
+	})
 
-		if (keyboardShortcut && keyboardShortcut.allowRepeat === isRepeat) {
-			store.dispatch(keyboardShortcut.action)
-			if (keyboardShortcut.preventDefault) {
-				event.preventDefault()
-			}
+	function foo(event: KeyboardEvent) {
+		const keyboardShortcut = keyboardShortcuts[event.key.toLowerCase()]
+
+		if (!keyboardShortcut) return
+		if (event.repeat && keyboardShortcut.allowRepeat === false) return
+
+		const actionPropToUse = getPropNameForEventType(event.type)
+		const action = keyboardShortcut[actionPropToUse]
+
+		if (!action) return
+
+		if (typeof action === 'function') {
+			store.dispatch(action(event))
 		} else {
-			const state: IAppState = store.getState()
-			const myClientId = state.websocket.myClientId
-
-			if (isMidiKey(keyName) && !isRepeat) {
-				const midiKeyNumber = keyToMidiMap[keyName]
-				store.dispatch(virtualKeyPressed(myClientId, midiKeyNumber))
-			} else {
-				switch (keyName) {
-					case 'x': return store.dispatch(increaseVirtualOctave(myClientId))
-					case 'z': return store.dispatch(decreaseVirtualOctave(myClientId))
-					default: return
-				}
-			}
+			store.dispatch(action)
 		}
-	}
 
-	function onKeyUp(keyName) {
-		if (isMidiKey(keyName) === false) return
-
-		const midiKeyNumber = keyToMidiMap[keyName]
-
-		const state: IAppState = store.getState()
-
-		store.dispatch(virtualKeyUp(state.websocket.myClientId, midiKeyNumber))
+		if (keyboardShortcut.preventDefault) {
+			event.preventDefault()
+		}
 	}
 }
 
-export function isMidiKey(keyName: string) {
-	return Object.keys(keyToMidiMap).some(x => x === keyName.toLowerCase())
+function getPropNameForEventType(eventType: string) {
+	switch (eventType) {
+		case 'keydown': return 'actionOnKeyDown'
+		case 'keyup': return 'actionOnKeyUp'
+		case 'keypress': return 'actionOnKeyPress'
+	}
 }

@@ -30,3 +30,5 @@ export function websocketReducer(state: IWebsocketState = {info: '_'}, action): 
 			return state
 	}
 }
+
+export const selectLocalClientId = state => state.websocket.myClientId

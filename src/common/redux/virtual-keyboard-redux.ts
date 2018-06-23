@@ -60,6 +60,15 @@ export const virtualOctave = (ownerId: ClientId, octave: Octave) => {
 	}
 }
 
+export const VIRTUAL_OCTAVE_CHANGE = 'VIRTUAL_OCTAVE_CHANGE'
+export const virtualOctaveChange = (ownerId: ClientId, delta: number) => {
+	return {
+		type: VIRTUAL_OCTAVE_CHANGE,
+		ownerId,
+		delta,
+	}
+}
+
 export const INCREASE_VIRTUAL_OCTAVE = 'INCREASE_VIRTUAL_OCTAVE'
 export const increaseVirtualOctave = (ownerId: ClientId) => {
 	return {
@@ -157,6 +166,14 @@ export function virtualKeyboardsReducer(state: VirtualKeyboardsState = initialSt
 				[action.ownerId]: {
 					...state[action.ownerId],
 					octave: action.octave,
+				},
+			}
+		case VIRTUAL_OCTAVE_CHANGE:
+			return {
+				...state,
+				[action.ownerId]: {
+					...state[action.ownerId],
+					octave: state[action.ownerId].octave + action.delta,
 				},
 			}
 		case INCREASE_VIRTUAL_OCTAVE:

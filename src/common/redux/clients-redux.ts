@@ -1,8 +1,9 @@
 import Color from 'color'
+import {createSelector} from 'reselect'
 import {hashbow} from '../../client/utils'
 import {ClientId} from '../../client/websocket-listeners'
 import {IMidiNote} from '../MidiNote'
-import {IAppState} from './configureStore'
+import {selectLocalClientId} from './websocket-redux'
 
 export const SET_CLIENTS = 'SET_CLIENTS'
 export const NEW_CLIENT = 'NEW_CLIENT'
@@ -89,6 +90,9 @@ export function clientsReducer(state: IClientsState = [], action) {
 	}
 }
 
-export function selectOwner(state: IAppState) {
-	return state.clients.find(x => x.id === state.websocket.myClientId) || new DummyClient()
-}
+export const selectAllClients = state => state.clients
+
+export const selectLocalClient = createSelector(
+	[selectAllClients, selectLocalClientId],
+	(clients, localClientId) => clients.find(x => x.id === localClientId) || new DummyClient(),
+)
