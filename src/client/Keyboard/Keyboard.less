@@ -29,13 +29,16 @@
         display: inline-flex;
         flex-direction: column;
         justify-content: space-between;
-        height: 64px;
+        height: 56px;
         &.pressed {
             background-color: currentColor;
             filter: saturate(200%)
         }
         &.notPressed {
             transition: background-color 0.3s ease-out;
+        }
+        .noteName {
+            font-size: 0.9em;
         }
         &.white .noteName {
             color: #31313d;
