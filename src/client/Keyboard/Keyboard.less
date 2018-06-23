@@ -2,6 +2,9 @@
 .keyboard {
     display: inline-flex;
     flex-direction: column;
+    .container {
+        letter-spacing: normal;
+    }
     &.isNotPlaying {
         transition: box-shadow 0.3s ease-out;
     }
@@ -24,8 +27,7 @@
         }
     }
     .key {
-        letter-spacing: normal;
-        width: 32px;
+        width: 24px;
         display: inline-flex;
         flex-direction: column;
         justify-content: space-between;
@@ -69,7 +71,7 @@
             width: 100%;
             font-size: 0.8em;
             * {
-                margin: 0 8px;
+                margin: 0 4px;
             }
         }
     }
