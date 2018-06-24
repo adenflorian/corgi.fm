@@ -2,7 +2,7 @@ import {Dispatch, Middleware} from 'redux'
 import {addBasicInstrument, BasicInstrumentState} from './basic-instruments-redux'
 import {ADD_CLIENT, selectLocalClient} from './clients-redux'
 import {IAppState} from './configureStore'
-import {addConnection, Connection} from './connections-redux'
+import {addConnection, Connection, ConnectionSourceType, ConnectionTargetType} from './connections-redux'
 import {selectLocalKeyboardId, setLocalVirtualKeyboardId} from './local-redux'
 import {makeActionCreator} from './redux-utils'
 import {
@@ -56,5 +56,10 @@ function createLocalStuff(dispatch: Dispatch, state: IAppState) {
 	dispatch(addVirtualKeyboard(newVirtualKeyboard))
 	dispatch(setLocalVirtualKeyboardId(newVirtualKeyboard.id))
 
-	dispatch(addConnection(new Connection(newVirtualKeyboard.id, newInstrument.id)))
+	dispatch(addConnection(new Connection(
+		newVirtualKeyboard.id,
+		ConnectionSourceType.keyboard,
+		newInstrument.id,
+		ConnectionTargetType.instrument,
+	)))
 }

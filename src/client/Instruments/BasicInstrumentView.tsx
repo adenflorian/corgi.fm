@@ -8,8 +8,9 @@ import {
 	selectInstrument, setBasicInstrumentOscillatorType,
 } from '../../common/redux/basic-instruments-redux'
 import {IAppState} from '../../common/redux/configureStore'
-import {selectFirstConnectionByTargetId} from '../../common/redux/connections-redux'
-import {makeGetMidiOutput, selectVirtualKeyboard} from '../../common/redux/virtual-keyboard-redux'
+import {
+	getConnectionSourceColor, getConnectionSourceNotes, selectFirstConnectionByTargetId,
+} from '../../common/redux/connections-redux'
 import {audioContext, preFx} from '../setup-audio-context'
 import {Knob} from '../Volume/Knob'
 import {ClientId} from '../websocket-listeners'
@@ -136,21 +137,17 @@ class BasicInstrumentOscillatorTypes extends Component<IBasicInstrumentOscillato
 }
 
 const makeMapStateToProps = () => {
-	const getMidiOutputByOwner = makeGetMidiOutput()
-
 	return (state: IAppState, props: IBasicInstrumentViewProps) => {
 		const connection = selectFirstConnectionByTargetId(state, props.id)
-		const sourceId = connection && connection.sourceId
-		const rawMidiNotes = sourceId ? getMidiOutputByOwner(state, sourceId) : []
-		const keyboardColor = sourceId ? selectVirtualKeyboard(state, sourceId).color : undefined
+		const rawMidiNotes = connection && getConnectionSourceNotes(state, connection.id)
 		const instrumentState = selectInstrument(state, props.id)
 
 		return {
-			rawMidiNotes,
-			isPlaying: rawMidiNotes.length > 0,
+			rawMidiNotes: rawMidiNotes || [],
+			isPlaying: rawMidiNotes ? rawMidiNotes.length > 0 : false,
 			oscillatorType: instrumentState && instrumentState.oscillatorType,
 			instrumentId: instrumentState && instrumentState.id,
-			color: keyboardColor,
+			color: connection && getConnectionSourceColor(state, connection.id),
 		}
 	}
 }

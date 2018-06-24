@@ -11,10 +11,7 @@ import {IAppState} from '../common/redux/configureStore'
 import {
 	deleteConnections, selectAllConnections, selectConnectionsWithSourceOrTargetIds, updateConnections,
 } from '../common/redux/connections-redux'
-import {
-	selectSimpleTrackEvents, selectSimpleTrackIsPlaying, setSimpleTrackEvents,
-} from '../common/redux/simple-track-redux'
-import {playSimpleTrack} from '../common/redux/track-player-middleware'
+import {selectAllTracks, updateTracks} from '../common/redux/tracks-redux'
 import {
 	deleteVirtualKeyboards, selectAllVirtualKeyboards, selectVirtualKeyboardsByOwner, updateVirtualKeyboards,
 } from '../common/redux/virtual-keyboard-redux'
@@ -84,20 +81,6 @@ function syncState(newClientSocket: Socket, store: Store) {
 	})
 
 	newClientSocket.emit(WebSocketEvent.broadcast, {
-		...setSimpleTrackEvents(selectSimpleTrackEvents(state)),
-		alreadyBroadcasted: true,
-		source: 'server',
-	})
-
-	if (selectSimpleTrackIsPlaying(state)) {
-		newClientSocket.emit(WebSocketEvent.broadcast, {
-			...playSimpleTrack(),
-			alreadyBroadcasted: true,
-			source: 'server',
-		})
-	}
-
-	newClientSocket.emit(WebSocketEvent.broadcast, {
 		...updateBasicInstruments(selectAllInstruments(state)),
 		alreadyBroadcasted: true,
 		source: 'server',
@@ -111,6 +94,12 @@ function syncState(newClientSocket: Socket, store: Store) {
 
 	newClientSocket.emit(WebSocketEvent.broadcast, {
 		...updateConnections(selectAllConnections(state)),
+		alreadyBroadcasted: true,
+		source: 'server',
+	})
+
+	newClientSocket.emit(WebSocketEvent.broadcast, {
+		...updateTracks(selectAllTracks(state)),
 		alreadyBroadcasted: true,
 		source: 'server',
 	})

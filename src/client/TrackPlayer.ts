@@ -1,7 +1,5 @@
-import {Dispatch} from 'redux'
 import {logger} from '../common/logger'
 import {IMidiNote} from '../common/MidiNote'
-import {setSimpleTrackIndex} from '../common/redux/simple-track-redux'
 
 export enum SimpleTrackEventAction {
 	playNote,
@@ -15,21 +13,21 @@ export interface ISimpleTrackEvent {
 	notes?: IMidiNote[]
 }
 
-// const TRACK_1 = 'track-1'
+export type IndexChangeHandler = (newIndex: number) => any
 
-export class SimpleTrackPlayer {
+export class TrackPlayer {
 	private _audioContext: AudioContext
 	private _index: number = 0
-	private _dispatch: Dispatch
 	private _events: ISimpleTrackEvent[]
 	private _startTime: number
 	private _inTick: boolean = false
 	private _tick: number = 0
 	private _isPlaying: boolean = false
+	private _onIndexChange: IndexChangeHandler
 
-	constructor(dispatch: Dispatch, audioContext: AudioContext) {
-		this._dispatch = dispatch
+	constructor(audioContext: AudioContext, onIndexChange: IndexChangeHandler) {
 		this._audioContext = audioContext
+		this._onIndexChange = onIndexChange
 	}
 
 	public play = (events: ISimpleTrackEvent[]) => {
@@ -52,7 +50,7 @@ export class SimpleTrackPlayer {
 		this._isPlaying = false
 		this._index = 0
 		this._tick = 0
-		this._dispatch(setSimpleTrackIndex(-1))
+		this._onIndexChange(-1)
 	}
 
 	public getCurrentPlayTime() {
@@ -84,7 +82,7 @@ export class SimpleTrackPlayer {
 		logger.debug('_doTick, currentPlayTime: ', currentPlayTime)
 		logger.debug('_doTick, nextEvent: ', nextEvent)
 		if (this._tick % 10 === 0) {
-			this._dispatch(setSimpleTrackIndex(Math.floor(currentPlayTime * 5)))
+			this._onIndexChange(Math.floor(currentPlayTime * 5))
 		}
 
 		if (nextEvent.time <= currentPlayTime) {

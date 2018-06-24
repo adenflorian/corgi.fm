@@ -7,6 +7,7 @@ import {IClientState, selectAllClients, selectLocalClient} from '../common/redux
 import {IAppState} from '../common/redux/configureStore'
 import {selectAllConnectionIds} from '../common/redux/connections-redux'
 import {AppOptions} from '../common/redux/options-redux'
+import {selectAllTrackIds} from '../common/redux/tracks-redux'
 import {selectAllVirtualKeyboardIds} from '../common/redux/virtual-keyboard-redux'
 import './App.less'
 import {ConnectedConnectionView} from './Connection'
@@ -14,7 +15,7 @@ import './css-reset.css'
 import {ConnectedBasicInstrumentView} from './Instruments/BasicInstrumentView'
 import {ConnectedKeyboard} from './Keyboard/Keyboard'
 import {ConnectedOption} from './Option'
-import {ConnectedSimpleTrack} from './SimpleTrack'
+import {ConnectedTrackView} from './TrackView'
 import {ConnectedVolumeControl} from './Volume/VolumeControl'
 
 interface IAppProps {
@@ -24,6 +25,7 @@ interface IAppProps {
 	instrumentIds: string[]
 	keyboardIds: string[]
 	connectionIds: string[]
+	trackIds: string[]
 }
 
 // const TRACK_1 = 'track-1'
@@ -59,9 +61,17 @@ class App extends React.Component<IAppProps, {}> {
 					<div className="board connected">
 						<ConnectedVolumeControl color={TRACK_1_COLOR} />
 					</div>
-					<div className="board connected">
-						<ConnectedSimpleTrack color={TRACK_1_COLOR} />
-					</div>
+
+					{this.props.trackIds.map(trackId => {
+						return (
+							<div
+								key={trackId}
+								className="board connected"
+							>
+								<ConnectedTrackView id={trackId} />
+							</div>
+						)
+					})}
 
 					{this.props.keyboardIds.map(keyboardId => {
 						return (
@@ -104,6 +114,7 @@ const mapStateToProps = (state: IAppState) => ({
 	keyboardIds: selectAllVirtualKeyboardIds(state),
 	instrumentIds: selectAllInstrumentIds(state),
 	connectionIds: selectAllConnectionIds(state),
+	trackIds: selectAllTrackIds(state),
 })
 
 export const ConnectedApp = connect(mapStateToProps)(App)

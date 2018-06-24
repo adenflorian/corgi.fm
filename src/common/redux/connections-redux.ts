@@ -1,8 +1,10 @@
 import {AnyAction} from 'redux'
 import * as uuid from 'uuid'
+import {logger} from '../logger'
 import {IAppState} from './configureStore'
 import {makeActionCreator, makeBroadcaster, makeServerAction} from './redux-utils'
-import {IVirtualKeyboardState, selectVirtualKeyboard} from './virtual-keyboard-redux'
+import {selectTrack} from './tracks-redux'
+import {IVirtualKeyboardState, makeGetMidiOutput, selectVirtualKeyboard} from './virtual-keyboard-redux'
 
 export const ADD_CONNECTION = 'ADD_CONNECTION'
 export const addConnection = makeServerAction(makeBroadcaster((connection: IConnection) => ({
@@ -27,10 +29,36 @@ export interface IConnectionsState {
 	},
 }
 
+export enum ConnectionSourceType {
+	keyboard,
+	track,
+}
+
+export enum ConnectionTargetType {
+	instrument,
+}
+
 export interface IConnection {
 	sourceId: string
+	sourceType: ConnectionSourceType
 	targetId: string
+	targetType: ConnectionTargetType
 	id: string
+}
+
+export class Connection implements IConnection {
+	public id = uuid.v4()
+	public sourceId: string
+	public sourceType: ConnectionSourceType
+	public targetId: string
+	public targetType: ConnectionTargetType
+
+	constructor(sourceId: string, sourceType: ConnectionSourceType, targetId: string, targetType: ConnectionTargetType) {
+		this.sourceId = sourceId
+		this.sourceType = sourceType
+		this.targetId = targetId
+		this.targetType = targetType
+	}
 }
 
 const initialState: IConnectionsState = {
@@ -70,17 +98,6 @@ export function connectionsReducer(state: IConnectionsState = initialState, acti
 	}
 }
 
-export class Connection implements IConnection {
-	public id = uuid.v4()
-	public sourceId: string
-	public targetId: string
-
-	constructor(sourceId: string, targetId: string) {
-		this.sourceId = sourceId
-		this.targetId = targetId
-	}
-}
-
 export const selectConnection = (state: IAppState, id: string): IConnection => selectAllConnections(state)[id]
 export const selectSourceByConnectionId = (state: IAppState, id: string): IVirtualKeyboardState =>
 	selectVirtualKeyboard(state, selectConnection(state, id).sourceId)
@@ -100,3 +117,38 @@ export const selectConnectionsWithSourceOrTargetIds = (state: IAppState, sourceO
 export const selectFirstConnectionByTargetId = (state: IAppState, targetId: string) =>
 	selectAllConnectionsAsArray(state)
 		.find(x => x.targetId === targetId)
+
+export const getConnectionSourceColor = (state: IAppState, id: string) => {
+	const connection = selectConnection(state, id)
+	switch (connection.sourceType) {
+		case ConnectionSourceType.keyboard:
+			return selectVirtualKeyboard(state, connection.sourceId).color
+		case ConnectionSourceType.track:
+			const track = selectTrack(state, connection.sourceId)
+			return track ? track.color : 'gray'
+		default:
+			logger.warn('couldnt find source color (unsupported connection source type)')
+			return 'red'
+	}
+}
+
+const getMidiOutput = makeGetMidiOutput()
+
+export const getConnectionSourceNotes = (state: IAppState, id: string) => {
+	const connection = selectConnection(state, id)
+	switch (connection.sourceType) {
+		case ConnectionSourceType.keyboard:
+			return getMidiOutput(state, connection.sourceId)
+		case ConnectionSourceType.track:
+			const track = selectTrack(state, connection.sourceId)
+			if (!track) return []
+			if (track.index >= 0 && track.index < track.notes.length) {
+				return track.notes[track.index].notes
+			} else {
+				return []
+			}
+		default:
+			logger.warn('couldnt find source color (unsupported connection source type)')
+			return 'red'
+	}
+}

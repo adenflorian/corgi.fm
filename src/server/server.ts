@@ -5,9 +5,9 @@ import * as socketIO from 'socket.io'
 import {logger} from '../common/logger'
 import {addBasicInstrument, BasicInstrumentState} from '../common/redux/basic-instruments-redux'
 import {addClient, ClientState} from '../common/redux/clients-redux'
-import {addConnection, Connection} from '../common/redux/connections-redux'
-import {setLocalVirtualKeyboardId} from '../common/redux/local-redux'
-import {addVirtualKeyboard, VirtualKeyboardState} from '../common/redux/virtual-keyboard-redux'
+import {addConnection, Connection, ConnectionSourceType, ConnectionTargetType} from '../common/redux/connections-redux'
+import {addTrack, TrackState} from '../common/redux/tracks-redux'
+// import {addVirtualKeyboard, VirtualKeyboardState} from '../common/redux/virtual-keyboard-redux'
 import {configureServerStore} from './configure-server-store'
 import {setupServerWebSocketListeners} from './server-socket-listeners'
 import {setupExpressApp} from './setup-express-app'
@@ -38,9 +38,55 @@ function createServerStuff(dispatch: Dispatch) {
 	const newInstrument = new BasicInstrumentState(serverClient.id)
 	dispatch(addBasicInstrument(newInstrument))
 
-	const newVirtualKeyboard = new VirtualKeyboardState(serverClient.id, serverClient.color)
-	dispatch(addVirtualKeyboard(newVirtualKeyboard))
-	dispatch(setLocalVirtualKeyboardId(newVirtualKeyboard.id))
+	// const newVirtualKeyboard = new VirtualKeyboardState(serverClient.id, serverClient.color)
+	// dispatch(addVirtualKeyboard(newVirtualKeyboard))
 
-	dispatch(addConnection(new Connection(newVirtualKeyboard.id, newInstrument.id)))
+	// dispatch(addConnection(new Connection(newVirtualKeyboard.id, newInstrument.id)))
+
+	const serverTrack = new TrackState(getInitialTrackEvents())
+	dispatch(addTrack(serverTrack))
+	dispatch(addConnection(new Connection(
+		serverTrack.id,
+		ConnectionSourceType.track,
+		newInstrument.id,
+		ConnectionTargetType.instrument,
+	)))
 }
+
+function getInitialTrackEvents() {
+	return [
+		{notes: [49]},
+		{notes: [63, 58]},
+		{notes: [49]},
+		{notes: []},
+		{notes: [49, 58]},
+		{notes: []},
+		{notes: [49]},
+		{notes: [58, 63]},
+		{notes: [51]},
+		{notes: []},
+		{notes: [51, 58]},
+		{notes: []},
+		{notes: [51]},
+		{notes: [58]},
+		{notes: [66, 51]},
+		{notes: []},
+	]
+}
+
+// {notes: [1]},
+// {notes: [15, 10]},
+// {notes: [1]},
+// {notes: []},
+// {notes: [1, 10]},
+// {notes: []},
+// {notes: [1]},
+// {notes: [10, 15]},
+// {notes: [3]},
+// {notes: []},
+// {notes: [3, 10]},
+// {notes: []},
+// {notes: [3]},
+// {notes: [10]},
+// {notes: [18, 3]},
+// {notes: []},

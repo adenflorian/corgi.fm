@@ -6,7 +6,11 @@
 		"experimentalDecorators": true,
 		"sourceMap": true,
 		"target": "es6",
-		"module": "commonjs"
+		"module": "commonjs",
+		"lib": [
+			"dom",
+			"es7"
+		],
 	},
 	"files": [
 		"main.ts",

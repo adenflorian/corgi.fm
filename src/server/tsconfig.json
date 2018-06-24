@@ -4,7 +4,11 @@
 		"noUnusedParameters": true,
 		"sourceMap": false,
 		"target": "esnext",
-		"module": "commonjs"
+		"module": "commonjs",
+		"lib": [
+			"dom",
+			"es7"
+		],
 	},
 	"files": [
 		"server.ts"

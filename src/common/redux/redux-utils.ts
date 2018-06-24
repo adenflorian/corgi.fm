@@ -1,3 +1,5 @@
+import {ActionCreator, AnyAction} from 'redux'
+
 export function makeActionCreator(type, ...argNames) {
 	argNames.forEach(arg => {
 		if (arg === 'type') {
@@ -13,11 +15,11 @@ export function makeActionCreator(type, ...argNames) {
 	}
 }
 
-export function makeBroadcaster(actionCreator: any) {
+export function makeBroadcaster(actionCreator: ActionCreator<AnyAction>): ActionCreator<AnyAction> {
 	return (...args) => ({...actionCreator(...args), shouldBroadcast: true})
 }
 
-export function makeServerAction(actionCreator: any) {
+export function makeServerAction(actionCreator: ActionCreator<AnyAction>): ActionCreator<AnyAction> {
 	return (...args) => ({...actionCreator(...args), dispatchOnServer: true})
 }
 

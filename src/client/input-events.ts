@@ -1,6 +1,5 @@
 import {AnyAction, Store} from 'redux'
 import {localMidiKeyPress, localMidiKeyUp, localMidiOctaveChange} from '../common/redux/local-middleware'
-import {togglePlaySimpleTrack} from '../common/redux/track-player-middleware'
 
 interface KeyBoardShortcuts {
 	[key: string]: KeyBoardShortcut
@@ -17,17 +16,17 @@ interface KeyBoardShortcut {
 type keyboardActionCreator = (e: KeyboardEvent) => AnyAction
 
 const keyboardShortcuts: KeyBoardShortcuts = {
-	' ': {
-		actionOnKeyDown: togglePlaySimpleTrack(),
-		allowRepeat: false,
-		preventDefault: true,
-	},
-	'z': {
+	// ' ': {
+	// 	actionOnKeyDown: togglePlaySimpleTrack(),
+	// 	allowRepeat: false,
+	// 	preventDefault: true,
+	// },
+	z: {
 		actionOnKeyDown: (e: KeyboardEvent) => localMidiOctaveChange(e.shiftKey ? -2 : -1),
 		allowRepeat: true,
 		preventDefault: true,
 	},
-	'x': {
+	x: {
 		actionOnKeyDown: (e: KeyboardEvent) => localMidiOctaveChange(e.shiftKey ? 2 : 1),
 		allowRepeat: true,
 		preventDefault: true,
