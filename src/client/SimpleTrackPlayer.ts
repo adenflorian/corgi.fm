@@ -2,7 +2,6 @@ import {Dispatch} from 'redux'
 import {logger} from '../common/logger'
 import {IMidiNote} from '../common/MidiNote'
 import {setSimpleTrackIndex} from '../common/redux/simple-track-redux'
-import {virtualAllKeysUp, virtualKeyPressed} from '../common/redux/virtual-keyboard-redux'
 
 export enum SimpleTrackEventAction {
 	playNote,
@@ -16,7 +15,7 @@ export interface ISimpleTrackEvent {
 	notes?: IMidiNote[]
 }
 
-const TRACK_1 = 'track-1'
+// const TRACK_1 = 'track-1'
 
 export class SimpleTrackPlayer {
 	private _audioContext: AudioContext
@@ -94,30 +93,30 @@ export class SimpleTrackPlayer {
 				this._tick = 0
 				this._startTime = this._audioContext.currentTime
 			} else {
-				this._doEvent(nextEvent)
+				// this._doEvent(nextEvent)
 				this._index++
 			}
 		}
 	}
 
-	private _doEvent(event: ISimpleTrackEvent) {
-		logger.debug('_doEvent, event: ', event)
-		switch (event.action) {
-			case SimpleTrackEventAction.playNote: return this._playNotes(event.notes)
-			case SimpleTrackEventAction.stopNote: return this._stopAllNotes()
-			default: return logger.warn('unknown event note action')
-		}
-	}
+	// private _doEvent(event: ISimpleTrackEvent) {
+	// 	logger.debug('_doEvent, event: ', event)
+	// 	// switch (event.action) {
+	// 	// 	case SimpleTrackEventAction.playNote: return this._playNotes(event.notes)
+	// 	// 	case SimpleTrackEventAction.stopNote: return this._stopAllNotes()
+	// 	// 	default: return logger.warn('unknown event note action')
+	// 	// }
+	// }
 
-	private _playNotes(notes: IMidiNote[]) {
-		notes.forEach(note => this._dispatch(virtualKeyPressed(TRACK_1, note)))
-	}
+	// private _playNotes(notes: IMidiNote[]) {
+	// 	// notes.forEach(note => this._dispatch(virtualKeyPressed(TRACK_1, note)))
+	// }
 
 	// private _stopNotes(notes: IMidiNote[]) {
 	// 	notes.forEach(note => this._dispatch(virtualKeyUp(TRACK_1, note)))
 	// }
 
 	private _stopAllNotes() {
-		this._dispatch(virtualAllKeysUp(TRACK_1))
+		// this._dispatch(virtualAllKeysUp(TRACK_1))
 	}
 }

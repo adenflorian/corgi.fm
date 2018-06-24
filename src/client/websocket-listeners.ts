@@ -2,12 +2,10 @@ import {Store} from 'redux'
 import * as io from 'socket.io-client'
 import {logger} from '../common/logger'
 import {IMidiNote} from '../common/MidiNote'
-import {addBasicInstrument, BasicInstrumentState} from '../common/redux/basic-instruments-redux'
-import {clientDisconnected, newClient, SET_CLIENTS} from '../common/redux/clients-redux'
-import {IAppState} from '../common/redux/configureStore'
+import {clientDisconnected, SET_CLIENTS} from '../common/redux/clients-redux'
 import {setVirtualKeys, virtualOctave} from '../common/redux/virtual-keyboard-redux'
-import {selectLocalClientId, SET_MY_CLIENT_ID, setInfo, setSocket} from '../common/redux/websocket-redux'
-import {BroadcastAction} from '../common/redux/websocket-sender-middleware'
+import {BroadcastAction} from '../common/redux/websocket-client-sender-middleware'
+import {setInfo, setSocket} from '../common/redux/websocket-redux'
 import {WebSocketEvent} from '../common/server-constants'
 import {Octave} from './music/music-types'
 
@@ -16,22 +14,10 @@ const port = 80
 export function setupWebsocketAndListeners(store: Store) {
 	const socket = io.connect(window.location.hostname + `:${port}/`)
 
-	logger.log('socket connected')
-
-	store.dispatch(setSocket(socket))
-
 	socket.on('connect', () => {
 		socketInfo('connected')
-		setClientId(socket.id)
-		createLocalStuff(store)
+		store.dispatch(setSocket(socket))
 	})
-
-	function setClientId(newClientId) {
-		store.dispatch({
-			type: SET_MY_CLIENT_ID,
-			id: newClientId,
-		})
-	}
 
 	setupDefaultListeners([
 		['disconnect'],
@@ -71,11 +57,6 @@ export function setupWebsocketAndListeners(store: Store) {
 		})
 	}
 
-	socket.on('newClient', data => {
-		logger.log('newClient: ', data)
-		store.dispatch(newClient(data.id))
-	})
-
 	socket.on('clientDisconnected', data => {
 		logger.log('clientDisconnected: ', data)
 		store.dispatch(clientDisconnected(data.id))
@@ -114,10 +95,4 @@ export interface NotesPayload {
 export interface OctavePayload {
 	octave: Octave
 	clientId: ClientId
-}
-
-function createLocalStuff(store: Store) {
-	const state: IAppState = store.getState()
-	const newInstrument = new BasicInstrumentState(selectLocalClientId(state))
-	store.dispatch(addBasicInstrument(newInstrument))
 }

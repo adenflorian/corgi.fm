@@ -4,23 +4,25 @@ import {isProd} from '../../client/is-prod'
 import {ISimpleTrackState, simpleTrackReducer} from '../../common/redux/simple-track-redux'
 import {audioReducer, IAudioState} from './audio-redux'
 import {basicInstrumentsReducer, IBasicInstrumentsState} from './basic-instruments-redux'
-import {clientsReducer, IClient} from './clients-redux'
+import {clientsReducer, IClientsState} from './clients-redux'
 import {connectionsReducer, IConnectionsState} from './connections-redux'
 import {localMiddleware} from './local-middleware'
+import {ILocalState, localReducer} from './local-redux'
 import {IOptionsState, optionsReducer} from './options-redux'
 import {trackPlayerMiddleware} from './track-player-middleware'
-import {virtualKeyboardsReducer, VirtualKeyboardsState} from './virtual-keyboard-redux'
+import {IVirtualKeyboardsState, virtualKeyboardsReducer} from './virtual-keyboard-redux'
+import {websocketSenderMiddleware} from './websocket-client-sender-middleware'
 import {IWebsocketState, websocketReducer} from './websocket-redux'
-import {websocketSenderMiddleware} from './websocket-sender-middleware'
 
 export interface IAppState {
 	audio: IAudioState
 	basicInstruments: IBasicInstrumentsState
-	clients: IClient[]
+	clients: IClientsState
 	connections: IConnectionsState
+	local: ILocalState
 	options: IOptionsState
 	simpleTrack: ISimpleTrackState
-	virtualKeyboards: VirtualKeyboardsState
+	virtualKeyboards: IVirtualKeyboardsState
 	websocket: IWebsocketState
 }
 
@@ -39,6 +41,7 @@ export function configureStore(initialState: IAppState | any = {}): Store {
 			basicInstruments: basicInstrumentsReducer,
 			clients: clientsReducer,
 			connections: connectionsReducer,
+			local: localReducer,
 			options: optionsReducer,
 			simpleTrack: simpleTrackReducer,
 			virtualKeyboards: virtualKeyboardsReducer,

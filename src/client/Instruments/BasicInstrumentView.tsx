@@ -5,10 +5,11 @@ import ReactSVG from 'react-svg'
 import {Dispatch} from 'redux'
 import {IMidiNote} from '../../common/MidiNote'
 import {
-	selectInstrumentByOwner, setBasicInstrumentOscillatorType,
+	selectInstrument, setBasicInstrumentOscillatorType,
 } from '../../common/redux/basic-instruments-redux'
 import {IAppState} from '../../common/redux/configureStore'
-import {makeGetMidiOutputByOwner} from '../../common/redux/virtual-keyboard-redux'
+import {selectFirstConnectionByTargetId} from '../../common/redux/connections-redux'
+import {makeGetMidiOutput, selectVirtualKeyboard} from '../../common/redux/virtual-keyboard-redux'
 import {audioContext, preFx} from '../setup-audio-context'
 import {Knob} from '../Volume/Knob'
 import {ClientId} from '../websocket-listeners'
@@ -23,12 +24,13 @@ export type MidiNotes = IMidiNote[]
 interface IBasicInstrumentViewProps {
 	color?: string
 	rawMidiNotes?: MidiNotes
-	ownerId: ClientId
+	ownerId?: ClientId
 	pan?: number
 	isPlaying?: boolean
 	oscillatorType?: OscillatorType
 	dispatch?: Dispatch
 	instrumentId?: string
+	id: string
 }
 
 const oscillatorTypes = [
@@ -78,6 +80,7 @@ export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 
 		return (
 			<div
+				id={this.props.id}
 				className={`container basicInstrument ${isPlaying ? 'isPlaying saturate' : 'isNotPlaying'}`}
 				style={{color}}
 			>
@@ -133,17 +136,21 @@ class BasicInstrumentOscillatorTypes extends Component<IBasicInstrumentOscillato
 }
 
 const makeMapStateToProps = () => {
-	const getMidiOutputByOwner = makeGetMidiOutputByOwner()
+	const getMidiOutputByOwner = makeGetMidiOutput()
 
 	return (state: IAppState, props: IBasicInstrumentViewProps) => {
-		const rawMidiNotes = props.ownerId ? getMidiOutputByOwner(state, props) : []
-		const instrumentState = selectInstrumentByOwner(state, props.ownerId)
+		const connection = selectFirstConnectionByTargetId(state, props.id)
+		const sourceId = connection && connection.sourceId
+		const rawMidiNotes = sourceId ? getMidiOutputByOwner(state, sourceId) : []
+		const keyboardColor = sourceId ? selectVirtualKeyboard(state, sourceId).color : undefined
+		const instrumentState = selectInstrument(state, props.id)
 
 		return {
 			rawMidiNotes,
 			isPlaying: rawMidiNotes.length > 0,
 			oscillatorType: instrumentState && instrumentState.oscillatorType,
 			instrumentId: instrumentState && instrumentState.id,
+			color: keyboardColor,
 		}
 	}
 }

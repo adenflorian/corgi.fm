@@ -2,49 +2,37 @@ import {AnyAction, Store} from 'redux'
 import {Server, Socket} from 'socket.io'
 import {logger} from '../common/logger'
 import {
-	selectAllInstruments, updateBasicInstruments,
+	deleteBasicInstruments, selectAllInstruments, selectInstrumentsByOwner, updateBasicInstruments,
 } from '../common/redux/basic-instruments-redux'
+import {
+	addClient, clientDisconnected, ClientState, selectAllClients, selectClientBySocketId, setClients,
+} from '../common/redux/clients-redux'
 import {IAppState} from '../common/redux/configureStore'
+import {
+	deleteConnections, selectAllConnections, selectConnectionsWithSourceOrTargetIds, updateConnections,
+} from '../common/redux/connections-redux'
 import {
 	selectSimpleTrackEvents, selectSimpleTrackIsPlaying, setSimpleTrackEvents,
 } from '../common/redux/simple-track-redux'
 import {playSimpleTrack} from '../common/redux/track-player-middleware'
-import {BroadcastAction} from '../common/redux/websocket-sender-middleware'
+import {
+	deleteVirtualKeyboards, selectAllVirtualKeyboards, selectVirtualKeyboardsByOwner, updateVirtualKeyboards,
+} from '../common/redux/virtual-keyboard-redux'
+import {BroadcastAction} from '../common/redux/websocket-client-sender-middleware'
 import {WebSocketEvent} from '../common/server-constants'
-import {Clients} from './Clients'
-
-const clients = new Clients()
 
 export function setupServerWebSocketListeners(io: Server, store: Store) {
 	io.on('connection', socket => {
 		logger.log('new connection | ', socket.id)
 
-		clients.add(socket.id)
-		logger.debug('clients: ', clients)
+		const addClientAction = addClient(new ClientState(socket.id))
+		store.dispatch(addClientAction)
+		io.local.emit(WebSocketEvent.broadcast, addClientAction)
 
-		sendNewClientToOthers(socket, clients.get(socket.id))
 		syncState(socket, store)
 
-		socket.on('notes', notesPayload => {
-			logger.debug(`notes: ${socket.id} | `, notesPayload)
-			clients.setNotes(socket.id, notesPayload.notes)
-			socket.broadcast.emit('notes', {
-				notes: notesPayload.notes,
-				clientId: socket.id,
-			})
-		})
-
-		socket.on('octave', octavePayload => {
-			logger.debug(`octave: ${socket.id} | `, octavePayload)
-			clients.setOctave(socket.id, octavePayload.octave)
-			socket.broadcast.emit('octave', {
-				octave: octavePayload.octave,
-				clientId: socket.id,
-			})
-		})
-
 		socket.on(WebSocketEvent.broadcast, (action: BroadcastAction) => {
-			logger.log(`${WebSocketEvent.broadcast}: ${socket.id} | `, action)
+			logger.debug(`${WebSocketEvent.broadcast}: ${socket.id} | `, action)
 			if (action.dispatchOnServer) {
 				store.dispatch(action)
 			}
@@ -52,36 +40,48 @@ export function setupServerWebSocketListeners(io: Server, store: Store) {
 		})
 
 		socket.on(WebSocketEvent.serverAction, (action: AnyAction) => {
-			logger.log(`${WebSocketEvent.serverAction}: ${socket.id} | `, action)
+			logger.debug(`${WebSocketEvent.serverAction}: ${socket.id} | `, action)
 			store.dispatch(action)
 		})
 
 		socket.on('disconnect', () => {
 			logger.log(`client disconnected: ${socket.id}`)
-			clients.remove(socket.id)
-			sendClientDisconnected(socket.id, io)
+			const state: IAppState = store.getState()
+			const clientId = selectClientBySocketId(state, socket.id).id
+
+			const clientDisconnectedAction = clientDisconnected(clientId)
+			store.dispatch(clientDisconnectedAction)
+			io.local.emit(WebSocketEvent.broadcast, clientDisconnectedAction)
+
+			const instrumentIdsToDelete = selectInstrumentsByOwner(state, clientId).map(x => x.id)
+			const deleteBasicInstrumentsAction = deleteBasicInstruments(instrumentIdsToDelete)
+			store.dispatch(deleteBasicInstrumentsAction)
+			io.local.emit(WebSocketEvent.broadcast, deleteBasicInstrumentsAction)
+
+			const keyboardIdsToDelete = selectVirtualKeyboardsByOwner(state, clientId).map(x => x.id)
+			const deleteVirtualKeyboardsAction = deleteVirtualKeyboards(keyboardIdsToDelete)
+			store.dispatch(deleteVirtualKeyboardsAction)
+			io.local.emit(WebSocketEvent.broadcast, deleteVirtualKeyboardsAction)
+
+			const sourceAndTargetIds = instrumentIdsToDelete.concat(keyboardIdsToDelete)
+			const connectionIdsToDelete = selectConnectionsWithSourceOrTargetIds(state, sourceAndTargetIds).map(x => x.id)
+			const deleteConnectionsAction = deleteConnections(connectionIdsToDelete)
+			store.dispatch(deleteConnectionsAction)
+			io.local.emit(WebSocketEvent.broadcast, deleteConnectionsAction)
+
+			logger.log(`done cleaning: ${socket.id}`)
 		})
 	})
 }
 
-function sendNewClientToOthers(socket, client) {
-	logger.debug('sending new client info to all clients')
-	socket.broadcast.emit('newClient', client)
-}
-
-function sendClientDisconnected(id, io: Server) {
-	logger.debug('sending clientDisconnected to all clients')
-	io.local.emit('clientDisconnected', {
-		id,
-	})
-}
-
 function syncState(newClientSocket: Socket, store: Store) {
-	newClientSocket.emit('clients', {
-		clients: clients.toArray(),
-	})
-
 	const state: IAppState = store.getState()
+
+	newClientSocket.emit(WebSocketEvent.broadcast, {
+		...setClients(selectAllClients(state)),
+		alreadyBroadcasted: true,
+		source: 'server',
+	})
 
 	newClientSocket.emit(WebSocketEvent.broadcast, {
 		...setSimpleTrackEvents(selectSimpleTrackEvents(state)),
@@ -99,6 +99,18 @@ function syncState(newClientSocket: Socket, store: Store) {
 
 	newClientSocket.emit(WebSocketEvent.broadcast, {
 		...updateBasicInstruments(selectAllInstruments(state)),
+		alreadyBroadcasted: true,
+		source: 'server',
+	})
+
+	newClientSocket.emit(WebSocketEvent.broadcast, {
+		...updateVirtualKeyboards(selectAllVirtualKeyboards(state)),
+		alreadyBroadcasted: true,
+		source: 'server',
+	})
+
+	newClientSocket.emit(WebSocketEvent.broadcast, {
+		...updateConnections(selectAllConnections(state)),
 		alreadyBroadcasted: true,
 		source: 'server',
 	})

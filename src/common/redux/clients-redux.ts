@@ -1,23 +1,28 @@
-import Color from 'color'
-import {createSelector} from 'reselect'
+import * as animal from 'animal-id'
+import * as Color from 'color'
+import * as uuid from 'uuid'
 import {hashbow} from '../../client/utils'
 import {ClientId} from '../../client/websocket-listeners'
-import {IMidiNote} from '../MidiNote'
-import {selectLocalClientId} from './websocket-redux'
+import {IAppState} from './configureStore'
+import {selectLocalSocket} from './websocket-redux'
 
-export const SET_CLIENTS = 'SET_CLIENTS'
-export const NEW_CLIENT = 'NEW_CLIENT'
-export const CLIENT_DISCONNECTED = 'CLIENT_DISCONNECTED'
-export const CLIENT_DISCONNECTING = 'CLIENT_DISCONNECTING'
-export const CLIENT_NOTES = 'CLIENT_NOTES'
-
-export const newClient = (id: ClientId) => {
+export const ADD_CLIENT = 'ADD_CLIENT'
+export const addClient = (client: IClientState) => {
 	return {
-		type: NEW_CLIENT,
-		id,
+		type: ADD_CLIENT,
+		client,
 	}
 }
 
+export const SET_CLIENTS = 'SET_CLIENTS'
+export const setClients = (clients: IClientState[]) => {
+	return {
+		type: SET_CLIENTS,
+		clients,
+	}
+}
+
+export const CLIENT_DISCONNECTED = 'CLIENT_DISCONNECTED'
 export const clientDisconnected = (id: ClientId) => {
 	return {
 		type: CLIENT_DISCONNECTED,
@@ -25,6 +30,7 @@ export const clientDisconnected = (id: ClientId) => {
 	}
 }
 
+export const CLIENT_DISCONNECTING = 'CLIENT_DISCONNECTING'
 export const clientDisconnecting = (id: ClientId) => {
 	return {
 		type: CLIENT_DISCONNECTING,
@@ -32,67 +38,75 @@ export const clientDisconnecting = (id: ClientId) => {
 	}
 }
 
-export interface IClient {
-	id: string,
-	notes: IMidiNote[]
-	color: string
+export interface IClientsState {
+	clients: IClientState[]
 }
 
-export class Client implements IClient {
-	public static fromBackEndClient(backEndClient: any) {
-		return new Client(backEndClient.id)
-	}
+export interface IClientState {
+	id: string
+	color: string
+	name: string
+	socketId: string
+}
 
-	public readonly id
-	public readonly color
-	public notes
+export class ClientState implements IClientState {
+	public readonly socketId: string
+	public readonly id = uuid.v4()
+	public readonly color: string
+	public readonly name: string
 
-	constructor(id: ClientId) {
-		this.id = id
+	constructor(socketId: string) {
+		this.socketId = socketId
+		this.name = animal.getId() + '-' + this.id[0]
 		this.color = Color(hashbow(this.id)).desaturate(0.2).hsl().string()
 	}
 }
 
-export class DummyClient implements IClient {
-	public id
-	public color
-	public notes
+const initialState = {
+	clients: [],
 }
 
-export type IClientsState = IClient[]
-
-export function clientsReducer(state: IClientsState = [], action) {
+export function clientsReducer(clientsState: IClientsState = initialState, action) {
 	switch (action.type) {
+		case ADD_CLIENT:
+			return {
+				...clientsState,
+				clients: [
+					...clientsState.clients,
+					action.client,
+				],
+			}
 		case SET_CLIENTS:
-			return action.clients.map(x => Client.fromBackEndClient(x))
-		case NEW_CLIENT:
-			return [
-				...state.filter(x => x.id !== action.id),
-				new Client(action.id),
-			]
+			return {
+				...clientsState,
+				clients: action.clients,
+			}
 		case CLIENT_DISCONNECTED:
-			return state.filter(x => x.id !== action.id)
+			return {
+				...clientsState,
+				clients: clientsState.clients.filter(x => x.id !== action.id),
+			}
 		case CLIENT_DISCONNECTING:
-			return state.map(x => x.id === action.id ? {...x, disconnecting: true} : x)
-		case CLIENT_NOTES:
-			return state.map(client => {
-				if (client.id === action.clientId) {
-					return {
-						...client,
-						notes: action.notes,
-					}
-				} else {
-					return client
-				}
-			})
+			return {
+				...clientsState,
+				clients: clientsState.clients
+					.map(x => x.id === action.id ? {...x, disconnecting: true} : x),
+			}
 		default:
-			return state
+			return clientsState
 	}
 }
 
-export const selectAllClients = state => state.clients
+export function selectClientById(state: IAppState, id) {
+	return selectAllClients(state).find(x => x.id === id)
+}
 
-export const selectLocalClient = createSelector(
-	[selectAllClients, selectLocalClientId],
-	(clients, localClientId) => clients.find(x => x.id === localClientId) || new DummyClient(),
-)
+export function selectClientBySocketId(state: IAppState, socketId) {
+	return selectAllClients(state).find(x => x.socketId === socketId)
+}
+
+export function selectLocalClient(state: IAppState) {
+	return selectAllClients(state).find(x => x.socketId === selectLocalSocket(state).id)
+}
+
+export const selectAllClients = (state: IAppState) => state.clients.clients

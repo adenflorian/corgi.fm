@@ -1,17 +1,14 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
-import {IBasicInstrumentState, selectInstrumentByOwner} from '../../common/redux/basic-instruments-redux'
-import {DummyClient} from '../../common/redux/clients-redux'
+import {ClientState, selectClientById, selectLocalClient} from '../../common/redux/clients-redux'
 import {IAppState} from '../../common/redux/configureStore'
-import {addConnection, Connection} from '../../common/redux/connections-redux'
 import {
-	selectVirtualKeyboardByOwner, virtualKeyFlip, virtualKeyPressed, virtualKeyUp,
+	selectVirtualKeyboard, virtualKeyFlip, virtualKeyPressed, virtualKeyUp,
 } from '../../common/redux/virtual-keyboard-redux'
 import {keyToMidiMap} from '../input-events'
 import {Octave} from '../music/music-types'
 import {keyColors} from '../utils'
-import {ClientId} from '../websocket-listeners'
 import './Keyboard.less'
 
 const defaultNumberOfKeys = 17
@@ -39,7 +36,7 @@ export function isWhiteKey(keyNumber: number) {
 }
 
 interface IKeyboardProps {
-	ownerId: ClientId,
+	ownerName: string,
 	pressedMidiKeys?: any,
 	octave?: Octave
 	virtualMidiKeyboard: any
@@ -49,34 +46,30 @@ interface IKeyboardProps {
 	isPlaying?: boolean
 	dispatch?: Dispatch
 	id?: string
-	instrumentId?: string
 }
 
 export class Keyboard extends React.Component<IKeyboardProps> {
 	public static defaultProps = {
 		pressedMidiKeys: [],
-		owner: new DummyClient(),
 		showNoteNames: true,
 	}
 
 	constructor(props: IKeyboardProps) {
 		super(props)
-		if (props.isLocal) {
-			props.dispatch(addConnection(new Connection(props.id, props.instrumentId)))
-		}
 	}
 
 	public render() {
-		const {ownerId, pressedMidiKeys, octave, color, isPlaying,
+		const {ownerName, pressedMidiKeys, octave, color, isPlaying,
 			virtualMidiKeyboard, isLocal, showNoteNames} = this.props
 
 		return (
 			<div
+				id={this.props.id}
 				style={{color}}
 				className={`keyboard ${isLocal ? 'isLocal' : ''} ${isPlaying ? 'saturate' : 'isNotPlaying'}`}
 			>
 				<div className="label clientId colorize">
-					{ownerId || '""'}
+					{ownerName || '""'}
 				</div>
 				<div className="container">
 					<div className="isometricBoxShadow"></div>
@@ -122,14 +115,14 @@ export class Keyboard extends React.Component<IKeyboardProps> {
 	private handleMouseOver = (e: React.MouseEvent, index: number) => {
 		if (this.props.isLocal === false) return
 		if (isLeftMouseButtonDown(e.buttons)) {
-			this.props.dispatch(virtualKeyPressed(this.props.ownerId, index))
+			this.props.dispatch(virtualKeyPressed(this.props.id, index))
 		}
 	}
 
 	private handleMouseOut = (e: React.MouseEvent, index: number) => {
 		if (this.props.isLocal === false) return
 		if (isLeftMouseButtonDown(e.buttons)) {
-			this.props.dispatch(virtualKeyUp(this.props.ownerId, index))
+			this.props.dispatch(virtualKeyUp(this.props.id, index))
 		}
 	}
 
@@ -137,9 +130,9 @@ export class Keyboard extends React.Component<IKeyboardProps> {
 		if (this.props.isLocal === false) return
 		if (e.button === 0) {
 			if (e.shiftKey) {
-				this.props.dispatch(virtualKeyFlip(this.props.ownerId, index))
+				this.props.dispatch(virtualKeyFlip(this.props.id, index))
 			} else {
-				this.props.dispatch(virtualKeyPressed(this.props.ownerId, index))
+				this.props.dispatch(virtualKeyPressed(this.props.id, index))
 			}
 		}
 	}
@@ -147,7 +140,7 @@ export class Keyboard extends React.Component<IKeyboardProps> {
 	private handleMouseUp = (e: React.MouseEvent, index: number) => {
 		if (this.props.isLocal === false) return
 		if (e.button === 0 && e.shiftKey === false) {
-			this.props.dispatch(virtualKeyUp(this.props.ownerId, index))
+			this.props.dispatch(virtualKeyUp(this.props.id, index))
 		}
 	}
 }
@@ -161,21 +154,21 @@ function isLeftMouseButtonDown(buttons: number): boolean {
 }
 
 const mapStateToProps = (state: IAppState, props) => {
-	const owner = state.clients.find(x => x.id === props.ownerId)
-	const virtualKeyboard = selectVirtualKeyboardByOwner(state, props)
+	const virtualKeyboard = selectVirtualKeyboard(state, props.id)
+	const owner = selectClientById(state, virtualKeyboard.ownerId) || {} as ClientState
 	const pressedMidiKeys = virtualKeyboard ? virtualKeyboard.pressedKeys : []
-	const instrument = selectInstrumentByOwner(state, props.ownerId) || {} as IBasicInstrumentState
+	const localClient = selectLocalClient(state)
 
 	return {
 		pressedMidiKeys,
 		octave: virtualKeyboard && virtualKeyboard.octave,
 		virtualMidiKeyboard: globalVirtualMidiKeyboard,
 		color: props.color || (owner && owner.color),
-		isLocal: state.websocket.myClientId === props.ownerId,
+		isLocal: localClient.id === owner.id,
 		showNoteNames: state.options.showNoteNamesOnKeyboard,
 		isPlaying: pressedMidiKeys.length > 0,
 		id: virtualKeyboard.id,
-		instrumentId: instrument.id,
+		ownerName: owner.name,
 	}
 }
 

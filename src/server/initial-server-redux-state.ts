@@ -1,11 +1,6 @@
-import * as uuid from 'uuid'
-
 export function getInitialServerState() {
 	return {
 		simpleTrack: getInitialSimpleTrack(),
-		basicInstruments: {
-			instruments: getInitialInstruments(),
-		},
 	}
 }
 
@@ -29,17 +24,5 @@ function getInitialSimpleTrack() {
 			{notes: [18, 3]},
 			{notes: []},
 		],
-	}
-}
-
-function getInitialInstruments() {
-	const newId = uuid.v4()
-
-	return {
-		[newId]: {
-			oscillatorType: 'sine' as OscillatorType,
-			id: newId,
-			ownerId: 'track-1',
-		},
 	}
 }
