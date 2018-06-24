@@ -38,17 +38,29 @@ function createServerStuff(dispatch: Dispatch) {
 	const newInstrument = new BasicInstrumentState(serverClient.id)
 	dispatch(addBasicInstrument(newInstrument))
 
-	// const newVirtualKeyboard = new VirtualKeyboardState(serverClient.id, serverClient.color)
-	// dispatch(addVirtualKeyboard(newVirtualKeyboard))
-
-	// dispatch(addConnection(new Connection(newVirtualKeyboard.id, newInstrument.id)))
-
 	const serverTrack = new TrackState(getInitialTrackEvents())
 	dispatch(addTrack(serverTrack))
 	dispatch(addConnection(new Connection(
 		serverTrack.id,
 		ConnectionSourceType.track,
 		newInstrument.id,
+		ConnectionTargetType.instrument,
+	)))
+
+	// const newVirtualKeyboard = new VirtualKeyboardState(serverClient.id, serverClient.color)
+	// dispatch(addVirtualKeyboard(newVirtualKeyboard))
+
+	// dispatch(addConnection(new Connection(newVirtualKeyboard.id, newInstrument.id)))
+
+	const newInstrument2 = new BasicInstrumentState(serverClient.id)
+	dispatch(addBasicInstrument(newInstrument2))
+
+	const serverTrack2 = new TrackState(getInitialTrackEvents2())
+	dispatch(addTrack(serverTrack2))
+	dispatch(addConnection(new Connection(
+		serverTrack2.id,
+		ConnectionSourceType.track,
+		newInstrument2.id,
 		ConnectionTargetType.instrument,
 	)))
 }
@@ -70,6 +82,16 @@ function getInitialTrackEvents() {
 		{notes: [51]},
 		{notes: [58]},
 		{notes: [66, 51]},
+		{notes: []},
+	]
+}
+
+function getInitialTrackEvents2() {
+	return [
+		{notes: [54]},
+		{notes: []},
+		{notes: []},
+		{notes: []},
 		{notes: []},
 	]
 }
