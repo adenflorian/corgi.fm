@@ -50,12 +50,22 @@ export interface IClientState {
 }
 
 export class ClientState implements IClientState {
+	public static createServerClient() {
+		return {
+			id: 'server',
+			socketId: 'server',
+			name: 'server',
+			color: 'rgb(89, 122, 166)',
+		}
+	}
+
 	public readonly socketId: string
-	public readonly id = uuid.v4()
+	public readonly id: string
 	public readonly color: string
 	public readonly name: string
 
 	constructor(socketId: string) {
+		this.id = uuid.v4()
 		this.socketId = socketId
 		this.name = animal.getId() + '-' + this.id[0]
 		this.color = Color(hashbow(this.id)).desaturate(0.2).hsl().string()

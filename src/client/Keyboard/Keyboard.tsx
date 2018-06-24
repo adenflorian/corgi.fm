@@ -163,7 +163,7 @@ const mapStateToProps = (state: IAppState, props) => {
 		pressedMidiKeys,
 		octave: virtualKeyboard && virtualKeyboard.octave,
 		virtualMidiKeyboard: globalVirtualMidiKeyboard,
-		color: props.color || (owner && owner.color),
+		color: owner && owner.color,
 		isLocal: localClient.id === owner.id,
 		showNoteNames: state.options.showNoteNamesOnKeyboard,
 		isPlaying: pressedMidiKeys.length > 0,

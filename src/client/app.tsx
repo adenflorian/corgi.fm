@@ -1,6 +1,6 @@
 import Color from 'color'
-import * as React from 'react'
 import {Fragment} from 'react'
+import * as React from 'react'
 import {connect} from 'react-redux'
 import {selectAllInstrumentIds} from '../common/redux/basic-instruments-redux'
 import {IClientState, selectAllClients, selectLocalClient} from '../common/redux/clients-redux'

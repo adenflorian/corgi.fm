@@ -4,6 +4,7 @@ import {Dispatch, Store} from 'redux'
 import * as socketIO from 'socket.io'
 import {logger} from '../common/logger'
 import {addBasicInstrument, BasicInstrumentState} from '../common/redux/basic-instruments-redux'
+import {addClient, ClientState} from '../common/redux/clients-redux'
 import {addConnection, Connection} from '../common/redux/connections-redux'
 import {setLocalVirtualKeyboardId} from '../common/redux/local-redux'
 import {addVirtualKeyboard, VirtualKeyboardState} from '../common/redux/virtual-keyboard-redux'
@@ -30,12 +31,14 @@ server.listen(port)
 logger.log('shamu server listening on port', port)
 
 function createServerStuff(dispatch: Dispatch) {
-	const track1Id = 'track-1'
+	const serverClient = ClientState.createServerClient()
+	const addClientAction = addClient(serverClient)
+	store.dispatch(addClientAction)
 
-	const newInstrument = new BasicInstrumentState(track1Id)
+	const newInstrument = new BasicInstrumentState(serverClient.id)
 	dispatch(addBasicInstrument(newInstrument))
 
-	const newVirtualKeyboard = new VirtualKeyboardState(track1Id, '#4077bf')
+	const newVirtualKeyboard = new VirtualKeyboardState(serverClient.id, serverClient.color)
 	dispatch(addVirtualKeyboard(newVirtualKeyboard))
 	dispatch(setLocalVirtualKeyboardId(newVirtualKeyboard.id))
 
