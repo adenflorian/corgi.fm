@@ -122,7 +122,8 @@ export const getConnectionSourceColor = (state: IAppState, id: string) => {
 	const connection = selectConnection(state, id)
 	switch (connection.sourceType) {
 		case ConnectionSourceType.keyboard:
-			return selectVirtualKeyboard(state, connection.sourceId).color
+			const virtualKeyboard = selectVirtualKeyboard(state, connection.sourceId)
+			return virtualKeyboard && virtualKeyboard.color
 		case ConnectionSourceType.track:
 			const track = selectTrack(state, connection.sourceId)
 			return track ? track.color : 'gray'

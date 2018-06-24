@@ -4,7 +4,7 @@ import {IAppState} from '../common/redux/configureStore'
 import {
 	getConnectionSourceColor, IConnection, selectConnection,
 } from '../common/redux/connections-redux'
-import './Connection.less'
+import './ConnectionView.less'
 
 export interface IConnectionViewProps {
 	id: string
