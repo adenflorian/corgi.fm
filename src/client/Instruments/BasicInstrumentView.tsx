@@ -5,7 +5,7 @@ import ReactSVG from 'react-svg'
 import {Dispatch} from 'redux'
 import {IMidiNote} from '../../common/MidiNote'
 import {
-	selectInstrument, setBasicInstrumentOscillatorType,
+	BasicInstrumentParam, selectInstrument, setBasicInstrumentOscillatorType, setBasicInstrumentParam,
 } from '../../common/redux/basic-instruments-redux'
 import {IAppState} from '../../common/redux/configureStore'
 import {
@@ -78,20 +78,27 @@ export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 
 		this.instrument.setMidiNotes(rawMidiNotes)
 		this.instrument.setOscillatorType(oscillatorType)
+		this.instrument.setPan(pan)
 
 		return (
 			<div
-				id={this.props.id}
 				className={`container basicInstrument ${isPlaying ? 'isPlaying saturate' : 'isNotPlaying'}`}
 				style={{color}}
 			>
 				<div className="isometricBoxShadow"></div>
 				<div
+					id={this.props.id}
 					className="basicInstrument"
 				>
 					<div className="label colorize">basic instrument</div>
 
-					<Knob min={-1} max={1} value={pan} label="pan" readOnly={true} />
+					<Knob
+						min={-1}
+						max={1}
+						value={pan}
+						onChange={value => this.props.dispatch(setBasicInstrumentParam(this.props.id, BasicInstrumentParam.pan, value))}
+						label="pan"
+					/>
 
 					<BasicInstrumentOscillatorTypes
 						handleClick={this._handleOscillatorTypeClicked}
@@ -148,6 +155,7 @@ const makeMapStateToProps = () => {
 			oscillatorType: instrumentState && instrumentState.oscillatorType,
 			instrumentId: instrumentState && instrumentState.id,
 			color: connection && getConnectionSourceColor(state, connection.id),
+			pan: instrumentState && instrumentState.pan,
 		}
 	}
 }

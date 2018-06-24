@@ -64,14 +64,13 @@ export class Keyboard extends React.Component<IKeyboardProps> {
 
 		return (
 			<div
-				id={this.props.id}
 				style={{color}}
 				className={`keyboard ${isLocal ? 'isLocal' : ''} ${isPlaying ? 'saturate' : 'isNotPlaying'}`}
 			>
 				<div className="label clientId colorize">
 					{ownerName || '""'}
 				</div>
-				<div className="container">
+				<div id={this.props.id} className="container">
 					<div className="isometricBoxShadow"></div>
 					<div className="octave black unselectable">
 						<div className="octaveNumber">

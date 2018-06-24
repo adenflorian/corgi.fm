@@ -30,6 +30,20 @@ export const setBasicInstrumentOscillatorType = makeServerAction(makeBroadcaster
 	}),
 ))
 
+export const SET_BASIC_INSTRUMENT_PARAM = 'SET_BASIC_INSTRUMENT_PARAM'
+export const setBasicInstrumentParam = makeServerAction(makeBroadcaster(
+	(id: string, paramName: BasicInstrumentParam, value: any) => ({
+		type: SET_BASIC_INSTRUMENT_PARAM,
+		id,
+		paramName,
+		value,
+	}),
+))
+
+export enum BasicInstrumentParam {
+	pan = 'pan',
+}
+
 export interface BasicInstrumentAction extends AnyAction {
 	instrument?: IBasicInstrumentState
 	instruments?: IBasicInstruments
@@ -49,12 +63,14 @@ export interface IBasicInstrumentState {
 	oscillatorType: OscillatorType
 	id: string
 	ownerId: ClientId
+	pan: number
 }
 
 export class BasicInstrumentState implements IBasicInstrumentState {
 	public oscillatorType: OscillatorType = 'sine'
 	public id = uuid.v4()
-	public ownerId
+	public ownerId: string
+	public pan: number
 
 	constructor(ownerId: ClientId) {
 		this.ownerId = ownerId
@@ -87,21 +103,33 @@ export function basicInstrumentsReducer(
 				},
 			}
 		case SET_BASIC_INSTRUMENT_OSCILLATOR_TYPE:
-			if (state.instruments[action.id] === undefined) {
-				throw new Error('instrument dos not exist with id: ' + action.id)
-			}
+		case SET_BASIC_INSTRUMENT_PARAM:
 			return {
 				...state,
 				instruments: {
 					...state.instruments,
-					[action.id]: {
-						...state.instruments[action.id],
-						oscillatorType: action.oscillatorType,
-					},
+					[action.id]: basicInstrumentReducer(state.instruments[action.id], action),
 				},
 			}
 		default:
 			return state
+	}
+}
+
+function basicInstrumentReducer(basicInstrument: IBasicInstrumentState, action: AnyAction) {
+	switch (action.type) {
+		case SET_BASIC_INSTRUMENT_OSCILLATOR_TYPE:
+			return {
+				...basicInstrument,
+				oscillatorType: action.oscillatorType,
+			}
+		case SET_BASIC_INSTRUMENT_PARAM:
+			return {
+				...basicInstrument,
+				[action.paramName]: action.value,
+			}
+		default:
+			throw new Error('invalid basicInstrument action type')
 	}
 }
 
