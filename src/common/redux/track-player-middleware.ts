@@ -5,19 +5,19 @@ import {makeActionCreator, makeBroadcaster, makeServerAction} from './redux-util
 import {ITrackEvent, selectTrack, setTrackIndex} from './tracks-redux'
 
 export const PLAY_TRACK = 'PLAY_TRACK'
-export const playTrack = makeServerAction(makeBroadcaster(makeActionCreator(PLAY_TRACK)))
+export const playTrack = makeServerAction(makeBroadcaster(makeActionCreator(PLAY_TRACK, 'id')))
 
 export const STOP_TRACK = 'STOP_TRACK'
-export const stopTrack = makeServerAction(makeBroadcaster(makeActionCreator(STOP_TRACK)))
+export const stopTrack = makeServerAction(makeBroadcaster(makeActionCreator(STOP_TRACK, 'id')))
 
 export const TOGGLE_PLAY_TRACK = 'TOGGLE_PLAY_TRACK'
-export const togglePlayTrack = makeActionCreator(TOGGLE_PLAY_TRACK)
+export const togglePlayTrack = makeActionCreator(TOGGLE_PLAY_TRACK, 'id')
 
 export const RESTART_TRACK = 'RESTART_TRACK'
-export const restartTrack = makeBroadcaster(makeActionCreator(RESTART_TRACK))
+export const restartTrack = makeBroadcaster(makeActionCreator(RESTART_TRACK, 'id'))
 
 export const REFRESH_TRACK_PLAYER_EVENTS = 'REFRESH_TRACK_PLAYER_EVENTS'
-export const refreshTrackPlayerEvents = makeBroadcaster(makeActionCreator(REFRESH_TRACK_PLAYER_EVENTS))
+export const refreshTrackPlayerEvents = makeBroadcaster(makeActionCreator(REFRESH_TRACK_PLAYER_EVENTS, 'id'))
 
 interface ITrackPlayers {
 	[trackId: string]: TrackPlayer

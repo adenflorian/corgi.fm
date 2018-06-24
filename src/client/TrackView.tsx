@@ -3,8 +3,8 @@ import * as React from 'react'
 import {connect, Dispatch} from 'react-redux'
 import {logger} from '../common/logger'
 import {IAppState} from '../common/redux/configureStore'
-import {refreshTrackPlayerEvents} from '../common/redux/track-player-middleware'
-import {ITrackEvent, playTrack, selectTrack, setTrackNote, stopTrack} from '../common/redux/tracks-redux'
+import {playTrack, refreshTrackPlayerEvents, restartTrack, stopTrack} from '../common/redux/track-player-middleware'
+import {ITrackEvent, selectTrack, setTrackNote} from '../common/redux/tracks-redux'
 import {isWhiteKey} from './Keyboard/Keyboard'
 import './TrackView.less'
 
@@ -93,7 +93,7 @@ export class TrackView extends Component<ITrackViewProps> {
 
 	private handleRestartButtonClicked = () => {
 		logger.warn('restart not yet impl')
-		// this.props.dispatch({})
+		this.props.dispatch(restartTrack(this.props.id))
 	}
 
 	private handleNoteClicked = (index: number, isEnabled: boolean, noteNumber: number) => {

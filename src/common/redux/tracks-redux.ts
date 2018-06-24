@@ -6,6 +6,7 @@ import {IMidiNote} from '../MidiNote'
 import {addIfNew} from '../server-common'
 import {IAppState} from './configureStore'
 import {makeActionCreator, makeBroadcaster, makeServerAction} from './redux-utils'
+import {PLAY_TRACK, STOP_TRACK} from './track-player-middleware'
 
 export const ADD_TRACK = 'ADD_TRACK'
 export const addTrack = makeServerAction(makeBroadcaster((track: ITrackState) => ({
@@ -52,22 +53,6 @@ export const setTrackIndex = (id: string, index: number) => {
 		type: SET_TRACK_INDEX,
 		id,
 		index,
-	}
-}
-
-export const PLAY_TRACK = 'PLAY_TRACK'
-export const playTrack = (id: string) => {
-	return {
-		type: PLAY_TRACK,
-		id,
-	}
-}
-
-export const STOP_TRACK = 'STOP_TRACK'
-export const stopTrack = (id: string) => {
-	return {
-		type: STOP_TRACK,
-		id,
 	}
 }
 
