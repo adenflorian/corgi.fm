@@ -30,12 +30,12 @@ export interface IConnectionsState {
 }
 
 export enum ConnectionSourceType {
-	keyboard,
-	track,
+	keyboard = 'keyboard',
+	track = 'track',
 }
 
 export enum ConnectionTargetType {
-	instrument,
+	instrument = 'instrument',
 }
 
 export interface IConnection {

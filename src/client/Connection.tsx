@@ -1,7 +1,9 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {IAppState} from '../common/redux/configureStore'
-import {IConnection, selectConnection, selectSourceByConnectionId} from '../common/redux/connections-redux'
+import {
+	getConnectionSourceColor, IConnection, selectConnection,
+} from '../common/redux/connections-redux'
 import './Connection.less'
 
 export interface IConnectionViewProps {
@@ -66,8 +68,7 @@ export class ConnectionView extends React.Component<IConnectionViewProps> {
 
 const mapState = (state: IAppState, props: IConnectionViewProps) => {
 	const connection = selectConnection(state, props.id) || {} as IConnection
-	const source = selectSourceByConnectionId(state, connection.id)
-	const sourceColor = source && source.color
+	const sourceColor = connection && getConnectionSourceColor(state, connection.id)
 	return {
 		sourceId: connection.sourceId,
 		targetId: connection.targetId,
