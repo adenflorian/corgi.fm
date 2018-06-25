@@ -98,6 +98,7 @@ export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 						value={pan}
 						onChange={value => this.props.dispatch(setBasicInstrumentParam(this.props.id, BasicInstrumentParam.pan, value))}
 						label="pan"
+						markColor="currentColor"
 					/>
 
 					<BasicInstrumentOscillatorTypes
