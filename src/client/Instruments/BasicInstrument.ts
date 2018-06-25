@@ -59,6 +59,10 @@ export class BasicInstrument {
 		this._panNode.pan.setValueAtTime(pan, this._audioContext.currentTime)
 	}
 
+	public setLowPassFilterCutoffFrequency(frequency: number) {
+		this._lowPassFilter.frequency.value = frequency
+	}
+
 	public setMidiNotes = (midiNotes: IMidiNote[]) => {
 		// const frequency: number = this._getFrequencyFromMidiNotes(midiNotes) || 0
 		// this._oscillator.frequency.value = frequency

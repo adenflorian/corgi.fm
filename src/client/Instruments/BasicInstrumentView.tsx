@@ -32,6 +32,7 @@ interface IBasicInstrumentViewProps {
 	dispatch?: Dispatch
 	instrumentId?: string
 	id: string
+	lowPassFilterCutoffFrequency?: number
 }
 
 const oscillatorTypes = [
@@ -70,6 +71,7 @@ export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 		if (this.props.pan !== nextProps.pan) return true
 		if (this.props.isPlaying !== nextProps.isPlaying) return true
 		if (this.props.oscillatorType !== nextProps.oscillatorType) return true
+		if (this.props.lowPassFilterCutoffFrequency !== nextProps.lowPassFilterCutoffFrequency) return true
 		return false
 	}
 
@@ -79,6 +81,7 @@ export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 		this.instrument.setMidiNotes(rawMidiNotes)
 		this.instrument.setOscillatorType(oscillatorType)
 		this.instrument.setPan(pan)
+		this.instrument.setLowPassFilterCutoffFrequency(this.props.lowPassFilterCutoffFrequency)
 
 		return (
 			<div
@@ -98,6 +101,20 @@ export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 						value={pan}
 						onChange={value => this.props.dispatch(setBasicInstrumentParam(this.props.id, BasicInstrumentParam.pan, value))}
 						label="pan"
+						markColor="currentColor"
+					/>
+
+					<Knob
+						min={0}
+						max={10000}
+						value={this.props.lowPassFilterCutoffFrequency}
+						onChange={value =>
+							this.props.dispatch(
+								setBasicInstrumentParam(this.props.id, BasicInstrumentParam.lowPassFilterCutoffFrequency, value),
+							)
+						}
+						sensitivity={100}
+						label="lpf"
 						markColor="currentColor"
 					/>
 
@@ -157,6 +174,7 @@ const makeMapStateToProps = () => {
 			instrumentId: instrumentState && instrumentState.id,
 			color: connection && getConnectionSourceColor(state, connection.id),
 			pan: instrumentState && instrumentState.pan,
+			lowPassFilterCutoffFrequency: instrumentState && instrumentState.lowPassFilterCutoffFrequency,
 		}
 	}
 }

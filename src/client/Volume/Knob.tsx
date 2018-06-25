@@ -111,7 +111,11 @@ export class Knob extends Component<IKnobProps, IKnobState> {
 				return Math.max(this.props.min, Math.min(this.props.max, combined))
 			}
 
-			this.props.onChange(calculateNewVolume(this.props.value, mouseXDelta, mouseYDelta))
+			const newValue = calculateNewVolume(this.props.value, mouseXDelta, mouseYDelta)
+
+			if (newValue !== this.props.value) {
+				this.props.onChange(calculateNewVolume(this.props.value, mouseXDelta, mouseYDelta))
+			}
 		}
 	}
 

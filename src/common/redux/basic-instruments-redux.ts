@@ -43,6 +43,7 @@ export const setBasicInstrumentParam = makeServerAction(makeBroadcaster(
 
 export enum BasicInstrumentParam {
 	pan = 'pan',
+	lowPassFilterCutoffFrequency = 'lowPassFilterCutoffFrequency',
 }
 
 export interface BasicInstrumentAction extends AnyAction {
@@ -65,6 +66,7 @@ export interface IBasicInstrumentState {
 	id: string
 	ownerId: ClientId
 	pan: number
+	lowPassFilterCutoffFrequency: number
 }
 
 export class BasicInstrumentState implements IBasicInstrumentState {
@@ -72,6 +74,7 @@ export class BasicInstrumentState implements IBasicInstrumentState {
 	public id = uuid.v4()
 	public ownerId: string
 	public pan: number = Math.random() - 0.5
+	public lowPassFilterCutoffFrequency: number = Math.random() * 10000 + 1000
 
 	constructor(ownerId: ClientId) {
 		this.ownerId = ownerId
