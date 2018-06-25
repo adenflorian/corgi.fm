@@ -11,6 +11,7 @@ export interface IConnectionViewProps {
 	sourceId?: string
 	targetId?: string
 	sourceColor?: string
+	offset?: number
 }
 
 type AnyRect = ClientRect | DOMRect | any
@@ -22,7 +23,11 @@ export class ConnectionView extends React.Component<IConnectionViewProps> {
 
 	constructor(props) {
 		super(props)
-		window.addEventListener('resize', this.componentDidUpdate)
+		window.addEventListener('resize', () => this.componentDidUpdate())
+		window.addEventListener('scroll', () => this.componentDidUpdate())
+		setTimeout(() => {
+			this.componentDidUpdate()
+		}, 500)
 	}
 
 	public componentDidUpdate() {
@@ -35,18 +40,18 @@ export class ConnectionView extends React.Component<IConnectionViewProps> {
 		// console.log('lineElement: ', lineElement)
 		if (sourceElement) {
 			const sourceBox: AnyRect = sourceElement.getBoundingClientRect()
-			lineElement.setAttribute('x1', (sourceBox.x - 50).toString())
+			lineElement.setAttribute('x1', (sourceBox.x - 50 - this.props.offset).toString())
 			lineElement.setAttribute('y1', (sourceBox.y + (sourceBox.height / 2)).toString())
-			sourceStubLineElement.setAttribute('x1', (sourceBox.x - 50).toString())
+			sourceStubLineElement.setAttribute('x1', (sourceBox.x - 50 - this.props.offset).toString())
 			sourceStubLineElement.setAttribute('y1', (sourceBox.y + (sourceBox.height / 2)).toString())
 			sourceStubLineElement.setAttribute('x2', (sourceBox.x).toString())
 			sourceStubLineElement.setAttribute('y2', (sourceBox.y + (sourceBox.height / 2)).toString())
 		}
 		if (targetElement) {
 			const targetBox: AnyRect = targetElement.getBoundingClientRect()
-			lineElement.setAttribute('x2', (targetBox.x - 50).toString())
+			lineElement.setAttribute('x2', (targetBox.x - 50 - this.props.offset).toString())
 			lineElement.setAttribute('y2', (targetBox.y + (targetBox.height / 2)).toString())
-			targetStubLineElement.setAttribute('x1', (targetBox.x - 50).toString())
+			targetStubLineElement.setAttribute('x1', (targetBox.x - 50 - this.props.offset).toString())
 			targetStubLineElement.setAttribute('y1', (targetBox.y + (targetBox.height / 2)).toString())
 			targetStubLineElement.setAttribute('x2', (targetBox.x).toString())
 			targetStubLineElement.setAttribute('y2', (targetBox.y + (targetBox.height / 2)).toString())
@@ -73,6 +78,7 @@ const mapState = (state: IAppState, props: IConnectionViewProps) => {
 		sourceId: connection.sourceId,
 		targetId: connection.targetId,
 		sourceColor,
+		offset: connection.id.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0) % 100,
 	}
 }
 

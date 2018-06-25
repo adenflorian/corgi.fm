@@ -28,12 +28,11 @@ export class TrackView extends Component<ITrackViewProps> {
 
 		return (
 			<div
-				id={this.props.id}
 				className={`track ${isPlaying ? 'isPlaying saturate' : 'isNotPlaying'}`}
 				style={{color}}
 			>
 				<div className="label transitionAllColor">track-1</div>
-				<div className="container">
+				<div id={this.props.id} className="container">
 					<div className="isometricBoxShadow"></div>
 					<div className="controls unselectable">
 						<div
