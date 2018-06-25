@@ -60,12 +60,13 @@ export class ConnectionView extends React.Component<IConnectionViewProps> {
 
 	public render() {
 		const color = this.props.sourceColor
+		const strokeWidth = '2px'
 
 		return (
 			<svg className="connection" xmlns="http://www.w3.org/2000/svg">
-				<line ref={this.connectionLine} x1={0} y1={0} x2={0} y2={0} stroke={color} strokeWidth="4px" />
-				<line ref={this.sourceStubLine} x1={0} y1={0} x2={0} y2={0} stroke={color} strokeWidth="4px" />
-				<line ref={this.targetStubLine} x1={0} y1={0} x2={0} y2={0} stroke={color} strokeWidth="4px" />
+				<line ref={this.connectionLine} x1={0} y1={0} x2={0} y2={0} stroke={color} strokeWidth={strokeWidth} />
+				<line ref={this.sourceStubLine} x1={0} y1={0} x2={0} y2={0} stroke={color} strokeWidth={strokeWidth} />
+				<line ref={this.targetStubLine} x1={0} y1={0} x2={0} y2={0} stroke={color} strokeWidth={strokeWidth} />
 			</svg>
 		)
 	}

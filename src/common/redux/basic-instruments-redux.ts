@@ -1,6 +1,7 @@
 import {AnyAction} from 'redux'
 import * as uuid from 'uuid'
 import {ClientId} from '../../client/websocket-listeners'
+import {pickRandomArrayElement} from '../common-utils'
 import {IAppState} from './configureStore'
 import {makeActionCreator, makeBroadcaster, makeServerAction} from './redux-utils'
 
@@ -67,10 +68,10 @@ export interface IBasicInstrumentState {
 }
 
 export class BasicInstrumentState implements IBasicInstrumentState {
-	public oscillatorType: OscillatorType = 'sine'
+	public oscillatorType: OscillatorType = pickRandomArrayElement(['sine', 'sawtooth', 'square']) as OscillatorType
 	public id = uuid.v4()
 	public ownerId: string
-	public pan: number
+	public pan: number = Math.random() - 0.5
 
 	constructor(ownerId: ClientId) {
 		this.ownerId = ownerId
