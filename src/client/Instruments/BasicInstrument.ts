@@ -1,4 +1,4 @@
-// import ADSR from 'adsr'
+import ADSR from 'adsr'
 import {IMidiNote} from '../../common/MidiNote'
 import {getFrequencyUsingHalfStepsFromA4} from '../music/music-functions'
 
@@ -10,7 +10,7 @@ export class BasicInstrument {
 	private _voiceCount = 10
 	private _lowPassFilter: BiquadFilterNode
 	private _lfo: OscillatorNode
-	// private _adsr: AudioNode | any
+	private _adsr: AudioNode | any
 
 	constructor({destination, audioContext}: {destination: any, audioContext: AudioContext}) {
 		this._audioContext = audioContext
@@ -37,14 +37,10 @@ export class BasicInstrument {
 		this._lfo.start()
 
 		this._gain = audioContext.createGain()
+		this._gain.gain.value = 0
 
-		this._lfo.connect(lfoGain)
-			.connect(this._gain.gain)
-
-		// this._adsr = ADSR(this._audioContext)
-		// this._adsr.attack = 3
-		// this._adsr.start(this._audioContext.currentTime)
-		// this._adsr.connect(this._gain.gain)
+		// this._lfo.connect(lfoGain)
+		// 	.connect(this._gain.gain)
 
 		this._panNode.connect(this._lowPassFilter)
 		this._lowPassFilter.connect(this._gain)
@@ -88,6 +84,8 @@ export class BasicInstrument {
 
 		this._lfo.frequency.linearRampToValueAtTime((highestFrequency / 100) + 1, this._audioContext.currentTime + 0.01)
 
+		this._initAdsr()
+
 		// let adjustedMidiNotes
 
 		// if (midiNotes.length >= this._oscillators.length) {
@@ -123,6 +121,21 @@ export class BasicInstrument {
 	public dispose() {
 		this._oscillators.forEach(osc => osc.stop())
 		this._lfo.stop()
+	}
+
+	private _initAdsr() {
+		if (this._adsr) {
+			this._adsr.stop(this._audioContext.currentTime)
+			this._adsr.disconnect()
+		}
+		this._adsr = ADSR(this._audioContext)
+		this._adsr.connect(this._gain.gain)
+		this._adsr.attack = 0.01
+		this._adsr.decay = 0.4
+		this._adsr.sustain = 0
+		this._adsr.release = 0
+		this._adsr.value.value = 2
+		this._adsr.start(this._audioContext.currentTime)
 	}
 }
 
