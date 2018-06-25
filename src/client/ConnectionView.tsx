@@ -1,3 +1,4 @@
+import Color from 'color'
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {IAppState} from '../common/redux/configureStore'
@@ -40,18 +41,18 @@ export class ConnectionView extends React.Component<IConnectionViewProps> {
 		// console.log('lineElement: ', lineElement)
 		if (sourceElement) {
 			const sourceBox: AnyRect = sourceElement.getBoundingClientRect()
-			lineElement.setAttribute('x1', (sourceBox.x - 50 - this.props.offset).toString())
+			lineElement.setAttribute('x1', (sourceBox.x + sourceBox.width + this.props.offset).toString())
 			lineElement.setAttribute('y1', (sourceBox.y + (sourceBox.height / 2)).toString())
-			sourceStubLineElement.setAttribute('x1', (sourceBox.x - 50 - this.props.offset).toString())
+			sourceStubLineElement.setAttribute('x1', (sourceBox.x + sourceBox.width + this.props.offset).toString())
 			sourceStubLineElement.setAttribute('y1', (sourceBox.y + (sourceBox.height / 2)).toString())
-			sourceStubLineElement.setAttribute('x2', (sourceBox.x).toString())
+			sourceStubLineElement.setAttribute('x2', (sourceBox.x + sourceBox.width).toString())
 			sourceStubLineElement.setAttribute('y2', (sourceBox.y + (sourceBox.height / 2)).toString())
 		}
 		if (targetElement) {
 			const targetBox: AnyRect = targetElement.getBoundingClientRect()
-			lineElement.setAttribute('x2', (targetBox.x - 50 - this.props.offset).toString())
+			lineElement.setAttribute('x2', (targetBox.x - this.props.offset).toString())
 			lineElement.setAttribute('y2', (targetBox.y + (targetBox.height / 2)).toString())
-			targetStubLineElement.setAttribute('x1', (targetBox.x - 50 - this.props.offset).toString())
+			targetStubLineElement.setAttribute('x1', (targetBox.x - this.props.offset).toString())
 			targetStubLineElement.setAttribute('y1', (targetBox.y + (targetBox.height / 2)).toString())
 			targetStubLineElement.setAttribute('x2', (targetBox.x).toString())
 			targetStubLineElement.setAttribute('y2', (targetBox.y + (targetBox.height / 2)).toString())
@@ -60,13 +61,15 @@ export class ConnectionView extends React.Component<IConnectionViewProps> {
 
 	public render() {
 		const color = this.props.sourceColor
+		const darkerColor = Color(this.props.sourceColor).darken(0.6).hsl().string()
 		const strokeWidth = '2px'
+		const strokeWidth2 = '8px'
 
 		return (
 			<svg className="connection" xmlns="http://www.w3.org/2000/svg">
-				<line ref={this.connectionLine} x1={0} y1={0} x2={0} y2={0} stroke={color} strokeWidth={strokeWidth} />
-				<line ref={this.sourceStubLine} x1={0} y1={0} x2={0} y2={0} stroke={color} strokeWidth={strokeWidth} />
-				<line ref={this.targetStubLine} x1={0} y1={0} x2={0} y2={0} stroke={color} strokeWidth={strokeWidth} />
+				<line ref={this.connectionLine} x1={0} y1={0} x2={0} y2={0} stroke={darkerColor} strokeWidth={strokeWidth} />
+				<line ref={this.sourceStubLine} x1={0} y1={0} x2={0} y2={0} stroke={color} strokeWidth={strokeWidth2} />
+				<line ref={this.targetStubLine} x1={0} y1={0} x2={0} y2={0} stroke={color} strokeWidth={strokeWidth2} />
 			</svg>
 		)
 	}
@@ -79,7 +82,8 @@ const mapState = (state: IAppState, props: IConnectionViewProps) => {
 		sourceId: connection.sourceId,
 		targetId: connection.targetId,
 		sourceColor,
-		offset: connection.id.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0) % 100,
+		// offset: connection.id.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0) % 100,
+		offset: 16,
 	}
 }
 
