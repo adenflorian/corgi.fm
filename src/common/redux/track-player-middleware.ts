@@ -1,8 +1,8 @@
 import {AnyAction, Dispatch, Middleware, Store} from 'redux'
 import {audioContext} from '../../client/setup-audio-context'
-import {ISimpleTrackEvent, SimpleTrackEventAction, TrackPlayer} from '../../client/TrackPlayer'
+import {TrackPlayer} from '../../client/TrackPlayer'
 import {makeActionCreator, makeBroadcaster, makeServerAction} from './redux-utils'
-import {ITrackEvent, selectTrack, setTrackIndex} from './tracks-redux'
+import {selectTrack, setTrackIndex} from './tracks-redux'
 
 export const PLAY_TRACK = 'PLAY_TRACK'
 export const playTrack = makeServerAction(makeBroadcaster(makeActionCreator(PLAY_TRACK, 'id')))
@@ -31,7 +31,7 @@ export const trackPlayerMiddleware: Middleware = (store: Store) => next => actio
 		case STOP_TRACK:
 		case TOGGLE_PLAY_TRACK:
 		case RESTART_TRACK:
-		case REFRESH_TRACK_PLAYER_EVENTS:
+			// case REFRESH_TRACK_PLAYER_EVENTS:
 			let trackPlayer = trackPlayers[action.id]
 			if (trackPlayer === undefined) {
 				trackPlayers[action.id] = new TrackPlayer(
@@ -49,7 +49,7 @@ export const trackPlayerMiddleware: Middleware = (store: Store) => next => actio
 function foo(action: AnyAction, trackPlayer: TrackPlayer, next: Dispatch, store: Store) {
 	switch (action.type) {
 		case PLAY_TRACK:
-			trackPlayer.play(notesToEvents(selectTrack(store.getState(), action.id).notes))
+			trackPlayer.play(selectTrack(store.getState(), action.id).notes.length)
 			return next(action)
 		case STOP_TRACK:
 			trackPlayer.stop()
@@ -59,37 +59,37 @@ function foo(action: AnyAction, trackPlayer: TrackPlayer, next: Dispatch, store:
 				trackPlayer.stop()
 				next(stopTrack())
 			} else {
-				trackPlayer.play(notesToEvents(selectTrack(store.getState(), action.id).notes))
+				trackPlayer.play(selectTrack(store.getState(), action.id).notes.length)
 				next(playTrack())
 			}
 			return next(action)
 		case RESTART_TRACK:
 			if (trackPlayer.isPlaying()) {
 				trackPlayer.stop()
-				trackPlayer.play(notesToEvents(selectTrack(store.getState(), action.id).notes))
+				trackPlayer.play(selectTrack(store.getState(), action.id).notes.length)
 			}
 			return next(action)
-		case REFRESH_TRACK_PLAYER_EVENTS:
-			next(action)
-			trackPlayer.setEvents(notesToEvents(selectTrack(store.getState(), action.id).notes))
-			return
+		// case REFRESH_TRACK_PLAYER_EVENTS:
+		// 	next(action)
+		// 	trackPlayer.setEvents(selectTrack(store.getState(), action.id).notes.length)
+		// 	return
 		default:
 			throw new Error('invalid track player action type')
 	}
 }
 
-function notesToEvents(events: ITrackEvent[]): ISimpleTrackEvent[] {
-	return events.reduce((newEvents, event, index) => {
-		newEvents.push({
-			time: index / 5,
-			action: SimpleTrackEventAction.playNote,
-			notes: event.notes,
-		})
-		newEvents.push({
-			time: (index / 5) + (1 / 5),
-			action: SimpleTrackEventAction.stopNote,
-			notes: event.notes,
-		})
-		return newEvents
-	}, []).concat({time: events.length / 5, action: SimpleTrackEventAction.endTrack, notes: []})
-}
+// function notesToEvents(events: ITrackEvent[]): ISimpleTrackEvent[] {
+// 	return events.reduce((newEvents, event, index) => {
+// 		newEvents.push({
+// 			time: index / 5,
+// 			action: SimpleTrackEventAction.playNote,
+// 			notes: event.notes,
+// 		})
+// 		newEvents.push({
+// 			time: (index / 5) + (1 / 5),
+// 			action: SimpleTrackEventAction.stopNote,
+// 			notes: event.notes,
+// 		})
+// 		return newEvents
+// 	}, []).concat({time: events.length / 5, action: SimpleTrackEventAction.endTrack, notes: []})
+// }
