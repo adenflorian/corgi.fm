@@ -74,6 +74,7 @@ export interface ITrackState {
 	isPlaying: boolean
 	id: string
 	color: string
+	name: string
 }
 
 export class TrackState implements ITrackState {
@@ -82,6 +83,7 @@ export class TrackState implements ITrackState {
 	public readonly index: number = -1
 	public readonly isPlaying: boolean = false
 	public readonly color: string
+	public name: string
 
 	constructor(events?: ITrackEvent[]) {
 		this.color = Color(hashbow(this.id)).desaturate(0.2).hsl().string()

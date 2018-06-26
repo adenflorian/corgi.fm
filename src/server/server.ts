@@ -39,6 +39,7 @@ function createServerStuff(dispatch: Dispatch) {
 	dispatch(addBasicInstrument(newInstrument))
 
 	const serverTrack = new TrackState(getInitialTrackEvents())
+	serverTrack.name = 'track 1'
 	dispatch(addTrack(serverTrack))
 	dispatch(addConnection(new Connection(
 		serverTrack.id,
@@ -56,6 +57,7 @@ function createServerStuff(dispatch: Dispatch) {
 	dispatch(addBasicInstrument(newInstrument2))
 
 	const serverTrack2 = new TrackState(getInitialTrackEvents2())
+	serverTrack2.name = 'track 2'
 	dispatch(addTrack(serverTrack2))
 	dispatch(addConnection(new Connection(
 		serverTrack2.id,

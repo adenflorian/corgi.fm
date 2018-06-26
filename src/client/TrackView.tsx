@@ -15,6 +15,7 @@ interface ITrackViewProps {
 	color?: string
 	dispatch?: Dispatch
 	id: string
+	name: string
 }
 
 export class TrackView extends Component<ITrackViewProps> {
@@ -31,7 +32,7 @@ export class TrackView extends Component<ITrackViewProps> {
 				className={`track ${isPlaying ? 'isPlaying saturate' : 'isNotPlaying'}`}
 				style={{color}}
 			>
-				<div className="label transitionAllColor">track-1</div>
+				<div className="label transitionAllColor">{this.props.name}</div>
 				<div id={this.props.id} className="container">
 					<div className="isometricBoxShadow"></div>
 					<div className="controls unselectable">
@@ -108,6 +109,7 @@ const mapStateToProps = (state: IAppState, props: ITrackViewProps) => {
 		activeIndex: track.index,
 		isPlaying: track.isPlaying,
 		color: track.color,
+		name: track.name,
 	}
 }
 
