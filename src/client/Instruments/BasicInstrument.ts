@@ -1,4 +1,4 @@
-import ADSR from 'adsr'
+// import ADSR from 'adsr'
 import {IMidiNote} from '../../common/MidiNote'
 import {getFrequencyUsingHalfStepsFromA4} from '../music/music-functions'
 
@@ -6,38 +6,23 @@ export class BasicInstrument {
 	private _panNode: StereoPannerNode
 	private _audioContext: AudioContext
 	private _gain: GainNode
-	private _oscillators: OscillatorNode[] = []
-	private _voiceCount = 10
+	// private _voiceCount = 10
 	private _lowPassFilter: BiquadFilterNode
-	private _lfo: OscillatorNode
-	private _adsr: AudioNode | any
+	private _previousNotes: number[] = []
+	private _noteToOscillatorMap: Map<number, OscillatorNode> = new Map()
+	private _oscillatorType: OscillatorType
 
 	constructor({destination, audioContext}: {destination: any, audioContext: AudioContext}) {
 		this._audioContext = audioContext
 
 		this._panNode = this._audioContext.createStereoPanner()
 
-		for (let i = 0; i < this._voiceCount; i++) {
-			this._oscillators[i] = this._audioContext.createOscillator()
-			this._oscillators[i].type = 'sawtooth'
-			this._oscillators[i].frequency.value = 0
-			this._oscillators[i].connect(this._panNode)
-			this._oscillators[i].start()
-		}
-
 		this._lowPassFilter = this._audioContext.createBiquadFilter()
 		this._lowPassFilter.type = 'lowpass'
 		this._lowPassFilter.frequency.value = 10000
 
-		this._lfo = audioContext.createOscillator()
-		this._lfo.frequency.value = 2
-		const lfoGain = audioContext.createGain()
-		lfoGain.gain.value = 0.05
-
-		this._lfo.start()
-
 		this._gain = audioContext.createGain()
-		this._gain.gain.value = 0
+		this._gain.gain.value = 1
 
 		// this._lfo.connect(lfoGain)
 		// 	.connect(this._gain.gain)
@@ -60,83 +45,53 @@ export class BasicInstrument {
 	}
 
 	public setMidiNotes = (midiNotes: IMidiNote[]) => {
-		// const frequency: number = this._getFrequencyFromMidiNotes(midiNotes) || 0
-		// this._oscillator.frequency.value = frequency
+		const newNotes = midiNotes.filter(x => this._previousNotes.includes(x) === false)
+		const offNotes = this._previousNotes.filter(x => midiNotes.includes(x) === false)
 
-		let highestFrequency = 0
-
-		// TODO: Find oscillator that's at desired freq and use it,
-		//   or store state of pressed midi notes and only do things for changed notes
-
-		this._oscillators.forEach((oscillator, index) => {
-			const newFrequency = midiNoteToFrequency(midiNotes[index])
-
-			// oscillator.frequency.linearRampToValueAtTime(newFrequency, this._audioContext.currentTime + 0.01)
-
-			if (oscillator.frequency.value !== newFrequency) {
-				oscillator.frequency.value = newFrequency
-			}
-
-			if (newFrequency > highestFrequency) {
-				highestFrequency = newFrequency
-			}
+		newNotes.forEach(note => {
+			const newOsc = this._audioContext.createOscillator()
+			this._noteToOscillatorMap.set(note, newOsc)
+			newOsc.type = this._oscillatorType
+			newOsc.frequency.value = midiNoteToFrequency(note)
+			newOsc.connect(this._panNode)
+			newOsc.start()
 		})
 
-		this._lfo.frequency.linearRampToValueAtTime((highestFrequency / 100) + 1, this._audioContext.currentTime + 0.01)
+		offNotes.forEach(note => {
+			const oldOsc = this._noteToOscillatorMap.get(note)
+			oldOsc.stop()
+			oldOsc.disconnect()
+			this._noteToOscillatorMap.delete(note)
+		})
 
-		this._initAdsr()
-
-		// let adjustedMidiNotes
-
-		// if (midiNotes.length >= this._oscillators.length) {
-		// 	this._oscillators
-		// } else if (midiNotes.length < this._voiceCount) {
-		// 	const notesToAdd = this._voiceCount - midiNotes.length
-		// 	adjustedMidiNotes = midiNotes
-		// 	for (let i = 0; i < notesToAdd; i++) {
-		// 		const element = array[i]
-		// 		adjustedMidiNotes.push(0)
-		// 	}
-		// 	adjustedMidiNotes
-		// } else {
-		// 	adjustedMidiNotes = midiNotes
-		// }
-
+		this._previousNotes = midiNotes
 	}
 
 	public setOscillatorType = (type: OscillatorType) => {
-		this._oscillators.forEach(osc => {
-			if (osc.type !== type) {
-				osc.type = type
-			}
+		this._oscillatorType = type
+	}
+
+	public dispose() {
+		this._noteToOscillatorMap.forEach(osc => {
+			osc.stop()
+			osc.disconnect()
 		})
 	}
 
-	// private _getFrequencyFromMidiNotes(midiNotes: IMidiNote[]): number {
-	// 	return !midiNotes || midiNotes.length === 0
-	// 		? 0
-	// 		: midiNoteToFrequency(midiNotes[midiNotes.length - 1])
+	// private _initAdsr() {
+	// 	if (this._adsr) {
+	// 		this._adsr.stop(this._audioContext.currentTime)
+	// 		this._adsr.disconnect()
+	// 	}
+	// 	this._adsr = ADSR(this._audioContext)
+	// 	this._adsr.connect(this._gain.gain)
+	// 	this._adsr.attack = 0.01
+	// 	this._adsr.decay = 0.4
+	// 	this._adsr.sustain = 0
+	// 	this._adsr.release = 0
+	// 	this._adsr.value.value = 2
+	// 	this._adsr.start(this._audioContext.currentTime)
 	// }
-
-	public dispose() {
-		this._oscillators.forEach(osc => osc.stop())
-		this._lfo.stop()
-	}
-
-	private _initAdsr() {
-		if (this._adsr) {
-			this._adsr.stop(this._audioContext.currentTime)
-			this._adsr.disconnect()
-		}
-		this._adsr = ADSR(this._audioContext)
-		this._adsr.connect(this._gain.gain)
-		this._adsr.attack = 0.01
-		this._adsr.decay = 0.4
-		this._adsr.sustain = 0
-		this._adsr.release = 0
-		this._adsr.value.value = 2
-		this._adsr.start(this._audioContext.currentTime)
-	}
 }
 
 const A4 = 69
@@ -147,3 +102,8 @@ function midiNoteToFrequency(midiNote: IMidiNote): number {
 	const halfStepsFromA4 = midiNote - A4
 	return getFrequencyUsingHalfStepsFromA4(halfStepsFromA4)
 }
+
+// class Voice {
+// 	private _oscillator: OscillatorNode
+// 	private _gain: GainNode
+// }
