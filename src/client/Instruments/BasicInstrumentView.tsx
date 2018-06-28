@@ -50,11 +50,13 @@ export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 
 	private instrument: BasicInstrument
 
-	constructor(props) {
+	constructor(props: IBasicInstrumentViewProps) {
 		super(props)
 		this.instrument = new BasicInstrument({
 			audioContext,
 			destination: preFx,
+			voiceCount: 3,
+			oscillatorType: props.oscillatorType,
 		})
 		this.instrument.setPan(props.pan)
 	}
