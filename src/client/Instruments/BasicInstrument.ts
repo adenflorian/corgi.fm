@@ -17,7 +17,7 @@ export class BasicInstrument {
 	private _previousNotes: number[] = []
 	private _oscillatorType: OscillatorType
 	private _attackTimeInSeconds: number = 0.01
-	private _releaseTimeInSeconds: number = 2
+	private _releaseTimeInSeconds: number = 0.01
 	private _voices: Voices
 	private _settingMidiNotes: boolean = false
 
@@ -90,12 +90,8 @@ function midiNoteToFrequency(midiNote: IMidiNote): number {
 
 class Voices {
 	private _availableVoices: Voice[] = []
-	private _noteToVoiceMap: Map<number, Voice> = new Map()
-	private _notePlayOrder: number[] = []
-	private _audioContext: AudioContext
 
 	constructor(voiceCount: number, audioContext: AudioContext, destination: AudioNode, oscType: OscillatorType) {
-		this._audioContext = audioContext
 		for (let i = 0; i < voiceCount; i++) {
 			this._availableVoices.push(new Voice(audioContext, destination, oscType))
 		}
@@ -103,77 +99,38 @@ class Voices {
 
 	public playNote(note: number, oscType: OscillatorType, attackTimeInSeconds: number) {
 		logger.log('Voices.playNote: ', note)
-		logger.log('Voices.playNote this._notePlayOrder: ', this._notePlayOrder)
-		logger.log('Voices.playNote this._noteToVoiceMap: ', this._noteToVoiceMap)
+
 		const voice = this._getVoice()
-
-		this._noteToVoiceMap.set(note, voice)
-
-		this._notePlayOrder.push(note)
-
-		if (this._notePlayOrder.length > 3) {
-			throw new Error('ggggggggggg')
-		}
 
 		voice.playNote(note, oscType, attackTimeInSeconds)
 	}
 
 	public releaseNote = (note: number, timeToReleaseInSeconds: number) => {
 		logger.log('Voices.releaseNote: ', note)
-		logger.log('Voices.releaseNote: ', this._noteToVoiceMap)
 
-		if (this._noteToVoiceMap.has(note) === false) return
+		const voice = this._availableVoices.find(x => x.playingNote === note)
 
-		logger.log('Voices.releaseNote2')
+		if (voice) {
+			voice.release(timeToReleaseInSeconds)
+			this._availableVoices = this._availableVoices.filter(x => x !== voice)
+			this._availableVoices.unshift(voice)
+		}
 
-		const voice = this._noteToVoiceMap.get(note) as Voice
-
-		logger.log('Voices.releaseNote voice: ', voice)
-
-		voice.release(timeToReleaseInSeconds)
-
-		const releasedNotePlayStartTime = voice.playStartTime
-
-		setTimeout(() => {
-			logger.log('Voices.releaseNote after timeout: ', this._noteToVoiceMap)
-			logger.log('Voices.releaseNote after timeout: ', this._noteToVoiceMap.has(note))
-			logger.log('Voices.releaseNote after timeout releasedNotePlayStartTime: ', releasedNotePlayStartTime)
-			logger.log('Voices.releaseNote after timeout voice.playStartTime: ', voice.playStartTime)
-			logger.log('Voices.releaseNote after timeout this._noteToVoiceMap.get(note): ', this._noteToVoiceMap.get(note))
-			if (this._noteToVoiceMap.has(note) === false) return
-			logger.log('8888888', voice)
-			const currentVoice = this._noteToVoiceMap.get(note)
-			if (releasedNotePlayStartTime !== currentVoice.playStartTime) return
-			logger.log('9999999', voice)
-			this._availableVoices.push(voice)
-			this._noteToVoiceMap.delete(note)
-			this._notePlayOrder = this._notePlayOrder.filter(x => x !== note)
-		}, timeToReleaseInSeconds * 1000)
 	}
 
 	private _getVoice(): Voice {
-		if (this._availableVoices.length > 0) {
-			logger.log('pop')
-			logger.log('pop this._availableVoices: ', this._availableVoices)
-			return this._availableVoices.pop()
-		} else {
-			logger.log('steal')
-			if (this._notePlayOrder.length > 3) {
-				throw new Error('asdadasdads')
-			}
-			const note = this._notePlayOrder[0]
-			logger.log('steal note: ', note)
-			logger.log('steal this._notePlayOrder before: ', this._notePlayOrder)
-			this._notePlayOrder = this._notePlayOrder.slice(1)
-			logger.log('steal this._notePlayOrder after: ', this._notePlayOrder)
-			const voice = this._noteToVoiceMap.get(note)
-			this._noteToVoiceMap.delete(note)
-			return voice
-		}
+		logger.log('_getVoice')
+		logger.log('_getVoice: ', JSON.stringify(this._availableVoices, null, 2))
+		const voice = this._availableVoices.shift()
+		logger.log('_getVoice: ', JSON.stringify(this._availableVoices, null, 2))
+		this._availableVoices.push(voice)
+		logger.log('_getVoice: ', JSON.stringify(this._availableVoices, null, 2))
+		return voice
 	}
 }
 
 class Voice {
+	public playingNote: number = -1
 	public playStartTime: number = 0
 	private _oscillator: OscillatorNode
 	private _gain: GainNode | any
@@ -193,6 +150,7 @@ class Voice {
 	}
 
 	public playNote(note: number, oscType: OscillatorType, attackTimeInSeconds: number) {
+		this._gain.gain.cancelAndHoldAtTime(this._audioContext.currentTime)
 		this._gain.gain.setValueAtTime(0, this._audioContext.currentTime)
 		this._gain.gain.linearRampToValueAtTime(1, this._audioContext.currentTime + attackTimeInSeconds)
 
@@ -200,14 +158,19 @@ class Voice {
 		this._oscillator.frequency.value = midiNoteToFrequency(note)
 
 		this.playStartTime = this._audioContext.currentTime
+
+		this.playingNote = note
 	}
 
 	public release = (timeToReleaseInSeconds: number) => {
 		// this._gain.gain.cancelAndHoldAtTime(this._audioContext.currentTime)
-		// const endTime = this._audioContext.currentTime + timeToReleaseInSeconds
+		const endTime = this._audioContext.currentTime + timeToReleaseInSeconds
+		this._gain.gain.exponentialRampToValueAtTime(0.00001, endTime)
 		// this._gain.gain.exponentialRampToValueAtTime(0.00001, endTime)
 		// this._gain.gain.setValueAtTime(0, endTime + 0.001)
-		this._oscillator.frequency.setValueAtTime(0, this._audioContext.currentTime)
+		// this._oscillator.frequency.setValueAtTime(0, this._audioContext.currentTime)
+
+		this.playingNote = -1
 	}
 
 	public setOscillatorType = (oscType: OscillatorType) => {
