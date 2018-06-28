@@ -16,8 +16,8 @@ export class BasicInstrument {
 	private _lowPassFilter: BiquadFilterNode
 	private _previousNotes: number[] = []
 	private _oscillatorType: OscillatorType
-	private _attackTimeInSeconds: number = 0.01
-	private _releaseTimeInSeconds: number = 0.01
+	private _attackTimeInSeconds: number = 5
+	private _releaseTimeInSeconds: number = 5
 	private _voices: Voices
 	private _settingMidiNotes: boolean = false
 
@@ -119,12 +119,8 @@ class Voices {
 	}
 
 	private _getVoice(): Voice {
-		logger.log('_getVoice')
-		logger.log('_getVoice: ', JSON.stringify(this._availableVoices, null, 2))
 		const voice = this._availableVoices.shift()
-		logger.log('_getVoice: ', JSON.stringify(this._availableVoices, null, 2))
 		this._availableVoices.push(voice)
-		logger.log('_getVoice: ', JSON.stringify(this._availableVoices, null, 2))
 		return voice
 	}
 }
@@ -133,7 +129,7 @@ class Voice {
 	public playingNote: number = -1
 	public playStartTime: number = 0
 	private _oscillator: OscillatorNode
-	private _gain: GainNode | any
+	private _gain: GainNode
 	private _audioContext: AudioContext
 
 	constructor(audioContext: AudioContext, destination: AudioNode, oscType: OscillatorType) {
@@ -144,13 +140,15 @@ class Voice {
 		this._oscillator.frequency.setValueAtTime(0, this._audioContext.currentTime)
 
 		this._gain = audioContext.createGain()
+		this._gain.gain.setValueAtTime(0, this._audioContext.currentTime)
 
 		this._oscillator.connect(this._gain)
 			.connect(destination)
 	}
 
 	public playNote(note: number, oscType: OscillatorType, attackTimeInSeconds: number) {
-		this._gain.gain.cancelAndHoldAtTime(this._audioContext.currentTime)
+		this._gain.gain.cancelScheduledValues(this._audioContext.currentTime)
+		// this._gain.gain.setValueAtTime(this._gain.gain.value, this._audioContext.currentTime)
 		this._gain.gain.setValueAtTime(0, this._audioContext.currentTime)
 		this._gain.gain.linearRampToValueAtTime(1, this._audioContext.currentTime + attackTimeInSeconds)
 
@@ -163,7 +161,9 @@ class Voice {
 	}
 
 	public release = (timeToReleaseInSeconds: number) => {
-		// this._gain.gain.cancelAndHoldAtTime(this._audioContext.currentTime)
+		const gain = this._gain.gain as any
+		gain.cancelAndHoldAtTime(this._audioContext.currentTime)
+		this._gain.gain.setValueAtTime(this._gain.gain.value, this._audioContext.currentTime)
 		const endTime = this._audioContext.currentTime + timeToReleaseInSeconds
 		this._gain.gain.exponentialRampToValueAtTime(0.00001, endTime)
 		// this._gain.gain.exponentialRampToValueAtTime(0.00001, endTime)
