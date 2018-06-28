@@ -18,12 +18,18 @@
 - [ ] midi timeline thing
 - [ ] maybe use automerge? https://github.com/automerge/automerge
 - [ ] options view
-- [ ] maybe use requestAnimationFrame()
+- [√] maybe use requestAnimationFrame()
 - [ ] store index of simpleTrack on server for new clients
 - [ ] make use of `'` and `[` keys
 - [ ] add `+` and `-` for octave
 - [ ] persist keyboard state on server, and don't store notes and octaves on clients
-
+- [ ] TONE.js
+- [ ] immer js
+- [...] ADSR
+	- [...] A
+	- [ ] D
+	- [ ] S
+	- [...] R
 
 # References
 - https://github.com/grimmdude/MidiPlayerJS/blob/master/src/player.js
