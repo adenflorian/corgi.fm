@@ -147,9 +147,7 @@ class Voice {
 	}
 
 	public playNote(note: number, oscType: OscillatorType, attackTimeInSeconds: number) {
-		const gain = this._gain.gain as any
-		gain.cancelAndHoldAtTime(this._audioContext.currentTime)
-		// this._gain.gain.cancelScheduledValues(this._audioContext.currentTime)
+		this._cancelAndHoldOrJustCancel()
 		this._gain.gain.setValueAtTime(0, this._audioContext.currentTime)
 		this._gain.gain.linearRampToValueAtTime(1, this._audioContext.currentTime + attackTimeInSeconds)
 
@@ -162,8 +160,7 @@ class Voice {
 	}
 
 	public release = (timeToReleaseInSeconds: number) => {
-		const gain = this._gain.gain as any
-		gain.cancelAndHoldAtTime(this._audioContext.currentTime)
+		this._cancelAndHoldOrJustCancel()
 		this._gain.gain.setValueAtTime(this._gain.gain.value, this._audioContext.currentTime)
 		this._gain.gain.exponentialRampToValueAtTime(0.00001, this._audioContext.currentTime + timeToReleaseInSeconds)
 
@@ -182,5 +179,15 @@ class Voice {
 		delete this._oscillator
 		this._gain.disconnect()
 		delete this._gain
+	}
+
+	private _cancelAndHoldOrJustCancel = () => {
+		const gain = this._gain.gain as any
+		// cancelAndHoldAtTime is not implemented in firefox
+		if (gain.cancelAndHoldAtTime) {
+			gain.cancelAndHoldAtTime(this._audioContext.currentTime)
+		} else {
+			this._gain.gain.cancelScheduledValues(this._audioContext.currentTime)
+		}
 	}
 }
