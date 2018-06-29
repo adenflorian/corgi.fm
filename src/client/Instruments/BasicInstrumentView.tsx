@@ -55,7 +55,7 @@ export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 		this.instrument = new BasicInstrument({
 			audioContext,
 			destination: preFx,
-			voiceCount: 3,
+			voiceCount: 9,
 			oscillatorType: props.oscillatorType,
 		})
 		this.instrument.setPan(props.pan)

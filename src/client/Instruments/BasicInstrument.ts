@@ -15,7 +15,7 @@ export class BasicInstrument {
 	private _lowPassFilter: BiquadFilterNode
 	private _previousNotes: number[] = []
 	private _oscillatorType: OscillatorType
-	private _attackTimeInSeconds: number = 5
+	private _attackTimeInSeconds: number = 0.01
 	private _releaseTimeInSeconds: number = 5
 	private _voices: Voices
 
@@ -100,8 +100,8 @@ class Voices {
 
 		if (voice) {
 			voice.release(timeToReleaseInSeconds)
-			this._availableVoices = this._availableVoices.filter(x => x !== voice)
-			this._availableVoices.unshift(voice)
+			// this._availableVoices = this._availableVoices.filter(x => x !== voice)
+			// this._availableVoices.unshift(voice)
 		}
 	}
 
@@ -138,7 +138,7 @@ class Voice {
 		const gain = this._gain.gain as any
 		gain.cancelAndHoldAtTime(this._audioContext.currentTime)
 		// this._gain.gain.cancelScheduledValues(this._audioContext.currentTime)
-		this._gain.gain.setValueAtTime(0.00001, this._audioContext.currentTime)
+		this._gain.gain.setValueAtTime(0, this._audioContext.currentTime)
 		this._gain.gain.linearRampToValueAtTime(1, this._audioContext.currentTime + attackTimeInSeconds)
 
 		this._oscillator.type = oscType
