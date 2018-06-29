@@ -48,7 +48,11 @@ interface IKeyboardProps {
 	id?: string
 }
 
-export class Keyboard extends React.Component<IKeyboardProps> {
+interface IKeyboardState {
+	wasMouseClickedOnKeyboard: boolean
+}
+
+export class Keyboard extends React.Component<IKeyboardProps, IKeyboardState> {
 	public static defaultProps = {
 		pressedMidiKeys: [],
 		showNoteNames: true,
@@ -56,6 +60,18 @@ export class Keyboard extends React.Component<IKeyboardProps> {
 
 	constructor(props: IKeyboardProps) {
 		super(props)
+	}
+
+	public componentDidMount() {
+		if (this.props.isLocal) {
+			window.addEventListener('mouseup', this.handleWindowMouseUp)
+		}
+	}
+
+	public componentWillUnmount() {
+		if (this.props.isLocal) {
+			window.removeEventListener('mouseup', this.handleWindowMouseUp)
+		}
 	}
 
 	public render() {
@@ -113,7 +129,7 @@ export class Keyboard extends React.Component<IKeyboardProps> {
 
 	private handleMouseOver = (e: React.MouseEvent, index: number) => {
 		if (this.props.isLocal === false) return
-		if (isLeftMouseButtonDown(e.buttons)) {
+		if (isLeftMouseButtonDown(e.buttons) && this.state.wasMouseClickedOnKeyboard) {
 			this.props.dispatch(virtualKeyPressed(this.props.id, index))
 		}
 	}
@@ -128,6 +144,7 @@ export class Keyboard extends React.Component<IKeyboardProps> {
 	private handleMouseDown = (e: React.MouseEvent, index: number) => {
 		if (this.props.isLocal === false) return
 		if (e.button === 0) {
+			this.setState({wasMouseClickedOnKeyboard: true})
 			if (e.shiftKey) {
 				this.props.dispatch(virtualKeyFlip(this.props.id, index))
 			} else {
@@ -140,6 +157,12 @@ export class Keyboard extends React.Component<IKeyboardProps> {
 		if (this.props.isLocal === false) return
 		if (e.button === 0 && e.shiftKey === false) {
 			this.props.dispatch(virtualKeyUp(this.props.id, index))
+		}
+	}
+
+	private handleWindowMouseUp = (e: MouseEvent) => {
+		if (e.button === 0) {
+			this.setState({wasMouseClickedOnKeyboard: false})
 		}
 	}
 }
