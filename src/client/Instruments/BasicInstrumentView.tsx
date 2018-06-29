@@ -107,7 +107,7 @@ export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 								setBasicInstrumentParam(this.props.id, BasicInstrumentParam.lowPassFilterCutoffFrequency, value),
 							)
 						}
-						sensitivity={100}
+						sensitivity={20}
 						label="lpf"
 						markColor="currentColor"
 					/>
@@ -121,7 +121,7 @@ export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 								setBasicInstrumentParam(this.props.id, BasicInstrumentParam.attack, value),
 							)
 						}
-						sensitivity={0.1}
+						sensitivity={0.05}
 						label="attack"
 						markColor="currentColor"
 					/>
@@ -135,7 +135,7 @@ export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 								setBasicInstrumentParam(this.props.id, BasicInstrumentParam.release, value),
 							)
 						}
-						sensitivity={1}
+						sensitivity={0.5}
 						label="release"
 						markColor="currentColor"
 					/>
