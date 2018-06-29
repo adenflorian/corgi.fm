@@ -16,7 +16,7 @@ export class BasicInstrument {
 	private _previousNotes: number[] = []
 	private _oscillatorType: OscillatorType
 	private _attackTimeInSeconds: number = 0.01
-	private _releaseTimeInSeconds: number = 5
+	private _releaseTimeInSeconds: number = 3
 	private _voices: Voices
 
 	constructor(options: IBasicInstrumentOptions) {
@@ -44,12 +44,13 @@ export class BasicInstrument {
 
 		this._oscillatorType = options.oscillatorType
 
-		this._voices = new Voices(options.voiceCount, this._audioContext, options.destination, this._oscillatorType)
+		this._voices = new Voices(options.voiceCount, this._audioContext, this._panNode, this._oscillatorType)
 	}
 
 	public setPan = (pan: number) => this._panNode.pan.setValueAtTime(pan, this._audioContext.currentTime)
 
-	public setLowPassFilterCutoffFrequency = (frequency: number) => this._lowPassFilter.frequency.value = frequency
+	public setLowPassFilterCutoffFrequency = (frequency: number) =>
+		this._lowPassFilter.frequency.setValueAtTime(frequency, this._audioContext.currentTime)
 
 	public setOscillatorType = (type: OscillatorType) => this._oscillatorType = type
 
@@ -153,8 +154,7 @@ class Voice {
 		const gain = this._gain.gain as any
 		gain.cancelAndHoldAtTime(this._audioContext.currentTime)
 		this._gain.gain.setValueAtTime(this._gain.gain.value, this._audioContext.currentTime)
-		const endTime = this._audioContext.currentTime + timeToReleaseInSeconds
-		this._gain.gain.exponentialRampToValueAtTime(0.00001, endTime)
+		this._gain.gain.exponentialRampToValueAtTime(0.00001, this._audioContext.currentTime + timeToReleaseInSeconds)
 
 		this.playingNote = -1
 	}
