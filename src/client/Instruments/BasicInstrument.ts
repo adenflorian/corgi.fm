@@ -1,4 +1,3 @@
-import {logger} from '../../common/logger'
 import {IMidiNote} from '../../common/MidiNote'
 import {getFrequencyUsingHalfStepsFromA4} from '../music/music-functions'
 
@@ -19,7 +18,6 @@ export class BasicInstrument {
 	private _attackTimeInSeconds: number = 5
 	private _releaseTimeInSeconds: number = 5
 	private _voices: Voices
-	private _settingMidiNotes: boolean = false
 
 	constructor(options: IBasicInstrumentOptions) {
 		this._audioContext = options.audioContext
@@ -56,10 +54,6 @@ export class BasicInstrument {
 	public setOscillatorType = (type: OscillatorType) => this._oscillatorType = type
 
 	public setMidiNotes = (midiNotes: IMidiNote[]) => {
-		if (this._settingMidiNotes) return
-
-		this._settingMidiNotes = true
-		logger.log('setMidiNotes enter: ', midiNotes)
 		const newNotes = midiNotes.filter(x => this._previousNotes.includes(x) === false)
 		const offNotes = this._previousNotes.filter(x => midiNotes.includes(x) === false)
 
@@ -72,8 +66,6 @@ export class BasicInstrument {
 		})
 
 		this._previousNotes = midiNotes
-		logger.log('setMidiNotes exit: ', midiNotes)
-		this._settingMidiNotes = false
 	}
 
 	public dispose = () => undefined
@@ -98,16 +90,12 @@ class Voices {
 	}
 
 	public playNote(note: number, oscType: OscillatorType, attackTimeInSeconds: number) {
-		logger.log('Voices.playNote: ', note)
-
 		const voice = this._getVoice()
 
 		voice.playNote(note, oscType, attackTimeInSeconds)
 	}
 
 	public releaseNote = (note: number, timeToReleaseInSeconds: number) => {
-		logger.log('Voices.releaseNote: ', note)
-
 		const voice = this._availableVoices.find(x => x.playingNote === note)
 
 		if (voice) {
@@ -115,10 +103,10 @@ class Voices {
 			this._availableVoices = this._availableVoices.filter(x => x !== voice)
 			this._availableVoices.unshift(voice)
 		}
-
 	}
 
 	private _getVoice(): Voice {
+		// TODO Pick voice that was played last
 		const voice = this._availableVoices.shift()
 		this._availableVoices.push(voice)
 		return voice
@@ -147,9 +135,10 @@ class Voice {
 	}
 
 	public playNote(note: number, oscType: OscillatorType, attackTimeInSeconds: number) {
-		this._gain.gain.cancelScheduledValues(this._audioContext.currentTime)
-		// this._gain.gain.setValueAtTime(this._gain.gain.value, this._audioContext.currentTime)
-		this._gain.gain.setValueAtTime(0, this._audioContext.currentTime)
+		const gain = this._gain.gain as any
+		gain.cancelAndHoldAtTime(this._audioContext.currentTime)
+		// this._gain.gain.cancelScheduledValues(this._audioContext.currentTime)
+		this._gain.gain.setValueAtTime(0.00001, this._audioContext.currentTime)
 		this._gain.gain.linearRampToValueAtTime(1, this._audioContext.currentTime + attackTimeInSeconds)
 
 		this._oscillator.type = oscType
@@ -166,9 +155,6 @@ class Voice {
 		this._gain.gain.setValueAtTime(this._gain.gain.value, this._audioContext.currentTime)
 		const endTime = this._audioContext.currentTime + timeToReleaseInSeconds
 		this._gain.gain.exponentialRampToValueAtTime(0.00001, endTime)
-		// this._gain.gain.exponentialRampToValueAtTime(0.00001, endTime)
-		// this._gain.gain.setValueAtTime(0, endTime + 0.001)
-		// this._oscillator.frequency.setValueAtTime(0, this._audioContext.currentTime)
 
 		this.playingNote = -1
 	}
@@ -187,23 +173,3 @@ class Voice {
 		delete this._gain
 	}
 }
-
-// class VoicePool {
-// 	private _voices: Voice[]
-
-// 	constructor(voiceCount: number = 3, audioContext: AudioContext) {
-// 		this._voices = new Array(voiceCount).fill(new Voice(audioContext))
-// 	}
-
-// 	public getVoice(): Voice {
-// 		return this._voices.pop()
-// 	}
-
-// 	public returnVoice(voice: Voice) {
-// 		this._voices.push(voice)
-// 	}
-
-// 	public isVoiceAvailable(): boolean {
-// 		return this._voices.length > 0
-// 	}
-// }
