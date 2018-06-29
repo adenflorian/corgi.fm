@@ -52,7 +52,10 @@ export class BasicInstrument {
 	public setLowPassFilterCutoffFrequency = (frequency: number) =>
 		this._lowPassFilter.frequency.setValueAtTime(frequency, this._audioContext.currentTime)
 
-	public setOscillatorType = (type: OscillatorType) => this._oscillatorType = type
+	public setOscillatorType = (type: OscillatorType) => {
+		this._oscillatorType = type
+		this._voices.setOscillatorType(type)
+	}
 
 	public setAttack = (attackTimeInSeconds: number) => this._attackTimeInSeconds = attackTimeInSeconds
 
@@ -108,6 +111,10 @@ class Voices {
 			// this._availableVoices = this._availableVoices.filter(x => x !== voice)
 			// this._availableVoices.unshift(voice)
 		}
+	}
+
+	public setOscillatorType(type: OscillatorType) {
+		this._availableVoices.forEach(x => x.setOscillatorType(type))
 	}
 
 	private _getVoice(): Voice {
