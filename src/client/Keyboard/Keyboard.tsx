@@ -74,7 +74,7 @@ export class Keyboard extends React.Component<IKeyboardProps> {
 					<div className="isometricBoxShadow"></div>
 					<div className="octave black unselectable">
 						<div className="octaveNumber">
-							{octave}
+							<div>{octave}</div>
 						</div>
 						{isLocal &&
 							<div className="octaveKeys smallText">
