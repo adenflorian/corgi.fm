@@ -54,6 +54,10 @@ export class BasicInstrument {
 
 	public setOscillatorType = (type: OscillatorType) => this._oscillatorType = type
 
+	public setAttack = (attackTimeInSeconds: number) => this._attackTimeInSeconds = attackTimeInSeconds
+
+	public setRelease = (releaseTimeInSeconds: number) => this._releaseTimeInSeconds = releaseTimeInSeconds
+
 	public setMidiNotes = (midiNotes: IMidiNote[]) => {
 		const newNotes = midiNotes.filter(x => this._previousNotes.includes(x) === false)
 		const offNotes = this._previousNotes.filter(x => midiNotes.includes(x) === false)

@@ -33,6 +33,8 @@ interface IBasicInstrumentViewProps {
 	instrumentId?: string
 	id: string
 	lowPassFilterCutoffFrequency?: number
+	attack?: number
+	release?: number
 }
 
 const oscillatorTypes = [
@@ -65,18 +67,6 @@ export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 		this.instrument.dispose()
 	}
 
-	public shouldComponentUpdate(nextProps) {
-		if (this.props.color !== nextProps.color) return true
-		if (this.props.rawMidiNotes.length !== nextProps.rawMidiNotes.length) return true
-		if (this.props.rawMidiNotes.toString() !== nextProps.rawMidiNotes.toString()) return true
-		if (this.props.ownerId !== nextProps.ownerId) return true
-		if (this.props.pan !== nextProps.pan) return true
-		if (this.props.isPlaying !== nextProps.isPlaying) return true
-		if (this.props.oscillatorType !== nextProps.oscillatorType) return true
-		if (this.props.lowPassFilterCutoffFrequency !== nextProps.lowPassFilterCutoffFrequency) return true
-		return false
-	}
-
 	public render() {
 		const {color, isPlaying, pan, rawMidiNotes, oscillatorType} = this.props
 
@@ -84,6 +74,8 @@ export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 		this.instrument.setOscillatorType(oscillatorType)
 		this.instrument.setPan(pan)
 		this.instrument.setLowPassFilterCutoffFrequency(this.props.lowPassFilterCutoffFrequency)
+		this.instrument.setAttack(this.props.attack)
+		this.instrument.setRelease(this.props.release)
 
 		return (
 			<div
@@ -95,7 +87,7 @@ export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 					id={this.props.id}
 					className="basicInstrument"
 				>
-					<div className="label colorize">basic instrument</div>
+					{/* <div className="label colorize">basic instrument</div> */}
 
 					<Knob
 						min={-1}
@@ -117,6 +109,34 @@ export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 						}
 						sensitivity={100}
 						label="lpf"
+						markColor="currentColor"
+					/>
+
+					<Knob
+						min={0.01}
+						max={10}
+						value={this.props.attack}
+						onChange={value =>
+							this.props.dispatch(
+								setBasicInstrumentParam(this.props.id, BasicInstrumentParam.attack, value),
+							)
+						}
+						sensitivity={0.1}
+						label="attack"
+						markColor="currentColor"
+					/>
+
+					<Knob
+						min={0.01}
+						max={60}
+						value={this.props.release}
+						onChange={value =>
+							this.props.dispatch(
+								setBasicInstrumentParam(this.props.id, BasicInstrumentParam.release, value),
+							)
+						}
+						sensitivity={1}
+						label="release"
 						markColor="currentColor"
 					/>
 
@@ -177,6 +197,8 @@ const makeMapStateToProps = () => {
 			color: connection && getConnectionSourceColor(state, connection.id),
 			pan: instrumentState && instrumentState.pan,
 			lowPassFilterCutoffFrequency: instrumentState && instrumentState.lowPassFilterCutoffFrequency,
+			attack: instrumentState && instrumentState.attack,
+			release: instrumentState && instrumentState.release,
 		}
 	}
 }
