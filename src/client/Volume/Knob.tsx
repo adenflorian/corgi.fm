@@ -106,7 +106,7 @@ export class Knob extends Component<IKnobProps, IKnobState> {
 			const mouseYDelta = (this.state.mouseY - this.state.lastMousePosition.y) * this.props.sensitivity
 
 			const calculateNewVolume = (oldValue: number, mouseDeltaX: number, mouseDeltaY: number): number => {
-				const delta = mouseDeltaX - mouseDeltaY
+				const delta = 0 - mouseDeltaY
 				const combined = oldValue + delta
 				return Math.max(this.props.min, Math.min(this.props.max, combined))
 			}
