@@ -89,60 +89,44 @@ export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 				>
 					{/* <div className="label colorize">basic instrument</div> */}
 
+					<BasicInstrumentOscillatorTypes
+						handleClick={this._handleOscillatorTypeClicked}
+						activeType={oscillatorType}
+					/>
+
 					<Knob
 						min={-1}
 						max={1}
 						value={pan}
-						onChange={value => this.props.dispatch(setBasicInstrumentParam(this.props.id, BasicInstrumentParam.pan, value))}
+						onChange={value => this._dispatchChangeInstrumentParam(BasicInstrumentParam.pan, value)}
 						label="pan"
-						markColor="currentColor"
 					/>
 
 					<Knob
 						min={0}
 						max={10000}
 						value={this.props.lowPassFilterCutoffFrequency}
-						onChange={value =>
-							this.props.dispatch(
-								setBasicInstrumentParam(this.props.id, BasicInstrumentParam.lowPassFilterCutoffFrequency, value),
-							)
-						}
+						onChange={value => this._dispatchChangeInstrumentParam(BasicInstrumentParam.lowPassFilterCutoffFrequency, value)}
 						sensitivity={20}
 						label="lpf"
-						markColor="currentColor"
 					/>
 
 					<Knob
 						min={0.01}
 						max={10}
 						value={this.props.attack}
-						onChange={value =>
-							this.props.dispatch(
-								setBasicInstrumentParam(this.props.id, BasicInstrumentParam.attack, value),
-							)
-						}
+						onChange={value => this._dispatchChangeInstrumentParam(BasicInstrumentParam.attack, value)}
 						sensitivity={0.05}
 						label="attack"
-						markColor="currentColor"
 					/>
 
 					<Knob
 						min={0.01}
 						max={60}
 						value={this.props.release}
-						onChange={value =>
-							this.props.dispatch(
-								setBasicInstrumentParam(this.props.id, BasicInstrumentParam.release, value),
-							)
-						}
+						onChange={value => this._dispatchChangeInstrumentParam(BasicInstrumentParam.release, value)}
 						sensitivity={0.5}
 						label="release"
-						markColor="currentColor"
-					/>
-
-					<BasicInstrumentOscillatorTypes
-						handleClick={this._handleOscillatorTypeClicked}
-						activeType={oscillatorType}
 					/>
 				</div >
 			</div>
@@ -151,6 +135,12 @@ export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 
 	private _handleOscillatorTypeClicked = (type: OscillatorType) => {
 		this.props.dispatch(setBasicInstrumentOscillatorType(this.props.instrumentId, type))
+	}
+
+	private _dispatchChangeInstrumentParam = (paramType: BasicInstrumentParam, value: any) => {
+		this.props.dispatch(
+			setBasicInstrumentParam(this.props.id, paramType, value),
+		)
 	}
 }
 

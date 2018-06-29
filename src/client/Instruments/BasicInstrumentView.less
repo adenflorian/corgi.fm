@@ -5,6 +5,9 @@
     &.isNotPlaying {
         transition: box-shadow 0.3s ease-out;
     }
+    & > *:last-child {
+        margin-right: 16px;
+    }
     .label,
     .knob,
     .oscillatorTypes {
@@ -14,7 +17,6 @@
     }
     .oscillatorTypes {
         display: flex;
-        margin-right: 16px;
         svg {
             margin: 8px;
             display: flex;

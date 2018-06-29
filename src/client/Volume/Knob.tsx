@@ -35,7 +35,7 @@ export class Knob extends Component<IKnobProps, IKnobState> {
 		max: 1,
 		sensitivity: 0.005,
 		readOnly: false,
-		markColor: 'gray',
+		markColor: 'currentColor',
 	}
 
 	public state: IKnobState = {
