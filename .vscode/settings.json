@@ -30,6 +30,7 @@
     "typescript.tsdk": "node_modules\\typescript\\lib",
     "cSpell.words": [
         "DEVTOOLS",
+        "ICVC",
         "Scrollable",
         "Shamu",
         "Unmount",
