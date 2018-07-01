@@ -16,9 +16,6 @@ export const togglePlayTrack = makeActionCreator(TOGGLE_PLAY_TRACK, 'id')
 export const RESTART_TRACK = 'RESTART_TRACK'
 export const restartTrack = makeBroadcaster(makeActionCreator(RESTART_TRACK, 'id'))
 
-export const REFRESH_TRACK_PLAYER_EVENTS = 'REFRESH_TRACK_PLAYER_EVENTS'
-export const refreshTrackPlayerEvents = makeBroadcaster(makeActionCreator(REFRESH_TRACK_PLAYER_EVENTS, 'id'))
-
 interface ITrackPlayers {
 	[trackId: string]: TrackPlayer
 }
@@ -32,7 +29,6 @@ export const trackPlayerMiddleware: Middleware = (store: Store) => next => actio
 		case TOGGLE_PLAY_TRACK:
 		case RESTART_TRACK:
 		case UPDATE_TRACKS:
-			// case REFRESH_TRACK_PLAYER_EVENTS:
 			let trackPlayer = trackPlayers[action.id]
 			if (trackPlayer === undefined) {
 				trackPlayers[action.id] = new TrackPlayer(
