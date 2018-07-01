@@ -1,13 +1,13 @@
 import Color from 'color'
 import * as React from 'react'
 import {connect} from 'react-redux'
-import {IAppState} from '../common/redux/configureStore'
+import {IAppState} from '../../common/redux/configureStore'
 import {
 	getConnectionSourceColor, IConnection, selectConnection,
-} from '../common/redux/connections-redux'
+} from '../../common/redux/connections-redux'
 import './ConnectionView.less'
 
-export interface IConnectionViewProps {
+export interface IConnectionViewContainerProps {
 	id: string
 	sourceId?: string
 	targetId?: string
@@ -17,7 +17,7 @@ export interface IConnectionViewProps {
 
 type AnyRect = ClientRect | DOMRect | any
 
-export class ConnectionView extends React.Component<IConnectionViewProps> {
+export class ConnectionViewContainer extends React.Component<IConnectionViewContainerProps> {
 	private connectionLine: any = React.createRef()
 	private sourceStubLine: any = React.createRef()
 	private targetStubLine: any = React.createRef()
@@ -33,30 +33,33 @@ export class ConnectionView extends React.Component<IConnectionViewProps> {
 
 	public componentDidUpdate() {
 		const sourceElement = document.getElementById(this.props.sourceId)
+		if (!sourceElement) return
 		const targetElement = document.getElementById(this.props.targetId)
+		if (!targetElement) return
+
 		// console.log('targetElement: ', targetElement)
+
 		const lineElement = this.connectionLine.current as SVGElement
 		const sourceStubLineElement = this.sourceStubLine.current as SVGElement
 		const targetStubLineElement = this.targetStubLine.current as SVGElement
+
 		// console.log('lineElement: ', lineElement)
-		if (sourceElement) {
-			const sourceBox: AnyRect = sourceElement.getBoundingClientRect()
-			lineElement.setAttribute('x1', (sourceBox.x + sourceBox.width + this.props.offset).toString())
-			lineElement.setAttribute('y1', (sourceBox.y + (sourceBox.height / 2)).toString())
-			sourceStubLineElement.setAttribute('x1', (sourceBox.x + sourceBox.width + this.props.offset).toString())
-			sourceStubLineElement.setAttribute('y1', (sourceBox.y + (sourceBox.height / 2)).toString())
-			sourceStubLineElement.setAttribute('x2', (sourceBox.x + sourceBox.width).toString())
-			sourceStubLineElement.setAttribute('y2', (sourceBox.y + (sourceBox.height / 2)).toString())
-		}
-		if (targetElement) {
-			const targetBox: AnyRect = targetElement.getBoundingClientRect()
-			lineElement.setAttribute('x2', (targetBox.x - this.props.offset).toString())
-			lineElement.setAttribute('y2', (targetBox.y + (targetBox.height / 2)).toString())
-			targetStubLineElement.setAttribute('x1', (targetBox.x - this.props.offset).toString())
-			targetStubLineElement.setAttribute('y1', (targetBox.y + (targetBox.height / 2)).toString())
-			targetStubLineElement.setAttribute('x2', (targetBox.x).toString())
-			targetStubLineElement.setAttribute('y2', (targetBox.y + (targetBox.height / 2)).toString())
-		}
+
+		const sourceBox: AnyRect = sourceElement.getBoundingClientRect()
+		lineElement.setAttribute('x1', (sourceBox.x + sourceBox.width + this.props.offset).toString())
+		lineElement.setAttribute('y1', (sourceBox.y + (sourceBox.height / 2)).toString())
+		sourceStubLineElement.setAttribute('x1', (sourceBox.x + sourceBox.width + this.props.offset).toString())
+		sourceStubLineElement.setAttribute('y1', (sourceBox.y + (sourceBox.height / 2)).toString())
+		sourceStubLineElement.setAttribute('x2', (sourceBox.x + sourceBox.width).toString())
+		sourceStubLineElement.setAttribute('y2', (sourceBox.y + (sourceBox.height / 2)).toString())
+
+		const targetBox: AnyRect = targetElement.getBoundingClientRect()
+		lineElement.setAttribute('x2', (targetBox.x - this.props.offset).toString())
+		lineElement.setAttribute('y2', (targetBox.y + (targetBox.height / 2)).toString())
+		targetStubLineElement.setAttribute('x1', (targetBox.x - this.props.offset).toString())
+		targetStubLineElement.setAttribute('y1', (targetBox.y + (targetBox.height / 2)).toString())
+		targetStubLineElement.setAttribute('x2', (targetBox.x).toString())
+		targetStubLineElement.setAttribute('y2', (targetBox.y + (targetBox.height / 2)).toString())
 	}
 
 	public render() {
@@ -75,7 +78,7 @@ export class ConnectionView extends React.Component<IConnectionViewProps> {
 	}
 }
 
-const mapState = (state: IAppState, props: IConnectionViewProps) => {
+const mapState = (state: IAppState, props: IConnectionViewContainerProps) => {
 	const connection = selectConnection(state, props.id) || {} as IConnection
 	const sourceColor = connection && getConnectionSourceColor(state, connection.id)
 	return {
@@ -87,4 +90,4 @@ const mapState = (state: IAppState, props: IConnectionViewProps) => {
 	}
 }
 
-export const ConnectedConnectionView = connect(mapState, null, null, {pure: false})(ConnectionView)
+export const ConnectedConnectionViewContainer = connect(mapState, null, null, {pure: false})(ConnectionViewContainer)

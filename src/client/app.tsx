@@ -5,12 +5,11 @@ import {connect} from 'react-redux'
 import {selectAllInstrumentIds} from '../common/redux/basic-instruments-redux'
 import {IClientState, selectAllClients, selectLocalClient} from '../common/redux/clients-redux'
 import {IAppState} from '../common/redux/configureStore'
-import {selectAllConnectionIds} from '../common/redux/connections-redux'
 import {AppOptions} from '../common/redux/options-redux'
 import {selectAllTrackIds} from '../common/redux/tracks-redux'
 import {selectAllVirtualKeyboardIds} from '../common/redux/virtual-keyboard-redux'
 import './App.less'
-import {ConnectedConnectionView} from './ConnectionView'
+import {ConnectionsContainer} from './Connections/Connections'
 import './css-reset.css'
 import {ConnectedBasicInstrumentView} from './Instruments/BasicInstrumentView'
 import {ConnectedKeyboard} from './Keyboard/Keyboard'
@@ -24,11 +23,9 @@ interface IAppProps {
 	info: string
 	instrumentIds: string[]
 	keyboardIds: string[]
-	connectionIds: string[]
 	trackIds: string[]
 }
 
-// const TRACK_1 = 'track-1'
 const TRACK_1_BASE_COLOR = '#4077bf'
 const TRACK_1_COLOR = Color(TRACK_1_BASE_COLOR).desaturate(0.4).hsl().string()
 
@@ -44,12 +41,7 @@ class App extends React.Component<IAppProps, {}> {
 
 		return (
 			<Fragment>
-				{/* <h1 id="title">sha-mu</h1> */}
-				{this.props.connectionIds.map(connectionId => {
-					return (
-						<ConnectedConnectionView key={connectionId} id={connectionId} />
-					)
-				})}
+				<ConnectionsContainer />
 
 				<div className="boardContainer">
 					<div className="board connected" style={{marginBottom: 'auto'}}>
@@ -113,7 +105,6 @@ const mapStateToProps = (state: IAppState) => ({
 	info: state.websocket.info,
 	keyboardIds: selectAllVirtualKeyboardIds(state),
 	instrumentIds: selectAllInstrumentIds(state),
-	connectionIds: selectAllConnectionIds(state),
 	trackIds: selectAllTrackIds(state),
 })
 

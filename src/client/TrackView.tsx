@@ -16,7 +16,7 @@ interface ITrackViewProps {
 	color?: string
 	dispatch?: Dispatch
 	id: string
-	name: string
+	name?: string
 }
 
 export class TrackView extends Component<ITrackViewProps> {
