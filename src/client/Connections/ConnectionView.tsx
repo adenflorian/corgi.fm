@@ -9,8 +9,10 @@ export interface Point {
 
 export interface IConnectionViewProps {
 	color: string
-	sourcePoint: Point
-	destinationPoint: Point
+	sourceX: number
+	sourceY: number
+	targetX: number
+	targetY: number
 	connectorWidth?: number
 	connectorHeight?: number
 }
@@ -31,10 +33,10 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps> {
 			<React.Fragment>
 				<svg className="connection longLine" xmlns="http://www.w3.org/2000/svg">
 					<line
-						x1={this.props.sourcePoint.x + this.props.connectorWidth}
-						y1={this.props.sourcePoint.y}
-						x2={this.props.destinationPoint.x}
-						y2={this.props.destinationPoint.y}
+						x1={this.props.sourceX + this.props.connectorWidth}
+						y1={this.props.sourceY}
+						x2={this.props.targetX}
+						y2={this.props.targetY}
 						stroke={darkerColor}
 						strokeWidth={strokeWidth}
 					/>
@@ -44,16 +46,16 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps> {
 					xmlns="http://www.w3.org/2000/svg"
 					style={{
 						width: this.props.connectorWidth,
-						height: 8,
-						top: this.props.sourcePoint.y - (this.props.connectorHeight / 2),
-						left: this.props.sourcePoint.x,
+						height: this.props.connectorHeight,
+						top: this.props.sourceY - (this.props.connectorHeight / 2),
+						left: this.props.sourceX,
 					}}
 				>
 					<line
 						x1={0}
-						y1={4}
+						y1={this.props.connectorHeight / 2}
 						x2={this.props.connectorWidth}
-						y2={4}
+						y2={this.props.connectorHeight / 2}
 						stroke={color}
 						strokeWidth={strokeWidth2}
 					/>
@@ -63,16 +65,16 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps> {
 					xmlns="http://www.w3.org/2000/svg"
 					style={{
 						width: this.props.connectorWidth,
-						height: 8,
-						top: this.props.destinationPoint.y - (this.props.connectorHeight / 2),
-						left: this.props.destinationPoint.x,
+						height: this.props.connectorHeight,
+						top: this.props.targetY - (this.props.connectorHeight / 2),
+						left: this.props.targetX,
 					}}
 				>
 					<line
 						x1={0}
-						y1={4}
+						y1={this.props.connectorHeight / 2}
 						x2={this.props.connectorWidth}
-						y2={4}
+						y2={this.props.connectorHeight / 2}
 						stroke={color}
 						strokeWidth={strokeWidth2}
 					/>

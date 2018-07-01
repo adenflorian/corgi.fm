@@ -76,8 +76,10 @@ export class ConnectionViewContainer extends React.Component<IConnectionViewCont
 			return (
 				<ConnectionView
 					color={this.props.sourceColor}
-					sourcePoint={sourcePosition}
-					destinationPoint={targetPosition}
+					sourceX={sourcePosition.x}
+					sourceY={sourcePosition.y}
+					targetX={targetPosition.x}
+					targetY={targetPosition.y}
 				/>
 			)
 		}
