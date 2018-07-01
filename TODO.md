@@ -26,10 +26,10 @@
 - [ ] TONE.js
 - [ ] immer js
 - [...] ADSR
-	- [...] A
+	- [√] A
 	- [ ] D
 	- [ ] S
-	- [...] R
+	- [√] R
 
 # References
 - https://github.com/grimmdude/MidiPlayerJS/blob/master/src/player.js
