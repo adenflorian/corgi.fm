@@ -18,7 +18,7 @@ type AnyRect = ClientRect | DOMRect | any
 
 interface Positions {
 	sourcePosition?: Point,
-	destinationPosition?: Point,
+	targetPosition?: Point,
 }
 
 interface ICVCState {
@@ -50,10 +50,10 @@ export class ConnectionViewContainer extends React.Component<IConnectionViewCont
 
 		const newPositions = {
 			sourcePosition: {
-				x: sourceBox.x + sourceBox.width + this.props.offset,
+				x: sourceBox.x + sourceBox.width,
 				y: sourceBox.y + (sourceBox.height / 2),
 			},
-			destinationPosition: {
+			targetPosition: {
 				x: targetBox.x - this.props.offset,
 				y: (targetBox.y + (targetBox.height / 2)),
 			},
@@ -68,16 +68,16 @@ export class ConnectionViewContainer extends React.Component<IConnectionViewCont
 	}
 
 	public render() {
-		const {positions: {sourcePosition, destinationPosition}} = this.state
+		const {positions: {sourcePosition, targetPosition}} = this.state
 
-		if (sourcePosition === undefined || destinationPosition === undefined) {
+		if (sourcePosition === undefined || targetPosition === undefined) {
 			return null
 		} else {
 			return (
 				<ConnectionView
 					color={this.props.sourceColor}
 					sourcePoint={sourcePosition}
-					destinationPoint={destinationPosition}
+					destinationPoint={targetPosition}
 				/>
 			)
 		}
