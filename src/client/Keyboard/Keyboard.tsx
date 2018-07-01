@@ -8,7 +8,7 @@ import {
 } from '../../common/redux/virtual-keyboard-redux'
 import {keyToMidiMap} from '../input-events'
 import {Octave} from '../music/music-types'
-import {keyColors} from '../utils'
+import {isLeftMouseButtonDown, keyColors} from '../utils'
 import './Keyboard.less'
 
 const defaultNumberOfKeys = 17
@@ -165,14 +165,6 @@ export class Keyboard extends React.Component<IKeyboardProps, IKeyboardState> {
 			this.setState({wasMouseClickedOnKeyboard: false})
 		}
 	}
-}
-
-/** @param buttons The buttons property from a mouse event */
-function isLeftMouseButtonDown(buttons: number): boolean {
-	// buttons is not implemented in safari :(
-	if (buttons === undefined) return false
-
-	return buttons % 2 === 1
 }
 
 const mapStateToProps = (state: IAppState, props) => {

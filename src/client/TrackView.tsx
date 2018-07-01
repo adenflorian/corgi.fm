@@ -7,6 +7,7 @@ import {playTrack, refreshTrackPlayerEvents, restartTrack, stopTrack} from '../c
 import {ITrackEvent, selectTrack, setTrackNote} from '../common/redux/tracks-redux'
 import {isWhiteKey} from './Keyboard/Keyboard'
 import './TrackView.less'
+import {isLeftMouseButtonDown, isRightMouseButtonDown} from './utils'
 
 interface ITrackViewProps {
 	events?: ITrackEvent[]
@@ -70,7 +71,8 @@ export class TrackView extends Component<ITrackViewProps> {
 											<div
 												key={i2}
 												className={`note ${isEnabled ? 'on' : ''} ${isWhiteKey(i2) ? 'white' : 'black'}`}
-												onClick={() => this.handleNoteClicked(index, !isEnabled, i2)}
+												onClick={() => this.handleNoteClicked(index, isEnabled, i2)}
+												onMouseOut={e => this.handleMouseOut(index, isEnabled, i2, e)}
 											/>
 										)
 									})}
@@ -97,8 +99,16 @@ export class TrackView extends Component<ITrackViewProps> {
 	}
 
 	private handleNoteClicked = (index: number, isEnabled: boolean, noteNumber: number) => {
-		this.props.dispatch(setTrackNote(this.props.id, index, isEnabled, noteNumber))
+		this.props.dispatch(setTrackNote(this.props.id, index, !isEnabled, noteNumber))
 		this.props.dispatch(refreshTrackPlayerEvents())
+	}
+
+	private handleMouseOut = (index: number, isEnabled: boolean, noteNumber: number, e) => {
+		if (e.ctrlKey && isEnabled === true && isLeftMouseButtonDown(e.buttons)) {
+			this.props.dispatch(setTrackNote(this.props.id, index, false, noteNumber))
+			this.props.dispatch(refreshTrackPlayerEvents())
+			logger.log('out, ', noteNumber)
+		}
 	}
 }
 

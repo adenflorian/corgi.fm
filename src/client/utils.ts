@@ -134,3 +134,21 @@ export const keyColors = Object.freeze({
 	10: {color: 'black', name: 'A#'},
 	11: {color: 'white', name: 'B'},
 })
+
+/** @param buttons The buttons property from a mouse event */
+export function isLeftMouseButtonDown(buttons: number): boolean {
+	// buttons is not implemented in safari :(
+	if (buttons === undefined) return false
+
+	return buttons % 2 === 1
+}
+
+/** @param buttons The buttons property from a mouse event */
+export function isRightMouseButtonDown(buttons: number): boolean {
+	// buttons is not implemented in safari :(
+	if (buttons === undefined) return false
+	if (buttons === 2) return true
+	if (buttons === 3) return true
+
+	return false
+}
