@@ -3,7 +3,7 @@ import {connect} from 'react-redux'
 import {IAppState} from '../../common/redux/configureStore'
 import {selectTrack} from '../../common/redux/tracks-redux'
 import {Track} from './Track'
-import './TrackView.less'
+import './Track.less'
 
 interface ITrackContainerProps {
 	isPlaying: boolean

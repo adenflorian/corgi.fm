@@ -34,7 +34,7 @@ export class VolumeControl extends Component<IVolumeControlProps> {
 					value={this.props.masterVolume}
 					onChange={this.props.changeMasterVolume}
 					min={0}
-					max={1}
+					max={0.5}
 					markColor={newColor}
 				/>
 			</div>
