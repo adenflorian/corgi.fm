@@ -1,13 +1,13 @@
 @import '../colors.less';
 .knob {
+    position: relative;
+    width: 32px;
+    height: 32px;
     .actualKnob {
         background-color: #41414d;
         border-radius: 50%;
         width: 32px;
         height: 32px;
-    }
-    &.readOnly .actualKnob {
-        background-color: #33333b;
     }
     .mark {
         width: 4px;
@@ -17,11 +17,19 @@
             filter: saturate(200%);
         }
     }
-    &.readOnly .mark {
-        background-color: @darkGreen;
-        width: 4px;
-        height: 8px;
-        margin: auto;
+    &.readOnly {
+        .actualKnob {
+            background-color: #33333b;
+        }
+        .mark {
+            background-color: @darkGreen;
+            width: 4px;
+            height: 8px;
+            margin: auto;
+        }
+        .label {
+            color: @subtleGrayBlackBg;
+        }
     }
     .label {
         font-size: 10px;
@@ -35,7 +43,9 @@
             filter: saturate(200%);
         }
     }
-    &.readOnly .label {
-        color: @subtleGrayBlackBg;
+    .arc {
+        position: absolute;
+        top: 0;
+        left: 0;
     }
 }

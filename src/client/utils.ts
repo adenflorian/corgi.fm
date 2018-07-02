@@ -152,3 +152,7 @@ export function isRightMouseButtonDown(buttons: number): boolean {
 
 	return false
 }
+
+export const valueToPercentageOfMinMax = (value: number, min: number, max: number) => {
+	return ((value - min) * 100) / (max - min)
+}
