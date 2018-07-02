@@ -1,12 +1,12 @@
 export interface IWebsocketState {
-	socket?: SocketIOClient.Socket,
+	id?: string,
 	info?: string
 }
 
-export const SET_SOCKET = 'SET_SOCKET'
-export const setSocket = (socket: SocketIOClient.Socket) => ({
-	type: SET_SOCKET,
-	socket,
+export const SET_SOCKET_ID = 'SET_SOCKET_ID'
+export const setSocketId = (id: string) => ({
+	type: SET_SOCKET_ID,
+	id,
 })
 
 export const SET_INFO = 'SET_INFO'
@@ -17,8 +17,8 @@ export const setInfo = (info: string) => ({
 
 export function websocketReducer(state: IWebsocketState = {info: '_'}, action): IWebsocketState {
 	switch (action.type) {
-		case SET_SOCKET:
-			return {...state, socket: action.socket}
+		case SET_SOCKET_ID:
+			return {...state, id: action.id}
 		case SET_INFO:
 			return {...state, info: action.info}
 		default:
@@ -26,4 +26,4 @@ export function websocketReducer(state: IWebsocketState = {info: '_'}, action): 
 	}
 }
 
-export const selectLocalSocket = state => state.websocket.socket
+export const selectLocalSocketId = state => state.websocket.id

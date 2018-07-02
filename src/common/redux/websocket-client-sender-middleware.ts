@@ -1,6 +1,8 @@
 import {AnyAction, Dispatch, Middleware} from 'redux'
+import {socket} from '../../client/websocket-listeners'
 import {WebSocketEvent} from '../../common/server-constants'
 import {IAppState} from './configureStore'
+import {selectLocalSocketId} from './websocket-redux'
 
 export interface BroadcastAction extends AnyAction {
 	shouldBroadcast: boolean
@@ -22,9 +24,9 @@ function isNetworkAction(action: AnyAction | BroadcastAction) {
 
 function processNetworkAction(action: BroadcastAction, getState, next: Dispatch) {
 	const state: IAppState = getState()
-	const socket = state.websocket.socket
+	const socketId = selectLocalSocketId(state)
 
-	action.source = socket.id
+	action.source = socketId
 
 	if (action.shouldBroadcast) {
 		socket.emit(WebSocketEvent.broadcast, action)

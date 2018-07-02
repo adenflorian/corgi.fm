@@ -8,7 +8,7 @@ import {makeActionCreator} from './redux-utils'
 import {
 	addVirtualKeyboard, VirtualKeyboardState, virtualKeyPressed, virtualKeyUp, virtualOctaveChange,
 } from './virtual-keyboard-redux'
-import {selectLocalSocket} from './websocket-redux'
+import {selectLocalSocketId} from './websocket-redux'
 
 export const LOCAL_MIDI_KEY_PRESS = 'LOCAL_MIDI_KEY_PRESS'
 export const localMidiKeyPress = makeActionCreator(LOCAL_MIDI_KEY_PRESS, 'midiNote')
@@ -36,7 +36,7 @@ export const localMiddleware: Middleware = ({dispatch, getState}) => next => act
 		case ADD_CLIENT: {
 			next(action)
 			const state: IAppState = getState()
-			if (action.client.socketId === selectLocalSocket(state).id) {
+			if (action.client.socketId === selectLocalSocketId(state)) {
 				createLocalStuff(dispatch, state)
 			}
 			return

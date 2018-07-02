@@ -5,7 +5,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "start": "yarn clean && concurrently --names \"parcel,server\" \"yarn watch-parcel\" \"yarn watch-server\"",
-    "watch-parcel": "parcel src/client/index.html --open",
+    "watch-parcel": "parcel src/client/index.html",
     "watch-server": "ts-node-dev --project src/server/tsconfig.json src/server/server.ts",
     "start-prod": "pm2 start server/server.js",
     "lint": "eslint . && tslint src/client/**/*.ts* --project src/client/tsconfig.json && tslint src/server/**/*.ts* --project src/server/tsconfig.json ",

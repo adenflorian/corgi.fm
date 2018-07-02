@@ -5,7 +5,7 @@ import {setupInputEventListeners} from './input-events'
 import {renderApp} from './react-main'
 import {audioContext, setupAudioContext} from './setup-audio-context'
 import {setupMidiSupport} from './setup-midi-support'
-import {setupWebsocketAndListeners} from './websocket-listeners'
+import {setupWebsocketAndListeners, socket} from './websocket-listeners'
 
 const store = configureStore(getInitialReduxState())
 
@@ -31,8 +31,8 @@ declare global {
 if (module.hot) {
 	const state: IAppState = store.getState()
 
-	module.hot.accept(() => renderApp(store))
-
-	module.hot.dispose(() => state.websocket.socket.disconnect())
+	module.hot.dispose(() => socket.disconnect())
 	module.hot.dispose(() => audioContext.close())
+
+	module.hot.accept(() => renderApp(store))
 }

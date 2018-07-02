@@ -1,5 +1,5 @@
-import {logger} from '../common/logger'
-import {IMidiNote} from '../common/MidiNote'
+import {logger} from '../../common/logger'
+import {IMidiNote} from '../../common/MidiNote'
 
 export enum SimpleTrackEventAction {
 	playNote,

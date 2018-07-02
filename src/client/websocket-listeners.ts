@@ -5,18 +5,20 @@ import {IMidiNote} from '../common/MidiNote'
 import {clientDisconnected, SET_CLIENTS} from '../common/redux/clients-redux'
 import {setVirtualKeys, virtualOctave} from '../common/redux/virtual-keyboard-redux'
 import {BroadcastAction} from '../common/redux/websocket-client-sender-middleware'
-import {setInfo, setSocket} from '../common/redux/websocket-redux'
+import {setInfo, setSocketId} from '../common/redux/websocket-redux'
 import {WebSocketEvent} from '../common/server-constants'
 import {Octave} from './music/music-types'
 
 const port = 80
 
+export let socket
+
 export function setupWebsocketAndListeners(store: Store) {
-	const socket = io.connect(window.location.hostname + `:${port}/`)
+	socket = io.connect(window.location.hostname + `:${port}/`)
 
 	socket.on('connect', () => {
 		socketInfo('connected')
-		store.dispatch(setSocket(socket))
+		store.dispatch(setSocketId(socket.id))
 	})
 
 	setupDefaultListeners([
@@ -81,8 +83,6 @@ export function setupWebsocketAndListeners(store: Store) {
 		store.dispatch(setInfo(info))
 		logger.log(info)
 	}
-
-	return socket
 }
 
 export type ClientId = string

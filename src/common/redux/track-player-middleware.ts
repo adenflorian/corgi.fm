@@ -1,6 +1,6 @@
 import {AnyAction, Dispatch, Middleware, Store} from 'redux'
 import {audioContext} from '../../client/setup-audio-context'
-import {TrackPlayer} from '../../client/TrackPlayer'
+import {TrackPlayer} from '../../client/Track/TrackPlayer'
 import {makeActionCreator, makeBroadcaster, makeServerAction} from './redux-utils'
 import {ITracks, selectTrack, setTrackIndex, UPDATE_TRACKS} from './tracks-redux'
 

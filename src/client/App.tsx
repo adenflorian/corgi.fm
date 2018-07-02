@@ -14,7 +14,7 @@ import './css-reset.css'
 import {ConnectedBasicInstrumentView} from './Instruments/BasicInstrumentView'
 import {ConnectedKeyboard} from './Keyboard/Keyboard'
 import {ConnectedOption} from './Option'
-import {ConnectedTrackView} from './TrackView'
+import {ConnectedTrackContainer} from './Track/TrackContainer'
 import {ConnectedVolumeControl} from './Volume/VolumeControl'
 
 interface IAppProps {
@@ -60,7 +60,7 @@ class App extends React.Component<IAppProps, {}> {
 								key={trackId}
 								className="board connected"
 							>
-								<ConnectedTrackView id={trackId} />
+								<ConnectedTrackContainer id={trackId} />
 							</div>
 						)
 					})}

@@ -4,7 +4,7 @@ import * as uuid from 'uuid'
 import {hashbow} from '../../client/utils'
 import {ClientId} from '../../client/websocket-listeners'
 import {IAppState} from './configureStore'
-import {selectLocalSocket} from './websocket-redux'
+import {selectLocalSocketId} from './websocket-redux'
 
 export const ADD_CLIENT = 'ADD_CLIENT'
 export const addClient = (client: IClientState) => {
@@ -116,7 +116,7 @@ export function selectClientBySocketId(state: IAppState, socketId) {
 }
 
 export function selectLocalClient(state: IAppState) {
-	return selectAllClients(state).find(x => x.socketId === selectLocalSocket(state).id)
+	return selectAllClients(state).find(x => x.socketId === selectLocalSocketId(state))
 }
 
 export const selectAllClients = (state: IAppState) => state.clients.clients
