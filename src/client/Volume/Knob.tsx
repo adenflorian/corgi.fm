@@ -73,29 +73,30 @@ export class Knob extends Component<IKnobProps, IKnobState> {
 			<div
 				className={`knob ${readOnly ? 'readOnly' : ''}`}
 			>
-				<svg className="arc colorize" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"
-					style={{
-						position: 'absolute',
-						overflow: 'visible',
-						transform: `rotate(90deg)`,
-					}}
-				>
-					<circle cx="50%" cy="50%" r="64%"
-						fill="none" stroke="currentColor" stroke-width="2"
-						stroke-dasharray={`0 50% ${percentage * 3}% 100000`} stroke-dashoffset="1"
-					// transform="rotate(90, 50, 50)"
-					/>
-				</svg>
-				<div
-					className="actualKnob"
-					style={{
-						transform: `rotate(${this._getRotation(value, min, max)}deg)`,
-					}}
-					onMouseDown={this._handleMouseDown}
-				>
-					<div className="mark" style={{backgroundColor: markColor}}></div>
-					<div className="label unselectable">{label}</div>
+				<div className="actualKnobContainer">
+					<svg className="arc colorize" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"
+						style={{
+							position: 'absolute',
+							overflow: 'visible',
+							transform: `rotate(90deg)`,
+						}}
+					>
+						<circle cx="50%" cy="50%" r="64%"
+							fill="none" stroke="currentColor" strokeWidth="2"
+							strokeDasharray={`0 50% ${percentage * 3}% 100000`} strokeDashoffset="1"
+						/>
+					</svg>
+					<div
+						className="actualKnob"
+						style={{
+							transform: `rotate(${this._getRotation(value, min, max)}deg)`,
+						}}
+						onMouseDown={this._handleMouseDown}
+					>
+						<div className="mark" style={{backgroundColor: markColor}}></div>
+					</div>
 				</div>
+				<div className="label unselectable">{label}</div>
 			</div>
 		)
 	}
