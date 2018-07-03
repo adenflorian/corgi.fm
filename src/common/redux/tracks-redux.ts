@@ -56,6 +56,15 @@ export const setTrackIndex = (id: string, index: number) => {
 	}
 }
 
+export const SET_TRACK_BOTTOM_NOTE = 'SET_TRACK_BOTTOM_NOTE'
+export const setTrackBottomNote = (id: string, bottomNote: number) => {
+	return {
+		type: SET_TRACK_BOTTOM_NOTE,
+		id,
+		bottomNote,
+	}
+}
+
 export interface ITrackEvent {
 	notes: IMidiNote[]
 }
@@ -75,6 +84,7 @@ export interface ITrackState {
 	id: string
 	color: string
 	name: string
+	bottomNote: number
 }
 
 export class TrackState implements ITrackState {
@@ -84,6 +94,7 @@ export class TrackState implements ITrackState {
 	public readonly isPlaying: boolean = false
 	public readonly color: string
 	public name: string
+	public bottomNote: number = 0
 
 	constructor(events?: ITrackEvent[]) {
 		this.color = Color(hashbow(this.id)).desaturate(0.2).hsl().string()
@@ -137,6 +148,7 @@ export function tracksReducer(
 		case SET_TRACK_INDEX:
 		case PLAY_TRACK:
 		case STOP_TRACK:
+		case SET_TRACK_BOTTOM_NOTE:
 			return {
 				...state,
 				tracks: {
@@ -186,6 +198,8 @@ function trackReducer(track: ITrackState, action: AnyAction) {
 			return {...track, isPlaying: true}
 		case STOP_TRACK:
 			return {...track, isPlaying: false}
+		case SET_TRACK_BOTTOM_NOTE:
+			return {...track, bottomNote: action.bottomNote}
 		default:
 			throw new Error('invalid action type')
 	}

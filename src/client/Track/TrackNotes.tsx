@@ -9,13 +9,16 @@ import {isLeftMouseButtonDown} from '../utils'
 interface ITrackNotesProps {
 	events: ITrackEvent[]
 	activeIndex: number
+	bottomNote: number
 	handleNoteClicked: (index, isEnabled, i2) => void
 	handleMouseEnter: (index, isEnabled, i2, e) => void
 	handleMouseDown: (index, isEnabled, i2, e) => void
 }
 
 export const TrackNotes = (props: ITrackNotesProps) => {
-	const {activeIndex, events, handleNoteClicked, handleMouseEnter, handleMouseDown} = props
+	const {activeIndex, bottomNote, events, handleNoteClicked, handleMouseEnter, handleMouseDown} = props
+
+	const notesToShow = 36
 
 	return (
 		<div className="events">
@@ -26,8 +29,8 @@ export const TrackNotes = (props: ITrackNotesProps) => {
 						key={index}
 						className={`event ${isActiveIndex ? 'active' : 'transitionAllColor'}`}
 					>
-						{Array.apply(0, new Array(36)).map((_, i2) => {
-							i2 += 48
+						{Array.apply(0, new Array(notesToShow)).map((_, i2) => {
+							i2 += bottomNote
 							const isEnabled = event.notes.some(x => x === i2)
 							return (
 								<div
@@ -56,6 +59,7 @@ const mapSateToProps = (state: IAppState, props: ITrackNotesConnectedProps) => {
 	return {
 		events: trackState.notes,
 		activeIndex: trackState.index,
+		bottomNote: trackState.bottomNote,
 	}
 }
 

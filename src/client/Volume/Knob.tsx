@@ -16,17 +16,12 @@ interface IKnobProps {
 }
 
 interface IKnobState {
-	mouseX: number
-	mouseY: number
 	mouseDownPosition: {
 		x: number,
 		y: number,
 	}
-	lastMousePosition: {
-		x: number,
-		y: number,
-	}
-	isMouseDown: boolean
+	isMouseDown: boolean,
+	valueWhenMouseDown?: number
 }
 
 export class Knob extends Component<IKnobProps, IKnobState> {
@@ -40,13 +35,7 @@ export class Knob extends Component<IKnobProps, IKnobState> {
 	}
 
 	public state: IKnobState = {
-		mouseX: 0,
-		mouseY: 0,
 		mouseDownPosition: {
-			x: 0,
-			y: 0,
-		},
-		lastMousePosition: {
 			x: 0,
 			y: 0,
 		},
@@ -108,39 +97,31 @@ export class Knob extends Component<IKnobProps, IKnobState> {
 	}
 
 	private _handleMouseMove = (e: MouseEvent) => {
-		this.setState({
-			mouseX: e.screenX,
-			mouseY: e.screenY,
-			lastMousePosition: {
-				x: this.state.mouseX,
-				y: this.state.mouseY,
-			},
-		})
 		if (this.state.isMouseDown) {
-			const mouseXDelta = (this.state.mouseX - this.state.lastMousePosition.x) * this.props.sensitivity
-			const mouseYDelta = (this.state.mouseY - this.state.lastMousePosition.y) * this.props.sensitivity
+			const mouseYDelta = (e.screenY - this.state.mouseDownPosition.y) * this.props.sensitivity
 
-			const calculateNewVolume = (oldValue: number, mouseDeltaX: number, mouseDeltaY: number): number => {
-				const delta = 0 - mouseDeltaY
+			const calculateNewVolume = (oldValue: number, mouseDeltaY: number): number => {
+				const delta = -mouseDeltaY
 				const combined = oldValue + delta
 				return Math.max(this.props.min, Math.min(this.props.max, combined))
 			}
 
-			const newValue = calculateNewVolume(this.props.value, mouseXDelta, mouseYDelta)
+			const newValue = calculateNewVolume(this.state.valueWhenMouseDown, mouseYDelta)
 
 			if (newValue !== this.props.value) {
-				this.props.onChange(calculateNewVolume(this.props.value, mouseXDelta, mouseYDelta))
+				this.props.onChange(newValue)
 			}
 		}
 	}
 
-	private _handleMouseDown = () => {
+	private _handleMouseDown = (e: React.MouseEvent) => {
 		this.setState({
 			mouseDownPosition: {
-				x: this.state.mouseX,
-				y: this.state.mouseY,
+				x: e.screenX,
+				y: e.screenY,
 			},
 			isMouseDown: true,
+			valueWhenMouseDown: this.props.value,
 		})
 	}
 
