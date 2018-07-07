@@ -17,7 +17,7 @@
     "deploy-test": "yarn build && bash scripts/deploy-test.sh",
     "deploy-prod": "yarn build && bash scripts/deploy-prod.sh",
     "build": "rm -rf built && yarn build-server && yarn build-client && yarn build-other",
-    "build-client": "parcel build src/client/index.html --out-dir built/client",
+    "build-client": "parcel build src/client/index.html --out-dir built/public --no-source-maps",
     "build-server": "tsc --project src/server/tsconfig.json --outDir built",
     "build-other": "cp package.json yarn.lock built",
     "setup-test-server": "bash scripts/setup-test-server.sh",
