@@ -1,4 +1,3 @@
-import {Component} from 'react'
 import * as React from 'react'
 import {connect} from 'react-redux'
 import ReactSVG from 'react-svg'
@@ -23,18 +22,16 @@ import SquareWave from './SquareWave.svg'
 export type MidiNotes = IMidiNote[]
 
 interface IBasicInstrumentViewProps {
-	color?: string
-	rawMidiNotes?: MidiNotes
-	ownerId?: ClientId
-	pan?: number
-	isPlaying?: boolean
-	oscillatorType?: OscillatorType
+	color: string
+	rawMidiNotes: MidiNotes
+	pan: number
+	isPlaying: boolean
+	oscillatorType: OscillatorType
 	dispatch?: Dispatch
-	instrumentId?: string
+	lowPassFilterCutoffFrequency: number
+	attack: number
+	release: number
 	id: string
-	lowPassFilterCutoffFrequency?: number
-	attack?: number
-	release?: number
 }
 
 const oscillatorTypes = [
@@ -43,7 +40,7 @@ const oscillatorTypes = [
 	{type: 'sawtooth', svgPath: SawWave},
 ]
 
-export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
+export class BasicInstrumentView extends React.PureComponent<IBasicInstrumentViewProps> {
 	public static defaultProps = {
 		pan: 0,
 		rawMidiNotes: [],
@@ -87,8 +84,6 @@ export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 					id={this.props.id}
 					className="basicInstrument"
 				>
-					{/* <div className="label colorize">basic instrument</div> */}
-
 					<BasicInstrumentOscillatorTypes
 						handleClick={this._handleOscillatorTypeClicked}
 						activeType={oscillatorType}
@@ -98,8 +93,9 @@ export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 						min={-1}
 						max={1}
 						value={pan}
-						onChange={value => this._dispatchChangeInstrumentParam(BasicInstrumentParam.pan, value)}
+						onChange={this._dispatchChangeInstrumentParam}
 						label="pan"
+						onChangeId={BasicInstrumentParam.pan}
 					/>
 
 					<Knob
@@ -107,8 +103,9 @@ export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 						max={10000}
 						curve={2}
 						value={this.props.lowPassFilterCutoffFrequency}
-						onChange={value => this._dispatchChangeInstrumentParam(BasicInstrumentParam.lowPassFilterCutoffFrequency, value)}
+						onChange={this._dispatchChangeInstrumentParam}
 						label="lpf"
+						onChangeId={BasicInstrumentParam.lowPassFilterCutoffFrequency}
 					/>
 
 					<Knob
@@ -116,8 +113,9 @@ export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 						max={10}
 						curve={3}
 						value={this.props.attack}
-						onChange={value => this._dispatchChangeInstrumentParam(BasicInstrumentParam.attack, value)}
+						onChange={this._dispatchChangeInstrumentParam}
 						label="attack"
+						onChangeId={BasicInstrumentParam.attack}
 					/>
 
 					<Knob
@@ -125,8 +123,9 @@ export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 						max={60}
 						curve={2}
 						value={this.props.release}
-						onChange={value => this._dispatchChangeInstrumentParam(BasicInstrumentParam.release, value)}
+						onChange={this._dispatchChangeInstrumentParam}
 						label="release"
+						onChangeId={BasicInstrumentParam.release}
 					/>
 				</div >
 			</div>
@@ -134,10 +133,10 @@ export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 	}
 
 	private _handleOscillatorTypeClicked = (type: OscillatorType) => {
-		this.props.dispatch(setBasicInstrumentOscillatorType(this.props.instrumentId, type))
+		this.props.dispatch(setBasicInstrumentOscillatorType(this.props.id, type))
 	}
 
-	private _dispatchChangeInstrumentParam = (paramType: BasicInstrumentParam, value: any) => {
+	private _dispatchChangeInstrumentParam = (value: any, paramType: BasicInstrumentParam) => {
 		this.props.dispatch(
 			setBasicInstrumentParam(this.props.id, paramType, value),
 		)
@@ -149,12 +148,7 @@ interface IBasicInstrumentOscillatorTypesProps {
 	activeType: OscillatorType
 }
 
-class BasicInstrumentOscillatorTypes extends Component<IBasicInstrumentOscillatorTypesProps> {
-	public shouldComponentUpdate(nextProps) {
-		if (this.props.activeType !== nextProps.activeType) return true
-		return false
-	}
-
+class BasicInstrumentOscillatorTypes extends React.PureComponent<IBasicInstrumentOscillatorTypesProps> {
 	public render() {
 		const {activeType, handleClick} = this.props
 
@@ -174,7 +168,7 @@ class BasicInstrumentOscillatorTypes extends Component<IBasicInstrumentOscillato
 }
 
 const makeMapStateToProps = () => {
-	return (state: IAppState, props: IBasicInstrumentViewProps) => {
+	return (state: IAppState, props: IConnectedBasicInstrumentViewProps): IBasicInstrumentViewProps => {
 		const connection = selectFirstConnectionByTargetId(state, props.id)
 		const rawMidiNotes = connection && getConnectionSourceNotes(state, connection.id)
 		const instrumentState = selectInstrument(state, props.id)
@@ -182,15 +176,19 @@ const makeMapStateToProps = () => {
 		return {
 			rawMidiNotes: rawMidiNotes || [],
 			isPlaying: rawMidiNotes ? rawMidiNotes.length > 0 : false,
-			oscillatorType: instrumentState && instrumentState.oscillatorType,
-			instrumentId: instrumentState && instrumentState.id,
+			oscillatorType: instrumentState.oscillatorType,
 			color: connection && getConnectionSourceColor(state, connection.id),
-			pan: instrumentState && instrumentState.pan,
-			lowPassFilterCutoffFrequency: instrumentState && instrumentState.lowPassFilterCutoffFrequency,
-			attack: instrumentState && instrumentState.attack,
-			release: instrumentState && instrumentState.release,
+			pan: instrumentState.pan,
+			lowPassFilterCutoffFrequency: instrumentState.lowPassFilterCutoffFrequency,
+			attack: instrumentState.attack,
+			release: instrumentState.release,
+			id: props.id,
 		}
 	}
+}
+
+interface IConnectedBasicInstrumentViewProps {
+	id: string
 }
 
 export const ConnectedBasicInstrumentView = connect(

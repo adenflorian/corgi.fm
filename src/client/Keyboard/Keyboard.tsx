@@ -52,7 +52,7 @@ interface IKeyboardState {
 	wasMouseClickedOnKeyboard: boolean
 }
 
-export class Keyboard extends React.Component<IKeyboardProps, IKeyboardState> {
+export class Keyboard extends React.PureComponent<IKeyboardProps, IKeyboardState> {
 	public static defaultProps = {
 		pressedMidiKeys: [],
 		showNoteNames: true,

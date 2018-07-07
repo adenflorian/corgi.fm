@@ -243,6 +243,10 @@ export const selectAllTrackIds = (state: IAppState) => {
 	return Object.keys(selectAllTracks(state))
 }
 
-export const selectTrack = (state: IAppState, id) => {
-	return selectAllTracks(state)[id]
-}
+export const selectTrack = (state: IAppState, id) => selectAllTracks(state)[id]
+
+export const selectTrackEvents = (state: IAppState, id) => selectTrack(state, id).events
+
+export const selectTrackEvent = (state: IAppState, id, eventIndex) => selectTrackEvents(state, id)[eventIndex]
+
+export const selectTrackEventNotes = (state: IAppState, id, eventIndex) => selectTrackEvent(state, id, eventIndex).notes

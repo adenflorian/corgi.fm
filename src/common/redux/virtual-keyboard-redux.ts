@@ -254,7 +254,7 @@ export const selectVirtualKeyboard = (state: IAppState, id) => {
 	return selectAllVirtualKeyboards(state)[id]
 }
 
-export const makeGetMidiOutput = () => {
+export const makeGetKeyboardMidiOutput = () => {
 	return createSelector(
 		selectVirtualKeyboard,
 		keyboard => keyboard === undefined ? [] : keyboard.pressedKeys.map(x => applyOctave(x, keyboard.octave)),

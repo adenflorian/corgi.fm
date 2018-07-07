@@ -4,7 +4,7 @@ import {logger} from '../logger'
 import {IAppState} from './configureStore'
 import {makeActionCreator, makeBroadcaster, makeServerAction} from './redux-utils'
 import {selectTrack} from './tracks-redux'
-import {IVirtualKeyboardState, makeGetMidiOutput, selectVirtualKeyboard} from './virtual-keyboard-redux'
+import {IVirtualKeyboardState, makeGetKeyboardMidiOutput, selectVirtualKeyboard} from './virtual-keyboard-redux'
 
 export const ADD_CONNECTION = 'ADD_CONNECTION'
 export const addConnection = makeServerAction(makeBroadcaster((connection: IConnection) => ({
@@ -133,23 +133,25 @@ export const getConnectionSourceColor = (state: IAppState, id: string) => {
 	}
 }
 
-const getMidiOutput = makeGetMidiOutput()
+const getKeyboardMidiOutput = makeGetKeyboardMidiOutput()
+
+const emptyArray = []
 
 export const getConnectionSourceNotes = (state: IAppState, id: string) => {
 	const connection = selectConnection(state, id)
 	switch (connection.sourceType) {
 		case ConnectionSourceType.keyboard:
-			return getMidiOutput(state, connection.sourceId)
+			return getKeyboardMidiOutput(state, connection.sourceId)
 		case ConnectionSourceType.track:
 			const track = selectTrack(state, connection.sourceId)
-			if (!track) return []
+			if (!track) return emptyArray
 			if (track.index >= 0 && track.index < track.events.length) {
 				return track.events[track.index].notes
 			} else {
-				return []
+				return emptyArray
 			}
 		default:
-			logger.warn('couldnt find source color (unsupported connection source type)')
-			return 'red'
+			logger.warn('couldnt find source notes (unsupported connection source type)')
+			return emptyArray
 	}
 }
