@@ -50,6 +50,13 @@ export class Knob extends Component<IKnobProps, IKnobState> {
 		window.addEventListener('mouseup', this._handleMouseUp)
 	}
 
+	public componentWillReceiveProps(nextProps) {
+		const normalizedNextValue = this._normalize(nextProps.value)
+		if (normalizedNextValue !== this.state.normalizedValue) {
+			this.setState({normalizedValue: normalizedNextValue})
+		}
+	}
+
 	public componentWillUnmount() {
 		window.removeEventListener('mousemove', this._handleMouseMove)
 		window.removeEventListener('mouseup', this._handleMouseUp)

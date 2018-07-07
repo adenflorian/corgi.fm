@@ -70,18 +70,18 @@ export function setupWebsocketAndListeners(store: Store) {
 	})
 
 	socket.on('octave', (data: OctavePayload) => {
-		logger.log('octave: ', data)
+		logger.debug('octave: ', data)
 		store.dispatch(virtualOctave(data.clientId, data.octave))
 	})
 
 	socket.on(WebSocketEvent.broadcast, (action: BroadcastAction) => {
-		logger.log(WebSocketEvent.broadcast)
+		logger.debug(WebSocketEvent.broadcast)
 		store.dispatch({...action, alreadyBroadcasted: true})
 	})
 
 	function socketInfo(info: string) {
 		store.dispatch(setInfo(info))
-		logger.log(info)
+		logger.debug(info)
 	}
 }
 
