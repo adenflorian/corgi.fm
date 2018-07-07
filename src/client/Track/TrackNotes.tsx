@@ -94,7 +94,7 @@ const mapDispatchToProps = (dispatch: Dispatch, {id}: ITrackNotesConnectedProps)
 		}
 	},
 	handleScrollChange: (newValue: number) => {
-		dispatch(setTrackBottomNote(id, Math.floor(newValue)))
+		dispatch(setTrackBottomNote(id, Math.round(newValue)))
 	},
 })
 
