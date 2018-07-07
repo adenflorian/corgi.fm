@@ -58,6 +58,7 @@ export const TrackNotes = (props: ITrackNotesProps) => {
 				value={bottomNote}
 				onChange={handleScrollChange}
 				marks={marks}
+				sliderGrabberHeightPercentage={notesToShow * 100 / MAX_MIDI_NOTE_NUMBER_127}
 			/>
 		</div>
 	)

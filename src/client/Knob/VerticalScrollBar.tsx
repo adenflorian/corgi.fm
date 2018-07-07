@@ -10,6 +10,7 @@ interface IVerticalScrollBarProps {
 	curve?: number
 	onChangeId?: any
 	marks?: number[]
+	sliderGrabberHeightPercentage?: number,
 }
 
 export class VerticalScrollBar extends React.PureComponent<IVerticalScrollBarProps> {
@@ -32,6 +33,7 @@ export class VerticalScrollBar extends React.PureComponent<IVerticalScrollBarPro
 						percentage={percentage}
 						handleMouseDown={handleMouseDown}
 						marks={marks}
+						sliderGrabberHeightPercentage={this.props.sliderGrabberHeightPercentage}
 					/>
 				}
 			</SliderController>
