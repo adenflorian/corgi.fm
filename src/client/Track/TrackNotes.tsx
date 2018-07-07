@@ -2,8 +2,10 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 import {IAppState} from '../../common/redux/configureStore'
-import {ITrackEvent, selectTrack, setTrackNote} from '../../common/redux/tracks-redux'
+import {ITrackEvent, selectTrack, setTrackBottomNote, setTrackNote} from '../../common/redux/tracks-redux'
+import {MAX_MIDI_NOTE_NUMBER_127, MIN_MIDI_NOTE_NUMBER_0} from '../../common/server-constants'
 import {isWhiteKey} from '../Keyboard/Keyboard'
+import {VerticalScrollBar} from '../Knob/VerticalScrollBar'
 import {isLeftMouseButtonDown} from '../utils'
 
 interface ITrackNotesProps {
@@ -14,10 +16,12 @@ interface ITrackNotesProps {
 	handleNoteClicked: (index, isEnabled, i2) => void
 	handleMouseEnter: (index, isEnabled, i2, e) => void
 	handleMouseDown: (index, isEnabled, i2, e) => void
+	handleScrollChange: (newValue: number) => void
 }
 
 export const TrackNotes = (props: ITrackNotesProps) => {
-	const {activeIndex, bottomNote, events, handleNoteClicked, handleMouseEnter, handleMouseDown, notesToShow} = props
+	const {activeIndex, bottomNote, events, handleNoteClicked,
+		handleMouseEnter, handleMouseDown, notesToShow, handleScrollChange} = props
 
 	return (
 		<div className="events">
@@ -44,6 +48,12 @@ export const TrackNotes = (props: ITrackNotesProps) => {
 					</div>
 				)
 			})}
+			<VerticalScrollBar
+				min={MIN_MIDI_NOTE_NUMBER_0}
+				max={MAX_MIDI_NOTE_NUMBER_127 - notesToShow}
+				value={bottomNote}
+				onChange={handleScrollChange}
+			/>
 		</div>
 	)
 }
@@ -76,6 +86,9 @@ const mapDispatchToProps = (dispatch: Dispatch, {id}: ITrackNotesConnectedProps)
 		if (e.ctrlKey && isEnabled === true && isLeftMouseButtonDown(e.buttons)) {
 			dispatch(setTrackNote(id, index, false, noteNumber))
 		}
+	},
+	handleScrollChange: (newValue: number) => {
+		dispatch(setTrackBottomNote(id, Math.floor(newValue)))
 	},
 })
 

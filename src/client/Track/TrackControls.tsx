@@ -3,17 +3,11 @@ import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 import {IAppState} from '../../common/redux/configureStore'
 import {playTrack, restartTrack, stopTrack} from '../../common/redux/track-player-middleware'
-import {selectTrack, setTrackBottomNote} from '../../common/redux/tracks-redux'
-import {MAX_MIDI_NOTE_NUMBER_127, MIN_MIDI_NOTE_NUMBER_0} from '../../common/server-constants'
-import {Knob} from '../Knob/Knob'
 
 interface ITrackControlsProps {
-	bottomNote: number
 	handlePlayButtonClicked: () => void
 	handleStopButtonClicked: () => void
 	handleRestartButtonClicked: () => void
-	handleBottomNoteChanged: (e) => void
-	notesToShow: number
 }
 
 export const TrackControls = (props: ITrackControlsProps) => {
@@ -37,16 +31,6 @@ export const TrackControls = (props: ITrackControlsProps) => {
 			>
 				↻
 			</div>
-			<div
-				className="bottomNote colorTransition"
-			>
-				<Knob
-					value={props.bottomNote}
-					onChange={value => props.handleBottomNoteChanged(Math.floor(value))}
-					min={MIN_MIDI_NOTE_NUMBER_0}
-					max={MAX_MIDI_NOTE_NUMBER_127 - props.notesToShow}
-				/>
-			</div>
 		</div>
 	)
 }
@@ -56,11 +40,9 @@ interface ITrackControlsConnectedProps {
 }
 
 const mapSateToProps = (state: IAppState, props: ITrackControlsConnectedProps) => {
-	const trackState = selectTrack(state, props.id)
+	// const trackState = selectTrack(state, props.id)
 
 	return {
-		bottomNote: trackState.bottomNote,
-		notesToShow: trackState.notesToShow,
 	}
 }
 
@@ -68,7 +50,6 @@ const mapDispatchToProps = (dispatch: Dispatch, {id}: ITrackControlsConnectedPro
 	handlePlayButtonClicked: () => dispatch(playTrack(id)),
 	handleStopButtonClicked: () => dispatch(stopTrack(id)),
 	handleRestartButtonClicked: () => dispatch(restartTrack(id)),
-	handleBottomNoteChanged: e => dispatch(setTrackBottomNote(id, e)),
 })
 
 export const TrackControlsConnected = connect(
