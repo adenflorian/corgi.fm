@@ -31,14 +31,41 @@ export class ConnectionViewContainer extends React.Component<IConnectionViewCont
 
 	constructor(props) {
 		super(props)
-		window.addEventListener('resize', () => this.componentDidUpdate())
-		window.addEventListener('scroll', () => this.componentDidUpdate())
+		window.addEventListener('resize', this._foo)
+		window.addEventListener('scroll', this._foo)
 		setTimeout(() => {
 			this.componentDidUpdate()
 		}, 500)
 	}
 
 	public componentDidUpdate() {
+		this._foo()
+	}
+
+	public componentWillUnmount() {
+		window.removeEventListener('resize', this._foo)
+		window.removeEventListener('scroll', this._foo)
+	}
+
+	public render() {
+		const {positions: {sourcePosition, targetPosition}} = this.state
+
+		if (sourcePosition === undefined || targetPosition === undefined) {
+			return null
+		} else {
+			return (
+				<ConnectionView
+					color={this.props.sourceColor}
+					sourceX={sourcePosition.x}
+					sourceY={sourcePosition.y}
+					targetX={targetPosition.x}
+					targetY={targetPosition.y}
+				/>
+			)
+		}
+	}
+
+	private _foo = () => {
 		const sourceElement = document.getElementById(this.props.sourceId)
 		if (!sourceElement) return
 		const targetElement = document.getElementById(this.props.targetId)
@@ -64,24 +91,6 @@ export class ConnectionViewContainer extends React.Component<IConnectionViewCont
 				positions: newPositions,
 				oldPositions: this.state.positions,
 			})
-		}
-	}
-
-	public render() {
-		const {positions: {sourcePosition, targetPosition}} = this.state
-
-		if (sourcePosition === undefined || targetPosition === undefined) {
-			return null
-		} else {
-			return (
-				<ConnectionView
-					color={this.props.sourceColor}
-					sourceX={sourcePosition.x}
-					sourceY={sourcePosition.y}
-					targetX={targetPosition.x}
-					targetY={targetPosition.y}
-				/>
-			)
 		}
 	}
 }
