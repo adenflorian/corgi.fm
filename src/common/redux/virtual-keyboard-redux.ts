@@ -177,6 +177,9 @@ export function virtualKeyboardsReducer(
 }
 
 function virtualKeyboardReducer(virtualKeyboard: IVirtualKeyboardState, action: AnyAction) {
+	if (virtualKeyboard === undefined) {
+		return
+	}
 	switch (action.type) {
 		case VIRTUAL_KEY_PRESSED:
 			return {
