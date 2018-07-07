@@ -1,6 +1,5 @@
 import {Store} from 'redux'
-import {IAppState} from '../common/redux/configureStore'
-import {virtualKeyPressed, virtualKeyUp} from '../common/redux/virtual-keyboard-redux'
+import {localMidiKeyPress, localMidiKeyUp} from '../common/redux/local-middleware'
 
 declare global {
 	interface Navigator {
@@ -26,7 +25,7 @@ export function setupMidiSupport(store: Store, logger) {
 }
 
 function onMidiNotAvailable() {
-	_logger.log('No MIDI support in your browser.')
+	_logger.log('No MIDI support in your browser. Try Chrome or Opera.')
 }
 
 function onMidiFailure() {
@@ -94,19 +93,16 @@ function onMidiMessage(event) {
 	// pressure: 176, cmd 11:
 	// bend: 224, cmd: 14
 
-	const state: IAppState = _store.getState()
-	const myClientId = state.websocket.myClientId
-
-	switch (type) {
-		case 144:
-			_store.dispatch(virtualKeyPressed(myClientId, note))
-			break
-		case 128:
-			_store.dispatch(virtualKeyUp(myClientId, note))
-			break
-	}
-
 	if (velocity === 0) {
-		_store.dispatch(virtualKeyUp(myClientId, note))
+		_store.dispatch(localMidiKeyUp(note))
+	} else {
+		switch (type) {
+			case 144:
+				_store.dispatch(localMidiKeyPress(note))
+				break
+			case 128:
+				_store.dispatch(localMidiKeyUp(note))
+				break
+		}
 	}
 }
