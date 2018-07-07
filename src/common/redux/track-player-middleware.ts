@@ -46,7 +46,7 @@ export const trackPlayerMiddleware: Middleware = (store: Store) => next => actio
 function foo(action: AnyAction, trackPlayer: TrackPlayer, next: Dispatch, store: Store) {
 	switch (action.type) {
 		case PLAY_TRACK:
-			trackPlayer.play(selectTrack(store.getState(), action.id).notes.length)
+			trackPlayer.play(selectTrack(store.getState(), action.id).events.length)
 			return next(action)
 		case STOP_TRACK:
 			trackPlayer.stop()
@@ -63,7 +63,7 @@ function foo(action: AnyAction, trackPlayer: TrackPlayer, next: Dispatch, store:
 		case RESTART_TRACK:
 			if (trackPlayer.isPlaying()) {
 				trackPlayer.stop()
-				trackPlayer.play(selectTrack(store.getState(), action.id).notes.length)
+				trackPlayer.play(selectTrack(store.getState(), action.id).events.length)
 			}
 			return next(action)
 		case UPDATE_TRACKS:

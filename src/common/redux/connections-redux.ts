@@ -143,8 +143,8 @@ export const getConnectionSourceNotes = (state: IAppState, id: string) => {
 		case ConnectionSourceType.track:
 			const track = selectTrack(state, connection.sourceId)
 			if (!track) return []
-			if (track.index >= 0 && track.index < track.notes.length) {
-				return track.notes[track.index].notes
+			if (track.index >= 0 && track.index < track.events.length) {
+				return track.events[track.index].notes
 			} else {
 				return []
 			}

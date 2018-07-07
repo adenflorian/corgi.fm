@@ -10,15 +10,14 @@ interface ITrackNotesProps {
 	events: ITrackEvent[]
 	activeIndex: number
 	bottomNote: number
+	notesToShow: number
 	handleNoteClicked: (index, isEnabled, i2) => void
 	handleMouseEnter: (index, isEnabled, i2, e) => void
 	handleMouseDown: (index, isEnabled, i2, e) => void
 }
 
 export const TrackNotes = (props: ITrackNotesProps) => {
-	const {activeIndex, bottomNote, events, handleNoteClicked, handleMouseEnter, handleMouseDown} = props
-
-	const notesToShow = 36
+	const {activeIndex, bottomNote, events, handleNoteClicked, handleMouseEnter, handleMouseDown, notesToShow} = props
 
 	return (
 		<div className="events">
@@ -57,9 +56,10 @@ const mapSateToProps = (state: IAppState, props: ITrackNotesConnectedProps) => {
 	const trackState = selectTrack(state, props.id)
 
 	return {
-		events: trackState.notes,
+		events: trackState.events,
 		activeIndex: trackState.index,
 		bottomNote: trackState.bottomNote,
+		notesToShow: trackState.notesToShow,
 	}
 }
 

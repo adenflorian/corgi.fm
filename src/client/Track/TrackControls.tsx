@@ -4,6 +4,7 @@ import {Dispatch} from 'redux'
 import {IAppState} from '../../common/redux/configureStore'
 import {playTrack, restartTrack, stopTrack} from '../../common/redux/track-player-middleware'
 import {selectTrack, setTrackBottomNote} from '../../common/redux/tracks-redux'
+import {MAX_MIDI_NOTE_NUMBER_127, MIN_MIDI_NOTE_NUMBER_0} from '../../common/server-constants'
 import {Knob} from '../Volume/Knob'
 
 interface ITrackControlsProps {
@@ -12,6 +13,7 @@ interface ITrackControlsProps {
 	handleStopButtonClicked: () => void
 	handleRestartButtonClicked: () => void
 	handleBottomNoteChanged: (e) => void
+	notesToShow: number
 }
 
 export const TrackControls = (props: ITrackControlsProps) => {
@@ -41,9 +43,8 @@ export const TrackControls = (props: ITrackControlsProps) => {
 				<Knob
 					value={props.bottomNote}
 					onChange={value => props.handleBottomNoteChanged(Math.floor(value))}
-					min={0}
-					max={84}
-					sensitivity={0.1}
+					min={MIN_MIDI_NOTE_NUMBER_0}
+					max={MAX_MIDI_NOTE_NUMBER_127 - props.notesToShow}
 				/>
 			</div>
 		</div>
@@ -59,6 +60,7 @@ const mapSateToProps = (state: IAppState, props: ITrackControlsConnectedProps) =
 
 	return {
 		bottomNote: trackState.bottomNote,
+		notesToShow: trackState.notesToShow,
 	}
 }
 

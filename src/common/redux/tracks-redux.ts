@@ -4,6 +4,7 @@ import * as uuid from 'uuid'
 import {hashbow} from '../../client/utils'
 import {IMidiNote} from '../MidiNote'
 import {addIfNew} from '../server-common'
+import {MAX_MIDI_NOTE_NUMBER_127} from '../server-constants'
 import {IAppState} from './configureStore'
 import {makeActionCreator, makeBroadcaster, makeServerAction} from './redux-utils'
 import {PLAY_TRACK, STOP_TRACK} from './track-player-middleware'
@@ -78,27 +79,29 @@ export interface ITracks {
 }
 
 export interface ITrackState {
-	notes: ITrackEvent[]
+	events: ITrackEvent[]
 	index: number
 	isPlaying: boolean
 	id: string
 	color: string
 	name: string
 	bottomNote: number
+	notesToShow: number
 }
 
 export class TrackState implements ITrackState {
 	public readonly id: string = uuid.v4()
-	public readonly notes: ITrackEvent[]
+	public readonly events: ITrackEvent[]
 	public readonly index: number = -1
 	public readonly isPlaying: boolean = false
 	public readonly color: string
 	public name: string
 	public bottomNote: number = 0
+	public notesToShow = 36
 
 	constructor(events?: ITrackEvent[]) {
 		this.color = Color(hashbow(this.id)).desaturate(0.2).hsl().string()
-		this.notes = events || [
+		this.events = events || [
 			{notes: []},
 			{notes: []},
 			{notes: []},
@@ -136,11 +139,17 @@ export function tracksReducer(
 			action.trackIds.forEach(x => delete newState.tracks[x])
 			return newState
 		case UPDATE_TRACKS:
+			const tracks: ITracks = action.tracks
+			Object.keys(tracks).forEach(key => {
+				const track = tracks[key]
+				const lowestNote = findLowestNote(track.events)
+				track.bottomNote = Math.min(MAX_MIDI_NOTE_NUMBER_127 - track.notesToShow, lowestNote)
+			})
 			return {
 				...state,
 				tracks: {
 					...state.tracks,
-					...action.tracks,
+					...tracks,
 				},
 			}
 		case SET_TRACK_NOTE:
@@ -161,6 +170,24 @@ export function tracksReducer(
 	}
 }
 
+function findLowestNote(events: ITrackEvent[]): number {
+	let lowest = Number.MAX_VALUE
+
+	events.forEach(event => {
+		event.notes.forEach(note => {
+			if (note < lowest) {
+				lowest = note
+			}
+		})
+	})
+
+	if (lowest === Number.MAX_VALUE) {
+		return 0
+	}
+
+	return lowest
+}
+
 function trackReducer(track: ITrackState, action: AnyAction) {
 	switch (action.type) {
 		case SET_TRACK_NOTE:
@@ -169,7 +196,7 @@ function trackReducer(track: ITrackState, action: AnyAction) {
 			}
 			return {
 				...track,
-				notes: track.notes.map((event, eventIndex) => {
+				events: track.events.map((event, eventIndex) => {
 					if (eventIndex === action.index) {
 						if (action.enabled) {
 							return {
