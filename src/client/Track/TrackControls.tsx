@@ -5,7 +5,7 @@ import {IAppState} from '../../common/redux/configureStore'
 import {playTrack, restartTrack, stopTrack} from '../../common/redux/track-player-middleware'
 import {selectTrack, setTrackBottomNote} from '../../common/redux/tracks-redux'
 import {MAX_MIDI_NOTE_NUMBER_127, MIN_MIDI_NOTE_NUMBER_0} from '../../common/server-constants'
-import {Knob} from '../Volume/Knob'
+import {Knob} from '../Knob/Knob'
 
 interface ITrackControlsProps {
 	bottomNote: number

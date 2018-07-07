@@ -6,7 +6,7 @@ import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 import {IAppState} from '../../common/redux/configureStore'
 import {setOptionMasterVolume} from '../../common/redux/options-redux'
-import {Knob} from './Knob'
+import {Knob} from '../Knob/Knob'
 import './VolumeControl.less'
 
 interface IVolumeControlProps {

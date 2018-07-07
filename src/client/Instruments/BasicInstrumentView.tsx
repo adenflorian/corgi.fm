@@ -11,8 +11,8 @@ import {IAppState} from '../../common/redux/configureStore'
 import {
 	getConnectionSourceColor, getConnectionSourceNotes, selectFirstConnectionByTargetId,
 } from '../../common/redux/connections-redux'
+import {Knob} from '../Knob/Knob'
 import {audioContext, preFx} from '../setup-audio-context'
-import {Knob} from '../Volume/Knob'
 import {ClientId} from '../websocket-listeners'
 import {BasicInstrument} from './BasicInstrument'
 import './BasicInstrumentView.less'
