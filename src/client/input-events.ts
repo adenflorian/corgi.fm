@@ -21,12 +21,22 @@ const keyboardShortcuts: KeyBoardShortcuts = {
 	// 	allowRepeat: false,
 	// 	preventDefault: true,
 	// },
-	z: {
+	'z': {
 		actionOnKeyDown: (e: KeyboardEvent) => localMidiOctaveChange(e.shiftKey ? -2 : -1),
 		allowRepeat: true,
 		preventDefault: true,
 	},
-	x: {
+	'x': {
+		actionOnKeyDown: (e: KeyboardEvent) => localMidiOctaveChange(e.shiftKey ? 2 : 1),
+		allowRepeat: true,
+		preventDefault: true,
+	},
+	'-': {
+		actionOnKeyDown: (e: KeyboardEvent) => localMidiOctaveChange(e.shiftKey ? -2 : -1),
+		allowRepeat: true,
+		preventDefault: true,
+	},
+	'+': {
 		actionOnKeyDown: (e: KeyboardEvent) => localMidiOctaveChange(e.shiftKey ? 2 : 1),
 		allowRepeat: true,
 		preventDefault: true,
