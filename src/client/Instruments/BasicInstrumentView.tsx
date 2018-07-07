@@ -105,27 +105,27 @@ export class BasicInstrumentView extends Component<IBasicInstrumentViewProps> {
 					<Knob
 						min={0}
 						max={10000}
+						curve={2}
 						value={this.props.lowPassFilterCutoffFrequency}
 						onChange={value => this._dispatchChangeInstrumentParam(BasicInstrumentParam.lowPassFilterCutoffFrequency, value)}
-						sensitivity={20}
 						label="lpf"
 					/>
 
 					<Knob
 						min={0.01}
 						max={10}
+						curve={3}
 						value={this.props.attack}
 						onChange={value => this._dispatchChangeInstrumentParam(BasicInstrumentParam.attack, value)}
-						sensitivity={0.05}
 						label="attack"
 					/>
 
 					<Knob
 						min={0.01}
 						max={60}
+						curve={2}
 						value={this.props.release}
 						onChange={value => this._dispatchChangeInstrumentParam(BasicInstrumentParam.release, value)}
-						sensitivity={0.5}
 						label="release"
 					/>
 				</div >
