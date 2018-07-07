@@ -20,7 +20,7 @@ export const VerticalScrollBarView = (props: IVerticalScrollBarViewProps) => {
 			<div
 				className="slider"
 				style={{
-					top: `${100 - (percentage * 100)}%`,
+					top: `${90 - (percentage * 90)}%`,
 				}}
 				onMouseDown={handleMouseDown}
 			/>
