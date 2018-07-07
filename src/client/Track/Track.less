@@ -15,7 +15,6 @@
         position: relative;
         display: flex;
         background-color: @panelGray;
-        max-width: 512px;
         .isNotPlaying& {
             transition: box-shadow 0.3s ease-out;
         }
@@ -57,9 +56,9 @@
         .events {
             display: flex;
             justify-content: space-between;
-            max-width: 416px;
             .event {
-                width: 80px;
+                min-width: 16px;
+                max-width: 32px;
                 height: 256px; // border: 1px solid @borderGray;
                 margin: 0px 0;
                 display: flex;
@@ -102,6 +101,9 @@
                         filter: saturate(50%)
                     }
                 }
+            }
+            .scrollBar {
+                width: 16px;
             }
         }
     }
