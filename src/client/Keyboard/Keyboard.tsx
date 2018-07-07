@@ -136,7 +136,7 @@ export class Keyboard extends React.Component<IKeyboardProps, IKeyboardState> {
 
 	private handleMouseOut = (e: React.MouseEvent, index: number) => {
 		if (this.props.isLocal === false) return
-		if (isLeftMouseButtonDown(e.buttons)) {
+		if (isLeftMouseButtonDown(e.buttons) && this.state.wasMouseClickedOnKeyboard) {
 			this.props.dispatch(virtualKeyUp(this.props.id, index))
 		}
 	}
