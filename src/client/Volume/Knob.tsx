@@ -1,7 +1,7 @@
+import {normalize} from 'path'
 import 'rc-slider/assets/index.css'
 import React = require('react')
 import {Component} from 'react'
-import {valueToPercentageOfMinMax} from '../utils'
 import './Knob.less'
 
 interface IKnobProps {
@@ -9,10 +9,10 @@ interface IKnobProps {
 	min?: number
 	max?: number
 	onChange?: (newValue: number) => any
-	sensitivity?: number
 	value: number
 	readOnly?: boolean
 	markColor?: string
+	curve?: number
 }
 
 interface IKnobState {
@@ -21,7 +21,7 @@ interface IKnobState {
 		y: number,
 	}
 	isMouseDown: boolean,
-	valueWhenMouseDown?: number
+	normalizedValue: number
 }
 
 export class Knob extends Component<IKnobProps, IKnobState> {
@@ -29,9 +29,9 @@ export class Knob extends Component<IKnobProps, IKnobState> {
 		onChange: () => undefined,
 		min: 0,
 		max: 1,
-		sensitivity: 0.005,
 		readOnly: false,
 		markColor: 'currentColor',
+		curve: 1,
 	}
 
 	public state: IKnobState = {
@@ -40,10 +40,12 @@ export class Knob extends Component<IKnobProps, IKnobState> {
 			y: 0,
 		},
 		isMouseDown: false,
+		normalizedValue: 0.5,
 	}
 
 	constructor(props: IKnobProps) {
 		super(props)
+		this.state.normalizedValue = this._normalize(this.props.value)
 		window.addEventListener('mousemove', this._handleMouseMove)
 		window.addEventListener('mouseup', this._handleMouseUp)
 	}
@@ -54,9 +56,11 @@ export class Knob extends Component<IKnobProps, IKnobState> {
 	}
 
 	public render() {
-		const {value, label, min, max, readOnly, markColor} = this.props
+		const {label, readOnly, markColor} = this.props
 
-		const percentage = valueToPercentageOfMinMax(value, min, max)
+		const normalizedValue = this.state.normalizedValue
+
+		const percentage = normalizedValue * 100
 
 		return (
 			<div
@@ -78,7 +82,7 @@ export class Knob extends Component<IKnobProps, IKnobState> {
 					<div
 						className="actualKnob"
 						style={{
-							transform: `rotate(${this._getRotation(value, min, max)}deg)`,
+							transform: `rotate(${this._getRotation(normalizedValue)}deg)`,
 						}}
 						onMouseDown={this._handleMouseDown}
 					>
@@ -98,20 +102,33 @@ export class Knob extends Component<IKnobProps, IKnobState> {
 
 	private _handleMouseMove = (e: MouseEvent) => {
 		if (this.state.isMouseDown) {
-			const mouseYDelta = (e.screenY - this.state.mouseDownPosition.y) * this.props.sensitivity
-
-			const calculateNewVolume = (oldValue: number, mouseDeltaY: number): number => {
-				const delta = -mouseDeltaY
-				const combined = oldValue + delta
-				return Math.max(this.props.min, Math.min(this.props.max, combined))
+			let sensitivity = 0.005
+			if (e.shiftKey) {
+				sensitivity *= 2
 			}
+			const mouseYDelta = e.movementY * sensitivity
 
-			const newValue = calculateNewVolume(this.state.valueWhenMouseDown, mouseYDelta)
+			const normalizedValue = this.state.normalizedValue
 
-			if (newValue !== this.props.value) {
-				this.props.onChange(newValue)
+			const newNormalizedValue = Math.max(0, Math.min(1, normalizedValue - mouseYDelta))
+
+			if (newNormalizedValue !== normalizedValue) {
+				this.setState({normalizedValue: newNormalizedValue})
+				this.props.onChange(this._deNormalize(newNormalizedValue))
 			}
 		}
+	}
+
+	private _normalize = (value: number) => {
+		const normalizedValue = (value - this.props.min) / (this.props.max - this.props.min)
+		const curvedValue = Math.pow(normalizedValue, 1 / this.props.curve)
+		return curvedValue
+	}
+
+	private _deNormalize = (value: number) => {
+		const deCurvedValue = Math.pow(value, this.props.curve)
+		const deNormalizedValue = (deCurvedValue * (this.props.max - this.props.min)) + this.props.min
+		return deNormalizedValue
 	}
 
 	private _handleMouseDown = (e: React.MouseEvent) => {
@@ -121,18 +138,14 @@ export class Knob extends Component<IKnobProps, IKnobState> {
 				y: e.screenY,
 			},
 			isMouseDown: true,
-			valueWhenMouseDown: this.props.value,
 		})
 	}
 
-	private _getRotation(input: number, min: number, max: number): number {
+	private _getRotation(normalizedInput: number): number {
 		const minDegrees = 220
 		const maxDegrees = 500
 		const rangeDegrees = maxDegrees - minDegrees
-		const inputRange = Math.abs(max - min)
-		const inputDistanceFromMin = Math.abs(input - min)
-		const inputToRangeRatio = inputDistanceFromMin / inputRange
-		const amountOfDegreesToApply = rangeDegrees * inputToRangeRatio
+		const amountOfDegreesToApply = rangeDegrees * normalizedInput
 		return minDegrees + amountOfDegreesToApply
 	}
 }
