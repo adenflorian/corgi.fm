@@ -36,8 +36,10 @@
 	- like a pan knob, when centered should have no arc, and arc can go left or right from center
 
 # Track
-- [ ] scroll bar
-- [ ] mini map scroll bar
+
+## Track Scroll Bar
+- [ ] make slider stay with mouse 1:1
+- [√] mini map
 
 # References
 - https://github.com/grimmdude/MidiPlayerJS/blob/master/src/player.js

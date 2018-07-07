@@ -23,6 +23,10 @@ export const TrackNotes = (props: ITrackNotesProps) => {
 	const {activeIndex, bottomNote, events, handleNoteClicked,
 		handleMouseEnter, handleMouseDown, notesToShow, handleScrollChange} = props
 
+	const marks = events.reduce((allMarks: number[], event) => {
+		return allMarks.concat(event.notes.map(note => note / 127))
+	}, [])
+
 	return (
 		<div className="events">
 			{events.map((event, index) => {
@@ -53,6 +57,7 @@ export const TrackNotes = (props: ITrackNotesProps) => {
 				max={MAX_MIDI_NOTE_NUMBER_127 - notesToShow}
 				value={bottomNote}
 				onChange={handleScrollChange}
+				marks={marks}
 			/>
 		</div>
 	)

@@ -3,12 +3,12 @@ import './VerticalScrollBar.less'
 
 interface IVerticalScrollBarViewProps {
 	percentage: number
-	adjustedPercentage: number
 	handleMouseDown: (e: React.MouseEvent) => any
+	marks: number[]
 }
 
 export const VerticalScrollBarView = (props: IVerticalScrollBarViewProps) => {
-	const {handleMouseDown, percentage, adjustedPercentage} = props
+	const {handleMouseDown, percentage, marks} = props
 
 	return (
 		<div
@@ -24,6 +24,23 @@ export const VerticalScrollBarView = (props: IVerticalScrollBarViewProps) => {
 				}}
 				onMouseDown={handleMouseDown}
 			/>
+			{marks.map((mark, index) => {
+				return (
+					<div
+						key={index}
+						className="mark"
+						style={{
+							position: 'absolute',
+							top: `${90 - (mark * 90)}%`,
+							backgroundColor: 'currentColor',
+							width: '100%',
+							height: '1px',
+							filter: 'opacity(0.4)',
+							backgroundBlendMode: 'add',
+						}}
+					/>
+				)
+			})}
 		</div>
 	)
 }

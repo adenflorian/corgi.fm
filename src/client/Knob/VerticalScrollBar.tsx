@@ -9,6 +9,7 @@ interface IVerticalScrollBarProps {
 	value: number
 	curve?: number
 	onChangeId?: any
+	marks?: number[]
 }
 
 export class VerticalScrollBar extends React.PureComponent<IVerticalScrollBarProps> {
@@ -18,18 +19,19 @@ export class VerticalScrollBar extends React.PureComponent<IVerticalScrollBarPro
 		readOnly: false,
 		markColor: 'currentColor',
 		curve: 1,
+		marks: [],
 	}
 
 	public render() {
-		const {value, min, max, curve} = this.props
+		const {value, min, max, curve, marks} = this.props
 
 		return (
 			<SliderController min={min} max={max} curve={curve} onChange={this._handleOnChange} value={value}>
-				{(handleMouseDown, percentage, adjustedPercentage) =>
+				{(handleMouseDown, percentage) =>
 					<VerticalScrollBarView
 						percentage={percentage}
-						adjustedPercentage={adjustedPercentage}
 						handleMouseDown={handleMouseDown}
+						marks={marks}
 					/>
 				}
 			</SliderController>
