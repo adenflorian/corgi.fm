@@ -4,6 +4,7 @@ import * as uuid from 'uuid'
 import {hashbow} from '../../client/utils'
 import {ClientId} from '../../client/websocket-listeners'
 import {IAppState} from './configureStore'
+import {makeBroadcaster, makeServerAction} from './redux-utils'
 import {selectLocalSocketId} from './websocket-redux'
 
 export const ADD_CLIENT = 'ADD_CLIENT'
@@ -21,6 +22,15 @@ export const setClients = (clients: IClientState[]) => {
 		clients,
 	}
 }
+
+export const SET_CLIENT_POINTER = 'SET_CLIENT_POINTER'
+export const setClientPointer = makeServerAction(makeBroadcaster((id: ClientId, pointer: IClientPointer) => {
+	return {
+		type: SET_CLIENT_POINTER,
+		id,
+		pointer,
+	}
+}))
 
 export const CLIENT_DISCONNECTED = 'CLIENT_DISCONNECTED'
 export const clientDisconnected = (id: ClientId) => {
@@ -47,6 +57,14 @@ export interface IClientState {
 	color: string
 	name: string
 	socketId: string
+	pointer: IClientPointer
+}
+
+export interface IClientPointer {
+	x: number
+	y: number
+	ownerId: string
+	color?: string
 }
 
 export class ClientState implements IClientState {
@@ -63,12 +81,14 @@ export class ClientState implements IClientState {
 	public readonly id: string
 	public readonly color: string
 	public readonly name: string
+	public readonly pointer: IClientPointer
 
 	constructor(socketId: string) {
 		this.id = uuid.v4()
 		this.socketId = socketId
 		this.name = animal.getId() + '-' + this.id[0]
 		this.color = Color(hashbow(this.id)).desaturate(0.2).hsl().string()
+		this.pointer = {x: 0, y: 0, ownerId: this.id}
 	}
 }
 
@@ -102,6 +122,12 @@ export function clientsReducer(clientsState: IClientsState = initialState, actio
 				clients: clientsState.clients
 					.map(x => x.id === action.id ? {...x, disconnecting: true} : x),
 			}
+		case SET_CLIENT_POINTER:
+			return {
+				...clientsState,
+				clients: clientsState.clients
+					.map(x => x.id === action.id ? {...x, pointer: action.pointer} : x),
+			}
 		default:
 			return clientsState
 	}
@@ -120,3 +146,10 @@ export function selectLocalClient(state: IAppState) {
 }
 
 export const selectAllClients = (state: IAppState) => state.clients.clients
+
+export const selectAllOtherPointers = (state: IAppState) => {
+	const localClientId = selectLocalClient(state).id
+	return selectAllClients(state)
+		.filter(x => x.id !== 'server' && x.id !== localClientId)
+		.map(x => x.pointer)
+}

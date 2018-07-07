@@ -1,6 +1,6 @@
 import Color from 'color'
-import {Fragment} from 'react'
 import * as React from 'react'
+import {Fragment} from 'react'
 import {connect} from 'react-redux'
 import {selectAllInstrumentIds} from '../common/redux/basic-instruments-redux'
 import {IClientState, selectAllClients, selectLocalClient} from '../common/redux/clients-redux'
@@ -13,6 +13,7 @@ import {ConnectionsContainer} from './Connections/Connections'
 import './css-reset.css'
 import {ConnectedBasicInstrumentView} from './Instruments/BasicInstrumentView'
 import {ConnectedKeyboard} from './Keyboard/Keyboard'
+import {MousePointers} from './MousePointers'
 import {ConnectedOption} from './Option'
 import {ConnectedTrackContainer} from './Track/TrackContainer'
 import {ConnectedVolumeControl} from './Volume/VolumeControl'
@@ -41,6 +42,7 @@ class App extends React.Component<IAppProps, {}> {
 
 		return (
 			<Fragment>
+				<MousePointers />
 				<ConnectionsContainer />
 
 				<div className="boardContainer">

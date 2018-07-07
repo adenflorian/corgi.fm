@@ -30,6 +30,7 @@
 	- [ ] D
 	- [ ] S
 	- [√] R
+- [√] track mouse pointers
 
 # Knob
 - [ ] Allow for arc to go both directions

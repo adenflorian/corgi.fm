@@ -1,4 +1,5 @@
 import {AnyAction, Store} from 'redux'
+import {selectLocalClient, setClientPointer} from '../common/redux/clients-redux'
 import {localMidiKeyPress, localMidiKeyUp, localMidiOctaveChange} from '../common/redux/local-middleware'
 
 interface KeyBoardShortcuts {
@@ -83,6 +84,19 @@ export function setupInputEventListeners(window: Window, store: Store) {
 
 	window.addEventListener('keypress', e => {
 		foo(e)
+	})
+
+	window.addEventListener('mousemove', e => {
+		const state = store.getState()
+		const localClient = selectLocalClient(state)
+		if (localClient && localClient.id) {
+			const halfWidth = window.innerWidth / 2
+			const distanceFromCenterX = e.clientX - halfWidth
+			store.dispatch(setClientPointer(localClient.id, {
+				x: distanceFromCenterX,
+				y: e.clientY + window.scrollY,
+			}))
+		}
 	})
 
 	function foo(event: KeyboardEvent) {
