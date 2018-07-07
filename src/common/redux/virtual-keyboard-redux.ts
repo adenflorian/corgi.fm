@@ -164,6 +164,7 @@ export function virtualKeyboardsReducer(
 		case SET_VIRTUAL_KEYS:
 		case VIRTUAL_OCTAVE:
 		case VIRTUAL_OCTAVE_CHANGE:
+			if (state.keyboards.hasOwnProperty(action.id) === false) return state
 			return {
 				...state,
 				keyboards: {
@@ -177,9 +178,6 @@ export function virtualKeyboardsReducer(
 }
 
 function virtualKeyboardReducer(virtualKeyboard: IVirtualKeyboardState, action: AnyAction) {
-	if (virtualKeyboard === undefined) {
-		return
-	}
 	switch (action.type) {
 		case VIRTUAL_KEY_PRESSED:
 			return {
