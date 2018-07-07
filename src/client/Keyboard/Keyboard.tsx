@@ -57,6 +57,9 @@ export class Keyboard extends React.Component<IKeyboardProps, IKeyboardState> {
 		pressedMidiKeys: [],
 		showNoteNames: true,
 	}
+	public state = {
+		wasMouseClickedOnKeyboard: false,
+	}
 
 	constructor(props: IKeyboardProps) {
 		super(props)
