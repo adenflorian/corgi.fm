@@ -107,6 +107,8 @@ export class Knob extends Component<IKnobProps, IKnobState> {
 			let sensitivity = 0.005
 			if (e.shiftKey) {
 				sensitivity *= 2
+			} else if (e.altKey) {
+				sensitivity *= 0.25
 			}
 			const mouseYDelta = e.movementY * sensitivity
 
