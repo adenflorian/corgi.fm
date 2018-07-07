@@ -56,11 +56,9 @@ export class Knob extends Component<IKnobProps, IKnobState> {
 	}
 
 	public render() {
-		const {label, readOnly, markColor} = this.props
+		const {value, label, readOnly, markColor} = this.props
 
 		const normalizedValue = this.state.normalizedValue
-
-		const percentage = normalizedValue * 100
 
 		return (
 			<div
@@ -75,8 +73,12 @@ export class Knob extends Component<IKnobProps, IKnobState> {
 						}}
 					>
 						<circle cx="50%" cy="50%" r="64%"
+							fill="none" stroke="gray" strokeWidth="2"
+							strokeDasharray={`0 50% ${normalizedValue * 300}% 100000`} strokeDashoffset="1"
+						/>
+						<circle cx="50%" cy="50%" r="64%"
 							fill="none" stroke="currentColor" strokeWidth="2"
-							strokeDasharray={`0 50% ${percentage * 3}% 100000`} strokeDashoffset="1"
+							strokeDasharray={`0 50% ${this._normalize(value, false) * 300}% 100000`} strokeDashoffset="1"
 						/>
 					</svg>
 					<div
@@ -119,10 +121,13 @@ export class Knob extends Component<IKnobProps, IKnobState> {
 		}
 	}
 
-	private _normalize = (value: number) => {
+	private _normalize = (value: number, curve = true) => {
 		const normalizedValue = (value - this.props.min) / (this.props.max - this.props.min)
-		const curvedValue = Math.pow(normalizedValue, 1 / this.props.curve)
-		return curvedValue
+		if (curve) {
+			return Math.pow(normalizedValue, 1 / this.props.curve)
+		} else {
+			return normalizedValue
+		}
 	}
 
 	private _deNormalize = (value: number) => {
