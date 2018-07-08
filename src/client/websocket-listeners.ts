@@ -7,6 +7,7 @@ import {setVirtualKeys, virtualOctave} from '../common/redux/virtual-keyboard-re
 import {BroadcastAction} from '../common/redux/websocket-client-sender-middleware'
 import {setInfo, setSocketId} from '../common/redux/websocket-redux'
 import {WebSocketEvent} from '../common/server-constants'
+import {selfDisconnected} from './../common/redux/common-actions'
 import {Octave} from './music/music-types'
 
 const port = 80
@@ -17,11 +18,15 @@ export function setupWebsocketAndListeners(store: Store) {
 	socket = io.connect(window.location.hostname + `:${port}/`)
 
 	socket.on('connect', () => {
-		socketInfo('connected')
 		store.dispatch(setSocketId(socket.id))
 	})
 
+	socket.on('disconnect', () => {
+		store.dispatch(selfDisconnected())
+	})
+
 	setupDefaultListeners([
+		['connect'],
 		['disconnect'],
 		['reconnect_attempt'],
 		['reconnecting'],
