@@ -8,7 +8,7 @@ export interface IMultiStateThings {
 	[key: string]: IMultiStateThing
 }
 
-interface IMultiStateThing {
+export interface IMultiStateThing {
 	id: string
 }
 
@@ -25,49 +25,56 @@ const initialState: IMultiState = {
 
 type ADD_MULTI_THING = 'ADD_MULTI_THING'
 export const ADD_MULTI_THING: ADD_MULTI_THING = 'ADD_MULTI_THING'
-interface IAddMultiThingAction {
+interface IAddMultiThingAction extends IMultiThingAction {
 	type: ADD_MULTI_THING
 	thing: IMultiStateThing
 }
-type addMultiThing = (thing: IMultiStateThing) => IAddMultiThingAction
-export const addMultiThing: addMultiThing = (thing: IMultiStateThing) => ({
+export const addMultiThing = (thing: IMultiStateThing, thingType: string): IAddMultiThingAction => ({
 	type: ADD_MULTI_THING,
 	thing,
+	thingType,
 })
 
 type DELETE_THINGS = 'DELETE_THINGS'
 export const DELETE_MULTI_THINGS: DELETE_THINGS = 'DELETE_THINGS'
-export const deleteThings = (thingIds: string[]) => ({
-	type: DELETE_MULTI_THINGS,
-	thingIds,
-})
-interface IDeleteMultiThingsAction {
+interface IDeleteMultiThingsAction extends IMultiThingAction {
 	type: DELETE_THINGS
 	thingIds: string[]
 }
+export const deleteThings = (thingIds: string[], thingType: string): IDeleteMultiThingsAction => ({
+	type: DELETE_MULTI_THINGS,
+	thingIds,
+	thingType,
+})
 
 type UPDATE_THINGS = 'UPDATE_THINGS'
 export const UPDATE_MULTI_THINGS: UPDATE_THINGS = 'UPDATE_THINGS'
-export const updateThings = (things: IMultiStateThings) => ({
-	type: UPDATE_MULTI_THINGS,
-	things,
-})
-interface IUpdateMultiThingsAction {
+interface IUpdateMultiThingsAction extends IMultiThingAction {
 	type: UPDATE_THINGS
 	things: IMultiStateThings
 }
+export const updateThings = (things: IMultiStateThings, thingType: string): IUpdateMultiThingsAction => ({
+	type: UPDATE_MULTI_THINGS,
+	things,
+	thingType,
+})
 
 type MultiThingAction =
 	IUpdateMultiThingsAction | IAddMultiThingAction | IDeleteMultiThingsAction | {type: '', id?: string}
 
+interface IMultiThingAction {
+	thingType: string
+}
+
 export function makeMultiReducer<T extends IMultiStateThing>(
 	innerReducer: (state: T, action: any) => any,
-	prefix: string,
+	thingType: string,
 	actionTypes: string[],
 ) {
 	return (state: IMultiState = initialState, action: MultiThingAction) => {
 		switch (action.type) {
 			case ADD_MULTI_THING:
+				if (action.thingType !== thingType) return state
 				return {
 					...state,
 					things: {
@@ -76,10 +83,12 @@ export function makeMultiReducer<T extends IMultiStateThing>(
 					},
 				}
 			case DELETE_MULTI_THINGS:
+				if (action.thingType !== thingType) return state
 				const newState = {...state, things: {...state.things}}
 				action.thingIds.forEach(x => delete newState.things[x])
 				return newState
 			case UPDATE_MULTI_THINGS:
+				if (action.thingType !== thingType) return state
 				return {
 					...state,
 					things: {

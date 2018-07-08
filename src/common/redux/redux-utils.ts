@@ -1,5 +1,3 @@
-import {ActionCreator, AnyAction} from 'redux'
-
 export function makeActionCreator(type, ...argNames) {
 	argNames.forEach(arg => {
 		if (arg === 'type') {

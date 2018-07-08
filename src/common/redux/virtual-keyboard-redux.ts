@@ -7,7 +7,10 @@ import {ClientId} from '../../client/websocket-listeners'
 import {addIfNew} from '../../common/server-common'
 import {IMidiNote} from '../MidiNote'
 import {IAppState} from './configureStore'
+import {addMultiThing, deleteThings, IMultiStateThing, makeMultiReducer, updateThings} from './multi-reducer'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
+
+const VIRTUAL_KEYBOARD_THING_TYPE = 'VIRTUAL_KEYBOARD'
 
 export interface VirtualKeyAction {
 	type: string
@@ -19,24 +22,21 @@ export interface VirtualKeyAction {
 
 export const ADD_VIRTUAL_KEYBOARD = 'ADD_VIRTUAL_KEYBOARD'
 export const addVirtualKeyboard = (virtualKeyboard: IVirtualKeyboardState) => ({
-	type: ADD_VIRTUAL_KEYBOARD,
-	virtualKeyboard,
+	...addMultiThing(virtualKeyboard, VIRTUAL_KEYBOARD_THING_TYPE),
 	SERVER_ACTION,
 	BROADCASTER_ACTION,
 })
 
 export const DELETE_VIRTUAL_KEYBOARDS = 'DELETE_VIRTUAL_KEYBOARDS'
 export const deleteVirtualKeyboards = (virtualKeyboardIds: string[]) => ({
-	type: DELETE_VIRTUAL_KEYBOARDS,
-	virtualKeyboardIds,
+	...deleteThings(virtualKeyboardIds, VIRTUAL_KEYBOARD_THING_TYPE),
 	SERVER_ACTION,
 	BROADCASTER_ACTION,
 })
 
 export const UPDATE_VIRTUAL_KEYBOARDS = 'UPDATE_VIRTUAL_KEYBOARDS'
 export const updateVirtualKeyboards = (keyboards: any) => ({
-	type: UPDATE_VIRTUAL_KEYBOARDS,
-	keyboards,
+	...updateThings(keyboards, VIRTUAL_KEYBOARD_THING_TYPE),
 	BROADCASTER_ACTION,
 })
 
@@ -109,14 +109,14 @@ export const setVirtualKeys = (id: string, keys: IMidiNote[]) => {
 }
 
 export interface IVirtualKeyboardsState {
-	keyboards: IVirtualKeyboards
+	things: IVirtualKeyboards
 }
 
 export interface IVirtualKeyboards {
 	[clientId: string]: IVirtualKeyboardState,
 }
 
-export interface IVirtualKeyboardState {
+export interface IVirtualKeyboardState extends IMultiStateThing {
 	pressedKeys: IMidiNote[]
 	octave: Octave
 	id: string
@@ -137,57 +137,18 @@ export class VirtualKeyboardState implements IVirtualKeyboardState {
 	}
 }
 
-const initialState: IVirtualKeyboardsState = createInitialVirtualKeyboardsState()
+const keyboardActionTypes = [
+	VIRTUAL_KEY_PRESSED,
+	VIRTUAL_KEY_UP,
+	VIRTUAL_ALL_KEYS_UP,
+	VIRTUAL_KEY_FLIP,
+	SET_VIRTUAL_KEYS,
+	VIRTUAL_OCTAVE,
+	VIRTUAL_OCTAVE_CHANGE,
+]
 
-function createInitialVirtualKeyboardsState() {
-	return {
-		keyboards: {},
-	}
-}
-
-export function virtualKeyboardsReducer(
-	state: IVirtualKeyboardsState = initialState, action: VirtualKeyAction | any,
-): IVirtualKeyboardsState {
-	switch (action.type) {
-		case ADD_VIRTUAL_KEYBOARD:
-			return {
-				...state,
-				keyboards: {
-					...state.keyboards,
-					[action.virtualKeyboard.id]: action.virtualKeyboard,
-				},
-			}
-		case DELETE_VIRTUAL_KEYBOARDS:
-			const newState = {...state, keyboards: {...state.keyboards}}
-			action.virtualKeyboardIds.forEach(x => delete newState.keyboards[x])
-			return newState
-		case UPDATE_VIRTUAL_KEYBOARDS:
-			return {
-				...state,
-				keyboards: {
-					...state.keyboards,
-					...action.keyboards,
-				},
-			}
-		case VIRTUAL_KEY_PRESSED:
-		case VIRTUAL_KEY_UP:
-		case VIRTUAL_ALL_KEYS_UP:
-		case VIRTUAL_KEY_FLIP:
-		case SET_VIRTUAL_KEYS:
-		case VIRTUAL_OCTAVE:
-		case VIRTUAL_OCTAVE_CHANGE:
-			if (state.keyboards.hasOwnProperty(action.id) === false) return state
-			return {
-				...state,
-				keyboards: {
-					...state.keyboards,
-					[action.id]: virtualKeyboardReducer(state.keyboards[action.id], action),
-				},
-			}
-		default:
-			return state
-	}
-}
+export const virtualKeyboardsReducer = makeMultiReducer(
+	virtualKeyboardReducer, VIRTUAL_KEYBOARD_THING_TYPE, keyboardActionTypes)
 
 function virtualKeyboardReducer(virtualKeyboard: IVirtualKeyboardState, action: AnyAction) {
 	switch (action.type) {
@@ -250,7 +211,7 @@ export interface IMidi {
 }
 
 export const selectAllVirtualKeyboards = (state: IAppState) => {
-	return state.virtualKeyboards.keyboards
+	return state.virtualKeyboards.things
 }
 
 export const selectAllVirtualKeyboardsArray = (state: IAppState) => {

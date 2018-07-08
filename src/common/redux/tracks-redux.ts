@@ -7,26 +7,28 @@ import {addIfNew} from '../server-common'
 import {MAX_MIDI_NOTE_NUMBER_127} from '../server-constants'
 import {IAppState} from './configureStore'
 import {addMultiThing, deleteThings, IMultiStateThings, makeMultiReducer, updateThings} from './multi-reducer'
-import {BROADCASTER_ACTION, makeActionCreator, SERVER_ACTION} from './redux-utils'
+import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
 import {PLAY_TRACK, STOP_TRACK} from './track-player-middleware'
+
+const TRACK_THING_TYPE = 'TRACK'
 
 export const ADD_TRACK = 'ADD_TRACK'
 export const addTrack = (track: ITrackState) => ({
-	...addMultiThing(track),
+	...addMultiThing(track, TRACK_THING_TYPE),
 	SERVER_ACTION,
 	BROADCASTER_ACTION,
 })
 
 export const DELETE_TRACKS = 'DELETE_TRACKS'
 export const deleteTracks = (trackIds: string[]) => ({
-	...deleteThings(trackIds),
+	...deleteThings(trackIds, TRACK_THING_TYPE),
 	SERVER_ACTION,
 	BROADCASTER_ACTION,
 })
 
 export const UPDATE_TRACKS = 'UPDATE_TRACKS'
 export const updateTracks = (tracks: ITracks) => ({
-	...updateThings(tracks),
+	...updateThings(tracks, TRACK_THING_TYPE),
 	BROADCASTER_ACTION,
 })
 
@@ -154,7 +156,7 @@ export const trackActionTypes = [
 	SET_TRACK_BOTTOM_NOTE,
 ]
 
-export const tracksReducer = makeMultiReducer(trackReducer, 'TRACK', trackActionTypes)
+export const tracksReducer = makeMultiReducer(trackReducer, TRACK_THING_TYPE, trackActionTypes)
 
 export function trackReducer(track: ITrackState, action: AnyAction) {
 	switch (action.type) {
