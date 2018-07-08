@@ -1,6 +1,6 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
-import {IClientState, selectAllClients, selectLocalClient} from '../common/redux/clients-redux'
+import {selectAllClients, selectLocalClient} from '../common/redux/clients-redux'
 import {IAppState} from '../common/redux/configureStore'
 
 interface IMousePointersViewProps {
@@ -31,6 +31,7 @@ class MousePointersView extends React.PureComponent<IMousePointersViewProps> {
 									height: 8,
 									backgroundColor: pointer.color,
 									zIndex: 10,
+									filter: 'opacity(0.8)',
 								}}
 							/>
 						)
