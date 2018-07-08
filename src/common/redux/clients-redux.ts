@@ -57,7 +57,7 @@ export interface IClientState {
 	color: string
 	name: string
 	socketId: string
-	pointer: IClientPointer
+	pointer?: IClientPointer
 }
 
 export interface IClientPointer {
