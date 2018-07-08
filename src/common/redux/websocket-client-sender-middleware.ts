@@ -2,12 +2,12 @@ import {AnyAction, Dispatch, Middleware} from 'redux'
 import {socket} from '../../client/websocket-listeners'
 import {WebSocketEvent} from '../../common/server-constants'
 import {IAppState} from './configureStore'
+import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
 import {selectLocalSocketId} from './websocket-redux'
 
 export interface BroadcastAction extends AnyAction {
-	shouldBroadcast: boolean
 	alreadyBroadcasted: boolean
-	dispatchOnServer: boolean
+	[BROADCASTER_ACTION]: any
 }
 
 export const websocketSenderMiddleware: Middleware = ({getState}) => next => (action: AnyAction | BroadcastAction) => {
@@ -19,7 +19,7 @@ export const websocketSenderMiddleware: Middleware = ({getState}) => next => (ac
 }
 
 function isNetworkAction(action: AnyAction | BroadcastAction) {
-	return action.shouldBroadcast || action.dispatchOnServer
+	return action[BROADCASTER_ACTION] || action[SERVER_ACTION]
 }
 
 function processNetworkAction(action: BroadcastAction, getState, next: Dispatch) {
@@ -28,9 +28,9 @@ function processNetworkAction(action: BroadcastAction, getState, next: Dispatch)
 
 	action.source = socketId
 
-	if (action.shouldBroadcast) {
+	if (action[BROADCASTER_ACTION]) {
 		socket.emit(WebSocketEvent.broadcast, action)
-	} else if (action.dispatchOnServer) {
+	} else if (action[SERVER_ACTION]) {
 		socket.emit(WebSocketEvent.serverAction, action)
 	} else {
 		throw new Error('invalid network action: ' + JSON.stringify(action, null, 2))

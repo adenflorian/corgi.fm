@@ -3,43 +3,51 @@ import * as uuid from 'uuid'
 import {ClientId} from '../../client/websocket-listeners'
 import {pickRandomArrayElement} from '../common-utils'
 import {IAppState} from './configureStore'
-import {makeActionCreator, makeBroadcaster, makeServerAction} from './redux-utils'
+import {BROADCASTER_ACTION, makeActionCreator, SERVER_ACTION} from './redux-utils'
 
 export const ADD_BASIC_INSTRUMENT = 'ADD_BASIC_INSTRUMENT'
-export const addBasicInstrument = makeServerAction(makeBroadcaster((instrument: IBasicInstrumentState) => ({
+export const addBasicInstrument = (instrument: IBasicInstrumentState) => ({
 	type: ADD_BASIC_INSTRUMENT,
 	instrument,
-})))
+	SERVER_ACTION,
+	BROADCASTER_ACTION,
+})
 
 export const DELETE_BASIC_INSTRUMENTS = 'DELETE_BASIC_INSTRUMENTS'
-export const deleteBasicInstruments = makeServerAction(makeBroadcaster((instrumentIds: string[]) => ({
+export const deleteBasicInstruments = (instrumentIds: string[]) => ({
 	type: DELETE_BASIC_INSTRUMENTS,
 	instrumentIds,
-})))
+	SERVER_ACTION,
+	BROADCASTER_ACTION,
+})
 
 export const UPDATE_BASIC_INSTRUMENTS = 'UPDATE_BASIC_INSTRUMENTS'
-export const updateBasicInstruments = makeBroadcaster(makeActionCreator(
-	UPDATE_BASIC_INSTRUMENTS, 'instruments',
-))
+export const updateBasicInstruments = (instruments: IBasicInstruments) => ({
+	type: UPDATE_BASIC_INSTRUMENTS,
+	instruments,
+	BROADCASTER_ACTION,
+})
 
 export const SET_BASIC_INSTRUMENT_OSCILLATOR_TYPE = 'SET_BASIC_INSTRUMENT_OSCILLATOR_TYPE'
-export const setBasicInstrumentOscillatorType = makeServerAction(makeBroadcaster(
+export const setBasicInstrumentOscillatorType =
 	(id: string, oscillatorType: OscillatorType) => ({
 		type: SET_BASIC_INSTRUMENT_OSCILLATOR_TYPE,
 		id,
 		oscillatorType,
-	}),
-))
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	})
 
 export const SET_BASIC_INSTRUMENT_PARAM = 'SET_BASIC_INSTRUMENT_PARAM'
-export const setBasicInstrumentParam = makeServerAction(makeBroadcaster(
+export const setBasicInstrumentParam =
 	(id: string, paramName: BasicInstrumentParam, value: any) => ({
 		type: SET_BASIC_INSTRUMENT_PARAM,
 		id,
 		paramName,
 		value,
-	}),
-))
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	})
 
 export enum BasicInstrumentParam {
 	pan = 'pan',

@@ -2,31 +2,39 @@ import {AnyAction} from 'redux'
 import * as uuid from 'uuid'
 import {logger} from '../logger'
 import {IAppState} from './configureStore'
-import {makeActionCreator, makeBroadcaster, makeServerAction} from './redux-utils'
+import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
 import {selectTrack} from './tracks-redux'
 import {IVirtualKeyboardState, makeGetKeyboardMidiOutput, selectVirtualKeyboard} from './virtual-keyboard-redux'
 
 export const ADD_CONNECTION = 'ADD_CONNECTION'
-export const addConnection = makeServerAction(makeBroadcaster((connection: IConnection) => ({
+export const addConnection = (connection: IConnection) => ({
 	type: ADD_CONNECTION,
 	connection,
-})))
+	SERVER_ACTION,
+	BROADCASTER_ACTION,
+})
 
 export const DELETE_CONNECTIONS = 'DELETE_CONNECTIONS'
-export const deleteConnections = makeServerAction(makeBroadcaster((connectionIds: string[]) => ({
+export const deleteConnections = (connectionIds: string[]) => ({
 	type: DELETE_CONNECTIONS,
 	connectionIds,
-})))
+	SERVER_ACTION,
+	BROADCASTER_ACTION,
+})
 
 export const UPDATE_CONNECTIONS = 'UPDATE_CONNECTIONS'
-export const updateConnections = makeBroadcaster(makeActionCreator(
-	UPDATE_CONNECTIONS, 'connections',
-))
+export const updateConnections = (connections: IConnections) => ({
+	type: UPDATE_CONNECTIONS,
+	connections,
+	BROADCASTER_ACTION,
+})
 
 export interface IConnectionsState {
-	connections: {
-		[key: string]: IConnection,
-	},
+	connections: IConnections
+}
+
+export interface IConnections {
+	[key: string]: IConnection
 }
 
 export enum ConnectionSourceType {

@@ -4,7 +4,7 @@ import * as uuid from 'uuid'
 import {hashbow} from '../../client/utils'
 import {ClientId} from '../../client/websocket-listeners'
 import {IAppState} from './configureStore'
-import {makeBroadcaster, makeServerAction} from './redux-utils'
+import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
 import {selectLocalSocketId} from './websocket-redux'
 
 export const ADD_CLIENT = 'ADD_CLIENT'
@@ -24,13 +24,15 @@ export const setClients = (clients: IClientState[]) => {
 }
 
 export const SET_CLIENT_POINTER = 'SET_CLIENT_POINTER'
-export const setClientPointer = makeServerAction(makeBroadcaster((id: ClientId, pointer: IClientPointer) => {
+export const setClientPointer = (id: ClientId, pointer: IClientPointer) => {
 	return {
 		type: SET_CLIENT_POINTER,
 		id,
 		pointer,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
 	}
-}))
+}
 
 export const CLIENT_DISCONNECTED = 'CLIENT_DISCONNECTED'
 export const clientDisconnected = (id: ClientId) => {

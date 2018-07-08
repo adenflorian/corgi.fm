@@ -15,13 +15,8 @@ export function makeActionCreator(type, ...argNames) {
 	}
 }
 
-export function makeBroadcaster(actionCreator: ActionCreator<AnyAction>): ActionCreator<AnyAction> {
-	return (...args) => ({...actionCreator(...args), shouldBroadcast: true})
-}
-
-export function makeServerAction(actionCreator: ActionCreator<AnyAction>): ActionCreator<AnyAction> {
-	return (...args) => ({...actionCreator(...args), dispatchOnServer: true})
-}
+export const SERVER_ACTION = 'SERVER_ACTION'
+export const BROADCASTER_ACTION = 'BROADCASTER_ACTION'
 
 export function createReducer(initialState, handlers) {
 	return function reducer(state = initialState, action) {

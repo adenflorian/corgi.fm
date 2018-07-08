@@ -7,7 +7,7 @@ import {ClientId} from '../../client/websocket-listeners'
 import {addIfNew} from '../../common/server-common'
 import {IMidiNote} from '../MidiNote'
 import {IAppState} from './configureStore'
-import {makeActionCreator, makeBroadcaster, makeServerAction} from './redux-utils'
+import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
 
 export interface VirtualKeyAction {
 	type: string
@@ -18,39 +18,49 @@ export interface VirtualKeyAction {
 }
 
 export const ADD_VIRTUAL_KEYBOARD = 'ADD_VIRTUAL_KEYBOARD'
-export const addVirtualKeyboard = makeServerAction(makeBroadcaster((virtualKeyboard: IVirtualKeyboardState) => ({
+export const addVirtualKeyboard = (virtualKeyboard: IVirtualKeyboardState) => ({
 	type: ADD_VIRTUAL_KEYBOARD,
 	virtualKeyboard,
-})))
+	SERVER_ACTION,
+	BROADCASTER_ACTION,
+})
 
 export const DELETE_VIRTUAL_KEYBOARDS = 'DELETE_VIRTUAL_KEYBOARDS'
-export const deleteVirtualKeyboards = makeServerAction(makeBroadcaster((virtualKeyboardIds: string[]) => ({
+export const deleteVirtualKeyboards = (virtualKeyboardIds: string[]) => ({
 	type: DELETE_VIRTUAL_KEYBOARDS,
 	virtualKeyboardIds,
-})))
+	SERVER_ACTION,
+	BROADCASTER_ACTION,
+})
 
 export const UPDATE_VIRTUAL_KEYBOARDS = 'UPDATE_VIRTUAL_KEYBOARDS'
-export const updateVirtualKeyboards = makeBroadcaster(makeActionCreator(
-	UPDATE_VIRTUAL_KEYBOARDS, 'keyboards',
-))
+export const updateVirtualKeyboards = (keyboards: any) => ({
+	type: UPDATE_VIRTUAL_KEYBOARDS,
+	keyboards,
+	BROADCASTER_ACTION,
+})
 
 export const VIRTUAL_KEY_PRESSED = 'VIRTUAL_KEY_PRESSED'
-export const virtualKeyPressed = makeServerAction(makeBroadcaster((id: string, number: number) => {
+export const virtualKeyPressed = (id: string, number: number) => {
 	return {
 		type: VIRTUAL_KEY_PRESSED,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
 		id,
 		number,
 	}
-}))
+}
 
 export const VIRTUAL_KEY_UP = 'VIRTUAL_KEY_UP'
-export const virtualKeyUp = makeServerAction(makeBroadcaster((id: string, number: number) => {
+export const virtualKeyUp = (id: string, number: number) => {
 	return {
 		type: VIRTUAL_KEY_UP,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
 		id,
 		number,
 	}
-}))
+}
 
 export const VIRTUAL_ALL_KEYS_UP = 'VIRTUAL_ALL_KEYS_UP'
 export const virtualAllKeysUp = (id: string) => {
@@ -79,13 +89,15 @@ export const virtualOctave = (id: string, octave: Octave) => {
 }
 
 export const VIRTUAL_OCTAVE_CHANGE = 'VIRTUAL_OCTAVE_CHANGE'
-export const virtualOctaveChange = makeServerAction(makeBroadcaster((id: string, delta: number) => {
+export const virtualOctaveChange = (id: string, delta: number) => {
 	return {
 		type: VIRTUAL_OCTAVE_CHANGE,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
 		id,
 		delta,
 	}
-}))
+}
 
 export const SET_VIRTUAL_KEYS = 'SET_VIRTUAL_KEYS'
 export const setVirtualKeys = (id: string, keys: IMidiNote[]) => {

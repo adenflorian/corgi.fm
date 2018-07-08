@@ -1,20 +1,38 @@
 import {AnyAction, Dispatch, Middleware, Store} from 'redux'
 import {audioContext} from '../../client/setup-audio-context'
 import {TrackPlayer} from '../../client/Track/TrackPlayer'
-import {makeActionCreator, makeBroadcaster, makeServerAction} from './redux-utils'
+import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
 import {ITracks, selectTrack, setTrackIndex, UPDATE_TRACKS} from './tracks-redux'
 
 export const PLAY_TRACK = 'PLAY_TRACK'
-export const playTrack = makeServerAction(makeBroadcaster(makeActionCreator(PLAY_TRACK, 'id')))
+export const playTrack = (id: string) => ({
+	type: PLAY_TRACK,
+	id,
+	SERVER_ACTION,
+	BROADCASTER_ACTION,
+})
 
 export const STOP_TRACK = 'STOP_TRACK'
-export const stopTrack = makeServerAction(makeBroadcaster(makeActionCreator(STOP_TRACK, 'id')))
+export const stopTrack = (id: string) => ({
+	type: STOP_TRACK,
+	id,
+	SERVER_ACTION,
+	BROADCASTER_ACTION,
+})
 
 export const TOGGLE_PLAY_TRACK = 'TOGGLE_PLAY_TRACK'
-export const togglePlayTrack = makeActionCreator(TOGGLE_PLAY_TRACK, 'id')
+export const togglePlayTrack = (id: string) => ({
+	type: TOGGLE_PLAY_TRACK,
+	id,
+})
 
 export const RESTART_TRACK = 'RESTART_TRACK'
-export const restartTrack = makeBroadcaster(makeActionCreator(RESTART_TRACK, 'id'))
+export const restartTrack = (id: string) => ({
+	type: RESTART_TRACK,
+	id,
+	SERVER_ACTION,
+	BROADCASTER_ACTION,
+})
 
 interface ITrackPlayers {
 	[trackId: string]: TrackPlayer

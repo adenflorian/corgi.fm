@@ -1,5 +1,5 @@
 import {logger} from '../common/logger'
-import {configureStore, IAppState} from '../common/redux/configureStore'
+import {configureStore} from '../common/redux/configureStore'
 import {getInitialReduxState} from '../common/redux/initial-client-redux-state'
 import {setupInputEventListeners} from './input-events'
 import {renderApp} from './react-main'
@@ -29,8 +29,6 @@ declare global {
 }
 
 if (module.hot) {
-	const state: IAppState = store.getState()
-
 	module.hot.dispose(() => socket.disconnect())
 	module.hot.dispose(() => audioContext.close())
 

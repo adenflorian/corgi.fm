@@ -6,28 +6,32 @@ import {IMidiNote} from '../MidiNote'
 import {addIfNew} from '../server-common'
 import {MAX_MIDI_NOTE_NUMBER_127} from '../server-constants'
 import {IAppState} from './configureStore'
-import {makeActionCreator, makeBroadcaster, makeServerAction} from './redux-utils'
+import {addMultiThing, deleteThings, IMultiStateThings, makeMultiReducer, updateThings} from './multi-reducer'
+import {BROADCASTER_ACTION, makeActionCreator, SERVER_ACTION} from './redux-utils'
 import {PLAY_TRACK, STOP_TRACK} from './track-player-middleware'
 
 export const ADD_TRACK = 'ADD_TRACK'
-export const addTrack = makeServerAction(makeBroadcaster((track: ITrackState) => ({
-	type: ADD_TRACK,
-	track,
-})))
+export const addTrack = (track: ITrackState) => ({
+	...addMultiThing(track),
+	SERVER_ACTION,
+	BROADCASTER_ACTION,
+})
 
 export const DELETE_TRACKS = 'DELETE_TRACKS'
-export const deleteTracks = makeServerAction(makeBroadcaster((trackIds: string[]) => ({
-	type: DELETE_TRACKS,
-	trackIds,
-})))
+export const deleteTracks = (trackIds: string[]) => ({
+	...deleteThings(trackIds),
+	SERVER_ACTION,
+	BROADCASTER_ACTION,
+})
 
 export const UPDATE_TRACKS = 'UPDATE_TRACKS'
-export const updateTracks = makeBroadcaster(makeActionCreator(
-	UPDATE_TRACKS, 'tracks',
-))
+export const updateTracks = (tracks: ITracks) => ({
+	...updateThings(tracks),
+	BROADCASTER_ACTION,
+})
 
 export const SET_TRACK_NOTE = 'SET_TRACK_NOTE'
-export const setTrackNote = makeServerAction(makeBroadcaster(
+export const setTrackNote =
 	(trackId: string, index: number, enabled: boolean, note: IMidiNote) => {
 		return {
 			type: SET_TRACK_NOTE,
@@ -35,9 +39,10 @@ export const setTrackNote = makeServerAction(makeBroadcaster(
 			index,
 			enabled,
 			note,
+			SERVER_ACTION,
+			BROADCASTER_ACTION,
 		}
-	},
-))
+	}
 
 export const SET_TRACK_EVENTS = 'SET_TRACK_EVENTS'
 export const setTrackEvents = (trackId: string, events: ITrackEvent[]) => {
@@ -58,23 +63,25 @@ export const setTrackIndex = (id: string, index: number) => {
 }
 
 export const SET_TRACK_BOTTOM_NOTE = 'SET_TRACK_BOTTOM_NOTE'
-export const setTrackBottomNote = makeServerAction(makeBroadcaster((id: string, bottomNote: number) => {
+export const setTrackBottomNote = (id: string, bottomNote: number) => {
 	return {
 		type: SET_TRACK_BOTTOM_NOTE,
 		id,
 		bottomNote,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
 	}
-}))
+}
 
 export interface ITrackEvent {
 	notes: IMidiNote[]
 }
 
 export interface ITracksState {
-	tracks: ITracks
+	things: ITracks
 }
 
-export interface ITracks {
+export interface ITracks extends IMultiStateThings {
 	[key: string]: ITrackState
 }
 
@@ -116,56 +123,6 @@ export class TrackState implements ITrackState {
 	}
 }
 
-export interface ITrackEvent {
-	notes: IMidiNote[]
-}
-
-const initialState: ITracksState = {
-	tracks: {},
-}
-
-export function tracksReducer(
-	state: ITracksState = initialState, action: AnyAction,
-): ITracksState {
-	switch (action.type) {
-		case ADD_TRACK:
-			return {
-				...state,
-				tracks: {
-					...state.tracks,
-					[action.track.id]: action.track,
-				},
-			}
-		case DELETE_TRACKS:
-			const newState = {...state, tracks: {...state.tracks}}
-			action.trackIds.forEach(x => delete newState.tracks[x])
-			return newState
-		case UPDATE_TRACKS:
-			return {
-				...state,
-				tracks: {
-					...state.tracks,
-					...action.tracks,
-				},
-			}
-		case SET_TRACK_NOTE:
-		case SET_TRACK_EVENTS:
-		case SET_TRACK_INDEX:
-		case PLAY_TRACK:
-		case STOP_TRACK:
-		case SET_TRACK_BOTTOM_NOTE:
-			return {
-				...state,
-				tracks: {
-					...state.tracks,
-					[action.id]: trackReducer(state.tracks[action.id], action),
-				},
-			}
-		default:
-			return state
-	}
-}
-
 function findLowestNote(events: ITrackEvent[]): number {
 	let lowest = Number.MAX_VALUE
 
@@ -184,7 +141,22 @@ function findLowestNote(events: ITrackEvent[]): number {
 	return lowest
 }
 
-function trackReducer(track: ITrackState, action: AnyAction) {
+export interface ITrackEvent {
+	notes: IMidiNote[]
+}
+
+export const trackActionTypes = [
+	SET_TRACK_NOTE,
+	SET_TRACK_EVENTS,
+	SET_TRACK_INDEX,
+	PLAY_TRACK,
+	STOP_TRACK,
+	SET_TRACK_BOTTOM_NOTE,
+]
+
+export const tracksReducer = makeMultiReducer(trackReducer, 'TRACK', trackActionTypes)
+
+export function trackReducer(track: ITrackState, action: AnyAction) {
 	switch (action.type) {
 		case SET_TRACK_NOTE:
 			if (action.note === undefined) {
@@ -228,7 +200,9 @@ function trackReducer(track: ITrackState, action: AnyAction) {
 	}
 }
 
-export const selectAllTracks = (state: IAppState) => state.tracks.tracks
+export const selectAllTracks = (state: IAppState) => {
+	return state.tracks.things
+}
 
 export const selectAllTracksArray = (state: IAppState) => {
 	const tracks = selectAllTracks(state)

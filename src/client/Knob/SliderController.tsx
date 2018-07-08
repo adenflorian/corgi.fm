@@ -1,6 +1,5 @@
 import * as React from 'react'
 import './Knob.less'
-import {KnobView} from './KnobView'
 
 interface ISliderControllerProps {
 	min?: number

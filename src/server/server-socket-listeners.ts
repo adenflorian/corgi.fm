@@ -11,6 +11,7 @@ import {IAppState} from '../common/redux/configureStore'
 import {
 	deleteConnections, selectAllConnections, selectConnectionsWithSourceOrTargetIds, updateConnections,
 } from '../common/redux/connections-redux'
+import {BROADCASTER_ACTION} from '../common/redux/redux-utils'
 import {selectAllTracks, updateTracks} from '../common/redux/tracks-redux'
 import {
 	deleteVirtualKeyboards, selectAllVirtualKeyboards, selectVirtualKeyboardsByOwner, updateVirtualKeyboards,
@@ -30,7 +31,7 @@ export function setupServerWebSocketListeners(io: Server, store: Store) {
 
 		socket.on(WebSocketEvent.broadcast, (action: BroadcastAction) => {
 			logger.debug(`${WebSocketEvent.broadcast}: ${socket.id} | `, action)
-			if (action.dispatchOnServer) {
+			if (action[BROADCASTER_ACTION]) {
 				store.dispatch(action)
 			}
 			socket.broadcast.emit(WebSocketEvent.broadcast, {...action, alreadyBroadcasted: true})
@@ -71,36 +72,38 @@ export function setupServerWebSocketListeners(io: Server, store: Store) {
 	})
 }
 
+const server = 'server'
+
 function syncState(newClientSocket: Socket, store: Store) {
 	const state: IAppState = store.getState()
 
 	newClientSocket.emit(WebSocketEvent.broadcast, {
 		...setClients(selectAllClients(state)),
 		alreadyBroadcasted: true,
-		source: 'server',
+		source: server,
 	})
 
 	newClientSocket.emit(WebSocketEvent.broadcast, {
 		...updateBasicInstruments(selectAllInstruments(state)),
 		alreadyBroadcasted: true,
-		source: 'server',
+		source: server,
 	})
 
 	newClientSocket.emit(WebSocketEvent.broadcast, {
 		...updateVirtualKeyboards(selectAllVirtualKeyboards(state)),
 		alreadyBroadcasted: true,
-		source: 'server',
+		source: server,
 	})
 
 	newClientSocket.emit(WebSocketEvent.broadcast, {
 		...updateConnections(selectAllConnections(state)),
 		alreadyBroadcasted: true,
-		source: 'server',
+		source: server,
 	})
 
 	newClientSocket.emit(WebSocketEvent.broadcast, {
 		...updateTracks(selectAllTracks(state)),
 		alreadyBroadcasted: true,
-		source: 'server',
+		source: server,
 	})
 }

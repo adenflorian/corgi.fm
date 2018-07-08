@@ -12,7 +12,6 @@ import {
 } from '../../common/redux/connections-redux'
 import {Knob} from '../Knob/Knob'
 import {audioContext, preFx} from '../setup-audio-context'
-import {ClientId} from '../websocket-listeners'
 import {BasicInstrument} from './BasicInstrument'
 import './BasicInstrumentView.less'
 import SawWave from './SawWave.svg'
