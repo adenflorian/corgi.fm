@@ -3,28 +3,29 @@ import * as uuid from 'uuid'
 import {ClientId} from '../../client/websocket-listeners'
 import {pickRandomArrayElement} from '../common-utils'
 import {IAppState} from './configureStore'
-import {BROADCASTER_ACTION, makeActionCreator, SERVER_ACTION} from './redux-utils'
+import {addMultiThing, deleteThings, makeMultiReducer, updateThings} from './multi-reducer'
+import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
+import {trackActionTypes} from './tracks-redux'
+
+const BASIC_INSTRUMENT_THING_TYPE = 'BASIC_INSTRUMENT'
 
 export const ADD_BASIC_INSTRUMENT = 'ADD_BASIC_INSTRUMENT'
 export const addBasicInstrument = (instrument: IBasicInstrumentState) => ({
-	type: ADD_BASIC_INSTRUMENT,
-	instrument,
+	...addMultiThing(instrument, BASIC_INSTRUMENT_THING_TYPE),
 	SERVER_ACTION,
 	BROADCASTER_ACTION,
 })
 
 export const DELETE_BASIC_INSTRUMENTS = 'DELETE_BASIC_INSTRUMENTS'
 export const deleteBasicInstruments = (instrumentIds: string[]) => ({
-	type: DELETE_BASIC_INSTRUMENTS,
-	instrumentIds,
+	...deleteThings(instrumentIds, BASIC_INSTRUMENT_THING_TYPE),
 	SERVER_ACTION,
 	BROADCASTER_ACTION,
 })
 
 export const UPDATE_BASIC_INSTRUMENTS = 'UPDATE_BASIC_INSTRUMENTS'
 export const updateBasicInstruments = (instruments: IBasicInstruments) => ({
-	type: UPDATE_BASIC_INSTRUMENTS,
-	instruments,
+	...updateThings(instruments, BASIC_INSTRUMENT_THING_TYPE),
 	BROADCASTER_ACTION,
 })
 
@@ -62,7 +63,7 @@ export interface BasicInstrumentAction extends AnyAction {
 }
 
 export interface IBasicInstrumentsState {
-	instruments: {
+	things: {
 		[key: string]: IBasicInstrumentState,
 	}
 }
@@ -95,44 +96,16 @@ export class BasicInstrumentState implements IBasicInstrumentState {
 	}
 }
 
-const basicInstrumentsInitialState: IBasicInstrumentsState = {
-	instruments: {},
-}
+const basicInstrumentActionTypes = [
+	SET_BASIC_INSTRUMENT_OSCILLATOR_TYPE,
+	SET_BASIC_INSTRUMENT_PARAM,
+]
 
-export function basicInstrumentsReducer(
-	state = basicInstrumentsInitialState, action: BasicInstrumentAction,
-): IBasicInstrumentsState {
-	switch (action.type) {
-		case ADD_BASIC_INSTRUMENT:
-			return {
-				...state,
-				instruments: {...state.instruments, [action.instrument.id]: action.instrument},
-			}
-		case DELETE_BASIC_INSTRUMENTS:
-			const newState = {...state, instruments: {...state.instruments}}
-			action.instrumentIds.forEach(x => delete newState.instruments[x])
-			return newState
-		case UPDATE_BASIC_INSTRUMENTS:
-			return {
-				...state,
-				instruments: {
-					...state.instruments,
-					...action.instruments,
-				},
-			}
-		case SET_BASIC_INSTRUMENT_OSCILLATOR_TYPE:
-		case SET_BASIC_INSTRUMENT_PARAM:
-			return {
-				...state,
-				instruments: {
-					...state.instruments,
-					[action.id]: basicInstrumentReducer(state.instruments[action.id], action),
-				},
-			}
-		default:
-			return state
-	}
-}
+export const basicInstrumentsReducer = makeMultiReducer(
+	basicInstrumentReducer,
+	BASIC_INSTRUMENT_THING_TYPE,
+	basicInstrumentActionTypes,
+)
 
 function basicInstrumentReducer(basicInstrument: IBasicInstrumentState, action: AnyAction) {
 	switch (action.type) {
@@ -151,7 +124,7 @@ function basicInstrumentReducer(basicInstrument: IBasicInstrumentState, action: 
 	}
 }
 
-export const selectAllInstruments = (state: IAppState) => state.basicInstruments.instruments
+export const selectAllInstruments = (state: IAppState) => state.basicInstruments.things
 
 export const selectAllInstrumentIds = (state: IAppState) => Object.keys(selectAllInstruments(state))
 

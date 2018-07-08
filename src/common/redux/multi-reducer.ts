@@ -16,13 +16,6 @@ const initialState: IMultiState = {
 	things: {},
 }
 
-// export const addMultiThing = <T>(thingName: string, thing: T) => {
-// 	return {
-// 		type: `${thingName}_ADD`,
-// 		thing,
-// 	}
-// }
-
 type ADD_MULTI_THING = 'ADD_MULTI_THING'
 export const ADD_MULTI_THING: ADD_MULTI_THING = 'ADD_MULTI_THING'
 interface IAddMultiThingAction extends IMultiThingAction {
