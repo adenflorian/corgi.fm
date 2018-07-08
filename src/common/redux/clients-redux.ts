@@ -61,8 +61,8 @@ export interface IClientState {
 }
 
 export interface IClientPointer {
-	x: number
-	y: number
+	distanceFromCenterX: number
+	distanceFromBoardsTop: number
 	ownerId: string
 	color?: string
 }
@@ -88,7 +88,7 @@ export class ClientState implements IClientState {
 		this.socketId = socketId
 		this.name = animal.getId() + '-' + this.id[0]
 		this.color = Color(hashbow(this.id)).desaturate(0.2).hsl().string()
-		this.pointer = {x: 0, y: 0, ownerId: this.id}
+		this.pointer = {distanceFromCenterX: 0, distanceFromBoardsTop: 0, ownerId: this.id}
 	}
 }
 

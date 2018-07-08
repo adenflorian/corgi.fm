@@ -5,11 +5,11 @@ import {selectAllConnectionIds} from '../../common/redux/connections-redux'
 import {ConnectedConnectionViewContainer} from './ConnectionViewContainer'
 
 const Connections = ({connectionIds}) => (
-	connectionIds.map(connectionId => {
-		return (
+	<div className="connections" style={{display: 'flex'}}>
+		{connectionIds.map(connectionId => (
 			<ConnectedConnectionViewContainer key={connectionId} id={connectionId} />
-		)
-	})
+		))}
+	</div>
 )
 
 const mapStateToProps = (state: IAppState) => ({

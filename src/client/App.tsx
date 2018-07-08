@@ -45,13 +45,14 @@ class App extends React.Component<IAppProps, {}> {
 				<MousePointers />
 				<ConnectionsContainer />
 
-				<div className="boardContainer">
-					<div className="board connected" style={{marginBottom: 'auto'}}>
-						<ConnectedOption
-							option={AppOptions.showNoteNamesOnKeyboard}
-							label="show names on keyboard"
-						/>
-					</div>
+				<div className="board connected" style={{marginBottom: 'auto'}}>
+					<ConnectedOption
+						option={AppOptions.showNoteNamesOnKeyboard}
+						label="show names on keyboard"
+					/>
+				</div>
+
+				<div id="mainBoards" className="boards">
 					<div className="board connected">
 						<ConnectedVolumeControl color={TRACK_1_COLOR} />
 					</div>
@@ -67,7 +68,8 @@ class App extends React.Component<IAppProps, {}> {
 									<ConnectedTrackContainer id={trackId} />
 								</div>
 							)
-						})}
+						})
+					}
 
 					{this.props.keyboardIds
 						.sort()
@@ -80,7 +82,8 @@ class App extends React.Component<IAppProps, {}> {
 									<ConnectedKeyboard id={keyboardId} />
 								</div>
 							)
-						})}
+						})
+					}
 
 					{this.props.instrumentIds
 						.sort()
@@ -93,14 +96,15 @@ class App extends React.Component<IAppProps, {}> {
 									<ConnectedBasicInstrumentView id={instrumentId} />
 								</div>
 							)
-						})}
+						})
+					}
+				</div>
 
-					<div
-						id="info"
-						style={{marginTop: 'auto'}}
-					>
-						{clients.length > 0 && info}
-					</div>
+				<div
+					id="info"
+					style={{marginTop: 'auto'}}
+				>
+					{clients.length > 0 && info}
 				</div>
 			</Fragment>
 		)
