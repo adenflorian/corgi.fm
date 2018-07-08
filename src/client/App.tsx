@@ -56,38 +56,44 @@ class App extends React.Component<IAppProps, {}> {
 						<ConnectedVolumeControl color={TRACK_1_COLOR} />
 					</div>
 
-					{this.props.trackIds.map(trackId => {
-						return (
-							<div
-								key={trackId}
-								className="board connected"
-							>
-								<ConnectedTrackContainer id={trackId} />
-							</div>
-						)
-					})}
+					{this.props.trackIds
+						.sort()
+						.map(trackId => {
+							return (
+								<div
+									key={trackId}
+									className="board connected"
+								>
+									<ConnectedTrackContainer id={trackId} />
+								</div>
+							)
+						})}
 
-					{this.props.keyboardIds.map(keyboardId => {
-						return (
-							<div
-								key={keyboardId}
-								className="board connected"
-							>
-								<ConnectedKeyboard id={keyboardId} />
-							</div>
-						)
-					})}
+					{this.props.keyboardIds
+						.sort()
+						.map(keyboardId => {
+							return (
+								<div
+									key={keyboardId}
+									className="board connected"
+								>
+									<ConnectedKeyboard id={keyboardId} />
+								</div>
+							)
+						})}
 
-					{this.props.instrumentIds.map(instrumentId => {
-						return (
-							<div
-								key={instrumentId}
-								className="board"
-							>
-								<ConnectedBasicInstrumentView id={instrumentId} />
-							</div>
-						)
-					})}
+					{this.props.instrumentIds
+						.sort()
+						.map(instrumentId => {
+							return (
+								<div
+									key={instrumentId}
+									className="board"
+								>
+									<ConnectedBasicInstrumentView id={instrumentId} />
+								</div>
+							)
+						})}
 
 					<div
 						id="info"
