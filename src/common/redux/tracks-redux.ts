@@ -58,13 +58,13 @@ export const setTrackIndex = (id: string, index: number) => {
 }
 
 export const SET_TRACK_BOTTOM_NOTE = 'SET_TRACK_BOTTOM_NOTE'
-export const setTrackBottomNote = (id: string, bottomNote: number) => {
+export const setTrackBottomNote = makeServerAction(makeBroadcaster((id: string, bottomNote: number) => {
 	return {
 		type: SET_TRACK_BOTTOM_NOTE,
 		id,
 		bottomNote,
 	}
-}
+}))
 
 export interface ITrackEvent {
 	notes: IMidiNote[]
@@ -111,6 +111,8 @@ export class TrackState implements ITrackState {
 			{notes: []},
 			{notes: []},
 		]
+		const lowestNote = findLowestNote(this.events)
+		this.bottomNote = Math.min(MAX_MIDI_NOTE_NUMBER_127 - this.notesToShow, lowestNote)
 	}
 }
 
@@ -139,17 +141,11 @@ export function tracksReducer(
 			action.trackIds.forEach(x => delete newState.tracks[x])
 			return newState
 		case UPDATE_TRACKS:
-			const tracks: ITracks = action.tracks
-			Object.keys(tracks).forEach(key => {
-				const track = tracks[key]
-				const lowestNote = findLowestNote(track.events)
-				track.bottomNote = Math.min(MAX_MIDI_NOTE_NUMBER_127 - track.notesToShow, lowestNote)
-			})
 			return {
 				...state,
 				tracks: {
 					...state.tracks,
-					...tracks,
+					...action.tracks,
 				},
 			}
 		case SET_TRACK_NOTE:
