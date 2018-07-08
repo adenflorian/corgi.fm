@@ -32,6 +32,9 @@
 	- [√] R
 - [√] track mouse pointers
 
+# Keyboard
+- [ ] do something to visualize external midi keyboard notes
+
 # Knob
 - [ ] Allow for arc to go both directions
 	- like a pan knob, when centered should have no arc, and arc can go left or right from center
