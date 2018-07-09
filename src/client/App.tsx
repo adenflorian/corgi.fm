@@ -1,6 +1,7 @@
 import Color from 'color'
-import * as React from 'react'
 import {Fragment} from 'react'
+import * as React from 'react'
+import {hot} from 'react-hot-loader'
 import {connect} from 'react-redux'
 import {selectAllInstrumentIds} from '../common/redux/basic-instruments-redux'
 import {IClientState, selectAllClients, selectLocalClient} from '../common/redux/clients-redux'
@@ -120,4 +121,4 @@ const mapStateToProps = (state: IAppState) => ({
 	trackIds: selectAllTrackIds(state),
 })
 
-export const ConnectedApp = connect(mapStateToProps)(App)
+export const ConnectedApp = hot(module)(connect(mapStateToProps)(App))

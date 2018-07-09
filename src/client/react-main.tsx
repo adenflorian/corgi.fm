@@ -9,14 +9,8 @@ export function renderApp(store: Store) {
 	const HotProvider = hot(module)(Provider)
 	ReactDOM.render(
 		<HotProvider store={store}>
-			{getComponentByPath()}
+			<ConnectedApp />
 		</HotProvider>,
 		document.getElementById('react-app'),
 	)
-}
-
-function getComponentByPath() {
-	switch (window.location.pathname) {
-		default: return <ConnectedApp />
-	}
 }

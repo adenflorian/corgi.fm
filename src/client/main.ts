@@ -31,6 +31,4 @@ declare global {
 if (module.hot) {
 	module.hot.dispose(() => socket.disconnect())
 	module.hot.dispose(() => audioContext.close())
-
-	module.hot.accept(() => renderApp(store))
 }

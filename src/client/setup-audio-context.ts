@@ -1,5 +1,6 @@
 import {Store} from 'redux'
 import Reverb from 'soundbank-reverb'
+import {logger} from '../common/logger'
 import {reportLevels} from '../common/redux/audio-redux'
 import {IAppState} from '../common/redux/configureStore'
 
@@ -14,6 +15,7 @@ export let audioContext: AudioContext
 export let preFx: GainNode
 
 export function setupAudioContext(store: Store) {
+	logger.log('setting up audio context')
 	// Might be needed for safari
 	const AudioContext = window.AudioContext || window.webkitAudioContext
 	audioContext = new AudioContext()
