@@ -2,8 +2,11 @@ import {Store} from 'redux'
 import * as io from 'socket.io-client'
 import {logger} from '../common/logger'
 import {IMidiNote} from '../common/MidiNote'
+import {BASIC_INSTRUMENT_THING_TYPE} from '../common/redux/basic-instruments-redux'
 import {clientDisconnected, SET_CLIENTS} from '../common/redux/clients-redux'
-import {setVirtualKeys, virtualOctave} from '../common/redux/virtual-keyboard-redux'
+import {deleteAllThings} from '../common/redux/multi-reducer'
+import {TRACK_THING_TYPE} from '../common/redux/tracks-redux'
+import {setVirtualKeys, VIRTUAL_KEYBOARD_THING_TYPE, virtualOctave} from '../common/redux/virtual-keyboard-redux'
 import {BroadcastAction} from '../common/redux/websocket-client-sender-middleware'
 import {setInfo, setSocketId} from '../common/redux/websocket-redux'
 import {WebSocketEvent} from '../common/server-constants'
@@ -18,11 +21,16 @@ export function setupWebsocketAndListeners(store: Store) {
 	socket = io.connect(window.location.hostname + `:${port}/`)
 
 	socket.on('connect', () => {
+		logger.log('socket: connect')
 		store.dispatch(setSocketId(socket.id))
 	})
 
 	socket.on('disconnect', () => {
+		logger.log('socket: disconnect')
 		store.dispatch(selfDisconnected())
+		store.dispatch(deleteAllThings(TRACK_THING_TYPE))
+		store.dispatch(deleteAllThings(VIRTUAL_KEYBOARD_THING_TYPE))
+		store.dispatch(deleteAllThings(BASIC_INSTRUMENT_THING_TYPE))
 	})
 
 	setupDefaultListeners([

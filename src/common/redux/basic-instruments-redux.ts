@@ -5,9 +5,8 @@ import {pickRandomArrayElement} from '../common-utils'
 import {IAppState} from './configureStore'
 import {addMultiThing, deleteThings, makeMultiReducer, updateThings} from './multi-reducer'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
-import {trackActionTypes} from './tracks-redux'
 
-const BASIC_INSTRUMENT_THING_TYPE = 'BASIC_INSTRUMENT'
+export const BASIC_INSTRUMENT_THING_TYPE = 'BASIC_INSTRUMENT'
 
 export const ADD_BASIC_INSTRUMENT = 'ADD_BASIC_INSTRUMENT'
 export const addBasicInstrument = (instrument: IBasicInstrumentState) => ({

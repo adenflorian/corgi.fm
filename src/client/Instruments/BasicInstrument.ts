@@ -187,7 +187,7 @@ class Voice {
 		if (gain.cancelAndHoldAtTime) {
 			gain.cancelAndHoldAtTime(this._audioContext.currentTime)
 		} else {
-			this._gain.gain.cancelScheduledValues(this._audioContext.currentTime)
+			gain.cancelScheduledValues(this._audioContext.currentTime)
 		}
 	}
 }

@@ -10,7 +10,7 @@ import {addMultiThing, deleteThings, IMultiStateThings, makeMultiReducer, update
 import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
 import {PLAY_TRACK, STOP_TRACK} from './track-player-middleware'
 
-const TRACK_THING_TYPE = 'TRACK'
+export const TRACK_THING_TYPE = 'TRACK'
 
 export const ADD_TRACK = 'ADD_TRACK'
 export const addTrack = (track: ITrackState) => ({

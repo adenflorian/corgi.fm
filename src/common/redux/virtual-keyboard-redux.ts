@@ -10,7 +10,7 @@ import {IAppState} from './configureStore'
 import {addMultiThing, deleteThings, IMultiStateThing, makeMultiReducer, updateThings} from './multi-reducer'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
 
-const VIRTUAL_KEYBOARD_THING_TYPE = 'VIRTUAL_KEYBOARD'
+export const VIRTUAL_KEYBOARD_THING_TYPE = 'VIRTUAL_KEYBOARD'
 
 export interface VirtualKeyAction {
 	type: string

@@ -40,6 +40,16 @@ export const deleteThings = (thingIds: string[], thingType: string): IDeleteMult
 	thingType,
 })
 
+type DELETE_ALL_THINGS = 'DELETE_ALL_THINGS'
+export const DELETE_ALL_THINGS: DELETE_ALL_THINGS = 'DELETE_ALL_THINGS'
+interface IDeleteAllThingsAction extends IMultiThingAction {
+	type: DELETE_ALL_THINGS
+}
+export const deleteAllThings = (thingType: string): IDeleteAllThingsAction => ({
+	type: DELETE_ALL_THINGS,
+	thingType,
+})
+
 type UPDATE_THINGS = 'UPDATE_THINGS'
 export const UPDATE_MULTI_THINGS: UPDATE_THINGS = 'UPDATE_THINGS'
 interface IUpdateMultiThingsAction extends IMultiThingAction {
@@ -53,7 +63,8 @@ export const updateThings = (things: IMultiStateThings, thingType: string): IUpd
 })
 
 type MultiThingAction =
-	IUpdateMultiThingsAction | IAddMultiThingAction | IDeleteMultiThingsAction | {type: '', id?: string}
+	IUpdateMultiThingsAction | IAddMultiThingAction | IDeleteMultiThingsAction | IDeleteAllThingsAction
+	| {type: '', id?: string}
 
 interface IMultiThingAction {
 	thingType: string
@@ -80,6 +91,9 @@ export function makeMultiReducer<T extends IMultiStateThing>(
 				const newState = {...state, things: {...state.things}}
 				action.thingIds.forEach(x => delete newState.things[x])
 				return newState
+			case DELETE_ALL_THINGS:
+				if (action.thingType !== thingType) return state
+				return {...state, things: {}}
 			case UPDATE_MULTI_THINGS:
 				if (action.thingType !== thingType) return state
 				return {
