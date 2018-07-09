@@ -1,4 +1,5 @@
 import {AnyAction} from '../../../node_modules/redux'
+import {logger} from '../logger'
 
 interface IMultiState {
 	things: IMultiStateThings
@@ -105,11 +106,16 @@ export function makeMultiReducer<T extends IMultiStateThing>(
 				}
 			default:
 				if (actionTypes.includes(action.type)) {
+					const thing = state.things[action.id]
+					if (thing === undefined) {
+						logger.warn('uh oh owo fucky wucky: ' + action.id)
+						return state
+					}
 					return {
 						...state,
 						things: {
 							...state.things,
-							[action.id]: innerReducer(state.things[action.id] as T, action),
+							[action.id]: innerReducer(thing as T, action),
 						},
 					}
 				} else {

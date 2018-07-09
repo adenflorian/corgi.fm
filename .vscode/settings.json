@@ -39,6 +39,7 @@
         "automerge",
         "callout",
         "desaturate",
+        "fucky",
         "hashbow",
         "immer",
         "keyframes",
@@ -55,7 +56,8 @@
         "sysex",
         "unpress",
         "unselectable",
-        "uuidv"
+        "uuidv",
+        "wucky"
     ],
     "editor.dragAndDrop": false,
     "cSpell.ignorePaths": [
