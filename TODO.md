@@ -31,6 +31,11 @@
 	- [ ] S
 	- [√] R
 - [√] track mouse pointers
+- [ ] LFO
+- [ ] Automation
+- [√] triangle wave
+- [ ] different filter types
+- [ ] arps
 
 # Keyboard
 - [ ] do something to visualize external midi keyboard notes

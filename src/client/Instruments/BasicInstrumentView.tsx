@@ -17,6 +17,7 @@ import './BasicInstrumentView.less'
 import SawWave from './SawWave.svg'
 import SineWave from './SineWave.svg'
 import SquareWave from './SquareWave.svg'
+import TriangleWave from './TriangleWave.svg'
 
 export type MidiNotes = IMidiNote[]
 
@@ -35,8 +36,9 @@ interface IBasicInstrumentViewProps {
 
 const oscillatorTypes = [
 	{type: 'sine', svgPath: SineWave},
-	{type: 'square', svgPath: SquareWave},
+	{type: 'triangle', svgPath: TriangleWave},
 	{type: 'sawtooth', svgPath: SawWave},
+	{type: 'square', svgPath: SquareWave},
 ]
 
 export class BasicInstrumentView extends React.PureComponent<IBasicInstrumentViewProps> {
