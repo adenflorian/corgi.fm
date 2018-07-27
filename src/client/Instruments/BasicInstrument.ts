@@ -1,4 +1,5 @@
 import {IMidiNote} from '../../common/MidiNote'
+import {Arp} from '../arp'
 import {getFrequencyUsingHalfStepsFromA4} from '../music/music-functions'
 
 export interface IBasicInstrumentOptions {
@@ -18,6 +19,7 @@ export class BasicInstrument {
 	private _attackTimeInSeconds: number = 0.01
 	private _releaseTimeInSeconds: number = 3
 	private _voices: Voices
+	private _arp = new Arp()
 
 	constructor(options: IBasicInstrumentOptions) {
 		this._audioContext = options.audioContext
@@ -30,6 +32,8 @@ export class BasicInstrument {
 
 		this._gain = this._audioContext.createGain()
 		this._gain.gain.value = 1
+
+		this._arp.start(this._setMidiNotesFromArp)
 
 		// this._lfo.connect(lfoGain)
 		// 	.connect(this._gain.gain)
@@ -62,6 +66,18 @@ export class BasicInstrument {
 	public setRelease = (releaseTimeInSeconds: number) => this._releaseTimeInSeconds = releaseTimeInSeconds
 
 	public setMidiNotes = (midiNotes: IMidiNote[]) => {
+		const arp = true
+
+		if (arp) {
+			this._arp.setNotes(midiNotes)
+		} else {
+			this._setMidiNotesFromArp(midiNotes)
+		}
+	}
+
+	public dispose = () => undefined
+
+	private _setMidiNotesFromArp = (midiNotes: IMidiNote[]) => {
 		const newNotes = midiNotes.filter(x => this._previousNotes.includes(x) === false)
 		const offNotes = this._previousNotes.filter(x => midiNotes.includes(x) === false)
 
@@ -75,8 +91,6 @@ export class BasicInstrument {
 
 		this._previousNotes = midiNotes
 	}
-
-	public dispose = () => undefined
 }
 
 const A4 = 69
