@@ -11,9 +11,5 @@
 			"dom",
 			"es7"
 		],
-	},
-	"files": [
-		"main.ts",
-		"svg.d.ts"
-	],
+	}
 }

@@ -1,6 +1,7 @@
 import {logger} from '../common/logger'
 import {configureStore} from '../common/redux/configureStore'
 import {getInitialReduxState} from '../common/redux/initial-client-redux-state'
+import {fpsLoop} from './fps-loop'
 import {setupInputEventListeners} from './input-events'
 import {renderApp} from './react-main'
 import {audioContext, setupAudioContext} from './setup-audio-context'
@@ -19,6 +20,8 @@ setupWebsocketAndListeners(store)
 
 renderApp(store)
 
+fpsLoop()
+
 declare global {
 	interface NodeModule {
 		hot: {
@@ -29,6 +32,8 @@ declare global {
 }
 
 if (module.hot) {
-	module.hot.dispose(() => socket.disconnect())
-	module.hot.dispose(() => audioContext.close())
+	module.hot.dispose(() => {
+		socket.disconnect()
+		audioContext.close()
+	})
 }
