@@ -49,6 +49,16 @@ body {
     margin: 4px;
 }
 
+#mainBoards {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+#rightBoards {
+    justify-content: space-around;
+}
+
 .boards {
     display: flex;
     flex-direction: column;
@@ -140,7 +150,7 @@ body {
     z-index: -10;
     box-shadow: currentColor -1px 1px, currentColor -2px 2px;
     .saturate & {
-        filter: saturate(200%);
+        filter: saturate(300%);
     }
 }
 
@@ -152,6 +162,6 @@ body {
 
 .saturate {
     .colorize {
-        filter: saturate(200%);
+        filter: saturate(300%);
     }
 }

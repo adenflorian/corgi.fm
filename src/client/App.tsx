@@ -37,7 +37,7 @@ class App extends React.Component<IAppProps, {}> {
 	}
 
 	public render() {
-		const {info, myClient, clients} = this.props
+		const {info, myClient} = this.props
 
 		return (
 			<Fragment>
@@ -54,52 +54,53 @@ class App extends React.Component<IAppProps, {}> {
 							<div id="fps"></div>
 						</div>
 
-						<div id="mainBoards" className="boards">
-							<div className="board connected">
-								<ConnectedVolumeControl color={TRACK_1_COLOR} />
+						<div id="mainBoards">
+							<div id="leftBoards" className="boards">
+								<div className="board connected">
+									<ConnectedVolumeControl color={TRACK_1_COLOR} />
+								</div>
+								{this.props.trackIds
+									.sort()
+									.map(trackId => {
+										return (
+											<div
+												key={trackId}
+												className="board connected"
+											>
+												<ConnectedTrackContainer id={trackId} />
+											</div>
+										)
+									})
+								}
+								{this.props.keyboardIds
+									.sort()
+									.map(keyboardId => {
+										return (
+											<div
+												key={keyboardId}
+												className="board connected"
+											>
+												<ConnectedKeyboard id={keyboardId} />
+											</div>
+										)
+									})
+								}
 							</div>
-
-							{this.props.trackIds
-								.sort()
-								.map(trackId => {
-									return (
-										<div
-											key={trackId}
-											className="board connected"
-										>
-											<ConnectedTrackContainer id={trackId} />
-										</div>
-									)
-								})
-							}
-
-							{this.props.keyboardIds
-								.sort()
-								.map(keyboardId => {
-									return (
-										<div
-											key={keyboardId}
-											className="board connected"
-										>
-											<ConnectedKeyboard id={keyboardId} />
-										</div>
-									)
-								})
-							}
-
-							{this.props.instrumentIds
-								.sort()
-								.map(instrumentId => {
-									return (
-										<div
-											key={instrumentId}
-											className="board"
-										>
-											<ConnectedBasicInstrumentView id={instrumentId} />
-										</div>
-									)
-								})
-							}
+							<div id="rightBoards" className="boards">
+								{this.props.instrumentIds
+									.sort()
+									.map(instrumentId => {
+										return (
+											<div
+												key={instrumentId}
+												className="board"
+											>
+												<ConnectedBasicInstrumentView id={instrumentId} />
+											</div>
+										)
+									})
+								}
+							</div>
 						</div>
 					</Fragment>
 				}
