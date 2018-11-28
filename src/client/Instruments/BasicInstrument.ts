@@ -33,7 +33,7 @@ export class BasicInstrument {
 		this._gain = this._audioContext.createGain()
 		this._gain.gain.value = 1
 
-		this._arp.start(this._setMidiNotesFromArp)
+		// this._arp.start(this._setMidiNotesFromArp)
 
 		// this._lfo.connect(lfoGain)
 		// 	.connect(this._gain.gain)
@@ -66,7 +66,7 @@ export class BasicInstrument {
 	public setRelease = (releaseTimeInSeconds: number) => this._releaseTimeInSeconds = releaseTimeInSeconds
 
 	public setMidiNotes = (midiNotes: IMidiNote[]) => {
-		const arp = true
+		const arp = false
 
 		if (arp) {
 			this._arp.setNotes(midiNotes)
