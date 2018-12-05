@@ -78,7 +78,7 @@ class App extends React.Component<IAppProps, {}> {
 											<div
 												key={connection.targetId}
 												className="board connected"
-												style={{marginTop: 32, minWidth: 'auto', maxWidth: 600, width: 'auto', flexGrow: 1}}
+												style={{minWidth: 'auto', maxWidth: 600, width: 'auto', flexGrow: 1}}
 											>
 												<ConnectedBasicInstrumentView id={connection.targetId} />
 											</div>

@@ -78,7 +78,7 @@ export class BasicInstrumentView extends React.PureComponent<IBasicInstrumentVie
 		return (
 			<div
 				className={`container basicInstrument ${isPlaying ? 'isPlaying saturate' : 'isNotPlaying'}`}
-				style={{color}}
+				style={{bottom: -12, color}}
 			>
 				<div className="isometricBoxShadow"></div>
 				<div
