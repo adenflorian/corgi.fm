@@ -52,20 +52,21 @@ export function setupServerWebSocketListeners(io: Server, store: Store) {
 			io.local.emit(WebSocketEvent.broadcast, clientDisconnectedAction)
 
 			const instrumentIdsToDelete = selectInstrumentsByOwner(state, clientId).map(x => x.id)
-			const deleteBasicInstrumentsAction = deleteBasicInstruments(instrumentIdsToDelete)
-			store.dispatch(deleteBasicInstrumentsAction)
-			io.local.emit(WebSocketEvent.broadcast, deleteBasicInstrumentsAction)
-
 			const keyboardIdsToDelete = selectVirtualKeyboardsByOwner(state, clientId).map(x => x.id)
-			const deleteVirtualKeyboardsAction = deleteVirtualKeyboards(keyboardIdsToDelete)
-			store.dispatch(deleteVirtualKeyboardsAction)
-			io.local.emit(WebSocketEvent.broadcast, deleteVirtualKeyboardsAction)
 
 			const sourceAndTargetIds = instrumentIdsToDelete.concat(keyboardIdsToDelete)
 			const connectionIdsToDelete = selectConnectionsWithSourceOrTargetIds(state, sourceAndTargetIds).map(x => x.id)
 			const deleteConnectionsAction = deleteConnections(connectionIdsToDelete)
 			store.dispatch(deleteConnectionsAction)
 			io.local.emit(WebSocketEvent.broadcast, deleteConnectionsAction)
+
+			const deleteBasicInstrumentsAction = deleteBasicInstruments(instrumentIdsToDelete)
+			store.dispatch(deleteBasicInstrumentsAction)
+			io.local.emit(WebSocketEvent.broadcast, deleteBasicInstrumentsAction)
+
+			const deleteVirtualKeyboardsAction = deleteVirtualKeyboards(keyboardIdsToDelete)
+			store.dispatch(deleteVirtualKeyboardsAction)
+			io.local.emit(WebSocketEvent.broadcast, deleteVirtualKeyboardsAction)
 
 			logger.log(`done cleaning: ${socket.id}`)
 		})
@@ -96,13 +97,13 @@ function syncState(newClientSocket: Socket, store: Store) {
 	})
 
 	newClientSocket.emit(WebSocketEvent.broadcast, {
-		...updateConnections(selectAllConnections(state)),
+		...updateTracks(selectAllTracks(state)),
 		alreadyBroadcasted: true,
 		source: server,
 	})
 
 	newClientSocket.emit(WebSocketEvent.broadcast, {
-		...updateTracks(selectAllTracks(state)),
+		...updateConnections(selectAllConnections(state)),
 		alreadyBroadcasted: true,
 		source: server,
 	})

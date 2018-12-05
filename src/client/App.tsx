@@ -6,6 +6,7 @@ import {connect} from 'react-redux'
 import {selectAllInstrumentIds} from '../common/redux/basic-instruments-redux'
 import {IClientState, selectAllClients, selectLocalClient} from '../common/redux/clients-redux'
 import {IAppState} from '../common/redux/configureStore'
+import {IConnection, selectAllConnectionsAsArray} from '../common/redux/connections-redux'
 import {AppOptions} from '../common/redux/options-redux'
 import {selectAllTrackIds} from '../common/redux/tracks-redux'
 import {selectAllVirtualKeyboardIds} from '../common/redux/virtual-keyboard-redux'
@@ -22,6 +23,7 @@ import {ConnectedVolumeControl} from './Volume/VolumeControl'
 interface IAppProps {
 	myClient: IClientState
 	clients: any[]
+	connections: IConnection[]
 	info: string
 	instrumentIds: string[]
 	keyboardIds: string[]
@@ -59,43 +61,34 @@ class App extends React.Component<IAppProps, {}> {
 								<div className="board connected">
 									<ConnectedVolumeControl color={TRACK_1_COLOR} />
 								</div>
-								{this.props.trackIds
-									.sort()
-									.map(trackId => {
+								{this.props.connections
+									.sort(sortConnection)
+									.map(connection => {
 										return (
 											<div
-												key={trackId}
+												key={connection.sourceId}
 												className="board connected"
 											>
-												<ConnectedTrackContainer id={trackId} />
-											</div>
-										)
-									})
-								}
-								{this.props.keyboardIds
-									.sort()
-									.map(keyboardId => {
-										return (
-											<div
-												key={keyboardId}
-												className="board connected"
-											>
-												<ConnectedKeyboard id={keyboardId} />
+												{
+													connection.sourceType === 'track'
+														? <ConnectedTrackContainer id={connection.sourceId} />
+														: <ConnectedKeyboard id={connection.sourceId} />
+												}
 											</div>
 										)
 									})
 								}
 							</div>
 							<div id="rightBoards" className="boards">
-								{this.props.instrumentIds
-									.sort()
-									.map(instrumentId => {
+								{this.props.connections
+									.sort(sortConnection)
+									.map(connection => {
 										return (
 											<div
-												key={instrumentId}
-												className="board"
+												key={connection.targetId}
+												className="board connected"
 											>
-												<ConnectedBasicInstrumentView id={instrumentId} />
+												<ConnectedBasicInstrumentView id={connection.targetId} />
 											</div>
 										)
 									})
@@ -116,6 +109,12 @@ class App extends React.Component<IAppProps, {}> {
 	}
 }
 
+function sortConnection(connA: IConnection, connB: IConnection) {
+	if (connA.sourceType !== connB.sourceType) {
+		return connA.sourceType === 'track' ? -1 : 1
+	}
+}
+
 const mapStateToProps = (state: IAppState) => ({
 	clients: selectAllClients(state),
 	myClient: selectLocalClient(state),
@@ -123,6 +122,7 @@ const mapStateToProps = (state: IAppState) => ({
 	keyboardIds: selectAllVirtualKeyboardIds(state),
 	instrumentIds: selectAllInstrumentIds(state),
 	trackIds: selectAllTrackIds(state),
+	connections: selectAllConnectionsAsArray(state),
 })
 
 export const ConnectedApp = hot(module)(connect(mapStateToProps)(App))
