@@ -56,15 +56,15 @@ class App extends React.Component<IAppProps, {}> {
 							<div id="fps"></div>
 						</div>
 
-						<div id="mainBoards">
-							<div id="leftBoards" className="boards">
-								<div className="board connected">
-									<ConnectedVolumeControl color={TRACK_1_COLOR} />
-								</div>
-								{this.props.connections
-									.sort(sortConnection)
-									.map(connection => {
-										return (
+						<div id="mainBoards" className="boards">
+							<div className="board connected">
+								<ConnectedVolumeControl color={TRACK_1_COLOR} />
+							</div>
+							{this.props.connections
+								.sort(sortConnection)
+								.map(connection => {
+									return (
+										<div className="boardRow">
 											<div
 												key={connection.sourceId}
 												className="board connected"
@@ -75,25 +75,17 @@ class App extends React.Component<IAppProps, {}> {
 														: <ConnectedKeyboard id={connection.sourceId} />
 												}
 											</div>
-										)
-									})
-								}
-							</div>
-							<div id="rightBoards" className="boards">
-								{this.props.connections
-									.sort(sortConnection)
-									.map(connection => {
-										return (
 											<div
 												key={connection.targetId}
 												className="board connected"
+												style={{marginTop: 32}}
 											>
 												<ConnectedBasicInstrumentView id={connection.targetId} />
 											</div>
-										)
-									})
-								}
-							</div>
+										</div>
+									)
+								})
+							}
 						</div>
 					</Fragment>
 				}
