@@ -1,7 +1,7 @@
 // tslint:disable:no-console
 const logLevel = {
 	log: true,
-	debug: false,
+	debug: true,
 	warn: true,
 }
 
@@ -18,7 +18,7 @@ export const logger = {
 	},
 	debug: (...args) => {
 		if (logLevel.debug) {
-			console.debug(...args)
+			console.log(...args)
 		}
 	},
 }
