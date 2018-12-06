@@ -1,17 +1,14 @@
 import {Store} from 'redux'
 import * as io from 'socket.io-client'
 import {logger} from '../common/logger'
-import {IMidiNote} from '../common/MidiNote'
 import {BASIC_INSTRUMENT_THING_TYPE} from '../common/redux/basic-instruments-redux'
-import {clientDisconnected, SET_CLIENTS} from '../common/redux/clients-redux'
 import {deleteAllThings} from '../common/redux/multi-reducer'
 import {TRACK_THING_TYPE} from '../common/redux/tracks-redux'
-import {setVirtualKeys, VIRTUAL_KEYBOARD_THING_TYPE, virtualOctave} from '../common/redux/virtual-keyboard-redux'
+import {VIRTUAL_KEYBOARD_THING_TYPE} from '../common/redux/virtual-keyboard-redux'
 import {BroadcastAction} from '../common/redux/websocket-client-sender-middleware'
 import {setInfo, setSocketId} from '../common/redux/websocket-redux'
 import {WebSocketEvent} from '../common/server-constants'
 import {selfDisconnected} from './../common/redux/common-actions'
-import {Octave} from './music/music-types'
 
 const port = 80
 
@@ -31,6 +28,13 @@ export function setupWebsocketAndListeners(store: Store) {
 		store.dispatch(deleteAllThings(TRACK_THING_TYPE))
 		store.dispatch(deleteAllThings(VIRTUAL_KEYBOARD_THING_TYPE))
 		store.dispatch(deleteAllThings(BASIC_INSTRUMENT_THING_TYPE))
+	})
+
+	socket.on(WebSocketEvent.broadcast, (action: BroadcastAction) => {
+		if (action.type !== 'SET_CLIENT_POINTER') {
+			logger.debug('Received broadcast: ', action)
+		}
+		store.dispatch({...action, alreadyBroadcasted: true})
 	})
 
 	setupDefaultListeners([
@@ -60,52 +64,8 @@ export function setupWebsocketAndListeners(store: Store) {
 		})
 	}
 
-	socket.on('clients', data => {
-		logger.log('clients: ', data.clients)
-		setClients(data.clients)
-	})
-
-	function setClients(newClients) {
-		store.dispatch({
-			type: SET_CLIENTS,
-			clients: newClients,
-		})
-	}
-
-	socket.on('clientDisconnected', data => {
-		logger.log('clientDisconnected: ', data)
-		store.dispatch(clientDisconnected(data.id))
-	})
-
-	socket.on('notes', (data: NotesPayload) => {
-		logger.debug('notes: ', data)
-		store.dispatch(setVirtualKeys(data.clientId, data.notes))
-	})
-
-	socket.on('octave', (data: OctavePayload) => {
-		logger.debug('octave: ', data)
-		store.dispatch(virtualOctave(data.clientId, data.octave))
-	})
-
-	socket.on(WebSocketEvent.broadcast, (action: BroadcastAction) => {
-		logger.debug(WebSocketEvent.broadcast)
-		store.dispatch({...action, alreadyBroadcasted: true})
-	})
-
 	function socketInfo(info: string) {
 		store.dispatch(setInfo(info))
 		logger.debug(info)
 	}
-}
-
-export type ClientId = string
-
-export interface NotesPayload {
-	notes: IMidiNote[]
-	clientId: ClientId
-}
-
-export interface OctavePayload {
-	octave: Octave
-	clientId: ClientId
 }
