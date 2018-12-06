@@ -1,6 +1,6 @@
-import {applyMiddleware, combineReducers, compose, createStore, Store} from 'redux'
+import {applyMiddleware, combineReducers, createStore, Store} from 'redux'
+import {composeWithDevTools} from 'redux-devtools-extension/developmentOnly'
 import persistState from 'redux-localstorage'
-import {isProd} from '../../client/is-prod'
 import {audioReducer, IAudioState} from './audio-redux'
 import {basicInstrumentsReducer, IBasicInstrumentsState} from './basic-instruments-redux'
 import {clientsReducer, IClientsState} from './clients-redux'
@@ -26,13 +26,9 @@ export interface IAppState {
 	websocket: IWebsocketState
 }
 
-declare global {
-	interface Window {__REDUX_DEVTOOLS_EXTENSION_COMPOSE__: any}
-}
-
-const tryToUseReduxDevTools = isProd() === false
-
-const composeEnhancers = tryToUseReduxDevTools && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
+const composeEnhancers = composeWithDevTools({
+	actionsBlacklist: ['SET_CLIENT_POINTER', 'REPORT_LEVELS'],
+})
 
 export function configureStore(initialState: IAppState | any = {}): Store {
 	return createStore(
