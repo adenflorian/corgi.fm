@@ -7,22 +7,28 @@ import {addBasicInstrument, BasicInstrumentState} from '../common/redux/basic-in
 import {addClient, ClientState} from '../common/redux/clients-redux'
 import {addConnection, Connection, ConnectionSourceType, ConnectionTargetType} from '../common/redux/connections-redux'
 import {addTrack, TrackState} from '../common/redux/tracks-redux'
-// import {addVirtualKeyboard, VirtualKeyboardState} from '../common/redux/virtual-keyboard-redux'
+import {configureRoomStore} from './configure-room-store'
 import {configureServerStore} from './configure-server-store'
 import {setupServerWebSocketListeners} from './server-socket-listeners'
 import {setupExpressApp} from './setup-express-app'
 
-const store: Store = configureServerStore()
+const serverStore = configureServerStore()
 
-createServerStuff(store.dispatch)
+const roomStores = {
+	roomA: configureRoomStore(),
+	roomB: configureRoomStore(),
+}
+
+createServerStuff(roomStores.roomA.dispatch)
+createServerStuff(roomStores.roomB.dispatch)
 
 const app: express.Application = express()
 const server: http.Server = new http.Server(app)
 const io: socketIO.Server = socketIO(server)
 
-setupExpressApp(app, store)
+setupExpressApp(app, roomStores)
 
-setupServerWebSocketListeners(io, store)
+setupServerWebSocketListeners(io, serverStore, roomStores)
 
 const port = 80
 
@@ -33,7 +39,7 @@ logger.log('shamu server listening on port', port)
 function createServerStuff(dispatch: Dispatch) {
 	const serverClient = ClientState.createServerClient()
 	const addClientAction = addClient(serverClient)
-	store.dispatch(addClientAction)
+	dispatch(addClientAction)
 
 	const newInstrument = new BasicInstrumentState(serverClient.id)
 	dispatch(addBasicInstrument(newInstrument))

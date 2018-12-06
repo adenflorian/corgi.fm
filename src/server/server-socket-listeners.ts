@@ -20,54 +20,54 @@ import {
 import {BroadcastAction} from '../common/redux/websocket-client-sender-middleware'
 import {WebSocketEvent} from '../common/server-constants'
 
-const defaultRoom = 'lobby'
+// const defaultRoom = 'lobby'
 const roomA = 'roomA'
 const roomB = 'roomB'
 
 let flag = false
 
-export function setupServerWebSocketListeners(io: Server, store: Store) {
+export function setupServerWebSocketListeners(io: Server, serverStore: Store, roomStores: any) {
 
-	store.dispatch(setRooms([roomA, roomB]))
+	serverStore.dispatch(setRooms([roomA, roomB]))
 
 	io.on('connection', socket => {
 		logger.log('new connection | ', socket.id)
 
 		flag = !flag
 
-		socket.join(defaultRoom, err => {
+		const roomToJoin = flag ? roomA : roomB
+
+		socket.join(roomToJoin, err => {
 			if (err) throw new Error(err)
-			const rooms = Object.keys(socket.rooms)
-			logger.log(rooms)
-			io.to(defaultRoom).emit('a new user has joined the room') // broadcast to everyone in the room
+			io.to(roomToJoin).emit('a new user has joined the room') // broadcast to everyone in the room
 
 			const addClientAction = addClient(new ClientState(socket.id))
-			store.dispatch(addClientAction)
-			io.to(defaultRoom).emit(WebSocketEvent.broadcast, addClientAction)
+			roomStores[roomToJoin].dispatch(addClientAction)
+			io.to(roomToJoin).emit(WebSocketEvent.broadcast, addClientAction)
 
-			syncState(socket, store)
+			syncState(socket, roomStores[roomToJoin], serverStore)
 
 			socket.on(WebSocketEvent.broadcast, (action: BroadcastAction) => {
 				logger.debug(`${WebSocketEvent.broadcast}: ${socket.id} | `, action)
 				if (action[BROADCASTER_ACTION]) {
-					store.dispatch(action)
+					roomStores[roomToJoin].dispatch(action)
 				}
-				socket.broadcast.emit(WebSocketEvent.broadcast, {...action, alreadyBroadcasted: true})
+				socket.broadcast.to(roomToJoin).emit(WebSocketEvent.broadcast, {...action, alreadyBroadcasted: true})
 			})
 
 			socket.on(WebSocketEvent.serverAction, (action: AnyAction) => {
 				logger.debug(`${WebSocketEvent.serverAction}: ${socket.id} | `, action)
-				store.dispatch(action)
+				roomStores[roomToJoin].dispatch(action)
 			})
 
 			socket.on('disconnect', () => {
 				logger.log(`client disconnected: ${socket.id}`)
-				const state: IAppState = store.getState()
+				const state: IAppState = roomStores[roomToJoin].getState()
 				const clientId = selectClientBySocketId(state, socket.id).id
 
 				const clientDisconnectedAction = clientDisconnected(clientId)
-				store.dispatch(clientDisconnectedAction)
-				io.to(defaultRoom).emit(WebSocketEvent.broadcast, clientDisconnectedAction)
+				roomStores[roomToJoin].dispatch(clientDisconnectedAction)
+				io.to(roomToJoin).emit(WebSocketEvent.broadcast, clientDisconnectedAction)
 
 				const instrumentIdsToDelete = selectInstrumentsByOwner(state, clientId).map(x => x.id)
 				const keyboardIdsToDelete = selectVirtualKeyboardsByOwner(state, clientId).map(x => x.id)
@@ -75,16 +75,16 @@ export function setupServerWebSocketListeners(io: Server, store: Store) {
 				const sourceAndTargetIds = instrumentIdsToDelete.concat(keyboardIdsToDelete)
 				const connectionIdsToDelete = selectConnectionsWithSourceOrTargetIds(state, sourceAndTargetIds).map(x => x.id)
 				const deleteConnectionsAction = deleteConnections(connectionIdsToDelete)
-				store.dispatch(deleteConnectionsAction)
-				io.to(defaultRoom).emit(WebSocketEvent.broadcast, deleteConnectionsAction)
+				roomStores[roomToJoin].dispatch(deleteConnectionsAction)
+				io.to(roomToJoin).emit(WebSocketEvent.broadcast, deleteConnectionsAction)
 
 				const deleteBasicInstrumentsAction = deleteBasicInstruments(instrumentIdsToDelete)
-				store.dispatch(deleteBasicInstrumentsAction)
-				io.to(defaultRoom).emit(WebSocketEvent.broadcast, deleteBasicInstrumentsAction)
+				roomStores[roomToJoin].dispatch(deleteBasicInstrumentsAction)
+				io.to(roomToJoin).emit(WebSocketEvent.broadcast, deleteBasicInstrumentsAction)
 
 				const deleteVirtualKeyboardsAction = deleteVirtualKeyboards(keyboardIdsToDelete)
-				store.dispatch(deleteVirtualKeyboardsAction)
-				io.to(defaultRoom).emit(WebSocketEvent.broadcast, deleteVirtualKeyboardsAction)
+				roomStores[roomToJoin].dispatch(deleteVirtualKeyboardsAction)
+				io.to(roomToJoin).emit(WebSocketEvent.broadcast, deleteVirtualKeyboardsAction)
 
 				logger.log(`done cleaning: ${socket.id}`)
 			})
@@ -95,11 +95,11 @@ export function setupServerWebSocketListeners(io: Server, store: Store) {
 
 const server = 'server'
 
-function syncState(newClientSocket: Socket, store: Store) {
+function syncState(newClientSocket: Socket, store: Store, serverStore: Store) {
 	const state: IAppState = store.getState()
 
 	newClientSocket.emit(WebSocketEvent.broadcast, {
-		...setRooms(selectAllRooms(state)),
+		...setRooms(selectAllRooms(serverStore.getState())),
 		alreadyBroadcasted: true,
 		source: server,
 	})
