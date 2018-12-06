@@ -64,7 +64,7 @@ class App extends React.Component<IAppProps, {}> {
 								.sort(sortConnection)
 								.map(connection => {
 									return (
-										<div className="boardRow">
+										<div className="boardRow" key={connection.id}>
 											<div
 												key={connection.sourceId}
 												className="board connected"

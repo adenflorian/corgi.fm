@@ -52,3 +52,12 @@
 
 # References
 - https://github.com/grimmdude/MidiPlayerJS/blob/master/src/player.js
+
+
+Scenario: User opens shamu
+
+
+switch rooms
+create rooms
+default room?
+single default room or make more automatically?
