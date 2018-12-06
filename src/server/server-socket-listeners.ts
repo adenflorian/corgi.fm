@@ -12,6 +12,7 @@ import {
 	deleteConnections, selectAllConnections, selectConnectionsWithSourceOrTargetIds, updateConnections,
 } from '../common/redux/connections-redux'
 import {BROADCASTER_ACTION} from '../common/redux/redux-utils'
+import {selectAllRooms, setRooms} from '../common/redux/rooms-redux'
 import {selectAllTracks, updateTracks} from '../common/redux/tracks-redux'
 import {
 	deleteVirtualKeyboards, selectAllVirtualKeyboards, selectVirtualKeyboardsByOwner, updateVirtualKeyboards,
@@ -26,6 +27,9 @@ const roomB = 'roomB'
 let flag = false
 
 export function setupServerWebSocketListeners(io: Server, store: Store) {
+
+	store.dispatch(setRooms([roomA, roomB]))
+
 	io.on('connection', socket => {
 		logger.log('new connection | ', socket.id)
 
@@ -93,6 +97,12 @@ const server = 'server'
 
 function syncState(newClientSocket: Socket, store: Store) {
 	const state: IAppState = store.getState()
+
+	newClientSocket.emit(WebSocketEvent.broadcast, {
+		...setRooms(selectAllRooms(state)),
+		alreadyBroadcasted: true,
+		source: server,
+	})
 
 	newClientSocket.emit(WebSocketEvent.broadcast, {
 		...setClients(selectAllClients(state)),

@@ -8,6 +8,7 @@ import {connectionsReducer, IConnectionsState} from './connections-redux'
 import {localMiddleware} from './local-middleware'
 import {ILocalState, localReducer} from './local-redux'
 import {IOptionsState, optionsReducer} from './options-redux'
+import {IRoomsState, roomsReducer} from './rooms-redux'
 import {trackPlayerMiddleware} from './track-player-middleware'
 import {ITracksState, tracksReducer} from './tracks-redux'
 import {IVirtualKeyboardsState, virtualKeyboardsReducer} from './virtual-keyboard-redux'
@@ -21,6 +22,7 @@ export interface IAppState {
 	connections: IConnectionsState
 	local: ILocalState
 	options: IOptionsState
+	rooms: IRoomsState
 	tracks: ITracksState
 	virtualKeyboards: IVirtualKeyboardsState
 	websocket: IWebsocketState
@@ -39,6 +41,7 @@ export function configureStore(initialState: IAppState | any = {}): Store {
 			connections: connectionsReducer,
 			local: localReducer,
 			options: optionsReducer,
+			rooms: roomsReducer,
 			tracks: tracksReducer,
 			virtualKeyboards: virtualKeyboardsReducer,
 			websocket: websocketReducer,
