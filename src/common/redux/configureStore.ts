@@ -29,7 +29,7 @@ export interface IAppState {
 }
 
 const composeEnhancers = composeWithDevTools({
-	actionsBlacklist: ['SET_CLIENT_POINTER', 'REPORT_LEVELS'],
+	actionsBlacklist: ['SET_CLIENT_POINTER', 'REPORT_LEVELS', 'SET_INFO'],
 })
 
 export function configureStore(initialState: IAppState | any = {}): Store {

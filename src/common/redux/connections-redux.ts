@@ -22,6 +22,11 @@ export const deleteConnections = (connectionIds: string[]) => ({
 	BROADCASTER_ACTION,
 })
 
+export const DELETE_ALL_CONNECTIONS = 'DELETE_ALL_CONNECTIONS'
+export const deleteAllConnections = () => ({
+	type: DELETE_ALL_CONNECTIONS,
+})
+
 export const UPDATE_CONNECTIONS = 'UPDATE_CONNECTIONS'
 export const updateConnections = (connections: IConnections) => ({
 	type: UPDATE_CONNECTIONS,
@@ -93,6 +98,11 @@ export function connectionsReducer(state: IConnectionsState = initialState, acti
 			const newState = {...state, connections: {...state.connections}}
 			action.connectionIds.forEach(x => delete newState.connections[x])
 			return newState
+		case DELETE_ALL_CONNECTIONS:
+			return {
+				...state,
+				connections: {},
+			}
 		case UPDATE_CONNECTIONS:
 			return {
 				...state,

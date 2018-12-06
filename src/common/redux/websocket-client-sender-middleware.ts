@@ -1,6 +1,8 @@
 import {AnyAction, Dispatch, Middleware} from 'redux'
 import {socket} from '../../client/websocket-listeners'
 import {WebSocketEvent} from '../../common/server-constants'
+import {logger} from '../logger'
+import {SET_CLIENT_POINTER} from './clients-redux'
 import {IAppState} from './configureStore'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
 import {selectLocalSocketId} from './websocket-redux'
@@ -27,6 +29,10 @@ function processNetworkAction(action: BroadcastAction, getState, next: Dispatch)
 	const socketId = selectLocalSocketId(state)
 
 	action.source = socketId
+
+	if (action.type !== SET_CLIENT_POINTER) {
+		logger.debug('sending action to server: ', action)
+	}
 
 	if (action[BROADCASTER_ACTION]) {
 		socket.emit(WebSocketEvent.broadcast, action)

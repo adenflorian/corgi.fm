@@ -1,10 +1,12 @@
 import {Dispatch, Middleware} from 'redux'
+import {deleteAllTheThings} from '../../client/websocket-listeners'
 import {addBasicInstrument, BasicInstrumentState} from './basic-instruments-redux'
 import {ADD_CLIENT, selectLocalClient} from './clients-redux'
 import {IAppState} from './configureStore'
 import {addConnection, Connection, ConnectionSourceType, ConnectionTargetType} from './connections-redux'
 import {selectLocalKeyboardId, setLocalVirtualKeyboardId} from './local-redux'
 import {makeActionCreator} from './redux-utils'
+import {SET_ACTIVE_ROOM, SET_ROOMS} from './rooms-redux'
 import {
 	addVirtualKeyboard, VirtualKeyboardState, virtualKeyPressed, virtualKeyUp, virtualOctaveChange,
 } from './virtual-keyboard-redux'
@@ -40,6 +42,10 @@ export const localMiddleware: Middleware = ({dispatch, getState}) => next => act
 				createLocalStuff(dispatch, state)
 			}
 			return
+		}
+		case SET_ACTIVE_ROOM: {
+			next(action)
+			return deleteAllTheThings(dispatch)
 		}
 		default:
 			return next(action)

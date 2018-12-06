@@ -1,7 +1,9 @@
+import {Dispatch} from 'react-redux'
 import {Store} from 'redux'
 import * as io from 'socket.io-client'
 import {logger} from '../common/logger'
 import {BASIC_INSTRUMENT_THING_TYPE} from '../common/redux/basic-instruments-redux'
+import {deleteAllConnections} from '../common/redux/connections-redux'
 import {deleteAllThings} from '../common/redux/multi-reducer'
 import {TRACK_THING_TYPE} from '../common/redux/tracks-redux'
 import {VIRTUAL_KEYBOARD_THING_TYPE} from '../common/redux/virtual-keyboard-redux'
@@ -14,6 +16,15 @@ const port = 80
 
 export let socket
 
+export type ClientId = string
+
+export function deleteAllTheThings(dispatch: Dispatch) {
+	dispatch(deleteAllConnections())
+	dispatch(deleteAllThings(TRACK_THING_TYPE))
+	dispatch(deleteAllThings(VIRTUAL_KEYBOARD_THING_TYPE))
+	dispatch(deleteAllThings(BASIC_INSTRUMENT_THING_TYPE))
+}
+
 export function setupWebsocketAndListeners(store: Store) {
 	socket = io.connect(window.location.hostname + `:${port}/`)
 
@@ -25,9 +36,7 @@ export function setupWebsocketAndListeners(store: Store) {
 	socket.on('disconnect', () => {
 		logger.log('socket: disconnect')
 		store.dispatch(selfDisconnected())
-		store.dispatch(deleteAllThings(TRACK_THING_TYPE))
-		store.dispatch(deleteAllThings(VIRTUAL_KEYBOARD_THING_TYPE))
-		store.dispatch(deleteAllThings(BASIC_INSTRUMENT_THING_TYPE))
+		deleteAllTheThings(store.dispatch)
 	})
 
 	socket.on(WebSocketEvent.broadcast, (action: BroadcastAction) => {

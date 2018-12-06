@@ -17,6 +17,7 @@ import {ConnectedBasicInstrumentView} from './Instruments/BasicInstrumentView'
 import {ConnectedKeyboard} from './Keyboard/Keyboard'
 import {MousePointers} from './MousePointers'
 import {ConnectedOption} from './Option'
+import {ConnectedRoomSelector} from './RoomSelector'
 import {ConnectedTrackContainer} from './Track/TrackContainer'
 import {ConnectedVolumeControl} from './Volume/VolumeControl'
 
@@ -54,6 +55,7 @@ class App extends React.Component<IAppProps, {}> {
 								label="show names on keyboard"
 							/>
 							<div id="fps"></div>
+							<ConnectedRoomSelector />
 						</div>
 
 						<div id="mainBoards" className="boards">

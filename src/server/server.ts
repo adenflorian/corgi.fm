@@ -9,18 +9,18 @@ import {addConnection, Connection, ConnectionSourceType, ConnectionTargetType} f
 import {addTrack, TrackState} from '../common/redux/tracks-redux'
 import {configureRoomStore} from './configure-room-store'
 import {configureServerStore} from './configure-server-store'
-import {setupServerWebSocketListeners} from './server-socket-listeners'
+import {roomA, roomB, setupServerWebSocketListeners} from './server-socket-listeners'
 import {setupExpressApp} from './setup-express-app'
 
 const serverStore = configureServerStore()
 
 const roomStores = {
-	roomA: configureRoomStore(),
-	roomB: configureRoomStore(),
+	[roomA]: configureRoomStore(),
+	[roomB]: configureRoomStore(),
 }
 
-createServerStuff(roomStores.roomA.dispatch)
-createServerStuff(roomStores.roomB.dispatch)
+createServerStuff(roomStores[roomA].dispatch)
+createServerStuff(roomStores[roomB].dispatch)
 
 const app: express.Application = express()
 const server: http.Server = new http.Server(app)
