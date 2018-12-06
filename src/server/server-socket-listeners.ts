@@ -12,7 +12,7 @@ import {
 	deleteConnections, selectAllConnections, selectConnectionsWithSourceOrTargetIds, updateConnections,
 } from '../common/redux/connections-redux'
 import {BROADCASTER_ACTION} from '../common/redux/redux-utils'
-import {selectAllRooms, setRooms} from '../common/redux/rooms-redux'
+import {selectAllRooms, setActiveRoom, setRooms} from '../common/redux/rooms-redux'
 import {selectAllTracks, updateTracks} from '../common/redux/tracks-redux'
 import {
 	deleteVirtualKeyboards, selectAllVirtualKeyboards, selectVirtualKeyboardsByOwner, updateVirtualKeyboards,
@@ -45,7 +45,7 @@ export function setupServerWebSocketListeners(io: Server, serverStore: Store, ro
 			roomStores[roomToJoin].dispatch(addClientAction)
 			io.to(roomToJoin).emit(WebSocketEvent.broadcast, addClientAction)
 
-			syncState(socket, roomStores[roomToJoin], serverStore)
+			syncState(socket, roomStores[roomToJoin], serverStore, roomToJoin)
 
 			socket.on(WebSocketEvent.broadcast, (action: BroadcastAction) => {
 				logger.debug(`${WebSocketEvent.broadcast}: ${socket.id} | `, action)
@@ -95,11 +95,17 @@ export function setupServerWebSocketListeners(io: Server, serverStore: Store, ro
 
 const server = 'server'
 
-function syncState(newClientSocket: Socket, store: Store, serverStore: Store) {
+function syncState(newClientSocket: Socket, store: Store, serverStore: Store, activeRoom: string) {
 	const state: IAppState = store.getState()
 
 	newClientSocket.emit(WebSocketEvent.broadcast, {
 		...setRooms(selectAllRooms(serverStore.getState())),
+		alreadyBroadcasted: true,
+		source: server,
+	})
+
+	newClientSocket.emit(WebSocketEvent.broadcast, {
+		...setActiveRoom(activeRoom),
 		alreadyBroadcasted: true,
 		source: server,
 	})

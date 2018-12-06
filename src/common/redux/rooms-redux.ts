@@ -1,3 +1,4 @@
+import {Action} from 'redux'
 import {IAppState} from './configureStore'
 import {createReducer} from './redux-utils'
 
@@ -13,13 +14,35 @@ export const setRooms = (rooms: string[]) => ({
 	rooms,
 })
 
-export type IRoomsState = string[]
+export const SET_ACTIVE_ROOM = 'SET_ACTIVE_ROOM'
+export const setActiveRoom = room => ({
+	type: SET_ACTIVE_ROOM,
+	room,
+})
 
-export const roomsReducer = createReducer([],
+export interface IRoomsState {
+	all: string[],
+	activeRoom: string
+}
+
+export function roomsReducer(state: IRoomsState, action: Action<any>) {
+	return {
+		...roomsOtherReducer(state, action),
+		rooms: roomsArrayReducer(state, action),
+	}
+}
+
+const roomsOtherReducer = createReducer({},
 	{
-		[ADD_ROOM]: (state: IRoomsState, {room}) => state.concat(room),
-		[SET_ROOMS]: (_: IRoomsState, {rooms}) => rooms,
+		[SET_ACTIVE_ROOM]: (state: IRoomsState, {room}) => ({...state, active: room}),
 	},
 )
 
-export const selectAllRooms = (state: IAppState) => state.rooms
+const roomsArrayReducer = createReducer([],
+	{
+		[ADD_ROOM]: (state: string[], {room}) => state.concat(room),
+		[SET_ROOMS]: (_, {rooms}) => rooms,
+	},
+)
+
+export const selectAllRooms = (state: IAppState) => state.rooms.all
