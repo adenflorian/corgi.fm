@@ -31,7 +31,7 @@ export const updateBasicInstruments = (instruments: IBasicInstruments) => ({
 
 export const SET_BASIC_INSTRUMENT_OSCILLATOR_TYPE = 'SET_BASIC_INSTRUMENT_OSCILLATOR_TYPE'
 export const setBasicInstrumentOscillatorType =
-	(id: string, oscillatorType: OscillatorType) => ({
+	(id: string, oscillatorType: ShamuOscillatorType) => ({
 		type: SET_BASIC_INSTRUMENT_OSCILLATOR_TYPE,
 		id,
 		oscillatorType,

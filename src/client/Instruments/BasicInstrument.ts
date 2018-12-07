@@ -147,11 +147,17 @@ class Voice {
 	private _audioContext: AudioContext
 	private _oscillatorType: ShamuOscillatorType
 	private _destination: AudioNode
+	private _whiteNoise: AudioBufferSourceNode
+	private _noiseBuffer: AudioBuffer
 
 	constructor(audioContext: AudioContext, destination: AudioNode, oscType: ShamuOscillatorType) {
 		this._audioContext = audioContext
 		this._destination = destination
 		this._oscillatorType = oscType
+		this._gain = this._audioContext.createGain()
+		this._gain.gain.setValueAtTime(0, this._audioContext.currentTime)
+
+		this._generateNoiseBuffer()
 
 		this._buildChain()
 	}
@@ -178,70 +184,79 @@ class Voice {
 	}
 
 	public setOscillatorType = (newOscType: ShamuOscillatorType) => {
+		const oldOscType = this._oscillatorType
+
 		if (this._oscillatorType !== newOscType) {
 			this._oscillatorType = newOscType
 
-			if (newOscType in BuiltInOscillatorType) {
+			if (newOscType in BuiltInOscillatorType && oldOscType in BuiltInOscillatorType) {
 				this._oscillator.type = newOscType as OscillatorType
 			} else {
-				this._deleteChain()
-				this._buildChain()
+				this._rebuildChain()
 			}
 		}
 	}
 
 	public dispose = () => {
 		this._deleteChain()
+		this._gain.disconnect()
+		delete this._gain
 	}
 
-	private _buildChain() {
-		this._oscillator = this._audioContext.createOscillator()
-		if (this._oscillatorType === CustomOscillatorType.noise) {
-			this._buildNoiseChain()
-		} else {
-			this._buildNormalChain()
-		}
+	private _rebuildChain() {
+		this._deleteChain()
+		this._buildChain()
 	}
 
-	private _buildNoiseChain() {
+	private _generateNoiseBuffer() {
 		const bufferSize = 2 * this._audioContext.sampleRate
-		const noiseBuffer = this._audioContext.createBuffer(1, bufferSize, this._audioContext.sampleRate)
-		const output = noiseBuffer.getChannelData(0)
+		this._noiseBuffer = this._audioContext.createBuffer(1, bufferSize, this._audioContext.sampleRate)
+		const output = this._noiseBuffer.getChannelData(0)
 
 		for (let i = 0; i < bufferSize; i++) {
 			output[i] = Math.random() * 2 - 1
 		}
+	}
 
-		const whiteNoise = this._audioContext.createBufferSource()
-		whiteNoise.buffer = noiseBuffer
-		whiteNoise.loop = true
-		whiteNoise.start(0)
+	private _buildChain() {
+		this._oscillator = this._audioContext.createOscillator()
+		this._oscillator.start()
+		this._whiteNoise = this._audioContext.createBufferSource()
+		this._whiteNoise.start()
 
-		this._gain = this._audioContext.createGain()
-		this._gain.gain.setValueAtTime(0, this._audioContext.currentTime)
-
-		whiteNoise.connect(this._gain)
+		this._buildSpecificChain().connect(this._gain)
 			.connect(this._destination)
 	}
 
-	private _buildNormalChain() {
-		this._oscillator.start()
+	private _buildSpecificChain(): AudioNode {
+		if (this._oscillatorType === CustomOscillatorType.noise) {
+			return this._buildNoiseChain()
+		} else {
+			return this._buildNormalChain()
+		}
+	}
+
+	private _buildNoiseChain(): AudioNode {
+		this._whiteNoise.buffer = this._noiseBuffer
+		this._whiteNoise.loop = true
+
+		return this._whiteNoise
+	}
+
+	private _buildNormalChain(): AudioNode {
 		this._oscillator.type = this._oscillatorType as OscillatorType
-		this._oscillator.frequency.setValueAtTime(0, this._audioContext.currentTime)
+		this._oscillator.frequency.setValueAtTime(midiNoteToFrequency(this.playingNote), this._audioContext.currentTime)
 
-		this._gain = this._audioContext.createGain()
-		this._gain.gain.setValueAtTime(0, this._audioContext.currentTime)
-
-		this._oscillator.connect(this._gain)
-			.connect(this._destination)
+		return this._oscillator
 	}
 
 	private _deleteChain() {
 		this._oscillator.stop()
 		this._oscillator.disconnect()
 		delete this._oscillator
-		this._gain.disconnect()
-		delete this._gain
+		this._whiteNoise.stop()
+		this._whiteNoise.disconnect()
+		delete this._whiteNoise
 	}
 
 	private _cancelAndHoldOrJustCancel = () => {
