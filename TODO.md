@@ -70,10 +70,12 @@ Scenario: User opens shamu
 
 # Rooms
 - [√] switch rooms
-- [ ] create rooms
-	- [ ] redux
-	- [ ] 
+- [√] create rooms
+- [ ] lobby
 - [ ] delete empty rooms when last user leaves or after timer
+- [ ] choose name for room at creation
+- [ ] rename existing rooms
+- [ ] room ownership
 - [ ] join room by url
 - [ ] create more rooms automatically when lobby is full
 - [ ] observers (users who can join room but not play)
