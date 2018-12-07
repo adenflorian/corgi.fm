@@ -21,7 +21,7 @@
 - [ ] maybe use automerge? https://github.com/automerge/automerge
 - [ ] options view
 - [√] maybe use requestAnimationFrame()
-- [ ] make use of `'` and `[` keys
+- [ ] make use of `'` key
 - [ ] add `+` and `-` for octave
 - [√] persist keyboard state on server, and don't store notes and octaves on clients
 - [ ] TONE.js
