@@ -10,7 +10,10 @@
         "quotemark",
         "semicolon",
         "space-before-function-paren",
-        "trailing-comma"
+        "trailing-comma",
+        "prefer-const",
+        "no-var-keyword",
+        "one-variable-per-declaration"
     ],
     "files.eol": "\n",
     "javascript.preferences.quoteStyle": "single",

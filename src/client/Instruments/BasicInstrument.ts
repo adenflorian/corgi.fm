@@ -6,7 +6,7 @@ export interface IBasicInstrumentOptions {
 	destination: any
 	audioContext: AudioContext
 	voiceCount: number
-	oscillatorType: OscillatorType
+	oscillatorType: ShamuOscillatorType
 }
 
 export class BasicInstrument {
@@ -15,7 +15,7 @@ export class BasicInstrument {
 	private _gain: GainNode
 	private _lowPassFilter: BiquadFilterNode
 	private _previousNotes: number[] = []
-	private _oscillatorType: OscillatorType
+	private _oscillatorType: ShamuOscillatorType
 	private _attackTimeInSeconds: number = 0.01
 	private _releaseTimeInSeconds: number = 3
 	private _voices: Voices
@@ -56,7 +56,7 @@ export class BasicInstrument {
 	public setLowPassFilterCutoffFrequency = (frequency: number) =>
 		this._lowPassFilter.frequency.setValueAtTime(frequency, this._audioContext.currentTime)
 
-	public setOscillatorType = (type: OscillatorType) => {
+	public setOscillatorType = (type: ShamuOscillatorType) => {
 		this._oscillatorType = type
 		this._voices.setOscillatorType(type)
 	}
@@ -105,13 +105,13 @@ function midiNoteToFrequency(midiNote: IMidiNote): number {
 class Voices {
 	private _availableVoices: Voice[] = []
 
-	constructor(voiceCount: number, audioContext: AudioContext, destination: AudioNode, oscType: OscillatorType) {
+	constructor(voiceCount: number, audioContext: AudioContext, destination: AudioNode, oscType: ShamuOscillatorType) {
 		for (let i = 0; i < voiceCount; i++) {
 			this._availableVoices.push(new Voice(audioContext, destination, oscType))
 		}
 	}
 
-	public playNote(note: number, oscType: OscillatorType, attackTimeInSeconds: number) {
+	public playNote(note: number, oscType: ShamuOscillatorType, attackTimeInSeconds: number) {
 		const voice = this._getVoice()
 
 		voice.playNote(note, oscType, attackTimeInSeconds)
@@ -127,7 +127,7 @@ class Voices {
 		}
 	}
 
-	public setOscillatorType(type: OscillatorType) {
+	public setOscillatorType(type: ShamuOscillatorType) {
 		this._availableVoices.forEach(x => x.setOscillatorType(type))
 	}
 
@@ -145,27 +145,23 @@ class Voice {
 	private _oscillator: OscillatorNode
 	private _gain: GainNode
 	private _audioContext: AudioContext
+	private _oscillatorType: ShamuOscillatorType
+	private _destination: AudioNode
 
-	constructor(audioContext: AudioContext, destination: AudioNode, oscType: OscillatorType) {
+	constructor(audioContext: AudioContext, destination: AudioNode, oscType: ShamuOscillatorType) {
 		this._audioContext = audioContext
-		this._oscillator = audioContext.createOscillator()
-		this._oscillator.start()
-		this._oscillator.type = oscType
-		this._oscillator.frequency.setValueAtTime(0, this._audioContext.currentTime)
+		this._destination = destination
+		this._oscillatorType = oscType
 
-		this._gain = audioContext.createGain()
-		this._gain.gain.setValueAtTime(0, this._audioContext.currentTime)
-
-		this._oscillator.connect(this._gain)
-			.connect(destination)
+		this._buildChain()
 	}
 
-	public playNote(note: number, oscType: OscillatorType, attackTimeInSeconds: number) {
+	public playNote(note: number, oscType: ShamuOscillatorType, attackTimeInSeconds: number) {
 		this._cancelAndHoldOrJustCancel()
 		this._gain.gain.setValueAtTime(0, this._audioContext.currentTime)
 		this._gain.gain.linearRampToValueAtTime(1, this._audioContext.currentTime + attackTimeInSeconds)
 
-		this._oscillator.type = oscType
+		// this._oscillator.type = oscType
 		this._oscillator.frequency.value = midiNoteToFrequency(note)
 
 		this.playStartTime = this._audioContext.currentTime
@@ -181,13 +177,66 @@ class Voice {
 		this.playingNote = -1
 	}
 
-	public setOscillatorType = (oscType: OscillatorType) => {
-		if (this._oscillator.type !== oscType) {
-			this._oscillator.type = oscType
+	public setOscillatorType = (newOscType: ShamuOscillatorType) => {
+		if (this._oscillatorType !== newOscType) {
+			this._oscillatorType = newOscType
+
+			if (newOscType in BuiltInOscillatorType) {
+				this._oscillator.type = newOscType as OscillatorType
+			} else {
+				this._deleteChain()
+				this._buildChain()
+			}
 		}
 	}
 
 	public dispose = () => {
+		this._deleteChain()
+	}
+
+	private _buildChain() {
+		this._oscillator = this._audioContext.createOscillator()
+		if (this._oscillatorType === CustomOscillatorType.noise) {
+			this._buildNoiseChain()
+		} else {
+			this._buildNormalChain()
+		}
+	}
+
+	private _buildNoiseChain() {
+		const bufferSize = 2 * this._audioContext.sampleRate
+		const noiseBuffer = this._audioContext.createBuffer(1, bufferSize, this._audioContext.sampleRate)
+		const output = noiseBuffer.getChannelData(0)
+
+		for (let i = 0; i < bufferSize; i++) {
+			output[i] = Math.random() * 2 - 1
+		}
+
+		const whiteNoise = this._audioContext.createBufferSource()
+		whiteNoise.buffer = noiseBuffer
+		whiteNoise.loop = true
+		whiteNoise.start(0)
+
+		this._gain = this._audioContext.createGain()
+		this._gain.gain.setValueAtTime(0, this._audioContext.currentTime)
+
+		whiteNoise.connect(this._gain)
+			.connect(this._destination)
+	}
+
+	private _buildNormalChain() {
+		this._oscillator.start()
+		this._oscillator.type = this._oscillatorType as OscillatorType
+		this._oscillator.frequency.setValueAtTime(0, this._audioContext.currentTime)
+
+		this._gain = this._audioContext.createGain()
+		this._gain.gain.setValueAtTime(0, this._audioContext.currentTime)
+
+		this._oscillator.connect(this._gain)
+			.connect(this._destination)
+	}
+
+	private _deleteChain() {
 		this._oscillator.stop()
 		this._oscillator.disconnect()
 		delete this._oscillator
@@ -204,4 +253,17 @@ class Voice {
 			gain.cancelScheduledValues(this._audioContext.currentTime)
 		}
 	}
+}
+
+export type ShamuOscillatorType = BuiltInOscillatorType | CustomOscillatorType.noise
+
+export enum BuiltInOscillatorType {
+	sine = 'sine',
+	square = 'square',
+	sawtooth = 'sawtooth',
+	triangle = 'triangle',
+}
+
+export enum CustomOscillatorType {
+	noise = 'noise',
 }

@@ -14,6 +14,8 @@ const port = 80
 
 export let socket
 
+export type ClientId = string
+
 export function setupWebsocketAndListeners(store: Store) {
 	socket = io.connect(window.location.hostname + `:${port}/`)
 
