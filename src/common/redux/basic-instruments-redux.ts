@@ -83,7 +83,8 @@ export interface IBasicInstrumentState {
 }
 
 export class BasicInstrumentState implements IBasicInstrumentState {
-	public oscillatorType: OscillatorType = pickRandomArrayElement(['sine', 'sawtooth', 'square']) as OscillatorType
+	public oscillatorType: ShamuOscillatorType
+		= pickRandomArrayElement(['sine', 'sawtooth', 'square', 'triangle']) as ShamuOscillatorType
 	public id = uuid.v4()
 	public ownerId: string
 	public pan: number = Math.random() - 0.5
