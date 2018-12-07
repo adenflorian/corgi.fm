@@ -1,6 +1,6 @@
 import {AnyAction} from 'redux'
 import * as uuid from 'uuid'
-import {ShamuOscillatorType} from '../../client/Instruments/BasicInstrument'
+import {ShamuOscillatorType} from '../../client/Instruments/OscillatorTypes'
 import {ClientId} from '../../client/websocket-listeners'
 import {pickRandomArrayElement} from '../common-utils'
 import {IAppState} from './configureStore'

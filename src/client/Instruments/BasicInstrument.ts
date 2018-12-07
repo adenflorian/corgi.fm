@@ -1,6 +1,7 @@
 import {IMidiNote} from '../../common/MidiNote'
 import {Arp} from '../arp'
 import {getFrequencyUsingHalfStepsFromA4} from '../music/music-functions'
+import {BuiltInOscillatorType, CustomOscillatorType, ShamuOscillatorType} from './OscillatorTypes'
 
 export interface IBasicInstrumentOptions {
 	destination: any
@@ -268,17 +269,4 @@ class Voice {
 			gain.cancelScheduledValues(this._audioContext.currentTime)
 		}
 	}
-}
-
-export type ShamuOscillatorType = BuiltInOscillatorType | CustomOscillatorType.noise
-
-export enum BuiltInOscillatorType {
-	sine = 'sine',
-	square = 'square',
-	sawtooth = 'sawtooth',
-	triangle = 'triangle',
-}
-
-export enum CustomOscillatorType {
-	noise = 'noise',
 }
