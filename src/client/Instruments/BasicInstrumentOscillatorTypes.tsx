@@ -1,6 +1,7 @@
 import * as React from 'react'
 import ReactSVG from 'react-svg'
 import {ShamuOscillatorType} from './BasicInstrument'
+import NoiseWave from './NoiseWave.svg'
 import SawWave from './SawWave.svg'
 import SineWave from './SineWave.svg'
 import SquareWave from './SquareWave.svg'
@@ -16,7 +17,7 @@ const oscillatorTypes = [
 	{type: 'triangle', svgPath: TriangleWave},
 	{type: 'sawtooth', svgPath: SawWave},
 	{type: 'square', svgPath: SquareWave},
-	{type: 'noise', svgPath: SquareWave},
+	{type: 'noise', svgPath: NoiseWave},
 ]
 
 export class BasicInstrumentOscillatorTypes extends React.PureComponent<IBasicInstrumentOscillatorTypesProps> {
