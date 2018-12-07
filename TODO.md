@@ -38,11 +38,12 @@
 - [ ] different filter types
 - [ ] arp
 - [ ] keyboard keys to adjust synth params
-- [...] noise wave type
+- [√] noise wave type
 	- https://noisehack.com/generate-noise-web-audio-api
 - [ ] LFO
 - [ ] make a simple version that's just keyboards, or a single keyboard
 - [ ] op1 arp sequencer thing
+- [ ] have a midi library
 
 # Keyboard
 - [ ] do something to visualize external midi keyboard notes
