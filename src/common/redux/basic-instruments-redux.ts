@@ -1,5 +1,6 @@
 import {AnyAction} from 'redux'
 import * as uuid from 'uuid'
+import {ShamuOscillatorType} from '../../client/Instruments/OscillatorTypes'
 import {ClientId} from '../../client/websocket-listeners'
 import {pickRandomArrayElement} from '../common-utils'
 import {IAppState} from './configureStore'
@@ -30,7 +31,7 @@ export const updateBasicInstruments = (instruments: IBasicInstruments) => ({
 
 export const SET_BASIC_INSTRUMENT_OSCILLATOR_TYPE = 'SET_BASIC_INSTRUMENT_OSCILLATOR_TYPE'
 export const setBasicInstrumentOscillatorType =
-	(id: string, oscillatorType: OscillatorType) => ({
+	(id: string, oscillatorType: ShamuOscillatorType) => ({
 		type: SET_BASIC_INSTRUMENT_OSCILLATOR_TYPE,
 		id,
 		oscillatorType,
@@ -72,7 +73,7 @@ export interface IBasicInstruments {
 }
 
 export interface IBasicInstrumentState {
-	oscillatorType: OscillatorType
+	oscillatorType: ShamuOscillatorType
 	id: string
 	ownerId: ClientId
 	pan: number
@@ -82,7 +83,8 @@ export interface IBasicInstrumentState {
 }
 
 export class BasicInstrumentState implements IBasicInstrumentState {
-	public oscillatorType: OscillatorType = pickRandomArrayElement(['sine', 'sawtooth', 'square']) as OscillatorType
+	public oscillatorType: ShamuOscillatorType
+		= pickRandomArrayElement(['sine', 'sawtooth', 'square', 'triangle']) as ShamuOscillatorType
 	public id = uuid.v4()
 	public ownerId: string
 	public pan: number = Math.random() - 0.5

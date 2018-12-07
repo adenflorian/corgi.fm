@@ -1,6 +1,5 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
-import ReactSVG from 'react-svg'
 import {Dispatch} from 'redux'
 import {IMidiNote} from '../../common/MidiNote'
 import {
@@ -12,12 +11,9 @@ import {
 } from '../../common/redux/connections-redux'
 import {Knob} from '../Knob/Knob'
 import {audioContext, preFx} from '../setup-audio-context'
-import {BasicInstrument} from './BasicInstrument'
+import {BasicInstrument, ShamuOscillatorType} from './BasicInstrument'
+import {BasicInstrumentOscillatorTypes} from './BasicInstrumentOscillatorTypes'
 import './BasicInstrumentView.less'
-import SawWave from './SawWave.svg'
-import SineWave from './SineWave.svg'
-import SquareWave from './SquareWave.svg'
-import TriangleWave from './TriangleWave.svg'
 
 export type MidiNotes = IMidiNote[]
 
@@ -26,20 +22,13 @@ interface IBasicInstrumentViewProps {
 	rawMidiNotes: MidiNotes
 	pan: number
 	isPlaying: boolean
-	oscillatorType: OscillatorType
+	oscillatorType: ShamuOscillatorType
 	dispatch?: Dispatch
 	lowPassFilterCutoffFrequency: number
 	attack: number
 	release: number
 	id: string
 }
-
-const oscillatorTypes = [
-	{type: 'sine', svgPath: SineWave},
-	{type: 'triangle', svgPath: TriangleWave},
-	{type: 'sawtooth', svgPath: SawWave},
-	{type: 'square', svgPath: SquareWave},
-]
 
 export class BasicInstrumentView extends React.PureComponent<IBasicInstrumentViewProps> {
 	public static defaultProps = {
@@ -133,37 +122,13 @@ export class BasicInstrumentView extends React.PureComponent<IBasicInstrumentVie
 		)
 	}
 
-	private _handleOscillatorTypeClicked = (type: OscillatorType) => {
+	private _handleOscillatorTypeClicked = (type: ShamuOscillatorType) => {
 		this.props.dispatch(setBasicInstrumentOscillatorType(this.props.id, type))
 	}
 
 	private _dispatchChangeInstrumentParam = (value: any, paramType: BasicInstrumentParam) => {
 		this.props.dispatch(
 			setBasicInstrumentParam(this.props.id, paramType, value),
-		)
-	}
-}
-
-interface IBasicInstrumentOscillatorTypesProps {
-	handleClick: (type: OscillatorType) => void
-	activeType: OscillatorType
-}
-
-class BasicInstrumentOscillatorTypes extends React.PureComponent<IBasicInstrumentOscillatorTypesProps> {
-	public render() {
-		const {activeType, handleClick} = this.props
-
-		return (
-			<div className="oscillatorTypes">
-				{oscillatorTypes.map(({type, svgPath}) =>
-					<div key={type} onClick={handleClick.bind(undefined, type)}>
-						<ReactSVG
-							path={svgPath}
-							className={activeType === type ? 'active colorize' : undefined}
-						/>
-					</div>,
-				)}
-			</div>
 		)
 	}
 }

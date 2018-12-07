@@ -1,3 +1,4 @@
+# TODO
 - [√] only left click to play note
 - [√] put z and x markings for octave
 - [√] don't show keyboard letters on the track or remote keyboards
@@ -20,7 +21,7 @@
 - [ ] maybe use automerge? https://github.com/automerge/automerge
 - [ ] options view
 - [√] maybe use requestAnimationFrame()
-- [ ] make use of `'` and `[` keys
+- [ ] make use of `'` key
 - [ ] add `+` and `-` for octave
 - [√] persist keyboard state on server, and don't store notes and octaves on clients
 - [ ] TONE.js
@@ -35,7 +36,14 @@
 - [ ] Automation
 - [√] triangle wave
 - [ ] different filter types
-- [ ] arps
+- [ ] arp
+- [ ] keyboard keys to adjust synth params
+- [√] noise wave type
+	- https://noisehack.com/generate-noise-web-audio-api
+- [ ] LFO
+- [ ] make a simple version that's just keyboards, or a single keyboard
+- [ ] op1 arp sequencer thing
+- [ ] have a midi library
 
 # Keyboard
 - [ ] do something to visualize external midi keyboard notes
@@ -45,6 +53,8 @@
 	- like a pan knob, when centered should have no arc, and arc can go left or right from center
 
 # Track
+- [ ] make size adjustable
+	- drop down with size options?
 
 ## Track Scroll Bar
 - [ ] make slider stay with mouse 1:1

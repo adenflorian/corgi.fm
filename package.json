@@ -1,6 +1,6 @@
 {
   "name": "sha-mu",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "main": "server.js",
   "license": "UNLICENSED",
   "scripts": {
