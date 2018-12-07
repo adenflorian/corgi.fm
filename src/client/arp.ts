@@ -1,4 +1,3 @@
-import {logger} from '../common/logger'
 import {IMidiNote} from '../common/MidiNote'
 
 export class Arp {

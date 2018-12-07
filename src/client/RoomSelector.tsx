@@ -2,8 +2,9 @@ import * as React from 'react'
 import {Component} from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
+import {logger} from '../common/logger'
 import {IAppState} from '../common/redux/configureStore'
-import {changeRoom, selectActiveRoom, selectAllRooms} from '../common/redux/rooms-redux'
+import {changeRoom, createRoom, selectActiveRoom, selectAllRooms} from '../common/redux/rooms-redux'
 
 interface IRoomSelectorProps {
 	activeRoom?: string
@@ -22,10 +23,15 @@ export class RoomSelector extends Component<IRoomSelectorProps> {
 
 		return (
 			<div id="roomSelector">
-				<label htmlFor="roomSelect">Room </label>
-				<select name="roomSelect" value={activeRoom} onChange={this.onRoomSelect} >
-					{rooms.map(room => <option key={room}>{room}</option>)}
-				</select>
+				<div>
+					<label htmlFor="roomSelect">Room </label>
+					<select name="roomSelect" value={activeRoom} onChange={this.onRoomSelect} >
+						{rooms.map(room => <option key={room}>{room}</option>)}
+					</select>
+				</div>
+				<div>
+					<button id="newRoomButton" onClick={this.onNewRoomButtonClick}>New Room</button>
+				</div>
 			</div>
 		)
 	}
@@ -36,6 +42,11 @@ export class RoomSelector extends Component<IRoomSelectorProps> {
 		if (newRoom !== this.props.activeRoom) {
 			this.props.dispatch(changeRoom(newRoom))
 		}
+	}
+
+	private onNewRoomButtonClick = () => {
+		logger.log('new room')
+		this.props.dispatch(createRoom())
 	}
 }
 

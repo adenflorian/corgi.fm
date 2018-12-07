@@ -2,12 +2,6 @@ import {Action} from 'redux'
 import {IAppState} from './configureStore'
 import {createReducer, SERVER_ACTION} from './redux-utils'
 
-export const ADD_ROOM = 'ADD_ROOM'
-export const addRoom = (room: string) => ({
-	type: ADD_ROOM,
-	room,
-})
-
 export const SET_ROOMS = 'SET_ROOMS'
 export const setRooms = (rooms: string[]) => ({
 	type: SET_ROOMS,
@@ -25,6 +19,13 @@ export const changeRoom = room => ({
 	type: CHANGE_ROOM,
 	SERVER_ACTION,
 	room,
+})
+
+export const CREATE_ROOM = 'CREATE_ROOM'
+export const createRoom = (name?: string) => ({
+	type: CREATE_ROOM,
+	SERVER_ACTION,
+	name,
 })
 
 export interface IRoomsState {
@@ -47,7 +48,7 @@ const roomsOtherReducer = createReducer({},
 
 const roomsArrayReducer = createReducer([],
 	{
-		[ADD_ROOM]: (state: string[], {room}) => state.concat(room),
+		[CREATE_ROOM]: (state: string[], {name}) => state.concat(name),
 		[SET_ROOMS]: (_, {rooms}) => rooms,
 	},
 )

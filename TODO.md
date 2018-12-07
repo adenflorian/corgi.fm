@@ -44,6 +44,8 @@
 - [ ] make a simple version that's just keyboards, or a single keyboard
 - [ ] op1 arp sequencer thing
 - [ ] have a midi library
+- [ ] mute audio on join and show popup letting know user that it might be loud
+- [ ] let players send hearts and claps and stuff to show that they like what the person is playing
 
 # Keyboard
 - [ ] do something to visualize external midi keyboard notes
@@ -66,8 +68,13 @@
 
 Scenario: User opens shamu
 
-
-switch rooms
-create rooms
-default room?
-single default room or make more automatically?
+# Rooms
+- [√] switch rooms
+- [ ] create rooms
+	- [ ] redux
+	- [ ] 
+- [ ] delete empty rooms when last user leaves or after timer
+- [ ] join room by url
+- [ ] create more rooms automatically when lobby is full
+- [ ] observers (users who can join room but not play)
+	- permissions system

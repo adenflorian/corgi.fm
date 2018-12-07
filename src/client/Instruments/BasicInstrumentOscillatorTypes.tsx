@@ -1,7 +1,7 @@
 import * as React from 'react'
 import ReactSVG from 'react-svg'
-import {ShamuOscillatorType} from './BasicInstrument'
 import NoiseWave from './NoiseWave.svg'
+import {ShamuOscillatorType} from './OscillatorTypes'
 import SawWave from './SawWave.svg'
 import SineWave from './SineWave.svg'
 import SquareWave from './SquareWave.svg'

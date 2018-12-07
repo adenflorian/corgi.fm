@@ -11,9 +11,10 @@ import {
 } from '../../common/redux/connections-redux'
 import {Knob} from '../Knob/Knob'
 import {audioContext, preFx} from '../setup-audio-context'
-import {BasicInstrument, ShamuOscillatorType} from './BasicInstrument'
+import {BasicInstrument} from './BasicInstrument'
 import {BasicInstrumentOscillatorTypes} from './BasicInstrumentOscillatorTypes'
 import './BasicInstrumentView.less'
+import {ShamuOscillatorType} from './OscillatorTypes'
 
 export type MidiNotes = IMidiNote[]
 
