@@ -41,7 +41,8 @@ export function setupWebsocketAndListeners(store: Store) {
 
 	socket.on(WebSocketEvent.broadcast, (action: BroadcastAction) => {
 		if (action.type !== 'SET_CLIENT_POINTER') {
-			logger.debug('Received broadcast: ', action)
+			logger.log('Received broadcast: ', action.type)
+			logger.debug(action)
 		}
 		store.dispatch({...action, alreadyBroadcasted: true})
 	})
