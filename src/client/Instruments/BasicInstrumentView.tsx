@@ -1,6 +1,7 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
+import {logger} from '../../common/logger'
 import {IMidiNote} from '../../common/MidiNote'
 import {
 	BasicInstrumentParam, selectInstrument, setBasicInstrumentOscillatorType, setBasicInstrumentParam,
@@ -42,16 +43,18 @@ export class BasicInstrumentView extends React.PureComponent<IBasicInstrumentVie
 
 	constructor(props: IBasicInstrumentViewProps) {
 		super(props)
-		this.instrument = new BasicInstrument({
-			audioContext,
-			destination: preFx,
-			voiceCount: 9,
-			oscillatorType: props.oscillatorType,
-		})
-		this.instrument.setPan(props.pan)
+		this._makeInstrument(props)
+	}
+
+	public componentDidUpdate(prevProps: IBasicInstrumentViewProps) {
+		if (prevProps.id !== this.props.id) {
+			this.instrument.dispose()
+			this._makeInstrument(this.props)
+		}
 	}
 
 	public componentWillUnmount() {
+		logger.log('BasicInstrumentView.componentWillUnmount')
 		this.instrument.dispose()
 	}
 
@@ -121,6 +124,16 @@ export class BasicInstrumentView extends React.PureComponent<IBasicInstrumentVie
 				</div >
 			</div>
 		)
+	}
+
+	private _makeInstrument = (props: IBasicInstrumentViewProps) => {
+		this.instrument = new BasicInstrument({
+			audioContext,
+			destination: preFx,
+			voiceCount: 9,
+			oscillatorType: props.oscillatorType,
+		})
+		this.instrument.setPan(props.pan)
 	}
 
 	private _handleOscillatorTypeClicked = (type: ShamuOscillatorType) => {

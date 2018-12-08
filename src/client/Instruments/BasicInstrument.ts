@@ -76,7 +76,16 @@ export class BasicInstrument {
 		}
 	}
 
-	public dispose = () => undefined
+	public dispose = () => {
+		this._panNode.disconnect()
+		delete this._panNode
+		this._gain.disconnect()
+		delete this._gain
+		this._lowPassFilter.disconnect()
+		delete this._lowPassFilter
+		this._voices.dispose()
+		this._arp.dispose()
+	}
 
 	private _setMidiNotesFromArp = (midiNotes: IMidiNote[]) => {
 		const newNotes = midiNotes.filter(x => this._previousNotes.includes(x) === false)
@@ -130,6 +139,10 @@ class Voices {
 
 	public setOscillatorType(type: ShamuOscillatorType) {
 		this._availableVoices.forEach(x => x.setOscillatorType(type))
+	}
+
+	public dispose() {
+		this._availableVoices.forEach(x => x.dispose())
 	}
 
 	private _getVoice(): Voice {

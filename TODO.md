@@ -73,7 +73,7 @@ Scenario: User opens shamu
 - [√] create rooms
 - [√] lobby
 - [√] put user in new room when they click new room button
-- [ ] BUG: If user is holding down a note key when they change rooms the notes keep lplaying and you cant stop it
+- [√] BUG: If user is holding down a note key when they change rooms the notes keep playing and you cant stop it
 - [ ] delete empty rooms when last user leaves or after timer
 - [ ] choose name for room at creation
 - [ ] rename existing rooms

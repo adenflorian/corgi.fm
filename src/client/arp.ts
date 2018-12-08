@@ -20,6 +20,8 @@ export class Arp {
 		requestAnimationFrame(this._loop)
 	}
 
+	public dispose = () => undefined
+
 	private _setStartTime() {
 		this._startTime = performance.now()
 	}
