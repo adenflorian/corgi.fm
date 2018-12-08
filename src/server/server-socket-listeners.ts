@@ -72,6 +72,8 @@ export function setupServerWebSocketListeners(io: Server, serverStore: Store) {
 							alreadyBroadcasted: true,
 							source: server,
 						})
+
+						changeRooms(newRoomName)
 					}
 				}
 			})
