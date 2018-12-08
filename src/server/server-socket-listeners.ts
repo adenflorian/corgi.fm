@@ -26,22 +26,13 @@ import {BroadcastAction} from '../common/redux/websocket-client-sender-middlewar
 import {WebSocketEvent} from '../common/server-constants'
 import {createServerStuff} from './create-server-stuff'
 
-// const defaultRoom = 'lobby'
-export const roomA = 'A'
-export const roomB = 'B'
-
-let flag = false
+export const lobby = 'lobby'
 
 export function setupServerWebSocketListeners(io: Server, serverStore: Store) {
-
 	io.on('connection', socket => {
 		logger.log('new connection | ', socket.id)
 
-		flag = !flag
-
-		const roomToJoin = flag ? roomA : roomB
-
-		socket.join(roomToJoin, err => {
+		socket.join(lobby, err => {
 			if (err) throw new Error(err)
 
 			onJoinRoom(io, socket, selectRoomStoreByName(serverStore.getState(), getRoom(socket)),
