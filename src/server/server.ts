@@ -2,7 +2,6 @@ import * as express from 'express'
 import * as http from 'http'
 import * as socketIO from 'socket.io'
 import {logger} from '../common/logger'
-import {selectRoomStoreByName} from '../common/redux/room-stores-redux'
 import {createRoom} from '../common/redux/rooms-redux'
 import {configureServerStore} from './configure-server-store'
 import {createServerStuff} from './create-server-stuff'
@@ -13,7 +12,7 @@ const serverStore = configureServerStore()
 
 serverStore.dispatch(createRoom(lobby))
 
-createServerStuff(selectRoomStoreByName(serverStore.getState(), lobby).dispatch)
+createServerStuff(lobby, serverStore)
 
 const app: express.Application = express()
 const server: http.Server = new http.Server(app)
@@ -27,4 +26,4 @@ const port = 80
 
 server.listen(port)
 
-logger.log('shamu server listening on port', port)
+logger.log('shamu server listening on port ' + port)

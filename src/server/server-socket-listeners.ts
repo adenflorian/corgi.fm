@@ -14,9 +14,12 @@ import {
 	deleteConnections, selectAllConnections, selectConnectionsWithSourceOrTargetIds, updateConnections,
 } from '../common/redux/connections-redux'
 import {BROADCASTER_ACTION} from '../common/redux/redux-utils'
-import {selectAllRoomStores, selectAllRoomStoresAsArray, selectRoomStoreByName} from '../common/redux/room-stores-redux'
 import {
-	CHANGE_ROOM, CREATE_ROOM, createRoom, selectAllRooms, setActiveRoom, setRooms,
+	roomAction, selectAllRoomNames, selectAllRoomStates,
+	selectAllRoomStatesAsArray, selectRoomExists, selectRoomStateByName,
+} from '../common/redux/room-stores-redux'
+import {
+	CHANGE_ROOM, CREATE_ROOM, createRoom, deleteRoom, selectAllRooms, setActiveRoom, setRooms,
 } from '../common/redux/rooms-redux'
 import {selectAllTracks, updateTracks} from '../common/redux/tracks-redux'
 import {
@@ -24,18 +27,41 @@ import {
 } from '../common/redux/virtual-keyboard-redux'
 import {BroadcastAction} from '../common/redux/websocket-client-sender-middleware'
 import {WebSocketEvent} from '../common/server-constants'
+import {IServerState} from './configure-server-store'
 import {createServerStuff} from './create-server-stuff'
 
 export const lobby = 'lobby'
 
+const server = 'server'
+
 export function setupServerWebSocketListeners(io: Server, serverStore: Store) {
+	setInterval(() => {
+		const ioRoomNames = Object.keys(io.sockets.adapter.rooms)
+
+		const reduxRooms = selectAllRoomNames(serverStore.getState())
+
+		const emptyRooms = reduxRooms.filter(x => ioRoomNames.includes(x) === false && x !== lobby)
+
+		emptyRooms.forEach(x => serverStore.dispatch(deleteRoom(x)))
+
+		if (emptyRooms.length > 0) {
+			logger.log('deleting empty rooms: ', emptyRooms)
+
+			io.local.emit(WebSocketEvent.broadcast, {
+				...setRooms(selectAllRooms(serverStore.getState())),
+				alreadyBroadcasted: true,
+				source: 'server',
+			})
+		}
+	}, 5000)
+
 	io.on('connection', socket => {
 		logger.log('new connection | ', socket.id)
 
 		socket.join(lobby, err => {
 			if (err) throw new Error(err)
 
-			onJoinRoom(io, socket, selectRoomStoreByName(serverStore.getState(), getRoom(socket)),
+			onJoinRoom(io, socket, getRoom(socket),
 				serverStore, new ClientState(socket.id))
 
 			socket.on(WebSocketEvent.broadcast, (action: BroadcastAction) => {
@@ -43,121 +69,132 @@ export function setupServerWebSocketListeners(io: Server, serverStore: Store) {
 					logger.debug(`${WebSocketEvent.broadcast}: ${socket.id} | `, action)
 				}
 				if (action[BROADCASTER_ACTION]) {
-					selectRoomStoreByName(serverStore.getState(), getRoom(socket)).dispatch(action)
+					serverStore.dispatch(roomAction(action, getRoom(socket)))
 				}
 				socket.broadcast.to(getRoom(socket)).emit(WebSocketEvent.broadcast, {...action, alreadyBroadcasted: true})
 			})
 
 			socket.on(WebSocketEvent.serverAction, (action: AnyAction) => {
 				logger.debug(`${WebSocketEvent.serverAction}: ${socket.id} | `, action)
-				selectRoomStoreByName(serverStore.getState(), getRoom(socket)).dispatch(action)
+
+				serverStore.dispatch(roomAction(action, getRoom(socket)))
 
 				if (action.type === CHANGE_ROOM) {
 					changeRooms(action.room)
 				}
 
 				if (action.type === CREATE_ROOM) {
-					const newRoomName = animal.getId()
-
-					const existingRoomNames = selectAllRooms(serverStore.getState())
-
-					if (existingRoomNames.includes(newRoomName)) {
-						changeRooms(newRoomName)
-					} else {
-						serverStore.dispatch(createRoom(newRoomName))
-						createServerStuff(selectRoomStoreByName(serverStore.getState(), newRoomName).dispatch)
-
-						io.local.emit(WebSocketEvent.broadcast, {
-							...setRooms(selectAllRooms(serverStore.getState())),
-							alreadyBroadcasted: true,
-							source: server,
-						})
-
-						changeRooms(newRoomName)
-					}
+					makeAndJoinNewRoom(animal.getId())
 				}
 			})
-
-			function changeRooms(newRoom: string) {
-				const roomToLeave = getRoom(socket)
-
-				if (roomToLeave === newRoom) return
-
-				const client = selectClientBySocketId(
-					selectRoomStoreByName(serverStore.getState(), roomToLeave).getState(), socket.id,
-				)
-
-				socket.leave(roomToLeave)
-
-				onLeaveRoom(io, socket, selectRoomStoreByName(serverStore.getState(), roomToLeave), roomToLeave)
-
-				socket.join(newRoom, err2 => {
-					if (err2) throw new Error(err2)
-
-					onJoinRoom(io, socket, selectRoomStoreByName(serverStore.getState(), newRoom), serverStore, client)
-				})
-			}
 
 			socket.on('disconnect', () => {
 				logger.log(`client disconnected: ${socket.id}`)
 
 				const serverState = serverStore.getState()
-				const roomStores = selectAllRoomStores(serverState)
-				const roomStoresArray: Store[] = selectAllRoomStoresAsArray(serverState)
+				const roomStates = selectAllRoomStates(serverState)
+				const roomStoresArray = selectAllRoomStatesAsArray(serverState)
 
 				const roomStoreIndex = roomStoresArray
-					.findIndex(x => selectAllClients(x.getState()).some(y => y.socketId === socket.id))
+					.findIndex(x => selectAllClients(x).some(y => y.socketId === socket.id))
 
 				onLeaveRoom(
-					io, socket, roomStores[Object.keys(roomStores)[roomStoreIndex]], Object.keys(roomStores)[roomStoreIndex])
+					io, socket, Object.keys(roomStates)[roomStoreIndex], serverStore,
+				)
 
 				logger.log(`done cleaning: ${socket.id}`)
 			})
 		})
+
+		function changeRooms(newRoom: string) {
+			const roomToLeave = getRoom(socket)
+
+			if (roomToLeave === newRoom) return
+
+			const client = selectClientBySocketId(
+				selectRoomStateByName(serverStore.getState(), roomToLeave), socket.id,
+			)
+
+			socket.leave(roomToLeave)
+
+			onLeaveRoom(io, socket, roomToLeave, serverStore)
+
+			socket.join(newRoom, err => {
+				if (err) throw new Error(err)
+
+				const roomExists = selectRoomExists(serverStore.getState(), newRoom)
+
+				// Do this check after joining the socket to the room, that way the room can't get deleted anymore
+				if (roomExists === false) {
+					makeNewRoom(newRoom)
+				}
+
+				onJoinRoom(io, socket, newRoom, serverStore, client)
+			})
+		}
+
+		function makeAndJoinNewRoom(newRoomName: string) {
+			if (selectRoomExists(serverStore.getState(), newRoomName) === false) {
+				makeNewRoom(newRoomName)
+			}
+
+			changeRooms(newRoomName)
+		}
+
+		function makeNewRoom(newRoomName: string) {
+			if (selectRoomExists(serverStore.getState(), newRoomName)) {
+				throw new Error(`room exists, this shouldn't happen`)
+			} else {
+				serverStore.dispatch(createRoom(newRoomName))
+				createServerStuff(newRoomName, serverStore)
+
+				io.local.emit(WebSocketEvent.broadcast, {
+					...setRooms(selectAllRooms(serverStore.getState())),
+					alreadyBroadcasted: true,
+					source: server,
+				})
+			}
+		}
 	})
 }
 
-const server = 'server'
-
-function onJoinRoom(io, socket, roomStore, serverStore, client: IClientState) {
-	syncState(socket, roomStore, serverStore, getRoom(socket))
+function onJoinRoom(io, socket, room: string, serverStore: Store, client: IClientState) {
+	syncState(socket, selectRoomStateByName(serverStore.getState(), room), serverStore.getState(), getRoom(socket))
 
 	const addClientAction = addClient(client)
-	roomStore.dispatch(addClientAction)
+	serverStore.dispatch(roomAction(addClientAction, room))
 	io.to(getRoom(socket)).emit(WebSocketEvent.broadcast, addClientAction)
 }
 
-function onLeaveRoom(io, socket, roomStore, roomToLeave) {
-	const state: IAppState = roomStore.getState()
-	const clientId = selectClientBySocketId(state, socket.id).id
+function onLeaveRoom(io, socket, roomToLeave: string, serverStore: Store) {
+	const roomState: IAppState = selectRoomStateByName(serverStore.getState(), roomToLeave)
+	const clientId = selectClientBySocketId(roomState, socket.id).id
 
 	const clientDisconnectedAction = clientDisconnected(clientId)
-	roomStore.dispatch(clientDisconnectedAction)
+	serverStore.dispatch(roomAction(clientDisconnectedAction, roomToLeave))
 	io.to(roomToLeave).emit(WebSocketEvent.broadcast, clientDisconnectedAction)
 
-	const instrumentIdsToDelete = selectInstrumentsByOwner(state, clientId).map(x => x.id)
-	const keyboardIdsToDelete = selectVirtualKeyboardsByOwner(state, clientId).map(x => x.id)
+	const instrumentIdsToDelete = selectInstrumentsByOwner(roomState, clientId).map(x => x.id)
+	const keyboardIdsToDelete = selectVirtualKeyboardsByOwner(roomState, clientId).map(x => x.id)
 
 	const sourceAndTargetIds = instrumentIdsToDelete.concat(keyboardIdsToDelete)
-	const connectionIdsToDelete = selectConnectionsWithSourceOrTargetIds(state, sourceAndTargetIds).map(x => x.id)
+	const connectionIdsToDelete = selectConnectionsWithSourceOrTargetIds(roomState, sourceAndTargetIds).map(x => x.id)
 	const deleteConnectionsAction = deleteConnections(connectionIdsToDelete)
-	roomStore.dispatch(deleteConnectionsAction)
+	serverStore.dispatch(roomAction(deleteConnectionsAction, roomToLeave))
 	io.to(roomToLeave).emit(WebSocketEvent.broadcast, deleteConnectionsAction)
 
 	const deleteBasicInstrumentsAction = deleteBasicInstruments(instrumentIdsToDelete)
-	roomStore.dispatch(deleteBasicInstrumentsAction)
+	serverStore.dispatch(roomAction(deleteBasicInstrumentsAction, roomToLeave))
 	io.to(roomToLeave).emit(WebSocketEvent.broadcast, deleteBasicInstrumentsAction)
 
 	const deleteVirtualKeyboardsAction = deleteVirtualKeyboards(keyboardIdsToDelete)
-	roomStore.dispatch(deleteVirtualKeyboardsAction)
+	serverStore.dispatch(roomAction(deleteVirtualKeyboardsAction, roomToLeave))
 	io.to(roomToLeave).emit(WebSocketEvent.broadcast, deleteVirtualKeyboardsAction)
 }
 
-function syncState(newClientSocket: Socket, store: Store, serverStore: Store, activeRoom: string) {
-	const state: IAppState = store.getState()
-
+function syncState(newClientSocket: Socket, roomState: IAppState, serverState: IServerState, activeRoom: string) {
 	newClientSocket.emit(WebSocketEvent.broadcast, {
-		...setRooms(selectAllRooms(serverStore.getState())),
+		...setRooms(selectAllRooms(serverState)),
 		alreadyBroadcasted: true,
 		source: server,
 	})
@@ -169,31 +206,31 @@ function syncState(newClientSocket: Socket, store: Store, serverStore: Store, ac
 	})
 
 	newClientSocket.emit(WebSocketEvent.broadcast, {
-		...setClients(selectAllClients(state)),
+		...setClients(selectAllClients(roomState)),
 		alreadyBroadcasted: true,
 		source: server,
 	})
 
 	newClientSocket.emit(WebSocketEvent.broadcast, {
-		...updateBasicInstruments(selectAllInstruments(state)),
+		...updateBasicInstruments(selectAllInstruments(roomState)),
 		alreadyBroadcasted: true,
 		source: server,
 	})
 
 	newClientSocket.emit(WebSocketEvent.broadcast, {
-		...updateVirtualKeyboards(selectAllVirtualKeyboards(state)),
+		...updateVirtualKeyboards(selectAllVirtualKeyboards(roomState)),
 		alreadyBroadcasted: true,
 		source: server,
 	})
 
 	newClientSocket.emit(WebSocketEvent.broadcast, {
-		...updateTracks(selectAllTracks(state)),
+		...updateTracks(selectAllTracks(roomState)),
 		alreadyBroadcasted: true,
 		source: server,
 	})
 
 	newClientSocket.emit(WebSocketEvent.broadcast, {
-		...updateConnections(selectAllConnections(state)),
+		...updateConnections(selectAllConnections(roomState)),
 		alreadyBroadcasted: true,
 		source: server,
 	})

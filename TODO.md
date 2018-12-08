@@ -65,8 +65,8 @@
 # References
 - https://github.com/grimmdude/MidiPlayerJS/blob/master/src/player.js
 
-
-Scenario: User opens shamu
+# BasicInstrument
+- [ ] voices still round robin, instead it should pick voices that aren't playing
 
 # Rooms
 - [√] switch rooms
@@ -74,7 +74,8 @@ Scenario: User opens shamu
 - [√] lobby
 - [√] put user in new room when they click new room button
 - [√] BUG: If user is holding down a note key when they change rooms the notes keep playing and you cant stop it
-- [ ] delete empty rooms when last user leaves or after timer
+- [√] handle user joining a room that doesn't exist
+- [√] delete empty rooms every 5 seconds
 - [ ] choose name for room at creation
 - [ ] rename existing rooms
 - [ ] room ownership

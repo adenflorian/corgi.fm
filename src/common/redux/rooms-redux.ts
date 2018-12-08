@@ -1,5 +1,5 @@
 import {Action} from 'redux'
-import {IAppState} from './configureStore'
+import {ICommonState} from './configureStore'
 import {createReducer, SERVER_ACTION} from './redux-utils'
 
 export const SET_ROOMS = 'SET_ROOMS'
@@ -28,6 +28,13 @@ export const createRoom = (name?: string) => ({
 	name,
 })
 
+export const DELETE_ROOM = 'DELETE_ROOM'
+export const deleteRoom = (name?: string) => ({
+	type: DELETE_ROOM,
+	SERVER_ACTION,
+	name,
+})
+
 export interface IRoomsState {
 	all: string[],
 	activeRoom: string
@@ -49,10 +56,11 @@ const roomsOtherReducer = createReducer({},
 const roomsArrayReducer = createReducer([],
 	{
 		[CREATE_ROOM]: (state: string[], {name}) => state.concat(name),
+		[DELETE_ROOM]: (state: string[], {name}) => state.filter(x => x !== name),
 		[SET_ROOMS]: (_, {rooms}) => rooms,
 	},
 )
 
-const selectRoomsState = (state: IAppState) => state.rooms
-export const selectAllRooms = (state: IAppState) => selectRoomsState(state).all
-export const selectActiveRoom = (state: IAppState) => selectRoomsState(state).activeRoom
+const selectRoomsState = (state: ICommonState) => state.rooms
+export const selectAllRooms = (state: ICommonState) => selectRoomsState(state).all
+export const selectActiveRoom = (state: ICommonState) => selectRoomsState(state).activeRoom
