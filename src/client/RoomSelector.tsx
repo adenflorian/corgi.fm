@@ -26,7 +26,7 @@ export class RoomSelector extends Component<IRoomSelectorProps> {
 				<div>
 					<label htmlFor="roomSelect">Room </label>
 					<select name="roomSelect" value={activeRoom} onChange={this.onRoomSelect} >
-						{rooms.map(room => <option key={room}>{room}</option>)}
+						{rooms.map(room => <option key={room || 'null'}>{room}</option>)}
 					</select>
 				</div>
 				<div>
