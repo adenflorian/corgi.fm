@@ -1266,13 +1266,13 @@ cli-width@^2.0.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/cli-width/-/cli-width-2.2.0.tgz#ff19ede8a9a5e579324147b0c11f0fbcbabed639"
 
+clone@2.1.1, clone@^2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/clone/-/clone-2.1.1.tgz#d217d1e961118e3ac9a4b8bba3285553bf647cdb"
+
 clone@^1.0.2:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/clone/-/clone-1.0.4.tgz#da309cc263df15994c688ca902179ca3c7cd7c7e"
-
-clone@^2.1.1:
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/clone/-/clone-2.1.1.tgz#d217d1e961118e3ac9a4b8bba3285553bf647cdb"
 
 clones@^1.1.0:
   version "1.1.0"
@@ -1402,10 +1402,6 @@ component-classes@^1.2.5:
   resolved "https://registry.yarnpkg.com/component-classes/-/component-classes-1.2.6.tgz#c642394c3618a4d8b0b8919efccbbd930e5cd691"
   dependencies:
     component-indexof "0.0.3"
-
-component-emitter@1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/component-emitter/-/component-emitter-1.2.0.tgz#ccd113a86388d06482d03de3fc7df98526ba8efe"
 
 component-emitter@1.2.1, component-emitter@^1.2.1:
   version "1.2.1"
@@ -1690,10 +1686,6 @@ currently-unhandled@^0.4.1:
   resolved "https://registry.yarnpkg.com/currently-unhandled/-/currently-unhandled-0.4.1.tgz#988df33feab191ef799a61369dd76c17adf957ea"
   dependencies:
     array-find-index "^1.0.1"
-
-cycle@1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/cycle/-/cycle-1.0.3.tgz#21e80b2be8580f98b468f379430662b046c34ad2"
 
 dashdash@^1.12.0:
   version "1.14.1"
@@ -3152,7 +3144,7 @@ js-yaml@~3.7.0:
     argparse "^1.0.7"
     esprima "^2.6.0"
 
-jsan@^3.1.3:
+jsan@^3.1.13, jsan@^3.1.5:
   version "3.1.13"
   resolved "https://registry.yarnpkg.com/jsan/-/jsan-3.1.13.tgz#4de8c7bf8d1cfcd020c313d438f930cec4b91d86"
 
@@ -3638,6 +3630,10 @@ nan@^2.0.7, nan@^2.9.2:
   version "2.10.0"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.10.0.tgz#96d0cd610ebd58d4b4de9cc0c6828cda99c7548f"
 
+nanoid@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-2.0.0.tgz#e1ab4a4b024a38d15531ba34a712a201540de639"
+
 nanomatch@^1.2.9:
   version "1.2.9"
   resolved "https://registry.yarnpkg.com/nanomatch/-/nanomatch-1.2.9.tgz#879f7150cb2dab7a471259066c104eee6e0fa7c2"
@@ -3931,10 +3927,6 @@ optionator@^0.8.1, optionator@^0.8.2:
     prelude-ls "~1.1.2"
     type-check "~0.3.2"
     wordwrap "~1.0.0"
-
-options@>=0.0.5:
-  version "0.0.6"
-  resolved "https://registry.yarnpkg.com/options/-/options-0.0.6.tgz#ec22d312806bb53e731773e7cdaefcf1c643128f"
 
 os-browserify@^0.3.0:
   version "0.3.0"
@@ -4895,7 +4887,7 @@ redux-devtools-extension@^2.13.7:
   version "2.13.7"
   resolved "https://registry.yarnpkg.com/redux-devtools-extension/-/redux-devtools-extension-2.13.7.tgz#14bd7a1a7c8bee7f397beb1116fd16fc9633b752"
 
-redux-devtools-instrument@^1.3.1:
+redux-devtools-instrument@^1.9.3:
   version "1.9.3"
   resolved "https://registry.yarnpkg.com/redux-devtools-instrument/-/redux-devtools-instrument-1.9.3.tgz#37b229f3a64a404d7d2c43489ef91cae8f712a4b"
   dependencies:
@@ -4958,22 +4950,32 @@ regjsparser@^0.1.4:
   dependencies:
     jsesc "~0.5.0"
 
-remote-redux-devtools@0.5.0:
-  version "0.5.0"
-  resolved "http://registry.npmjs.org/remote-redux-devtools/-/remote-redux-devtools-0.5.0.tgz#0f3ba21519f567d8c225a00076d5fa8a99cd0128"
+remote-redux-devtools@^0.5.14:
+  version "0.5.14"
+  resolved "https://registry.yarnpkg.com/remote-redux-devtools/-/remote-redux-devtools-0.5.14.tgz#a03e86dc94140fec595cf792f8e6a60b6b5a27ff"
   dependencies:
-    jsan "^3.1.3"
+    jsan "^3.1.13"
     querystring "^0.2.0"
-    redux-devtools-instrument "^1.3.1"
-    remotedev-utils "0.0.5"
-    socketcluster-client "4.3.19"
+    redux-devtools-instrument "^1.9.3"
+    remotedev-utils "^0.1.1"
+    rn-host-detect "^1.1.5"
+    socketcluster-client "^14.2.1"
 
-remotedev-utils@0.0.5:
-  version "0.0.5"
-  resolved "https://registry.yarnpkg.com/remotedev-utils/-/remotedev-utils-0.0.5.tgz#51816a7b856f3b5a161ac74bd91f6f00b2522c74"
+remotedev-serialize@^0.1.0:
+  version "0.1.6"
+  resolved "https://registry.yarnpkg.com/remotedev-serialize/-/remotedev-serialize-0.1.6.tgz#312e5f4f1520e28eb468898761b02b83eefc473b"
+  dependencies:
+    jsan "^3.1.13"
+
+remotedev-utils@^0.1.1:
+  version "0.1.4"
+  resolved "https://registry.yarnpkg.com/remotedev-utils/-/remotedev-utils-0.1.4.tgz#643700819a943678073c75eb185e81d96620b348"
   dependencies:
     get-params "^0.1.2"
+    jsan "^3.1.5"
     lodash "^4.0.0"
+    remotedev-serialize "^0.1.0"
+    shortid "^2.2.6"
 
 remove-trailing-separator@^1.0.1:
   version "1.1.0"
@@ -5067,6 +5069,10 @@ ripemd160@^2.0.0, ripemd160@^2.0.1:
     hash-base "^3.0.0"
     inherits "^2.0.1"
 
+rn-host-detect@^1.1.5:
+  version "1.1.5"
+  resolved "https://registry.yarnpkg.com/rn-host-detect/-/rn-host-detect-1.1.5.tgz#fbecb982b73932f34529e97932b9a63e58d8deb6"
+
 run-async@^2.2.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/run-async/-/run-async-2.3.0.tgz#0371ab4ae0bdd720d4166d7dfda64ff7a445a6c0"
@@ -5115,40 +5121,19 @@ sax@^1.2.4, sax@~1.2.1, sax@~1.2.4:
   version "1.2.4"
   resolved "https://registry.yarnpkg.com/sax/-/sax-1.2.4.tgz#2816234e2378bddc4e5354fab5caa895df7100d9"
 
-sc-channel@1.0.x:
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/sc-channel/-/sc-channel-1.0.6.tgz#b38bd47a993e78290fbc53467867f6b2a0a08639"
+sc-channel@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/sc-channel/-/sc-channel-1.2.0.tgz#d9209f3a91e3fa694c66b011ce55c4ad8c3087d9"
   dependencies:
-    sc-emitter "1.x.x"
+    component-emitter "1.2.1"
 
-sc-emitter@1.0.x:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/sc-emitter/-/sc-emitter-1.0.1.tgz#0fbf52950c9c6816235cec99544cec38a5010763"
-  dependencies:
-    component-emitter "1.2.0"
+sc-errors@^1.4.1:
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/sc-errors/-/sc-errors-1.4.1.tgz#53e80030fe647e133d73b51eaa7d2b0f7591fd5b"
 
-sc-emitter@1.x.x:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/sc-emitter/-/sc-emitter-1.1.0.tgz#ef119d4222f4c64f887b486964ef11116cdd0e75"
-  dependencies:
-    component-emitter "1.2.0"
-
-sc-errors@1.0.x:
-  version "1.0.6"
-  resolved "http://registry.npmjs.org/sc-errors/-/sc-errors-1.0.6.tgz#80e77c36348b2c88bbe7ead8dc63be61f34b7103"
-  dependencies:
-    cycle "1.0.3"
-
-sc-formatter@1.0.x:
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/sc-formatter/-/sc-formatter-1.0.4.tgz#a9f35b93731c8f84eba2e1fd928776a0afcbba4b"
-
-sc-ws@1.0.x:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/sc-ws/-/sc-ws-1.0.2.tgz#75c1c5151712f388482bffc00725cfb26e581fd8"
-  dependencies:
-    options ">=0.0.5"
-    ultron "1.0.x"
+sc-formatter@^3.0.1:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/sc-formatter/-/sc-formatter-3.0.2.tgz#9abdb14e71873ce7157714d3002477bbdb33c4e6"
 
 "semver@2 || 3 || 4 || 5", semver@5.*, semver@^5.0.1, semver@^5.1.0, semver@^5.3, semver@^5.3.0, semver@^5.4.1, semver@^5.5.0:
   version "5.5.0"
@@ -5273,6 +5258,12 @@ shimmer@^1.0.0, shimmer@^1.1.0, shimmer@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/shimmer/-/shimmer-1.2.0.tgz#f966f7555789763e74d8841193685a5e78736665"
 
+shortid@^2.2.6:
+  version "2.2.14"
+  resolved "https://registry.yarnpkg.com/shortid/-/shortid-2.2.14.tgz#80db6aafcbc3e3a46850b3c88d39e051b84c8d18"
+  dependencies:
+    nanoid "^2.0.0"
+
 sigmund@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/sigmund/-/sigmund-1.0.1.tgz#3ff21f198cad2175f9f3b781853fd94d0d19b590"
@@ -5366,17 +5357,20 @@ socket.io@^2.1.1:
     socket.io-client "2.1.1"
     socket.io-parser "~3.2.0"
 
-socketcluster-client@4.3.19:
-  version "4.3.19"
-  resolved "http://registry.npmjs.org/socketcluster-client/-/socketcluster-client-4.3.19.tgz#df247662e29eb54160c923f02eaf958394994cb5"
+socketcluster-client@^14.2.1:
+  version "14.2.1"
+  resolved "https://registry.yarnpkg.com/socketcluster-client/-/socketcluster-client-14.2.1.tgz#f5cc896fb713006deb2aea6727440c2bff5d43cb"
   dependencies:
     base-64 "0.1.0"
+    clone "2.1.1"
+    component-emitter "1.2.1"
     linked-list "0.1.0"
-    sc-channel "1.0.x"
-    sc-emitter "1.0.x"
-    sc-errors "1.0.x"
-    sc-formatter "1.0.x"
-    sc-ws "1.0.x"
+    querystring "0.2.0"
+    sc-channel "^1.2.0"
+    sc-errors "^1.4.1"
+    sc-formatter "^3.0.1"
+    uuid "3.2.1"
+    ws "5.1.1"
 
 sort-keys@^1.0.0:
   version "1.1.2"
@@ -5890,10 +5884,6 @@ uglify-es@^3.2.1, uglify-es@^3.3.9:
     commander "~2.13.0"
     source-map "~0.6.1"
 
-ultron@1.0.x:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/ultron/-/ultron-1.0.2.tgz#ace116ab557cd197386a4e88f4685378c8b2e4fa"
-
 ultron@~1.1.0:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/ultron/-/ultron-1.1.1.tgz#9fe1536a10a664a65266a1e3ccf85fd36302bc9c"
@@ -5985,7 +5975,7 @@ utils-merge@1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/utils-merge/-/utils-merge-1.0.1.tgz#9f95710f50a267947b2ccc124741c1028427e713"
 
-uuid@^3.0.1, uuid@^3.1.0:
+uuid@3.2.1, uuid@^3.0.1, uuid@^3.1.0:
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.2.1.tgz#12c528bb9d58d0b9265d9a2f6f0fe8be17ff1f14"
 
@@ -6091,6 +6081,12 @@ write@^0.2.1:
   resolved "https://registry.yarnpkg.com/write/-/write-0.2.1.tgz#5fc03828e264cea3fe91455476f7a3c566cb0757"
   dependencies:
     mkdirp "^0.5.1"
+
+ws@5.1.1:
+  version "5.1.1"
+  resolved "http://registry.npmjs.org/ws/-/ws-5.1.1.tgz#1d43704689711ac1942fd2f283e38f825c4b8b95"
+  dependencies:
+    async-limiter "~1.0.0"
 
 ws@^5.1.1:
   version "5.2.0"

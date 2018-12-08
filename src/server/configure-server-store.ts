@@ -1,5 +1,6 @@
 import {combineReducers, createStore} from 'redux'
 import devToolsEnhancer from 'remote-redux-devtools'
+import {actionsBlacklist} from '../common/common-constants'
 import {IRoomStoresState, roomStoresReducer} from '../common/redux/room-stores-redux'
 import {IRoomsState, roomsReducer} from '../common/redux/rooms-redux'
 import {getInitialServerState} from './initial-server-redux-state'
@@ -16,6 +17,10 @@ export function configureServerStore() {
 			roomStores: roomStoresReducer,
 		}),
 		getInitialServerState(),
-		devToolsEnhancer(),
+		devToolsEnhancer({
+			name: 'serverStore',
+			actionsBlacklist,
+			maxAge: 100,
+		}),
 	)
 }

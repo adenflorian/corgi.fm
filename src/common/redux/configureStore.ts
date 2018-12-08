@@ -1,6 +1,7 @@
 import {applyMiddleware, combineReducers, createStore, Store} from 'redux'
 import {composeWithDevTools} from 'redux-devtools-extension/developmentOnly'
 import persistState from 'redux-localstorage'
+import {actionsBlacklist} from '../common-constants'
 import {audioReducer, IAudioState} from './audio-redux'
 import {basicInstrumentsReducer, IBasicInstrumentsState} from './basic-instruments-redux'
 import {clientsReducer, IClientsState} from './clients-redux'
@@ -28,8 +29,12 @@ export interface IAppState {
 	websocket: IWebsocketState
 }
 
+export interface ICommonState {
+	rooms: IRoomsState
+}
+
 const composeEnhancers = composeWithDevTools({
-	actionsBlacklist: ['SET_CLIENT_POINTER', 'REPORT_LEVELS', 'SET_INFO'],
+	actionsBlacklist,
 })
 
 export function configureStore(initialState: IAppState | any = {}): Store {
