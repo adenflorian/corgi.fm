@@ -1,7 +1,7 @@
 import * as express from 'express'
 import * as path from 'path'
 import {Store} from 'redux'
-import {selectRoomStoreByName} from '../common/redux/room-stores-redux'
+import {selectRoomStateByName} from '../common/redux/room-stores-redux'
 
 export function setupExpressApp(app: express.Application, serverStore: Store) {
 	app.use(express.static(path.join(__dirname, '../public')))
@@ -15,6 +15,6 @@ export function setupExpressApp(app: express.Application, serverStore: Store) {
 	})
 
 	app.get('/state/:room', (req, res) => {
-		res.json(selectRoomStoreByName(serverStore.getState(), req.params.room).getState())
+		res.json(selectRoomStateByName(serverStore.getState(), req.params.room))
 	})
 }
