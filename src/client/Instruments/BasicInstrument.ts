@@ -1,5 +1,6 @@
 import {setTimeout} from 'timers'
 import * as uuid from 'uuid'
+import {logger} from '../../common/logger'
 import {IMidiNote} from '../../common/MidiNote'
 import {Arp} from '../arp'
 import {getFrequencyUsingHalfStepsFromA4} from '../music/music-functions'
@@ -126,7 +127,7 @@ class Voices {
 	}
 
 	public playNote(note: number, attackTimeInSeconds: number) {
-		const voice = this._getVoice()
+		const voice = this._getVoice(note)
 
 		voice.playNote(note, attackTimeInSeconds)
 	}
@@ -158,7 +159,25 @@ class Voices {
 		this._inactiveVoices.forEach(x => x.dispose())
 	}
 
-	private _getVoice(): Voice {
+	private _getVoice(note: number): Voice {
+		// Look for active voice that is playing same note
+		const sameNoteActiveVoice = this._activeVoices.find(x => x.playingNote === note)
+
+		if (sameNoteActiveVoice) {
+			this._activeVoices = this._activeVoices.filter(x => x !== sameNoteActiveVoice)
+			this._activeVoices.push(sameNoteActiveVoice)
+			return sameNoteActiveVoice
+		}
+
+		// Look for releasing voice that is playing same note
+		const sameNoteReleasingVoice = this._releasingVoices.find(x => x.playingNote === note)
+
+		if (sameNoteReleasingVoice) {
+			this._releasingVoices = this._releasingVoices.filter(x => x !== sameNoteReleasingVoice)
+			this._activeVoices.push(sameNoteReleasingVoice)
+			return sameNoteReleasingVoice
+		}
+
 		if (this._inactiveVoices.length > 0) {
 			// Try to return inactive voice first
 			const voice = this._inactiveVoices.shift()
@@ -221,7 +240,6 @@ class Voice {
 		this._gain.gain.setValueAtTime(this._gain.gain.value, this._audioContext.currentTime)
 		this._gain.gain.exponentialRampToValueAtTime(0.00001, this._audioContext.currentTime + timeToReleaseInSeconds)
 
-		this.playingNote = -1
 		this._releaseId = uuid.v4()
 		return this._releaseId
 	}

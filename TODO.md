@@ -85,3 +85,7 @@
 - [ ] create more rooms automatically when lobby is full
 - [ ] observers (users who can join room but not play)
 	- permissions system
+
+# Bugs
+- [ ] mouse pointers are off
+ - [ ] dev tools
