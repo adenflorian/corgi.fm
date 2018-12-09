@@ -125,8 +125,8 @@ export function setupInputEventListeners(window: Window, store: Store) {
 	})
 
 	function sendMouseUpdate(mouseX, mouseY, localClientId) {
-		const halfWidth = document.body.clientWidth / 2
-		const distanceFromCenterX = mouseX - halfWidth
+		const halfWidth = document.body.scrollWidth / 2
+		const distanceFromCenterX = mouseX - halfWidth + window.scrollX
 		const mainBoardsRect: any = document.getElementById('mainBoards').getBoundingClientRect()
 		const mainBoardsTop = mainBoardsRect.y
 		const distanceFromBoardsTop = mouseY - mainBoardsTop

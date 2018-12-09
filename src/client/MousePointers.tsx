@@ -24,7 +24,7 @@ class MousePointersView extends React.PureComponent<IMousePointersViewProps> {
 								key={index}
 								className="pointer"
 								style={{
-									position: 'absolute',
+									position: 'fixed',
 									top: pointer.y,
 									left: pointer.x,
 									width: 8,
@@ -54,9 +54,9 @@ const mapStateToProps = (state: IAppState): IMousePointersViewProps => {
 	return {
 		pointers: otherClients.map(client => ({
 			x: client.pointer.distanceFromCenterX
-				+ (document.body.clientWidth / 2) - (size / 2),
+				+ (document.body.scrollWidth / 2) - (size / 2) - window.scrollX,
 			y: client.pointer.distanceFromBoardsTop
-				+ mainBoardsRect.y + window.scrollY - (size / 2),
+				+ mainBoardsRect.y - (size / 2),
 			color: client.color,
 		})),
 	}

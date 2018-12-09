@@ -90,7 +90,7 @@
 - [ ] delete old chat messages
 
 # Bugs
-
+- [ ] shift click note not showing on other clients
 
 # Adagio
 - [...] UI layout
