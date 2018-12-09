@@ -86,6 +86,9 @@
 - [ ] observers (users who can join room but not play)
 	- permissions system
 
+# Chat
+- [ ] delete old chat messages
+
 # Bugs
 
 
@@ -96,6 +99,7 @@
 - [ ] analytics
 - [ ] newsletter (a way for users to sign up to get future updates)
 - [ ] let user change name
+- [ ] https
 
 # Ballad
 - [ ] login system

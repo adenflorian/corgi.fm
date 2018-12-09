@@ -37,14 +37,9 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 		return (
 			<div
 				id="chat"
-				style={{
-					zIndex: this.state.isChatFocused ? 1 : 0,
-					userSelect: this.state.isChatFocused ? 'text' : 'none',
-				}}
-				onFocus={() => this.setState({isChatFocused: true})}
-				onBlur={() => this.setState({isChatFocused: false})}
-				tabIndex={-1}
 				className={this.state.isChatFocused ? 'focused' : ''}
+				onFocus={this._onFocus}
+				onBlur={this._onBlur}
 			>
 				<div
 					id="chatVerticalGradient"
@@ -56,8 +51,17 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 				/>
 				<ul>
 					{messages.map((x, i) =>
-						<li key={i}>
-							<span style={{color: x.color}}>{x.authorName}:</span> {x.text}
+						<li
+							key={i}
+						>
+							<div className="selectable" tabIndex={-1}>
+								<span className="author" style={{color: x.color}}>
+									{x.authorName}
+								</span>
+								<span className="text" >
+									{' ' + x.text}
+								</span>
+							</div>
 						</li>,
 					)}
 				</ul>
@@ -72,6 +76,14 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 				</form>
 			</div>
 		)
+	}
+
+	private _onBlur = e => {
+		this.setState({isChatFocused: false})
+	}
+
+	private _onFocus = e => {
+		this.setState({isChatFocused: true})
 	}
 
 	private _onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => this.setState({chatMessage: e.target.value})
