@@ -47,12 +47,12 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 				className={this.state.isChatFocused ? 'focused' : ''}
 			>
 				<div
-					id="chatGradient"
-					className={this.state.isChatFocused ? '' : 'chatVerticalGradient'}
+					id="chatVerticalGradient"
+					className="chatGradient"
 				/>
 				<div
-					id="chatGradient"
-					className={this.state.isChatFocused ? '' : 'chatHorizontalGradient'}
+					id="chatHorizontalGradient"
+					className="chatGradient"
 				/>
 				<ul>
 					{messages.map((x, i) =>
