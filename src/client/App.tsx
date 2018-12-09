@@ -11,6 +11,7 @@ import {AppOptions} from '../common/redux/options-redux'
 import {selectAllTrackIds} from '../common/redux/tracks-redux'
 import {selectAllVirtualKeyboardIds} from '../common/redux/virtual-keyboard-redux'
 import './App.less'
+import {Chat} from './Chat'
 import {ConnectionsContainer} from './Connections/Connections'
 import './css-reset.css'
 import {ConnectedBasicInstrumentView} from './Instruments/BasicInstrumentView'
@@ -48,6 +49,7 @@ class App extends React.Component<IAppProps, {}> {
 					<Fragment>
 						<MousePointers />
 						<ConnectionsContainer />
+						<Chat />
 
 						<div style={{marginBottom: 'auto'}}>
 							<ConnectedOption
