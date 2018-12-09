@@ -44,7 +44,16 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 				onFocus={() => this.setState({isChatFocused: true})}
 				onBlur={() => this.setState({isChatFocused: false})}
 				tabIndex={-1}
+				className={this.state.isChatFocused ? 'focused' : ''}
 			>
+				<div
+					id="chatGradient"
+					className={this.state.isChatFocused ? '' : 'chatVerticalGradient'}
+				/>
+				<div
+					id="chatGradient"
+					className={this.state.isChatFocused ? '' : 'chatHorizontalGradient'}
+				/>
 				<ul>
 					{messages.map((x, i) =>
 						<li key={i}>
