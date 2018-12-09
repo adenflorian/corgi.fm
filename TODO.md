@@ -78,12 +78,28 @@
 - [√] BUG: If user is holding down a note key when they change rooms the notes keep playing and you cant stop it
 - [√] handle user joining a room that doesn't exist
 - [√] delete empty rooms every 5 seconds
-- [ ] choose name for room at creation
+- [ ] *choose name for room at creation
+- [ ] *join room by url
 - [ ] rename existing rooms
 - [ ] room ownership
-- [ ] join room by url
 - [ ] create more rooms automatically when lobby is full
 - [ ] observers (users who can join room but not play)
 	- permissions system
 
 # Bugs
+
+
+# Adagio
+- [...] UI layout
+- [...] rooms
+- [ ] chat
+- [ ] analytics
+- [ ] newsletter (a way for users to sign up to get future updates)
+
+# Ballad
+- [ ] login system
+- [ ] permission system
+- [ ] new sequencers
+- [ ] new instruments
+- [ ] more keyboard features
+
