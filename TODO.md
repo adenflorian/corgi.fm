@@ -57,6 +57,7 @@
 # Track
 - [ ] make size adjustable
 	- drop down with size options?
+- [ ] global play button
 
 ## Track Scroll Bar
 - [ ] make slider stay with mouse 1:1
@@ -66,7 +67,7 @@
 - https://github.com/grimmdude/MidiPlayerJS/blob/master/src/player.js
 
 # BasicInstrument
-- [ ] voices still round robin, instead it should pick voices that aren't playing
+- [√] voices still round robin, instead it should pick voices that aren't playing
 
 # Rooms
 - [√] switch rooms
