@@ -11,7 +11,7 @@ import {AppOptions} from '../common/redux/options-redux'
 import {selectAllTrackIds} from '../common/redux/tracks-redux'
 import {selectAllVirtualKeyboardIds} from '../common/redux/virtual-keyboard-redux'
 import './App.less'
-import {Chat} from './Chat'
+import {ConnectedChat} from './Chat'
 import {ConnectionsContainer} from './Connections/Connections'
 import './css-reset.css'
 import {ConnectedBasicInstrumentView} from './Instruments/BasicInstrumentView'
@@ -35,6 +35,8 @@ interface IAppProps {
 const TRACK_1_BASE_COLOR = '#4077bf'
 const TRACK_1_COLOR = Color(TRACK_1_BASE_COLOR).desaturate(0.4).hsl().string()
 
+export const mainBoardsId = 'mainBoards'
+
 class App extends React.Component<IAppProps, {}> {
 	public static defaultProps = {
 		clients: [],
@@ -49,7 +51,7 @@ class App extends React.Component<IAppProps, {}> {
 					<Fragment>
 						<MousePointers />
 						<ConnectionsContainer />
-						<Chat />
+						<ConnectedChat />
 
 						<div id="topDiv" style={{marginBottom: 'auto'}}>
 							<ConnectedOption
@@ -60,7 +62,7 @@ class App extends React.Component<IAppProps, {}> {
 							<ConnectedRoomSelector />
 						</div>
 
-						<div className="boards">
+						<div id={mainBoardsId} className="boards">
 							<div className="boardRow">
 								<div className="board connected">
 									<ConnectedVolumeControl color={TRACK_1_COLOR} />

@@ -4,6 +4,7 @@ import persistState from 'redux-localstorage'
 import {actionsBlacklist} from '../common-constants'
 import {audioReducer, IAudioState} from './audio-redux'
 import {basicInstrumentsReducer, IBasicInstrumentsState} from './basic-instruments-redux'
+import {chatReducer, IChatState} from './chat-redux'
 import {clientsReducer, IClientsState} from './clients-redux'
 import {connectionsReducer, IConnectionsState} from './connections-redux'
 import {localMiddleware} from './local-middleware'
@@ -19,6 +20,7 @@ import {IWebsocketState, websocketReducer} from './websocket-redux'
 export interface IAppState {
 	audio: IAudioState
 	basicInstruments: IBasicInstrumentsState
+	chat: IChatState
 	clients: IClientsState
 	connections: IConnectionsState
 	local: ILocalState
@@ -42,6 +44,7 @@ export function configureStore(initialState: IAppState | any = {}): Store {
 		combineReducers({
 			audio: audioReducer,
 			basicInstruments: basicInstrumentsReducer,
+			chat: chatReducer,
 			clients: clientsReducer,
 			connections: connectionsReducer,
 			local: localReducer,

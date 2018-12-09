@@ -1,6 +1,7 @@
 import {Action, combineReducers, Store} from 'redux'
 import {IServerState} from '../../server/configure-server-store'
 import {basicInstrumentsReducer, IBasicInstrumentsState} from './basic-instruments-redux'
+import {chatReducer} from './chat-redux'
 import {clientsReducer, IClientsState} from './clients-redux'
 import {IAppState} from './configureStore'
 import {connectionsReducer, IConnectionsState} from './connections-redux'
@@ -29,6 +30,7 @@ export interface IRoomStoresState {
 
 const roomReducers = combineReducers({
 	basicInstruments: basicInstrumentsReducer,
+	chat: chatReducer,
 	clients: clientsReducer,
 	connections: connectionsReducer,
 	tracks: tracksReducer,

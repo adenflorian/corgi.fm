@@ -149,6 +149,13 @@ export function selectLocalClient(state: IAppState) {
 
 export const selectAllClients = (state: IAppState) => state.clients.clients
 
+export const selectAllClientsAsMap = (state: IAppState) => state.clients.clients.reduce((map, client) => {
+	return {
+		...map,
+		[client.id]: client,
+	}
+})
+
 export const selectAllOtherPointers = (state: IAppState) => {
 	const localClientId = selectLocalClient(state).id
 	return selectAllClients(state)
