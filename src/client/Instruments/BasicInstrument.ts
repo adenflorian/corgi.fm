@@ -1,3 +1,5 @@
+import {setTimeout} from 'timers'
+import * as uuid from 'uuid'
 import {IMidiNote} from '../../common/MidiNote'
 import {Arp} from '../arp'
 import {getFrequencyUsingHalfStepsFromA4} from '../music/music-functions'
@@ -96,7 +98,7 @@ export class BasicInstrument {
 		})
 
 		newNotes.forEach(note => {
-			this._voices.playNote(note, this._oscillatorType, this._attackTimeInSeconds)
+			this._voices.playNote(note, this._attackTimeInSeconds)
 		})
 
 		this._previousNotes = midiNotes
@@ -115,6 +117,7 @@ function midiNoteToFrequency(midiNote: IMidiNote): number {
 class Voices {
 	private _inactiveVoices: Voice[] = []
 	private _activeVoices: Voice[] = []
+	private _releasingVoices: Voice[] = []
 
 	constructor(voiceCount: number, audioContext: AudioContext, destination: AudioNode, oscType: ShamuOscillatorType) {
 		for (let i = 0; i < voiceCount; i++) {
@@ -122,20 +125,28 @@ class Voices {
 		}
 	}
 
-	public playNote(note: number, oscType: ShamuOscillatorType, attackTimeInSeconds: number) {
+	public playNote(note: number, attackTimeInSeconds: number) {
 		const voice = this._getVoice()
 
-		voice.playNote(note, oscType, attackTimeInSeconds)
+		voice.playNote(note, attackTimeInSeconds)
 	}
 
 	public releaseNote = (note: number, timeToReleaseInSeconds: number) => {
 		const voice = this._activeVoices.find(x => x.playingNote === note)
 
 		if (voice) {
-			voice.release(timeToReleaseInSeconds)
+			const releaseId = voice.release(timeToReleaseInSeconds)
 
 			this._activeVoices = this._activeVoices.filter(x => x !== voice)
-			this._inactiveVoices.push(voice)
+			this._releasingVoices.push(voice)
+
+			setTimeout(() => {
+				const releasingVoice = this._releasingVoices.find(x => x.getReleaseId() === releaseId)
+				if (releasingVoice) {
+					this._releasingVoices = this._releasingVoices.filter(x => x.getReleaseId() !== releaseId)
+					this._inactiveVoices.push(releasingVoice)
+				}
+			}, timeToReleaseInSeconds * 1000)
 		}
 	}
 
@@ -148,13 +159,18 @@ class Voices {
 	}
 
 	private _getVoice(): Voice {
-		// Try to return inactive voice first
 		if (this._inactiveVoices.length > 0) {
+			// Try to return inactive voice first
 			const voice = this._inactiveVoices.shift()
 			this._activeVoices.push(voice)
 			return voice
+		} else if (this._releasingVoices.length > 0) {
+			// Next try releasing voices
+			const voice = this._releasingVoices.shift()
+			this._activeVoices.push(voice)
+			return voice
 		} else {
-			// Fallback to active voices
+			// Lastly use active voices
 			const voice = this._activeVoices.shift()
 			this._activeVoices.push(voice)
 			return voice
@@ -172,6 +188,7 @@ class Voice {
 	private _destination: AudioNode
 	private _whiteNoise: AudioBufferSourceNode
 	private _noiseBuffer: AudioBuffer
+	private _releaseId: string
 
 	constructor(audioContext: AudioContext, destination: AudioNode, oscType: ShamuOscillatorType) {
 		this._audioContext = audioContext
@@ -185,12 +202,13 @@ class Voice {
 		this._buildChain()
 	}
 
-	public playNote(note: number, oscType: ShamuOscillatorType, attackTimeInSeconds: number) {
+	public getReleaseId = () => this._releaseId
+
+	public playNote(note: number, attackTimeInSeconds: number) {
 		this._cancelAndHoldOrJustCancel()
 		this._gain.gain.setValueAtTime(0, this._audioContext.currentTime)
 		this._gain.gain.linearRampToValueAtTime(1, this._audioContext.currentTime + attackTimeInSeconds)
 
-		// this._oscillator.type = oscType
 		this._oscillator.frequency.value = midiNoteToFrequency(note)
 
 		this.playStartTime = this._audioContext.currentTime
@@ -204,6 +222,8 @@ class Voice {
 		this._gain.gain.exponentialRampToValueAtTime(0.00001, this._audioContext.currentTime + timeToReleaseInSeconds)
 
 		this.playingNote = -1
+		this._releaseId = uuid.v4()
+		return this._releaseId
 	}
 
 	public setOscillatorType = (newOscType: ShamuOscillatorType) => {

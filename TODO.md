@@ -46,6 +46,7 @@
 - [ ] have a midi library
 - [ ] mute audio on join and show popup letting know user that it might be loud
 - [ ] let players send hearts and claps and stuff to show that they like what the person is playing
+- [ ] what do about firefox
 
 # Keyboard
 - [ ] do something to visualize external midi keyboard notes
