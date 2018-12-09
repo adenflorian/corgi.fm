@@ -3,7 +3,7 @@ import {Component} from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 import {chatSubmit, IChatMessage, selectAllMessages} from '../common/redux/chat-redux'
-import {selectAllClientsAsMap, selectLocalClient} from '../common/redux/clients-redux'
+import {selectLocalClient} from '../common/redux/clients-redux'
 import {IAppState} from '../common/redux/configureStore'
 import './Chat.less'
 
@@ -15,7 +15,6 @@ interface IChatComponentState {
 interface IChatProps {
 	author?: string
 	authorColor?: string
-	authorId?: string
 	dispatch?: Dispatch
 	messages?: IChatMessage[]
 }
@@ -70,21 +69,17 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 
 	private _onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		this.props.dispatch(chatSubmit({
-			authorId: this.props.authorId,
+			authorName: this.props.author,
 			text: this.state.chatMessage,
+			color: this.props.authorColor,
 		}))
 		this.setState({chatMessage: ''})
 		e.preventDefault()
 	}
 }
 
-export const ConnectedChat = connect((state: IAppState) => {
-	const clients = selectAllClientsAsMap(state)
-
-	return {
-		author: selectLocalClient(state).name,
-		authorId: selectLocalClient(state).id,
-		messages: selectAllMessages(state)
-			.map(x => ({...x, authorName: clients[x.authorId].name, color: clients[x.authorId].color})) as IChatMessage[],
-	}
-})(Chat)
+export const ConnectedChat = connect((state: IAppState) => ({
+	author: selectLocalClient(state).name,
+	authorColor: selectLocalClient(state).color,
+	messages: selectAllMessages(state),
+}))(Chat)

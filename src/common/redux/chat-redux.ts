@@ -11,14 +11,22 @@ export const chatSubmit = (message: IChatMessage) => {
 	}
 }
 
+export const SET_CHAT = 'SET_CHAT'
+export const setChat = (messages: IChatMessage[]) => {
+	return {
+		type: SET_CHAT,
+		BROADCASTER_ACTION,
+		messages,
+	}
+}
+
 export interface IChatState {
 	messages: IChatMessage[]
 }
 
 export interface IChatMessage {
-	authorName?: string
-	authorId: string
-	color?: string
+	authorName: string
+	color: string
 	text: string
 }
 
@@ -31,6 +39,10 @@ export function chatReducer(state: IChatState = initialState, action): IChatStat
 		case CHAT_SUBMIT: return {
 			...state,
 			messages: state.messages.concat(action.message),
+		}
+		case SET_CHAT: return {
+			...state,
+			messages: action.messages,
 		}
 		default: return state
 	}

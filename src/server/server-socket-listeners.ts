@@ -5,6 +5,7 @@ import {logger} from '../common/logger'
 import {
 	deleteBasicInstruments, selectAllInstruments, selectInstrumentsByOwner, updateBasicInstruments,
 } from '../common/redux/basic-instruments-redux'
+import {selectAllMessages, setChat} from '../common/redux/chat-redux'
 import {
 	addClient, clientDisconnected, ClientState, IClientState, selectAllClients,
 	selectClientBySocketId, SET_CLIENT_POINTER, setClients,
@@ -207,6 +208,12 @@ function syncState(newClientSocket: Socket, roomState: IAppState, serverState: I
 
 	newClientSocket.emit(WebSocketEvent.broadcast, {
 		...setClients(selectAllClients(roomState)),
+		alreadyBroadcasted: true,
+		source: server,
+	})
+
+	newClientSocket.emit(WebSocketEvent.broadcast, {
+		...setChat(selectAllMessages(roomState)),
 		alreadyBroadcasted: true,
 		source: server,
 	})
