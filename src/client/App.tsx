@@ -51,7 +51,7 @@ class App extends React.Component<IAppProps, {}> {
 						<ConnectionsContainer />
 						<Chat />
 
-						<div style={{marginBottom: 'auto'}}>
+						<div id="topDiv" style={{marginBottom: 'auto'}}>
 							<ConnectedOption
 								option={AppOptions.showNoteNamesOnKeyboard}
 								label="show names on keyboard"
@@ -60,7 +60,7 @@ class App extends React.Component<IAppProps, {}> {
 							<ConnectedRoomSelector />
 						</div>
 
-						<div id="mainBoards" className="boards">
+						<div className="boards">
 							<div className="boardRow">
 								<div className="board connected">
 									<ConnectedVolumeControl color={TRACK_1_COLOR} />
