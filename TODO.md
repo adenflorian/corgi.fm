@@ -87,5 +87,3 @@
 	- permissions system
 
 # Bugs
-- [ ] mouse pointers are off
- - [ ] dev tools

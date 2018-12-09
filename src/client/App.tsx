@@ -59,8 +59,10 @@ class App extends React.Component<IAppProps, {}> {
 						</div>
 
 						<div id="mainBoards" className="boards">
-							<div className="board connected">
-								<ConnectedVolumeControl color={TRACK_1_COLOR} />
+							<div className="boardRow">
+								<div className="board connected">
+									<ConnectedVolumeControl color={TRACK_1_COLOR} />
+								</div>
 							</div>
 							{this.props.connections
 								.sort(sortConnection)
@@ -80,7 +82,6 @@ class App extends React.Component<IAppProps, {}> {
 											<div
 												key={connection.targetId}
 												className="board connected"
-												style={{minWidth: 'auto', maxWidth: 600, width: 'auto', flexGrow: 1}}
 											>
 												<ConnectedBasicInstrumentView id={connection.targetId} />
 											</div>
