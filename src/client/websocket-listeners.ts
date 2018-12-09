@@ -1,4 +1,4 @@
-import {Dispatch} from 'react-redux'
+import {Dispatch} from 'redux'
 import {Store} from 'redux'
 import * as io from 'socket.io-client'
 import {logger} from '../common/logger'
