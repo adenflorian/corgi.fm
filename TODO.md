@@ -92,9 +92,10 @@
 # Adagio
 - [...] UI layout
 - [...] rooms
-- [ ] chat
+- [...] chat
 - [ ] analytics
 - [ ] newsletter (a way for users to sign up to get future updates)
+- [ ] let user change name
 
 # Ballad
 - [ ] login system
