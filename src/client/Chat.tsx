@@ -13,6 +13,8 @@ interface IChatProps {
 	messages?: IChatMessage[]
 }
 
+export const chatInputId = 'chatInput'
+
 export class Chat extends Component<IChatProps> {
 	public static defaultProps = {
 		messages: [
@@ -30,7 +32,7 @@ export class Chat extends Component<IChatProps> {
 				<ul>
 					{messages.map((x, i) => <li key={i}>{x.author}: {x.text}</li>)}
 				</ul>
-				<input id="chatInput" type="text" />
+				<input id={chatInputId} type="text" />
 			</div>
 		)
 	}

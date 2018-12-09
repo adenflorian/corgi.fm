@@ -65,7 +65,7 @@ export interface IClientState {
 export interface IClientPointer {
 	distanceFromCenterX: number
 	distanceFromBoardsTop: number
-	ownerId: string
+	ownerId?: string
 	color?: string
 }
 
