@@ -2,7 +2,7 @@
 Real time music collaboration.
 
 ## Required Software
-- node 10.3
+- node 10.14.1
 - yarn
 
 ## Secrets setup
