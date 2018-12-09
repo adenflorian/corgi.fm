@@ -113,11 +113,12 @@ function midiNoteToFrequency(midiNote: IMidiNote): number {
 }
 
 class Voices {
-	private _availableVoices: Voice[] = []
+	private _inactiveVoices: Voice[] = []
+	private _activeVoices: Voice[] = []
 
 	constructor(voiceCount: number, audioContext: AudioContext, destination: AudioNode, oscType: ShamuOscillatorType) {
 		for (let i = 0; i < voiceCount; i++) {
-			this._availableVoices.push(new Voice(audioContext, destination, oscType))
+			this._inactiveVoices.push(new Voice(audioContext, destination, oscType))
 		}
 	}
 
@@ -128,28 +129,36 @@ class Voices {
 	}
 
 	public releaseNote = (note: number, timeToReleaseInSeconds: number) => {
-		const voice = this._availableVoices.find(x => x.playingNote === note)
+		const voice = this._activeVoices.find(x => x.playingNote === note)
 
 		if (voice) {
 			voice.release(timeToReleaseInSeconds)
-			// this._availableVoices = this._availableVoices.filter(x => x !== voice)
-			// this._availableVoices.unshift(voice)
+
+			this._activeVoices = this._activeVoices.filter(x => x !== voice)
+			this._inactiveVoices.push(voice)
 		}
 	}
 
 	public setOscillatorType(type: ShamuOscillatorType) {
-		this._availableVoices.forEach(x => x.setOscillatorType(type))
+		this._inactiveVoices.forEach(x => x.setOscillatorType(type))
 	}
 
 	public dispose() {
-		this._availableVoices.forEach(x => x.dispose())
+		this._inactiveVoices.forEach(x => x.dispose())
 	}
 
 	private _getVoice(): Voice {
-		// TODO Pick voice that was played last
-		const voice = this._availableVoices.shift()
-		this._availableVoices.push(voice)
-		return voice
+		// Try to return inactive voice first
+		if (this._inactiveVoices.length > 0) {
+			const voice = this._inactiveVoices.shift()
+			this._activeVoices.push(voice)
+			return voice
+		} else {
+			// Fallback to active voices
+			const voice = this._activeVoices.shift()
+			this._activeVoices.push(voice)
+			return voice
+		}
 	}
 }
 
