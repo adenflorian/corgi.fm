@@ -26,13 +26,13 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 		messages: [],
 	}
 
-	public chatInputRef: React.RefObject<HTMLInputElement>
-	public chatRef: React.RefObject<HTMLDivElement>
-
 	public state: IChatComponentState = {
 		chatMessage: '',
 		isChatFocused: false,
 	}
+
+	public chatInputRef: React.RefObject<HTMLInputElement>
+	public chatRef: React.RefObject<HTMLDivElement>
 
 	constructor(props) {
 		super(props)
@@ -79,11 +79,9 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 						</li>,
 					)}
 				</ul>
-				<form onSubmit={this._onSubmit} style={{textAlign: 'initial'}}>
-					{/* <div className="isometricBoxShadow" color={authorColor} >
-					</div> */}
-					<div className="inputWrapper" style={{color: authorColor}}>
-						<span className="author">
+				<form onSubmit={this._onSubmit} style={{textAlign: 'initial'}} tabIndex={-1}>
+					<div className="inputWrapper" style={{color: authorColor}} tabIndex={-1}>
+						<span className="author" tabIndex={-1}>
 							{author}
 						</span>
 						<input
