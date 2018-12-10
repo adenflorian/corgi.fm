@@ -51,6 +51,11 @@
 - [ ] simple mode
 - [ ] make usable on mobile
 
+# Connections
+- [ ] make it obvious which direction data flows
+- [ ] brighten the connectors and line when data is going across it
+- [ ] make them moveable
+
 # Keyboard
 - [ ] do something to visualize external midi keyboard notes
 

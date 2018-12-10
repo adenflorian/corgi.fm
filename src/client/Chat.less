@@ -48,17 +48,13 @@
                 margin-left: 0;
                 cursor: text;
 
-                &:focus {
-                    outline: none;
-                }
-
                 .author {
                 }
 
                 .text {
                     font-weight: initial;
                     text-transform: initial;
-                    letter-spacing: initial;
+                    letter-spacing: 0.4px;
                 }
             }
 
@@ -70,6 +66,10 @@
 
     form {
         z-index: 3;
+
+        &:hover {
+            z-index: 4;
+        }
 
         .inputWrapper {
             display: flex;
@@ -94,7 +94,6 @@
             #chatInput {
                 position: relative;
                 flex-grow: 1;
-                z-index: 1;
                 box-sizing: border-box;
                 border: none;
                 padding: 0;
@@ -106,10 +105,6 @@
                 text-transform: initial;
                 resize: none;
                 letter-spacing: initial;
-
-                &:focus {
-                    outline: none;
-                }
             }
         }
     }
