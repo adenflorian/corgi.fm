@@ -27,6 +27,7 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 	}
 
 	public chatInputRef: React.RefObject<HTMLInputElement>
+	public chatRef: React.RefObject<HTMLDivElement>
 
 	public state: IChatComponentState = {
 		chatMessage: '',
@@ -36,11 +37,12 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 	constructor(props) {
 		super(props)
 		this.chatInputRef = React.createRef()
+		this.chatRef = React.createRef()
 	}
 
-	public componentDidMount = () => window.addEventListener('keypress', this._onKeypress)
+	public componentDidMount = () => window.addEventListener('keydown', this._onKeydown)
 
-	public componentWillUnmount = () => window.removeEventListener('keypress', this._onKeypress)
+	public componentWillUnmount = () => window.removeEventListener('keydown', this._onKeydown)
 
 	public render() {
 		const {author, authorColor, messages} = this.props
@@ -48,6 +50,7 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 		return (
 			<div
 				id="chat"
+				ref={this.chatRef}
 				className={this.state.isChatFocused ? 'focused' : ''}
 				onFocus={this._onFocus}
 				onBlur={this._onBlur}
@@ -97,7 +100,11 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 		)
 	}
 
-	private _onKeypress = (e: KeyboardEvent) => e.key === 'Enter' && this.chatInputRef.current.focus()
+	private _onKeydown = (e: KeyboardEvent) => {
+		if (e.repeat) return
+		if (e.key === 'Enter') this.chatInputRef.current.focus()
+		if (e.key === 'Escape') (document.activeElement as HTMLElement).blur()
+	}
 
 	private _onBlur = () => this.setState({isChatFocused: false})
 
