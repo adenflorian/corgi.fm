@@ -27,7 +27,7 @@ export class BasicInstrumentOscillatorTypes extends React.PureComponent<IBasicIn
 		return (
 			<div className="oscillatorTypes">
 				{oscillatorTypes.map(({type, svgPath}) =>
-					<div key={type} onClick={handleClick.bind(undefined, type)}>
+					<div key={type} onClick={handleClick.bind(undefined, type)} style={{width: 40, height: 40}}>
 						<ReactSVG
 							path={svgPath}
 							className={activeType === type ? 'active colorize' : undefined}
