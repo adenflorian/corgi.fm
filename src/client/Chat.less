@@ -13,16 +13,19 @@
     word-wrap: break-word;
     // border: 2px solid @panelGray;
     // font-size: 0.8em;
-    opacity: 0.5;
 
     &.focused {
         z-index: 1;
         user-select: text;
-        opacity: 1;
     }
 
     #chatMessages {
         padding: 0 8px 0 8px;
+        opacity: 0.5;
+
+        .focused& {
+            opacity: 1;
+        }
     
         li {
             text-align: left;
