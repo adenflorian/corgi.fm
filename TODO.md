@@ -47,6 +47,9 @@
 - [ ] mute audio on join and show popup letting know user that it might be loud
 - [ ] let players send hearts and claps and stuff to show that they like what the person is playing
 - [ ] what do about firefox
+- [ ] offline mode
+- [ ] simple mode
+- [ ] make usable on mobile
 
 # Keyboard
 - [ ] do something to visualize external midi keyboard notes
@@ -80,6 +83,7 @@
 - [√] delete empty rooms every 5 seconds
 - [ ] *choose name for room at creation
 - [ ] *join room by url
+- [ ] *better UX
 - [ ] rename existing rooms
 - [ ] room ownership
 - [ ] create more rooms automatically when lobby is full
@@ -101,6 +105,8 @@
 - [ ] newsletter (a way for users to sign up to get future updates)
 - [ ] let user change name
 - [ ] https
+- [ ] options view
+- [ ] better pointer
 
 # Ballad
 - [ ] login system
@@ -108,4 +114,6 @@
 - [ ] new sequencers
 - [ ] new instruments
 - [ ] more keyboard features
+- [ ] show list of room members
+- [ ] send hearts and claps and stuff
 

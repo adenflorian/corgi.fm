@@ -32,7 +32,7 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 	}
 
 	public render() {
-		const {authorColor, messages} = this.props
+		const {author, authorColor, messages} = this.props
 
 		return (
 			<div
@@ -59,7 +59,7 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 									{x.authorName}
 								</span>
 								<span className="text" >
-									{' ' + x.text}
+									{x.text}
 								</span>
 							</div>
 						</li>,
@@ -69,6 +69,9 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 					{/* <div className="isometricBoxShadow" color={authorColor} >
 					</div> */}
 					<div className="inputWrapper" style={{color: authorColor}}>
+						<span className="author">
+							{author}
+						</span>
 						<input
 							id={chatInputId}
 							type="text"
