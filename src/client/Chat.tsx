@@ -130,6 +130,8 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 		if (this.state.username === '') return
 
 		this.props.dispatch(setClientName(this.props.authorId, this.state.username))
+
+		return (document.activeElement as HTMLElement).blur()
 	}
 
 	private _onSubmitChat = (e: React.FormEvent<HTMLFormElement>) => {
