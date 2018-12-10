@@ -112,7 +112,10 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 
 	private _onKeydown = (e: KeyboardEvent) => {
 		if (e.repeat) return
-		if (e.key === 'Enter' && this.state.isChatFocused === false) this.chatInputRef.current.focus()
+		if (e.key === 'Enter' && this.state.isChatFocused === false) {
+			this.chatInputRef.current.focus()
+			e.preventDefault()
+		}
 		if (e.key === 'Escape') (document.activeElement as HTMLElement).blur()
 	}
 
@@ -120,9 +123,14 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 
 	private _onFocus = () => this.setState({isChatFocused: true})
 
-	private _onNameInputChange = (e: React.ChangeEvent<HTMLInputElement>) => this.setState({username: e.target.value})
+	private _onNameInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const newValue = e.target.value
+		this.setState({username: newValue})
 
-	private _onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => this.setState({chatMessage: e.target.value})
+		if (newValue === '') return
+
+		this.props.dispatch(setClientName(this.props.authorId, newValue))
+	}
 
 	private _onSubmitNameChange = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
@@ -134,18 +142,22 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 		return (document.activeElement as HTMLElement).blur()
 	}
 
+	private _onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => this.setState({chatMessage: e.target.value})
+
 	private _onSubmitChat = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
 
-		if (this.state.chatMessage === '') return
+		if (this.state.chatMessage !== '') {
+			this.props.dispatch(chatSubmit({
+				authorName: this.props.author,
+				text: this.state.chatMessage,
+				color: this.props.authorColor,
+			}))
 
-		this.props.dispatch(chatSubmit({
-			authorName: this.props.author,
-			text: this.state.chatMessage,
-			color: this.props.authorColor,
-		}))
+			this.setState({chatMessage: ''})
+		}
 
-		this.setState({chatMessage: ''})
+		return (document.activeElement as HTMLElement).blur()
 	}
 }
 

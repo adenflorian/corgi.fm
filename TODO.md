@@ -19,7 +19,6 @@
 - [√] visual for master volume amp thing
 - [ ] midi timeline thing
 - [ ] maybe use automerge? https://github.com/automerge/automerge
-- [ ] options view
 - [√] maybe use requestAnimationFrame()
 - [ ] make use of `'` key
 - [ ] add `+` and `-` for octave
@@ -99,6 +98,8 @@
 - [ ] delete old chat messages
 - [√] Hit enter to focus chat
 - [ ] play sound when new message?
+- when change name, should we change the name in old chat messages?
+- [ ] update name in bottom left on blur of name input
 
 # Bugs
 - [ ] shift click note not showing on other clients
@@ -109,8 +110,7 @@
 - [...] chat
 - [ ] analytics
 - [ ] newsletter (a way for users to sign up to get future updates)
-- [ ] let user change name
-	- by clicking on name in bottom left?
+- [...] let user change name
 - [ ] https
 - [ ] options view
 - [ ] better pointer
