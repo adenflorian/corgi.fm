@@ -1,25 +1,26 @@
 import * as React from 'react'
 import {Component} from 'react'
+import AutosizeInput from 'react-input-autosize'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 import {chatSubmit, IChatMessage, selectAllMessages} from '../common/redux/chat-redux'
-import {selectLocalClient} from '../common/redux/clients-redux'
+import {selectLocalClient, setClientName} from '../common/redux/clients-redux'
 import {IAppState} from '../common/redux/configureStore'
 import './Chat.less'
 
 interface IChatComponentState {
 	chatMessage: string
 	isChatFocused: boolean
+	username: string
 }
 
 interface IChatProps {
 	author?: string
 	authorColor?: string
+	authorId?: string
 	dispatch?: Dispatch
 	messages?: IChatMessage[]
 }
-
-export const chatInputId = 'chatInput'
 
 export class Chat extends Component<IChatProps, IChatComponentState> {
 	public static defaultProps = {
@@ -29,15 +30,17 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 	public state: IChatComponentState = {
 		chatMessage: '',
 		isChatFocused: false,
+		username: '',
 	}
 
 	public chatInputRef: React.RefObject<HTMLInputElement>
 	public chatRef: React.RefObject<HTMLDivElement>
 
-	constructor(props) {
+	constructor(props: IChatProps) {
 		super(props)
 		this.chatInputRef = React.createRef()
 		this.chatRef = React.createRef()
+		this.state.username = props.author
 	}
 
 	public componentDidMount = () => window.addEventListener('keydown', this._onKeydown)
@@ -45,7 +48,7 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 	public componentWillUnmount = () => window.removeEventListener('keydown', this._onKeydown)
 
 	public render() {
-		const {author, authorColor, messages} = this.props
+		const {authorColor, messages} = this.props
 
 		return (
 			<div
@@ -79,28 +82,37 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 						</li>,
 					)}
 				</ul>
-				<form onSubmit={this._onSubmit} style={{textAlign: 'initial'}} tabIndex={-1}>
+				<div className="chatBottom" style={{textAlign: 'initial'}} tabIndex={-1}>
 					<div className="inputWrapper" style={{color: authorColor}} tabIndex={-1}>
-						<span className="author" tabIndex={-1}>
-							{author}
-						</span>
-						<input
-							id={chatInputId}
-							type="text"
-							ref={this.chatInputRef}
-							onChange={this._onInputChange}
-							value={this.state.chatMessage}
-							autoComplete="off"
-						/>
+						<form className="nameForm" onSubmit={this._onSubmitNameChange}>
+							<AutosizeInput
+								name="nameAutosizeInput"
+								className="author"
+								value={this.state.username}
+								onChange={this._onNameInputChange}
+								autoComplete="off"
+								style={{color: authorColor}}
+							/>
+						</form>
+						<form className="chatMessageForm" onSubmit={this._onSubmitChat}>
+							<input
+								id="chatInput"
+								type="text"
+								ref={this.chatInputRef}
+								onChange={this._onInputChange}
+								value={this.state.chatMessage}
+								autoComplete="off"
+							/>
+						</form>
 					</div>
-				</form>
+				</div>
 			</div>
 		)
 	}
 
 	private _onKeydown = (e: KeyboardEvent) => {
 		if (e.repeat) return
-		if (e.key === 'Enter') this.chatInputRef.current.focus()
+		if (e.key === 'Enter' && this.state.isChatFocused === false) this.chatInputRef.current.focus()
 		if (e.key === 'Escape') (document.activeElement as HTMLElement).blur()
 	}
 
@@ -108,9 +120,19 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 
 	private _onFocus = () => this.setState({isChatFocused: true})
 
+	private _onNameInputChange = (e: React.ChangeEvent<HTMLInputElement>) => this.setState({username: e.target.value})
+
 	private _onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => this.setState({chatMessage: e.target.value})
 
-	private _onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+	private _onSubmitNameChange = (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault()
+
+		if (this.state.username === '') return
+
+		this.props.dispatch(setClientName(this.props.authorId, this.state.username))
+	}
+
+	private _onSubmitChat = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
 
 		if (this.state.chatMessage === '') return
@@ -128,5 +150,6 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 export const ConnectedChat = connect((state: IAppState) => ({
 	author: selectLocalClient(state).name,
 	authorColor: selectLocalClient(state).color,
+	authorId: selectLocalClient(state).id,
 	messages: selectAllMessages(state),
 }))(Chat)

@@ -628,6 +628,12 @@
   dependencies:
     "@types/react" "*"
 
+"@types/react-input-autosize@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@types/react-input-autosize/-/react-input-autosize-2.0.0.tgz#c537405729a2f9cf15ebdc690d80ceccfff482b5"
+  dependencies:
+    "@types/react" "*"
+
 "@types/react-redux@^6.0.2":
   version "6.0.11"
   resolved "https://registry.yarnpkg.com/@types/react-redux/-/react-redux-6.0.11.tgz#d872254bbcba42465195a5475f40b22502b0407d"
@@ -5280,6 +5286,12 @@ react-hot-loader@^4.3.0:
     prop-types "^15.6.1"
     react-lifecycles-compat "^3.0.4"
     shallowequal "^1.0.2"
+
+react-input-autosize@^2.2.1:
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/react-input-autosize/-/react-input-autosize-2.2.1.tgz#ec428fa15b1592994fb5f9aa15bb1eb6baf420f8"
+  dependencies:
+    prop-types "^15.5.8"
 
 react-is@^16.3.2, react-is@^16.6.0:
   version "16.6.3"

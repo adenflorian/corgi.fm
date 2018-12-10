@@ -1,7 +1,6 @@
 import {AnyAction, Store} from 'redux'
 import {selectLocalClient, setClientPointer} from '../common/redux/clients-redux'
 import {localMidiKeyPress, localMidiKeyUp, localMidiOctaveChange} from '../common/redux/local-middleware'
-import {chatInputId} from './Chat'
 
 interface KeyBoardShortcuts {
 	[key: string]: KeyBoardShortcut
@@ -78,10 +77,10 @@ let lastScrollY = window.scrollY
 
 export function setupInputEventListeners(window: Window, store: Store) {
 
-	const isChatInputFocused = () => document.getElementById(chatInputId) === document.activeElement
+	const isInputFocused = () => document.activeElement.tagName === 'INPUT'
 
 	window.addEventListener('keydown', e => {
-		if (isChatInputFocused()) return
+		if (isInputFocused()) return
 		onKeyEvent(e)
 	})
 
@@ -90,7 +89,7 @@ export function setupInputEventListeners(window: Window, store: Store) {
 	})
 
 	window.addEventListener('keypress', e => {
-		if (isChatInputFocused()) return
+		if (isInputFocused()) return
 		onKeyEvent(e)
 	})
 
@@ -111,7 +110,7 @@ export function setupInputEventListeners(window: Window, store: Store) {
 			store.dispatch(action)
 		}
 
-		if (!isChatInputFocused() && keyboardShortcut.preventDefault) {
+		if (!isInputFocused() && keyboardShortcut.preventDefault) {
 			event.preventDefault()
 		}
 	}

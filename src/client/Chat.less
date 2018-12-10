@@ -64,7 +64,7 @@
         }
     }
 
-    form {
+    .chatBottom {
         z-index: 3;
 
         &:hover {
@@ -88,23 +88,32 @@
                 filter: saturate(300%);
             }
 
-            .author {
-            }
-
-            #chatInput {
-                position: relative;
-                flex-grow: 1;
-                box-sizing: border-box;
-                border: none;
-                padding: 0;
+            input {
                 background-color: unset;
-                color: @defaultGray;
                 font-size: inherit;
                 font-family: inherit;
                 text-decoration: inherit;
-                text-transform: initial;
-                resize: none;
-                letter-spacing: initial;
+                border: none;
+                padding: 0;
+            }
+
+            form.nameForm {
+                input {
+                    letter-spacing: inherit;
+                    text-transform: inherit;
+                    font-weight: inherit;
+                    color: inherit;
+                }
+            }
+
+            form.chatMessageForm {
+                flex-grow: 1;
+
+                #chatInput {
+                    width: 100%;
+                    color: @defaultGray;
+                    letter-spacing: initial;
+                }
             }
         }
     }
