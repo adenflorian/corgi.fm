@@ -3,7 +3,20 @@
 	// for the documentation about the extensions.json format
 	"recommendations": [
 		// Extension identifier format: ${publisher}.${name}. Example: vscode.csharp
+		"bierner.emojisense",
+		"Compulim.compulim-vscode-closetag",
+		"streetsidesoftware.code-spell-checker",
+		"msjsdiag.debugger-for-chrome",
+		"dsznajder.es7-react-js-snippets",
+		"dbaeumer.vscode-eslint",
+		"waderyan.gitblame",
+		"donjayamanne.githistory",
+		"codezombiech.gitignore",
+		"eamodio.gitlens",
+		"Zignd.html-css-class-completion",
+		"eg2.vscode-npm-script",
+		"IBM.output-colorizer",
 		"eg2.tslint",
-		"dbaeumer.vscode-eslint"
+		"gamunu.vscode-yarn",
 	]
 }
