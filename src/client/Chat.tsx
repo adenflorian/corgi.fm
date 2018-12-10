@@ -32,7 +32,7 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 	}
 
 	public render() {
-		const {messages} = this.props
+		const {authorColor, messages} = this.props
 
 		return (
 			<div
@@ -66,13 +66,17 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 					)}
 				</ul>
 				<form onSubmit={this._onSubmit} style={{textAlign: 'initial'}}>
-					<input
-						id={chatInputId}
-						type="text"
-						onChange={this._onInputChange}
-						value={this.state.chatMessage}
-						autoComplete="off"
-					/>
+					{/* <div className="isometricBoxShadow" color={authorColor} >
+					</div> */}
+					<div className="inputWrapper" style={{color: authorColor}}>
+						<input
+							id={chatInputId}
+							type="text"
+							onChange={this._onInputChange}
+							value={this.state.chatMessage}
+							autoComplete="off"
+						/>
+					</div>
 				</form>
 			</div>
 		)

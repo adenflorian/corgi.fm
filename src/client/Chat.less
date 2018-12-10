@@ -7,7 +7,7 @@
     justify-content: flex-end;
     .spacing();
     z-index: 0;
-    // padding: 8px;
+    padding: 2px;
     background-color: rgba(20, 20, 24, 0.6);
     overflow: hidden;
     word-wrap: break-word;
@@ -59,16 +59,29 @@
         }
     }
 
+    .inputWrapper {
+        margin-top: 8px;
+        box-shadow: currentColor -1px 1px, currentColor -2px 2px;
+        .saturate & {
+            filter: saturate(300%);
+        }
+        
+        opacity: 0.5;
+
+        .focused&, &:hover {
+            opacity: 1;
+        }
+    }
+
     #chatInput {
         position: relative;
         z-index: 1;
         box-sizing: border-box;
         border: none;
         width: 100%;
-        margin-top: 8px;
         padding: 6px 8px 6px 8px;
         background-color: @panelGrayTransparent;
-        color: inherit;
+        color: @defaultGray;
         font-size: inherit;
         font-family: inherit;
         text-decoration: inherit;
