@@ -98,11 +98,15 @@
 - [ ] delete old chat messages
 - [√] Hit enter to focus chat
 - [ ] play sound when new message?
+
+# Username
 - when change name, should we change the name in old chat messages?
 - [√] update name in bottom left on blur of name input
+- [√] save name in local storage and us on re-entry
 
 # Bugs
 - [ ] shift click note not showing on other clients
+- [ ] long usernames mess up the keyboard
 
 # Adagio
 - [...] UI layout

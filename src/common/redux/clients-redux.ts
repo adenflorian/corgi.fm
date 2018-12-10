@@ -96,10 +96,10 @@ export class ClientState implements IClientState {
 	public readonly name: string
 	public readonly pointer: IClientPointer
 
-	constructor(socketId: string) {
+	constructor({socketId, name}: {socketId: string, name?: string}) {
 		this.id = uuid.v4()
 		this.socketId = socketId
-		this.name = animal.getId() + '-' + this.id[0]
+		this.name = name || animal.getId() + '-' + this.id[0]
 		this.color = Color(hashbow(this.id)).desaturate(0.2).hsl().string()
 		this.pointer = {distanceFromCenterX: 0, distanceFromBoardsTop: 0, ownerId: this.id}
 	}

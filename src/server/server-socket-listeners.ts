@@ -63,7 +63,7 @@ export function setupServerWebSocketListeners(io: Server, serverStore: Store) {
 			if (err) throw new Error(err)
 
 			onJoinRoom(io, socket, getRoom(socket),
-				serverStore, new ClientState(socket.id))
+				serverStore, new ClientState({socketId: socket.id, name: socket.handshake.query.username}))
 
 			socket.on(WebSocketEvent.broadcast, (action: BroadcastAction) => {
 				if (action.type !== SET_CLIENT_POINTER) {

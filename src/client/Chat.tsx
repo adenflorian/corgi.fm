@@ -7,6 +7,7 @@ import {chatSubmit, IChatMessage, selectAllMessages} from '../common/redux/chat-
 import {selectLocalClient, setClientName} from '../common/redux/clients-redux'
 import {IAppState} from '../common/redux/configureStore'
 import './Chat.less'
+import {saveUsernameToLocalStorage} from './username'
 
 interface IChatComponentState {
 	chatMessage: string
@@ -43,9 +44,14 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 		this.state.username = props.author
 	}
 
-	public componentDidMount = () => window.addEventListener('keydown', this._onKeydown)
+	public componentDidMount = () => {
+		window.addEventListener('keydown', this._onKeydown)
+		saveUsernameToLocalStorage(this.props.author)
+	}
 
 	public componentWillUnmount = () => window.removeEventListener('keydown', this._onKeydown)
+
+	public componentDidUpdate = () => saveUsernameToLocalStorage(this.props.author)
 
 	public render() {
 		const {authorColor, messages} = this.props

@@ -11,6 +11,7 @@ import {BroadcastAction} from '../common/redux/websocket-client-sender-middlewar
 import {setInfo, setSocketId} from '../common/redux/websocket-redux'
 import {WebSocketEvent} from '../common/server-constants'
 import {selfDisconnected} from './../common/redux/common-actions'
+import {getUsernameFromLocalStorage} from './username'
 
 const port = 80
 
@@ -26,7 +27,11 @@ export function deleteAllTheThings(dispatch: Dispatch) {
 }
 
 export function setupWebsocketAndListeners(store: Store) {
-	socket = io.connect(window.location.hostname + `:${port}/`)
+	socket = io.connect(window.location.hostname + `:${port}/`, {
+		query: {
+			username: getUsernameFromLocalStorage() || '',
+		},
+	})
 
 	socket.on('connect', () => {
 		logger.log('socket: connect')
