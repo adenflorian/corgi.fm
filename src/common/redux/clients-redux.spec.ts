@@ -1,5 +1,5 @@
 import {expect} from 'chai'
-import {Client, clientsReducer, newClient} from './clients-redux'
+import {addClient, clientsReducer, ClientState} from './clients-redux'
 
 declare const describe: (x, y) => any
 declare const it: (x, y) => any
@@ -9,30 +9,38 @@ describe('clients-redux', () => {
 		[
 			{
 				name: 'add new client',
-				initialState: [
-					new Client('123'),
-					new Client('444'),
-				],
-				action: newClient('777'),
-				expectedState: [
-					new Client('123'),
-					new Client('444'),
-					new Client('777'),
-				],
+				initialState: {
+					clients: [
+						new ClientState('123'),
+						new ClientState('444'),
+					],
+				},
+				action: addClient(new ClientState('777')),
+				expectedState: {
+					clients: [
+						new ClientState('123'),
+						new ClientState('444'),
+						new ClientState('777'),
+					],
+				},
 			},
 			{
 				name: 'add new already existing client',
-				initialState: [
-					new Client('123'),
-					new Client('777'),
-					new Client('444'),
-				],
-				action: newClient('777'),
-				expectedState: [
-					new Client('123'),
-					new Client('444'),
-					new Client('777'),
-				],
+				initialState: {
+					clients: [
+						new ClientState('123'),
+						new ClientState('777'),
+						new ClientState('444'),
+					],
+				},
+				action: addClient(new ClientState('777')),
+				expectedState: {
+					clients: [
+						new ClientState('123'),
+						new ClientState('444'),
+						new ClientState('777'),
+					],
+				},
 			},
 		].forEach(test => {
 			it(test.name, () => {

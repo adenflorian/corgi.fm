@@ -23,6 +23,17 @@ export const setClients = (clients: IClientState[]) => {
 	}
 }
 
+export const SET_CLIENT_NAME = 'SET_CLIENT_NAME'
+export const setClientName = (id: ClientId, newName: string) => {
+	return {
+		type: SET_CLIENT_NAME,
+		id,
+		newName,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	}
+}
+
 export const SET_CLIENT_POINTER = 'SET_CLIENT_POINTER'
 export const setClientPointer = (id: ClientId, pointer: IClientPointer) => {
 	return {
@@ -123,6 +134,12 @@ export function clientsReducer(clientsState: IClientsState = initialState, actio
 				...clientsState,
 				clients: clientsState.clients
 					.map(x => x.id === action.id ? {...x, disconnecting: true} : x),
+			}
+		case SET_CLIENT_NAME:
+			return {
+				...clientsState,
+				clients: clientsState.clients
+					.map(x => x.id === action.id ? {...x, name: action.newName} : x),
 			}
 		case SET_CLIENT_POINTER:
 			return {
