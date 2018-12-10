@@ -26,10 +26,21 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 		messages: [],
 	}
 
+	public chatInputRef: React.RefObject<HTMLInputElement>
+
 	public state: IChatComponentState = {
 		chatMessage: '',
 		isChatFocused: false,
 	}
+
+	constructor(props) {
+		super(props)
+		this.chatInputRef = React.createRef()
+	}
+
+	public componentDidMount = () => window.addEventListener('keypress', this._onKeypress)
+
+	public componentWillUnmount = () => window.removeEventListener('keypress', this._onKeypress)
 
 	public render() {
 		const {author, authorColor, messages} = this.props
@@ -75,6 +86,7 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 						<input
 							id={chatInputId}
 							type="text"
+							ref={this.chatInputRef}
 							onChange={this._onInputChange}
 							value={this.state.chatMessage}
 							autoComplete="off"
@@ -85,24 +97,26 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 		)
 	}
 
-	private _onBlur = e => {
-		this.setState({isChatFocused: false})
-	}
+	private _onKeypress = (e: KeyboardEvent) => e.key === 'Enter' && this.chatInputRef.current.focus()
 
-	private _onFocus = e => {
-		this.setState({isChatFocused: true})
-	}
+	private _onBlur = () => this.setState({isChatFocused: false})
+
+	private _onFocus = () => this.setState({isChatFocused: true})
 
 	private _onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => this.setState({chatMessage: e.target.value})
 
 	private _onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault()
+
+		if (this.state.chatMessage === '') return
+
 		this.props.dispatch(chatSubmit({
 			authorName: this.props.author,
 			text: this.state.chatMessage,
 			color: this.props.authorColor,
 		}))
+
 		this.setState({chatMessage: ''})
-		e.preventDefault()
 	}
 }
 

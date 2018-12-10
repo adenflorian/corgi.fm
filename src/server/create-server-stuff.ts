@@ -14,7 +14,7 @@ export function createServerStuff(room: string, serverStore: Store) {
 	serverStore.dispatch(roomAction(addBasicInstrument(newInstrument), room))
 
 	const serverTrack = new TrackState(getInitialTrackEvents())
-	serverTrack.name = 'track 1'
+	serverTrack.name = 'melody'
 	serverStore.dispatch(roomAction(addTrack(serverTrack), room))
 	serverStore.dispatch(roomAction(addConnection(new Connection(
 		serverTrack.id,
@@ -32,7 +32,7 @@ export function createServerStuff(room: string, serverStore: Store) {
 	serverStore.dispatch(roomAction(addBasicInstrument(newInstrument2), room))
 
 	const serverTrack2 = new TrackState(getInitialTrackEvents2())
-	serverTrack2.name = 'track 2'
+	serverTrack2.name = 'bass'
 	serverStore.dispatch(roomAction(addTrack(serverTrack2), room))
 	serverStore.dispatch(roomAction(addConnection(new Connection(
 		serverTrack2.id,

@@ -92,7 +92,8 @@
 
 # Chat
 - [ ] delete old chat messages
-- [ ] Hit enter to focus chat
+- [√] Hit enter to focus chat
+- [ ] play sound when new message?
 
 # Bugs
 - [ ] shift click note not showing on other clients
@@ -104,6 +105,7 @@
 - [ ] analytics
 - [ ] newsletter (a way for users to sign up to get future updates)
 - [ ] let user change name
+	- by clicking on name in bottom left?
 - [ ] https
 - [ ] options view
 - [ ] better pointer
@@ -116,4 +118,3 @@
 - [ ] more keyboard features
 - [ ] show list of room members
 - [ ] send hearts and claps and stuff
-
