@@ -49,7 +49,7 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 					id="chatHorizontalGradient"
 					className="chatGradient"
 				/>
-				<ul>
+				<ul id="chatMessages">
 					{messages.map((x, i) =>
 						<li
 							key={i}

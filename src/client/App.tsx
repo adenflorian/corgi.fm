@@ -58,6 +58,7 @@ class App extends React.Component<IAppProps, {}> {
 								option={AppOptions.showNoteNamesOnKeyboard}
 								label="show names on keyboard"
 							/>
+							{info}
 							<div id="fps"></div>
 							<ConnectedRoomSelector />
 						</div>
@@ -101,7 +102,6 @@ class App extends React.Component<IAppProps, {}> {
 					id="info"
 					style={{marginTop: 'auto'}}
 				>
-					{info}
 				</div>
 			</Fragment>
 		)

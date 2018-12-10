@@ -5,76 +5,92 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    bottom: 16px;
-    top: 16px;
-    left: 16px;
-    right: 16px;
+    .spacing();
     z-index: 0;
-    padding: 8px;
+    // padding: 8px;
     background-color: rgba(20, 20, 24, 0.6);
     overflow: hidden;
     word-wrap: break-word;
-    border: 2px solid @panelGray;
-    font-size: 0.8em;
-    letter-spacing: initial;
+    // border: 2px solid @panelGray;
+    // font-size: 0.8em;
+    opacity: 0.5;
 
     &.focused {
         z-index: 1;
         user-select: text;
+        opacity: 1;
     }
+
+    #chatMessages {
+        padding: 0 8px 0 8px;
     
-    li {
-        text-align: left;
-        z-index: 0;
-        pointer-events: none;
+        li {
+            text-align: left;
+            z-index: 0;
+            pointer-events: none;
 
-        .selectable {
-            width: fit-content;
-            max-width: 100%;
-            margin-right: auto;
-            margin-left: 0;
-            cursor: text;
+            .selectable {
+                width: fit-content;
+                max-width: 100%;
+                margin-right: auto;
+                margin-left: 0;
+                cursor: text;
 
-            .author {
-                letter-spacing: 1px;
+                &:focus {
+                    outline: none;
+                }
+
+                .author {
+                }
+
+                .text {
+                    font-weight: initial;
+                    text-transform: initial;
+                    letter-spacing: initial;
+                }
             }
 
-            .text {
-                font-weight: initial;
-                text-transform: initial;
+            .focused& {
+                pointer-events: all;
             }
         }
     }
 
-    &.focused li {
-        pointer-events: all;
-    }
-
     #chatInput {
-        width: 100%;
         position: relative;
-        margin-top: 8px;
-        padding-left: 6px;
         z-index: 1;
+        box-sizing: border-box;
+        border: none;
+        width: 100%;
+        margin-top: 8px;
+        padding: 6px 8px 6px 8px;
         background-color: @panelGrayTransparent;
-        border: 2px solid @panelGray;
         color: inherit;
         font-size: inherit;
         font-family: inherit;
         text-decoration: inherit;
-        font: inherit;
         text-transform: uppercase;
         text-transform: initial;
+        resize: none;
+        letter-spacing: initial;
+
+        &:focus {
+            outline: none;
+        }
+    }
+
+    .spacing() {
+        bottom: 0px;
+        top: 0px;
+        left: 0px;
+        right: 0px;
     }
 
     .chatGradient {
         position: fixed;
-        width: 100%;
-        height: 100%;
-        bottom: 16px;
-        top: 16px;
-        left: 16px;
-        right: 16px;
+        width: inherit;
+        height: inherit;
+        .spacing();
         pointer-events: none;
         z-index: 2;
     }

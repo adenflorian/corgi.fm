@@ -88,6 +88,7 @@
 
 # Chat
 - [ ] delete old chat messages
+- [ ] Hit enter to focus chat
 
 # Bugs
 - [ ] shift click note not showing on other clients
