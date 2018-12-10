@@ -99,7 +99,7 @@
 - [√] Hit enter to focus chat
 - [ ] play sound when new message?
 - when change name, should we change the name in old chat messages?
-- [ ] update name in bottom left on blur of name input
+- [√] update name in bottom left on blur of name input
 
 # Bugs
 - [ ] shift click note not showing on other clients

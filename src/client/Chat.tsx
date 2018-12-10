@@ -92,6 +92,7 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 								onChange={this._onNameInputChange}
 								autoComplete="off"
 								style={{color: authorColor}}
+								onBlur={this._onNameInputBlur}
 							/>
 						</form>
 						<form className="chatMessageForm" onSubmit={this._onSubmitChat}>
@@ -123,6 +124,9 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 
 	private _onFocus = () => this.setState({isChatFocused: true})
 
+	// Name
+	private _onNameInputBlur = () => this.setState({username: this.props.author})
+
 	private _onNameInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const newValue = e.target.value
 		this.setState({username: newValue})
@@ -142,6 +146,7 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 		return (document.activeElement as HTMLElement).blur()
 	}
 
+	// Chat
 	private _onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => this.setState({chatMessage: e.target.value})
 
 	private _onSubmitChat = (e: React.FormEvent<HTMLFormElement>) => {
