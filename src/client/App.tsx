@@ -59,7 +59,7 @@ class App extends React.Component<IAppProps, {}> {
 								label="show names on keyboard"
 							/>
 							{info}
-							<div id="fps"></div>
+							<div id="fps">FPS</div>
 							<ConnectedRoomSelector />
 						</div>
 
