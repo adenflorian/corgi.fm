@@ -110,7 +110,7 @@
 # Bugs
 - [ ] shift click note not showing on other clients
 - [√] long usernames mess up the keyboard
-- [ ] long usernames mess up the chat input
+- [√] long usernames mess up the chat input
 
 # Adagio
 - [...] UI layout
