@@ -118,9 +118,10 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 
 	private _onNameInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const newValue = e.target.value.substring(0, maxUsernameLength)
+
 		this.setState({username: newValue})
 
-		if (newValue === '') return
+		if (newValue === '' || newValue.length !== newValue.trim().length) return
 
 		this.props.dispatch(setClientName(this.props.authorId, newValue))
 	}
@@ -129,6 +130,8 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 		e.preventDefault()
 
 		if (this.state.username === '') return
+
+		this.setState({username: this.state.username.trim()})
 
 		this.props.dispatch(setClientName(this.props.authorId, this.state.username))
 

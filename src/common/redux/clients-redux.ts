@@ -1,5 +1,6 @@
 import * as animal from 'animal-id'
-import * as Color from 'color'
+import ColorDefault from 'color'
+import * as ColorAll from 'color'
 import * as uuid from 'uuid'
 import {hashbow} from '../../client/utils'
 import {ClientId} from '../../client/websocket-listeners'
@@ -28,7 +29,7 @@ export const setClientName = (id: ClientId, newName: string) => {
 	return {
 		type: SET_CLIENT_NAME,
 		id,
-		newName: newName.substring(0, maxUsernameLength),
+		newName: newName.substring(0, maxUsernameLength).trim(),
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	}
@@ -98,11 +99,12 @@ export class ClientState implements IClientState {
 	public readonly name: string
 	public readonly pointer: IClientPointer
 
-	constructor({socketId, name}: {socketId: string, name?: string}) {
+	constructor({socketId, name}: {socketId: string, name: string | ''}) {
 		this.id = uuid.v4()
 		this.socketId = socketId
-		this.name = name.substring(0, maxUsernameLength) || animal.getId() + '-' + this.id[0]
-		this.color = Color(hashbow(this.id)).desaturate(0.2).hsl().string()
+		this.name = name === '' ? animal.getId() + '-' + this.id[0] : name.substring(0, maxUsernameLength).trim()
+		const colorFunc = ColorDefault || ColorAll
+		this.color = colorFunc(hashbow(this.id)).desaturate(0.2).hsl().string()
 		this.pointer = {distanceFromCenterX: 0, distanceFromBoardsTop: 0, ownerId: this.id}
 	}
 }
@@ -141,7 +143,7 @@ export function clientsReducer(clientsState: IClientsState = initialState, actio
 			return {
 				...clientsState,
 				clients: clientsState.clients
-					.map(x => x.id === action.id ? {...x, name: action.newName.substring(0, maxUsernameLength)} : x),
+					.map(x => x.id === action.id ? {...x, name: action.newName.substring(0, maxUsernameLength).trim()} : x),
 			}
 		case SET_CLIENT_POINTER:
 			return {

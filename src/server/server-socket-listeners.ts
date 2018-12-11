@@ -57,13 +57,15 @@ export function setupServerWebSocketListeners(io: Server, serverStore: Store) {
 	}, 5000)
 
 	io.on('connection', socket => {
-		logger.log('new connection | ', socket.id)
+		const newConnectionUsername = socket.handshake.query.username
+
+		logger.log(`new connection | ${socket.id} | ${newConnectionUsername}`)
 
 		socket.join(lobby, err => {
 			if (err) throw new Error(err)
 
 			onJoinRoom(io, socket, getRoom(socket),
-				serverStore, new ClientState({socketId: socket.id, name: socket.handshake.query.username}))
+				serverStore, new ClientState({socketId: socket.id, name: newConnectionUsername}))
 
 			socket.on(WebSocketEvent.broadcast, (action: BroadcastAction) => {
 				if (action.type !== SET_CLIENT_POINTER) {

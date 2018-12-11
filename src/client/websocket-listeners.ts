@@ -30,7 +30,7 @@ export function deleteAllTheThings(dispatch: Dispatch) {
 export function setupWebsocketAndListeners(store: Store) {
 	socket = io.connect(window.location.hostname + `:${port}/`, {
 		query: {
-			username: getUsernameFromLocalStorage().substring(0, maxUsernameLength) || '',
+			username: getUsernameFromLocalStorage().substring(0, maxUsernameLength),
 		},
 	})
 
