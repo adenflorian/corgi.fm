@@ -111,6 +111,8 @@
 - [√] shift click note not showing on other clients
 - [√] long usernames mess up the keyboard
 - [√] long usernames mess up the chat input
+- [ ] can't use scroll wheel in sequencer
+- [ ] sequencer doesn't always play when joining room with a playing sequencer
 
 # Adagio
 - [...] UI layout
