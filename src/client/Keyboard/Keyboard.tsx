@@ -81,9 +81,11 @@ export class Keyboard extends React.PureComponent<IKeyboardProps, IKeyboardState
 		const {ownerName, pressedMidiKeys, octave, color, isPlaying,
 			virtualMidiKeyboard, isLocal, showNoteNames} = this.props
 
-		const isOwnerNameTooLong = ownerName.length > 16
+		const maxUsernameDisplayLength = 24
 
-		const ownerNameDisplay = isOwnerNameTooLong ? ownerName.substring(0, 16) + '...' : ownerName
+		const isOwnerNameTooLong = ownerName.length > maxUsernameDisplayLength
+
+		const ownerNameDisplay = isOwnerNameTooLong ? ownerName.substring(0, maxUsernameDisplayLength) + '...' : ownerName
 
 		return (
 			<div

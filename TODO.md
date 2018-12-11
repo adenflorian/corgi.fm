@@ -50,6 +50,7 @@
 - [ ] simple mode
 - [ ] make usable on mobile
 - [ ] show loading icon on startup
+- [ ] show badge on test server with warning
 
 # Connections
 - [ ] make it obvious which direction data flows

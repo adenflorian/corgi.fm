@@ -28,7 +28,7 @@ export const setClientName = (id: ClientId, newName: string) => {
 	return {
 		type: SET_CLIENT_NAME,
 		id,
-		newName,
+		newName: newName.substring(0, maxUsernameLength),
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	}
@@ -60,6 +60,8 @@ export const clientDisconnecting = (id: ClientId) => {
 		id,
 	}
 }
+
+export const maxUsernameLength = 42
 
 export interface IClientsState {
 	clients: IClientState[]
@@ -99,7 +101,7 @@ export class ClientState implements IClientState {
 	constructor({socketId, name}: {socketId: string, name?: string}) {
 		this.id = uuid.v4()
 		this.socketId = socketId
-		this.name = name || animal.getId() + '-' + this.id[0]
+		this.name = name.substring(0, maxUsernameLength) || animal.getId() + '-' + this.id[0]
 		this.color = Color(hashbow(this.id)).desaturate(0.2).hsl().string()
 		this.pointer = {distanceFromCenterX: 0, distanceFromBoardsTop: 0, ownerId: this.id}
 	}
@@ -139,7 +141,7 @@ export function clientsReducer(clientsState: IClientsState = initialState, actio
 			return {
 				...clientsState,
 				clients: clientsState.clients
-					.map(x => x.id === action.id ? {...x, name: action.newName} : x),
+					.map(x => x.id === action.id ? {...x, name: action.newName.substring(0, maxUsernameLength)} : x),
 			}
 		case SET_CLIENT_POINTER:
 			return {

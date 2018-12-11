@@ -3,10 +3,11 @@ import {Component} from 'react'
 import AutosizeInput from 'react-input-autosize'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
-import {chatSubmit, IChatMessage, selectAllMessages} from '../common/redux/chat-redux'
-import {selectLocalClient, setClientName} from '../common/redux/clients-redux'
+import {chatSubmit} from '../common/redux/chat-redux'
+import {maxUsernameLength, selectLocalClient, setClientName} from '../common/redux/clients-redux'
 import {IAppState} from '../common/redux/configureStore'
 import './Chat.less'
+import {ConnectedChatMessages} from './Chat/ChatMessages'
 import {saveUsernameToLocalStorage} from './username'
 
 interface IChatComponentState {
@@ -20,14 +21,9 @@ interface IChatProps {
 	authorColor?: string
 	authorId?: string
 	dispatch?: Dispatch
-	messages?: IChatMessage[]
 }
 
 export class Chat extends Component<IChatProps, IChatComponentState> {
-	public static defaultProps = {
-		messages: [],
-	}
-
 	public state: IChatComponentState = {
 		chatMessage: '',
 		isChatFocused: false,
@@ -54,7 +50,7 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 	public componentDidUpdate = () => saveUsernameToLocalStorage(this.props.author)
 
 	public render() {
-		const {authorColor, messages} = this.props
+		const {authorColor} = this.props
 
 		return (
 			<div
@@ -72,22 +68,9 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 					id="chatHorizontalGradient"
 					className="chatGradient"
 				/>
-				<ul id="chatMessages">
-					{messages.map((x, i) =>
-						<li
-							key={i}
-						>
-							<div className="selectable" tabIndex={-1}>
-								<span className="author" style={{color: x.color}}>
-									{x.authorName}
-								</span>
-								<span className="text" >
-									{x.text}
-								</span>
-							</div>
-						</li>,
-					)}
-				</ul>
+
+				<ConnectedChatMessages />
+
 				<div className="chatBottom" style={{textAlign: 'initial'}} tabIndex={-1}>
 					<div className="inputWrapper" style={{color: authorColor}} tabIndex={-1}>
 						<form className="nameForm" onSubmit={this._onSubmitNameChange}>
@@ -134,7 +117,7 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 	private _onNameInputBlur = () => this.setState({username: this.props.author})
 
 	private _onNameInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const newValue = e.target.value
+		const newValue = e.target.value.substring(0, maxUsernameLength)
 		this.setState({username: newValue})
 
 		if (newValue === '') return
@@ -176,5 +159,4 @@ export const ConnectedChat = connect((state: IAppState) => ({
 	author: selectLocalClient(state).name,
 	authorColor: selectLocalClient(state).color,
 	authorId: selectLocalClient(state).id,
-	messages: selectAllMessages(state),
 }))(Chat)

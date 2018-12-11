@@ -3,6 +3,7 @@ import {Store} from 'redux'
 import * as io from 'socket.io-client'
 import {logger} from '../common/logger'
 import {BASIC_INSTRUMENT_THING_TYPE} from '../common/redux/basic-instruments-redux'
+import {maxUsernameLength} from '../common/redux/clients-redux'
 import {deleteAllConnections} from '../common/redux/connections-redux'
 import {deleteAllThings} from '../common/redux/multi-reducer'
 import {TRACK_THING_TYPE} from '../common/redux/tracks-redux'
@@ -29,7 +30,7 @@ export function deleteAllTheThings(dispatch: Dispatch) {
 export function setupWebsocketAndListeners(store: Store) {
 	socket = io.connect(window.location.hostname + `:${port}/`, {
 		query: {
-			username: getUsernameFromLocalStorage() || '',
+			username: getUsernameFromLocalStorage().substring(0, maxUsernameLength) || '',
 		},
 	})
 
