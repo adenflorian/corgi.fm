@@ -54,6 +54,7 @@ interface IKeyboardState {
 
 export class Keyboard extends React.PureComponent<IKeyboardProps, IKeyboardState> {
 	public static defaultProps = {
+		ownerName: '',
 		pressedMidiKeys: [],
 		showNoteNames: true,
 	}

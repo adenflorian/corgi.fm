@@ -119,6 +119,8 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 	private _onNameInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const newValue = e.target.value.substring(0, maxUsernameLength)
 
+		if (newValue === this.state.username) return
+
 		this.setState({username: newValue})
 
 		if (newValue === '' || newValue.length !== newValue.trim().length) return

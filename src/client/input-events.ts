@@ -85,6 +85,7 @@ export function setupInputEventListeners(window: Window, store: Store) {
 	})
 
 	window.addEventListener('keyup', e => {
+		// Don't block keyup when input is focused, or else music key might get stuck down
 		onKeyEvent(e)
 	})
 
