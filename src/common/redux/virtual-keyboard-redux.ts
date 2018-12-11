@@ -70,15 +70,6 @@ export const virtualAllKeysUp = (id: string) => {
 	}
 }
 
-export const VIRTUAL_KEY_FLIP = 'VIRTUAL_KEY_FLIP'
-export const virtualKeyFlip = (id: string, number: number) => {
-	return {
-		type: VIRTUAL_KEY_FLIP,
-		id,
-		number,
-	}
-}
-
 export const VIRTUAL_OCTAVE = 'VIRTUAL_OCTAVE'
 export const virtualOctave = (id: string, octave: Octave) => {
 	return {
@@ -141,7 +132,6 @@ const keyboardActionTypes = [
 	VIRTUAL_KEY_PRESSED,
 	VIRTUAL_KEY_UP,
 	VIRTUAL_ALL_KEYS_UP,
-	VIRTUAL_KEY_FLIP,
 	SET_VIRTUAL_KEYS,
 	VIRTUAL_OCTAVE,
 	VIRTUAL_OCTAVE_CHANGE,
@@ -169,14 +159,6 @@ function virtualKeyboardReducer(virtualKeyboard: IVirtualKeyboardState, action: 
 			return {
 				...virtualKeyboard,
 				pressedKeys: [],
-			}
-		case VIRTUAL_KEY_FLIP:
-			return {
-				...virtualKeyboard,
-				pressedKeys: flipKey(
-					virtualKeyboard.pressedKeys,
-					action.number,
-				),
 			}
 		case SET_VIRTUAL_KEYS:
 			return {

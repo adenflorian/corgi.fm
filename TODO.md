@@ -108,7 +108,7 @@
 - [√] save name in local storage and us on re-entry
 
 # Bugs
-- [ ] shift click note not showing on other clients
+- [√] shift click note not showing on other clients
 - [√] long usernames mess up the keyboard
 - [√] long usernames mess up the chat input
 

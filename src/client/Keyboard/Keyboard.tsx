@@ -3,9 +3,7 @@ import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 import {ClientState, selectClientById, selectLocalClient} from '../../common/redux/clients-redux'
 import {IAppState} from '../../common/redux/configureStore'
-import {
-	selectVirtualKeyboard, virtualKeyFlip, virtualKeyPressed, virtualKeyUp,
-} from '../../common/redux/virtual-keyboard-redux'
+import {selectVirtualKeyboard, virtualKeyPressed, virtualKeyUp} from '../../common/redux/virtual-keyboard-redux'
 import {keyToMidiMap} from '../input-events'
 import {Octave} from '../music/music-types'
 import {isLeftMouseButtonDown, keyColors} from '../utils'
@@ -37,7 +35,7 @@ export function isWhiteKey(keyNumber: number) {
 
 interface IKeyboardProps {
 	ownerName: string,
-	pressedMidiKeys?: any,
+	pressedMidiKeys?: any[],
 	octave?: Octave
 	virtualMidiKeyboard: any
 	color: string
@@ -116,7 +114,7 @@ export class Keyboard extends React.PureComponent<IKeyboardProps, IKeyboardState
 								className={`key ${value.color} ${isKeyPressed ? 'pressed' : 'notPressed'}`}
 								onMouseOver={e => this.handleMouseOver(e, index)}
 								onMouseOut={e => this.handleMouseOut(e, index)}
-								onMouseDown={e => this.handleMouseDown(e, index)}
+								onMouseDown={e => this.handleMouseDown(e, index, isKeyPressed)}
 								onMouseUp={e => this.handleMouseUp(e, index)}
 							>
 								<div className="noteName unselectable">
@@ -151,12 +149,16 @@ export class Keyboard extends React.PureComponent<IKeyboardProps, IKeyboardState
 		}
 	}
 
-	private handleMouseDown = (e: React.MouseEvent, index: number) => {
+	private handleMouseDown = (e: React.MouseEvent, index: number, isKeyPressed: boolean) => {
 		if (this.props.isLocal === false) return
 		if (e.button === 0) {
 			this.setState({wasMouseClickedOnKeyboard: true})
 			if (e.shiftKey) {
-				this.props.dispatch(virtualKeyFlip(this.props.id, index))
+				if (isKeyPressed) {
+					this.props.dispatch(virtualKeyUp(this.props.id, index))
+				} else {
+					this.props.dispatch(virtualKeyPressed(this.props.id, index))
+				}
 			} else {
 				this.props.dispatch(virtualKeyPressed(this.props.id, index))
 			}
