@@ -49,6 +49,7 @@
 - [ ] offline mode
 - [ ] simple mode
 - [ ] make usable on mobile
+- [ ] show loading icon on startup
 
 # Connections
 - [ ] make it obvious which direction data flows
@@ -98,6 +99,7 @@
 - [ ] delete old chat messages
 - [√] Hit enter to focus chat
 - [ ] play sound when new message?
+- [ ] make new messages start at full opacity then fade to whatever the normal opacity is
 
 # Username
 - when change name, should we change the name in old chat messages?
@@ -106,7 +108,8 @@
 
 # Bugs
 - [ ] shift click note not showing on other clients
-- [ ] long usernames mess up the keyboard
+- [√] long usernames mess up the keyboard
+- [ ] long usernames mess up the chat input
 
 # Adagio
 - [...] UI layout

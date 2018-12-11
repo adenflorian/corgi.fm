@@ -81,13 +81,17 @@ export class Keyboard extends React.PureComponent<IKeyboardProps, IKeyboardState
 		const {ownerName, pressedMidiKeys, octave, color, isPlaying,
 			virtualMidiKeyboard, isLocal, showNoteNames} = this.props
 
+		const isOwnerNameTooLong = ownerName.length > 16
+
+		const ownerNameDisplay = isOwnerNameTooLong ? ownerName.substring(0, 16) + '...' : ownerName
+
 		return (
 			<div
 				style={{color}}
 				className={`keyboard ${isLocal ? 'isLocal' : ''} ${isPlaying ? 'saturate' : 'isNotPlaying'}`}
 			>
-				<div className="label clientId colorize">
-					{ownerName || '""'}
+				<div className="label clientId colorize" title={isOwnerNameTooLong ? ownerName.toUpperCase() : ''}>
+					{ownerNameDisplay || '""'}
 				</div>
 				<div id={this.props.id} className="container">
 					<div className="isometricBoxShadow"></div>
