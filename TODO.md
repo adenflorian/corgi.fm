@@ -95,6 +95,7 @@
 - [ ] create more rooms automatically when lobby is full
 - [ ] observers (users who can join room but not play)
 	- permissions system
+- [ ] use `strictNullChecks` typescript config
 
 # Chat
 - [ ] delete old chat messages
