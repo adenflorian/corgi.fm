@@ -12,9 +12,10 @@ import {BroadcastAction} from '../common/redux/websocket-client-sender-middlewar
 import {setInfo, setSocketId} from '../common/redux/websocket-redux'
 import {WebSocketEvent} from '../common/server-constants'
 import {selfDisconnected} from './../common/redux/common-actions'
+import {isProd} from './is-prod'
 import {getUsernameFromLocalStorage} from './username'
 
-const port = process.env.NODE_ENV === 'production' ? 443 : 3000
+const port = isProd() ? 443 : 3000
 
 export let socket
 
