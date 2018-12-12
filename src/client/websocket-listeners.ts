@@ -14,7 +14,7 @@ import {WebSocketEvent} from '../common/server-constants'
 import {selfDisconnected} from './../common/redux/common-actions'
 import {getUsernameFromLocalStorage} from './username'
 
-const port = 80
+const port = process.env.NODE_ENV === 'production' ? 443 : 3000
 
 export let socket
 

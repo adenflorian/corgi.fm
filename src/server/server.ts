@@ -22,7 +22,7 @@ setupExpressApp(app, serverStore)
 
 setupServerWebSocketListeners(io, serverStore)
 
-const port = 80
+const port = 3000
 
 server.listen(port)
 

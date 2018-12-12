@@ -53,6 +53,7 @@
 - [ ] show loading icon on startup
 - [ ] show badge on test server with warning
 - [ ] extend the range of the keyboard by one which will map to the `'` key
+- [ ] use `strictNullChecks` typescript config
 
 # Connections
 - [ ] make it obvious which direction data flows
@@ -94,16 +95,16 @@
 - [ ] *better UX
 - [ ] rename existing rooms
 - [ ] room ownership
-- [ ] create more rooms automatically when lobby is full
+- [ ] create more lobbies automatically when lobby is full
 - [ ] observers (users who can join room but not play)
 	- permissions system
-- [ ] use `strictNullChecks` typescript config
 
 # Chat
 - [ ] delete old chat messages
 - [√] Hit enter to focus chat
 - [ ] play sound when new message?
 - [ ] make new messages start at full opacity then fade to whatever the normal opacity is
+- [ ] make chat bottom bar always in front?
 
 # Username
 - when change name, should we change the name in old chat messages?
@@ -116,7 +117,7 @@
 - [√] long usernames mess up the chat input
 - [ ] can't use scroll wheel in sequencer
 - [ ] sequencer doesn't always play when joining room with a playing sequencer
-- [ ] can't click chat on short window
+- [√] can't click chat on short window
 
 # Adagio
 - [...] UI layout
@@ -125,7 +126,7 @@
 - [ ] analytics
 - [ ] newsletter (a way for users to sign up to get future updates)
 - [...] let user change name
-- [ ] https
+- [√] https
 - [ ] options view
 - [ ] better pointer
 
@@ -137,3 +138,8 @@
 - [ ] more keyboard features
 - [ ] show list of room members
 - [ ] send hearts and claps and stuff
+- [ ] export midi
+- [ ] import midi
+- [ ] Docker?
+- [ ] pick final product name
+- [ ] get domain
