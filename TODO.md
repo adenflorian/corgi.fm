@@ -114,6 +114,7 @@
 - [√] long usernames mess up the chat input
 - [ ] can't use scroll wheel in sequencer
 - [ ] sequencer doesn't always play when joining room with a playing sequencer
+- [ ] can't click chat on short window
 
 # Adagio
 - [...] UI layout
