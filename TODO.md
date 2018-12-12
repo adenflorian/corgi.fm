@@ -22,6 +22,7 @@
 - [√] maybe use requestAnimationFrame()
 - [ ] make use of `'` key
 - [ ] add `+` and `-` for octave
+	- [ ] [bug] pressing shift `=` (`+`) increases the octave by 2
 - [√] persist keyboard state on server, and don't store notes and octaves on clients
 - [ ] TONE.js
 - [ ] immer js
@@ -51,6 +52,7 @@
 - [ ] make usable on mobile
 - [ ] show loading icon on startup
 - [ ] show badge on test server with warning
+- [ ] extend the range of the keyboard by one which will map to the `'` key
 
 # Connections
 - [ ] make it obvious which direction data flows
