@@ -13,10 +13,10 @@ import {BroadcastAction} from '../common/redux/websocket-client-sender-middlewar
 import {setInfo, setSocketId} from '../common/redux/websocket-redux'
 import {WebSocketEvent} from '../common/server-constants'
 import {selfDisconnected} from './../common/redux/common-actions'
-import {isProd} from './is-prod'
+import {isLocalDevClient} from './is-prod-client'
 import {getUsernameFromLocalStorage} from './username'
 
-const port = isProd() ? 443 : 3000
+const port = isLocalDevClient() ? 3000 : 443
 
 export let socket
 

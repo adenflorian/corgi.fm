@@ -5,8 +5,11 @@ import {logger} from '../common/logger'
 import {createRoom} from '../common/redux/rooms-redux'
 import {configureServerStore} from './configure-server-store'
 import {createServerStuff} from './create-server-stuff'
+import {logServerEnv} from './is-prod-server'
 import {lobby, setupServerWebSocketListeners} from './server-socket-listeners'
 import {setupExpressApp} from './setup-express-app'
+
+logServerEnv()
 
 const serverStore = configureServerStore()
 

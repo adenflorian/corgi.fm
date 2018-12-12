@@ -1,8 +1,8 @@
 import * as express from 'express'
 import * as path from 'path'
 import {Store} from 'redux'
-import {isProd} from '../common/common-utils'
 import {selectRoomStateByName} from '../common/redux/room-stores-redux'
+import {isProdServer} from './is-prod-server'
 
 export function setupExpressApp(app: express.Application, serverStore: Store) {
 	app.use(express.static(path.join(__dirname, '../public')))
@@ -11,7 +11,7 @@ export function setupExpressApp(app: express.Application, serverStore: Store) {
 		res.sendFile(path.join(__dirname, '../public/index.html'))
 	})
 
-	if (isProd()) {
+	if (!isProdServer()) {
 		app.get('/state', (_, res) => {
 			res.json(serverStore.getState())
 		})

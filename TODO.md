@@ -56,6 +56,8 @@
 - [ ] use `strictNullChecks` typescript config
 - [ ] flash action
 	- send messages to users to be displayed on their screens
+- [ ] setup dotenv files
+	- https://parceljs.org/env.html
 
 # Connections
 - [ ] make it obvious which direction data flows
