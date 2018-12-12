@@ -54,6 +54,8 @@
 - [ ] show badge on test server with warning
 - [ ] extend the range of the keyboard by one which will map to the `'` key
 - [ ] use `strictNullChecks` typescript config
+- [ ] flash action
+	- send messages to users to be displayed on their screens
 
 # Connections
 - [ ] make it obvious which direction data flows
@@ -91,13 +93,14 @@
 - [√] handle user joining a room that doesn't exist
 - [√] delete empty rooms every 5 seconds
 - [ ] *choose name for room at creation
-- [ ] *join room by url
+- [√] *join room by url
 - [ ] *better UX
 - [ ] rename existing rooms
 - [ ] room ownership
 - [ ] create more lobbies automatically when lobby is full
 - [ ] observers (users who can join room but not play)
 	- permissions system
+- [ ] limit number of rooms?
 
 # Chat
 - [ ] delete old chat messages
@@ -129,6 +132,7 @@
 - [√] https
 - [ ] options view
 - [ ] better pointer
+- [ ] favicon
 
 # Ballad
 - [ ] login system

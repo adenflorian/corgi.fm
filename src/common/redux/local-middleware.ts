@@ -6,7 +6,7 @@ import {IAppState} from './configureStore'
 import {addConnection, Connection, ConnectionSourceType, ConnectionTargetType} from './connections-redux'
 import {selectLocalKeyboardId, setLocalVirtualKeyboardId} from './local-redux'
 import {makeActionCreator} from './redux-utils'
-import {SET_ACTIVE_ROOM, SET_ROOMS} from './rooms-redux'
+import {selectActiveRoom, SET_ACTIVE_ROOM, SET_ROOMS} from './rooms-redux'
 import {
 	addVirtualKeyboard, VirtualKeyboardState, virtualKeyPressed, virtualKeyUp, virtualOctaveChange,
 } from './virtual-keyboard-redux'
@@ -45,6 +45,7 @@ export const localMiddleware: Middleware = ({dispatch, getState}) => next => act
 		}
 		case SET_ACTIVE_ROOM: {
 			next(action)
+			window.history.pushState({}, document.title, '/' + selectActiveRoom(getState()))
 			return deleteAllTheThings(dispatch)
 		}
 		default:

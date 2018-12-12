@@ -1,6 +1,7 @@
 import {Dispatch} from 'redux'
 import {Store} from 'redux'
 import * as io from 'socket.io-client'
+import {maxRoomNameLength} from '../common/common-constants'
 import {logger} from '../common/logger'
 import {BASIC_INSTRUMENT_THING_TYPE} from '../common/redux/basic-instruments-redux'
 import {maxUsernameLength} from '../common/redux/clients-redux'
@@ -32,6 +33,7 @@ export function setupWebsocketAndListeners(store: Store) {
 	socket = io.connect(window.location.hostname + `:${port}/`, {
 		query: {
 			username: getUsernameFromLocalStorage().substring(0, maxUsernameLength),
+			room: window.location.pathname.trim().substring(0, maxRoomNameLength),
 		},
 	})
 

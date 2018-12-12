@@ -1,6 +1,7 @@
 import * as animal from 'animal-id'
 import {AnyAction, Store} from 'redux'
 import {Server, Socket} from 'socket.io'
+import {maxRoomNameLength} from '../common/common-constants'
 import {logger} from '../common/logger'
 import {
 	deleteBasicInstruments, selectAllInstruments, selectInstrumentsByOwner, updateBasicInstruments,
@@ -59,14 +60,29 @@ export function setupServerWebSocketListeners(io: Server, serverStore: Store) {
 	io.on('connection', socket => {
 		const newConnectionUsername = socket.handshake.query.username
 
-		logger.log(`new connection | ${socket.id} | ${newConnectionUsername}`)
+		const newConnectionRoom = getRoomName(socket.handshake.query.room)
 
-		socket.join(lobby, err => {
-			if (err) throw new Error(err)
+		logger.log(
+			`new connection | socketId: '${socket.id}' | username: '${newConnectionUsername}' | room: '${newConnectionRoom}'`,
+		)
 
-			onJoinRoom(io, socket, getRoom(socket),
-				serverStore, new ClientState({socketId: socket.id, name: newConnectionUsername}))
+		registerCallBacks()
 
+		joinOrCreateRoom(newConnectionRoom || lobby, new ClientState({socketId: socket.id, name: newConnectionUsername}))
+
+		function getRoomName(roomQueryString: string) {
+			try {
+				return decodeURIComponent(roomQueryString.replace(/^\//, ''))
+					.replace(/ +(?= )/g, '')
+					.trim()
+					.substring(0, maxRoomNameLength)
+			} catch (error) {
+				logger.warn('failed to parse room name: ', error)
+				return ''
+			}
+		}
+
+		function registerCallBacks() {
 			socket.on(WebSocketEvent.broadcast, (action: BroadcastAction) => {
 				if (action.type !== SET_CLIENT_POINTER) {
 					logger.debug(`${WebSocketEvent.broadcast}: ${socket.id} | `, action)
@@ -107,7 +123,22 @@ export function setupServerWebSocketListeners(io: Server, serverStore: Store) {
 
 				logger.log(`done cleaning: ${socket.id}`)
 			})
-		})
+		}
+
+		function joinOrCreateRoom(newRoom: string, client: IClientState) {
+			socket.join(newRoom, err => {
+				if (err) throw new Error(err)
+
+				const roomExists = selectRoomExists(serverStore.getState(), newRoom)
+
+				// Do this check after joining the socket to the room, that way the room can't get deleted anymore
+				if (roomExists === false) {
+					makeNewRoom(newRoom)
+				}
+
+				onJoinRoom(io, socket, newRoom, serverStore, client)
+			})
+		}
 
 		function changeRooms(newRoom: string) {
 			const roomToLeave = getRoom(socket)
