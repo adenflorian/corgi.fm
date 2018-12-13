@@ -19,7 +19,6 @@ export class BasicInstrument {
 	private _gain: GainNode
 	private _lowPassFilter: BiquadFilterNode
 	private _previousNotes: number[] = []
-	private _oscillatorType: ShamuOscillatorType
 	private _attackTimeInSeconds: number = 0.01
 	private _releaseTimeInSeconds: number = 3
 	private _voices: Voices
@@ -50,9 +49,7 @@ export class BasicInstrument {
 			module.hot.dispose(this.dispose)
 		}
 
-		this._oscillatorType = options.oscillatorType
-
-		this._voices = new Voices(options.voiceCount, this._audioContext, this._panNode, this._oscillatorType)
+		this._voices = new Voices(options.voiceCount, this._audioContext, this._panNode, options.oscillatorType)
 	}
 
 	public setPan = (pan: number) => this._panNode.pan.setValueAtTime(pan, this._audioContext.currentTime)
@@ -61,7 +58,6 @@ export class BasicInstrument {
 		this._lowPassFilter.frequency.setValueAtTime(frequency, this._audioContext.currentTime)
 
 	public setOscillatorType = (type: ShamuOscillatorType) => {
-		this._oscillatorType = type
 		this._voices.setOscillatorType(type)
 	}
 
@@ -152,7 +148,10 @@ class Voices {
 	}
 
 	public setOscillatorType(type: ShamuOscillatorType) {
-		this._inactiveVoices.forEach(x => x.setOscillatorType(type))
+		this._activeVoices
+			.concat(this._releasingVoices)
+			.concat(this._inactiveVoices)
+			.forEach(x => x.setOscillatorType(type))
 	}
 
 	public dispose() {
@@ -204,10 +203,12 @@ class Voice {
 	private _gain: GainNode
 	private _audioContext: AudioContext
 	private _oscillatorType: ShamuOscillatorType
+	private _nextOscillatorType: ShamuOscillatorType
 	private _destination: AudioNode
 	private _whiteNoise: AudioBufferSourceNode
 	private _noiseBuffer: AudioBuffer
 	private _releaseId: string
+	private _status: VoiceStatus = VoiceStatus.off
 
 	constructor(audioContext: AudioContext, destination: AudioNode, oscType: ShamuOscillatorType) {
 		this._audioContext = audioContext
@@ -230,9 +231,12 @@ class Voice {
 
 		this._oscillator.frequency.value = midiNoteToFrequency(note)
 
+		this._refreshOscillatorType()
+
 		this.playStartTime = this._audioContext.currentTime
 
 		this.playingNote = note
+		this._status = VoiceStatus.playing
 	}
 
 	public release = (timeToReleaseInSeconds: number) => {
@@ -240,18 +244,26 @@ class Voice {
 		this._gain.gain.setValueAtTime(this._gain.gain.value, this._audioContext.currentTime)
 		this._gain.gain.exponentialRampToValueAtTime(0.00001, this._audioContext.currentTime + timeToReleaseInSeconds)
 
+		this._status = VoiceStatus.releasing
 		this._releaseId = uuid.v4()
 		return this._releaseId
 	}
 
 	public setOscillatorType = (newOscType: ShamuOscillatorType) => {
-		const oldOscType = this._oscillatorType
+		this._nextOscillatorType = newOscType
 
-		if (this._oscillatorType !== newOscType) {
-			this._oscillatorType = newOscType
+		if (this._status === VoiceStatus.playing) {
+			this._refreshOscillatorType()
+		}
+	}
 
-			if (newOscType in BuiltInOscillatorType && oldOscType in BuiltInOscillatorType) {
-				this._oscillator.type = newOscType as OscillatorType
+	public _refreshOscillatorType = () => {
+		if (this._oscillatorType !== this._nextOscillatorType) {
+			const oldOscType = this._oscillatorType
+			this._oscillatorType = this._nextOscillatorType
+
+			if (this._oscillatorType in BuiltInOscillatorType && oldOscType in BuiltInOscillatorType) {
+				this._oscillator.type = this._oscillatorType as OscillatorType
 			} else {
 				this._rebuildChain()
 			}
@@ -329,4 +341,10 @@ class Voice {
 			gain.cancelScheduledValues(this._audioContext.currentTime)
 		}
 	}
+}
+
+enum VoiceStatus {
+	playing,
+	releasing,
+	off,
 }
