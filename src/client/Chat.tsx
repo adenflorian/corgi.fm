@@ -117,7 +117,9 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 	private _onNameInputBlur = () => this.setState({username: this.props.author})
 
 	private _onNameInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const newValue = e.target.value.substring(0, maxUsernameLength)
+		const newValue = e.target.value
+			.replace(/ +(?= )/g, '')
+			.substring(0, maxUsernameLength)
 
 		if (newValue === this.state.username) return
 

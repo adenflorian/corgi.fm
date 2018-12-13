@@ -8,8 +8,8 @@ import {
 } from '../common/redux/basic-instruments-redux'
 import {selectAllMessages, setChat} from '../common/redux/chat-redux'
 import {
-	addClient, clientDisconnected, ClientState, IClientState, selectAllClients,
-	selectClientBySocketId, SET_CLIENT_POINTER, setClients,
+	addClient, clientDisconnected, ClientState, IClientState, maxUsernameLength,
+	selectAllClients, selectClientBySocketId, SET_CLIENT_POINTER, setClients,
 } from '../common/redux/clients-redux'
 import {IAppState} from '../common/redux/configureStore'
 import {
@@ -59,6 +59,9 @@ export function setupServerWebSocketListeners(io: Server, serverStore: Store) {
 
 	io.on('connection', socket => {
 		const newConnectionUsername = socket.handshake.query.username
+			.replace(/ +(?= )/g, '')
+			.trim()
+			.substring(0, maxUsernameLength)
 
 		const newConnectionRoom = getRoomName(socket.handshake.query.room)
 

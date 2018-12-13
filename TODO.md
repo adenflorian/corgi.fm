@@ -129,7 +129,7 @@
 - [...] rooms
 - [...] chat
 - [ ] analytics
-- [ ] newsletter (a way for users to sign up to get future updates)
+- [...] newsletter (a way for users to sign up to get future updates)
 - [...] let user change name
 - [√] https
 - [ ] options view

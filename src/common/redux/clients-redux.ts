@@ -102,7 +102,10 @@ export class ClientState implements IClientState {
 	constructor({socketId, name}: {socketId: string, name: string | ''}) {
 		this.id = uuid.v4()
 		this.socketId = socketId
-		this.name = name === '' ? animal.getId() + '-' + this.id[0] : name.substring(0, maxUsernameLength).trim()
+		this.name = name === '' ? animal.getId() + '-' + this.id[0] : name
+			.replace(/ +(?= )/g, '')
+			.trim()
+			.substring(0, maxUsernameLength)
 		const colorFunc = ColorDefault || ColorAll
 		this.color = colorFunc(hashbow(this.id)).desaturate(0.2).hsl().string()
 		this.pointer = {distanceFromCenterX: 0, distanceFromBoardsTop: 0, ownerId: this.id}
@@ -143,7 +146,13 @@ export function clientsReducer(clientsState: IClientsState = initialState, actio
 			return {
 				...clientsState,
 				clients: clientsState.clients
-					.map(x => x.id === action.id ? {...x, name: action.newName.substring(0, maxUsernameLength).trim()} : x),
+					.map(x => x.id === action.id ? {
+						...x,
+						name: action.newName
+							.replace(/ +(?= )/g, '')
+							.trim()
+							.substring(0, maxUsernameLength),
+					} : x),
 			}
 		case SET_CLIENT_POINTER:
 			return {
