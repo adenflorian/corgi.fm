@@ -23,11 +23,15 @@ export class RoomSelector extends Component<IRoomSelectorProps> {
 
 		return (
 			<div id="roomSelector">
-				<div>
+				<div className="selectRow">
 					<label htmlFor="roomSelect">Room </label>
-					<select name="roomSelect" value={activeRoom} onChange={this.onRoomSelect} >
-						{rooms.map(room => <option key={room || 'null'} value={room} label={room}>{room}</option>)}
-					</select>
+					<div className="selectContainer">
+						<div className="isometricBoxShadow" />
+						<select name="roomSelect" value={activeRoom} onChange={this.onRoomSelect}>
+							{rooms.map(room => <option key={room || 'null'} value={room} label={room}>{room}</option>)}
+						</select>
+						<span>▼</span>
+					</div>
 				</div>
 
 				<div className="buttonContainer">

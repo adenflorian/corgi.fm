@@ -54,17 +54,21 @@ class App extends React.Component<IAppProps, {}> {
 						<ConnectedChat />
 
 						<div id="topDiv" style={{marginBottom: 'auto'}}>
-							<ConnectedOption
-								option={AppOptions.showNoteNamesOnKeyboard}
-								label="show names on keyboard"
-							/>
-							{info}
-							<div id="fps">FPS</div>
-							<div className="buttonContainer">
-								<div className="isometricBoxShadow" />
-								<button onClick={() => window.location.pathname = '/newsletter'}>Newsletter Signup</button>
+							<div className="left">
+								<ConnectedOption
+									option={AppOptions.showNoteNamesOnKeyboard}
+									label="show names on keyboard"
+								/>
+								{info}
+								<div id="fps">FPS</div>
 							</div>
-							<ConnectedRoomSelector />
+							<div className="right">
+								<div className="buttonContainer">
+									<div className="isometricBoxShadow" />
+									<button onClick={() => window.location.pathname = '/newsletter'}>Newsletter Signup</button>
+								</div>
+								<ConnectedRoomSelector />
+							</div>
 						</div>
 
 						<div id={mainBoardsId} className="boards">
@@ -104,7 +108,6 @@ class App extends React.Component<IAppProps, {}> {
 
 				<div
 					id="info"
-					style={{marginTop: 'auto'}}
 				>
 				</div>
 			</Fragment>

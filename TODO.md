@@ -103,6 +103,7 @@
 - [ ] observers (users who can join room but not play)
 	- permissions system
 - [ ] limit number of rooms?
+- [ ] assign a room a color
 
 # Chat
 - [ ] delete old chat messages

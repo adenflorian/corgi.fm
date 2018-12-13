@@ -17,7 +17,7 @@ body {
     text-transform: uppercase;
     text-align: center;
     letter-spacing: 2px;
-    text-shadow: -1px 1px 1px black;
+    text-shadow: -1px 1px 1px rgb(24, 24, 24);
 }
 
 #title {
@@ -45,10 +45,24 @@ body {
 }
 
 #topDiv {
-    width: 1296px;
-    margin: auto;
     margin-top: 0;
-    z-index: 0;
+    z-index: 1;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    min-height: fit-content;
+    position: fixed;
+    width: 100%;
+
+    .left {
+        text-align: left;
+    }
+
+    .right {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+    }
 }
 
 .clientId {
@@ -59,6 +73,7 @@ body {
 
 #mainBoards {
     z-index: 0;
+    margin: auto;
 }
 
 .boardRow {
@@ -153,16 +168,16 @@ body {
     display: flex;
     background-color: @panelGray;
     width: fit-content;
-    margin: 8px auto;
+    margin: 8px 8px 10px 8px;
 }
 
 .buttonContainer {
     .container();
-    color: rgb(172, 172, 172);
+    color: @defaultGray;
 
     &:hover {
         .isometricBoxShadow, button {
-            filter: brightness(135%)
+            filter: brightness(125%)
         }
     }
 
@@ -175,6 +190,75 @@ body {
             left: 1px;
         }
     }
+
+    button {
+        position: relative;
+        background-color: transparent;
+        border: none;
+        padding: 8px;
+        font-size: inherit;
+        text-transform: inherit;
+        font-weight: inherit;
+        letter-spacing: inherit;
+        color: currentColor;
+        text-shadow: inherit;
+    }
+}
+
+.selectContainer {
+    .container();
+
+    span {
+        position: absolute;
+        right: 8px;
+        padding: 8px 0;
+        pointer-events: none;
+    }
+
+    &:hover {
+        .isometricBoxShadow, select, span {
+            filter: brightness(125%)
+        }
+    }
+
+    &:active {
+        top: 1px;
+        left: -1px;
+
+        .isometricBoxShadow {
+            top: -1px;
+            left: 1px;
+        }
+    }
+    
+
+    select {
+        position: relative;
+        background-color: transparent;
+        border: none;
+        padding: 8px 32px 8px 8px;
+        font-size: inherit;
+        text-transform: inherit;
+        font-weight: inherit;
+        letter-spacing: inherit;
+        color: currentColor;
+        text-shadow: inherit;
+
+        /* reset */
+        border-radius: 0;
+        margin: 0;      
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+        -webkit-appearance:none;
+        -moz-appearance:none;
+
+        option {
+            background-color: @panelGray;
+            font-weight: inherit;
+            letter-spacing: inherit;
+        }
+    }
 }
 
 .saturate {
@@ -183,14 +267,16 @@ body {
     }
 }
 
-button {
-    position: relative;
-    background-color: transparent;
-    border: none;
-    padding: 8px;
-    font-size: inherit;
-    text-transform: inherit;
-    font-weight: inherit;
-    letter-spacing: inherit;
-    color: currentColor;
+#roomSelector {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+
+    .selectRow {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        position: relative;
+        top: -2px;
+    }
 }
