@@ -7,8 +7,8 @@ import {isProdServer} from './is-prod-server'
 export function setupExpressApp(app: express.Application, serverStore: Store) {
 	app.use(express.static(path.join(__dirname, '../public')))
 
-	app.get('/*', (_, res) => {
-		res.sendFile(path.join(__dirname, '../public/index.html'))
+	app.get('/newsletter', (_, res) => {
+		res.sendFile(path.join(__dirname, '../public/newsletter.html'))
 	})
 
 	if (!isProdServer()) {
@@ -20,4 +20,8 @@ export function setupExpressApp(app: express.Application, serverStore: Store) {
 			res.json(selectRoomStateByName(serverStore.getState(), req.params.room))
 		})
 	}
+
+	app.get('/*', (_, res) => {
+		res.sendFile(path.join(__dirname, '../public/index.html'))
+	})
 }
