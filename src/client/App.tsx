@@ -60,7 +60,10 @@ class App extends React.Component<IAppProps, {}> {
 							/>
 							{info}
 							<div id="fps">FPS</div>
-							<button onClick={() => window.location.pathname = '/newsletter'}>Newsletter Signup</button>
+							<div className="buttonContainer">
+								<div className="isometricBoxShadow" />
+								<button onClick={() => window.location.pathname = '/newsletter'}>Newsletter Signup</button>
+							</div>
 							<ConnectedRoomSelector />
 						</div>
 

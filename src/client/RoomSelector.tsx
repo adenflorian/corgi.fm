@@ -29,7 +29,9 @@ export class RoomSelector extends Component<IRoomSelectorProps> {
 						{rooms.map(room => <option key={room || 'null'} value={room} label={room}>{room}</option>)}
 					</select>
 				</div>
-				<div>
+
+				<div className="buttonContainer">
+					<div className="isometricBoxShadow" />
 					<button id="newRoomButton" onClick={this.onNewRoomButtonClick}>New Room</button>
 				</div>
 			</div>
