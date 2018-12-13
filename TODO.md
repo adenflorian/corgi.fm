@@ -130,8 +130,8 @@
 - [...] rooms
 - [...] chat
 - [ ] analytics
-- [...] newsletter (a way for users to sign up to get future updates)
-- [...] let user change name
+- [√] newsletter (a way for users to sign up to get future updates)
+- [...] let user change name (need better UX design)
 - [√] https
 - [ ] options view
 - [ ] better pointer
