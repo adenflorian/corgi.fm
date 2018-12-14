@@ -59,7 +59,7 @@ class App extends React.Component<IAppProps, {}> {
 									option={AppOptions.showNoteNamesOnKeyboard}
 									label="show names on keyboard"
 								/>
-								{info}
+								<div>{info}</div>
 								<div id="fps">FPS</div>
 							</div>
 							<div className="right">
