@@ -58,6 +58,9 @@
 	- send messages to users to be displayed on their screens
 - [ ] setup dotenv files
 	- https://parceljs.org/env.html
+- [ ] bot that checks main functionality on the app 24/7 and alert devs if issues arise
+- [ ] make desktop version using electron
+	- so chrome auto updating can't break the whole app
 
 # Connections
 - [ ] make it obvious which direction data flows

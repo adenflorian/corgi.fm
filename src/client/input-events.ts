@@ -1,6 +1,7 @@
 import {AnyAction, Store} from 'redux'
 import {selectLocalClient, setClientPointer} from '../common/redux/clients-redux'
 import {localMidiKeyPress, localMidiKeyUp, localMidiOctaveChange} from '../common/redux/local-middleware'
+import {audioContext} from './setup-audio-context'
 
 interface KeyBoardShortcuts {
 	[key: string]: KeyBoardShortcut
@@ -79,8 +80,13 @@ export function setupInputEventListeners(window: Window, store: Store) {
 
 	const isInputFocused = () => document.activeElement.tagName === 'INPUT'
 
+	window.addEventListener('mousedown', _ => {
+		if (audioContext.state === 'suspended') audioContext.resume()
+	})
+
 	window.addEventListener('keydown', e => {
 		if (isInputFocused()) return
+		if (audioContext.state === 'suspended') audioContext.resume()
 		onKeyEvent(e)
 	})
 
