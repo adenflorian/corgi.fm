@@ -1,4 +1,4 @@
-import {IAppState} from './configureStore'
+import {IAppState} from './client-store'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
 
 export const CHAT_SUBMIT = 'CHAT_SUBMIT'

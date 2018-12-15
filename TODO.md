@@ -107,6 +107,10 @@
 	- permissions system
 - [ ] limit number of rooms?
 - [ ] assign a room a color
+- [ ] room types
+	- [ ] single keyboard
+	- [ ] advanced
+	- etc.
 
 # Chat
 - [ ] delete old chat messages

@@ -6,7 +6,7 @@ import {IMidiNote} from '../../common/MidiNote'
 import {
 	BasicInstrumentParam, selectInstrument, setBasicInstrumentOscillatorType, setBasicInstrumentParam,
 } from '../../common/redux/basic-instruments-redux'
-import {IAppState} from '../../common/redux/configureStore'
+import {IAppState} from '../../common/redux/client-store'
 import {
 	getConnectionSourceColor, getConnectionSourceNotes, selectFirstConnectionByTargetId,
 } from '../../common/redux/connections-redux'

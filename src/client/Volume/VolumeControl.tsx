@@ -4,7 +4,7 @@ import {Component} from 'react'
 import React = require('react')
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
-import {IAppState} from '../../common/redux/configureStore'
+import {IAppState} from '../../common/redux/client-store'
 import {setOptionMasterVolume} from '../../common/redux/options-redux'
 import {Knob} from '../Knob/Knob'
 import './VolumeControl.less'

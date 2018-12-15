@@ -1,5 +1,5 @@
 import {AnyAction} from 'redux'
-import {IAppState} from './configureStore'
+import {IAppState} from './client-store'
 
 interface ILocalAction extends AnyAction {
 	id?: string

@@ -2,7 +2,7 @@ import {Store} from 'redux'
 import Reverb from 'soundbank-reverb'
 import {logger} from '../common/logger'
 import {reportLevels} from '../common/redux/audio-redux'
-import {IAppState} from '../common/redux/configureStore'
+import {IAppState} from '../common/redux/client-store'
 
 declare global {
 	interface Window {

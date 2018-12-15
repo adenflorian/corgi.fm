@@ -1,7 +1,7 @@
 import {AnyAction} from 'redux'
 import * as uuid from 'uuid'
 import {logger} from '../logger'
-import {IAppState} from './configureStore'
+import {IAppState} from './client-store'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
 import {selectTrack} from './tracks-redux'
 import {IVirtualKeyboardState, makeGetKeyboardMidiOutput, selectVirtualKeyboard} from './virtual-keyboard-redux'

@@ -4,7 +4,7 @@ import * as ColorAll from 'color'
 import * as uuid from 'uuid'
 import {hashbow} from '../../client/utils'
 import {ClientId} from '../../client/websocket-listeners'
-import {IAppState} from './configureStore'
+import {IAppState} from './client-store'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
 import {selectLocalSocketId} from './websocket-redux'
 

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
+import {IAppState} from '../common/redux/client-store'
 import {selectAllClients, selectLocalClient} from '../common/redux/clients-redux'
-import {IAppState} from '../common/redux/configureStore'
 
 interface IMousePointersViewProps {
 	pointers: Array<{

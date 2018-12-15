@@ -1,5 +1,5 @@
 import {logger} from '../common/logger'
-import {configureStore} from '../common/redux/configureStore'
+import {configureStore} from '../common/redux/client-store'
 import {getInitialReduxState} from '../common/redux/initial-client-redux-state'
 import {fpsLoop} from './fps-loop'
 import {setupInputEventListeners} from './input-events'

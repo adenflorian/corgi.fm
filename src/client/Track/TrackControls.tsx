@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
-import {IAppState} from '../../common/redux/configureStore'
+import {IAppState} from '../../common/redux/client-store'
 import {playTrack, restartTrack, stopTrack} from '../../common/redux/track-player-middleware'
 
 interface ITrackControlsProps {

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
-import {IAppState} from '../../common/redux/configureStore'
+import {IAppState} from '../../common/redux/client-store'
 import {ITrackEvent, selectTrack, setTrackBottomNote, setTrackNote} from '../../common/redux/tracks-redux'
 import {MAX_MIDI_NOTE_NUMBER_127, MIN_MIDI_NOTE_NUMBER_0} from '../../common/server-constants'
 import {isWhiteKey} from '../Keyboard/Keyboard'

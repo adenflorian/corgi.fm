@@ -3,7 +3,7 @@ import {Component} from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 import {logger} from '../common/logger'
-import {IAppState} from '../common/redux/configureStore'
+import {IAppState} from '../common/redux/client-store'
 import {changeRoom, createRoom, selectActiveRoom, selectAllRooms} from '../common/redux/rooms-redux'
 
 interface IRoomSelectorProps {

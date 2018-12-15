@@ -3,7 +3,7 @@ import * as uuid from 'uuid'
 import {ShamuOscillatorType} from '../../client/Instruments/OscillatorTypes'
 import {ClientId} from '../../client/websocket-listeners'
 import {pickRandomArrayElement} from '../common-utils'
-import {IAppState} from './configureStore'
+import {IAppState} from './client-store'
 import {addMultiThing, deleteThings, makeMultiReducer, updateThings} from './multi-reducer'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
 

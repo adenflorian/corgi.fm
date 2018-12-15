@@ -1,6 +1,6 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
-import {IAppState} from '../../common/redux/configureStore'
+import {IAppState} from '../../common/redux/client-store'
 import {selectAllConnectionIds} from '../../common/redux/connections-redux'
 import {ConnectedConnectionViewContainer} from './ConnectionViewContainer'
 

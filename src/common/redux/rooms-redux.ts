@@ -1,5 +1,5 @@
 import {Action} from 'redux'
-import {ICommonState} from './configureStore'
+import {ICommonState} from './client-store'
 import {createReducer, SERVER_ACTION} from './redux-utils'
 
 export const SET_ROOMS = 'SET_ROOMS'

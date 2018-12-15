@@ -6,7 +6,7 @@ import {Octave} from '../../client/music/music-types'
 import {ClientId} from '../../client/websocket-listeners'
 import {addIfNew} from '../../common/server-common'
 import {IMidiNote} from '../MidiNote'
-import {IAppState} from './configureStore'
+import {IAppState} from './client-store'
 import {addMultiThing, deleteThings, IMultiStateThing, makeMultiReducer, updateThings} from './multi-reducer'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
 
