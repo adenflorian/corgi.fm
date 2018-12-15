@@ -1,9 +1,7 @@
 import * as animal from 'animal-id'
-import ColorDefault from 'color'
-import * as ColorAll from 'color'
-import * as uuid from 'uuid'
-import {hashbow} from '../../client/utils'
+import {v4} from 'uuid'
 import {ClientId} from '../../client/websocket-listeners'
+import {getColorHslByString} from '../shamu-color'
 import {IAppState} from './client-store'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
 import {selectLocalSocketId} from './websocket-redux'
@@ -100,14 +98,13 @@ export class ClientState implements IClientState {
 	public readonly pointer: IClientPointer
 
 	constructor({socketId, name}: {socketId: string, name: string | ''}) {
-		this.id = uuid.v4()
+		this.id = v4()
 		this.socketId = socketId
 		this.name = name === '' ? animal.getId() + '-' + this.id[0] : name
 			.replace(/ +(?= )/g, '')
 			.trim()
 			.substring(0, maxUsernameLength)
-		const colorFunc = ColorDefault || ColorAll
-		this.color = colorFunc(hashbow(this.id)).desaturate(0.2).hsl().string()
+		this.color = getColorHslByString(this.id)
 		this.pointer = {distanceFromCenterX: 0, distanceFromBoardsTop: 0, ownerId: this.id}
 	}
 }

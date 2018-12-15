@@ -1,0 +1,13 @@
+{
+	"compilerOptions": {
+		"noUnusedLocals": false,
+		"noUnusedParameters": false,
+		"sourceMap": false,
+		"target": "esnext",
+		"module": "commonjs",
+		"lib": [
+			"dom",
+			"es7"
+		],
+	}
+}

@@ -1,51 +1,70 @@
 import {expect} from 'chai'
+import * as sinon from 'sinon'
+import * as shamuColor from '../shamu-color'
 import {addClient, clientsReducer, ClientState} from './clients-redux'
 
-declare const describe: (x, y) => any
-declare const it: (x, y) => any
+import * as uuid from 'uuid'
 
-describe('clients-redux', () => {
+describe.only('clients-redux', () => {
 	describe('clientsReducer', () => {
-		[
-			{
-				name: 'add new client',
-				initialState: {
-					clients: [
-						new ClientState('123'),
-						new ClientState('444'),
-					],
+		describe('ADD_CLIENT', () => {
+			let sandbox: sinon.SinonSandbox
+
+			beforeEach(() => {
+				sandbox = sinon.createSandbox()
+				sandbox.stub(uuid, 'v4')
+				sandbox.stub(shamuColor, 'getColorByString').returns('fakeColorString')
+			})
+
+			afterEach(() => {
+				sandbox.restore()
+			})
+
+			const tests = [
+				{
+					name: 'add new client',
+					initialState: () => ({
+						clients: [
+							new ClientState({socketId: '123', name: 'aaa'}),
+							new ClientState({socketId: '444', name: 'ddd'}),
+						],
+					}),
+					action: () => addClient(new ClientState({socketId: '777', name: 'fff'})),
+					expectedState: () => ({
+						clients: [
+							new ClientState({socketId: '123', name: 'aaa'}),
+							new ClientState({socketId: '444', name: 'ddd'}),
+							new ClientState({socketId: '777', name: 'fff'}),
+						],
+					}),
 				},
-				action: addClient(new ClientState('777')),
-				expectedState: {
-					clients: [
-						new ClientState('123'),
-						new ClientState('444'),
-						new ClientState('777'),
-					],
+				{
+					// TODO It probably should update the existing one or throw error?
+					name: 'should push on new client even if existing socketId?',
+					initialState: () => ({
+						clients: [
+							new ClientState({socketId: '123', name: 'sss'}),
+							new ClientState({socketId: '777', name: 'ggg'}),
+							new ClientState({socketId: '444', name: 'jjj'}),
+						],
+					}),
+					action: () => addClient(new ClientState({socketId: '777', name: 'hhh'})),
+					expectedState: () => ({
+						clients: [
+							new ClientState({socketId: '123', name: 'sss'}),
+							new ClientState({socketId: '777', name: 'ggg'}),
+							new ClientState({socketId: '444', name: 'jjj'}),
+							new ClientState({socketId: '777', name: 'hhh'}),
+						],
+					}),
 				},
-			},
-			{
-				name: 'add new already existing client',
-				initialState: {
-					clients: [
-						new ClientState('123'),
-						new ClientState('777'),
-						new ClientState('444'),
-					],
-				},
-				action: addClient(new ClientState('777')),
-				expectedState: {
-					clients: [
-						new ClientState('123'),
-						new ClientState('444'),
-						new ClientState('777'),
-					],
-				},
-			},
-		].forEach(test => {
-			it(test.name, () => {
-				expect(clientsReducer(test.initialState, test.action))
-					.to.deep.equal(test.expectedState)
+			]
+
+			tests.forEach(test => {
+				it(test.name, () => {
+					expect(clientsReducer(test.initialState(), test.action()))
+						.to.deep.equal(test.expectedState())
+				})
 			})
 		})
 	})

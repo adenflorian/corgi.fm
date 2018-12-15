@@ -1,4 +1,3 @@
-import Color from 'color'
 import {Fragment} from 'react'
 import * as React from 'react'
 import {hot} from 'react-hot-loader'
@@ -10,6 +9,7 @@ import {IConnection, selectAllConnectionsAsArray} from '../common/redux/connecti
 import {AppOptions} from '../common/redux/options-redux'
 import {selectAllTrackIds} from '../common/redux/tracks-redux'
 import {selectAllVirtualKeyboardIds} from '../common/redux/virtual-keyboard-redux'
+import {getColorHslByHex} from '../common/shamu-color'
 import './App.less'
 import {ConnectedChat} from './Chat'
 import {ConnectionsContainer} from './Connections/Connections'
@@ -33,7 +33,7 @@ interface IAppProps {
 }
 
 const TRACK_1_BASE_COLOR = '#4077bf'
-const TRACK_1_COLOR = Color(TRACK_1_BASE_COLOR).desaturate(0.4).hsl().string()
+const MASTER_VOLUME_COLOR = getColorHslByHex(TRACK_1_BASE_COLOR)
 
 export const mainBoardsId = 'mainBoards'
 
@@ -74,7 +74,7 @@ class App extends React.Component<IAppProps, {}> {
 						<div id={mainBoardsId} className="boards">
 							<div className="boardRow">
 								<div className="board connected">
-									<ConnectedVolumeControl color={TRACK_1_COLOR} />
+									<ConnectedVolumeControl color={MASTER_VOLUME_COLOR} />
 								</div>
 							</div>
 							{this.props.connections

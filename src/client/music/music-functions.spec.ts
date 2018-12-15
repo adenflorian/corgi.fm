@@ -1,9 +1,6 @@
 import {expect} from 'chai'
 import {applyOctave} from './music-functions'
 
-declare const describe: (x, y) => any
-declare const it: (x, y) => any
-
 describe('input-middleware', () => {
 	describe('applyOctave', () => {
 		[
