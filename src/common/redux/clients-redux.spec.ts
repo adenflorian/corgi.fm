@@ -13,7 +13,7 @@ describe.only('clients-redux', () => {
 			beforeEach(() => {
 				sandbox = sinon.createSandbox()
 				sandbox.stub(uuid, 'v4')
-				sandbox.stub(shamuColor, 'getColorByString').returns('fakeColorString')
+				sandbox.stub(shamuColor, 'getColorHslByString').returns('fakeColorString')
 			})
 
 			afterEach(() => {
