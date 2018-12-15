@@ -7,11 +7,11 @@ import {
 	deleteBasicInstruments, selectAllInstruments, selectInstrumentsByOwner, updateBasicInstruments,
 } from '../common/redux/basic-instruments-redux'
 import {selectAllMessages, setChat} from '../common/redux/chat-redux'
+import {IAppState} from '../common/redux/client-store'
 import {
 	addClient, clientDisconnected, ClientState, IClientState, maxUsernameLength,
 	selectAllClients, selectClientBySocketId, SET_CLIENT_POINTER, setClients,
 } from '../common/redux/clients-redux'
-import {IAppState} from '../common/redux/configureStore'
 import {
 	deleteConnections, selectAllConnections, selectConnectionsWithSourceOrTargetIds, updateConnections,
 } from '../common/redux/connections-redux'
