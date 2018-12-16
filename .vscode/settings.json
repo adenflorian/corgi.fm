@@ -81,7 +81,8 @@
         ".vscode",
         "typings",
         "built/**/*",
-        ".cache"
+        ".cache",
+        "TODO.md"
     ],
     "less.lint.emptyRules": "ignore",
 }

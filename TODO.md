@@ -53,7 +53,7 @@
 - [ ] show loading icon on startup
 - [ ] show badge on test server with warning
 - [ ] extend the range of the keyboard by one which will map to the `'` key
-- [ ] use `strictNullChecks` typescript config
+- [√] use `strictNullChecks` typescript config
 - [ ] flash action
 	- send messages to users to be displayed on their screens
 - [ ] setup dotenv files
@@ -61,6 +61,7 @@
 - [ ] bot that checks main functionality on the app 24/7 and alert devs if issues arise
 - [ ] make desktop version using electron
 	- so chrome auto updating can't break the whole app
+- [ ] turn off audio after 30 minutes and show dialog asking if user is still there
 
 # Connections
 - [ ] make it obvious which direction data flows
@@ -111,6 +112,9 @@
 	- [ ] single keyboard
 	- [ ] advanced
 	- etc.
+
+# Newsletter
+- [ ] put a back button on the newsletter page?
 
 # Chat
 - [ ] delete old chat messages

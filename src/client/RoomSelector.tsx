@@ -30,7 +30,9 @@ export class RoomSelector extends Component<IRoomSelectorProps> {
 						<select name="roomSelect" value={activeRoom} onChange={this.onRoomSelect}>
 							{rooms.map(room => <option key={room || 'null'} value={room} label={room}>{room}</option>)}
 						</select>
-						<span>▼</span>
+						<div className="arrow">
+							<div>▼</div>
+						</div>
 					</div>
 				</div>
 
