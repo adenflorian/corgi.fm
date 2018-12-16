@@ -57,6 +57,7 @@
         "nginx",
         "onmidimessage",
         "onstatechange",
+        "polyfill",
         "reselect",
         "signups",
         "slidedown",

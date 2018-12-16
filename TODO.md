@@ -134,6 +134,22 @@
 - [ ] review chrome autoplay fix
 	- https://developers.google.com/web/updates/2017/09/autoplay-policy-changes#webaudio
 
+# Warnings
+- [ ] [Violation] 'readystatechange' handler took 727ms - polling-xhr.js:242
+	- something in socket.io is taking 727ms
+	- haven't seen an issue reported about it yet
+- [ ] [Violation] 'setTimeout' handler took 706ms (x2) - build-impulse.js:37
+	- from `soundbank-reverb`
+	- setting the convolver buffer can take up to ~700ms
+	- using promises didn't help
+	- using a single reverb didn't help
+	- also related to how the sound stops for a split second after loading
+- [ ] [Violation] Forced reflow while executing JavaScript took 79ms
+	- https://stackoverflow.com/questions/41218507/violation-long-running-javascript-task-took-xx-ms
+	- causes:
+		- AutosizeInput `react-input-autosize`
+		- something in `<ConnectionsContainer />`
+
 # Adagio
 - [...] UI layout
 - [...] rooms
