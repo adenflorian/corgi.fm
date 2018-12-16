@@ -4,7 +4,7 @@ import {logger} from '../logger'
 import {IAppState} from './client-store'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
 import {selectTrack} from './tracks-redux'
-import {IVirtualKeyboardState, makeGetKeyboardMidiOutput, selectVirtualKeyboard} from './virtual-keyboard-redux'
+import {IVirtualKeyboardState, makeGetKeyboardMidiOutput, selectVirtualKeyboardById} from './virtual-keyboard-redux'
 
 export const ADD_CONNECTION = 'ADD_CONNECTION'
 export const addConnection = (connection: IConnection) => ({
@@ -118,7 +118,7 @@ export function connectionsReducer(state: IConnectionsState = initialState, acti
 
 export const selectConnection = (state: IAppState, id: string): IConnection => selectAllConnections(state)[id]
 export const selectSourceByConnectionId = (state: IAppState, id: string): IVirtualKeyboardState =>
-	selectVirtualKeyboard(state, selectConnection(state, id).sourceId)
+	selectVirtualKeyboardById(state, selectConnection(state, id).sourceId)
 
 export const selectAllConnectionIds = (state: IAppState) => Object.keys(selectAllConnections(state))
 export const selectAllConnections = (state: IAppState) => state.connections.connections
@@ -140,7 +140,7 @@ export const getConnectionSourceColor = (state: IAppState, id: string) => {
 	const connection = selectConnection(state, id)
 	switch (connection.sourceType) {
 		case ConnectionSourceType.keyboard:
-			const virtualKeyboard = selectVirtualKeyboard(state, connection.sourceId)
+			const virtualKeyboard = selectVirtualKeyboardById(state, connection.sourceId)
 			return virtualKeyboard && virtualKeyboard.color
 		case ConnectionSourceType.track:
 			const track = selectTrack(state, connection.sourceId)

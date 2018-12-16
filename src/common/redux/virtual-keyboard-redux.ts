@@ -7,6 +7,7 @@ import {ClientId} from '../../client/websocket-listeners'
 import {addIfNew} from '../../common/server-common'
 import {IMidiNote} from '../MidiNote'
 import {IAppState} from './client-store'
+import {selectLocalClient} from './clients-redux'
 import {addMultiThing, deleteThings, IMultiStateThing, makeMultiReducer, updateThings} from './multi-reducer'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
 
@@ -205,13 +206,13 @@ export const selectAllVirtualKeyboardIds = (state: IAppState) => {
 	return Object.keys(selectAllVirtualKeyboards(state))
 }
 
-export const selectVirtualKeyboard = (state: IAppState, id) => {
+export const selectVirtualKeyboardById = (state: IAppState, id) => {
 	return selectAllVirtualKeyboards(state)[id]
 }
 
 export const makeGetKeyboardMidiOutput = () => {
 	return createSelector(
-		selectVirtualKeyboard,
+		selectVirtualKeyboardById,
 		keyboard => keyboard === undefined ? [] : keyboard.pressedKeys.map(x => applyOctave(x, keyboard.octave)),
 	)
 }
@@ -219,4 +220,11 @@ export const makeGetKeyboardMidiOutput = () => {
 export function selectVirtualKeyboardsByOwner(state: IAppState, ownerId: ClientId) {
 	return selectAllVirtualKeyboardsArray(state)
 		.filter(x => x.ownerId === ownerId)
+}
+
+export const selectLocalKeyboardId = (state: IAppState) => {
+	const localClientId = selectLocalClient(state).id
+	const keyboard = selectAllVirtualKeyboardsArray(state)
+		.find(x => x.ownerId === localClientId)
+	return keyboard ? keyboard.id : 'fakeKeyboardId'
 }

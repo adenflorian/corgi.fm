@@ -4,11 +4,10 @@ import {addBasicInstrument, BasicInstrumentState} from './basic-instruments-redu
 import {IAppState} from './client-store'
 import {ADD_CLIENT, selectLocalClient} from './clients-redux'
 import {addConnection, Connection, ConnectionSourceType, ConnectionTargetType} from './connections-redux'
-import {selectLocalKeyboardId, setLocalVirtualKeyboardId} from './local-redux'
 import {makeActionCreator} from './redux-utils'
-import {selectActiveRoom, SET_ACTIVE_ROOM, SET_ROOMS} from './rooms-redux'
+import {selectActiveRoom, SET_ACTIVE_ROOM} from './rooms-redux'
 import {
-	addVirtualKeyboard, VirtualKeyboardState, virtualKeyPressed, virtualKeyUp, virtualOctaveChange,
+	addVirtualKeyboard, selectLocalKeyboardId, VirtualKeyboardState, virtualKeyPressed, virtualKeyUp, virtualOctaveChange,
 } from './virtual-keyboard-redux'
 import {selectLocalSocketId} from './websocket-redux'
 
@@ -61,7 +60,6 @@ function createLocalStuff(dispatch: Dispatch, state: IAppState) {
 
 	const newVirtualKeyboard = new VirtualKeyboardState(localClient.id, localClient.color)
 	dispatch(addVirtualKeyboard(newVirtualKeyboard))
-	dispatch(setLocalVirtualKeyboardId(newVirtualKeyboard.id))
 
 	dispatch(addConnection(new Connection(
 		newVirtualKeyboard.id,

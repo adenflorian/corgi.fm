@@ -3,7 +3,7 @@ import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 import {IAppState} from '../../common/redux/client-store'
 import {ClientState, selectClientById, selectLocalClient} from '../../common/redux/clients-redux'
-import {selectVirtualKeyboard, virtualKeyPressed, virtualKeyUp} from '../../common/redux/virtual-keyboard-redux'
+import {selectVirtualKeyboardById, virtualKeyPressed, virtualKeyUp} from '../../common/redux/virtual-keyboard-redux'
 import {keyToMidiMap} from '../input-events'
 import {Octave} from '../music/music-types'
 import {isLeftMouseButtonDown, keyColors} from '../utils'
@@ -187,7 +187,7 @@ export class Keyboard extends React.PureComponent<IKeyboardAllProps, IKeyboardSt
 }
 
 const mapStateToProps = (state: IAppState, props: IKeyboardProps): IKeyboardReduxProps => {
-	const virtualKeyboard = selectVirtualKeyboard(state, props.id)
+	const virtualKeyboard = selectVirtualKeyboardById(state, props.id)
 	const owner = selectClientById(state, virtualKeyboard.ownerId) || {} as ClientState
 	const pressedMidiKeys = virtualKeyboard ? virtualKeyboard.pressedKeys : []
 	const localClient = selectLocalClient(state)

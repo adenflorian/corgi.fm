@@ -8,7 +8,6 @@ import {chatReducer, IChatState} from './chat-redux'
 import {clientsReducer, IClientsState} from './clients-redux'
 import {connectionsReducer, IConnectionsState} from './connections-redux'
 import {localMiddleware} from './local-middleware'
-import {ILocalState, localReducer} from './local-redux'
 import {IOptionsState, optionsReducer} from './options-redux'
 import {IRoomsState, roomsReducer} from './rooms-redux'
 import {trackPlayerMiddleware} from './track-player-middleware'
@@ -23,7 +22,6 @@ export interface IAppState {
 	chat: IChatState
 	clients: IClientsState
 	connections: IConnectionsState
-	local: ILocalState
 	options: IOptionsState
 	rooms: IRoomsState
 	tracks: ITracksState
@@ -47,7 +45,6 @@ export function configureStore(initialState: IAppState | any = {}): Store {
 			chat: chatReducer,
 			clients: clientsReducer,
 			connections: connectionsReducer,
-			local: localReducer,
 			options: optionsReducer,
 			rooms: roomsReducer,
 			tracks: tracksReducer,
