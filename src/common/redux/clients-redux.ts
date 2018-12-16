@@ -204,6 +204,10 @@ export function selectClientBySocketId(state: IAppState, socketId): IClientState
 	}
 }
 
+export function selectIsLocalClientReady(state: IAppState): boolean {
+	return selectAllClients(state).some(x => x.socketId === selectLocalSocketId(state))
+}
+
 export function selectLocalClient(state: IAppState): IClientState {
 	const localClient = selectAllClients(state).find(x => x.socketId === selectLocalSocketId(state))
 	if (localClient) {

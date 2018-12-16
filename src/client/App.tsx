@@ -1,136 +1,28 @@
-import {Fragment} from 'react'
 import * as React from 'react'
 import {hot} from 'react-hot-loader'
 import {connect} from 'react-redux'
-import {selectAllInstrumentIds} from '../common/redux/basic-instruments-redux'
 import {IAppState} from '../common/redux/client-store'
-import {IClientState, selectAllClients, selectLocalClient} from '../common/redux/clients-redux'
-import {IConnection, selectAllConnectionsAsArray} from '../common/redux/connections-redux'
-import {AppOptions} from '../common/redux/options-redux'
-import {selectAllTrackIds} from '../common/redux/tracks-redux'
-import {selectAllVirtualKeyboardIds} from '../common/redux/virtual-keyboard-redux'
-import {getColorHslByHex} from '../common/shamu-color'
-import './App.less'
-import {ConnectedChat} from './Chat'
-import {ConnectionsContainer} from './Connections/Connections'
-import './css-reset.css'
-import {ConnectedBasicInstrumentView} from './Instruments/BasicInstrumentView'
-import {ConnectedKeyboard} from './Keyboard/Keyboard'
-import {MousePointers} from './MousePointers'
-import {ConnectedOption} from './Option'
-import {ConnectedRoomSelector} from './RoomSelector'
-import {ConnectedTrackContainer} from './Track/TrackContainer'
-import {ConnectedVolumeControl} from './Volume/VolumeControl'
+import {selectIsLocalClientReady} from '../common/redux/clients-redux'
+import {ConnectedOnlineApp} from './OnlineApp'
 
 interface IAppProps {
-	myClient: IClientState
-	clients: any[]
-	connections: IConnection[]
-	info: string
-	instrumentIds: string[]
-	keyboardIds: string[]
-	trackIds: string[]
+	isLocalClientReady: boolean
 }
-
-const TRACK_1_BASE_COLOR = '#4077bf'
-const MASTER_VOLUME_COLOR = getColorHslByHex(TRACK_1_BASE_COLOR)
-
-export const mainBoardsId = 'mainBoards'
 
 class App extends React.Component<IAppProps, {}> {
-	public static defaultProps = {
-		clients: [],
-	}
-
 	public render() {
-		const {info, myClient} = this.props
+		const {isLocalClientReady} = this.props
 
-		return (
-			<Fragment>
-				{myClient &&
-					<Fragment>
-						<MousePointers />
-						<ConnectionsContainer />
-						<ConnectedChat />
-
-						<div id="topDiv" style={{marginBottom: 'auto'}}>
-							<div className="left">
-								<ConnectedOption
-									option={AppOptions.showNoteNamesOnKeyboard}
-									label="show names on keyboard"
-								/>
-								<div>{info}</div>
-								<div id="fps">FPS</div>
-							</div>
-							<div className="right">
-								<div className="buttonContainer">
-									<div className="isometricBoxShadow" />
-									<button onClick={() => window.location.pathname = '/newsletter'}>Newsletter Signup</button>
-								</div>
-								<ConnectedRoomSelector />
-							</div>
-						</div>
-
-						<div id={mainBoardsId} className="boards">
-							<div className="boardRow">
-								<div className="board connected">
-									<ConnectedVolumeControl color={MASTER_VOLUME_COLOR} />
-								</div>
-							</div>
-							{this.props.connections
-								.sort(sortConnection)
-								.map(connection => {
-									return (
-										<div className="boardRow" key={connection.id}>
-											<div
-												key={connection.sourceId}
-												className="board connected"
-											>
-												{
-													connection.sourceType === 'track'
-														? <ConnectedTrackContainer id={connection.sourceId} />
-														: <ConnectedKeyboard id={connection.sourceId} />
-												}
-											</div>
-											<div
-												key={connection.targetId}
-												className="board connected"
-											>
-												<ConnectedBasicInstrumentView id={connection.targetId} />
-											</div>
-										</div>
-									)
-								})
-							}
-						</div>
-					</Fragment>
-				}
-
-				<div
-					id="info"
-				>
-				</div>
-			</Fragment>
-		)
-	}
-}
-
-function sortConnection(connA: IConnection, connB: IConnection) {
-	if (connA.sourceType !== connB.sourceType) {
-		return connA.sourceType === 'track' ? -1 : 1
-	} else {
-		return 0
+		if (isLocalClientReady) {
+			return <ConnectedOnlineApp />
+		} else {
+			return 'connecting...'
+		}
 	}
 }
 
 const mapStateToProps = (state: IAppState) => ({
-	clients: selectAllClients(state),
-	myClient: selectLocalClient(state),
-	info: state.websocket.info,
-	keyboardIds: selectAllVirtualKeyboardIds(state),
-	instrumentIds: selectAllInstrumentIds(state),
-	trackIds: selectAllTrackIds(state),
-	connections: selectAllConnectionsAsArray(state),
+	isLocalClientReady: selectIsLocalClientReady(state),
 })
 
 export const ConnectedApp = hot(module)(connect(mapStateToProps)(App))
