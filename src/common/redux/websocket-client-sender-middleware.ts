@@ -2,7 +2,7 @@ import {AnyAction, Dispatch, Middleware} from 'redux'
 import {socket} from '../../client/websocket-listeners'
 import {WebSocketEvent} from '../../common/server-constants'
 import {logger} from '../logger'
-import {IAppState} from './client-store'
+import {IClientAppState} from './client-store'
 import {SET_CLIENT_POINTER} from './clients-redux'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
 import {selectLocalSocketId} from './websocket-redux'
@@ -25,7 +25,7 @@ function isNetworkAction(action: AnyAction | BroadcastAction) {
 }
 
 function processNetworkAction(action: BroadcastAction, getState, next: Dispatch) {
-	const state: IAppState = getState()
+	const state: IClientAppState = getState()
 	const socketId = selectLocalSocketId(state)
 
 	action.source = socketId

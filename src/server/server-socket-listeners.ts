@@ -7,7 +7,7 @@ import {
 	deleteBasicInstruments, selectAllInstruments, selectInstrumentsByOwner, updateBasicInstruments,
 } from '../common/redux/basic-instruments-redux'
 import {selectAllMessages, setChat} from '../common/redux/chat-redux'
-import {IAppState} from '../common/redux/client-store'
+import {IClientAppState} from '../common/redux/client-store'
 import {
 	addClient, clientDisconnected, ClientState, IClientState, maxUsernameLength,
 	selectAllClients, selectClientBySocketId, SET_CLIENT_POINTER, setClients,
@@ -204,7 +204,7 @@ function onJoinRoom(io, socket, room: string, serverStore: Store, client: IClien
 }
 
 function onLeaveRoom(io, socket, roomToLeave: string, serverStore: Store) {
-	const roomState: IAppState = selectRoomStateByName(serverStore.getState(), roomToLeave)
+	const roomState: IClientAppState = selectRoomStateByName(serverStore.getState(), roomToLeave)
 	const clientId = selectClientBySocketId(roomState, socket.id).id
 
 	const instrumentIdsToDelete = selectInstrumentsByOwner(roomState, clientId).map(x => x.id)
@@ -229,7 +229,7 @@ function onLeaveRoom(io, socket, roomToLeave: string, serverStore: Store) {
 	io.to(roomToLeave).emit(WebSocketEvent.broadcast, clientDisconnectedAction)
 }
 
-function syncState(newClientSocket: Socket, roomState: IAppState, serverState: IServerState, activeRoom: string) {
+function syncState(newClientSocket: Socket, roomState: IClientAppState, serverState: IServerState, activeRoom: string) {
 	newClientSocket.emit(WebSocketEvent.broadcast, {
 		...setRooms(selectAllRooms(serverState)),
 		alreadyBroadcasted: true,

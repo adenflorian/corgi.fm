@@ -16,7 +16,7 @@ import {IVirtualKeyboardsState, virtualKeyboardsReducer} from './virtual-keyboar
 import {websocketSenderMiddleware} from './websocket-client-sender-middleware'
 import {IWebsocketState, websocketReducer} from './websocket-redux'
 
-export interface IAppState {
+export interface IClientAppState {
 	audio: IAudioState
 	basicInstruments: IBasicInstrumentsState
 	chat: IChatState
@@ -37,7 +37,7 @@ const composeEnhancers = composeWithDevTools({
 	actionsBlacklist,
 })
 
-export function configureStore(initialState: IAppState | any = {}): Store {
+export function configureStore(initialState: IClientAppState | any = {}): Store {
 	return createStore(
 		combineReducers({
 			audio: audioReducer,

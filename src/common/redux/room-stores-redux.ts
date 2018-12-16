@@ -2,7 +2,7 @@ import {Action, combineReducers, Store} from 'redux'
 import {IServerState} from '../../server/configure-server-store'
 import {basicInstrumentsReducer, IBasicInstrumentsState} from './basic-instruments-redux'
 import {chatReducer} from './chat-redux'
-import {IAppState} from './client-store'
+import {IClientAppState} from './client-store'
 import {clientsReducer, IClientsState} from './clients-redux'
 import {connectionsReducer, IConnectionsState} from './connections-redux'
 import {CREATE_ROOM, DELETE_ROOM} from './rooms-redux'
@@ -25,7 +25,7 @@ export interface IRoomStateTree {
 }
 
 export interface IRoomStoresState {
-	[key: string]: IAppState
+	[key: string]: IClientAppState
 }
 
 const roomReducers = combineReducers({

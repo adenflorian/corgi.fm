@@ -1,4 +1,4 @@
-import {IAppState} from './client-store'
+import {IClientAppState} from './client-store'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
 
 export const CHAT_SUBMIT = 'CHAT_SUBMIT'
@@ -48,4 +48,4 @@ export function chatReducer(state: IChatState = initialState, action): IChatStat
 	}
 }
 
-export const selectAllMessages = (state: IAppState) => state.chat.messages
+export const selectAllMessages = (state: IClientAppState) => state.chat.messages

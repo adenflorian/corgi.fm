@@ -3,7 +3,7 @@ import {v4} from 'uuid'
 import {ClientId} from '../../client/websocket-listeners'
 import {logger} from '../logger'
 import {getColorHslByString} from '../shamu-color'
-import {IAppState} from './client-store'
+import {IClientAppState} from './client-store'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
 import {selectLocalSocketId} from './websocket-redux'
 
@@ -164,7 +164,7 @@ export function clientsReducer(clientsState: IClientsState = initialState, actio
 	}
 }
 
-export function selectClientById(state: IAppState, id): IClientState {
+export function selectClientById(state: IClientAppState, id): IClientState {
 	const client = selectAllClients(state).find(x => x.id === id)
 	if (client) {
 		return client
@@ -184,7 +184,7 @@ export function selectClientById(state: IAppState, id): IClientState {
 	}
 }
 
-export function selectClientBySocketId(state: IAppState, socketId): IClientState {
+export function selectClientBySocketId(state: IClientAppState, socketId): IClientState {
 	const client = selectAllClients(state).find(x => x.socketId === socketId)
 	if (client) {
 		return client
@@ -204,11 +204,11 @@ export function selectClientBySocketId(state: IAppState, socketId): IClientState
 	}
 }
 
-export function selectIsLocalClientReady(state: IAppState): boolean {
+export function selectIsLocalClientReady(state: IClientAppState): boolean {
 	return selectAllClients(state).some(x => x.socketId === selectLocalSocketId(state))
 }
 
-export function selectLocalClient(state: IAppState): IClientState {
+export function selectLocalClient(state: IClientAppState): IClientState {
 	const localClient = selectAllClients(state).find(x => x.socketId === selectLocalSocketId(state))
 	if (localClient) {
 		return localClient
@@ -227,16 +227,16 @@ export function selectLocalClient(state: IAppState): IClientState {
 	}
 }
 
-export const selectAllClients = (state: IAppState) => state.clients.clients
+export const selectAllClients = (state: IClientAppState) => state.clients.clients
 
-export const selectAllClientsAsMap = (state: IAppState) => state.clients.clients.reduce((map, client) => {
+export const selectAllClientsAsMap = (state: IClientAppState) => state.clients.clients.reduce((map, client) => {
 	return {
 		...map,
 		[client.id]: client,
 	}
 })
 
-export const selectAllOtherPointers = (state: IAppState) => {
+export const selectAllOtherPointers = (state: IClientAppState) => {
 	const localClientId = selectLocalClient(state).id
 	return selectAllClients(state)
 		.filter(x => x.id !== 'server' && x.id !== localClientId)

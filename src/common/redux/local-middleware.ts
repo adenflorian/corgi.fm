@@ -1,7 +1,7 @@
 import {Dispatch, Middleware} from 'redux'
 import {deleteAllTheThings} from '../../client/websocket-listeners'
 import {addBasicInstrument, BasicInstrumentState} from './basic-instruments-redux'
-import {IAppState} from './client-store'
+import {IClientAppState} from './client-store'
 import {ADD_CLIENT, selectLocalClient} from './clients-redux'
 import {addConnection, Connection, ConnectionSourceType, ConnectionTargetType} from './connections-redux'
 import {makeActionCreator} from './redux-utils'
@@ -36,7 +36,7 @@ export const localMiddleware: Middleware = ({dispatch, getState}) => next => act
 		}
 		case ADD_CLIENT: {
 			next(action)
-			const state: IAppState = getState()
+			const state: IClientAppState = getState()
 			if (action.client.socketId === selectLocalSocketId(state)) {
 				createLocalStuff(dispatch, state)
 			}
@@ -52,7 +52,7 @@ export const localMiddleware: Middleware = ({dispatch, getState}) => next => act
 	}
 }
 
-function createLocalStuff(dispatch: Dispatch, state: IAppState) {
+function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 	const localClient = selectLocalClient(state)
 
 	const newInstrument = new BasicInstrumentState(localClient.id)

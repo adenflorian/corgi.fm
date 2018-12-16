@@ -1,5 +1,6 @@
-import {AnyAction} from '../../../node_modules/redux'
 import {logger} from '../logger'
+import {IClientAppState} from './client-store'
+import {IVirtualKeyboards} from './virtual-keyboard-redux'
 
 interface IMultiState {
 	things: IMultiStateThings
@@ -13,8 +14,10 @@ export interface IMultiStateThing {
 	id: string
 }
 
-const initialState: IMultiState = {
-	things: {},
+export enum MultiThingType {
+	virtualKeyboard,
+	track,
+	basicInstrument,
 }
 
 type ADD_MULTI_THING = 'ADD_MULTI_THING'
@@ -23,7 +26,7 @@ interface IAddMultiThingAction extends IMultiThingAction {
 	type: ADD_MULTI_THING
 	thing: IMultiStateThing
 }
-export const addMultiThing = (thing: IMultiStateThing, thingType: string): IAddMultiThingAction => ({
+export const addMultiThing = (thing: IMultiStateThing, thingType: MultiThingType): IAddMultiThingAction => ({
 	type: ADD_MULTI_THING,
 	thing,
 	thingType,
@@ -35,7 +38,7 @@ interface IDeleteMultiThingsAction extends IMultiThingAction {
 	type: DELETE_THINGS
 	thingIds: string[]
 }
-export const deleteThings = (thingIds: string[], thingType: string): IDeleteMultiThingsAction => ({
+export const deleteThings = (thingIds: string[], thingType: MultiThingType): IDeleteMultiThingsAction => ({
 	type: DELETE_MULTI_THINGS,
 	thingIds,
 	thingType,
@@ -46,7 +49,7 @@ export const DELETE_ALL_THINGS: DELETE_ALL_THINGS = 'DELETE_ALL_THINGS'
 interface IDeleteAllThingsAction extends IMultiThingAction {
 	type: DELETE_ALL_THINGS
 }
-export const deleteAllThings = (thingType: string): IDeleteAllThingsAction => ({
+export const deleteAllThings = (thingType: MultiThingType): IDeleteAllThingsAction => ({
 	type: DELETE_ALL_THINGS,
 	thingType,
 })
@@ -57,7 +60,7 @@ interface IUpdateMultiThingsAction extends IMultiThingAction {
 	type: UPDATE_THINGS
 	things: IMultiStateThings
 }
-export const updateThings = (things: IMultiStateThings, thingType: string): IUpdateMultiThingsAction => ({
+export const updateThings = (things: IMultiStateThings, thingType: MultiThingType): IUpdateMultiThingsAction => ({
 	type: UPDATE_MULTI_THINGS,
 	things,
 	thingType,
@@ -68,12 +71,16 @@ type MultiThingAction =
 	| {type: '', id: string}
 
 interface IMultiThingAction {
-	thingType: string
+	thingType: MultiThingType
+}
+
+const initialState: IMultiState = {
+	things: {},
 }
 
 export function makeMultiReducer<T extends IMultiStateThing>(
 	innerReducer: (state: T, action: any) => any,
-	thingType: string,
+	thingType: MultiThingType,
 	actionTypes: string[],
 ) {
 	return (state: IMultiState = initialState, action: MultiThingAction) => {

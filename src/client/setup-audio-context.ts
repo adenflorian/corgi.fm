@@ -2,7 +2,7 @@ import {Store} from 'redux'
 import Reverb from 'soundbank-reverb'
 import {logger} from '../common/logger'
 import {reportLevels} from '../common/redux/audio-redux'
-import {IAppState} from '../common/redux/client-store'
+import {IClientAppState} from '../common/redux/client-store'
 
 declare global {
 	interface Window {
@@ -80,12 +80,6 @@ export function setupAudioContext(store: Store) {
 		})
 	}
 
-	// function arrayMax(arr) {
-	// 	return arr.reduce((max, num) => {
-	// 		return Math.max(max, num)
-	// 	}, 0)
-	// }
-
 	master.connect(audioContext.destination)
 	master.connect(analyser)
 
@@ -94,7 +88,7 @@ export function setupAudioContext(store: Store) {
 	let previousMasterVolume
 
 	store.subscribe(() => {
-		const state: IAppState = store.getState()
+		const state: IClientAppState = store.getState()
 		const newVolume = state.options.masterVolume
 		if (previousMasterVolume !== newVolume) {
 			master.gain.value = state.options.masterVolume

@@ -1,7 +1,7 @@
 import {AnyAction} from 'redux'
 import * as uuid from 'uuid'
 import {logger} from '../logger'
-import {IAppState} from './client-store'
+import {IClientAppState} from './client-store'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
 import {selectTrack} from './tracks-redux'
 import {IVirtualKeyboardState, makeGetKeyboardMidiOutput, selectVirtualKeyboardById} from './virtual-keyboard-redux'
@@ -116,27 +116,27 @@ export function connectionsReducer(state: IConnectionsState = initialState, acti
 	}
 }
 
-export const selectConnection = (state: IAppState, id: string): IConnection => selectAllConnections(state)[id]
-export const selectSourceByConnectionId = (state: IAppState, id: string): IVirtualKeyboardState =>
+export const selectConnection = (state: IClientAppState, id: string): IConnection => selectAllConnections(state)[id]
+export const selectSourceByConnectionId = (state: IClientAppState, id: string): IVirtualKeyboardState =>
 	selectVirtualKeyboardById(state, selectConnection(state, id).sourceId)
 
-export const selectAllConnectionIds = (state: IAppState) => Object.keys(selectAllConnections(state))
-export const selectAllConnections = (state: IAppState) => state.connections.connections
-export const selectAllConnectionsAsArray = (state: IAppState) => {
+export const selectAllConnectionIds = (state: IClientAppState) => Object.keys(selectAllConnections(state))
+export const selectAllConnections = (state: IClientAppState) => state.connections.connections
+export const selectAllConnectionsAsArray = (state: IClientAppState) => {
 	const allConnections = selectAllConnections(state)
 	return Object.keys(allConnections).map(x => allConnections[x])
 }
 
-export const selectConnectionsWithSourceOrTargetIds = (state: IAppState, sourceOrTargetIds: string[]) => {
+export const selectConnectionsWithSourceOrTargetIds = (state: IClientAppState, sourceOrTargetIds: string[]) => {
 	return selectAllConnectionsAsArray(state)
 		.filter(x => sourceOrTargetIds.includes(x.sourceId) || sourceOrTargetIds.includes(x.targetId))
 }
 
-export const selectFirstConnectionByTargetId = (state: IAppState, targetId: string) =>
+export const selectFirstConnectionByTargetId = (state: IClientAppState, targetId: string) =>
 	selectAllConnectionsAsArray(state)
 		.find(x => x.targetId === targetId)
 
-export const getConnectionSourceColor = (state: IAppState, id: string) => {
+export const getConnectionSourceColor = (state: IClientAppState, id: string) => {
 	const connection = selectConnection(state, id)
 	switch (connection.sourceType) {
 		case ConnectionSourceType.keyboard:
@@ -155,7 +155,7 @@ const getKeyboardMidiOutput = makeGetKeyboardMidiOutput()
 
 const emptyArray = []
 
-export const getConnectionSourceNotes = (state: IAppState, id: string) => {
+export const getConnectionSourceNotes = (state: IClientAppState, id: string) => {
 	const connection = selectConnection(state, id)
 	switch (connection.sourceType) {
 		case ConnectionSourceType.keyboard:

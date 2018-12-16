@@ -6,12 +6,12 @@ import {Octave} from '../../client/music/music-types'
 import {ClientId} from '../../client/websocket-listeners'
 import {addIfNew} from '../../common/server-common'
 import {IMidiNote} from '../MidiNote'
-import {IAppState} from './client-store'
+import {IClientAppState} from './client-store'
 import {selectLocalClient} from './clients-redux'
-import {addMultiThing, deleteThings, IMultiStateThing, makeMultiReducer, updateThings} from './multi-reducer'
+import {
+	addMultiThing, deleteThings, IMultiStateThing, IMultiStateThings, makeMultiReducer, MultiThingType, updateThings,
+} from './multi-reducer'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
-
-export const VIRTUAL_KEYBOARD_THING_TYPE = 'VIRTUAL_KEYBOARD'
 
 export interface VirtualKeyAction {
 	type: string
@@ -23,21 +23,21 @@ export interface VirtualKeyAction {
 
 export const ADD_VIRTUAL_KEYBOARD = 'ADD_VIRTUAL_KEYBOARD'
 export const addVirtualKeyboard = (virtualKeyboard: IVirtualKeyboardState) => ({
-	...addMultiThing(virtualKeyboard, VIRTUAL_KEYBOARD_THING_TYPE),
+	...addMultiThing(virtualKeyboard, MultiThingType.virtualKeyboard),
 	SERVER_ACTION,
 	BROADCASTER_ACTION,
 })
 
 export const DELETE_VIRTUAL_KEYBOARDS = 'DELETE_VIRTUAL_KEYBOARDS'
 export const deleteVirtualKeyboards = (virtualKeyboardIds: string[]) => ({
-	...deleteThings(virtualKeyboardIds, VIRTUAL_KEYBOARD_THING_TYPE),
+	...deleteThings(virtualKeyboardIds, MultiThingType.virtualKeyboard),
 	SERVER_ACTION,
 	BROADCASTER_ACTION,
 })
 
 export const UPDATE_VIRTUAL_KEYBOARDS = 'UPDATE_VIRTUAL_KEYBOARDS'
 export const updateVirtualKeyboards = (keyboards: any) => ({
-	...updateThings(keyboards, VIRTUAL_KEYBOARD_THING_TYPE),
+	...updateThings(keyboards, MultiThingType.virtualKeyboard),
 	BROADCASTER_ACTION,
 })
 
@@ -104,7 +104,7 @@ export interface IVirtualKeyboardsState {
 	things: IVirtualKeyboards
 }
 
-export interface IVirtualKeyboards {
+export interface IVirtualKeyboards extends IMultiStateThings {
 	[clientId: string]: IVirtualKeyboardState,
 }
 
@@ -139,7 +139,7 @@ const keyboardActionTypes = [
 ]
 
 export const virtualKeyboardsReducer = makeMultiReducer(
-	virtualKeyboardReducer, VIRTUAL_KEYBOARD_THING_TYPE, keyboardActionTypes)
+	virtualKeyboardReducer, MultiThingType.virtualKeyboard, keyboardActionTypes)
 
 function virtualKeyboardReducer(virtualKeyboard: IVirtualKeyboardState, action: AnyAction) {
 	switch (action.type) {
@@ -193,20 +193,20 @@ export interface IMidi {
 	notes: IMidiNote[]
 }
 
-export const selectAllVirtualKeyboards = (state: IAppState) => {
+export const selectAllVirtualKeyboards = (state: IClientAppState) => {
 	return state.virtualKeyboards.things
 }
 
-export const selectAllVirtualKeyboardsArray = (state: IAppState) => {
+export const selectAllVirtualKeyboardsArray = (state: IClientAppState) => {
 	const keyboards = selectAllVirtualKeyboards(state)
 	return Object.keys(keyboards).map(x => keyboards[x])
 }
 
-export const selectAllVirtualKeyboardIds = (state: IAppState) => {
+export const selectAllVirtualKeyboardIds = (state: IClientAppState) => {
 	return Object.keys(selectAllVirtualKeyboards(state))
 }
 
-export const selectVirtualKeyboardById = (state: IAppState, id) => {
+export const selectVirtualKeyboardById = (state: IClientAppState, id) => {
 	return selectAllVirtualKeyboards(state)[id]
 }
 
@@ -217,12 +217,12 @@ export const makeGetKeyboardMidiOutput = () => {
 	)
 }
 
-export function selectVirtualKeyboardsByOwner(state: IAppState, ownerId: ClientId) {
+export function selectVirtualKeyboardsByOwner(state: IClientAppState, ownerId: ClientId) {
 	return selectAllVirtualKeyboardsArray(state)
 		.filter(x => x.ownerId === ownerId)
 }
 
-export const selectLocalKeyboardId = (state: IAppState) => {
+export const selectLocalKeyboardId = (state: IClientAppState) => {
 	const localClientId = selectLocalClient(state).id
 	const keyboard = selectAllVirtualKeyboardsArray(state)
 		.find(x => x.ownerId === localClientId)

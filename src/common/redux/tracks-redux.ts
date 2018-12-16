@@ -5,30 +5,30 @@ import {hashbow} from '../../client/utils'
 import {IMidiNote} from '../MidiNote'
 import {addIfNew} from '../server-common'
 import {MAX_MIDI_NOTE_NUMBER_127} from '../server-constants'
-import {IAppState} from './client-store'
-import {addMultiThing, deleteThings, IMultiStateThings, makeMultiReducer, updateThings} from './multi-reducer'
+import {IClientAppState} from './client-store'
+import {
+	addMultiThing, deleteThings, IMultiStateThings, makeMultiReducer, MultiThingType, updateThings,
+} from './multi-reducer'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
 import {PLAY_TRACK, STOP_TRACK} from './track-player-middleware'
 
-export const TRACK_THING_TYPE = 'TRACK'
-
 export const ADD_TRACK = 'ADD_TRACK'
 export const addTrack = (track: ITrackState) => ({
-	...addMultiThing(track, TRACK_THING_TYPE),
+	...addMultiThing(track, MultiThingType.track),
 	SERVER_ACTION,
 	BROADCASTER_ACTION,
 })
 
 export const DELETE_TRACKS = 'DELETE_TRACKS'
 export const deleteTracks = (trackIds: string[]) => ({
-	...deleteThings(trackIds, TRACK_THING_TYPE),
+	...deleteThings(trackIds, MultiThingType.track),
 	SERVER_ACTION,
 	BROADCASTER_ACTION,
 })
 
 export const UPDATE_TRACKS = 'UPDATE_TRACKS'
 export const updateTracks = (tracks: ITracks) => ({
-	...updateThings(tracks, TRACK_THING_TYPE),
+	...updateThings(tracks, MultiThingType.track),
 	BROADCASTER_ACTION,
 })
 
@@ -156,7 +156,7 @@ export const trackActionTypes = [
 	SET_TRACK_BOTTOM_NOTE,
 ]
 
-export const tracksReducer = makeMultiReducer(trackReducer, TRACK_THING_TYPE, trackActionTypes)
+export const tracksReducer = makeMultiReducer(trackReducer, MultiThingType.track, trackActionTypes)
 
 export function trackReducer(track: ITrackState, action: AnyAction) {
 	switch (action.type) {
@@ -202,23 +202,25 @@ export function trackReducer(track: ITrackState, action: AnyAction) {
 	}
 }
 
-export const selectAllTracks = (state: IAppState) => {
-	return state.tracks.things
-}
+export const selectAllTracks = (state: IClientAppState) => state.tracks.things
 
-export const selectAllTracksArray = (state: IAppState) => {
+export const selectAllTracksArray = (state: IClientAppState) => {
 	const tracks = selectAllTracks(state)
 	return Object.keys(tracks).map(x => tracks[x])
 }
 
-export const selectAllTrackIds = (state: IAppState) => {
+export const selectAllTrackIds = (state: IClientAppState) => {
 	return Object.keys(selectAllTracks(state))
 }
 
-export const selectTrack = (state: IAppState, id) => selectAllTracks(state)[id]
+export const selectTrack = (state: IClientAppState, id: string) =>
+	selectAllTracks(state)[id]
 
-export const selectTrackEvents = (state: IAppState, id) => selectTrack(state, id).events
+export const selectTrackEvents = (state: IClientAppState, id: string) =>
+	selectTrack(state, id).events
 
-export const selectTrackEvent = (state: IAppState, id, eventIndex) => selectTrackEvents(state, id)[eventIndex]
+export const selectTrackEvent = (state: IClientAppState, id: string, eventIndex: number) =>
+	selectTrackEvents(state, id)[eventIndex]
 
-export const selectTrackEventNotes = (state: IAppState, id, eventIndex) => selectTrackEvent(state, id, eventIndex).notes
+export const selectTrackEventNotes = (state: IClientAppState, id: string, eventIndex: number) =>
+	selectTrackEvent(state, id, eventIndex).notes
