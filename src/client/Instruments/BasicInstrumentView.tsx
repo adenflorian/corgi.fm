@@ -61,7 +61,6 @@ export class BasicInstrumentView
 	}
 
 	public componentWillUnmount() {
-		logger.log('BasicInstrumentView.componentWillUnmount')
 		this.instrument.dispose()
 	}
 

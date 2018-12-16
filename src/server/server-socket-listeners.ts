@@ -207,10 +207,6 @@ function onLeaveRoom(io, socket, roomToLeave: string, serverStore: Store) {
 	const roomState: IAppState = selectRoomStateByName(serverStore.getState(), roomToLeave)
 	const clientId = selectClientBySocketId(roomState, socket.id).id
 
-	const clientDisconnectedAction = clientDisconnected(clientId)
-	serverStore.dispatch(roomAction(clientDisconnectedAction, roomToLeave))
-	io.to(roomToLeave).emit(WebSocketEvent.broadcast, clientDisconnectedAction)
-
 	const instrumentIdsToDelete = selectInstrumentsByOwner(roomState, clientId).map(x => x.id)
 	const keyboardIdsToDelete = selectVirtualKeyboardsByOwner(roomState, clientId).map(x => x.id)
 
@@ -227,6 +223,10 @@ function onLeaveRoom(io, socket, roomToLeave: string, serverStore: Store) {
 	const deleteVirtualKeyboardsAction = deleteVirtualKeyboards(keyboardIdsToDelete)
 	serverStore.dispatch(roomAction(deleteVirtualKeyboardsAction, roomToLeave))
 	io.to(roomToLeave).emit(WebSocketEvent.broadcast, deleteVirtualKeyboardsAction)
+
+	const clientDisconnectedAction = clientDisconnected(clientId)
+	serverStore.dispatch(roomAction(clientDisconnectedAction, roomToLeave))
+	io.to(roomToLeave).emit(WebSocketEvent.broadcast, clientDisconnectedAction)
 }
 
 function syncState(newClientSocket: Socket, roomState: IAppState, serverState: IServerState, activeRoom: string) {
