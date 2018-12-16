@@ -1,5 +1,5 @@
 import {AnyAction, Store} from 'redux'
-import {selectLocalClient, setClientPointer} from '../common/redux/clients-redux'
+import {selectIsLocalClientReady, selectLocalClient, setClientPointer} from '../common/redux/clients-redux'
 import {localMidiKeyPress, localMidiKeyUp, localMidiOctaveChange} from '../common/redux/local-middleware'
 import {getMainBoardsRectY} from './MousePointers'
 import {audioContext} from './setup-audio-context'
@@ -125,13 +125,13 @@ export function setupInputEventListeners(window: Window, store: Store) {
 
 	window.addEventListener('mousemove', e => {
 		const state = store.getState()
-		const localClient = selectLocalClient(state)
-		if (localClient && localClient.id) {
+		if (selectIsLocalClientReady(state)) {
+			const localClient = selectLocalClient(state)
 			sendMouseUpdate(e.clientX, e.clientY, localClient.id)
 		}
 	})
 
-	function sendMouseUpdate(mouseX, mouseY, localClientId) {
+	function sendMouseUpdate(mouseX: number, mouseY: number, localClientId: string) {
 		const halfWidth = document.body.scrollWidth / 2
 		const distanceFromCenterX = mouseX - halfWidth + window.scrollX
 		const distanceFromBoardsTop = mouseY - getMainBoardsRectY()
@@ -141,11 +141,12 @@ export function setupInputEventListeners(window: Window, store: Store) {
 		}))
 	}
 
-	window.addEventListener('scroll', e => {
+	window.addEventListener('scroll', _ => {
 		const scrollDelta = window.scrollY - lastScrollY
 		lastScrollY = window.scrollY
-		const localClient = selectLocalClient(store.getState())
-		if (localClient && localClient.id) {
+		const state = store.getState()
+		if (selectIsLocalClientReady(state)) {
+			const localClient = selectLocalClient(state)
 			store.dispatch(setClientPointer(localClient.id, {
 				distanceFromCenterX: localClient.pointer.distanceFromCenterX,
 				distanceFromBoardsTop: localClient.pointer.distanceFromBoardsTop + scrollDelta,
