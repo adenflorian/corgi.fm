@@ -65,7 +65,7 @@ export const updateThings = (things: IMultiStateThings, thingType: string): IUpd
 
 type MultiThingAction =
 	IUpdateMultiThingsAction | IAddMultiThingAction | IDeleteMultiThingsAction | IDeleteAllThingsAction
-	| {type: '', id?: string}
+	| {type: '', id: string}
 
 interface IMultiThingAction {
 	thingType: string

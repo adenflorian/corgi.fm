@@ -1,6 +1,7 @@
 import {AnyAction, Store} from 'redux'
 import {selectLocalClient, setClientPointer} from '../common/redux/clients-redux'
 import {localMidiKeyPress, localMidiKeyUp, localMidiOctaveChange} from '../common/redux/local-middleware'
+import {getMainBoardsRectY} from './MousePointers'
 import {audioContext} from './setup-audio-context'
 
 interface KeyBoardShortcuts {
@@ -78,7 +79,7 @@ let lastScrollY = window.scrollY
 
 export function setupInputEventListeners(window: Window, store: Store) {
 
-	const isInputFocused = () => document.activeElement.tagName === 'INPUT'
+	const isInputFocused = (): boolean => document.activeElement ? document.activeElement.tagName === 'INPUT' : false
 
 	window.addEventListener('mousedown', _ => {
 		if (audioContext.state === 'suspended') audioContext.resume()
@@ -133,9 +134,7 @@ export function setupInputEventListeners(window: Window, store: Store) {
 	function sendMouseUpdate(mouseX, mouseY, localClientId) {
 		const halfWidth = document.body.scrollWidth / 2
 		const distanceFromCenterX = mouseX - halfWidth + window.scrollX
-		const mainBoardsRect: any = document.getElementById('mainBoards').getBoundingClientRect()
-		const mainBoardsTop = mainBoardsRect.y
-		const distanceFromBoardsTop = mouseY - mainBoardsTop
+		const distanceFromBoardsTop = mouseY - getMainBoardsRectY()
 		store.dispatch(setClientPointer(localClientId, {
 			distanceFromCenterX,
 			distanceFromBoardsTop,
@@ -155,10 +154,11 @@ export function setupInputEventListeners(window: Window, store: Store) {
 	})
 }
 
-function getPropNameForEventType(eventType: string) {
+function getPropNameForEventType(eventType) {
 	switch (eventType) {
 		case 'keydown': return 'actionOnKeyDown'
 		case 'keyup': return 'actionOnKeyUp'
 		case 'keypress': return 'actionOnKeyPress'
 	}
+	throw new Error('unsupported eventType: ' + eventType)
 }

@@ -38,7 +38,6 @@
             "allow-leading-underscore",
             "allow-pascal-case"
         ],
-        "no-unused-variable": true,
         "interface-name": false,
         "max-classes-per-file": false
     },

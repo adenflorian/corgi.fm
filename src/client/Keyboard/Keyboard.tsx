@@ -14,7 +14,7 @@ const defaultNumberOfKeys = 17
 const globalVirtualMidiKeyboard = createVirtualMidiKeyboard(defaultNumberOfKeys)
 
 function createVirtualMidiKeyboard(numberOfKeys: number) {
-	const newVirtualMidiKeyboard = []
+	const newVirtualMidiKeyboard: IVirtualMidiKeyboard = []
 
 	for (let i = 0; i < numberOfKeys; i++) {
 		const baseNumber = i % 12
@@ -33,34 +33,41 @@ export function isWhiteKey(keyNumber: number) {
 	return keyColors[baseNumber].color === 'white'
 }
 
+type IVirtualMidiKeyboard = IVirtualMidiKey[]
+
+interface IVirtualMidiKey {
+	color: string
+	keyName: string
+	name: string
+}
+
+type IKeyboardAllProps = IKeyboardProps & IKeyboardReduxProps & {dispatch: Dispatch}
+
 interface IKeyboardProps {
-	ownerName: string,
-	pressedMidiKeys?: any[],
-	octave?: Octave
-	virtualMidiKeyboard: any
+	id: string
+}
+
+interface IKeyboardReduxProps {
 	color: string
 	isLocal: boolean
+	isPlaying: boolean
+	octave: Octave
+	ownerName: string,
+	pressedMidiKeys: any[],
 	showNoteNames: boolean
-	isPlaying?: boolean
-	dispatch?: Dispatch
-	id?: string
+	virtualMidiKeyboard: IVirtualMidiKeyboard
 }
 
 interface IKeyboardState {
 	wasMouseClickedOnKeyboard: boolean
 }
 
-export class Keyboard extends React.PureComponent<IKeyboardProps, IKeyboardState> {
-	public static defaultProps = {
-		ownerName: '',
-		pressedMidiKeys: [],
-		showNoteNames: true,
-	}
+export class Keyboard extends React.PureComponent<IKeyboardAllProps, IKeyboardState> {
 	public state = {
 		wasMouseClickedOnKeyboard: false,
 	}
 
-	constructor(props: IKeyboardProps) {
+	constructor(props: IKeyboardAllProps) {
 		super(props)
 	}
 
@@ -179,23 +186,24 @@ export class Keyboard extends React.PureComponent<IKeyboardProps, IKeyboardState
 	}
 }
 
-const mapStateToProps = (state: IAppState, props) => {
+const mapStateToProps = (state: IAppState, props: IKeyboardProps): IKeyboardReduxProps => {
 	const virtualKeyboard = selectVirtualKeyboard(state, props.id)
 	const owner = selectClientById(state, virtualKeyboard.ownerId) || {} as ClientState
 	const pressedMidiKeys = virtualKeyboard ? virtualKeyboard.pressedKeys : []
 	const localClient = selectLocalClient(state)
 
 	return {
-		pressedMidiKeys,
-		octave: virtualKeyboard && virtualKeyboard.octave,
-		virtualMidiKeyboard: globalVirtualMidiKeyboard,
-		color: owner && owner.color,
+		color: owner.color,
 		isLocal: localClient.id === owner.id,
-		showNoteNames: state.options.showNoteNamesOnKeyboard,
 		isPlaying: pressedMidiKeys.length > 0,
-		id: virtualKeyboard.id,
+		octave: virtualKeyboard.octave,
 		ownerName: owner.name,
+		pressedMidiKeys,
+		showNoteNames: state.options.showNoteNamesOnKeyboard,
+		virtualMidiKeyboard: globalVirtualMidiKeyboard,
 	}
 }
 
-export const ConnectedKeyboard = connect(mapStateToProps)(Keyboard)
+export const ConnectedKeyboard = connect(
+	mapStateToProps,
+)(Keyboard as React.ComponentClass<IKeyboardAllProps>) as React.ComponentClass<IKeyboardProps>

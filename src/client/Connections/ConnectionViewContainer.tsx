@@ -10,8 +10,8 @@ export interface IConnectionViewContainerProps {
 	id: string
 	sourceId?: string
 	targetId?: string
-	sourceColor?: string
-	offset?: number
+	sourceColor: string
+	offset: number
 }
 
 type AnyRect = ClientRect | DOMRect | any
@@ -27,24 +27,29 @@ interface ICVCState {
 }
 
 export class ConnectionViewContainer extends React.Component<IConnectionViewContainerProps, ICVCState> {
+	public static defaultProps = {
+		offset: 0,
+		sourceColor: 'gray',
+	}
+
 	public state: ICVCState = {positions: {}, oldPositions: {}}
 
 	constructor(props) {
 		super(props)
-		window.addEventListener('resize', this._foo)
-		window.addEventListener('scroll', this._foo)
+		window.addEventListener('resize', this._updatePositions)
+		window.addEventListener('scroll', this._updatePositions)
 		setTimeout(() => {
 			this.componentDidUpdate()
 		}, 500)
 	}
 
 	public componentDidUpdate() {
-		this._foo()
+		this._updatePositions()
 	}
 
 	public componentWillUnmount() {
-		window.removeEventListener('resize', this._foo)
-		window.removeEventListener('scroll', this._foo)
+		window.removeEventListener('resize', this._updatePositions)
+		window.removeEventListener('scroll', this._updatePositions)
 	}
 
 	public render() {
@@ -65,9 +70,12 @@ export class ConnectionViewContainer extends React.Component<IConnectionViewCont
 		}
 	}
 
-	private _foo = () => {
+	private _updatePositions = () => {
+		if (this.props.sourceId === undefined) return
 		const sourceElement = document.getElementById(this.props.sourceId)
 		if (!sourceElement) return
+
+		if (this.props.targetId === undefined) return
 		const targetElement = document.getElementById(this.props.targetId)
 		if (!targetElement) return
 

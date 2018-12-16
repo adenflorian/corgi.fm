@@ -3,13 +3,13 @@ import {SliderController} from './SliderController'
 import {VerticalScrollBarView} from './VerticalScrollBarView'
 
 interface IVerticalScrollBarProps {
-	min?: number
-	max?: number
+	min: number
+	max: number
 	onChange: (newValue: number, onChangeId: any) => any
 	value: number
-	curve?: number
+	curve: number
 	onChangeId?: any
-	marks?: number[]
+	marks: number[]
 	sliderGrabberHeightPercentage?: number,
 }
 
@@ -17,8 +17,6 @@ export class VerticalScrollBar extends React.PureComponent<IVerticalScrollBarPro
 	public static defaultProps = {
 		min: 0,
 		max: 1,
-		readOnly: false,
-		markColor: 'currentColor',
 		curve: 1,
 		marks: [],
 	}

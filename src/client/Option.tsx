@@ -7,12 +7,17 @@ import {setOption} from '../common/redux/options-redux'
 
 interface IOptionProps {
 	option: string
-	value?: any
-	setValue?: (newValue: any) => any
+	value: boolean
+	setValue: (newValue: any) => any
 	label: string
 }
 
 export class Option extends Component<IOptionProps> {
+	public static defaultProps = {
+		setValue: () => undefined,
+		value: false,
+	}
+
 	public render() {
 		const {label, value, setValue} = this.props
 

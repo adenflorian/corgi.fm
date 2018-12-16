@@ -118,6 +118,8 @@ class App extends React.Component<IAppProps, {}> {
 function sortConnection(connA: IConnection, connB: IConnection) {
 	if (connA.sourceType !== connB.sourceType) {
 		return connA.sourceType === 'track' ? -1 : 1
+	} else {
+		return 0
 	}
 }
 

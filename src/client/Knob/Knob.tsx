@@ -4,25 +4,26 @@ import {KnobView} from './KnobView'
 import {SliderController} from './SliderController'
 
 interface IKnobProps {
-	label?: string
-	min?: number
-	max?: number
-	onChange?: (newValue: number, onChangeId: any) => any
-	value: number
-	readOnly?: boolean
-	markColor?: string
-	curve?: number
+	curve: number
+	label: string
+	markColor: string
+	max: number
+	min: number
+	onChange: (newValue: number, onChangeId: any) => any
 	onChangeId?: any
+	readOnly: boolean
+	value: number
 }
 
 export class Knob extends React.PureComponent<IKnobProps> {
 	public static defaultProps = {
-		onChange: () => undefined,
-		min: 0,
-		max: 1,
-		readOnly: false,
-		markColor: 'currentColor',
 		curve: 1,
+		label: '',
+		markColor: 'currentColor',
+		max: 1,
+		min: 0,
+		onChange: () => undefined,
+		readOnly: false,
 	}
 
 	public render() {

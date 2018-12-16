@@ -13,8 +13,8 @@ export interface IConnectionViewProps {
 	sourceY: number
 	targetX: number
 	targetY: number
-	connectorWidth?: number
-	connectorHeight?: number
+	connectorWidth: number
+	connectorHeight: number
 }
 
 export class ConnectionView extends React.PureComponent<IConnectionViewProps> {

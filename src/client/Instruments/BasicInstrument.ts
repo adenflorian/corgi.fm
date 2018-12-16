@@ -1,6 +1,5 @@
 import {setTimeout} from 'timers'
 import * as uuid from 'uuid'
-import {logger} from '../../common/logger'
 import {IMidiNote} from '../../common/MidiNote'
 import {Arp} from '../arp'
 import {getFrequencyUsingHalfStepsFromA4} from '../music/music-functions'
@@ -179,17 +178,17 @@ class Voices {
 
 		if (this._inactiveVoices.length > 0) {
 			// Try to return inactive voice first
-			const voice = this._inactiveVoices.shift()
+			const voice = this._inactiveVoices.shift()!
 			this._activeVoices.push(voice)
 			return voice
 		} else if (this._releasingVoices.length > 0) {
 			// Next try releasing voices
-			const voice = this._releasingVoices.shift()
+			const voice = this._releasingVoices.shift()!
 			this._activeVoices.push(voice)
 			return voice
 		} else {
 			// Lastly use active voices
-			const voice = this._activeVoices.shift()
+			const voice = this._activeVoices.shift()!
 			this._activeVoices.push(voice)
 			return voice
 		}

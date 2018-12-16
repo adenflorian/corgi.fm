@@ -1,6 +1,7 @@
 import * as animal from 'animal-id'
 import {v4} from 'uuid'
 import {ClientId} from '../../client/websocket-listeners'
+import {logger} from '../logger'
 import {getColorHslByString} from '../shamu-color'
 import {IAppState} from './client-store'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
@@ -71,7 +72,7 @@ export interface IClientState {
 	color: string
 	name: string
 	socketId: string
-	pointer?: IClientPointer
+	pointer: IClientPointer
 }
 
 export interface IClientPointer {
@@ -82,12 +83,13 @@ export interface IClientPointer {
 }
 
 export class ClientState implements IClientState {
-	public static createServerClient() {
+	public static createServerClient(): IClientState {
 		return {
 			id: 'server',
 			socketId: 'server',
 			name: 'server',
 			color: 'rgb(89, 122, 166)',
+			pointer: {distanceFromBoardsTop: 0, distanceFromCenterX: 0},
 		}
 	}
 
@@ -162,16 +164,63 @@ export function clientsReducer(clientsState: IClientsState = initialState, actio
 	}
 }
 
-export function selectClientById(state: IAppState, id) {
-	return selectAllClients(state).find(x => x.id === id)
+export function selectClientById(state: IAppState, id): IClientState {
+	const client = selectAllClients(state).find(x => x.id === id)
+	if (client) {
+		return client
+	} else {
+		logger.warn(`selectClientById was called with id '${id}'`
+			+ `, but no client with that id was found, returning fake`)
+		return {
+			color: 'gray',
+			id: 'fakeClientId',
+			name: 'fakeClient',
+			pointer: {
+				distanceFromBoardsTop: 0,
+				distanceFromCenterX: 0,
+			},
+			socketId: 'fakeClientSocketId',
+		}
+	}
 }
 
-export function selectClientBySocketId(state: IAppState, socketId) {
-	return selectAllClients(state).find(x => x.socketId === socketId)
+export function selectClientBySocketId(state: IAppState, socketId): IClientState {
+	const client = selectAllClients(state).find(x => x.socketId === socketId)
+	if (client) {
+		return client
+	} else {
+		logger.warn(`selectClientBySocketId was called with socketId '${socketId}'`
+			+ `, but no client with that socket id was found, returning fake`)
+		return {
+			color: 'gray',
+			id: 'fakeClientId',
+			name: 'fakeClient',
+			pointer: {
+				distanceFromBoardsTop: 0,
+				distanceFromCenterX: 0,
+			},
+			socketId: 'fakeClientSocketId',
+		}
+	}
 }
 
-export function selectLocalClient(state: IAppState) {
-	return selectAllClients(state).find(x => x.socketId === selectLocalSocketId(state))
+export function selectLocalClient(state: IAppState): IClientState {
+	const localClient = selectAllClients(state).find(x => x.socketId === selectLocalSocketId(state))
+	if (localClient) {
+		return localClient
+	} else {
+		logger.warn('selectLocalClient was called but localClient is not set, returning fake')
+		return {
+			color: 'gray',
+			id: 'fakeLocalClientId',
+			name: 'fakeLocalClient',
+			pointer: {
+				distanceFromBoardsTop: 0,
+				distanceFromCenterX: 0,
+			},
+			socketId: 'fakeLocalClientSocketId',
+		}
+	}
 }
 
 export const selectAllClients = (state: IAppState) => state.clients.clients

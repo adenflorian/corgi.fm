@@ -44,21 +44,24 @@ class MousePointersView extends React.PureComponent<IMousePointersViewProps> {
 const mapStateToProps = (state: IAppState): IMousePointersViewProps => {
 	const localClientId = selectLocalClient(state).id
 	const otherClients = selectAllClients(state).filter(x => x.id !== 'server' && x.id !== localClientId)
-	const mainBoardsElement = document.getElementById('mainBoards')
-	let mainBoardsRect: any
-	if (mainBoardsElement) {
-		mainBoardsRect = document.getElementById('mainBoards').getBoundingClientRect()
-	} else {
-		mainBoardsRect = {y: 0}
-	}
 	return {
 		pointers: otherClients.map(client => ({
 			x: client.pointer.distanceFromCenterX
 				+ (document.body.scrollWidth / 2) - (size / 2) - window.scrollX,
 			y: client.pointer.distanceFromBoardsTop
-				+ mainBoardsRect.y - (size / 2),
+				+ getMainBoardsRectY() - (size / 2),
 			color: client.color,
 		})),
+	}
+}
+
+export function getMainBoardsRectY() {
+	const mainBoardsElement = document.getElementById('mainBoards')
+
+	if (mainBoardsElement) {
+		return (mainBoardsElement.getBoundingClientRect() as DOMRect).y
+	} else {
+		return 0
 	}
 }
 

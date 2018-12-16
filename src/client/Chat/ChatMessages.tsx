@@ -5,7 +5,7 @@ import {IChatMessage, selectAllMessages} from '../../common/redux/chat-redux'
 import {IAppState} from '../../common/redux/client-store'
 
 interface IChatMessagesProps {
-	messages?: IChatMessage[]
+	messages: IChatMessage[]
 }
 
 export class ChatMessages extends Component<IChatMessagesProps> {

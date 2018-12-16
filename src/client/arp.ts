@@ -40,7 +40,7 @@ function arp(midiNotes, rate, startTime, currentTime) {
 	if (length === 0) return []
 	if (length === 1) return [...midiNotes]
 
-	const timeElapsedSeconds: number = Number.parseInt(((currentTime - startTime) / 1000 / (1 / rate)).toFixed(0))
+	const timeElapsedSeconds: number = Number.parseInt(((currentTime - startTime) / 1000 / (1 / rate)).toFixed(0), 10)
 
 	return [midiNotes[timeElapsedSeconds % length]]
 }

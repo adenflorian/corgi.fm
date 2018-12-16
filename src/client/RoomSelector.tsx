@@ -7,9 +7,9 @@ import {IAppState} from '../common/redux/client-store'
 import {changeRoom, createRoom, selectActiveRoom, selectAllRooms} from '../common/redux/rooms-redux'
 
 interface IRoomSelectorProps {
-	activeRoom?: string
-	dispatch?: Dispatch
-	rooms?: string[]
+	activeRoom: string
+	dispatch: Dispatch
+	rooms: string[]
 }
 
 export class RoomSelector extends Component<IRoomSelectorProps> {

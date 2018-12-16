@@ -17,10 +17,10 @@ interface IChatComponentState {
 }
 
 interface IChatProps {
-	author?: string
-	authorColor?: string
-	authorId?: string
-	dispatch?: Dispatch
+	author: string
+	authorColor: string
+	authorId: string
+	dispatch: Dispatch
 }
 
 export class Chat extends Component<IChatProps, IChatComponentState> {
@@ -102,7 +102,7 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 
 	private _onKeydown = (e: KeyboardEvent) => {
 		if (e.repeat) return
-		if (e.key === 'Enter' && this.state.isChatFocused === false) {
+		if (e.key === 'Enter' && this.state.isChatFocused === false && this.chatInputRef.current !== null) {
 			this.chatInputRef.current.focus()
 			e.preventDefault()
 		}

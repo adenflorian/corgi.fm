@@ -19,34 +19,41 @@ import {ShamuOscillatorType} from './OscillatorTypes'
 
 export type MidiNotes = IMidiNote[]
 
+type IBasicInstrumentViewAllProps = IBasicInstrumentViewProps & IBasicInstrumentViewReduxProps & {dispatch: Dispatch}
+
 interface IBasicInstrumentViewProps {
+	id: string
+}
+
+interface IBasicInstrumentViewReduxProps {
 	color: string
 	rawMidiNotes: MidiNotes
 	pan: number
 	isPlaying: boolean
 	oscillatorType: ShamuOscillatorType
-	dispatch?: Dispatch
 	lowPassFilterCutoffFrequency: number
 	attack: number
 	release: number
-	id: string
 }
 
-export class BasicInstrumentView extends React.PureComponent<IBasicInstrumentViewProps> {
+export class BasicInstrumentView
+	extends React.PureComponent<IBasicInstrumentViewAllProps> {
+
 	public static defaultProps = {
+		dispatch: _ => ({}) as Dispatch,
+		color: 'gray',
 		pan: 0,
 		rawMidiNotes: [],
-		color: 'gray',
 	}
 
 	private instrument: BasicInstrument
 
-	constructor(props: IBasicInstrumentViewProps) {
+	constructor(props: IBasicInstrumentViewAllProps) {
 		super(props)
 		this._makeInstrument(props)
 	}
 
-	public componentDidUpdate(prevProps: IBasicInstrumentViewProps) {
+	public componentDidUpdate(prevProps: IBasicInstrumentViewAllProps) {
 		if (prevProps.id !== this.props.id) {
 			this.instrument.dispose()
 			this._makeInstrument(this.props)
@@ -126,7 +133,7 @@ export class BasicInstrumentView extends React.PureComponent<IBasicInstrumentVie
 		)
 	}
 
-	private _makeInstrument = (props: IBasicInstrumentViewProps) => {
+	private _makeInstrument = (props: IBasicInstrumentViewAllProps) => {
 		this.instrument = new BasicInstrument({
 			audioContext,
 			destination: preFx,
@@ -148,7 +155,7 @@ export class BasicInstrumentView extends React.PureComponent<IBasicInstrumentVie
 }
 
 const makeMapStateToProps = () => {
-	return (state: IAppState, props: IConnectedBasicInstrumentViewProps): IBasicInstrumentViewProps => {
+	return (state: IAppState, props: IBasicInstrumentViewProps): IBasicInstrumentViewReduxProps => {
 		const connection = selectFirstConnectionByTargetId(state, props.id)
 		const rawMidiNotes = connection && getConnectionSourceNotes(state, connection.id)
 		const instrumentState = selectInstrument(state, props.id)
@@ -157,20 +164,17 @@ const makeMapStateToProps = () => {
 			rawMidiNotes: rawMidiNotes || [],
 			isPlaying: rawMidiNotes ? rawMidiNotes.length > 0 : false,
 			oscillatorType: instrumentState.oscillatorType,
-			color: connection && getConnectionSourceColor(state, connection.id),
+			color: connection ? getConnectionSourceColor(state, connection.id) : BasicInstrumentView.defaultProps.color,
 			pan: instrumentState.pan,
 			lowPassFilterCutoffFrequency: instrumentState.lowPassFilterCutoffFrequency,
 			attack: instrumentState.attack,
 			release: instrumentState.release,
-			id: props.id,
 		}
 	}
 }
 
-interface IConnectedBasicInstrumentViewProps {
-	id: string
-}
-
 export const ConnectedBasicInstrumentView = connect(
 	makeMapStateToProps,
-)(BasicInstrumentView)
+)(
+	BasicInstrumentView as React.ComponentClass<IBasicInstrumentViewAllProps>,
+) as React.ComponentClass<IBasicInstrumentViewProps>

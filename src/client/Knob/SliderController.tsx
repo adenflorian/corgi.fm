@@ -2,11 +2,11 @@ import * as React from 'react'
 import './Knob.less'
 
 interface ISliderControllerProps {
-	min?: number
-	max?: number
-	onChange?: (newValue: number) => any
+	min: number
+	max: number
+	onChange: (newValue: number) => any
 	value: number
-	curve?: number
+	curve: number
 	children: (handleMouseDown: any, percentage: number, adjustedPercentage: number) => any
 }
 
@@ -24,8 +24,6 @@ export class SliderController extends React.Component<ISliderControllerProps, IS
 		onChange: () => undefined,
 		min: 0,
 		max: 1,
-		readOnly: false,
-		markColor: 'currentColor',
 		curve: 1,
 	}
 

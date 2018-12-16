@@ -4,6 +4,7 @@
 		"noUnusedLocals": false,
 		"noUnusedParameters": false,
 		"experimentalDecorators": true,
+		"strictNullChecks": true,
 		"sourceMap": true,
 		"target": "es6",
 		"module": "commonjs",
