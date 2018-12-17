@@ -1,31 +1,42 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
-import {IAppState} from '../../common/redux/client-store'
+import {IClientAppState} from '../../common/redux/common-redux-types'
 import {ITrackEvent, selectTrack, setTrackBottomNote, setTrackNote} from '../../common/redux/tracks-redux'
 import {MAX_MIDI_NOTE_NUMBER_127, MIN_MIDI_NOTE_NUMBER_0} from '../../common/server-constants'
 import {isWhiteKey} from '../Keyboard/Keyboard'
 import {VerticalScrollBar} from '../Knob/VerticalScrollBar'
 import {isLeftMouseButtonDown} from '../utils'
 
+type trackEventHandler = (index: number, isEnabled: boolean, i2: number, e: React.MouseEvent) => void
+
 interface ITrackNotesProps {
+	id: string
+}
+
+interface ITrackNotesReduxProps {
 	events: ITrackEvent[]
 	activeIndex: number
 	bottomNote: number
 	notesToShow: number
-	handleNoteClicked: (index, isEnabled, i2) => void
-	handleMouseEnter: (index, isEnabled, i2, e) => void
-	handleMouseDown: (index, isEnabled, i2, e) => void
+}
+
+interface ITrackNotesDispatchProps {
+	handleNoteClicked: trackEventHandler
+	handleMouseEnter: trackEventHandler
+	handleMouseDown: trackEventHandler
 	handleScrollChange: (newValue: number) => void
 }
 
-export const TrackNotes = (props: ITrackNotesProps) => {
+type ITrackNotesAllProps = ITrackNotesProps & ITrackNotesReduxProps & ITrackNotesDispatchProps
+
+export const TrackNotes = (props: ITrackNotesAllProps) => {
 	const {activeIndex, bottomNote, events, handleNoteClicked,
 		handleMouseEnter, handleMouseDown, notesToShow, handleScrollChange} = props
 
-	const marks = events.reduce((allMarks: number[], event) => {
+	const marks = events.reduce((allMarks, event) => {
 		return allMarks.concat(event.notes.map(note => note / 127))
-	}, [])
+	}, new Array<number>())
 
 	return (
 		<div className="events">
@@ -43,7 +54,7 @@ export const TrackNotes = (props: ITrackNotesProps) => {
 								<div
 									key={i2}
 									className={`note ${isEnabled ? 'on' : ''} ${isWhiteKey(i2) ? 'white' : 'black'}`}
-									onClick={() => handleNoteClicked(index, isEnabled, i2)}
+									onClick={e => handleNoteClicked(index, isEnabled, i2, e)}
 									onMouseEnter={e => handleMouseEnter(index, isEnabled, i2, e)}
 									onMouseDown={e => handleMouseDown(index, isEnabled, i2, e)}
 								/>
@@ -64,12 +75,8 @@ export const TrackNotes = (props: ITrackNotesProps) => {
 	)
 }
 
-interface ITrackNotesConnectedProps {
-	id: string
-}
-
-const mapSateToProps = (state: IAppState, props: ITrackNotesConnectedProps) => {
-	const trackState = selectTrack(state, props.id)
+const mapSateToProps = (state: IClientAppState, props: ITrackNotesProps): ITrackNotesReduxProps => {
+	const trackState = selectTrack(state.room, props.id)
 
 	return {
 		events: trackState.events,
@@ -79,21 +86,21 @@ const mapSateToProps = (state: IAppState, props: ITrackNotesConnectedProps) => {
 	}
 }
 
-const mapDispatchToProps = (dispatch: Dispatch, {id}: ITrackNotesConnectedProps) => ({
-	handleNoteClicked: (index: number, isEnabled: boolean, noteNumber: number) => {
+const mapDispatchToProps = (dispatch: Dispatch, {id}: ITrackNotesProps): ITrackNotesDispatchProps => ({
+	handleNoteClicked: (index, isEnabled, noteNumber) => {
 		dispatch(setTrackNote(id, index, !isEnabled, noteNumber))
 	},
-	handleMouseEnter: (index: number, isEnabled: boolean, noteNumber: number, e) => {
+	handleMouseEnter: (index, isEnabled, noteNumber, e) => {
 		if (e.ctrlKey && isEnabled === true && isLeftMouseButtonDown(e.buttons)) {
 			dispatch(setTrackNote(id, index, false, noteNumber))
 		}
 	},
-	handleMouseDown: (index: number, isEnabled: boolean, noteNumber: number, e) => {
+	handleMouseDown: (index, isEnabled, noteNumber, e) => {
 		if (e.ctrlKey && isEnabled === true && isLeftMouseButtonDown(e.buttons)) {
 			dispatch(setTrackNote(id, index, false, noteNumber))
 		}
 	},
-	handleScrollChange: (newValue: number) => {
+	handleScrollChange: newValue => {
 		dispatch(setTrackBottomNote(id, Math.round(newValue)))
 	},
 })

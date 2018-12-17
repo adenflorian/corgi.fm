@@ -1,6 +1,7 @@
-import {AnyAction, Dispatch, Middleware, Store} from 'redux'
-import {audioContext} from '../../client/setup-audio-context'
-import {TrackPlayer} from '../../client/Track/TrackPlayer'
+import {AnyAction, Dispatch, Middleware, MiddlewareAPI} from 'redux'
+import {TrackPlayer} from '../../client/TrackPlayer'
+import {audioContext} from '../setup-audio-context'
+import {IClientAppState} from './common-redux-types'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
 import {ITracks, selectTrack, setTrackIndex, UPDATE_TRACKS} from './tracks-redux'
 
@@ -40,7 +41,7 @@ interface ITrackPlayers {
 
 const trackPlayers: ITrackPlayers = {}
 
-export const trackPlayerMiddleware: Middleware = (store: Store) => next => action => {
+export const trackPlayerMiddleware: Middleware<{}, IClientAppState> = store => next => action => {
 	switch (action.type) {
 		case PLAY_TRACK:
 		case STOP_TRACK:
@@ -61,10 +62,12 @@ export const trackPlayerMiddleware: Middleware = (store: Store) => next => actio
 	}
 }
 
-function foo(action: AnyAction, trackPlayer: TrackPlayer, next: Dispatch, store: Store) {
+function foo(
+	action: AnyAction, trackPlayer: TrackPlayer, next: Dispatch, store: MiddlewareAPI<Dispatch, IClientAppState>,
+) {
 	switch (action.type) {
 		case PLAY_TRACK:
-			trackPlayer.play(selectTrack(store.getState(), action.id).events.length)
+			trackPlayer.play(selectTrack(store.getState().room, action.id).events.length)
 			return next(action)
 		case STOP_TRACK:
 			trackPlayer.stop()
@@ -81,7 +84,7 @@ function foo(action: AnyAction, trackPlayer: TrackPlayer, next: Dispatch, store:
 		case RESTART_TRACK:
 			if (trackPlayer.isPlaying()) {
 				trackPlayer.stop()
-				trackPlayer.play(selectTrack(store.getState(), action.id).events.length)
+				trackPlayer.play(selectTrack(store.getState().room, action.id).events.length)
 			}
 			return next(action)
 		case UPDATE_TRACKS:

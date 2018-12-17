@@ -1,13 +1,14 @@
-import {Action, combineReducers, Store} from 'redux'
-import {IServerState} from '../../server/configure-server-store'
-import {basicInstrumentsReducer, IBasicInstrumentsState} from './basic-instruments-redux'
+import {Map} from 'immutable'
+import {Action, combineReducers} from 'redux'
+import {basicInstrumentsReducer} from './basic-instruments-redux'
 import {chatReducer} from './chat-redux'
-import {IClientAppState} from './client-store'
-import {clientsReducer, IClientsState} from './clients-redux'
-import {connectionsReducer, IConnectionsState} from './connections-redux'
+import {IClientRoomState} from './common-redux-types'
+import {IServerState} from './configure-server-store'
+import {connectionsReducer} from './connections-redux'
+import {roomMembersReducer} from './room-members-redux'
 import {CREATE_ROOM, DELETE_ROOM} from './rooms-redux'
-import {ITracksState, tracksReducer} from './tracks-redux'
-import {IVirtualKeyboardsState, virtualKeyboardsReducer} from './virtual-keyboard-redux'
+import {tracksReducer} from './tracks-redux'
+import {virtualKeyboardsReducer} from './virtual-keyboard-redux'
 
 export const ROOM_ACTION = 'ROOM_ACTION'
 export const roomAction = (action: Action, room: string) => ({
@@ -16,46 +17,27 @@ export const roomAction = (action: Action, room: string) => ({
 	action,
 })
 
-export interface IRoomStateTree {
-	basicInstruments: IBasicInstrumentsState
-	clients: IClientsState
-	connections: IConnectionsState
-	tracks: ITracksState
-	virtualKeyboards: IVirtualKeyboardsState
-}
+export type IRoomStoresState = Map<string, IClientRoomState>
 
-export interface IRoomStoresState {
-	[key: string]: IClientAppState
-}
-
-const roomReducers = combineReducers({
+export const roomReducers = combineReducers<IClientRoomState>({
 	basicInstruments: basicInstrumentsReducer,
 	chat: chatReducer,
-	clients: clientsReducer,
 	connections: connectionsReducer,
+	members: roomMembersReducer,
 	tracks: tracksReducer,
 	virtualKeyboards: virtualKeyboardsReducer,
 })
 
-export function roomStoresReducer(state: IRoomStoresState = {}, action: any) {
+export function roomStoresReducer(
+	state: IRoomStoresState = Map<string, IClientRoomState>(), action: any,
+): IRoomStoresState {
 	switch (action.type) {
-		case CREATE_ROOM: return {
-			...state,
-			[action.name]: roomReducers(undefined, {type: '@@INIT'}),
-		}
-
-		case DELETE_ROOM: {
-			const newState = {...state}
-			delete newState[action.name]
-			return newState
-		}
+		case CREATE_ROOM: return state.set(action.name, roomReducers(undefined, {type: '@@INIT'}))
+		case DELETE_ROOM: return state.delete(action.name)
 	}
 
 	if (action.type.startsWith(ROOM_ACTION)) {
-		return {
-			...state,
-			[action.room]: roomReducers(state[action.room], action.action),
-		}
+		return state.set(action.room, roomReducers(state.get(action.room), action.action))
 	} else {
 		return state
 	}
@@ -63,11 +45,11 @@ export function roomStoresReducer(state: IRoomStoresState = {}, action: any) {
 
 export const selectAllRoomStates = (state: IServerState) => state.roomStores
 
-export const selectAllRoomNames = (state: IServerState) => Object.keys(selectAllRoomStates(state))
+export const selectAllRoomNames = (state: IServerState) => selectAllRoomStates(state).keySeq().toArray()
 
 export const selectAllRoomStatesAsArray = (state: IServerState) =>
-	selectAllRoomNames(state).map(x => selectAllRoomStates(state)[x])
+	selectAllRoomStates(state).toIndexedSeq().toArray()
 
 export const selectRoomExists = (state: IServerState, name: string) => selectAllRoomNames(state).includes(name)
 
-export const selectRoomStateByName = (state: IServerState, name: string) => selectAllRoomStates(state)[name]
+export const selectRoomStateByName = (state: IServerState, name: string) => selectAllRoomStates(state).get(name)

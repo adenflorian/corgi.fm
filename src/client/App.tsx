@@ -1,8 +1,8 @@
 import * as React from 'react'
 import {hot} from 'react-hot-loader'
 import {connect} from 'react-redux'
-import {IAppState} from '../common/redux/client-store'
 import {selectIsLocalClientReady} from '../common/redux/clients-redux'
+import {IClientAppState} from '../common/redux/common-redux-types'
 import {ConnectedOnlineApp} from './OnlineApp'
 
 interface IAppProps {
@@ -21,7 +21,7 @@ class App extends React.Component<IAppProps, {}> {
 	}
 }
 
-const mapStateToProps = (state: IAppState) => ({
+const mapStateToProps = (state: IClientAppState) => ({
 	isLocalClientReady: selectIsLocalClientReady(state),
 })
 

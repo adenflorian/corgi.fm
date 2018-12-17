@@ -1,4 +1,3 @@
 export function getInitialReduxState() {
-	return {
-	}
+	return {}
 }

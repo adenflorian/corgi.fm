@@ -1,7 +1,7 @@
 import * as React from 'react'
 import ReactSVG from 'react-svg'
+import {BuiltInOscillatorType, CustomOscillatorType, ShamuOscillatorType} from '../../common/OscillatorTypes'
 import NoiseWave from './NoiseWave.svg'
-import {ShamuOscillatorType} from './OscillatorTypes'
 import SawWave from './SawWave.svg'
 import SineWave from './SineWave.svg'
 import SquareWave from './SquareWave.svg'
@@ -12,12 +12,12 @@ interface IBasicInstrumentOscillatorTypesProps {
 	activeType: ShamuOscillatorType
 }
 
-const oscillatorTypes = [
-	{type: 'sine', svgPath: SineWave},
-	{type: 'triangle', svgPath: TriangleWave},
-	{type: 'sawtooth', svgPath: SawWave},
-	{type: 'square', svgPath: SquareWave},
-	{type: 'noise', svgPath: NoiseWave},
+const oscillatorTypes: Array<{type: ShamuOscillatorType, svgPath: string}> = [
+	{type: BuiltInOscillatorType.sine, svgPath: SineWave},
+	{type: BuiltInOscillatorType.triangle, svgPath: TriangleWave},
+	{type: BuiltInOscillatorType.sawtooth, svgPath: SawWave},
+	{type: BuiltInOscillatorType.square, svgPath: SquareWave},
+	{type: CustomOscillatorType.noise, svgPath: NoiseWave},
 ]
 
 export class BasicInstrumentOscillatorTypes extends React.PureComponent<IBasicInstrumentOscillatorTypesProps> {
@@ -29,7 +29,7 @@ export class BasicInstrumentOscillatorTypes extends React.PureComponent<IBasicIn
 				{oscillatorTypes.map(({type, svgPath}) =>
 					<div key={type} onClick={handleClick.bind(undefined, type)} style={{width: 40, height: 40}}>
 						<ReactSVG
-							path={svgPath}
+							src={svgPath}
 							className={activeType === type ? 'active colorize' : undefined}
 						/>
 					</div>,

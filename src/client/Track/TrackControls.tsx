@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
-import {IAppState} from '../../common/redux/client-store'
+import {IClientAppState} from '../../common/redux/common-redux-types'
 import {playTrack, restartTrack, stopTrack} from '../../common/redux/track-player-middleware'
 
 interface ITrackControlsProps {
@@ -39,7 +39,7 @@ interface ITrackControlsConnectedProps {
 	id: string
 }
 
-const mapSateToProps = (state: IAppState, props: ITrackControlsConnectedProps) => {
+const mapSateToProps = (state: IClientAppState, props: ITrackControlsConnectedProps) => {
 	// const trackState = selectTrack(state, props.id)
 
 	return {

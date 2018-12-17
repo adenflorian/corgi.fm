@@ -3,8 +3,8 @@ import {Component} from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 import {logger} from '../common/logger'
-import {IAppState} from '../common/redux/client-store'
-import {changeRoom, createRoom, selectActiveRoom, selectAllRooms} from '../common/redux/rooms-redux'
+import {IClientAppState} from '../common/redux/common-redux-types'
+import {changeRoom, createRoom, requestCreateRoom, selectActiveRoom, selectAllRooms} from '../common/redux/rooms-redux'
 
 interface IRoomSelectorProps {
 	activeRoom: string
@@ -28,7 +28,7 @@ export class RoomSelector extends Component<IRoomSelectorProps> {
 					<div className="selectContainer">
 						<div className="isometricBoxShadow" />
 						<select name="roomSelect" value={activeRoom} onChange={this.onRoomSelect}>
-							{rooms.map(room => <option key={room || 'null'} value={room} label={room}>{room}</option>)}
+							{rooms.map(room => <option key={room} value={room} label={room}>{room}</option>)}
 						</select>
 						<div className="arrow">
 							<div>▼</div>
@@ -54,11 +54,11 @@ export class RoomSelector extends Component<IRoomSelectorProps> {
 
 	private onNewRoomButtonClick = () => {
 		logger.log('new room')
-		this.props.dispatch(createRoom())
+		this.props.dispatch(requestCreateRoom())
 	}
 }
 
-export const ConnectedRoomSelector = connect((state: IAppState) => ({
+export const ConnectedRoomSelector = connect((state: IClientAppState) => ({
 	activeRoom: selectActiveRoom(state),
 	rooms: selectAllRooms(state),
 }))(RoomSelector)

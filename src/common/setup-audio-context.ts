@@ -1,8 +1,8 @@
 import {Store} from 'redux'
 import Reverb from 'soundbank-reverb'
-import {logger} from '../common/logger'
-import {reportLevels} from '../common/redux/audio-redux'
-import {IClientAppState} from '../common/redux/client-store'
+import {logger} from './logger'
+import {reportLevels} from './redux/audio-redux'
+import {IClientAppState} from './redux/common-redux-types'
 
 declare global {
 	interface Window {
@@ -74,7 +74,7 @@ export function setupAudioContext(store: Store) {
 		}
 	}
 
-	function sumArray(arr) {
+	function sumArray(arr: Uint8Array) {
 		return arr.reduce((sum, num) => {
 			return sum + num
 		})
@@ -85,7 +85,7 @@ export function setupAudioContext(store: Store) {
 
 	preFx.gain.value = 0.5
 
-	let previousMasterVolume
+	let previousMasterVolume: number
 
 	store.subscribe(() => {
 		const state: IClientAppState = store.getState()

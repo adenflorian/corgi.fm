@@ -1,5 +1,5 @@
-import {logger} from '../../common/logger'
-import {IMidiNote} from '../../common/MidiNote'
+import {logger} from '../common/logger'
+import {IMidiNote} from '../common/MidiNote'
 
 export enum SimpleTrackEventAction {
 	playNote,
@@ -26,6 +26,7 @@ export class TrackPlayer {
 	constructor(audioContext: AudioContext, onIndexChange: IndexChangeHandler) {
 		this._audioContext = audioContext
 		this._onIndexChange = onIndexChange
+		this._startTime = this._audioContext.currentTime
 	}
 
 	public play = (trackLength: number) => {

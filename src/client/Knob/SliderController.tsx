@@ -43,7 +43,7 @@ export class SliderController extends React.Component<ISliderControllerProps, IS
 		window.addEventListener('mouseup', this._handleMouseUp)
 	}
 
-	public componentWillReceiveProps(nextProps) {
+	public componentWillReceiveProps(nextProps: ISliderControllerProps) {
 		const normalizedNextValue = this._normalize(nextProps.value)
 		if (normalizedNextValue !== this.state.normalizedValue) {
 			this.setState({normalizedValue: normalizedNextValue})

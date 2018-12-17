@@ -1,0 +1,58 @@
+{
+	// See https://go.microsoft.com/fwlink/?LinkId=733558
+	// for the documentation about the tasks.json format
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "scan client for typescript problems",
+			"command": "./node_modules/.bin/tsc",
+			"type": "shell",
+			"options": {
+				"shell": {
+					"executable": "bash"
+				}
+			},
+			"args": [
+				"-w",
+				"-p",
+				"${workspaceFolder}\\src\\client",
+				"--noEmit"
+			],
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "shared",
+				"clear": false
+			},
+			"isBackground": true,
+			"problemMatcher": "$tsc-watch"
+		},
+		{
+			"label": "scan server for typescript problems",
+			"command": "./node_modules/.bin/tsc",
+			"type": "shell",
+			"options": {
+				"shell": {
+					"executable": "bash"
+				}
+			},
+			"args": [
+				"-w",
+				"-p",
+				"${workspaceFolder}\\src\\server",
+				"--noEmit"
+			],
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "shared",
+				"showReuseMessage": true,
+				"clear": false
+			},
+			"isBackground": true,
+			"problemMatcher": "$tsc-watch"
+		},
+	]
+}

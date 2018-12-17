@@ -1,22 +1,30 @@
-import Color from 'color'
 import 'rc-slider/assets/index.css'
 import {Component} from 'react'
 import React = require('react')
 import {connect} from 'react-redux'
-import {Dispatch} from 'redux'
-import {IAppState} from '../../common/redux/client-store'
+import {Action, Dispatch} from 'redux'
+import {IClientAppState} from '../../common/redux/common-redux-types'
 import {setOptionMasterVolume} from '../../common/redux/options-redux'
+import {colorFunc} from '../../common/shamu-color'
 import {Knob} from '../Knob/Knob'
 import './VolumeControl.less'
 
 interface IVolumeControlProps {
-	masterVolume: number,
-	changeMasterVolume: (number) => {type: any}
 	color: string
+}
+
+interface IVolumeControlReduxProps {
+	masterVolume: number,
 	reportedMasterVolume: number
 }
 
-export class VolumeControl extends Component<IVolumeControlProps> {
+interface IVolumeControlDispatchProps {
+	changeMasterVolume: (number: number) => Action
+}
+
+type IVolumeControlAllProps = IVolumeControlProps & IVolumeControlReduxProps & IVolumeControlDispatchProps
+
+export class VolumeControl extends Component<IVolumeControlAllProps> {
 	public static defaultProps = {
 		color: 'gray',
 	}
@@ -24,11 +32,11 @@ export class VolumeControl extends Component<IVolumeControlProps> {
 	public render() {
 		const {color, reportedMasterVolume} = this.props
 
-		const newColor = Color(color).saturate(reportedMasterVolume / 25).hsl().string()
+		const newColor = colorFunc(color).saturate(reportedMasterVolume / 25).hsl().string()
 
 		return (
 			<div className="volume container" style={{color: newColor}}>
-				<div className="isometricBoxShadow"></div>
+				<div className="isometricBoxShadow" />
 				<div className="label">master volume</div>
 				<Knob
 					value={this.props.masterVolume}
@@ -42,9 +50,9 @@ export class VolumeControl extends Component<IVolumeControlProps> {
 	}
 }
 
-export const ConnectedVolumeControl = connect((state: IAppState) => ({
+export const ConnectedVolumeControl = connect((state: IClientAppState) => ({
 	masterVolume: state.options.masterVolume,
 	reportedMasterVolume: Math.floor(state.audio.reportedMasterLevel),
-}), (dispatch: Dispatch) => ({
+}), (dispatch: Dispatch): IVolumeControlDispatchProps => ({
 	changeMasterVolume: volume => dispatch(setOptionMasterVolume(volume)),
 }))(VolumeControl)

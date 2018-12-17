@@ -1,6 +1,6 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
-import {IAppState} from '../../common/redux/client-store'
+import {IClientAppState} from '../../common/redux/common-redux-types'
 import {
 	getConnectionSourceColor, IConnection, selectConnection,
 } from '../../common/redux/connections-redux'
@@ -34,7 +34,7 @@ export class ConnectionViewContainer extends React.Component<IConnectionViewCont
 
 	public state: ICVCState = {positions: {}, oldPositions: {}}
 
-	constructor(props) {
+	constructor(props: IConnectionViewContainerProps) {
 		super(props)
 		window.addEventListener('resize', this._updatePositions)
 		window.addEventListener('scroll', this._updatePositions)
@@ -103,9 +103,9 @@ export class ConnectionViewContainer extends React.Component<IConnectionViewCont
 	}
 }
 
-const mapState = (state: IAppState, props: IConnectionViewContainerProps) => {
-	const connection = selectConnection(state, props.id) || {} as IConnection
-	const sourceColor = connection && getConnectionSourceColor(state, connection.id)
+const mapState = (state: IClientAppState, props: IConnectionViewContainerProps) => {
+	const connection = selectConnection(state.room, props.id) || {} as IConnection
+	const sourceColor = connection && getConnectionSourceColor(state.room, connection.id)
 	return {
 		sourceId: connection.sourceId,
 		targetId: connection.targetId,

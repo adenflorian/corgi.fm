@@ -2,31 +2,36 @@ import * as React from 'react'
 import {Component} from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
-import {IAppState} from '../common/redux/client-store'
-import {setOption} from '../common/redux/options-redux'
+import {IClientAppState} from '../common/redux/common-redux-types'
+import {AppOption, setOption} from '../common/redux/options-redux'
 
 interface IOptionProps {
-	option: string
-	value: boolean
-	setValue: (newValue: any) => any
+	option: AppOption
 	label: string
 }
 
-export class Option extends Component<IOptionProps> {
+interface IOptionReduxProps {
+	value: number | boolean
+}
+
+type IOptionAllProps = IOptionProps & IOptionReduxProps & {dispatch: Dispatch}
+
+export class Option extends Component<IOptionAllProps> {
 	public static defaultProps = {
-		setValue: () => undefined,
 		value: false,
 	}
 
 	public render() {
-		const {label, value, setValue} = this.props
+		const {dispatch, label, option, value} = this.props
+
+		if (typeof value === 'number') throw new Error('numbers are not supported in this component')
 
 		return (
 			<div className="option">
 				{label}
 				<input
 					type="checkbox"
-					onChange={e => setValue(e.target.checked)}
+					onChange={e => dispatch(setOption(option, e.target.checked))}
 					checked={value}
 				/>
 			</div>
@@ -34,8 +39,6 @@ export class Option extends Component<IOptionProps> {
 	}
 }
 
-export const ConnectedOption = connect((state: IAppState, props: IOptionProps) => ({
+export const ConnectedOption = connect((state: IClientAppState, props: IOptionProps): IOptionReduxProps => ({
 	value: state.options[props.option],
-}), (dispatch: Dispatch, props: IOptionProps) => ({
-	setValue: (newValue: any) => dispatch(setOption(props.option, newValue)),
 }))(Option)

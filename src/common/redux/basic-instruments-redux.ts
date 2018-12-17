@@ -1,10 +1,10 @@
 import {AnyAction} from 'redux'
 import * as uuid from 'uuid'
-import {ShamuOscillatorType} from '../../client/Instruments/OscillatorTypes'
-import {ClientId} from '../../client/websocket-listeners'
+import {ClientId} from '../common-types'
 import {pickRandomArrayElement} from '../common-utils'
-import {IClientAppState} from './client-store'
-import {addMultiThing, deleteThings, makeMultiReducer, MultiThingType, updateThings} from './multi-reducer'
+import {ShamuOscillatorType} from '../OscillatorTypes'
+import {IClientRoomState} from './common-redux-types'
+import {addMultiThing, deleteThings, IMultiState, makeMultiReducer, MultiThingType, updateThings} from './multi-reducer'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
 
 export const ADD_BASIC_INSTRUMENT = 'ADD_BASIC_INSTRUMENT'
@@ -60,7 +60,7 @@ export interface BasicInstrumentAction extends AnyAction {
 	instruments?: IBasicInstruments
 }
 
-export interface IBasicInstrumentsState {
+export interface IBasicInstrumentsState extends IMultiState {
 	things: IBasicInstruments
 }
 
@@ -98,7 +98,7 @@ const basicInstrumentActionTypes = [
 	SET_BASIC_INSTRUMENT_PARAM,
 ]
 
-export const basicInstrumentsReducer = makeMultiReducer(
+export const basicInstrumentsReducer = makeMultiReducer<IBasicInstrumentState, IBasicInstrumentsState>(
 	basicInstrumentReducer,
 	MultiThingType.basicInstrument,
 	basicInstrumentActionTypes,
@@ -121,15 +121,15 @@ function basicInstrumentReducer(basicInstrument: IBasicInstrumentState, action: 
 	}
 }
 
-export const selectAllInstruments = (state: IClientAppState) => state.basicInstruments.things
+export const selectAllInstruments = (state: IClientRoomState) => state.basicInstruments.things
 
-export const selectAllInstrumentIds = (state: IClientAppState) => Object.keys(selectAllInstruments(state))
+export const selectAllInstrumentIds = (state: IClientRoomState) => Object.keys(selectAllInstruments(state))
 
-export function selectInstrumentsByOwner(state: IClientAppState, ownerId: ClientId) {
+export function selectInstrumentsByOwner(state: IClientRoomState, ownerId: ClientId) {
 	const instruments = selectAllInstruments(state)
 	return Object.keys(instruments)
 		.map(x => instruments[x])
 		.filter(x => x.ownerId === ownerId)
 }
 
-export const selectInstrument = (state, id) => selectAllInstruments(state)[id]
+export const selectInstrument = (state: IClientRoomState, id: string) => selectAllInstruments(state)[id]

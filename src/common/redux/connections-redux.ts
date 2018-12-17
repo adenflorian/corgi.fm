@@ -1,7 +1,9 @@
+import {Map} from 'immutable'
+import {string} from 'prop-types'
 import {AnyAction} from 'redux'
 import * as uuid from 'uuid'
 import {logger} from '../logger'
-import {IClientAppState} from './client-store'
+import {IClientRoomState} from './common-redux-types'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
 import {selectTrack} from './tracks-redux'
 import {IVirtualKeyboardState, makeGetKeyboardMidiOutput, selectVirtualKeyboardById} from './virtual-keyboard-redux'
@@ -38,9 +40,9 @@ export interface IConnectionsState {
 	connections: IConnections
 }
 
-export interface IConnections {
-	[key: string]: IConnection
-}
+export type IConnections = Map<string, IConnection>
+
+export const Connections = Map
 
 export enum ConnectionSourceType {
 	keyboard = 'keyboard',
@@ -75,7 +77,7 @@ export class Connection implements IConnection {
 }
 
 const initialState: IConnectionsState = {
-	connections: {},
+	connections: Connections(),
 }
 
 export interface IConnectionAction extends AnyAction {
@@ -84,79 +86,73 @@ export interface IConnectionAction extends AnyAction {
 	connectionIds: string[]
 }
 
-export function connectionsReducer(state: IConnectionsState = initialState, action: IConnectionAction) {
+export function connectionsReducer(
+	state: IConnectionsState = initialState, action: IConnectionAction,
+): IConnectionsState {
 	switch (action.type) {
-		case ADD_CONNECTION:
-			return {
-				...state,
-				connections: {
-					...state.connections,
-					[action.connection.id]: action.connection,
-				},
-			}
-		case DELETE_CONNECTIONS:
-			const newState = {...state, connections: {...state.connections}}
-			action.connectionIds.forEach(x => delete newState.connections[x])
-			return newState
-		case DELETE_ALL_CONNECTIONS:
-			return {
-				...state,
-				connections: {},
-			}
-		case UPDATE_CONNECTIONS:
-			return {
-				...state,
-				connections: {
-					...state.connections,
-					...action.connections,
-				},
-			}
-		default:
-			return state
+		case ADD_CONNECTION: return {
+			...state,
+			connections: state.connections.set(action.connection.id, action.connection),
+		}
+		case DELETE_CONNECTIONS: return {
+			...state,
+			connections: state.connections.deleteAll(action.connectionIds),
+		}
+		case DELETE_ALL_CONNECTIONS: return {
+			...state,
+			connections: Connections(),
+		}
+		case UPDATE_CONNECTIONS: return {
+			...state,
+			connections: state.connections.merge(action.connections),
+		}
+		default: return state
 	}
 }
 
-export const selectConnection = (state: IClientAppState, id: string): IConnection => selectAllConnections(state)[id]
-export const selectSourceByConnectionId = (state: IClientAppState, id: string): IVirtualKeyboardState =>
-	selectVirtualKeyboardById(state, selectConnection(state, id).sourceId)
+export const selectConnection = (state: IClientRoomState, id: string) => selectAllConnections(state).get(id)
+export const selectSourceByConnectionId = (state: IClientRoomState, id: string): IVirtualKeyboardState =>
+	selectVirtualKeyboardById(state, selectConnection(state, id)!.sourceId)
 
-export const selectAllConnectionIds = (state: IClientAppState) => Object.keys(selectAllConnections(state))
-export const selectAllConnections = (state: IClientAppState) => state.connections.connections
-export const selectAllConnectionsAsArray = (state: IClientAppState) => {
-	const allConnections = selectAllConnections(state)
-	return Object.keys(allConnections).map(x => allConnections[x])
-}
+export const selectAllConnectionIds = (state: IClientRoomState) => Object.keys(selectAllConnections(state))
+export const selectAllConnections = (state: IClientRoomState) => state.connections.connections
+export const selectAllConnectionsAsArray = (state: IClientRoomState): IConnection[] =>
+	selectAllConnections(state).toIndexedSeq().toArray()
 
-export const selectConnectionsWithSourceOrTargetIds = (state: IClientAppState, sourceOrTargetIds: string[]) => {
+export const selectConnectionsWithSourceOrTargetIds = (state: IClientRoomState, sourceOrTargetIds: string[]) => {
 	return selectAllConnectionsAsArray(state)
 		.filter(x => sourceOrTargetIds.includes(x.sourceId) || sourceOrTargetIds.includes(x.targetId))
 }
 
-export const selectFirstConnectionByTargetId = (state: IClientAppState, targetId: string) =>
+export const selectFirstConnectionByTargetId = (state: IClientRoomState, targetId: string) =>
 	selectAllConnectionsAsArray(state)
 		.find(x => x.targetId === targetId)
 
-export const getConnectionSourceColor = (state: IClientAppState, id: string) => {
+export const getConnectionSourceColor = (state: IClientRoomState, id: string) => {
 	const connection = selectConnection(state, id)
-	switch (connection.sourceType) {
-		case ConnectionSourceType.keyboard:
-			const virtualKeyboard = selectVirtualKeyboardById(state, connection.sourceId)
-			return virtualKeyboard && virtualKeyboard.color
-		case ConnectionSourceType.track:
-			const track = selectTrack(state, connection.sourceId)
-			return track ? track.color : 'gray'
-		default:
-			logger.warn('couldnt find source color (unsupported connection source type)')
-			return 'red'
+	if (connection) {
+		switch (connection.sourceType) {
+			case ConnectionSourceType.keyboard:
+				const virtualKeyboard = selectVirtualKeyboardById(state, connection.sourceId)
+				return virtualKeyboard && virtualKeyboard.color
+			case ConnectionSourceType.track:
+				const track = selectTrack(state, connection.sourceId)
+				return track ? track.color : 'gray'
+			default:
+				logger.warn('couldnt find source color (unsupported connection source type)')
+				return 'red'
+		}
+	} else {
+		return 'gray'
 	}
 }
 
 const getKeyboardMidiOutput = makeGetKeyboardMidiOutput()
 
-const emptyArray = []
+const emptyArray: number[] = []
 
-export const getConnectionSourceNotes = (state: IClientAppState, id: string) => {
-	const connection = selectConnection(state, id)
+export const getConnectionSourceNotes = (state: IClientRoomState, id: string): number[] => {
+	const connection = selectConnection(state, id)!
 	switch (connection.sourceType) {
 		case ConnectionSourceType.keyboard:
 			return getKeyboardMidiOutput(state, connection.sourceId)

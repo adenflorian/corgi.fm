@@ -1,8 +1,9 @@
-import ColorDefault from 'color'
+// tslint:disable-next-line:no-var-requires
+const ColorDefault = require('color')
 import * as ColorAll from 'color'
 import {hashbow} from '../client/utils'
 
-const colorFunc = ColorDefault || ColorAll
+export const colorFunc: typeof ColorAll = ColorDefault || ColorAll
 
 export function getColorHslByString(str: string): string {
 	return colorFunc(hashbow(str)).desaturate(0.2).hsl().string()

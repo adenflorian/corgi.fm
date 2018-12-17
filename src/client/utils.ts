@@ -1,4 +1,6 @@
-export function hashbow(input, saturation = 50, lightness = 50) {
+export type IHashable = string | number | boolean | symbol | object
+
+export function hashbow(input: IHashable, saturation = 50, lightness = 50) {
 	const greyValues = [null, undefined, [], {}, '']
 
 	if (greyValues.indexOf(input) !== -1) {
@@ -12,7 +14,7 @@ export function hashbow(input, saturation = 50, lightness = 50) {
 	return hslToHex(squared % 360, saturation, lightness)
 }
 
-function convertToNumber(input: any): number {
+function convertToNumber(input: IHashable): number {
 	switch (input.constructor) {
 		case Function:
 		case RegExp:
@@ -21,12 +23,12 @@ function convertToNumber(input: any): number {
 		case Array:
 			return getNumberFromString(JSON.stringify(input))
 		case Number:
-			return input
+			return input as number
 		case Boolean:
 			return input ? 120 : 0
 		case String:
 		default:
-			return getNumberFromString(input)
+			return getNumberFromString(input.toString())
 	}
 }
 
@@ -36,7 +38,7 @@ const sum = (a: number, b: number): number => a + b
 
 const toCharCode = (char: string): number => char.charCodeAt(0)
 
-function hslToHex(hue, saturation, luminosity) {
+function hslToHex(hue: number, saturation: number, luminosity: number) {
 	// resolve degrees to 0 - 359 range
 	hue = cycle(hue)
 
@@ -61,7 +63,7 @@ function hslToHex(hue, saturation, luminosity) {
 		.join('')
 }
 
-function cycle(val) {
+function cycle(val: number) {
 	// for safety:
 	val = Math.min(val, 1e7)
 	val = Math.max(val, -1e7)
@@ -71,7 +73,7 @@ function cycle(val) {
 	return val
 }
 
-function hslToRgb(hue, saturation, lightness) {
+function hslToRgb(hue: number, saturation: number, lightness: number) {
 	// based on algorithm from http://en.wikipedia.org/wiki/HSL_and_HSV#Converting_to_RGB
 	if (hue === undefined) {
 		return [0, 0, 0]
@@ -82,9 +84,9 @@ function hslToRgb(hue, saturation, lightness) {
 	const secondComponent = chroma * (1 - Math.abs((huePrime % 2) - 1))
 
 	huePrime = Math.floor(huePrime)
-	let red
-	let green
-	let blue
+	let red = 0
+	let green = 0
+	let blue = 0
 
 	if (huePrime === 0) {
 		red = chroma
@@ -120,7 +122,18 @@ function hslToRgb(hue, saturation, lightness) {
 	return [Math.round(red * 255), Math.round(green * 255), Math.round(blue * 255)]
 }
 
-export const keyColors = Object.freeze({
+export type NoteName = 'C' | 'C#' | 'D' | 'D#' | 'E' | 'F' | 'F#' | 'G' | 'G#' | 'A' | 'A#' | 'B'
+
+export type KeyColor = 'white' | 'black'
+
+export interface IKeyColors {
+	[key: number]: {
+		color: KeyColor,
+		name: NoteName,
+	}
+}
+
+export const keyColors: Readonly<IKeyColors> = Object.freeze({
 	0: {color: 'white', name: 'C'},
 	1: {color: 'black', name: 'C#'},
 	2: {color: 'white', name: 'D'},
@@ -133,7 +146,7 @@ export const keyColors = Object.freeze({
 	9: {color: 'white', name: 'A'},
 	10: {color: 'black', name: 'A#'},
 	11: {color: 'white', name: 'B'},
-})
+} as IKeyColors)
 
 /** @param buttons The buttons property from a mouse event */
 export function isLeftMouseButtonDown(buttons: number): boolean {

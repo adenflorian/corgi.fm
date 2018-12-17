@@ -2,10 +2,9 @@ import {Fragment} from 'react'
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {selectAllInstrumentIds} from '../common/redux/basic-instruments-redux'
-import {IAppState} from '../common/redux/client-store'
 import {IClientState, selectAllClients, selectLocalClient} from '../common/redux/clients-redux'
+import {IClientAppState} from '../common/redux/common-redux-types'
 import {IConnection, selectAllConnectionsAsArray} from '../common/redux/connections-redux'
-import {AppOptions} from '../common/redux/options-redux'
 import {selectAllTrackIds} from '../common/redux/tracks-redux'
 import {selectAllVirtualKeyboardIds} from '../common/redux/virtual-keyboard-redux'
 import {getColorHslByHex} from '../common/shamu-color'
@@ -36,7 +35,7 @@ const MASTER_VOLUME_COLOR = getColorHslByHex(TRACK_1_BASE_COLOR)
 
 export const mainBoardsId = 'mainBoards'
 
-class OnlineApp extends React.Component<IOnlineAppProps, {}> {
+class OnlineApp extends React.Component<IOnlineAppProps> {
 	public static defaultProps = {
 		clients: [],
 	}
@@ -55,7 +54,7 @@ class OnlineApp extends React.Component<IOnlineAppProps, {}> {
 						<div id="topDiv" style={{marginBottom: 'auto'}}>
 							<div className="left">
 								<ConnectedOption
-									option={AppOptions.showNoteNamesOnKeyboard}
+									option={'showNoteNamesOnKeyboard'}
 									label="show names on keyboard"
 								/>
 								<div>{info}</div>
@@ -122,14 +121,14 @@ function sortConnection(connA: IConnection, connB: IConnection) {
 	}
 }
 
-const mapStateToProps = (state: IAppState) => ({
+const mapStateToProps = (state: IClientAppState): IOnlineAppProps => ({
 	clients: selectAllClients(state),
 	myClient: selectLocalClient(state),
 	info: state.websocket.info,
-	keyboardIds: selectAllVirtualKeyboardIds(state),
-	instrumentIds: selectAllInstrumentIds(state),
-	trackIds: selectAllTrackIds(state),
-	connections: selectAllConnectionsAsArray(state),
+	keyboardIds: selectAllVirtualKeyboardIds(state.room),
+	instrumentIds: selectAllInstrumentIds(state.room),
+	trackIds: selectAllTrackIds(state.room),
+	connections: selectAllConnectionsAsArray(state.room),
 })
 
-export const ConnectedOnlineApp = (connect(mapStateToProps)(OnlineApp))
+export const ConnectedOnlineApp = connect(mapStateToProps)(OnlineApp)

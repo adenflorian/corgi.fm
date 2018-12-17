@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
-import {IAppState} from '../common/redux/client-store'
 import {selectAllClients, selectLocalClient} from '../common/redux/clients-redux'
+import {IClientAppState} from '../common/redux/common-redux-types'
 
 interface IMousePointersViewProps {
 	pointers: Array<{
@@ -41,7 +41,7 @@ class MousePointersView extends React.PureComponent<IMousePointersViewProps> {
 	}
 }
 
-const mapStateToProps = (state: IAppState): IMousePointersViewProps => {
+const mapStateToProps = (state: IClientAppState): IMousePointersViewProps => {
 	const localClientId = selectLocalClient(state).id
 	const otherClients = selectAllClients(state).filter(x => x.id !== 'server' && x.id !== localClientId)
 	return {

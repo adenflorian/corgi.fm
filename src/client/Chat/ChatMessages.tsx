@@ -2,7 +2,7 @@ import * as React from 'react'
 import {Component} from 'react'
 import {connect} from 'react-redux'
 import {IChatMessage, selectAllMessages} from '../../common/redux/chat-redux'
-import {IAppState} from '../../common/redux/client-store'
+import {IClientAppState} from '../../common/redux/common-redux-types'
 
 interface IChatMessagesProps {
 	messages: IChatMessage[]
@@ -35,6 +35,6 @@ export class ChatMessages extends Component<IChatMessagesProps> {
 	}
 }
 
-export const ConnectedChatMessages = connect((state: IAppState) => ({
-	messages: selectAllMessages(state),
+export const ConnectedChatMessages = connect((state: IClientAppState) => ({
+	messages: selectAllMessages(state.room),
 }))(ChatMessages)

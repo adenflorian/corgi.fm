@@ -1,16 +1,17 @@
 {
 	"compilerOptions": {
-		"jsx": "react",
 		"noUnusedLocals": false,
 		"noUnusedParameters": false,
-		"experimentalDecorators": true,
-		"strictNullChecks": true,
 		"sourceMap": true,
+		"strict": true,
+		"noImplicitReturns": true,
 		"target": "es6",
 		"module": "commonjs",
 		"lib": [
 			"dom",
 			"es7"
 		],
+		"experimentalDecorators": true,
+		"jsx": "react",
 	}
 }

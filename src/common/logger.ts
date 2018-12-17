@@ -6,17 +6,17 @@ const logLevel = {
 }
 
 export const logger = {
-	log: (...args) => {
+	log: (...args: any[]) => {
 		if (logLevel.log) {
 			console.log(...args)
 		}
 	},
-	warn: (...args) => {
+	warn: (...args: any[]) => {
 		if (logLevel.warn) {
 			console.warn(...args)
 		}
 	},
-	debug: (...args) => {
+	debug: (...args: any[]) => {
 		if (logLevel.debug) {
 			console.log(...args)
 		}

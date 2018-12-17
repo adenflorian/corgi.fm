@@ -2,7 +2,7 @@ import {expect} from 'chai'
 import {isProdServer} from './is-prod-server'
 
 describe('is-prod-server', () => {
-	let originalNodeEnv
+	let originalNodeEnv: any
 
 	beforeEach(() => (originalNodeEnv = process.env.NODE_ENV))
 	afterEach(() => (process.env.NODE_ENV = originalNodeEnv))

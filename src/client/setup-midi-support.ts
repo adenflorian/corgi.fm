@@ -1,18 +1,17 @@
 import {Store} from 'redux'
+import {logger} from '../common/logger'
 import {localMidiKeyPress, localMidiKeyUp} from '../common/redux/local-middleware'
 
 declare global {
 	interface Navigator {
-		requestMIDIAccess: (any) => Promise<any>
+		requestMIDIAccess: (any: any) => Promise<any>
 	}
 }
 
 let _store: Store
-let _logger
 
-export function setupMidiSupport(store: Store, logger) {
+export function setupMidiSupport(store: Store) {
 	_store = store
-	_logger = logger
 
 	if (navigator.requestMIDIAccess) {
 		navigator.requestMIDIAccess({
@@ -25,29 +24,51 @@ export function setupMidiSupport(store: Store, logger) {
 }
 
 function onMidiNotAvailable() {
-	_logger.log('No MIDI support in your browser. Try Chrome or Opera.')
+	logger.log('No MIDI support in your browser. Try Chrome or Opera.')
 }
 
 function onMidiFailure() {
-	_logger.log('fail')
+	logger.log('fail')
 }
 
-type MidiAccess = any
-type MIDIInput = any
+interface MidiAccess {
+	onstatechange: (e: MidiStateChangeEvent) => void
+	inputs: MIDIInputMap
+}
+
+interface MidiStateChangeEvent extends Event {
+	port: MIDIInput
+}
+
+interface MidiMessageEvent extends Event {
+	data: any
+}
+
+type MIDIInputMap = Readonly<Map<any, any>>
+
+interface MIDIInput {
+	name: string
+	manufacturer: string
+	state: string,
+	type: 'input' | string
+	valueOf: () => {
+		onmidimessage: (e: MidiMessageEvent) => void,
+	}
+}
 
 function onMidiSuccess(midiAccess: MidiAccess) {
-	_logger.log('success: ', midiAccess)
+	logger.log('success: ', midiAccess)
 
 	for (const input of midiAccess.inputs.values()) {
-		_logger.log('input: ', input)
+		logger.log('input: ', input)
 		input.valueOf().onmidimessage = onMidiMessage
 	}
 
 	midiAccess.onstatechange = onStateChange
 }
 
-function onStateChange(event) {
-	_logger.log('midi state change: ', event)
+function onStateChange(event: MidiStateChangeEvent) {
+	logger.log('midi state change: ', event)
 
 	if (event.port.type === 'input') {
 		onInputStateChange(event.port)
@@ -63,16 +84,16 @@ function onInputStateChange(input: MIDIInput) {
 }
 
 function onInputDisconnected(input: MIDIInput) {
-	_logger.log('input disconnected: ', input)
+	logger.log('input disconnected: ', input)
 }
 
 function onInputConnected(input: MIDIInput) {
-	_logger.log('input connected: ', input)
+	logger.log('input connected: ', input)
 	input.valueOf().onmidimessage = onMidiMessage
 }
 
-function onMidiMessage(event) {
-	_logger.debug('MIDI MESSAGE!', event.data)
+function onMidiMessage(event: MidiMessageEvent) {
+	logger.debug('MIDI MESSAGE!', event.data)
 	// const note = message.data[1]
 	// const velocity = message.data[0]
 

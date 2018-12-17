@@ -1,11 +1,10 @@
-import {logger} from '../common/logger'
-import {configureStore} from '../common/redux/client-store'
 import {getInitialReduxState} from '../common/redux/initial-client-redux-state'
+import {audioContext, setupAudioContext} from '../common/setup-audio-context'
+import {configureStore} from './client-store'
 import {fpsLoop} from './fps-loop'
 import {setupInputEventListeners} from './input-events'
 import {logClientEnv} from './is-prod-client'
 import {renderApp} from './react-main'
-import {audioContext, setupAudioContext} from './setup-audio-context'
 import {setupMidiSupport} from './setup-midi-support'
 import {setupWebsocketAndListeners, socket} from './websocket-listeners'
 
@@ -15,7 +14,7 @@ const store = configureStore(getInitialReduxState())
 
 setupAudioContext(store)
 
-setupMidiSupport(store, logger)
+setupMidiSupport(store)
 
 setupInputEventListeners(window, store)
 

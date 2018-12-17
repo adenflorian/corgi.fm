@@ -1,7 +1,8 @@
-import {IClientAppState} from './client-store'
-import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
+import {IClientRoomState} from './common-redux-types'
+import {BROADCASTER_ACTION, createReducer, SERVER_ACTION} from './redux-utils'
 
 export const CHAT_SUBMIT = 'CHAT_SUBMIT'
+export type ChatSubmitAction = ReturnType<typeof chatSubmit>
 export const chatSubmit = (message: IChatMessage) => {
 	return {
 		type: CHAT_SUBMIT,
@@ -12,6 +13,7 @@ export const chatSubmit = (message: IChatMessage) => {
 }
 
 export const SET_CHAT = 'SET_CHAT'
+export type SetChatAction = ReturnType<typeof setChat>
 export const setChat = (messages: IChatMessage[]) => {
 	return {
 		type: SET_CHAT,
@@ -30,22 +32,23 @@ export interface IChatMessage {
 	text: string
 }
 
-const initialState = {
+const initialState: IChatState = {
 	messages: [],
 }
 
-export function chatReducer(state: IChatState = initialState, action): IChatState {
-	switch (action.type) {
-		case CHAT_SUBMIT: return {
+export const chatReducer = createReducer(initialState, {
+	[CHAT_SUBMIT]: (state, {message}: ChatSubmitAction) => {
+		return {
 			...state,
-			messages: state.messages.concat(action.message),
+			messages: state.messages.concat(message),
 		}
-		case SET_CHAT: return {
+	},
+	[SET_CHAT]: (state, {messages}: SetChatAction) => {
+		return {
 			...state,
-			messages: action.messages,
+			messages,
 		}
-		default: return state
-	}
-}
+	},
+})
 
-export const selectAllMessages = (state: IClientAppState) => state.chat.messages
+export const selectAllMessages = (state: IClientRoomState) => state.chat.messages

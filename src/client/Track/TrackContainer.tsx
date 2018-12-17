@@ -1,6 +1,6 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
-import {IAppState} from '../../common/redux/client-store'
+import {IClientAppState} from '../../common/redux/common-redux-types'
 import {selectTrack} from '../../common/redux/tracks-redux'
 import {Track} from './Track'
 import './Track.less'
@@ -29,8 +29,8 @@ interface IConnectedTrackContainerProps {
 	id: string
 }
 
-const mapStateToProps = (state: IAppState, props: IConnectedTrackContainerProps) => {
-	const track = selectTrack(state, props.id)
+const mapStateToProps = (state: IClientAppState, props: IConnectedTrackContainerProps) => {
+	const track = selectTrack(state.room, props.id)
 
 	return {
 		isPlaying: track.isPlaying,

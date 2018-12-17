@@ -1,13 +1,16 @@
 import {Dispatch, Middleware} from 'redux'
-import {deleteAllTheThings} from '../../client/websocket-listeners'
 import {addBasicInstrument, BasicInstrumentState} from './basic-instruments-redux'
-import {IClientAppState} from './client-store'
 import {ADD_CLIENT, selectLocalClient} from './clients-redux'
-import {addConnection, Connection, ConnectionSourceType, ConnectionTargetType} from './connections-redux'
+import {IClientAppState} from './common-redux-types'
+import {
+	addConnection, Connection, ConnectionSourceType, ConnectionTargetType, deleteAllConnections,
+} from './connections-redux'
+import {deleteAllThings, MultiThingType} from './multi-reducer'
 import {makeActionCreator} from './redux-utils'
 import {selectActiveRoom, SET_ACTIVE_ROOM} from './rooms-redux'
 import {
-	addVirtualKeyboard, selectLocalKeyboardId, VirtualKeyboardState, virtualKeyPressed, virtualKeyUp, virtualOctaveChange,
+	addVirtualKeyboard, selectVirtualKeyboardIdByOwner,
+	VirtualKeyboardState, virtualKeyPressed, virtualKeyUp, virtualOctaveChange,
 } from './virtual-keyboard-redux'
 import {selectLocalSocketId} from './websocket-redux'
 
@@ -20,36 +23,44 @@ export const localMidiKeyUp = makeActionCreator(LOCAL_MIDI_KEY_UP, 'midiNote')
 export const LOCAL_MIDI_OCTAVE_CHANGE = 'LOCAL_MIDI_OCTAVE_CHANGE'
 export const localMidiOctaveChange = makeActionCreator(LOCAL_MIDI_OCTAVE_CHANGE, 'delta')
 
-export const localMiddleware: Middleware = ({dispatch, getState}) => next => action => {
+export function deleteAllTheThings(dispatch: Dispatch) {
+	dispatch(deleteAllConnections())
+	dispatch(deleteAllThings(MultiThingType.track))
+	dispatch(deleteAllThings(MultiThingType.virtualKeyboard))
+	dispatch(deleteAllThings(MultiThingType.basicInstrument))
+}
+
+export const localMiddleware: Middleware<{}, IClientAppState> = ({dispatch, getState}) => next => action => {
 	switch (action.type) {
 		case LOCAL_MIDI_KEY_PRESS: {
 			next(action)
-			return dispatch(virtualKeyPressed(selectLocalKeyboardId(getState()), action.midiNote))
+			return dispatch(virtualKeyPressed(getLocalVirtualKeyboardId(getState()), action.midiNote))
 		}
 		case LOCAL_MIDI_KEY_UP: {
 			next(action)
-			return dispatch(virtualKeyUp(selectLocalKeyboardId(getState()), action.midiNote))
+			return dispatch(virtualKeyUp(getLocalVirtualKeyboardId(getState()), action.midiNote))
 		}
 		case LOCAL_MIDI_OCTAVE_CHANGE: {
 			next(action)
-			return dispatch(virtualOctaveChange(selectLocalKeyboardId(getState()), action.delta))
+			return dispatch(virtualOctaveChange(getLocalVirtualKeyboardId(getState()), action.delta))
 		}
 		case ADD_CLIENT: {
 			next(action)
-			const state: IClientAppState = getState()
-			if (action.client.socketId === selectLocalSocketId(state)) {
-				createLocalStuff(dispatch, state)
-			}
 			return
 		}
 		case SET_ACTIVE_ROOM: {
 			next(action)
 			window.history.pushState({}, document.title, '/' + selectActiveRoom(getState()))
-			return deleteAllTheThings(dispatch)
+			deleteAllTheThings(dispatch)
+			return createLocalStuff(dispatch, getState())
 		}
 		default:
 			return next(action)
 	}
+}
+
+function getLocalVirtualKeyboardId(state: IClientAppState) {
+	return selectVirtualKeyboardIdByOwner(state.room, selectLocalClient(state).id)
 }
 
 function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {

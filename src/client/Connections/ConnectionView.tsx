@@ -1,5 +1,5 @@
-import Color from 'color'
 import * as React from 'react'
+import {colorFunc} from '../../common/shamu-color'
 import './ConnectionView.less'
 
 export interface Point {
@@ -25,7 +25,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps> {
 
 	public render() {
 		const color = this.props.color
-		const darkerColor = Color(color).darken(0.6).hsl().string()
+		const darkerColor = colorFunc(color).darken(0.6).hsl().string()
 		const strokeWidth = '2px'
 		const strokeWidth2 = '8px'
 

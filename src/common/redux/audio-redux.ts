@@ -7,9 +7,12 @@ export interface IAudioState {
 	reportedMasterLevel: number
 }
 
+const initialState: IAudioState = {
+	reportedMasterLevel: 0,
+}
+
 export const audioReducer = createReducer(
-	{
-	},
+	initialState,
 	{
 		[REPORT_LEVELS]: (state: IAudioState, {master}) => {
 			return {

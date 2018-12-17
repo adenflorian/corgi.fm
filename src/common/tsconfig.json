@@ -3,7 +3,8 @@
 		"noUnusedLocals": false,
 		"noUnusedParameters": false,
 		"sourceMap": false,
-		"strictNullChecks": true,
+		"strict": true,
+		"noImplicitReturns": true,
 		"target": "esnext",
 		"module": "commonjs",
 		"lib": [

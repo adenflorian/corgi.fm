@@ -1,12 +1,12 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
-import {IAppState} from '../../common/redux/client-store'
 import {ClientState, selectClientById, selectLocalClient} from '../../common/redux/clients-redux'
+import {IClientAppState} from '../../common/redux/common-redux-types'
 import {selectVirtualKeyboardById, virtualKeyPressed, virtualKeyUp} from '../../common/redux/virtual-keyboard-redux'
 import {keyToMidiMap} from '../input-events'
 import {Octave} from '../music/music-types'
-import {isLeftMouseButtonDown, keyColors} from '../utils'
+import {isLeftMouseButtonDown, KeyColor, keyColors, NoteName} from '../utils'
 import './Keyboard.less'
 
 const defaultNumberOfKeys = 17
@@ -20,7 +20,7 @@ function createVirtualMidiKeyboard(numberOfKeys: number) {
 		const baseNumber = i % 12
 		newVirtualMidiKeyboard[i] = {
 			...keyColors[baseNumber],
-			keyName: Object.keys(keyToMidiMap)[i],
+			keyName: keyToMidiMap.keySeq().toArray()[i],
 		}
 	}
 
@@ -36,9 +36,9 @@ export function isWhiteKey(keyNumber: number) {
 type IVirtualMidiKeyboard = IVirtualMidiKey[]
 
 interface IVirtualMidiKey {
-	color: string
+	color: KeyColor
 	keyName: string
-	name: string
+	name: NoteName
 }
 
 type IKeyboardAllProps = IKeyboardProps & IKeyboardReduxProps & {dispatch: Dispatch}
@@ -186,8 +186,8 @@ export class Keyboard extends React.PureComponent<IKeyboardAllProps, IKeyboardSt
 	}
 }
 
-const mapStateToProps = (state: IAppState, props: IKeyboardProps): IKeyboardReduxProps => {
-	const virtualKeyboard = selectVirtualKeyboardById(state, props.id)
+const mapStateToProps = (state: IClientAppState, props: IKeyboardProps): IKeyboardReduxProps => {
+	const virtualKeyboard = selectVirtualKeyboardById(state.room, props.id)
 	const owner = selectClientById(state, virtualKeyboard.ownerId) || {} as ClientState
 	const pressedMidiKeys = virtualKeyboard ? virtualKeyboard.pressedKeys : []
 	const localClient = selectLocalClient(state)

@@ -4,8 +4,8 @@ import AutosizeInput from 'react-input-autosize'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 import {chatSubmit} from '../common/redux/chat-redux'
-import {IAppState} from '../common/redux/client-store'
 import {maxUsernameLength, selectLocalClient, setClientName} from '../common/redux/clients-redux'
+import {IClientAppState} from '../common/redux/common-redux-types'
 import './Chat.less'
 import {ConnectedChatMessages} from './Chat/ChatMessages'
 import {saveUsernameToLocalStorage} from './username'
@@ -162,7 +162,7 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 	}
 }
 
-export const ConnectedChat = connect((state: IAppState) => ({
+export const ConnectedChat = connect((state: IClientAppState) => ({
 	author: selectLocalClient(state).name,
 	authorColor: selectLocalClient(state).color,
 	authorId: selectLocalClient(state).id,

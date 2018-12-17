@@ -1,8 +1,6 @@
 import {logger} from '../logger'
-import {IClientAppState} from './client-store'
-import {IVirtualKeyboards} from './virtual-keyboard-redux'
 
-interface IMultiState {
+export interface IMultiState {
 	things: IMultiStateThings
 }
 
@@ -74,16 +72,12 @@ interface IMultiThingAction {
 	thingType: MultiThingType
 }
 
-const initialState: IMultiState = {
-	things: {},
-}
-
-export function makeMultiReducer<T extends IMultiStateThing>(
+export function makeMultiReducer<T extends IMultiStateThing, U extends IMultiState>(
 	innerReducer: (state: T, action: any) => any,
 	thingType: MultiThingType,
 	actionTypes: string[],
 ) {
-	return (state: IMultiState = initialState, action: MultiThingAction) => {
+	return (state: U = {things: {}} as U, action: MultiThingAction): U => {
 		switch (action.type) {
 			case ADD_MULTI_THING:
 				if (action.thingType !== thingType) return state

@@ -1,14 +1,9 @@
-import {Dispatch} from 'redux'
 import {Store} from 'redux'
 import * as io from 'socket.io-client'
 import {maxRoomNameLength} from '../common/common-constants'
 import {logger} from '../common/logger'
-import {BASIC_INSTRUMENT_THING_TYPE} from '../common/redux/basic-instruments-redux'
 import {maxUsernameLength} from '../common/redux/clients-redux'
-import {deleteAllConnections} from '../common/redux/connections-redux'
-import {deleteAllThings} from '../common/redux/multi-reducer'
-import {TRACK_THING_TYPE} from '../common/redux/tracks-redux'
-import {VIRTUAL_KEYBOARD_THING_TYPE} from '../common/redux/virtual-keyboard-redux'
+import {deleteAllTheThings} from '../common/redux/local-middleware'
 import {BroadcastAction} from '../common/redux/websocket-client-sender-middleware'
 import {setInfo, setSocketId} from '../common/redux/websocket-redux'
 import {WebSocketEvent} from '../common/server-constants'
@@ -18,16 +13,7 @@ import {getUsernameFromLocalStorage} from './username'
 
 const port = isLocalDevClient() ? 3000 : 443
 
-export let socket
-
-export type ClientId = string
-
-export function deleteAllTheThings(dispatch: Dispatch) {
-	dispatch(deleteAllConnections())
-	dispatch(deleteAllThings(TRACK_THING_TYPE))
-	dispatch(deleteAllThings(VIRTUAL_KEYBOARD_THING_TYPE))
-	dispatch(deleteAllThings(BASIC_INSTRUMENT_THING_TYPE))
-}
+export let socket: SocketIOClient.Socket
 
 export function setupWebsocketAndListeners(store: Store) {
 	socket = io.connect(window.location.hostname + `:${port}/`, {
@@ -78,7 +64,7 @@ export function setupWebsocketAndListeners(store: Store) {
 	}
 
 	function setupDefaultEventListener(eventName: string, friendlyName?: string) {
-		socket.on(eventName, data => {
+		socket.on(eventName, (data: any) => {
 			socketInfo(`${friendlyName || eventName}: ` + JSON.stringify(data, null, 2))
 		})
 	}

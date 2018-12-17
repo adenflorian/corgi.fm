@@ -1,10 +1,14 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
-import {IAppState} from '../../common/redux/client-store'
+import {IClientAppState} from '../../common/redux/common-redux-types'
 import {selectAllConnectionIds} from '../../common/redux/connections-redux'
 import {ConnectedConnectionViewContainer} from './ConnectionViewContainer'
 
-const Connections = ({connectionIds}) => (
+interface IConnectionsProps {
+	connectionIds: string[]
+}
+
+const Connections = ({connectionIds}: IConnectionsProps) => (
 	<div className="connections" style={{display: 'flex'}}>
 		{connectionIds.map(connectionId => (
 			<ConnectedConnectionViewContainer key={connectionId} id={connectionId} />
@@ -12,8 +16,8 @@ const Connections = ({connectionIds}) => (
 	</div>
 )
 
-const mapStateToProps = (state: IAppState) => ({
-	connectionIds: selectAllConnectionIds(state),
+const mapStateToProps = (state: IClientAppState) => ({
+	connectionIds: selectAllConnectionIds(state.room),
 })
 
 export const ConnectionsContainer = connect(mapStateToProps)(Connections)

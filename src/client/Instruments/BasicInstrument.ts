@@ -1,9 +1,9 @@
 import {setTimeout} from 'timers'
 import * as uuid from 'uuid'
 import {IMidiNote} from '../../common/MidiNote'
+import {BuiltInOscillatorType, CustomOscillatorType, ShamuOscillatorType} from '../../common/OscillatorTypes'
 import {Arp} from '../arp'
 import {getFrequencyUsingHalfStepsFromA4} from '../music/music-functions'
-import {BuiltInOscillatorType, CustomOscillatorType, ShamuOscillatorType} from './OscillatorTypes'
 
 export interface IBasicInstrumentOptions {
 	destination: any
@@ -206,17 +206,20 @@ class Voice {
 	private _destination: AudioNode
 	private _whiteNoise: AudioBufferSourceNode
 	private _noiseBuffer: AudioBuffer
-	private _releaseId: string
+	private _releaseId: string = ''
 	private _status: VoiceStatus = VoiceStatus.off
 
 	constructor(audioContext: AudioContext, destination: AudioNode, oscType: ShamuOscillatorType) {
 		this._audioContext = audioContext
 		this._destination = destination
 		this._oscillatorType = oscType
+		this._nextOscillatorType = oscType
 		this._gain = this._audioContext.createGain()
 		this._gain.gain.setValueAtTime(0, this._audioContext.currentTime)
+		this._oscillator = this._audioContext.createOscillator()
+		this._whiteNoise = this._audioContext.createBufferSource()
 
-		this._generateNoiseBuffer()
+		this._noiseBuffer = this._generateNoiseBuffer()
 
 		this._buildChain()
 	}
@@ -282,12 +285,14 @@ class Voice {
 
 	private _generateNoiseBuffer() {
 		const bufferSize = 2 * this._audioContext.sampleRate
-		this._noiseBuffer = this._audioContext.createBuffer(1, bufferSize, this._audioContext.sampleRate)
-		const output = this._noiseBuffer.getChannelData(0)
+		const buffer = this._audioContext.createBuffer(1, bufferSize, this._audioContext.sampleRate)
+		const output = buffer.getChannelData(0)
 
 		for (let i = 0; i < bufferSize; i++) {
 			output[i] = Math.random() * 2 - 1
 		}
+
+		return buffer
 	}
 
 	private _buildChain() {

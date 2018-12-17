@@ -1,21 +1,20 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
-import {logger} from '../../common/logger'
 import {IMidiNote} from '../../common/MidiNote'
+import {ShamuOscillatorType} from '../../common/OscillatorTypes'
 import {
 	BasicInstrumentParam, selectInstrument, setBasicInstrumentOscillatorType, setBasicInstrumentParam,
 } from '../../common/redux/basic-instruments-redux'
-import {IAppState} from '../../common/redux/client-store'
+import {IClientAppState} from '../../common/redux/common-redux-types'
 import {
 	getConnectionSourceColor, getConnectionSourceNotes, selectFirstConnectionByTargetId,
 } from '../../common/redux/connections-redux'
+import {audioContext, preFx} from '../../common/setup-audio-context'
 import {Knob} from '../Knob/Knob'
-import {audioContext, preFx} from '../setup-audio-context'
 import {BasicInstrument} from './BasicInstrument'
 import {BasicInstrumentOscillatorTypes} from './BasicInstrumentOscillatorTypes'
 import './BasicInstrumentView.less'
-import {ShamuOscillatorType} from './OscillatorTypes'
 
 export type MidiNotes = IMidiNote[]
 
@@ -36,11 +35,21 @@ interface IBasicInstrumentViewReduxProps {
 	release: number
 }
 
+function makeInstrument(props: IBasicInstrumentViewAllProps) {
+	const instrument = new BasicInstrument({
+		audioContext,
+		destination: preFx,
+		voiceCount: 9,
+		oscillatorType: props.oscillatorType,
+	})
+	instrument.setPan(props.pan)
+	return instrument
+}
+
 export class BasicInstrumentView
 	extends React.PureComponent<IBasicInstrumentViewAllProps> {
 
 	public static defaultProps = {
-		dispatch: _ => ({}) as Dispatch,
 		color: 'gray',
 		pan: 0,
 		rawMidiNotes: [],
@@ -50,13 +59,13 @@ export class BasicInstrumentView
 
 	constructor(props: IBasicInstrumentViewAllProps) {
 		super(props)
-		this._makeInstrument(props)
+		this.instrument = makeInstrument(props)
 	}
 
 	public componentDidUpdate(prevProps: IBasicInstrumentViewAllProps) {
 		if (prevProps.id !== this.props.id) {
 			this.instrument.dispose()
-			this._makeInstrument(this.props)
+			this.instrument = makeInstrument(this.props)
 		}
 	}
 
@@ -132,16 +141,6 @@ export class BasicInstrumentView
 		)
 	}
 
-	private _makeInstrument = (props: IBasicInstrumentViewAllProps) => {
-		this.instrument = new BasicInstrument({
-			audioContext,
-			destination: preFx,
-			voiceCount: 9,
-			oscillatorType: props.oscillatorType,
-		})
-		this.instrument.setPan(props.pan)
-	}
-
 	private _handleOscillatorTypeClicked = (type: ShamuOscillatorType) => {
 		this.props.dispatch(setBasicInstrumentOscillatorType(this.props.id, type))
 	}
@@ -154,16 +153,16 @@ export class BasicInstrumentView
 }
 
 const makeMapStateToProps = () => {
-	return (state: IAppState, props: IBasicInstrumentViewProps): IBasicInstrumentViewReduxProps => {
-		const connection = selectFirstConnectionByTargetId(state, props.id)
-		const rawMidiNotes = connection && getConnectionSourceNotes(state, connection.id)
-		const instrumentState = selectInstrument(state, props.id)
+	return (state: IClientAppState, props: IBasicInstrumentViewProps): IBasicInstrumentViewReduxProps => {
+		const connection = selectFirstConnectionByTargetId(state.room, props.id)
+		const rawMidiNotes = connection && getConnectionSourceNotes(state.room, connection.id)
+		const instrumentState = selectInstrument(state.room, props.id)
 
 		return {
 			rawMidiNotes: rawMidiNotes || [],
 			isPlaying: rawMidiNotes ? rawMidiNotes.length > 0 : false,
 			oscillatorType: instrumentState.oscillatorType,
-			color: connection ? getConnectionSourceColor(state, connection.id) : BasicInstrumentView.defaultProps.color,
+			color: connection ? getConnectionSourceColor(state.room, connection.id) : BasicInstrumentView.defaultProps.color,
 			pan: instrumentState.pan,
 			lowPassFilterCutoffFrequency: instrumentState.lowPassFilterCutoffFrequency,
 			attack: instrumentState.attack,

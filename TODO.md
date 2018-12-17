@@ -53,7 +53,6 @@
 - [ ] show loading icon on startup
 - [ ] show badge on test server with warning
 - [ ] extend the range of the keyboard by one which will map to the `'` key
-- [√] use `strictNullChecks` typescript config
 - [ ] flash action
 	- send messages to users to be displayed on their screens
 - [ ] setup dotenv files
@@ -62,6 +61,10 @@
 - [ ] make desktop version using electron
 	- so chrome auto updating can't break the whole app
 - [ ] turn off audio after 30 minutes and show dialog asking if user is still there
+
+# Clean Code
+- [√] use `strictNullChecks` typescript config
+- [ ] `tslint:all`
 
 # Connections
 - [ ] make it obvious which direction data flows

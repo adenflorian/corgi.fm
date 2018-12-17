@@ -1,13 +1,14 @@
-import * as Color from 'color'
 import {AnyAction} from 'redux'
 import * as uuid from 'uuid'
 import {hashbow} from '../../client/utils'
 import {IMidiNote} from '../MidiNote'
 import {addIfNew} from '../server-common'
 import {MAX_MIDI_NOTE_NUMBER_127} from '../server-constants'
-import {IClientAppState} from './client-store'
+import {colorFunc} from '../shamu-color'
+import {IClientRoomState} from './common-redux-types'
 import {
-	addMultiThing, deleteThings, IMultiStateThings, makeMultiReducer, MultiThingType, updateThings,
+	addMultiThing, deleteThings, IMultiState, IMultiStateThing,
+	IMultiStateThings, makeMultiReducer, MultiThingType, updateThings,
 } from './multi-reducer'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
 import {PLAY_TRACK, STOP_TRACK} from './track-player-middleware'
@@ -79,7 +80,7 @@ export interface ITrackEvent {
 	notes: IMidiNote[]
 }
 
-export interface ITracksState {
+export interface ITracksState extends IMultiState {
 	things: ITracks
 }
 
@@ -87,7 +88,7 @@ export interface ITracks extends IMultiStateThings {
 	[key: string]: ITrackState
 }
 
-export interface ITrackState {
+export interface ITrackState extends IMultiStateThing {
 	events: ITrackEvent[]
 	index: number
 	isPlaying: boolean
@@ -104,12 +105,13 @@ export class TrackState implements ITrackState {
 	public readonly index: number = -1
 	public readonly isPlaying: boolean = false
 	public readonly color: string
-	public name: string
-	public bottomNote: number = 0
-	public notesToShow = 36
+	public readonly name: string
+	public readonly bottomNote: number
+	public readonly notesToShow = 36
 
-	constructor(events?: ITrackEvent[]) {
-		this.color = Color(hashbow(this.id)).desaturate(0.2).hsl().string()
+	constructor(name: string, events?: ITrackEvent[]) {
+		this.name = name
+		this.color = colorFunc(hashbow(this.id)).desaturate(0.2).hsl().string()
 		this.events = events || [
 			{notes: []},
 			{notes: []},
@@ -156,7 +158,8 @@ export const trackActionTypes = [
 	SET_TRACK_BOTTOM_NOTE,
 ]
 
-export const tracksReducer = makeMultiReducer(trackReducer, MultiThingType.track, trackActionTypes)
+export const tracksReducer =
+	makeMultiReducer<ITrackState, ITracksState>(trackReducer, MultiThingType.track, trackActionTypes)
 
 export function trackReducer(track: ITrackState, action: AnyAction) {
 	switch (action.type) {
@@ -202,25 +205,25 @@ export function trackReducer(track: ITrackState, action: AnyAction) {
 	}
 }
 
-export const selectAllTracks = (state: IClientAppState) => state.tracks.things
+export const selectAllTracks = (state: IClientRoomState) => state.tracks.things
 
-export const selectAllTracksArray = (state: IClientAppState) => {
+export const selectAllTracksArray = (state: IClientRoomState) => {
 	const tracks = selectAllTracks(state)
 	return Object.keys(tracks).map(x => tracks[x])
 }
 
-export const selectAllTrackIds = (state: IClientAppState) => {
+export const selectAllTrackIds = (state: IClientRoomState) => {
 	return Object.keys(selectAllTracks(state))
 }
 
-export const selectTrack = (state: IClientAppState, id: string) =>
+export const selectTrack = (state: IClientRoomState, id: string) =>
 	selectAllTracks(state)[id]
 
-export const selectTrackEvents = (state: IClientAppState, id: string) =>
+export const selectTrackEvents = (state: IClientRoomState, id: string) =>
 	selectTrack(state, id).events
 
-export const selectTrackEvent = (state: IClientAppState, id: string, eventIndex: number) =>
+export const selectTrackEvent = (state: IClientRoomState, id: string, eventIndex: number) =>
 	selectTrackEvents(state, id)[eventIndex]
 
-export const selectTrackEventNotes = (state: IClientAppState, id: string, eventIndex: number) =>
+export const selectTrackEventNotes = (state: IClientRoomState, id: string, eventIndex: number) =>
 	selectTrackEvent(state, id, eventIndex).notes

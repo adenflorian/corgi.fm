@@ -1,13 +1,15 @@
 import * as animal from 'animal-id'
 import {v4} from 'uuid'
-import {ClientId} from '../../client/websocket-listeners'
+import {ClientId} from '../common-types'
 import {logger} from '../logger'
 import {getColorHslByString} from '../shamu-color'
-import {IClientAppState} from './client-store'
-import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
+import {IClientAppState} from './common-redux-types'
+import {IServerState} from './configure-server-store'
+import {BROADCASTER_ACTION, createReducer, SERVER_ACTION} from './redux-utils'
 import {selectLocalSocketId} from './websocket-redux'
 
 export const ADD_CLIENT = 'ADD_CLIENT'
+export type AddClientAction = ReturnType<typeof addClient>
 export const addClient = (client: IClientState) => {
 	return {
 		type: ADD_CLIENT,
@@ -16,6 +18,7 @@ export const addClient = (client: IClientState) => {
 }
 
 export const SET_CLIENTS = 'SET_CLIENTS'
+export type SetClientsAction = ReturnType<typeof setClients>
 export const setClients = (clients: IClientState[]) => {
 	return {
 		type: SET_CLIENTS,
@@ -24,6 +27,7 @@ export const setClients = (clients: IClientState[]) => {
 }
 
 export const SET_CLIENT_NAME = 'SET_CLIENT_NAME'
+export type SetClientNameAction = ReturnType<typeof setClientName>
 export const setClientName = (id: ClientId, newName: string) => {
 	return {
 		type: SET_CLIENT_NAME,
@@ -35,6 +39,7 @@ export const setClientName = (id: ClientId, newName: string) => {
 }
 
 export const SET_CLIENT_POINTER = 'SET_CLIENT_POINTER'
+export type SetClientPointerAction = ReturnType<typeof setClientPointer>
 export const setClientPointer = (id: ClientId, pointer: IClientPointer) => {
 	return {
 		type: SET_CLIENT_POINTER,
@@ -46,6 +51,7 @@ export const setClientPointer = (id: ClientId, pointer: IClientPointer) => {
 }
 
 export const CLIENT_DISCONNECTED = 'CLIENT_DISCONNECTED'
+export type ClientDisconnectedAction = ReturnType<typeof clientDisconnected>
 export const clientDisconnected = (id: ClientId) => {
 	return {
 		type: CLIENT_DISCONNECTED,
@@ -54,6 +60,7 @@ export const clientDisconnected = (id: ClientId) => {
 }
 
 export const CLIENT_DISCONNECTING = 'CLIENT_DISCONNECTING'
+export type ClientDisconnectingAction = ReturnType<typeof clientDisconnecting>
 export const clientDisconnecting = (id: ClientId) => {
 	return {
 		type: CLIENT_DISCONNECTING,
@@ -111,60 +118,50 @@ export class ClientState implements IClientState {
 	}
 }
 
-const initialState = {
+const initialState: IClientsState = {
 	clients: [],
 }
 
-export function clientsReducer(clientsState: IClientsState = initialState, action) {
-	switch (action.type) {
-		case ADD_CLIENT:
-			return {
-				...clientsState,
-				clients: [
-					...clientsState.clients,
-					action.client,
-				],
-			}
-		case SET_CLIENTS:
-			return {
-				...clientsState,
-				clients: action.clients,
-			}
-		case CLIENT_DISCONNECTED:
-			return {
-				...clientsState,
-				clients: clientsState.clients.filter(x => x.id !== action.id),
-			}
-		case CLIENT_DISCONNECTING:
-			return {
-				...clientsState,
-				clients: clientsState.clients
-					.map(x => x.id === action.id ? {...x, disconnecting: true} : x),
-			}
-		case SET_CLIENT_NAME:
-			return {
-				...clientsState,
-				clients: clientsState.clients
-					.map(x => x.id === action.id ? {
-						...x,
-						name: action.newName
-							.replace(/ +(?= )/g, '')
-							.trim()
-							.substring(0, maxUsernameLength),
-					} : x),
-			}
-		case SET_CLIENT_POINTER:
-			return {
-				...clientsState,
-				clients: clientsState.clients
-					.map(x => x.id === action.id ? {...x, pointer: action.pointer} : x),
-			}
-		default:
-			return clientsState
-	}
-}
+export const clientsReducer = createReducer(initialState, {
+	[ADD_CLIENT]: (state, {client}: AddClientAction) => ({
+		...state,
+		clients: [
+			...state.clients,
+			client,
+		],
+	}),
+	[SET_CLIENTS]: (state, {clients}: SetClientsAction) => ({
+		...state,
+		clients,
+	}),
+	[CLIENT_DISCONNECTED]: (state, {id}: ClientDisconnectedAction) => ({
+		...state,
+		clients: state.clients.filter(x => x.id !== id),
+	}),
+	[CLIENT_DISCONNECTING]: (state, {id}: ClientDisconnectingAction) => ({
+		...state,
+		clients: state.clients
+			.map(x => x.id === id ? {...x, disconnecting: true} : x),
+	}),
+	[SET_CLIENT_NAME]: (state, {id, newName}: SetClientNameAction) => ({
+		...state,
+		clients: state.clients
+			.map(x => x.id === id ? {
+				...x,
+				name: newName
+					.replace(/ +(?= )/g, '')
+					.trim()
+					.substring(0, maxUsernameLength),
+			} : x),
+	}),
+	[SET_CLIENT_POINTER]: (state, {id, pointer}: SetClientPointerAction) => ({
+		...state,
+		clients: state.clients
+			.map(x => x.id === id ? {...x, pointer} : x),
+	}),
+})
 
-export function selectClientById(state: IClientAppState, id): IClientState {
+export function selectClientById(state: IClientAppState, id: ClientId): IClientState {
 	const client = selectAllClients(state).find(x => x.id === id)
 	if (client) {
 		return client
@@ -184,7 +181,7 @@ export function selectClientById(state: IClientAppState, id): IClientState {
 	}
 }
 
-export function selectClientBySocketId(state: IClientAppState, socketId): IClientState {
+export function selectClientBySocketId(state: IClientAppState | IServerState, socketId: string): IClientState {
 	const client = selectAllClients(state).find(x => x.socketId === socketId)
 	if (client) {
 		return client
@@ -227,14 +224,15 @@ export function selectLocalClient(state: IClientAppState): IClientState {
 	}
 }
 
-export const selectAllClients = (state: IClientAppState) => state.clients.clients
+export const selectAllClients = (state: IClientAppState | IServerState) => state.clients.clients
 
-export const selectAllClientsAsMap = (state: IClientAppState) => state.clients.clients.reduce((map, client) => {
-	return {
-		...map,
-		[client.id]: client,
-	}
-})
+export const selectAllClientsAsMap = (state: IClientAppState | IServerState) =>
+	state.clients.clients.reduce((map, client) => {
+		return {
+			...map,
+			[client.id]: client,
+		}
+	})
 
 export const selectAllOtherPointers = (state: IClientAppState) => {
 	const localClientId = selectLocalClient(state).id
