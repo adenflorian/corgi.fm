@@ -45,11 +45,7 @@ export function roomStoresReducer(
 
 export const selectAllRoomStates = (state: IServerState) => state.roomStores
 
-export const selectAllRoomNames = (state: IServerState) => selectAllRoomStates(state).keySeq().toArray()
-
 export const selectAllRoomStatesAsArray = (state: IServerState) =>
 	selectAllRoomStates(state).toIndexedSeq().toArray()
-
-export const selectRoomExists = (state: IServerState, name: string) => selectAllRoomNames(state).includes(name)
 
 export const selectRoomStateByName = (state: IServerState, name: string) => selectAllRoomStates(state).get(name)

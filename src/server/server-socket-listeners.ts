@@ -22,11 +22,11 @@ import {
 	addRoomMember, deleteRoomMember, selectAllRoomMemberIds, selectRoomMemberState, setRoomMembers,
 } from '../common/redux/room-members-redux'
 import {
-	roomAction, selectAllRoomNames, selectAllRoomStates,
-	selectAllRoomStatesAsArray, selectRoomExists, selectRoomStateByName,
+	roomAction, selectAllRoomStates, selectRoomStateByName,
 } from '../common/redux/room-stores-redux'
 import {
-	CHANGE_ROOM, CREATE_ROOM, createRoom, deleteRoom, REQUEST_CREATE_ROOM, selectAllRooms, setActiveRoom, setRooms,
+	CHANGE_ROOM, createRoom, deleteRoom, REQUEST_CREATE_ROOM,
+	selectAllRoomNames, selectRoomExists, setActiveRoom, setRooms,
 } from '../common/redux/rooms-redux'
 import {selectAllTracks, updateTracks} from '../common/redux/tracks-redux'
 import {
@@ -50,11 +50,11 @@ export function setupServerWebSocketListeners(io: Server, serverStore: Store) {
 
 		emptyRooms.forEach(x => serverStore.dispatch(deleteRoom(x)))
 
-		if (emptyRooms.length > 0) {
+		if (emptyRooms.count() > 0) {
 			logger.log('deleting empty rooms: ', emptyRooms)
 
 			io.local.emit(WebSocketEvent.broadcast, {
-				...setRooms(selectAllRooms(serverStore.getState())),
+				...setRooms(selectAllRoomNames(serverStore.getState())),
 				alreadyBroadcasted: true,
 				source: 'server',
 			})
@@ -200,7 +200,7 @@ export function setupServerWebSocketListeners(io: Server, serverStore: Store) {
 				createServerStuff(newRoomName, serverStore)
 
 				io.local.emit(WebSocketEvent.broadcast, {
-					...setRooms(selectAllRooms(serverStore.getState())),
+					...setRooms(selectAllRoomNames(serverStore.getState())),
 					alreadyBroadcasted: true,
 					source: server,
 				})
@@ -248,7 +248,7 @@ function onLeaveRoom(io: Server, socket: Socket, roomToLeave: string, serverStor
 
 function syncState(newSocket: Socket, roomState: IClientRoomState, serverState: IServerState, activeRoom: string) {
 	newSocket.emit(WebSocketEvent.broadcast, {
-		...setRooms(selectAllRooms(serverState)),
+		...setRooms(selectAllRoomNames(serverState)),
 		alreadyBroadcasted: true,
 		source: server,
 	})

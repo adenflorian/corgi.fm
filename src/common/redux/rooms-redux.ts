@@ -83,6 +83,14 @@ const roomsNamesReducer: Reducer<RoomNames, RoomsReduxAction> = (state = List<st
 	}
 }
 
-const selectRoomsState = (state: {rooms: IRoomsState}) => state.rooms
-export const selectAllRooms = (state: {rooms: IRoomsState}) => selectRoomsState(state).names
-export const selectActiveRoom = (state: {rooms: IRoomsState}) => selectRoomsState(state).activeRoom
+const selectRoomsState = (state: {rooms: IRoomsState}): IRoomsState =>
+	state.rooms
+
+export const selectAllRoomNames = (state: {rooms: IRoomsState}): List<string> =>
+	selectRoomsState(state).names
+
+export const selectActiveRoom = (state: {rooms: IRoomsState}): string =>
+	selectRoomsState(state).activeRoom
+
+export const selectRoomExists = (state: {rooms: IRoomsState}, name: string): boolean =>
+	selectAllRoomNames(state).includes(name)

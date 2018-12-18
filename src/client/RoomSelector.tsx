@@ -1,20 +1,20 @@
+import {List} from 'immutable'
 import * as React from 'react'
 import {Component} from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 import {logger} from '../common/logger'
 import {IClientAppState} from '../common/redux/common-redux-types'
-import {changeRoom, createRoom, requestCreateRoom, selectActiveRoom, selectAllRooms} from '../common/redux/rooms-redux'
+import {changeRoom, requestCreateRoom, selectActiveRoom, selectAllRoomNames} from '../common/redux/rooms-redux'
 
 interface IRoomSelectorProps {
 	activeRoom: string
-	dispatch: Dispatch
-	rooms: string[]
+	rooms: List<string>
 }
 
-export class RoomSelector extends Component<IRoomSelectorProps> {
+export class RoomSelector extends Component<IRoomSelectorProps & {dispatch: Dispatch}> {
 	public static defaultProps = {
-		rooms: [],
+		rooms: List<string>(),
 		activeRoom: '',
 	}
 
@@ -57,7 +57,7 @@ export class RoomSelector extends Component<IRoomSelectorProps> {
 	}
 }
 
-export const ConnectedRoomSelector = connect((state: IClientAppState) => ({
+export const ConnectedRoomSelector = connect((state: IClientAppState): IRoomSelectorProps => ({
 	activeRoom: selectActiveRoom(state),
-	rooms: selectAllRooms(state),
+	rooms: selectAllRoomNames(state),
 }))(RoomSelector)
