@@ -2,20 +2,20 @@ import {Store} from 'redux'
 import {addBasicInstrument, BasicInstrumentState} from '../common/redux/basic-instruments-redux'
 import {addClient, ClientState} from '../common/redux/clients-redux'
 import {addConnection, Connection, ConnectionSourceType, ConnectionTargetType} from '../common/redux/connections-redux'
-import {roomAction} from '../common/redux/room-stores-redux'
+import {createRoomAction} from '../common/redux/room-stores-redux'
 import {addTrack, TrackState} from '../common/redux/tracks-redux'
 
 export function createServerStuff(room: string, serverStore: Store) {
 	const serverClient = ClientState.createServerClient()
 	const addClientAction = addClient(serverClient)
-	serverStore.dispatch(roomAction(addClientAction, room))
+	serverStore.dispatch(createRoomAction(addClientAction, room))
 
 	const newInstrument = new BasicInstrumentState(serverClient.id)
-	serverStore.dispatch(roomAction(addBasicInstrument(newInstrument), room))
+	serverStore.dispatch(createRoomAction(addBasicInstrument(newInstrument), room))
 
 	const serverTrack = new TrackState('melody', getInitialTrackEvents())
-	serverStore.dispatch(roomAction(addTrack(serverTrack), room))
-	serverStore.dispatch(roomAction(addConnection(new Connection(
+	serverStore.dispatch(createRoomAction(addTrack(serverTrack), room))
+	serverStore.dispatch(createRoomAction(addConnection(new Connection(
 		serverTrack.id,
 		ConnectionSourceType.track,
 		newInstrument.id,
@@ -23,16 +23,16 @@ export function createServerStuff(room: string, serverStore: Store) {
 	)), room))
 
 	// const newVirtualKeyboard = new VirtualKeyboardState(serverClient.id, serverClient.color)
-	// serverStore.dispatch(roomAction(addVirtualKeyboard(newVirtualKeyboard))
+	// serverStore.dispatch(createRoomAction(addVirtualKeyboard(newVirtualKeyboard))
 
-	// serverStore.dispatch(roomAction(addConnection(new Connection(newVirtualKeyboard.id, newInstrument.id)))
+	// serverStore.dispatch(createRoomAction(addConnection(new Connection(newVirtualKeyboard.id, newInstrument.id)))
 
 	const newInstrument2 = new BasicInstrumentState(serverClient.id)
-	serverStore.dispatch(roomAction(addBasicInstrument(newInstrument2), room))
+	serverStore.dispatch(createRoomAction(addBasicInstrument(newInstrument2), room))
 
 	const serverTrack2 = new TrackState('bass', getInitialTrackEvents2())
-	serverStore.dispatch(roomAction(addTrack(serverTrack2), room))
-	serverStore.dispatch(roomAction(addConnection(new Connection(
+	serverStore.dispatch(createRoomAction(addTrack(serverTrack2), room))
+	serverStore.dispatch(createRoomAction(addConnection(new Connection(
 		serverTrack2.id,
 		ConnectionSourceType.track,
 		newInstrument2.id,

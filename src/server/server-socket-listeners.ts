@@ -22,7 +22,7 @@ import {
 	addRoomMember, deleteRoomMember, selectAllRoomMemberIds, selectRoomMemberState, setRoomMembers,
 } from '../common/redux/room-members-redux'
 import {
-	roomAction, selectAllRoomStates, selectRoomStateByName,
+	createRoomAction, selectAllRoomStates, selectRoomStateByName,
 } from '../common/redux/room-stores-redux'
 import {
 	CHANGE_ROOM, createRoom, deleteRoom, REQUEST_CREATE_ROOM,
@@ -101,7 +101,7 @@ export function setupServerWebSocketListeners(io: Server, serverStore: Store) {
 					logger.debug(`${WebSocketEvent.broadcast}: ${socket.id} | `, action)
 				}
 				if (action[BROADCASTER_ACTION]) {
-					serverStore.dispatch(roomAction(action, getRoom(socket)))
+					serverStore.dispatch(createRoomAction(action, getRoom(socket)))
 				}
 				socket.broadcast.to(getRoom(socket)).emit(WebSocketEvent.broadcast, {...action, alreadyBroadcasted: true})
 			})
@@ -109,7 +109,7 @@ export function setupServerWebSocketListeners(io: Server, serverStore: Store) {
 			socket.on(WebSocketEvent.serverAction, (action: AnyAction) => {
 				logger.debug(`${WebSocketEvent.serverAction}: ${socket.id} | `, action)
 
-				serverStore.dispatch(roomAction(action, getRoom(socket)))
+				serverStore.dispatch(createRoomAction(action, getRoom(socket)))
 
 				if (action.type === CHANGE_ROOM) {
 					changeRooms(action.room)
@@ -215,7 +215,7 @@ function onJoinRoom(io: Server, socket: Socket, room: string, serverStore: Store
 	syncState(socket, roomState, serverStore.getState(), getRoom(socket))
 
 	const addRoomMemberAction = addRoomMember(clientId)
-	serverStore.dispatch(roomAction(addRoomMemberAction, room))
+	serverStore.dispatch(createRoomAction(addRoomMemberAction, room))
 	io.to(getRoom(socket)).emit(WebSocketEvent.broadcast, addRoomMemberAction)
 }
 
@@ -230,19 +230,19 @@ function onLeaveRoom(io: Server, socket: Socket, roomToLeave: string, serverStor
 	const sourceAndTargetIds = instrumentIdsToDelete.concat(keyboardIdsToDelete)
 	const connectionIdsToDelete = selectConnectionsWithSourceOrTargetIds(roomState, sourceAndTargetIds).map(x => x.id)
 	const deleteConnectionsAction = deleteConnections(connectionIdsToDelete)
-	serverStore.dispatch(roomAction(deleteConnectionsAction, roomToLeave))
+	serverStore.dispatch(createRoomAction(deleteConnectionsAction, roomToLeave))
 	io.to(roomToLeave).emit(WebSocketEvent.broadcast, deleteConnectionsAction)
 
 	const deleteBasicInstrumentsAction = deleteBasicInstruments(instrumentIdsToDelete)
-	serverStore.dispatch(roomAction(deleteBasicInstrumentsAction, roomToLeave))
+	serverStore.dispatch(createRoomAction(deleteBasicInstrumentsAction, roomToLeave))
 	io.to(roomToLeave).emit(WebSocketEvent.broadcast, deleteBasicInstrumentsAction)
 
 	const deleteVirtualKeyboardsAction = deleteVirtualKeyboards(keyboardIdsToDelete)
-	serverStore.dispatch(roomAction(deleteVirtualKeyboardsAction, roomToLeave))
+	serverStore.dispatch(createRoomAction(deleteVirtualKeyboardsAction, roomToLeave))
 	io.to(roomToLeave).emit(WebSocketEvent.broadcast, deleteVirtualKeyboardsAction)
 
 	const deleteRoomMemberAction = deleteRoomMember(clientId)
-	serverStore.dispatch(roomAction(deleteRoomMemberAction, roomToLeave))
+	serverStore.dispatch(createRoomAction(deleteRoomMemberAction, roomToLeave))
 	io.to(roomToLeave).emit(WebSocketEvent.broadcast, deleteRoomMemberAction)
 }
 
