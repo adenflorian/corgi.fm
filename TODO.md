@@ -115,6 +115,7 @@
 	- [ ] single keyboard
 	- [ ] advanced
 	- etc.
+- [ ] show member count for each room in room selector
 
 # Newsletter
 - [ ] put a back button on the newsletter page?

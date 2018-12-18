@@ -226,6 +226,8 @@ export function selectLocalClient(state: IClientAppState): IClientState {
 
 export const selectAllClients = (state: IClientAppState | IServerState) => state.clients.clients
 
+export const selectClientCount = (state: IClientAppState | IServerState) => selectAllClients(state).length
+
 export const selectAllClientsAsMap = (state: IClientAppState | IServerState) =>
 	state.clients.clients.reduce((map, client) => {
 		return {

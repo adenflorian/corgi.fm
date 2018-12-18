@@ -53,3 +53,5 @@ export const roomMembersReducer = createReducer(initialState, {
 export const selectRoomMemberState = (state: IClientRoomState): IRoomMembersState => state.members
 
 export const selectAllRoomMemberIds = (state: IClientRoomState): IRoomMembersIds => selectRoomMemberState(state).ids
+
+export const selectMemberCount = (state: IClientRoomState): number => selectAllRoomMemberIds(state).count()

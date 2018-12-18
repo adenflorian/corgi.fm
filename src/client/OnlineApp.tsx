@@ -2,9 +2,10 @@ import {Fragment} from 'react'
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {selectAllInstrumentIds} from '../common/redux/basic-instruments-redux'
-import {IClientState, selectAllClients, selectLocalClient} from '../common/redux/clients-redux'
+import {IClientState, selectAllClients, selectClientCount, selectLocalClient} from '../common/redux/clients-redux'
 import {IClientAppState} from '../common/redux/common-redux-types'
 import {IConnection, selectAllConnectionsAsArray} from '../common/redux/connections-redux'
+import {selectMemberCount} from '../common/redux/room-members-redux'
 import {selectAllTrackIds} from '../common/redux/tracks-redux'
 import {selectAllVirtualKeyboardIds} from '../common/redux/virtual-keyboard-redux'
 import {getColorHslByHex} from '../common/shamu-color'
@@ -21,12 +22,13 @@ import {ConnectedTrackContainer} from './Track/TrackContainer'
 import {ConnectedVolumeControl} from './Volume/VolumeControl'
 
 interface IOnlineAppProps {
-	myClient: IClientState
-	clients: any[]
+	clientCount: number
 	connections: IConnection[]
 	info: string
 	instrumentIds: string[]
 	keyboardIds: string[]
+	memberCount: number
+	myClient: IClientState
 	trackIds: string[]
 }
 
@@ -36,12 +38,8 @@ const MASTER_VOLUME_COLOR = getColorHslByHex(TRACK_1_BASE_COLOR)
 export const mainBoardsId = 'mainBoards'
 
 class OnlineApp extends React.Component<IOnlineAppProps> {
-	public static defaultProps = {
-		clients: [],
-	}
-
 	public render() {
-		const {info, myClient} = this.props
+		const {clientCount, info, memberCount, myClient} = this.props
 
 		return (
 			<Fragment>
@@ -66,6 +64,8 @@ class OnlineApp extends React.Component<IOnlineAppProps> {
 									<button onClick={() => window.location.pathname = '/newsletter'}>Newsletter Signup</button>
 								</div>
 								<ConnectedRoomSelector />
+								<div style={{margin: 8}}>{memberCount} room member{memberCount > 1 ? 's' : ''}</div>
+								<div style={{margin: 8}}>{clientCount} total user{clientCount > 1 ? 's' : ''}</div>
 							</div>
 						</div>
 
@@ -122,13 +122,14 @@ function sortConnection(connA: IConnection, connB: IConnection) {
 }
 
 const mapStateToProps = (state: IClientAppState): IOnlineAppProps => ({
-	clients: selectAllClients(state),
+	clientCount: selectClientCount(state),
 	myClient: selectLocalClient(state),
 	info: state.websocket.info,
 	keyboardIds: selectAllVirtualKeyboardIds(state.room),
 	instrumentIds: selectAllInstrumentIds(state.room),
 	trackIds: selectAllTrackIds(state.room),
 	connections: selectAllConnectionsAsArray(state.room),
+	memberCount: selectMemberCount(state.room),
 })
 
 export const ConnectedOnlineApp = connect(mapStateToProps)(OnlineApp)

@@ -23,6 +23,10 @@ export class RoomSelector extends Component<IRoomSelectorProps> {
 
 		return (
 			<div id="roomSelector">
+				<div className="buttonContainer">
+					<div className="isometricBoxShadow" />
+					<button id="newRoomButton" onClick={this.onNewRoomButtonClick}>New Room</button>
+				</div>
 				<div className="selectRow">
 					<label htmlFor="roomSelect">Room </label>
 					<div className="selectContainer">
@@ -34,11 +38,6 @@ export class RoomSelector extends Component<IRoomSelectorProps> {
 							<div>▼</div>
 						</div>
 					</div>
-				</div>
-
-				<div className="buttonContainer">
-					<div className="isometricBoxShadow" />
-					<button id="newRoomButton" onClick={this.onNewRoomButtonClick}>New Room</button>
 				</div>
 			</div>
 		)
