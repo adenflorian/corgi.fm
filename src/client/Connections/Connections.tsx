@@ -16,7 +16,7 @@ const Connections = ({connectionIds}: IConnectionsProps) => (
 	</div>
 )
 
-const mapStateToProps = (state: IClientAppState) => ({
+const mapStateToProps = (state: IClientAppState): IConnectionsProps => ({
 	connectionIds: selectAllConnectionIds(state.room),
 })
 
