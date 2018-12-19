@@ -1,5 +1,6 @@
 import {Dispatch, Middleware} from 'redux'
 import {addBasicInstrument, BasicInstrumentState} from './basic-instruments-redux'
+import {addBasicSampler, BasicSamplerState} from './basic-sampler-redux'
 import {ADD_CLIENT, selectLocalClient} from './clients-redux'
 import {IClientAppState} from './common-redux-types'
 import {
@@ -12,7 +13,6 @@ import {
 	addVirtualKeyboard, selectVirtualKeyboardIdByOwner,
 	VirtualKeyboardState, virtualKeyPressed, virtualKeyUp, virtualOctaveChange,
 } from './virtual-keyboard-redux'
-import {selectLocalSocketId} from './websocket-redux'
 
 export const LOCAL_MIDI_KEY_PRESS = 'LOCAL_MIDI_KEY_PRESS'
 export const localMidiKeyPress = makeActionCreator(LOCAL_MIDI_KEY_PRESS, 'midiNote')
@@ -66,16 +66,28 @@ function getLocalVirtualKeyboardId(state: IClientAppState) {
 function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 	const localClient = selectLocalClient(state)
 
-	const newInstrument = new BasicInstrumentState(localClient.id)
-	dispatch(addBasicInstrument(newInstrument))
-
 	const newVirtualKeyboard = new VirtualKeyboardState(localClient.id, localClient.color)
 	dispatch(addVirtualKeyboard(newVirtualKeyboard))
 
-	dispatch(addConnection(new Connection(
-		newVirtualKeyboard.id,
-		ConnectionSourceType.keyboard,
-		newInstrument.id,
-		ConnectionTargetType.instrument,
-	)))
+	if (localClient.name.toLowerCase() === '$sampler') {
+		const newSampler = new BasicSamplerState(localClient.id)
+		dispatch(addBasicSampler(newSampler))
+
+		dispatch(addConnection(new Connection(
+			newVirtualKeyboard.id,
+			ConnectionSourceType.keyboard,
+			newSampler.id,
+			ConnectionTargetType.sampler,
+		)))
+	} else {
+		const newInstrument = new BasicInstrumentState(localClient.id)
+		dispatch(addBasicInstrument(newInstrument))
+
+		dispatch(addConnection(new Connection(
+			newVirtualKeyboard.id,
+			ConnectionSourceType.keyboard,
+			newInstrument.id,
+			ConnectionTargetType.instrument,
+		)))
+	}
 }

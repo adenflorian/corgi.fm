@@ -1,5 +1,4 @@
-import {Map, Seq} from 'immutable'
-import {string} from 'prop-types'
+import {Map} from 'immutable'
 import {AnyAction} from 'redux'
 import * as uuid from 'uuid'
 import {logger} from '../logger'
@@ -51,6 +50,7 @@ export enum ConnectionSourceType {
 
 export enum ConnectionTargetType {
 	instrument = 'instrument',
+	sampler = 'sampler',
 }
 
 export interface IConnection {

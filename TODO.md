@@ -62,6 +62,11 @@
 	- so chrome auto updating can't break the whole app
 - [ ] turn off audio after 30 minutes and show dialog asking if user is still there
 
+# Sampler
+- [ ] presentation
+- [ ] redux
+- [ ] networking
+
 # Clean Code
 - [√] use `strictNullChecks` typescript config
 - [ ] `tslint:all`

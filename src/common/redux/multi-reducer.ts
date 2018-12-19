@@ -16,6 +16,7 @@ export enum MultiThingType {
 	virtualKeyboard,
 	track,
 	basicInstrument,
+	basicSampler,
 }
 
 type ADD_MULTI_THING = 'ADD_MULTI_THING'

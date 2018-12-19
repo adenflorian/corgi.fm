@@ -2,14 +2,15 @@ import {Fragment} from 'react'
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {selectAllInstrumentIds} from '../common/redux/basic-instruments-redux'
-import {IClientState, selectAllClients, selectClientCount, selectLocalClient} from '../common/redux/clients-redux'
+import {IClientState, selectClientCount, selectLocalClient} from '../common/redux/clients-redux'
 import {IClientAppState} from '../common/redux/common-redux-types'
-import {IConnection, selectAllConnectionsAsArray} from '../common/redux/connections-redux'
+import {ConnectionTargetType, IConnection, selectAllConnectionsAsArray} from '../common/redux/connections-redux'
 import {selectMemberCount} from '../common/redux/room-members-redux'
 import {selectAllTrackIds} from '../common/redux/tracks-redux'
 import {selectAllVirtualKeyboardIds} from '../common/redux/virtual-keyboard-redux'
 import {getColorHslByHex} from '../common/shamu-color'
 import './App.less'
+import {BasicSampler} from './BasicSampler/BasicSampler'
 import {ConnectedChat} from './Chat'
 import {ConnectionsContainer} from './Connections/Connections'
 import './css-reset.css'
@@ -90,12 +91,22 @@ class OnlineApp extends React.Component<IOnlineAppProps> {
 														: <ConnectedKeyboard id={connection.sourceId} />
 												}
 											</div>
-											<div
-												key={connection.targetId}
-												className="board connected"
-											>
-												<ConnectedBasicInstrumentView id={connection.targetId} />
-											</div>
+											{connection.targetType === ConnectionTargetType.instrument &&
+												<div
+													key={connection.targetId}
+													className="board connected"
+												>
+													<ConnectedBasicInstrumentView id={connection.targetId} />
+												</div>
+											}
+											{connection.targetType === ConnectionTargetType.sampler &&
+												<div
+													key={connection.targetId}
+													className="board connected"
+												>
+													<BasicSampler id={connection.targetId} />
+												</div>
+											}
 										</div>
 									)
 								})

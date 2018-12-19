@@ -1,5 +1,6 @@
 import {IAudioState} from './audio-redux'
 import {IBasicInstrumentsState} from './basic-instruments-redux'
+import {IBasicSamplersState} from './basic-sampler-redux'
 import {IChatState} from './chat-redux'
 import {IClientsState} from './clients-redux'
 import {IConnectionsState} from './connections-redux'
@@ -21,6 +22,7 @@ export interface IClientAppState {
 
 export interface IClientRoomState {
 	basicInstruments: IBasicInstrumentsState
+	basicSamplers: IBasicSamplersState
 	chat: IChatState
 	connections: IConnectionsState
 	members: IRoomMembersState

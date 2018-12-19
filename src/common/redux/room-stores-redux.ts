@@ -1,6 +1,7 @@
 import {Map} from 'immutable'
 import {Action, combineReducers, Reducer} from 'redux'
 import {basicInstrumentsReducer} from './basic-instruments-redux'
+import {basicSamplersReducer} from './basic-sampler-redux'
 import {chatReducer} from './chat-redux'
 import {IClientRoomState} from './common-redux-types'
 import {IServerState} from './configure-server-store'
@@ -22,6 +23,7 @@ export type IRoomStoresState = Map<string, IClientRoomState>
 
 export const roomReducers = combineReducers<IClientRoomState>({
 	basicInstruments: basicInstrumentsReducer,
+	basicSamplers: basicSamplersReducer,
 	chat: chatReducer,
 	connections: connectionsReducer,
 	members: roomMembersReducer,
