@@ -7,6 +7,9 @@ import {logger} from '../common/logger'
 import {
 	deleteBasicInstruments, selectAllInstruments, selectInstrumentsByOwner, updateBasicInstruments,
 } from '../common/redux/basic-instruments-redux'
+import {
+	deleteBasicSamplers, selectAllSamplers, selectSamplersByOwner, updateBasicSamplers,
+} from '../common/redux/basic-sampler-redux'
 import {selectAllMessages, setChat} from '../common/redux/chat-redux'
 import {
 	addClient, clientDisconnected, ClientState, maxUsernameLength,
@@ -225,9 +228,10 @@ function onLeaveRoom(io: Server, socket: Socket, roomToLeave: string, serverStor
 	const clientId = selectClientBySocketId(serverStore.getState(), socket.id).id
 
 	const instrumentIdsToDelete = selectInstrumentsByOwner(roomState, clientId).map(x => x.id)
+	const samplerIdsToDelete = selectSamplersByOwner(roomState, clientId).map(x => x.id)
 	const keyboardIdsToDelete = selectVirtualKeyboardsByOwner(roomState, clientId).map(x => x.id)
 
-	const sourceAndTargetIds = instrumentIdsToDelete.concat(keyboardIdsToDelete)
+	const sourceAndTargetIds = instrumentIdsToDelete.concat(keyboardIdsToDelete).concat(samplerIdsToDelete)
 	const connectionIdsToDelete = selectConnectionsWithSourceOrTargetIds(roomState, sourceAndTargetIds).map(x => x.id)
 	const deleteConnectionsAction = deleteConnections(connectionIdsToDelete)
 	serverStore.dispatch(createRoomAction(deleteConnectionsAction, roomToLeave))
@@ -236,6 +240,10 @@ function onLeaveRoom(io: Server, socket: Socket, roomToLeave: string, serverStor
 	const deleteBasicInstrumentsAction = deleteBasicInstruments(instrumentIdsToDelete)
 	serverStore.dispatch(createRoomAction(deleteBasicInstrumentsAction, roomToLeave))
 	io.to(roomToLeave).emit(WebSocketEvent.broadcast, deleteBasicInstrumentsAction)
+
+	const deleteBasicSamplersAction = deleteBasicSamplers(samplerIdsToDelete)
+	serverStore.dispatch(createRoomAction(deleteBasicSamplersAction, roomToLeave))
+	io.to(roomToLeave).emit(WebSocketEvent.broadcast, deleteBasicSamplersAction)
 
 	const deleteVirtualKeyboardsAction = deleteVirtualKeyboards(keyboardIdsToDelete)
 	serverStore.dispatch(createRoomAction(deleteVirtualKeyboardsAction, roomToLeave))
@@ -265,40 +273,22 @@ function syncState(newSocket: Socket, roomState: IClientRoomState, serverState: 
 		source: server,
 	})
 
-	newSocket.emit(WebSocketEvent.broadcast, {
-		...setRoomMembers(selectRoomMemberState(roomState).ids),
-		alreadyBroadcasted: true,
-		source: server,
-	})
+	const foo = [
+		[setRoomMembers, selectAllRoomMemberIds],
+		[setChat, selectAllMessages],
+		[updateBasicInstruments, selectAllInstruments],
+		[updateBasicSamplers, selectAllSamplers],
+		[updateVirtualKeyboards, selectAllVirtualKeyboards],
+		[updateTracks, selectAllTracks],
+		[updateConnections, selectAllConnections],
+	]
 
-	newSocket.emit(WebSocketEvent.broadcast, {
-		...setChat(selectAllMessages(roomState)),
-		alreadyBroadcasted: true,
-		source: server,
-	})
-
-	newSocket.emit(WebSocketEvent.broadcast, {
-		...updateBasicInstruments(selectAllInstruments(roomState)),
-		alreadyBroadcasted: true,
-		source: server,
-	})
-
-	newSocket.emit(WebSocketEvent.broadcast, {
-		...updateVirtualKeyboards(selectAllVirtualKeyboards(roomState)),
-		alreadyBroadcasted: true,
-		source: server,
-	})
-
-	newSocket.emit(WebSocketEvent.broadcast, {
-		...updateTracks(selectAllTracks(roomState)),
-		alreadyBroadcasted: true,
-		source: server,
-	})
-
-	newSocket.emit(WebSocketEvent.broadcast, {
-		...updateConnections(selectAllConnections(roomState)),
-		alreadyBroadcasted: true,
-		source: server,
+	foo.forEach(([actionCreator, selector]: any[]) => {
+		newSocket.emit(WebSocketEvent.broadcast, {
+			...actionCreator(selector(roomState)),
+			alreadyBroadcasted: true,
+			source: server,
+		})
 	})
 }
 

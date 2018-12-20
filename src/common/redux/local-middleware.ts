@@ -28,6 +28,7 @@ export function deleteAllTheThings(dispatch: Dispatch) {
 	dispatch(deleteAllThings(MultiThingType.track))
 	dispatch(deleteAllThings(MultiThingType.virtualKeyboard))
 	dispatch(deleteAllThings(MultiThingType.basicInstrument))
+	dispatch(deleteAllThings(MultiThingType.basicSampler))
 }
 
 export const localMiddleware: Middleware<{}, IClientAppState> = ({dispatch, getState}) => next => action => {
