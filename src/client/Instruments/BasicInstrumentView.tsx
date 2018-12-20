@@ -8,7 +8,7 @@ import {
 } from '../../common/redux/basic-instruments-redux'
 import {IClientAppState} from '../../common/redux/common-redux-types'
 import {
-	getConnectionSourceColor, selectConnectionSourceNotes, selectFirstConnectionByTargetId,
+	selectConnectionSourceColor, selectConnectionSourceNotesByTargetId, selectFirstConnectionByTargetId,
 } from '../../common/redux/connections-redux'
 import {audioContext, preFx} from '../../common/setup-audio-context'
 import {Knob} from '../Knob/Knob'
@@ -155,14 +155,14 @@ export class BasicInstrumentView
 const makeMapStateToProps = () => {
 	return (state: IClientAppState, props: IBasicInstrumentViewProps): IBasicInstrumentViewReduxProps => {
 		const connection = selectFirstConnectionByTargetId(state.room, props.id)
-		const rawMidiNotes = connection && selectConnectionSourceNotes(state.room, connection.id)
+		const rawMidiNotes = selectConnectionSourceNotesByTargetId(state.room, props.id)
 		const instrumentState = selectInstrument(state.room, props.id)
 
 		return {
 			rawMidiNotes: rawMidiNotes || [],
 			isPlaying: rawMidiNotes ? rawMidiNotes.length > 0 : false,
 			oscillatorType: instrumentState.oscillatorType,
-			color: connection ? getConnectionSourceColor(state.room, connection.id) : BasicInstrumentView.defaultProps.color,
+			color: connection ? selectConnectionSourceColor(state.room, connection.id) : BasicInstrumentView.defaultProps.color,
 			pan: instrumentState.pan,
 			lowPassFilterCutoffFrequency: instrumentState.lowPassFilterCutoffFrequency,
 			attack: instrumentState.attack,

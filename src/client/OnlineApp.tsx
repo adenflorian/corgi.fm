@@ -10,7 +10,7 @@ import {selectAllTrackIds} from '../common/redux/tracks-redux'
 import {selectAllVirtualKeyboardIds} from '../common/redux/virtual-keyboard-redux'
 import {getColorHslByHex} from '../common/shamu-color'
 import './App.less'
-import {BasicSampler} from './BasicSampler/BasicSampler'
+import {ConnectedBasicSampler} from './BasicSampler/BasicSampler'
 import {ConnectedChat} from './Chat'
 import {ConnectionsContainer} from './Connections/Connections'
 import './css-reset.css'
@@ -104,7 +104,7 @@ class OnlineApp extends React.Component<IOnlineAppProps> {
 													key={connection.targetId}
 													className="board connected"
 												>
-													<BasicSampler id={connection.targetId} />
+													<ConnectedBasicSampler id={connection.targetId} />
 												</div>
 											}
 										</div>

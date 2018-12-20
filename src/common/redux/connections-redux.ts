@@ -134,7 +134,15 @@ export const selectFirstConnectionByTargetId = (state: IClientRoomState, targetI
 	selectAllConnectionsAsArray(state)
 		.find(x => x.targetId === targetId)
 
-export const getConnectionSourceColor = (state: IClientRoomState, id: string) => {
+export const selectFirstConnectionIdByTargetId = (state: IClientRoomState, targetId: string) => {
+	const conn = selectFirstConnectionByTargetId(state, targetId)
+	return conn ? conn.id : 'fakeConnectionId'
+}
+
+export const getConnectionSourceColorByTargetId = (state: IClientRoomState, targetId: string) =>
+	selectConnectionSourceColor(state, selectFirstConnectionIdByTargetId(state, targetId))
+
+export const selectConnectionSourceColor = (state: IClientRoomState, id: string) => {
 	const connection = selectConnection(state, id)
 	if (connection) {
 		switch (connection.sourceType) {
@@ -157,8 +165,15 @@ const getKeyboardMidiOutput = makeGetKeyboardMidiOutput()
 
 const emptyArray: number[] = []
 
+export const selectConnectionSourceNotesByTargetId = (state: IClientRoomState, targetId: string): number[] =>
+	selectConnectionSourceNotes(state, selectFirstConnectionIdByTargetId(state, targetId))
+
 export const selectConnectionSourceNotes = (state: IClientRoomState, id: string): number[] => {
-	const connection = selectConnection(state, id)!
+	const connection = selectConnection(state, id)
+	if (connection === undefined) {
+		logger.warn(`could not find connection with id: ${id}`)
+		return emptyArray
+	}
 	switch (connection.sourceType) {
 		case ConnectionSourceType.keyboard:
 			return getKeyboardMidiOutput(state, connection.sourceId)
