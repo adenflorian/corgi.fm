@@ -9,8 +9,6 @@ export class BasicSamplerInstrument implements IInstrument {
 	private _gain: GainNode
 	private _lowPassFilter: BiquadFilterNode
 	private _previousNotes: number[] = []
-	private _myArrayBuffer: AudioBuffer
-	private _audioBufferSource: AudioBufferSourceNode
 
 	constructor(options: IBasicSamplerOptions) {
 		this._audioContext = options.audioContext
@@ -31,25 +29,40 @@ export class BasicSamplerInstrument implements IInstrument {
 		if (module.hot) {
 			module.hot.dispose(this.dispose)
 		}
-
-		// Create an empty two second stereo buffer at the
-		// sample rate of the AudioContext
-		const channels = 2
-		const frameCount = this._audioContext.sampleRate * 2.0
-
-		this._myArrayBuffer = this._audioContext.createBuffer(channels, frameCount, this._audioContext.sampleRate)
-
-		this._audioBufferSource = this._audioContext.createBufferSource()
-		// set the buffer in the AudioBufferSourceNode
-		this._audioBufferSource.buffer = SamplesManager.sampleC4
-		// connect the AudioBufferSourceNode to the
-		// destination so we can hear the sound
-		this._audioBufferSource.connect(this._panNode)
-		// start the source playing
-		this._audioBufferSource.start()
 	}
 
-	public setMidiNotes = (midiNotes: number[]) => undefined
+	public setMidiNotes = (midiNotes: number[]) => {
+		const newNotes = midiNotes.filter(x => this._previousNotes.includes(x) === false)
+		const offNotes = this._previousNotes.filter(x => midiNotes.includes(x) === false)
+
+		// offNotes.forEach(note => {
+		// })
+
+		newNotes.forEach(note => {
+			this._playSample()
+		})
+
+		this._previousNotes = midiNotes
+	}
 
 	public dispose = () => undefined
+
+	private _playSample = () => {
+		const audioBufferSource = this._audioContext.createBufferSource()
+
+		// set the buffer in the AudioBufferSourceNode
+		audioBufferSource.buffer = SamplesManager.sampleC4
+
+		// connect the AudioBufferSourceNode to the
+		// destination so we can hear the sound
+		audioBufferSource.connect(this._panNode)
+
+		// start the source playing
+		audioBufferSource.start()
+
+		setTimeout(() => {
+			audioBufferSource.stop()
+			audioBufferSource.disconnect()
+		}, 15000)
+	}
 }

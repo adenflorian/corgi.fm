@@ -3,6 +3,7 @@ secrets.*
 built
 dist
 .cache
+*.mp3
 
 # Logs
 logs
