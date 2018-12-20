@@ -4,6 +4,9 @@ built
 dist
 .cache
 *.mp3
+*.aiff
+*.wav
+*.zip
 
 # Logs
 logs
