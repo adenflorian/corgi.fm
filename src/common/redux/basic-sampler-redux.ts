@@ -1,6 +1,5 @@
 import {AnyAction} from 'redux'
 import * as uuid from 'uuid'
-import {BasicSamplerInstrument} from '../../client/BasicSampler/BasicSamplerInstrument'
 import {ClientId} from '../common-types'
 import {IClientRoomState} from './common-redux-types'
 import {addMultiThing, deleteThings, IMultiState, makeMultiReducer, MultiThingType, updateThings} from './multi-reducer'

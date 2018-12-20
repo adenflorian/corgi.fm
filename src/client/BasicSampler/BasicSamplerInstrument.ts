@@ -1,4 +1,5 @@
 import {IInstrument, IInstrumentOptions} from '../Instruments/IInstrument'
+import {SamplesManager} from './SamplesManager'
 
 export type IBasicSamplerOptions = IInstrumentOptions
 
@@ -38,20 +39,9 @@ export class BasicSamplerInstrument implements IInstrument {
 
 		this._myArrayBuffer = this._audioContext.createBuffer(channels, frameCount, this._audioContext.sampleRate)
 
-		// Fill the buffer with white noise;
-		// just random values between -1.0 and 1.0
-		for (let channel = 0; channel < channels; channel++) {
-			// This gives us the actual array that contains the data
-			const nowBuffering = this._myArrayBuffer.getChannelData(channel)
-			for (let i = 0; i < frameCount; i++) {
-				// Math.random() is in [0; 1.0]
-				// audio needs to be in [-1.0; 1.0]
-				nowBuffering[i] = Math.random() * 2 - 1
-			}
-		}
 		this._audioBufferSource = this._audioContext.createBufferSource()
 		// set the buffer in the AudioBufferSourceNode
-		this._audioBufferSource.buffer = this._myArrayBuffer
+		this._audioBufferSource.buffer = SamplesManager.sampleC4
 		// connect the AudioBufferSourceNode to the
 		// destination so we can hear the sound
 		this._audioBufferSource.connect(this._panNode)

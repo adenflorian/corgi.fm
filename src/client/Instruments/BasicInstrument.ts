@@ -11,7 +11,7 @@ export interface IBasicInstrumentOptions extends IInstrumentOptions {
 	oscillatorType: ShamuOscillatorType
 }
 
-// TODO Make into an BasicInstrumentAudioNode
+// TODO Make into an BasicInstrumentAudioNode?
 export class BasicInstrument implements IInstrument {
 	private _panNode: StereoPannerNode
 	private _audioContext: AudioContext
