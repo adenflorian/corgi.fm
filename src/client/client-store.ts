@@ -5,6 +5,7 @@ import {actionsBlacklist} from '../common/common-constants'
 import {audioReducer} from '../common/redux/audio-redux'
 import {clientsReducer} from '../common/redux/clients-redux'
 import {IClientAppState} from '../common/redux/common-redux-types'
+import {complexObjectsReducer} from '../common/redux/complex-objects-redux'
 import {localMiddleware} from '../common/redux/local-middleware'
 import {optionsReducer} from '../common/redux/options-redux'
 import {roomReducers} from '../common/redux/room-stores-redux'
@@ -22,6 +23,7 @@ export function configureStore(initialState: IClientAppState | any = {}): Store<
 		combineReducers({
 			audio: audioReducer,
 			clients: clientsReducer,
+			complexObjects: complexObjectsReducer,
 			options: optionsReducer,
 			rooms: roomsReducer,
 			websocket: websocketReducer,

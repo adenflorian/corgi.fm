@@ -4,15 +4,15 @@ import {IMidiNote} from '../../common/MidiNote'
 import {BuiltInOscillatorType, CustomOscillatorType, ShamuOscillatorType} from '../../common/OscillatorTypes'
 import {Arp} from '../arp'
 import {getFrequencyUsingHalfStepsFromA4} from '../music/music-functions'
+import {IInstrument, IInstrumentOptions} from './IInstrument'
 
-export interface IBasicInstrumentOptions {
-	destination: any
-	audioContext: AudioContext
+export interface IBasicInstrumentOptions extends IInstrumentOptions {
 	voiceCount: number
 	oscillatorType: ShamuOscillatorType
 }
 
-export class BasicInstrument {
+// TODO Make into an BasicInstrumentAudioNode
+export class BasicInstrument implements IInstrument {
 	private _panNode: StereoPannerNode
 	private _audioContext: AudioContext
 	private _gain: GainNode

@@ -8,7 +8,7 @@ import {
 } from '../../common/redux/basic-instruments-redux'
 import {IClientAppState} from '../../common/redux/common-redux-types'
 import {
-	getConnectionSourceColor, getConnectionSourceNotes, selectFirstConnectionByTargetId,
+	getConnectionSourceColor, selectConnectionSourceNotes, selectFirstConnectionByTargetId,
 } from '../../common/redux/connections-redux'
 import {audioContext, preFx} from '../../common/setup-audio-context'
 import {Knob} from '../Knob/Knob'
@@ -155,7 +155,7 @@ export class BasicInstrumentView
 const makeMapStateToProps = () => {
 	return (state: IClientAppState, props: IBasicInstrumentViewProps): IBasicInstrumentViewReduxProps => {
 		const connection = selectFirstConnectionByTargetId(state.room, props.id)
-		const rawMidiNotes = connection && getConnectionSourceNotes(state.room, connection.id)
+		const rawMidiNotes = connection && selectConnectionSourceNotes(state.room, connection.id)
 		const instrumentState = selectInstrument(state.room, props.id)
 
 		return {

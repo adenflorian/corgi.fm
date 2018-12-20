@@ -157,7 +157,7 @@ const getKeyboardMidiOutput = makeGetKeyboardMidiOutput()
 
 const emptyArray: number[] = []
 
-export const getConnectionSourceNotes = (state: IClientRoomState, id: string): number[] => {
+export const selectConnectionSourceNotes = (state: IClientRoomState, id: string): number[] => {
 	const connection = selectConnection(state, id)!
 	switch (connection.sourceType) {
 		case ConnectionSourceType.keyboard:
