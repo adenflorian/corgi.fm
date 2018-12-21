@@ -122,32 +122,6 @@ function hslToRgb(hue: number, saturation: number, lightness: number) {
 	return [Math.round(red * 255), Math.round(green * 255), Math.round(blue * 255)]
 }
 
-export type NoteName = 'C' | 'C#' | 'D' | 'D#' | 'E' | 'F' | 'F#' | 'G' | 'G#' | 'A' | 'A#' | 'B'
-
-export type KeyColor = 'white' | 'black'
-
-export interface IKeyColors {
-	[key: number]: {
-		color: KeyColor,
-		name: NoteName,
-	}
-}
-
-export const keyColors: Readonly<IKeyColors> = Object.freeze({
-	0: {color: 'white', name: 'C'},
-	1: {color: 'black', name: 'C#'},
-	2: {color: 'white', name: 'D'},
-	3: {color: 'black', name: 'D#'},
-	4: {color: 'white', name: 'E'},
-	5: {color: 'white', name: 'F'},
-	6: {color: 'black', name: 'F#'},
-	7: {color: 'white', name: 'G'},
-	8: {color: 'black', name: 'G#'},
-	9: {color: 'white', name: 'A'},
-	10: {color: 'black', name: 'A#'},
-	11: {color: 'white', name: 'B'},
-} as IKeyColors)
-
 /** @param buttons The buttons property from a mouse event */
 export function isLeftMouseButtonDown(buttons: number): boolean {
 	// buttons is not implemented in safari :(

@@ -1,4 +1,5 @@
 import {IInstrument, IInstrumentOptions} from '../Instruments/IInstrument'
+import {midiNoteToNoteName, NoteNameSharps} from '../music/music-functions'
 import {SamplesManager} from './SamplesManager'
 
 export type IBasicSamplerOptions = IInstrumentOptions
@@ -17,7 +18,7 @@ export class BasicSamplerInstrument implements IInstrument {
 
 		this._lowPassFilter = this._audioContext.createBiquadFilter()
 		this._lowPassFilter.type = 'lowpass'
-		this._lowPassFilter.frequency.value = 500
+		this._lowPassFilter.frequency.value = 10000
 
 		this._gain = this._audioContext.createGain()
 		this._gain.gain.value = 0.5
@@ -39,7 +40,7 @@ export class BasicSamplerInstrument implements IInstrument {
 		// })
 
 		newNotes.forEach(note => {
-			this._playSample()
+			this._playSample(midiNoteToNoteName(note))
 		})
 
 		this._previousNotes = midiNotes
@@ -47,11 +48,11 @@ export class BasicSamplerInstrument implements IInstrument {
 
 	public dispose = () => undefined
 
-	private _playSample = () => {
+	private _playSample = (noteName: NoteNameSharps) => {
 		const audioBufferSource = this._audioContext.createBufferSource()
 
 		// set the buffer in the AudioBufferSourceNode
-		audioBufferSource.buffer = SamplesManager.sampleC4
+		audioBufferSource.buffer = SamplesManager.getSample(noteName)
 
 		// connect the AudioBufferSourceNode to the
 		// destination so we can hear the sound

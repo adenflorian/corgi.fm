@@ -3,7 +3,7 @@ import * as uuid from 'uuid'
 import {IMidiNote} from '../../common/MidiNote'
 import {BuiltInOscillatorType, CustomOscillatorType, ShamuOscillatorType} from '../../common/OscillatorTypes'
 import {Arp} from '../arp'
-import {getFrequencyUsingHalfStepsFromA4} from '../music/music-functions'
+import {midiNoteToFrequency} from '../music/music-functions'
 import {IInstrument, IInstrumentOptions} from './IInstrument'
 
 export interface IBasicInstrumentOptions extends IInstrumentOptions {
@@ -99,15 +99,6 @@ export class BasicInstrument implements IInstrument {
 
 		this._previousNotes = midiNotes
 	}
-}
-
-const A4 = 69
-
-function midiNoteToFrequency(midiNote: IMidiNote): number {
-	if (midiNote === undefined) return 0
-
-	const halfStepsFromA4 = midiNote - A4
-	return getFrequencyUsingHalfStepsFromA4(halfStepsFromA4)
 }
 
 class Voices {

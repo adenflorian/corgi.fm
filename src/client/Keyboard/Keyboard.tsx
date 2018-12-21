@@ -5,8 +5,9 @@ import {ClientState, selectClientById, selectLocalClient} from '../../common/red
 import {IClientAppState} from '../../common/redux/common-redux-types'
 import {selectVirtualKeyboardById, virtualKeyPressed, virtualKeyUp} from '../../common/redux/virtual-keyboard-redux'
 import {keyToMidiMap} from '../input-events'
+import {KeyColor, keyColors, NoteNameSharps} from '../music/music-functions'
 import {Octave} from '../music/music-types'
-import {isLeftMouseButtonDown, KeyColor, keyColors, NoteName} from '../utils'
+import {isLeftMouseButtonDown} from '../utils'
 import './Keyboard.less'
 
 const defaultNumberOfKeys = 17
@@ -38,7 +39,7 @@ type IVirtualMidiKeyboard = IVirtualMidiKey[]
 interface IVirtualMidiKey {
 	color: KeyColor
 	keyName: string
-	name: NoteName
+	name: NoteNameSharps
 }
 
 type IKeyboardAllProps = IKeyboardProps & IKeyboardReduxProps & {dispatch: Dispatch}
