@@ -172,7 +172,9 @@ class SamplerVoice {
 
 	public playNote(note: number, attackTimeInSeconds: number) {
 		this._cancelAndHoldOrJustCancel()
-		this._gain.gain.setValueAtTime(0, this._audioContext.currentTime)
+		// Never go straight to 0 or you'll probably get a click sound
+		this._gain.gain.linearRampToValueAtTime(0, this._audioContext.currentTime + 0.001)
+		// this._gain.gain.setValueAtTime(0, this._audioContext.currentTime)
 		this._gain.gain.linearRampToValueAtTime(1, this._audioContext.currentTime + attackTimeInSeconds)
 
 		this._audioBufferSource.stop()
