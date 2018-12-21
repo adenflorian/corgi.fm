@@ -145,7 +145,10 @@ class Voices {
 	}
 
 	public dispose() {
-		this._inactiveVoices.forEach(x => x.dispose())
+		this._inactiveVoices
+			.concat(this._releasingVoices)
+			.concat(this._activeVoices)
+			.forEach(x => x.dispose())
 	}
 
 	private _getVoice(note: number): Voice {
