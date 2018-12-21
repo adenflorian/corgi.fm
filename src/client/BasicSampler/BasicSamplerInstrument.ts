@@ -1,6 +1,6 @@
 import uuid = require('uuid')
 import {IInstrument, IInstrumentOptions} from '../Instruments/IInstrument'
-import {midiNoteToNoteName} from '../music/music-functions'
+import {getOctaveFromMidiNote, midiNoteToNoteName} from '../music/music-functions'
 import {SamplesManager} from './SamplesManager'
 
 export type IBasicSamplerOptions = IInstrumentOptions
@@ -181,7 +181,7 @@ class SamplerVoice {
 		this._audioBufferSource.disconnect()
 		delete this._audioBufferSource
 		this._audioBufferSource = this._audioContext.createBufferSource()
-		this._audioBufferSource.buffer = SamplesManager.getSample(midiNoteToNoteName(note))
+		this._audioBufferSource.buffer = SamplesManager.getSample(midiNoteToNoteName(note), getOctaveFromMidiNote(note))
 		this._audioBufferSource.connect(this._gain)
 		this._audioBufferSource.start()
 

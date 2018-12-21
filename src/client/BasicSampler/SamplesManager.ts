@@ -1,7 +1,9 @@
 import {isLocalDevClient} from '../is-prod-client'
 import {NoteNameSharps} from '../music/music-functions'
+import {Octave} from '../music/music-types'
 
-const octaveToGet = '4'
+// const octaveToGet = '4'
+const octavesToGet = [1, 2, 3, 4, 5, 6, 7]
 
 const samplesToGet = [
 	'C',
@@ -40,27 +42,31 @@ export class SamplesManager {
 
 		SamplesManager._isInitialized = true
 
+		SamplesManager._emptyAudioBuffer = new AudioBuffer({length: 1, sampleRate: audioContext.sampleRate})
+
 		await samplesToGet.forEach(async sampleName => {
-			const noteName = sampleName + octaveToGet
+			await octavesToGet.forEach(async octave => {
+				const noteName = sampleName + octave
 
-			const sample = await fetch(`${getUrl()}/${noteName}-49-96.mp3`)
-				.then(async response => {
-					return await audioContext.decodeAudioData(await response.arrayBuffer())
-				})
+				if (noteName === 'Gb7' || noteName === 'Ab3') return
 
-			SamplesManager._samples.set(noteName, sample)
+				const sample = await fetch(`${getUrl()}/${noteName}-49-96.mp3`)
+					.then(async response => {
+						return await audioContext.decodeAudioData(await response.arrayBuffer())
+					})
+
+				SamplesManager._samples.set(noteName, sample)
+			})
 		})
 	}
 
-	public static getSample(noteName: NoteNameSharps) {
+	public static getSample(noteName: NoteNameSharps, octave: Octave = 4) {
 		const convertedName = convertNoteNameToFlatsName(noteName)
-		const foo = SamplesManager._samples.get(convertedName + octaveToGet)
-		if (foo === undefined) {
-			throw new Error('could not find sample with note name: ' + noteName)
-		}
-		return foo
+		const foo = SamplesManager._samples.get(convertedName + octave)
+		return foo || SamplesManager._emptyAudioBuffer
 	}
 
+	private static _emptyAudioBuffer: AudioBuffer
 	private static _isInitialized = false
 	private static readonly _samples = new Map<string, AudioBuffer>()
 }

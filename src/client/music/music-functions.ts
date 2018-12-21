@@ -1,4 +1,5 @@
 import {IMidiNote} from '../../common/MidiNote'
+import {Octave} from './music-types'
 
 export function applyOctave(midiNumber: number, octave: number) {
 	if (octave === -1) return midiNumber
@@ -24,6 +25,10 @@ export function midiNoteToFrequency(midiNote: IMidiNote): number {
 
 export function midiNoteToNoteName(midiNote: IMidiNote): NoteNameSharps {
 	return keyColors[midiNote % 12].name
+}
+
+export function getOctaveFromMidiNote(midiNote: IMidiNote): Octave {
+	return Math.floor(midiNote / 12)
 }
 
 export type NoteNameSharps = 'C' | 'C#' | 'D' | 'D#' | 'E' | 'F' | 'F#' | 'G' | 'G#' | 'A' | 'A#' | 'B'

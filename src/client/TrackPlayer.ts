@@ -31,7 +31,6 @@ export class TrackPlayer {
 
 	public play = (trackLength: number) => {
 		if (this.isPlaying()) return
-		logger.log('play')
 		this._startTime = this._audioContext.currentTime
 		this._isPlaying = true
 		this._trackLength = trackLength
