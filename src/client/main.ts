@@ -57,7 +57,7 @@ async function setupAsync() {
 			let sampler: BasicSamplerInstrument = selectComplexObjectById(state, samplerId)
 
 			if (sampler === undefined) {
-				sampler = new BasicSamplerInstrument({audioContext, destination: audioContext.destination})
+				sampler = new BasicSamplerInstrument({audioContext, destination: audioContext.destination, voiceCount: 20})
 				store.dispatch(
 					addComplexObject(samplerId, sampler),
 				)
