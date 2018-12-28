@@ -45,7 +45,7 @@ export class Knob extends React.PureComponent<IKnobProps> {
 		)
 	}
 
-	private _handleOnChange = (newValue: number) => {
+	private readonly _handleOnChange = (newValue: number) => {
 		this.props.onChange(newValue, this.props.onChangeId)
 	}
 }

@@ -3,10 +3,10 @@ import {IMidiNotes} from '../common/MidiNote'
 export type OnNewNotes = (newNotes: IMidiNotes) => void
 
 export class Arp {
+	private readonly _rate: number = 1
+	private readonly _shouldReTrigger: boolean = false
 	private _notes: IMidiNotes = []
-	private _rate: number = 1
 	private _startTime: number = 0
-	private _shouldReTrigger: boolean = false
 
 	public setNotes(notes: IMidiNotes) {
 		this._notes = notes
@@ -28,7 +28,7 @@ export class Arp {
 		this._startTime = performance.now()
 	}
 
-	private _loop = (timestamp: number) => {
+	private readonly _loop = (timestamp: number) => {
 		const newNotes = arp(this._notes, this._rate, this._startTime, timestamp)
 		this._onNewNotes(newNotes)
 

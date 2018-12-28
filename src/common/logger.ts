@@ -1,8 +1,9 @@
 // tslint:disable:no-console
 const logLevel = {
 	log: true,
-	debug: false,
 	warn: true,
+	debug: true,
+	trace: false,
 }
 
 export const logger = {
@@ -18,6 +19,11 @@ export const logger = {
 	},
 	debug: (...args: any[]) => {
 		if (logLevel.debug) {
+			console.log(...args)
+		}
+	},
+	trace: (...args: any[]) => {
+		if (logLevel.trace) {
 			console.log(...args)
 		}
 	},

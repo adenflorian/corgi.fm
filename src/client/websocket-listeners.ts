@@ -36,8 +36,8 @@ export function setupWebsocketAndListeners(store: Store) {
 
 	socket.on(WebSocketEvent.broadcast, (action: BroadcastAction) => {
 		if (action.type !== 'SET_CLIENT_POINTER') {
-			logger.log('Received broadcast: ', action.type)
-			logger.debug(action)
+			logger.trace('Received broadcast: ', action.type)
+			logger.trace(action)
 		}
 		store.dispatch({...action, alreadyBroadcasted: true})
 	})
@@ -71,6 +71,6 @@ export function setupWebsocketAndListeners(store: Store) {
 
 	function socketInfo(info: string) {
 		store.dispatch(setInfo(info))
-		logger.debug(info)
+		logger.trace(info)
 	}
 }

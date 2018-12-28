@@ -38,7 +38,7 @@ export class VerticalScrollBar extends React.PureComponent<IVerticalScrollBarPro
 		)
 	}
 
-	private _handleOnChange = (newValue: number) => {
+	private readonly _handleOnChange = (newValue: number) => {
 		this.props.onChange(newValue, this.props.onChangeId)
 	}
 }

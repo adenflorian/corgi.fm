@@ -43,7 +43,7 @@ export class RoomSelector extends Component<IRoomSelectorProps & {dispatch: Disp
 		)
 	}
 
-	private onRoomSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+	private readonly onRoomSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
 		const newRoom = e.target.value
 
 		if (newRoom !== this.props.activeRoom) {
@@ -51,7 +51,7 @@ export class RoomSelector extends Component<IRoomSelectorProps & {dispatch: Disp
 		}
 	}
 
-	private onNewRoomButtonClick = () => {
+	private readonly onNewRoomButtonClick = () => {
 		logger.log('new room')
 		this.props.dispatch(requestCreateRoom())
 	}

@@ -32,7 +32,7 @@ function processNetworkAction(action: BroadcastAction, getState: () => IClientAp
 	action.source = socketId
 
 	if (action.type !== SET_CLIENT_POINTER) {
-		logger.debug('sending action to server: ', action)
+		logger.trace('sending action to server: ', action)
 	}
 
 	if (action[BROADCASTER_ACTION]) {

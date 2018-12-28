@@ -93,7 +93,7 @@ function onInputConnected(input: MIDIInput) {
 }
 
 function onMidiMessage(event: MidiMessageEvent) {
-	logger.debug('MIDI MESSAGE!', event.data)
+	logger.trace('MIDI MESSAGE!', event.data)
 	// const note = message.data[1]
 	// const velocity = message.data[0]
 

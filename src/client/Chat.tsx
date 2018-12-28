@@ -100,7 +100,7 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 		)
 	}
 
-	private _onKeydown = (e: KeyboardEvent) => {
+	private readonly _onKeydown = (e: KeyboardEvent) => {
 		if (e.repeat) return
 		if (e.key === 'Enter' && this.state.isChatFocused === false && this.chatInputRef.current !== null) {
 			this.chatInputRef.current.focus()
@@ -109,14 +109,14 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 		if (e.key === 'Escape') (document.activeElement as HTMLElement).blur()
 	}
 
-	private _onBlur = () => this.setState({isChatFocused: false})
+	private readonly _onBlur = () => this.setState({isChatFocused: false})
 
-	private _onFocus = () => this.setState({isChatFocused: true})
+	private readonly _onFocus = () => this.setState({isChatFocused: true})
 
 	// Name
-	private _onNameInputBlur = () => this.setState({username: this.props.author})
+	private readonly _onNameInputBlur = () => this.setState({username: this.props.author})
 
-	private _onNameInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	private readonly _onNameInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const newValue = e.target.value
 			.replace(/ +(?= )/g, '')
 			.substring(0, maxUsernameLength)
@@ -130,7 +130,7 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 		this.props.dispatch(setClientName(this.props.authorId, newValue))
 	}
 
-	private _onSubmitNameChange = (e: React.FormEvent<HTMLFormElement>) => {
+	private readonly _onSubmitNameChange = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
 
 		if (this.state.username === '') return
@@ -143,9 +143,10 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 	}
 
 	// Chat
-	private _onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => this.setState({chatMessage: e.target.value})
+	private readonly _onInputChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+		this.setState({chatMessage: e.target.value})
 
-	private _onSubmitChat = (e: React.FormEvent<HTMLFormElement>) => {
+	private readonly _onSubmitChat = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
 
 		if (this.state.chatMessage !== '') {

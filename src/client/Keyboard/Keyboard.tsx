@@ -143,21 +143,21 @@ export class Keyboard extends React.PureComponent<IKeyboardAllProps, IKeyboardSt
 		)
 	}
 
-	private handleMouseOver = (e: React.MouseEvent, index: number) => {
+	private readonly handleMouseOver = (e: React.MouseEvent, index: number) => {
 		if (this.props.isLocal === false) return
 		if (isLeftMouseButtonDown(e.buttons) && this.state.wasMouseClickedOnKeyboard) {
 			this.props.dispatch(virtualKeyPressed(this.props.id, index))
 		}
 	}
 
-	private handleMouseOut = (e: React.MouseEvent, index: number) => {
+	private readonly handleMouseOut = (e: React.MouseEvent, index: number) => {
 		if (this.props.isLocal === false) return
 		if (isLeftMouseButtonDown(e.buttons) && this.state.wasMouseClickedOnKeyboard) {
 			this.props.dispatch(virtualKeyUp(this.props.id, index))
 		}
 	}
 
-	private handleMouseDown = (e: React.MouseEvent, index: number, isKeyPressed: boolean) => {
+	private readonly handleMouseDown = (e: React.MouseEvent, index: number, isKeyPressed: boolean) => {
 		if (this.props.isLocal === false) return
 		if (e.button === 0) {
 			this.setState({wasMouseClickedOnKeyboard: true})
@@ -173,14 +173,14 @@ export class Keyboard extends React.PureComponent<IKeyboardAllProps, IKeyboardSt
 		}
 	}
 
-	private handleMouseUp = (e: React.MouseEvent, index: number) => {
+	private readonly handleMouseUp = (e: React.MouseEvent, index: number) => {
 		if (this.props.isLocal === false) return
 		if (e.button === 0 && e.shiftKey === false) {
 			this.props.dispatch(virtualKeyUp(this.props.id, index))
 		}
 	}
 
-	private handleWindowMouseUp = (e: MouseEvent) => {
+	private readonly handleWindowMouseUp = (e: MouseEvent) => {
 		if (e.button === 0) {
 			this.setState({wasMouseClickedOnKeyboard: false})
 		}

@@ -101,7 +101,7 @@ export function setupServerWebSocketListeners(io: Server, serverStore: Store) {
 		function registerCallBacks() {
 			socket.on(WebSocketEvent.broadcast, (action: BroadcastAction) => {
 				if (action.type !== SET_CLIENT_POINTER) {
-					logger.debug(`${WebSocketEvent.broadcast}: ${socket.id} | `, action)
+					logger.trace(`${WebSocketEvent.broadcast}: ${socket.id} | `, action)
 				}
 				if (action[BROADCASTER_ACTION]) {
 					serverStore.dispatch(createRoomAction(action, getRoom(socket)))
@@ -110,7 +110,7 @@ export function setupServerWebSocketListeners(io: Server, serverStore: Store) {
 			})
 
 			socket.on(WebSocketEvent.serverAction, (action: AnyAction) => {
-				logger.debug(`${WebSocketEvent.serverAction}: ${socket.id} | `, action)
+				logger.trace(`${WebSocketEvent.serverAction}: ${socket.id} | `, action)
 
 				serverStore.dispatch(createRoomAction(action, getRoom(socket)))
 

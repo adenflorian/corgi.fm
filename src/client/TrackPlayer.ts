@@ -16,11 +16,11 @@ export interface ISimpleTrackEvent {
 export type IndexChangeHandler = (newIndex: number) => any
 
 export class TrackPlayer {
-	private _audioContext: AudioContext
+	private readonly _audioContext: AudioContext
 	private _index: number = 0
 	private _startTime: number
 	private _isPlaying: boolean = false
-	private _onIndexChange: IndexChangeHandler
+	private readonly _onIndexChange: IndexChangeHandler
 	private _trackLength = 0
 
 	constructor(audioContext: AudioContext, onIndexChange: IndexChangeHandler) {
@@ -51,7 +51,7 @@ export class TrackPlayer {
 		return this._isPlaying
 	}
 
-	private _onTick = () => {
+	private readonly _onTick = () => {
 		this._doTick()
 
 		if (this._isPlaying) {

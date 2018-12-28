@@ -63,7 +63,7 @@ export class SliderController extends React.Component<ISliderControllerProps, IS
 		)
 	}
 
-	private _handleMouseUp = () => {
+	private readonly _handleMouseUp = () => {
 		if (this.state.isMouseDown) {
 			this.setState({
 				isMouseDown: false,
@@ -71,7 +71,7 @@ export class SliderController extends React.Component<ISliderControllerProps, IS
 		}
 	}
 
-	private _handleMouseMove = (e: MouseEvent) => {
+	private readonly _handleMouseMove = (e: MouseEvent) => {
 		if (this.state.isMouseDown) {
 			let sensitivity = 0.005
 			if (e.shiftKey) {
@@ -92,7 +92,7 @@ export class SliderController extends React.Component<ISliderControllerProps, IS
 		}
 	}
 
-	private _normalize = (value: number, curve = true) => {
+	private readonly _normalize = (value: number, curve = true) => {
 		const normalizedValue = (value - this.props.min) / (this.props.max - this.props.min)
 		if (curve) {
 			return Math.pow(normalizedValue, 1 / this.props.curve)
@@ -101,13 +101,13 @@ export class SliderController extends React.Component<ISliderControllerProps, IS
 		}
 	}
 
-	private _deNormalize = (value: number) => {
+	private readonly _deNormalize = (value: number) => {
 		const deCurvedValue = Math.pow(value, this.props.curve)
 		const deNormalizedValue = (deCurvedValue * (this.props.max - this.props.min)) + this.props.min
 		return deNormalizedValue
 	}
 
-	private _handleMouseDown = (e: React.MouseEvent) => {
+	private readonly _handleMouseDown = (e: React.MouseEvent) => {
 		this.setState({
 			mouseDownPosition: {
 				x: e.screenX,

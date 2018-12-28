@@ -141,11 +141,11 @@ export class BasicInstrumentView
 		)
 	}
 
-	private _handleOscillatorTypeClicked = (type: ShamuOscillatorType) => {
+	private readonly _handleOscillatorTypeClicked = (type: ShamuOscillatorType) => {
 		this.props.dispatch(setBasicInstrumentOscillatorType(this.props.id, type))
 	}
 
-	private _dispatchChangeInstrumentParam = (value: any, paramType: BasicInstrumentParam) => {
+	private readonly _dispatchChangeInstrumentParam = (value: any, paramType: BasicInstrumentParam) => {
 		this.props.dispatch(
 			setBasicInstrumentParam(this.props.id, paramType, value),
 		)

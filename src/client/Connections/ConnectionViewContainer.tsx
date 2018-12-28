@@ -70,7 +70,7 @@ export class ConnectionViewContainer extends React.Component<IConnectionViewCont
 		}
 	}
 
-	private _updatePositions = () => {
+	private readonly _updatePositions = () => {
 		if (this.props.sourceId === undefined) return
 		const sourceElement = document.getElementById(this.props.sourceId)
 		if (!sourceElement) return

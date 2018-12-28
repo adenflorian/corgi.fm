@@ -39,7 +39,8 @@
             "allow-pascal-case"
         ],
         "interface-name": false,
-        "max-classes-per-file": false
+        "max-classes-per-file": false,
+        "prefer-readonly": true
     },
     "rulesDirectory": [],
     "linterOptions": {
