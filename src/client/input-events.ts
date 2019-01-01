@@ -2,7 +2,6 @@ import {Map} from 'immutable'
 import {AnyAction, Store} from 'redux'
 import {selectIsLocalClientReady, selectLocalClient, setClientPointer} from '../common/redux/clients-redux'
 import {localMidiKeyPress, localMidiKeyUp, localMidiOctaveChange} from '../common/redux/local-middleware'
-import {audioContext} from '../common/setup-audio-context'
 import {getMainBoardsRectY} from './MousePointers'
 
 type IKeyBoardShortcuts = Map<string, KeyBoardShortcut>
@@ -80,7 +79,7 @@ const keyboardShortcuts: IKeyBoardShortcuts = KeyBoardShortcuts({
 
 let lastScrollY = window.scrollY
 
-export function setupInputEventListeners(window: Window, store: Store) {
+export function setupInputEventListeners(window: Window, store: Store, audioContext: AudioContext) {
 
 	const isInputFocused = (): boolean => document.activeElement ? document.activeElement.tagName === 'INPUT' : false
 

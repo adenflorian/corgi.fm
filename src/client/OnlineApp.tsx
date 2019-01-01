@@ -1,7 +1,7 @@
 import {Fragment} from 'react'
 import * as React from 'react'
 import {connect} from 'react-redux'
-import {selectAllInstrumentIds} from '../common/redux/basic-instruments-redux'
+import {selectAllBasicInstrumentIds} from '../common/redux/basic-instruments-redux'
 import {IClientState, selectClientCount, selectLocalClient} from '../common/redux/clients-redux'
 import {IClientAppState} from '../common/redux/common-redux-types'
 import {ConnectionTargetType, IConnection, selectAllConnectionsAsArray} from '../common/redux/connections-redux'
@@ -137,7 +137,7 @@ const mapStateToProps = (state: IClientAppState): IOnlineAppProps => ({
 	myClient: selectLocalClient(state),
 	info: state.websocket.info,
 	keyboardIds: selectAllVirtualKeyboardIds(state.room),
-	instrumentIds: selectAllInstrumentIds(state.room),
+	instrumentIds: selectAllBasicInstrumentIds(state.room),
 	trackIds: selectAllTrackIds(state.room),
 	connections: selectAllConnectionsAsArray(state.room),
 	memberCount: selectMemberCount(state.room),

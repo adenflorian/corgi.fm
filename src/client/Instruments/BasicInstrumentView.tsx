@@ -10,9 +10,7 @@ import {IClientAppState} from '../../common/redux/common-redux-types'
 import {
 	selectConnectionSourceColor, selectConnectionSourceNotesByTargetId, selectFirstConnectionByTargetId,
 } from '../../common/redux/connections-redux'
-import {audioContext, preFx} from '../../common/setup-audio-context'
 import {Knob} from '../Knob/Knob'
-import {BasicInstrument} from './BasicInstrument'
 import {BasicInstrumentOscillatorTypes} from './BasicInstrumentOscillatorTypes'
 import './BasicInstrumentView.less'
 
@@ -35,17 +33,6 @@ interface IBasicInstrumentViewReduxProps {
 	release: number
 }
 
-function makeInstrument(props: IBasicInstrumentViewAllProps) {
-	const instrument = new BasicInstrument({
-		audioContext,
-		destination: preFx,
-		voiceCount: 9,
-		oscillatorType: props.oscillatorType,
-	})
-	instrument.setPan(props.pan)
-	return instrument
-}
-
 export class BasicInstrumentView
 	extends React.PureComponent<IBasicInstrumentViewAllProps> {
 
@@ -55,33 +42,8 @@ export class BasicInstrumentView
 		rawMidiNotes: [],
 	}
 
-	private instrument: BasicInstrument
-
-	constructor(props: IBasicInstrumentViewAllProps) {
-		super(props)
-		this.instrument = makeInstrument(props)
-	}
-
-	public componentDidUpdate(prevProps: IBasicInstrumentViewAllProps) {
-		if (prevProps.id !== this.props.id) {
-			this.instrument.dispose()
-			this.instrument = makeInstrument(this.props)
-		}
-	}
-
-	public componentWillUnmount() {
-		this.instrument.dispose()
-	}
-
 	public render() {
-		const {color, isPlaying, pan, rawMidiNotes, oscillatorType} = this.props
-
-		this.instrument.setMidiNotes(rawMidiNotes)
-		this.instrument.setOscillatorType(oscillatorType)
-		this.instrument.setPan(pan)
-		this.instrument.setLowPassFilterCutoffFrequency(this.props.lowPassFilterCutoffFrequency)
-		this.instrument.setAttack(this.props.attack)
-		this.instrument.setRelease(this.props.release)
+		const {color, isPlaying, pan, oscillatorType} = this.props
 
 		return (
 			<div

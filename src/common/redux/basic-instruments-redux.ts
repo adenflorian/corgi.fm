@@ -123,7 +123,7 @@ function basicInstrumentReducer(basicInstrument: IBasicInstrumentState, action: 
 
 export const selectAllInstruments = (state: IClientRoomState) => state.basicInstruments.things
 
-export const selectAllInstrumentIds = (state: IClientRoomState) => Object.keys(selectAllInstruments(state))
+export const selectAllBasicInstrumentIds = (state: IClientRoomState) => Object.keys(selectAllInstruments(state))
 
 export function selectInstrumentsByOwner(state: IClientRoomState, ownerId: ClientId) {
 	const instruments = selectAllInstruments(state)

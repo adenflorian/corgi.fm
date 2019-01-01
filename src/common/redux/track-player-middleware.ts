@@ -1,6 +1,5 @@
 import {AnyAction, Dispatch, Middleware, MiddlewareAPI} from 'redux'
 import {TrackPlayer} from '../../client/TrackPlayer'
-import {audioContext} from '../setup-audio-context'
 import {IClientAppState} from './common-redux-types'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
 import {ITracks, selectTrack, setTrackIndex, UPDATE_TRACKS} from './tracks-redux'
@@ -41,25 +40,30 @@ interface ITrackPlayers {
 
 const trackPlayers: ITrackPlayers = {}
 
-export const trackPlayerMiddleware: Middleware<{}, IClientAppState> = store => next => action => {
-	switch (action.type) {
-		case PLAY_TRACK:
-		case STOP_TRACK:
-		case TOGGLE_PLAY_TRACK:
-		case RESTART_TRACK:
-		case UPDATE_TRACKS:
-			let trackPlayer = trackPlayers[action.id]
-			if (trackPlayer === undefined) {
-				trackPlayers[action.id] = new TrackPlayer(
-					audioContext,
-					index => store.dispatch(setTrackIndex(action.id, index)),
-				)
-				trackPlayer = trackPlayers[action.id]
-			}
-			return foo(action, trackPlayer, next, store)
-		default:
-			return next(action)
+export const createTrackPlayerMiddleware = (audioContext: AudioContext) => {
+
+	const trackPlayerMiddleware: Middleware<{}, IClientAppState> = store => next => action => {
+		switch (action.type) {
+			case PLAY_TRACK:
+			case STOP_TRACK:
+			case TOGGLE_PLAY_TRACK:
+			case RESTART_TRACK:
+			case UPDATE_TRACKS:
+				let trackPlayer = trackPlayers[action.id]
+				if (trackPlayer === undefined) {
+					trackPlayers[action.id] = new TrackPlayer(
+						audioContext,
+						index => store.dispatch(setTrackIndex(action.id, index)),
+					)
+					trackPlayer = trackPlayers[action.id]
+				}
+				return foo(action, trackPlayer, next, store)
+			default:
+				return next(action)
+		}
 	}
+
+	return trackPlayerMiddleware
 }
 
 function foo(

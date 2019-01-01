@@ -11,28 +11,21 @@ declare global {
 	}
 }
 
-export let audioContext: AudioContext
-export let preFx: GainNode
-
-export function setupAudioContext(store: Store) {
+export function setupAudioContext(audioContext: AudioContext, preFx: GainNode, store: Store) {
 	logger.log('setting up audio context')
-	// Might be needed for safari
-	const AudioContext = window.AudioContext || window.webkitAudioContext
-	audioContext = new AudioContext()
 
-	preFx = audioContext.createGain()
 	const master = audioContext.createGain()
 
 	const reverbHigh = Reverb(audioContext)
-	reverbHigh.time = 1
+	reverbHigh.time = 0.9
 	reverbHigh.cutoff.value = 5000
 
 	const reverb = Reverb(audioContext)
-	reverb.time = 5
+	reverb.time = 3.5
 	reverb.cutoff.value = 2000
 
 	const reverbLowAndLong = Reverb(audioContext)
-	reverbLowAndLong.time = 30
+	reverbLowAndLong.time = 20
 	reverbLowAndLong.cutoff.value = 150
 
 	preFx.connect(reverbHigh)
@@ -95,4 +88,6 @@ export function setupAudioContext(store: Store) {
 		}
 		previousMasterVolume = newVolume
 	})
+
+	return audioContext
 }

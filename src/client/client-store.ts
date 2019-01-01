@@ -10,7 +10,7 @@ import {localMiddleware} from '../common/redux/local-middleware'
 import {optionsReducer} from '../common/redux/options-redux'
 import {roomReducers} from '../common/redux/room-stores-redux'
 import {roomsReducer} from '../common/redux/rooms-redux'
-import {trackPlayerMiddleware} from '../common/redux/track-player-middleware'
+import {createTrackPlayerMiddleware} from '../common/redux/track-player-middleware'
 import {websocketSenderMiddleware} from '../common/redux/websocket-client-sender-middleware'
 import {websocketReducer} from '../common/redux/websocket-redux'
 
@@ -18,7 +18,9 @@ const composeEnhancers = composeWithDevTools({
 	actionsBlacklist,
 })
 
-export function configureStore(initialState: IClientAppState | any = {}): Store<IClientAppState> {
+export function configureStore(initialState: IClientAppState | any = {}, audioContext: AudioContext)
+	: Store<IClientAppState> {
+
 	return createStore(
 		combineReducers({
 			audio: audioReducer,
@@ -33,7 +35,7 @@ export function configureStore(initialState: IClientAppState | any = {}): Store<
 		composeEnhancers(
 			applyMiddleware(
 				localMiddleware,
-				trackPlayerMiddleware,
+				createTrackPlayerMiddleware(audioContext),
 				websocketSenderMiddleware,
 			),
 			persistState('options'),
