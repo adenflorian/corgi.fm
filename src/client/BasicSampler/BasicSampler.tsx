@@ -16,33 +16,65 @@ interface IBasicSamplerProps {
 interface IBasicSamplerReduxProps {
 	color: string
 	isPlaying: boolean
-	lowPassFilterCutoffFrequency: number
+	pan: number,
+	lowPassFilterCutoffFrequency: number,
+	attack: number,
+	release: number,
 }
 
 type IBasicSamplerAllProps = IBasicSamplerProps & IBasicSamplerReduxProps & {dispatch: Dispatch}
 
 export class BasicSampler extends React.PureComponent<IBasicSamplerAllProps> {
 	public render() {
-		const {id, color, isPlaying, lowPassFilterCutoffFrequency} = this.props
+		const {color, isPlaying} = this.props
 
 		return (
 			<div
 				className={`container basicSampler ${isPlaying ? 'isPlaying saturate' : 'isNotPlaying'}`}
-				id={id}
+				id={this.props.id}
 				style={{color}}
 			>
 				<div className="isometricBoxShadow" />
 				<div className="inside">
-					hello world, i am a basic sampler
+					<div className="samplerLabel">piano sampler</div>
+
+					<Knob
+						min={-1}
+						max={1}
+						value={this.props.pan}
+						onChange={this._dispatchChangeInstrumentParam}
+						label="pan"
+						onChangeId={BasicSamplerParam.pan}
+					/>
 
 					<Knob
 						min={0}
 						max={10000}
 						curve={2}
-						value={lowPassFilterCutoffFrequency}
+						value={this.props.lowPassFilterCutoffFrequency}
 						onChange={this._dispatchChangeInstrumentParam}
 						label="lpf"
 						onChangeId={BasicSamplerParam.lowPassFilterCutoffFrequency}
+					/>
+
+					<Knob
+						min={0.01}
+						max={10}
+						curve={3}
+						value={this.props.attack}
+						onChange={this._dispatchChangeInstrumentParam}
+						label="attack"
+						onChangeId={BasicSamplerParam.attack}
+					/>
+
+					<Knob
+						min={0.01}
+						max={60}
+						curve={2}
+						value={this.props.release}
+						onChange={this._dispatchChangeInstrumentParam}
+						label="release"
+						onChangeId={BasicSamplerParam.release}
 					/>
 				</div>
 			</div>
@@ -54,9 +86,16 @@ export class BasicSampler extends React.PureComponent<IBasicSamplerAllProps> {
 }
 
 export const ConnectedBasicSampler = connect(
-	(state: IClientAppState, {id}: IBasicSamplerProps): IBasicSamplerReduxProps => ({
-		color: getConnectionSourceColorByTargetId(state.room, id),
-		isPlaying: selectConnectionSourceNotesByTargetId(state.room, id).length > 0,
-		lowPassFilterCutoffFrequency: selectSampler(state.room, id).lowPassFilterCutoffFrequency,
-	}),
+	(state: IClientAppState, {id}: IBasicSamplerProps): IBasicSamplerReduxProps => {
+		const samplerState = selectSampler(state.room, id)
+
+		return {
+			color: getConnectionSourceColorByTargetId(state.room, id),
+			isPlaying: selectConnectionSourceNotesByTargetId(state.room, id).length > 0,
+			pan: samplerState.pan,
+			lowPassFilterCutoffFrequency: samplerState.lowPassFilterCutoffFrequency,
+			attack: samplerState.attack,
+			release: samplerState.release,
+		}
+	},
 )(BasicSampler)
