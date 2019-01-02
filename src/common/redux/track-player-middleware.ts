@@ -1,6 +1,7 @@
 import {AnyAction, Dispatch, Middleware, MiddlewareAPI} from 'redux'
 import {TrackPlayer} from '../../client/TrackPlayer'
 import {IClientAppState} from './common-redux-types'
+import {addComplexObject, selectComplexObjectById} from './complex-objects-redux'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
 import {ITracks, selectTrack, setTrackIndex, UPDATE_TRACKS} from './tracks-redux'
 
@@ -20,12 +21,6 @@ export const stopTrack = (id: string) => ({
 	BROADCASTER_ACTION,
 })
 
-export const TOGGLE_PLAY_TRACK = 'TOGGLE_PLAY_TRACK'
-export const togglePlayTrack = (id: string) => ({
-	type: TOGGLE_PLAY_TRACK,
-	id,
-})
-
 export const RESTART_TRACK = 'RESTART_TRACK'
 export const restartTrack = (id: string) => ({
 	type: RESTART_TRACK,
@@ -34,30 +29,27 @@ export const restartTrack = (id: string) => ({
 	BROADCASTER_ACTION,
 })
 
-interface ITrackPlayers {
-	[trackId: string]: TrackPlayer
-}
-
-const trackPlayers: ITrackPlayers = {}
-
 export const createTrackPlayerMiddleware = (audioContext: AudioContext) => {
 
 	const trackPlayerMiddleware: Middleware<{}, IClientAppState> = store => next => action => {
 		switch (action.type) {
 			case PLAY_TRACK:
 			case STOP_TRACK:
-			case TOGGLE_PLAY_TRACK:
 			case RESTART_TRACK:
 			case UPDATE_TRACKS:
-				let trackPlayer = trackPlayers[action.id]
+				let trackPlayer = selectComplexObjectById(store.getState(), action.id)
+
 				if (trackPlayer === undefined) {
-					trackPlayers[action.id] = new TrackPlayer(
+					trackPlayer = new TrackPlayer(
 						audioContext,
 						index => store.dispatch(setTrackIndex(action.id, index)),
 					)
-					trackPlayer = trackPlayers[action.id]
+					store.dispatch(
+						addComplexObject(action.id, trackPlayer),
+					)
 				}
-				return foo(action, trackPlayer, next, store)
+
+				return handleAction(action, trackPlayer, next, store)
 			default:
 				return next(action)
 		}
@@ -66,7 +58,7 @@ export const createTrackPlayerMiddleware = (audioContext: AudioContext) => {
 	return trackPlayerMiddleware
 }
 
-function foo(
+function handleAction(
 	action: AnyAction, trackPlayer: TrackPlayer, next: Dispatch, store: MiddlewareAPI<Dispatch, IClientAppState>,
 ) {
 	switch (action.type) {
@@ -76,15 +68,6 @@ function foo(
 		case STOP_TRACK:
 			trackPlayer.stop()
 			return next(action)
-		// case TOGGLE_PLAY_TRACK:
-		// 	if (trackPlayer.isPlaying()) {
-		// 		trackPlayer.stop()
-		// 		next(stopTrack())
-		// 	} else {
-		// 		trackPlayer.play(selectTrack(store.getState(), action.id).notes.length)
-		// 		next(playTrack())
-		// 	}
-		// 	return next(action)
 		case RESTART_TRACK:
 			if (trackPlayer.isPlaying()) {
 				trackPlayer.stop()
