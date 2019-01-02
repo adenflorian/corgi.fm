@@ -2,7 +2,7 @@ import {Store} from 'redux'
 import {
 	BasicInstrumentState, selectAllBasicInstrumentIds, selectInstrument,
 } from '../common/redux/basic-instruments-redux'
-import {selectAllSamplerIds, selectSampler} from '../common/redux/basic-sampler-redux'
+import {BasicSamplerState, selectAllSamplerIds, selectSampler} from '../common/redux/basic-sampler-redux'
 import {IClientAppState, IClientRoomState} from '../common/redux/common-redux-types'
 import {addComplexObject, selectComplexObjectById} from '../common/redux/complex-objects-redux'
 import {selectConnectionSourceNotes, selectConnectionsWithSourceOrTargetIds} from '../common/redux/connections-redux'
@@ -30,6 +30,12 @@ export const setupInstrumentManager = (store: Store<IClientAppState>, audioConte
 			selectAllSamplerIds,
 			selectSampler,
 			options => new BasicSamplerInstrument({...options, voiceCount: 20}),
+			(instrument: BasicSamplerInstrument, instrumentState: BasicSamplerState) => {
+				instrument.setPan(instrumentState.pan)
+				instrument.setLowPassFilterCutoffFrequency(instrumentState.lowPassFilterCutoffFrequency)
+				instrument.setAttack(instrumentState.attack)
+				instrument.setRelease(instrumentState.release)
+			},
 		)
 	}
 
