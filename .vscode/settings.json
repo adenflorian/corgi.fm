@@ -60,6 +60,7 @@
         "nginx",
         "onmidimessage",
         "onstatechange",
+        "pageview",
         "polyfill",
         "reselect",
         "selectable",

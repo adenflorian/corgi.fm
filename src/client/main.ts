@@ -1,4 +1,5 @@
 import 'babel-polyfill'
+import * as ReactGA from 'react-ga'
 import {getInitialReduxState} from '../common/redux/initial-client-redux-state'
 import {setupAudioContext} from '../common/setup-audio-context'
 import {SamplesManager} from './BasicSampler/SamplesManager'
@@ -10,6 +11,9 @@ import {logClientEnv} from './is-prod-client'
 import {renderApp} from './react-main'
 import {setupMidiSupport} from './setup-midi-support'
 import {setupWebsocketAndListeners, socket} from './websocket-listeners'
+
+ReactGA.initialize('UA-50585312-6')
+ReactGA.pageview(window.location.pathname + window.location.search)
 
 declare global {
 	interface NodeModule {
