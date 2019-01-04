@@ -168,13 +168,13 @@
 - [...] UI layout
 - [...] rooms
 - [...] chat
-- [...] analytics
+- [ ] analytics
 - [√] newsletter (a way for users to sign up to get future updates)
 - [...] let user change name (need better UX design)
 - [√] https
 - [ ] options view
 - [ ] better pointer
-- [...] favicon
+- [ ] favicon
 
 # Ballad
 - [ ] login system
