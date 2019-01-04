@@ -6,6 +6,7 @@ import {Dispatch} from 'redux'
 import {logger} from '../common/logger'
 import {IClientAppState} from '../common/redux/common-redux-types'
 import {changeRoom, requestCreateRoom, selectActiveRoom, selectAllRoomNames} from '../common/redux/rooms-redux'
+import {Button} from './Button/Button'
 
 interface IRoomSelectorProps {
 	activeRoom: string
@@ -23,10 +24,10 @@ export class RoomSelector extends Component<IRoomSelectorProps & {dispatch: Disp
 
 		return (
 			<div id="roomSelector">
-				<div className="buttonContainer">
-					<div className="isometricBoxShadow" />
-					<button id="newRoomButton" onClick={this.onNewRoomButtonClick}>New Room</button>
-				</div>
+				<Button
+					buttonProps={{id: 'newRoomButton', onClick: this.onNewRoomButtonClick}}
+					buttonChildren="New Room"
+				/>
 				<div className="selectRow">
 					<label htmlFor="roomSelect">Room </label>
 					<div className="selectContainer">

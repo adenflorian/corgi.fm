@@ -181,42 +181,6 @@ body {
     margin: 8px 8px 10px 8px;
 }
 
-.buttonContainer {
-    .container();
-    color: @defaultGray;
-
-    &:hover {
-        .isometricBoxShadow, button {
-            filter: brightness(125%)
-        }
-    }
-
-    &:active {
-        top: 1px;
-        left: -1px;
-
-        .isometricBoxShadow {
-            top: -1px;
-            left: 1px;
-        }
-    }
-
-    button {
-        position: relative;
-        background-color: transparent;
-        border: none;
-        padding: 8px;
-        font-size: 16px;
-        text-transform: inherit;
-        font-weight: inherit;
-        font-family: inherit;
-        letter-spacing: inherit;
-        color: currentColor;
-        text-shadow: inherit;
-        height: 32px;
-    }
-}
-
 .selectContainer {
     .container();
 

@@ -9,15 +9,15 @@ import {selectMemberCount} from '../common/redux/room-members-redux'
 import {selectAllTrackIds} from '../common/redux/tracks-redux'
 import {selectAllVirtualKeyboardIds} from '../common/redux/virtual-keyboard-redux'
 import {getColorHslByHex} from '../common/shamu-color'
-import './App.less'
 import {ConnectedBasicSampler} from './BasicSampler/BasicSampler'
+import {Button} from './Button/Button'
 import {ConnectedChat} from './Chat'
 import {ConnectionsContainer} from './Connections/Connections'
-import './css-reset.css'
 import {ConnectedBasicInstrumentView} from './Instruments/BasicInstrumentView'
 import {ConnectedKeyboard} from './Keyboard/Keyboard'
 import {MousePointers} from './MousePointers'
 import {ConnectedOption} from './Option'
+import {Options} from './Options/Options'
 import {ConnectedRoomSelector} from './RoomSelector'
 import {ConnectedTrackContainer} from './Track/TrackContainer'
 import {ConnectedVolumeControl} from './Volume/VolumeControl'
@@ -56,14 +56,15 @@ class OnlineApp extends React.Component<IOnlineAppProps> {
 									option={'showNoteNamesOnKeyboard'}
 									label="show names on keyboard"
 								/>
+								<Options />
 								<div>{info}</div>
 								<div id="fps">FPS</div>
 							</div>
 							<div className="right">
-								<div className="buttonContainer">
-									<div className="isometricBoxShadow" />
-									<button onClick={() => window.location.pathname = '/newsletter'}>Newsletter Signup</button>
-								</div>
+								<Button
+									buttonProps={{onClick: () => window.location.pathname = '/newsletter'}}
+									buttonChildren="Newsletter Signup"
+								/>
 								<ConnectedRoomSelector />
 								<div style={{margin: 8}}>{memberCount} room member{memberCount > 1 ? 's' : ''}</div>
 								<div style={{margin: 8}}>{clientCount} total user{clientCount > 1 ? 's' : ''}</div>
