@@ -8,40 +8,11 @@ interface IMousePointersViewProps {
 		x: number,
 		y: number,
 		color: string,
+		name: string,
 	}>
 }
 
 const size = 8
-
-const pathOuter = `
-	M2882 7943
-	c4 -2601 9 -4962 10 -5249
-	l3 -521 1105 1034
-	c608 569 1153 1079 1211 1133
-	l106 99 503 -1282
-	c589 -1502 941 -2394 998 -2527 42 -98 123
-		-210 152 -210 49 0 867 267 1095 357 295 117
-		375 174 375 271 0 34 -157 408 -825 1960 -455
-		1054 -827 1921 -828 1927 -1 5 12 8 28 7 17
-		-1 783 -65 1704 -142 920 -78 1677 -139 1681
-		-138 5 2 -1625 1787 -3622 3968 -1996 2181
-		-3645 3982 -3664 4003 -19 20 -35 37 -36 37
-		-2 0 0 -2127 4 -4727
-	z
-`
-
-const pathInner = `
-	m3399 442
-	l2993 -3270 -39 -2
-	c-22 -1 -717 55 -1545 125 -828 71 -1506 125
-		-1508 121 -5 -11 1178 -2774 1495 -3494 63 -143
-		160 -358 215 -478 55 -120 98 -221 95 -224 -8
-		-7 -818 -293 -832 -293 -5 0 -381 944 -834 2098
-		-454 1153 -829 2107 -836 2120 -10 21 -71 -34
-		-1100 -997 -600 -561 -1092 -1018 -1094 -1015
-		-7 6 -16 8584 -10 8582 4 -2 1354 -1474 3000 -3273
-	z
-`
 
 class MousePointersView extends React.PureComponent<IMousePointersViewProps> {
 	public render() {
@@ -55,40 +26,46 @@ class MousePointersView extends React.PureComponent<IMousePointersViewProps> {
 								className="pointer"
 								style={{
 									position: 'fixed',
-									top: pointer.y + 4,
-									left: pointer.x - 4,
-									width: 8,
-									height: 8,
+									top: pointer.y - 2,
+									left: pointer.x - 8,
+									width: 16,
+									height: 16,
 									// backgroundColor: pointer.color,
 									zIndex: 10,
 									// filter: 'opacity(0.8)',
 								}}
 							>
 								<svg
-									version="1.0"
+									version="1.1"
 									xmlns="http://www.w3.org/2000/svg"
-									width="28px"
-									height="28px"
-									viewBox="0 0 1280.000000 1280.000000"
 									preserveAspectRatio="xMidYMid meet"
+									viewBox="0 0 64 64"
+									width="48px"
+									height="48px"
 								>
-									<g
-										transform="translate(0.000000,1280.000000) scale(0.100000,-0.100000)"
-										fill="black"
-										stroke="none"
-									>
-										<path
-											d={pathOuter}
-											fill="white"
-										/>
-										<path
-											d={pathOuter + ' ' + pathInner}
-										/>
-									</g>
+									<path
+										d="
+										M46 38.56L34.78 37.77L40.36 51.15L35.49 53L30.07 39.23L22.17 47.18L22 12.37L46 38.56Z
+										"
+										opacity="1"
+										fill="#282832"
+										stroke={pointer.color}
+										stroke-width="2"
+										stroke-opacity="1"
+									/>
 								</svg>
+								<div
+									style={{
+										color: pointer.color,
+										marginLeft: 14,
+									}}
+								>
+									{pointer.name}
+								</div>
 							</div>
 						)
-					})}
+					})
+				}
 			</div>
 		)
 	}
@@ -104,6 +81,7 @@ const mapStateToProps = (state: IClientAppState): IMousePointersViewProps => {
 			y: client.pointer.distanceFromBoardsTop
 				+ getMainBoardsRectY() - (size / 2),
 			color: client.color,
+			name: client.name,
 		})),
 	}
 }
