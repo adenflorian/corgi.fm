@@ -5,7 +5,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "start": "yarn clean && concurrently --names \"parcel,server\" \"yarn watch-parcel\" \"yarn watch-server\"",
-    "watch-parcel": "parcel src/client/index.html",
+    "watch-parcel": "parcel src/public/index.html",
     "watch-server": "ts-node-dev --notify false --inspect --project src/server/tsconfig.json src/server/server.ts",
     "start-prod": "NODE_ENV=production pm2 start server/server.js",
     "lint": "eslint . && tslint src/client/**/*.ts* --project src/client/tsconfig.json && tslint src/server/**/*.ts* --project src/server/tsconfig.json ",
@@ -19,7 +19,7 @@
     "deploy-test": "yarn build && bash scripts/deploy-test.sh",
     "deploy-prod": "yarn build && bash scripts/deploy-prod.sh",
     "build": "rm -rf built && yarn build-server && yarn build-client && yarn build-other",
-    "build-client": "parcel build src/client/index.html src/client/newsletter.html --out-dir built/public --no-source-maps",
+    "build-client": "parcel build src/public/index.html src/client/newsletter.html --out-dir built/public --no-source-maps",
     "build-server": "tsc --project src/server/tsconfig.json --outDir built",
     "build-other": "cp package.json yarn.lock built && cp src/public/* built/public",
     "setup-test-server": "bash scripts/setup-test-server.sh",
