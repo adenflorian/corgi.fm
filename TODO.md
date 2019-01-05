@@ -88,6 +88,7 @@
 - [ ] make size adjustable
 	- drop down with size options?
 - [ ] global play button
+- [ ] click and drag midi to ableton from shamu
 
 ## Track Scroll Bar
 - [ ] make slider stay with mouse 1:1
@@ -168,23 +169,23 @@
 - [...] UI layout
 - [...] rooms
 - [...] chat
-- [...] analytics
+- [...] analytics (needs more testing and more events)
 - [√] newsletter (a way for users to sign up to get future updates)
 - [...] let user change name (need better UX design)
 - [√] https
-- [ ] options view
+- [...] options view
 - [...] better pointer
-- [...] favicon
-
+- [...] favicon (better icon?)
 # Ballad
 - [ ] login system
 - [ ] permission system
 - [ ] new sequencers
 - [ ] new instruments
+	- [...] sampler
 - [ ] more keyboard features
 - [ ] show list of room members
 - [ ] send hearts and claps and stuff
-- [ ] export midi
+- [...] export midi
 - [ ] import midi
 - [ ] Docker?
 - [ ] pick final product name

@@ -1,9 +1,14 @@
+import {saveAs} from 'file-saver'
+import * as MidiWriter from 'midi-writer-js'
 import {AnyAction, Dispatch, Middleware, MiddlewareAPI} from 'redux'
+import {midiNoteToNoteName} from '../../client/music/music-functions'
 import {TrackPlayer} from '../../client/TrackPlayer'
 import {IClientAppState} from './common-redux-types'
 import {addComplexObject, selectComplexObjectById} from './complex-objects-redux'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
-import {ITracks, selectTrack, setTrackIndex, UPDATE_TRACKS} from './tracks-redux'
+import {
+	EXPORT_TRACK_MIDI, ExportTrackMidiAction, ITracks, selectTrack, selectTrackEvents, setTrackIndex, UPDATE_TRACKS,
+} from './tracks-redux'
 
 export const PLAY_TRACK = 'PLAY_TRACK'
 export const playTrack = (id: string) => ({
@@ -50,6 +55,8 @@ export const createTrackPlayerMiddleware = (audioContext: AudioContext) => {
 				}
 
 				return handleAction(action, trackPlayer, next, store)
+			case EXPORT_TRACK_MIDI:
+				return exportTrackMidi(action, next, store)
 			default:
 				return next(action)
 		}
@@ -108,3 +115,42 @@ function handleAction(
 // 		return newEvents
 // 	}, []).concat({time: events.length / 5, action: SimpleTrackEventAction.endTrack, notes: []})
 // }
+
+function exportTrackMidi(
+	action: ExportTrackMidiAction, next: Dispatch, store: MiddlewareAPI<Dispatch, IClientAppState>,
+) {
+	const roomState = store.getState().room
+
+	const events = selectTrackEvents(roomState, action.trackId)
+
+	const midiTrack = new MidiWriter.Track()
+
+	const duration = '8'
+
+	let nextWait = '0'
+
+	const eventsToMidi = events.map(event => {
+		const x = new MidiWriter.NoteEvent({
+			pitch: event.notes,
+			duration,
+			wait: nextWait,
+		})
+
+		nextWait = event.notes.length === 0 ? duration : '0'
+
+		return x
+	})
+
+	midiTrack.setTempo(120)
+
+	midiTrack.addEvent(
+		eventsToMidi,
+		// () => ({sequential: true}),
+	)
+
+	const write = new MidiWriter.Writer([midiTrack])
+
+	saveAs(write.dataUri(), selectTrack(roomState, action.trackId).name + '.mid')
+
+	return next(action)
+}

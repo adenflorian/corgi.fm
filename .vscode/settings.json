@@ -24,7 +24,10 @@
     "search.exclude": {
         "**/node_modules": true,
         "**/bower_components": true,
-        "built/**/*": true
+        "built/**/*": true,
+        "yarn.lock": true,
+        "yarn-error.log": true,
+        "samples": true
     },
     "editor.codeActionsOnSave": {
         "source.organizeImports": false

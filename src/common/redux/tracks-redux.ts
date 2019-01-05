@@ -76,6 +76,13 @@ export const setTrackBottomNote = (id: string, bottomNote: number) => {
 	}
 }
 
+export const EXPORT_TRACK_MIDI = 'EXPORT_TRACK_MIDI'
+export type ExportTrackMidiAction = ReturnType<typeof exportTrackMidi>
+export const exportTrackMidi = (trackId: string) => ({
+	type: EXPORT_TRACK_MIDI,
+	trackId,
+})
+
 export interface ITrackEvent {
 	notes: IMidiNote[]
 }

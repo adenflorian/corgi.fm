@@ -1,58 +1,48 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
-import {IClientAppState} from '../../common/redux/common-redux-types'
 import {playTrack, restartTrack, stopTrack} from '../../common/redux/track-player-middleware'
+import {exportTrackMidi} from '../../common/redux/tracks-redux'
+import {isProdClient} from '../is-prod-client'
 
 interface ITrackControlsProps {
 	handlePlayButtonClicked: () => void
 	handleStopButtonClicked: () => void
 	handleRestartButtonClicked: () => void
+	id: string
 }
 
-export const TrackControls = (props: ITrackControlsProps) => {
+export const TrackControls = (props: ITrackControlsProps & {dispatch: Dispatch}) => {
 	return (
 		<div className="controls unselectable">
 			<div
 				className="play colorTransition"
-				onClick={props.handlePlayButtonClicked}
+				onClick={() => props.dispatch(playTrack(props.id))}
 			>
 				▶
 			</div>
 			<div
 				className="stop colorTransition"
-				onClick={props.handleStopButtonClicked}
+				onClick={() => props.dispatch(stopTrack(props.id))}
 			>
 				◼
 			</div>
 			<div
 				className="restart colorTransition"
-				onClick={props.handleRestartButtonClicked}
+				onClick={() => props.dispatch(restartTrack(props.id))}
 			>
 				↻
 			</div>
+			{isProdClient() === false &&
+				<div
+					className="export colorTransition"
+					onClick={() => props.dispatch(exportTrackMidi(props.id))}
+				>
+					⭳
+				</div>
+			}
 		</div>
 	)
 }
 
-interface ITrackControlsConnectedProps {
-	id: string
-}
-
-const mapSateToProps = (state: IClientAppState, props: ITrackControlsConnectedProps) => {
-	// const trackState = selectTrack(state, props.id)
-
-	return {
-	}
-}
-
-const mapDispatchToProps = (dispatch: Dispatch, {id}: ITrackControlsConnectedProps) => ({
-	handlePlayButtonClicked: () => dispatch(playTrack(id)),
-	handleStopButtonClicked: () => dispatch(stopTrack(id)),
-	handleRestartButtonClicked: () => dispatch(restartTrack(id)),
-})
-
-export const TrackControlsConnected = connect(
-	mapSateToProps,
-	mapDispatchToProps,
-)(TrackControls)
+export const TrackControlsConnected = connect()(TrackControls)
