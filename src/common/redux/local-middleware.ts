@@ -1,7 +1,7 @@
 import {Dispatch, Middleware} from 'redux'
 import {addBasicInstrument, BasicInstrumentState} from './basic-instruments-redux'
 import {addBasicSampler, BasicSamplerState} from './basic-sampler-redux'
-import {ADD_CLIENT, selectLocalClient} from './clients-redux'
+import {selectLocalClient} from './clients-redux'
 import {IClientAppState} from './common-redux-types'
 import {
 	addConnection, Connection, ConnectionSourceType, ConnectionTargetType, deleteAllConnections,
@@ -32,31 +32,22 @@ export function deleteAllTheThings(dispatch: Dispatch) {
 }
 
 export const localMiddleware: Middleware<{}, IClientAppState> = ({dispatch, getState}) => next => action => {
+	next(action)
 	switch (action.type) {
 		case LOCAL_MIDI_KEY_PRESS: {
-			next(action)
 			return dispatch(virtualKeyPressed(getLocalVirtualKeyboardId(getState()), action.midiNote))
 		}
 		case LOCAL_MIDI_KEY_UP: {
-			next(action)
 			return dispatch(virtualKeyUp(getLocalVirtualKeyboardId(getState()), action.midiNote))
 		}
 		case LOCAL_MIDI_OCTAVE_CHANGE: {
-			next(action)
 			return dispatch(virtualOctaveChange(getLocalVirtualKeyboardId(getState()), action.delta))
 		}
-		case ADD_CLIENT: {
-			next(action)
-			return
-		}
 		case SET_ACTIVE_ROOM: {
-			next(action)
 			window.history.pushState({}, document.title, '/' + selectActiveRoom(getState()))
 			deleteAllTheThings(dispatch)
 			return createLocalStuff(dispatch, getState())
 		}
-		default:
-			return next(action)
 	}
 }
 

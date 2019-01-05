@@ -153,6 +153,7 @@
 - [√] can't click chat on short window
 - [ ] review chrome autoplay fix
 	- https://developers.google.com/web/updates/2017/09/autoplay-policy-changes#webaudio
+- [ ] instrument keeps playing afer owner leaves
 
 # Warnings
 - [ ] [Violation] 'readystatechange' handler took 727ms - polling-xhr.js:242

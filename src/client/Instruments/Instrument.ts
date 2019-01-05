@@ -43,10 +43,17 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> implement
 		}
 	}
 
-	public setPan = (pan: number) => this._panNode.pan.setValueAtTime(pan, this._audioContext.currentTime)
+	public setPan = (pan: number) => {
+		if (pan !== this._panNode.pan.value) {
+			this._panNode.pan.setValueAtTime(pan, this._audioContext.currentTime)
+		}
+	}
 
-	public setLowPassFilterCutoffFrequency = (frequency: number) =>
-		this._lowPassFilter.frequency.setValueAtTime(frequency, this._audioContext.currentTime)
+	public setLowPassFilterCutoffFrequency = (frequency: number) => {
+		if (frequency !== this._lowPassFilter.frequency.value) {
+			this._lowPassFilter.frequency.setValueAtTime(frequency, this._audioContext.currentTime)
+		}
+	}
 
 	public setMidiNotes = (midiNotes: IMidiNotes) => {
 		const arp = false

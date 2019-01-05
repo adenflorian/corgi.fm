@@ -1,4 +1,4 @@
-import {IInstrumentOptions, Instrument, Voice, Voices} from '../Instruments/IInstrument'
+import {IInstrumentOptions, Instrument, Voice, Voices} from '../Instruments/Instrument'
 import {getOctaveFromMidiNote, midiNoteToNoteName} from '../music/music-functions'
 import {SamplesManager} from './SamplesManager'
 

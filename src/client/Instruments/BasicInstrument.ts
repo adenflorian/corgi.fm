@@ -1,6 +1,6 @@
 import {BuiltInOscillatorType, CustomOscillatorType, ShamuOscillatorType} from '../../common/OscillatorTypes'
 import {midiNoteToFrequency} from '../music/music-functions'
-import {IInstrumentOptions, Instrument, Voice, Voices, VoiceStatus} from './IInstrument'
+import {IInstrumentOptions, Instrument, Voice, Voices, VoiceStatus} from './Instrument'
 
 export interface IBasicInstrumentOptions extends IInstrumentOptions {
 	oscillatorType: ShamuOscillatorType

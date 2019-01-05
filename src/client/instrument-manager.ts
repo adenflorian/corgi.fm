@@ -8,7 +8,7 @@ import {addComplexObject, selectComplexObjectById} from '../common/redux/complex
 import {selectConnectionSourceNotes, selectConnectionsWithSourceOrTargetIds} from '../common/redux/connections-redux'
 import {BasicSamplerInstrument} from './BasicSampler/BasicSamplerInstrument'
 import {BasicInstrument} from './Instruments/BasicInstrument'
-import {IInstrument, IInstrumentOptions} from './Instruments/IInstrument'
+import {IInstrument, IInstrumentOptions} from './Instruments/Instrument'
 
 type InstrumentIdsSelector = (roomState: IClientRoomState) => string[]
 type InstrumentStateSelector<S> = (roomState: IClientRoomState, id: string) => S
