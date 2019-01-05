@@ -5,7 +5,7 @@ import {selectAllBasicInstrumentIds} from '../common/redux/basic-instruments-red
 import {IClientState, selectClientCount, selectLocalClient} from '../common/redux/clients-redux'
 import {IClientAppState} from '../common/redux/common-redux-types'
 import {ConnectionTargetType, IConnection, selectAllConnectionsAsArray} from '../common/redux/connections-redux'
-import {selectAllGridSequencerIds} from '../common/redux/grid-sequencers-redux'
+import {selectAllGridSequencers} from '../common/redux/grid-sequencers-redux'
 import {selectMemberCount} from '../common/redux/room-members-redux'
 import {selectAllVirtualKeyboardIds} from '../common/redux/virtual-keyboard-redux'
 import {getColorHslByHex} from '../common/shamu-color'
@@ -140,7 +140,7 @@ const mapStateToProps = (state: IClientAppState): IOnlineAppProps => ({
 	info: state.websocket.info,
 	keyboardIds: selectAllVirtualKeyboardIds(state.room),
 	instrumentIds: selectAllBasicInstrumentIds(state.room),
-	gridSequencerIds: selectAllGridSequencerIds(state.room),
+	gridSequencerIds: Object.keys(selectAllGridSequencers(state.room)),
 	connections: selectAllConnectionsAsArray(state.room),
 	memberCount: selectMemberCount(state.room),
 })

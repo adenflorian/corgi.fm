@@ -3,7 +3,7 @@ import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 import {IClientAppState} from '../../common/redux/common-redux-types'
 import {
-	IGridSequencerEvent, selectGridSequencer, setGridSequencerBottomNote, setGridSequencerNote,
+	IGridSequencerEvent, selectAllGridSequencers, setGridSequencerField, setGridSequencerNote,
 } from '../../common/redux/grid-sequencers-redux'
 import {MAX_MIDI_NOTE_NUMBER_127, MIN_MIDI_NOTE_NUMBER_0} from '../../common/server-constants'
 import {isWhiteKey} from '../Keyboard/Keyboard'
@@ -79,7 +79,7 @@ export const GridSequencerNotes = (props: IGridSequencerNotesAllProps) => {
 }
 
 const mapSateToProps = (state: IClientAppState, props: IGridSequencerNotesProps): IGridSequencerNotesReduxProps => {
-	const gridSequencerState = selectGridSequencer(state.room, props.id)
+	const gridSequencerState = selectAllGridSequencers(state.room)[props.id]
 
 	return {
 		events: gridSequencerState.events,
@@ -104,7 +104,7 @@ const mapDispatchToProps = (dispatch: Dispatch, {id}: IGridSequencerNotesProps):
 		}
 	},
 	handleScrollChange: newValue => {
-		dispatch(setGridSequencerBottomNote(id, Math.round(newValue)))
+		dispatch(setGridSequencerField(id, 'bottomNote', Math.round(newValue)))
 	},
 })
 

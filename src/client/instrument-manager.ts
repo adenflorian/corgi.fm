@@ -1,4 +1,5 @@
 import {Store} from 'redux'
+import {toArray} from '../common/common-utils'
 import {
 	BasicInstrumentState, selectAllBasicInstrumentIds, selectInstrument,
 } from '../common/redux/basic-instruments-redux'
@@ -6,7 +7,7 @@ import {BasicSamplerState, selectAllSamplerIds, selectSampler} from '../common/r
 import {IClientAppState, IClientRoomState} from '../common/redux/common-redux-types'
 import {selectConnectionSourceNotes, selectConnectionsWithSourceOrTargetIds} from '../common/redux/connections-redux'
 import {
-	selectAllGridSequencersArray, setGridSequencerIndex,
+	selectAllGridSequencers, setGridSequencerField,
 } from '../common/redux/grid-Sequencers-redux'
 import {BasicSamplerInstrument} from './BasicSampler/BasicSamplerInstrument'
 import {GridSequencerPlayer} from './GridSequencerPlayer'
@@ -92,7 +93,7 @@ export const setupInstrumentManager = (store: Store<IClientAppState>, audioConte
 	}
 
 	function handleGridSequencers(state: IClientAppState) {
-		const gridSequencers = selectAllGridSequencersArray(state.room)
+		const gridSequencers = toArray(selectAllGridSequencers(state.room))
 
 		gridSequencers.forEach(gridSequencer => {
 			let sequencer = stuffMap.get(gridSequencer.id) as GridSequencerPlayer
@@ -100,7 +101,7 @@ export const setupInstrumentManager = (store: Store<IClientAppState>, audioConte
 			sequencer = createIfNotExisting(gridSequencer.id, sequencer, () => {
 				return new GridSequencerPlayer(
 					audioContext,
-					index => store.dispatch(setGridSequencerIndex(gridSequencer.id, index)),
+					index => store.dispatch(setGridSequencerField(gridSequencer.id, 'index', index)),
 				)
 			})
 

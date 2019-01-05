@@ -3,7 +3,7 @@ import {AnyAction} from 'redux'
 import * as uuid from 'uuid'
 import {logger} from '../logger'
 import {IClientRoomState} from './common-redux-types'
-import {selectGridSequencer} from './grid-sequencers-redux'
+import {selectAllGridSequencers} from './grid-sequencers-redux'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
 import {IVirtualKeyboardState, makeGetKeyboardMidiOutput, selectVirtualKeyboardById} from './virtual-keyboard-redux'
 
@@ -142,15 +142,15 @@ export const selectFirstConnectionIdByTargetId = (state: IClientRoomState, targe
 export const getConnectionSourceColorByTargetId = (state: IClientRoomState, targetId: string) =>
 	selectConnectionSourceColor(state, selectFirstConnectionIdByTargetId(state, targetId))
 
-export const selectConnectionSourceColor = (state: IClientRoomState, id: string) => {
-	const connection = selectConnection(state, id)
+export const selectConnectionSourceColor = (roomState: IClientRoomState, id: string) => {
+	const connection = selectConnection(roomState, id)
 	if (connection) {
 		switch (connection.sourceType) {
 			case ConnectionSourceType.keyboard:
-				const virtualKeyboard = selectVirtualKeyboardById(state, connection.sourceId)
+				const virtualKeyboard = selectVirtualKeyboardById(roomState, connection.sourceId)
 				return virtualKeyboard && virtualKeyboard.color
 			case ConnectionSourceType.gridSequencer:
-				const gridSequencer = selectGridSequencer(state, connection.sourceId)
+				const gridSequencer = selectAllGridSequencers(roomState)[connection.sourceId]
 				return gridSequencer ? gridSequencer.color : 'gray'
 			default:
 				logger.warn('couldnt find source color (unsupported connection source type)')
@@ -178,7 +178,7 @@ export const selectConnectionSourceNotes = (state: IClientRoomState, id: string)
 		case ConnectionSourceType.keyboard:
 			return getKeyboardMidiOutput(state, connection.sourceId)
 		case ConnectionSourceType.gridSequencer:
-			const gridSequencer = selectGridSequencer(state, connection.sourceId)
+			const gridSequencer = selectAllGridSequencers(state)[connection.sourceId]
 			if (!gridSequencer) return emptyArray
 			if (gridSequencer.index >= 0 && gridSequencer.index < gridSequencer.events.length) {
 				return gridSequencer.events[gridSequencer.index].notes

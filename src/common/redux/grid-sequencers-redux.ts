@@ -38,44 +38,6 @@ export const setGridSequencerNote =
 		}
 	}
 
-export const SET_GRID_SEQUENCER_EVENTS = 'SET_GRID_SEQUENCER_EVENTS'
-export const setGridSequencerEvents = (gridSequencerId: string, events: IGridSequencerEvent[]) => {
-	return {
-		type: SET_GRID_SEQUENCER_EVENTS,
-		id: gridSequencerId,
-		events,
-	}
-}
-
-export const SET_GRID_SEQUENCER_INDEX = 'SET_GRID_SEQUENCER_INDEX'
-export const setGridSequencerIndex = (id: string, index: number) => {
-	return {
-		type: SET_GRID_SEQUENCER_INDEX,
-		id,
-		index,
-	}
-}
-
-export const SET_GRID_SEQUENCER_BOTTOM_NOTE = 'SET_GRID_SEQUENCER_BOTTOM_NOTE'
-export const setGridSequencerBottomNote = (id: string, bottomNote: number) => {
-	return {
-		type: SET_GRID_SEQUENCER_BOTTOM_NOTE,
-		id,
-		bottomNote,
-		SERVER_ACTION,
-		BROADCASTER_ACTION,
-	}
-}
-
-export const SET_GRID_SEQUENCER_IS_PLAYING = 'SET_GRID_SEQUENCER_IS_PLAYING'
-export const setGridSequencerIsPlaying = (id: string, isPlaying: boolean) => ({
-	type: SET_GRID_SEQUENCER_IS_PLAYING,
-	id,
-	isPlaying,
-	SERVER_ACTION,
-	BROADCASTER_ACTION,
-})
-
 export const RESTART_GRID_SEQUENCER = 'RESTART_GRID_SEQUENCER'
 export const restartGridSequencer = (id: string) => ({
 	type: RESTART_GRID_SEQUENCER,
@@ -89,6 +51,15 @@ export type ExportGridSequencerMidiAction = ReturnType<typeof exportGridSequence
 export const exportGridSequencerMidi = (gridSequencerId: string) => ({
 	type: EXPORT_GRID_SEQUENCER_MIDI,
 	gridSequencerId,
+})
+
+export const SET_GRID_SEQUENCER_FIELD = 'SET_GRID_SEQUENCER_FIELD'
+export type SetGridSequencerField = ReturnType<typeof setGridSequencerField>
+export const setGridSequencerField = (id: string, fieldName: 'isPlaying' | 'bottomNote' | 'index', data: any) => ({
+	type: SET_GRID_SEQUENCER_FIELD,
+	id,
+	fieldName,
+	data,
 })
 
 export interface IGridSequencerEvent {
@@ -169,10 +140,7 @@ export interface IGridSequencerEvent {
 
 export const gridSequencerActionTypes = [
 	SET_GRID_SEQUENCER_NOTE,
-	SET_GRID_SEQUENCER_EVENTS,
-	SET_GRID_SEQUENCER_INDEX,
-	SET_GRID_SEQUENCER_IS_PLAYING,
-	SET_GRID_SEQUENCER_BOTTOM_NOTE,
+	SET_GRID_SEQUENCER_FIELD,
 ]
 
 export const gridSequencersReducer =
@@ -205,38 +173,11 @@ export function gridSequencerReducer(gridSequencer: IGridSequencerState, action:
 					}
 				}),
 			}
-		case SET_GRID_SEQUENCER_EVENTS:
-			return {
-				...gridSequencer,
-				notes: action.events,
-			}
-		case SET_GRID_SEQUENCER_INDEX:
-			return {...gridSequencer, index: action.index}
-		case SET_GRID_SEQUENCER_IS_PLAYING:
-			return {...gridSequencer, isPlaying: action.isPlaying}
-		case SET_GRID_SEQUENCER_BOTTOM_NOTE:
-			return {...gridSequencer, bottomNote: action.bottomNote}
+		case SET_GRID_SEQUENCER_FIELD:
+			return {...gridSequencer, [action.fieldName]: action.data}
 		default:
 			throw new Error('invalid action type')
 	}
 }
 
 export const selectAllGridSequencers = (state: IClientRoomState) => state.gridSequencers.things
-
-export const selectAllGridSequencersArray =
-	createSelectAllOfThingAsArray<IGridSequencers, IGridSequencerState>(selectAllGridSequencers)
-
-export const selectAllGridSequencerIds = (state: IClientRoomState) =>
-	Object.keys(selectAllGridSequencers(state))
-
-export const selectGridSequencer = (state: IClientRoomState, id: string) =>
-	selectAllGridSequencers(state)[id]
-
-export const selectGridSequencerEvents = (state: IClientRoomState, id: string) =>
-	selectGridSequencer(state, id).events
-
-export const selectGridSequencerEvent = (state: IClientRoomState, id: string, eventIndex: number) =>
-	selectGridSequencerEvents(state, id)[eventIndex]
-
-export const selectGridSequencerEventNotes = (state: IClientRoomState, id: string, eventIndex: number) =>
-	selectGridSequencerEvent(state, id, eventIndex).notes
