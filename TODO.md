@@ -46,7 +46,7 @@
 - [ ] have a midi library
 - [ ] mute audio on join and show popup letting know user that it might be loud
 - [ ] let players send hearts and claps and stuff to show that they like what the person is playing
-- [ ] what do about firefox
+- [√] disallow browsers that aren't chrome
 - [ ] offline mode
 - [ ] simple mode
 - [ ] make usable on mobile
@@ -62,6 +62,7 @@
 	- so chrome auto updating can't break the whole app
 - [ ] turn off audio after 30 minutes and show dialog asking if user is still there
 - [ ] velocity
+- [ ] download an open source font
 
 # Sampler
 - [ ] presentation

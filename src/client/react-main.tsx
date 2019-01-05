@@ -14,3 +14,10 @@ export function renderApp(store: Store) {
 		document.getElementById('react-app'),
 	)
 }
+
+export function renderOther(other: any) {
+	ReactDOM.render(
+		other,
+		document.getElementById('react-app'),
+	)
+}
