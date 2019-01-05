@@ -52,13 +52,9 @@ class OnlineApp extends React.Component<IOnlineAppProps> {
 
 						<div id="topDiv" style={{marginBottom: 'auto'}}>
 							<div className="left">
-								<ConnectedOption
-									option={'showNoteNamesOnKeyboard'}
-									label="show names on keyboard"
-								/>
-								<Options />
 								<div>{info}</div>
 								<div id="fps">FPS</div>
+								<Options />
 							</div>
 							<div className="right">
 								<Button

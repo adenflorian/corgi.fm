@@ -176,6 +176,7 @@
 - [...] options view
 - [...] better pointer
 - [...] favicon (better icon?)
+
 # Ballad
 - [ ] login system
 - [ ] permission system
