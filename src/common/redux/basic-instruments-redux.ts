@@ -4,28 +4,20 @@ import {ClientId} from '../common-types'
 import {pickRandomArrayElement} from '../common-utils'
 import {ShamuOscillatorType} from '../OscillatorTypes'
 import {IClientRoomState} from './common-redux-types'
-import {addMultiThing, deleteThings, IMultiState, makeMultiReducer, MultiThingType, updateThings} from './multi-reducer'
-import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
+import {
+	addMultiThing, createSelectAllOfThingAsArray, deleteThings,
+	IMultiState, makeMultiReducer, MultiThingType, updateThings,
+} from './multi-reducer'
+import {BROADCASTER_ACTION, NetworkActionType, SERVER_ACTION} from './redux-utils'
 
-export const ADD_BASIC_INSTRUMENT = 'ADD_BASIC_INSTRUMENT'
-export const addBasicInstrument = (instrument: IBasicInstrumentState) => ({
-	...addMultiThing(instrument, MultiThingType.basicInstrument),
-	SERVER_ACTION,
-	BROADCASTER_ACTION,
-})
+export const addBasicInstrument = (instrument: IBasicInstrumentState) =>
+	addMultiThing(instrument, MultiThingType.basicInstrument, NetworkActionType.SERVER_AND_BROADCASTER)
 
-export const DELETE_BASIC_INSTRUMENTS = 'DELETE_BASIC_INSTRUMENTS'
-export const deleteBasicInstruments = (instrumentIds: string[]) => ({
-	...deleteThings(instrumentIds, MultiThingType.basicInstrument),
-	SERVER_ACTION,
-	BROADCASTER_ACTION,
-})
+export const deleteBasicInstruments = (instrumentIds: string[]) =>
+	deleteThings(instrumentIds, MultiThingType.basicInstrument, NetworkActionType.SERVER_AND_BROADCASTER)
 
-export const UPDATE_BASIC_INSTRUMENTS = 'UPDATE_BASIC_INSTRUMENTS'
-export const updateBasicInstruments = (instruments: IBasicInstruments) => ({
-	...updateThings(instruments, MultiThingType.basicInstrument),
-	BROADCASTER_ACTION,
-})
+export const updateBasicInstruments = (instruments: IBasicInstruments) =>
+	updateThings(instruments, MultiThingType.basicInstrument, NetworkActionType.BROADCASTER)
 
 export const SET_BASIC_INSTRUMENT_OSCILLATOR_TYPE = 'SET_BASIC_INSTRUMENT_OSCILLATOR_TYPE'
 export const setBasicInstrumentOscillatorType =
@@ -123,13 +115,12 @@ function basicInstrumentReducer(basicInstrument: IBasicInstrumentState, action: 
 
 export const selectAllInstruments = (state: IClientRoomState) => state.basicInstruments.things
 
+export const selectAllInstrumentsAsArray =
+	createSelectAllOfThingAsArray<IBasicInstruments, IBasicInstrumentState>(selectAllInstruments)
+
 export const selectAllBasicInstrumentIds = (state: IClientRoomState) => Object.keys(selectAllInstruments(state))
 
-export function selectInstrumentsByOwner(state: IClientRoomState, ownerId: ClientId) {
-	const instruments = selectAllInstruments(state)
-	return Object.keys(instruments)
-		.map(x => instruments[x])
-		.filter(x => x.ownerId === ownerId)
-}
+export const selectInstrumentsByOwner = (state: IClientRoomState, ownerId: ClientId) =>
+	selectAllInstrumentsAsArray(state).filter(x => x.ownerId === ownerId)
 
 export const selectInstrument = (state: IClientRoomState, id: string) => selectAllInstruments(state)[id]

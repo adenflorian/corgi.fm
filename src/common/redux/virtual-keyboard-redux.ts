@@ -11,7 +11,7 @@ import {
 	addMultiThing, deleteThings, IMultiState, IMultiStateThing,
 	IMultiStateThings, makeMultiReducer, MultiThingType, updateThings,
 } from './multi-reducer'
-import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
+import {BROADCASTER_ACTION, NetworkActionType, SERVER_ACTION} from './redux-utils'
 
 export interface VirtualKeyAction {
 	type: string
@@ -22,24 +22,16 @@ export interface VirtualKeyAction {
 }
 
 export const ADD_VIRTUAL_KEYBOARD = 'ADD_VIRTUAL_KEYBOARD'
-export const addVirtualKeyboard = (virtualKeyboard: IVirtualKeyboardState) => ({
-	...addMultiThing(virtualKeyboard, MultiThingType.virtualKeyboard),
-	SERVER_ACTION,
-	BROADCASTER_ACTION,
-})
+export const addVirtualKeyboard = (virtualKeyboard: IVirtualKeyboardState) =>
+	addMultiThing(virtualKeyboard, MultiThingType.virtualKeyboard, NetworkActionType.SERVER_AND_BROADCASTER)
 
 export const DELETE_VIRTUAL_KEYBOARDS = 'DELETE_VIRTUAL_KEYBOARDS'
-export const deleteVirtualKeyboards = (virtualKeyboardIds: string[]) => ({
-	...deleteThings(virtualKeyboardIds, MultiThingType.virtualKeyboard),
-	SERVER_ACTION,
-	BROADCASTER_ACTION,
-})
+export const deleteVirtualKeyboards = (virtualKeyboardIds: string[]) =>
+	deleteThings(virtualKeyboardIds, MultiThingType.virtualKeyboard, NetworkActionType.SERVER_AND_BROADCASTER)
 
 export const UPDATE_VIRTUAL_KEYBOARDS = 'UPDATE_VIRTUAL_KEYBOARDS'
-export const updateVirtualKeyboards = (keyboards: any) => ({
-	...updateThings(keyboards, MultiThingType.virtualKeyboard),
-	BROADCASTER_ACTION,
-})
+export const updateVirtualKeyboards = (keyboards: any) =>
+	updateThings(keyboards, MultiThingType.virtualKeyboard, NetworkActionType.BROADCASTER)
 
 export const VIRTUAL_KEY_PRESSED = 'VIRTUAL_KEY_PRESSED'
 export const virtualKeyPressed = (id: string, number: number) => {

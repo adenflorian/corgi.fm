@@ -2,7 +2,7 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 import {
-	exportGridSequencerMidi, playGridSequencer, stopGridSequencer,
+	exportGridSequencerMidi, setGridSequencerIsPlaying,
 } from '../../common/redux/grid-sequencers-redux'
 import {isProdClient} from '../is-prod-client'
 
@@ -15,13 +15,13 @@ export const GridSequencerControls = (props: IGridSequencerControlsProps & {disp
 		<div className="controls unselectable">
 			<div
 				className="play colorTransition"
-				onClick={() => props.dispatch(playGridSequencer(props.id))}
+				onClick={() => props.dispatch(setGridSequencerIsPlaying(props.id, true))}
 			>
 				▶
 			</div>
 			<div
 				className="stop colorTransition"
-				onClick={() => props.dispatch(stopGridSequencer(props.id))}
+				onClick={() => props.dispatch(setGridSequencerIsPlaying(props.id, false))}
 			>
 				◼
 			</div>

@@ -66,6 +66,8 @@
 - [ ] Define purpose/goals/mission of this app
 	- collaboration
 	- learning?
+- [ ] build object oriented prototype
+	- Unity?
 
 # Sampler
 - [ ] presentation

@@ -74,5 +74,7 @@ function getInitialGridSequencerEvents() {
 }
 
 function getInitialGridSequencerEvents2() {
-	return new Array(32).fill({notes: []})
+	return new Array(32)
+		.fill({notes: []})
+		.map((_, i) => ({notes: i % 2 === 1 ? [] : [32]}))
 }

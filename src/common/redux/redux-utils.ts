@@ -22,6 +22,13 @@ interface ISomeAction extends Action {
 export const SERVER_ACTION = 'SERVER_ACTION'
 export const BROADCASTER_ACTION = 'BROADCASTER_ACTION'
 
+export enum NetworkActionType {
+	SERVER_ACTION = 'SERVER_ACTION',
+	BROADCASTER = 'BROADCASTER_ACTION',
+	SERVER_AND_BROADCASTER = 'SERVER_AND_BROADCASTER',
+	NO = 'NO',
+}
+
 export interface IReducerHandlers<S> {
 	[key: string]: (state: S, action: Action | any) => S
 }

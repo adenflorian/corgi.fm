@@ -1,4 +1,6 @@
 import {logger} from '../logger'
+import {IClientRoomState} from './common-redux-types'
+import {BROADCASTER_ACTION, NetworkActionType, SERVER_ACTION} from './redux-utils'
 
 export interface IMultiState {
 	things: IMultiStateThings
@@ -25,11 +27,27 @@ interface IAddMultiThingAction extends IMultiThingAction {
 	type: ADD_MULTI_THING
 	thing: IMultiStateThing
 }
-export const addMultiThing = (thing: IMultiStateThing, thingType: MultiThingType): IAddMultiThingAction => ({
+export const addMultiThing = (
+	thing: IMultiStateThing,
+	thingType: MultiThingType,
+	netActionType: NetworkActionType = NetworkActionType.NO,
+): IAddMultiThingAction => ({
 	type: ADD_MULTI_THING,
 	thing,
 	thingType,
+	...expandNetActionType(netActionType),
 })
+
+function expandNetActionType(netActionType: NetworkActionType) {
+	switch (netActionType) {
+		case NetworkActionType.SERVER_ACTION: return {SERVER_ACTION}
+		case NetworkActionType.BROADCASTER: return {BROADCASTER_ACTION}
+		case NetworkActionType.SERVER_AND_BROADCASTER: return {SERVER_ACTION, BROADCASTER_ACTION}
+		case NetworkActionType.NO:
+		default:
+			return {}
+	}
+}
 
 type DELETE_THINGS = 'DELETE_THINGS'
 export const DELETE_MULTI_THINGS: DELETE_THINGS = 'DELETE_THINGS'
@@ -37,10 +55,15 @@ interface IDeleteMultiThingsAction extends IMultiThingAction {
 	type: DELETE_THINGS
 	thingIds: string[]
 }
-export const deleteThings = (thingIds: string[], thingType: MultiThingType): IDeleteMultiThingsAction => ({
+export const deleteThings = (
+	thingIds: string[],
+	thingType: MultiThingType,
+	netActionType: NetworkActionType = NetworkActionType.NO,
+): IDeleteMultiThingsAction => ({
 	type: DELETE_MULTI_THINGS,
 	thingIds,
 	thingType,
+	...expandNetActionType(netActionType),
 })
 
 type DELETE_ALL_THINGS = 'DELETE_ALL_THINGS'
@@ -59,10 +82,15 @@ interface IUpdateMultiThingsAction extends IMultiThingAction {
 	type: UPDATE_THINGS
 	things: IMultiStateThings
 }
-export const updateThings = (things: IMultiStateThings, thingType: MultiThingType): IUpdateMultiThingsAction => ({
+export const updateThings = (
+	things: IMultiStateThings,
+	thingType: MultiThingType,
+	netActionType: NetworkActionType = NetworkActionType.NO,
+): IUpdateMultiThingsAction => ({
 	type: UPDATE_MULTI_THINGS,
 	things,
 	thingType,
+	...expandNetActionType(netActionType),
 })
 
 type MultiThingAction =
@@ -125,4 +153,17 @@ export function makeMultiReducer<T extends IMultiStateThing, U extends IMultiSta
 				}
 		}
 	}
+}
+
+export const createSelectAllOfThingAsArray =
+	<T extends IThings, U>(selectAllOfThing: SelectAllOfThing<T>) => (state: IClientRoomState) => {
+		const things = selectAllOfThing(state)
+		return Object.keys(things)
+			.map(x => things[x]) as U[]
+	}
+
+export type SelectAllOfThing<T extends IThings> = (clientRoomState: IClientRoomState) => T
+
+export interface IThings {
+	[key: string]: any
 }

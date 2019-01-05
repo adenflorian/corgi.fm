@@ -7,30 +7,22 @@ import {MAX_MIDI_NOTE_NUMBER_127} from '../server-constants'
 import {colorFunc} from '../shamu-color'
 import {IClientRoomState} from './common-redux-types'
 import {
-	addMultiThing, deleteThings, IMultiState, IMultiStateThing,
-	IMultiStateThings, makeMultiReducer, MultiThingType, updateThings,
+	addMultiThing, createSelectAllOfThingAsArray, deleteThings, IMultiState,
+	IMultiStateThing, IMultiStateThings, makeMultiReducer, MultiThingType, updateThings,
 } from './multi-reducer'
-import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
+import {BROADCASTER_ACTION, NetworkActionType, SERVER_ACTION} from './redux-utils'
 
 export const ADD_GRID_SEQUENCER = 'ADD_GRID_SEQUENCER'
-export const addGridSequencer = (gridSequencer: IGridSequencerState) => ({
-	...addMultiThing(gridSequencer, MultiThingType.gridSequencer),
-	SERVER_ACTION,
-	BROADCASTER_ACTION,
-})
+export const addGridSequencer = (gridSequencer: IGridSequencerState) =>
+	addMultiThing(gridSequencer, MultiThingType.gridSequencer, NetworkActionType.SERVER_AND_BROADCASTER)
 
 export const DELETE_GRID_SEQUENCERS = 'DELETE_GRID_SEQUENCERS'
-export const deleteGridSequencers = (gridSequencerIds: string[]) => ({
-	...deleteThings(gridSequencerIds, MultiThingType.gridSequencer),
-	SERVER_ACTION,
-	BROADCASTER_ACTION,
-})
+export const deleteGridSequencers = (gridSequencerIds: string[]) =>
+	deleteThings(gridSequencerIds, MultiThingType.gridSequencer, NetworkActionType.SERVER_AND_BROADCASTER)
 
 export const UPDATE_GRID_SEQUENCERS = 'UPDATE_GRID_SEQUENCERS'
-export const updateGridSequencers = (gridSequencers: IGridSequencers) => ({
-	...updateThings(gridSequencers, MultiThingType.gridSequencer),
-	BROADCASTER_ACTION,
-})
+export const updateGridSequencers = (gridSequencers: IGridSequencers) =>
+	updateThings(gridSequencers, MultiThingType.gridSequencer, NetworkActionType.BROADCASTER)
 
 export const SET_GRID_SEQUENCER_NOTE = 'SET_GRID_SEQUENCER_NOTE'
 export const setGridSequencerNote =
@@ -75,18 +67,11 @@ export const setGridSequencerBottomNote = (id: string, bottomNote: number) => {
 	}
 }
 
-export const PLAY_GRID_SEQUENCER = 'PLAY_GRID_SEQUENCER'
-export const playGridSequencer = (id: string) => ({
-	type: PLAY_GRID_SEQUENCER,
+export const SET_GRID_SEQUENCER_IS_PLAYING = 'SET_GRID_SEQUENCER_IS_PLAYING'
+export const setGridSequencerIsPlaying = (id: string, isPlaying: boolean) => ({
+	type: SET_GRID_SEQUENCER_IS_PLAYING,
 	id,
-	SERVER_ACTION,
-	BROADCASTER_ACTION,
-})
-
-export const STOP_GRID_SEQUENCER = 'STOP_GRID_SEQUENCER'
-export const stopGridSequencer = (id: string) => ({
-	type: STOP_GRID_SEQUENCER,
-	id,
+	isPlaying,
 	SERVER_ACTION,
 	BROADCASTER_ACTION,
 })
@@ -186,8 +171,7 @@ export const gridSequencerActionTypes = [
 	SET_GRID_SEQUENCER_NOTE,
 	SET_GRID_SEQUENCER_EVENTS,
 	SET_GRID_SEQUENCER_INDEX,
-	PLAY_GRID_SEQUENCER,
-	STOP_GRID_SEQUENCER,
+	SET_GRID_SEQUENCER_IS_PLAYING,
 	SET_GRID_SEQUENCER_BOTTOM_NOTE,
 ]
 
@@ -228,10 +212,8 @@ export function gridSequencerReducer(gridSequencer: IGridSequencerState, action:
 			}
 		case SET_GRID_SEQUENCER_INDEX:
 			return {...gridSequencer, index: action.index}
-		case PLAY_GRID_SEQUENCER:
-			return {...gridSequencer, isPlaying: true}
-		case STOP_GRID_SEQUENCER:
-			return {...gridSequencer, isPlaying: false}
+		case SET_GRID_SEQUENCER_IS_PLAYING:
+			return {...gridSequencer, isPlaying: action.isPlaying}
 		case SET_GRID_SEQUENCER_BOTTOM_NOTE:
 			return {...gridSequencer, bottomNote: action.bottomNote}
 		default:
@@ -241,10 +223,8 @@ export function gridSequencerReducer(gridSequencer: IGridSequencerState, action:
 
 export const selectAllGridSequencers = (state: IClientRoomState) => state.gridSequencers.things
 
-export const selectAllGridSequencersArray = (state: IClientRoomState) => {
-	const gridSequencers = selectAllGridSequencers(state)
-	return Object.keys(gridSequencers).map(x => gridSequencers[x])
-}
+export const selectAllGridSequencersArray =
+	createSelectAllOfThingAsArray<IGridSequencers, IGridSequencerState>(selectAllGridSequencers)
 
 export const selectAllGridSequencerIds = (state: IClientRoomState) =>
 	Object.keys(selectAllGridSequencers(state))
