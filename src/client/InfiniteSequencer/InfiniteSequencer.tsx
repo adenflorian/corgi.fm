@@ -1,10 +1,10 @@
 import * as React from 'react'
 import {Component} from 'react'
 import {connect} from 'react-redux'
-import {Action} from 'redux'
+import {Dispatch} from 'redux'
 import {IClientAppState} from '../../common/redux/common-redux-types'
 import {IGridSequencerEvent} from '../../common/redux/grid-sequencers-redux'
-import {selectAllInfiniteSequencers} from '../../common/redux/infinite-sequencers-redux'
+import {selectAllInfiniteSequencers, setInfiniteSequencerField} from '../../common/redux/infinite-sequencers-redux'
 import {getOctaveFromMidiNote, midiNoteToNoteName} from '../music/music-functions'
 import {Panel} from '../Panel'
 import './InfiniteSequencer.less'
@@ -14,12 +14,15 @@ interface IInfiniteSequencerProps {
 }
 
 interface IInfiniteSequencerReduxProps {
-	events: IGridSequencerEvent[]
 	activeIndex: number
+	color: string
+	events: IGridSequencerEvent[]
+	isPlaying: boolean
+	name: string
 }
 
 type IInfiniteSequencerAllProps =
-	IInfiniteSequencerProps & IInfiniteSequencerReduxProps
+	IInfiniteSequencerProps & IInfiniteSequencerReduxProps & {dispatch: Dispatch}
 
 export class InfiniteSequencer extends Component<IInfiniteSequencerAllProps> {
 	public static defaultProps = {
@@ -27,20 +30,40 @@ export class InfiniteSequencer extends Component<IInfiniteSequencerAllProps> {
 	}
 
 	public render() {
+		const {color, isPlaying, id} = this.props
+
 		return (
 			<div className="infiniteSequencer">
-				<Panel id={this.props.id}>
-					<div className="controls" style={{margin: 8}}>
-						<div className="record">⬤</div>
-					</div>
-					<div className="display">
-						{this.props.events.map((event, index) =>
-							<div key={index} className="event">
-								{midiNoteToNoteName(event.notes[0]) + getOctaveFromMidiNote(event.notes[0])}
-							</div>,
-						)}
-					</div>
-				</Panel>
+				<div
+					className={`gridSequencer ${isPlaying ? 'isPlaying saturate' : 'isNotPlaying'}`}
+					style={{color}}
+				>
+					<div className="label transitionAllColor">{name}</div>
+					<Panel id={this.props.id}>
+						<div className="controls" style={{margin: 8}}>
+							<div className="record">⬤</div>
+							<div
+								className="play"
+								onClick={() => this.props.dispatch(setInfiniteSequencerField(id, 'isPlaying', true))}
+							>
+								▶
+							</div>
+							<div
+								className="stop"
+								onClick={() => this.props.dispatch(setInfiniteSequencerField(id, 'isPlaying', false))}
+							>
+								◼
+							</div>
+						</div>
+						<div className="display">
+							{this.props.events.map((event, index) =>
+								<div key={index} className="event">
+									{midiNoteToNoteName(event.notes[0]) + getOctaveFromMidiNote(event.notes[0])}
+								</div>,
+							)}
+						</div>
+					</Panel>
+				</div>
 			</div>
 		)
 	}
@@ -53,6 +76,9 @@ export const ConnectedInfiniteSequencer = connect(
 		return {
 			events: infiniteSequencerState.events,
 			activeIndex: infiniteSequencerState.index,
+			isPlaying: infiniteSequencerState.isPlaying,
+			color: infiniteSequencerState.color,
+			name: infiniteSequencerState.name,
 		}
 	},
 )(InfiniteSequencer)
