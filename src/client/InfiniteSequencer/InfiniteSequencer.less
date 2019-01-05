@@ -1,0 +1,37 @@
+@import "../colors.less";
+
+.infiniteSequencer {
+	.panel {
+			width: 576px;
+
+		.controls {
+			width: 32px;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+
+		.display {
+			height: 56px;
+			display: flex;
+			flex-direction: row;
+			flex-grow: 1;
+
+			.event {
+				min-width: 48px;
+				width: 100%;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+
+				&:nth-child(odd) {
+					background-color: #31313d;
+				}
+
+				&:nth-child(even) {
+					background-color: #282832;
+				}
+			}
+		}
+	}
+}

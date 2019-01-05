@@ -7,7 +7,7 @@ import {MAX_MIDI_NOTE_NUMBER_127} from '../server-constants'
 import {colorFunc} from '../shamu-color'
 import {IClientRoomState} from './common-redux-types'
 import {
-	addMultiThing, createSelectAllOfThingAsArray, deleteThings, IMultiState,
+	addMultiThing, deleteThings, IMultiState,
 	IMultiStateThing, IMultiStateThings, makeMultiReducer, MultiThingType, updateThings,
 } from './multi-reducer'
 import {BROADCASTER_ACTION, NetworkActionType, SERVER_ACTION} from './redux-utils'
@@ -101,16 +101,8 @@ export class GridSequencerState implements IGridSequencerState {
 	constructor(name: string, events?: IGridSequencerEvent[]) {
 		this.name = name
 		this.color = colorFunc(hashbow(this.id)).desaturate(0.2).hsl().string()
-		this.events = events || [
-			{notes: []},
-			{notes: []},
-			{notes: []},
-			{notes: []},
-			{notes: []},
-			{notes: []},
-			{notes: []},
-			{notes: []},
-		]
+		this.events = events ||
+			[{notes: []}, {notes: []}, {notes: []}, {notes: []}, {notes: []}, {notes: []}, {notes: []}, {notes: []}]
 		const lowestNote = findLowestNote(this.events)
 		this.bottomNote = Math.min(MAX_MIDI_NOTE_NUMBER_127 - this.notesToShow, lowestNote)
 	}
@@ -147,7 +139,7 @@ export const gridSequencersReducer =
 	makeMultiReducer<IGridSequencerState, IGridSequencersState>(
 		gridSequencerReducer, MultiThingType.gridSequencer, gridSequencerActionTypes)
 
-export function gridSequencerReducer(gridSequencer: IGridSequencerState, action: AnyAction) {
+function gridSequencerReducer(gridSequencer: IGridSequencerState, action: AnyAction) {
 	switch (action.type) {
 		case SET_GRID_SEQUENCER_NOTE:
 			if (action.note === undefined) {

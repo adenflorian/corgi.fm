@@ -21,6 +21,7 @@ import {
 	deleteConnections, selectAllConnections, selectConnectionsWithSourceOrTargetIds, updateConnections,
 } from '../common/redux/connections-redux'
 import {selectAllGridSequencers, updateGridSequencers} from '../common/redux/grid-sequencers-redux'
+import {selectAllInfiniteSequencers, updateInfiniteSequencers} from '../common/redux/infinite-sequencers-redux'
 import {BROADCASTER_ACTION} from '../common/redux/redux-utils'
 import {
 	addRoomMember, deleteRoomMember, selectAllRoomMemberIds, selectRoomMemberState, setRoomMembers,
@@ -280,6 +281,7 @@ function syncState(newSocket: Socket, roomState: IClientRoomState, serverState: 
 		[updateBasicSamplers, selectAllSamplers],
 		[updateVirtualKeyboards, selectAllVirtualKeyboards],
 		[updateGridSequencers, selectAllGridSequencers],
+		[updateInfiniteSequencers, selectAllInfiniteSequencers],
 		[updateConnections, selectAllConnections],
 	]
 

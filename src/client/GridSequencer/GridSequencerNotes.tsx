@@ -78,7 +78,7 @@ export const GridSequencerNotes = (props: IGridSequencerNotesAllProps) => {
 	)
 }
 
-const mapSateToProps = (state: IClientAppState, props: IGridSequencerNotesProps): IGridSequencerNotesReduxProps => {
+const mapStateToProps = (state: IClientAppState, props: IGridSequencerNotesProps): IGridSequencerNotesReduxProps => {
 	const gridSequencerState = selectAllGridSequencers(state.room)[props.id]
 
 	return {
@@ -109,6 +109,6 @@ const mapDispatchToProps = (dispatch: Dispatch, {id}: IGridSequencerNotesProps):
 })
 
 export const GridSequencerNotesConnected = connect(
-	mapSateToProps,
+	mapStateToProps,
 	mapDispatchToProps,
 )(GridSequencerNotes)

@@ -7,6 +7,7 @@ import {IClientRoomState} from './common-redux-types'
 import {IServerState} from './configure-server-store'
 import {connectionsReducer} from './connections-redux'
 import {gridSequencersReducer} from './grid-sequencers-redux'
+import {infiniteSequencersReducer} from './infinite-sequencers-redux'
 import {roomMembersReducer} from './room-members-redux'
 import {CREATE_ROOM, DELETE_ROOM, RoomsReduxAction} from './rooms-redux'
 import {virtualKeyboardsReducer} from './virtual-keyboard-redux'
@@ -28,6 +29,7 @@ export const roomReducers = combineReducers<IClientRoomState>({
 	connections: connectionsReducer,
 	members: roomMembersReducer,
 	gridSequencers: gridSequencersReducer,
+	infiniteSequencers: infiniteSequencersReducer,
 	virtualKeyboards: virtualKeyboardsReducer,
 })
 

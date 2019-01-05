@@ -1,8 +1,10 @@
 import {Store} from 'redux'
 import {addBasicInstrument, BasicInstrumentState} from '../common/redux/basic-instruments-redux'
+import {addBasicSampler, BasicSamplerState} from '../common/redux/basic-sampler-redux'
 import {addClient, ClientState} from '../common/redux/clients-redux'
 import {addConnection, Connection, ConnectionSourceType, ConnectionTargetType} from '../common/redux/connections-redux'
 import {addGridSequencer, GridSequencerState} from '../common/redux/grid-sequencers-redux'
+import {addInfiniteSequencer, InfiniteSequencerState} from '../common/redux/infinite-sequencers-redux'
 import {createRoomAction} from '../common/redux/room-stores-redux'
 
 export function createServerStuff(room: string, serverStore: Store) {
@@ -39,17 +41,17 @@ export function createServerStuff(room: string, serverStore: Store) {
 		ConnectionTargetType.instrument,
 	)), room))
 
-	// const newInstrument3 = new BasicSamplerState(serverClient.id)
-	// serverStore.dispatch(createRoomAction(addBasicSampler(newInstrument3), room))
+	const newInstrument3 = new BasicSamplerState(serverClient.id)
+	serverStore.dispatch(createRoomAction(addBasicSampler(newInstrument3), room))
 
-	// const serverGridSequencer3 = new GridSequencerState('bass', getInitialGridSequencerEvents2())
-	// serverStore.dispatch(createRoomAction(addGridSequencer(serverGridSequencer3), room))
-	// serverStore.dispatch(createRoomAction(addConnection(new Connection(
-	// 	serverGridSequencer3.id,
-	// 	ConnectionSourceType.gridSequencer,
-	// 	newInstrument3.id,
-	// 	ConnectionTargetType.instrument,
-	// )), room))
+	const serverGridSequencer3 = new InfiniteSequencerState('arp')
+	serverStore.dispatch(createRoomAction(addInfiniteSequencer(serverGridSequencer3), room))
+	serverStore.dispatch(createRoomAction(addConnection(new Connection(
+		serverGridSequencer3.id,
+		ConnectionSourceType.infiniteSequencer,
+		newInstrument3.id,
+		ConnectionTargetType.sampler,
+	)), room))
 }
 
 function getInitialGridSequencerEvents() {

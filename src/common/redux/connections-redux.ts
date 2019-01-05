@@ -4,6 +4,7 @@ import * as uuid from 'uuid'
 import {logger} from '../logger'
 import {IClientRoomState} from './common-redux-types'
 import {selectAllGridSequencers} from './grid-sequencers-redux'
+import {selectAllInfiniteSequencers} from './infinite-sequencers-redux'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
 import {IVirtualKeyboardState, makeGetKeyboardMidiOutput, selectVirtualKeyboardById} from './virtual-keyboard-redux'
 
@@ -46,6 +47,7 @@ export const Connections = Map
 export enum ConnectionSourceType {
 	keyboard = 'keyboard',
 	gridSequencer = 'gridSequencer',
+	infiniteSequencer = 'infiniteSequencer',
 }
 
 export enum ConnectionTargetType {
@@ -152,9 +154,11 @@ export const selectConnectionSourceColor = (roomState: IClientRoomState, id: str
 			case ConnectionSourceType.gridSequencer:
 				const gridSequencer = selectAllGridSequencers(roomState)[connection.sourceId]
 				return gridSequencer ? gridSequencer.color : 'gray'
+			case ConnectionSourceType.infiniteSequencer:
+				const infiniteSequencer = selectAllInfiniteSequencers(roomState)[connection.sourceId]
+				return infiniteSequencer ? infiniteSequencer.color : 'gray'
 			default:
-				logger.warn('couldnt find source color (unsupported connection source type)')
-				return 'red'
+				throw new Error('couldnt find source color (unsupported connection source type)')
 		}
 	} else {
 		return 'gray'
@@ -185,8 +189,15 @@ export const selectConnectionSourceNotes = (state: IClientRoomState, id: string)
 			} else {
 				return emptyArray
 			}
+		case ConnectionSourceType.infiniteSequencer:
+			const infiniteSequencer = selectAllInfiniteSequencers(state)[connection.sourceId]
+			if (!infiniteSequencer) return emptyArray
+			if (infiniteSequencer.index >= 0 && infiniteSequencer.index < infiniteSequencer.events.length) {
+				return infiniteSequencer.events[infiniteSequencer.index].notes
+			} else {
+				return emptyArray
+			}
 		default:
-			logger.warn('couldnt find source notes (unsupported connection source type)')
-			return emptyArray
+			throw new Error('couldnt find source color (unsupported connection source type)')
 	}
 }

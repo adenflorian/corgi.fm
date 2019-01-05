@@ -6,7 +6,7 @@ export interface IPanelProps {
 }
 
 export const Panel = (props: IPanelProps) => (
-	<div id={props.id} className="container">
+	<div id={props.id} className="container panel">
 		<div className="isometricBoxShadow"></div>
 		{props.children}
 	</div>

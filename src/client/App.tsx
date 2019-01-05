@@ -5,10 +5,10 @@ import {selectIsLocalClientReady} from '../common/redux/clients-redux'
 import {IClientAppState} from '../common/redux/common-redux-types'
 import './App.less'
 import './css-reset.css'
+import {InfiniteSequencer} from './InfiniteSequencer/InfiniteSequencer'
 import {isLocalDevClient} from './is-prod-client'
 import {ConnectedOnlineApp} from './OnlineApp'
 import {Options} from './Options/Options'
-import {SimpleSequencer} from './SimpleSequencer/SimpleSequencer'
 
 interface IAppProps {
 	isLocalClientReady: boolean
@@ -21,7 +21,7 @@ class App extends React.Component<IAppProps, {}> {
 		if (isLocalDevClient()) {
 			switch (window.location.pathname.replace('/', '')) {
 				case 'options': return <Options />
-				case 'simpleSequencer': return <SimpleSequencer />
+				case 'infiniteSequencer': return <InfiniteSequencer />
 			}
 		}
 
