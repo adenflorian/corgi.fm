@@ -2,35 +2,38 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 import {IClientAppState} from '../../common/redux/common-redux-types'
-import {ITrackEvent, selectTrack, setTrackBottomNote, setTrackNote} from '../../common/redux/tracks-redux'
+import {
+	IGridSequencerEvent, selectGridSequencer, setGridSequencerBottomNote, setGridSequencerNote,
+} from '../../common/redux/grid-sequencers-redux'
 import {MAX_MIDI_NOTE_NUMBER_127, MIN_MIDI_NOTE_NUMBER_0} from '../../common/server-constants'
 import {isWhiteKey} from '../Keyboard/Keyboard'
 import {VerticalScrollBar} from '../Knob/VerticalScrollBar'
 import {isLeftMouseButtonDown} from '../utils'
 
-type trackEventHandler = (index: number, isEnabled: boolean, i2: number, e: React.MouseEvent) => void
+type gridSequencerEventHandler = (index: number, isEnabled: boolean, i2: number, e: React.MouseEvent) => void
 
-interface ITrackNotesProps {
+interface IGridSequencerNotesProps {
 	id: string
 }
 
-interface ITrackNotesReduxProps {
-	events: ITrackEvent[]
+interface IGridSequencerNotesReduxProps {
+	events: IGridSequencerEvent[]
 	activeIndex: number
 	bottomNote: number
 	notesToShow: number
 }
 
-interface ITrackNotesDispatchProps {
-	handleNoteClicked: trackEventHandler
-	handleMouseEnter: trackEventHandler
-	handleMouseDown: trackEventHandler
+interface IGridSequencerNotesDispatchProps {
+	handleNoteClicked: gridSequencerEventHandler
+	handleMouseEnter: gridSequencerEventHandler
+	handleMouseDown: gridSequencerEventHandler
 	handleScrollChange: (newValue: number) => void
 }
 
-type ITrackNotesAllProps = ITrackNotesProps & ITrackNotesReduxProps & ITrackNotesDispatchProps
+type IGridSequencerNotesAllProps =
+	IGridSequencerNotesProps & IGridSequencerNotesReduxProps & IGridSequencerNotesDispatchProps
 
-export const TrackNotes = (props: ITrackNotesAllProps) => {
+export const GridSequencerNotes = (props: IGridSequencerNotesAllProps) => {
 	const {activeIndex, bottomNote, events, handleNoteClicked,
 		handleMouseEnter, handleMouseDown, notesToShow, handleScrollChange} = props
 
@@ -75,37 +78,37 @@ export const TrackNotes = (props: ITrackNotesAllProps) => {
 	)
 }
 
-const mapSateToProps = (state: IClientAppState, props: ITrackNotesProps): ITrackNotesReduxProps => {
-	const trackState = selectTrack(state.room, props.id)
+const mapSateToProps = (state: IClientAppState, props: IGridSequencerNotesProps): IGridSequencerNotesReduxProps => {
+	const gridSequencerState = selectGridSequencer(state.room, props.id)
 
 	return {
-		events: trackState.events,
-		activeIndex: trackState.index,
-		bottomNote: trackState.bottomNote,
-		notesToShow: trackState.notesToShow,
+		events: gridSequencerState.events,
+		activeIndex: gridSequencerState.index,
+		bottomNote: gridSequencerState.bottomNote,
+		notesToShow: gridSequencerState.notesToShow,
 	}
 }
 
-const mapDispatchToProps = (dispatch: Dispatch, {id}: ITrackNotesProps): ITrackNotesDispatchProps => ({
+const mapDispatchToProps = (dispatch: Dispatch, {id}: IGridSequencerNotesProps): IGridSequencerNotesDispatchProps => ({
 	handleNoteClicked: (index, isEnabled, noteNumber) => {
-		dispatch(setTrackNote(id, index, !isEnabled, noteNumber))
+		dispatch(setGridSequencerNote(id, index, !isEnabled, noteNumber))
 	},
 	handleMouseEnter: (index, isEnabled, noteNumber, e) => {
 		if (e.ctrlKey && isEnabled === true && isLeftMouseButtonDown(e.buttons)) {
-			dispatch(setTrackNote(id, index, false, noteNumber))
+			dispatch(setGridSequencerNote(id, index, false, noteNumber))
 		}
 	},
 	handleMouseDown: (index, isEnabled, noteNumber, e) => {
 		if (e.ctrlKey && isEnabled === true && isLeftMouseButtonDown(e.buttons)) {
-			dispatch(setTrackNote(id, index, false, noteNumber))
+			dispatch(setGridSequencerNote(id, index, false, noteNumber))
 		}
 	},
 	handleScrollChange: newValue => {
-		dispatch(setTrackBottomNote(id, Math.round(newValue)))
+		dispatch(setGridSequencerBottomNote(id, Math.round(newValue)))
 	},
 })
 
-export const TrackNotesConnected = connect(
+export const GridSequencerNotesConnected = connect(
 	mapSateToProps,
 	mapDispatchToProps,
-)(TrackNotes)
+)(GridSequencerNotes)

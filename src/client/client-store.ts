@@ -6,11 +6,11 @@ import {audioReducer} from '../common/redux/audio-redux'
 import {clientsReducer} from '../common/redux/clients-redux'
 import {IClientAppState} from '../common/redux/common-redux-types'
 import {complexObjectsReducer} from '../common/redux/complex-objects-redux'
+import {createGridSequencerPlayerMiddleware} from '../common/redux/grid-sequencer-player-middleware'
 import {localMiddleware} from '../common/redux/local-middleware'
 import {optionsReducer} from '../common/redux/options-redux'
 import {roomReducers} from '../common/redux/room-stores-redux'
 import {roomsReducer} from '../common/redux/rooms-redux'
-import {createTrackPlayerMiddleware} from '../common/redux/track-player-middleware'
 import {websocketSenderMiddleware} from '../common/redux/websocket-client-sender-middleware'
 import {websocketReducer} from '../common/redux/websocket-redux'
 
@@ -35,7 +35,7 @@ export function configureStore(initialState: IClientAppState | any = {}, audioCo
 		composeEnhancers(
 			applyMiddleware(
 				localMiddleware,
-				createTrackPlayerMiddleware(audioContext),
+				createGridSequencerPlayerMiddleware(audioContext),
 				websocketSenderMiddleware,
 			),
 			persistState('options'),

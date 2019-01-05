@@ -6,9 +6,9 @@ import {chatReducer} from './chat-redux'
 import {IClientRoomState} from './common-redux-types'
 import {IServerState} from './configure-server-store'
 import {connectionsReducer} from './connections-redux'
+import {gridSequencersReducer} from './grid-sequencers-redux'
 import {roomMembersReducer} from './room-members-redux'
 import {CREATE_ROOM, DELETE_ROOM, RoomsReduxAction} from './rooms-redux'
-import {tracksReducer} from './tracks-redux'
 import {virtualKeyboardsReducer} from './virtual-keyboard-redux'
 
 export const ROOM_ACTION = 'ROOM_ACTION'
@@ -27,7 +27,7 @@ export const roomReducers = combineReducers<IClientRoomState>({
 	chat: chatReducer,
 	connections: connectionsReducer,
 	members: roomMembersReducer,
-	tracks: tracksReducer,
+	gridSequencers: gridSequencersReducer,
 	virtualKeyboards: virtualKeyboardsReducer,
 })
 

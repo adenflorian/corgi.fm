@@ -20,6 +20,7 @@ import {IServerState} from '../common/redux/configure-server-store'
 import {
 	deleteConnections, selectAllConnections, selectConnectionsWithSourceOrTargetIds, updateConnections,
 } from '../common/redux/connections-redux'
+import {selectAllGridSequencers, updateGridSequencers} from '../common/redux/grid-sequencers-redux'
 import {BROADCASTER_ACTION} from '../common/redux/redux-utils'
 import {
 	addRoomMember, deleteRoomMember, selectAllRoomMemberIds, selectRoomMemberState, setRoomMembers,
@@ -31,7 +32,6 @@ import {
 	CHANGE_ROOM, createRoom, deleteRoom, REQUEST_CREATE_ROOM,
 	selectAllRoomNames, selectRoomExists, setActiveRoom, setRooms,
 } from '../common/redux/rooms-redux'
-import {selectAllTracks, updateTracks} from '../common/redux/tracks-redux'
 import {
 	deleteVirtualKeyboards, selectAllVirtualKeyboards, selectVirtualKeyboardsByOwner, updateVirtualKeyboards,
 } from '../common/redux/virtual-keyboard-redux'
@@ -279,7 +279,7 @@ function syncState(newSocket: Socket, roomState: IClientRoomState, serverState: 
 		[updateBasicInstruments, selectAllInstruments],
 		[updateBasicSamplers, selectAllSamplers],
 		[updateVirtualKeyboards, selectAllVirtualKeyboards],
-		[updateTracks, selectAllTracks],
+		[updateGridSequencers, selectAllGridSequencers],
 		[updateConnections, selectAllConnections],
 	]
 

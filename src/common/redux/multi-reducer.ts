@@ -14,7 +14,7 @@ export interface IMultiStateThing {
 
 export enum MultiThingType {
 	virtualKeyboard,
-	track,
+	gridSequencer,
 	basicInstrument,
 	basicSampler,
 }

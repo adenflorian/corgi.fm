@@ -3,8 +3,8 @@ import {AnyAction} from 'redux'
 import * as uuid from 'uuid'
 import {logger} from '../logger'
 import {IClientRoomState} from './common-redux-types'
+import {selectGridSequencer} from './grid-sequencers-redux'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
-import {selectTrack} from './tracks-redux'
 import {IVirtualKeyboardState, makeGetKeyboardMidiOutput, selectVirtualKeyboardById} from './virtual-keyboard-redux'
 
 export const ADD_CONNECTION = 'ADD_CONNECTION'
@@ -45,7 +45,7 @@ export const Connections = Map
 
 export enum ConnectionSourceType {
 	keyboard = 'keyboard',
-	track = 'track',
+	gridSequencer = 'gridSequencer',
 }
 
 export enum ConnectionTargetType {
@@ -149,9 +149,9 @@ export const selectConnectionSourceColor = (state: IClientRoomState, id: string)
 			case ConnectionSourceType.keyboard:
 				const virtualKeyboard = selectVirtualKeyboardById(state, connection.sourceId)
 				return virtualKeyboard && virtualKeyboard.color
-			case ConnectionSourceType.track:
-				const track = selectTrack(state, connection.sourceId)
-				return track ? track.color : 'gray'
+			case ConnectionSourceType.gridSequencer:
+				const gridSequencer = selectGridSequencer(state, connection.sourceId)
+				return gridSequencer ? gridSequencer.color : 'gray'
 			default:
 				logger.warn('couldnt find source color (unsupported connection source type)')
 				return 'red'
@@ -177,11 +177,11 @@ export const selectConnectionSourceNotes = (state: IClientRoomState, id: string)
 	switch (connection.sourceType) {
 		case ConnectionSourceType.keyboard:
 			return getKeyboardMidiOutput(state, connection.sourceId)
-		case ConnectionSourceType.track:
-			const track = selectTrack(state, connection.sourceId)
-			if (!track) return emptyArray
-			if (track.index >= 0 && track.index < track.events.length) {
-				return track.events[track.index].notes
+		case ConnectionSourceType.gridSequencer:
+			const gridSequencer = selectGridSequencer(state, connection.sourceId)
+			if (!gridSequencer) return emptyArray
+			if (gridSequencer.index >= 0 && gridSequencer.index < gridSequencer.events.length) {
+				return gridSequencer.events[gridSequencer.index].notes
 			} else {
 				return emptyArray
 			}

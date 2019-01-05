@@ -25,7 +25,7 @@ export const localMidiOctaveChange = makeActionCreator(LOCAL_MIDI_OCTAVE_CHANGE,
 
 export function deleteAllTheThings(dispatch: Dispatch) {
 	dispatch(deleteAllConnections())
-	dispatch(deleteAllThings(MultiThingType.track))
+	dispatch(deleteAllThings(MultiThingType.gridSequencer))
 	dispatch(deleteAllThings(MultiThingType.virtualKeyboard))
 	dispatch(deleteAllThings(MultiThingType.basicInstrument))
 	dispatch(deleteAllThings(MultiThingType.basicSampler))

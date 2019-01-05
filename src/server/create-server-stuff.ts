@@ -2,8 +2,8 @@ import {Store} from 'redux'
 import {addBasicInstrument, BasicInstrumentState} from '../common/redux/basic-instruments-redux'
 import {addClient, ClientState} from '../common/redux/clients-redux'
 import {addConnection, Connection, ConnectionSourceType, ConnectionTargetType} from '../common/redux/connections-redux'
+import {addGridSequencer, GridSequencerState} from '../common/redux/grid-sequencers-redux'
 import {createRoomAction} from '../common/redux/room-stores-redux'
-import {addTrack, TrackState} from '../common/redux/tracks-redux'
 
 export function createServerStuff(room: string, serverStore: Store) {
 	const serverClient = ClientState.createServerClient()
@@ -13,11 +13,11 @@ export function createServerStuff(room: string, serverStore: Store) {
 	const newInstrument = new BasicInstrumentState(serverClient.id)
 	serverStore.dispatch(createRoomAction(addBasicInstrument(newInstrument), room))
 
-	const serverTrack = new TrackState('melody', getInitialTrackEvents())
-	serverStore.dispatch(createRoomAction(addTrack(serverTrack), room))
+	const serverGridSequencer = new GridSequencerState('melody', getInitialGridSequencerEvents())
+	serverStore.dispatch(createRoomAction(addGridSequencer(serverGridSequencer), room))
 	serverStore.dispatch(createRoomAction(addConnection(new Connection(
-		serverTrack.id,
-		ConnectionSourceType.track,
+		serverGridSequencer.id,
+		ConnectionSourceType.gridSequencer,
 		newInstrument.id,
 		ConnectionTargetType.instrument,
 	)), room))
@@ -30,17 +30,29 @@ export function createServerStuff(room: string, serverStore: Store) {
 	const newInstrument2 = new BasicInstrumentState(serverClient.id)
 	serverStore.dispatch(createRoomAction(addBasicInstrument(newInstrument2), room))
 
-	const serverTrack2 = new TrackState('bass', getInitialTrackEvents2())
-	serverStore.dispatch(createRoomAction(addTrack(serverTrack2), room))
+	const serverGridSequencer2 = new GridSequencerState('bass', getInitialGridSequencerEvents2())
+	serverStore.dispatch(createRoomAction(addGridSequencer(serverGridSequencer2), room))
 	serverStore.dispatch(createRoomAction(addConnection(new Connection(
-		serverTrack2.id,
-		ConnectionSourceType.track,
+		serverGridSequencer2.id,
+		ConnectionSourceType.gridSequencer,
 		newInstrument2.id,
 		ConnectionTargetType.instrument,
 	)), room))
+
+	// const newInstrument3 = new BasicSamplerState(serverClient.id)
+	// serverStore.dispatch(createRoomAction(addBasicSampler(newInstrument3), room))
+
+	// const serverGridSequencer3 = new GridSequencerState('bass', getInitialGridSequencerEvents2())
+	// serverStore.dispatch(createRoomAction(addGridSequencer(serverGridSequencer3), room))
+	// serverStore.dispatch(createRoomAction(addConnection(new Connection(
+	// 	serverGridSequencer3.id,
+	// 	ConnectionSourceType.gridSequencer,
+	// 	newInstrument3.id,
+	// 	ConnectionTargetType.instrument,
+	// )), room))
 }
 
-function getInitialTrackEvents() {
+function getInitialGridSequencerEvents() {
 	return [
 		{notes: [49]},
 		{notes: [63, 58]},
@@ -61,6 +73,6 @@ function getInitialTrackEvents() {
 	]
 }
 
-function getInitialTrackEvents2() {
+function getInitialGridSequencerEvents2() {
 	return new Array(32).fill({notes: []})
 }

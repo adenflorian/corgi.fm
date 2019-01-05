@@ -1,26 +1,26 @@
 import {IMidiNote} from '../common/MidiNote'
 
-export enum SimpleTrackEventAction {
+export enum SimpleGridSequencerEventAction {
 	playNote,
 	stopNote,
-	endTrack,
+	endGridSequencer,
 }
 
-export interface ISimpleTrackEvent {
+export interface ISimpleGridSequencerEvent {
 	time: number
-	action: SimpleTrackEventAction
+	action: SimpleGridSequencerEventAction
 	notes?: IMidiNote[]
 }
 
 export type IndexChangeHandler = (newIndex: number) => any
 
-export class TrackPlayer {
+export class GridSequencerPlayer {
 	private readonly _audioContext: AudioContext
 	private _index: number = 0
 	private _startTime: number
 	private _isPlaying: boolean = false
 	private readonly _onIndexChange: IndexChangeHandler
-	private _trackLength = 0
+	private _gridSequencerLength = 0
 
 	constructor(audioContext: AudioContext, onIndexChange: IndexChangeHandler) {
 		this._audioContext = audioContext
@@ -28,11 +28,11 @@ export class TrackPlayer {
 		this._startTime = this._audioContext.currentTime
 	}
 
-	public play = (trackLength: number) => {
+	public play = (gridSequencerLength: number) => {
 		if (this.isPlaying()) return
 		this._startTime = this._audioContext.currentTime
 		this._isPlaying = true
-		this._trackLength = trackLength
+		this._gridSequencerLength = gridSequencerLength
 		window.requestAnimationFrame(this._onTick)
 	}
 
@@ -62,7 +62,7 @@ export class TrackPlayer {
 		const newIndex = Math.floor(this.getCurrentPlayTime() * 5)
 
 		if (newIndex !== this._index) {
-			if (newIndex >= this._trackLength) {
+			if (newIndex >= this._gridSequencerLength) {
 				this._index = 0
 				this._startTime = this._audioContext.currentTime
 			} else {

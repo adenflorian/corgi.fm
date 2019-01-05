@@ -8,6 +8,7 @@ import './css-reset.css'
 import {isLocalDevClient} from './is-prod-client'
 import {ConnectedOnlineApp} from './OnlineApp'
 import {Options} from './Options/Options'
+import {SimpleSequencer} from './SimpleSequencer/SimpleSequencer'
 
 interface IAppProps {
 	isLocalClientReady: boolean
@@ -18,8 +19,9 @@ class App extends React.Component<IAppProps, {}> {
 		const {isLocalClientReady} = this.props
 
 		if (isLocalDevClient()) {
-			if (window.location.pathname === '/options') {
-				return <Options />
+			switch (window.location.pathname.replace('/', '')) {
+				case 'options': return <Options />
+				case 'simpleSequencer': return <SimpleSequencer />
 			}
 		}
 

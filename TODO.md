@@ -10,7 +10,7 @@
 - [√] allow two different notes at once
 - [√] setup redux for server
 - [√] have server keep track of play status
-- [ ] store index of simpleTrack on server for new clients
+- [ ] store index of simpleGridSequencer on server for new clients
 - [√] need way to bypass virtual keyboard
 - [ ] fine grained note start times and lengths
 - [√] don't unnecessarily change osc freq when diff notes are set
@@ -63,6 +63,9 @@
 - [ ] turn off audio after 30 minutes and show dialog asking if user is still there
 - [ ] velocity
 - [ ] download an open source font
+- [ ] Define purpose/goals/mission of this app
+	- collaboration
+	- learning?
 
 # Sampler
 - [ ] presentation
@@ -85,13 +88,14 @@
 - [ ] Allow for arc to go both directions
 	- like a pan knob, when centered should have no arc, and arc can go left or right from center
 
-# Track
+# GridSequencer
 - [ ] make size adjustable
 	- drop down with size options?
 - [ ] global play button
 - [ ] click and drag midi to ableton from shamu
+- [ ] input notes from keyboard
 
-## Track Scroll Bar
+## GridSequencer Scroll Bar
 - [ ] make slider stay with mouse 1:1
 - [√] mini map
 
@@ -177,6 +181,7 @@
 - [...] options view
 - [...] better pointer
 - [...] favicon (better icon?)
+- [ ] feedback button
 
 # Ballad
 - [ ] login system

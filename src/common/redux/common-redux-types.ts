@@ -5,10 +5,10 @@ import {IChatState} from './chat-redux'
 import {IClientsState} from './clients-redux'
 import {IComplexObjectsState} from './complex-objects-redux'
 import {IConnectionsState} from './connections-redux'
+import {IGridSequencersState} from './grid-sequencers-redux'
 import {IOptionsState} from './options-redux'
 import {IRoomMembersState} from './room-members-redux'
 import {IRoomsState} from './rooms-redux'
-import {ITracksState} from './tracks-redux'
 import {IVirtualKeyboardsState} from './virtual-keyboard-redux'
 import {IWebsocketState} from './websocket-redux'
 
@@ -28,6 +28,6 @@ export interface IClientRoomState {
 	chat: IChatState
 	connections: IConnectionsState
 	members: IRoomMembersState
-	tracks: ITracksState
+	gridSequencers: IGridSequencersState
 	virtualKeyboards: IVirtualKeyboardsState
 }

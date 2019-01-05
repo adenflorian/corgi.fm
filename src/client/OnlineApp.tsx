@@ -5,21 +5,21 @@ import {selectAllBasicInstrumentIds} from '../common/redux/basic-instruments-red
 import {IClientState, selectClientCount, selectLocalClient} from '../common/redux/clients-redux'
 import {IClientAppState} from '../common/redux/common-redux-types'
 import {ConnectionTargetType, IConnection, selectAllConnectionsAsArray} from '../common/redux/connections-redux'
+import {selectAllGridSequencerIds} from '../common/redux/grid-sequencers-redux'
 import {selectMemberCount} from '../common/redux/room-members-redux'
-import {selectAllTrackIds} from '../common/redux/tracks-redux'
 import {selectAllVirtualKeyboardIds} from '../common/redux/virtual-keyboard-redux'
 import {getColorHslByHex} from '../common/shamu-color'
 import {ConnectedBasicSampler} from './BasicSampler/BasicSampler'
 import {Button} from './Button/Button'
 import {ConnectedChat} from './Chat'
 import {ConnectionsContainer} from './Connections/Connections'
+import {ConnectedGridSequencerContainer} from './GridSequencer/GridSequencerContainer'
 import {ConnectedBasicInstrumentView} from './Instruments/BasicInstrumentView'
 import {ConnectedKeyboard} from './Keyboard/Keyboard'
 import {MousePointers} from './MousePointers'
-import {ConnectedOption} from './Option'
 import {Options} from './Options/Options'
 import {ConnectedRoomSelector} from './RoomSelector'
-import {ConnectedTrackContainer} from './Track/TrackContainer'
+import {SimpleSequencer} from './SimpleSequencer/SimpleSequencer'
 import {ConnectedVolumeControl} from './Volume/VolumeControl'
 
 interface IOnlineAppProps {
@@ -30,11 +30,11 @@ interface IOnlineAppProps {
 	keyboardIds: string[]
 	memberCount: number
 	myClient: IClientState
-	trackIds: string[]
+	gridSequencerIds: string[]
 }
 
-const TRACK_1_BASE_COLOR = '#4077bf'
-const MASTER_VOLUME_COLOR = getColorHslByHex(TRACK_1_BASE_COLOR)
+const GRID_SEQUENCER_1_BASE_COLOR = '#4077bf'
+const MASTER_VOLUME_COLOR = getColorHslByHex(GRID_SEQUENCER_1_BASE_COLOR)
 
 export const mainBoardsId = 'mainBoards'
 
@@ -73,6 +73,11 @@ class OnlineApp extends React.Component<IOnlineAppProps> {
 									<ConnectedVolumeControl color={MASTER_VOLUME_COLOR} />
 								</div>
 							</div>
+							<div className="boardRow">
+								<div className="board connected">
+									<SimpleSequencer />
+								</div>
+							</div>
 							{this.props.connections
 								.sort(sortConnection)
 								.map(connection => {
@@ -83,8 +88,8 @@ class OnlineApp extends React.Component<IOnlineAppProps> {
 												className="board connected"
 											>
 												{
-													connection.sourceType === 'track'
-														? <ConnectedTrackContainer id={connection.sourceId} />
+													connection.sourceType === 'gridSequencer'
+														? <ConnectedGridSequencerContainer id={connection.sourceId} />
 														: <ConnectedKeyboard id={connection.sourceId} />
 												}
 											</div>
@@ -123,7 +128,7 @@ class OnlineApp extends React.Component<IOnlineAppProps> {
 
 function sortConnection(connA: IConnection, connB: IConnection) {
 	if (connA.sourceType !== connB.sourceType) {
-		return connA.sourceType === 'track' ? -1 : 1
+		return connA.sourceType === 'gridSequencer' ? -1 : 1
 	} else {
 		return 0
 	}
@@ -135,7 +140,7 @@ const mapStateToProps = (state: IClientAppState): IOnlineAppProps => ({
 	info: state.websocket.info,
 	keyboardIds: selectAllVirtualKeyboardIds(state.room),
 	instrumentIds: selectAllBasicInstrumentIds(state.room),
-	trackIds: selectAllTrackIds(state.room),
+	gridSequencerIds: selectAllGridSequencerIds(state.room),
 	connections: selectAllConnectionsAsArray(state.room),
 	memberCount: selectMemberCount(state.room),
 })
