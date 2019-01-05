@@ -5,7 +5,6 @@ import {actionsBlacklist} from '../common/common-constants'
 import {audioReducer} from '../common/redux/audio-redux'
 import {clientsReducer} from '../common/redux/clients-redux'
 import {IClientAppState} from '../common/redux/common-redux-types'
-import {complexObjectsReducer} from '../common/redux/complex-objects-redux'
 import {createGridSequencerPlayerMiddleware} from '../common/redux/grid-sequencer-player-middleware'
 import {localMiddleware} from '../common/redux/local-middleware'
 import {optionsReducer} from '../common/redux/options-redux'
@@ -18,14 +17,13 @@ const composeEnhancers = composeWithDevTools({
 	actionsBlacklist,
 })
 
-export function configureStore(initialState: IClientAppState | any = {}, audioContext: AudioContext)
+export function configureStore(initialState: IClientAppState | any = {})
 	: Store<IClientAppState> {
 
 	return createStore(
 		combineReducers({
 			audio: audioReducer,
 			clients: clientsReducer,
-			complexObjects: complexObjectsReducer,
 			options: optionsReducer,
 			rooms: roomsReducer,
 			websocket: websocketReducer,
@@ -35,7 +33,7 @@ export function configureStore(initialState: IClientAppState | any = {}, audioCo
 		composeEnhancers(
 			applyMiddleware(
 				localMiddleware,
-				createGridSequencerPlayerMiddleware(audioContext),
+				createGridSequencerPlayerMiddleware(),
 				websocketSenderMiddleware,
 			),
 			persistState('options'),

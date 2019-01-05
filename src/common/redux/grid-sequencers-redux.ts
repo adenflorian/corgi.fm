@@ -6,7 +6,6 @@ import {addIfNew} from '../server-common'
 import {MAX_MIDI_NOTE_NUMBER_127} from '../server-constants'
 import {colorFunc} from '../shamu-color'
 import {IClientRoomState} from './common-redux-types'
-import {PLAY_GRID_SEQUENCER, STOP_GRID_SEQUENCER} from './grid-sequencer-player-middleware'
 import {
 	addMultiThing, deleteThings, IMultiState, IMultiStateThing,
 	IMultiStateThings, makeMultiReducer, MultiThingType, updateThings,
@@ -75,6 +74,30 @@ export const setGridSequencerBottomNote = (id: string, bottomNote: number) => {
 		BROADCASTER_ACTION,
 	}
 }
+
+export const PLAY_GRID_SEQUENCER = 'PLAY_GRID_SEQUENCER'
+export const playGridSequencer = (id: string) => ({
+	type: PLAY_GRID_SEQUENCER,
+	id,
+	SERVER_ACTION,
+	BROADCASTER_ACTION,
+})
+
+export const STOP_GRID_SEQUENCER = 'STOP_GRID_SEQUENCER'
+export const stopGridSequencer = (id: string) => ({
+	type: STOP_GRID_SEQUENCER,
+	id,
+	SERVER_ACTION,
+	BROADCASTER_ACTION,
+})
+
+export const RESTART_GRID_SEQUENCER = 'RESTART_GRID_SEQUENCER'
+export const restartGridSequencer = (id: string) => ({
+	type: RESTART_GRID_SEQUENCER,
+	id,
+	SERVER_ACTION,
+	BROADCASTER_ACTION,
+})
 
 export const EXPORT_GRID_SEQUENCER_MIDI = 'EXPORT_GRID_SEQUENCER_MIDI'
 export type ExportGridSequencerMidiAction = ReturnType<typeof exportGridSequencerMidi>

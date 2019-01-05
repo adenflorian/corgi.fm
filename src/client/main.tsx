@@ -50,7 +50,7 @@ async function setupAsync() {
 	const audioContext = new AudioContext()
 	const preFx = audioContext.createGain()
 
-	const store = configureStore(getInitialReduxState(), audioContext)
+	const store = configureStore(getInitialReduxState())
 
 	setupAudioContext(audioContext, preFx, store)
 

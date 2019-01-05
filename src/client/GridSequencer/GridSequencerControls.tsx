@@ -2,9 +2,8 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 import {
-	playGridSequencer, restartGridSequencer, stopGridSequencer,
-} from '../../common/redux/grid-sequencer-player-middleware'
-import {exportGridSequencerMidi} from '../../common/redux/grid-sequencers-redux'
+	exportGridSequencerMidi, playGridSequencer, stopGridSequencer,
+} from '../../common/redux/grid-sequencers-redux'
 import {isProdClient} from '../is-prod-client'
 
 interface IGridSequencerControlsProps {
@@ -26,12 +25,13 @@ export const GridSequencerControls = (props: IGridSequencerControlsProps & {disp
 			>
 				◼
 			</div>
-			<div
+			{/* Commented out until it can be implemented with new sequencer player code */}
+			{/* <div
 				className="restart colorTransition"
 				onClick={() => props.dispatch(restartGridSequencer(props.id))}
 			>
 				↻
-			</div>
+			</div> */}
 			{isProdClient() === false &&
 				<div
 					className="export colorTransition"

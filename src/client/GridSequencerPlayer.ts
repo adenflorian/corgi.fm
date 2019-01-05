@@ -42,13 +42,9 @@ export class GridSequencerPlayer {
 		this._onIndexChange(-1)
 	}
 
-	public getCurrentPlayTime() {
-		return this._audioContext.currentTime - this._startTime
-	}
+	public getCurrentPlayTime = () => this._audioContext.currentTime - this._startTime
 
-	public isPlaying(): boolean {
-		return this._isPlaying
-	}
+	public isPlaying = () => this._isPlaying
 
 	private readonly _onTick = () => {
 		this._doTick()
@@ -58,7 +54,7 @@ export class GridSequencerPlayer {
 		}
 	}
 
-	private _doTick() {
+	private _doTick = () => {
 		const newIndex = Math.floor(this.getCurrentPlayTime() * 5)
 
 		if (newIndex !== this._index) {

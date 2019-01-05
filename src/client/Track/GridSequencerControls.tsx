@@ -2,9 +2,8 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 import {
-	playGridSequencer, restartGridSequencer, stopGridSequencer,
-} from '../../common/redux/grid-sequencer-player-middleware'
-import {exportGridSequencerMidi} from '../../common/redux/grid-sequencers-redux'
+	exportGridSequencerMidi, playGridSequencer, restartGridSequencer, stopGridSequencer,
+} from '../../common/redux/grid-sequencers-redux'
 import {isProdClient} from '../is-prod-client'
 
 interface IGridSequencerControlsProps {
