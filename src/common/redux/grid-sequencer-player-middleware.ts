@@ -3,7 +3,7 @@ import * as MidiWriter from 'midi-writer-js'
 import {Dispatch, Middleware, MiddlewareAPI} from 'redux'
 import {IClientAppState} from './common-redux-types'
 import {
-	EXPORT_GRID_SEQUENCER_MIDI, ExportGridSequencerMidiAction, selectAllGridSequencers,
+	EXPORT_SEQUENCER_MIDI, ExportSequencerMidiAction, selectAllGridSequencers, selectAllSequencers,
 } from './grid-sequencers-redux'
 
 export const createGridSequencerPlayerMiddleware = () => {
@@ -12,20 +12,22 @@ export const createGridSequencerPlayerMiddleware = () => {
 		next(action)
 
 		switch (action.type) {
-			case EXPORT_GRID_SEQUENCER_MIDI:
-				return exportGridSequencerMidi(action, next, store)
+			case EXPORT_SEQUENCER_MIDI:
+				return exportSequencerMidi(action, next, store)
 		}
 	}
 
 	return gridSequencerPlayerMiddleware
 }
 
-function exportGridSequencerMidi(
-	action: ExportGridSequencerMidiAction, next: Dispatch, store: MiddlewareAPI<Dispatch, IClientAppState>,
+function exportSequencerMidi(
+	action: ExportSequencerMidiAction, next: Dispatch, store: MiddlewareAPI<Dispatch, IClientAppState>,
 ) {
 	const roomState = store.getState().room
 
-	const events = selectAllGridSequencers(roomState)[action.gridSequencerId].events
+	const sequencer = selectAllSequencers(roomState)[action.sequencerId]
+
+	const events = sequencer.events
 
 	const midiGridSequencer = new MidiWriter.Track()
 
@@ -54,5 +56,5 @@ function exportGridSequencerMidi(
 
 	const write = new MidiWriter.Writer([midiGridSequencer])
 
-	saveAs(write.dataUri(), selectAllGridSequencers(roomState)[action.gridSequencerId].name + '.mid')
+	saveAs(write.dataUri(), sequencer.name + '.mid')
 }

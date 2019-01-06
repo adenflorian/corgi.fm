@@ -47,13 +47,6 @@ export const restartInfiniteSequencer = (id: string) => ({
 	BROADCASTER_ACTION,
 })
 
-export const EXPORT_INFINITE_SEQUENCER_MIDI = 'EXPORT_INFINITE_SEQUENCER_MIDI'
-export type ExportInfiniteSequencerMidiAction = ReturnType<typeof exportInfiniteSequencerMidi>
-export const exportInfiniteSequencerMidi = (infiniteSequencerId: string) => ({
-	type: EXPORT_INFINITE_SEQUENCER_MIDI,
-	infiniteSequencerId,
-})
-
 export const SET_INFINITE_SEQUENCER_FIELD = 'SET_INFINITE_SEQUENCER_FIELD'
 export type SetInfiniteSequencerField = ReturnType<typeof setInfiniteSequencerField>
 export const setInfiniteSequencerField =

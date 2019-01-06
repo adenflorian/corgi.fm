@@ -46,11 +46,11 @@ export const restartGridSequencer = (id: string) => ({
 	BROADCASTER_ACTION,
 })
 
-export const EXPORT_GRID_SEQUENCER_MIDI = 'EXPORT_GRID_SEQUENCER_MIDI'
-export type ExportGridSequencerMidiAction = ReturnType<typeof exportGridSequencerMidi>
-export const exportGridSequencerMidi = (gridSequencerId: string) => ({
-	type: EXPORT_GRID_SEQUENCER_MIDI,
-	gridSequencerId,
+export const EXPORT_SEQUENCER_MIDI = 'EXPORT_SEQUENCER_MIDI'
+export type ExportSequencerMidiAction = ReturnType<typeof exportSequencerMidi>
+export const exportSequencerMidi = (sequencerId: string) => ({
+	type: EXPORT_SEQUENCER_MIDI,
+	sequencerId,
 })
 
 export const SET_GRID_SEQUENCER_FIELD = 'SET_GRID_SEQUENCER_FIELD'
@@ -182,3 +182,8 @@ function gridSequencerReducer(gridSequencer: IGridSequencerState, action: AnyAct
 }
 
 export const selectAllGridSequencers = (state: IClientRoomState) => state.gridSequencers.things
+
+export const selectAllSequencers = (state: IClientRoomState) => ({
+	...state.gridSequencers.things,
+	...state.infiniteSequencers.things,
+})

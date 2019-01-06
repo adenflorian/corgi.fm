@@ -3,7 +3,7 @@ import {Component} from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 import {IClientAppState} from '../../common/redux/common-redux-types'
-import {IGridSequencerEvent} from '../../common/redux/grid-sequencers-redux'
+import {exportSequencerMidi, IGridSequencerEvent} from '../../common/redux/grid-sequencers-redux'
 import {
 	InfiniteSequencerFields, selectAllInfiniteSequencers, setInfiniteSequencerField,
 } from '../../common/redux/infinite-sequencers-redux'
@@ -38,12 +38,12 @@ export class InfiniteSequencer extends Component<IInfiniteSequencerAllProps> {
 		return (
 			<div className="infiniteSequencer">
 				<div
-					className={`gridSequencer ${isPlaying ? 'isPlaying saturate' : 'isNotPlaying'}`}
+					className={`${isPlaying ? 'isPlaying saturate' : 'isNotPlaying'}`}
 					style={{color: isRecording ? 'red' : color}}
 				>
 					<div className="label transitionAllColor">{name}</div>
 					<Panel id={this.props.id}>
-						<div className="controls" style={{margin: 8}}>
+						<div className="controls">
 							<div
 								className="play"
 								onClick={() => this.props.dispatch(
@@ -64,6 +64,13 @@ export class InfiniteSequencer extends Component<IInfiniteSequencerAllProps> {
 									setInfiniteSequencerField(id, InfiniteSequencerFields.isRecording, !isRecording))}
 							>
 								⬤
+							</div>
+							<div
+								className="export"
+								onClick={() => this.props.dispatch(
+									exportSequencerMidi(id))}
+							>
+								⭳
 							</div>
 						</div>
 						<div className={`display ${this.props.events.length > 8 ? 'small' : ''}`}>
