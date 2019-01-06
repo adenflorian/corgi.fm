@@ -103,6 +103,8 @@
 
 # Infinite Sequencer
 - [ ] click and drag notes left and right to change order, up and down to change note
+- [ ] find better way to clear notes
+- [ ] fix recording and playing at same time
 
 # References
 - https://github.com/grimmdude/MidiPlayerJS/blob/master/src/player.js
