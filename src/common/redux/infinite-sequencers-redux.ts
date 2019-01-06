@@ -66,7 +66,11 @@ export const setInfiniteSequencerField =
 	})
 
 function foo(fieldName: InfiniteSequencerFields) {
-	if ([InfiniteSequencerFields.isPlaying, InfiniteSequencerFields.bottomNote].includes(fieldName)) {
+	if ([
+		InfiniteSequencerFields.isPlaying,
+		InfiniteSequencerFields.bottomNote,
+		InfiniteSequencerFields.isRecording,
+	].includes(fieldName)) {
 		return {SERVER_ACTION, BROADCASTER_ACTION}
 	} else {
 		return {}
