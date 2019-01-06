@@ -4,7 +4,9 @@ import {connect} from 'react-redux'
 import {selectAllBasicInstrumentIds} from '../common/redux/basic-instruments-redux'
 import {IClientState, selectClientCount, selectLocalClient} from '../common/redux/clients-redux'
 import {IClientAppState} from '../common/redux/common-redux-types'
-import {ConnectionSourceType, ConnectionTargetType, IConnection, selectAllConnectionsAsArray} from '../common/redux/connections-redux'
+import {
+	ConnectionSourceType, ConnectionTargetType, IConnection, selectAllConnectionsAsArray,
+} from '../common/redux/connections-redux'
 import {selectAllGridSequencers} from '../common/redux/grid-sequencers-redux'
 import {selectMemberCount} from '../common/redux/room-members-redux'
 import {selectAllVirtualKeyboardIds} from '../common/redux/virtual-keyboard-redux'
@@ -125,9 +127,13 @@ class OnlineApp extends React.Component<IOnlineAppProps> {
 
 function sortConnection(connA: IConnection, connB: IConnection) {
 	if (connA.sourceType !== connB.sourceType) {
-		return connA.sourceType === 'gridSequencer' ? -1 : 1
+		return connA.sourceType === 'gridSequencer'
+			? -1
+			: connA.sourceType === 'infiniteSequencer'
+				? -1
+				: 1
 	} else {
-		return 0
+		return connA.id > connB.id ? -1 : 1
 	}
 }
 
