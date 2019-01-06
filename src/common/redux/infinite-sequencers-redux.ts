@@ -74,10 +74,10 @@ function foo(fieldName: InfiniteSequencerFields) {
 }
 
 export enum InfiniteSequencerFields {
-	isPlaying,
-	bottomNote,
-	index,
-	isRecording,
+	isPlaying = 'isPlaying',
+	bottomNote = 'bottomNote',
+	index = 'index',
+	isRecording = 'isRecording',
 }
 
 export interface IInfiniteSequencerEvent {

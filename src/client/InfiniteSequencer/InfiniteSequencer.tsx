@@ -7,7 +7,7 @@ import {IGridSequencerEvent} from '../../common/redux/grid-sequencers-redux'
 import {
 	InfiniteSequencerFields, selectAllInfiniteSequencers, setInfiniteSequencerField,
 } from '../../common/redux/infinite-sequencers-redux'
-import {getOctaveFromMidiNote, midiNoteToNoteName} from '../music/music-functions'
+import {getOctaveFromMidiNote, midiNoteToNoteName, removeOctave} from '../music/music-functions'
 import {Panel} from '../Panel'
 import './InfiniteSequencer.less'
 
@@ -70,9 +70,9 @@ export class InfiniteSequencer extends Component<IInfiniteSequencerAllProps> {
 							{this.props.events.map((event, index) =>
 								<div
 									key={index}
-									className="event"
+									className={`event ${this.props.activeIndex === index ? 'active' : ''}`}
 									style={{
-										backgroundColor: `hsl(${event.notes[0]}, 90%, 50%)`,
+										backgroundColor: `hsl(${removeOctave(event.notes[0]) * 23}, 60%, 60%)`,
 									}}
 								>
 									{
