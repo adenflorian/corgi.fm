@@ -1,3 +1,4 @@
+import {Action, Reducer} from 'redux'
 import {logger} from '../logger'
 import {IClientRoomState} from './common-redux-types'
 import {BROADCASTER_ACTION, NetworkActionType, SERVER_ACTION} from './redux-utils'
@@ -94,7 +95,7 @@ export const updateThings = (
 	...expandNetActionType(netActionType),
 })
 
-type MultiThingAction =
+export type MultiThingAction =
 	IUpdateMultiThingsAction | IAddMultiThingAction | IDeleteMultiThingsAction | IDeleteAllThingsAction
 	| {type: '', id: string}
 
@@ -141,16 +142,28 @@ export function makeMultiReducer<T extends IMultiStateThing, U extends IMultiSta
 					if (thing === undefined) {
 						logger.warn('uh oh owo fucky wucky: ' + action.id)
 						return state
+					} else {
+						return {
+							...state,
+							things: {
+								...state.things,
+								[action.id]: innerReducer(thing as T, action),
+							},
+						}
 					}
+				} else {
+					const newThings: IMultiStateThings = {}
+					Object.keys(state.things).forEach(id => {
+						const thing = state.things[id]
+						newThings[id] = innerReducer(thing as T, action)
+					})
 					return {
 						...state,
 						things: {
 							...state.things,
-							[action.id]: innerReducer(thing as T, action),
+							...newThings,
 						},
 					}
-				} else {
-					return state
 				}
 		}
 	}

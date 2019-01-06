@@ -83,7 +83,7 @@ function basicSamplerReducer(basicSampler: IBasicSamplerState, action: AnyAction
 				[action.paramName]: action.value,
 			}
 		default:
-			throw new Error('invalid basicSampler action type')
+			return basicSampler
 	}
 }
 

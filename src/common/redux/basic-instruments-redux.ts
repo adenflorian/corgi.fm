@@ -109,7 +109,7 @@ function basicInstrumentReducer(basicInstrument: IBasicInstrumentState, action: 
 				[action.paramName]: action.value,
 			}
 		default:
-			throw new Error('invalid basicInstrument action type')
+			return basicInstrument
 	}
 }
 

@@ -169,7 +169,7 @@ function virtualKeyboardReducer(virtualKeyboard: IVirtualKeyboardState, action: 
 				octave: virtualKeyboard.octave + action.delta,
 			}
 		default:
-			throw new Error('invalid action type')
+			return virtualKeyboard
 	}
 }
 

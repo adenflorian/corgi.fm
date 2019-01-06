@@ -18,6 +18,7 @@ interface IInfiniteSequencerReduxProps {
 	color: string
 	events: IGridSequencerEvent[]
 	isPlaying: boolean
+	isRecording: boolean
 	name: string
 }
 
@@ -30,18 +31,17 @@ export class InfiniteSequencer extends Component<IInfiniteSequencerAllProps> {
 	}
 
 	public render() {
-		const {color, isPlaying, id} = this.props
+		const {color, isPlaying, id, isRecording} = this.props
 
 		return (
 			<div className="infiniteSequencer">
 				<div
 					className={`gridSequencer ${isPlaying ? 'isPlaying saturate' : 'isNotPlaying'}`}
-					style={{color}}
+					style={{color: isRecording ? 'red' : color}}
 				>
 					<div className="label transitionAllColor">{name}</div>
 					<Panel id={this.props.id}>
 						<div className="controls" style={{margin: 8}}>
-							<div className="record">⬤</div>
 							<div
 								className="play"
 								onClick={() => this.props.dispatch(setInfiniteSequencerField(id, 'isPlaying', true))}
@@ -53,6 +53,12 @@ export class InfiniteSequencer extends Component<IInfiniteSequencerAllProps> {
 								onClick={() => this.props.dispatch(setInfiniteSequencerField(id, 'isPlaying', false))}
 							>
 								◼
+							</div>
+							<div
+								className="record"
+								onClick={() => this.props.dispatch(setInfiniteSequencerField(id, 'isRecording', !isRecording))}
+							>
+								⬤
 							</div>
 						</div>
 						<div className="display">
@@ -77,6 +83,7 @@ export const ConnectedInfiniteSequencer = connect(
 			events: infiniteSequencerState.events,
 			activeIndex: infiniteSequencerState.index,
 			isPlaying: infiniteSequencerState.isPlaying,
+			isRecording: infiniteSequencerState.isRecording,
 			color: infiniteSequencerState.color,
 			name: infiniteSequencerState.name,
 		}

@@ -5,6 +5,7 @@ import {IMidiNote} from '../MidiNote'
 import {addIfNew} from '../server-common'
 import {colorFunc} from '../shamu-color'
 import {IClientRoomState} from './common-redux-types'
+import {LOCAL_MIDI_KEY_PRESS} from './local-middleware'
 import {
 	addMultiThing, deleteThings, IMultiState,
 	IMultiStateThing, IMultiStateThings, makeMultiReducer, MultiThingType, updateThings,
@@ -54,12 +55,24 @@ export const exportInfiniteSequencerMidi = (infiniteSequencerId: string) => ({
 
 export const SET_INFINITE_SEQUENCER_FIELD = 'SET_INFINITE_SEQUENCER_FIELD'
 export type SetInfiniteSequencerField = ReturnType<typeof setInfiniteSequencerField>
-export const setInfiniteSequencerField = (id: string, fieldName: 'isPlaying' | 'bottomNote' | 'index', data: any) => ({
-	type: SET_INFINITE_SEQUENCER_FIELD,
-	id,
-	fieldName,
-	data,
-})
+export const setInfiniteSequencerField =
+	(id: string, fieldName: Fields, data: any) => ({
+		type: SET_INFINITE_SEQUENCER_FIELD,
+		id,
+		fieldName,
+		data,
+		...foo(fieldName),
+	})
+
+function foo(fieldName: Fields) {
+	if (['isPlaying', 'bottomNote'].includes(fieldName)) {
+		return {SERVER_ACTION, BROADCASTER_ACTION}
+	} else {
+		return {}
+	}
+}
+
+type Fields = 'isPlaying' | 'bottomNote' | 'index' | 'isRecording'
 
 export interface IInfiniteSequencerEvent {
 	notes: IMidiNote[]
@@ -80,6 +93,7 @@ export interface ISequencerState extends IMultiStateThing {
 	id: string
 	color: string
 	name: string
+	isRecording: boolean
 }
 
 export type IInfiniteSequencerState = ISequencerState
@@ -91,6 +105,7 @@ export class InfiniteSequencerState implements IInfiniteSequencerState {
 	public readonly isPlaying: boolean = false
 	public readonly color: string
 	public readonly name: string
+	public readonly isRecording: boolean = false
 
 	constructor(name: string, events?: IInfiniteSequencerEvent[]) {
 		this.name = name
@@ -114,7 +129,9 @@ export const infiniteSequencersReducer =
 	makeMultiReducer<IInfiniteSequencerState, IInfiniteSequencersState>(
 		infiniteSequencerReducer, MultiThingType.infiniteSequencer, infiniteSequencerActionTypes)
 
-function infiniteSequencerReducer(infiniteSequencer: IInfiniteSequencerState, action: AnyAction) {
+function infiniteSequencerReducer(
+	infiniteSequencer: IInfiniteSequencerState, action: AnyAction,
+): IInfiniteSequencerState {
 	switch (action.type) {
 		case SET_INFINITE_SEQUENCER_NOTE:
 			if (action.note === undefined) {
@@ -142,8 +159,17 @@ function infiniteSequencerReducer(infiniteSequencer: IInfiniteSequencerState, ac
 			}
 		case SET_INFINITE_SEQUENCER_FIELD:
 			return {...infiniteSequencer, [action.fieldName]: action.data}
+		case LOCAL_MIDI_KEY_PRESS:
+			if (infiniteSequencer.isRecording) {
+				return {
+					...infiniteSequencer,
+					events: infiniteSequencer.events.concat({notes: [action.midiNote]}),
+				}
+			} else {
+				return infiniteSequencer
+			}
 		default:
-			throw new Error('invalid action type')
+			return infiniteSequencer
 	}
 }
 

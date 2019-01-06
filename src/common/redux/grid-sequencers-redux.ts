@@ -60,7 +60,16 @@ export const setGridSequencerField = (id: string, fieldName: 'isPlaying' | 'bott
 	id,
 	fieldName,
 	data,
+	...foo(fieldName),
 })
+
+function foo(fieldName: 'isPlaying' | 'bottomNote' | 'index') {
+	if (['isPlaying', 'bottomNote'].includes(fieldName)) {
+		return {SERVER_ACTION, BROADCASTER_ACTION}
+	} else {
+		return {}
+	}
+}
 
 export interface IGridSequencerEvent {
 	notes: IMidiNote[]
@@ -168,7 +177,7 @@ function gridSequencerReducer(gridSequencer: IGridSequencerState, action: AnyAct
 		case SET_GRID_SEQUENCER_FIELD:
 			return {...gridSequencer, [action.fieldName]: action.data}
 		default:
-			throw new Error('invalid action type')
+			return gridSequencer
 	}
 }
 
