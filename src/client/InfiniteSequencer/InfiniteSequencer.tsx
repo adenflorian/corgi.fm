@@ -3,7 +3,9 @@ import {Component} from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 import {IClientAppState} from '../../common/redux/common-redux-types'
-import {exportSequencerMidi, IGridSequencerEvent} from '../../common/redux/grid-sequencers-redux'
+import {
+	exportSequencerMidi, findLowestAndHighestNotes, IGridSequencerEvent,
+} from '../../common/redux/grid-sequencers-redux'
 import {
 	InfiniteSequencerFields, selectAllInfiniteSequencers, setInfiniteSequencerField,
 } from '../../common/redux/infinite-sequencers-redux'
@@ -13,6 +15,7 @@ import './InfiniteSequencer.less'
 
 interface IInfiniteSequencerProps {
 	id: string
+	style: InfiniteSequencerStyle
 }
 
 interface IInfiniteSequencerReduxProps {
@@ -27,13 +30,23 @@ interface IInfiniteSequencerReduxProps {
 type IInfiniteSequencerAllProps =
 	IInfiniteSequencerProps & IInfiniteSequencerReduxProps & {dispatch: Dispatch}
 
+enum InfiniteSequencerStyle {
+	colorBars,
+	colorGrid,
+}
+
 export class InfiniteSequencer extends Component<IInfiniteSequencerAllProps> {
 	public static defaultProps = {
 		events: [],
+		style: InfiniteSequencerStyle.colorGrid,
 	}
 
 	public render() {
-		const {color, isPlaying, id, isRecording} = this.props
+		const {color, isPlaying, id, isRecording, style, events} = this.props
+
+		const {lowestNote, highestNote} = findLowestAndHighestNotes(events)
+		const numberOfPossibleNotes = highestNote - lowestNote + 1
+		const noteHeightPercentage = 100 / numberOfPossibleNotes
 
 		return (
 			<div className="infiniteSequencer">
@@ -73,26 +86,44 @@ export class InfiniteSequencer extends Component<IInfiniteSequencerAllProps> {
 								⭳
 							</div>
 						</div>
-						<div className={`display ${this.props.events.length > 8 ? 'small' : ''}`}>
-							{this.props.events.map((event, index) =>
-								<div
-									key={index}
-									className={`event ${this.props.activeIndex === index ? 'active' : ''}`}
-									style={{
-										backgroundColor: `hsl(${removeOctave(event.notes[0]) * 23}, ${event.notes[0] + 10}%, 60%)`,
-									}}
-								>
-									{
-										this.props.events.length <= 8
-											? midiNoteToNoteName(event.notes[0]) + getOctaveFromMidiNote(event.notes[0])
-											: undefined
-									}
-								</div>,
-							)}
-						</div>
+						{style === InfiniteSequencerStyle.colorBars &&
+							<div className={`display ${this.props.events.length > 8 ? 'small' : ''}`}>
+								{this.props.events.map((event, index) =>
+									<div
+										key={index}
+										className={`event ${this.props.activeIndex === index ? 'active' : ''}`}
+										style={{
+											backgroundColor: `hsl(${removeOctave(event.notes[0]) * 23}, ${event.notes[0] + 10}%, 60%)`,
+										}}
+									>
+										{
+											this.props.events.length <= 8
+												? midiNoteToNoteName(event.notes[0]) + getOctaveFromMidiNote(event.notes[0])
+												: undefined
+										}
+									</div>,
+								)}
+							</div>
+						}
+						{style === InfiniteSequencerStyle.colorGrid &&
+							<div className={`display ${this.props.events.length > 8 ? 'small' : ''}`}>
+								{this.props.events.map(x => x.notes[0]).map((note, index) =>
+									<div
+										key={index}
+										className={`event ${this.props.activeIndex === index ? 'active' : ''}`}
+										style={{
+											backgroundColor: `hsl(${removeOctave(note) * 23}, 60%, 60%)`,
+											height: `${noteHeightPercentage + (note === lowestNote ? 1 : 0)}%`,
+											top: `${(highestNote - note) * noteHeightPercentage}%`,
+										}}
+									>
+									</div>,
+								)}
+							</div>
+						}
 					</Panel>
 				</div>
-			</div>
+			</div >
 		)
 	}
 }

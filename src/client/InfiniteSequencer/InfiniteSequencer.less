@@ -18,6 +18,8 @@
 			flex-wrap: wrap;
 			flex-grow: 1;
 			max-width: 48px * 2px;
+			// background-color: #282832;
+			// background-color: @panelGrayLight;
 			
 			& > * {
 				width: 48px;
@@ -32,14 +34,19 @@
 			display: flex;
 			flex-direction: row;
 			flex-grow: 1;
+			overflow: hidden;
 			// width: 528px;
+			// background-color: @panelGrayLight;
+			background-color: #282832;
 
 			.event {
 				min-width: 1px;
+				min-height: 1px;
 				width: 100%;
 				display: flex;
 				justify-content: center;
 				align-items: center;
+				position: relative;
 
 				// &:nth-child(odd) {
 				// 	background-color: #31313d;

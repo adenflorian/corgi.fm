@@ -117,7 +117,14 @@ export class GridSequencerState implements IGridSequencerState {
 	}
 }
 
-function findLowestNote(events: IGridSequencerEvent[]): number {
+export function findLowestAndHighestNotes(events: IGridSequencerEvent[]) {
+	return {
+		lowestNote: findLowestNote(events),
+		highestNote: findHighestNote(events),
+	}
+}
+
+export function findLowestNote(events: IGridSequencerEvent[]): number {
 	let lowest = Number.MAX_VALUE
 
 	events.forEach(event => {
@@ -133,6 +140,24 @@ function findLowestNote(events: IGridSequencerEvent[]): number {
 	}
 
 	return lowest
+}
+
+export function findHighestNote(events: IGridSequencerEvent[]): number {
+	let highest = Number.MIN_VALUE
+
+	events.forEach(event => {
+		event.notes.forEach(note => {
+			if (note > highest) {
+				highest = note
+			}
+		})
+	})
+
+	if (highest === Number.MIN_VALUE) {
+		return 127
+	}
+
+	return highest
 }
 
 export interface IGridSequencerEvent {
