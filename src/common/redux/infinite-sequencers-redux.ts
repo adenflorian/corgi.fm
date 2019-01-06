@@ -11,6 +11,7 @@ import {
 	IMultiStateThing, IMultiStateThings, makeMultiReducer, MultiThingType, updateThings,
 } from './multi-reducer'
 import {BROADCASTER_ACTION, NetworkActionType, SERVER_ACTION} from './redux-utils'
+import {VIRTUAL_KEY_PRESSED} from './virtual-keyboard-redux'
 
 export const ADD_INFINITE_SEQUENCER = 'ADD_INFINITE_SEQUENCER'
 export const addInfiniteSequencer = (infiniteSequencer: IInfiniteSequencerState) =>
@@ -56,7 +57,7 @@ export const exportInfiniteSequencerMidi = (infiniteSequencerId: string) => ({
 export const SET_INFINITE_SEQUENCER_FIELD = 'SET_INFINITE_SEQUENCER_FIELD'
 export type SetInfiniteSequencerField = ReturnType<typeof setInfiniteSequencerField>
 export const setInfiniteSequencerField =
-	(id: string, fieldName: Fields, data: any) => ({
+	(id: string, fieldName: InfiniteSequencerFields, data: any) => ({
 		type: SET_INFINITE_SEQUENCER_FIELD,
 		id,
 		fieldName,
@@ -64,15 +65,20 @@ export const setInfiniteSequencerField =
 		...foo(fieldName),
 	})
 
-function foo(fieldName: Fields) {
-	if (['isPlaying', 'bottomNote'].includes(fieldName)) {
+function foo(fieldName: InfiniteSequencerFields) {
+	if ([InfiniteSequencerFields.isPlaying, InfiniteSequencerFields.bottomNote].includes(fieldName)) {
 		return {SERVER_ACTION, BROADCASTER_ACTION}
 	} else {
 		return {}
 	}
 }
 
-type Fields = 'isPlaying' | 'bottomNote' | 'index' | 'isRecording'
+export enum InfiniteSequencerFields {
+	isPlaying,
+	bottomNote,
+	index,
+	isRecording,
+}
 
 export interface IInfiniteSequencerEvent {
 	notes: IMidiNote[]
@@ -158,8 +164,24 @@ function infiniteSequencerReducer(
 				}),
 			}
 		case SET_INFINITE_SEQUENCER_FIELD:
+			if (action.fieldName === 'isRecording' && action.data === true) {
+				return {
+					...infiniteSequencer,
+					[action.fieldName]: action.data,
+					events: [],
+				}
+			}
 			return {...infiniteSequencer, [action.fieldName]: action.data}
-		case LOCAL_MIDI_KEY_PRESS:
+		// case LOCAL_MIDI_KEY_PRESS:
+		// 	if (infiniteSequencer.isRecording) {
+		// 		return {
+		// 			...infiniteSequencer,
+		// 			events: infiniteSequencer.events.concat({notes: [action.midiNote]}),
+		// 		}
+		// 	} else {
+		// 		return infiniteSequencer
+		// 	}
+		case VIRTUAL_KEY_PRESSED:
 			if (infiniteSequencer.isRecording) {
 				return {
 					...infiniteSequencer,

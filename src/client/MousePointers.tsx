@@ -50,8 +50,8 @@ class MousePointersView extends React.PureComponent<IMousePointersViewProps> {
 										opacity="1"
 										fill="#282832"
 										stroke={pointer.color}
-										stroke-width="2"
-										stroke-opacity="1"
+										strokeWidth="2"
+										strokeOpacity="1"
 									/>
 								</svg>
 								<div

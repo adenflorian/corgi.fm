@@ -2,7 +2,7 @@ import {AnyAction} from 'redux'
 import {createSelector} from 'reselect'
 import * as uuid from 'uuid'
 import {applyOctave} from '../../client/music/music-functions'
-import {Octave} from '../../client/music/music-types'
+import {MidiNotes, Octave} from '../../client/music/music-types'
 import {addIfNew} from '../../common/server-common'
 import {ClientId} from '../common-types'
 import {IMidiNote} from '../MidiNote'
@@ -34,13 +34,15 @@ export const updateVirtualKeyboards = (keyboards: any) =>
 	updateThings(keyboards, MultiThingType.virtualKeyboard, NetworkActionType.BROADCASTER)
 
 export const VIRTUAL_KEY_PRESSED = 'VIRTUAL_KEY_PRESSED'
-export const virtualKeyPressed = (id: string, number: number) => {
+export const virtualKeyPressed = (id: string, number: number, octave: Octave, midiNote: IMidiNote) => {
 	return {
 		type: VIRTUAL_KEY_PRESSED,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 		id,
 		number,
+		octave,
+		midiNote,
 	}
 }
 

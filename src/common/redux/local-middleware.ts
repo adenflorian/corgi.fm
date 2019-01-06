@@ -1,4 +1,5 @@
 import {Dispatch, Middleware} from 'redux'
+import {applyOctave} from '../../client/music/music-functions'
 import {addBasicInstrument, BasicInstrumentState} from './basic-instruments-redux'
 import {addBasicSampler, BasicSamplerState} from './basic-sampler-redux'
 import {selectLocalClient} from './clients-redux'
@@ -10,8 +11,8 @@ import {deleteAllThings, MultiThingType} from './multi-reducer'
 import {makeActionCreator} from './redux-utils'
 import {selectActiveRoom, SET_ACTIVE_ROOM} from './rooms-redux'
 import {
-	addVirtualKeyboard, selectVirtualKeyboardIdByOwner,
-	VirtualKeyboardState, virtualKeyPressed, virtualKeyUp, virtualOctaveChange,
+	addVirtualKeyboard, selectVirtualKeyboardById,
+	selectVirtualKeyboardIdByOwner, VirtualKeyboardState, virtualKeyPressed, virtualKeyUp, virtualOctaveChange,
 } from './virtual-keyboard-redux'
 
 export const LOCAL_MIDI_KEY_PRESS = 'LOCAL_MIDI_KEY_PRESS'
@@ -35,7 +36,14 @@ export const localMiddleware: Middleware<{}, IClientAppState> = ({dispatch, getS
 	next(action)
 	switch (action.type) {
 		case LOCAL_MIDI_KEY_PRESS: {
-			return dispatch(virtualKeyPressed(getLocalVirtualKeyboardId(getState()), action.midiNote))
+			const localVirtualKeyboard = getLocalVirtualKeyboard(getState())
+			return dispatch(
+				virtualKeyPressed(
+					localVirtualKeyboard.id,
+					action.midiNote,
+					localVirtualKeyboard.octave,
+					applyOctave(action.midiNote, localVirtualKeyboard.octave)),
+			)
 		}
 		case LOCAL_MIDI_KEY_UP: {
 			return dispatch(virtualKeyUp(getLocalVirtualKeyboardId(getState()), action.midiNote))
@@ -53,6 +61,10 @@ export const localMiddleware: Middleware<{}, IClientAppState> = ({dispatch, getS
 
 function getLocalVirtualKeyboardId(state: IClientAppState) {
 	return selectVirtualKeyboardIdByOwner(state.room, selectLocalClient(state).id)
+}
+
+function getLocalVirtualKeyboard(state: IClientAppState) {
+	return selectVirtualKeyboardById(state.room, getLocalVirtualKeyboardId(state))
 }
 
 function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {

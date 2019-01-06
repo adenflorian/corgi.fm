@@ -4,7 +4,9 @@ import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 import {IClientAppState} from '../../common/redux/common-redux-types'
 import {IGridSequencerEvent} from '../../common/redux/grid-sequencers-redux'
-import {selectAllInfiniteSequencers, setInfiniteSequencerField} from '../../common/redux/infinite-sequencers-redux'
+import {
+	InfiniteSequencerFields, selectAllInfiniteSequencers, setInfiniteSequencerField,
+} from '../../common/redux/infinite-sequencers-redux'
 import {getOctaveFromMidiNote, midiNoteToNoteName} from '../music/music-functions'
 import {Panel} from '../Panel'
 import './InfiniteSequencer.less'
@@ -44,27 +46,40 @@ export class InfiniteSequencer extends Component<IInfiniteSequencerAllProps> {
 						<div className="controls" style={{margin: 8}}>
 							<div
 								className="play"
-								onClick={() => this.props.dispatch(setInfiniteSequencerField(id, 'isPlaying', true))}
+								onClick={() => this.props.dispatch(
+									setInfiniteSequencerField(id, InfiniteSequencerFields.isPlaying, true))}
 							>
 								▶
 							</div>
 							<div
 								className="stop"
-								onClick={() => this.props.dispatch(setInfiniteSequencerField(id, 'isPlaying', false))}
+								onClick={() => this.props.dispatch(
+									setInfiniteSequencerField(id, InfiniteSequencerFields.isPlaying, false))}
 							>
 								◼
 							</div>
 							<div
 								className="record"
-								onClick={() => this.props.dispatch(setInfiniteSequencerField(id, 'isRecording', !isRecording))}
+								onClick={() => this.props.dispatch(
+									setInfiniteSequencerField(id, InfiniteSequencerFields.isRecording, !isRecording))}
 							>
 								⬤
 							</div>
 						</div>
-						<div className="display">
+						<div className={`display ${this.props.events.length > 8 ? 'small' : ''}`}>
 							{this.props.events.map((event, index) =>
-								<div key={index} className="event">
-									{midiNoteToNoteName(event.notes[0]) + getOctaveFromMidiNote(event.notes[0])}
+								<div
+									key={index}
+									className="event"
+									style={{
+										backgroundColor: `hsl(${event.notes[0]}, 90%, 50%)`,
+									}}
+								>
+									{
+										this.props.events.length <= 8
+											? midiNoteToNoteName(event.notes[0]) + getOctaveFromMidiNote(event.notes[0])
+											: undefined
+									}
 								</div>,
 							)}
 						</div>

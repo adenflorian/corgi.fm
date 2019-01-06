@@ -5,7 +5,7 @@ import {ClientState, selectClientById, selectLocalClient} from '../../common/red
 import {IClientAppState} from '../../common/redux/common-redux-types'
 import {selectVirtualKeyboardById, virtualKeyPressed, virtualKeyUp} from '../../common/redux/virtual-keyboard-redux'
 import {keyToMidiMap} from '../input-events'
-import {KeyColor, keyColors, NoteNameSharps} from '../music/music-functions'
+import {applyOctave, KeyColor, keyColors, NoteNameSharps} from '../music/music-functions'
 import {Octave} from '../music/music-types'
 import {isLeftMouseButtonDown} from '../utils'
 import './Keyboard.less'
@@ -146,7 +146,9 @@ export class Keyboard extends React.PureComponent<IKeyboardAllProps, IKeyboardSt
 	private readonly handleMouseOver = (e: React.MouseEvent, index: number) => {
 		if (this.props.isLocal === false) return
 		if (isLeftMouseButtonDown(e.buttons) && this.state.wasMouseClickedOnKeyboard) {
-			this.props.dispatch(virtualKeyPressed(this.props.id, index))
+			this.props.dispatch(
+				virtualKeyPressed(this.props.id, index, this.props.octave, applyOctave(index, this.props.octave)),
+			)
 		}
 	}
 
@@ -165,10 +167,14 @@ export class Keyboard extends React.PureComponent<IKeyboardAllProps, IKeyboardSt
 				if (isKeyPressed) {
 					this.props.dispatch(virtualKeyUp(this.props.id, index))
 				} else {
-					this.props.dispatch(virtualKeyPressed(this.props.id, index))
+					this.props.dispatch(
+						virtualKeyPressed(this.props.id, index, this.props.octave, applyOctave(index, this.props.octave)),
+					)
 				}
 			} else {
-				this.props.dispatch(virtualKeyPressed(this.props.id, index))
+				this.props.dispatch(
+					virtualKeyPressed(this.props.id, index, this.props.octave, applyOctave(index, this.props.octave)),
+				)
 			}
 		}
 	}
