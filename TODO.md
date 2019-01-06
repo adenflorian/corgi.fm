@@ -101,6 +101,9 @@
 - [ ] make slider stay with mouse 1:1
 - [√] mini map
 
+# Infinite Sequencer
+- [ ] click and drag notes left and right to change order, up and down to change note
+
 # References
 - https://github.com/grimmdude/MidiPlayerJS/blob/master/src/player.js
 

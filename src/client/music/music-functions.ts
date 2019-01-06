@@ -28,7 +28,8 @@ export function midiNoteToFrequency(midiNote: IMidiNote): number {
 }
 
 export function midiNoteToNoteName(midiNote: IMidiNote): NoteNameSharps {
-	return keyColors[midiNote % 12].name
+	const x = ((midiNote % 12) + 12) % 12
+	return keyColors[x].name
 }
 
 export function getOctaveFromMidiNote(midiNote: IMidiNote): Octave {

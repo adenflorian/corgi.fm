@@ -72,7 +72,7 @@ export class InfiniteSequencer extends Component<IInfiniteSequencerAllProps> {
 									key={index}
 									className={`event ${this.props.activeIndex === index ? 'active' : ''}`}
 									style={{
-										backgroundColor: `hsl(${removeOctave(event.notes[0]) * 23}, 60%, 60%)`,
+										backgroundColor: `hsl(${removeOctave(event.notes[0]) * 23}, ${event.notes[0] + 10}%, 60%)`,
 									}}
 								>
 									{
