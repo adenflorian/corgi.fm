@@ -12,46 +12,103 @@ export function createServerStuff(room: string, serverStore: Store) {
 	const addClientAction = addClient(serverClient)
 	serverStore.dispatch(createRoomAction(addClientAction, room))
 
-	const newInstrument = new BasicInstrumentState(serverClient.id)
-	serverStore.dispatch(createRoomAction(addBasicInstrument(newInstrument), room))
+	createSourceAndTarget({
+		source: {
+			type: ConnectionSourceType.gridSequencer,
+			events: getInitialGridSequencerEvents(),
+		},
+		target: {
+			type: ConnectionTargetType.sampler,
+			name: 'melody',
+		},
+	})
 
-	const serverGridSequencer = new GridSequencerState('melody', getInitialGridSequencerEvents())
-	serverStore.dispatch(createRoomAction(addGridSequencer(serverGridSequencer), room))
-	serverStore.dispatch(createRoomAction(addConnection(new Connection(
-		serverGridSequencer.id,
-		ConnectionSourceType.gridSequencer,
-		newInstrument.id,
-		ConnectionTargetType.instrument,
-	)), room))
+	createSourceAndTarget({
+		source: {
+			type: ConnectionSourceType.gridSequencer,
+			events: getInitialGridSequencerEvents2(),
+		},
+		target: {
+			type: ConnectionTargetType.instrument,
+			name: 'bass',
+		},
+	})
 
-	// const newVirtualKeyboard = new VirtualKeyboardState(serverClient.id, serverClient.color)
-	// serverStore.dispatch(createRoomAction(addVirtualKeyboard(newVirtualKeyboard))
+	createSourceAndTarget({
+		source: {
+			type: ConnectionSourceType.infiniteSequencer,
+			events: getInitialInfiniteSequencerEvents(),
+		},
+		target: {
+			type: ConnectionTargetType.sampler,
+			name: 'arp',
+		},
+	})
 
-	// serverStore.dispatch(createRoomAction(addConnection(new Connection(newVirtualKeyboard.id, newInstrument.id)))
+	createSourceAndTarget({
+		source: {
+			type: ConnectionSourceType.infiniteSequencer,
+			events: getInitialInfiniteSequencerEvents(),
+		},
+		target: {
+			type: ConnectionTargetType.instrument,
+			name: 'arp2',
+		},
+	})
 
-	const newInstrument2 = new BasicInstrumentState(serverClient.id)
-	serverStore.dispatch(createRoomAction(addBasicInstrument(newInstrument2), room))
+	interface CreateSourceAndTargetArgs {
+		source: {
+			type: ConnectionSourceType,
+			events?: any,
+		},
+		target: {
+			type: ConnectionTargetType,
+			name: string,
+		},
+	}
 
-	const serverGridSequencer2 = new GridSequencerState('bass', getInitialGridSequencerEvents2())
-	serverStore.dispatch(createRoomAction(addGridSequencer(serverGridSequencer2), room))
-	serverStore.dispatch(createRoomAction(addConnection(new Connection(
-		serverGridSequencer2.id,
-		ConnectionSourceType.gridSequencer,
-		newInstrument2.id,
-		ConnectionTargetType.instrument,
-	)), room))
+	function createSourceAndTarget(options: CreateSourceAndTargetArgs) {
+		const target = createTarget(options.target.type)
 
-	const newInstrument3 = new BasicSamplerState(serverClient.id)
-	serverStore.dispatch(createRoomAction(addBasicSampler(newInstrument3), room))
+		const source = createSource(options.source.type, options.target.name, options.source.events)
 
-	const serverGridSequencer3 = new InfiniteSequencerState('arp')
-	serverStore.dispatch(createRoomAction(addInfiniteSequencer(serverGridSequencer3), room))
-	serverStore.dispatch(createRoomAction(addConnection(new Connection(
-		serverGridSequencer3.id,
-		ConnectionSourceType.infiniteSequencer,
-		newInstrument3.id,
-		ConnectionTargetType.sampler,
-	)), room))
+		serverStore.dispatch(createRoomAction(addConnection(new Connection(
+			source.id,
+			options.source.type,
+			target.id,
+			options.target.type,
+		)), room))
+	}
+
+	function createSource(type: ConnectionSourceType, name: string, events?: any) {
+		switch (type) {
+			case ConnectionSourceType.gridSequencer:
+				const x = new GridSequencerState(name, 36, events)
+				serverStore.dispatch(createRoomAction(addGridSequencer(x), room))
+				return x
+			case ConnectionSourceType.infiniteSequencer:
+				const y = new InfiniteSequencerState(name, events)
+				serverStore.dispatch(createRoomAction(addInfiniteSequencer(y), room))
+				return y
+			default:
+				throw new Error('Invalid type')
+		}
+	}
+
+	function createTarget(type: ConnectionTargetType): any {
+		switch (type) {
+			case ConnectionTargetType.instrument:
+				const x = new BasicInstrumentState(serverClient.id)
+				serverStore.dispatch(createRoomAction(addBasicInstrument(x), room))
+				return x
+			case ConnectionTargetType.sampler:
+				const y = new BasicSamplerState(serverClient.id)
+				serverStore.dispatch(createRoomAction(addBasicSampler(y), room))
+				return y
+			default:
+				throw new Error('Invalid type')
+		}
+	}
 }
 
 function getInitialGridSequencerEvents() {
@@ -79,4 +136,17 @@ function getInitialGridSequencerEvents2() {
 	return new Array(32)
 		.fill({notes: []})
 		.map((_, i) => ({notes: i % 2 === 1 ? [] : [32]}))
+}
+
+function getInitialInfiniteSequencerEvents() {
+	return [
+		{notes: [60]},
+		{notes: [64]},
+		{notes: [67]},
+		{notes: [71]},
+		{notes: [72]},
+		{notes: [71]},
+		{notes: [67]},
+		{notes: [64]},
+	]
 }

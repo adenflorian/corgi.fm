@@ -105,14 +105,15 @@ export class GridSequencerState implements IGridSequencerState {
 	public readonly color: string
 	public readonly name: string
 	public readonly bottomNote: number
-	public readonly notesToShow = 36
+	public readonly notesToShow: number
 
-	constructor(name: string, events?: IGridSequencerEvent[]) {
+	constructor(name: string, notesToShow: number, events?: IGridSequencerEvent[]) {
 		this.name = name
 		this.color = colorFunc(hashbow(this.id)).desaturate(0.2).hsl().string()
 		this.events = events ||
 			[{notes: []}, {notes: []}, {notes: []}, {notes: []}, {notes: []}, {notes: []}, {notes: []}, {notes: []}]
 		const lowestNote = findLowestNote(this.events)
+		this.notesToShow = notesToShow
 		this.bottomNote = Math.min(MAX_MIDI_NOTE_NUMBER_127 - this.notesToShow, lowestNote)
 	}
 }

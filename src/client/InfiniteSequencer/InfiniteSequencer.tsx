@@ -7,7 +7,7 @@ import {
 	exportSequencerMidi, findLowestAndHighestNotes, IGridSequencerEvent,
 } from '../../common/redux/grid-sequencers-redux'
 import {
-	InfiniteSequencerFields, selectAllInfiniteSequencers, setInfiniteSequencerField,
+	InfiniteSequencerFields, InfiniteSequencerStyle, selectAllInfiniteSequencers, setInfiniteSequencerField,
 } from '../../common/redux/infinite-sequencers-redux'
 import {getOctaveFromMidiNote, midiNoteToNoteName, removeOctave} from '../music/music-functions'
 import {Panel} from '../Panel'
@@ -29,11 +29,6 @@ interface IInfiniteSequencerReduxProps {
 
 type IInfiniteSequencerAllProps =
 	IInfiniteSequencerProps & IInfiniteSequencerReduxProps & {dispatch: Dispatch}
-
-enum InfiniteSequencerStyle {
-	colorBars,
-	colorGrid,
-}
 
 export class InfiniteSequencer extends Component<IInfiniteSequencerAllProps> {
 	public static defaultProps = {
@@ -85,6 +80,13 @@ export class InfiniteSequencer extends Component<IInfiniteSequencerAllProps> {
 							>
 								⭳
 							</div>
+							{/* <div
+								className="style"
+								onClick={() => this.props.dispatch(
+									setInfiniteSequencerField(id))}
+							>
+								★
+							</div> */}
 						</div>
 						{style === InfiniteSequencerStyle.colorBars &&
 							<div className={`display ${this.props.events.length > 8 ? 'small' : ''}`}>

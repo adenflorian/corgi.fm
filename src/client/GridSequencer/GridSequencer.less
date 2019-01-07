@@ -34,7 +34,8 @@
             .event {
                 min-width: 16px;
                 max-width: 32px;
-                height: 256px; // border: 1px solid @borderGray;
+                min-height: 48px * 2;
+                max-height: 256px;
                 margin: 0px 0;
                 display: flex;
                 flex-direction: column-reverse;
@@ -51,7 +52,8 @@
                     filter: brightness(110%)
                 }
                 .note {
-                    height: 100%;
+                    height: 8px;
+                    width: 16px;
                     &.white {
                         background-color: #31313d;
                     }

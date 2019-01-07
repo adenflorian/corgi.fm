@@ -75,6 +75,7 @@ export enum InfiniteSequencerFields {
 	bottomNote = 'bottomNote',
 	index = 'index',
 	isRecording = 'isRecording',
+	style = 'style',
 }
 
 export interface IInfiniteSequencerEvent {
@@ -97,6 +98,12 @@ export interface ISequencerState extends IMultiStateThing {
 	color: string
 	name: string
 	isRecording: boolean
+	style: InfiniteSequencerStyle
+}
+
+export enum InfiniteSequencerStyle {
+	colorBars,
+	colorGrid,
 }
 
 export type IInfiniteSequencerState = ISequencerState
@@ -109,6 +116,7 @@ export class InfiniteSequencerState implements IInfiniteSequencerState {
 	public readonly color: string
 	public readonly name: string
 	public readonly isRecording: boolean = false
+	public readonly style = InfiniteSequencerStyle.colorGrid
 
 	constructor(name: string, events?: IInfiniteSequencerEvent[]) {
 		this.name = name
