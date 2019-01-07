@@ -4,7 +4,9 @@ import {addBasicSampler, BasicSamplerState} from '../common/redux/basic-sampler-
 import {addClient, ClientState} from '../common/redux/clients-redux'
 import {addConnection, Connection, ConnectionSourceType, ConnectionTargetType} from '../common/redux/connections-redux'
 import {addGridSequencer, GridSequencerState} from '../common/redux/grid-sequencers-redux'
-import {addInfiniteSequencer, InfiniteSequencerState} from '../common/redux/infinite-sequencers-redux'
+import {
+	addInfiniteSequencer, InfiniteSequencerState, InfiniteSequencerStyle,
+} from '../common/redux/infinite-sequencers-redux'
 import {createRoomAction} from '../common/redux/room-stores-redux'
 
 export function createServerStuff(room: string, serverStore: Store) {
@@ -16,10 +18,10 @@ export function createServerStuff(room: string, serverStore: Store) {
 		source: {
 			type: ConnectionSourceType.gridSequencer,
 			events: getInitialGridSequencerEvents(),
+			name: 'melody',
 		},
 		target: {
 			type: ConnectionTargetType.sampler,
-			name: 'melody',
 		},
 	})
 
@@ -27,10 +29,10 @@ export function createServerStuff(room: string, serverStore: Store) {
 		source: {
 			type: ConnectionSourceType.gridSequencer,
 			events: getInitialGridSequencerEvents2(),
+			name: 'bass',
 		},
 		target: {
 			type: ConnectionTargetType.instrument,
-			name: 'bass',
 		},
 	})
 
@@ -38,10 +40,11 @@ export function createServerStuff(room: string, serverStore: Store) {
 		source: {
 			type: ConnectionSourceType.infiniteSequencer,
 			events: getInitialInfiniteSequencerEvents(),
+			name: 'arp',
+			infinityStyle: InfiniteSequencerStyle.colorGrid,
 		},
 		target: {
 			type: ConnectionTargetType.sampler,
-			name: 'arp',
 		},
 	})
 
@@ -49,10 +52,11 @@ export function createServerStuff(room: string, serverStore: Store) {
 		source: {
 			type: ConnectionSourceType.infiniteSequencer,
 			events: getInitialInfiniteSequencerEvents(),
+			name: 'arp2',
+			infinityStyle: InfiniteSequencerStyle.colorBars,
 		},
 		target: {
 			type: ConnectionTargetType.instrument,
-			name: 'arp2',
 		},
 	})
 
@@ -60,17 +64,20 @@ export function createServerStuff(room: string, serverStore: Store) {
 		source: {
 			type: ConnectionSourceType,
 			events?: any,
+			infinityStyle?: InfiniteSequencerStyle,
+			name: string,
 		},
 		target: {
 			type: ConnectionTargetType,
-			name: string,
 		},
 	}
 
 	function createSourceAndTarget(options: CreateSourceAndTargetArgs) {
 		const target = createTarget(options.target.type)
 
-		const source = createSource(options.source.type, options.target.name, options.source.events)
+		const source = createSource({
+			...options.source,
+		})
 
 		serverStore.dispatch(createRoomAction(addConnection(new Connection(
 			source.id,
@@ -80,14 +87,21 @@ export function createServerStuff(room: string, serverStore: Store) {
 		)), room))
 	}
 
-	function createSource(type: ConnectionSourceType, name: string, events?: any) {
-		switch (type) {
+	interface CreateSourceArgs {
+		type: ConnectionSourceType,
+		name: string,
+		infinityStyle?: InfiniteSequencerStyle,
+		events?: any,
+	}
+
+	function createSource(args: CreateSourceArgs) {
+		switch (args.type) {
 			case ConnectionSourceType.gridSequencer:
-				const x = new GridSequencerState(name, 36, events)
+				const x = new GridSequencerState(args.name, 36, args.events)
 				serverStore.dispatch(createRoomAction(addGridSequencer(x), room))
 				return x
 			case ConnectionSourceType.infiniteSequencer:
-				const y = new InfiniteSequencerState(name, events)
+				const y = new InfiniteSequencerState(args.name, args.infinityStyle || InfiniteSequencerStyle.colorGrid, args.events)
 				serverStore.dispatch(createRoomAction(addInfiniteSequencer(y), room))
 				return y
 			default:

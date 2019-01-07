@@ -63,6 +63,7 @@ function foo(fieldName: InfiniteSequencerFields) {
 		InfiniteSequencerFields.isPlaying,
 		InfiniteSequencerFields.bottomNote,
 		InfiniteSequencerFields.isRecording,
+		InfiniteSequencerFields.style,
 	].includes(fieldName)) {
 		return {SERVER_ACTION, BROADCASTER_ACTION}
 	} else {
@@ -102,8 +103,8 @@ export interface ISequencerState extends IMultiStateThing {
 }
 
 export enum InfiniteSequencerStyle {
-	colorBars,
-	colorGrid,
+	colorBars = 'colorBars',
+	colorGrid = 'colorGrid',
 }
 
 export type IInfiniteSequencerState = ISequencerState
@@ -116,14 +117,15 @@ export class InfiniteSequencerState implements IInfiniteSequencerState {
 	public readonly color: string
 	public readonly name: string
 	public readonly isRecording: boolean = false
-	public readonly style = InfiniteSequencerStyle.colorGrid
+	public readonly style: InfiniteSequencerStyle
 
-	constructor(name: string, events?: IInfiniteSequencerEvent[]) {
+	constructor(name: string, style: InfiniteSequencerStyle, events?: IInfiniteSequencerEvent[]) {
 		this.name = name
 		this.color = colorFunc(hashbow(this.id)).desaturate(0.2).hsl().string()
 		this.events = events ||
 			[{notes: [44]}, {notes: [45]}, {notes: [46]}, {notes: [47]},
 			{notes: [48]}, {notes: [49]}, {notes: [50]}, {notes: [51]}]
+		this.style = style
 	}
 }
 

@@ -15,7 +15,6 @@ import './InfiniteSequencer.less'
 
 interface IInfiniteSequencerProps {
 	id: string
-	style: InfiniteSequencerStyle
 }
 
 interface IInfiniteSequencerReduxProps {
@@ -25,6 +24,7 @@ interface IInfiniteSequencerReduxProps {
 	isPlaying: boolean
 	isRecording: boolean
 	name: string
+	style: InfiniteSequencerStyle
 }
 
 type IInfiniteSequencerAllProps =
@@ -33,7 +33,6 @@ type IInfiniteSequencerAllProps =
 export class InfiniteSequencer extends Component<IInfiniteSequencerAllProps> {
 	public static defaultProps = {
 		events: [],
-		style: InfiniteSequencerStyle.colorGrid,
 	}
 
 	public render() {
@@ -80,13 +79,20 @@ export class InfiniteSequencer extends Component<IInfiniteSequencerAllProps> {
 							>
 								⭳
 							</div>
-							{/* <div
+							<div
 								className="style"
 								onClick={() => this.props.dispatch(
-									setInfiniteSequencerField(id))}
+									setInfiniteSequencerField(
+										id,
+										InfiniteSequencerFields.style,
+										this.props.style === InfiniteSequencerStyle.colorBars
+											? InfiniteSequencerStyle.colorGrid
+											: InfiniteSequencerStyle.colorBars,
+									),
+								)}
 							>
 								★
-							</div> */}
+							</div>
 						</div>
 						{style === InfiniteSequencerStyle.colorBars &&
 							<div className={`display ${this.props.events.length > 8 ? 'small' : ''}`}>
@@ -141,6 +147,7 @@ export const ConnectedInfiniteSequencer = connect(
 			isRecording: infiniteSequencerState.isRecording,
 			color: infiniteSequencerState.color,
 			name: infiniteSequencerState.name,
+			style: infiniteSequencerState.style,
 		}
 	},
 )(InfiniteSequencer)
