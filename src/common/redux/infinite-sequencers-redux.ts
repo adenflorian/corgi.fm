@@ -5,7 +5,6 @@ import {IMidiNote} from '../MidiNote'
 import {addIfNew} from '../server-common'
 import {colorFunc} from '../shamu-color'
 import {IClientRoomState} from './common-redux-types'
-import {LOCAL_MIDI_KEY_PRESS} from './local-middleware'
 import {
 	addMultiThing, deleteThings, IMultiState,
 	IMultiStateThing, IMultiStateThings, makeMultiReducer, MultiThingType, updateThings,
@@ -14,7 +13,7 @@ import {BROADCASTER_ACTION, NetworkActionType, SERVER_ACTION} from './redux-util
 import {VIRTUAL_KEY_PRESSED} from './virtual-keyboard-redux'
 
 export const ADD_INFINITE_SEQUENCER = 'ADD_INFINITE_SEQUENCER'
-export const addInfiniteSequencer = (infiniteSequencer: IInfiniteSequencerState) =>
+export const addInfiniteSequencer = (infiniteSequencer: InfiniteSequencerState) =>
 	addMultiThing(infiniteSequencer, MultiThingType.infiniteSequencer, NetworkActionType.SERVER_AND_BROADCASTER)
 
 export const DELETE_INFINITE_SEQUENCERS = 'DELETE_INFINITE_SEQUENCERS'
@@ -88,7 +87,7 @@ export interface IInfiniteSequencersState extends IMultiState {
 }
 
 export interface IInfiniteSequencers extends IMultiStateThings {
-	[key: string]: IInfiniteSequencerState
+	[key: string]: InfiniteSequencerState
 }
 
 export interface ISequencerState extends IMultiStateThing {
@@ -99,7 +98,6 @@ export interface ISequencerState extends IMultiStateThing {
 	color: string
 	name: string
 	isRecording: boolean
-	style: InfiniteSequencerStyle
 }
 
 export enum InfiniteSequencerStyle {
@@ -107,9 +105,7 @@ export enum InfiniteSequencerStyle {
 	colorGrid = 'colorGrid',
 }
 
-export type IInfiniteSequencerState = ISequencerState
-
-export class InfiniteSequencerState implements IInfiniteSequencerState {
+export class InfiniteSequencerState implements ISequencerState {
 	public readonly id: string = uuid.v4()
 	public readonly events: IInfiniteSequencerEvent[]
 	public readonly index: number = -1
@@ -139,12 +135,12 @@ export const infiniteSequencerActionTypes = [
 ]
 
 export const infiniteSequencersReducer =
-	makeMultiReducer<IInfiniteSequencerState, IInfiniteSequencersState>(
+	makeMultiReducer<InfiniteSequencerState, IInfiniteSequencersState>(
 		infiniteSequencerReducer, MultiThingType.infiniteSequencer, infiniteSequencerActionTypes)
 
 function infiniteSequencerReducer(
-	infiniteSequencer: IInfiniteSequencerState, action: AnyAction,
-): IInfiniteSequencerState {
+	infiniteSequencer: InfiniteSequencerState, action: AnyAction,
+): InfiniteSequencerState {
 	switch (action.type) {
 		case SET_INFINITE_SEQUENCER_NOTE:
 			if (action.note === undefined) {
@@ -177,17 +173,17 @@ function infiniteSequencerReducer(
 					[action.fieldName]: action.data,
 					events: [],
 				}
+			} else if (action.fieldName === 'index') {
+				return {
+					...infiniteSequencer,
+					[action.fieldName]: action.data % infiniteSequencer.events.length,
+				}
+			} else {
+				return {
+					...infiniteSequencer,
+					[action.fieldName]: action.data,
+				}
 			}
-			return {...infiniteSequencer, [action.fieldName]: action.data}
-		// case LOCAL_MIDI_KEY_PRESS:
-		// 	if (infiniteSequencer.isRecording) {
-		// 		return {
-		// 			...infiniteSequencer,
-		// 			events: infiniteSequencer.events.concat({notes: [action.midiNote]}),
-		// 		}
-		// 	} else {
-		// 		return infiniteSequencer
-		// 	}
 		case VIRTUAL_KEY_PRESSED:
 			if (infiniteSequencer.isRecording) {
 				return {

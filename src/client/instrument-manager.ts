@@ -9,7 +9,9 @@ import {selectConnectionSourceNotes, selectConnectionsWithSourceOrTargetIds} fro
 import {
 	selectAllGridSequencers, setGridSequencerField,
 } from '../common/redux/grid-Sequencers-redux'
-import {selectAllInfiniteSequencers, setInfiniteSequencerField} from '../common/redux/infinite-sequencers-redux'
+import {
+	InfiniteSequencerFields, selectAllInfiniteSequencers, setInfiniteSequencerField,
+} from '../common/redux/infinite-sequencers-redux'
 import {BasicSamplerInstrument} from './BasicSampler/BasicSamplerInstrument'
 import {GridSequencerPlayer} from './GridSequencerPlayer'
 import {BasicInstrument} from './Instruments/BasicInstrument'
@@ -108,7 +110,7 @@ export const setupInstrumentManager = (store: Store<IClientAppState>, audioConte
 
 			if (gridSequencer.isPlaying !== sequencer.isPlaying()) {
 				if (gridSequencer.isPlaying) {
-					sequencer.play(gridSequencer.events.length)
+					sequencer.play()
 				} else {
 					sequencer.stop()
 				}
@@ -125,13 +127,13 @@ export const setupInstrumentManager = (store: Store<IClientAppState>, audioConte
 			sequencer = createIfNotExisting(infiniteSequencer.id, sequencer, () => {
 				return new GridSequencerPlayer(
 					audioContext,
-					index => store.dispatch(setInfiniteSequencerField(infiniteSequencer.id, 'index', index)),
+					index => store.dispatch(setInfiniteSequencerField(infiniteSequencer.id, InfiniteSequencerFields.index, index)),
 				)
 			})
 
 			if (infiniteSequencer.isPlaying !== sequencer.isPlaying()) {
 				if (infiniteSequencer.isPlaying) {
-					sequencer.play(infiniteSequencer.events.length)
+					sequencer.play()
 				} else {
 					sequencer.stop()
 				}

@@ -1,3 +1,4 @@
+import {logger} from '../common/logger'
 import {IMidiNote} from '../common/MidiNote'
 
 export enum SimpleGridSequencerEventAction {
@@ -20,7 +21,6 @@ export class GridSequencerPlayer {
 	private _startTime: number
 	private _isPlaying: boolean = false
 	private readonly _onIndexChange: IndexChangeHandler
-	private _gridSequencerLength = 0
 
 	constructor(audioContext: AudioContext, onIndexChange: IndexChangeHandler) {
 		this._audioContext = audioContext
@@ -28,11 +28,10 @@ export class GridSequencerPlayer {
 		this._startTime = this._audioContext.currentTime
 	}
 
-	public play = (gridSequencerLength: number) => {
+	public play = () => {
 		if (this.isPlaying()) return
 		this._startTime = this._audioContext.currentTime
 		this._isPlaying = true
-		this._gridSequencerLength = gridSequencerLength
 		window.requestAnimationFrame(this._onTick)
 	}
 
@@ -58,12 +57,12 @@ export class GridSequencerPlayer {
 		const newIndex = Math.floor(this.getCurrentPlayTime() * 5)
 
 		if (newIndex !== this._index) {
-			if (newIndex >= this._gridSequencerLength) {
-				this._index = 0
-				this._startTime = this._audioContext.currentTime
-			} else {
-				this._index = newIndex
+			if (newIndex - this._index > 1) {
+				logger.warn('newIndex was more than 1 off of this._index: ', newIndex - this._index)
 			}
+
+			this._index = newIndex
+
 			if (this._isPlaying) {
 				this._onIndexChange(this._index)
 			}

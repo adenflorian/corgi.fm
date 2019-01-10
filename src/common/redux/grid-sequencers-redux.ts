@@ -201,7 +201,17 @@ function gridSequencerReducer(gridSequencer: IGridSequencerState, action: AnyAct
 				}),
 			}
 		case SET_GRID_SEQUENCER_FIELD:
-			return {...gridSequencer, [action.fieldName]: action.data}
+			if (action.fieldName === 'index') {
+				return {
+					...gridSequencer,
+					[action.fieldName]: action.data % gridSequencer.events.length,
+				}
+			} else {
+				return {
+					...gridSequencer,
+					[action.fieldName]: action.data,
+				}
+			}
 		default:
 			return gridSequencer
 	}
