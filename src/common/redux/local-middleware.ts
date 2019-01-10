@@ -1,5 +1,6 @@
 import {Dispatch, Middleware} from 'redux'
 import {applyOctave} from '../../client/music/music-functions'
+import {logger} from '../logger'
 import {addBasicInstrument, BasicInstrumentState} from './basic-instruments-redux'
 import {addBasicSampler, BasicSamplerState} from './basic-sampler-redux'
 import {selectLocalClient} from './clients-redux'
@@ -69,6 +70,11 @@ function getLocalVirtualKeyboard(state: IClientAppState) {
 
 function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 	const localClient = selectLocalClient(state)
+
+	if (localClient.name.startsWith('fake')) {
+		logger.warn('FAKE')
+		return
+	}
 
 	const newVirtualKeyboard = new VirtualKeyboardState(localClient.id, localClient.color)
 	dispatch(addVirtualKeyboard(newVirtualKeyboard))
