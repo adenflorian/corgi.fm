@@ -1,5 +1,5 @@
 import {Map} from 'immutable'
-import {AnyAction} from 'redux'
+import {Reducer} from 'redux'
 import * as uuid from 'uuid'
 import {logger} from '../logger'
 import {IClientRoomState} from './common-redux-types'
@@ -9,29 +9,33 @@ import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
 import {IVirtualKeyboardState, makeGetKeyboardMidiOutput, selectVirtualKeyboardById} from './virtual-keyboard-redux'
 
 export const ADD_CONNECTION = 'ADD_CONNECTION'
+export type AddConnectionAction = ReturnType<typeof addConnection>
 export const addConnection = (connection: IConnection) => ({
-	type: ADD_CONNECTION,
+	type: ADD_CONNECTION as typeof ADD_CONNECTION,
 	connection,
 	SERVER_ACTION,
 	BROADCASTER_ACTION,
 })
 
 export const DELETE_CONNECTIONS = 'DELETE_CONNECTIONS'
+export type DeleteConnectionsAction = ReturnType<typeof deleteConnections>
 export const deleteConnections = (connectionIds: string[]) => ({
-	type: DELETE_CONNECTIONS,
+	type: DELETE_CONNECTIONS as typeof DELETE_CONNECTIONS,
 	connectionIds,
 	SERVER_ACTION,
 	BROADCASTER_ACTION,
 })
 
 export const DELETE_ALL_CONNECTIONS = 'DELETE_ALL_CONNECTIONS'
+export type DeleteAllConnectionsAction = ReturnType<typeof deleteAllConnections>
 export const deleteAllConnections = () => ({
-	type: DELETE_ALL_CONNECTIONS,
+	type: DELETE_ALL_CONNECTIONS as typeof DELETE_ALL_CONNECTIONS,
 })
 
 export const UPDATE_CONNECTIONS = 'UPDATE_CONNECTIONS'
+export type UpdateConnectionsAction = ReturnType<typeof updateConnections>
 export const updateConnections = (connections: IConnections) => ({
-	type: UPDATE_CONNECTIONS,
+	type: UPDATE_CONNECTIONS as typeof UPDATE_CONNECTIONS,
 	connections,
 	BROADCASTER_ACTION,
 })
@@ -82,35 +86,26 @@ const initialState: IConnectionsState = {
 	connections: Connections(),
 }
 
-export interface IConnectionAction extends AnyAction {
-	connection: IConnection
-	id: string
-	connectionIds: string[]
-}
+export type IConnectionAction = AddConnectionAction | DeleteConnectionsAction
+	| DeleteAllConnectionsAction | UpdateConnectionsAction
 
-export function connectionsReducer(
-	state: IConnectionsState = initialState, action: IConnectionAction,
-): IConnectionsState {
-	switch (action.type) {
-		case ADD_CONNECTION: return {
-			...state,
-			connections: state.connections.set(action.connection.id, action.connection),
+export const connectionsReducer: Reducer<IConnectionsState, IConnectionAction> =
+	(state = initialState, action) => {
+		return {
+			connections: connectionsSpecificReducer(state.connections, action),
 		}
-		case DELETE_CONNECTIONS: return {
-			...state,
-			connections: state.connections.deleteAll(action.connectionIds),
-		}
-		case DELETE_ALL_CONNECTIONS: return {
-			...state,
-			connections: Connections(),
-		}
-		case UPDATE_CONNECTIONS: return {
-			...state,
-			connections: state.connections.merge(action.connections),
-		}
-		default: return state
 	}
-}
+
+export const connectionsSpecificReducer: Reducer<IConnections, IConnectionAction> =
+	(connections = Connections(), action) => {
+		switch (action.type) {
+			case ADD_CONNECTION: return connections.set(action.connection.id, action.connection)
+			case DELETE_CONNECTIONS: return connections.deleteAll(action.connectionIds)
+			case DELETE_ALL_CONNECTIONS: return connections.clear()
+			case UPDATE_CONNECTIONS: return connections.merge(action.connections)
+			default: return connections
+		}
+	}
 
 export const selectConnection = (state: IClientRoomState, id: string) =>
 	selectAllConnections(state).get(id)
