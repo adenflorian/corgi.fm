@@ -3,6 +3,7 @@ import {v4} from 'uuid'
 import {ClientId} from '../common-types'
 import {logger} from '../logger'
 import {getColorHslByString} from '../shamu-color'
+import {SELF_DISCONNECTED} from './common-actions'
 import {IClientAppState} from './common-redux-types'
 import {IServerState} from './configure-server-store'
 import {BROADCASTER_ACTION, createReducer, SERVER_ACTION} from './redux-utils'
@@ -158,6 +159,10 @@ export const clientsReducer = createReducer(initialState, {
 		...state,
 		clients: state.clients
 			.map(x => x.id === id ? {...x, pointer} : x),
+	}),
+	[SELF_DISCONNECTED]: state => ({
+		...state,
+		clients: [],
 	}),
 })
 
