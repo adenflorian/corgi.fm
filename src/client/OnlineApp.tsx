@@ -16,9 +16,10 @@ import {Button} from './Button/Button'
 import {ConnectedChat} from './Chat'
 import {ConnectionsContainer} from './Connections/Connections'
 import {ConnectedGridSequencerContainer} from './GridSequencer/GridSequencerContainer'
-import {ConnectedInfiniteSequencer, InfiniteSequencer} from './InfiniteSequencer/InfiniteSequencer'
+import {ConnectedInfiniteSequencer} from './InfiniteSequencer/InfiniteSequencer'
 import {ConnectedBasicInstrumentView} from './Instruments/BasicInstrumentView'
 import {ConnectedKeyboard} from './Keyboard/Keyboard'
+import {ConnectedMasterControls} from './MasterControls'
 import {MousePointers} from './MousePointers'
 import {Options} from './Options/Options'
 import {ConnectedRoomSelector} from './RoomSelector'
@@ -71,6 +72,9 @@ class OnlineApp extends React.Component<IOnlineAppProps> {
 
 						<div id={mainBoardsId} className="boards">
 							<div className="boardRow">
+								<div className="board connected">
+									<ConnectedMasterControls />
+								</div>
 								<div className="board connected">
 									<ConnectedVolumeControl color={MASTER_VOLUME_COLOR} />
 								</div>

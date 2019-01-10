@@ -1,10 +1,11 @@
-import {AnyAction} from 'redux'
+import {AnyAction, Reducer} from 'redux'
 import * as uuid from 'uuid'
 import {hashbow} from '../../client/utils'
 import {IMidiNote} from '../MidiNote'
 import {addIfNew} from '../server-common'
 import {MAX_MIDI_NOTE_NUMBER_127} from '../server-constants'
 import {colorFunc} from '../shamu-color'
+import {PLAY_ALL, STOP_ALL} from './common-actions'
 import {IClientRoomState} from './common-redux-types'
 import {
 	addMultiThing, deleteThings, IMultiState,
@@ -170,52 +171,55 @@ export const gridSequencerActionTypes = [
 	SET_GRID_SEQUENCER_FIELD,
 ]
 
+const gridSequencerReducer: Reducer<IGridSequencerState, AnyAction> =
+	(gridSequencer = new GridSequencerState('defaultName', 4), action) => {
+		switch (action.type) {
+			case SET_GRID_SEQUENCER_NOTE:
+				if (action.note === undefined) {
+					throw new Error('action.notes === undefined')
+				}
+				return {
+					...gridSequencer,
+					events: gridSequencer.events.map((event, eventIndex) => {
+						if (eventIndex === action.index) {
+							if (action.enabled) {
+								return {
+									...event,
+									notes: addIfNew(event.notes, action.note),
+								}
+							} else {
+								return {
+									...event,
+									notes: event.notes.filter(x => x !== action.note),
+								}
+							}
+						} else {
+							return event
+						}
+					}),
+				}
+			case SET_GRID_SEQUENCER_FIELD:
+				if (action.fieldName === 'index') {
+					return {
+						...gridSequencer,
+						[action.fieldName]: action.data % gridSequencer.events.length,
+					}
+				} else {
+					return {
+						...gridSequencer,
+						[action.fieldName]: action.data,
+					}
+				}
+			case PLAY_ALL: return {...gridSequencer, isPlaying: true}
+			case STOP_ALL: return {...gridSequencer, isPlaying: false}
+			default:
+				return gridSequencer
+		}
+	}
+
 export const gridSequencersReducer =
 	makeMultiReducer<IGridSequencerState, IGridSequencersState>(
 		gridSequencerReducer, MultiThingType.gridSequencer, gridSequencerActionTypes)
-
-function gridSequencerReducer(gridSequencer: IGridSequencerState, action: AnyAction) {
-	switch (action.type) {
-		case SET_GRID_SEQUENCER_NOTE:
-			if (action.note === undefined) {
-				throw new Error('action.notes === undefined')
-			}
-			return {
-				...gridSequencer,
-				events: gridSequencer.events.map((event, eventIndex) => {
-					if (eventIndex === action.index) {
-						if (action.enabled) {
-							return {
-								...event,
-								notes: addIfNew(event.notes, action.note),
-							}
-						} else {
-							return {
-								...event,
-								notes: event.notes.filter(x => x !== action.note),
-							}
-						}
-					} else {
-						return event
-					}
-				}),
-			}
-		case SET_GRID_SEQUENCER_FIELD:
-			if (action.fieldName === 'index') {
-				return {
-					...gridSequencer,
-					[action.fieldName]: action.data % gridSequencer.events.length,
-				}
-			} else {
-				return {
-					...gridSequencer,
-					[action.fieldName]: action.data,
-				}
-			}
-		default:
-			return gridSequencer
-	}
-}
 
 export const selectAllGridSequencers = (state: IClientRoomState) => state.gridSequencers.things
 

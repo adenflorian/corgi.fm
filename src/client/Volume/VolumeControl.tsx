@@ -1,12 +1,13 @@
 import 'rc-slider/assets/index.css'
-import {Component} from 'react'
 import React = require('react')
+import {Component} from 'react'
 import {connect} from 'react-redux'
 import {Action, Dispatch} from 'redux'
 import {IClientAppState} from '../../common/redux/common-redux-types'
 import {setOptionMasterVolume} from '../../common/redux/options-redux'
 import {colorFunc} from '../../common/shamu-color'
 import {Knob} from '../Knob/Knob'
+import {Panel} from '../Panel'
 import './VolumeControl.less'
 
 interface IVolumeControlProps {
@@ -35,9 +36,7 @@ export class VolumeControl extends Component<IVolumeControlAllProps> {
 		const newColor = colorFunc(color).saturate(reportedMasterVolume / 25).hsl().string()
 
 		return (
-			<div className="volume container" style={{color: newColor}}>
-				<div className="isometricBoxShadow" />
-				<div className="label">master volume</div>
+			<Panel className="volume" label="master volume" color={newColor}>
 				<Knob
 					value={this.props.masterVolume}
 					onChange={this.props.changeMasterVolume}
@@ -45,7 +44,7 @@ export class VolumeControl extends Component<IVolumeControlAllProps> {
 					max={0.5}
 					markColor={newColor}
 				/>
-			</div>
+			</Panel>
 		)
 	}
 }

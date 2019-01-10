@@ -2,6 +2,7 @@ import * as React from 'react'
 import {Component} from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
+import {playAll} from '../../common/redux/common-actions'
 import {IClientAppState} from '../../common/redux/common-redux-types'
 import {
 	exportSequencerMidi, findLowestAndHighestNotes, IGridSequencerEvent,
@@ -46,10 +47,8 @@ export class InfiniteSequencer extends Component<IInfiniteSequencerAllProps> {
 			<div className="infiniteSequencer">
 				<div
 					className={`${isPlaying ? 'isPlaying saturate' : 'isNotPlaying'}`}
-					style={{color: isRecording ? 'red' : color}}
 				>
-					<div className="label transitionAllColor">{name}</div>
-					<Panel id={this.props.id}>
+					<Panel id={this.props.id} label={name} color={isRecording ? 'red' : color}>
 						<div className="controls">
 							<div
 								className="play"

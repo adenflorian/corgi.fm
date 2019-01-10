@@ -19,7 +19,7 @@ export const GridSequencer = (props: IGridSequencerProps) => {
 			style={{color}}
 		>
 			<div className="label transitionAllColor">{name}</div>
-			<Panel id={id}>
+			<Panel id={id} color={color}>
 				<GridSequencerControlsConnected
 					id={id}
 				/>

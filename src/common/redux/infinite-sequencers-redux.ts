@@ -4,6 +4,7 @@ import {hashbow} from '../../client/utils'
 import {IMidiNote} from '../MidiNote'
 import {addIfNew} from '../server-common'
 import {colorFunc} from '../shamu-color'
+import {PLAY_ALL, STOP_ALL} from './common-actions'
 import {IClientRoomState} from './common-redux-types'
 import {
 	addMultiThing, deleteThings, IMultiState,
@@ -184,6 +185,8 @@ function infiniteSequencerReducer(
 					[action.fieldName]: action.data,
 				}
 			}
+		case PLAY_ALL: return {...infiniteSequencer, isPlaying: true}
+		case STOP_ALL: return {...infiniteSequencer, isPlaying: false}
 		case VIRTUAL_KEY_PRESSED:
 			if (infiniteSequencer.isRecording) {
 				return {
