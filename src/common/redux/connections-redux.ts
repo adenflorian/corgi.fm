@@ -213,7 +213,7 @@ export const selectConnectionSourceNotes = (state: IClientRoomState, id: string)
 			// const index = gridSequencer.index
 			const index = globalClockIndex
 
-			if (index >= 0) {
+			if (index >= 0 && gridSequencer.events.length > 0) {
 				return gridSequencer.events[index % gridSequencer.events.length].notes
 			} else {
 				return emptyArray
@@ -228,7 +228,7 @@ export const selectConnectionSourceNotes = (state: IClientRoomState, id: string)
 
 			const index = globalClockIndex
 
-			if (index >= 0) {
+			if (index >= 0 && infiniteSequencer.events.length > 0) {
 				return infiniteSequencer.events[index % infiniteSequencer.events.length].notes
 			} else {
 				return emptyArray
