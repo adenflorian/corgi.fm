@@ -1,25 +1,17 @@
 @import "../colors.less";
+
 .basicInstrument {
+    display: inline-flex;
     align-items: center;
+    padding: 0 8px;
 
     &.isNotPlaying {
         transition: box-shadow 0.3s ease-out;
     }
 
-    & > *:last-child {
-        margin-right: 16px;
-    }
-
-    .label,
-    .knob,
-    .oscillatorTypes {
-        text-shadow: 0 0 16px @darkTextShadow;
-        margin: 8px 0;
-        margin-left: 16px;
-    }
-
     .oscillatorTypes {
         display: flex;
+        margin-right: 8px;
 
         svg {
             margin: 8px;

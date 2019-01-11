@@ -31,12 +31,13 @@ export class BasicSampler extends React.PureComponent<IBasicSamplerAllProps> {
 
 		return (
 			<Panel
-				className={`basicSampler ${isPlaying ? 'isPlaying' : 'isNotPlaying'}`}
+				className={`${isPlaying ? 'isPlaying' : 'isNotPlaying'}`}
 				id={this.props.id}
 				color={color}
 				saturate={isPlaying}
 			>
-				<div className="inside">
+				<div className="basicSampler">
+
 					<div className="samplerLabel colorize">Piano Sampler</div>
 
 					<Knob

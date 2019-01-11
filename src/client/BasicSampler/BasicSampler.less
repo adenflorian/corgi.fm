@@ -1,27 +1,14 @@
 @import "../colors.less";
-.basicSampler {
-    .inside {
-        margin: 8px;
-        display: inline-flex;
 
-        .samplerLabel {
-            margin: auto;
-            margin-left: 8px;
-        }
+.basicSampler {
+    display: inline-flex;
+    padding: 0 8px;
+
+    .samplerLabel {
+        margin: auto 8px;
     }
 
     &.isNotPlaying {
         transition: box-shadow 0.3s ease-out;
-    }
-
-    & > *:last-child {
-        margin-right: 16px;
-    }
-
-    .label,
-    .knob {
-        text-shadow: 0 0 16px @darkTextShadow;
-        margin: 8px 0;
-        margin-left: 16px;
     }
 }

@@ -48,52 +48,52 @@ export class BasicInstrumentView
 
 		return (
 			<Panel
-				className={`basicInstrument ${isPlaying ? 'isPlaying' : 'isNotPlaying'}`}
+				className={`${isPlaying ? 'isPlaying' : 'isNotPlaying'}`}
 				color={color}
 				saturate={isPlaying}
 				id={this.props.id}
 			>
-				<BasicInstrumentOscillatorTypes
-					handleClick={this._handleOscillatorTypeClicked}
-					activeType={oscillatorType}
-				/>
-				<Knob
-					min={-1}
-					max={1}
-					value={pan}
-					onChange={this._dispatchChangeInstrumentParam}
-					label="pan"
-					onChangeId={BasicInstrumentParam.pan}
-				/>
-				<Knob
-					min={0}
-					max={10000}
-					curve={2}
-					value={this.props.lowPassFilterCutoffFrequency}
-					onChange={this._dispatchChangeInstrumentParam}
-					label="lpf"
-					onChangeId={BasicInstrumentParam.lowPassFilterCutoffFrequency}
-				/>
-				<Knob
-					min={0.01}
-					max={10}
-					curve={3}
-					value={this.props.attack}
-					onChange={this._dispatchChangeInstrumentParam}
-					label="attack"
-					onChangeId={BasicInstrumentParam.attack}
-				/>
-				<Knob
-					min={0.01}
-					max={60}
-					curve={2}
-					value={this.props.release}
-					onChange={this._dispatchChangeInstrumentParam}
-					label="release"
-					onChangeId={BasicInstrumentParam.release}
-				/>
-				{/* </div > */}
-				{/* </div> */}
+				<div className="basicInstrument">
+					<BasicInstrumentOscillatorTypes
+						handleClick={this._handleOscillatorTypeClicked}
+						activeType={oscillatorType}
+					/>
+					<Knob
+						min={-1}
+						max={1}
+						value={pan}
+						onChange={this._dispatchChangeInstrumentParam}
+						label="pan"
+						onChangeId={BasicInstrumentParam.pan}
+					/>
+					<Knob
+						min={0}
+						max={10000}
+						curve={2}
+						value={this.props.lowPassFilterCutoffFrequency}
+						onChange={this._dispatchChangeInstrumentParam}
+						label="lpf"
+						onChangeId={BasicInstrumentParam.lowPassFilterCutoffFrequency}
+					/>
+					<Knob
+						min={0.01}
+						max={10}
+						curve={3}
+						value={this.props.attack}
+						onChange={this._dispatchChangeInstrumentParam}
+						label="attack"
+						onChangeId={BasicInstrumentParam.attack}
+					/>
+					<Knob
+						min={0.01}
+						max={60}
+						curve={2}
+						value={this.props.release}
+						onChange={this._dispatchChangeInstrumentParam}
+						label="release"
+						onChangeId={BasicInstrumentParam.release}
+					/>
+				</div>
 			</Panel>
 		)
 	}
