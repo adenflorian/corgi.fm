@@ -144,23 +144,46 @@ export const getConnectionSourceColorByTargetId = (state: IClientRoomState, targ
 
 export const selectConnectionSourceColor = (roomState: IClientRoomState, id: string) => {
 	const connection = selectConnection(roomState, id)
-	if (connection) {
-		switch (connection.sourceType) {
-			case ConnectionSourceType.keyboard:
-				const virtualKeyboard = selectVirtualKeyboardById(roomState, connection.sourceId)
-				return virtualKeyboard && virtualKeyboard.color
-			case ConnectionSourceType.gridSequencer:
-				const gridSequencer = selectAllGridSequencers(roomState)[connection.sourceId]
-				return gridSequencer ? gridSequencer.color : 'gray'
-			case ConnectionSourceType.infiniteSequencer:
-				const infiniteSequencer = selectAllInfiniteSequencers(roomState)[connection.sourceId]
-				return infiniteSequencer ? infiniteSequencer.color : 'gray'
-			default:
-				throw new Error('couldnt find source color (unsupported connection source type)')
-		}
-	} else {
-		return 'gray'
+
+	if (!connection) return 'gray'
+
+	switch (connection.sourceType) {
+		case ConnectionSourceType.keyboard:
+			const virtualKeyboard = selectVirtualKeyboardById(roomState, connection.sourceId)
+			return virtualKeyboard && virtualKeyboard.color
+		case ConnectionSourceType.gridSequencer:
+			const gridSequencer = selectAllGridSequencers(roomState)[connection.sourceId]
+			return gridSequencer ? gridSequencer.color : 'gray'
+		case ConnectionSourceType.infiniteSequencer:
+			const infiniteSequencer = selectAllInfiniteSequencers(roomState)[connection.sourceId]
+			return infiniteSequencer ? infiniteSequencer.color : 'gray'
+		default:
+			throw new Error('couldnt find source color (unsupported connection source type)')
 	}
+}
+
+export const selectConnectionSourceIsPlaying = (roomState: IClientRoomState, id: string) => {
+	const connection = selectConnection(roomState, id)
+
+	if (!connection) return false
+
+	switch (connection.sourceType) {
+		case ConnectionSourceType.keyboard:
+			const virtualKeyboard = selectVirtualKeyboardById(roomState, connection.sourceId)
+			return virtualKeyboard && virtualKeyboard.pressedKeys.length > 0
+		case ConnectionSourceType.gridSequencer:
+			const gridSequencer = selectAllGridSequencers(roomState)[connection.sourceId]
+			return gridSequencer ? gridSequencer.isPlaying : false
+		case ConnectionSourceType.infiniteSequencer:
+			const infiniteSequencer = selectAllInfiniteSequencers(roomState)[connection.sourceId]
+			return infiniteSequencer ? infiniteSequencer.isPlaying : false
+		default:
+			throw new Error('couldnt find source isPlaying (unsupported connection source type)')
+	}
+}
+
+export const selectConnectionSourceShouldHighlight = (roomState: IClientRoomState, id: string) => {
+	return selectConnectionSourceNotes(roomState, id).length > 0
 }
 
 const getKeyboardMidiOutput = makeGetKeyboardMidiOutput()

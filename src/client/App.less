@@ -122,8 +122,12 @@ body {
 
 .saturate {
     .colorize {
-        filter: saturate(300%);
+        .saturate.colorize()
     }
+}
+
+.saturate.colorize {
+    filter: saturate(300%);
 }
 
 .play {

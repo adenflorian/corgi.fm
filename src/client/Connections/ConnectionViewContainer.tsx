@@ -3,16 +3,24 @@ import {connect} from 'react-redux'
 import {IClientAppState} from '../../common/redux/common-redux-types'
 import {
 	IConnection, selectConnection, selectConnectionSourceColor,
+	selectConnectionSourceIsPlaying, selectConnectionSourceShouldHighlight,
 } from '../../common/redux/connections-redux'
 import {ConnectionView, Point} from './ConnectionView'
 
 export interface IConnectionViewContainerProps {
 	id: string
+}
+
+export interface IConnectionViewContainerReduxProps {
 	sourceId?: string
 	targetId?: string
 	sourceColor: string
 	offset: number
+	isSourcePlaying: boolean
+	shouldHighlight: boolean
 }
+
+type IConnectionViewContainerAllProps = IConnectionViewContainerProps & IConnectionViewContainerReduxProps
 
 type AnyRect = ClientRect | DOMRect | any
 
@@ -26,7 +34,7 @@ interface ICVCState {
 	oldPositions: Positions
 }
 
-export class ConnectionViewContainer extends React.Component<IConnectionViewContainerProps, ICVCState> {
+export class ConnectionViewContainer extends React.Component<IConnectionViewContainerAllProps, ICVCState> {
 	public static defaultProps = {
 		offset: 0,
 		sourceColor: 'gray',
@@ -34,7 +42,7 @@ export class ConnectionViewContainer extends React.Component<IConnectionViewCont
 
 	public state: ICVCState = {positions: {}, oldPositions: {}}
 
-	constructor(props: IConnectionViewContainerProps) {
+	constructor(props: IConnectionViewContainerAllProps) {
 		super(props)
 		window.addEventListener('resize', this._updatePositions)
 		window.addEventListener('scroll', this._updatePositions)
@@ -65,6 +73,9 @@ export class ConnectionViewContainer extends React.Component<IConnectionViewCont
 					sourceY={sourcePosition.y}
 					targetX={targetPosition.x}
 					targetY={targetPosition.y}
+					saturateSource={this.props.isSourcePlaying}
+					saturateTarget={this.props.shouldHighlight}
+					id={this.props.id}
 				/>
 			)
 		}
@@ -103,14 +114,18 @@ export class ConnectionViewContainer extends React.Component<IConnectionViewCont
 	}
 }
 
-const mapState = (state: IClientAppState, props: IConnectionViewContainerProps) => {
+const mapState = (state: IClientAppState, props: IConnectionViewContainerProps): IConnectionViewContainerReduxProps => {
 	const connection = selectConnection(state.room, props.id) || {} as IConnection
 	const sourceColor = connection && selectConnectionSourceColor(state.room, connection.id)
+	const isSourcePlaying = connection && selectConnectionSourceIsPlaying(state.room, connection.id)
+	const shouldHighlight = connection && selectConnectionSourceShouldHighlight(state.room, connection.id)
 	return {
 		sourceId: connection.sourceId,
 		targetId: connection.targetId,
 		sourceColor,
 		offset: 16,
+		isSourcePlaying,
+		shouldHighlight,
 	}
 }
 

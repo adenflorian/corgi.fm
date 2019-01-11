@@ -8,16 +8,15 @@ interface IConnectionsProps {
 	connectionIds: string[]
 }
 
-const Connections = ({connectionIds}: IConnectionsProps) => (
+export const Connections = ({connectionIds}: IConnectionsProps) =>
 	<div className="connections" style={{display: 'flex'}}>
 		{connectionIds.map(connectionId => (
 			<ConnectedConnectionViewContainer key={connectionId} id={connectionId} />
 		))}
 	</div>
-)
 
-const mapStateToProps = (state: IClientAppState): IConnectionsProps => ({
-	connectionIds: selectAllConnectionIds(state.room),
-})
-
-export const ConnectionsContainer = connect(mapStateToProps)(Connections)
+export const ConnectionsContainer = connect(
+	(state: IClientAppState): IConnectionsProps => ({
+		connectionIds: selectAllConnectionIds(state.room),
+	}),
+)(Connections)

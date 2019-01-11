@@ -13,6 +13,10 @@ export function getColorHslByHex(hex: string): string {
 	return colorFunc(hex).desaturate(0.4).hsl().string()
 }
 
+export function saturateColor(color: string) {
+	return colorFunc(color).saturate(3).hsl().string()
+}
+
 // Keep in sync with colors.less
 export enum CssColor {
 	frenchGray = '#BDBDC6',

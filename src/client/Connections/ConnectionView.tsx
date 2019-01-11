@@ -1,5 +1,5 @@
 import * as React from 'react'
-import {colorFunc} from '../../common/shamu-color'
+import {colorFunc, saturateColor} from '../../common/shamu-color'
 import './ConnectionView.less'
 
 export interface Point {
@@ -15,6 +15,9 @@ export interface IConnectionViewProps {
 	targetY: number
 	connectorWidth: number
 	connectorHeight: number
+	saturateSource: boolean
+	saturateTarget: boolean
+	id: string
 }
 
 export class ConnectionView extends React.PureComponent<IConnectionViewProps> {
@@ -24,25 +27,40 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps> {
 	}
 
 	public render() {
-		const color = this.props.color
+		const {color, saturateSource, saturateTarget, id} = this.props
+
 		const darkerColor = colorFunc(color).darken(0.6).hsl().string()
 		const strokeWidth = '2px'
 		const strokeWidth2 = '8px'
 
 		return (
-			<React.Fragment>
-				<svg className="connection longLine" xmlns="http://www.w3.org/2000/svg">
+			<div>
+				<svg className={`connection colorize longLine`} xmlns="http://www.w3.org/2000/svg">
+					<defs>
+						<linearGradient
+							id={id}
+							x1={this.props.sourceX + this.props.connectorWidth}
+							y1={this.props.sourceY}
+							x2={this.props.targetX}
+							y2={this.props.targetY}
+							gradientUnits="userSpaceOnUse"
+						>
+							<stop stop-color={saturateSource ? saturateColor(darkerColor) : darkerColor} offset="0" />
+							<stop stop-color={saturateTarget ? saturateColor(darkerColor) : darkerColor} offset="1" />
+						</linearGradient>
+					</defs>
 					<line
 						x1={this.props.sourceX + this.props.connectorWidth}
 						y1={this.props.sourceY}
 						x2={this.props.targetX}
 						y2={this.props.targetY}
-						stroke={darkerColor}
+						// stroke={darkerColor}
+						stroke={`url(#${id})`}
 						strokeWidth={strokeWidth}
 					/>
 				</svg>
 				<svg
-					className="connection connector source"
+					className={`connection colorize connector source ${saturateSource ? 'saturate' : ''}`}
 					xmlns="http://www.w3.org/2000/svg"
 					style={{
 						width: this.props.connectorWidth,
@@ -61,7 +79,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps> {
 					/>
 				</svg>
 				<svg
-					className="connection connector target"
+					className={`connection colorize connector target ${saturateTarget ? 'saturate' : ''}`}
 					xmlns="http://www.w3.org/2000/svg"
 					style={{
 						width: this.props.connectorWidth,
@@ -79,7 +97,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps> {
 						strokeWidth={strokeWidth2}
 					/>
 				</svg>
-			</React.Fragment>
+			</div>
 		)
 	}
 }
