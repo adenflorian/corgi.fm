@@ -126,31 +126,198 @@ export function createServerStuff(room: string, serverStore: Store) {
 }
 
 function getInitialGridSequencerEvents() {
-	return [
-		{notes: [49]},
-		{notes: [63, 58]},
-		{notes: [49]},
-		{notes: []},
-		{notes: [49, 58]},
-		{notes: []},
-		{notes: [49]},
-		{notes: [58, 63]},
-		{notes: [51]},
-		{notes: []},
-		{notes: [51, 58]},
-		{notes: []},
-		{notes: [51]},
-		{notes: [58]},
-		{notes: [66, 51]},
-		{notes: []},
-	]
+	return new Array(16)
+		.fill({notes: []})
+		.map((_, i) => ({notes: i % 2 === 1 ? [] : [24]}))
+	// return [
+	// 	{notes: [49]},
+	// 	{notes: [63, 58]},
+	// 	{notes: [49]},
+	// 	{notes: []},
+	// 	{notes: [49, 58]},
+	// 	{notes: []},
+	// 	{notes: [49]},
+	// 	{notes: [58, 63]},
+	// 	{notes: [51]},
+	// 	{notes: []},
+	// 	{notes: [51, 58]},
+	// 	{notes: []},
+	// 	{notes: [51]},
+	// 	{notes: [58]},
+	// 	{notes: [66, 51]},
+	// 	{notes: []},
+	// ]
 }
 
 function getInitialGridSequencerEvents2() {
-	return new Array(32)
-		.fill({notes: []})
-		.map((_, i) => ({notes: i % 2 === 1 ? [] : [32]}))
+	return bassNotes
+	// return new Array(32)
+	// 	.fill({notes: []})
+	// 	.map((_, i) => ({notes: i % 2 === 1 ? [] : [32]}))
 }
+
+const bassNotes = [
+	{
+		notes: [
+			36,
+		],
+	},
+	{
+		notes: [
+			40,
+		],
+	},
+	{
+		notes: [
+			43,
+		],
+	},
+	{
+		notes: [
+			47,
+		],
+	},
+	{
+		notes: [
+			48,
+		],
+	},
+	{
+		notes: [
+			47,
+		],
+	},
+	{
+		notes: [
+			43,
+		],
+	},
+	{
+		notes: [
+			40,
+		],
+	},
+	{
+		notes: [
+			36,
+		],
+	},
+	{
+		notes: [
+			40,
+		],
+	},
+	{
+		notes: [
+			43,
+		],
+	},
+	{
+		notes: [
+			47,
+		],
+	},
+	{
+		notes: [
+			48,
+		],
+	},
+	{
+		notes: [
+			47,
+		],
+	},
+	{
+		notes: [
+			43,
+		],
+	},
+	{
+		notes: [
+			40,
+		],
+	},
+	{
+		notes: [
+			36,
+		],
+	},
+	{
+		notes: [
+			40,
+		],
+	},
+	{
+		notes: [
+			43,
+		],
+	},
+	{
+		notes: [
+			47,
+		],
+	},
+	{
+		notes: [
+			48,
+		],
+	},
+	{
+		notes: [
+			47,
+		],
+	},
+	{
+		notes: [
+			43,
+		],
+	},
+	{
+		notes: [
+			40,
+		],
+	},
+	{
+		notes: [
+			36,
+		],
+	},
+	{
+		notes: [
+			40,
+		],
+	},
+	{
+		notes: [
+			43,
+		],
+	},
+	{
+		notes: [
+			47,
+		],
+	},
+	{
+		notes: [
+			48,
+		],
+	},
+	{
+		notes: [
+			47,
+		],
+	},
+	{
+		notes: [
+			43,
+		],
+	},
+	{
+		notes: [
+			40,
+		],
+	},
+]
 
 function getInitialInfiniteSequencerEvents() {
 	return [
