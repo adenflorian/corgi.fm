@@ -188,70 +188,8 @@ body {
 
 .label {
     text-shadow: 0 0 16px @darkTextShadow;
-    margin-bottom: 4px;
-    color: currentColor;
     .isPlaying& {
         filter: saturate(300%);
-    }
-}
-
-.selectContainer {
-    .panel();
-
-    .arrow {
-        position: absolute;
-        right: 8px;
-        pointer-events: none;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        height: 100%;
-    }
-
-    &:hover {
-        .isometricBoxShadow, select, .arrow {
-            filter: brightness(125%)
-        }
-    }
-
-    &:active {
-        top: 1px;
-        left: -1px;
-
-        .isometricBoxShadow {
-            top: -1px;
-            left: 1px;
-        }
-    }
-    
-
-    select {
-        position: relative;
-        background-color: transparent;
-        border: none;
-        padding: 8px 32px 8px 8px;
-        font-size: 16px;
-        text-transform: inherit;
-        font-weight: inherit;
-        letter-spacing: inherit;
-        color: currentColor;
-        text-shadow: inherit;
-        height: 32px;
-
-        /* reset */
-        border-radius: 0;
-        margin: 0;      
-        -webkit-box-sizing: border-box;
-        -moz-box-sizing: border-box;
-        box-sizing: border-box;
-        -webkit-appearance:none;
-        -moz-appearance:none;
-
-        option {
-            background-color: @panelGray;
-            font-weight: inherit;
-            letter-spacing: inherit;
-        }
     }
 }
 

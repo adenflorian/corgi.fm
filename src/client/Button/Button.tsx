@@ -4,7 +4,7 @@ import './Button.less'
 
 interface IButtonProps {
 	buttonProps: any
-	buttonChildren: any
+	children: any
 }
 
 export class Button extends Component<IButtonProps> {
@@ -15,7 +15,7 @@ export class Button extends Component<IButtonProps> {
 				<button
 					{...this.props.buttonProps}
 				>
-					{this.props.buttonChildren}
+					{this.props.children}
 				</button>
 			</div>
 		)

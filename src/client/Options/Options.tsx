@@ -22,8 +22,9 @@ export class Options extends React.Component {
 			<Fragment>
 				<Button
 					buttonProps={{onClick: () => this.setState({showOptions: !this.state.showOptions})}}
-					buttonChildren="Options"
-				/>
+				>
+					Options
+				</Button>
 				{this.state.showOptions &&
 					<div className="optionsBG" onClick={() => this._hideOptions()}>
 						<div className="optionsPanel" onClick={e => e.stopPropagation()}>

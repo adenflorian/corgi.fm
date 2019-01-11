@@ -122,6 +122,9 @@ export const selectAllConnections = (state: IClientRoomState) =>
 export const selectAllConnectionsAsArray = (state: IClientRoomState): IConnection[] =>
 	selectAllConnections(state).toIndexedSeq().toArray()
 
+export const selectSortedConnections = (state: IClientRoomState): IConnection[] =>
+	selectAllConnectionsAsArray(state).sort(sortConnection)
+
 export const selectConnectionsWithSourceOrTargetIds = (state: IClientRoomState, sourceOrTargetIds: string[]) => {
 	return selectAllConnectionsAsArray(state)
 		.filter(x => sourceOrTargetIds.includes(x.sourceId) || sourceOrTargetIds.includes(x.targetId))
@@ -194,5 +197,17 @@ export const selectConnectionSourceNotes = (state: IClientRoomState, id: string)
 			}
 		default:
 			throw new Error('couldnt find source color (unsupported connection source type)')
+	}
+}
+
+export function sortConnection(connA: IConnection, connB: IConnection) {
+	if (connA.sourceType !== connB.sourceType) {
+		return connA.sourceType === 'gridSequencer'
+			? -1
+			: connA.sourceType === 'infiniteSequencer'
+				? -1
+				: 1
+	} else {
+		return connA.id > connB.id ? -1 : 1
 	}
 }

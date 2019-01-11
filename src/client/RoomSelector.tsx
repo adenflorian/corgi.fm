@@ -7,6 +7,7 @@ import {logger} from '../common/logger'
 import {IClientAppState} from '../common/redux/common-redux-types'
 import {changeRoom, requestCreateRoom, selectActiveRoom, selectAllRoomNames} from '../common/redux/rooms-redux'
 import {Button} from './Button/Button'
+import {Select} from './Select/Select'
 
 interface IRoomSelectorProps {
 	activeRoom: string
@@ -26,20 +27,16 @@ export class RoomSelector extends Component<IRoomSelectorProps & {dispatch: Disp
 			<div id="roomSelector">
 				<Button
 					buttonProps={{id: 'newRoomButton', onClick: this.onNewRoomButtonClick}}
-					buttonChildren="New Room"
+				>
+					New Room
+				</Button>
+				<Select
+					label="Room"
+					name="roomSelect"
+					onChange={this.onRoomSelect}
+					options={rooms}
+					value={activeRoom}
 				/>
-				<div className="selectRow">
-					<label htmlFor="roomSelect">Room </label>
-					<div className="selectContainer">
-						<div className="isometricBoxShadow" />
-						<select name="roomSelect" value={activeRoom} onChange={this.onRoomSelect}>
-							{rooms.map(room => <option key={room} value={room} label={room}>{room}</option>)}
-						</select>
-						<div className="arrow">
-							<div>▼</div>
-						</div>
-					</div>
-				</div>
 			</div>
 		)
 	}
