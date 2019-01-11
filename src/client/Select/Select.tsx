@@ -1,5 +1,6 @@
 import {List} from 'immutable'
 import * as React from 'react'
+import {Panel} from '../Panel'
 import './Select.less'
 
 interface ISelectProps {
@@ -13,8 +14,7 @@ interface ISelectProps {
 export const Select = ({label, name, onChange, options, value}: ISelectProps) =>
 	<div className="shamuSelect">
 		<label htmlFor={name}>{label}</label>
-		<div className="selectContainer">
-			<div className="isometricBoxShadow" />
+		<Panel className="selectContainer">
 			<select name={name} value={value} onChange={onChange}>
 				{options.map(choice =>
 					<option key={choice} value={choice} label={choice}>{choice}</option>,
@@ -23,5 +23,5 @@ export const Select = ({label, name, onChange, options, value}: ISelectProps) =>
 			<div className="arrow">
 				<div>▼</div>
 			</div>
-		</div>
+		</Panel>
 	</div>

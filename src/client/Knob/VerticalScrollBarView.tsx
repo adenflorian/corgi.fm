@@ -1,5 +1,5 @@
 import * as React from 'react'
-import {CssColor} from '../../common/server-constants'
+import {CssColor} from '../../common/shamu-color'
 
 interface IVerticalScrollBarViewProps {
 	percentage: number

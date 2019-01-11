@@ -9,7 +9,7 @@ interface IMasterControlsProps {
 }
 
 export const MasterControls = ({onPlay, onStop}: IMasterControlsProps) =>
-	<Panel className="masterControls" color="lightGray">
+	<Panel className="masterControls">
 		<div style={{margin: 8}}>
 			<div>
 				Master Controls

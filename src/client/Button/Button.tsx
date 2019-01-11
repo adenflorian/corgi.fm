@@ -11,10 +11,7 @@ interface IButtonProps {
 export class Button extends Component<IButtonProps> {
 	public render() {
 		return (
-			<Panel
-				className="buttonContainer"
-				color="lightGray"
-			>
+			<Panel className="buttonContainer">
 				<button
 					{...this.props.buttonProps}
 				>

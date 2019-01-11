@@ -12,3 +12,32 @@ export function getColorHslByString(str: string): string {
 export function getColorHslByHex(hex: string): string {
 	return colorFunc(hex).desaturate(0.4).hsl().string()
 }
+
+// Keep in sync with colors.less
+export enum CssColor {
+	frenchGray = '#BDBDC6',
+	panelGray = '#282832',
+	panelGrayLight = '#41414d',
+	panelGrayTransparent = 'rgba(40, 40, 50, 0.5)',
+	gray2 = '#31313d',
+	gray3 = '#424258',
+	knobGray = '#33333b',
+	keyWhite = '#EBEBF6',
+	defaultGray = '#CDCBE1',
+	subtleGrayWhiteBg = '#a0a0ab',
+	subtleGrayBlackBg = '#8C8C99',
+	orange = 'rgb(191, 111, 64)',
+	brightOrange = 'rgb(226, 123, 75)',
+	red = 'rgb(191, 64, 64)',
+	brightRed = 'rgb(226, 75, 83)',
+	green = '#40bf42',
+	darkGreen = '#2f6330',
+	brightGreen = '#4fe751',
+	purple = 'rgb(168, 64, 191)',
+	brightPurple = 'rgb(199, 79, 226)',
+	blue = 'rgb(64, 87, 191)',
+	brightBlue = 'rgb(79, 106, 226)',
+	darkTextShadow = 'rgb(20, 20, 22)',
+	appBackground = '#121621',
+	overlayGray = 'rgba(20, 20, 24, 0.6)',
+}

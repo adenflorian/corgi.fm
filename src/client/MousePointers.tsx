@@ -2,6 +2,7 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import {selectAllClients, selectLocalClient} from '../common/redux/clients-redux'
 import {IClientAppState} from '../common/redux/common-redux-types'
+import {CssColor} from '../common/shamu-color'
 
 interface IMousePointersViewProps {
 	pointers: Array<{
@@ -48,7 +49,7 @@ class MousePointersView extends React.PureComponent<IMousePointersViewProps> {
 										M46 38.56L34.78 37.77L40.36 51.15L35.49 53L30.07 39.23L22.17 47.18L22 12.37L46 38.56Z
 										"
 										opacity="1"
-										fill="#282832"
+										fill={CssColor.panelGray}
 										stroke={pointer.color}
 										strokeWidth="2"
 										strokeOpacity="1"

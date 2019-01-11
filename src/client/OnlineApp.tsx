@@ -9,7 +9,7 @@ import {
 } from '../common/redux/connections-redux'
 import {selectAllGridSequencers} from '../common/redux/grid-sequencers-redux'
 import {selectAllVirtualKeyboardIds} from '../common/redux/virtual-keyboard-redux'
-import {getColorHslByHex} from '../common/shamu-color'
+import {CssColor, getColorHslByHex} from '../common/shamu-color'
 import {ConnectedBasicSampler} from './BasicSampler/BasicSampler'
 import {ConnectedChat} from './Chat'
 import {ConnectionsContainer} from './Connections/Connections'
@@ -29,9 +29,6 @@ interface IOnlineAppProps {
 	myClient: IClientState
 	gridSequencerIds: string[]
 }
-
-const GRID_SEQUENCER_1_BASE_COLOR = '#4077bf'
-const MASTER_VOLUME_COLOR = getColorHslByHex(GRID_SEQUENCER_1_BASE_COLOR)
 
 export const mainBoardsId = 'mainBoards'
 
@@ -54,7 +51,7 @@ class OnlineApp extends React.Component<IOnlineAppProps> {
 									<ConnectedMasterControls />
 								</div>
 								<div className="board connected">
-									<ConnectedVolumeControl color={MASTER_VOLUME_COLOR} />
+									<ConnectedVolumeControl color={getColorHslByHex(CssColor.blue)} />
 								</div>
 							</div>
 							{this.props.connections
