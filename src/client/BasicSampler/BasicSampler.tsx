@@ -7,6 +7,7 @@ import {
 	getConnectionSourceColorByTargetId, selectConnectionSourceNotesByTargetId,
 } from '../../common/redux/connections-redux'
 import {Knob} from '../Knob/Knob'
+import {Panel} from '../Panel'
 import './BasicSampler.less'
 
 interface IBasicSamplerProps {
@@ -29,14 +30,14 @@ export class BasicSampler extends React.PureComponent<IBasicSamplerAllProps> {
 		const {color, isPlaying} = this.props
 
 		return (
-			<div
-				className={`container basicSampler ${isPlaying ? 'isPlaying saturate' : 'isNotPlaying'}`}
+			<Panel
+				className={`basicSampler ${isPlaying ? 'isPlaying' : 'isNotPlaying'}`}
 				id={this.props.id}
-				style={{color}}
+				color={color}
+				saturate={isPlaying}
 			>
-				<div className="isometricBoxShadow" />
 				<div className="inside">
-					<div className="samplerLabel">piano sampler</div>
+					<div className="samplerLabel colorize">Piano Sampler</div>
 
 					<Knob
 						min={-1}
@@ -77,7 +78,7 @@ export class BasicSampler extends React.PureComponent<IBasicSamplerAllProps> {
 						onChangeId={BasicSamplerParam.release}
 					/>
 				</div>
-			</div>
+			</Panel>
 		)
 	}
 

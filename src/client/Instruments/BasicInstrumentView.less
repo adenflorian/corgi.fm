@@ -1,13 +1,15 @@
 @import "../colors.less";
 .basicInstrument {
-    display: inline-flex;
     align-items: center;
+
     &.isNotPlaying {
         transition: box-shadow 0.3s ease-out;
     }
+
     & > *:last-child {
         margin-right: 16px;
     }
+
     .label,
     .knob,
     .oscillatorTypes {
@@ -15,8 +17,10 @@
         margin: 8px 0;
         margin-left: 16px;
     }
+
     .oscillatorTypes {
         display: flex;
+
         svg {
             margin: 8px;
             display: flex;
@@ -27,6 +31,7 @@
                 color: inherit;
             }
         }
+        
         .active svg {
             color: inherit;
         }

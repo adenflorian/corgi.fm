@@ -11,6 +11,7 @@ import {
 	selectConnectionSourceColor, selectConnectionSourceNotesByTargetId, selectFirstConnectionByTargetId,
 } from '../../common/redux/connections-redux'
 import {Knob} from '../Knob/Knob'
+import {Panel} from '../Panel'
 import {BasicInstrumentOscillatorTypes} from './BasicInstrumentOscillatorTypes'
 import './BasicInstrumentView.less'
 
@@ -46,60 +47,54 @@ export class BasicInstrumentView
 		const {color, isPlaying, pan, oscillatorType} = this.props
 
 		return (
-			<div
-				className={`container basicInstrument ${isPlaying ? 'isPlaying saturate' : 'isNotPlaying'}`}
-				style={{bottom: -12, color}}
+			<Panel
+				className={`basicInstrument ${isPlaying ? 'isPlaying' : 'isNotPlaying'}`}
+				color={color}
+				saturate={isPlaying}
+				id={this.props.id}
 			>
-				<div className="isometricBoxShadow"></div>
-				<div
-					id={this.props.id}
-					className="basicInstrument"
-				>
-					<BasicInstrumentOscillatorTypes
-						handleClick={this._handleOscillatorTypeClicked}
-						activeType={oscillatorType}
-					/>
-
-					<Knob
-						min={-1}
-						max={1}
-						value={pan}
-						onChange={this._dispatchChangeInstrumentParam}
-						label="pan"
-						onChangeId={BasicInstrumentParam.pan}
-					/>
-
-					<Knob
-						min={0}
-						max={10000}
-						curve={2}
-						value={this.props.lowPassFilterCutoffFrequency}
-						onChange={this._dispatchChangeInstrumentParam}
-						label="lpf"
-						onChangeId={BasicInstrumentParam.lowPassFilterCutoffFrequency}
-					/>
-
-					<Knob
-						min={0.01}
-						max={10}
-						curve={3}
-						value={this.props.attack}
-						onChange={this._dispatchChangeInstrumentParam}
-						label="attack"
-						onChangeId={BasicInstrumentParam.attack}
-					/>
-
-					<Knob
-						min={0.01}
-						max={60}
-						curve={2}
-						value={this.props.release}
-						onChange={this._dispatchChangeInstrumentParam}
-						label="release"
-						onChangeId={BasicInstrumentParam.release}
-					/>
-				</div >
-			</div>
+				<BasicInstrumentOscillatorTypes
+					handleClick={this._handleOscillatorTypeClicked}
+					activeType={oscillatorType}
+				/>
+				<Knob
+					min={-1}
+					max={1}
+					value={pan}
+					onChange={this._dispatchChangeInstrumentParam}
+					label="pan"
+					onChangeId={BasicInstrumentParam.pan}
+				/>
+				<Knob
+					min={0}
+					max={10000}
+					curve={2}
+					value={this.props.lowPassFilterCutoffFrequency}
+					onChange={this._dispatchChangeInstrumentParam}
+					label="lpf"
+					onChangeId={BasicInstrumentParam.lowPassFilterCutoffFrequency}
+				/>
+				<Knob
+					min={0.01}
+					max={10}
+					curve={3}
+					value={this.props.attack}
+					onChange={this._dispatchChangeInstrumentParam}
+					label="attack"
+					onChangeId={BasicInstrumentParam.attack}
+				/>
+				<Knob
+					min={0.01}
+					max={60}
+					curve={2}
+					value={this.props.release}
+					onChange={this._dispatchChangeInstrumentParam}
+					label="release"
+					onChangeId={BasicInstrumentParam.release}
+				/>
+				{/* </div > */}
+				{/* </div> */}
+			</Panel>
 		)
 	}
 
