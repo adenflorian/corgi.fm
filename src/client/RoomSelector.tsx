@@ -32,11 +32,6 @@ export class RoomSelector extends Component<IRoomSelectorProps & {dispatch: Disp
 					alignItems: 'flex-end',
 				}}
 			>
-				<Button
-					buttonProps={{id: 'newRoomButton', onClick: this.onNewRoomButtonClick}}
-				>
-					New Room
-				</Button>
 				<Select
 					label="Room"
 					name="roomSelect"
@@ -44,6 +39,11 @@ export class RoomSelector extends Component<IRoomSelectorProps & {dispatch: Disp
 					options={rooms}
 					value={activeRoom}
 				/>
+				<Button
+					buttonProps={{id: 'newRoomButton', onClick: this.onNewRoomButtonClick}}
+				>
+					New Room
+				</Button>
 			</div>
 		)
 	}

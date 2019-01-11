@@ -11,7 +11,7 @@ import {
 	selectConnectionSourceColor, selectConnectionSourceNotesByTargetId, selectFirstConnectionByTargetId,
 } from '../../common/redux/connections-redux'
 import {Knob} from '../Knob/Knob'
-import {Panel} from '../Panel'
+import {Panel} from '../Panel/Panel'
 import {BasicInstrumentOscillatorTypes} from './BasicInstrumentOscillatorTypes'
 import './BasicInstrumentView.less'
 

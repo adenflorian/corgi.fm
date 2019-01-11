@@ -7,7 +7,7 @@ import {selectVirtualKeyboardById, virtualKeyPressed, virtualKeyUp} from '../../
 import {keyToMidiMap} from '../input-events'
 import {applyOctave, KeyColor, keyColors, NoteNameSharps} from '../music/music-functions'
 import {Octave} from '../music/music-types'
-import {Panel} from '../Panel'
+import {Panel} from '../Panel/Panel'
 import {isLeftMouseButtonDown} from '../utils'
 import './Keyboard.less'
 

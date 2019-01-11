@@ -1,5 +1,5 @@
 import * as React from 'react'
-import {Panel} from '../Panel'
+import {Panel} from '../Panel/Panel'
 import {GridSequencerControlsConnected} from './GridSequencerControls'
 import {GridSequencerNotesConnected} from './GridSequencerNotes'
 

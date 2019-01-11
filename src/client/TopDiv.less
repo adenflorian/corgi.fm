@@ -10,10 +10,12 @@
     pointer-events: none;
 
     .left {
+        display: flex;
+        flex-direction: column;
         text-align: left;
 
         & > * {
-            margin: 8px;
+            margin-left: 8px;
             pointer-events: all;
         }
     }
@@ -24,6 +26,7 @@
         align-items: flex-end;
 
         & > * {
+            margin-right: 8px;
             pointer-events: all;
         }
     }

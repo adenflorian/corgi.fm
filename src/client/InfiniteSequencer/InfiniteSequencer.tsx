@@ -2,7 +2,6 @@ import * as React from 'react'
 import {Component} from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
-import {playAll} from '../../common/redux/common-actions'
 import {IClientAppState} from '../../common/redux/common-redux-types'
 import {
 	exportSequencerMidi, findLowestAndHighestNotes, IGridSequencerEvent,
@@ -11,7 +10,7 @@ import {
 	InfiniteSequencerFields, InfiniteSequencerStyle, selectAllInfiniteSequencers, setInfiniteSequencerField,
 } from '../../common/redux/infinite-sequencers-redux'
 import {getOctaveFromMidiNote, midiNoteToNoteName, removeOctave} from '../music/music-functions'
-import {Panel} from '../Panel'
+import {Panel} from '../Panel/Panel'
 import './InfiniteSequencer.less'
 
 interface IInfiniteSequencerProps {

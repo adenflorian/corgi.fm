@@ -45,8 +45,8 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps> {
 							y2={this.props.targetY}
 							gradientUnits="userSpaceOnUse"
 						>
-							<stop stop-color={saturateSource ? saturateColor(darkerColor) : darkerColor} offset="0" />
-							<stop stop-color={saturateTarget ? saturateColor(darkerColor) : darkerColor} offset="1" />
+							<stop stopColor={saturateSource ? saturateColor(darkerColor) : darkerColor} offset="0" />
+							<stop stopColor={saturateTarget ? saturateColor(darkerColor) : darkerColor} offset="1" />
 						</linearGradient>
 					</defs>
 					<line
@@ -54,7 +54,6 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps> {
 						y1={this.props.sourceY}
 						x2={this.props.targetX}
 						y2={this.props.targetY}
-						// stroke={darkerColor}
 						stroke={`url(#${id})`}
 						strokeWidth={strokeWidth}
 					/>

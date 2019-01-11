@@ -7,7 +7,7 @@ import {IClientAppState} from '../../common/redux/common-redux-types'
 import {setOptionMasterVolume} from '../../common/redux/options-redux'
 import {colorFunc} from '../../common/shamu-color'
 import {Knob} from '../Knob/Knob'
-import {Panel} from '../Panel'
+import {Panel} from '../Panel/Panel'
 import './VolumeControl.less'
 
 interface IVolumeControlProps {

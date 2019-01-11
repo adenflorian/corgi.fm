@@ -1,6 +1,6 @@
 import * as React from 'react'
 import {Component} from 'react'
-import {Panel} from '../Panel'
+import {Panel} from '../Panel/Panel'
 import './Button.less'
 
 interface IButtonProps {

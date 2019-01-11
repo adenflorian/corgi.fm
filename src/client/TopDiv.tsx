@@ -17,13 +17,13 @@ interface ITopDivProps {
 export const TopDiv = ({memberCount, clientCount, info}: ITopDivProps) =>
 	<div id="topDiv" style={{marginBottom: 'auto'}}>
 		<div className="left">
-			<div>{info}</div>
-			<div id="fps">FPS</div>
-			<Options />
+			<div style={{margin: 8}}>{info}</div>
+			<div id="fps" style={{margin: 8}}>FPS</div>
 		</div>
 		<div className="right">
 			<NewsletterSignupButton />
 			<ConnectedRoomSelector />
+			<Options />
 			<div style={{margin: 8}}>{memberCount} room member{memberCount > 1 ? 's' : ''}</div>
 			<div style={{margin: 8}}>{clientCount} total user{clientCount > 1 ? 's' : ''}</div>
 		</div>

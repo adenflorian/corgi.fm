@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {playAll, stopAll} from '../common/redux/common-actions'
-import {Panel} from './Panel'
+import {Panel} from './Panel/Panel'
 
 interface IMasterControlsProps {
 	onPlay: () => void,

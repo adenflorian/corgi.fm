@@ -1,6 +1,6 @@
 import {List} from 'immutable'
 import * as React from 'react'
-import {Panel} from '../Panel'
+import {Panel} from '../Panel/Panel'
 import './Select.less'
 
 interface ISelectProps {
