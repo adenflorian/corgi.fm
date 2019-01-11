@@ -3,6 +3,7 @@ import {Component} from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 import {IClientAppState} from '../../common/redux/common-redux-types'
+import {selectGlobalClockState} from '../../common/redux/global-clock-redux'
 import {
 	exportSequencerMidi, findLowestAndHighestNotes, IGridSequencerEvent,
 } from '../../common/redux/grid-sequencers-redux'
@@ -140,7 +141,9 @@ export const ConnectedInfiniteSequencer = connect(
 
 		return {
 			events: infiniteSequencerState.events,
-			activeIndex: infiniteSequencerState.index,
+			activeIndex: infiniteSequencerState.isPlaying
+				? selectGlobalClockState(state.room).index % infiniteSequencerState.events.length
+				: -1,
 			isPlaying: infiniteSequencerState.isPlaying,
 			isRecording: infiniteSequencerState.isRecording,
 			color: infiniteSequencerState.color,
