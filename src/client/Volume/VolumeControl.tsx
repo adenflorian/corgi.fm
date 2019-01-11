@@ -36,7 +36,8 @@ export class VolumeControl extends Component<IVolumeControlAllProps> {
 		const newColor = colorFunc(color).saturate(reportedMasterVolume / 25).hsl().string()
 
 		return (
-			<Panel className="volume" label="master volume" color={newColor}>
+			<Panel className="volume" color={newColor}>
+				<div className="label">master volume</div>
 				<Knob
 					value={this.props.masterVolume}
 					onChange={this.props.changeMasterVolume}

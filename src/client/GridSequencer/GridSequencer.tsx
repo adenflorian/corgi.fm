@@ -14,19 +14,19 @@ export const GridSequencer = (props: IGridSequencerProps) => {
 	const {id, color, isPlaying, name} = props
 
 	return (
-		<div
-			className={`gridSequencer ${isPlaying ? 'isPlaying saturate' : 'isNotPlaying'}`}
-			style={{color}}
+		<Panel
+			id={id}
+			color={color}
+			label={name}
+			className={`gridSequencer ${isPlaying ? 'isPlaying' : 'isNotPlaying'}`}
+			saturate={isPlaying}
 		>
-			<div className="label transitionAllColor">{name}</div>
-			<Panel id={id} color={color}>
-				<GridSequencerControlsConnected
-					id={id}
-				/>
-				<GridSequencerNotesConnected
-					id={id}
-				/>
-			</Panel>
-		</div>
+			<GridSequencerControlsConnected
+				id={id}
+			/>
+			<GridSequencerNotesConnected
+				id={id}
+			/>
+		</Panel>
 	)
 }

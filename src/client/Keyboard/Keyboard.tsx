@@ -7,6 +7,7 @@ import {selectVirtualKeyboardById, virtualKeyPressed, virtualKeyUp} from '../../
 import {keyToMidiMap} from '../input-events'
 import {applyOctave, KeyColor, keyColors, NoteNameSharps} from '../music/music-functions'
 import {Octave} from '../music/music-types'
+import {Panel} from '../Panel'
 import {isLeftMouseButtonDown} from '../utils'
 import './Keyboard.less'
 
@@ -95,51 +96,49 @@ export class Keyboard extends React.PureComponent<IKeyboardAllProps, IKeyboardSt
 		const ownerNameDisplay = isOwnerNameTooLong ? ownerName.substring(0, maxUsernameDisplayLength) + '...' : ownerName
 
 		return (
-			<div
-				style={{color}}
-				className={`keyboard ${isLocal ? 'isLocal' : ''} ${isPlaying ? 'saturate' : 'isNotPlaying'}`}
+			<Panel
+				color={color}
+				className={`keyboard ${isLocal ? 'isLocal' : ''}  ${isPlaying ? 'isPlaying' : 'isNotPlaying'}`}
+				label={ownerNameDisplay || '""'}
+				labelTitle={isOwnerNameTooLong ? ownerName.toUpperCase() : ''}
+				id={this.props.id}
+				saturate={isPlaying}
 			>
-				<div className="label clientId colorize" title={isOwnerNameTooLong ? ownerName.toUpperCase() : ''}>
-					{ownerNameDisplay || '""'}
-				</div>
-				<div id={this.props.id} className="container">
-					<div className="isometricBoxShadow"></div>
-					<div className="octave black unselectable">
-						<div className="octaveNumber">
-							<div>{octave}</div>
-						</div>
-						{isLocal &&
-							<div className="octaveKeys smallText">
-								<span>z</span><span>x</span>
-							</div>
-						}
+				<div className="octave black unselectable">
+					<div className="octaveNumber">
+						<div>{octave}</div>
 					</div>
-					{virtualMidiKeyboard.map((value, index) => {
-						const isKeyPressed = pressedMidiKeys.some(x => x === index)
-						return (
-							<div
-								key={index}
-								className={`key ${value.color} ${isKeyPressed ? 'pressed' : 'notPressed'}`}
-								onMouseOver={e => this.handleMouseOver(e, index)}
-								onMouseOut={e => this.handleMouseOut(e, index)}
-								onMouseDown={e => this.handleMouseDown(e, index, isKeyPressed)}
-								onMouseUp={e => this.handleMouseUp(e, index)}
-							>
-								<div className="noteName unselectable">
-									{showNoteNames &&
-										value.name
-									}
-								</div>
-								{isLocal &&
-									<div className="unselectable smallText">
-										{value.keyName}
-									</div>
+					{isLocal &&
+						<div className="octaveKeys smallText">
+							<span>z</span><span>x</span>
+						</div>
+					}
+				</div>
+				{virtualMidiKeyboard.map((value, index) => {
+					const isKeyPressed = pressedMidiKeys.some(x => x === index)
+					return (
+						<div
+							key={index}
+							className={`key ${value.color} ${isKeyPressed ? 'pressed' : 'notPressed'}`}
+							onMouseOver={e => this.handleMouseOver(e, index)}
+							onMouseOut={e => this.handleMouseOut(e, index)}
+							onMouseDown={e => this.handleMouseDown(e, index, isKeyPressed)}
+							onMouseUp={e => this.handleMouseUp(e, index)}
+						>
+							<div className="noteName unselectable">
+								{showNoteNames &&
+									value.name
 								}
 							</div>
-						)
-					})}
-				</div>
-			</div>
+							{isLocal &&
+								<div className="unselectable smallText">
+									{value.keyName}
+								</div>
+							}
+						</div>
+					)
+				})}
+			</Panel>
 		)
 	}
 
