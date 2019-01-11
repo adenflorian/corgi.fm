@@ -1,5 +1,6 @@
 import * as React from 'react'
 import {Component} from 'react'
+import {Panel} from '../Panel'
 import './Button.less'
 
 interface IButtonProps {
@@ -10,14 +11,16 @@ interface IButtonProps {
 export class Button extends Component<IButtonProps> {
 	public render() {
 		return (
-			<div className="buttonContainer">
-				<div className="isometricBoxShadow" />
+			<Panel
+				className="buttonContainer"
+				color="lightGray"
+			>
 				<button
 					{...this.props.buttonProps}
 				>
 					{this.props.children}
 				</button>
-			</div>
+			</Panel>
 		)
 	}
 }
