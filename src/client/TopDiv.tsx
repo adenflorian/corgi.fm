@@ -6,6 +6,7 @@ import {selectMemberCount} from '../common/redux/room-members-redux'
 import {NewsletterSignupButton} from './Newsletter/NewsletterSignupButton'
 import {Options} from './Options/Options'
 import {ConnectedRoomSelector} from './RoomSelector'
+import './TopDiv.less'
 
 interface ITopDivProps {
 	memberCount: number,

@@ -53,37 +53,6 @@ body {
     outline: none;
 }
 
-#topDiv {
-    margin-top: 0;
-    z-index: 1;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    min-height: fit-content;
-    position: fixed;
-    width: 100%;
-    pointer-events: none;
-
-    .left {
-        text-align: left;
-
-        & > * {
-            margin: 8px;
-            pointer-events: all;
-        }
-    }
-
-    .right {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-
-        & > * {
-            pointer-events: all;
-        }
-    }
-}
-
 #mainBoards {
     z-index: 0;
     margin: auto;
@@ -107,54 +76,14 @@ body {
 }
 
 #info {
-    font-size: 0.8em;
-    color: @defaultGray;
-    animation-duration: 1s;
-    animation-name: info-slideup;
-    padding-top: 8px;
     z-index: 0;
     pointer-events: none;
-    height: 48px;
+    height: 56px;
     flex-shrink: 0;
-}
-
-@keyframes info-slideup {
-    from {
-        bottom: -24px
-    }
-    to {
-        bottom: 0
-    }
-}
-
-@keyframes boardSlideIn {
-    from {
-        height: 0;
-        margin-left: 200%;
-        width: 300%;
-    }
-    to {
-        width: 100%;
-    }
-}
-
-@keyframes boardSlideOut {
-    from {
-        width: 100%;
-    }
-    to {
-        height: 0;
-        margin-right: 200%;
-        width: 300%;
-    }
 }
 
 .unselectable {
     user-select: none;
-}
-
-.BgColorTransition {
-    transition: background-color 0.3s ease-out;
 }
 
 .colorTransition {
@@ -164,7 +93,6 @@ body {
 .transitionAllColor {
     transition: color 0.3s ease-out, background-color 0.3s ease-out, border-color 0.3s ease-out, box-shadow 0.3s ease-out, filter 0.3s ease-out;
 }
-
 
 .panel {
     position: relative;
@@ -185,7 +113,6 @@ body {
     }
 }
 
-
 .label {
     text-shadow: 0 0 16px @darkTextShadow;
     .isPlaying& {
@@ -198,21 +125,6 @@ body {
         filter: saturate(300%);
     }
 }
-
-#roomSelector {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-
-    .selectRow {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        position: relative;
-        top: -2px;
-    }
-}
-
 
 .play {
     &:hover,

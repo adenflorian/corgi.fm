@@ -24,7 +24,14 @@ export class RoomSelector extends Component<IRoomSelectorProps & {dispatch: Disp
 		const {activeRoom, rooms} = this.props
 
 		return (
-			<div id="roomSelector">
+			<div
+				id="roomSelector"
+				style={{
+					display: 'flex',
+					flexDirection: 'column',
+					alignItems: 'flex-end',
+				}}
+			>
 				<Button
 					buttonProps={{id: 'newRoomButton', onClick: this.onNewRoomButtonClick}}
 				>

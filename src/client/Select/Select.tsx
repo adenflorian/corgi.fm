@@ -11,7 +11,7 @@ interface ISelectProps {
 }
 
 export const Select = ({label, name, onChange, options, value}: ISelectProps) =>
-	<div className="selectRow">
+	<div className="shamuSelect">
 		<label htmlFor={name}>{label}</label>
 		<div className="selectContainer">
 			<div className="isometricBoxShadow" />
