@@ -6,6 +6,7 @@ import {
 import {BasicSamplerState, selectAllSamplerIds, selectSampler} from '../common/redux/basic-sampler-redux'
 import {IClientAppState, IClientRoomState} from '../common/redux/common-redux-types'
 import {selectConnectionSourceNotes, selectConnectionsWithSourceOrTargetIds} from '../common/redux/connections-redux'
+import {setGlobalClockIndex} from '../common/redux/global-clock-redux'
 import {
 	selectAllGridSequencers, setGridSequencerField,
 } from '../common/redux/grid-Sequencers-redux'
@@ -25,14 +26,22 @@ type UpdateSpecificInstrument<I extends IInstrument, S> = (instrument: I, instru
 const stuffMap = new Map<string, any>()
 
 export const setupInstrumentManager = (store: Store<IClientAppState>, audioContext: AudioContext, preFx: GainNode) => {
+
+	const globalClock = new GridSequencerPlayer(
+		audioContext,
+		index => store.dispatch(setGlobalClockIndex(index)),
+	)
+
+	globalClock.play()
+
 	store.subscribe(() => {
 		const state = store.getState()
 
 		handleSamplers(state)
 		handleBasicInstruments(state)
 
-		handleGridSequencers(state)
-		handleInfiniteSequencers(state)
+		// handleGridSequencers(state)
+		// handleInfiniteSequencers(state)
 	})
 
 	function handleSamplers(state: IClientAppState) {
@@ -95,51 +104,51 @@ export const setupInstrumentManager = (store: Store<IClientAppState>, audioConte
 		})
 	}
 
-	function handleGridSequencers(state: IClientAppState) {
-		const gridSequencers = toArray(selectAllGridSequencers(state.room))
+	// function handleGridSequencers(state: IClientAppState) {
+	// 	const gridSequencers = toArray(selectAllGridSequencers(state.room))
 
-		gridSequencers.forEach(gridSequencer => {
-			let sequencer = stuffMap.get(gridSequencer.id) as GridSequencerPlayer
+	// 	gridSequencers.forEach(gridSequencer => {
+	// 		let sequencer = stuffMap.get(gridSequencer.id) as GridSequencerPlayer
 
-			sequencer = createIfNotExisting(gridSequencer.id, sequencer, () => {
-				return new GridSequencerPlayer(
-					audioContext,
-					index => store.dispatch(setGridSequencerField(gridSequencer.id, 'index', index)),
-				)
-			})
+	// 		sequencer = createIfNotExisting(gridSequencer.id, sequencer, () => {
+	// 			return new GridSequencerPlayer(
+	// 				audioContext,
+	// 				index => store.dispatch(setGridSequencerField(gridSequencer.id, 'index', index)),
+	// 			)
+	// 		})
 
-			if (gridSequencer.isPlaying !== sequencer.isPlaying()) {
-				if (gridSequencer.isPlaying) {
-					sequencer.play()
-				} else {
-					sequencer.stop()
-				}
-			}
-		})
-	}
+	// 		if (gridSequencer.isPlaying !== sequencer.isPlaying()) {
+	// 			if (gridSequencer.isPlaying) {
+	// 				sequencer.play()
+	// 			} else {
+	// 				sequencer.stop()
+	// 			}
+	// 		}
+	// 	})
+	// }
 
-	function handleInfiniteSequencers(state: IClientAppState) {
-		const infiniteSequencers = toArray(selectAllInfiniteSequencers(state.room))
+	// function handleInfiniteSequencers(state: IClientAppState) {
+	// 	const infiniteSequencers = toArray(selectAllInfiniteSequencers(state.room))
 
-		infiniteSequencers.forEach(infiniteSequencer => {
-			let sequencer = stuffMap.get(infiniteSequencer.id) as GridSequencerPlayer
+	// 	infiniteSequencers.forEach(infiniteSequencer => {
+	// 		let sequencer = stuffMap.get(infiniteSequencer.id) as GridSequencerPlayer
 
-			sequencer = createIfNotExisting(infiniteSequencer.id, sequencer, () => {
-				return new GridSequencerPlayer(
-					audioContext,
-					index => store.dispatch(setInfiniteSequencerField(infiniteSequencer.id, InfiniteSequencerFields.index, index)),
-				)
-			})
+	// 		sequencer = createIfNotExisting(infiniteSequencer.id, sequencer, () => {
+	// 			return new GridSequencerPlayer(
+	// 				audioContext,
+	// 				index => store.dispatch(setInfiniteSequencerField(infiniteSequencer.id, InfiniteSequencerFields.index, index)),
+	// 			)
+	// 		})
 
-			if (infiniteSequencer.isPlaying !== sequencer.isPlaying()) {
-				if (infiniteSequencer.isPlaying) {
-					sequencer.play()
-				} else {
-					sequencer.stop()
-				}
-			}
-		})
-	}
+	// 		if (infiniteSequencer.isPlaying !== sequencer.isPlaying()) {
+	// 			if (infiniteSequencer.isPlaying) {
+	// 				sequencer.play()
+	// 			} else {
+	// 				sequencer.stop()
+	// 			}
+	// 		}
+	// 	})
+	// }
 
 	function createIfNotExisting<T>(id: string, thing: any, thingFactory: () => T): T {
 		if (thing === undefined) {

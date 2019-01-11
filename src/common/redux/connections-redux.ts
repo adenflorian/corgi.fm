@@ -3,6 +3,7 @@ import {Reducer} from 'redux'
 import * as uuid from 'uuid'
 import {logger} from '../logger'
 import {IClientRoomState} from './common-redux-types'
+import {selectGlobalClockState} from './global-clock-redux'
 import {selectAllGridSequencers} from './grid-sequencers-redux'
 import {selectAllInfiniteSequencers} from './infinite-sequencers-redux'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
@@ -202,22 +203,37 @@ export const selectConnectionSourceNotes = (state: IClientRoomState, id: string)
 	switch (connection.sourceType) {
 		case ConnectionSourceType.keyboard:
 			return getKeyboardMidiOutput(state, connection.sourceId)
-		case ConnectionSourceType.gridSequencer:
+		case ConnectionSourceType.gridSequencer: {
 			const gridSequencer = selectAllGridSequencers(state)[connection.sourceId]
 			if (!gridSequencer) return emptyArray
-			if (gridSequencer.index >= 0 && gridSequencer.index < gridSequencer.events.length) {
-				return gridSequencer.events[gridSequencer.index].notes
+			if (!gridSequencer.isPlaying) return emptyArray
+
+			const globalClockIndex = selectGlobalClockState(state).index
+
+			// const index = gridSequencer.index
+			const index = globalClockIndex
+
+			if (index >= 0) {
+				return gridSequencer.events[index % gridSequencer.events.length].notes
 			} else {
 				return emptyArray
 			}
-		case ConnectionSourceType.infiniteSequencer:
+		}
+		case ConnectionSourceType.infiniteSequencer: {
 			const infiniteSequencer = selectAllInfiniteSequencers(state)[connection.sourceId]
 			if (!infiniteSequencer) return emptyArray
-			if (infiniteSequencer.index >= 0 && infiniteSequencer.index < infiniteSequencer.events.length) {
-				return infiniteSequencer.events[infiniteSequencer.index].notes
+			if (!infiniteSequencer.isPlaying) return emptyArray
+
+			const globalClockIndex = selectGlobalClockState(state).index
+
+			const index = globalClockIndex
+
+			if (index >= 0) {
+				return infiniteSequencer.events[index % infiniteSequencer.events.length].notes
 			} else {
 				return emptyArray
 			}
+		}
 		default:
 			throw new Error('couldnt find source color (unsupported connection source type)')
 	}

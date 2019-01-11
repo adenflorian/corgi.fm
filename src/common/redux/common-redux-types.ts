@@ -4,6 +4,7 @@ import {IBasicSamplersState} from './basic-sampler-redux'
 import {IChatState} from './chat-redux'
 import {IClientsState} from './clients-redux'
 import {IConnectionsState} from './connections-redux'
+import {IGlobalClockState} from './global-clock-redux'
 import {IGridSequencersState} from './grid-sequencers-redux'
 import {IInfiniteSequencersState} from './infinite-sequencers-redux'
 import {IOptionsState} from './options-redux'
@@ -26,6 +27,7 @@ export interface IClientRoomState {
 	basicSamplers: IBasicSamplersState
 	chat: IChatState
 	connections: IConnectionsState
+	globalClock: IGlobalClockState
 	gridSequencers: IGridSequencersState
 	infiniteSequencers: IInfiniteSequencersState
 	members: IRoomMembersState
