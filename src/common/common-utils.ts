@@ -5,3 +5,7 @@ export function pickRandomArrayElement<T>(array: T[]): T {
 export function toArray(obj: any) {
 	return Object.keys(obj).map(x => obj[x])
 }
+
+export function getKeyByValue(object: any, value: any) {
+	return Object.keys(object).find(key => object[key] === value)
+}

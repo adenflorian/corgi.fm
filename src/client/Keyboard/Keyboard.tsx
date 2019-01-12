@@ -1,6 +1,7 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
+import {getKeyByValue} from '../../common/common-utils'
 import {ClientState, selectClientById, selectLocalClient} from '../../common/redux/clients-redux'
 import {IClientAppState} from '../../common/redux/common-redux-types'
 import {selectVirtualKeyboardById, virtualKeyPressed, virtualKeyUp} from '../../common/redux/virtual-keyboard-redux'
@@ -22,7 +23,7 @@ function createVirtualMidiKeyboard(numberOfKeys: number) {
 		const baseNumber = i % 12
 		newVirtualMidiKeyboard[i] = {
 			...keyColors[baseNumber],
-			keyName: keyToMidiMap.keySeq().toArray()[i],
+			keyName: getKeyByValue(keyToMidiMap.toJS(), i)!,
 		}
 	}
 
