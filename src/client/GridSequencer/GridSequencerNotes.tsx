@@ -4,7 +4,7 @@ import {Dispatch} from 'redux'
 import {IClientAppState} from '../../common/redux/common-redux-types'
 import {selectGlobalClockState} from '../../common/redux/global-clock-redux'
 import {
-	IGridSequencerEvent, selectAllGridSequencers, setGridSequencerField, setGridSequencerNote,
+	GridSequencerFields, IGridSequencerEvent, selectAllGridSequencers, setGridSequencerField, setGridSequencerNote,
 } from '../../common/redux/grid-sequencers-redux'
 import {MAX_MIDI_NOTE_NUMBER_127, MIN_MIDI_NOTE_NUMBER_0} from '../../common/server-constants'
 import {isWhiteKey} from '../Keyboard/Keyboard'
@@ -87,7 +87,7 @@ const mapStateToProps = (state: IClientAppState, props: IGridSequencerNotesProps
 		activeIndex: gridSequencerState.isPlaying
 			? selectGlobalClockState(state.room).index % gridSequencerState.events.length
 			: -1,
-		bottomNote: gridSequencerState.bottomNote,
+		bottomNote: gridSequencerState.scrollY,
 		notesToShow: gridSequencerState.notesToShow,
 	}
 }
@@ -107,7 +107,7 @@ const mapDispatchToProps = (dispatch: Dispatch, {id}: IGridSequencerNotesProps):
 		}
 	},
 	handleScrollChange: newValue => {
-		dispatch(setGridSequencerField(id, 'bottomNote', Math.round(newValue)))
+		dispatch(setGridSequencerField(id, GridSequencerFields.scrollY, Math.round(newValue)))
 	},
 })
 

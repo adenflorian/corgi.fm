@@ -57,7 +57,7 @@ export const exportSequencerMidi = (sequencerId: string) => ({
 
 export const SET_GRID_SEQUENCER_FIELD = 'SET_GRID_SEQUENCER_FIELD'
 export type SetGridSequencerField = ReturnType<typeof setGridSequencerField>
-export const setGridSequencerField = (id: string, fieldName: 'isPlaying' | 'bottomNote' | 'index', data: any) => ({
+export const setGridSequencerField = (id: string, fieldName: GridSequencerFields, data: any) => ({
 	type: SET_GRID_SEQUENCER_FIELD,
 	id,
 	fieldName,
@@ -65,12 +65,21 @@ export const setGridSequencerField = (id: string, fieldName: 'isPlaying' | 'bott
 	...foo(fieldName),
 })
 
-function foo(fieldName: 'isPlaying' | 'bottomNote' | 'index') {
-	if (['isPlaying', 'bottomNote'].includes(fieldName)) {
+function foo(fieldName: GridSequencerFields) {
+	if ([
+		GridSequencerFields.isPlaying,
+		GridSequencerFields.scrollY,
+	].includes(fieldName)) {
 		return {SERVER_ACTION, BROADCASTER_ACTION}
 	} else {
 		return {}
 	}
+}
+
+export enum GridSequencerFields {
+	isPlaying = 'isPlaying',
+	scrollY = 'scrollY',
+	index = 'index',
 }
 
 export interface IGridSequencerEvent {
@@ -95,28 +104,41 @@ export interface ISequencerState extends IMultiStateThing {
 }
 
 export interface IGridSequencerState extends ISequencerState {
-	bottomNote: number
+	scrollY: number
 	notesToShow: number
 }
 
 export class GridSequencerState implements IGridSequencerState {
+	private static readonly _defaultEvents =
+		[{notes: []}, {notes: []}, {notes: []}, {notes: []}, {notes: []}, {notes: []}, {notes: []}, {notes: []}]
+
 	public readonly id: string = uuid.v4()
 	public readonly events: IGridSequencerEvent[]
 	public readonly index: number = -1
 	public readonly isPlaying: boolean = false
 	public readonly color: string
 	public readonly name: string
-	public readonly bottomNote: number
+	public readonly scrollY: number
 	public readonly notesToShow: number
 
 	constructor(name: string, notesToShow: number, events?: IGridSequencerEvent[]) {
 		this.name = name
 		this.color = colorFunc(hashbow(this.id)).desaturate(0.2).hsl().string()
-		this.events = events ||
-			[{notes: []}, {notes: []}, {notes: []}, {notes: []}, {notes: []}, {notes: []}, {notes: []}, {notes: []}]
-		const lowestNote = findLowestNote(this.events)
+		this.events = events || GridSequencerState._defaultEvents
 		this.notesToShow = notesToShow
-		this.bottomNote = Math.min(MAX_MIDI_NOTE_NUMBER_127 - this.notesToShow, lowestNote)
+
+		this.scrollY = this._calculateScrollY()
+	}
+
+	get maxScrollY() {return MAX_MIDI_NOTE_NUMBER_127 - this.notesToShow}
+	get lowestNote() {return findLowestNote(this.events)}
+	get highestNote() {return findHighestNote(this.events)}
+
+	private _calculateScrollY() {
+		const notesRange = this.highestNote - this.lowestNote
+		const desiredScrollY = Math.round(this.lowestNote - (this.notesToShow / 2) + (notesRange / 2))
+
+		return Math.min(this.maxScrollY, desiredScrollY)
 	}
 }
 
