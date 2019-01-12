@@ -2,7 +2,7 @@ import {Fragment} from 'react'
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {selectAllBasicInstrumentIds} from '../common/redux/basic-instruments-redux'
-import {IClientState, selectLocalClient} from '../common/redux/clients-redux'
+import {selectLocalClient} from '../common/redux/clients-redux'
 import {IClientAppState} from '../common/redux/common-redux-types'
 import {
 	ConnectionSourceType, ConnectionTargetType, IConnection, selectSortedConnections,
@@ -26,7 +26,7 @@ interface IOnlineAppProps {
 	connections: IConnection[]
 	instrumentIds: string[]
 	keyboardIds: string[]
-	myClient: IClientState
+	hasLocalClient: boolean
 	gridSequencerIds: string[]
 }
 
@@ -34,11 +34,11 @@ export const mainBoardsId = 'mainBoards'
 
 class OnlineApp extends React.Component<IOnlineAppProps> {
 	public render() {
-		const {myClient} = this.props
+		const {hasLocalClient} = this.props
 
 		return (
 			<Fragment>
-				{myClient &&
+				{hasLocalClient &&
 					<Fragment>
 						<MousePointers />
 						<ConnectedChat />
@@ -101,7 +101,7 @@ class OnlineApp extends React.Component<IOnlineAppProps> {
 }
 
 const mapStateToProps = (state: IClientAppState): IOnlineAppProps => ({
-	myClient: selectLocalClient(state),
+	hasLocalClient: selectLocalClient(state) !== undefined,
 	keyboardIds: selectAllVirtualKeyboardIds(state.room),
 	instrumentIds: selectAllBasicInstrumentIds(state.room),
 	gridSequencerIds: selectAllGridSequencerIds(state.room),
