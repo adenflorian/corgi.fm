@@ -109,25 +109,29 @@ export const connectionsSpecificReducer: Reducer<IConnections, IConnectionAction
 		}
 	}
 
+export const selectAllConnections = (state: IClientRoomState) =>
+	state.connections.connections
+
 export const selectConnection = (state: IClientRoomState, id: string) =>
 	selectAllConnections(state).get(id)
 
 export const selectSourceByConnectionId = (state: IClientRoomState, id: string): IVirtualKeyboardState =>
 	selectVirtualKeyboardById(state, selectConnection(state, id)!.sourceId)
 
-export const selectAllConnections = (state: IClientRoomState) =>
-	state.connections.connections
-
 export const selectAllConnectionIds = createSelector(
 	selectAllConnections,
 	connections => connections.keySeq().toArray(),
 )
 
-export const selectAllConnectionsAsArray = (state: IClientRoomState): IConnection[] =>
-	selectAllConnections(state).toIndexedSeq().toArray()
+export const selectAllConnectionsAsArray = createSelector(
+	selectAllConnections,
+	connections => connections.toIndexedSeq().toArray(),
+)
 
-export const selectSortedConnections = (state: IClientRoomState): IConnection[] =>
-	selectAllConnectionsAsArray(state).sort(sortConnection)
+export const selectSortedConnections = createSelector(
+	selectAllConnectionsAsArray,
+	connections => connections.sort(sortConnection),
+)
 
 export const selectConnectionsWithSourceOrTargetIds = (state: IClientRoomState, sourceOrTargetIds: string[]) => {
 	return selectAllConnectionsAsArray(state)

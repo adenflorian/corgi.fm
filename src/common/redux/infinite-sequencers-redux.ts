@@ -130,14 +130,22 @@ export interface IInfiniteSequencerEvent {
 	notes: IMidiNote[]
 }
 
-export const infiniteSequencerActionTypes = [
+const infiniteSequencerActionTypes = [
 	SET_INFINITE_SEQUENCER_NOTE,
 	SET_INFINITE_SEQUENCER_FIELD,
 ]
 
+const infiniteSequencerGlobalActionTypes = [
+	PLAY_ALL,
+	STOP_ALL,
+	VIRTUAL_KEY_PRESSED,
+]
+
 export const infiniteSequencersReducer =
 	makeMultiReducer<InfiniteSequencerState, IInfiniteSequencersState>(
-		infiniteSequencerReducer, MultiThingType.infiniteSequencer, infiniteSequencerActionTypes)
+		infiniteSequencerReducer, MultiThingType.infiniteSequencer,
+		infiniteSequencerActionTypes, infiniteSequencerGlobalActionTypes,
+	)
 
 function infiniteSequencerReducer(
 	infiniteSequencer: InfiniteSequencerState, action: AnyAction,

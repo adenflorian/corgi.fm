@@ -1,4 +1,5 @@
 import {AnyAction, Reducer} from 'redux'
+import {createSelector} from 'reselect'
 import * as uuid from 'uuid'
 import {hashbow} from '../../client/utils'
 import {IMidiNote} from '../MidiNote'
@@ -166,9 +167,14 @@ export interface IGridSequencerEvent {
 	notes: IMidiNote[]
 }
 
-export const gridSequencerActionTypes = [
+const gridSequencerActionTypes = [
 	SET_GRID_SEQUENCER_NOTE,
 	SET_GRID_SEQUENCER_FIELD,
+]
+
+const gridSequencerGlobalActionTypes = [
+	PLAY_ALL,
+	STOP_ALL,
 ]
 
 const gridSequencerReducer: Reducer<IGridSequencerState, AnyAction> =
@@ -219,9 +225,16 @@ const gridSequencerReducer: Reducer<IGridSequencerState, AnyAction> =
 
 export const gridSequencersReducer =
 	makeMultiReducer<IGridSequencerState, IGridSequencersState>(
-		gridSequencerReducer, MultiThingType.gridSequencer, gridSequencerActionTypes)
+		gridSequencerReducer, MultiThingType.gridSequencer,
+		gridSequencerActionTypes, gridSequencerGlobalActionTypes,
+	)
 
 export const selectAllGridSequencers = (state: IClientRoomState) => state.gridSequencers.things
+
+export const selectAllGridSequencerIds = createSelector(
+	selectAllGridSequencers,
+	gridSequencers => Object.keys(gridSequencers),
+)
 
 export const selectAllSequencers = (state: IClientRoomState) => ({
 	...state.gridSequencers.things,

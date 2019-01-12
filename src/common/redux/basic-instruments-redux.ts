@@ -1,4 +1,5 @@
 import {AnyAction} from 'redux'
+import {createSelector} from 'reselect'
 import * as uuid from 'uuid'
 import {ClientId} from '../common-types'
 import {pickRandomArrayElement} from '../common-utils'
@@ -118,7 +119,10 @@ export const selectAllInstruments = (state: IClientRoomState) => state.basicInst
 export const selectAllInstrumentsAsArray =
 	createSelectAllOfThingAsArray<IBasicInstruments, IBasicInstrumentState>(selectAllInstruments)
 
-export const selectAllBasicInstrumentIds = (state: IClientRoomState) => Object.keys(selectAllInstruments(state))
+export const selectAllBasicInstrumentIds = createSelector(
+	selectAllInstruments,
+	basicInstruments => Object.keys(basicInstruments),
+)
 
 export const selectInstrumentsByOwner = (state: IClientRoomState, ownerId: ClientId) =>
 	selectAllInstrumentsAsArray(state).filter(x => x.ownerId === ownerId)

@@ -107,6 +107,7 @@ export function makeMultiReducer<T extends IMultiStateThing, U extends IMultiSta
 	innerReducer: (state: T, action: any) => any,
 	thingType: MultiThingType,
 	actionTypes: string[],
+	globalActionTypes: string[] = [],
 ) {
 	return (state: U = {things: {}} as U, action: MultiThingAction): U => {
 		switch (action.type) {
@@ -151,7 +152,7 @@ export function makeMultiReducer<T extends IMultiStateThing, U extends IMultiSta
 							},
 						}
 					}
-				} else {
+				} else if (globalActionTypes.includes(action.type)) {
 					const newThings: IMultiStateThings = {}
 					Object.keys(state.things).forEach(id => {
 						const thing = state.things[id]
@@ -164,6 +165,8 @@ export function makeMultiReducer<T extends IMultiStateThing, U extends IMultiSta
 							...newThings,
 						},
 					}
+				} else {
+					return state
 				}
 		}
 	}

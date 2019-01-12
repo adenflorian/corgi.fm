@@ -7,7 +7,7 @@ import {IClientAppState} from '../common/redux/common-redux-types'
 import {
 	ConnectionSourceType, ConnectionTargetType, IConnection, selectSortedConnections,
 } from '../common/redux/connections-redux'
-import {selectAllGridSequencers} from '../common/redux/grid-sequencers-redux'
+import {selectAllGridSequencerIds} from '../common/redux/grid-sequencers-redux'
 import {selectAllVirtualKeyboardIds} from '../common/redux/virtual-keyboard-redux'
 import {CssColor, getColorHslByHex} from '../common/shamu-color'
 import {ConnectedBasicSampler} from './BasicSampler/BasicSampler'
@@ -104,7 +104,7 @@ const mapStateToProps = (state: IClientAppState): IOnlineAppProps => ({
 	myClient: selectLocalClient(state),
 	keyboardIds: selectAllVirtualKeyboardIds(state.room),
 	instrumentIds: selectAllBasicInstrumentIds(state.room),
-	gridSequencerIds: Object.keys(selectAllGridSequencers(state.room)),
+	gridSequencerIds: selectAllGridSequencerIds(state.room),
 	connections: selectSortedConnections(state.room),
 })
 

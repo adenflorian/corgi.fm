@@ -187,18 +187,18 @@ export interface IMidi {
 	notes: IMidiNote[]
 }
 
-export const selectAllVirtualKeyboards = (state: IClientRoomState) => {
-	return state.virtualKeyboards.things
-}
+export const selectAllVirtualKeyboards = (state: IClientRoomState) =>
+	state.virtualKeyboards.things
 
 export const selectAllVirtualKeyboardsArray = (state: IClientRoomState) => {
 	const keyboards = selectAllVirtualKeyboards(state)
 	return Object.keys(keyboards).map(x => keyboards[x])
 }
 
-export const selectAllVirtualKeyboardIds = (state: IClientRoomState) => {
-	return Object.keys(selectAllVirtualKeyboards(state))
-}
+export const selectAllVirtualKeyboardIds = createSelector(
+	selectAllVirtualKeyboards,
+	virtualKeyboards => Object.keys(virtualKeyboards),
+)
 
 export const selectVirtualKeyboardById = (state: IClientRoomState, id: string) => {
 	return selectAllVirtualKeyboards(state)[id]
