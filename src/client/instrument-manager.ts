@@ -1,4 +1,5 @@
 import {Store} from 'redux'
+import {IDisposable} from '../common/common-types'
 import {toArray} from '../common/common-utils'
 import {
 	BasicInstrumentState, selectAllBasicInstrumentIds, selectInstrument,
@@ -23,7 +24,12 @@ type InstrumentStateSelector<S> = (roomState: IClientRoomState, id: string) => S
 type InstrumentFactory<I extends IInstrument, S> = (options: IInstrumentOptions, instrumentState: S) => I
 type UpdateSpecificInstrument<I extends IInstrument, S> = (instrument: I, instrumentState: S) => void
 
-const stuffMap = new Map<string, any>()
+type StuffMap = Map<string, IDisposable>
+
+const stuffMap = Object.freeze({
+	samplers: new Map<string, IDisposable>() as StuffMap,
+	basicInstruments: new Map<string, IDisposable>() as StuffMap,
+})
 
 // let previousState: any = {}
 
@@ -58,6 +64,7 @@ export const setupInstrumentManager = (store: Store<IClientAppState>, audioConte
 				selectAllSamplerIds,
 				selectSampler,
 				options => new BasicSamplerInstrument({...options, voiceCount: 20}),
+				stuffMap.samplers,
 				(instrument: BasicSamplerInstrument, instrumentState: BasicSamplerState) => {
 					instrument.setPan(instrumentState.pan)
 					instrument.setLowPassFilterCutoffFrequency(instrumentState.lowPassFilterCutoffFrequency)
@@ -72,6 +79,7 @@ export const setupInstrumentManager = (store: Store<IClientAppState>, audioConte
 				selectAllBasicInstrumentIds,
 				selectInstrument,
 				(options, instrumentState) => new BasicInstrument({...options, voiceCount: 9, ...instrumentState}),
+				stuffMap.basicInstruments,
 				(instrument: BasicInstrument, instrumentState: BasicInstrumentState) => {
 					instrument.setOscillatorType(instrumentState.oscillatorType)
 					instrument.setPan(instrumentState.pan)
@@ -86,21 +94,30 @@ export const setupInstrumentManager = (store: Store<IClientAppState>, audioConte
 			instrumentIdsSelector: InstrumentIdsSelector,
 			instrumentStateSelector: InstrumentStateSelector<S>,
 			instrumentCreator: InstrumentFactory<I, S>,
+			stuff: StuffMap,
 			updateSpecificInstrument?: UpdateSpecificInstrument<I, S>,
 		) {
-			instrumentIdsSelector(state.room).forEach(instrumentId => {
+			const instrumentIds = instrumentIdsSelector(state.room)
+			stuff.forEach((_, key) => {
+				if (instrumentIds.includes(key) === false) {
+					stuff.get(key)!.dispose()
+					stuff.delete(key)
+				}
+			})
+
+			instrumentIds.forEach(instrumentId => {
 				const connection = selectConnectionsWithSourceOrTargetIds(state.room, [instrumentId])[0]
 
 				if (connection === undefined) return
 
 				const sourceNotes = selectConnectionSourceNotes(state.room, connection.id)
-				let instrument: I = stuffMap.get(instrumentId)
 
 				const instrumentState = instrumentStateSelector(state.room, instrumentId)
 
-				instrument = createIfNotExisting(
+				const instrument = createIfNotExisting(
+					stuff,
 					instrumentId,
-					instrument,
+					stuff.get(instrumentId),
 					() => instrumentCreator({audioContext, destination: preFx, voiceCount: 1}, instrumentState),
 				)
 
@@ -108,6 +125,7 @@ export const setupInstrumentManager = (store: Store<IClientAppState>, audioConte
 
 				if (updateSpecificInstrument) updateSpecificInstrument(instrument, instrumentState)
 			})
+
 		}
 
 		// function handleGridSequencers() {
@@ -156,10 +174,10 @@ export const setupInstrumentManager = (store: Store<IClientAppState>, audioConte
 		// 	})
 		// }
 
-		function createIfNotExisting<T>(id: string, thing: any, thingFactory: () => T): T {
+		function createIfNotExisting<T>(stuff: StuffMap, id: string, thing: any, thingFactory: () => T): T {
 			if (thing === undefined) {
 				thing = thingFactory()
-				stuffMap.set(id, thing)
+				stuff.set(id, thing)
 			}
 			return thing
 		}

@@ -1,10 +1,10 @@
 import uuid = require('uuid')
+import {IDisposable} from '../../common/common-types'
 import {IMidiNotes} from '../../common/MidiNote'
 import {Arp} from '../arp'
 
-export interface IInstrument {
+export interface IInstrument extends IDisposable {
 	setMidiNotes: (midiNotes: IMidiNotes) => void
-	dispose: () => void
 }
 
 export abstract class Instrument<T extends Voices<V>, V extends Voice> implements IInstrument {
