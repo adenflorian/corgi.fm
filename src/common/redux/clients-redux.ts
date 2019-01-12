@@ -8,7 +8,7 @@ import {getColorHslByString} from '../shamu-color'
 import {SELF_DISCONNECTED} from './common-actions'
 import {IClientAppState} from './common-redux-types'
 import {IServerState} from './configure-server-store'
-import {BROADCASTER_ACTION, createReducer, SERVER_ACTION} from './redux-utils'
+import {BROADCASTER_ACTION, createDeepEqualSelector, createReducer, SERVER_ACTION} from './redux-utils'
 import {selectLocalSocketId} from './websocket-redux'
 
 export const ADD_CLIENT = 'ADD_CLIENT'
@@ -249,17 +249,26 @@ export const selectAllClientsAsMap = (state: IClientAppState | IServerState) =>
 
 const size = 8
 
-export const selectAllOtherPointers = createSelector(
-	[selectLocalClientId, selectAllClients],
-	(localClientId, allClients) =>
-		allClients
-			.filter(x => x.id !== 'server' && x.id !== localClientId)
-			.map(client => ({
-				x: client.pointer.distanceFromCenterX
-					+ (document.body.scrollWidth / 2) - (size / 2) - window.scrollX,
-				y: client.pointer.distanceFromBoardsTop
-					+ getMainBoardsRectY() - (size / 2),
-				color: client.color,
-				name: client.name,
-			})),
+export const selectAllClientIds = createSelector(
+	[selectAllClients],
+	allClients => allClients.map(client => client.id),
+)
+
+export const selectAllOtherClientIds = createDeepEqualSelector(
+	[selectLocalClientId, selectAllClientIds],
+	(localClientId, allClientIds) =>
+		allClientIds.filter(x => x !== 'server' && x !== localClientId),
+)
+
+export const selectClientPointerInfo = createSelector(
+	[selectClientById],
+	client => ({
+		x: client.pointer.distanceFromCenterX
+			+ (document.body.scrollWidth / 2) - (size / 2) - window.scrollX,
+		y: client.pointer.distanceFromBoardsTop
+			+ getMainBoardsRectY() - (size / 2),
+		color: client.color,
+		name: client.name,
+		id: client.id,
+	}),
 )

@@ -1,4 +1,6 @@
+import {isEqual} from 'lodash'
 import {Action} from 'redux'
+import {createSelectorCreator, defaultMemoize} from 'reselect'
 
 export function makeActionCreator(type: string, ...argNames: any[]) {
 	argNames.forEach(arg => {
@@ -42,3 +44,8 @@ export function createReducer<S>(initialState: S, handlers: IReducerHandlers<S>)
 		}
 	}
 }
+
+export const createDeepEqualSelector = createSelectorCreator(
+	defaultMemoize,
+	isEqual,
+)

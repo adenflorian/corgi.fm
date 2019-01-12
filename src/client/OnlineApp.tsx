@@ -18,7 +18,7 @@ import {ConnectedInfiniteSequencer} from './InfiniteSequencer/InfiniteSequencer'
 import {ConnectedBasicInstrumentView} from './Instruments/BasicInstrumentView'
 import {ConnectedKeyboard} from './Keyboard/Keyboard'
 import {ConnectedMasterControls} from './MasterControls'
-import {MousePointers} from './MousePointers'
+import {ConnectedMousePointers} from './MousePointers/MousePointers'
 import {ConnectedTopDiv} from './TopDiv'
 import {ConnectedVolumeControl} from './Volume/VolumeControl'
 
@@ -40,7 +40,7 @@ class OnlineApp extends React.Component<IOnlineAppProps> {
 			<Fragment>
 				{hasLocalClient &&
 					<Fragment>
-						<MousePointers />
+						<ConnectedMousePointers />
 						<ConnectedChat />
 						<ConnectedTopDiv />
 
