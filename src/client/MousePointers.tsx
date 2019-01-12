@@ -1,6 +1,6 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
-import {selectAllClients, selectLocalClient} from '../common/redux/clients-redux'
+import {selectAllClients, selectAllOtherPointers, selectLocalClient} from '../common/redux/clients-redux'
 import {IClientAppState} from '../common/redux/common-redux-types'
 import {CssColor} from '../common/shamu-color'
 import {getMainBoardsRectY} from './utils'
@@ -13,8 +13,6 @@ interface IMousePointersViewProps {
 		name: string,
 	}>
 }
-
-const size = 8
 
 class MousePointersView extends React.PureComponent<IMousePointersViewProps> {
 	public render() {
@@ -32,9 +30,7 @@ class MousePointersView extends React.PureComponent<IMousePointersViewProps> {
 									left: pointer.x - 8,
 									width: 16,
 									height: 16,
-									// backgroundColor: pointer.color,
 									zIndex: 10,
-									// filter: 'opacity(0.8)',
 								}}
 							>
 								<svg
@@ -74,17 +70,8 @@ class MousePointersView extends React.PureComponent<IMousePointersViewProps> {
 }
 
 const mapStateToProps = (state: IClientAppState): IMousePointersViewProps => {
-	const localClientId = selectLocalClient(state).id
-	const otherClients = selectAllClients(state).filter(x => x.id !== 'server' && x.id !== localClientId)
 	return {
-		pointers: otherClients.map(client => ({
-			x: client.pointer.distanceFromCenterX
-				+ (document.body.scrollWidth / 2) - (size / 2) - window.scrollX,
-			y: client.pointer.distanceFromBoardsTop
-				+ getMainBoardsRectY() - (size / 2),
-			color: client.color,
-			name: client.name,
-		})),
+		pointers: selectAllOtherPointers(state),
 	}
 }
 

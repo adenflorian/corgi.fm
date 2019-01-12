@@ -1,5 +1,7 @@
 import * as animal from 'animal-id'
+import {createSelector} from 'reselect'
 import {v4} from 'uuid'
+import {getMainBoardsRectY} from '../../client/utils'
 import {ClientId} from '../common-types'
 import {logger} from '../logger'
 import {getColorHslByString} from '../shamu-color'
@@ -229,6 +231,10 @@ export function selectLocalClient(state: IClientAppState): IClientState {
 	}
 }
 
+export function selectLocalClientId(state: IClientAppState): string {
+	return selectLocalClient(state).id
+}
+
 export const selectAllClients = (state: IClientAppState | IServerState) => state.clients.clients
 
 export const selectClientCount = (state: IClientAppState | IServerState) => selectAllClients(state).length
@@ -241,9 +247,19 @@ export const selectAllClientsAsMap = (state: IClientAppState | IServerState) =>
 		}
 	})
 
-export const selectAllOtherPointers = (state: IClientAppState) => {
-	const localClientId = selectLocalClient(state).id
-	return selectAllClients(state)
-		.filter(x => x.id !== 'server' && x.id !== localClientId)
-		.map(x => x.pointer)
-}
+const size = 8
+
+export const selectAllOtherPointers = createSelector(
+	[selectLocalClientId, selectAllClients],
+	(localClientId, allClients) =>
+		allClients
+			.filter(x => x.id !== 'server' && x.id !== localClientId)
+			.map(client => ({
+				x: client.pointer.distanceFromCenterX
+					+ (document.body.scrollWidth / 2) - (size / 2) - window.scrollX,
+				y: client.pointer.distanceFromBoardsTop
+					+ getMainBoardsRectY() - (size / 2),
+				color: client.color,
+				name: client.name,
+			})),
+)

@@ -69,7 +69,10 @@
 - [ ] build object oriented prototype
 	- Unity?
 - [ ] global midi export button
+
+# Shared Cursors
 - [ ] make shared cursor not block pointer events
+- [ ] use relative positioning like the connections so it doesn't have to rerender on scroll
 
 # Sampler
 - [ ] presentation
