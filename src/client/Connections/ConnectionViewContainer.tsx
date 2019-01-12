@@ -126,4 +126,4 @@ const mapState = (state: IClientAppState, props: IConnectionViewContainerProps):
 	}
 }
 
-export const ConnectedConnectionViewContainer = connect(mapState, null, null, {pure: false})(ConnectionViewContainer)
+export const ConnectedConnectionViewContainer = connect(mapState)(ConnectionViewContainer)

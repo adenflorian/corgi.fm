@@ -1,5 +1,6 @@
 import {Map} from 'immutable'
 import {Reducer} from 'redux'
+import {createSelector} from 'reselect'
 import * as uuid from 'uuid'
 import {logger} from '../logger'
 import {IClientRoomState} from './common-redux-types'
@@ -114,11 +115,13 @@ export const selectConnection = (state: IClientRoomState, id: string) =>
 export const selectSourceByConnectionId = (state: IClientRoomState, id: string): IVirtualKeyboardState =>
 	selectVirtualKeyboardById(state, selectConnection(state, id)!.sourceId)
 
-export const selectAllConnectionIds = (state: IClientRoomState): string[] =>
-	selectAllConnections(state).keySeq().toArray()
-
 export const selectAllConnections = (state: IClientRoomState) =>
 	state.connections.connections
+
+export const selectAllConnectionIds = createSelector(
+	selectAllConnections,
+	connections => connections.keySeq().toArray(),
+)
 
 export const selectAllConnectionsAsArray = (state: IClientRoomState): IConnection[] =>
 	selectAllConnections(state).toIndexedSeq().toArray()
