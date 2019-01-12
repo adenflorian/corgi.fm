@@ -17,8 +17,9 @@ export function createServerStuff(room: string, serverStore: Store) {
 	createSourceAndTarget({
 		source: {
 			type: ConnectionSourceType.gridSequencer,
-			events: getInitialGridSequencerEvents(),
-			name: 'melody',
+			events: getBassNotes(),
+			name: 'bass',
+			notesToShow: 12,
 		},
 		target: {
 			type: ConnectionTargetType.sampler,
@@ -28,8 +29,9 @@ export function createServerStuff(room: string, serverStore: Store) {
 	createSourceAndTarget({
 		source: {
 			type: ConnectionSourceType.gridSequencer,
-			events: getInitialGridSequencerEvents2(),
-			name: 'bass',
+			events: getMelodyNotes(),
+			name: 'melody',
+			notesToShow: 24,
 		},
 		target: {
 			type: ConnectionTargetType.instrument,
@@ -48,28 +50,11 @@ export function createServerStuff(room: string, serverStore: Store) {
 		},
 	})
 
-	createSourceAndTarget({
-		source: {
-			type: ConnectionSourceType.infiniteSequencer,
-			events: getInitialInfiniteSequencerEvents(),
-			name: 'arp2',
-			infinityStyle: InfiniteSequencerStyle.colorBars,
-		},
-		target: {
-			type: ConnectionTargetType.instrument,
-		},
-	})
-
 	interface CreateSourceAndTargetArgs {
-		source: {
-			type: ConnectionSourceType,
-			events?: any,
-			infinityStyle?: InfiniteSequencerStyle,
-			name: string,
-		},
+		source: CreateSourceArgs
 		target: {
 			type: ConnectionTargetType,
-		},
+		}
 	}
 
 	function createSourceAndTarget(options: CreateSourceAndTargetArgs) {
@@ -88,16 +73,17 @@ export function createServerStuff(room: string, serverStore: Store) {
 	}
 
 	interface CreateSourceArgs {
-		type: ConnectionSourceType,
-		name: string,
-		infinityStyle?: InfiniteSequencerStyle,
-		events?: any,
+		type: ConnectionSourceType
+		name: string
+		infinityStyle?: InfiniteSequencerStyle
+		events?: any
+		notesToShow?: number
 	}
 
 	function createSource(args: CreateSourceArgs) {
 		switch (args.type) {
 			case ConnectionSourceType.gridSequencer:
-				const x = new GridSequencerState(args.name, 36, args.events)
+				const x = new GridSequencerState(args.name, args.notesToShow || 24, args.events)
 				serverStore.dispatch(createRoomAction(addGridSequencer(x), room))
 				return x
 			case ConnectionSourceType.infiniteSequencer:
@@ -125,199 +111,48 @@ export function createServerStuff(room: string, serverStore: Store) {
 	}
 }
 
-function getInitialGridSequencerEvents() {
+function getBassNotes() {
 	return new Array(16)
 		.fill({notes: []})
 		.map((_, i) => ({notes: i % 2 === 1 ? [] : [24]}))
-	// return [
-	// 	{notes: [49]},
-	// 	{notes: [63, 58]},
-	// 	{notes: [49]},
-	// 	{notes: []},
-	// 	{notes: [49, 58]},
-	// 	{notes: []},
-	// 	{notes: [49]},
-	// 	{notes: [58, 63]},
-	// 	{notes: [51]},
-	// 	{notes: []},
-	// 	{notes: [51, 58]},
-	// 	{notes: []},
-	// 	{notes: [51]},
-	// 	{notes: [58]},
-	// 	{notes: [66, 51]},
-	// 	{notes: []},
-	// ]
 }
 
-function getInitialGridSequencerEvents2() {
-	return bassNotes
-	// return new Array(32)
-	// 	.fill({notes: []})
-	// 	.map((_, i) => ({notes: i % 2 === 1 ? [] : [32]}))
+function getMelodyNotes() {
+	return [
+		{notes: [36]},
+		{notes: [40]},
+		{notes: [43]},
+		{notes: [47]},
+		{notes: [48]},
+		{notes: [47]},
+		{notes: [43]},
+		{notes: [40]},
+		{notes: [36]},
+		{notes: [40]},
+		{notes: [43]},
+		{notes: [47]},
+		{notes: [48]},
+		{notes: [47]},
+		{notes: [43]},
+		{notes: [40]},
+		{notes: [36]},
+		{notes: [40]},
+		{notes: [43]},
+		{notes: [47]},
+		{notes: [48]},
+		{notes: [47]},
+		{notes: [43]},
+		{notes: [40]},
+		{notes: [36]},
+		{notes: [40]},
+		{notes: [43]},
+		{notes: [47]},
+		{notes: [48]},
+		{notes: [47]},
+		{notes: [43]},
+		{notes: [40]},
+	]
 }
-
-const bassNotes = [
-	{
-		notes: [
-			36,
-		],
-	},
-	{
-		notes: [
-			40,
-		],
-	},
-	{
-		notes: [
-			43,
-		],
-	},
-	{
-		notes: [
-			47,
-		],
-	},
-	{
-		notes: [
-			48,
-		],
-	},
-	{
-		notes: [
-			47,
-		],
-	},
-	{
-		notes: [
-			43,
-		],
-	},
-	{
-		notes: [
-			40,
-		],
-	},
-	{
-		notes: [
-			36,
-		],
-	},
-	{
-		notes: [
-			40,
-		],
-	},
-	{
-		notes: [
-			43,
-		],
-	},
-	{
-		notes: [
-			47,
-		],
-	},
-	{
-		notes: [
-			48,
-		],
-	},
-	{
-		notes: [
-			47,
-		],
-	},
-	{
-		notes: [
-			43,
-		],
-	},
-	{
-		notes: [
-			40,
-		],
-	},
-	{
-		notes: [
-			36,
-		],
-	},
-	{
-		notes: [
-			40,
-		],
-	},
-	{
-		notes: [
-			43,
-		],
-	},
-	{
-		notes: [
-			47,
-		],
-	},
-	{
-		notes: [
-			48,
-		],
-	},
-	{
-		notes: [
-			47,
-		],
-	},
-	{
-		notes: [
-			43,
-		],
-	},
-	{
-		notes: [
-			40,
-		],
-	},
-	{
-		notes: [
-			36,
-		],
-	},
-	{
-		notes: [
-			40,
-		],
-	},
-	{
-		notes: [
-			43,
-		],
-	},
-	{
-		notes: [
-			47,
-		],
-	},
-	{
-		notes: [
-			48,
-		],
-	},
-	{
-		notes: [
-			47,
-		],
-	},
-	{
-		notes: [
-			43,
-		],
-	},
-	{
-		notes: [
-			40,
-		],
-	},
-]
 
 function getInitialInfiniteSequencerEvents() {
 	return [
