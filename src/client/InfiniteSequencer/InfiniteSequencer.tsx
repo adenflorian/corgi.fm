@@ -44,93 +44,95 @@ export class InfiniteSequencer extends Component<IInfiniteSequencerAllProps> {
 		const noteHeightPercentage = 100 / numberOfPossibleNotes
 
 		return (
-			<div className="infiniteSequencer">
-				<div
-					className={`${isPlaying ? 'isPlaying saturate' : 'isNotPlaying'}`}
-				>
-					<Panel id={this.props.id} label={name} color={isRecording ? 'red' : color}>
-						<div className="controls">
-							<div
-								className="play"
-								onClick={() => this.props.dispatch(
-									setInfiniteSequencerField(id, InfiniteSequencerFields.isPlaying, true))}
-							>
-								▶
+			<div
+				className={
+					`infiniteSequencer ` +
+					`${isPlaying ? 'isPlaying saturate' : 'isNotPlaying'}` + ` ` +
+					`${isRecording ? `isRecording` : ''}`
+				}
+			>
+				<Panel id={this.props.id} label={name} color={isRecording ? 'red' : color}>
+					<div className="controls">
+						<div
+							className="play"
+							onClick={() => this.props.dispatch(
+								setInfiniteSequencerField(id, InfiniteSequencerFields.isPlaying, true))}
+						>
+							▶
 							</div>
-							<div
-								className="stop"
-								onClick={() => this.props.dispatch(
-									setInfiniteSequencerField(id, InfiniteSequencerFields.isPlaying, false))}
-							>
-								◼
+						<div
+							className="stop"
+							onClick={() => this.props.dispatch(
+								setInfiniteSequencerField(id, InfiniteSequencerFields.isPlaying, false))}
+						>
+							◼
 							</div>
-							<div
-								className="record"
-								onClick={() => this.props.dispatch(
-									setInfiniteSequencerField(id, InfiniteSequencerFields.isRecording, !isRecording))}
-							>
-								⬤
+						<div
+							className="record"
+							onClick={() => this.props.dispatch(
+								setInfiniteSequencerField(id, InfiniteSequencerFields.isRecording, !isRecording))}
+						>
+							⬤
 							</div>
-							<div
-								className="export"
-								onClick={() => this.props.dispatch(
-									exportSequencerMidi(id))}
-							>
-								⭳
+						<div
+							className="export"
+							onClick={() => this.props.dispatch(
+								exportSequencerMidi(id))}
+						>
+							⭳
 							</div>
-							<div
-								className="style"
-								onClick={() => this.props.dispatch(
-									setInfiniteSequencerField(
-										id,
-										InfiniteSequencerFields.style,
-										this.props.style === InfiniteSequencerStyle.colorBars
-											? InfiniteSequencerStyle.colorGrid
-											: InfiniteSequencerStyle.colorBars,
-									),
-								)}
-							>
-								★
+						<div
+							className="style"
+							onClick={() => this.props.dispatch(
+								setInfiniteSequencerField(
+									id,
+									InfiniteSequencerFields.style,
+									this.props.style === InfiniteSequencerStyle.colorBars
+										? InfiniteSequencerStyle.colorGrid
+										: InfiniteSequencerStyle.colorBars,
+								),
+							)}
+						>
+							★
 							</div>
+					</div>
+					{style === InfiniteSequencerStyle.colorBars &&
+						<div className={`display ${this.props.events.length > 8 ? 'small' : ''}`}>
+							{this.props.events.map((event, index) =>
+								<div
+									key={index}
+									className={`event ${this.props.activeIndex === index ? 'active' : ''}`}
+									style={{
+										backgroundColor: `hsl(${removeOctave(event.notes[0]) * 23}, ${event.notes[0] + 10}%, 60%)`,
+									}}
+								>
+									{
+										this.props.events.length <= 8
+											? midiNoteToNoteName(event.notes[0]) + getOctaveFromMidiNote(event.notes[0])
+											: undefined
+									}
+								</div>,
+							)}
 						</div>
-						{style === InfiniteSequencerStyle.colorBars &&
-							<div className={`display ${this.props.events.length > 8 ? 'small' : ''}`}>
-								{this.props.events.map((event, index) =>
-									<div
-										key={index}
-										className={`event ${this.props.activeIndex === index ? 'active' : ''}`}
-										style={{
-											backgroundColor: `hsl(${removeOctave(event.notes[0]) * 23}, ${event.notes[0] + 10}%, 60%)`,
-										}}
-									>
-										{
-											this.props.events.length <= 8
-												? midiNoteToNoteName(event.notes[0]) + getOctaveFromMidiNote(event.notes[0])
-												: undefined
-										}
-									</div>,
-								)}
-							</div>
-						}
-						{style === InfiniteSequencerStyle.colorGrid &&
-							<div className={`display ${this.props.events.length > 8 ? 'small' : ''}`}>
-								{this.props.events.map(x => x.notes[0]).map((note, index) =>
-									<div
-										key={index}
-										className={`event ${this.props.activeIndex === index ? 'active' : ''}`}
-										style={{
-											backgroundColor: `hsl(${removeOctave(note) * 23}, 60%, 60%)`,
-											height: `${noteHeightPercentage + (note === lowestNote ? 1 : 0)}%`,
-											top: `${(highestNote - note) * noteHeightPercentage}%`,
-										}}
-									>
-									</div>,
-								)}
-							</div>
-						}
-					</Panel>
-				</div>
-			</div >
+					}
+					{style === InfiniteSequencerStyle.colorGrid &&
+						<div className={`display ${this.props.events.length > 8 ? 'small' : ''}`}>
+							{this.props.events.map(x => x.notes[0]).map((note, index) =>
+								<div
+									key={index}
+									className={`event ${this.props.activeIndex === index ? 'active' : ''}`}
+									style={{
+										backgroundColor: `hsl(${removeOctave(note) * 23}, 60%, 60%)`,
+										height: `${noteHeightPercentage + (note === lowestNote ? 1 : 0)}%`,
+										top: `${(highestNote - note) * noteHeightPercentage}%`,
+									}}
+								>
+								</div>,
+							)}
+						</div>
+					}
+				</Panel>
+			</div>
 		)
 	}
 }
