@@ -25,6 +25,8 @@ type UpdateSpecificInstrument<I extends IInstrument, S> = (instrument: I, instru
 
 const stuffMap = new Map<string, any>()
 
+// let previousState: any = {}
+
 export const setupInstrumentManager = (store: Store<IClientAppState>, audioContext: AudioContext, preFx: GainNode) => {
 
 	const globalClock = new GridSequencerPlayer(
@@ -34,127 +36,132 @@ export const setupInstrumentManager = (store: Store<IClientAppState>, audioConte
 
 	globalClock.play()
 
-	store.subscribe(() => {
+	store.subscribe(updateInstrumentLayer)
+
+	function updateInstrumentLayer() {
 		const state = store.getState()
 
-		handleSamplers(state)
-		handleBasicInstruments(state)
+		// if (state.room === previousState.room) return
 
-		// handleGridSequencers(state)
-		// handleInfiniteSequencers(state)
-	})
+		// previousState = state
 
-	function handleSamplers(state: IClientAppState) {
-		updateInstrumentType(
-			state,
-			selectAllSamplerIds,
-			selectSampler,
-			options => new BasicSamplerInstrument({...options, voiceCount: 20}),
-			(instrument: BasicSamplerInstrument, instrumentState: BasicSamplerState) => {
-				instrument.setPan(instrumentState.pan)
-				instrument.setLowPassFilterCutoffFrequency(instrumentState.lowPassFilterCutoffFrequency)
-				instrument.setAttack(instrumentState.attack)
-				instrument.setRelease(instrumentState.release)
-			},
-		)
-	}
+		// console.log('instr manager update')
 
-	function handleBasicInstruments(state: IClientAppState) {
-		updateInstrumentType(
-			state,
-			selectAllBasicInstrumentIds,
-			selectInstrument,
-			(options, instrumentState) => new BasicInstrument({...options, voiceCount: 9, ...instrumentState}),
-			(instrument: BasicInstrument, instrumentState: BasicInstrumentState) => {
-				instrument.setOscillatorType(instrumentState.oscillatorType)
-				instrument.setPan(instrumentState.pan)
-				instrument.setLowPassFilterCutoffFrequency(instrumentState.lowPassFilterCutoffFrequency)
-				instrument.setAttack(instrumentState.attack)
-				instrument.setRelease(instrumentState.release)
-			},
-		)
-	}
+		handleSamplers()
+		handleBasicInstruments()
 
-	function updateInstrumentType<I extends IInstrument, S>(
-		state: IClientAppState,
-		instrumentIdsSelector: InstrumentIdsSelector,
-		instrumentStateSelector: InstrumentStateSelector<S>,
-		instrumentCreator: InstrumentFactory<I, S>,
-		updateSpecificInstrument?: UpdateSpecificInstrument<I, S>,
-	) {
-		instrumentIdsSelector(state.room).forEach(instrumentId => {
-			const connection = selectConnectionsWithSourceOrTargetIds(state.room, [instrumentId])[0]
+		// handleGridSequencers()
+		// handleInfiniteSequencers()
 
-			if (connection === undefined) return
-
-			const sourceNotes = selectConnectionSourceNotes(state.room, connection.id)
-			let instrument: I = stuffMap.get(instrumentId)
-
-			const instrumentState = instrumentStateSelector(state.room, instrumentId)
-
-			instrument = createIfNotExisting(
-				instrumentId,
-				instrument,
-				() => instrumentCreator({audioContext, destination: preFx, voiceCount: 1}, instrumentState),
+		function handleSamplers() {
+			updateInstrumentType(
+				selectAllSamplerIds,
+				selectSampler,
+				options => new BasicSamplerInstrument({...options, voiceCount: 20}),
+				(instrument: BasicSamplerInstrument, instrumentState: BasicSamplerState) => {
+					instrument.setPan(instrumentState.pan)
+					instrument.setLowPassFilterCutoffFrequency(instrumentState.lowPassFilterCutoffFrequency)
+					instrument.setAttack(instrumentState.attack)
+					instrument.setRelease(instrumentState.release)
+				},
 			)
-
-			instrument.setMidiNotes(sourceNotes)
-
-			if (updateSpecificInstrument) updateSpecificInstrument(instrument, instrumentState)
-		})
-	}
-
-	// function handleGridSequencers(state: IClientAppState) {
-	// 	const gridSequencers = toArray(selectAllGridSequencers(state.room))
-
-	// 	gridSequencers.forEach(gridSequencer => {
-	// 		let sequencer = stuffMap.get(gridSequencer.id) as GridSequencerPlayer
-
-	// 		sequencer = createIfNotExisting(gridSequencer.id, sequencer, () => {
-	// 			return new GridSequencerPlayer(
-	// 				audioContext,
-	// 				index => store.dispatch(setGridSequencerField(gridSequencer.id, 'index', index)),
-	// 			)
-	// 		})
-
-	// 		if (gridSequencer.isPlaying !== sequencer.isPlaying()) {
-	// 			if (gridSequencer.isPlaying) {
-	// 				sequencer.play()
-	// 			} else {
-	// 				sequencer.stop()
-	// 			}
-	// 		}
-	// 	})
-	// }
-
-	// function handleInfiniteSequencers(state: IClientAppState) {
-	// 	const infiniteSequencers = toArray(selectAllInfiniteSequencers(state.room))
-
-	// 	infiniteSequencers.forEach(infiniteSequencer => {
-	// 		let sequencer = stuffMap.get(infiniteSequencer.id) as GridSequencerPlayer
-
-	// 		sequencer = createIfNotExisting(infiniteSequencer.id, sequencer, () => {
-	// 			return new GridSequencerPlayer(
-	// 				audioContext,
-	// 				index => store.dispatch(setInfiniteSequencerField(infiniteSequencer.id, InfiniteSequencerFields.index, index)),
-	// 			)
-	// 		})
-
-	// 		if (infiniteSequencer.isPlaying !== sequencer.isPlaying()) {
-	// 			if (infiniteSequencer.isPlaying) {
-	// 				sequencer.play()
-	// 			} else {
-	// 				sequencer.stop()
-	// 			}
-	// 		}
-	// 	})
-	// }
-
-	function createIfNotExisting<T>(id: string, thing: any, thingFactory: () => T): T {
-		if (thing === undefined) {
-			thing = thingFactory()
-			stuffMap.set(id, thing)
 		}
-		return thing
+
+		function handleBasicInstruments() {
+			updateInstrumentType(
+				selectAllBasicInstrumentIds,
+				selectInstrument,
+				(options, instrumentState) => new BasicInstrument({...options, voiceCount: 9, ...instrumentState}),
+				(instrument: BasicInstrument, instrumentState: BasicInstrumentState) => {
+					instrument.setOscillatorType(instrumentState.oscillatorType)
+					instrument.setPan(instrumentState.pan)
+					instrument.setLowPassFilterCutoffFrequency(instrumentState.lowPassFilterCutoffFrequency)
+					instrument.setAttack(instrumentState.attack)
+					instrument.setRelease(instrumentState.release)
+				},
+			)
+		}
+
+		function updateInstrumentType<I extends IInstrument, S>(
+			instrumentIdsSelector: InstrumentIdsSelector,
+			instrumentStateSelector: InstrumentStateSelector<S>,
+			instrumentCreator: InstrumentFactory<I, S>,
+			updateSpecificInstrument?: UpdateSpecificInstrument<I, S>,
+		) {
+			instrumentIdsSelector(state.room).forEach(instrumentId => {
+				const connection = selectConnectionsWithSourceOrTargetIds(state.room, [instrumentId])[0]
+
+				if (connection === undefined) return
+
+				const sourceNotes = selectConnectionSourceNotes(state.room, connection.id)
+				let instrument: I = stuffMap.get(instrumentId)
+
+				const instrumentState = instrumentStateSelector(state.room, instrumentId)
+
+				instrument = createIfNotExisting(
+					instrumentId,
+					instrument,
+					() => instrumentCreator({audioContext, destination: preFx, voiceCount: 1}, instrumentState),
+				)
+
+				instrument.setMidiNotes(sourceNotes)
+
+				if (updateSpecificInstrument) updateSpecificInstrument(instrument, instrumentState)
+			})
+		}
+
+		// function handleGridSequencers() {
+		// 	const gridSequencers = toArray(selectAllGridSequencers(state.room))
+
+		// 	gridSequencers.forEach(gridSequencer => {
+		// 		let sequencer = stuffMap.get(gridSequencer.id) as GridSequencerPlayer
+
+		// 		sequencer = createIfNotExisting(gridSequencer.id, sequencer, () => {
+		// 			return new GridSequencerPlayer(
+		// 				audioContext,
+		// 				index => store.dispatch(setGridSequencerField(gridSequencer.id, 'index', index)),
+		// 			)
+		// 		})
+
+		// 		if (gridSequencer.isPlaying !== sequencer.isPlaying()) {
+		// 			if (gridSequencer.isPlaying) {
+		// 				sequencer.play()
+		// 			} else {
+		// 				sequencer.stop()
+		// 			}
+		// 		}
+		// 	})
+		// }
+
+		// function handleInfiniteSequencers() {
+		// 	const infiniteSequencers = toArray(selectAllInfiniteSequencers(state.room))
+
+		// 	infiniteSequencers.forEach(infiniteSequencer => {
+		// 		let sequencer = stuffMap.get(infiniteSequencer.id) as GridSequencerPlayer
+
+		// 		sequencer = createIfNotExisting(infiniteSequencer.id, sequencer, () => {
+		// 			return new GridSequencerPlayer(
+		// 				audioContext,
+		// 				index => store.dispatch(setInfiniteSequencerField(infiniteSequencer.id, InfiniteSequencerFields.index, index)),
+		// 			)
+		// 		})
+
+		// 		if (infiniteSequencer.isPlaying !== sequencer.isPlaying()) {
+		// 			if (infiniteSequencer.isPlaying) {
+		// 				sequencer.play()
+		// 			} else {
+		// 				sequencer.stop()
+		// 			}
+		// 		}
+		// 	})
+		// }
+
+		function createIfNotExisting<T>(id: string, thing: any, thingFactory: () => T): T {
+			if (thing === undefined) {
+				thing = thingFactory()
+				stuffMap.set(id, thing)
+			}
+			return thing
+		}
 	}
 }

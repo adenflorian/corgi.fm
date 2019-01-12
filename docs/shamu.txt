@@ -1,0 +1,19 @@
+June 23, 2018
+
+instruments (take midi and make sound)
+people (send key presses, and own things)
+tracks (emit midi)
+keyboards (emit midi)
+
+
+
+connections (connect sources to targets)
+- people to keyboards
+- keyboards to instruments
+- tracks to instruments
+- tracks to keyboards
+- keyboards to keyboards
+- [
+	{sourceType: 'keyboard', sourceParam: 'notes', sourceId: '123', targetType: 'instrument', targetInput: 'notes', targetId: '321'}
+]
+clocks (emit ticks)

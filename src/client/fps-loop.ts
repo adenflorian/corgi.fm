@@ -1,27 +1,34 @@
-let stop = false
 const filterStrength = 20
-let frameTime = 0
-let lastLoop = Date.now()
+let stop = false
+let frameTime = 1
+let lastLoop = performance.now()
 let thisLoop
+let thisFrameTime
 
-export function fpsLoop() {
+export function startFpsLoop() {
+	window.requestAnimationFrame(fpsLoop)
+}
+
+const fpsLoop: FrameRequestCallback = time => {
 	if (stop === true) return
 
-	thisLoop = Date.now()
-	const thisFrameTime = thisLoop - lastLoop
+	thisLoop = time
+	thisFrameTime = thisLoop - lastLoop
 	frameTime += (thisFrameTime - frameTime) / filterStrength
 	lastLoop = thisLoop
 
 	window.requestAnimationFrame(fpsLoop)
 }
 
+const fpsUpdateInterval = setInterval(updateFpsDisplay, 250)
+
 let fpsNode
-const interval = setInterval(() => {
+function updateFpsDisplay() {
 	fpsNode = document.getElementById('fps')
 	if (fpsNode) {
 		fpsNode.textContent = 'FPS ' + (1000 / frameTime).toFixed(0)
 	}
-}, 250)
+}
 
 declare global {
 	interface NodeModule {
@@ -35,6 +42,6 @@ declare global {
 if (module.hot) {
 	module.hot.dispose(() => {
 		stop = true
-		clearInterval(interval)
+		clearInterval(fpsUpdateInterval)
 	})
 }

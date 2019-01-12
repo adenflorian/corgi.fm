@@ -69,6 +69,7 @@
 - [ ] build object oriented prototype
 	- Unity?
 - [ ] global midi export button
+- [ ] look into making an audio node that is a sequencer
 
 # Shared Cursors
 - [ ] make shared cursor not block pointer events

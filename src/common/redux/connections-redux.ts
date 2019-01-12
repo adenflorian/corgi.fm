@@ -1,5 +1,5 @@
 import {Map} from 'immutable'
-import {Reducer} from 'redux'
+import {combineReducers, Reducer} from 'redux'
 import {createSelector} from 'reselect'
 import * as uuid from 'uuid'
 import {logger} from '../logger'
@@ -84,21 +84,10 @@ export class Connection implements IConnection {
 	}
 }
 
-const initialState: IConnectionsState = {
-	connections: Connections(),
-}
-
 export type IConnectionAction = AddConnectionAction | DeleteConnectionsAction
 	| DeleteAllConnectionsAction | UpdateConnectionsAction
 
-export const connectionsReducer: Reducer<IConnectionsState, IConnectionAction> =
-	(state = initialState, action) => {
-		return {
-			connections: connectionsSpecificReducer(state.connections, action),
-		}
-	}
-
-export const connectionsSpecificReducer: Reducer<IConnections, IConnectionAction> =
+const connectionsSpecificReducer: Reducer<IConnections, IConnectionAction> =
 	(connections = Connections(), action) => {
 		switch (action.type) {
 			case ADD_CONNECTION: return connections.set(action.connection.id, action.connection)
@@ -108,6 +97,10 @@ export const connectionsSpecificReducer: Reducer<IConnections, IConnectionAction
 			default: return connections
 		}
 	}
+
+export const connectionsReducer: Reducer<IConnectionsState, IConnectionAction> = combineReducers({
+	connections: connectionsSpecificReducer,
+})
 
 export const selectAllConnections = (state: IClientRoomState) =>
 	state.connections.connections

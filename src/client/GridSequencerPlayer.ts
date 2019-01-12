@@ -28,24 +28,24 @@ export class GridSequencerPlayer {
 		this._startTime = this._audioContext.currentTime
 	}
 
-	public play = () => {
+	public readonly play = () => {
 		if (this.isPlaying()) return
 		this._startTime = this._audioContext.currentTime
 		this._isPlaying = true
 		window.requestAnimationFrame(this._onTick)
 	}
 
-	public stop = () => {
+	public readonly stop = () => {
 		this._isPlaying = false
 		this._index = 0
 		this._onIndexChange(-1)
 	}
 
-	public getCurrentPlayTime = () => this._audioContext.currentTime - this._startTime
+	public readonly getCurrentPlayTime = () => this._audioContext.currentTime - this._startTime
 
-	public isPlaying = () => this._isPlaying
+	public readonly isPlaying = () => this._isPlaying
 
-	private readonly _onTick = () => {
+	private readonly _onTick: FrameRequestCallback = () => {
 		this._doTick()
 
 		if (this._isPlaying) {
@@ -53,7 +53,7 @@ export class GridSequencerPlayer {
 		}
 	}
 
-	private _doTick = () => {
+	private readonly _doTick = () => {
 		const newIndex = Math.floor(this.getCurrentPlayTime() * 5)
 
 		if (newIndex !== this._index) {

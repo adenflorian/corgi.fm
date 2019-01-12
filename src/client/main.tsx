@@ -6,7 +6,7 @@ import {setupAudioContext} from '../common/setup-audio-context'
 import {SamplesManager} from './BasicSampler/SamplesManager'
 import {BrowserWarning} from './BrowserWarning'
 import {configureStore} from './client-store'
-import {fpsLoop} from './fps-loop'
+import {startFpsLoop} from './fps-loop'
 import {setupInputEventListeners} from './input-events'
 import {setupInstrumentManager} from './instrument-manager'
 import {logClientEnv} from './is-prod-client'
@@ -66,7 +66,7 @@ async function setupAsync() {
 
 	renderApp(store)
 
-	fpsLoop()
+	startFpsLoop()
 
 	if (module.hot) {
 		module.hot.dispose(() => {

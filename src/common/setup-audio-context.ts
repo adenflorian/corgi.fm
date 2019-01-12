@@ -49,8 +49,9 @@ export function setupAudioContext(audioContext: AudioContext, preFx: GainNode, s
 	let lastReportedValue = -999
 	const deltaThreshold = 0.5
 
-	javascriptNode.onaudioprocess = () => {
+	javascriptNode.onaudioprocess = checkAudioLevels
 
+	function checkAudioLevels() {
 		const timeSinceLastUpdate = Date.now() - lastUpdateTime
 
 		if (timeSinceLastUpdate >= updateInterval) {
