@@ -41,11 +41,11 @@ class OnlineApp extends React.Component<IOnlineAppProps> {
 				{myClient &&
 					<Fragment>
 						<MousePointers />
-						<ConnectionsContainer />
 						<ConnectedChat />
 						<ConnectedTopDiv />
 
 						<div id={mainBoardsId} className="boards">
+							<ConnectionsContainer />
 							<div className="boardRow">
 								<div className="board connected">
 									<ConnectedMasterControls />

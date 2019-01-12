@@ -1,11 +1,15 @@
 .connection {
-        position: fixed;
+    position: absolute;
+    overflow: visible;
+
     &.connector {
         z-index: 1;
+
         &:hover {
             filter: saturate(300%);
         }
     }
+
     &.longLine {
         width: 100%;
         height: 100%;

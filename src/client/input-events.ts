@@ -2,7 +2,7 @@ import {Map} from 'immutable'
 import {AnyAction, Store} from 'redux'
 import {selectIsLocalClientReady, selectLocalClient, setClientPointer} from '../common/redux/clients-redux'
 import {localMidiKeyPress, localMidiKeyUp, localMidiOctaveChange} from '../common/redux/local-middleware'
-import {getMainBoardsRectY} from './MousePointers'
+import {getMainBoardsRectY} from './utils'
 
 type IKeyBoardShortcuts = Map<string, KeyBoardShortcut>
 

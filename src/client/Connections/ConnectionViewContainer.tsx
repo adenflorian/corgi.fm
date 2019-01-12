@@ -2,9 +2,10 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import {IClientAppState} from '../../common/redux/common-redux-types'
 import {
-	IConnection, selectConnection, selectConnectionSourceColor,
-	selectConnectionSourceIsPlaying, selectConnectionSourceShouldHighlight,
+	IConnection, selectAllConnections, selectConnection,
+	selectConnectionSourceColor, selectConnectionSourceIsPlaying, selectConnectionSourceShouldHighlight,
 } from '../../common/redux/connections-redux'
+import {getMainBoardsRectX, getMainBoardsRectY} from '../utils'
 import {ConnectionView, Point} from './ConnectionView'
 
 export interface IConnectionViewContainerProps {
@@ -12,6 +13,7 @@ export interface IConnectionViewContainerProps {
 }
 
 export interface IConnectionViewContainerReduxProps {
+	connections: any
 	sourceId?: string
 	targetId?: string
 	sourceColor: string
@@ -34,7 +36,7 @@ interface ICVCState {
 	oldPositions: Positions
 }
 
-export class ConnectionViewContainer extends React.Component<IConnectionViewContainerAllProps, ICVCState> {
+export class ConnectionViewContainer extends React.PureComponent<IConnectionViewContainerAllProps, ICVCState> {
 	public static defaultProps = {
 		offset: 0,
 		sourceColor: 'gray',
@@ -44,8 +46,6 @@ export class ConnectionViewContainer extends React.Component<IConnectionViewCont
 
 	constructor(props: IConnectionViewContainerAllProps) {
 		super(props)
-		window.addEventListener('resize', this._updatePositions)
-		window.addEventListener('scroll', this._updatePositions)
 		setTimeout(() => {
 			this.componentDidUpdate()
 		}, 500)
@@ -53,11 +53,6 @@ export class ConnectionViewContainer extends React.Component<IConnectionViewCont
 
 	public componentDidUpdate() {
 		this._updatePositions()
-	}
-
-	public componentWillUnmount() {
-		window.removeEventListener('resize', this._updatePositions)
-		window.removeEventListener('scroll', this._updatePositions)
 	}
 
 	public render() {
@@ -96,12 +91,12 @@ export class ConnectionViewContainer extends React.Component<IConnectionViewCont
 
 		const newPositions = {
 			sourcePosition: {
-				x: sourceBox.x + sourceBox.width,
-				y: sourceBox.y + (sourceBox.height / 2),
+				x: sourceBox.x + sourceBox.width - getMainBoardsRectX(),
+				y: sourceBox.y + (sourceBox.height / 2) - getMainBoardsRectY(),
 			},
 			targetPosition: {
-				x: targetBox.x - this.props.offset,
-				y: (targetBox.y + (targetBox.height / 2)),
+				x: targetBox.x - this.props.offset - getMainBoardsRectX(),
+				y: targetBox.y + (targetBox.height / 2) - getMainBoardsRectY(),
 			},
 		}
 
@@ -126,6 +121,8 @@ const mapState = (state: IClientAppState, props: IConnectionViewContainerProps):
 		offset: 16,
 		isSourcePlaying,
 		shouldHighlight,
+		// Forces update when connections change
+		connections: selectAllConnections(state.room),
 	}
 }
 

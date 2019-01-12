@@ -143,3 +143,21 @@ export function isRightMouseButtonDown(buttons: number): boolean {
 export const valueToPercentageOfMinMax = (value: number, min: number, max: number) => {
 	return ((value - min) * 100) / (max - min)
 }
+
+export function getMainBoardsRectY() {
+	return getMainBoardsRect().y
+}
+
+export function getMainBoardsRectX() {
+	return getMainBoardsRect().x
+}
+
+function getMainBoardsRect() {
+	const mainBoardsElement = document.getElementById('mainBoards')
+
+	if (mainBoardsElement) {
+		return (mainBoardsElement.getBoundingClientRect() as DOMRect)
+	} else {
+		return {x: 0, y: 0}
+	}
+}

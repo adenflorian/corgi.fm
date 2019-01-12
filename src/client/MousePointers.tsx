@@ -3,6 +3,7 @@ import {connect} from 'react-redux'
 import {selectAllClients, selectLocalClient} from '../common/redux/clients-redux'
 import {IClientAppState} from '../common/redux/common-redux-types'
 import {CssColor} from '../common/shamu-color'
+import {getMainBoardsRectY} from './utils'
 
 interface IMousePointersViewProps {
 	pointers: Array<{
@@ -84,16 +85,6 @@ const mapStateToProps = (state: IClientAppState): IMousePointersViewProps => {
 			color: client.color,
 			name: client.name,
 		})),
-	}
-}
-
-export function getMainBoardsRectY() {
-	const mainBoardsElement = document.getElementById('mainBoards')
-
-	if (mainBoardsElement) {
-		return (mainBoardsElement.getBoundingClientRect() as DOMRect).y
-	} else {
-		return 0
 	}
 }
 

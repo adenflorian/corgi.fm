@@ -1,5 +1,8 @@
 import * as React from 'react'
-import {colorFunc, saturateColor} from '../../common/shamu-color'
+import {
+	// colorFunc,
+	saturateColor,
+} from '../../common/shamu-color'
 import './ConnectionView.less'
 
 export interface Point {
@@ -20,6 +23,20 @@ export interface IConnectionViewProps {
 	id: string
 }
 
+class LineState {
+	constructor(
+		public readonly x1: number,
+		public readonly y1: number,
+		public readonly x2: number,
+		public readonly y2: number,
+	) {}
+
+	public readonly width = () => Math.abs(this.x1 - this.x2)
+	public readonly height = () => Math.abs(this.y1 - this.y2)
+	public readonly leftMost = () => Math.min(this.x1, this.x2)
+	public readonly topMost = () => Math.min(this.y1, this.y2)
+}
+
 export class ConnectionView extends React.PureComponent<IConnectionViewProps> {
 	public static defaultProps = {
 		connectorWidth: 16,
@@ -29,33 +46,50 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps> {
 	public render() {
 		const {color, saturateSource, saturateTarget, id} = this.props
 
-		const darkerColor = colorFunc(color).darken(0.6).hsl().string()
-		const strokeWidth = '2px'
-		const strokeWidth2 = '8px'
+		// const darkerColor = colorFunc(color).darken(0.6).hsl().string()
+		const longLineStrokeWidth = 2
+		const connectorStrokeWidth = 8
+
+		const line = new LineState(
+			this.props.sourceX + this.props.connectorWidth,
+			this.props.sourceY,
+			this.props.targetX,
+			this.props.targetY,
+		)
 
 		return (
 			<div>
-				<svg className={`connection colorize longLine`} xmlns="http://www.w3.org/2000/svg">
+				<svg
+					className={`connection colorize longLine`}
+					xmlns="http://www.w3.org/2000/svg"
+					style={{
+						width: line.width(),
+						height: line.height(),
+						minHeight: longLineStrokeWidth,
+						top: line.topMost(),
+						left: line.leftMost(),
+					}}
+				>
 					<defs>
 						<linearGradient
 							id={id}
-							x1={this.props.sourceX + this.props.connectorWidth}
-							y1={this.props.sourceY}
-							x2={this.props.targetX}
-							y2={this.props.targetY}
+							x1={(line.x1 - line.leftMost())}
+							y1={(line.y1 - line.topMost())}
+							x2={(line.x2 - line.leftMost())}
+							y2={(line.y2 - line.topMost())}
 							gradientUnits="userSpaceOnUse"
 						>
-							<stop stopColor={saturateSource ? saturateColor(darkerColor) : darkerColor} offset="0" />
-							<stop stopColor={saturateTarget ? saturateColor(darkerColor) : darkerColor} offset="1" />
+							<stop stopColor={saturateSource ? saturateColor(color) : color} offset="0%" />
+							<stop stopColor={saturateTarget ? saturateColor(color) : color} offset="100%" />
 						</linearGradient>
 					</defs>
 					<line
-						x1={this.props.sourceX + this.props.connectorWidth}
-						y1={this.props.sourceY}
-						x2={this.props.targetX}
-						y2={this.props.targetY}
+						x1={line.x1 - line.leftMost()}
+						y1={line.y1 - line.topMost()}
+						x2={line.x2 - line.leftMost()}
+						y2={line.y2 - line.topMost()}
 						stroke={`url(#${id})`}
-						strokeWidth={strokeWidth}
+						strokeWidth={longLineStrokeWidth + 'px'}
 					/>
 				</svg>
 				<svg
@@ -74,7 +108,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps> {
 						x2={this.props.connectorWidth}
 						y2={this.props.connectorHeight / 2}
 						stroke={color}
-						strokeWidth={strokeWidth2}
+						strokeWidth={connectorStrokeWidth}
 					/>
 				</svg>
 				<svg
@@ -93,7 +127,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps> {
 						x2={this.props.connectorWidth}
 						y2={this.props.connectorHeight / 2}
 						stroke={color}
-						strokeWidth={strokeWidth2}
+						strokeWidth={connectorStrokeWidth}
 					/>
 				</svg>
 			</div>

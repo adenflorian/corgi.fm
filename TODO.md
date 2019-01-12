@@ -68,6 +68,8 @@
 	- learning?
 - [ ] build object oriented prototype
 	- Unity?
+- [ ] global midi export button
+- [ ] make shared cursor not block pointer events
 
 # Sampler
 - [ ] presentation
@@ -105,6 +107,8 @@
 - [ ] click and drag notes left and right to change order, up and down to change note
 - [ ] find better way to clear notes
 - [ ] fix recording and playing at same time
+- [ ] undo button
+- [ ] record button should be red when recording
 
 # References
 - https://github.com/grimmdude/MidiPlayerJS/blob/master/src/player.js
@@ -135,6 +139,9 @@
 	- [ ] advanced
 	- etc.
 - [ ] show member count for each room in room selector
+
+# Global Clock
+- [ ] clicking play should reset global index to 0
 
 # Newsletter
 - [ ] put a back button on the newsletter page?
