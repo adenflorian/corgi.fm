@@ -1,3 +1,4 @@
+import {Map} from 'immutable'
 import {AnyAction, Reducer} from 'redux'
 import {createSelector} from 'reselect'
 import * as uuid from 'uuid'
@@ -8,6 +9,7 @@ import {MAX_MIDI_NOTE_NUMBER_127} from '../server-constants'
 import {colorFunc} from '../shamu-color'
 import {PLAY_ALL, STOP_ALL} from './common-actions'
 import {IClientRoomState} from './common-redux-types'
+import {selectAllInfiniteSequencers} from './infinite-sequencers-redux'
 import {
 	addMultiThing, deleteThings, IMultiState,
 	IMultiStateThing, IMultiStateThings, makeMultiReducer, MultiThingType, updateThings,
@@ -268,3 +270,8 @@ export const selectAllSequencers = (state: IClientRoomState) => ({
 	...state.gridSequencers.things,
 	...state.infiniteSequencers.things,
 })
+
+export const selectIsAnythingPlaying = createSelector(
+	[selectAllGridSequencers, selectAllInfiniteSequencers],
+	(gridSeqs, infSeqs) => Map(gridSeqs).merge(infSeqs).some(x => x.isPlaying),
+)

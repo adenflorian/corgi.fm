@@ -1,35 +1,57 @@
 import * as React from 'react'
+import {
+	IoMdPlay as Play, IoMdSquare as Stop,
+} from 'react-icons/io'
 import {connect} from 'react-redux'
 import {playAll, stopAll} from '../common/redux/common-actions'
+import {IClientAppState} from '../common/redux/common-redux-types'
+import {selectIsAnythingPlaying} from '../common/redux/grid-sequencers-redux'
+import './MasterControls.less'
 import {Panel} from './Panel/Panel'
 
-interface IMasterControlsProps {
-	onPlay: () => void,
+interface IMasterControlsReduxProps {
+	isAnythingPlaying: boolean
+}
+
+interface IMasterControlsDispatchProps {
+	onPlay: () => void
 	onStop: () => void
 }
 
-export const MasterControls = ({onPlay, onStop}: IMasterControlsProps) =>
-	<Panel className="masterControls">
-		<div style={{margin: 8}}>
-			<div>
-				Master Controls
-			</div>
-			<span
-				className="play"
-				onClick={() => onPlay()}
-			>
-				▶
-			</span>
-			<span
-				className="stop"
-				onClick={() => onStop()}
-			>
-				◼
-			</span>
+export const MasterControls: React.FunctionComponent<IMasterControlsReduxProps & IMasterControlsDispatchProps> =
+	({onPlay, onStop, isAnythingPlaying}) =>
+		<div
+			className={
+				`masterControls ` +
+				`${isAnythingPlaying ? 'isPlaying saturate' : 'isNotPlaying'}`
+			}
+		>
+			<Panel>
+				<div>
+					<div style={{margin: 8, marginBottom: 0}}>
+						Master Controls
+					</div>
+					<div className="controls">
+						<span
+							className="play"
+							onClick={() => onPlay()}
+						>
+							<Play />
+						</span>
+						<span
+							className="stop"
+							onClick={() => onStop()}
+						>
+							<Stop />
+						</span>
+					</div>
+				</div>
+			</Panel>
 		</div>
-	</Panel>
 
 export const ConnectedMasterControls = connect(
-	null,
+	(state: IClientAppState): IMasterControlsReduxProps => ({
+		isAnythingPlaying: selectIsAnythingPlaying(state.room),
+	}),
 	{onPlay: playAll, onStop: stopAll},
 )(MasterControls)

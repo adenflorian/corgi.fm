@@ -41,6 +41,7 @@
         "Hashable",
         "ICVC",
         "Scrollable",
+        "Seqs",
         "Shamu",
         "Signup",
         "Unmount",

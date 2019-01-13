@@ -1,0 +1,21 @@
+@import "./colors.less";
+
+.masterControls{
+    .controls {
+        display: flex;
+        flex-direction: row;
+        flex-flow: wrap;
+        justify-content: space-around;
+        align-items: center;
+        font-size: 24px;
+        color: @defaultGray;
+        
+        & > * {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    }
+}
