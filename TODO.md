@@ -21,7 +21,7 @@
 - [ ] maybe use automerge? https://github.com/automerge/automerge
 - [√] maybe use requestAnimationFrame()
 - [ ] make use of `'` key
-- [ ] add `+` and `-` for octave
+- [...] add `+` and `-` for octave
 	- [ ] [bug] pressing shift `=` (`+`) increases the octave by 2
 - [√] persist keyboard state on server, and don't store notes and octaves on clients
 - [ ] TONE.js
@@ -42,7 +42,7 @@
 	- https://noisehack.com/generate-noise-web-audio-api
 - [ ] LFO
 - [ ] make a simple version that's just keyboards, or a single keyboard
-- [ ] op1 arp sequencer thing
+- [√] op1 arp sequencer thing
 - [ ] have a midi library
 - [ ] mute audio on join and show popup letting know user that it might be loud
 - [ ] let players send hearts and claps and stuff to show that they like what the person is playing
@@ -61,7 +61,8 @@
 - [ ] make desktop version using electron
 	- so chrome auto updating can't break the whole app
 - [ ] turn off audio after 30 minutes and show dialog asking if user is still there
-- [ ] velocity
+- [ ] note velocity from external midi keyboard
+- [ ] program velocity into sequencer
 - [ ] download an open source font
 - [ ] Define purpose/goals/mission of this app
 	- collaboration
@@ -70,6 +71,7 @@
 	- Unity?
 - [ ] global midi export button
 - [ ] look into making an audio node that is a sequencer
+- [ ] keep track of what object is selected and route keyboard commands like ctrl + z to the selected object
 
 # Shared Cursors
 - [ ] make shared cursor not block pointer events
@@ -88,6 +90,7 @@
 
 # Keyboard
 - [ ] do something to visualize external midi keyboard notes
+- [ ] show icon or something to show which users are using an external midi keyboard
 
 # Knob
 - [ ] Allow for arc to go both directions
@@ -99,6 +102,7 @@
 - [√] global play button
 - [ ] click and drag midi to ableton from shamu
 - [ ] input notes from keyboard
+- [ ] allow using scroll wheel
 
 ## GridSequencer Scroll Bar
 - [ ] make slider stay with mouse 1:1
@@ -143,6 +147,7 @@
 
 # Global Clock
 - [ ] clicking play should reset global index to 0
+- [ ] stop it when nothing is playing
 
 # Newsletter
 - [ ] put a back button on the newsletter page?
@@ -163,12 +168,11 @@
 - [√] shift click note not showing on other clients
 - [√] long usernames mess up the keyboard
 - [√] long usernames mess up the chat input
-- [ ] can't use scroll wheel in sequencer
 - [ ] sequencer doesn't always play when joining room with a playing sequencer
 - [√] can't click chat on short window
 - [ ] review chrome autoplay fix
 	- https://developers.google.com/web/updates/2017/09/autoplay-policy-changes#webaudio
-- [ ] instrument keeps playing afer owner leaves
+- [√] instrument keeps playing afer owner leaves
 
 # Warnings
 - [ ] [Violation] 'readystatechange' handler took 727ms - polling-xhr.js:242
