@@ -1,5 +1,7 @@
 import * as React from 'react'
 import {Component} from 'react'
+import {FaEraser, FaStar} from 'react-icons/fa'
+import {IoMdStar as Star} from 'react-icons/io'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 import {IClientAppState} from '../../common/redux/common-redux-types'
@@ -59,28 +61,35 @@ export class InfiniteSequencer extends Component<IInfiniteSequencerAllProps> {
 								setInfiniteSequencerField(id, InfiniteSequencerFields.isPlaying, true))}
 						>
 							▶
-							</div>
+						</div>
 						<div
 							className="stop"
 							onClick={() => this.props.dispatch(
 								setInfiniteSequencerField(id, InfiniteSequencerFields.isPlaying, false))}
 						>
 							◼
-							</div>
+						</div>
 						<div
 							className="record"
 							onClick={() => this.props.dispatch(
 								setInfiniteSequencerField(id, InfiniteSequencerFields.isRecording, !isRecording))}
 						>
 							⬤
-							</div>
+						</div>
 						<div
 							className="export"
 							onClick={() => this.props.dispatch(
 								exportSequencerMidi(id))}
 						>
 							⭳
-							</div>
+						</div>
+						{/* <div
+							className="erase"
+						// onClick={() => this.props.dispatch(
+						// 	exportSequencerMidi(id))}
+						>
+							<FaEraser />
+						</div> */}
 						<div
 							className="style"
 							onClick={() => this.props.dispatch(
@@ -93,8 +102,8 @@ export class InfiniteSequencer extends Component<IInfiniteSequencerAllProps> {
 								),
 							)}
 						>
-							★
-							</div>
+							<Star />
+						</div>
 					</div>
 					{style === InfiniteSequencerStyle.colorBars &&
 						<div className={`display ${this.props.events.length > 8 ? 'small' : ''}`}>

@@ -45,6 +45,7 @@
     "react-dom": "^16.4.0",
     "react-ga": "^2.5.6",
     "react-hot-loader": "^4.3.0",
+    "react-icons": "^3.3.0",
     "react-input-autosize": "^2.2.1",
     "react-redux": "^5.0.7",
     "react-svg": "^7.2.2",

@@ -1,9 +1,14 @@
 .connection {
-    position: absolute;
-    overflow: visible;
+
+    svg {
+        position: absolute;
+        overflow: visible;
+        filter: drop-shadow(0 0 2px #181818);
+    }
+
 
     &.connector {
-        z-index: 1;
+        z-index: 0;
 
         &:hover {
             filter: saturate(300%);
@@ -11,9 +16,7 @@
     }
 
     &.longLine {
-        width: 100%;
-        height: 100%;
-        z-index: 1;
+        z-index: -1;
         pointer-events: none;
     }
 }

@@ -4,12 +4,16 @@ import {hot} from 'react-hot-loader'
 import {Provider} from 'react-redux'
 import {Store} from 'redux'
 import {ConnectedApp} from './App'
+import {SvgGradients} from './SvgGradients'
 
 export function renderApp(store: Store) {
 	const HotProvider = hot(module)(Provider)
 	ReactDOM.render(
 		<HotProvider store={store}>
-			<ConnectedApp />
+			<React.Fragment>
+				<ConnectedApp />
+				<SvgGradients />
+			</React.Fragment>
 		</HotProvider>,
 		document.getElementById('react-app'),
 	)

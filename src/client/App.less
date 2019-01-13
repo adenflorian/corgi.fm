@@ -161,3 +161,25 @@ body {
         color: @brightRed;
     }
 }
+.erase {
+    &:hover {
+        color: @red;
+    }
+    &:active {
+        color: @brightRed;
+    }
+}
+.style {
+    &:active {
+        filter: saturate(2);
+    }
+    svg:hover {
+        path {
+            fill: url(#rainbow);
+        }
+    }
+}
+
+svg {
+    filter: drop-shadow(-1px 1px 1px #181818);
+}

@@ -58,9 +58,9 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps> {
 		)
 
 		return (
-			<div>
+			<div className="connection">
 				<svg
-					className={`connection colorize longLine`}
+					className={`colorize longLine`}
 					xmlns="http://www.w3.org/2000/svg"
 					style={{
 						width: line.width(),
@@ -93,7 +93,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps> {
 					/>
 				</svg>
 				<svg
-					className={`connection colorize connector source ${saturateSource ? 'saturate' : ''}`}
+					className={`colorize connector source ${saturateSource ? 'saturate' : ''}`}
 					xmlns="http://www.w3.org/2000/svg"
 					style={{
 						width: this.props.connectorWidth,
@@ -112,7 +112,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps> {
 					/>
 				</svg>
 				<svg
-					className={`connection colorize connector target ${saturateTarget ? 'saturate' : ''}`}
+					className={`colorize connector target ${saturateTarget ? 'saturate' : ''}`}
 					xmlns="http://www.w3.org/2000/svg"
 					style={{
 						width: this.props.connectorWidth,
