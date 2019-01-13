@@ -6,15 +6,27 @@
     }
 
     .controls {
-        width: 32px;
-        margin: 8px;
         display: flex;
         flex-direction: column;
+        flex-flow: wrap;
         justify-content: space-around;
-        letter-spacing: 0;
+        align-items: center;
         font-size: 24px;
         color: @defaultGray;
+        flex-wrap: wrap;
+        flex-grow: 1;
+        max-width: 48px * 2px;
+        min-width: 48px;
+        
+        & > * {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
     }
+    
     .events {
         display: flex;
         justify-content: space-between;

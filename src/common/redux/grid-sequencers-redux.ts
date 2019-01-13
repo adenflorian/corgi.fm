@@ -13,6 +13,7 @@ import {
 	IMultiStateThing, IMultiStateThings, makeMultiReducer, MultiThingType, updateThings,
 } from './multi-reducer'
 import {BROADCASTER_ACTION, NetworkActionType, SERVER_ACTION} from './redux-utils'
+import {CLEAR_SEQUENCER, createSequencerEvents} from './sequencer-redux'
 
 export const ADD_GRID_SEQUENCER = 'ADD_GRID_SEQUENCER'
 export const addGridSequencer = (gridSequencer: IGridSequencerState) =>
@@ -192,6 +193,7 @@ export interface IGridSequencerEvent {
 const gridSequencerActionTypes = [
 	SET_GRID_SEQUENCER_NOTE,
 	SET_GRID_SEQUENCER_FIELD,
+	CLEAR_SEQUENCER,
 ]
 
 const gridSequencerGlobalActionTypes = [
@@ -238,6 +240,10 @@ const gridSequencerReducer: Reducer<IGridSequencerState, AnyAction> =
 						[action.fieldName]: action.data,
 					}
 				}
+			case CLEAR_SEQUENCER: return {
+				...gridSequencer,
+				events: createSequencerEvents(gridSequencer.events.length),
+			}
 			case PLAY_ALL: return {...gridSequencer, isPlaying: true}
 			case STOP_ALL: return {...gridSequencer, isPlaying: false}
 			default:

@@ -1,10 +1,11 @@
 import * as React from 'react'
+import {FaEraser} from 'react-icons/fa'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 import {
 	exportSequencerMidi, GridSequencerFields, setGridSequencerField,
 } from '../../common/redux/grid-sequencers-redux'
-import {isProdClient} from '../is-prod-client'
+import {clearSequencer} from '../../common/redux/sequencer-redux'
 
 interface IGridSequencerControlsProps {
 	id: string
@@ -25,21 +26,18 @@ export const GridSequencerControls = (props: IGridSequencerControlsProps & {disp
 			>
 				◼
 			</div>
-			{/* Commented out until it can be implemented with new sequencer player code */}
-			{/* <div
-				className="restart colorTransition"
-				onClick={() => props.dispatch(restartGridSequencer(props.id))}
+			<div
+				className="export colorTransition"
+				onClick={() => props.dispatch(exportSequencerMidi(props.id))}
 			>
-				↻
-			</div> */}
-			{isProdClient() === false &&
-				<div
-					className="export colorTransition"
-					onClick={() => props.dispatch(exportSequencerMidi(props.id))}
-				>
-					⭳
-				</div>
-			}
+				⭳
+			</div>
+			<div
+				className="erase"
+				onClick={() => props.dispatch(clearSequencer(props.id))}
+			>
+				<FaEraser />
+			</div>
 		</div>
 	)
 }

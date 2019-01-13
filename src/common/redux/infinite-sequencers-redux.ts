@@ -11,6 +11,7 @@ import {
 	IMultiStateThing, IMultiStateThings, makeMultiReducer, MultiThingType, updateThings,
 } from './multi-reducer'
 import {BROADCASTER_ACTION, NetworkActionType, SERVER_ACTION} from './redux-utils'
+import {CLEAR_SEQUENCER, createSequencerEvents} from './sequencer-redux'
 import {VIRTUAL_KEY_PRESSED} from './virtual-keyboard-redux'
 
 export const ADD_INFINITE_SEQUENCER = 'ADD_INFINITE_SEQUENCER'
@@ -133,6 +134,7 @@ export interface IInfiniteSequencerEvent {
 const infiniteSequencerActionTypes = [
 	SET_INFINITE_SEQUENCER_NOTE,
 	SET_INFINITE_SEQUENCER_FIELD,
+	CLEAR_SEQUENCER,
 ]
 
 const infiniteSequencerGlobalActionTypes = [
@@ -193,6 +195,10 @@ function infiniteSequencerReducer(
 					[action.fieldName]: action.data,
 				}
 			}
+		case CLEAR_SEQUENCER: return {
+			...infiniteSequencer,
+			events: createSequencerEvents(0),
+		}
 		case PLAY_ALL: return {...infiniteSequencer, isPlaying: true}
 		case STOP_ALL: return {...infiniteSequencer, isPlaying: false}
 		case VIRTUAL_KEY_PRESSED:
