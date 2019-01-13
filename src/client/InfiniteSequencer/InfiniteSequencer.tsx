@@ -9,12 +9,12 @@ import {Dispatch} from 'redux'
 import {IClientAppState} from '../../common/redux/common-redux-types'
 import {selectGlobalClockState} from '../../common/redux/global-clock-redux'
 import {
-	exportSequencerMidi, findLowestAndHighestNotes, IGridSequencerEvent,
+	exportSequencerMidi, findLowestAndHighestNotes,
 } from '../../common/redux/grid-sequencers-redux'
 import {
 	InfiniteSequencerFields, InfiniteSequencerStyle, selectAllInfiniteSequencers, setInfiniteSequencerField,
 } from '../../common/redux/infinite-sequencers-redux'
-import {clearSequencer, undoSequencer} from '../../common/redux/sequencer-redux'
+import {clearSequencer, ISequencerEvent, undoSequencer} from '../../common/redux/sequencer-redux'
 import {getOctaveFromMidiNote, midiNoteToNoteName, removeOctave} from '../music/music-functions'
 import {Panel} from '../Panel/Panel'
 import './InfiniteSequencer.less'
@@ -26,7 +26,7 @@ interface IInfiniteSequencerProps {
 interface IInfiniteSequencerReduxProps {
 	activeIndex: number
 	color: string
-	events: IGridSequencerEvent[]
+	events: ISequencerEvent[]
 	isPlaying: boolean
 	isRecording: boolean
 	name: string

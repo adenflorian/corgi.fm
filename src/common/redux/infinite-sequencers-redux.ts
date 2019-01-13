@@ -1,4 +1,4 @@
-import {List, Stack} from 'immutable'
+import {Stack} from 'immutable'
 import {AnyAction} from 'redux'
 import * as uuid from 'uuid'
 import {hashbow} from '../../client/utils'
@@ -9,10 +9,12 @@ import {PLAY_ALL, STOP_ALL} from './common-actions'
 import {IClientRoomState} from './common-redux-types'
 import {
 	addMultiThing, deleteThings, IMultiState,
-	IMultiStateThing, IMultiStateThings, makeMultiReducer, MultiThingType, updateThings,
+	IMultiStateThings, makeMultiReducer, MultiThingType, updateThings,
 } from './multi-reducer'
 import {BROADCASTER_ACTION, NetworkActionType, SERVER_ACTION} from './redux-utils'
-import {CLEAR_SEQUENCER, createSequencerEvents, UNDO_SEQUENCER} from './sequencer-redux'
+import {
+	CLEAR_SEQUENCER, createSequencerEvents, ISequencerEvent, ISequencerState, UNDO_SEQUENCER,
+} from './sequencer-redux'
 import {VIRTUAL_KEY_PRESSED} from './virtual-keyboard-redux'
 
 export const ADD_INFINITE_SEQUENCER = 'ADD_INFINITE_SEQUENCER'
@@ -81,27 +83,12 @@ export enum InfiniteSequencerFields {
 	style = 'style',
 }
 
-export interface IInfiniteSequencerEvent {
-	notes: IMidiNote[]
-}
-
 export interface IInfiniteSequencersState extends IMultiState {
 	things: IInfiniteSequencers
 }
 
 export interface IInfiniteSequencers extends IMultiStateThings {
 	[key: string]: InfiniteSequencerState
-}
-
-export interface ISequencerState extends IMultiStateThing {
-	events: IInfiniteSequencerEvent[]
-	index: number
-	isPlaying: boolean
-	id: string
-	color: string
-	name: string
-	isRecording: boolean
-	previousEvents: IInfiniteSequencerEvent[][]
 }
 
 export enum InfiniteSequencerStyle {
@@ -111,16 +98,16 @@ export enum InfiniteSequencerStyle {
 
 export class InfiniteSequencerState implements ISequencerState {
 	public readonly id: string = uuid.v4()
-	public readonly events: IInfiniteSequencerEvent[]
+	public readonly events: ISequencerEvent[]
 	public readonly index: number = -1
 	public readonly isPlaying: boolean = false
 	public readonly color: string
 	public readonly name: string
 	public readonly isRecording: boolean = false
 	public readonly style: InfiniteSequencerStyle
-	public readonly previousEvents: IInfiniteSequencerEvent[][] = []
+	public readonly previousEvents: ISequencerEvent[][] = []
 
-	constructor(name: string, style: InfiniteSequencerStyle, events?: IInfiniteSequencerEvent[]) {
+	constructor(name: string, style: InfiniteSequencerStyle, events?: ISequencerEvent[]) {
 		this.name = name
 		this.color = colorFunc(hashbow(this.id)).desaturate(0.2).hsl().string()
 		this.events = events ||
@@ -128,10 +115,6 @@ export class InfiniteSequencerState implements ISequencerState {
 			{notes: [48]}, {notes: [49]}, {notes: [50]}, {notes: [51]}]
 		this.style = style
 	}
-}
-
-export interface IInfiniteSequencerEvent {
-	notes: IMidiNote[]
 }
 
 const infiniteSequencerActionTypes = [
@@ -200,15 +183,14 @@ function infiniteSequencerReducer(
 				}
 			}
 		case UNDO_SEQUENCER: {
-			if (infiniteSequencer.previousEvents.length > 0) {
-				const prv = Stack(infiniteSequencer.previousEvents)
-				return {
-					...infiniteSequencer,
-					events: prv.first(),
-					previousEvents: prv.shift().toJS(),
-				}
-			} else {
-				return infiniteSequencer
+			if (infiniteSequencer.previousEvents.length === 0) return infiniteSequencer
+
+			const prv = Stack(infiniteSequencer.previousEvents)
+
+			return {
+				...infiniteSequencer,
+				events: prv.first(),
+				previousEvents: prv.shift().toJS(),
 			}
 		}
 		case CLEAR_SEQUENCER: {

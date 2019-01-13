@@ -141,7 +141,6 @@ export function makeMultiReducer<T extends IMultiStateThing, U extends IMultiSta
 				if (actionTypes.includes(action.type)) {
 					const thing = state.things[action.id]
 					if (thing === undefined) {
-						logger.warn('uh oh owo fucky wucky: ' + action.id)
 						return state
 					} else {
 						return {

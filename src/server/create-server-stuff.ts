@@ -8,6 +8,7 @@ import {
 	addInfiniteSequencer, InfiniteSequencerState, InfiniteSequencerStyle,
 } from '../common/redux/infinite-sequencers-redux'
 import {createRoomAction} from '../common/redux/room-stores-redux'
+import {createSequencerEvents} from '../common/redux/sequencer-redux'
 
 export function createServerStuff(room: string, serverStore: Store) {
 	const serverClient = ClientState.createServerClient()
@@ -112,8 +113,7 @@ export function createServerStuff(room: string, serverStore: Store) {
 }
 
 function getBassNotes() {
-	return new Array(16)
-		.fill({notes: []})
+	return createSequencerEvents(16)
 		.map((_, i) => ({notes: i % 2 === 1 ? [] : [24]}))
 }
 

@@ -1,3 +1,5 @@
+import {IMidiNote} from '../MidiNote'
+import {IMultiStateThing} from './multi-reducer'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
 
 export const CLEAR_SEQUENCER = 'CLEAR_SEQUENCER'
@@ -21,4 +23,19 @@ export const undoSequencer = (id: string) => ({
 export const createSequencerEvents = (indexCount: number) => {
 	return new Array(indexCount)
 		.fill({notes: []})
+}
+
+export interface ISequencerEvent {
+	notes: IMidiNote[]
+}
+
+export interface ISequencerState extends IMultiStateThing {
+	events: ISequencerEvent[]
+	index: number
+	isPlaying: boolean
+	id: string
+	color: string
+	name: string
+	isRecording: boolean
+	previousEvents: ISequencerEvent[][]
 }

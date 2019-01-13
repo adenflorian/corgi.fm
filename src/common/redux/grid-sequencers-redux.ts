@@ -1,4 +1,4 @@
-import {Map} from 'immutable'
+import {Map, Stack} from 'immutable'
 import {AnyAction, Reducer} from 'redux'
 import {createSelector} from 'reselect'
 import * as uuid from 'uuid'
@@ -12,10 +12,12 @@ import {IClientRoomState} from './common-redux-types'
 import {selectAllInfiniteSequencers} from './infinite-sequencers-redux'
 import {
 	addMultiThing, deleteThings, IMultiState,
-	IMultiStateThing, IMultiStateThings, makeMultiReducer, MultiThingType, updateThings,
+	IMultiStateThings, makeMultiReducer, MultiThingType, updateThings,
 } from './multi-reducer'
 import {BROADCASTER_ACTION, NetworkActionType, SERVER_ACTION} from './redux-utils'
-import {CLEAR_SEQUENCER, createSequencerEvents} from './sequencer-redux'
+import {
+	CLEAR_SEQUENCER, createSequencerEvents, ISequencerEvent, ISequencerState, UNDO_SEQUENCER,
+} from './sequencer-redux'
 
 export const ADD_GRID_SEQUENCER = 'ADD_GRID_SEQUENCER'
 export const addGridSequencer = (gridSequencer: IGridSequencerState) =>
@@ -85,10 +87,6 @@ export enum GridSequencerFields {
 	index = 'index',
 }
 
-export interface IGridSequencerEvent {
-	notes: IMidiNote[]
-}
-
 export interface IGridSequencersState extends IMultiState {
 	things: IGridSequencers
 }
@@ -97,37 +95,27 @@ export interface IGridSequencers extends IMultiStateThings {
 	[key: string]: IGridSequencerState
 }
 
-export interface ISequencerState extends IMultiStateThing {
-	events: IGridSequencerEvent[]
-	index: number
-	isPlaying: boolean
-	id: string
-	color: string
-	name: string
-}
-
 export interface IGridSequencerState extends ISequencerState {
 	scrollY: number
 	notesToShow: number
 }
 
 export class GridSequencerState implements IGridSequencerState {
-	private static readonly _defaultEvents =
-		[{notes: []}, {notes: []}, {notes: []}, {notes: []}, {notes: []}, {notes: []}, {notes: []}, {notes: []}]
-
 	public readonly id: string = uuid.v4()
-	public readonly events: IGridSequencerEvent[]
+	public readonly events: ISequencerEvent[]
 	public readonly index: number = -1
 	public readonly isPlaying: boolean = false
 	public readonly color: string
 	public readonly name: string
 	public readonly scrollY: number
 	public readonly notesToShow: number
+	public readonly isRecording: boolean = false
+	public readonly previousEvents: ISequencerEvent[][] = []
 
-	constructor(name: string, notesToShow: number, events?: IGridSequencerEvent[]) {
+	constructor(name: string, notesToShow: number, events?: ISequencerEvent[]) {
 		this.name = name
 		this.color = colorFunc(hashbow(this.id)).desaturate(0.2).hsl().string()
-		this.events = events || GridSequencerState._defaultEvents
+		this.events = events || createSequencerEvents(8)
 		this.notesToShow = notesToShow
 
 		this.scrollY = this._calculateScrollY()
@@ -145,14 +133,14 @@ export class GridSequencerState implements IGridSequencerState {
 	}
 }
 
-export function findLowestAndHighestNotes(events: IGridSequencerEvent[]) {
+export function findLowestAndHighestNotes(events: ISequencerEvent[]) {
 	return {
 		lowestNote: findLowestNote(events),
 		highestNote: findHighestNote(events),
 	}
 }
 
-export function findLowestNote(events: IGridSequencerEvent[]): number {
+export function findLowestNote(events: ISequencerEvent[]): number {
 	let lowest = Number.MAX_VALUE
 
 	events.forEach(event => {
@@ -170,7 +158,7 @@ export function findLowestNote(events: IGridSequencerEvent[]): number {
 	return lowest
 }
 
-export function findHighestNote(events: IGridSequencerEvent[]): number {
+export function findHighestNote(events: ISequencerEvent[]): number {
 	let highest = Number.MIN_VALUE
 
 	events.forEach(event => {
@@ -188,14 +176,11 @@ export function findHighestNote(events: IGridSequencerEvent[]): number {
 	return highest
 }
 
-export interface IGridSequencerEvent {
-	notes: IMidiNote[]
-}
-
 const gridSequencerActionTypes = [
 	SET_GRID_SEQUENCER_NOTE,
 	SET_GRID_SEQUENCER_FIELD,
 	CLEAR_SEQUENCER,
+	UNDO_SEQUENCER,
 ]
 
 const gridSequencerGlobalActionTypes = [
@@ -229,6 +214,7 @@ const gridSequencerReducer: Reducer<IGridSequencerState, AnyAction> =
 							return event
 						}
 					}),
+					previousEvents: [gridSequencer.events, ...gridSequencer.previousEvents],
 				}
 			case SET_GRID_SEQUENCER_FIELD:
 				if (action.fieldName === 'index') {
@@ -242,9 +228,25 @@ const gridSequencerReducer: Reducer<IGridSequencerState, AnyAction> =
 						[action.fieldName]: action.data,
 					}
 				}
-			case CLEAR_SEQUENCER: return {
-				...gridSequencer,
-				events: createSequencerEvents(gridSequencer.events.length),
+			case UNDO_SEQUENCER: {
+				if (gridSequencer.previousEvents.length === 0) return gridSequencer
+
+				const prv = Stack(gridSequencer.previousEvents)
+
+				return {
+					...gridSequencer,
+					events: prv.first(),
+					previousEvents: prv.shift().toJS(),
+				}
+			}
+			case CLEAR_SEQUENCER: {
+				if (isEmptyGridSequencer(gridSequencer)) return gridSequencer
+
+				return {
+					...gridSequencer,
+					events: createSequencerEvents(gridSequencer.events.length),
+					previousEvents: [gridSequencer.events, ...gridSequencer.previousEvents],
+				}
 			}
 			case PLAY_ALL: return {...gridSequencer, isPlaying: true}
 			case STOP_ALL: return {...gridSequencer, isPlaying: false}
@@ -252,6 +254,10 @@ const gridSequencerReducer: Reducer<IGridSequencerState, AnyAction> =
 				return gridSequencer
 		}
 	}
+
+function isEmptyGridSequencer(gridSequencer: IGridSequencerState) {
+	return gridSequencer.events.some(x => x.notes.length > 0) === false
+}
 
 export const gridSequencersReducer =
 	makeMultiReducer<IGridSequencerState, IGridSequencersState>(
