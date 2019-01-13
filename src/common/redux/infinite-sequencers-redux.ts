@@ -176,6 +176,12 @@ function infiniteSequencerReducer(
 					...infiniteSequencer,
 					[action.fieldName]: action.data % infiniteSequencer.events.length,
 				}
+			} else if (action.fieldName === InfiniteSequencerFields.isPlaying && action.data === false) {
+				return {
+					...infiniteSequencer,
+					[action.fieldName]: action.data,
+					isRecording: false,
+				}
 			} else {
 				return {
 					...infiniteSequencer,
@@ -203,7 +209,7 @@ function infiniteSequencerReducer(
 			}
 		}
 		case PLAY_ALL: return {...infiniteSequencer, isPlaying: true}
-		case STOP_ALL: return {...infiniteSequencer, isPlaying: false}
+		case STOP_ALL: return {...infiniteSequencer, isPlaying: false, isRecording: false}
 		case VIRTUAL_KEY_PRESSED:
 			if (infiniteSequencer.isRecording) {
 				return {
