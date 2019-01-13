@@ -76,9 +76,6 @@
 - [ ] use relative positioning like the connections so it doesn't have to rerender on scroll
 
 # Sampler
-- [ ] presentation
-- [ ] redux
-- [ ] networking
 
 # Clean Code
 - [√] use `strictNullChecks` typescript config
@@ -86,7 +83,7 @@
 
 # Connections
 - [ ] make it obvious which direction data flows
-- [ ] brighten the connectors and line when data is going across it
+- [√] brighten the connectors and line when data is going across it
 - [ ] make them moveable
 
 # Keyboard
@@ -99,7 +96,7 @@
 # GridSequencer
 - [ ] make size adjustable
 	- drop down with size options?
-- [ ] global play button
+- [√] global play button
 - [ ] click and drag midi to ableton from shamu
 - [ ] input notes from keyboard
 
@@ -109,10 +106,10 @@
 
 # Infinite Sequencer
 - [ ] click and drag notes left and right to change order, up and down to change note
-- [ ] find better way to clear notes
+- [√] find better way to clear notes
 - [ ] fix recording and playing at same time
-- [ ] undo button
-- [ ] record button should be red when recording
+- [√] undo button
+- [√] record button should be red when recording
 
 # References
 - https://github.com/grimmdude/MidiPlayerJS/blob/master/src/player.js
@@ -205,7 +202,7 @@
 # Ballad
 - [ ] login system
 - [ ] permission system
-- [ ] new sequencers
+- [...] new sequencers
 - [ ] new instruments
 	- [...] sampler
 - [ ] more keyboard features

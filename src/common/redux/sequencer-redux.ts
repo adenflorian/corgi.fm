@@ -39,3 +39,7 @@ export interface ISequencerState extends IMultiStateThing {
 	isRecording: boolean
 	previousEvents: ISequencerEvent[][]
 }
+
+export function isEmptyEvents(events: ISequencerEvent[]) {
+	return events.some(x => x.notes.length > 0) === false
+}

@@ -16,7 +16,7 @@ import {
 } from './multi-reducer'
 import {BROADCASTER_ACTION, NetworkActionType, SERVER_ACTION} from './redux-utils'
 import {
-	CLEAR_SEQUENCER, createSequencerEvents, ISequencerEvent, ISequencerState, UNDO_SEQUENCER,
+	CLEAR_SEQUENCER, createSequencerEvents, isEmptyEvents, ISequencerEvent, ISequencerState, UNDO_SEQUENCER,
 } from './sequencer-redux'
 
 export const ADD_GRID_SEQUENCER = 'ADD_GRID_SEQUENCER'
@@ -240,7 +240,7 @@ const gridSequencerReducer: Reducer<IGridSequencerState, AnyAction> =
 				}
 			}
 			case CLEAR_SEQUENCER: {
-				if (isEmptyGridSequencer(gridSequencer)) return gridSequencer
+				if (isEmptyEvents(gridSequencer.events)) return gridSequencer
 
 				return {
 					...gridSequencer,
@@ -254,10 +254,6 @@ const gridSequencerReducer: Reducer<IGridSequencerState, AnyAction> =
 				return gridSequencer
 		}
 	}
-
-function isEmptyGridSequencer(gridSequencer: IGridSequencerState) {
-	return gridSequencer.events.some(x => x.notes.length > 0) === false
-}
 
 export const gridSequencersReducer =
 	makeMultiReducer<IGridSequencerState, IGridSequencersState>(

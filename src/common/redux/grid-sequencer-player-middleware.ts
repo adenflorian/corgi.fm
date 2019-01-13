@@ -5,6 +5,7 @@ import {IClientAppState} from './common-redux-types'
 import {
 	EXPORT_SEQUENCER_MIDI, ExportSequencerMidiAction, selectAllGridSequencers, selectAllSequencers,
 } from './grid-sequencers-redux'
+import {isEmptyEvents} from './sequencer-redux'
 
 export const createGridSequencerPlayerMiddleware = () => {
 
@@ -13,7 +14,7 @@ export const createGridSequencerPlayerMiddleware = () => {
 
 		switch (action.type) {
 			case EXPORT_SEQUENCER_MIDI:
-				return exportSequencerMidi(action, next, store)
+				return exportSequencerMidi(action, store)
 		}
 	}
 
@@ -21,13 +22,16 @@ export const createGridSequencerPlayerMiddleware = () => {
 }
 
 function exportSequencerMidi(
-	action: ExportSequencerMidiAction, next: Dispatch, store: MiddlewareAPI<Dispatch, IClientAppState>,
+	action: ExportSequencerMidiAction, store: MiddlewareAPI<Dispatch, IClientAppState>,
 ) {
 	const roomState = store.getState().room
 
 	const sequencer = selectAllSequencers(roomState)[action.sequencerId]
 
 	const events = sequencer.events
+
+	if (events.length === 0) return
+	if (isEmptyEvents(events)) return
 
 	const midiGridSequencer = new MidiWriter.Track()
 
