@@ -10,7 +10,7 @@ function foo() {
 	return new Array(stopCount)
 		.fill(0)
 		.map((_, i) =>
-			<React.Fragment>
+			<React.Fragment key={i}>
 				<stop
 					offset={i / stopCount}
 					stopColor={`hsl(${startHue + (i / stopCount * x)}, ${saturation}%, ${lightness}%)`}

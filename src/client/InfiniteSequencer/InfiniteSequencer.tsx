@@ -1,7 +1,9 @@
 import * as React from 'react'
-import {Component} from 'react'
-import {FaEraser, FaStar} from 'react-icons/fa'
-import {IoMdStar as Star} from 'react-icons/io'
+import {
+	IoMdDownload as Download, IoMdNuclear as Clear, IoMdPlay as Play,
+	IoMdRecording as Record, IoMdSquare as Stop, IoMdStar as Star,
+	IoMdUndo as Undo,
+} from 'react-icons/io'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 import {IClientAppState} from '../../common/redux/common-redux-types'
@@ -12,7 +14,7 @@ import {
 import {
 	InfiniteSequencerFields, InfiniteSequencerStyle, selectAllInfiniteSequencers, setInfiniteSequencerField,
 } from '../../common/redux/infinite-sequencers-redux'
-import {clearSequencer} from '../../common/redux/sequencer-redux'
+import {clearSequencer, undoSequencer} from '../../common/redux/sequencer-redux'
 import {getOctaveFromMidiNote, midiNoteToNoteName, removeOctave} from '../music/music-functions'
 import {Panel} from '../Panel/Panel'
 import './InfiniteSequencer.less'
@@ -56,34 +58,40 @@ export const InfiniteSequencer: React.FunctionComponent<IInfiniteSequencerAllPro
 						onClick={() => props.dispatch(
 							setInfiniteSequencerField(id, InfiniteSequencerFields.isPlaying, true))}
 					>
-						▶
-						</div>
+						<Play />
+					</div>
 					<div
 						className="stop"
 						onClick={() => props.dispatch(
 							setInfiniteSequencerField(id, InfiniteSequencerFields.isPlaying, false))}
 					>
-						◼
-						</div>
+						<Stop />
+					</div>
 					<div
 						className="record"
 						onClick={() => props.dispatch(
 							setInfiniteSequencerField(id, InfiniteSequencerFields.isRecording, !isRecording))}
 					>
-						⬤
-						</div>
+						<Record />
+					</div>
 					<div
 						className="export"
 						onClick={() => props.dispatch(
 							exportSequencerMidi(id))}
 					>
-						⭳
-						</div>
+						<Download />
+					</div>
 					<div
 						className="erase"
 						onClick={() => props.dispatch(clearSequencer(props.id))}
 					>
-						<FaEraser />
+						<Clear />
+					</div>
+					<div
+						className="undo"
+						onClick={() => props.dispatch(undoSequencer(props.id))}
+					>
+						<Undo />
 					</div>
 					<div
 						className="style"

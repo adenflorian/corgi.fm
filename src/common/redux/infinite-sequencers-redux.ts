@@ -1,3 +1,4 @@
+import {List, Stack} from 'immutable'
 import {AnyAction} from 'redux'
 import * as uuid from 'uuid'
 import {hashbow} from '../../client/utils'
@@ -11,7 +12,7 @@ import {
 	IMultiStateThing, IMultiStateThings, makeMultiReducer, MultiThingType, updateThings,
 } from './multi-reducer'
 import {BROADCASTER_ACTION, NetworkActionType, SERVER_ACTION} from './redux-utils'
-import {CLEAR_SEQUENCER, createSequencerEvents} from './sequencer-redux'
+import {CLEAR_SEQUENCER, createSequencerEvents, UNDO_SEQUENCER} from './sequencer-redux'
 import {VIRTUAL_KEY_PRESSED} from './virtual-keyboard-redux'
 
 export const ADD_INFINITE_SEQUENCER = 'ADD_INFINITE_SEQUENCER'
@@ -100,6 +101,7 @@ export interface ISequencerState extends IMultiStateThing {
 	color: string
 	name: string
 	isRecording: boolean
+	previousEvents: IInfiniteSequencerEvent[][]
 }
 
 export enum InfiniteSequencerStyle {
@@ -116,6 +118,7 @@ export class InfiniteSequencerState implements ISequencerState {
 	public readonly name: string
 	public readonly isRecording: boolean = false
 	public readonly style: InfiniteSequencerStyle
+	public readonly previousEvents: IInfiniteSequencerEvent[][] = []
 
 	constructor(name: string, style: InfiniteSequencerStyle, events?: IInfiniteSequencerEvent[]) {
 		this.name = name
@@ -135,6 +138,7 @@ const infiniteSequencerActionTypes = [
 	SET_INFINITE_SEQUENCER_NOTE,
 	SET_INFINITE_SEQUENCER_FIELD,
 	CLEAR_SEQUENCER,
+	UNDO_SEQUENCER,
 ]
 
 const infiniteSequencerGlobalActionTypes = [
@@ -153,10 +157,7 @@ function infiniteSequencerReducer(
 	infiniteSequencer: InfiniteSequencerState, action: AnyAction,
 ): InfiniteSequencerState {
 	switch (action.type) {
-		case SET_INFINITE_SEQUENCER_NOTE:
-			if (action.note === undefined) {
-				throw new Error('action.notes === undefined')
-			}
+		case SET_INFINITE_SEQUENCER_NOTE: {
 			return {
 				...infiniteSequencer,
 				events: infiniteSequencer.events.map((event, eventIndex) => {
@@ -176,15 +177,18 @@ function infiniteSequencerReducer(
 						return event
 					}
 				}),
+				previousEvents: [infiniteSequencer.events, ...infiniteSequencer.previousEvents],
 			}
+		}
 		case SET_INFINITE_SEQUENCER_FIELD:
-			if (action.fieldName === 'isRecording' && action.data === true) {
+			if (action.fieldName === InfiniteSequencerFields.isRecording && action.data === true) {
 				return {
 					...infiniteSequencer,
 					[action.fieldName]: action.data,
 					events: [],
+					previousEvents: [infiniteSequencer.events, ...infiniteSequencer.previousEvents],
 				}
-			} else if (action.fieldName === 'index') {
+			} else if (action.fieldName === InfiniteSequencerFields.index) {
 				return {
 					...infiniteSequencer,
 					[action.fieldName]: action.data % infiniteSequencer.events.length,
@@ -195,9 +199,26 @@ function infiniteSequencerReducer(
 					[action.fieldName]: action.data,
 				}
 			}
-		case CLEAR_SEQUENCER: return {
-			...infiniteSequencer,
-			events: createSequencerEvents(0),
+		case UNDO_SEQUENCER: {
+			if (infiniteSequencer.previousEvents.length > 0) {
+				const prv = Stack(infiniteSequencer.previousEvents)
+				return {
+					...infiniteSequencer,
+					events: prv.first(),
+					previousEvents: prv.shift().toJS(),
+				}
+			} else {
+				return infiniteSequencer
+			}
+		}
+		case CLEAR_SEQUENCER: {
+			if (infiniteSequencer.events.length === 0) return infiniteSequencer
+
+			return {
+				...infiniteSequencer,
+				events: createSequencerEvents(0),
+				previousEvents: [infiniteSequencer.events, ...infiniteSequencer.previousEvents],
+			}
 		}
 		case PLAY_ALL: return {...infiniteSequencer, isPlaying: true}
 		case STOP_ALL: return {...infiniteSequencer, isPlaying: false}
@@ -206,6 +227,7 @@ function infiniteSequencerReducer(
 				return {
 					...infiniteSequencer,
 					events: infiniteSequencer.events.concat({notes: [action.midiNote]}),
+					previousEvents: [infiniteSequencer.events, ...infiniteSequencer.previousEvents],
 				}
 			} else {
 				return infiniteSequencer
