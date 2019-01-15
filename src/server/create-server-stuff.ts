@@ -19,7 +19,7 @@ export function createServerStuff(room: string, serverStore: Store) {
 		source: {
 			type: ConnectionSourceType.gridSequencer,
 			events: getBassNotes(),
-			name: 'bass',
+			name: '',
 			notesToShow: 12,
 		},
 		target: {
@@ -31,7 +31,7 @@ export function createServerStuff(room: string, serverStore: Store) {
 		source: {
 			type: ConnectionSourceType.gridSequencer,
 			events: getMelodyNotes(),
-			name: 'melody',
+			name: '',
 			notesToShow: 24,
 		},
 		target: {
