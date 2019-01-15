@@ -13,7 +13,7 @@ import {
 } from './multi-reducer'
 import {BROADCASTER_ACTION, NetworkActionType, SERVER_ACTION} from './redux-utils'
 import {
-	CLEAR_SEQUENCER, createSequencerEvents, ISequencerEvent, ISequencerState, UNDO_SEQUENCER,
+	CLEAR_SEQUENCER, createSequencerEvents, ISequencerEvent, ISequencerState, SKIP_NOTE, UNDO_SEQUENCER,
 } from './sequencer-redux'
 import {VIRTUAL_KEY_PRESSED} from './virtual-keyboard-redux'
 
@@ -128,6 +128,7 @@ const infiniteSequencerGlobalActionTypes = [
 	PLAY_ALL,
 	STOP_ALL,
 	VIRTUAL_KEY_PRESSED,
+	SKIP_NOTE,
 ]
 
 export const infiniteSequencersReducer =
@@ -215,6 +216,16 @@ function infiniteSequencerReducer(
 				return {
 					...infiniteSequencer,
 					events: infiniteSequencer.events.concat({notes: [action.midiNote]}),
+					previousEvents: [infiniteSequencer.events, ...infiniteSequencer.previousEvents],
+				}
+			} else {
+				return infiniteSequencer
+			}
+		case SKIP_NOTE:
+			if (infiniteSequencer.isRecording) {
+				return {
+					...infiniteSequencer,
+					events: infiniteSequencer.events.concat({notes: []}),
 					previousEvents: [infiniteSequencer.events, ...infiniteSequencer.previousEvents],
 				}
 			} else {

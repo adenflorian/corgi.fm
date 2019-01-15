@@ -96,7 +96,10 @@
 - [ ] Allow for arc to go both directions
 	- like a pan knob, when centered should have no arc, and arc can go left or right from center
 
-# GridSequencer
+# Sequencers
+- [ ] limit undo history
+
+## GridSequencer
 - [ ] make size adjustable
 	- drop down with size options?
 - [√] global play button
@@ -104,11 +107,11 @@
 - [ ] input notes from keyboard
 - [ ] allow using scroll wheel
 
-## GridSequencer Scroll Bar
+### GridSequencer Scroll Bar
 - [ ] make slider stay with mouse 1:1
 - [√] mini map
 
-# Infinite Sequencer
+## Infinite Sequencer
 - [ ] click and drag notes left and right to change order, up and down to change note
 - [√] find better way to clear notes
 - [ ] fix recording and playing at same time

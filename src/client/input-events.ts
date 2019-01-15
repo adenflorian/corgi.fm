@@ -2,6 +2,7 @@ import {Map} from 'immutable'
 import {AnyAction, Store} from 'redux'
 import {selectIsLocalClientReady, selectLocalClient, setClientPointer} from '../common/redux/clients-redux'
 import {localMidiKeyPress, localMidiKeyUp, localMidiOctaveChange} from '../common/redux/local-middleware'
+import {skipNote} from '../common/redux/sequencer-redux'
 import {getMainBoardsRectY} from './utils'
 
 type IKeyBoardShortcuts = Map<string, KeyBoardShortcut>
@@ -71,6 +72,11 @@ const keyboardShortcuts: IKeyBoardShortcuts = KeyBoardShortcuts({
 	},
 	'+': {
 		actionOnKeyDown: (e: KeyboardEvent) => localMidiOctaveChange(e.shiftKey ? 2 : 1),
+		allowRepeat: true,
+		preventDefault: true,
+	},
+	' ': {
+		actionOnKeyDown: () => skipNote(),
 		allowRepeat: true,
 		preventDefault: true,
 	},

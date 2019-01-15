@@ -20,6 +20,14 @@ export const undoSequencer = (id: string) => ({
 	BROADCASTER_ACTION,
 })
 
+export const SKIP_NOTE = 'SKIP_NOTE'
+export type SkipNoteAction = ReturnType<typeof skipNote>
+export const skipNote = () => ({
+	type: SKIP_NOTE as typeof SKIP_NOTE,
+	SERVER_ACTION,
+	BROADCASTER_ACTION,
+})
+
 export const createSequencerEvents = (indexCount: number) => {
 	return new Array(indexCount)
 		.fill({notes: []})
