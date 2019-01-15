@@ -51,6 +51,18 @@ export function createServerStuff(room: string, serverStore: Store) {
 		},
 	})
 
+	createSourceAndTarget({
+		source: {
+			type: ConnectionSourceType.infiniteSequencer,
+			events: getInitialInfiniteSequencerEvents(),
+			name: 'arp2',
+			infinityStyle: InfiniteSequencerStyle.colorBars,
+		},
+		target: {
+			type: ConnectionTargetType.instrument,
+		},
+	})
+
 	interface CreateSourceAndTargetArgs {
 		source: CreateSourceArgs
 		target: {

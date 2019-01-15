@@ -110,20 +110,27 @@ export const InfiniteSequencer: React.FunctionComponent<IInfiniteSequencerAllPro
 				</div>
 				{style === InfiniteSequencerStyle.colorBars &&
 					<div className={`display ${props.events.length > 8 ? 'small' : ''}`}>
-						{props.events.map((event, index) =>
-							<div
-								key={index}
-								className={`event ${props.activeIndex === index ? 'active' : ''}`}
-								style={{
-									backgroundColor: `hsl(${removeOctave(event.notes[0]) * 23}, ${event.notes[0] + 10}%, 60%)`,
-								}}
-							>
-								{
-									props.events.length <= 8
-										? midiNoteToNoteName(event.notes[0]) + getOctaveFromMidiNote(event.notes[0])
-										: undefined
-								}
-							</div>,
+						{props.events.map((event, index) => {
+							const note = event.notes[0] || -1
+
+							return (
+								< div
+									key={index}
+									className={`event ${props.activeIndex === index ? 'active' : ''}`}
+									style={{
+										backgroundColor: note === -1 ? 'none' : `hsl(${removeOctave(note) * 23}, ${note + 10}%, 60%)`,
+									}}
+								>
+									{
+										note === -1
+											? undefined
+											: props.events.length <= 8
+												? midiNoteToNoteName(note) + getOctaveFromMidiNote(note)
+												: undefined
+									}
+								</div>
+							)
+						},
 						)}
 					</div>
 				}
@@ -144,7 +151,7 @@ export const InfiniteSequencer: React.FunctionComponent<IInfiniteSequencerAllPro
 					</div>
 				}
 			</Panel>
-		</div>
+		</div >
 	)
 }
 
