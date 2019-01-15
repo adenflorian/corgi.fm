@@ -18,19 +18,19 @@ export const GridSequencerControls = (props: IGridSequencerControlsProps & {disp
 	return (
 		<div className="controls unselectable">
 			<div
-				className="play colorTransition"
+				className="play"
 				onClick={() => props.dispatch(setGridSequencerField(props.id, GridSequencerFields.isPlaying, true))}
 			>
 				<Play />
 			</div>
 			<div
-				className="stop colorTransition"
+				className="stop"
 				onClick={() => props.dispatch(setGridSequencerField(props.id, GridSequencerFields.isPlaying, false))}
 			>
 				<Stop />
 			</div>
 			<div
-				className="export colorTransition"
+				className="export"
 				onClick={() => props.dispatch(exportSequencerMidi(props.id))}
 			>
 				<Download />

@@ -3,7 +3,6 @@ import {connect} from 'react-redux'
 import {selectClientCount} from '../common/redux/clients-redux'
 import {IClientAppState} from '../common/redux/common-redux-types'
 import {selectMemberCount} from '../common/redux/room-members-redux'
-import {NewsletterSignupButton} from './Newsletter/NewsletterSignupButton'
 import {Options} from './Options/Options'
 import {ConnectedRoomSelector} from './RoomSelector'
 import './TopDiv.less'
@@ -19,13 +18,14 @@ export const TopDiv = ({memberCount, clientCount, info}: ITopDivProps) =>
 		<div className="left">
 			<div style={{margin: 8}}>{info}</div>
 			<div id="fps" style={{margin: 8}}>FPS</div>
-		</div>
-		<div className="right">
-			<NewsletterSignupButton />
-			<ConnectedRoomSelector />
-			<Options />
 			<div style={{margin: 8}}>{memberCount} room member{memberCount > 1 ? 's' : ''}</div>
 			<div style={{margin: 8}}>{clientCount} total user{clientCount > 1 ? 's' : ''}</div>
+		</div>
+		<div className="right">
+			<ConnectedRoomSelector />
+			<Options />
+			<a href="/newsletter" target="_blank" style={{margin: 8}}>Newsletter Signup</a>
+			<a href="https://discord.gg/qADwrxd" target="_blank" style={{margin: 8}}>Discord</a>
 		</div>
 	</div>
 

@@ -4,8 +4,9 @@ import {Dispatch} from 'redux'
 import {IClientAppState} from '../../common/redux/common-redux-types'
 import {selectGlobalClockState} from '../../common/redux/global-clock-redux'
 import {
-	GridSequencerFields, IGridSequencerEvent, selectAllGridSequencers, setGridSequencerField, setGridSequencerNote,
+	GridSequencerFields, selectAllGridSequencers, setGridSequencerField, setGridSequencerNote,
 } from '../../common/redux/grid-sequencers-redux'
+import {ISequencerEvent} from '../../common/redux/sequencer-redux'
 import {MAX_MIDI_NOTE_NUMBER_127, MIN_MIDI_NOTE_NUMBER_0} from '../../common/server-constants'
 import {isWhiteKey} from '../Keyboard/Keyboard'
 import {VerticalScrollBar} from '../Knob/VerticalScrollBar'
@@ -18,7 +19,7 @@ interface IGridSequencerNotesProps {
 }
 
 interface IGridSequencerNotesReduxProps {
-	events: IGridSequencerEvent[]
+	events: ISequencerEvent[]
 	activeIndex: number
 	bottomNote: number
 	notesToShow: number

@@ -29,8 +29,7 @@ export const VerticalScrollBarView = (props: IVerticalScrollBarViewProps) => {
 					zIndex: 2,
 					width: '100%',
 					height: `${sliderGrabberHeightPercentage}%`,
-					backgroundColor: CssColor.defaultGray,
-					filter: 'opacity(0.2)',
+					backgroundColor: CssColor.panelGrayLight,
 				}}
 				onMouseDown={handleMouseDown}
 			/>
@@ -46,6 +45,8 @@ export const VerticalScrollBarView = (props: IVerticalScrollBarViewProps) => {
 							width: '100%',
 							height: '1%',
 							filter: 'opacity(0.4)',
+							zIndex: 2,
+							pointerEvents: 'none',
 						}}
 					/>
 				)
