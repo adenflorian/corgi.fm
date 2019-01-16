@@ -13,7 +13,14 @@ interface ISelectProps {
 
 export const Select = ({label, name, onChange, options, value}: ISelectProps) =>
 	<div className="shamuSelect">
-		<label htmlFor={name}>{label}</label>
+		<label
+			htmlFor={name}
+			style={{
+				position: 'relative',
+				top: -1,
+			}}>
+			{label}
+		</label>
 		<Panel className="selectContainer">
 			<select name={name} value={value} onChange={onChange}>
 				{options.map(choice =>
