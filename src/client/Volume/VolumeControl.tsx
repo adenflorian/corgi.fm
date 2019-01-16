@@ -37,7 +37,7 @@ export class VolumeControl extends Component<IVolumeControlAllProps> {
 
 		return (
 			<Panel className="volume" color={newColor}>
-				<div className="label">master volume</div>
+				<div className="label">Master Volume</div>
 				<Knob
 					value={this.props.masterVolume}
 					onChange={this.props.changeMasterVolume}

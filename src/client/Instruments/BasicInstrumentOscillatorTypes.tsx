@@ -31,6 +31,7 @@ export class BasicInstrumentOscillatorTypes extends React.PureComponent<IBasicIn
 						<ReactSVG
 							src={svgPath}
 							className={activeType === type ? 'active colorize' : undefined}
+							svgStyle={{width: '1.3em', height: '1.3em'}}
 						/>
 					</div>,
 				)}

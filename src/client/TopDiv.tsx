@@ -18,13 +18,13 @@ export const TopDiv = ({memberCount, clientCount, info}: ITopDivProps) =>
 		<div className="left">
 			<div style={{margin: 8}}>{info}</div>
 			<div id="fps" style={{margin: 8}}>FPS</div>
-			<div style={{margin: 8}}>{memberCount} room member{memberCount > 1 ? 's' : ''}</div>
-			<div style={{margin: 8}}>{clientCount} total user{clientCount > 1 ? 's' : ''}</div>
+			<div style={{margin: 8}}>{memberCount} Room Member{memberCount > 1 ? 's' : ''}</div>
+			<div style={{margin: 8}}>{clientCount} Total User{clientCount > 1 ? 's' : ''}</div>
 		</div>
 		<div className="right">
 			<ConnectedRoomSelector />
 			<Options />
-			<a href="/newsletter" target="_blank" style={{margin: 8}}>Newsletter Signup</a>
+			<a href="/newsletter" target="_blank" style={{margin: 8}}>Newsletter</a>
 			<a href="https://discord.gg/qADwrxd" target="_blank" style={{margin: 8}}>Discord</a>
 		</div>
 	</div>
