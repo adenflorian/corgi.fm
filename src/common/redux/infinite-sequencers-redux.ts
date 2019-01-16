@@ -169,8 +169,6 @@ function infiniteSequencerReducer(
 				return {
 					...infiniteSequencer,
 					[action.fieldName]: action.data,
-					events: [],
-					previousEvents: [infiniteSequencer.events, ...infiniteSequencer.previousEvents],
 				}
 			} else if (action.fieldName === InfiniteSequencerFields.index) {
 				return {
