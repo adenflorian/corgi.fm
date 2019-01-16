@@ -8,6 +8,7 @@ import {
 } from '../../common/redux/grid-sequencers-redux'
 import {ISequencerEvent} from '../../common/redux/sequencer-redux'
 import {MAX_MIDI_NOTE_NUMBER_127, MIN_MIDI_NOTE_NUMBER_0} from '../../common/server-constants'
+import {getColorStringForMidiNote} from '../../common/shamu-color'
 import {isWhiteKey} from '../Keyboard/Keyboard'
 import {VerticalScrollBar} from '../Knob/VerticalScrollBar'
 import {isLeftMouseButtonDown} from '../utils'
@@ -62,6 +63,10 @@ export const GridSequencerNotes = (props: IGridSequencerNotesAllProps) => {
 									onClick={e => handleNoteClicked(index, isEnabled, i2, e)}
 									onMouseEnter={e => handleMouseEnter(index, isEnabled, i2, e)}
 									onMouseDown={e => handleMouseDown(index, isEnabled, i2, e)}
+									style={{
+										backgroundColor: isEnabled ? getColorStringForMidiNote(i2) : undefined,
+										color: getColorStringForMidiNote(i2),
+									}}
 								/>
 							)
 						})}
