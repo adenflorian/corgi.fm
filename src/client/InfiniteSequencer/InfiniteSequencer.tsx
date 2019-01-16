@@ -115,20 +115,18 @@ export const InfiniteSequencer: React.FunctionComponent<IInfiniteSequencerAllPro
 					>
 						<Star />
 					</div>
-					{props.style === InfiniteSequencerStyle.colorGrid &&
-						<div
-							className="showRows"
-							onClick={() => props.dispatch(
-								setInfiniteSequencerField(
-									id,
-									InfiniteSequencerFields.showRows,
-									!props.showRows,
-								),
-							)}
-						>
-							<Rows />
-						</div>
-					}
+					<div
+						className={`showRows ${props.style === InfiniteSequencerStyle.colorGrid ? '' : 'disabled'}`}
+						onClick={() => props.style === InfiniteSequencerStyle.colorGrid && props.dispatch(
+							setInfiniteSequencerField(
+								id,
+								InfiniteSequencerFields.showRows,
+								!props.showRows,
+							),
+						)}
+					>
+						<Rows />
+					</div>
 				</div>
 				{style === InfiniteSequencerStyle.colorBars &&
 					<div className={`display ${props.events.length > 8 ? 'small' : ''}`}>
