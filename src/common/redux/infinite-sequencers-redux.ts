@@ -68,6 +68,7 @@ function foo(fieldName: InfiniteSequencerFields) {
 		InfiniteSequencerFields.bottomNote,
 		InfiniteSequencerFields.isRecording,
 		InfiniteSequencerFields.style,
+		InfiniteSequencerFields.showRows,
 	].includes(fieldName)) {
 		return {SERVER_ACTION, BROADCASTER_ACTION}
 	} else {
@@ -81,6 +82,7 @@ export enum InfiniteSequencerFields {
 	index = 'index',
 	isRecording = 'isRecording',
 	style = 'style',
+	showRows = 'showRows',
 }
 
 export interface IInfiniteSequencersState extends IMultiState {
@@ -106,6 +108,7 @@ export class InfiniteSequencerState implements ISequencerState {
 	public readonly isRecording: boolean = false
 	public readonly style: InfiniteSequencerStyle
 	public readonly previousEvents: ISequencerEvent[][] = []
+	public readonly showRows = false
 
 	constructor(name: string, style: InfiniteSequencerStyle, events?: ISequencerEvent[]) {
 		this.name = name

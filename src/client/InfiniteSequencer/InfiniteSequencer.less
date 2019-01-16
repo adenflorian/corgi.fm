@@ -33,23 +33,52 @@
 			overflow: hidden;
 			background-color: @panelGray;
 			color: @panelGray;
+			position: relative;
 
-			.event {
-				min-width: 1px;
-				min-height: 1px;
-				width: 100%;
+			.notes {
 				display: flex;
-				justify-content: center;
-				align-items: center;
+				flex-direction: row;
+				overflow: hidden;
+				color: @panelGray;
 				position: relative;
+				width: 100%;
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				z-index: 1;
 
-                &.active {
-                    filter: brightness(120%)
-                }
+				.event {
+					min-width: 1px;
+					min-height: 1px;
+					width: 100%;
+					display: flex;
+					justify-content: center;
+					align-items: center;
+					position: relative;
+					flex-grow: 1;
+
+					&.active {
+						filter: brightness(120%)
+					}
+				}
+
+				&.small .event {
+					overflow: hidden;
+				}
 			}
 
-			&.small .event {
-				overflow: hidden;
+			.rows {
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+
+                .white {
+                    background-color: @gray2;
+                }
 			}
 		}
 	}

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {
-	IoMdDownload as Download, IoMdNuclear as Clear, IoMdPlay as Play,
-	IoMdSquare as Stop, IoMdUndo as Undo,
+	IoMdDownload as Download, IoMdPlay as Play, IoMdSquare as Stop,
+	IoMdTrash as Clear, IoMdUndo as Undo,
 } from 'react-icons/io'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'

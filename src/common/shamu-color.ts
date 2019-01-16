@@ -1,7 +1,9 @@
 // tslint:disable-next-line:no-var-requires
 const ColorDefault = require('color')
 import * as ColorAll from 'color'
+import {removeOctave} from '../client/music/music-functions'
 import {hashbow} from '../client/utils'
+import {IMidiNote} from './MidiNote'
 
 export const colorFunc: typeof ColorAll = ColorDefault || ColorAll
 
@@ -15,6 +17,10 @@ export function getColorHslByHex(hex: string): string {
 
 export function saturateColor(color: string) {
 	return colorFunc(color).saturate(3).hsl().string()
+}
+
+export function getColorStringForMidiNote(note: IMidiNote) {
+	return `hsl(${removeOctave(note) * 23}, 60%, 60%)`
 }
 
 // Keep in sync with colors.less
