@@ -2,7 +2,7 @@ import {Store} from 'redux'
 import {addBasicInstrument, BasicInstrumentState} from '../common/redux/basic-instruments-redux'
 import {addBasicSampler, BasicSamplerState} from '../common/redux/basic-sampler-redux'
 import {addClient, ClientState} from '../common/redux/clients-redux'
-import {addConnection, Connection, ConnectionSourceType, ConnectionTargetType} from '../common/redux/connections-redux'
+import {addConnection, Connection, ConnectionNodeType} from '../common/redux/connections-redux'
 import {addGridSequencer, GridSequencerState} from '../common/redux/grid-sequencers-redux'
 import {
 	addInfiniteSequencer, InfiniteSequencerState, InfiniteSequencerStyle,
@@ -17,56 +17,56 @@ export function createServerStuff(room: string, serverStore: Store) {
 
 	createSourceAndTarget({
 		source: {
-			type: ConnectionSourceType.gridSequencer,
+			type: ConnectionNodeType.gridSequencer,
 			events: getBassNotes(),
-			name: '',
+			name: 'bass',
 			notesToShow: 12,
 		},
 		target: {
-			type: ConnectionTargetType.sampler,
+			type: ConnectionNodeType.sampler,
 		},
 	})
 
 	createSourceAndTarget({
 		source: {
-			type: ConnectionSourceType.gridSequencer,
+			type: ConnectionNodeType.gridSequencer,
 			events: getMelodyNotes(),
-			name: '',
+			name: 'melody',
 			notesToShow: 24,
 		},
 		target: {
-			type: ConnectionTargetType.instrument,
+			type: ConnectionNodeType.instrument,
 		},
 	})
 
 	createSourceAndTarget({
 		source: {
-			type: ConnectionSourceType.infiniteSequencer,
+			type: ConnectionNodeType.infiniteSequencer,
 			events: getInitialInfiniteSequencerEvents(),
 			name: 'arp',
 			infinityStyle: InfiniteSequencerStyle.colorGrid,
 		},
 		target: {
-			type: ConnectionTargetType.sampler,
+			type: ConnectionNodeType.sampler,
 		},
 	})
 
 	createSourceAndTarget({
 		source: {
-			type: ConnectionSourceType.infiniteSequencer,
+			type: ConnectionNodeType.infiniteSequencer,
 			events: getInitialInfiniteSequencerEvents(),
 			name: 'arp2',
 			infinityStyle: InfiniteSequencerStyle.colorBars,
 		},
 		target: {
-			type: ConnectionTargetType.instrument,
+			type: ConnectionNodeType.instrument,
 		},
 	})
 
 	interface CreateSourceAndTargetArgs {
 		source: CreateSourceArgs
 		target: {
-			type: ConnectionTargetType,
+			type: ConnectionNodeType,
 		}
 	}
 
@@ -83,10 +83,17 @@ export function createServerStuff(room: string, serverStore: Store) {
 			target.id,
 			options.target.type,
 		)), room))
+
+		// serverStore.dispatch(createRoomAction(addConnection(new Connection(
+		// 	target.id,
+		// 	options.target.type,
+		// 	target.id,
+		// 	options.target.type,
+		// )), room))
 	}
 
 	interface CreateSourceArgs {
-		type: ConnectionSourceType
+		type: ConnectionNodeType
 		name: string
 		infinityStyle?: InfiniteSequencerStyle
 		events?: any
@@ -95,11 +102,11 @@ export function createServerStuff(room: string, serverStore: Store) {
 
 	function createSource(args: CreateSourceArgs) {
 		switch (args.type) {
-			case ConnectionSourceType.gridSequencer:
+			case ConnectionNodeType.gridSequencer:
 				const x = new GridSequencerState(args.name, args.notesToShow || 24, args.events)
 				serverStore.dispatch(createRoomAction(addGridSequencer(x), room))
 				return x
-			case ConnectionSourceType.infiniteSequencer:
+			case ConnectionNodeType.infiniteSequencer:
 				const y = new InfiniteSequencerState(args.name, args.infinityStyle || InfiniteSequencerStyle.colorGrid, args.events)
 				serverStore.dispatch(createRoomAction(addInfiniteSequencer(y), room))
 				return y
@@ -108,13 +115,13 @@ export function createServerStuff(room: string, serverStore: Store) {
 		}
 	}
 
-	function createTarget(type: ConnectionTargetType): any {
+	function createTarget(type: ConnectionNodeType): any {
 		switch (type) {
-			case ConnectionTargetType.instrument:
+			case ConnectionNodeType.instrument:
 				const x = new BasicInstrumentState(serverClient.id)
 				serverStore.dispatch(createRoomAction(addBasicInstrument(x), room))
 				return x
-			case ConnectionTargetType.sampler:
+			case ConnectionNodeType.sampler:
 				const y = new BasicSamplerState(serverClient.id)
 				serverStore.dispatch(createRoomAction(addBasicSampler(y), room))
 				return y

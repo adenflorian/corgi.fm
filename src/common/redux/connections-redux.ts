@@ -3,10 +3,11 @@ import {combineReducers, Reducer} from 'redux'
 import {createSelector} from 'reselect'
 import * as uuid from 'uuid'
 import {logger} from '../logger'
+import {selectBasicInstrument} from './basic-instruments-redux'
+import {selectSampler} from './basic-sampler-redux'
 import {IClientRoomState} from './common-redux-types'
-import {selectGlobalClockState} from './global-clock-redux'
-import {selectAllGridSequencers} from './grid-sequencers-redux'
-import {selectAllInfiniteSequencers} from './infinite-sequencers-redux'
+import {selectGridSequencer, selectGridSequencerActiveNotes} from './grid-sequencers-redux'
+import {selectInfiniteSequencer, selectInfiniteSequencerActiveNotes} from './infinite-sequencers-redux'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
 import {IVirtualKeyboardState, makeGetKeyboardMidiOutput, selectVirtualKeyboardById} from './virtual-keyboard-redux'
 
@@ -50,6 +51,45 @@ export type IConnections = Map<string, IConnection>
 
 export const Connections = Map
 
+export enum ConnectionNodeType {
+	keyboard = 'keyboard',
+	gridSequencer = 'gridSequencer',
+	infiniteSequencer = 'infiniteSequencer',
+	instrument = 'instrument',
+	sampler = 'sampler',
+	audioOutput = 'audioOutput',
+}
+
+export interface ConnectionNodeInfo {
+	[key: string]: {
+		stateSelector: IConnectableStateSelector,
+	}
+}
+
+export const ConnectionNodeInfo: ConnectionNodeInfo = {
+	[ConnectionNodeType.keyboard]: {
+		stateSelector: selectVirtualKeyboardById,
+	},
+	[ConnectionNodeType.gridSequencer]: {
+		stateSelector: selectGridSequencer,
+	},
+	[ConnectionNodeType.infiniteSequencer]: {
+		stateSelector: selectInfiniteSequencer,
+	},
+	[ConnectionNodeType.instrument]: {
+		stateSelector: selectBasicInstrument,
+	},
+	[ConnectionNodeType.sampler]: {
+		stateSelector: selectSampler,
+	},
+	[ConnectionNodeType.audioOutput]: {
+		stateSelector: () => ({
+			id: 'audioOutput',
+			color: 'black',
+		}),
+	},
+}
+
 export enum ConnectionSourceType {
 	keyboard = 'keyboard',
 	gridSequencer = 'gridSequencer',
@@ -63,25 +103,31 @@ export enum ConnectionTargetType {
 
 export interface IConnection {
 	sourceId: string
-	sourceType: ConnectionSourceType
+	sourceType: ConnectionNodeType
 	targetId: string
-	targetType: ConnectionTargetType
+	targetType: ConnectionNodeType
 	id: string
 }
 
+export type IConnectableStateSelector = (roomState: IClientRoomState, id: string) => IConnectable
+
+export interface IConnectable {
+	id: string
+	color: string
+	isPlaying?: boolean
+}
+
+export const MASTER_AUDIO_OUTPUT_TARGET_ID = 'MASTER_AUDIO_OUTPUT_TARGET_ID'
+
 export class Connection implements IConnection {
 	public id = uuid.v4()
-	public sourceId: string
-	public sourceType: ConnectionSourceType
-	public targetId: string
-	public targetType: ConnectionTargetType
 
-	constructor(sourceId: string, sourceType: ConnectionSourceType, targetId: string, targetType: ConnectionTargetType) {
-		this.sourceId = sourceId
-		this.sourceType = sourceType
-		this.targetId = targetId
-		this.targetType = targetType
-	}
+	constructor(
+		public sourceId: string,
+		public sourceType: ConnectionNodeType,
+		public targetId: string,
+		public targetType: ConnectionNodeType,
+	) {}
 }
 
 export type IConnectionAction = AddConnectionAction | DeleteConnectionsAction
@@ -148,19 +194,7 @@ export const selectConnectionSourceColor = (roomState: IClientRoomState, id: str
 
 	if (!connection) return 'gray'
 
-	switch (connection.sourceType) {
-		case ConnectionSourceType.keyboard:
-			const virtualKeyboard = selectVirtualKeyboardById(roomState, connection.sourceId)
-			return virtualKeyboard && virtualKeyboard.color
-		case ConnectionSourceType.gridSequencer:
-			const gridSequencer = selectAllGridSequencers(roomState)[connection.sourceId]
-			return gridSequencer ? gridSequencer.color : 'gray'
-		case ConnectionSourceType.infiniteSequencer:
-			const infiniteSequencer = selectAllInfiniteSequencers(roomState)[connection.sourceId]
-			return infiniteSequencer ? infiniteSequencer.color : 'gray'
-		default:
-			throw new Error('couldnt find source color (unsupported connection source type)')
-	}
+	return ConnectionNodeInfo[connection.sourceType].stateSelector(roomState, connection.sourceId).color
 }
 
 export const selectConnectionSourceIsPlaying = (roomState: IClientRoomState, id: string) => {
@@ -168,19 +202,7 @@ export const selectConnectionSourceIsPlaying = (roomState: IClientRoomState, id:
 
 	if (!connection) return false
 
-	switch (connection.sourceType) {
-		case ConnectionSourceType.keyboard:
-			const virtualKeyboard = selectVirtualKeyboardById(roomState, connection.sourceId)
-			return virtualKeyboard && virtualKeyboard.pressedKeys.length > 0
-		case ConnectionSourceType.gridSequencer:
-			const gridSequencer = selectAllGridSequencers(roomState)[connection.sourceId]
-			return gridSequencer ? gridSequencer.isPlaying : false
-		case ConnectionSourceType.infiniteSequencer:
-			const infiniteSequencer = selectAllInfiniteSequencers(roomState)[connection.sourceId]
-			return infiniteSequencer ? infiniteSequencer.isPlaying : false
-		default:
-			throw new Error('couldnt find source isPlaying (unsupported connection source type)')
-	}
+	return ConnectionNodeInfo[connection.sourceType].stateSelector(roomState, connection.sourceId).isPlaying || false
 }
 
 export const selectConnectionSourceShouldHighlight = (roomState: IClientRoomState, id: string) => {
@@ -196,44 +218,19 @@ export const selectConnectionSourceNotesByTargetId = (state: IClientRoomState, t
 
 export const selectConnectionSourceNotes = (state: IClientRoomState, id: string): number[] => {
 	const connection = selectConnection(state, id)
+
 	if (connection === undefined) {
 		logger.warn(`could not find connection with id: ${id}`)
 		return emptyArray
 	}
+
 	switch (connection.sourceType) {
-		case ConnectionSourceType.keyboard:
+		case ConnectionNodeType.keyboard:
 			return getKeyboardMidiOutput(state, connection.sourceId)
-		case ConnectionSourceType.gridSequencer: {
-			const gridSequencer = selectAllGridSequencers(state)[connection.sourceId]
-			if (!gridSequencer) return emptyArray
-			if (!gridSequencer.isPlaying) return emptyArray
-
-			const globalClockIndex = selectGlobalClockState(state).index
-
-			// const index = gridSequencer.index
-			const index = globalClockIndex
-
-			if (index >= 0 && gridSequencer.events.length > 0) {
-				return gridSequencer.events[index % gridSequencer.events.length].notes
-			} else {
-				return emptyArray
-			}
-		}
-		case ConnectionSourceType.infiniteSequencer: {
-			const infiniteSequencer = selectAllInfiniteSequencers(state)[connection.sourceId]
-			if (!infiniteSequencer) return emptyArray
-			if (!infiniteSequencer.isPlaying) return emptyArray
-
-			const globalClockIndex = selectGlobalClockState(state).index
-
-			const index = globalClockIndex
-
-			if (index >= 0 && infiniteSequencer.events.length > 0) {
-				return infiniteSequencer.events[index % infiniteSequencer.events.length].notes
-			} else {
-				return emptyArray
-			}
-		}
+		case ConnectionNodeType.gridSequencer:
+			return selectGridSequencerActiveNotes(state, connection.sourceId)
+		case ConnectionNodeType.infiniteSequencer:
+			return selectInfiniteSequencerActiveNotes(state, connection.sourceId)
 		default:
 			throw new Error('couldnt find source color (unsupported connection source type)')
 	}
@@ -241,9 +238,9 @@ export const selectConnectionSourceNotes = (state: IClientRoomState, id: string)
 
 export function sortConnection(connA: IConnection, connB: IConnection) {
 	if (connA.sourceType !== connB.sourceType) {
-		return connA.sourceType === 'gridSequencer'
+		return connA.sourceType === ConnectionNodeType.gridSequencer
 			? -1
-			: connA.sourceType === 'infiniteSequencer'
+			: connA.sourceType === ConnectionNodeType.infiniteSequencer
 				? -1
 				: 1
 	} else {

@@ -1,5 +1,6 @@
 import {Stack} from 'immutable'
 import {AnyAction} from 'redux'
+import {createSelector} from 'reselect'
 import * as uuid from 'uuid'
 import {hashbow} from '../../client/utils'
 import {IMidiNote} from '../MidiNote'
@@ -7,6 +8,8 @@ import {addIfNew} from '../server-common'
 import {colorFunc} from '../shamu-color'
 import {PLAY_ALL, STOP_ALL} from './common-actions'
 import {IClientRoomState} from './common-redux-types'
+import {IConnectable} from './connections-redux'
+import {selectGlobalClockState} from './global-clock-redux'
 import {
 	addMultiThing, deleteThings, IMultiState,
 	IMultiStateThings, makeMultiReducer, MultiThingType, updateThings,
@@ -98,7 +101,7 @@ export enum InfiniteSequencerStyle {
 	colorGrid = 'colorGrid',
 }
 
-export class InfiniteSequencerState implements ISequencerState {
+export class InfiniteSequencerState implements ISequencerState, IConnectable {
 	public readonly id: string = uuid.v4()
 	public readonly events: ISequencerEvent[]
 	public readonly index: number = -1
@@ -238,3 +241,25 @@ function infiniteSequencerReducer(
 }
 
 export const selectAllInfiniteSequencers = (state: IClientRoomState) => state.infiniteSequencers.things
+
+export const selectInfiniteSequencer = (state: IClientRoomState, id: string) => selectAllInfiniteSequencers(state)[id]
+
+const emptyArray: number[] = []
+
+export const selectInfiniteSequencerActiveNotes = createSelector(
+	[selectInfiniteSequencer, selectGlobalClockState],
+	(infiniteSequencer, globalClockState) => {
+		if (!infiniteSequencer) return emptyArray
+		if (!infiniteSequencer.isPlaying) return emptyArray
+
+		const globalClockIndex = globalClockState.index
+
+		const index = globalClockIndex
+
+		if (index >= 0 && infiniteSequencer.events.length > 0) {
+			return infiniteSequencer.events[index % infiniteSequencer.events.length].notes
+		} else {
+			return emptyArray
+		}
+	},
+)

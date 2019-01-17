@@ -5,6 +5,7 @@ import {ClientId} from '../common-types'
 import {pickRandomArrayElement} from '../common-utils'
 import {ShamuOscillatorType} from '../OscillatorTypes'
 import {IClientRoomState} from './common-redux-types'
+import {IConnectable} from './connections-redux'
 import {
 	addMultiThing, createSelectAllOfThingAsArray, deleteThings,
 	IMultiState, makeMultiReducer, MultiThingType, updateThings,
@@ -61,7 +62,7 @@ export interface IBasicInstruments {
 	[key: string]: IBasicInstrumentState
 }
 
-export interface IBasicInstrumentState {
+export interface IBasicInstrumentState extends IConnectable {
 	oscillatorType: ShamuOscillatorType
 	id: string
 	ownerId: ClientId
@@ -80,6 +81,7 @@ export class BasicInstrumentState implements IBasicInstrumentState {
 	public lowPassFilterCutoffFrequency: number = Math.random() * 10000 + 1000
 	public attack: number = 0.01
 	public release: number = 1
+	public color: string = 'red'
 
 	constructor(ownerId: ClientId) {
 		this.ownerId = ownerId
@@ -114,17 +116,17 @@ function basicInstrumentReducer(basicInstrument: IBasicInstrumentState, action: 
 	}
 }
 
-export const selectAllInstruments = (state: IClientRoomState) => state.basicInstruments.things
+export const selectAllBasicInstruments = (state: IClientRoomState) => state.basicInstruments.things
 
-export const selectAllInstrumentsAsArray =
-	createSelectAllOfThingAsArray<IBasicInstruments, IBasicInstrumentState>(selectAllInstruments)
+export const selectAllBasicInstrumentsAsArray =
+	createSelectAllOfThingAsArray<IBasicInstruments, IBasicInstrumentState>(selectAllBasicInstruments)
 
 export const selectAllBasicInstrumentIds = createSelector(
-	selectAllInstruments,
+	selectAllBasicInstruments,
 	basicInstruments => Object.keys(basicInstruments),
 )
 
-export const selectInstrumentsByOwner = (state: IClientRoomState, ownerId: ClientId) =>
-	selectAllInstrumentsAsArray(state).filter(x => x.ownerId === ownerId)
+export const selectBasicInstrumentsByOwner = (state: IClientRoomState, ownerId: ClientId) =>
+	selectAllBasicInstrumentsAsArray(state).filter(x => x.ownerId === ownerId)
 
-export const selectInstrument = (state: IClientRoomState, id: string) => selectAllInstruments(state)[id]
+export const selectBasicInstrument = (state: IClientRoomState, id: string) => selectAllBasicInstruments(state)[id]

@@ -4,7 +4,7 @@ import {Dispatch} from 'redux'
 import {IMidiNote} from '../../common/MidiNote'
 import {ShamuOscillatorType} from '../../common/OscillatorTypes'
 import {
-	BasicInstrumentParam, selectInstrument, setBasicInstrumentOscillatorType, setBasicInstrumentParam,
+	BasicInstrumentParam, selectBasicInstrument, setBasicInstrumentOscillatorType, setBasicInstrumentParam,
 } from '../../common/redux/basic-instruments-redux'
 import {IClientAppState} from '../../common/redux/common-redux-types'
 import {
@@ -113,7 +113,7 @@ const makeMapStateToProps = () => {
 	return (state: IClientAppState, props: IBasicInstrumentViewProps): IBasicInstrumentViewReduxProps => {
 		const connection = selectFirstConnectionByTargetId(state.room, props.id)
 		const rawMidiNotes = selectConnectionSourceNotesByTargetId(state.room, props.id)
-		const instrumentState = selectInstrument(state.room, props.id)
+		const instrumentState = selectBasicInstrument(state.room, props.id)
 
 		return {
 			rawMidiNotes: rawMidiNotes || [],

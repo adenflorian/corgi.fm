@@ -2,6 +2,7 @@ import {AnyAction} from 'redux'
 import * as uuid from 'uuid'
 import {ClientId} from '../common-types'
 import {IClientRoomState} from './common-redux-types'
+import {IConnectable} from './connections-redux'
 import {
 	addMultiThing, createSelectAllOfThingAsArray, deleteThings, IMultiState,
 	makeMultiReducer, MultiThingType, updateThings,
@@ -43,7 +44,7 @@ export interface IBasicSamplers {
 	[key: string]: IBasicSamplerState
 }
 
-export interface IBasicSamplerState {
+export interface IBasicSamplerState extends IConnectable {
 	id: string
 	ownerId: ClientId
 	pan: number
@@ -59,6 +60,7 @@ export class BasicSamplerState implements IBasicSamplerState {
 	public lowPassFilterCutoffFrequency: number = Math.random() * 10000 + 1000
 	public attack: number = 0.01
 	public release: number = 1
+	public color: string = 'orange'
 
 	constructor(ownerId: ClientId) {
 		this.ownerId = ownerId

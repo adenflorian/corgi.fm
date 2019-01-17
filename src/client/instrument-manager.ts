@@ -2,7 +2,7 @@ import {Store} from 'redux'
 import {IDisposable} from '../common/common-types'
 import {toArray} from '../common/common-utils'
 import {
-	BasicInstrumentState, selectAllBasicInstrumentIds, selectInstrument,
+	BasicInstrumentState, selectAllBasicInstrumentIds, selectBasicInstrument,
 } from '../common/redux/basic-instruments-redux'
 import {BasicSamplerState, selectAllSamplerIds, selectSampler} from '../common/redux/basic-sampler-redux'
 import {IClientAppState, IClientRoomState} from '../common/redux/common-redux-types'
@@ -77,7 +77,7 @@ export const setupInstrumentManager = (store: Store<IClientAppState>, audioConte
 		function handleBasicInstruments() {
 			updateInstrumentType(
 				selectAllBasicInstrumentIds,
-				selectInstrument,
+				selectBasicInstrument,
 				(options, instrumentState) => new BasicInstrument({...options, voiceCount: 9, ...instrumentState}),
 				stuffMap.basicInstruments,
 				(instrument: BasicInstrument, instrumentState: BasicInstrumentState) => {

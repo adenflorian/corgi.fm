@@ -9,6 +9,7 @@ import {MAX_MIDI_NOTE_NUMBER_127} from '../server-constants'
 import {colorFunc} from '../shamu-color'
 import {PLAY_ALL, STOP_ALL} from './common-actions'
 import {IClientRoomState} from './common-redux-types'
+import {selectGlobalClockState} from './global-clock-redux'
 import {selectAllInfiniteSequencers} from './infinite-sequencers-redux'
 import {
 	addMultiThing, deleteThings, IMultiState,
@@ -268,12 +269,34 @@ export const selectAllGridSequencerIds = createSelector(
 	gridSequencers => Object.keys(gridSequencers),
 )
 
+export const selectGridSequencer = (state: IClientRoomState, id: string) => selectAllGridSequencers(state)[id]
+
+const emptyArray: number[] = []
+
 export const selectAllSequencers = (state: IClientRoomState) => ({
 	...state.gridSequencers.things,
 	...state.infiniteSequencers.things,
 })
 
 export const selectIsAnythingPlaying = createSelector(
-	[selectAllGridSequencers, selectAllInfiniteSequencers],
+	[selectAllGridSequencers, selectAllGridSequencers],
 	(gridSeqs, infSeqs) => Map(gridSeqs).merge(infSeqs).some(x => x.isPlaying),
+)
+
+export const selectGridSequencerActiveNotes = createSelector(
+	[selectGridSequencer, selectGlobalClockState],
+	(gridSequencer, globalClockState) => {
+		if (!gridSequencer) return emptyArray
+		if (!gridSequencer.isPlaying) return emptyArray
+
+		const globalClockIndex = globalClockState.index
+
+		const index = globalClockIndex
+
+		if (index >= 0 && gridSequencer.events.length > 0) {
+			return gridSequencer.events[index % gridSequencer.events.length].notes
+		} else {
+			return emptyArray
+		}
+	},
 )

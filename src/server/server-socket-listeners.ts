@@ -1,11 +1,11 @@
 import * as animal from 'animal-id'
 import {AnyAction, Store} from 'redux'
 import {Server, Socket} from 'socket.io'
-import {maxRoomNameLength} from '../common/common-constants'
+import {actionsBlacklist, maxRoomNameLength} from '../common/common-constants'
 import {ClientId} from '../common/common-types'
 import {logger} from '../common/logger'
 import {
-	deleteBasicInstruments, selectAllInstruments, selectInstrumentsByOwner, updateBasicInstruments,
+	deleteBasicInstruments, selectAllBasicInstruments, selectBasicInstrumentsByOwner, updateBasicInstruments,
 } from '../common/redux/basic-instruments-redux'
 import {
 	deleteBasicSamplers, selectAllSamplers, selectSamplersByOwner, updateBasicSamplers,
@@ -101,7 +101,7 @@ export function setupServerWebSocketListeners(io: Server, serverStore: Store) {
 
 		function registerCallBacks() {
 			socket.on(WebSocketEvent.broadcast, (action: BroadcastAction) => {
-				if (action.type !== SET_CLIENT_POINTER) {
+				if (actionsBlacklist.includes(action.type) === false) {
 					logger.trace(`${WebSocketEvent.broadcast}: ${socket.id} | `, action)
 				}
 				if (action[BROADCASTER_ACTION]) {
@@ -228,7 +228,7 @@ function onLeaveRoom(io: Server, socket: Socket, roomToLeave: string, serverStor
 	if (!roomState) return logger.warn(`onLeaveRoom-couldn't find room state: roomToLeave: ${roomToLeave}`)
 	const clientId = selectClientBySocketId(serverStore.getState(), socket.id).id
 
-	const instrumentIdsToDelete = selectInstrumentsByOwner(roomState, clientId).map(x => x.id)
+	const instrumentIdsToDelete = selectBasicInstrumentsByOwner(roomState, clientId).map(x => x.id)
 	const samplerIdsToDelete = selectSamplersByOwner(roomState, clientId).map(x => x.id)
 	const keyboardIdsToDelete = selectVirtualKeyboardsByOwner(roomState, clientId).map(x => x.id)
 
@@ -277,7 +277,7 @@ function syncState(newSocket: Socket, roomState: IClientRoomState, serverState: 
 	const foo = [
 		[setRoomMembers, selectAllRoomMemberIds],
 		[setChat, selectAllMessages],
-		[updateBasicInstruments, selectAllInstruments],
+		[updateBasicInstruments, selectAllBasicInstruments],
 		[updateBasicSamplers, selectAllSamplers],
 		[updateVirtualKeyboards, selectAllVirtualKeyboards],
 		[updateGridSequencers, selectAllGridSequencers],
