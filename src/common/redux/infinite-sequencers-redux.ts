@@ -181,7 +181,7 @@ function infiniteSequencerReducer(
 					...infiniteSequencer,
 					[action.fieldName]: action.data % infiniteSequencer.events.length,
 				}
-			} else if (action.fieldName === InfiniteSequencerFields.isPlaying && action.data === false) {
+			} else if (action.fieldName === InfiniteSequencerFields.isPlaying) {
 				return {
 					...infiniteSequencer,
 					[action.fieldName]: action.data,
