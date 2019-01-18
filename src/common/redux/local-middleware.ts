@@ -6,7 +6,8 @@ import {addBasicSampler, BasicSamplerState} from './basic-sampler-redux'
 import {selectLocalClient} from './clients-redux'
 import {IClientAppState} from './common-redux-types'
 import {
-	addConnection, Connection, ConnectionNodeType, deleteAllConnections, MASTER_AUDIO_OUTPUT_TARGET_ID,
+	addConnection, Connection, ConnectionNodeType, deleteAllConnections,
+	MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID,
 } from './connections-redux'
 import {deleteAllThings, MultiThingType} from './multi-reducer'
 import {makeActionCreator} from './redux-utils'
@@ -83,6 +84,7 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 		const newSampler = new BasicSamplerState(localClient.id)
 		dispatch(addBasicSampler(newSampler))
 
+		// Source to target
 		dispatch(addConnection(new Connection(
 			newVirtualKeyboard.id,
 			ConnectionNodeType.keyboard,
@@ -90,16 +92,26 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 			ConnectionNodeType.sampler,
 		)))
 
+		// Target to audio output
 		dispatch(addConnection(new Connection(
 			newSampler.id,
 			ConnectionNodeType.sampler,
 			MASTER_AUDIO_OUTPUT_TARGET_ID,
 			ConnectionNodeType.audioOutput,
+		)))
+
+		// Master clock to source
+		dispatch(addConnection(new Connection(
+			MASTER_CLOCK_SOURCE_ID,
+			ConnectionNodeType.masterClock,
+			newVirtualKeyboard.id,
+			ConnectionNodeType.keyboard,
 		)))
 	} else {
 		const newInstrument = new BasicInstrumentState(localClient.id)
 		dispatch(addBasicInstrument(newInstrument))
 
+		// Source to target
 		dispatch(addConnection(new Connection(
 			newVirtualKeyboard.id,
 			ConnectionNodeType.keyboard,
@@ -107,11 +119,20 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 			ConnectionNodeType.instrument,
 		)))
 
+		// Target to audio output
 		dispatch(addConnection(new Connection(
 			newInstrument.id,
 			ConnectionNodeType.instrument,
 			MASTER_AUDIO_OUTPUT_TARGET_ID,
 			ConnectionNodeType.audioOutput,
+		)))
+
+		// Master clock to source
+		dispatch(addConnection(new Connection(
+			MASTER_CLOCK_SOURCE_ID,
+			ConnectionNodeType.masterClock,
+			newVirtualKeyboard.id,
+			ConnectionNodeType.keyboard,
 		)))
 	}
 }

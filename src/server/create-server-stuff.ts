@@ -3,7 +3,7 @@ import {addBasicInstrument, BasicInstrumentState} from '../common/redux/basic-in
 import {addBasicSampler, BasicSamplerState} from '../common/redux/basic-sampler-redux'
 import {addClient, ClientState} from '../common/redux/clients-redux'
 import {
-	addConnection, Connection, ConnectionNodeType, MASTER_AUDIO_OUTPUT_TARGET_ID,
+	addConnection, Connection, ConnectionNodeType, MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID,
 } from '../common/redux/connections-redux'
 import {addGridSequencer, GridSequencerState} from '../common/redux/grid-sequencers-redux'
 import {
@@ -79,6 +79,7 @@ export function createServerStuff(room: string, serverStore: Store) {
 			...options.source,
 		})
 
+		// Source to target
 		serverStore.dispatch(createRoomAction(addConnection(new Connection(
 			source.id,
 			options.source.type,
@@ -86,11 +87,20 @@ export function createServerStuff(room: string, serverStore: Store) {
 			options.target.type,
 		)), room))
 
+		// Target to audio output
 		serverStore.dispatch(createRoomAction(addConnection(new Connection(
 			target.id,
 			options.target.type,
 			MASTER_AUDIO_OUTPUT_TARGET_ID,
 			ConnectionNodeType.audioOutput,
+		)), room))
+
+		// Master clock to source
+		serverStore.dispatch(createRoomAction(addConnection(new Connection(
+			MASTER_CLOCK_SOURCE_ID,
+			ConnectionNodeType.masterClock,
+			source.id,
+			options.source.type,
 		)), room))
 	}
 

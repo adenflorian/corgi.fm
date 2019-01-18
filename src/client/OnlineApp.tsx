@@ -56,7 +56,8 @@ class OnlineApp extends React.Component<IOnlineAppProps> {
 							</div>
 							{this.props.connections
 								.map(connection => {
-									if (connection.targetType === ConnectionNodeType.audioOutput) return
+									if ([ConnectionNodeType.audioOutput, ConnectionNodeType.masterClock].includes(connection.targetType)) return
+									if ([ConnectionNodeType.audioOutput, ConnectionNodeType.masterClock].includes(connection.sourceType)) return
 
 									return (
 										<div className="boardRow" key={connection.id}>

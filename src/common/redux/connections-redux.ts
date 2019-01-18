@@ -3,6 +3,7 @@ import {combineReducers, Reducer} from 'redux'
 import {createSelector} from 'reselect'
 import * as uuid from 'uuid'
 import {logger} from '../logger'
+import {CssColor} from '../shamu-color'
 import {selectBasicInstrument} from './basic-instruments-redux'
 import {selectSampler} from './basic-sampler-redux'
 import {IClientRoomState} from './common-redux-types'
@@ -58,6 +59,7 @@ export enum ConnectionNodeType {
 	instrument = 'instrument',
 	sampler = 'sampler',
 	audioOutput = 'audioOutput',
+	masterClock = 'masterClock',
 }
 
 export interface ConnectionNodeInfo {
@@ -84,8 +86,14 @@ export const ConnectionNodeInfo: ConnectionNodeInfo = {
 	},
 	[ConnectionNodeType.audioOutput]: {
 		stateSelector: () => ({
-			id: 'audioOutput',
-			color: 'black',
+			id: MASTER_AUDIO_OUTPUT_TARGET_ID,
+			color: CssColor.panelGray,
+		}),
+	},
+	[ConnectionNodeType.masterClock]: {
+		stateSelector: () => ({
+			id: MASTER_CLOCK_SOURCE_ID,
+			color: CssColor.panelGray,
 		}),
 	},
 }
@@ -107,6 +115,8 @@ export interface IConnectable {
 }
 
 export const MASTER_AUDIO_OUTPUT_TARGET_ID = 'MASTER_AUDIO_OUTPUT_TARGET_ID'
+
+export const MASTER_CLOCK_SOURCE_ID = 'MASTER_CLOCK_SOURCE_ID'
 
 export class Connection implements IConnection {
 	public id = uuid.v4()

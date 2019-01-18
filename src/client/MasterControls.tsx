@@ -5,6 +5,7 @@ import {
 import {connect} from 'react-redux'
 import {playAll, stopAll} from '../common/redux/common-actions'
 import {IClientAppState} from '../common/redux/common-redux-types'
+import {MASTER_CLOCK_SOURCE_ID} from '../common/redux/connections-redux'
 import {selectIsAnythingPlaying} from '../common/redux/grid-sequencers-redux'
 import './MasterControls.less'
 import {Panel} from './Panel/Panel'
@@ -26,7 +27,7 @@ export const MasterControls: React.FunctionComponent<IMasterControlsReduxProps &
 				`${isAnythingPlaying ? 'isPlaying saturate' : 'isNotPlaying'}`
 			}
 		>
-			<Panel>
+			<Panel id={MASTER_CLOCK_SOURCE_ID}>
 				<div>
 					<div style={{margin: 8, marginBottom: 0}}>
 						Master Controls
