@@ -8,6 +8,7 @@ import {IGlobalClockState} from './global-clock-redux'
 import {IGridSequencersState} from './grid-sequencers-redux'
 import {IInfiniteSequencersState} from './infinite-sequencers-redux'
 import {IOptionsState} from './options-redux'
+import {IPositionsState} from './positions-redux'
 import {IRoomMembersState} from './room-members-redux'
 import {IRoomsState} from './rooms-redux'
 import {IVirtualKeyboardsState} from './virtual-keyboard-redux'
@@ -31,5 +32,6 @@ export interface IClientRoomState {
 	gridSequencers: IGridSequencersState
 	infiniteSequencers: IInfiniteSequencersState
 	members: IRoomMembersState
+	positions: IPositionsState
 	virtualKeyboards: IVirtualKeyboardsState
 }

@@ -10,6 +10,7 @@ import {
 	MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID,
 } from './connections-redux'
 import {deleteAllThings, MultiThingType} from './multi-reducer'
+import {addPosition, deleteAllPositions, Position} from './positions-redux'
 import {makeActionCreator} from './redux-utils'
 import {selectActiveRoom, SET_ACTIVE_ROOM} from './rooms-redux'
 import {
@@ -32,6 +33,7 @@ export function deleteAllTheThings(dispatch: Dispatch) {
 	dispatch(deleteAllThings(MultiThingType.virtualKeyboard))
 	dispatch(deleteAllThings(MultiThingType.basicInstrument))
 	dispatch(deleteAllThings(MultiThingType.basicSampler))
+	dispatch(deleteAllPositions())
 }
 
 export const localMiddleware: Middleware<{}, IClientAppState> = ({dispatch, getState}) => next => action => {
@@ -79,10 +81,12 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 
 	const newVirtualKeyboard = new VirtualKeyboardState(localClient.id, localClient.color)
 	dispatch(addVirtualKeyboard(newVirtualKeyboard))
+	dispatch(addPosition(new Position(newVirtualKeyboard.id)))
 
 	if (localClient.name.toLowerCase() === '$sampler') {
 		const newSampler = new BasicSamplerState(localClient.id)
 		dispatch(addBasicSampler(newSampler))
+		dispatch(addPosition(new Position(newSampler.id)))
 
 		// Source to target
 		dispatch(addConnection(new Connection(
@@ -110,6 +114,7 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 	} else {
 		const newInstrument = new BasicInstrumentState(localClient.id)
 		dispatch(addBasicInstrument(newInstrument))
+		dispatch(addPosition(new Position(newInstrument.id)))
 
 		// Source to target
 		dispatch(addConnection(new Connection(

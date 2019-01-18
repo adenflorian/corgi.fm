@@ -9,6 +9,7 @@ import {addGridSequencer, GridSequencerState} from '../common/redux/grid-sequenc
 import {
 	addInfiniteSequencer, InfiniteSequencerState, InfiniteSequencerStyle,
 } from '../common/redux/infinite-sequencers-redux'
+import {addPosition, Position} from '../common/redux/positions-redux'
 import {createRoomAction} from '../common/redux/room-stores-redux'
 import {createSequencerEvents} from '../common/redux/sequencer-redux'
 
@@ -74,10 +75,12 @@ export function createServerStuff(room: string, serverStore: Store) {
 
 	function createSourceAndTarget(options: CreateSourceAndTargetArgs) {
 		const target = createTarget(options.target.type)
+		serverStore.dispatch(createRoomAction(addPosition(new Position(target.id)), room))
 
 		const source = createSource({
 			...options.source,
 		})
+		serverStore.dispatch(createRoomAction(addPosition(new Position(source.id)), room))
 
 		// Source to target
 		serverStore.dispatch(createRoomAction(addConnection(new Connection(

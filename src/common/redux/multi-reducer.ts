@@ -103,6 +103,7 @@ interface IMultiThingAction {
 	thingType: MultiThingType
 }
 
+// TODO Use immutable js like connections redux
 export function makeMultiReducer<T extends IMultiStateThing, U extends IMultiState>(
 	innerReducer: (state: T, action: any) => any,
 	thingType: MultiThingType,

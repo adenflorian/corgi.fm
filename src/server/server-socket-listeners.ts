@@ -22,6 +22,9 @@ import {
 } from '../common/redux/connections-redux'
 import {selectAllGridSequencers, updateGridSequencers} from '../common/redux/grid-sequencers-redux'
 import {selectAllInfiniteSequencers, updateInfiniteSequencers} from '../common/redux/infinite-sequencers-redux'
+import {
+	deletePositions, selectAllPositions, selectPositionsWithTargetIds, updatePositions,
+} from '../common/redux/positions-redux'
 import {BROADCASTER_ACTION} from '../common/redux/redux-utils'
 import {
 	addRoomMember, deleteRoomMember, selectAllRoomMemberIds, selectRoomMemberState, setRoomMembers,
@@ -238,6 +241,11 @@ function onLeaveRoom(io: Server, socket: Socket, roomToLeave: string, serverStor
 	serverStore.dispatch(createRoomAction(deleteConnectionsAction, roomToLeave))
 	io.to(roomToLeave).emit(WebSocketEvent.broadcast, deleteConnectionsAction)
 
+	const positionIdsToDelete = selectPositionsWithTargetIds(roomState, sourceAndTargetIds).map(x => x.id)
+	const deletePositionsAction = deletePositions(positionIdsToDelete)
+	serverStore.dispatch(createRoomAction(deletePositionsAction, roomToLeave))
+	io.to(roomToLeave).emit(WebSocketEvent.broadcast, deletePositionsAction)
+
 	const deleteBasicInstrumentsAction = deleteBasicInstruments(instrumentIdsToDelete)
 	serverStore.dispatch(createRoomAction(deleteBasicInstrumentsAction, roomToLeave))
 	io.to(roomToLeave).emit(WebSocketEvent.broadcast, deleteBasicInstrumentsAction)
@@ -283,6 +291,7 @@ function syncState(newSocket: Socket, roomState: IClientRoomState, serverState: 
 		[updateGridSequencers, selectAllGridSequencers],
 		[updateInfiniteSequencers, selectAllInfiniteSequencers],
 		[updateConnections, selectAllConnections],
+		[updatePositions, selectAllPositions],
 	]
 
 	foo.forEach(([actionCreator, selector]: any[]) => {

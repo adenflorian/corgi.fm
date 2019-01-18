@@ -9,6 +9,7 @@ import {connectionsReducer} from './connections-redux'
 import {globalClockReducer} from './global-clock-redux'
 import {gridSequencersReducer} from './grid-sequencers-redux'
 import {infiniteSequencersReducer} from './infinite-sequencers-redux'
+import {positionsReducer} from './positions-redux'
 import {roomMembersReducer} from './room-members-redux'
 import {CREATE_ROOM, DELETE_ROOM, RoomsReduxAction} from './rooms-redux'
 import {virtualKeyboardsReducer} from './virtual-keyboard-redux'
@@ -28,10 +29,11 @@ export const roomReducers = combineReducers<IClientRoomState>({
 	basicSamplers: basicSamplersReducer,
 	chat: chatReducer,
 	connections: connectionsReducer,
-	members: roomMembersReducer,
 	globalClock: globalClockReducer,
 	gridSequencers: gridSequencersReducer,
 	infiniteSequencers: infiniteSequencersReducer,
+	members: roomMembersReducer,
+	positions: positionsReducer,
 	virtualKeyboards: virtualKeyboardsReducer,
 })
 

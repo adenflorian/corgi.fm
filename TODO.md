@@ -72,6 +72,7 @@
 - [ ] global midi export button
 - [ ] look into making an audio node that is a sequencer
 - [ ] keep track of what object is selected and route keyboard commands like ctrl + z to the selected object
+- [ ] resolve // TODOs
 
 # Shared Cursors
 - [ ] make shared cursor not block pointer events
