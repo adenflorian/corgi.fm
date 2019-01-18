@@ -2,7 +2,9 @@ import {Store} from 'redux'
 import {addBasicInstrument, BasicInstrumentState} from '../common/redux/basic-instruments-redux'
 import {addBasicSampler, BasicSamplerState} from '../common/redux/basic-sampler-redux'
 import {addClient, ClientState} from '../common/redux/clients-redux'
-import {addConnection, Connection, ConnectionNodeType} from '../common/redux/connections-redux'
+import {
+	addConnection, Connection, ConnectionNodeType, MASTER_AUDIO_OUTPUT_TARGET_ID,
+} from '../common/redux/connections-redux'
 import {addGridSequencer, GridSequencerState} from '../common/redux/grid-sequencers-redux'
 import {
 	addInfiniteSequencer, InfiniteSequencerState, InfiniteSequencerStyle,
@@ -84,12 +86,12 @@ export function createServerStuff(room: string, serverStore: Store) {
 			options.target.type,
 		)), room))
 
-		// serverStore.dispatch(createRoomAction(addConnection(new Connection(
-		// 	target.id,
-		// 	options.target.type,
-		// 	target.id,
-		// 	options.target.type,
-		// )), room))
+		serverStore.dispatch(createRoomAction(addConnection(new Connection(
+			target.id,
+			options.target.type,
+			MASTER_AUDIO_OUTPUT_TARGET_ID,
+			ConnectionNodeType.audioOutput,
+		)), room))
 	}
 
 	interface CreateSourceArgs {

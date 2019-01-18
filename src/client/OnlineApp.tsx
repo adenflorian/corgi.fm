@@ -5,7 +5,7 @@ import {selectAllBasicInstrumentIds} from '../common/redux/basic-instruments-red
 import {selectLocalClient} from '../common/redux/clients-redux'
 import {IClientAppState} from '../common/redux/common-redux-types'
 import {
-	ConnectionSourceType, ConnectionTargetType, IConnection, selectSortedConnections,
+	ConnectionNodeType, IConnection, selectSortedConnections,
 } from '../common/redux/connections-redux'
 import {selectAllGridSequencerIds} from '../common/redux/grid-sequencers-redux'
 import {selectAllVirtualKeyboardIds} from '../common/redux/virtual-keyboard-redux'
@@ -56,6 +56,8 @@ class OnlineApp extends React.Component<IOnlineAppProps> {
 							</div>
 							{this.props.connections
 								.map(connection => {
+									if (connection.targetType === ConnectionNodeType.audioOutput) return
+
 									return (
 										<div className="boardRow" key={connection.id}>
 											<div
@@ -63,14 +65,16 @@ class OnlineApp extends React.Component<IOnlineAppProps> {
 												className="board connected"
 											>
 												{
-													connection.sourceType === ConnectionSourceType.gridSequencer
+													connection.sourceType === ConnectionNodeType.gridSequencer
 														? <ConnectedGridSequencerContainer id={connection.sourceId} />
-														: connection.sourceType === ConnectionSourceType.infiniteSequencer
+														: connection.sourceType === ConnectionNodeType.infiniteSequencer
 															? <ConnectedInfiniteSequencer id={connection.sourceId} />
-															: <ConnectedKeyboard id={connection.sourceId} />
+															: connection.sourceType === ConnectionNodeType.keyboard
+																? <ConnectedKeyboard id={connection.sourceId} />
+																: new Error('ugh')
 												}
 											</div>
-											{connection.targetType === ConnectionTargetType.instrument &&
+											{connection.targetType === ConnectionNodeType.instrument &&
 												<div
 													key={connection.targetId}
 													className="board connected"
@@ -78,7 +82,7 @@ class OnlineApp extends React.Component<IOnlineAppProps> {
 													<ConnectedBasicInstrumentView id={connection.targetId} />
 												</div>
 											}
-											{connection.targetType === ConnectionTargetType.sampler &&
+											{connection.targetType === ConnectionNodeType.sampler &&
 												<div
 													key={connection.targetId}
 													className="board connected"

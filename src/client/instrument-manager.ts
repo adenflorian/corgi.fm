@@ -6,7 +6,7 @@ import {
 } from '../common/redux/basic-instruments-redux'
 import {BasicSamplerState, selectAllSamplerIds, selectSampler} from '../common/redux/basic-sampler-redux'
 import {IClientAppState, IClientRoomState} from '../common/redux/common-redux-types'
-import {selectConnectionSourceNotes, selectConnectionsWithSourceOrTargetIds} from '../common/redux/connections-redux'
+import {selectConnectionSourceNotes, selectConnectionsWithTargetIds} from '../common/redux/connections-redux'
 import {setGlobalClockIndex} from '../common/redux/global-clock-redux'
 import {
 	selectAllGridSequencers, setGridSequencerField,
@@ -106,7 +106,7 @@ export const setupInstrumentManager = (store: Store<IClientAppState>, audioConte
 			})
 
 			instrumentIds.forEach(instrumentId => {
-				const connection = selectConnectionsWithSourceOrTargetIds(state.room, [instrumentId])[0]
+				const connection = selectConnectionsWithTargetIds(state.room, [instrumentId])[0]
 
 				if (connection === undefined) return
 

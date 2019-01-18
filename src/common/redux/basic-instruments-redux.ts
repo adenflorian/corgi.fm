@@ -4,6 +4,7 @@ import * as uuid from 'uuid'
 import {ClientId} from '../common-types'
 import {pickRandomArrayElement} from '../common-utils'
 import {ShamuOscillatorType} from '../OscillatorTypes'
+import {CssColor} from '../shamu-color'
 import {IClientRoomState} from './common-redux-types'
 import {IConnectable} from './connections-redux'
 import {
@@ -81,7 +82,7 @@ export class BasicInstrumentState implements IBasicInstrumentState {
 	public lowPassFilterCutoffFrequency: number = Math.random() * 10000 + 1000
 	public attack: number = 0.01
 	public release: number = 1
-	public color: string = 'red'
+	public color: string = CssColor.panelGray
 
 	constructor(ownerId: ClientId) {
 		this.ownerId = ownerId

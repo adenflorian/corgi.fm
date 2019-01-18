@@ -6,7 +6,7 @@ import {addBasicSampler, BasicSamplerState} from './basic-sampler-redux'
 import {selectLocalClient} from './clients-redux'
 import {IClientAppState} from './common-redux-types'
 import {
-	addConnection, Connection, ConnectionNodeType, ConnectionSourceType, ConnectionTargetType, deleteAllConnections,
+	addConnection, Connection, ConnectionNodeType, deleteAllConnections, MASTER_AUDIO_OUTPUT_TARGET_ID,
 } from './connections-redux'
 import {deleteAllThings, MultiThingType} from './multi-reducer'
 import {makeActionCreator} from './redux-utils'
@@ -89,6 +89,13 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 			newSampler.id,
 			ConnectionNodeType.sampler,
 		)))
+
+		dispatch(addConnection(new Connection(
+			newSampler.id,
+			ConnectionNodeType.sampler,
+			MASTER_AUDIO_OUTPUT_TARGET_ID,
+			ConnectionNodeType.audioOutput,
+		)))
 	} else {
 		const newInstrument = new BasicInstrumentState(localClient.id)
 		dispatch(addBasicInstrument(newInstrument))
@@ -98,6 +105,13 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 			ConnectionNodeType.keyboard,
 			newInstrument.id,
 			ConnectionNodeType.instrument,
+		)))
+
+		dispatch(addConnection(new Connection(
+			newInstrument.id,
+			ConnectionNodeType.instrument,
+			MASTER_AUDIO_OUTPUT_TARGET_ID,
+			ConnectionNodeType.audioOutput,
 		)))
 	}
 }

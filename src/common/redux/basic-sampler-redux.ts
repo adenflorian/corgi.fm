@@ -1,6 +1,7 @@
 import {AnyAction} from 'redux'
 import * as uuid from 'uuid'
 import {ClientId} from '../common-types'
+import {CssColor} from '../shamu-color'
 import {IClientRoomState} from './common-redux-types'
 import {IConnectable} from './connections-redux'
 import {
@@ -60,7 +61,7 @@ export class BasicSamplerState implements IBasicSamplerState {
 	public lowPassFilterCutoffFrequency: number = Math.random() * 10000 + 1000
 	public attack: number = 0.01
 	public release: number = 1
-	public color: string = 'orange'
+	public color: string = CssColor.panelGray
 
 	constructor(ownerId: ClientId) {
 		this.ownerId = ownerId

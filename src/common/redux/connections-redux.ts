@@ -90,17 +90,6 @@ export const ConnectionNodeInfo: ConnectionNodeInfo = {
 	},
 }
 
-export enum ConnectionSourceType {
-	keyboard = 'keyboard',
-	gridSequencer = 'gridSequencer',
-	infiniteSequencer = 'infiniteSequencer',
-}
-
-export enum ConnectionTargetType {
-	instrument = 'instrument',
-	sampler = 'sampler',
-}
-
 export interface IConnection {
 	sourceId: string
 	sourceType: ConnectionNodeType
@@ -177,6 +166,16 @@ export const selectConnectionsWithSourceOrTargetIds = (state: IClientRoomState, 
 		.filter(x => sourceOrTargetIds.includes(x.sourceId) || sourceOrTargetIds.includes(x.targetId))
 }
 
+export const selectConnectionsWithTargetIds = (state: IClientRoomState, targetIds: string[]) => {
+	return selectAllConnectionsAsArray(state)
+		.filter(x => targetIds.includes(x.targetId))
+}
+
+export const selectConnectionsWithSourceIds = (state: IClientRoomState, targetIds: string[]) => {
+	return selectAllConnectionsAsArray(state)
+		.filter(x => targetIds.includes(x.targetId))
+}
+
 export const selectFirstConnectionByTargetId = (state: IClientRoomState, targetId: string) =>
 	selectAllConnectionsAsArray(state)
 		.find(x => x.targetId === targetId)
@@ -232,7 +231,7 @@ export const selectConnectionSourceNotes = (state: IClientRoomState, id: string)
 		case ConnectionNodeType.infiniteSequencer:
 			return selectInfiniteSequencerActiveNotes(state, connection.sourceId)
 		default:
-			throw new Error('couldnt find source color (unsupported connection source type)')
+			return emptyArray
 	}
 }
 
