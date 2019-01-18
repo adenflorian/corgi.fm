@@ -46,7 +46,6 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps> {
 	public render() {
 		const {color, saturateSource, saturateTarget, id} = this.props
 
-		// const darkerColor = colorFunc(color).darken(0.6).hsl().string()
 		const longLineStrokeWidth = 2
 		const connectorStrokeWidth = 8
 
@@ -68,6 +67,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps> {
 						minHeight: longLineStrokeWidth,
 						top: line.topMost(),
 						left: line.leftMost(),
+						zIndex: -3,
 					}}
 				>
 					<defs>
