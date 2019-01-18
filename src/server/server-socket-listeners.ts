@@ -13,7 +13,7 @@ import {
 import {selectAllMessages, setChat} from '../common/redux/chat-redux'
 import {
 	addClient, clientDisconnected, ClientState, maxUsernameLength,
-	selectAllClients, selectClientBySocketId, SET_CLIENT_POINTER, setClients,
+	selectAllClients, selectClientBySocketId, setClients,
 } from '../common/redux/clients-redux'
 import {IClientRoomState} from '../common/redux/common-redux-types'
 import {IServerState} from '../common/redux/configure-server-store'

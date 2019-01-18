@@ -1,6 +1,8 @@
 import {isEqual} from 'lodash'
+import {connect, DispatchProp, InferableComponentEnhancerWithProps, MapStateToPropsParam} from 'react-redux'
 import {Action} from 'redux'
 import {createSelectorCreator, defaultMemoize} from 'reselect'
+import {IClientAppState} from './common-redux-types'
 
 export function makeActionCreator(type: string, ...argNames: any[]) {
 	argNames.forEach(arg => {
@@ -49,3 +51,9 @@ export const createDeepEqualSelector = createSelectorCreator(
 	defaultMemoize,
 	isEqual,
 )
+
+type shamuConnect2 = <TStateProps = {}, no_dispatch = {}, TOwnProps = {}, State = IClientAppState>(
+	mapStateToProps: MapStateToPropsParam<TStateProps, TOwnProps, State>,
+) => InferableComponentEnhancerWithProps<TStateProps & DispatchProp, TOwnProps>
+
+export const shamuConnect = connect as shamuConnect2

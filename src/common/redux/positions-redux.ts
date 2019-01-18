@@ -57,8 +57,8 @@ export class Position implements IPosition {
 
 	constructor(
 		public readonly targetId: string,
-		public readonly x: number = 0,
-		public readonly y: number = 0,
+		public readonly x: number = Math.random() * 1600 - 800,
+		public readonly y: number = Math.random() * 1000 - 500,
 	) {}
 }
 
@@ -89,6 +89,11 @@ export const selectPosition = (state: IClientRoomState, id: string) =>
 export const selectAllPositionsAsArray = createSelector(
 	selectAllPositions,
 	positions => positions.toIndexedSeq().toArray(),
+)
+
+export const selectAllPositionIds = createSelector(
+	selectAllPositionsAsArray,
+	positions => positions.map(x => x.id),
 )
 
 export const selectPositionsWithTargetIds = (state: IClientRoomState, targetIds: string[]) => {

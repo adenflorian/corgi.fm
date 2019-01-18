@@ -19,6 +19,7 @@ import {ConnectedBasicInstrumentView} from './Instruments/BasicInstrumentView'
 import {ConnectedKeyboard} from './Keyboard/Keyboard'
 import {ConnectedMasterControls} from './MasterControls'
 import {ConnectedMousePointers} from './MousePointers/MousePointers'
+import {ConnectedSimpleGraph} from './SimpleGraph/SimpleGraph'
 import {ConnectedTopDiv} from './TopDiv'
 import {ConnectedVolumeControl} from './Volume/VolumeControl'
 
@@ -46,54 +47,59 @@ class OnlineApp extends React.Component<IOnlineAppProps> {
 
 						<div id={mainBoardsId} className="boards">
 							<ConnectionsContainer />
-							<div className="boardRow">
-								<div className="board connected">
-									<ConnectedMasterControls />
-								</div>
-								<div className="board connected">
-									<ConnectedVolumeControl color={getColorHslByHex(CssColor.blue)} />
-								</div>
-							</div>
-							{this.props.connections
-								.map(connection => {
-									if ([ConnectionNodeType.audioOutput, ConnectionNodeType.masterClock].includes(connection.targetType)) return
-									if ([ConnectionNodeType.audioOutput, ConnectionNodeType.masterClock].includes(connection.sourceType)) return
-
-									return (
-										<div className="boardRow" key={connection.id}>
-											<div
-												key={connection.sourceId}
-												className="board connected"
-											>
-												{
-													connection.sourceType === ConnectionNodeType.gridSequencer
-														? <ConnectedGridSequencerContainer id={connection.sourceId} />
-														: connection.sourceType === ConnectionNodeType.infiniteSequencer
-															? <ConnectedInfiniteSequencer id={connection.sourceId} />
-															: connection.sourceType === ConnectionNodeType.keyboard
-																? <ConnectedKeyboard id={connection.sourceId} />
-																: new Error('ugh')
-												}
-											</div>
-											{connection.targetType === ConnectionNodeType.instrument &&
-												<div
-													key={connection.targetId}
-													className="board connected"
-												>
-													<ConnectedBasicInstrumentView id={connection.targetId} />
-												</div>
-											}
-											{connection.targetType === ConnectionNodeType.sampler &&
-												<div
-													key={connection.targetId}
-													className="board connected"
-												>
-													<ConnectedBasicSampler id={connection.targetId} />
-												</div>
-											}
+							{window.location.pathname === '/graph'
+								? <ConnectedSimpleGraph />
+								: <Fragment>
+									<div className="boardRow">
+										<div className="board connected">
+											<ConnectedMasterControls />
 										</div>
-									)
-								})
+										<div className="board connected">
+											<ConnectedVolumeControl color={getColorHslByHex(CssColor.blue)} />
+										</div>
+									</div>
+									{this.props.connections
+										.map(connection => {
+											if ([ConnectionNodeType.audioOutput, ConnectionNodeType.masterClock].includes(connection.targetType)) return
+											if ([ConnectionNodeType.audioOutput, ConnectionNodeType.masterClock].includes(connection.sourceType)) return
+
+											return (
+												<div className="boardRow" key={connection.id}>
+													<div
+														key={connection.sourceId}
+														className="board connected"
+													>
+														{
+															connection.sourceType === ConnectionNodeType.gridSequencer
+																? <ConnectedGridSequencerContainer id={connection.sourceId} />
+																: connection.sourceType === ConnectionNodeType.infiniteSequencer
+																	? <ConnectedInfiniteSequencer id={connection.sourceId} />
+																	: connection.sourceType === ConnectionNodeType.keyboard
+																		? <ConnectedKeyboard id={connection.sourceId} />
+																		: new Error('ugh')
+														}
+													</div>
+													{connection.targetType === ConnectionNodeType.instrument &&
+														<div
+															key={connection.targetId}
+															className="board connected"
+														>
+															<ConnectedBasicInstrumentView id={connection.targetId} />
+														</div>
+													}
+													{connection.targetType === ConnectionNodeType.sampler &&
+														<div
+															key={connection.targetId}
+															className="board connected"
+														>
+															<ConnectedBasicSampler id={connection.targetId} />
+														</div>
+													}
+												</div>
+											)
+										})
+									}
+								</Fragment>
 							}
 						</div>
 					</Fragment>
