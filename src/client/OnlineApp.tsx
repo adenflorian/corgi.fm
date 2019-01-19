@@ -37,10 +37,10 @@ class OnlineApp extends React.Component<IOnlineAppProps> {
 						<ConnectedTopDiv />
 
 						<div id={mainBoardsId} className="boards">
-							<ConnectionsContainer />
 							{window.location.pathname === '/graph'
 								? <ConnectedSimpleGraph />
 								: <Fragment>
+									<ConnectionsContainer />
 									<div className="boardRow">
 										<div className="board connected">
 											<ConnectedMasterControls />
