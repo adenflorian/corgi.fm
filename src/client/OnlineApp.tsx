@@ -8,6 +8,7 @@ import {
 } from '../common/redux/connections-redux'
 import {CssColor, getColorHslByHex} from '../common/shamu-color'
 import {ConnectedChat} from './Chat'
+import {mainBoardsId} from './client-constants'
 import {ConnectionsContainer} from './Connections/Connections'
 import {ConnectedMasterControls} from './MasterControls'
 import {ConnectedMousePointers} from './MousePointers/MousePointers'
@@ -20,8 +21,6 @@ interface IOnlineAppProps {
 	connections: IConnection[]
 	hasLocalClient: boolean
 }
-
-export const mainBoardsId = 'mainBoards'
 
 // TODO Make Pure
 class OnlineApp extends React.Component<IOnlineAppProps> {
@@ -36,10 +35,10 @@ class OnlineApp extends React.Component<IOnlineAppProps> {
 						<ConnectedChat />
 						<ConnectedTopDiv />
 
-						<div id={mainBoardsId} className="boards">
-							{window.location.pathname === '/graph'
-								? <ConnectedSimpleGraph />
-								: <Fragment>
+						{window.location.pathname === '/graph'
+							? <ConnectedSimpleGraph />
+							: <Fragment>
+								<div id={mainBoardsId} className="boards">
 									<ConnectionsContainer />
 									<div className="boardRow">
 										<div className="board connected">
@@ -72,13 +71,13 @@ class OnlineApp extends React.Component<IOnlineAppProps> {
 											)
 										})
 									}
-								</Fragment>
-							}
-						</div>
+								</div>
+
+								<div id="info" />
+							</Fragment>
+						}
 					</Fragment>
 				}
-
-				<div id="info" />
 			</Fragment>
 		)
 	}
