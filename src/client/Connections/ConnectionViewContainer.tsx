@@ -17,7 +17,6 @@ export interface IConnectionViewContainerReduxProps {
 	sourceId?: string
 	targetId?: string
 	sourceColor: string
-	offset: number
 	isSourceActive: boolean
 	isSourceSending: boolean
 }
@@ -38,7 +37,6 @@ interface ICVCState {
 
 export class ConnectionViewContainer extends React.PureComponent<IConnectionViewContainerAllProps, ICVCState> {
 	public static defaultProps = {
-		offset: 0,
 		sourceColor: 'gray',
 	}
 
@@ -95,7 +93,7 @@ export class ConnectionViewContainer extends React.PureComponent<IConnectionView
 				y: sourceBox.y + (sourceBox.height / 2) - getMainBoardsRectY(),
 			},
 			targetPosition: {
-				x: targetBox.x - this.props.offset - getMainBoardsRectX(),
+				x: targetBox.x - getMainBoardsRectX(),
 				y: targetBox.y + (targetBox.height / 2) - getMainBoardsRectY(),
 			},
 		}
@@ -118,7 +116,6 @@ const mapState = (state: IClientAppState, props: IConnectionViewContainerProps):
 		sourceId: connection.sourceId,
 		targetId: connection.targetId,
 		sourceColor,
-		offset: 16,
 		isSourceActive,
 		isSourceSending,
 		// Forces update when connections change

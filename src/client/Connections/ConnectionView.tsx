@@ -52,7 +52,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps> {
 		const line = new LineState(
 			this.props.sourceX + this.props.connectorWidth,
 			this.props.sourceY,
-			this.props.targetX,
+			this.props.targetX - this.props.connectorWidth,
 			this.props.targetY,
 		)
 
@@ -118,7 +118,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps> {
 						width: this.props.connectorWidth,
 						height: this.props.connectorHeight,
 						top: this.props.targetY - (this.props.connectorHeight / 2),
-						left: this.props.targetX,
+						left: this.props.targetX - this.props.connectorWidth,
 					}}
 				>
 					<line
