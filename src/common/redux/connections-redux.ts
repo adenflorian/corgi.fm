@@ -206,7 +206,7 @@ export const selectConnectionSourceColor = (roomState: IClientRoomState, id: str
 	return ConnectionNodeInfo[connection.sourceType].stateSelector(roomState, connection.sourceId).color
 }
 
-export const selectConnectionSourceIsPlaying = (roomState: IClientRoomState, id: string) => {
+export const selectConnectionSourceIsActive = (roomState: IClientRoomState, id: string) => {
 	const connection = selectConnection(roomState, id)
 
 	if (!connection) return false
@@ -214,7 +214,7 @@ export const selectConnectionSourceIsPlaying = (roomState: IClientRoomState, id:
 	return ConnectionNodeInfo[connection.sourceType].stateSelector(roomState, connection.sourceId).isPlaying || false
 }
 
-export const selectConnectionSourceShouldHighlight = (roomState: IClientRoomState, id: string) => {
+export const selectConnectionSourceIsSending = (roomState: IClientRoomState, id: string) => {
 	return selectConnectionSourceNotes(roomState, id).length > 0
 }
 

@@ -3,7 +3,7 @@ import {connect} from 'react-redux'
 import {IClientAppState} from '../../common/redux/common-redux-types'
 import {
 	IConnection, selectAllConnections, selectConnection,
-	selectConnectionSourceColor, selectConnectionSourceIsPlaying, selectConnectionSourceShouldHighlight,
+	selectConnectionSourceColor, selectConnectionSourceIsActive, selectConnectionSourceIsSending,
 } from '../../common/redux/connections-redux'
 import {getMainBoardsRectX, getMainBoardsRectY} from '../utils'
 import {ConnectionView, Point} from './ConnectionView'
@@ -18,8 +18,8 @@ export interface IConnectionViewContainerReduxProps {
 	targetId?: string
 	sourceColor: string
 	offset: number
-	isSourcePlaying: boolean
-	shouldHighlight: boolean
+	isSourceActive: boolean
+	isSourceSending: boolean
 }
 
 type IConnectionViewContainerAllProps = IConnectionViewContainerProps & IConnectionViewContainerReduxProps
@@ -68,8 +68,8 @@ export class ConnectionViewContainer extends React.PureComponent<IConnectionView
 					sourceY={sourcePosition.y}
 					targetX={targetPosition.x}
 					targetY={targetPosition.y}
-					saturateSource={this.props.isSourcePlaying}
-					saturateTarget={this.props.shouldHighlight}
+					saturateSource={this.props.isSourceActive}
+					saturateTarget={this.props.isSourceSending}
 					id={this.props.id}
 				/>
 			)
@@ -112,15 +112,15 @@ export class ConnectionViewContainer extends React.PureComponent<IConnectionView
 const mapState = (state: IClientAppState, props: IConnectionViewContainerProps): IConnectionViewContainerReduxProps => {
 	const connection = selectConnection(state.room, props.id) || {} as IConnection
 	const sourceColor = connection && selectConnectionSourceColor(state.room, connection.id)
-	const isSourcePlaying = connection && selectConnectionSourceIsPlaying(state.room, connection.id)
-	const shouldHighlight = connection && selectConnectionSourceShouldHighlight(state.room, connection.id)
+	const isSourceActive = connection && selectConnectionSourceIsActive(state.room, connection.id)
+	const isSourceSending = connection && selectConnectionSourceIsSending(state.room, connection.id)
 	return {
 		sourceId: connection.sourceId,
 		targetId: connection.targetId,
 		sourceColor,
 		offset: 16,
-		isSourcePlaying,
-		shouldHighlight,
+		isSourceActive,
+		isSourceSending,
 		// Forces update when connections change
 		connections: selectAllConnections(state.room),
 	}
