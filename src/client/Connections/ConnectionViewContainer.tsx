@@ -21,11 +21,11 @@ export interface IConnectionViewContainerReduxProps {
 	isSourceSending: boolean
 }
 
-type IConnectionViewContainerAllProps = IConnectionViewContainerProps & IConnectionViewContainerReduxProps
+export type IConnectionViewContainerAllProps = IConnectionViewContainerProps & IConnectionViewContainerReduxProps
 
 type AnyRect = ClientRect | DOMRect | any
 
-interface Positions {
+export interface Positions {
 	sourcePosition?: Point,
 	targetPosition?: Point,
 }
@@ -107,20 +107,22 @@ export class ConnectionViewContainer extends React.PureComponent<IConnectionView
 	}
 }
 
-const mapState = (state: IClientAppState, props: IConnectionViewContainerProps): IConnectionViewContainerReduxProps => {
-	const connection = selectConnection(state.room, props.id) || {} as IConnection
-	const sourceColor = connection && selectConnectionSourceColor(state.room, connection.id)
-	const isSourceActive = connection && selectConnectionSourceIsActive(state.room, connection.id)
-	const isSourceSending = connection && selectConnectionSourceIsSending(state.room, connection.id)
-	return {
-		sourceId: connection.sourceId,
-		targetId: connection.targetId,
-		sourceColor,
-		isSourceActive,
-		isSourceSending,
-		// Forces update when connections change
-		connections: selectAllConnections(state.room),
+export const mapStateToProps =
+	(state: IClientAppState, props: IConnectionViewContainerProps): IConnectionViewContainerReduxProps => {
+		const connection = selectConnection(state.room, props.id) || {} as IConnection
+		const sourceColor = connection && selectConnectionSourceColor(state.room, connection.id)
+		const isSourceActive = connection && selectConnectionSourceIsActive(state.room, connection.id)
+		const isSourceSending = connection && selectConnectionSourceIsSending(state.room, connection.id)
+		// console.log('DDDDDDDDDDDD')
+		return {
+			sourceId: connection.sourceId,
+			targetId: connection.targetId,
+			sourceColor,
+			isSourceActive,
+			isSourceSending,
+			// Forces update when connections change
+			connections: selectAllConnections(state.room),
+		}
 	}
-}
 
-export const ConnectedConnectionViewContainer = connect(mapState)(ConnectionViewContainer)
+export const ConnectedConnectionViewContainer = connect(mapStateToProps)(ConnectionViewContainer)

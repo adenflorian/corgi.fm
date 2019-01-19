@@ -9,6 +9,7 @@ import {selectSampler} from './basic-sampler-redux'
 import {IClientRoomState} from './common-redux-types'
 import {selectGridSequencer, selectGridSequencerActiveNotes} from './grid-sequencers-redux'
 import {selectInfiniteSequencer, selectInfiniteSequencerActiveNotes} from './infinite-sequencers-redux'
+import {IPosition, selectPosition, selectPositionsWithIds} from './positions-redux'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
 import {IVirtualKeyboardState, makeGetKeyboardMidiOutput, selectVirtualKeyboardById} from './virtual-keyboard-redux'
 
@@ -60,41 +61,58 @@ export enum ConnectionNodeType {
 	sampler = 'sampler',
 	audioOutput = 'audioOutput',
 	masterClock = 'masterClock',
+	dummy = 'dummy',
 }
 
 export interface ConnectionNodeInfo {
 	[key: string]: {
 		stateSelector: IConnectableStateSelector,
+		width: number,
+		height: number,
 	}
 }
 
 export const ConnectionNodeInfo: ConnectionNodeInfo = {
 	[ConnectionNodeType.keyboard]: {
 		stateSelector: selectVirtualKeyboardById,
+		width: 456,
+		height: 88,
 	},
 	[ConnectionNodeType.gridSequencer]: {
 		stateSelector: selectGridSequencer,
+		width: 520,
+		height: 234,
 	},
 	[ConnectionNodeType.infiniteSequencer]: {
 		stateSelector: selectInfiniteSequencer,
+		width: 576,
+		height: 80,
 	},
 	[ConnectionNodeType.instrument]: {
 		stateSelector: selectBasicInstrument,
+		width: 416,
+		height: 56,
 	},
 	[ConnectionNodeType.sampler]: {
 		stateSelector: selectSampler,
+		width: 416,
+		height: 56,
 	},
 	[ConnectionNodeType.audioOutput]: {
 		stateSelector: () => ({
 			id: MASTER_AUDIO_OUTPUT_TARGET_ID,
 			color: CssColor.panelGray,
 		}),
+		width: 198.14,
+		height: 48,
 	},
 	[ConnectionNodeType.masterClock]: {
 		stateSelector: () => ({
 			id: MASTER_CLOCK_SOURCE_ID,
 			color: CssColor.panelGray,
 		}),
+		width: 134.813,
+		height: 72,
 	},
 }
 
@@ -119,6 +137,14 @@ export const MASTER_AUDIO_OUTPUT_TARGET_ID = 'MASTER_AUDIO_OUTPUT_TARGET_ID'
 export const MASTER_CLOCK_SOURCE_ID = 'MASTER_CLOCK_SOURCE_ID'
 
 export class Connection implements IConnection {
+	public static dummy: IConnection = {
+		sourceId: '-1',
+		sourceType: ConnectionNodeType.dummy,
+		targetId: '-1',
+		targetType: ConnectionNodeType.dummy,
+		id: '-1',
+	}
+
 	public id = uuid.v4()
 
 	constructor(
@@ -151,7 +177,7 @@ export const selectAllConnections = (state: IClientRoomState) =>
 	state.connections.connections
 
 export const selectConnection = (state: IClientRoomState, id: string) =>
-	selectAllConnections(state).get(id)
+	selectAllConnections(state).get(id) || Connection.dummy
 
 export const selectSourceByConnectionId = (state: IClientRoomState, id: string): IVirtualKeyboardState =>
 	selectVirtualKeyboardById(state, selectConnection(state, id)!.sourceId)
@@ -254,5 +280,39 @@ export function sortConnection(connA: IConnection, connB: IConnection) {
 				: 1
 	} else {
 		return connA.id > connB.id ? -1 : 1
+	}
+}
+
+const defaultPosition: IPosition = {
+	id: 'uh oh',
+	targetType: ConnectionNodeType.dummy,
+	x: 0,
+	y: 0,
+	width: 0,
+	height: 0,
+}
+
+const selectConnectionSourcePosition =
+	(state: IClientRoomState, connection: IConnection) => selectPosition(state, connection.sourceId)
+
+const selectConnectionTargetPosition =
+	(state: IClientRoomState, connection: IConnection) => selectPosition(state, connection.targetId)
+
+export const makeConnectionPositionsSelector = () => createSelector(
+	selectConnectionSourcePosition,
+	selectConnectionTargetPosition,
+	makePositionsObject,
+)
+
+function makePositionsObject(sourcePosition = defaultPosition, targetPosition = defaultPosition) {
+	return {
+		sourcePosition: {
+			x: sourcePosition.x + sourcePosition.width,
+			y: sourcePosition.y + (sourcePosition.height / 2),
+		},
+		targetPosition: {
+			x: targetPosition.x,
+			y: targetPosition.y + (targetPosition.height / 2),
+		},
 	}
 }

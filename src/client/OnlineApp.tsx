@@ -9,7 +9,7 @@ import {
 import {CssColor, getColorHslByHex} from '../common/shamu-color'
 import {ConnectedChat} from './Chat'
 import {mainBoardsId} from './client-constants'
-import {ConnectionsContainer} from './Connections/Connections'
+import {ConnectedConnections, ConnectionsUsage} from './Connections/Connections'
 import {ConnectedMasterControls} from './MasterControls'
 import {ConnectedMousePointers} from './MousePointers/MousePointers'
 import {ConnectedSimpleGraph} from './SimpleGraph/SimpleGraph'
@@ -39,7 +39,7 @@ class OnlineApp extends React.Component<IOnlineAppProps> {
 							? <ConnectedSimpleGraph />
 							: <Fragment>
 								<div id={mainBoardsId} className="boards">
-									<ConnectionsContainer />
+									<ConnectedConnections usage={ConnectionsUsage.normal} />
 									<div className="boardRow">
 										<div className="board connected">
 											<ConnectedMasterControls />

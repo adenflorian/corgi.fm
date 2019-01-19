@@ -109,15 +109,15 @@ export class BasicInstrumentView
 	}
 }
 
-const makeMapStateToProps = () => {
-	return (state: IClientAppState, props: IBasicInstrumentViewProps): IBasicInstrumentViewReduxProps => {
+export const ConnectedBasicInstrumentView = connect(
+	(state: IClientAppState, props: IBasicInstrumentViewProps): IBasicInstrumentViewReduxProps => {
 		const connection = selectFirstConnectionByTargetId(state.room, props.id)
 		const rawMidiNotes = selectConnectionSourceNotesByTargetId(state.room, props.id)
 		const instrumentState = selectBasicInstrument(state.room, props.id)
 
 		return {
-			rawMidiNotes: rawMidiNotes || [],
-			isPlaying: rawMidiNotes ? rawMidiNotes.length > 0 : false,
+			rawMidiNotes,
+			isPlaying: rawMidiNotes.length > 0,
 			oscillatorType: instrumentState.oscillatorType,
 			color: connection ? selectConnectionSourceColor(state.room, connection.id) : BasicInstrumentView.defaultProps.color,
 			pan: instrumentState.pan,
@@ -125,11 +125,7 @@ const makeMapStateToProps = () => {
 			attack: instrumentState.attack,
 			release: instrumentState.release,
 		}
-	}
-}
-
-export const ConnectedBasicInstrumentView = connect(
-	makeMapStateToProps,
+	},
 )(
 	BasicInstrumentView as React.ComponentClass<IBasicInstrumentViewAllProps>,
 ) as React.ComponentClass<IBasicInstrumentViewProps>

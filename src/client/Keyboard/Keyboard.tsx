@@ -195,8 +195,8 @@ export class Keyboard extends React.PureComponent<IKeyboardAllProps, IKeyboardSt
 
 const mapStateToProps = (state: IClientAppState, props: IKeyboardProps): IKeyboardReduxProps => {
 	const virtualKeyboard = selectVirtualKeyboardById(state.room, props.id)
-	const owner = selectClientById(state, virtualKeyboard.ownerId) || {} as ClientState
-	const pressedMidiKeys = virtualKeyboard ? virtualKeyboard.pressedKeys : []
+	const owner = selectClientById(state, virtualKeyboard.ownerId)
+	const pressedMidiKeys = virtualKeyboard.pressedKeys
 	const localClient = selectLocalClient(state)
 
 	return {

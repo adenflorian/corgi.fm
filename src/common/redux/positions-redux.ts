@@ -2,7 +2,7 @@ import {Map} from 'immutable'
 import {combineReducers, Reducer} from 'redux'
 import {createSelector} from 'reselect'
 import {IClientRoomState} from './common-redux-types'
-import {ConnectionNodeType} from './connections-redux'
+import {ConnectionNodeInfo, ConnectionNodeType} from './connections-redux'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
 
 export const ADD_POSITION = 'ADD_POSITION'
@@ -48,6 +48,8 @@ export const Positions = Map
 export interface IPosition {
 	id: string
 	targetType: ConnectionNodeType
+	width: number
+	height: number
 	x: number
 	y: number
 }
@@ -56,9 +58,18 @@ export class Position implements IPosition {
 	constructor(
 		public readonly id: string,
 		public readonly targetType: ConnectionNodeType,
-		public readonly x: number = Math.random() * 1600 - 800,
-		public readonly y: number = Math.random() * 1000 - 500,
-	) {}
+		public readonly width = -1,
+		public readonly height = -1,
+		public readonly x = Math.random() * 1600 - 800,
+		public readonly y = Math.random() * 1000 - 500,
+	) {
+		if (width === -1) {
+			this.width = ConnectionNodeInfo[targetType].width
+		}
+		if (height === -1) {
+			this.height = ConnectionNodeInfo[targetType].height
+		}
+	}
 }
 
 export type IPositionAction = AddPositionAction | DeletePositionsAction
