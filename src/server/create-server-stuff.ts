@@ -18,6 +18,11 @@ export function createServerStuff(room: string, serverStore: Store) {
 	const addClientAction = addClient(serverClient)
 	serverStore.dispatch(createRoomAction(addClientAction, room))
 
+	serverStore.dispatch(createRoomAction(addPosition(
+		new Position(MASTER_CLOCK_SOURCE_ID, ConnectionNodeType.masterClock)), room))
+	serverStore.dispatch(createRoomAction(addPosition(
+		new Position(MASTER_AUDIO_OUTPUT_TARGET_ID, ConnectionNodeType.audioOutput)), room))
+
 	createSourceAndTarget({
 		source: {
 			type: ConnectionNodeType.gridSequencer,

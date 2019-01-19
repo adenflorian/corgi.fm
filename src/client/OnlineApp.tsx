@@ -7,16 +7,12 @@ import {
 	ConnectionNodeType, IConnection, selectSortedConnections,
 } from '../common/redux/connections-redux'
 import {CssColor, getColorHslByHex} from '../common/shamu-color'
-import {ConnectedBasicSampler} from './BasicSampler/BasicSampler'
 import {ConnectedChat} from './Chat'
 import {ConnectionsContainer} from './Connections/Connections'
-import {ConnectedGridSequencerContainer} from './GridSequencer/GridSequencerContainer'
-import {ConnectedInfiniteSequencer} from './InfiniteSequencer/InfiniteSequencer'
-import {ConnectedBasicInstrumentView} from './Instruments/BasicInstrumentView'
-import {ConnectedKeyboard} from './Keyboard/Keyboard'
 import {ConnectedMasterControls} from './MasterControls'
 import {ConnectedMousePointers} from './MousePointers/MousePointers'
 import {ConnectedSimpleGraph} from './SimpleGraph/SimpleGraph'
+import {getComponentByNodeType} from './SimpleGraph/SimpleGraphNode'
 import {ConnectedTopDiv} from './TopDiv'
 import {ConnectedVolumeControl} from './Volume/VolumeControl'
 
@@ -64,32 +60,14 @@ class OnlineApp extends React.Component<IOnlineAppProps> {
 														key={connection.sourceId}
 														className="board connected"
 													>
-														{
-															connection.sourceType === ConnectionNodeType.gridSequencer
-																? <ConnectedGridSequencerContainer id={connection.sourceId} />
-																: connection.sourceType === ConnectionNodeType.infiniteSequencer
-																	? <ConnectedInfiniteSequencer id={connection.sourceId} />
-																	: connection.sourceType === ConnectionNodeType.keyboard
-																		? <ConnectedKeyboard id={connection.sourceId} />
-																		: new Error('ugh')
-														}
+														{getComponentByNodeType(connection.sourceType, connection.sourceId)}
 													</div>
-													{connection.targetType === ConnectionNodeType.instrument &&
-														<div
-															key={connection.targetId}
-															className="board connected"
-														>
-															<ConnectedBasicInstrumentView id={connection.targetId} />
-														</div>
-													}
-													{connection.targetType === ConnectionNodeType.sampler &&
-														<div
-															key={connection.targetId}
-															className="board connected"
-														>
-															<ConnectedBasicSampler id={connection.targetId} />
-														</div>
-													}
+													<div
+														key={connection.targetId}
+														className="board connected"
+													>
+														{getComponentByNodeType(connection.targetType, connection.targetId)}
+													</div>
 												</div>
 											)
 										})

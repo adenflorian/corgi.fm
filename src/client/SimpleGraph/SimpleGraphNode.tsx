@@ -19,7 +19,7 @@ type ISimpleGraphNodeReduxProps = IPosition
 type ISimpleGraphNodeAllProps = ISimpleGraphNodeProps & ISimpleGraphNodeReduxProps
 
 // Using a normal function allows for component name to show in react dev tools
-export function SimpleGraphNode({positionId, x, y, targetId, targetType}: ISimpleGraphNodeAllProps) {
+export function SimpleGraphNode({x, y, targetId, targetType}: ISimpleGraphNodeAllProps) {
 	return <div
 		className="simpleGraphNode"
 		style={{
@@ -28,12 +28,11 @@ export function SimpleGraphNode({positionId, x, y, targetId, targetType}: ISimpl
 			left: x + 'px',
 		}}
 	>
-		<p>hello world, this is a simple graph node: {positionId}</p>
 		{getComponentByNodeType(targetType, targetId)}
 	</div>
 }
 
-function getComponentByNodeType(type: ConnectionNodeType, id: string) {
+export function getComponentByNodeType(type: ConnectionNodeType, id: string) {
 	switch (type) {
 		case ConnectionNodeType.masterClock: return <ConnectedMasterControls />
 		case ConnectionNodeType.audioOutput: return <ConnectedVolumeControl />

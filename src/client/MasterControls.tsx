@@ -30,7 +30,7 @@ export const MasterControls: React.FunctionComponent<IMasterControlsReduxProps &
 			<Panel id={MASTER_CLOCK_SOURCE_ID}>
 				<div>
 					<div style={{margin: 8, marginBottom: 0}}>
-						Master Controls
+						Master Clock
 					</div>
 					<div className="controls">
 						<span
