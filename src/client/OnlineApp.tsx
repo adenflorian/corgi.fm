@@ -1,14 +1,11 @@
 import {Fragment} from 'react'
 import * as React from 'react'
 import {connect} from 'react-redux'
-import {selectAllBasicInstrumentIds} from '../common/redux/basic-instruments-redux'
 import {selectLocalClient} from '../common/redux/clients-redux'
 import {IClientAppState} from '../common/redux/common-redux-types'
 import {
 	ConnectionNodeType, IConnection, selectSortedConnections,
 } from '../common/redux/connections-redux'
-import {selectAllGridSequencerIds} from '../common/redux/grid-sequencers-redux'
-import {selectAllVirtualKeyboardIds} from '../common/redux/virtual-keyboard-redux'
 import {CssColor, getColorHslByHex} from '../common/shamu-color'
 import {ConnectedBasicSampler} from './BasicSampler/BasicSampler'
 import {ConnectedChat} from './Chat'
@@ -25,14 +22,12 @@ import {ConnectedVolumeControl} from './Volume/VolumeControl'
 
 interface IOnlineAppProps {
 	connections: IConnection[]
-	instrumentIds: string[]
-	keyboardIds: string[]
 	hasLocalClient: boolean
-	gridSequencerIds: string[]
 }
 
 export const mainBoardsId = 'mainBoards'
 
+// TODO Make Pure
 class OnlineApp extends React.Component<IOnlineAppProps> {
 	public render() {
 		const {hasLocalClient} = this.props
@@ -113,9 +108,6 @@ class OnlineApp extends React.Component<IOnlineAppProps> {
 
 const mapStateToProps = (state: IClientAppState): IOnlineAppProps => ({
 	hasLocalClient: selectLocalClient(state) !== undefined,
-	keyboardIds: selectAllVirtualKeyboardIds(state.room),
-	instrumentIds: selectAllBasicInstrumentIds(state.room),
-	gridSequencerIds: selectAllGridSequencerIds(state.room),
 	connections: selectSortedConnections(state.room),
 })
 

@@ -81,12 +81,12 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 
 	const newVirtualKeyboard = new VirtualKeyboardState(localClient.id, localClient.color)
 	dispatch(addVirtualKeyboard(newVirtualKeyboard))
-	dispatch(addPosition(new Position(newVirtualKeyboard.id)))
+	dispatch(addPosition(new Position(newVirtualKeyboard.id, ConnectionNodeType.keyboard)))
 
 	if (localClient.name.toLowerCase() === '$sampler') {
 		const newSampler = new BasicSamplerState(localClient.id)
 		dispatch(addBasicSampler(newSampler))
-		dispatch(addPosition(new Position(newSampler.id)))
+		dispatch(addPosition(new Position(newSampler.id, ConnectionNodeType.sampler)))
 
 		// Source to target
 		dispatch(addConnection(new Connection(
@@ -114,7 +114,7 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 	} else {
 		const newInstrument = new BasicInstrumentState(localClient.id)
 		dispatch(addBasicInstrument(newInstrument))
-		dispatch(addPosition(new Position(newInstrument.id)))
+		dispatch(addPosition(new Position(newInstrument.id, ConnectionNodeType.instrument)))
 
 		// Source to target
 		dispatch(addConnection(new Connection(

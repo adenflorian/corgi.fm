@@ -3,6 +3,7 @@ import {combineReducers, Reducer} from 'redux'
 import {createSelector} from 'reselect'
 import * as uuid from 'uuid'
 import {IClientRoomState} from './common-redux-types'
+import {ConnectionNodeType} from './connections-redux'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
 
 export const ADD_POSITION = 'ADD_POSITION'
@@ -48,6 +49,7 @@ export const Positions = Map
 export interface IPosition {
 	id: string
 	targetId: string
+	targetType: ConnectionNodeType
 	x: number
 	y: number
 }
@@ -57,6 +59,7 @@ export class Position implements IPosition {
 
 	constructor(
 		public readonly targetId: string,
+		public readonly targetType: ConnectionNodeType,
 		public readonly x: number = Math.random() * 1600 - 800,
 		public readonly y: number = Math.random() * 1000 - 500,
 	) {}

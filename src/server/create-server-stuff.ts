@@ -75,12 +75,12 @@ export function createServerStuff(room: string, serverStore: Store) {
 
 	function createSourceAndTarget(options: CreateSourceAndTargetArgs) {
 		const target = createTarget(options.target.type)
-		serverStore.dispatch(createRoomAction(addPosition(new Position(target.id)), room))
+		serverStore.dispatch(createRoomAction(addPosition(new Position(target.id, options.target.type)), room))
 
 		const source = createSource({
 			...options.source,
 		})
-		serverStore.dispatch(createRoomAction(addPosition(new Position(source.id)), room))
+		serverStore.dispatch(createRoomAction(addPosition(new Position(source.id, options.source.type)), room))
 
 		// Source to target
 		serverStore.dispatch(createRoomAction(addConnection(new Connection(

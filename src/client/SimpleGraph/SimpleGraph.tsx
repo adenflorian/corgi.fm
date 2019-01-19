@@ -8,7 +8,7 @@ interface ISimpleGraphReduxProps {
 	positionIds: string[]
 }
 
-export const SimpleGraph: React.FunctionComponent<ISimpleGraphReduxProps> =
+export const SimpleGraph: React.FC<ISimpleGraphReduxProps> =
 	({positionIds}) =>
 		<div className="simpleGraph">
 			<p>hello world, this is graph</p>

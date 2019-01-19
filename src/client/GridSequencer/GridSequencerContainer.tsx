@@ -31,6 +31,7 @@ interface IConnectedGridSequencerContainerProps {
 
 const mapStateToProps = (state: IClientAppState, props: IConnectedGridSequencerContainerProps) => {
 	const gridSequencer = selectAllGridSequencers(state.room)[props.id]
+	if (!gridSequencer) throw new Error('gridSequencer does not exist with id: ' + props.id)
 
 	return {
 		isPlaying: gridSequencer.isPlaying,
