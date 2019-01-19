@@ -17,14 +17,13 @@ interface ISimpleGraphNodeProps {
 interface ISimpleGraphNodeReduxProps {
 	x: number
 	y: number
-	targetId: string
 	targetType: ConnectionNodeType
 }
 
 type ISimpleGraphNodeAllProps = ISimpleGraphNodeProps & ISimpleGraphNodeReduxProps
 
 // Using a normal function allows for component name to show in react dev tools
-export function SimpleGraphNode({x, y, targetId, targetType}: ISimpleGraphNodeAllProps) {
+export function SimpleGraphNode({x, y, positionId, targetType}: ISimpleGraphNodeAllProps) {
 	return <div
 		className="simpleGraphNode"
 		style={{
@@ -33,7 +32,7 @@ export function SimpleGraphNode({x, y, targetId, targetType}: ISimpleGraphNodeAl
 			left: x + 'px',
 		}}
 	>
-		{getComponentByNodeType(targetType, targetId)}
+		{getComponentByNodeType(targetType, positionId)}
 	</div>
 }
 
@@ -60,7 +59,6 @@ export const ConnectedSimpleGraphNode = shamuConnect(
 		return {
 			x: position.x,
 			y: position.y,
-			targetId: position.targetId,
 			targetType: position.targetType,
 		}
 	},

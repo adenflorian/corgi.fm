@@ -12,7 +12,7 @@ import {
 	addInfiniteSequencer, InfiniteSequencerState, InfiniteSequencerStyle,
 } from '../common/redux/infinite-sequencers-redux'
 import {
-	addPosition, Position, selectAllPositions, selectAllPositionsWithTargetIdsAsKeys, updatePositions,
+	addPosition, Position, selectAllPositions, updatePositions,
 } from '../common/redux/positions-redux'
 import {createRoomAction} from '../common/redux/room-stores-redux'
 import {createSequencerEvents} from '../common/redux/sequencer-redux'
@@ -78,7 +78,6 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 	// Calculate positions
 	const roomState = serverStore.getState().roomStores.get(room)!
 	const originalPositions = selectAllPositions(roomState)
-	const positionsByTargetIds = selectAllPositionsWithTargetIdsAsKeys(roomState)
 
 	const connectionsToMasterAudioOutput = selectConnectionsWithTargetIds(roomState, [MASTER_AUDIO_OUTPUT_TARGET_ID])
 
@@ -88,13 +87,12 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 	const ySpacing = 256
 
 	const newPositions = originalPositions.withMutations(mutablePositions => {
-		mutablePositions.update(
-			positionsByTargetIds.get(MASTER_AUDIO_OUTPUT_TARGET_ID)!.id, x => ({...x, x: rightMost, y: 0}),
+		mutablePositions.update(MASTER_AUDIO_OUTPUT_TARGET_ID,
+			x => ({...x, x: rightMost, y: 0}),
 		)
 
 		const foo = (x: number, prevY: number) => (connection: IConnection, i: number) => {
-			mutablePositions.update(
-				positionsByTargetIds.get(connection.sourceId)!.id,
+			mutablePositions.update(connection.sourceId,
 				z => ({...z, x: rightMost - (xSpacing * x), y: topMost + (i * ySpacing) + (prevY * ySpacing)}),
 			)
 			selectConnectionsWithTargetIds(roomState, [connection.sourceId]).forEach(foo(x + 1, i))

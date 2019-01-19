@@ -1,7 +1,6 @@
 import {Map} from 'immutable'
 import {combineReducers, Reducer} from 'redux'
 import {createSelector} from 'reselect'
-import * as uuid from 'uuid'
 import {IClientRoomState} from './common-redux-types'
 import {ConnectionNodeType} from './connections-redux'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
@@ -48,17 +47,14 @@ export const Positions = Map
 
 export interface IPosition {
 	id: string
-	targetId: string
 	targetType: ConnectionNodeType
 	x: number
 	y: number
 }
 
 export class Position implements IPosition {
-	public readonly id = uuid.v4()
-
 	constructor(
-		public readonly targetId: string,
+		public readonly id: string,
 		public readonly targetType: ConnectionNodeType,
 		public readonly x: number = Math.random() * 1600 - 800,
 		public readonly y: number = Math.random() * 1000 - 500,
@@ -86,11 +82,6 @@ export const positionsReducer: Reducer<IPositionsState, IPositionAction> = combi
 export const selectAllPositions = (state: IClientRoomState) =>
 	state.positions.all
 
-export const selectAllPositionsWithTargetIdsAsKeys = createSelector(
-	selectAllPositions,
-	positions => positions.mapEntries(([k, v]) => [v.targetId, v]),
-)
-
 export const selectPosition = (state: IClientRoomState, id: string) =>
 	selectAllPositions(state).get(id)
 
@@ -100,11 +91,11 @@ export const selectAllPositionsAsArray = createSelector(
 )
 
 export const selectAllPositionIds = createSelector(
-	selectAllPositionsAsArray,
-	positions => positions.map(x => x.id),
+	selectAllPositions,
+	positions => [...positions.keys()],
 )
 
-export const selectPositionsWithTargetIds = (state: IClientRoomState, targetIds: string[]) => {
+export const selectPositionsWithIds = (state: IClientRoomState, ids: string[]) => {
 	return selectAllPositionsAsArray(state)
-		.filter(x => targetIds.includes(x.targetId))
+		.filter(x => ids.includes(x.id))
 }

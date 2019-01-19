@@ -23,7 +23,7 @@ import {
 import {selectAllGridSequencers, updateGridSequencers} from '../common/redux/grid-sequencers-redux'
 import {selectAllInfiniteSequencers, updateInfiniteSequencers} from '../common/redux/infinite-sequencers-redux'
 import {
-	deletePositions, selectAllPositions, selectPositionsWithTargetIds, updatePositions,
+	deletePositions, selectAllPositions, selectPositionsWithIds, updatePositions,
 } from '../common/redux/positions-redux'
 import {BROADCASTER_ACTION} from '../common/redux/redux-utils'
 import {
@@ -241,7 +241,7 @@ function onLeaveRoom(io: Server, socket: Socket, roomToLeave: string, serverStor
 	serverStore.dispatch(createRoomAction(deleteConnectionsAction, roomToLeave))
 	io.to(roomToLeave).emit(WebSocketEvent.broadcast, deleteConnectionsAction)
 
-	const positionIdsToDelete = selectPositionsWithTargetIds(roomState, sourceAndTargetIds).map(x => x.id)
+	const positionIdsToDelete = selectPositionsWithIds(roomState, sourceAndTargetIds).map(x => x.id)
 	const deletePositionsAction = deletePositions(positionIdsToDelete)
 	serverStore.dispatch(createRoomAction(deletePositionsAction, roomToLeave))
 	io.to(roomToLeave).emit(WebSocketEvent.broadcast, deletePositionsAction)
