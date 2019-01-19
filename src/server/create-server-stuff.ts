@@ -2,18 +2,22 @@ import {Store} from 'redux'
 import {addBasicInstrument, BasicInstrumentState} from '../common/redux/basic-instruments-redux'
 import {addBasicSampler, BasicSamplerState} from '../common/redux/basic-sampler-redux'
 import {addClient, ClientState} from '../common/redux/clients-redux'
+import {IServerState} from '../common/redux/configure-server-store'
 import {
-	addConnection, Connection, ConnectionNodeType, MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID,
+	addConnection, Connection, ConnectionNodeType, IConnection,
+	MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID, selectConnectionsWithTargetIds,
 } from '../common/redux/connections-redux'
 import {addGridSequencer, GridSequencerState} from '../common/redux/grid-sequencers-redux'
 import {
 	addInfiniteSequencer, InfiniteSequencerState, InfiniteSequencerStyle,
 } from '../common/redux/infinite-sequencers-redux'
-import {addPosition, Position} from '../common/redux/positions-redux'
+import {
+	addPosition, Position, selectAllPositions, selectAllPositionsWithTargetIdsAsKeys, updatePositions,
+} from '../common/redux/positions-redux'
 import {createRoomAction} from '../common/redux/room-stores-redux'
 import {createSequencerEvents} from '../common/redux/sequencer-redux'
 
-export function createServerStuff(room: string, serverStore: Store) {
+export function createServerStuff(room: string, serverStore: Store<IServerState>) {
 	const serverClient = ClientState.createServerClient()
 	const addClientAction = addClient(serverClient)
 	serverStore.dispatch(createRoomAction(addClientAction, room))
@@ -70,6 +74,36 @@ export function createServerStuff(room: string, serverStore: Store) {
 			type: ConnectionNodeType.instrument,
 		},
 	})
+
+	// Calculate positions
+	const roomState = serverStore.getState().roomStores.get(room)!
+	const originalPositions = selectAllPositions(roomState)
+	const positionsByTargetIds = selectAllPositionsWithTargetIdsAsKeys(roomState)
+
+	const connectionsToMasterAudioOutput = selectConnectionsWithTargetIds(roomState, [MASTER_AUDIO_OUTPUT_TARGET_ID])
+
+	const rightMost = 600
+	const topMost = -600
+	const xSpacing = 700
+	const ySpacing = 256
+
+	const newPositions = originalPositions.withMutations(mutablePositions => {
+		mutablePositions.update(
+			positionsByTargetIds.get(MASTER_AUDIO_OUTPUT_TARGET_ID)!.id, x => ({...x, x: rightMost, y: 0}),
+		)
+
+		const foo = (x: number, prevY: number) => (connection: IConnection, i: number) => {
+			mutablePositions.update(
+				positionsByTargetIds.get(connection.sourceId)!.id,
+				z => ({...z, x: rightMost - (xSpacing * x), y: topMost + (i * ySpacing) + (prevY * ySpacing)}),
+			)
+			selectConnectionsWithTargetIds(roomState, [connection.sourceId]).forEach(foo(x + 1, i))
+		}
+
+		connectionsToMasterAudioOutput.forEach(foo(1, 0))
+	})
+
+	serverStore.dispatch(createRoomAction(updatePositions(newPositions), room))
 
 	interface CreateSourceAndTargetArgs {
 		source: CreateSourceArgs

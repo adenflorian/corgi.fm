@@ -86,6 +86,11 @@ export const positionsReducer: Reducer<IPositionsState, IPositionAction> = combi
 export const selectAllPositions = (state: IClientRoomState) =>
 	state.positions.all
 
+export const selectAllPositionsWithTargetIdsAsKeys = createSelector(
+	selectAllPositions,
+	positions => positions.mapEntries(([k, v]) => [v.targetId, v]),
+)
+
 export const selectPosition = (state: IClientRoomState, id: string) =>
 	selectAllPositions(state).get(id)
 

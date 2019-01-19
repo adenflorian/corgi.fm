@@ -14,7 +14,12 @@ interface ISimpleGraphNodeProps {
 	positionId: string
 }
 
-type ISimpleGraphNodeReduxProps = IPosition
+interface ISimpleGraphNodeReduxProps {
+	x: number
+	y: number
+	targetId: string
+	targetType: ConnectionNodeType
+}
 
 type ISimpleGraphNodeAllProps = ISimpleGraphNodeProps & ISimpleGraphNodeReduxProps
 
@@ -50,6 +55,13 @@ export function getComponentByNodeType(type: ConnectionNodeType, id: string) {
 
 export const ConnectedSimpleGraphNode = shamuConnect(
 	(state, {positionId}: ISimpleGraphNodeProps): ISimpleGraphNodeReduxProps => {
-		return selectPosition(state.room, positionId)!
+		const position = selectPosition(state.room, positionId)!
+
+		return {
+			x: position.x,
+			y: position.y,
+			targetId: position.targetId,
+			targetType: position.targetType,
+		}
 	},
 )(SimpleGraphNode)
