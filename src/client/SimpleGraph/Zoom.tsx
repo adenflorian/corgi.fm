@@ -8,6 +8,11 @@ interface IZoomState {
 	zoom: number
 }
 
+const maxZoom = 10
+const minZoom = 0.1
+const scrollMod = 0.001
+const mouseMod = 0.001
+
 export class Zoom extends React.PureComponent<IZoomProps, IZoomState> {
 	public state = {
 		zoom: 1,
@@ -15,10 +20,12 @@ export class Zoom extends React.PureComponent<IZoomProps, IZoomState> {
 
 	public componentDidMount() {
 		window.addEventListener('wheel', this._onMouseWheel)
+		window.addEventListener('mousemove', this._onMouseMove)
 	}
 
 	public componentWillUnmount() {
 		window.removeEventListener('wheel', this._onMouseWheel)
+		window.removeEventListener('mousemove', this._onMouseMove)
 	}
 
 	public render() {
@@ -29,6 +36,7 @@ export class Zoom extends React.PureComponent<IZoomProps, IZoomState> {
 				className="zoom"
 				style={{
 					transform: `scale(${this.state.zoom})`,
+					willChange: 'transform',
 				}}
 			>
 				{children}
@@ -36,5 +44,23 @@ export class Zoom extends React.PureComponent<IZoomProps, IZoomState> {
 		)
 	}
 
-	private _onMouseWheel = (e: WheelEvent) => this.setState({zoom: this.state.zoom - (e.deltaY * 0.001)})
+	private _onMouseWheel = (e: WheelEvent) =>
+		this.setState({
+			zoom: Math.min(maxZoom,
+				Math.max(minZoom,
+					this.state.zoom - (e.deltaY * scrollMod),
+				),
+			),
+		})
+
+	private _onMouseMove = (e: MouseEvent) =>
+		e.ctrlKey
+			? this.setState({
+				zoom: Math.min(maxZoom,
+					Math.max(minZoom,
+						this.state.zoom - (e.movementY * mouseMod),
+					),
+				),
+			})
+			: null
 }
