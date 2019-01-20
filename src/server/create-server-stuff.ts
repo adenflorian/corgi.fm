@@ -112,12 +112,12 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 
 	function createSourceAndTarget(options: CreateSourceAndTargetArgs) {
 		const target = createTarget(options.target.type)
-		serverStore.dispatch(createRoomAction(addPosition(new Position(target.id, options.target.type)), room))
+		serverStore.dispatch(createRoomAction(addPosition(
+			new Position(target.id, options.target.type)), room))
 
-		const source = createSource({
-			...options.source,
-		})
-		serverStore.dispatch(createRoomAction(addPosition(new Position(source.id, options.source.type)), room))
+		const source = createSource({...options.source})
+		serverStore.dispatch(createRoomAction(addPosition(
+			new Position(source.id, options.source.type, source.width, source.height)), room))
 
 		// Source to target
 		serverStore.dispatch(createRoomAction(addConnection(new Connection(
@@ -167,7 +167,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 		}
 	}
 
-	function createTarget(type: ConnectionNodeType): any {
+	function createTarget(type: ConnectionNodeType) {
 		switch (type) {
 			case ConnectionNodeType.instrument:
 				const x = new BasicInstrumentState(serverClient.id)

@@ -102,6 +102,14 @@ export interface IGridSequencerState extends ISequencerState {
 }
 
 export class GridSequencerState implements IGridSequencerState {
+	public static defaultWidth = 520
+	public static defaultHeight = 234
+	public static labelHeight = 16
+	public static controlsWidth = 120
+	public static noteWidth = 12
+	public static scrollBarWidth = 16
+	public static noteHeight = 8
+
 	public readonly id: string = uuid.v4()
 	public readonly events: ISequencerEvent[]
 	public readonly index: number = -1
@@ -112,6 +120,8 @@ export class GridSequencerState implements IGridSequencerState {
 	public readonly notesToShow: number
 	public readonly isRecording: boolean = false
 	public readonly previousEvents: ISequencerEvent[][] = []
+	public readonly width: number = GridSequencerState.defaultWidth
+	public readonly height: number = GridSequencerState.defaultHeight
 
 	constructor(name: string, notesToShow: number, events?: ISequencerEvent[]) {
 		this.name = name
@@ -120,6 +130,15 @@ export class GridSequencerState implements IGridSequencerState {
 		this.notesToShow = notesToShow
 
 		this.scrollY = this._calculateScrollY()
+
+		this.width =
+			GridSequencerState.controlsWidth +
+			(GridSequencerState.noteWidth * this.events.length) +
+			GridSequencerState.scrollBarWidth
+
+		this.height =
+			(GridSequencerState.noteHeight * notesToShow) +
+			(GridSequencerState.labelHeight * 2)
 	}
 
 	get maxScrollY() {return MAX_MIDI_NOTE_NUMBER_127 - this.notesToShow}

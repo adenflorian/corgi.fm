@@ -7,9 +7,11 @@ import {CssColor} from '../shamu-color'
 import {selectBasicInstrument} from './basic-instruments-redux'
 import {selectSampler} from './basic-sampler-redux'
 import {IClientRoomState} from './common-redux-types'
-import {selectGridSequencer, selectGridSequencerActiveNotes} from './grid-sequencers-redux'
-import {selectInfiniteSequencer, selectInfiniteSequencerActiveNotes} from './infinite-sequencers-redux'
-import {IPosition, selectPosition, selectPositionsWithIds} from './positions-redux'
+import {GridSequencerState, selectGridSequencer, selectGridSequencerActiveNotes} from './grid-sequencers-redux'
+import {
+	InfiniteSequencerState, selectInfiniteSequencer, selectInfiniteSequencerActiveNotes,
+} from './infinite-sequencers-redux'
+import {IPosition, selectPosition} from './positions-redux'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
 import {IVirtualKeyboardState, makeGetKeyboardMidiOutput, selectVirtualKeyboardById} from './virtual-keyboard-redux'
 
@@ -80,13 +82,13 @@ export const ConnectionNodeInfo: ConnectionNodeInfo = {
 	},
 	[ConnectionNodeType.gridSequencer]: {
 		stateSelector: selectGridSequencer,
-		width: 520,
-		height: 234,
+		width: GridSequencerState.defaultWidth,
+		height: GridSequencerState.defaultHeight,
 	},
 	[ConnectionNodeType.infiniteSequencer]: {
 		stateSelector: selectInfiniteSequencer,
-		width: 576,
-		height: 80,
+		width: InfiniteSequencerState.defaultWidth,
+		height: InfiniteSequencerState.defaultHeight,
 	},
 	[ConnectionNodeType.instrument]: {
 		stateSelector: selectBasicInstrument,

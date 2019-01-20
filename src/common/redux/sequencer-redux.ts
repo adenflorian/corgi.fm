@@ -46,6 +46,8 @@ export interface ISequencerState extends IMultiStateThing {
 	name: string
 	isRecording: boolean
 	previousEvents: ISequencerEvent[][]
+	width: number
+	height: number
 }
 
 export function isEmptyEvents(events: ISequencerEvent[]) {

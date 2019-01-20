@@ -102,6 +102,9 @@ export enum InfiniteSequencerStyle {
 }
 
 export class InfiniteSequencerState implements ISequencerState, IConnectable {
+	public static defaultWidth = 576
+	public static defaultHeight = 80
+
 	public readonly id: string = uuid.v4()
 	public readonly events: ISequencerEvent[]
 	public readonly index: number = -1
@@ -112,6 +115,8 @@ export class InfiniteSequencerState implements ISequencerState, IConnectable {
 	public readonly style: InfiniteSequencerStyle
 	public readonly previousEvents: ISequencerEvent[][] = []
 	public readonly showRows = false
+	public readonly width: number = InfiniteSequencerState.defaultWidth
+	public readonly height: number = InfiniteSequencerState.defaultHeight
 
 	constructor(name: string, style: InfiniteSequencerStyle, events?: ISequencerEvent[]) {
 		this.name = name
