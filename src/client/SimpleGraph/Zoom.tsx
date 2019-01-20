@@ -1,4 +1,5 @@
 import * as React from 'react'
+import {simpleGlobalClientState} from '../SimpleGlobalClientState'
 
 interface IZoomProps {
 	children: React.ReactNode
@@ -15,10 +16,10 @@ interface IZoomState {
 const maxZoom = 10
 const minZoom = 0.1
 const scrollZoomMod = 0.001
-const mouseZoomMod = 0.0001
+const mouseZoomMod = 0.001
 const mousePanMod = 1
 const maxPan = 1000
-const foo = Math.max(scrollZoomMod.toString().length, mouseZoomMod.toString().length)
+export const zoomTextLength = Math.max(scrollZoomMod.toString().length, mouseZoomMod.toString().length)
 
 export class Zoom extends React.PureComponent<IZoomProps, IZoomState> {
 	public state = {
@@ -37,14 +38,12 @@ export class Zoom extends React.PureComponent<IZoomProps, IZoomState> {
 	public componentWillUnmount() {
 		window.removeEventListener('wheel', this._onMouseWheel)
 		window.removeEventListener('mousemove', this._onMouseMove)
+		simpleGlobalClientState.zoom = 1
 	}
 
 	public render() {
 		const {children} = this.props
 		const {zoom, pan} = this.state
-
-		const zoomTextElement = document.getElementById('zoomText')
-		if (zoomTextElement) zoomTextElement.innerText = zoom.toFixed(foo - 3).replace(/([^\.])0*$/, '$1')
 
 		return (
 			<div
@@ -70,6 +69,8 @@ export class Zoom extends React.PureComponent<IZoomProps, IZoomState> {
 	private _zoom = (zoom: number, round: boolean = false) => {
 		let newZoom = this._clampZoom(this.state.zoom - zoom)
 		if (round) newZoom = Math.round(newZoom * 10) / 10
+
+		simpleGlobalClientState.zoom = newZoom
 
 		this.setState({
 			zoom: newZoom,

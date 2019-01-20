@@ -67,55 +67,54 @@ export enum ConnectionNodeType {
 }
 
 export interface ConnectionNodeInfo {
-	[key: string]: {
-		stateSelector: IConnectableStateSelector,
-		width: number,
-		height: number,
-	}
+	stateSelector: IConnectableStateSelector,
+	width: number,
+	height: number,
 }
 
-export const ConnectionNodeInfo: ConnectionNodeInfo = {
-	[ConnectionNodeType.keyboard]: {
-		stateSelector: selectVirtualKeyboardById,
-		width: 456,
-		height: 88,
-	},
-	[ConnectionNodeType.gridSequencer]: {
-		stateSelector: selectGridSequencer,
-		width: GridSequencerState.defaultWidth,
-		height: GridSequencerState.defaultHeight,
-	},
-	[ConnectionNodeType.infiniteSequencer]: {
-		stateSelector: selectInfiniteSequencer,
-		width: InfiniteSequencerState.defaultWidth,
-		height: InfiniteSequencerState.defaultHeight,
-	},
-	[ConnectionNodeType.instrument]: {
-		stateSelector: selectBasicInstrument,
-		width: 416,
-		height: 56,
-	},
-	[ConnectionNodeType.sampler]: {
-		stateSelector: selectSampler,
-		width: 416,
-		height: 56,
-	},
-	[ConnectionNodeType.audioOutput]: {
-		stateSelector: () => ({
-			id: MASTER_AUDIO_OUTPUT_TARGET_ID,
-			color: CssColor.panelGray,
-		}),
-		width: 198.14,
-		height: 48,
-	},
-	[ConnectionNodeType.masterClock]: {
-		stateSelector: () => ({
-			id: MASTER_CLOCK_SOURCE_ID,
-			color: CssColor.panelGray,
-		}),
-		width: 134.813,
-		height: 72,
-	},
+export const getConnectionNodeInfo = (type: ConnectionNodeType): ConnectionNodeInfo => {
+	switch (type) {
+		case ConnectionNodeType.keyboard: return {
+			stateSelector: selectVirtualKeyboardById,
+			width: 456,
+			height: 88,
+		}
+		case ConnectionNodeType.gridSequencer: return {
+			stateSelector: selectGridSequencer,
+			width: GridSequencerState.defaultWidth,
+			height: GridSequencerState.defaultHeight,
+		}
+		case ConnectionNodeType.infiniteSequencer: return {
+			stateSelector: selectInfiniteSequencer,
+			width: InfiniteSequencerState.defaultWidth,
+			height: InfiniteSequencerState.defaultHeight,
+		}
+		case ConnectionNodeType.instrument: return {
+			stateSelector: selectBasicInstrument,
+			width: 416,
+			height: 56,
+		}
+		case ConnectionNodeType.sampler: return {
+			stateSelector: selectSampler,
+			width: 416,
+			height: 56,
+		}
+		case ConnectionNodeType.audioOutput: return {
+			stateSelector: () => ({id: MASTER_AUDIO_OUTPUT_TARGET_ID, color: CssColor.panelGray}),
+			width: 198.14,
+			height: 48,
+		}
+		case ConnectionNodeType.masterClock: return {
+			stateSelector: () => ({id: MASTER_CLOCK_SOURCE_ID, color: CssColor.panelGray}),
+			width: 134.813,
+			height: 72,
+		}
+		default: return {
+			stateSelector: () => ({id: 'oh no', color: 'black'}),
+			width: 0,
+			height: 0,
+		}
+	}
 }
 
 export interface IConnection {
@@ -229,17 +228,13 @@ export const getConnectionSourceColorByTargetId = (state: IClientRoomState, targ
 export const selectConnectionSourceColor = (roomState: IClientRoomState, id: string) => {
 	const connection = selectConnection(roomState, id)
 
-	if (!connection) return 'gray'
-
-	return ConnectionNodeInfo[connection.sourceType].stateSelector(roomState, connection.sourceId).color
+	return getConnectionNodeInfo(connection.sourceType).stateSelector(roomState, connection.sourceId).color
 }
 
 export const selectConnectionSourceIsActive = (roomState: IClientRoomState, id: string) => {
 	const connection = selectConnection(roomState, id)
 
-	if (!connection) return false
-
-	return ConnectionNodeInfo[connection.sourceType].stateSelector(roomState, connection.sourceId).isPlaying || false
+	return getConnectionNodeInfo(connection.sourceType).stateSelector(roomState, connection.sourceId).isPlaying || false
 }
 
 export const selectConnectionSourceIsSending = (roomState: IClientRoomState, id: string) => {

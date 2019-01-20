@@ -19,7 +19,7 @@ export const SimpleGraph: React.FC<ISimpleGraphReduxProps> =
 				position: 'fixed',
 				width: 0,
 				height: 0,
-				margin: '50%',
+				margin: '50vh 50vw',
 			}}
 		>
 			<Zoom>

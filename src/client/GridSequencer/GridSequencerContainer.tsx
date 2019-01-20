@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {IClientAppState} from '../../common/redux/common-redux-types'
-import {selectAllGridSequencers} from '../../common/redux/grid-sequencers-redux'
+import {selectGridSequencer} from '../../common/redux/grid-sequencers-redux'
 import {GridSequencer} from './GridSequencer'
 import './GridSequencer.less'
 
@@ -30,8 +30,7 @@ interface IConnectedGridSequencerContainerProps {
 }
 
 const mapStateToProps = (state: IClientAppState, props: IConnectedGridSequencerContainerProps) => {
-	const gridSequencer = selectAllGridSequencers(state.room)[props.id]
-	if (!gridSequencer) throw new Error('gridSequencer does not exist with id: ' + props.id)
+	const gridSequencer = selectGridSequencer(state.room, props.id)
 
 	return {
 		isPlaying: gridSequencer.isPlaying,

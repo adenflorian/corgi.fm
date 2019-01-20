@@ -3,7 +3,8 @@ import {AnyAction, Store} from 'redux'
 import {selectIsLocalClientReady, selectLocalClient, setClientPointer} from '../common/redux/clients-redux'
 import {localMidiKeyPress, localMidiKeyUp, localMidiOctaveChange} from '../common/redux/local-middleware'
 import {skipNote} from '../common/redux/sequencer-redux'
-import {getMainBoardsRectY} from './utils'
+import {simpleGlobalClientState} from './SimpleGlobalClientState'
+import {getMainBoardsRectX, getMainBoardsRectY} from './utils'
 
 type IKeyBoardShortcuts = Map<string, KeyBoardShortcut>
 
@@ -140,9 +141,10 @@ export function setupInputEventListeners(window: Window, store: Store, audioCont
 	})
 
 	function sendMouseUpdate(mouseX: number, mouseY: number, localClientId: string) {
-		const halfWidth = document.body.scrollWidth / 2
-		const distanceFromCenterX = mouseX - halfWidth + window.scrollX
-		const distanceFromBoardsTop = mouseY - getMainBoardsRectY()
+		const distanceFromCenterX = (mouseX - getMainBoardsRectX()) / simpleGlobalClientState.zoom
+
+		const distanceFromBoardsTop = (mouseY - getMainBoardsRectY()) / simpleGlobalClientState.zoom
+
 		store.dispatch(setClientPointer(localClientId, {
 			distanceFromCenterX,
 			distanceFromBoardsTop,

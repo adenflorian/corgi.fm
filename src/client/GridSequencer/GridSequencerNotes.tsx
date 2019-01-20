@@ -4,7 +4,7 @@ import {Dispatch} from 'redux'
 import {IClientAppState} from '../../common/redux/common-redux-types'
 import {selectGlobalClockState} from '../../common/redux/global-clock-redux'
 import {
-	GridSequencerFields, selectAllGridSequencers, setGridSequencerField, setGridSequencerNote,
+	GridSequencerFields, selectAllGridSequencers, selectGridSequencer, setGridSequencerField, setGridSequencerNote,
 } from '../../common/redux/grid-sequencers-redux'
 import {ISequencerEvent} from '../../common/redux/sequencer-redux'
 import {MAX_MIDI_NOTE_NUMBER_127, MIN_MIDI_NOTE_NUMBER_0} from '../../common/server-constants'
@@ -50,6 +50,7 @@ export const GridSequencerNotes = (props: IGridSequencerNotesAllProps) => {
 		<div className="events">
 			{events.map((event, eventIndex) => {
 				return <Event
+					key={eventIndex}
 					notes={event.notes}
 					eventIndex={eventIndex}
 					notesToShow={notesToShow}
@@ -148,7 +149,7 @@ class Note extends React.PureComponent<INoteProps> {
 }
 
 const mapStateToProps = (state: IClientAppState, props: IGridSequencerNotesProps): IGridSequencerNotesReduxProps => {
-	const gridSequencerState = selectAllGridSequencers(state.room)[props.id]
+	const gridSequencerState = selectGridSequencer(state.room, props.id)
 
 	return {
 		events: gridSequencerState.events,

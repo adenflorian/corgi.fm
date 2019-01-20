@@ -2,7 +2,7 @@ import {Map} from 'immutable'
 import {combineReducers, Reducer} from 'redux'
 import {createSelector} from 'reselect'
 import {IClientRoomState} from './common-redux-types'
-import {ConnectionNodeInfo, ConnectionNodeType} from './connections-redux'
+import {ConnectionNodeType, getConnectionNodeInfo} from './connections-redux'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
 
 export const ADD_POSITION = 'ADD_POSITION'
@@ -64,10 +64,10 @@ export class Position implements IPosition {
 		public readonly y = Math.random() * 1000 - 500,
 	) {
 		if (width === -1) {
-			this.width = ConnectionNodeInfo[targetType].width
+			this.width = getConnectionNodeInfo(targetType).width
 		}
 		if (height === -1) {
-			this.height = ConnectionNodeInfo[targetType].height
+			this.height = getConnectionNodeInfo(targetType).height
 		}
 	}
 }

@@ -110,6 +110,21 @@ export class GridSequencerState implements IGridSequencerState {
 	public static scrollBarWidth = 16
 	public static noteHeight = 8
 
+	public static dummy: IGridSequencerState = {
+		id: 'dummy',
+		events: [],
+		index: -1,
+		isPlaying: false,
+		color: 'gray',
+		name: 'dummy',
+		scrollY: 0,
+		notesToShow: 0,
+		isRecording: false,
+		previousEvents: [],
+		width: GridSequencerState.defaultWidth,
+		height: GridSequencerState.defaultHeight,
+	}
+
 	public readonly id: string = uuid.v4()
 	public readonly events: ISequencerEvent[]
 	public readonly index: number = -1
@@ -141,9 +156,9 @@ export class GridSequencerState implements IGridSequencerState {
 			(GridSequencerState.labelHeight * 2)
 	}
 
-	get maxScrollY() {return MAX_MIDI_NOTE_NUMBER_127 - this.notesToShow}
-	get lowestNote() {return findLowestNote(this.events)}
-	get highestNote() {return findHighestNote(this.events)}
+	private get maxScrollY() {return MAX_MIDI_NOTE_NUMBER_127 - this.notesToShow}
+	private get lowestNote() {return findLowestNote(this.events)}
+	private get highestNote() {return findHighestNote(this.events)}
 
 	private _calculateScrollY() {
 		const notesRange = this.highestNote - this.lowestNote
@@ -288,7 +303,8 @@ export const selectAllGridSequencerIds = createSelector(
 	gridSequencers => Object.keys(gridSequencers),
 )
 
-export const selectGridSequencer = (state: IClientRoomState, id: string) => selectAllGridSequencers(state)[id]
+export const selectGridSequencer = (state: IClientRoomState, id: string) =>
+	selectAllGridSequencers(state)[id] || GridSequencerState.dummy
 
 const emptyArray: number[] = []
 

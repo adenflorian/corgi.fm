@@ -1,7 +1,7 @@
 import * as animal from 'animal-id'
 import {createSelector} from 'reselect'
 import {v4} from 'uuid'
-import {getMainBoardsRectY} from '../../client/utils'
+import {getMainBoardsRectX, getMainBoardsRectY} from '../../client/utils'
 import {ClientId} from '../common-types'
 import {logger} from '../logger'
 import {getColorHslByString} from '../shamu-color'
@@ -259,12 +259,11 @@ export const selectAllOtherClientIds = createDeepEqualSelector(
 	(localClientId, allClientIds) =>
 		allClientIds.filter(x => x !== 'server' && x !== localClientId),
 )
-
 export const selectClientPointerInfo = createSelector(
 	[selectClientById],
 	client => ({
 		x: client.pointer.distanceFromCenterX
-			+ (document.body.scrollWidth / 2) - (size / 2) - window.scrollX,
+			+ getMainBoardsRectX() - (size / 2),
 		y: client.pointer.distanceFromBoardsTop
 			+ getMainBoardsRectY() - (size / 2),
 		color: client.color,

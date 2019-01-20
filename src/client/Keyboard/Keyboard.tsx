@@ -65,6 +65,8 @@ interface IKeyboardState {
 	wasMouseClickedOnKeyboard: boolean
 }
 
+const maxUsernameDisplayLength = 24
+
 export class Keyboard extends React.PureComponent<IKeyboardAllProps, IKeyboardState> {
 	public state = {
 		wasMouseClickedOnKeyboard: false,
@@ -90,8 +92,6 @@ export class Keyboard extends React.PureComponent<IKeyboardAllProps, IKeyboardSt
 		const {ownerName, pressedMidiKeys, octave, color, isPlaying,
 			virtualMidiKeyboard, isLocal, showNoteNames} = this.props
 
-		const maxUsernameDisplayLength = 24
-
 		const isOwnerNameTooLong = ownerName.length > maxUsernameDisplayLength
 
 		const ownerNameDisplay = isOwnerNameTooLong ? ownerName.substring(0, maxUsernameDisplayLength) + '...' : ownerName
@@ -100,7 +100,7 @@ export class Keyboard extends React.PureComponent<IKeyboardAllProps, IKeyboardSt
 			<Panel
 				color={color}
 				className={`keyboard ${isLocal ? 'isLocal' : ''}  ${isPlaying ? 'isPlaying' : 'isNotPlaying'}`}
-				label={ownerNameDisplay || '""'}
+				label={ownerNameDisplay}
 				labelTitle={isOwnerNameTooLong ? ownerName.toUpperCase() : ''}
 				id={this.props.id}
 				saturate={isPlaying}

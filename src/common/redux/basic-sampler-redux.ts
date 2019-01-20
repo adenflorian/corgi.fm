@@ -55,6 +55,16 @@ export interface IBasicSamplerState extends IConnectable {
 }
 
 export class BasicSamplerState implements IBasicSamplerState {
+	public static dummy: IBasicSamplerState = {
+		id: 'dummy',
+		ownerId: 'dummyOwner',
+		pan: 0,
+		lowPassFilterCutoffFrequency: 0,
+		attack: 0,
+		release: 0,
+		color: 'gray',
+	}
+
 	public id = uuid.v4()
 	public ownerId: string
 	public pan: number = Math.random() - 0.5
@@ -100,4 +110,5 @@ export const selectAllSamplersAsArray =
 export const selectSamplersByOwner = (state: IClientRoomState, ownerId: ClientId) =>
 	selectAllSamplersAsArray(state).filter(x => x.ownerId === ownerId)
 
-export const selectSampler = (state: IClientRoomState, id: string) => selectAllSamplers(state)[id]
+export const selectSampler = (state: IClientRoomState, id: string) =>
+	selectAllSamplers(state)[id] || BasicSamplerState.dummy

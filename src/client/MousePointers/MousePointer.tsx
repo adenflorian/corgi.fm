@@ -28,6 +28,7 @@ export const MousePointer: React.FunctionComponent<MousePointerAllProps> =
 				width: 16,
 				height: 16,
 				zIndex: 10,
+				pointerEvents: 'none',
 			}}
 		>
 			<svg

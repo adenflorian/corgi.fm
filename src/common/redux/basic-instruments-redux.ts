@@ -3,7 +3,7 @@ import {createSelector} from 'reselect'
 import * as uuid from 'uuid'
 import {ClientId} from '../common-types'
 import {pickRandomArrayElement} from '../common-utils'
-import {ShamuOscillatorType} from '../OscillatorTypes'
+import {BuiltInOscillatorType, ShamuOscillatorType} from '../OscillatorTypes'
 import {CssColor} from '../shamu-color'
 import {IClientRoomState} from './common-redux-types'
 import {IConnectable} from './connections-redux'
@@ -74,6 +74,17 @@ export interface IBasicInstrumentState extends IConnectable {
 }
 
 export class BasicInstrumentState implements IBasicInstrumentState {
+	public static dummy: IBasicInstrumentState = {
+		oscillatorType: BuiltInOscillatorType.sine,
+		id: 'dummy',
+		ownerId: 'dummyOwner',
+		pan: 0,
+		lowPassFilterCutoffFrequency: 0,
+		attack: 0,
+		release: 0,
+		color: 'gray',
+	}
+
 	public oscillatorType: ShamuOscillatorType
 		= pickRandomArrayElement(['sine', 'sawtooth', 'square', 'triangle']) as ShamuOscillatorType
 	public id = uuid.v4()
@@ -130,4 +141,5 @@ export const selectAllBasicInstrumentIds = createSelector(
 export const selectBasicInstrumentsByOwner = (state: IClientRoomState, ownerId: ClientId) =>
 	selectAllBasicInstrumentsAsArray(state).filter(x => x.ownerId === ownerId)
 
-export const selectBasicInstrument = (state: IClientRoomState, id: string) => selectAllBasicInstruments(state)[id]
+export const selectBasicInstrument = (state: IClientRoomState, id: string) =>
+	selectAllBasicInstruments(state)[id] || BasicInstrumentState.dummy
