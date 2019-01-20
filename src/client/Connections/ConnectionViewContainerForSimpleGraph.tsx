@@ -1,5 +1,6 @@
 import * as React from 'react'
-import {makeConnectionPositionsSelector, selectConnection} from '../../common/redux/connections-redux'
+import {selectConnection} from '../../common/redux/connections-redux'
+import {makeConnectionPositionsSelector} from '../../common/redux/positions-redux'
 import {shamuConnect} from '../../common/redux/redux-utils'
 import {ConnectionView} from './ConnectionView'
 import {

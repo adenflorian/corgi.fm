@@ -2,7 +2,7 @@ import {Map} from 'immutable'
 import {combineReducers, Reducer} from 'redux'
 import {createSelector} from 'reselect'
 import {IClientRoomState} from './common-redux-types'
-import {ConnectionNodeType, getConnectionNodeInfo} from './connections-redux'
+import {ConnectionNodeType, getConnectionNodeInfo, IConnection} from './connections-redux'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
 
 export const ADD_POSITION = 'ADD_POSITION'
@@ -109,4 +109,38 @@ export const selectAllPositionIds = createSelector(
 export const selectPositionsWithIds = (state: IClientRoomState, ids: string[]) => {
 	return selectAllPositionsAsArray(state)
 		.filter(x => ids.includes(x.id))
+}
+
+const defaultPosition: IPosition = {
+	id: 'uh oh',
+	targetType: ConnectionNodeType.dummy,
+	x: 0,
+	y: 0,
+	width: 0,
+	height: 0,
+}
+
+const selectConnectionSourcePosition =
+	(state: IClientRoomState, connection: IConnection) => selectPosition(state, connection.sourceId)
+
+const selectConnectionTargetPosition =
+	(state: IClientRoomState, connection: IConnection) => selectPosition(state, connection.targetId)
+
+export const makeConnectionPositionsSelector = () => createSelector(
+	selectConnectionSourcePosition,
+	selectConnectionTargetPosition,
+	makePositionsObject,
+)
+
+function makePositionsObject(sourcePosition = defaultPosition, targetPosition = defaultPosition) {
+	return {
+		sourcePosition: {
+			x: sourcePosition.x + sourcePosition.width,
+			y: sourcePosition.y + (sourcePosition.height / 2),
+		},
+		targetPosition: {
+			x: targetPosition.x,
+			y: targetPosition.y + (targetPosition.height / 2),
+		},
+	}
 }

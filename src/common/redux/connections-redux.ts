@@ -11,7 +11,6 @@ import {GridSequencerState, selectGridSequencer, selectGridSequencerActiveNotes}
 import {
 	InfiniteSequencerState, selectInfiniteSequencer, selectInfiniteSequencerActiveNotes,
 } from './infinite-sequencers-redux'
-import {IPosition, selectPosition} from './positions-redux'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
 import {IVirtualKeyboardState, makeGetKeyboardMidiOutput, selectVirtualKeyboardById} from './virtual-keyboard-redux'
 
@@ -101,7 +100,7 @@ export const getConnectionNodeInfo = (type: ConnectionNodeType): ConnectionNodeI
 		}
 		case ConnectionNodeType.audioOutput: return {
 			stateSelector: () => ({id: MASTER_AUDIO_OUTPUT_TARGET_ID, color: CssColor.panelGray}),
-			width: 198.14,
+			width: 140.48,
 			height: 48,
 		}
 		case ConnectionNodeType.masterClock: return {
@@ -277,39 +276,5 @@ export function sortConnection(connA: IConnection, connB: IConnection) {
 				: 1
 	} else {
 		return connA.id > connB.id ? -1 : 1
-	}
-}
-
-const defaultPosition: IPosition = {
-	id: 'uh oh',
-	targetType: ConnectionNodeType.dummy,
-	x: 0,
-	y: 0,
-	width: 0,
-	height: 0,
-}
-
-const selectConnectionSourcePosition =
-	(state: IClientRoomState, connection: IConnection) => selectPosition(state, connection.sourceId)
-
-const selectConnectionTargetPosition =
-	(state: IClientRoomState, connection: IConnection) => selectPosition(state, connection.targetId)
-
-export const makeConnectionPositionsSelector = () => createSelector(
-	selectConnectionSourcePosition,
-	selectConnectionTargetPosition,
-	makePositionsObject,
-)
-
-function makePositionsObject(sourcePosition = defaultPosition, targetPosition = defaultPosition) {
-	return {
-		sourcePosition: {
-			x: sourcePosition.x + sourcePosition.width,
-			y: sourcePosition.y + (sourcePosition.height / 2),
-		},
-		targetPosition: {
-			x: targetPosition.x,
-			y: targetPosition.y + (targetPosition.height / 2),
-		},
 	}
 }

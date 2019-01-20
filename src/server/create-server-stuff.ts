@@ -81,12 +81,12 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 
 	const connectionsToMasterAudioOutput = selectConnectionsWithTargetIds(roomState, [MASTER_AUDIO_OUTPUT_TARGET_ID])
 
-	const rightMost = 600
-	const topMost = -600
-	const xSpacing = 700
-	const ySpacing = 256
-
 	const newPositions = originalPositions.withMutations(mutablePositions => {
+		const rightMost = 600
+		const topMost = -600
+		const xSpacing = 700
+		const ySpacing = 256
+
 		mutablePositions.update(MASTER_AUDIO_OUTPUT_TARGET_ID,
 			x => ({...x, x: rightMost, y: 0}),
 		)
@@ -101,7 +101,23 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 		connectionsToMasterAudioOutput.forEach(foo(1, 0))
 	})
 
-	serverStore.dispatch(createRoomAction(updatePositions(newPositions), room))
+	{
+		let leftMost = 0
+		let rightMost = 0
+
+		newPositions.forEach(x => {
+			if (x.x < leftMost) leftMost = x.x
+			if (x.x + x.width > rightMost) rightMost = x.x + x.width
+		})
+
+		const adjustX = -(leftMost + rightMost) / 2
+		// console.log('leftMost: ', leftMost)
+		// console.log('rightMost: ', rightMost)
+		// console.log('adjustX: ', adjustX)
+		const adjustedPosition = newPositions.map(x => ({...x, x: x.x + adjustX}))
+
+		serverStore.dispatch(createRoomAction(updatePositions(adjustedPosition), room))
+	}
 
 	interface CreateSourceAndTargetArgs {
 		source: CreateSourceArgs
