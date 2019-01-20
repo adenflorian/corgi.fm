@@ -34,10 +34,6 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 		return (
 			// @ts-ignore: https://github.com/mzabriskie/react-draggable/issues/381
 			<Draggable
-				// defaultPosition={{
-				// 	x,
-				// 	y,
-				// }}
 				// onStart={this._handleStart}
 				onDrag={this._handleDrag}
 				// onStop={this._handleStop}
@@ -46,6 +42,12 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 					y,
 				}}
 				scale={simpleGlobalClientState.zoom}
+				bounds={{
+					top: -2000,
+					right: 2000,
+					bottom: 2000,
+					left: -2000,
+				}}
 			>
 				<div
 					className="simpleGraphNode"
