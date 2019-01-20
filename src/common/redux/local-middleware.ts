@@ -4,13 +4,14 @@ import {logger} from '../logger'
 import {addBasicInstrument, BasicInstrumentState} from './basic-instruments-redux'
 import {addBasicSampler, BasicSamplerState} from './basic-sampler-redux'
 import {selectLocalClient} from './clients-redux'
+import {READY} from './common-actions'
 import {IClientAppState} from './common-redux-types'
 import {
 	addConnection, Connection, ConnectionNodeType, deleteAllConnections,
 	MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID,
 } from './connections-redux'
 import {deleteAllThings, MultiThingType} from './multi-reducer'
-import {addPosition, deleteAllPositions, Position} from './positions-redux'
+import {addPosition, deleteAllPositions, Position, selectPositionExtremes} from './positions-redux'
 import {makeActionCreator} from './redux-utils'
 import {selectActiveRoom, SET_ACTIVE_ROOM} from './rooms-redux'
 import {
@@ -57,7 +58,9 @@ export const localMiddleware: Middleware<{}, IClientAppState> = ({dispatch, getS
 		}
 		case SET_ACTIVE_ROOM: {
 			window.history.pushState({}, document.title, '/' + selectActiveRoom(getState()))
-			deleteAllTheThings(dispatch)
+			return deleteAllTheThings(dispatch)
+		}
+		case READY: {
 			return createLocalStuff(dispatch, getState())
 		}
 	}
@@ -79,14 +82,19 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 		return
 	}
 
+	const extremes = selectPositionExtremes(state.room)
+
 	const newVirtualKeyboard = new VirtualKeyboardState(localClient.id, localClient.color)
 	dispatch(addVirtualKeyboard(newVirtualKeyboard))
-	dispatch(addPosition(new Position(newVirtualKeyboard.id, ConnectionNodeType.keyboard)))
+	dispatch(addPosition(new Position(
+		newVirtualKeyboard.id, ConnectionNodeType.keyboard, -1, -1, extremes.leftMost, extremes.bottomMost)))
+
+	const nextPosition = [-1, -1, extremes.leftMost + 600, extremes.bottomMost]
 
 	if (localClient.name.toLowerCase() === '$sampler') {
 		const newSampler = new BasicSamplerState(localClient.id)
 		dispatch(addBasicSampler(newSampler))
-		dispatch(addPosition(new Position(newSampler.id, ConnectionNodeType.sampler)))
+		dispatch(addPosition(new Position(newSampler.id, ConnectionNodeType.sampler, ...nextPosition)))
 
 		// Source to target
 		dispatch(addConnection(new Connection(
@@ -114,7 +122,7 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 	} else {
 		const newInstrument = new BasicInstrumentState(localClient.id)
 		dispatch(addBasicInstrument(newInstrument))
-		dispatch(addPosition(new Position(newInstrument.id, ConnectionNodeType.instrument)))
+		dispatch(addPosition(new Position(newInstrument.id, ConnectionNodeType.instrument, ...nextPosition)))
 
 		// Source to target
 		dispatch(addConnection(new Connection(

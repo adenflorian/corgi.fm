@@ -15,6 +15,7 @@ import {
 	addClient, clientDisconnected, ClientState, maxUsernameLength,
 	selectAllClients, selectClientBySocketId, setClients,
 } from '../common/redux/clients-redux'
+import {ready} from '../common/redux/common-actions'
 import {IClientRoomState} from '../common/redux/common-redux-types'
 import {IServerState} from '../common/redux/configure-server-store'
 import {
@@ -300,6 +301,12 @@ function syncState(newSocket: Socket, roomState: IClientRoomState, serverState: 
 			alreadyBroadcasted: true,
 			source: server,
 		})
+	})
+
+	newSocket.emit(WebSocketEvent.broadcast, {
+		...ready(),
+		alreadyBroadcasted: true,
+		source: server,
 	})
 }
 

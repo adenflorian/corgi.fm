@@ -18,3 +18,9 @@ export const stopAll = () => ({
 	BROADCASTER_ACTION,
 	SERVER_ACTION,
 })
+
+export const READY = 'READY'
+export type ReadyAction = ReturnType<typeof ready>
+export const ready = () => ({
+	type: READY as typeof READY,
+})
