@@ -10,6 +10,7 @@ import {ConnectedInfiniteSequencer} from '../InfiniteSequencer/InfiniteSequencer
 import {ConnectedBasicInstrumentView} from '../Instruments/BasicInstrumentView'
 import {ConnectedKeyboard} from '../Keyboard/Keyboard'
 import {ConnectedMasterControls} from '../MasterControls'
+import {simpleGlobalClientState} from '../SimpleGlobalClientState'
 import {ConnectedVolumeControl} from '../Volume/VolumeControl'
 
 interface ISimpleGraphNodeProps {
@@ -31,6 +32,7 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 		const {x, y, width, height, positionId, targetType} = this.props
 
 		return (
+			// @ts-ignore: https://github.com/mzabriskie/react-draggable/issues/381
 			<Draggable
 				// defaultPosition={{
 				// 	x,
@@ -43,6 +45,7 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 					x,
 					y,
 				}}
+				scale={simpleGlobalClientState.zoom}
 			>
 				<div
 					className="simpleGraphNode"
