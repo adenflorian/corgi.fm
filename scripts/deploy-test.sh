@@ -17,6 +17,6 @@ echo 'nvm' | ssh ${SSH_USER_TEST}@${SSH_HOST_TEST} '
     mkdir shamu;
     tar -xzvf shamu.tar.gz --directory shamu;
     cd shamu/built;
-    yarn;
+    yarn --prod;
     yarn start-prod;
 '
