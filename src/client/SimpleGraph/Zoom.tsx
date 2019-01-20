@@ -19,7 +19,7 @@ const scrollZoomMod = 0.001
 const mouseZoomMod = 0.001
 const mousePanMod = 1
 const maxPan = 1000
-export const zoomTextLength = Math.max(scrollZoomMod.toString().length, mouseZoomMod.toString().length)
+// const zoomTextLength = Math.max(scrollZoomMod.toString().length, mouseZoomMod.toString().length)
 
 export class Zoom extends React.PureComponent<IZoomProps, IZoomState> {
 	public state = {
@@ -49,7 +49,7 @@ export class Zoom extends React.PureComponent<IZoomProps, IZoomState> {
 			<div
 				className="zoom"
 				style={{
-					transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
+					transform: `scale(${zoom}) translate(${pan.x}px, ${pan.y}px)`,
 					willChange: 'transform',
 				}}
 			>
@@ -87,8 +87,8 @@ export class Zoom extends React.PureComponent<IZoomProps, IZoomState> {
 	private _pan = (e: MouseEvent) => {
 		this.setState({
 			pan: {
-				x: this._clampPan(this.state.pan.x + (e.movementX * mousePanMod)),
-				y: this._clampPan(this.state.pan.y + (e.movementY * mousePanMod)),
+				x: this._clampPan(this.state.pan.x + (e.movementX * mousePanMod / this.state.zoom)),
+				y: this._clampPan(this.state.pan.y + (e.movementY * mousePanMod / this.state.zoom)),
 			},
 		})
 	}
