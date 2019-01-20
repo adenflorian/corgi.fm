@@ -8,7 +8,7 @@
     "watch-parcel": "parcel src/client/index.html",
     "watch-server": "ts-node-dev --notify false --inspect --project src/server/tsconfig.json src/server/server.ts",
     "start-prod": "NODE_ENV=production pm2 start server/server.js",
-    "start-prod-docker": "NODE_ENV=production pm2-runtime server/server.js",
+    "start-prod-docker": "NODE_ENV=production pm2-runtime built/server/server.js",
     "lint": "eslint . && tslint src/client/**/*.ts* --project src/client/tsconfig.json && tslint src/server/**/*.ts* --project src/server/tsconfig.json ",
     "test": "yarn test-client && yarn test-server && yarn test-common",
     "test-client": "cross-env TS_NODE_PROJECT=\"src/client/tsconfig.json\" mocha --opts src/client/mocha.opts",

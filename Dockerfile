@@ -7,11 +7,12 @@ WORKDIR /usr/src/app
 COPY package.json ./
 COPY yarn.lock ./
 
-RUN yarn --prod
-RUN yarn global add pm2
+RUN yarn
 
 # Bundle app source
-COPY built .
+COPY . .
+
+RUN yarn build
 
 EXPOSE 3000
 
