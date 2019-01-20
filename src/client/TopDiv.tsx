@@ -18,6 +18,7 @@ export const TopDiv = ({memberCount, clientCount, info}: ITopDivProps) =>
 		<div className="left">
 			<div style={{margin: 8}}>{info}</div>
 			<div id="fps" style={{margin: 8}}>FPS</div>
+			<div style={{margin: 8}}>zoom: <span id="zoomText"></span></div>
 			<div style={{margin: 8}}>{memberCount} Room Member{memberCount > 1 ? 's' : ''}</div>
 			<div style={{margin: 8}}>{clientCount} Total User{clientCount > 1 ? 's' : ''}</div>
 		</div>
