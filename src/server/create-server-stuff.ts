@@ -12,7 +12,7 @@ import {
 	addInfiniteSequencer, InfiniteSequencerState, InfiniteSequencerStyle,
 } from '../common/redux/infinite-sequencers-redux'
 import {
-	addPosition, Position, selectAllPositions, updatePositions,
+	addPosition, calculateExtremes, Position, selectAllPositions, updatePositions,
 } from '../common/redux/positions-redux'
 import {createRoomAction} from '../common/redux/room-stores-redux'
 import {createSequencerEvents} from '../common/redux/sequencer-redux'
@@ -100,26 +100,11 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 	})
 
 	{
-		let leftMost = 0
-		let rightMost = 0
-		let topMost = 0
-		let bottomMost = 0
-
-		newPositions.forEach(x => {
-			if (x.x < leftMost) leftMost = x.x
-			if (x.x + x.width > rightMost) rightMost = x.x + x.width
-			if (x.y < topMost) topMost = x.y
-			if (x.y + x.height > bottomMost) bottomMost = x.y + x.height
-		})
+		const {leftMost, rightMost, topMost, bottomMost} = calculateExtremes(newPositions)
 
 		const adjustX = -(leftMost + rightMost) / 2
 		const adjustY = -(topMost + bottomMost) / 2
-		// console.log('leftMost: ', leftMost)
-		// console.log('rightMost: ', rightMost)
-		// console.log('adjustX: ', adjustX)
-		// console.log('topMost: ', topMost)
-		// console.log('bottomMost: ', bottomMost)
-		// console.log('adjustY: ', adjustY)
+
 		const adjustedPosition = newPositions.map(x => ({...x, x: x.x + adjustX, y: x.y + adjustY}))
 
 		serverStore.dispatch(createRoomAction(updatePositions(adjustedPosition), room))

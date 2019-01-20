@@ -25,7 +25,7 @@ export const SimpleGraph: React.FC<ISimpleGraphReduxProps> =
 			<Zoom>
 				<div id={mainBoardsId} className="boards">
 					<ConnectedConnections usage={ConnectionsUsage.simpleGraph} />
-					<p style={{height: 0}}>hello world, this is graph</p>
+					<p style={{height: 0}}>+</p>
 					{positionIds.map(positionId =>
 						<ConnectedSimpleGraphNode key={positionId} positionId={positionId} />,
 					)}

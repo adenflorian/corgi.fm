@@ -1,4 +1,4 @@
-import {Map} from 'immutable'
+import {Map, Record} from 'immutable'
 import {combineReducers, Reducer} from 'redux'
 import {createSelector} from 'reselect'
 import {IClientRoomState} from './common-redux-types'
@@ -143,4 +143,30 @@ function makePositionsObject(sourcePosition = defaultPosition, targetPosition = 
 			y: targetPosition.y + (targetPosition.height / 2),
 		},
 	}
+}
+
+export const selectPositionExtremes = createSelector(
+	selectAllPositions,
+	calculateExtremes,
+)
+
+export function calculateExtremes(positions: IPositions) {
+	let leftMost = 0
+	let rightMost = 0
+	let topMost = 0
+	let bottomMost = 0
+
+	positions.forEach(x => {
+		if (x.x < leftMost) leftMost = x.x
+		if (x.x + x.width > rightMost) rightMost = x.x + x.width
+		if (x.y < topMost) topMost = x.y
+		if (x.y + x.height > bottomMost) bottomMost = x.y + x.height
+	})
+
+	return Object.freeze({
+		leftMost,
+		rightMost,
+		topMost,
+		bottomMost,
+	})
 }
