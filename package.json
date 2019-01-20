@@ -86,7 +86,7 @@
     "eslint": "^4.19.1",
     "less": "^3.0.4",
     "mocha": "^5.2.0",
-    "parcel-bundler": "^1.8.1",
+    "parcel-bundler": "^1.11.0",
     "pm2": "^2.10.4",
     "sinon": "^7.2.2",
     "ts-node": "^6.1.0",
