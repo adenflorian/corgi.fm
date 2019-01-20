@@ -82,18 +82,16 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 	const connectionsToMasterAudioOutput = selectConnectionsWithTargetIds(roomState, [MASTER_AUDIO_OUTPUT_TARGET_ID])
 
 	const newPositions = originalPositions.withMutations(mutablePositions => {
-		const rightMost = 600
-		const topMost = -600
 		const xSpacing = 700
 		const ySpacing = 256
 
 		mutablePositions.update(MASTER_AUDIO_OUTPUT_TARGET_ID,
-			x => ({...x, x: rightMost, y: 0}),
+			x => ({...x, x: 0, y: 0}),
 		)
 
 		const foo = (x: number, prevY: number) => (connection: IConnection, i: number) => {
 			mutablePositions.update(connection.sourceId,
-				z => ({...z, x: rightMost - (xSpacing * x), y: topMost + (i * ySpacing) + (prevY * ySpacing)}),
+				z => ({...z, x: -xSpacing * x, y: (i * ySpacing) + (prevY * ySpacing)}),
 			)
 			selectConnectionsWithTargetIds(roomState, [connection.sourceId]).forEach(foo(x + 1, i))
 		}
@@ -104,17 +102,25 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 	{
 		let leftMost = 0
 		let rightMost = 0
+		let topMost = 0
+		let bottomMost = 0
 
 		newPositions.forEach(x => {
 			if (x.x < leftMost) leftMost = x.x
 			if (x.x + x.width > rightMost) rightMost = x.x + x.width
+			if (x.y < topMost) topMost = x.y
+			if (x.y + x.height > bottomMost) bottomMost = x.y + x.height
 		})
 
 		const adjustX = -(leftMost + rightMost) / 2
+		const adjustY = -(topMost + bottomMost) / 2
 		// console.log('leftMost: ', leftMost)
 		// console.log('rightMost: ', rightMost)
 		// console.log('adjustX: ', adjustX)
-		const adjustedPosition = newPositions.map(x => ({...x, x: x.x + adjustX}))
+		// console.log('topMost: ', topMost)
+		// console.log('bottomMost: ', bottomMost)
+		// console.log('adjustY: ', adjustY)
+		const adjustedPosition = newPositions.map(x => ({...x, x: x.x + adjustX, y: x.y + adjustY}))
 
 		serverStore.dispatch(createRoomAction(updatePositions(adjustedPosition), room))
 	}
