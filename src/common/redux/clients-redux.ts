@@ -259,15 +259,17 @@ export const selectAllOtherClientIds = createDeepEqualSelector(
 	(localClientId, allClientIds) =>
 		allClientIds.filter(x => x !== 'server' && x !== localClientId),
 )
+
 export const selectClientPointerInfo = createSelector(
 	[selectClientById],
 	client => ({
-		x: client.pointer.distanceFromCenterX
-			+ getMainBoardsRectX() - (size / 2),
-		y: client.pointer.distanceFromBoardsTop
-			+ getMainBoardsRectY() - (size / 2),
+		x: client.pointer.distanceFromCenterX,
+		y: client.pointer.distanceFromBoardsTop,
 		color: client.color,
 		name: client.name,
 		id: client.id,
+		mainBoardsRectX: getMainBoardsRectX(),
+		mainBoardsRectY: getMainBoardsRectY(),
+		size,
 	}),
 )

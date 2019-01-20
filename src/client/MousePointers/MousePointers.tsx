@@ -1,11 +1,12 @@
+import {List} from 'immutable'
 import * as React from 'react'
 import {connect} from 'react-redux'
-import {selectAllOtherClientIds} from '../../common/redux/clients-redux'
 import {IClientAppState} from '../../common/redux/common-redux-types'
+import {selectAllOtherRoomMemberIds} from '../../common/redux/room-members-redux'
 import {ConnectedMousePointer} from './MousePointer'
 
 interface IMousePointersViewProps {
-	clientIds: string[]
+	clientIds: List<string>
 }
 
 export const MousePointers: React.FunctionComponent<IMousePointersViewProps> =
@@ -23,7 +24,7 @@ export const MousePointers: React.FunctionComponent<IMousePointersViewProps> =
 
 const mapStateToProps = (state: IClientAppState): IMousePointersViewProps => {
 	return {
-		clientIds: selectAllOtherClientIds(state),
+		clientIds: selectAllOtherRoomMemberIds(state),
 	}
 }
 

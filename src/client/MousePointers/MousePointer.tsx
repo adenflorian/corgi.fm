@@ -3,6 +3,7 @@ import {connect} from 'react-redux'
 import {selectClientPointerInfo} from '../../common/redux/clients-redux'
 import {IClientAppState} from '../../common/redux/common-redux-types'
 import {CssColor} from '../../common/shamu-color'
+import {simpleGlobalClientState} from '../SimpleGlobalClientState'
 
 interface MousePointerProps {
 	clientId: string
@@ -62,6 +63,12 @@ export const MousePointer: React.FunctionComponent<MousePointerAllProps> =
 
 export const ConnectedMousePointer = connect(
 	(state: IClientAppState, props: MousePointerProps): MousePointerReduxProps => {
-		return selectClientPointerInfo(state, props.clientId)
+		const {x, y, mainBoardsRectX, mainBoardsRectY, size, ...rest} = selectClientPointerInfo(state, props.clientId)
+
+		return {
+			...rest,
+			x: (x * simpleGlobalClientState.zoom) + mainBoardsRectX - (size / 2),
+			y: (y * simpleGlobalClientState.zoom) + mainBoardsRectY - (size / 2),
+		}
 	},
 )(MousePointer)

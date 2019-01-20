@@ -1,11 +1,12 @@
 import {List} from 'immutable'
+import {createSelector} from 'reselect'
 import {ClientId} from '../common-types'
+import {selectLocalClientId} from './clients-redux'
 import {IClientRoomState} from './common-redux-types'
 import {createReducer} from './redux-utils'
 
 export interface IRoomMembersState {
-	ids: IRoomMembersIds,
-	// owner: ClientId
+	ids: IRoomMembersIds
 }
 
 export type IRoomMembersIds = List<ClientId>
@@ -53,5 +54,12 @@ export const roomMembersReducer = createReducer(initialState, {
 export const selectRoomMemberState = (state: IClientRoomState): IRoomMembersState => state.members
 
 export const selectAllRoomMemberIds = (state: IClientRoomState): IRoomMembersIds => selectRoomMemberState(state).ids
+
+export const selectAllOtherRoomMemberIds = createSelector(
+	selectLocalClientId,
+	state => selectAllRoomMemberIds(state.room),
+	(localClientId, allClientIds) =>
+		allClientIds.filter(x => x !== 'server' && x !== localClientId),
+)
 
 export const selectMemberCount = (state: IClientRoomState): number => selectAllRoomMemberIds(state).count()
