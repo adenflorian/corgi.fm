@@ -113,7 +113,7 @@ export const mapStateToProps =
 		const sourceColor = connection && selectConnectionSourceColor(state.room, connection.id)
 		const isSourceActive = connection && selectConnectionSourceIsActive(state.room, connection.id)
 		const isSourceSending = connection && selectConnectionSourceIsSending(state.room, connection.id)
-		// console.log('DDDDDDDDDDDD')
+
 		return {
 			sourceId: connection.sourceId,
 			targetId: connection.targetId,

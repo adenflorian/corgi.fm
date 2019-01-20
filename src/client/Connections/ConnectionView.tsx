@@ -1,6 +1,5 @@
 import * as React from 'react'
 import {
-	// colorFunc,
 	saturateColor,
 } from '../../common/shamu-color'
 import './ConnectionView.less'
@@ -37,6 +36,9 @@ class LineState {
 	public readonly topMost = () => Math.min(this.y1, this.y2)
 }
 
+const longLineStrokeWidth = 2
+const connectorStrokeWidth = 8
+
 export class ConnectionView extends React.PureComponent<IConnectionViewProps> {
 	public static defaultProps = {
 		connectorWidth: 16,
@@ -45,9 +47,6 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps> {
 
 	public render() {
 		const {color, saturateSource, saturateTarget, id} = this.props
-
-		const longLineStrokeWidth = 2
-		const connectorStrokeWidth = 8
 
 		const line = new LineState(
 			this.props.sourceX + this.props.connectorWidth,

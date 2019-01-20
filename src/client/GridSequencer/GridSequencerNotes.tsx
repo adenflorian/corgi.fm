@@ -13,7 +13,9 @@ import {isWhiteKey} from '../Keyboard/Keyboard'
 import {VerticalScrollBar} from '../Knob/VerticalScrollBar'
 import {isLeftMouseButtonDown} from '../utils'
 
-type gridSequencerEventHandler = (index: number, isEnabled: boolean, i2: number, e: React.MouseEvent) => void
+type GridSequencerEventHandler = (index: number, isEnabled: boolean, i2: number, e: React.MouseEvent) => void
+
+type MouseEventHandler = (e: React.MouseEvent) => void
 
 interface IGridSequencerNotesProps {
 	id: string
@@ -27,9 +29,9 @@ interface IGridSequencerNotesReduxProps {
 }
 
 interface IGridSequencerNotesDispatchProps {
-	handleNoteClicked: gridSequencerEventHandler
-	handleMouseEnter: gridSequencerEventHandler
-	handleMouseDown: gridSequencerEventHandler
+	handleNoteClicked: GridSequencerEventHandler
+	handleMouseEnter: GridSequencerEventHandler
+	handleMouseDown: GridSequencerEventHandler
 	handleScrollChange: (newValue: number) => void
 }
 
@@ -46,32 +48,17 @@ export const GridSequencerNotes = (props: IGridSequencerNotesAllProps) => {
 
 	return (
 		<div className="events">
-			{events.map((event, index) => {
-				const isActiveIndex = activeIndex === index
-				return (
-					<div
-						key={index}
-						className={`event ${isActiveIndex ? 'active' : 'transitionAllColor'}`}
-					>
-						{Array.apply(0, new Array(notesToShow)).map((_, i2) => {
-							i2 += bottomNote
-							const isEnabled = event.notes.some(x => x === i2)
-							return (
-								<div
-									key={i2}
-									className={`note ${isEnabled ? 'on' : ''} ${isWhiteKey(i2) ? 'white' : 'black'}`}
-									onClick={e => handleNoteClicked(index, isEnabled, i2, e)}
-									onMouseEnter={e => handleMouseEnter(index, isEnabled, i2, e)}
-									onMouseDown={e => handleMouseDown(index, isEnabled, i2, e)}
-									style={{
-										backgroundColor: isEnabled ? getColorStringForMidiNote(i2) : undefined,
-										color: getColorStringForMidiNote(i2),
-									}}
-								/>
-							)
-						})}
-					</div>
-				)
+			{events.map((event, eventIndex) => {
+				return <Event
+					notes={event.notes}
+					eventIndex={eventIndex}
+					notesToShow={notesToShow}
+					bottomNote={bottomNote}
+					isActive={activeIndex === eventIndex}
+					handleNoteClicked={handleNoteClicked}
+					handleMouseEnter={handleMouseEnter}
+					handleMouseDown={handleMouseDown}
+				/>
 			})}
 			<VerticalScrollBar
 				min={MIN_MIDI_NOTE_NUMBER_0}
@@ -83,6 +70,81 @@ export const GridSequencerNotes = (props: IGridSequencerNotesAllProps) => {
 			/>
 		</div>
 	)
+}
+
+interface IEventProps {
+	notes: number[]
+	eventIndex: number
+	notesToShow: number
+	bottomNote: number
+	isActive: boolean
+	handleNoteClicked: GridSequencerEventHandler
+	handleMouseEnter: GridSequencerEventHandler
+	handleMouseDown: GridSequencerEventHandler
+}
+
+class Event extends React.PureComponent<IEventProps> {
+	public render() {
+		const {eventIndex, notesToShow, isActive} = this.props
+
+		const placeholderNotesArray = Array.apply(0, new Array(notesToShow))
+
+		return <div
+			key={eventIndex}
+			className={`event ${isActive ? 'active' : 'transitionAllColor'}`}
+		>
+			{placeholderNotesArray.map(this._renderNote)}
+		</div>
+	}
+
+	private _renderNote = (_: any, i: number) => {
+		const note = i + this.props.bottomNote
+		const isEnabled = this.props.notes.includes(note)
+		return <Note
+			key={note}
+			note={note}
+			eventIndex={this.props.eventIndex}
+			isEnabled={isEnabled}
+			onClick={this.props.handleNoteClicked}
+			onMouseEnter={this.props.handleMouseEnter}
+			onMouseDown={this.props.handleMouseDown}
+		/>
+	}
+}
+
+interface INoteProps {
+	note: number,
+	eventIndex: number,
+	isEnabled: boolean,
+	onClick: GridSequencerEventHandler,
+	onMouseEnter: GridSequencerEventHandler,
+	onMouseDown: GridSequencerEventHandler
+}
+
+class Note extends React.PureComponent<INoteProps> {
+	public render() {
+		const {note, isEnabled} = this.props
+
+		return <div
+			className={`note ${isEnabled ? 'on' : ''} ${isWhiteKey(note) ? 'white' : 'black'}`}
+			onClick={this._onClick}
+			onMouseEnter={this._onMouseEnter}
+			onMouseDown={this._onMouseDown}
+			style={{
+				backgroundColor: isEnabled ? getColorStringForMidiNote(note) : undefined,
+				color: getColorStringForMidiNote(note),
+			}}
+		/>
+	}
+
+	private _onClick: MouseEventHandler =
+		e => this.props.onClick(this.props.eventIndex, this.props.isEnabled, this.props.note, e)
+
+	private _onMouseEnter: MouseEventHandler =
+		e => this.props.onMouseEnter(this.props.eventIndex, this.props.isEnabled, this.props.note, e)
+
+	private _onMouseDown: MouseEventHandler =
+		e => this.props.onMouseDown(this.props.eventIndex, this.props.isEnabled, this.props.note, e)
 }
 
 const mapStateToProps = (state: IClientAppState, props: IGridSequencerNotesProps): IGridSequencerNotesReduxProps => {

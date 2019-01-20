@@ -73,6 +73,9 @@
 - [ ] look into making an audio node that is a sequencer
 - [ ] keep track of what object is selected and route keyboard commands like ctrl + z to the selected object
 - [ ] resolve // TODOs
+- [ ] show different stuff at different zoom levels
+	- at small zoom show small music intrument parts
+	- at big zoom level show big music things
 
 # Shared Cursors
 - [ ] make shared cursor not block pointer events
