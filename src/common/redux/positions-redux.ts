@@ -1,4 +1,4 @@
-import {Map, Record} from 'immutable'
+import {Map} from 'immutable'
 import {combineReducers, Reducer} from 'redux'
 import {createSelector} from 'reselect'
 import {IClientRoomState} from './common-redux-types'
@@ -34,6 +34,16 @@ export type UpdatePositionsAction = ReturnType<typeof updatePositions>
 export const updatePositions = (positions: IPositions) => ({
 	type: UPDATE_POSITIONS as typeof UPDATE_POSITIONS,
 	positions,
+	BROADCASTER_ACTION,
+})
+
+export const UPDATE_POSITION = 'UPDATE_POSITION'
+export type UpdatePositionAction = ReturnType<typeof updatePosition>
+export const updatePosition = (id: string, position: Partial<IPosition>) => ({
+	type: UPDATE_POSITION as typeof UPDATE_POSITION,
+	id,
+	position,
+	SERVER_ACTION,
 	BROADCASTER_ACTION,
 })
 
@@ -73,7 +83,7 @@ export class Position implements IPosition {
 }
 
 export type IPositionAction = AddPositionAction | DeletePositionsAction
-	| DeleteAllPositionsAction | UpdatePositionsAction
+	| DeleteAllPositionsAction | UpdatePositionsAction | UpdatePositionAction
 
 const positionsSpecificReducer: Reducer<IPositions, IPositionAction> =
 	(positions = Positions(), action) => {
@@ -82,6 +92,7 @@ const positionsSpecificReducer: Reducer<IPositions, IPositionAction> =
 			case DELETE_POSITIONS: return positions.deleteAll(action.positionIds)
 			case DELETE_ALL_POSITIONS: return positions.clear()
 			case UPDATE_POSITIONS: return positions.merge(action.positions)
+			case UPDATE_POSITION: return positions.update(action.id, x => ({...x, ...action.position}))
 			default: return positions
 		}
 	}

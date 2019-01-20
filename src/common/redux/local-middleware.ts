@@ -84,12 +84,16 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 
 	const extremes = selectPositionExtremes(state.room)
 
+	const x = 700
+	const y = 40
+	const labelHeight = 16
+
 	const newVirtualKeyboard = new VirtualKeyboardState(localClient.id, localClient.color)
 	dispatch(addVirtualKeyboard(newVirtualKeyboard))
 	dispatch(addPosition(new Position(
-		newVirtualKeyboard.id, ConnectionNodeType.keyboard, -1, -1, extremes.leftMost, extremes.bottomMost)))
+		newVirtualKeyboard.id, ConnectionNodeType.keyboard, -1, -1, extremes.leftMost + x, extremes.bottomMost + y)))
 
-	const nextPosition = [-1, -1, extremes.leftMost + 600, extremes.bottomMost]
+	const nextPosition = [-1, -1, extremes.leftMost + (x * 2), extremes.bottomMost + y + labelHeight]
 
 	if (localClient.name.toLowerCase() === '$sampler') {
 		const newSampler = new BasicSamplerState(localClient.id)
