@@ -1,0 +1,8 @@
+.cache
+dist
+node_modules
+samples
+scripts
+npm-debug.log
+secrets.sh
+yarn-error.log

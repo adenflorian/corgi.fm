@@ -8,6 +8,7 @@
     "watch-parcel": "parcel src/client/index.html",
     "watch-server": "ts-node-dev --notify false --inspect --project src/server/tsconfig.json src/server/server.ts",
     "start-prod": "NODE_ENV=production pm2 start server/server.js",
+    "start-prod-docker": "NODE_ENV=production pm2-runtime server/server.js",
     "lint": "eslint . && tslint src/client/**/*.ts* --project src/client/tsconfig.json && tslint src/server/**/*.ts* --project src/server/tsconfig.json ",
     "test": "yarn test-client && yarn test-server && yarn test-common",
     "test-client": "cross-env TS_NODE_PROJECT=\"src/client/tsconfig.json\" mocha --opts src/client/mocha.opts",
@@ -22,6 +23,8 @@
     "build-client": "parcel build src/client/index.html src/client/newsletter.html --out-dir built/public --no-source-maps",
     "build-server": "tsc --project src/server/tsconfig.json --outDir built",
     "build-other": "cp package.json yarn.lock built && cp src/public/* built/public",
+    "build-docker": "docker build -t shamu .",
+    "start-docker": "yarn build-docker && docker run -p 3000:3000 shamu",
     "setup-test-server": "bash scripts/setup-test-server.sh",
     "setup-prod-server": "bash scripts/setup-prod-server.sh"
   },
