@@ -1,9 +1,11 @@
 import * as React from 'react'
 import Draggable, {DraggableEventHandler} from 'react-draggable'
+import {IoMdMenu} from 'react-icons/io'
 import {Dispatch} from 'redux'
 import {ConnectionNodeType} from '../../common/redux/connections-redux'
 import {selectPosition, updatePosition} from '../../common/redux/positions-redux'
 import {shamuConnect} from '../../common/redux/redux-utils'
+import {CssColor} from '../../common/shamu-color'
 import {ConnectedBasicSampler} from '../BasicSampler/BasicSampler'
 import {ConnectedGridSequencerContainer} from '../GridSequencer/GridSequencerContainer'
 import {ConnectedInfiniteSequencer} from '../InfiniteSequencer/InfiniteSequencer'
@@ -27,6 +29,8 @@ interface ISimpleGraphNodeReduxProps {
 
 type ISimpleGraphNodeAllProps = ISimpleGraphNodeProps & ISimpleGraphNodeReduxProps & {dispatch: Dispatch}
 
+const handleClassName = 'handle'
+
 export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProps> {
 	public render() {
 		const {x, y, width, height, positionId, targetType} = this.props
@@ -48,7 +52,7 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 					bottom: 2000,
 					left: -2000,
 				}}
-				handle=".handle"
+				handle={`.${handleClassName}`}
 			>
 				<div
 					className="simpleGraphNode"
@@ -60,18 +64,10 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 						height,
 					}}
 				>
-					{/* <div
-						className="handle"
-						style={{
-							width: 50,
-							height: 50,
-							backgroundColor: 'white',
-							position: 'absolute',
-						}}
-					></div> */}
+					<Handle />
 					{getComponentByNodeType(targetType, positionId)}
 				</div>
-			</Draggable>
+			</Draggable >
 		)
 	}
 
@@ -85,6 +81,26 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 	// private _handleStop: DraggableEventHandler = (e, data) =>
 	// 	console.log('_handleStop: ', data)
 }
+
+const handleSize = 24
+const borderRadius = 4
+
+const Handle = () =>
+	<div
+		className={handleClassName}
+		style={{
+			width: handleSize,
+			// height: handleSize,
+			backgroundColor: CssColor.panelGray,
+			position: 'absolute',
+			bottom: '100%',
+			left: 8,
+			borderTopLeftRadius: borderRadius,
+			borderTopRightRadius: borderRadius,
+		}}
+	>
+		<IoMdMenu />
+	</div>
 
 export function getComponentByNodeType(type: ConnectionNodeType, id: string) {
 	switch (type) {
