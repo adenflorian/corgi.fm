@@ -76,7 +76,7 @@ export const getConnectionNodeInfo = (type: ConnectionNodeType): ConnectionNodeI
 		case ConnectionNodeType.keyboard: return {
 			stateSelector: selectVirtualKeyboardById,
 			width: 456,
-			height: 88,
+			height: 56,
 		}
 		case ConnectionNodeType.gridSequencer: return {
 			stateSelector: selectGridSequencer,

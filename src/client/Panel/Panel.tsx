@@ -17,25 +17,38 @@ export const Panel: React.FunctionComponent<IPanelProps> =
 
 		const renderLabel = label !== undefined && label !== ''
 
+		const margin = 16
+		const labelHeight = 20
+
 		return (
-			<React.Fragment>
-				<div
-					style={{color}}
-					className={`${saturate ? 'saturate' : ''}`}
-				>
-					{renderLabel &&
-						<div className="label colorize transitionAllColor" title={labelTitle}>
-							{label}
-						</div>
-					}
+			<div
+				style={{
+					color,
+					position: 'relative',
+					marginTop: margin + labelHeight,
+				}}
+				className={`panelContainer ${saturate ? 'saturate' : ''}`}
+			>
+				{renderLabel &&
 					<div
-						id={id}
-						className={`panel ${className} ${renderLabel ? 'renderLabel' : ''}`}
+						className="label colorize transitionAllColor"
+						title={labelTitle}
+						style={{
+							position: 'absolute',
+							top: -labelHeight,
+							width: '100%',
+						}}
 					>
-						<div className="isometricBoxShadow" />
-						{children}
+						{label}
 					</div>
+				}
+				<div
+					id={id}
+					className={`panel ${className} ${renderLabel ? 'renderLabel' : ''}`}
+				>
+					<div className="isometricBoxShadow" />
+					{children}
 				</div>
-			</React.Fragment>
+			</div>
 		)
 	}
