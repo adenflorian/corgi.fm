@@ -48,6 +48,7 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 					bottom: 2000,
 					left: -2000,
 				}}
+				handle=".handle"
 			>
 				<div
 					className="simpleGraphNode"
@@ -59,6 +60,15 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 						height,
 					}}
 				>
+					{/* <div
+						className="handle"
+						style={{
+							width: 50,
+							height: 50,
+							backgroundColor: 'white',
+							position: 'absolute',
+						}}
+					></div> */}
 					{getComponentByNodeType(targetType, positionId)}
 				</div>
 			</Draggable>

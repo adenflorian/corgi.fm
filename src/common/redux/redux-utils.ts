@@ -1,5 +1,9 @@
 import {isEqual} from 'lodash'
-import {connect, DispatchProp, InferableComponentEnhancerWithProps, MapStateToPropsParam} from 'react-redux'
+import {
+	connect, DispatchProp, InferableComponentEnhancer,
+	InferableComponentEnhancerWithProps, MapDispatchToPropsNonObject,
+	MapDispatchToPropsParam, MapStateToPropsParam, MergeProps, Options, ResolveThunks,
+} from 'react-redux'
 import {Action} from 'redux'
 import {createSelectorCreator, defaultMemoize} from 'reselect'
 import {IClientAppState} from './common-redux-types'
@@ -52,8 +56,104 @@ export const createDeepEqualSelector = createSelectorCreator(
 	isEqual,
 )
 
-type shamuConnect2 = <TStateProps = {}, no_dispatch = {}, TOwnProps = {}, State = IClientAppState>(
-	mapStateToProps: MapStateToPropsParam<TStateProps, TOwnProps, State>,
-) => InferableComponentEnhancerWithProps<TStateProps & DispatchProp, TOwnProps>
+interface ShamuConnect2 {
+	(): InferableComponentEnhancer<DispatchProp>
 
-export const shamuConnect = connect as shamuConnect2
+	<TStateProps = {}, no_dispatch = {}, TOwnProps = {}, State = IClientAppState>(
+		mapStateToProps: MapStateToPropsParam<TStateProps, TOwnProps, State>,
+	): InferableComponentEnhancerWithProps<TStateProps & DispatchProp, TOwnProps>
+
+	<no_state = {}, TDispatchProps = {}, TOwnProps = {}>(
+		mapStateToProps: null | undefined,
+		mapDispatchToProps: MapDispatchToPropsNonObject<TDispatchProps, TOwnProps>,
+	): InferableComponentEnhancerWithProps<TDispatchProps, TOwnProps>
+
+	<no_state = {}, TDispatchProps = {}, TOwnProps = {}>(
+		mapStateToProps: null | undefined,
+		mapDispatchToProps: TDispatchProps,
+	): InferableComponentEnhancerWithProps<
+		ResolveThunks<TDispatchProps>,
+		TOwnProps
+	>
+
+	<TStateProps = {}, TDispatchProps = {}, TOwnProps = {}, State = IClientAppState>(
+		mapStateToProps: MapStateToPropsParam<TStateProps, TOwnProps, State>,
+		mapDispatchToProps: MapDispatchToPropsNonObject<TDispatchProps, TOwnProps>,
+	): InferableComponentEnhancerWithProps<TStateProps & TDispatchProps, TOwnProps>
+
+	<TStateProps = {}, TDispatchProps = {}, TOwnProps = {}, State = IClientAppState>(
+		mapStateToProps: MapStateToPropsParam<TStateProps, TOwnProps, State>,
+		mapDispatchToProps: TDispatchProps,
+	): InferableComponentEnhancerWithProps<
+		TStateProps & ResolveThunks<TDispatchProps>,
+		TOwnProps
+	>
+
+	<TStateProps = {}, no_dispatch = {}, TOwnProps = {}, TMergedProps = {}, State = IClientAppState>(
+		mapStateToProps: MapStateToPropsParam<TStateProps, TOwnProps, State>,
+		mapDispatchToProps: null | undefined,
+		mergeProps: MergeProps<TStateProps, undefined, TOwnProps, TMergedProps>,
+	): InferableComponentEnhancerWithProps<TMergedProps, TOwnProps>
+
+	<no_state = {}, TDispatchProps = {}, TOwnProps = {}, TMergedProps = {}>(
+		mapStateToProps: null | undefined,
+		mapDispatchToProps: MapDispatchToPropsParam<TDispatchProps, TOwnProps>,
+		mergeProps: MergeProps<undefined, TDispatchProps, TOwnProps, TMergedProps>,
+	): InferableComponentEnhancerWithProps<TMergedProps, TOwnProps>
+
+	<no_state = {}, no_dispatch = {}, TOwnProps = {}, TMergedProps = {}>(
+		mapStateToProps: null | undefined,
+		mapDispatchToProps: null | undefined,
+		mergeProps: MergeProps<undefined, undefined, TOwnProps, TMergedProps>,
+	): InferableComponentEnhancerWithProps<TMergedProps, TOwnProps>
+
+	<TStateProps = {}, TDispatchProps = {}, TOwnProps = {}, TMergedProps = {}, State = IClientAppState>(
+		mapStateToProps: MapStateToPropsParam<TStateProps, TOwnProps, State>,
+		mapDispatchToProps: MapDispatchToPropsParam<TDispatchProps, TOwnProps>,
+		mergeProps: MergeProps<TStateProps, TDispatchProps, TOwnProps, TMergedProps>,
+		options?: Options<State, TStateProps, TOwnProps, TMergedProps>,
+	): InferableComponentEnhancerWithProps<TMergedProps, TOwnProps>
+
+	<TStateProps = {}, no_dispatch = {}, TOwnProps = {}, State = IClientAppState>(
+		mapStateToProps: MapStateToPropsParam<TStateProps, TOwnProps, State>,
+		mapDispatchToProps: null | undefined,
+		mergeProps: null | undefined,
+		options: Options<State, TStateProps, TOwnProps>,
+	): InferableComponentEnhancerWithProps<DispatchProp & TStateProps, TOwnProps>
+
+	<TStateProps = {}, TDispatchProps = {}, TOwnProps = {}>(
+		mapStateToProps: null | undefined,
+		mapDispatchToProps: MapDispatchToPropsNonObject<TDispatchProps, TOwnProps>,
+		mergeProps: null | undefined,
+		options: Options<{}, TStateProps, TOwnProps>,
+	): InferableComponentEnhancerWithProps<TDispatchProps, TOwnProps>
+
+	<TStateProps = {}, TDispatchProps = {}, TOwnProps = {}>(
+		mapStateToProps: null | undefined,
+		mapDispatchToProps: TDispatchProps,
+		mergeProps: null | undefined,
+		options: Options<{}, TStateProps, TOwnProps>,
+	): InferableComponentEnhancerWithProps<
+		ResolveThunks<TDispatchProps>,
+		TOwnProps
+	>
+
+	<TStateProps = {}, TDispatchProps = {}, TOwnProps = {}, State = IClientAppState>(
+		mapStateToProps: MapStateToPropsParam<TStateProps, TOwnProps, State>,
+		mapDispatchToProps: MapDispatchToPropsNonObject<TDispatchProps, TOwnProps>,
+		mergeProps: null | undefined,
+		options: Options<State, TStateProps, TOwnProps>,
+	): InferableComponentEnhancerWithProps<TStateProps & TDispatchProps, TOwnProps>
+
+	<TStateProps = {}, TDispatchProps = {}, TOwnProps = {}, State = IClientAppState>(
+		mapStateToProps: MapStateToPropsParam<TStateProps, TOwnProps, State>,
+		mapDispatchToProps: TDispatchProps,
+		mergeProps: null | undefined,
+		options: Options<State, TStateProps, TOwnProps>,
+	): InferableComponentEnhancerWithProps<
+		TStateProps & ResolveThunks<TDispatchProps>,
+		TOwnProps
+	>
+}
+
+export const shamuConnect = connect as ShamuConnect2

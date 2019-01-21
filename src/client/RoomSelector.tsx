@@ -1,68 +1,45 @@
 import {List} from 'immutable'
 import * as React from 'react'
 import {Component} from 'react'
-import {connect} from 'react-redux'
-import {Dispatch} from 'redux'
-import {logger} from '../common/logger'
-import {IClientAppState} from '../common/redux/common-redux-types'
-import {changeRoom, requestCreateRoom, selectActiveRoom, selectAllRoomNames} from '../common/redux/rooms-redux'
-import {Button} from './Button/Button'
+import {shamuConnect} from '../common/redux/redux-utils'
+import {changeRoom, selectActiveRoom, selectAllRoomNames} from '../common/redux/rooms-redux'
 import {Select} from './Select/Select'
 
-interface IRoomSelectorProps {
+interface IRoomSelectorReduxProps {
 	activeRoom: string
 	rooms: List<string>
 }
 
-export class RoomSelector extends Component<IRoomSelectorProps & {dispatch: Dispatch}> {
-	public static defaultProps = {
-		rooms: List<string>(),
-		activeRoom: '',
-	}
+interface IRoomSelectorDispatchProps {
+	changeRoom: typeof changeRoom
+}
 
-	public render() {
-		const {activeRoom, rooms} = this.props
+type IRoomSelectorAllProps = IRoomSelectorReduxProps & IRoomSelectorDispatchProps
 
-		return (
-			<div
-				id="roomSelector"
-				style={{
-					display: 'flex',
-					flexDirection: 'column',
-					alignItems: 'flex-end',
-				}}
-			>
-				<Select
-					label="Room"
-					name="roomSelect"
-					onChange={this.onRoomSelect}
-					options={rooms}
-					value={activeRoom}
-				/>
-				<Button
-					buttonProps={{id: 'newRoomButton', onClick: this.onNewRoomButtonClick}}
-				>
-					New Room
-				</Button>
-			</div>
-		)
-	}
+export class RoomSelector extends Component<IRoomSelectorAllProps> {
+	public readonly render = () =>
+		<Select
+			label="Room"
+			name="roomSelect"
+			onChange={this.onRoomSelect}
+			options={this.props.rooms}
+			value={this.props.activeRoom}
+		/>
 
 	private readonly onRoomSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
 		const newRoom = e.target.value
 
 		if (newRoom !== this.props.activeRoom) {
-			this.props.dispatch(changeRoom(newRoom))
+			this.props.changeRoom(newRoom)
 		}
-	}
-
-	private readonly onNewRoomButtonClick = () => {
-		logger.log('new room')
-		this.props.dispatch(requestCreateRoom())
 	}
 }
 
-export const ConnectedRoomSelector = connect((state: IClientAppState): IRoomSelectorProps => ({
-	activeRoom: selectActiveRoom(state),
-	rooms: selectAllRoomNames(state),
-}))(RoomSelector)
+export const ConnectedRoomSelector = shamuConnect(
+	(state): IRoomSelectorReduxProps => ({
+		activeRoom: selectActiveRoom(state),
+		rooms: selectAllRoomNames(state),
+	}), {
+		changeRoom,
+	} as IRoomSelectorDispatchProps,
+)(RoomSelector)

@@ -25,7 +25,7 @@ export const Panel: React.FunctionComponent<IPanelProps> =
 				style={{
 					color,
 					position: 'relative',
-					marginTop: margin + labelHeight,
+					// marginTop: margin + labelHeight,
 				}}
 				className={`panelContainer ${saturate ? 'saturate' : ''}`}
 			>
