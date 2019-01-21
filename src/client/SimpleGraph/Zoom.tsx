@@ -1,4 +1,5 @@
 import * as React from 'react'
+import PlusSVG from '../OtherSVG/plus.svg'
 import {simpleGlobalClientState} from '../SimpleGlobalClientState'
 
 interface IZoomProps {
@@ -20,6 +21,8 @@ const mouseZoomMod = 0.001
 const mousePanMod = 1
 const maxPan = 1000
 // const zoomTextLength = Math.max(scrollZoomMod.toString().length, mouseZoomMod.toString().length)
+
+const bgSize = 10000
 
 export class Zoom extends React.PureComponent<IZoomProps, IZoomState> {
 	public state = {
@@ -46,15 +49,28 @@ export class Zoom extends React.PureComponent<IZoomProps, IZoomState> {
 		const {zoom, pan} = this.state
 
 		return (
-			<div
-				className="zoom"
-				style={{
-					transform: `scale(${zoom}) translate(${pan.x}px, ${pan.y}px)`,
-					willChange: 'transform',
-				}}
-			>
-				{children}
-			</div>
+			<React.Fragment>
+				<div
+					className="zoom"
+					style={{
+						transform: `scale(${zoom}) translate(${pan.x}px, ${pan.y}px)`,
+						willChange: 'transform',
+					}}
+				>
+					<div
+						className="zoomBackground"
+						style={{
+							position: 'fixed',
+							width: `${bgSize}vw`,
+							height: `${bgSize}vh`,
+							top: `-${bgSize / 2}vh`,
+							left: `-${bgSize / 2}vw`,
+							backgroundImage: `url(${PlusSVG})`,
+						}}
+					/>
+					{children}
+				</div>
+			</React.Fragment>
 		)
 	}
 

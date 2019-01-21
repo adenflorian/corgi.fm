@@ -5,22 +5,20 @@
 }
 
 #chat {
-    position: fixed;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    .spacing();
-    z-index: 0;
-    .padding();
-    background-color: @overlayGray;
-    overflow: hidden;
-    word-wrap: break-word;
-    height: 50%;
+    // position: fixed;
+    // display: flex;
+    // flex-direction: column;
+    // justify-content: flex-end;
+    // .spacing();
+    // z-index: 0;
+    // .padding();
+    // background-color: @overlayGray;
+    // overflow: hidden;
+    // word-wrap: break-word;
+    // height: 50%;
 
     &.focused {
-        z-index: 1;
         user-select: text;
-        height: 100%;
     }
 
     .author {
@@ -29,11 +27,23 @@
     }
 
     #chatMessages {
+        position: fixed;
         padding: 0 8px 0 8px;
         opacity: 0.5;
+        height: 50%;
+        .spacing();
+        left: 2px;
+        bottom: 42px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        z-index: -2;
+        overflow: hidden;
 
         .focused& {
             opacity: 1;
+            z-index: 15;
+            height: 100%;
         }
     
         li {
@@ -65,11 +75,15 @@
     }
 
     .chatBottom {
-        z-index: 3;
+        position: fixed;
+        z-index: 15;
+        bottom: 2px;
+        left: 2px;
+        width: 100%;
 
-        &:hover {
-            z-index: 4;
-        }
+        // &:hover {
+        //     z-index: 4;
+        // }
 
         .inputWrapper {
             display: flex;
@@ -118,6 +132,19 @@
         }
     }
 
+    .chatOverlay {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        background-color: @overlayGray;
+        display: none;
+    }
+
+    &.focused .chatOverlay {
+        z-index: 10;
+        display: block;
+    }
+
     .spacing() {
         bottom: 0px;
         // top: 0px;
@@ -127,17 +154,19 @@
 
     .chatGradient {
         position: fixed;
-        width: inherit;
-        height: inherit;
+        width: 100%;
+        height: 50%;
         .spacing();
         .padding();
         pointer-events: none;
-        z-index: 2;
+        z-index: -1;
+        bottom: 42px;
     }
 
-    &.focused #chatVerticalGradient,
-    &.focused #chatHorizontalGradient {
+    &.focused .chatGradient {
         background: none;
+        z-index: 1;
+        height: 100%;
     }
 
     #chatVerticalGradient {
@@ -149,7 +178,6 @@
     }
 
     #chatHorizontalGradient {
-        z-index: 4;
         background: linear-gradient(
             to left,
             @appBackground, 

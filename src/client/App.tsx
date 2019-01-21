@@ -5,7 +5,6 @@ import {selectIsLocalClientReady} from '../common/redux/clients-redux'
 import {IClientAppState} from '../common/redux/common-redux-types'
 import './App.less'
 import './css-reset.css'
-import {InfiniteSequencer} from './InfiniteSequencer/InfiniteSequencer'
 import {isLocalDevClient} from './is-prod-client'
 import {ConnectedOnlineApp} from './OnlineApp'
 import {Options} from './Options/Options'
@@ -28,7 +27,17 @@ class App extends React.Component<IAppProps, {}> {
 		if (isLocalClientReady) {
 			return <ConnectedOnlineApp />
 		} else {
-			return 'connecting...'
+			return <div
+				style={{
+					display: 'flex',
+					justifyContent: 'center',
+					alignItems: 'center',
+					height: '100%',
+					fontSize: '2em',
+				}}
+			>
+				connecting...
+			</div>
 		}
 	}
 }

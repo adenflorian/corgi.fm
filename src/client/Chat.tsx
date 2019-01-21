@@ -68,6 +68,9 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 					id="chatHorizontalGradient"
 					className="chatGradient"
 				/>
+				<div
+					className="chatOverlay"
+				/>
 
 				<ConnectedChatMessages />
 

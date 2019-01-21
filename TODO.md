@@ -76,6 +76,10 @@
 - [ ] show different stuff at different zoom levels
 	- at small zoom show small music intrument parts
 	- at big zoom level show big music things
+- [ ] make webgl visualization bg that reacts to that music
+- [ ] use discord for chat somehow?
+- [ ] make instruments that run around the screen
+	- nyan cat
 
 # Shared Cursors
 - [ ] make shared cursor not block pointer events

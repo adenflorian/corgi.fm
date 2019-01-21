@@ -31,7 +31,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 		source: {
 			type: ConnectionNodeType.gridSequencer,
 			events: getBassNotes(),
-			name: 'bass',
+			name: 'Bass',
 			notesToShow: 12,
 		},
 		target: {
@@ -43,7 +43,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 		source: {
 			type: ConnectionNodeType.gridSequencer,
 			events: getMelodyNotes(),
-			name: 'melody',
+			name: 'Melody',
 			notesToShow: 24,
 		},
 		target: {
@@ -55,7 +55,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 		source: {
 			type: ConnectionNodeType.infiniteSequencer,
 			events: getInitialInfiniteSequencerEvents(),
-			name: 'arp',
+			name: 'Arp',
 			infinityStyle: InfiniteSequencerStyle.colorGrid,
 		},
 		target: {
@@ -67,7 +67,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 		source: {
 			type: ConnectionNodeType.infiniteSequencer,
 			events: getInitialInfiniteSequencerEvents(),
-			name: 'arp2',
+			name: 'Arp 2',
 			infinityStyle: InfiniteSequencerStyle.colorBars,
 		},
 		target: {

@@ -97,6 +97,7 @@ const Handle = () =>
 			left: 8,
 			borderTopLeftRadius: borderRadius,
 			borderTopRightRadius: borderRadius,
+			boxShadow: 'inset 0px -6px 8px -5px #000000c2',
 		}}
 	>
 		<IoMdMenu />
