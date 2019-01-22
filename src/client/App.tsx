@@ -36,7 +36,7 @@ class App extends React.Component<IAppProps, {}> {
 					fontSize: '2em',
 				}}
 			>
-				connecting...
+				Connecting...
 			</div>
 		}
 	}

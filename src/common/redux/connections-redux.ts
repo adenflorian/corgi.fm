@@ -99,12 +99,12 @@ export const getConnectionNodeInfo = (type: ConnectionNodeType): ConnectionNodeI
 			height: 56,
 		}
 		case ConnectionNodeType.audioOutput: return {
-			stateSelector: () => ({id: MASTER_AUDIO_OUTPUT_TARGET_ID, color: CssColor.panelGray}),
+			stateSelector: () => ({id: MASTER_AUDIO_OUTPUT_TARGET_ID, color: CssColor.green}),
 			width: 140.48,
 			height: 48,
 		}
 		case ConnectionNodeType.masterClock: return {
-			stateSelector: () => ({id: MASTER_CLOCK_SOURCE_ID, color: CssColor.panelGray}),
+			stateSelector: () => ({id: MASTER_CLOCK_SOURCE_ID, color: CssColor.blue}),
 			width: 134.813,
 			height: 72,
 		}

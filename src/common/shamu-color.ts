@@ -47,6 +47,8 @@ export enum CssColor {
 	brightPurple = 'rgb(199, 79, 226)',
 	blue = 'rgb(64, 87, 191)',
 	brightBlue = 'rgb(79, 106, 226)',
+	yellow = '#ccd65c',
+	brightYellow = '#ddeb47',
 	darkTextShadow = 'rgb(20, 20, 22)',
 	appBackground = '#121621',
 	overlayGray = 'rgba(20, 20, 24, 0.6)',
