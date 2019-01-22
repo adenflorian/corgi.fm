@@ -1,4 +1,5 @@
 @import "./colors.less";
+@import "./AppCommon.less";
 
 body {
     background-color: @appBackground;
@@ -18,7 +19,7 @@ body {
     // text-transform: lowercase;
     text-align: center;
     letter-spacing: 2px;
-    text-shadow: -1px 1px 1px rgb(24, 24, 24);
+    .textShadow()
 }
 
 * {
@@ -207,7 +208,7 @@ a {
 }
 
 svg {
-    filter: drop-shadow(-1px 1px 1px #181818);
+    filter: drop-shadow(@shadow);
 }
 
 .disabled {
