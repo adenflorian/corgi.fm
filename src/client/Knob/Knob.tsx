@@ -13,6 +13,7 @@ interface IKnobProps {
 	onChangeId?: any
 	readOnly: boolean
 	value: number
+	size: number
 }
 
 export class Knob extends React.PureComponent<IKnobProps> {
@@ -24,10 +25,11 @@ export class Knob extends React.PureComponent<IKnobProps> {
 		min: 0,
 		onChange: () => undefined,
 		readOnly: false,
+		size: 32,
 	}
 
 	public render() {
-		const {value, label, readOnly, markColor, min, max, curve} = this.props
+		const {value, label, readOnly, markColor, min, max, curve, size} = this.props
 
 		return (
 			<SliderController min={min} max={max} curve={curve} onChange={this._handleOnChange} value={value}>
@@ -39,6 +41,7 @@ export class Knob extends React.PureComponent<IKnobProps> {
 						readOnly={readOnly}
 						markColor={markColor}
 						handleMouseDown={handleMouseDown}
+						size={size}
 					/>
 				}
 			</SliderController>

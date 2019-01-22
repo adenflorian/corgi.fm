@@ -9,16 +9,23 @@ interface IKnobViewProps {
 	readOnly?: boolean
 	markColor?: string
 	handleMouseDown: (e: React.MouseEvent) => any
+	size: number
 }
 
-export const KnobView = (props: IKnobViewProps) => {
+export const KnobView: React.FC<IKnobViewProps> = props => {
 	const {handleMouseDown, percentage, adjustedPercentage, label, readOnly = false, markColor = 'gray'} = props
 
 	return (
 		<div
 			className={`knob ${readOnly ? 'readOnly' : ''}`}
 		>
-			<div className="actualKnobContainer">
+			<div
+				className="actualKnobContainer"
+				style={{
+					width: props.size,
+					height: props.size,
+				}}
+			>
 				<svg className="arc colorize" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"
 					style={{
 						position: 'absolute',
@@ -49,6 +56,10 @@ export const KnobView = (props: IKnobViewProps) => {
 			<div className="label unselectable">{label}</div>
 		</div>
 	)
+}
+
+KnobView.defaultProps = {
+	size: 32,
 }
 
 function _getRotation(normalizedInput: number): number {

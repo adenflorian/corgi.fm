@@ -1,21 +1,23 @@
 import 'rc-slider/assets/index.css'
-import {Component} from 'react'
 import React = require('react')
+import {Component} from 'react'
 import {connect} from 'react-redux'
 import {Action, Dispatch} from 'redux'
 import {IClientAppState} from '../../common/redux/common-redux-types'
-import {MASTER_AUDIO_OUTPUT_TARGET_ID} from '../../common/redux/connections-redux'
+import {
+	ConnectionNodeType, getConnectionNodeInfo, MASTER_AUDIO_OUTPUT_TARGET_ID,
+} from '../../common/redux/connections-redux'
 import {setOptionMasterVolume} from '../../common/redux/options-redux'
 import {colorFunc} from '../../common/shamu-color'
 import {Knob} from '../Knob/Knob'
 import {Panel} from '../Panel/Panel'
 import './VolumeControl.less'
 
-interface IVolumeControlProps {
-	color: string
-}
+// interface IVolumeControlProps {
+// }
 
 interface IVolumeControlReduxProps {
+	color: string
 	masterVolume: number,
 	reportedMasterVolume: number
 }
@@ -24,7 +26,7 @@ interface IVolumeControlDispatchProps {
 	changeMasterVolume: (number: number) => Action
 }
 
-type IVolumeControlAllProps = IVolumeControlProps & IVolumeControlReduxProps & IVolumeControlDispatchProps
+type IVolumeControlAllProps = IVolumeControlReduxProps & IVolumeControlDispatchProps
 
 export class VolumeControl extends Component<IVolumeControlAllProps> {
 	public static defaultProps = {
@@ -45,15 +47,22 @@ export class VolumeControl extends Component<IVolumeControlAllProps> {
 					min={0}
 					max={0.5}
 					markColor={newColor}
+					size={40}
 				/>
 			</Panel>
 		)
 	}
 }
 
-export const ConnectedVolumeControl = connect((state: IClientAppState) => ({
-	masterVolume: state.options.masterVolume,
-	reportedMasterVolume: Math.floor(state.audio.reportedMasterLevel),
-}), (dispatch: Dispatch): IVolumeControlDispatchProps => ({
-	changeMasterVolume: volume => dispatch(setOptionMasterVolume(volume)),
-}))(VolumeControl)
+export const ConnectedVolumeControl = connect(
+	(state: IClientAppState) => ({
+		color: getConnectionNodeInfo(ConnectionNodeType.audioOutput)
+			.stateSelector(state.room, MASTER_AUDIO_OUTPUT_TARGET_ID)
+			.color,
+		masterVolume: state.options.masterVolume,
+		reportedMasterVolume: Math.floor(state.audio.reportedMasterLevel),
+	}),
+	(dispatch: Dispatch): IVolumeControlDispatchProps => ({
+		changeMasterVolume: volume => dispatch(setOptionMasterVolume(volume)),
+	}),
+)(VolumeControl)
