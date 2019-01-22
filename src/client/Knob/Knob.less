@@ -1,4 +1,5 @@
 @import '../colors.less';
+@import '../AppCommon.less';
 
 .knob {
     display: flex;
@@ -23,6 +24,15 @@
             height: 100%;
         }
 
+        .knobShadow {
+            .actualKnob();
+            background-color: unset;
+            .boxShadow();
+            pointer-events: none;
+            position: absolute;
+            top: 0;
+        }
+
         .mark {
             width: 4px;
             height: 8px;
@@ -42,13 +52,13 @@
     }
 
     .label {
-        font-size: 11px;
+        font-size: 10px;
         letter-spacing: normal;
-        font-weight: 400;
+        font-weight: 300;
         text-transform: lowercase;
         position: absolute;
         margin: 0 !important;
-        bottom: -14px;
+        bottom: -13px;
         color: @subtleGrayBlackBg;
         height: auto;
 

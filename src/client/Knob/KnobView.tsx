@@ -1,4 +1,5 @@
 import * as React from 'react'
+import {CssColor} from '../../common/shamu-color'
 import './Knob.less'
 
 interface IKnobViewProps {
@@ -26,7 +27,7 @@ export const KnobView = (props: IKnobViewProps) => {
 					}}
 				>
 					<circle cx="50%" cy="50%" r="64%"
-						fill="none" stroke="gray" strokeWidth="2"
+						fill="none" stroke={CssColor.panelGrayLight} strokeWidth="2"
 						strokeDasharray={`0 50% ${percentage * 300}% 100000`} strokeDashoffset="1"
 					/>
 					<circle cx="50%" cy="50%" r="64%"
@@ -34,6 +35,7 @@ export const KnobView = (props: IKnobViewProps) => {
 						strokeDasharray={`0 50% ${adjustedPercentage * 300}% 100000`} strokeDashoffset="1"
 					/>
 				</svg>
+				<div className="knobShadow" />
 				<div
 					className="actualKnob"
 					style={{

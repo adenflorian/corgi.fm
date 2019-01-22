@@ -109,7 +109,7 @@ export const getConnectionNodeInfo = (type: ConnectionNodeType): ConnectionNodeI
 			height: 72,
 		}
 		default: return {
-			stateSelector: () => ({id: 'oh no', color: 'black'}),
+			stateSelector: () => ({id: 'oh no', color: CssColor.subtleGrayBlackBg}),
 			width: 0,
 			height: 0,
 		}
@@ -214,7 +214,7 @@ export const selectConnectionsWithSourceIds = (state: IClientRoomState, targetId
 
 export const selectFirstConnectionByTargetId = (state: IClientRoomState, targetId: string) =>
 	selectAllConnectionsAsArray(state)
-		.find(x => x.targetId === targetId)
+		.find(x => x.targetId === targetId) || Connection.dummy
 
 export const selectFirstConnectionIdByTargetId = (state: IClientRoomState, targetId: string) => {
 	const conn = selectFirstConnectionByTargetId(state, targetId)

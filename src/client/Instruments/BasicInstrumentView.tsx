@@ -38,7 +38,6 @@ export class BasicInstrumentView
 	extends React.PureComponent<IBasicInstrumentViewAllProps> {
 
 	public static defaultProps = {
-		color: 'gray',
 		pan: 0,
 		rawMidiNotes: [],
 	}
@@ -119,7 +118,7 @@ export const ConnectedBasicInstrumentView = connect(
 			rawMidiNotes,
 			isPlaying: rawMidiNotes.length > 0,
 			oscillatorType: instrumentState.oscillatorType,
-			color: connection ? selectConnectionSourceColor(state.room, connection.id) : BasicInstrumentView.defaultProps.color,
+			color: selectConnectionSourceColor(state.room, connection.id),
 			pan: instrumentState.pan,
 			lowPassFilterCutoffFrequency: instrumentState.lowPassFilterCutoffFrequency,
 			attack: instrumentState.attack,
