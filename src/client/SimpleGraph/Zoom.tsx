@@ -80,7 +80,7 @@ export class Zoom extends React.PureComponent<IZoomProps, IZoomState> {
 		if (e.ctrlKey) {
 			this._zoom(e.deltaY * scrollZoomMod, false)
 		} else {
-			this._pan(e.deltaX, -e.deltaY)
+			this._pan(-e.deltaX, -e.deltaY)
 		}
 		e.preventDefault()
 	}
