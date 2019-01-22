@@ -1,10 +1,18 @@
 import * as React from 'react'
+import {AppOptions, selectOption, selectOptions} from '../../common/redux/options-redux'
+import {shamuConnect} from '../../common/redux/redux-utils'
 import PlusSVG from '../OtherSVG/plus.svg'
 import {simpleGlobalClientState} from '../SimpleGlobalClientState'
 
 interface IZoomProps {
 	children: React.ReactNode
 }
+
+interface IZoomReduxProps {
+	requireCtrlToZoom: boolean
+}
+
+type IZoomAllProps = IZoomProps & IZoomReduxProps
 
 interface IZoomState {
 	zoom: number
@@ -24,7 +32,7 @@ const maxPan = 1000
 
 const bgSize = 10000
 
-export class Zoom extends React.PureComponent<IZoomProps, IZoomState> {
+export class Zoom extends React.PureComponent<IZoomAllProps, IZoomState> {
 	public state = {
 		zoom: 1,
 		pan: {
@@ -77,7 +85,7 @@ export class Zoom extends React.PureComponent<IZoomProps, IZoomState> {
 	private _onMouseWheel = (e: WheelEvent) => {
 		// Turning off rounding so that two finger track pad scrolling will be smooth
 		// TODO Detect if scroll amount is small or large, if large, round it
-		if (e.ctrlKey) {
+		if (this.props.requireCtrlToZoom === false || e.ctrlKey) {
 			this._zoom(e.deltaY * scrollZoomMod, false)
 		} else {
 			this._pan(-e.deltaX, -e.deltaY)
@@ -120,3 +128,9 @@ export class Zoom extends React.PureComponent<IZoomProps, IZoomState> {
 	private _clampPan = (pan: number, zoom: number = this.state.zoom) =>
 		Math.min(maxPan * zoom, Math.max(-maxPan * zoom, pan))
 }
+
+export const ConnectedZoom = shamuConnect(
+	(state): IZoomReduxProps => ({
+		requireCtrlToZoom: selectOptions(state).requireCtrlToScroll,
+	}),
+)(Zoom)

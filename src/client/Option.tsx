@@ -3,15 +3,15 @@ import {Component} from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 import {IClientAppState} from '../common/redux/common-redux-types'
-import {AppOption, setOption} from '../common/redux/options-redux'
+import {AppOptions, selectOption, setOption} from '../common/redux/options-redux'
 
 interface IOptionProps {
-	option: AppOption
+	option: AppOptions
 	label: string
 }
 
 interface IOptionReduxProps {
-	value: number | boolean
+	value: any
 }
 
 type IOptionAllProps = IOptionProps & IOptionReduxProps & {dispatch: Dispatch}
@@ -40,5 +40,5 @@ export class Option extends Component<IOptionAllProps> {
 }
 
 export const ConnectedOption = connect((state: IClientAppState, props: IOptionProps): IOptionReduxProps => ({
-	value: state.options[props.option],
+	value: selectOption(state, props.option),
 }))(Option)

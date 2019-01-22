@@ -1,5 +1,6 @@
 import * as React from 'react'
 import {Fragment} from 'react'
+import {AppOptions} from '../../common/redux/options-redux'
 import {Button} from '../Button/Button'
 import {ConnectedOption} from '../Option'
 import './Options.less'
@@ -29,8 +30,12 @@ export class Options extends React.Component {
 					<div className="optionsBG" onClick={() => this._hideOptions()}>
 						<div className="optionsPanel" onClick={e => e.stopPropagation()}>
 							<ConnectedOption
-								option={'showNoteNamesOnKeyboard'}
+								option={AppOptions.showNoteNamesOnKeyboard}
 								label="show names on keyboard"
+							/>
+							<ConnectedOption
+								option={AppOptions.requireCtrlToScroll}
+								label="require control key to scroll"
 							/>
 						</div>
 					</div>

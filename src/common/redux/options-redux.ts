@@ -1,13 +1,15 @@
+import {IClientAppState} from './common-redux-types'
 import {createReducer} from './redux-utils'
 
-export const AppOptions = Object.freeze({
-	masterVolume: 'masterVolume',
-	showNoteNamesOnKeyboard: 'showNoteNamesOnKeyboard',
-})
+export enum AppOptions {
+	masterVolume = 'masterVolume',
+	showNoteNamesOnKeyboard = 'showNoteNamesOnKeyboard',
+	requireCtrlToScroll = 'requireCtrlToScroll',
+}
 
 export const SET_OPTION = 'SET_OPTION'
 export type SetOptionAction = ReturnType<typeof setOption>
-export const setOption = (option: string, value: any) => ({
+export const setOption = (option: AppOptions, value: any) => ({
 	type: SET_OPTION,
 	option,
 	value,
@@ -15,17 +17,14 @@ export const setOption = (option: string, value: any) => ({
 
 export const setOptionShowNoteNames = setOption.bind(null, AppOptions.showNoteNamesOnKeyboard)
 export const setOptionMasterVolume = setOption.bind(null, AppOptions.masterVolume)
+export const setOptionRequireCtrlToZoom = setOption.bind(null, AppOptions.requireCtrlToScroll)
 
-export interface IOptionsState {
-	showNoteNamesOnKeyboard: boolean
-	masterVolume: number
-}
+export type IOptionsState = typeof initialState
 
-export type AppOption = 'masterVolume' | 'showNoteNamesOnKeyboard'
-
-const initialState: IOptionsState = {
+const initialState = {
 	showNoteNamesOnKeyboard: true,
 	masterVolume: 0.1,
+	requireCtrlToScroll: true,
 }
 
 export const optionsReducer = createReducer(initialState, {
@@ -34,3 +33,7 @@ export const optionsReducer = createReducer(initialState, {
 		[option]: value,
 	}),
 })
+
+export const selectOptions = (state: IClientAppState) => state.options
+
+export const selectOption = (state: IClientAppState, option: AppOptions) => selectOptions(state)[option]

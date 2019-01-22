@@ -84,7 +84,6 @@
 # Shared Cursors
 - [ ] make shared cursor not block pointer events
 - [ ] use relative positioning like the connections so it doesn't have to rerender on scroll
-- [ ] be affected by zoom?
 - [ ] optimize
 	- [ ] less updates over network
 	- [ ] less dispatches
@@ -184,8 +183,11 @@
 
 # SimpleGraph
 - [ ] move last touched node to highest z index
-- [ ] support trackpad zomm and pan
+- [√] support trackpad zo0m and pan
 - [ ] add buttons on side of screen for zoom and pan and show keyboard shortcuts when hovering over icon
+- [ ] make zoom and pan affect mouse cursors
+- [ ] use position system to render mouse cursors
+	- [ ] use transform translat and will-change
 
 # Bugs
 - [√] shift click note not showing on other clients

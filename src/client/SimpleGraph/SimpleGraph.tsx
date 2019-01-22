@@ -5,7 +5,7 @@ import {selectAllPositionIds} from '../../common/redux/positions-redux'
 import {mainBoardsId} from '../client-constants'
 import {ConnectedConnections, ConnectionsUsage} from '../Connections/Connections'
 import {ConnectedSimpleGraphNode} from './SimpleGraphNode'
-import {Zoom} from './Zoom'
+import {ConnectedZoom} from './Zoom'
 
 interface ISimpleGraphReduxProps {
 	positionIds: string[]
@@ -22,7 +22,7 @@ export const SimpleGraph: React.FC<ISimpleGraphReduxProps> =
 				margin: '50vh 50vw',
 			}}
 		>
-			<Zoom>
+			<ConnectedZoom>
 				<div id={mainBoardsId} className="boards">
 					<ConnectedConnections usage={ConnectionsUsage.simpleGraph} />
 					{/* <p style={{height: 0}}>+</p> */}
@@ -30,7 +30,7 @@ export const SimpleGraph: React.FC<ISimpleGraphReduxProps> =
 						<ConnectedSimpleGraphNode key={positionId} positionId={positionId} />,
 					)}
 				</div>
-			</Zoom>
+			</ConnectedZoom>
 		</div>
 
 export const ConnectedSimpleGraph = connect(
