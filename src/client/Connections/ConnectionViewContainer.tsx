@@ -6,7 +6,7 @@ import {
 	selectConnectionSourceColor, selectConnectionSourceIsActive, selectConnectionSourceIsSending,
 } from '../../common/redux/connections-redux'
 import {getMainBoardsRectX, getMainBoardsRectY} from '../utils'
-import {ConnectionView, Point} from './ConnectionView'
+import {ConnectedConnectionView, Point} from './ConnectionView'
 
 export interface IConnectionViewContainerProps {
 	id: string
@@ -60,7 +60,7 @@ export class ConnectionViewContainer extends React.PureComponent<IConnectionView
 			return null
 		} else {
 			return (
-				<ConnectionView
+				<ConnectedConnectionView
 					color={this.props.sourceColor}
 					sourceX={sourcePosition.x}
 					sourceY={sourcePosition.y}

@@ -2,7 +2,7 @@ import * as React from 'react'
 import {selectConnection} from '../../common/redux/connections-redux'
 import {makeConnectionPositionsSelector} from '../../common/redux/positions-redux'
 import {shamuConnect} from '../../common/redux/redux-utils'
-import {ConnectionView} from './ConnectionView'
+import {ConnectedConnectionView} from './ConnectionView'
 import {
 	IConnectionViewContainerAllProps, IConnectionViewContainerProps, mapStateToProps, Positions,
 } from './ConnectionViewContainer'
@@ -19,7 +19,7 @@ export const ConnectionViewContainerForSimpleGraph: React.FC<IConnectionViewCont
 	({sourceColor, isSourceActive, isSourceSending, id, positions: {sourcePosition, targetPosition}}) =>
 		sourcePosition === undefined || targetPosition === undefined
 			? null
-			: <ConnectionView
+			: <ConnectedConnectionView
 				color={sourceColor}
 				sourceX={sourcePosition.x}
 				sourceY={sourcePosition.y}

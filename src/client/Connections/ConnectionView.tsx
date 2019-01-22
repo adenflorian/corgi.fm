@@ -1,4 +1,7 @@
 import * as React from 'react'
+import {Dispatch} from 'redux'
+import {deleteConnections} from '../../common/redux/connections-redux'
+import {shamuConnect} from '../../common/redux/redux-utils'
 import {
 	saturateColor,
 } from '../../common/shamu-color'
@@ -39,7 +42,7 @@ class LineState {
 const longLineStrokeWidth = 2
 const connectorStrokeWidth = 8
 
-export class ConnectionView extends React.PureComponent<IConnectionViewProps> {
+export class ConnectionView extends React.PureComponent<IConnectionViewProps & {dispatch: Dispatch}> {
 	public static defaultProps = {
 		connectorWidth: 16,
 		connectorHeight: 8,
@@ -58,6 +61,10 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps> {
 		return (
 			<div className="connection">
 				<svg
+					onContextMenu={(e: React.MouseEvent) => {
+						this.props.dispatch(deleteConnections([id]))
+						e.preventDefault()
+					}}
 					className={`colorize longLine`}
 					xmlns="http://www.w3.org/2000/svg"
 					style={{
@@ -133,3 +140,5 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps> {
 		)
 	}
 }
+
+export const ConnectedConnectionView = shamuConnect()(ConnectionView)
