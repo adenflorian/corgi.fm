@@ -74,12 +74,20 @@ export class Zoom extends React.PureComponent<IZoomProps, IZoomState> {
 		)
 	}
 
-	private _onMouseWheel = (e: WheelEvent) =>
-		this._zoom(e.deltaY * scrollZoomMod, true)
+	private _onMouseWheel = (e: WheelEvent) => {
+		// Turning off rounding so that two finger track pad scrolling will be smooth
+		// TODO Detect if scroll amount is small or large, if large, round it
+		if (e.ctrlKey) {
+			this._zoom(e.deltaY * scrollZoomMod, false)
+		} else {
+			this._pan(e.deltaX, -e.deltaY)
+		}
+		e.preventDefault()
+	}
 
 	private _onMouseMove = (e: MouseEvent) => {
-		if (e.ctrlKey) this._zoom(e.movementY * mouseZoomMod)
-		if (e.buttons === 4) this._pan(e)
+		// if (e.ctrlKey) this._zoom(e.movementY * mouseZoomMod)
+		if (e.buttons === 4) this._pan(e.movementX, e.movementY)
 	}
 
 	private _zoom = (zoom: number, round: boolean = false) => {
@@ -100,11 +108,11 @@ export class Zoom extends React.PureComponent<IZoomProps, IZoomState> {
 	private _clampZoom = (val: number) =>
 		Math.min(maxZoom, Math.max(minZoom, val))
 
-	private _pan = (e: MouseEvent) => {
+	private _pan = (x = 0, y = 0) => {
 		this.setState({
 			pan: {
-				x: this._clampPan(this.state.pan.x + (e.movementX * mousePanMod / this.state.zoom)),
-				y: this._clampPan(this.state.pan.y + (e.movementY * mousePanMod / this.state.zoom)),
+				x: this._clampPan(this.state.pan.x + (x * mousePanMod / this.state.zoom)),
+				y: this._clampPan(this.state.pan.y + (y * mousePanMod / this.state.zoom)),
 			},
 		})
 	}

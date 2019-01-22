@@ -84,8 +84,14 @@
 # Shared Cursors
 - [ ] make shared cursor not block pointer events
 - [ ] use relative positioning like the connections so it doesn't have to rerender on scroll
+- [ ] be affected by zoom?
+- [ ] optimize
+	- [ ] less updates over network
+	- [ ] less dispatches
+- [ ] interpolate
 
 # Sampler
+- [ ] fix missing piano note
 
 # Clean Code
 - [√] use `strictNullChecks` typescript config
@@ -95,6 +101,7 @@
 - [ ] make it obvious which direction data flows
 - [√] brighten the connectors and line when data is going across it
 - [ ] make them moveable
+- [ ] fix invisible long line when vertical
 
 # Keyboard
 - [ ] do something to visualize external midi keyboard notes
@@ -175,6 +182,11 @@
 - [√] update name in bottom left on blur of name input
 - [√] save name in local storage and us on re-entry
 
+# SimpleGraph
+- [ ] move last touched node to highest z index
+- [ ] support trackpad zomm and pan
+- [ ] add buttons on side of screen for zoom and pan and show keyboard shortcuts when hovering over icon
+
 # Bugs
 - [√] shift click note not showing on other clients
 - [√] long usernames mess up the keyboard
@@ -212,7 +224,8 @@
 - [...] options view
 - [...] better pointer
 - [...] favicon (better icon?)
-- [ ] feedback button
+- [...] feedback button
+	- added link to the discord
 
 # Ballad
 - [ ] login system
@@ -225,6 +238,6 @@
 - [ ] send hearts and claps and stuff
 - [...] export midi
 - [ ] import midi
-- [ ] Docker?
+- [...] Docker?
 - [ ] pick final product name
 - [ ] get domain
