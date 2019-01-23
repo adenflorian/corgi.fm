@@ -59,8 +59,14 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps & {
 		)
 
 		const buffer = 50
+		const joint = 8
 
-		const pathDPart1 = `M ${line.x1} ${line.y1} L ${line.x2} ${line.y2}`
+		const pathDPart1 = `
+			M ${line.x1} ${line.y1}
+			L ${line.x1 + joint} ${line.y1}
+			L ${line.x2 - joint} ${line.y2}
+			L ${line.x2} ${line.y2}
+		`
 
 		const pathDPart2 = `M ${line.x1 + buffer} ${line.y1 + buffer} M ${line.x2 + buffer} ${line.y2 + buffer}`
 			+ `M ${line.x1 - buffer} ${line.y1 - buffer} M ${line.x2 - buffer} ${line.y2 - buffer}`
@@ -75,25 +81,39 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps & {
 					style={{
 						position: 'fixed',
 						pointerEvents: 'none',
+						color,
+						fill: 'none',
 					}}
 				>
 					<defs>
 						<linearGradient
 							id={id}
-							x1={(line.x1 - line.leftMost())}
-							y1={(line.y1 - line.topMost())}
-							x2={(line.x2 - line.leftMost())}
-							y2={(line.y2 - line.topMost())}
+							x1={(line.x1)}
+							y1={(line.y1)}
+							x2={(line.x2)}
+							y2={(line.y2)}
 							gradientUnits="userSpaceOnUse"
+						// gradientUnits="objectBoundingBox"
 						>
 							<stop stopColor={saturateSource ? saturateColor(color) : color} offset="0%" />
 							<stop stopColor={saturateTarget ? saturateColor(color) : color} offset="100%" />
 						</linearGradient>
+						{/* <radialGradient
+							cx="0%"
+							cy="0%"
+							r="100%"
+							// fr="50%"
+							spreadMethod="pad"
+							id={id}
+						>
+							<stop offset="0%" stop-color="gold" />
+							<stop offset="100%" stop-color="green" />
+						</radialGradient> */}
 						<filter id="saturate">
 							<feColorMatrix in="SourceGraphic"
 								type="saturate"
 								values="3" />
-							<feGaussianBlur in="SourceGraphic" stdDeviation="8" />
+							{/* <feGaussianBlur in="SourceGraphic" stdDeviation="8" /> */}
 						</filter>
 					</defs>
 					<g
@@ -111,7 +131,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps & {
 							className="invisibleLongLine"
 							d={pathDPart1}
 							stroke="#0000"
-							strokeWidth={50 + 'px'}
+							strokeWidth={24 + 'px'}
 							strokeLinecap="round"
 						/>
 						<path
@@ -119,7 +139,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps & {
 							d={pathDFull}
 							stroke={`url(#${id})`}
 							strokeWidth={4 + 'px'}
-							strokeLinecap="round"
+						// strokeLinecap="round"
 						/>
 					</g>
 
