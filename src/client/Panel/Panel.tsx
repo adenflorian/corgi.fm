@@ -13,7 +13,7 @@ export interface IPanelProps {
 }
 
 export const Panel: React.FunctionComponent<IPanelProps> =
-	({children, className, color = CssColor.defaultGray, id, label, labelTitle, saturate}) => {
+	({children, className, color = CssColor.defaultGray, id, label, labelTitle, saturate = false}) => {
 
 		const renderLabel = label !== undefined && label !== ''
 
@@ -31,7 +31,7 @@ export const Panel: React.FunctionComponent<IPanelProps> =
 			>
 				{renderLabel &&
 					<div
-						className="label colorize transitionAllColor"
+						className="label colorize"
 						title={labelTitle}
 						style={{
 							position: 'absolute',
@@ -47,14 +47,14 @@ export const Panel: React.FunctionComponent<IPanelProps> =
 					className={`panel ${className} ${renderLabel ? 'renderLabel' : ''}`}
 				>
 					{/* <div className="isometricBoxShadow" /> */}
-					<ShamuBorder />
+					<ShamuBorder saturate={saturate} />
 					{children}
 				</div>
 			</div>
 		)
 	}
 
-const ShamuBorder = () =>
+const ShamuBorder = ({saturate}: {saturate: boolean}) =>
 	<svg
 		style={{
 			position: 'absolute',
@@ -66,6 +66,7 @@ const ShamuBorder = () =>
 			top: 2,
 			left: -2,
 			zIndex: -1,
+			filter: saturate ? 'saturate(3)' : 'none',
 		}}
 	>
 		<g>
