@@ -66,7 +66,7 @@ const ShamuBorder = ({saturate}: {saturate: boolean}) =>
 			top: 2,
 			left: -2,
 			zIndex: -1,
-			filter: saturate ? 'saturate(3)' : 'none',
+			filter: `drop-shadow(-1px 1px 4px rgb(24, 24, 24))` + (saturate ? ' saturate(3)' : ''),
 		}}
 	>
 		<g>
