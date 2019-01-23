@@ -25,7 +25,7 @@ export const ConnectionViewContainerForSimpleGraph: React.FC<IConnectionViewCont
 				sourceY={sourcePosition.y}
 				targetX={targetPosition.x}
 				targetY={targetPosition.y}
-				saturateSource={isSourceActive}
+				saturateSource={isSourceActive || isSourceSending}
 				saturateTarget={isSourceSending}
 				id={id}
 			/>

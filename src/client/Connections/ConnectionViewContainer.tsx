@@ -66,7 +66,7 @@ export class ConnectionViewContainer extends React.PureComponent<IConnectionView
 					sourceY={sourcePosition.y}
 					targetX={targetPosition.x}
 					targetY={targetPosition.y}
-					saturateSource={this.props.isSourceActive}
+					saturateSource={this.props.isSourceActive || this.props.isSourceSending}
 					saturateTarget={this.props.isSourceSending}
 					id={this.props.id}
 				/>
