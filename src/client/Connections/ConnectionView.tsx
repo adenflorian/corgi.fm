@@ -58,22 +58,23 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps & {
 			this.props.targetY,
 		)
 
+		const buffer = 50
+
+		const pathDPart1 = `M ${line.x1} ${line.y1} L ${line.x2} ${line.y2}`
+
+		const pathDPart2 = `M ${line.x1 + buffer} ${line.y1 + buffer} M ${line.x2 + buffer} ${line.y2 + buffer}`
+			+ `M ${line.x1 - buffer} ${line.y1 - buffer} M ${line.x2 - buffer} ${line.y2 - buffer}`
+
+		const pathDFull = pathDPart1 + ' ' + pathDPart2
+
 		return (
 			<div className="connection">
 				<svg
-					onContextMenu={(e: React.MouseEvent) => {
-						this.props.dispatch(deleteConnections([id]))
-						e.preventDefault()
-					}}
 					className={`colorize longLine`}
 					xmlns="http://www.w3.org/2000/svg"
 					style={{
-						width: line.width(),
-						height: line.height(),
-						minHeight: longLineStrokeWidth,
-						top: line.topMost(),
-						left: line.leftMost(),
-						zIndex: -3,
+						position: 'fixed',
+						pointerEvents: 'none',
 					}}
 				>
 					<defs>
@@ -92,16 +93,36 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps & {
 							<feColorMatrix in="SourceGraphic"
 								type="saturate"
 								values="3" />
+							<feGaussianBlur in="SourceGraphic" stdDeviation="8" />
 						</filter>
 					</defs>
-					<line
-						x1={line.x1 - line.leftMost()}
-						y1={line.y1 - line.topMost()}
-						x2={line.x2 - line.leftMost()}
-						y2={line.y2 - line.topMost()}
-						stroke={`url(#${id})`}
-						strokeWidth={longLineStrokeWidth + 'px'}
-					/>
+					<g
+						onContextMenu={(e: React.MouseEvent) => {
+							this.props.dispatch(deleteConnections([id]))
+							e.preventDefault()
+						}}
+					>
+						<path
+							d={pathDPart1}
+							stroke={`url(#${id})`}
+							strokeWidth={longLineStrokeWidth + 'px'}
+						/>
+						<path
+							className="invisibleLongLine"
+							d={pathDPart1}
+							stroke="#0000"
+							strokeWidth={50 + 'px'}
+							strokeLinecap="round"
+						/>
+						<path
+							className="blurLine"
+							d={pathDFull}
+							stroke={`url(#${id})`}
+							strokeWidth={4 + 'px'}
+							strokeLinecap="round"
+						/>
+					</g>
+
 				</svg>
 				<svg
 					className={`colorize connector source ${saturateSource ? 'saturate' : ''}`}
