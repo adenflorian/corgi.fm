@@ -102,6 +102,20 @@
 - [ ] make them moveable
 - [ ] fix invisible long line when vertical
 
+## Adding/Changing/Removing Connections
+should anything allow multiple incoming connections?
+- yes, although it not might really do anything
+
+if you click and drag the output side of a connection, it moves it
+if you click and drag from the input side of a connection and starts a new connection
+
+allow multiple inputs and multiple outputs
+
+possible starting points:
+- deleting connections
+- moving output side of connection
+- creating new connections from the output of a node
+
 # Keyboard
 - [ ] do something to visualize external midi keyboard notes
 - [ ] show icon or something to show which users are using an external midi keyboard

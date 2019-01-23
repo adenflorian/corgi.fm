@@ -7,7 +7,7 @@
     }
 
 
-    &.connector {
+    & .connector {
         z-index: 0;
 
         &:hover {
@@ -15,8 +15,13 @@
         }
     }
 
-    &.longLine {
+    & .longLine {
         z-index: -1;
-        pointer-events: none;
+
+        & line {
+            &:hover {
+                filter: url(#saturate);
+            }
+        }
     }
 }

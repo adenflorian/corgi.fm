@@ -88,6 +88,11 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps & {
 							<stop stopColor={saturateSource ? saturateColor(color) : color} offset="0%" />
 							<stop stopColor={saturateTarget ? saturateColor(color) : color} offset="100%" />
 						</linearGradient>
+						<filter id="saturate">
+							<feColorMatrix in="SourceGraphic"
+								type="saturate"
+								values="3" />
+						</filter>
 					</defs>
 					<line
 						x1={line.x1 - line.leftMost()}
