@@ -40,7 +40,7 @@ type IInfiniteSequencerAllProps =
 	IInfiniteSequencerProps & IInfiniteSequencerReduxProps & {dispatch: Dispatch}
 
 export const InfiniteSequencer: React.FunctionComponent<IInfiniteSequencerAllProps> = props => {
-	const {color, isPlaying, id, isRecording, style, events} = props
+	const {color, isPlaying, id, isRecording, style, events, name} = props
 
 	const {lowestNote, highestNote} = findLowestAndHighestNotes(events)
 	const numberOfPossibleNotes = highestNote - lowestNote + 1
@@ -59,7 +59,12 @@ export const InfiniteSequencer: React.FunctionComponent<IInfiniteSequencerAllPro
 				`${isRecording ? `isRecording` : ''}`
 			}
 		>
-			<Panel id={props.id} label={name} color={isRecording ? 'red' : color}>
+			<Panel
+				id={props.id}
+				label={name}
+				color={isRecording ? 'red' : color}
+				saturate={isPlaying}
+			>
 				<div className="controls">
 					<div
 						className="play"
