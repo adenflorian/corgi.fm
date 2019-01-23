@@ -108,6 +108,8 @@ export const setupInstrumentManager = (store: Store<IClientAppState>, audioConte
 			instrumentIds.forEach(instrumentId => {
 				const connection = selectConnectionsWithTargetIds(state.room, [instrumentId])[0]
 
+				const instrumentState = instrumentStateSelector(state.room, instrumentId)
+
 				const instrument = createIfNotExisting(
 					stuff,
 					instrumentId,
@@ -116,13 +118,11 @@ export const setupInstrumentManager = (store: Store<IClientAppState>, audioConte
 				)
 
 				if (connection === undefined) {
-					instrument.setMidiNotes([])
+					// instrument.setMidiNotes([])
 					return
 				}
 
 				const sourceNotes = selectConnectionSourceNotes(state.room, connection.id)
-
-				const instrumentState = instrumentStateSelector(state.room, instrumentId)
 
 				instrument.setMidiNotes(sourceNotes)
 
