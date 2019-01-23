@@ -46,9 +46,29 @@ export const Panel: React.FunctionComponent<IPanelProps> =
 					id={id}
 					className={`panel ${className} ${renderLabel ? 'renderLabel' : ''}`}
 				>
-					<div className="isometricBoxShadow" />
+					{/* <div className="isometricBoxShadow" /> */}
+					<ShamuBorder />
 					{children}
 				</div>
 			</div>
 		)
 	}
+
+const ShamuBorder = () =>
+	<svg
+		style={{
+			position: 'absolute',
+			width: '100%',
+			height: '100%',
+			stroke: 'none',
+			fill: 'currentColor',
+			strokeWidth: 4,
+			top: 2,
+			left: -2,
+			zIndex: -1,
+		}}
+	>
+		<g>
+			<rect x="0" y="0" width="100%" height="100%" />
+		</g>
+	</svg>
