@@ -15,8 +15,8 @@ export function getColorHslByHex(hex: string): string {
 	return colorFunc(hex).desaturate(0.4).hsl().string()
 }
 
-export function saturateColor(color: string) {
-	return colorFunc(color).saturate(3).hsl().string()
+export function saturateColor(color: string, amount = 3) {
+	return colorFunc(color).saturate(amount).hsl().string()
 }
 
 export function getColorStringForMidiNote(note: IMidiNote) {

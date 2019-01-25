@@ -1,7 +1,6 @@
 import {AnyAction} from 'redux'
 import * as uuid from 'uuid'
 import {ClientId} from '../common-types'
-import {CssColor} from '../shamu-color'
 import {IClientRoomState} from './common-redux-types'
 import {IConnectable} from './connections-redux'
 import {
@@ -10,7 +9,7 @@ import {
 } from './multi-reducer'
 import {BROADCASTER_ACTION, NetworkActionType, SERVER_ACTION} from './redux-utils'
 
-export const addBasicSampler = (sampler: IBasicSamplerState) =>
+export const addBasicSampler = (sampler: BasicSamplerState) =>
 	addMultiThing(sampler, MultiThingType.basicSampler, NetworkActionType.SERVER_AND_BROADCASTER)
 
 export const deleteBasicSamplers = (samplerIds: string[]) =>
@@ -42,19 +41,10 @@ export interface IBasicSamplersState extends IMultiState {
 }
 
 export interface IBasicSamplers {
-	[key: string]: IBasicSamplerState
+	[key: string]: BasicSamplerState
 }
 
-export interface IBasicSamplerState extends IConnectable {
-	id: string
-	ownerId: ClientId
-	pan: number
-	lowPassFilterCutoffFrequency: number
-	attack: number
-	release: number
-}
-
-export class BasicSamplerState implements IBasicSamplerState {
+export class BasicSamplerState implements IConnectable {
 	public static dummy: BasicSamplerState = {
 		id: 'dummy',
 		ownerId: 'dummyOwner',
@@ -82,13 +72,13 @@ const basicSamplerActionTypes = [
 	SET_BASIC_SAMPLER_PARAM,
 ]
 
-export const basicSamplersReducer = makeMultiReducer<IBasicSamplerState, IBasicSamplersState>(
+export const basicSamplersReducer = makeMultiReducer<BasicSamplerState, IBasicSamplersState>(
 	basicSamplerReducer,
 	MultiThingType.basicSampler,
 	basicSamplerActionTypes,
 )
 
-function basicSamplerReducer(basicSampler: IBasicSamplerState, action: AnyAction) {
+function basicSamplerReducer(basicSampler: BasicSamplerState, action: AnyAction) {
 	switch (action.type) {
 		case SET_BASIC_SAMPLER_PARAM:
 			return {
@@ -105,7 +95,7 @@ export const selectAllSamplers = (state: IClientRoomState) => state.basicSampler
 export const selectAllSamplerIds = (state: IClientRoomState) => Object.keys(selectAllSamplers(state))
 
 export const selectAllSamplersAsArray =
-	createSelectAllOfThingAsArray<IBasicSamplers, IBasicSamplerState>(selectAllSamplers)
+	createSelectAllOfThingAsArray<IBasicSamplers, BasicSamplerState>(selectAllSamplers)
 
 export const selectSamplersByOwner = (state: IClientRoomState, ownerId: ClientId) =>
 	selectAllSamplersAsArray(state).filter(x => x.ownerId === ownerId)

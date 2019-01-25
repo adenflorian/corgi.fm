@@ -4,7 +4,6 @@ import * as uuid from 'uuid'
 import {ClientId} from '../common-types'
 import {pickRandomArrayElement} from '../common-utils'
 import {BuiltInOscillatorType, ShamuOscillatorType} from '../OscillatorTypes'
-import {CssColor} from '../shamu-color'
 import {IClientRoomState} from './common-redux-types'
 import {IConnectable} from './connections-redux'
 import {
@@ -13,7 +12,7 @@ import {
 } from './multi-reducer'
 import {BROADCASTER_ACTION, NetworkActionType, SERVER_ACTION} from './redux-utils'
 
-export const addBasicInstrument = (instrument: IBasicInstrumentState) =>
+export const addBasicInstrument = (instrument: BasicInstrumentState) =>
 	addMultiThing(instrument, MultiThingType.basicInstrument, NetworkActionType.SERVER_AND_BROADCASTER)
 
 export const deleteBasicInstruments = (instrumentIds: string[]) =>
@@ -51,7 +50,7 @@ export enum BasicInstrumentParam {
 }
 
 export interface BasicInstrumentAction extends AnyAction {
-	instrument?: IBasicInstrumentState
+	instrument?: BasicInstrumentState
 	instruments?: IBasicInstruments
 }
 
@@ -60,20 +59,10 @@ export interface IBasicInstrumentsState extends IMultiState {
 }
 
 export interface IBasicInstruments {
-	[key: string]: IBasicInstrumentState
+	[key: string]: BasicInstrumentState
 }
 
-export interface IBasicInstrumentState extends IConnectable {
-	oscillatorType: ShamuOscillatorType
-	id: string
-	ownerId: ClientId
-	pan: number
-	lowPassFilterCutoffFrequency: number
-	attack: number
-	release: number
-}
-
-export class BasicInstrumentState implements IBasicInstrumentState {
+export class BasicInstrumentState implements IConnectable {
 	public static dummy: BasicInstrumentState = {
 		oscillatorType: BuiltInOscillatorType.sine,
 		id: 'dummy',
@@ -105,13 +94,13 @@ const basicInstrumentActionTypes = [
 	SET_BASIC_INSTRUMENT_PARAM,
 ]
 
-export const basicInstrumentsReducer = makeMultiReducer<IBasicInstrumentState, IBasicInstrumentsState>(
+export const basicInstrumentsReducer = makeMultiReducer<BasicInstrumentState, IBasicInstrumentsState>(
 	basicInstrumentReducer,
 	MultiThingType.basicInstrument,
 	basicInstrumentActionTypes,
 )
 
-function basicInstrumentReducer(basicInstrument: IBasicInstrumentState, action: AnyAction) {
+function basicInstrumentReducer(basicInstrument: BasicInstrumentState, action: AnyAction) {
 	switch (action.type) {
 		case SET_BASIC_INSTRUMENT_OSCILLATOR_TYPE:
 			return {
@@ -131,7 +120,7 @@ function basicInstrumentReducer(basicInstrument: IBasicInstrumentState, action: 
 export const selectAllBasicInstruments = (state: IClientRoomState) => state.basicInstruments.things
 
 export const selectAllBasicInstrumentsAsArray =
-	createSelectAllOfThingAsArray<IBasicInstruments, IBasicInstrumentState>(selectAllBasicInstruments)
+	createSelectAllOfThingAsArray<IBasicInstruments, BasicInstrumentState>(selectAllBasicInstruments)
 
 export const selectAllBasicInstrumentIds = createSelector(
 	selectAllBasicInstruments,

@@ -5,9 +5,14 @@ import {Arp} from '../arp'
 
 export interface IInstrument extends IDisposable {
 	setMidiNotes: (midiNotes: IMidiNotes) => void
+	setPan: (pan: number) => void
+	setLowPassFilterCutoffFrequency: (frequency: number) => void
+	setAttack: (attackTimeInSeconds: number) => void
+	setRelease: (releaseTimeInSeconds: number) => void
+	getActivityLevel: () => number
 }
 
-export abstract class Instrument<T extends Voices<V>, V extends Voice> implements IInstrument {
+export abstract class Instrument<T extends Voices<V>, V extends Voice> implements IDisposable {
 	protected readonly _panNode: StereoPannerNode
 	protected readonly _audioContext: AudioContext
 	protected readonly _lowPassFilter: BiquadFilterNode
@@ -68,6 +73,8 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> implement
 	public setAttack = (attackTimeInSeconds: number) => this._attackTimeInSeconds = attackTimeInSeconds
 
 	public setRelease = (releaseTimeInSeconds: number) => this._releaseTimeInSeconds = releaseTimeInSeconds
+
+	public getActivityLevel = () => this._getVoices().getActivityLevel()
 
 	public abstract dispose(): void
 
@@ -136,6 +143,12 @@ export abstract class Voices<V extends Voice> {
 				}
 			}, timeToReleaseInSeconds * 1000)
 		}
+	}
+
+	public getActivityLevel = () => {
+		if (this._activeVoices.length > 0) return 1
+		if (this._releasingVoices.length > 0) return 0.5
+		return 0
 	}
 
 	public dispose() {

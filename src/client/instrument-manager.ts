@@ -1,19 +1,14 @@
 import {Store} from 'redux'
 import {IDisposable} from '../common/common-types'
-import {toArray} from '../common/common-utils'
 import {
 	BasicInstrumentState, selectAllBasicInstrumentIds, selectBasicInstrument,
 } from '../common/redux/basic-instruments-redux'
 import {BasicSamplerState, selectAllSamplerIds, selectSampler} from '../common/redux/basic-sampler-redux'
 import {IClientAppState, IClientRoomState} from '../common/redux/common-redux-types'
-import {selectConnectionSourceNotes, selectConnectionsWithTargetIds} from '../common/redux/connections-redux'
+import {
+	IConnectable, selectConnectionSourceNotes, selectConnectionsWithTargetIds,
+} from '../common/redux/connections-redux'
 import {setGlobalClockIndex} from '../common/redux/global-clock-redux'
-import {
-	selectAllGridSequencers, setGridSequencerField,
-} from '../common/redux/grid-Sequencers-redux'
-import {
-	InfiniteSequencerFields, selectAllInfiniteSequencers, setInfiniteSequencerField,
-} from '../common/redux/infinite-sequencers-redux'
 import {BasicSamplerInstrument} from './BasicSampler/BasicSamplerInstrument'
 import {GridSequencerPlayer} from './GridSequencerPlayer'
 import {BasicInstrument} from './Instruments/BasicInstrument'
@@ -47,17 +42,8 @@ export const setupInstrumentManager = (store: Store<IClientAppState>, audioConte
 	function updateInstrumentLayer() {
 		const state = store.getState()
 
-		// if (state.room === previousState.room) return
-
-		// previousState = state
-
-		// console.log('instr manager update')
-
 		handleSamplers()
 		handleBasicInstruments()
-
-		// handleGridSequencers()
-		// handleInfiniteSequencers()
 
 		function handleSamplers() {
 			updateInstrumentType(
@@ -90,7 +76,7 @@ export const setupInstrumentManager = (store: Store<IClientAppState>, audioConte
 			)
 		}
 
-		function updateInstrumentType<I extends IInstrument, S>(
+		function updateInstrumentType<I extends IInstrument, S extends IConnectable>(
 			instrumentIdsSelector: InstrumentIdsSelector,
 			instrumentStateSelector: InstrumentStateSelector<S>,
 			instrumentCreator: InstrumentFactory<I, S>,
@@ -118,7 +104,7 @@ export const setupInstrumentManager = (store: Store<IClientAppState>, audioConte
 				)
 
 				if (connection === undefined) {
-					// instrument.setMidiNotes([])
+					instrument.setMidiNotes([])
 					return
 				}
 
@@ -130,52 +116,6 @@ export const setupInstrumentManager = (store: Store<IClientAppState>, audioConte
 			})
 
 		}
-
-		// function handleGridSequencers() {
-		// 	const gridSequencers = toArray(selectAllGridSequencers(state.room))
-
-		// 	gridSequencers.forEach(gridSequencer => {
-		// 		let sequencer = stuffMap.get(gridSequencer.id) as GridSequencerPlayer
-
-		// 		sequencer = createIfNotExisting(gridSequencer.id, sequencer, () => {
-		// 			return new GridSequencerPlayer(
-		// 				audioContext,
-		// 				index => store.dispatch(setGridSequencerField(gridSequencer.id, 'index', index)),
-		// 			)
-		// 		})
-
-		// 		if (gridSequencer.isPlaying !== sequencer.isPlaying()) {
-		// 			if (gridSequencer.isPlaying) {
-		// 				sequencer.play()
-		// 			} else {
-		// 				sequencer.stop()
-		// 			}
-		// 		}
-		// 	})
-		// }
-
-		// function handleInfiniteSequencers() {
-		// 	const infiniteSequencers = toArray(selectAllInfiniteSequencers(state.room))
-
-		// 	infiniteSequencers.forEach(infiniteSequencer => {
-		// 		let sequencer = stuffMap.get(infiniteSequencer.id) as GridSequencerPlayer
-
-		// 		sequencer = createIfNotExisting(infiniteSequencer.id, sequencer, () => {
-		// 			return new GridSequencerPlayer(
-		// 				audioContext,
-		// 				index => store.dispatch(setInfiniteSequencerField(infiniteSequencer.id, InfiniteSequencerFields.index, index)),
-		// 			)
-		// 		})
-
-		// 		if (infiniteSequencer.isPlaying !== sequencer.isPlaying()) {
-		// 			if (infiniteSequencer.isPlaying) {
-		// 				sequencer.play()
-		// 			} else {
-		// 				sequencer.stop()
-		// 			}
-		// 		}
-		// 	})
-		// }
 
 		function createIfNotExisting<T>(stuff: StuffMap, id: string, thing: any, thingFactory: () => T): T {
 			if (thing === undefined) {
