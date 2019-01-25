@@ -74,7 +74,7 @@ export interface IBasicInstrumentState extends IConnectable {
 }
 
 export class BasicInstrumentState implements IBasicInstrumentState {
-	public static dummy: IBasicInstrumentState = {
+	public static dummy: BasicInstrumentState = {
 		oscillatorType: BuiltInOscillatorType.sine,
 		id: 'dummy',
 		ownerId: 'dummyOwner',
@@ -82,7 +82,7 @@ export class BasicInstrumentState implements IBasicInstrumentState {
 		lowPassFilterCutoffFrequency: 0,
 		attack: 0,
 		release: 0,
-		color: 'gray',
+		color: false,
 	}
 
 	public oscillatorType: ShamuOscillatorType
@@ -93,7 +93,7 @@ export class BasicInstrumentState implements IBasicInstrumentState {
 	public lowPassFilterCutoffFrequency: number = Math.random() * 10000 + 1000
 	public attack: number = 0.01
 	public release: number = 1
-	public color: string = CssColor.panelGray
+	public color: false = false
 
 	constructor(ownerId: ClientId) {
 		this.ownerId = ownerId

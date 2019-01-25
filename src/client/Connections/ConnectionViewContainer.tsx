@@ -109,10 +109,10 @@ export class ConnectionViewContainer extends React.PureComponent<IConnectionView
 
 export const mapStateToProps =
 	(state: IClientAppState, props: IConnectionViewContainerProps): IConnectionViewContainerReduxProps => {
-		const connection = selectConnection(state.room, props.id) || {} as IConnection
-		const sourceColor = connection && selectConnectionSourceColor(state.room, connection.id)
-		const isSourceActive = connection && selectConnectionSourceIsActive(state.room, connection.id)
-		const isSourceSending = connection && selectConnectionSourceIsSending(state.room, connection.id)
+		const connection = selectConnection(state.room, props.id)
+		const sourceColor = selectConnectionSourceColor(state.room, connection.id)
+		const isSourceActive = selectConnectionSourceIsActive(state.room, connection.id)
+		const isSourceSending = selectConnectionSourceIsSending(state.room, connection.id)
 
 		return {
 			sourceId: connection.sourceId,

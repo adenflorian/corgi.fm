@@ -128,7 +128,7 @@ export type IConnectableStateSelector = (roomState: IClientRoomState, id: string
 
 export interface IConnectable {
 	id: string
-	color: string
+	color: string | false
 	isPlaying?: boolean
 }
 
@@ -216,27 +216,31 @@ export const selectFirstConnectionByTargetId = (state: IClientRoomState, targetI
 	selectAllConnectionsAsArray(state)
 		.find(x => x.targetId === targetId) || Connection.dummy
 
-export const selectFirstConnectionIdByTargetId = (state: IClientRoomState, targetId: string) => {
+export const selectFirstConnectionIdByTargetId = (state: IClientRoomState, targetId: string): string => {
 	const conn = selectFirstConnectionByTargetId(state, targetId)
 	return conn ? conn.id : 'fakeConnectionId'
 }
 
-export const getConnectionSourceColorByTargetId = (state: IClientRoomState, targetId: string) =>
+export const selectConnectionSourceColorByTargetId = (state: IClientRoomState, targetId: string): string =>
 	selectConnectionSourceColor(state, selectFirstConnectionIdByTargetId(state, targetId))
 
 export const selectConnectionSourceColor = (roomState: IClientRoomState, id: string) => {
 	const connection = selectConnection(roomState, id)
 
-	return getConnectionNodeInfo(connection.sourceType).stateSelector(roomState, connection.sourceId).color
+	return (
+		getConnectionNodeInfo(connection.sourceType).stateSelector(roomState, connection.sourceId).color
+		||
+		selectConnectionSourceColorByTargetId(roomState, connection.sourceId)
+	)
 }
 
-export const selectConnectionSourceIsActive = (roomState: IClientRoomState, id: string) => {
+export const selectConnectionSourceIsActive = (roomState: IClientRoomState, id: string): boolean => {
 	const connection = selectConnection(roomState, id)
 
 	return getConnectionNodeInfo(connection.sourceType).stateSelector(roomState, connection.sourceId).isPlaying || false
 }
 
-export const selectConnectionSourceIsSending = (roomState: IClientRoomState, id: string) => {
+export const selectConnectionSourceIsSending = (roomState: IClientRoomState, id: string): boolean => {
 	return selectConnectionSourceNotes(roomState, id).length > 0
 }
 

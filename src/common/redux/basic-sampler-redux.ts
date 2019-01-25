@@ -55,14 +55,14 @@ export interface IBasicSamplerState extends IConnectable {
 }
 
 export class BasicSamplerState implements IBasicSamplerState {
-	public static dummy: IBasicSamplerState = {
+	public static dummy: BasicSamplerState = {
 		id: 'dummy',
 		ownerId: 'dummyOwner',
 		pan: 0,
 		lowPassFilterCutoffFrequency: 0,
 		attack: 0,
 		release: 0,
-		color: 'gray',
+		color: false,
 	}
 
 	public id = uuid.v4()
@@ -71,7 +71,7 @@ export class BasicSamplerState implements IBasicSamplerState {
 	public lowPassFilterCutoffFrequency: number = Math.random() * 10000 + 1000
 	public attack: number = 0.01
 	public release: number = 1
-	public color: string = CssColor.panelGray
+	public color: false = false
 
 	constructor(ownerId: ClientId) {
 		this.ownerId = ownerId

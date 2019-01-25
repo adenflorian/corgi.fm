@@ -80,6 +80,7 @@
 - [ ] use discord for chat somehow?
 - [ ] make instruments that run around the screen
 	- nyan cat
+- [ ] try to use decorators on action types to generate a giant combined action type
 
 # Shared Cursors
 - [ ] make shared cursor not block pointer events
