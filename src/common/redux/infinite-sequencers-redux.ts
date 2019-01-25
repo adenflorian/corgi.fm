@@ -249,6 +249,12 @@ export const selectAllInfiniteSequencers = (state: IClientRoomState) => state.in
 
 export const selectInfiniteSequencer = (state: IClientRoomState, id: string) => selectAllInfiniteSequencers(state)[id]
 
+export const selectInfiniteSequencerIsActive = (state: IClientRoomState, id: string) =>
+	selectInfiniteSequencer(state, id).isPlaying
+
+export const selectInfiniteSequencerIsSending = (state: IClientRoomState, id: string) =>
+	selectInfiniteSequencerActiveNotes(state, id).length > 0
+
 const emptyArray: number[] = []
 
 export const selectInfiniteSequencerActiveNotes = createSelector(

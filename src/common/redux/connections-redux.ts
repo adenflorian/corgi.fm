@@ -1,4 +1,4 @@
-import {Map} from 'immutable'
+import {Map, Record} from 'immutable'
 import {combineReducers, Reducer} from 'redux'
 import {createSelector} from 'reselect'
 import * as uuid from 'uuid'
@@ -7,12 +7,19 @@ import {CssColor} from '../shamu-color'
 import {selectBasicInstrument} from './basic-instruments-redux'
 import {selectSampler} from './basic-sampler-redux'
 import {IClientRoomState} from './common-redux-types'
-import {GridSequencerState, selectGridSequencer, selectGridSequencerActiveNotes} from './grid-sequencers-redux'
+import {
+	GridSequencerState, selectGridSequencer, selectGridSequencerActiveNotes,
+	selectGridSequencerIsActive, selectGridSequencerIsSending,
+} from './grid-sequencers-redux'
 import {
 	InfiniteSequencerState, selectInfiniteSequencer, selectInfiniteSequencerActiveNotes,
+	selectInfiniteSequencerIsActive, selectInfiniteSequencerIsSending,
 } from './infinite-sequencers-redux'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
-import {IVirtualKeyboardState, makeGetKeyboardMidiOutput, selectVirtualKeyboardById} from './virtual-keyboard-redux'
+import {
+	IVirtualKeyboardState, makeGetKeyboardMidiOutput, selectVirtualKeyboardById,
+	selectVirtualKeyboardIsActive, selectVirtualKeyboardIsSending,
+} from './virtual-keyboard-redux'
 
 export const ADD_CONNECTION = 'ADD_CONNECTION'
 export type AddConnectionAction = ReturnType<typeof addConnection>
@@ -65,55 +72,79 @@ export enum ConnectionNodeType {
 	dummy = 'dummy',
 }
 
-export interface ConnectionNodeInfo {
+export interface IConnectionNodeInfo {
 	stateSelector: IConnectableStateSelector,
+	selectIsActive: IConnectableIsActiveSelector,
+	selectIsSending: IConnectableIsActiveSelector,
 	width: number,
 	height: number,
 }
 
-export const getConnectionNodeInfo = (type: ConnectionNodeType): ConnectionNodeInfo => {
-	switch (type) {
-		case ConnectionNodeType.keyboard: return {
-			stateSelector: selectVirtualKeyboardById,
-			width: 456,
-			height: 56,
-		}
-		case ConnectionNodeType.gridSequencer: return {
-			stateSelector: selectGridSequencer,
-			width: GridSequencerState.defaultWidth,
-			height: GridSequencerState.defaultHeight,
-		}
-		case ConnectionNodeType.infiniteSequencer: return {
-			stateSelector: selectInfiniteSequencer,
-			width: InfiniteSequencerState.defaultWidth,
-			height: InfiniteSequencerState.defaultHeight,
-		}
-		case ConnectionNodeType.instrument: return {
-			stateSelector: selectBasicInstrument,
-			width: 416,
-			height: 56,
-		}
-		case ConnectionNodeType.sampler: return {
-			stateSelector: selectSampler,
-			width: 416,
-			height: 56,
-		}
-		case ConnectionNodeType.audioOutput: return {
-			stateSelector: () => ({id: MASTER_AUDIO_OUTPUT_TARGET_ID, color: CssColor.green}),
-			width: 140.48,
-			height: 48,
-		}
-		case ConnectionNodeType.masterClock: return {
-			stateSelector: () => ({id: MASTER_CLOCK_SOURCE_ID, color: CssColor.blue}),
-			width: 134.813,
-			height: 72,
-		}
-		default: return {
-			stateSelector: () => ({id: 'oh no', color: CssColor.subtleGrayBlackBg}),
-			width: 0,
-			height: 0,
-		}
-	}
+const NodeInfoRecord = Record<IConnectionNodeInfo>({
+	stateSelector: () => ({
+		color: CssColor.subtleGrayBlackBg,
+		id: 'oh no',
+	}),
+	selectIsActive: () => null,
+	selectIsSending: () => null,
+	width: 0,
+	height: 0,
+})
+
+const NodeInfoMap = Map({
+	[ConnectionNodeType.keyboard]: NodeInfoRecord({
+		stateSelector: selectVirtualKeyboardById,
+		selectIsActive: selectVirtualKeyboardIsActive,
+		selectIsSending: selectVirtualKeyboardIsSending,
+		width: 456,
+		height: 56,
+	}),
+	[ConnectionNodeType.gridSequencer]: NodeInfoRecord({
+		stateSelector: selectGridSequencer,
+		selectIsActive: selectGridSequencerIsActive,
+		selectIsSending: selectGridSequencerIsSending,
+		width: GridSequencerState.defaultWidth,
+		height: GridSequencerState.defaultHeight,
+	}),
+	[ConnectionNodeType.infiniteSequencer]: NodeInfoRecord({
+		stateSelector: selectInfiniteSequencer,
+		selectIsActive: selectInfiniteSequencerIsActive,
+		selectIsSending: selectInfiniteSequencerIsSending,
+		width: InfiniteSequencerState.defaultWidth,
+		height: InfiniteSequencerState.defaultHeight,
+	}),
+	[ConnectionNodeType.instrument]: NodeInfoRecord({
+		stateSelector: selectBasicInstrument,
+		width: 416,
+		height: 56,
+	}),
+	[ConnectionNodeType.sampler]: NodeInfoRecord({
+		stateSelector: selectSampler,
+		width: 416,
+		height: 56,
+	}),
+	[ConnectionNodeType.audioOutput]: NodeInfoRecord({
+		stateSelector: () => ({id: MASTER_AUDIO_OUTPUT_TARGET_ID, color: CssColor.green}),
+		width: 140.48,
+		height: 48,
+	}),
+	[ConnectionNodeType.masterClock]: NodeInfoRecord({
+		stateSelector: () => ({id: MASTER_CLOCK_SOURCE_ID, color: CssColor.blue}),
+		selectIsActive: () => false,
+		selectIsSending: () => false,
+		width: 134.813,
+		height: 72,
+	}),
+})
+
+const dummyNodeInfo = NodeInfoRecord({
+	stateSelector: () => ({id: 'oh no', color: CssColor.subtleGrayBlackBg, isPlaying: false}),
+	width: 0,
+	height: 0,
+})
+
+export const getConnectionNodeInfo = (type: ConnectionNodeType): IConnectionNodeInfo => {
+	return NodeInfoMap.get(type) || dummyNodeInfo
 }
 
 export interface IConnection {
@@ -126,10 +157,13 @@ export interface IConnection {
 
 export type IConnectableStateSelector = (roomState: IClientRoomState, id: string) => IConnectable
 
+export type IConnectableIsActiveSelector = (roomState: IClientRoomState, id: string) => boolean | null
+
+export type IConnectableIsSendingSelector = (roomState: IClientRoomState, id: string) => boolean | null
+
 export interface IConnectable {
 	id: string
 	color: string | false
-	isPlaying?: boolean
 }
 
 export const MASTER_AUDIO_OUTPUT_TARGET_ID = 'MASTER_AUDIO_OUTPUT_TARGET_ID'
@@ -237,11 +271,29 @@ export const selectConnectionSourceColor = (roomState: IClientRoomState, id: str
 export const selectConnectionSourceIsActive = (roomState: IClientRoomState, id: string): boolean => {
 	const connection = selectConnection(roomState, id)
 
-	return getConnectionNodeInfo(connection.sourceType).stateSelector(roomState, connection.sourceId).isPlaying || false
+	const isPlaying = getConnectionNodeInfo(connection.sourceType).selectIsActive(roomState, connection.sourceId)
+
+	if (isPlaying !== null) {
+		return isPlaying
+	} else if (connection === Connection.dummy) {
+		return false
+	} else {
+		return selectConnectionSourceIsActive(roomState, selectFirstConnectionIdByTargetId(roomState, connection.sourceId))
+	}
 }
 
 export const selectConnectionSourceIsSending = (roomState: IClientRoomState, id: string): boolean => {
-	return selectConnectionSourceNotes(roomState, id).length > 0
+	const connection = selectConnection(roomState, id)
+
+	const isSending = getConnectionNodeInfo(connection.sourceType).selectIsSending(roomState, connection.sourceId)
+
+	if (isSending !== null) {
+		return isSending
+	} else if (connection === Connection.dummy) {
+		return false
+	} else {
+		return selectConnectionSourceIsSending(roomState, selectFirstConnectionIdByTargetId(roomState, connection.sourceId))
+	}
 }
 
 const getKeyboardMidiOutput = makeGetKeyboardMidiOutput()

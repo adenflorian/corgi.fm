@@ -307,17 +307,23 @@ export const selectAllGridSequencerIds = createSelector(
 export const selectGridSequencer = (state: IClientRoomState, id: string) =>
 	selectAllGridSequencers(state)[id] || GridSequencerState.dummy
 
-const emptyArray: number[] = []
+export const selectGridSequencerIsActive = (state: IClientRoomState, id: string) =>
+	selectGridSequencer(state, id).isPlaying
 
-export const selectAllSequencers = (state: IClientRoomState) => ({
-	...state.gridSequencers.things,
-	...state.infiniteSequencers.things,
-})
+export const selectGridSequencerIsSending = (state: IClientRoomState, id: string) =>
+	selectGridSequencerActiveNotes(state, id).length > 0
+
+export const selectAllSequencers = createSelector(
+	[selectAllGridSequencers, selectAllInfiniteSequencers],
+	(gridSeqs, infSeqs) => ({...gridSeqs, ...infSeqs}),
+)
 
 export const selectIsAnythingPlaying = createSelector(
-	[selectAllGridSequencers, selectAllGridSequencers],
-	(gridSeqs, infSeqs) => Map(gridSeqs).merge(infSeqs).some(x => x.isPlaying),
+	[selectAllSequencers],
+	allSeqs => Map(allSeqs).some(x => x.isPlaying),
 )
+
+const emptyArray: number[] = []
 
 export const selectGridSequencerActiveNotes = createSelector(
 	[selectGridSequencer, selectGlobalClockState],

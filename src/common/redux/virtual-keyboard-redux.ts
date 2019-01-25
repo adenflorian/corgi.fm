@@ -110,9 +110,11 @@ export interface IVirtualKeyboardState extends IMultiStateThing {
 	color: string
 }
 
+const emptyArray: any[] = []
+
 export class VirtualKeyboardState implements IVirtualKeyboardState {
 	public static dummy: IVirtualKeyboardState = {
-		pressedKeys: [],
+		pressedKeys: emptyArray,
 		octave: 0,
 		id: 'dummy',
 		ownerId: 'dummyOwner',
@@ -210,6 +212,14 @@ export const selectAllVirtualKeyboardIds = createSelector(
 
 export const selectVirtualKeyboardById = (state: IClientRoomState, id: string) => {
 	return selectAllVirtualKeyboards(state)[id] || VirtualKeyboardState.dummy
+}
+
+export const selectVirtualKeyboardIsActive = (state: IClientRoomState, id: string) => {
+	return selectVirtualKeyboardById(state, id).pressedKeys.length > 0
+}
+
+export const selectVirtualKeyboardIsSending = (state: IClientRoomState, id: string) => {
+	return selectVirtualKeyboardById(state, id).pressedKeys.length > 0
 }
 
 export const makeGetKeyboardMidiOutput = () => {
