@@ -1,12 +1,13 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
+import {Point} from '../../common/common-types'
 import {IClientAppState} from '../../common/redux/common-redux-types'
 import {
-	IConnection, selectAllConnections, selectConnection,
-	selectConnectionSourceColor, selectConnectionSourceIsActive, selectConnectionSourceIsSending,
+	GhostConnectorRecord, selectAllConnections,
+	selectConnection, selectConnectionSourceColor, selectConnectionSourceIsActive, selectConnectionSourceIsSending,
 } from '../../common/redux/connections-redux'
 import {getMainBoardsRectX, getMainBoardsRectY} from '../utils'
-import {ConnectedConnectionView, Point} from './ConnectionView'
+import {ConnectedConnectionView} from './ConnectionView'
 
 export interface IConnectionViewContainerProps {
 	id: string
@@ -19,6 +20,7 @@ export interface IConnectionViewContainerReduxProps {
 	sourceColor: string
 	isSourceActive: boolean
 	isSourceSending: boolean
+	ghostConnector: GhostConnectorRecord
 }
 
 export type IConnectionViewContainerAllProps = IConnectionViewContainerProps & IConnectionViewContainerReduxProps
@@ -120,6 +122,7 @@ export const mapStateToProps =
 			sourceColor,
 			isSourceActive,
 			isSourceSending,
+			ghostConnector: connection.ghostConnector,
 			// Forces update when connections change
 			connections: selectAllConnections(state.room),
 		}

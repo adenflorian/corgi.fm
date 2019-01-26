@@ -53,6 +53,16 @@ export const updateConnections = (connections: IConnections) => ({
 	BROADCASTER_ACTION,
 })
 
+export const UPDATE_GHOST_CONNECTOR = 'UPDATE_GHOST_CONNECTOR'
+export type UpdateGhostConnectorAction = ReturnType<typeof updateGhostConnector>
+export const updateGhostConnector = (id: string, connector: Partial<GhostConnectorRecord>) => ({
+	type: UPDATE_GHOST_CONNECTOR as typeof UPDATE_GHOST_CONNECTOR,
+	id,
+	connector,
+	SERVER_ACTION,
+	BROADCASTER_ACTION,
+})
+
 export interface IConnectionsState {
 	connections: IConnections
 }
@@ -147,12 +157,29 @@ export const getConnectionNodeInfo = (type: ConnectionNodeType): IConnectionNode
 	return NodeInfoMap.get(type) || dummyNodeInfo
 }
 
+export enum GhostConnectorStatus {
+	hidden = 'hidden',
+	activeSource = 'activeSource',
+	activeTarget = 'activeTarget',
+}
+
+const makeGhostConnectorRecord = Record({
+	x: 0,
+	y: 0,
+	status: GhostConnectorStatus.hidden,
+})
+
+export const defaultGhostConnector = makeGhostConnectorRecord()
+
+export type GhostConnectorRecord = ReturnType<typeof makeGhostConnectorRecord>
+
 export interface IConnection {
 	sourceId: string
 	sourceType: ConnectionNodeType
 	targetId: string
 	targetType: ConnectionNodeType
 	id: string
+	ghostConnector: GhostConnectorRecord
 }
 
 export type IConnectableStateSelector = (roomState: IClientRoomState, id: string) => IConnectable
@@ -177,9 +204,11 @@ export class Connection implements IConnection {
 		targetId: '-1',
 		targetType: ConnectionNodeType.dummy,
 		id: '-1',
+		ghostConnector: makeGhostConnectorRecord(),
 	}
 
-	public id = uuid.v4()
+	public readonly id = uuid.v4()
+	public readonly ghostConnector = makeGhostConnectorRecord()
 
 	constructor(
 		public sourceId: string,
@@ -190,7 +219,7 @@ export class Connection implements IConnection {
 }
 
 export type IConnectionAction = AddConnectionAction | DeleteConnectionsAction
-	| DeleteAllConnectionsAction | UpdateConnectionsAction
+	| DeleteAllConnectionsAction | UpdateConnectionsAction | UpdateGhostConnectorAction
 
 const connectionsSpecificReducer: Reducer<IConnections, IConnectionAction> =
 	(connections = Connections(), action) => {
@@ -199,6 +228,11 @@ const connectionsSpecificReducer: Reducer<IConnections, IConnectionAction> =
 			case DELETE_CONNECTIONS: return connections.deleteAll(action.connectionIds)
 			case DELETE_ALL_CONNECTIONS: return connections.clear()
 			case UPDATE_CONNECTIONS: return connections.merge(action.connections)
+			case UPDATE_GHOST_CONNECTOR:
+				return connections.update(
+					action.id,
+					x => ({...x, ghostConnector: {...x.ghostConnector, ...action.connector}}),
+				)
 			default: return connections
 		}
 	}

@@ -16,7 +16,10 @@ type IConnectionViewContainerForSimpleGraphAllProps =
 	IConnectionViewContainerForSimpleGraphReduxProps
 
 export const ConnectionViewContainerForSimpleGraph: React.FC<IConnectionViewContainerForSimpleGraphAllProps> =
-	({sourceColor, isSourceActive, isSourceSending, id, positions: {sourcePosition, targetPosition}}) =>
+	({
+		sourceColor, isSourceActive, isSourceSending, id,
+		positions: {sourcePosition, targetPosition}, ghostConnector,
+	}) =>
 		sourcePosition === undefined || targetPosition === undefined
 			? null
 			: <ConnectedConnectionView
@@ -25,6 +28,7 @@ export const ConnectionViewContainerForSimpleGraph: React.FC<IConnectionViewCont
 				sourceY={sourcePosition.y}
 				targetX={targetPosition.x}
 				targetY={targetPosition.y}
+				ghostConnector={ghostConnector}
 				saturateSource={isSourceActive || isSourceSending}
 				saturateTarget={isSourceSending}
 				id={id}
