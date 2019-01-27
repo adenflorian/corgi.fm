@@ -8,12 +8,12 @@ import {addIfNew} from '../server-common'
 import {colorFunc} from '../shamu-color'
 import {PLAY_ALL, STOP_ALL} from './common-actions'
 import {IClientRoomState} from './common-redux-types'
-import {IConnectable} from './connections-redux'
 import {selectGlobalClockState} from './global-clock-redux'
 import {
 	addMultiThing, deleteThings, IMultiState,
 	IMultiStateThings, makeMultiReducer, MultiThingType, updateThings,
 } from './multi-reducer'
+import {IConnectable} from './node-types'
 import {BROADCASTER_ACTION, NetworkActionType, SERVER_ACTION} from './redux-utils'
 import {
 	CLEAR_SEQUENCER, createSequencerEvents, ISequencerEvent, ISequencerState, SKIP_NOTE, UNDO_SEQUENCER,

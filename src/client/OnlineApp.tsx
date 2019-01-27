@@ -4,8 +4,9 @@ import {connect} from 'react-redux'
 import {selectLocalClient} from '../common/redux/clients-redux'
 import {IClientAppState} from '../common/redux/common-redux-types'
 import {
-	ConnectionNodeType, IConnection, selectSortedConnections,
+	IConnection, selectSortedConnections,
 } from '../common/redux/connections-redux'
+import {ConnectionNodeType} from '../common/redux/node-types'
 import {CssColor, getColorHslByHex} from '../common/shamu-color'
 import {ConnectedChat} from './Chat'
 import {mainBoardsId} from './client-constants'

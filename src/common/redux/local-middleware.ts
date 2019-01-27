@@ -7,10 +7,11 @@ import {selectLocalClient} from './clients-redux'
 import {READY} from './common-actions'
 import {IClientAppState} from './common-redux-types'
 import {
-	Connection, ConnectionNodeType, connectionsActions,
-	MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID,
+	Connection, connectionsActions,
 } from './connections-redux'
 import {deleteAllThings, MultiThingType} from './multi-reducer'
+import {ConnectionNodeType} from './node-types'
+import {MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID} from './node-types'
 import {addPosition, deleteAllPositions, Position, selectPositionExtremes} from './positions-redux'
 import {makeActionCreator} from './redux-utils'
 import {selectActiveRoom, SET_ACTIVE_ROOM} from './rooms-redux'

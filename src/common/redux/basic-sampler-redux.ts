@@ -2,11 +2,11 @@ import {AnyAction} from 'redux'
 import * as uuid from 'uuid'
 import {ClientId} from '../common-types'
 import {IClientRoomState} from './common-redux-types'
-import {IConnectable} from './connections-redux'
 import {
 	addMultiThing, createSelectAllOfThingAsArray, deleteThings, IMultiState,
 	makeMultiReducer, MultiThingType, updateThings,
 } from './multi-reducer'
+import {IConnectable} from './node-types'
 import {BROADCASTER_ACTION, NetworkActionType, SERVER_ACTION} from './redux-utils'
 
 export const addBasicSampler = (sampler: BasicSamplerState) =>

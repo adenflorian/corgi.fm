@@ -5,11 +5,11 @@ import {ClientId} from '../common-types'
 import {pickRandomArrayElement} from '../common-utils'
 import {BuiltInOscillatorType, ShamuOscillatorType} from '../OscillatorTypes'
 import {IClientRoomState} from './common-redux-types'
-import {IConnectable} from './connections-redux'
 import {
 	addMultiThing, createSelectAllOfThingAsArray, deleteThings,
 	IMultiState, makeMultiReducer, MultiThingType, updateThings,
 } from './multi-reducer'
+import {IConnectable} from './node-types'
 import {BROADCASTER_ACTION, NetworkActionType, SERVER_ACTION} from './redux-utils'
 
 export const addBasicInstrument = (instrument: BasicInstrumentState) =>

@@ -6,9 +6,10 @@ import {
 import {BasicSamplerState, selectAllSamplerIds, selectSampler} from '../common/redux/basic-sampler-redux'
 import {IClientAppState, IClientRoomState} from '../common/redux/common-redux-types'
 import {
-	IConnectable, selectConnectionSourceNotes, selectConnectionsWithTargetIds,
+	selectConnectionSourceNotes, selectConnectionsWithTargetIds,
 } from '../common/redux/connections-redux'
 import {setGlobalClockIndex} from '../common/redux/global-clock-redux'
+import {IConnectable} from '../common/redux/node-types'
 import {BasicSamplerInstrument} from './BasicSampler/BasicSamplerInstrument'
 import {GridSequencerPlayer} from './GridSequencerPlayer'
 import {BasicInstrument} from './Instruments/BasicInstrument'

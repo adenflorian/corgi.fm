@@ -1,12 +1,13 @@
 import 'rc-slider/assets/index.css'
-import React = require('react')
 import {Component} from 'react'
+import React = require('react')
 import {connect} from 'react-redux'
 import {Action, Dispatch} from 'redux'
 import {IClientAppState} from '../../common/redux/common-redux-types'
 import {
-	MASTER_AUDIO_OUTPUT_TARGET_ID, selectConnectionSourceColorByTargetId,
+	selectConnectionSourceColorByTargetId,
 } from '../../common/redux/connections-redux'
+import {MASTER_AUDIO_OUTPUT_TARGET_ID} from '../../common/redux/node-types'
 import {setOptionMasterVolume} from '../../common/redux/options-redux'
 import {colorFunc} from '../../common/shamu-color'
 import {Knob} from '../Knob/Knob'

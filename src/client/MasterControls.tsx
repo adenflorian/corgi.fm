@@ -5,8 +5,9 @@ import {
 import {connect} from 'react-redux'
 import {playAll, stopAll} from '../common/redux/common-actions'
 import {IClientAppState} from '../common/redux/common-redux-types'
-import {ConnectionNodeType, getConnectionNodeInfo, MASTER_CLOCK_SOURCE_ID} from '../common/redux/connections-redux'
+import {getConnectionNodeInfo} from '../common/redux/connections-redux'
 import {selectIsAnythingPlaying} from '../common/redux/grid-sequencers-redux'
+import {ConnectionNodeType, MASTER_CLOCK_SOURCE_ID} from '../common/redux/node-types'
 import './MasterControls.less'
 import {Panel} from './Panel/Panel'
 

@@ -4,13 +4,14 @@ import {addBasicSampler, BasicSamplerState} from '../common/redux/basic-sampler-
 import {addClient, ClientState} from '../common/redux/clients-redux'
 import {IServerState} from '../common/redux/configure-server-store'
 import {
-	Connection, ConnectionNodeType, connectionsActions, IConnection,
-	MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID, selectConnectionsWithTargetIds,
+	Connection, connectionsActions, IConnection, selectConnectionsWithTargetIds,
 } from '../common/redux/connections-redux'
 import {addGridSequencer, GridSequencerState} from '../common/redux/grid-sequencers-redux'
 import {
 	addInfiniteSequencer, InfiniteSequencerState, InfiniteSequencerStyle,
 } from '../common/redux/infinite-sequencers-redux'
+import {ConnectionNodeType} from '../common/redux/node-types'
+import {MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID} from '../common/redux/node-types'
 import {
 	addPosition, calculateExtremes, Position, selectAllPositions, updatePositions,
 } from '../common/redux/positions-redux'
