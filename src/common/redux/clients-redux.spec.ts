@@ -39,7 +39,6 @@ describe.only('clients-redux', () => {
 					}),
 				},
 				{
-					// TODO It probably should update the existing one or throw error?
 					name: 'should push on new client even if existing socketId?',
 					initialState: () => ({
 						clients: [
