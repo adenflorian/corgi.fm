@@ -81,6 +81,7 @@
 - [ ] make instruments that run around the screen
 	- nyan cat
 - [ ] try to use decorators on action types to generate a giant combined action type
+- [ ] when someone first joins, show them a list of demos that that can copy into a new room to quickly show people what shamu can do
 
 # Shared Cursors
 - [ ] make shared cursor not block pointer events

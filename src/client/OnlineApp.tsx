@@ -22,8 +22,7 @@ interface IOnlineAppProps {
 	hasLocalClient: boolean
 }
 
-// TODO Make Pure
-class OnlineApp extends React.Component<IOnlineAppProps> {
+class OnlineApp extends React.PureComponent<IOnlineAppProps> {
 	public render() {
 		const {hasLocalClient} = this.props
 

@@ -6,7 +6,7 @@ export interface IBasicInstrumentOptions extends IInstrumentOptions {
 	oscillatorType: ShamuOscillatorType
 }
 
-// TODO Make into an BasicInstrumentAudioNode?
+// TODO Make into a BasicInstrumentAudioNode?
 export class BasicInstrument extends Instrument<SynthVoices, SynthVoice> {
 	private readonly _voices: SynthVoices
 
