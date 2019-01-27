@@ -238,7 +238,7 @@ function onLeaveRoom(io: Server, socket: Socket, roomToLeave: string, serverStor
 
 	const sourceAndTargetIds = instrumentIdsToDelete.concat(keyboardIdsToDelete).concat(samplerIdsToDelete)
 	const connectionIdsToDelete = selectConnectionsWithSourceOrTargetIds(roomState, sourceAndTargetIds).map(x => x.id)
-	const deleteConnectionsAction = connectionsActions.deleteConnections(connectionIdsToDelete)
+	const deleteConnectionsAction = connectionsActions.delete(connectionIdsToDelete)
 	serverStore.dispatch(createRoomAction(deleteConnectionsAction, roomToLeave))
 	io.to(roomToLeave).emit(WebSocketEvent.broadcast, deleteConnectionsAction)
 
@@ -291,7 +291,7 @@ function syncState(newSocket: Socket, roomState: IClientRoomState, serverState: 
 		[updateVirtualKeyboards, selectAllVirtualKeyboards],
 		[updateGridSequencers, selectAllGridSequencers],
 		[updateInfiniteSequencers, selectAllInfiniteSequencers],
-		[connectionsActions.updateConnections, selectAllConnections],
+		[connectionsActions.updateAll, selectAllConnections],
 		[updatePositions, selectAllPositions],
 	]
 

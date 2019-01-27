@@ -125,7 +125,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps & {
 					</defs>
 					<g
 						onContextMenu={(e: React.MouseEvent) => {
-							this.props.dispatch(connectionsActions.deleteConnections([id]))
+							this.props.dispatch(connectionsActions.delete([id]))
 							e.preventDefault()
 						}}
 					>

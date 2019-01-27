@@ -29,22 +29,22 @@ export const UPDATE_CONNECTIONS = 'UPDATE_CONNECTIONS'
 export const UPDATE_GHOST_CONNECTOR = 'UPDATE_GHOST_CONNECTOR'
 
 export const connectionsActions = Object.freeze({
-	addConnection: (connection: IConnection) => ({
+	add: (connection: IConnection) => ({
 		type: ADD_CONNECTION as typeof ADD_CONNECTION,
 		connection,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	}),
-	deleteConnections: (connectionIds: string[]) => ({
+	delete: (connectionIds: string[]) => ({
 		type: DELETE_CONNECTIONS as typeof DELETE_CONNECTIONS,
 		connectionIds,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	}),
-	deleteAllConnections: () => ({
+	deleteAll: () => ({
 		type: DELETE_ALL_CONNECTIONS as typeof DELETE_ALL_CONNECTIONS,
 	}),
-	updateConnections: (connections: IConnections) => ({
+	updateAll: (connections: IConnections) => ({
 		type: UPDATE_CONNECTIONS as typeof UPDATE_CONNECTIONS,
 		connections,
 		BROADCASTER_ACTION,

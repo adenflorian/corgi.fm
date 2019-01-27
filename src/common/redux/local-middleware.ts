@@ -29,7 +29,7 @@ export const LOCAL_MIDI_OCTAVE_CHANGE = 'LOCAL_MIDI_OCTAVE_CHANGE'
 export const localMidiOctaveChange = makeActionCreator(LOCAL_MIDI_OCTAVE_CHANGE, 'delta')
 
 export function deleteAllTheThings(dispatch: Dispatch) {
-	dispatch(connectionsActions.deleteAllConnections())
+	dispatch(connectionsActions.deleteAll())
 	dispatch(deleteAllThings(MultiThingType.gridSequencer))
 	dispatch(deleteAllThings(MultiThingType.virtualKeyboard))
 	dispatch(deleteAllThings(MultiThingType.basicInstrument))
@@ -101,7 +101,7 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 		dispatch(addPosition(new Position(newSampler.id, ConnectionNodeType.sampler, ...nextPosition)))
 
 		// Source to target
-		dispatch(connectionsActions.addConnection(new Connection(
+		dispatch(connectionsActions.add(new Connection(
 			newVirtualKeyboard.id,
 			ConnectionNodeType.keyboard,
 			newSampler.id,
@@ -109,7 +109,7 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 		)))
 
 		// Target to audio output
-		dispatch(connectionsActions.addConnection(new Connection(
+		dispatch(connectionsActions.add(new Connection(
 			newSampler.id,
 			ConnectionNodeType.sampler,
 			MASTER_AUDIO_OUTPUT_TARGET_ID,
@@ -117,7 +117,7 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 		)))
 
 		// Master clock to source
-		dispatch(connectionsActions.addConnection(new Connection(
+		dispatch(connectionsActions.add(new Connection(
 			MASTER_CLOCK_SOURCE_ID,
 			ConnectionNodeType.masterClock,
 			newVirtualKeyboard.id,
@@ -129,7 +129,7 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 		dispatch(addPosition(new Position(newInstrument.id, ConnectionNodeType.instrument, ...nextPosition)))
 
 		// Source to target
-		dispatch(connectionsActions.addConnection(new Connection(
+		dispatch(connectionsActions.add(new Connection(
 			newVirtualKeyboard.id,
 			ConnectionNodeType.keyboard,
 			newInstrument.id,
@@ -137,7 +137,7 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 		)))
 
 		// Target to audio output
-		dispatch(connectionsActions.addConnection(new Connection(
+		dispatch(connectionsActions.add(new Connection(
 			newInstrument.id,
 			ConnectionNodeType.instrument,
 			MASTER_AUDIO_OUTPUT_TARGET_ID,
@@ -145,7 +145,7 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 		)))
 
 		// Master clock to source
-		dispatch(connectionsActions.addConnection(new Connection(
+		dispatch(connectionsActions.add(new Connection(
 			MASTER_CLOCK_SOURCE_ID,
 			ConnectionNodeType.masterClock,
 			newVirtualKeyboard.id,
