@@ -4,12 +4,10 @@ import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
 import * as uuid from 'uuid'
 import {logger} from '../logger'
-import {CssColor} from '../shamu-color'
 import {IClientRoomState} from './common-redux-types'
 import {selectGridSequencerActiveNotes} from './grid-sequencers-redux'
 import {selectInfiniteSequencerActiveNotes} from './infinite-sequencers-redux'
-import {IConnectionNodeInfo, NodeInfoMap, NodeInfoRecord} from './node-types'
-import {ConnectionNodeType} from './node-types'
+import {ConnectionNodeType, getConnectionNodeInfo} from './node-types'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
 import {IVirtualKeyboardState, makeGetKeyboardMidiOutput, selectVirtualKeyboardById} from './virtual-keyboard-redux'
 
@@ -56,16 +54,6 @@ export interface IConnectionsState {
 export type IConnections = Map<string, IConnection>
 
 export const Connections = Map
-
-const dummyNodeInfo = NodeInfoRecord({
-	stateSelector: () => ({id: 'oh no', color: CssColor.subtleGrayBlackBg, isPlaying: false}),
-	width: 0,
-	height: 0,
-})
-
-export const getConnectionNodeInfo = (type: ConnectionNodeType): IConnectionNodeInfo => {
-	return NodeInfoMap.get(type) || dummyNodeInfo
-}
 
 export enum GhostConnectorStatus {
 	hidden = 'hidden',

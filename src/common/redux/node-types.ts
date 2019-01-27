@@ -103,3 +103,13 @@ export const NodeInfoMap = Map({
 		height: 72,
 	}),
 })
+
+const dummyNodeInfo = NodeInfoRecord({
+	stateSelector: () => ({id: 'oh no', color: CssColor.subtleGrayBlackBg, isPlaying: false}),
+	width: 0,
+	height: 0,
+})
+
+export const getConnectionNodeInfo = (type: ConnectionNodeType): IConnectionNodeInfo => {
+	return NodeInfoMap.get(type) || dummyNodeInfo
+}
