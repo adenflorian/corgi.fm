@@ -4,7 +4,7 @@ import {addBasicSampler, BasicSamplerState} from '../common/redux/basic-sampler-
 import {addClient, ClientState} from '../common/redux/clients-redux'
 import {IServerState} from '../common/redux/configure-server-store'
 import {
-	addConnection, Connection, ConnectionNodeType, IConnection,
+	Connection, ConnectionNodeType, connectionsActions, IConnection,
 	MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID, selectConnectionsWithTargetIds,
 } from '../common/redux/connections-redux'
 import {addGridSequencer, GridSequencerState} from '../common/redux/grid-sequencers-redux'
@@ -127,7 +127,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 			new Position(source.id, options.source.type, source.width, source.height)), room))
 
 		// Source to target
-		serverStore.dispatch(createRoomAction(addConnection(new Connection(
+		serverStore.dispatch(createRoomAction(connectionsActions.addConnection(new Connection(
 			source.id,
 			options.source.type,
 			target.id,
@@ -135,7 +135,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 		)), room))
 
 		// Target to audio output
-		serverStore.dispatch(createRoomAction(addConnection(new Connection(
+		serverStore.dispatch(createRoomAction(connectionsActions.addConnection(new Connection(
 			target.id,
 			options.target.type,
 			MASTER_AUDIO_OUTPUT_TARGET_ID,
@@ -143,7 +143,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 		)), room))
 
 		// Master clock to source
-		serverStore.dispatch(createRoomAction(addConnection(new Connection(
+		serverStore.dispatch(createRoomAction(connectionsActions.addConnection(new Connection(
 			MASTER_CLOCK_SOURCE_ID,
 			ConnectionNodeType.masterClock,
 			source.id,

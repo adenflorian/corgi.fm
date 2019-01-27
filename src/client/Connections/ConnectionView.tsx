@@ -2,7 +2,7 @@ import * as React from 'react'
 import Draggable, {DraggableEventHandler} from 'react-draggable'
 import {Dispatch} from 'redux'
 import {
-	defaultGhostConnector, deleteConnections, GhostConnectorRecord, GhostConnectorStatus, updateGhostConnector,
+	connectionsActions, defaultGhostConnector, GhostConnectorRecord, GhostConnectorStatus,
 } from '../../common/redux/connections-redux'
 import {shamuConnect} from '../../common/redux/redux-utils'
 import {
@@ -125,7 +125,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps & {
 					</defs>
 					<g
 						onContextMenu={(e: React.MouseEvent) => {
-							this.props.dispatch(deleteConnections([id]))
+							this.props.dispatch(connectionsActions.deleteConnections([id]))
 							e.preventDefault()
 						}}
 					>
@@ -271,11 +271,12 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps & {
 	}
 
 	private readonly _handleDrag: DraggableEventHandler = (_, data) => {
-		this.props.dispatch(updateGhostConnector(this.props.id, {x: data.x, y: data.y + (this.props.connectorHeight / 2)}))
+		this.props.dispatch(
+			connectionsActions.updateGhostConnector(this.props.id, {x: data.x, y: data.y + (this.props.connectorHeight / 2)}))
 	}
 
 	private readonly _handleStartDrag: DraggableEventHandler = (_, data) => {
-		this.props.dispatch(updateGhostConnector(this.props.id, {
+		this.props.dispatch(connectionsActions.updateGhostConnector(this.props.id, {
 			status: GhostConnectorStatus.activeSource,
 			x: this.props.sourceX,
 			y: this.props.sourceY,
@@ -283,7 +284,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps & {
 	}
 
 	private readonly _handleStopDrag: DraggableEventHandler = (_, __) => {
-		this.props.dispatch(updateGhostConnector(this.props.id, {
+		this.props.dispatch(connectionsActions.updateGhostConnector(this.props.id, {
 			status: GhostConnectorStatus.hidden,
 			x: this.props.sourceX,
 			y: this.props.sourceY,

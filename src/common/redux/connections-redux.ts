@@ -1,6 +1,7 @@
 import {Map, Record} from 'immutable'
 import {combineReducers, Reducer} from 'redux'
 import {createSelector} from 'reselect'
+import {ActionType} from 'typesafe-actions'
 import * as uuid from 'uuid'
 import {logger} from '../logger'
 import {CssColor} from '../shamu-color'
@@ -22,45 +23,39 @@ import {
 } from './virtual-keyboard-redux'
 
 export const ADD_CONNECTION = 'ADD_CONNECTION'
-export type AddConnectionAction = ReturnType<typeof addConnection>
-export const addConnection = (connection: IConnection) => ({
-	type: ADD_CONNECTION as typeof ADD_CONNECTION,
-	connection,
-	SERVER_ACTION,
-	BROADCASTER_ACTION,
-})
-
 export const DELETE_CONNECTIONS = 'DELETE_CONNECTIONS'
-export type DeleteConnectionsAction = ReturnType<typeof deleteConnections>
-export const deleteConnections = (connectionIds: string[]) => ({
-	type: DELETE_CONNECTIONS as typeof DELETE_CONNECTIONS,
-	connectionIds,
-	SERVER_ACTION,
-	BROADCASTER_ACTION,
-})
-
 export const DELETE_ALL_CONNECTIONS = 'DELETE_ALL_CONNECTIONS'
-export type DeleteAllConnectionsAction = ReturnType<typeof deleteAllConnections>
-export const deleteAllConnections = () => ({
-	type: DELETE_ALL_CONNECTIONS as typeof DELETE_ALL_CONNECTIONS,
-})
-
 export const UPDATE_CONNECTIONS = 'UPDATE_CONNECTIONS'
-export type UpdateConnectionsAction = ReturnType<typeof updateConnections>
-export const updateConnections = (connections: IConnections) => ({
-	type: UPDATE_CONNECTIONS as typeof UPDATE_CONNECTIONS,
-	connections,
-	BROADCASTER_ACTION,
-})
-
 export const UPDATE_GHOST_CONNECTOR = 'UPDATE_GHOST_CONNECTOR'
-export type UpdateGhostConnectorAction = ReturnType<typeof updateGhostConnector>
-export const updateGhostConnector = (id: string, connector: Partial<GhostConnectorRecord>) => ({
-	type: UPDATE_GHOST_CONNECTOR as typeof UPDATE_GHOST_CONNECTOR,
-	id,
-	connector,
-	SERVER_ACTION,
-	BROADCASTER_ACTION,
+
+export const connectionsActions = Object.freeze({
+	addConnection: (connection: IConnection) => ({
+		type: ADD_CONNECTION as typeof ADD_CONNECTION,
+		connection,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	}),
+	deleteConnections: (connectionIds: string[]) => ({
+		type: DELETE_CONNECTIONS as typeof DELETE_CONNECTIONS,
+		connectionIds,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	}),
+	deleteAllConnections: () => ({
+		type: DELETE_ALL_CONNECTIONS as typeof DELETE_ALL_CONNECTIONS,
+	}),
+	updateConnections: (connections: IConnections) => ({
+		type: UPDATE_CONNECTIONS as typeof UPDATE_CONNECTIONS,
+		connections,
+		BROADCASTER_ACTION,
+	}),
+	updateGhostConnector: (id: string, connector: Partial<GhostConnectorRecord>) => ({
+		type: UPDATE_GHOST_CONNECTOR as typeof UPDATE_GHOST_CONNECTOR,
+		id,
+		connector,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	}),
 })
 
 export interface IConnectionsState {
@@ -218,8 +213,7 @@ export class Connection implements IConnection {
 	) {}
 }
 
-export type IConnectionAction = AddConnectionAction | DeleteConnectionsAction
-	| DeleteAllConnectionsAction | UpdateConnectionsAction | UpdateGhostConnectorAction
+export type IConnectionAction = ActionType<typeof connectionsActions>
 
 const connectionsSpecificReducer: Reducer<IConnections, IConnectionAction> =
 	(connections = Connections(), action) => {

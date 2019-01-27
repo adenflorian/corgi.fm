@@ -19,7 +19,7 @@ import {ready} from '../common/redux/common-actions'
 import {IClientRoomState} from '../common/redux/common-redux-types'
 import {IServerState} from '../common/redux/configure-server-store'
 import {
-	deleteConnections, selectAllConnections, selectConnectionsWithSourceOrTargetIds, updateConnections,
+	connectionsActions, selectAllConnections, selectConnectionsWithSourceOrTargetIds,
 } from '../common/redux/connections-redux'
 import {selectAllGridSequencers, updateGridSequencers} from '../common/redux/grid-sequencers-redux'
 import {selectAllInfiniteSequencers, updateInfiniteSequencers} from '../common/redux/infinite-sequencers-redux'
@@ -238,7 +238,7 @@ function onLeaveRoom(io: Server, socket: Socket, roomToLeave: string, serverStor
 
 	const sourceAndTargetIds = instrumentIdsToDelete.concat(keyboardIdsToDelete).concat(samplerIdsToDelete)
 	const connectionIdsToDelete = selectConnectionsWithSourceOrTargetIds(roomState, sourceAndTargetIds).map(x => x.id)
-	const deleteConnectionsAction = deleteConnections(connectionIdsToDelete)
+	const deleteConnectionsAction = connectionsActions.deleteConnections(connectionIdsToDelete)
 	serverStore.dispatch(createRoomAction(deleteConnectionsAction, roomToLeave))
 	io.to(roomToLeave).emit(WebSocketEvent.broadcast, deleteConnectionsAction)
 
@@ -291,7 +291,7 @@ function syncState(newSocket: Socket, roomState: IClientRoomState, serverState: 
 		[updateVirtualKeyboards, selectAllVirtualKeyboards],
 		[updateGridSequencers, selectAllGridSequencers],
 		[updateInfiniteSequencers, selectAllInfiniteSequencers],
-		[updateConnections, selectAllConnections],
+		[connectionsActions.updateConnections, selectAllConnections],
 		[updatePositions, selectAllPositions],
 	]
 
