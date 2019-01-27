@@ -1,5 +1,3 @@
-import {Action, Reducer} from 'redux'
-import {logger} from '../logger'
 import {IClientRoomState} from './common-redux-types'
 import {BROADCASTER_ACTION, NetworkActionType, SERVER_ACTION} from './redux-utils'
 
@@ -16,25 +14,21 @@ export interface IMultiStateThing {
 }
 
 export enum MultiThingType {
-	virtualKeyboard,
-	gridSequencer,
-	infiniteSequencer,
-	basicInstrument,
-	basicSampler,
+	virtualKeyboard = 'virtualKeyboard',
+	gridSequencer = 'gridSequencer',
+	infiniteSequencer = 'infiniteSequencer',
+	basicInstrument = 'basicInstrument',
+	basicSampler = 'basicSampler',
 }
 
-type ADD_MULTI_THING = 'ADD_MULTI_THING'
-export const ADD_MULTI_THING: ADD_MULTI_THING = 'ADD_MULTI_THING'
-interface IAddMultiThingAction extends IMultiThingAction {
-	type: ADD_MULTI_THING
-	thing: IMultiStateThing
-}
+export const ADD_MULTI_THING = 'ADD_MULTI_THING'
+type AddMultiThingAction = ReturnType<typeof addMultiThing>
 export const addMultiThing = (
 	thing: IMultiStateThing,
 	thingType: MultiThingType,
 	netActionType: NetworkActionType = NetworkActionType.NO,
-): IAddMultiThingAction => ({
-	type: ADD_MULTI_THING,
+) => ({
+	type: ADD_MULTI_THING as typeof ADD_MULTI_THING,
 	thing,
 	thingType,
 	...expandNetActionType(netActionType),
@@ -51,57 +45,42 @@ function expandNetActionType(netActionType: NetworkActionType) {
 	}
 }
 
-type DELETE_THINGS = 'DELETE_THINGS'
-export const DELETE_MULTI_THINGS: DELETE_THINGS = 'DELETE_THINGS'
-interface IDeleteMultiThingsAction extends IMultiThingAction {
-	type: DELETE_THINGS
-	thingIds: string[]
-}
+export const DELETE_MULTI_THINGS = 'DELETE_MULTI_THINGS'
+type DeleteMultiThingsAction = ReturnType<typeof deleteThings>
 export const deleteThings = (
 	thingIds: string[],
 	thingType: MultiThingType,
 	netActionType: NetworkActionType = NetworkActionType.NO,
-): IDeleteMultiThingsAction => ({
-	type: DELETE_MULTI_THINGS,
+) => ({
+	type: DELETE_MULTI_THINGS as typeof DELETE_MULTI_THINGS,
 	thingIds,
 	thingType,
 	...expandNetActionType(netActionType),
 })
 
-type DELETE_ALL_THINGS = 'DELETE_ALL_THINGS'
-export const DELETE_ALL_THINGS: DELETE_ALL_THINGS = 'DELETE_ALL_THINGS'
-interface IDeleteAllThingsAction extends IMultiThingAction {
-	type: DELETE_ALL_THINGS
-}
-export const deleteAllThings = (thingType: MultiThingType): IDeleteAllThingsAction => ({
-	type: DELETE_ALL_THINGS,
+export const DELETE_ALL_THINGS = 'DELETE_ALL_THINGS'
+type DeleteAllThingsAction = ReturnType<typeof deleteAllThings>
+export const deleteAllThings = (thingType: MultiThingType) => ({
+	type: DELETE_ALL_THINGS as typeof DELETE_ALL_THINGS,
 	thingType,
 })
 
-type UPDATE_THINGS = 'UPDATE_THINGS'
-export const UPDATE_MULTI_THINGS: UPDATE_THINGS = 'UPDATE_THINGS'
-interface IUpdateMultiThingsAction extends IMultiThingAction {
-	type: UPDATE_THINGS
-	things: IMultiStateThings
-}
+export const UPDATE_MULTI_THINGS = 'UPDATE_MULTI_THINGS'
+type UpdateMultiThingsAction = ReturnType<typeof updateThings>
 export const updateThings = (
 	things: IMultiStateThings,
 	thingType: MultiThingType,
 	netActionType: NetworkActionType = NetworkActionType.NO,
-): IUpdateMultiThingsAction => ({
-	type: UPDATE_MULTI_THINGS,
+) => ({
+	type: UPDATE_MULTI_THINGS as typeof UPDATE_MULTI_THINGS,
 	things,
 	thingType,
 	...expandNetActionType(netActionType),
 })
 
 export type MultiThingAction =
-	IUpdateMultiThingsAction | IAddMultiThingAction | IDeleteMultiThingsAction | IDeleteAllThingsAction
+	UpdateMultiThingsAction | AddMultiThingAction | DeleteMultiThingsAction | DeleteAllThingsAction
 	| {type: '', id: string}
-
-interface IMultiThingAction {
-	thingType: MultiThingType
-}
 
 // TODO Use immutable js like connections redux
 export function makeMultiReducer<T extends IMultiStateThing, U extends IMultiState>(

@@ -82,6 +82,7 @@
 	- nyan cat
 - [ ] try to use decorators on action types to generate a giant combined action type
 - [ ] when someone first joins, show them a list of demos that that can copy into a new room to quickly show people what shamu can do
+- [ ] on the borwser warning screen, show why chrome is the only supported browser, like what is missing from firefox
 
 # Shared Cursors
 - [ ] make shared cursor not block pointer events

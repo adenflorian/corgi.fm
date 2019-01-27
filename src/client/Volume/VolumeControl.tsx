@@ -5,16 +5,13 @@ import {connect} from 'react-redux'
 import {Action, Dispatch} from 'redux'
 import {IClientAppState} from '../../common/redux/common-redux-types'
 import {
-	ConnectionNodeType, getConnectionNodeInfo, MASTER_AUDIO_OUTPUT_TARGET_ID,
+	MASTER_AUDIO_OUTPUT_TARGET_ID, selectConnectionSourceColorByTargetId,
 } from '../../common/redux/connections-redux'
 import {setOptionMasterVolume} from '../../common/redux/options-redux'
 import {colorFunc} from '../../common/shamu-color'
 import {Knob} from '../Knob/Knob'
 import {Panel} from '../Panel/Panel'
 import './VolumeControl.less'
-
-// interface IVolumeControlProps {
-// }
 
 interface IVolumeControlReduxProps {
 	color: string
@@ -55,13 +52,13 @@ export class VolumeControl extends Component<IVolumeControlAllProps> {
 }
 
 export const ConnectedVolumeControl = connect(
-	(state: IClientAppState) => ({
-		color: getConnectionNodeInfo(ConnectionNodeType.audioOutput)
-			.stateSelector(state.room, MASTER_AUDIO_OUTPUT_TARGET_ID)
-			.color,
-		masterVolume: state.options.masterVolume,
-		reportedMasterVolume: Math.floor(state.audio.reportedMasterLevel),
-	}),
+	(state: IClientAppState): IVolumeControlReduxProps => {
+		return {
+			color: selectConnectionSourceColorByTargetId(state.room, MASTER_AUDIO_OUTPUT_TARGET_ID),
+			masterVolume: state.options.masterVolume,
+			reportedMasterVolume: Math.floor(state.audio.reportedMasterLevel),
+		}
+	},
 	(dispatch: Dispatch): IVolumeControlDispatchProps => ({
 		changeMasterVolume: volume => dispatch(setOptionMasterVolume(volume)),
 	}),

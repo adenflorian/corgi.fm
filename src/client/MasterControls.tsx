@@ -59,7 +59,7 @@ export const ConnectedMasterControls = connect(
 		isAnythingPlaying: selectIsAnythingPlaying(state.room),
 		color: getConnectionNodeInfo(ConnectionNodeType.masterClock)
 			.stateSelector(state.room, MASTER_CLOCK_SOURCE_ID)
-			.color,
+			.color || 'gray',
 	}),
 	{onPlay: playAll, onStop: stopAll},
 )(MasterControls)

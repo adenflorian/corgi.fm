@@ -26,8 +26,6 @@ const stuffMap = Object.freeze({
 	basicInstruments: new Map<string, IDisposable>() as StuffMap,
 })
 
-// let previousState: any = {}
-
 export const setupInstrumentManager = (store: Store<IClientAppState>, audioContext: AudioContext, preFx: GainNode) => {
 
 	const globalClock = new GridSequencerPlayer(

@@ -27,7 +27,16 @@ interface ISomeAction extends Action {
 	[key: string]: any
 }
 
+/**
+ * Will dispatch on the server.
+ * Use if you want the server to remember the result of dispatching this action.
+ */
 export const SERVER_ACTION = 'SERVER_ACTION'
+
+/**
+ * Will be dispatched on all other clients.
+ * Use if you want other clients to see the result of dispatching this action.
+ */
 export const BROADCASTER_ACTION = 'BROADCASTER_ACTION'
 
 export enum NetworkActionType {
