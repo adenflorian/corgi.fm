@@ -40,8 +40,7 @@ function expandNetActionType(netActionType: NetworkActionType) {
 		case NetworkActionType.BROADCASTER: return {BROADCASTER_ACTION}
 		case NetworkActionType.SERVER_AND_BROADCASTER: return {SERVER_ACTION, BROADCASTER_ACTION}
 		case NetworkActionType.NO:
-		default:
-			return {}
+		default: return {}
 	}
 }
 

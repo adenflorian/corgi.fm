@@ -67,8 +67,6 @@ const makeGhostConnectorRecord = Record({
 	status: GhostConnectorStatus.hidden,
 })
 
-export const defaultGhostConnector = makeGhostConnectorRecord()
-
 export type GhostConnectorRecord = ReturnType<typeof makeGhostConnectorRecord>
 
 export interface IConnection {

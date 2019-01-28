@@ -13,7 +13,7 @@ import {
 import {ConnectionNodeType} from '../common/redux/node-types'
 import {MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID} from '../common/redux/node-types'
 import {
-	addPosition, calculateExtremes, Position, selectAllPositions, updatePositions,
+	addPosition, calculateExtremes, makePosition, selectAllPositions, updatePositions,
 } from '../common/redux/positions-redux'
 import {createRoomAction} from '../common/redux/room-stores-redux'
 import {createSequencerEvents} from '../common/redux/sequencer-redux'
@@ -24,9 +24,9 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 	serverStore.dispatch(createRoomAction(addClientAction, room))
 
 	serverStore.dispatch(createRoomAction(addPosition(
-		new Position(MASTER_CLOCK_SOURCE_ID, ConnectionNodeType.masterClock)), room))
+		makePosition({id: MASTER_CLOCK_SOURCE_ID, targetType: ConnectionNodeType.masterClock})), room))
 	serverStore.dispatch(createRoomAction(addPosition(
-		new Position(MASTER_AUDIO_OUTPUT_TARGET_ID, ConnectionNodeType.audioOutput)), room))
+		makePosition({id: MASTER_AUDIO_OUTPUT_TARGET_ID, targetType: ConnectionNodeType.audioOutput})), room))
 
 	createSourceAndTarget({
 		source: {
@@ -121,11 +121,11 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 	function createSourceAndTarget(options: CreateSourceAndTargetArgs) {
 		const target = createTarget(options.target.type)
 		serverStore.dispatch(createRoomAction(addPosition(
-			new Position(target.id, options.target.type)), room))
+			makePosition({id: target.id, targetType: options.target.type})), room))
 
 		const source = createSource({...options.source})
 		serverStore.dispatch(createRoomAction(addPosition(
-			new Position(source.id, options.source.type, source.width, source.height)), room))
+			makePosition({id: source.id, targetType: options.source.type, width: source.width, height: source.height})), room))
 
 		// Source to target
 		serverStore.dispatch(createRoomAction(connectionsActions.add(new Connection(

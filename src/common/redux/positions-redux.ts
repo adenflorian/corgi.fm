@@ -1,4 +1,4 @@
-import {Map} from 'immutable'
+import {Map, Record} from 'immutable'
 import {combineReducers, Reducer} from 'redux'
 import {createSelector} from 'reselect'
 import {IClientRoomState} from './common-redux-types'
@@ -56,31 +56,27 @@ export type IPositions = Map<string, IPosition>
 
 export const Positions = Map
 
-export interface IPosition {
-	id: string
-	targetType: ConnectionNodeType
-	width: number
-	height: number
-	x: number
-	y: number
+export type IPosition = typeof defaultPosition
+
+const defaultPosition = {
+	id: '-1',
+	targetType: ConnectionNodeType.dummy,
+	width: -1,
+	height: -1,
+	x: Math.random() * 1600 - 800,
+	y: Math.random() * 1000 - 500,
 }
 
-export class Position implements IPosition {
-	constructor(
-		public readonly id: string,
-		public readonly targetType: ConnectionNodeType,
-		public readonly width = -1,
-		public readonly height = -1,
-		public readonly x = Math.random() * 1600 - 800,
-		public readonly y = Math.random() * 1000 - 500,
-	) {
-		if (width === -1) {
-			this.width = getConnectionNodeInfo(targetType).width
-		}
-		if (height === -1) {
-			this.height = getConnectionNodeInfo(targetType).height
-		}
-	}
+const makePositionRecord = Record(defaultPosition)
+
+export const makePosition = (
+	position: Pick<IPosition, 'id' | 'targetType'> & Partial<IPosition>,
+): Readonly<IPosition> => {
+	return makePositionRecord({
+		...position,
+		width: position.width === undefined ? getConnectionNodeInfo(position.targetType).width : position.width,
+		height: position.height === undefined ? getConnectionNodeInfo(position.targetType).height : position.height,
+	}).toJS()
 }
 
 export type IPositionAction = AddPositionAction | DeletePositionsAction
@@ -121,15 +117,6 @@ export const selectAllPositionIds = createSelector(
 export const selectPositionsWithIds = (state: IClientRoomState, ids: string[]) => {
 	return selectAllPositionsAsArray(state)
 		.filter(x => ids.includes(x.id))
-}
-
-const defaultPosition: IPosition = {
-	id: 'uh oh',
-	targetType: ConnectionNodeType.dummy,
-	x: 0,
-	y: 0,
-	width: 0,
-	height: 0,
 }
 
 const selectConnectionSourcePosition =

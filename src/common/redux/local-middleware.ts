@@ -12,7 +12,7 @@ import {
 import {deleteAllThings, MultiThingType} from './multi-reducer'
 import {ConnectionNodeType} from './node-types'
 import {MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID} from './node-types'
-import {addPosition, deleteAllPositions, Position, selectPositionExtremes} from './positions-redux'
+import {addPosition, deleteAllPositions, makePosition, selectPositionExtremes} from './positions-redux'
 import {makeActionCreator} from './redux-utils'
 import {selectActiveRoom, SET_ACTIVE_ROOM} from './rooms-redux'
 import {
@@ -91,15 +91,26 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 
 	const newVirtualKeyboard = new VirtualKeyboardState(localClient.id, localClient.color)
 	dispatch(addVirtualKeyboard(newVirtualKeyboard))
-	dispatch(addPosition(new Position(
-		newVirtualKeyboard.id, ConnectionNodeType.keyboard, -1, -1, extremes.leftMost + x, extremes.bottomMost + y)))
+	dispatch(addPosition(makePosition({
+		id: newVirtualKeyboard.id,
+		targetType: ConnectionNodeType.keyboard,
+		x: extremes.leftMost + x,
+		y: extremes.bottomMost + y,
+	})))
 
-	const nextPosition = [-1, -1, extremes.leftMost + (x * 2), extremes.bottomMost + y + labelHeight]
+	const nextPosition = {
+		x: extremes.leftMost + (x * 2),
+		y: extremes.bottomMost + y + labelHeight,
+	}
 
 	if (localClient.name.toLowerCase() === '$sampler') {
 		const newSampler = new BasicSamplerState(localClient.id)
 		dispatch(addBasicSampler(newSampler))
-		dispatch(addPosition(new Position(newSampler.id, ConnectionNodeType.sampler, ...nextPosition)))
+		dispatch(addPosition(makePosition({
+			id: newSampler.id,
+			targetType: ConnectionNodeType.sampler,
+			...nextPosition,
+		})))
 
 		// Source to target
 		dispatch(connectionsActions.add(new Connection(
@@ -127,7 +138,11 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 	} else {
 		const newInstrument = new BasicInstrumentState(localClient.id)
 		dispatch(addBasicInstrument(newInstrument))
-		dispatch(addPosition(new Position(newInstrument.id, ConnectionNodeType.instrument, ...nextPosition)))
+		dispatch(addPosition(makePosition({
+			id: newInstrument.id,
+			targetType: ConnectionNodeType.instrument,
+			...nextPosition,
+		})))
 
 		// Source to target
 		dispatch(connectionsActions.add(new Connection(

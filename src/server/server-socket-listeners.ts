@@ -283,7 +283,7 @@ function syncState(newSocket: Socket, roomState: IClientRoomState, serverState: 
 		source: server,
 	})
 
-	const foo = [
+	const updaters = [
 		[setRoomMembers, selectAllRoomMemberIds],
 		[setChat, selectAllMessages],
 		[updateBasicInstruments, selectAllBasicInstruments],
@@ -295,12 +295,14 @@ function syncState(newSocket: Socket, roomState: IClientRoomState, serverState: 
 		[updatePositions, selectAllPositions],
 	]
 
-	foo.forEach(([actionCreator, selector]: any[]) => {
-		newSocket.emit(WebSocketEvent.broadcast, {
+	updaters.forEach(([actionCreator, selector]: any[]) => {
+		const action = {
 			...actionCreator(selector(roomState)),
 			alreadyBroadcasted: true,
 			source: server,
-		})
+		}
+		newSocket.emit(WebSocketEvent.broadcast, action)
+		logger.trace(`SYNC: `, action)
 	})
 
 	newSocket.emit(WebSocketEvent.broadcast, {
