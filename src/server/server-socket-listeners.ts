@@ -237,7 +237,9 @@ function onLeaveRoom(io: Server, socket: Socket, roomToLeave: string, serverStor
 	const keyboardIdsToDelete = selectVirtualKeyboardsByOwner(roomState, clientId).map(x => x.id)
 
 	const sourceAndTargetIds = instrumentIdsToDelete.concat(keyboardIdsToDelete).concat(samplerIdsToDelete)
-	const connectionIdsToDelete = selectConnectionsWithSourceOrTargetIds(roomState, sourceAndTargetIds).map(x => x.id)
+	const connectionIdsToDelete = selectConnectionsWithSourceOrTargetIds(roomState, sourceAndTargetIds)
+		.map(x => x.id)
+		.toList()
 	const deleteConnectionsAction = connectionsActions.delete(connectionIdsToDelete)
 	serverStore.dispatch(createRoomAction(deleteConnectionsAction, roomToLeave))
 	io.to(roomToLeave).emit(WebSocketEvent.broadcast, deleteConnectionsAction)

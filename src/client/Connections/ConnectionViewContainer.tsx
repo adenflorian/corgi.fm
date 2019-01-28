@@ -4,7 +4,8 @@ import {Point} from '../../common/common-types'
 import {IClientAppState} from '../../common/redux/common-redux-types'
 import {
 	GhostConnectorRecord, selectAllConnections,
-	selectConnection, selectConnectionSourceColor, selectConnectionSourceIsActive, selectConnectionSourceIsSending,
+	selectConnection, selectConnectionSourceColor,
+	selectConnectionSourceIsActive, selectConnectionSourceIsSending,
 } from '../../common/redux/connections-redux'
 import {getMainBoardsRectX, getMainBoardsRectY} from '../utils'
 import {ConnectedConnectionView} from './ConnectionView'

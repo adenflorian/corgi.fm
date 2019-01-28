@@ -1,13 +1,13 @@
 import {Store} from 'redux'
-import {IDisposable} from '../common/common-types'
 import {IConnectable} from '../common/common-types'
+import {IDisposable} from '../common/common-types'
 import {
 	BasicInstrumentState, selectAllBasicInstrumentIds, selectBasicInstrument,
 } from '../common/redux/basic-instruments-redux'
 import {BasicSamplerState, selectAllSamplerIds, selectSampler} from '../common/redux/basic-sampler-redux'
 import {IClientAppState, IClientRoomState} from '../common/redux/common-redux-types'
 import {
-	selectConnectionSourceNotes, selectConnectionsWithTargetIds,
+	selectConnectionSourceNotes, selectConnectionSourceNotesByTargetId, selectConnectionsWithTargetIds,
 } from '../common/redux/connections-redux'
 import {setGlobalClockIndex} from '../common/redux/global-clock-redux'
 import {BasicSamplerInstrument} from './BasicSampler/BasicSamplerInstrument'
@@ -91,8 +91,6 @@ export const setupInstrumentManager = (store: Store<IClientAppState>, audioConte
 			})
 
 			instrumentIds.forEach(instrumentId => {
-				const connection = selectConnectionsWithTargetIds(state.room, [instrumentId])[0]
-
 				const instrumentState = instrumentStateSelector(state.room, instrumentId)
 
 				const instrument = createIfNotExisting(
@@ -102,12 +100,7 @@ export const setupInstrumentManager = (store: Store<IClientAppState>, audioConte
 					() => instrumentCreator({audioContext, destination: preFx, voiceCount: 1}, instrumentState),
 				)
 
-				if (connection === undefined) {
-					instrument.setMidiNotes([])
-					return
-				}
-
-				const sourceNotes = selectConnectionSourceNotes(state.room, connection.id)
+				const sourceNotes = selectConnectionSourceNotesByTargetId(state.room, instrumentId)
 
 				instrument.setMidiNotes(sourceNotes)
 

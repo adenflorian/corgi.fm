@@ -1,10 +1,11 @@
-import {Map, Record} from 'immutable'
+import {List, Map, Record} from 'immutable'
 import {combineReducers, Reducer} from 'redux'
 import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
 import * as uuid from 'uuid'
 import {ConnectionNodeType} from '../common-types'
 import {logger} from '../logger'
+import {mixColors} from '../shamu-color'
 import {IClientRoomState} from './common-redux-types'
 import {selectGridSequencerActiveNotes} from './grid-sequencers-redux'
 import {selectInfiniteSequencerActiveNotes} from './infinite-sequencers-redux'
@@ -25,7 +26,7 @@ export const connectionsActions = Object.freeze({
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	}),
-	delete: (connectionIds: string[]) => ({
+	delete: (connectionIds: List<string>) => ({
 		type: DELETE_CONNECTIONS as typeof DELETE_CONNECTIONS,
 		connectionIds,
 		SERVER_ACTION,
@@ -138,33 +139,28 @@ export const selectAllConnectionIds = createSelector(
 	connections => connections.keySeq().toArray(),
 )
 
-export const selectAllConnectionsAsArray = createSelector(
-	selectAllConnections,
-	connections => connections.toIndexedSeq().toArray(),
-)
-
 export const selectSortedConnections = createSelector(
-	selectAllConnectionsAsArray,
+	selectAllConnections,
 	connections => connections.sort(sortConnection),
 )
 
 export const selectConnectionsWithSourceOrTargetIds = (state: IClientRoomState, sourceOrTargetIds: string[]) => {
-	return selectAllConnectionsAsArray(state)
+	return selectAllConnections(state)
 		.filter(x => sourceOrTargetIds.includes(x.sourceId) || sourceOrTargetIds.includes(x.targetId))
 }
 
 export const selectConnectionsWithTargetIds = (state: IClientRoomState, targetIds: string[]) => {
-	return selectAllConnectionsAsArray(state)
+	return selectAllConnections(state)
 		.filter(x => targetIds.includes(x.targetId))
 }
 
 export const selectConnectionsWithSourceIds = (state: IClientRoomState, targetIds: string[]) => {
-	return selectAllConnectionsAsArray(state)
+	return selectAllConnections(state)
 		.filter(x => targetIds.includes(x.targetId))
 }
 
 export const selectFirstConnectionByTargetId = (state: IClientRoomState, targetId: string) =>
-	selectAllConnectionsAsArray(state)
+	selectAllConnections(state)
 		.find(x => x.targetId === targetId) || Connection.dummy
 
 export const selectFirstConnectionIdByTargetId = (state: IClientRoomState, targetId: string): string => {
@@ -172,12 +168,25 @@ export const selectFirstConnectionIdByTargetId = (state: IClientRoomState, targe
 	return conn ? conn.id : 'fakeConnectionId'
 }
 
-export const selectConnectionSourceColorByTargetId = (state: IClientRoomState, targetId: string): string =>
-	selectConnectionSourceColor(state, selectFirstConnectionIdByTargetId(state, targetId))
+/** For use by a node */
+export const selectConnectionSourceColorByTargetId = (state: IClientRoomState, targetId: string): string => {
+	const connections = selectAllConnections(state).filter(x => x.targetId === targetId)
 
-export const selectConnectionSourceColor = (roomState: IClientRoomState, id: string) => {
-	const connection = selectConnection(roomState, id)
+	if (connections.count() === 0) return makeConnectionSourceColorSelector(state)(Connection.dummy)
 
+	const colors = connections.map(makeConnectionSourceColorSelector(state))
+
+	return mixColors(colors.toList())
+}
+
+/** For use by a connection */
+export const selectConnectionSourceColor = (state: IClientRoomState, id: string): string => {
+	const connection = selectConnection(state, id)
+
+	return makeConnectionSourceColorSelector(state)(connection)
+}
+
+const makeConnectionSourceColorSelector = (roomState: IClientRoomState) => (connection: IConnection) => {
 	return (
 		getConnectionNodeInfo(connection.sourceType).stateSelector(roomState, connection.sourceId).color
 		||

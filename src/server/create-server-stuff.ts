@@ -92,13 +92,12 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 
 	const serverStuff = createSourceAndTargets(serverStuffDefinitions)
 
-	connectNodes(serverStuff.get('arp')!.source, serverStuff.get('arp2')!.target)
-
 	// Calculate positions
 	const roomState = serverStore.getState().roomStores.get(room)!
 	const originalPositions = selectAllPositions(roomState)
 
-	const connectionsToMasterAudioOutput = selectConnectionsWithTargetIds(roomState, [MASTER_AUDIO_OUTPUT_TARGET_ID])
+	const connectionsToMasterAudioOutput =
+		selectConnectionsWithTargetIds(roomState, [MASTER_AUDIO_OUTPUT_TARGET_ID]).toList()
 
 	const newPositions = originalPositions.withMutations(mutablePositions => {
 		const xSpacing = 700
@@ -112,7 +111,9 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 			mutablePositions.update(connection.sourceId,
 				z => ({...z, x: -xSpacing * x, y: (i * ySpacing) + (prevY * ySpacing)}),
 			)
-			selectConnectionsWithTargetIds(roomState, [connection.sourceId]).forEach(foo(x + 1, i))
+			selectConnectionsWithTargetIds(roomState, [connection.sourceId])
+				.toList()
+				.forEach(foo(x + 1, i))
 		}
 
 		connectionsToMasterAudioOutput.forEach(foo(1, 0))
@@ -128,6 +129,9 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 
 		serverStore.dispatch(createRoomAction(updatePositions(adjustedPosition), room))
 	}
+
+	// Do extra connections after calculating positions, so that it doesn't mess up positions
+	connectNodes(serverStuff.get('arp')!.source, serverStuff.get('arp2')!.target)
 
 	interface CreateSourceAndTargetArgs {
 		source: CreateSourceArgs

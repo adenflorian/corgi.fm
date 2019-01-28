@@ -1,3 +1,4 @@
+import {List} from 'immutable'
 import * as React from 'react'
 import Draggable, {DraggableEventHandler} from 'react-draggable'
 import {Dispatch} from 'redux'
@@ -125,7 +126,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps & {
 					</defs>
 					<g
 						onContextMenu={(e: React.MouseEvent) => {
-							this.props.dispatch(connectionsActions.delete([id]))
+							this.props.dispatch(connectionsActions.delete(List([id])))
 							e.preventDefault()
 						}}
 					>

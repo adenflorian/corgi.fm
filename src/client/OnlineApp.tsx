@@ -1,3 +1,4 @@
+import {List} from 'immutable'
 import {Fragment} from 'react'
 import * as React from 'react'
 import {connect} from 'react-redux'
@@ -19,7 +20,7 @@ import {ConnectedTopDiv} from './TopDiv'
 import {ConnectedVolumeControl} from './Volume/VolumeControl'
 
 interface IOnlineAppProps {
-	connections: IConnection[]
+	connections: List<IConnection>
 	hasLocalClient: boolean
 }
 
@@ -85,7 +86,7 @@ class OnlineApp extends React.PureComponent<IOnlineAppProps> {
 
 const mapStateToProps = (state: IClientAppState): IOnlineAppProps => ({
 	hasLocalClient: selectLocalClient(state) !== undefined,
-	connections: selectSortedConnections(state.room),
+	connections: selectSortedConnections(state.room).toList(),
 })
 
 export const ConnectedOnlineApp = connect(mapStateToProps)(OnlineApp)

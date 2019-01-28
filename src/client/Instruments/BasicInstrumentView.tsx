@@ -8,7 +8,7 @@ import {
 } from '../../common/redux/basic-instruments-redux'
 import {IClientAppState} from '../../common/redux/common-redux-types'
 import {
-	selectConnectionSourceColor, selectConnectionSourceNotesByTargetId, selectFirstConnectionByTargetId,
+	selectConnectionSourceColorByTargetId, selectConnectionSourceNotesByTargetId,
 } from '../../common/redux/connections-redux'
 import {Knob} from '../Knob/Knob'
 import {Panel} from '../Panel/Panel'
@@ -110,7 +110,6 @@ export class BasicInstrumentView
 
 export const ConnectedBasicInstrumentView = connect(
 	(state: IClientAppState, props: IBasicInstrumentViewProps): IBasicInstrumentViewReduxProps => {
-		const connection = selectFirstConnectionByTargetId(state.room, props.id)
 		const rawMidiNotes = selectConnectionSourceNotesByTargetId(state.room, props.id)
 		const instrumentState = selectBasicInstrument(state.room, props.id)
 
@@ -118,7 +117,7 @@ export const ConnectedBasicInstrumentView = connect(
 			rawMidiNotes,
 			isPlaying: rawMidiNotes.length > 0,
 			oscillatorType: instrumentState.oscillatorType,
-			color: selectConnectionSourceColor(state.room, connection.id),
+			color: selectConnectionSourceColorByTargetId(state.room, props.id),
 			pan: instrumentState.pan,
 			lowPassFilterCutoffFrequency: instrumentState.lowPassFilterCutoffFrequency,
 			attack: instrumentState.attack,
