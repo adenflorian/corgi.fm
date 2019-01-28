@@ -7,11 +7,9 @@ import {ConnectionNodeType} from '../common-types'
 import {logger} from '../logger'
 import {mixColors} from '../shamu-color'
 import {IClientRoomState} from './common-redux-types'
-import {selectGridSequencerActiveNotes} from './grid-sequencers-redux'
-import {selectInfiniteSequencerActiveNotes} from './infinite-sequencers-redux'
 import {getConnectionNodeInfo} from './node-types'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
-import {IVirtualKeyboardState, makeGetKeyboardMidiOutput, selectVirtualKeyboardById} from './virtual-keyboard-redux'
+import {IVirtualKeyboardState, selectVirtualKeyboardById} from './virtual-keyboard-redux'
 
 export const ADD_CONNECTION = 'ADD_CONNECTION'
 export const DELETE_CONNECTIONS = 'DELETE_CONNECTIONS'
@@ -112,11 +110,9 @@ const connectionsSpecificReducer: Reducer<IConnections, IConnectionAction> =
 			case DELETE_CONNECTIONS: return connections.deleteAll(action.connectionIds)
 			case DELETE_ALL_CONNECTIONS: return connections.clear()
 			case UPDATE_CONNECTIONS: return connections.merge(action.connections)
-			case UPDATE_GHOST_CONNECTOR:
-				return connections.update(
-					action.id,
-					x => ({...x, ghostConnector: {...x.ghostConnector, ...action.connector}}),
-				)
+			case UPDATE_GHOST_CONNECTOR: return connections.update(action.id,
+				x => ({...x, ghostConnector: {...x.ghostConnector, ...action.connector}}),
+			)
 			default: return connections
 		}
 	}
@@ -222,8 +218,6 @@ export const selectConnectionSourceIsSending = (roomState: IClientRoomState, id:
 	}
 }
 
-const getKeyboardMidiOutput = makeGetKeyboardMidiOutput()
-
 const emptyArray: number[] = []
 
 export const selectConnectionSourceNotesByTargetId = (state: IClientRoomState, targetId: string): number[] =>
@@ -237,16 +231,7 @@ export const selectConnectionSourceNotes = (state: IClientRoomState, id: string)
 		return emptyArray
 	}
 
-	switch (connection.sourceType) {
-		case ConnectionNodeType.keyboard:
-			return getKeyboardMidiOutput(state, connection.sourceId)
-		case ConnectionNodeType.gridSequencer:
-			return selectGridSequencerActiveNotes(state, connection.sourceId)
-		case ConnectionNodeType.infiniteSequencer:
-			return selectInfiniteSequencerActiveNotes(state, connection.sourceId)
-		default:
-			return emptyArray
-	}
+	return getConnectionNodeInfo(connection.sourceType).selectActiveNotes(state, connection.sourceId)
 }
 
 export function sortConnection(connA: IConnection, connB: IConnection) {

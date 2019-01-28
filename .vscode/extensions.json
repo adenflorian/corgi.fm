@@ -17,5 +17,6 @@
 		"IBM.output-colorizer",
 		"eg2.tslint",
 		"gamunu.vscode-yarn",
+		"kisstkondoros.vscode-codemetrics"
 	]
 }

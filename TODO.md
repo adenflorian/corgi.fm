@@ -83,6 +83,9 @@
 - [ ] try to use decorators on action types to generate a giant combined action type
 - [ ] when someone first joins, show them a list of demos that that can copy into a new room to quickly show people what shamu can do
 - [ ] on the borwser warning screen, show why chrome is the only supported browser, like what is missing from firefox
+- [ ] use gzip on nginx
+	- https://expressjs.com/en/advanced/best-practice-performance.html#use-gzip-compression
+	- http://nginx.org/en/docs/http/ngx_http_gzip_module.html
 
 # Shared Cursors
 - [ ] make shared cursor not block pointer events
@@ -104,6 +107,7 @@
 - [√] brighten the connectors and line when data is going across it
 - [ ] make them moveable
 - [ ] fix invisible long line when vertical
+- [ ] make input connector look like a stack cable when multiple inputs
 
 ## Adding/Changing/Removing Connections
 should anything allow multiple incoming connections?

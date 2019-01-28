@@ -98,4 +98,5 @@
         "TODO.md"
     ],
     "less.lint.emptyRules": "ignore",
+    "codemetrics.basics.CodeLensHiddenUnder": 6,
 }
