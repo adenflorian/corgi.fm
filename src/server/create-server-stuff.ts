@@ -1,6 +1,6 @@
 import {Map} from 'immutable'
 import {Store} from 'redux'
-import {ConnectionNodeType} from '../common/common-types'
+import {ConnectionNodeType, IConnectable} from '../common/common-types'
 import {addBasicInstrument, BasicInstrumentState} from '../common/redux/basic-instruments-redux'
 import {addBasicSampler, BasicSamplerState} from '../common/redux/basic-sampler-redux'
 import {addClient, ClientState} from '../common/redux/clients-redux'
@@ -18,6 +18,18 @@ import {
 } from '../common/redux/positions-redux'
 import {createRoomAction} from '../common/redux/room-stores-redux'
 import {createSequencerEvents} from '../common/redux/sequencer-redux'
+
+const masterAudioOutput: IConnectable = Object.freeze({
+	id: MASTER_AUDIO_OUTPUT_TARGET_ID,
+	type: ConnectionNodeType.audioOutput,
+	color: '',
+})
+
+const masterClock: IConnectable = Object.freeze({
+	id: MASTER_CLOCK_SOURCE_ID,
+	type: ConnectionNodeType.masterClock,
+	color: '',
+})
 
 export function createServerStuff(room: string, serverStore: Store<IServerState>) {
 	const serverClient = ClientState.createServerClient()
@@ -78,11 +90,9 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 		},
 	})
 
-	createSourceAndTargets(serverStuffDefinitions)
+	const serverStuff = createSourceAndTargets(serverStuffDefinitions)
 
-	function createSourceAndTargets(defs: typeof serverStuffDefinitions) {
-		return Map(defs).map(createSourceAndTarget)
-	}
+	connectNodes(serverStuff.get('arp')!.source, serverStuff.get('arp2')!.target)
 
 	// Calculate positions
 	const roomState = serverStore.getState().roomStores.get(room)!
@@ -126,6 +136,10 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 		}
 	}
 
+	function createSourceAndTargets(defs: typeof serverStuffDefinitions) {
+		return Map(defs).map(createSourceAndTarget)
+	}
+
 	function createSourceAndTarget(options: CreateSourceAndTargetArgs) {
 		const target = createTarget(options.target.type)
 		serverStore.dispatch(createRoomAction(addPosition(
@@ -135,29 +149,11 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 		serverStore.dispatch(createRoomAction(addPosition(
 			makePosition({id: source.id, targetType: options.source.type, width: source.width, height: source.height})), room))
 
-		// Source to target
-		serverStore.dispatch(createRoomAction(connectionsActions.add(new Connection(
-			source.id,
-			source.type,
-			target.id,
-			target.type,
-		)), room))
+		connectNodes(source, target)
 
-		// Target to audio output
-		serverStore.dispatch(createRoomAction(connectionsActions.add(new Connection(
-			target.id,
-			target.type,
-			MASTER_AUDIO_OUTPUT_TARGET_ID,
-			ConnectionNodeType.audioOutput,
-		)), room))
+		connectNodes(target, masterAudioOutput)
 
-		// Master clock to source
-		serverStore.dispatch(createRoomAction(connectionsActions.add(new Connection(
-			MASTER_CLOCK_SOURCE_ID,
-			ConnectionNodeType.masterClock,
-			source.id,
-			source.type,
-		)), room))
+		connectNodes(masterClock, source)
 
 		return {
 			source,
@@ -201,6 +197,15 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 			default:
 				throw new Error('Invalid type')
 		}
+	}
+
+	function connectNodes(source: IConnectable, target: IConnectable) {
+		serverStore.dispatch(createRoomAction(connectionsActions.add(new Connection(
+			source.id,
+			source.type,
+			target.id,
+			target.type,
+		)), room))
 	}
 }
 
