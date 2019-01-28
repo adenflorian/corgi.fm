@@ -3,6 +3,7 @@ import {AnyAction} from 'redux'
 import {createSelector} from 'reselect'
 import * as uuid from 'uuid'
 import {hashbow} from '../../client/utils'
+import {ConnectionNodeType, IConnectable} from '../common-types'
 import {IMidiNote} from '../MidiNote'
 import {addIfNew} from '../server-common'
 import {colorFunc} from '../shamu-color'
@@ -13,7 +14,6 @@ import {
 	addMultiThing, deleteThings, IMultiState,
 	IMultiStateThings, makeMultiReducer, MultiThingType, updateThings,
 } from './multi-reducer'
-import {IConnectable} from './node-types'
 import {BROADCASTER_ACTION, NetworkActionType, SERVER_ACTION} from './redux-utils'
 import {
 	CLEAR_SEQUENCER, createSequencerEvents, ISequencerEvent, ISequencerState, SKIP_NOTE, UNDO_SEQUENCER,
@@ -117,6 +117,7 @@ export class InfiniteSequencerState implements ISequencerState, IConnectable {
 	public readonly showRows = false
 	public readonly width: number = InfiniteSequencerState.defaultWidth
 	public readonly height: number = InfiniteSequencerState.defaultHeight
+	public readonly type = ConnectionNodeType.infiniteSequencer
 
 	constructor(name: string, style: InfiniteSequencerStyle, events?: ISequencerEvent[]) {
 		this.name = name

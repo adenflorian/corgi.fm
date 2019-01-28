@@ -1,12 +1,12 @@
 import {AnyAction} from 'redux'
 import * as uuid from 'uuid'
 import {ClientId} from '../common-types'
+import {ConnectionNodeType, IConnectable} from '../common-types'
 import {IClientRoomState} from './common-redux-types'
 import {
 	addMultiThing, createSelectAllOfThingAsArray, deleteThings, IMultiState,
 	makeMultiReducer, MultiThingType, updateThings,
 } from './multi-reducer'
-import {IConnectable} from './node-types'
 import {BROADCASTER_ACTION, NetworkActionType, SERVER_ACTION} from './redux-utils'
 
 export const addBasicSampler = (sampler: BasicSamplerState) =>
@@ -53,15 +53,17 @@ export class BasicSamplerState implements IConnectable {
 		attack: 0,
 		release: 0,
 		color: false,
+		type: ConnectionNodeType.sampler,
 	}
 
-	public id = uuid.v4()
-	public ownerId: string
-	public pan: number = Math.random() - 0.5
-	public lowPassFilterCutoffFrequency: number = Math.random() * 10000 + 1000
-	public attack: number = 0.01
-	public release: number = 1
-	public color: false = false
+	public readonly id = uuid.v4()
+	public readonly ownerId: string
+	public readonly pan: number = Math.random() - 0.5
+	public readonly lowPassFilterCutoffFrequency: number = Math.random() * 10000 + 1000
+	public readonly attack: number = 0.01
+	public readonly release: number = 1
+	public readonly color: false = false
+	public readonly type = ConnectionNodeType.sampler
 
 	constructor(ownerId: ClientId) {
 		this.ownerId = ownerId

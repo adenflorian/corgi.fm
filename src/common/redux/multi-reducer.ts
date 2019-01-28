@@ -1,3 +1,4 @@
+import {IConnectable} from '../common-types'
 import {IClientRoomState} from './common-redux-types'
 import {BROADCASTER_ACTION, NetworkActionType, SERVER_ACTION} from './redux-utils'
 
@@ -9,7 +10,7 @@ export interface IMultiStateThings {
 	[key: string]: IMultiStateThing
 }
 
-export interface IMultiStateThing {
+export interface IMultiStateThing extends IConnectable {
 	id: string
 }
 

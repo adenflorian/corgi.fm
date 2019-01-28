@@ -3,6 +3,7 @@ import {AnyAction, Reducer} from 'redux'
 import {createSelector} from 'reselect'
 import * as uuid from 'uuid'
 import {hashbow} from '../../client/utils'
+import {ConnectionNodeType} from '../common-types'
 import {IMidiNote} from '../MidiNote'
 import {addIfNew} from '../server-common'
 import {MAX_MIDI_NOTE_NUMBER_127} from '../server-constants'
@@ -122,6 +123,7 @@ export class GridSequencerState implements IGridSequencerState {
 		previousEvents: [],
 		width: GridSequencerState.defaultWidth,
 		height: GridSequencerState.defaultHeight,
+		type: ConnectionNodeType.gridSequencer,
 	}
 
 	public readonly id: string = uuid.v4()
@@ -136,6 +138,7 @@ export class GridSequencerState implements IGridSequencerState {
 	public readonly previousEvents: ISequencerEvent[][] = []
 	public readonly width: number = GridSequencerState.defaultWidth
 	public readonly height: number = GridSequencerState.defaultHeight
+	public readonly type = ConnectionNodeType.gridSequencer
 
 	constructor(name: string, notesToShow: number, events?: ISequencerEvent[]) {
 		this.name = name

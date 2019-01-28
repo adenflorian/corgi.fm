@@ -1,4 +1,6 @@
+import {Map} from 'immutable'
 import {Store} from 'redux'
+import {ConnectionNodeType} from '../common/common-types'
 import {addBasicInstrument, BasicInstrumentState} from '../common/redux/basic-instruments-redux'
 import {addBasicSampler, BasicSamplerState} from '../common/redux/basic-sampler-redux'
 import {addClient, ClientState} from '../common/redux/clients-redux'
@@ -10,7 +12,6 @@ import {addGridSequencer, GridSequencerState} from '../common/redux/grid-sequenc
 import {
 	addInfiniteSequencer, InfiniteSequencerState, InfiniteSequencerStyle,
 } from '../common/redux/infinite-sequencers-redux'
-import {ConnectionNodeType} from '../common/redux/node-types'
 import {MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID} from '../common/redux/node-types'
 import {
 	addPosition, calculateExtremes, makePosition, selectAllPositions, updatePositions,
@@ -21,54 +22,67 @@ import {createSequencerEvents} from '../common/redux/sequencer-redux'
 export function createServerStuff(room: string, serverStore: Store<IServerState>) {
 	const serverClient = ClientState.createServerClient()
 	const addClientAction = addClient(serverClient)
+
 	serverStore.dispatch(createRoomAction(addClientAction, room))
 
 	serverStore.dispatch(createRoomAction(addPosition(
 		makePosition({id: MASTER_CLOCK_SOURCE_ID, targetType: ConnectionNodeType.masterClock})), room))
+
 	serverStore.dispatch(createRoomAction(addPosition(
 		makePosition({id: MASTER_AUDIO_OUTPUT_TARGET_ID, targetType: ConnectionNodeType.audioOutput})), room))
 
-	Object.freeze([{
-		source: {
-			type: ConnectionNodeType.gridSequencer,
-			events: getBassNotes(),
-			name: 'Bass',
-			notesToShow: 12,
+	const serverStuffDefinitions = Object.freeze({
+		bass: {
+			source: {
+				type: ConnectionNodeType.gridSequencer,
+				events: getBassNotes(),
+				name: 'Bass',
+				notesToShow: 12,
+			},
+			target: {
+				type: ConnectionNodeType.sampler,
+			},
 		},
-		target: {
-			type: ConnectionNodeType.sampler,
+		melody: {
+			source: {
+				type: ConnectionNodeType.gridSequencer,
+				events: getMelodyNotes(),
+				name: 'Melody',
+				notesToShow: 24,
+			},
+			target: {
+				type: ConnectionNodeType.instrument,
+			},
 		},
-	}, {
-		source: {
-			type: ConnectionNodeType.gridSequencer,
-			events: getMelodyNotes(),
-			name: 'Melody',
-			notesToShow: 24,
+		arp: {
+			source: {
+				type: ConnectionNodeType.infiniteSequencer,
+				events: getInitialInfiniteSequencerEvents(),
+				name: 'Arp',
+				infinityStyle: InfiniteSequencerStyle.colorGrid,
+			},
+			target: {
+				type: ConnectionNodeType.sampler,
+			},
 		},
-		target: {
-			type: ConnectionNodeType.instrument,
+		arp2: {
+			source: {
+				type: ConnectionNodeType.infiniteSequencer,
+				events: getInitialInfiniteSequencerEvents(),
+				name: 'Arp 2',
+				infinityStyle: InfiniteSequencerStyle.colorBars,
+			},
+			target: {
+				type: ConnectionNodeType.instrument,
+			},
 		},
-	}, {
-		source: {
-			type: ConnectionNodeType.infiniteSequencer,
-			events: getInitialInfiniteSequencerEvents(),
-			name: 'Arp',
-			infinityStyle: InfiniteSequencerStyle.colorGrid,
-		},
-		target: {
-			type: ConnectionNodeType.sampler,
-		},
-	}, {
-		source: {
-			type: ConnectionNodeType.infiniteSequencer,
-			events: getInitialInfiniteSequencerEvents(),
-			name: 'Arp 2',
-			infinityStyle: InfiniteSequencerStyle.colorBars,
-		},
-		target: {
-			type: ConnectionNodeType.instrument,
-		},
-	}]).forEach(createSourceAndTarget)
+	})
+
+	createSourceAndTargets(serverStuffDefinitions)
+
+	function createSourceAndTargets(defs: typeof serverStuffDefinitions) {
+		return Map(defs).map(createSourceAndTarget)
+	}
 
 	// Calculate positions
 	const roomState = serverStore.getState().roomStores.get(room)!
@@ -124,15 +138,15 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 		// Source to target
 		serverStore.dispatch(createRoomAction(connectionsActions.add(new Connection(
 			source.id,
-			options.source.type,
+			source.type,
 			target.id,
-			options.target.type,
+			target.type,
 		)), room))
 
 		// Target to audio output
 		serverStore.dispatch(createRoomAction(connectionsActions.add(new Connection(
 			target.id,
-			options.target.type,
+			target.type,
 			MASTER_AUDIO_OUTPUT_TARGET_ID,
 			ConnectionNodeType.audioOutput,
 		)), room))
@@ -142,8 +156,13 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 			MASTER_CLOCK_SOURCE_ID,
 			ConnectionNodeType.masterClock,
 			source.id,
-			options.source.type,
+			source.type,
 		)), room))
+
+		return {
+			source,
+			target,
+		}
 	}
 
 	interface CreateSourceArgs {

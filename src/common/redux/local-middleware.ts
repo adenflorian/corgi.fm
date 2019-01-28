@@ -1,5 +1,6 @@
 import {Dispatch, Middleware} from 'redux'
 import {applyOctave} from '../../client/music/music-functions'
+import {ConnectionNodeType} from '../common-types'
 import {logger} from '../logger'
 import {addBasicInstrument, BasicInstrumentState} from './basic-instruments-redux'
 import {addBasicSampler, BasicSamplerState} from './basic-sampler-redux'
@@ -10,7 +11,6 @@ import {
 	Connection, connectionsActions,
 } from './connections-redux'
 import {deleteAllThings, MultiThingType} from './multi-reducer'
-import {ConnectionNodeType} from './node-types'
 import {MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID} from './node-types'
 import {addPosition, deleteAllPositions, makePosition, selectPositionExtremes} from './positions-redux'
 import {makeActionCreator} from './redux-utils'

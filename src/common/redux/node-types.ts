@@ -1,4 +1,5 @@
 import {Map, Record} from 'immutable'
+import {ConnectionNodeType, IConnectable} from '../common-types'
 import {CssColor} from '../shamu-color'
 import {selectBasicInstrument} from './basic-instruments-redux'
 import {selectSampler} from './basic-sampler-redux'
@@ -19,22 +20,6 @@ export type IConnectableIsActiveSelector = (roomState: IClientRoomState, id: str
 
 export type IConnectableIsSendingSelector = (roomState: IClientRoomState, id: string) => boolean | null
 
-export interface IConnectable {
-	id: string
-	color: string | false
-}
-
-export enum ConnectionNodeType {
-	keyboard = 'keyboard',
-	gridSequencer = 'gridSequencer',
-	infiniteSequencer = 'infiniteSequencer',
-	instrument = 'instrument',
-	sampler = 'sampler',
-	audioOutput = 'audioOutput',
-	masterClock = 'masterClock',
-	dummy = 'dummy',
-}
-
 export const MASTER_AUDIO_OUTPUT_TARGET_ID = 'MASTER_AUDIO_OUTPUT_TARGET_ID'
 
 export const MASTER_CLOCK_SOURCE_ID = 'MASTER_CLOCK_SOURCE_ID'
@@ -51,6 +36,7 @@ export const NodeInfoRecord = Record<IConnectionNodeInfo>({
 	stateSelector: () => ({
 		color: CssColor.subtleGrayBlackBg,
 		id: 'oh no',
+		type: ConnectionNodeType.dummy,
 	}),
 	selectIsActive: () => null,
 	selectIsSending: () => null,
@@ -91,12 +77,20 @@ export const NodeInfoMap = Map({
 		height: 56,
 	}),
 	[ConnectionNodeType.audioOutput]: NodeInfoRecord({
-		stateSelector: () => ({id: MASTER_AUDIO_OUTPUT_TARGET_ID, color: CssColor.green}),
+		stateSelector: () => ({
+			id: MASTER_AUDIO_OUTPUT_TARGET_ID,
+			color: CssColor.green,
+			type: ConnectionNodeType.audioOutput,
+		}),
 		width: 140.48,
 		height: 48,
 	}),
 	[ConnectionNodeType.masterClock]: NodeInfoRecord({
-		stateSelector: () => ({id: MASTER_CLOCK_SOURCE_ID, color: CssColor.blue}),
+		stateSelector: () => ({
+			id: MASTER_CLOCK_SOURCE_ID,
+			color: CssColor.blue,
+			type: ConnectionNodeType.masterClock,
+		}),
 		selectIsActive: () => false,
 		selectIsSending: () => false,
 		width: 134.813,
@@ -105,7 +99,12 @@ export const NodeInfoMap = Map({
 })
 
 const dummyNodeInfo = NodeInfoRecord({
-	stateSelector: () => ({id: 'oh no', color: CssColor.subtleGrayBlackBg, isPlaying: false}),
+	stateSelector: () => ({
+		id: 'oh no',
+		color: CssColor.subtleGrayBlackBg,
+		isPlaying: false,
+		type: ConnectionNodeType.dummy,
+	}),
 	width: 0,
 	height: 0,
 })

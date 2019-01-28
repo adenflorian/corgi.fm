@@ -22,8 +22,7 @@ export const createRoomAction = (action: Action, room: string) => ({
 	action,
 })
 
-export type IRoomStoresState = Map<string, IClientRoomState>
-
+// Used on the client, because a client is only in one room at a time
 export const roomReducers = combineReducers<IClientRoomState>({
 	basicInstruments: basicInstrumentsReducer,
 	basicSamplers: basicSamplersReducer,
@@ -37,8 +36,11 @@ export const roomReducers = combineReducers<IClientRoomState>({
 	virtualKeyboards: virtualKeyboardsReducer,
 })
 
-const initialState: IRoomStoresState = Map<string, IClientRoomState>()
+const initialState = Map<string, IClientRoomState>()
 
+export type IRoomStoresState = typeof initialState
+
+// Used on the server, because the server tracks multiple rooms
 export const roomStoresReducer: Reducer<IRoomStoresState, RoomsReduxAction> = (state = initialState, action) => {
 	switch (action.type) {
 		case CREATE_ROOM: return state.set(action.name, roomReducers(undefined, {type: '@@INIT'}))

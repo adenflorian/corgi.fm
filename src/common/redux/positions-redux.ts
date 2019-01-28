@@ -1,9 +1,10 @@
 import {Map, Record} from 'immutable'
 import {combineReducers, Reducer} from 'redux'
 import {createSelector} from 'reselect'
+import {ConnectionNodeType} from '../common-types'
 import {IClientRoomState} from './common-redux-types'
 import {IConnection} from './connections-redux'
-import {ConnectionNodeType, getConnectionNodeInfo} from './node-types'
+import {getConnectionNodeInfo} from './node-types'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
 
 export const ADD_POSITION = 'ADD_POSITION'

@@ -2,9 +2,10 @@ import {AnyAction} from 'redux'
 import {createSelector} from 'reselect'
 import * as uuid from 'uuid'
 import {applyOctave} from '../../client/music/music-functions'
-import {MidiNotes, Octave} from '../../client/music/music-types'
+import {Octave} from '../../client/music/music-types'
 import {addIfNew} from '../../common/server-common'
 import {ClientId} from '../common-types'
+import {ConnectionNodeType} from '../common-types'
 import {IMidiNote} from '../MidiNote'
 import {IClientRoomState} from './common-redux-types'
 import {
@@ -119,13 +120,15 @@ export class VirtualKeyboardState implements IVirtualKeyboardState {
 		id: 'dummy',
 		ownerId: 'dummyOwner',
 		color: 'gray',
+		type: ConnectionNodeType.keyboard,
 	}
 
-	public pressedKeys: number[] = []
-	public octave: number = 4
-	public id: string = uuid.v4()
-	public ownerId: ClientId
-	public color: string
+	public readonly pressedKeys: number[] = []
+	public readonly octave: number = 4
+	public readonly id: string = uuid.v4()
+	public readonly ownerId: ClientId
+	public readonly color: string
+	public readonly type = ConnectionNodeType.keyboard
 
 	constructor(ownerId: ClientId, color: string) {
 		this.ownerId = ownerId

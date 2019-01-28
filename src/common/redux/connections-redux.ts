@@ -3,11 +3,12 @@ import {combineReducers, Reducer} from 'redux'
 import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
 import * as uuid from 'uuid'
+import {ConnectionNodeType} from '../common-types'
 import {logger} from '../logger'
 import {IClientRoomState} from './common-redux-types'
 import {selectGridSequencerActiveNotes} from './grid-sequencers-redux'
 import {selectInfiniteSequencerActiveNotes} from './infinite-sequencers-redux'
-import {ConnectionNodeType, getConnectionNodeInfo} from './node-types'
+import {getConnectionNodeInfo} from './node-types'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
 import {IVirtualKeyboardState, makeGetKeyboardMidiOutput, selectVirtualKeyboardById} from './virtual-keyboard-redux'
 
@@ -68,6 +69,8 @@ const makeGhostConnectorRecord = Record({
 })
 
 export type GhostConnectorRecord = ReturnType<typeof makeGhostConnectorRecord>
+
+export const defaultGhostConnector = makeGhostConnectorRecord()
 
 export interface IConnection {
 	sourceId: string
