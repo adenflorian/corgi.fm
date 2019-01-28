@@ -28,7 +28,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 	serverStore.dispatch(createRoomAction(addPosition(
 		makePosition({id: MASTER_AUDIO_OUTPUT_TARGET_ID, targetType: ConnectionNodeType.audioOutput})), room))
 
-	createSourceAndTarget({
+	Object.freeze([{
 		source: {
 			type: ConnectionNodeType.gridSequencer,
 			events: getBassNotes(),
@@ -38,9 +38,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 		target: {
 			type: ConnectionNodeType.sampler,
 		},
-	})
-
-	createSourceAndTarget({
+	}, {
 		source: {
 			type: ConnectionNodeType.gridSequencer,
 			events: getMelodyNotes(),
@@ -50,9 +48,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 		target: {
 			type: ConnectionNodeType.instrument,
 		},
-	})
-
-	createSourceAndTarget({
+	}, {
 		source: {
 			type: ConnectionNodeType.infiniteSequencer,
 			events: getInitialInfiniteSequencerEvents(),
@@ -62,9 +58,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 		target: {
 			type: ConnectionNodeType.sampler,
 		},
-	})
-
-	createSourceAndTarget({
+	}, {
 		source: {
 			type: ConnectionNodeType.infiniteSequencer,
 			events: getInitialInfiniteSequencerEvents(),
@@ -74,7 +68,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 		target: {
 			type: ConnectionNodeType.instrument,
 		},
-	})
+	}]).forEach(createSourceAndTarget)
 
 	// Calculate positions
 	const roomState = serverStore.getState().roomStores.get(room)!
