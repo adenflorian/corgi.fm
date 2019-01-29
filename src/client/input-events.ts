@@ -1,8 +1,8 @@
 import {Map} from 'immutable'
 import {AnyAction, Store} from 'redux'
-import {selectIsLocalClientReady, selectLocalClient, setClientPointer} from '../common/redux/clients-redux'
-import {localMidiKeyPress, localMidiKeyUp, localMidiOctaveChange} from '../common/redux/local-middleware'
-import {skipNote} from '../common/redux/sequencer-redux'
+import {selectIsLocalClientReady, selectLocalClient, setClientPointer} from '../common/redux'
+import {skipNote} from '../common/redux'
+import {localMidiKeyPress, localMidiKeyUp, localMidiOctaveChange} from '../common/redux'
 import {simpleGlobalClientState} from './SimpleGlobalClientState'
 import {getMainBoardsRectX, getMainBoardsRectY} from './utils'
 

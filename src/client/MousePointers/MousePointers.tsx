@@ -1,8 +1,8 @@
 import {List} from 'immutable'
 import * as React from 'react'
 import {connect} from 'react-redux'
-import {IClientAppState} from '../../common/redux/common-redux-types'
-import {selectAllOtherRoomMemberIds} from '../../common/redux/room-members-redux'
+import {IClientAppState} from '../../common/redux'
+import {selectAllOtherRoomMemberIds} from '../../common/redux'
 import {ConnectedMousePointer} from './MousePointer'
 
 interface IMousePointersViewProps {

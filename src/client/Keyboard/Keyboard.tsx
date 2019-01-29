@@ -2,9 +2,10 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 import {getKeyByValue} from '../../common/common-utils'
-import {selectClientById, selectLocalClient} from '../../common/redux/clients-redux'
-import {IClientAppState} from '../../common/redux/common-redux-types'
-import {selectVirtualKeyboardById, virtualKeyPressed, virtualKeyUp} from '../../common/redux/virtual-keyboard-redux'
+import {IMidiNotes} from '../../common/MidiNote'
+import {selectClientById, selectLocalClient} from '../../common/redux'
+import {IClientAppState} from '../../common/redux'
+import {selectVirtualKeyboardById, virtualKeyPressed, virtualKeyUp} from '../../common/redux'
 import {keyToMidiMap} from '../input-events'
 import {applyOctave, KeyColor, keyColors, NoteNameSharps} from '../music/music-functions'
 import {Octave} from '../music/music-types'
@@ -56,7 +57,7 @@ interface IKeyboardReduxProps {
 	isPlaying: boolean
 	octave: Octave
 	ownerName: string,
-	pressedMidiKeys: any[],
+	pressedMidiKeys: IMidiNotes,
 	showNoteNames: boolean
 	virtualMidiKeyboard: IVirtualMidiKeyboard
 }
@@ -202,7 +203,7 @@ const mapStateToProps = (state: IClientAppState, props: IKeyboardProps): IKeyboa
 	return {
 		color: owner.color,
 		isLocal: localClient.id === owner.id,
-		isPlaying: pressedMidiKeys.length > 0,
+		isPlaying: pressedMidiKeys.count() > 0,
 		octave: virtualKeyboard.octave,
 		ownerName: owner.name,
 		pressedMidiKeys,

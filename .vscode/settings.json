@@ -38,6 +38,7 @@
     "typescript.tsdk": "node_modules\\typescript\\lib",
     "cSpell.words": [
         "DEVTOOLS",
+        "Deserializer",
         "Hashable",
         "ICVC",
         "Scrollable",
@@ -54,6 +55,7 @@
         "callout",
         "contenteditable",
         "desaturate",
+        "deserialize",
         "draggable",
         "focusable",
         "fucky",

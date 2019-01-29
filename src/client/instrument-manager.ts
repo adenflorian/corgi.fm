@@ -1,15 +1,15 @@
 import {Store} from 'redux'
-import {IConnectable} from '../common/common-types'
 import {IDisposable} from '../common/common-types'
+import {IConnectable} from '../common/common-types'
 import {
 	BasicInstrumentState, selectAllBasicInstrumentIds, selectBasicInstrument,
-} from '../common/redux/basic-instruments-redux'
-import {BasicSamplerState, selectAllSamplerIds, selectSampler} from '../common/redux/basic-sampler-redux'
-import {IClientAppState, IClientRoomState} from '../common/redux/common-redux-types'
+} from '../common/redux'
+import {BasicSamplerState, selectAllSamplerIds, selectSampler} from '../common/redux'
+import {IClientAppState, IClientRoomState} from '../common/redux'
+import {setGlobalClockIndex} from '../common/redux'
 import {
-	selectConnectionSourceNotes, selectConnectionSourceNotesByTargetId, selectConnectionsWithTargetIds,
-} from '../common/redux/connections-redux'
-import {setGlobalClockIndex} from '../common/redux/global-clock-redux'
+	selectConnectionSourceNotesByTargetId,
+} from '../common/redux'
 import {BasicSamplerInstrument} from './BasicSampler/BasicSamplerInstrument'
 import {GridSequencerPlayer} from './GridSequencerPlayer'
 import {BasicInstrument} from './Instruments/BasicInstrument'

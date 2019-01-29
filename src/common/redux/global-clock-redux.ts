@@ -1,6 +1,6 @@
 import {Record} from 'immutable'
 import {Reducer} from 'redux'
-import {IClientRoomState} from './common-redux-types'
+import {IClientRoomState} from './index'
 
 export const SET_GLOBAL_CLOCK_INDEX = 'SET_GLOBAL_CLOCK_INDEX'
 export type SetGlobalClockIndexAction = ReturnType<typeof setGlobalClockIndex>

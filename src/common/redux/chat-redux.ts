@@ -1,5 +1,5 @@
-import {IClientRoomState} from './common-redux-types'
-import {BROADCASTER_ACTION, createReducer, SERVER_ACTION} from './redux-utils'
+import {IClientRoomState} from './index'
+import {BROADCASTER_ACTION, createReducer, SERVER_ACTION} from './index'
 
 export const CHAT_SUBMIT = 'CHAT_SUBMIT'
 export type ChatSubmitAction = ReturnType<typeof chatSubmit>

@@ -1,6 +1,6 @@
 import uuid = require('uuid')
 import {IDisposable} from '../../common/common-types'
-import {IMidiNotes} from '../../common/MidiNote'
+import {emptyMidiNotes, IMidiNotes} from '../../common/MidiNote'
 import {Arp} from '../arp'
 
 export interface IInstrument extends IDisposable {
@@ -18,7 +18,7 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> implement
 	protected readonly _lowPassFilter: BiquadFilterNode
 	private readonly _arp = new Arp()
 	private readonly _gain: GainNode
-	private _previousNotes: number[] = []
+	private _previousNotes = emptyMidiNotes
 	private _attackTimeInSeconds: number = 0.01
 	private _releaseTimeInSeconds: number = 3
 

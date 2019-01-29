@@ -3,8 +3,8 @@ import Draggable, {DraggableEventHandler} from 'react-draggable'
 import {IoMdMenu} from 'react-icons/io'
 import {Dispatch} from 'redux'
 import {ConnectionNodeType} from '../../common/common-types'
-import {selectPosition, updatePosition} from '../../common/redux/positions-redux'
-import {shamuConnect} from '../../common/redux/redux-utils'
+import {selectPosition, updatePosition} from '../../common/redux'
+import {shamuConnect} from '../../common/redux'
 import {CssColor} from '../../common/shamu-color'
 import {ConnectedBasicSampler} from '../BasicSampler/BasicSampler'
 import {ConnectedGridSequencerContainer} from '../GridSequencer/GridSequencerContainer'
@@ -71,14 +71,14 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 		)
 	}
 
-	// private _handleStart: DraggableEventHandler = (e, data) =>
+	// private readonly _handleStart: DraggableEventHandler = (e, data) =>
 	// 	console.log('_handleStart: ', data)
 
-	private _handleDrag: DraggableEventHandler = (e, data) => {
+	private readonly _handleDrag: DraggableEventHandler = (e, data) => {
 		this.props.dispatch(updatePosition(this.props.positionId, {x: data.x, y: data.y}))
 	}
 
-	// private _handleStop: DraggableEventHandler = (e, data) =>
+	// private readonly _handleStop: DraggableEventHandler = (e, data) =>
 	// 	console.log('_handleStop: ', data)
 }
 
@@ -110,10 +110,10 @@ export function getComponentByNodeType(type: ConnectionNodeType, id: string) {
 
 		case ConnectionNodeType.gridSequencer: return <ConnectedGridSequencerContainer id={id} />
 		case ConnectionNodeType.infiniteSequencer: return <ConnectedInfiniteSequencer id={id} />
-		case ConnectionNodeType.keyboard: return <ConnectedKeyboard id={id} />
+		case ConnectionNodeType.virtualKeyboard: return <ConnectedKeyboard id={id} />
 
-		case ConnectionNodeType.instrument: return <ConnectedBasicInstrumentView id={id} />
-		case ConnectionNodeType.sampler: return <ConnectedBasicSampler id={id} />
+		case ConnectionNodeType.basicInstrument: return <ConnectedBasicInstrumentView id={id} />
+		case ConnectionNodeType.basicSampler: return <ConnectedBasicSampler id={id} />
 
 		default: return null
 	}

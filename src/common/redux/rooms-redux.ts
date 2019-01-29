@@ -1,6 +1,6 @@
 import {List} from 'immutable'
 import {Reducer} from 'redux'
-import {SERVER_ACTION} from './redux-utils'
+import {SERVER_ACTION} from './index'
 
 type RoomNames = List<string>
 

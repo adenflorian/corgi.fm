@@ -1,6 +1,6 @@
 import * as React from 'react'
 import {Fragment} from 'react'
-import {AppOptions} from '../../common/redux/options-redux'
+import {AppOptions} from '../../common/redux'
 import {Button} from '../Button/Button'
 import {ConnectedOption} from '../Option'
 import './Options.less'
@@ -44,11 +44,11 @@ export class Options extends React.Component {
 		)
 	}
 
-	private _onKeyDown = (e: KeyboardEvent) => {
+	private readonly _onKeyDown = (e: KeyboardEvent) => {
 		if (e.key === 'Escape' && this.state.showOptions) {
 			this._hideOptions()
 		}
 	}
 
-	private _hideOptions = () => this.setState({showOptions: false})
+	private readonly _hideOptions = () => this.setState({showOptions: false})
 }

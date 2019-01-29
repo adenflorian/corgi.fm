@@ -1,6 +1,6 @@
 import * as React from 'react'
-import {AppOptions, selectOption, selectOptions} from '../../common/redux/options-redux'
-import {shamuConnect} from '../../common/redux/redux-utils'
+import {AppOptions, selectOption, selectOptions} from '../../common/redux'
+import {shamuConnect} from '../../common/redux'
 import PlusSVG from '../OtherSVG/plus.svg'
 import {simpleGlobalClientState} from '../SimpleGlobalClientState'
 
@@ -82,7 +82,7 @@ export class Zoom extends React.PureComponent<IZoomAllProps, IZoomState> {
 		)
 	}
 
-	private _onMouseWheel = (e: WheelEvent) => {
+	private readonly _onMouseWheel = (e: WheelEvent) => {
 		// Turning off rounding so that two finger track pad scrolling will be smooth
 		// TODO Detect if scroll amount is small or large, if large, round it
 		if (this.props.requireCtrlToZoom === false || e.ctrlKey) {
@@ -93,12 +93,12 @@ export class Zoom extends React.PureComponent<IZoomAllProps, IZoomState> {
 		e.preventDefault()
 	}
 
-	private _onMouseMove = (e: MouseEvent) => {
+	private readonly _onMouseMove = (e: MouseEvent) => {
 		// if (e.ctrlKey) this._zoom(e.movementY * mouseZoomMod)
 		if (e.buttons === 4) this._pan(e.movementX, e.movementY)
 	}
 
-	private _zoom = (zoom: number, round: boolean = false) => {
+	private readonly _zoom = (zoom: number, round: boolean = false) => {
 		let newZoom = this._clampZoom(this.state.zoom - zoom)
 		if (round) newZoom = Math.round(newZoom * 10) / 10
 
@@ -113,10 +113,10 @@ export class Zoom extends React.PureComponent<IZoomAllProps, IZoomState> {
 		})
 	}
 
-	private _clampZoom = (val: number) =>
+	private readonly _clampZoom = (val: number) =>
 		Math.min(maxZoom, Math.max(minZoom, val))
 
-	private _pan = (x = 0, y = 0) => {
+	private readonly _pan = (x = 0, y = 0) => {
 		this.setState({
 			pan: {
 				x: this._clampPan(this.state.pan.x + (x * mousePanMod / this.state.zoom)),
@@ -125,7 +125,7 @@ export class Zoom extends React.PureComponent<IZoomAllProps, IZoomState> {
 		})
 	}
 
-	private _clampPan = (pan: number, zoom: number = this.state.zoom) =>
+	private readonly _clampPan = (pan: number, zoom: number = this.state.zoom) =>
 		Math.min(maxPan * zoom, Math.max(-maxPan * zoom, pan))
 }
 

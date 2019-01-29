@@ -1,36 +1,24 @@
-import {Stack} from 'immutable'
+import {List, Stack} from 'immutable'
 import {AnyAction} from 'redux'
 import {createSelector} from 'reselect'
 import * as uuid from 'uuid'
-import {hashbow} from '../../client/utils'
 import {ConnectionNodeType, IConnectable} from '../common-types'
-import {IMidiNote} from '../MidiNote'
-import {addIfNew} from '../server-common'
-import {colorFunc} from '../shamu-color'
-import {PLAY_ALL, STOP_ALL} from './common-actions'
-import {IClientRoomState} from './common-redux-types'
-import {selectGlobalClockState} from './global-clock-redux'
-import {
-	addMultiThing, deleteThings, IMultiState,
-	IMultiStateThings, makeMultiReducer, MultiThingType, updateThings,
-} from './multi-reducer'
-import {BROADCASTER_ACTION, NetworkActionType, SERVER_ACTION} from './redux-utils'
-import {
-	CLEAR_SEQUENCER, createSequencerEvents, ISequencerEvent, ISequencerState, SKIP_NOTE, UNDO_SEQUENCER,
-} from './sequencer-redux'
-import {VIRTUAL_KEY_PRESSED} from './virtual-keyboard-redux'
+import {IMidiNote, MidiNotes} from '../MidiNote'
+import {colorFunc, hashbow} from '../shamu-color'
+import {addMultiThing, BROADCASTER_ACTION, CLEAR_SEQUENCER, createSequencerEvents, deleteThings, IClientRoomState, IMultiState, IMultiStateThings, ISequencerState, makeMultiReducer, NetworkActionType, PLAY_ALL, selectGlobalClockState, SERVER_ACTION, SKIP_NOTE, STOP_ALL, UNDO_SEQUENCER, updateThings, VIRTUAL_KEY_PRESSED} from './index'
+import {makeSequencerEvents, SequencerEvents} from './sequencer-redux'
 
 export const ADD_INFINITE_SEQUENCER = 'ADD_INFINITE_SEQUENCER'
 export const addInfiniteSequencer = (infiniteSequencer: InfiniteSequencerState) =>
-	addMultiThing(infiniteSequencer, MultiThingType.infiniteSequencer, NetworkActionType.SERVER_AND_BROADCASTER)
+	addMultiThing(infiniteSequencer, ConnectionNodeType.infiniteSequencer, NetworkActionType.SERVER_AND_BROADCASTER)
 
 export const DELETE_INFINITE_SEQUENCERS = 'DELETE_INFINITE_SEQUENCERS'
 export const deleteInfiniteSequencers = (infiniteSequencerIds: string[]) =>
-	deleteThings(infiniteSequencerIds, MultiThingType.infiniteSequencer, NetworkActionType.SERVER_AND_BROADCASTER)
+	deleteThings(infiniteSequencerIds, ConnectionNodeType.infiniteSequencer, NetworkActionType.SERVER_AND_BROADCASTER)
 
 export const UPDATE_INFINITE_SEQUENCERS = 'UPDATE_INFINITE_SEQUENCERS'
 export const updateInfiniteSequencers = (infiniteSequencers: IInfiniteSequencers) =>
-	updateThings(infiniteSequencers, MultiThingType.infiniteSequencer, NetworkActionType.BROADCASTER)
+	updateThings(infiniteSequencers, ConnectionNodeType.infiniteSequencer, NetworkActionType.BROADCASTER)
 
 export const SET_INFINITE_SEQUENCER_NOTE = 'SET_INFINITE_SEQUENCER_NOTE'
 export const setInfiniteSequencerNote =
@@ -105,26 +93,40 @@ export class InfiniteSequencerState implements ISequencerState, IConnectable {
 	public static defaultWidth = 576
 	public static defaultHeight = 80
 
+	public static dummy: InfiniteSequencerState = {
+		id: 'dummy',
+		events: makeSequencerEvents(),
+		index: -1,
+		isPlaying: false,
+		color: 'gray',
+		name: 'dummy',
+		isRecording: false,
+		previousEvents: List<SequencerEvents>(),
+		type: ConnectionNodeType.infiniteSequencer,
+		style: InfiniteSequencerStyle.colorGrid,
+		showRows: false,
+		width: InfiniteSequencerState.defaultWidth,
+		height: InfiniteSequencerState.defaultHeight,
+	}
+
 	public readonly id: string = uuid.v4()
-	public readonly events: ISequencerEvent[]
+	public readonly events: SequencerEvents
 	public readonly index: number = -1
 	public readonly isPlaying: boolean = false
 	public readonly color: string
 	public readonly name: string
 	public readonly isRecording: boolean = false
 	public readonly style: InfiniteSequencerStyle
-	public readonly previousEvents: ISequencerEvent[][] = []
+	public readonly previousEvents = List<SequencerEvents>()
 	public readonly showRows = false
 	public readonly width: number = InfiniteSequencerState.defaultWidth
 	public readonly height: number = InfiniteSequencerState.defaultHeight
 	public readonly type = ConnectionNodeType.infiniteSequencer
 
-	constructor(name: string, style: InfiniteSequencerStyle, events?: ISequencerEvent[]) {
+	constructor(name: string, style: InfiniteSequencerStyle, events = makeSequencerEvents()) {
 		this.name = name
 		this.color = colorFunc(hashbow(this.id)).desaturate(0.2).hsl().string()
-		this.events = events ||
-			[{notes: [44]}, {notes: [45]}, {notes: [46]}, {notes: [47]},
-			{notes: [48]}, {notes: [49]}, {notes: [50]}, {notes: [51]}]
+		this.events = events
 		this.style = style
 	}
 }
@@ -145,7 +147,7 @@ const infiniteSequencerGlobalActionTypes = [
 
 export const infiniteSequencersReducer =
 	makeMultiReducer<InfiniteSequencerState, IInfiniteSequencersState>(
-		infiniteSequencerReducer, MultiThingType.infiniteSequencer,
+		infiniteSequencerReducer, ConnectionNodeType.infiniteSequencer,
 		infiniteSequencerActionTypes, infiniteSequencerGlobalActionTypes,
 	)
 
@@ -161,7 +163,7 @@ function infiniteSequencerReducer(
 						if (action.enabled) {
 							return {
 								...event,
-								notes: addIfNew(event.notes, action.note),
+								notes: event.notes.add(action.note),
 							}
 						} else {
 							return {
@@ -173,7 +175,7 @@ function infiniteSequencerReducer(
 						return event
 					}
 				}),
-				previousEvents: [infiniteSequencer.events, ...infiniteSequencer.previousEvents],
+				previousEvents: infiniteSequencer.previousEvents.unshift(infiniteSequencer.events),
 			}
 		}
 		case SET_INFINITE_SEQUENCER_FIELD:
@@ -185,7 +187,7 @@ function infiniteSequencerReducer(
 			} else if (action.fieldName === InfiniteSequencerFields.index) {
 				return {
 					...infiniteSequencer,
-					[action.fieldName]: action.data % infiniteSequencer.events.length,
+					[action.fieldName]: action.data % infiniteSequencer.events.count(),
 				}
 			} else if (action.fieldName === InfiniteSequencerFields.isPlaying) {
 				return {
@@ -200,23 +202,23 @@ function infiniteSequencerReducer(
 				}
 			}
 		case UNDO_SEQUENCER: {
-			if (infiniteSequencer.previousEvents.length === 0) return infiniteSequencer
+			if (infiniteSequencer.previousEvents.count() === 0) return infiniteSequencer
 
 			const prv = Stack(infiniteSequencer.previousEvents)
 
 			return {
 				...infiniteSequencer,
 				events: prv.first(),
-				previousEvents: prv.shift().toJS(),
+				previousEvents: prv.shift().toList(),
 			}
 		}
 		case CLEAR_SEQUENCER: {
-			if (infiniteSequencer.events.length === 0) return infiniteSequencer
+			if (infiniteSequencer.events.count() === 0) return infiniteSequencer
 
 			return {
 				...infiniteSequencer,
 				events: createSequencerEvents(0),
-				previousEvents: [infiniteSequencer.events, ...infiniteSequencer.previousEvents],
+				previousEvents: infiniteSequencer.previousEvents.unshift(infiniteSequencer.events),
 			}
 		}
 		case PLAY_ALL: return {...infiniteSequencer, isPlaying: true}
@@ -225,8 +227,8 @@ function infiniteSequencerReducer(
 			if (infiniteSequencer.isRecording) {
 				return {
 					...infiniteSequencer,
-					events: infiniteSequencer.events.concat({notes: [action.midiNote]}),
-					previousEvents: [infiniteSequencer.events, ...infiniteSequencer.previousEvents],
+					events: infiniteSequencer.events.concat({notes: MidiNotes([action.midiNote])}),
+					previousEvents: infiniteSequencer.previousEvents.unshift(infiniteSequencer.events),
 				}
 			} else {
 				return infiniteSequencer
@@ -235,8 +237,8 @@ function infiniteSequencerReducer(
 			if (infiniteSequencer.isRecording) {
 				return {
 					...infiniteSequencer,
-					events: infiniteSequencer.events.concat({notes: []}),
-					previousEvents: [infiniteSequencer.events, ...infiniteSequencer.previousEvents],
+					events: infiniteSequencer.events.concat({notes: MidiNotes()}),
+					previousEvents: infiniteSequencer.previousEvents.unshift(infiniteSequencer.events),
 				}
 			} else {
 				return infiniteSequencer
@@ -248,30 +250,30 @@ function infiniteSequencerReducer(
 
 export const selectAllInfiniteSequencers = (state: IClientRoomState) => state.infiniteSequencers.things
 
-export const selectInfiniteSequencer = (state: IClientRoomState, id: string) => selectAllInfiniteSequencers(state)[id]
+export const selectInfiniteSequencer = (state: IClientRoomState, id: string) => selectAllInfiniteSequencers(state)[id] || InfiniteSequencerState.dummy
 
 export const selectInfiniteSequencerIsActive = (state: IClientRoomState, id: string) =>
 	selectInfiniteSequencer(state, id).isPlaying
 
 export const selectInfiniteSequencerIsSending = (state: IClientRoomState, id: string) =>
-	selectInfiniteSequencerActiveNotes(state, id).length > 0
+	selectInfiniteSequencerActiveNotes(state, id).count() > 0
 
-const emptyArray: number[] = []
+const emptyNotes = MidiNotes()
 
 export const selectInfiniteSequencerActiveNotes = createSelector(
 	[selectInfiniteSequencer, selectGlobalClockState],
 	(infiniteSequencer, globalClockState) => {
-		if (!infiniteSequencer) return emptyArray
-		if (!infiniteSequencer.isPlaying) return emptyArray
+		if (!infiniteSequencer) return emptyNotes
+		if (!infiniteSequencer.isPlaying) return emptyNotes
 
 		const globalClockIndex = globalClockState.index
 
 		const index = globalClockIndex
 
-		if (index >= 0 && infiniteSequencer.events.length > 0) {
-			return infiniteSequencer.events[index % infiniteSequencer.events.length].notes
+		if (index >= 0 && infiniteSequencer.events.count() > 0) {
+			return infiniteSequencer.events.get(index % infiniteSequencer.events.count())!.notes
 		} else {
-			return emptyArray
+			return emptyNotes
 		}
 	},
 )

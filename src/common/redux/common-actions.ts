@@ -1,4 +1,4 @@
-import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
+import {BROADCASTER_ACTION, SERVER_ACTION} from './index'
 
 export const SELF_DISCONNECTED = 'SELF_DISCONNECTED'
 export const selfDisconnected = () => ({type: SELF_DISCONNECTED})

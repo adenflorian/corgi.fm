@@ -2,16 +2,8 @@ import {applyMiddleware, combineReducers, createStore, Store} from 'redux'
 import {composeWithDevTools} from 'redux-devtools-extension/developmentOnly'
 import persistState from 'redux-localstorage'
 import {actionsBlacklist} from '../common/common-constants'
-import {audioReducer} from '../common/redux/audio-redux'
-import {clientsReducer} from '../common/redux/clients-redux'
-import {IClientAppState} from '../common/redux/common-redux-types'
-import {createGridSequencerPlayerMiddleware} from '../common/redux/grid-sequencer-player-middleware'
-import {localMiddleware} from '../common/redux/local-middleware'
-import {optionsReducer} from '../common/redux/options-redux'
-import {roomReducers} from '../common/redux/room-stores-redux'
-import {roomsReducer} from '../common/redux/rooms-redux'
-import {websocketSenderMiddleware} from '../common/redux/websocket-client-sender-middleware'
-import {websocketReducer} from '../common/redux/websocket-redux'
+import {audioReducer, clientsReducer, createGridSequencerPlayerMiddleware, IClientAppState, localMiddleware, optionsReducer, roomReducers, roomsReducer, websocketReducer} from '../common/redux'
+import {websocketSenderMiddleware} from './websocket-client-sender-middleware'
 
 const composeEnhancers = composeWithDevTools({
 	actionsBlacklist,

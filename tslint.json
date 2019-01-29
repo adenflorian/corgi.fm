@@ -40,7 +40,13 @@
         ],
         "interface-name": false,
         "max-classes-per-file": false,
-        "prefer-readonly": true
+        "prefer-readonly": true,
+        "max-line-length": [
+            true,
+            {
+                "ignore-pattern": "^import |^export {(.*?)}|class [a-zA-Z]+ implements |//"
+            }
+        ]
     },
     "rulesDirectory": [],
     "linterOptions": {

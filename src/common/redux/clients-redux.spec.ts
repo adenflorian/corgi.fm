@@ -1,7 +1,7 @@
 import {expect} from 'chai'
 import * as sinon from 'sinon'
 import * as shamuColor from '../shamu-color'
-import {addClient, clientsReducer, ClientState} from './clients-redux'
+import {addClient, clientsReducer, ClientState} from './index'
 
 import * as uuid from 'uuid'
 

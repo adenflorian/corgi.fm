@@ -1,21 +1,22 @@
+import {Set} from 'immutable'
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
-import {IMidiNote} from '../../common/MidiNote'
+import {IMidiNotes} from '../../common/MidiNote'
 import {ShamuOscillatorType} from '../../common/OscillatorTypes'
 import {
 	BasicInstrumentParam, selectBasicInstrument, setBasicInstrumentOscillatorType, setBasicInstrumentParam,
-} from '../../common/redux/basic-instruments-redux'
-import {IClientAppState} from '../../common/redux/common-redux-types'
+} from '../../common/redux'
+import {IClientAppState} from '../../common/redux'
 import {
 	selectConnectionSourceColorByTargetId, selectConnectionSourceNotesByTargetId,
-} from '../../common/redux/connections-redux'
+} from '../../common/redux'
 import {Knob} from '../Knob/Knob'
 import {Panel} from '../Panel/Panel'
 import {BasicInstrumentOscillatorTypes} from './BasicInstrumentOscillatorTypes'
 import './BasicInstrumentView.less'
 
-export type MidiNotes = IMidiNote[]
+export type MidiNotes = IMidiNotes
 
 type IBasicInstrumentViewAllProps = IBasicInstrumentViewProps & IBasicInstrumentViewReduxProps & {dispatch: Dispatch}
 
@@ -39,7 +40,7 @@ export class BasicInstrumentView
 
 	public static defaultProps = {
 		pan: 0,
-		rawMidiNotes: [],
+		rawMidiNotes: Set(),
 	}
 
 	public render() {
@@ -115,7 +116,7 @@ export const ConnectedBasicInstrumentView = connect(
 
 		return {
 			rawMidiNotes,
-			isPlaying: rawMidiNotes.length > 0,
+			isPlaying: rawMidiNotes.count() > 0,
 			oscillatorType: instrumentState.oscillatorType,
 			color: selectConnectionSourceColorByTargetId(state.room, props.id),
 			pan: instrumentState.pan,

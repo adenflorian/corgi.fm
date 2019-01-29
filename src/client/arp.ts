@@ -1,12 +1,12 @@
-import {IMidiNotes} from '../common/MidiNote'
+import {emptyMidiNotes, IMidiNotes, MidiNotes} from '../common/MidiNote'
 
 export type OnNewNotes = (newNotes: IMidiNotes) => void
 
 export class Arp {
-	private readonly _rate: number = 1
-	private readonly _shouldReTrigger: boolean = false
-	private _notes: IMidiNotes = []
-	private _startTime: number = 0
+	private readonly _rate = 1
+	private readonly _shouldReTrigger = false
+	private _notes = emptyMidiNotes
+	private _startTime = 0
 
 	public setNotes(notes: IMidiNotes) {
 		this._notes = notes
@@ -24,7 +24,7 @@ export class Arp {
 	public dispose = () => undefined
 	private _onNewNotes: OnNewNotes = () => undefined
 
-	private _setStartTime() {
+	private readonly _setStartTime = () => {
 		this._startTime = performance.now()
 	}
 
@@ -36,13 +36,13 @@ export class Arp {
 	}
 }
 
-function arp(midiNotes: IMidiNotes, rate: number, startTime: number, currentTime: number) {
-	const length = midiNotes.length
+function arp(midiNotes: IMidiNotes, rate: number, startTime: number, currentTime: number): IMidiNotes {
+	const length = midiNotes.count()
 
-	if (length === 0) return []
-	if (length === 1) return [...midiNotes]
+	if (length === 0) return emptyMidiNotes
+	if (length === 1) return midiNotes
 
 	const timeElapsedSeconds: number = Number.parseInt(((currentTime - startTime) / 1000 / (1 / rate)).toFixed(0), 10)
 
-	return [midiNotes[timeElapsedSeconds % length]]
+	return MidiNotes([midiNotes.get(timeElapsedSeconds % length) || -1])
 }

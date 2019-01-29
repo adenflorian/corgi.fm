@@ -1,38 +1,32 @@
+import {Set} from 'immutable'
 import {AnyAction} from 'redux'
 import {createSelector} from 'reselect'
 import * as uuid from 'uuid'
 import {applyOctave} from '../../client/music/music-functions'
 import {Octave} from '../../client/music/music-types'
-import {addIfNew} from '../../common/server-common'
-import {ClientId} from '../common-types'
-import {ConnectionNodeType} from '../common-types'
-import {IMidiNote} from '../MidiNote'
-import {IClientRoomState} from './common-redux-types'
-import {
-	addMultiThing, deleteThings, IMultiState, IMultiStateThing,
-	IMultiStateThings, makeMultiReducer, MultiThingType, updateThings,
-} from './multi-reducer'
-import {BROADCASTER_ACTION, NetworkActionType, SERVER_ACTION} from './redux-utils'
+import {ClientId, ConnectionNodeType, IMultiStateThing, IMultiStateThingDeserializer} from '../common-types'
+import {emptyMidiNotes, IMidiNote, IMidiNotes, MidiNotes} from '../MidiNote'
+import {addMultiThing, BROADCASTER_ACTION, deleteThings, IClientRoomState, IMultiState, IMultiStateThings, makeMultiReducer, NetworkActionType, SERVER_ACTION, updateThings} from './index'
 
 export interface VirtualKeyAction {
 	type: string
 	ownerId: ClientId
 	number?: number
 	octave?: Octave
-	keys?: IMidiNote[]
+	keys?: IMidiNotes
 }
 
 export const ADD_VIRTUAL_KEYBOARD = 'ADD_VIRTUAL_KEYBOARD'
 export const addVirtualKeyboard = (virtualKeyboard: IVirtualKeyboardState) =>
-	addMultiThing(virtualKeyboard, MultiThingType.virtualKeyboard, NetworkActionType.SERVER_AND_BROADCASTER)
+	addMultiThing(virtualKeyboard, ConnectionNodeType.virtualKeyboard, NetworkActionType.SERVER_AND_BROADCASTER)
 
 export const DELETE_VIRTUAL_KEYBOARDS = 'DELETE_VIRTUAL_KEYBOARDS'
 export const deleteVirtualKeyboards = (virtualKeyboardIds: string[]) =>
-	deleteThings(virtualKeyboardIds, MultiThingType.virtualKeyboard, NetworkActionType.SERVER_AND_BROADCASTER)
+	deleteThings(virtualKeyboardIds, ConnectionNodeType.virtualKeyboard, NetworkActionType.SERVER_AND_BROADCASTER)
 
 export const UPDATE_VIRTUAL_KEYBOARDS = 'UPDATE_VIRTUAL_KEYBOARDS'
 export const updateVirtualKeyboards = (keyboards: any) =>
-	updateThings(keyboards, MultiThingType.virtualKeyboard, NetworkActionType.BROADCASTER)
+	updateThings(keyboards, ConnectionNodeType.virtualKeyboard, NetworkActionType.BROADCASTER)
 
 export const VIRTUAL_KEY_PRESSED = 'VIRTUAL_KEY_PRESSED'
 export const virtualKeyPressed = (id: string, number: number, octave: Octave, midiNote: IMidiNote) => {
@@ -87,7 +81,7 @@ export const virtualOctaveChange = (id: string, delta: number) => {
 }
 
 export const SET_VIRTUAL_KEYS = 'SET_VIRTUAL_KEYS'
-export const setVirtualKeys = (id: string, keys: IMidiNote[]) => {
+export const setVirtualKeys = (id: string, keys: IMidiNotes) => {
 	return {
 		type: SET_VIRTUAL_KEYS,
 		id,
@@ -104,31 +98,38 @@ export interface IVirtualKeyboards extends IMultiStateThings {
 }
 
 export interface IVirtualKeyboardState extends IMultiStateThing {
-	pressedKeys: IMidiNote[]
+	pressedKeys: IMidiNotes
 	octave: Octave
 	id: string
 	ownerId: ClientId
 	color: string
 }
 
-const emptyArray: any[] = []
-
 export class VirtualKeyboardState implements IVirtualKeyboardState {
 	public static dummy: IVirtualKeyboardState = {
-		pressedKeys: emptyArray,
+		pressedKeys: emptyMidiNotes,
 		octave: 0,
 		id: 'dummy',
 		ownerId: 'dummyOwner',
 		color: 'gray',
-		type: ConnectionNodeType.keyboard,
+		type: ConnectionNodeType.virtualKeyboard,
 	}
 
-	public readonly pressedKeys: number[] = []
+	public static fromJS: IMultiStateThingDeserializer = state => {
+		const x = state as VirtualKeyboardState
+		const y = {
+			...state,
+			pressedKeys: MidiNotes(x.pressedKeys),
+		} as VirtualKeyboardState
+		return y
+	}
+
+	public readonly pressedKeys: IMidiNotes = Set()
 	public readonly octave: number = 4
 	public readonly id: string = uuid.v4()
 	public readonly ownerId: ClientId
 	public readonly color: string
-	public readonly type = ConnectionNodeType.keyboard
+	public readonly type = ConnectionNodeType.virtualKeyboard
 
 	constructor(ownerId: ClientId, color: string) {
 		this.ownerId = ownerId
@@ -146,17 +147,14 @@ const keyboardActionTypes = [
 ]
 
 export const virtualKeyboardsReducer = makeMultiReducer<IVirtualKeyboardState, IVirtualKeyboardsState>(
-	virtualKeyboardReducer, MultiThingType.virtualKeyboard, keyboardActionTypes)
+	virtualKeyboardReducer, ConnectionNodeType.virtualKeyboard, keyboardActionTypes)
 
-function virtualKeyboardReducer(virtualKeyboard: IVirtualKeyboardState, action: AnyAction) {
+function virtualKeyboardReducer(virtualKeyboard: IVirtualKeyboardState, action: AnyAction): IVirtualKeyboardState {
 	switch (action.type) {
 		case VIRTUAL_KEY_PRESSED:
 			return {
 				...virtualKeyboard,
-				pressedKeys: addIfNew(
-					virtualKeyboard.pressedKeys,
-					action.number,
-				),
+				pressedKeys: virtualKeyboard.pressedKeys.add(action.number),
 			}
 		case VIRTUAL_KEY_UP:
 			return {
@@ -166,7 +164,7 @@ function virtualKeyboardReducer(virtualKeyboard: IVirtualKeyboardState, action: 
 		case VIRTUAL_ALL_KEYS_UP:
 			return {
 				...virtualKeyboard,
-				pressedKeys: [],
+				pressedKeys: emptyMidiNotes,
 			}
 		case SET_VIRTUAL_KEYS:
 			return {
@@ -197,7 +195,7 @@ export function flipKey(keys: any[], key: any) {
 }
 
 export interface IMidi {
-	notes: IMidiNote[]
+	notes: IMidiNotes
 }
 
 export const selectAllVirtualKeyboards = (state: IClientRoomState) =>
@@ -218,17 +216,17 @@ export const selectVirtualKeyboardById = (state: IClientRoomState, id: string) =
 }
 
 export const selectVirtualKeyboardIsActive = (state: IClientRoomState, id: string) => {
-	return selectVirtualKeyboardById(state, id).pressedKeys.length > 0
+	return selectVirtualKeyboardById(state, id).pressedKeys.count() > 0
 }
 
 export const selectVirtualKeyboardIsSending = (state: IClientRoomState, id: string) => {
-	return selectVirtualKeyboardById(state, id).pressedKeys.length > 0
+	return selectVirtualKeyboardById(state, id).pressedKeys.count() > 0
 }
 
 export const makeGetKeyboardMidiOutput = () => {
 	return createSelector(
 		selectVirtualKeyboardById,
-		keyboard => keyboard === undefined ? [] : keyboard.pressedKeys.map(x => applyOctave(x, keyboard.octave)),
+		keyboard => keyboard === undefined ? MidiNotes() : keyboard.pressedKeys.map(x => applyOctave(x, keyboard.octave)),
 	)
 }
 

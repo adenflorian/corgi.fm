@@ -1,22 +1,16 @@
 import {AnyAction} from 'redux'
 import * as uuid from 'uuid'
-import {ClientId} from '../common-types'
-import {ConnectionNodeType, IConnectable} from '../common-types'
-import {IClientRoomState} from './common-redux-types'
-import {
-	addMultiThing, createSelectAllOfThingAsArray, deleteThings, IMultiState,
-	makeMultiReducer, MultiThingType, updateThings,
-} from './multi-reducer'
-import {BROADCASTER_ACTION, NetworkActionType, SERVER_ACTION} from './redux-utils'
+import {ClientId, ConnectionNodeType, IConnectable} from '../common-types'
+import {addMultiThing, BROADCASTER_ACTION, createSelectAllOfThingAsArray, deleteThings, IClientRoomState, IMultiState, makeMultiReducer, NetworkActionType, SERVER_ACTION, updateThings} from './index'
 
 export const addBasicSampler = (sampler: BasicSamplerState) =>
-	addMultiThing(sampler, MultiThingType.basicSampler, NetworkActionType.SERVER_AND_BROADCASTER)
+	addMultiThing(sampler, ConnectionNodeType.basicSampler, NetworkActionType.SERVER_AND_BROADCASTER)
 
 export const deleteBasicSamplers = (samplerIds: string[]) =>
-	deleteThings(samplerIds, MultiThingType.basicSampler, NetworkActionType.SERVER_AND_BROADCASTER)
+	deleteThings(samplerIds, ConnectionNodeType.basicSampler, NetworkActionType.SERVER_AND_BROADCASTER)
 
 export const updateBasicSamplers = (samplers: IBasicSamplers) =>
-	updateThings(samplers, MultiThingType.basicSampler, NetworkActionType.BROADCASTER)
+	updateThings(samplers, ConnectionNodeType.basicSampler, NetworkActionType.BROADCASTER)
 
 export const SET_BASIC_SAMPLER_PARAM = 'SET_BASIC_SAMPLER_PARAM'
 export const setBasicSamplerParam =
@@ -53,7 +47,7 @@ export class BasicSamplerState implements IConnectable {
 		attack: 0,
 		release: 0,
 		color: false,
-		type: ConnectionNodeType.sampler,
+		type: ConnectionNodeType.basicSampler,
 	}
 
 	public readonly id = uuid.v4()
@@ -63,7 +57,7 @@ export class BasicSamplerState implements IConnectable {
 	public readonly attack: number = 0.01
 	public readonly release: number = 1
 	public readonly color: false = false
-	public readonly type = ConnectionNodeType.sampler
+	public readonly type = ConnectionNodeType.basicSampler
 
 	constructor(ownerId: ClientId) {
 		this.ownerId = ownerId
@@ -76,7 +70,7 @@ const basicSamplerActionTypes = [
 
 export const basicSamplersReducer = makeMultiReducer<BasicSamplerState, IBasicSamplersState>(
 	basicSamplerReducer,
-	MultiThingType.basicSampler,
+	ConnectionNodeType.basicSampler,
 	basicSamplerActionTypes,
 )
 

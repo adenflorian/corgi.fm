@@ -52,7 +52,7 @@ class SamplerVoice extends Voice {
 		this._afterPlayNote(note)
 	}
 
-	public dispose = () => {
+	public readonly dispose = () => {
 		this._audioBufferSource.stop()
 		this._audioBufferSource.disconnect()
 		delete this._audioBufferSource

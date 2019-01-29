@@ -5,11 +5,7 @@ import {getMainBoardsRectX, getMainBoardsRectY} from '../../client/utils'
 import {ClientId} from '../common-types'
 import {logger} from '../logger'
 import {getColorHslByString} from '../shamu-color'
-import {SELF_DISCONNECTED} from './common-actions'
-import {IClientAppState} from './common-redux-types'
-import {IServerState} from './configure-server-store'
-import {BROADCASTER_ACTION, createDeepEqualSelector, createReducer, SERVER_ACTION} from './redux-utils'
-import {selectLocalSocketId} from './websocket-redux'
+import {BROADCASTER_ACTION, createDeepEqualSelector, createReducer, IClientAppState, IServerState, selectLocalSocketId, SELF_DISCONNECTED, SERVER_ACTION} from './index'
 
 export const ADD_CLIENT = 'ADD_CLIENT'
 export type AddClientAction = ReturnType<typeof addClient>

@@ -1,9 +1,7 @@
 import {List} from 'immutable'
 import {createSelector} from 'reselect'
 import {ClientId} from '../common-types'
-import {selectLocalClientId} from './clients-redux'
-import {IClientRoomState} from './common-redux-types'
-import {createReducer} from './redux-utils'
+import {createReducer, IClientRoomState, selectLocalClientId} from './index'
 
 export interface IRoomMembersState {
 	ids: IRoomMembersIds

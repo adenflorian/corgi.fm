@@ -1,5 +1,5 @@
 import {logger} from '../common/logger'
-import {IMidiNote} from '../common/MidiNote'
+import {IMidiNotes} from '../common/MidiNote'
 
 export enum SimpleGridSequencerEventAction {
 	playNote,
@@ -10,7 +10,7 @@ export enum SimpleGridSequencerEventAction {
 export interface ISimpleGridSequencerEvent {
 	time: number
 	action: SimpleGridSequencerEventAction
-	notes?: IMidiNote[]
+	notes?: IMidiNotes
 }
 
 export type IndexChangeHandler = (newIndex: number) => any

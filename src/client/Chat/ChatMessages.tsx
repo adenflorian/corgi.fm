@@ -1,8 +1,8 @@
 import * as React from 'react'
 import {Component} from 'react'
 import {connect} from 'react-redux'
-import {IChatMessage, selectAllMessages} from '../../common/redux/chat-redux'
-import {IClientAppState} from '../../common/redux/common-redux-types'
+import {IChatMessage, selectAllMessages} from '../../common/redux'
+import {IClientAppState} from '../../common/redux'
 
 interface IChatMessagesProps {
 	messages: IChatMessage[]

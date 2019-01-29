@@ -6,7 +6,7 @@ import {
 } from 'react-redux'
 import {Action} from 'redux'
 import {createSelectorCreator, defaultMemoize} from 'reselect'
-import {IClientAppState} from './common-redux-types'
+import {IClientAppState} from './index'
 
 export function makeActionCreator(type: string, ...argNames: any[]) {
 	argNames.forEach(arg => {

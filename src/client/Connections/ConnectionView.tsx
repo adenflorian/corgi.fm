@@ -4,8 +4,8 @@ import Draggable, {DraggableEventHandler} from 'react-draggable'
 import {Dispatch} from 'redux'
 import {
 	connectionsActions, defaultGhostConnector, GhostConnectorRecord, GhostConnectorStatus,
-} from '../../common/redux/connections-redux'
-import {shamuConnect} from '../../common/redux/redux-utils'
+} from '../../common/redux'
+import {shamuConnect} from '../../common/redux'
 import {
 	saturateColor,
 } from '../../common/shamu-color'

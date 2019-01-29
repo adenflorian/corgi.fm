@@ -1,6 +1,7 @@
-import {IConnectable} from '../common-types'
-import {IClientRoomState} from './common-redux-types'
-import {BROADCASTER_ACTION, NetworkActionType, SERVER_ACTION} from './redux-utils'
+import {Map} from 'immutable'
+import {ConnectionNodeType, IMultiStateThing} from '../common-types'
+import {assertArrayHasNoUndefinedElements} from '../common-utils'
+import {BROADCASTER_ACTION, getConnectionNodeInfo, IClientRoomState, NetworkActionType, SERVER_ACTION} from './index'
 
 export interface IMultiState {
 	things: IMultiStateThings
@@ -10,23 +11,17 @@ export interface IMultiStateThings {
 	[key: string]: IMultiStateThing
 }
 
-export interface IMultiStateThing extends IConnectable {
-	id: string
-}
-
-export enum MultiThingType {
-	virtualKeyboard = 'virtualKeyboard',
-	gridSequencer = 'gridSequencer',
-	infiniteSequencer = 'infiniteSequencer',
-	basicInstrument = 'basicInstrument',
-	basicSampler = 'basicSampler',
-}
+export const dummyMultiStateThing: IMultiStateThing = Object.freeze({
+	id: '-1',
+	color: 'black',
+	type: ConnectionNodeType.dummy,
+})
 
 export const ADD_MULTI_THING = 'ADD_MULTI_THING'
 type AddMultiThingAction = ReturnType<typeof addMultiThing>
 export const addMultiThing = (
 	thing: IMultiStateThing,
-	thingType: MultiThingType,
+	thingType: ConnectionNodeType,
 	netActionType: NetworkActionType = NetworkActionType.NO,
 ) => ({
 	type: ADD_MULTI_THING as typeof ADD_MULTI_THING,
@@ -49,7 +44,7 @@ export const DELETE_MULTI_THINGS = 'DELETE_MULTI_THINGS'
 type DeleteMultiThingsAction = ReturnType<typeof deleteThings>
 export const deleteThings = (
 	thingIds: string[],
-	thingType: MultiThingType,
+	thingType: ConnectionNodeType,
 	netActionType: NetworkActionType = NetworkActionType.NO,
 ) => ({
 	type: DELETE_MULTI_THINGS as typeof DELETE_MULTI_THINGS,
@@ -60,7 +55,7 @@ export const deleteThings = (
 
 export const DELETE_ALL_THINGS = 'DELETE_ALL_THINGS'
 type DeleteAllThingsAction = ReturnType<typeof deleteAllThings>
-export const deleteAllThings = (thingType: MultiThingType) => ({
+export const deleteAllThings = (thingType: ConnectionNodeType) => ({
 	type: DELETE_ALL_THINGS as typeof DELETE_ALL_THINGS,
 	thingType,
 })
@@ -69,7 +64,7 @@ export const UPDATE_MULTI_THINGS = 'UPDATE_MULTI_THINGS'
 type UpdateMultiThingsAction = ReturnType<typeof updateThings>
 export const updateThings = (
 	things: IMultiStateThings,
-	thingType: MultiThingType,
+	thingType: ConnectionNodeType,
 	netActionType: NetworkActionType = NetworkActionType.NO,
 ) => ({
 	type: UPDATE_MULTI_THINGS as typeof UPDATE_MULTI_THINGS,
@@ -85,10 +80,12 @@ export type MultiThingAction =
 // TODO Use immutable js like connections redux
 export function makeMultiReducer<T extends IMultiStateThing, U extends IMultiState>(
 	innerReducer: (state: T, action: any) => any,
-	thingType: MultiThingType,
+	thingType: ConnectionNodeType,
 	actionTypes: string[],
 	globalActionTypes: string[] = [],
 ) {
+	assertArrayHasNoUndefinedElements(globalActionTypes)
+
 	return (state: U = {things: {}} as U, action: MultiThingAction): U => {
 		switch (action.type) {
 			case ADD_MULTI_THING:
@@ -97,7 +94,7 @@ export function makeMultiReducer<T extends IMultiStateThing, U extends IMultiSta
 					...state,
 					things: {
 						...state.things,
-						[action.thing.id]: action.thing,
+						[action.thing.id]: getConnectionNodeInfo(thingType).stateDeserializer(action.thing),
 					},
 				}
 			case DELETE_MULTI_THINGS:
@@ -110,11 +107,14 @@ export function makeMultiReducer<T extends IMultiStateThing, U extends IMultiSta
 				return {...state, things: {}}
 			case UPDATE_MULTI_THINGS:
 				if (action.thingType !== thingType) return state
+				const xx = Map(action.things).map(getConnectionNodeInfo(thingType).stateDeserializer).toObject()
+				// console.log('XXXXXXXX ' + action.thingType + ': ', xx)
 				return {
 					...state,
 					things: {
 						...state.things,
-						...action.things,
+						// ...action.things,
+						...xx,
 					},
 				}
 			default:

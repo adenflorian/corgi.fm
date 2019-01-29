@@ -7,8 +7,8 @@ import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 import {
 	exportSequencerMidi, GridSequencerFields, setGridSequencerField,
-} from '../../common/redux/grid-sequencers-redux'
-import {clearSequencer, undoSequencer} from '../../common/redux/sequencer-redux'
+} from '../../common/redux'
+import {clearSequencer, undoSequencer} from '../../common/redux'
 
 interface IGridSequencerControlsProps {
 	id: string

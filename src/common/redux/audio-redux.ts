@@ -1,4 +1,4 @@
-import {createReducer, makeActionCreator} from './redux-utils'
+import {createReducer, makeActionCreator} from './index'
 
 export const REPORT_LEVELS = 'REPORT_LEVELS'
 export const reportLevels = makeActionCreator(REPORT_LEVELS, 'master')

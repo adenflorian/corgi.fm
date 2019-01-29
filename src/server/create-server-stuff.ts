@@ -1,23 +1,8 @@
-import {Map} from 'immutable'
+import {List, Map} from 'immutable'
 import {Store} from 'redux'
 import {ConnectionNodeType, IConnectable} from '../common/common-types'
-import {addBasicInstrument, BasicInstrumentState} from '../common/redux/basic-instruments-redux'
-import {addBasicSampler, BasicSamplerState} from '../common/redux/basic-sampler-redux'
-import {addClient, ClientState} from '../common/redux/clients-redux'
-import {IServerState} from '../common/redux/configure-server-store'
-import {
-	Connection, connectionsActions, IConnection, selectConnectionsWithTargetIds,
-} from '../common/redux/connections-redux'
-import {addGridSequencer, GridSequencerState} from '../common/redux/grid-sequencers-redux'
-import {
-	addInfiniteSequencer, InfiniteSequencerState, InfiniteSequencerStyle,
-} from '../common/redux/infinite-sequencers-redux'
-import {MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID} from '../common/redux/node-types'
-import {
-	addPosition, calculateExtremes, makePosition, selectAllPositions, updatePositions,
-} from '../common/redux/positions-redux'
-import {createRoomAction} from '../common/redux/room-stores-redux'
-import {createSequencerEvents} from '../common/redux/sequencer-redux'
+import {MidiNotes} from '../common/MidiNote'
+import {addBasicInstrument, addBasicSampler, addClient, addGridSequencer, addInfiniteSequencer, addPosition, BasicInstrumentState, BasicSamplerState, calculateExtremes, ClientState, Connection, connectionsActions, createRoomAction, createSequencerEvents, GridSequencerState, IConnection, InfiniteSequencerState, InfiniteSequencerStyle, ISequencerEvent, IServerState, makePosition, makeSequencerEvents, MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID, selectAllPositions, selectConnectionsWithTargetIds, SequencerEvents, updatePositions} from '../common/redux'
 
 const masterAudioOutput: IConnectable = Object.freeze({
 	id: MASTER_AUDIO_OUTPUT_TARGET_ID,
@@ -52,7 +37,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 				notesToShow: 12,
 			},
 			target: {
-				type: ConnectionNodeType.sampler,
+				type: ConnectionNodeType.basicSampler,
 			},
 		},
 		melody: {
@@ -63,7 +48,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 				notesToShow: 24,
 			},
 			target: {
-				type: ConnectionNodeType.instrument,
+				type: ConnectionNodeType.basicInstrument,
 			},
 		},
 		arp: {
@@ -74,7 +59,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 				infinityStyle: InfiniteSequencerStyle.colorGrid,
 			},
 			target: {
-				type: ConnectionNodeType.sampler,
+				type: ConnectionNodeType.basicSampler,
 			},
 		},
 		arp2: {
@@ -85,7 +70,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 				infinityStyle: InfiniteSequencerStyle.colorBars,
 			},
 			target: {
-				type: ConnectionNodeType.instrument,
+				type: ConnectionNodeType.basicInstrument,
 			},
 		},
 	})
@@ -169,7 +154,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 		type: ConnectionNodeType
 		name: string
 		infinityStyle?: InfiniteSequencerStyle
-		events?: any
+		events?: SequencerEvents
 		notesToShow?: number
 	}
 
@@ -190,11 +175,11 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 
 	function createTarget(type: ConnectionNodeType) {
 		switch (type) {
-			case ConnectionNodeType.instrument:
+			case ConnectionNodeType.basicInstrument:
 				const x = new BasicInstrumentState(serverClient.id)
 				serverStore.dispatch(createRoomAction(addBasicInstrument(x), room))
 				return x
-			case ConnectionNodeType.sampler:
+			case ConnectionNodeType.basicSampler:
 				const y = new BasicSamplerState(serverClient.id)
 				serverStore.dispatch(createRoomAction(addBasicSampler(y), room))
 				return y
@@ -215,55 +200,55 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 
 function getBassNotes() {
 	return createSequencerEvents(16)
-		.map((_, i) => ({notes: i % 2 === 1 ? [] : [24]}))
+		.map((_, i) => ({notes: MidiNotes(i % 2 === 1 ? [] : [24])}))
 }
 
 function getMelodyNotes() {
-	return [
-		{notes: [36]},
-		{notes: [40]},
-		{notes: [43]},
-		{notes: [47]},
-		{notes: [48]},
-		{notes: [47]},
-		{notes: [43]},
-		{notes: [40]},
-		{notes: [36]},
-		{notes: [40]},
-		{notes: [43]},
-		{notes: [47]},
-		{notes: [48]},
-		{notes: [47]},
-		{notes: [43]},
-		{notes: [40]},
-		{notes: [36]},
-		{notes: [40]},
-		{notes: [43]},
-		{notes: [47]},
-		{notes: [48]},
-		{notes: [47]},
-		{notes: [43]},
-		{notes: [40]},
-		{notes: [36]},
-		{notes: [40]},
-		{notes: [43]},
-		{notes: [47]},
-		{notes: [48]},
-		{notes: [47]},
-		{notes: [43]},
-		{notes: [40]},
-	]
+	return makeSequencerEvents([
+		{notes: MidiNotes([36])},
+		{notes: MidiNotes([40])},
+		{notes: MidiNotes([43])},
+		{notes: MidiNotes([47])},
+		{notes: MidiNotes([48])},
+		{notes: MidiNotes([47])},
+		{notes: MidiNotes([43])},
+		{notes: MidiNotes([40])},
+		{notes: MidiNotes([36])},
+		{notes: MidiNotes([40])},
+		{notes: MidiNotes([43])},
+		{notes: MidiNotes([47])},
+		{notes: MidiNotes([48])},
+		{notes: MidiNotes([47])},
+		{notes: MidiNotes([43])},
+		{notes: MidiNotes([40])},
+		{notes: MidiNotes([36])},
+		{notes: MidiNotes([40])},
+		{notes: MidiNotes([43])},
+		{notes: MidiNotes([47])},
+		{notes: MidiNotes([48])},
+		{notes: MidiNotes([47])},
+		{notes: MidiNotes([43])},
+		{notes: MidiNotes([40])},
+		{notes: MidiNotes([36])},
+		{notes: MidiNotes([40])},
+		{notes: MidiNotes([43])},
+		{notes: MidiNotes([47])},
+		{notes: MidiNotes([48])},
+		{notes: MidiNotes([47])},
+		{notes: MidiNotes([43])},
+		{notes: MidiNotes([40])},
+	])
 }
 
 function getInitialInfiniteSequencerEvents() {
-	return [
-		{notes: [60]},
-		{notes: [64]},
-		{notes: [67]},
-		{notes: [71]},
-		{notes: [72]},
-		{notes: [71]},
-		{notes: [67]},
-		{notes: [64]},
-	]
+	return makeSequencerEvents([
+		{notes: MidiNotes([60])},
+		{notes: MidiNotes([64])},
+		{notes: MidiNotes([67])},
+		{notes: MidiNotes([71])},
+		{notes: MidiNotes([72])},
+		{notes: MidiNotes([71])},
+		{notes: MidiNotes([67])},
+		{notes: MidiNotes([64])},
+	])
 }

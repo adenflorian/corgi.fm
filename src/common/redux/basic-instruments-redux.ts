@@ -1,25 +1,19 @@
 import {AnyAction} from 'redux'
 import {createSelector} from 'reselect'
 import * as uuid from 'uuid'
-import {ClientId} from '../common-types'
-import {ConnectionNodeType, IConnectable} from '../common-types'
+import {ClientId, ConnectionNodeType, IConnectable} from '../common-types'
 import {pickRandomArrayElement} from '../common-utils'
 import {BuiltInOscillatorType, ShamuOscillatorType} from '../OscillatorTypes'
-import {IClientRoomState} from './common-redux-types'
-import {
-	addMultiThing, createSelectAllOfThingAsArray, deleteThings,
-	IMultiState, makeMultiReducer, MultiThingType, updateThings,
-} from './multi-reducer'
-import {BROADCASTER_ACTION, NetworkActionType, SERVER_ACTION} from './redux-utils'
+import {addMultiThing, BROADCASTER_ACTION, createSelectAllOfThingAsArray, deleteThings, IClientRoomState, IMultiState, makeMultiReducer, NetworkActionType, SERVER_ACTION, updateThings} from './index'
 
 export const addBasicInstrument = (instrument: BasicInstrumentState) =>
-	addMultiThing(instrument, MultiThingType.basicInstrument, NetworkActionType.SERVER_AND_BROADCASTER)
+	addMultiThing(instrument, ConnectionNodeType.basicInstrument, NetworkActionType.SERVER_AND_BROADCASTER)
 
 export const deleteBasicInstruments = (instrumentIds: string[]) =>
-	deleteThings(instrumentIds, MultiThingType.basicInstrument, NetworkActionType.SERVER_AND_BROADCASTER)
+	deleteThings(instrumentIds, ConnectionNodeType.basicInstrument, NetworkActionType.SERVER_AND_BROADCASTER)
 
 export const updateBasicInstruments = (instruments: IBasicInstruments) =>
-	updateThings(instruments, MultiThingType.basicInstrument, NetworkActionType.BROADCASTER)
+	updateThings(instruments, ConnectionNodeType.basicInstrument, NetworkActionType.BROADCASTER)
 
 export const SET_BASIC_INSTRUMENT_OSCILLATOR_TYPE = 'SET_BASIC_INSTRUMENT_OSCILLATOR_TYPE'
 export const setBasicInstrumentOscillatorType =
@@ -72,7 +66,7 @@ export class BasicInstrumentState implements IConnectable {
 		attack: 0,
 		release: 0,
 		color: false,
-		type: ConnectionNodeType.instrument,
+		type: ConnectionNodeType.basicInstrument,
 	}
 
 	public readonly oscillatorType: ShamuOscillatorType
@@ -84,7 +78,7 @@ export class BasicInstrumentState implements IConnectable {
 	public readonly attack: number = 0.01
 	public readonly release: number = 1
 	public readonly color: false = false
-	public readonly type = ConnectionNodeType.instrument
+	public readonly type = ConnectionNodeType.basicInstrument
 
 	constructor(ownerId: ClientId) {
 		this.ownerId = ownerId
@@ -98,7 +92,7 @@ const basicInstrumentActionTypes = [
 
 export const basicInstrumentsReducer = makeMultiReducer<BasicInstrumentState, IBasicInstrumentsState>(
 	basicInstrumentReducer,
-	MultiThingType.basicInstrument,
+	ConnectionNodeType.basicInstrument,
 	basicInstrumentActionTypes,
 )
 

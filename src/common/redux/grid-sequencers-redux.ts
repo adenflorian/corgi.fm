@@ -1,37 +1,25 @@
-import {Map, Stack} from 'immutable'
+import {List, Map, Stack} from 'immutable'
 import {AnyAction, Reducer} from 'redux'
 import {createSelector} from 'reselect'
 import * as uuid from 'uuid'
-import {hashbow} from '../../client/utils'
 import {ConnectionNodeType} from '../common-types'
-import {IMidiNote} from '../MidiNote'
-import {addIfNew} from '../server-common'
+import {emptyMidiNotes, IMidiNote} from '../MidiNote'
 import {MAX_MIDI_NOTE_NUMBER_127} from '../server-constants'
-import {colorFunc} from '../shamu-color'
-import {PLAY_ALL, STOP_ALL} from './common-actions'
-import {IClientRoomState} from './common-redux-types'
-import {selectGlobalClockState} from './global-clock-redux'
-import {selectAllInfiniteSequencers} from './infinite-sequencers-redux'
-import {
-	addMultiThing, deleteThings, IMultiState,
-	IMultiStateThings, makeMultiReducer, MultiThingType, updateThings,
-} from './multi-reducer'
-import {BROADCASTER_ACTION, NetworkActionType, SERVER_ACTION} from './redux-utils'
-import {
-	CLEAR_SEQUENCER, createSequencerEvents, isEmptyEvents, ISequencerEvent, ISequencerState, UNDO_SEQUENCER,
-} from './sequencer-redux'
+import {colorFunc, hashbow} from '../shamu-color'
+import {addMultiThing, BROADCASTER_ACTION, CLEAR_SEQUENCER, createSequencerEvents, deleteThings, IClientRoomState, IMultiState, IMultiStateThings, isEmptyEvents, ISequencerEvent, ISequencerState, makeMultiReducer, NetworkActionType, PLAY_ALL, selectAllInfiniteSequencers, selectGlobalClockState, SERVER_ACTION, STOP_ALL, UNDO_SEQUENCER, updateThings} from './index'
+import {makeSequencerEvents, SequencerEvents} from './sequencer-redux'
 
 export const ADD_GRID_SEQUENCER = 'ADD_GRID_SEQUENCER'
 export const addGridSequencer = (gridSequencer: IGridSequencerState) =>
-	addMultiThing(gridSequencer, MultiThingType.gridSequencer, NetworkActionType.SERVER_AND_BROADCASTER)
+	addMultiThing(gridSequencer, ConnectionNodeType.gridSequencer, NetworkActionType.SERVER_AND_BROADCASTER)
 
 export const DELETE_GRID_SEQUENCERS = 'DELETE_GRID_SEQUENCERS'
 export const deleteGridSequencers = (gridSequencerIds: string[]) =>
-	deleteThings(gridSequencerIds, MultiThingType.gridSequencer, NetworkActionType.SERVER_AND_BROADCASTER)
+	deleteThings(gridSequencerIds, ConnectionNodeType.gridSequencer, NetworkActionType.SERVER_AND_BROADCASTER)
 
 export const UPDATE_GRID_SEQUENCERS = 'UPDATE_GRID_SEQUENCERS'
 export const updateGridSequencers = (gridSequencers: IGridSequencers) =>
-	updateThings(gridSequencers, MultiThingType.gridSequencer, NetworkActionType.BROADCASTER)
+	updateThings(gridSequencers, ConnectionNodeType.gridSequencer, NetworkActionType.BROADCASTER)
 
 export const SET_GRID_SEQUENCER_NOTE = 'SET_GRID_SEQUENCER_NOTE'
 export const setGridSequencerNote =
@@ -112,7 +100,7 @@ export class GridSequencerState implements IGridSequencerState {
 
 	public static dummy: IGridSequencerState = {
 		id: 'dummy',
-		events: [],
+		events: makeSequencerEvents(),
 		index: -1,
 		isPlaying: false,
 		color: 'gray',
@@ -120,14 +108,14 @@ export class GridSequencerState implements IGridSequencerState {
 		scrollY: 0,
 		notesToShow: 0,
 		isRecording: false,
-		previousEvents: [],
+		previousEvents: List<SequencerEvents>(),
 		width: GridSequencerState.defaultWidth,
 		height: GridSequencerState.defaultHeight,
 		type: ConnectionNodeType.gridSequencer,
 	}
 
 	public readonly id: string = uuid.v4()
-	public readonly events: ISequencerEvent[]
+	public readonly events: SequencerEvents
 	public readonly index: number = -1
 	public readonly isPlaying: boolean = false
 	public readonly color: string
@@ -135,12 +123,12 @@ export class GridSequencerState implements IGridSequencerState {
 	public readonly scrollY: number
 	public readonly notesToShow: number
 	public readonly isRecording: boolean = false
-	public readonly previousEvents: ISequencerEvent[][] = []
+	public readonly previousEvents = List<SequencerEvents>()
 	public readonly width: number = GridSequencerState.defaultWidth
 	public readonly height: number = GridSequencerState.defaultHeight
 	public readonly type = ConnectionNodeType.gridSequencer
 
-	constructor(name: string, notesToShow: number, events?: ISequencerEvent[]) {
+	constructor(name: string, notesToShow: number, events?: SequencerEvents) {
 		this.name = name
 		this.color = colorFunc(hashbow(this.id)).desaturate(0.2).hsl().string()
 		this.events = events || createSequencerEvents(8)
@@ -156,7 +144,7 @@ export class GridSequencerState implements IGridSequencerState {
 
 		this.width =
 			controlsWidth +
-			(GridSequencerState.noteWidth * this.events.length) +
+			(GridSequencerState.noteWidth * this.events.count()) +
 			GridSequencerState.scrollBarWidth
 	}
 
@@ -172,14 +160,14 @@ export class GridSequencerState implements IGridSequencerState {
 	}
 }
 
-export function findLowestAndHighestNotes(events: ISequencerEvent[]) {
+export function findLowestAndHighestNotes(events: SequencerEvents) {
 	return {
 		lowestNote: findLowestNote(events),
 		highestNote: findHighestNote(events),
 	}
 }
 
-export function findLowestNote(events: ISequencerEvent[]): number {
+export function findLowestNote(events: SequencerEvents): number {
 	let lowest = Number.MAX_VALUE
 
 	events.forEach(event => {
@@ -197,7 +185,7 @@ export function findLowestNote(events: ISequencerEvent[]): number {
 	return lowest
 }
 
-export function findHighestNote(events: ISequencerEvent[]): number {
+export function findHighestNote(events: SequencerEvents): number {
 	let highest = Number.MIN_VALUE
 
 	events.forEach(event => {
@@ -241,7 +229,7 @@ const gridSequencerReducer: Reducer<IGridSequencerState, AnyAction> =
 							if (action.enabled) {
 								return {
 									...event,
-									notes: addIfNew(event.notes, action.note),
+									notes: event.notes.add(action.note),
 								}
 							} else {
 								return {
@@ -253,13 +241,13 @@ const gridSequencerReducer: Reducer<IGridSequencerState, AnyAction> =
 							return event
 						}
 					}),
-					previousEvents: [gridSequencer.events, ...gridSequencer.previousEvents],
+					previousEvents: gridSequencer.previousEvents.unshift(gridSequencer.events),
 				}
 			case SET_GRID_SEQUENCER_FIELD:
 				if (action.fieldName === 'index') {
 					return {
 						...gridSequencer,
-						[action.fieldName]: action.data % gridSequencer.events.length,
+						[action.fieldName]: action.data % gridSequencer.events.count(),
 					}
 				} else {
 					return {
@@ -268,14 +256,14 @@ const gridSequencerReducer: Reducer<IGridSequencerState, AnyAction> =
 					}
 				}
 			case UNDO_SEQUENCER: {
-				if (gridSequencer.previousEvents.length === 0) return gridSequencer
+				if (gridSequencer.previousEvents.count() === 0) return gridSequencer
 
 				const prv = Stack(gridSequencer.previousEvents)
 
 				return {
 					...gridSequencer,
 					events: prv.first(),
-					previousEvents: prv.shift().toJS(),
+					previousEvents: prv.shift().toList(),
 				}
 			}
 			case CLEAR_SEQUENCER: {
@@ -283,8 +271,8 @@ const gridSequencerReducer: Reducer<IGridSequencerState, AnyAction> =
 
 				return {
 					...gridSequencer,
-					events: createSequencerEvents(gridSequencer.events.length),
-					previousEvents: [gridSequencer.events, ...gridSequencer.previousEvents],
+					events: createSequencerEvents(gridSequencer.events.count()),
+					previousEvents: gridSequencer.previousEvents.unshift(gridSequencer.events),
 				}
 			}
 			case PLAY_ALL: return {...gridSequencer, isPlaying: true}
@@ -296,7 +284,7 @@ const gridSequencerReducer: Reducer<IGridSequencerState, AnyAction> =
 
 export const gridSequencersReducer =
 	makeMultiReducer<IGridSequencerState, IGridSequencersState>(
-		gridSequencerReducer, MultiThingType.gridSequencer,
+		gridSequencerReducer, ConnectionNodeType.gridSequencer,
 		gridSequencerActionTypes, gridSequencerGlobalActionTypes,
 	)
 
@@ -314,7 +302,7 @@ export const selectGridSequencerIsActive = (state: IClientRoomState, id: string)
 	selectGridSequencer(state, id).isPlaying
 
 export const selectGridSequencerIsSending = (state: IClientRoomState, id: string) =>
-	selectGridSequencerActiveNotes(state, id).length > 0
+	selectGridSequencerActiveNotes(state, id).count() > 0
 
 export const selectAllSequencers = createSelector(
 	[selectAllGridSequencers, selectAllInfiniteSequencers],
@@ -326,22 +314,20 @@ export const selectIsAnythingPlaying = createSelector(
 	allSeqs => Map(allSeqs).some(x => x.isPlaying),
 )
 
-const emptyArray: number[] = []
-
 export const selectGridSequencerActiveNotes = createSelector(
 	[selectGridSequencer, selectGlobalClockState],
 	(gridSequencer, globalClockState) => {
-		if (!gridSequencer) return emptyArray
-		if (!gridSequencer.isPlaying) return emptyArray
+		if (!gridSequencer) return emptyMidiNotes
+		if (!gridSequencer.isPlaying) return emptyMidiNotes
 
 		const globalClockIndex = globalClockState.index
 
 		const index = globalClockIndex
 
-		if (index >= 0 && gridSequencer.events.length > 0) {
-			return gridSequencer.events[index % gridSequencer.events.length].notes
+		if (index >= 0 && gridSequencer.events.count() > 0) {
+			return gridSequencer.events.get(index % gridSequencer.events.count())!.notes
 		} else {
-			return emptyArray
+			return emptyMidiNotes
 		}
 	},
 )

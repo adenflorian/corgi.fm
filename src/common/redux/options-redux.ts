@@ -1,5 +1,4 @@
-import {IClientAppState} from './common-redux-types'
-import {createReducer} from './redux-utils'
+import {createReducer, IClientAppState} from './index'
 
 export enum AppOptions {
 	masterVolume = 'masterVolume',

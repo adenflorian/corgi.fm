@@ -15,12 +15,18 @@ export interface IConnectable {
 	type: ConnectionNodeType
 }
 
+export interface IMultiStateThing extends IConnectable {
+	id: string
+}
+
+export type IMultiStateThingDeserializer = (state: IMultiStateThing) => IMultiStateThing
+
 export enum ConnectionNodeType {
-	keyboard = 'keyboard',
+	virtualKeyboard = 'virtualKeyboard',
 	gridSequencer = 'gridSequencer',
 	infiniteSequencer = 'infiniteSequencer',
-	instrument = 'instrument',
-	sampler = 'sampler',
+	basicInstrument = 'basicInstrument',
+	basicSampler = 'basicSampler',
 	audioOutput = 'audioOutput',
 	masterClock = 'masterClock',
 	dummy = 'dummy',

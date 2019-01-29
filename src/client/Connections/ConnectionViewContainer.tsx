@@ -1,12 +1,12 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {Point} from '../../common/common-types'
-import {IClientAppState} from '../../common/redux/common-redux-types'
+import {IClientAppState} from '../../common/redux'
 import {
 	GhostConnectorRecord, selectAllConnections,
 	selectConnection, selectConnectionSourceColor,
 	selectConnectionSourceIsActive, selectConnectionSourceIsSending,
-} from '../../common/redux/connections-redux'
+} from '../../common/redux'
 import {getMainBoardsRectX, getMainBoardsRectY} from '../utils'
 import {ConnectedConnectionView} from './ConnectionView'
 

@@ -1,12 +1,9 @@
+import {List} from 'immutable'
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
-import {IClientAppState} from '../../common/redux/common-redux-types'
-import {selectGlobalClockState} from '../../common/redux/global-clock-redux'
-import {
-	GridSequencerFields, selectAllGridSequencers, selectGridSequencer, setGridSequencerField, setGridSequencerNote,
-} from '../../common/redux/grid-sequencers-redux'
-import {ISequencerEvent} from '../../common/redux/sequencer-redux'
+import {IMidiNotes} from '../../common/MidiNote'
+import {GridSequencerFields, IClientAppState, selectGlobalClockState, selectGridSequencer, SequencerEvents, setGridSequencerField, setGridSequencerNote} from '../../common/redux'
 import {MAX_MIDI_NOTE_NUMBER_127, MIN_MIDI_NOTE_NUMBER_0} from '../../common/server-constants'
 import {getColorStringForMidiNote} from '../../common/shamu-color'
 import {isWhiteKey} from '../Keyboard/Keyboard'
@@ -22,7 +19,7 @@ interface IGridSequencerNotesProps {
 }
 
 interface IGridSequencerNotesReduxProps {
-	events: ISequencerEvent[]
+	events: SequencerEvents
 	activeIndex: number
 	bottomNote: number
 	notesToShow: number
@@ -44,7 +41,7 @@ export const GridSequencerNotes = (props: IGridSequencerNotesAllProps) => {
 
 	const marks = events.reduce((allMarks, event) => {
 		return allMarks.concat(event.notes.map(note => note / 127))
-	}, new Array<number>())
+	}, List<number>())
 
 	return (
 		<div className="events">
@@ -74,7 +71,7 @@ export const GridSequencerNotes = (props: IGridSequencerNotesAllProps) => {
 }
 
 interface IEventProps {
-	notes: number[]
+	notes: IMidiNotes
 	eventIndex: number
 	notesToShow: number
 	bottomNote: number
@@ -98,7 +95,7 @@ class Event extends React.PureComponent<IEventProps> {
 		</div>
 	}
 
-	private _renderNote = (_: any, i: number) => {
+	private readonly _renderNote = (_: any, i: number) => {
 		const note = i + this.props.bottomNote
 		const isEnabled = this.props.notes.includes(note)
 		return <Note
@@ -138,13 +135,13 @@ class Note extends React.PureComponent<INoteProps> {
 		/>
 	}
 
-	private _onClick: MouseEventHandler =
+	private readonly _onClick: MouseEventHandler =
 		e => this.props.onClick(this.props.eventIndex, this.props.isEnabled, this.props.note, e)
 
-	private _onMouseEnter: MouseEventHandler =
+	private readonly _onMouseEnter: MouseEventHandler =
 		e => this.props.onMouseEnter(this.props.eventIndex, this.props.isEnabled, this.props.note, e)
 
-	private _onMouseDown: MouseEventHandler =
+	private readonly _onMouseDown: MouseEventHandler =
 		e => this.props.onMouseDown(this.props.eventIndex, this.props.isEnabled, this.props.note, e)
 }
 
@@ -154,7 +151,7 @@ const mapStateToProps = (state: IClientAppState, props: IGridSequencerNotesProps
 	return {
 		events: gridSequencerState.events,
 		activeIndex: gridSequencerState.isPlaying
-			? selectGlobalClockState(state.room).index % gridSequencerState.events.length
+			? selectGlobalClockState(state.room).index % gridSequencerState.events.count()
 			: -1,
 		bottomNote: gridSequencerState.scrollY,
 		notesToShow: gridSequencerState.notesToShow,

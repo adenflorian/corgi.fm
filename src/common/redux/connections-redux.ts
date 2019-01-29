@@ -1,15 +1,13 @@
-import {List, Map, Record} from 'immutable'
+import {List, Map, Record, Set} from 'immutable'
 import {combineReducers, Reducer} from 'redux'
 import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
 import * as uuid from 'uuid'
 import {ConnectionNodeType} from '../common-types'
 import {logger} from '../logger'
+import {emptyMidiNotes, IMidiNotes} from '../MidiNote'
 import {mixColors} from '../shamu-color'
-import {IClientRoomState} from './common-redux-types'
-import {getConnectionNodeInfo} from './node-types'
-import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
-import {IVirtualKeyboardState, selectVirtualKeyboardById} from './virtual-keyboard-redux'
+import {BROADCASTER_ACTION, getConnectionNodeInfo, IClientRoomState, IVirtualKeyboardState, selectVirtualKeyboardById, SERVER_ACTION} from './index'
 
 export const ADD_CONNECTION = 'ADD_CONNECTION'
 export const DELETE_CONNECTIONS = 'DELETE_CONNECTIONS'
@@ -190,6 +188,36 @@ const makeConnectionSourceColorSelector = (roomState: IClientRoomState) => (conn
 	)
 }
 
+// TODO Combine notes from multiple sources
+export const selectConnectionSourceNotesByTargetId = (state: IClientRoomState, targetId: string): IMidiNotes =>
+	selectConnectionSourceNotes(state, selectFirstConnectionIdByTargetId(state, targetId))
+
+export const selectConnectionSourceNotes = (state: IClientRoomState, id: string): IMidiNotes => {
+	const connection = selectConnection(state, id)
+
+	if (connection === undefined) {
+		logger.warn(`could not find connection with id: ${id}`)
+		return emptyMidiNotes
+	}
+
+	return getConnectionNodeInfo(connection.sourceType).selectActiveNotes(state, connection.sourceId)
+}
+
+/** For use by a node */
+export const selectConnectionSourceNotesByTargetId2 = (state: IClientRoomState, targetId: string): IMidiNotes => {
+	const connections = selectAllConnections(state).filter(x => x.targetId === targetId)
+
+	if (connections.count() === 0) return makeConnectionSourceNotesSelector(state)(Connection.dummy)
+
+	const notes = connections.map(makeConnectionSourceNotesSelector(state))
+
+	return Set.union(notes.toList())
+}
+
+const makeConnectionSourceNotesSelector = (roomState: IClientRoomState) => (connection: IConnection): IMidiNotes => {
+	return getConnectionNodeInfo(connection.sourceType).selectActiveNotes(roomState, connection.sourceId)
+}
+
 export const selectConnectionSourceIsActive = (roomState: IClientRoomState, id: string): boolean => {
 	const connection = selectConnection(roomState, id)
 
@@ -216,22 +244,6 @@ export const selectConnectionSourceIsSending = (roomState: IClientRoomState, id:
 	} else {
 		return selectConnectionSourceIsSending(roomState, selectFirstConnectionIdByTargetId(roomState, connection.sourceId))
 	}
-}
-
-const emptyArray: number[] = []
-
-export const selectConnectionSourceNotesByTargetId = (state: IClientRoomState, targetId: string): number[] =>
-	selectConnectionSourceNotes(state, selectFirstConnectionIdByTargetId(state, targetId))
-
-export const selectConnectionSourceNotes = (state: IClientRoomState, id: string): number[] => {
-	const connection = selectConnection(state, id)
-
-	if (connection === undefined) {
-		logger.warn(`could not find connection with id: ${id}`)
-		return emptyArray
-	}
-
-	return getConnectionNodeInfo(connection.sourceType).selectActiveNotes(state, connection.sourceId)
 }
 
 export function sortConnection(connA: IConnection, connB: IConnection) {

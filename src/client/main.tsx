@@ -1,7 +1,7 @@
 import 'babel-polyfill'
 import * as React from 'react'
 import * as ReactGA from 'react-ga'
-import {getInitialReduxState} from '../common/redux/initial-client-redux-state'
+import {getInitialReduxState} from '../common/redux'
 import {setupAudioContext} from '../common/setup-audio-context'
 import {SamplesManager} from './BasicSampler/SamplesManager'
 import {BrowserWarning} from './BrowserWarning'

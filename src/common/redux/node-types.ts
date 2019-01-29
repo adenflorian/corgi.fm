@@ -1,21 +1,10 @@
-import {Map, Record} from 'immutable'
-import {ConnectionNodeType, IConnectable} from '../common-types'
-import {IMidiNotes} from '../MidiNote'
+import {Map, Record, Set} from 'immutable'
+import {ConnectionNodeType, IConnectable, IMultiStateThing} from '../common-types'
+import {IMidiNote} from '../MidiNote'
 import {CssColor} from '../shamu-color'
-import {selectBasicInstrument} from './basic-instruments-redux'
-import {selectSampler} from './basic-sampler-redux'
-import {IClientRoomState} from './common-redux-types'
-import {
-	GridSequencerState, selectGridSequencer, selectGridSequencerActiveNotes,
-	selectGridSequencerIsActive, selectGridSequencerIsSending,
-} from './grid-sequencers-redux'
-import {
-	InfiniteSequencerState, selectInfiniteSequencer,
-	selectInfiniteSequencerActiveNotes, selectInfiniteSequencerIsActive, selectInfiniteSequencerIsSending,
-} from './infinite-sequencers-redux'
-import {
-	makeGetKeyboardMidiOutput, selectVirtualKeyboardById, selectVirtualKeyboardIsActive, selectVirtualKeyboardIsSending,
-} from './virtual-keyboard-redux'
+import {GridSequencerState, IClientRoomState, InfiniteSequencerState, makeGetKeyboardMidiOutput, selectBasicInstrument, selectGridSequencer, selectGridSequencerActiveNotes, selectGridSequencerIsActive, selectGridSequencerIsSending, selectInfiniteSequencer, selectInfiniteSequencerActiveNotes, selectInfiniteSequencerIsActive, selectInfiniteSequencerIsSending, selectSampler, selectVirtualKeyboardById, selectVirtualKeyboardIsActive, selectVirtualKeyboardIsSending} from './index'
+import {deserializeSequencerState} from './sequencer-redux'
+import {VirtualKeyboardState} from './virtual-keyboard-redux'
 
 export const MASTER_AUDIO_OUTPUT_TARGET_ID = 'MASTER_AUDIO_OUTPUT_TARGET_ID'
 
@@ -31,17 +20,19 @@ export const NodeInfoRecord = Record({
 	})) as (roomState: IClientRoomState, id: string) => IConnectable,
 	selectIsActive: (() => null) as (roomState: IClientRoomState, id: string) => boolean | null,
 	selectIsSending: (() => null) as (roomState: IClientRoomState, id: string) => boolean | null,
-	selectActiveNotes: (() => []) as (roomState: IClientRoomState, id: string) => IMidiNotes,
+	selectActiveNotes: (_: IClientRoomState, __: string) => Set<IMidiNote>(),
+	stateDeserializer: ((state: IMultiStateThing) => state) as (state: IMultiStateThing) => IMultiStateThing,
 	width: 0,
 	height: 0,
 })
 
 export const NodeInfoMap = Map({
-	[ConnectionNodeType.keyboard]: NodeInfoRecord({
+	[ConnectionNodeType.virtualKeyboard]: NodeInfoRecord({
 		stateSelector: selectVirtualKeyboardById,
 		selectIsActive: selectVirtualKeyboardIsActive,
 		selectIsSending: selectVirtualKeyboardIsSending,
 		selectActiveNotes: makeGetKeyboardMidiOutput(),
+		stateDeserializer: VirtualKeyboardState.fromJS,
 		width: 456,
 		height: 56,
 	}),
@@ -50,6 +41,7 @@ export const NodeInfoMap = Map({
 		selectIsActive: selectGridSequencerIsActive,
 		selectIsSending: selectGridSequencerIsSending,
 		selectActiveNotes: selectGridSequencerActiveNotes,
+		stateDeserializer: deserializeSequencerState,
 		width: GridSequencerState.defaultWidth,
 		height: GridSequencerState.defaultHeight,
 	}),
@@ -58,15 +50,16 @@ export const NodeInfoMap = Map({
 		selectIsActive: selectInfiniteSequencerIsActive,
 		selectIsSending: selectInfiniteSequencerIsSending,
 		selectActiveNotes: selectInfiniteSequencerActiveNotes,
+		stateDeserializer: deserializeSequencerState,
 		width: InfiniteSequencerState.defaultWidth,
 		height: InfiniteSequencerState.defaultHeight,
 	}),
-	[ConnectionNodeType.instrument]: NodeInfoRecord({
+	[ConnectionNodeType.basicInstrument]: NodeInfoRecord({
 		stateSelector: selectBasicInstrument,
 		width: 416,
 		height: 56,
 	}),
-	[ConnectionNodeType.sampler]: NodeInfoRecord({
+	[ConnectionNodeType.basicSampler]: NodeInfoRecord({
 		stateSelector: selectSampler,
 		width: 416,
 		height: 56,

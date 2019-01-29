@@ -1,6 +1,7 @@
-import {IMidiNote} from '../MidiNote'
-import {IMultiStateThing} from './multi-reducer'
-import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
+import {List} from 'immutable'
+import {IMultiStateThing} from '../common-types'
+import {emptyMidiNotes, IMidiNotes, MidiNotes} from '../MidiNote'
+import {BROADCASTER_ACTION, SERVER_ACTION} from './index'
 
 export const CLEAR_SEQUENCER = 'CLEAR_SEQUENCER'
 export type ClearSequencerAction = ReturnType<typeof clearSequencer>
@@ -29,27 +30,46 @@ export const skipNote = () => ({
 })
 
 export const createSequencerEvents = (indexCount: number) => {
-	return new Array(indexCount)
-		.fill({notes: []})
+	return makeSequencerEvents(new Array(indexCount)
+		.fill({notes: emptyMidiNotes}))
 }
 
 export interface ISequencerEvent {
-	notes: IMidiNote[]
+	notes: IMidiNotes
+}
+
+export type SequencerEvents = List<ISequencerEvent>
+
+export const makeSequencerEvents =
+	(x: ISequencerEvent[] | List<ISequencerEvent> = Array<ISequencerEvent>()): SequencerEvents => List<ISequencerEvent>(x)
+
+export function deserializeEvents(events: SequencerEvents): SequencerEvents {
+	return makeSequencerEvents(events.map(x => ({...x, notes: MidiNotes(x.notes)})))
 }
 
 export interface ISequencerState extends IMultiStateThing {
-	events: ISequencerEvent[]
+	events: SequencerEvents
 	index: number
 	isPlaying: boolean
 	id: string
 	color: string
 	name: string
 	isRecording: boolean
-	previousEvents: ISequencerEvent[][]
+	previousEvents: List<SequencerEvents>
 	width: number
 	height: number
 }
 
-export function isEmptyEvents(events: ISequencerEvent[]) {
-	return events.some(x => x.notes.length > 0) === false
+export function isEmptyEvents(events: SequencerEvents) {
+	return events.some(x => x.notes.count() > 0) === false
+}
+
+export function deserializeSequencerState<T extends ISequencerState>(state: IMultiStateThing): IMultiStateThing {
+	const x = state as T
+	const y = {
+		...x,
+		events: deserializeEvents(x.events),
+		previousEvents: List(x.previousEvents.map(deserializeEvents)),
+	} as T
+	return y
 }

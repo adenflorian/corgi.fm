@@ -1,11 +1,7 @@
 import * as React from 'react'
-import {selectConnection} from '../../common/redux/connections-redux'
-import {makeConnectionPositionsSelector} from '../../common/redux/positions-redux'
-import {shamuConnect} from '../../common/redux/redux-utils'
+import {makeConnectionPositionsSelector, selectConnection, shamuConnect} from '../../common/redux'
 import {ConnectedConnectionView} from './ConnectionView'
-import {
-	IConnectionViewContainerAllProps, IConnectionViewContainerProps, mapStateToProps, Positions,
-} from './ConnectionViewContainer'
+import {IConnectionViewContainerAllProps, IConnectionViewContainerProps, mapStateToProps, Positions} from './ConnectionViewContainer'
 
 interface IConnectionViewContainerForSimpleGraphReduxProps {
 	positions: Positions

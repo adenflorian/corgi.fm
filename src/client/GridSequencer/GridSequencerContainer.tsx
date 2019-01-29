@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
-import {IClientAppState} from '../../common/redux/common-redux-types'
-import {selectGridSequencer} from '../../common/redux/grid-sequencers-redux'
+import {IClientAppState} from '../../common/redux'
+import {selectGridSequencer} from '../../common/redux'
 import {GridSequencer} from './GridSequencer'
 import './GridSequencer.less'
 

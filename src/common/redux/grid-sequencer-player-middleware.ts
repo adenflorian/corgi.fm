@@ -1,11 +1,11 @@
 import {saveAs} from 'file-saver'
 import * as MidiWriter from 'midi-writer-js'
 import {Dispatch, Middleware, MiddlewareAPI} from 'redux'
-import {IClientAppState} from './common-redux-types'
+import {IClientAppState} from './index'
 import {
-	EXPORT_SEQUENCER_MIDI, ExportSequencerMidiAction, selectAllGridSequencers, selectAllSequencers,
-} from './grid-sequencers-redux'
-import {isEmptyEvents} from './sequencer-redux'
+	EXPORT_SEQUENCER_MIDI, ExportSequencerMidiAction, selectAllSequencers,
+} from './index'
+import {isEmptyEvents} from './index'
 
 export const createGridSequencerPlayerMiddleware = () => {
 
@@ -30,7 +30,7 @@ function exportSequencerMidi(
 
 	const events = sequencer.events
 
-	if (events.length === 0) return
+	if (events.count() === 0) return
 	if (isEmptyEvents(events)) return
 
 	const midiGridSequencer = new MidiWriter.Track()
@@ -41,12 +41,12 @@ function exportSequencerMidi(
 
 	const eventsToMidi = events.map(event => {
 		const x = new MidiWriter.NoteEvent({
-			pitch: event.notes,
+			pitch: event.notes.toArray(),
 			duration,
 			wait: nextWait,
 		})
 
-		nextWait = event.notes.length === 0 ? duration : '0'
+		nextWait = event.notes.count() === 0 ? duration : '0'
 
 		return x
 	})

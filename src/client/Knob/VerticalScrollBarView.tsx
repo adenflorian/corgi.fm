@@ -1,10 +1,11 @@
+import {List} from 'immutable'
 import * as React from 'react'
 import {CssColor} from '../../common/shamu-color'
 
 interface IVerticalScrollBarViewProps {
 	percentage: number
 	handleMouseDown: (e: React.MouseEvent) => any
-	marks: number[]
+	marks: List<number>
 	sliderGrabberHeightPercentage?: number,
 }
 

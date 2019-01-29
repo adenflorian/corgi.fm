@@ -3,12 +3,12 @@ import {Component} from 'react'
 import React = require('react')
 import {connect} from 'react-redux'
 import {Action, Dispatch} from 'redux'
-import {IClientAppState} from '../../common/redux/common-redux-types'
+import {IClientAppState} from '../../common/redux'
 import {
 	selectConnectionSourceColorByTargetId,
-} from '../../common/redux/connections-redux'
-import {MASTER_AUDIO_OUTPUT_TARGET_ID} from '../../common/redux/node-types'
-import {setOptionMasterVolume} from '../../common/redux/options-redux'
+} from '../../common/redux'
+import {MASTER_AUDIO_OUTPUT_TARGET_ID} from '../../common/redux'
+import {setOptionMasterVolume} from '../../common/redux'
 import {colorFunc} from '../../common/shamu-color'
 import {Knob} from '../Knob/Knob'
 import {Panel} from '../Panel/Panel'

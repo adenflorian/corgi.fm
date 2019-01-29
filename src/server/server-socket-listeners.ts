@@ -4,43 +4,7 @@ import {Server, Socket} from 'socket.io'
 import {actionsBlacklist, maxRoomNameLength} from '../common/common-constants'
 import {ClientId} from '../common/common-types'
 import {logger} from '../common/logger'
-import {
-	deleteBasicInstruments, selectAllBasicInstruments, selectBasicInstrumentsByOwner, updateBasicInstruments,
-} from '../common/redux/basic-instruments-redux'
-import {
-	deleteBasicSamplers, selectAllSamplers, selectSamplersByOwner, updateBasicSamplers,
-} from '../common/redux/basic-sampler-redux'
-import {selectAllMessages, setChat} from '../common/redux/chat-redux'
-import {
-	addClient, clientDisconnected, ClientState, maxUsernameLength,
-	selectAllClients, selectClientBySocketId, setClients,
-} from '../common/redux/clients-redux'
-import {ready} from '../common/redux/common-actions'
-import {IClientRoomState} from '../common/redux/common-redux-types'
-import {IServerState} from '../common/redux/configure-server-store'
-import {
-	connectionsActions, selectAllConnections, selectConnectionsWithSourceOrTargetIds,
-} from '../common/redux/connections-redux'
-import {selectAllGridSequencers, updateGridSequencers} from '../common/redux/grid-sequencers-redux'
-import {selectAllInfiniteSequencers, updateInfiniteSequencers} from '../common/redux/infinite-sequencers-redux'
-import {
-	deletePositions, selectAllPositions, selectPositionsWithIds, updatePositions,
-} from '../common/redux/positions-redux'
-import {BROADCASTER_ACTION} from '../common/redux/redux-utils'
-import {
-	addRoomMember, deleteRoomMember, selectAllRoomMemberIds, selectRoomMemberState, setRoomMembers,
-} from '../common/redux/room-members-redux'
-import {
-	createRoomAction, selectAllRoomStates, selectRoomStateByName,
-} from '../common/redux/room-stores-redux'
-import {
-	CHANGE_ROOM, createRoom, deleteRoom, REQUEST_CREATE_ROOM,
-	selectAllRoomNames, selectRoomExists, setActiveRoom, setRooms,
-} from '../common/redux/rooms-redux'
-import {
-	deleteVirtualKeyboards, selectAllVirtualKeyboards, selectVirtualKeyboardsByOwner, updateVirtualKeyboards,
-} from '../common/redux/virtual-keyboard-redux'
-import {BroadcastAction} from '../common/redux/websocket-client-sender-middleware'
+import {addClient, addRoomMember, BroadcastAction, BROADCASTER_ACTION, CHANGE_ROOM, clientDisconnected, ClientState, connectionsActions, createRoom, createRoomAction, deleteBasicInstruments, deleteBasicSamplers, deletePositions, deleteRoom, deleteRoomMember, deleteVirtualKeyboards, IClientRoomState, IServerState, maxUsernameLength, ready, REQUEST_CREATE_ROOM, selectAllBasicInstruments, selectAllClients, selectAllConnections, selectAllGridSequencers, selectAllInfiniteSequencers, selectAllMessages, selectAllPositions, selectAllRoomMemberIds, selectAllRoomNames, selectAllRoomStates, selectAllSamplers, selectAllVirtualKeyboards, selectBasicInstrumentsByOwner, selectClientBySocketId, selectConnectionsWithSourceOrTargetIds, selectPositionsWithIds, selectRoomExists, selectRoomStateByName, selectSamplersByOwner, selectVirtualKeyboardsByOwner, setActiveRoom, setChat, setClients, setRoomMembers, setRooms, updateBasicInstruments, updateBasicSamplers, updateGridSequencers, updateInfiniteSequencers, updatePositions, updateVirtualKeyboards} from '../common/redux'
 import {WebSocketEvent} from '../common/server-constants'
 import {createServerStuff} from './create-server-stuff'
 

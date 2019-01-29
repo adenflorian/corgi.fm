@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
-import {selectClientPointerInfo} from '../../common/redux/clients-redux'
-import {IClientAppState} from '../../common/redux/common-redux-types'
+import {selectClientPointerInfo} from '../../common/redux'
+import {IClientAppState} from '../../common/redux'
 import {CssColor} from '../../common/shamu-color'
 import {simpleGlobalClientState} from '../SimpleGlobalClientState'
 

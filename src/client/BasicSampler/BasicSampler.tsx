@@ -1,11 +1,11 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
-import {BasicSamplerParam, selectSampler, setBasicSamplerParam} from '../../common/redux/basic-sampler-redux'
-import {IClientAppState} from '../../common/redux/common-redux-types'
+import {BasicSamplerParam, selectSampler, setBasicSamplerParam} from '../../common/redux'
+import {IClientAppState} from '../../common/redux'
 import {
 	selectConnectionSourceColorByTargetId, selectConnectionSourceNotesByTargetId,
-} from '../../common/redux/connections-redux'
+} from '../../common/redux'
 import {Knob} from '../Knob/Knob'
 import {Panel} from '../Panel/Panel'
 import './BasicSampler.less'
@@ -93,7 +93,7 @@ export const ConnectedBasicSampler = connect(
 
 		return {
 			color: selectConnectionSourceColorByTargetId(state.room, id),
-			isPlaying: selectConnectionSourceNotesByTargetId(state.room, id).length > 0,
+			isPlaying: selectConnectionSourceNotesByTargetId(state.room, id).count() > 0,
 			pan: samplerState.pan,
 			lowPassFilterCutoffFrequency: samplerState.lowPassFilterCutoffFrequency,
 			attack: samplerState.attack,

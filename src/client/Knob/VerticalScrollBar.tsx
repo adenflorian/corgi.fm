@@ -1,3 +1,4 @@
+import {List} from 'immutable'
 import * as React from 'react'
 import {SliderController} from './SliderController'
 import {VerticalScrollBarView} from './VerticalScrollBarView'
@@ -9,7 +10,7 @@ interface IVerticalScrollBarProps {
 	value: number
 	curve: number
 	onChangeId?: any
-	marks: number[]
+	marks: List<number>
 	sliderGrabberHeightPercentage?: number,
 }
 

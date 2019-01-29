@@ -1,22 +1,16 @@
-import {AnyAction, Dispatch, Middleware, MiddlewareAPI, Store} from 'redux'
-import {socket} from '../../client/websocket-listeners'
-import {WebSocketEvent} from '../../common/server-constants'
-import {logger} from '../logger'
-import {SET_CLIENT_POINTER} from './clients-redux'
-import {IClientAppState} from './common-redux-types'
-import {BROADCASTER_ACTION, SERVER_ACTION} from './redux-utils'
-import {selectLocalSocketId} from './websocket-redux'
-
-export interface BroadcastAction extends AnyAction {
-	alreadyBroadcasted: boolean
-	[BROADCASTER_ACTION]: any
-}
+import {AnyAction, Dispatch, Middleware} from 'redux'
+import {logger} from '../common/logger'
+import {BroadcastAction} from '../common/redux'
+import {BROADCASTER_ACTION, IClientAppState, selectLocalSocketId, SERVER_ACTION, SET_CLIENT_POINTER} from '../common/redux'
+import {WebSocketEvent} from '../common/server-constants'
+import {socket} from './websocket-listeners'
 
 export const websocketSenderMiddleware: Middleware<{}, IClientAppState, Dispatch> =
 	({getState}) => next => (action: AnyAction | BroadcastAction) => {
 		if (isNetworkAction(action) && !action.alreadyBroadcasted) {
 			return processNetworkAction(action as BroadcastAction, getState, next)
 		} else {
+			// console.log('websocketSenderMiddleware: ', action.type)
 			return next(action)
 		}
 	}

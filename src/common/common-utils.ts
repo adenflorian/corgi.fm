@@ -9,3 +9,11 @@ export function toArray(obj: any) {
 export function getKeyByValue(object: any, value: any) {
 	return Object.keys(object).find(key => object[key] === value)
 }
+
+export function assertArrayHasNoUndefinedElements(array: any[]): void {
+	array.forEach(x => {
+		if (x === undefined) {
+			throw new Error('assertArrayHasNoUndefinedElements failed: ' + JSON.stringify(array))
+		}
+	})
+}

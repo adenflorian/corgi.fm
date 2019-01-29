@@ -1,23 +1,12 @@
+import {List} from 'immutable'
 import * as React from 'react'
-import {
-	IoMdDownload as Download, IoMdGrid as Rows, IoMdPlay as Play,
-	IoMdRecording as Record, IoMdSquare as Stop, IoMdStar as Star,
-	IoMdTrash as Clear, IoMdUndo as Undo,
-} from 'react-icons/io'
+import {IoMdDownload as Download, IoMdGrid as Rows, IoMdPlay as Play, IoMdRecording as Record, IoMdSquare as Stop, IoMdStar as Star, IoMdTrash as Clear, IoMdUndo as Undo} from 'react-icons/io'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
-import {IClientAppState} from '../../common/redux/common-redux-types'
-import {selectGlobalClockState} from '../../common/redux/global-clock-redux'
-import {
-	exportSequencerMidi, findLowestAndHighestNotes,
-} from '../../common/redux/grid-sequencers-redux'
-import {
-	InfiniteSequencerFields, InfiniteSequencerStyle, selectAllInfiniteSequencers, setInfiniteSequencerField,
-} from '../../common/redux/infinite-sequencers-redux'
-import {clearSequencer, ISequencerEvent, undoSequencer} from '../../common/redux/sequencer-redux'
+import {clearSequencer, exportSequencerMidi, findLowestAndHighestNotes, IClientAppState, InfiniteSequencerFields, InfiniteSequencerStyle, selectGlobalClockState, selectInfiniteSequencer, SequencerEvents, setInfiniteSequencerField, undoSequencer} from '../../common/redux'
 import {getColorStringForMidiNote} from '../../common/shamu-color'
 import {isWhiteKey} from '../Keyboard/Keyboard'
-import {getOctaveFromMidiNote, midiNoteToNoteName, removeOctave} from '../music/music-functions'
+import {getOctaveFromMidiNote, midiNoteToNoteName} from '../music/music-functions'
 import {Panel} from '../Panel/Panel'
 import './InfiniteSequencer.less'
 
@@ -28,7 +17,7 @@ interface IInfiniteSequencerProps {
 interface IInfiniteSequencerReduxProps {
 	activeIndex: number
 	color: string
-	events: ISequencerEvent[]
+	events: SequencerEvents
 	isPlaying: boolean
 	isRecording: boolean
 	name: string
@@ -134,10 +123,10 @@ export const InfiniteSequencer: React.FunctionComponent<IInfiniteSequencerAllPro
 					</div>
 				</div>
 				{style === InfiniteSequencerStyle.colorBars &&
-					<div className={`display ${props.events.length > 8 ? 'small' : ''}`}>
+					<div className={`display ${props.events.count() > 8 ? 'small' : ''}`}>
 						<div className="notes">
 							{props.events.map((event, index) => {
-								const note = event.notes[0] || -1
+								const note = event.notes.first(-1)
 
 								return (
 									< div
@@ -150,7 +139,7 @@ export const InfiniteSequencer: React.FunctionComponent<IInfiniteSequencerAllPro
 										{
 											note === -1
 												? undefined
-												: props.events.length <= 8
+												: props.events.count() <= 8
 													? midiNoteToNoteName(note) + getOctaveFromMidiNote(note)
 													: undefined
 										}
@@ -162,9 +151,9 @@ export const InfiniteSequencer: React.FunctionComponent<IInfiniteSequencerAllPro
 					</div>
 				}
 				{style === InfiniteSequencerStyle.colorGrid &&
-					<div className={`display ${props.events.length > 8 ? 'small' : ''}`}>
+					<div className={`display ${props.events.count() > 8 ? 'small' : ''}`}>
 						<div className="notes">
-							{props.events.map(x => x.notes[0]).map((note, index) =>
+							{props.events.map(x => x.notes.first(-1)).map((note, index) =>
 								<div
 									key={index}
 									className={`event ${props.activeIndex === index ? 'active' : ''}`}
@@ -203,12 +192,12 @@ export const InfiniteSequencer: React.FunctionComponent<IInfiniteSequencerAllPro
 
 export const ConnectedInfiniteSequencer = connect(
 	(state: IClientAppState, props: IInfiniteSequencerProps): IInfiniteSequencerReduxProps => {
-		const infiniteSequencerState = selectAllInfiniteSequencers(state.room)[props.id]
+		const infiniteSequencerState = selectInfiniteSequencer(state.room, props.id)
 
 		return {
 			events: infiniteSequencerState.events,
 			activeIndex: infiniteSequencerState.isPlaying
-				? selectGlobalClockState(state.room).index % infiniteSequencerState.events.length
+				? selectGlobalClockState(state.room).index % infiniteSequencerState.events.count()
 				: -1,
 			isPlaying: infiniteSequencerState.isPlaying,
 			isRecording: infiniteSequencerState.isRecording,
