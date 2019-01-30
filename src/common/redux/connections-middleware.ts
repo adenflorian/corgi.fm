@@ -29,6 +29,7 @@ export const connectionsMiddleware: Middleware<{}, IClientAppState> =
 
 				// Find nodes within threshold
 				const newConnectionCandidates = selectAllPositions(stateAfter.room)
+					.map(moveToOutputPosition)
 					.map(getDistanceFromGhostConnector)
 					.filter(withinThreshold)
 
@@ -55,6 +56,14 @@ export const connectionsMiddleware: Middleware<{}, IClientAppState> =
 
 function getDistanceBetweenPoints(a: Point, b: Point): number {
 	return new Victor(a.x, a.y).distance(new Victor(b.x, b.y))
+}
+
+function moveToOutputPosition(position: IPosition): IPosition {
+	return {
+		...position,
+		x: position.x + position.width,
+		y: position.y + (position.height / 2),
+	}
 }
 
 function withinThreshold(distance: IPosition & {distanceFromGhostConnector: number}) {
