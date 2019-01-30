@@ -9,6 +9,7 @@ import {shamuConnect} from '../../common/redux'
 import {
 	saturateColor,
 } from '../../common/shamu-color'
+import {simpleGlobalClientState} from '../SimpleGlobalClientState'
 import './ConnectionView.less'
 
 export interface IConnectionViewProps {
@@ -211,7 +212,9 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps & {
 							</g>
 						</svg>
 					}
+					{/* // @ts-ignore: https://github.com/mzabriskie/react-draggable/issues/381 */}
 					<Draggable
+						scale={simpleGlobalClientState.zoom}
 						onStart={this._handleStartDrag}
 						onStop={this._handleStopDrag}
 						onDrag={this._handleDrag}
