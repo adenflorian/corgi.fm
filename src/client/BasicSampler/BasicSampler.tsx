@@ -83,7 +83,7 @@ export class BasicSampler extends React.PureComponent<IBasicSamplerAllProps> {
 		)
 	}
 
-	private readonly _dispatchChangeInstrumentParam = (value: any, paramType: BasicSamplerParam) =>
+	private readonly _dispatchChangeInstrumentParam = (paramType: BasicSamplerParam, value: any) =>
 		this.props.dispatch(setBasicSamplerParam(this.props.id, paramType, value))
 }
 

@@ -58,6 +58,7 @@ export interface ISequencerState extends IMultiStateThing {
 	previousEvents: List<SequencerEvents>
 	width: number
 	height: number
+	rate: number
 }
 
 export function isEmptyEvents(events: SequencerEvents) {

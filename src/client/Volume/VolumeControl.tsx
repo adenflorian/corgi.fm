@@ -21,7 +21,7 @@ interface IVolumeControlReduxProps {
 }
 
 interface IVolumeControlDispatchProps {
-	changeMasterVolume: (number: number) => Action
+	changeMasterVolume: (_: any, number: number) => Action
 }
 
 type IVolumeControlAllProps = IVolumeControlReduxProps & IVolumeControlDispatchProps
@@ -61,6 +61,6 @@ export const ConnectedVolumeControl = connect(
 		}
 	},
 	(dispatch: Dispatch): IVolumeControlDispatchProps => ({
-		changeMasterVolume: volume => dispatch(setOptionMasterVolume(volume)),
+		changeMasterVolume: (_, volume) => dispatch(setOptionMasterVolume(volume)),
 	}),
 )(VolumeControl)

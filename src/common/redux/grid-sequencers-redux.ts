@@ -112,6 +112,7 @@ export class GridSequencerState implements IGridSequencerState {
 		width: GridSequencerState.defaultWidth,
 		height: GridSequencerState.defaultHeight,
 		type: ConnectionNodeType.gridSequencer,
+		rate: 1,
 	}
 
 	public readonly id: string = uuid.v4()
@@ -127,6 +128,7 @@ export class GridSequencerState implements IGridSequencerState {
 	public readonly width: number = GridSequencerState.defaultWidth
 	public readonly height: number = GridSequencerState.defaultHeight
 	public readonly type = ConnectionNodeType.gridSequencer
+	public readonly rate = 1
 
 	constructor(name: string, notesToShow: number, events?: SequencerEvents) {
 		this.name = name

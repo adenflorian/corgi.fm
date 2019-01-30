@@ -50,16 +50,17 @@ export const setInfiniteSequencerField =
 		id,
 		fieldName,
 		data,
-		...foo(fieldName),
+		...getNetworkFlags(fieldName),
 	})
 
-function foo(fieldName: InfiniteSequencerFields) {
+function getNetworkFlags(fieldName: InfiniteSequencerFields) {
 	if ([
 		InfiniteSequencerFields.isPlaying,
 		InfiniteSequencerFields.bottomNote,
 		InfiniteSequencerFields.isRecording,
 		InfiniteSequencerFields.style,
 		InfiniteSequencerFields.showRows,
+		InfiniteSequencerFields.rate,
 	].includes(fieldName)) {
 		return {SERVER_ACTION, BROADCASTER_ACTION}
 	} else {
@@ -74,6 +75,7 @@ export enum InfiniteSequencerFields {
 	isRecording = 'isRecording',
 	style = 'style',
 	showRows = 'showRows',
+	rate = 'rate',
 }
 
 export interface IInfiniteSequencersState extends IMultiState {
@@ -107,6 +109,7 @@ export class InfiniteSequencerState implements ISequencerState, IConnectable {
 		showRows: false,
 		width: InfiniteSequencerState.defaultWidth,
 		height: InfiniteSequencerState.defaultHeight,
+		rate: 1,
 	}
 
 	public readonly id: string = uuid.v4()
@@ -122,6 +125,7 @@ export class InfiniteSequencerState implements ISequencerState, IConnectable {
 	public readonly width: number = InfiniteSequencerState.defaultWidth
 	public readonly height: number = InfiniteSequencerState.defaultHeight
 	public readonly type = ConnectionNodeType.infiniteSequencer
+	public readonly rate = 1
 
 	constructor(name: string, style: InfiniteSequencerStyle, events = makeSequencerEvents()) {
 		this.name = name
@@ -271,7 +275,7 @@ export const selectInfiniteSequencerActiveNotes = createSelector(
 		const index = globalClockIndex
 
 		if (index >= 0 && infiniteSequencer.events.count() > 0) {
-			return infiniteSequencer.events.get(index % infiniteSequencer.events.count())!.notes
+			return infiniteSequencer.events.get((index / Math.round(infiniteSequencer.rate)) % infiniteSequencer.events.count())!.notes
 		} else {
 			return emptyNotes
 		}

@@ -1,4 +1,3 @@
-import {List} from 'immutable'
 import * as React from 'react'
 import {IoMdDownload as Download, IoMdGrid as Rows, IoMdPlay as Play, IoMdRecording as Record, IoMdSquare as Stop, IoMdStar as Star, IoMdTrash as Clear, IoMdUndo as Undo} from 'react-icons/io'
 import {connect} from 'react-redux'
@@ -6,6 +5,7 @@ import {Dispatch} from 'redux'
 import {clearSequencer, exportSequencerMidi, findLowestAndHighestNotes, IClientAppState, InfiniteSequencerFields, InfiniteSequencerStyle, selectGlobalClockState, selectInfiniteSequencer, SequencerEvents, setInfiniteSequencerField, undoSequencer} from '../../common/redux'
 import {getColorStringForMidiNote} from '../../common/shamu-color'
 import {isWhiteKey} from '../Keyboard/Keyboard'
+import {Knob} from '../Knob/Knob'
 import {getOctaveFromMidiNote, midiNoteToNoteName} from '../music/music-functions'
 import {Panel} from '../Panel/Panel'
 import './InfiniteSequencer.less'
@@ -21,6 +21,7 @@ interface IInfiniteSequencerReduxProps {
 	isPlaying: boolean
 	isRecording: boolean
 	name: string
+	rate: number
 	showRows: boolean
 	style: InfiniteSequencerStyle
 }
@@ -29,7 +30,7 @@ type IInfiniteSequencerAllProps =
 	IInfiniteSequencerProps & IInfiniteSequencerReduxProps & {dispatch: Dispatch}
 
 export const InfiniteSequencer: React.FunctionComponent<IInfiniteSequencerAllProps> = props => {
-	const {color, isPlaying, id, isRecording, style, events, name} = props
+	const {color, isPlaying, id, isRecording, style, events, name, rate, dispatch} = props
 
 	const {lowestNote, highestNote} = findLowestAndHighestNotes(events)
 	const numberOfPossibleNotes = highestNote - lowestNote + 1
@@ -39,6 +40,9 @@ export const InfiniteSequencer: React.FunctionComponent<IInfiniteSequencerAllPro
 	for (let i = highestNote; i >= lowestNote; i--) {
 		rows.push(i)
 	}
+
+	const dispatchInfiniteSeqParam = (paramType: InfiniteSequencerFields, value: any) =>
+		dispatch(setInfiniteSequencerField(id, paramType, value))
 
 	return (
 		<div
@@ -57,70 +61,71 @@ export const InfiniteSequencer: React.FunctionComponent<IInfiniteSequencerAllPro
 				<div className="controls">
 					<div
 						className="play"
-						onClick={() => props.dispatch(
-							setInfiniteSequencerField(id, InfiniteSequencerFields.isPlaying, true))}
+						onClick={() => dispatchInfiniteSeqParam(InfiniteSequencerFields.isPlaying, true)}
 					>
 						<Play />
 					</div>
 					<div
 						className="stop"
-						onClick={() => props.dispatch(
-							setInfiniteSequencerField(id, InfiniteSequencerFields.isPlaying, false))}
+						onClick={() => dispatchInfiniteSeqParam(InfiniteSequencerFields.isPlaying, false)}
 					>
 						<Stop />
 					</div>
 					<div
 						className="record"
-						onClick={() => props.dispatch(
-							setInfiniteSequencerField(id, InfiniteSequencerFields.isRecording, !isRecording))}
+						onClick={() => dispatchInfiniteSeqParam(InfiniteSequencerFields.isRecording, !isRecording)}
 					>
 						<Record />
 					</div>
 					<div
 						className="export"
-						onClick={() => props.dispatch(
+						onClick={() => dispatch(
 							exportSequencerMidi(id))}
 					>
 						<Download />
 					</div>
 					<div
 						className="erase"
-						onClick={() => props.dispatch(clearSequencer(props.id))}
+						onClick={() => dispatch(clearSequencer(props.id))}
 					>
 						<Clear />
 					</div>
 					<div
 						className="undo"
-						onClick={() => props.dispatch(undoSequencer(props.id))}
+						onClick={() => dispatch(undoSequencer(props.id))}
 					>
 						<Undo />
 					</div>
+
 					<div
 						className="style"
-						onClick={() => props.dispatch(
-							setInfiniteSequencerField(
-								id,
-								InfiniteSequencerFields.style,
-								props.style === InfiniteSequencerStyle.colorBars
-									? InfiniteSequencerStyle.colorGrid
-									: InfiniteSequencerStyle.colorBars,
-							),
+						onClick={() => dispatchInfiniteSeqParam(
+							InfiniteSequencerFields.style,
+							props.style === InfiniteSequencerStyle.colorBars
+								? InfiniteSequencerStyle.colorGrid
+								: InfiniteSequencerStyle.colorBars,
 						)}
 					>
 						<Star />
 					</div>
 					<div
 						className={`showRows ${props.style === InfiniteSequencerStyle.colorGrid ? '' : 'disabled'}`}
-						onClick={() => props.style === InfiniteSequencerStyle.colorGrid && props.dispatch(
-							setInfiniteSequencerField(
-								id,
-								InfiniteSequencerFields.showRows,
-								!props.showRows,
-							),
+						onClick={() => props.style === InfiniteSequencerStyle.colorGrid && dispatchInfiniteSeqParam(
+							InfiniteSequencerFields.showRows,
+							!props.showRows,
 						)}
 					>
 						<Rows />
 					</div>
+
+					<Knob
+						min={1}
+						max={8}
+						value={rate}
+						onChange={dispatchInfiniteSeqParam}
+						label="rate"
+						onChangeId={InfiniteSequencerFields.rate}
+					/>
 				</div>
 				{style === InfiniteSequencerStyle.colorBars &&
 					<div className={`display ${props.events.count() > 8 ? 'small' : ''}`}>
@@ -197,12 +202,13 @@ export const ConnectedInfiniteSequencer = connect(
 		return {
 			events: infiniteSequencerState.events,
 			activeIndex: infiniteSequencerState.isPlaying
-				? selectGlobalClockState(state.room).index % infiniteSequencerState.events.count()
+				? (selectGlobalClockState(state.room).index / Math.round(infiniteSequencerState.rate)) % infiniteSequencerState.events.count()
 				: -1,
 			isPlaying: infiniteSequencerState.isPlaying,
 			isRecording: infiniteSequencerState.isRecording,
 			color: infiniteSequencerState.color,
 			name: infiniteSequencerState.name,
+			rate: infiniteSequencerState.rate,
 			showRows: infiniteSequencerState.showRows,
 			style: infiniteSequencerState.style,
 		}

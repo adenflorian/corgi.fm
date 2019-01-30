@@ -102,7 +102,7 @@ export class BasicInstrumentView
 		this.props.dispatch(setBasicInstrumentOscillatorType(this.props.id, type))
 	}
 
-	private readonly _dispatchChangeInstrumentParam = (value: any, paramType: BasicInstrumentParam) => {
+	private readonly _dispatchChangeInstrumentParam = (paramType: BasicInstrumentParam, value: any) => {
 		this.props.dispatch(
 			setBasicInstrumentParam(this.props.id, paramType, value),
 		)

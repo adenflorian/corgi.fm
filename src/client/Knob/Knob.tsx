@@ -9,7 +9,7 @@ interface IKnobProps {
 	markColor: string
 	max: number
 	min: number
-	onChange: (newValue: number, onChangeId: any) => any
+	onChange: (onChangeId: any, newValue: number) => any
 	onChangeId?: any
 	readOnly: boolean
 	value: number
@@ -49,6 +49,6 @@ export class Knob extends React.PureComponent<IKnobProps> {
 	}
 
 	private readonly _handleOnChange = (newValue: number) => {
-		this.props.onChange(newValue, this.props.onChangeId)
+		this.props.onChange(this.props.onChangeId, newValue)
 	}
 }
