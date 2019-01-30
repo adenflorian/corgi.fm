@@ -29,6 +29,7 @@
     "setup-prod-server": "bash scripts/setup-prod-server.sh"
   },
   "dependencies": {
+    "@types/victor": "^1.1.0",
     "adsr": "^1.0.1",
     "animal-id": "^0.0.1",
     "autoprefixer": "^9.4.2",
@@ -61,7 +62,8 @@
     "socket.io": "^2.1.1",
     "soundbank-reverb": "^1.1.2",
     "typesafe-actions": "^3.0.0",
-    "uuid": "^3.3.2"
+    "uuid": "^3.3.2",
+    "victor": "^1.1.0"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",

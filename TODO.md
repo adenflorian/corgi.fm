@@ -134,12 +134,16 @@ possible starting points:
 
 # Sequencers
 - [ ] limit undo history
+- [ ] redo button
+- [ ] click and drag midi to ableton from shamu
+- [ ] click and drag midi from ableton to shamu
+- [ ] click and drag midi files from computer to shamu
 
 ## GridSequencer
 - [ ] make size adjustable
+	- use react-draggable
 	- drop down with size options?
 - [√] global play button
-- [ ] click and drag midi to ableton from shamu
 - [ ] input notes from keyboard
 - [ ] allow using scroll wheel
 
@@ -151,6 +155,7 @@ possible starting points:
 - [ ] click and drag notes left and right to change order, up and down to change note
 - [√] find better way to clear notes
 - [ ] fix recording and playing at same time
+	- what is this problem?
 - [√] undo button
 - [√] record button should be red when recording
 

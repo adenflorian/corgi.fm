@@ -8,6 +8,8 @@ export * from './sequencer-redux'
 export * from './global-clock-redux'
 export * from './websocket-redux'
 export * from './virtual-keyboard-redux'
+export * from './connections-redux'
+export * from './connections-middleware'
 
 export * from './common-actions'
 
@@ -17,7 +19,6 @@ export * from './basic-sampler-redux'
 export * from './chat-redux'
 export * from './clients-redux'
 export * from './configure-server-store'
-export * from './connections-redux'
 export * from './grid-sequencer-player-middleware'
 
 export * from './infinite-sequencers-redux'

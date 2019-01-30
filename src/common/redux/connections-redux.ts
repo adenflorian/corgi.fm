@@ -3,9 +3,8 @@ import {combineReducers, Reducer} from 'redux'
 import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
 import * as uuid from 'uuid'
-import {ConnectionNodeType} from '../common-types'
-import {logger} from '../logger'
-import {emptyMidiNotes, IMidiNotes} from '../MidiNote'
+import {ConnectionNodeType, Point} from '../common-types'
+import {IMidiNotes} from '../MidiNote'
 import {mixColors} from '../shamu-color'
 import {BROADCASTER_ACTION, getConnectionNodeInfo, IClientRoomState, IVirtualKeyboardState, selectVirtualKeyboardById, SERVER_ACTION} from './index'
 
@@ -13,7 +12,10 @@ export const ADD_CONNECTION = 'ADD_CONNECTION'
 export const DELETE_CONNECTIONS = 'DELETE_CONNECTIONS'
 export const DELETE_ALL_CONNECTIONS = 'DELETE_ALL_CONNECTIONS'
 export const UPDATE_CONNECTIONS = 'UPDATE_CONNECTIONS'
+export const UPDATE_CONNECTION = 'UPDATE_CONNECTION'
 export const UPDATE_GHOST_CONNECTOR = 'UPDATE_GHOST_CONNECTOR'
+export const MOVE_GHOST_CONNECTOR = 'MOVE_GHOST_CONNECTOR'
+export const STOP_DRAGGING_GHOST_CONNECTOR = 'STOP_DRAGGING_GHOST_CONNECTOR'
 
 export const connectionsActions = Object.freeze({
 	add: (connection: IConnection) => ({
@@ -36,10 +38,32 @@ export const connectionsActions = Object.freeze({
 		connections,
 		BROADCASTER_ACTION,
 	}),
+	update: (id: string, connection: Partial<IConnection>) => ({
+		type: UPDATE_CONNECTION as typeof UPDATE_CONNECTION,
+		id,
+		connection,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	}),
 	updateGhostConnector: (id: string, connector: Partial<GhostConnectorRecord>) => ({
 		type: UPDATE_GHOST_CONNECTOR as typeof UPDATE_GHOST_CONNECTOR,
 		id,
 		connector,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	}),
+	moveGhostConnector: (id: string, x: number, y: number) => ({
+		type: MOVE_GHOST_CONNECTOR as typeof MOVE_GHOST_CONNECTOR,
+		id,
+		x,
+		y,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	}),
+	stopDraggingGhostConnector: (id: string, connectorPosition: Pick<GhostConnectorRecord, 'x' | 'y'>) => ({
+		type: STOP_DRAGGING_GHOST_CONNECTOR as typeof STOP_DRAGGING_GHOST_CONNECTOR,
+		id,
+		connector: {...connectorPosition, status: GhostConnectorStatus.hidden} as GhostConnectorRecord,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	}),
@@ -108,9 +132,18 @@ const connectionsSpecificReducer: Reducer<IConnections, IConnectionAction> =
 			case DELETE_CONNECTIONS: return connections.deleteAll(action.connectionIds)
 			case DELETE_ALL_CONNECTIONS: return connections.clear()
 			case UPDATE_CONNECTIONS: return connections.merge(action.connections)
+			case UPDATE_CONNECTION: return connections.update(action.id, x => ({...x, ...action.connection}))
 			case UPDATE_GHOST_CONNECTOR: return connections.update(action.id,
 				x => ({...x, ghostConnector: {...x.ghostConnector, ...action.connector}}),
 			)
+			case MOVE_GHOST_CONNECTOR: return connections.update(action.id,
+				x => ({...x, ghostConnector: {...x.ghostConnector, x: action.x, y: action.y}}),
+			)
+			case STOP_DRAGGING_GHOST_CONNECTOR: {
+				return connections.update(action.id,
+					x => ({...x, ghostConnector: {...x.ghostConnector, ...action.connector}}),
+				)
+			}
 			default: return connections
 		}
 	}

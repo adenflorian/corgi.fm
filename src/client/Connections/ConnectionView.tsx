@@ -243,7 +243,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps & {
 								y2={this.props.connectorHeight / 2}
 								// stroke="gray"
 								strokeWidth={connectorStrokeWidth}
-								strokeDasharray={4}
+							// strokeDasharray={4}
 							/>
 						</svg>
 					</Draggable>
@@ -272,11 +272,14 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps & {
 	}
 
 	private readonly _handleDrag: DraggableEventHandler = (_, data) => {
-		this.props.dispatch(
-			connectionsActions.updateGhostConnector(this.props.id, {x: data.x, y: data.y + (this.props.connectorHeight / 2)}))
+		this.props.dispatch(connectionsActions.moveGhostConnector(
+			this.props.id,
+			data.x,
+			data.y + (this.props.connectorHeight / 2),
+		))
 	}
 
-	private readonly _handleStartDrag: DraggableEventHandler = (_, data) => {
+	private readonly _handleStartDrag: DraggableEventHandler = (_, __) => {
 		this.props.dispatch(connectionsActions.updateGhostConnector(this.props.id, {
 			status: GhostConnectorStatus.activeSource,
 			x: this.props.sourceX,
@@ -285,8 +288,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps & {
 	}
 
 	private readonly _handleStopDrag: DraggableEventHandler = (_, __) => {
-		this.props.dispatch(connectionsActions.updateGhostConnector(this.props.id, {
-			status: GhostConnectorStatus.hidden,
+		this.props.dispatch(connectionsActions.stopDraggingGhostConnector(this.props.id, {
 			x: this.props.sourceX,
 			y: this.props.sourceY,
 		}))
