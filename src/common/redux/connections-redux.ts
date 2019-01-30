@@ -188,24 +188,9 @@ const makeConnectionSourceColorSelector = (roomState: IClientRoomState) => (conn
 	)
 }
 
-// TODO Combine notes from multiple sources
-export const selectConnectionSourceNotesByTargetId = (state: IClientRoomState, targetId: string): IMidiNotes =>
-	selectConnectionSourceNotes(state, selectFirstConnectionIdByTargetId(state, targetId))
-
-export const selectConnectionSourceNotes = (state: IClientRoomState, id: string): IMidiNotes => {
-	const connection = selectConnection(state, id)
-
-	if (connection === undefined) {
-		logger.warn(`could not find connection with id: ${id}`)
-		return emptyMidiNotes
-	}
-
-	return getConnectionNodeInfo(connection.sourceType).selectActiveNotes(state, connection.sourceId)
-}
-
 /** For use by a node */
-export const selectConnectionSourceNotesByTargetId2 = (state: IClientRoomState, targetId: string): IMidiNotes => {
-	const connections = selectAllConnections(state).filter(x => x.targetId === targetId)
+export const selectConnectionSourceNotesByTargetId = (state: IClientRoomState, targetId: string): IMidiNotes => {
+	const connections = selectConnectionsWithTargetIds(state, [targetId])
 
 	if (connections.count() === 0) return makeConnectionSourceNotesSelector(state)(Connection.dummy)
 

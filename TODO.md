@@ -111,12 +111,13 @@
 
 ## Adding/Changing/Removing Connections
 should anything allow multiple incoming connections?
-- yes, although it not might really do anything
+- yes, instruments will union the incoming notes together
+	- for an audio node it would need a mixer node or something
 
 if you click and drag the output side of a connection, it moves it
 if you click and drag from the input side of a connection and starts a new connection
 
-allow multiple inputs and multiple outputs
+- [√] allow multiple inputs and multiple outputs
 
 possible starting points:
 - deleting connections
