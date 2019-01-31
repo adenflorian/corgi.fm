@@ -13,6 +13,11 @@
 		],
 		"experimentalDecorators": true,
 		"jsx": "react",
+		"plugins": [
+			{
+				"name": "typescript-tslint-plugin"
+			}
+		]
 	},
 	"include": [
 		"*",

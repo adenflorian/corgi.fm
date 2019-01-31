@@ -1,10 +1,11 @@
 {
     "defaultSeverity": "error",
     "extends": [
-        "tslint:recommended"
+        "tslint:all"
     ],
     "jsRules": {},
     "rules": {
+        "no-inferred-empty-object-type": true,
         "quotemark": [
             true,
             "single",

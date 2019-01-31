@@ -1,22 +1,25 @@
 {
     "eslint.autoFixOnSave": true,
-    "tslint.autoFixOnSave": [
-        "array-type",
-        "arrow-parens",
-        "indent",
-        "member-ordering",
-        "no-consecutive-blank-lines",
-        "no-var-keyword",
-        "object-literal-key-quotes",
-        "one-variable-per-declaration",
-        "ordered-imports",
-        "prefer-const",
-        "quotemark",
-        "semicolon",
-        "space-before-function-paren",
-        "trailing-comma",
-        "eofline"
-    ],
+    // "tslint.autoFixOnSave": [
+    //     "array-type",
+    //     "arrow-parens",
+    //     "indent",
+    //     "member-ordering",
+    //     "no-consecutive-blank-lines",
+    //     "no-var-keyword",
+    //     "object-literal-key-quotes",
+    //     "one-variable-per-declaration",
+    //     "ordered-imports",
+    //     "prefer-const",
+    //     "quotemark",
+    //     "semicolon",
+    //     "space-before-function-paren",
+    //     "trailing-comma",
+    //     "eofline"
+    // ],
+    "tslint.jsEnable": true,
+    // "tslint.packageManager": "yarn",
+    // "tslint.run": "onType",
     "files.eol": "\n",
     "javascript.preferences.quoteStyle": "single",
     "typescript.preferences.quoteStyle": "single",
@@ -32,9 +35,6 @@
     "editor.codeActionsOnSave": {
         "source.organizeImports": false
     },
-    "tslint.jsEnable": true,
-    "tslint.packageManager": "yarn",
-    "tslint.run": "onType",
     "typescript.tsdk": "node_modules\\typescript\\lib",
     "cSpell.words": [
         "DEVTOOLS",

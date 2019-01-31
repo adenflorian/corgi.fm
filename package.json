@@ -9,7 +9,7 @@
     "watch-server": "ts-node-dev --notify false --inspect --project src/server/tsconfig.json src/server/server.ts",
     "start-prod": "NODE_ENV=production pm2 start server/server.js",
     "start-prod-docker": "NODE_ENV=production pm2-runtime built/server/server.js",
-    "lint": "eslint . && tslint src/client/**/*.ts* --project src/client/tsconfig.json && tslint src/server/**/*.ts* --project src/server/tsconfig.json ",
+    "lint": "eslint . && tslint src/client/**/*.ts* --project src/client/tsconfig.json && tslint src/server/**/*.ts* --project src/server/tsconfig.json && tslint src/common/**/*.ts* --project src/common/tsconfig.json ",
     "test": "yarn test-client && yarn test-server && yarn test-common",
     "test-client": "cross-env TS_NODE_PROJECT=\"src/client/tsconfig.json\" mocha --opts src/client/mocha.opts",
     "test-server": "cross-env TS_NODE_PROJECT=\"src/server/tsconfig.json\" mocha --opts src/server/mocha.opts",
@@ -95,7 +95,8 @@
     "sinon": "^7.2.2",
     "ts-node": "^6.1.0",
     "ts-node-dev": "^1.0.0-pre.26",
-    "tslint": "^5.10.0",
-    "typescript": "^3.2.2"
+    "tslint": "^5.12.1",
+    "typescript": "^3.2.4",
+    "typescript-tslint-plugin": "^0.3.0"
   }
 }

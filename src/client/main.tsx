@@ -1,7 +1,6 @@
 import 'babel-polyfill'
 import * as React from 'react'
 import * as ReactGA from 'react-ga'
-import {getInitialReduxState} from '../common/redux'
 import {setupAudioContext} from '../common/setup-audio-context'
 import {SamplesManager} from './BasicSampler/SamplesManager'
 import {BrowserWarning} from './BrowserWarning'
@@ -50,7 +49,7 @@ async function setupAsync() {
 	const audioContext = new AudioContext()
 	const preFx = audioContext.createGain()
 
-	const store = configureStore(getInitialReduxState())
+	const store = configureStore()
 
 	setupAudioContext(audioContext, preFx, store)
 

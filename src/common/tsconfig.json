@@ -11,6 +11,11 @@
 			"dom",
 			"es7"
 		],
+		"plugins": [
+			{
+				"name": "typescript-tslint-plugin"
+			}
+		]
 	},
 	"include": [
 		"*",
