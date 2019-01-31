@@ -1,10 +1,56 @@
 {
     "defaultSeverity": "error",
     "extends": [
-        "tslint:all"
+        "tslint:recommended"
     ],
     "jsRules": {},
     "rules": {
+        "restrict-plus-operands": false,
+        "strict-boolean-expressions": false,
+        "increment-decrement": false,
+        "no-magic-numbers": false,
+        "typedef": [
+            true,
+            // "call-signature",
+            // "arrow-call-signature",
+            // "parameter",
+            // "arrow-parameter",
+            "property-declaration",
+            // "variable-declaration",
+            "member-variable-declaration",
+            // "object-destructuring",
+            "array-destructuring"
+        ],
+        "no-submodule-imports": [
+            true,
+            "react-icons"
+        ],
+        "completed-docs": false,
+        "no-import-side-effect": [
+            true,
+            {
+                "ignore-module": "(\\.html|\\.css|\\.less)$"
+            }
+        ],
+        "file-name-casing": false,
+        "whitespace": [
+            true,
+            "check-branch",
+            "check-decl",
+            "check-operator",
+            // "check-module",
+            "check-separator",
+            "check-rest-spread",
+            "check-type",
+            "check-typecast",
+            "check-type-operator",
+            "check-preblock"
+            // "check-postbrace"
+        ],
+        "linebreak-style": [
+            true,
+            "LF"
+        ],
         "no-inferred-empty-object-type": true,
         "quotemark": [
             true,
