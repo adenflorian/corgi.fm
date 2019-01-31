@@ -17,7 +17,7 @@ interface IKnobProps {
 }
 
 export class Knob extends React.PureComponent<IKnobProps> {
-	public static defaultProps = {
+	public static defaultProps: Partial<IKnobProps> = {
 		curve: 1,
 		label: '',
 		markColor: 'currentColor',

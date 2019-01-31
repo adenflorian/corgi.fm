@@ -17,19 +17,21 @@
             // "arrow-parameter",
             "property-declaration",
             // "variable-declaration",
-            "member-variable-declaration",
+            // "member-variable-declaration",
             // "object-destructuring",
             "array-destructuring"
         ],
         "no-submodule-imports": [
             true,
-            "react-icons"
+            "react-icons",
+            "rc-slider",
+            "redux-devtools-extension"
         ],
         "completed-docs": false,
         "no-import-side-effect": [
             true,
             {
-                "ignore-module": "(\\.html|\\.css|\\.less)$"
+                "ignore-module": "(\\.html|\\.css|\\.less|babel-polyfill)$"
             }
         ],
         "file-name-casing": false,
@@ -47,10 +49,7 @@
             "check-preblock"
             // "check-postbrace"
         ],
-        "linebreak-style": [
-            true,
-            "LF"
-        ],
+        "linebreak-style": false,
         "no-inferred-empty-object-type": true,
         "quotemark": [
             true,

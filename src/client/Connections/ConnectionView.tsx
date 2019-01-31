@@ -212,7 +212,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps & {
 							</g>
 						</svg>
 					}
-					{/* // @ts-ignore: https://github.com/mzabriskie/react-draggable/issues/381 */}
+					{/* @ts-ignore: https://github.com/mzabriskie/react-draggable/issues/381 */}
 					<Draggable
 						scale={simpleGlobalClientState.zoom}
 						onStart={this._handleStartDrag}
