@@ -47,7 +47,7 @@
     "rc-slider": "^8.6.1",
     "react": "^16.4.0",
     "react-dom": "^16.4.0",
-    "react-draggable": "^3.1.1",
+    "react-draggable": "https://github.com/mzabriskie/react-draggable.git",
     "react-ga": "^2.5.6",
     "react-hot-loader": "^4.3.0",
     "react-icons": "^3.3.0",
