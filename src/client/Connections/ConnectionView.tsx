@@ -19,8 +19,6 @@ export interface IConnectionViewProps {
 	targetX: number
 	targetY: number
 	ghostConnector?: GhostConnectorRecord
-	connectorWidth: number
-	connectorHeight: number
 	saturateSource: boolean
 	saturateTarget: boolean
 	id: string
@@ -42,27 +40,24 @@ class LineState {
 
 const longLineStrokeWidth = 2
 const connectorStrokeWidth = 8
+const connectorWidth = 16
+const connectorHeight = 8
 
 export class ConnectionView extends React.PureComponent<IConnectionViewProps & {dispatch: Dispatch}> {
-	public static defaultProps = {
-		connectorWidth: 16,
-		connectorHeight: 8,
-	}
-
 	public render() {
 		const {color, saturateSource, saturateTarget, id, ghostConnector = defaultGhostConnector} = this.props
 
 		const line = new LineState(
-			this.props.sourceX + this.props.connectorWidth,
+			this.props.sourceX + connectorWidth,
 			this.props.sourceY,
-			this.props.targetX - this.props.connectorWidth,
+			this.props.targetX - connectorWidth,
 			this.props.targetY,
 		)
 
 		const lineGhost = new LineState(
-			ghostConnector.x + this.props.connectorWidth,
+			ghostConnector.x + connectorWidth,
 			ghostConnector.y,
-			this.props.targetX - this.props.connectorWidth,
+			this.props.targetX - connectorWidth,
 			this.props.targetY,
 		)
 
@@ -141,7 +136,6 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps & {
 							d={pathDPart1}
 							stroke="#0000"
 							strokeWidth={24 + 'px'}
-						// strokeLinecap="round"
 						/>
 						<path
 							className="blurLine"
@@ -156,17 +150,17 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps & {
 					className={`colorize connector source ${saturateSource ? 'saturate' : ''}`}
 					xmlns="http://www.w3.org/2000/svg"
 					style={{
-						width: this.props.connectorWidth,
-						height: this.props.connectorHeight,
-						top: this.props.sourceY - (this.props.connectorHeight / 2),
+						width: connectorWidth,
+						height: connectorHeight,
+						top: this.props.sourceY - (connectorHeight / 2),
 						left: this.props.sourceX,
 					}}
 				>
 					<line
 						x1={0}
-						y1={this.props.connectorHeight / 2}
-						x2={this.props.connectorWidth}
-						y2={this.props.connectorHeight / 2}
+						y1={connectorHeight / 2}
+						x2={connectorWidth}
+						y2={connectorHeight / 2}
 						stroke={color}
 						strokeWidth={connectorStrokeWidth}
 					/>
@@ -175,17 +169,17 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps & {
 					className={`colorize connector target ${saturateTarget ? 'saturate' : ''}`}
 					xmlns="http://www.w3.org/2000/svg"
 					style={{
-						width: this.props.connectorWidth,
-						height: this.props.connectorHeight,
-						top: this.props.targetY - (this.props.connectorHeight / 2),
-						left: this.props.targetX - this.props.connectorWidth,
+						width: connectorWidth,
+						height: connectorHeight,
+						top: this.props.targetY - (connectorHeight / 2),
+						left: this.props.targetX - connectorWidth,
 					}}
 				>
 					<line
 						x1={0}
-						y1={this.props.connectorHeight / 2}
-						x2={this.props.connectorWidth}
-						y2={this.props.connectorHeight / 2}
+						y1={connectorHeight / 2}
+						x2={connectorWidth}
+						y2={connectorHeight / 2}
 						stroke={color}
 						strokeWidth={connectorStrokeWidth}
 					/>
@@ -212,90 +206,116 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps & {
 							</g>
 						</svg>
 					}
-					{/* @ts-ignore: https://github.com/mzabriskie/react-draggable/issues/381 */}
-					<Draggable
-						scale={simpleGlobalClientState.zoom}
-						onStart={this._handleStartDrag}
-						onStop={this._handleStopDrag}
-						onDrag={this._handleDrag}
-						position={isGhostSourceActive
-							? {
-								x: ghostConnector.x,
-								y: ghostConnector.y - (this.props.connectorHeight / 2),
-							}
-							: {
-								x: this.props.sourceX,
-								y: this.props.sourceY - (this.props.connectorHeight / 2),
-							}
-						}
-					>
-						<svg
-							className={`colorize connector source`}
-							xmlns="http://www.w3.org/2000/svg"
-							style={{
-								width: this.props.connectorWidth,
-								height: this.props.connectorHeight,
-								// top: this.props.sourceY - (this.props.connectorHeight / 2),
-								// left: this.props.sourceX,
-							}}
-						>
-							<line
-								x1={0}
-								y1={this.props.connectorHeight / 2}
-								x2={this.props.connectorWidth}
-								y2={this.props.connectorHeight / 2}
-								// stroke="gray"
-								strokeWidth={connectorStrokeWidth}
-							// strokeDasharray={4}
-							/>
-						</svg>
-					</Draggable>
-					<svg
-						className={`colorize connector target`}
-						xmlns="http://www.w3.org/2000/svg"
-						style={{
-							width: this.props.connectorWidth,
-							height: this.props.connectorHeight,
-							top: this.props.targetY - (this.props.connectorHeight / 2),
-							left: this.props.targetX - this.props.connectorWidth,
-						}}
-					>
-						<line
-							x1={0}
-							y1={this.props.connectorHeight / 2}
-							x2={this.props.connectorWidth}
-							y2={this.props.connectorHeight / 2}
-							// stroke="gray"
-							strokeWidth={connectorStrokeWidth}
-						/>
-					</svg>
+					<GhostConnector
+						dispatch={this.props.dispatch}
+						isActive={isGhostSourceActive}
+						ghostConnector={ghostConnector}
+						parentX={this.props.sourceX}
+						parentY={this.props.sourceY}
+						connectionId={id}
+						sourceOrTarget={GhostConnectorStatus.activeSource}
+					/>
+					<GhostConnector
+						dispatch={this.props.dispatch}
+						isActive={isGhostTargetActive}
+						ghostConnector={ghostConnector}
+						parentX={this.props.targetX}
+						parentY={this.props.targetY}
+						connectionId={id}
+						sourceOrTarget={GhostConnectorStatus.activeTarget}
+					/>
 				</div>
 			</div>
+		)
+	}
+}
+
+interface IGhostConnectorProps {
+	dispatch: Dispatch
+	isActive: boolean
+	ghostConnector: GhostConnectorRecord
+	parentX: number
+	parentY: number
+	connectionId: string
+	sourceOrTarget: GhostConnectorStatus
+}
+
+class GhostConnector extends React.PureComponent<IGhostConnectorProps> {
+	public render() {
+		const {isActive, ghostConnector, parentX, parentY} = this.props
+
+		return (
+			<Draggable
+				scale={simpleGlobalClientState.zoom}
+				onStart={this._handleStartDrag}
+				onStop={this._handleStopDrag}
+				onDrag={this._handleDrag}
+				position={isActive
+					? {
+						x: ghostConnector.x,
+						y: ghostConnector.y - (connectorHeight / 2),
+					}
+					: {
+						x: parentX,
+						y: parentY - (connectorHeight / 2),
+					}
+				}
+			>
+				<div>
+					<Connector
+						width={connectorWidth}
+						height={connectorHeight}
+					/>
+				</div>
+			</Draggable>
 		)
 	}
 
 	private readonly _handleDrag: DraggableEventHandler = (_, data) => {
 		this.props.dispatch(connectionsActions.moveGhostConnector(
-			this.props.id,
+			this.props.connectionId,
 			data.x,
-			data.y + (this.props.connectorHeight / 2),
+			data.y + (connectorHeight / 2),
 		))
 	}
 
 	private readonly _handleStartDrag: DraggableEventHandler = (_, __) => {
-		this.props.dispatch(connectionsActions.updateGhostConnector(this.props.id, {
-			status: GhostConnectorStatus.activeSource,
-			x: this.props.sourceX,
-			y: this.props.sourceY,
-		}))
+		this.props.dispatch(connectionsActions.updateGhostConnector(
+			this.props.connectionId, {
+				status: this.props.sourceOrTarget,
+				x: this.props.parentX,
+				y: this.props.parentY,
+			}))
 	}
 
 	private readonly _handleStopDrag: DraggableEventHandler = (_, __) => {
-		this.props.dispatch(connectionsActions.stopDraggingGhostConnector(this.props.id, {
-			x: this.props.sourceX,
-			y: this.props.sourceY,
-		}))
+		this.props.dispatch(connectionsActions.stopDraggingGhostConnector(
+			this.props.connectionId, {
+				x: this.props.parentX,
+				y: this.props.parentY,
+			}))
 	}
+}
+
+function Connector({width, height}: {width: number, height: number}) {
+	return (
+		<svg
+			className={`colorize connector target`}
+			xmlns="http://www.w3.org/2000/svg"
+			style={{
+				width,
+				height,
+			}}
+		>
+			<line
+				x1={0}
+				y1={height / 2}
+				x2={width}
+				y2={height / 2}
+				strokeWidth={connectorStrokeWidth}
+			/>
+		</svg>
+	)
 }
 
 export const ConnectedConnectionView = shamuConnect()(ConnectionView)
