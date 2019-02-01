@@ -86,6 +86,7 @@
 - [ ] use gzip on nginx
 	- https://expressjs.com/en/advanced/best-practice-performance.html#use-gzip-compression
 	- http://nginx.org/en/docs/http/ngx_http_gzip_module.html
+- [ ] instead of calling setMidiNotes all the time to trigger notes, use AudioParam automation to queue up note changes in the future based off of what is in a sequencer
 
 # Shared Cursors
 - [ ] make shared cursor not block pointer events

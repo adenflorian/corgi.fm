@@ -49,14 +49,18 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> implement
 	}
 
 	public setPan = (pan: number) => {
-		if (pan !== this._panNode.pan.value) {
-			this._panNode.pan.setValueAtTime(pan, this._audioContext.currentTime)
+		// Rounding to nearest to 32 bit number because AudioParam values are 32 bit floats
+		const newPan = Math.fround(pan)
+		if (newPan !== this._panNode.pan.value) {
+			this._panNode.pan.setValueAtTime(newPan, this._audioContext.currentTime)
 		}
 	}
 
 	public setLowPassFilterCutoffFrequency = (frequency: number) => {
-		if (frequency !== this._lowPassFilter.frequency.value) {
-			this._lowPassFilter.frequency.setValueAtTime(frequency, this._audioContext.currentTime)
+		// Rounding to nearest to 32 bit number because AudioParam values are 32 bit floats
+		const newFreq = Math.fround(frequency)
+		if (newFreq !== this._lowPassFilter.frequency.value) {
+			this._lowPassFilter.frequency.setValueAtTime(newFreq, this._audioContext.currentTime)
 		}
 	}
 
