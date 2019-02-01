@@ -28,7 +28,24 @@ export const connectionsMiddleware: Middleware<{}, IClientAppState> =
 		}
 
 		function handleStopDraggingGhostConnector(connectionId: string) {
+
+			const connection = selectConnection(stateBefore.room, connectionId)
+
+			const ghostConnector = connection.ghostConnector
+
+			const validatePosition = (position: IPosition) => {
+				if (
+					position.id === connection.sourceId ||
+					position.id === connection.targetId
+				) {
+					return false
+				} else {
+					return true
+				}
+			}
+
 			const changeConnectionSource = (position: IPosition) => {
+				if (validatePosition(position) === false) return
 				dispatch(connectionsActions.update(connectionId, {
 					sourceId: position.id,
 					sourceType: position.targetType,
@@ -36,6 +53,7 @@ export const connectionsMiddleware: Middleware<{}, IClientAppState> =
 			}
 
 			const changeConnectionTarget = (position: IPosition) => {
+				if (validatePosition(position) === false) return
 				dispatch(connectionsActions.update(connectionId, {
 					targetId: position.id,
 					targetType: position.targetType,
@@ -49,8 +67,6 @@ export const connectionsMiddleware: Middleware<{}, IClientAppState> =
 					default: throw new Error('Unexpected ghost connector status (changeConnection): ' + ghostConnector.status)
 				}
 			}
-
-			const ghostConnector = selectConnection(stateBefore.room, connectionId).ghostConnector
 
 			const getPositionFunc = () => {
 				switch (ghostConnector.status) {
