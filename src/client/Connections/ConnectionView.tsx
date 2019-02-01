@@ -43,6 +43,8 @@ const connectorStrokeWidth = 8
 const connectorWidth = 16
 const connectorHeight = 8
 
+const line0 = new LineState(0, 0, 0, 0)
+
 export class ConnectionView extends React.PureComponent<IConnectionViewProps & {dispatch: Dispatch}> {
 	public render() {
 		const {color, saturateSource, saturateTarget, id, ghostConnector = defaultGhostConnector} = this.props
@@ -54,12 +56,25 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps & {
 			this.props.targetY,
 		)
 
-		const lineGhost = new LineState(
-			ghostConnector.x + connectorWidth,
-			ghostConnector.y,
-			this.props.targetX - connectorWidth,
-			this.props.targetY,
-		)
+		const getGhostLine = () => {
+			if (ghostConnector.status === GhostConnectorStatus.activeSource) {
+				return new LineState(
+					ghostConnector.x + connectorWidth,
+					ghostConnector.y,
+					this.props.targetX - connectorWidth,
+					this.props.targetY,
+				)
+			} else if (ghostConnector.status === GhostConnectorStatus.activeTarget) {
+				return new LineState(
+					this.props.sourceX + connectorWidth,
+					this.props.sourceY,
+					ghostConnector.x,
+					ghostConnector.y,
+				)
+			} else {
+				return line0
+			}
+		}
 
 		const buffer = 50
 		const joint = 8
@@ -71,11 +86,13 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps & {
 			L ${line.x2} ${line.y2}
 		`
 
+		const ghostLine = getGhostLine()
+
 		const pathDPart1Ghost = `
-			M ${lineGhost.x1} ${lineGhost.y1}
-			L ${lineGhost.x1 + joint} ${lineGhost.y1}
-			L ${lineGhost.x2 - joint} ${lineGhost.y2}
-			L ${lineGhost.x2} ${lineGhost.y2}
+			M ${ghostLine.x1} ${ghostLine.y1}
+			L ${ghostLine.x1 + joint} ${ghostLine.y1}
+			L ${ghostLine.x2 - joint} ${ghostLine.y2}
+			L ${ghostLine.x2} ${ghostLine.y2}
 		`
 
 		// This path is a hack to get the filter to work properly
@@ -85,8 +102,6 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps & {
 
 		const pathDFull = pathDPart1 + ' ' + pathDPart2
 
-		const isGhostSourceActive = ghostConnector.status === GhostConnectorStatus.activeSource
-		const isGhostTargetActive = ghostConnector.status === GhostConnectorStatus.activeTarget
 		const isGhostHidden = ghostConnector.status === GhostConnectorStatus.hidden
 
 		return (
@@ -184,7 +199,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps & {
 						strokeWidth={connectorStrokeWidth}
 					/>
 				</svg>
-				<div className={`ghost ${isGhostHidden ? 'hidden' : 'active'}`}>
+				<div className={`ghost ${ghostConnector.status === GhostConnectorStatus.hidden ? 'hidden' : 'active'}`}>
 					{!isGhostHidden &&
 						<svg
 							className={`colorize longLine`}
@@ -208,7 +223,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps & {
 					}
 					<GhostConnector
 						dispatch={this.props.dispatch}
-						isActive={isGhostSourceActive}
+						isActive={ghostConnector.status === GhostConnectorStatus.activeSource}
 						ghostConnector={ghostConnector}
 						parentX={this.props.sourceX}
 						parentY={this.props.sourceY}
@@ -217,9 +232,9 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps & {
 					/>
 					<GhostConnector
 						dispatch={this.props.dispatch}
-						isActive={isGhostTargetActive}
+						isActive={ghostConnector.status === GhostConnectorStatus.activeTarget}
 						ghostConnector={ghostConnector}
-						parentX={this.props.targetX}
+						parentX={this.props.targetX - connectorWidth}
 						parentY={this.props.targetY}
 						connectionId={id}
 						sourceOrTarget={GhostConnectorStatus.activeTarget}
