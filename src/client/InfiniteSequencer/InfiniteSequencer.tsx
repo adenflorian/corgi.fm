@@ -163,7 +163,7 @@ export const InfiniteSequencer: React.FunctionComponent<IInfiniteSequencerAllPro
 						<div className={`display ${props.events.count() > 8 ? 'small' : ''}`}>
 							<div className="notes">
 								{props.events.map(x => x.notes.first(-1)).map((note, index) =>
-									<ColorGridNote note={note} index={index} />,
+									<ColorGridNote note={note} index={index} key={index} />,
 								)}
 							</div>
 							{props.showRows &&
@@ -192,7 +192,6 @@ export const InfiniteSequencer: React.FunctionComponent<IInfiniteSequencerAllPro
 	function ColorGridNote({note, index}: {note: IMidiNote, index: number}) {
 		return (
 			<div
-				key={index}
 				className={`event ${props.activeIndex === index ? 'active' : ''}`}
 				style={{
 					backgroundColor: note === -1 ? 'none' : getColorStringForMidiNote(note),

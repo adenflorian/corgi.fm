@@ -6,7 +6,8 @@ import {
 } from 'react-redux'
 import {Action} from 'redux'
 import {createSelectorCreator, defaultMemoize} from 'reselect'
-import {IClientAppState} from './index'
+import {assertArrayHasNoUndefinedElements} from '../common-utils'
+import {IClientAppState, MOVE_GHOST_CONNECTOR, REPORT_LEVELS, SET_CLIENT_POINTER, SET_GLOBAL_CLOCK_INDEX, SET_INFO} from './index'
 
 export function makeActionCreator(type: string, ...argNames: any[]) {
 	argNames.forEach(arg => {
@@ -166,3 +167,19 @@ interface ShamuConnect2 {
 }
 
 export const shamuConnect = connect as ShamuConnect2
+
+export const getActionsBlacklist = () => {
+	const x = [
+		SET_CLIENT_POINTER,
+		REPORT_LEVELS,
+		SET_INFO,
+		SET_GLOBAL_CLOCK_INDEX,
+		MOVE_GHOST_CONNECTOR,
+	]
+
+	// If anything is undefined in the blacklist the redux dev tools breaks
+	// TODO Create GitHub issue and do a PR to do this check in the dev tools
+	assertArrayHasNoUndefinedElements(x)
+
+	return x
+}

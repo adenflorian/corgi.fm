@@ -2,18 +2,19 @@
 // Order matters
 // It controls the module load order
 
-export * from './redux-utils'
 export * from './multi-reducer'
 export * from './sequencer-redux'
 export * from './global-clock-redux'
-export * from './websocket-redux'
 export * from './virtual-keyboard-redux'
 export * from './connections-redux'
 export * from './connections-middleware'
+export * from './audio-redux'
+
+export * from './redux-utils'
+export * from './websocket-redux'
 
 export * from './common-actions'
 
-export * from './audio-redux'
 export * from './basic-instruments-redux'
 export * from './basic-sampler-redux'
 export * from './chat-redux'

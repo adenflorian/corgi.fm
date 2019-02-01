@@ -1,10 +1,10 @@
 import * as animal from 'animal-id'
 import {AnyAction, Store} from 'redux'
 import {Server, Socket} from 'socket.io'
-import {actionsBlacklist, maxRoomNameLength} from '../common/common-constants'
+import {maxRoomNameLength} from '../common/common-constants'
 import {ClientId} from '../common/common-types'
 import {logger} from '../common/logger'
-import {addClient, addRoomMember, BroadcastAction, BROADCASTER_ACTION, CHANGE_ROOM, clientDisconnected, ClientState, connectionsActions, createRoom, createRoomAction, deleteBasicInstruments, deleteBasicSamplers, deletePositions, deleteRoom, deleteRoomMember, deleteVirtualKeyboards, IClientRoomState, IServerState, maxUsernameLength, ready, REQUEST_CREATE_ROOM, selectAllBasicInstruments, selectAllClients, selectAllConnections, selectAllGridSequencers, selectAllInfiniteSequencers, selectAllMessages, selectAllPositions, selectAllRoomMemberIds, selectAllRoomNames, selectAllRoomStates, selectAllSamplers, selectAllVirtualKeyboards, selectBasicInstrumentsByOwner, selectClientBySocketId, selectConnectionsWithSourceOrTargetIds, selectPositionsWithIds, selectRoomExists, selectRoomStateByName, selectSamplersByOwner, selectVirtualKeyboardsByOwner, setActiveRoom, setChat, setClients, setRoomMembers, setRooms, updateBasicInstruments, updateBasicSamplers, updateGridSequencers, updateInfiniteSequencers, updatePositions, updateVirtualKeyboards} from '../common/redux'
+import {addClient, addRoomMember, BroadcastAction, BROADCASTER_ACTION, CHANGE_ROOM, clientDisconnected, ClientState, connectionsActions, createRoom, createRoomAction, deleteBasicInstruments, deleteBasicSamplers, deletePositions, deleteRoom, deleteRoomMember, deleteVirtualKeyboards, getActionsBlacklist, IClientRoomState, IServerState, maxUsernameLength, ready, REQUEST_CREATE_ROOM, selectAllBasicInstruments, selectAllClients, selectAllConnections, selectAllGridSequencers, selectAllInfiniteSequencers, selectAllMessages, selectAllPositions, selectAllRoomMemberIds, selectAllRoomNames, selectAllRoomStates, selectAllSamplers, selectAllVirtualKeyboards, selectBasicInstrumentsByOwner, selectClientBySocketId, selectConnectionsWithSourceOrTargetIds, selectPositionsWithIds, selectRoomExists, selectRoomStateByName, selectSamplersByOwner, selectVirtualKeyboardsByOwner, setActiveRoom, setChat, setClients, setRoomMembers, setRooms, updateBasicInstruments, updateBasicSamplers, updateGridSequencers, updateInfiniteSequencers, updatePositions, updateVirtualKeyboards} from '../common/redux'
 import {WebSocketEvent} from '../common/server-constants'
 import {createServerStuff} from './create-server-stuff'
 
@@ -69,7 +69,7 @@ export function setupServerWebSocketListeners(io: Server, serverStore: Store) {
 
 		function registerCallBacks() {
 			socket.on(WebSocketEvent.broadcast, (action: BroadcastAction) => {
-				if (actionsBlacklist.includes(action.type) === false) {
+				if (getActionsBlacklist().includes(action.type) === false) {
 					logger.trace(`${WebSocketEvent.broadcast}: ${socket.id} | `, action)
 				}
 				if (action[BROADCASTER_ACTION]) {
