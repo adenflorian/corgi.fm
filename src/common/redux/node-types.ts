@@ -87,6 +87,14 @@ export const NodeInfoMap = Map({
 	}),
 })
 
+export function isAudioNodeType(type: ConnectionNodeType) {
+	return [
+		ConnectionNodeType.basicInstrument,
+		ConnectionNodeType.basicSampler,
+		ConnectionNodeType.audioOutput,
+	].includes(type)
+}
+
 const dummyNodeInfo = NodeInfoRecord()
 
 export const getConnectionNodeInfo = (type: ConnectionNodeType): IConnectionNodeInfo => {

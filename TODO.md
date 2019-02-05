@@ -87,6 +87,8 @@
 	- https://expressjs.com/en/advanced/best-practice-performance.html#use-gzip-compression
 	- http://nginx.org/en/docs/http/ngx_http_gzip_module.html
 - [ ] instead of calling setMidiNotes all the time to trigger notes, use AudioParam automation to queue up note changes in the future based off of what is in a sequencer
+- [ ] make it obvious that master audio output node is local only
+	- maybe make a local audio slider that's not a part of the graph
 
 # Shared Cursors
 - [ ] make shared cursor not block pointer events
@@ -124,6 +126,39 @@ possible starting points:
 - deleting connections
 - moving output side of connection
 - creating new connections from the output of a node
+
+## Updating web audio graph
+when i break the connection from an instrument to the audio output i want sound to stop
+i want the instrument to disconnect from w/e audio node it is connected to
+
+- [√] give instruments a disconnect and connect function
+
+connections middleware?
+when a connection source or target is changed, or is a new connection or a connection was deleted
+if the source or target of the connection was changed, (or new or deleted conection)
+	then call the necessary functions on the instruments involved to update the web audio graph
+	
+instrument manager?
+
+what are the types of nodes that have an audio graph component?
+- intruments
+- audio output
+- future
+	- effects
+	- audio inputs (microphone, external instruments)
+
+how to tell what to connect to what in the instrument manager?
+
+make Instrument implement the AudioNode interface?
+	pass through stuff to the underlying audio node
+
+make it so intsrument doesnt take a destination at construction
+instead all connections must be done my the instrument manager
+instrument manager already handles all creation and destruction of instruments
+- [√] when an instrument gets created, look to see if it has an outgoing connection
+- [√] see if connection is connected to anything
+- [√] see if connection target is an audio node thing?
+- [√] if it is, use the targets input audio node as the output audio node for the new instrument
 
 # Keyboard
 - [ ] do something to visualize external midi keyboard notes
@@ -216,6 +251,7 @@ possible starting points:
 - [ ] make zoom and pan affect mouse cursors
 - [ ] use position system to render mouse cursors
 	- [ ] use transform translat and will-change
+- [ ] different icon for drag handle so people don't think it's a menu
 
 # Bugs
 - [√] shift click note not showing on other clients

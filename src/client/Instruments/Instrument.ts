@@ -3,7 +3,15 @@ import {IDisposable} from '../../common/common-types'
 import {emptyMidiNotes, IMidiNotes} from '../../common/MidiNote'
 import {Arp} from '../arp'
 
-export interface IInstrument extends IDisposable {
+export interface IAudioNodeWrapper extends IDisposable {
+	getInputAudioNode: () => AudioNode
+	getOutputAudioNode: () => AudioNode
+	connect: (destination: IAudioNodeWrapper, targetId: string) => void
+	disconnectAll: () => void
+	getConnectedTargetId: () => string
+}
+
+export interface IInstrument extends IDisposable, IAudioNodeWrapper {
 	setMidiNotes: (midiNotes: IMidiNotes) => void
 	setPan: (pan: number) => void
 	setLowPassFilterCutoffFrequency: (frequency: number) => void
@@ -12,7 +20,7 @@ export interface IInstrument extends IDisposable {
 	getActivityLevel: () => number
 }
 
-export abstract class Instrument<T extends Voices<V>, V extends Voice> implements IDisposable {
+export abstract class Instrument<T extends Voices<V>, V extends Voice> implements IInstrument {
 	protected readonly _panNode: StereoPannerNode
 	protected readonly _audioContext: AudioContext
 	protected readonly _lowPassFilter: BiquadFilterNode
@@ -21,6 +29,7 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> implement
 	private _previousNotes = emptyMidiNotes
 	private _attackTimeInSeconds: number = 0.01
 	private _releaseTimeInSeconds: number = 3
+	private _connectedTargetId: string = '-1'
 
 	constructor(options: IInstrumentOptions, startingGainValue: number) {
 		this._audioContext = options.audioContext
@@ -47,6 +56,24 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> implement
 			module.hot.dispose(this.dispose)
 		}
 	}
+
+	public readonly connect = (destination: IAudioNodeWrapper, targetId: string) => {
+		this.disconnectAll()
+		this._gain.connect(destination.getInputAudioNode())
+		this._connectedTargetId = targetId
+	}
+
+	public readonly disconnectAll = () => {
+		this._gain.disconnect()
+		this._connectedTargetId = '-1'
+	}
+
+	public readonly getConnectedTargetId = () => this._connectedTargetId
+
+	// TODO Not sure if this will be ok, might need a dummy node?
+	public getInputAudioNode = () => this._gain
+
+	public getOutputAudioNode = () => this._gain
 
 	public setPan = (pan: number) => {
 		// Rounding to nearest to 32 bit number because AudioParam values are 32 bit floats
