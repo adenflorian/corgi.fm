@@ -181,9 +181,9 @@ export const selectConnectionsWithTargetIds = (state: IClientRoomState, targetId
 		.filter(x => targetIds.includes(x.targetId))
 }
 
-export const selectConnectionsWithSourceIds = (state: IClientRoomState, targetIds: string[]) => {
+export const selectConnectionsWithSourceIds = (state: IClientRoomState, sourceIds: string[]) => {
 	return selectAllConnections(state)
-		.filter(x => targetIds.includes(x.targetId))
+		.filter(x => sourceIds.includes(x.sourceId))
 }
 
 export const selectFirstConnectionByTargetId = (state: IClientRoomState, targetId: string) =>
