@@ -35,8 +35,8 @@ const initialState: IRoomMembersState = {
 }
 
 export const roomMembersReducer = createReducer(initialState, {
-	[SET_ROOM_MEMBERS]: (_, {memberIds}: SetRoomMembersAction) => ({
-		...StaticRange,
+	[SET_ROOM_MEMBERS]: (state, {memberIds}: SetRoomMembersAction) => ({
+		...state,
 		ids: List<ClientId>(memberIds),
 	}),
 	[ADD_ROOM_MEMBER]: (state, {memberId}: AddRoomMemberAction) => ({
