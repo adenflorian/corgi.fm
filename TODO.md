@@ -245,7 +245,7 @@ instrument manager already handles all creation and destruction of instruments
 - [√] save name in local storage and us on re-entry
 
 # SimpleGraph
-- [ ] move last touched node to highest z index
+- [√] move last touched node to highest z index
 	- who should keep track of the last touched node?
 	- react draggable?
 	- redux?
@@ -271,7 +271,7 @@ instrument manager already handles all creation and destruction of instruments
 - [ ] add buttons on side of screen for zoom and pan and show keyboard shortcuts when hovering over icon
 - [ ] make zoom and pan affect mouse cursors
 - [ ] use position system to render mouse cursors
-	- [ ] use transform translat and will-change
+	- [ ] use transform translate and will-change
 - [ ] different icon for drag handle so people don't think it's a menu
 
 # Bugs

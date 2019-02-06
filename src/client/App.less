@@ -120,8 +120,15 @@ a {
     }
 }
 
-.highlight, .handle:hover {
+.highlight {
     filter: brightness(2)
+}
+
+.handle {
+    &:hover, &:active {
+        cursor: move;
+        filter: brightness(2)
+    }
 }
 
 .saturate.colorize {
