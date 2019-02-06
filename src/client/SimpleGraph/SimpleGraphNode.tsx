@@ -3,7 +3,7 @@ import Draggable, {DraggableEventHandler} from 'react-draggable'
 import {IoMdMenu} from 'react-icons/io'
 import {Dispatch} from 'redux'
 import {ConnectionNodeType} from '../../common/common-types'
-import {selectPosition, updatePosition} from '../../common/redux'
+import {selectPosition, selectPositionsMeta, updatePosition} from '../../common/redux'
 import {shamuConnect} from '../../common/redux'
 import {CssColor} from '../../common/shamu-color'
 import {ConnectedBasicSampler} from '../BasicSampler/BasicSampler'
@@ -25,6 +25,7 @@ interface ISimpleGraphNodeReduxProps {
 	targetType: ConnectionNodeType
 	width: number
 	height: number
+	zIndex: number
 }
 
 type ISimpleGraphNodeAllProps = ISimpleGraphNodeProps & ISimpleGraphNodeReduxProps & {dispatch: Dispatch}
@@ -33,7 +34,7 @@ const handleClassName = 'handle'
 
 export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProps> {
 	public render() {
-		const {x, y, width, height, positionId, targetType} = this.props
+		const {x, y, width, height, positionId, targetType, zIndex} = this.props
 
 		return (
 			// @ts-ignore: https://github.com/mzabriskie/react-draggable/issues/381
@@ -62,6 +63,7 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 						willChange: 'transform',
 						width,
 						height,
+						zIndex,
 					}}
 				>
 					<Handle />
@@ -129,6 +131,7 @@ export const ConnectedSimpleGraphNode = shamuConnect(
 			targetType: position.targetType,
 			width: position.width,
 			height: position.height,
+			zIndex: selectPositionsMeta(state.room).lastTouchedId === positionId ? 1 : 0,
 		}
 	},
 )(SimpleGraphNode)

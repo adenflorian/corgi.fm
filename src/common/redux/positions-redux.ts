@@ -48,7 +48,10 @@ export const updatePosition = (id: string, position: Partial<IPosition>) => ({
 
 export interface IPositionsState {
 	all: IPositions
+	meta: IPositionsMetaState
 }
+
+export type IPositionsMetaState = ReturnType<typeof makePositionsMetaRecord>
 
 export type IPositions = Map<string, IPosition>
 
@@ -65,7 +68,13 @@ const defaultPosition = {
 	y: Math.random() * 1000 - 500,
 }
 
+const defaultPositionsMeta = Object.freeze({
+	lastTouchedId: '-1',
+})
+
 const makePositionRecord = Record(defaultPosition)
+
+const makePositionsMetaRecord = Record(defaultPositionsMeta)
 
 export const makePosition = (
 	position: Pick<IPosition, 'id' | 'targetType'> & Partial<IPosition>,
@@ -97,8 +106,17 @@ function sortPositions(positions: IPositions) {
 	return positions.sortBy(x => x.id)
 }
 
+const metaReducer: Reducer<IPositionsMetaState, IPositionAction> =
+	(meta = makePositionsMetaRecord(), action) => {
+		switch (action.type) {
+			case UPDATE_POSITION: return meta.set('lastTouchedId', action.id)
+			default: return meta
+		}
+	}
+
 export const positionsReducer: Reducer<IPositionsState, IPositionAction> = combineReducers({
 	all: positionsSpecificReducer,
+	meta: metaReducer,
 })
 
 // Selectors
@@ -173,3 +191,5 @@ export function calculateExtremes(positions: IPositions) {
 		bottomMost,
 	})
 }
+
+export const selectPositionsMeta = (roomState: IClientRoomState) => roomState.positions.meta

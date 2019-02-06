@@ -253,13 +253,16 @@ instrument manager already handles all creation and destruction of instruments
 	- should this be networked?
 		- preferably
 			- that means redux
-	- positions redux
-		- lastTouchedId
+	- [√] positions redux
+		- [√] lastTouchedId
 	- to make sure that the zindex order renders the same on everyones computer,
 		we need to make sure that things are rendered in order
 		sort by id in selector? or in reducer?
 	- maybe use an ordered map?
+		- ordered map won't work, need a sorted map
+			- https://github.com/facebook/immutable-js/issues/88
 	- [√] sort by id in reducer
+	- [√] when a position is updated, mark it as last touched
 - [√] support trackpad zoom and pan
 - [ ] add buttons on side of screen for zoom and pan and show keyboard shortcuts when hovering over icon
 - [ ] make zoom and pan affect mouse cursors
