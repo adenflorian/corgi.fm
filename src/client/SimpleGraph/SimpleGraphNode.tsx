@@ -1,6 +1,6 @@
 import * as React from 'react'
 import Draggable, {DraggableEventHandler} from 'react-draggable'
-import {IoMdMenu} from 'react-icons/io'
+import {IoMdMove as HandleIcon} from 'react-icons/io'
 import {Dispatch} from 'redux'
 import {ConnectionNodeType} from '../../common/common-types'
 import {nodeClicked, selectPosition, updatePosition} from '../../common/redux'
@@ -97,8 +97,11 @@ const Handle = () =>
 	<div
 		className={handleClassName}
 		style={{
+			display: 'flex',
+			justifyContent: 'center',
+			alignItems: 'center',
 			width: handleSize,
-			// height: handleSize,
+			height: handleSize,
 			backgroundColor: CssColor.panelGray,
 			position: 'absolute',
 			bottom: '100%',
@@ -108,7 +111,7 @@ const Handle = () =>
 			boxShadow: 'inset 0px -6px 8px -5px #000000c2',
 		}}
 	>
-		<IoMdMenu />
+		<HandleIcon />
 	</div>
 
 export function getComponentByNodeType(type: ConnectionNodeType, id: string) {
