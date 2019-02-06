@@ -54,6 +54,7 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 					left: -2000,
 				}}
 				handle={`.${handleClassName}`}
+				onMouseDown={this._handleMouseDown}
 			>
 				<div
 					className="simpleGraphNode"
@@ -76,8 +77,13 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 	// private readonly _handleStart: DraggableEventHandler = (e, data) =>
 	// 	console.log('_handleStart: ', data)
 
-	private readonly _handleDrag: DraggableEventHandler = (e, data) => {
+	private readonly _handleDrag: DraggableEventHandler = (_, data) => {
 		this.props.dispatch(updatePosition(this.props.positionId, {x: data.x, y: data.y}))
+	}
+
+	private readonly _handleMouseDown = () => {
+		// Dispatching update with empty data to update last touched
+		this.props.dispatch(updatePosition(this.props.positionId, {}))
 	}
 
 	// private readonly _handleStop: DraggableEventHandler = (e, data) =>
