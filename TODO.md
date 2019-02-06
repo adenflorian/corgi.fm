@@ -230,7 +230,6 @@ instrument manager already handles all creation and destruction of instruments
 - [ ] stop it when nothing is playing
 
 # Newsletter
-- [ ] put a back button on the newsletter page?
 
 # Chat
 - [ ] delete old chat messages
@@ -270,9 +269,10 @@ instrument manager already handles all creation and destruction of instruments
 - [√] support trackpad zoom and pan
 - [ ] add buttons on side of screen for zoom and pan and show keyboard shortcuts when hovering over icon
 - [ ] make zoom and pan affect mouse cursors
-- [ ] use position system to render mouse cursors
-	- [ ] use transform translate and will-change
-- [ ] different icon for drag handle so people don't think it's a menu
+	- [ ] use position system to render mouse cursors
+		- [ ] use transform translate and will-change
+- [√] different icon for drag handle so people don't think it's a menu
+- [ ] auto organize button
 
 # Bugs
 - [√] shift click note not showing on other clients

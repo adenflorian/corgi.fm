@@ -104,13 +104,17 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 		connectionsToMasterAudioOutput.forEach(foo(1, 0))
 	})
 
+	// Centering graph
 	{
 		const {leftMost, rightMost, topMost, bottomMost} = calculateExtremes(newPositions)
 
 		const adjustX = -(leftMost + rightMost) / 2
 		const adjustY = -(topMost + bottomMost) / 2
 
-		const adjustedPosition = newPositions.map(x => ({...x, x: x.x + adjustX, y: x.y + adjustY}))
+		// Center audio output (root node) vertically
+		const adjustedPosition = newPositions
+			.map(x => ({...x, x: x.x + adjustX, y: x.y + adjustY}))
+			.update(MASTER_AUDIO_OUTPUT_TARGET_ID, x => ({...x, y: 0}))
 
 		serverStore.dispatch(createRoomAction(updatePositions(adjustedPosition), room))
 	}
