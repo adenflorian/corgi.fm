@@ -79,12 +79,30 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps & {
 		const buffer = 50
 		const joint = 8
 
+		// Straight lines
+		// const pathDPart1 = `
+		// 	M ${line.x1} ${line.y1}
+		// 	L ${line.x1 + joint} ${line.y1}
+		// 	L ${line.x2 - joint} ${line.y2}
+		// 	L ${line.x2} ${line.y2}
+		// `
+
+		const diff = Math.abs((line.x2 - line.x1) / 2)
+
+		const curveStrength = Math.max(10, diff)
+		// const curveStrength = 100
+
+		// Curved
 		const pathDPart1 = `
 			M ${line.x1} ${line.y1}
-			L ${line.x1 + joint} ${line.y1}
-			L ${line.x2 - joint} ${line.y2}
-			L ${line.x2} ${line.y2}
+			C ${line.x1 + joint + curveStrength} ${line.y1} ${line.x2 - joint - curveStrength} ${line.y2} ${line.x2} ${line.y2}
 		`
+		// const pathDPart1 = `
+		// 	M ${line.x1} ${line.y1}
+		// 	L ${line.x1 + joint} ${line.y1}
+		// 	C ${line.x1 + joint + curveStrength} ${line.y1} ${line.x2 - joint - curveStrength} ${line.y2} ${line.x2 - joint} ${line.y2}
+		// 	L ${line.x2} ${line.y2}
+		// `
 
 		const ghostLine = getGhostLine()
 
