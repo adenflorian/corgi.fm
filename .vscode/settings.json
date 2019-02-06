@@ -37,6 +37,7 @@
     },
     "typescript.tsdk": "node_modules\\typescript\\lib",
     "cSpell.words": [
+        "Comparator",
         "DEVTOOLS",
         "Deserializer",
         "Hashable",

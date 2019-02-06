@@ -246,7 +246,21 @@ instrument manager already handles all creation and destruction of instruments
 
 # SimpleGraph
 - [ ] move last touched node to highest z index
-- [√] support trackpad zo0m and pan
+	- who should keep track of the last touched node?
+	- react draggable?
+	- redux?
+		- positions?
+	- should this be networked?
+		- preferably
+			- that means redux
+	- positions redux
+		- lastTouchedId
+	- to make sure that the zindex order renders the same on everyones computer,
+		we need to make sure that things are rendered in order
+		sort by id in selector? or in reducer?
+	- maybe use an ordered map?
+	- [√] sort by id in reducer
+- [√] support trackpad zoom and pan
 - [ ] add buttons on side of screen for zoom and pan and show keyboard shortcuts when hovering over icon
 - [ ] make zoom and pan affect mouse cursors
 - [ ] use position system to render mouse cursors

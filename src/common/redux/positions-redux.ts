@@ -80,22 +80,28 @@ export const makePosition = (
 export type IPositionAction = AddPositionAction | DeletePositionsAction
 	| DeleteAllPositionsAction | UpdatePositionsAction | UpdatePositionAction
 
+// Reducers
 const positionsSpecificReducer: Reducer<IPositions, IPositionAction> =
 	(positions = Positions(), action) => {
 		switch (action.type) {
-			case ADD_POSITION: return positions.set(action.position.id, action.position)
-			case DELETE_POSITIONS: return positions.deleteAll(action.positionIds)
+			case ADD_POSITION: return sortPositions(positions.set(action.position.id, action.position))
+			case DELETE_POSITIONS: return sortPositions(positions.deleteAll(action.positionIds))
 			case DELETE_ALL_POSITIONS: return positions.clear()
-			case UPDATE_POSITIONS: return positions.merge(action.positions)
+			case UPDATE_POSITIONS: return sortPositions(positions.merge(action.positions))
 			case UPDATE_POSITION: return positions.update(action.id, x => ({...x, ...action.position}))
 			default: return positions
 		}
 	}
 
+function sortPositions(positions: IPositions) {
+	return positions.sortBy(x => x.id)
+}
+
 export const positionsReducer: Reducer<IPositionsState, IPositionAction> = combineReducers({
 	all: positionsSpecificReducer,
 })
 
+// Selectors
 export const selectAllPositions = (state: IClientRoomState) =>
 	state.positions.all
 
