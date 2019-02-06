@@ -263,10 +263,10 @@ instrument manager already handles all creation and destruction of instruments
 			- https://github.com/facebook/immutable-js/issues/88
 	- [√] sort by id in reducer
 	- [√] when a position is updated, mark it as last touched
-	- [ ] maybe store zIndex on each position state?
+	- [√] maybe store zIndex on each position state?
 		- will automatically get synced to server
 		- allows for more complex ordering
-	- [ ] mark as last touched immediately after clicking on node
+	- [√] mark as last touched immediately after clicking on node
 - [√] support trackpad zoom and pan
 - [ ] add buttons on side of screen for zoom and pan and show keyboard shortcuts when hovering over icon
 - [ ] make zoom and pan affect mouse cursors

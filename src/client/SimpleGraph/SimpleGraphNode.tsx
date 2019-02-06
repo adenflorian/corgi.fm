@@ -3,7 +3,7 @@ import Draggable, {DraggableEventHandler} from 'react-draggable'
 import {IoMdMenu} from 'react-icons/io'
 import {Dispatch} from 'redux'
 import {ConnectionNodeType} from '../../common/common-types'
-import {selectPosition, selectPositionsMeta, updatePosition} from '../../common/redux'
+import {nodeClicked, selectPosition, updatePosition} from '../../common/redux'
 import {shamuConnect} from '../../common/redux'
 import {CssColor} from '../../common/shamu-color'
 import {ConnectedBasicSampler} from '../BasicSampler/BasicSampler'
@@ -83,7 +83,7 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 
 	private readonly _handleMouseDown = () => {
 		// Dispatching update with empty data to update last touched
-		this.props.dispatch(updatePosition(this.props.positionId, {}))
+		this.props.dispatch(nodeClicked(this.props.positionId))
 	}
 
 	// private readonly _handleStop: DraggableEventHandler = (e, data) =>
@@ -137,7 +137,7 @@ export const ConnectedSimpleGraphNode = shamuConnect(
 			targetType: position.targetType,
 			width: position.width,
 			height: position.height,
-			zIndex: selectPositionsMeta(state.room).lastTouchedId === positionId ? 1 : 0,
+			zIndex: position.zIndex,
 		}
 	},
 )(SimpleGraphNode)

@@ -46,12 +46,18 @@ export const updatePosition = (id: string, position: Partial<IPosition>) => ({
 	BROADCASTER_ACTION,
 })
 
+export const NODE_CLICKED = 'NODE_CLICKED'
+export type NodeClickedAction = ReturnType<typeof nodeClicked>
+export const nodeClicked = (id: string) => ({
+	type: NODE_CLICKED as typeof NODE_CLICKED,
+	id,
+	SERVER_ACTION,
+	BROADCASTER_ACTION,
+})
+
 export interface IPositionsState {
 	all: IPositions
-	meta: IPositionsMetaState
 }
-
-export type IPositionsMetaState = ReturnType<typeof makePositionsMetaRecord>
 
 export type IPositions = Map<string, IPosition>
 
@@ -66,15 +72,10 @@ const defaultPosition = {
 	height: -1,
 	x: Math.random() * 1600 - 800,
 	y: Math.random() * 1000 - 500,
+	zIndex: 0,
 }
 
-const defaultPositionsMeta = Object.freeze({
-	lastTouchedId: '-1',
-})
-
 const makePositionRecord = Record(defaultPosition)
-
-const makePositionsMetaRecord = Record(defaultPositionsMeta)
 
 export const makePosition = (
 	position: Pick<IPosition, 'id' | 'targetType'> & Partial<IPosition>,
@@ -86,7 +87,7 @@ export const makePosition = (
 	}).toJS()
 }
 
-export type IPositionAction = AddPositionAction | DeletePositionsAction
+export type IPositionAction = AddPositionAction | DeletePositionsAction | NodeClickedAction
 	| DeleteAllPositionsAction | UpdatePositionsAction | UpdatePositionAction
 
 // Reducers
@@ -98,25 +99,26 @@ const positionsSpecificReducer: Reducer<IPositions, IPositionAction> =
 			case DELETE_ALL_POSITIONS: return positions.clear()
 			case UPDATE_POSITIONS: return sortPositions(positions.merge(action.positions))
 			case UPDATE_POSITION: return positions.update(action.id, x => ({...x, ...action.position}))
+			case NODE_CLICKED: return positions.update(action.id, x => ({
+				...x,
+				zIndex: getNewZIndex(positions, x.zIndex),
+			}))
 			default: return positions
 		}
 	}
+
+function getNewZIndex(positions: IPositions, currentZIndex: number) {
+	const highest = selectHighestZIndexOfAllPositionsLocal(positions)
+	if (currentZIndex === 0) return highest + 1
+	return currentZIndex < highest ? highest + 1 : currentZIndex
+}
 
 function sortPositions(positions: IPositions) {
 	return positions.sortBy(x => x.id)
 }
 
-const metaReducer: Reducer<IPositionsMetaState, IPositionAction> =
-	(meta = makePositionsMetaRecord(), action) => {
-		switch (action.type) {
-			case UPDATE_POSITION: return meta.set('lastTouchedId', action.id)
-			default: return meta
-		}
-	}
-
 export const positionsReducer: Reducer<IPositionsState, IPositionAction> = combineReducers({
 	all: positionsSpecificReducer,
-	meta: metaReducer,
 })
 
 // Selectors
@@ -192,4 +194,16 @@ export function calculateExtremes(positions: IPositions) {
 	})
 }
 
-export const selectPositionsMeta = (roomState: IClientRoomState) => roomState.positions.meta
+const selectHighestZIndexOfAllPositionsLocal = createSelector(
+	(positions: IPositions) => positions,
+	positions => positions.reduce(maxPositionZIndex, Number.MIN_SAFE_INTEGER),
+)
+
+function maxPositionZIndex(highestZIndex: number, pos: IPosition) {
+	return Math.max(highestZIndex, pos.zIndex)
+}
+
+export const selectHighestZIndexOfAllPositions = createSelector(
+	selectAllPositions,
+	selectHighestZIndexOfAllPositionsLocal,
+)
