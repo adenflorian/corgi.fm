@@ -3,7 +3,7 @@ import * as React from 'react'
 import Draggable, {DraggableEventHandler} from 'react-draggable'
 import {Dispatch} from 'redux'
 import {
-	connectionsActions, defaultGhostConnector, GhostConnectorRecord, GhostConnectorStatus,
+	connectionsActions, defaultGhostConnector, GhostConnectorRecord, GhostConnectorStatus, GhostConnectorType,
 } from '../../common/redux'
 import {shamuConnect} from '../../common/redux'
 import {
@@ -22,6 +22,10 @@ export interface IConnectionViewProps {
 	saturateSource: boolean
 	saturateTarget: boolean
 	id: string
+}
+
+interface IConnectionViewState {
+	isAddMode: boolean
 }
 
 class LineState {
@@ -45,7 +49,21 @@ const connectorHeight = 8
 
 const line0 = new LineState(0, 0, 0, 0)
 
-export class ConnectionView extends React.PureComponent<IConnectionViewProps & {dispatch: Dispatch}> {
+export class ConnectionView extends React.PureComponent<IConnectionViewProps & {dispatch: Dispatch}, IConnectionViewState> {
+	public state = {
+		isAddMode: false,
+	}
+
+	public componentDidMount() {
+		window.addEventListener('keydown', this._onKeyDown)
+		window.addEventListener('keyup', this._onKeyUp)
+	}
+
+	public componentWillUnmount() {
+		window.removeEventListener('keydown', this._onKeyDown)
+		window.removeEventListener('keyup', this._onKeyUp)
+	}
+
 	public render() {
 		const {color, saturateSource, saturateTarget, id, ghostConnector = defaultGhostConnector} = this.props
 
@@ -239,27 +257,71 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps & {
 							</g>
 						</svg>
 					}
-					<GhostConnector
-						dispatch={this.props.dispatch}
-						isActive={ghostConnector.status === GhostConnectorStatus.activeSource}
-						ghostConnector={ghostConnector}
-						parentX={this.props.sourceX}
-						parentY={this.props.sourceY}
-						connectionId={id}
-						sourceOrTarget={GhostConnectorStatus.activeSource}
-					/>
-					<GhostConnector
-						dispatch={this.props.dispatch}
-						isActive={ghostConnector.status === GhostConnectorStatus.activeTarget}
-						ghostConnector={ghostConnector}
-						parentX={this.props.targetX - connectorWidth}
-						parentY={this.props.targetY}
-						connectionId={id}
-						sourceOrTarget={GhostConnectorStatus.activeTarget}
-					/>
+					{/* Moving */}
+					{this.state.isAddMode === false &&
+						<React.Fragment>
+							<GhostConnector
+								dispatch={this.props.dispatch}
+								isActive={ghostConnector.status === GhostConnectorStatus.activeSource}
+								ghostConnector={ghostConnector}
+								parentX={this.props.sourceX}
+								parentY={this.props.sourceY}
+								connectionId={id}
+								sourceOrTarget={GhostConnectorStatus.activeSource}
+								movingOrAdding={GhostConnectorType.moving}
+							/>
+							<GhostConnector
+								dispatch={this.props.dispatch}
+								isActive={ghostConnector.status === GhostConnectorStatus.activeTarget}
+								ghostConnector={ghostConnector}
+								parentX={this.props.targetX - connectorWidth}
+								parentY={this.props.targetY}
+								connectionId={id}
+								sourceOrTarget={GhostConnectorStatus.activeTarget}
+								movingOrAdding={GhostConnectorType.moving}
+							/>
+						</React.Fragment>
+					}
+					{/* Adding */}
+					{this.state.isAddMode === true &&
+						<React.Fragment>
+							<GhostConnector
+								dispatch={this.props.dispatch}
+								isActive={ghostConnector.status === GhostConnectorStatus.activeTarget}
+								ghostConnector={ghostConnector}
+								parentX={this.props.sourceX}
+								parentY={this.props.sourceY}
+								connectionId={id}
+								sourceOrTarget={GhostConnectorStatus.activeTarget}
+								movingOrAdding={GhostConnectorType.adding}
+							/>
+							<GhostConnector
+								dispatch={this.props.dispatch}
+								isActive={ghostConnector.status === GhostConnectorStatus.activeSource}
+								ghostConnector={ghostConnector}
+								parentX={this.props.targetX - connectorWidth}
+								parentY={this.props.targetY}
+								connectionId={id}
+								sourceOrTarget={GhostConnectorStatus.activeSource}
+								movingOrAdding={GhostConnectorType.adding}
+							/>
+						</React.Fragment>
+					}
 				</div>
 			</div>
 		)
+	}
+
+	private readonly _onKeyDown = (e: KeyboardEvent) => {
+		if (this.state.isAddMode === false && e.ctrlKey) {
+			this.setState({isAddMode: true})
+		}
+	}
+
+	private readonly _onKeyUp = (e: KeyboardEvent) => {
+		if (this.state.isAddMode === true && !e.ctrlKey) {
+			this.setState({isAddMode: false})
+		}
 	}
 }
 
@@ -271,6 +333,7 @@ interface IGhostConnectorProps {
 	parentY: number
 	connectionId: string
 	sourceOrTarget: GhostConnectorStatus
+	movingOrAdding: GhostConnectorType
 }
 
 class GhostConnector extends React.PureComponent<IGhostConnectorProps> {
@@ -315,6 +378,7 @@ class GhostConnector extends React.PureComponent<IGhostConnectorProps> {
 	private readonly _handleStartDrag: DraggableEventHandler = (_, __) => {
 		this.props.dispatch(connectionsActions.updateGhostConnector(
 			this.props.connectionId, {
+				addingOrMoving: this.props.movingOrAdding,
 				status: this.props.sourceOrTarget,
 				x: this.props.parentX,
 				y: this.props.parentY,

@@ -2,7 +2,7 @@ import {Middleware} from 'redux'
 import Victor = require('victor')
 import {Point} from '../common-types'
 import {logger} from '../logger'
-import {connectionsActions, GhostConnectorStatus, IConnectionAction, selectConnection, STOP_DRAGGING_GHOST_CONNECTOR} from './connections-redux'
+import {Connection, connectionsActions, GhostConnectorStatus, GhostConnectorType, IConnectionAction, selectConnection, STOP_DRAGGING_GHOST_CONNECTOR} from './connections-redux'
 import {IClientAppState} from './index'
 import {IPosition, selectAllPositions} from './positions-redux'
 
@@ -60,11 +60,41 @@ export const connectionsMiddleware: Middleware<{}, IClientAppState> =
 				}))
 			}
 
+			const newConnectionToSource = (position: IPosition) => {
+				if (validatePosition(position) === false) return
+				dispatch(connectionsActions.add(new Connection(
+					position.id,
+					position.targetType,
+					connection.targetId,
+					connection.targetType,
+				)))
+			}
+
+			const newConnectionToTarget = (position: IPosition) => {
+				if (validatePosition(position) === false) return
+				dispatch(connectionsActions.add(new Connection(
+					connection.sourceId,
+					connection.sourceType,
+					position.id,
+					position.targetType,
+				)))
+			}
+
 			const getChangeConnectionFunc = () => {
-				switch (ghostConnector.status) {
-					case GhostConnectorStatus.activeSource: return changeConnectionSource
-					case GhostConnectorStatus.activeTarget: return changeConnectionTarget
-					default: throw new Error('Unexpected ghost connector status (changeConnection): ' + ghostConnector.status)
+				if (ghostConnector.addingOrMoving === GhostConnectorType.moving) {
+					switch (ghostConnector.status) {
+						case GhostConnectorStatus.activeSource: return changeConnectionSource
+						case GhostConnectorStatus.activeTarget: return changeConnectionTarget
+						default: throw new Error('Unexpected ghost connector status (moving)(changeConnection): ' + ghostConnector.status)
+					}
+				} else if (ghostConnector.addingOrMoving === GhostConnectorType.adding) {
+					switch (ghostConnector.status) {
+						case GhostConnectorStatus.activeSource: return newConnectionToSource
+						case GhostConnectorStatus.activeTarget: return newConnectionToTarget
+						default: throw new Error('Unexpected ghost connector status (adding)(changeConnection): ' + ghostConnector.status)
+					}
+				} else {
+					throw new Error('Unexpected ghost connector addingOrMoving (changeConnection): ' + ghostConnector.addingOrMoving)
 				}
 			}
 

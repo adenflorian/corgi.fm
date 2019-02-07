@@ -83,10 +83,16 @@ export enum GhostConnectorStatus {
 	activeTarget = 'activeTarget',
 }
 
+export enum GhostConnectorType {
+	moving,
+	adding,
+}
+
 const makeGhostConnectorRecord = Record({
 	x: 0,
 	y: 0,
 	status: GhostConnectorStatus.hidden,
+	addingOrMoving: GhostConnectorType.moving,
 })
 
 export type GhostConnectorRecord = ReturnType<typeof makeGhostConnectorRecord>
