@@ -36,7 +36,7 @@ class OnlineApp extends React.PureComponent<IOnlineAppProps> {
 						<ConnectedChat />
 						<ConnectedTopDiv />
 
-						{window.location.pathname === '/graph'
+						{window.location.pathname !== '/old'
 							? <ConnectedSimpleGraph />
 							: <Fragment>
 								<div id={mainBoardsId} className="boards">

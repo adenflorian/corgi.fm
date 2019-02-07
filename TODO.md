@@ -91,6 +91,7 @@
 	- maybe make a local audio slider that's not a part of the graph
 - [ ] add a link to the prod site and vice versa
 - [ ] make room option to switch between straight and curved connection lines
+- [ ] make slash (/) commands that can be used in chat
 
 # Shared Cursors
 - [ ] make shared cursor not block pointer events
@@ -110,9 +111,11 @@
 # Connections
 - [ ] make it obvious which direction data flows
 - [√] brighten the connectors and line when data is going across it
-- [ ] make them moveable
+- [√] make them moveable
 - [ ] fix invisible long line when vertical
 - [ ] make input connector look like a stack cable when multiple inputs
+- [ ] animate dashed ghost connector
+- [ ] animate active connections in the direction that data is flowing
 
 ## Adding/Changing/Removing Connections
 should anything allow multiple incoming connections?
@@ -128,6 +131,10 @@ possible starting points:
 - deleting connections
 - moving output side of connection
 - creating new connections from the output of a node
+
+- [ ] adding new connections
+	- [√] control click and drag on connector to mak new connector
+	- [ ] show icon with message when hovering over a connector saying to hold control to add new connection
 
 ## Updating web audio graph
 when i break the connection from an instrument to the audio output i want sound to stop

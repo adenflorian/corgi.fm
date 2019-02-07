@@ -19,6 +19,7 @@ sha-mu design
 	- groove boxes
 		- teenage engineering OP-1
 		- synthstrom deluge
+- http://nenadmilosevic.co/ableton-live-redesign/
 
 # Guidelines
 
@@ -32,3 +33,8 @@ Dark mode by default
 - thick vector line art
 - hand drawn
 - CAD
+- like Discord/slack?
+	- sidebar on left with rooms
+	- local user stuff in bottom left
+	- chat on bottom
+	- room members on right
