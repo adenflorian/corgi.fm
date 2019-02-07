@@ -90,6 +90,7 @@
 - [ ] make it obvious that master audio output node is local only
 	- maybe make a local audio slider that's not a part of the graph
 - [ ] add a link to the prod site and vice versa
+- [ ] make room option to switch between straight and curved connection lines
 
 # Shared Cursors
 - [ ] make shared cursor not block pointer events
@@ -274,6 +275,7 @@ instrument manager already handles all creation and destruction of instruments
 		- [ ] use transform translate and will-change
 - [√] different icon for drag handle so people don't think it's a menu
 - [ ] auto organize button
+- [√] center master clock node vertically in create server stuff
 
 # Bugs
 - [√] shift click note not showing on other clients

@@ -115,6 +115,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 		const adjustedPosition = newPositions
 			.map(x => ({...x, x: x.x + adjustX, y: x.y + adjustY}))
 			.update(MASTER_AUDIO_OUTPUT_TARGET_ID, x => ({...x, y: 0}))
+			.update(MASTER_CLOCK_SOURCE_ID, x => ({...x, y: 0}))
 
 		serverStore.dispatch(createRoomAction(updatePositions(adjustedPosition), room))
 	}
