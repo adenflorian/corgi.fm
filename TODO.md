@@ -89,6 +89,7 @@
 - [ ] instead of calling setMidiNotes all the time to trigger notes, use AudioParam automation to queue up note changes in the future based off of what is in a sequencer
 - [ ] make it obvious that master audio output node is local only
 	- maybe make a local audio slider that's not a part of the graph
+- [ ] add a link to the prod site and vice versa
 
 # Shared Cursors
 - [ ] make shared cursor not block pointer events

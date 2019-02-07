@@ -4,6 +4,38 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
+			"label": "yarn watch-parcel",
+			"type": "shell",
+			"command": [
+				"yarn",
+				"watch-parcel"
+			],
+			"presentation": {
+				"group": "groupA"
+			}
+		},
+		{
+			"label": "yarn watch-server",
+			"type": "shell",
+			"command": [
+				"yarn",
+				"watch-server"
+			],
+			"presentation": {
+				"group": "groupA"
+			}
+		},
+		{
+			"label": "yarn go",
+			"dependsOn": [
+				"yarn watch-parcel",
+				"yarn watch-server"
+			],
+			"runOptions": {
+				"runOn": "folderOpen"
+			}
+		},
+		{
 			"label": "scan client for typescript problems",
 			"command": "./node_modules/.bin/tsc",
 			"type": "shell",
