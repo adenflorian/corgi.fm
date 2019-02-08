@@ -1,7 +1,7 @@
 import {applyMiddleware, combineReducers, createStore, Store} from 'redux'
 import {composeWithDevTools} from 'redux-devtools-extension/developmentOnly'
 import persistState from 'redux-localstorage'
-import {audioReducer, clientsReducer, connectionsMiddleware, createGridSequencerPlayerMiddleware, getActionsBlacklist, IClientAppState, localMiddleware, optionsReducer, roomReducers, roomsReducer, websocketReducer} from '../common/redux'
+import {audioReducer, clientsReducer, connectionsMiddleware, createGridSequencerPlayerMiddleware, getActionsBlacklist, IClientAppState, localMiddleware, optionsReducer, roomReducers, roomsReducer, userInputReducer, websocketReducer} from '../common/redux'
 import {websocketSenderMiddleware} from './websocket-client-sender-middleware'
 
 const composeEnhancers = composeWithDevTools({
@@ -19,6 +19,7 @@ export function configureStore(initialState: IClientAppState | any = {})
 			rooms: roomsReducer,
 			websocket: websocketReducer,
 			room: roomReducers,
+			userInput: userInputReducer,
 		}),
 		initialState,
 		composeEnhancers(

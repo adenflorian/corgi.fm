@@ -11,7 +11,9 @@
 				"watch-parcel"
 			],
 			"presentation": {
-				"group": "groupA"
+				"group": "groupA",
+				"showReuseMessage": false,
+				"panel": "shared",
 			}
 		},
 		{
@@ -22,7 +24,9 @@
 				"watch-server"
 			],
 			"presentation": {
-				"group": "groupA"
+				"group": "groupA",
+				"showReuseMessage": false,
+				"panel": "shared",
 			}
 		},
 		{

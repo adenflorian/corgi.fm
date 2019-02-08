@@ -1,6 +1,6 @@
 import {Map} from 'immutable'
-import {AnyAction, Store} from 'redux'
-import {selectIsLocalClientReady, selectLocalClient, setClientPointer} from '../common/redux'
+import {Action, AnyAction, Store} from 'redux'
+import {selectIsLocalClientReady, selectLocalClient, setClientPointer, userInputActions} from '../common/redux'
 import {skipNote} from '../common/redux'
 import {localMidiKeyPress, localMidiKeyUp, localMidiOctaveChange} from '../common/redux'
 import {simpleGlobalClientState} from './SimpleGlobalClientState'
@@ -8,25 +8,21 @@ import {getMainBoardsRectX, getMainBoardsRectY} from './utils'
 
 type IKeyBoardShortcuts = Map<string, KeyBoardShortcut>
 
-const KeyBoardShortcuts = Map
-
 interface KeyBoardShortcut {
-	actionOnKeyDown?: AnyAction | keyboardActionCreator
-	actionOnKeyUp?: AnyAction | keyboardActionCreator
-	actionOnKeyPress?: AnyAction | keyboardActionCreator
+	actionOnKeyDown?: Action | keyboardActionCreator
+	actionOnKeyUp?: Action | keyboardActionCreator
+	actionOnKeyPress?: Action | keyboardActionCreator
 	allowRepeat: boolean
 	preventDefault: boolean
 }
 
 type keyboardActionCreator = (e: KeyboardEvent) => AnyAction
 
-const other: any = {}
+const midiKeyShortcuts: {[key: string]: KeyBoardShortcut} = {}
 
 export type IKeyToMidiMap = Map<string, number>
 
-const KeyToMidiMap = Map
-
-export const keyToMidiMap: IKeyToMidiMap = KeyToMidiMap({
+export const keyToMidiMap: IKeyToMidiMap = Map<number>({
 	'a': 0,
 	'w': 1,
 	's': 2,
@@ -47,7 +43,7 @@ export const keyToMidiMap: IKeyToMidiMap = KeyToMidiMap({
 })
 
 keyToMidiMap.forEach((val, key) => {
-	other[key] = {
+	midiKeyShortcuts[key] = {
 		actionOnKeyDown: localMidiKeyPress(val),
 		actionOnKeyUp: localMidiKeyUp(val),
 		allowRepeat: false,
@@ -55,7 +51,7 @@ keyToMidiMap.forEach((val, key) => {
 	}
 })
 
-const keyboardShortcuts: IKeyBoardShortcuts = KeyBoardShortcuts({
+const keyboardShortcuts: IKeyBoardShortcuts = Map<KeyBoardShortcut>({
 	'z': {
 		actionOnKeyDown: (e: KeyboardEvent) => localMidiOctaveChange(e.shiftKey ? -2 : -1),
 		allowRepeat: true,
@@ -81,8 +77,27 @@ const keyboardShortcuts: IKeyBoardShortcuts = KeyBoardShortcuts({
 		allowRepeat: true,
 		preventDefault: true,
 	},
-	...other,
+	'Control': {
+		actionOnKeyDown: userInputActions.setKeys({ctrl: true}),
+		actionOnKeyUp: userInputActions.setKeys({ctrl: false}),
+		allowRepeat: false,
+		preventDefault: false,
+	},
+	'Alt': {
+		actionOnKeyDown: userInputActions.setKeys({alt: true}),
+		actionOnKeyUp: userInputActions.setKeys({alt: false}),
+		allowRepeat: false,
+		preventDefault: false,
+	},
+	'Shift': {
+		actionOnKeyDown: userInputActions.setKeys({shift: true}),
+		actionOnKeyUp: userInputActions.setKeys({shift: false}),
+		allowRepeat: false,
+		preventDefault: false,
+	},
 })
+	.merge(midiKeyShortcuts)
+	.mapKeys(x => x.toLowerCase())
 
 let lastScrollY = window.scrollY
 
