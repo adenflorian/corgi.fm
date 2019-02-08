@@ -1,6 +1,6 @@
 import {Map} from 'immutable'
 import {Action, combineReducers, Reducer} from 'redux'
-import {basicInstrumentsReducer, basicSamplersReducer, chatReducer, connectionsReducer, CREATE_ROOM, DELETE_ROOM, globalClockReducer, gridSequencersReducer, IClientRoomState, infiniteSequencersReducer, IServerState, positionsReducer, roomMembersReducer, RoomsReduxAction, virtualKeyboardsReducer} from './index'
+import {basicSamplersReducer, basicSynthesizersReducer, chatReducer, connectionsReducer, CREATE_ROOM, DELETE_ROOM, globalClockReducer, gridSequencersReducer, IClientRoomState, infiniteSequencersReducer, IServerState, positionsReducer, roomMembersReducer, RoomsReduxAction, virtualKeyboardsReducer} from './index'
 
 export const ROOM_ACTION = 'ROOM_ACTION'
 type RoomAction = ReturnType<typeof createRoomAction>
@@ -12,7 +12,7 @@ export const createRoomAction = (action: Action, room: string) => ({
 
 // Used on the client, because a client is only in one room at a time
 export const roomReducers = combineReducers<IClientRoomState>({
-	basicInstruments: basicInstrumentsReducer,
+	basicSynthesizers: basicSynthesizersReducer,
 	basicSamplers: basicSamplersReducer,
 	chat: chatReducer,
 	connections: connectionsReducer,

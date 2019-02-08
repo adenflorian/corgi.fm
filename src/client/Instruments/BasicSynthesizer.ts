@@ -2,15 +2,15 @@ import {BuiltInOscillatorType, CustomOscillatorType, ShamuOscillatorType} from '
 import {midiNoteToFrequency} from '../music/music-functions'
 import {IInstrumentOptions, Instrument, Voice, Voices, VoiceStatus} from './Instrument'
 
-export interface IBasicInstrumentOptions extends IInstrumentOptions {
+export interface IBasicSynthesizerOptions extends IInstrumentOptions {
 	oscillatorType: ShamuOscillatorType
 }
 
-// TODO Make into a BasicInstrumentAudioNode?
-export class BasicInstrument extends Instrument<SynthVoices, SynthVoice> {
+// TODO Make into a BasicSynthesizerAudioNode?
+export class BasicSynthesizer extends Instrument<SynthVoices, SynthVoice> {
 	private readonly _voices: SynthVoices
 
-	constructor(options: IBasicInstrumentOptions) {
+	constructor(options: IBasicSynthesizerOptions) {
 		super(options, 1)
 
 		this._voices = new SynthVoices(options.voiceCount, this._audioContext, this._panNode, options.oscillatorType)

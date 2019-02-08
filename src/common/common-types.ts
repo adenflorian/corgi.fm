@@ -25,7 +25,7 @@ export enum ConnectionNodeType {
 	virtualKeyboard = 'virtualKeyboard',
 	gridSequencer = 'gridSequencer',
 	infiniteSequencer = 'infiniteSequencer',
-	basicInstrument = 'basicInstrument',
+	basicSynthesizer = 'basicSynthesizer',
 	basicSampler = 'basicSampler',
 	audioOutput = 'audioOutput',
 	masterClock = 'masterClock',

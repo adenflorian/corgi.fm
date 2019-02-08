@@ -5,7 +5,7 @@ import {Dispatch} from 'redux'
 import {IMidiNotes} from '../../common/MidiNote'
 import {ShamuOscillatorType} from '../../common/OscillatorTypes'
 import {
-	BasicInstrumentParam, selectBasicInstrument, setBasicInstrumentOscillatorType, setBasicInstrumentParam,
+	BasicSynthesizerParam, selectBasicSynthesizer, setBasicSynthesizerOscillatorType, setBasicSynthesizerParam,
 } from '../../common/redux'
 import {IClientAppState} from '../../common/redux'
 import {
@@ -13,18 +13,18 @@ import {
 } from '../../common/redux'
 import {Knob} from '../Knob/Knob'
 import {Panel} from '../Panel/Panel'
-import {BasicInstrumentOscillatorTypes} from './BasicInstrumentOscillatorTypes'
-import './BasicInstrumentView.less'
+import {BasicSynthesizerOscillatorTypes} from './BasicSynthesizerOscillatorTypes'
+import './BasicSynthesizerView.less'
 
 export type MidiNotes = IMidiNotes
 
-type IBasicInstrumentViewAllProps = IBasicInstrumentViewProps & IBasicInstrumentViewReduxProps & {dispatch: Dispatch}
+type IBasicSynthesizerViewAllProps = IBasicSynthesizerViewProps & IBasicSynthesizerViewReduxProps & {dispatch: Dispatch}
 
-interface IBasicInstrumentViewProps {
+interface IBasicSynthesizerViewProps {
 	id: string
 }
 
-interface IBasicInstrumentViewReduxProps {
+interface IBasicSynthesizerViewReduxProps {
 	color: string
 	rawMidiNotes: MidiNotes
 	pan: number
@@ -35,8 +35,8 @@ interface IBasicInstrumentViewReduxProps {
 	release: number
 }
 
-export class BasicInstrumentView
-	extends React.PureComponent<IBasicInstrumentViewAllProps> {
+export class BasicSynthesizerView
+	extends React.PureComponent<IBasicSynthesizerViewAllProps> {
 
 	public static defaultProps = {
 		pan: 0,
@@ -53,8 +53,8 @@ export class BasicInstrumentView
 				saturate={isPlaying}
 				id={this.props.id}
 			>
-				<div className="basicInstrument">
-					<BasicInstrumentOscillatorTypes
+				<div className="basicSynthesizer">
+					<BasicSynthesizerOscillatorTypes
 						handleClick={this._handleOscillatorTypeClicked}
 						activeType={oscillatorType}
 					/>
@@ -64,7 +64,7 @@ export class BasicInstrumentView
 						value={pan}
 						onChange={this._dispatchChangeInstrumentParam}
 						label="pan"
-						onChangeId={BasicInstrumentParam.pan}
+						onChangeId={BasicSynthesizerParam.pan}
 					/>
 					<Knob
 						min={0}
@@ -73,7 +73,7 @@ export class BasicInstrumentView
 						value={this.props.lowPassFilterCutoffFrequency}
 						onChange={this._dispatchChangeInstrumentParam}
 						label="lpf"
-						onChangeId={BasicInstrumentParam.lowPassFilterCutoffFrequency}
+						onChangeId={BasicSynthesizerParam.lowPassFilterCutoffFrequency}
 					/>
 					<Knob
 						min={0.01}
@@ -82,7 +82,7 @@ export class BasicInstrumentView
 						value={this.props.attack}
 						onChange={this._dispatchChangeInstrumentParam}
 						label="attack"
-						onChangeId={BasicInstrumentParam.attack}
+						onChangeId={BasicSynthesizerParam.attack}
 					/>
 					<Knob
 						min={0.01}
@@ -91,7 +91,7 @@ export class BasicInstrumentView
 						value={this.props.release}
 						onChange={this._dispatchChangeInstrumentParam}
 						label="release"
-						onChangeId={BasicInstrumentParam.release}
+						onChangeId={BasicSynthesizerParam.release}
 					/>
 				</div>
 			</Panel>
@@ -99,20 +99,20 @@ export class BasicInstrumentView
 	}
 
 	private readonly _handleOscillatorTypeClicked = (type: ShamuOscillatorType) => {
-		this.props.dispatch(setBasicInstrumentOscillatorType(this.props.id, type))
+		this.props.dispatch(setBasicSynthesizerOscillatorType(this.props.id, type))
 	}
 
-	private readonly _dispatchChangeInstrumentParam = (paramType: BasicInstrumentParam, value: any) => {
+	private readonly _dispatchChangeInstrumentParam = (paramType: BasicSynthesizerParam, value: any) => {
 		this.props.dispatch(
-			setBasicInstrumentParam(this.props.id, paramType, value),
+			setBasicSynthesizerParam(this.props.id, paramType, value),
 		)
 	}
 }
 
-export const ConnectedBasicInstrumentView = connect(
-	(state: IClientAppState, props: IBasicInstrumentViewProps): IBasicInstrumentViewReduxProps => {
+export const ConnectedBasicSynthesizerView = connect(
+	(state: IClientAppState, props: IBasicSynthesizerViewProps): IBasicSynthesizerViewReduxProps => {
 		const rawMidiNotes = selectConnectionSourceNotesByTargetId(state.room, props.id)
-		const instrumentState = selectBasicInstrument(state.room, props.id)
+		const instrumentState = selectBasicSynthesizer(state.room, props.id)
 
 		return {
 			rawMidiNotes,
@@ -126,5 +126,5 @@ export const ConnectedBasicInstrumentView = connect(
 		}
 	},
 )(
-	BasicInstrumentView as React.ComponentClass<IBasicInstrumentViewAllProps>,
-) as React.ComponentClass<IBasicInstrumentViewProps>
+	BasicSynthesizerView as React.ComponentClass<IBasicSynthesizerViewAllProps>,
+) as React.ComponentClass<IBasicSynthesizerViewProps>

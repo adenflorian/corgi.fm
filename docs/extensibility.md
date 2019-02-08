@@ -29,6 +29,7 @@ Let's say we want to make a new audio effect node called Delay (*folder* **new f
 
 ### Plan
 - [ ] Use decorators?
+- [ ] make parent reducer shamuNodesReducer?
 
 ## Which files should be the only ones to change, ideally?
 - *client*

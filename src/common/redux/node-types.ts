@@ -2,7 +2,7 @@ import {Map, Record, Set} from 'immutable'
 import {ConnectionNodeType, IConnectable, IMultiStateThing} from '../common-types'
 import {IMidiNote} from '../MidiNote'
 import {CssColor} from '../shamu-color'
-import {GridSequencerState, IClientRoomState, InfiniteSequencerState, makeGetKeyboardMidiOutput, selectBasicInstrument, selectGridSequencer, selectGridSequencerActiveNotes, selectGridSequencerIsActive, selectGridSequencerIsSending, selectInfiniteSequencer, selectInfiniteSequencerActiveNotes, selectInfiniteSequencerIsActive, selectInfiniteSequencerIsSending, selectSampler, selectVirtualKeyboardById, selectVirtualKeyboardIsActive, selectVirtualKeyboardIsSending} from './index'
+import {GridSequencerState, IClientRoomState, InfiniteSequencerState, makeGetKeyboardMidiOutput, selectBasicSynthesizer, selectGridSequencer, selectGridSequencerActiveNotes, selectGridSequencerIsActive, selectGridSequencerIsSending, selectInfiniteSequencer, selectInfiniteSequencerActiveNotes, selectInfiniteSequencerIsActive, selectInfiniteSequencerIsSending, selectSampler, selectVirtualKeyboardById, selectVirtualKeyboardIsActive, selectVirtualKeyboardIsSending} from './index'
 import {deserializeSequencerState} from './sequencer-redux'
 import {VirtualKeyboardState} from './virtual-keyboard-redux'
 
@@ -54,8 +54,8 @@ export const NodeInfoMap = Map({
 		width: InfiniteSequencerState.defaultWidth,
 		height: InfiniteSequencerState.defaultHeight,
 	}),
-	[ConnectionNodeType.basicInstrument]: NodeInfoRecord({
-		stateSelector: selectBasicInstrument,
+	[ConnectionNodeType.basicSynthesizer]: NodeInfoRecord({
+		stateSelector: selectBasicSynthesizer,
 		width: 416,
 		height: 56,
 	}),
@@ -89,7 +89,7 @@ export const NodeInfoMap = Map({
 
 export function isAudioNodeType(type: ConnectionNodeType) {
 	return [
-		ConnectionNodeType.basicInstrument,
+		ConnectionNodeType.basicSynthesizer,
 		ConnectionNodeType.basicSampler,
 		ConnectionNodeType.audioOutput,
 	].includes(type)

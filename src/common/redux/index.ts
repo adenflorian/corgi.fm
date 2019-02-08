@@ -15,7 +15,7 @@ export * from './websocket-redux'
 
 export * from './common-actions'
 
-export * from './basic-instruments-redux'
+export * from './basic-synthesizers-redux'
 export * from './basic-sampler-redux'
 export * from './chat-redux'
 export * from './clients-redux'

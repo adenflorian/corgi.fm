@@ -9,7 +9,7 @@ import {CssColor} from '../../common/shamu-color'
 import {ConnectedBasicSampler} from '../BasicSampler/BasicSampler'
 import {ConnectedGridSequencerContainer} from '../GridSequencer/GridSequencerContainer'
 import {ConnectedInfiniteSequencer} from '../InfiniteSequencer/InfiniteSequencer'
-import {ConnectedBasicInstrumentView} from '../Instruments/BasicInstrumentView'
+import {ConnectedBasicSynthesizerView} from '../Instruments/BasicSynthesizerView'
 import {ConnectedKeyboard} from '../Keyboard/Keyboard'
 import {ConnectedMasterControls} from '../MasterControls'
 import {simpleGlobalClientState} from '../SimpleGlobalClientState'
@@ -123,7 +123,7 @@ export function getComponentByNodeType(type: ConnectionNodeType, id: string) {
 		case ConnectionNodeType.infiniteSequencer: return <ConnectedInfiniteSequencer id={id} />
 		case ConnectionNodeType.virtualKeyboard: return <ConnectedKeyboard id={id} />
 
-		case ConnectionNodeType.basicInstrument: return <ConnectedBasicInstrumentView id={id} />
+		case ConnectionNodeType.basicSynthesizer: return <ConnectedBasicSynthesizerView id={id} />
 		case ConnectionNodeType.basicSampler: return <ConnectedBasicSampler id={id} />
 
 		default: return null

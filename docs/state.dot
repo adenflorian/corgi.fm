@@ -14,7 +14,7 @@ strict graph {
 	}
 
 	room -- {
-		basicInstruments
+		basicSynthesizers
 		basicSamplers
 		chat
 		connections

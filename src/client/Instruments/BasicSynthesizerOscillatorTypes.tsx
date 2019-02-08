@@ -7,7 +7,7 @@ import SineWave from './SineWave.svg'
 import SquareWave from './SquareWave.svg'
 import TriangleWave from './TriangleWave.svg'
 
-interface IBasicInstrumentOscillatorTypesProps {
+interface IBasicSynthesizerOscillatorTypesProps {
 	handleClick: (type: ShamuOscillatorType) => void
 	activeType: ShamuOscillatorType
 }
@@ -20,7 +20,7 @@ const oscillatorTypes: Array<{type: ShamuOscillatorType, svgPath: string}> = [
 	{type: CustomOscillatorType.noise, svgPath: NoiseWave},
 ]
 
-export class BasicInstrumentOscillatorTypes extends React.PureComponent<IBasicInstrumentOscillatorTypesProps> {
+export class BasicSynthesizerOscillatorTypes extends React.PureComponent<IBasicSynthesizerOscillatorTypesProps> {
 	public render() {
 		const {activeType, handleClick} = this.props
 

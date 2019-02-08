@@ -2,7 +2,7 @@ import {Dispatch, Middleware} from 'redux'
 import {applyOctave} from '../../client/music/music-functions'
 import {ConnectionNodeType} from '../common-types'
 import {logger} from '../logger'
-import {addBasicInstrument, addBasicSampler, addPosition, addVirtualKeyboard, BasicInstrumentState, BasicSamplerState, Connection, connectionsActions, deleteAllPositions, deleteAllThings, IClientAppState, makeActionCreator, makePosition, MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID, READY, selectActiveRoom, selectLocalClient, selectPositionExtremes, selectVirtualKeyboardById, selectVirtualKeyboardIdByOwner, SET_ACTIVE_ROOM, VirtualKeyboardState, virtualKeyPressed, virtualKeyUp, virtualOctaveChange} from './index'
+import {addBasicSampler, addBasicSynthesizer, addPosition, addVirtualKeyboard, BasicSamplerState, BasicSynthesizerState, Connection, connectionsActions, deleteAllPositions, deleteAllThings, IClientAppState, makeActionCreator, makePosition, MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID, READY, selectActiveRoom, selectLocalClient, selectPositionExtremes, selectVirtualKeyboardById, selectVirtualKeyboardIdByOwner, SET_ACTIVE_ROOM, VirtualKeyboardState, virtualKeyPressed, virtualKeyUp, virtualOctaveChange} from './index'
 
 export const LOCAL_MIDI_KEY_PRESS = 'LOCAL_MIDI_KEY_PRESS'
 export const localMidiKeyPress = makeActionCreator(LOCAL_MIDI_KEY_PRESS, 'midiNote')
@@ -17,7 +17,7 @@ export function deleteAllTheThings(dispatch: Dispatch) {
 	dispatch(connectionsActions.deleteAll())
 	dispatch(deleteAllThings(ConnectionNodeType.gridSequencer))
 	dispatch(deleteAllThings(ConnectionNodeType.virtualKeyboard))
-	dispatch(deleteAllThings(ConnectionNodeType.basicInstrument))
+	dispatch(deleteAllThings(ConnectionNodeType.basicSynthesizer))
 	dispatch(deleteAllThings(ConnectionNodeType.basicSampler))
 	dispatch(deleteAllPositions())
 }
@@ -120,11 +120,11 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 			ConnectionNodeType.virtualKeyboard,
 		)))
 	} else {
-		const newInstrument = new BasicInstrumentState(localClient.id)
-		dispatch(addBasicInstrument(newInstrument))
+		const newInstrument = new BasicSynthesizerState(localClient.id)
+		dispatch(addBasicSynthesizer(newInstrument))
 		dispatch(addPosition(makePosition({
 			id: newInstrument.id,
-			targetType: ConnectionNodeType.basicInstrument,
+			targetType: ConnectionNodeType.basicSynthesizer,
 			...nextPosition,
 		})))
 
@@ -133,13 +133,13 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 			newVirtualKeyboard.id,
 			ConnectionNodeType.virtualKeyboard,
 			newInstrument.id,
-			ConnectionNodeType.basicInstrument,
+			ConnectionNodeType.basicSynthesizer,
 		)))
 
 		// Target to audio output
 		dispatch(connectionsActions.add(new Connection(
 			newInstrument.id,
-			ConnectionNodeType.basicInstrument,
+			ConnectionNodeType.basicSynthesizer,
 			MASTER_AUDIO_OUTPUT_TARGET_ID,
 			ConnectionNodeType.audioOutput,
 		)))

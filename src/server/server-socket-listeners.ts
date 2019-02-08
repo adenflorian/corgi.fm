@@ -4,7 +4,7 @@ import {Server, Socket} from 'socket.io'
 import {maxRoomNameLength} from '../common/common-constants'
 import {ClientId} from '../common/common-types'
 import {logger} from '../common/logger'
-import {addClient, addRoomMember, BroadcastAction, BROADCASTER_ACTION, CHANGE_ROOM, clientDisconnected, ClientState, connectionsActions, createRoom, createRoomAction, deleteBasicInstruments, deleteBasicSamplers, deletePositions, deleteRoom, deleteRoomMember, deleteVirtualKeyboards, getActionsBlacklist, IClientRoomState, IServerState, maxUsernameLength, ready, REQUEST_CREATE_ROOM, selectAllBasicInstruments, selectAllClients, selectAllConnections, selectAllGridSequencers, selectAllInfiniteSequencers, selectAllMessages, selectAllPositions, selectAllRoomMemberIds, selectAllRoomNames, selectAllRoomStates, selectAllSamplers, selectAllVirtualKeyboards, selectBasicInstrumentsByOwner, selectClientBySocketId, selectConnectionsWithSourceOrTargetIds, selectPositionsWithIds, selectRoomExists, selectRoomStateByName, selectSamplersByOwner, selectVirtualKeyboardsByOwner, setActiveRoom, setChat, setClients, setRoomMembers, setRooms, updateBasicInstruments, updateBasicSamplers, updateGridSequencers, updateInfiniteSequencers, updatePositions, updateVirtualKeyboards} from '../common/redux'
+import {addClient, addRoomMember, BroadcastAction, BROADCASTER_ACTION, CHANGE_ROOM, clientDisconnected, ClientState, connectionsActions, createRoom, createRoomAction, deleteBasicSamplers, deleteBasicSynthesizers, deletePositions, deleteRoom, deleteRoomMember, deleteVirtualKeyboards, getActionsBlacklist, IClientRoomState, IServerState, maxUsernameLength, ready, REQUEST_CREATE_ROOM, selectAllBasicSynthesizers, selectAllClients, selectAllConnections, selectAllGridSequencers, selectAllInfiniteSequencers, selectAllMessages, selectAllPositions, selectAllRoomMemberIds, selectAllRoomNames, selectAllRoomStates, selectAllSamplers, selectAllVirtualKeyboards, selectBasicSynthesizersByOwner, selectClientBySocketId, selectConnectionsWithSourceOrTargetIds, selectPositionsWithIds, selectRoomExists, selectRoomStateByName, selectSamplersByOwner, selectVirtualKeyboardsByOwner, setActiveRoom, setChat, setClients, setRoomMembers, setRooms, updateBasicSamplers, updateBasicSynthesizers, updateGridSequencers, updateInfiniteSequencers, updatePositions, updateVirtualKeyboards} from '../common/redux'
 import {WebSocketEvent} from '../common/server-constants'
 import {createServerStuff} from './create-server-stuff'
 
@@ -196,7 +196,7 @@ function onLeaveRoom(io: Server, socket: Socket, roomToLeave: string, serverStor
 	if (!roomState) return logger.warn(`onLeaveRoom-couldn't find room state: roomToLeave: ${roomToLeave}`)
 	const clientId = selectClientBySocketId(serverStore.getState(), socket.id).id
 
-	const instrumentIdsToDelete = selectBasicInstrumentsByOwner(roomState, clientId).map(x => x.id)
+	const instrumentIdsToDelete = selectBasicSynthesizersByOwner(roomState, clientId).map(x => x.id)
 	const samplerIdsToDelete = selectSamplersByOwner(roomState, clientId).map(x => x.id)
 	const keyboardIdsToDelete = selectVirtualKeyboardsByOwner(roomState, clientId).map(x => x.id)
 
@@ -213,9 +213,9 @@ function onLeaveRoom(io: Server, socket: Socket, roomToLeave: string, serverStor
 	serverStore.dispatch(createRoomAction(deletePositionsAction, roomToLeave))
 	io.to(roomToLeave).emit(WebSocketEvent.broadcast, deletePositionsAction)
 
-	const deleteBasicInstrumentsAction = deleteBasicInstruments(instrumentIdsToDelete)
-	serverStore.dispatch(createRoomAction(deleteBasicInstrumentsAction, roomToLeave))
-	io.to(roomToLeave).emit(WebSocketEvent.broadcast, deleteBasicInstrumentsAction)
+	const deleteBasicSynthesizersAction = deleteBasicSynthesizers(instrumentIdsToDelete)
+	serverStore.dispatch(createRoomAction(deleteBasicSynthesizersAction, roomToLeave))
+	io.to(roomToLeave).emit(WebSocketEvent.broadcast, deleteBasicSynthesizersAction)
 
 	const deleteBasicSamplersAction = deleteBasicSamplers(samplerIdsToDelete)
 	serverStore.dispatch(createRoomAction(deleteBasicSamplersAction, roomToLeave))
@@ -252,7 +252,7 @@ function syncState(newSocket: Socket, roomState: IClientRoomState, serverState: 
 	const updaters = [
 		[setRoomMembers, selectAllRoomMemberIds],
 		[setChat, selectAllMessages],
-		[updateBasicInstruments, selectAllBasicInstruments],
+		[updateBasicSynthesizers, selectAllBasicSynthesizers],
 		[updateBasicSamplers, selectAllSamplers],
 		[updateVirtualKeyboards, selectAllVirtualKeyboards],
 		[updateGridSequencers, selectAllGridSequencers],

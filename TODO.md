@@ -211,7 +211,7 @@ instrument manager already handles all creation and destruction of instruments
 # References
 - https://github.com/grimmdude/MidiPlayerJS/blob/master/src/player.js
 
-# BasicInstrument
+# BasicSynthesizer
 - [√] voices still round robin, instead it should pick voices that aren't playing
 
 # Rooms

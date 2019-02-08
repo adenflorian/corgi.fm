@@ -2,7 +2,7 @@ import {Store} from 'redux'
 import {ConnectionNodeType, IConnectable} from '../common/common-types'
 import {IDisposable} from '../common/common-types'
 import {
-	BasicInstrumentState, isAudioNodeType, MASTER_AUDIO_OUTPUT_TARGET_ID, selectAllBasicInstrumentIds, selectBasicInstrument, selectConnectionSourceColorByTargetId, selectConnectionsWithSourceIds,
+	BasicSynthesizerState, isAudioNodeType, MASTER_AUDIO_OUTPUT_TARGET_ID, selectAllBasicSynthesizerIds, selectBasicSynthesizer, selectConnectionSourceColorByTargetId, selectConnectionsWithSourceIds,
 } from '../common/redux'
 import {BasicSamplerState, selectAllSamplerIds, selectSampler} from '../common/redux'
 import {IClientAppState, IClientRoomState} from '../common/redux'
@@ -12,7 +12,7 @@ import {
 } from '../common/redux'
 import {BasicSamplerInstrument} from './BasicSampler/BasicSamplerInstrument'
 import {GridSequencerPlayer} from './GridSequencerPlayer'
-import {BasicInstrument} from './Instruments/BasicInstrument'
+import {BasicSynthesizer} from './Instruments/BasicSynthesizer'
 import {IAudioNodeWrapper, IInstrument, IInstrumentOptions} from './Instruments/Instrument'
 
 type InstrumentIdsSelector = (roomState: IClientRoomState) => string[]
@@ -26,7 +26,7 @@ class StuffMap extends Map<string, IAudioNodeWrapper> {}
 // so that we can delete stuff properly
 const stuffMaps: {[key: string]: StuffMap} = Object.freeze({
 	[ConnectionNodeType.basicSampler]: new StuffMap(),
-	[ConnectionNodeType.basicInstrument]: new StuffMap(),
+	[ConnectionNodeType.basicSynthesizer]: new StuffMap(),
 	[ConnectionNodeType.audioOutput]: new StuffMap(),
 })
 
@@ -58,7 +58,7 @@ export const setupInstrumentManager =
 			const state = store.getState()
 
 			handleSamplers()
-			handleBasicInstruments()
+			handleBasicSynthesizers()
 
 			function handleSamplers() {
 				updateInstrumentType(
@@ -78,17 +78,17 @@ export const setupInstrumentManager =
 				)
 			}
 
-			function handleBasicInstruments() {
+			function handleBasicSynthesizers() {
 				updateInstrumentType(
-					selectAllBasicInstrumentIds,
-					selectBasicInstrument,
-					(options, instrumentState) => new BasicInstrument({
+					selectAllBasicSynthesizerIds,
+					selectBasicSynthesizer,
+					(options, instrumentState) => new BasicSynthesizer({
 						...options,
 						voiceCount: 9,
 						...instrumentState,
 					}),
-					stuffMaps[ConnectionNodeType.basicInstrument],
-					(instrument: BasicInstrument, instrumentState: BasicInstrumentState) => {
+					stuffMaps[ConnectionNodeType.basicSynthesizer],
+					(instrument: BasicSynthesizer, instrumentState: BasicSynthesizerState) => {
 						instrument.setOscillatorType(instrumentState.oscillatorType)
 						instrument.setPan(instrumentState.pan)
 						instrument.setLowPassFilterCutoffFrequency(instrumentState.lowPassFilterCutoffFrequency)

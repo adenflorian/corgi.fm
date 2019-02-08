@@ -1,5 +1,5 @@
 import {AnyAction} from 'redux'
-import {IAudioState, IBasicInstrumentsState, IBasicSamplersState, IChatState, IClientsState, IConnectionsState, IGlobalClockState, IGridSequencersState, IInfiniteSequencersState, IOptionsState, IPositionsState, IRoomMembersState, IRoomsState, IVirtualKeyboardsState, IWebsocketState, UserInputState} from './index'
+import {IAudioState, IBasicSamplersState, IBasicSynthesizersState, IChatState, IClientsState, IConnectionsState, IGlobalClockState, IGridSequencersState, IInfiniteSequencersState, IOptionsState, IPositionsState, IRoomMembersState, IRoomsState, IVirtualKeyboardsState, IWebsocketState, UserInputState} from './index'
 import {BROADCASTER_ACTION} from './redux-utils'
 
 export interface IClientAppState {
@@ -13,7 +13,7 @@ export interface IClientAppState {
 }
 
 export interface IClientRoomState {
-	basicInstruments: IBasicInstrumentsState
+	basicSynthesizers: IBasicSynthesizersState
 	basicSamplers: IBasicSamplersState
 	chat: IChatState
 	connections: IConnectionsState

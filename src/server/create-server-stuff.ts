@@ -1,8 +1,8 @@
-import {List, Map} from 'immutable'
+import {Map} from 'immutable'
 import {Store} from 'redux'
 import {ConnectionNodeType, IConnectable} from '../common/common-types'
 import {MidiNotes} from '../common/MidiNote'
-import {addBasicInstrument, addBasicSampler, addClient, addGridSequencer, addInfiniteSequencer, addPosition, BasicInstrumentState, BasicSamplerState, calculateExtremes, ClientState, Connection, connectionsActions, createRoomAction, createSequencerEvents, GridSequencerState, IConnection, InfiniteSequencerState, InfiniteSequencerStyle, ISequencerEvent, IServerState, makePosition, makeSequencerEvents, MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID, selectAllPositions, selectConnectionsWithTargetIds, SequencerEvents, updatePositions} from '../common/redux'
+import {addBasicSampler, addBasicSynthesizer, addClient, addGridSequencer, addInfiniteSequencer, addPosition, BasicSamplerState, BasicSynthesizerState, calculateExtremes, ClientState, Connection, connectionsActions, createRoomAction, createSequencerEvents, GridSequencerState, IConnection, InfiniteSequencerState, InfiniteSequencerStyle, ISequencerEvent, IServerState, makePosition, makeSequencerEvents, MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID, selectAllPositions, selectConnectionsWithTargetIds, SequencerEvents, updatePositions} from '../common/redux'
 
 const masterAudioOutput: IConnectable = Object.freeze({
 	id: MASTER_AUDIO_OUTPUT_TARGET_ID,
@@ -48,7 +48,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 				notesToShow: 24,
 			},
 			target: {
-				type: ConnectionNodeType.basicInstrument,
+				type: ConnectionNodeType.basicSynthesizer,
 			},
 		},
 		arp: {
@@ -70,7 +70,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 				infinityStyle: InfiniteSequencerStyle.colorBars,
 			},
 			target: {
-				type: ConnectionNodeType.basicInstrument,
+				type: ConnectionNodeType.basicSynthesizer,
 			},
 		},
 	})
@@ -180,9 +180,9 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 
 	function createTarget(type: ConnectionNodeType) {
 		switch (type) {
-			case ConnectionNodeType.basicInstrument:
-				const x = new BasicInstrumentState(serverClient.id)
-				serverStore.dispatch(createRoomAction(addBasicInstrument(x), room))
+			case ConnectionNodeType.basicSynthesizer:
+				const x = new BasicSynthesizerState(serverClient.id)
+				serverStore.dispatch(createRoomAction(addBasicSynthesizer(x), room))
 				return x
 			case ConnectionNodeType.basicSampler:
 				const y = new BasicSamplerState(serverClient.id)
