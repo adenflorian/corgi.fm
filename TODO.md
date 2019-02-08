@@ -93,6 +93,9 @@
 - [ ] make room option to switch between straight and curved connection lines
 - [ ] make slash (/) commands that can be used in chat
 
+# DevOps
+- [ ] figure out how to do `yarn build` without stopping parcel and the server
+
 # Shared Cursors
 - [ ] make shared cursor not block pointer events
 - [ ] use relative positioning like the connections so it doesn't have to rerender on scroll
@@ -135,6 +138,7 @@ possible starting points:
 - [ ] adding new connections
 	- [√] control click and drag on connector to mak new connector
 	- [ ] show icon with message when hovering over a connector saying to hold control to add new connection
+	- [ ] allow making new connections from a node with no connections on it
 
 ## Updating web audio graph
 when i break the connection from an instrument to the audio output i want sound to stop

@@ -13,7 +13,7 @@ export interface IPanelProps {
 }
 
 export const Panel: React.FunctionComponent<IPanelProps> =
-	({children, className, color = CssColor.defaultGray, id, label, labelTitle, saturate = false}) => {
+	({children, className = '', color = CssColor.defaultGray, id, label, labelTitle, saturate = false}) => {
 
 		const renderLabel = label !== undefined && label !== ''
 

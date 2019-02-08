@@ -10,6 +10,8 @@ sha-mu design
 	- tools should be intuitive so users can easily figure out how to use them and learn what they do
 - deep
 	- quick to learn, hard to master?
+- progressive
+	- features will gradually be introduced to the user
 
 # Inspirations
 - software
@@ -38,3 +40,10 @@ Dark mode by default
 	- local user stuff in bottom left
 	- chat on bottom
 	- room members on right
+
+
+
+
+
+
+sequencers should have an on off switch instead of a play and stop button?
