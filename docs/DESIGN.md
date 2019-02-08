@@ -47,3 +47,33 @@ Dark mode by default
 
 
 sequencers should have an on off switch instead of a play and stop button?
+
+
+
+
+infinite sequencer design
+
+controls
+- play
+- stop
+- record
+
+- modifying notes
+	- clear
+	- undo
+	- redo
+
+- external files
+	- download
+	- upload
+
+- appearance
+	- change style
+	- show bars
+
+- modifiers
+	- rate
+	- octave
+
+controls that every sequencer will have
+?
