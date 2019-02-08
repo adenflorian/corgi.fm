@@ -13,7 +13,12 @@
 			"presentation": {
 				"group": "groupA",
 				"showReuseMessage": false,
-				"panel": "shared",
+				"panel": "dedicated",
+				"focus": true
+			},
+			"problemMatcher": [],
+			"runOptions": {
+				"runOn": "folderOpen"
 			}
 		},
 		{
@@ -26,15 +31,10 @@
 			"presentation": {
 				"group": "groupA",
 				"showReuseMessage": false,
-				"panel": "shared",
-			}
-		},
-		{
-			"label": "yarn go",
-			"dependsOn": [
-				"yarn watch-parcel",
-				"yarn watch-server"
-			],
+				"panel": "dedicated",
+				"focus": true
+			},
+			"problemMatcher": [],
 			"runOptions": {
 				"runOn": "folderOpen"
 			}
@@ -89,6 +89,6 @@
 			},
 			"isBackground": true,
 			"problemMatcher": "$tsc-watch"
-		},
+		}
 	]
 }
