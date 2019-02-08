@@ -3,7 +3,7 @@ import * as React from 'react'
 import Draggable, {DraggableEventHandler} from 'react-draggable'
 import {Dispatch} from 'redux'
 import {
-	connectionsActions, defaultGhostConnector, GhostConnectorRecord, GhostConnectorStatus, GhostConnectorType,
+	connectionsActions, defaultGhostConnector, GhostConnectorRecord, GhostConnectorStatus, GhostConnectorType, IClientAppState, selectUserInputKeys,
 } from '../../common/redux'
 import {shamuConnect} from '../../common/redux'
 import {
@@ -24,9 +24,11 @@ export interface IConnectionViewProps {
 	id: string
 }
 
-interface IConnectionViewState {
+interface IConnectionViewReduxProps {
 	isAddMode: boolean
 }
+
+type IConnectionViewAllProps = IConnectionViewProps & IConnectionViewReduxProps & {dispatch: Dispatch}
 
 class LineState {
 	constructor(
@@ -49,21 +51,7 @@ const connectorHeight = 8
 
 const line0 = new LineState(0, 0, 0, 0)
 
-export class ConnectionView extends React.PureComponent<IConnectionViewProps & {dispatch: Dispatch}, IConnectionViewState> {
-	public state = {
-		isAddMode: false,
-	}
-
-	public componentDidMount() {
-		window.addEventListener('keydown', this._onKeyDown)
-		window.addEventListener('keyup', this._onKeyUp)
-	}
-
-	public componentWillUnmount() {
-		window.removeEventListener('keydown', this._onKeyDown)
-		window.removeEventListener('keyup', this._onKeyUp)
-	}
-
+export class ConnectionView extends React.PureComponent<IConnectionViewAllProps> {
 	public render() {
 		const {color, saturateSource, saturateTarget, id, ghostConnector = defaultGhostConnector} = this.props
 
@@ -258,7 +246,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps & {
 						</svg>
 					}
 					{/* Moving */}
-					{this.state.isAddMode === false &&
+					{this.props.isAddMode === false &&
 						<React.Fragment>
 							<GhostConnector
 								dispatch={this.props.dispatch}
@@ -283,7 +271,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps & {
 						</React.Fragment>
 					}
 					{/* Adding */}
-					{this.state.isAddMode === true &&
+					{this.props.isAddMode === true &&
 						<React.Fragment>
 							<GhostConnector
 								dispatch={this.props.dispatch}
@@ -310,18 +298,6 @@ export class ConnectionView extends React.PureComponent<IConnectionViewProps & {
 				</div>
 			</div>
 		)
-	}
-
-	private readonly _onKeyDown = (e: KeyboardEvent) => {
-		if (this.state.isAddMode === false && e.ctrlKey) {
-			this.setState({isAddMode: true})
-		}
-	}
-
-	private readonly _onKeyUp = (e: KeyboardEvent) => {
-		if (this.state.isAddMode === true && !e.ctrlKey) {
-			this.setState({isAddMode: false})
-		}
 	}
 }
 
@@ -415,4 +391,8 @@ function Connector({width, height}: {width: number, height: number}) {
 	)
 }
 
-export const ConnectedConnectionView = shamuConnect()(ConnectionView)
+export const ConnectedConnectionView = shamuConnect(
+	(state: IClientAppState): IConnectionViewReduxProps => ({
+		isAddMode: selectUserInputKeys(state).ctrl,
+	}),
+)(ConnectionView)
