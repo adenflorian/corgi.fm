@@ -3,7 +3,6 @@ import {Fragment} from 'react'
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {ConnectionNodeType} from '../common/common-types'
-import {selectLocalClient} from '../common/redux'
 import {IClientAppState} from '../common/redux'
 import {
 	IConnection, selectSortedConnections,
@@ -21,62 +20,55 @@ import {ConnectedVolumeControl} from './Volume/VolumeControl'
 
 interface IOnlineAppProps {
 	connections: List<IConnection>
-	hasLocalClient: boolean
 }
 
 class OnlineApp extends React.PureComponent<IOnlineAppProps> {
 	public render() {
-		const {hasLocalClient} = this.props
-
 		return (
 			<Fragment>
-				{hasLocalClient &&
-					<Fragment>
-						<ConnectedMousePointers />
-						<ConnectedChat />
-						<ConnectedTopDiv />
+				<ConnectedMousePointers />
+				<ConnectedChat />
+				<ConnectedTopDiv />
 
-						{window.location.pathname !== '/old'
-							? <ConnectedSimpleGraph />
-							: <Fragment>
-								<div id={mainBoardsId} className="boards">
-									<ConnectedConnections usage={ConnectionsUsage.normal} />
-									<div className="boardRow">
-										<div className="board connected">
-											<ConnectedMasterControls />
-										</div>
-										<div className="board connected">
-											<ConnectedVolumeControl color={getColorHslByHex(CssColor.blue)} />
-										</div>
-									</div>
-									{this.props.connections
-										.map(connection => {
-											if ([ConnectionNodeType.audioOutput, ConnectionNodeType.masterClock].includes(connection.targetType)) return
-											if ([ConnectionNodeType.audioOutput, ConnectionNodeType.masterClock].includes(connection.sourceType)) return
-
-											return (
-												<div className="boardRow" key={connection.id}>
-													<div
-														key={connection.sourceId}
-														className="board connected"
-													>
-														{getComponentByNodeType(connection.sourceType, connection.sourceId)}
-													</div>
-													<div
-														key={connection.targetId}
-														className="board connected"
-													>
-														{getComponentByNodeType(connection.targetType, connection.targetId)}
-													</div>
-												</div>
-											)
-										})
-									}
+				{window.location.pathname !== '/old'
+					? <ConnectedSimpleGraph />
+					: <Fragment>
+						<div id={mainBoardsId} className="boards">
+							<ConnectedConnections usage={ConnectionsUsage.normal} />
+							<div className="boardRow">
+								<div className="board connected">
+									<ConnectedMasterControls />
 								</div>
+								<div className="board connected">
+									<ConnectedVolumeControl color={getColorHslByHex(CssColor.blue)} />
+								</div>
+							</div>
+							{this.props.connections
+								.map(connection => {
+									if ([ConnectionNodeType.audioOutput, ConnectionNodeType.masterClock].includes(connection.targetType)) return
+									if ([ConnectionNodeType.audioOutput, ConnectionNodeType.masterClock].includes(connection.sourceType)) return
 
-								<div id="info" />
-							</Fragment>
-						}
+									return (
+										<div className="boardRow" key={connection.id}>
+											<div
+												key={connection.sourceId}
+												className="board connected"
+											>
+												{getComponentByNodeType(connection.sourceType, connection.sourceId)}
+											</div>
+											<div
+												key={connection.targetId}
+												className="board connected"
+											>
+												{getComponentByNodeType(connection.targetType, connection.targetId)}
+											</div>
+										</div>
+									)
+								})
+							}
+						</div>
+
+						<div id="info" />
 					</Fragment>
 				}
 			</Fragment>
@@ -85,7 +77,6 @@ class OnlineApp extends React.PureComponent<IOnlineAppProps> {
 }
 
 const mapStateToProps = (state: IClientAppState): IOnlineAppProps => ({
-	hasLocalClient: selectLocalClient(state) !== undefined,
 	connections: selectSortedConnections(state.room).toList(),
 })
 
