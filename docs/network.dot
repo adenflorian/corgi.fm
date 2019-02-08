@@ -1,0 +1,5 @@
+graph {
+	server -- clientA
+	server -- clientB
+	server -- clientC
+}

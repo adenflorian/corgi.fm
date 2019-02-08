@@ -1,9 +1,11 @@
 # sha-mu
-Real time music collaboration.
+Real time online music collaboration.
+"Multiplayer DAW".
 
 ## Required Software
 - node 10.14.1
 - yarn
+- graphviz (for viewing diagrams in docs folder)
 
 ## Secrets setup
 Create `secrets.sh` in project root.
@@ -13,4 +15,7 @@ Create `secrets.sh` in project root.
 
 SSH_HOST=example.com
 SSH_USER=notroot
+
+SSH_HOST_TEST=test.example.com
+SSH_USER_TEST=notroot
 ```

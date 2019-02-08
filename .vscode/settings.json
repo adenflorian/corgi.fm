@@ -60,6 +60,7 @@
         "draggable",
         "focusable",
         "fucky",
+        "graphviz",
         "hashbow",
         "immer",
         "input",

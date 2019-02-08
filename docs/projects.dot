@@ -1,0 +1,8 @@
+graph {
+	client [shape=record label="client|{react|audio|browser}"]
+	common [shape=record label="common|{redux|common stuff}"]
+	server [shape=record label="server|{redux|database?}"]
+
+	client -- common
+	server -- common
+}

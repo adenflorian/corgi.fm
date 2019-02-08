@@ -1,0 +1,6 @@
+graph {
+	App -- {TestingHarness Connecting OnlineApp};
+	OnlineApp -- {MousePointers Chat TopDiv SimpleGraph OldGraph}
+	SimpleGraph -- Zoom -- mainBoards -- {SimpleGraphNode Connections}
+	SimpleGraphNode -- Draggable -- {Handle Panel}
+}

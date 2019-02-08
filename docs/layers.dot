@@ -1,0 +1,11 @@
+graph {
+    node [shape="box" fontname="Arial"];
+
+    pres [label="Presentation Layer\n(react, web audio api, redux)"]
+    net [label="Network Layer\n(socket.io)"]
+    db [label="Persistence Layer\n(database?)"]
+
+    rankdir="TB"
+
+    pres -- net -- db
+}

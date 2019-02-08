@@ -1,0 +1,28 @@
+strict graph {
+	node [shape=box]
+
+	graph [splines=false, rankdir="LR"]
+
+	IClientAppState -- {
+		audio
+		clients
+		options
+		rooms
+		websocket
+		userInput
+		room
+	}
+
+	room -- {
+		basicInstruments
+		basicSamplers
+		chat
+		connections
+		globalClock
+		gridSequencers
+		infiniteSequencers
+		members
+		positions
+		virtualKeyboards
+	}
+}
