@@ -15,6 +15,8 @@ export * from './websocket-redux'
 
 export * from './common-actions'
 
+export * from './shamu-graph'
+
 export * from './basic-synthesizers-redux'
 export * from './basic-sampler-redux'
 export * from './chat-redux'
@@ -33,4 +35,5 @@ export * from './room-members-redux'
 export * from './room-stores-redux'
 export * from './rooms-redux'
 export * from './user-input-redux'
+
 export * from './common-redux-types'

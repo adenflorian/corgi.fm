@@ -7,6 +7,7 @@ import {
 	IServerState, positionsReducer, roomMembersReducer,
 	RoomsReduxAction, virtualKeyboardsReducer,
 } from './index'
+import {shamuGraphReducer} from './shamu-graph'
 
 export const ROOM_ACTION = 'ROOM_ACTION'
 type RoomAction = ReturnType<typeof createRoomAction>
@@ -27,6 +28,7 @@ export const roomReducers = combineReducers(Object.freeze({
 	infiniteSequencers: infiniteSequencersReducer,
 	members: roomMembersReducer,
 	positions: positionsReducer,
+	shamuGraph: shamuGraphReducer,
 	virtualKeyboards: virtualKeyboardsReducer,
 }))
 
