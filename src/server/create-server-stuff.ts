@@ -8,12 +8,12 @@ import {
 	BasicSamplerState, BasicSynthesizerState,
 	calculateExtremes, ClientState, Connection,
 	connectionsActions, createRoomAction, createSequencerEvents,
-	GridSequencerState, IConnection, InfiniteSequencerState,
-	InfiniteSequencerStyle, IServerState,
-	makeNodeState, makePosition, makeSequencerEvents,
+	GridSequencerState, IConnection, IConnections,
+	InfiniteSequencerState, InfiniteSequencerStyle,
+	IPositions, IServerState, makeNodeState,
+	makePosition, makeSequencerEvents,
 	MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID,
-	selectAllPositions, selectConnectionsWithTargetIds,
-	SequencerEvents, shamuNodesActions, updatePositions,
+	NodeSpecialState, selectAllConnections, selectAllPositions, selectConnectionsWithTargetIds, selectConnectionsWithTargetIds2, SequencerEvents, shamuNodesActions, updatePositions,
 } from '../common/redux'
 
 const masterAudioOutput: IConnectable = Object.freeze({
@@ -40,11 +40,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 	dispatchToRoom(addPosition(
 		makePosition({id: MASTER_AUDIO_OUTPUT_TARGET_ID, targetType: ConnectionNodeType.audioOutput})))
 
-	dispatchToRoom(shamuNodesActions.add(makeNodeState({
-		ownerId: serverClient.id,
-		type: ConnectionNodeType.basicSampler,
-		specialData: new BasicSamplerState(serverClient.id),
-	})))
+	makeServerOwnedNode(ConnectionNodeType.basicSampler, new BasicSamplerState(serverClient.id))
 
 	const serverStuffDefinitions = Object.freeze({
 		bass: {
@@ -95,48 +91,16 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 
 	const serverStuff = createSourceAndTargets(serverStuffDefinitions)
 
-	// Calculate positions
 	const roomState = serverStore.getState().roomStores.get(room)!
-	const originalPositions = selectAllPositions(roomState)
 
-	const connectionsToMasterAudioOutput =
-		selectConnectionsWithTargetIds(roomState, [MASTER_AUDIO_OUTPUT_TARGET_ID]).toList()
-
-	const newPositions = originalPositions.withMutations(mutablePositions => {
-		const xSpacing = 700
-		const ySpacing = 256
-
-		mutablePositions.update(MASTER_AUDIO_OUTPUT_TARGET_ID,
-			x => ({...x, x: 0, y: 0}),
-		)
-
-		const foo = (x: number, prevY: number) => (connection: IConnection, i: number) => {
-			mutablePositions.update(connection.sourceId,
-				z => ({...z, x: -xSpacing * x, y: (i * ySpacing) + (prevY * ySpacing)}),
-			)
-			selectConnectionsWithTargetIds(roomState, [connection.sourceId])
-				.toList()
-				.forEach(foo(x + 1, i))
-		}
-
-		connectionsToMasterAudioOutput.forEach(foo(1, 0))
-	})
-
-	// Centering graph
-	{
-		const {leftMost, rightMost, topMost, bottomMost} = calculateExtremes(newPositions)
-
-		const adjustX = -(leftMost + rightMost) / 2
-		const adjustY = -(topMost + bottomMost) / 2
-
-		// Center audio output (root node) vertically
-		const adjustedPosition = newPositions
-			.map(x => ({...x, x: x.x + adjustX, y: x.y + adjustY}))
-			.update(MASTER_AUDIO_OUTPUT_TARGET_ID, x => ({...x, y: 0}))
-			.update(MASTER_CLOCK_SOURCE_ID, x => ({...x, y: 0}))
-
-		dispatchToRoom(updatePositions(adjustedPosition))
-	}
+	dispatchToRoom(
+		updatePositions(
+			calculatePositionsGivenConnections(
+				selectAllPositions(roomState),
+				selectAllConnections(roomState),
+			),
+		),
+	)
 
 	// Do extra connections after calculating positions, so that it doesn't mess up positions
 	connectNodes(serverStuff.get('arp')!.source, serverStuff.get('arp2')!.target)
@@ -186,10 +150,12 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 			case ConnectionNodeType.gridSequencer:
 				const x = new GridSequencerState(args.name, args.notesToShow || 24, args.events)
 				dispatchToRoom(addGridSequencer(x))
+				makeServerOwnedNode(args.type, x)
 				return x
 			case ConnectionNodeType.infiniteSequencer:
 				const y = new InfiniteSequencerState(args.name, args.infinityStyle || InfiniteSequencerStyle.colorGrid, args.events)
 				dispatchToRoom(addInfiniteSequencer(y))
+				makeServerOwnedNode(args.type, y)
 				return y
 			default:
 				throw new Error('Invalid type')
@@ -201,10 +167,12 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 			case ConnectionNodeType.basicSynthesizer:
 				const x = new BasicSynthesizerState(serverClient.id)
 				dispatchToRoom(addBasicSynthesizer(x))
+				makeServerOwnedNode(type, x)
 				return x
 			case ConnectionNodeType.basicSampler:
 				const y = new BasicSamplerState(serverClient.id)
 				dispatchToRoom(addBasicSampler(y))
+				makeServerOwnedNode(type, y)
 				return y
 			default:
 				throw new Error('Invalid type')
@@ -220,9 +188,50 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 		)))
 	}
 
+	function makeServerOwnedNode(type: ConnectionNodeType, specialState: NodeSpecialState) {
+		return dispatchToRoom(shamuNodesActions.add(makeNodeState({
+			ownerId: serverClient.id,
+			type,
+			specialState,
+		})))
+	}
+
 	function dispatchToRoom(action: Action) {
 		return serverStore.dispatch(createRoomAction(action, room))
 	}
+}
+
+// TODO Take position width and height into account
+function calculatePositionsGivenConnections(positions: IPositions, connections: IConnections) {
+	const originalPositions = positions
+
+	const connectionsToMasterAudioOutput = selectConnectionsWithTargetIds2(connections, [MASTER_AUDIO_OUTPUT_TARGET_ID]).toList()
+
+	const newPositions = originalPositions.withMutations(mutablePositions => {
+		const xSpacing = 700
+		const ySpacing = 256
+
+		mutablePositions.update(MASTER_AUDIO_OUTPUT_TARGET_ID, x => ({...x, x: 0, y: 0}))
+
+		const calculatePosition = (x: number, prevY: number) => (connection: IConnection, i: number) => {
+			mutablePositions.update(connection.sourceId, z => ({...z, x: -xSpacing * x, y: (i * ySpacing) + (prevY * ySpacing)}))
+			selectConnectionsWithTargetIds2(connections, [connection.sourceId])
+				.toList()
+				.forEach(calculatePosition(x + 1, i))
+		}
+		connectionsToMasterAudioOutput.forEach(calculatePosition(1, 0))
+	})
+
+	// Centering graph
+	const {leftMost, rightMost, topMost, bottomMost} = calculateExtremes(newPositions)
+	const adjustX = -(leftMost + rightMost) / 2
+	const adjustY = -(topMost + bottomMost) / 2
+
+	// Center audio output (root node) vertically
+	return newPositions
+		.map(x => ({...x, x: x.x + adjustX, y: x.y + adjustY}))
+		.update(MASTER_AUDIO_OUTPUT_TARGET_ID, x => ({...x, y: 0}))
+		.update(MASTER_CLOCK_SOURCE_ID, x => ({...x, y: 0}))
 }
 
 function getBassNotes() {

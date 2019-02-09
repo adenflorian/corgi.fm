@@ -1,5 +1,6 @@
 import {Map} from 'immutable'
 import {ActionType} from 'typesafe-actions'
+import * as uuid from 'uuid'
 import {ConnectionNodeType} from '../../common-types'
 import {
 	BasicSamplerState, BasicSynthesizerState, GridSequencerState,
@@ -41,20 +42,20 @@ export interface NodeState {
 	type: ConnectionNodeType
 	position: IPosition
 	ownerId: string
-	specialData: NodeSpecialState
+	specialState: NodeSpecialState
 }
 
-export function makeNodeState({ownerId, type, specialData}: Pick<NodeState, 'ownerId' | 'type' | 'specialData'>) {
-	const id = '-1'
+export function makeNodeState({ownerId, type, specialState}: Pick<NodeState, 'ownerId' | 'type' | 'specialState'>) {
+	const id = uuid.v4()
 
 	return Object.freeze({
 		id,
 		ownerId,
 		type,
-		specialData,
+		specialState,
 		position: makePosition({
-			id,
-			targetType: type,
+			id, // TODO Is this still needed?
+			targetType: type, // TODO Is this still needed?
 		}),
 	})
 }

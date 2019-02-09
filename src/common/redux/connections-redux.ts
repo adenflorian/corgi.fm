@@ -182,9 +182,13 @@ export const selectConnectionsWithSourceOrTargetIds = (state: IClientRoomState, 
 		.filter(x => sourceOrTargetIds.includes(x.sourceId) || sourceOrTargetIds.includes(x.targetId))
 }
 
-export const selectConnectionsWithTargetIds = (state: IClientRoomState, targetIds: string[]) => {
-	return selectAllConnections(state)
+export const selectConnectionsWithTargetIds2 = (connections: IConnections, targetIds: string[]) => {
+	return connections
 		.filter(x => targetIds.includes(x.targetId))
+}
+
+export const selectConnectionsWithTargetIds = (state: IClientRoomState, targetIds: string[]) => {
+	return selectConnectionsWithTargetIds2(selectAllConnections(state), targetIds)
 }
 
 export const selectConnectionsWithSourceIds = (state: IClientRoomState, sourceIds: string[]) => {

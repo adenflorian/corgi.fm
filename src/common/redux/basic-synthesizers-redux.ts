@@ -84,7 +84,7 @@ export class BasicSynthesizerState implements IConnectable {
 	public readonly type = ConnectionNodeType.basicSynthesizer
 
 	constructor(ownerId: ClientId) {
-		this.ownerId = ownerId
+		this.ownerId = ownerId	// TODO Is this still needed?
 	}
 }
 
