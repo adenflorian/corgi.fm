@@ -4,7 +4,7 @@ import {Server, Socket} from 'socket.io'
 import {maxRoomNameLength} from '../common/common-constants'
 import {ClientId} from '../common/common-types'
 import {logger} from '../common/logger'
-import {addClient, addRoomMember, BroadcastAction, BROADCASTER_ACTION, CHANGE_ROOM, clientDisconnected, ClientState, connectionsActions, createRoom, createRoomAction, deleteBasicSamplers, deleteBasicSynthesizers, deletePositions, deleteRoom, deleteRoomMember, deleteVirtualKeyboards, getActionsBlacklist, IClientRoomState, IServerState, maxUsernameLength, ready, REQUEST_CREATE_ROOM, selectAllBasicSynthesizers, selectAllClients, selectAllConnections, selectAllGridSequencers, selectAllInfiniteSequencers, selectAllMessages, selectAllPositions, selectAllRoomMemberIds, selectAllRoomNames, selectAllRoomStates, selectAllSamplers, selectAllVirtualKeyboards, selectBasicSynthesizersByOwner, selectClientBySocketId, selectConnectionsWithSourceOrTargetIds, selectPositionsWithIds, selectRoomExists, selectRoomStateByName, selectSamplersByOwner, selectVirtualKeyboardsByOwner, setActiveRoom, setChat, setClients, setRoomMembers, setRooms, updateBasicSamplers, updateBasicSynthesizers, updateGridSequencers, updateInfiniteSequencers, updatePositions, updateVirtualKeyboards} from '../common/redux'
+import {addClient, addRoomMember, BroadcastAction, BROADCASTER_ACTION, CHANGE_ROOM, clientDisconnected, ClientState, connectionsActions, createRoom, createRoomAction, deleteBasicSamplers, deleteBasicSynthesizers, deletePositions, deleteRoom, deleteRoomMember, deleteVirtualKeyboards, getActionsBlacklist, IClientRoomState, IServerState, maxUsernameLength, ready, REQUEST_CREATE_ROOM, selectAllBasicSynthesizers, selectAllClients, selectAllConnections, selectAllGridSequencers, selectAllInfiniteSequencers, selectAllMessages, selectAllPositions, selectAllRoomMemberIds, selectAllRoomNames, selectAllRoomStates, selectAllSamplers, selectAllVirtualKeyboards, selectBasicSynthesizersByOwner, selectClientBySocketId, selectConnectionsWithSourceOrTargetIds, selectPositionsWithIds, selectRoomExists, selectRoomStateByName, selectSamplersByOwner, selectShamuGraphState, selectVirtualKeyboardsByOwner, setActiveRoom, setChat, setClients, setRoomMembers, setRooms, shamuGraphActions, shamuNodesActions, updateBasicSamplers, updateBasicSynthesizers, updateGridSequencers, updateInfiniteSequencers, updatePositions, updateVirtualKeyboards} from '../common/redux'
 import {WebSocketEvent} from '../common/server-constants'
 import {createServerStuff} from './create-server-stuff'
 
@@ -269,6 +269,12 @@ function syncState(newSocket: Socket, roomState: IClientRoomState, serverState: 
 		}
 		newSocket.emit(WebSocketEvent.broadcast, action)
 		logger.trace(`SYNC: `, action)
+	})
+
+	newSocket.emit(WebSocketEvent.broadcast, {
+		...shamuGraphActions.replace(selectShamuGraphState(roomState)),
+		alreadyBroadcasted: true,
+		source: server,
 	})
 
 	newSocket.emit(WebSocketEvent.broadcast, {
