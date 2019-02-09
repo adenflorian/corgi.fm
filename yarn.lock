@@ -6739,7 +6739,7 @@ typesafe-actions@^3.0.0:
   resolved "https://registry.yarnpkg.com/typesafe-actions/-/typesafe-actions-3.0.0.tgz#8b162ea11fa7383d4b4d96afc181118e84e06e10"
   integrity sha512-NLpRc/FY+jPfWL0aUXQzjxPyF0Xug2om6akaoRLQ18KGwP2yYNBJu9vkv2q1q+Cx/+edy2Qf6O8xXnYY/xwz1A==
 
-typescript-tslint-plugin@^0.3.0:
+typescript-tslint-plugin@^0.3.1:
   version "0.3.1"
   resolved "https://registry.yarnpkg.com/typescript-tslint-plugin/-/typescript-tslint-plugin-0.3.1.tgz#d86ae0342c9e8f9ecfcbcc47f7a7c2b5ab0e86f9"
   integrity sha512-h8HEPBm36UEs901ld1x6m5eY/UFb4mF+A0nvERr4BWMww5wnV5nfcm9ZFt18foYL0GQ5NVMt1Tb3466WUU8dRQ==
