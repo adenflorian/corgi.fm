@@ -1,8 +1,20 @@
 import {Map} from 'immutable'
-import {Store} from 'redux'
+import {Action, Store} from 'redux'
 import {ConnectionNodeType, IConnectable} from '../common/common-types'
 import {MidiNotes} from '../common/MidiNote'
-import {addBasicSampler, addBasicSynthesizer, addClient, addGridSequencer, addInfiniteSequencer, addPosition, BasicSamplerState, BasicSynthesizerState, calculateExtremes, ClientState, Connection, connectionsActions, createRoomAction, createSequencerEvents, GridSequencerState, IConnection, InfiniteSequencerState, InfiniteSequencerStyle, ISequencerEvent, IServerState, makePosition, makeSequencerEvents, MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID, selectAllPositions, selectConnectionsWithTargetIds, SequencerEvents, updatePositions} from '../common/redux'
+import {
+	addBasicSampler, addBasicSynthesizer, addClient,
+	addGridSequencer, addInfiniteSequencer, addPosition,
+	BasicSamplerState, BasicSynthesizerState,
+	calculateExtremes, ClientState, Connection,
+	connectionsActions, createRoomAction, createSequencerEvents,
+	GridSequencerState, IConnection, InfiniteSequencerState,
+	InfiniteSequencerStyle, IServerState,
+	makeNodeState, makePosition, makeSequencerEvents,
+	MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID,
+	selectAllPositions, selectConnectionsWithTargetIds,
+	SequencerEvents, shamuNodesActions, updatePositions,
+} from '../common/redux'
 
 const masterAudioOutput: IConnectable = Object.freeze({
 	id: MASTER_AUDIO_OUTPUT_TARGET_ID,
@@ -20,13 +32,19 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 	const serverClient = ClientState.createServerClient()
 	const addClientAction = addClient(serverClient)
 
-	serverStore.dispatch(createRoomAction(addClientAction, room))
+	dispatchToRoom(addClientAction)
 
-	serverStore.dispatch(createRoomAction(addPosition(
-		makePosition({id: MASTER_CLOCK_SOURCE_ID, targetType: ConnectionNodeType.masterClock})), room))
+	dispatchToRoom(addPosition(
+		makePosition({id: MASTER_CLOCK_SOURCE_ID, targetType: ConnectionNodeType.masterClock})))
 
-	serverStore.dispatch(createRoomAction(addPosition(
-		makePosition({id: MASTER_AUDIO_OUTPUT_TARGET_ID, targetType: ConnectionNodeType.audioOutput})), room))
+	dispatchToRoom(addPosition(
+		makePosition({id: MASTER_AUDIO_OUTPUT_TARGET_ID, targetType: ConnectionNodeType.audioOutput})))
+
+	dispatchToRoom(shamuNodesActions.add(makeNodeState({
+		ownerId: serverClient.id,
+		type: ConnectionNodeType.basicSampler,
+		specialData: new BasicSamplerState(serverClient.id),
+	})))
 
 	const serverStuffDefinitions = Object.freeze({
 		bass: {
@@ -117,7 +135,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 			.update(MASTER_AUDIO_OUTPUT_TARGET_ID, x => ({...x, y: 0}))
 			.update(MASTER_CLOCK_SOURCE_ID, x => ({...x, y: 0}))
 
-		serverStore.dispatch(createRoomAction(updatePositions(adjustedPosition), room))
+		dispatchToRoom(updatePositions(adjustedPosition))
 	}
 
 	// Do extra connections after calculating positions, so that it doesn't mess up positions
@@ -136,12 +154,12 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 
 	function createSourceAndTarget(options: CreateSourceAndTargetArgs) {
 		const target = createTarget(options.target.type)
-		serverStore.dispatch(createRoomAction(addPosition(
-			makePosition({id: target.id, targetType: options.target.type})), room))
+		dispatchToRoom(addPosition(
+			makePosition({id: target.id, targetType: options.target.type})))
 
 		const source = createSource({...options.source})
-		serverStore.dispatch(createRoomAction(addPosition(
-			makePosition({id: source.id, targetType: options.source.type, width: source.width, height: source.height})), room))
+		dispatchToRoom(addPosition(
+			makePosition({id: source.id, targetType: options.source.type, width: source.width, height: source.height})))
 
 		connectNodes(source, target)
 
@@ -167,11 +185,11 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 		switch (args.type) {
 			case ConnectionNodeType.gridSequencer:
 				const x = new GridSequencerState(args.name, args.notesToShow || 24, args.events)
-				serverStore.dispatch(createRoomAction(addGridSequencer(x), room))
+				dispatchToRoom(addGridSequencer(x))
 				return x
 			case ConnectionNodeType.infiniteSequencer:
 				const y = new InfiniteSequencerState(args.name, args.infinityStyle || InfiniteSequencerStyle.colorGrid, args.events)
-				serverStore.dispatch(createRoomAction(addInfiniteSequencer(y), room))
+				dispatchToRoom(addInfiniteSequencer(y))
 				return y
 			default:
 				throw new Error('Invalid type')
@@ -182,11 +200,11 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 		switch (type) {
 			case ConnectionNodeType.basicSynthesizer:
 				const x = new BasicSynthesizerState(serverClient.id)
-				serverStore.dispatch(createRoomAction(addBasicSynthesizer(x), room))
+				dispatchToRoom(addBasicSynthesizer(x))
 				return x
 			case ConnectionNodeType.basicSampler:
 				const y = new BasicSamplerState(serverClient.id)
-				serverStore.dispatch(createRoomAction(addBasicSampler(y), room))
+				dispatchToRoom(addBasicSampler(y))
 				return y
 			default:
 				throw new Error('Invalid type')
@@ -194,12 +212,16 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 	}
 
 	function connectNodes(source: IConnectable, target: IConnectable) {
-		serverStore.dispatch(createRoomAction(connectionsActions.add(new Connection(
+		dispatchToRoom(connectionsActions.add(new Connection(
 			source.id,
 			source.type,
 			target.id,
 			target.type,
-		)), room))
+		)))
+	}
+
+	function dispatchToRoom(action: Action) {
+		return serverStore.dispatch(createRoomAction(action, room))
 	}
 }
 

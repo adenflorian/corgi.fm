@@ -3,7 +3,7 @@ import {ActionType} from 'typesafe-actions'
 import {ConnectionNodeType} from '../../common-types'
 import {
 	BasicSamplerState, BasicSynthesizerState, GridSequencerState,
-	InfiniteSequencerState, IPosition, VirtualKeyboardState,
+	InfiniteSequencerState, IPosition, makePosition, VirtualKeyboardState,
 } from '../index'
 
 export const ADD_SHAMU_NODE = 'ADD_SHAMU_NODE'
@@ -33,8 +33,23 @@ interface NodeState {
 	id: string
 	type: ConnectionNodeType
 	position: IPosition
-	owner: string
+	ownerId: string
 	specialData: NodeSpecialState
+}
+
+export function makeNodeState({ownerId, type, specialData}: Pick<NodeState, 'ownerId' | 'type' | 'specialData'>) {
+	const id = '-1'
+
+	return Object.freeze({
+		id,
+		ownerId,
+		type,
+		specialData,
+		position: makePosition({
+			id,
+			targetType: type,
+		}),
+	})
 }
 
 export type NodeSpecialState = BasicSynthesizerState | BasicSamplerState |
