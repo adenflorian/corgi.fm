@@ -106,6 +106,7 @@ class SynthVoice extends Voice {
 	}
 
 	private readonly _applyFineTuning = (baseFreq: number, fine: number) => {
+		// Multiplying a frequency by 0.059454545454545 will give you the next half step up
 		return baseFreq + ((fine * 0.059454545454545) * baseFreq)
 	}
 

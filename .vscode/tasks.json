@@ -4,7 +4,16 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"label": "yarn watch-parcel",
+			"label": "go",
+			"type": "process",
+			"dependsOn": [
+				"watch-parcel",
+				"watch-server"
+			],
+			"problemMatcher": []
+		},
+		{
+			"label": "watch-parcel",
 			"type": "shell",
 			"command": [
 				"yarn",
@@ -22,7 +31,7 @@
 			}
 		},
 		{
-			"label": "yarn watch-server",
+			"label": "watch-server",
 			"type": "shell",
 			"command": [
 				"yarn",
