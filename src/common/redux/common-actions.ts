@@ -24,3 +24,9 @@ export type ReadyAction = ReturnType<typeof ready>
 export const ready = () => ({
 	type: READY as typeof READY,
 })
+
+export const ORGANIZE_GRAPH = 'ORGANIZE_GRAPH'
+export type OrganizeGraphAction = ReturnType<typeof organizeGraph>
+export const organizeGraph = () => ({
+	type: ORGANIZE_GRAPH as typeof ORGANIZE_GRAPH,
+})

@@ -2,14 +2,19 @@ import {Middleware} from 'redux'
 import Victor = require('victor')
 import {Point} from '../common-types'
 import {logger} from '../logger'
-import {Connection, connectionsActions, GhostConnectorStatus, GhostConnectorType, IConnectionAction, selectConnection, STOP_DRAGGING_GHOST_CONNECTOR} from './connections-redux'
-import {IClientAppState} from './index'
-import {IPosition, selectAllPositions} from './positions-redux'
+import {OrganizeGraphAction} from './common-actions'
+import {BroadcastAction} from './common-redux-types'
+import {
+	calculateExtremes, Connection, connectionsActions,
+	GhostConnectorStatus, GhostConnectorType, IClientAppState,
+	IConnection, IConnectionAction, IConnections,
+	IPosition, IPositions, MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID, ORGANIZE_GRAPH, selectAllConnections, selectAllPositions, selectConnection, selectConnectionsWithTargetIds2, STOP_DRAGGING_GHOST_CONNECTOR, updatePositions,
+} from './index'
 
 const connectionThreshold = 100
 
 export const connectionsMiddleware: Middleware<{}, IClientAppState> =
-	({dispatch, getState}) => next => (action: IConnectionAction) => {
+	({dispatch, getState}) => next => (action: IConnectionAction | OrganizeGraphAction) => {
 		const stateBefore = getState()
 
 		next(action)
@@ -18,13 +23,27 @@ export const connectionsMiddleware: Middleware<{}, IClientAppState> =
 
 		switch (action.type) {
 			case STOP_DRAGGING_GHOST_CONNECTOR: {
+				if ((action as unknown as BroadcastAction).alreadyBroadcasted) return
 				try {
 					handleStopDraggingGhostConnector(action.id)
 				} catch (error) {
 					logger.warn('Caught error (will ignore) when handling ' + STOP_DRAGGING_GHOST_CONNECTOR + ': ', error)
 					return
 				}
+				return
 			}
+			// case ORGANIZE_GRAPH: {
+			// 	dispatch(
+			// 		updatePositions(
+			// 			calculatePositionsGivenConnections(
+			// 				selectAllPositions(stateAfter.room),
+			// 				selectAllConnections(stateAfter.room),
+			// 			),
+			// 		),
+			// 	)
+			// 	return
+			// }
+			default: return
 		}
 
 		function handleStopDraggingGhostConnector(connectionId: string) {
@@ -162,4 +181,37 @@ function getClosest(closest: IPosition & {distanceFromGhostConnector: number}, p
 	return position.distanceFromGhostConnector < closest.distanceFromGhostConnector
 		? position
 		: closest
+}
+
+// TODO Take position width and height into account
+export function calculatePositionsGivenConnections(positions: IPositions, connections: IConnections) {
+	const originalPositions = positions
+
+	const connectionsToMasterAudioOutput = selectConnectionsWithTargetIds2(connections, [MASTER_AUDIO_OUTPUT_TARGET_ID]).toList()
+
+	const newPositions = originalPositions.withMutations(mutablePositions => {
+		const xSpacing = 700
+		const ySpacing = 256
+
+		mutablePositions.update(MASTER_AUDIO_OUTPUT_TARGET_ID, x => ({...x, x: 0, y: 0}))
+
+		const calculatePosition = (x: number, prevY: number) => (connection: IConnection, i: number) => {
+			mutablePositions.update(connection.sourceId, z => ({...z, x: -xSpacing * x, y: (i * ySpacing) + (prevY * ySpacing)}))
+			selectConnectionsWithTargetIds2(connections, [connection.sourceId])
+				.toList()
+				.forEach(calculatePosition(x + 1, i))
+		}
+		connectionsToMasterAudioOutput.forEach(calculatePosition(1, 0))
+	})
+
+	// Centering graph
+	const {leftMost, rightMost, topMost, bottomMost} = calculateExtremes(newPositions)
+	const adjustX = -(leftMost + rightMost) / 2
+	const adjustY = -(topMost + bottomMost) / 2
+
+	// Center audio output (root node) vertically
+	return newPositions
+		.map(x => ({...x, x: x.x + adjustX, y: x.y + adjustY}))
+		.update(MASTER_AUDIO_OUTPUT_TARGET_ID, x => ({...x, y: 0}))
+		.update(MASTER_CLOCK_SOURCE_ID, x => ({...x, y: 0}))
 }

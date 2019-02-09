@@ -363,10 +363,7 @@ class GhostConnector extends React.PureComponent<IGhostConnectorProps> {
 
 	private readonly _handleStopDrag: DraggableEventHandler = (_, __) => {
 		this.props.dispatch(connectionsActions.stopDraggingGhostConnector(
-			this.props.connectionId, {
-				x: this.props.parentX,
-				y: this.props.parentY,
-			}))
+			this.props.connectionId))
 	}
 }
 

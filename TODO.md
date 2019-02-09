@@ -297,6 +297,8 @@ instrument manager already handles all creation and destruction of instruments
 - [ ] review chrome autoplay fix
 	- https://developers.google.com/web/updates/2017/09/autoplay-policy-changes#webaudio
 - [√] instrument keeps playing afer owner leaves
+- [√] stop drag ghost connector running middleware func on all clients
+- [ ] when adding a new connector, one ghost connector is in wrong place
 
 # Warnings
 - [ ] [Violation] 'readystatechange' handler took 727ms - polling-xhr.js:242

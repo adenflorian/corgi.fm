@@ -60,10 +60,9 @@ export const connectionsActions = Object.freeze({
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	}),
-	stopDraggingGhostConnector: (id: string, connectorPosition: Pick<GhostConnectorRecord, 'x' | 'y'>) => ({
+	stopDraggingGhostConnector: (id: string) => ({
 		type: STOP_DRAGGING_GHOST_CONNECTOR as typeof STOP_DRAGGING_GHOST_CONNECTOR,
 		id,
-		connector: {...connectorPosition, status: GhostConnectorStatus.hidden} as GhostConnectorRecord,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	}),
@@ -147,7 +146,13 @@ const connectionsSpecificReducer: Reducer<IConnections, IConnectionAction> =
 			)
 			case STOP_DRAGGING_GHOST_CONNECTOR: {
 				return connections.update(action.id,
-					x => ({...x, ghostConnector: {...x.ghostConnector, ...action.connector}}),
+					x => ({
+						...x,
+						ghostConnector: {
+							...x.ghostConnector,
+							status: GhostConnectorStatus.hidden,
+						},
+					}),
 				)
 			}
 			default: return connections
