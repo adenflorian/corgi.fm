@@ -1,6 +1,12 @@
 import {Map} from 'immutable'
 import {Action, combineReducers, Reducer} from 'redux'
-import {basicSamplersReducer, basicSynthesizersReducer, chatReducer, connectionsReducer, CREATE_ROOM, DELETE_ROOM, globalClockReducer, gridSequencersReducer, IClientRoomState, infiniteSequencersReducer, IServerState, positionsReducer, roomMembersReducer, RoomsReduxAction, virtualKeyboardsReducer} from './index'
+import {
+	basicSamplersReducer, basicSynthesizersReducer, chatReducer,
+	connectionsReducer, CREATE_ROOM, DELETE_ROOM, globalClockReducer,
+	gridSequencersReducer, IClientRoomState, infiniteSequencersReducer,
+	IServerState, positionsReducer, roomMembersReducer,
+	RoomsReduxAction, virtualKeyboardsReducer,
+} from './index'
 
 export const ROOM_ACTION = 'ROOM_ACTION'
 type RoomAction = ReturnType<typeof createRoomAction>
@@ -11,7 +17,7 @@ export const createRoomAction = (action: Action, room: string) => ({
 })
 
 // Used on the client, because a client is only in one room at a time
-export const roomReducers = combineReducers<IClientRoomState>({
+export const roomReducers = combineReducers(Object.freeze({
 	basicSynthesizers: basicSynthesizersReducer,
 	basicSamplers: basicSamplersReducer,
 	chat: chatReducer,
@@ -22,7 +28,7 @@ export const roomReducers = combineReducers<IClientRoomState>({
 	members: roomMembersReducer,
 	positions: positionsReducer,
 	virtualKeyboards: virtualKeyboardsReducer,
-})
+}))
 
 const initialState = Map<string, IClientRoomState>()
 
