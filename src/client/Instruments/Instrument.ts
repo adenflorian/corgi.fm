@@ -59,12 +59,12 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> implement
 
 	public readonly connect = (destination: IAudioNodeWrapper, targetId: string) => {
 		this.disconnectAll()
-		this._gain.connect(destination.getInputAudioNode())
+		this.getOutputAudioNode().connect(destination.getInputAudioNode())
 		this._connectedTargetId = targetId
 	}
 
 	public readonly disconnectAll = () => {
-		this._gain.disconnect()
+		this.getOutputAudioNode().disconnect()
 		this._connectedTargetId = '-1'
 	}
 
