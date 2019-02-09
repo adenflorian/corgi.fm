@@ -56,7 +56,7 @@ export const NodeInfoMap = Map({
 	}),
 	[ConnectionNodeType.basicSynthesizer]: NodeInfoRecord({
 		stateSelector: selectBasicSynthesizer,
-		width: 416,
+		width: 464,
 		height: 56,
 	}),
 	[ConnectionNodeType.basicSampler]: NodeInfoRecord({

@@ -20,6 +20,10 @@ export class BasicSynthesizer extends Instrument<SynthVoices, SynthVoice> {
 		this._voices.setOscillatorType(type)
 	}
 
+	public setFineTuning = (fine: number) => {
+		this._voices.setFineTuning(fine)
+	}
+
 	public dispose = () => {
 		this._voices.dispose()
 
@@ -39,10 +43,11 @@ class SynthVoices extends Voices<SynthVoice> {
 	}
 
 	public setOscillatorType(type: ShamuOscillatorType) {
-		this._activeVoices
-			.concat(this._releasingVoices)
-			.concat(this._inactiveVoices)
-			.forEach(x => x.setOscillatorType(type))
+		this._allVoices.forEach(x => x.setOscillatorType(type))
+	}
+
+	public setFineTuning(fine: number) {
+		this._allVoices.forEach(x => x.setFineTuning(fine))
 	}
 }
 
@@ -51,6 +56,8 @@ class SynthVoice extends Voice {
 	private _oscillatorType: ShamuOscillatorType
 	private _nextOscillatorType: ShamuOscillatorType
 	private _whiteNoise: AudioBufferSourceNode
+	private _fineTuning: number = 0
+	private _frequency: number = 0
 	private readonly _noiseBuffer: AudioBuffer
 
 	constructor(audioContext: AudioContext, destination: AudioNode, oscType: ShamuOscillatorType) {
@@ -82,14 +89,24 @@ class SynthVoice extends Voice {
 		}
 	}
 
+	public setFineTuning = (fine: number) => {
+		this._fineTuning = fine
+		this._oscillator.frequency.value = this._applyFineTuning(this._frequency, this._fineTuning)
+	}
+
 	public dispose = () => {
 		this._deleteChain()
 		this._dispose()
 	}
 
 	private readonly _playSynthNote = (note: number) => {
-		this._oscillator.frequency.value = midiNoteToFrequency(note)
+		this._frequency = midiNoteToFrequency(note)
+		this._oscillator.frequency.value = this._applyFineTuning(this._frequency, this._fineTuning)
 		this._refreshOscillatorType()
+	}
+
+	private readonly _applyFineTuning = (baseFreq: number, fine: number) => {
+		return baseFreq + ((fine * 0.059454545454545) * baseFreq)
 	}
 
 	private readonly _refreshOscillatorType = () => {

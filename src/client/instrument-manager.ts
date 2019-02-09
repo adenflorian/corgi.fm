@@ -94,6 +94,7 @@ export const setupInstrumentManager =
 						instrument.setLowPassFilterCutoffFrequency(instrumentState.lowPassFilterCutoffFrequency)
 						instrument.setAttack(instrumentState.attack)
 						instrument.setRelease(instrumentState.release)
+						instrument.setFineTuning(instrumentState.fineTuning)
 					},
 				)
 			}

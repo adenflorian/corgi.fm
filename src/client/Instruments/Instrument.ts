@@ -150,6 +150,11 @@ export abstract class Voices<V extends Voice> {
 	protected _inactiveVoices: V[] = []
 	protected _activeVoices: V[] = []
 	protected _releasingVoices: V[] = []
+	protected get _allVoices() {
+		return this._inactiveVoices
+			.concat(this._activeVoices)
+			.concat(this._releasingVoices)
+	}
 
 	public playNote(note: number, attackTimeInSeconds: number) {
 		const voice = this._getVoice(note)
@@ -183,10 +188,7 @@ export abstract class Voices<V extends Voice> {
 	}
 
 	public dispose() {
-		this._inactiveVoices
-			.concat(this._releasingVoices)
-			.concat(this._activeVoices)
-			.forEach(x => x.dispose())
+		this._allVoices.forEach(x => x.dispose())
 	}
 
 	protected _getVoice(note: number): V {

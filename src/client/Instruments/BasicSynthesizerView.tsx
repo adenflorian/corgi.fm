@@ -33,6 +33,7 @@ interface IBasicSynthesizerViewReduxProps {
 	lowPassFilterCutoffFrequency: number
 	attack: number
 	release: number
+	fineTuning: number
 }
 
 export class BasicSynthesizerView
@@ -93,6 +94,14 @@ export class BasicSynthesizerView
 						label="release"
 						onChangeId={BasicSynthesizerParam.release}
 					/>
+					<Knob
+						min={-1}
+						max={1}
+						value={this.props.fineTuning}
+						onChange={this._dispatchChangeInstrumentParam}
+						label="fine"
+						onChangeId={BasicSynthesizerParam.fineTuning}
+					/>
 				</div>
 			</Panel>
 		)
@@ -123,6 +132,7 @@ export const ConnectedBasicSynthesizerView = connect(
 			lowPassFilterCutoffFrequency: instrumentState.lowPassFilterCutoffFrequency,
 			attack: instrumentState.attack,
 			release: instrumentState.release,
+			fineTuning: instrumentState.fineTuning,
 		}
 	},
 )(

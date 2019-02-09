@@ -41,6 +41,7 @@ export enum BasicSynthesizerParam {
 	lowPassFilterCutoffFrequency = 'lowPassFilterCutoffFrequency',
 	attack = 'attack',
 	release = 'release',
+	fineTuning = 'fineTuning',
 }
 
 export interface BasicSynthesizerAction extends AnyAction {
@@ -67,6 +68,7 @@ export class BasicSynthesizerState implements IConnectable {
 		release: 0,
 		color: false,
 		type: ConnectionNodeType.basicSynthesizer,
+		fineTuning: 0,
 	}
 
 	public readonly oscillatorType: ShamuOscillatorType
@@ -77,6 +79,7 @@ export class BasicSynthesizerState implements IConnectable {
 	public readonly lowPassFilterCutoffFrequency: number = Math.random() * 10000 + 1000
 	public readonly attack: number = 0.01
 	public readonly release: number = 1
+	public readonly fineTuning: number = 0
 	public readonly color: false = false
 	public readonly type = ConnectionNodeType.basicSynthesizer
 
