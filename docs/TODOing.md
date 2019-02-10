@@ -1,14 +1,17 @@
 # Now
-- [ ] reverb
+- [ ] convolution reverb
 	- [√] make it connected to audio output at server create stuff
 	- [√] remove reverb from master
-	- [ ] troubleshoot perf issues
+	- [√] troubleshoot perf issues
 		- Reverb buildImpulse keeps running
 			- because I'm setting the time value every update
 				- [√] stop that
-	- [ ] look into using different reverb
-	- [ ] make it sound good
-		- [ ] when time is changed, it rebuilds some reverb data
+	- [√] make it sound good
+		- ~~when time is changed, it rebuilds some reverb data~~
+			- this is how a convolver reverb works
+	- [√] make ui better
+	- [ ] make it get organized in create server stuff
+
 
 # Soon
 - [ ] add ability to add nodes
@@ -19,3 +22,7 @@
 		- keeping positions state where it is for now, the important thing is the actual node types
 	- [ ] change all the old multi things to use new graph state
 		- [ ] change selectors to grab from new graph state
+
+# Later
+- [ ] look into using an algorithmic reverb
+	- https://itnext.io/algorithmic-reverb-and-web-audio-api-e1ccec94621a

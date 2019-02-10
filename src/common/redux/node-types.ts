@@ -67,8 +67,8 @@ export const NodeInfoMap = Map({
 	}),
 	[ConnectionNodeType.simpleReverb]: NodeInfoRecord({
 		stateSelector: selectSimpleReverb,
-		width: 256,
-		height: 80,
+		width: 256 + 16,	// main width plus padding
+		height: 56,
 	}),
 	[ConnectionNodeType.audioOutput]: NodeInfoRecord({
 		stateSelector: () => ({

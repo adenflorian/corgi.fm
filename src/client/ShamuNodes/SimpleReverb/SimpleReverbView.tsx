@@ -30,24 +30,42 @@ export const SimpleReverbView: React.FC<ISimpleReverbAllProps> =
 				color={color}
 				saturate={isPlaying}
 			>
-				<Knob
-					label="time"
-					min={0}
-					max={30}
-					curve={3}
-					value={time}
-					onChange={changeParam}
-					onChangeId={SimpleReverbParam.time}
-				/>
-				<Knob
-					label="lpf"
-					min={0}
-					max={10000}
-					curve={2}
-					value={lpf}
-					onChange={changeParam}
-					onChangeId={SimpleReverbParam.lowPassFilterCutoffFrequency}
-				/>
+				<div
+					style={{
+						display: 'flex',
+						flexDirection: 'row',
+						padding: '0 8px',
+					}}
+				>
+					<div
+						style={{
+							display: 'flex',
+							flexDirection: 'column',
+							justifyContent: 'center',
+							alignItems: 'center',
+						}}
+					>
+						Simple Reverb (Convolution)
+				</div>
+					<Knob
+						label="time"
+						min={0}
+						max={30}
+						curve={3}
+						value={time}
+						onChange={changeParam}
+						onChangeId={SimpleReverbParam.time}
+					/>
+					<Knob
+						label="lpf"
+						min={0}
+						max={10000}
+						curve={2}
+						value={lpf}
+						onChange={changeParam}
+						onChangeId={SimpleReverbParam.lowPassFilterCutoffFrequency}
+					/>
+				</div>
 			</Panel>
 		)
 	}
