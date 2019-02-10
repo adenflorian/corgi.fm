@@ -1,13 +1,14 @@
 import * as Immutable from 'immutable'
 import {Store} from 'redux'
 import {ConnectionNodeType, IConnectable} from '../common/common-types'
-import {
-	BasicSynthesizerState, isAudioNodeType, MASTER_AUDIO_OUTPUT_TARGET_ID, selectAllBasicSynthesizerIds, selectAllSimpleReverbIds, selectBasicSynthesizer, selectConnectionsWithSourceIds, selectSimpleReverb, SimpleReverbState,
-} from '../common/redux'
+import {logger} from '../common/logger';
 import {IClientAppState, IClientRoomState} from '../common/redux'
 import {setGlobalClockIndex} from '../common/redux'
 import {
 	selectConnectionSourceNotesByTargetId,
+} from '../common/redux'
+import {
+	BasicSynthesizerState, IConnection, isAudioNodeType, MASTER_AUDIO_OUTPUT_TARGET_ID, selectAllBasicSynthesizerIds, selectAllSimpleReverbIds, selectBasicSynthesizer, selectConnectionsWithSourceIds, selectSimpleReverb, SimpleReverbState,
 } from '../common/redux'
 import {BasicSamplerState, selectAllSamplerIds, selectSampler} from '../common/redux'
 import {BasicSamplerInstrument} from './BasicSampler/BasicSamplerInstrument'
@@ -43,11 +44,12 @@ export const setupInstrumentManager =
 			MASTER_AUDIO_OUTPUT_TARGET_ID,
 			{
 				getInputAudioNode: () => preFx,
-				connect: () => null,
-				disconnectAll: () => null,
-				dispose: () => null,
 				getOutputAudioNode: () => preFx,
+				connect: () => null,
+				disconnect: () => null,
+				disconnectAll: () => null,
 				getConnectedTargets: () => Immutable.Map(),
+				dispose: () => null,
 			},
 		)
 
@@ -135,7 +137,7 @@ export const setupInstrumentManager =
 						}, instrumentState),
 					)
 
-					updateAudioConnections(instrumentId, instrument)
+					updateAudioConnectionsFromSource(state.room, instrumentId, instrument)
 
 					const sourceNotes = selectConnectionSourceNotesByTargetId(state.room, instrumentId)
 
@@ -189,50 +191,44 @@ export const setupInstrumentManager =
 						}, effectState),
 					)
 
-					updateAudioConnections(effectId, effect)
+					updateAudioConnectionsFromSource(state.room, effectId, effect)
 
 					if (updateSpecificEffect) updateSpecificEffect(effect, effectState)
 				})
 			}
-
-			function createIfNotExisting<T>(stuff: StuffMap, id: string, thing: any, thingFactory: () => T): T {
-				if (thing === undefined) {
-					thing = thingFactory()
-					stuff.set(id, thing)
-				}
-				return thing
-			}
-
-			function updateAudioConnections(audioNodeWrapperId: string, audioNodeWrapper: IAudioNodeWrapper) {
-
-				// TODO What do if multiple connections?
-				const outgoingConnections = selectConnectionsWithSourceIds(state.room, [audioNodeWrapperId])
-
-				let hasNewConnection = false
-
-				if (outgoingConnections.count() === 0) {
-					audioNodeWrapper.disconnectAll()
-				}
-
-				outgoingConnections.forEach(outgoingConnection => {
-					if (outgoingConnection && isAudioNodeType(outgoingConnection.targetType)) {
-						const targetAudioNodeWrapper = stuffMaps[outgoingConnection.targetType].get(outgoingConnection.targetId)
-
-						if (targetAudioNodeWrapper) {
-							if (audioNodeWrapper.getConnectedTargets().has(outgoingConnection.targetId) === false) {
-								if (hasNewConnection === false) {
-									hasNewConnection = true
-									audioNodeWrapper.disconnectAll()
-								}
-								audioNodeWrapper.connect(targetAudioNodeWrapper, outgoingConnection.targetId)
-							}
-						} else {
-							audioNodeWrapper.disconnectAll()
-						}
-					} else {
-						audioNodeWrapper.disconnectAll()
-					}
-				})
-			}
 		}
 	}
+
+function updateAudioConnectionsFromSource(roomState: IClientRoomState, sourceId: string, audioNodeWrapper: IAudioNodeWrapper) {
+	const outgoingConnections = selectConnectionsWithSourceIds(roomState, [sourceId])
+
+	if (outgoingConnections.count() === 0) {
+		return audioNodeWrapper.disconnectAll()
+	}
+
+	const validOutgoingConnections = outgoingConnections.filter(isConnectionToAudioNode)
+	const newConnections = validOutgoingConnections.filter(x => audioNodeWrapper.getConnectedTargets().has(x.targetId) === false)
+	const deletedTargetIds = audioNodeWrapper.getConnectedTargets().keySeq().filter(id => validOutgoingConnections.some(x => x.targetId === id) === false)
+
+	newConnections.forEach(newConnection => {
+		const targetAudioNodeWrapper = stuffMaps[newConnection.targetType].get(newConnection.targetId)
+		if (!targetAudioNodeWrapper) return
+		audioNodeWrapper.connect(targetAudioNodeWrapper, newConnection.targetId)
+	})
+
+	deletedTargetIds.forEach(deletedTargetId => {
+		audioNodeWrapper.disconnect(deletedTargetId)
+	})
+}
+
+function createIfNotExisting<T>(stuff: StuffMap, id: string, thing: any, thingFactory: () => T): T {
+	if (thing === undefined) {
+		thing = thingFactory()
+		stuff.set(id, thing)
+	}
+	return thing
+}
+
+function isConnectionToAudioNode(connection: IConnection) {
+	return isAudioNodeType(connection.targetType)
+}

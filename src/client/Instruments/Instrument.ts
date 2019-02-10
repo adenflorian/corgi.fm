@@ -1,6 +1,7 @@
 import {Map} from 'immutable'
 import uuid = require('uuid')
 import {IDisposable} from '../../common/common-types'
+import {logger} from '../../common/logger'
 import {emptyMidiNotes, IMidiNotes} from '../../common/MidiNote'
 import {Arp} from '../arp'
 
@@ -9,6 +10,7 @@ export interface IAudioNodeWrapper extends IDisposable {
 	getOutputAudioNode: () => AudioNode
 	getConnectedTargets: () => Map<string, IAudioNodeWrapper>
 	connect: (destination: IAudioNodeWrapper, targetId: string) => void
+	disconnect: (targetId: string) => void
 	disconnectAll: () => void
 }
 
@@ -30,6 +32,19 @@ export abstract class AudioNodeWrapper implements IAudioNodeWrapper {
 
 		this.getOutputAudioNode().connect(destination.getInputAudioNode())
 		this._connectedTargets = this._connectedTargets.set(targetId, destination)
+		logger.debug('AudioNodeWrapper.connect targetId: ', targetId)
+	}
+
+	public readonly disconnect = (targetId: string) => {
+		if (this._connectedTargets.count() === 0) return
+
+		const targetToDisconnect = this._connectedTargets.get(targetId)
+
+		if (!targetToDisconnect) return
+
+		this.getOutputAudioNode().disconnect(targetToDisconnect.getInputAudioNode())
+
+		this._connectedTargets = this._connectedTargets.delete(targetId)
 	}
 
 	public readonly disconnectAll = () => {
