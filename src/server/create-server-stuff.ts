@@ -102,6 +102,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 	// Do extra connections after calculating positions, so that it doesn't mess up positions
 	connectNodes(serverStuff.get('arp')!.source, serverStuff.get('arp2')!.target)
 
+	// Reverb
 	const simpleReverb = createSource({
 		name: 'Reverb A',
 		type: ConnectionNodeType.simpleReverb,
@@ -109,6 +110,8 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 
 	dispatchToRoom(addPosition(
 		makePosition({id: simpleReverb.id, targetType: ConnectionNodeType.simpleReverb})))
+
+	connectNodes(simpleReverb, masterAudioOutput)
 
 	interface CreateSourceAndTargetArgs {
 		source: CreateSourceArgs
