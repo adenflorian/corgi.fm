@@ -1,13 +1,7 @@
-import {Map} from 'immutable'
-import {Action, combineReducers} from 'redux'
-import {ActionType} from 'typesafe-actions'
-import * as uuid from 'uuid'
-import {ConnectionNodeType} from '../../common-types'
-import {
-	basicSamplersReducer, BasicSamplerState, basicSynthesizersReducer,
-	BasicSynthesizerState, gridSequencersReducer, GridSequencerState, infiniteSequencersReducer, InfiniteSequencerState, IPosition, makePosition, virtualKeyboardsReducer, VirtualKeyboardState,
-} from '../index'
-import {UPDATE_POSITIONS, UpdatePositionsAction} from '../positions-redux'
+import {combineReducers} from 'redux'
+import {IClientRoomState} from '../common-redux-types'
+import {basicSamplersReducer, basicSynthesizersReducer, gridSequencersReducer, infiniteSequencersReducer, virtualKeyboardsReducer} from '../index'
+import {IMultiState} from '../multi-reducer'
 
 // export const ADD_SHAMU_NODE = 'ADD_SHAMU_NODE'
 // export const DELETE_SHAMU_NODES = 'DELETE_SHAMU_NODES'
@@ -136,3 +130,19 @@ export const nodesReducer = combineReducers(Object.freeze({
 // }
 
 // const dummyNodeSpecialState: NodeSpecialState = GridSequencerState.dummy
+
+export const selectNodeIdsOwnedByClient = (state: IClientRoomState, clientId: string) => {
+	const nodes = state.shamuGraph.nodes as unknown as {[key: string]: IMultiState}
+
+	const ids: string[] = []
+
+	Object.keys(nodes).forEach(nodeKey => {
+		const things = nodes[nodeKey].things
+		Object.keys(things).forEach(thingKey => {
+			const thing = things[thingKey]
+			if (thing.ownerId === clientId) ids.push(thing.id)
+		})
+	})
+
+	return ids
+}

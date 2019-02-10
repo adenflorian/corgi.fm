@@ -1,5 +1,5 @@
 import {List, Map, Stack} from 'immutable'
-import {AnyAction, Reducer} from 'redux'
+import {AnyAction} from 'redux'
 import {createSelector} from 'reselect'
 import * as uuid from 'uuid'
 import {ConnectionNodeType} from '../common-types'
@@ -101,6 +101,7 @@ export class GridSequencerState implements IGridSequencerState, NodeSpecialState
 
 	public static dummy: IGridSequencerState = {
 		id: 'dummy',
+		ownerId: 'dummyOwner',
 		events: makeSequencerEvents(),
 		index: -1,
 		isPlaying: false,
@@ -117,6 +118,7 @@ export class GridSequencerState implements IGridSequencerState, NodeSpecialState
 	}
 
 	public readonly id: string = uuid.v4()
+	public readonly ownerId: string
 	public readonly events: SequencerEvents
 	public readonly index: number = -1
 	public readonly isPlaying: boolean = false
@@ -131,7 +133,8 @@ export class GridSequencerState implements IGridSequencerState, NodeSpecialState
 	public readonly type = ConnectionNodeType.gridSequencer
 	public readonly rate = 1
 
-	constructor(name: string, notesToShow: number, events?: SequencerEvents) {
+	constructor(ownerId: string, name: string, notesToShow: number, events?: SequencerEvents) {
+		this.ownerId = ownerId
 		this.name = name
 		this.color = colorFunc(hashbow(this.id)).desaturate(0.2).hsl().string()
 		this.events = events || createSequencerEvents(8)
@@ -218,8 +221,8 @@ const gridSequencerGlobalActionTypes = [
 	STOP_ALL,
 ]
 
-const gridSequencerReducer: Reducer<IGridSequencerState, AnyAction> =
-	(gridSequencer = new GridSequencerState('defaultName', 4), action) => {
+const gridSequencerReducer =
+	(gridSequencer: IGridSequencerState, action: AnyAction) => {
 		switch (action.type) {
 			case SET_GRID_SEQUENCER_NOTE:
 				if (action.note === undefined) {

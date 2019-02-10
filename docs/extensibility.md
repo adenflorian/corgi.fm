@@ -21,10 +21,12 @@ Let's say we want to make a new audio effect node called Delay (*folder* **new f
 		- [ ] node-types.ts (NodeInfoMap)
 		- [ ] room-stores-redux.ts (roomReducers)
 - [ ] *server*
-	- [ ] server-socket-listeners.ts
+	- [ ] create-server-stuff.ts (not sure if this would ever go away...)
+	- [√] server-socket-listeners.ts
 		- [√] syncState
 			- replaced with `shamuGraphActions.replace(selectShamuGraphState(roomState))` 2019-02-09
-		- [ ] onLeaveRoom
+		- [√] onLeaveRoom
+			- replaced with `deleteThingsAny(nodeIdsOwnedByClient)` 2019-02-09
 
 ### Summary:
 - 4 new files

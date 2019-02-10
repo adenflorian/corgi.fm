@@ -98,6 +98,7 @@ export class InfiniteSequencerState implements ISequencerState, IConnectable, No
 
 	public static dummy: InfiniteSequencerState = {
 		id: 'dummy',
+		ownerId: 'dummyOwner',
 		events: makeSequencerEvents(),
 		index: -1,
 		isPlaying: false,
@@ -114,6 +115,7 @@ export class InfiniteSequencerState implements ISequencerState, IConnectable, No
 	}
 
 	public readonly id: string = uuid.v4()
+	public readonly ownerId: string
 	public readonly events: SequencerEvents
 	public readonly index: number = -1
 	public readonly isPlaying: boolean = false
@@ -128,7 +130,8 @@ export class InfiniteSequencerState implements ISequencerState, IConnectable, No
 	public readonly type = ConnectionNodeType.infiniteSequencer
 	public readonly rate = 1
 
-	constructor(name: string, style: InfiniteSequencerStyle, events = makeSequencerEvents()) {
+	constructor(ownerId: string, name: string, style: InfiniteSequencerStyle, events = makeSequencerEvents()) {
+		this.ownerId = ownerId
 		this.name = name
 		this.color = colorFunc(hashbow(this.id)).desaturate(0.2).hsl().string()
 		this.events = events

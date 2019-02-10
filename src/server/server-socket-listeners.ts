@@ -4,7 +4,7 @@ import {Server, Socket} from 'socket.io'
 import {maxRoomNameLength} from '../common/common-constants'
 import {ClientId} from '../common/common-types'
 import {logger} from '../common/logger'
-import {addClient, addRoomMember, BroadcastAction, BROADCASTER_ACTION, CHANGE_ROOM, clientDisconnected, ClientState, connectionsActions, createRoom, createRoomAction, deleteBasicSamplers, deleteBasicSynthesizers, deletePositions, deleteRoom, deleteRoomMember, deleteVirtualKeyboards, getActionsBlacklist, IClientRoomState, IServerState, maxUsernameLength, ready, REQUEST_CREATE_ROOM, selectAllClients, selectAllConnections, selectAllMessages, selectAllPositions, selectAllRoomMemberIds, selectAllRoomNames, selectAllRoomStates, selectBasicSynthesizersByOwner, selectClientBySocketId, selectConnectionsWithSourceOrTargetIds, selectPositionsWithIds, selectRoomExists, selectRoomStateByName, selectSamplersByOwner, selectShamuGraphState, selectVirtualKeyboardsByOwner, setActiveRoom, setChat, setClients, setRoomMembers, setRooms, shamuGraphActions, updatePositions} from '../common/redux'
+import {addClient, addRoomMember, BroadcastAction, BROADCASTER_ACTION, CHANGE_ROOM, clientDisconnected, ClientState, connectionsActions, createRoom, createRoomAction, deletePositions, deleteRoom, deleteRoomMember, deleteThingsAny, getActionsBlacklist, IClientRoomState, IServerState, maxUsernameLength, ready, REQUEST_CREATE_ROOM, selectAllClients, selectAllConnections, selectAllMessages, selectAllPositions, selectAllRoomMemberIds, selectAllRoomNames, selectAllRoomStates, selectClientBySocketId, selectConnectionsWithSourceOrTargetIds, selectNodeIdsOwnedByClient, selectPositionsWithIds, selectRoomExists, selectRoomStateByName, selectShamuGraphState, setActiveRoom, setChat, setClients, setRoomMembers, setRooms, shamuGraphActions, updatePositions} from '../common/redux'
 import {WebSocketEvent} from '../common/server-constants'
 import {createServerStuff} from './create-server-stuff'
 
@@ -191,39 +191,30 @@ function onJoinRoom(io: Server, socket: Socket, room: string, serverStore: Store
 	io.to(getRoom(socket)).emit(WebSocketEvent.broadcast, addRoomMemberAction)
 }
 
+/** When a user leaves a room, tell all the other room members to delete that user's things */
 function onLeaveRoom(io: Server, socket: Socket, roomToLeave: string, serverStore: Store<IServerState>) {
 	const roomState = selectRoomStateByName(serverStore.getState(), roomToLeave)
 	if (!roomState) return logger.warn(`onLeaveRoom-couldn't find room state: roomToLeave: ${roomToLeave}`)
 	const clientId = selectClientBySocketId(serverStore.getState(), socket.id).id
 
-	const instrumentIdsToDelete = selectBasicSynthesizersByOwner(roomState, clientId).map(x => x.id)
-	const samplerIdsToDelete = selectSamplersByOwner(roomState, clientId).map(x => x.id)
-	const keyboardIdsToDelete = selectVirtualKeyboardsByOwner(roomState, clientId).map(x => x.id)
+	{
+		const nodeIdsOwnedByClient = selectNodeIdsOwnedByClient(roomState, clientId)
+		const connectionIdsToDelete = selectConnectionsWithSourceOrTargetIds(roomState, nodeIdsOwnedByClient)
+			.map(x => x.id)
+			.toList()
+		const deleteConnectionsAction = connectionsActions.delete(connectionIdsToDelete)
+		serverStore.dispatch(createRoomAction(deleteConnectionsAction, roomToLeave))
+		io.to(roomToLeave).emit(WebSocketEvent.broadcast, deleteConnectionsAction)
 
-	const sourceAndTargetIds = instrumentIdsToDelete.concat(keyboardIdsToDelete).concat(samplerIdsToDelete)
-	const connectionIdsToDelete = selectConnectionsWithSourceOrTargetIds(roomState, sourceAndTargetIds)
-		.map(x => x.id)
-		.toList()
-	const deleteConnectionsAction = connectionsActions.delete(connectionIdsToDelete)
-	serverStore.dispatch(createRoomAction(deleteConnectionsAction, roomToLeave))
-	io.to(roomToLeave).emit(WebSocketEvent.broadcast, deleteConnectionsAction)
+		const positionIdsToDelete = selectPositionsWithIds(roomState, nodeIdsOwnedByClient).map(x => x.id)
+		const deletePositionsAction = deletePositions(positionIdsToDelete)
+		serverStore.dispatch(createRoomAction(deletePositionsAction, roomToLeave))
+		io.to(roomToLeave).emit(WebSocketEvent.broadcast, deletePositionsAction)
 
-	const positionIdsToDelete = selectPositionsWithIds(roomState, sourceAndTargetIds).map(x => x.id)
-	const deletePositionsAction = deletePositions(positionIdsToDelete)
-	serverStore.dispatch(createRoomAction(deletePositionsAction, roomToLeave))
-	io.to(roomToLeave).emit(WebSocketEvent.broadcast, deletePositionsAction)
-
-	const deleteBasicSynthesizersAction = deleteBasicSynthesizers(instrumentIdsToDelete)
-	serverStore.dispatch(createRoomAction(deleteBasicSynthesizersAction, roomToLeave))
-	io.to(roomToLeave).emit(WebSocketEvent.broadcast, deleteBasicSynthesizersAction)
-
-	const deleteBasicSamplersAction = deleteBasicSamplers(samplerIdsToDelete)
-	serverStore.dispatch(createRoomAction(deleteBasicSamplersAction, roomToLeave))
-	io.to(roomToLeave).emit(WebSocketEvent.broadcast, deleteBasicSamplersAction)
-
-	const deleteVirtualKeyboardsAction = deleteVirtualKeyboards(keyboardIdsToDelete)
-	serverStore.dispatch(createRoomAction(deleteVirtualKeyboardsAction, roomToLeave))
-	io.to(roomToLeave).emit(WebSocketEvent.broadcast, deleteVirtualKeyboardsAction)
+		const deleteNodes = deleteThingsAny(nodeIdsOwnedByClient)
+		serverStore.dispatch(createRoomAction(deleteNodes, roomToLeave))
+		io.to(roomToLeave).emit(WebSocketEvent.broadcast, deleteNodes)
+	}
 
 	const deleteRoomMemberAction = deleteRoomMember(clientId)
 	serverStore.dispatch(createRoomAction(deleteRoomMemberAction, roomToLeave))

@@ -13,6 +13,7 @@ export interface IMultiStateThings {
 
 export const dummyMultiStateThing: IMultiStateThing = Object.freeze({
 	id: '-1',
+	ownerId: '-2',
 	color: 'black',
 	type: ConnectionNodeType.dummy,
 })
@@ -53,6 +54,17 @@ export const deleteThings = (
 	...expandNetActionType(netActionType),
 })
 
+export const DELETE_MULTI_THINGS_ANY = 'DELETE_MULTI_THINGS_ANY'
+type DeleteMultiThingsAnyAction = ReturnType<typeof deleteThingsAny>
+export const deleteThingsAny = (
+	thingIds: string[],
+	netActionType: NetworkActionType = NetworkActionType.NO,
+) => ({
+	type: DELETE_MULTI_THINGS_ANY as typeof DELETE_MULTI_THINGS_ANY,
+	thingIds,
+	...expandNetActionType(netActionType),
+})
+
 export const DELETE_ALL_THINGS = 'DELETE_ALL_THINGS'
 type DeleteAllThingsAction = ReturnType<typeof deleteAllThings>
 export const deleteAllThings = (thingType: ConnectionNodeType) => ({
@@ -74,7 +86,8 @@ export const updateThings = (
 })
 
 export type MultiThingAction =
-	UpdateMultiThingsAction | AddMultiThingAction | DeleteMultiThingsAction | DeleteAllThingsAction
+	UpdateMultiThingsAction | AddMultiThingAction |
+	DeleteMultiThingsAction | DeleteAllThingsAction | DeleteMultiThingsAnyAction
 	| {type: '', id: string}
 
 // TODO Use immutable js like connections redux
@@ -97,11 +110,17 @@ export function makeMultiReducer<T extends IMultiStateThing, U extends IMultiSta
 						[action.thing.id]: getConnectionNodeInfo(thingType).stateDeserializer(action.thing),
 					},
 				}
-			case DELETE_MULTI_THINGS:
+			case DELETE_MULTI_THINGS: {
 				if (action.thingType !== thingType) return state
 				const newState = {...state, things: {...state.things}}
 				action.thingIds.forEach(x => delete newState.things[x])
 				return newState
+			}
+			case DELETE_MULTI_THINGS_ANY: {
+				const newState = {...state, things: {...state.things}}
+				action.thingIds.forEach(x => delete newState.things[x])
+				return newState
+			}
 			case DELETE_ALL_THINGS:
 				if (action.thingType !== thingType) return state
 				return {...state, things: {}}
