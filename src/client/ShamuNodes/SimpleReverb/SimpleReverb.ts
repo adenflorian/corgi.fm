@@ -1,8 +1,8 @@
-import Reverb from 'soundbank-reverb'
+import Reverb, {ReverbNode} from 'soundbank-reverb'
 import {IAudioNodeWrapper, IAudioNodeWrapperOptions} from '../../Instruments/Instrument'
 
 export class SimpleReverb implements IAudioNodeWrapper {
-	private readonly _reverbNode: Reverb
+	private readonly _reverbNode: ReverbNode
 	private _connectedTargetId: string = '-1'
 
 	constructor(options: IAudioNodeWrapperOptions) {
