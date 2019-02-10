@@ -253,7 +253,7 @@ function infiniteSequencerReducer(
 	}
 }
 
-export const selectAllInfiniteSequencers = (state: IClientRoomState) => state.infiniteSequencers.things
+export const selectAllInfiniteSequencers = (state: IClientRoomState) => state.shamuGraph.nodes.infiniteSequencers.things
 
 export const selectInfiniteSequencer = (state: IClientRoomState, id: string) => selectAllInfiniteSequencers(state)[id] || InfiniteSequencerState.dummy
 

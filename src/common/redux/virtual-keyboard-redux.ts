@@ -200,7 +200,7 @@ export interface IMidi {
 }
 
 export const selectAllVirtualKeyboards = (state: IClientRoomState) =>
-	state.virtualKeyboards.things
+	state.shamuGraph.nodes.virtualKeyboards.things
 
 export const selectAllVirtualKeyboardsArray = (state: IClientRoomState) => {
 	const keyboards = selectAllVirtualKeyboards(state)

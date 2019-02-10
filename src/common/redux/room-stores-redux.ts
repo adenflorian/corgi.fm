@@ -19,17 +19,12 @@ export const createRoomAction = (action: Action, room: string) => ({
 
 // Used on the client, because a client is only in one room at a time
 export const roomReducers = combineReducers(Object.freeze({
-	basicSynthesizers: basicSynthesizersReducer,
-	basicSamplers: basicSamplersReducer,
 	chat: chatReducer,
 	connections: connectionsReducer,
 	globalClock: globalClockReducer,
-	gridSequencers: gridSequencersReducer,
-	infiniteSequencers: infiniteSequencersReducer,
 	members: roomMembersReducer,
 	positions: positionsReducer,
 	shamuGraph: shamuGraphReducer,
-	virtualKeyboards: virtualKeyboardsReducer,
 }))
 
 const initialState = Map<string, IClientRoomState>()

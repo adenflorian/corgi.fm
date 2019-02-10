@@ -87,7 +87,7 @@ function basicSamplerReducer(basicSampler: BasicSamplerState, action: AnyAction)
 	}
 }
 
-export const selectAllSamplers = (state: IClientRoomState) => state.basicSamplers.things
+export const selectAllSamplers = (state: IClientRoomState) => state.shamuGraph.nodes.basicSamplers.things
 
 export const selectAllSamplerIds = (state: IClientRoomState) => Object.keys(selectAllSamplers(state))
 

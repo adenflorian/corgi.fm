@@ -117,7 +117,7 @@ function basicSynthesizerReducer(basicSynthesizer: BasicSynthesizerState, action
 	}
 }
 
-export const selectAllBasicSynthesizers = (state: IClientRoomState) => state.basicSynthesizers.things
+export const selectAllBasicSynthesizers = (state: IClientRoomState) => state.shamuGraph.nodes.basicSynthesizers.things
 
 export const selectAllBasicSynthesizersAsArray =
 	createSelectAllOfThingAsArray<IBasicSynthesizers, BasicSynthesizerState>(selectAllBasicSynthesizers)

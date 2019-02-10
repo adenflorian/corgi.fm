@@ -291,7 +291,7 @@ export const gridSequencersReducer =
 		gridSequencerActionTypes, gridSequencerGlobalActionTypes,
 	)
 
-export const selectAllGridSequencers = (state: IClientRoomState) => state.gridSequencers.things
+export const selectAllGridSequencers = (state: IClientRoomState) => state.shamuGraph.nodes.gridSequencers.things
 
 export const selectAllGridSequencerIds = createSelector(
 	selectAllGridSequencers,

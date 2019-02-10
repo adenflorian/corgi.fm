@@ -10,10 +10,9 @@ import {
 	Connection, connectionsActions, createRoomAction,
 	createSequencerEvents, GridSequencerState, IConnection,
 	IConnections, InfiniteSequencerState,
-	InfiniteSequencerStyle, IPositions, IServerState,
-	makeNodeState, makePosition,
+	InfiniteSequencerStyle, IPositions, IServerState, makePosition,
 	makeSequencerEvents, MASTER_AUDIO_OUTPUT_TARGET_ID,
-	MASTER_CLOCK_SOURCE_ID, NodeSpecialState, selectAllConnections, selectAllPositions, selectConnectionsWithTargetIds, selectConnectionsWithTargetIds2, SequencerEvents, shamuNodesActions, updatePositions,
+	MASTER_CLOCK_SOURCE_ID, NodeSpecialState, selectAllConnections, selectAllPositions, selectConnectionsWithTargetIds, selectConnectionsWithTargetIds2, SequencerEvents, updatePositions,
 } from '../common/redux'
 
 const masterAudioOutput: IConnectable = Object.freeze({
@@ -39,8 +38,6 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 
 	dispatchToRoom(addPosition(
 		makePosition({id: MASTER_AUDIO_OUTPUT_TARGET_ID, targetType: ConnectionNodeType.audioOutput})))
-
-	makeServerOwnedNode(ConnectionNodeType.basicSampler, new BasicSamplerState(serverClient.id))
 
 	const serverStuffDefinitions = Object.freeze({
 		bass: {
@@ -150,12 +147,12 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 			case ConnectionNodeType.gridSequencer:
 				const x = new GridSequencerState(args.name, args.notesToShow || 24, args.events)
 				dispatchToRoom(addGridSequencer(x))
-				makeServerOwnedNode(args.type, x)
+				// makeServerOwnedNode(args.type, x)
 				return x
 			case ConnectionNodeType.infiniteSequencer:
 				const y = new InfiniteSequencerState(args.name, args.infinityStyle || InfiniteSequencerStyle.colorGrid, args.events)
 				dispatchToRoom(addInfiniteSequencer(y))
-				makeServerOwnedNode(args.type, y)
+				// makeServerOwnedNode(args.type, y)
 				return y
 			default:
 				throw new Error('Invalid type')
@@ -167,12 +164,12 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 			case ConnectionNodeType.basicSynthesizer:
 				const x = new BasicSynthesizerState(serverClient.id)
 				dispatchToRoom(addBasicSynthesizer(x))
-				makeServerOwnedNode(type, x)
+				// makeServerOwnedNode(type, x)
 				return x
 			case ConnectionNodeType.basicSampler:
 				const y = new BasicSamplerState(serverClient.id)
 				dispatchToRoom(addBasicSampler(y))
-				makeServerOwnedNode(type, y)
+				// makeServerOwnedNode(type, y)
 				return y
 			default:
 				throw new Error('Invalid type')
@@ -188,13 +185,13 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 		)))
 	}
 
-	function makeServerOwnedNode(type: ConnectionNodeType, specialState: NodeSpecialState) {
-		return dispatchToRoom(shamuNodesActions.add(makeNodeState({
-			ownerId: serverClient.id,
-			type,
-			specialState,
-		})))
-	}
+	// function makeServerOwnedNode(type: ConnectionNodeType, specialState: NodeSpecialState) {
+	// 	return dispatchToRoom(shamuNodesActions.add(makeNodeState({
+	// 		ownerId: serverClient.id,
+	// 		type,
+	// 		specialState,
+	// 	})))
+	// }
 
 	function dispatchToRoom(action: Action) {
 		return serverStore.dispatch(createRoomAction(action, room))
