@@ -1,3 +1,4 @@
+import {Map} from 'immutable'
 import uuid = require('uuid')
 import {IDisposable} from '../../common/common-types'
 import {emptyMidiNotes, IMidiNotes} from '../../common/MidiNote'
@@ -6,13 +7,37 @@ import {Arp} from '../arp'
 export interface IAudioNodeWrapper extends IDisposable {
 	getInputAudioNode: () => AudioNode
 	getOutputAudioNode: () => AudioNode
+	getConnectedTargets: () => Map<string, IAudioNodeWrapper>
 	connect: (destination: IAudioNodeWrapper, targetId: string) => void
 	disconnectAll: () => void
-	getConnectedTargetId: () => string
 }
 
 export interface IAudioNodeWrapperOptions {
 	audioContext: AudioContext
+}
+
+export abstract class AudioNodeWrapper implements IAudioNodeWrapper {
+	public abstract getInputAudioNode: () => AudioNode
+	public abstract getOutputAudioNode: () => AudioNode
+	public abstract dispose: () => void
+
+	private _connectedTargets = Map<string, IAudioNodeWrapper>()
+
+	public readonly getConnectedTargets = () => this._connectedTargets
+
+	public readonly connect = (destination: IAudioNodeWrapper, targetId: string) => {
+		if (this._connectedTargets.has(targetId)) return
+
+		this.getOutputAudioNode().connect(destination.getInputAudioNode())
+		this._connectedTargets = this._connectedTargets.set(targetId, destination)
+	}
+
+	public readonly disconnectAll = () => {
+		if (this._connectedTargets.count() === 0) return
+
+		this.getOutputAudioNode().disconnect()
+		this._connectedTargets = this._connectedTargets.clear()
+	}
 }
 
 export interface IInstrument extends IDisposable, IAudioNodeWrapper {
@@ -24,7 +49,7 @@ export interface IInstrument extends IDisposable, IAudioNodeWrapper {
 	getActivityLevel: () => number
 }
 
-export abstract class Instrument<T extends Voices<V>, V extends Voice> implements IInstrument {
+export abstract class Instrument<T extends Voices<V>, V extends Voice> extends AudioNodeWrapper {
 	protected readonly _panNode: StereoPannerNode
 	protected readonly _audioContext: AudioContext
 	protected readonly _lowPassFilter: BiquadFilterNode
@@ -33,9 +58,10 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> implement
 	private _previousNotes = emptyMidiNotes
 	private _attackTimeInSeconds: number = 0.01
 	private _releaseTimeInSeconds: number = 3
-	private _connectedTargetId: string = '-1'
 
 	constructor(options: IInstrumentOptions, startingGainValue: number) {
+		super()
+
 		this._audioContext = options.audioContext
 
 		this._panNode = this._audioContext.createStereoPanner()
@@ -54,31 +80,12 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> implement
 
 		this._panNode.connect(this._lowPassFilter)
 		this._lowPassFilter.connect(this._gain)
-
-		if (module.hot) {
-			module.hot.dispose(this.dispose)
-		}
 	}
 
-	public readonly connect = (destination: IAudioNodeWrapper, targetId: string) => {
-		this.disconnectAll()
-		this.getOutputAudioNode().connect(destination.getInputAudioNode())
-		this._connectedTargetId = targetId
-	}
+	public readonly getInputAudioNode = () => this._gain
+	public readonly getOutputAudioNode = () => this._gain
 
-	public readonly disconnectAll = () => {
-		this.getOutputAudioNode().disconnect()
-		this._connectedTargetId = '-1'
-	}
-
-	public readonly getConnectedTargetId = () => this._connectedTargetId
-
-	// TODO Not sure if this will be ok, might need a dummy node?
-	public getInputAudioNode = () => this._gain
-
-	public getOutputAudioNode = () => this._gain
-
-	public setPan = (pan: number) => {
+	public readonly setPan = (pan: number) => {
 		// Rounding to nearest to 32 bit number because AudioParam values are 32 bit floats
 		const newPan = Math.fround(pan)
 		if (newPan !== this._panNode.pan.value) {
@@ -86,7 +93,7 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> implement
 		}
 	}
 
-	public setLowPassFilterCutoffFrequency = (frequency: number) => {
+	public readonly setLowPassFilterCutoffFrequency = (frequency: number) => {
 		// Rounding to nearest to 32 bit number because AudioParam values are 32 bit floats
 		const newFreq = Math.fround(frequency)
 		if (newFreq !== this._lowPassFilter.frequency.value) {
@@ -94,7 +101,7 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> implement
 		}
 	}
 
-	public setMidiNotes = (midiNotes: IMidiNotes) => {
+	public readonly setMidiNotes = (midiNotes: IMidiNotes) => {
 		const arp = false
 
 		if (arp) {
@@ -104,13 +111,11 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> implement
 		}
 	}
 
-	public setAttack = (attackTimeInSeconds: number) => this._attackTimeInSeconds = attackTimeInSeconds
+	public readonly setAttack = (attackTimeInSeconds: number) => this._attackTimeInSeconds = attackTimeInSeconds
 
-	public setRelease = (releaseTimeInSeconds: number) => this._releaseTimeInSeconds = releaseTimeInSeconds
+	public readonly setRelease = (releaseTimeInSeconds: number) => this._releaseTimeInSeconds = releaseTimeInSeconds
 
-	public getActivityLevel = () => this._getVoices().getActivityLevel()
-
-	public abstract dispose(): void
+	public readonly getActivityLevel = () => this._getVoices().getActivityLevel()
 
 	protected _dispose = () => {
 		this._panNode.disconnect()

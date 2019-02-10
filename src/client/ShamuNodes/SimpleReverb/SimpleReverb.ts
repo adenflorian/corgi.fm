@@ -1,11 +1,19 @@
 import Reverb, {ReverbNode} from 'soundbank-reverb'
-import {IAudioNodeWrapper, IAudioNodeWrapperOptions} from '../../Instruments/Instrument'
+import {AudioNodeWrapper, IAudioNodeWrapperOptions} from '../../Instruments/Instrument'
 
-export class SimpleReverb implements IAudioNodeWrapper {
+// TODO Add other Reverb params
+//   - [√] time: number
+//   - [√] cutoff: AudioParam
+//   - [ ] decay: number
+//   - [ ] reverse: boolean
+//   - [ ] wet: GainNode
+//   - [ ] dry: GainNode
+//   - [ ] filterType: BiquadFilterType
+export class SimpleReverb extends AudioNodeWrapper {
 	private readonly _reverbNode: ReverbNode
-	private _connectedTargetId: string = '-1'
 
 	constructor(options: IAudioNodeWrapperOptions) {
+		super()
 		this._reverbNode = Reverb(options.audioContext)
 		this._reverbNode.time = 3.5
 		this._reverbNode.cutoff.value = 2000
@@ -29,19 +37,6 @@ export class SimpleReverb implements IAudioNodeWrapper {
 			this._reverbNode.cutoff.value = newCutoff
 		}
 	}
-
-	public readonly connect = (destination: IAudioNodeWrapper, targetId: string) => {
-		this.disconnectAll()
-		this.getOutputAudioNode().connect(destination.getInputAudioNode())
-		this._connectedTargetId = targetId
-	}
-
-	public readonly disconnectAll = () => {
-		this.getOutputAudioNode().disconnect()
-		this._connectedTargetId = '-1'
-	}
-
-	public readonly getConnectedTargetId = () => this._connectedTargetId
 
 	public readonly dispose = () => {
 		this._reverbNode.disconnect()

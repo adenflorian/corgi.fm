@@ -1,0 +1,14 @@
+- 2019-02-09 - 2019-02-10
+	- [√] convolution reverb (initial impl)
+		- [√] make it connected to audio output at server create stuff
+		- [√] remove reverb from master
+		- [√] troubleshoot perf issues
+			- Reverb buildImpulse keeps running
+				- because I'm setting the time value every update
+					- [√] stop that
+		- [√] make it sound good
+			- ~~when time is changed, it rebuilds some reverb data~~
+				- this is how a convolver reverb works
+		- [√] make ui better
+		- [√] make it get organized in create server stuff
+		- [√] make everything go through the reverb before audio output

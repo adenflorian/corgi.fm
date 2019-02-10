@@ -1,14 +1,15 @@
+import * as Immutable from 'immutable'
 import {Store} from 'redux'
 import {ConnectionNodeType, IConnectable} from '../common/common-types'
 import {
 	BasicSynthesizerState, isAudioNodeType, MASTER_AUDIO_OUTPUT_TARGET_ID, selectAllBasicSynthesizerIds, selectAllSimpleReverbIds, selectBasicSynthesizer, selectConnectionsWithSourceIds, selectSimpleReverb, SimpleReverbState,
 } from '../common/redux'
-import {BasicSamplerState, selectAllSamplerIds, selectSampler} from '../common/redux'
 import {IClientAppState, IClientRoomState} from '../common/redux'
 import {setGlobalClockIndex} from '../common/redux'
 import {
 	selectConnectionSourceNotesByTargetId,
 } from '../common/redux'
+import {BasicSamplerState, selectAllSamplerIds, selectSampler} from '../common/redux'
 import {BasicSamplerInstrument} from './BasicSampler/BasicSamplerInstrument'
 import {GridSequencerPlayer} from './GridSequencerPlayer'
 import {BasicSynthesizer} from './Instruments/BasicSynthesizer'
@@ -46,7 +47,7 @@ export const setupInstrumentManager =
 				disconnectAll: () => null,
 				dispose: () => null,
 				getOutputAudioNode: () => preFx,
-				getConnectedTargetId: () => '-1',
+				getConnectedTargets: () => Immutable.Map(),
 			},
 		)
 
@@ -205,21 +206,33 @@ export const setupInstrumentManager =
 			function updateAudioConnections(audioNodeWrapperId: string, audioNodeWrapper: IAudioNodeWrapper) {
 
 				// TODO What do if multiple connections?
-				const outgoingConnection = selectConnectionsWithSourceIds(state.room, [audioNodeWrapperId]).first(null)
+				const outgoingConnections = selectConnectionsWithSourceIds(state.room, [audioNodeWrapperId])
 
-				if (outgoingConnection && isAudioNodeType(outgoingConnection.targetType)) {
-					const targetAudioNodeWrapper = stuffMaps[outgoingConnection.targetType].get(outgoingConnection.targetId)
+				let hasNewConnection = false
 
-					if (targetAudioNodeWrapper) {
-						if (audioNodeWrapper.getConnectedTargetId() !== outgoingConnection.targetId) {
-							audioNodeWrapper.connect(targetAudioNodeWrapper, outgoingConnection.targetId)
+				if (outgoingConnections.count() === 0) {
+					audioNodeWrapper.disconnectAll()
+				}
+
+				outgoingConnections.forEach(outgoingConnection => {
+					if (outgoingConnection && isAudioNodeType(outgoingConnection.targetType)) {
+						const targetAudioNodeWrapper = stuffMaps[outgoingConnection.targetType].get(outgoingConnection.targetId)
+
+						if (targetAudioNodeWrapper) {
+							if (audioNodeWrapper.getConnectedTargets().has(outgoingConnection.targetId) === false) {
+								if (hasNewConnection === false) {
+									hasNewConnection = true
+									audioNodeWrapper.disconnectAll()
+								}
+								audioNodeWrapper.connect(targetAudioNodeWrapper, outgoingConnection.targetId)
+							}
+						} else {
+							audioNodeWrapper.disconnectAll()
 						}
 					} else {
 						audioNodeWrapper.disconnectAll()
 					}
-				} else {
-					audioNodeWrapper.disconnectAll()
-				}
+				})
 			}
 		}
 	}
