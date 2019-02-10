@@ -16,24 +16,26 @@ export function setupAudioContext(audioContext: AudioContext, preFx: GainNode, s
 
 	const master = audioContext.createGain()
 
-	const reverbHigh = Reverb(audioContext)
-	reverbHigh.time = 0.9
-	reverbHigh.cutoff.value = 5000
+	// const reverbHigh = Reverb(audioContext)
+	// reverbHigh.time = 0.9
+	// reverbHigh.cutoff.value = 5000
 
-	const reverb = Reverb(audioContext)
-	reverb.time = 3.5
-	reverb.cutoff.value = 2000
+	// const reverb = Reverb(audioContext)
+	// reverb.time = 3.5
+	// reverb.cutoff.value = 2000
 
-	const reverbLowAndLong = Reverb(audioContext)
-	reverbLowAndLong.time = 20
-	reverbLowAndLong.cutoff.value = 150
+	// const reverbLowAndLong = Reverb(audioContext)
+	// reverbLowAndLong.time = 20
+	// reverbLowAndLong.cutoff.value = 150
 
-	preFx.connect(reverbHigh)
-		.connect(master)
-	preFx.connect(reverb)
-		.connect(master)
-	preFx.connect(reverbLowAndLong)
-		.connect(master)
+	// preFx.connect(reverbHigh)
+	// 	.connect(master)
+	// preFx.connect(reverb)
+	// 	.connect(master)
+	// preFx.connect(reverbLowAndLong)
+	// 	.connect(master)
+
+	preFx.connect(master)
 
 	const analyser = audioContext.createAnalyser()
 	analyser.smoothingTimeConstant = 0.3

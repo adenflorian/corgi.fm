@@ -1,7 +1,7 @@
 # Now
 - [ ] reverb
 	- [√] make it connected to audio output at server create stuff
-	- [ ] remove reverb from master
+	- [√] remove reverb from master
 	- [ ] make it sound good
 
 # Soon
