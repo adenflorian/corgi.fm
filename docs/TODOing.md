@@ -2,7 +2,13 @@
 - [ ] reverb
 	- [√] make it connected to audio output at server create stuff
 	- [√] remove reverb from master
+	- [ ] troubleshoot perf issues
+		- Reverb buildImpulse keeps running
+			- because I'm setting the time value every update
+				- [√] stop that
+	- [ ] look into using different reverb
 	- [ ] make it sound good
+		- [ ] when time is changed, it rebuilds some reverb data
 
 # Soon
 - [ ] add ability to add nodes
