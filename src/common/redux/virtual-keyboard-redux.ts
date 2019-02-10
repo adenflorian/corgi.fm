@@ -17,7 +17,6 @@ export interface VirtualKeyAction {
 	keys?: IMidiNotes
 }
 
-export const ADD_VIRTUAL_KEYBOARD = 'ADD_VIRTUAL_KEYBOARD'
 export const addVirtualKeyboard = (virtualKeyboard: IVirtualKeyboardState) =>
 	addMultiThing(virtualKeyboard, ConnectionNodeType.virtualKeyboard, NetworkActionType.SERVER_AND_BROADCASTER)
 

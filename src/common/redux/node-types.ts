@@ -4,6 +4,7 @@ import {IMidiNote} from '../MidiNote'
 import {CssColor} from '../shamu-color'
 import {GridSequencerState, IClientRoomState, InfiniteSequencerState, makeGetKeyboardMidiOutput, selectBasicSynthesizer, selectGridSequencer, selectGridSequencerActiveNotes, selectGridSequencerIsActive, selectGridSequencerIsSending, selectInfiniteSequencer, selectInfiniteSequencerActiveNotes, selectInfiniteSequencerIsActive, selectInfiniteSequencerIsSending, selectSampler, selectVirtualKeyboardById, selectVirtualKeyboardIsActive, selectVirtualKeyboardIsSending} from './index'
 import {deserializeSequencerState} from './sequencer-redux'
+import {selectSimpleReverb} from './simple-reverb-redux'
 import {VirtualKeyboardState} from './virtual-keyboard-redux'
 
 export const MASTER_AUDIO_OUTPUT_TARGET_ID = 'MASTER_AUDIO_OUTPUT_TARGET_ID'
@@ -64,6 +65,11 @@ export const NodeInfoMap = Map({
 		width: 416,
 		height: 56,
 	}),
+	[ConnectionNodeType.simpleReverb]: NodeInfoRecord({
+		stateSelector: selectSimpleReverb,
+		width: 256,
+		height: 80,
+	}),
 	[ConnectionNodeType.audioOutput]: NodeInfoRecord({
 		stateSelector: () => ({
 			id: MASTER_AUDIO_OUTPUT_TARGET_ID,
@@ -92,6 +98,7 @@ export function isAudioNodeType(type: ConnectionNodeType) {
 		ConnectionNodeType.basicSynthesizer,
 		ConnectionNodeType.basicSampler,
 		ConnectionNodeType.audioOutput,
+		ConnectionNodeType.simpleReverb,
 	].includes(type)
 }
 

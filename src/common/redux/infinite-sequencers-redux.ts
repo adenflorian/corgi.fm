@@ -9,7 +9,6 @@ import {addMultiThing, BROADCASTER_ACTION, CLEAR_SEQUENCER, createSequencerEvent
 import {makeSequencerEvents, SequencerEvents} from './sequencer-redux'
 import {NodeSpecialState} from './shamu-graph'
 
-export const ADD_INFINITE_SEQUENCER = 'ADD_INFINITE_SEQUENCER'
 export const addInfiniteSequencer = (infiniteSequencer: InfiniteSequencerState) =>
 	addMultiThing(infiniteSequencer, ConnectionNodeType.infiniteSequencer, NetworkActionType.SERVER_AND_BROADCASTER)
 

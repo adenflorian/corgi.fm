@@ -1,8 +1,7 @@
 import {Store} from 'redux'
 import {ConnectionNodeType, IConnectable} from '../common/common-types'
-import {IDisposable} from '../common/common-types'
 import {
-	BasicSynthesizerState, isAudioNodeType, MASTER_AUDIO_OUTPUT_TARGET_ID, selectAllBasicSynthesizerIds, selectBasicSynthesizer, selectConnectionSourceColorByTargetId, selectConnectionsWithSourceIds,
+	BasicSynthesizerState, isAudioNodeType, MASTER_AUDIO_OUTPUT_TARGET_ID, selectAllBasicSynthesizerIds, selectAllSimpleReverbIds, selectBasicSynthesizer, selectConnectionsWithSourceIds, selectSimpleReverb, SimpleReverbState,
 } from '../common/redux'
 import {BasicSamplerState, selectAllSamplerIds, selectSampler} from '../common/redux'
 import {IClientAppState, IClientRoomState} from '../common/redux'
@@ -13,12 +12,17 @@ import {
 import {BasicSamplerInstrument} from './BasicSampler/BasicSamplerInstrument'
 import {GridSequencerPlayer} from './GridSequencerPlayer'
 import {BasicSynthesizer} from './Instruments/BasicSynthesizer'
-import {IAudioNodeWrapper, IInstrument, IInstrumentOptions} from './Instruments/Instrument'
+import {IAudioNodeWrapper, IAudioNodeWrapperOptions, IInstrument, IInstrumentOptions} from './Instruments/Instrument'
+import {SimpleReverb} from './ShamuNodes/SimpleReverb/SimpleReverb'
 
-type InstrumentIdsSelector = (roomState: IClientRoomState) => string[]
-type InstrumentStateSelector<S> = (roomState: IClientRoomState, id: string) => S
+type IdsSelector = (roomState: IClientRoomState) => string[]
+type StateSelector<S> = (roomState: IClientRoomState, id: string) => S
+
 type InstrumentFactory<I extends IInstrument, S> = (options: IInstrumentOptions, instrumentState: S) => I
 type UpdateSpecificInstrument<I extends IInstrument, S> = (instrument: I, instrumentState: S) => void
+
+type EffectFactory<E, S> = (options: IAudioNodeWrapperOptions, effectState: S) => E
+type UpdateSpecificEffect<E, S> = (effect: E, effectState: S) => void
 
 class StuffMap extends Map<string, IAudioNodeWrapper> {}
 
@@ -28,6 +32,7 @@ const stuffMaps: {[key: string]: StuffMap} = Object.freeze({
 	[ConnectionNodeType.basicSampler]: new StuffMap(),
 	[ConnectionNodeType.basicSynthesizer]: new StuffMap(),
 	[ConnectionNodeType.audioOutput]: new StuffMap(),
+	[ConnectionNodeType.simpleReverb]: new StuffMap(),
 })
 
 export const setupInstrumentManager =
@@ -59,6 +64,7 @@ export const setupInstrumentManager =
 
 			handleSamplers()
 			handleBasicSynthesizers()
+			handleSimpleReverbs()
 
 			function handleSamplers() {
 				updateInstrumentType(
@@ -100,8 +106,8 @@ export const setupInstrumentManager =
 			}
 
 			function updateInstrumentType<I extends IInstrument, S extends IConnectable>(
-				instrumentIdsSelector: InstrumentIdsSelector,
-				instrumentStateSelector: InstrumentStateSelector<S>,
+				instrumentIdsSelector: IdsSelector,
+				instrumentStateSelector: StateSelector<S>,
 				instrumentCreator: InstrumentFactory<I, S>,
 				stuff: StuffMap,
 				updateSpecificInstrument?: UpdateSpecificInstrument<I, S>,
@@ -124,7 +130,6 @@ export const setupInstrumentManager =
 						stuff.get(instrumentId),
 						() => instrumentCreator({
 							audioContext,
-							destination: preFx,
 							voiceCount: 1,
 						}, instrumentState),
 					)
@@ -136,6 +141,56 @@ export const setupInstrumentManager =
 					instrument.setMidiNotes(sourceNotes)
 
 					if (updateSpecificInstrument) updateSpecificInstrument(instrument, instrumentState)
+				})
+			}
+
+			function handleSimpleReverbs() {
+				updateEffectType(
+					selectAllSimpleReverbIds,
+					selectSimpleReverb,
+					(options, effectState) => new SimpleReverb({
+						...options,
+						...effectState,
+					}),
+					stuffMaps[ConnectionNodeType.simpleReverb],
+					(effect: SimpleReverb, effectState: SimpleReverbState) => {
+						effect.setTime(effectState.time)
+						effect.setCutoff(effectState.lowPassFilterCutoffFrequency)
+					},
+				)
+			}
+
+			function updateEffectType<E extends IAudioNodeWrapper, S extends IConnectable>(
+				effectIdsSelector: IdsSelector,
+				effectStateSelector: StateSelector<S>,
+				effectCreator: EffectFactory<E, S>,
+				stuff: StuffMap,
+				updateSpecificEffect?: UpdateSpecificEffect<E, S>,
+			) {
+				const effectIds = effectIdsSelector(state.room)
+
+				stuff.forEach((_, key) => {
+					if (effectIds.includes(key) === false) {
+						stuff.get(key)!.dispose()
+						stuff.delete(key)
+					}
+				})
+
+				effectIds.forEach(effectId => {
+					const effectState = effectStateSelector(state.room, effectId)
+
+					const effect = createIfNotExisting(
+						stuff,
+						effectId,
+						stuff.get(effectId),
+						() => effectCreator({
+							audioContext,
+						}, effectState),
+					)
+
+					updateAudioConnections(effectId, effect)
+
+					if (updateSpecificEffect) updateSpecificEffect(effect, effectState)
 				})
 			}
 

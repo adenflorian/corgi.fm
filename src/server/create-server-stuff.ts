@@ -5,14 +5,14 @@ import {MidiNotes} from '../common/MidiNote'
 import {
 	addBasicSampler, addBasicSynthesizer, addClient,
 	addGridSequencer, addInfiniteSequencer, addPosition,
-	BasicSamplerState, BasicSynthesizerState,
-	calculateExtremes, calculatePositionsGivenConnections, ClientState,
-	Connection, connectionsActions, createRoomAction,
-	createSequencerEvents, GridSequencerState, IConnection,
-	IConnections, InfiniteSequencerState,
-	InfiniteSequencerStyle, IPositions, IServerState, makePosition,
-	makeSequencerEvents, MASTER_AUDIO_OUTPUT_TARGET_ID,
-	MASTER_CLOCK_SOURCE_ID, NodeSpecialState, selectAllConnections, selectAllPositions, selectConnectionsWithTargetIds, selectConnectionsWithTargetIds2, SequencerEvents, updatePositions,
+	addSimpleReverb, BasicSamplerState,
+	BasicSynthesizerState, calculateExtremes, calculatePositionsGivenConnections,
+	ClientState, Connection, connectionsActions,
+	createRoomAction, createSequencerEvents, GridSequencerState,
+	IConnection, IConnections,
+	InfiniteSequencerState, InfiniteSequencerStyle, IPositions, IServerState,
+	makePosition, makeSequencerEvents,
+	MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID, NodeSpecialState, selectAllConnections, selectAllPositions, selectConnectionsWithTargetIds, selectConnectionsWithTargetIds2, SequencerEvents, SimpleReverbState, updatePositions,
 } from '../common/redux'
 
 const masterAudioOutput: IConnectable = Object.freeze({
@@ -86,7 +86,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 		},
 	})
 
-	const serverStuff = createSourceAndTargets(serverStuffDefinitions)
+	// const serverStuff = createSourceAndTargets(serverStuffDefinitions)
 
 	const roomState = serverStore.getState().roomStores.get(room)!
 
@@ -100,7 +100,15 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 	)
 
 	// Do extra connections after calculating positions, so that it doesn't mess up positions
-	connectNodes(serverStuff.get('arp')!.source, serverStuff.get('arp2')!.target)
+	// connectNodes(serverStuff.get('arp')!.source, serverStuff.get('arp2')!.target)
+
+	const simpleReverb = createSource({
+		name: 'Reverb A',
+		type: ConnectionNodeType.simpleReverb,
+	})
+
+	dispatchToRoom(addPosition(
+		makePosition({id: simpleReverb.id, targetType: ConnectionNodeType.simpleReverb})))
 
 	interface CreateSourceAndTargetArgs {
 		source: CreateSourceArgs
@@ -154,6 +162,11 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 				dispatchToRoom(addInfiniteSequencer(y))
 				// makeServerOwnedNode(args.type, y)
 				return y
+			case ConnectionNodeType.simpleReverb:
+				const z = new SimpleReverbState(serverClient.id)
+				dispatchToRoom(addSimpleReverb(z))
+				// makeServerOwnedNode(args.type, z)
+				return z
 			default:
 				throw new Error('Invalid type')
 		}

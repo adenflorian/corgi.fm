@@ -1,7 +1,9 @@
 import {combineReducers} from 'redux'
-import {IClientRoomState} from '../common-redux-types'
-import {basicSamplersReducer, basicSynthesizersReducer, gridSequencersReducer, infiniteSequencersReducer, virtualKeyboardsReducer} from '../index'
-import {IMultiState} from '../multi-reducer'
+import {
+	basicSamplersReducer, basicSynthesizersReducer, gridSequencersReducer,
+	IClientRoomState, IMultiState, infiniteSequencersReducer,
+	simpleReverbsReducer, virtualKeyboardsReducer,
+} from '../index'
 
 // export const ADD_SHAMU_NODE = 'ADD_SHAMU_NODE'
 // export const DELETE_SHAMU_NODES = 'DELETE_SHAMU_NODES'
@@ -70,6 +72,7 @@ export const nodesReducer = combineReducers(Object.freeze({
 	basicSamplers: basicSamplersReducer,
 	gridSequencers: gridSequencersReducer,
 	infiniteSequencers: infiniteSequencersReducer,
+	simpleReverbs: simpleReverbsReducer,
 	virtualKeyboards: virtualKeyboardsReducer,
 }))
 

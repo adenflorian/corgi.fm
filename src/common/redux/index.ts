@@ -17,6 +17,7 @@ export * from './common-actions'
 
 export * from './basic-synthesizers-redux'
 export * from './basic-sampler-redux'
+export * from './simple-reverb-redux'
 export * from './chat-redux'
 export * from './clients-redux'
 export * from './configure-server-store'

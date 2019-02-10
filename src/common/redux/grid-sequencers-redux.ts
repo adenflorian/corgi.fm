@@ -10,7 +10,6 @@ import {addMultiThing, BROADCASTER_ACTION, CLEAR_SEQUENCER, createSequencerEvent
 import {makeSequencerEvents, SequencerEvents} from './sequencer-redux'
 import {NodeSpecialState} from './shamu-graph'
 
-export const ADD_GRID_SEQUENCER = 'ADD_GRID_SEQUENCER'
 export const addGridSequencer = (gridSequencer: IGridSequencerState) =>
 	addMultiThing(gridSequencer, ConnectionNodeType.gridSequencer, NetworkActionType.SERVER_AND_BROADCASTER)
 

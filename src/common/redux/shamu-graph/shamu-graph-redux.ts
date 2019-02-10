@@ -36,6 +36,7 @@ export function shamuGraphReducer(state: ShamuGraphState | undefined, action: Sh
 				basicSamplers: deserialize(ConnectionNodeType.basicSampler, action.shamuGraphState.nodes.basicSamplers),
 				gridSequencers: deserialize(ConnectionNodeType.gridSequencer, action.shamuGraphState.nodes.gridSequencers),
 				infiniteSequencers: deserialize(ConnectionNodeType.infiniteSequencer, action.shamuGraphState.nodes.infiniteSequencers),
+				simpleReverbs: deserialize(ConnectionNodeType.simpleReverb, action.shamuGraphState.nodes.simpleReverbs),
 				virtualKeyboards: deserialize(ConnectionNodeType.virtualKeyboard, action.shamuGraphState.nodes.virtualKeyboards),
 			}),
 			edges: makeShamuEdgesState().merge(action.shamuGraphState.edges),

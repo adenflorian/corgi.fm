@@ -31,4 +31,5 @@ export enum ConnectionNodeType {
 	audioOutput = 'audioOutput',
 	masterClock = 'masterClock',
 	dummy = 'dummy',
+	simpleReverb = 'simpleReverb',
 }

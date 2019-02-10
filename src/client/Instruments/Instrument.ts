@@ -11,6 +11,10 @@ export interface IAudioNodeWrapper extends IDisposable {
 	getConnectedTargetId: () => string
 }
 
+export interface IAudioNodeWrapperOptions {
+	audioContext: AudioContext
+}
+
 export interface IInstrument extends IDisposable, IAudioNodeWrapper {
 	setMidiNotes: (midiNotes: IMidiNotes) => void
 	setPan: (pan: number) => void
@@ -50,7 +54,6 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> implement
 
 		this._panNode.connect(this._lowPassFilter)
 		this._lowPassFilter.connect(this._gain)
-		this._gain.connect(options.destination)
 
 		if (module.hot) {
 			module.hot.dispose(this.dispose)
@@ -134,9 +137,7 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> implement
 	}
 }
 
-export interface IInstrumentOptions {
-	audioContext: AudioContext
-	destination: AudioNode
+export interface IInstrumentOptions extends IAudioNodeWrapperOptions {
 	voiceCount: number
 }
 
