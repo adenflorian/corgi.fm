@@ -6,21 +6,13 @@ import {ConnectionNodeType} from '../common-types'
 import {emptyMidiNotes, IMidiNote} from '../MidiNote'
 import {MAX_MIDI_NOTE_NUMBER_127} from '../server-constants'
 import {colorFunc, hashbow} from '../shamu-color'
-import {addMultiThing, BROADCASTER_ACTION, CLEAR_SEQUENCER, createSequencerEvents, deleteThings, IClientRoomState, IMultiState, IMultiStateThings, isEmptyEvents, ISequencerEvent, ISequencerState, makeMultiReducer, NetworkActionType, PLAY_ALL, selectAllInfiniteSequencers, selectGlobalClockState, SERVER_ACTION, STOP_ALL, UNDO_SEQUENCER, updateThings} from './index'
+import {addMultiThing, BROADCASTER_ACTION, CLEAR_SEQUENCER, createSequencerEvents, IClientRoomState, IMultiState, IMultiStateThings, isEmptyEvents, ISequencerState, makeMultiReducer, NetworkActionType, PLAY_ALL, selectAllInfiniteSequencers, selectGlobalClockState, SERVER_ACTION, STOP_ALL, UNDO_SEQUENCER} from './index'
 import {makeSequencerEvents, SequencerEvents} from './sequencer-redux'
 import {NodeSpecialState} from './shamu-graph'
 
 export const ADD_GRID_SEQUENCER = 'ADD_GRID_SEQUENCER'
 export const addGridSequencer = (gridSequencer: IGridSequencerState) =>
 	addMultiThing(gridSequencer, ConnectionNodeType.gridSequencer, NetworkActionType.SERVER_AND_BROADCASTER)
-
-export const DELETE_GRID_SEQUENCERS = 'DELETE_GRID_SEQUENCERS'
-export const deleteGridSequencers = (gridSequencerIds: string[]) =>
-	deleteThings(gridSequencerIds, ConnectionNodeType.gridSequencer, NetworkActionType.SERVER_AND_BROADCASTER)
-
-export const UPDATE_GRID_SEQUENCERS = 'UPDATE_GRID_SEQUENCERS'
-export const updateGridSequencers = (gridSequencers: IGridSequencers) =>
-	updateThings(gridSequencers, ConnectionNodeType.gridSequencer, NetworkActionType.BROADCASTER)
 
 export const SET_GRID_SEQUENCER_NOTE = 'SET_GRID_SEQUENCER_NOTE'
 export const setGridSequencerNote =

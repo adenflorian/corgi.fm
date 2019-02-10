@@ -19,7 +19,10 @@ Let's say we want to make a new audio effect node called Delay (*folder* **new f
 		- [ ] index.ts (module loading order)
 		- [ ] local-middleware.ts (deleteAllTheThings, createLocalStuff)
 		- [ ] node-types.ts (NodeInfoMap)
-		- [ ] room-stores-redux.ts (roomReducers)
+		- [√] room-stores-redux.ts (roomReducers)
+			- moved to shamu-nodes-redux.ts 2019-02-09
+		- [ ] shamu-nodes-redux.ts (nodesReducer)
+		- [ ] shamu-graph-redux.ts (shamuGraphReducer)
 - [ ] *server*
 	- [ ] create-server-stuff.ts (not sure if this would ever go away...)
 	- [√] server-socket-listeners.ts

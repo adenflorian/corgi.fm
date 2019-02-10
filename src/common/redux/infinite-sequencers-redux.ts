@@ -5,21 +5,13 @@ import * as uuid from 'uuid'
 import {ConnectionNodeType, IConnectable} from '../common-types'
 import {IMidiNote, MidiNotes} from '../MidiNote'
 import {colorFunc, hashbow} from '../shamu-color'
-import {addMultiThing, BROADCASTER_ACTION, CLEAR_SEQUENCER, createSequencerEvents, deleteThings, IClientRoomState, IMultiState, IMultiStateThings, ISequencerState, makeMultiReducer, NetworkActionType, PLAY_ALL, selectGlobalClockState, SERVER_ACTION, SKIP_NOTE, STOP_ALL, UNDO_SEQUENCER, updateThings, VIRTUAL_KEY_PRESSED} from './index'
+import {addMultiThing, BROADCASTER_ACTION, CLEAR_SEQUENCER, createSequencerEvents, IClientRoomState, IMultiState, IMultiStateThings, ISequencerState, makeMultiReducer, NetworkActionType, PLAY_ALL, selectGlobalClockState, SERVER_ACTION, SKIP_NOTE, STOP_ALL, UNDO_SEQUENCER, VIRTUAL_KEY_PRESSED} from './index'
 import {makeSequencerEvents, SequencerEvents} from './sequencer-redux'
 import {NodeSpecialState} from './shamu-graph'
 
 export const ADD_INFINITE_SEQUENCER = 'ADD_INFINITE_SEQUENCER'
 export const addInfiniteSequencer = (infiniteSequencer: InfiniteSequencerState) =>
 	addMultiThing(infiniteSequencer, ConnectionNodeType.infiniteSequencer, NetworkActionType.SERVER_AND_BROADCASTER)
-
-export const DELETE_INFINITE_SEQUENCERS = 'DELETE_INFINITE_SEQUENCERS'
-export const deleteInfiniteSequencers = (infiniteSequencerIds: string[]) =>
-	deleteThings(infiniteSequencerIds, ConnectionNodeType.infiniteSequencer, NetworkActionType.SERVER_AND_BROADCASTER)
-
-export const UPDATE_INFINITE_SEQUENCERS = 'UPDATE_INFINITE_SEQUENCERS'
-export const updateInfiniteSequencers = (infiniteSequencers: IInfiniteSequencers) =>
-	updateThings(infiniteSequencers, ConnectionNodeType.infiniteSequencer, NetworkActionType.BROADCASTER)
 
 export const SET_INFINITE_SEQUENCER_NOTE = 'SET_INFINITE_SEQUENCER_NOTE'
 export const setInfiniteSequencerNote =

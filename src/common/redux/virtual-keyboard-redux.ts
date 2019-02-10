@@ -6,7 +6,7 @@ import {applyOctave} from '../../client/music/music-functions'
 import {Octave} from '../../client/music/music-types'
 import {ClientId, ConnectionNodeType, IMultiStateThing, IMultiStateThingDeserializer} from '../common-types'
 import {emptyMidiNotes, IMidiNote, IMidiNotes, MidiNotes} from '../MidiNote'
-import {addMultiThing, BROADCASTER_ACTION, deleteThings, IClientRoomState, IMultiState, IMultiStateThings, makeMultiReducer, NetworkActionType, SERVER_ACTION, updateThings} from './index'
+import {addMultiThing, BROADCASTER_ACTION, IClientRoomState, IMultiState, IMultiStateThings, makeMultiReducer, NetworkActionType, SERVER_ACTION} from './index'
 import {NodeSpecialState} from './shamu-graph'
 
 export interface VirtualKeyAction {
@@ -20,14 +20,6 @@ export interface VirtualKeyAction {
 export const ADD_VIRTUAL_KEYBOARD = 'ADD_VIRTUAL_KEYBOARD'
 export const addVirtualKeyboard = (virtualKeyboard: IVirtualKeyboardState) =>
 	addMultiThing(virtualKeyboard, ConnectionNodeType.virtualKeyboard, NetworkActionType.SERVER_AND_BROADCASTER)
-
-export const DELETE_VIRTUAL_KEYBOARDS = 'DELETE_VIRTUAL_KEYBOARDS'
-export const deleteVirtualKeyboards = (virtualKeyboardIds: string[]) =>
-	deleteThings(virtualKeyboardIds, ConnectionNodeType.virtualKeyboard, NetworkActionType.SERVER_AND_BROADCASTER)
-
-export const UPDATE_VIRTUAL_KEYBOARDS = 'UPDATE_VIRTUAL_KEYBOARDS'
-export const updateVirtualKeyboards = (keyboards: any) =>
-	updateThings(keyboards, ConnectionNodeType.virtualKeyboard, NetworkActionType.BROADCASTER)
 
 export const VIRTUAL_KEY_PRESSED = 'VIRTUAL_KEY_PRESSED'
 export const virtualKeyPressed = (id: string, number: number, octave: Octave, midiNote: IMidiNote) => {

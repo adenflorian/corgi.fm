@@ -3,13 +3,12 @@ import {combineReducers} from 'redux'
 import {ActionType, StateType} from 'typesafe-actions'
 import {ConnectionNodeType} from '../../common-types'
 import {IClientRoomState} from '../index'
-import {IMultiState, IMultiStateThings} from '../multi-reducer'
+import {IMultiState} from '../multi-reducer'
 import {getConnectionNodeInfo} from '../node-types'
 import {
 	edgesReducer, nodesReducer,
 } from './index'
 import {makeShamuEdgesState} from './shamu-edges-redux'
-// import {makeShamuNodesState} from './shamu-nodes-redux'
 
 export const REPLACE_SHAMU_GRAPH_STATE = 'REPLACE_SHAMU_GRAPH_STATE'
 

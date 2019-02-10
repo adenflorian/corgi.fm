@@ -1,11 +1,9 @@
 import {Map} from 'immutable'
 import {Action, combineReducers, Reducer} from 'redux'
 import {
-	basicSamplersReducer, basicSynthesizersReducer, chatReducer,
-	connectionsReducer, CREATE_ROOM, DELETE_ROOM, globalClockReducer,
-	gridSequencersReducer, IClientRoomState, infiniteSequencersReducer,
-	IServerState, positionsReducer, roomMembersReducer,
-	RoomsReduxAction, virtualKeyboardsReducer,
+	chatReducer, connectionsReducer, CREATE_ROOM, DELETE_ROOM,
+	globalClockReducer, IClientRoomState, IServerState, positionsReducer,
+	roomMembersReducer, RoomsReduxAction,
 } from './index'
 import {shamuGraphReducer} from './shamu-graph'
 
