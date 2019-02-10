@@ -8,7 +8,7 @@ import {configureStore} from './client-store'
 import {startFpsLoop} from './fps-loop'
 import {setupInputEventListeners} from './input-events'
 import {setupInstrumentManager} from './instrument-manager'
-import {logClientEnv} from './is-prod-client'
+import {isLocalDevClient, logClientEnv} from './is-prod-client'
 import {renderApp, renderOther} from './react-main'
 import {setupMidiSupport} from './setup-midi-support'
 import {setupWebsocketAndListeners, socket} from './websocket-listeners'
@@ -34,7 +34,7 @@ declare global {
 // Chrome 1 - 68
 const isChrome = () => !!window.chrome
 
-if (!isChrome()) {
+if (!isChrome() && !isLocalDevClient()) {
 	renderOther(<BrowserWarning />)
 } else {
 	setupAsync()
