@@ -33,6 +33,7 @@ export type UpdatePositionsAction = ReturnType<typeof updatePositions>
 export const updatePositions = (positions: IPositions) => ({
 	type: UPDATE_POSITIONS as typeof UPDATE_POSITIONS,
 	positions,
+	SERVER_ACTION,
 	BROADCASTER_ACTION,
 })
 

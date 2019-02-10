@@ -92,6 +92,7 @@
 - [ ] add a link to the prod site and vice versa
 - [ ] make room option to switch between straight and curved connection lines
 - [ ] make slash (/) commands that can be used in chat
+- [ ] figure out how to get middleware for room state to work on server store
 
 # DevOps
 - [ ] figure out how to do `yarn build` without stopping parcel and the server

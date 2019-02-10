@@ -2,7 +2,7 @@ import {applyMiddleware, createStore, Store} from 'redux'
 import {composeWithDevTools} from 'redux-devtools-extension/developmentOnly'
 import persistState from 'redux-localstorage'
 import {
-	connectionsMiddleware, createGridSequencerPlayerMiddleware,
+	connectionsClientMiddleware, createGridSequencerPlayerMiddleware,
 	getActionsBlacklist, getClientReducers, IClientAppState, localMiddleware,
 } from '../common/redux'
 import {websocketSenderMiddleware} from './websocket-client-sender-middleware'
@@ -21,7 +21,7 @@ export function configureStore(initialState: IClientAppState | any = {})
 			applyMiddleware(
 				localMiddleware,
 				createGridSequencerPlayerMiddleware(),
-				connectionsMiddleware,
+				connectionsClientMiddleware,
 				websocketSenderMiddleware,
 			),
 			persistState('options'),

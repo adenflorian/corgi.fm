@@ -4,16 +4,11 @@ import {Point} from '../common-types'
 import {logger} from '../logger'
 import {OrganizeGraphAction} from './common-actions'
 import {BroadcastAction} from './common-redux-types'
-import {
-	calculateExtremes, Connection, connectionsActions,
-	GhostConnectorStatus, GhostConnectorType, IClientAppState,
-	IConnection, IConnectionAction, IConnections,
-	IPosition, IPositions, MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID, ORGANIZE_GRAPH, selectAllConnections, selectAllPositions, selectConnection, selectConnectionsWithTargetIds2, STOP_DRAGGING_GHOST_CONNECTOR, updatePositions,
-} from './index'
+import {calculateExtremes, Connection, connectionsActions, GhostConnectorStatus, GhostConnectorType, IClientAppState, IConnection, IConnectionAction, IConnections, IPosition, IPositions, MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID, ORGANIZE_GRAPH, selectAllConnections, selectAllPositions, selectConnection, selectConnectionsWithTargetIds2, STOP_DRAGGING_GHOST_CONNECTOR, updatePositions} from './index'
 
 const connectionThreshold = 100
 
-export const connectionsMiddleware: Middleware<{}, IClientAppState> =
+export const connectionsClientMiddleware: Middleware<{}, IClientAppState> =
 	({dispatch, getState}) => next => (action: IConnectionAction | OrganizeGraphAction) => {
 		const stateBefore = getState()
 
@@ -32,17 +27,15 @@ export const connectionsMiddleware: Middleware<{}, IClientAppState> =
 				}
 				return
 			}
-			// case ORGANIZE_GRAPH: {
-			// 	dispatch(
-			// 		updatePositions(
-			// 			calculatePositionsGivenConnections(
-			// 				selectAllPositions(stateAfter.room),
-			// 				selectAllConnections(stateAfter.room),
-			// 			),
-			// 		),
-			// 	)
-			// 	return
-			// }
+			case ORGANIZE_GRAPH:
+				return dispatch(
+					updatePositions(
+						calculatePositionsGivenConnections(
+							selectAllPositions(stateAfter.room),
+							selectAllConnections(stateAfter.room),
+						),
+					),
+				)
 			default: return
 		}
 
