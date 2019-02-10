@@ -39,6 +39,17 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 	dispatchToRoom(addPosition(
 		makePosition({id: MASTER_AUDIO_OUTPUT_TARGET_ID, targetType: ConnectionNodeType.audioOutput})))
 
+	// Reverb
+	const simpleReverb = createSource({
+		name: 'Reverb A',
+		type: ConnectionNodeType.simpleReverb,
+	}) as SimpleReverbState
+
+	dispatchToRoom(addPosition(
+		makePosition({id: simpleReverb.id, targetType: ConnectionNodeType.simpleReverb})))
+
+	connectNodes(simpleReverb, masterAudioOutput)
+
 	const serverStuffDefinitions = Object.freeze({
 		bass: {
 			source: {
@@ -88,17 +99,6 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 
 	const serverStuff = createSourceAndTargets(serverStuffDefinitions)
 
-	// Reverb
-	const simpleReverb = createSource({
-		name: 'Reverb A',
-		type: ConnectionNodeType.simpleReverb,
-	})
-
-	dispatchToRoom(addPosition(
-		makePosition({id: simpleReverb.id, targetType: ConnectionNodeType.simpleReverb})))
-
-	connectNodes(simpleReverb, masterAudioOutput)
-
 	// Update positions
 	const roomState = serverStore.getState().roomStores.get(room)!
 
@@ -136,7 +136,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 
 		connectNodes(source, target)
 
-		connectNodes(target, masterAudioOutput)
+		connectNodes(target, simpleReverb)
 
 		connectNodes(masterClock, source)
 

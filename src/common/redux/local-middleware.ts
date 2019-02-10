@@ -59,6 +59,7 @@ function getLocalVirtualKeyboard(state: IClientAppState) {
 	return selectVirtualKeyboardById(state.room, getLocalVirtualKeyboardId(state))
 }
 
+// TODO Refactor to use functions in create-server-stuff.ts
 function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 	const localClient = selectLocalClient(state)
 

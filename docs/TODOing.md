@@ -11,8 +11,7 @@
 			- this is how a convolver reverb works
 	- [√] make ui better
 	- [√] make it get organized in create server stuff
-	- [ ] make everything go through the reverb before audio output
-
+	- [√] make everything go through the reverb before audio output
 
 # Soon
 - [ ] add ability to add nodes
