@@ -8,6 +8,7 @@ import {MAX_MIDI_NOTE_NUMBER_127} from '../server-constants'
 import {colorFunc, hashbow} from '../shamu-color'
 import {addMultiThing, BROADCASTER_ACTION, CLEAR_SEQUENCER, createSequencerEvents, deleteThings, IClientRoomState, IMultiState, IMultiStateThings, isEmptyEvents, ISequencerEvent, ISequencerState, makeMultiReducer, NetworkActionType, PLAY_ALL, selectAllInfiniteSequencers, selectGlobalClockState, SERVER_ACTION, STOP_ALL, UNDO_SEQUENCER, updateThings} from './index'
 import {makeSequencerEvents, SequencerEvents} from './sequencer-redux'
+import {NodeSpecialState} from './shamu-graph'
 
 export const ADD_GRID_SEQUENCER = 'ADD_GRID_SEQUENCER'
 export const addGridSequencer = (gridSequencer: IGridSequencerState) =>
@@ -90,7 +91,7 @@ export interface IGridSequencerState extends ISequencerState {
 	notesToShow: number
 }
 
-export class GridSequencerState implements IGridSequencerState {
+export class GridSequencerState implements IGridSequencerState, NodeSpecialState {
 	public static defaultWidth = 520
 	public static defaultHeight = 234
 	public static noteWidth = 12

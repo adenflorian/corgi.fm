@@ -5,6 +5,7 @@ import {ClientId, ConnectionNodeType, IConnectable} from '../common-types'
 import {pickRandomArrayElement} from '../common-utils'
 import {BuiltInOscillatorType, ShamuOscillatorType} from '../OscillatorTypes'
 import {addMultiThing, BROADCASTER_ACTION, createSelectAllOfThingAsArray, deleteThings, IClientRoomState, IMultiState, makeMultiReducer, NetworkActionType, SERVER_ACTION, updateThings} from './index'
+import {NodeSpecialState} from './shamu-graph'
 
 export const addBasicSynthesizer = (instrument: BasicSynthesizerState) =>
 	addMultiThing(instrument, ConnectionNodeType.basicSynthesizer, NetworkActionType.SERVER_AND_BROADCASTER)
@@ -57,7 +58,7 @@ export interface IBasicSynthesizers {
 	[key: string]: BasicSynthesizerState
 }
 
-export class BasicSynthesizerState implements IConnectable {
+export class BasicSynthesizerState implements IConnectable, NodeSpecialState {
 	public static dummy: BasicSynthesizerState = {
 		oscillatorType: BuiltInOscillatorType.sine,
 		id: 'dummy',

@@ -7,6 +7,7 @@ import {IMidiNote, MidiNotes} from '../MidiNote'
 import {colorFunc, hashbow} from '../shamu-color'
 import {addMultiThing, BROADCASTER_ACTION, CLEAR_SEQUENCER, createSequencerEvents, deleteThings, IClientRoomState, IMultiState, IMultiStateThings, ISequencerState, makeMultiReducer, NetworkActionType, PLAY_ALL, selectGlobalClockState, SERVER_ACTION, SKIP_NOTE, STOP_ALL, UNDO_SEQUENCER, updateThings, VIRTUAL_KEY_PRESSED} from './index'
 import {makeSequencerEvents, SequencerEvents} from './sequencer-redux'
+import {NodeSpecialState} from './shamu-graph'
 
 export const ADD_INFINITE_SEQUENCER = 'ADD_INFINITE_SEQUENCER'
 export const addInfiniteSequencer = (infiniteSequencer: InfiniteSequencerState) =>
@@ -91,7 +92,7 @@ export enum InfiniteSequencerStyle {
 	colorGrid = 'colorGrid',
 }
 
-export class InfiniteSequencerState implements ISequencerState, IConnectable {
+export class InfiniteSequencerState implements ISequencerState, IConnectable, NodeSpecialState {
 	public static defaultWidth = 576
 	public static defaultHeight = 80
 

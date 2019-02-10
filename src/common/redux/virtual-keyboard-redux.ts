@@ -7,6 +7,7 @@ import {Octave} from '../../client/music/music-types'
 import {ClientId, ConnectionNodeType, IMultiStateThing, IMultiStateThingDeserializer} from '../common-types'
 import {emptyMidiNotes, IMidiNote, IMidiNotes, MidiNotes} from '../MidiNote'
 import {addMultiThing, BROADCASTER_ACTION, deleteThings, IClientRoomState, IMultiState, IMultiStateThings, makeMultiReducer, NetworkActionType, SERVER_ACTION, updateThings} from './index'
+import {NodeSpecialState} from './shamu-graph'
 
 export interface VirtualKeyAction {
 	type: string
@@ -105,7 +106,7 @@ export interface IVirtualKeyboardState extends IMultiStateThing {
 	color: string
 }
 
-export class VirtualKeyboardState implements IVirtualKeyboardState {
+export class VirtualKeyboardState implements IVirtualKeyboardState, NodeSpecialState {
 	public static dummy: IVirtualKeyboardState = {
 		pressedKeys: emptyMidiNotes,
 		octave: 0,

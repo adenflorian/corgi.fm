@@ -1,4 +1,5 @@
 import {Map} from 'immutable'
+import {Action, combineReducers} from 'redux'
 import {ActionType} from 'typesafe-actions'
 import * as uuid from 'uuid'
 import {ConnectionNodeType} from '../../common-types'
@@ -6,6 +7,7 @@ import {
 	BasicSamplerState, BasicSynthesizerState, GridSequencerState,
 	InfiniteSequencerState, IPosition, makePosition, VirtualKeyboardState,
 } from '../index'
+import {UPDATE_POSITIONS, UpdatePositionsAction} from '../positions-redux'
 
 export const ADD_SHAMU_NODE = 'ADD_SHAMU_NODE'
 export const DELETE_SHAMU_NODES = 'DELETE_SHAMU_NODES'
@@ -40,7 +42,7 @@ export function makeShamuNodesState() {
 export interface NodeState {
 	id: string
 	type: ConnectionNodeType
-	position: IPosition
+	// position: IPosition
 	ownerId: string
 	specialState: NodeSpecialState
 }
@@ -53,17 +55,21 @@ export function makeNodeState({ownerId, type, specialState}: Pick<NodeState, 'ow
 		ownerId,
 		type,
 		specialState,
-		position: makePosition({
-			id, // TODO Is this still needed?
-			targetType: type, // TODO Is this still needed?
-		}),
+		// position: makePosition({
+		// 	id, // TODO Is this still needed?
+		// 	targetType: type, // TODO Is this still needed?
+		// }),
 	})
 }
 
-export type NodeSpecialState = BasicSynthesizerState | BasicSamplerState |
+export type NodeSpecialState2 = BasicSynthesizerState | BasicSamplerState |
 	VirtualKeyboardState | GridSequencerState | InfiniteSequencerState
 
-export type ShamuNodesAction = ActionType<typeof shamuNodesActions>
+export interface NodeSpecialState {
+	id: string
+}
+
+export type ShamuNodesAction = ActionType<typeof shamuNodesActions> | UpdatePositionsAction
 
 export function nodesReducer(state = makeShamuNodesState(), action: ShamuNodesAction) {
 	switch (action.type) {
@@ -74,3 +80,51 @@ export function nodesReducer(state = makeShamuNodesState(), action: ShamuNodesAc
 		default: return state
 	}
 }
+
+// Modeled after redux combineReducers
+// function specialStateReducer(state: ShamuNodesState, action: UpdatePositionsAction): ShamuNodesState {
+// 	let newStates = makeShamuNodesState()
+
+// 	let hasChanged = false
+
+// 	state.forEach(x => {
+// 		const newState = nodeReducer(x, action)
+
+// 		newStates = newStates.set(x.id, newState)
+
+// 		hasChanged = hasChanged || newState !== x
+// 	})
+
+// 	return hasChanged ? newStates : state
+// }
+
+// const dummyNodeState = makeNodeState({
+// 	ownerId: '-1',
+// 	type: ConnectionNodeType.dummy,
+// 	specialState: {id: '-1'},
+// })
+
+// function nodeReducer(state: NodeState, action: UpdatePositionsAction) {
+// 	switch (action.type) {
+// 		case UPDATE_POSITIONS: {
+// 			return {
+// 				...state,
+// 				position: {
+// 					...state.position,
+// 					...(action.positions.get(state.id) || {}),
+// 				},
+// 			}
+// 		}
+// 		default: return state
+// 	}
+// }
+
+// function specialStateReducer(state: ShamuNodesState, action: Action) {
+// 	return combineReducers(state.map(x => getReducerByType(x.type)).toObject())(state, action)
+// }
+
+// function getReducerByType(type: ConnectionNodeType) {
+// 	return (state: NodeSpecialState = dummyNodeSpecialState, action: Action) => state
+// }
+
+// const dummyNodeSpecialState: NodeSpecialState = GridSequencerState.dummy

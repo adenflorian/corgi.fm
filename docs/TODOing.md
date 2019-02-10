@@ -1,0 +1,4 @@
+- [ ] new graph state
+	- ~~update positions calculations to update positions in new graph state~~
+		- keeping positions state where it is for now, the important thing is the actual node types
+	- [ ] change all the old multi things to use new graph state

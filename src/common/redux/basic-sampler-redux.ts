@@ -2,6 +2,7 @@ import {AnyAction} from 'redux'
 import * as uuid from 'uuid'
 import {ClientId, ConnectionNodeType, IConnectable} from '../common-types'
 import {addMultiThing, BROADCASTER_ACTION, createSelectAllOfThingAsArray, deleteThings, IClientRoomState, IMultiState, makeMultiReducer, NetworkActionType, SERVER_ACTION, updateThings} from './index'
+import {NodeSpecialState} from './shamu-graph'
 
 export const addBasicSampler = (sampler: BasicSamplerState) =>
 	addMultiThing(sampler, ConnectionNodeType.basicSampler, NetworkActionType.SERVER_AND_BROADCASTER)
@@ -38,7 +39,7 @@ export interface IBasicSamplers {
 	[key: string]: BasicSamplerState
 }
 
-export class BasicSamplerState implements IConnectable {
+export class BasicSamplerState implements IConnectable, NodeSpecialState {
 	public static dummy: BasicSamplerState = {
 		id: 'dummy',
 		ownerId: 'dummyOwner',
