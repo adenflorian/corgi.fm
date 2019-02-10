@@ -98,6 +98,11 @@
 			},
 			"isBackground": true,
 			"problemMatcher": "$tsc-watch"
+		},
+		{
+			"type": "npm",
+			"script": "deploy-test",
+			"problemMatcher": []
 		}
 	]
 }
