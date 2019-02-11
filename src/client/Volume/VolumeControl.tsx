@@ -47,6 +47,14 @@ export class VolumeControl extends Component<IVolumeControlAllProps> {
 					markColor={newColor}
 					size={40}
 				/>
+				{/* <Knob
+					value={this.props.masterVolume}
+					onChange={this.props.changeMasterVolume}
+					min={-70}
+					max={6}
+					markColor={newColor}
+					size={40}
+				/> */}
 			</Panel>
 		)
 	}

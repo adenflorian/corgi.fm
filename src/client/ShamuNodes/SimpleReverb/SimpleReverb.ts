@@ -13,10 +13,12 @@ export class SimpleReverb extends AudioNodeWrapper {
 	private readonly _reverbNode: ReverbNode
 
 	constructor(options: IAudioNodeWrapperOptions) {
-		super()
+		super(options)
 		this._reverbNode = Reverb(options.audioContext)
 		this._reverbNode.time = 3.5
 		this._reverbNode.cutoff.value = 2000
+		this._reverbNode.dry.value = 0
+		this._reverbNode.wet.value = 1
 	}
 
 	public readonly getInputAudioNode = () => this._reverbNode

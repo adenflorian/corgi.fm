@@ -1,7 +1,6 @@
 import * as Immutable from 'immutable'
 import {Store} from 'redux'
 import {ConnectionNodeType, IConnectable} from '../common/common-types'
-import {logger} from '../common/logger';
 import {IClientAppState, IClientRoomState} from '../common/redux'
 import {setGlobalClockIndex} from '../common/redux'
 import {
@@ -14,7 +13,7 @@ import {BasicSamplerState, selectAllSamplerIds, selectSampler} from '../common/r
 import {BasicSamplerInstrument} from './BasicSampler/BasicSamplerInstrument'
 import {GridSequencerPlayer} from './GridSequencerPlayer'
 import {BasicSynthesizer} from './Instruments/BasicSynthesizer'
-import {IAudioNodeWrapper, IAudioNodeWrapperOptions, IInstrument, IInstrumentOptions} from './Instruments/Instrument'
+import {AudioNodeWrapper, IAudioNodeWrapperOptions, IInstrument, IInstrumentOptions, MasterAudioOutput} from './Instruments/Instrument'
 import {SimpleReverb} from './ShamuNodes/SimpleReverb/SimpleReverb'
 
 type IdsSelector = (roomState: IClientRoomState) => string[]
@@ -26,7 +25,7 @@ type UpdateSpecificInstrument<I extends IInstrument, S> = (instrument: I, instru
 type EffectFactory<E, S> = (options: IAudioNodeWrapperOptions, effectState: S) => E
 type UpdateSpecificEffect<E, S> = (effect: E, effectState: S) => void
 
-class StuffMap extends Map<string, IAudioNodeWrapper> {}
+class StuffMap extends Map<string, AudioNodeWrapper> {}
 
 // Need separate properties to match up with what IDs selector is used
 // so that we can delete stuff properly
@@ -42,15 +41,11 @@ export const setupInstrumentManager =
 
 		stuffMaps[ConnectionNodeType.audioOutput].set(
 			MASTER_AUDIO_OUTPUT_TARGET_ID,
-			{
-				getInputAudioNode: () => preFx,
-				getOutputAudioNode: () => preFx,
-				connect: () => null,
-				disconnect: () => null,
-				disconnectAll: () => null,
-				getConnectedTargets: () => Immutable.Map(),
-				dispose: () => null,
-			},
+			new MasterAudioOutput({
+				audioNode: preFx,
+				audioContext,
+				id: MASTER_AUDIO_OUTPUT_TARGET_ID,
+			}),
 		)
 
 		const globalClock = new GridSequencerPlayer(
@@ -132,6 +127,7 @@ export const setupInstrumentManager =
 						instrumentId,
 						stuff.get(instrumentId),
 						() => instrumentCreator({
+							id: instrumentId,
 							audioContext,
 							voiceCount: 1,
 						}, instrumentState),
@@ -163,7 +159,7 @@ export const setupInstrumentManager =
 				)
 			}
 
-			function updateEffectType<E extends IAudioNodeWrapper, S extends IConnectable>(
+			function updateEffectType<E extends AudioNodeWrapper, S extends IConnectable>(
 				effectIdsSelector: IdsSelector,
 				effectStateSelector: StateSelector<S>,
 				effectCreator: EffectFactory<E, S>,
@@ -187,6 +183,7 @@ export const setupInstrumentManager =
 						effectId,
 						stuff.get(effectId),
 						() => effectCreator({
+							id: effectId,
 							audioContext,
 						}, effectState),
 					)
@@ -199,7 +196,7 @@ export const setupInstrumentManager =
 		}
 	}
 
-function updateAudioConnectionsFromSource(roomState: IClientRoomState, sourceId: string, audioNodeWrapper: IAudioNodeWrapper) {
+function updateAudioConnectionsFromSource(roomState: IClientRoomState, sourceId: string, audioNodeWrapper: AudioNodeWrapper) {
 	const outgoingConnections = selectConnectionsWithSourceIds(roomState, [sourceId])
 
 	if (outgoingConnections.count() === 0) {

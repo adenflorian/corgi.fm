@@ -1,37 +1,53 @@
-import {Map} from 'immutable'
+import {List, Map} from 'immutable'
 import uuid = require('uuid')
 import {IDisposable} from '../../common/common-types'
 import {logger} from '../../common/logger'
 import {emptyMidiNotes, IMidiNotes} from '../../common/MidiNote'
 import {Arp} from '../arp'
 
-export interface IAudioNodeWrapper extends IDisposable {
-	getInputAudioNode: () => AudioNode
-	getOutputAudioNode: () => AudioNode
-	getConnectedTargets: () => Map<string, IAudioNodeWrapper>
-	connect: (destination: IAudioNodeWrapper, targetId: string) => void
-	disconnect: (targetId: string) => void
-	disconnectAll: () => void
-}
-
 export interface IAudioNodeWrapperOptions {
 	audioContext: AudioContext
+	id: string
 }
 
-export abstract class AudioNodeWrapper implements IAudioNodeWrapper {
-	public abstract getInputAudioNode: () => AudioNode
-	public abstract getOutputAudioNode: () => AudioNode
+export abstract class AudioNodeWrapper {
 	public abstract dispose: () => void
+	public readonly id: string
+	protected abstract getInputAudioNode: () => AudioNode | null
+	protected abstract getOutputAudioNode: () => AudioNode | null
+	protected readonly _audioContext: AudioContext
+	private _connectedTargets = Map<string, AudioNodeWrapper>()
 
-	private _connectedTargets = Map<string, IAudioNodeWrapper>()
+	constructor(options: IAudioNodeWrapperOptions) {
+		this.id = options.id
+		this._audioContext = options.audioContext
+	}
 
 	public readonly getConnectedTargets = () => this._connectedTargets
 
-	public readonly connect = (destination: IAudioNodeWrapper, targetId: string) => {
+	public readonly connect = (destination: AudioNodeWrapper, targetId: string) => {
 		if (this._connectedTargets.has(targetId)) return
 
-		this.getOutputAudioNode().connect(destination.getInputAudioNode())
+		// TODO Prevent feedback loop
+
+		// console.log(destination.context.)
+
+		const outputAudioNode = this.getOutputAudioNode()
+
+		if (!outputAudioNode) return
+
+		const inputAudioNode = destination.getInputAudioNode()
+
+		if (!inputAudioNode) return
+
 		this._connectedTargets = this._connectedTargets.set(targetId, destination)
+
+		if (detectFeedbackLoop(this)) {
+			logger.warn('Feedback loop detected, preventing connection')
+			return
+		}
+
+		outputAudioNode.connect(inputAudioNode)
 		logger.debug('AudioNodeWrapper.connect targetId: ', targetId)
 	}
 
@@ -42,20 +58,71 @@ export abstract class AudioNodeWrapper implements IAudioNodeWrapper {
 
 		if (!targetToDisconnect) return
 
-		this.getOutputAudioNode().disconnect(targetToDisconnect.getInputAudioNode())
-
 		this._connectedTargets = this._connectedTargets.delete(targetId)
+
+		const audioNodeToDisconnect = targetToDisconnect.getInputAudioNode()
+
+		if (!audioNodeToDisconnect) return
+
+		const output = this.getOutputAudioNode()
+
+		if (!output) return
+
+		try {
+			output.disconnect(audioNodeToDisconnect)
+		} catch (e) {
+			if (e instanceof Error && e.message.includes('the given destination is not connected')) {
+				// Do nothing, this is expected in prevented feedback loop situations
+			} else {
+				throw new Error(e)
+			}
+		}
 	}
 
 	public readonly disconnectAll = () => {
 		if (this._connectedTargets.count() === 0) return
 
-		this.getOutputAudioNode().disconnect()
 		this._connectedTargets = this._connectedTargets.clear()
+
+		const output = this.getOutputAudioNode()
+
+		if (!output) return
+
+		output.disconnect()
 	}
 }
 
-export interface IInstrument extends IDisposable, IAudioNodeWrapper {
+function detectFeedbackLoop(nodeWrapper: AudioNodeWrapper, i = 0, nodeIds: List<string> = List<string>()): boolean {
+	if (nodeIds.contains(nodeWrapper.id)) return true
+	if (i > 500) return true
+
+	const netNodeIds = nodeIds.push(nodeWrapper.id)
+
+	if (nodeWrapper.getConnectedTargets().count() === 0) return false
+
+	return nodeWrapper.getConnectedTargets().some(x => {
+		return detectFeedbackLoop(x, i + 1, nodeIds)
+	})
+}
+
+interface MasterAudioOutputOptions extends IAudioNodeWrapperOptions {
+	audioNode: AudioNode
+}
+
+export class MasterAudioOutput extends AudioNodeWrapper {
+	private readonly _audioNode: AudioNode
+
+	constructor(options: MasterAudioOutputOptions) {
+		super(options)
+		this._audioNode = options.audioNode
+	}
+
+	public readonly getInputAudioNode = () => this._audioNode
+	public readonly getOutputAudioNode = () => null
+	public readonly dispose = () => undefined
+}
+
+export interface IInstrument extends IDisposable, AudioNodeWrapper {
 	setMidiNotes: (midiNotes: IMidiNotes) => void
 	setPan: (pan: number) => void
 	setLowPassFilterCutoffFrequency: (frequency: number) => void
@@ -64,7 +131,7 @@ export interface IInstrument extends IDisposable, IAudioNodeWrapper {
 	getActivityLevel: () => number
 }
 
-export abstract class Instrument<T extends Voices<V>, V extends Voice> extends AudioNodeWrapper {
+export abstract class Instrument<T extends Voices<V>, V extends Voice> extends AudioNodeWrapper implements IInstrument {
 	protected readonly _panNode: StereoPannerNode
 	protected readonly _audioContext: AudioContext
 	protected readonly _lowPassFilter: BiquadFilterNode
@@ -74,8 +141,8 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 	private _attackTimeInSeconds: number = 0.01
 	private _releaseTimeInSeconds: number = 3
 
-	constructor(options: IInstrumentOptions, startingGainValue: number) {
-		super()
+	constructor(options: IInstrumentOptions) {
+		super(options)
 
 		this._audioContext = options.audioContext
 
@@ -86,7 +153,8 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 		this._lowPassFilter.frequency.value = 10000
 
 		this._gain = this._audioContext.createGain()
-		this._gain.gain.value = startingGainValue
+		// Just below 1 to help mitigate an infinite feedback loop
+		this._gain.gain.value = 0.999
 
 		// this._arp.start(this._setMidiNotesFromArp)
 
@@ -97,7 +165,7 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 		this._lowPassFilter.connect(this._gain)
 	}
 
-	public readonly getInputAudioNode = () => this._gain
+	public readonly getInputAudioNode = () => null
 	public readonly getOutputAudioNode = () => this._gain
 
 	public readonly setPan = (pan: number) => {
@@ -112,7 +180,7 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 		// Rounding to nearest to 32 bit number because AudioParam values are 32 bit floats
 		const newFreq = Math.fround(frequency)
 		if (newFreq !== this._lowPassFilter.frequency.value) {
-			this._lowPassFilter.frequency.setValueAtTime(newFreq, this._audioContext.currentTime)
+			this._lowPassFilter.frequency.linearRampToValueAtTime(newFreq, this._audioContext.currentTime + 0.004)
 		}
 	}
 
@@ -275,6 +343,7 @@ export abstract class Voice {
 		this._cancelAndHoldOrJustCancel()
 		this._gain.gain.setValueAtTime(this._gain.gain.value, this._audioContext.currentTime)
 		this._gain.gain.exponentialRampToValueAtTime(0.00001, this._audioContext.currentTime + timeToReleaseInSeconds)
+		this._gain.gain.setValueAtTime(0, this._audioContext.currentTime + timeToReleaseInSeconds)
 
 		this._status = VoiceStatus.releasing
 		this._releaseId = uuid.v4()

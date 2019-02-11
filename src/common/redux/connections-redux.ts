@@ -1,4 +1,5 @@
 import {List, Map, Record, Set} from 'immutable'
+import {string} from 'prop-types'
 import {combineReducers, Reducer} from 'redux'
 import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
@@ -211,12 +212,15 @@ export const selectFirstConnectionIdByTargetId = (state: IClientRoomState, targe
 }
 
 /** For use by a node */
-export const selectConnectionSourceColorByTargetId = (state: IClientRoomState, targetId: string): string => {
+export const selectConnectionSourceColorByTargetId = (state: IClientRoomState, targetId: string, foo: List<string> = List<string>(), i: number = 0): string => {
+	// return 'black'
+	// if (!requestorId) console.log('AAAAAAAAA targetId: ', targetId)
+	// if (i > 900 && i % 10 === 0) console.log('GGGGGGGGG: ', i + '  ' + requestorId)
 	const connections = selectAllConnections(state).filter(x => x.targetId === targetId)
 
-	if (connections.count() === 0) return makeConnectionSourceColorSelector(state)(Connection.dummy)
+	if (connections.count() === 0) return makeConnectionSourceColorSelector(state, foo, i)(Connection.dummy)
 
-	const colors = connections.map(makeConnectionSourceColorSelector(state))
+	const colors = connections.map(makeConnectionSourceColorSelector(state, foo, i))
 
 	return mixColors(colors.toList())
 }
@@ -225,14 +229,17 @@ export const selectConnectionSourceColorByTargetId = (state: IClientRoomState, t
 export const selectConnectionSourceColor = (state: IClientRoomState, id: string): string => {
 	const connection = selectConnection(state, id)
 
-	return makeConnectionSourceColorSelector(state)(connection)
+	return makeConnectionSourceColorSelector(state, List<string>(), 0)(connection)
 }
 
-const makeConnectionSourceColorSelector = (roomState: IClientRoomState) => (connection: IConnection) => {
+const makeConnectionSourceColorSelector = (roomState: IClientRoomState, foo: List<string>, i: number) => (connection: IConnection) => {
+	if (i > 900 && i % 10 === 0) console.log('GGGGGGGGG: i: ', i + '  foo.count(): ' + foo.count() + '  connection.sourceId: ' + connection.sourceId + '  connection.id: ' + connection.id)
+	if (foo.contains(connection.id)) return 'black'
+
 	return (
 		getConnectionNodeInfo(connection.sourceType).stateSelector(roomState, connection.sourceId).color
 		||
-		selectConnectionSourceColorByTargetId(roomState, connection.sourceId)
+		selectConnectionSourceColorByTargetId(roomState, connection.sourceId, foo.push(connection.id), i + 1)
 	)
 }
 
@@ -252,31 +259,33 @@ const makeConnectionSourceNotesSelector = (roomState: IClientRoomState) => (conn
 }
 
 export const selectConnectionSourceIsActive = (roomState: IClientRoomState, id: string): boolean => {
-	const connection = selectConnection(roomState, id)
+	return false
+	// const connection = selectConnection(roomState, id)
 
-	const isPlaying = getConnectionNodeInfo(connection.sourceType).selectIsActive(roomState, connection.sourceId)
+	// const isPlaying = getConnectionNodeInfo(connection.sourceType).selectIsActive(roomState, connection.sourceId)
 
-	if (isPlaying !== null) {
-		return isPlaying
-	} else if (connection === Connection.dummy) {
-		return false
-	} else {
-		return selectConnectionSourceIsActive(roomState, selectFirstConnectionIdByTargetId(roomState, connection.sourceId))
-	}
+	// if (isPlaying !== null) {
+	// 	return isPlaying
+	// } else if (connection === Connection.dummy) {
+	// 	return false
+	// } else {
+	// 	return selectConnectionSourceIsActive(roomState, selectFirstConnectionIdByTargetId(roomState, connection.sourceId))
+	// }
 }
 
 export const selectConnectionSourceIsSending = (roomState: IClientRoomState, id: string): boolean => {
-	const connection = selectConnection(roomState, id)
+	return false
+	// const connection = selectConnection(roomState, id)
 
-	const isSending = getConnectionNodeInfo(connection.sourceType).selectIsSending(roomState, connection.sourceId)
+	// const isSending = getConnectionNodeInfo(connection.sourceType).selectIsSending(roomState, connection.sourceId)
 
-	if (isSending !== null) {
-		return isSending
-	} else if (connection === Connection.dummy) {
-		return false
-	} else {
-		return selectConnectionSourceIsSending(roomState, selectFirstConnectionIdByTargetId(roomState, connection.sourceId))
-	}
+	// if (isSending !== null) {
+	// 	return isSending
+	// } else if (connection === Connection.dummy) {
+	// 	return false
+	// } else {
+	// 	return selectConnectionSourceIsSending(roomState, selectFirstConnectionIdByTargetId(roomState, connection.sourceId))
+	// }
 }
 
 export function sortConnection(connA: IConnection, connB: IConnection) {

@@ -8,7 +8,7 @@ export class BasicSamplerInstrument extends Instrument<SamplerVoices, SamplerVoi
 	private readonly _voices: SamplerVoices
 
 	constructor(options: IBasicSamplerOptions) {
-		super(options, 1)
+		super(options)
 
 		this._voices = new SamplerVoices(options.voiceCount, this._audioContext, this._panNode)
 	}

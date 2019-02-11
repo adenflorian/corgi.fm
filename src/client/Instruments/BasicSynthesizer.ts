@@ -11,7 +11,7 @@ export class BasicSynthesizer extends Instrument<SynthVoices, SynthVoice> {
 	private readonly _voices: SynthVoices
 
 	constructor(options: IBasicSynthesizerOptions) {
-		super(options, 1)
+		super(options)
 
 		this._voices = new SynthVoices(options.voiceCount, this._audioContext, this._panNode, options.oscillatorType)
 	}

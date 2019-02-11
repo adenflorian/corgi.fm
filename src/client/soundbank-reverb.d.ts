@@ -4,8 +4,8 @@ declare module 'soundbank-reverb' {
 		cutoff: AudioParam
 		decay: number
 		reverse: boolean
-		wet: GainNode
-		dry: GainNode
+		wet: AudioParam
+		dry: AudioParam
 		filterType: BiquadFilterType
 	}
 	const Reverb: (ctx: AudioContext) => ReverbNode

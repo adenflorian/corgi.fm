@@ -2,7 +2,7 @@ import {Store} from 'redux'
 import Reverb from 'soundbank-reverb'
 import {logger} from './logger'
 import {reportLevels} from './redux/audio-redux'
-import {IClientAppState} from './redux/index'
+import {IClientAppState, setOptionMasterVolume} from './redux/index'
 
 declare global {
 	interface Window {
@@ -11,10 +11,13 @@ declare global {
 	}
 }
 
-export function setupAudioContext(audioContext: AudioContext, preFx: GainNode, store: Store) {
+export function setupAudioContext(audioContext: AudioContext, preFx: GainNode, store: Store<IClientAppState>) {
 	logger.log('setting up audio context')
 
-	const master = audioContext.createGain()
+	const masterGain = audioContext.createGain()
+
+	const masterFilter = audioContext.createBiquadFilter()
+	masterFilter.frequency.value = 10000
 
 	// const reverbHigh = Reverb(audioContext)
 	// reverbHigh.time = 0.9
@@ -35,8 +38,6 @@ export function setupAudioContext(audioContext: AudioContext, preFx: GainNode, s
 	// preFx.connect(reverbLowAndLong)
 	// 	.connect(master)
 
-	preFx.connect(master)
-
 	const analyser = audioContext.createAnalyser()
 	analyser.smoothingTimeConstant = 0.3
 	analyser.fftSize = 1024
@@ -55,6 +56,11 @@ export function setupAudioContext(audioContext: AudioContext, preFx: GainNode, s
 
 	function checkAudioLevels() {
 		const timeSinceLastUpdate = Date.now() - lastUpdateTime
+
+		if (masterLimiter.reduction < -10 && store.getState().options.masterVolume !== 0) {
+			store.dispatch(setOptionMasterVolume(0))
+			logger.warn('Feedback loop detected, setting master volume to 0')
+		}
 
 		if (timeSinceLastUpdate >= updateInterval) {
 			const array = new Uint8Array(analyser.frequencyBinCount)
@@ -76,8 +82,21 @@ export function setupAudioContext(audioContext: AudioContext, preFx: GainNode, s
 		})
 	}
 
-	master.connect(audioContext.destination)
-	master.connect(analyser)
+	const masterLimiter = audioContext.createDynamicsCompressor()
+	masterLimiter.threshold.value = -3.0 // this is the pitfall, leave some headroom
+	masterLimiter.knee.value = 0.0 // brute force
+	masterLimiter.ratio.value = 20.0 // max compression
+	masterLimiter.attack.value = 0.000 // 5ms attack
+	masterLimiter.release.value = 0.000 // 50ms release
+	// limiter.attack.value = 0.005 // 5ms attack
+	// limiter.release.value = 0.050 // 50ms release
+
+	const finalNode = preFx.connect(masterGain)
+		.connect(masterLimiter)
+		.connect(masterFilter)
+
+	finalNode.connect(analyser)
+	finalNode.connect(audioContext.destination)
 
 	preFx.gain.value = 0.5
 
@@ -87,9 +106,12 @@ export function setupAudioContext(audioContext: AudioContext, preFx: GainNode, s
 		const state: IClientAppState = store.getState()
 		const newVolume = state.options.masterVolume
 		if (previousMasterVolume !== newVolume) {
-			master.gain.value = state.options.masterVolume
+			// master.gain.value = state.options.masterVolume
+			masterGain.gain.value = Math.min(0.5, state.options.masterVolume)
+			// limiter.threshold.value = Math.min(-12, state.options.masterVolume)
 		}
 		previousMasterVolume = newVolume
+		// console.log('limiter.reduction: ' + masterLimiter.reduction)
 	})
 
 	return audioContext

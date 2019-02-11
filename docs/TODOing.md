@@ -2,10 +2,11 @@
 - [√] fix multiple audio outputs
 	- [√] allow multiple audio outputs
 	- [√] properly disconnect things when a node already has multiple outbound connections
-- [ ] 'Maximum call stack size exceeded' issue again with looped connections
+- [√] 'Maximum call stack size exceeded' issue again with looped connections
 	- sampler -> reverb -> same sampler
 
 # Soon
+- [ ] fix old view
 - [ ] allow adding connections from a node with no connections on it already
 - [ ] add ability to add nodes
 - [ ] new graph state

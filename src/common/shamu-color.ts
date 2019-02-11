@@ -24,6 +24,7 @@ export function getColorStringForMidiNote(note: IMidiNote): string {
 }
 
 export function mixColors(colors: List<string>): string {
+	// console.log('colors.count(): ', colors.count())
 	if (colors.count() === 0) return 'black'
 	if (colors.count() === 1) return colors.first()
 	return `hsl(${colorFunc(colors.reduce(mix2Colors)).hue()}, 40%, 50%)`
