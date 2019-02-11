@@ -1,5 +1,5 @@
 import {Dispatch, Middleware} from 'redux'
-import {applyOctave} from '../../client/music/music-functions'
+import {applyOctave} from '../../client/WebAudio/music-functions'
 import {ConnectionNodeType} from '../common-types'
 import {logger} from '../logger'
 import {addBasicSampler, addBasicSynthesizer, addPosition, addVirtualKeyboard, BasicSamplerState, BasicSynthesizerState, Connection, connectionsActions, deleteAllPositions, deleteAllThings, IClientAppState, makeActionCreator, makePosition, MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID, READY, selectActiveRoom, selectLocalClient, selectPositionExtremes, selectVirtualKeyboardById, selectVirtualKeyboardIdByOwner, SET_ACTIVE_ROOM, VirtualKeyboardState, virtualKeyPressed, virtualKeyUp, virtualOctaveChange} from './index'

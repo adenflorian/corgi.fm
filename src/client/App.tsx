@@ -20,8 +20,8 @@ class App extends React.Component<IAppProps, {}> {
 
 		if (isLocalDevClient()) {
 			switch (window.location.pathname.replace('/', '')) {
-				case 'options': return <Options />
-				case 'reverb': return <SimpleReverbView id="-1" color="red" isPlaying={false} />
+				// case 'options': return <Options />
+				// case 'reverb': return <SimpleReverbView id="-1" color="red" isPlaying={false} />
 				// case 'infiniteSequencer': return <InfiniteSequencer id="fakeId" />
 			}
 		}

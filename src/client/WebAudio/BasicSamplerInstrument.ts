@@ -1,5 +1,5 @@
-import {IInstrumentOptions, Instrument, Voice, Voices} from '../Instruments/Instrument'
-import {getOctaveFromMidiNote, midiNoteToNoteName} from '../music/music-functions'
+import {IInstrumentOptions, Instrument, Voice, Voices} from './Instrument'
+import {getOctaveFromMidiNote, midiNoteToNoteName} from './music-functions'
 import {SamplesManager} from './SamplesManager'
 
 export type IBasicSamplerOptions = IInstrumentOptions

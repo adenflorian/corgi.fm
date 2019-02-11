@@ -3,7 +3,7 @@ import uuid = require('uuid')
 import {IDisposable} from '../../common/common-types'
 import {logger} from '../../common/logger'
 import {emptyMidiNotes, IMidiNotes} from '../../common/MidiNote'
-import {Arp} from '../arp'
+import {Arp} from './arp'
 
 export interface IAudioNodeWrapperOptions {
 	audioContext: AudioContext

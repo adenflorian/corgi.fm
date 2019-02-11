@@ -1,20 +1,20 @@
-import * as Immutable from 'immutable'
 import {Store} from 'redux'
 import {ConnectionNodeType, IConnectable} from '../common/common-types'
-import {IClientAppState, IClientRoomState} from '../common/redux'
-import {setGlobalClockIndex} from '../common/redux'
 import {
-	selectConnectionSourceNotesByTargetId,
+	BasicSamplerState, BasicSynthesizerState, IClientAppState, IClientRoomState,
+	IConnection, isAudioNodeType, MASTER_AUDIO_OUTPUT_TARGET_ID,
+	selectAllBasicSynthesizerIds, selectAllSamplerIds, selectAllSimpleReverbIds,
+	selectBasicSynthesizer, selectConnectionSourceNotesByTargetId,
+	selectConnectionsWithSourceIds, selectSampler, selectSimpleReverb,
+	setGlobalClockIndex, SimpleReverbState,
 } from '../common/redux'
-import {
-	BasicSynthesizerState, IConnection, isAudioNodeType, MASTER_AUDIO_OUTPUT_TARGET_ID, selectAllBasicSynthesizerIds, selectAllSimpleReverbIds, selectBasicSynthesizer, selectConnectionsWithSourceIds, selectSimpleReverb, SimpleReverbState,
-} from '../common/redux'
-import {BasicSamplerState, selectAllSamplerIds, selectSampler} from '../common/redux'
-import {BasicSamplerInstrument} from './BasicSampler/BasicSamplerInstrument'
 import {GridSequencerPlayer} from './GridSequencerPlayer'
-import {BasicSynthesizer} from './Instruments/BasicSynthesizer'
-import {AudioNodeWrapper, IAudioNodeWrapperOptions, IInstrument, IInstrumentOptions, MasterAudioOutput} from './Instruments/Instrument'
-import {SimpleReverb} from './ShamuNodes/SimpleReverb/SimpleReverb'
+import {BasicSamplerInstrument} from './WebAudio/BasicSamplerInstrument'
+import {BasicSynthesizer} from './WebAudio/BasicSynthesizer'
+import {
+	AudioNodeWrapper, IAudioNodeWrapperOptions, IInstrument, IInstrumentOptions, MasterAudioOutput,
+} from './WebAudio/Instrument'
+import {SimpleReverb} from './WebAudio/SimpleReverb'
 
 type IdsSelector = (roomState: IClientRoomState) => string[]
 type StateSelector<S> = (roomState: IClientRoomState, id: string) => S

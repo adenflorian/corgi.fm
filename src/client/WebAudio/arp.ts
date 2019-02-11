@@ -1,4 +1,4 @@
-import {emptyMidiNotes, IMidiNotes, MidiNotes} from '../common/MidiNote'
+import {emptyMidiNotes, IMidiNotes, MidiNotes} from '../../common/MidiNote'
 
 export type OnNewNotes = (newNotes: IMidiNotes) => void
 

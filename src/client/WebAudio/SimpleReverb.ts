@@ -1,5 +1,5 @@
 import Reverb, {ReverbNode} from 'soundbank-reverb'
-import {AudioNodeWrapper, IAudioNodeWrapperOptions} from '../../Instruments/Instrument'
+import {AudioNodeWrapper, IAudioNodeWrapperOptions} from './Instrument'
 
 // TODO Add other Reverb params
 //   - [√] time: number

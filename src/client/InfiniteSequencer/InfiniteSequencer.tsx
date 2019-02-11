@@ -7,8 +7,8 @@ import {clearSequencer, exportSequencerMidi, findLowestAndHighestNotes, IClientA
 import {getColorStringForMidiNote} from '../../common/shamu-color'
 import {isWhiteKey} from '../Keyboard/Keyboard'
 import {Knob} from '../Knob/Knob'
-import {getOctaveFromMidiNote, midiNoteToNoteName} from '../music/music-functions'
 import {Panel} from '../Panel/Panel'
+import {getOctaveFromMidiNote, midiNoteToNoteName} from '../WebAudio/music-functions'
 import './InfiniteSequencer.less'
 
 interface IInfiniteSequencerProps {

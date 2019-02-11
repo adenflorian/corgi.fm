@@ -7,10 +7,10 @@ import {selectClientById, selectLocalClient} from '../../common/redux'
 import {IClientAppState} from '../../common/redux'
 import {selectVirtualKeyboardById, virtualKeyPressed, virtualKeyUp} from '../../common/redux'
 import {keyToMidiMap} from '../input-events'
-import {applyOctave, KeyColor, keyColors, NoteNameSharps} from '../music/music-functions'
-import {Octave} from '../music/music-types'
 import {Panel} from '../Panel/Panel'
 import {isLeftMouseButtonDown} from '../utils'
+import {applyOctave, KeyColor, keyColors, NoteNameSharps} from '../WebAudio/music-functions'
+import {Octave} from '../WebAudio/music-types'
 import './Keyboard.less'
 
 const defaultNumberOfKeys = 17
