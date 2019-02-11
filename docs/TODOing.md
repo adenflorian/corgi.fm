@@ -4,8 +4,11 @@
 	- [√] properly disconnect things when a node already has multiple outbound connections
 - [√] 'Maximum call stack size exceeded' issue again with looped connections
 	- sampler -> reverb -> same sampler
+- [ ] fix perf issues with looped connections (color calcs?)
 
 # Soon
+- [ ] use OscillatorNode.detune
+	- https://developer.mozilla.org/en-US/docs/Web/API/OscillatorNode/detune
 - [ ] fix old view
 - [ ] allow adding connections from a node with no connections on it already
 - [ ] add ability to add nodes
