@@ -55,7 +55,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 	public render() {
 		const {color, saturateSource, saturateTarget, id, ghostConnector = defaultGhostConnector} = this.props
 
-		const line = new LineState(
+		const connectedLine = new LineState(
 			this.props.sourceX + connectorWidth,
 			this.props.sourceY,
 			this.props.targetX - connectorWidth,
@@ -87,39 +87,36 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 
 		// Straight lines
 		// const pathDPart1 = `
-		// 	M ${line.x1} ${line.y1}
-		// 	L ${line.x1 + joint} ${line.y1}
-		// 	L ${line.x2 - joint} ${line.y2}
-		// 	L ${line.x2} ${line.y2}
+		// 	M ${connectedLine.x1} ${connectedLine.y1}
+		// 	L ${connectedLine.x1 + joint} ${connectedLine.y1}
+		// 	L ${connectedLine.x2 - joint} ${connectedLine.y2}
+		// 	L ${connectedLine.x2} ${connectedLine.y2}
 		// `
 
-		const diff = Math.abs((line.x2 - line.x1) / 2)
-
-		const curveStrength = Math.max(10, diff)
-		// const curveStrength = 100
-
 		// Curved
-		const pathDPart1 = `
-			M ${line.x1} ${line.y1}
-			C ${line.x1 + joint + curveStrength} ${line.y1} ${line.x2 - joint - curveStrength} ${line.y2} ${line.x2} ${line.y2}
-		`
+		const pathDPart1 = makeCurvedPath(connectedLine)
+
 		// const pathDPart1 = `
-		// 	M ${line.x1} ${line.y1}
-		// 	L ${line.x1 + joint} ${line.y1}
-		// 	C ${line.x1 + joint + curveStrength} ${line.y1} ${line.x2 - joint - curveStrength} ${line.y2} ${line.x2 - joint} ${line.y2}
-		// 	L ${line.x2} ${line.y2}
+		// 	M ${connectedLine.x1} ${connectedLine.y1}
+		// 	L ${connectedLine.x1 + joint} ${connectedLine.y1}
+		// 	C ${connectedLine.x1 + joint + curveStrength} ${connectedLine.y1} ${connectedLine.x2 - joint - curveStrength} ${connectedLine.y2} ${connectedLine.x2 - joint} ${connectedLine.y2}
+		// 	L ${connectedLine.x2} ${connectedLine.y2}
 		// `
 
 		const ghostLine = getGhostLine()
 
-		const diff2 = Math.abs((ghostLine.x2 - ghostLine.x1) / 2)
+		const pathDPart1Ghost = makeCurvedPath(ghostLine)
 
-		const curveStrength2 = Math.max(10, diff2)
+		function makeCurvedPath(line: LineState) {
+			const diff2 = Math.abs((line.x2 - line.x1) / 2)
 
-		const pathDPart1Ghost = `
-			M ${ghostLine.x1} ${ghostLine.y1}
-			C ${ghostLine.x1 + joint + curveStrength2} ${ghostLine.y1} ${ghostLine.x2 - joint - curveStrength2} ${ghostLine.y2} ${ghostLine.x2} ${ghostLine.y2}
-		`
+			const curveStrength2 = Math.max(10, diff2)
+
+			return `
+				M ${line.x1} ${line.y1}
+				C ${line.x1 + joint + curveStrength2} ${line.y1} ${line.x2 - joint - curveStrength2} ${line.y2} ${line.x2} ${line.y2}
+			`
+		}
 
 		// const pathDPart1Ghost = `
 		// 	M ${ghostLine.x1} ${ghostLine.y1}
@@ -130,8 +127,8 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 
 		// This path is a hack to get the filter to work properly
 		// It forces the "render box?" to be bigger than the actual drawn path
-		const pathDPart2 = `M ${line.x1 + buffer} ${line.y1 + buffer} M ${line.x2 + buffer} ${line.y2 + buffer}`
-			+ `M ${line.x1 - buffer} ${line.y1 - buffer} M ${line.x2 - buffer} ${line.y2 - buffer}`
+		const pathDPart2 = `M ${connectedLine.x1 + buffer} ${connectedLine.y1 + buffer} M ${connectedLine.x2 + buffer} ${connectedLine.y2 + buffer}`
+			+ `M ${connectedLine.x1 - buffer} ${connectedLine.y1 - buffer} M ${connectedLine.x2 - buffer} ${connectedLine.y2 - buffer}`
 
 		const pathDFull = pathDPart1 + ' ' + pathDPart2
 
@@ -152,10 +149,10 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 					<defs>
 						<linearGradient
 							id={id}
-							x1={(line.x1)}
-							y1={(line.y1)}
-							x2={(line.x2)}
-							y2={(line.y2)}
+							x1={(connectedLine.x1)}
+							y1={(connectedLine.y1)}
+							x2={(connectedLine.x2)}
+							y2={(connectedLine.y2)}
 							gradientUnits="userSpaceOnUse"
 						// gradientUnits="objectBoundingBox"
 						>
