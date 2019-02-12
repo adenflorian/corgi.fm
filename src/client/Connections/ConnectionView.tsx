@@ -112,12 +112,21 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 
 		const ghostLine = getGhostLine()
 
+		const diff2 = Math.abs((ghostLine.x2 - ghostLine.x1) / 2)
+
+		const curveStrength2 = Math.max(10, diff2)
+
 		const pathDPart1Ghost = `
 			M ${ghostLine.x1} ${ghostLine.y1}
-			L ${ghostLine.x1 + joint} ${ghostLine.y1}
-			L ${ghostLine.x2 - joint} ${ghostLine.y2}
-			L ${ghostLine.x2} ${ghostLine.y2}
+			C ${ghostLine.x1 + joint + curveStrength2} ${ghostLine.y1} ${ghostLine.x2 - joint - curveStrength2} ${ghostLine.y2} ${ghostLine.x2} ${ghostLine.y2}
 		`
+
+		// const pathDPart1Ghost = `
+		// 	M ${ghostLine.x1} ${ghostLine.y1}
+		// 	L ${ghostLine.x1 + joint} ${ghostLine.y1}
+		// 	L ${ghostLine.x2 - joint} ${ghostLine.y2}
+		// 	L ${ghostLine.x2} ${ghostLine.y2}
+		// `
 
 		// This path is a hack to get the filter to work properly
 		// It forces the "render box?" to be bigger than the actual drawn path

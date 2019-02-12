@@ -1,16 +1,12 @@
 # Now
-- [√] fix multiple audio outputs
-	- [√] allow multiple audio outputs
-	- [√] properly disconnect things when a node already has multiple outbound connections
-- [√] 'Maximum call stack size exceeded' issue again with looped connections
-	- sampler -> reverb -> same sampler
-- [ ] fix perf issues with looped connections (color calcs?)
+- [ ] fix ghost connection to be curved
+- [ ] allow adding connections from a node with no connections on it already
 
 # Soon
+- [ ] fix perf issues with looped connections (color calcs?)
 - [ ] use OscillatorNode.detune
 	- https://developer.mozilla.org/en-US/docs/Web/API/OscillatorNode/detune
 - [ ] fix old view
-- [ ] allow adding connections from a node with no connections on it already
 - [ ] add ability to add nodes
 - [ ] new graph state
 	- [√] move reducers for the different node types under the shamu graph reducer, but keep them separate

@@ -38,11 +38,8 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 		const {x, y, width, height, positionId, targetType, zIndex} = this.props
 
 		return (
-			// @ts-ignore: https://github.com/mzabriskie/react-draggable/issues/381
 			<Draggable
-				// onStart={this._handleStart}
 				onDrag={this._handleDrag}
-				// onStop={this._handleStop}
 				position={{
 					x,
 					y,
@@ -61,7 +58,6 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 					className="simpleGraphNode"
 					style={{
 						position: 'absolute',
-						// backgroundColor: 'green',
 						willChange: 'transform',
 						width,
 						height,
@@ -75,20 +71,13 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 		)
 	}
 
-	// private readonly _handleStart: DraggableEventHandler = (e, data) =>
-	// 	console.log('_handleStart: ', data)
-
 	private readonly _handleDrag: DraggableEventHandler = (_, data) => {
 		this.props.dispatch(updatePosition(this.props.positionId, {x: data.x, y: data.y}))
 	}
 
 	private readonly _handleMouseDown = () => {
-		// Dispatching update with empty data to update last touched
 		this.props.dispatch(nodeClicked(this.props.positionId))
 	}
-
-	// private readonly _handleStop: DraggableEventHandler = (e, data) =>
-	// 	console.log('_handleStop: ', data)
 }
 
 const handleSize = 24

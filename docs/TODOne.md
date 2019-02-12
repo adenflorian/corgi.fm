@@ -12,3 +12,8 @@
 		- [√] make ui better
 		- [√] make it get organized in create server stuff
 		- [√] make everything go through the reverb before audio output
+	- [√] fix multiple audio outputs
+		- [√] allow multiple audio outputs
+		- [√] properly disconnect things when a node already has multiple outbound connections
+	- [√] 'Maximum call stack size exceeded' issue again with looped connections
+		- sampler -> reverb -> same sampler
