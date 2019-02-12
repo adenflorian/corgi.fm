@@ -12,7 +12,7 @@ interface ISimpleGraphReduxProps {
 }
 
 export const SimpleGraph: React.FC<ISimpleGraphReduxProps> =
-	({positionIds}) =>
+	React.memo(({positionIds}) =>
 		<div
 			className="simpleGraph"
 			style={{
@@ -31,7 +31,8 @@ export const SimpleGraph: React.FC<ISimpleGraphReduxProps> =
 					)}
 				</div>
 			</ConnectedZoom>
-		</div>
+		</div>,
+	)
 
 export const ConnectedSimpleGraph = connect(
 	(state: IClientAppState): ISimpleGraphReduxProps => ({

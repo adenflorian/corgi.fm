@@ -18,8 +18,8 @@ interface MousePointerReduxProps {
 
 type MousePointerAllProps = MousePointerProps & MousePointerReduxProps
 
-export const MousePointer: React.FunctionComponent<MousePointerAllProps> =
-	({color, name, x, y}) =>
+export const MousePointer: React.FC<MousePointerAllProps> =
+	React.memo(({color, name, x, y}) =>
 		<div
 			className="pointer"
 			style={{
@@ -59,7 +59,8 @@ export const MousePointer: React.FunctionComponent<MousePointerAllProps> =
 			>
 				{name}
 			</div>
-		</div>
+		</div>,
+	)
 
 export const ConnectedMousePointer = connect(
 	(state: IClientAppState, props: MousePointerProps): MousePointerReduxProps => {

@@ -30,7 +30,7 @@ interface IInfiniteSequencerReduxProps {
 type IInfiniteSequencerAllProps =
 	IInfiniteSequencerProps & IInfiniteSequencerReduxProps & {dispatch: Dispatch}
 
-export const InfiniteSequencer: React.FunctionComponent<IInfiniteSequencerAllProps> = props => {
+export const InfiniteSequencer: React.FC<IInfiniteSequencerAllProps> = React.memo(props => {
 	const {color, isPlaying, id, isRecording, style, events, name, rate, dispatch} = props
 
 	const {lowestNote, highestNote} = findLowestAndHighestNotes(events)
@@ -44,6 +44,17 @@ export const InfiniteSequencer: React.FunctionComponent<IInfiniteSequencerAllPro
 
 	const dispatchInfiniteSeqParam = (paramType: InfiniteSequencerFields, value: number | boolean | string) =>
 		dispatch(setInfiniteSequencerField(id, paramType, value))
+
+	const ColorGridNote = React.memo(({note, index}: {note: IMidiNote, index: number}) =>
+		<div
+			className={`event ${props.activeIndex === index ? 'active' : ''}`}
+			style={{
+				backgroundColor: note === -1 ? 'none' : getColorStringForMidiNote(note),
+				height: `${noteHeightPercentage + (note === lowestNote ? 1 : 0)}%`,
+				top: `${(highestNote - note) * noteHeightPercentage}%`,
+			}}
+		/>,
+	)
 
 	return render()
 
@@ -188,20 +199,7 @@ export const InfiniteSequencer: React.FunctionComponent<IInfiniteSequencerAllPro
 			</div >
 		)
 	}
-
-	function ColorGridNote({note, index}: {note: IMidiNote, index: number}) {
-		return (
-			<div
-				className={`event ${props.activeIndex === index ? 'active' : ''}`}
-				style={{
-					backgroundColor: note === -1 ? 'none' : getColorStringForMidiNote(note),
-					height: `${noteHeightPercentage + (note === lowestNote ? 1 : 0)}%`,
-					top: `${(highestNote - note) * noteHeightPercentage}%`,
-				}}
-			/>
-		)
-	}
-}
+})
 
 export const ConnectedInfiniteSequencer = connect(
 	(state: IClientAppState, props: IInfiniteSequencerProps): IInfiniteSequencerReduxProps => {

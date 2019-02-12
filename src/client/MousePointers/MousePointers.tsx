@@ -9,8 +9,8 @@ interface IMousePointersViewProps {
 	clientIds: List<string>
 }
 
-export const MousePointers: React.FunctionComponent<IMousePointersViewProps> =
-	({clientIds}) =>
+export const MousePointers: React.FC<IMousePointersViewProps> =
+	React.memo(({clientIds}) =>
 		<div className="pointers">
 			{clientIds
 				.map(clientId =>
@@ -20,7 +20,8 @@ export const MousePointers: React.FunctionComponent<IMousePointersViewProps> =
 					/>,
 				)
 			}
-		</div>
+		</div>,
+	)
 
 const mapStateToProps = (state: IClientAppState): IMousePointersViewProps => {
 	return {

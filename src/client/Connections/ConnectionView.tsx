@@ -174,14 +174,14 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 					</g>
 
 				</svg>
-				<ConnectorMemo
+				<Connector
 					width={connectorWidth}
 					height={connectorHeight}
 					x={this.props.sourceX}
 					y={this.props.sourceY}
 					color={color}
 				/>
-				<ConnectorMemo
+				<Connector
 					width={connectorWidth}
 					height={connectorHeight}
 					x={this.props.targetX - connectorWidth}
@@ -296,7 +296,7 @@ class GhostConnector extends React.PureComponent<IGhostConnectorProps> {
 				}
 			>
 				<div>
-					<ConnectorMemo
+					<Connector
 						width={connectorWidth}
 						height={connectorHeight}
 					/>
@@ -338,30 +338,28 @@ interface ConnectorProps {
 	color?: string
 }
 
-const ConnectorMemo: React.FC<ConnectorProps> =
-	React.memo(function Connector({width, height, saturate = false, x = 0, y = 0, color}) {
-		return (
-			<svg
-				className={`colorize connector${saturate ? ' saturate' : ''}`}
-				xmlns="http://www.w3.org/2000/svg"
-				style={{
-					width,
-					height,
-					top: y - (connectorHeight / 2),
-					left: x,
-				}}
-			>
-				<line
-					x1={0}
-					y1={height / 2}
-					x2={width}
-					y2={height / 2}
-					strokeWidth={connectorStrokeWidth}
-					stroke={color}
-				/>
-			</svg>
-		)
-	})
+const Connector: React.FC<ConnectorProps> =
+	React.memo(({width, height, saturate = false, x = 0, y = 0, color}) =>
+		<svg
+			className={`colorize connector${saturate ? ' saturate' : ''}`}
+			xmlns="http://www.w3.org/2000/svg"
+			style={{
+				width,
+				height,
+				top: y - (connectorHeight / 2),
+				left: x,
+			}}
+		>
+			<line
+				x1={0}
+				y1={height / 2}
+				x2={width}
+				y2={height / 2}
+				strokeWidth={connectorStrokeWidth}
+				stroke={color}
+			/>
+		</svg>,
+	)
 
 export const ConnectedConnectionView = shamuConnect(
 	(state: IClientAppState): IConnectionViewReduxProps => ({

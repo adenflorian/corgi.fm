@@ -22,7 +22,7 @@ interface ISimpleReverbDispatchProps {
 type ISimpleReverbAllProps = ISimpleReverbProps & ISimpleReverbReduxProps & ISimpleReverbDispatchProps
 
 export const SimpleReverbView: React.FC<ISimpleReverbAllProps> =
-	({id, color, isPlaying, time, lpf, changeParam}) => {
+	React.memo(({id, color, isPlaying, time, lpf, changeParam}) => {
 		return (
 			<Panel
 				className={`${isPlaying ? 'isPlaying' : 'isNotPlaying'}`}
@@ -68,7 +68,7 @@ export const SimpleReverbView: React.FC<ISimpleReverbAllProps> =
 				</div>
 			</Panel>
 		)
-	}
+	})
 
 export const ConnectedSimpleReverb = shamuConnect(
 	(state, {id}: ISimpleReverbProps): ISimpleReverbReduxProps => {

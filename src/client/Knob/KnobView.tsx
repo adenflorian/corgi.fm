@@ -12,7 +12,7 @@ interface IKnobViewProps {
 	size: number
 }
 
-export const KnobView: React.FC<IKnobViewProps> = props => {
+export const KnobView: React.FC<IKnobViewProps> = React.memo(props => {
 	const {handleMouseDown, percentage, adjustedPercentage, label, readOnly = false, markColor = 'gray'} = props
 
 	return (
@@ -56,7 +56,7 @@ export const KnobView: React.FC<IKnobViewProps> = props => {
 			<div className="label unselectable">{label}</div>
 		</div>
 	)
-}
+})
 
 KnobView.defaultProps = {
 	size: 32,

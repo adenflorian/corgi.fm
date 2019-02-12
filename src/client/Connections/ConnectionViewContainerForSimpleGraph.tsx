@@ -12,7 +12,7 @@ type IConnectionViewContainerForSimpleGraphAllProps =
 	IConnectionViewContainerForSimpleGraphReduxProps
 
 export const ConnectionViewContainerForSimpleGraph: React.FC<IConnectionViewContainerForSimpleGraphAllProps> =
-	({
+	React.memo(({
 		sourceColor, isSourceActive, isSourceSending, id,
 		positions: {sourcePosition, targetPosition}, ghostConnector,
 	}) =>
@@ -28,7 +28,8 @@ export const ConnectionViewContainerForSimpleGraph: React.FC<IConnectionViewCont
 				saturateSource={isSourceActive || isSourceSending}
 				saturateTarget={isSourceSending}
 				id={id}
-			/>
+			/>,
+	)
 
 export const ConnectedConnectionViewContainerForSimpleGraph = shamuConnect(
 	() => {

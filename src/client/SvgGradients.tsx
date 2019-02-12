@@ -23,7 +23,7 @@ function foo() {
 		)
 }
 
-export const SvgGradients = () =>
+export const SvgGradients = React.memo(() =>
 	<React.Fragment>
 		<svg
 			style={{
@@ -43,4 +43,5 @@ export const SvgGradients = () =>
 				{foo()}
 			</linearGradient>
 		</svg>
-	</React.Fragment >
+	</React.Fragment >,
+)

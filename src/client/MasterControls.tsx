@@ -21,8 +21,8 @@ interface IMasterControlsDispatchProps {
 	onStop: () => void
 }
 
-export const MasterControls: React.FunctionComponent<IMasterControlsReduxProps & IMasterControlsDispatchProps> =
-	({onPlay, onStop, isAnythingPlaying, color}) =>
+export const MasterControls: React.FC<IMasterControlsReduxProps & IMasterControlsDispatchProps> =
+	React.memo(({onPlay, onStop, isAnythingPlaying, color}) =>
 		<div
 			className={
 				`masterControls ` +
@@ -53,7 +53,8 @@ export const MasterControls: React.FunctionComponent<IMasterControlsReduxProps &
 					</div>
 				</div>
 			</Panel>
-		</div>
+		</div>,
+	)
 
 export const ConnectedMasterControls = connect(
 	(state: IClientAppState): IMasterControlsReduxProps => ({

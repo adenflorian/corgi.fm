@@ -12,8 +12,8 @@ export interface IPanelProps {
 	saturate?: boolean
 }
 
-export const Panel: React.FunctionComponent<IPanelProps> =
-	({children, className = '', color = CssColor.defaultGray, id, label, labelTitle, saturate = false}) => {
+export const Panel: React.FC<IPanelProps> =
+	React.memo(({children, className = '', color = CssColor.defaultGray, id, label, labelTitle, saturate = false}) => {
 
 		const renderLabel = label !== undefined && label !== ''
 
@@ -52,7 +52,7 @@ export const Panel: React.FunctionComponent<IPanelProps> =
 				</div>
 			</div>
 		)
-	}
+	})
 
 const ShamuBorder = ({saturate}: {saturate: boolean}) =>
 	<svg
