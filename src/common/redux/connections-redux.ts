@@ -1,12 +1,11 @@
 import {List, Map, Record, Set} from 'immutable'
-import {string} from 'prop-types'
 import {combineReducers, Reducer} from 'redux'
 import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
 import * as uuid from 'uuid'
 import {ConnectionNodeType} from '../common-types'
 import {IMidiNotes} from '../MidiNote'
-import {mixColors} from '../shamu-color'
+import {CssColor, mixColors} from '../shamu-color'
 import {BROADCASTER_ACTION, getConnectionNodeInfo, IClientRoomState, IVirtualKeyboardState, selectVirtualKeyboardById, SERVER_ACTION} from './index'
 
 export const ADD_CONNECTION = 'ADD_CONNECTION'
@@ -212,36 +211,35 @@ export const selectFirstConnectionIdByTargetId = (state: IClientRoomState, targe
 }
 
 /** For use by a node */
-export const selectConnectionSourceColorByTargetId = (state: IClientRoomState, targetId: string, foo: List<string> = List<string>(), i: number = 0): string => {
-	// return 'black'
-	// if (!requestorId) console.log('AAAAAAAAA targetId: ', targetId)
-	// if (i > 900 && i % 10 === 0) console.log('GGGGGGGGG: ', i + '  ' + requestorId)
-	const connections = selectAllConnections(state).filter(x => x.targetId === targetId)
+export const selectConnectionSourceColorByTargetId =
+	(state: IClientRoomState, targetId: string, processedIds = List<string>()): string => {
+		const connections = selectAllConnections(state).filter(x => x.targetId === targetId)
 
-	if (connections.count() === 0) return makeConnectionSourceColorSelector(state, foo, i)(Connection.dummy)
+		if (connections.count() === 0) return makeConnectionSourceColorSelector(state, processedIds)(Connection.dummy)
 
-	const colors = connections.map(makeConnectionSourceColorSelector(state, foo, i))
+		const colors = connections.map(makeConnectionSourceColorSelector(state, processedIds))
 
-	return mixColors(colors.toList())
-}
+		return mixColors(colors.toList())
+	}
 
 /** For use by a connection */
 export const selectConnectionSourceColor = (state: IClientRoomState, id: string): string => {
 	const connection = selectConnection(state, id)
 
-	return makeConnectionSourceColorSelector(state, List<string>(), 0)(connection)
+	return makeConnectionSourceColorSelector(state)(connection)
 }
 
-const makeConnectionSourceColorSelector = (roomState: IClientRoomState, foo: List<string>, i: number) => (connection: IConnection) => {
-	if (i > 900 && i % 10 === 0) console.log('GGGGGGGGG: i: ', i + '  foo.count(): ' + foo.count() + '  connection.sourceId: ' + connection.sourceId + '  connection.id: ' + connection.id)
-	if (foo.contains(connection.id)) return 'black'
+const makeConnectionSourceColorSelector =
+	(roomState: IClientRoomState, processedIds = List<string>()) => (connection: IConnection) => {
+		// If in a loop
+		if (processedIds.contains(connection.id)) return CssColor.subtleGrayBlackBg
 
-	return (
-		getConnectionNodeInfo(connection.sourceType).stateSelector(roomState, connection.sourceId).color
-		||
-		selectConnectionSourceColorByTargetId(roomState, connection.sourceId, foo.push(connection.id), i + 1)
-	)
-}
+		return (
+			getConnectionNodeInfo(connection.sourceType).stateSelector(roomState, connection.sourceId).color
+			||
+			selectConnectionSourceColorByTargetId(roomState, connection.sourceId, processedIds.push(connection.id))
+		)
+	}
 
 /** For use by a node */
 export const selectConnectionSourceNotesByTargetId = (state: IClientRoomState, targetId: string): IMidiNotes => {
