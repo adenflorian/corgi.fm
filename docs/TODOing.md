@@ -1,6 +1,9 @@
 # Now
-- [ ] fix ghost connection to be curved
+- [√] fix ghost connection to be curved
 - [ ] allow adding connections from a node with no connections on it already
+	- [ ] split up ConnectionView
+		- [ ] Connector component
+		- [ ] ConnectionLine component
 
 # Soon
 - [ ] fix perf issues with looped connections (color calcs?)

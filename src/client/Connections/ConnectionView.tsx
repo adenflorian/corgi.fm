@@ -174,44 +174,20 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 					</g>
 
 				</svg>
-				<svg
-					className={`colorize connector source ${saturateSource ? 'saturate' : ''}`}
-					xmlns="http://www.w3.org/2000/svg"
-					style={{
-						width: connectorWidth,
-						height: connectorHeight,
-						top: this.props.sourceY - (connectorHeight / 2),
-						left: this.props.sourceX,
-					}}
-				>
-					<line
-						x1={0}
-						y1={connectorHeight / 2}
-						x2={connectorWidth}
-						y2={connectorHeight / 2}
-						stroke={color}
-						strokeWidth={connectorStrokeWidth}
-					/>
-				</svg>
-				<svg
-					className={`colorize connector target ${saturateTarget ? 'saturate' : ''}`}
-					xmlns="http://www.w3.org/2000/svg"
-					style={{
-						width: connectorWidth,
-						height: connectorHeight,
-						top: this.props.targetY - (connectorHeight / 2),
-						left: this.props.targetX - connectorWidth,
-					}}
-				>
-					<line
-						x1={0}
-						y1={connectorHeight / 2}
-						x2={connectorWidth}
-						y2={connectorHeight / 2}
-						stroke={color}
-						strokeWidth={connectorStrokeWidth}
-					/>
-				</svg>
+				<Connector
+					width={connectorWidth}
+					height={connectorHeight}
+					x={this.props.sourceX}
+					y={this.props.sourceY}
+					color={color}
+				/>
+				<Connector
+					width={connectorWidth}
+					height={connectorHeight}
+					x={this.props.targetX - connectorWidth}
+					y={this.props.targetY}
+					color={color}
+				/>
 				<div className={`ghost ${ghostConnector.status === GhostConnectorStatus.hidden ? 'hidden' : 'active'}`}>
 					{!isGhostHidden &&
 						<svg
@@ -227,7 +203,6 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 							<g>
 								<path
 									d={pathDPart1Ghost}
-									// stroke={`gray`}
 									strokeWidth={longLineStrokeWidth + 'px'}
 									strokeDasharray={4}
 								/>
@@ -314,11 +289,11 @@ class GhostConnector extends React.PureComponent<IGhostConnectorProps> {
 				position={isActive
 					? {
 						x: ghostConnector.x,
-						y: ghostConnector.y - (connectorHeight / 2),
+						y: ghostConnector.y,
 					}
 					: {
 						x: parentX,
-						y: parentY - (connectorHeight / 2),
+						y: parentY,
 					}
 				}
 			>
@@ -336,7 +311,7 @@ class GhostConnector extends React.PureComponent<IGhostConnectorProps> {
 		this.props.dispatch(connectionsActions.moveGhostConnector(
 			this.props.connectionId,
 			data.x,
-			data.y + (connectorHeight / 2),
+			data.y,
 		))
 	}
 
@@ -356,14 +331,25 @@ class GhostConnector extends React.PureComponent<IGhostConnectorProps> {
 	}
 }
 
-function Connector({width, height}: {width: number, height: number}) {
+interface ConnectorProps {
+	width: number
+	height: number
+	saturate?: boolean
+	x?: number
+	y?: number
+	color?: string
+}
+
+function Connector({width, height, saturate = false, x = 0, y = 0, color}: ConnectorProps) {
 	return (
 		<svg
-			className={`colorize connector target`}
+			className={`colorize connector${saturate ? ' saturate' : ''}`}
 			xmlns="http://www.w3.org/2000/svg"
 			style={{
 				width,
 				height,
+				top: y - (connectorHeight / 2),
+				left: x,
 			}}
 		>
 			<line
@@ -372,6 +358,7 @@ function Connector({width, height}: {width: number, height: number}) {
 				x2={width}
 				y2={height / 2}
 				strokeWidth={connectorStrokeWidth}
+				stroke={color}
 			/>
 		</svg>
 	)
