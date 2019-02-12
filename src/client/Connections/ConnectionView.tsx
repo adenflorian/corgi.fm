@@ -3,12 +3,10 @@ import * as React from 'react'
 import Draggable, {DraggableEventHandler} from 'react-draggable'
 import {Dispatch} from 'redux'
 import {
-	connectionsActions, defaultGhostConnector, GhostConnectorRecord, GhostConnectorStatus, GhostConnectorType, IClientAppState, selectUserInputKeys,
+	connectionsActions, defaultGhostConnector, GhostConnectorRecord, GhostConnectorStatus,
+	GhostConnectorType, IClientAppState, selectUserInputKeys, shamuConnect,
 } from '../../common/redux'
-import {shamuConnect} from '../../common/redux'
-import {
-	saturateColor,
-} from '../../common/shamu-color'
+import {saturateColor} from '../../common/shamu-color'
 import {simpleGlobalClientState} from '../SimpleGlobalClientState'
 import './ConnectionView.less'
 
@@ -62,48 +60,31 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 			this.props.targetY,
 		)
 
-		const getGhostLine = () => {
-			if (ghostConnector.status === GhostConnectorStatus.activeSource) {
-				return new LineState(
-					ghostConnector.x + connectorWidth,
-					ghostConnector.y,
-					this.props.targetX - connectorWidth,
-					this.props.targetY,
-				)
-			} else if (ghostConnector.status === GhostConnectorStatus.activeTarget) {
-				return new LineState(
-					this.props.sourceX + connectorWidth,
-					this.props.sourceY,
-					ghostConnector.x,
-					ghostConnector.y,
-				)
-			} else {
-				return line0
+		const ghostLine = (() => {
+			switch (ghostConnector.status) {
+				case GhostConnectorStatus.activeSource:
+					return new LineState(
+						ghostConnector.x + connectorWidth,
+						ghostConnector.y,
+						this.props.targetX - connectorWidth,
+						this.props.targetY,
+					)
+				case GhostConnectorStatus.activeTarget:
+					return new LineState(
+						this.props.sourceX + connectorWidth,
+						this.props.sourceY,
+						ghostConnector.x,
+						ghostConnector.y,
+					)
+				default:
+					return line0
 			}
-		}
+		})()
 
 		const buffer = 50
 		const joint = 8
 
-		// Straight lines
-		// const pathDPart1 = `
-		// 	M ${connectedLine.x1} ${connectedLine.y1}
-		// 	L ${connectedLine.x1 + joint} ${connectedLine.y1}
-		// 	L ${connectedLine.x2 - joint} ${connectedLine.y2}
-		// 	L ${connectedLine.x2} ${connectedLine.y2}
-		// `
-
-		// Curved
 		const pathDPart1 = makeCurvedPath(connectedLine)
-
-		// const pathDPart1 = `
-		// 	M ${connectedLine.x1} ${connectedLine.y1}
-		// 	L ${connectedLine.x1 + joint} ${connectedLine.y1}
-		// 	C ${connectedLine.x1 + joint + curveStrength} ${connectedLine.y1} ${connectedLine.x2 - joint - curveStrength} ${connectedLine.y2} ${connectedLine.x2 - joint} ${connectedLine.y2}
-		// 	L ${connectedLine.x2} ${connectedLine.y2}
-		// `
-
-		const ghostLine = getGhostLine()
 
 		const pathDPart1Ghost = makeCurvedPath(ghostLine)
 
@@ -118,12 +99,14 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 			`
 		}
 
-		// const pathDPart1Ghost = `
-		// 	M ${ghostLine.x1} ${ghostLine.y1}
-		// 	L ${ghostLine.x1 + joint} ${ghostLine.y1}
-		// 	L ${ghostLine.x2 - joint} ${ghostLine.y2}
-		// 	L ${ghostLine.x2} ${ghostLine.y2}
-		// `
+		function makeStraightPath(line: LineState) {
+			return `
+				M ${line.x1} ${line.y1}
+				L ${line.x1 + joint} ${line.y1}
+				L ${line.x2 - joint} ${line.y2}
+				L ${line.x2} ${line.y2}
+			`
+		}
 
 		// This path is a hack to get the filter to work properly
 		// It forces the "render box?" to be bigger than the actual drawn path
