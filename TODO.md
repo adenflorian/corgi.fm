@@ -121,8 +121,8 @@
 - [ ] make it obvious which direction data flows
 - [√] brighten the connectors and line when data is going across it
 - [√] make them moveable
-- [ ] fix invisible long line when vertical
-- [ ] make input connector look like a stack cable when multiple inputs
+- [√] fix invisible long line when vertical (kind of fixed by only being curved lines now?)
+- [√] make input connector look like a stack cable when multiple inputs
 - [ ] animate dashed ghost connector
 - [ ] animate active connections in the direction that data is flowing
 
