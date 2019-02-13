@@ -50,6 +50,7 @@ export class Zoom extends React.PureComponent<IZoomAllProps, IZoomState> {
 		window.removeEventListener('wheel', this._onMouseWheel)
 		window.removeEventListener('mousemove', this._onMouseMove)
 		simpleGlobalClientState.zoom = 1
+		simpleGlobalClientState.pan = {x: 0, y: 0}
 	}
 
 	public render() {
@@ -90,7 +91,13 @@ export class Zoom extends React.PureComponent<IZoomAllProps, IZoomState> {
 		let newZoom = this._clampZoom(this.state.zoom - zoom)
 		if (round) newZoom = Math.round(newZoom * 10) / 10
 
+		const newPan = {
+			x: this._clampPan(this.state.pan.x, newZoom),
+			y: this._clampPan(this.state.pan.y, newZoom),
+		}
+
 		simpleGlobalClientState.zoom = newZoom
+		simpleGlobalClientState.pan = newPan
 
 		this.setState({
 			zoom: newZoom,
@@ -105,11 +112,13 @@ export class Zoom extends React.PureComponent<IZoomAllProps, IZoomState> {
 		Math.min(maxZoom, Math.max(minZoom, val))
 
 	private readonly _pan = (x = 0, y = 0) => {
+		const newPan = {
+			x: this._clampPan(this.state.pan.x + (x * mousePanMod / this.state.zoom)),
+			y: this._clampPan(this.state.pan.y + (y * mousePanMod / this.state.zoom)),
+		}
+		simpleGlobalClientState.pan = newPan
 		this.setState({
-			pan: {
-				x: this._clampPan(this.state.pan.x + (x * mousePanMod / this.state.zoom)),
-				y: this._clampPan(this.state.pan.y + (y * mousePanMod / this.state.zoom)),
-			},
+			pan: newPan,
 		})
 	}
 

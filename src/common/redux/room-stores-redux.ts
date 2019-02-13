@@ -2,8 +2,8 @@ import {Map} from 'immutable'
 import {Action, combineReducers, Reducer} from 'redux'
 import {
 	chatReducer, connectionsReducer, CREATE_ROOM, DELETE_ROOM,
-	globalClockReducer, IClientRoomState, IServerState, positionsReducer,
-	roomMembersReducer, RoomsReduxAction,
+	globalClockReducer, IClientRoomState, IServerState, pointersStateReducer,
+	positionsReducer, roomMembersReducer, RoomsReduxAction,
 } from './index'
 import {shamuGraphReducer} from './shamu-graph'
 
@@ -23,6 +23,7 @@ export const roomReducers = combineReducers(Object.freeze({
 	members: roomMembersReducer,
 	positions: positionsReducer,
 	shamuGraph: shamuGraphReducer,
+	pointers: pointersStateReducer,
 }))
 
 const initialState = Map<string, IClientRoomState>()

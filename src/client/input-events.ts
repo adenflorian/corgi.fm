@@ -1,10 +1,11 @@
 import {Map} from 'immutable'
 import {Action, AnyAction, Store} from 'redux'
-import {selectIsLocalClientReady, selectLocalClient, setClientPointer, userInputActions} from '../common/redux'
-import {skipNote} from '../common/redux'
-import {localMidiKeyPress, localMidiKeyUp, localMidiOctaveChange} from '../common/redux'
+import {
+	IClientAppState, localMidiKeyPress, localMidiKeyUp, localMidiOctaveChange,
+	pointersActions, selectIsLocalClientReady, selectLocalClient,
+	skipNote, userInputActions,
+} from '../common/redux'
 import {simpleGlobalClientState} from './SimpleGlobalClientState'
-import {getMainBoardsRectX, getMainBoardsRectY} from './utils'
 
 type IKeyBoardShortcuts = Map<string, KeyBoardShortcut>
 
@@ -99,11 +100,12 @@ const keyboardShortcuts: IKeyBoardShortcuts = Map<KeyBoardShortcut>({
 	.merge(midiKeyShortcuts)
 	.mapKeys(x => x.toLowerCase())
 
-let lastScrollY = window.scrollY
-
-export function setupInputEventListeners(window: Window, store: Store, audioContext: AudioContext) {
-
-	const isInputFocused = (): boolean => document.activeElement ? document.activeElement.tagName === 'INPUT' : false
+export function setupInputEventListeners(
+	window: Window, store: Store<IClientAppState>, audioContext: AudioContext,
+) {
+	const isInputFocused = (): boolean => document.activeElement
+		? document.activeElement.tagName === 'INPUT'
+		: false
 
 	window.addEventListener('mousedown', _ => {
 		if (audioContext.state === 'suspended') audioContext.resume()
@@ -147,37 +149,36 @@ export function setupInputEventListeners(window: Window, store: Store, audioCont
 		}
 	}
 
-	window.addEventListener('mousemove', e => {
-		const state = store.getState()
-		if (selectIsLocalClientReady(state)) {
-			const localClient = selectLocalClient(state)
-			sendMouseUpdate(e.clientX, e.clientY, localClient.id)
-		}
-	})
+	window.addEventListener('mousemove', e => sendMouseUpdate(e.clientX, e.clientY))
 
-	function sendMouseUpdate(mouseX: number, mouseY: number, localClientId: string) {
-		const distanceFromCenterX = (mouseX - getMainBoardsRectX()) / simpleGlobalClientState.zoom
+	window.addEventListener('wheel', _ => setTimeout(() => sendMouseUpdate(), 0))
 
-		const distanceFromBoardsTop = (mouseY - getMainBoardsRectY()) / simpleGlobalClientState.zoom
-
-		store.dispatch(setClientPointer(localClientId, {
-			distanceFromCenterX,
-			distanceFromBoardsTop,
-		}))
+	let lastMousePosition = {
+		x: 0,
+		y: 0,
 	}
 
-	window.addEventListener('scroll', _ => {
-		const scrollDelta = window.scrollY - lastScrollY
-		lastScrollY = window.scrollY
+	function sendMouseUpdate(x?: number, y?: number) {
 		const state = store.getState()
-		if (selectIsLocalClientReady(state)) {
-			const localClient = selectLocalClient(state)
-			store.dispatch(setClientPointer(localClient.id, {
-				distanceFromCenterX: localClient.pointer.distanceFromCenterX,
-				distanceFromBoardsTop: localClient.pointer.distanceFromBoardsTop + scrollDelta,
-			}))
+
+		if (!selectIsLocalClientReady(state)) return
+
+		const localClientId = selectLocalClient(state).id
+
+		if (!x || !y) {
+			x = lastMousePosition.x
+			y = lastMousePosition.y
+		} else {
+			lastMousePosition = {x, y}
 		}
-	})
+
+		const {pan, zoom} = simpleGlobalClientState
+
+		store.dispatch(pointersActions.update(localClientId, {
+			x: ((x - (window.innerWidth / 2)) / zoom) - pan.x,
+			y: ((y - (window.innerHeight / 2)) / zoom) - pan.y,
+		}))
+	}
 }
 
 function getPropNameForEventType(eventType: string) {

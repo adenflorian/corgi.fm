@@ -5,6 +5,7 @@ import {IClientAppState} from '../../common/redux'
 import {selectAllPositionIds} from '../../common/redux'
 import {mainBoardsId} from '../client-constants'
 import {ConnectedConnections, ConnectionsUsage} from '../Connections/Connections'
+import {ConnectedMousePointers} from '../MousePointers/MousePointers'
 import {ConnectedSimpleGraphNode} from './SimpleGraphNode'
 import {ConnectedZoom} from './Zoom'
 
@@ -25,6 +26,7 @@ export const SimpleGraph: React.FC<ISimpleGraphReduxProps> =
 		>
 			<ConnectedZoom>
 				<div id={mainBoardsId} className="boards">
+					<ConnectedMousePointers />
 					<ConnectedConnections usage={ConnectionsUsage.simpleGraph} />
 					{positionIds.map(positionId =>
 						<ConnectedSimpleGraphNode key={positionId} positionId={positionId} />,

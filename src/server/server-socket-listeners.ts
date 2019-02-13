@@ -4,7 +4,7 @@ import {Server, Socket} from 'socket.io'
 import {maxRoomNameLength} from '../common/common-constants'
 import {ClientId} from '../common/common-types'
 import {logger} from '../common/logger'
-import {addClient, addRoomMember, BroadcastAction, BROADCASTER_ACTION, CHANGE_ROOM, clientDisconnected, ClientState, connectionsActions, createRoom, createRoomAction, deletePositions, deleteRoom, deleteRoomMember, deleteThingsAny, getActionsBlacklist, IClientRoomState, IServerState, maxUsernameLength, ready, REQUEST_CREATE_ROOM, selectAllClients, selectAllConnections, selectAllMessages, selectAllPositions, selectAllRoomMemberIds, selectAllRoomNames, selectAllRoomStates, selectClientBySocketId, selectConnectionsWithSourceOrTargetIds, selectNodeIdsOwnedByClient, selectPositionsWithIds, selectRoomExists, selectRoomStateByName, selectShamuGraphState, setActiveRoom, setChat, setClients, setRoomMembers, setRooms, shamuGraphActions, updatePositions} from '../common/redux'
+import {addClient, addRoomMember, BroadcastAction, BROADCASTER_ACTION, CHANGE_ROOM, clientDisconnected, ClientState, connectionsActions, createRoom, createRoomAction, deletePositions, deleteRoom, deleteRoomMember, deleteThingsAny, getActionsBlacklist, IClientRoomState, IServerState, maxUsernameLength, pointersActions, ready, REQUEST_CREATE_ROOM, selectAllClients, selectAllConnections, selectAllMessages, selectAllPointers, selectAllPositions, selectAllRoomMemberIds, selectAllRoomNames, selectAllRoomStates, selectClientBySocketId, selectConnectionsWithSourceOrTargetIds, selectNodeIdsOwnedByClient, selectPositionsWithIds, selectRoomExists, selectRoomStateByName, selectShamuGraphState, setActiveRoom, setChat, setClients, setRoomMembers, setRooms, shamuGraphActions, updatePositions} from '../common/redux'
 import {WebSocketEvent} from '../common/server-constants'
 import {createServerStuff} from './create-server-stuff'
 
@@ -214,6 +214,10 @@ function onLeaveRoom(io: Server, socket: Socket, roomToLeave: string, serverStor
 		const deleteNodes = deleteThingsAny(nodeIdsOwnedByClient)
 		serverStore.dispatch(createRoomAction(deleteNodes, roomToLeave))
 		io.to(roomToLeave).emit(WebSocketEvent.broadcast, deleteNodes)
+
+		const deletePointer = pointersActions.delete(clientId)
+		serverStore.dispatch(createRoomAction(deletePointer, roomToLeave))
+		io.to(roomToLeave).emit(WebSocketEvent.broadcast, deletePointer)
 	}
 
 	const deleteRoomMemberAction = deleteRoomMember(clientId)
@@ -241,10 +245,12 @@ function syncState(newSocket: Socket, roomState: IClientRoomState, serverState: 
 	})
 
 	const updaters = [
+		[pointersActions.replaceAll, selectAllPointers],
 		[setRoomMembers, selectAllRoomMemberIds],
 		[setChat, selectAllMessages],
 		[connectionsActions.updateAll, selectAllConnections],
 		[updatePositions, selectAllPositions],
+		[shamuGraphActions.replace, selectShamuGraphState],
 	]
 
 	updaters.forEach(([actionCreator, selector]: any[]) => {
@@ -255,12 +261,6 @@ function syncState(newSocket: Socket, roomState: IClientRoomState, serverState: 
 		}
 		newSocket.emit(WebSocketEvent.broadcast, action)
 		logger.trace(`SYNC: `, action)
-	})
-
-	newSocket.emit(WebSocketEvent.broadcast, {
-		...shamuGraphActions.replace(selectShamuGraphState(roomState)),
-		alreadyBroadcasted: true,
-		source: server,
 	})
 
 	newSocket.emit(WebSocketEvent.broadcast, {

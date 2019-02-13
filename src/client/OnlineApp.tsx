@@ -26,13 +26,13 @@ class OnlineApp extends React.PureComponent<IOnlineAppProps> {
 	public render() {
 		return (
 			<Fragment>
-				<ConnectedMousePointers />
 				<ConnectedChat />
 				<ConnectedTopDiv />
 
 				{window.location.pathname !== '/old'
 					? <ConnectedSimpleGraph />
 					: <Fragment>
+						<ConnectedMousePointers />
 						<div id={mainBoardsId} className="boards">
 							<ConnectedConnections usage={ConnectionsUsage.normal} />
 							<div className="boardRow">

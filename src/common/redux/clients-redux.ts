@@ -1,11 +1,14 @@
 import * as animal from 'animal-id'
 import {createSelector} from 'reselect'
 import {v4} from 'uuid'
-import {getMainBoardsRectX, getMainBoardsRectY} from '../../client/utils'
 import {ClientId} from '../common-types'
 import {logger} from '../logger'
 import {getColorHslByString} from '../shamu-color'
-import {BROADCASTER_ACTION, createDeepEqualSelector, createReducer, IClientAppState, IServerState, selectLocalSocketId, SELF_DISCONNECTED, SERVER_ACTION} from './index'
+import {
+	BROADCASTER_ACTION, createDeepEqualSelector, createReducer,
+	IClientAppState, IServerState, selectLocalSocketId,
+	SELF_DISCONNECTED, SERVER_ACTION,
+} from './index'
 
 export const ADD_CLIENT = 'ADD_CLIENT'
 export type AddClientAction = ReturnType<typeof addClient>
@@ -243,8 +246,6 @@ export const selectAllClientsAsMap = (state: IClientAppState | IServerState) =>
 		}
 	})
 
-const size = 8
-
 export const selectAllClientIds = createSelector(
 	[selectAllClients],
 	allClients => allClients.map(client => client.id),
@@ -254,18 +255,4 @@ export const selectAllOtherClientIds = createDeepEqualSelector(
 	[selectLocalClientId, selectAllClientIds],
 	(localClientId, allClientIds) =>
 		allClientIds.filter(x => x !== 'server' && x !== localClientId),
-)
-
-export const selectClientPointerInfo = createSelector(
-	[selectClientById],
-	client => ({
-		x: client.pointer.distanceFromCenterX,
-		y: client.pointer.distanceFromBoardsTop,
-		color: client.color,
-		name: client.name,
-		id: client.id,
-		mainBoardsRectX: getMainBoardsRectX(),
-		mainBoardsRectY: getMainBoardsRectY(),
-		size,
-	}),
 )

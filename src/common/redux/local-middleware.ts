@@ -3,6 +3,7 @@ import {applyOctave} from '../../client/WebAudio/music-functions'
 import {ConnectionNodeType} from '../common-types'
 import {logger} from '../logger'
 import {addBasicSampler, addBasicSynthesizer, addPosition, addVirtualKeyboard, BasicSamplerState, BasicSynthesizerState, Connection, connectionsActions, deleteAllPositions, deleteAllThings, IClientAppState, makeActionCreator, makePosition, MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID, READY, selectActiveRoom, selectLocalClient, selectPositionExtremes, selectVirtualKeyboardById, selectVirtualKeyboardIdByOwner, SET_ACTIVE_ROOM, VirtualKeyboardState, virtualKeyPressed, virtualKeyUp, virtualOctaveChange} from './index'
+import {pointersActions} from './pointers-redux'
 
 export const LOCAL_MIDI_KEY_PRESS = 'LOCAL_MIDI_KEY_PRESS'
 export const localMidiKeyPress = makeActionCreator(LOCAL_MIDI_KEY_PRESS, 'midiNote')
@@ -67,6 +68,8 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 		logger.warn('FAKE')
 		return
 	}
+
+	dispatch(pointersActions.add(localClient.id))
 
 	const extremes = selectPositionExtremes(state.room)
 

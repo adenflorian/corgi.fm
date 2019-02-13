@@ -1,9 +1,7 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
-import {selectClientPointerInfo} from '../../common/redux'
-import {IClientAppState} from '../../common/redux'
+import {IClientAppState, selectClientById, selectPointer} from '../../common/redux'
 import {CssColor} from '../../common/shamu-color'
-import {simpleGlobalClientState} from '../SimpleGlobalClientState'
 
 interface MousePointerProps {
 	clientId: string
@@ -23,13 +21,13 @@ export const MousePointer: React.FC<MousePointerAllProps> =
 		<div
 			className="pointer"
 			style={{
-				position: 'fixed',
-				top: y - 2,
-				left: x - 8,
-				width: 16,
-				height: 16,
-				zIndex: 10,
+				position: 'absolute',
+				width: 0,
+				height: 0,
+				zIndex: 2147483647,
 				pointerEvents: 'none',
+				transform: `translate(${x - 16}px, ${y - 8}px)`,
+				willChange: 'transform',
 			}}
 		>
 			<svg
@@ -64,12 +62,14 @@ export const MousePointer: React.FC<MousePointerAllProps> =
 
 export const ConnectedMousePointer = connect(
 	(state: IClientAppState, props: MousePointerProps): MousePointerReduxProps => {
-		const {x, y, mainBoardsRectX, mainBoardsRectY, size, ...rest} = selectClientPointerInfo(state, props.clientId)
+		const client = selectClientById(state, props.clientId)
+		const pointer = selectPointer(state.room, props.clientId)
 
 		return {
-			...rest,
-			x: (x * simpleGlobalClientState.zoom) + mainBoardsRectX - (size / 2),
-			y: (y * simpleGlobalClientState.zoom) + mainBoardsRectY - (size / 2),
+			color: client.color,
+			name: client.name,
+			x: pointer.x,
+			y: pointer.y,
 		}
 	},
 )(MousePointer)

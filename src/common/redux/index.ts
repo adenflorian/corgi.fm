@@ -3,6 +3,7 @@
 // It controls the module load order
 
 export * from './multi-reducer'
+export * from './pointers-redux'
 export * from './sequencer-redux'
 export * from './global-clock-redux'
 export * from './virtual-keyboard-redux'
