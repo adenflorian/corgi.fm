@@ -179,7 +179,7 @@ export const selectAllConnectionIds = createSelector(
 
 export const selectSortedConnections = createSelector(
 	selectAllConnections,
-	connections => connections.sort(sortConnection),
+	connections => connections.sort(sortConnection).toList(),
 )
 
 export const selectConnectionsWithSourceOrTargetIds = (state: IClientRoomState, sourceOrTargetIds: string[]) => {

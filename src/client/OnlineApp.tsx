@@ -77,7 +77,7 @@ class OnlineApp extends React.PureComponent<IOnlineAppProps> {
 }
 
 const mapStateToProps = (state: IClientAppState): IOnlineAppProps => ({
-	connections: selectSortedConnections(state.room).toList(),
+	connections: selectSortedConnections(state.room),
 })
 
 export const ConnectedOnlineApp = connect(mapStateToProps)(OnlineApp)
