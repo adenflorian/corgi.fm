@@ -50,16 +50,6 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 
 	connectNodes(simpleReverb, masterAudioOutput)
 
-	const simpleReverb2 = createSource({
-		name: 'Reverb A',
-		type: ConnectionNodeType.simpleReverb,
-	}) as SimpleReverbState
-
-	dispatchToRoom(addPosition(
-		makePosition({id: simpleReverb2.id, targetType: ConnectionNodeType.simpleReverb})))
-
-	connectNodes(simpleReverb2, masterAudioOutput)
-
 	const serverStuffDefinitions = Object.freeze({
 		bass: {
 			source: {
@@ -127,6 +117,18 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 	serverStuff.forEach(x => {
 		connectNodes(x.target, masterAudioOutput)
 	})
+
+	// const simpleReverb2 = createSource({
+	// 	name: 'Reverb A',
+	// 	type: ConnectionNodeType.simpleReverb,
+	// }) as SimpleReverbState
+
+	// dispatchToRoom(addPosition(makePosition({
+	// 	id: simpleReverb2.id,
+	// 	targetType: ConnectionNodeType.simpleReverb,
+	// })))
+
+	// connectNodes(simpleReverb2, masterAudioOutput)
 
 	interface CreateSourceAndTargetArgs {
 		source: CreateSourceArgs

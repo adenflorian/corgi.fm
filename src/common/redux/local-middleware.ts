@@ -73,32 +73,38 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 
 	const extremes = selectPositionExtremes(state.room)
 
-	const x = 700
-	const y = 40
-	const labelHeight = 16
+	const y = 96
 
 	const newVirtualKeyboard = new VirtualKeyboardState(localClient.id, localClient.color)
 	dispatch(addVirtualKeyboard(newVirtualKeyboard))
-	dispatch(addPosition(makePosition({
+	const keyboardPosition = makePosition({
 		id: newVirtualKeyboard.id,
 		targetType: ConnectionNodeType.virtualKeyboard,
-		x: extremes.leftMost + x,
+		x: -661,
 		y: extremes.bottomMost + y,
-	})))
+	})
+	dispatch(addPosition({
+		...keyboardPosition,
+		y: keyboardPosition.y - (keyboardPosition.height / 2),
+	}))
 
 	const nextPosition = {
-		x: extremes.leftMost + (x * 2),
-		y: extremes.bottomMost + y + labelHeight,
+		x: -76.5935,
+		y: extremes.bottomMost + y,
 	}
 
 	if (localClient.name.toLowerCase() === '$sampler') {
 		const newSampler = new BasicSamplerState(localClient.id)
 		dispatch(addBasicSampler(newSampler))
-		dispatch(addPosition(makePosition({
+		const samplerPosition = makePosition({
 			id: newSampler.id,
 			targetType: ConnectionNodeType.basicSampler,
 			...nextPosition,
-		})))
+		})
+		dispatch(addPosition({
+			...samplerPosition,
+			y: samplerPosition.y - (samplerPosition.height / 2),
+		}))
 
 		// Source to target
 		dispatch(connectionsActions.add(new Connection(
@@ -126,11 +132,15 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 	} else {
 		const newInstrument = new BasicSynthesizerState(localClient.id)
 		dispatch(addBasicSynthesizer(newInstrument))
-		dispatch(addPosition(makePosition({
+		const instrumentPosition = makePosition({
 			id: newInstrument.id,
 			targetType: ConnectionNodeType.basicSynthesizer,
 			...nextPosition,
-		})))
+		})
+		dispatch(addPosition({
+			...instrumentPosition,
+			y: instrumentPosition.y - (instrumentPosition.height / 2),
+		}))
 
 		// Source to target
 		dispatch(connectionsActions.add(new Connection(

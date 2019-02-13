@@ -77,7 +77,7 @@ export const NodeInfoMap = Map({
 			type: ConnectionNodeType.audioOutput,
 		}),
 		width: 140.48,
-		height: 48,
+		height: 56,
 	}),
 	[ConnectionNodeType.masterClock]: NodeInfoRecord({
 		stateSelector: () => ({
