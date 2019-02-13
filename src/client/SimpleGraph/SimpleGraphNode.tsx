@@ -83,8 +83,8 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 const handleSize = 24
 const borderRadius = 4
 
-const Handle = () =>
-	<div
+const Handle = React.memo(function Handle_() {
+	return <div
 		className={handleClassName}
 		style={{
 			display: 'flex',
@@ -103,6 +103,7 @@ const Handle = () =>
 	>
 		<HandleIcon />
 	</div>
+})
 
 export function getComponentByNodeType(type: ConnectionNodeType, id: string) {
 	switch (type) {
