@@ -57,28 +57,16 @@ export class Zoom extends React.PureComponent<IZoomAllProps, IZoomState> {
 		const {zoom, pan} = this.state
 
 		return (
-			<React.Fragment>
-				<div
-					className="zoom"
-					style={{
-						transform: `scale(${zoom}) translate(${pan.x}px, ${pan.y}px)`,
-						willChange: 'transform',
-					}}
-				>
-					<div
-						className="zoomBackground"
-						style={{
-							position: 'fixed',
-							width: `${bgSize}vw`,
-							height: `${bgSize}vh`,
-							top: `-${bgSize / 2}vh`,
-							left: `-${bgSize / 2}vw`,
-							backgroundImage: `url(${PlusSVG})`,
-						}}
-					/>
-					{children}
-				</div>
-			</React.Fragment>
+			<div
+				className="zoom"
+				style={{
+					transform: `scale(${zoom}) translate(${pan.x}px, ${pan.y}px)`,
+					willChange: 'transform',
+				}}
+			>
+				<ZoomBackground />
+				{children}
+			</div>
 		)
 	}
 
@@ -128,6 +116,20 @@ export class Zoom extends React.PureComponent<IZoomAllProps, IZoomState> {
 	private readonly _clampPan = (pan: number, zoom: number = this.state.zoom) =>
 		Math.min(maxPan * zoom, Math.max(-maxPan * zoom, pan))
 }
+
+const ZoomBackground = React.memo(() =>
+	<div
+		className="zoomBackground"
+		style={{
+			position: 'fixed',
+			width: `${bgSize}vw`,
+			height: `${bgSize}vh`,
+			top: `-${bgSize / 2}vh`,
+			left: `-${bgSize / 2}vw`,
+			backgroundImage: `url(${PlusSVG})`,
+		}}
+	/>,
+)
 
 export const ConnectedZoom = shamuConnect(
 	(state): IZoomReduxProps => ({

@@ -93,6 +93,10 @@
 - [ ] make room option to switch between straight and curved connection lines
 - [ ] make slash (/) commands that can be used in chat
 - [ ] figure out how to get middleware for room state to work on server store
+- [ ] look into mobx
+
+# Optimizations
+- [ ] use debounce for some network updates like mouse cursors and node positions?
 
 # DevOps
 - [ ] figure out how to do `yarn build` without stopping parcel and the server

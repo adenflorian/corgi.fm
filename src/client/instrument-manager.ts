@@ -29,6 +29,7 @@ class StuffMap extends Map<string, AudioNodeWrapper> {}
 
 // Need separate properties to match up with what IDs selector is used
 // so that we can delete stuff properly
+// This might be able to be simplified if we can simplify the shamuGraph redux state
 const stuffMaps: {[key: string]: StuffMap} = Object.freeze({
 	[ConnectionNodeType.basicSampler]: new StuffMap(),
 	[ConnectionNodeType.basicSynthesizer]: new StuffMap(),
@@ -62,11 +63,7 @@ export const setupInstrumentManager =
 		function updateInstrumentLayer() {
 			const state = store.getState()
 
-			/* What state do we care about?
-				- room
-					- connections
-					- shamuGraph
-			*/
+			// Optimization
 			if (state.room === previousState.room) {
 				return
 			}
