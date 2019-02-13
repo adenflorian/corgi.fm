@@ -297,3 +297,15 @@ export function sortConnection(connA: IConnection, connB: IConnection) {
 		return connA.id > connB.id ? -1 : 1
 	}
 }
+
+export const selectConnectionStackOrderForTarget = (roomState: IClientRoomState, id: string) => {
+	const connection = selectConnection(roomState, id)
+	const connections = selectConnectionsWithTargetIds(roomState, [connection.targetId])
+	return connections.toIndexedSeq().indexOf(connection)
+}
+
+export const selectConnectionStackOrderForSource = (roomState: IClientRoomState, id: string) => {
+	const connection = selectConnection(roomState, id)
+	const connections = selectConnectionsWithSourceIds(roomState, [connection.sourceId])
+	return connections.toIndexedSeq().indexOf(connection)
+}

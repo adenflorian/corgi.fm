@@ -20,6 +20,8 @@ export interface IConnectionViewProps {
 	saturateSource: boolean
 	saturateTarget: boolean
 	id: string
+	sourceStackOrder?: number
+	targetStackOrder?: number
 }
 
 interface IConnectionViewReduxProps {
@@ -51,12 +53,18 @@ const line0 = new LineState(0, 0, 0, 0)
 
 export class ConnectionView extends React.PureComponent<IConnectionViewAllProps> {
 	public render() {
-		const {color, saturateSource, saturateTarget, id, ghostConnector = defaultGhostConnector} = this.props
+		const {color, saturateSource, saturateTarget, id,
+			ghostConnector = defaultGhostConnector, targetStackOrder = 0, sourceStackOrder = 0} = this.props
+
+		const sourceConnectorLeft = this.props.sourceX + (connectorWidth * sourceStackOrder)
+		const sourceConnectorRight = this.props.sourceX + connectorWidth + (connectorWidth * sourceStackOrder)
+		const targetConnectorLeft = this.props.targetX - connectorWidth - (connectorWidth * targetStackOrder)
+		const targetConnectorRight = this.props.targetX - (connectorWidth * targetStackOrder)
 
 		const connectedLine = new LineState(
-			this.props.sourceX + connectorWidth,
+			sourceConnectorRight,
 			this.props.sourceY,
-			this.props.targetX - connectorWidth,
+			targetConnectorLeft,
 			this.props.targetY,
 		)
 
@@ -66,12 +74,12 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 					return new LineState(
 						ghostConnector.x + connectorWidth,
 						ghostConnector.y,
-						this.props.targetX - connectorWidth,
+						targetConnectorLeft,
 						this.props.targetY,
 					)
 				case GhostConnectorStatus.activeTarget:
 					return new LineState(
-						this.props.sourceX + connectorWidth,
+						sourceConnectorRight,
 						this.props.sourceY,
 						ghostConnector.x,
 						ghostConnector.y,
@@ -177,14 +185,14 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 				<Connector
 					width={connectorWidth}
 					height={connectorHeight}
-					x={this.props.sourceX}
+					x={sourceConnectorLeft}
 					y={this.props.sourceY}
 					color={color}
 				/>
 				<Connector
 					width={connectorWidth}
 					height={connectorHeight}
-					x={this.props.targetX - connectorWidth}
+					x={targetConnectorLeft}
 					y={this.props.targetY}
 					color={color}
 				/>
@@ -215,7 +223,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 								dispatch={this.props.dispatch}
 								isActive={ghostConnector.status === GhostConnectorStatus.activeSource}
 								ghostConnector={ghostConnector}
-								parentX={this.props.sourceX}
+								parentX={sourceConnectorLeft}
 								parentY={this.props.sourceY}
 								connectionId={id}
 								sourceOrTarget={GhostConnectorStatus.activeSource}
@@ -225,7 +233,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 								dispatch={this.props.dispatch}
 								isActive={ghostConnector.status === GhostConnectorStatus.activeTarget}
 								ghostConnector={ghostConnector}
-								parentX={this.props.targetX - connectorWidth}
+								parentX={targetConnectorLeft}
 								parentY={this.props.targetY}
 								connectionId={id}
 								sourceOrTarget={GhostConnectorStatus.activeTarget}
@@ -239,7 +247,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 								dispatch={this.props.dispatch}
 								isActive={ghostConnector.status === GhostConnectorStatus.activeTarget}
 								ghostConnector={ghostConnector}
-								parentX={this.props.sourceX}
+								parentX={sourceConnectorLeft}
 								parentY={this.props.sourceY}
 								connectionId={id}
 								sourceOrTarget={GhostConnectorStatus.activeTarget}
@@ -249,7 +257,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 								dispatch={this.props.dispatch}
 								isActive={ghostConnector.status === GhostConnectorStatus.activeSource}
 								ghostConnector={ghostConnector}
-								parentX={this.props.targetX - connectorWidth}
+								parentX={targetConnectorLeft}
 								parentY={this.props.targetY}
 								connectionId={id}
 								sourceOrTarget={GhostConnectorStatus.activeSource}
