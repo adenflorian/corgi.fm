@@ -36,6 +36,8 @@ const stuffMaps: {[key: string]: StuffMap} = Object.freeze({
 	[ConnectionNodeType.simpleReverb]: new StuffMap(),
 })
 
+let previousState: Partial<IClientAppState> = {}
+
 export const setupInstrumentManager =
 	(store: Store<IClientAppState>, audioContext: AudioContext, preFx: GainNode) => {
 
@@ -59,6 +61,17 @@ export const setupInstrumentManager =
 
 		function updateInstrumentLayer() {
 			const state = store.getState()
+
+			/* What state do we care about?
+				- room
+					- connections
+					- shamuGraph
+			*/
+			if (state.room === previousState.room) {
+				return
+			}
+
+			previousState = state
 
 			handleSamplers()
 			handleBasicSynthesizers()
