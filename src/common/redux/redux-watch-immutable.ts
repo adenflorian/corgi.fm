@@ -1,3 +1,5 @@
+import {Store} from 'redux'
+
 /*
 https://github.com/Danetag/redux-watch-immutable
 
@@ -24,90 +26,89 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-let store = null;
-let currentState = null;
+type Comparator = (a: any, b: any) => boolean
 
-const aPath = [];
-const aPathExisting = [];
+export class ReduxWatcher {
+	private readonly aPath = []
+	private readonly aPathExisting = []
 
-let compareValues = (a, b) => {
-	return a === b;
-};
+	constructor(
+		private store: Store,
+		private currentState: any,
+	) {}
 
-const watch_ = () => {
-	const prev = currentState;
-	currentState = store.getState();
-
-	aPath.forEach((o, i) => {
-		const currentValue = currentState.getIn(o.path);
-		const prevValue = prev.getIn(o.path);
-		if (!compareValues(currentValue, prevValue)) {
-			o.aCallback.forEach((cb) => {
-				// setTimeout: to make sure the stack is free
-				setTimeout(() => cb(currentValue, prevValue, aPath[i]), 0);
-			});
-		}
-	});
-};
-
-/* API */
-
-export const setStore = (store_ = null) => {
-	if (!store_) {
-		console.error('You haven\'t provided a store');
-		return false;
-	}
-	store = store_;
-	currentState = store.getState();
-	store.subscribe(watch_);
-	return store;
-};
-
-export const setCompareFn = (compare_ = null) => {
-	if (!compare_) compareValues = compare_;
-};
-
-export const watch = (objectPath = '', callback = null) => {
-	const idx = aPathExisting.indexOf(objectPath);
-
-	// New path
-	if (idx > -1) {
-		// if new callback, add it
-		let check = true;
-		aPath[idx].aCallback.forEach((cb) => {
-			if (cb === callback) check = false;
-		});
-
-		if (check) {
-			// add the callback yo an existing path
-			aPath[idx].aCallback.push(callback);
-		}
-	} else {
-		aPath.push({
-			path: objectPath.split('.'),
-			aCallback: [callback]
-		});
-
-		aPathExisting.push(objectPath);
+	public readonly setStore = (store: Store) => {
+		this.store = store
+		this.currentState = this.store.getState()
+		this.store.subscribe(this._watch)
+		return this.store
 	}
 
-	// return the dispose function
-	return () => {
-		const idxPath = aPathExisting.indexOf(objectPath);
+	public readonly setCompareFn = (compare: Comparator) => {
+		this._compare = compare
+	}
 
-		if (idxPath > -1) {
-			// delete only the callback. If last callback, delete the path
-			let idxCb = -1;
-			aPath[idxPath].aCallback.forEach((cb, i) => {
-				if (cb === callback) idxCb = i;
-			});
+	public readonly watch = (objectPath: string, callback: () => void) => {
+		const index = this.aPathExisting.indexOf(objectPath)
 
-			if (idxCb > -1) aPath[idxPath].aCallback.splice(idxCb, 1);
+		// New path
+		if (index > -1) {
+			// if new callback, add it
+			let check = true
+			this.aPath[index].aCallback.forEach(cb => {
+				if (cb === callback) check = false
+			})
 
-			if (!aPath[idxPath].aCallback.length) {
-				aPath.splice(idxPath, 1);
-				aPathExisting.splice(idxPath, 1);
+			if (check) {
+				// add the callback yo an existing path
+				this.aPath[index].aCallback.push(callback)
+			}
+		} else {
+			this.aPath.push({
+				path: objectPath.split('.'),
+				aCallback: [callback],
+			})
+
+			this.aPathExisting.push(objectPath)
+		}
+
+		// return the dispose function
+		return () => {
+			const idxPath = this.aPathExisting.indexOf(objectPath)
+
+			if (idxPath > -1) {
+				// delete only the callback. If last callback, delete the path
+				let idxCb = -1
+				this.aPath[idxPath].aCallback.forEach((cb, i) => {
+					if (cb === callback) idxCb = i
+				})
+
+				if (idxCb > -1) this.aPath[idxPath].aCallback.splice(idxCb, 1)
+
+				if (!this.aPath[idxPath].aCallback.length) {
+					this.aPath.splice(idxPath, 1)
+					this.aPathExisting.splice(idxPath, 1)
+				}
 			}
 		}
-	};
-};
+	}
+
+	private _compare: Comparator = (a, b) => a === b
+
+	private readonly _watch = () => {
+		const prev = this.currentState
+		this.currentState = this.store.getState()
+
+		this.aPath.forEach((o, i) => {
+			const currentValue = this.currentState.getIn(o.path)
+			const prevValue = prev.getIn(o.path)
+
+			if (!this._compare(currentValue, prevValue)) {
+				o.aCallback.forEach(cb => {
+					// setTimeout: to make sure the stack is free
+					setTimeout(() => cb(currentValue, prevValue, this.aPath[i]), 0)
+				})
+			}
+		})
+	}
+}
