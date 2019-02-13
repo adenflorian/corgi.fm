@@ -124,6 +124,10 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 	// Do extra connections after calculating positions, so that it doesn't mess up positions
 	connectNodes(serverStuff.get('arp')!.source, serverStuff.get('arp2')!.target)
 
+	serverStuff.forEach(x => {
+		connectNodes(x.target, masterAudioOutput)
+	})
+
 	interface CreateSourceAndTargetArgs {
 		source: CreateSourceArgs
 		target: {

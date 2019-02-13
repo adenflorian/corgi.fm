@@ -94,6 +94,7 @@
 - [ ] make slash (/) commands that can be used in chat
 - [ ] figure out how to get middleware for room state to work on server store
 - [ ] look into mobx
+- [ ] warn user if master volume is at or near 0
 
 # Optimizations
 - [ ] use debounce for some network updates like mouse cursors and node positions?
