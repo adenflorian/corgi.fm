@@ -57,9 +57,9 @@ export function setupAudioContext(audioContext: AudioContext, preFx: GainNode, s
 	function checkAudioLevels() {
 		const timeSinceLastUpdate = Date.now() - lastUpdateTime
 
-		if (masterLimiter.reduction < -10 && store.getState().options.masterVolume !== 0) {
+		if (audioContext.currentTime > 1 && masterLimiter.reduction < -10 && store.getState().options.masterVolume !== 0) {
 			store.dispatch(setOptionMasterVolume(0))
-			logger.warn('Feedback loop detected, setting master volume to 0')
+			logger.warn(`Feedback loop detected, setting master volume to 0 (masterLimiter.reduction: ${masterLimiter.reduction}`)
 		}
 
 		if (timeSinceLastUpdate >= updateInterval) {
@@ -112,6 +112,7 @@ export function setupAudioContext(audioContext: AudioContext, preFx: GainNode, s
 		}
 		previousMasterVolume = newVolume
 		// console.log('limiter.reduction: ' + masterLimiter.reduction)
+		// console.log('audioContext.currentTime: ' + audioContext.currentTime)
 	})
 
 	return audioContext

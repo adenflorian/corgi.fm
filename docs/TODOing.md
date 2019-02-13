@@ -1,8 +1,8 @@
 # Now
 - [√] fix ghost connection to be curved
-- [ ] make zoom and pan affect mouse cursors
-	- [ ] use position system to render mouse cursors
-		- [ ] use transform translate and will-change
+- [√] make zoom and pan affect mouse cursors
+	- [√] use position system to render mouse cursors
+		- [√] use transform translate and will-change
 
 # Soon
 - [ ] fix perf issues with looped connections (color calcs?)
