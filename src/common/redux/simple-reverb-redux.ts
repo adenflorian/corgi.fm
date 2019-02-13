@@ -46,7 +46,7 @@ export class SimpleReverbState implements IConnectable, NodeSpecialState {
 
 	public readonly id = uuid.v4()
 	public readonly ownerId: string
-	public readonly lowPassFilterCutoffFrequency: number = 10000
+	public readonly lowPassFilterCutoffFrequency: number = 2000
 	public readonly time: number = 5
 	public readonly width: number = 256
 	public readonly height: number = 80
