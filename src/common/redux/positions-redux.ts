@@ -127,7 +127,7 @@ export const selectAllPositions = (state: IClientRoomState) =>
 	state.positions.all
 
 export const selectPosition = (state: IClientRoomState, id: string) =>
-	selectAllPositions(state).get(id)
+	selectAllPositions(state).get(id) || defaultPosition
 
 export const selectAllPositionsAsArray = createSelector(
 	selectAllPositions,
@@ -136,7 +136,7 @@ export const selectAllPositionsAsArray = createSelector(
 
 export const selectAllPositionIds = createSelector(
 	selectAllPositions,
-	positions => [...positions.keys()],
+	positions => positions.keySeq(),
 )
 
 export const selectPositionsWithIds = (state: IClientRoomState, ids: string[]) => {

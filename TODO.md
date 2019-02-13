@@ -286,9 +286,6 @@ instrument manager already handles all creation and destruction of instruments
 	- [√] mark as last touched immediately after clicking on node
 - [√] support trackpad zoom and pan
 - [ ] add buttons on side of screen for zoom and pan and show keyboard shortcuts when hovering over icon
-- [ ] make zoom and pan affect mouse cursors
-	- [ ] use position system to render mouse cursors
-		- [ ] use transform translate and will-change
 - [√] different icon for drag handle so people don't think it's a menu
 - [ ] auto organize button
 - [√] center master clock node vertically in create server stuff

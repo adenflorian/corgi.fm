@@ -1,9 +1,11 @@
 # Now
 - [√] fix ghost connection to be curved
-- [ ] fix perf issues with looped connections (color calcs?)
-- [ ] https://github.com/jprichardson/redux-watch
+- [ ] make zoom and pan affect mouse cursors
+	- [ ] use position system to render mouse cursors
+		- [ ] use transform translate and will-change
 
 # Soon
+- [ ] fix perf issues with looped connections (color calcs?)
 - [ ] allow adding connections from a node with no connections on it already
 	- [ ] split up ConnectionView
 		- [ ] Connector component

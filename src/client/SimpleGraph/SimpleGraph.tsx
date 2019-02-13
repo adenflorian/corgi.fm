@@ -1,3 +1,4 @@
+import {Seq} from 'immutable'
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {IClientAppState} from '../../common/redux'
@@ -8,7 +9,7 @@ import {ConnectedSimpleGraphNode} from './SimpleGraphNode'
 import {ConnectedZoom} from './Zoom'
 
 interface ISimpleGraphReduxProps {
-	positionIds: string[]
+	positionIds: Seq.Indexed<string>
 }
 
 export const SimpleGraph: React.FC<ISimpleGraphReduxProps> =
@@ -25,13 +26,16 @@ export const SimpleGraph: React.FC<ISimpleGraphReduxProps> =
 			<ConnectedZoom>
 				<div id={mainBoardsId} className="boards">
 					<ConnectedConnections usage={ConnectionsUsage.simpleGraph} />
-					{/* <p style={{height: 0}}>+</p> */}
 					{positionIds.map(positionId =>
 						<ConnectedSimpleGraphNode key={positionId} positionId={positionId} />,
 					)}
 				</div>
 			</ConnectedZoom>
 		</div>,
+		// TODO
+		// (prev, next) => {
+		// 	return next.positionIds.count() === prev.positionIds.count()
+		// },
 	)
 
 export const ConnectedSimpleGraph = connect(

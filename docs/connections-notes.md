@@ -24,3 +24,31 @@ It behaves like a ghost connector for creating a new connection
 
 who will render this ghost connector?
 SimpleGraphNode?
+
+# Colors and isActive
+
+## How to determine color of a node
+- If node state has its own color
+- Then use that
+- Else, combine colors of all incoming connections
+
+## How to determine color of a connection
+	- If source node state has its own color
+	- Then use that
+	- Else, combine colors of all incoming connections
+
+## Should colors be lazily calculated or stored in state?
+- If lazily calculated, then it gets complicated and perf issues
+- If in state...when to calculate?
+- When a node color changes or a connection changes (nodes cant change color at the moment)
+- Where to store color state?
+- Position state? (it's really generic node state at this point rather than just position data)
+- Connections can still just get it from the source node
+
+Middleware?
+When
+
+## PositionState
+  - node id(s) of where color and isActive is coming from
+  - colorSourceNodeIds: List<string>
+  - isActiveSourceNodeIds: List<string>
