@@ -1,17 +1,19 @@
 .connection {
-
     svg {
         position: absolute;
         overflow: visible;
         filter: drop-shadow(0 0 2px #181818);
     }
 
-
     .connector {
         z-index: 0;
 
         &:hover {
             filter: saturate(300%);
+        }
+        &:active {
+            cursor: grabbing;
+            filter: saturate(400%);
         }
     }
 

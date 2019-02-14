@@ -1,3 +1,8 @@
+- 2019-02-12
+	- [√] fix ghost connection to be curved
+	- [√] make zoom and pan affect mouse cursors
+		- [√] use position system to render mouse cursors
+			- [√] use transform translate and will-change
 - 2019-02-09 - 2019-02-10
 	- [√] convolution reverb (initial impl)
 		- [√] make it connected to audio output at server create stuff
@@ -17,3 +22,4 @@
 		- [√] properly disconnect things when a node already has multiple outbound connections
 	- [√] 'Maximum call stack size exceeded' issue again with looped connections
 		- sampler -> reverb -> same sampler
+

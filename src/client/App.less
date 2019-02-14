@@ -125,9 +125,14 @@ a {
 }
 
 .handle {
-    &:hover, &:active {
-        cursor: move;
+    cursor: grab;
+    
+    &:hover {
         filter: brightness(2)
+    }
+    &:active {
+        cursor: grabbing;
+        filter: brightness(3)
     }
 }
 

@@ -213,6 +213,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 									d={pathDPart1Ghost}
 									strokeWidth={longLineStrokeWidth + 'px'}
 									strokeDasharray={4}
+									stroke={`url(#${id})`}
 								/>
 							</g>
 						</svg>
@@ -228,6 +229,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 								connectionId={id}
 								sourceOrTarget={GhostConnectorStatus.activeSource}
 								movingOrAdding={GhostConnectorType.moving}
+								color={color}
 							/>
 							<GhostConnector
 								dispatch={this.props.dispatch}
@@ -238,6 +240,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 								connectionId={id}
 								sourceOrTarget={GhostConnectorStatus.activeTarget}
 								movingOrAdding={GhostConnectorType.moving}
+								color={color}
 							/>
 						</React.Fragment>
 					}
@@ -252,6 +255,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 								connectionId={id}
 								sourceOrTarget={GhostConnectorStatus.activeTarget}
 								movingOrAdding={GhostConnectorType.adding}
+								color={color}
 							/>
 							<GhostConnector
 								dispatch={this.props.dispatch}
@@ -262,6 +266,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 								connectionId={id}
 								sourceOrTarget={GhostConnectorStatus.activeSource}
 								movingOrAdding={GhostConnectorType.adding}
+								color={color}
 							/>
 						</React.Fragment>
 					}
@@ -280,11 +285,12 @@ interface IGhostConnectorProps {
 	connectionId: string
 	sourceOrTarget: GhostConnectorStatus
 	movingOrAdding: GhostConnectorType
+	color: string
 }
 
 class GhostConnector extends React.PureComponent<IGhostConnectorProps> {
 	public render() {
-		const {isActive, ghostConnector, parentX, parentY} = this.props
+		const {isActive, ghostConnector, parentX, parentY, color} = this.props
 
 		return (
 			<Draggable
@@ -307,6 +313,7 @@ class GhostConnector extends React.PureComponent<IGhostConnectorProps> {
 					<Connector
 						width={connectorWidth}
 						height={connectorHeight}
+						color={color}
 					/>
 				</div>
 			</Draggable>

@@ -5,3 +5,4 @@
 - https://github.com/gajus/redux-immutable
 - https://github.com/indexiatech/redux-immutablejs
 - https://github.com/erikras/multireducer
+- https://github.com/trimstray/nginx-quick-reference
