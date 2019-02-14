@@ -9,6 +9,7 @@ import {
 import {saturateColor} from '../../common/shamu-color'
 import {simpleGlobalClientState} from '../SimpleGlobalClientState'
 import './ConnectionView.less'
+import {Connector} from './Connector'
 
 export interface IConnectionViewProps {
 	color: string
@@ -45,7 +46,6 @@ class LineState {
 }
 
 const longLineStrokeWidth = 2
-const connectorStrokeWidth = 8
 const connectorWidth = 16
 const connectorHeight = 8
 
@@ -343,38 +343,6 @@ class GhostConnector extends React.PureComponent<IGhostConnectorProps> {
 			this.props.connectionId))
 	}
 }
-
-interface ConnectorProps {
-	width: number
-	height: number
-	saturate?: boolean
-	x?: number
-	y?: number
-	color?: string
-}
-
-const Connector: React.FC<ConnectorProps> =
-	React.memo(({width, height, saturate = false, x = 0, y = 0, color}) =>
-		<svg
-			className={`colorize connector${saturate ? ' saturate' : ''}`}
-			xmlns="http://www.w3.org/2000/svg"
-			style={{
-				width,
-				height,
-				top: y - (connectorHeight / 2),
-				left: x,
-			}}
-		>
-			<line
-				x1={0}
-				y1={height / 2}
-				x2={width}
-				y2={height / 2}
-				strokeWidth={connectorStrokeWidth}
-				stroke={color}
-			/>
-		</svg>,
-	)
 
 export const ConnectedConnectionView = shamuConnect(
 	(state: IClientAppState): IConnectionViewReduxProps => ({
