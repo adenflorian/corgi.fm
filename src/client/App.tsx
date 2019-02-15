@@ -6,7 +6,7 @@ import {IClientAppState} from '../common/redux'
 import './App.less'
 import './css-reset.css'
 import {isLocalDevClient} from './is-prod-client'
-import {ConnectedOnlineApp} from './OnlineApp'
+import {OnlineApp} from './OnlineApp'
 import {Options} from './Options/Options'
 import {SimpleReverbView} from './ShamuNodes/SimpleReverb/SimpleReverbView'
 
@@ -27,7 +27,7 @@ class App extends React.Component<IAppProps, {}> {
 		}
 
 		if (isLocalClientReady) {
-			return <ConnectedOnlineApp />
+			return <OnlineApp />
 		} else {
 			return <div
 				style={{
