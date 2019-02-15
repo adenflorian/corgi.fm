@@ -3,7 +3,7 @@ import Draggable, {DraggableEventHandler} from 'react-draggable'
 import {IoMdMove as HandleIcon} from 'react-icons/io'
 import {Dispatch} from 'redux'
 import {ConnectionNodeType} from '../../common/common-types'
-import {nodeClicked, selectPosition, updatePosition} from '../../common/redux'
+import {movePosition, nodeClicked, selectPosition} from '../../common/redux'
 import {shamuConnect} from '../../common/redux'
 import {CssColor} from '../../common/shamu-color'
 import {ConnectedBasicSampler} from '../BasicSampler/BasicSampler'
@@ -27,6 +27,7 @@ interface ISimpleGraphNodeReduxProps {
 	width: number
 	height: number
 	zIndex: number
+	color: string
 }
 
 type ISimpleGraphNodeAllProps = ISimpleGraphNodeProps & ISimpleGraphNodeReduxProps & {dispatch: Dispatch}
@@ -35,7 +36,7 @@ const handleClassName = 'handle'
 
 export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProps> {
 	public render() {
-		const {x, y, width, height, positionId, targetType, zIndex} = this.props
+		const {x, y, width, height, positionId, targetType, zIndex, color} = this.props
 
 		return (
 			<Draggable
@@ -65,14 +66,14 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 					}}
 				>
 					<Handle />
-					{getComponentByNodeType(targetType, positionId)}
+					{getComponentByNodeType(targetType, positionId, color)}
 				</div>
 			</Draggable >
 		)
 	}
 
 	private readonly _handleDrag: DraggableEventHandler = (_, data) => {
-		this.props.dispatch(updatePosition(this.props.positionId, {x: data.x, y: data.y}))
+		this.props.dispatch(movePosition(this.props.positionId, {x: data.x, y: data.y}))
 	}
 
 	private readonly _handleMouseDown = () => {
@@ -105,7 +106,7 @@ const Handle = React.memo(function Handle_() {
 	</div>
 })
 
-export function getComponentByNodeType(type: ConnectionNodeType, id: string) {
+export function getComponentByNodeType(type: ConnectionNodeType, id: string, color: string) {
 	switch (type) {
 		case ConnectionNodeType.masterClock: return <ConnectedMasterControls />
 		case ConnectionNodeType.audioOutput: return <ConnectedVolumeControl />
@@ -114,10 +115,10 @@ export function getComponentByNodeType(type: ConnectionNodeType, id: string) {
 		case ConnectionNodeType.infiniteSequencer: return <ConnectedInfiniteSequencer id={id} />
 		case ConnectionNodeType.virtualKeyboard: return <ConnectedKeyboard id={id} />
 
-		case ConnectionNodeType.basicSynthesizer: return <ConnectedBasicSynthesizerView id={id} />
-		case ConnectionNodeType.basicSampler: return <ConnectedBasicSampler id={id} />
+		case ConnectionNodeType.basicSynthesizer: return <ConnectedBasicSynthesizerView id={id} color={color} />
+		case ConnectionNodeType.basicSampler: return <ConnectedBasicSampler id={id} color={color} />
 
-		case ConnectionNodeType.simpleReverb: return <ConnectedSimpleReverb id={id} />
+		case ConnectionNodeType.simpleReverb: return <ConnectedSimpleReverb id={id} color={color} />
 
 		default: throw new Error('invalid type: ' + type.toString() + ' ' + id)
 	}
@@ -134,6 +135,7 @@ export const ConnectedSimpleGraphNode = shamuConnect(
 			width: position.width,
 			height: position.height,
 			zIndex: position.zIndex,
+			color: position.color,
 		}
 	},
 )(SimpleGraphNode)

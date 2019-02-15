@@ -4,9 +4,6 @@ import React = require('react')
 import {connect} from 'react-redux'
 import {Action, Dispatch} from 'redux'
 import {IClientAppState} from '../../common/redux'
-import {
-	selectConnectionSourceColorByTargetId,
-} from '../../common/redux'
 import {MASTER_AUDIO_OUTPUT_TARGET_ID} from '../../common/redux'
 import {setOptionMasterVolume} from '../../common/redux'
 import {colorFunc} from '../../common/shamu-color'
@@ -14,8 +11,11 @@ import {Knob} from '../Knob/Knob'
 import {Panel} from '../Panel/Panel'
 import './VolumeControl.less'
 
-interface IVolumeControlReduxProps {
+interface IVolumeControlProps {
 	color: string
+}
+
+interface IVolumeControlReduxProps {
 	masterVolume: number,
 	reportedMasterVolume: number
 }
@@ -24,7 +24,7 @@ interface IVolumeControlDispatchProps {
 	changeMasterVolume: (_: any, number: number) => Action
 }
 
-type IVolumeControlAllProps = IVolumeControlReduxProps & IVolumeControlDispatchProps
+type IVolumeControlAllProps = IVolumeControlProps & IVolumeControlReduxProps & IVolumeControlDispatchProps
 
 export class VolumeControl extends Component<IVolumeControlAllProps> {
 	public static defaultProps = {
@@ -63,7 +63,6 @@ export class VolumeControl extends Component<IVolumeControlAllProps> {
 export const ConnectedVolumeControl = connect(
 	(state: IClientAppState): IVolumeControlReduxProps => {
 		return {
-			color: selectConnectionSourceColorByTargetId(state.room, MASTER_AUDIO_OUTPUT_TARGET_ID),
 			masterVolume: state.options.masterVolume,
 			reportedMasterVolume: Math.floor(state.audio.reportedMasterLevel),
 		}

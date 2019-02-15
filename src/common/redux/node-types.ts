@@ -25,6 +25,7 @@ export const NodeInfoRecord = Record({
 	stateDeserializer: ((state: IMultiStateThing) => state) as (state: IMultiStateThing) => IMultiStateThing,
 	width: 0,
 	height: 0,
+	color: CssColor.subtleGrayBlackBg,
 })
 
 export const NodeInfoMap = Map({
@@ -78,6 +79,7 @@ export const NodeInfoMap = Map({
 		}),
 		width: 140.48,
 		height: 56,
+		color: CssColor.green,
 	}),
 	[ConnectionNodeType.masterClock]: NodeInfoRecord({
 		stateSelector: () => ({
@@ -90,6 +92,7 @@ export const NodeInfoMap = Map({
 		selectIsSending: () => false,
 		width: 134.813,
 		height: 72,
+		color: CssColor.blue,
 	}),
 })
 

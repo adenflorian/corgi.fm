@@ -2,7 +2,10 @@ import {Map, Record} from 'immutable'
 import {combineReducers, Reducer} from 'redux'
 import {createSelector} from 'reselect'
 import {ConnectionNodeType} from '../common-types'
-import {BROADCASTER_ACTION, getConnectionNodeInfo, IClientRoomState, IConnection, SERVER_ACTION} from './index'
+import {CssColor} from '../shamu-color'
+import {
+	BROADCASTER_ACTION, getConnectionNodeInfo, IClientRoomState, IConnection, SERVER_ACTION,
+} from './index'
 
 export const ADD_POSITION = 'ADD_POSITION'
 export type AddPositionAction = ReturnType<typeof addPosition>
@@ -47,6 +50,16 @@ export const updatePosition = (id: string, position: Partial<IPosition>) => ({
 	BROADCASTER_ACTION,
 })
 
+export const MOVE_POSITION = 'MOVE_POSITION'
+export type MovePositionAction = ReturnType<typeof movePosition>
+export const movePosition = (id: string, position: Pick<IPosition, 'x' | 'y'>) => ({
+	type: MOVE_POSITION as typeof MOVE_POSITION,
+	id,
+	position,
+	SERVER_ACTION,
+	BROADCASTER_ACTION,
+})
+
 export const NODE_CLICKED = 'NODE_CLICKED'
 export type NodeClickedAction = ReturnType<typeof nodeClicked>
 export const nodeClicked = (id: string) => ({
@@ -74,6 +87,7 @@ const defaultPosition = {
 	x: Math.random() * 1600 - 800,
 	y: Math.random() * 1000 - 500,
 	zIndex: 0,
+	color: CssColor.subtleGrayBlackBg,
 }
 
 const makePositionRecord = Record(defaultPosition)
@@ -85,11 +99,12 @@ export const makePosition = (
 		...position,
 		width: position.width === undefined ? getConnectionNodeInfo(position.targetType).width : position.width,
 		height: position.height === undefined ? getConnectionNodeInfo(position.targetType).height : position.height,
+		color: position.color === undefined ? getConnectionNodeInfo(position.targetType).color : position.color,
 	}).toJS()
 }
 
 export type IPositionAction = AddPositionAction | DeletePositionsAction | NodeClickedAction
-	| DeleteAllPositionsAction | UpdatePositionsAction | UpdatePositionAction
+	| DeleteAllPositionsAction | UpdatePositionsAction | UpdatePositionAction | MovePositionAction
 
 // Reducers
 const positionsSpecificReducer: Reducer<IPositions, IPositionAction> =
@@ -100,6 +115,7 @@ const positionsSpecificReducer: Reducer<IPositions, IPositionAction> =
 			case DELETE_ALL_POSITIONS: return positions.clear()
 			case UPDATE_POSITIONS: return sortPositions(positions.merge(action.positions))
 			case UPDATE_POSITION: return positions.update(action.id, x => ({...x, ...action.position}))
+			case MOVE_POSITION: return positions.update(action.id, x => ({...x, ...action.position}))
 			case NODE_CLICKED: return positions.update(action.id, x => ({
 				...x,
 				zIndex: getNewZIndex(positions, x.zIndex),

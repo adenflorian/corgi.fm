@@ -2,11 +2,12 @@ import * as React from 'react'
 import {Point} from '../../common/common-types'
 import {
 	GhostConnectorRecord, makeConnectionPositionsSelector,
-	selectConnection, selectConnectionSourceColor,
+	selectConnection,
 	selectConnectionSourceIsActive, selectConnectionSourceIsSending,
 	selectConnectionStackOrderForSource,
-	selectConnectionStackOrderForTarget, shamuConnect,
+	selectConnectionStackOrderForTarget, selectPosition, shamuConnect,
 } from '../../common/redux'
+import {CssColor} from '../../common/shamu-color'
 import {ConnectedConnectionView} from './ConnectionView'
 
 interface IConnectionViewContainerProps {
@@ -18,8 +19,6 @@ interface IConnectionViewContainerReduxProps {
 	targetPosition: Point
 	sourceStackOrder: number
 	targetStackOrder: number
-	sourceId?: string
-	targetId?: string
 	sourceColor: string
 	isSourceActive: boolean
 	isSourceSending: boolean
@@ -53,14 +52,12 @@ export const ConnectedConnectionViewContainer = shamuConnect(
 
 		return (state, props: IConnectionViewContainerProps): IConnectionViewContainerReduxProps => {
 			const connection = selectConnection(state.room, props.id)
-			const sourceColor = selectConnectionSourceColor(state.room, connection.id)
+			const sourceColor = selectPosition(state.room, connection.sourceId).color
 			const isSourceActive = selectConnectionSourceIsActive(state.room, connection.id)
 			const isSourceSending = selectConnectionSourceIsSending(state.room, connection.id)
 			const positions = positionsSelector(state.room, connection)
 
 			return {
-				sourceId: connection.sourceId,
-				targetId: connection.targetId,
 				sourceColor,
 				isSourceActive,
 				isSourceSending,

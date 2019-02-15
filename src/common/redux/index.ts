@@ -9,6 +9,7 @@ export * from './global-clock-redux'
 export * from './virtual-keyboard-redux'
 export * from './connections-redux'
 export * from './connections-middleware'
+export * from './dragging-connections'
 export * from './audio-redux'
 
 export * from './redux-utils'

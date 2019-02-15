@@ -211,35 +211,35 @@ export const selectFirstConnectionIdByTargetId = (state: IClientRoomState, targe
 }
 
 /** For use by a node */
-export const selectConnectionSourceColorByTargetId =
-	(state: IClientRoomState, targetId: string, processedIds = List<string>()): string => {
-		const connections = selectAllConnections(state).filter(x => x.targetId === targetId)
+// export const selectConnectionSourceColorByTargetId =
+// 	(state: IClientRoomState, targetId: string, processedIds = List<string>()): string => {
+// 		const connections = selectAllConnections(state).filter(x => x.targetId === targetId)
 
-		if (connections.count() === 0) return makeConnectionSourceColorSelector(state, processedIds)(Connection.dummy)
+// 		if (connections.count() === 0) return makeConnectionSourceColorSelector(state, processedIds)(Connection.dummy)
 
-		const colors = connections.map(makeConnectionSourceColorSelector(state, processedIds))
+// 		const colors = connections.map(makeConnectionSourceColorSelector(state, processedIds))
 
-		return mixColors(colors.toList())
-	}
+// 		return mixColors(colors.toList())
+// 	}
 
-/** For use by a connection */
-export const selectConnectionSourceColor = (state: IClientRoomState, id: string): string => {
-	const connection = selectConnection(state, id)
+// /** For use by a connection */
+// export const selectConnectionSourceColor = (state: IClientRoomState, id: string): string => {
+// 	const connection = selectConnection(state, id)
 
-	return makeConnectionSourceColorSelector(state)(connection)
-}
+// 	return makeConnectionSourceColorSelector(state)(connection)
+// }
 
-const makeConnectionSourceColorSelector =
-	(roomState: IClientRoomState, processedIds = List<string>()) => (connection: IConnection) => {
-		// If in a loop
-		if (processedIds.contains(connection.id)) return CssColor.subtleGrayBlackBg
+// const makeConnectionSourceColorSelector =
+// 	(roomState: IClientRoomState, processedIds = List<string>()) => (connection: IConnection) => {
+// 		// If in a loop
+// 		if (processedIds.contains(connection.id)) return CssColor.subtleGrayBlackBg
 
-		return (
-			getConnectionNodeInfo(connection.sourceType).stateSelector(roomState, connection.sourceId).color
-			||
-			selectConnectionSourceColorByTargetId(roomState, connection.sourceId, processedIds.push(connection.id))
-		)
-	}
+// 		return (
+// 			getConnectionNodeInfo(connection.sourceType).stateSelector(roomState, connection.sourceId).color
+// 			||
+// 			selectConnectionSourceColorByTargetId(roomState, connection.sourceId, processedIds.push(connection.id))
+// 		)
+// 	}
 
 /** For use by a node */
 export const selectConnectionSourceNotesByTargetId = (state: IClientRoomState, targetId: string): IMidiNotes => {

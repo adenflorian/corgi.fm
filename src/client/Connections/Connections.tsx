@@ -15,7 +15,7 @@ interface IConnectionsReduxProps {
 
 type IConnectionsAllProps = IConnectionsProps & IConnectionsReduxProps
 
-export const Connections = React.memo(({connectionIds}: IConnectionsAllProps) => {
+export const Connections = ({connectionIds}: IConnectionsAllProps) => {
 	return (
 		<div className="connections">
 			{connectionIds.map(connectionId =>
@@ -23,7 +23,7 @@ export const Connections = React.memo(({connectionIds}: IConnectionsAllProps) =>
 			)}
 		</div>
 	)
-})
+}
 
 export const ConnectedConnections = shamuConnect(
 	(state): IConnectionsReduxProps => ({

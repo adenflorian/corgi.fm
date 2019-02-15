@@ -1,15 +1,15 @@
 import * as React from 'react'
 import {Dispatch} from 'redux'
-import {selectConnectionSourceColorByTargetId, selectConnectionSourceNotesByTargetId, selectSimpleReverb, setSimpleReverbParam, shamuConnect, SimpleReverbParam} from '../../../common/redux'
+import {selectConnectionSourceNotesByTargetId, selectSimpleReverb, setSimpleReverbParam, shamuConnect, SimpleReverbParam} from '../../../common/redux'
 import {Knob} from '../../Knob/Knob'
 import {Panel} from '../../Panel/Panel'
 
 interface ISimpleReverbProps {
+	color: string
 	id: string
 }
 
 interface ISimpleReverbReduxProps {
-	color: string
 	isPlaying: boolean
 	lpf: number
 	time: number
@@ -75,7 +75,6 @@ export const ConnectedSimpleReverb = shamuConnect(
 		const simpleReverbState = selectSimpleReverb(state.room, id)
 
 		return {
-			color: selectConnectionSourceColorByTargetId(state.room, id),
 			isPlaying: selectConnectionSourceNotesByTargetId(state.room, id).count() > 0,
 			lpf: simpleReverbState.lowPassFilterCutoffFrequency,
 			time: simpleReverbState.time,

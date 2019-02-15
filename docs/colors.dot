@@ -1,0 +1,6 @@
+digraph {
+	graph [label="where color comes from"]
+
+	ShamuNode -> {Self Ancestor}
+	Connection -> {Ancestor}
+}

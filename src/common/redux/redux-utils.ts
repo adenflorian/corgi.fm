@@ -7,9 +7,11 @@ import {
 import {Action} from 'redux'
 import {createSelectorCreator, defaultMemoize} from 'reselect'
 import {assertArrayHasNoUndefinedElements} from '../common-utils'
-import {IClientAppState, MOVE_GHOST_CONNECTOR, REPORT_LEVELS, SET_CLIENT_POINTER, SET_GLOBAL_CLOCK_INDEX, SET_INFO} from './index'
-import {UPDATE_POINTER} from './pointers-redux'
-import {UPDATE_POSITION} from './positions-redux'
+import {
+	IClientAppState, MOVE_GHOST_CONNECTOR, MOVE_POSITION,
+	REPORT_LEVELS, SET_CLIENT_POINTER, SET_GLOBAL_CLOCK_INDEX,
+	SET_INFO, UPDATE_POINTER,
+} from './index'
 
 export function makeActionCreator(type: string, ...argNames: any[]) {
 	argNames.forEach(arg => {
@@ -178,7 +180,7 @@ export const getActionsBlacklist = () => {
 		SET_GLOBAL_CLOCK_INDEX,
 		MOVE_GHOST_CONNECTOR,
 		UPDATE_POINTER,
-		UPDATE_POSITION,
+		MOVE_POSITION,
 	]
 
 	// If anything is undefined in the blacklist the redux dev tools breaks

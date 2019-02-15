@@ -1,18 +1,18 @@
 import {Map} from 'immutable'
 import {Action, Store} from 'redux'
 import {ConnectionNodeType, IConnectable} from '../common/common-types'
+import {calculatePositionsGivenConnections} from '../common/compute-positions'
 import {MidiNotes} from '../common/MidiNote'
 import {
 	addBasicSampler, addBasicSynthesizer, addClient,
 	addGridSequencer, addInfiniteSequencer, addPosition,
 	addSimpleReverb, BasicSamplerState,
-	BasicSynthesizerState, calculateExtremes, calculatePositionsGivenConnections,
-	ClientState, Connection, connectionsActions,
+	BasicSynthesizerState, ClientState, Connection, connectionsActions,
 	createRoomAction, createSequencerEvents, GridSequencerState,
-	IConnection, IConnections,
-	InfiniteSequencerState, InfiniteSequencerStyle, IPositions, IServerState,
+	InfiniteSequencerState, InfiniteSequencerStyle, IServerState,
 	makePosition, makeSequencerEvents,
-	MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID, NodeSpecialState, selectAllConnections, selectAllPositions, selectConnectionsWithTargetIds, selectConnectionsWithTargetIds2, SequencerEvents, SimpleReverbState, updatePositions,
+	MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID, selectAllConnections,
+	selectAllPositions, SequencerEvents, SimpleReverbState, updatePositions,
 } from '../common/redux'
 
 const masterAudioOutput: IConnectable = Object.freeze({

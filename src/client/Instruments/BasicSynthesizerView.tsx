@@ -9,7 +9,7 @@ import {
 } from '../../common/redux'
 import {IClientAppState} from '../../common/redux'
 import {
-	selectConnectionSourceColorByTargetId, selectConnectionSourceNotesByTargetId,
+	selectConnectionSourceNotesByTargetId,
 } from '../../common/redux'
 import {Knob} from '../Knob/Knob'
 import {Panel} from '../Panel/Panel'
@@ -21,11 +21,11 @@ export type MidiNotes = IMidiNotes
 type IBasicSynthesizerViewAllProps = IBasicSynthesizerViewProps & IBasicSynthesizerViewReduxProps & {dispatch: Dispatch}
 
 interface IBasicSynthesizerViewProps {
+	color: string
 	id: string
 }
 
 interface IBasicSynthesizerViewReduxProps {
-	color: string
 	rawMidiNotes: MidiNotes
 	pan: number
 	isPlaying: boolean
@@ -127,7 +127,6 @@ export const ConnectedBasicSynthesizerView = connect(
 			rawMidiNotes,
 			isPlaying: rawMidiNotes.count() > 0,
 			oscillatorType: instrumentState.oscillatorType,
-			color: selectConnectionSourceColorByTargetId(state.room, props.id),
 			pan: instrumentState.pan,
 			lowPassFilterCutoffFrequency: instrumentState.lowPassFilterCutoffFrequency,
 			attack: instrumentState.attack,
