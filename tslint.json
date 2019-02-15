@@ -5,6 +5,7 @@
     ],
     "jsRules": {},
     "rules": {
+        "no-empty-interface": false,
         "restrict-plus-operands": false,
         "strict-boolean-expressions": false,
         "increment-decrement": false,

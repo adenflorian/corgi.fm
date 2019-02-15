@@ -2,6 +2,7 @@ import {List} from 'immutable'
 import * as React from 'react'
 import Draggable, {DraggableEventHandler} from 'react-draggable'
 import {Dispatch} from 'redux'
+import {Point} from '../../common/common-types'
 import {
 	connectionsActions, defaultGhostConnector, GhostConnectorRecord, GhostConnectorStatus,
 	GhostConnectorType, IClientAppState, selectUserInputKeys, shamuConnect,
@@ -13,10 +14,8 @@ import {Connector} from './Connector'
 
 export interface IConnectionViewProps {
 	color: string
-	sourceX: number
-	sourceY: number
-	targetX: number
-	targetY: number
+	sourcePosition: Point
+	targetPosition: Point
 	ghostConnector?: GhostConnectorRecord
 	saturateSource: boolean
 	saturateTarget: boolean
@@ -53,19 +52,19 @@ const line0 = new LineState(0, 0, 0, 0)
 
 export class ConnectionView extends React.PureComponent<IConnectionViewAllProps> {
 	public render() {
-		const {color, saturateSource, saturateTarget, id,
+		const {color, saturateSource, saturateTarget, id, sourcePosition, targetPosition,
 			ghostConnector = defaultGhostConnector, targetStackOrder = 0, sourceStackOrder = 0} = this.props
 
-		const sourceConnectorLeft = this.props.sourceX + (connectorWidth * sourceStackOrder)
-		const sourceConnectorRight = this.props.sourceX + connectorWidth + (connectorWidth * sourceStackOrder)
-		const targetConnectorLeft = this.props.targetX - connectorWidth - (connectorWidth * targetStackOrder)
-		const targetConnectorRight = this.props.targetX - (connectorWidth * targetStackOrder)
+		const sourceConnectorLeft = sourcePosition.x + (connectorWidth * sourceStackOrder)
+		const sourceConnectorRight = sourcePosition.x + connectorWidth + (connectorWidth * sourceStackOrder)
+		const targetConnectorLeft = targetPosition.x - connectorWidth - (connectorWidth * targetStackOrder)
+		const targetConnectorRight = targetPosition.x - (connectorWidth * targetStackOrder)
 
 		const connectedLine = new LineState(
 			sourceConnectorRight,
-			this.props.sourceY,
+			sourcePosition.y,
 			targetConnectorLeft,
-			this.props.targetY,
+			targetPosition.y,
 		)
 
 		const ghostLine = (() => {
@@ -75,12 +74,12 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 						ghostConnector.x + connectorWidth,
 						ghostConnector.y,
 						targetConnectorLeft,
-						this.props.targetY,
+						targetPosition.y,
 					)
 				case GhostConnectorStatus.activeTarget:
 					return new LineState(
 						sourceConnectorRight,
-						this.props.sourceY,
+						sourcePosition.y,
 						ghostConnector.x,
 						ghostConnector.y,
 					)
@@ -186,14 +185,14 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 					width={connectorWidth}
 					height={connectorHeight}
 					x={sourceConnectorLeft}
-					y={this.props.sourceY}
+					y={sourcePosition.y}
 					color={color}
 				/>
 				<Connector
 					width={connectorWidth}
 					height={connectorHeight}
 					x={targetConnectorLeft}
-					y={this.props.targetY}
+					y={targetPosition.y}
 					color={color}
 				/>
 				<div className={`ghost ${ghostConnector.status === GhostConnectorStatus.hidden ? 'hidden' : 'active'}`}>
@@ -225,7 +224,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 								isActive={ghostConnector.status === GhostConnectorStatus.activeSource}
 								ghostConnector={ghostConnector}
 								parentX={sourceConnectorLeft}
-								parentY={this.props.sourceY}
+								parentY={sourcePosition.y}
 								connectionId={id}
 								sourceOrTarget={GhostConnectorStatus.activeSource}
 								movingOrAdding={GhostConnectorType.moving}
@@ -236,7 +235,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 								isActive={ghostConnector.status === GhostConnectorStatus.activeTarget}
 								ghostConnector={ghostConnector}
 								parentX={targetConnectorLeft}
-								parentY={this.props.targetY}
+								parentY={targetPosition.y}
 								connectionId={id}
 								sourceOrTarget={GhostConnectorStatus.activeTarget}
 								movingOrAdding={GhostConnectorType.moving}
@@ -251,7 +250,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 								isActive={ghostConnector.status === GhostConnectorStatus.activeTarget}
 								ghostConnector={ghostConnector}
 								parentX={sourceConnectorLeft}
-								parentY={this.props.sourceY}
+								parentY={sourcePosition.y}
 								connectionId={id}
 								sourceOrTarget={GhostConnectorStatus.activeTarget}
 								movingOrAdding={GhostConnectorType.adding}
@@ -262,7 +261,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 								isActive={ghostConnector.status === GhostConnectorStatus.activeSource}
 								ghostConnector={ghostConnector}
 								parentX={targetConnectorLeft}
-								parentY={this.props.targetY}
+								parentY={targetPosition.y}
 								connectionId={id}
 								sourceOrTarget={GhostConnectorStatus.activeSource}
 								movingOrAdding={GhostConnectorType.adding}

@@ -1,18 +1,13 @@
 import * as React from 'react'
-import {connect} from 'react-redux'
-import {IClientAppState} from '../../common/redux'
-import {selectAllConnectionIds} from '../../common/redux'
+import {selectAllConnectionIds, shamuConnect} from '../../common/redux'
 import {ConnectedConnectionViewContainer} from './ConnectionViewContainer'
-import {ConnectedConnectionViewContainerForSimpleGraph} from './ConnectionViewContainerForSimpleGraph'
 
 export enum ConnectionsUsage {
 	normal = 'normal',
 	simpleGraph = 'simpleGraph',
 }
 
-interface IConnectionsProps {
-	usage: ConnectionsUsage
-}
+interface IConnectionsProps {}
 
 interface IConnectionsReduxProps {
 	connectionIds: string[]
@@ -20,26 +15,18 @@ interface IConnectionsReduxProps {
 
 type IConnectionsAllProps = IConnectionsProps & IConnectionsReduxProps
 
-export const Connections = ({connectionIds, usage}: IConnectionsAllProps) => {
-	const ConnectionViewContainerComp = getComponentForUsage(usage)
+export const Connections = React.memo(({connectionIds}: IConnectionsAllProps) => {
+	return (
+		<div className="connections">
+			{connectionIds.map(connectionId =>
+				<ConnectedConnectionViewContainer key={connectionId} id={connectionId} />,
+			)}
+		</div>
+	)
+})
 
-	return <div className="connections" style={{display: 'flex'}}>
-		{connectionIds.map(connectionId =>
-			<ConnectionViewContainerComp key={connectionId} id={connectionId} />,
-		)}
-	</div>
-}
-
-function getComponentForUsage(usage: ConnectionsUsage) {
-	switch (usage) {
-		case ConnectionsUsage.normal: return ConnectedConnectionViewContainer
-		case ConnectionsUsage.simpleGraph: return ConnectedConnectionViewContainerForSimpleGraph
-		default: throw new Error('usage not yet implemented: ' + usage)
-	}
-}
-
-export const ConnectedConnections = connect(
-	(state: IClientAppState): IConnectionsReduxProps => ({
+export const ConnectedConnections = shamuConnect(
+	(state): IConnectionsReduxProps => ({
 		connectionIds: selectAllConnectionIds(state.room),
 	}),
 )(Connections)
