@@ -1,33 +1,40 @@
+import {List} from 'immutable'
 import {Dispatch} from 'redux'
-import {logger} from './logger'
-import {IClientRoomState, IConnection, selectPosition, updatePosition} from './redux'
+import {
+	IClientRoomState, IConnection, selectConnection,
+	selectConnectionsWithSourceIds, selectPosition, updatePosition,
+} from './redux'
+import {CssColor} from './shamu-color'
 
-export function colorConnections(roomState: IClientRoomState, dispatch: Dispatch, connection: IConnection) {
-	try {
-		goo()
-	} catch (error) {
-		logger.warn('Caught error (will ignore) when doing colorConnections: ', error)
-		return
-	}
+export function handleAddConnection(roomState: IClientRoomState, dispatch: Dispatch, originalConnection: IConnection) {
+	const sourceColor = selectPosition(roomState, originalConnection.sourceId).color
 
-	function goo() {
+	updateConnectionTargetColor(roomState, dispatch, originalConnection, sourceColor)
+}
 
-		console.log('colorConnections 1')
+export function handleDeleteConnection(beforeState: IClientRoomState, dispatch: Dispatch, connectionIds: List<string>) {
+	connectionIds.forEach(connectionId => {
+		const connection = selectConnection(beforeState, connectionId)
+		updateConnectionTargetColor(beforeState, dispatch, connection, CssColor.subtleGrayBlackBg)
+	})
+}
 
-		// When a connection changes
-		// The middleware will trace the graph downstream from that connection
-		// 	and dispatch color updates for all necessary items
+function updateConnectionTargetColor(
+	roomState: IClientRoomState,
+	dispatch: Dispatch,
+	connection: IConnection,
+	color: string,
+	processedConnectionIDs = List<string>(),
+) {
+	if (processedConnectionIDs.contains(connection.id)) return console.log('loop detected')
 
-		// get target node
+	dispatch(updatePosition(connection.targetId, {
+		color,
+	}))
 
-		// get color of source node
-		const sourceColor = selectPosition(roomState, connection.sourceId).color
-		console.log('colorConnections 2 - sourceColor: ', sourceColor)
+	const nextConnections = selectConnectionsWithSourceIds(roomState, [connection.targetId])
 
-		// update target node color
-		dispatch(updatePosition(connection.targetId, {
-			color: sourceColor,
-		}))
-		console.log('colorConnections 3')
-	}
+	nextConnections.forEach(
+		x => updateConnectionTargetColor(roomState, dispatch, x, color, processedConnectionIDs.push(connection.id)),
+	)
 }

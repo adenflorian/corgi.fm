@@ -1,5 +1,5 @@
 import {Map} from 'immutable'
-import {Action} from 'redux'
+import {AnyAction} from 'redux'
 import {IConnection} from '../index'
 
 export type ShamuEdgesState = ReturnType<typeof makeShamuEdgesState>
@@ -10,6 +10,6 @@ export function makeShamuEdgesState() {
 
 export type EdgeState = IConnection
 
-export function edgesReducer(state = makeShamuEdgesState(), action: Action) {
+export function edgesReducer(state = makeShamuEdgesState(), action: AnyAction) {
 	return state
 }

@@ -2,9 +2,8 @@ import {List} from 'immutable'
 import * as React from 'react'
 import Draggable, {DraggableEventHandler} from 'react-draggable'
 import {Dispatch} from 'redux'
-import {Point} from '../../common/common-types'
 import {
-	connectionsActions, defaultGhostConnector, GhostConnectorRecord, GhostConnectorStatus,
+	connectionsActions, GhostConnectorRecord, GhostConnectorStatus,
 	GhostConnectorType, IClientAppState, selectUserInputKeys, shamuConnect,
 } from '../../common/redux'
 import {saturateColor} from '../../common/shamu-color'
@@ -14,9 +13,11 @@ import {Connector} from './Connector'
 
 export interface IConnectionViewProps {
 	color: string
-	sourcePosition: Point
-	targetPosition: Point
-	ghostConnector?: GhostConnectorRecord
+	sourceX: number
+	sourceY: number
+	targetX: number
+	targetY: number
+	ghostConnector: GhostConnectorRecord
 	saturateSource: boolean
 	saturateTarget: boolean
 	id: string
@@ -50,70 +51,40 @@ const connectorHeight = 8
 
 const line0 = new LineState(0, 0, 0, 0)
 
+const buffer = 50
+const joint = 8
+
 export class ConnectionView extends React.PureComponent<IConnectionViewAllProps> {
 	public render() {
-		const {color, saturateSource, saturateTarget, id, sourcePosition, targetPosition,
-			ghostConnector = defaultGhostConnector, targetStackOrder = 0, sourceStackOrder = 0} = this.props
+		const {color, saturateSource, saturateTarget, id, sourceX, sourceY, targetX, targetY,
+			ghostConnector, targetStackOrder = 0, sourceStackOrder = 0} = this.props
 
-		const sourceConnectorLeft = sourcePosition.x + (connectorWidth * sourceStackOrder)
-		const sourceConnectorRight = sourcePosition.x + connectorWidth + (connectorWidth * sourceStackOrder)
-		const targetConnectorLeft = targetPosition.x - connectorWidth - (connectorWidth * targetStackOrder)
-		const targetConnectorRight = targetPosition.x - (connectorWidth * targetStackOrder)
+		const sourceConnectorLeft = sourceX + (connectorWidth * sourceStackOrder)
+		const sourceConnectorRight = sourceX + connectorWidth + (connectorWidth * sourceStackOrder)
+		const targetConnectorLeft = targetX - connectorWidth - (connectorWidth * targetStackOrder)
+		const targetConnectorRight = targetX - (connectorWidth * targetStackOrder)
 
 		const connectedLine = new LineState(
 			sourceConnectorRight,
-			sourcePosition.y,
+			sourceY,
 			targetConnectorLeft,
-			targetPosition.y,
+			targetY,
 		)
 
-		const ghostLine = (() => {
-			switch (ghostConnector.status) {
-				case GhostConnectorStatus.activeSource:
-					return new LineState(
-						ghostConnector.x + connectorWidth,
-						ghostConnector.y,
-						targetConnectorLeft,
-						targetPosition.y,
-					)
-				case GhostConnectorStatus.activeTarget:
-					return new LineState(
-						sourceConnectorRight,
-						sourcePosition.y,
-						ghostConnector.x,
-						ghostConnector.y,
-					)
-				default:
-					return line0
-			}
-		})()
+		const ghostLine = this._getGhostLine(sourceConnectorRight, targetConnectorLeft)
 
-		const buffer = 50
-		const joint = 8
+		const pathDPart1 = this._makeCurvedPath(connectedLine)
 
-		const pathDPart1 = makeCurvedPath(connectedLine)
+		const pathDPart1Ghost = this._makeCurvedPath(ghostLine)
 
-		const pathDPart1Ghost = makeCurvedPath(ghostLine)
-
-		function makeCurvedPath(line: LineState) {
-			const diff2 = Math.abs((line.x2 - line.x1) / 2)
-
-			const curveStrength2 = Math.max(10, diff2)
-
-			return `
-				M ${line.x1} ${line.y1}
-				C ${line.x1 + joint + curveStrength2} ${line.y1} ${line.x2 - joint - curveStrength2} ${line.y2} ${line.x2} ${line.y2}
-			`
-		}
-
-		function makeStraightPath(line: LineState) {
-			return `
-				M ${line.x1} ${line.y1}
-				L ${line.x1 + joint} ${line.y1}
-				L ${line.x2 - joint} ${line.y2}
-				L ${line.x2} ${line.y2}
-			`
-		}
+		// function makeStraightPath(line: LineState) {
+		// 	return `
+		// 		M ${line.x1} ${line.y1}
+		// 		L ${line.x1 + joint} ${line.y1}
+		// 		L ${line.x2 - joint} ${line.y2}
+		// 		L ${line.x2} ${line.y2}
+		// 	`
+		// }
 
 		// This path is a hack to get the filter to work properly
 		// It forces the "render box?" to be bigger than the actual drawn path
@@ -126,73 +97,28 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 
 		return (
 			<div className="connection">
-				<svg
-					className={`colorize longLine`}
-					xmlns="http://www.w3.org/2000/svg"
-					style={{
-						position: 'fixed',
-						pointerEvents: 'none',
-						color,
-						fill: 'none',
-					}}
-				>
-					<defs>
-						<linearGradient
-							id={id}
-							x1={(connectedLine.x1)}
-							y1={(connectedLine.y1)}
-							x2={(connectedLine.x2)}
-							y2={(connectedLine.y2)}
-							gradientUnits="userSpaceOnUse"
-						// gradientUnits="objectBoundingBox"
-						>
-							<stop stopColor={saturateSource ? saturateColor(color) : color} offset="0%" />
-							<stop stopColor={saturateTarget ? saturateColor(color) : color} offset="100%" />
-						</linearGradient>
-						<filter id="saturate">
-							<feColorMatrix in="SourceGraphic"
-								type="saturate"
-								values="3" />
-						</filter>
-					</defs>
-					<g
-						onContextMenu={(e: React.MouseEvent) => {
-							this.props.dispatch(connectionsActions.delete(List([id])))
-							e.preventDefault()
-						}}
-					>
-						<path
-							d={pathDPart1}
-							stroke={`url(#${id})`}
-							strokeWidth={longLineStrokeWidth + 'px'}
-						/>
-						<path
-							className="invisibleLongLine"
-							d={pathDPart1}
-							stroke="#0000"
-							strokeWidth={24 + 'px'}
-						/>
-						<path
-							className="blurLine"
-							d={pathDFull}
-							stroke={`url(#${id})`}
-							strokeWidth={4 + 'px'}
-						/>
-					</g>
-
-				</svg>
+				<ConnectionLine
+					id={id}
+					color={color}
+					saturateSource={saturateSource}
+					saturateTarget={saturateTarget}
+					dispatch={this.props.dispatch}
+					pathDPart1={pathDPart1}
+					pathDFull={pathDFull}
+					connectedLine={connectedLine}
+				/>
 				<Connector
 					width={connectorWidth}
 					height={connectorHeight}
 					x={sourceConnectorLeft}
-					y={sourcePosition.y}
+					y={sourceY}
 					color={color}
 				/>
 				<Connector
 					width={connectorWidth}
 					height={connectorHeight}
 					x={targetConnectorLeft}
-					y={targetPosition.y}
+					y={targetY}
 					color={color}
 				/>
 				<div className={`ghost ${ghostConnector.status === GhostConnectorStatus.hidden ? 'hidden' : 'active'}`}>
@@ -224,7 +150,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 								isActive={ghostConnector.status === GhostConnectorStatus.activeSource}
 								ghostConnector={ghostConnector}
 								parentX={sourceConnectorLeft}
-								parentY={sourcePosition.y}
+								parentY={sourceY}
 								connectionId={id}
 								sourceOrTarget={GhostConnectorStatus.activeSource}
 								movingOrAdding={GhostConnectorType.moving}
@@ -235,7 +161,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 								isActive={ghostConnector.status === GhostConnectorStatus.activeTarget}
 								ghostConnector={ghostConnector}
 								parentX={targetConnectorLeft}
-								parentY={targetPosition.y}
+								parentY={targetY}
 								connectionId={id}
 								sourceOrTarget={GhostConnectorStatus.activeTarget}
 								movingOrAdding={GhostConnectorType.moving}
@@ -250,7 +176,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 								isActive={ghostConnector.status === GhostConnectorStatus.activeTarget}
 								ghostConnector={ghostConnector}
 								parentX={sourceConnectorLeft}
-								parentY={sourcePosition.y}
+								parentY={sourceY}
 								connectionId={id}
 								sourceOrTarget={GhostConnectorStatus.activeTarget}
 								movingOrAdding={GhostConnectorType.adding}
@@ -261,7 +187,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 								isActive={ghostConnector.status === GhostConnectorStatus.activeSource}
 								ghostConnector={ghostConnector}
 								parentX={targetConnectorLeft}
-								parentY={targetPosition.y}
+								parentY={targetY}
 								connectionId={id}
 								sourceOrTarget={GhostConnectorStatus.activeSource}
 								movingOrAdding={GhostConnectorType.adding}
@@ -273,7 +199,113 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 			</div>
 		)
 	}
+
+	private readonly _makeCurvedPath = (line: LineState) => {
+		const diff2 = Math.abs((line.x2 - line.x1) / 2)
+
+		const curveStrength2 = Math.max(10, diff2)
+
+		return `
+				M ${line.x1} ${line.y1}
+				C ${line.x1 + joint + curveStrength2} ${line.y1} ${line.x2 - joint - curveStrength2} ${line.y2} ${line.x2} ${line.y2}
+			`
+	}
+
+	private readonly _getGhostLine = (sourceConnectorRight: number, targetConnectorLeft: number) => {
+		switch (this.props.ghostConnector.status) {
+			case GhostConnectorStatus.activeSource:
+				return new LineState(
+					this.props.ghostConnector.x + connectorWidth,
+					this.props.ghostConnector.y,
+					targetConnectorLeft,
+					this.props.targetY,
+				)
+			case GhostConnectorStatus.activeTarget:
+				return new LineState(
+					sourceConnectorRight,
+					this.props.sourceY,
+					this.props.ghostConnector.x,
+					this.props.ghostConnector.y,
+				)
+			default:
+				return line0
+		}
+	}
 }
+
+interface ConnectionLineProps {
+	id: string
+	color: string
+	saturateSource: boolean
+	saturateTarget: boolean
+	dispatch: Dispatch
+	pathDPart1: string
+	pathDFull: string
+	connectedLine: LineState
+}
+
+const ConnectionLine = React.memo(
+	({id, color, saturateSource, saturateTarget, pathDPart1,
+		pathDFull, dispatch, connectedLine}: ConnectionLineProps,
+	) => {
+		return (
+			<svg
+				className={`colorize longLine`}
+				xmlns="http://www.w3.org/2000/svg"
+				style={{
+					position: 'fixed',
+					pointerEvents: 'none',
+					color,
+					fill: 'none',
+				}}
+			>
+				<defs>
+					<linearGradient
+						id={id}
+						x1={(connectedLine.x1)}
+						y1={(connectedLine.y1)}
+						x2={(connectedLine.x2)}
+						y2={(connectedLine.y2)}
+						gradientUnits="userSpaceOnUse"
+					// gradientUnits="objectBoundingBox"
+					>
+						<stop stopColor={saturateSource ? saturateColor(color) : color} offset="0%" />
+						<stop stopColor={saturateTarget ? saturateColor(color) : color} offset="100%" />
+					</linearGradient>
+					<filter id="saturate">
+						<feColorMatrix in="SourceGraphic"
+							type="saturate"
+							values="3" />
+					</filter>
+				</defs>
+				<g
+					onContextMenu={(e: React.MouseEvent) => {
+						dispatch(connectionsActions.delete(List([id])))
+						e.preventDefault()
+					}}
+				>
+					<path
+						d={pathDPart1}
+						stroke={`url(#${id})`}
+						strokeWidth={longLineStrokeWidth + 'px'}
+					/>
+					<path
+						className="invisibleLongLine"
+						d={pathDPart1}
+						stroke="#0000"
+						strokeWidth={24 + 'px'}
+					/>
+					<path
+						className="blurLine"
+						d={pathDFull}
+						stroke={`url(#${id})`}
+						strokeWidth={4 + 'px'}
+					/>
+				</g>
+			</svg>
+		)
+	},
+)
 
 interface IGhostConnectorProps {
 	dispatch: Dispatch

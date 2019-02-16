@@ -33,10 +33,10 @@ export * from './node-types'
 export * from './options-redux'
 export * from './positions-redux'
 export * from './room-members-redux'
+export * from './shamu-graph'
+
 export * from './room-stores-redux'
 export * from './rooms-redux'
-
-export * from './shamu-graph'
 
 export * from './user-input-redux'
 

@@ -87,7 +87,7 @@ const defaultPosition = {
 	x: Math.random() * 1600 - 800,
 	y: Math.random() * 1000 - 500,
 	zIndex: 0,
-	color: CssColor.subtleGrayBlackBg,
+	color: CssColor.subtleGrayBlackBg as string,
 }
 
 const makePositionRecord = Record(defaultPosition)
@@ -158,31 +158,6 @@ export const selectAllPositionIds = createSelector(
 export const selectPositionsWithIds = (state: IClientRoomState, ids: string[]) => {
 	return selectAllPositionsAsArray(state)
 		.filter(x => ids.includes(x.id))
-}
-
-const selectConnectionSourcePosition =
-	(state: IClientRoomState, connection: IConnection) => selectPosition(state, connection.sourceId)
-
-const selectConnectionTargetPosition =
-	(state: IClientRoomState, connection: IConnection) => selectPosition(state, connection.targetId)
-
-export const makeConnectionPositionsSelector = () => createSelector(
-	selectConnectionSourcePosition,
-	selectConnectionTargetPosition,
-	makePositionsObject,
-)
-
-function makePositionsObject(sourcePosition = defaultPosition, targetPosition = defaultPosition) {
-	return {
-		sourcePosition: {
-			x: sourcePosition.x + sourcePosition.width,
-			y: sourcePosition.y + (sourcePosition.height / 2),
-		},
-		targetPosition: {
-			x: targetPosition.x,
-			y: targetPosition.y + (targetPosition.height / 2),
-		},
-	}
 }
 
 export const selectPositionExtremes = createSelector(

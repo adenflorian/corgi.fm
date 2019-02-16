@@ -23,11 +23,6 @@ export type ShamuGraphAction = ActionType<typeof shamuGraphActions>
 
 export type ShamuGraphState = StateType<typeof shamuGraphCombinedReducers>
 
-const shamuGraphCombinedReducers = combineReducers({
-	nodes: nodesReducer,
-	edges: edgesReducer,
-})
-
 export function shamuGraphReducer(state: ShamuGraphState | undefined, action: ShamuGraphAction) {
 	switch (action.type) {
 		case REPLACE_SHAMU_GRAPH_STATE: return {
@@ -44,6 +39,11 @@ export function shamuGraphReducer(state: ShamuGraphState | undefined, action: Sh
 		default: return shamuGraphCombinedReducers(state, action)
 	}
 }
+
+const shamuGraphCombinedReducers = combineReducers({
+	nodes: nodesReducer,
+	edges: edgesReducer,
+})
 
 function deserialize<T extends IMultiState>(type: ConnectionNodeType, multiState: T): T {
 	return Object.freeze({

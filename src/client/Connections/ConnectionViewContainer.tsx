@@ -1,13 +1,11 @@
 import * as React from 'react'
-import {Point} from '../../common/common-types'
 import {
-	GhostConnectorRecord, makeConnectionPositionsSelector,
-	selectConnection,
-	selectConnectionSourceIsActive, selectConnectionSourceIsSending,
-	selectConnectionStackOrderForSource,
+	GhostConnectorRecord, IPosition,
+	selectConnection, selectConnectionSourceColor,
+	selectConnectionSourceIsActive,
+	selectConnectionSourceIsSending, selectConnectionStackOrderForSource,
 	selectConnectionStackOrderForTarget, selectPosition, shamuConnect,
 } from '../../common/redux'
-import {CssColor} from '../../common/shamu-color'
 import {ConnectedConnectionView} from './ConnectionView'
 
 interface IConnectionViewContainerProps {
@@ -15,8 +13,8 @@ interface IConnectionViewContainerProps {
 }
 
 interface IConnectionViewContainerReduxProps {
-	sourcePosition: Point
-	targetPosition: Point
+	sourcePosition: IPosition
+	targetPosition: IPosition
 	sourceStackOrder: number
 	targetStackOrder: number
 	sourceColor: string
@@ -36,8 +34,10 @@ export const ConnectionViewContainer: React.FC<IConnectionViewContainerAllProps>
 	}) =>
 		<ConnectedConnectionView
 			color={sourceColor}
-			sourcePosition={sourcePosition}
-			targetPosition={targetPosition}
+			sourceX={sourcePosition.x + sourcePosition.width}
+			sourceY={sourcePosition.y + (sourcePosition.height / 2)}
+			targetX={targetPosition.x}
+			targetY={targetPosition.y + (targetPosition.height / 2)}
 			ghostConnector={ghostConnector}
 			saturateSource={isSourceActive || isSourceSending}
 			saturateTarget={isSourceSending}
@@ -47,26 +47,23 @@ export const ConnectionViewContainer: React.FC<IConnectionViewContainerAllProps>
 		/>
 
 export const ConnectedConnectionViewContainer = shamuConnect(
-	() => {
-		const positionsSelector = makeConnectionPositionsSelector()
+	(state, props: IConnectionViewContainerProps): IConnectionViewContainerReduxProps => {
+		const connection = selectConnection(state.room, props.id)
+		const isSourceActive = selectConnectionSourceIsActive(state.room, connection.id)
+		const isSourceSending = selectConnectionSourceIsSending(state.room, connection.id)
+		const sourcePosition = selectPosition(state.room, connection.sourceId)
+		const targetPosition = selectPosition(state.room, connection.targetId)
+		const sourceColor = selectConnectionSourceColor(state.room, props.id)
 
-		return (state, props: IConnectionViewContainerProps): IConnectionViewContainerReduxProps => {
-			const connection = selectConnection(state.room, props.id)
-			const sourceColor = selectPosition(state.room, connection.sourceId).color
-			const isSourceActive = selectConnectionSourceIsActive(state.room, connection.id)
-			const isSourceSending = selectConnectionSourceIsSending(state.room, connection.id)
-			const positions = positionsSelector(state.room, connection)
-
-			return {
-				sourceColor,
-				isSourceActive,
-				isSourceSending,
-				ghostConnector: connection.ghostConnector,
-				sourcePosition: positions.sourcePosition,
-				targetPosition: positions.targetPosition,
-				sourceStackOrder: selectConnectionStackOrderForSource(state.room, props.id),
-				targetStackOrder: selectConnectionStackOrderForTarget(state.room, props.id),
-			}
+		return {
+			sourceColor,
+			isSourceActive,
+			isSourceSending,
+			ghostConnector: connection.ghostConnector,
+			sourcePosition,
+			targetPosition,
+			sourceStackOrder: selectConnectionStackOrderForSource(state.room, props.id),
+			targetStackOrder: selectConnectionStackOrderForTarget(state.room, props.id),
 		}
 	},
 )(ConnectionViewContainer)

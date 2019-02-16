@@ -2,10 +2,10 @@ import {Map} from 'immutable'
 import {Action, combineReducers, Reducer} from 'redux'
 import {
 	chatReducer, connectionsReducer, CREATE_ROOM, DELETE_ROOM,
-	globalClockReducer, IClientRoomState, IServerState, pointersStateReducer,
-	positionsReducer, roomMembersReducer, RoomsReduxAction,
+	globalClockReducer, IClientRoomState, IServerState,
+	pointersStateReducer, positionsReducer, roomMembersReducer,
+	RoomsReduxAction, shamuGraphReducer,
 } from './index'
-import {shamuGraphReducer} from './shamu-graph'
 
 export const ROOM_ACTION = 'ROOM_ACTION'
 type RoomAction = ReturnType<typeof createRoomAction>
@@ -16,7 +16,7 @@ export const createRoomAction = (action: Action, room: string) => ({
 })
 
 // Used on the client, because a client is only in one room at a time
-export const roomReducers = combineReducers(Object.freeze({
+export const roomReducers = combineReducers({
 	chat: chatReducer,
 	connections: connectionsReducer,
 	globalClock: globalClockReducer,
@@ -24,7 +24,7 @@ export const roomReducers = combineReducers(Object.freeze({
 	positions: positionsReducer,
 	shamuGraph: shamuGraphReducer,
 	pointers: pointersStateReducer,
-}))
+})
 
 const initialState = Map<string, IClientRoomState>()
 
