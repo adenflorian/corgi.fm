@@ -256,6 +256,7 @@ const makeConnectionSourceNotesSelector = (roomState: IClientRoomState) => (conn
 	return getConnectionNodeInfo(connection.sourceType).selectActiveNotes(roomState, connection.sourceId)
 }
 
+// TODO Handle multiple ancestor connections
 export const selectConnectionSourceIsActive = (roomState: IClientRoomState, id: string, processedIds = List<string>()): boolean => {
 	if (processedIds.contains(id)) return false
 
@@ -268,10 +269,12 @@ export const selectConnectionSourceIsActive = (roomState: IClientRoomState, id: 
 	} else if (connection === Connection.dummy) {
 		return false
 	} else {
-		return selectConnectionSourceIsActive(roomState, selectFirstConnectionIdByTargetId(roomState, connection.sourceId), processedIds.push(id))
+		// Get isSending now, because reasons
+		return selectConnectionSourceIsSending(roomState, selectFirstConnectionIdByTargetId(roomState, connection.sourceId), processedIds.push(id))
 	}
 }
 
+// TODO Handle multiple ancestor connections
 export const selectConnectionSourceIsSending = (roomState: IClientRoomState, id: string, processedIds = List<string>()): boolean => {
 	if (processedIds.contains(id)) return false
 
