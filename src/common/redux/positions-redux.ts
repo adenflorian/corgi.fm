@@ -87,7 +87,6 @@ const defaultPosition = {
 	x: Math.random() * 1600 - 800,
 	y: Math.random() * 1000 - 500,
 	zIndex: 0,
-	color: CssColor.subtleGrayBlackBg as string,
 }
 
 const makePositionRecord = Record(defaultPosition)
@@ -99,7 +98,6 @@ export const makePosition = (
 		...position,
 		width: position.width === undefined ? getConnectionNodeInfo(position.targetType).width : position.width,
 		height: position.height === undefined ? getConnectionNodeInfo(position.targetType).height : position.height,
-		color: position.color === undefined ? getConnectionNodeInfo(position.targetType).color : position.color,
 	}).toJS()
 }
 

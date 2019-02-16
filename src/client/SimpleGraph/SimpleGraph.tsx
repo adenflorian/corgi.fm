@@ -27,14 +27,14 @@ export const SimpleGraph: React.FC<ISimpleGraphReduxProps> =
 			<ConnectedZoom>
 				<div id={mainBoardsId} className="boards">
 					<ConnectedMousePointers />
-					<ConnectedConnections usage={ConnectionsUsage.simpleGraph} />
+					<ConnectedConnections />
 					{positionIds.map(positionId =>
 						<ConnectedSimpleGraphNode key={positionId} positionId={positionId} />,
 					)}
 				</div>
 			</ConnectedZoom>
 		</div>,
-		// TODO
+		// TODO Only update if IDs actually changed
 		// (prev, next) => {
 		// 	return next.positionIds.count() === prev.positionIds.count()
 		// },

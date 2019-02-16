@@ -7,9 +7,9 @@ import {
 import {CssColor} from './shamu-color'
 
 export function handleAddConnection(roomState: IClientRoomState, dispatch: Dispatch, originalConnection: IConnection) {
-	const sourceColor = selectPosition(roomState, originalConnection.sourceId).color
+	// const sourceColor = selectPosition(roomState, originalConnection.sourceId).color
 
-	updateConnectionTargetColor(roomState, dispatch, originalConnection, sourceColor)
+	// updateConnectionTargetColor(roomState, dispatch, originalConnection, sourceColor)
 }
 
 export function handleDeleteConnection(beforeState: IClientRoomState, dispatch: Dispatch, connectionIds: List<string>) {
@@ -26,11 +26,11 @@ function updateConnectionTargetColor(
 	color: string,
 	processedConnectionIDs = List<string>(),
 ) {
-	if (processedConnectionIDs.contains(connection.id)) return console.log('loop detected')
+	if (processedConnectionIDs.contains(connection.id)) return
 
-	dispatch(updatePosition(connection.targetId, {
-		color,
-	}))
+	// dispatch(updatePosition(connection.targetId, {
+	// 	color,
+	// }))
 
 	const nextConnections = selectConnectionsWithSourceIds(roomState, [connection.targetId])
 
