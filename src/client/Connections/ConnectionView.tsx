@@ -113,6 +113,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 					x={sourceConnectorLeft}
 					y={sourceY}
 					color={color}
+					saturate={saturateSource}
 				/>
 				<Connector
 					width={connectorWidth}
@@ -120,6 +121,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 					x={targetConnectorLeft}
 					y={targetY}
 					color={color}
+					saturate={saturateTarget}
 				/>
 				<div className={`ghost ${ghostConnector.status === GhostConnectorStatus.hidden ? 'hidden' : 'active'}`}>
 					{!isGhostHidden &&
@@ -138,7 +140,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 									d={pathDPart1Ghost}
 									strokeWidth={longLineStrokeWidth + 'px'}
 									strokeDasharray={4}
-									stroke={`url(#${id})`}
+									stroke={color}
 								/>
 							</g>
 						</svg>
@@ -154,7 +156,8 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 								connectionId={id}
 								sourceOrTarget={GhostConnectorStatus.activeSource}
 								movingOrAdding={GhostConnectorType.moving}
-								color={color}
+								color={ghostConnector.status === GhostConnectorStatus.activeTarget ? '#0000' : color}
+								saturate={saturateSource}
 							/>
 							<GhostConnector
 								dispatch={this.props.dispatch}
@@ -165,7 +168,8 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 								connectionId={id}
 								sourceOrTarget={GhostConnectorStatus.activeTarget}
 								movingOrAdding={GhostConnectorType.moving}
-								color={color}
+								color={ghostConnector.status === GhostConnectorStatus.activeSource ? '#0000' : color}
+								saturate={saturateTarget}
 							/>
 						</React.Fragment>
 					}
@@ -181,6 +185,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 								sourceOrTarget={GhostConnectorStatus.activeTarget}
 								movingOrAdding={GhostConnectorType.adding}
 								color={color}
+								saturate={saturateSource}
 							/>
 							<GhostConnector
 								dispatch={this.props.dispatch}
@@ -192,6 +197,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 								sourceOrTarget={GhostConnectorStatus.activeSource}
 								movingOrAdding={GhostConnectorType.adding}
 								color={color}
+								saturate={saturateTarget}
 							/>
 						</React.Fragment>
 					}
@@ -317,11 +323,13 @@ interface IGhostConnectorProps {
 	sourceOrTarget: GhostConnectorStatus
 	movingOrAdding: GhostConnectorType
 	color: string
+	saturate: boolean
 }
 
 class GhostConnector extends React.PureComponent<IGhostConnectorProps> {
 	public render() {
-		const {isActive, ghostConnector, parentX, parentY, color} = this.props
+		const {isActive, ghostConnector,
+			parentX, parentY, color, saturate} = this.props
 
 		return (
 			<Draggable
@@ -345,6 +353,7 @@ class GhostConnector extends React.PureComponent<IGhostConnectorProps> {
 						width={connectorWidth}
 						height={connectorHeight}
 						color={color}
+						saturate={saturate}
 					/>
 				</div>
 			</Draggable>

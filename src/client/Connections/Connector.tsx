@@ -3,7 +3,7 @@ import * as React from 'react'
 interface ConnectorProps {
 	width: number
 	height: number
-	saturate?: boolean
+	saturate: boolean
 	x?: number
 	y?: number
 	color?: string
