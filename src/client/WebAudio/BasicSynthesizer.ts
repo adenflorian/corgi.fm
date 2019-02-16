@@ -10,22 +10,26 @@ export interface IBasicSynthesizerOptions extends IInstrumentOptions {
 export class BasicSynthesizer extends Instrument<SynthVoices, SynthVoice> {
 	private readonly _voices: SynthVoices
 	private _fineTuning: number = 0
+	private _oscillatorType: ShamuOscillatorType
 
 	constructor(options: IBasicSynthesizerOptions) {
 		super(options)
+
+		this._oscillatorType = options.oscillatorType
 
 		this._voices = new SynthVoices(options.voiceCount, this._audioContext, this._panNode, options.oscillatorType)
 	}
 
 	public setOscillatorType = (type: ShamuOscillatorType) => {
+		if (type === this._oscillatorType) return
+		this._oscillatorType = type
 		this._voices.setOscillatorType(type)
 	}
 
 	public setFineTuning = (fine: number) => {
-		if (fine !== this._fineTuning) {
-			this._fineTuning = fine
-			this._voices.setFineTuning(fine)
-		}
+		if (fine === this._fineTuning) return
+		this._fineTuning = fine
+		this._voices.setFineTuning(fine)
 	}
 
 	public dispose = () => {
@@ -94,8 +98,9 @@ class SynthVoice extends Voice {
 	}
 
 	public setFineTuning = (fine: number) => {
+		if (fine === this._fineTuning) return
 		this._fineTuning = fine
-		this._oscillator.frequency.value = this._applyFineTuning(this._frequency, this._fineTuning)
+		this._oscillator.detune.value = fine
 	}
 
 	public dispose = () => {
@@ -105,13 +110,8 @@ class SynthVoice extends Voice {
 
 	private readonly _playSynthNote = (note: number) => {
 		this._frequency = midiNoteToFrequency(note)
-		this._oscillator.frequency.value = this._applyFineTuning(this._frequency, this._fineTuning)
+		this._oscillator.frequency.value = this._frequency
 		this._refreshOscillatorType()
-	}
-
-	private readonly _applyFineTuning = (baseFreq: number, fine: number) => {
-		// Multiplying a frequency by 0.059454545454545 will give you the next half step up
-		return baseFreq + ((fine * 0.059454545454545) * baseFreq)
 	}
 
 	private readonly _refreshOscillatorType = () => {

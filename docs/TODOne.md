@@ -1,3 +1,6 @@
+- 2019-02-13 - 2019-02-15
+- [√] highlight connector on mouseover
+	- [√] make ghost connector look like normal connector
 - 2019-02-12
 	- [√] fix ghost connection to be curved
 	- [√] make zoom and pan affect mouse cursors

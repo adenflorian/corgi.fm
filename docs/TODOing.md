@@ -1,15 +1,12 @@
 # Now
-- [√] highlight connector on mouseover
-	- [√] make ghost connector look like normal connector
+- [√] use OscillatorNode.detune
+	- https://developer.mozilla.org/en-US/docs/Web/API/OscillatorNode/detune
 
 # Soon
-- [ ] fix perf issues with looped connections (color calcs?)
 - [ ] allow adding connections from a node with no connections on it already
 	- [ ] split up ConnectionView
 		- [ ] Connector component
 		- [ ] ConnectionLine component
-- [ ] use OscillatorNode.detune
-	- https://developer.mozilla.org/en-US/docs/Web/API/OscillatorNode/detune
 - [ ] fix old view
 - [ ] add ability to add nodes
 - [ ] new graph state
