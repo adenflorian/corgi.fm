@@ -9,6 +9,7 @@ export interface IBasicSynthesizerOptions extends IInstrumentOptions {
 // TODO Make into a BasicSynthesizerAudioNode?
 export class BasicSynthesizer extends Instrument<SynthVoices, SynthVoice> {
 	private readonly _voices: SynthVoices
+	private _fineTuning: number = 0
 
 	constructor(options: IBasicSynthesizerOptions) {
 		super(options)
@@ -21,7 +22,10 @@ export class BasicSynthesizer extends Instrument<SynthVoices, SynthVoice> {
 	}
 
 	public setFineTuning = (fine: number) => {
-		this._voices.setFineTuning(fine)
+		if (fine !== this._fineTuning) {
+			this._fineTuning = fine
+			this._voices.setFineTuning(fine)
+		}
 	}
 
 	public dispose = () => {
