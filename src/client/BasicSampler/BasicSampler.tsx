@@ -37,47 +37,45 @@ export class BasicSampler extends React.PureComponent<IBasicSamplerAllProps> {
 				saturate={isPlaying}
 			>
 				<div className="basicSampler">
-
 					<div className="samplerLabel colorize">Piano Sampler</div>
 
-					<Knob
-						min={-1}
-						max={1}
-						value={this.props.pan}
-						onChange={this._dispatchChangeInstrumentParam}
-						label="pan"
-						onChangeId={BasicSamplerParam.pan}
-					/>
-
-					<Knob
-						min={0}
-						max={10000}
-						curve={2}
-						value={this.props.lowPassFilterCutoffFrequency}
-						onChange={this._dispatchChangeInstrumentParam}
-						label="lpf"
-						onChangeId={BasicSamplerParam.lowPassFilterCutoffFrequency}
-					/>
-
-					<Knob
-						min={0.01}
-						max={10}
-						curve={3}
-						value={this.props.attack}
-						onChange={this._dispatchChangeInstrumentParam}
-						label="attack"
-						onChangeId={BasicSamplerParam.attack}
-					/>
-
-					<Knob
-						min={0.01}
-						max={60}
-						curve={2}
-						value={this.props.release}
-						onChange={this._dispatchChangeInstrumentParam}
-						label="release"
-						onChangeId={BasicSamplerParam.release}
-					/>
+					<div className="knobs">
+						<Knob
+							min={-1}
+							max={1}
+							value={this.props.pan}
+							onChange={this._dispatchChangeInstrumentParam}
+							label="pan"
+							onChangeId={BasicSamplerParam.pan}
+						/>
+						<Knob
+							min={0}
+							max={10000}
+							curve={2}
+							value={this.props.lowPassFilterCutoffFrequency}
+							onChange={this._dispatchChangeInstrumentParam}
+							label="lpf"
+							onChangeId={BasicSamplerParam.lowPassFilterCutoffFrequency}
+						/>
+						<Knob
+							min={0.01}
+							max={10}
+							curve={3}
+							value={this.props.attack}
+							onChange={this._dispatchChangeInstrumentParam}
+							label="attack"
+							onChangeId={BasicSamplerParam.attack}
+						/>
+						<Knob
+							min={0.01}
+							max={60}
+							curve={2}
+							value={this.props.release}
+							onChange={this._dispatchChangeInstrumentParam}
+							label="release"
+							onChangeId={BasicSamplerParam.release}
+						/>
+					</div>
 				</div>
 			</Panel>
 		)

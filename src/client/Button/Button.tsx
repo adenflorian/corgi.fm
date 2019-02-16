@@ -11,7 +11,10 @@ interface IButtonProps {
 export class Button extends Component<IButtonProps> {
 	public render() {
 		return (
-			<Panel className="buttonContainer">
+			<Panel
+				className="buttonContainer"
+				autoSize={true}
+			>
 				<button
 					{...this.props.buttonProps}
 				>

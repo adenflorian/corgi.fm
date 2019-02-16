@@ -80,7 +80,7 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 	const keyboardPosition = makePosition({
 		id: newVirtualKeyboard.id,
 		targetType: ConnectionNodeType.virtualKeyboard,
-		x: -661,
+		x: -556,
 		y: extremes.bottomMost + y,
 	})
 	dispatch(addPosition({
@@ -89,7 +89,7 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 	}))
 
 	const nextPosition = {
-		x: -76.5935,
+		x: 24,
 		y: extremes.bottomMost + y,
 	}
 

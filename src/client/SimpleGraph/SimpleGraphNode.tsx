@@ -4,10 +4,9 @@ import {IoMdMove as HandleIcon} from 'react-icons/io'
 import {Dispatch} from 'redux'
 import {ConnectionNodeType} from '../../common/common-types'
 import {
-	IPosition, movePosition, nodeClicked,
-	selectConnectionSourceColorByTargetId, selectPosition,
+	getConnectionNodeInfo, IPosition, movePosition, nodeClicked,
+	selectConnectionSourceColorByTargetId, selectPosition, shamuConnect,
 } from '../../common/redux'
-import {shamuConnect} from '../../common/redux'
 import {CssColor} from '../../common/shamu-color'
 import {ConnectedBasicSampler} from '../BasicSampler/BasicSampler'
 import {ConnectedGridSequencerContainer} from '../GridSequencer/GridSequencerContainer'
@@ -109,8 +108,8 @@ const Handle = React.memo(function Handle_() {
 
 export function getComponentByNodeType(type: ConnectionNodeType, id: string, color: string) {
 	switch (type) {
-		case ConnectionNodeType.masterClock: return <ConnectedMasterControls />
-		case ConnectionNodeType.audioOutput: return <ConnectedVolumeControl />
+		case ConnectionNodeType.masterClock: return <ConnectedMasterControls color={color} />
+		case ConnectionNodeType.audioOutput: return <ConnectedVolumeControl color={color} />
 
 		case ConnectionNodeType.gridSequencer: return <ConnectedGridSequencerContainer id={id} />
 		case ConnectionNodeType.infiniteSequencer: return <ConnectedInfiniteSequencer id={id} />
@@ -127,9 +126,12 @@ export function getComponentByNodeType(type: ConnectionNodeType, id: string, col
 
 export const ConnectedSimpleGraphNode = shamuConnect(
 	(state, {positionId}: ISimpleGraphNodeProps): ISimpleGraphNodeReduxProps => {
+		const position = selectPosition(state.room, positionId)
+
 		return {
-			position: selectPosition(state.room, positionId)!,
-			color: selectConnectionSourceColorByTargetId(state.room, positionId),
+			position,
+			color: getConnectionNodeInfo(position.targetType).color
+				|| selectConnectionSourceColorByTargetId(state.room, positionId),
 		}
 	},
 )(SimpleGraphNode)

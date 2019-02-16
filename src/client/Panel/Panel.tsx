@@ -10,14 +10,14 @@ export interface IPanelProps {
 	label?: string
 	labelTitle?: string
 	saturate?: boolean
+	autoSize?: boolean
 }
 
 export const Panel: React.FC<IPanelProps> =
-	React.memo(({children, className = '', color = CssColor.defaultGray, id, label, labelTitle, saturate = false}) => {
+	React.memo(({autoSize = false, children, className = '', color = CssColor.defaultGray, id, label, labelTitle, saturate = false}) => {
 
 		const renderLabel = label !== undefined && label !== ''
 
-		const margin = 16
 		const labelHeight = 20
 
 		return (
@@ -25,7 +25,8 @@ export const Panel: React.FC<IPanelProps> =
 				style={{
 					color,
 					position: 'relative',
-					// marginTop: margin + labelHeight,
+					width: autoSize ? 'auto' : undefined,
+					height: autoSize ? 'auto' : undefined,
 				}}
 				className={`panelContainer ${saturate ? 'saturate' : ''}`}
 			>
@@ -46,7 +47,6 @@ export const Panel: React.FC<IPanelProps> =
 					id={id}
 					className={`panel ${className} ${renderLabel ? 'renderLabel' : ''}`}
 				>
-					{/* <div className="isometricBoxShadow" /> */}
 					<ShamuBorder saturate={saturate} />
 					{children}
 				</div>
@@ -54,7 +54,7 @@ export const Panel: React.FC<IPanelProps> =
 		)
 	})
 
-const ShamuBorder = ({saturate}: {saturate: boolean}) =>
+const ShamuBorder = React.memo(({saturate}: {saturate: boolean}) =>
 	<svg
 		style={{
 			position: 'absolute',
@@ -72,4 +72,5 @@ const ShamuBorder = ({saturate}: {saturate: boolean}) =>
 		<g>
 			<rect x="0" y="0" width="100%" height="100%" />
 		</g>
-	</svg>
+	</svg>,
+)

@@ -25,7 +25,7 @@ export const NodeInfoRecord = Record({
 	stateDeserializer: ((state: IMultiStateThing) => state) as (state: IMultiStateThing) => IMultiStateThing,
 	width: 0,
 	height: 0,
-	color: CssColor.subtleGrayBlackBg,
+	color: false as string | false,
 })
 
 export const NodeInfoMap = Map({
@@ -58,17 +58,17 @@ export const NodeInfoMap = Map({
 	}),
 	[ConnectionNodeType.basicSynthesizer]: NodeInfoRecord({
 		stateSelector: selectBasicSynthesizer,
-		width: 464,
-		height: 56,
+		width: 256,
+		height: 112,
 	}),
 	[ConnectionNodeType.basicSampler]: NodeInfoRecord({
 		stateSelector: selectSampler,
-		width: 416,
-		height: 56,
+		width: 256,
+		height: 112,
 	}),
 	[ConnectionNodeType.simpleReverb]: NodeInfoRecord({
 		stateSelector: selectSimpleReverb,
-		width: 256 + 16,	// main width plus padding
+		width: 256 + 16, // main width plus padding
 		height: 56,
 	}),
 	[ConnectionNodeType.audioOutput]: NodeInfoRecord({
@@ -77,9 +77,8 @@ export const NodeInfoMap = Map({
 			color: CssColor.green,
 			type: ConnectionNodeType.audioOutput,
 		}),
-		width: 140.48,
-		height: 56,
-		color: CssColor.green,
+		width: 192,
+		height: 88,
 	}),
 	[ConnectionNodeType.masterClock]: NodeInfoRecord({
 		stateSelector: () => ({
@@ -90,8 +89,8 @@ export const NodeInfoMap = Map({
 		// Return false because it is left most node on graph
 		selectIsActive: () => false,
 		selectIsSending: () => false,
-		width: 134.813,
-		height: 72,
+		width: 128,
+		height: 80,
 		color: CssColor.blue,
 	}),
 })

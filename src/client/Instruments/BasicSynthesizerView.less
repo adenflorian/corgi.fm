@@ -1,18 +1,23 @@
 @import "../colors.less";
 
 .basicSynthesizer {
-    display: inline-flex;
+    display: flex;
+    flex-direction: column;
     align-items: center;
+    justify-content: center;
     padding: 0 8px;
-    width: 400px;
+    width: 100%;
 
     &.isNotPlaying {
         transition: box-shadow 0.3s ease-out;
     }
 
     .oscillatorTypes {
+        height: 56px;
         display: flex;
-        margin-right: 8px;
+        width: 100%;
+        justify-content: space-around;
+        align-items: center;
 
         svg {
             margin: 8px;
@@ -29,5 +34,11 @@
         .active svg {
             color: inherit;
         }
+    }
+
+    .knobs {
+        display: flex;
+        width: 100%;
+        justify-content: space-around;
     }
 }

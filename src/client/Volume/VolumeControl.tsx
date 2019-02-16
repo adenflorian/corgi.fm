@@ -27,10 +27,6 @@ interface IVolumeControlDispatchProps {
 type IVolumeControlAllProps = IVolumeControlProps & IVolumeControlReduxProps & IVolumeControlDispatchProps
 
 export class VolumeControl extends Component<IVolumeControlAllProps> {
-	public static defaultProps = {
-		color: 'gray',
-	}
-
 	public render() {
 		const {color, reportedMasterVolume} = this.props
 
@@ -38,23 +34,15 @@ export class VolumeControl extends Component<IVolumeControlAllProps> {
 
 		return (
 			<Panel id={MASTER_AUDIO_OUTPUT_TARGET_ID} className="volume" color={newColor}>
-				<div className="label">Audio Output</div>
+				<div className="volume-label">Audio Output</div>
 				<Knob
 					value={this.props.masterVolume}
 					onChange={this.props.changeMasterVolume}
 					min={0}
 					max={0.5}
 					markColor={newColor}
-					size={40}
+					size={56}
 				/>
-				{/* <Knob
-					value={this.props.masterVolume}
-					onChange={this.props.changeMasterVolume}
-					min={-70}
-					max={6}
-					markColor={newColor}
-					size={40}
-				/> */}
 			</Panel>
 		)
 	}

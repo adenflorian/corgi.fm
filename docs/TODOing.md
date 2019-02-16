@@ -1,6 +1,7 @@
 # Now
 - [√] use OscillatorNode.detune
 	- https://developer.mozilla.org/en-US/docs/Web/API/OscillatorNode/detune
+- [ ] fix connectors not lighting up
 
 # Soon
 - [ ] allow adding connections from a node with no connections on it already
