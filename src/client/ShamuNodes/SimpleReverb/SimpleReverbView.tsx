@@ -38,6 +38,7 @@ export const SimpleReverbView: React.FC<ISimpleReverbAllProps> =
 					}}
 				>
 					<div
+						className={`colorize`}
 						style={{
 							display: 'flex',
 							flexDirection: 'column',

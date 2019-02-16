@@ -131,6 +131,7 @@
 - [ ] have a node that hands out connections
 	- [ ] like a needle cushion
 - [ ] show move icon on connector on hover
+- [ ] visually differentiate between midi and audio connections (and both)
 
 ## Adding/Changing/Removing Connections
 should anything allow multiple incoming connections?
