@@ -2,8 +2,8 @@ import {Map} from 'immutable'
 import {Action, AnyAction, Store} from 'redux'
 import {
 	IClientAppState, localMidiKeyPress, localMidiKeyUp, localMidiOctaveChange,
-	pointersActions, selectIsLocalClientReady, selectLocalClient,
-	skipNote, userInputActions,
+	pointersActions, selectGlobalClockIsPlaying, selectIsLocalClientReady,
+	selectLocalClient, setGlobalClockIsPlaying, skipNote, userInputActions,
 } from '../common/redux'
 import {simpleGlobalClientState} from './SimpleGlobalClientState'
 
@@ -17,7 +17,7 @@ interface KeyBoardShortcut {
 	preventDefault: boolean
 }
 
-type keyboardActionCreator = (e: KeyboardEvent) => AnyAction
+type keyboardActionCreator = (e: KeyboardEvent, state: IClientAppState) => AnyAction
 
 const midiKeyShortcuts: {[key: string]: KeyBoardShortcut} = {}
 
@@ -73,7 +73,7 @@ const keyboardShortcuts: IKeyBoardShortcuts = Map<KeyBoardShortcut>({
 		allowRepeat: true,
 		preventDefault: true,
 	},
-	' ': {
+	'ArrowRight': {
 		actionOnKeyDown: () => skipNote(),
 		allowRepeat: true,
 		preventDefault: true,
@@ -93,6 +93,11 @@ const keyboardShortcuts: IKeyBoardShortcuts = Map<KeyBoardShortcut>({
 	'Shift': {
 		actionOnKeyDown: userInputActions.setKeys({shift: true}),
 		actionOnKeyUp: userInputActions.setKeys({shift: false}),
+		allowRepeat: false,
+		preventDefault: false,
+	},
+	' ': {
+		actionOnKeyPress: (_, state) => setGlobalClockIsPlaying(!selectGlobalClockIsPlaying(state.room)),
 		allowRepeat: false,
 		preventDefault: false,
 	},
@@ -139,7 +144,7 @@ export function setupInputEventListeners(
 		if (!action) return
 
 		if (typeof action === 'function') {
-			store.dispatch(action(event))
+			store.dispatch(action(event, store.getState()))
 		} else {
 			store.dispatch(action)
 		}
