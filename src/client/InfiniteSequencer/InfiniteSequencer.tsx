@@ -3,7 +3,7 @@ import {IoMdDownload as Download, IoMdGrid as Rows, IoMdPlay as Play, IoMdRecord
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 import {IMidiNote} from '../../common/MidiNote'
-import {clearSequencer, exportSequencerMidi, findLowestAndHighestNotes, IClientAppState, InfiniteSequencerFields, InfiniteSequencerStyle, selectGlobalClockState, selectInfiniteSequencer, SequencerEvents, setInfiniteSequencerField, undoSequencer} from '../../common/redux'
+import {clearSequencer, exportSequencerMidi, findLowestAndHighestNotes, IClientAppState, InfiniteSequencerFields, InfiniteSequencerStyle, selectGlobalClockState, selectInfiniteSequencer, SequencerEvents, setGlobalClockIsPlaying, setInfiniteSequencerField, undoSequencer} from '../../common/redux'
 import {getColorStringForMidiNote} from '../../common/shamu-color'
 import {isWhiteKey} from '../Keyboard/Keyboard'
 import {Knob} from '../Knob/Knob'
@@ -76,7 +76,10 @@ export const InfiniteSequencer: React.FC<IInfiniteSequencerAllProps> = React.mem
 					<div className="controls">
 						<div
 							className="play"
-							onClick={() => dispatchInfiniteSeqParam(InfiniteSequencerFields.isPlaying, true)}
+							onClick={() => {
+								dispatchInfiniteSeqParam(InfiniteSequencerFields.isPlaying, true)
+								dispatch(setGlobalClockIsPlaying(true))
+							}}
 						>
 							<Play />
 						</div>

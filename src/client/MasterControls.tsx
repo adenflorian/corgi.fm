@@ -4,8 +4,8 @@ import {
 } from 'react-icons/io'
 import {connect} from 'react-redux'
 import {
-	IClientAppState, MASTER_CLOCK_SOURCE_ID, playAll,
-	selectGlobalClockState, stopAll,
+	IClientAppState, MASTER_CLOCK_SOURCE_ID,
+	selectGlobalClockState, setGlobalClockIsPlaying,
 } from '../common/redux'
 import './MasterControls.less'
 import {Panel} from './Panel/Panel'
@@ -64,5 +64,8 @@ export const ConnectedMasterControls = connect(
 			index: globalClock.index,
 		}
 	},
-	{onPlay: playAll, onStop: stopAll},
+	{
+		onPlay: () => setGlobalClockIsPlaying(true),
+		onStop: () => setGlobalClockIsPlaying(false),
+	},
 )(MasterControls)
