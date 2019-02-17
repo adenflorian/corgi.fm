@@ -67,12 +67,12 @@ export const setupInstrumentManager =
 				return
 			}
 
-			if (selectGlobalClockState(state.room).isPlaying !== selectGlobalClockState(previousState.room).isPlaying) {
-				if (selectGlobalClockState(state.room).isPlaying) {
-					globalClock.play()
-				} else {
-					globalClock.stop()
-				}
+			const newGlobalClockState = selectGlobalClockState(state.room)
+
+			if (newGlobalClockState.isPlaying) {
+				globalClock.play(newGlobalClockState.playCount)
+			} else {
+				globalClock.stop()
 			}
 
 			previousState = state

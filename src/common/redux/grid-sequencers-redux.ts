@@ -124,12 +124,13 @@ export class GridSequencerState implements IGridSequencerState, NodeSpecialState
 	public readonly type = ConnectionNodeType.gridSequencer
 	public readonly rate = 1
 
-	constructor(ownerId: string, name: string, notesToShow: number, events?: SequencerEvents) {
+	constructor(ownerId: string, name: string, notesToShow: number, events?: SequencerEvents, isPlaying = false) {
 		this.ownerId = ownerId
 		this.name = name
 		this.color = colorFunc(hashbow(this.id)).desaturate(0.2).hsl().string()
 		this.events = events || createSequencerEvents(8)
 		this.notesToShow = notesToShow
+		this.isPlaying = isPlaying
 
 		this.scrollY = this._calculateScrollY()
 

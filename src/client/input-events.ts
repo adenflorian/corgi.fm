@@ -2,8 +2,8 @@ import {Map} from 'immutable'
 import {Action, AnyAction, Store} from 'redux'
 import {
 	IClientAppState, localMidiKeyPress, localMidiKeyUp, localMidiOctaveChange,
-	pointersActions, selectGlobalClockIsPlaying, selectIsLocalClientReady,
-	selectLocalClient, setGlobalClockIsPlaying, skipNote, userInputActions,
+	pointersActions, restartGlobalClock, selectGlobalClockIsPlaying,
+	selectIsLocalClientReady, selectLocalClient, setGlobalClockIsPlaying, skipNote, userInputActions,
 } from '../common/redux'
 import {simpleGlobalClientState} from './SimpleGlobalClientState'
 
@@ -54,22 +54,22 @@ keyToMidiMap.forEach((val, key) => {
 
 const keyboardShortcuts: IKeyBoardShortcuts = Map<KeyBoardShortcut>({
 	'z': {
-		actionOnKeyDown: (e: KeyboardEvent) => localMidiOctaveChange(e.shiftKey ? -2 : -1),
+		actionOnKeyDown: e => localMidiOctaveChange(e.shiftKey ? -2 : -1),
 		allowRepeat: true,
 		preventDefault: true,
 	},
 	'x': {
-		actionOnKeyDown: (e: KeyboardEvent) => localMidiOctaveChange(e.shiftKey ? 2 : 1),
+		actionOnKeyDown: e => localMidiOctaveChange(e.shiftKey ? 2 : 1),
 		allowRepeat: true,
 		preventDefault: true,
 	},
 	'-': {
-		actionOnKeyDown: (e: KeyboardEvent) => localMidiOctaveChange(e.shiftKey ? -2 : -1),
+		actionOnKeyDown: e => localMidiOctaveChange(e.shiftKey ? -2 : -1),
 		allowRepeat: true,
 		preventDefault: true,
 	},
 	'+': {
-		actionOnKeyDown: (e: KeyboardEvent) => localMidiOctaveChange(e.shiftKey ? 2 : 1),
+		actionOnKeyDown: e => localMidiOctaveChange(e.shiftKey ? 2 : 1),
 		allowRepeat: true,
 		preventDefault: true,
 	},
@@ -97,7 +97,11 @@ const keyboardShortcuts: IKeyBoardShortcuts = Map<KeyBoardShortcut>({
 		preventDefault: false,
 	},
 	' ': {
-		actionOnKeyPress: (_, state) => setGlobalClockIsPlaying(!selectGlobalClockIsPlaying(state.room)),
+		actionOnKeyPress: (e, state) => {
+			return e.ctrlKey
+				? restartGlobalClock()
+				: setGlobalClockIsPlaying(!selectGlobalClockIsPlaying(state.room))
+		},
 		allowRepeat: false,
 		preventDefault: false,
 	},

@@ -4,7 +4,7 @@ import {Server, Socket} from 'socket.io'
 import {maxRoomNameLength} from '../common/common-constants'
 import {ClientId} from '../common/common-types'
 import {logger} from '../common/logger'
-import {addClient, addRoomMember, BroadcastAction, BROADCASTER_ACTION, CHANGE_ROOM, clientDisconnected, ClientState, connectionsActions, createRoom, createRoomAction, deletePositions, deleteRoom, deleteRoomMember, deleteThingsAny, getActionsBlacklist, IClientRoomState, IServerState, maxUsernameLength, pointersActions, ready, REQUEST_CREATE_ROOM, selectAllClients, selectAllConnections, selectAllMessages, selectAllPointers, selectAllPositions, selectAllRoomMemberIds, selectAllRoomNames, selectAllRoomStates, selectClientBySocketId, selectConnectionsWithSourceOrTargetIds, selectNodeIdsOwnedByClient, selectPositionsWithIds, selectRoomExists, selectRoomStateByName, selectShamuGraphState, setActiveRoom, setChat, setClients, setRoomMembers, setRooms, shamuGraphActions, updatePositions} from '../common/redux'
+import {addClient, addRoomMember, BroadcastAction, BROADCASTER_ACTION, CHANGE_ROOM, clientDisconnected, ClientState, connectionsActions, createRoom, createRoomAction, deletePositions, deleteRoom, deleteRoomMember, deleteThingsAny, getActionsBlacklist, IClientRoomState, IServerState, maxUsernameLength, pointersActions, ready, replaceGlobalClockState, REQUEST_CREATE_ROOM, selectAllClients, selectAllConnections, selectAllMessages, selectAllPointers, selectAllPositions, selectAllRoomMemberIds, selectAllRoomNames, selectAllRoomStates, selectClientBySocketId, selectConnectionsWithSourceOrTargetIds, selectGlobalClockState, selectNodeIdsOwnedByClient, selectPositionsWithIds, selectRoomExists, selectRoomStateByName, selectShamuGraphState, setActiveRoom, setChat, setClients, setRoomMembers, setRooms, shamuGraphActions, updatePositions} from '../common/redux'
 import {WebSocketEvent} from '../common/server-constants'
 import {createServerStuff} from './create-server-stuff'
 
@@ -251,6 +251,7 @@ function syncState(newSocket: Socket, roomState: IClientRoomState, serverState: 
 		[connectionsActions.updateAll, selectAllConnections],
 		[updatePositions, selectAllPositions],
 		[shamuGraphActions.replace, selectShamuGraphState],
+		[replaceGlobalClockState, selectGlobalClockState],
 	]
 
 	updaters.forEach(([actionCreator, selector]: any[]) => {

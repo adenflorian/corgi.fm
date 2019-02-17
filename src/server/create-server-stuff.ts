@@ -79,6 +79,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 				events: getInitialInfiniteSequencerEvents(),
 				name: 'Arp',
 				infinityStyle: InfiniteSequencerStyle.colorGrid,
+				isPlaying: true,
 			},
 			target: {
 				type: ConnectionNodeType.basicSampler,
@@ -168,17 +169,20 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 		infinityStyle?: InfiniteSequencerStyle
 		events?: SequencerEvents
 		notesToShow?: number
+		isPlaying?: boolean
 	}
 
 	function createSource(args: CreateSourceArgs) {
 		switch (args.type) {
 			case ConnectionNodeType.gridSequencer:
-				const x = new GridSequencerState(serverClient.id, args.name, args.notesToShow || 24, args.events)
+				const x = new GridSequencerState(
+					serverClient.id, args.name, args.notesToShow || 24, args.events, args.isPlaying)
 				dispatchToRoom(addGridSequencer(x))
 				// makeServerOwnedNode(args.type, x)
 				return x
 			case ConnectionNodeType.infiniteSequencer:
-				const y = new InfiniteSequencerState(serverClient.id, args.name, args.infinityStyle || InfiniteSequencerStyle.colorGrid, args.events)
+				const y = new InfiniteSequencerState(
+					serverClient.id, args.name, args.infinityStyle || InfiniteSequencerStyle.colorGrid, args.events, args.isPlaying)
 				dispatchToRoom(addInfiniteSequencer(y))
 				// makeServerOwnedNode(args.type, y)
 				return y
