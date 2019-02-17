@@ -33,15 +33,12 @@ class SamplerVoices extends Voices<SamplerVoice> {
 }
 
 class SamplerVoice extends Voice {
-	private _audioBufferSource: AudioBufferSourceNode
+	private _audioBufferSource: AudioBufferSourceNode | undefined
 
 	constructor(audioContext: AudioContext, destination: AudioNode) {
 		super(audioContext, destination)
 
 		this._gain.connect(this._destination)
-
-		this._audioBufferSource = this._audioContext.createBufferSource()
-		this._audioBufferSource.start()
 	}
 
 	public playNote(note: number, attackTimeInSeconds: number) {
@@ -52,20 +49,24 @@ class SamplerVoice extends Voice {
 		this._afterPlayNote(note)
 	}
 
-	public readonly dispose = () => {
-		this._audioBufferSource.stop()
-		this._audioBufferSource.disconnect()
-		delete this._audioBufferSource
+	public dispose() {
+		this._disposeAudioBufferSource()
 		this._dispose()
 	}
 
 	private _playSamplerNote(note: number) {
-		this._audioBufferSource.stop()
-		this._audioBufferSource.disconnect()
-		delete this._audioBufferSource
+		this._disposeAudioBufferSource()
 		this._audioBufferSource = this._audioContext.createBufferSource()
 		this._audioBufferSource.buffer = SamplesManager.getSample(midiNoteToNoteName(note), getOctaveFromMidiNote(note))
 		this._audioBufferSource.connect(this._gain)
 		this._audioBufferSource.start()
+	}
+
+	private _disposeAudioBufferSource() {
+		if (this._audioBufferSource) {
+			this._audioBufferSource.stop()
+			this._audioBufferSource.disconnect()
+			delete this._audioBufferSource
+		}
 	}
 }

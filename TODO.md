@@ -106,7 +106,7 @@
 
 # Shared Cursors
 - [ ] make shared cursor not block pointer events
-- [ ] use relative positioning like the connections so it doesn't have to rerender on scroll
+- [√] use relative positioning like the connections so it doesn't have to rerender on scroll
 - [ ] optimize
 	- [ ] less updates over network
 	- [ ] less dispatches
@@ -131,6 +131,7 @@
 - [ ] have a node that hands out connections
 	- [ ] like a needle cushion
 - [ ] show move icon on connector on hover
+	- now shows grab icon when moving, but hand icon on hover is too big
 - [ ] visually differentiate between midi and audio connections (and both)
 
 ## Adding/Changing/Removing Connections
@@ -254,6 +255,7 @@ instrument manager already handles all creation and destruction of instruments
 # Global Clock
 - [√] clicking play should reset global index to 0
 - [√] stop it when nothing is playing
+- [ ] make downstream nodes actually depend on the connection from the master clock
 
 # Newsletter
 
