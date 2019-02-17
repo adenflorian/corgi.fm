@@ -5,7 +5,7 @@ import {
 import {connect} from 'react-redux'
 import {
 	IClientAppState, MASTER_CLOCK_SOURCE_ID, playAll,
-	selectIsAnythingPlaying, stopAll,
+	selectGlobalClockState, stopAll,
 } from '../common/redux'
 import './MasterControls.less'
 import {Panel} from './Panel/Panel'
@@ -16,6 +16,7 @@ interface IMasterControlsProps {
 
 interface IMasterControlsReduxProps {
 	isAnythingPlaying: boolean
+	index: number
 }
 
 interface IMasterControlsDispatchProps {
@@ -24,19 +25,20 @@ interface IMasterControlsDispatchProps {
 }
 
 export const MasterControls: React.FC<IMasterControlsProps & IMasterControlsReduxProps & IMasterControlsDispatchProps> =
-	React.memo(({onPlay, onStop, isAnythingPlaying, color}) =>
+	React.memo(({onPlay, onStop, isAnythingPlaying, color, index}) =>
 		<Panel
 			id={MASTER_CLOCK_SOURCE_ID}
 			color={color}
 			saturate={isAnythingPlaying}
+			className={`${isAnythingPlaying ? 'isPlaying' : 'isNotPlaying'}`}
 		>
 			<div className="masterControls">
-				<div className="masterControls-label">
+				<div className="masterControls-label colorize">
 					Master Clock
 				</div>
 				<div className="controls">
 					<span
-						className="play"
+						className={`play ${index % 2 === 0 ? 'highlight' : ''}`}
 						onClick={() => onPlay()}
 					>
 						<Play />
@@ -53,8 +55,14 @@ export const MasterControls: React.FC<IMasterControlsProps & IMasterControlsRedu
 	)
 
 export const ConnectedMasterControls = connect(
-	(state: IClientAppState): IMasterControlsReduxProps => ({
-		isAnythingPlaying: selectIsAnythingPlaying(state.room),
-	}),
+	(state: IClientAppState): IMasterControlsReduxProps => {
+		const globalClock = selectGlobalClockState(state.room)
+
+		return {
+			isAnythingPlaying: globalClock.isPlaying,
+			// isAnythingPlaying: selectIsAnythingPlaying(state.room),
+			index: globalClock.index,
+		}
+	},
 	{onPlay: playAll, onStop: stopAll},
 )(MasterControls)

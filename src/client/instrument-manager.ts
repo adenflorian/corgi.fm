@@ -5,8 +5,8 @@ import {
 	IConnection, isAudioNodeType, MASTER_AUDIO_OUTPUT_TARGET_ID,
 	selectAllBasicSynthesizerIds, selectAllSamplerIds, selectAllSimpleReverbIds,
 	selectBasicSynthesizer, selectConnectionSourceNotesByTargetId,
-	selectConnectionsWithSourceIds, selectSampler, selectSimpleReverb,
-	setGlobalClockIndex, SimpleReverbState,
+	selectConnectionsWithSourceIds, selectGlobalClockState, selectSampler,
+	selectSimpleReverb, setGlobalClockIndex, SimpleReverbState,
 } from '../common/redux'
 import {GridSequencerPlayer} from './GridSequencerPlayer'
 import {BasicSamplerInstrument} from './WebAudio/BasicSamplerInstrument'
@@ -37,7 +37,7 @@ const stuffMaps: {[key: string]: StuffMap} = Object.freeze({
 	[ConnectionNodeType.simpleReverb]: new StuffMap(),
 })
 
-let previousState: Partial<IClientAppState> = {}
+let previousState: IClientAppState | undefined
 
 export const setupInstrumentManager =
 	(store: Store<IClientAppState>, audioContext: AudioContext, preFx: GainNode) => {
@@ -56,16 +56,23 @@ export const setupInstrumentManager =
 			index => store.dispatch(setGlobalClockIndex(index)),
 		)
 
-		globalClock.play()
-
 		store.subscribe(updateInstrumentLayer)
 
 		function updateInstrumentLayer() {
 			const state = store.getState()
 
 			// Optimization
-			if (state.room === previousState.room) {
+			if (!previousState || state.room === previousState.room) {
+				previousState = state
 				return
+			}
+
+			if (selectGlobalClockState(state.room).isPlaying !== selectGlobalClockState(previousState.room).isPlaying) {
+				if (selectGlobalClockState(state.room).isPlaying) {
+					globalClock.play()
+				} else {
+					globalClock.stop()
+				}
 			}
 
 			previousState = state

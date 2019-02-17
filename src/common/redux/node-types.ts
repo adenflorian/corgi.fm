@@ -2,10 +2,17 @@ import {Map, Record, Set} from 'immutable'
 import {ConnectionNodeType, IConnectable, IMultiStateThing} from '../common-types'
 import {IMidiNote} from '../MidiNote'
 import {CssColor} from '../shamu-color'
-import {GridSequencerState, IClientRoomState, InfiniteSequencerState, makeGetKeyboardMidiOutput, selectBasicSynthesizer, selectGridSequencer, selectGridSequencerActiveNotes, selectGridSequencerIsActive, selectGridSequencerIsSending, selectInfiniteSequencer, selectInfiniteSequencerActiveNotes, selectInfiniteSequencerIsActive, selectInfiniteSequencerIsSending, selectSampler, selectVirtualKeyboardById, selectVirtualKeyboardIsActive, selectVirtualKeyboardIsSending} from './index'
-import {deserializeSequencerState} from './sequencer-redux'
-import {selectSimpleReverb} from './simple-reverb-redux'
-import {VirtualKeyboardState} from './virtual-keyboard-redux'
+import {
+	deserializeSequencerState, GridSequencerState, IClientRoomState,
+	InfiniteSequencerState, makeGetKeyboardMidiOutput, selectBasicSynthesizer,
+	selectGlobalClockIsPlaying, selectGridSequencer,
+	selectGridSequencerActiveNotes, selectGridSequencerIsActive,
+	selectGridSequencerIsSending, selectInfiniteSequencer,
+	selectInfiniteSequencerActiveNotes, selectInfiniteSequencerIsActive,
+	selectInfiniteSequencerIsSending, selectSampler,
+	selectSimpleReverb, selectVirtualKeyboardById,
+	selectVirtualKeyboardIsActive, selectVirtualKeyboardIsSending, VirtualKeyboardState,
+} from './index'
 
 export const MASTER_AUDIO_OUTPUT_TARGET_ID = 'MASTER_AUDIO_OUTPUT_TARGET_ID'
 
@@ -86,9 +93,8 @@ export const NodeInfoMap = Map({
 			color: CssColor.blue,
 			type: ConnectionNodeType.masterClock,
 		}),
-		// Return false because it is left most node on graph
-		selectIsActive: () => false,
-		selectIsSending: () => false,
+		selectIsActive: selectGlobalClockIsPlaying,
+		selectIsSending: selectGlobalClockIsPlaying,
 		width: 128,
 		height: 80,
 		color: CssColor.blue,

@@ -253,7 +253,7 @@ instrument manager already handles all creation and destruction of instruments
 
 # Global Clock
 - [ ] clicking play should reset global index to 0
-- [ ] stop it when nothing is playing
+- [√] stop it when nothing is playing
 
 # Newsletter
 

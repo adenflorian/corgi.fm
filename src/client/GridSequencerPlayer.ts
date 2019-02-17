@@ -29,13 +29,23 @@ export class GridSequencerPlayer {
 	}
 
 	public readonly play = () => {
+		logger.debug('GridSequencerPlayer play')
 		if (this.isPlaying()) return
 		this._startTime = this._audioContext.currentTime
 		this._isPlaying = true
 		window.requestAnimationFrame(this._onTick)
 	}
 
+	public readonly restart = () => {
+		logger.debug('GridSequencerPlayer restart')
+		if (!this.isPlaying()) return this.play()
+
+		this._startTime = this._audioContext.currentTime
+	}
+
 	public readonly stop = () => {
+		logger.debug('GridSequencerPlayer stop')
+		if (this._isPlaying === false) return
 		this._isPlaying = false
 		this._index = 0
 		this._onIndexChange(-1)
