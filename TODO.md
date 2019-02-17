@@ -252,7 +252,7 @@ instrument manager already handles all creation and destruction of instruments
 - [ ] show member count for each room in room selector
 
 # Global Clock
-- [ ] clicking play should reset global index to 0
+- [√] clicking play should reset global index to 0
 - [√] stop it when nothing is playing
 
 # Newsletter

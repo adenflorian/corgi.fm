@@ -1,9 +1,9 @@
 import {Map} from 'immutable'
 import {Action, AnyAction, Store} from 'redux'
 import {
-	IClientAppState, localMidiKeyPress, localMidiKeyUp, localMidiOctaveChange,
-	pointersActions, restartGlobalClock, selectGlobalClockIsPlaying,
-	selectIsLocalClientReady, selectLocalClient, setGlobalClockIsPlaying, skipNote, userInputActions,
+	globalClockActions, IClientAppState, localMidiKeyPress, localMidiKeyUp,
+	localMidiOctaveChange, pointersActions,
+	selectGlobalClockIsPlaying, selectIsLocalClientReady, selectLocalClient, skipNote, userInputActions,
 } from '../common/redux'
 import {simpleGlobalClientState} from './SimpleGlobalClientState'
 
@@ -99,8 +99,10 @@ const keyboardShortcuts: IKeyBoardShortcuts = Map<KeyBoardShortcut>({
 	' ': {
 		actionOnKeyPress: (e, state) => {
 			return e.ctrlKey
-				? restartGlobalClock()
-				: setGlobalClockIsPlaying(!selectGlobalClockIsPlaying(state.room))
+				? globalClockActions.restart()
+				: selectGlobalClockIsPlaying(state.room)
+					? globalClockActions.stop()
+					: globalClockActions.start()
 		},
 		allowRepeat: false,
 		preventDefault: false,

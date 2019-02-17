@@ -1,12 +1,12 @@
 import {Store} from 'redux'
 import {ConnectionNodeType, IConnectable} from '../common/common-types'
 import {
-	BasicSamplerState, BasicSynthesizerState, IClientAppState, IClientRoomState,
-	IConnection, isAudioNodeType, MASTER_AUDIO_OUTPUT_TARGET_ID,
-	selectAllBasicSynthesizerIds, selectAllSamplerIds, selectAllSimpleReverbIds,
-	selectBasicSynthesizer, selectConnectionSourceNotesByTargetId,
-	selectConnectionsWithSourceIds, selectGlobalClockState, selectSampler,
-	selectSimpleReverb, setGlobalClockIndex, SimpleReverbState,
+	BasicSamplerState, BasicSynthesizerState, globalClockActions, IClientAppState,
+	IClientRoomState, IConnection, isAudioNodeType,
+	MASTER_AUDIO_OUTPUT_TARGET_ID, selectAllBasicSynthesizerIds, selectAllSamplerIds,
+	selectAllSimpleReverbIds, selectBasicSynthesizer,
+	selectConnectionSourceNotesByTargetId, selectConnectionsWithSourceIds, selectGlobalClockState,
+	selectSampler, selectSimpleReverb, SimpleReverbState,
 } from '../common/redux'
 import {GridSequencerPlayer} from './GridSequencerPlayer'
 import {BasicSamplerInstrument} from './WebAudio/BasicSamplerInstrument'
@@ -53,7 +53,7 @@ export const setupInstrumentManager =
 
 		const globalClock = new GridSequencerPlayer(
 			audioContext,
-			index => store.dispatch(setGlobalClockIndex(index)),
+			index => store.dispatch(globalClockActions.setIndex(index)),
 		)
 
 		store.subscribe(updateInstrumentLayer)

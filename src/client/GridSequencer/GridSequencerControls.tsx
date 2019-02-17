@@ -6,8 +6,8 @@ import {
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 import {
-	clearSequencer, exportSequencerMidi, GridSequencerFields,
-	setGlobalClockIsPlaying, setGridSequencerField, undoSequencer,
+	clearSequencer, exportSequencerMidi, globalClockActions,
+	GridSequencerFields, setGridSequencerField, undoSequencer,
 } from '../../common/redux'
 
 interface IGridSequencerControlsProps {
@@ -21,7 +21,7 @@ export const GridSequencerControls = (props: IGridSequencerControlsProps & {disp
 				className="play"
 				onClick={() => {
 					props.dispatch(setGridSequencerField(props.id, GridSequencerFields.isPlaying, true))
-					props.dispatch(setGlobalClockIsPlaying(true))
+					props.dispatch(globalClockActions.start())
 				}}
 			>
 				<Play />
