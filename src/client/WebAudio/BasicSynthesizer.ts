@@ -60,23 +60,23 @@ class SynthVoices extends Voices<SynthVoice> {
 }
 
 class SynthVoice extends Voice {
-	private _oscillator: OscillatorNode
+	private static _noiseBuffer: AudioBuffer
+	private _oscillator: OscillatorNode | undefined
 	private _oscillatorType: ShamuOscillatorType
 	private _nextOscillatorType: ShamuOscillatorType
-	private _whiteNoise: AudioBufferSourceNode
+	private _whiteNoise: AudioBufferSourceNode | undefined
 	private _fineTuning: number = 0
 	private _frequency: number = 0
-	private readonly _noiseBuffer: AudioBuffer
 
 	constructor(audioContext: AudioContext, destination: AudioNode, oscType: ShamuOscillatorType) {
 		super(audioContext, destination)
 
 		this._oscillatorType = oscType
 		this._nextOscillatorType = oscType
-		this._oscillator = this._audioContext.createOscillator()
-		this._whiteNoise = this._audioContext.createBufferSource()
 
-		this._noiseBuffer = this._generateNoiseBuffer()
+		if (!SynthVoice._noiseBuffer) {
+			SynthVoice._noiseBuffer = this._generateNoiseBuffer()
+		}
 
 		this._buildChain()
 	}
@@ -89,7 +89,7 @@ class SynthVoice extends Voice {
 		this._afterPlayNote(note)
 	}
 
-	public setOscillatorType = (newOscType: ShamuOscillatorType) => {
+	public setOscillatorType(newOscType: ShamuOscillatorType) {
 		this._nextOscillatorType = newOscType
 
 		if (this._status === VoiceStatus.playing) {
@@ -97,30 +97,36 @@ class SynthVoice extends Voice {
 		}
 	}
 
-	public setFineTuning = (fine: number) => {
+	public setFineTuning(fine: number) {
 		if (fine === this._fineTuning) return
 		this._fineTuning = fine
-		this._oscillator.detune.value = fine
+		if (this._oscillator) {
+			this._oscillator.detune.value = fine
+		}
 	}
 
-	public dispose = () => {
+	public dispose() {
 		this._deleteChain()
 		this._dispose()
 	}
 
-	private readonly _playSynthNote = (note: number) => {
+	private _playSynthNote(note: number) {
 		this._frequency = midiNoteToFrequency(note)
-		this._oscillator.frequency.value = this._frequency
+		if (this._oscillator) {
+			this._oscillator.frequency.value = this._frequency
+		}
 		this._refreshOscillatorType()
 	}
 
-	private readonly _refreshOscillatorType = () => {
+	private _refreshOscillatorType() {
 		if (this._oscillatorType !== this._nextOscillatorType) {
 			const oldOscType = this._oscillatorType
 			this._oscillatorType = this._nextOscillatorType
 
 			if (this._oscillatorType in BuiltInOscillatorType && oldOscType in BuiltInOscillatorType) {
-				this._oscillator.type = this._oscillatorType as OscillatorType
+				if (this._oscillator) {
+					this._oscillator.type = this._oscillatorType as OscillatorType
+				}
 			} else {
 				this._rebuildChain()
 			}
@@ -145,11 +151,6 @@ class SynthVoice extends Voice {
 	}
 
 	private _buildChain() {
-		this._oscillator = this._audioContext.createOscillator()
-		this._oscillator.start()
-		this._whiteNoise = this._audioContext.createBufferSource()
-		this._whiteNoise.start()
-
 		this._buildSpecificChain().connect(this._gain)
 			.connect(this._destination)
 	}
@@ -163,13 +164,17 @@ class SynthVoice extends Voice {
 	}
 
 	private _buildNoiseChain(): AudioNode {
-		this._whiteNoise.buffer = this._noiseBuffer
+		this._whiteNoise = this._audioContext.createBufferSource()
+		this._whiteNoise.start()
+		this._whiteNoise.buffer = SynthVoice._noiseBuffer
 		this._whiteNoise.loop = true
 
 		return this._whiteNoise
 	}
 
 	private _buildNormalChain(): AudioNode {
+		this._oscillator = this._audioContext.createOscillator()
+		this._oscillator.start()
 		this._oscillator.type = this._oscillatorType as OscillatorType
 		this._oscillator.frequency.setValueAtTime(midiNoteToFrequency(this.playingNote), this._audioContext.currentTime)
 
@@ -177,11 +182,15 @@ class SynthVoice extends Voice {
 	}
 
 	private _deleteChain() {
-		this._oscillator.stop()
-		this._oscillator.disconnect()
-		delete this._oscillator
-		this._whiteNoise.stop()
-		this._whiteNoise.disconnect()
-		delete this._whiteNoise
+		if (this._oscillator) {
+			this._oscillator.stop()
+			this._oscillator.disconnect()
+			delete this._oscillator
+		}
+		if (this._whiteNoise) {
+			this._whiteNoise.stop()
+			this._whiteNoise.disconnect()
+			delete this._whiteNoise
+		}
 	}
 }
