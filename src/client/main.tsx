@@ -8,6 +8,7 @@ import {startFpsLoop} from './fps-loop'
 import {setupInputEventListeners} from './input-events'
 import {setupInstrumentManager} from './instrument-manager'
 import {isLocalDevClient, logClientEnv} from './is-prod-client'
+import {loadExperiment} from './main-experiment'
 import {renderApp, renderOther} from './react-main'
 import {setupMidiSupport} from './setup-midi-support'
 import {SamplesManager} from './WebAudio/SamplesManager'
@@ -15,6 +16,8 @@ import {setupWebsocketAndListeners, socket} from './websocket-listeners'
 
 ReactGA.initialize('UA-50585312-6')
 ReactGA.pageview(window.location.pathname + window.location.search)
+
+start()
 
 declare global {
 	interface NodeModule {
@@ -31,16 +34,21 @@ declare global {
 	}
 }
 
-// Chrome 1 - 68
-const isChrome = () => !!window.chrome
-
-if (!isChrome() && !isLocalDevClient()) {
-	renderOther(<BrowserWarning />)
-} else {
-	setupAsync()
+function start() {
+	switch (window.location.pathname.replace('/', '')) {
+		case 'exp': return loadExperiment()
+		default: return setupAsync()
+	}
 }
 
 async function setupAsync() {
+
+	// Chrome 1 - 68
+	const isChrome = () => !!window.chrome
+
+	if (!isChrome() && !isLocalDevClient()) {
+		return renderOther(<BrowserWarning />)
+	}
 
 	logClientEnv()
 
