@@ -41,7 +41,7 @@ interface Note {
 	note: number
 }
 
-const fancy = {
+const fancy1 = {
 	length: 2 * 1000,
 	events: [
 		{
@@ -115,7 +115,225 @@ const fancy = {
 	] as Note[],
 }
 
-const bpm = 240
+const fancy = {
+	length: 2 * 1000,
+	events: [
+		{
+			startBeat: 0,
+			note: 60,
+		},
+		{
+			startBeat: 1 / 4 * 1000,
+			note: 64,
+		},
+		{
+			startBeat: 2 / 4 * 1000,
+			note: 67,
+		},
+		{
+			startBeat: 3 / 4 * 1000,
+			note: 71,
+		},
+		{
+			startBeat: 4 / 4 * 1000,
+			note: 72,
+		},
+		{
+			startBeat: 5 / 4 * 1000,
+			note: 71,
+		},
+		{
+			startBeat: 6 / 4 * 1000,
+			note: 67,
+		},
+		{
+			startBeat: 7 / 4 * 1000,
+			note: 64,
+		},
+		{
+			startBeat: 0 + 2000,
+			note: 60,
+		},
+		{
+			startBeat: 1 / 8 * 1000 + 2000,
+			note: 64,
+		},
+		{
+			startBeat: 2 / 8 * 1000 + 2000,
+			note: 67,
+		},
+		{
+			startBeat: 3 / 8 * 1000 + 2000,
+			note: 71,
+		},
+		{
+			startBeat: 4 / 8 * 1000 + 2000,
+			note: 72,
+		},
+		{
+			startBeat: 5 / 8 * 1000 + 2000,
+			note: 71,
+		},
+		{
+			startBeat: 6 / 8 * 1000 + 2000,
+			note: 67,
+		},
+		{
+			startBeat: 7 / 8 * 1000 + 2000,
+			note: 64,
+		},
+		{
+			startBeat: 0 + 3000,
+			note: 60,
+		},
+		{
+			startBeat: 1 / 8 * 1000 + 3000,
+			note: 64,
+		},
+		{
+			startBeat: 2 / 8 * 1000 + 3000,
+			note: 67,
+		},
+		{
+			startBeat: 3 / 8 * 1000 + 3000,
+			note: 71,
+		},
+		{
+			startBeat: 4 / 8 * 1000 + 3000,
+			note: 72,
+		},
+		{
+			startBeat: 5 / 8 * 1000 + 3000,
+			note: 71,
+		},
+		{
+			startBeat: 6 / 8 * 1000 + 3000,
+			note: 67,
+		},
+		{
+			startBeat: 7 / 8 * 1000 + 3000,
+			note: 64,
+		},
+		{
+			startBeat: 0 / 16 * 1000 + 4000,
+			note: 60,
+		},
+		{
+			startBeat: 1 / 16 * 1000 + 4000,
+			note: 64,
+		},
+		{
+			startBeat: 2 / 16 * 1000 + 4000,
+			note: 67,
+		},
+		{
+			startBeat: 3 / 16 * 1000 + 4000,
+			note: 71,
+		},
+		{
+			startBeat: 4 / 16 * 1000 + 4000,
+			note: 72,
+		},
+		{
+			startBeat: 5 / 16 * 1000 + 4000,
+			note: 71,
+		},
+		{
+			startBeat: 6 / 16 * 1000 + 4000,
+			note: 67,
+		},
+		{
+			startBeat: 7 / 16 * 1000 + 4000,
+			note: 64,
+		},
+		{
+			startBeat: 8 / 16 * 1000 + 4000,
+			note: 60,
+		},
+		{
+			startBeat: 9 / 16 * 1000 + 4000,
+			note: 64,
+		},
+		{
+			startBeat: 10 / 16 * 1000 + 4000,
+			note: 67,
+		},
+		{
+			startBeat: 11 / 16 * 1000 + 4000,
+			note: 71,
+		},
+		{
+			startBeat: 12 / 16 * 1000 + 4000,
+			note: 72,
+		},
+		{
+			startBeat: 13 / 16 * 1000 + 4000,
+			note: 71,
+		},
+		{
+			startBeat: 14 / 16 * 1000 + 4000,
+			note: 67,
+		},
+		{
+			startBeat: 15 / 16 * 1000 + 4000,
+			note: 64,
+		},
+
+		{
+			startBeat: 0 / 3 * 1000 + 6000,
+			note: 71,
+		},
+		{
+			startBeat: 0 / 3 * 1000 + 6000,
+			note: 67,
+		},
+		{
+			startBeat: 0 / 3 * 1000 + 6000,
+			note: 64,
+		},
+
+		{
+			startBeat: 1 / 3 * 1000 + 6000,
+			note: 71,
+		},
+		{
+			startBeat: 1 / 3 * 1000 + 6000,
+			note: 67,
+		},
+		{
+			startBeat: 1 / 3 * 1000 + 6000,
+			note: 64,
+		},
+
+		{
+			startBeat: 2 / 3 * 1000 + 6000,
+			note: 71,
+		},
+		{
+			startBeat: 2 / 3 * 1000 + 6000,
+			note: 67,
+		},
+		{
+			startBeat: 2 / 3 * 1000 + 6000,
+			note: 64,
+		},
+
+		{
+			startBeat: 0 / 3 * 1000 + 7000,
+			note: 74,
+		},
+		{
+			startBeat: 0 / 3 * 1000 + 7000,
+			note: 70,
+		},
+		{
+			startBeat: 0 / 3 * 1000 + 7000,
+			note: 67,
+		},
+	] as Note[],
+}
+
+const bpm = 60
 const threshold = (1000 * 60) / bpm
 
 let elapsedTimeMs: number
@@ -155,7 +373,7 @@ let lastBeatChecked = 0
 const lookAheadSec = 0.1
 const lookAheadMs = lookAheadSec * 1000
 const lookAheadBeats = lookAheadMs * (bpm / 60)
-const lookAheadRangeSec = 1
+const lookAheadRangeSec = 0.1
 const lookAheadRangeBeats = lookAheadRangeSec * 1000
 
 function mainLoop(time: number) {
