@@ -1,3 +1,5 @@
+import React = require('react')
+import ReactDOM = require('react-dom')
 import {logger} from '../common/logger'
 import {IMidiNote} from '../common/MidiNote'
 import {midiNoteToFrequency} from './WebAudio/music-functions'
@@ -14,7 +16,12 @@ export function loadExperiment() {
 	preFx.gain.value = 0.1
 	preFx.connect(ctx.destination)
 
-	startMainLoop()
+	ReactDOM.render(
+		<Experiment />,
+		document.getElementById('react-app'),
+	)
+
+	// startMainLoop()
 
 	// playNote(60, 0)
 	// playNote(61, 0.5)
@@ -26,6 +33,21 @@ export function loadExperiment() {
 			preFx.disconnect()
 			stop = true
 		})
+	}
+}
+
+class Experiment extends React.PureComponent {
+	public render() {
+		return (
+			<button
+				onClick={() => {
+					ctx.resume()
+					startMainLoop()
+				}}
+			>
+				start
+			</button>
+		)
 	}
 }
 
@@ -342,8 +364,11 @@ let lastTimeMs: number
 
 let stop = false
 let flag = false
+let started = false
 
 function startMainLoop() {
+	if (started) return
+	started = true
 	elapsedTimeMs = 0
 	startTimeMs = performance.now()
 	lastTimeMs = startTimeMs
