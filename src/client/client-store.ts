@@ -1,6 +1,6 @@
 import {applyMiddleware, createStore, Store} from 'redux'
 import {composeWithDevTools} from 'redux-devtools-extension/developmentOnly'
-import * as persistState from 'redux-localstorage'
+import persistState from 'redux-localstorage'
 import {
 	connectionsClientMiddleware, createGridSequencerPlayerMiddleware,
 	getActionsBlacklist, getClientReducers, IClientAppState, localMiddleware,

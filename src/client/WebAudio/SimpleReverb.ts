@@ -1,4 +1,4 @@
-import * as Reverb from 'soundbank-reverb'
+import Reverb from 'soundbank-reverb'
 import {AudioNodeWrapper, IAudioNodeWrapperOptions} from './Instrument'
 
 // TODO Add other Reverb params
