@@ -1,5 +1,5 @@
 declare module 'soundbank-reverb' {
-	export interface ReverbNode extends AudioNode {
+	interface ReverbNode extends AudioNode {
 		time: number
 		cutoff: AudioParam
 		decay: number
@@ -8,6 +8,13 @@ declare module 'soundbank-reverb' {
 		dry: AudioParam
 		filterType: BiquadFilterType
 	}
-	const Reverb: (ctx: AudioContext) => ReverbNode
-	export default Reverb
+
+	export = soundbank_reverb
+
+	function soundbank_reverb(ctx: AudioContext): ReverbNode
+
+	namespace soundbank_reverb {
+		const prototype: {
+		};
+	}
 }

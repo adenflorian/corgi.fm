@@ -1,4 +1,4 @@
-import Reverb, {ReverbNode} from 'soundbank-reverb'
+import * as Reverb from 'soundbank-reverb'
 import {AudioNodeWrapper, IAudioNodeWrapperOptions} from './Instrument'
 
 // TODO Add other Reverb params
@@ -10,7 +10,7 @@ import {AudioNodeWrapper, IAudioNodeWrapperOptions} from './Instrument'
 //   - [ ] dry: GainNode
 //   - [ ] filterType: BiquadFilterType
 export class SimpleReverb extends AudioNodeWrapper {
-	private readonly _reverbNode: ReverbNode
+	private readonly _reverbNode: ReturnType<typeof Reverb>
 
 	constructor(options: IAudioNodeWrapperOptions) {
 		super(options)
