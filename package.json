@@ -16,7 +16,7 @@
     "test-common": "cross-env TS_NODE_PROJECT=\"src/common/tsconfig.json\" mocha --opts src/common/mocha.opts",
     "test-debug": "mocha --inspect --opts src/mocha.opts",
     "tdd": "mocha --watch src/**/*.ts* --reporter dot --opts src/mocha.opts",
-    "clean": "rm -rf .cache built dist",
+    "clean": "rm -rf .cache built dist yarn-error.log",
     "deploy-test": "yarn build && bash scripts/deploy-test.sh",
     "deploy-prod": "yarn build && bash scripts/deploy-prod.sh",
     "build": "rm -rf built && yarn build-server && yarn build-client && yarn build-other",

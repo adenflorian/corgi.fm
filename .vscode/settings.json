@@ -25,12 +25,13 @@
     "typescript.preferences.quoteStyle": "single",
     "editor.insertSpaces": false,
     "search.exclude": {
-        "**/node_modules": true,
         "**/bower_components": true,
+        "**/node_modules": true,
         "built/**/*": true,
-        "yarn.lock": true,
+        "dist": true,
+        "samples": true,
         "yarn-error.log": true,
-        "samples": true
+        "yarn.lock": true
     },
     "editor.codeActionsOnSave": {
         "source.organizeImports": false
