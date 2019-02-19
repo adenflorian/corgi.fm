@@ -1,3 +1,4 @@
+import {List, Record} from 'immutable'
 import React = require('react')
 import ReactDOM = require('react-dom')
 import {logger} from '../common/logger'
@@ -16,17 +17,18 @@ export function loadExperiment() {
 	preFx.gain.value = 0.1
 	preFx.connect(ctx.destination)
 
-	ReactDOM.render(
-		<Experiment />,
-		document.getElementById('react-app'),
-	)
-
-	// startMainLoop()
-
-	// playNote(60, 0)
-	// playNote(61, 0.5)
-	// playNote(62, 1.5)
-	// playNote(64, 3)
+	if (ctx.state === 'running') {
+		startMainLoop()
+		ReactDOM.render(
+			<p>starting automatically because context did not get paused</p>,
+			document.getElementById('react-app'),
+		)
+	} else {
+		ReactDOM.render(
+			<Experiment />,
+			document.getElementById('react-app'),
+		)
+	}
 
 	if (module.hot) {
 		module.hot.dispose(() => {
@@ -51,95 +53,23 @@ class Experiment extends React.PureComponent {
 	}
 }
 
-// const melody = [65, 67, 72, 69, 0, 69, 74, 0]
-const melody = [60, 61, 62, 63, 64, 65, 66, 67]
-let melodyIndex = 0
-
-const bass = [53, 0, 0, 0, 0, 0, 0, 0, 50, 0, 0, 0, 0, 0, 0, 0]
-let bassIndex = 0
-
-interface Note {
+interface Event {
 	startBeat: number,
 	note: number
 }
 
-const fancy1 = {
-	length: 2 * 1000,
-	events: [
-		{
-			startBeat: 0 / 16 * 1000,
-			note: 60,
-		},
-		{
-			startBeat: 1 / 16 * 1000,
-			note: 59,
-		},
-		{
-			startBeat: 2 / 16 * 1000,
-			note: 60,
-		},
-		{
-			startBeat: 3 / 16 * 1000,
-			note: 57,
-		},
-		{
-			startBeat: 1 * 1000,
-			note: 61,
-		},
-		{
-			startBeat: 1.5 * 1000,
-			note: 62,
-		},
-		{
-			startBeat: 1.75 * 1000,
-			note: 63,
-		},
-		{
-			startBeat: 2 * 1000,
-			note: 65,
-		},
-		{
-			startBeat: 2 * 1000,
-			note: 69,
-		},
-		{
-			startBeat: 3 * 1000,
-			note: 72,
-		},
-		{
-			startBeat: 3 * 1000,
-			note: 68,
-		},
-		{
-			startBeat: 4 * 1000,
-			note: 69,
-		},
-		{
-			startBeat: 4 * 1000,
-			note: 73,
-		},
-		{
-			startBeat: 4 * 1000,
-			note: 76,
-		},
-		{
-			startBeat: 6 * 1000,
-			note: 56,
-		},
-		{
-			startBeat: 6 * 1000,
-			note: 60,
-		},
-		{
-			startBeat: 6 * 1000,
-			note: 63,
-		},
-	] as Note[],
-}
+type MidiClip = ReturnType<typeof makeMidiClip>
 
-const fancy = {
-	length: 2 * 1000,
-	events: [
+const makeMidiClip = Record({
+	lengthInBeats: 4,
+	loop: true,
+	events: List<Event>(),
+})
+
+const longDemoMidiClip = makeMidiClip({
+	lengthInBeats: 2 * 1000,
+	loop: false,
+	events: List([
 		{
 			startBeat: 0,
 			note: 60,
@@ -352,40 +282,87 @@ const fancy = {
 			startBeat: 0 / 3 * 1000 + 7000,
 			note: 67,
 		},
-	] as Note[],
-}
+	]),
+})
+
+const shortLoopedMidiClip = makeMidiClip({
+	lengthInBeats: 2 * 1000,
+	loop: true,
+	events: List([
+		{
+			startBeat: 0,
+			note: 60,
+		},
+		{
+			startBeat: 1 / 4 * 1000,
+			note: 64,
+		},
+		{
+			startBeat: 2 / 4 * 1000,
+			note: 67,
+		},
+		{
+			startBeat: 3 / 4 * 1000,
+			note: 71,
+		},
+		{
+			startBeat: 4 / 4 * 1000,
+			note: 72,
+		},
+		{
+			startBeat: 5 / 4 * 1000,
+			note: 71,
+		},
+		{
+			startBeat: 6 / 4 * 1000,
+			note: 67,
+		},
+		{
+			startBeat: 7 / 4 * 1000,
+			note: 64,
+		},
+	]),
+})
+
+// const song = longDemoSong
+const midiClip: MidiClip = shortLoopedMidiClip
 
 const bpm = 60
-const threshold = (1000 * 60) / bpm
 
-let elapsedTimeMs: number
 let startTimeMs: number
 let lastTimeMs: number
 
 let stop = false
-let flag = false
 let started = false
+
+/*
+looping is hard
+i would like a way to abstract away the fact that it loops from as much of this logic as possible
+i got looping kind of working, but its not perfect and has edge cases that fail
+the only thing that really needs to know about looping is the thing that reads the events, or provides the events
+i wonder if i can make some kind of  stream that has events fed in from the original clip but with the times altered according to bpm and looping and stuff
+*/
 
 function startMainLoop() {
 	if (started) return
 	started = true
-	elapsedTimeMs = 0
 	startTimeMs = performance.now()
 	lastTimeMs = startTimeMs
-	console.log('currentBeat: ', currentBeat)
 
-	const beginRange = currentBeat
-	const endRange = currentBeat + lookAheadBeats + lookAheadRangeBeats
-	lastBeatChecked = endRange
+	const startRangeBeat = currentBeat
+	const endRangeBeat = currentBeat + lookAheadBeats + lookAheadRangeBeats
 
-	fancy.events.forEach(({startBeat, note}) => {
-		console.log('startBeat: ', startBeat)
-		if (startBeat >= beginRange && startBeat <= endRange) {
-			const delay = (startBeat - currentBeat) * (60 / bpm)
+	logger.log(`START | currentBeat: ${currentBeat} | checking beats: ${startRangeBeat} <= beat < ${endRangeBeat} `)
+
+	midiClip.events.forEach(({startBeat, note}, key) => {
+		if (startBeat >= startRangeBeat && startBeat < endRangeBeat) {
+			const delay = getDelayMs(startBeat, currentBeat, midiClip.lengthInBeats, bpm)
+			logger.log(`  PLAY NOTE0 ${key}: `, {currentBeat, lastBeatChecked, note, delay, startBeat})
 			playNote2(note, delay)
-			logger.log({currentBeat, lastBeatChecked, note, delay, startBeat, bpm})
 		}
 	})
+
+	lastBeatChecked = endRangeBeat
 
 	mainLoop(startTimeMs)
 }
@@ -394,12 +371,21 @@ let lastBeat = 0
 let currentBeat = 0
 let elapsedBeats = 0
 let lastBeatChecked = 0
+let loops = 0
 
-const lookAheadSec = 0.1
+const lookAheadSec = 0.11
 const lookAheadMs = lookAheadSec * 1000
 const lookAheadBeats = lookAheadMs * (bpm / 60)
-const lookAheadRangeSec = 0.1
-const lookAheadRangeBeats = lookAheadRangeSec * 1000
+const lookAheadRangeSec = 1.519
+const lookAheadRangeMs = lookAheadRangeSec * 1000
+const lookAheadRangeBeats = lookAheadRangeMs * (bpm / 60)
+
+logger.log({lookAheadSec, lookAheadMs, lookAheadBeats})
+logger.log({lookAheadRangeSec, lookAheadRangeMs, lookAheadRangeBeats})
+
+// range should probably always be smaller than look ahead
+
+const createThisShouldntHappenError = () => new Error(`this shouldn't happen`)
 
 function mainLoop(time: number) {
 	if (stop) return
@@ -408,79 +394,73 @@ function mainLoop(time: number) {
 
 	lastTimeMs = time
 
-	elapsedTimeMs += deltaTime
+	const deltaBeats = deltaTime * (bpm / 60)
 
-	if (elapsedTimeMs > threshold) {
-		elapsedTimeMs -= threshold
+	currentBeat += deltaBeats
+	elapsedBeats += deltaBeats
 
-		// playNote(flag ? 55 : 57)
-		flag = !flag
-
-		// playNote(melody[melodyIndex] + 0, 0.1)
-		melodyIndex++
-
-		if (melodyIndex === melody.length) melodyIndex = 0
-
-		// playNote(bass[bassIndex] + 0, 2)
-		bassIndex++
-
-		if (bassIndex === bass.length) bassIndex = 0
+	if (currentBeat >= midiClip.lengthInBeats) {
+		currentBeat -= midiClip.lengthInBeats
 	}
 
-	// console.log(elapsedTime)
-
-	currentBeat += deltaTime * (bpm / 60)
-	elapsedBeats += deltaTime * (bpm / 60)
-
-	// look behind
-	// if (beatIndex > fancy.length) {
-	// 	beatIndex -= fancy.length
-
-	// 	fancy.events.forEach(({startBeat, note}) => {
-	// 		if (startBeat > lastBeatIndex && startBeat < fancy.length) {
-	// 			playNote2(note)
-	// 		}
-	// 		if (startBeat >= 0 && startBeat <= beatIndex) {
-	// 			playNote2(note)
-	// 		}
-	// 	})
-	// } else {
-	// 	fancy.events.filter(({startBeat}) => startBeat > lastBeatIndex && startBeat <= beatIndex).forEach(x => {
-	// 		playNote2(x.note, (x.startBeat - lastBeatIndex) / 1000)
-	// 		console.log(x.note)
-	// 	})
-	// }
-
-	// look ahead
-	// if (currentBeat > fancy.length) {
-	// 	currentBeat -= fancy.length
-
-	// 	// fancy.events.forEach(({startBeat, note}) => {
-	// 	// 	if (startBeat > lastBeat && startBeat < fancy.length) {
-	// 	// 		// playNote2(note)
-	// 	// 	}
-	// 	// 	if (startBeat >= 0 && startBeat <= currentBeat) {
-	// 	// 		// playNote2(note)
-	// 	// 	}
-	// 	// })
-	// } else {
 	if (elapsedBeats > lookAheadRangeBeats) {
 		elapsedBeats -= lookAheadRangeBeats
 
-		const beginRange = lastBeatChecked
-		const endRange = lastBeatChecked + lookAheadRangeBeats
-		lastBeatChecked = endRange
-		logger.log({currentBeat, lastBeatChecked})
+		const startRangeBeat = lastBeatChecked
+		const endRangeBeat = lastBeatChecked + lookAheadRangeBeats
 
-		fancy.events.forEach(({startBeat, note}) => {
-			if (startBeat > beginRange && startBeat <= endRange) {
-				const delay = (startBeat - currentBeat) * (60 / bpm)
-				playNote2(note, delay)
-				logger.log({currentBeat, lastBeatChecked, note, delay, startBeat})
-			}
-		})
+		if (endRangeBeat <= midiClip.lengthInBeats) {
+			logger.log(`NORMAL | currentBeat: ${currentBeat} | checking beats: ${startRangeBeat} <= beat < ${endRangeBeat} `)
+
+			if (startRangeBeat === midiClip.lengthInBeats) throw createThisShouldntHappenError()
+
+			midiClip.events.forEach(({startBeat, note}, key) => {
+				if (startRangeBeat <= startBeat && startBeat < endRangeBeat) {
+					const delay = getDelayMs(startBeat, currentBeat, midiClip.lengthInBeats, bpm)
+					logger.log(`  PLAY NOTE1 ${key}: `, {currentBeat, lastBeatChecked, note, delay, startBeat})
+					if (delay <= 0) throw new Error('delay <= 0')
+					playNote2(note, delay)
+				}
+			})
+			lastBeatChecked = endRangeBeat
+		} else if (endRangeBeat > midiClip.lengthInBeats) {
+			if (startRangeBeat > midiClip.lengthInBeats) throw createThisShouldntHappenError()
+
+			const startRangeBeat1 = lastBeatChecked
+			const endRangeBeat1 = midiClip.lengthInBeats
+
+			const startRangeBeat2 = 0
+			const endRangeBeat2 = lookAheadRangeBeats - (midiClip.lengthInBeats - lastBeatChecked)
+
+			logger.log(`LOOP | currentBeat: ${currentBeat} | checking beats: ${startRangeBeat1} <= beat < ${endRangeBeat1} &  ${startRangeBeat2} <= beat < ${endRangeBeat2}`)
+
+			midiClip.events.forEach(({startBeat, note}, key) => {
+				if (startRangeBeat1 <= startBeat && startBeat < endRangeBeat1) {
+					const delay = getDelayMs(startBeat, currentBeat, midiClip.lengthInBeats, bpm)
+					logger.log(`  PLAY NOTE2 ${key}: `, {currentBeat, lastBeatChecked, note, delay, startBeat})
+					if (delay <= 0) throw new Error('delay <= 0')
+					playNote2(note, delay)
+				}
+			})
+
+			// TODO Deal with loop which is smaller than look ahead range
+
+			midiClip.events.forEach(({startBeat, note}, key) => {
+				if (startRangeBeat2 <= startBeat && startBeat < endRangeBeat2) {
+					const delay = getDelayMs(startBeat, currentBeat, midiClip.lengthInBeats, bpm)
+					logger.log(`  PLAY NOTE3 ${key}: `, {currentBeat, lastBeatChecked, note, delay, startBeat})
+					if (delay <= 0) throw new Error('delay <= 0')
+					playNote2(note, delay)
+				}
+			})
+
+			lastBeatChecked = endRangeBeat - midiClip.lengthInBeats
+			loops++
+			if (loops > 1) throw new Error('stop')
+		} else {
+			throw createThisShouldntHappenError()
+		}
 	}
-	// }
 
 	lastBeat = currentBeat
 
@@ -488,16 +468,29 @@ function mainLoop(time: number) {
 
 	// let xx = 0
 
-	// while (xx < 200000000) {
+	// while (xx < 2000000000) {
 	// 	xx++
 	// }
 
 	requestAnimationFrame(mainLoop)
 }
 
+function getDelayMs(startBeat: number, currentBeatA: number, clipLength: number, bpm: number) {
+	if (startBeat > currentBeatA) {
+		return (startBeat - currentBeatA) * (60 / bpm)
+	} else if (startBeat === currentBeatA) {
+		return 0
+	} else if (startBeat < currentBeatA) {
+		return (startBeat - (currentBeatA - clipLength)) * (60 / bpm)
+	} else {
+		throw createThisShouldntHappenError()
+	}
+}
+
 // const gains = Array<GainNode>()
 
 function playNote(note: IMidiNote, startDelayMs = 0) {
+	if (startDelayMs <= 0) logger.warn('delay <= 0: ', startDelayMs)
 
 	const attack = 0.01
 	const release = 1
@@ -539,6 +532,7 @@ function playNote(note: IMidiNote, startDelayMs = 0) {
 }
 
 function playNote2(note: IMidiNote, startDelayMs: number = 0) {
+	if (startDelayMs <= 0) logger.warn('startDelayMs <= 0 | ', startDelayMs)
 	const startDelaySec = startDelayMs / 1000
 
 	const attack = 0.01
