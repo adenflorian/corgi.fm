@@ -30,8 +30,6 @@ export abstract class AudioNodeWrapper {
 
 		// TODO Prevent feedback loop
 
-		// console.log(destination.context.)
-
 		const outputAudioNode = this.getOutputAudioNode()
 
 		if (!outputAudioNode) return

@@ -1,4 +1,5 @@
 import {Store} from 'redux'
+import {OscillatorType} from 'tone';
 import {ConnectionNodeType, IConnectable} from '../common/common-types'
 import {
 	BasicSamplerState, BasicSynthesizerState, globalClockActions, IClientAppState,
@@ -119,6 +120,23 @@ export const setupInstrumentManager =
 				// 		instrument.setFineTuning(instrumentState.fineTuning)
 				// 	},
 				// )
+				updateInstrumentType(
+					selectAllBasicSynthesizerIds,
+					selectBasicSynthesizer,
+					(options, instrumentState) => new BasicToneSynth({
+						...options,
+						...instrumentState,
+					}),
+					stuffMaps[ConnectionNodeType.basicSynthesizer],
+					(instrument: BasicToneSynth, instrumentState: BasicSynthesizerState) => {
+						instrument.setOscillatorType(instrumentState.oscillatorType as OscillatorType)
+						instrument.setPan(instrumentState.pan)
+						instrument.setLowPassFilterCutoffFrequency(instrumentState.lowPassFilterCutoffFrequency)
+						instrument.setAttack(instrumentState.attack)
+						instrument.setRelease(instrumentState.release)
+						instrument.setFineTuning(instrumentState.fineTuning)
+					},
+				)
 				updateToneType(
 					selectAllBasicSynthesizerIds,
 					selectBasicSynthesizer,
@@ -187,12 +205,10 @@ export const setupInstrumentManager =
 						stuff,
 						instrumentId,
 						stuff.get(instrumentId),
-						() => new BasicToneSynth(),
-						// () => instrumentCreator({
-						// 	id: instrumentId,
-						// 	audioContext,
-						// 	voiceCount: 1,
-						// }, instrumentState),
+						() => new BasicToneSynth({
+							audioContext,
+							id: instrumentId,
+						}),
 					)
 
 					// updateAudioConnectionsFromSource(state.room, instrumentId, instrument)
