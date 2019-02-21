@@ -1,5 +1,6 @@
 # Now
 - [ ] tone.js
+	- [ ] master volume
 	- [ ] synth
 	- [ ] sampler
 	- [ ] sequencer data structs
