@@ -1,3 +1,7 @@
+
+- [√] use OscillatorNode.detune
+	- https://developer.mozilla.org/en-US/docs/Web/API/OscillatorNode/detune
+- [√] fix connectors not lighting up
 - 2019-02-13 - 2019-02-15
 - [√] highlight connector on mouseover
 	- [√] make ghost connector look like normal connector

@@ -61,6 +61,7 @@
     "reselect": "^3.0.1",
     "socket.io": "^2.1.1",
     "soundbank-reverb": "^1.1.2",
+    "tone": "^13.4.9",
     "typesafe-actions": "^3.0.0",
     "uuid": "^3.3.2",
     "victor": "^1.1.0"
@@ -82,6 +83,7 @@
     "@types/sinon": "^7.0.0",
     "@types/socket.io": "^2.1.2",
     "@types/socket.io-client": "^1.4.32",
+    "@types/tone": "https://github.com/Tonejs/TypeScript.git",
     "@types/uuid": "^3.4.4",
     "chai": "^4.1.2",
     "concurrently": "^3.5.1",

@@ -11,6 +11,7 @@ import {
 import {GridSequencerPlayer} from './GridSequencerPlayer'
 import {BasicSamplerInstrument} from './WebAudio/BasicSamplerInstrument'
 import {BasicSynthesizer} from './WebAudio/BasicSynthesizer'
+import {BasicToneSynth} from './WebAudio/BasicToneSynth'
 import {
 	AudioNodeWrapper, IAudioNodeWrapperOptions, IInstrument, IInstrumentOptions, MasterAudioOutput,
 } from './WebAudio/Instrument'
@@ -100,23 +101,28 @@ export const setupInstrumentManager =
 			}
 
 			function handleBasicSynthesizers() {
-				updateInstrumentType(
+				// updateInstrumentType(
+				// 	selectAllBasicSynthesizerIds,
+				// 	selectBasicSynthesizer,
+				// 	(options, instrumentState) => new BasicSynthesizer({
+				// 		...options,
+				// 		voiceCount: 9,
+				// 		...instrumentState,
+				// 	}),
+				// 	stuffMaps[ConnectionNodeType.basicSynthesizer],
+				// 	(instrument: BasicSynthesizer, instrumentState: BasicSynthesizerState) => {
+				// 		instrument.setOscillatorType(instrumentState.oscillatorType)
+				// 		instrument.setPan(instrumentState.pan)
+				// 		instrument.setLowPassFilterCutoffFrequency(instrumentState.lowPassFilterCutoffFrequency)
+				// 		instrument.setAttack(instrumentState.attack)
+				// 		instrument.setRelease(instrumentState.release)
+				// 		instrument.setFineTuning(instrumentState.fineTuning)
+				// 	},
+				// )
+				updateToneType(
 					selectAllBasicSynthesizerIds,
 					selectBasicSynthesizer,
-					(options, instrumentState) => new BasicSynthesizer({
-						...options,
-						voiceCount: 9,
-						...instrumentState,
-					}),
 					stuffMaps[ConnectionNodeType.basicSynthesizer],
-					(instrument: BasicSynthesizer, instrumentState: BasicSynthesizerState) => {
-						instrument.setOscillatorType(instrumentState.oscillatorType)
-						instrument.setPan(instrumentState.pan)
-						instrument.setLowPassFilterCutoffFrequency(instrumentState.lowPassFilterCutoffFrequency)
-						instrument.setAttack(instrumentState.attack)
-						instrument.setRelease(instrumentState.release)
-						instrument.setFineTuning(instrumentState.fineTuning)
-					},
 				)
 			}
 
@@ -157,6 +163,46 @@ export const setupInstrumentManager =
 					instrument.setMidiNotes(sourceNotes)
 
 					if (updateSpecificInstrument) updateSpecificInstrument(instrument, instrumentState)
+				})
+			}
+
+			function updateToneType<S extends IConnectable>(
+				instrumentIdsSelector: IdsSelector,
+				instrumentStateSelector: StateSelector<S>,
+				stuff: StuffMap,
+			) {
+				const instrumentIds = instrumentIdsSelector(state.room)
+
+				stuff.forEach((_, key) => {
+					if (instrumentIds.includes(key) === false) {
+						stuff.get(key)!.dispose()
+						stuff.delete(key)
+					}
+				})
+
+				instrumentIds.forEach(instrumentId => {
+					const instrumentState = instrumentStateSelector(state.room, instrumentId)
+
+					const instrument = createIfNotExisting(
+						stuff,
+						instrumentId,
+						stuff.get(instrumentId),
+						() => new BasicToneSynth(),
+						// () => instrumentCreator({
+						// 	id: instrumentId,
+						// 	audioContext,
+						// 	voiceCount: 1,
+						// }, instrumentState),
+					)
+
+					// updateAudioConnectionsFromSource(state.room, instrumentId, instrument)
+
+					const sourceNotes = selectConnectionSourceNotesByTargetId(state.room, instrumentId)
+
+					instrument.setMidiNotes(sourceNotes)
+
+					// instrument.setMidiNotes(sourceNotes)
+
 				})
 			}
 
