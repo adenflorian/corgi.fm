@@ -25,12 +25,12 @@ const testClip = makeMidiClip({
 type Tests = Array<{
 	name: string,
 	start: number,
-	end: number,
+	length: number,
 	expected: MidiEvent[],
 }>
 
 describe.only('note-scheduler', () => {
-	describe.only('Range', () => {
+	describe('Range', () => {
 		describe('bad args', () => {
 			it('should throw when start too big', () => {
 				expect(() => new Range(100000000))
@@ -41,12 +41,19 @@ describe.only('note-scheduler', () => {
 					.to.throw('too big')
 			})
 		})
+		describe('end', () => {
+			it('should be start plus length', () => {
+				expect(new Range(0).end).to.equal(0)
+				expect(new Range(0, 1).end).to.equal(1)
+				expect(new Range(0.000001, 3.333333).end).to.equal(3.333334)
+			})
+		})
 		describe('normalize', () => {
 			[
 				{
 					length: 2,
 					input: new Range(3.99, 4.647),
-					output: new Range(1.99, 0.647),
+					output: new Range(1.99, 4.647),
 				},
 				{
 					length: 2,
@@ -99,7 +106,7 @@ describe.only('note-scheduler', () => {
 						() => {
 							const normalizedRange = input.normalize(length)
 							expect(normalizedRange.start).to.equal(output.start)
-							expect(normalizedRange.end).to.equal(output.end)
+							expect(normalizedRange.length).to.equal(output.length)
 						},
 					)
 				})
@@ -111,14 +118,14 @@ describe.only('note-scheduler', () => {
 				new NoteScheduler(makeMidiClip())
 					.getNotes(new Range(-1, 1))
 			})
-				.to.throw('start time must be >= 0')
+				.to.throw('start must be >= 0')
 		})
-		it('should fail when start time is greater than end time', () => {
+		it('should fail when length is negative', () => {
 			expect(() => {
 				new NoteScheduler(makeMidiClip())
-					.getNotes(new Range(2, 1))
+					.getNotes(new Range(2, -1))
 			})
-				.to.throw(`start time must be <= end time`)
+				.to.throw(`length must be >= 0`)
 		})
 		it('should fail when clipLength is negative', () => {
 			expect(() => {
@@ -165,17 +172,17 @@ describe.only('note-scheduler', () => {
 				// start 0 range < clip.length
 				{
 					name: 'start 0 range < clip.length - A',
-					start: 0.00, end: 0.01,
+					start: 0.00, length: 0.01,
 					expected: [event0],
 				},
 				{
 					name: 'start 0 range < clip.length - B',
-					start: 0.00, end: 0.25,
+					start: 0.00, length: 0.25,
 					expected: [event0],
 				},
 				{
 					name: 'start 0 range < clip.length - C',
-					start: 0.00, end: 0.250000001,
+					start: 0.00, length: 0.250000001,
 					expected: [
 						{startBeat: 0.00, note: 60},
 						{startBeat: 0.25, note: 64},
@@ -184,7 +191,7 @@ describe.only('note-scheduler', () => {
 
 				{
 					name: 'exact length of clip',
-					start: 0.00, end: 2.00,
+					start: 0.00, length: 2.00,
 					expected: [
 						{startBeat: 0.0, note: 60},
 						{startBeat: 0.25, note: 64},
@@ -195,24 +202,24 @@ describe.only('note-scheduler', () => {
 				},
 				{
 					name: 'half length, start halfway',
-					start: 1.00, end: 2.00,
+					start: 1.00, length: 1.00,
 					expected: [
 						{startBeat: 1.0, note: 67},
 						{startBeat: 1.5, note: 71},
 						{startBeat: 1.99, note: 72},
 					],
 				},
-				// {
-				// 	name: 'exact length, 1st loop',
-				// 	start: 2.00, end: 4.00,
-				// 	expected: [
-				// 		{startBeat: 0.0, note: 60},
-				// 		{startBeat: 0.25, note: 64},
-				// 		{startBeat: 1.0, note: 67},
-				// 		{startBeat: 1.5, note: 71},
-				// 		{startBeat: 1.99, note: 72},
-				// 	],
-				// },
+				{
+					name: 'exact length, 1st loop',
+					start: 2.00, length: 2.00,
+					expected: [
+						{startBeat: 0.0, note: 60},
+						{startBeat: 0.25, note: 64},
+						{startBeat: 1.0, note: 67},
+						{startBeat: 1.5, note: 71},
+						{startBeat: 1.99, note: 72},
+					],
+				},
 				// {
 				// 	name: 'exact length, start halfway',
 				// 	start: 1.00, end: 3.00,
@@ -243,10 +250,10 @@ describe.only('note-scheduler', () => {
 				// },
 			] as Tests
 		)
-			.forEach(({name, start, end, expected}) => {
+			.forEach(({name, start, length, expected}) => {
 				it(name, () => {
 					const result = new NoteScheduler(testClip)
-						.getNotes(new Range(start, end))
+						.getNotes(new Range(start, length))
 						.toArray()
 
 					expect(result).to.deep.equal(expected)

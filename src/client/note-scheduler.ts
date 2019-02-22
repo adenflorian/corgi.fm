@@ -51,33 +51,31 @@ scheduler
 
 */
 
-// Max safe end number ~100,000,000
+const precision = 1000000
+
 export class Range {
 	/** exclusive */
 	public static readonly maxSafeNumber = 100000000
-	public readonly start: number
 	public readonly end: number
 
 	constructor(
-		start: number,
-		end?: number,
+		/** Always 0 or greater, defaults to 0 */
+		public readonly start = 0,
+		/** Always 0 or greater, defaults to 0 */
+		public readonly length = 0,
 	) {
-		this.start = start
-		this.end = end === undefined ? start : end
-		if (Math.max(this.start, this.end) >= Range.maxSafeNumber) {
+		if (start < 0) throw new Error('start must be >= 0')
+		if (length < 0) throw new Error('length must be >= 0')
+		if (Math.max(this.start, this.start + this.length) >= Range.maxSafeNumber) {
 			throw new Error('too big')
 		}
-	}
-
-	public get length() {
-		return this.end - this.start
+		this.end = ((this.start * precision) + (this.length * precision)) / precision
 	}
 
 	public normalize(max: number) {
-		const x = 1000000
 		return new Range(
-			((this.start * x) % (max * x) / x),
-			((this.end * x) % (max * x) / x),
+			((this.start * precision) % (max * precision) / precision),
+			this.length,
 		)
 	}
 }
@@ -101,12 +99,12 @@ export type MidiClip = ReturnType<typeof makeMidiClip>
 export class NoteScheduler {
 	constructor(
 		private readonly _clip: MidiClip,
-	) {}
+	) {
+		if (this._clip.length <= 0) throw new Error(`clipLength must be > 0`)
+	}
 
 	// Maybe range should only ever be a simple number, divisible by 10 or something
 	public getNotes(range: Range): MidiEvents {
-		this._validateArgs(range)
-
 		if (range.length === 0) {
 			return this._checkSingleBeat(range.start)
 		}
@@ -116,12 +114,6 @@ export class NoteScheduler {
 		}
 
 		throw createThisShouldntHappenError()
-	}
-
-	private _validateArgs({start, end}: Range) {
-		if (start > end) throw new Error(`start time must be <= end time`)
-		if (this._clip.length <= 0) throw new Error(`clipLength must be > 0`)
-		if (start < 0) throw new Error('start time must be >= 0')
 	}
 
 	private _checkSingleBeat(start: number): MidiEvents {
@@ -135,18 +127,22 @@ export class NoteScheduler {
 
 	private _checkBeatRange(range: Range): MidiEvents {
 		if (this._rangeIsWithinBounds(range)) {
-			return this._checkWithinClipBounds(range)
+			return this._checkWithinClipBounds(range.normalize(this._clip.length))
 		} else {
 			return this._checkCrossingClipBounds(range)
 		}
 	}
 
 	private _rangeIsWithinBounds(range: Range) {
-		// if (range.length <= this._clip.length) {
-		// 	const normalizedRange =
-		// }
-		return range.length <= this._clip.length
-			&& (range.start === 0 || range.end <= this._clip.length)
+		if (range.length <= this._clip.length) {
+			const {start, end} = range.normalize(this._clip.length)
+
+			return 0 <= start && end <= this._clip.length
+		} else {
+			return false
+		}
+		// return range.length <= this._clip.length
+		// 	&& (range.start === 0 || range.end <= this._clip.length)
 	}
 
 	private _checkWithinClipBounds({start, end}: Range): MidiEvents {
