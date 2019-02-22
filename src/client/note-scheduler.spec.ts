@@ -30,13 +30,79 @@ type Tests = Array<{
 }>
 
 describe.only('note-scheduler', () => {
-	describe('Range', () => {
-		describe('normalize', () => {
-			it('should work', () => {
-				const normalizedRange = new Range(3.99, 4.647).normalize(2)
-				expect(normalizedRange.start).to.equal(1.99)
-				expect(normalizedRange.end).to.equal(0.647)
+	describe.only('Range', () => {
+		describe('bad args', () => {
+			it('should throw when start too big', () => {
+				expect(() => new Range(100000000))
+					.to.throw('too big')
 			})
+			it('should throw when end too big', () => {
+				expect(() => new Range(0, 100000000))
+					.to.throw('too big')
+			})
+		})
+		describe('normalize', () => {
+			[
+				{
+					length: 2,
+					input: new Range(3.99, 4.647),
+					output: new Range(1.99, 0.647),
+				},
+				{
+					length: 2,
+					input: new Range(0),
+					output: new Range(0),
+				},
+				{
+					length: 2,
+					input: new Range(0.001),
+					output: new Range(0.001),
+				},
+				{
+					length: 2,
+					input: new Range(1.234567),
+					output: new Range(1.234567),
+				},
+				{
+					length: 2,
+					input: new Range(9.876543),
+					output: new Range(1.876543),
+				},
+				{
+					length: 3,
+					input: new Range(9.876543),
+					output: new Range(0.876543),
+				},
+				{
+					length: 3,
+					input: new Range(99999997.876543),
+					output: new Range(1.876543),
+				},
+				{
+					length: 3.3,
+					input: new Range(33333333.333333),
+					output: new Range(0.333333),
+				},
+				{
+					length: 33333333.333333,
+					input: new Range(33333333.333333),
+					output: new Range(0),
+				},
+				{
+					length: 33333333.333333,
+					input: new Range(1.333333),
+					output: new Range(1.333333),
+				},
+			]
+				.forEach(({length, input, output}) => {
+					it(`${length} ${JSON.stringify(input)} -> ${JSON.stringify(output)}`,
+						() => {
+							const normalizedRange = input.normalize(length)
+							expect(normalizedRange.start).to.equal(output.start)
+							expect(normalizedRange.end).to.equal(output.end)
+						},
+					)
+				})
 		})
 	})
 	describe('invalid inputs', () => {

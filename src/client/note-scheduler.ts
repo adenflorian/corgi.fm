@@ -51,7 +51,10 @@ scheduler
 
 */
 
+// Max safe end number ~100,000,000
 export class Range {
+	/** exclusive */
+	public static readonly maxSafeNumber = 100000000
 	public readonly start: number
 	public readonly end: number
 
@@ -61,6 +64,9 @@ export class Range {
 	) {
 		this.start = start
 		this.end = end === undefined ? start : end
+		if (Math.max(this.start, this.end) >= Range.maxSafeNumber) {
+			throw new Error('too big')
+		}
 	}
 
 	public get length() {
@@ -68,13 +74,10 @@ export class Range {
 	}
 
 	public normalize(max: number) {
-		// return new Range(
-		// 	this.start % max,
-		// 	this.end % max,
-		// )
+		const x = 1000000
 		return new Range(
-			((this.start * 1000) % (max * 1000) / 1000),
-			((this.end * 1000) % (max * 1000) / 1000),
+			((this.start * x) % (max * x) / x),
+			((this.end * x) % (max * x) / x),
 		)
 	}
 }
