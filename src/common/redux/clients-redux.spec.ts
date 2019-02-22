@@ -5,7 +5,7 @@ import {addClient, clientsReducer, ClientState} from './index'
 
 import * as uuid from 'uuid'
 
-describe.only('clients-redux', () => {
+describe('clients-redux', () => {
 	describe('clientsReducer', () => {
 		describe('ADD_CLIENT', () => {
 			let sandbox: sinon.SinonSandbox

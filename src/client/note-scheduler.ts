@@ -12,7 +12,7 @@ i wonder if i can make some kind of  stream that has events fed in from the orig
 midiClipStreamReader
 - getNextEvent() => {startBeat: 1/4, note: 60}
 - readBeats(0.5 beats) => {startBeat: 1/4, note: 60}
-- getEventsInRange(start, end) => [{startTime: 1230.0, note: 60}, {startTime: 1231.5, note: 62}]
+- getEventsInRange(range) => [{startTime: 1230.0, note: 60}, {startTime: 1231.5, note: 62}]
 should the reader return events in the context of the midi clip or in the context of the song/app/scheduler?
 what is needed to convert from clip context to global?
 - current time
@@ -50,6 +50,23 @@ scheduler
 
 */
 
+export class Range {
+	public readonly start: number
+	public readonly end: number
+
+	constructor(
+		start: number,
+		end?: number,
+	) {
+		this.start = start
+		this.end = end === undefined ? start : end
+	}
+
+	public get length() {
+		return this.end - this.start
+	}
+}
+
 export interface MidiEvent {
 	startBeat: number,
 	note: number
@@ -72,25 +89,21 @@ export class NoteScheduler {
 	) {}
 
 	// Maybe range should only ever be a simple number, divisible by 10 or something
-	public getNotes(start: number, end?: number): MidiEvents {
-		if (end === undefined) end = start
+	public getNotes(range: Range): MidiEvents {
+		this._validateArgs(range)
 
-		this._validateArgs(start, end)
-
-		const rangeLength = end - start
-
-		if (rangeLength === 0) {
-			return this._checkSingleBeat(start)
+		if (range.length === 0) {
+			return this._checkSingleBeat(range.start)
 		}
 
-		if (rangeLength > 0) {
-			return this._checkBeatRange(start, end)
+		if (range.length > 0) {
+			return this._checkBeatRange(range)
 		}
 
 		throw createThisShouldntHappenError()
 	}
 
-	private _validateArgs(start: number, end: number) {
+	private _validateArgs({start, end}: Range) {
 		if (start > end) throw new Error(`start time must be <= end time`)
 		if (this._clip.length <= 0) throw new Error(`clipLength must be > 0`)
 		if (start < 0) throw new Error('start time must be >= 0')
@@ -104,17 +117,26 @@ export class NoteScheduler {
 		})
 	}
 
-	private _checkBeatRange(start: number, end: number): MidiEvents {
-		if (end - start <= this._clip.length) {
-			if (start === 0 || end <= this._clip.length) {
-				return this._clip.events.filter(x => {
-					return start <= x.startBeat && x.startBeat < end
-				})
-			} else {
-				return List()
-			}
+	private _checkBeatRange(range: Range): MidiEvents {
+		const rangeIsWithinClipBounds = range.length <= this._clip.length
+			&& (range.start === 0 || range.end <= this._clip.length)
+
+		if (rangeIsWithinClipBounds) {
+			return this._checkWithinClipBounds(range)
 		} else {
-			return List() // TODO
+			return this._checkCrossingClipBounds(range)
 		}
+	}
+
+	private _checkWithinClipBounds({start, end}: Range): MidiEvents {
+		return this._clip.events.filter(x => {
+			return start <= x.startBeat && x.startBeat < end
+		})
+	}
+
+	private _checkCrossingClipBounds({start, end}: Range): MidiEvents {
+		return this._clip.events.filter(x => {
+			return start <= x.startBeat && x.startBeat < end
+		})
 	}
 }
