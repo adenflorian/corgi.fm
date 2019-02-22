@@ -1,6 +1,6 @@
 import {expect} from 'chai'
 import {List} from 'immutable'
-import {getNotes, makeMidiClip, MidiEvent} from './note-scheduler'
+import {makeMidiClip, MidiEvent, NoteScheduler} from './note-scheduler'
 
 const event0 = {startBeat: 0.0, note: 60}
 const event1 = {startBeat: 0.25, note: 64}
@@ -32,15 +32,15 @@ type Tests = Array<{
 describe.only('note-scheduler', () => {
 	describe('invalid inputs', () => {
 		it('should fail when start time is negative', () => {
-			expect(() => {getNotes(-1, 1, makeMidiClip())})
+			expect(() => {new NoteScheduler(makeMidiClip()).getNotes(-1, 1)})
 				.to.throw('start time must be >= 0')
 		})
 		it('should fail when start time is greater than end time', () => {
-			expect(() => {getNotes(2, 1, makeMidiClip())})
+			expect(() => {new NoteScheduler(makeMidiClip()).getNotes(2, 1)})
 				.to.throw(`start time must be <= end time`)
 		})
 		it('should fail when clipLength is negative', () => {
-			expect(() => {getNotes(0, 1, makeMidiClip({length: -1}))})
+			expect(() => {new NoteScheduler(makeMidiClip({length: -1})).getNotes(0, 1)})
 				.to.throw(`clipLength must be > 0`)
 		})
 	})
@@ -150,7 +150,9 @@ describe.only('note-scheduler', () => {
 		)
 			.forEach(({name, start, end, expected}) => {
 				it(name, () => {
-					const result = getNotes(start, end, testClip).toArray()
+					const result = new NoteScheduler(testClip)
+						.getNotes(start, end)
+						.toArray()
 
 					expect(result).to.deep.equal(expected)
 				})

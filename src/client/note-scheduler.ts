@@ -1,7 +1,5 @@
 import {List, Record} from 'immutable'
-import {isEqual} from 'lodash'
 import {createThisShouldntHappenError} from '../common/common-utils'
-import {logger} from '../common/logger'
 
 /*
 looping is hard
@@ -67,39 +65,50 @@ export type MidiEvents = MidiClip['events']
 
 export type MidiClip = ReturnType<typeof makeMidiClip>
 
-// Maybe range should only ever be a simple number, divisible by 10 or something
-export function getNotes(start: number, end: number, clip: MidiClip): MidiEvents {
-	const clipLength = clip.length
-	const bigStart = start * 1000
-	const bigEnd = end * 1000
-	const bigClipLength = clipLength * 1000
-	const rangeLength = end - start
+export class NoteScheduler {
+	constructor(
+		private readonly _clip: MidiClip,
+	) {}
 
-	if (rangeLength < 0) throw new Error(`start time must be <= end time`)
-	if (clipLength <= 0) throw new Error(`clipLength must be > 0`)
-	if (start < 0) throw new Error('start time must be >= 0')
+	// Maybe range should only ever be a simple number, divisible by 10 or something
+	public getNotes(start: number, end: number): MidiEvents {
+		const clipLength = this._clip.length
+		const rangeLength = end - start
 
-	const clipEventStart = bigStart % bigClipLength
+		if (rangeLength < 0) throw new Error(`start time must be <= end time`)
+		if (clipLength <= 0) throw new Error(`clipLength must be > 0`)
+		if (start < 0) throw new Error('start time must be >= 0')
 
-	if (rangeLength === 0) {
-		return clip.events.filter(x => {
+		const bigStart = start * 1000
+		const bigEnd = end * 1000
+		const bigClipLength = clipLength * 1000
+
+		if (rangeLength === 0) {
+			return this._checkSingleBeat(bigStart)
+		}
+
+		if (rangeLength > 0) {
+			if (rangeLength <= clipLength) {
+				if (start === 0 || end <= clipLength) {
+					return this._clip.events.filter(x => {
+						return start <= x.startBeat && x.startBeat < end
+					})
+				} else {
+					return List()
+				}
+			} else {
+				return List() // TODO
+			}
+		}
+
+		throw createThisShouldntHappenError()
+	}
+
+	private _checkSingleBeat(bigStart: number) {
+		const clipEventStart = bigStart % (this._clip.length * 1000)
+
+		return this._clip.events.filter(x => {
 			return x.startBeat * 1000 === clipEventStart
 		})
 	}
-
-	if (rangeLength > 0) {
-		if (rangeLength <= clipLength) {
-			if (start === 0 || end <= clipLength) {
-				return clip.events.filter(x => {
-					return start <= x.startBeat && x.startBeat < end
-				})
-			} else {
-				return List()
-			}
-		} else {
-			return List() // TODO
-		}
-	}
-
-	throw createThisShouldntHappenError()
 }
