@@ -1,9 +1,10 @@
-import {List, Record} from 'immutable'
-import {isEqual} from 'lodash'
+import {List} from 'immutable'
 import React = require('react')
 import ReactDOM = require('react-dom')
+import {createThisShouldntHappenError} from '../common/common-utils'
 import {logger} from '../common/logger'
 import {IMidiNote} from '../common/MidiNote'
+import {makeMidiClip, MidiClip} from './note-scheduler'
 import {midiNoteToFrequency} from './WebAudio/music-functions'
 
 let ctx: AudioContext
@@ -53,21 +54,6 @@ class Experiment extends React.PureComponent {
 		)
 	}
 }
-
-interface MidiEvent {
-	startBeat: number,
-	note: number
-}
-
-const makeMidiClip = Record({
-	length: 4,
-	loop: true,
-	events: List<MidiEvent>(),
-})
-
-type MidiEvents = MidiClip['events']
-
-type MidiClip = ReturnType<typeof makeMidiClip>
 
 const longDemoMidiClip = makeMidiClip({
 	length: 2 * 1000,
@@ -338,120 +324,7 @@ let lastTimeMs: number
 let stop = false
 let started = false
 
-/*
-looping is hard
-i would like a way to abstract away the fact that it loops from as much of this logic as possible
-i got looping kind of working, but its not perfect and has edge cases that fail
-the only thing that really needs to know about looping is the thing that reads the events, or provides the events
-i wonder if i can make some kind of  stream that has events fed in from the original clip but with the times altered according to bpm and looping and stuff
-
-midiClipStreamReader
-- getNextEvent() => {startBeat: 1/4, note: 60}
-- readBeats(0.5 beats) => {startBeat: 1/4, note: 60}
-- getEventsInRange(start, end) => [{startTime: 1230.0, note: 60}, {startTime: 1231.5, note: 62}]
-should the reader return events in the context of the midi clip or in the context of the song/app/scheduler?
-what is needed to convert from clip context to global?
-- current time
-- bpm
-- clip length?
-
-clip
-- length: 2
-- events: [0.0, 0.25, 1.0, 1.5, 1.99]
-
-g = global time
-c = clip time
-L - clip length
-
-g    | c
-0.00 | 0.00
-0.25 | 0.25
-1.00 | 1.00
-1.50 | 1.50
-1.99 | 1.99
-2.00 | 0.00
-2.25 | 0.25
-3.00 | 1.00
-3.99 | 1.99
-4.00 | 0.00
-5.00 | 1.00
-6.00 | 0.00
-
-c = f(g) = g % L
-
-midiClipStreamReader needs to keep track of loop count
-
-a system that use the midiClipStreamReader
-scheduler
-
-*/
-
-const testClip = makeMidiClip({
-	length: 2,
-	loop: true,
-	events: List([
-		{startBeat: 0.0, note: 60},
-		{startBeat: 0.25, note: 64},
-		{startBeat: 1.0, note: 67},
-		{startBeat: 1.5, note: 71},
-		{startBeat: 1.99, note: 72},
-		{startBeat: 2.0, note: 71},
-	]),
-})
-
-function testGetNotes() {
-	(
-		[
-			{start: 0.00, end: 0.00, expected: [{startBeat: 0.00, note: 60}]},
-			{start: 0.25, end: 0.25, expected: [{startBeat: 0.25, note: 64}]},
-			{start: 1.00, end: 1.00, expected: [{startBeat: 1.00, note: 67}]},
-			{start: 2.00, end: 2.00, expected: [{startBeat: 0.00, note: 60}]},
-			{start: 3.00, end: 3.00, expected: [{startBeat: 1.00, note: 67}]},
-			{start: 3.99, end: 3.99, expected: [{startBeat: 1.99, note: 72}]},
-			{start: 0.00, end: 0.01, expected: [{startBeat: 0.00, note: 72}]},
-		] as Array<{start: number, end: number, expected: MidiEvent[]}>
-	)
-		.forEach(({start, end, expected}) => {
-			const result = getNotes(start, end, testClip).toArray()
-
-			// expect(result).to.deep.equal(expected)
-
-			const fail = isEqual(result, expected) === false
-
-			logger.log(
-				`getNotes(${start.toFixed(2)}, ${end.toFixed(2)}, testClip): `
-				+ JSON.stringify(getNotes(start, end, testClip).toArray())
-				+ ' '
-				+ (fail ? 'FAIL expected: ' + JSON.stringify(expected) : ''),
-			)
-		})
-}
-
-function getNotes(start: number, end: number, clip: MidiClip): MidiEvents {
-	const bigStart = start * 1000
-	const bigEnd = end * 1000
-	const bigClipLength = clip.length * 1000
-	const rangeLength = end - start
-
-	if (rangeLength < 0) throw new Error('rangeLength < 0')
-	if (clip.length <= 0) throw new Error('clip.length <= 0')
-	// logger.log('start|end: ' + start + ' ' + end)
-
-	if (rangeLength === 0) {
-		const clipEventStart = bigStart % bigClipLength
-		return clip.events.filter(x => {
-			// logger.log(x.startBeat + ' ' + clipEventStart)
-			return x.startBeat * 1000 === clipEventStart
-		})
-	} else if (rangeLength > 0) {
-		return List()
-	} else {
-		throw createThisShouldntHappenError()
-	}
-}
-
 function startMainLoop() {
-	testGetNotes()
 
 	return logger.warn('disabled')
 
@@ -495,8 +368,6 @@ logger.log({lookAheadSec, lookAheadMs, lookAheadBeats})
 logger.log({lookAheadRangeSec, lookAheadRangeMs, lookAheadRangeBeats})
 
 // range should probably always be smaller than look ahead
-
-const createThisShouldntHappenError = () => new Error(`this shouldn't happen`)
 
 function mainLoop(time: number) {
 	if (stop) return

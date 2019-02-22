@@ -17,3 +17,5 @@ export function assertArrayHasNoUndefinedElements(array: any[]): void {
 		}
 	})
 }
+
+export const createThisShouldntHappenError = () => new Error(`this shouldn't happen`)
