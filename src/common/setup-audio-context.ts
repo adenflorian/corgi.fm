@@ -89,7 +89,8 @@ export function setupAudioContext(audioContext: AudioContext, preFx: GainNode, s
 		if (previousMasterVolume !== newVolume) {
 			// master.gain.value = state.options.masterVolume
 			masterGain.gain.value = Math.min(0.5, state.options.masterVolume)
-			Master.volume.value = Math.min(0, Math.log(state.options.masterVolume) * 10)
+			// console.log('Master: ', Master)
+			// Master.volume.value = Math.min(0, Math.log(state.options.masterVolume) * 10)
 			// console.log('state.options.masterVolume: ', state.options.masterVolume)
 			// console.log('tone.js master volume: ', Master.volume.value)
 			// limiter.threshold.value = Math.min(-12, state.options.masterVolume)
