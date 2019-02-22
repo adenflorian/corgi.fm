@@ -65,50 +65,56 @@ export type MidiEvents = MidiClip['events']
 
 export type MidiClip = ReturnType<typeof makeMidiClip>
 
+// TODO * 1000 is gonna fail eventually, need something more robust
 export class NoteScheduler {
 	constructor(
 		private readonly _clip: MidiClip,
 	) {}
 
 	// Maybe range should only ever be a simple number, divisible by 10 or something
-	public getNotes(start: number, end: number): MidiEvents {
-		const clipLength = this._clip.length
+	public getNotes(start: number, end?: number): MidiEvents {
+		if (end === undefined) end = start
+
+		this._validateArgs(start, end)
+
 		const rangeLength = end - start
 
-		if (rangeLength < 0) throw new Error(`start time must be <= end time`)
-		if (clipLength <= 0) throw new Error(`clipLength must be > 0`)
-		if (start < 0) throw new Error('start time must be >= 0')
-
-		const bigStart = start * 1000
-		const bigEnd = end * 1000
-		const bigClipLength = clipLength * 1000
-
 		if (rangeLength === 0) {
-			return this._checkSingleBeat(bigStart)
+			return this._checkSingleBeat(start)
 		}
 
 		if (rangeLength > 0) {
-			if (rangeLength <= clipLength) {
-				if (start === 0 || end <= clipLength) {
-					return this._clip.events.filter(x => {
-						return start <= x.startBeat && x.startBeat < end
-					})
-				} else {
-					return List()
-				}
-			} else {
-				return List() // TODO
-			}
+			return this._checkBeatRange(start, end)
 		}
 
 		throw createThisShouldntHappenError()
 	}
 
-	private _checkSingleBeat(bigStart: number) {
-		const clipEventStart = bigStart % (this._clip.length * 1000)
+	private _validateArgs(start: number, end: number) {
+		if (start > end) throw new Error(`start time must be <= end time`)
+		if (this._clip.length <= 0) throw new Error(`clipLength must be > 0`)
+		if (start < 0) throw new Error('start time must be >= 0')
+	}
+
+	private _checkSingleBeat(start: number): MidiEvents {
+		const clipEventStart = (start * 1000) % (this._clip.length * 1000)
 
 		return this._clip.events.filter(x => {
 			return x.startBeat * 1000 === clipEventStart
 		})
+	}
+
+	private _checkBeatRange(start: number, end: number): MidiEvents {
+		if (end - start <= this._clip.length) {
+			if (start === 0 || end <= this._clip.length) {
+				return this._clip.events.filter(x => {
+					return start <= x.startBeat && x.startBeat < end
+				})
+			} else {
+				return List()
+			}
+		} else {
+			return List() // TODO
+		}
 	}
 }

@@ -49,32 +49,32 @@ describe.only('note-scheduler', () => {
 			[
 				{
 					name: '0 range - 0.00',
-					start: 0.00, end: 0.00,
+					start: 0.00,
 					expected: [event0],
 				},
 				{
 					name: '0 range - 0.25',
-					start: 0.25, end: 0.25,
+					start: 0.25,
 					expected: [event1],
 				},
 				{
 					name: '0 range - 1.00',
-					start: 1.00, end: 1.00,
+					start: 1.00,
 					expected: [event2],
 				},
 				{
 					name: '0 range - 2.00',
-					start: 2.00, end: 2.00,
+					start: 2.00,
 					expected: [event0],
 				},
 				{
 					name: '0 range - 3.00',
-					start: 3.00, end: 3.00,
+					start: 3.00,
 					expected: [event2],
 				},
 				{
 					name: '0 range - 3.99',
-					start: 3.99, end: 3.99,
+					start: 3.99,
 					expected: [event4],
 				},
 
