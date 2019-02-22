@@ -12,6 +12,7 @@
     "lint": "eslint . && tslint src/client/**/*.ts* --project src/client/tsconfig.json && tslint src/server/**/*.ts* --project src/server/tsconfig.json && tslint src/common/**/*.ts* --project src/common/tsconfig.json ",
     "test": "yarn test-client && yarn test-server && yarn test-common",
     "test-client": "cross-env TS_NODE_PROJECT=\"src/client/tsconfig.json\" mocha --opts src/client/mocha.opts",
+    "tdd-client": "cross-env TS_NODE_PROJECT=\"src/client/tsconfig.json\" mocha --opts src/client/mocha.opts --watch --watch-extensions ts",
     "test-server": "cross-env TS_NODE_PROJECT=\"src/server/tsconfig.json\" mocha --opts src/server/mocha.opts",
     "test-common": "cross-env TS_NODE_PROJECT=\"src/common/tsconfig.json\" mocha --opts src/common/mocha.opts",
     "test-debug": "mocha --inspect --opts src/mocha.opts",
@@ -29,7 +30,6 @@
     "setup-prod-server": "bash scripts/setup-prod-server.sh"
   },
   "dependencies": {
-    "@types/victor": "^1.1.0",
     "adsr": "^1.0.1",
     "animal-id": "^0.0.1",
     "autoprefixer": "^9.4.2",
@@ -85,6 +85,7 @@
     "@types/socket.io-client": "^1.4.32",
     "@types/tone": "https://github.com/Tonejs/TypeScript.git",
     "@types/uuid": "^3.4.4",
+    "@types/victor": "^1.1.0",
     "chai": "^4.1.2",
     "concurrently": "^3.5.1",
     "cross-env": "^5.1.6",
