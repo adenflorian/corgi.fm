@@ -1,5 +1,6 @@
 import {List, Record} from 'immutable'
 import {createThisShouldntHappenError} from '../common/common-utils'
+import {logger} from '../common/logger'
 
 /*
 looping is hard
@@ -65,6 +66,17 @@ export class Range {
 	public get length() {
 		return this.end - this.start
 	}
+
+	public normalize(max: number) {
+		// return new Range(
+		// 	this.start % max,
+		// 	this.end % max,
+		// )
+		return new Range(
+			((this.start * 1000) % (max * 1000) / 1000),
+			((this.end * 1000) % (max * 1000) / 1000),
+		)
+	}
 }
 
 export interface MidiEvent {
@@ -110,6 +122,7 @@ export class NoteScheduler {
 	}
 
 	private _checkSingleBeat(start: number): MidiEvents {
+		logger.log('_checkSingleBeat')
 		const clipEventStart = (start * 1000) % (this._clip.length * 1000)
 
 		return this._clip.events.filter(x => {
@@ -118,25 +131,30 @@ export class NoteScheduler {
 	}
 
 	private _checkBeatRange(range: Range): MidiEvents {
-		const rangeIsWithinClipBounds = range.length <= this._clip.length
-			&& (range.start === 0 || range.end <= this._clip.length)
-
-		if (rangeIsWithinClipBounds) {
+		if (this._rangeIsWithinBounds(range)) {
 			return this._checkWithinClipBounds(range)
 		} else {
 			return this._checkCrossingClipBounds(range)
 		}
 	}
 
+	private _rangeIsWithinBounds(range: Range) {
+		// if (range.length <= this._clip.length) {
+		// 	const normalizedRange =
+		// }
+		return range.length <= this._clip.length
+			&& (range.start === 0 || range.end <= this._clip.length)
+	}
+
 	private _checkWithinClipBounds({start, end}: Range): MidiEvents {
+		logger.log('_checkWithinClipBounds')
 		return this._clip.events.filter(x => {
 			return start <= x.startBeat && x.startBeat < end
 		})
 	}
 
 	private _checkCrossingClipBounds({start, end}: Range): MidiEvents {
-		return this._clip.events.filter(x => {
-			return start <= x.startBeat && x.startBeat < end
-		})
+		logger.log('_checkCrossingClipBounds')
+		return List()
 	}
 }

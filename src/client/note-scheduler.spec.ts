@@ -30,6 +30,15 @@ type Tests = Array<{
 }>
 
 describe.only('note-scheduler', () => {
+	describe('Range', () => {
+		describe('normalize', () => {
+			it('should work', () => {
+				const normalizedRange = new Range(3.99, 4.647).normalize(2)
+				expect(normalizedRange.start).to.equal(1.99)
+				expect(normalizedRange.end).to.equal(0.647)
+			})
+		})
+	})
 	describe('invalid inputs', () => {
 		it('should fail when start time is negative', () => {
 			expect(() => {
@@ -127,6 +136,17 @@ describe.only('note-scheduler', () => {
 						{startBeat: 1.99, note: 72},
 					],
 				},
+				// {
+				// 	name: 'exact length, 1st loop',
+				// 	start: 2.00, end: 4.00,
+				// 	expected: [
+				// 		{startBeat: 0.0, note: 60},
+				// 		{startBeat: 0.25, note: 64},
+				// 		{startBeat: 1.0, note: 67},
+				// 		{startBeat: 1.5, note: 71},
+				// 		{startBeat: 1.99, note: 72},
+				// 	],
+				// },
 				// {
 				// 	name: 'exact length, start halfway',
 				// 	start: 1.00, end: 3.00,
