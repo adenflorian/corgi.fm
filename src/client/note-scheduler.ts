@@ -78,82 +78,75 @@ export function applyBPMToEvents(events: MidiGlobalClipEvents, bpm: number) {
 	return events.map(applyBPMMapper(bpm))
 }
 
-export class NoteScheduler {
-	constructor(
-		private readonly _clip: MidiClip,
-	) {
-		if (this._clip.length <= 0) throw new Error(`clipLength must be > 0`)
+// Maybe range should only ever be a simple number, divisible by 10 or something
+/** Must apply BPM on result */
+export function getNotes(clip: MidiClip, range: Range, offset = 0): MidiGlobalClipEvents {
+	logger.trace('getNotes')
+	if (range.length === 0) {
+		return _checkSingleBeat(range.normalize(clip.length), offset)
 	}
 
-	// Maybe range should only ever be a simple number, divisible by 10 or something
-	/** Must apply BPM on result */
-	public getNotes(range: Range, offset = 0): MidiGlobalClipEvents {
-		logger.trace('getNotes')
-		if (range.length === 0) {
-			return this._checkSingleBeat(range.normalize(this._clip.length), offset)
-		}
-
-		if (range.length > 0) {
-			return this._checkBeatRange(range, offset)
-		}
-
-		throw createThisShouldntHappenError()
+	if (range.length > 0) {
+		return _checkBeatRange(range, offset)
 	}
 
-	private _checkSingleBeat({start}: Range, offset: number): MidiGlobalClipEvents {
+	throw createThisShouldntHappenError()
+
+	function _checkSingleBeat({start}: Range, _offset: number): MidiGlobalClipEvents {
 		logger.trace('_checkSingleBeat')
 
-		return this._clip.events.filter(x => {
+		return clip.events.filter(x => {
 			return x.startBeat === start
 		})
-			.map(x => ({note: x.note, startTime: 0 + offset}))
+			.map(x => ({note: x.note, startTime: 0 + _offset}))
 	}
 
-	private _checkBeatRange(range: Range, offset: number): MidiGlobalClipEvents {
-		if (this._rangeIsWithinBounds(range)) {
-			return this._checkWithinClipBounds(range.normalize(this._clip.length), offset)
+	function _checkBeatRange(_range: Range, _offset: number): MidiGlobalClipEvents {
+		if (_rangeIsWithinBounds(_range)) {
+			return _checkWithinClipBounds(_range.normalize(clip.length), _offset)
 		} else {
-			return this._checkCrossingClipBounds(range.normalize(this._clip.length), offset)
+			return _checkCrossingClipBounds(_range.normalize(clip.length), _offset)
 		}
 	}
 
-	private _rangeIsWithinBounds(range: Range) {
-		if (range.length <= this._clip.length) {
-			const {start, end} = range.normalize(this._clip.length)
+	function _rangeIsWithinBounds(_range: Range) {
+		if (_range.length <= clip.length) {
+			const {start, end} = _range.normalize(clip.length)
 
-			return 0 <= start && end <= this._clip.length
+			return 0 <= start && end <= clip.length
 		} else {
 			return false
 		}
 	}
 
-	private _checkWithinClipBounds({start, end}: Range, offset: number): MidiGlobalClipEvents {
+	function _checkWithinClipBounds({start, end}: Range, _offset: number): MidiGlobalClipEvents {
 		logger.trace('_checkWithinClipBounds')
 
-		return this._clip.events.filter(x => {
+		return clip.events.filter(x => {
 			return start <= x.startBeat && x.startBeat < end
 		})
-			.map(x => ({note: x.note, startTime: x.startBeat - start + offset}))
+			.map(x => ({note: x.note, startTime: x.startBeat - start + _offset}))
 	}
 
-	private _checkCrossingClipBounds(range: Range, offset: number): MidiGlobalClipEvents {
+	function _checkCrossingClipBounds(_range: Range, _offset: number): MidiGlobalClipEvents {
 		logger.trace('_checkCrossingClipBounds')
 
-		const newLength = this._clip.length - range.start
-		const newEnd = range.start + newLength
-		const excess = range.end - newEnd
+		const newLength = clip.length - _range.start
+		const newEnd = _range.start + newLength
+		const excess = _range.end - newEnd
 
-		const events = this._checkWithinClipBounds(
-			new Range(range.start, newLength),
-			offset,
+		const events = _checkWithinClipBounds(
+			new Range(_range.start, newLength),
+			_offset,
 		)
 
 		if (excess === 0) {
 			return events
 		} else {
-			return events.concat(this.getNotes(
+			return events.concat(getNotes(
+				clip,
 				new Range(0, excess),
-				offset + this._clip.length - range.start,
+				_offset + clip.length - _range.start,
 			))
 		}
 	}

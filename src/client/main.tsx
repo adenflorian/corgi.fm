@@ -9,6 +9,7 @@ import {setupInputEventListeners} from './input-events'
 import {setupInstrumentManager} from './instrument-manager'
 import {isLocalDevClient, logClientEnv} from './is-prod-client'
 import {loadExperiment} from './main-experiment'
+import {startNoteScanner} from './note-scanner'
 import {renderApp, renderOther} from './react-main'
 import {setupMidiSupport} from './setup-midi-support'
 import {SamplesManager} from './WebAudio/SamplesManager'
@@ -74,6 +75,8 @@ async function setupAsync() {
 	renderApp(store)
 
 	startFpsLoop()
+
+	startNoteScanner(store)
 
 	if (module.hot) {
 		module.hot.dispose(() => {

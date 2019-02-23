@@ -1,4 +1,4 @@
-import {AnyAction, combineReducers} from 'redux'
+import {AnyAction, combineReducers, Store} from 'redux'
 import {StateType} from 'typesafe-actions'
 import {
 	audioReducer, clientsReducer, optionsReducer, roomReducers,
@@ -9,6 +9,8 @@ import {BROADCASTER_ACTION} from './redux-utils'
 export type IClientAppState = StateType<ReturnType<typeof getClientReducers>>
 
 export type IClientRoomState = StateType<typeof roomReducers>
+
+export type ClientStore = Store<IClientAppState>
 
 export function getClientReducers() {
 	return combineReducers(Object.freeze({

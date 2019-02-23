@@ -39,6 +39,11 @@ const stuffMaps: {[key: string]: StuffMap} = Object.freeze({
 	[ConnectionNodeType.simpleReverb]: new StuffMap(),
 })
 
+/** please don't mutate */
+export function getInstruments() {
+	return stuffMaps
+}
+
 let previousState: IClientAppState | undefined
 
 export const setupInstrumentManager =

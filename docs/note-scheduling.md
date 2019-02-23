@@ -1,3 +1,12 @@
+
+# Hooking up new note scheduler
+currently, the main trigger for notes to be played is redux store updates
+I want the trigger to be RAF
+
+
+
+
+# Scratch
 looping is hard
 i would like a way to abstract away the fact that it loops from as much of this logic as possible
 i got looping kind of working, but its not perfect and has edge cases that fail

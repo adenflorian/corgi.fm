@@ -296,6 +296,9 @@ export const selectAllGridSequencerIds = createSelector(
 export const selectGridSequencer = (state: IClientRoomState, id: string) =>
 	selectAllGridSequencers(state)[id] || GridSequencerState.dummy
 
+export const selectGridSequencerEvents = (state: IClientRoomState, id: string) =>
+	selectGridSequencer(state, id).events
+
 export const selectGridSequencerIsActive = (state: IClientRoomState, id: string) =>
 	selectGridSequencer(state, id).isPlaying
 
