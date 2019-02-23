@@ -81,19 +81,36 @@ export class Range {
 }
 
 export interface MidiEvent {
-	startBeat: number,
 	note: number
+}
+
+export interface MidiClipEvent extends MidiEvent {
+	startBeat: number
 }
 
 export const makeMidiClip = Record({
 	length: 4,
 	loop: true,
-	events: List<MidiEvent>(),
+	events: List<MidiClipEvent>(),
 })
 
-export type MidiEvents = MidiClip['events']
-
 export type MidiClip = ReturnType<typeof makeMidiClip>
+
+export type MidiClipEvents = MidiClip['events']
+
+export interface MidiGlobalClipEvent extends MidiEvent {
+	startTime: number
+}
+
+export const makeMidiGlobalClip = Record({
+	length: 4,
+	loop: true,
+	events: List<MidiGlobalClipEvent>(),
+})
+
+export type MidiGlobalClip = ReturnType<typeof makeMidiGlobalClip>
+
+export type MidiGlobalClipEvents = MidiGlobalClip['events']
 
 // TODO * 1000 is gonna fail eventually, need something more robust
 export class NoteScheduler {
@@ -104,36 +121,37 @@ export class NoteScheduler {
 	}
 
 	// Maybe range should only ever be a simple number, divisible by 10 or something
-	public getNotes(range: Range): MidiEvents {
+	public getNotes(range: Range, offset = 0): MidiGlobalClipEvents {
 		// logger.log('getNotes')
 		// logger.log('range.start: ', range.start)
 		// logger.log('range.end: ', range.end)
 		// logger.log('range.length: ', range.length)
 		if (range.length === 0) {
-			return this._checkSingleBeat(range.start)
+			return this._checkSingleBeat(range.start, offset)
 		}
 
 		if (range.length > 0) {
-			return this._checkBeatRange(range)
+			return this._checkBeatRange(range, offset)
 		}
 
 		throw createThisShouldntHappenError()
 	}
 
-	private _checkSingleBeat(start: number): MidiEvents {
+	private _checkSingleBeat(start: number, offset: number): MidiGlobalClipEvents {
 		logger.log('_checkSingleBeat')
-		const clipEventStart = (start * 1000) % (this._clip.length * 1000)
+		const clipEventStart = ((start * 1000) % (this._clip.length * 1000)) / 1000
 
 		return this._clip.events.filter(x => {
-			return x.startBeat * 1000 === clipEventStart
+			return x.startBeat === clipEventStart
 		})
+			.map(x => ({note: x.note, startTime: 0 + offset}))
 	}
 
-	private _checkBeatRange(range: Range): MidiEvents {
+	private _checkBeatRange(range: Range, offset: number): MidiGlobalClipEvents {
 		if (this._rangeIsWithinBounds(range)) {
-			return this._checkWithinClipBounds(range.normalize(this._clip.length))
+			return this._checkWithinClipBounds(range.normalize(this._clip.length), offset)
 		} else {
-			return this._checkCrossingClipBounds(range.normalize(this._clip.length))
+			return this._checkCrossingClipBounds(range.normalize(this._clip.length), offset)
 		}
 	}
 
@@ -145,21 +163,20 @@ export class NoteScheduler {
 		} else {
 			return false
 		}
-		// return range.length <= this._clip.length
-		// 	&& (range.start === 0 || range.end <= this._clip.length)
 	}
 
-	private _checkWithinClipBounds({start, end}: Range): MidiEvents {
+	private _checkWithinClipBounds({start, end}: Range, offset: number): MidiGlobalClipEvents {
 		logger.log('_checkWithinClipBounds')
 		return this._clip.events.filter(x => {
 			return start <= x.startBeat && x.startBeat < end
 		})
+			.map(x => ({note: x.note, startTime: x.startBeat - start + offset}))
 	}
 
-	private _checkCrossingClipBounds(range: Range): MidiEvents {
+	private _checkCrossingClipBounds(range: Range, offset: number): MidiGlobalClipEvents {
 		logger.log('_checkCrossingClipBounds')
-		const length = this._clip.length - range.start
-		const newEnd = range.start + length
+		const newLength = this._clip.length - range.start
+		const newEnd = range.start + newLength
 		const excess = range.end - newEnd
 		// console.log('range.start: ', range.start)
 		// console.log('end: ', range.end)
@@ -168,14 +185,18 @@ export class NoteScheduler {
 		// console.log('newEnd: ', newEnd)
 		// console.log('excess: ', excess)
 
-		const events = this._clip.events.filter(x => {
-			return range.start <= x.startBeat && x.startBeat < newEnd
-		})
+		const events = this._checkWithinClipBounds(
+			new Range(range.start, newLength),
+			offset,
+		)
 
 		if (excess === 0) {
 			return events
 		} else {
-			return events.concat(this.getNotes(new Range(0, excess)))
+			return events.concat(this.getNotes(
+				new Range(0, excess),
+				offset + this._clip.length - range.start,
+			))
 		}
 
 		// it crosses bound

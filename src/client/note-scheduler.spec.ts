@@ -1,24 +1,17 @@
 import {expect} from 'chai'
 import {List} from 'immutable'
-import {makeMidiClip, MidiEvent, NoteScheduler, Range} from './note-scheduler'
-
-const event0 = {startBeat: 0.0, note: 60}
-const event1 = {startBeat: 0.25, note: 64}
-const event2 = {startBeat: 1.0, note: 67}
-const event3 = {startBeat: 1.5, note: 71}
-const event4 = {startBeat: 1.99, note: 72}
-const event5 = {startBeat: 2.0, note: 71}
+import {makeMidiClip, MidiGlobalClipEvent, NoteScheduler, Range} from './note-scheduler'
 
 const testClip = makeMidiClip({
 	length: 2,
 	loop: true,
 	events: List([
-		event0,
-		event1,
-		event2,
-		event3,
-		event4,
-		event5,
+		{startBeat: 0.0, note: 60},
+		{startBeat: 0.25, note: 64},
+		{startBeat: 1.0, note: 67},
+		{startBeat: 1.5, note: 71},
+		{startBeat: 1.99, note: 72},
+		{startBeat: 2.0, note: 71},
 	]),
 })
 
@@ -26,7 +19,7 @@ type Tests = Array<{
 	name: string,
 	start: number,
 	length: number,
-	expected: MidiEvent[],
+	expected: MidiGlobalClipEvent[],
 }>
 
 describe.only('note-scheduler', () => {
@@ -135,57 +128,57 @@ describe.only('note-scheduler', () => {
 				.to.throw(`clipLength must be > 0`)
 		})
 	})
-	describe('stuff', () => {
+	describe.only('stuff', () => {
 		(
 			[
 				{
 					name: '0 range - 0.00',
 					start: 0.00,
-					expected: [event0],
+					expected: [{startTime: 0.0, note: 60}],
 				},
 				{
 					name: '0 range - 0.25',
 					start: 0.25,
-					expected: [event1],
+					expected: [{startTime: 0.00, note: 64}],
 				},
 				{
 					name: '0 range - 1.00',
 					start: 1.00,
-					expected: [event2],
+					expected: [{startTime: 0.00, note: 67}],
 				},
 				{
 					name: '0 range - 2.00',
 					start: 2.00,
-					expected: [event0],
+					expected: [{startTime: 0.0, note: 60}],
 				},
 				{
 					name: '0 range - 3.00',
 					start: 3.00,
-					expected: [event2],
+					expected: [{startTime: 0.00, note: 67}],
 				},
 				{
 					name: '0 range - 3.99',
 					start: 3.99,
-					expected: [event4],
+					expected: [{startTime: 0.00, note: 72}],
 				},
 
 				// start 0 range < clip.length
 				{
 					name: 'start 0 range < clip.length - A',
 					start: 0.00, length: 0.01,
-					expected: [event0],
+					expected: [{startTime: 0.0, note: 60}],
 				},
 				{
 					name: 'start 0 range < clip.length - B',
 					start: 0.00, length: 0.25,
-					expected: [event0],
+					expected: [{startTime: 0.0, note: 60}],
 				},
 				{
 					name: 'start 0 range < clip.length - C',
 					start: 0.00, length: 0.250000001,
 					expected: [
-						{startBeat: 0.00, note: 60},
-						{startBeat: 0.25, note: 64},
+						{startTime: 0.00, note: 60},
+						{startTime: 0.25, note: 64},
 					],
 				},
 
@@ -193,97 +186,97 @@ describe.only('note-scheduler', () => {
 					name: 'exact length of clip',
 					start: 0.00, length: 2.00,
 					expected: [
-						{startBeat: 0.0, note: 60},
-						{startBeat: 0.25, note: 64},
-						{startBeat: 1.0, note: 67},
-						{startBeat: 1.5, note: 71},
-						{startBeat: 1.99, note: 72},
+						{startTime: 0.0, note: 60},
+						{startTime: 0.25, note: 64},
+						{startTime: 1.0, note: 67},
+						{startTime: 1.5, note: 71},
+						{startTime: 1.99, note: 72},
 					],
 				},
 				{
 					name: 'half length, start halfway',
 					start: 1.00, length: 1.00,
 					expected: [
-						{startBeat: 1.0, note: 67},
-						{startBeat: 1.5, note: 71},
-						{startBeat: 1.99, note: 72},
+						{startTime: 0.0, note: 67},
+						{startTime: 0.5, note: 71},
+						{startTime: 0.99, note: 72},
 					],
 				},
 				{
 					name: 'exact length, 1st loop',
 					start: 2.00, length: 2.00,
 					expected: [
-						{startBeat: 0.0, note: 60},
-						{startBeat: 0.25, note: 64},
-						{startBeat: 1.0, note: 67},
-						{startBeat: 1.5, note: 71},
-						{startBeat: 1.99, note: 72},
+						{startTime: 0.0, note: 60},
+						{startTime: 0.25, note: 64},
+						{startTime: 1.0, note: 67},
+						{startTime: 1.5, note: 71},
+						{startTime: 1.99, note: 72},
 					],
 				},
 				{
 					name: 'exact length, start halfway',
 					start: 1.00, length: 2.00,
 					expected: [
-						{startBeat: 1.0, note: 67},
-						{startBeat: 1.5, note: 71},
-						{startBeat: 1.99, note: 72},
-						{startBeat: 0.0, note: 60},
-						{startBeat: 0.25, note: 64},
+						{startTime: 0.0, note: 67},
+						{startTime: 0.5, note: 71},
+						{startTime: 0.99, note: 72},
+						{startTime: 1.0, note: 60},
+						{startTime: 1.25, note: 64},
 					],
 				},
 				{
 					name: 'twice length of clip',
 					start: 0.00, length: 4.00,
 					expected: [
-						{startBeat: 0.0, note: 60},
-						{startBeat: 0.25, note: 64},
-						{startBeat: 1.0, note: 67},
-						{startBeat: 1.5, note: 71},
-						{startBeat: 1.99, note: 72},
-						{startBeat: 0.0, note: 60},
-						{startBeat: 0.25, note: 64},
-						{startBeat: 1.0, note: 67},
-						{startBeat: 1.5, note: 71},
-						{startBeat: 1.99, note: 72},
+						{startTime: 0.0, note: 60},
+						{startTime: 0.25, note: 64},
+						{startTime: 1.0, note: 67},
+						{startTime: 1.5, note: 71},
+						{startTime: 1.99, note: 72},
+						{startTime: 2.0, note: 60},
+						{startTime: 2.25, note: 64},
+						{startTime: 3.0, note: 67},
+						{startTime: 3.5, note: 71},
+						{startTime: 3.99, note: 72},
 					],
 				},
 				{
 					name: 'thrice length of clip',
 					start: 0.00, length: 6.00,
 					expected: [
-						{startBeat: 0.0, note: 60},
-						{startBeat: 0.25, note: 64},
-						{startBeat: 1.0, note: 67},
-						{startBeat: 1.5, note: 71},
-						{startBeat: 1.99, note: 72},
-						{startBeat: 0.0, note: 60},
-						{startBeat: 0.25, note: 64},
-						{startBeat: 1.0, note: 67},
-						{startBeat: 1.5, note: 71},
-						{startBeat: 1.99, note: 72},
-						{startBeat: 0.0, note: 60},
-						{startBeat: 0.25, note: 64},
-						{startBeat: 1.0, note: 67},
-						{startBeat: 1.5, note: 71},
-						{startBeat: 1.99, note: 72},
+						{startTime: 0.0, note: 60},
+						{startTime: 0.25, note: 64},
+						{startTime: 1.0, note: 67},
+						{startTime: 1.5, note: 71},
+						{startTime: 1.99, note: 72},
+						{startTime: 2.0, note: 60},
+						{startTime: 2.25, note: 64},
+						{startTime: 3.0, note: 67},
+						{startTime: 3.5, note: 71},
+						{startTime: 3.99, note: 72},
+						{startTime: 4.0, note: 60},
+						{startTime: 4.25, note: 64},
+						{startTime: 5.0, note: 67},
+						{startTime: 5.5, note: 71},
+						{startTime: 5.99, note: 72},
 					],
 				},
 				{
 					name: 'thrice and a half length of clip',
 					start: 0.00, length: 5.00,
 					expected: [
-						{startBeat: 0.0, note: 60},
-						{startBeat: 0.25, note: 64},
-						{startBeat: 1.0, note: 67},
-						{startBeat: 1.5, note: 71},
-						{startBeat: 1.99, note: 72},
-						{startBeat: 0.0, note: 60},
-						{startBeat: 0.25, note: 64},
-						{startBeat: 1.0, note: 67},
-						{startBeat: 1.5, note: 71},
-						{startBeat: 1.99, note: 72},
-						{startBeat: 0.0, note: 60},
-						{startBeat: 0.25, note: 64},
+						{startTime: 0.0, note: 60},
+						{startTime: 0.25, note: 64},
+						{startTime: 1.0, note: 67},
+						{startTime: 1.5, note: 71},
+						{startTime: 1.99, note: 72},
+						{startTime: 2.0, note: 60},
+						{startTime: 2.25, note: 64},
+						{startTime: 3.0, note: 67},
+						{startTime: 3.5, note: 71},
+						{startTime: 3.99, note: 72},
+						{startTime: 4.0, note: 60},
+						{startTime: 4.25, note: 64},
 					],
 				},
 			] as Tests
