@@ -105,6 +105,10 @@ export class NoteScheduler {
 
 	// Maybe range should only ever be a simple number, divisible by 10 or something
 	public getNotes(range: Range): MidiEvents {
+		// logger.log('getNotes')
+		// logger.log('range.start: ', range.start)
+		// logger.log('range.end: ', range.end)
+		// logger.log('range.length: ', range.length)
 		if (range.length === 0) {
 			return this._checkSingleBeat(range.start)
 		}
@@ -129,7 +133,7 @@ export class NoteScheduler {
 		if (this._rangeIsWithinBounds(range)) {
 			return this._checkWithinClipBounds(range.normalize(this._clip.length))
 		} else {
-			return this._checkCrossingClipBounds(range)
+			return this._checkCrossingClipBounds(range.normalize(this._clip.length))
 		}
 	}
 
@@ -152,8 +156,41 @@ export class NoteScheduler {
 		})
 	}
 
-	private _checkCrossingClipBounds({start, end}: Range): MidiEvents {
+	private _checkCrossingClipBounds(range: Range): MidiEvents {
 		logger.log('_checkCrossingClipBounds')
-		return List()
+		const length = this._clip.length - range.start
+		const newEnd = range.start + length
+		const excess = range.end - newEnd
+		// console.log('range.start: ', range.start)
+		// console.log('end: ', range.end)
+		// console.log('this._clip.length: ', this._clip.length)
+		// console.log('length: ', length)
+		// console.log('newEnd: ', newEnd)
+		// console.log('excess: ', excess)
+
+		const events = this._clip.events.filter(x => {
+			return range.start <= x.startBeat && x.startBeat < newEnd
+		})
+
+		if (excess === 0) {
+			return events
+		} else {
+			return events.concat(this.getNotes(new Range(0, excess)))
+		}
+
+		// it crosses bound
+		// where is start going to be?
+		// is the range normalized?
+		// should it be?
+		// yes?
+		// might have to normalize each time it loops
+		// this will have some kind of loop or recursion
+		// might be useful to be able to debug here
+		// need to split into multiple normalized ranges,
+		//   then check each range against the notes
+		// now need to loop, while excess > 0
+
+		// start: 1.00, length: 30.00,
+		// start: 0.00, length: 29.00,
 	}
 }
