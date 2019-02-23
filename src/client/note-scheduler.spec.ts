@@ -23,7 +23,7 @@ type Tests = Array<{
 }>
 
 describe.only('note-scheduler', () => {
-	describe.only('bpm functions', () => {
+	describe('bpm functions', () => {
 		describe('applyBPM', () => {
 			[
 				{time: 0, bpm: 60, expected: 0},
@@ -204,7 +204,7 @@ describe.only('note-scheduler', () => {
 				.to.throw(`clipLength must be > 0`)
 		})
 	})
-	describe('stuff', () => {
+	describe.only('stuff', () => {
 		(
 			[
 				{
