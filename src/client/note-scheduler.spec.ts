@@ -1,6 +1,6 @@
 import {expect} from 'chai'
 import {List} from 'immutable'
-import {makeMidiClip, MidiGlobalClipEvent, NoteScheduler, Range} from './note-scheduler'
+import {applyBPM, applyBPMToEvents, makeMidiClip, MidiGlobalClipEvent, MidiGlobalClipEvents, NoteScheduler, Range} from './note-scheduler'
 
 const testClip = makeMidiClip({
 	length: 2,
@@ -23,6 +23,82 @@ type Tests = Array<{
 }>
 
 describe.only('note-scheduler', () => {
+	describe.only('bpm functions', () => {
+		describe('applyBPM', () => {
+			[
+				{time: 0, bpm: 60, expected: 0},
+				{time: 1, bpm: 60, expected: 1},
+				{time: 2, bpm: 60, expected: 2},
+				{time: 0, bpm: 30, expected: 0},
+				{time: 1, bpm: 30, expected: 2},
+				{time: 1, bpm: 120, expected: 0.5},
+				{time: 333333.333333, bpm: 30, expected: 666666.666666},
+				{time: 333333.333333, bpm: 120, expected: 166666.6666665},
+				{time: 1, bpm: 3, expected: 20},
+			]
+				.forEach(({time, bpm, expected}) => {
+					it(`time: ${time} | bpm: ${bpm}`, () => {
+						expect(applyBPM(time, bpm)).to.equal(expected)
+					})
+				})
+		})
+		describe('applyBPMToEvents', () => {
+			([
+				{
+					name: '60 bpm',
+					events: List<MidiGlobalClipEvent>([
+						{startTime: 0.0, note: 60},
+						{startTime: 0.25, note: 64},
+						{startTime: 1.0, note: 67},
+						{startTime: 1.5, note: 71},
+						{startTime: 1.99, note: 72},
+						{startTime: 2.0, note: 71},
+					]),
+					bpm: 60,
+					expected: List<MidiGlobalClipEvent>([
+						{startTime: 0.0, note: 60},
+						{startTime: 0.25, note: 64},
+						{startTime: 1.0, note: 67},
+						{startTime: 1.5, note: 71},
+						{startTime: 1.99, note: 72},
+						{startTime: 2.0, note: 71},
+					]),
+				},
+				{
+					name: '40 bpm',
+					events: List<MidiGlobalClipEvent>([
+						{startTime: 0.0, note: 60},
+						{startTime: 0.25, note: 64},
+						{startTime: 1.0, note: 67},
+						{startTime: 1.5, note: 71},
+						{startTime: 1.99, note: 72},
+						{startTime: 2.0, note: 71},
+					]),
+					bpm: 40,
+					expected: List<MidiGlobalClipEvent>([
+						{startTime: 0.0, note: 60},
+						{startTime: 0.375, note: 64},
+						{startTime: 1.5, note: 67},
+						{startTime: 2.25, note: 71},
+						{startTime: 2.985, note: 72},
+						{startTime: 3.0, note: 71},
+					]),
+				},
+			] as Array<{
+				name: string,
+				events: MidiGlobalClipEvents,
+				bpm: number,
+				expected: MidiGlobalClipEvents,
+			}>)
+				.forEach(({name, events, bpm, expected}) => {
+					it(`name: ${name}`, () => {
+						expect(
+							applyBPMToEvents(events, bpm).toArray(),
+						).to.deep.equal(expected.toArray())
+					})
+				})
+		})
+	})
 	describe('Range', () => {
 		describe('bad args', () => {
 			it('should throw when start too big', () => {
@@ -128,7 +204,7 @@ describe.only('note-scheduler', () => {
 				.to.throw(`clipLength must be > 0`)
 		})
 	})
-	describe.only('stuff', () => {
+	describe('stuff', () => {
 		(
 			[
 				{

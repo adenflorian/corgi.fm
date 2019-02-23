@@ -112,6 +112,21 @@ export type MidiGlobalClip = ReturnType<typeof makeMidiGlobalClip>
 
 export type MidiGlobalClipEvents = MidiGlobalClip['events']
 
+export const applyBPM = (beat: number, bpm: number) => {
+	return beat * (60 / bpm)
+}
+
+export const applyBPMMapper = (bpm: number) => (event: MidiGlobalClipEvent) => {
+	return {
+		...event,
+		startTime: applyBPM(event.startTime, bpm),
+	}
+}
+
+export function applyBPMToEvents(events: MidiGlobalClipEvents, bpm: number) {
+	return events.map(applyBPMMapper(bpm))
+}
+
 // TODO * 1000 is gonna fail eventually, need something more robust
 export class NoteScheduler {
 	constructor(
@@ -121,6 +136,7 @@ export class NoteScheduler {
 	}
 
 	// Maybe range should only ever be a simple number, divisible by 10 or something
+	/** Must apply BPM on result */
 	public getNotes(range: Range, offset = 0): MidiGlobalClipEvents {
 		// logger.log('getNotes')
 		// logger.log('range.start: ', range.start)
