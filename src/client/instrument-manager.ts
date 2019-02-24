@@ -47,7 +47,12 @@ export function getInstruments() {
 let previousState: IClientAppState | undefined
 
 export const setupInstrumentManager =
-	(store: Store<IClientAppState>, audioContext: AudioContext, preFx: GainNode) => {
+	(
+		store: Store<IClientAppState>,
+		audioContext: AudioContext,
+		preFx: GainNode,
+		isNewNoteScannerEnabled: boolean,
+	) => {
 
 		stuffMaps[ConnectionNodeType.audioOutput].set(
 			MASTER_AUDIO_OUTPUT_TARGET_ID,
@@ -183,7 +188,9 @@ export const setupInstrumentManager =
 
 					const sourceNotes = selectConnectionSourceNotesByTargetId(state.room, instrumentId)
 
-					// instrument.setMidiNotes(sourceNotes)
+					if (isNewNoteScannerEnabled === false) {
+						instrument.setMidiNotes(sourceNotes)
+					}
 
 					if (updateSpecificInstrument) updateSpecificInstrument(instrument, instrumentState)
 				})

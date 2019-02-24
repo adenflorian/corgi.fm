@@ -44,6 +44,8 @@ function start() {
 
 async function setupAsync() {
 
+	const isNewNoteScannerEnabled = window.location.pathname.replace('/', '') === 'scan'
+
 	// Chrome 1 - 68
 	const isChrome = () => !!window.chrome
 
@@ -70,13 +72,15 @@ async function setupAsync() {
 
 	setupWebsocketAndListeners(store)
 
-	setupInstrumentManager(store, audioContext, preFx)
+	setupInstrumentManager(store, audioContext, preFx, isNewNoteScannerEnabled)
 
 	renderApp(store)
 
 	startFpsLoop()
 
-	startNoteScanner(store, audioContext)
+	if (isNewNoteScannerEnabled) {
+		startNoteScanner(store, audioContext)
+	}
 
 	if (module.hot) {
 		module.hot.dispose(() => {

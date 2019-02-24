@@ -19,6 +19,7 @@ export class BasicSynthesizer extends Instrument<SynthVoices, SynthVoice> {
 
 		this._oscillatorType = options.oscillatorType
 
+		// this._voices = new SynthVoices(0, this._audioContext, this._panNode, options.oscillatorType)
 		this._voices = new SynthVoices(options.voiceCount, this._audioContext, this._panNode, options.oscillatorType)
 	}
 
@@ -83,7 +84,7 @@ class SynthVoice extends Voice {
 	private _fineTuning: number = 0
 	private _frequency: number = 0
 
-	constructor(audioContext: AudioContext, destination: AudioNode, oscType: ShamuOscillatorType) {
+	constructor(audioContext: AudioContext, destination: AudioNode, oscType: ShamuOscillatorType, forScheduling = false) {
 		super(audioContext, destination)
 
 		this._oscillatorType = oscType
@@ -93,7 +94,9 @@ class SynthVoice extends Voice {
 			SynthVoice._noiseBuffer = this._generateNoiseBuffer()
 		}
 
-		this._buildChain()
+		if (forScheduling === false) {
+			this._buildChain()
+		}
 	}
 
 	public playNote(note: number, attackTimeInSeconds: number) {
@@ -140,11 +143,14 @@ class SynthVoice extends Voice {
 
 	private _scheduleNormalNote(note: number, attackTimeInSeconds: number, delaySeconds: number, release: number): void {
 		// logger.log('synth scheduleNote delaySeconds: ' + delaySeconds + ' | note: ' + note)
+
+		const lifeLength = delaySeconds + attackTimeInSeconds + release
+
 		const oscA = this._audioContext.createOscillator()
 		oscA.type = this._oscillatorType as OscillatorType
 		oscA.detune.value = this._fineTuning
 		oscA.start(this._audioContext.currentTime + delaySeconds)
-		oscA.stop(this._audioContext.currentTime + delaySeconds + attackTimeInSeconds + release)
+		oscA.stop(this._audioContext.currentTime + lifeLength)
 		oscA.frequency.setValueAtTime(midiNoteToFrequency(note), this._audioContext.currentTime)
 
 		let gain: GainNode
@@ -164,6 +170,8 @@ class SynthVoice extends Voice {
 		oscA.connect(gain)
 			.connect(this._destination)
 	}
+
+	// private _releaseSch
 
 	private _playSynthNote(note: number) {
 		this._frequency = midiNoteToFrequency(note)
