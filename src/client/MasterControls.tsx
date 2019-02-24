@@ -31,6 +31,44 @@ interface IMasterControlsDispatchProps {
 export const MasterControls: React.FC<IMasterControlsProps & IMasterControlsReduxProps & IMasterControlsDispatchProps> =
 	React.memo(({onPlay, restart, onStop, setField, masterClockState, color}) => {
 
+		const knobs = <div className="knobs">
+			<Knob
+				label="bpm"
+				min={0}
+				max={999}
+				value={masterClockState.bpm}
+				onChange={(_, bpm) => setField({bpm})}
+			/>
+			<Knob
+				label="offset"
+				min={0}
+				max={10}
+				value={masterClockState.eventOffsetSeconds}
+				onChange={(_, eventOffsetSeconds) => setField({eventOffsetSeconds})}
+			/>
+			<Knob
+				label="window"
+				min={0}
+				max={10}
+				value={masterClockState.eventWindowSeconds}
+				onChange={(_, eventWindowSeconds) => setField({eventWindowSeconds})}
+			/>
+			<Knob
+				label="MRA"
+				min={0}
+				max={10}
+				value={masterClockState.maxReadAheadSeconds}
+				onChange={(_, maxReadAheadSeconds) => setField({maxReadAheadSeconds})}
+			/>
+			<Knob
+				label="MRW"
+				min={0}
+				max={10}
+				value={masterClockState.maxReadWindowSeconds}
+				onChange={(_, maxReadWindowSeconds) => setField({maxReadWindowSeconds})}
+			/>
+		</div>
+
 		return (
 			<Panel
 				id={MASTER_CLOCK_SOURCE_ID}
@@ -57,47 +95,8 @@ export const MasterControls: React.FC<IMasterControlsProps & IMasterControlsRedu
 						>
 							<Stop />
 						</span>
-
-						<Knob
-							label="bpm"
-							min={0}
-							max={999}
-							value={masterClockState.bpm}
-							onChange={(_, bpm) => setField({bpm})}
-						/>
-
-						<Knob
-							label="offset"
-							min={0}
-							max={10}
-							value={masterClockState.eventOffsetSeconds}
-							onChange={(_, eventOffsetSeconds) => setField({eventOffsetSeconds})}
-						/>
-
-						<Knob
-							label="window"
-							min={0}
-							max={10}
-							value={masterClockState.eventWindowSeconds}
-							onChange={(_, eventWindowSeconds) => setField({eventWindowSeconds})}
-						/>
-
-						<Knob
-							label="maxAhead"
-							min={0}
-							max={10}
-							value={masterClockState.maxReadAheadSeconds}
-							onChange={(_, maxReadAheadSeconds) => setField({maxReadAheadSeconds})}
-						/>
-
-						<Knob
-							label="maxReadWin"
-							min={0}
-							max={10}
-							value={masterClockState.maxReadWindowSeconds}
-							onChange={(_, maxReadWindowSeconds) => setField({maxReadWindowSeconds})}
-						/>
 					</div>
+					{knobs}
 				</div>
 			</Panel>
 		)

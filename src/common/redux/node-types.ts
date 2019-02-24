@@ -95,8 +95,8 @@ export const NodeInfoMap = Map({
 		}),
 		selectIsActive: selectGlobalClockIsPlaying,
 		selectIsSending: selectGlobalClockIsPlaying,
-		width: 128,
-		height: 80,
+		width: 256,
+		height: 128,
 		color: CssColor.blue,
 	}),
 })
