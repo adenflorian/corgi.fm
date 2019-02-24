@@ -36,10 +36,11 @@ export const MasterControls: React.FC<IMasterControlsProps & IMasterControlsRedu
 				label="bpm"
 				min={0}
 				max={999}
+				curve={2}
 				value={masterClockState.bpm}
 				onChange={(_, bpm) => setField({bpm})}
 			/>
-			<Knob
+			{/* <Knob
 				label="offset"
 				min={0}
 				max={10}
@@ -52,21 +53,22 @@ export const MasterControls: React.FC<IMasterControlsProps & IMasterControlsRedu
 				max={10}
 				value={masterClockState.eventWindowSeconds}
 				onChange={(_, eventWindowSeconds) => setField({eventWindowSeconds})}
-			/>
+			/> */}
 			<Knob
 				label="MRA"
 				min={0}
 				max={10}
+				curve={2}
 				value={masterClockState.maxReadAheadSeconds}
 				onChange={(_, maxReadAheadSeconds) => setField({maxReadAheadSeconds})}
 			/>
-			<Knob
+			{/* <Knob
 				label="MRW"
 				min={0}
 				max={10}
 				value={masterClockState.maxReadWindowSeconds}
 				onChange={(_, maxReadWindowSeconds) => setField({maxReadWindowSeconds})}
-			/>
+			/> */}
 		</div>
 
 		return (
