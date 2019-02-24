@@ -99,6 +99,7 @@
     "ts-node": "^6.1.0",
     "ts-node-dev": "^1.0.0-pre.26",
     "tslint": "^5.12.1",
+    "tslint-immutable": "^5.3.0",
     "typescript": "^3.3.1",
     "typescript-tslint-plugin": "^0.3.1"
   }

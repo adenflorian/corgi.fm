@@ -14,7 +14,6 @@ export class BasicToneSynth extends AudioNodeWrapper implements IDisposable, IIn
 		super(options)
 
 		// this._synth.volume
-		console.log('ASDASDASD: ', this._synth)
 		this._synth.envelope.attack = 0.01
 		this._synth.envelope.decay = 0.00
 		this._synth.envelope.sustain = 1
