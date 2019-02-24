@@ -5,7 +5,7 @@ import {
 	ClientStore, IClientRoomState, ISequencerEvent,
 	selectAllGridSequencers, selectGlobalClockState,
 } from '../common/redux'
-import {longDemoMidiClip, postalClipB} from './clips'
+import {longDemoMidiClip, postalClipB, shortDemoMidiClip} from './clips'
 import {getInstruments} from './instrument-manager'
 import {getEvents, makeMidiClip, MidiClip, MidiClipEvents, Range} from './note-scheduler'
 import {BasicSynthesizer} from './WebAudio/BasicSynthesizer'
@@ -20,16 +20,7 @@ export function startNoteScanner(store: ClientStore, audioContext: AudioContext)
 	requestAnimationFrame(mainLoop)
 }
 
-let _isPlaying = false
-let _cursorBeats = 0
 let stop = false
-let startTimeInSeconds = 0
-
-if (module.hot) {
-	module.hot.dispose(() => {
-		stop = true
-	})
-}
 
 function mainLoop(msSinceAppStart: number) {
 	// logger.log('im a loop: ', msSinceAppStart)
@@ -40,7 +31,19 @@ function mainLoop(msSinceAppStart: number) {
 	requestAnimationFrame(mainLoop)
 }
 
-const clip = longDemoMidiClip
+if (module.hot) {
+	module.hot.dispose(() => {
+		stop = true
+	})
+}
+
+const clip = shortDemoMidiClip
+
+let _isPlaying = false
+let _cursorBeats = 0
+let startTimeInSeconds = 0
+let currentSongTimeBeats = 0
+let lastAudioContextTime = 0
 
 // TODO Where to apply actualBPM
 
@@ -58,14 +61,22 @@ function foo() {
 		logger.log('[note-scanner] isPlaying: ', isPlaying)
 		if (isPlaying) {
 			startTimeInSeconds = _audioContext.currentTime
+			currentSongTimeBeats = 0
 			_cursorBeats = 0
+			lastAudioContextTime = 0
 			logger.log('[note-scanner] startTimeInSeconds: ', startTimeInSeconds)
 		}
 	}
 
 	if (isPlaying === false) return
 
-	const currentSongTimeBeats = (_audioContext.currentTime - startTimeInSeconds) * (actualBPM / 60)
+	const deltaTimeSeconds = _audioContext.currentTime - lastAudioContextTime
+
+	lastAudioContextTime = _audioContext.currentTime
+
+	const deltaBeats = deltaTimeSeconds * (actualBPM / 60)
+
+	currentSongTimeBeats += deltaBeats
 
 	const maxReadAheadBeats = maxReadAheadSeconds * (actualBPM / 60)
 
