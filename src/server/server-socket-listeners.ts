@@ -271,6 +271,8 @@ function syncState(newSocket: Socket, roomState: IClientRoomState, serverState: 
 	})
 }
 
+// TODO Will break once supporting multiple rooms at once
 function getRoom(socket: Socket) {
-	return Object.keys(socket.rooms)[1]
+	const realRooms = Object.keys(socket.rooms).filter(x => x !== socket.id)
+	return realRooms[0]
 }
