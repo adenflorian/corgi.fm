@@ -1,11 +1,11 @@
-import {ConnectionNodeType} from '../common/common-types'
+import {ConnectionNodeType, MidiRange, notesToNote} from '../common/common-types'
 import {logger} from '../common/logger'
 import {
 	ClientStore, selectGlobalClockState,
 } from '../common/redux'
 import {shortDemoMidiClip} from './clips'
 import {getInstruments} from './instrument-manager'
-import {getEvents, Range} from './note-scheduler'
+import {getEvents} from './note-scheduler'
 import {BasicSynthesizer} from './WebAudio/BasicSynthesizer'
 
 let _store: ClientStore
@@ -84,7 +84,7 @@ function scheduleNotes() {
 	// distance from currentSongTime to where the cursor just started reading events from
 	const offset = _cursorBeats - currentSongTimeBeats
 
-	const readRangeBeats = new Range(_cursorBeats, beatsToRead)
+	const readRangeBeats = new MidiRange(_cursorBeats, beatsToRead)
 
 	const eventsToSchedule = getEvents(clip, readRangeBeats)
 
@@ -117,8 +117,10 @@ function scheduleNotes() {
 			// logger.log('offset: ', offset)
 			// logger.log('event.startTime: ', event.startTime)
 			const delaySeconds = ((offset + event.startTime) * (60 / actualBPM))
-			synth.scheduleNote(event.note, delaySeconds)
-			synth.scheduleRelease(event.note, delaySeconds, delaySeconds + 0.1)
+			let actualNote = notesToNote(event.notes)
+			console.log('actualNote: ' + actualNote + ' | delaySeconds: ' + delaySeconds)
+			synth.scheduleNote(actualNote, delaySeconds)
+			synth.scheduleRelease(actualNote, delaySeconds, delaySeconds + 0.1)
 		})
 	})
 

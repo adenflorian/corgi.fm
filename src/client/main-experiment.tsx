@@ -1,10 +1,10 @@
 import {List} from 'immutable'
 import React = require('react')
 import ReactDOM = require('react-dom')
+import {makeMidiClip, MidiClip, notesToNote, makeMidiClipEvent} from '../common/common-types'
 import {createThisShouldntHappenError} from '../common/common-utils'
 import {logger} from '../common/logger'
-import {IMidiNote} from '../common/MidiNote'
-import {makeMidiClip, MidiClip} from './note-scheduler'
+import {IMidiNote, IMidiNotes} from '../common/MidiNote'
 import {midiNoteToFrequency} from './WebAudio/music-functions'
 
 let ctx: AudioContext
@@ -59,218 +59,218 @@ const longDemoMidiClip = makeMidiClip({
 	length: 2 * 1000,
 	loop: false,
 	events: List([
-		{
+		makeMidiClipEvent({
 			startBeat: 0,
 			note: 60,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 1 / 4 * 1000,
 			note: 64,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 2 / 4 * 1000,
 			note: 67,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 3 / 4 * 1000,
 			note: 71,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 4 / 4 * 1000,
 			note: 72,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 5 / 4 * 1000,
 			note: 71,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 6 / 4 * 1000,
 			note: 67,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 7 / 4 * 1000,
 			note: 64,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 0 + 2000,
 			note: 60,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 1 / 8 * 1000 + 2000,
 			note: 64,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 2 / 8 * 1000 + 2000,
 			note: 67,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 3 / 8 * 1000 + 2000,
 			note: 71,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 4 / 8 * 1000 + 2000,
 			note: 72,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 5 / 8 * 1000 + 2000,
 			note: 71,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 6 / 8 * 1000 + 2000,
 			note: 67,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 7 / 8 * 1000 + 2000,
 			note: 64,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 0 + 3000,
 			note: 60,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 1 / 8 * 1000 + 3000,
 			note: 64,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 2 / 8 * 1000 + 3000,
 			note: 67,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 3 / 8 * 1000 + 3000,
 			note: 71,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 4 / 8 * 1000 + 3000,
 			note: 72,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 5 / 8 * 1000 + 3000,
 			note: 71,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 6 / 8 * 1000 + 3000,
 			note: 67,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 7 / 8 * 1000 + 3000,
 			note: 64,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 0 / 16 * 1000 + 4000,
 			note: 60,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 1 / 16 * 1000 + 4000,
 			note: 64,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 2 / 16 * 1000 + 4000,
 			note: 67,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 3 / 16 * 1000 + 4000,
 			note: 71,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 4 / 16 * 1000 + 4000,
 			note: 72,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 5 / 16 * 1000 + 4000,
 			note: 71,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 6 / 16 * 1000 + 4000,
 			note: 67,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 7 / 16 * 1000 + 4000,
 			note: 64,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 8 / 16 * 1000 + 4000,
 			note: 60,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 9 / 16 * 1000 + 4000,
 			note: 64,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 10 / 16 * 1000 + 4000,
 			note: 67,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 11 / 16 * 1000 + 4000,
 			note: 71,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 12 / 16 * 1000 + 4000,
 			note: 72,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 13 / 16 * 1000 + 4000,
 			note: 71,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 14 / 16 * 1000 + 4000,
 			note: 67,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 15 / 16 * 1000 + 4000,
 			note: 64,
-		},
+		}),
 
-		{
+		makeMidiClipEvent({
 			startBeat: 0 / 3 * 1000 + 6000,
 			note: 71,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 0 / 3 * 1000 + 6000,
 			note: 67,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 0 / 3 * 1000 + 6000,
 			note: 64,
-		},
+		}),
 
-		{
+		makeMidiClipEvent({
 			startBeat: 1 / 3 * 1000 + 6000,
 			note: 71,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 1 / 3 * 1000 + 6000,
 			note: 67,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 1 / 3 * 1000 + 6000,
 			note: 64,
-		},
+		}),
 
-		{
+		makeMidiClipEvent({
 			startBeat: 2 / 3 * 1000 + 6000,
 			note: 71,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 2 / 3 * 1000 + 6000,
 			note: 67,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 2 / 3 * 1000 + 6000,
 			note: 64,
-		},
+		}),
 
-		{
+		makeMidiClipEvent({
 			startBeat: 0 / 3 * 1000 + 7000,
 			note: 74,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 0 / 3 * 1000 + 7000,
 			note: 70,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 0 / 3 * 1000 + 7000,
 			note: 67,
-		},
+		}),
 	]),
 })
 
@@ -278,38 +278,38 @@ const shortLoopedMidiClip = makeMidiClip({
 	length: 2 * 1000,
 	loop: true,
 	events: List([
-		{
+		makeMidiClipEvent({
 			startBeat: 0,
 			note: 60,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 1 / 4 * 1000,
 			note: 64,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 2 / 4 * 1000,
 			note: 67,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 3 / 4 * 1000,
 			note: 71,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 4 / 4 * 1000,
 			note: 72,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 5 / 4 * 1000,
 			note: 71,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 6 / 4 * 1000,
 			note: 67,
-		},
-		{
+		}),
+		makeMidiClipEvent({
 			startBeat: 7 / 4 * 1000,
 			note: 64,
-		},
+		}),
 	]),
 })
 
@@ -338,7 +338,7 @@ function startMainLoop() {
 
 	logger.log(`START | currentBeat: ${currentBeat} | checking beats: ${startRangeBeat} <= beat < ${endRangeBeat} `)
 
-	midiClip.events.forEach(({startBeat, note}, key) => {
+	midiClip.events.forEach(({startBeat, notes: note}, key) => {
 		if (startBeat >= startRangeBeat && startBeat < endRangeBeat) {
 			const delay = getDelayMs(startBeat, currentBeat, midiClip.length, bpm)
 			logger.log(`  PLAY NOTE0 ${key}: `, {currentBeat, lastBeatChecked, note, delay, startBeat})
@@ -396,7 +396,7 @@ function mainLoop(time: number) {
 
 			if (startRangeBeat === midiClip.length) throw createThisShouldntHappenError()
 
-			midiClip.events.forEach(({startBeat, note}, key) => {
+			midiClip.events.forEach(({startBeat, notes: note}, key) => {
 				if (startRangeBeat <= startBeat && startBeat < endRangeBeat) {
 					const delay = getDelayMs(startBeat, currentBeat, midiClip.length, bpm)
 					logger.log(`  PLAY NOTE1 ${key}: `, {currentBeat, lastBeatChecked, note, delay, startBeat})
@@ -416,7 +416,7 @@ function mainLoop(time: number) {
 
 			logger.log(`LOOP | currentBeat: ${currentBeat} | checking beats: ${startRangeBeat1} <= beat < ${endRangeBeat1} &  ${startRangeBeat2} <= beat < ${endRangeBeat2}`)
 
-			midiClip.events.forEach(({startBeat, note}, key) => {
+			midiClip.events.forEach(({startBeat, notes: note}, key) => {
 				if (startRangeBeat1 <= startBeat && startBeat < endRangeBeat1) {
 					const delay = getDelayMs(startBeat, currentBeat, midiClip.length, bpm)
 					logger.log(`  PLAY NOTE2 ${key}: `, {currentBeat, lastBeatChecked, note, delay, startBeat})
@@ -427,7 +427,7 @@ function mainLoop(time: number) {
 
 			// TODO Deal with loop which is smaller than look ahead range
 
-			midiClip.events.forEach(({startBeat, note}, key) => {
+			midiClip.events.forEach(({startBeat, notes: note}, key) => {
 				if (startRangeBeat2 <= startBeat && startBeat < endRangeBeat2) {
 					const delay = getDelayMs(startBeat, currentBeat, midiClip.length, bpm)
 					logger.log(`  PLAY NOTE3 ${key}: `, {currentBeat, lastBeatChecked, note, delay, startBeat})
@@ -513,9 +513,11 @@ function playNote(note: IMidiNote, startDelayMs = 0) {
 	}
 }
 
-function playNote2(note: IMidiNote, startDelayMs: number = 0) {
+function playNote2(note: IMidiNote | IMidiNotes, startDelayMs: number = 0) {
 	if (startDelayMs <= 0) logger.warn('startDelayMs <= 0 | ', startDelayMs)
 	const startDelaySec = startDelayMs / 1000
+
+	let actualNote = notesToNote(note)
 
 	const attack = 0.01
 	const release = 1
@@ -523,7 +525,7 @@ function playNote2(note: IMidiNote, startDelayMs: number = 0) {
 	const oscA = ctx.createOscillator()
 	oscA.start(ctx.currentTime + startDelaySec)
 	oscA.stop(ctx.currentTime + startDelaySec + attack + release)
-	oscA.frequency.setValueAtTime(midiNoteToFrequency(note), ctx.currentTime)
+	oscA.frequency.setValueAtTime(midiNoteToFrequency(actualNote), ctx.currentTime)
 
 	let gain: GainNode
 
