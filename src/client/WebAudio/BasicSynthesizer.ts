@@ -1,3 +1,4 @@
+import {Map} from 'immutable'
 import {logger} from '../../common/logger'
 import {IMidiNote} from '../../common/MidiNote'
 import {BuiltInOscillatorType, CustomOscillatorType, ShamuOscillatorType} from '../../common/OscillatorTypes'
@@ -57,10 +58,12 @@ class SynthVoices extends Voices<SynthVoice> {
 		audioContext: AudioContext, destination: AudioNode,
 		oscType: ShamuOscillatorType, forScheduling: boolean,
 	) {
-		return new SynthVoice(audioContext, destination, oscType, forScheduling)
+		return new SynthVoice(audioContext, destination, oscType, forScheduling, this._nextId++)
 	}
 
-	protected _scheduledVoices: SynthVoice[] = []
+	private static _nextId = 0
+
+	protected _scheduledVoices = Map<number, SynthVoice>()
 
 	constructor(voiceCount: number, audioContext: AudioContext, destination: AudioNode, oscType: ShamuOscillatorType) {
 		super()
@@ -83,7 +86,7 @@ class SynthVoices extends Voices<SynthVoice> {
 
 		newVoice.scheduleNote(note, attackTimeInSeconds, delaySeconds)
 
-		this._scheduledVoices.push(newVoice)
+		this._scheduledVoices = this._scheduledVoices.set(newVoice._id, newVoice)
 	}
 
 	public scheduleRelease(note: number, delaySeconds: number, releaseSeconds: number) {
@@ -91,14 +94,21 @@ class SynthVoices extends Voices<SynthVoice> {
 			.filter(x => x.playingNote === note)
 			.find(x => x.getIsReleaseScheduled() === false)
 
+		console.log('this._scheduledVoices: ', this._scheduledVoices)
+
 		if (!firstUnReleasedVoiceForNote) throw new Error('trying to schedule release for note, but no available note to release')
 
-		firstUnReleasedVoiceForNote.scheduleRelease(delaySeconds, releaseSeconds)
+		firstUnReleasedVoiceForNote.scheduleRelease(
+			delaySeconds,
+			releaseSeconds,
+			() => (this._scheduledVoices = this._scheduledVoices.delete(firstUnReleasedVoiceForNote._id)),
+		)
 	}
 }
 
 class SynthVoice extends Voice {
 	private static _noiseBuffer: AudioBuffer
+	public readonly _id: number
 	private _oscillator: OscillatorNode | undefined
 	private _oscillatorType: ShamuOscillatorType
 	private _nextOscillatorType: ShamuOscillatorType
@@ -107,8 +117,10 @@ class SynthVoice extends Voice {
 	private _frequency: number = 0
 	private _isReleaseScheduled = false
 
-	constructor(audioContext: AudioContext, destination: AudioNode, oscType: ShamuOscillatorType, forScheduling: boolean) {
+	constructor(audioContext: AudioContext, destination: AudioNode, oscType: ShamuOscillatorType, forScheduling: boolean, id: number) {
 		super(audioContext, destination)
+
+		this._id = id
 
 		this._oscillatorType = oscType
 		this._nextOscillatorType = oscType
@@ -145,12 +157,12 @@ class SynthVoice extends Voice {
 		this.playingNote = note
 	}
 
-	public scheduleRelease(delaySeconds: number, releaseSeconds: number) {
+	public scheduleRelease(delaySeconds: number, releaseSeconds: number, onEnded: () => void) {
 
 		if (this._oscillatorType === CustomOscillatorType.noise) {
 			// TODO
 		} else {
-			this._scheduleReleaseNormalNote(delaySeconds, releaseSeconds)
+			this._scheduleReleaseNormalNote(delaySeconds, releaseSeconds, onEnded)
 		}
 
 		this._isReleaseScheduled = true
@@ -195,7 +207,7 @@ class SynthVoice extends Voice {
 			.connect(this._destination)
 	}
 
-	private _scheduleReleaseNormalNote(delaySeconds: number, releaseSeconds: number) {
+	private _scheduleReleaseNormalNote(delaySeconds: number, releaseSeconds: number, onEnded: () => void) {
 		if (!this._oscillator) return
 
 		const releaseStartTimeSeconds = this._audioContext.currentTime + delaySeconds
@@ -205,6 +217,12 @@ class SynthVoice extends Voice {
 		this._gain.gain.linearRampToValueAtTime(1, releaseStartTimeSeconds)
 		this._gain.gain.exponentialRampToValueAtTime(0.00001, stopTimeSeconds)
 		this._oscillator.stop(stopTimeSeconds)
+		this._oscillator.onended = () => {
+			this._oscillator!.disconnect()
+			this._gain.disconnect()
+			delete this._gain
+			onEnded()
+		}
 	}
 
 	private _playSynthNote(note: number) {
