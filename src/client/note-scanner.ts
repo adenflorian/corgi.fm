@@ -122,10 +122,13 @@ function scheduleNotes() {
 			// logger.log('offset: ', offset)
 			// logger.log('event.startTime: ', event.startTime)
 			const delaySeconds = ((offset + event.startTime) * (60 / actualBPM))
+
+			const noteLength = 0.1
+
 			let actualNote = notesToNote(event.notes)
 			console.log('actualNote: ' + actualNote + ' | delaySeconds: ' + delaySeconds)
 			synth.scheduleNote(actualNote, delaySeconds)
-			synth.scheduleRelease(actualNote, delaySeconds, delaySeconds + 0.1)
+			synth.scheduleRelease(actualNote, delaySeconds + noteLength)
 		})
 	})
 

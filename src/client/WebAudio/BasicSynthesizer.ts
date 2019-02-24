@@ -28,8 +28,8 @@ export class BasicSynthesizer extends Instrument<SynthVoices, SynthVoice> {
 		this._voices.scheduleNote(note, delaySeconds, this._attackTimeInSeconds, this._audioContext, this._panNode, this._oscillatorType)
 	}
 
-	public scheduleRelease(note: number, delaySeconds: number, releaseSeconds: number) {
-		this._voices.scheduleRelease(note, delaySeconds, releaseSeconds)
+	public scheduleRelease(note: number, delaySeconds: number) {
+		this._voices.scheduleRelease(note, delaySeconds, this._releaseTimeInSeconds)
 	}
 
 	public setOscillatorType = (type: ShamuOscillatorType) => {
@@ -58,10 +58,8 @@ class SynthVoices extends Voices<SynthVoice> {
 		audioContext: AudioContext, destination: AudioNode,
 		oscType: ShamuOscillatorType, forScheduling: boolean,
 	) {
-		return new SynthVoice(audioContext, destination, oscType, forScheduling, this._nextId++)
+		return new SynthVoice(audioContext, destination, oscType, forScheduling)
 	}
-
-	private static _nextId = 0
 
 	protected _scheduledVoices = Map<number, SynthVoice>()
 
@@ -69,7 +67,8 @@ class SynthVoices extends Voices<SynthVoice> {
 		super()
 
 		for (let i = 0; i < voiceCount; i++) {
-			this._inactiveVoices.push(SynthVoices.createVoice(audioContext, destination, oscType, false))
+			const newVoice = SynthVoices.createVoice(audioContext, destination, oscType, false)
+			this._inactiveVoices = this._inactiveVoices.set(newVoice.id, newVoice)
 		}
 	}
 
@@ -86,7 +85,7 @@ class SynthVoices extends Voices<SynthVoice> {
 
 		newVoice.scheduleNote(note, attackTimeInSeconds, delaySeconds)
 
-		this._scheduledVoices = this._scheduledVoices.set(newVoice._id, newVoice)
+		this._scheduledVoices = this._scheduledVoices.set(newVoice.id, newVoice)
 	}
 
 	public scheduleRelease(note: number, delaySeconds: number, releaseSeconds: number) {
@@ -101,14 +100,13 @@ class SynthVoices extends Voices<SynthVoice> {
 		firstUnReleasedVoiceForNote.scheduleRelease(
 			delaySeconds,
 			releaseSeconds,
-			() => (this._scheduledVoices = this._scheduledVoices.delete(firstUnReleasedVoiceForNote._id)),
+			() => (this._scheduledVoices = this._scheduledVoices.delete(firstUnReleasedVoiceForNote.id)),
 		)
 	}
 }
 
 class SynthVoice extends Voice {
 	private static _noiseBuffer: AudioBuffer
-	public readonly _id: number
 	private _oscillator: OscillatorNode | undefined
 	private _oscillatorType: ShamuOscillatorType
 	private _nextOscillatorType: ShamuOscillatorType
@@ -117,10 +115,8 @@ class SynthVoice extends Voice {
 	private _frequency: number = 0
 	private _isReleaseScheduled = false
 
-	constructor(audioContext: AudioContext, destination: AudioNode, oscType: ShamuOscillatorType, forScheduling: boolean, id: number) {
+	constructor(audioContext: AudioContext, destination: AudioNode, oscType: ShamuOscillatorType, forScheduling: boolean) {
 		super(audioContext, destination)
-
-		this._id = id
 
 		this._oscillatorType = oscType
 		this._nextOscillatorType = oscType

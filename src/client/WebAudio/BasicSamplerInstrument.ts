@@ -27,7 +27,8 @@ class SamplerVoices extends Voices<SamplerVoice> {
 		super()
 
 		for (let i = 0; i < voiceCount; i++) {
-			this._inactiveVoices.push(new SamplerVoice(audioContext, destination))
+			const newVoice = new SamplerVoice(audioContext, destination)
+			this._inactiveVoices = this._inactiveVoices.set(newVoice.id, newVoice)
 		}
 	}
 }

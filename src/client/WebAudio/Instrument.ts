@@ -1,4 +1,4 @@
-import {List, Map} from 'immutable'
+import {List, Map, OrderedMap} from 'immutable'
 import uuid = require('uuid')
 import {IDisposable} from '../../common/common-types'
 import {logger} from '../../common/logger'
@@ -234,13 +234,16 @@ export enum VoiceStatus {
 }
 
 export abstract class Voices<V extends Voice> {
-	protected _inactiveVoices: V[] = []
-	protected _activeVoices: V[] = []
-	protected _releasingVoices: V[] = []
+	protected _inactiveVoices = OrderedMap<number, V>()
+	protected _activeVoices = OrderedMap<number, V>()
+	protected _releasingVoices = OrderedMap<number, V>()
+	protected _scheduledVoices = OrderedMap<number, V>()
+
 	protected get _allVoices() {
 		return this._inactiveVoices
 			.concat(this._activeVoices)
 			.concat(this._releasingVoices)
+			.concat(this._scheduledVoices)
 	}
 
 	public playNote(note: number, attackTimeInSeconds: number) {
@@ -255,22 +258,22 @@ export abstract class Voices<V extends Voice> {
 		if (voice) {
 			const releaseId = voice.release(timeToReleaseInSeconds)
 
-			this._activeVoices = this._activeVoices.filter(x => x !== voice)
-			this._releasingVoices.push(voice)
+			this._activeVoices = this._activeVoices.delete(voice.id)
+			this._releasingVoices = this._releasingVoices.set(voice.id, voice)
 
 			setTimeout(() => {
 				const releasingVoice = this._releasingVoices.find(x => x.getReleaseId() === releaseId)
 				if (releasingVoice) {
 					this._releasingVoices = this._releasingVoices.filter(x => x.getReleaseId() !== releaseId)
-					this._inactiveVoices.push(releasingVoice)
+					this._inactiveVoices = this._inactiveVoices.set(releasingVoice.id, releasingVoice)
 				}
 			}, timeToReleaseInSeconds * 1000)
 		}
 	}
 
 	public getActivityLevel = () => {
-		if (this._activeVoices.length > 0) return 1
-		if (this._releasingVoices.length > 0) return 0.5
+		if (this._activeVoices.count() > 0) return 1
+		if (this._releasingVoices.count() > 0) return 0.5
 		return 0
 	}
 
@@ -284,7 +287,7 @@ export abstract class Voices<V extends Voice> {
 
 		if (sameNoteActiveVoice) {
 			this._activeVoices = this._activeVoices.filter(x => x !== sameNoteActiveVoice)
-			this._activeVoices.push(sameNoteActiveVoice)
+			this._activeVoices = this._activeVoices.set(sameNoteActiveVoice.id, sameNoteActiveVoice)
 			return sameNoteActiveVoice
 		}
 
@@ -293,24 +296,26 @@ export abstract class Voices<V extends Voice> {
 
 		if (sameNoteReleasingVoice) {
 			this._releasingVoices = this._releasingVoices.filter(x => x !== sameNoteReleasingVoice)
-			this._activeVoices.push(sameNoteReleasingVoice)
+			this._activeVoices = this._activeVoices.set(sameNoteReleasingVoice.id, sameNoteReleasingVoice)
 			return sameNoteReleasingVoice
 		}
 
-		if (this._inactiveVoices.length > 0) {
+		if (this._inactiveVoices.count() > 0) {
 			// Try to return inactive voice first
-			const voice = this._inactiveVoices.shift()!
-			this._activeVoices.push(voice)
+			const voice = this._inactiveVoices.first() as V
+			this._inactiveVoices = this._inactiveVoices.delete(voice.id)
+			this._activeVoices = this._activeVoices.set(voice.id, voice)
 			return voice
-		} else if (this._releasingVoices.length > 0) {
+		} else if (this._releasingVoices.count() > 0) {
 			// Next try releasing voices
-			const voice = this._releasingVoices.shift()!
-			this._activeVoices.push(voice)
+			const voice = this._releasingVoices.first() as V
+			this._releasingVoices = this._releasingVoices.delete(voice.id)
+			this._activeVoices = this._activeVoices.set(voice.id, voice)
 			return voice
 		} else {
 			// Lastly use active voices
-			const voice = this._activeVoices.shift()!
-			this._activeVoices.push(voice)
+			const voice = this._activeVoices.first() as V
+			this._activeVoices = this._activeVoices.delete(voice.id).set(voice.id, voice)
 			return voice
 		}
 	}
@@ -319,13 +324,17 @@ export abstract class Voices<V extends Voice> {
 export abstract class Voice {
 	public playingNote: number = -1
 	public playStartTime: number = 0
+	public readonly id: number
 	protected _audioContext: AudioContext
 	protected _destination: AudioNode
 	protected _releaseId: string = ''
 	protected _status: VoiceStatus = VoiceStatus.off
 	protected _gain: GainNode
 
+	protected static _nextId = 0
+
 	constructor(audioContext: AudioContext, destination: AudioNode) {
+		this.id = Voice._nextId++
 		this._audioContext = audioContext
 		this._destination = destination
 
