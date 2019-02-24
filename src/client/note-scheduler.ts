@@ -15,10 +15,10 @@ export class Range {
 		/** Always 0 or greater, defaults to 0 */
 		public readonly length = 0,
 	) {
-		if (start < 0) throw new Error('start must be >= 0')
-		if (length < 0) throw new Error('length must be >= 0')
+		if (start < 0) throw new Error('start must be >= 0 | ' + JSON.stringify(this))
+		if (length < 0) throw new Error('length must be >= 0 | ' + JSON.stringify(this))
 		if (Math.max(this.start, this.start + this.length) >= Range.maxSafeNumber) {
-			throw new Error('too big')
+			throw new Error('too big | ' + JSON.stringify(this))
 		}
 		this.end = ((this.start * precision) + (this.length * precision)) / precision
 	}
@@ -80,7 +80,7 @@ export function applyBPMToEvents(events: MidiGlobalClipEvents, bpm: number) {
 
 // Maybe range should only ever be a simple number, divisible by 10 or something
 /** Must apply BPM on result */
-export function getNotes(clip: MidiClip, initialRange: Range): MidiGlobalClipEvents {
+export function getEvents(clip: MidiClip, initialRange: Range): MidiGlobalClipEvents {
 	logger.trace('getNotes')
 	if (clip.length <= 0) throw new Error('clip length must be > 0')
 

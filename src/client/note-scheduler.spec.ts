@@ -1,6 +1,6 @@
 import {expect} from 'chai'
 import {List} from 'immutable'
-import {applyBPM, applyBPMToEvents, getNotes, makeMidiClip, MidiGlobalClipEvent, MidiGlobalClipEvents, Range} from './note-scheduler'
+import {applyBPM, applyBPMToEvents, getEvents, makeMidiClip, MidiGlobalClipEvent, MidiGlobalClipEvents, Range} from './note-scheduler'
 
 const testClip = makeMidiClip({
 	length: 2,
@@ -184,23 +184,23 @@ describe('note-scheduler', () => {
 	describe('invalid inputs', () => {
 		it('should fail when start time is negative', () => {
 			expect(() => {
-				getNotes(makeMidiClip(), new Range(-1, 1))
+				getEvents(makeMidiClip(), new Range(-1, 1))
 			})
 				.to.throw('start must be >= 0')
 		})
 		it('should fail when length is negative', () => {
 			expect(() => {
-				getNotes(makeMidiClip(), new Range(2, -1))
+				getEvents(makeMidiClip(), new Range(2, -1))
 			})
 				.to.throw(`length must be >= 0`)
 		})
 		it('should fail when clipLength is negative', () => {
 			expect(() => {
-				getNotes(makeMidiClip({length: -1}), new Range(0, 1))
+				getEvents(makeMidiClip({length: -1}), new Range(0, 1))
 			})
 				.to.throw('clip length must be > 0')
 			expect(() => {
-				getNotes(makeMidiClip({length: 0}), new Range(0, 1))
+				getEvents(makeMidiClip({length: 0}), new Range(0, 1))
 			})
 				.to.throw('clip length must be > 0')
 		})
@@ -360,7 +360,7 @@ describe('note-scheduler', () => {
 		)
 			.forEach(({name, start, length, expected}) => {
 				it(name, () => {
-					const result = getNotes(testClip, new Range(start, length)).toArray()
+					const result = getEvents(testClip, new Range(start, length)).toArray()
 
 					expect(result).to.deep.equal(expected)
 				})

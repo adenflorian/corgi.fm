@@ -106,32 +106,15 @@ class SynthVoice extends Voice {
 
 	public scheduleNote(note: number, attackTimeInSeconds: number, delaySeconds: number): void {
 		// if delay is 0 then the scheduler isn't working properly
-		if (delaySeconds <= 0) throw new Error('delay <= 0: ' + delaySeconds)
+		if (delaySeconds < 0) throw new Error('delay <= 0: ' + delaySeconds)
 
-		const release = 1
+		const release = 0.2
 
-		const oscA = this._audioContext.createOscillator()
-		oscA.start(this._audioContext.currentTime + delaySeconds)
-		oscA.stop(this._audioContext.currentTime + delaySeconds + attackTimeInSeconds + release)
-		oscA.frequency.setValueAtTime(midiNoteToFrequency(note), this._audioContext.currentTime)
-
-		let gain: GainNode
-
-		// if (gains.length > 0) {
-		// 	gain = gains.shift()!
-		// } else {
-		gain = this._audioContext.createGain()
-		// }
-		logger.log('synth scheduleNote delaySeconds: ', delaySeconds)
-
-		// gain.gain.cancelAndHoldAtTime(this._audioContext.currentTime)
-		gain.gain.linearRampToValueAtTime(0, this._audioContext.currentTime + delaySeconds)
-		gain.gain.linearRampToValueAtTime(1, this._audioContext.currentTime + delaySeconds + attackTimeInSeconds)
-		// gain.gain.value = 1
-		gain.gain.exponentialRampToValueAtTime(0.00001, this._audioContext.currentTime + delaySeconds + attackTimeInSeconds + release)
-
-		oscA.connect(gain)
-			.connect(this._destination)
+		if (this._oscillatorType === CustomOscillatorType.noise) {
+			// TODO
+		} else {
+			this._scheduleNormalNote(note, attackTimeInSeconds, delaySeconds, release)
+		}
 	}
 
 	public setOscillatorType(newOscType: ShamuOscillatorType) {
@@ -153,6 +136,33 @@ class SynthVoice extends Voice {
 	public dispose() {
 		this._deleteChain()
 		this._dispose()
+	}
+
+	private _scheduleNormalNote(note: number, attackTimeInSeconds: number, delaySeconds: number, release: number): void {
+		// logger.log('synth scheduleNote delaySeconds: ' + delaySeconds + ' | note: ' + note)
+		const oscA = this._audioContext.createOscillator()
+		oscA.type = this._oscillatorType as OscillatorType
+		oscA.detune.value = this._fineTuning
+		oscA.start(this._audioContext.currentTime + delaySeconds)
+		oscA.stop(this._audioContext.currentTime + delaySeconds + attackTimeInSeconds + release)
+		oscA.frequency.setValueAtTime(midiNoteToFrequency(note), this._audioContext.currentTime)
+
+		let gain: GainNode
+
+		// if (gains.length > 0) {
+		// 	gain = gains.shift()!
+		// } else {
+		gain = this._audioContext.createGain()
+		// }
+
+		// gain.gain.cancelAndHoldAtTime(this._audioContext.currentTime)
+		gain.gain.linearRampToValueAtTime(0, this._audioContext.currentTime + delaySeconds)
+		gain.gain.linearRampToValueAtTime(1, this._audioContext.currentTime + delaySeconds + attackTimeInSeconds)
+		// gain.gain.value = 1
+		gain.gain.exponentialRampToValueAtTime(0.00001, this._audioContext.currentTime + delaySeconds + attackTimeInSeconds + release)
+
+		oscA.connect(gain)
+			.connect(this._destination)
 	}
 
 	private _playSynthNote(note: number) {
