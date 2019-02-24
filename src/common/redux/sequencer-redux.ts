@@ -34,11 +34,11 @@ export const createSequencerEvents = (indexCount: number) => {
 		.fill({notes: emptyMidiNotes}))
 }
 
+export type SequencerEvents = List<ISequencerEvent>
+
 export interface ISequencerEvent {
 	notes: IMidiNotes
 }
-
-export type SequencerEvents = List<ISequencerEvent>
 
 export const makeSequencerEvents =
 	(x: ISequencerEvent[] | List<ISequencerEvent> = Array<ISequencerEvent>()): SequencerEvents => List<ISequencerEvent>(x)

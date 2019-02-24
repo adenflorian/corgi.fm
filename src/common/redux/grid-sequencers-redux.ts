@@ -49,10 +49,10 @@ export const setGridSequencerField = (id: string, fieldName: GridSequencerFields
 	id,
 	fieldName,
 	data,
-	...foo(fieldName),
+	...getNetworkActionThings(fieldName),
 })
 
-function foo(fieldName: GridSequencerFields) {
+function getNetworkActionThings(fieldName: GridSequencerFields) {
 	if ([
 		GridSequencerFields.isPlaying,
 		GridSequencerFields.scrollY,

@@ -1,13 +1,11 @@
-import {List} from 'immutable'
 import {ConnectionNodeType} from '../common/common-types'
 import {logger} from '../common/logger'
 import {
-	ClientStore, IClientRoomState, ISequencerEvent,
-	selectAllGridSequencers, selectGlobalClockState,
+	ClientStore, selectGlobalClockState,
 } from '../common/redux'
-import {longDemoMidiClip, postalClipB, shortDemoMidiClip} from './clips'
+import {shortDemoMidiClip} from './clips'
 import {getInstruments} from './instrument-manager'
-import {getEvents, makeMidiClip, MidiClip, MidiClipEvents, Range} from './note-scheduler'
+import {getEvents, Range} from './note-scheduler'
 import {BasicSynthesizer} from './WebAudio/BasicSynthesizer'
 
 let _store: ClientStore
@@ -22,11 +20,10 @@ export function startNoteScanner(store: ClientStore, audioContext: AudioContext)
 
 let stop = false
 
-function mainLoop(msSinceAppStart: number) {
-	// logger.log('im a loop: ', msSinceAppStart)
+function mainLoop() {
 	if (stop === true) return
 
-	foo()
+	scheduleNotes()
 
 	requestAnimationFrame(mainLoop)
 }
@@ -45,13 +42,11 @@ let startTimeInSeconds = 0
 let currentSongTimeBeats = 0
 let lastAudioContextTime = 0
 
-// TODO Where to apply actualBPM
-
-function foo() {
+function scheduleNotes() {
 	const roomState = _store.getState().room
+
 	const {
-		eventWindowSeconds, eventOffsetSeconds, isPlaying, bpm,
-		maxReadAheadSeconds, maxReadWindowSeconds,
+		isPlaying, bpm, maxReadAheadSeconds,
 	} = selectGlobalClockState(roomState)
 
 	const actualBPM = Math.max(0.000001, bpm)

@@ -1,9 +1,6 @@
 # Now
-- [ ] tone.js
-	- [√] master volume
-	- [ ] synth
-	- [ ] sampler
-	- [ ] sequencer data structs
+- [ ] hook up note-scanner with everything
+	- change sequencer state to whole new stuff
 
 # Soon
 - [ ] allow adding connections from a node with no connections on it already
@@ -22,3 +19,8 @@
 # Later
 - [ ] look into using an algorithmic reverb
 	- https://itnext.io/algorithmic-reverb-and-web-audio-api-e1ccec94621a
+- [ ] tone.js
+	- [√] master volume
+	- [ ] synth
+	- [ ] sampler
+	- [ ] sequencer data structures

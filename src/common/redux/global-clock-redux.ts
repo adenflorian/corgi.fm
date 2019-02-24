@@ -34,8 +34,7 @@ export const globalClockActions = Object.freeze({
 		BROADCASTER_ACTION,
 	}),
 	update: (
-		update: Partial<Pick<IGlobalClockState, 'bpm' | 'eventOffsetSeconds'
-			| 'eventWindowSeconds' | 'maxReadAheadSeconds' | 'maxReadWindowSeconds'>>,
+		update: Partial<Pick<IGlobalClockState, 'bpm' | 'maxReadAheadSeconds'>>,
 	) => ({
 		type: UPDATE_GLOBAL_CLOCK as typeof UPDATE_GLOBAL_CLOCK,
 		update,
@@ -49,10 +48,7 @@ const defaultGlobalClockState = {
 	isPlaying: false,
 	playCount: 0,
 	bpm: 20,
-	eventWindowSeconds: 1,
-	eventOffsetSeconds: 2,
 	maxReadAheadSeconds: 0.1,
-	maxReadWindowSeconds: 0.1,
 }
 
 const makeGlobalClockState = Record(defaultGlobalClockState)
