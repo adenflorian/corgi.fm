@@ -91,7 +91,7 @@ function foo() {
 		maxReadAheadSeconds, maxReadWindowSeconds,
 	} = selectGlobalClockState(roomState)
 
-	const actualBPM = Math.max(0.000001, 240)
+	const actualBPM = Math.max(0.000001, bpm)
 
 	if (isPlaying !== _isPlaying) {
 		_isPlaying = isPlaying
@@ -155,35 +155,4 @@ function foo() {
 	})
 
 	_cursorBeats += beatsToRead
-}
-
-function getEventsFromState(roomState: IClientRoomState) {
-	const sequencers = selectAllGridSequencers(roomState)
-
-	const clips = Object.keys(sequencers)
-		.map(x => sequencers[x])
-		.filter(x => x.isPlaying)
-		.map(x => x.events)
-		.map(makeMidiClipFromGridSeqEvents)
-
-	return clips
-}
-
-function makeMidiClipFromGridSeqEvents(events: List<ISequencerEvent>): MidiClip {
-	return makeMidiClip({
-		length: events.count(),
-		loop: true,
-		events: convertGridSeqEvents(events),
-	})
-}
-
-function convertGridSeqEvents(events: List<ISequencerEvent>): MidiClipEvents {
-	return events.map(convertGridSeqEvent).reduce((x, y) => x.concat(y))
-}
-
-function convertGridSeqEvent(event: ISequencerEvent): MidiClipEvents {
-	return event.notes.map((x, i) => ({
-		note: x,
-		startBeat: i,
-	})).toList()
 }
