@@ -1,0 +1,8 @@
+- app time
+	- time since page loaded in ms
+- audio context time
+	- time since audio context started in seconds
+- song time
+	- time inside of song in seconds
+- clip time
+	- time inside of clip in beats

@@ -1,3 +1,5 @@
+import {logger} from '../../common/logger'
+import {IMidiNote} from '../../common/MidiNote'
 import {BuiltInOscillatorType, CustomOscillatorType, ShamuOscillatorType} from '../../common/OscillatorTypes'
 import {IInstrumentOptions, Instrument, Voice, Voices, VoiceStatus} from './Instrument'
 import {midiNoteToFrequency} from './music-functions'
@@ -18,6 +20,14 @@ export class BasicSynthesizer extends Instrument<SynthVoices, SynthVoice> {
 		this._oscillatorType = options.oscillatorType
 
 		this._voices = new SynthVoices(options.voiceCount, this._audioContext, this._panNode, options.oscillatorType)
+	}
+
+	public scheduleNote(note: IMidiNote, delaySeconds: number) {
+		this.createVoice().scheduleNote(note, this._attackTimeInSeconds, delaySeconds)
+	}
+
+	public createVoice() {
+		return SynthVoices.createVoice(this._audioContext, this._panNode, this._oscillatorType)
 	}
 
 	public setOscillatorType = (type: ShamuOscillatorType) => {
@@ -42,11 +52,16 @@ export class BasicSynthesizer extends Instrument<SynthVoices, SynthVoice> {
 }
 
 class SynthVoices extends Voices<SynthVoice> {
+
+	public static createVoice(audioContext: AudioContext, destination: AudioNode, oscType: ShamuOscillatorType) {
+		return new SynthVoice(audioContext, destination, oscType)
+	}
+
 	constructor(voiceCount: number, audioContext: AudioContext, destination: AudioNode, oscType: ShamuOscillatorType) {
 		super()
 
 		for (let i = 0; i < voiceCount; i++) {
-			this._inactiveVoices.push(new SynthVoice(audioContext, destination, oscType))
+			this._inactiveVoices.push(SynthVoices.createVoice(audioContext, destination, oscType))
 		}
 	}
 
@@ -87,6 +102,36 @@ class SynthVoice extends Voice {
 		this._playSynthNote(note)
 
 		this._afterPlayNote(note)
+	}
+
+	public scheduleNote(note: number, attackTimeInSeconds: number, delaySeconds: number): void {
+		// if delay is 0 then the scheduler isn't working properly
+		if (delaySeconds <= 0) throw new Error('delay <= 0: ' + delaySeconds)
+
+		const release = 1
+
+		const oscA = this._audioContext.createOscillator()
+		oscA.start(this._audioContext.currentTime + delaySeconds)
+		oscA.stop(this._audioContext.currentTime + delaySeconds + attackTimeInSeconds + release)
+		oscA.frequency.setValueAtTime(midiNoteToFrequency(note), this._audioContext.currentTime)
+
+		let gain: GainNode
+
+		// if (gains.length > 0) {
+		// 	gain = gains.shift()!
+		// } else {
+		gain = this._audioContext.createGain()
+		// }
+		logger.log('synth scheduleNote delaySeconds: ', delaySeconds)
+
+		// gain.gain.cancelAndHoldAtTime(this._audioContext.currentTime)
+		gain.gain.linearRampToValueAtTime(0, this._audioContext.currentTime + delaySeconds)
+		gain.gain.linearRampToValueAtTime(1, this._audioContext.currentTime + delaySeconds + attackTimeInSeconds)
+		// gain.gain.value = 1
+		gain.gain.exponentialRampToValueAtTime(0.00001, this._audioContext.currentTime + delaySeconds + attackTimeInSeconds + release)
+
+		oscA.connect(gain)
+			.connect(this._destination)
 	}
 
 	public setOscillatorType(newOscType: ShamuOscillatorType) {

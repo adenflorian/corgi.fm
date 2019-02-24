@@ -76,7 +76,7 @@ async function setupAsync() {
 
 	startFpsLoop()
 
-	startNoteScanner(store)
+	startNoteScanner(store, audioContext)
 
 	if (module.hot) {
 		module.hot.dispose(() => {

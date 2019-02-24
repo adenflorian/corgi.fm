@@ -46,7 +46,7 @@ export abstract class AudioNodeWrapper {
 		}
 
 		outputAudioNode.connect(inputAudioNode)
-		logger.debug('AudioNodeWrapper.connect targetId: ', targetId)
+		// logger.debug('AudioNodeWrapper.connect targetId: ', targetId)
 	}
 
 	public readonly disconnect = (targetId: string) => {
@@ -130,14 +130,15 @@ export interface IInstrument extends IDisposable, AudioNodeWrapper {
 }
 
 export abstract class Instrument<T extends Voices<V>, V extends Voice> extends AudioNodeWrapper implements IInstrument {
+
 	protected readonly _panNode: StereoPannerNode
 	protected readonly _audioContext: AudioContext
 	protected readonly _lowPassFilter: BiquadFilterNode
+	protected _attackTimeInSeconds: number = 0.01
+	protected _releaseTimeInSeconds: number = 3
 	private readonly _arp = new Arp()
 	private readonly _gain: GainNode
 	private _previousNotes = emptyMidiNotes
-	private _attackTimeInSeconds: number = 0.01
-	private _releaseTimeInSeconds: number = 3
 
 	constructor(options: IInstrumentOptions) {
 		super(options)

@@ -183,7 +183,7 @@ export const setupInstrumentManager =
 
 					const sourceNotes = selectConnectionSourceNotesByTargetId(state.room, instrumentId)
 
-					instrument.setMidiNotes(sourceNotes)
+					// instrument.setMidiNotes(sourceNotes)
 
 					if (updateSpecificInstrument) updateSpecificInstrument(instrument, instrumentState)
 				})

@@ -22,7 +22,7 @@ type Tests = Array<{
 	expected: MidiGlobalClipEvent[],
 }>
 
-describe.only('note-scheduler', () => {
+describe('note-scheduler', () => {
 	describe('bpm functions', () => {
 		describe('applyBPM', () => {
 			[
@@ -198,10 +198,14 @@ describe.only('note-scheduler', () => {
 			expect(() => {
 				getNotes(makeMidiClip({length: -1}), new Range(0, 1))
 			})
-				.to.throw(`clipLength must be > 0`)
+				.to.throw('clip length must be > 0')
+			expect(() => {
+				getNotes(makeMidiClip({length: 0}), new Range(0, 1))
+			})
+				.to.throw('clip length must be > 0')
 		})
 	})
-	describe.only('stuff', () => {
+	describe('stuff', () => {
 		(
 			[
 				{

@@ -1,5 +1,4 @@
 import {Record} from 'immutable'
-import {Reducer} from 'redux'
 import {ActionType} from 'typesafe-actions'
 import {BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION} from './index'
 
@@ -39,6 +38,11 @@ const defaultGlobalClockState = {
 	index: -1,
 	isPlaying: false,
 	playCount: 0,
+	bpm: 60,
+	eventWindowSeconds: 1,
+	eventOffsetSeconds: 2,
+	maxReadAheadSeconds: 1,
+	maxReadWindowSeconds: 0.1,
 }
 
 const makeGlobalClockState = Record(defaultGlobalClockState)

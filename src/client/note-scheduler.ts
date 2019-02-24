@@ -80,17 +80,23 @@ export function applyBPMToEvents(events: MidiGlobalClipEvents, bpm: number) {
 
 // Maybe range should only ever be a simple number, divisible by 10 or something
 /** Must apply BPM on result */
-export function getNotes(clip: MidiClip, range: Range, offset = 0): MidiGlobalClipEvents {
+export function getNotes(clip: MidiClip, initialRange: Range): MidiGlobalClipEvents {
 	logger.trace('getNotes')
-	if (range.length === 0) {
-		return _checkSingleBeat(range.normalize(clip.length), offset)
-	}
+	if (clip.length <= 0) throw new Error('clip length must be > 0')
 
-	if (range.length > 0) {
-		return _checkBeatRange(range, offset)
-	}
+	return _getNotes(initialRange, 0)
 
-	throw createThisShouldntHappenError()
+	function _getNotes(range: Range, offset = 0): MidiGlobalClipEvents {
+		if (range.length === 0) {
+			return _checkSingleBeat(range.normalize(clip.length), offset)
+		}
+
+		if (range.length > 0) {
+			return _checkBeatRange(range, offset)
+		}
+
+		throw createThisShouldntHappenError()
+	}
 
 	function _checkSingleBeat({start}: Range, _offset: number): MidiGlobalClipEvents {
 		logger.trace('_checkSingleBeat')
@@ -143,8 +149,7 @@ export function getNotes(clip: MidiClip, range: Range, offset = 0): MidiGlobalCl
 		if (excess === 0) {
 			return events
 		} else {
-			return events.concat(getNotes(
-				clip,
+			return events.concat(_getNotes(
 				new Range(0, excess),
 				_offset + clip.length - _range.start,
 			))
