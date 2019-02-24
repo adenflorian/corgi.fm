@@ -24,7 +24,11 @@ export class BasicSynthesizer extends Instrument<SynthVoices, SynthVoice> {
 	}
 
 	public scheduleNote(note: IMidiNote, delaySeconds: number) {
-		this.createVoice().scheduleNote(note, this._attackTimeInSeconds, delaySeconds)
+		this._voices.scheduleNote(note, delaySeconds, this._attackTimeInSeconds, this._audioContext, this._panNode, this._oscillatorType)
+	}
+
+	public scheduleRelease(note: number, delaySeconds: number, releaseSeconds: number) {
+		this._voices.scheduleRelease(note, delaySeconds, releaseSeconds)
 	}
 
 	public createVoice() {
@@ -53,10 +57,11 @@ export class BasicSynthesizer extends Instrument<SynthVoices, SynthVoice> {
 }
 
 class SynthVoices extends Voices<SynthVoice> {
-
 	public static createVoice(audioContext: AudioContext, destination: AudioNode, oscType: ShamuOscillatorType) {
 		return new SynthVoice(audioContext, destination, oscType)
 	}
+
+	protected _scheduledVoices: SynthVoice[] = []
 
 	constructor(voiceCount: number, audioContext: AudioContext, destination: AudioNode, oscType: ShamuOscillatorType) {
 		super()
@@ -73,6 +78,24 @@ class SynthVoices extends Voices<SynthVoice> {
 	public setFineTuning(fine: number) {
 		this._allVoices.forEach(x => x.setFineTuning(fine))
 	}
+
+	public scheduleNote(note: IMidiNote, delaySeconds: number, attackTimeInSeconds: number, audioContext: AudioContext, destination: AudioNode, oscType: ShamuOscillatorType) {
+		const newVoice = SynthVoices.createVoice(audioContext, destination, oscType)
+
+		newVoice.scheduleNote(note, attackTimeInSeconds, delaySeconds)
+
+		this._scheduledVoices.push(newVoice)
+	}
+
+	public scheduleRelease(note: number, delaySeconds: number, releaseSeconds: number) {
+		const firstUnReleasedVoiceForNote = this._scheduledVoices
+			.filter(x => x.playingNote === note)
+			.find(x => x.getIsReleaseScheduled() === false)
+
+		if (!firstUnReleasedVoiceForNote) throw new Error('trying to schedule release for note, but no available note to release')
+
+		firstUnReleasedVoiceForNote.scheduleRelease(delaySeconds, releaseSeconds)
+	}
 }
 
 class SynthVoice extends Voice {
@@ -83,6 +106,7 @@ class SynthVoice extends Voice {
 	private _whiteNoise: AudioBufferSourceNode | undefined
 	private _fineTuning: number = 0
 	private _frequency: number = 0
+	private _isReleaseScheduled = false
 
 	constructor(audioContext: AudioContext, destination: AudioNode, oscType: ShamuOscillatorType, forScheduling = false) {
 		super(audioContext, destination)
@@ -107,17 +131,30 @@ class SynthVoice extends Voice {
 		this._afterPlayNote(note)
 	}
 
+	public getIsReleaseScheduled = () => this._isReleaseScheduled
+
 	public scheduleNote(note: number, attackTimeInSeconds: number, delaySeconds: number): void {
 		// if delay is 0 then the scheduler isn't working properly
 		if (delaySeconds < 0) throw new Error('delay <= 0: ' + delaySeconds)
 
-		const release = 0.2
+		if (this._oscillatorType === CustomOscillatorType.noise) {
+			// TODO
+		} else {
+			this._scheduleNormalNote(note, attackTimeInSeconds, delaySeconds)
+		}
+
+		this.playingNote = note
+	}
+
+	public scheduleRelease(delaySeconds: number, releaseSeconds: number) {
 
 		if (this._oscillatorType === CustomOscillatorType.noise) {
 			// TODO
 		} else {
-			this._scheduleNormalNote(note, attackTimeInSeconds, delaySeconds, release)
+			this._scheduleReleaseNormalNote(delaySeconds, releaseSeconds)
 		}
+
+		this._isReleaseScheduled = true
 	}
 
 	public setOscillatorType(newOscType: ShamuOscillatorType) {
@@ -141,37 +178,35 @@ class SynthVoice extends Voice {
 		this._dispose()
 	}
 
-	private _scheduleNormalNote(note: number, attackTimeInSeconds: number, delaySeconds: number, release: number): void {
+	private _scheduleNormalNote(note: number, attackTimeInSeconds: number, delaySeconds: number): void {
 		// logger.log('synth scheduleNote delaySeconds: ' + delaySeconds + ' | note: ' + note)
 
-		const lifeLength = delaySeconds + attackTimeInSeconds + release
+		this._oscillator = this._audioContext.createOscillator()
+		this._oscillator.type = this._oscillatorType as OscillatorType
+		this._oscillator.detune.value = this._fineTuning
+		this._oscillator.frequency.setValueAtTime(midiNoteToFrequency(note), this._audioContext.currentTime)
+		this._oscillator.start(this._audioContext.currentTime + delaySeconds)
 
-		const oscA = this._audioContext.createOscillator()
-		oscA.type = this._oscillatorType as OscillatorType
-		oscA.detune.value = this._fineTuning
-		oscA.start(this._audioContext.currentTime + delaySeconds)
-		oscA.stop(this._audioContext.currentTime + lifeLength)
-		oscA.frequency.setValueAtTime(midiNoteToFrequency(note), this._audioContext.currentTime)
+		this._gain = this._audioContext.createGain()
 
-		let gain: GainNode
+		this._gain.gain.linearRampToValueAtTime(0, this._audioContext.currentTime + delaySeconds)
+		this._gain.gain.linearRampToValueAtTime(1, this._audioContext.currentTime + delaySeconds + attackTimeInSeconds)
 
-		// if (gains.length > 0) {
-		// 	gain = gains.shift()!
-		// } else {
-		gain = this._audioContext.createGain()
-		// }
-
-		// gain.gain.cancelAndHoldAtTime(this._audioContext.currentTime)
-		gain.gain.linearRampToValueAtTime(0, this._audioContext.currentTime + delaySeconds)
-		gain.gain.linearRampToValueAtTime(1, this._audioContext.currentTime + delaySeconds + attackTimeInSeconds)
-		// gain.gain.value = 1
-		gain.gain.exponentialRampToValueAtTime(0.00001, this._audioContext.currentTime + delaySeconds + attackTimeInSeconds + release)
-
-		oscA.connect(gain)
+		this._oscillator.connect(this._gain)
 			.connect(this._destination)
 	}
 
-	// private _releaseSch
+	private _scheduleReleaseNormalNote(delaySeconds: number, releaseSeconds: number) {
+		if (!this._oscillator) return
+
+		const releaseStartTimeSeconds = this._audioContext.currentTime + delaySeconds
+		const stopTimeSeconds = this._audioContext.currentTime + delaySeconds + releaseSeconds
+
+		this._cancelAndHoldOrJustCancel(releaseStartTimeSeconds)
+		this._gain.gain.linearRampToValueAtTime(1, releaseStartTimeSeconds)
+		this._gain.gain.exponentialRampToValueAtTime(0.00001, stopTimeSeconds)
+		this._oscillator.stop(stopTimeSeconds)
+	}
 
 	private _playSynthNote(note: number) {
 		this._frequency = midiNoteToFrequency(note)

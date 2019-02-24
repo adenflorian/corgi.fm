@@ -110,7 +110,9 @@ function foo() {
 			// logger.log('scheduleNote currentSongTimeBeats: ', currentSongTimeBeats)
 			// logger.log('offset: ', offset)
 			// logger.log('event.startTime: ', event.startTime)
-			synth.scheduleNote(event.note, ((offset + event.startTime) * (60 / actualBPM)))
+			const delaySeconds = ((offset + event.startTime) * (60 / actualBPM))
+			synth.scheduleNote(event.note, delaySeconds)
+			synth.scheduleRelease(event.note, delaySeconds + 0.5, delaySeconds + 0.1)
 		})
 	})
 

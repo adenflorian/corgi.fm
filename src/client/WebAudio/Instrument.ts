@@ -371,14 +371,16 @@ export abstract class Voice {
 		delete this._gain
 	}
 
-	private readonly _cancelAndHoldOrJustCancel = () => {
+	protected readonly _cancelAndHoldOrJustCancel = (delaySeconds = 0) => {
 		const gain = this._gain.gain as any
+
+		const cancelTimeSeconds = this._audioContext.currentTime + delaySeconds
 
 		// cancelAndHoldAtTime is not implemented in firefox
 		if (gain.cancelAndHoldAtTime) {
-			gain.cancelAndHoldAtTime(this._audioContext.currentTime)
+			gain.cancelAndHoldAtTime(cancelTimeSeconds)
 		} else {
-			gain.cancelScheduledValues(this._audioContext.currentTime)
+			gain.cancelScheduledValues(cancelTimeSeconds)
 		}
 	}
 }
