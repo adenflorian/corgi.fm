@@ -31,10 +31,6 @@ export class BasicSynthesizer extends Instrument<SynthVoices, SynthVoice> {
 		this._voices.scheduleRelease(note, delaySeconds, releaseSeconds)
 	}
 
-	public createVoice() {
-		return SynthVoices.createVoice(this._audioContext, this._panNode, this._oscillatorType)
-	}
-
 	public setOscillatorType = (type: ShamuOscillatorType) => {
 		if (type === this._oscillatorType) return
 		this._oscillatorType = type
@@ -57,8 +53,11 @@ export class BasicSynthesizer extends Instrument<SynthVoices, SynthVoice> {
 }
 
 class SynthVoices extends Voices<SynthVoice> {
-	public static createVoice(audioContext: AudioContext, destination: AudioNode, oscType: ShamuOscillatorType) {
-		return new SynthVoice(audioContext, destination, oscType)
+	public static createVoice(
+		audioContext: AudioContext, destination: AudioNode,
+		oscType: ShamuOscillatorType, forScheduling: boolean,
+	) {
+		return new SynthVoice(audioContext, destination, oscType, forScheduling)
 	}
 
 	protected _scheduledVoices: SynthVoice[] = []
@@ -67,7 +66,7 @@ class SynthVoices extends Voices<SynthVoice> {
 		super()
 
 		for (let i = 0; i < voiceCount; i++) {
-			this._inactiveVoices.push(SynthVoices.createVoice(audioContext, destination, oscType))
+			this._inactiveVoices.push(SynthVoices.createVoice(audioContext, destination, oscType, false))
 		}
 	}
 
@@ -80,7 +79,7 @@ class SynthVoices extends Voices<SynthVoice> {
 	}
 
 	public scheduleNote(note: IMidiNote, delaySeconds: number, attackTimeInSeconds: number, audioContext: AudioContext, destination: AudioNode, oscType: ShamuOscillatorType) {
-		const newVoice = SynthVoices.createVoice(audioContext, destination, oscType)
+		const newVoice = SynthVoices.createVoice(audioContext, destination, oscType, true)
 
 		newVoice.scheduleNote(note, attackTimeInSeconds, delaySeconds)
 
@@ -108,7 +107,7 @@ class SynthVoice extends Voice {
 	private _frequency: number = 0
 	private _isReleaseScheduled = false
 
-	constructor(audioContext: AudioContext, destination: AudioNode, oscType: ShamuOscillatorType, forScheduling = false) {
+	constructor(audioContext: AudioContext, destination: AudioNode, oscType: ShamuOscillatorType, forScheduling: boolean) {
 		super(audioContext, destination)
 
 		this._oscillatorType = oscType
