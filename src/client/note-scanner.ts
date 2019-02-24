@@ -5,7 +5,7 @@ import {
 	ClientStore, IClientRoomState, ISequencerEvent,
 	selectAllGridSequencers, selectGlobalClockState,
 } from '../common/redux'
-import {postalClipB} from './clips'
+import {longDemoMidiClip, postalClipB} from './clips'
 import {getInstruments} from './instrument-manager'
 import {getEvents, makeMidiClip, MidiClip, MidiClipEvents, Range} from './note-scheduler'
 import {BasicSynthesizer} from './WebAudio/BasicSynthesizer'
@@ -40,7 +40,7 @@ function mainLoop(msSinceAppStart: number) {
 	requestAnimationFrame(mainLoop)
 }
 
-const clip = postalClipB
+const clip = longDemoMidiClip
 
 // TODO Where to apply actualBPM
 
@@ -112,7 +112,7 @@ function foo() {
 			// logger.log('event.startTime: ', event.startTime)
 			const delaySeconds = ((offset + event.startTime) * (60 / actualBPM))
 			synth.scheduleNote(event.note, delaySeconds)
-			synth.scheduleRelease(event.note, delaySeconds + 0.5, delaySeconds + 0.1)
+			synth.scheduleRelease(event.note, delaySeconds, delaySeconds + 0.1)
 		})
 	})
 

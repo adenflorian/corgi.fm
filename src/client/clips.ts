@@ -884,7 +884,7 @@ export const postalClipB = makeMidiClip({
 		{startBeat: 5325121, note: 66},
 		{startBeat: 5341761, note: 55},
 		{startBeat: 5341761, note: 67},
-	]).map(x => ({...x, startBeat: x.startBeat / 181441})),
+	]).map(x => ({...x, startBeat: (x.startBeat - 181441) / 181441})),
 })
 
 // logger.log('postalClipB: ', postalClipB.toJS())

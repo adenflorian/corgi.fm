@@ -51,7 +51,7 @@ const defaultGlobalClockState = {
 	bpm: 20,
 	eventWindowSeconds: 1,
 	eventOffsetSeconds: 2,
-	maxReadAheadSeconds: 1,
+	maxReadAheadSeconds: 0.1,
 	maxReadWindowSeconds: 0.1,
 }
 
