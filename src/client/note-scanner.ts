@@ -36,11 +36,13 @@ if (module.hot) {
 
 const clip = shortDemoMidiClip
 
+const _jumpStartSeconds = 0.5
+
 let _isPlaying = false
 let _cursorBeats = 0
-let startTimeInSeconds = 0
 let currentSongTimeBeats = 0
 let lastAudioContextTime = 0
+let _justStarted = false
 
 function scheduleNotes() {
 	const roomState = _store.getState().room
@@ -55,23 +57,23 @@ function scheduleNotes() {
 		_isPlaying = isPlaying
 		logger.log('[note-scanner] isPlaying: ', isPlaying)
 		if (isPlaying) {
-			startTimeInSeconds = _audioContext.currentTime
-			currentSongTimeBeats = 0
-			_cursorBeats = 0
-			lastAudioContextTime = 0
-			logger.log('[note-scanner] startTimeInSeconds: ', startTimeInSeconds)
+			_justStarted = true
 		}
 	}
 
 	if (isPlaying === false) return
 
 	const deltaTimeSeconds = _audioContext.currentTime - lastAudioContextTime
-
 	lastAudioContextTime = _audioContext.currentTime
 
 	const deltaBeats = deltaTimeSeconds * (actualBPM / 60)
 
 	currentSongTimeBeats += deltaBeats
+
+	if (_justStarted) {
+		currentSongTimeBeats = 0
+		_cursorBeats = 0
+	}
 
 	const maxReadAheadBeats = maxReadAheadSeconds * (actualBPM / 60)
 
@@ -79,7 +81,10 @@ function scheduleNotes() {
 	// read from cursor to next cursor position
 	_cursorBeats = Math.max(_cursorBeats, currentSongTimeBeats)
 	const cursorDestinationBeats = currentSongTimeBeats + maxReadAheadBeats
-	const beatsToRead = Math.max(0, (cursorDestinationBeats - _cursorBeats) * (1))
+	const minBeatsToRead = _justStarted
+		? (_jumpStartSeconds * (actualBPM / 60))
+		: 0
+	const beatsToRead = Math.max(minBeatsToRead, cursorDestinationBeats - _cursorBeats)
 
 	// distance from currentSongTime to where the cursor just started reading events from
 	const offset = _cursorBeats - currentSongTimeBeats
@@ -91,11 +96,11 @@ function scheduleNotes() {
 	// logger.log('actualBPM: ', actualBPM)
 	// logger.log('maxReadAheadBeats: ', maxReadAheadBeats)
 	// logger.log('currentSongTimeSeconds: ', currentSongTimeBeats)
-	// logger.log('_cursorSeconds: ', _cursorBeats)
+	logger.log('_cursorBeats: ', _cursorBeats)
 	// logger.log('cursorDestinationSeconds: ', cursorDestinationBeats)
-	// logger.log('secondsToRead: ', beatsToRead)
+	logger.log('beatsToRead: ', beatsToRead)
 	// logger.log('offset: ', offset)
-	// logger.log('_cursorSeconds - currentSongTimeSeconds: ', _cursorBeats - currentSongTimeBeats)
+	// logger.log('_cursorBeats - currentSongTimeSeconds: ', _cursorBeats - currentSongTimeBeats)
 	// logger.log('clip: ', clip)
 	// logger.log('readRangeBeats: ', readRangeBeats)
 	// logger.log('eventsToSchedule: ', eventsToSchedule)
@@ -125,4 +130,5 @@ function scheduleNotes() {
 	})
 
 	_cursorBeats += beatsToRead
+	_justStarted = false
 }
