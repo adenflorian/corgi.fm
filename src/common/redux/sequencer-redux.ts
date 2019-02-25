@@ -21,6 +21,14 @@ export const undoSequencer = (id: string) => ({
 	BROADCASTER_ACTION,
 })
 
+export const UNDO_RECORDING_SEQUENCER = 'UNDO_RECORDING_SEQUENCER'
+export type UndoRecordingSequencerAction = ReturnType<typeof undoRecordingSequencer>
+export const undoRecordingSequencer = () => ({
+	type: UNDO_RECORDING_SEQUENCER as typeof UNDO_RECORDING_SEQUENCER,
+	SERVER_ACTION,
+	BROADCASTER_ACTION,
+})
+
 export const SKIP_NOTE = 'SKIP_NOTE'
 export type SkipNoteAction = ReturnType<typeof skipNote>
 export const skipNote = () => ({

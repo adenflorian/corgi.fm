@@ -221,6 +221,7 @@ instrument manager already handles all creation and destruction of instruments
 	- what is this problem?
 - [√] undo button
 - [√] record button should be red when recording
+- [√] backspace to undo note while recording
 
 # References
 - https://github.com/grimmdude/MidiPlayerJS/blob/master/src/player.js

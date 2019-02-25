@@ -112,6 +112,7 @@ export const InfiniteSequencer: React.FC<IInfiniteSequencerAllProps> = React.mem
 						<div
 							className="undo"
 							onClick={() => dispatch(undoSequencer(props.id))}
+							title="undo (hit backspace to undo while recording)"
 						>
 							<Undo />
 						</div>

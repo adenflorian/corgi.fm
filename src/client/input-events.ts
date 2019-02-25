@@ -3,7 +3,8 @@ import {Action, AnyAction, Store} from 'redux'
 import {
 	globalClockActions, IClientAppState, localMidiKeyPress, localMidiKeyUp,
 	localMidiOctaveChange, pointersActions,
-	selectGlobalClockIsPlaying, selectIsLocalClientReady, selectLocalClient, skipNote, userInputActions,
+	selectGlobalClockIsPlaying, selectIsLocalClientReady, selectLocalClient,
+	skipNote, userInputActions, undoRecordingSequencer,
 } from '../common/redux'
 import {simpleGlobalClientState} from './SimpleGlobalClientState'
 
@@ -76,6 +77,11 @@ const keyboardShortcuts: IKeyBoardShortcuts = Map<KeyBoardShortcut>({
 	'ArrowRight': {
 		actionOnKeyDown: () => skipNote(),
 		allowRepeat: true,
+		preventDefault: true,
+	},
+	'Backspace': {
+		actionOnKeyDown: () => undoRecordingSequencer(),
+		allowRepeat: false,
 		preventDefault: true,
 	},
 	'Control': {

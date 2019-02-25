@@ -11,7 +11,7 @@ import {
 	makeMultiReducer, NetworkActionType, PLAY_ALL, selectGlobalClockState,
 	SERVER_ACTION, SKIP_NOTE, STOP_ALL, UNDO_SEQUENCER, VIRTUAL_KEY_PRESSED
 } from './index'
-import {makeSequencerEvents} from './sequencer-redux'
+import {makeSequencerEvents, UNDO_RECORDING_SEQUENCER} from './sequencer-redux'
 import {NodeSpecialState} from './shamu-graph'
 
 export const addInfiniteSequencer = (infiniteSequencer: InfiniteSequencerState) =>
@@ -156,6 +156,7 @@ const infiniteSequencerGlobalActionTypes = [
 	STOP_ALL,
 	VIRTUAL_KEY_PRESSED,
 	SKIP_NOTE,
+	UNDO_RECORDING_SEQUENCER,
 ]
 
 export const infiniteSequencersReducer =
@@ -217,6 +218,7 @@ function infiniteSequencerReducer(
 					[action.fieldName]: action.data,
 				}
 			}
+		case UNDO_RECORDING_SEQUENCER:
 		case UNDO_SEQUENCER: {
 			if (infiniteSequencer.previousEvents.count() === 0) return infiniteSequencer
 
