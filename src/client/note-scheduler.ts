@@ -21,7 +21,7 @@ export function applyBPMToEvents(events: MidiGlobalClipEvents, bpm: number) {
 /** Must apply BPM on result */
 export function getEvents(clip: MidiClip, initialRange: MidiRange): MidiGlobalClipEvents {
 	logger.trace('getNotes')
-	if (clip.length <= 0) throw new Error('clip length must be > 0')
+	if (clip.length <= 0) throw new Error('clip length must be > 0: ' + JSON.stringify(clip))
 
 	return _getNotes(initialRange, 0)
 
@@ -34,7 +34,7 @@ export function getEvents(clip: MidiClip, initialRange: MidiRange): MidiGlobalCl
 			return _checkBeatRange(range, offset)
 		}
 
-		throw createThisShouldntHappenError()
+		throw new Error('invalid range: ' + JSON.stringify(range))
 	}
 
 	function _checkSingleBeat({start}: MidiRange, _offset: number): MidiGlobalClipEvents {

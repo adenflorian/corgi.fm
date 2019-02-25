@@ -1,7 +1,7 @@
 import {List} from 'immutable'
 import React = require('react')
 import ReactDOM = require('react-dom')
-import {makeMidiClip, MidiClip, notesToNote, makeMidiClipEvent} from '../common/common-types'
+import {makeMidiClip, MidiClip, makeMidiClipEvent} from '../common/common-types'
 import {createThisShouldntHappenError} from '../common/common-utils'
 import {logger} from '../common/logger'
 import {IMidiNote, IMidiNotes} from '../common/MidiNote'
@@ -513,11 +513,11 @@ function playNote(note: IMidiNote, startDelayMs = 0) {
 	}
 }
 
-function playNote2(note: IMidiNote | IMidiNotes, startDelayMs: number = 0) {
+function playNote2(note: IMidiNotes, startDelayMs: number = 0) {
 	if (startDelayMs <= 0) logger.warn('startDelayMs <= 0 | ', startDelayMs)
 	const startDelaySec = startDelayMs / 1000
 
-	let actualNote = notesToNote(note)
+	let actualNote = note.first(0)
 
 	const attack = 0.01
 	const release = 1

@@ -41,19 +41,13 @@ export interface MidiEvent {
 	notes: IMidiNotes
 }
 
-export function notesToNote(note: IMidiNote | IMidiNotes) {
-	if (typeof note === 'number') {
-		return note
-	} else {
-		return note.first(0)
-	}
-}
-
 export interface MidiClipEvent extends MidiEvent {
 	startBeat: number
 }
 
-export function makeMidiClipEvent(event: Partial<MidiClipEvent & {note: number}>): MidiClipEvent {
+export function makeMidiClipEvent(
+	event: {notes?: IMidiNotes, note?: IMidiNote, startBeat: number}
+): MidiClipEvent {
 	const actualNotes = event.note !== undefined
 		? Set([event.note])
 		: event.notes !== undefined
@@ -80,8 +74,8 @@ export function makeMidiGlobalClipEvent(event: Partial<MidiGlobalClipEvent & {no
 }
 
 export const makeMidiClip = Record({
-	length: 4,
-	loop: true,
+	length: 0,
+	loop: false,
 	events: List<MidiClipEvent>(),
 })
 
@@ -118,6 +112,7 @@ export class MidiRange {
 	) {
 		if (start < 0) throw new Error('start must be >= 0 | ' + JSON.stringify(this))
 		if (length < 0) throw new Error('length must be >= 0 | ' + JSON.stringify(this))
+		if (start === null || length === null) throw new Error('y r u null | ' + JSON.stringify(this))
 		if (Math.max(this.start, this.start + this.length) >= MidiRange.maxSafeNumber) {
 			throw new Error('too big | ' + JSON.stringify(this))
 		}

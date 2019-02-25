@@ -130,7 +130,13 @@ export class InfiniteSequencerState implements ISequencerState, IConnectable, No
 	public readonly type = ConnectionNodeType.infiniteSequencer
 	public readonly rate = 1
 
-	constructor(ownerId: string, name: string, style: InfiniteSequencerStyle, events = makeSequencerEvents(), isPlaying = false) {
+	constructor(
+		ownerId: string,
+		name: string,
+		style: InfiniteSequencerStyle,
+		events: MidiClipEvents,
+		isPlaying = false,
+	) {
 		this.ownerId = ownerId
 		this.name = name
 		this.color = colorFunc(hashbow(this.id)).desaturate(0.2).hsl().string()
@@ -172,26 +178,23 @@ function infiniteSequencerReducer(
 		case SET_INFINITE_SEQUENCER_NOTE: {
 			return {
 				...infiniteSequencer,
-				midiClip: {
-					...infiniteSequencer.midiClip,
-					events: infiniteSequencer.midiClip.events.map((event, eventIndex) => {
-						if (eventIndex === action.index) {
-							if (action.enabled) {
-								return {
-									...event,
-									notes: event.notes.add(action.note),
-								}
-							} else {
-								return {
-									...event,
-									notes: event.notes.filter(x => x !== action.note),
-								}
+				midiClip: infiniteSequencer.midiClip.set('events', infiniteSequencer.midiClip.events.map((event, eventIndex) => {
+					if (eventIndex === action.index) {
+						if (action.enabled) {
+							return {
+								...event,
+								notes: event.notes.add(action.note),
 							}
 						} else {
-							return event
+							return {
+								...event,
+								notes: event.notes.filter(x => x !== action.note),
+							}
 						}
-					}),
-				},
+					} else {
+						return event
+					}
+				})),
 				previousEvents: infiniteSequencer.previousEvents.unshift(infiniteSequencer.midiClip.events),
 			}
 		}
@@ -226,10 +229,7 @@ function infiniteSequencerReducer(
 
 			return {
 				...infiniteSequencer,
-				midiClip: {
-					...infiniteSequencer.midiClip,
-					events: prv.first(),
-				},
+				midiClip: infiniteSequencer.midiClip.set('events', prv.first()),
 				previousEvents: prv.shift().toList(),
 			}
 		}
@@ -238,10 +238,7 @@ function infiniteSequencerReducer(
 
 			return {
 				...infiniteSequencer,
-				midiClip: {
-					...infiniteSequencer.midiClip,
-					events: createSequencerEvents(0),
-				},
+				midiClip: infiniteSequencer.midiClip.set('events', createSequencerEvents(0)),
 				previousEvents: infiniteSequencer.previousEvents.unshift(infiniteSequencer.midiClip.events),
 			}
 		}
@@ -251,14 +248,12 @@ function infiniteSequencerReducer(
 			if (infiniteSequencer.isRecording) {
 				return {
 					...infiniteSequencer,
-					midiClip: {
-						...infiniteSequencer.midiClip,
-						events: infiniteSequencer.midiClip.events
-							.concat({
-								notes: MidiNotes([action.midiNote]),
-								startBeat: infiniteSequencer.midiClip.events.count()
-							}),
-					},
+					midiClip: infiniteSequencer.midiClip.set('events', infiniteSequencer.midiClip.events
+						.concat({
+							notes: MidiNotes([action.midiNote]),
+							startBeat: infiniteSequencer.midiClip.events.count()
+						})
+					),
 					previousEvents: infiniteSequencer.previousEvents.unshift(infiniteSequencer.midiClip.events),
 				}
 			} else {
@@ -268,14 +263,12 @@ function infiniteSequencerReducer(
 			if (infiniteSequencer.isRecording) {
 				return {
 					...infiniteSequencer,
-					midiClip: {
-						...infiniteSequencer.midiClip,
-						events: infiniteSequencer.midiClip.events
-							.concat({
-								notes: MidiNotes(),
-								startBeat: infiniteSequencer.midiClip.events.count()
-							}),
-					},
+					midiClip: infiniteSequencer.midiClip.set('events', infiniteSequencer.midiClip.events
+						.concat({
+							notes: MidiNotes(),
+							startBeat: infiniteSequencer.midiClip.events.count()
+						})
+					),
 					previousEvents: infiniteSequencer.previousEvents.unshift(infiniteSequencer.midiClip.events),
 				}
 			} else {

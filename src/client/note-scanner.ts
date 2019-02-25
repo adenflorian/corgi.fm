@@ -1,7 +1,7 @@
-import {ConnectionNodeType, MidiRange, notesToNote} from '../common/common-types'
+import {ConnectionNodeType, MidiRange, makeMidiClip} from '../common/common-types'
 import {logger} from '../common/logger'
 import {
-	ClientStore, selectGlobalClockState,
+	ClientStore, selectGlobalClockState, selectAllGridSequencers,
 } from '../common/redux'
 import {shortDemoMidiClip} from './clips'
 import {getInstruments} from './instrument-manager'
@@ -34,7 +34,7 @@ if (module.hot) {
 	})
 }
 
-const clip = shortDemoMidiClip
+let clip = shortDemoMidiClip
 
 const _jumpStartSeconds = 0.5
 
@@ -44,8 +44,16 @@ let currentSongTimeBeats = 0
 let lastAudioContextTime = 0
 let _justStarted = false
 
+const emptyMidiClip = makeMidiClip()
+
 function scheduleNotes() {
 	const roomState = _store.getState().room
+
+	const allGridSeqs = selectAllGridSequencers(roomState)
+
+	const gridSeq = Object.keys(allGridSeqs).map(x => allGridSeqs[x])[0]
+
+	clip = gridSeq ? gridSeq.midiClip : emptyMidiClip
 
 	const {
 		isPlaying, bpm, maxReadAheadSeconds,
@@ -96,9 +104,9 @@ function scheduleNotes() {
 	// logger.log('actualBPM: ', actualBPM)
 	// logger.log('maxReadAheadBeats: ', maxReadAheadBeats)
 	// logger.log('currentSongTimeSeconds: ', currentSongTimeBeats)
-	logger.log('_cursorBeats: ', _cursorBeats)
+	// logger.log('_cursorBeats: ', _cursorBeats)
 	// logger.log('cursorDestinationSeconds: ', cursorDestinationBeats)
-	logger.log('beatsToRead: ', beatsToRead)
+	// logger.log('beatsToRead: ', beatsToRead)
 	// logger.log('offset: ', offset)
 	// logger.log('_cursorBeats - currentSongTimeSeconds: ', _cursorBeats - currentSongTimeBeats)
 	// logger.log('clip: ', clip)
@@ -125,10 +133,12 @@ function scheduleNotes() {
 
 			const noteLength = 0.1
 
-			let actualNote = notesToNote(event.notes)
-			console.log('actualNote: ' + actualNote + ' | delaySeconds: ' + delaySeconds)
-			synth.scheduleNote(actualNote, delaySeconds)
-			synth.scheduleRelease(actualNote, delaySeconds + noteLength)
+			event.notes.forEach(note => {
+				console.log('actualNote: ' + note + ' | delaySeconds: ' + delaySeconds)
+				// console.log('gridSeq: ', gridSeq)
+				synth.scheduleNote(note, delaySeconds)
+				synth.scheduleRelease(note, delaySeconds + noteLength)
+			})
 		})
 	})
 

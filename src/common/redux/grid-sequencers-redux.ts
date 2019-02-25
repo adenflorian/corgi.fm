@@ -7,7 +7,6 @@ import {emptyMidiNotes, IMidiNote} from '../MidiNote'
 import {MAX_MIDI_NOTE_NUMBER_127} from '../server-constants'
 import {colorFunc, hashbow} from '../shamu-color'
 import {addMultiThing, BROADCASTER_ACTION, CLEAR_SEQUENCER, createSequencerEvents, IClientRoomState, IMultiState, IMultiStateThings, isEmptyEvents, ISequencerState, makeMultiReducer, NetworkActionType, PLAY_ALL, selectAllInfiniteSequencers, selectGlobalClockState, SERVER_ACTION, STOP_ALL, UNDO_SEQUENCER} from './index'
-import {makeSequencerEvents} from './sequencer-redux'
 import {NodeSpecialState} from './shamu-graph'
 
 export const addGridSequencer = (gridSequencer: IGridSequencerState) =>
@@ -230,26 +229,23 @@ const gridSequencerReducer =
 				}
 				return {
 					...gridSequencer,
-					midiClip: {
-						...gridSequencer.midiClip,
-						events: gridSequencer.midiClip.events.map((event, eventIndex) => {
-							if (eventIndex === action.index) {
-								if (action.enabled) {
-									return {
-										...event,
-										notes: event.notes.add(action.note),
-									}
-								} else {
-									return {
-										...event,
-										notes: event.notes.filter(x => x !== action.note),
-									}
+					midiClip: gridSequencer.midiClip.set('events', gridSequencer.midiClip.events.map((event, eventIndex) => {
+						if (eventIndex === action.index) {
+							if (action.enabled) {
+								return {
+									...event,
+									notes: event.notes.add(action.note),
 								}
 							} else {
-								return event
+								return {
+									...event,
+									notes: event.notes.filter(x => x !== action.note),
+								}
 							}
-						}),
-					},
+						} else {
+							return event
+						}
+					})),
 					previousEvents: gridSequencer.previousEvents.unshift(gridSequencer.midiClip.events),
 				}
 			case SET_GRID_SEQUENCER_FIELD:
@@ -271,10 +267,7 @@ const gridSequencerReducer =
 
 				return {
 					...gridSequencer,
-					midiClip: {
-						...gridSequencer.midiClip,
-						events: prv.first()
-					},
+					midiClip: gridSequencer.midiClip.set('events', prv.first()),
 					previousEvents: prv.shift().toList(),
 				}
 			}
@@ -283,10 +276,10 @@ const gridSequencerReducer =
 
 				return {
 					...gridSequencer,
-					midiClip: {
-						...gridSequencer.midiClip,
-						events: createSequencerEvents(gridSequencer.midiClip.events.count())
-					},
+					midiClip: gridSequencer.midiClip.set(
+						'events',
+						createSequencerEvents(gridSequencer.midiClip.events.count())
+					),
 					previousEvents: gridSequencer.previousEvents.unshift(gridSequencer.midiClip.events),
 				}
 			}

@@ -176,13 +176,23 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 		switch (args.type) {
 			case ConnectionNodeType.gridSequencer:
 				const x = new GridSequencerState(
-					serverClient.id, args.name, args.notesToShow || 24, args.events!, args.isPlaying)
+					serverClient.id,
+					args.name,
+					args.notesToShow || 24,
+					args.events!,
+					args.isPlaying,
+				)
 				dispatchToRoom(addGridSequencer(x))
 				// makeServerOwnedNode(args.type, x)
 				return x
 			case ConnectionNodeType.infiniteSequencer:
 				const y = new InfiniteSequencerState(
-					serverClient.id, args.name, args.infinityStyle || InfiniteSequencerStyle.colorGrid, args.events, args.isPlaying)
+					serverClient.id,
+					args.name,
+					args.infinityStyle || InfiniteSequencerStyle.colorGrid,
+					args.events!,
+					args.isPlaying,
+				)
 				dispatchToRoom(addInfiniteSequencer(y))
 				// makeServerOwnedNode(args.type, y)
 				return y
