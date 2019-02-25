@@ -1,6 +1,6 @@
 import {List} from 'immutable'
-import {IMultiStateThing} from '../common-types'
-import {emptyMidiNotes, IMidiNotes, MidiNotes} from '../MidiNote'
+import {IMultiStateThing, MidiClipEvent} from '../common-types'
+import {emptyMidiNotes, MidiNotes} from '../MidiNote'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './index'
 
 export const CLEAR_SEQUENCER = 'CLEAR_SEQUENCER'
@@ -34,14 +34,10 @@ export const createSequencerEvents = (indexCount: number) => {
 		.fill({notes: emptyMidiNotes}))
 }
 
-export type SequencerEvents = List<ISequencerEvent>
-
-export interface ISequencerEvent {
-	notes: IMidiNotes
-}
+export type SequencerEvents = List<MidiClipEvent>
 
 export const makeSequencerEvents =
-	(x: ISequencerEvent[] | List<ISequencerEvent> = Array<ISequencerEvent>()): SequencerEvents => List<ISequencerEvent>(x)
+	(x: MidiClipEvent[] | List<MidiClipEvent> = Array<MidiClipEvent>()): SequencerEvents => List<MidiClipEvent>(x)
 
 export function deserializeEvents(events: SequencerEvents): SequencerEvents {
 	return makeSequencerEvents(events.map(x => ({...x, notes: MidiNotes(x.notes)})))

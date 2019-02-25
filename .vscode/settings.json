@@ -106,4 +106,5 @@
     ],
     "less.lint.emptyRules": "ignore",
     "codemetrics.basics.CodeLensHiddenUnder": 20,
+    "codemetrics.basics.CodeLensEnabled": false,
 }

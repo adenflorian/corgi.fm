@@ -227,7 +227,7 @@ function infiniteSequencerReducer(
 			if (infiniteSequencer.isRecording) {
 				return {
 					...infiniteSequencer,
-					events: infiniteSequencer.events.concat({notes: MidiNotes([action.midiNote])}),
+					events: infiniteSequencer.events.concat({notes: MidiNotes([action.midiNote]), startBeat: infiniteSequencer.events.count()}),
 					previousEvents: infiniteSequencer.previousEvents.unshift(infiniteSequencer.events),
 				}
 			} else {
@@ -237,7 +237,7 @@ function infiniteSequencerReducer(
 			if (infiniteSequencer.isRecording) {
 				return {
 					...infiniteSequencer,
-					events: infiniteSequencer.events.concat({notes: MidiNotes()}),
+					events: infiniteSequencer.events.concat({notes: MidiNotes(), startBeat: infiniteSequencer.events.count()}),
 					previousEvents: infiniteSequencer.previousEvents.unshift(infiniteSequencer.events),
 				}
 			} else {

@@ -235,57 +235,60 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 	}
 }
 
-function getBassNotes() {
+function getBassNotes(): SequencerEvents {
 	return createSequencerEvents(16)
-		.map((_, i) => ({notes: MidiNotes(i % 2 === 1 ? [] : [24])}))
+		.map((_, i) => ({
+			notes: MidiNotes(i % 2 === 1 ? [] : [24]),
+			startBeat: i
+		}))
 }
 
 function getMelodyNotes() {
 	return makeSequencerEvents([
-		{notes: MidiNotes([36])},
-		{notes: MidiNotes([40])},
-		{notes: MidiNotes([43])},
-		{notes: MidiNotes([47])},
-		{notes: MidiNotes([48])},
-		{notes: MidiNotes([47])},
-		{notes: MidiNotes([43])},
-		{notes: MidiNotes([40])},
-		{notes: MidiNotes([36])},
-		{notes: MidiNotes([40])},
-		{notes: MidiNotes([43])},
-		{notes: MidiNotes([47])},
-		{notes: MidiNotes([48])},
-		{notes: MidiNotes([47])},
-		{notes: MidiNotes([43])},
-		{notes: MidiNotes([40])},
-		{notes: MidiNotes([36])},
-		{notes: MidiNotes([40])},
-		{notes: MidiNotes([43])},
-		{notes: MidiNotes([47])},
-		{notes: MidiNotes([48])},
-		{notes: MidiNotes([47])},
-		{notes: MidiNotes([43])},
-		{notes: MidiNotes([40])},
-		{notes: MidiNotes([36])},
-		{notes: MidiNotes([40])},
-		{notes: MidiNotes([43])},
-		{notes: MidiNotes([47])},
-		{notes: MidiNotes([48])},
-		{notes: MidiNotes([47])},
-		{notes: MidiNotes([43])},
-		{notes: MidiNotes([40])},
+		{notes: MidiNotes([36]), startBeat: 0},
+		{notes: MidiNotes([40]), startBeat: 1},
+		{notes: MidiNotes([43]), startBeat: 2},
+		{notes: MidiNotes([47]), startBeat: 3},
+		{notes: MidiNotes([48]), startBeat: 4},
+		{notes: MidiNotes([47]), startBeat: 5},
+		{notes: MidiNotes([43]), startBeat: 6},
+		{notes: MidiNotes([40]), startBeat: 7},
+		{notes: MidiNotes([36]), startBeat: 8},
+		{notes: MidiNotes([40]), startBeat: 9},
+		{notes: MidiNotes([43]), startBeat: 10},
+		{notes: MidiNotes([47]), startBeat: 11},
+		{notes: MidiNotes([48]), startBeat: 12},
+		{notes: MidiNotes([47]), startBeat: 13},
+		{notes: MidiNotes([43]), startBeat: 14},
+		{notes: MidiNotes([40]), startBeat: 15},
+		{notes: MidiNotes([36]), startBeat: 16},
+		{notes: MidiNotes([40]), startBeat: 17},
+		{notes: MidiNotes([43]), startBeat: 18},
+		{notes: MidiNotes([47]), startBeat: 19},
+		{notes: MidiNotes([48]), startBeat: 20},
+		{notes: MidiNotes([47]), startBeat: 21},
+		{notes: MidiNotes([43]), startBeat: 22},
+		{notes: MidiNotes([40]), startBeat: 23},
+		{notes: MidiNotes([36]), startBeat: 24},
+		{notes: MidiNotes([40]), startBeat: 25},
+		{notes: MidiNotes([43]), startBeat: 26},
+		{notes: MidiNotes([47]), startBeat: 27},
+		{notes: MidiNotes([48]), startBeat: 28},
+		{notes: MidiNotes([47]), startBeat: 29},
+		{notes: MidiNotes([43]), startBeat: 30},
+		{notes: MidiNotes([40]), startBeat: 31},
 	])
 }
 
 function getInitialInfiniteSequencerEvents() {
 	return makeSequencerEvents([
-		{notes: MidiNotes([60])},
-		{notes: MidiNotes([64])},
-		{notes: MidiNotes([67])},
-		{notes: MidiNotes([71])},
-		{notes: MidiNotes([72])},
-		{notes: MidiNotes([71])},
-		{notes: MidiNotes([67])},
-		{notes: MidiNotes([64])},
+		{notes: MidiNotes([60]), startBeat: 0},
+		{notes: MidiNotes([64]), startBeat: 1},
+		{notes: MidiNotes([67]), startBeat: 2},
+		{notes: MidiNotes([71]), startBeat: 3},
+		{notes: MidiNotes([72]), startBeat: 4},
+		{notes: MidiNotes([71]), startBeat: 5},
+		{notes: MidiNotes([67]), startBeat: 6},
+		{notes: MidiNotes([64]), startBeat: 7},
 	])
 }
