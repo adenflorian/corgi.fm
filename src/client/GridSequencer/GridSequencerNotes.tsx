@@ -2,8 +2,12 @@ import {List} from 'immutable'
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
+import {MidiClipEvents} from '../../common/common-types'
 import {IMidiNotes} from '../../common/MidiNote'
-import {GridSequencerFields, IClientAppState, selectGlobalClockState, selectGridSequencer, SequencerEvents, setGridSequencerField, setGridSequencerNote} from '../../common/redux'
+import {
+	GridSequencerFields, IClientAppState, selectGlobalClockState,
+	selectGridSequencer, setGridSequencerField, setGridSequencerNote
+} from '../../common/redux'
 import {MAX_MIDI_NOTE_NUMBER_127, MIN_MIDI_NOTE_NUMBER_0} from '../../common/server-constants'
 import {getColorStringForMidiNote} from '../../common/shamu-color'
 import {isWhiteKey} from '../Keyboard/Keyboard'
@@ -19,7 +23,7 @@ interface IGridSequencerNotesProps {
 }
 
 interface IGridSequencerNotesReduxProps {
-	events: SequencerEvents
+	events: MidiClipEvents
 	activeIndex: number
 	bottomNote: number
 	notesToShow: number
@@ -149,9 +153,9 @@ const mapStateToProps = (state: IClientAppState, props: IGridSequencerNotesProps
 	const gridSequencerState = selectGridSequencer(state.room, props.id)
 
 	return {
-		events: gridSequencerState.events,
+		events: gridSequencerState.midiClip.events,
 		activeIndex: gridSequencerState.isPlaying
-			? selectGlobalClockState(state.room).index % gridSequencerState.events.count()
+			? selectGlobalClockState(state.room).index % gridSequencerState.midiClip.events.count()
 			: -1,
 		bottomNote: gridSequencerState.scrollY,
 		notesToShow: gridSequencerState.notesToShow,

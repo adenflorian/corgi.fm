@@ -1,6 +1,6 @@
 import {Map} from 'immutable'
 import {Action, Store} from 'redux'
-import {ConnectionNodeType, IConnectable} from '../common/common-types'
+import {ConnectionNodeType, IConnectable, MidiClipEvents} from '../common/common-types'
 import {calculatePositionsGivenConnections} from '../common/compute-positions'
 import {MidiNotes} from '../common/MidiNote'
 import {
@@ -12,7 +12,7 @@ import {
 	InfiniteSequencerState, InfiniteSequencerStyle, IServerState,
 	makePosition, makeSequencerEvents,
 	MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID, selectAllConnections,
-	selectAllPositions, SequencerEvents, SimpleReverbState, updatePositions,
+	selectAllPositions, SimpleReverbState, updatePositions,
 } from '../common/redux'
 
 const masterAudioOutput: IConnectable = Object.freeze({
@@ -167,7 +167,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 		type: ConnectionNodeType
 		name: string
 		infinityStyle?: InfiniteSequencerStyle
-		events?: SequencerEvents
+		events?: MidiClipEvents
 		notesToShow?: number
 		isPlaying?: boolean
 	}
@@ -176,7 +176,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 		switch (args.type) {
 			case ConnectionNodeType.gridSequencer:
 				const x = new GridSequencerState(
-					serverClient.id, args.name, args.notesToShow || 24, args.events, args.isPlaying)
+					serverClient.id, args.name, args.notesToShow || 24, args.events!, args.isPlaying)
 				dispatchToRoom(addGridSequencer(x))
 				// makeServerOwnedNode(args.type, x)
 				return x
@@ -235,7 +235,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 	}
 }
 
-function getBassNotes(): SequencerEvents {
+function getBassNotes(): MidiClipEvents {
 	return createSequencerEvents(16)
 		.map((_, i) => ({
 			notes: MidiNotes(i % 2 === 1 ? [] : [24]),

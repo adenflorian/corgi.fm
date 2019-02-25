@@ -27,6 +27,7 @@ export const localMiddleware: Middleware<{}, IClientAppState> = ({dispatch, getS
 	next(action)
 	switch (action.type) {
 		case LOCAL_MIDI_KEY_PRESS: {
+			// TODO trigger attack on instrument
 			const localVirtualKeyboard = getLocalVirtualKeyboard(getState())
 			return dispatch(
 				virtualKeyPressed(
@@ -37,6 +38,7 @@ export const localMiddleware: Middleware<{}, IClientAppState> = ({dispatch, getS
 			)
 		}
 		case LOCAL_MIDI_KEY_UP: {
+			// TODO trigger release on instrument
 			return dispatch(virtualKeyUp(getLocalVirtualKeyboardId(getState()), action.midiNote))
 		}
 		case LOCAL_MIDI_OCTAVE_CHANGE: {

@@ -189,6 +189,7 @@ export const setupInstrumentManager =
 					const sourceNotes = selectConnectionSourceNotesByTargetId(state.room, instrumentId)
 
 					if (isNewNoteScannerEnabled === false) {
+						// In old system, all note changes go thru here
 						instrument.setMidiNotes(sourceNotes)
 					}
 

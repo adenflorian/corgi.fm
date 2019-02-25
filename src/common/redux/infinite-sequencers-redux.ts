@@ -2,11 +2,16 @@ import {List, Stack} from 'immutable'
 import {AnyAction} from 'redux'
 import {createSelector} from 'reselect'
 import * as uuid from 'uuid'
-import {ConnectionNodeType, IConnectable} from '../common-types'
+import {ConnectionNodeType, IConnectable, MidiClipEvents, makeMidiClip, MidiClip} from '../common-types'
 import {IMidiNote, MidiNotes} from '../MidiNote'
 import {colorFunc, hashbow} from '../shamu-color'
-import {addMultiThing, BROADCASTER_ACTION, CLEAR_SEQUENCER, createSequencerEvents, IClientRoomState, IMultiState, IMultiStateThings, ISequencerState, makeMultiReducer, NetworkActionType, PLAY_ALL, selectGlobalClockState, SERVER_ACTION, SKIP_NOTE, STOP_ALL, UNDO_SEQUENCER, VIRTUAL_KEY_PRESSED} from './index'
-import {makeSequencerEvents, SequencerEvents} from './sequencer-redux'
+import {
+	addMultiThing, BROADCASTER_ACTION, CLEAR_SEQUENCER, createSequencerEvents,
+	IClientRoomState, IMultiState, IMultiStateThings, ISequencerState,
+	makeMultiReducer, NetworkActionType, PLAY_ALL, selectGlobalClockState,
+	SERVER_ACTION, SKIP_NOTE, STOP_ALL, UNDO_SEQUENCER, VIRTUAL_KEY_PRESSED
+} from './index'
+import {makeSequencerEvents} from './sequencer-redux'
 import {NodeSpecialState} from './shamu-graph'
 
 export const addInfiniteSequencer = (infiniteSequencer: InfiniteSequencerState) =>
@@ -90,31 +95,35 @@ export class InfiniteSequencerState implements ISequencerState, IConnectable, No
 	public static dummy: InfiniteSequencerState = {
 		id: 'dummy',
 		ownerId: 'dummyOwner',
-		events: makeSequencerEvents(),
 		index: -1,
 		isPlaying: false,
 		color: 'gray',
 		name: 'dummy',
 		isRecording: false,
-		previousEvents: List<SequencerEvents>(),
+		previousEvents: List<MidiClipEvents>(),
 		type: ConnectionNodeType.infiniteSequencer,
 		style: InfiniteSequencerStyle.colorGrid,
 		showRows: false,
 		width: InfiniteSequencerState.defaultWidth,
 		height: InfiniteSequencerState.defaultHeight,
 		rate: 1,
+		midiClip: makeMidiClip({
+			events: List(),
+			length: 0,
+			loop: false
+		}),
 	}
 
 	public readonly id: string = uuid.v4()
 	public readonly ownerId: string
-	public readonly events: SequencerEvents
+	public readonly midiClip: MidiClip
 	public readonly index: number = -1
 	public readonly isPlaying: boolean = false
 	public readonly color: string
 	public readonly name: string
 	public readonly isRecording: boolean = false
 	public readonly style: InfiniteSequencerStyle
-	public readonly previousEvents = List<SequencerEvents>()
+	public readonly previousEvents = List<MidiClipEvents>()
 	public readonly showRows = false
 	public readonly width: number = InfiniteSequencerState.defaultWidth
 	public readonly height: number = InfiniteSequencerState.defaultHeight
@@ -125,9 +134,13 @@ export class InfiniteSequencerState implements ISequencerState, IConnectable, No
 		this.ownerId = ownerId
 		this.name = name
 		this.color = colorFunc(hashbow(this.id)).desaturate(0.2).hsl().string()
-		this.events = events
 		this.style = style
 		this.isPlaying = isPlaying
+		this.midiClip = makeMidiClip({
+			events: events,
+			length: events.count(),
+			loop: true
+		})
 	}
 }
 
@@ -158,24 +171,27 @@ function infiniteSequencerReducer(
 		case SET_INFINITE_SEQUENCER_NOTE: {
 			return {
 				...infiniteSequencer,
-				events: infiniteSequencer.events.map((event, eventIndex) => {
-					if (eventIndex === action.index) {
-						if (action.enabled) {
-							return {
-								...event,
-								notes: event.notes.add(action.note),
+				midiClip: {
+					...infiniteSequencer.midiClip,
+					events: infiniteSequencer.midiClip.events.map((event, eventIndex) => {
+						if (eventIndex === action.index) {
+							if (action.enabled) {
+								return {
+									...event,
+									notes: event.notes.add(action.note),
+								}
+							} else {
+								return {
+									...event,
+									notes: event.notes.filter(x => x !== action.note),
+								}
 							}
 						} else {
-							return {
-								...event,
-								notes: event.notes.filter(x => x !== action.note),
-							}
+							return event
 						}
-					} else {
-						return event
-					}
-				}),
-				previousEvents: infiniteSequencer.previousEvents.unshift(infiniteSequencer.events),
+					}),
+				},
+				previousEvents: infiniteSequencer.previousEvents.unshift(infiniteSequencer.midiClip.events),
 			}
 		}
 		case SET_INFINITE_SEQUENCER_FIELD:
@@ -187,7 +203,7 @@ function infiniteSequencerReducer(
 			} else if (action.fieldName === InfiniteSequencerFields.index) {
 				return {
 					...infiniteSequencer,
-					[action.fieldName]: action.data % infiniteSequencer.events.count(),
+					[action.fieldName]: action.data % infiniteSequencer.midiClip.events.count(),
 				}
 			} else if (action.fieldName === InfiniteSequencerFields.isPlaying) {
 				return {
@@ -208,17 +224,23 @@ function infiniteSequencerReducer(
 
 			return {
 				...infiniteSequencer,
-				events: prv.first(),
+				midiClip: {
+					...infiniteSequencer.midiClip,
+					events: prv.first(),
+				},
 				previousEvents: prv.shift().toList(),
 			}
 		}
 		case CLEAR_SEQUENCER: {
-			if (infiniteSequencer.events.count() === 0) return infiniteSequencer
+			if (infiniteSequencer.midiClip.events.count() === 0) return infiniteSequencer
 
 			return {
 				...infiniteSequencer,
-				events: createSequencerEvents(0),
-				previousEvents: infiniteSequencer.previousEvents.unshift(infiniteSequencer.events),
+				midiClip: {
+					...infiniteSequencer.midiClip,
+					events: createSequencerEvents(0),
+				},
+				previousEvents: infiniteSequencer.previousEvents.unshift(infiniteSequencer.midiClip.events),
 			}
 		}
 		case PLAY_ALL: return {...infiniteSequencer, isPlaying: true}
@@ -227,8 +249,15 @@ function infiniteSequencerReducer(
 			if (infiniteSequencer.isRecording) {
 				return {
 					...infiniteSequencer,
-					events: infiniteSequencer.events.concat({notes: MidiNotes([action.midiNote]), startBeat: infiniteSequencer.events.count()}),
-					previousEvents: infiniteSequencer.previousEvents.unshift(infiniteSequencer.events),
+					midiClip: {
+						...infiniteSequencer.midiClip,
+						events: infiniteSequencer.midiClip.events
+							.concat({
+								notes: MidiNotes([action.midiNote]),
+								startBeat: infiniteSequencer.midiClip.events.count()
+							}),
+					},
+					previousEvents: infiniteSequencer.previousEvents.unshift(infiniteSequencer.midiClip.events),
 				}
 			} else {
 				return infiniteSequencer
@@ -237,8 +266,15 @@ function infiniteSequencerReducer(
 			if (infiniteSequencer.isRecording) {
 				return {
 					...infiniteSequencer,
-					events: infiniteSequencer.events.concat({notes: MidiNotes(), startBeat: infiniteSequencer.events.count()}),
-					previousEvents: infiniteSequencer.previousEvents.unshift(infiniteSequencer.events),
+					midiClip: {
+						...infiniteSequencer.midiClip,
+						events: infiniteSequencer.midiClip.events
+							.concat({
+								notes: MidiNotes(),
+								startBeat: infiniteSequencer.midiClip.events.count()
+							}),
+					},
+					previousEvents: infiniteSequencer.previousEvents.unshift(infiniteSequencer.midiClip.events),
 				}
 			} else {
 				return infiniteSequencer
@@ -270,8 +306,8 @@ export const selectInfiniteSequencerActiveNotes = createSelector(
 
 		const index = globalClockIndex
 
-		if (index >= 0 && infiniteSequencer.events.count() > 0) {
-			return infiniteSequencer.events.get((index / Math.round(infiniteSequencer.rate)) % infiniteSequencer.events.count())!.notes
+		if (index >= 0 && infiniteSequencer.midiClip.events.count() > 0) {
+			return infiniteSequencer.midiClip.events.get((index / Math.round(infiniteSequencer.rate)) % infiniteSequencer.midiClip.events.count())!.notes
 		} else {
 			return emptyNotes
 		}

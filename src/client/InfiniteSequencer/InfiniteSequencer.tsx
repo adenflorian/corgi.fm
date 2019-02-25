@@ -2,8 +2,9 @@ import * as React from 'react'
 import {IoMdDownload as Download, IoMdGrid as Rows, IoMdPlay as Play, IoMdRecording as Record, IoMdSquare as Stop, IoMdStar as Star, IoMdTrash as Clear, IoMdUndo as Undo} from 'react-icons/io'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
+import {MidiClipEvents} from '../../common/common-types'
 import {IMidiNote} from '../../common/MidiNote'
-import {clearSequencer, exportSequencerMidi, findLowestAndHighestNotes, globalClockActions, IClientAppState, InfiniteSequencerFields, InfiniteSequencerStyle, selectGlobalClockState, selectInfiniteSequencer, SequencerEvents, setInfiniteSequencerField, undoSequencer} from '../../common/redux'
+import {clearSequencer, exportSequencerMidi, findLowestAndHighestNotes, globalClockActions, IClientAppState, InfiniteSequencerFields, InfiniteSequencerStyle, selectGlobalClockState, selectInfiniteSequencer, setInfiniteSequencerField, undoSequencer} from '../../common/redux'
 import {getColorStringForMidiNote} from '../../common/shamu-color'
 import {isWhiteKey} from '../Keyboard/Keyboard'
 import {Knob} from '../Knob/Knob'
@@ -18,7 +19,7 @@ interface IInfiniteSequencerProps {
 interface IInfiniteSequencerReduxProps {
 	activeIndex: number
 	color: string
-	events: SequencerEvents
+	events: MidiClipEvents
 	isPlaying: boolean
 	isRecording: boolean
 	name: string
@@ -209,9 +210,9 @@ export const ConnectedInfiniteSequencer = connect(
 		const infiniteSequencerState = selectInfiniteSequencer(state.room, props.id)
 
 		return {
-			events: infiniteSequencerState.events,
+			events: infiniteSequencerState.midiClip.events,
 			activeIndex: infiniteSequencerState.isPlaying
-				? (selectGlobalClockState(state.room).index / Math.round(infiniteSequencerState.rate)) % infiniteSequencerState.events.count()
+				? (selectGlobalClockState(state.room).index / Math.round(infiniteSequencerState.rate)) % infiniteSequencerState.midiClip.events.count()
 				: -1,
 			isPlaying: infiniteSequencerState.isPlaying,
 			isRecording: infiniteSequencerState.isRecording,

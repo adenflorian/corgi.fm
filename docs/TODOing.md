@@ -1,6 +1,7 @@
 # Now
 - [ ] hook up note-scanner with everything
 	- [ ] change sequencer state to whole new stuff
+	- [ ] keyboard
 
 # Soon
 - [ ] allow adding connections from a node with no connections on it already

@@ -2,12 +2,12 @@ import {List, Map, Stack} from 'immutable'
 import {AnyAction} from 'redux'
 import {createSelector} from 'reselect'
 import * as uuid from 'uuid'
-import {ConnectionNodeType} from '../common-types'
+import {ConnectionNodeType, MidiClipEvents, MidiClip, makeMidiClip} from '../common-types'
 import {emptyMidiNotes, IMidiNote} from '../MidiNote'
 import {MAX_MIDI_NOTE_NUMBER_127} from '../server-constants'
 import {colorFunc, hashbow} from '../shamu-color'
 import {addMultiThing, BROADCASTER_ACTION, CLEAR_SEQUENCER, createSequencerEvents, IClientRoomState, IMultiState, IMultiStateThings, isEmptyEvents, ISequencerState, makeMultiReducer, NetworkActionType, PLAY_ALL, selectAllInfiniteSequencers, selectGlobalClockState, SERVER_ACTION, STOP_ALL, UNDO_SEQUENCER} from './index'
-import {makeSequencerEvents, SequencerEvents} from './sequencer-redux'
+import {makeSequencerEvents} from './sequencer-redux'
 import {NodeSpecialState} from './shamu-graph'
 
 export const addGridSequencer = (gridSequencer: IGridSequencerState) =>
@@ -93,7 +93,6 @@ export class GridSequencerState implements IGridSequencerState, NodeSpecialState
 	public static dummy: IGridSequencerState = {
 		id: 'dummy',
 		ownerId: 'dummyOwner',
-		events: makeSequencerEvents(),
 		index: -1,
 		isPlaying: false,
 		color: 'gray',
@@ -101,16 +100,21 @@ export class GridSequencerState implements IGridSequencerState, NodeSpecialState
 		scrollY: 0,
 		notesToShow: 0,
 		isRecording: false,
-		previousEvents: List<SequencerEvents>(),
+		previousEvents: List<MidiClipEvents>(),
 		width: GridSequencerState.defaultWidth,
 		height: GridSequencerState.defaultHeight,
 		type: ConnectionNodeType.gridSequencer,
 		rate: 1,
+		midiClip: makeMidiClip({
+			events: List(),
+			length: 0,
+			loop: false
+		}),
 	}
 
 	public readonly id: string = uuid.v4()
 	public readonly ownerId: string
-	public readonly events: SequencerEvents
+	public readonly midiClip: MidiClip
 	public readonly index: number = -1
 	public readonly isPlaying: boolean = false
 	public readonly color: string
@@ -118,19 +122,23 @@ export class GridSequencerState implements IGridSequencerState, NodeSpecialState
 	public readonly scrollY: number
 	public readonly notesToShow: number
 	public readonly isRecording: boolean = false
-	public readonly previousEvents = List<SequencerEvents>()
+	public readonly previousEvents = List<MidiClipEvents>()
 	public readonly width: number = GridSequencerState.defaultWidth
 	public readonly height: number = GridSequencerState.defaultHeight
 	public readonly type = ConnectionNodeType.gridSequencer
 	public readonly rate = 1
 
-	constructor(ownerId: string, name: string, notesToShow: number, events?: SequencerEvents, isPlaying = false) {
+	constructor(ownerId: string, name: string, notesToShow: number, events: MidiClipEvents, isPlaying = false) {
 		this.ownerId = ownerId
 		this.name = name
 		this.color = colorFunc(hashbow(this.id)).desaturate(0.2).hsl().string()
-		this.events = events || createSequencerEvents(8)
 		this.notesToShow = notesToShow
 		this.isPlaying = isPlaying
+		this.midiClip = makeMidiClip({
+			events: events,
+			length: events.count(),
+			loop: true
+		})
 
 		this.scrollY = this._calculateScrollY()
 
@@ -142,13 +150,13 @@ export class GridSequencerState implements IGridSequencerState, NodeSpecialState
 
 		this.width =
 			controlsWidth +
-			(GridSequencerState.noteWidth * this.events.count()) +
+			(GridSequencerState.noteWidth * this.midiClip.events.count()) +
 			GridSequencerState.scrollBarWidth
 	}
 
 	private get maxScrollY() {return MAX_MIDI_NOTE_NUMBER_127 - this.notesToShow}
-	private get lowestNote() {return findLowestNote(this.events)}
-	private get highestNote() {return findHighestNote(this.events)}
+	private get lowestNote() {return findLowestNote(this.midiClip.events)}
+	private get highestNote() {return findHighestNote(this.midiClip.events)}
 
 	private _calculateScrollY() {
 		const notesRange = this.highestNote - this.lowestNote
@@ -158,14 +166,14 @@ export class GridSequencerState implements IGridSequencerState, NodeSpecialState
 	}
 }
 
-export function findLowestAndHighestNotes(events: SequencerEvents) {
+export function findLowestAndHighestNotes(events: MidiClipEvents) {
 	return {
 		lowestNote: findLowestNote(events),
 		highestNote: findHighestNote(events),
 	}
 }
 
-export function findLowestNote(events: SequencerEvents): number {
+export function findLowestNote(events: MidiClipEvents): number {
 	let lowest = Number.MAX_VALUE
 
 	events.forEach(event => {
@@ -183,7 +191,7 @@ export function findLowestNote(events: SequencerEvents): number {
 	return lowest
 }
 
-export function findHighestNote(events: SequencerEvents): number {
+export function findHighestNote(events: MidiClipEvents): number {
 	let highest = Number.MIN_VALUE
 
 	events.forEach(event => {
@@ -214,7 +222,7 @@ const gridSequencerGlobalActionTypes = [
 ]
 
 const gridSequencerReducer =
-	(gridSequencer: IGridSequencerState, action: AnyAction) => {
+	(gridSequencer: IGridSequencerState, action: AnyAction): IGridSequencerState => {
 		switch (action.type) {
 			case SET_GRID_SEQUENCER_NOTE:
 				if (action.note === undefined) {
@@ -222,30 +230,33 @@ const gridSequencerReducer =
 				}
 				return {
 					...gridSequencer,
-					events: gridSequencer.events.map((event, eventIndex) => {
-						if (eventIndex === action.index) {
-							if (action.enabled) {
-								return {
-									...event,
-									notes: event.notes.add(action.note),
+					midiClip: {
+						...gridSequencer.midiClip,
+						events: gridSequencer.midiClip.events.map((event, eventIndex) => {
+							if (eventIndex === action.index) {
+								if (action.enabled) {
+									return {
+										...event,
+										notes: event.notes.add(action.note),
+									}
+								} else {
+									return {
+										...event,
+										notes: event.notes.filter(x => x !== action.note),
+									}
 								}
 							} else {
-								return {
-									...event,
-									notes: event.notes.filter(x => x !== action.note),
-								}
+								return event
 							}
-						} else {
-							return event
-						}
-					}),
-					previousEvents: gridSequencer.previousEvents.unshift(gridSequencer.events),
+						}),
+					},
+					previousEvents: gridSequencer.previousEvents.unshift(gridSequencer.midiClip.events),
 				}
 			case SET_GRID_SEQUENCER_FIELD:
 				if (action.fieldName === 'index') {
 					return {
 						...gridSequencer,
-						[action.fieldName]: action.data % gridSequencer.events.count(),
+						[action.fieldName]: action.data % gridSequencer.midiClip.events.count(),
 					}
 				} else {
 					return {
@@ -260,17 +271,23 @@ const gridSequencerReducer =
 
 				return {
 					...gridSequencer,
-					events: prv.first(),
+					midiClip: {
+						...gridSequencer.midiClip,
+						events: prv.first()
+					},
 					previousEvents: prv.shift().toList(),
 				}
 			}
 			case CLEAR_SEQUENCER: {
-				if (isEmptyEvents(gridSequencer.events)) return gridSequencer
+				if (isEmptyEvents(gridSequencer.midiClip.events)) return gridSequencer
 
 				return {
 					...gridSequencer,
-					events: createSequencerEvents(gridSequencer.events.count()),
-					previousEvents: gridSequencer.previousEvents.unshift(gridSequencer.events),
+					midiClip: {
+						...gridSequencer.midiClip,
+						events: createSequencerEvents(gridSequencer.midiClip.events.count())
+					},
+					previousEvents: gridSequencer.previousEvents.unshift(gridSequencer.midiClip.events),
 				}
 			}
 			case PLAY_ALL: return {...gridSequencer, isPlaying: true}
@@ -297,7 +314,7 @@ export const selectGridSequencer = (state: IClientRoomState, id: string) =>
 	selectAllGridSequencers(state)[id] || GridSequencerState.dummy
 
 export const selectGridSequencerEvents = (state: IClientRoomState, id: string) =>
-	selectGridSequencer(state, id).events
+	selectGridSequencer(state, id).midiClip.events
 
 export const selectGridSequencerIsActive = (state: IClientRoomState, id: string) =>
 	selectGridSequencer(state, id).isPlaying
@@ -325,8 +342,8 @@ export const selectGridSequencerActiveNotes = createSelector(
 
 		const index = globalClockIndex
 
-		if (index >= 0 && gridSequencer.events.count() > 0) {
-			return gridSequencer.events.get(index % gridSequencer.events.count())!.notes
+		if (index >= 0 && gridSequencer.midiClip.events.count() > 0) {
+			return gridSequencer.midiClip.events.get(index % gridSequencer.midiClip.events.count())!.notes
 		} else {
 			return emptyMidiNotes
 		}

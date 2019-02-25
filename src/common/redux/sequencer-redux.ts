@@ -1,5 +1,5 @@
 import {List} from 'immutable'
-import {IMultiStateThing, MidiClipEvent} from '../common-types'
+import {IMultiStateThing, MidiClipEvent, MidiClip, MidiClipEvents, makeMidiClip} from '../common-types'
 import {emptyMidiNotes, MidiNotes} from '../MidiNote'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './index'
 
@@ -34,30 +34,28 @@ export const createSequencerEvents = (indexCount: number) => {
 		.fill({notes: emptyMidiNotes}))
 }
 
-export type SequencerEvents = List<MidiClipEvent>
-
 export const makeSequencerEvents =
-	(x: MidiClipEvent[] | List<MidiClipEvent> = Array<MidiClipEvent>()): SequencerEvents => List<MidiClipEvent>(x)
+	(x: MidiClipEvent[] | List<MidiClipEvent> = Array<MidiClipEvent>()): MidiClipEvents => List<MidiClipEvent>(x)
 
-export function deserializeEvents(events: SequencerEvents): SequencerEvents {
+export function deserializeEvents(events: MidiClipEvents): MidiClipEvents {
 	return makeSequencerEvents(events.map(x => ({...x, notes: MidiNotes(x.notes)})))
 }
 
 export interface ISequencerState extends IMultiStateThing {
-	events: SequencerEvents
+	midiClip: MidiClip
 	index: number
 	isPlaying: boolean
 	id: string
 	color: string
 	name: string
 	isRecording: boolean
-	previousEvents: List<SequencerEvents>
+	previousEvents: List<MidiClipEvents>
 	width: number
 	height: number
 	rate: number
 }
 
-export function isEmptyEvents(events: SequencerEvents) {
+export function isEmptyEvents(events: MidiClipEvents) {
 	return events.some(x => x.notes.count() > 0) === false
 }
 
@@ -65,7 +63,10 @@ export function deserializeSequencerState<T extends ISequencerState>(state: IMul
 	const x = state as T
 	const y = {
 		...x,
-		events: deserializeEvents(x.events),
+		midiClip: makeMidiClip({
+			...x.midiClip,
+			events: deserializeEvents(x.midiClip.events)
+		}),
 		previousEvents: List(x.previousEvents.map(deserializeEvents)),
 	} as T
 	return y
