@@ -113,7 +113,6 @@ class SynthVoice extends Voice {
 	private _whiteNoise: AudioBufferSourceNode | undefined
 	private _fineTuning: number = 0
 	private _frequency: number = 0
-	private _isReleaseScheduled = false
 
 	constructor(
 		audioContext: AudioContext, destination: AudioNode,
@@ -190,39 +189,28 @@ class SynthVoice extends Voice {
 	}
 
 	private _scheduleNormalNote(note: number, attackTimeInSeconds: number, delaySeconds: number): void {
-		// logger.log('synth scheduleNote delaySeconds: ' + delaySeconds + ' | note: ' + note)
+		this._attackStartTimeSeconds = this._audioContext.currentTime + delaySeconds
+		this._attackEndTimeSeconds = this._attackStartTimeSeconds + attackTimeInSeconds
 
 		this._oscillator = this._audioContext.createOscillator()
 		this._oscillator.type = this._oscillatorType as OscillatorType
 		this._oscillator.detune.value = this._fineTuning
 		this._oscillator.frequency.setValueAtTime(midiNoteToFrequency(note), this._audioContext.currentTime)
-		this._oscillator.start(this._audioContext.currentTime + delaySeconds)
+		this._oscillator.start(this._attackStartTimeSeconds)
+		
+		// logger.log(this.id + ' synth scheduleNote delaySeconds: ' + delaySeconds + ' | note: ' + note + ' | attackTimeInSeconds: ' + attackTimeInSeconds)
 
 		this._gain = this._audioContext.createGain()
-
-		this._gain.gain.linearRampToValueAtTime(0, this._audioContext.currentTime + delaySeconds)
-		this._gain.gain.linearRampToValueAtTime(1, this._audioContext.currentTime + delaySeconds + attackTimeInSeconds)
+		this._gain.gain.value = 0
+		this._gain.gain.linearRampToValueAtTime(0, this._attackStartTimeSeconds)
+		this._gain.gain.linearRampToValueAtTime(this._sustainLevel, this._attackEndTimeSeconds)
 
 		this._oscillator.connect(this._gain)
 			.connect(this._destination)
 	}
 
 	private _scheduleReleaseNormalNote(delaySeconds: number, releaseSeconds: number, onEnded: () => void) {
-		if (!this._oscillator) return
-
-		const releaseStartTimeSeconds = this._audioContext.currentTime + delaySeconds
-		const stopTimeSeconds = this._audioContext.currentTime + delaySeconds + releaseSeconds
-
-		this._cancelAndHoldOrJustCancel(releaseStartTimeSeconds)
-		this._gain.gain.linearRampToValueAtTime(1, releaseStartTimeSeconds)
-		this._gain.gain.exponentialRampToValueAtTime(0.00001, stopTimeSeconds)
-		this._oscillator.stop(stopTimeSeconds)
-		this._oscillator.onended = () => {
-			this._oscillator!.disconnect()
-			this._gain.disconnect()
-			delete this._gain
-			onEnded()
-		}
+		this._scheduleReleaseNormalNoteGeneric(delaySeconds, releaseSeconds, this._oscillator, onEnded)
 	}
 
 	private _playSynthNote(note: number) {

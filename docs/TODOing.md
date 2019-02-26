@@ -1,8 +1,9 @@
 # Now
 - [ ] hook up note-scanner with everything
-	- [ ] change sequencer state to whole new stuff
+	- [√] change sequencer state to whole new stuff
+	- [√] respect sequencer isPlaying
+	- [√] get sampler to support scheduled notes
 	- [ ] keyboard
-	- [ ] respect sequencer isPlaying
 
 in old setup
 i iterate thru the instruments

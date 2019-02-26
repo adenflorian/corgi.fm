@@ -335,6 +335,10 @@ export abstract class Voice {
 	protected _releaseId: string = ''
 	protected _status: VoiceStatus = VoiceStatus.off
 	protected _gain: GainNode
+	protected _isReleaseScheduled = false
+	protected _attackStartTimeSeconds = 0.005
+	protected _attackEndTimeSeconds = 0
+	protected _sustainLevel = 1
 
 	protected static _nextId = 0
 
@@ -364,6 +368,45 @@ export abstract class Voice {
 
 	public abstract dispose(): void
 
+
+
+	protected _scheduleReleaseNormalNoteGeneric(
+		delaySeconds: number,
+		releaseSeconds: number,
+		audioNode: AudioScheduledSourceNode | undefined,
+		onEnded: () => void
+	) {
+		const releaseStartTimeSeconds = this._audioContext.currentTime + delaySeconds
+		const stopTimeSeconds = this._audioContext.currentTime + delaySeconds + releaseSeconds
+
+		// logger.log(this.id + ' synth scheduleRelease delay: ' + delaySeconds + ' | release: ' + releaseSeconds + ' | stop: ' + stopTimeSeconds)
+
+		if (this._attackEndTimeSeconds < releaseStartTimeSeconds) {
+			// if attack is short, do linear ramp to sustain with no cancel
+			this._gain.gain.linearRampToValueAtTime(this._sustainLevel, releaseStartTimeSeconds)
+		} else {
+			// if attack is long, cancel and hold, calculate target sustain, and continue ramping to it
+			this._cancelAndHoldOrJustCancel()
+			// for linear attack only, need different math for other attack curves
+			const originalAttackLength = this._attackEndTimeSeconds - this._attackStartTimeSeconds
+			const newAttackLength = releaseStartTimeSeconds - this._attackStartTimeSeconds
+			const ratio = newAttackLength / originalAttackLength
+			const targetSustainAtReleaseStart = ratio * this._sustainLevel
+			this._gain.gain.linearRampToValueAtTime(targetSustainAtReleaseStart, releaseStartTimeSeconds)
+		}
+
+		this._gain.gain.exponentialRampToValueAtTime(0.00001, stopTimeSeconds)
+
+		if (!audioNode) return
+		audioNode.stop(stopTimeSeconds)
+		audioNode.onended = () => {
+			audioNode!.disconnect()
+			this._gain.disconnect()
+			delete this._gain
+			onEnded()
+		}
+	}
+
 	protected _beforePlayNote(attackTimeInSeconds: number) {
 		this._cancelAndHoldOrJustCancel()
 
@@ -371,7 +414,7 @@ export abstract class Voice {
 		this._gain.gain.linearRampToValueAtTime(0, this._audioContext.currentTime + 0.001)
 
 		// this._gain.gain.setValueAtTime(0, this._audioContext.currentTime)
-		this._gain.gain.linearRampToValueAtTime(1, this._audioContext.currentTime + attackTimeInSeconds)
+		this._gain.gain.linearRampToValueAtTime(this._sustainLevel, this._audioContext.currentTime + attackTimeInSeconds)
 	}
 
 	protected _afterPlayNote(note: number) {
