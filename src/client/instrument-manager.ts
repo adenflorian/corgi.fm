@@ -79,12 +79,14 @@ export const setupInstrumentManager =
 				return
 			}
 
-			const newGlobalClockState = selectGlobalClockState(state.room)
+			if (isNewNoteScannerEnabled === false) {
+				const newGlobalClockState = selectGlobalClockState(state.room)
 
-			if (newGlobalClockState.isPlaying) {
-				globalClock.play(newGlobalClockState.playCount)
-			} else {
-				globalClock.stop()
+				if (newGlobalClockState.isPlaying) {
+					globalClock.play(newGlobalClockState.playCount)
+				} else {
+					globalClock.stop()
+				}
 			}
 
 			previousState = state
