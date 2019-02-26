@@ -134,8 +134,8 @@ export class GridSequencerState implements IGridSequencerState, NodeSpecialState
 		this.notesToShow = notesToShow
 		this.isPlaying = isPlaying
 		this.midiClip = makeMidiClip({
-			events: events,
-			length: events.count(),
+			events: events.map(x => ({...x, startBeat: x.startBeat / 4})),
+			length: events.count() / 4,
 			loop: true
 		})
 

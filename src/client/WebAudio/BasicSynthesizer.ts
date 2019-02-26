@@ -93,7 +93,7 @@ class SynthVoices extends Voices<SynthVoice> {
 			.filter(x => x.playingNote === note)
 			.find(x => x.getIsReleaseScheduled() === false)
 
-		console.log('this._scheduledVoices: ', this._scheduledVoices)
+		// console.log('this._scheduledVoices: ', this._scheduledVoices)
 
 		if (!firstUnReleasedVoiceForNote) throw new Error('trying to schedule release for note, but no available note to release')
 

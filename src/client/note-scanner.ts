@@ -36,7 +36,9 @@ if (module.hot) {
 
 let clip = shortDemoMidiClip
 
-const _jumpStartSeconds = 0.5
+// not sure if needed?
+// causes problems with range 0 and repeating notes on start
+const _jumpStartSeconds = 0.0
 
 let _isPlaying = false
 let _cursorBeats = 0
@@ -103,7 +105,7 @@ function scheduleNotes() {
 
 	// logger.log('actualBPM: ', actualBPM)
 	// logger.log('maxReadAheadBeats: ', maxReadAheadBeats)
-	// logger.log('currentSongTimeSeconds: ', currentSongTimeBeats)
+	// logger.log('currentSongTimeBeats: ', currentSongTimeBeats)
 	// logger.log('_cursorBeats: ', _cursorBeats)
 	// logger.log('cursorDestinationSeconds: ', cursorDestinationBeats)
 	// logger.log('beatsToRead: ', beatsToRead)

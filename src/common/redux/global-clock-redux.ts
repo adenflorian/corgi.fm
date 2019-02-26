@@ -47,7 +47,7 @@ const defaultGlobalClockState = {
 	index: -1,
 	isPlaying: false,
 	playCount: 0,
-	bpm: 20,
+	bpm: 120,
 	maxReadAheadSeconds: 0.1,
 }
 
