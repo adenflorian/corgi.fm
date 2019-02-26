@@ -100,6 +100,7 @@ function scheduleNotes() {
 	// run all sequencers events thru scheduler
 
 	const sequencersEvents = Map(selectAllSequencers(roomState))
+		.filter(x => x.isPlaying)
 		.map(x => getEvents(x.midiClip, readRangeBeats))
 
 
@@ -123,7 +124,7 @@ function scheduleNotes() {
 
 	const instruments = getAllInstruments()
 
-	console.log('instruments: ', instruments)
+	// console.log('instruments: ', instruments)
 
 	let flag = false
 
@@ -135,7 +136,7 @@ function scheduleNotes() {
 		// make a selector to get array of source IDs?
 		const sourceIds = selectConnectionSourceIdsByTarget(roomState, instrument.id)
 
-		console.log('sourceIds: ', sourceIds)
+		// console.log('sourceIds: ', sourceIds)
 
 		const eventsToSchedule = Map<number, IMidiNotes>().withMutations(mutable => {
 			sequencersEvents.filter((_, id) => sourceIds.includes(id))
@@ -149,7 +150,7 @@ function scheduleNotes() {
 				})
 		})
 
-		console.log('eventsToSchedule: ', eventsToSchedule)
+		// console.log('eventsToSchedule: ', eventsToSchedule)
 		// union events
 		// how?
 		// off of what field?
@@ -168,7 +169,7 @@ function scheduleNotes() {
 			const noteLength = 0.1
 
 			notes.forEach(note => {
-				console.log('actualNote: ' + note + ' | delaySeconds: ' + delaySeconds)
+				// console.log('actualNote: ' + note + ' | delaySeconds: ' + delaySeconds)
 				// console.log('gridSeq: ', gridSeq)
 				instrument.scheduleNote(note, delaySeconds)
 				instrument.scheduleRelease(note, delaySeconds + noteLength)

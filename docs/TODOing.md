@@ -2,6 +2,7 @@
 - [ ] hook up note-scanner with everything
 	- [ ] change sequencer state to whole new stuff
 	- [ ] keyboard
+	- [ ] respect sequencer isPlaying
 
 in old setup
 i iterate thru the instruments
