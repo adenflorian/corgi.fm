@@ -28,7 +28,7 @@ function exportSequencerMidi(
 
 	const sequencer = selectAllSequencers(roomState)[action.sequencerId]
 
-	const events = sequencer.events
+	const events = sequencer.midiClip.events
 
 	if (events.count() === 0) return
 	if (isEmptyEvents(events)) return
