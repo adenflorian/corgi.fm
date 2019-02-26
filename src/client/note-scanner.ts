@@ -1,10 +1,9 @@
 import {ConnectionNodeType, MidiRange, makeMidiClip} from '../common/common-types'
 import {logger} from '../common/logger'
 import {
-	ClientStore, selectGlobalClockState, selectAllGridSequencers,
+	ClientStore, selectGlobalClockState, selectAllGridSequencers, selectAllSequencers,
 } from '../common/redux'
 import {shortDemoMidiClip} from './clips'
-import {getInstruments} from './instrument-manager'
 import {getEvents} from './note-scheduler'
 import {BasicSynthesizer} from './WebAudio/BasicSynthesizer'
 
@@ -51,12 +50,6 @@ const emptyMidiClip = makeMidiClip()
 function scheduleNotes() {
 	const roomState = _store.getState().room
 
-	const allGridSeqs = selectAllGridSequencers(roomState)
-
-	const gridSeq = Object.keys(allGridSeqs).map(x => allGridSeqs[x])[0]
-
-	clip = gridSeq ? gridSeq.midiClip : emptyMidiClip
-
 	const {
 		isPlaying, bpm, maxReadAheadSeconds,
 	} = selectGlobalClockState(roomState)
@@ -101,6 +94,19 @@ function scheduleNotes() {
 
 	const readRangeBeats = new MidiRange(_cursorBeats, beatsToRead)
 
+	// run all sequencers events thru scheduler
+
+	const allSequencers = selectAllSequencers(roomState)
+
+	const allSequencersArray = Object.freeze(
+		Object.keys(allSequencers)
+			.map(x => allSequencers[x])
+	)
+
+
+
+	// clip = gridSeq ? gridSeq.midiClip : emptyMidiClip
+
 	const eventsToSchedule = getEvents(clip, readRangeBeats)
 
 	// logger.log('actualBPM: ', actualBPM)
@@ -115,34 +121,38 @@ function scheduleNotes() {
 	// logger.log('readRangeBeats: ', readRangeBeats)
 	// logger.log('eventsToSchedule: ', eventsToSchedule)
 
-	const instruments = getInstruments()
+	// const instruments = getInstruments()
 
 	let flag = false
 
-	instruments[ConnectionNodeType.basicSynthesizer].forEach((x, _) => {
-		// temp: so that only the first synth is used
-		if (flag) return
+	// then for each instrument
+	// union events from the input sequencers and schedule them
 
-		flag = true
+	// instruments[ConnectionNodeType.basicSynthesizer].forEach((x, _) => {
+	// 	// temp: so that only the first synth is used
+	// 	if (flag) return
 
-		const synth = x as BasicSynthesizer
+	// 	flag = true
 
-		eventsToSchedule.forEach(event => {
-			// logger.log('scheduleNote currentSongTimeBeats: ', currentSongTimeBeats)
-			// logger.log('offset: ', offset)
-			// logger.log('event.startTime: ', event.startTime)
-			const delaySeconds = ((offset + event.startTime) * (60 / actualBPM))
+	// 	const synth = x as BasicSynthesizer
 
-			const noteLength = 0.1
 
-			event.notes.forEach(note => {
-				console.log('actualNote: ' + note + ' | delaySeconds: ' + delaySeconds)
-				// console.log('gridSeq: ', gridSeq)
-				synth.scheduleNote(note, delaySeconds)
-				synth.scheduleRelease(note, delaySeconds + noteLength)
-			})
-		})
-	})
+	// 	eventsToSchedule.forEach(event => {
+	// 		// logger.log('scheduleNote currentSongTimeBeats: ', currentSongTimeBeats)
+	// 		// logger.log('offset: ', offset)
+	// 		// logger.log('event.startTime: ', event.startTime)
+	// 		const delaySeconds = ((offset + event.startTime) * (60 / actualBPM))
+
+	// 		const noteLength = 0.1
+
+	// 		event.notes.forEach(note => {
+	// 			console.log('actualNote: ' + note + ' | delaySeconds: ' + delaySeconds)
+	// 			// console.log('gridSeq: ', gridSeq)
+	// 			synth.scheduleNote(note, delaySeconds)
+	// 			synth.scheduleRelease(note, delaySeconds + noteLength)
+	// 		})
+	// 	})
+	// })
 
 	_cursorBeats += beatsToRead
 	_justStarted = false
