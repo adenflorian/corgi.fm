@@ -1,6 +1,7 @@
 import {IInstrumentOptions, Instrument, Voice, Voices} from './Instrument'
 import {getOctaveFromMidiNote, midiNoteToNoteName} from './music-functions'
 import {SamplesManager} from './SamplesManager'
+import {IMidiNote} from '../../common/MidiNote';
 
 export type IBasicSamplerOptions = IInstrumentOptions
 
@@ -12,6 +13,9 @@ export class BasicSamplerInstrument extends Instrument<SamplerVoices, SamplerVoi
 
 		this._voices = new SamplerVoices(options.voiceCount, this._audioContext, this._panNode)
 	}
+
+	public scheduleNote(note: IMidiNote, delaySeconds: number) {}
+	public scheduleRelease(note: number, delaySeconds: number) {}
 
 	public dispose = () => {
 		this._voices.dispose()

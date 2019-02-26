@@ -14,7 +14,8 @@ import {BasicSamplerInstrument} from './WebAudio/BasicSamplerInstrument'
 import {BasicSynthesizer} from './WebAudio/BasicSynthesizer'
 // import {BasicToneSynth} from './WebAudio/BasicToneSynth'
 import {
-	AudioNodeWrapper, IAudioNodeWrapperOptions, IInstrument, IInstrumentOptions, MasterAudioOutput,
+	AudioNodeWrapper, IAudioNodeWrapperOptions, IInstrument,
+	IInstrumentOptions, MasterAudioOutput,
 } from './WebAudio/Instrument'
 import {SimpleReverb} from './WebAudio/SimpleReverb'
 import {Map} from 'immutable';
@@ -40,10 +41,11 @@ let stuffMaps = Map<ConnectionNodeType, StuffMap>([
 	[ConnectionNodeType.simpleReverb, Map()],
 ])
 
-/** please don't mutate */
 export function getAllInstruments() {
 	return stuffMaps.get(ConnectionNodeType.basicSampler)!
-		.concat(stuffMaps.get(ConnectionNodeType.basicSynthesizer)!)
+		.concat(
+			stuffMaps.get(ConnectionNodeType.basicSynthesizer)!
+		) as Map<string, IInstrument>
 }
 
 let previousState: IClientAppState | undefined

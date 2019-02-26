@@ -1,11 +1,14 @@
-import {ConnectionNodeType, MidiRange, makeMidiClip} from '../common/common-types'
+import {Map} from 'immutable'
+import {MidiRange, makeMidiClip} from '../common/common-types'
 import {logger} from '../common/logger'
 import {
-	ClientStore, selectGlobalClockState, selectAllGridSequencers, selectAllSequencers,
+	ClientStore, selectGlobalClockState, selectAllSequencers,
+	selectConnectionSourceIdsByTarget,
 } from '../common/redux'
 import {shortDemoMidiClip} from './clips'
+import {getAllInstruments} from './instrument-manager'
 import {getEvents} from './note-scheduler'
-import {BasicSynthesizer} from './WebAudio/BasicSynthesizer'
+import {IMidiNotes} from '../common/MidiNote'
 
 let _store: ClientStore
 let _audioContext: AudioContext
@@ -96,18 +99,15 @@ function scheduleNotes() {
 
 	// run all sequencers events thru scheduler
 
-	const allSequencers = selectAllSequencers(roomState)
-
-	const allSequencersArray = Object.freeze(
-		Object.keys(allSequencers)
-			.map(x => allSequencers[x])
-	)
+	const sequencersEvents = Map(selectAllSequencers(roomState))
+		.map(x => getEvents(x.midiClip, readRangeBeats))
 
 
 
 	// clip = gridSeq ? gridSeq.midiClip : emptyMidiClip
+	// clip = shortDemoMidiClip
 
-	const eventsToSchedule = getEvents(clip, readRangeBeats)
+	// const eventsToSchedule = getEvents(clip, readRangeBeats)
 
 	// logger.log('actualBPM: ', actualBPM)
 	// logger.log('maxReadAheadBeats: ', maxReadAheadBeats)
@@ -121,38 +121,61 @@ function scheduleNotes() {
 	// logger.log('readRangeBeats: ', readRangeBeats)
 	// logger.log('eventsToSchedule: ', eventsToSchedule)
 
-	// const instruments = getInstruments()
+	const instruments = getAllInstruments()
+
+	console.log('instruments: ', instruments)
 
 	let flag = false
 
 	// then for each instrument
 	// union events from the input sequencers and schedule them
+	instruments.forEach(instrument => {
+		// how to get input events
+		// how to know which ones to get
+		// make a selector to get array of source IDs?
+		const sourceIds = selectConnectionSourceIdsByTarget(roomState, instrument.id)
 
-	// instruments[ConnectionNodeType.basicSynthesizer].forEach((x, _) => {
-	// 	// temp: so that only the first synth is used
-	// 	if (flag) return
+		console.log('sourceIds: ', sourceIds)
 
-	// 	flag = true
+		const eventsToSchedule = Map<number, IMidiNotes>().withMutations(mutable => {
+			sequencersEvents.filter((_, id) => sourceIds.includes(id))
+				.toList()
+				.flatMap(x => x).forEach(event => {
+					if (mutable.has(event.startTime)) {
+						mutable.update(event.startTime, x => x.union(event.notes))
+					} else {
+						mutable.set(event.startTime, event.notes)
+					}
+				})
+		})
 
-	// 	const synth = x as BasicSynthesizer
+		console.log('eventsToSchedule: ', eventsToSchedule)
+		// union events
+		// how?
+		// off of what field?
+		// startBeat
+		// make a map where key is startBeat and val is notes
+		// union the notes together
 
 
-	// 	eventsToSchedule.forEach(event => {
-	// 		// logger.log('scheduleNote currentSongTimeBeats: ', currentSongTimeBeats)
-	// 		// logger.log('offset: ', offset)
-	// 		// logger.log('event.startTime: ', event.startTime)
-	// 		const delaySeconds = ((offset + event.startTime) * (60 / actualBPM))
 
-	// 		const noteLength = 0.1
+		eventsToSchedule.forEach((notes, startTime) => {
+			// logger.log('scheduleNote currentSongTimeBeats: ', currentSongTimeBeats)
+			// logger.log('offset: ', offset)
+			// logger.log('event.startTime: ', event.startTime)
+			const delaySeconds = ((offset + startTime) * (60 / actualBPM))
 
-	// 		event.notes.forEach(note => {
-	// 			console.log('actualNote: ' + note + ' | delaySeconds: ' + delaySeconds)
-	// 			// console.log('gridSeq: ', gridSeq)
-	// 			synth.scheduleNote(note, delaySeconds)
-	// 			synth.scheduleRelease(note, delaySeconds + noteLength)
-	// 		})
-	// 	})
-	// })
+			const noteLength = 0.1
+
+			notes.forEach(note => {
+				console.log('actualNote: ' + note + ' | delaySeconds: ' + delaySeconds)
+				// console.log('gridSeq: ', gridSeq)
+				instrument.scheduleNote(note, delaySeconds)
+				instrument.scheduleRelease(note, delaySeconds + noteLength)
+			})
+		})
+
+	})
 
 	_cursorBeats += beatsToRead
 	_justStarted = false

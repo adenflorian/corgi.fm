@@ -252,6 +252,12 @@ export const selectConnectionSourceNotesByTargetId = (state: IClientRoomState, t
 	return Set.union(notes.toList())
 }
 
+export const selectConnectionSourceIdsByTarget = (state: IClientRoomState, targetId: string): List<string> => {
+	return selectConnectionsWithTargetIds(state, [targetId])
+		.toList()
+		.map(x => x.sourceId)
+}
+
 const makeConnectionSourceNotesSelector = (roomState: IClientRoomState) => (connection: IConnection): IMidiNotes => {
 	return getConnectionNodeInfo(connection.sourceType).selectActiveNotes(roomState, connection.sourceId)
 }

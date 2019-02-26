@@ -2,7 +2,7 @@ import {List, Map, OrderedMap} from 'immutable'
 import uuid = require('uuid')
 import {IDisposable} from '../../common/common-types'
 import {logger} from '../../common/logger'
-import {emptyMidiNotes, IMidiNotes} from '../../common/MidiNote'
+import {emptyMidiNotes, IMidiNotes, IMidiNote} from '../../common/MidiNote'
 import {Arp} from './arp'
 
 export interface IAudioNodeWrapperOptions {
@@ -127,8 +127,11 @@ export interface IInstrument extends IDisposable, AudioNodeWrapper {
 	setAttack: (attackTimeInSeconds: number) => void
 	setRelease: (releaseTimeInSeconds: number) => void
 	getActivityLevel: () => number
+	scheduleNote(note: IMidiNote, delaySeconds: number): void
+	scheduleRelease(note: number, delaySeconds: number): void
 }
 
+// TODO Default generic types to {} or something so that w dont need to use the interface
 export abstract class Instrument<T extends Voices<V>, V extends Voice> extends AudioNodeWrapper implements IInstrument {
 
 	protected readonly _panNode: StereoPannerNode
@@ -163,6 +166,8 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 		this._panNode.connect(this._lowPassFilter)
 		this._lowPassFilter.connect(this._gain)
 	}
+	public abstract scheduleNote(note: IMidiNote, delaySeconds: number): void
+	public abstract scheduleRelease(note: number, delaySeconds: number): void
 
 	public readonly getInputAudioNode = () => null
 	public readonly getOutputAudioNode = () => this._gain
