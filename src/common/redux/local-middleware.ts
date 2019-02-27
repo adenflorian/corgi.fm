@@ -4,6 +4,12 @@ import {ConnectionNodeType} from '../common-types'
 import {logger} from '../logger'
 import {addBasicSampler, addBasicSynthesizer, addPosition, addVirtualKeyboard, BasicSamplerState, BasicSynthesizerState, Connection, connectionsActions, deleteAllPositions, deleteAllThings, IClientAppState, makeActionCreator, makePosition, MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID, READY, selectActiveRoom, selectLocalClient, selectPositionExtremes, selectVirtualKeyboardById, selectVirtualKeyboardIdByOwner, SET_ACTIVE_ROOM, VirtualKeyboardState, virtualKeyPressed, virtualKeyUp, virtualOctaveChange} from './index'
 import {pointersActions} from './pointers-redux'
+import {IMidiNote} from '../MidiNote'
+import {selectConnectionsWithSourceIds} from './connections-redux'
+import {IClientRoomState} from './common-redux-types'
+import {getAllInstruments} from '../../client/instrument-manager'
+import {isNewNoteScannerEnabled} from '../../client/is-prod-client'
+import {isClient} from '../is-client-or-server'
 
 export const LOCAL_MIDI_KEY_PRESS = 'LOCAL_MIDI_KEY_PRESS'
 export const localMidiKeyPress = makeActionCreator(LOCAL_MIDI_KEY_PRESS, 'midiNote')
@@ -23,23 +29,42 @@ export function deleteAllTheThings(dispatch: Dispatch) {
 	dispatch(deleteAllPositions())
 }
 
-export const localMiddleware: Middleware<{}, IClientAppState> = ({dispatch, getState}) => next => action => {
+export const createLocalMiddleware: () => Middleware<{}, IClientAppState> = () => ({dispatch, getState}) => next => action => {
 	next(action)
 	switch (action.type) {
 		case LOCAL_MIDI_KEY_PRESS: {
-			// TODO trigger attack on instrument
-			const localVirtualKeyboard = getLocalVirtualKeyboard(getState())
+			const state = getState()
+
+			const localVirtualKeyboard = getLocalVirtualKeyboard(state)
+
+			const noteToPlay = applyOctave(action.midiNote, localVirtualKeyboard.octave)
+
+			// scheduleNote(noteToPlay, localVirtualKeyboard.id, state.room, 'on')
+
 			return dispatch(
 				virtualKeyPressed(
 					localVirtualKeyboard.id,
 					action.midiNote,
 					localVirtualKeyboard.octave,
-					applyOctave(action.midiNote, localVirtualKeyboard.octave)),
+					noteToPlay,
+				),
 			)
 		}
 		case LOCAL_MIDI_KEY_UP: {
-			// TODO trigger release on instrument
-			return dispatch(virtualKeyUp(getLocalVirtualKeyboardId(getState()), action.midiNote))
+			const state = getState()
+
+			const localVirtualKeyboard = getLocalVirtualKeyboard(state)
+
+			// const noteToRelease = applyOctave(action.midiNote, localVirtualKeyboard.octave)
+
+			// scheduleNote(noteToRelease, localVirtualKeyboard.id, state.room, 'off')
+
+			return dispatch(
+				virtualKeyUp(
+					localVirtualKeyboard.id,
+					action.midiNote,
+				)
+			)
 		}
 		case LOCAL_MIDI_OCTAVE_CHANGE: {
 			return dispatch(virtualOctaveChange(getLocalVirtualKeyboardId(getState()), action.delta))
@@ -53,6 +78,21 @@ export const localMiddleware: Middleware<{}, IClientAppState> = ({dispatch, getS
 		}
 	}
 }
+
+// function scheduleNote(note: IMidiNote, sourceId: string, roomState: IClientRoomState, onOrOff: 'on' | 'off') {
+// 	if (isClient() && isNewNoteScannerEnabled() === false) return
+// 	// get target Ids
+// 	const targetIds = selectConnectionsWithSourceIds(roomState, [sourceId]).map(x => x.targetId)
+// 	getAllInstruments().forEach(instrument => {
+// 		if (targetIds.includes(instrument.id) === false) return
+
+// 		if (onOrOff === 'on') {
+// 			instrument.scheduleNote(note, 0)
+// 		} else {
+// 			instrument.scheduleRelease(note, 0)
+// 		}
+// 	})
+// }
 
 function getLocalVirtualKeyboardId(state: IClientAppState) {
 	return selectVirtualKeyboardIdByOwner(state.room, selectLocalClient(state).id)

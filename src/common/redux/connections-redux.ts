@@ -242,8 +242,9 @@ const makeConnectionSourceColorSelector =
 	}
 
 /** For use by a node */
-export const selectConnectionSourceNotesByTargetId = (state: IClientRoomState, targetId: string): IMidiNotes => {
+export const selectConnectionSourceNotesByTargetId = (state: IClientRoomState, targetId: string, onlyFromKeyboards = false): IMidiNotes => {
 	const connections = selectConnectionsWithTargetIds(state, [targetId])
+		.filter(x => x.sourceType === ConnectionNodeType.virtualKeyboard || !onlyFromKeyboards)
 
 	if (connections.count() === 0) return makeConnectionSourceNotesSelector(state)(Connection.dummy)
 

@@ -186,15 +186,20 @@ export const setupInstrumentManager = (
 
 				updateAudioConnectionsFromSource(state.room, instrumentId, instrument)
 
-				const sourceNotes = selectConnectionSourceNotesByTargetId(state.room, instrumentId)
+				const sourceNotes = getSourceNotes(instrumentId)
 
-				if (isNewNoteScannerEnabled === false) {
-					// In old system, all note changes go thru here
-					instrument.setMidiNotes(sourceNotes)
-				}
+				instrument.setMidiNotes(sourceNotes)
 
 				if (updateSpecificInstrument) updateSpecificInstrument(instrument, instrumentState)
 			})
+		}
+
+		function getSourceNotes(instrumentId: string) {
+			if (isNewNoteScannerEnabled) {
+				return selectConnectionSourceNotesByTargetId(state.room, instrumentId, true)
+			} else {
+				return selectConnectionSourceNotesByTargetId(state.room, instrumentId, false)
+			}
 		}
 
 		// function updateToneType<S extends IConnectable>(

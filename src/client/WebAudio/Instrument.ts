@@ -368,8 +368,6 @@ export abstract class Voice {
 
 	public abstract dispose(): void
 
-
-
 	protected _scheduleReleaseNormalNoteGeneric(
 		delaySeconds: number,
 		releaseSeconds: number,

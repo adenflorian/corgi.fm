@@ -3,45 +3,46 @@
 	- [√] change sequencer state to whole new stuff
 	- [√] respect sequencer isPlaying
 	- [√] get sampler to support scheduled notes
-	- [ ] keyboard
-
-in old setup
-i iterate thru the instruments
-select notes from sources and union them together
-
-
-in new system
-i start from a clock (RAF)
-maybe i could iterate thru each instrument
-grab events from sources
-union
-run through note-scheduler
-then schedule?
-
-
-in a real mod synth setup
-that was sending midi from two sources into a poly synth
-and you sent the same note at same time
-what would you expect to happen?
-one note or two notes being played?
-can i test this in ableton?
-- yes
-- in ableton, it unions the midi so you would only hear one note
-- but only if exact same time
-- and of course, most poly synths only allow a voice to play one freq at a time
-- or more, only one voice at a freq at a time
-
-
-when to union?
-preferably after running thru the note scheduler
-
-
-each tick
-run all sequencers events thru scheduler
-
-then for each instrument
-
-union events from the input sequencers and schedule them
+	- [ ] get stuff working again
+		- [...] keyboard
+			- i want lowest latency possible for live keyboard playing
+			- i also want the keyboard notes to union with the sequencers or other keyboards
+				- this is hard, because the user playing the keyboard needs to be instant
+					but the other sequencers are scheduling notes
+			- first step?
+				- if notes aren't getting combined some how, then things can get loud
+				- not having super low latency is a deal breaker, so lets start there
+			- where does the user input start from?
+				- mouse
+				- keyboard
+					- input-events.ts
+					- LOCAL_MIDI_KEY_PRESS
+					- listen for action dispatch?
+						- if we do, we need to listen for it in middleware
+					- what are we even going to do with the key press?
+						- directly schedule notes to the connected instruments?
+					- what info do we need?
+						- what key was pressed
+						- virtual keyboard state (octave)
+						- access to instruments
+							- instrument-manager
+							- could pass a ref to a middleware creator
+							- or use getAllInstruments?
+						- connections state (or a selector)
+					- **do in local-middleware**
+					- why am i not storing instrument refs in store?
+					- [ ] PROBLEM
+						- the way i schedule releases wont work with keyboard?
+							- does it even work with multiple sequencers going to same instrument?
+					- [ ] OCTAVE PROBLEM
+						- switching octave while holding note
+						- how did old system do it?
+							- it releases old note and starts new one with newly triggered envelope
+					- why not just use old system for keyboards only?
+						- [ ] this works, but still has issue of playing two oscillators at same freq
+		- [ ] sequencer animations
+		- [ ] master clock play button animation
+		- [ ] rate knob on infinite sequencer
 
 # Soon
 - [ ] allow adding connections from a node with no connections on it already

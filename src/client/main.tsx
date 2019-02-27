@@ -7,7 +7,7 @@ import {configureStore} from './client-store'
 import {startFpsLoop} from './fps-loop'
 import {setupInputEventListeners} from './input-events'
 import {setupInstrumentManager} from './instrument-manager'
-import {isLocalDevClient, logClientEnv} from './is-prod-client'
+import {isLocalDevClient, logClientEnv, isNewNoteScannerEnabled} from './is-prod-client'
 import {loadExperiment} from './main-experiment'
 import {startNoteScanner} from './note-scanner'
 import {renderApp, renderOther} from './react-main'
@@ -44,8 +44,6 @@ function start() {
 
 async function setupAsync() {
 
-	const isNewNoteScannerEnabled = window.location.pathname.replace('/', '') === 'scan'
-
 	// Chrome 1 - 68
 	const isChrome = () => !!window.chrome
 
@@ -72,13 +70,13 @@ async function setupAsync() {
 
 	setupWebsocketAndListeners(store)
 
-	setupInstrumentManager(store, audioContext, preFx, isNewNoteScannerEnabled)
+	setupInstrumentManager(store, audioContext, preFx, isNewNoteScannerEnabled())
 
 	renderApp(store)
 
 	startFpsLoop()
 
-	if (isNewNoteScannerEnabled) {
+	if (isNewNoteScannerEnabled()) {
 		startNoteScanner(store, audioContext)
 	}
 

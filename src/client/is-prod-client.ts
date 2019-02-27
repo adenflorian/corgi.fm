@@ -17,3 +17,5 @@ export function logClientEnv() {
 					: 'unknown env',
 	)
 }
+
+export const isNewNoteScannerEnabled = () => window.location.pathname.replace('/', '') === 'scan'

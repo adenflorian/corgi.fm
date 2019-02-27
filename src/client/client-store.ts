@@ -3,7 +3,7 @@ import {composeWithDevTools} from 'redux-devtools-extension/developmentOnly'
 import persistState from 'redux-localstorage'
 import {
 	connectionsClientMiddleware, createGridSequencerPlayerMiddleware,
-	getActionsBlacklist, getClientReducers, IClientAppState, localMiddleware,
+	getActionsBlacklist, getClientReducers, IClientAppState, createLocalMiddleware,
 } from '../common/redux'
 import {websocketSenderMiddleware} from './websocket-client-sender-middleware'
 
@@ -19,7 +19,7 @@ export function configureStore(initialState: IClientAppState | any = {})
 		initialState,
 		composeEnhancers(
 			applyMiddleware(
-				localMiddleware,
+				createLocalMiddleware(),
 				createGridSequencerPlayerMiddleware(),
 				connectionsClientMiddleware,
 				websocketSenderMiddleware,

@@ -2,7 +2,7 @@
     "defaultSeverity": "error",
     "extends": [
         "tslint:recommended",
-        "tslint-immutable",
+        // "tslint-immutable",
         // "tslint-immutable/all"
     ],
     "jsRules": {},
