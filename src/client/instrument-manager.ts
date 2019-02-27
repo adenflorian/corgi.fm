@@ -19,6 +19,8 @@ import {
 } from './WebAudio/Instrument'
 import {SimpleReverb} from './WebAudio/SimpleReverb'
 import {Map} from 'immutable';
+import {useSchedulerForKeyboards} from './client-toggles';
+import {emptyMidiNotes} from '../common/MidiNote';
 
 type IdsSelector = (roomState: IClientRoomState) => string[]
 type StateSelector<S> = (roomState: IClientRoomState, id: string) => S
@@ -196,7 +198,11 @@ export const setupInstrumentManager = (
 
 		function getSourceNotes(instrumentId: string) {
 			if (isNewNoteScannerEnabled) {
-				return selectConnectionSourceNotesByTargetId(state.room, instrumentId, true)
+				if (useSchedulerForKeyboards()) {
+					return emptyMidiNotes
+				} else {
+					return selectConnectionSourceNotesByTargetId(state.room, instrumentId, true)
+				}
 			} else {
 				return selectConnectionSourceNotesByTargetId(state.room, instrumentId, false)
 			}
