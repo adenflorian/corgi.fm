@@ -56,7 +56,7 @@ export class BasicSynthesizer extends Instrument<SynthVoices, SynthVoice> {
 class SynthVoices extends Voices<SynthVoice> {
 	public static createVoice(
 		audioContext: AudioContext, destination: AudioNode,
-		oscType: ShamuOscillatorType, forScheduling: boolean, detune: number
+		oscType: ShamuOscillatorType, forScheduling: boolean, detune: number,
 	) {
 		return new SynthVoice(audioContext, destination, oscType, forScheduling, detune)
 	}
@@ -116,7 +116,7 @@ class SynthVoice extends Voice {
 
 	constructor(
 		audioContext: AudioContext, destination: AudioNode,
-		oscType: ShamuOscillatorType, forScheduling: boolean, detune: number
+		oscType: ShamuOscillatorType, forScheduling: boolean, detune: number,
 	) {
 		super(audioContext, destination)
 
@@ -197,7 +197,7 @@ class SynthVoice extends Voice {
 		this._oscillator.detune.value = this._fineTuning
 		this._oscillator.frequency.setValueAtTime(midiNoteToFrequency(note), this._audioContext.currentTime)
 		this._oscillator.start(this._attackStartTimeSeconds)
-		
+
 		// logger.log(this.id + ' synth scheduleNote delaySeconds: ' + delaySeconds + ' | note: ' + note + ' | attackTimeInSeconds: ' + attackTimeInSeconds)
 
 		this._gain = this._audioContext.createGain()

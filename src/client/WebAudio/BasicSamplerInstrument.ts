@@ -1,8 +1,8 @@
+import {logger} from '../../common/logger'
+import {IMidiNote} from '../../common/MidiNote'
 import {IInstrumentOptions, Instrument, Voice, Voices} from './Instrument'
 import {getOctaveFromMidiNote, midiNoteToNoteName} from './music-functions'
 import {SamplesManager} from './SamplesManager'
-import {IMidiNote} from '../../common/MidiNote';
-import {logger} from '../../common/logger';
 
 export type IBasicSamplerOptions = IInstrumentOptions
 
@@ -35,7 +35,7 @@ export class BasicSamplerInstrument extends Instrument<SamplerVoices, SamplerVoi
 class SamplerVoices extends Voices<SamplerVoice> {
 	public static createVoice(
 		audioContext: AudioContext, destination: AudioNode,
-		forScheduling: boolean
+		forScheduling: boolean,
 	) {
 		return new SamplerVoice(audioContext, destination, forScheduling)
 	}
@@ -119,7 +119,7 @@ class SamplerVoice extends Voice {
 		this._audioBufferSource = this._audioContext.createBufferSource()
 		this._audioBufferSource.buffer = SamplesManager.getSample(midiNoteToNoteName(note), getOctaveFromMidiNote(note))
 		this._audioBufferSource.start(this._attackStartTimeSeconds)
-		
+
 		// logger.log(this.id + ' synth scheduleNote delaySeconds: ' + delaySeconds + ' | note: ' + note + ' | attackTimeInSeconds: ' + attackTimeInSeconds)
 
 		this._gain = this._audioContext.createGain()

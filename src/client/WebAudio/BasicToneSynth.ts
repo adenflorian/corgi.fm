@@ -1,7 +1,7 @@
 import {Frequency, OscillatorType, Synth} from 'tone'
 import {IDisposable} from '../../common/common-types'
 import {emptyMidiNotes, IMidiNote, IMidiNotes} from '../../common/MidiNote'
-import {AudioNodeWrapper, IAudioNodeWrapperOptions, IInstrument} from './Instrument'
+import {AudioNodeWrapper, IAudioNodeWrapperOptions, IInstrument} from './index'
 
 export class BasicToneSynth extends AudioNodeWrapper implements IDisposable, IInstrument {
 	private readonly _synth: Synth = new Synth().toMaster()
@@ -20,6 +20,10 @@ export class BasicToneSynth extends AudioNodeWrapper implements IDisposable, IIn
 		this._synth.envelope.release = 0.01
 		this._synth.oscillator.type = 'sine'
 	}
+
+	public scheduleNote(note: IMidiNote, delaySeconds: number) {}
+
+	public scheduleRelease(note: number, delaySeconds: number) {}
 
 	public setMidiNotes(midiNotes: IMidiNotes) {
 		// const newNotes = midiNotes.filter(x => this._previousNotes.includes(x) === false)

@@ -1,6 +1,8 @@
+import {Map} from 'immutable'
 import {Store} from 'redux'
 // import {OscillatorType} from 'tone'
 import {ConnectionNodeType, IConnectable} from '../common/common-types'
+import {emptyMidiNotes} from '../common/MidiNote'
 import {
 	BasicSamplerState, BasicSynthesizerState, globalClockActions, IClientAppState,
 	IClientRoomState, IConnection, isAudioNodeType,
@@ -9,18 +11,16 @@ import {
 	selectConnectionSourceNotesByTargetId, selectConnectionsWithSourceIds, selectGlobalClockState,
 	selectSampler, selectSimpleReverb, SimpleReverbState,
 } from '../common/redux'
+import {useSchedulerForKeyboards} from './client-toggles'
 import {GridSequencerPlayer} from './GridSequencerPlayer'
-import {BasicSamplerInstrument} from './WebAudio/BasicSamplerInstrument'
-import {BasicSynthesizer} from './WebAudio/BasicSynthesizer'
 // import {BasicToneSynth} from './WebAudio/BasicToneSynth'
 import {
 	AudioNodeWrapper, IAudioNodeWrapperOptions, IInstrument,
 	IInstrumentOptions, MasterAudioOutput,
-} from './WebAudio/Instrument'
+} from './WebAudio'
+import {BasicSamplerInstrument} from './WebAudio/BasicSamplerInstrument'
+import {BasicSynthesizer} from './WebAudio/BasicSynthesizer'
 import {SimpleReverb} from './WebAudio/SimpleReverb'
-import {Map} from 'immutable';
-import {useSchedulerForKeyboards} from './client-toggles';
-import {emptyMidiNotes} from '../common/MidiNote';
 
 type IdsSelector = (roomState: IClientRoomState) => string[]
 type StateSelector<S> = (roomState: IClientRoomState, id: string) => S
@@ -46,7 +46,7 @@ let stuffMaps = Map<ConnectionNodeType, StuffMap>([
 export function getAllInstruments() {
 	return stuffMaps.get(ConnectionNodeType.basicSampler)!
 		.concat(
-			stuffMaps.get(ConnectionNodeType.basicSynthesizer)!
+			stuffMaps.get(ConnectionNodeType.basicSynthesizer)!,
 		) as Map<string, IInstrument>
 }
 
@@ -65,7 +65,7 @@ export const setupInstrumentManager = (
 			audioNode: preFx,
 			audioContext,
 			id: MASTER_AUDIO_OUTPUT_TARGET_ID,
-		})
+		}),
 	]]))
 
 	const globalClock = new GridSequencerPlayer(
@@ -332,7 +332,7 @@ function createIfNotExisting<T>(nodeType: ConnectionNodeType, id: string, thing:
 		thing = thingFactory()
 		stuffMaps = stuffMaps.set(
 			nodeType,
-			stuffMaps.get(nodeType)!.set(id, thing)
+			stuffMaps.get(nodeType)!.set(id, thing),
 		)
 	}
 	return thing

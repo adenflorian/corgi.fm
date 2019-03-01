@@ -1,25 +1,30 @@
 {
     "eslint.autoFixOnSave": true,
-    // "tslint.autoFixOnSave": [
-    //     "array-type",
-    //     "arrow-parens",
-    //     "indent",
-    //     "member-ordering",
-    //     "no-consecutive-blank-lines",
-    //     "no-var-keyword",
-    //     "object-literal-key-quotes",
-    //     "one-variable-per-declaration",
-    //     "ordered-imports",
-    //     "prefer-const",
-    //     "quotemark",
-    //     "semicolon",
-    //     "space-before-function-paren",
-    //     "trailing-comma",
-    //     "eofline"
-    // ],
+    "tslint.autoFixOnSave": [
+        "array-type",
+        "arrow-parens",
+        "indent",
+        "member-ordering",
+        "no-consecutive-blank-lines",
+        "no-var-keyword",
+        "object-literal-key-quotes",
+        "one-variable-per-declaration",
+        "ordered-imports",
+        "prefer-const",
+        "quotemark",
+        "semicolon",
+        "space-before-function-paren",
+        "trailing-comma",
+        "eofline"
+    ],
     "tslint.jsEnable": true,
-    // "tslint.packageManager": "yarn",
-    // "tslint.run": "onType",
+    "tslint.packageManager": "yarn",
+    "tslint.run": "onType",
+    "tslint.configFile": "./tslint.json",
+    "tslint.exclude": [
+        "node_modules",
+        "**/node_modules/*"
+    ],
     "files.eol": "\n",
     "javascript.preferences.quoteStyle": "single",
     "typescript.preferences.quoteStyle": "single",
@@ -106,8 +111,6 @@
         "TODO.md"
     ],
     "less.lint.emptyRules": "ignore",
-    "codemetrics.basics.CodeLensHiddenUnder": 20,
-    "codemetrics.basics.CodeLensEnabled": false,
     "files.associations": {
         "tsconfig.json": "json"
     },

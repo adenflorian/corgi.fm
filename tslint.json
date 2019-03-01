@@ -5,6 +5,7 @@
     ],
     "jsRules": {},
     "rules": {
+        "no-empty": false,
         "no-empty-interface": false,
         "restrict-plus-operands": false,
         "strict-boolean-expressions": false,
@@ -28,7 +29,6 @@
                 "ignore-module": "(\\.html|\\.css|\\.less|babel-polyfill)$"
             }
         ],
-        "file-name-casing": false,
         "whitespace": [
             true,
             "check-branch",
