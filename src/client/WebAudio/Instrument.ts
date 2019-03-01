@@ -2,7 +2,6 @@ import {OrderedMap} from 'immutable'
 import uuid = require('uuid')
 import {IDisposable} from '../../common/common-types'
 import {emptyMidiNotes, IMidiNote, IMidiNotes} from '../../common/MidiNote'
-import {Arp} from './arp'
 import {AudioNodeWrapper, IAudioNodeWrapperOptions} from './index'
 
 export abstract class Instrument<T extends Voices<V>, V extends Voice> extends AudioNodeWrapper implements IDisposable {
@@ -12,7 +11,6 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 	protected readonly _lowPassFilter: BiquadFilterNode
 	protected _attackTimeInSeconds: number = 0.01
 	protected _releaseTimeInSeconds: number = 3
-	private readonly _arp = new Arp()
 	private readonly _gain: GainNode
 	private _previousNotes = emptyMidiNotes
 
@@ -30,11 +28,6 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 		this._gain = this._audioContext.createGain()
 		// Just below 1 to help mitigate an infinite feedback loop
 		this._gain.gain.value = 0.999
-
-		// this._arp.start(this._setMidiNotesFromArp)
-
-		// this._lfo.connect(lfoGain)
-		// 	.connect(this._gain.gain)
 
 		this._panNode.connect(this._lowPassFilter)
 		this._lowPassFilter.connect(this._gain)
@@ -61,31 +54,6 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 
 	// TODO Check if changed before iterating through previous notes
 	public readonly setMidiNotes = (midiNotes: IMidiNotes) => {
-		const arp = false
-
-		if (arp) {
-			this._arp.setNotes(midiNotes)
-		} else {
-			this._setMidiNotesFromArp(midiNotes)
-		}
-	}
-
-	public readonly setAttack = (attackTimeInSeconds: number) => this._attackTimeInSeconds = attackTimeInSeconds
-
-	public readonly setRelease = (releaseTimeInSeconds: number) => this._releaseTimeInSeconds = releaseTimeInSeconds
-
-	public readonly getActivityLevel = () => this._getVoices().getActivityLevel()
-
-	protected _dispose = () => {
-		this._panNode.disconnect()
-		this._gain.disconnect()
-		this._lowPassFilter.disconnect()
-		this._arp.dispose()
-	}
-
-	protected abstract _getVoices(): T
-
-	private readonly _setMidiNotesFromArp = (midiNotes: IMidiNotes) => {
 		const newNotes = midiNotes.filter(x => this._previousNotes.includes(x) === false)
 		const offNotes = this._previousNotes.filter(x => midiNotes.includes(x) === false)
 
@@ -99,6 +67,20 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 
 		this._previousNotes = midiNotes
 	}
+
+	public readonly setAttack = (attackTimeInSeconds: number) => this._attackTimeInSeconds = attackTimeInSeconds
+
+	public readonly setRelease = (releaseTimeInSeconds: number) => this._releaseTimeInSeconds = releaseTimeInSeconds
+
+	public readonly getActivityLevel = () => this._getVoices().getActivityLevel()
+
+	protected _dispose = () => {
+		this._panNode.disconnect()
+		this._gain.disconnect()
+		this._lowPassFilter.disconnect()
+	}
+
+	protected abstract _getVoices(): T
 }
 
 export interface IInstrumentOptions extends IAudioNodeWrapperOptions {
