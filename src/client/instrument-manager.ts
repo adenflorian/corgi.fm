@@ -1,6 +1,5 @@
 import {Map} from 'immutable'
 import {Store} from 'redux'
-// import {OscillatorType} from 'tone'
 import {ConnectionNodeType, IConnectable} from '../common/common-types'
 import {emptyMidiNotes} from '../common/MidiNote'
 import {
@@ -13,10 +12,9 @@ import {
 } from '../common/redux'
 import {useSchedulerForKeyboards} from './client-toggles'
 import {GridSequencerPlayer} from './GridSequencerPlayer'
-// import {BasicToneSynth} from './WebAudio/BasicToneSynth'
 import {
-	AudioNodeWrapper, IAudioNodeWrapperOptions, IInstrument,
-	IInstrumentOptions, MasterAudioOutput,
+	AudioNodeWrapper, IAudioNodeWrapperOptions, IInstrumentOptions,
+	Instrument, MasterAudioOutput, Voice, Voices,
 } from './WebAudio'
 import {BasicSamplerInstrument} from './WebAudio/BasicSamplerInstrument'
 import {BasicSynthesizer} from './WebAudio/BasicSynthesizer'
@@ -25,8 +23,11 @@ import {SimpleReverb} from './WebAudio/SimpleReverb'
 type IdsSelector = (roomState: IClientRoomState) => string[]
 type StateSelector<S> = (roomState: IClientRoomState, id: string) => S
 
-type InstrumentFactory<I extends IInstrument, S> = (options: IInstrumentOptions, instrumentState: S) => I
-type UpdateSpecificInstrument<I extends IInstrument, S> = (instrument: I, instrumentState: S) => void
+type InstrumentFactory<I extends Instrument<Voices<Voice>, Voice>, S>
+	= (options: IInstrumentOptions, instrumentState: S) => I
+
+type UpdateSpecificInstrument<I extends Instrument<Voices<Voice>, Voice>, S>
+	= (instrument: I, instrumentState: S) => void
 
 type EffectFactory<E, S> = (options: IAudioNodeWrapperOptions, effectState: S) => E
 type UpdateSpecificEffect<E, S> = (effect: E, effectState: S) => void
@@ -47,7 +48,7 @@ export function getAllInstruments() {
 	return stuffMaps.get(ConnectionNodeType.basicSampler)!
 		.concat(
 			stuffMaps.get(ConnectionNodeType.basicSynthesizer)!,
-		) as Map<string, IInstrument>
+		) as Map<string, Instrument<Voices<Voice>, Voice>>
 }
 
 let previousState: IClientAppState | undefined
@@ -137,31 +138,9 @@ export const setupInstrumentManager = (
 					instrument.setFineTuning(instrumentState.fineTuning)
 				},
 			)
-			// updateInstrumentType(
-			// 	selectAllBasicSynthesizerIds,
-			// 	selectBasicSynthesizer,
-			// 	(options, instrumentState) => new BasicToneSynth({
-			// 		...options,
-			// 		...instrumentState,
-			// 	}),
-			// 	stuffMaps.get(ConnectionNodeType.basicSynthesizer)!,
-			// 	(instrument: BasicToneSynth, instrumentState: BasicSynthesizerState) => {
-			// 		instrument.setOscillatorType(instrumentState.oscillatorType as OscillatorType)
-			// 		instrument.setPan(instrumentState.pan)
-			// 		instrument.setLowPassFilterCutoffFrequency(instrumentState.lowPassFilterCutoffFrequency)
-			// 		instrument.setAttack(instrumentState.attack)
-			// 		instrument.setRelease(instrumentState.release)
-			// 		instrument.setFineTuning(instrumentState.fineTuning)
-			// 	},
-			// )
-			// updateToneType(
-			// 	selectAllBasicSynthesizerIds,
-			// 	selectBasicSynthesizer,
-			// 	stuffMaps.get(ConnectionNodeType.basicSynthesizer)!,
-			// )
 		}
 
-		function updateInstrumentType<I extends IInstrument, S extends IConnectable>(
+		function updateInstrumentType<I extends Instrument<Voices<Voice>, Voice>, S extends IConnectable>(
 			instrumentIdsSelector: IdsSelector,
 			instrumentStateSelector: StateSelector<S>,
 			instrumentCreator: InstrumentFactory<I, S>,
@@ -207,44 +186,6 @@ export const setupInstrumentManager = (
 				return selectConnectionSourceNotesByTargetId(state.room, instrumentId, false)
 			}
 		}
-
-		// function updateToneType<S extends IConnectable>(
-		// 	instrumentIdsSelector: IdsSelector,
-		// 	instrumentStateSelector: StateSelector<S>,
-		// 	stuff: StuffMap,
-		// ) {
-		// 	const instrumentIds = instrumentIdsSelector(state.room)
-
-		// 	stuff.forEach((_, key) => {
-		// 		if (instrumentIds.includes(key) === false) {
-		// 			stuff.get(key)!.dispose()
-		// 			stuff.delete(key)
-		// 		}
-		// 	})
-
-		// 	instrumentIds.forEach(instrumentId => {
-		// 		const instrumentState = instrumentStateSelector(state.room, instrumentId)
-
-		// 		const instrument = createIfNotExisting(
-		// 			stuff,
-		// 			instrumentId,
-		// 			stuff.get(instrumentId),
-		// 			() => new BasicToneSynth({
-		// 				audioContext,
-		// 				id: instrumentId,
-		// 			}),
-		// 		)
-
-		// 		// updateAudioConnectionsFromSource(state.room, instrumentId, instrument)
-
-		// 		const sourceNotes = selectConnectionSourceNotesByTargetId(state.room, instrumentId)
-
-		// 		instrument.setMidiNotes(sourceNotes)
-
-		// 		// instrument.setMidiNotes(sourceNotes)
-
-		// 	})
-		// }
 
 		function handleSimpleReverbs() {
 			updateEffectType(

@@ -1,5 +1,5 @@
-import {Record, List, Set} from 'immutable';
-import {IMidiNotes, IMidiNote} from './MidiNote';
+import {List, Record, Set} from 'immutable'
+import {IMidiNote, IMidiNotes} from './MidiNote'
 
 export type ClientId = string
 
@@ -46,7 +46,7 @@ export interface MidiClipEvent extends MidiEvent {
 }
 
 export function makeMidiClipEvent(
-	event: {notes?: IMidiNotes, note?: IMidiNote, startBeat: number}
+	event: {notes?: IMidiNotes, note?: IMidiNote, startBeat: number},
 ): MidiClipEvent {
 	const actualNotes = event.note !== undefined
 		? Set([event.note])
@@ -56,7 +56,7 @@ export function makeMidiClipEvent(
 
 	return Object.freeze({
 		startBeat: event.startBeat || 0,
-		notes: actualNotes
+		notes: actualNotes,
 	})
 }
 
@@ -69,7 +69,7 @@ export function makeMidiGlobalClipEvent(event: Partial<MidiGlobalClipEvent & {no
 
 	return Object.freeze({
 		startTime: event.startTime || 0,
-		notes: actualNotes
+		notes: actualNotes,
 	})
 }
 

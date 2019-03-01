@@ -5,19 +5,7 @@ import {emptyMidiNotes, IMidiNote, IMidiNotes} from '../../common/MidiNote'
 import {Arp} from './arp'
 import {AudioNodeWrapper, IAudioNodeWrapperOptions} from './index'
 
-export interface IInstrument extends IDisposable, AudioNodeWrapper {
-	setMidiNotes: (midiNotes: IMidiNotes) => void
-	setPan: (pan: number) => void
-	setLowPassFilterCutoffFrequency: (frequency: number) => void
-	setAttack: (attackTimeInSeconds: number) => void
-	setRelease: (releaseTimeInSeconds: number) => void
-	getActivityLevel: () => number
-	scheduleNote(note: IMidiNote, delaySeconds: number): void
-	scheduleRelease(note: number, delaySeconds: number): void
-}
-
-// TODO Default generic types to {} or something so that w dont need to use the interface
-export abstract class Instrument<T extends Voices<V>, V extends Voice> extends AudioNodeWrapper implements IInstrument {
+export abstract class Instrument<T extends Voices<V>, V extends Voice> extends AudioNodeWrapper implements IDisposable {
 
 	protected readonly _panNode: StereoPannerNode
 	protected readonly _audioContext: AudioContext

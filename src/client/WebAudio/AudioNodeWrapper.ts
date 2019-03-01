@@ -1,4 +1,5 @@
 import {List, Map} from 'immutable'
+import {IDisposable} from '../../common/common-types'
 import {logger} from '../../common/logger'
 
 export interface IAudioNodeWrapperOptions {
@@ -6,7 +7,7 @@ export interface IAudioNodeWrapperOptions {
 	id: string
 }
 
-export abstract class AudioNodeWrapper {
+export abstract class AudioNodeWrapper implements IDisposable {
 	public abstract dispose: () => void
 	public readonly id: string
 	protected abstract getInputAudioNode: () => AudioNode | null
