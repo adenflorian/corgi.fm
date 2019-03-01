@@ -1,7 +1,7 @@
 import {List} from 'immutable'
 import {
-	IMultiStateThing, MidiClipEvent, MidiClip, MidiClipEvents,
-	makeMidiClip, makeMidiClipEvent,
+	IMultiStateThing, makeMidiClip, makeMidiClipEvent, MidiClip,
+	MidiClipEvent, MidiClipEvents,
 } from '../common-types'
 import {emptyMidiNotes, MidiNotes} from '../MidiNote'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './index'
@@ -44,7 +44,7 @@ export const createSequencerEvents = (length: number): MidiClipEvents => {
 	return makeSequencerEvents(
 		new Array(length)
 			.fill(0)
-			.map((_, i) => makeMidiClipEvent({notes: emptyMidiNotes, startBeat: i}))
+			.map((_, i) => makeMidiClipEvent({notes: emptyMidiNotes, startBeat: i})),
 	)
 }
 
@@ -80,7 +80,7 @@ export function deserializeSequencerState<T extends ISequencerState>(state: IMul
 		midiClip: makeMidiClip({
 			length: x.midiClip.length,
 			loop: x.midiClip.loop,
-			events: deserializeEvents(x.midiClip.events)
+			events: deserializeEvents(x.midiClip.events),
 		}),
 		previousEvents: List(x.previousEvents.map(deserializeEvents)),
 	} as T

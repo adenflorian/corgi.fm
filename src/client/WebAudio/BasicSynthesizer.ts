@@ -1,111 +1,51 @@
-import {Map} from 'immutable'
-import {logger} from '../../common/logger'
-import {IMidiNote} from '../../common/MidiNote'
+import {midiNoteToFrequency} from '../../common/music-functions'
 import {BuiltInOscillatorType, CustomOscillatorType, ShamuOscillatorType} from '../../common/OscillatorTypes'
-import {IInstrumentOptions, Instrument, Voice, Voices, VoiceStatus} from './Instrument'
-import {midiNoteToFrequency} from './music-functions'
+import {IInstrumentOptions, Voice, VoiceStatus} from './index'
 
 export interface IBasicSynthesizerOptions extends IInstrumentOptions {
 	oscillatorType: ShamuOscillatorType
 }
 
 // TODO Make into a BasicSynthesizerAudioNode?
-export class BasicSynthesizer extends Instrument<SynthVoices, SynthVoice> {
-	private readonly _voices: SynthVoices
-	private _fineTuning: number = 0
-	private _oscillatorType: ShamuOscillatorType
+// export class BasicSynthesizer extends Instrument<SynthVoices, SynthVoice> {
+// 	private readonly _voices: SynthVoices
+// 	private _fineTuning: number = 0
+// 	private _oscillatorType: ShamuOscillatorType
 
-	constructor(options: IBasicSynthesizerOptions) {
-		super(options)
+// 	constructor(options: IBasicSynthesizerOptions) {
+// 		super(options)
 
-		this._oscillatorType = options.oscillatorType
+// 		this._oscillatorType = options.oscillatorType
 
-		// this._voices = new SynthVoices(0, this._audioContext, this._panNode, options.oscillatorType)
-		this._voices = new SynthVoices(options.voiceCount, this._audioContext, this._panNode, options.oscillatorType, this._fineTuning)
-	}
+// 		this._voices = new SynthVoices(options.voiceCount, this._audioContext, this._panNode, options.oscillatorType, this._fineTuning)
+// 	}
 
-	public scheduleNote(note: IMidiNote, delaySeconds: number) {
-		this._voices.scheduleNote(note, delaySeconds, this._attackTimeInSeconds, this._audioContext, this._panNode, this._oscillatorType, this._fineTuning)
-	}
+// 	public scheduleNote(note: IMidiNote, delaySeconds: number) {
+// 		this._voices.scheduleNote(note, delaySeconds, this._attackTimeInSeconds, this._audioContext, this._panNode, this._oscillatorType, this._fineTuning)
+// 	}
 
-	public scheduleRelease(note: number, delaySeconds: number) {
-		this._voices.scheduleRelease(note, delaySeconds, this._releaseTimeInSeconds)
-	}
+// 	public setOscillatorType = (type: ShamuOscillatorType) => {
+// 		if (type === this._oscillatorType) return
+// 		this._oscillatorType = type
+// 		this._voices.setOscillatorType(type)
+// 	}
 
-	public setOscillatorType = (type: ShamuOscillatorType) => {
-		if (type === this._oscillatorType) return
-		this._oscillatorType = type
-		this._voices.setOscillatorType(type)
-	}
+// 	public setFineTuning = (fine: number) => {
+// 		if (fine === this._fineTuning) return
+// 		this._fineTuning = fine
+// 		this._voices.setFineTuning(fine)
+// 	}
 
-	public setFineTuning = (fine: number) => {
-		if (fine === this._fineTuning) return
-		this._fineTuning = fine
-		this._voices.setFineTuning(fine)
-	}
+// 	public dispose = () => {
+// 		this._voices.dispose()
 
-	public dispose = () => {
-		this._voices.dispose()
+// 		this._dispose()
+// 	}
 
-		this._dispose()
-	}
+// 	protected _getVoices = () => this._voices
+// }
 
-	protected _getVoices = () => this._voices
-}
-
-class SynthVoices extends Voices<SynthVoice> {
-	public static createVoice(
-		audioContext: AudioContext, destination: AudioNode,
-		oscType: ShamuOscillatorType, forScheduling: boolean, detune: number,
-	) {
-		return new SynthVoice(audioContext, destination, oscType, forScheduling, detune)
-	}
-
-	protected _scheduledVoices = Map<number, SynthVoice>()
-
-	constructor(voiceCount: number, audioContext: AudioContext, destination: AudioNode, oscType: ShamuOscillatorType, detune: number) {
-		super()
-
-		for (let i = 0; i < voiceCount; i++) {
-			const newVoice = SynthVoices.createVoice(audioContext, destination, oscType, false, detune)
-			this._inactiveVoices = this._inactiveVoices.set(newVoice.id, newVoice)
-		}
-	}
-
-	public setOscillatorType(type: ShamuOscillatorType) {
-		this._allVoices.forEach(x => x.setOscillatorType(type))
-	}
-
-	public setFineTuning(fine: number) {
-		this._allVoices.forEach(x => x.setFineTuning(fine))
-	}
-
-	public scheduleNote(note: IMidiNote, delaySeconds: number, attackTimeInSeconds: number, audioContext: AudioContext, destination: AudioNode, oscType: ShamuOscillatorType, detune: number) {
-		const newVoice = SynthVoices.createVoice(audioContext, destination, oscType, true, detune)
-
-		newVoice.scheduleNote(note, attackTimeInSeconds, delaySeconds)
-
-		this._scheduledVoices = this._scheduledVoices.set(newVoice.id, newVoice)
-	}
-
-	public scheduleRelease(note: number, delaySeconds: number, releaseSeconds: number) {
-		const firstUnReleasedVoiceForNote = this._scheduledVoices
-			.filter(x => x.playingNote === note)
-			.find(x => x.getIsReleaseScheduled() === false)
-
-		// console.log('this._scheduledVoices: ', this._scheduledVoices)
-
-		if (!firstUnReleasedVoiceForNote) throw new Error('trying to schedule release for note, but no available note to release')
-
-		firstUnReleasedVoiceForNote.scheduleRelease(
-			delaySeconds,
-			releaseSeconds,
-			() => (this._scheduledVoices = this._scheduledVoices.delete(firstUnReleasedVoiceForNote.id)),
-		)
-	}
-}
-
-class SynthVoice extends Voice {
+export class SynthVoice extends Voice {
 	private static _noiseBuffer: AudioBuffer
 	private _oscillator: OscillatorNode | undefined
 	private _oscillatorType: ShamuOscillatorType
@@ -141,21 +81,6 @@ class SynthVoice extends Voice {
 		this._afterPlayNote(note)
 	}
 
-	public getIsReleaseScheduled = () => this._isReleaseScheduled
-
-	public scheduleNote(note: number, attackTimeInSeconds: number, delaySeconds: number): void {
-		// if delay is 0 then the scheduler isn't working properly
-		if (delaySeconds < 0) throw new Error('delay <= 0: ' + delaySeconds)
-
-		if (this._oscillatorType === CustomOscillatorType.noise) {
-			// TODO
-		} else {
-			this._scheduleNormalNote(note, attackTimeInSeconds, delaySeconds)
-		}
-
-		this.playingNote = note
-	}
-
 	public scheduleRelease(delaySeconds: number, releaseSeconds: number, onEnded: () => void) {
 
 		if (this._oscillatorType === CustomOscillatorType.noise) {
@@ -188,7 +113,9 @@ class SynthVoice extends Voice {
 		this._dispose()
 	}
 
-	private _scheduleNormalNote(note: number, attackTimeInSeconds: number, delaySeconds: number): void {
+	protected _scheduleNote(note: number, attackTimeInSeconds: number, delaySeconds: number): void {
+		if (this._oscillatorType === CustomOscillatorType.noise) return // TODO
+
 		this._attackStartTimeSeconds = this._audioContext.currentTime + delaySeconds
 		this._attackEndTimeSeconds = this._attackStartTimeSeconds + attackTimeInSeconds
 

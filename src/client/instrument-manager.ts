@@ -12,21 +12,17 @@ import {
 } from '../common/redux'
 import {useSchedulerForKeyboards} from './client-toggles'
 import {GridSequencerPlayer} from './GridSequencerPlayer'
-import {
-	AudioNodeWrapper, IAudioNodeWrapperOptions, IInstrumentOptions,
-	Instrument, MasterAudioOutput, Voice, Voices,
-} from './WebAudio'
-import {BasicSamplerInstrument} from './WebAudio/BasicSamplerInstrument'
-import {BasicSynthesizer} from './WebAudio/BasicSynthesizer'
-import {SimpleReverb} from './WebAudio/SimpleReverb'
+import {AudioNodeWrapper, IAudioNodeWrapperOptions, MasterAudioOutput} from './WebAudio'
+import {Instrument, InstrumentType} from './WebAudio'
+import {SimpleReverb} from './WebAudio'
 
 type IdsSelector = (roomState: IClientRoomState) => string[]
 type StateSelector<S> = (roomState: IClientRoomState, id: string) => S
 
-type InstrumentFactory<I extends Instrument<Voices<Voice>, Voice>, S>
-	= (options: IInstrumentOptions, instrumentState: S) => I
+type InstrumentFactory<I extends Instrument, S>
+	= (options: {id: string, audioContext: AudioContext}, instrumentState: S) => I
 
-type UpdateSpecificInstrument<I extends Instrument<Voices<Voice>, Voice>, S>
+type UpdateSpecificInstrument<I extends Instrument, S>
 	= (instrument: I, instrumentState: S) => void
 
 type EffectFactory<E, S> = (options: IAudioNodeWrapperOptions, effectState: S) => E
@@ -48,7 +44,7 @@ export function getAllInstruments() {
 	return stuffMaps.get(ConnectionNodeType.basicSampler)!
 		.concat(
 			stuffMaps.get(ConnectionNodeType.basicSynthesizer)!,
-		) as Map<string, Instrument<Voices<Voice>, Voice>>
+		) as Map<string, Instrument>
 }
 
 let previousState: IClientAppState | undefined
@@ -105,12 +101,13 @@ export const setupInstrumentManager = (
 			updateInstrumentType(
 				selectAllSamplerIds,
 				selectSampler,
-				options => new BasicSamplerInstrument({
+				options => new Instrument({
 					...options,
 					voiceCount: 20,
+					type: InstrumentType.BasicSampler,
 				}),
 				ConnectionNodeType.basicSampler,
-				(instrument: BasicSamplerInstrument, instrumentState: BasicSamplerState) => {
+				(instrument: Instrument, instrumentState: BasicSamplerState) => {
 					instrument.setPan(instrumentState.pan)
 					instrument.setLowPassFilterCutoffFrequency(instrumentState.lowPassFilterCutoffFrequency)
 					instrument.setAttack(instrumentState.attack)
@@ -123,24 +120,25 @@ export const setupInstrumentManager = (
 			updateInstrumentType(
 				selectAllBasicSynthesizerIds,
 				selectBasicSynthesizer,
-				(options, instrumentState) => new BasicSynthesizer({
+				(options, instrumentState) => new Instrument({
 					...options,
 					voiceCount: 9,
-					...instrumentState,
+					type: InstrumentType.BasicSynthesizer,
+					// ...instrumentState,
 				}),
 				ConnectionNodeType.basicSynthesizer,
-				(instrument: BasicSynthesizer, instrumentState: BasicSynthesizerState) => {
-					instrument.setOscillatorType(instrumentState.oscillatorType)
+				(instrument: Instrument, instrumentState: BasicSynthesizerState) => {
+					// instrument.setOscillatorType(instrumentState.oscillatorType)
 					instrument.setPan(instrumentState.pan)
 					instrument.setLowPassFilterCutoffFrequency(instrumentState.lowPassFilterCutoffFrequency)
 					instrument.setAttack(instrumentState.attack)
 					instrument.setRelease(instrumentState.release)
-					instrument.setFineTuning(instrumentState.fineTuning)
+					// instrument.setFineTuning(instrumentState.fineTuning)
 				},
 			)
 		}
 
-		function updateInstrumentType<I extends Instrument<Voices<Voice>, Voice>, S extends IConnectable>(
+		function updateInstrumentType<I extends Instrument, S extends IConnectable>(
 			instrumentIdsSelector: IdsSelector,
 			instrumentStateSelector: StateSelector<S>,
 			instrumentCreator: InstrumentFactory<I, S>,
@@ -161,7 +159,6 @@ export const setupInstrumentManager = (
 					() => instrumentCreator({
 						id: instrumentId,
 						audioContext,
-						voiceCount: 1,
 					}, instrumentState),
 				)
 
@@ -246,7 +243,11 @@ function deleteStuffThatNeedsToBe(nodeType: ConnectionNodeType, thingIds: string
 	}))
 }
 
-function updateAudioConnectionsFromSource(roomState: IClientRoomState, sourceId: string, audioNodeWrapper: AudioNodeWrapper) {
+function updateAudioConnectionsFromSource(
+	roomState: IClientRoomState,
+	sourceId: string,
+	audioNodeWrapper: AudioNodeWrapper,
+) {
 	const outgoingConnections = selectConnectionsWithSourceIds(roomState, [sourceId])
 
 	if (outgoingConnections.count() === 0) {
@@ -254,8 +255,13 @@ function updateAudioConnectionsFromSource(roomState: IClientRoomState, sourceId:
 	}
 
 	const validOutgoingConnections = outgoingConnections.filter(isConnectionToAudioNode)
-	const newConnections = validOutgoingConnections.filter(x => audioNodeWrapper.getConnectedTargets().has(x.targetId) === false)
-	const deletedTargetIds = audioNodeWrapper.getConnectedTargets().keySeq().filter(id => validOutgoingConnections.some(x => x.targetId === id) === false)
+
+	const newConnections = validOutgoingConnections
+		.filter(x => audioNodeWrapper.getConnectedTargets().has(x.targetId) === false)
+
+	const deletedTargetIds = audioNodeWrapper.getConnectedTargets()
+		.keySeq()
+		.filter(id => validOutgoingConnections.some(x => x.targetId === id) === false)
 
 	newConnections.forEach(newConnection => {
 		const targetAudioNodeWrapper = stuffMaps.get(newConnection.targetType)!.get(newConnection.targetId)
@@ -268,13 +274,19 @@ function updateAudioConnectionsFromSource(roomState: IClientRoomState, sourceId:
 	})
 }
 
-function createIfNotExisting<T>(nodeType: ConnectionNodeType, id: string, thing: any, thingFactory: () => T): T {
+function createIfNotExisting<T extends AudioNodeWrapper>(
+	nodeType: ConnectionNodeType,
+	id: string,
+	thing: any,
+	thingFactory: () => T,
+): T {
 	if (thing === undefined) {
-		thing = thingFactory()
+		const newThing = thingFactory()
 		stuffMaps = stuffMaps.set(
 			nodeType,
-			stuffMaps.get(nodeType)!.set(id, thing),
+			stuffMaps.get(nodeType)!.set(id, newThing),
 		)
+		return newThing
 	}
 	return thing
 }

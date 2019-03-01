@@ -1,6 +1,8 @@
 import {List, Record, Set} from 'immutable'
 import {IMidiNote, IMidiNotes} from './MidiNote'
 
+export type Octave = number
+
 export type ClientId = string
 
 export interface IDisposable {

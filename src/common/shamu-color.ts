@@ -2,8 +2,8 @@
 const ColorDefault = require('color')
 import * as ColorAll from 'color'
 import {List} from 'immutable'
-import {removeOctave} from '../client/WebAudio/music-functions'
 import {IMidiNote} from './MidiNote'
+import {removeOctave} from './music-functions'
 
 export const colorFunc: typeof ColorAll = ColorDefault || ColorAll
 

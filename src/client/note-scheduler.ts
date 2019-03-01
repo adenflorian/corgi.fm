@@ -1,6 +1,6 @@
+import {makeMidiGlobalClipEvent, MidiClip, MidiGlobalClipEvent, MidiGlobalClipEvents, MidiRange} from '../common/common-types'
 import {createThisShouldntHappenError} from '../common/common-utils'
 import {logger} from '../common/logger'
-import {MidiGlobalClipEvent, MidiGlobalClipEvents, MidiClip, MidiRange, makeMidiGlobalClipEvent} from '../common/common-types'
 
 export const applyBPM = (beat: number, bpm: number) => {
 	return beat * (60 / bpm)
