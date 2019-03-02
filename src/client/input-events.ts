@@ -1,11 +1,11 @@
 import {Map} from 'immutable'
 import {Action, AnyAction, Store} from 'redux'
 import {
-	globalClockActions, IClientAppState, localMidiKeyPress, localMidiKeyUp,
-	localMidiOctaveChange, pointersActions,
+	globalClockActions, IClientAppState, pointersActions,
 	selectGlobalClockIsPlaying, selectIsLocalClientReady, selectLocalClient,
 	skipNote, undoRecordingSequencer, userInputActions,
 } from '../common/redux'
+import {localMidiKeyPress, localMidiKeyUp, localMidiOctaveChange} from './local-middleware'
 import {simpleGlobalClientState} from './SimpleGlobalClientState'
 
 type IKeyBoardShortcuts = Map<string, KeyBoardShortcut>

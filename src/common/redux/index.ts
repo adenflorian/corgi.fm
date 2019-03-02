@@ -28,7 +28,6 @@ export * from './grid-sequencer-player-middleware'
 export * from './infinite-sequencers-redux'
 export * from './grid-sequencers-redux'
 
-export * from './local-middleware'
 export * from './node-types'
 export * from './options-redux'
 export * from './positions-redux'
