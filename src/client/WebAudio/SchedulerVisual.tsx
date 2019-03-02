@@ -2,6 +2,7 @@ import {Map, OrderedMap} from 'immutable'
 import {string} from 'prop-types'
 import * as React from 'react'
 import ReactDOM from 'react-dom'
+import {logger} from '../../common/logger'
 import {IMidiNote} from '../../common/MidiNote'
 import {getCurrentSongIsPlaying, getCurrentSongTime} from '../note-scanner'
 import {Voice} from './Instrument'
@@ -44,8 +45,8 @@ const SchedulerVisual = function SchedulerVisual_({scheduledVoices}: Props) {
 						>
 							<path
 								d={getPathDForVoice(voice)}
-								stroke="currentcolor"
-								strokeWidth={2}
+								stroke="white"
+								strokeWidth={1}
 							/>
 						</svg>
 					</div>
@@ -67,8 +68,9 @@ const SchedulerVisual = function SchedulerVisual_({scheduledVoices}: Props) {
 							` M ${width / 2} ${1 * height}` +
 							` L ${width / 2} 0`
 						}
-						stroke="white"
+						stroke="green"
 						strokeWidth={1}
+						strokeDasharray={4}
 					/>
 				</svg>
 			</div>
@@ -78,11 +80,14 @@ const SchedulerVisual = function SchedulerVisual_({scheduledVoices}: Props) {
 
 function getPathDForVoice(voice: Voice) {
 	const xShift = (-_audioContext.currentTime)
+	const xOffset = width / 2
 
-	return ` M ${((voice.getScheduledAttackStartTime() + xShift) * xScale) + (width / 2)} ${height}` +
-		` L ${((voice.getScheduledAttackEndTime() + xShift) * xScale) + (width / 2)} ${(voice.getScheduledSustainAfterAttack() * height) - height + 2}` +
-		` L ${Math.min(1000, ((voice.getScheduledReleaseStartTimeSeconds() + xShift) * xScale) + (width / 2))} ${(voice.getScheduledSustainAtRelease() * height) - height + 2}` +
-		` L ${Math.min(1000, ((voice.getScheduledReleaseEndTimeSeconds() + xShift) * xScale) + (width / 2))} ${height}`
+	return (
+		` M ${((voice.getScheduledAttackStartTime() + xShift) * xScale) + xOffset} ${height}` +
+		` L ${((voice.getScheduledAttackEndTime() + xShift) * xScale) + xOffset} ${(-height * voice.getScheduledSustainAtAttackEnd()) + height}` +
+		` L ${Math.min(1000, ((voice.getScheduledReleaseStartTimeSeconds() + xShift) * xScale) + xOffset)} ${(-height * voice.getScheduledSustainAtReleaseStart()) + height}` +
+		` L ${Math.min(1000, ((voice.getScheduledReleaseEndTimeSeconds() + xShift) * xScale) + xOffset)} ${(-height * voice.getScheduledSustainAtReleaseEnd()) + height}`
+	)
 }
 
 let _instruments = Map<string, OrderedMap<number, Voice>>()
@@ -122,3 +127,9 @@ function renderLoop() {
 
 	requestAnimationFrame(renderLoop)
 }
+
+window.addEventListener('keydown', e => {
+	if (e.key === 'b') {
+		logger.log('_instruments: ', _instruments.toJS())
+	}
+})

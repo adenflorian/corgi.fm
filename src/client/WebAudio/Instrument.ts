@@ -276,8 +276,9 @@ export abstract class Voice {
 	protected _isReleaseScheduled = false
 	protected _scheduledAttackStartTimeSeconds = 0
 	protected _scheduledAttackEndTimeSeconds = 0
-	protected _scheduledSustainAfterAttack = 1
-	protected _scheduledSustainAtRelease = 1
+	protected _scheduledSustainAtAttackEnd = 1
+	protected _scheduledSustainAtReleaseStart = 1
+	protected _scheduledSustainAtReleaseEnd = 0
 	protected _scheduledReleaseStartTimeSeconds = Number.MAX_VALUE
 	protected _scheduledReleaseEndTimeSeconds = Number.MAX_VALUE
 	protected _sustainLevel = 1
@@ -293,8 +294,9 @@ export abstract class Voice {
 
 	public getScheduledAttackStartTime = () => this._scheduledAttackStartTimeSeconds
 	public getScheduledAttackEndTime = () => this._scheduledAttackEndTimeSeconds
-	public getScheduledSustainAfterAttack = () => this._scheduledSustainAfterAttack
-	public getScheduledSustainAtRelease = () => this._scheduledSustainAtRelease
+	public getScheduledSustainAtAttackEnd = () => this._scheduledSustainAtAttackEnd
+	public getScheduledSustainAtReleaseStart = () => this._scheduledSustainAtReleaseStart
+	public getScheduledSustainAtReleaseEnd = () => this._scheduledSustainAtReleaseEnd
 	public getScheduledReleaseStartTimeSeconds = () => this._scheduledReleaseStartTimeSeconds
 	public getScheduledReleaseEndTimeSeconds = () => this._scheduledReleaseEndTimeSeconds
 
@@ -327,6 +329,27 @@ export abstract class Voice {
 		audioNode: AudioScheduledSourceNode | undefined,
 		onEnded: () => void,
 	) {
+
+		if (this._isReleaseScheduled) {
+			const originalReleaseLength = this._scheduledReleaseEndTimeSeconds - this._scheduledReleaseStartTimeSeconds
+
+			this._scheduledReleaseEndTimeSeconds = this._audioContext.currentTime + delaySeconds + releaseSeconds
+
+			const newReleaseLength = this._scheduledReleaseEndTimeSeconds - this._scheduledReleaseStartTimeSeconds
+			const ratio = newReleaseLength / originalReleaseLength
+			// Not accurate for a curved release, will be too high
+			this._scheduledSustainAtReleaseEnd = this._scheduledSustainAtReleaseStart - (ratio * this._scheduledSustainAtReleaseStart)
+			// logger.log('this._scheduledSustainAtReleaseStart: ', this._scheduledSustainAtReleaseStart)
+			// logger.log('ratio: ', ratio)
+			// logger.log('newReleaseLength: ', newReleaseLength)
+			// logger.log('originalReleaseLength: ', originalReleaseLength)
+			// logger.log('this._scheduledSustainAtReleaseEnd: ', this._scheduledSustainAtReleaseEnd)
+
+			if (!audioNode) return
+			audioNode.stop(this._scheduledReleaseEndTimeSeconds)
+			return
+		}
+
 		this._scheduledReleaseStartTimeSeconds = this._audioContext.currentTime + delaySeconds
 		this._scheduledReleaseEndTimeSeconds = this._audioContext.currentTime + delaySeconds + releaseSeconds
 
@@ -345,11 +368,11 @@ export abstract class Voice {
 			const targetSustainAtReleaseStart = ratio * this._sustainLevel
 			this._gain.gain.linearRampToValueAtTime(targetSustainAtReleaseStart, this._scheduledReleaseStartTimeSeconds)
 
-			logger.log('FOOOOOOOOOO')
+			// logger.log('FOOOOOOOOOO')
 
 			this._scheduledAttackEndTimeSeconds = this._scheduledReleaseStartTimeSeconds
-			this._scheduledSustainAfterAttack = targetSustainAtReleaseStart
-			this._scheduledSustainAtRelease = targetSustainAtReleaseStart
+			this._scheduledSustainAtAttackEnd = targetSustainAtReleaseStart
+			this._scheduledSustainAtReleaseStart = targetSustainAtReleaseStart
 		}
 
 		this._gain.gain.exponentialRampToValueAtTime(0.00001, this._scheduledReleaseEndTimeSeconds)
