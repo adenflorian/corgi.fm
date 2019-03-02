@@ -83,6 +83,8 @@ class SynthVoices extends Voices<SynthVoice> {
 		this._detune = fine
 		this._allVoices.forEach(x => x.setFineTuning(fine))
 	}
+
+	protected _getAudioContext() {return this._audioContext}
 }
 
 class SynthVoice extends Voice {

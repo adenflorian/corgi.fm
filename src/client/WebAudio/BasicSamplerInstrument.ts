@@ -49,6 +49,8 @@ class SamplerVoices extends Voices<SamplerVoice> {
 	public createVoice(forScheduling: boolean) {
 		return new SamplerVoice(this._audioContext, this._destination, forScheduling)
 	}
+
+	protected _getAudioContext() {return this._audioContext}
 }
 
 class SamplerVoice extends Voice {

@@ -171,6 +171,8 @@ export abstract class Voices<V extends Voice> {
 		this._allVoices.forEach(x => x.dispose())
 	}
 
+	protected abstract _getAudioContext(): AudioContext
+
 	protected _getVoice(note: number): V {
 		// Look for active voice that is playing same note
 		const sameNoteActiveVoice = this._activeVoices.find(x => x.playingNote === note)
