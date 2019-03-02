@@ -1,16 +1,16 @@
 import {Dispatch, Middleware} from 'redux'
-import {applyOctave} from '../../client/WebAudio/music-functions'
-import {ConnectionNodeType} from '../common-types'
-import {logger} from '../logger'
-import {addBasicSampler, addBasicSynthesizer, addPosition, addVirtualKeyboard, BasicSamplerState, BasicSynthesizerState, Connection, connectionsActions, deleteAllPositions, deleteAllThings, IClientAppState, makeActionCreator, makePosition, MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID, READY, selectActiveRoom, selectLocalClient, selectPositionExtremes, selectVirtualKeyboardById, selectVirtualKeyboardIdByOwner, SET_ACTIVE_ROOM, VirtualKeyboardState, virtualKeyPressed, virtualKeyUp, virtualOctaveChange} from './index'
-import {pointersActions} from './pointers-redux'
-import {IMidiNote} from '../MidiNote'
-import {selectConnectionsWithSourceIds} from './connections-redux'
-import {IClientRoomState} from './common-redux-types'
+import {useSchedulerForKeyboards} from '../../client/client-toggles'
 import {getAllInstruments} from '../../client/instrument-manager'
 import {isNewNoteScannerEnabled} from '../../client/is-prod-client'
+import {applyOctave} from '../../client/WebAudio/music-functions'
+import {ConnectionNodeType} from '../common-types'
 import {isClient} from '../is-client-or-server'
-import {useSchedulerForKeyboards} from '../../client/client-toggles';
+import {logger} from '../logger'
+import {IMidiNote} from '../MidiNote'
+import {IClientRoomState} from './common-redux-types'
+import {selectConnectionsWithSourceIds} from './connections-redux'
+import {addBasicSampler, addBasicSynthesizer, addPosition, addVirtualKeyboard, BasicSamplerState, BasicSynthesizerState, Connection, connectionsActions, deleteAllPositions, deleteAllThings, IClientAppState, makeActionCreator, makePosition, MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID, READY, selectActiveRoom, selectLocalClient, selectPositionExtremes, selectVirtualKeyboardById, selectVirtualKeyboardIdByOwner, SET_ACTIVE_ROOM, VirtualKeyboardState, virtualKeyPressed, virtualKeyUp, virtualOctaveChange} from './index'
+import {pointersActions} from './pointers-redux'
 
 export const LOCAL_MIDI_KEY_PRESS = 'LOCAL_MIDI_KEY_PRESS'
 export const localMidiKeyPress = makeActionCreator(LOCAL_MIDI_KEY_PRESS, 'midiNote')
@@ -64,7 +64,7 @@ export const createLocalMiddleware: () => Middleware<{}, IClientAppState> = () =
 				virtualKeyUp(
 					localVirtualKeyboard.id,
 					action.midiNote,
-				)
+				),
 			)
 		}
 		case LOCAL_MIDI_OCTAVE_CHANGE: {
@@ -98,6 +98,8 @@ export const createLocalMiddleware: () => Middleware<{}, IClientAppState> = () =
 function scheduleNote(note: IMidiNote, sourceId: string, roomState: IClientRoomState, onOrOff: 'on' | 'off') {
 	if (isClient() && isNewNoteScannerEnabled() === false) return
 	if (useSchedulerForKeyboards() === false) return
+
+	logger.log('[local-middleware.scheduleNote] note: ' + note + ' | onOrOff: ' + onOrOff)
 
 	const targetIds = selectConnectionsWithSourceIds(roomState, [sourceId]).map(x => x.targetId)
 

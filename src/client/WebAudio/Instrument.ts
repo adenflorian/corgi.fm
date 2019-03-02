@@ -1,6 +1,7 @@
 import {OrderedMap} from 'immutable'
 import uuid = require('uuid')
 import {IDisposable} from '../../common/common-types'
+import {logger} from '../../common/logger'
 import {emptyMidiNotes, IMidiNote, IMidiNotes} from '../../common/MidiNote'
 import {AudioNodeWrapper, IAudioNodeWrapperOptions} from './index'
 
@@ -135,6 +136,8 @@ export abstract class Voices<V extends Voice> {
 	public abstract createVoice(forScheduling: boolean): V
 
 	public scheduleNote(note: IMidiNote, delaySeconds: number, attackTimeInSeconds: number) {
+
+		// logger.log('[scheduleNote] ' + this.id + ' synth scheduleNote delaySeconds: ' + delaySeconds + ' | note: ' + note + ' | attackTimeInSeconds: ' + attackTimeInSeconds)
 		const newVoice = this.createVoice(true)
 
 		newVoice.scheduleNote(note, attackTimeInSeconds, delaySeconds)
@@ -147,7 +150,7 @@ export abstract class Voices<V extends Voice> {
 			.filter(x => x.playingNote === note)
 			.find(x => x.getIsReleaseScheduled() === false)
 
-		// console.log('this._scheduledVoices: ', this._scheduledVoices)
+		logger.log('this._scheduledVoices: ', this._scheduledVoices)
 
 		if (!firstUnReleasedVoiceForNote) throw new Error('trying to schedule release for note, but no available note to release')
 

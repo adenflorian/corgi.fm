@@ -176,12 +176,8 @@ export const setupInstrumentManager = (
 		}
 
 		function getSourceNotes(instrumentId: string) {
-			if (isNewNoteScannerEnabled) {
-				if (useSchedulerForKeyboards()) {
-					return emptyMidiNotes
-				} else {
-					return selectConnectionSourceNotesByTargetId(state.room, instrumentId, true)
-				}
+			if (isNewNoteScannerEnabled && useSchedulerForKeyboards()) {
+				return emptyMidiNotes
 			} else {
 				return selectConnectionSourceNotesByTargetId(state.room, instrumentId, false)
 			}

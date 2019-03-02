@@ -25,6 +25,9 @@
 				- it will need to keep track of all scheduled notes
 				- [ ] make instrument keep track of all scheduled notes/events/voices
 					- [√] move AudioNodeWrapper to new file
+		- BUG sometimes two note ons will schedule, but only one note off
+			- with current system, this will end in a stuck note
+			- once i implement the ableton system thing, this shouldnt be a problem, because it will only allow 1 at a time for same note
 		- what does ableton do?
 			- if two tracks play same note at same time, only one will play
 			- if a note is already playing, and a new note from different tracks start to play same note, old note is just stopped and new note starts attack
