@@ -32,6 +32,7 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 		this._panNode.connect(this._lowPassFilter)
 		this._lowPassFilter.connect(this._gain)
 	}
+
 	public abstract scheduleNote(note: IMidiNote, delaySeconds: number): void
 	public abstract scheduleRelease(note: number, delaySeconds: number): void
 
@@ -129,6 +130,16 @@ export abstract class Voices<V extends Voice> {
 				}
 			}, timeToReleaseInSeconds * 1000)
 		}
+	}
+
+	public abstract createVoice(forScheduling: boolean): V
+
+	public scheduleNote(note: IMidiNote, delaySeconds: number, attackTimeInSeconds: number) {
+		const newVoice = this.createVoice(true)
+
+		newVoice.scheduleNote(note, attackTimeInSeconds, delaySeconds)
+
+		this._scheduledVoices = this._scheduledVoices.set(newVoice.id, newVoice)
 	}
 
 	public scheduleRelease(note: number, delaySeconds: number, releaseSeconds: number) {
@@ -238,6 +249,8 @@ export abstract class Voice {
 		this._releaseId = uuid.v4()
 		return this._releaseId
 	}
+
+	public abstract scheduleNote(note: number, attackTimeInSeconds: number, delaySeconds: number): void
 
 	public abstract scheduleRelease(delaySeconds: number, releaseSeconds: number, onEnded: () => void): void
 

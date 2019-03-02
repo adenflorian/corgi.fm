@@ -16,7 +16,7 @@ export class BasicSamplerInstrument extends Instrument<SamplerVoices, SamplerVoi
 	}
 
 	public scheduleNote(note: IMidiNote, delaySeconds: number) {
-		this._voices.scheduleNote(note, delaySeconds, this._attackTimeInSeconds, this._audioContext, this._panNode)
+		this._voices.scheduleNote(note, delaySeconds, this._attackTimeInSeconds)
 	}
 
 	public scheduleRelease(note: number, delaySeconds: number) {
@@ -33,28 +33,21 @@ export class BasicSamplerInstrument extends Instrument<SamplerVoices, SamplerVoi
 }
 
 class SamplerVoices extends Voices<SamplerVoice> {
-	public static createVoice(
-		audioContext: AudioContext, destination: AudioNode,
-		forScheduling: boolean,
+	constructor(
+		private readonly _voiceCount: number,
+		private readonly _audioContext: AudioContext,
+		private readonly _destination: AudioNode,
 	) {
-		return new SamplerVoice(audioContext, destination, forScheduling)
-	}
-
-	constructor(voiceCount: number, audioContext: AudioContext, destination: AudioNode) {
 		super()
 
-		for (let i = 0; i < voiceCount; i++) {
-			const newVoice = SamplerVoices.createVoice(audioContext, destination, false)
+		for (let i = 0; i < this._voiceCount; i++) {
+			const newVoice = this.createVoice(false)
 			this._inactiveVoices = this._inactiveVoices.set(newVoice.id, newVoice)
 		}
 	}
 
-	public scheduleNote(note: IMidiNote, delaySeconds: number, attackTimeInSeconds: number, audioContext: AudioContext, destination: AudioNode) {
-		const newVoice = SamplerVoices.createVoice(audioContext, destination, true)
-
-		newVoice.scheduleNote(note, attackTimeInSeconds, delaySeconds)
-
-		this._scheduledVoices = this._scheduledVoices.set(newVoice.id, newVoice)
+	public createVoice(forScheduling: boolean) {
+		return new SamplerVoice(this._audioContext, this._destination, forScheduling)
 	}
 }
 
