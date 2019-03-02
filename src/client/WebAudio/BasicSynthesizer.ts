@@ -85,22 +85,6 @@ class SynthVoices extends Voices<SynthVoice> {
 
 		this._scheduledVoices = this._scheduledVoices.set(newVoice.id, newVoice)
 	}
-
-	public scheduleRelease(note: number, delaySeconds: number, releaseSeconds: number) {
-		const firstUnReleasedVoiceForNote = this._scheduledVoices
-			.filter(x => x.playingNote === note)
-			.find(x => x.getIsReleaseScheduled() === false)
-
-		// console.log('this._scheduledVoices: ', this._scheduledVoices)
-
-		if (!firstUnReleasedVoiceForNote) throw new Error('trying to schedule release for note, but no available note to release')
-
-		firstUnReleasedVoiceForNote.scheduleRelease(
-			delaySeconds,
-			releaseSeconds,
-			() => (this._scheduledVoices = this._scheduledVoices.delete(firstUnReleasedVoiceForNote.id)),
-		)
-	}
 }
 
 class SynthVoice extends Voice {
@@ -138,8 +122,6 @@ class SynthVoice extends Voice {
 
 		this._afterPlayNote(note)
 	}
-
-	public getIsReleaseScheduled = () => this._isReleaseScheduled
 
 	public scheduleNote(note: number, attackTimeInSeconds: number, delaySeconds: number): void {
 		// if delay is 0 then the scheduler isn't working properly

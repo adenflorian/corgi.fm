@@ -131,6 +131,22 @@ export abstract class Voices<V extends Voice> {
 		}
 	}
 
+	public scheduleRelease(note: number, delaySeconds: number, releaseSeconds: number) {
+		const firstUnReleasedVoiceForNote = this._scheduledVoices
+			.filter(x => x.playingNote === note)
+			.find(x => x.getIsReleaseScheduled() === false)
+
+		// console.log('this._scheduledVoices: ', this._scheduledVoices)
+
+		if (!firstUnReleasedVoiceForNote) throw new Error('trying to schedule release for note, but no available note to release')
+
+		firstUnReleasedVoiceForNote.scheduleRelease(
+			delaySeconds,
+			releaseSeconds,
+			() => (this._scheduledVoices = this._scheduledVoices.delete(firstUnReleasedVoiceForNote.id)),
+		)
+	}
+
 	public getActivityLevel = () => {
 		if (this._activeVoices.count() > 0) return 1
 		if (this._releasingVoices.count() > 0) return 0.5
@@ -206,6 +222,8 @@ export abstract class Voice {
 		this._gain.gain.setValueAtTime(0, this._audioContext.currentTime)
 	}
 
+	public getIsReleaseScheduled = () => this._isReleaseScheduled
+
 	public getReleaseId = () => this._releaseId
 
 	public abstract playNote(note: number, attackTimeInSeconds: number): void
@@ -220,6 +238,8 @@ export abstract class Voice {
 		this._releaseId = uuid.v4()
 		return this._releaseId
 	}
+
+	public abstract scheduleRelease(delaySeconds: number, releaseSeconds: number, onEnded: () => void): void
 
 	public abstract dispose(): void
 
