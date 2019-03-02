@@ -61,8 +61,6 @@ class SynthVoices extends Voices<SynthVoice> {
 		return new SynthVoice(audioContext, destination, oscType, forScheduling, detune)
 	}
 
-	protected _scheduledVoices = Map<number, SynthVoice>()
-
 	constructor(voiceCount: number, audioContext: AudioContext, destination: AudioNode, oscType: ShamuOscillatorType, detune: number) {
 		super()
 
