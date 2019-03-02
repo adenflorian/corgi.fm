@@ -108,6 +108,8 @@ export abstract class Voices<V extends Voice> {
 			.concat(this._scheduledVoices)
 	}
 
+	public getScheduledVoices() {return this._scheduledVoices}
+
 	public playNote(note: number, attackTimeInSeconds: number) {
 		const voice = this._getVoice(note)
 
@@ -273,8 +275,11 @@ export abstract class Voice {
 	protected _gain: GainNode
 	protected _isReleaseScheduled = false
 	protected _scheduledAttackStartTimeSeconds = 0
+	protected _scheduledAttackEndTimeSeconds = 0
+	protected _scheduledSustainAfterAttack = 1
+	protected _scheduledSustainAtRelease = 1
+	protected _scheduledReleaseStartTimeSeconds = Number.MAX_VALUE
 	protected _scheduledReleaseEndTimeSeconds = Number.MAX_VALUE
-	protected _attackEndTimeSeconds = 0
 	protected _sustainLevel = 1
 
 	constructor(audioContext: AudioContext, destination: AudioNode) {
@@ -287,6 +292,10 @@ export abstract class Voice {
 	}
 
 	public getScheduledAttackStartTime = () => this._scheduledAttackStartTimeSeconds
+	public getScheduledAttackEndTime = () => this._scheduledAttackEndTimeSeconds
+	public getScheduledSustainAfterAttack = () => this._scheduledSustainAfterAttack
+	public getScheduledSustainAtRelease = () => this._scheduledSustainAtRelease
+	public getScheduledReleaseStartTimeSeconds = () => this._scheduledReleaseStartTimeSeconds
 	public getScheduledReleaseEndTimeSeconds = () => this._scheduledReleaseEndTimeSeconds
 
 	public getIsReleaseScheduled = () => this._isReleaseScheduled
@@ -318,29 +327,35 @@ export abstract class Voice {
 		audioNode: AudioScheduledSourceNode | undefined,
 		onEnded: () => void,
 	) {
-		const releaseStartTimeSeconds = this._audioContext.currentTime + delaySeconds
-		const stopTimeSeconds = this._audioContext.currentTime + delaySeconds + releaseSeconds
+		this._scheduledReleaseStartTimeSeconds = this._audioContext.currentTime + delaySeconds
+		this._scheduledReleaseEndTimeSeconds = this._audioContext.currentTime + delaySeconds + releaseSeconds
 
-		// logger.log(this.id + ' synth scheduleRelease delay: ' + delaySeconds + ' | release: ' + releaseSeconds + ' | stop: ' + stopTimeSeconds)
+		// logger.log(this.id + ' synth scheduleRelease delay: ' + delaySeconds + ' | release: ' + releaseSeconds + ' | stop: ' + this._scheduledReleaseEndTimeSeconds)
 
-		if (this._attackEndTimeSeconds < releaseStartTimeSeconds) {
+		if (this._scheduledAttackEndTimeSeconds < this._scheduledReleaseStartTimeSeconds) {
 			// if attack is short, do linear ramp to sustain with no cancel
-			this._gain.gain.linearRampToValueAtTime(this._sustainLevel, releaseStartTimeSeconds)
+			this._gain.gain.linearRampToValueAtTime(this._sustainLevel, this._scheduledReleaseStartTimeSeconds)
 		} else {
 			// if attack is long, cancel and hold, calculate target sustain, and continue ramping to it
 			this._cancelAndHoldOrJustCancel()
 			// for linear attack only, need different math for other attack curves
-			const originalAttackLength = this._attackEndTimeSeconds - this._scheduledAttackStartTimeSeconds
-			const newAttackLength = releaseStartTimeSeconds - this._scheduledAttackStartTimeSeconds
+			const originalAttackLength = this._scheduledAttackEndTimeSeconds - this._scheduledAttackStartTimeSeconds
+			const newAttackLength = this._scheduledReleaseStartTimeSeconds - this._scheduledAttackStartTimeSeconds
 			const ratio = newAttackLength / originalAttackLength
 			const targetSustainAtReleaseStart = ratio * this._sustainLevel
-			this._gain.gain.linearRampToValueAtTime(targetSustainAtReleaseStart, releaseStartTimeSeconds)
+			this._gain.gain.linearRampToValueAtTime(targetSustainAtReleaseStart, this._scheduledReleaseStartTimeSeconds)
+
+			logger.log('FOOOOOOOOOO')
+
+			this._scheduledAttackEndTimeSeconds = this._scheduledReleaseStartTimeSeconds
+			this._scheduledSustainAfterAttack = targetSustainAtReleaseStart
+			this._scheduledSustainAtRelease = targetSustainAtReleaseStart
 		}
 
-		this._gain.gain.exponentialRampToValueAtTime(0.00001, stopTimeSeconds)
+		this._gain.gain.exponentialRampToValueAtTime(0.00001, this._scheduledReleaseEndTimeSeconds)
 
 		if (!audioNode) return
-		audioNode.stop(stopTimeSeconds)
+		audioNode.stop(this._scheduledReleaseEndTimeSeconds)
 		audioNode.onended = () => {
 			audioNode!.disconnect()
 			this._gain.disconnect()

@@ -92,7 +92,7 @@ class SamplerVoice extends Voice {
 
 	private _scheduleNormalNote(note: number, attackTimeInSeconds: number, delaySeconds: number): void {
 		this._scheduledAttackStartTimeSeconds = this._audioContext.currentTime + delaySeconds
-		this._attackEndTimeSeconds = this._scheduledAttackStartTimeSeconds + attackTimeInSeconds
+		this._scheduledAttackEndTimeSeconds = this._scheduledAttackStartTimeSeconds + attackTimeInSeconds
 
 		this._disposeAudioBufferSource()
 		this._audioBufferSource = this._audioContext.createBufferSource()
@@ -104,7 +104,7 @@ class SamplerVoice extends Voice {
 		this._gain = this._audioContext.createGain()
 		this._gain.gain.value = 0
 		this._gain.gain.linearRampToValueAtTime(0, this._scheduledAttackStartTimeSeconds)
-		this._gain.gain.linearRampToValueAtTime(this._sustainLevel, this._attackEndTimeSeconds)
+		this._gain.gain.linearRampToValueAtTime(this._sustainLevel, this._scheduledAttackEndTimeSeconds)
 
 		this._audioBufferSource.connect(this._gain)
 			.connect(this._destination)

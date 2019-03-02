@@ -47,6 +47,15 @@ let _cursorBeats = 0
 let currentSongTimeBeats = 0
 let lastAudioContextTime = 0
 let _justStarted = false
+let songStartTimeSeconds = 0
+
+export function getCurrentSongTime() {
+	return _audioContext.currentTime - songStartTimeSeconds
+}
+
+export function getCurrentSongIsPlaying() {
+	return _isPlaying
+}
 
 const emptyMidiClip = makeMidiClip()
 
@@ -64,6 +73,7 @@ function scheduleNotes() {
 		logger.log('[note-scanner] isPlaying: ', isPlaying)
 		if (isPlaying) {
 			_justStarted = true
+			songStartTimeSeconds = _audioContext.currentTime
 		}
 	}
 

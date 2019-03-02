@@ -3,7 +3,7 @@ import {IMidiNote} from '../../common/MidiNote'
 import {BuiltInOscillatorType, CustomOscillatorType, ShamuOscillatorType} from '../../common/OscillatorTypes'
 import {IInstrumentOptions, Instrument, Voice, Voices, VoiceStatus} from './Instrument'
 import {midiNoteToFrequency} from './music-functions'
-import {renderSchedulerVisual} from './SchedulerVisual'
+import {updateSchedulerVisual} from './SchedulerVisual'
 
 interface IBasicSynthesizerOptions extends IInstrumentOptions {
 	oscillatorType: ShamuOscillatorType
@@ -27,11 +27,13 @@ export class BasicSynthesizer extends Instrument<SynthVoices, SynthVoice> {
 	public scheduleNote(note: IMidiNote, delaySeconds: number) {
 		this._voices.scheduleNote(note, delaySeconds, this._attackTimeInSeconds)
 
-		renderSchedulerVisual(note, this.id)
+		updateSchedulerVisual(this.id, this._voices.getScheduledVoices(), this._audioContext)
 	}
 
 	public scheduleRelease(note: number, delaySeconds: number) {
 		this._voices.scheduleRelease(note, delaySeconds, this._releaseTimeInSeconds)
+
+		updateSchedulerVisual(this.id, this._voices.getScheduledVoices(), this._audioContext)
 	}
 
 	public setOscillatorType = (type: ShamuOscillatorType) => {
@@ -172,7 +174,7 @@ class SynthVoice extends Voice {
 
 	private _scheduleNormalNote(note: number, attackTimeInSeconds: number, delaySeconds: number): void {
 		this._scheduledAttackStartTimeSeconds = this._audioContext.currentTime + delaySeconds
-		this._attackEndTimeSeconds = this._scheduledAttackStartTimeSeconds + attackTimeInSeconds
+		this._scheduledAttackEndTimeSeconds = this._scheduledAttackStartTimeSeconds + attackTimeInSeconds
 
 		this._oscillator = this._audioContext.createOscillator()
 		this._oscillator.type = this._oscillatorType as OscillatorType
@@ -185,7 +187,7 @@ class SynthVoice extends Voice {
 		this._gain = this._audioContext.createGain()
 		this._gain.gain.value = 0
 		this._gain.gain.linearRampToValueAtTime(0, this._scheduledAttackStartTimeSeconds)
-		this._gain.gain.linearRampToValueAtTime(this._sustainLevel, this._attackEndTimeSeconds)
+		this._gain.gain.linearRampToValueAtTime(this._sustainLevel, this._scheduledAttackEndTimeSeconds)
 
 		this._oscillator.connect(this._gain)
 			.connect(this._destination)
