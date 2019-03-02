@@ -137,6 +137,28 @@ export abstract class Voices<V extends Voice> {
 
 	public scheduleNote(note: IMidiNote, delaySeconds: number, attackTimeInSeconds: number) {
 
+		const newNoteStartTime = this._getAudioContext().currentTime + delaySeconds
+
+		// check for any scheduled notes playing same note that will overlap
+		// if new note start is in middle of existing note, then schedule hard cutoff of existing note
+		//   or schedule new attack on existing voice
+		const scheduledVoicesSameNote = this._scheduledVoices.filter(x => x.playingNote === note)
+
+		// Its only possible for there to be one conflicting voice, because of this function
+
+		const conflictingVoice = scheduledVoicesSameNote.find(
+			x => x.getScheduledAttackStartTime() <= newNoteStartTime && newNoteStartTime < x.getScheduledReleaseEndTimeSeconds())
+
+		if (conflictingVoice) {
+			logger.log('conflictingVoice')
+			if (conflictingVoice.getScheduledAttackStartTime() === newNoteStartTime) return
+
+			// schedule hard cutoff of existing note
+			conflictingVoice.scheduleRelease(delaySeconds, 0, this._getOnEndedCallback(conflictingVoice.id))
+		}
+
+		// I should probably keep one voice per note
+
 		// logger.log('[scheduleNote] ' + this.id + ' synth scheduleNote delaySeconds: ' + delaySeconds + ' | note: ' + note + ' | attackTimeInSeconds: ' + attackTimeInSeconds)
 		const newVoice = this.createVoice(true)
 
@@ -150,14 +172,14 @@ export abstract class Voices<V extends Voice> {
 			.filter(x => x.playingNote === note)
 			.find(x => x.getIsReleaseScheduled() === false)
 
-		logger.log('this._scheduledVoices: ', this._scheduledVoices)
+		logger.log('[scheduleRelease] note: ' + note + ' | this._scheduledVoices: ', this._scheduledVoices)
 
 		if (!firstUnReleasedVoiceForNote) throw new Error('trying to schedule release for note, but no available note to release')
 
 		firstUnReleasedVoiceForNote.scheduleRelease(
 			delaySeconds,
 			releaseSeconds,
-			() => (this._scheduledVoices = this._scheduledVoices.delete(firstUnReleasedVoiceForNote.id)),
+			this._getOnEndedCallback(firstUnReleasedVoiceForNote.id),
 		)
 	}
 
@@ -211,21 +233,26 @@ export abstract class Voices<V extends Voice> {
 			return voice
 		}
 	}
+
+	private _getOnEndedCallback(id: number) {
+		return () => (this._scheduledVoices = this._scheduledVoices.delete(id))
+	}
 }
 
 export abstract class Voice {
 
 	protected static _nextId = 0
+	public readonly id: number
 	public playingNote: number = -1
 	public playStartTime: number = 0
-	public readonly id: number
 	protected _audioContext: AudioContext
 	protected _destination: AudioNode
 	protected _releaseId: string = ''
 	protected _status: VoiceStatus = VoiceStatus.off
 	protected _gain: GainNode
 	protected _isReleaseScheduled = false
-	protected _attackStartTimeSeconds = 0.005
+	protected _scheduledAttackStartTimeSeconds = 0
+	protected _scheduledReleaseEndTimeSeconds = Number.MAX_VALUE
 	protected _attackEndTimeSeconds = 0
 	protected _sustainLevel = 1
 
@@ -237,6 +264,9 @@ export abstract class Voice {
 		this._gain = this._audioContext.createGain()
 		this._gain.gain.setValueAtTime(0, this._audioContext.currentTime)
 	}
+
+	public getScheduledAttackStartTime = () => this._scheduledAttackStartTimeSeconds
+	public getScheduledReleaseEndTimeSeconds = () => this._scheduledReleaseEndTimeSeconds
 
 	public getIsReleaseScheduled = () => this._isReleaseScheduled
 
@@ -279,8 +309,8 @@ export abstract class Voice {
 			// if attack is long, cancel and hold, calculate target sustain, and continue ramping to it
 			this._cancelAndHoldOrJustCancel()
 			// for linear attack only, need different math for other attack curves
-			const originalAttackLength = this._attackEndTimeSeconds - this._attackStartTimeSeconds
-			const newAttackLength = releaseStartTimeSeconds - this._attackStartTimeSeconds
+			const originalAttackLength = this._attackEndTimeSeconds - this._scheduledAttackStartTimeSeconds
+			const newAttackLength = releaseStartTimeSeconds - this._scheduledAttackStartTimeSeconds
 			const ratio = newAttackLength / originalAttackLength
 			const targetSustainAtReleaseStart = ratio * this._sustainLevel
 			this._gain.gain.linearRampToValueAtTime(targetSustainAtReleaseStart, releaseStartTimeSeconds)

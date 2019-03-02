@@ -169,20 +169,20 @@ class SynthVoice extends Voice {
 	}
 
 	private _scheduleNormalNote(note: number, attackTimeInSeconds: number, delaySeconds: number): void {
-		this._attackStartTimeSeconds = this._audioContext.currentTime + delaySeconds
-		this._attackEndTimeSeconds = this._attackStartTimeSeconds + attackTimeInSeconds
+		this._scheduledAttackStartTimeSeconds = this._audioContext.currentTime + delaySeconds
+		this._attackEndTimeSeconds = this._scheduledAttackStartTimeSeconds + attackTimeInSeconds
 
 		this._oscillator = this._audioContext.createOscillator()
 		this._oscillator.type = this._oscillatorType as OscillatorType
 		this._oscillator.detune.value = this._fineTuning
 		this._oscillator.frequency.setValueAtTime(midiNoteToFrequency(note), this._audioContext.currentTime)
-		this._oscillator.start(this._attackStartTimeSeconds)
+		this._oscillator.start(this._scheduledAttackStartTimeSeconds)
 
 		logger.log(this.id + ' synth scheduleNote delaySeconds: ' + delaySeconds + ' | note: ' + note + ' | attackTimeInSeconds: ' + attackTimeInSeconds)
 
 		this._gain = this._audioContext.createGain()
 		this._gain.gain.value = 0
-		this._gain.gain.linearRampToValueAtTime(0, this._attackStartTimeSeconds)
+		this._gain.gain.linearRampToValueAtTime(0, this._scheduledAttackStartTimeSeconds)
 		this._gain.gain.linearRampToValueAtTime(this._sustainLevel, this._attackEndTimeSeconds)
 
 		this._oscillator.connect(this._gain)
