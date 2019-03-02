@@ -1,11 +1,11 @@
-import {Map} from 'immutable'
 import {logger} from '../../common/logger'
 import {IMidiNote} from '../../common/MidiNote'
 import {BuiltInOscillatorType, CustomOscillatorType, ShamuOscillatorType} from '../../common/OscillatorTypes'
 import {IInstrumentOptions, Instrument, Voice, Voices, VoiceStatus} from './Instrument'
 import {midiNoteToFrequency} from './music-functions'
+import {renderSchedulerVisual} from './SchedulerVisual'
 
-export interface IBasicSynthesizerOptions extends IInstrumentOptions {
+interface IBasicSynthesizerOptions extends IInstrumentOptions {
 	oscillatorType: ShamuOscillatorType
 }
 
@@ -26,6 +26,8 @@ export class BasicSynthesizer extends Instrument<SynthVoices, SynthVoice> {
 
 	public scheduleNote(note: IMidiNote, delaySeconds: number) {
 		this._voices.scheduleNote(note, delaySeconds, this._attackTimeInSeconds)
+
+		renderSchedulerVisual(note, this.id)
 	}
 
 	public scheduleRelease(note: number, delaySeconds: number) {

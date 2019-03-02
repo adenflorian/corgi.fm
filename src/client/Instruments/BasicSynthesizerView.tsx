@@ -48,64 +48,70 @@ export class BasicSynthesizerView
 		const {color, isPlaying, pan, oscillatorType} = this.props
 
 		return (
-			<Panel
-				className={`${isPlaying ? 'isPlaying' : 'isNotPlaying'}`}
-				color={color}
-				saturate={isPlaying}
-				id={this.props.id}
-			>
-				<div className="basicSynthesizer">
-					<BasicSynthesizerOscillatorTypes
-						handleClick={this._handleOscillatorTypeClicked}
-						activeType={oscillatorType}
-					/>
-					<div className="knobs">
-						<Knob
-							min={-1}
-							max={1}
-							value={pan}
-							onChange={this._dispatchChangeInstrumentParam}
-							label="pan"
-							onChangeId={BasicSynthesizerParam.pan}
+			<React.Fragment>
+				<Panel
+					className={`${isPlaying ? 'isPlaying' : 'isNotPlaying'}`}
+					color={color}
+					saturate={isPlaying}
+					id={this.props.id}
+				>
+					<div className="basicSynthesizer">
+						<BasicSynthesizerOscillatorTypes
+							handleClick={this._handleOscillatorTypeClicked}
+							activeType={oscillatorType}
 						/>
-						<Knob
-							min={0}
-							max={10000}
-							curve={2}
-							value={this.props.lowPassFilterCutoffFrequency}
-							onChange={this._dispatchChangeInstrumentParam}
-							label="lpf"
-							onChangeId={BasicSynthesizerParam.lowPassFilterCutoffFrequency}
-						/>
-						<Knob
-							min={0.01}
-							max={10}
-							curve={3}
-							value={this.props.attack}
-							onChange={this._dispatchChangeInstrumentParam}
-							label="attack"
-							onChangeId={BasicSynthesizerParam.attack}
-						/>
-						<Knob
-							min={0.01}
-							max={60}
-							curve={2}
-							value={this.props.release}
-							onChange={this._dispatchChangeInstrumentParam}
-							label="release"
-							onChangeId={BasicSynthesizerParam.release}
-						/>
-						<Knob
-							min={-100}
-							max={100}
-							value={this.props.fineTuning}
-							onChange={this._dispatchChangeInstrumentParam}
-							label="fine"
-							onChangeId={BasicSynthesizerParam.fineTuning}
-						/>
+						<div className="knobs">
+							<Knob
+								min={-1}
+								max={1}
+								value={pan}
+								onChange={this._dispatchChangeInstrumentParam}
+								label="pan"
+								onChangeId={BasicSynthesizerParam.pan}
+							/>
+							<Knob
+								min={0}
+								max={10000}
+								curve={2}
+								value={this.props.lowPassFilterCutoffFrequency}
+								onChange={this._dispatchChangeInstrumentParam}
+								label="lpf"
+								onChangeId={BasicSynthesizerParam.lowPassFilterCutoffFrequency}
+							/>
+							<Knob
+								min={0.01}
+								max={10}
+								curve={3}
+								value={this.props.attack}
+								onChange={this._dispatchChangeInstrumentParam}
+								label="attack"
+								onChangeId={BasicSynthesizerParam.attack}
+							/>
+							<Knob
+								min={0.01}
+								max={60}
+								curve={2}
+								value={this.props.release}
+								onChange={this._dispatchChangeInstrumentParam}
+								label="release"
+								onChangeId={BasicSynthesizerParam.release}
+							/>
+							<Knob
+								min={-100}
+								max={100}
+								value={this.props.fineTuning}
+								onChange={this._dispatchChangeInstrumentParam}
+								label="fine"
+								onChangeId={BasicSynthesizerParam.fineTuning}
+							/>
+						</div>
 					</div>
+				</Panel>
+				<div id={'scheduleVisual-' + this.props.id}
+				>
+					test
 				</div>
-			</Panel>
+			</React.Fragment>
 		)
 	}
 
