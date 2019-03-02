@@ -1,8 +1,9 @@
 import {getOctaveFromMidiNote, midiNoteToNoteName} from '../../common/music-functions'
 import {Voice} from './index'
 import {SamplesManager} from './index'
+import {InnerVoice} from './Instrument'
 
-export class SamplerVoice extends Voice {
+export class SamplerVoice implements InnerVoice {
 	private _audioBufferSource: AudioBufferSourceNode | undefined
 
 	constructor(audioContext: AudioContext, destination: AudioNode, forScheduling: boolean) {
@@ -11,23 +12,8 @@ export class SamplerVoice extends Voice {
 		this._gain.connect(this._destination)
 	}
 
-	public playNote(note: number, attackTimeInSeconds: number) {
-		this._beforePlayNote(attackTimeInSeconds)
-
-		this._playSamplerNote(note)
-
-		this._afterPlayNote(note)
-	}
-
-	public scheduleRelease(delaySeconds: number, releaseSeconds: number, onEnded: () => void) {
-		this._scheduleReleaseNormalNoteGeneric(delaySeconds, releaseSeconds, this._audioBufferSource, onEnded)
-
-		this._isReleaseScheduled = true
-	}
-
-	public dispose() {
+	protected _dispose() {
 		this._disposeAudioBufferSource()
-		this._dispose()
 	}
 
 	protected _scheduleNote(note: number, attackTimeInSeconds: number, delaySeconds: number): void {
@@ -50,7 +36,7 @@ export class SamplerVoice extends Voice {
 			.connect(this._destination)
 	}
 
-	private _playSamplerNote(note: number) {
+	protected _playNote(note: number) {
 		this._disposeAudioBufferSource()
 		this._audioBufferSource = this._audioContext.createBufferSource()
 		this._audioBufferSource.buffer = SamplesManager.getSample(midiNoteToNoteName(note), getOctaveFromMidiNote(note))

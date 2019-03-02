@@ -3,6 +3,7 @@ import uuid = require('uuid')
 import {IDisposable} from '../../common/common-types'
 import {emptyMidiNotes, IMidiNote, IMidiNotes} from '../../common/MidiNote'
 import {BuiltInOscillatorType} from '../../common/OscillatorTypes'
+import {IMidi} from '../../common/redux'
 import {AudioNodeWrapper, IAudioNodeWrapperOptions} from './index'
 import {SamplerVoice} from './index'
 import {SynthVoice} from './index'
@@ -22,10 +23,21 @@ export enum InstrumentType {
 	BasicSampler,
 }
 
-const voiceCreators = Map<InstrumentType, VoiceCreator>([
-	[InstrumentType.BasicSynthesizer, synthVoiceCreator],
-	[InstrumentType.BasicSampler, samplerVoiceCreator],
+interface InstrumentInfo {
+	voiceCreator: VoiceCreator
+}
+
+const instrumentInfos = Map<InstrumentType, InstrumentInfo>([
+	[InstrumentType.BasicSynthesizer, {
+		voiceCreator: synthVoiceCreator,
+	}],
+	[InstrumentType.BasicSampler, {
+		voiceCreator: samplerVoiceCreator,
+	}],
 ])
+
+// I need to be able to set instrument specific params
+// make options objects for each type?
 
 export class Instrument extends AudioNodeWrapper implements IDisposable {
 
@@ -53,15 +65,15 @@ export class Instrument extends AudioNodeWrapper implements IDisposable {
 		this._panNode.connect(this._lowPassFilter)
 		this._lowPassFilter.connect(this._gain)
 
-		const voiceCreator = voiceCreators.get(options.type)
+		const instrumentInfo = instrumentInfos.get(options.type)
 
-		if (!voiceCreator) throw new Error('missing voice creator for type: ' + options.type)
+		if (!instrumentInfo) throw new Error('missing voice creator for type: ' + options.type)
 
 		this._voices = new Voices(
 			options.voiceCount,
 			options.audioContext,
 			this._panNode,
-			voiceCreator,
+			instrumentInfo.voiceCreator,
 		)
 	}
 
@@ -256,25 +268,26 @@ export class Voices {
 }
 
 export abstract class Voice {
+	private static _nextId = 0
 
-	protected static _nextId = 0
+	public readonly id: number
 	public playingNote: number = -1
 	public playStartTime: number = 0
-	public readonly id: number
-	protected _audioContext: AudioContext
-	protected _destination: AudioNode
-	protected _releaseId: string = ''
-	protected _status: VoiceStatus = VoiceStatus.off
-	protected _gain: GainNode
-	protected _isReleaseScheduled = false
-	protected _attackStartTimeSeconds = 0.005
-	protected _attackEndTimeSeconds = 0
-	protected _sustainLevel = 1
 
-	constructor(audioContext: AudioContext, destination: AudioNode) {
+	private _releaseId: string = ''
+	private _status: VoiceStatus = VoiceStatus.off
+	private _gain: GainNode
+	private _isReleaseScheduled = false
+	private _attackStartTimeSeconds = 0.005
+	private _attackEndTimeSeconds = 0
+	private _sustainLevel = 1
+
+	constructor(
+		private readonly _audioContext: AudioContext,
+		private readonly _destination: AudioNode,
+		private readonly _innerVoice: InnerVoice,
+	) {
 		this.id = Voice._nextId++
-		this._audioContext = audioContext
-		this._destination = destination
 
 		this._gain = this._audioContext.createGain()
 		this._gain.gain.setValueAtTime(0, this._audioContext.currentTime)
@@ -282,15 +295,12 @@ export abstract class Voice {
 
 	public getReleaseId = () => this._releaseId
 
-	public abstract playNote(note: number, attackTimeInSeconds: number): void
+	public playNote(note: number, attackTimeInSeconds: number) {
+		this._beforePlayNote(attackTimeInSeconds)
 
-	public scheduleNote(note: number, attackTimeInSeconds: number, delaySeconds: number) {
-		// if delay is 0 then the scheduler isn't working properly
-		if (delaySeconds < 0) throw new Error('delay <= 0: ' + delaySeconds)
+		this._innerVoice.playNote(note)
 
-		this._scheduleNote(note, attackTimeInSeconds, delaySeconds)
-
-		this.playingNote = note
+		this._afterPlayNote(note)
 	}
 
 	public release = (timeToReleaseInSeconds: number) => {
@@ -304,15 +314,30 @@ export abstract class Voice {
 		return this._releaseId
 	}
 
+	public scheduleNote(note: number, attackTimeInSeconds: number, delaySeconds: number) {
+		// if delay is 0 then the scheduler isn't working properly
+		if (delaySeconds < 0) throw new Error('delay <= 0: ' + delaySeconds)
+
+		this._innerVoice.scheduleNote(note, attackTimeInSeconds, delaySeconds)
+
+		this.playingNote = note
+	}
+
 	public getIsReleaseScheduled = () => this._isReleaseScheduled
 
-	public abstract dispose(): void
+	public scheduleRelease(delaySeconds: number, releaseSeconds: number, onEnded: () => void) {
+		this._scheduleReleaseNormalNoteGeneric(delaySeconds, releaseSeconds, onEnded)
 
-	public abstract scheduleRelease(delaySeconds: number, releaseSeconds: number, onEnded: () => void): void
+		this._isReleaseScheduled = true
+	}
 
-	protected abstract _scheduleNote(note: number, attackTimeInSeconds: number, delaySeconds: number): void
+	public dispose() {
+		this._innerVoice.dispose()
+		this._gain.disconnect()
+		delete this._gain
+	}
 
-	protected _scheduleReleaseNormalNoteGeneric(
+	private _scheduleReleaseNormalNoteGeneric(
 		delaySeconds: number,
 		releaseSeconds: number,
 		audioNode: AudioScheduledSourceNode | undefined,
@@ -349,28 +374,7 @@ export abstract class Voice {
 		}
 	}
 
-	protected _beforePlayNote(attackTimeInSeconds: number) {
-		this._cancelAndHoldOrJustCancel()
-
-		// Never go straight to 0 or you'll probably get a click sound
-		this._gain.gain.linearRampToValueAtTime(0, this._audioContext.currentTime + 0.001)
-
-		// this._gain.gain.setValueAtTime(0, this._audioContext.currentTime)
-		this._gain.gain.linearRampToValueAtTime(this._sustainLevel, this._audioContext.currentTime + attackTimeInSeconds)
-	}
-
-	protected _afterPlayNote(note: number) {
-		this.playStartTime = this._audioContext.currentTime
-		this.playingNote = note
-		this._status = VoiceStatus.playing
-	}
-
-	protected _dispose() {
-		this._gain.disconnect()
-		delete this._gain
-	}
-
-	protected readonly _cancelAndHoldOrJustCancel = (delaySeconds = 0) => {
+	private readonly _cancelAndHoldOrJustCancel = (delaySeconds = 0) => {
 		const gain = this._gain.gain as any
 
 		const cancelTimeSeconds = this._audioContext.currentTime + delaySeconds
@@ -382,4 +386,26 @@ export abstract class Voice {
 			gain.cancelScheduledValues(cancelTimeSeconds)
 		}
 	}
+
+	private _beforePlayNote(attackTimeInSeconds: number) {
+		this._cancelAndHoldOrJustCancel()
+
+		// Never go straight to 0 or you'll probably get a click sound
+		this._gain.gain.linearRampToValueAtTime(0, this._audioContext.currentTime + 0.001)
+
+		// this._gain.gain.setValueAtTime(0, this._audioContext.currentTime)
+		this._gain.gain.linearRampToValueAtTime(this._sustainLevel, this._audioContext.currentTime + attackTimeInSeconds)
+	}
+
+	private _afterPlayNote(note: number) {
+		this.playStartTime = this._audioContext.currentTime
+		this.playingNote = note
+		this._status = VoiceStatus.playing
+	}
+}
+
+export interface InnerVoice {
+	playNote(note: IMidiNote): void
+	scheduleNote(note: number, attackTimeInSeconds: number, delaySeconds: number): void
+	dispose(): void
 }
