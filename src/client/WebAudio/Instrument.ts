@@ -157,6 +157,9 @@ export abstract class Voices<V extends Voice> {
 			conflictingVoice.scheduleRelease(delaySeconds, 0, this._getOnEndedCallback(conflictingVoice.id))
 		}
 
+		// Need to do something if new note starts before all scheduled notes
+		// need to schedule a release for it immediately
+
 		// I should probably keep one voice per note
 
 		// logger.log('[scheduleNote] ' + this.id + ' synth scheduleNote delaySeconds: ' + delaySeconds + ' | note: ' + note + ' | attackTimeInSeconds: ' + attackTimeInSeconds)
@@ -165,6 +168,23 @@ export abstract class Voices<V extends Voice> {
 		newVoice.scheduleNote(note, attackTimeInSeconds, delaySeconds)
 
 		this._scheduledVoices = this._scheduledVoices.set(newVoice.id, newVoice)
+
+		if (!conflictingVoice) {
+			// Check if any scheduled voices start after this new note
+			const voicesAfter = scheduledVoicesSameNote.filter(x => x.getScheduledAttackStartTime() > newNoteStartTime)
+
+			if (voicesAfter.count() > 0) {
+				logger.log('scheduling hard cutoff for new note because it is behind a future note. newVoice: ', newVoice)
+				const closestScheduledStart = voicesAfter.map(x => x.getScheduledAttackStartTime()).min()
+				if (closestScheduledStart === undefined) throw new Error('shouldnt happen i think')
+
+				newVoice.scheduleRelease(
+					closestScheduledStart - this._getAudioContext().currentTime,
+					0,
+					this._getOnEndedCallback(newVoice.id),
+				)
+			}
+		}
 	}
 
 	public scheduleRelease(note: number, delaySeconds: number, releaseSeconds: number) {
@@ -172,9 +192,10 @@ export abstract class Voices<V extends Voice> {
 			.filter(x => x.playingNote === note)
 			.find(x => x.getIsReleaseScheduled() === false)
 
-		logger.log('[scheduleRelease] note: ' + note + ' | this._scheduledVoices: ', this._scheduledVoices)
+		if (!firstUnReleasedVoiceForNote) return
+		// if (!firstUnReleasedVoiceForNote) throw new Error('trying to schedule release for note, but no available note to release')
 
-		if (!firstUnReleasedVoiceForNote) throw new Error('trying to schedule release for note, but no available note to release')
+		logger.log('[scheduleRelease] note: ' + note + ' | this._scheduledVoices: ', this._scheduledVoices)
 
 		firstUnReleasedVoiceForNote.scheduleRelease(
 			delaySeconds,
