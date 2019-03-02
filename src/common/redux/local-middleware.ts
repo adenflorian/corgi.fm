@@ -6,7 +6,7 @@ import {applyOctave} from '../../client/WebAudio/music-functions'
 import {ConnectionNodeType} from '../common-types'
 import {isClient} from '../is-client-or-server'
 import {logger} from '../logger'
-import {IMidiNote} from '../MidiNote'
+import {emptyMidiNotes, IMidiNote} from '../MidiNote'
 import {IClientRoomState} from './common-redux-types'
 import {selectConnectionsWithSourceIds} from './connections-redux'
 import {addBasicSampler, addBasicSynthesizer, addPosition, addVirtualKeyboard, BasicSamplerState, BasicSynthesizerState, Connection, connectionsActions, deleteAllPositions, deleteAllThings, IClientAppState, makeActionCreator, makePosition, MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID, READY, selectActiveRoom, selectLocalClient, selectPositionExtremes, selectVirtualKeyboardById, selectVirtualKeyboardIdByOwner, SET_ACTIVE_ROOM, VirtualKeyboardState, virtualKeyPressed, virtualKeyUp, virtualOctaveChange} from './index'
@@ -95,9 +95,25 @@ export const createLocalMiddleware: () => Middleware<{}, IClientAppState> = () =
 	}
 }
 
+let _previousNotes = emptyMidiNotes
+
 function scheduleNote(note: IMidiNote, sourceId: string, roomState: IClientRoomState, onOrOff: 'on' | 'off') {
 	if (isClient() && isNewNoteScannerEnabled() === false) return
 	if (useSchedulerForKeyboards() === false) return
+
+	if (onOrOff === 'on') {
+		if (_previousNotes.includes(note)) {
+			return
+		} else {
+			_previousNotes = _previousNotes.add(note)
+		}
+	} else {
+		if (_previousNotes.includes(note)) {
+			_previousNotes = _previousNotes.remove(note)
+		} else {
+			return
+		}
+	}
 
 	logger.log('[local-middleware.scheduleNote] note: ' + note + ' | onOrOff: ' + onOrOff)
 
