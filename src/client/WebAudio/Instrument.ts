@@ -368,8 +368,6 @@ export abstract class Voice {
 			const targetSustainAtReleaseStart = ratio * this._sustainLevel
 			this._gain.gain.linearRampToValueAtTime(targetSustainAtReleaseStart, this._scheduledReleaseStartTimeSeconds)
 
-			// logger.log('FOOOOOOOOOO')
-
 			this._scheduledAttackEndTimeSeconds = this._scheduledReleaseStartTimeSeconds
 			this._scheduledSustainAtAttackEnd = targetSustainAtReleaseStart
 			this._scheduledSustainAtReleaseStart = targetSustainAtReleaseStart

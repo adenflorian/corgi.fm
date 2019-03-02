@@ -143,7 +143,7 @@ export class InfiniteSequencerState implements ISequencerState, IConnectable, No
 		this.style = style
 		this.isPlaying = isPlaying
 		this.midiClip = makeMidiClip({
-			events: events,
+			events,
 			length: events.count(),
 			loop: true,
 		})

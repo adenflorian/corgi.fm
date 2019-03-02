@@ -107,7 +107,11 @@ export class BasicSynthesizerView
 						</div>
 					</div>
 				</Panel>
-				<div id={'scheduleVisual-' + this.props.id}
+				<div
+					id={'scheduleVisual-' + this.props.id}
+					style={{
+						pointerEvents: 'none',
+					}}
 				>
 					test
 				</div>
