@@ -4,7 +4,7 @@ import {
 	globalClockActions, IClientAppState, localMidiKeyPress, localMidiKeyUp,
 	localMidiOctaveChange, pointersActions,
 	selectGlobalClockIsPlaying, selectIsLocalClientReady, selectLocalClient,
-	skipNote, undoRecordingSequencer, userInputActions,
+	skipNote, userInputActions, undoRecordingSequencer,
 } from '../common/redux'
 import {simpleGlobalClientState} from './SimpleGlobalClientState'
 

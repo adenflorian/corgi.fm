@@ -2,7 +2,7 @@ import {List, Map, Stack} from 'immutable'
 import {AnyAction} from 'redux'
 import {createSelector} from 'reselect'
 import * as uuid from 'uuid'
-import {ConnectionNodeType, makeMidiClip, MidiClip, MidiClipEvents} from '../common-types'
+import {ConnectionNodeType, MidiClipEvents, MidiClip, makeMidiClip} from '../common-types'
 import {emptyMidiNotes, IMidiNote} from '../MidiNote'
 import {MAX_MIDI_NOTE_NUMBER_127} from '../server-constants'
 import {colorFunc, hashbow} from '../shamu-color'
@@ -107,7 +107,7 @@ export class GridSequencerState implements IGridSequencerState, NodeSpecialState
 		midiClip: makeMidiClip({
 			events: List(),
 			length: 0,
-			loop: false,
+			loop: false
 		}),
 	}
 
@@ -136,7 +136,7 @@ export class GridSequencerState implements IGridSequencerState, NodeSpecialState
 		this.midiClip = makeMidiClip({
 			events: events.map(x => ({...x, startBeat: x.startBeat / 4})),
 			length: events.count() / 4,
-			loop: true,
+			loop: true
 		})
 
 		this.scrollY = this._calculateScrollY()
@@ -278,7 +278,7 @@ const gridSequencerReducer =
 					...gridSequencer,
 					midiClip: gridSequencer.midiClip.set(
 						'events',
-						createSequencerEvents(gridSequencer.midiClip.events.count()),
+						createSequencerEvents(gridSequencer.midiClip.events.count())
 					),
 					previousEvents: gridSequencer.previousEvents.unshift(gridSequencer.midiClip.events),
 				}

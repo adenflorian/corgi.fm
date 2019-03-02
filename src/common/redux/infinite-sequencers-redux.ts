@@ -2,14 +2,14 @@ import {List, Stack} from 'immutable'
 import {AnyAction} from 'redux'
 import {createSelector} from 'reselect'
 import * as uuid from 'uuid'
-import {ConnectionNodeType, IConnectable, makeMidiClip, MidiClip, MidiClipEvents} from '../common-types'
+import {ConnectionNodeType, IConnectable, MidiClipEvents, makeMidiClip, MidiClip} from '../common-types'
 import {IMidiNote, MidiNotes} from '../MidiNote'
 import {colorFunc, hashbow} from '../shamu-color'
 import {
 	addMultiThing, BROADCASTER_ACTION, CLEAR_SEQUENCER, createSequencerEvents,
 	IClientRoomState, IMultiState, IMultiStateThings, ISequencerState,
 	makeMultiReducer, NetworkActionType, PLAY_ALL, selectGlobalClockState,
-	SERVER_ACTION, SKIP_NOTE, STOP_ALL, UNDO_SEQUENCER, VIRTUAL_KEY_PRESSED,
+	SERVER_ACTION, SKIP_NOTE, STOP_ALL, UNDO_SEQUENCER, VIRTUAL_KEY_PRESSED
 } from './index'
 import {makeSequencerEvents, UNDO_RECORDING_SEQUENCER} from './sequencer-redux'
 import {NodeSpecialState} from './shamu-graph'
@@ -110,7 +110,7 @@ export class InfiniteSequencerState implements ISequencerState, IConnectable, No
 		midiClip: makeMidiClip({
 			events: List(),
 			length: 0,
-			loop: false,
+			loop: false
 		}),
 	}
 
@@ -143,9 +143,9 @@ export class InfiniteSequencerState implements ISequencerState, IConnectable, No
 		this.style = style
 		this.isPlaying = isPlaying
 		this.midiClip = makeMidiClip({
-			events,
+			events: events,
 			length: events.count(),
-			loop: true,
+			loop: true
 		})
 	}
 }
@@ -251,8 +251,8 @@ function infiniteSequencerReducer(
 					midiClip: infiniteSequencer.midiClip.set('events', infiniteSequencer.midiClip.events
 						.concat({
 							notes: MidiNotes([action.midiNote]),
-							startBeat: infiniteSequencer.midiClip.events.count(),
-						}),
+							startBeat: infiniteSequencer.midiClip.events.count()
+						})
 					),
 					previousEvents: infiniteSequencer.previousEvents.unshift(infiniteSequencer.midiClip.events),
 				}
@@ -266,8 +266,8 @@ function infiniteSequencerReducer(
 					midiClip: infiniteSequencer.midiClip.set('events', infiniteSequencer.midiClip.events
 						.concat({
 							notes: MidiNotes(),
-							startBeat: infiniteSequencer.midiClip.events.count(),
-						}),
+							startBeat: infiniteSequencer.midiClip.events.count()
+						})
 					),
 					previousEvents: infiniteSequencer.previousEvents.unshift(infiniteSequencer.midiClip.events),
 				}

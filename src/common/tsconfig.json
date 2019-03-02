@@ -1,7 +1,6 @@
 {
 	"compilerOptions": {
 		"noEmit": true,
-		"allowSyntheticDefaultImports": true,
 		"noUnusedLocals": false,
 		"noUnusedParameters": false,
 		"sourceMap": false,
@@ -12,6 +11,11 @@
 		"lib": [
 			"dom",
 			"es7"
+		],
+		"plugins": [
+			{
+				"name": "typescript-tslint-plugin"
+			}
 		]
 	},
 	"include": [

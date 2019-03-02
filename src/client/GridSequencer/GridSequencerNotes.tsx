@@ -6,7 +6,7 @@ import {MidiClipEvents} from '../../common/common-types'
 import {IMidiNotes} from '../../common/MidiNote'
 import {
 	GridSequencerFields, IClientAppState, selectGlobalClockState,
-	selectGridSequencer, setGridSequencerField, setGridSequencerNote,
+	selectGridSequencer, setGridSequencerField, setGridSequencerNote
 } from '../../common/redux'
 import {MAX_MIDI_NOTE_NUMBER_127, MIN_MIDI_NOTE_NUMBER_0} from '../../common/server-constants'
 import {getColorStringForMidiNote} from '../../common/shamu-color'

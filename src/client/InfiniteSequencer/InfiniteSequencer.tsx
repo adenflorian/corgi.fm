@@ -4,12 +4,12 @@ import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 import {MidiClipEvents} from '../../common/common-types'
 import {IMidiNote} from '../../common/MidiNote'
-import {getOctaveFromMidiNote, midiNoteToNoteName} from '../../common/music-functions'
 import {clearSequencer, exportSequencerMidi, findLowestAndHighestNotes, globalClockActions, IClientAppState, InfiniteSequencerFields, InfiniteSequencerStyle, selectGlobalClockState, selectInfiniteSequencer, setInfiniteSequencerField, undoSequencer} from '../../common/redux'
 import {getColorStringForMidiNote} from '../../common/shamu-color'
 import {isWhiteKey} from '../Keyboard/Keyboard'
 import {Knob} from '../Knob/Knob'
 import {Panel} from '../Panel/Panel'
+import {getOctaveFromMidiNote, midiNoteToNoteName} from '../WebAudio/music-functions'
 import './InfiniteSequencer.less'
 
 interface IInfiniteSequencerProps {

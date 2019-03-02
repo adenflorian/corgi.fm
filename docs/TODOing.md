@@ -23,9 +23,8 @@
 			- the instrument?
 				- probably
 				- it will need to keep track of all scheduled notes
-				- [ ] **make instrument keep track of all scheduled notes/events/voices**
+				- [ ] make instrument keep track of all scheduled notes/events/voices
 					- [√] move AudioNodeWrapper to new file
-					- [ ] refactor instruments
 		- what does ableton do?
 			- if two tracks play same note at same time, only one will play
 			- if a note is already playing, and a new note from different tracks start to play same note, old note is just stopped and new note starts attack

@@ -14,7 +14,12 @@
 			"es7"
 		],
 		"experimentalDecorators": true,
-		"jsx": "react"
+		"jsx": "react",
+		"plugins": [
+			{
+				"name": "typescript-tslint-plugin"
+			}
+		]
 	},
 	"include": [
 		"./**/*.ts*",

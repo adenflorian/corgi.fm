@@ -1,5 +1,5 @@
-import {Octave} from './common-types'
-import {IMidiNote} from './MidiNote'
+import {IMidiNote} from '../../common/MidiNote'
+import {Octave} from './music-types'
 
 export function applyOctave(midiNumber: number, octave: number) {
 	if (octave === -1) return midiNumber

@@ -1,9 +1,9 @@
 import {expect} from 'chai'
 import {List} from 'immutable'
-import {
-	makeMidiClip, makeMidiClipEvent, makeMidiGlobalClipEvent, MidiGlobalClipEvent, MidiGlobalClipEvents, MidiRange,
-} from '../common/common-types'
 import {applyBPM, applyBPMToEvents, getEvents} from './note-scheduler'
+import {
+	makeMidiClip, MidiGlobalClipEvent, MidiGlobalClipEvents, MidiRange, makeMidiClipEvent, makeMidiGlobalClipEvent,
+} from '../common/common-types'
 
 const testClip = makeMidiClip({
 	length: 2,

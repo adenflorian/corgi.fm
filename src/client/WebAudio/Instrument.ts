@@ -1,56 +1,23 @@
-import {Map, OrderedMap} from 'immutable'
+import {OrderedMap} from 'immutable'
 import uuid = require('uuid')
 import {IDisposable} from '../../common/common-types'
 import {emptyMidiNotes, IMidiNote, IMidiNotes} from '../../common/MidiNote'
-import {BuiltInOscillatorType} from '../../common/OscillatorTypes'
-import {IMidi} from '../../common/redux'
 import {AudioNodeWrapper, IAudioNodeWrapperOptions} from './index'
-import {SamplerVoice} from './index'
-import {SynthVoice} from './index'
 
-export type VoiceCreator = (audioContext: AudioContext, destination: AudioNode, forScheduling: boolean) => Voice
+export abstract class Instrument<T extends Voices<V>, V extends Voice> extends AudioNodeWrapper implements IDisposable {
 
-export const samplerVoiceCreator: VoiceCreator = (context, destination, forScheduling) => {
-	return new SamplerVoice(context, destination, forScheduling)
-}
-
-export const synthVoiceCreator: VoiceCreator = (context, destination, forScheduling) => {
-	return new SynthVoice(context, destination, BuiltInOscillatorType.sawtooth, forScheduling, 0)
-}
-
-export enum InstrumentType {
-	BasicSynthesizer,
-	BasicSampler,
-}
-
-interface InstrumentInfo {
-	voiceCreator: VoiceCreator
-}
-
-const instrumentInfos = Map<InstrumentType, InstrumentInfo>([
-	[InstrumentType.BasicSynthesizer, {
-		voiceCreator: synthVoiceCreator,
-	}],
-	[InstrumentType.BasicSampler, {
-		voiceCreator: samplerVoiceCreator,
-	}],
-])
-
-// I need to be able to set instrument specific params
-// make options objects for each type?
-
-export class Instrument extends AudioNodeWrapper implements IDisposable {
-
-	private readonly _voices: Voices
-	private readonly _panNode: StereoPannerNode
-	private readonly _lowPassFilter: BiquadFilterNode
+	protected readonly _panNode: StereoPannerNode
+	protected readonly _audioContext: AudioContext
+	protected readonly _lowPassFilter: BiquadFilterNode
+	protected _attackTimeInSeconds: number = 0.01
+	protected _releaseTimeInSeconds: number = 3
 	private readonly _gain: GainNode
-	private _attackTimeInSeconds: number = 0.01
-	private _releaseTimeInSeconds: number = 3
 	private _previousNotes = emptyMidiNotes
 
 	constructor(options: IInstrumentOptions) {
 		super(options)
+
+		this._audioContext = options.audioContext
 
 		this._panNode = this._audioContext.createStereoPanner()
 
@@ -64,26 +31,9 @@ export class Instrument extends AudioNodeWrapper implements IDisposable {
 
 		this._panNode.connect(this._lowPassFilter)
 		this._lowPassFilter.connect(this._gain)
-
-		const instrumentInfo = instrumentInfos.get(options.type)
-
-		if (!instrumentInfo) throw new Error('missing voice creator for type: ' + options.type)
-
-		this._voices = new Voices(
-			options.voiceCount,
-			options.audioContext,
-			this._panNode,
-			instrumentInfo.voiceCreator,
-		)
 	}
-
-	public scheduleNote(note: IMidiNote, delaySeconds: number) {
-		this._voices.scheduleNote(note, delaySeconds, this._attackTimeInSeconds)
-	}
-
-	public scheduleRelease(note: number, delaySeconds: number) {
-		this._voices.scheduleRelease(note, delaySeconds, this._releaseTimeInSeconds)
-	}
+	public abstract scheduleNote(note: IMidiNote, delaySeconds: number): void
+	public abstract scheduleRelease(note: number, delaySeconds: number): void
 
 	public readonly getInputAudioNode = () => null
 	public readonly getOutputAudioNode = () => this._gain
@@ -108,11 +58,11 @@ export class Instrument extends AudioNodeWrapper implements IDisposable {
 		const offNotes = this._previousNotes.filter(x => midiNotes.includes(x) === false)
 
 		offNotes.forEach(note => {
-			this._voices.releaseNote(note, this._releaseTimeInSeconds)
+			this._getVoices().releaseNote(note, this._releaseTimeInSeconds)
 		})
 
 		newNotes.forEach(note => {
-			this._voices.playNote(note, this._attackTimeInSeconds)
+			this._getVoices().playNote(note, this._attackTimeInSeconds)
 		})
 
 		this._previousNotes = midiNotes
@@ -122,19 +72,19 @@ export class Instrument extends AudioNodeWrapper implements IDisposable {
 
 	public readonly setRelease = (releaseTimeInSeconds: number) => this._releaseTimeInSeconds = releaseTimeInSeconds
 
-	public readonly getActivityLevel = () => this._voices.getActivityLevel()
+	public readonly getActivityLevel = () => this._getVoices().getActivityLevel()
 
-	public dispose = () => {
-		this._voices.dispose()
+	protected _dispose = () => {
 		this._panNode.disconnect()
 		this._gain.disconnect()
 		this._lowPassFilter.disconnect()
 	}
+
+	protected abstract _getVoices(): T
 }
 
 export interface IInstrumentOptions extends IAudioNodeWrapperOptions {
 	voiceCount: number
-	type: InstrumentType
 }
 
 export enum VoiceStatus {
@@ -143,23 +93,11 @@ export enum VoiceStatus {
 	off,
 }
 
-export class Voices {
-	private _inactiveVoices = OrderedMap<number, Voice>()
-	private _activeVoices = OrderedMap<number, Voice>()
-	private _releasingVoices = OrderedMap<number, Voice>()
-	private _scheduledVoices = OrderedMap<number, Voice>()
-
-	constructor(
-		private readonly _voiceCount: number,
-		private readonly _audioContext: AudioContext,
-		private readonly _destination: AudioNode,
-		private readonly _voiceCreator: VoiceCreator,
-	) {
-		for (let i = 0; i < this._voiceCount; i++) {
-			const newVoice = this._voiceCreator(this._audioContext, this._destination, false)
-			this._inactiveVoices = this._inactiveVoices.set(newVoice.id, newVoice)
-		}
-	}
+export abstract class Voices<V extends Voice> {
+	protected _inactiveVoices = OrderedMap<number, V>()
+	protected _activeVoices = OrderedMap<number, V>()
+	protected _releasingVoices = OrderedMap<number, V>()
+	protected _scheduledVoices = OrderedMap<number, V>()
 
 	protected get _allVoices() {
 		return this._inactiveVoices
@@ -193,30 +131,6 @@ export class Voices {
 		}
 	}
 
-	public scheduleNote(note: IMidiNote, delaySeconds: number, attackSeconds: number) {
-		const newVoice = this._voiceCreator(this._audioContext, this._destination, true)
-
-		newVoice.scheduleNote(note, attackSeconds, delaySeconds)
-
-		this._scheduledVoices = this._scheduledVoices.set(newVoice.id, newVoice)
-	}
-
-	public scheduleRelease(note: number, delaySeconds: number, releaseSeconds: number) {
-		const firstUnReleasedVoiceForNote = this._scheduledVoices
-			.filter(x => x.playingNote === note)
-			.find(x => x.getIsReleaseScheduled() === false)
-
-		if (!firstUnReleasedVoiceForNote) {
-			throw new Error('trying to schedule release for note, but no available note to release')
-		}
-
-		firstUnReleasedVoiceForNote.scheduleRelease(
-			delaySeconds,
-			releaseSeconds,
-			() => (this._scheduledVoices = this._scheduledVoices.delete(firstUnReleasedVoiceForNote.id)),
-		)
-	}
-
 	public getActivityLevel = () => {
 		if (this._activeVoices.count() > 0) return 1
 		if (this._releasingVoices.count() > 0) return 0.5
@@ -227,7 +141,7 @@ export class Voices {
 		this._allVoices.forEach(x => x.dispose())
 	}
 
-	protected _getVoice(note: number): Voice {
+	protected _getVoice(note: number): V {
 		// Look for active voice that is playing same note
 		const sameNoteActiveVoice = this._activeVoices.find(x => x.playingNote === note)
 
@@ -248,19 +162,19 @@ export class Voices {
 
 		if (this._inactiveVoices.count() > 0) {
 			// Try to return inactive voice first
-			const voice = this._inactiveVoices.first() as Voice
+			const voice = this._inactiveVoices.first() as V
 			this._inactiveVoices = this._inactiveVoices.delete(voice.id)
 			this._activeVoices = this._activeVoices.set(voice.id, voice)
 			return voice
 		} else if (this._releasingVoices.count() > 0) {
 			// Next try releasing voices
-			const voice = this._releasingVoices.first() as Voice
+			const voice = this._releasingVoices.first() as V
 			this._releasingVoices = this._releasingVoices.delete(voice.id)
 			this._activeVoices = this._activeVoices.set(voice.id, voice)
 			return voice
 		} else {
 			// Lastly use active voices
-			const voice = this._activeVoices.first() as Voice
+			const voice = this._activeVoices.first() as V
 			this._activeVoices = this._activeVoices.delete(voice.id).set(voice.id, voice)
 			return voice
 		}
@@ -268,26 +182,25 @@ export class Voices {
 }
 
 export abstract class Voice {
-	private static _nextId = 0
 
-	public readonly id: number
+	protected static _nextId = 0
 	public playingNote: number = -1
 	public playStartTime: number = 0
+	public readonly id: number
+	protected _audioContext: AudioContext
+	protected _destination: AudioNode
+	protected _releaseId: string = ''
+	protected _status: VoiceStatus = VoiceStatus.off
+	protected _gain: GainNode
+	protected _isReleaseScheduled = false
+	protected _attackStartTimeSeconds = 0.005
+	protected _attackEndTimeSeconds = 0
+	protected _sustainLevel = 1
 
-	private _releaseId: string = ''
-	private _status: VoiceStatus = VoiceStatus.off
-	private _gain: GainNode
-	private _isReleaseScheduled = false
-	private _attackStartTimeSeconds = 0.005
-	private _attackEndTimeSeconds = 0
-	private _sustainLevel = 1
-
-	constructor(
-		private readonly _audioContext: AudioContext,
-		private readonly _destination: AudioNode,
-		private readonly _innerVoice: InnerVoice,
-	) {
+	constructor(audioContext: AudioContext, destination: AudioNode) {
 		this.id = Voice._nextId++
+		this._audioContext = audioContext
+		this._destination = destination
 
 		this._gain = this._audioContext.createGain()
 		this._gain.gain.setValueAtTime(0, this._audioContext.currentTime)
@@ -295,13 +208,7 @@ export abstract class Voice {
 
 	public getReleaseId = () => this._releaseId
 
-	public playNote(note: number, attackTimeInSeconds: number) {
-		this._beforePlayNote(attackTimeInSeconds)
-
-		this._innerVoice.playNote(note)
-
-		this._afterPlayNote(note)
-	}
+	public abstract playNote(note: number, attackTimeInSeconds: number): void
 
 	public release = (timeToReleaseInSeconds: number) => {
 		this._cancelAndHoldOrJustCancel()
@@ -314,30 +221,9 @@ export abstract class Voice {
 		return this._releaseId
 	}
 
-	public scheduleNote(note: number, attackTimeInSeconds: number, delaySeconds: number) {
-		// if delay is 0 then the scheduler isn't working properly
-		if (delaySeconds < 0) throw new Error('delay <= 0: ' + delaySeconds)
+	public abstract dispose(): void
 
-		this._innerVoice.scheduleNote(note, attackTimeInSeconds, delaySeconds)
-
-		this.playingNote = note
-	}
-
-	public getIsReleaseScheduled = () => this._isReleaseScheduled
-
-	public scheduleRelease(delaySeconds: number, releaseSeconds: number, onEnded: () => void) {
-		this._scheduleReleaseNormalNoteGeneric(delaySeconds, releaseSeconds, onEnded)
-
-		this._isReleaseScheduled = true
-	}
-
-	public dispose() {
-		this._innerVoice.dispose()
-		this._gain.disconnect()
-		delete this._gain
-	}
-
-	private _scheduleReleaseNormalNoteGeneric(
+	protected _scheduleReleaseNormalNoteGeneric(
 		delaySeconds: number,
 		releaseSeconds: number,
 		audioNode: AudioScheduledSourceNode | undefined,
@@ -374,7 +260,28 @@ export abstract class Voice {
 		}
 	}
 
-	private readonly _cancelAndHoldOrJustCancel = (delaySeconds = 0) => {
+	protected _beforePlayNote(attackTimeInSeconds: number) {
+		this._cancelAndHoldOrJustCancel()
+
+		// Never go straight to 0 or you'll probably get a click sound
+		this._gain.gain.linearRampToValueAtTime(0, this._audioContext.currentTime + 0.001)
+
+		// this._gain.gain.setValueAtTime(0, this._audioContext.currentTime)
+		this._gain.gain.linearRampToValueAtTime(this._sustainLevel, this._audioContext.currentTime + attackTimeInSeconds)
+	}
+
+	protected _afterPlayNote(note: number) {
+		this.playStartTime = this._audioContext.currentTime
+		this.playingNote = note
+		this._status = VoiceStatus.playing
+	}
+
+	protected _dispose() {
+		this._gain.disconnect()
+		delete this._gain
+	}
+
+	protected readonly _cancelAndHoldOrJustCancel = (delaySeconds = 0) => {
 		const gain = this._gain.gain as any
 
 		const cancelTimeSeconds = this._audioContext.currentTime + delaySeconds
@@ -386,26 +293,4 @@ export abstract class Voice {
 			gain.cancelScheduledValues(cancelTimeSeconds)
 		}
 	}
-
-	private _beforePlayNote(attackTimeInSeconds: number) {
-		this._cancelAndHoldOrJustCancel()
-
-		// Never go straight to 0 or you'll probably get a click sound
-		this._gain.gain.linearRampToValueAtTime(0, this._audioContext.currentTime + 0.001)
-
-		// this._gain.gain.setValueAtTime(0, this._audioContext.currentTime)
-		this._gain.gain.linearRampToValueAtTime(this._sustainLevel, this._audioContext.currentTime + attackTimeInSeconds)
-	}
-
-	private _afterPlayNote(note: number) {
-		this.playStartTime = this._audioContext.currentTime
-		this.playingNote = note
-		this._status = VoiceStatus.playing
-	}
-}
-
-export interface InnerVoice {
-	playNote(note: IMidiNote): void
-	scheduleNote(note: number, attackTimeInSeconds: number, delaySeconds: number): void
-	dispose(): void
 }

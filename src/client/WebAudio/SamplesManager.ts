@@ -1,6 +1,6 @@
-import {Octave} from '../../common/common-types'
-import {NoteNameSharps} from '../../common/music-functions'
 import {isLocalDevClient} from '../is-prod-client'
+import {NoteNameSharps} from '../WebAudio/music-functions'
+import {Octave} from '../WebAudio/music-types'
 
 // const octaveToGet = '4'
 const octavesToGet = [1, 2, 3, 4, 5, 6, 7]

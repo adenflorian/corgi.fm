@@ -1,14 +1,14 @@
 import {Map} from 'immutable'
-import {makeMidiClip, MidiRange} from '../common/common-types'
+import {MidiRange, makeMidiClip} from '../common/common-types'
 import {logger} from '../common/logger'
-import {IMidiNotes} from '../common/MidiNote'
 import {
-	ClientStore, selectAllSequencers, selectConnectionSourceIdsByTarget,
-	selectGlobalClockState,
+	ClientStore, selectGlobalClockState, selectAllSequencers,
+	selectConnectionSourceIdsByTarget,
 } from '../common/redux'
 import {shortDemoMidiClip} from './clips'
 import {getAllInstruments} from './instrument-manager'
 import {getEvents} from './note-scheduler'
+import {IMidiNotes} from '../common/MidiNote'
 
 let _store: ClientStore
 let _audioContext: AudioContext
@@ -36,7 +36,7 @@ if (module.hot) {
 	})
 }
 
-const clip = shortDemoMidiClip
+let clip = shortDemoMidiClip
 
 // not sure if needed?
 // causes problems with range 0 and repeating notes on start
@@ -103,6 +103,8 @@ function scheduleNotes() {
 		.filter(x => x.isPlaying)
 		.map(x => getEvents(x.midiClip, readRangeBeats))
 
+
+
 	// clip = gridSeq ? gridSeq.midiClip : emptyMidiClip
 	// clip = shortDemoMidiClip
 
@@ -124,7 +126,7 @@ function scheduleNotes() {
 
 	// console.log('instruments: ', instruments)
 
-	const flag = false
+	let flag = false
 
 	// then for each instrument
 	// union events from the input sequencers and schedule them
@@ -155,6 +157,8 @@ function scheduleNotes() {
 		// startBeat
 		// make a map where key is startBeat and val is notes
 		// union the notes together
+
+
 
 		eventsToSchedule.forEach((notes, startTime) => {
 			// logger.log('scheduleNote currentSongTimeBeats: ', currentSongTimeBeats)

@@ -11,6 +11,12 @@
 		"lib": [
 			"dom",
 			"es7"
+		],
+		"plugins": [
+			{
+				"name": "typescript-tslint-plugin",
+				"alwaysShowRuleFailuresAsWarnings": false,
+			}
 		]
 	},
 	"include": [
