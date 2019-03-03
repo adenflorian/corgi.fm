@@ -42,7 +42,7 @@ export const createSequencerEvents = (length: number): MidiClipEvents => {
 	return makeSequencerEvents(
 		new Array(length)
 			.fill(0)
-			.map((_, i) => makeMidiClipEvent({notes: emptyMidiNotes, startBeat: i})),
+			.map((_, i) => makeMidiClipEvent({notes: emptyMidiNotes, startBeat: i, durationBeats: 0.5})),
 	)
 }
 

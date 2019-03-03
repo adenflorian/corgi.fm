@@ -61,214 +61,266 @@ const longDemoMidiClip = makeMidiClip({
 	events: List([
 		makeMidiClipEvent({
 			startBeat: 0,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([60]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 1 / 4 * 1000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([64]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 2 / 4 * 1000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([67]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 3 / 4 * 1000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([71]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 4 / 4 * 1000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([72]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 5 / 4 * 1000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([71]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 6 / 4 * 1000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([67]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 7 / 4 * 1000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([64]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 0 + 2000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([60]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 1 / 8 * 1000 + 2000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([64]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 2 / 8 * 1000 + 2000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([67]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 3 / 8 * 1000 + 2000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([71]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 4 / 8 * 1000 + 2000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([72]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 5 / 8 * 1000 + 2000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([71]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 6 / 8 * 1000 + 2000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([67]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 7 / 8 * 1000 + 2000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([64]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 0 + 3000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([60]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 1 / 8 * 1000 + 3000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([64]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 2 / 8 * 1000 + 3000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([67]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 3 / 8 * 1000 + 3000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([71]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 4 / 8 * 1000 + 3000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([72]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 5 / 8 * 1000 + 3000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([71]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 6 / 8 * 1000 + 3000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([67]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 7 / 8 * 1000 + 3000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([64]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 0 / 16 * 1000 + 4000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([60]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 1 / 16 * 1000 + 4000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([64]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 2 / 16 * 1000 + 4000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([67]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 3 / 16 * 1000 + 4000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([71]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 4 / 16 * 1000 + 4000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([72]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 5 / 16 * 1000 + 4000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([71]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 6 / 16 * 1000 + 4000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([67]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 7 / 16 * 1000 + 4000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([64]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 8 / 16 * 1000 + 4000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([60]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 9 / 16 * 1000 + 4000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([64]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 10 / 16 * 1000 + 4000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([67]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 11 / 16 * 1000 + 4000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([71]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 12 / 16 * 1000 + 4000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([72]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 13 / 16 * 1000 + 4000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([71]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 14 / 16 * 1000 + 4000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([67]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 15 / 16 * 1000 + 4000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([64]),
 		}),
 
 		makeMidiClipEvent({
 			startBeat: 0 / 3 * 1000 + 6000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([71]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 0 / 3 * 1000 + 6000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([67]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 0 / 3 * 1000 + 6000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([64]),
 		}),
 
 		makeMidiClipEvent({
 			startBeat: 1 / 3 * 1000 + 6000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([71]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 1 / 3 * 1000 + 6000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([67]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 1 / 3 * 1000 + 6000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([64]),
 		}),
 
 		makeMidiClipEvent({
 			startBeat: 2 / 3 * 1000 + 6000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([71]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 2 / 3 * 1000 + 6000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([67]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 2 / 3 * 1000 + 6000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([64]),
 		}),
 
 		makeMidiClipEvent({
 			startBeat: 0 / 3 * 1000 + 7000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([74]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 0 / 3 * 1000 + 7000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([70]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 0 / 3 * 1000 + 7000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([67]),
 		}),
 	]),
@@ -280,34 +332,42 @@ const shortLoopedMidiClip = makeMidiClip({
 	events: List([
 		makeMidiClipEvent({
 			startBeat: 0,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([60]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 1 / 4 * 1000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([64]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 2 / 4 * 1000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([67]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 3 / 4 * 1000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([71]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 4 / 4 * 1000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([72]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 5 / 4 * 1000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([71]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 6 / 4 * 1000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([67]),
 		}),
 		makeMidiClipEvent({
 			startBeat: 7 / 4 * 1000,
+			durationBeats: 1 / 8 * 1000,
 			notes: Set([64]),
 		}),
 	]),

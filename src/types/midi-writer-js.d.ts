@@ -1,15 +1,15 @@
 declare module 'midi-writer-js' {
 	export class Track {
-		addEvent: (event: IMidiWriterEvent, mapFunction?: any) => any
-		setTempo: (tempo: number) => any
-		addText: (text: string) => any
-		addCopyright: (text: string) => any
-		addTrackName: (text: string) => any
-		addInstrumentName: (text: string) => any
-		addMarker: (text: string) => any
-		addCuePoint: (text: string) => any
-		addLyric: (text: string) => any
-		setTimeSignature: (numerator: number, denominator: number) => any
+		public addEvent: (event: IMidiWriterEvent, mapFunction?: any) => any
+		public setTempo: (tempo: number) => any
+		public addText: (text: string) => any
+		public addCopyright: (text: string) => any
+		public addTrackName: (text: string) => any
+		public addInstrumentName: (text: string) => any
+		public addMarker: (text: string) => any
+		public addCuePoint: (text: string) => any
+		public addLyric: (text: string) => any
+		public setTimeSignature: (numerator: number, denominator: number) => any
 	}
 
 	export interface IMidiWriterEvent {
@@ -27,12 +27,10 @@ declare module 'midi-writer-js' {
 	}
 
 	export class Writer {
-		constructor(tracks: Track[])
-
 		public dataUri: () => any
+
+		constructor(tracks: Track[])
 	}
 
 	export type mapFunction = (event: Track, index: number) => any
 }
-
-

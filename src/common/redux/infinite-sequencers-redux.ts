@@ -3,7 +3,7 @@ import {AnyAction} from 'redux'
 import {createSelector} from 'reselect'
 import * as uuid from 'uuid'
 import {ConnectionNodeType, IConnectable} from '../common-types'
-import {makeMidiClip, MidiClip, MidiClipEvents} from '../midi-types'
+import {makeMidiClip, makeMidiClipEvent, MidiClip, MidiClipEvents} from '../midi-types'
 import {IMidiNote, MidiNotes} from '../MidiNote'
 import {colorFunc, hashbow} from '../shamu-color'
 import {
@@ -249,10 +249,11 @@ function infiniteSequencerReducer(
 				return {
 					...infiniteSequencer,
 					midiClip: infiniteSequencer.midiClip.set('events', infiniteSequencer.midiClip.events
-						.concat({
+						.concat(makeMidiClipEvent({
 							notes: MidiNotes([action.midiNote]),
 							startBeat: infiniteSequencer.midiClip.events.count(),
-						}),
+							durationBeats: 1,
+						})),
 					),
 					previousEvents: infiniteSequencer.previousEvents.unshift(infiniteSequencer.midiClip.events),
 				}
@@ -267,6 +268,7 @@ function infiniteSequencerReducer(
 						.concat({
 							notes: MidiNotes(),
 							startBeat: infiniteSequencer.midiClip.events.count(),
+							durationBeats: 1,
 						}),
 					),
 					previousEvents: infiniteSequencer.previousEvents.unshift(infiniteSequencer.midiClip.events),
