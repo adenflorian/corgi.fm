@@ -1,9 +1,9 @@
 import {List, Set} from 'immutable'
-import React = require('react')
-import ReactDOM = require('react-dom')
-import {makeMidiClip, makeMidiClipEvent, MidiClip} from '../common/common-types'
+import * as React from 'react'
+import * as ReactDOM from 'react-dom'
 import {createThisShouldntHappenError} from '../common/common-utils'
 import {logger} from '../common/logger'
+import {makeMidiClip, makeMidiClipEvent, MidiClip} from '../common/midi-types'
 import {IMidiNotes} from '../common/MidiNote'
 import {midiNoteToFrequency} from './WebAudio/music-functions'
 

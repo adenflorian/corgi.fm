@@ -1,6 +1,6 @@
 import {Map} from 'immutable'
-import {makeMidiClip, MidiRange} from '../common/common-types'
 import {logger} from '../common/logger'
+import {makeMidiClip, MidiRange} from '../common/midi-types'
 import {IMidiNotes} from '../common/MidiNote'
 import {
 	ClientStore, selectAllSequencers, selectConnectionSourceIdsByTarget,

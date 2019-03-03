@@ -1,7 +1,8 @@
 import {Map} from 'immutable'
 import {Action, Store} from 'redux'
-import {ConnectionNodeType, IConnectable, MidiClipEvents} from '../common/common-types'
+import {ConnectionNodeType, IConnectable} from '../common/common-types'
 import {calculatePositionsGivenConnections} from '../common/compute-positions'
+import {MidiClipEvents} from '../common/midi-types'
 import {MidiNotes} from '../common/MidiNote'
 import {
 	addBasicSampler, addBasicSynthesizer, addClient,

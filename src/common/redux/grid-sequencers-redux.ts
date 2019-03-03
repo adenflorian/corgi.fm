@@ -2,11 +2,16 @@ import {List, Map, Stack} from 'immutable'
 import {AnyAction} from 'redux'
 import {createSelector} from 'reselect'
 import * as uuid from 'uuid'
-import {ConnectionNodeType, makeMidiClip, MidiClip, MidiClipEvents} from '../common-types'
+import {ConnectionNodeType} from '../common-types'
+import {makeMidiClip, MidiClip, MidiClipEvents} from '../midi-types'
 import {emptyMidiNotes, IMidiNote} from '../MidiNote'
 import {MAX_MIDI_NOTE_NUMBER_127} from '../server-constants'
 import {colorFunc, hashbow} from '../shamu-color'
-import {addMultiThing, BROADCASTER_ACTION, CLEAR_SEQUENCER, createSequencerEvents, IClientRoomState, IMultiState, IMultiStateThings, isEmptyEvents, ISequencerState, makeMultiReducer, NetworkActionType, PLAY_ALL, selectAllInfiniteSequencers, selectGlobalClockState, SERVER_ACTION, STOP_ALL, UNDO_SEQUENCER} from './index'
+import {
+	addMultiThing, BROADCASTER_ACTION, CLEAR_SEQUENCER, createSequencerEvents, IClientRoomState, IMultiState,
+	IMultiStateThings, isEmptyEvents, ISequencerState, makeMultiReducer, NetworkActionType, PLAY_ALL,
+	selectAllInfiniteSequencers, selectGlobalClockState, SERVER_ACTION, STOP_ALL, UNDO_SEQUENCER,
+} from './index'
 import {NodeSpecialState} from './shamu-graph'
 
 export const addGridSequencer = (gridSequencer: IGridSequencerState) =>

@@ -1,8 +1,6 @@
 import {List} from 'immutable'
-import {
-	IMultiStateThing, makeMidiClip, makeMidiClipEvent, MidiClip,
-	MidiClipEvent, MidiClipEvents,
-} from '../common-types'
+import {IMultiStateThing} from '../common-types'
+import {makeMidiClip, makeMidiClipEvent, MidiClip, MidiClipEvent, MidiClipEvents} from '../midi-types'
 import {emptyMidiNotes, MidiNotes} from '../MidiNote'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './index'
 

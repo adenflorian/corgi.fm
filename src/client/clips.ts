@@ -1,5 +1,5 @@
 import {List, Set} from 'immutable'
-import {makeMidiClip, makeMidiClipEvent} from '../common/common-types'
+import {makeMidiClip, makeMidiClipEvent} from '../common/midi-types'
 
 export const postalClipA = makeMidiClip({
 	length: 200,

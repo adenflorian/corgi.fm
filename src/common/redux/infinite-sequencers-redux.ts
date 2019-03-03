@@ -2,16 +2,16 @@ import {List, Stack} from 'immutable'
 import {AnyAction} from 'redux'
 import {createSelector} from 'reselect'
 import * as uuid from 'uuid'
-import {ConnectionNodeType, IConnectable, makeMidiClip, MidiClip, MidiClipEvents} from '../common-types'
+import {ConnectionNodeType, IConnectable} from '../common-types'
+import {makeMidiClip, MidiClip, MidiClipEvents} from '../midi-types'
 import {IMidiNote, MidiNotes} from '../MidiNote'
 import {colorFunc, hashbow} from '../shamu-color'
 import {
-	addMultiThing, BROADCASTER_ACTION, CLEAR_SEQUENCER, createSequencerEvents,
-	IClientRoomState, IMultiState, IMultiStateThings, ISequencerState,
-	makeMultiReducer, NetworkActionType, PLAY_ALL, selectGlobalClockState,
+	addMultiThing, BROADCASTER_ACTION, CLEAR_SEQUENCER, createSequencerEvents, IClientRoomState, IMultiState,
+	IMultiStateThings, ISequencerState, makeMultiReducer, NetworkActionType, PLAY_ALL, selectGlobalClockState,
 	SERVER_ACTION, SKIP_NOTE, STOP_ALL, UNDO_SEQUENCER, VIRTUAL_KEY_PRESSED,
 } from './index'
-import {makeSequencerEvents, UNDO_RECORDING_SEQUENCER} from './sequencer-redux'
+import {UNDO_RECORDING_SEQUENCER} from './sequencer-redux'
 import {NodeSpecialState} from './shamu-graph'
 
 export const addInfiniteSequencer = (infiniteSequencer: InfiniteSequencerState) =>

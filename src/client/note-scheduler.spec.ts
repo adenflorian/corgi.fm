@@ -2,7 +2,7 @@ import {expect} from 'chai'
 import {List, Set} from 'immutable'
 import {
 	makeMidiClip, makeMidiClipEvent, makeMidiGlobalClipEvent, MidiGlobalClipEvent, MidiGlobalClipEvents, MidiRange,
-} from '../common/common-types'
+} from '../common/midi-types'
 import {applyBPM, applyBPMToEvents, getEvents} from './note-scheduler'
 
 const testClip = makeMidiClip({

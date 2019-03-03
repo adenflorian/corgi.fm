@@ -2,7 +2,7 @@ import {List} from 'immutable'
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
-import {MidiClipEvents} from '../../common/common-types'
+import {MidiClipEvents} from '../../common/midi-types'
 import {IMidiNotes} from '../../common/MidiNote'
 import {
 	GridSequencerFields, IClientAppState, selectGlobalClockState,
