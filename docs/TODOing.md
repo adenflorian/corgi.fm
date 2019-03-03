@@ -10,13 +10,13 @@
 			- [√] synth view tsx
 			- [√] in the visual tsx file
 	- [ ] get stuff working again
-		- [...] keyboard
+		- [√] keyboard
 			- [√] computer keyboard
 			- [√] mouse
 				- this is a bit tricky
 				- need logic in local middleware, but that logic is currently only for local user
 			- [√] midi keyboard
-			- [ ] check performance
+			- [√] check performance
 		- [ ] sequencer animations
 		- [ ] master clock play button animation
 		- [ ] rate knob on infinite sequencer
