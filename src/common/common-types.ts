@@ -45,14 +45,10 @@ export interface MidiClipEvent extends MidiEvent {
 	startBeat: number
 }
 
-export function makeMidiClipEvent(
-	event: {notes?: IMidiNotes, note?: IMidiNote, startBeat: number},
-): MidiClipEvent {
-	const actualNotes = event.note !== undefined
-		? Set([event.note])
-		: event.notes !== undefined
-			? event.notes
-			: Set()
+export function makeMidiClipEvent(event: MidiClipEvent): Readonly<MidiClipEvent> {
+	const actualNotes = event.notes !== undefined
+		? event.notes
+		: Set()
 
 	return Object.freeze({
 		startBeat: event.startBeat || 0,
