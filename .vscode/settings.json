@@ -114,4 +114,5 @@
     "files.associations": {
         "tsconfig.json": "json"
     },
+    "tslint.ignoreDefinitionFiles": false,
 }

@@ -2,9 +2,10 @@ import {Store} from 'redux'
 import * as io from 'socket.io-client'
 import {maxRoomNameLength} from '../common/common-constants'
 import {logger} from '../common/logger'
-import {BroadcastAction, deleteAllTheThings, maxUsernameLength, selfDisconnected, setInfo, setSocketId} from '../common/redux'
+import {BroadcastAction, maxUsernameLength, selfDisconnected, setInfo, setSocketId} from '../common/redux'
 import {WebSocketEvent} from '../common/server-constants'
 import {isLocalDevClient} from './is-prod-client'
+import {deleteAllTheThings} from './local-middleware'
 import {getUsernameFromLocalStorage} from './username'
 
 const port = isLocalDevClient() ? 3000 : 443

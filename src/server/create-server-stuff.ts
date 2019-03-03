@@ -249,7 +249,7 @@ function getBassNotes(): MidiClipEvents {
 	return createSequencerEvents(16)
 		.map((_, i) => ({
 			notes: MidiNotes(i % 2 === 1 ? [] : [36]),
-			startBeat: i
+			startBeat: i,
 		}))
 }
 

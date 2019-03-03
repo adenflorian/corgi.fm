@@ -15,6 +15,6 @@ declare module 'soundbank-reverb' {
 
 	namespace soundbank_reverb {
 		const prototype: {
-		};
+		}
 	}
 }
