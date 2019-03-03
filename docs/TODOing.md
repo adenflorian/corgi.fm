@@ -21,6 +21,9 @@
 		- [ ] sequencer animations
 		- [ ] master clock play button animation
 		- [ ] rate knob on infinite sequencer
+	- **Bugs**
+		- [ ] 2019-03-03 Note getting stuck on when just sequencers are playing at normal speed
+			- put all 4 sequencers into same synth, with default release
 
 # Soon
 - [ ] allow adding connections from a node with no connections on it already
