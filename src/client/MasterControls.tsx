@@ -9,6 +9,7 @@ import {
 	MASTER_CLOCK_SOURCE_ID,
 	selectGlobalClockState,
 } from '../common/redux'
+import {isNewNoteScannerEnabled} from './is-prod-client'
 import {Knob} from './Knob/Knob'
 import './MasterControls.less'
 import {Panel} from './Panel/Panel'
@@ -33,7 +34,7 @@ export const MasterControls: React.FC<IMasterControlsProps & IMasterControlsRedu
 
 		const knobs = <div className="knobs">
 			<Knob
-				label="bpm"
+				label="BPM"
 				min={0.000001}
 				max={999}
 				curve={2}
@@ -41,7 +42,7 @@ export const MasterControls: React.FC<IMasterControlsProps & IMasterControlsRedu
 				onChange={(_, bpm) => setField({bpm})}
 			/>
 			<Knob
-				label="MRA"
+				label="Max Read Ahead"
 				min={0.0001}
 				max={5}
 				curve={2}
@@ -77,7 +78,9 @@ export const MasterControls: React.FC<IMasterControlsProps & IMasterControlsRedu
 							<Stop />
 						</span>
 					</div>
-					{knobs}
+					{isNewNoteScannerEnabled() &&
+						knobs
+					}
 				</div>
 			</Panel>
 		)
