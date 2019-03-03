@@ -13,6 +13,7 @@ import {startNoteScanner} from './note-scanner'
 import {renderApp, renderOther} from './react-main'
 import {setupMidiSupport} from './setup-midi-support'
 import {SamplesManager} from './WebAudio/SamplesManager'
+import {setStoreForSchedulerVisual} from './WebAudio/SchedulerVisual'
 import {setupWebsocketAndListeners, socket} from './websocket-listeners'
 
 ReactGA.initialize('UA-50585312-6')
@@ -59,6 +60,8 @@ async function setupAsync() {
 	const preFx = audioContext.createGain()
 
 	const store = configureStore()
+
+	setStoreForSchedulerVisual(store)
 
 	setupAudioContext(audioContext, preFx, store)
 

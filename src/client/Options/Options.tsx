@@ -37,6 +37,10 @@ export class Options extends React.Component {
 								option={AppOptions.requireCtrlToScroll}
 								label="require control key to scroll"
 							/>
+							<ConnectedOption
+								option={AppOptions.showSynthNoteSchedulerDebug}
+								label="show synth note scheduler debug under synth"
+							/>
 						</div>
 					</div>
 				}

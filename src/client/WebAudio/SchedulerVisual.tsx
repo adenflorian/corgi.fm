@@ -1,10 +1,10 @@
 import {Map, OrderedMap} from 'immutable'
-import {string} from 'prop-types'
 import * as React from 'react'
 import ReactDOM from 'react-dom'
+import {Store} from 'redux'
 import {logger} from '../../common/logger'
-import {IMidiNote} from '../../common/MidiNote'
-import {getCurrentSongIsPlaying, getCurrentSongTime} from '../note-scanner'
+import {AppOptions, IClientAppState, selectOption} from '../../common/redux'
+import {getCurrentSongIsPlaying} from '../note-scanner'
 import {Voice} from './Instrument'
 
 interface Props {
@@ -15,12 +15,18 @@ const xScale = 20
 const height = 50
 const width = 256
 
+let _store: Store<IClientAppState>
+
+export function setStoreForSchedulerVisual(store: Store<IClientAppState>) {
+	_store = store
+}
+
 const SchedulerVisual = function SchedulerVisual_({scheduledVoices}: Props) {
 	return (
 		<div
 			style={{
 				position: 'relative',
-				top: 8,
+				top: 2,
 				width,
 				height,
 			}}
@@ -127,7 +133,7 @@ export function updateSchedulerVisual(id: string, scheduledVoices: OrderedMap<nu
 renderLoop()
 
 function renderLoop() {
-	if (getCurrentSongIsPlaying()) {
+	if (getCurrentSongIsPlaying() && selectOption(_store.getState(), AppOptions.showSynthNoteSchedulerDebug)) {
 		_instruments.forEach((val, key) => {
 			renderSchedulerVisual(key, val)
 		})
