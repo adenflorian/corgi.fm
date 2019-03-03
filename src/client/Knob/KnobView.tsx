@@ -53,7 +53,7 @@ export const KnobView: React.FC<IKnobViewProps> = React.memo(props => {
 					<div className="mark" style={{backgroundColor: markColor}}></div>
 				</div>
 			</div>
-			<div className="label unselectable">{label}</div>
+			<div className="knobLabel unselectable">{label}</div>
 		</div>
 	)
 })
