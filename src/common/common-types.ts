@@ -37,14 +37,13 @@ export enum ConnectionNodeType {
 	simpleReverb = 'simpleReverb',
 }
 
-export interface MidiEvent {
+/** In clip time (beats); Means BPM has not been applied */
+export interface MidiClipEvent {
+	startBeat: number
 	notes: IMidiNotes
 }
 
-export interface MidiClipEvent extends MidiEvent {
-	startBeat: number
-}
-
+/** In clip time (beats); Means BPM has not been applied */
 export function makeMidiClipEvent(event: MidiClipEvent): Readonly<MidiClipEvent> {
 	const actualNotes = event.notes !== undefined
 		? event.notes
@@ -67,18 +66,22 @@ export function makeMidiGlobalClipEvent(event: MidiGlobalClipEvent): Readonly<Mi
 	})
 }
 
+/** In clip time (beats); Means BPM has not been applied */
 export const makeMidiClip = Record({
 	length: 0,
 	loop: false,
 	events: List<MidiClipEvent>(),
 })
 
+/** In clip time (beats); Means BPM has not been applied */
 export type MidiClip = ReturnType<typeof makeMidiClip>
 
+/** In clip time (beats); Means BPM has not been applied */
 export type MidiClipEvents = MidiClip['events']
 
-export interface MidiGlobalClipEvent extends MidiEvent {
+export interface MidiGlobalClipEvent {
 	startTime: number
+	notes: IMidiNotes
 }
 
 export const makeMidiGlobalClip = Record({
@@ -87,8 +90,10 @@ export const makeMidiGlobalClip = Record({
 	events: List<MidiGlobalClipEvent>(),
 })
 
+/** In audio context time (seconds); Means BPM is already applied */
 export type MidiGlobalClip = ReturnType<typeof makeMidiGlobalClip>
 
+/** In audio context time (seconds); Means BPM is already applied */
 export type MidiGlobalClipEvents = MidiGlobalClip['events']
 
 const precision = 1000000
@@ -106,7 +111,9 @@ export class MidiRange {
 	) {
 		if (start < 0) throw new Error('start must be >= 0 | ' + JSON.stringify(this))
 		if (length < 0) throw new Error('length must be >= 0 | ' + JSON.stringify(this))
+
 		if (start === null || length === null) throw new Error('y r u null | ' + JSON.stringify(this))
+
 		if (Math.max(this.start, this.start + this.length) >= MidiRange.maxSafeNumber) {
 			throw new Error('too big | ' + JSON.stringify(this))
 		}
