@@ -156,7 +156,7 @@ export abstract class Voices<V extends Voice> {
 			if (conflictingVoice.getScheduledAttackStartTime() === newNoteStartTime) return
 
 			// schedule hard cutoff of existing note
-			conflictingVoice.scheduleRelease(delaySeconds, 0, this._getOnEndedCallback(conflictingVoice.id))
+			conflictingVoice.scheduleRelease(delaySeconds, 0.001, this._getOnEndedCallback(conflictingVoice.id))
 		}
 
 		// Need to do something if new note starts before all scheduled notes
@@ -171,39 +171,45 @@ export abstract class Voices<V extends Voice> {
 
 		this._scheduledVoices = this._scheduledVoices.set(newVoice.id, newVoice)
 
-		if (!conflictingVoice) {
-			// Check if any scheduled voices start after this new note
-			const voicesAfter = scheduledVoicesSameNote.filter(x => x.getScheduledAttackStartTime() > newNoteStartTime)
+		// Check if any scheduled voices start after this new note
+		const voicesAfter = scheduledVoicesSameNote.filter(x => x.getScheduledAttackStartTime() > newNoteStartTime)
 
-			if (voicesAfter.count() > 0) {
-				logger.log('scheduling hard cutoff for new note because it is behind a future note. newVoice: ', newVoice)
-				const closestScheduledStart = voicesAfter.map(x => x.getScheduledAttackStartTime()).min()
-				if (closestScheduledStart === undefined) throw new Error('shouldnt happen i think')
+		if (voicesAfter.count() > 0) {
+			logger.log('scheduling hard cutoff for new note because it is behind a future note. newVoice: ', newVoice)
+			const closestScheduledStart = voicesAfter.map(x => x.getScheduledAttackStartTime()).min()
+			if (closestScheduledStart === undefined) throw new Error('shouldnt happen i think')
 
-				newVoice.scheduleRelease(
-					closestScheduledStart - this._getAudioContext().currentTime,
-					0,
-					this._getOnEndedCallback(newVoice.id),
-				)
-			}
+			newVoice.scheduleRelease(
+				closestScheduledStart - this._getAudioContext().currentTime,
+				0.001,
+				this._getOnEndedCallback(newVoice.id),
+			)
 		}
 	}
 
 	public scheduleRelease(note: number, delaySeconds: number, releaseSeconds: number) {
-		const firstUnReleasedVoiceForNote = this._scheduledVoices
-			.filter(x => x.playingNote === note)
-			.find(x => x.getIsReleaseScheduled() === false)
 
-		if (!firstUnReleasedVoiceForNote) return
-		// if (!firstUnReleasedVoiceForNote) throw new Error('trying to schedule release for note, but no available note to release')
+		const releaseStartTime = this._getAudioContext().currentTime + delaySeconds
 
-		logger.log('[scheduleRelease] note: ' + note + ' | this._scheduledVoices: ', this._scheduledVoices)
+		// Find scheduled voice that will be playing at releaseStartTime
+		const scheduledVoicesSameNote = this._scheduledVoices.filter(x => x.playingNote === note)
 
-		firstUnReleasedVoiceForNote.scheduleRelease(
-			delaySeconds,
-			releaseSeconds,
-			this._getOnEndedCallback(firstUnReleasedVoiceForNote.id),
-		)
+		// Its only possible for there to be one conflicting voice, because of this function
+
+		const conflictingVoice = scheduledVoicesSameNote.find(
+			x => x.getScheduledAttackStartTime() <= releaseStartTime && releaseStartTime < x.getScheduledReleaseEndTimeSeconds())
+
+		if (conflictingVoice) {
+			logger.log('conflictingVoice for release')
+			if (conflictingVoice.getScheduledAttackStartTime() === releaseStartTime) return
+
+			conflictingVoice.scheduleRelease(delaySeconds, releaseSeconds, this._getOnEndedCallback(conflictingVoice.id))
+
+			logger.log('[scheduleRelease] note: ' + note + ' | this._scheduledVoices: ', this._scheduledVoices)
+		} else {
+
+			logger.log('[scheduleRelease] no matching voice to release, note: ', note)
+		}
 	}
 
 	public getActivityLevel = () => {
@@ -331,23 +337,69 @@ export abstract class Voice {
 	) {
 
 		if (this._isReleaseScheduled) {
-			const originalReleaseLength = this._scheduledReleaseEndTimeSeconds - this._scheduledReleaseStartTimeSeconds
 
-			this._scheduledReleaseEndTimeSeconds = this._audioContext.currentTime + delaySeconds + releaseSeconds
+			// trying to re-release a voice
+			// new release start time must be between original attack start and release end
+			// is new release start before or after original release start?
+			// if after, then assume hard cutoff
+			// if before, need to redo all release stuff
+			const newReleaseStartTime = this._audioContext.currentTime + delaySeconds
 
-			const newReleaseLength = this._scheduledReleaseEndTimeSeconds - this._scheduledReleaseStartTimeSeconds
-			const ratio = newReleaseLength / originalReleaseLength
-			// Not accurate for a curved release, will be too high
-			this._scheduledSustainAtReleaseEnd = this._scheduledSustainAtReleaseStart - (ratio * this._scheduledSustainAtReleaseStart)
-			// logger.log('this._scheduledSustainAtReleaseStart: ', this._scheduledSustainAtReleaseStart)
-			// logger.log('ratio: ', ratio)
-			// logger.log('newReleaseLength: ', newReleaseLength)
-			// logger.log('originalReleaseLength: ', originalReleaseLength)
-			// logger.log('this._scheduledSustainAtReleaseEnd: ', this._scheduledSustainAtReleaseEnd)
+			if (newReleaseStartTime >= this._scheduledReleaseStartTimeSeconds) {
+				logger.log('!!! newReleaseStartTime >= this._scheduledReleaseStartTimeSeconds')
 
-			if (!audioNode) return
-			audioNode.stop(this._scheduledReleaseEndTimeSeconds)
-			return
+				const originalReleaseEndTime = this._scheduledReleaseEndTimeSeconds
+				const originalReleaseLength = originalReleaseEndTime - this._scheduledReleaseStartTimeSeconds
+				logger.log('this._scheduledReleaseStartTimeSeconds: ', this._scheduledReleaseStartTimeSeconds)
+				logger.log('originalReleaseEndTime: ', originalReleaseEndTime)
+
+				this._scheduledReleaseEndTimeSeconds = this._audioContext.currentTime + delaySeconds + releaseSeconds
+				logger.log('this._scheduledReleaseEndTimeSeconds: ', this._scheduledReleaseEndTimeSeconds)
+
+				const newReleaseLength = this._scheduledReleaseEndTimeSeconds - this._scheduledReleaseStartTimeSeconds
+				const ratio = newReleaseLength / originalReleaseLength
+				// Not accurate for a curved release, will be too high
+				this._scheduledSustainAtReleaseEnd = this._scheduledSustainAtReleaseStart - (ratio * this._scheduledSustainAtReleaseStart)
+				logger.log('this._scheduledSustainAtReleaseStart: ', this._scheduledSustainAtReleaseStart)
+				logger.log('ratio: ', ratio)
+				logger.log('newReleaseLength: ', newReleaseLength)
+				logger.log('originalReleaseLength: ', originalReleaseLength)
+				logger.log('this._scheduledSustainAtReleaseEnd: ', this._scheduledSustainAtReleaseEnd)
+
+				if (!audioNode) return
+				audioNode.stop(this._scheduledReleaseEndTimeSeconds)
+				return
+			} else {
+				logger.log('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
+				logger.log('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
+				logger.log('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
+				// TODO ??
+				// If we try to schedule ramps and stuff, we need to cancel existing ones from last release
+				// if new release time is during:
+				//   - attack     already have code for this i think
+				//   - sustain    easy, cancel and hold, then go from there, except cancel and hold is instant?
+				// if (this._scheduledReleaseStartTimeSeconds < this._scheduledAttackEndTimeSeconds) {
+				// 	logger.log('BBBBBBBBBBBBBBBBB')
+				// 	// if release start is during attack, cancel and hold, calculate target sustain, and continue ramping to it
+				// 	// TODO This is assuming that it is currently in attack
+				// 	this._cancelAndHoldOrJustCancel()
+				// 	// for linear attack only, need different math for other attack curves
+				// 	const originalAttackLength = this._scheduledAttackEndTimeSeconds - this._scheduledAttackStartTimeSeconds
+				// 	const newAttackLength = this._scheduledReleaseStartTimeSeconds - this._scheduledAttackStartTimeSeconds
+				// 	const ratio = newAttackLength / originalAttackLength
+				// 	const targetSustainAtReleaseStart = ratio * this._sustainLevel
+				// 	this._gain.gain.linearRampToValueAtTime(targetSustainAtReleaseStart, this._scheduledReleaseStartTimeSeconds)
+
+				// 	this._scheduledAttackEndTimeSeconds = this._scheduledReleaseStartTimeSeconds
+				// 	this._scheduledSustainAtAttackEnd = targetSustainAtReleaseStart
+				// 	this._scheduledSustainAtReleaseStart = targetSustainAtReleaseStart
+				// } else {
+				// 	logger.log('CCCCCCCCCCCCCCCCC')
+				// 	// if release start is during sustain
+				// 	this._gain.gain.linearRampToValueAtTime(this._sustainLevel, this._scheduledReleaseStartTimeSeconds)
+				// }
+				// return
+			}
 		}
 
 		this._scheduledReleaseStartTimeSeconds = this._audioContext.currentTime + delaySeconds
@@ -356,17 +408,18 @@ export abstract class Voice {
 		// logger.log(this.id + ' synth scheduleRelease delay: ' + delaySeconds + ' | release: ' + releaseSeconds + ' | stop: ' + this._scheduledReleaseEndTimeSeconds)
 
 		if (this._scheduledAttackEndTimeSeconds < this._scheduledReleaseStartTimeSeconds) {
-			// if attack is short, do linear ramp to sustain with no cancel
+			// if release start is during sustain
 			this._gain.gain.linearRampToValueAtTime(this._sustainLevel, this._scheduledReleaseStartTimeSeconds)
 		} else {
-			// if attack is long, cancel and hold, calculate target sustain, and continue ramping to it
-			this._cancelAndHoldOrJustCancel()
+			// if release start is during attack, cancel and hold, calculate target sustain, and continue ramping to it
+			// TODO This is assuming that it is currently in attack
+			this._cancelAndHoldOrJustCancel(this._scheduledReleaseStartTimeSeconds)
 			// for linear attack only, need different math for other attack curves
 			const originalAttackLength = this._scheduledAttackEndTimeSeconds - this._scheduledAttackStartTimeSeconds
 			const newAttackLength = this._scheduledReleaseStartTimeSeconds - this._scheduledAttackStartTimeSeconds
 			const ratio = newAttackLength / originalAttackLength
 			const targetSustainAtReleaseStart = ratio * this._sustainLevel
-			this._gain.gain.linearRampToValueAtTime(targetSustainAtReleaseStart, this._scheduledReleaseStartTimeSeconds)
+			// this._gain.gain.linearRampToValueAtTime(targetSustainAtReleaseStart, this._scheduledReleaseStartTimeSeconds)
 
 			this._scheduledAttackEndTimeSeconds = this._scheduledReleaseStartTimeSeconds
 			this._scheduledSustainAtAttackEnd = targetSustainAtReleaseStart
