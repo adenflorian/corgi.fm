@@ -61,14 +61,6 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 				onBlur={this._onBlur}
 			>
 				<div
-					id="chatVerticalGradient"
-					className="chatGradient"
-				/>
-				<div
-					id="chatHorizontalGradient"
-					className="chatGradient"
-				/>
-				<div
 					className="chatOverlay"
 				/>
 
