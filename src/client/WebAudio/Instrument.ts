@@ -188,24 +188,36 @@ export abstract class Voices<V extends Voice> {
 	}
 
 	public scheduleRelease(note: number, delaySeconds: number, releaseSeconds: number) {
+		const currentTime = this._getAudioContext().currentTime
 
-		const releaseStartTime = this._getAudioContext().currentTime + delaySeconds
+		const releaseStartTime = currentTime + delaySeconds
 
 		// Find scheduled voice that will be playing at releaseStartTime
 		const scheduledVoicesSameNote = this._scheduledVoices.filter(x => x.playingNote === note)
 
 		// Its only possible for there to be one conflicting voice, because of this function
-
-		const conflictingVoice = scheduledVoicesSameNote.find(
+		const voiceToRelease = scheduledVoicesSameNote.find(
 			x => x.getScheduledAttackStartTime() <= releaseStartTime && releaseStartTime < x.getScheduledReleaseEndTimeSeconds())
 
-		if (conflictingVoice) {
-			logger.log('conflictingVoice for release')
-			if (conflictingVoice.getScheduledAttackStartTime() === releaseStartTime) return
+		if (voiceToRelease) {
+			logger.log('found voiceToRelease: ', voiceToRelease)
+			if (voiceToRelease.getScheduledAttackStartTime() === releaseStartTime) return
 
-			conflictingVoice.scheduleRelease(delaySeconds, releaseSeconds, this._getOnEndedCallback(conflictingVoice.id))
+			voiceToRelease.scheduleRelease(delaySeconds, releaseSeconds, this._getOnEndedCallback(voiceToRelease.id))
 
 			logger.log('[scheduleRelease] note: ' + note + ' | this._scheduledVoices: ', this._scheduledVoices)
+
+			// Check if release crosses into another voice
+			// Check same note voices, where voice attack start is in our release window
+			const conflictingVoice = scheduledVoicesSameNote.find(
+				x => releaseStartTime <= x.getScheduledAttackStartTime() && x.getScheduledAttackStartTime() < releaseStartTime + releaseSeconds)
+
+			if (conflictingVoice) {
+				logger.log('conflictingVoice in release window, conflictingVoice: ', conflictingVoice)
+				// schedule hard cutoff on voiceToRelease
+				const hardCutoffDelay = conflictingVoice.getScheduledAttackStartTime() - currentTime
+				voiceToRelease.scheduleRelease(hardCutoffDelay, 0.001, this._getOnEndedCallback(voiceToRelease.id))
+			}
 		} else {
 
 			logger.log('[scheduleRelease] no matching voice to release, note: ', note)
@@ -313,7 +325,7 @@ export abstract class Voice {
 	public abstract playNote(note: number, attackTimeInSeconds: number): void
 
 	public release = (timeToReleaseInSeconds: number) => {
-		this._cancelAndHoldOrJustCancel()
+		this._cancelAndHoldOrJustCancelAtTime()
 		this._gain.gain.setValueAtTime(this._gain.gain.value, this._audioContext.currentTime)
 		this._gain.gain.exponentialRampToValueAtTime(0.00001, this._audioContext.currentTime + timeToReleaseInSeconds)
 		this._gain.gain.setValueAtTime(0, this._audioContext.currentTime + timeToReleaseInSeconds)
@@ -346,7 +358,11 @@ export abstract class Voice {
 			const newReleaseStartTime = this._audioContext.currentTime + delaySeconds
 
 			if (newReleaseStartTime >= this._scheduledReleaseStartTimeSeconds) {
+				// This means its a hard cutoff in the middle of a releasing voice
+				//   because another voice is starting on same note
 				logger.log('!!! newReleaseStartTime >= this._scheduledReleaseStartTimeSeconds')
+				// logger.log('!!! newReleaseStartTime: ', newReleaseStartTime)
+				// logger.log('!!! this._scheduledReleaseStartTimeSeconds: ', this._scheduledReleaseStartTimeSeconds)
 
 				const originalReleaseEndTime = this._scheduledReleaseEndTimeSeconds
 				const originalReleaseLength = originalReleaseEndTime - this._scheduledReleaseStartTimeSeconds
@@ -371,8 +387,8 @@ export abstract class Voice {
 				return
 			} else {
 				logger.log('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
-				logger.log('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
-				logger.log('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
+				// logger.log('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
+				// logger.log('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
 				// TODO ??
 				// If we try to schedule ramps and stuff, we need to cancel existing ones from last release
 				// if new release time is during:
@@ -402,18 +418,20 @@ export abstract class Voice {
 			}
 		}
 
+		// every time we release
+
 		this._scheduledReleaseStartTimeSeconds = this._audioContext.currentTime + delaySeconds
 		this._scheduledReleaseEndTimeSeconds = this._audioContext.currentTime + delaySeconds + releaseSeconds
 
 		// logger.log(this.id + ' synth scheduleRelease delay: ' + delaySeconds + ' | release: ' + releaseSeconds + ' | stop: ' + this._scheduledReleaseEndTimeSeconds)
 
+		this._cancelAndHoldOrJustCancelAtTime(this._scheduledReleaseStartTimeSeconds)
 		if (this._scheduledAttackEndTimeSeconds < this._scheduledReleaseStartTimeSeconds) {
 			// if release start is during sustain
 			this._gain.gain.linearRampToValueAtTime(this._sustainLevel, this._scheduledReleaseStartTimeSeconds)
 		} else {
 			// if release start is during attack, cancel and hold, calculate target sustain, and continue ramping to it
 			// TODO This is assuming that it is currently in attack
-			this._cancelAndHoldOrJustCancel(this._scheduledReleaseStartTimeSeconds)
 			// for linear attack only, need different math for other attack curves
 			const originalAttackLength = this._scheduledAttackEndTimeSeconds - this._scheduledAttackStartTimeSeconds
 			const newAttackLength = this._scheduledReleaseStartTimeSeconds - this._scheduledAttackStartTimeSeconds
@@ -439,7 +457,7 @@ export abstract class Voice {
 	}
 
 	protected _beforePlayNote(attackTimeInSeconds: number) {
-		this._cancelAndHoldOrJustCancel()
+		this._cancelAndHoldOrJustCancelAtTime()
 
 		// Never go straight to 0 or you'll probably get a click sound
 		this._gain.gain.linearRampToValueAtTime(0, this._audioContext.currentTime + 0.001)
@@ -459,16 +477,14 @@ export abstract class Voice {
 		delete this._gain
 	}
 
-	protected readonly _cancelAndHoldOrJustCancel = (delaySeconds = 0) => {
+	protected readonly _cancelAndHoldOrJustCancelAtTime = (time = this._audioContext.currentTime) => {
 		const gain = this._gain.gain as any
-
-		const cancelTimeSeconds = this._audioContext.currentTime + delaySeconds
 
 		// cancelAndHoldAtTime is not implemented in firefox
 		if (gain.cancelAndHoldAtTime) {
-			gain.cancelAndHoldAtTime(cancelTimeSeconds)
+			gain.cancelAndHoldAtTime(time)
 		} else {
-			gain.cancelScheduledValues(cancelTimeSeconds)
+			gain.cancelScheduledValues(time)
 		}
 	}
 }

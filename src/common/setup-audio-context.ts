@@ -100,5 +100,26 @@ export function setupAudioContext(audioContext: AudioContext, preFx: GainNode, s
 		// console.log('audioContext.currentTime: ' + audioContext.currentTime)
 	})
 
+	// For manual testing of web audio scheduling
+	// const oscGain = audioContext.createGain()
+	// oscGain.gain.value = 0
+	// oscGain.gain.linearRampToValueAtTime(0, audioContext.currentTime + 2)
+	// oscGain.gain.linearRampToValueAtTime(1, audioContext.currentTime + 4)
+	// oscGain.gain.linearRampToValueAtTime(0, audioContext.currentTime + 6)
+	// oscGain.gain.linearRampToValueAtTime(1, audioContext.currentTime + 7)
+	// oscGain.gain.linearRampToValueAtTime(0, audioContext.currentTime + 8)
+	// oscGain.gain.linearRampToValueAtTime(1, audioContext.currentTime + 9)
+	// oscGain.gain.cancelAndHoldAtTime(audioContext.currentTime + 8.2)
+	// oscGain.gain.linearRampToValueAtTime(0.2, audioContext.currentTime + 10)
+	// oscGain.gain.linearRampToValueAtTime(0, audioContext.currentTime + 11)
+	// oscGain.gain.linearRampToValueAtTime(1, audioContext.currentTime + 12)
+	// oscGain.gain.linearRampToValueAtTime(0, audioContext.currentTime + 13)
+	// oscGain.gain.cancelAndHoldAtTime(audioContext.currentTime + 12.8)
+
+	// const oscA = audioContext.createOscillator()
+	// oscA.type = 'sawtooth'
+	// oscA.connect(oscGain).connect(preFx)
+	// oscA.start()
+
 	return audioContext
 }

@@ -68,7 +68,7 @@ const SchedulerVisual = function SchedulerVisual_({scheduledVoices}: Props) {
 							` M ${width / 2} ${1 * height}` +
 							` L ${width / 2} 0`
 						}
-						stroke="green"
+						stroke="lime"
 						strokeWidth={1}
 						strokeDasharray={4}
 					/>
