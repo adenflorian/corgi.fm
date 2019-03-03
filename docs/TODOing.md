@@ -17,6 +17,7 @@
 				- need logic in local middleware, but that logic is currently only for local user
 			- [√] midi keyboard
 			- [√] check performance
+		- [ ] fix note length
 		- [ ] sequencer animations
 		- [ ] master clock play button animation
 		- [ ] rate knob on infinite sequencer

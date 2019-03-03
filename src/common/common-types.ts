@@ -60,12 +60,10 @@ export function makeMidiClipEvent(
 	})
 }
 
-export function makeMidiGlobalClipEvent(event: Partial<MidiGlobalClipEvent & {note: number}>): MidiGlobalClipEvent {
-	const actualNotes = event.note !== undefined
-		? Set([event.note])
-		: event.notes !== undefined
-			? event.notes
-			: Set()
+export function makeMidiGlobalClipEvent(event: MidiGlobalClipEvent): Readonly<MidiGlobalClipEvent> {
+	const actualNotes = event.notes !== undefined
+		? event.notes
+		: Set()
 
 	return Object.freeze({
 		startTime: event.startTime || 0,

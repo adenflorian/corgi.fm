@@ -108,7 +108,6 @@ function scheduleNotes() {
 	const readRangeBeats = new MidiRange(_cursorBeats, beatsToRead)
 
 	// run all sequencers events thru scheduler
-
 	const sequencersEvents = Map(selectAllSequencers(roomState))
 		.filter(x => x.isPlaying)
 		.map(x => getEvents(x.midiClip, readRangeBeats))
@@ -134,14 +133,9 @@ function scheduleNotes() {
 
 	// console.log('instruments: ', instruments)
 
-	const flag = false
-
 	// then for each instrument
 	// union events from the input sequencers and schedule them
 	instruments.forEach(instrument => {
-		// how to get input events
-		// how to know which ones to get
-		// make a selector to get array of source IDs?
 		const sourceIds = selectConnectionSourceIdsByTarget(roomState, instrument.id)
 
 		// console.log('sourceIds: ', sourceIds)
@@ -157,14 +151,6 @@ function scheduleNotes() {
 					}
 				})
 		})
-
-		// console.log('eventsToSchedule: ', eventsToSchedule)
-		// union events
-		// how?
-		// off of what field?
-		// startBeat
-		// make a map where key is startBeat and val is notes
-		// union the notes together
 
 		eventsToSchedule.forEach((notes, startTime) => {
 			// logger.log('scheduleNote currentSongTimeBeats: ', currentSongTimeBeats)
