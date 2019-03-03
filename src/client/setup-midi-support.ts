@@ -1,6 +1,6 @@
 import {Store} from 'redux'
 import {logger} from '../common/logger'
-import {localMidiKeyPress, localMidiKeyUp} from '../common/redux'
+import {localMidiKeyPress, localMidiKeyUp} from './local-middleware'
 
 declare global {
 	interface Navigator {

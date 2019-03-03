@@ -21,6 +21,7 @@ export const addVirtualKeyboard = (virtualKeyboard: IVirtualKeyboardState) =>
 	addMultiThing(virtualKeyboard, ConnectionNodeType.virtualKeyboard, NetworkActionType.SERVER_AND_BROADCASTER)
 
 export const VIRTUAL_KEY_PRESSED = 'VIRTUAL_KEY_PRESSED'
+export type VirtualKeyPressedAction = ReturnType<typeof virtualKeyPressed>
 export const virtualKeyPressed = (id: string, number: number, octave: Octave, midiNote: IMidiNote) => {
 	return {
 		type: VIRTUAL_KEY_PRESSED,
@@ -34,6 +35,7 @@ export const virtualKeyPressed = (id: string, number: number, octave: Octave, mi
 }
 
 export const VIRTUAL_KEY_UP = 'VIRTUAL_KEY_UP'
+export type VirtualKeyUpAction = ReturnType<typeof virtualKeyUp>
 export const virtualKeyUp = (id: string, number: number) => {
 	return {
 		type: VIRTUAL_KEY_UP,
@@ -44,24 +46,8 @@ export const virtualKeyUp = (id: string, number: number) => {
 	}
 }
 
-export const VIRTUAL_ALL_KEYS_UP = 'VIRTUAL_ALL_KEYS_UP'
-export const virtualAllKeysUp = (id: string) => {
-	return {
-		type: VIRTUAL_ALL_KEYS_UP,
-		id,
-	}
-}
-
-export const VIRTUAL_OCTAVE = 'VIRTUAL_OCTAVE'
-export const virtualOctave = (id: string, octave: Octave) => {
-	return {
-		type: VIRTUAL_OCTAVE,
-		id,
-		octave,
-	}
-}
-
 export const VIRTUAL_OCTAVE_CHANGE = 'VIRTUAL_OCTAVE_CHANGE'
+export type VirtualOctaveChangeAction = ReturnType<typeof virtualOctaveChange>
 export const virtualOctaveChange = (id: string, delta: number) => {
 	return {
 		type: VIRTUAL_OCTAVE_CHANGE,
@@ -69,15 +55,6 @@ export const virtualOctaveChange = (id: string, delta: number) => {
 		BROADCASTER_ACTION,
 		id,
 		delta,
-	}
-}
-
-export const SET_VIRTUAL_KEYS = 'SET_VIRTUAL_KEYS'
-export const setVirtualKeys = (id: string, keys: IMidiNotes) => {
-	return {
-		type: SET_VIRTUAL_KEYS,
-		id,
-		keys,
 	}
 }
 
@@ -132,9 +109,6 @@ export class VirtualKeyboardState implements IVirtualKeyboardState, NodeSpecialS
 const keyboardActionTypes = [
 	VIRTUAL_KEY_PRESSED,
 	VIRTUAL_KEY_UP,
-	VIRTUAL_ALL_KEYS_UP,
-	SET_VIRTUAL_KEYS,
-	VIRTUAL_OCTAVE,
 	VIRTUAL_OCTAVE_CHANGE,
 ]
 
@@ -152,21 +126,6 @@ function virtualKeyboardReducer(virtualKeyboard: IVirtualKeyboardState, action: 
 			return {
 				...virtualKeyboard,
 				pressedKeys: virtualKeyboard.pressedKeys.filter(x => x !== action.number),
-			}
-		case VIRTUAL_ALL_KEYS_UP:
-			return {
-				...virtualKeyboard,
-				pressedKeys: emptyMidiNotes,
-			}
-		case SET_VIRTUAL_KEYS:
-			return {
-				...virtualKeyboard,
-				pressedKeys: action.keys,
-			}
-		case VIRTUAL_OCTAVE:
-			return {
-				...virtualKeyboard,
-				octave: action.octave,
 			}
 		case VIRTUAL_OCTAVE_CHANGE:
 			return {

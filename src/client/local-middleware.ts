@@ -7,7 +7,7 @@ import {logger} from '../common/logger'
 import {emptyMidiNotes, IMidiNote} from '../common/MidiNote'
 import {IClientRoomState} from '../common/redux/common-redux-types'
 import {selectConnectionsWithSourceIds} from '../common/redux/connections-redux'
-import {addBasicSampler, addBasicSynthesizer, addPosition, addVirtualKeyboard, BasicSamplerState, BasicSynthesizerState, Connection, connectionsActions, deleteAllPositions, deleteAllThings, IClientAppState, makeActionCreator, makePosition, MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID, READY, selectActiveRoom, selectLocalClient, selectPositionExtremes, selectVirtualKeyboardById, selectVirtualKeyboardIdByOwner, SET_ACTIVE_ROOM, VirtualKeyboardState, virtualKeyPressed, virtualKeyUp, virtualOctaveChange} from '../common/redux/index'
+import {addBasicSampler, addBasicSynthesizer, addPosition, addVirtualKeyboard, BasicSamplerState, BasicSynthesizerState, Connection, connectionsActions, deleteAllPositions, deleteAllThings, IClientAppState, makeActionCreator, makePosition, MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID, READY, selectActiveRoom, selectLocalClient, selectPositionExtremes, selectVirtualKeyboardById, selectVirtualKeyboardIdByOwner, SET_ACTIVE_ROOM, VIRTUAL_KEY_PRESSED, VIRTUAL_KEY_UP, VIRTUAL_OCTAVE_CHANGE, VirtualKeyboardState, virtualKeyPressed, VirtualKeyPressedAction, virtualKeyUp, VirtualKeyUpAction, virtualOctaveChange, VirtualOctaveChangeAction} from '../common/redux/index'
 import {pointersActions} from '../common/redux/pointers-redux'
 import {useSchedulerForKeyboards} from './client-toggles'
 import {getAllInstruments} from './instrument-manager'
@@ -34,16 +34,16 @@ export function deleteAllTheThings(dispatch: Dispatch) {
 }
 
 export const createLocalMiddleware: () => Middleware<{}, IClientAppState> = () => ({dispatch, getState}) => next => action => {
-	next(action)
+	// TODO Do next later so keyboard is more responsive
+
 	switch (action.type) {
 		case LOCAL_MIDI_KEY_PRESS: {
+			next(action)
 			const state = getState()
 
 			const localVirtualKeyboard = getLocalVirtualKeyboard(state)
 
 			const noteToPlay = applyOctave(action.midiNote, localVirtualKeyboard.octave)
-
-			scheduleNote(noteToPlay, localVirtualKeyboard.id, state.room, 'on')
 
 			return dispatch(
 				virtualKeyPressed(
@@ -54,7 +54,15 @@ export const createLocalMiddleware: () => Middleware<{}, IClientAppState> = () =
 				),
 			)
 		}
+		case VIRTUAL_KEY_PRESSED: {
+			const virtualKeyPressedAction = action as VirtualKeyPressedAction
+
+			scheduleNote(virtualKeyPressedAction.midiNote, virtualKeyPressedAction.id, getState().room, 'on')
+
+			return next(action)
+		}
 		case LOCAL_MIDI_KEY_UP: {
+			next(action)
 			const state = getState()
 
 			const localVirtualKeyboard = getLocalVirtualKeyboard(state)
@@ -70,31 +78,65 @@ export const createLocalMiddleware: () => Middleware<{}, IClientAppState> = () =
 				),
 			)
 		}
+		case VIRTUAL_KEY_UP: {
+			const virtualKeyUpAction = action as VirtualKeyUpAction
+
+			const state = getState()
+
+			const noteToRelease = applyOctave(
+				virtualKeyUpAction.number,
+				selectVirtualKeyboardById(state.room, virtualKeyUpAction.id).octave,
+			)
+
+			scheduleNote(noteToRelease, virtualKeyUpAction.id, state.room, 'off')
+
+			return next(action)
+		}
 		case LOCAL_MIDI_OCTAVE_CHANGE: {
+			next(action)
 			// what do for scheduled keyboard notes?
 			// release then schedule new ones
 			// which ones?
 			// all the pressed keys from keyboard state
 			const state = getState()
 
-			const localVirtualKeyboard = getLocalVirtualKeyboard(state)
+			// const localVirtualKeyboard = getLocalVirtualKeyboard(state)
 
-			localVirtualKeyboard.pressedKeys.forEach(key => {
-				const noteToRelease = applyOctave(key, localVirtualKeyboard.octave)
-				const noteToSchedule = applyOctave(key, localVirtualKeyboard.octave + action.delta)
-				scheduleNote(noteToRelease, localVirtualKeyboard.id, state.room, 'off')
-				scheduleNote(noteToSchedule, localVirtualKeyboard.id, state.room, 'on')
-			})
+			// localVirtualKeyboard.pressedKeys.forEach(key => {
+			// 	const noteToRelease = applyOctave(key, localVirtualKeyboard.octave)
+			// 	const noteToSchedule = applyOctave(key, localVirtualKeyboard.octave + action.delta)
+			// 	scheduleNote(noteToRelease, localVirtualKeyboard.id, state.room, 'off')
+			// 	scheduleNote(noteToSchedule, localVirtualKeyboard.id, state.room, 'on')
+			// })
 
 			return dispatch(virtualOctaveChange(getLocalVirtualKeyboardId(state), action.delta))
 		}
+		case VIRTUAL_OCTAVE_CHANGE: {
+			const virtualOctaveChangeAction = action as VirtualOctaveChangeAction
+
+			const state = getState()
+
+			const keyboard = selectVirtualKeyboardById(state.room, virtualOctaveChangeAction.id)
+
+			keyboard.pressedKeys.forEach(key => {
+				const noteToRelease = applyOctave(key, keyboard.octave)
+				const noteToSchedule = applyOctave(key, keyboard.octave + action.delta)
+				scheduleNote(noteToRelease, keyboard.id, state.room, 'off')
+				scheduleNote(noteToSchedule, keyboard.id, state.room, 'on')
+			})
+
+			return next(action)
+		}
 		case SET_ACTIVE_ROOM: {
+			next(action)
 			window.history.pushState({}, document.title, '/' + selectActiveRoom(getState()))
 			return deleteAllTheThings(dispatch)
 		}
 		case READY: {
+			next(action)
 			return createLocalStuff(dispatch, getState())
 		}
+		default: return next(action)
 	}
 }
 
@@ -103,6 +145,10 @@ let _previousNotesForSourceId = Map<string, MidiNotes>()
 function scheduleNote(note: IMidiNote, sourceId: string, roomState: IClientRoomState, onOrOff: 'on' | 'off') {
 	if (isClient() && isNewNoteScannerEnabled() === false) return
 	if (useSchedulerForKeyboards() === false) return
+
+	if (_previousNotesForSourceId.has(sourceId) === false) {
+		_previousNotesForSourceId = _previousNotesForSourceId.set(sourceId, emptyMidiNotes)
+	}
 
 	const previousNotes = _previousNotesForSourceId.get(sourceId, emptyMidiNotes)
 

@@ -182,7 +182,7 @@ class SynthVoice extends Voice {
 		this._oscillator.frequency.setValueAtTime(midiNoteToFrequency(note), this._audioContext.currentTime)
 		this._oscillator.start(this._scheduledAttackStartTimeSeconds)
 
-		logger.log(this.id + ' synth scheduleNote delaySeconds: ' + delaySeconds + ' | note: ' + note + ' | attackTimeInSeconds: ' + attackTimeInSeconds)
+		// logger.log(this.id + ' synth scheduleNote delaySeconds: ' + delaySeconds + ' | note: ' + note + ' | attackTimeInSeconds: ' + attackTimeInSeconds)
 
 		this._gain = this._audioContext.createGain()
 		this._gain.gain.value = 0
