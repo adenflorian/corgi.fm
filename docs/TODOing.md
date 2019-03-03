@@ -12,8 +12,10 @@
 	- [ ] get stuff working again
 		- [...] keyboard
 			- [√] computer keyboard
-			- [ ] midi keyboard
 			- [ ] mouse
+				- this is a bit tricky
+				- need logic in local middleware, but that logic is currently only for local user
+			- [ ] midi keyboard
 		- [ ] sequencer animations
 		- [ ] master clock play button animation
 		- [ ] rate knob on infinite sequencer

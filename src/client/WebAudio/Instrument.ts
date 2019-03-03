@@ -152,7 +152,7 @@ export abstract class Voices<V extends Voice> {
 			x => x.getScheduledAttackStartTime() <= newNoteStartTime && newNoteStartTime < x.getScheduledReleaseEndTimeSeconds())
 
 		if (conflictingVoice) {
-			logger.log('conflictingVoice')
+			// logger.log('conflictingVoice')
 			if (conflictingVoice.getScheduledAttackStartTime() === newNoteStartTime) return
 
 			// schedule hard cutoff of existing note
@@ -175,7 +175,7 @@ export abstract class Voices<V extends Voice> {
 		const voicesAfter = scheduledVoicesSameNote.filter(x => x.getScheduledAttackStartTime() > newNoteStartTime)
 
 		if (voicesAfter.count() > 0) {
-			logger.log('scheduling hard cutoff for new note because it is behind a future note. newVoice: ', newVoice)
+			// logger.log('scheduling hard cutoff for new note because it is behind a future note. newVoice: ', newVoice)
 			const closestScheduledStart = voicesAfter.map(x => x.getScheduledAttackStartTime()).min()
 			if (closestScheduledStart === undefined) throw new Error('shouldnt happen i think')
 
@@ -200,12 +200,12 @@ export abstract class Voices<V extends Voice> {
 			x => x.getScheduledAttackStartTime() <= releaseStartTime && releaseStartTime < x.getScheduledReleaseEndTimeSeconds())
 
 		if (voiceToRelease) {
-			logger.log('found voiceToRelease: ', voiceToRelease)
+			// logger.log('found voiceToRelease: ', voiceToRelease)
 			if (voiceToRelease.getScheduledAttackStartTime() === releaseStartTime) return
 
 			voiceToRelease.scheduleRelease(delaySeconds, releaseSeconds, this._getOnEndedCallback(voiceToRelease.id))
 
-			logger.log('[scheduleRelease] note: ' + note + ' | this._scheduledVoices: ', this._scheduledVoices)
+			// logger.log('[scheduleRelease] note: ' + note + ' | this._scheduledVoices: ', this._scheduledVoices)
 
 			// Check if release crosses into another voice
 			// Check same note voices, where voice attack start is in our release window
@@ -213,14 +213,14 @@ export abstract class Voices<V extends Voice> {
 				x => releaseStartTime <= x.getScheduledAttackStartTime() && x.getScheduledAttackStartTime() < releaseStartTime + releaseSeconds)
 
 			if (conflictingVoice) {
-				logger.log('conflictingVoice in release window, conflictingVoice: ', conflictingVoice)
+				// logger.log('conflictingVoice in release window, conflictingVoice: ', conflictingVoice)
 				// schedule hard cutoff on voiceToRelease
 				const hardCutoffDelay = conflictingVoice.getScheduledAttackStartTime() - currentTime
 				voiceToRelease.scheduleRelease(hardCutoffDelay, 0.001, this._getOnEndedCallback(voiceToRelease.id))
 			}
 		} else {
 
-			logger.log('[scheduleRelease] no matching voice to release, note: ', note)
+			// logger.log('[scheduleRelease] no matching voice to release, note: ', note)
 		}
 	}
 
@@ -360,33 +360,33 @@ export abstract class Voice {
 			if (newReleaseStartTime >= this._scheduledReleaseStartTimeSeconds) {
 				// This means its a hard cutoff in the middle of a releasing voice
 				//   because another voice is starting on same note
-				logger.log('!!! newReleaseStartTime >= this._scheduledReleaseStartTimeSeconds')
+				// logger.log('!!! newReleaseStartTime >= this._scheduledReleaseStartTimeSeconds')
 				// logger.log('!!! newReleaseStartTime: ', newReleaseStartTime)
 				// logger.log('!!! this._scheduledReleaseStartTimeSeconds: ', this._scheduledReleaseStartTimeSeconds)
 
 				const originalReleaseEndTime = this._scheduledReleaseEndTimeSeconds
 				const originalReleaseLength = originalReleaseEndTime - this._scheduledReleaseStartTimeSeconds
-				logger.log('this._scheduledReleaseStartTimeSeconds: ', this._scheduledReleaseStartTimeSeconds)
-				logger.log('originalReleaseEndTime: ', originalReleaseEndTime)
+				// logger.log('this._scheduledReleaseStartTimeSeconds: ', this._scheduledReleaseStartTimeSeconds)
+				// logger.log('originalReleaseEndTime: ', originalReleaseEndTime)
 
 				this._scheduledReleaseEndTimeSeconds = this._audioContext.currentTime + delaySeconds + releaseSeconds
-				logger.log('this._scheduledReleaseEndTimeSeconds: ', this._scheduledReleaseEndTimeSeconds)
+				// logger.log('this._scheduledReleaseEndTimeSeconds: ', this._scheduledReleaseEndTimeSeconds)
 
 				const newReleaseLength = this._scheduledReleaseEndTimeSeconds - this._scheduledReleaseStartTimeSeconds
 				const ratio = newReleaseLength / originalReleaseLength
 				// Not accurate for a curved release, will be too high
 				this._scheduledSustainAtReleaseEnd = this._scheduledSustainAtReleaseStart - (ratio * this._scheduledSustainAtReleaseStart)
-				logger.log('this._scheduledSustainAtReleaseStart: ', this._scheduledSustainAtReleaseStart)
-				logger.log('ratio: ', ratio)
-				logger.log('newReleaseLength: ', newReleaseLength)
-				logger.log('originalReleaseLength: ', originalReleaseLength)
-				logger.log('this._scheduledSustainAtReleaseEnd: ', this._scheduledSustainAtReleaseEnd)
+				// logger.log('this._scheduledSustainAtReleaseStart: ', this._scheduledSustainAtReleaseStart)
+				// logger.log('ratio: ', ratio)
+				// logger.log('newReleaseLength: ', newReleaseLength)
+				// logger.log('originalReleaseLength: ', originalReleaseLength)
+				// logger.log('this._scheduledSustainAtReleaseEnd: ', this._scheduledSustainAtReleaseEnd)
 
 				if (!audioNode) return
 				audioNode.stop(this._scheduledReleaseEndTimeSeconds)
 				return
 			} else {
-				logger.log('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
+				// logger.log('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
 				// logger.log('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
 				// logger.log('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
 				// TODO ??

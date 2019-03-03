@@ -1,3 +1,5 @@
+import {Map} from 'immutable'
+import {string} from 'prop-types'
 import {Dispatch, Middleware} from 'redux'
 import {ConnectionNodeType} from '../common/common-types'
 import {isClient} from '../common/is-client-or-server'
@@ -9,6 +11,7 @@ import {addBasicSampler, addBasicSynthesizer, addPosition, addVirtualKeyboard, B
 import {pointersActions} from '../common/redux/pointers-redux'
 import {useSchedulerForKeyboards} from './client-toggles'
 import {getAllInstruments} from './instrument-manager'
+import {MidiNotes} from './Instruments/BasicSynthesizerView'
 import {isNewNoteScannerEnabled} from './is-prod-client'
 import {applyOctave} from './WebAudio/music-functions'
 
@@ -95,27 +98,29 @@ export const createLocalMiddleware: () => Middleware<{}, IClientAppState> = () =
 	}
 }
 
-let _previousNotes = emptyMidiNotes
+let _previousNotesForSourceId = Map<string, MidiNotes>()
 
 function scheduleNote(note: IMidiNote, sourceId: string, roomState: IClientRoomState, onOrOff: 'on' | 'off') {
 	if (isClient() && isNewNoteScannerEnabled() === false) return
 	if (useSchedulerForKeyboards() === false) return
 
+	const previousNotes = _previousNotesForSourceId.get(sourceId, emptyMidiNotes)
+
 	if (onOrOff === 'on') {
-		if (_previousNotes.includes(note)) {
+		if (previousNotes.includes(note)) {
 			return
 		} else {
-			_previousNotes = _previousNotes.add(note)
+			_previousNotesForSourceId = _previousNotesForSourceId.update(sourceId, x => x.add(note))
 		}
 	} else {
-		if (_previousNotes.includes(note)) {
-			_previousNotes = _previousNotes.remove(note)
+		if (previousNotes.includes(note)) {
+			_previousNotesForSourceId = _previousNotesForSourceId.update(sourceId, x => x.remove(note))
 		} else {
 			return
 		}
 	}
 
-	logger.log('[local-middleware.scheduleNote] note: ' + note + ' | onOrOff: ' + onOrOff)
+	// logger.log('[local-middleware.scheduleNote] note: ' + note + ' | onOrOff: ' + onOrOff)
 
 	const targetIds = selectConnectionsWithSourceIds(roomState, [sourceId]).map(x => x.targetId)
 
