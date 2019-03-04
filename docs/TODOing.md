@@ -36,13 +36,48 @@
 		- [ ] rate knob on infinite sequencer
 		- [√] release all notes on stop
 		- [ ] stopping song shouldnt release notes being played by user
-		- [ ] what does ableton do when you stop and there is a note with a really long release
+		- what does ableton do when you stop and there is a note with a really long release
+			- it just keeps on releasing, even when you hit play again
+			- but you can adjust release of note that are already releasing, in serum at least
+		- [ ] allow adjusting release of currently releasing notes
+		- [ ] get noise osc on synth working with schedules
+		- [ ] make instrument params affect currently playing notes
+			- [√] pan
+			- [√] filter
+			- [ ] attack
+			- [ ] release
+			- [√] detune
+			- [ ] osc type
+				- [ ] normal
+				- [ ] noise
 	- **Bugs**
 		- [ ] 2019-03-03 Note getting stuck on when just sequencers are playing at normal speed
 			- put all 4 sequencers into same synth, with default release
 		- [ ] 2019-03-03 When playing note on keyboard and change connection, note keeps playing on previous instrument
 			- need to somehow stop those notes
 			- maybe need a sourceId for each event/note?
+		- [√] 2019-03-03 note getting stuck on when switching synth osc types
+			- no scheduled voice for it in debug visual
+				- maybe audio node is undefined when it shouldnt be?
+				- then when it tries to stop it, its ignoring it because its undefined
+				- how to debug this tho
+				- not sure how to repro
+				- i think its specific to switching to and from noise osc type
+				- can get stuck on noise or other type
+				- where are the spots in the code that this could happen
+				- the voice is getting released, but .stop() isn't getting called on the source node
+				- audioNode is never null, but the issue is still happening
+					- meaning, there is both an osc and noise buffer at same time
+						- but that should never happen
+				- how am i still hearing sound if the gain was disconnected?
+					- maybe it wasn't?
+				- there is still a scheduledVoice, because i can change the osc type
+					- how?
+						- onEnded wasn't called?
+						- onEnded wont be called if audioNode never stops
+						- maybe its from switching osc type during release
+						- [√] make sure audioNode is stopped when switching synth osc type between noise and other
+						- should probably just clean up how the synth voice handles noise vs other types
 
 # Soon
 - [ ] allow adding connections from a node with no connections on it already

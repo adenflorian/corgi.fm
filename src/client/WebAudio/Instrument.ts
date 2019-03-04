@@ -4,7 +4,7 @@ import {IDisposable} from '../../common/common-types'
 import {logger} from '../../common/logger'
 import {emptyMidiNotes, IMidiNote, IMidiNotes} from '../../common/MidiNote'
 import {AudioNodeWrapper, IAudioNodeWrapperOptions} from './index'
-import {updateSchedulerVisual} from './SchedulerVisual'
+import {registerInstrumentWithSchedulerVisual} from './SchedulerVisual'
 
 export abstract class Instrument<T extends Voices<V>, V extends Voice> extends AudioNodeWrapper implements IDisposable {
 
@@ -174,7 +174,7 @@ export abstract class Voices<V extends Voice> {
 			if (conflictingVoice.getScheduledAttackStartTime() === newNoteStartTime) return
 
 			// schedule hard cutoff of existing note
-			conflictingVoice.scheduleRelease(delaySeconds, 0.001, this._getOnEndedCallback(conflictingVoice.id))
+			conflictingVoice.scheduleRelease(delaySeconds, 0.001)
 		}
 
 		// Need to do something if new note starts before all scheduled notes
@@ -200,7 +200,6 @@ export abstract class Voices<V extends Voice> {
 			newVoice.scheduleRelease(
 				closestScheduledStart - this._getAudioContext().currentTime,
 				0.001,
-				this._getOnEndedCallback(newVoice.id),
 			)
 		}
 	}
@@ -221,7 +220,7 @@ export abstract class Voices<V extends Voice> {
 			// logger.log('found voiceToRelease: ', voiceToRelease)
 			if (voiceToRelease.getScheduledAttackStartTime() === releaseStartTime) return
 
-			voiceToRelease.scheduleRelease(delaySeconds, releaseSeconds, this._getOnEndedCallback(voiceToRelease.id))
+			voiceToRelease.scheduleRelease(delaySeconds, releaseSeconds)
 
 			// logger.log('[scheduleRelease] note: ' + note + ' | this._scheduledVoices: ', this._scheduledVoices)
 
@@ -234,7 +233,7 @@ export abstract class Voices<V extends Voice> {
 				// logger.log('conflictingVoice in release window, conflictingVoice: ', conflictingVoice)
 				// schedule hard cutoff on voiceToRelease
 				const hardCutoffDelay = conflictingVoice.getScheduledAttackStartTime() - currentTime
-				voiceToRelease.scheduleRelease(hardCutoffDelay, 0.001, this._getOnEndedCallback(voiceToRelease.id))
+				voiceToRelease.scheduleRelease(hardCutoffDelay, 0.001)
 			}
 		} else {
 
@@ -244,7 +243,7 @@ export abstract class Voices<V extends Voice> {
 
 	public releaseAllScheduled(releaseSeconds: number) {
 		this._scheduledVoices.forEach(x => {
-			x.scheduleRelease(0, releaseSeconds, this._getOnEndedCallback(x.id), true)
+			x.scheduleRelease(0, releaseSeconds, true)
 		})
 	}
 
@@ -299,10 +298,12 @@ export abstract class Voices<V extends Voice> {
 		}
 	}
 
-	private _getOnEndedCallback(id: number) {
-		return () => (this._scheduledVoices = this._scheduledVoices.delete(id))
+	protected _getOnEndedCallback(): OnEndedCallback {
+		return (id: number) => (this._scheduledVoices = this._scheduledVoices.delete(id))
 	}
 }
+
+export type OnEndedCallback = (id: number) => void
 
 export abstract class Voice {
 
@@ -310,6 +311,7 @@ export abstract class Voice {
 	public readonly id: number
 	public playingNote: number = -1
 	public playStartTime: number = 0
+	protected readonly _onEnded: OnEndedCallback
 	protected _audioContext: AudioContext
 	protected _destination: AudioNode
 	protected _releaseId: string = ''
@@ -325,10 +327,11 @@ export abstract class Voice {
 	protected _scheduledReleaseEndTimeSeconds = Number.MAX_VALUE
 	protected _sustainLevel = 1
 
-	constructor(audioContext: AudioContext, destination: AudioNode) {
+	constructor(audioContext: AudioContext, destination: AudioNode, onEnded: OnEndedCallback) {
 		this.id = Voice._nextId++
 		this._audioContext = audioContext
 		this._destination = destination
+		this._onEnded = onEnded
 
 		this._gain = this._audioContext.createGain()
 		this._gain.gain.setValueAtTime(0, this._audioContext.currentTime)
@@ -366,7 +369,6 @@ export abstract class Voice {
 	public scheduleRelease(
 		delaySeconds: number,
 		releaseSeconds: number,
-		onEnded: () => void,
 		releaseIfNotCurrentlyReleasing = false,
 	) {
 		const audioNode = this.getAudioNodeToStop()
@@ -382,7 +384,9 @@ export abstract class Voice {
 
 			if (newReleaseStartTime >= this._scheduledReleaseStartTimeSeconds) {
 
-				if (releaseIfNotCurrentlyReleasing) return
+				if (releaseIfNotCurrentlyReleasing) {
+					return
+				}
 
 				// This means its a hard cutoff in the middle of a releasing voice
 				//   because another voice is starting on same note
@@ -408,7 +412,7 @@ export abstract class Voice {
 				// logger.log('originalReleaseLength: ', originalReleaseLength)
 				// logger.log('this._scheduledSustainAtReleaseEnd: ', this._scheduledSustainAtReleaseEnd)
 
-				if (!audioNode) return
+				if (!audioNode) throw new Error('AAAAAAAAAAAAAAA')
 				audioNode.stop(this._scheduledReleaseEndTimeSeconds)
 				return
 			} else {
@@ -464,13 +468,13 @@ export abstract class Voice {
 
 		this._gain.gain.exponentialRampToValueAtTime(0.00001, this._scheduledReleaseEndTimeSeconds)
 
-		if (!audioNode) return
+		if (!audioNode) throw new Error('BBBBBBBBBBBBB')
 		audioNode.stop(this._scheduledReleaseEndTimeSeconds)
 		audioNode.onended = () => {
 			audioNode!.disconnect()
 			this._gain.disconnect()
 			delete this._gain
-			onEnded()
+			this._onEnded(this.id)
 		}
 	}
 

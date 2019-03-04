@@ -1,6 +1,6 @@
 import {logger} from '../../common/logger'
 import {BuiltInOscillatorType, CustomOscillatorType, ShamuOscillatorType} from '../../common/OscillatorTypes'
-import {IInstrumentOptions, Instrument, Voice, Voices, VoiceStatus} from './Instrument'
+import {IInstrumentOptions, Instrument, OnEndedCallback, Voice, Voices} from './Instrument'
 import {midiNoteToFrequency} from './music-functions'
 
 interface IBasicSynthesizerOptions extends IInstrumentOptions {
@@ -56,7 +56,14 @@ class SynthVoices extends Voices<SynthVoice> {
 	}
 
 	public createVoice(forScheduling: boolean) {
-		return new SynthVoice(this._audioContext, this._destination, this._oscType, forScheduling, this._detune)
+		return new SynthVoice(
+			this._audioContext,
+			this._destination,
+			this._oscType,
+			forScheduling,
+			this._detune,
+			this._getOnEndedCallback(),
+		)
 	}
 
 	public setOscillatorType(type: ShamuOscillatorType) {
@@ -84,8 +91,9 @@ class SynthVoice extends Voice {
 	constructor(
 		audioContext: AudioContext, destination: AudioNode,
 		oscType: ShamuOscillatorType, forScheduling: boolean, detune: number,
+		onEnded: OnEndedCallback,
 	) {
-		super(audioContext, destination)
+		super(audioContext, destination, onEnded)
 
 		this._oscillatorType = oscType
 		this._nextOscillatorType = oscType
@@ -100,6 +108,7 @@ class SynthVoice extends Voice {
 		}
 	}
 
+	// TODO Maybe change to just stopAudioNode
 	public getAudioNodeToStop() {
 		if (this._oscillatorType === CustomOscillatorType.noise) {
 			return this._whiteNoise
@@ -121,7 +130,7 @@ class SynthVoice extends Voice {
 		if (delaySeconds < 0) throw new Error('delay <= 0: ' + delaySeconds)
 
 		if (this._oscillatorType === CustomOscillatorType.noise) {
-			// TODO
+			this._scheduleNoiseNote(note, attackTimeInSeconds, delaySeconds)
 		} else {
 			this._scheduleNormalNote(note, attackTimeInSeconds, delaySeconds)
 		}
@@ -132,16 +141,34 @@ class SynthVoice extends Voice {
 	public setOscillatorType(newOscType: ShamuOscillatorType) {
 		this._nextOscillatorType = newOscType
 
-		if (this._status === VoiceStatus.playing) {
-			this._refreshOscillatorType()
+		// TODO This might be needed for old system
+		// if (this._status === VoiceStatus.playing) {
+		this._refreshOscillatorType()
+		// }
+
+		// if release is scheduled, need to call stop on new node
+		if (this._isReleaseScheduled) {
+			if (this._whiteNoise) {
+				this._whiteNoise.stop(this.getScheduledReleaseEndTimeSeconds())
+				this._whiteNoise.onended = () => this._onEnded(this.id)
+			}
+			if (this._oscillator) {
+				this._oscillator.stop(this.getScheduledReleaseEndTimeSeconds())
+				this._oscillator.onended = () => this._onEnded(this.id)
+			}
 		}
 	}
 
 	public setDetune(detune: number) {
 		if (detune === this._detune) return
+
 		this._detune = detune
+
 		if (this._oscillator) {
 			this._oscillator.detune.value = detune
+		}
+		if (this._whiteNoise) {
+			this._whiteNoise.detune.value = detune
 		}
 	}
 
@@ -162,12 +189,31 @@ class SynthVoice extends Voice {
 
 		// logger.log(this.id + ' synth scheduleNote delaySeconds: ' + delaySeconds + ' | note: ' + note + ' | attackTimeInSeconds: ' + attackTimeInSeconds)
 
+		this._afterScheduleNote(this._oscillator)
+	}
+
+	private _scheduleNoiseNote(_: number, attackTimeInSeconds: number, delaySeconds: number): void {
+		this._scheduledAttackStartTimeSeconds = this._audioContext.currentTime + delaySeconds
+		this._scheduledAttackEndTimeSeconds = this._scheduledAttackStartTimeSeconds + attackTimeInSeconds
+
+		this._whiteNoise = this._audioContext.createBufferSource()
+		this._whiteNoise.start(this._scheduledAttackStartTimeSeconds)
+		this._whiteNoise.buffer = SynthVoice._noiseBuffer
+		this._whiteNoise.loop = true
+		this._whiteNoise.detune.value = this._detune
+
+		// logger.log(this.id + ' synth scheduleNote delaySeconds: ' + delaySeconds + ' | note: ' + note + ' | attackTimeInSeconds: ' + attackTimeInSeconds)
+
+		this._afterScheduleNote(this._whiteNoise)
+	}
+
+	private _afterScheduleNote(audioNode: AudioScheduledSourceNode) {
 		this._gain = this._audioContext.createGain()
 		this._gain.gain.value = 0
 		this._gain.gain.linearRampToValueAtTime(0, this._scheduledAttackStartTimeSeconds)
 		this._gain.gain.linearRampToValueAtTime(this._sustainLevel, this._scheduledAttackEndTimeSeconds)
 
-		this._oscillator.connect(this._gain)
+		audioNode.connect(this._gain)
 			.connect(this._destination)
 	}
 

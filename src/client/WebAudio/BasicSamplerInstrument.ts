@@ -1,5 +1,5 @@
 import {logger} from '../../common/logger'
-import {IInstrumentOptions, Instrument, Voice, Voices} from './Instrument'
+import {IInstrumentOptions, Instrument, OnEndedCallback, Voice, Voices} from './Instrument'
 import {getOctaveFromMidiNote, midiNoteToNoteName} from './music-functions'
 import {SamplesManager} from './SamplesManager'
 
@@ -32,7 +32,12 @@ class SamplerVoices extends Voices<SamplerVoice> {
 	}
 
 	public createVoice(forScheduling: boolean) {
-		return new SamplerVoice(this._audioContext, this._destination, forScheduling)
+		return new SamplerVoice(
+			this._audioContext,
+			this._destination,
+			forScheduling,
+			this._getOnEndedCallback(),
+		)
 	}
 
 	protected _getAudioContext() {return this._audioContext}
@@ -41,8 +46,11 @@ class SamplerVoices extends Voices<SamplerVoice> {
 class SamplerVoice extends Voice {
 	private _audioBufferSource: AudioBufferSourceNode | undefined
 
-	constructor(audioContext: AudioContext, destination: AudioNode, forScheduling: boolean) {
-		super(audioContext, destination)
+	constructor(
+		audioContext: AudioContext, destination: AudioNode,
+		forScheduling: boolean, onEnded: OnEndedCallback,
+	) {
+		super(audioContext, destination, onEnded)
 
 		this._gain.connect(this._destination)
 	}
