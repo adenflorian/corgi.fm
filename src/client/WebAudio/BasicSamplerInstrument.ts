@@ -1,5 +1,4 @@
 import {logger} from '../../common/logger'
-import {IMidiNote} from '../../common/MidiNote'
 import {IInstrumentOptions, Instrument, Voice, Voices} from './Instrument'
 import {getOctaveFromMidiNote, midiNoteToNoteName} from './music-functions'
 import {SamplesManager} from './SamplesManager'
@@ -13,20 +12,6 @@ export class BasicSamplerInstrument extends Instrument<SamplerVoices, SamplerVoi
 		super(options)
 
 		this._voices = new SamplerVoices(options.voiceCount, this._audioContext, this._panNode)
-	}
-
-	public scheduleNote(note: IMidiNote, delaySeconds: number) {
-		this._voices.scheduleNote(note, delaySeconds, this._attackTimeInSeconds)
-	}
-
-	public scheduleRelease(note: number, delaySeconds: number) {
-		this._voices.scheduleRelease(note, delaySeconds, this._releaseTimeInSeconds)
-	}
-
-	public dispose = () => {
-		this._voices.dispose()
-
-		this._dispose()
 	}
 
 	protected _getVoices = () => this._voices

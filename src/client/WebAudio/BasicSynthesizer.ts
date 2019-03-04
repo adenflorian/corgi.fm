@@ -1,39 +1,26 @@
 import {logger} from '../../common/logger'
-import {IMidiNote} from '../../common/MidiNote'
 import {BuiltInOscillatorType, CustomOscillatorType, ShamuOscillatorType} from '../../common/OscillatorTypes'
 import {IInstrumentOptions, Instrument, Voice, Voices, VoiceStatus} from './Instrument'
 import {midiNoteToFrequency} from './music-functions'
-import {updateSchedulerVisual} from './SchedulerVisual'
 
 interface IBasicSynthesizerOptions extends IInstrumentOptions {
 	oscillatorType: ShamuOscillatorType
+	detune: number
 }
 
 // TODO Make into a BasicSynthesizerAudioNode?
 export class BasicSynthesizer extends Instrument<SynthVoices, SynthVoice> {
 	private readonly _voices: SynthVoices
-	private _fineTuning: number = 0
+	private _detune: number
 	private _oscillatorType: ShamuOscillatorType
 
 	constructor(options: IBasicSynthesizerOptions) {
 		super(options)
 
 		this._oscillatorType = options.oscillatorType
+		this._detune = options.detune
 
-		// this._voices = new SynthVoices(0, this._audioContext, this._panNode, options.oscillatorType)
-		this._voices = new SynthVoices(options.voiceCount, this._audioContext, this._panNode, options.oscillatorType, this._fineTuning)
-	}
-
-	public scheduleNote(note: IMidiNote, delaySeconds: number) {
-		this._voices.scheduleNote(note, delaySeconds, this._attackTimeInSeconds)
-
-		updateSchedulerVisual(this.id, this._voices.getScheduledVoices(), this._audioContext)
-	}
-
-	public scheduleRelease(note: number, delaySeconds: number) {
-		this._voices.scheduleRelease(note, delaySeconds, this._releaseTimeInSeconds)
-
-		updateSchedulerVisual(this.id, this._voices.getScheduledVoices(), this._audioContext)
+		this._voices = new SynthVoices(options.voiceCount, this._audioContext, this._panNode, options.oscillatorType, this._detune)
 	}
 
 	public setOscillatorType = (type: ShamuOscillatorType) => {
@@ -42,16 +29,10 @@ export class BasicSynthesizer extends Instrument<SynthVoices, SynthVoice> {
 		this._voices.setOscillatorType(type)
 	}
 
-	public setFineTuning = (fine: number) => {
-		if (fine === this._fineTuning) return
-		this._fineTuning = fine
-		this._voices.setFineTuning(fine)
-	}
-
-	public dispose = () => {
-		this._voices.dispose()
-
-		this._dispose()
+	public setDetune = (detune: number) => {
+		if (detune === this._detune) return
+		this._detune = detune
+		this._voices.setDetune(detune)
 	}
 
 	protected _getVoices = () => this._voices
@@ -83,9 +64,9 @@ class SynthVoices extends Voices<SynthVoice> {
 		this._allVoices.forEach(x => x.setOscillatorType(type))
 	}
 
-	public setFineTuning(fine: number) {
-		this._detune = fine
-		this._allVoices.forEach(x => x.setFineTuning(fine))
+	public setDetune(detune: number) {
+		this._detune = detune
+		this._allVoices.forEach(x => x.setDetune(detune))
 	}
 
 	protected _getAudioContext() {return this._audioContext}
@@ -97,7 +78,7 @@ class SynthVoice extends Voice {
 	private _oscillatorType: ShamuOscillatorType
 	private _nextOscillatorType: ShamuOscillatorType
 	private _whiteNoise: AudioBufferSourceNode | undefined
-	private _fineTuning: number = 0
+	private _detune: number = 0
 	private _frequency: number = 0
 
 	constructor(
@@ -108,7 +89,7 @@ class SynthVoice extends Voice {
 
 		this._oscillatorType = oscType
 		this._nextOscillatorType = oscType
-		this._fineTuning = detune
+		this._detune = detune
 
 		if (!SynthVoice._noiseBuffer) {
 			SynthVoice._noiseBuffer = this._generateNoiseBuffer()
@@ -159,11 +140,11 @@ class SynthVoice extends Voice {
 		}
 	}
 
-	public setFineTuning(fine: number) {
-		if (fine === this._fineTuning) return
-		this._fineTuning = fine
+	public setDetune(detune: number) {
+		if (detune === this._detune) return
+		this._detune = detune
 		if (this._oscillator) {
-			this._oscillator.detune.value = fine
+			this._oscillator.detune.value = detune
 		}
 	}
 
@@ -178,7 +159,7 @@ class SynthVoice extends Voice {
 
 		this._oscillator = this._audioContext.createOscillator()
 		this._oscillator.type = this._oscillatorType as OscillatorType
-		this._oscillator.detune.value = this._fineTuning
+		this._oscillator.detune.value = this._detune
 		this._oscillator.frequency.setValueAtTime(midiNoteToFrequency(note), this._audioContext.currentTime)
 		this._oscillator.start(this._scheduledAttackStartTimeSeconds)
 

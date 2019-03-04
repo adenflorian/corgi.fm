@@ -126,6 +126,7 @@ export const setupInstrumentManager = (
 				(options, instrumentState) => new BasicSynthesizer({
 					...options,
 					voiceCount: 9,
+					detune: 0,
 					...instrumentState,
 				}),
 				ConnectionNodeType.basicSynthesizer,
@@ -135,7 +136,7 @@ export const setupInstrumentManager = (
 					instrument.setLowPassFilterCutoffFrequency(instrumentState.lowPassFilterCutoffFrequency)
 					instrument.setAttack(instrumentState.attack)
 					instrument.setRelease(instrumentState.release)
-					instrument.setFineTuning(instrumentState.fineTuning)
+					instrument.setDetune(instrumentState.fineTuning)
 				},
 			)
 		}

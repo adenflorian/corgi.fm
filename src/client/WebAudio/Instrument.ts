@@ -4,6 +4,7 @@ import {IDisposable} from '../../common/common-types'
 import {logger} from '../../common/logger'
 import {emptyMidiNotes, IMidiNote, IMidiNotes} from '../../common/MidiNote'
 import {AudioNodeWrapper, IAudioNodeWrapperOptions} from './index'
+import {updateSchedulerVisual} from './SchedulerVisual'
 
 export abstract class Instrument<T extends Voices<V>, V extends Voice> extends AudioNodeWrapper implements IDisposable {
 
@@ -34,8 +35,17 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 		this._lowPassFilter.connect(this._gain)
 	}
 
-	public abstract scheduleNote(note: IMidiNote, delaySeconds: number): void
-	public abstract scheduleRelease(note: number, delaySeconds: number): void
+	public scheduleNote(note: IMidiNote, delaySeconds: number) {
+		this._getVoices().scheduleNote(note, delaySeconds, this._attackTimeInSeconds)
+
+		updateSchedulerVisual(this.id, this._getVoices().getScheduledVoices(), this._audioContext)
+	}
+
+	public scheduleRelease(note: number, delaySeconds: number) {
+		this._getVoices().scheduleRelease(note, delaySeconds, this._releaseTimeInSeconds)
+
+		updateSchedulerVisual(this.id, this._getVoices().getScheduledVoices(), this._audioContext)
+	}
 
 	public readonly getInputAudioNode = () => null
 	public readonly getOutputAudioNode = () => this._gain
@@ -75,6 +85,12 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 	public readonly setRelease = (releaseTimeInSeconds: number) => this._releaseTimeInSeconds = releaseTimeInSeconds
 
 	public readonly getActivityLevel = () => this._getVoices().getActivityLevel()
+
+	public dispose = () => {
+		this._getVoices().dispose()
+
+		this._dispose()
+	}
 
 	protected _dispose = () => {
 		this._panNode.disconnect()
