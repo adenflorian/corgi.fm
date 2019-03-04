@@ -7,13 +7,9 @@ import {AppOptions, IClientAppState, selectOption, shamuConnect} from '../../com
 import {getCurrentSongIsPlaying} from '../note-scanner'
 import {Voice} from './Instrument'
 
-interface Props {
-	scheduledVoices: OrderedMap<number, Voice>
-}
-
-const xScale = 20
-const height = 50
-const width = 256
+const _xScale = 20
+const _height = 50
+const _width = 256
 
 let _store: Store<IClientAppState>
 
@@ -58,14 +54,18 @@ export const ConnectedNoteSchedulerVisualPlaceholder = shamuConnect(
 	}),
 )(NoteSchedulerVisualPlaceholder)
 
-const SchedulerVisual = function SchedulerVisual_({scheduledVoices}: Props) {
+interface SchedulerVisualProps {
+	scheduledVoices: OrderedMap<number, Voice>
+}
+
+const SchedulerVisual = function SchedulerVisual_({scheduledVoices}: SchedulerVisualProps) {
 	return (
 		<div
 			style={{
 				position: 'relative',
 				top: 2,
-				width,
-				height,
+				width: _width,
+				height: _height,
 			}}
 		>
 			{scheduledVoices.map(voice => {
@@ -74,8 +74,8 @@ const SchedulerVisual = function SchedulerVisual_({scheduledVoices}: Props) {
 						style={{
 							position: 'absolute',
 							fill: 'none',
-							width,
-							height,
+							width: _width,
+							height: _height,
 						}}
 						key={voice.id}
 					>
@@ -87,7 +87,7 @@ const SchedulerVisual = function SchedulerVisual_({scheduledVoices}: Props) {
 							}}
 						>
 							<path
-								d={getPathDForVoice(voice)}
+								d={_getPathDForVoice(voice)}
 								stroke="white"
 								strokeWidth={1}
 							/>
@@ -99,8 +99,8 @@ const SchedulerVisual = function SchedulerVisual_({scheduledVoices}: Props) {
 				style={{
 					position: 'absolute',
 					fill: 'none',
-					width,
-					height,
+					width: _width,
+					height: _height,
 				}}
 			>
 				<svg
@@ -108,8 +108,8 @@ const SchedulerVisual = function SchedulerVisual_({scheduledVoices}: Props) {
 				>
 					<path
 						d={
-							` M ${width / 2} ${1 * height}` +
-							` L ${width / 2} 0`
+							` M ${_width / 2} ${1 * _height}` +
+							` L ${_width / 2} 0`
 						}
 						stroke="lime"
 						strokeWidth={1}
@@ -121,30 +121,30 @@ const SchedulerVisual = function SchedulerVisual_({scheduledVoices}: Props) {
 	)
 }
 
-function getPathDForVoice(voice: Voice) {
+function _getPathDForVoice(voice: Voice) {
 	const xShift = (-_audioContext.currentTime)
-	const xOffset = width / 2
+	const xOffset = _width / 2
 
 	return (
 		` M ` +
-		`   ${((voice.getScheduledAttackStartTime() + xShift) * xScale) + xOffset} ` +
-		`   ${height}` +
+		`   ${((voice.getScheduledAttackStartTime() + xShift) * _xScale) + xOffset} ` +
+		`   ${_height}` +
 		` L ` +
-		`   ${((voice.getScheduledAttackEndTime() + xShift) * xScale) + xOffset} ` +
-		`   ${(-height * voice.getScheduledSustainAtAttackEnd()) + height}` +
+		`   ${((voice.getScheduledAttackEndTime() + xShift) * _xScale) + xOffset} ` +
+		`   ${(-_height * voice.getScheduledSustainAtAttackEnd()) + _height}` +
 		` L ` +
-		`   ${Math.min(1000, ((voice.getScheduledReleaseStartTimeSeconds() + xShift) * xScale) + xOffset)} ` +
-		`   ${(-height * voice.getScheduledSustainAtReleaseStart()) + height}` +
+		`   ${Math.min(1000, ((voice.getScheduledReleaseStartTimeSeconds() + xShift) * _xScale) + xOffset)} ` +
+		`   ${(-_height * voice.getScheduledSustainAtReleaseStart()) + _height}` +
 		` L ` +
-		`   ${Math.min(1000, ((voice.getScheduledReleaseEndTimeSeconds() + xShift) * xScale) + xOffset)} ` +
-		`                       ${(-height * voice.getScheduledSustainAtReleaseEnd()) + height}`
+		`   ${Math.min(1000, ((voice.getScheduledReleaseEndTimeSeconds() + xShift) * _xScale) + xOffset)} ` +
+		`                       ${(-_height * voice.getScheduledSustainAtReleaseEnd()) + _height}`
 	)
 }
 
 let _instruments = Map<string, OrderedMap<number, Voice>>()
 let _audioContext: AudioContext
 
-function renderSchedulerVisual(id: string, scheduledVoices: OrderedMap<number, Voice>) {
+function _renderSchedulerVisual(id: string, scheduledVoices: OrderedMap<number, Voice>) {
 	const element = document.getElementById('scheduleVisual-' + id)
 
 	if (!element) return logger.warn('missing placeholder element for debug visual: scheduleVisual -' + id)
@@ -167,20 +167,26 @@ export function updateSchedulerVisual(id: string, scheduledVoices: OrderedMap<nu
 	const currentTime = _audioContext.currentTime
 
 	_instruments = _instruments.update(id, x => x.filter(y => y.getScheduledReleaseEndTimeSeconds() >= currentTime - 10))
-
-	// renderSchedulerVisual(id, _instruments.get(id)!)
 }
 
-renderLoop()
+_renderLoop()
 
-function renderLoop() {
-	if (getCurrentSongIsPlaying() && selectOption(_store.getState(), AppOptions.showNoteSchedulerDebug)) {
-		_instruments.forEach((val, key) => {
-			renderSchedulerVisual(key, val)
-		})
+function _renderLoop() {
+	if (
+		_store &&
+		(getCurrentSongIsPlaying() || selectOption(_store.getState(), AppOptions.renderNoteSchedulerDebugWhileStopped)) &&
+		selectOption(_store.getState(), AppOptions.showNoteSchedulerDebug)
+	) {
+		_renderSchedulerVisualForAllInstruments()
 	}
 
-	requestAnimationFrame(renderLoop)
+	requestAnimationFrame(_renderLoop)
+}
+
+function _renderSchedulerVisualForAllInstruments() {
+	_instruments.forEach((val, key) => {
+		_renderSchedulerVisual(key, val)
+	})
 }
 
 window.addEventListener('keydown', e => {

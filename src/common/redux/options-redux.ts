@@ -5,6 +5,15 @@ export enum AppOptions {
 	showNoteNamesOnKeyboard = 'showNoteNamesOnKeyboard',
 	requireCtrlToScroll = 'requireCtrlToScroll',
 	showNoteSchedulerDebug = 'showNoteSchedulerDebug',
+	renderNoteSchedulerDebugWhileStopped = 'renderNoteSchedulerDebugWhileStopped',
+}
+
+const initialState = {
+	showNoteNamesOnKeyboard: true,
+	masterVolume: 0.1,
+	requireCtrlToScroll: true,
+	showNoteSchedulerDebug: false,
+	renderNoteSchedulerDebugWhileStopped: true,
 }
 
 export const SET_OPTION = 'SET_OPTION'
@@ -18,13 +27,6 @@ export const setOption = (option: AppOptions, value: any) => ({
 export const setOptionMasterVolume = setOption.bind(null, AppOptions.masterVolume)
 
 export type IOptionsState = typeof initialState
-
-const initialState = {
-	showNoteNamesOnKeyboard: true,
-	masterVolume: 0.1,
-	requireCtrlToScroll: true,
-	showNoteSchedulerDebug: false,
-}
 
 export const optionsReducer = createReducer(initialState, {
 	[SET_OPTION]: (state, {option, value}: SetOptionAction) => ({

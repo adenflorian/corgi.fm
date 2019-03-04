@@ -41,6 +41,10 @@ export class Options extends React.Component {
 								option={AppOptions.showNoteSchedulerDebug}
 								label="show synth note scheduler debug under synth"
 							/>
+							<ConnectedOption
+								option={AppOptions.renderNoteSchedulerDebugWhileStopped}
+								label="keep rendering note scheduler debug even when song is stopped"
+							/>
 						</div>
 					</div>
 				}
