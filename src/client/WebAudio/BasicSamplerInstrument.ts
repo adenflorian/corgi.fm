@@ -48,7 +48,7 @@ class SamplerVoice extends Voice {
 	}
 
 	public getAudioNodeToStop() {
-		return this._audioBufferSource!
+		return this._audioBufferSource
 	}
 
 	public playNote(note: number, attackTimeInSeconds: number) {

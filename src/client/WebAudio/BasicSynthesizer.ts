@@ -102,9 +102,9 @@ class SynthVoice extends Voice {
 
 	public getAudioNodeToStop() {
 		if (this._oscillatorType === CustomOscillatorType.noise) {
-			return this._whiteNoise!
+			return this._whiteNoise
 		} else {
-			return this._oscillator!
+			return this._oscillator
 		}
 	}
 

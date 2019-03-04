@@ -365,7 +365,7 @@ export abstract class Voice {
 
 	public abstract scheduleNote(note: number, attackTimeInSeconds: number, delaySeconds: number): void
 
-	public abstract getAudioNodeToStop(): AudioScheduledSourceNode
+	public abstract getAudioNodeToStop(): AudioScheduledSourceNode | undefined
 
 	public scheduleRelease(
 		delaySeconds: number,
@@ -412,6 +412,7 @@ export abstract class Voice {
 				// logger.log('originalReleaseLength: ', originalReleaseLength)
 				// logger.log('this._scheduledSustainAtReleaseEnd: ', this._scheduledSustainAtReleaseEnd)
 
+				if (!audioNode) return
 				audioNode.stop(this._scheduledReleaseEndTimeSeconds)
 				return
 			} else {
