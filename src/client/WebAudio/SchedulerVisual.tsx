@@ -141,7 +141,7 @@ function _getPathDForVoice(voice: Voice) {
 	)
 }
 
-let _instruments = Map<string, OrderedMap<number, Voice>>()
+let _instruments = Map<string, () => OrderedMap<number, Voice>>()
 let _audioContext: AudioContext
 
 function _renderSchedulerVisual(id: string, scheduledVoices: OrderedMap<number, Voice>) {
@@ -155,18 +155,10 @@ function _renderSchedulerVisual(id: string, scheduledVoices: OrderedMap<number, 
 	)
 }
 
-export function updateSchedulerVisual(id: string, scheduledVoices: OrderedMap<number, Voice>, audioContext: AudioContext) {
+export function registerInstrumentWithSchedulerVisual(id: string, getScheduledVoices: () => OrderedMap<number, Voice>, audioContext: AudioContext) {
 	if (!_audioContext) _audioContext = audioContext
 
-	if (_instruments.has(id) === false) {
-		_instruments = _instruments.set(id, scheduledVoices)
-	} else {
-		_instruments = _instruments.update(id, x => x.merge(scheduledVoices))
-	}
-
-	const currentTime = _audioContext.currentTime
-
-	_instruments = _instruments.update(id, x => x.filter(y => y.getScheduledReleaseEndTimeSeconds() >= currentTime - 10))
+	_instruments = _instruments.set(id, getScheduledVoices)
 }
 
 _renderLoop()
@@ -185,12 +177,14 @@ function _renderLoop() {
 
 function _renderSchedulerVisualForAllInstruments() {
 	_instruments.forEach((val, key) => {
-		_renderSchedulerVisual(key, val)
+		_renderSchedulerVisual(key, val())
 	})
 }
 
 window.addEventListener('keydown', e => {
 	if (e.key === 'b') {
-		logger.log('_instruments: ', _instruments.toJS())
+		_instruments.forEach((val, key) => {
+			logger.log(`instrument ${key}: `, val().toJS())
+		})
 	}
 })

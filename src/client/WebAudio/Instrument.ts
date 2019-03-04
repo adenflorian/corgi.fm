@@ -33,24 +33,20 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 
 		this._panNode.connect(this._lowPassFilter)
 		this._lowPassFilter.connect(this._gain)
+
+		registerInstrumentWithSchedulerVisual(this.id, () => this._getVoices().getScheduledVoices(), this._audioContext)
 	}
 
 	public scheduleNote(note: IMidiNote, delaySeconds: number) {
 		this._getVoices().scheduleNote(note, delaySeconds, this._attackTimeInSeconds)
-
-		updateSchedulerVisual(this.id, this._getVoices().getScheduledVoices(), this._audioContext)
 	}
 
 	public scheduleRelease(note: number, delaySeconds: number) {
 		this._getVoices().scheduleRelease(note, delaySeconds, this._releaseTimeInSeconds)
-
-		updateSchedulerVisual(this.id, this._getVoices().getScheduledVoices(), this._audioContext)
 	}
 
 	public releaseAllScheduled() {
 		this._getVoices().releaseAllScheduled(this._releaseTimeInSeconds)
-
-		updateSchedulerVisual(this.id, this._getVoices().getScheduledVoices(), this._audioContext)
 	}
 
 	public readonly getInputAudioNode = () => null
