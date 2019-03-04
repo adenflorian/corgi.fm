@@ -17,7 +17,20 @@
 				- need logic in local middleware, but that logic is currently only for local user
 			- [√] midi keyboard
 			- [√] check performance
-		- [ ] fix note length
+		- [√] make note-scanner use note length from event
+		- [ ] handle conflicting note lengths scenarios
+			- scenario A
+				- steps
+					- 2 sequencers going to same synth
+					- 1 note in each, same note, same start, but different length
+				- expected
+					- only the shorter note should be played, every time (ableton way)
+			- scenario B
+				- 2 sequencers going to same synth
+				- seq A [== ===  ]
+				- seq B [==== == ]
+				- exp   [== = =  ] (ableton)
+				- act   varies
 		- [ ] sequencer animations
 		- [ ] master clock play button animation
 		- [ ] rate knob on infinite sequencer
