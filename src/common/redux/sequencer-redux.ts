@@ -38,11 +38,11 @@ export const skipNote = () => ({
 	BROADCASTER_ACTION,
 })
 
-export const createSequencerEvents = (length: number): MidiClipEvents => {
+export const createSequencerEvents = (length: number, ratio = 1): MidiClipEvents => {
 	return makeSequencerEvents(
 		new Array(length)
 			.fill(0)
-			.map((_, i) => makeMidiClipEvent({notes: emptyMidiNotes, startBeat: i, durationBeats: 0.5})),
+			.map((_, i) => makeMidiClipEvent({notes: emptyMidiNotes, startBeat: i * ratio, durationBeats: 1 * ratio})),
 	)
 }
 

@@ -48,7 +48,7 @@ const defaultGlobalClockState = {
 	isPlaying: false,
 	playCount: 0,
 	bpm: 120,
-	maxReadAheadSeconds: 0.1,
+	maxReadAheadSeconds: 0.2,
 }
 
 const makeGlobalClockState = Record(defaultGlobalClockState)

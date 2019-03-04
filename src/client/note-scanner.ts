@@ -1,6 +1,6 @@
 import {Map} from 'immutable'
 import {logger} from '../common/logger'
-import {makeMidiClip, MidiRange} from '../common/midi-types'
+import {makeMidiClip, MidiGlobalClipEvent, MidiRange} from '../common/midi-types'
 import {IMidiNotes} from '../common/MidiNote'
 import {
 	ClientStore, selectAllSequencers, selectConnectionSourceIdsByTarget,
@@ -103,7 +103,7 @@ function scheduleNotes() {
 	const beatsToRead = Math.max(minBeatsToRead, cursorDestinationBeats - _cursorBeats)
 
 	// distance from currentSongTime to where the cursor just started reading events from
-	const offset = _cursorBeats - currentSongTimeBeats
+	const offsetBeats = _cursorBeats - currentSongTimeBeats
 
 	const readRangeBeats = new MidiRange(_cursorBeats, beatsToRead)
 
@@ -140,31 +140,31 @@ function scheduleNotes() {
 
 		// console.log('sourceIds: ', sourceIds)
 
-		const eventsToSchedule = Map<number, IMidiNotes>().withMutations(mutable => {
+		const eventsToSchedule = Map<number, MidiGlobalClipEvent>().withMutations(mutableEvents => {
 			sequencersEvents.filter((_, id) => sourceIds.includes(id))
 				.toList()
 				.flatMap(x => x).forEach(event => {
-					if (mutable.has(event.startTime)) {
-						mutable.update(event.startTime, x => x.union(event.notes))
+					if (mutableEvents.has(event.startTime)) {
+						mutableEvents.update(event.startTime, x => ({...x, notes: x.notes.union(event.notes)}))
 					} else {
-						mutable.set(event.startTime, event.notes)
+						mutableEvents.set(event.startTime, event)
 					}
 				})
 		})
 
-		eventsToSchedule.forEach((notes, startTime) => {
+		eventsToSchedule.forEach(event => {
 			// logger.log('scheduleNote currentSongTimeBeats: ', currentSongTimeBeats)
 			// logger.log('offset: ', offset)
 			// logger.log('event.startTime: ', event.startTime)
-			const delaySeconds = ((offset + startTime) * (60 / actualBPM))
+			const delaySecondsUntilStart = ((offsetBeats + event.startTime) * (60 / actualBPM))
 
-			const noteLength = 0.1
+			const delaySecondsUntilRelease = ((offsetBeats + event.endTime) * (60 / actualBPM))
 
-			notes.forEach(note => {
+			event.notes.forEach(note => {
 				// console.log('actualNote: ' + note + ' | delaySeconds: ' + delaySeconds)
 				// console.log('gridSeq: ', gridSeq)
-				instrument.scheduleNote(note, delaySeconds)
-				instrument.scheduleRelease(note, delaySeconds + noteLength)
+				instrument.scheduleNote(note, delaySecondsUntilStart)
+				instrument.scheduleRelease(note, delaySecondsUntilRelease)
 			})
 		})
 
