@@ -100,6 +100,14 @@ class SynthVoice extends Voice {
 		}
 	}
 
+	public getAudioNodeToStop() {
+		if (this._oscillatorType === CustomOscillatorType.noise) {
+			return this._whiteNoise!
+		} else {
+			return this._oscillator!
+		}
+	}
+
 	public playNote(note: number, attackTimeInSeconds: number) {
 		this._beforePlayNote(attackTimeInSeconds)
 
@@ -119,17 +127,6 @@ class SynthVoice extends Voice {
 		}
 
 		this.playingNote = note
-	}
-
-	public scheduleRelease(delaySeconds: number, releaseSeconds: number, onEnded: () => void) {
-
-		if (this._oscillatorType === CustomOscillatorType.noise) {
-			// TODO
-		} else {
-			this._scheduleReleaseNormalNote(delaySeconds, releaseSeconds, onEnded)
-		}
-
-		this._isReleaseScheduled = true
 	}
 
 	public setOscillatorType(newOscType: ShamuOscillatorType) {
@@ -172,10 +169,6 @@ class SynthVoice extends Voice {
 
 		this._oscillator.connect(this._gain)
 			.connect(this._destination)
-	}
-
-	private _scheduleReleaseNormalNote(delaySeconds: number, releaseSeconds: number, onEnded: () => void) {
-		this._scheduleReleaseNormalNoteGeneric(delaySeconds, releaseSeconds, this._oscillator, onEnded)
 	}
 
 	private _playSynthNote(note: number) {

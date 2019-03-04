@@ -47,6 +47,10 @@ class SamplerVoice extends Voice {
 		this._gain.connect(this._destination)
 	}
 
+	public getAudioNodeToStop() {
+		return this._audioBufferSource!
+	}
+
 	public playNote(note: number, attackTimeInSeconds: number) {
 		this._beforePlayNote(attackTimeInSeconds)
 
@@ -62,12 +66,6 @@ class SamplerVoice extends Voice {
 		this._scheduleNormalNote(note, attackTimeInSeconds, delaySeconds)
 
 		this.playingNote = note
-	}
-
-	public scheduleRelease(delaySeconds: number, releaseSeconds: number, onEnded: () => void) {
-		this._scheduleReleaseNormalNote(delaySeconds, releaseSeconds, onEnded)
-
-		this._isReleaseScheduled = true
 	}
 
 	public dispose() {
@@ -93,10 +91,6 @@ class SamplerVoice extends Voice {
 
 		this._audioBufferSource.connect(this._gain)
 			.connect(this._destination)
-	}
-
-	private _scheduleReleaseNormalNote(delaySeconds: number, releaseSeconds: number, onEnded: () => void) {
-		this._scheduleReleaseNormalNoteGeneric(delaySeconds, releaseSeconds, this._audioBufferSource, onEnded)
 	}
 
 	private _playSamplerNote(note: number) {

@@ -47,6 +47,12 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 		updateSchedulerVisual(this.id, this._getVoices().getScheduledVoices(), this._audioContext)
 	}
 
+	public releaseAllScheduled() {
+		this._getVoices().releaseAllScheduled()
+
+		updateSchedulerVisual(this.id, this._getVoices().getScheduledVoices(), this._audioContext)
+	}
+
 	public readonly getInputAudioNode = () => null
 	public readonly getOutputAudioNode = () => this._gain
 
@@ -240,6 +246,12 @@ export abstract class Voices<V extends Voice> {
 		}
 	}
 
+	public releaseAllScheduled() {
+		this._scheduledVoices.forEach(x => {
+			// x.scheduleRelease(0, -1, this._getOnEndedCallback(x.id))
+		})
+	}
+
 	public getActivityLevel = () => {
 		if (this._activeVoices.count() > 0) return 1
 		if (this._releasingVoices.count() > 0) return 0.5
@@ -353,16 +365,14 @@ export abstract class Voice {
 
 	public abstract scheduleNote(note: number, attackTimeInSeconds: number, delaySeconds: number): void
 
-	public abstract scheduleRelease(delaySeconds: number, releaseSeconds: number, onEnded: () => void): void
+	public abstract getAudioNodeToStop(): AudioScheduledSourceNode
 
-	public abstract dispose(): void
-
-	protected _scheduleReleaseNormalNoteGeneric(
+	public scheduleRelease(
 		delaySeconds: number,
 		releaseSeconds: number,
-		audioNode: AudioScheduledSourceNode | undefined,
 		onEnded: () => void,
 	) {
+		const audioNode = this.getAudioNodeToStop()
 
 		if (this._isReleaseScheduled) {
 
@@ -398,40 +408,13 @@ export abstract class Voice {
 				// logger.log('originalReleaseLength: ', originalReleaseLength)
 				// logger.log('this._scheduledSustainAtReleaseEnd: ', this._scheduledSustainAtReleaseEnd)
 
-				if (!audioNode) return
 				audioNode.stop(this._scheduledReleaseEndTimeSeconds)
 				return
 			} else {
-				// logger.log('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
-				// logger.log('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
-				// logger.log('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
-				// TODO ??
-				// If we try to schedule ramps and stuff, we need to cancel existing ones from last release
-				// if new release time is during:
-				//   - attack     already have code for this i think
-				//   - sustain    easy, cancel and hold, then go from there, except cancel and hold is instant?
-				// if (this._scheduledReleaseStartTimeSeconds < this._scheduledAttackEndTimeSeconds) {
-				// 	logger.log('BBBBBBBBBBBBBBBBB')
-				// 	// if release start is during attack, cancel and hold, calculate target sustain, and continue ramping to it
-				// 	// TODO This is assuming that it is currently in attack
-				// 	this._cancelAndHoldOrJustCancel()
-				// 	// for linear attack only, need different math for other attack curves
-				// 	const originalAttackLength = this._scheduledAttackEndTimeSeconds - this._scheduledAttackStartTimeSeconds
-				// 	const newAttackLength = this._scheduledReleaseStartTimeSeconds - this._scheduledAttackStartTimeSeconds
-				// 	const ratio = newAttackLength / originalAttackLength
-				// 	const targetSustainAtReleaseStart = ratio * this._sustainLevel
-				// 	this._gain.gain.linearRampToValueAtTime(targetSustainAtReleaseStart, this._scheduledReleaseStartTimeSeconds)
-
-				// 	this._scheduledAttackEndTimeSeconds = this._scheduledReleaseStartTimeSeconds
-				// 	this._scheduledSustainAtAttackEnd = targetSustainAtReleaseStart
-				// 	this._scheduledSustainAtReleaseStart = targetSustainAtReleaseStart
-				// } else {
-				// 	logger.log('CCCCCCCCCCCCCCCCC')
-				// 	// if release start is during sustain
-				// 	this._gain.gain.linearRampToValueAtTime(this._sustainLevel, this._scheduledReleaseStartTimeSeconds)
-				// }
-				// return
+				// Let it do normal release stuff
 			}
+		} else {
+			this._isReleaseScheduled = true
 		}
 
 		// every time we release
@@ -471,6 +454,8 @@ export abstract class Voice {
 			onEnded()
 		}
 	}
+
+	public abstract dispose(): void
 
 	protected _beforePlayNote(attackTimeInSeconds: number) {
 		this._cancelAndHoldOrJustCancelAtTime()
