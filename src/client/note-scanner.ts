@@ -74,6 +74,10 @@ function scheduleNotes() {
 		if (isPlaying) {
 			_justStarted = true
 			songStartTimeSeconds = _audioContext.currentTime
+		} else {
+			// song stopped
+			// release all notes on all instruments
+			releaseAllNotesOnAllInstruments()
 		}
 	}
 
@@ -172,4 +176,8 @@ function scheduleNotes() {
 
 	_cursorBeats += beatsToRead
 	_justStarted = false
+}
+
+function releaseAllNotesOnAllInstruments() {
+	getAllInstruments().forEach(x => x.releaseAllScheduled())
 }

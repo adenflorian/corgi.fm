@@ -48,7 +48,7 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 	}
 
 	public releaseAllScheduled() {
-		this._getVoices().releaseAllScheduled()
+		this._getVoices().releaseAllScheduled(this._releaseTimeInSeconds)
 
 		updateSchedulerVisual(this.id, this._getVoices().getScheduledVoices(), this._audioContext)
 	}
@@ -246,9 +246,9 @@ export abstract class Voices<V extends Voice> {
 		}
 	}
 
-	public releaseAllScheduled() {
+	public releaseAllScheduled(releaseSeconds: number) {
 		this._scheduledVoices.forEach(x => {
-			// x.scheduleRelease(0, -1, this._getOnEndedCallback(x.id))
+			x.scheduleRelease(0, releaseSeconds, this._getOnEndedCallback(x.id), true)
 		})
 	}
 
@@ -371,6 +371,7 @@ export abstract class Voice {
 		delaySeconds: number,
 		releaseSeconds: number,
 		onEnded: () => void,
+		releaseIfNotCurrentlyReleasing = false,
 	) {
 		const audioNode = this.getAudioNodeToStop()
 
@@ -384,6 +385,9 @@ export abstract class Voice {
 			const newReleaseStartTime = this._audioContext.currentTime + delaySeconds
 
 			if (newReleaseStartTime >= this._scheduledReleaseStartTimeSeconds) {
+
+				if (releaseIfNotCurrentlyReleasing) return
+
 				// This means its a hard cutoff in the middle of a releasing voice
 				//   because another voice is starting on same note
 				// logger.log('!!! newReleaseStartTime >= this._scheduledReleaseStartTimeSeconds')
@@ -422,12 +426,23 @@ export abstract class Voice {
 		this._scheduledReleaseStartTimeSeconds = this._audioContext.currentTime + delaySeconds
 		this._scheduledReleaseEndTimeSeconds = this._audioContext.currentTime + delaySeconds + releaseSeconds
 
-		// logger.log(this.id + ' synth scheduleRelease delay: ' + delaySeconds + ' | release: ' + releaseSeconds + ' | stop: ' + this._scheduledReleaseEndTimeSeconds)
+		// logger.log('synth scheduleRelease', {
+		// 	id: this.id,
+		// 	delaySeconds,
+		// 	releaseSeconds,
+		// 	_scheduledReleaseStartTimeSeconds: this._scheduledReleaseStartTimeSeconds,
+		// 	_scheduledReleaseEndTimeSeconds: this._scheduledReleaseEndTimeSeconds,
+		// })
 
-		this._cancelAndHoldOrJustCancelAtTime(this._scheduledReleaseStartTimeSeconds)
+		// If cancelAndHold is called with a past time it doesn't work
+		this._cancelAndHoldOrJustCancelAtTime(
+			releaseIfNotCurrentlyReleasing
+				? undefined
+				: Math.max(this._audioContext.currentTime + 0.0001, this._scheduledReleaseStartTimeSeconds),
+		)
 		if (this._scheduledAttackEndTimeSeconds < this._scheduledReleaseStartTimeSeconds) {
 			// if release start is during sustain
-			this._gain.gain.linearRampToValueAtTime(this._sustainLevel, this._scheduledReleaseStartTimeSeconds)
+			this._gain.gain.linearRampToValueAtTime(this._scheduledSustainAtAttackEnd, this._scheduledReleaseStartTimeSeconds)
 		} else {
 			// if release start is during attack, cancel and hold, calculate target sustain, and continue ramping to it
 			// TODO This is assuming that it is currently in attack
@@ -435,12 +450,19 @@ export abstract class Voice {
 			const originalAttackLength = this._scheduledAttackEndTimeSeconds - this._scheduledAttackStartTimeSeconds
 			const newAttackLength = this._scheduledReleaseStartTimeSeconds - this._scheduledAttackStartTimeSeconds
 			const ratio = newAttackLength / originalAttackLength
-			const targetSustainAtReleaseStart = ratio * this._sustainLevel
+			const targetSustainAtReleaseStart = ratio * this._scheduledSustainAtAttackEnd
 			// this._gain.gain.linearRampToValueAtTime(targetSustainAtReleaseStart, this._scheduledReleaseStartTimeSeconds)
 
 			this._scheduledAttackEndTimeSeconds = this._scheduledReleaseStartTimeSeconds
 			this._scheduledSustainAtAttackEnd = targetSustainAtReleaseStart
 			this._scheduledSustainAtReleaseStart = targetSustainAtReleaseStart
+			// logger.log('AAA: ', {
+			// 	releaseSeconds,
+			// 	originalAttackLength,
+			// 	newAttackLength,
+			// 	ratio,
+			// 	targetSustainAtReleaseStart,
+			// })
 		}
 
 		this._gain.gain.exponentialRampToValueAtTime(0.00001, this._scheduledReleaseEndTimeSeconds)

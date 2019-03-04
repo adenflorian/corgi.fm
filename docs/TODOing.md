@@ -34,9 +34,15 @@
 		- [ ] sequencer animations
 		- [ ] master clock play button animation
 		- [ ] rate knob on infinite sequencer
+		- [√] release all notes on stop
+		- [ ] stopping song shouldnt release notes being played by user
+		- [ ] what does ableton do when you stop and there is a note with a really long release
 	- **Bugs**
 		- [ ] 2019-03-03 Note getting stuck on when just sequencers are playing at normal speed
 			- put all 4 sequencers into same synth, with default release
+		- [ ] 2019-03-03 When playing note on keyboard and change connection, note keeps playing on previous instrument
+			- need to somehow stop those notes
+			- maybe need a sourceId for each event/note?
 
 # Soon
 - [ ] allow adding connections from a node with no connections on it already
