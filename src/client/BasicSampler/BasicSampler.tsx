@@ -8,6 +8,7 @@ import {
 } from '../../common/redux'
 import {Knob} from '../Knob/Knob'
 import {Panel} from '../Panel/Panel'
+import {ConnectedNoteSchedulerVisualPlaceholder} from '../WebAudio/SchedulerVisual'
 import './BasicSampler.less'
 
 interface IBasicSamplerProps {
@@ -30,54 +31,57 @@ export class BasicSampler extends React.PureComponent<IBasicSamplerAllProps> {
 		const {color, isPlaying} = this.props
 
 		return (
-			<Panel
-				className={`${isPlaying ? 'isPlaying' : 'isNotPlaying'}`}
-				id={this.props.id}
-				color={color}
-				saturate={isPlaying}
-			>
-				<div className="basicSampler">
-					<div className="samplerLabel colorize">Piano Sampler</div>
+			<React.Fragment>
+				<Panel
+					className={`${isPlaying ? 'isPlaying' : 'isNotPlaying'}`}
+					id={this.props.id}
+					color={color}
+					saturate={isPlaying}
+				>
+					<div className="basicSampler">
+						<div className="samplerLabel colorize">Piano Sampler</div>
 
-					<div className="knobs">
-						<Knob
-							min={-1}
-							max={1}
-							value={this.props.pan}
-							onChange={this._dispatchChangeInstrumentParam}
-							label="pan"
-							onChangeId={BasicSamplerParam.pan}
-						/>
-						<Knob
-							min={0}
-							max={10000}
-							curve={2}
-							value={this.props.lowPassFilterCutoffFrequency}
-							onChange={this._dispatchChangeInstrumentParam}
-							label="lpf"
-							onChangeId={BasicSamplerParam.lowPassFilterCutoffFrequency}
-						/>
-						<Knob
-							min={0.01}
-							max={10}
-							curve={3}
-							value={this.props.attack}
-							onChange={this._dispatchChangeInstrumentParam}
-							label="attack"
-							onChangeId={BasicSamplerParam.attack}
-						/>
-						<Knob
-							min={0.01}
-							max={60}
-							curve={2}
-							value={this.props.release}
-							onChange={this._dispatchChangeInstrumentParam}
-							label="release"
-							onChangeId={BasicSamplerParam.release}
-						/>
+						<div className="knobs">
+							<Knob
+								min={-1}
+								max={1}
+								value={this.props.pan}
+								onChange={this._dispatchChangeInstrumentParam}
+								label="pan"
+								onChangeId={BasicSamplerParam.pan}
+							/>
+							<Knob
+								min={0}
+								max={10000}
+								curve={2}
+								value={this.props.lowPassFilterCutoffFrequency}
+								onChange={this._dispatchChangeInstrumentParam}
+								label="lpf"
+								onChangeId={BasicSamplerParam.lowPassFilterCutoffFrequency}
+							/>
+							<Knob
+								min={0.01}
+								max={10}
+								curve={3}
+								value={this.props.attack}
+								onChange={this._dispatchChangeInstrumentParam}
+								label="attack"
+								onChangeId={BasicSamplerParam.attack}
+							/>
+							<Knob
+								min={0.01}
+								max={60}
+								curve={2}
+								value={this.props.release}
+								onChange={this._dispatchChangeInstrumentParam}
+								label="release"
+								onChangeId={BasicSamplerParam.release}
+							/>
+						</div>
 					</div>
-				</div>
-			</Panel>
+				</Panel>
+				<ConnectedNoteSchedulerVisualPlaceholder id={this.props.id} />
+			</React.Fragment>
 		)
 	}
 

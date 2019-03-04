@@ -3,7 +3,7 @@ import * as React from 'react'
 import ReactDOM from 'react-dom'
 import {Store} from 'redux'
 import {logger} from '../../common/logger'
-import {AppOptions, IClientAppState, selectOption} from '../../common/redux'
+import {AppOptions, IClientAppState, selectOption, shamuConnect} from '../../common/redux'
 import {getCurrentSongIsPlaying} from '../note-scanner'
 import {Voice} from './Instrument'
 
@@ -20,6 +20,43 @@ let _store: Store<IClientAppState>
 export function setStoreForSchedulerVisual(store: Store<IClientAppState>) {
 	_store = store
 }
+
+interface NoteSchedulerVisualPlaceholderProps {
+	id: string
+}
+
+interface NoteSchedulerVisualPlaceholderReduxProps {
+	showNoteSchedulerDebug: boolean
+}
+
+type NoteSchedulerVisualPlaceholderAllProps = NoteSchedulerVisualPlaceholderProps & NoteSchedulerVisualPlaceholderReduxProps
+
+export const NoteSchedulerVisualPlaceholder =
+	React.memo(function _NoteSchedulerVisualPlaceholder(props: NoteSchedulerVisualPlaceholderAllProps) {
+		if (props.showNoteSchedulerDebug) {
+			return (
+				<div
+					id={'scheduleVisual-' + props.id}
+					style={{
+						pointerEvents: 'none',
+						position: 'relative',
+						top: 2,
+						backgroundColor: '#29292f40',
+						height: 50,
+					}}
+				>
+				</div>
+			)
+		} else {
+			return null
+		}
+	})
+
+export const ConnectedNoteSchedulerVisualPlaceholder = shamuConnect(
+	state => ({
+		showNoteSchedulerDebug: selectOption(state, AppOptions.showNoteSchedulerDebug) as boolean,
+	}),
+)(NoteSchedulerVisualPlaceholder)
 
 const SchedulerVisual = function SchedulerVisual_({scheduledVoices}: Props) {
 	return (
@@ -108,6 +145,10 @@ let _instruments = Map<string, OrderedMap<number, Voice>>()
 let _audioContext: AudioContext
 
 function renderSchedulerVisual(id: string, scheduledVoices: OrderedMap<number, Voice>) {
+	const element = document.getElementById('scheduleVisual-' + id)
+
+	if (!element) return logger.warn('missing placeholder element for debug visual: scheduleVisual -' + id)
+
 	ReactDOM.render(
 		<SchedulerVisual scheduledVoices={scheduledVoices} />,
 		document.getElementById('scheduleVisual-' + id),
@@ -133,7 +174,7 @@ export function updateSchedulerVisual(id: string, scheduledVoices: OrderedMap<nu
 renderLoop()
 
 function renderLoop() {
-	if (getCurrentSongIsPlaying() && selectOption(_store.getState(), AppOptions.showSynthNoteSchedulerDebug)) {
+	if (getCurrentSongIsPlaying() && selectOption(_store.getState(), AppOptions.showNoteSchedulerDebug)) {
 		_instruments.forEach((val, key) => {
 			renderSchedulerVisual(key, val)
 		})

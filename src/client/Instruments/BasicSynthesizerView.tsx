@@ -5,7 +5,7 @@ import {Dispatch} from 'redux'
 import {IMidiNotes} from '../../common/MidiNote'
 import {ShamuOscillatorType} from '../../common/OscillatorTypes'
 import {
-	AppOptions, BasicSynthesizerParam, selectBasicSynthesizer, selectOption, setBasicSynthesizerOscillatorType, setBasicSynthesizerParam,
+	BasicSynthesizerParam, selectBasicSynthesizer, setBasicSynthesizerOscillatorType, setBasicSynthesizerParam,
 } from '../../common/redux'
 import {IClientAppState} from '../../common/redux'
 import {
@@ -13,6 +13,7 @@ import {
 } from '../../common/redux'
 import {Knob} from '../Knob/Knob'
 import {Panel} from '../Panel/Panel'
+import {ConnectedNoteSchedulerVisualPlaceholder} from '../WebAudio/SchedulerVisual'
 import {BasicSynthesizerOscillatorTypes} from './BasicSynthesizerOscillatorTypes'
 import './BasicSynthesizerView.less'
 
@@ -33,7 +34,6 @@ interface IBasicSynthesizerViewReduxProps {
 	lowPassFilterCutoffFrequency: number
 	attack: number
 	release: number
-	showSynthNoteSchedulerDebug: boolean
 	fineTuning: number
 }
 
@@ -108,19 +108,7 @@ export class BasicSynthesizerView
 						</div>
 					</div>
 				</Panel>
-				{this.props.showSynthNoteSchedulerDebug &&
-					<div
-						id={'scheduleVisual-' + this.props.id}
-						style={{
-							pointerEvents: 'none',
-							position: 'relative',
-							top: 2,
-							backgroundColor: '#29292f40',
-							height: 50,
-						}}
-					>
-					</div>
-				}
+				<ConnectedNoteSchedulerVisualPlaceholder id={this.props.id} />
 			</React.Fragment>
 		)
 	}
@@ -150,7 +138,6 @@ export const ConnectedBasicSynthesizerView = connect(
 			attack: instrumentState.attack,
 			release: instrumentState.release,
 			fineTuning: instrumentState.fineTuning,
-			showSynthNoteSchedulerDebug: selectOption(state, AppOptions.showSynthNoteSchedulerDebug) as boolean,
 		}
 	},
 )(
