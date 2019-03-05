@@ -82,6 +82,7 @@
 						- should probably just clean up how the synth voice handles noise vs other types
 
 # Soon
+- [ ] don't change current notes on keyboard when changing octave (at least not by default; something to put in options?)
 - [ ] allow adding connections from a node with no connections on it already
 	- [ ] split up ConnectionView
 		- [ ] Connector component
