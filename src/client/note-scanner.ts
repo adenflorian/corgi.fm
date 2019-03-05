@@ -17,10 +17,11 @@ export function startNoteScanner(store: ClientStore, audioContext: AudioContext)
 	logger.log('startNoteScanner')
 	_store = store
 	_audioContext = audioContext
+	stop = false
 	requestAnimationFrame(() => mainLoop(currentLoopId))
 }
 
-let stop = false
+let stop = true
 
 let isActiveTab = true
 
