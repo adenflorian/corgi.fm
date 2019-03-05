@@ -5,3 +5,4 @@ BUGS
 - [ ] changing room thru selector doesn't completely pick up new user name if changed in previous room?
 - [ ] when hooking up reverb and changing filter to 0 it can cause a loud sound which triggers the master volume safety
 - [ ] when ableton is open, shamu wont recognize midi keyboard
+- [ ] new options are getting wiped by options from localstorage
