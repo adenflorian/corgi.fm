@@ -82,7 +82,11 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 		this._previousNotes = midiNotes
 	}
 
-	public readonly setAttack = (attackTimeInSeconds: number) => this._attackTimeInSeconds = attackTimeInSeconds
+	public readonly setAttack = (attackTimeInSeconds: number) => {
+		if (this._attackTimeInSeconds === attackTimeInSeconds) return
+		this._attackTimeInSeconds = attackTimeInSeconds
+		this._getVoices().changeAttackForScheduledVoices(this._attackTimeInSeconds)
+	}
 
 	public readonly setRelease = (releaseTimeInSeconds: number) => this._releaseTimeInSeconds = releaseTimeInSeconds
 
@@ -244,6 +248,16 @@ export abstract class Voices<V extends Voice> {
 	public releaseAllScheduled(releaseSeconds: number) {
 		this._scheduledVoices.forEach(x => {
 			x.scheduleRelease(0, releaseSeconds, true)
+		})
+	}
+
+	public changeAttackForScheduledVoices(newAttackSeconds: number) {
+		// ask each voice to update attack?
+		// do we need to filter first?
+		// maybe only voices that...
+		// just do all for now
+		this._scheduledVoices.forEach(x => {
+			x.changeScheduledAttack(newAttackSeconds)
 		})
 	}
 
@@ -476,6 +490,24 @@ export abstract class Voice {
 			delete this._gain
 			this._onEnded(this.id)
 		}
+	}
+
+	public changeScheduledAttack(newAttackSeconds: number) {
+		/*
+		cases:
+			- before attack
+				- reschedule everything
+			- during attack
+				- reschedule everything
+			- after attack
+				- ignore
+
+		will it matter if release has already been scheduled? 🤷‍
+		*/
+
+		// If attack already finished
+		if (this.getScheduledAttackEndTime() < this._audioContext.currentTime) return
+
 	}
 
 	public abstract dispose(): void

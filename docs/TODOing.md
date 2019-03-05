@@ -39,17 +39,19 @@
 		- what does ableton do when you stop and there is a note with a really long release
 			- it just keeps on releasing, even when you hit play again
 			- but you can adjust release of note that are already releasing, in serum at least
-		- [ ] allow adjusting release of currently releasing notes
-		- [ ] get noise osc on synth working with schedules
+		- [√] get noise osc on synth working with schedules
 		- [ ] make instrument params affect currently playing notes
 			- [√] pan
 			- [√] filter
 			- [ ] attack
+				- how?
+				- cancelAndHold?
+				- how to know when to adjust?
 			- [ ] release
 			- [√] detune
-			- [ ] osc type
-				- [ ] normal
-				- [ ] noise
+			- [√] osc type
+				- [√] normal
+				- [√] noise
 	- **Bugs**
 		- [ ] 2019-03-03 Note getting stuck on when just sequencers are playing at normal speed
 			- put all 4 sequencers into same synth, with default release
