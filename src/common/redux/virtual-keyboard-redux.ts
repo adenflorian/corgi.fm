@@ -130,7 +130,7 @@ function virtualKeyboardReducer(virtualKeyboard: IVirtualKeyboardState, action: 
 		case VIRTUAL_OCTAVE_CHANGE:
 			return {
 				...virtualKeyboard,
-				octave: virtualKeyboard.octave + action.delta,
+				octave: Math.max(-10, Math.min(20, virtualKeyboard.octave + action.delta)),
 			}
 		default:
 			return virtualKeyboard
