@@ -1,4 +1,4 @@
-import {OrderedMap} from 'immutable'
+import {OrderedMap, Record} from 'immutable'
 import uuid = require('uuid')
 import {IDisposable} from '../../common/common-types'
 import {logger} from '../../common/logger'
@@ -503,11 +503,28 @@ export abstract class Voice {
 				- ignore
 
 		will it matter if release has already been scheduled? 🤷‍
+
+		maybe I should make a separate envelope class
+
+		or a function to apply envelope to a gain and scheduled source node
 		*/
 
 		// If attack already finished
 		if (this.getScheduledAttackEndTime() < this._audioContext.currentTime) return
 
+	}
+
+	public applyEnvelope(envelope: Envelope) {
+		// need gain and source node
+		// this._gain
+		// this.getAudioNodeToStop()
+		// got em
+
+		// what will schedule note look like?
+		// currently its handled by the voice impl
+		// have public func on Voice and inner ones for the impls
+
+		// this is more complicated than it has to be because im still supporting the old system in same classes
 	}
 
 	public abstract dispose(): void
@@ -544,3 +561,28 @@ export abstract class Voice {
 		}
 	}
 }
+
+const makeEnvelope = Record({
+	attackStart: 0,
+	releaseStart: 0,
+	hardCutoffTime: 0,
+	attack: 0.005,
+	decay: 0.0,
+	sustain: 1.0,
+	release: 0.10,
+})
+
+// class Envelope {
+// 	public readonly attackStart = 0
+// 	public readonly releaseStart = 0
+// 	public readonly hardCutoffTime = 0
+// 	public readonly attack = 0.005
+// 	public readonly decay = 0.0
+// 	public readonly sustain = 1.0
+// 	public readonly release = 0.10
+
+// 	constructor(
+// 	) {}
+// }
+
+type Envelope = ReturnType<typeof makeEnvelope>

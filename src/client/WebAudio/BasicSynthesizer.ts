@@ -184,6 +184,7 @@ class SynthVoice extends Voice {
 		this._oscillator = this._audioContext.createOscillator()
 		this._oscillator.type = this._oscillatorType as OscillatorType
 		this._oscillator.detune.value = this._detune
+		// TODO Just set it immediately
 		this._oscillator.frequency.setValueAtTime(midiNoteToFrequency(note), this._audioContext.currentTime)
 		this._oscillator.start(this._scheduledAttackStartTimeSeconds)
 

@@ -47,6 +47,8 @@
 				- how?
 				- cancelAndHold?
 				- how to know when to adjust?
+				- [ ] Refactor instrument stuff to separate scheduled and legacy stuff
+					- [ ] ScheduledVoice
 			- [ ] release
 			- [√] detune
 			- [√] osc type
