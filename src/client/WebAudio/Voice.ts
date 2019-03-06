@@ -203,19 +203,6 @@ export abstract class Voice {
 
 	}
 
-	public applyEnvelope(envelope: Envelope) {
-		// need gain and source node
-		// this._gain
-		// this.getAudioNodeToStop()
-		// got em
-
-		// what will schedule note look like?
-		// currently its handled by the voice impl
-		// have public func on Voice and inner ones for the impls
-
-		// this is more complicated than it has to be because im still supporting the old system in same classes
-	}
-
 	public abstract dispose(): void
 
 	protected _dispose() {
@@ -236,14 +223,45 @@ export abstract class Voice {
 	}
 }
 
-const makeEnvelope = Record({
+function applyEnvelope(
+	envelope: ScheduledEnvelope,
+	gain: GainNode,
+	sourceNode: AudioScheduledSourceNode,
+	audioContext: AudioContext,
+	startSource: boolean,
+	onEnded: () => void,
+) {
+	// attack start
+	gain.gain.cancelScheduledValues(audioContext.currentTime)
+	gain.gain.value = 0
+	gain.gain.linearRampToValueAtTime(0, envelope.attackStart)
+	gain.gain.linearRampToValueAtTime(envelope.sustain, envelope.attackStart + envelope.attackLength)
+
+	if (startSource) {
+		sourceNode.start(envelope.attackStart)
+	}
+
+	// TODO Handle cutoff attack and cutoff release
+
+	// attack end
+	gain.gain.linearRampToValueAtTime(envelope.sustain, envelope.releaseStart)
+
+	// release start
+	gain.gain.exponentialRampToValueAtTime(0.00001, envelope.releaseStart + envelope.releaseLength)
+
+	// release end
+	sourceNode.stop(envelope.releaseStart + envelope.releaseLength)
+	sourceNode.onended = onEnded
+}
+
+const makeScheduledEnvelope = Record({
 	attackStart: 0,
 	releaseStart: 0,
 	hardCutoffTime: 0,
-	attack: 0.005,
+	attackLength: 0.005,
 	decay: 0.0,
 	sustain: 1.0,
-	release: 0.10,
+	releaseLength: 0.10,
 })
 
 // class Envelope {
@@ -259,4 +277,5 @@ const makeEnvelope = Record({
 // 	) {}
 // }
 
-type Envelope = ReturnType<typeof makeEnvelope>
+/** All times in seconds */
+type ScheduledEnvelope = ReturnType<typeof makeScheduledEnvelope>
