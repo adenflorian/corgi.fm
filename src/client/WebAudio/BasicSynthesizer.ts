@@ -109,7 +109,7 @@ class SynthVoice extends Voice {
 	}
 
 	// TODO Maybe change to just stopAudioNode
-	public getAudioNodeToStop() {
+	public getAudioScheduledSourceNode() {
 		if (this._oscillatorType === CustomOscillatorType.noise) {
 			return this._whiteNoise
 		} else {

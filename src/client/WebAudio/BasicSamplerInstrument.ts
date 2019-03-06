@@ -57,7 +57,7 @@ class SamplerVoice extends Voice {
 		this._gain.connect(this._destination)
 	}
 
-	public getAudioNodeToStop() {
+	public getAudioScheduledSourceNode() {
 		return this._audioBufferSource
 	}
 

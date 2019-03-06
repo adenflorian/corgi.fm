@@ -52,6 +52,8 @@ export abstract class Voice {
 
 	public getReleaseId = () => this._releaseId
 
+	public abstract getAudioScheduledSourceNode(): AudioScheduledSourceNode | undefined
+
 	public abstract playNote(note: number, attackTimeInSeconds: number): void
 
 	protected _beforePlayNote(attackTimeInSeconds: number) {
@@ -95,29 +97,24 @@ export abstract class Voice {
 		this._gain.gain.linearRampToValueAtTime(0, this._scheduledAttackStartTimeSeconds)
 		this._gain.gain.linearRampToValueAtTime(this._sustainLevel, this._scheduledAttackEndTimeSeconds)
 
-		// logger.log(this.id + ' synth scheduleNote delaySeconds: ' + delaySeconds + ' | note: ' + note + ' | attackTimeInSeconds: ' + attackTimeInSeconds)
-
-		this.getAudioNodeToStop()!.connect(this._gain)
+		this.getAudioScheduledSourceNode()!.connect(this._gain)
 			.connect(this._destination)
 
-		this.getAudioNodeToStop()!.start(this._scheduledAttackStartTimeSeconds)
+		this.getAudioScheduledSourceNode()!.start(this._scheduledAttackStartTimeSeconds)
 
 		this.playingNote = note
 	}
 
 	protected abstract _scheduleNoteSpecific(note: number): void
 
-	public abstract getAudioNodeToStop(): AudioScheduledSourceNode | undefined
-
 	public scheduleRelease(
 		delaySeconds: number,
 		releaseSeconds: number,
 		releaseIfNotCurrentlyReleasing = false,
 	) {
-		const audioNode = this.getAudioNodeToStop()
+		const audioNode = this.getAudioScheduledSourceNode()!
 
 		if (this._isReleaseScheduled) {
-
 			// trying to re-release a voice
 			// new release start time must be between original attack start and release end
 			// is new release start before or after original release start?
@@ -127,35 +124,18 @@ export abstract class Voice {
 
 			if (newReleaseStartTime >= this._scheduledReleaseStartTimeSeconds) {
 
-				if (releaseIfNotCurrentlyReleasing) {
-					return
-				}
-
-				// This means its a hard cutoff in the middle of a releasing voice
-				//   because another voice is starting on same note
-				// logger.log('!!! newReleaseStartTime >= this._scheduledReleaseStartTimeSeconds')
-				// logger.log('!!! newReleaseStartTime: ', newReleaseStartTime)
-				// logger.log('!!! this._scheduledReleaseStartTimeSeconds: ', this._scheduledReleaseStartTimeSeconds)
+				if (releaseIfNotCurrentlyReleasing) return
 
 				const originalReleaseEndTime = this._scheduledReleaseEndTimeSeconds
 				const originalReleaseLength = originalReleaseEndTime - this._scheduledReleaseStartTimeSeconds
-				// logger.log('this._scheduledReleaseStartTimeSeconds: ', this._scheduledReleaseStartTimeSeconds)
-				// logger.log('originalReleaseEndTime: ', originalReleaseEndTime)
 
 				this._scheduledReleaseEndTimeSeconds = this._audioContext.currentTime + delaySeconds + releaseSeconds
-				// logger.log('this._scheduledReleaseEndTimeSeconds: ', this._scheduledReleaseEndTimeSeconds)
 
 				const newReleaseLength = this._scheduledReleaseEndTimeSeconds - this._scheduledReleaseStartTimeSeconds
 				const ratio = newReleaseLength / originalReleaseLength
 				// Not accurate for a curved release, will be too high
 				this._scheduledSustainAtReleaseEnd = this._scheduledSustainAtReleaseStart - (ratio * this._scheduledSustainAtReleaseStart)
-				// logger.log('this._scheduledSustainAtReleaseStart: ', this._scheduledSustainAtReleaseStart)
-				// logger.log('ratio: ', ratio)
-				// logger.log('newReleaseLength: ', newReleaseLength)
-				// logger.log('originalReleaseLength: ', originalReleaseLength)
-				// logger.log('this._scheduledSustainAtReleaseEnd: ', this._scheduledSustainAtReleaseEnd)
 
-				if (!audioNode) throw new Error('AAAAAAAAAAAAAAA')
 				audioNode.stop(this._scheduledReleaseEndTimeSeconds)
 				return
 			} else {
@@ -165,56 +145,36 @@ export abstract class Voice {
 			this._isReleaseScheduled = true
 		}
 
-		// every time we release
-
 		this._scheduledReleaseStartTimeSeconds = this._audioContext.currentTime + delaySeconds
 		this._scheduledReleaseEndTimeSeconds = this._audioContext.currentTime + delaySeconds + releaseSeconds
 
-		// logger.log('synth scheduleRelease', {
-		// 	id: this.id,
-		// 	delaySeconds,
-		// 	releaseSeconds,
-		// 	_scheduledReleaseStartTimeSeconds: this._scheduledReleaseStartTimeSeconds,
-		// 	_scheduledReleaseEndTimeSeconds: this._scheduledReleaseEndTimeSeconds,
-		// })
-
-		// If cancelAndHold is called with a past time it doesn't work
 		this._cancelAndHoldOrJustCancelAtTime(
 			releaseIfNotCurrentlyReleasing
 				? undefined
 				: Math.max(this._audioContext.currentTime + 0.0001, this._scheduledReleaseStartTimeSeconds),
 		)
-		if (this._scheduledAttackEndTimeSeconds < this._scheduledReleaseStartTimeSeconds) {
-			// if release start is during sustain
-			this._gain.gain.linearRampToValueAtTime(this._scheduledSustainAtAttackEnd, this._scheduledReleaseStartTimeSeconds)
-		} else {
-			// if release start is during attack, cancel and hold, calculate target sustain, and continue ramping to it
-			// TODO This is assuming that it is currently in attack
+
+		const releaseStartIsDuringAttack = this._scheduledReleaseStartTimeSeconds <= this._scheduledAttackEndTimeSeconds
+
+		if (releaseStartIsDuringAttack) {
 			// for linear attack only, need different math for other attack curves
 			const originalAttackLength = this._scheduledAttackEndTimeSeconds - this._scheduledAttackStartTimeSeconds
 			const newAttackLength = this._scheduledReleaseStartTimeSeconds - this._scheduledAttackStartTimeSeconds
 			const ratio = newAttackLength / originalAttackLength
 			const targetSustainAtReleaseStart = ratio * this._scheduledSustainAtAttackEnd
-			// this._gain.gain.linearRampToValueAtTime(targetSustainAtReleaseStart, this._scheduledReleaseStartTimeSeconds)
 
 			this._scheduledAttackEndTimeSeconds = this._scheduledReleaseStartTimeSeconds
 			this._scheduledSustainAtAttackEnd = targetSustainAtReleaseStart
 			this._scheduledSustainAtReleaseStart = targetSustainAtReleaseStart
-			// logger.log('AAA: ', {
-			// 	releaseSeconds,
-			// 	originalAttackLength,
-			// 	newAttackLength,
-			// 	ratio,
-			// 	targetSustainAtReleaseStart,
-			// })
+		} else {
+			this._gain.gain.linearRampToValueAtTime(this._scheduledSustainAtAttackEnd, this._scheduledReleaseStartTimeSeconds)
 		}
 
 		this._gain.gain.exponentialRampToValueAtTime(0.00001, this._scheduledReleaseEndTimeSeconds)
 
-		if (!audioNode) throw new Error('BBBBBBBBBBBBB')
 		audioNode.stop(this._scheduledReleaseEndTimeSeconds)
 		audioNode.onended = () => {
-			audioNode!.disconnect()
+			audioNode.disconnect()
 			this._gain.disconnect()
 			delete this._gain
 			this._onEnded(this.id)
@@ -263,6 +223,7 @@ export abstract class Voice {
 		delete this._gain
 	}
 
+	/** If cancelAndHold is called with a past time it doesn't work */
 	protected _cancelAndHoldOrJustCancelAtTime(time = this._audioContext.currentTime) {
 		const gain = this._gain.gain as any
 
