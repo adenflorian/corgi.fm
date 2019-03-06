@@ -125,19 +125,6 @@ class SynthVoice extends Voice {
 		this._afterPlayNote(note)
 	}
 
-	public scheduleNote(note: number, attackTimeInSeconds: number, delaySeconds: number): void {
-		// if delay is 0 then the scheduler isn't working properly
-		if (delaySeconds < 0) throw new Error('delay <= 0: ' + delaySeconds)
-
-		if (this._oscillatorType === CustomOscillatorType.noise) {
-			this._scheduleNoiseNote(note, attackTimeInSeconds, delaySeconds)
-		} else {
-			this._scheduleNormalNote(note, attackTimeInSeconds, delaySeconds)
-		}
-
-		this.playingNote = note
-	}
-
 	public setOscillatorType(newOscType: ShamuOscillatorType) {
 		this._nextOscillatorType = newOscType
 
@@ -177,45 +164,27 @@ class SynthVoice extends Voice {
 		this._dispose()
 	}
 
-	private _scheduleNormalNote(note: number, attackTimeInSeconds: number, delaySeconds: number): void {
-		this._scheduledAttackStartTimeSeconds = this._audioContext.currentTime + delaySeconds
-		this._scheduledAttackEndTimeSeconds = this._scheduledAttackStartTimeSeconds + attackTimeInSeconds
+	protected _scheduleNoteSpecific(note: number): void {
+		if (this._oscillatorType === CustomOscillatorType.noise) {
+			this._scheduleNoiseNote(note)
+		} else {
+			this._scheduleNormalNote(note)
+		}
+	}
 
+	private _scheduleNormalNote(note: number): void {
 		this._oscillator = this._audioContext.createOscillator()
 		this._oscillator.type = this._oscillatorType as OscillatorType
 		this._oscillator.detune.value = this._detune
 		// TODO Just set it immediately
 		this._oscillator.frequency.setValueAtTime(midiNoteToFrequency(note), this._audioContext.currentTime)
-		this._oscillator.start(this._scheduledAttackStartTimeSeconds)
-
-		// logger.log(this.id + ' synth scheduleNote delaySeconds: ' + delaySeconds + ' | note: ' + note + ' | attackTimeInSeconds: ' + attackTimeInSeconds)
-
-		this._afterScheduleNote(this._oscillator)
 	}
 
-	private _scheduleNoiseNote(_: number, attackTimeInSeconds: number, delaySeconds: number): void {
-		this._scheduledAttackStartTimeSeconds = this._audioContext.currentTime + delaySeconds
-		this._scheduledAttackEndTimeSeconds = this._scheduledAttackStartTimeSeconds + attackTimeInSeconds
-
+	private _scheduleNoiseNote(_: number): void {
 		this._whiteNoise = this._audioContext.createBufferSource()
-		this._whiteNoise.start(this._scheduledAttackStartTimeSeconds)
 		this._whiteNoise.buffer = SynthVoice._noiseBuffer
 		this._whiteNoise.loop = true
 		this._whiteNoise.detune.value = this._detune
-
-		// logger.log(this.id + ' synth scheduleNote delaySeconds: ' + delaySeconds + ' | note: ' + note + ' | attackTimeInSeconds: ' + attackTimeInSeconds)
-
-		this._afterScheduleNote(this._whiteNoise)
-	}
-
-	private _afterScheduleNote(audioNode: AudioScheduledSourceNode) {
-		this._gain = this._audioContext.createGain()
-		this._gain.gain.value = 0
-		this._gain.gain.linearRampToValueAtTime(0, this._scheduledAttackStartTimeSeconds)
-		this._gain.gain.linearRampToValueAtTime(this._sustainLevel, this._scheduledAttackEndTimeSeconds)
-
-		audioNode.connect(this._gain)
-			.connect(this._destination)
 	}
 
 	private _playSynthNote(note: number) {

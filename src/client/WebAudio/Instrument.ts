@@ -376,7 +376,29 @@ export abstract class Voice {
 		return this._releaseId
 	}
 
-	public abstract scheduleNote(note: number, attackTimeInSeconds: number, delaySeconds: number): void
+	public scheduleNote(note: number, attackTimeInSeconds: number, delaySeconds: number): void {
+		// if delay is 0 then the scheduler isn't working properly
+		if (delaySeconds < 0) throw new Error('delay <= 0: ' + delaySeconds)
+
+		this._scheduledAttackStartTimeSeconds = this._audioContext.currentTime + delaySeconds
+		this._scheduledAttackEndTimeSeconds = this._scheduledAttackStartTimeSeconds + attackTimeInSeconds
+
+		this._scheduleNoteSpecific(note)
+
+		this._gain = this._audioContext.createGain()
+		this._gain.gain.value = 0
+		this._gain.gain.linearRampToValueAtTime(0, this._scheduledAttackStartTimeSeconds)
+		this._gain.gain.linearRampToValueAtTime(this._sustainLevel, this._scheduledAttackEndTimeSeconds)
+
+		// logger.log(this.id + ' synth scheduleNote delaySeconds: ' + delaySeconds + ' | note: ' + note + ' | attackTimeInSeconds: ' + attackTimeInSeconds)
+
+		this.getAudioNodeToStop()!.connect(this._gain)
+			.connect(this._destination)
+
+		this.getAudioNodeToStop()!.start(this._scheduledAttackStartTimeSeconds)
+
+		this.playingNote = note
+	}
 
 	public abstract getAudioNodeToStop(): AudioScheduledSourceNode | undefined
 
@@ -528,6 +550,8 @@ export abstract class Voice {
 	}
 
 	public abstract dispose(): void
+
+	protected abstract _scheduleNoteSpecific(note: number): void
 
 	protected _beforePlayNote(attackTimeInSeconds: number) {
 		this._cancelAndHoldOrJustCancelAtTime()

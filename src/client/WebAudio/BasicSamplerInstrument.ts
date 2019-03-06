@@ -67,38 +67,15 @@ class SamplerVoice extends Voice {
 		this._afterPlayNote(note)
 	}
 
-	public scheduleNote(note: number, attackTimeInSeconds: number, delaySeconds: number): void {
-		// if delay is 0 then the scheduler isn't working properly
-		if (delaySeconds < 0) throw new Error('delay <= 0: ' + delaySeconds)
-
-		this._scheduleNormalNote(note, attackTimeInSeconds, delaySeconds)
-
-		this.playingNote = note
-	}
-
 	public dispose() {
 		this._disposeAudioBufferSource()
 		this._dispose()
 	}
 
-	private _scheduleNormalNote(note: number, attackTimeInSeconds: number, delaySeconds: number): void {
-		this._scheduledAttackStartTimeSeconds = this._audioContext.currentTime + delaySeconds
-		this._scheduledAttackEndTimeSeconds = this._scheduledAttackStartTimeSeconds + attackTimeInSeconds
-
+	protected _scheduleNoteSpecific(note: number): void {
 		this._disposeAudioBufferSource()
 		this._audioBufferSource = this._audioContext.createBufferSource()
 		this._audioBufferSource.buffer = SamplesManager.getSample(midiNoteToNoteName(note), getOctaveFromMidiNote(note))
-		this._audioBufferSource.start(this._scheduledAttackStartTimeSeconds)
-
-		// logger.log(this.id + ' synth scheduleNote delaySeconds: ' + delaySeconds + ' | note: ' + note + ' | attackTimeInSeconds: ' + attackTimeInSeconds)
-
-		this._gain = this._audioContext.createGain()
-		this._gain.gain.value = 0
-		this._gain.gain.linearRampToValueAtTime(0, this._scheduledAttackStartTimeSeconds)
-		this._gain.gain.linearRampToValueAtTime(this._sustainLevel, this._scheduledAttackEndTimeSeconds)
-
-		this._audioBufferSource.connect(this._gain)
-			.connect(this._destination)
 	}
 
 	private _playSamplerNote(note: number) {
