@@ -17,6 +17,8 @@ export abstract class Voices<V extends Voice> {
 			.concat(this._scheduledVoices)
 	}
 
+	protected abstract _createVoice(forScheduling: boolean): V
+
 	public getScheduledVoices() {return this._scheduledVoices}
 
 	public playNote(note: number, attackTimeInSeconds: number) {
@@ -44,52 +46,38 @@ export abstract class Voices<V extends Voice> {
 		}
 	}
 
-	public abstract createVoice(forScheduling: boolean): V
-
 	public scheduleNote(note: IMidiNote, delaySeconds: number, attackTimeInSeconds: number) {
 
 		const newNoteStartTime = this._getAudioContext().currentTime + delaySeconds
 
-		// check for any scheduled notes playing same note that will overlap
-		// if new note start is in middle of existing note, then schedule hard cutoff of existing note
-		//   or schedule new attack on existing voice
 		const scheduledVoicesSameNote = this._scheduledVoices.filter(x => x.playingNote === note)
 
-		// Its only possible for there to be one conflicting voice, because of this function
-
+		// It's only possible for there to be one conflicting voice, because of this function
 		const conflictingVoice = scheduledVoicesSameNote.find(
-			x => x.getScheduledAttackStartTime() <= newNoteStartTime && newNoteStartTime < x.getScheduledReleaseEndTimeSeconds())
+			x => x.scheduledAttackStartTime <= newNoteStartTime && newNoteStartTime < x.scheduledReleaseEndTimeSeconds)
 
 		if (conflictingVoice) {
-			// logger.log('conflictingVoice')
-			if (conflictingVoice.getScheduledAttackStartTime() === newNoteStartTime) return
+			if (conflictingVoice.scheduledAttackStartTime === newNoteStartTime) return
 
 			// schedule hard cutoff of existing note
 			conflictingVoice.scheduleRelease(delaySeconds, 0.001)
 		}
 
-		// Need to do something if new note starts before all scheduled notes
-		// need to schedule a release for it immediately
-
-		// I should probably keep one voice per note
-
-		// logger.log('[scheduleNote] ' + this.id + ' synth scheduleNote delaySeconds: ' + delaySeconds + ' | note: ' + note + ' | attackTimeInSeconds: ' + attackTimeInSeconds)
-		const newVoice = this.createVoice(true)
+		const newVoice = this._createVoice(true)
 
 		newVoice.scheduleNote(note, attackTimeInSeconds, delaySeconds)
 
 		this._scheduledVoices = this._scheduledVoices.set(newVoice.id, newVoice)
 
 		// Check if any scheduled voices start after this new note
-		const voicesAfter = scheduledVoicesSameNote.filter(x => x.getScheduledAttackStartTime() > newNoteStartTime)
+		const nextScheduledVoiceStartSeconds = scheduledVoicesSameNote
+			.filter(x => x.scheduledAttackStartTime > newNoteStartTime)
+			.map(x => x.scheduledAttackStartTime)
+			.min()
 
-		if (voicesAfter.count() > 0) {
-			// logger.log('scheduling hard cutoff for new note because it is behind a future note. newVoice: ', newVoice)
-			const closestScheduledStart = voicesAfter.map(x => x.getScheduledAttackStartTime()).min()
-			if (closestScheduledStart === undefined) throw new Error('shouldnt happen i think')
-
+		if (nextScheduledVoiceStartSeconds) {
 			newVoice.scheduleRelease(
-				closestScheduledStart - this._getAudioContext().currentTime,
+				nextScheduledVoiceStartSeconds - this._getAudioContext().currentTime,
 				0.001,
 			)
 		}
@@ -100,35 +88,40 @@ export abstract class Voices<V extends Voice> {
 
 		const releaseStartTime = currentTime + delaySeconds
 
-		// Find scheduled voice that will be playing at releaseStartTime
 		const scheduledVoicesSameNote = this._scheduledVoices.filter(x => x.playingNote === note)
 
-		// Its only possible for there to be one conflicting voice, because of this function
-		const voiceToRelease = scheduledVoicesSameNote.find(
-			x => x.getScheduledAttackStartTime() <= releaseStartTime && releaseStartTime < x.getScheduledReleaseEndTimeSeconds())
+		// It's only possible for there to be one conflicting voice, because of this function
+		const voiceToRelease = scheduledVoicesSameNote.find(voice => {
+			const voiceStartsBeforeRelease = voice.scheduledAttackStartTime <= releaseStartTime
 
-		if (voiceToRelease) {
-			// logger.log('found voiceToRelease: ', voiceToRelease)
-			if (voiceToRelease.getScheduledAttackStartTime() === releaseStartTime) return
+			const voiceEndsAfterRelease = releaseStartTime < voice.scheduledReleaseEndTimeSeconds
 
-			voiceToRelease.scheduleRelease(delaySeconds, releaseSeconds)
+			const voiceIsInWindow = voiceStartsBeforeRelease && voiceEndsAfterRelease
 
-			// logger.log('[scheduleRelease] note: ' + note + ' | this._scheduledVoices: ', this._scheduledVoices)
+			return voiceIsInWindow
+		})
 
-			// Check if release crosses into another voice
-			// Check same note voices, where voice attack start is in our release window
-			const conflictingVoice = scheduledVoicesSameNote.find(
-				x => releaseStartTime <= x.getScheduledAttackStartTime() && x.getScheduledAttackStartTime() < releaseStartTime + releaseSeconds)
+		if (!voiceToRelease) return
 
-			if (conflictingVoice) {
-				// logger.log('conflictingVoice in release window, conflictingVoice: ', conflictingVoice)
-				// schedule hard cutoff on voiceToRelease
-				const hardCutoffDelay = conflictingVoice.getScheduledAttackStartTime() - currentTime
-				voiceToRelease.scheduleRelease(hardCutoffDelay, 0.001)
-			}
-		} else {
+		// Don't bother if release is exactly on attack
+		// TODO This might be wrong...
+		if (voiceToRelease.scheduledAttackStartTime === releaseStartTime) return
 
-			// logger.log('[scheduleRelease] no matching voice to release, note: ', note)
+		voiceToRelease.scheduleRelease(delaySeconds, releaseSeconds)
+
+		// Check if release crosses into another voice
+		// Check same note voices, where voice attack start is in our release window
+		const conflictingVoice = scheduledVoicesSameNote.find(voice => {
+			const voiceStartsOnOrAfterReleaseStart = releaseStartTime <= voice.scheduledAttackStartTime
+
+			const voiceStartsBeforeReleaseEnd = voice.scheduledAttackStartTime < releaseStartTime + releaseSeconds
+
+			return voiceStartsOnOrAfterReleaseStart && voiceStartsBeforeReleaseEnd
+		})
+
+		if (conflictingVoice) {
+			const hardCutoffDelay = conflictingVoice.scheduledAttackStartTime - currentTime
+			voiceToRelease.scheduleRelease(hardCutoffDelay, 0.001)
 		}
 	}
 

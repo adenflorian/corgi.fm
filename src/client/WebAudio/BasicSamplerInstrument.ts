@@ -28,12 +28,12 @@ class SamplerVoices extends Voices<SamplerVoice> {
 		super()
 
 		for (let i = 0; i < this._voiceCount; i++) {
-			const newVoice = this.createVoice(false)
+			const newVoice = this._createVoice(false)
 			this._inactiveVoices = this._inactiveVoices.set(newVoice.id, newVoice)
 		}
 	}
 
-	public createVoice(forScheduling: boolean) {
+	protected _createVoice(forScheduling: boolean) {
 		return new SamplerVoice(
 			this._audioContext,
 			this._destination,

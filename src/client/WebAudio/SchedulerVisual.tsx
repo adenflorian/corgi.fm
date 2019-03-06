@@ -127,17 +127,17 @@ function _getPathDForVoice(voice: Voice) {
 
 	return (
 		` M ` +
-		`   ${((voice.getScheduledAttackStartTime() + xShift) * _xScale) + xOffset} ` +
+		`   ${((voice.scheduledAttackStartTime + xShift) * _xScale) + xOffset} ` +
 		`   ${_height}` +
 		` L ` +
-		`   ${((voice.getScheduledAttackEndTime() + xShift) * _xScale) + xOffset} ` +
-		`   ${(-_height * voice.getScheduledSustainAtAttackEnd()) + _height}` +
+		`   ${((voice.scheduledAttackEndTime + xShift) * _xScale) + xOffset} ` +
+		`   ${(-_height * voice.scheduledSustainAtAttackEnd) + _height}` +
 		` L ` +
-		`   ${Math.min(1000, ((voice.getScheduledReleaseStartTimeSeconds() + xShift) * _xScale) + xOffset)} ` +
-		`   ${(-_height * voice.getScheduledSustainAtReleaseStart()) + _height}` +
+		`   ${Math.min(1000, ((voice.scheduledReleaseStartTimeSeconds + xShift) * _xScale) + xOffset)} ` +
+		`   ${(-_height * voice.scheduledSustainAtReleaseStart) + _height}` +
 		` L ` +
-		`   ${Math.min(1000, ((voice.getScheduledReleaseEndTimeSeconds() + xShift) * _xScale) + xOffset)} ` +
-		`                       ${(-_height * voice.getScheduledSustainAtReleaseEnd()) + _height}`
+		`   ${Math.min(1000, ((voice.scheduledReleaseEndTimeSeconds + xShift) * _xScale) + xOffset)} ` +
+		`                       ${(-_height * voice.scheduledSustainAtReleaseEnd) + _height}`
 	)
 }
 

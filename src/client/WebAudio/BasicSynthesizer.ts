@@ -49,13 +49,13 @@ class SynthVoices extends Voices<SynthVoice> {
 		super()
 
 		for (let i = 0; i < this._voiceCount; i++) {
-			const newVoice = this.createVoice(false)
+			const newVoice = this._createVoice(false)
 
 			this._inactiveVoices = this._inactiveVoices.set(newVoice.id, newVoice)
 		}
 	}
 
-	public createVoice(forScheduling: boolean) {
+	protected _createVoice(forScheduling: boolean) {
 		return new SynthVoice(
 			this._audioContext,
 			this._destination,
@@ -136,11 +136,11 @@ class SynthVoice extends Voice {
 		// if release is scheduled, need to call stop on new node
 		if (this._isReleaseScheduled) {
 			if (this._whiteNoise) {
-				this._whiteNoise.stop(this.getScheduledReleaseEndTimeSeconds())
+				this._whiteNoise.stop(this.scheduledReleaseEndTimeSeconds)
 				this._whiteNoise.onended = () => this._onEnded(this.id)
 			}
 			if (this._oscillator) {
-				this._oscillator.stop(this.getScheduledReleaseEndTimeSeconds())
+				this._oscillator.stop(this.scheduledReleaseEndTimeSeconds)
 				this._oscillator.onended = () => this._onEnded(this.id)
 			}
 		}

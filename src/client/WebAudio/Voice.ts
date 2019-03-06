@@ -40,13 +40,13 @@ export abstract class Voice {
 		this._gain.gain.setValueAtTime(0, this._audioContext.currentTime)
 	}
 
-	public getScheduledAttackStartTime = () => this._scheduledAttackStartTimeSeconds
-	public getScheduledAttackEndTime = () => this._scheduledAttackEndTimeSeconds
-	public getScheduledSustainAtAttackEnd = () => this._scheduledSustainAtAttackEnd
-	public getScheduledSustainAtReleaseStart = () => this._scheduledSustainAtReleaseStart
-	public getScheduledSustainAtReleaseEnd = () => this._scheduledSustainAtReleaseEnd
-	public getScheduledReleaseStartTimeSeconds = () => this._scheduledReleaseStartTimeSeconds
-	public getScheduledReleaseEndTimeSeconds = () => this._scheduledReleaseEndTimeSeconds
+	public get scheduledAttackStartTime() {return this._scheduledAttackStartTimeSeconds}
+	public get scheduledAttackEndTime() {return this._scheduledAttackEndTimeSeconds}
+	public get scheduledSustainAtAttackEnd() {return this._scheduledSustainAtAttackEnd}
+	public get scheduledSustainAtReleaseStart() {return this._scheduledSustainAtReleaseStart}
+	public get scheduledSustainAtReleaseEnd() {return this._scheduledSustainAtReleaseEnd}
+	public get scheduledReleaseStartTimeSeconds() {return this._scheduledReleaseStartTimeSeconds}
+	public get scheduledReleaseEndTimeSeconds() {return this._scheduledReleaseEndTimeSeconds}
 
 	public getIsReleaseScheduled = () => this._isReleaseScheduled
 
@@ -199,7 +199,7 @@ export abstract class Voice {
 		*/
 
 		// If attack already finished
-		if (this.getScheduledAttackEndTime() < this._audioContext.currentTime) return
+		if (this.scheduledAttackEndTime < this._audioContext.currentTime) return
 
 	}
 
