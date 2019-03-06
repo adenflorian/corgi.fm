@@ -365,7 +365,23 @@ export abstract class Voice {
 
 	public abstract playNote(note: number, attackTimeInSeconds: number): void
 
-	public release = (timeToReleaseInSeconds: number) => {
+	protected _beforePlayNote(attackTimeInSeconds: number) {
+		this._cancelAndHoldOrJustCancelAtTime()
+
+		// Never go straight to 0 or you'll probably get a click sound
+		this._gain.gain.linearRampToValueAtTime(0, this._audioContext.currentTime + 0.001)
+
+		// this._gain.gain.setValueAtTime(0, this._audioContext.currentTime)
+		this._gain.gain.linearRampToValueAtTime(this._sustainLevel, this._audioContext.currentTime + attackTimeInSeconds)
+	}
+
+	protected _afterPlayNote(note: number) {
+		this.playStartTime = this._audioContext.currentTime
+		this.playingNote = note
+		this._status = VoiceStatus.playing
+	}
+
+	public release(timeToReleaseInSeconds: number) {
 		this._cancelAndHoldOrJustCancelAtTime()
 		this._gain.gain.setValueAtTime(this._gain.gain.value, this._audioContext.currentTime)
 		this._gain.gain.exponentialRampToValueAtTime(0.00001, this._audioContext.currentTime + timeToReleaseInSeconds)
@@ -399,6 +415,8 @@ export abstract class Voice {
 
 		this.playingNote = note
 	}
+
+	protected abstract _scheduleNoteSpecific(note: number): void
 
 	public abstract getAudioNodeToStop(): AudioScheduledSourceNode | undefined
 
@@ -551,30 +569,12 @@ export abstract class Voice {
 
 	public abstract dispose(): void
 
-	protected abstract _scheduleNoteSpecific(note: number): void
-
-	protected _beforePlayNote(attackTimeInSeconds: number) {
-		this._cancelAndHoldOrJustCancelAtTime()
-
-		// Never go straight to 0 or you'll probably get a click sound
-		this._gain.gain.linearRampToValueAtTime(0, this._audioContext.currentTime + 0.001)
-
-		// this._gain.gain.setValueAtTime(0, this._audioContext.currentTime)
-		this._gain.gain.linearRampToValueAtTime(this._sustainLevel, this._audioContext.currentTime + attackTimeInSeconds)
-	}
-
-	protected _afterPlayNote(note: number) {
-		this.playStartTime = this._audioContext.currentTime
-		this.playingNote = note
-		this._status = VoiceStatus.playing
-	}
-
 	protected _dispose() {
 		this._gain.disconnect()
 		delete this._gain
 	}
 
-	protected readonly _cancelAndHoldOrJustCancelAtTime = (time = this._audioContext.currentTime) => {
+	protected _cancelAndHoldOrJustCancelAtTime(time = this._audioContext.currentTime) {
 		const gain = this._gain.gain as any
 
 		// cancelAndHoldAtTime is not implemented in firefox

@@ -5,6 +5,7 @@
     ],
     "jsRules": {},
     "rules": {
+        "member-ordering": false,
         "no-empty": false,
         "no-empty-interface": false,
         "restrict-plus-operands": false,
