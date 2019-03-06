@@ -1,9 +1,7 @@
 import {IInstrumentOptions, Instrument, OnEndedCallback} from '.'
 import {logger} from '../../common/logger'
 import {BuiltInOscillatorType, CustomOscillatorType, ShamuOscillatorType} from '../../common/OscillatorTypes'
-import {midiNoteToFrequency} from './music-functions'
-import {Voice} from './Voice'
-import {Voices} from './Voices'
+import {midiNoteToFrequency, Voice, Voices} from './index'
 
 interface IBasicSynthesizerOptions extends IInstrumentOptions {
 	oscillatorType: ShamuOscillatorType

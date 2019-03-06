@@ -5,7 +5,7 @@ import {Store} from 'redux'
 import {logger} from '../../common/logger'
 import {AppOptions, IClientAppState, selectOption, shamuConnect} from '../../common/redux'
 import {getCurrentSongIsPlaying} from '../note-scanner'
-import {Voice} from './Voice'
+import {Voice} from './index'
 
 const _xScale = 20
 const _height = 50

@@ -1,9 +1,9 @@
-import {IInstrumentOptions, Instrument, OnEndedCallback} from '.'
 import {logger} from '../../common/logger'
-import {getOctaveFromMidiNote, midiNoteToNoteName} from './music-functions'
-import {SamplesManager} from './SamplesManager'
-import {Voice} from './Voice'
-import {Voices} from './Voices'
+import {
+	getOctaveFromMidiNote, IInstrumentOptions, Instrument,
+	midiNoteToNoteName, OnEndedCallback, SamplesManager,
+	Voice, Voices,
+} from './index'
 
 export type IBasicSamplerOptions = IInstrumentOptions
 

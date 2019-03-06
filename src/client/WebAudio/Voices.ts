@@ -1,6 +1,6 @@
 import {OrderedMap} from 'immutable'
 import {IMidiNote} from '../../common/MidiNote'
-import {Voice} from './Voice'
+import {Voice} from './index'
 
 export type OnEndedCallback = (id: number) => void
 

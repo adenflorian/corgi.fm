@@ -12,3 +12,5 @@ export * from './Voice'
 export * from './BasicSamplerInstrument'
 export * from './BasicSynthesizer'
 export * from './SimpleReverb'
+
+export * from './SchedulerVisual'

@@ -1,12 +1,7 @@
-import {Record} from 'immutable'
-import uuid = require('uuid')
 import {IDisposable} from '../../common/common-types'
 import {logger} from '../../common/logger'
 import {emptyMidiNotes, IMidiNote, IMidiNotes} from '../../common/MidiNote'
-import {AudioNodeWrapper, IAudioNodeWrapperOptions} from './index'
-import {registerInstrumentWithSchedulerVisual} from './SchedulerVisual'
-import {Voice} from './Voice'
-import {Voices} from './Voices'
+import {AudioNodeWrapper, IAudioNodeWrapperOptions, registerInstrumentWithSchedulerVisual, Voice, Voices} from './index'
 
 export abstract class Instrument<T extends Voices<V>, V extends Voice> extends AudioNodeWrapper implements IDisposable {
 
@@ -112,28 +107,3 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 export interface IInstrumentOptions extends IAudioNodeWrapperOptions {
 	voiceCount: number
 }
-
-const makeEnvelope = Record({
-	attackStart: 0,
-	releaseStart: 0,
-	hardCutoffTime: 0,
-	attack: 0.005,
-	decay: 0.0,
-	sustain: 1.0,
-	release: 0.10,
-})
-
-// class Envelope {
-// 	public readonly attackStart = 0
-// 	public readonly releaseStart = 0
-// 	public readonly hardCutoffTime = 0
-// 	public readonly attack = 0.005
-// 	public readonly decay = 0.0
-// 	public readonly sustain = 1.0
-// 	public readonly release = 0.10
-
-// 	constructor(
-// 	) {}
-// }
-
-type Envelope = ReturnType<typeof makeEnvelope>

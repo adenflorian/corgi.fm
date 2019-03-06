@@ -1,6 +1,6 @@
-import {Envelope} from 'tone'
+import {Record} from 'immutable'
 import uuid = require('uuid')
-import {OnEndedCallback} from '.'
+import {OnEndedCallback} from './index'
 
 enum VoiceStatus {
 	playing,
@@ -274,3 +274,28 @@ export abstract class Voice {
 		}
 	}
 }
+
+const makeEnvelope = Record({
+	attackStart: 0,
+	releaseStart: 0,
+	hardCutoffTime: 0,
+	attack: 0.005,
+	decay: 0.0,
+	sustain: 1.0,
+	release: 0.10,
+})
+
+// class Envelope {
+// 	public readonly attackStart = 0
+// 	public readonly releaseStart = 0
+// 	public readonly hardCutoffTime = 0
+// 	public readonly attack = 0.005
+// 	public readonly decay = 0.0
+// 	public readonly sustain = 1.0
+// 	public readonly release = 0.10
+
+// 	constructor(
+// 	) {}
+// }
+
+type Envelope = ReturnType<typeof makeEnvelope>
