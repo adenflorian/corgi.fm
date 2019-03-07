@@ -26,7 +26,7 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 
 		this._gain = this._audioContext.createGain()
 		// Just below 1 to help mitigate an infinite feedback loop
-		this._gain.gain.value = 0.999
+		this._gain.gain.value = 1
 
 		this._panNode.connect(this._lowPassFilter)
 		this._lowPassFilter.connect(this._gain)
@@ -86,6 +86,13 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 	}
 
 	public readonly setRelease = (releaseTimeInSeconds: number) => this._releaseTimeInSeconds = releaseTimeInSeconds
+
+	public setGain(gain: number) {
+		// Rounding to nearest to 32 bit number because AudioParam values are 32 bit floats
+		const newGain = Math.fround(gain)
+		if (newGain === this._gain.gain.value) return
+		this._gain.gain.linearRampToValueAtTime(newGain, this._audioContext.currentTime + 0.004)
+	}
 
 	public readonly getActivityLevel = () => this._getVoices().getActivityLevel()
 

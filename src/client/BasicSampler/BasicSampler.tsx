@@ -22,6 +22,7 @@ interface IBasicSamplerReduxProps {
 	lowPassFilterCutoffFrequency: number,
 	attack: number,
 	release: number,
+	gain: number,
 }
 
 type IBasicSamplerAllProps = IBasicSamplerProps & IBasicSamplerReduxProps & {dispatch: Dispatch}
@@ -77,6 +78,15 @@ export class BasicSampler extends React.PureComponent<IBasicSamplerAllProps> {
 								label="release"
 								onChangeId={BasicSamplerParam.release}
 							/>
+							<Knob
+								min={0}
+								max={1}
+								curve={2}
+								value={this.props.gain}
+								onChange={this._dispatchChangeInstrumentParam}
+								label="gain"
+								onChangeId={BasicSamplerParam.gain}
+							/>
 						</div>
 					</div>
 				</Panel>
@@ -99,6 +109,7 @@ export const ConnectedBasicSampler = connect(
 			lowPassFilterCutoffFrequency: samplerState.lowPassFilterCutoffFrequency,
 			attack: samplerState.attack,
 			release: samplerState.release,
+			gain: samplerState.gain,
 		}
 	},
 )(BasicSampler)
