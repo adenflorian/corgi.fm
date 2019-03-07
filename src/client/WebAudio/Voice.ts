@@ -1,5 +1,7 @@
 import {Record} from 'immutable'
+import {number} from 'prop-types'
 import uuid = require('uuid')
+import {logger} from '../../common/logger'
 import {OnEndedCallback} from './index'
 
 enum VoiceStatus {
@@ -29,6 +31,7 @@ export abstract class Voice {
 	protected _scheduledReleaseStartTimeSeconds = Number.MAX_VALUE
 	protected _scheduledReleaseEndTimeSeconds = Number.MAX_VALUE
 	protected _sustainLevel = 1
+	protected _scheduledEnvelope = new ScheduledEnvelope()
 
 	constructor(audioContext: AudioContext, destination: AudioNode, onEnded: OnEndedCallback) {
 		this.id = Voice._nextId++
@@ -47,6 +50,7 @@ export abstract class Voice {
 	public get scheduledSustainAtReleaseEnd() {return this._scheduledSustainAtReleaseEnd}
 	public get scheduledReleaseStartTimeSeconds() {return this._scheduledReleaseStartTimeSeconds}
 	public get scheduledReleaseEndTimeSeconds() {return this._scheduledReleaseEndTimeSeconds}
+	public get scheduledEnvelope() {return this._scheduledEnvelope}
 
 	public getIsReleaseScheduled = () => this._isReleaseScheduled
 
@@ -87,22 +91,33 @@ export abstract class Voice {
 		// if delay is 0 then the scheduler isn't working properly
 		if (delaySeconds < 0) throw new Error('delay <= 0: ' + delaySeconds)
 
-		this._scheduledAttackStartTimeSeconds = this._audioContext.currentTime + delaySeconds
-		this._scheduledAttackEndTimeSeconds = this._scheduledAttackStartTimeSeconds + attackTimeInSeconds
-
 		this._scheduleNoteSpecific(note)
-
-		this._gain = this._audioContext.createGain()
-		this._gain.gain.value = 0
-		this._gain.gain.linearRampToValueAtTime(0, this._scheduledAttackStartTimeSeconds)
-		this._gain.gain.linearRampToValueAtTime(this._sustainLevel, this._scheduledAttackEndTimeSeconds)
 
 		this.getAudioScheduledSourceNode()!.connect(this._gain)
 			.connect(this._destination)
 
-		this.getAudioScheduledSourceNode()!.start(this._scheduledAttackStartTimeSeconds)
-
 		this.playingNote = note
+
+		this._scheduledEnvelope = new ScheduledEnvelope(
+			this._audioContext.currentTime + delaySeconds,
+			Number.MAX_VALUE,
+			Number.MAX_VALUE,
+			attackTimeInSeconds,
+			this._sustainLevel,
+			Number.MAX_VALUE,
+		)
+
+		this._scheduledAttackStartTimeSeconds = this._scheduledEnvelope.attackStart
+		this._scheduledAttackEndTimeSeconds = this._scheduledEnvelope.attackEnd
+
+		_applyEnvelope(
+			this._scheduledEnvelope,
+			this._gain,
+			this.getAudioScheduledSourceNode()!,
+			this._audioContext,
+			true,
+			() => this._onEnded(this.id),
+		)
 	}
 
 	protected abstract _scheduleNoteSpecific(note: number): void
@@ -223,7 +238,7 @@ export abstract class Voice {
 	}
 }
 
-function applyEnvelope(
+function _applyEnvelope(
 	envelope: ScheduledEnvelope,
 	gain: GainNode,
 	sourceNode: AudioScheduledSourceNode,
@@ -231,11 +246,28 @@ function applyEnvelope(
 	startSource: boolean,
 	onEnded: () => void,
 ) {
+	// TODO If need to change start time of a note that's already scheduled
+	//   you have to trash the old oscillator and make a new one
+	//   can't call start more than once
+
 	// attack start
 	gain.gain.cancelScheduledValues(audioContext.currentTime)
 	gain.gain.value = 0
 	gain.gain.linearRampToValueAtTime(0, envelope.attackStart)
-	gain.gain.linearRampToValueAtTime(envelope.sustain, envelope.attackStart + envelope.attackLength)
+	// Before doing this, make sure we took everything else into account that we need to
+	// - [√] releaseStart
+	// - [ ] hardcutoff
+
+	const actualAttackEnd = Math.min(envelope.attackEnd, envelope.releaseStart)
+
+	const originalAttackLength = actualAttackEnd - envelope.attackStart
+	const actualAttackLength = envelope.releaseStart - envelope.attackStart
+	const ratio = actualAttackLength / originalAttackLength
+	const adjustedSustain = ratio * envelope.sustain
+
+	const actualSustain = Math.min(envelope.sustain, adjustedSustain)
+
+	gain.gain.linearRampToValueAtTime(actualSustain, actualAttackEnd)
 
 	if (startSource) {
 		sourceNode.start(envelope.attackStart)
@@ -247,35 +279,40 @@ function applyEnvelope(
 	gain.gain.linearRampToValueAtTime(envelope.sustain, envelope.releaseStart)
 
 	// release start
-	gain.gain.exponentialRampToValueAtTime(0.00001, envelope.releaseStart + envelope.releaseLength)
+	gain.gain.exponentialRampToValueAtTime(0.00001, envelope.releaseEnd)
 
 	// release end
-	sourceNode.stop(envelope.releaseStart + envelope.releaseLength)
+	sourceNode.stop(envelope.releaseEnd)
 	sourceNode.onended = onEnded
 }
 
-const makeScheduledEnvelope = Record({
-	attackStart: 0,
-	releaseStart: 0,
-	hardCutoffTime: 0,
-	attackLength: 0.005,
-	decay: 0.0,
-	sustain: 1.0,
-	releaseLength: 0.10,
-})
+// const makeScheduledEnvelope = Record({
+// 	attackStart: 0,
+// 	releaseStart: 0,
+// 	hardCutoffTime: 0,
+// 	attackLength: 0.005,
+// 	// decay: 0.0,
+// 	sustain: 1.0,
+// 	releaseLength: 0.10,
+// })
 
-// class Envelope {
-// 	public readonly attackStart = 0
-// 	public readonly releaseStart = 0
-// 	public readonly hardCutoffTime = 0
-// 	public readonly attack = 0.005
-// 	public readonly decay = 0.0
-// 	public readonly sustain = 1.0
-// 	public readonly release = 0.10
+class ScheduledEnvelope {
+	constructor(
+		public readonly attackStart = 0,
+		public readonly releaseStart = 0,
+		public readonly hardCutoffTime = 0,
+		public readonly attackLength = 0.005,
+		// public readonly decay = 0.0,
+		public readonly sustain = 1.0,
+		public readonly releaseLength = 0.10,
+	) {}
 
-// 	constructor(
-// 	) {}
-// }
+	public get attackEnd() {return this.attackStart + this.attackLength}
+
+	public get releaseEnd() {
+		return Math.min(Number.MAX_VALUE, this.releaseStart + this.releaseLength)
+	}
+}
 
 /** All times in seconds */
-type ScheduledEnvelope = ReturnType<typeof makeScheduledEnvelope>
+// type ScheduledEnvelope = ReturnType<typeof makeScheduledEnvelope>
