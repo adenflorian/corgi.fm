@@ -70,7 +70,7 @@ export const NodeInfoMap = Map({
 	}),
 	[ConnectionNodeType.basicSampler]: NodeInfoRecord({
 		stateSelector: selectSampler,
-		width: 256,
+		width: 304,
 		height: 112,
 	}),
 	[ConnectionNodeType.simpleReverb]: NodeInfoRecord({

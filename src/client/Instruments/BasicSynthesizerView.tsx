@@ -103,7 +103,7 @@ export class BasicSynthesizerView
 								max={100}
 								value={this.props.fineTuning}
 								onChange={this._dispatchChangeInstrumentParam}
-								label="fine"
+								label="detune"
 								onChangeId={BasicSynthesizerParam.fineTuning}
 							/>
 							<Knob

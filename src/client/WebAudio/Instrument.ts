@@ -10,6 +10,7 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 	protected readonly _lowPassFilter: BiquadFilterNode
 	protected _attackTimeInSeconds: number = 0.01
 	protected _releaseTimeInSeconds: number = 3
+	protected _detune: number
 	private readonly _gain: GainNode
 	private _previousNotes = emptyMidiNotes
 
@@ -27,6 +28,8 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 		this._gain = this._audioContext.createGain()
 		// Just below 1 to help mitigate an infinite feedback loop
 		this._gain.gain.value = 1
+
+		this._detune = options.detune
 
 		this._panNode.connect(this._lowPassFilter)
 		this._lowPassFilter.connect(this._gain)
@@ -87,6 +90,12 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 
 	public readonly setRelease = (releaseTimeInSeconds: number) => this._releaseTimeInSeconds = releaseTimeInSeconds
 
+	public setDetune = (detune: number) => {
+		if (detune === this._detune) return
+		this._detune = detune
+		this._getVoices().setDetune(detune)
+	}
+
 	public setGain(gain: number) {
 		// Rounding to nearest to 32 bit number because AudioParam values are 32 bit floats
 		const newGain = Math.fround(gain)
@@ -113,4 +122,5 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 
 export interface IInstrumentOptions extends IAudioNodeWrapperOptions {
 	voiceCount: number
+	detune: number
 }

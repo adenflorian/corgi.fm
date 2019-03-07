@@ -10,6 +10,10 @@ export abstract class Voices<V extends Voice> {
 	protected _releasingVoices = OrderedMap<number, V>()
 	protected _scheduledVoices = OrderedMap<number, V>()
 
+	constructor(
+		protected _detune: number,
+	) {}
+
 	protected get _allVoices() {
 		return this._inactiveVoices
 			.concat(this._activeVoices)
@@ -20,6 +24,11 @@ export abstract class Voices<V extends Voice> {
 	protected abstract _createVoice(forScheduling: boolean): V
 
 	public getScheduledVoices() {return this._scheduledVoices}
+
+	public setDetune(detune: number) {
+		this._detune = detune
+		this._allVoices.forEach(x => x.setDetune(detune))
+	}
 
 	public playNote(note: number, attackTimeInSeconds: number) {
 		const voice = this._getVoice(note)

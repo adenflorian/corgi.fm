@@ -105,9 +105,10 @@ export const setupInstrumentManager = (
 			updateInstrumentType(
 				selectAllSamplerIds,
 				selectSampler,
-				options => new BasicSamplerInstrument({
+				(options, instrumentState) => new BasicSamplerInstrument({
 					...options,
 					voiceCount: 20,
+					detune: instrumentState.detune,
 				}),
 				ConnectionNodeType.basicSampler,
 				(instrument: BasicSamplerInstrument, instrumentState: BasicSamplerState) => {
@@ -115,6 +116,7 @@ export const setupInstrumentManager = (
 					instrument.setLowPassFilterCutoffFrequency(instrumentState.lowPassFilterCutoffFrequency)
 					instrument.setAttack(instrumentState.attack)
 					instrument.setRelease(instrumentState.release)
+					instrument.setDetune(instrumentState.detune)
 					instrument.setGain(instrumentState.gain)
 				},
 			)
@@ -127,7 +129,7 @@ export const setupInstrumentManager = (
 				(options, instrumentState) => new BasicSynthesizer({
 					...options,
 					voiceCount: 9,
-					detune: 0,
+					detune: instrumentState.fineTuning,
 					...instrumentState,
 				}),
 				ConnectionNodeType.basicSynthesizer,
@@ -165,6 +167,7 @@ export const setupInstrumentManager = (
 						id: instrumentId,
 						audioContext,
 						voiceCount: 1,
+						detune: 0,	// TODO Shouldn't have to do this
 					}, instrumentState),
 				)
 

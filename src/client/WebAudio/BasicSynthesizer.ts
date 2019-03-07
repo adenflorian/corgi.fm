@@ -1,4 +1,4 @@
-import {IInstrumentOptions, Instrument, OnEndedCallback} from '.'
+import {IInstrumentOptions, Instrument, OnEndedCallback, TunableAudioScheduledSourceNode} from '.'
 import {logger} from '../../common/logger'
 import {BuiltInOscillatorType, CustomOscillatorType, ShamuOscillatorType} from '../../common/OscillatorTypes'
 import {midiNoteToFrequency, Voice, Voices} from './index'
@@ -11,28 +11,26 @@ interface IBasicSynthesizerOptions extends IInstrumentOptions {
 // TODO Make into a BasicSynthesizerAudioNode?
 export class BasicSynthesizer extends Instrument<SynthVoices, SynthVoice> {
 	private readonly _voices: SynthVoices
-	private _detune: number
 	private _oscillatorType: ShamuOscillatorType
 
 	constructor(options: IBasicSynthesizerOptions) {
 		super(options)
 
 		this._oscillatorType = options.oscillatorType
-		this._detune = options.detune
 
-		this._voices = new SynthVoices(options.voiceCount, this._audioContext, this._panNode, options.oscillatorType, this._detune)
+		this._voices = new SynthVoices(
+			options.voiceCount,
+			this._audioContext,
+			this._panNode,
+			options.oscillatorType,
+			this._detune,
+		)
 	}
 
 	public setOscillatorType = (type: ShamuOscillatorType) => {
 		if (type === this._oscillatorType) return
 		this._oscillatorType = type
 		this._voices.setOscillatorType(type)
-	}
-
-	public setDetune = (detune: number) => {
-		if (detune === this._detune) return
-		this._detune = detune
-		this._voices.setDetune(detune)
 	}
 
 	protected _getVoices = () => this._voices
@@ -44,9 +42,9 @@ class SynthVoices extends Voices<SynthVoice> {
 		private readonly _audioContext: AudioContext,
 		private readonly _destination: AudioNode,
 		private _oscType: ShamuOscillatorType,
-		private _detune: number,
+		_detune: number,
 	) {
-		super()
+		super(_detune)
 
 		for (let i = 0; i < this._voiceCount; i++) {
 			const newVoice = this._createVoice(false)
@@ -71,11 +69,6 @@ class SynthVoices extends Voices<SynthVoice> {
 		this._allVoices.forEach(x => x.setOscillatorType(type))
 	}
 
-	public setDetune(detune: number) {
-		this._detune = detune
-		this._allVoices.forEach(x => x.setDetune(detune))
-	}
-
 	protected _getAudioContext() {return this._audioContext}
 }
 
@@ -85,7 +78,6 @@ class SynthVoice extends Voice {
 	private _oscillatorType: ShamuOscillatorType
 	private _nextOscillatorType: ShamuOscillatorType
 	private _whiteNoise: AudioBufferSourceNode | undefined
-	private _detune: number = 0
 	private _frequency: number = 0
 
 	constructor(
@@ -93,11 +85,10 @@ class SynthVoice extends Voice {
 		oscType: ShamuOscillatorType, forScheduling: boolean, detune: number,
 		onEnded: OnEndedCallback,
 	) {
-		super(audioContext, destination, onEnded)
+		super(audioContext, destination, onEnded, detune)
 
 		this._oscillatorType = oscType
 		this._nextOscillatorType = oscType
-		this._detune = detune
 
 		if (!SynthVoice._noiseBuffer) {
 			SynthVoice._noiseBuffer = this._generateNoiseBuffer()
@@ -109,7 +100,7 @@ class SynthVoice extends Voice {
 	}
 
 	// TODO Maybe change to just stopAudioNode
-	public getAudioScheduledSourceNode() {
+	public getAudioScheduledSourceNode(): TunableAudioScheduledSourceNode | undefined {
 		if (this._oscillatorType === CustomOscillatorType.noise) {
 			return this._whiteNoise
 		} else {
@@ -146,19 +137,6 @@ class SynthVoice extends Voice {
 		}
 	}
 
-	public setDetune(detune: number) {
-		if (detune === this._detune) return
-
-		this._detune = detune
-
-		if (this._oscillator) {
-			this._oscillator.detune.value = detune
-		}
-		if (this._whiteNoise) {
-			this._whiteNoise.detune.value = detune
-		}
-	}
-
 	public dispose() {
 		this._deleteChain()
 		this._dispose()
@@ -175,7 +153,6 @@ class SynthVoice extends Voice {
 	private _scheduleNormalNote(note: number): void {
 		this._oscillator = this._audioContext.createOscillator()
 		this._oscillator.type = this._oscillatorType as OscillatorType
-		this._oscillator.detune.value = this._detune
 		// TODO Just set it immediately
 		this._oscillator.frequency.setValueAtTime(midiNoteToFrequency(note), this._audioContext.currentTime)
 	}
@@ -184,7 +161,6 @@ class SynthVoice extends Voice {
 		this._whiteNoise = this._audioContext.createBufferSource()
 		this._whiteNoise.buffer = SynthVoice._noiseBuffer
 		this._whiteNoise.loop = true
-		this._whiteNoise.detune.value = this._detune
 	}
 
 	private _playSynthNote(note: number) {

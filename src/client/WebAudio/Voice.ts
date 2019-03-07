@@ -10,6 +10,8 @@ enum VoiceStatus {
 	off,
 }
 
+export type TunableAudioScheduledSourceNode = AudioScheduledSourceNode & Pick<OscillatorNode, 'detune'>
+
 export abstract class Voice {
 
 	protected static _nextId = 0
@@ -32,12 +34,19 @@ export abstract class Voice {
 	protected _scheduledReleaseEndTimeSeconds = Number.MAX_VALUE
 	protected _sustainLevel = 1
 	protected _scheduledEnvelope = new ScheduledEnvelope()
+	protected _detune: number = 0
 
-	constructor(audioContext: AudioContext, destination: AudioNode, onEnded: OnEndedCallback) {
+	constructor(
+		audioContext: AudioContext,
+		destination: AudioNode,
+		onEnded: OnEndedCallback,
+		detune: number,
+	) {
 		this.id = Voice._nextId++
 		this._audioContext = audioContext
 		this._destination = destination
 		this._onEnded = onEnded
+		this._detune = detune
 
 		this._gain = this._audioContext.createGain()
 		this._gain.gain.setValueAtTime(0, this._audioContext.currentTime)
@@ -56,9 +65,17 @@ export abstract class Voice {
 
 	public getReleaseId = () => this._releaseId
 
-	public abstract getAudioScheduledSourceNode(): AudioScheduledSourceNode | undefined
+	public abstract getAudioScheduledSourceNode(): TunableAudioScheduledSourceNode | undefined
 
 	public abstract playNote(note: number, attackTimeInSeconds: number): void
+
+	public setDetune(detune: number) {
+		if (detune === this._detune) return
+
+		this._detune = detune
+
+		this.getAudioScheduledSourceNode()!.detune.value = detune
+	}
 
 	protected _beforePlayNote(attackTimeInSeconds: number) {
 		this._cancelAndHoldOrJustCancelAtTime()
@@ -92,6 +109,8 @@ export abstract class Voice {
 		if (delaySeconds < 0) throw new Error('delay <= 0: ' + delaySeconds)
 
 		this._scheduleNoteSpecific(note)
+
+		this.getAudioScheduledSourceNode()!.detune.value = this._detune
 
 		this.getAudioScheduledSourceNode()!.connect(this._gain)
 			.connect(this._destination)

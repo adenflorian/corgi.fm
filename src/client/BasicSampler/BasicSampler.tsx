@@ -22,6 +22,7 @@ interface IBasicSamplerReduxProps {
 	lowPassFilterCutoffFrequency: number,
 	attack: number,
 	release: number,
+	detune: number,
 	gain: number,
 }
 
@@ -79,6 +80,14 @@ export class BasicSampler extends React.PureComponent<IBasicSamplerAllProps> {
 								onChangeId={BasicSamplerParam.release}
 							/>
 							<Knob
+								min={-100}
+								max={100}
+								value={this.props.detune}
+								onChange={this._dispatchChangeInstrumentParam}
+								label="detune"
+								onChangeId={BasicSamplerParam.detune}
+							/>
+							<Knob
 								min={0}
 								max={1}
 								curve={2}
@@ -109,6 +118,7 @@ export const ConnectedBasicSampler = connect(
 			lowPassFilterCutoffFrequency: samplerState.lowPassFilterCutoffFrequency,
 			attack: samplerState.attack,
 			release: samplerState.release,
+			detune: samplerState.detune,
 			gain: samplerState.gain,
 		}
 	},

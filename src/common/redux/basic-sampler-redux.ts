@@ -23,6 +23,7 @@ export enum BasicSamplerParam {
 	lowPassFilterCutoffFrequency = 'lowPassFilterCutoffFrequency',
 	attack = 'attack',
 	release = 'release',
+	detune = 'detune',
 	gain = 'gain',
 }
 
@@ -42,6 +43,7 @@ export class BasicSamplerState implements IConnectable, NodeSpecialState {
 		lowPassFilterCutoffFrequency: 0,
 		attack: 0,
 		release: 0,
+		detune: 0,
 		gain: 1,
 		color: false,
 		type: ConnectionNodeType.basicSampler,
@@ -53,6 +55,7 @@ export class BasicSamplerState implements IConnectable, NodeSpecialState {
 	public readonly lowPassFilterCutoffFrequency: number = Math.min(10000, Math.random() * 10000 + 1000)
 	public readonly attack: number = 0.01
 	public readonly release: number = 1
+	public readonly detune = 0
 	public readonly gain = 1
 	public readonly color: false = false
 	public readonly type = ConnectionNodeType.basicSampler
