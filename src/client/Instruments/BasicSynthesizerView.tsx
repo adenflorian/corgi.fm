@@ -35,6 +35,7 @@ interface IBasicSynthesizerViewReduxProps {
 	attack: number
 	release: number
 	fineTuning: number
+	gain: number
 }
 
 export class BasicSynthesizerView
@@ -105,6 +106,14 @@ export class BasicSynthesizerView
 								label="fine"
 								onChangeId={BasicSynthesizerParam.fineTuning}
 							/>
+							<Knob
+								min={0}
+								max={1}
+								value={this.props.gain}
+								onChange={this._dispatchChangeInstrumentParam}
+								label="gain"
+								onChangeId={BasicSynthesizerParam.gain}
+							/>
 						</div>
 					</div>
 				</Panel>
@@ -138,6 +147,7 @@ export const ConnectedBasicSynthesizerView = connect(
 			attack: instrumentState.attack,
 			release: instrumentState.release,
 			fineTuning: instrumentState.fineTuning,
+			gain: instrumentState.gain,
 		}
 	},
 )(

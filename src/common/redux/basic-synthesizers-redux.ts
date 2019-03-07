@@ -37,6 +37,7 @@ export enum BasicSynthesizerParam {
 	attack = 'attack',
 	release = 'release',
 	fineTuning = 'fineTuning',
+	gain = 'gain',
 }
 
 export interface BasicSynthesizerAction extends AnyAction {
@@ -64,6 +65,7 @@ export class BasicSynthesizerState implements IConnectable, NodeSpecialState {
 		color: false,
 		type: ConnectionNodeType.basicSynthesizer,
 		fineTuning: 0,
+		gain: 1,
 	}
 
 	public readonly oscillatorType: ShamuOscillatorType
@@ -75,6 +77,7 @@ export class BasicSynthesizerState implements IConnectable, NodeSpecialState {
 	public readonly attack: number = 0.01
 	public readonly release: number = 1
 	public readonly fineTuning: number = 0
+	public readonly gain = 1
 	public readonly color: false = false
 	public readonly type = ConnectionNodeType.basicSynthesizer
 

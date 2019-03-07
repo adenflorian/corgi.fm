@@ -138,6 +138,7 @@ export const setupInstrumentManager = (
 					instrument.setAttack(instrumentState.attack)
 					instrument.setRelease(instrumentState.release)
 					instrument.setDetune(instrumentState.fineTuning)
+					instrument.setGain(instrumentState.gain)
 				},
 			)
 		}
