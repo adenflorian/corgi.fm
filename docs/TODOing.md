@@ -47,9 +47,7 @@
 				- how?
 				- cancelAndHold?
 				- how to know when to adjust?
-				- [ ] Refactor instrument stuff to separate scheduled and legacy stuff
-					- [ ] ScheduledInstrument
-					- [ ] ScheduledVoice
+				- [ ] applyEnvelope function
 			- [ ] release
 			- [√] detune
 			- [√] osc type
@@ -86,7 +84,8 @@
 
 # Soon
 - [√] put limits on virtual keyboard octave
-- [ ] add gain knob on instruments
+- [√] add gain knob on instruments
+- [ ] play note when placed in grid sequencer
 - [ ] don't change current notes on keyboard when changing octave (at least not by default; something to put in options?)
 	- not sure if possible/easy to make this an option
 - [ ] allow adding connections from a node with no connections on it already

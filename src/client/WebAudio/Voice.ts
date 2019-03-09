@@ -269,51 +269,104 @@ function _applyEnvelope(
 	//   you have to trash the old oscillator and make a new one
 	//   can't call start more than once
 
-	// attack start
-	gain.gain.cancelScheduledValues(audioContext.currentTime)
-	gain.gain.value = 0
-	gain.gain.linearRampToValueAtTime(0, envelope.attackStart)
 	// Before doing this, make sure we took everything else into account that we need to
 	// - [√] releaseStart
-	// - [ ] hardcutoff
+	// - [ ] hard cutoff
+	//   - if the next note starts before this on finishes its release
+	//   - could affect:
+	//     - [ ] actualAttackEnd
+	//     - [ ] actualSustain
+	//     - [ ] ?
 
 	const actualAttackEnd = Math.min(envelope.attackEnd, envelope.releaseStart)
 
-	const originalAttackLength = actualAttackEnd - envelope.attackStart
-	const actualAttackLength = envelope.releaseStart - envelope.attackStart
-	const ratio = actualAttackLength / originalAttackLength
-	const adjustedSustain = ratio * envelope.sustain
+	const adjustedSustain = calculateSustain(actualAttackEnd, envelope)
 
 	const actualSustain = Math.min(envelope.sustain, adjustedSustain)
 
-	gain.gain.linearRampToValueAtTime(actualSustain, actualAttackEnd)
+	// TODO Handle cutoff attack and cutoff release
+
+	_applyEnvelopeToGain(
+		audioContext,
+		gain,
+		envelope.attackStart,
+		actualAttackEnd,
+		actualSustain,
+		envelope.releaseStart,
+		envelope.releaseEnd,
+	)
 
 	if (startSource) {
 		sourceNode.start(envelope.attackStart)
 	}
 
-	// TODO Handle cutoff attack and cutoff release
-
-	// attack end
-	gain.gain.linearRampToValueAtTime(envelope.sustain, envelope.releaseStart)
-
-	// release start
-	gain.gain.exponentialRampToValueAtTime(0.00001, envelope.releaseEnd)
-
-	// release end
 	sourceNode.stop(envelope.releaseEnd)
+
 	sourceNode.onended = onEnded
 }
 
-// const makeScheduledEnvelope = Record({
-// 	attackStart: 0,
-// 	releaseStart: 0,
-// 	hardCutoffTime: 0,
-// 	attackLength: 0.005,
-// 	// decay: 0.0,
-// 	sustain: 1.0,
-// 	releaseLength: 0.10,
-// })
+function _applyEnvelopeToGain(
+	audioContext: AudioContext,
+	gain: GainNode,
+	attackStart: number,
+	attackEnd: number,
+	sustain: number,
+	releaseStart: number,
+	releaseEnd: number,
+) {
+	// What do we know at this point?
+	// attack start will never change
+	//
+
+	/*
+	can i really redo this stuff at any time during the life of a note?
+
+	maybe i can just call all these funcs regardless if the time passed in is in the past or not
+		and the WAAPI will just figure it out
+		- nope
+
+	try scheduling stuff in the past
+	- can't
+
+	maybe use multiple gain nodes for an envelope
+	1 for attack and 1 for release?
+	will that make things simpler at all?
+	- idk
+
+	id need to calculate the current sustain at any time
+	- can do
+	- see desmos graph
+	- https://www.desmos.com/calculator/t99q8totkj
+
+	so
+	cancel everything
+	determine current sustain?
+	determine what stage we're in
+
+	can't i just use set value curve at time?
+	- no
+	*/
+
+	// Before attack
+	// use cancelAndHold?
+	// cancel now or at attack start?
+	gain.gain.cancelScheduledValues(audioContext.currentTime)
+	gain.gain.value = 0
+	// attackStart could be in the past
+	gain.gain.linearRampToValueAtTime(0, attackStart)
+
+	// Attack
+	// attackEnd could be in the past
+	gain.gain.linearRampToValueAtTime(sustain, attackEnd)
+
+	// Sustain until release start
+	// releaseStart could be in the past
+	gain.gain.linearRampToValueAtTime(sustain, releaseStart)
+
+	// Release
+	// releaseEnd could be in the past
+	gain.gain.exponentialRampToValueAtTime(0.00001, releaseEnd)
+}
 
 class ScheduledEnvelope {
 	constructor(
@@ -333,5 +386,11 @@ class ScheduledEnvelope {
 	}
 }
 
-/** All times in seconds */
-// type ScheduledEnvelope = ReturnType<typeof makeScheduledEnvelope>
+function calculateSustain(actualAttackEnd: number, envelope: ScheduledEnvelope) {
+	const originalAttackLength = actualAttackEnd - envelope.attackStart
+	const actualAttackLength = envelope.releaseStart - envelope.attackStart
+	const ratio = actualAttackLength / originalAttackLength
+	const adjustedSustain = ratio * envelope.sustain
+
+	return adjustedSustain
+}
