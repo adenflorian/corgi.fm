@@ -1,7 +1,4 @@
-import {Record} from 'immutable'
-import {number} from 'prop-types'
 import uuid = require('uuid')
-import {logger} from '../../common/logger'
 import {OnEndedCallback} from './index'
 
 enum VoiceStatus {
@@ -33,7 +30,7 @@ export abstract class Voice {
 	protected _scheduledReleaseStartTimeSeconds = Number.MAX_VALUE
 	protected _scheduledReleaseEndTimeSeconds = Number.MAX_VALUE
 	protected _sustainLevel = 1
-	protected _scheduledEnvelope = new ScheduledEnvelope()
+	protected _scheduledEnvelope: ScheduledEnvelope | undefined
 	protected _detune: number = 0
 
 	constructor(
@@ -117,19 +114,20 @@ export abstract class Voice {
 
 		this.playingNote = note
 
-		this._scheduledEnvelope = new ScheduledEnvelope(
-			this._audioContext.currentTime + delaySeconds,
-			Number.MAX_VALUE,
-			Number.MAX_VALUE,
-			attackTimeInSeconds,
-			this._sustainLevel,
-			Number.MAX_VALUE,
-		)
+		this._scheduledEnvelope = calculateScheduledEnvelope({
+			attackStart: this._audioContext.currentTime + delaySeconds,
+			attackLength: attackTimeInSeconds,
+			sustain: this._sustainLevel,
+			releaseStart: Number.MAX_VALUE,
+			releaseLength: 0,
+			hardCutoffTime: Number.MAX_VALUE,
+		})
 
 		this._scheduledAttackStartTimeSeconds = this._scheduledEnvelope.attackStart
 		this._scheduledAttackEndTimeSeconds = this._scheduledEnvelope.attackEnd
 
 		_applyEnvelope(
+			undefined,
 			this._scheduledEnvelope,
 			this._gain,
 			this.getAudioScheduledSourceNode()!,
@@ -258,6 +256,7 @@ export abstract class Voice {
 }
 
 function _applyEnvelope(
+	previousScheduledEnvelope: ScheduledEnvelope | undefined,
 	envelope: ScheduledEnvelope,
 	gain: GainNode,
 	sourceNode: AudioScheduledSourceNode,
@@ -278,22 +277,11 @@ function _applyEnvelope(
 	//     - [ ] actualSustain
 	//     - [ ] ?
 
-	const actualAttackEnd = Math.min(envelope.attackEnd, envelope.releaseStart)
-
-	const adjustedSustain = calculateSustain(actualAttackEnd, envelope)
-
-	const actualSustain = Math.min(envelope.sustain, adjustedSustain)
-
-	// TODO Handle cutoff attack and cutoff release
-
 	_applyEnvelopeToGain(
 		audioContext,
 		gain,
-		envelope.attackStart,
-		actualAttackEnd,
-		actualSustain,
-		envelope.releaseStart,
-		envelope.releaseEnd,
+		previousScheduledEnvelope,
+		envelope,
 	)
 
 	if (startSource) {
@@ -308,89 +296,192 @@ function _applyEnvelope(
 function _applyEnvelopeToGain(
 	audioContext: AudioContext,
 	gain: GainNode,
-	attackStart: number,
-	attackEnd: number,
-	sustain: number,
-	releaseStart: number,
-	releaseEnd: number,
+	previousScheduledEnvelope: ScheduledEnvelope | undefined,
+	{attackStart, attackEnd, sustain, releaseStart, releaseEnd}: ScheduledEnvelope,
 ) {
-	// What do we know at this point?
-	// attack start will never change
-	//
-
 	/*
-	can i really redo this stuff at any time during the life of a note?
-
-	maybe i can just call all these funcs regardless if the time passed in is in the past or not
-		and the WAAPI will just figure it out
-		- nope
-
-	try scheduling stuff in the past
-	- can't
-
-	maybe use multiple gain nodes for an envelope
-	1 for attack and 1 for release?
-	will that make things simpler at all?
-	- idk
-
 	id need to calculate the current sustain at any time
 	- can do
 	- see desmos graph
 	- https://www.desmos.com/calculator/t99q8totkj
-
-	so
-	cancel everything
-	determine current sustain?
-	determine what stage we're in
-
-	can't i just use set value curve at time?
-	- no
 	*/
 
-	// Before attack
-	// use cancelAndHold?
-	// cancel now or at attack start?
-	gain.gain.cancelScheduledValues(audioContext.currentTime)
-	gain.gain.value = 0
-	// attackStart could be in the past
-	gain.gain.linearRampToValueAtTime(0, attackStart)
+	// TODO Need to use previous envelopes values
+	const stage = previousScheduledEnvelope === undefined
+		? EnvelopeStage.beforeAttack
+		: _determineEnvelopeStage(
+			audioContext,
+			previousScheduledEnvelope,
+		)
 
-	// Attack
-	// attackEnd could be in the past
-	gain.gain.linearRampToValueAtTime(sustain, attackEnd)
+	// _cancelAndHoldOrJustCancelAtTime(gain, audioContext.currentTime)
 
-	// Sustain until release start
-	// releaseStart could be in the past
-	gain.gain.linearRampToValueAtTime(sustain, releaseStart)
+	if (stage === EnvelopeStage.beforeAttack) {
+		gain.gain.cancelScheduledValues(audioContext.currentTime)
 
-	// Release
-	// releaseEnd could be in the past
-	gain.gain.exponentialRampToValueAtTime(0.00001, releaseEnd)
-}
+		// Before attack
+		gain.gain.value = 0
+		gain.gain.linearRampToValueAtTime(0, attackStart)
 
-class ScheduledEnvelope {
-	constructor(
-		public readonly attackStart = 0,
-		public readonly releaseStart = 0,
-		public readonly hardCutoffTime = 0,
-		public readonly attackLength = 0.005,
-		// public readonly decay = 0.0,
-		public readonly sustain = 1.0,
-		public readonly releaseLength = 0.10,
-	) {}
+		// Attack
+		gain.gain.linearRampToValueAtTime(sustain, attackEnd)
 
-	public get attackEnd() {return this.attackStart + this.attackLength}
+		// Sustain until release start
+		gain.gain.linearRampToValueAtTime(sustain, releaseStart)
 
-	public get releaseEnd() {
-		return Math.min(Number.MAX_VALUE, this.releaseStart + this.releaseLength)
+		// Release
+		gain.gain.exponentialRampToValueAtTime(0.00001, releaseEnd)
+
+		return
+	}
+
+	if (stage === EnvelopeStage.attack) {
+		_cancelAndHoldOrJustCancelAtTime(gain, audioContext.currentTime)
+
+		// Attack
+		gain.gain.linearRampToValueAtTime(sustain, attackEnd)
+
+		// Sustain until release start
+		gain.gain.linearRampToValueAtTime(sustain, releaseStart)
+
+		// Release
+		gain.gain.exponentialRampToValueAtTime(0.00001, releaseEnd)
+
+		return
+	}
+
+	if (stage === EnvelopeStage.sustain) {
+		_cancelAndHoldOrJustCancelAtTime(gain, audioContext.currentTime)
+
+		// Sustain until release start
+		gain.gain.linearRampToValueAtTime(sustain, releaseStart)
+
+		// Release
+		gain.gain.exponentialRampToValueAtTime(0.00001, releaseEnd)
+
+		return
+	}
+
+	if (stage === EnvelopeStage.release) {
+		_cancelAndHoldOrJustCancelAtTime(gain, audioContext.currentTime)
+
+		// Release
+		gain.gain.exponentialRampToValueAtTime(0.00001, releaseEnd)
+
+		return
+	}
+
+	if (stage === EnvelopeStage.afterRelease) {
+		return
 	}
 }
 
-function calculateSustain(actualAttackEnd: number, envelope: ScheduledEnvelope) {
-	const originalAttackLength = actualAttackEnd - envelope.attackStart
-	const actualAttackLength = envelope.releaseStart - envelope.attackStart
-	const ratio = actualAttackLength / originalAttackLength
-	const adjustedSustain = ratio * envelope.sustain
+function _determineEnvelopeStage(
+	audioContext: AudioContext,
+	{attackStart, attackEnd, releaseStart, releaseEnd}: ScheduledEnvelope,
+) {
+	const currentTime = audioContext.currentTime
 
-	return adjustedSustain
+	if (currentTime < attackStart) return EnvelopeStage.beforeAttack
+
+	if (currentTime < attackEnd) return EnvelopeStage.attack
+
+	if (currentTime < releaseStart) return EnvelopeStage.sustain
+
+	if (currentTime < releaseEnd) return EnvelopeStage.release
+
+	return EnvelopeStage.afterRelease
+}
+
+enum EnvelopeStage {
+	beforeAttack,
+	attack,
+	sustain,
+	release,
+	afterRelease,
+}
+
+interface CreateScheduledEnvelopeArgs {
+	attackStart: number
+	attackLength: number
+	// decay: number
+	sustain: number
+	releaseStart: number
+	releaseLength: number
+	hardCutoffTime: number
+}
+
+function calculateScheduledEnvelope(
+	{
+		attackStart,
+		attackLength,
+		sustain,
+		releaseStart,
+		releaseLength,
+		hardCutoffTime,
+	}: CreateScheduledEnvelopeArgs,
+) {
+	const desiredAttackEnd = attackStart + attackLength
+
+	const actualAttackEnd = Math.min(desiredAttackEnd, releaseStart)
+
+	const actualSustain = calculateSustain(actualAttackEnd, attackStart, sustain, releaseStart)
+
+	// TODO Handle cutoff attack and cutoff release
+
+	return new ScheduledEnvelope({
+		attackStart,
+		attackEnd: actualAttackEnd,
+		sustain: actualSustain,
+		releaseStart,
+		releaseEnd: releaseStart + releaseLength,
+		hardCutoffTime,
+	})
+}
+
+function calculateSustain(actualAttackEnd: number, attackStart: number, sustain: number, releaseStart: number) {
+	const originalAttackLength = actualAttackEnd - attackStart
+	const actualAttackLength = releaseStart - attackStart
+	const ratio = actualAttackLength / originalAttackLength
+	const adjustedSustain = ratio * sustain
+
+	return Math.min(sustain, adjustedSustain)
+}
+
+class ScheduledEnvelope {
+	public readonly attackStart: number
+	public readonly attackEnd: number
+	// public readonly decay: number
+	public readonly sustain: number
+	public readonly releaseStart: number
+	public readonly releaseEnd: number
+	public readonly hardCutoffTime: number
+
+	constructor(
+		env: ScheduledEnvelope,
+	) {
+		this.attackStart = env.attackStart
+		this.attackEnd = env.attackEnd
+		//  this.decay  = env.decay
+		this.sustain = env.sustain
+		this.releaseStart = env.releaseStart
+		this.releaseEnd = env.releaseEnd
+		this.hardCutoffTime = env.hardCutoffTime
+	}
+
+	// public get attackEnd() {return this.attackStart + this.attackLength}
+
+	// public get releaseEnd() {
+	// 	return Math.min(Number.MAX_VALUE, this.releaseStart + this.releaseLength)
+	// }
+}
+
+/** If cancelAndHold is called with a past time it doesn't work */
+function _cancelAndHoldOrJustCancelAtTime(gain: GainNode, time: number) {
+	// cancelAndHoldAtTime is not implemented in firefox
+	if (gain.gain.cancelAndHoldAtTime) {
+		gain.gain.cancelAndHoldAtTime(time)
+	} else {
+		gain.gain.cancelScheduledValues(time)
+	}
 }
