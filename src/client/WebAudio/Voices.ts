@@ -140,7 +140,7 @@ export abstract class Voices<V extends Voice> {
 		})
 	}
 
-	public changeAttackForScheduledVoices(newAttackSeconds: number) {
+	public changeAttackLengthForScheduledVoices(newAttackSeconds: number) {
 		// ask each voice to update attack?
 		// do we need to filter first?
 		// maybe only voices that...

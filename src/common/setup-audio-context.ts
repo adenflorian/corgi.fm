@@ -103,23 +103,83 @@ export function setupAudioContext(audioContext: AudioContext, preFx: GainNode, s
 	// For manual testing of web audio scheduling
 	// const oscGain = audioContext.createGain()
 	// oscGain.gain.value = 0
-	// oscGain.gain.linearRampToValueAtTime(0, audioContext.currentTime + 2)
-	// oscGain.gain.linearRampToValueAtTime(1, audioContext.currentTime + 4)
-	// oscGain.gain.linearRampToValueAtTime(0, audioContext.currentTime + 6)
-	// oscGain.gain.linearRampToValueAtTime(1, audioContext.currentTime + 7)
-	// oscGain.gain.linearRampToValueAtTime(0, audioContext.currentTime + 8)
-	// oscGain.gain.linearRampToValueAtTime(1, audioContext.currentTime + 9)
-	// oscGain.gain.cancelAndHoldAtTime(audioContext.currentTime + 8.2)
-	// oscGain.gain.linearRampToValueAtTime(0.2, audioContext.currentTime + 10)
-	// oscGain.gain.linearRampToValueAtTime(0, audioContext.currentTime + 11)
-	// oscGain.gain.linearRampToValueAtTime(1, audioContext.currentTime + 12)
-	// oscGain.gain.linearRampToValueAtTime(0, audioContext.currentTime + 13)
-	// oscGain.gain.cancelAndHoldAtTime(audioContext.currentTime + 12.8)
 
 	// const oscA = audioContext.createOscillator()
 	// oscA.type = 'sawtooth'
 	// oscA.connect(oscGain).connect(preFx)
-	// oscA.start()
+	// oscA.start(2)
+
+	// // before attack
+	// oscGain.gain.linearRampToValueAtTime(0, 2)
+
+	// const sustain = 1
+
+	// // attack
+	// oscGain.gain.linearRampToValueAtTime(sustain, 12)
+
+	// // // sustain
+	// // oscGain.gain.linearRampToValueAtTime(sustain, 12)
+
+	// // // release
+	// // oscGain.gain.linearRampToValueAtTime(0, 14)
+
+	// // change attack twice
+	// oscGain.gain.cancelAndHoldAtTime(4)
+	// oscGain.gain.linearRampToValueAtTime(sustain, 5.5)
+	// oscGain.gain.cancelAndHoldAtTime(5)
+	// oscGain.gain.linearRampToValueAtTime(sustain, 7)
+
+	// // sustain
+	// oscGain.gain.linearRampToValueAtTime(sustain, 8)
+
+	// // release
+	// oscGain.gain.linearRampToValueAtTime(0, 9)
+
+	// // window.addEventListener('keydown', e => {
+	// // 	if (e.key === 'v') {
+
+	// // 		oscGain.gain.cancelAndHoldAtTime(audioContext.currentTime)
+	// // 		oscGain.gain.linearRampToValueAtTime(sustain, audioContext.currentTime + 1)
+
+	// // 		// sustain
+	// // 		oscGain.gain.linearRampToValueAtTime(sustain, audioContext.currentTime + 2)
+
+	// // 		// release
+	// // 		oscGain.gain.linearRampToValueAtTime(0, audioContext.currentTime + 3)
+	// // 	}
+	// // })
+
+	// // oscA.frequency.setValueAtTime(440, audioContext.currentTime)
+
+	// // let done = false
+
+	// setInterval(() => {
+	// 	// if (done === false && audioContext.currentTime > 4) {
+	// 	// 	oscA.frequency.linearRampToValueAtTime(880, 3)
+	// 	// 	oscA.frequency.linearRampToValueAtTime(440, 5)
+	// 	// 	done = true
+	// 	// }
+	// 	// console.log('oscA.frequency.value: ', oscA.frequency.value)
+	// 	if (audioContext.currentTime > 10) return
+	// 	console.log('audioContext.currentTime: ', audioContext.currentTime)
+	// 	console.log('oscGain.gain.value: ', oscGain.gain.value)
+	// }, 100)
+
+	// // setTimeout(() => {
+	// // 	// oscGain.gain.linearRampToValueAtTime(0, 2)
+	// // }, 5000)
+
+	// const waveArray = new Float32Array(5)
+	// waveArray[0] = 440
+	// waveArray[1] = 880
+	// waveArray[2] = 440
+	// waveArray[3] = 880
+	// waveArray[4] = 440
+
+	// oscA.frequency.setValueCurveAtTime(waveArray, audioContext.currentTime + 4, 4)
+
+	// oscGain.gain.linearRampToValueAtTime(0.2, audioContext.currentTime + 8)
+	// oscGain.gain.linearRampToValueAtTime(0, audioContext.currentTime + 10)
 
 	return audioContext
 }
