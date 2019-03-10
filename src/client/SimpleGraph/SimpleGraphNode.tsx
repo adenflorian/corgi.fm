@@ -53,6 +53,7 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 					left: -2000,
 				}}
 				handle={`.${handleClassName}`}
+				cancel={`.actualKnob, .note, .key, .controls > *, .oscillatorTypes > *, .verticalScrollBar`}
 				onMouseDown={this._handleMouseDown}
 			>
 				<div
@@ -86,7 +87,7 @@ const borderRadius = 4
 
 const Handle = React.memo(function Handle_() {
 	return <div
-		className={handleClassName}
+		className={handleClassName + ' handleVisual'}
 		style={{
 			display: 'flex',
 			justifyContent: 'center',

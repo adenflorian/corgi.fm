@@ -28,7 +28,7 @@ export const Panel: React.FC<IPanelProps> =
 					width: autoSize ? 'auto' : undefined,
 					height: autoSize ? 'auto' : undefined,
 				}}
-				className={`panelContainer ${saturate ? 'saturate' : ''}`}
+				className={`panelContainer handle ${saturate ? 'saturate' : ''}`}
 			>
 				{renderLabel &&
 					<div
