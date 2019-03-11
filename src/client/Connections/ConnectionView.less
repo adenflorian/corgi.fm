@@ -37,9 +37,16 @@
 
     .ghost {
         stroke: gray;
+        animation: dash 60s infinite linear;
 
         &.hidden {
             stroke: #0000;
         }
     }
 }
+
+@keyframes dash {
+    to {
+      stroke-dashoffset: -1000;
+    }
+  }

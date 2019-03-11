@@ -126,7 +126,7 @@
 - [√] make them moveable
 - [√] fix invisible long line when vertical (kind of fixed by only being curved lines now?)
 - [√] make input connector look like a stack cable when multiple inputs
-- [ ] animate dashed ghost connector
+- [√] animate dashed ghost connector
 - [ ] animate active connections in the direction that data is flowing
 - [ ] show ghost connector for adding connections when mouse is near, and put it at top of connector stack, don't require ctrl to be held down
 - [ ] have a node that hands out connections
@@ -266,7 +266,7 @@ instrument manager already handles all creation and destruction of instruments
 - [√] Hit enter to focus chat
 - [ ] play sound when new message?
 - [ ] make new messages start at full opacity then fade to whatever the normal opacity is
-- [ ] make chat bottom bar always in front?
+- [√] make chat bottom bar always in front?
 
 # Username
 - when change name, should we change the name in old chat messages?

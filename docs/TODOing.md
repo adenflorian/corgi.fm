@@ -18,6 +18,7 @@
 			- [√] midi keyboard
 			- [√] check performance
 		- [√] make note-scanner use note length from event
+		- [ ] stopping a specific sequencer should immediately cancel scheduled notes from that sequencer
 		- [ ] handle conflicting note lengths scenarios
 			- scenario A
 				- steps
@@ -33,7 +34,8 @@
 				- act   varies
 		- [ ] sequencer animations
 		- [ ] master clock play button animation
-		- [ ] rate knob on infinite sequencer
+		- [x] rate knob on infinite sequencer
+			- removed for now, not sure how to implement
 		- [√] release all notes on stop
 		- [√] stopping song shouldn't release notes being played by user
 		- what does ableton do when you stop and there is a note with a really long release
@@ -43,12 +45,13 @@
 		- [√] make instrument params affect currently playing notes
 			- [√] pan
 			- [√] filter
-			- [ ] attack
+			- [x] attack
+				- chrome bug preventing impl
 				- how?
 				- cancelAndHold?
 				- how to know when to adjust?
 				- [ ] applyEnvelope function
-			- [ ] release
+			- [x] release
 				- chrome bug preventing impl
 			- [√] detune
 			- [√] osc type
