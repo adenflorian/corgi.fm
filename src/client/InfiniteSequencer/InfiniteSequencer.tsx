@@ -145,14 +145,14 @@ export const InfiniteSequencer: React.FC<IInfiniteSequencerAllProps> = React.mem
 							<Rows />
 						</div>
 
-						<Knob
+						{/* <Knob
 							min={1}
 							max={8}
 							value={rate}
 							onChange={dispatchInfiniteSeqParam}
 							label="rate"
 							onChangeId={InfiniteSequencerFields.rate}
-						/>
+						/> */}
 					</div>
 					{style === InfiniteSequencerStyle.colorBars &&
 						<div className={`display ${props.events.count() > 8 ? 'small' : ''}`}>
