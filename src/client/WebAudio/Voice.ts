@@ -39,6 +39,7 @@ export abstract class Voice {
 		destination: AudioNode,
 		onEnded: OnEndedCallback,
 		detune: number,
+		protected readonly _invincible: boolean,
 	) {
 		this.id = Voice._nextId++
 		this._audioContext = audioContext
@@ -58,6 +59,7 @@ export abstract class Voice {
 	public get scheduledReleaseStartTimeSeconds() {return this._scheduledReleaseStartTimeSeconds}
 	public get scheduledReleaseEndTimeSeconds() {return this._scheduledReleaseEndTimeSeconds}
 	public get scheduledEnvelope() {return this._scheduledEnvelope}
+	public get invincible() {return this._invincible}
 
 	public getIsReleaseScheduled = () => this._isReleaseScheduled
 

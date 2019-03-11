@@ -174,7 +174,7 @@ function scheduleNote(note: IMidiNote, sourceId: string, roomState: IClientRoomS
 		if (targetIds.includes(instrument.id) === false) return
 
 		if (onOrOff === 'on') {
-			instrument.scheduleNote(note, 0)
+			instrument.scheduleNote(note, 0, true)
 		} else {
 			instrument.scheduleRelease(note, 0)
 		}

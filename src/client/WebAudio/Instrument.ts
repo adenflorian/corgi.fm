@@ -37,8 +37,8 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 		registerInstrumentWithSchedulerVisual(this.id, () => this._getVoices().getScheduledVoices(), this._audioContext)
 	}
 
-	public scheduleNote(note: IMidiNote, delaySeconds: number) {
-		this._getVoices().scheduleNote(note, delaySeconds, this._attackTimeInSeconds)
+	public scheduleNote(note: IMidiNote, delaySeconds: number, invincible: boolean) {
+		this._getVoices().scheduleNote(note, delaySeconds, this._attackTimeInSeconds, invincible)
 	}
 
 	public scheduleRelease(note: number, delaySeconds: number) {

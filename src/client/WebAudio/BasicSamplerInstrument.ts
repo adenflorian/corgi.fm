@@ -34,18 +34,19 @@ class SamplerVoices extends Voices<SamplerVoice> {
 		super(_detune)
 
 		for (let i = 0; i < this._voiceCount; i++) {
-			const newVoice = this._createVoice(false)
+			const newVoice = this._createVoice(false, false)
 			this._inactiveVoices = this._inactiveVoices.set(newVoice.id, newVoice)
 		}
 	}
 
-	protected _createVoice(forScheduling: boolean) {
+	protected _createVoice(forScheduling: boolean, invincible: boolean) {
 		return new SamplerVoice(
 			this._audioContext,
 			this._destination,
 			forScheduling,
 			this._getOnEndedCallback(),
 			this._detune,
+			invincible,
 		)
 	}
 
@@ -60,8 +61,9 @@ class SamplerVoice extends Voice {
 		audioContext: AudioContext, destination: AudioNode,
 		forScheduling: boolean, onEnded: OnEndedCallback,
 		detune: number,
+		invincible: boolean,
 	) {
-		super(audioContext, destination, onEnded, detune)
+		super(audioContext, destination, onEnded, detune, invincible)
 
 		this._audioBufferSource = this._audioContext.createBufferSource()
 

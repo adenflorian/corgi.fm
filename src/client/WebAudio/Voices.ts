@@ -21,7 +21,7 @@ export abstract class Voices<V extends Voice> {
 			.concat(this._scheduledVoices)
 	}
 
-	protected abstract _createVoice(forScheduling: boolean): V
+	protected abstract _createVoice(forScheduling: boolean, invincible: boolean): V
 
 	public getScheduledVoices() {return this._scheduledVoices}
 
@@ -55,7 +55,7 @@ export abstract class Voices<V extends Voice> {
 		}
 	}
 
-	public scheduleNote(note: IMidiNote, delaySeconds: number, attackTimeInSeconds: number) {
+	public scheduleNote(note: IMidiNote, delaySeconds: number, attackTimeInSeconds: number, invincible: boolean) {
 
 		const newNoteStartTime = this._getAudioContext().currentTime + delaySeconds
 
@@ -72,7 +72,7 @@ export abstract class Voices<V extends Voice> {
 			conflictingVoice.scheduleRelease(delaySeconds, 0.001)
 		}
 
-		const newVoice = this._createVoice(true)
+		const newVoice = this._createVoice(true, invincible)
 
 		newVoice.scheduleNote(note, attackTimeInSeconds, delaySeconds)
 
@@ -135,9 +135,10 @@ export abstract class Voices<V extends Voice> {
 	}
 
 	public releaseAllScheduled(releaseSeconds: number) {
-		this._scheduledVoices.forEach(x => {
-			x.scheduleRelease(0, releaseSeconds, true)
-		})
+		this._scheduledVoices.filter(x => x.invincible === false)
+			.forEach(x => {
+				x.scheduleRelease(0, releaseSeconds, true)
+			})
 	}
 
 	public changeAttackLengthForScheduledVoices(newAttackSeconds: number) {

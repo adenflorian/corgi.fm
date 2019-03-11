@@ -35,12 +35,12 @@
 		- [ ] master clock play button animation
 		- [ ] rate knob on infinite sequencer
 		- [√] release all notes on stop
-		- [ ] stopping song shouldnt release notes being played by user
+		- [√] stopping song shouldn't release notes being played by user
 		- what does ableton do when you stop and there is a note with a really long release
 			- it just keeps on releasing, even when you hit play again
 			- but you can adjust release of note that are already releasing, in serum at least
 		- [√] get noise osc on synth working with schedules
-		- [ ] make instrument params affect currently playing notes
+		- [√] make instrument params affect currently playing notes
 			- [√] pan
 			- [√] filter
 			- [ ] attack
@@ -49,11 +49,14 @@
 				- how to know when to adjust?
 				- [ ] applyEnvelope function
 			- [ ] release
+				- chrome bug preventing impl
 			- [√] detune
 			- [√] osc type
 				- [√] normal
 				- [√] noise
 	- **Bugs**
+		- [ ] 2019-03-10 Not getting stuck when playing keyboard really fast with mouse
+			- haven't been able to reproduce
 		- [ ] 2019-03-03 Note getting stuck on when just sequencers are playing at normal speed
 			- put all 4 sequencers into same synth, with default release
 		- [ ] 2019-03-03 When playing note on keyboard and change connection, note keeps playing on previous instrument

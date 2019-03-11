@@ -188,7 +188,7 @@ function scheduleNotes() {
 			event.notes.forEach(note => {
 				// console.log('actualNote: ' + note + ' | delaySeconds: ' + delaySeconds)
 				// console.log('gridSeq: ', gridSeq)
-				instrument.scheduleNote(note, delaySecondsUntilStart)
+				instrument.scheduleNote(note, delaySecondsUntilStart, false)
 				instrument.scheduleRelease(note, delaySecondsUntilRelease)
 			})
 		})

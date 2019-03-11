@@ -47,13 +47,13 @@ class SynthVoices extends Voices<SynthVoice> {
 		super(_detune)
 
 		for (let i = 0; i < this._voiceCount; i++) {
-			const newVoice = this._createVoice(false)
+			const newVoice = this._createVoice(false, false)
 
 			this._inactiveVoices = this._inactiveVoices.set(newVoice.id, newVoice)
 		}
 	}
 
-	protected _createVoice(forScheduling: boolean) {
+	protected _createVoice(forScheduling: boolean, invincible: boolean) {
 		return new SynthVoice(
 			this._audioContext,
 			this._destination,
@@ -61,6 +61,7 @@ class SynthVoices extends Voices<SynthVoice> {
 			forScheduling,
 			this._detune,
 			this._getOnEndedCallback(),
+			invincible,
 		)
 	}
 
@@ -84,8 +85,9 @@ class SynthVoice extends Voice {
 		audioContext: AudioContext, destination: AudioNode,
 		oscType: ShamuOscillatorType, forScheduling: boolean, detune: number,
 		onEnded: OnEndedCallback,
+		invincible: boolean,
 	) {
-		super(audioContext, destination, onEnded, detune)
+		super(audioContext, destination, onEnded, detune, invincible)
 
 		this._oscillatorType = oscType
 		this._nextOscillatorType = oscType
