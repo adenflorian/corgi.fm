@@ -116,8 +116,3 @@
 # Later
 - [ ] look into using an algorithmic reverb
 	- https://itnext.io/algorithmic-reverb-and-web-audio-api-e1ccec94621a
-- [ ] tone.js (on hold, not needed so far)
-	- [√] master volume
-	- [ ] synth
-	- [ ] sampler
-	- [ ] sequencer data structures

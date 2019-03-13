@@ -25,7 +25,11 @@
 	- [ ] [bug] pressing shift `=` (`+`) increases the octave by 2
 - [ ] create way for user to decide whether they want changing virtual keyboard octaves to change currently playing notes or not
 - [√] persist keyboard state on server, and don't store notes and octaves on clients
-- [ ] TONE.js
+- [ ] TONE.js (on hold, not needed so far)
+	- [√] master volume
+	- [ ] synth
+	- [ ] sampler
+	- [ ] sequencer data structures
 - [ ] immer js
 - [...] ADSR
 	- [√] A
