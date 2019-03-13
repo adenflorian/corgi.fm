@@ -1,7 +1,7 @@
 import {List, Set} from 'immutable'
-import {makeMidiClip, makeMidiClipEvent} from '../common/midi-types'
+import {makeMidiClipEvent, MidiClip} from '../common/midi-types'
 
-export const shortDemoMidiClip = makeMidiClip({
+export const shortDemoMidiClip = new MidiClip({
 	length: 2,
 	loop: true,
 	events: List([
@@ -53,7 +53,7 @@ export const shortDemoMidiClip = makeMidiClip({
 	]),
 })
 
-export const longDemoMidiClip = makeMidiClip({
+export const longDemoMidiClip = new MidiClip({
 	length: 8,
 	loop: true,
 	events: List([

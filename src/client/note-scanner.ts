@@ -1,6 +1,6 @@
 import {Map} from 'immutable'
 import {logger} from '../common/logger'
-import {makeMidiClip, MidiGlobalClipEvent, MidiRange} from '../common/midi-types'
+import {MidiClip, MidiGlobalClipEvent, MidiRange} from '../common/midi-types'
 import {IMidiNotes} from '../common/MidiNote'
 import {
 	ClientStore, selectAllSequencers, selectConnectionSourceIdsByTarget,
@@ -78,7 +78,7 @@ export function getCurrentSongIsPlaying() {
 	return _isPlaying
 }
 
-const emptyMidiClip = makeMidiClip()
+const emptyMidiClip = new MidiClip()
 
 function scheduleNotes() {
 	const roomState = _store.getState().room

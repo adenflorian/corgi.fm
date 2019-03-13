@@ -3,7 +3,7 @@ import {AnyAction} from 'redux'
 import {createSelector} from 'reselect'
 import * as uuid from 'uuid'
 import {ConnectionNodeType, IConnectable} from '../common-types'
-import {makeMidiClip, makeMidiClipEvent, MidiClip, MidiClipEvents} from '../midi-types'
+import {makeMidiClipEvent, MidiClip, MidiClipEvents} from '../midi-types'
 import {IMidiNote, MidiNotes} from '../MidiNote'
 import {colorFunc, hashbow} from '../shamu-color'
 import {
@@ -107,7 +107,7 @@ export class InfiniteSequencerState implements ISequencerState, IConnectable, No
 		width: InfiniteSequencerState.defaultWidth,
 		height: InfiniteSequencerState.defaultHeight,
 		rate: 1,
-		midiClip: makeMidiClip({
+		midiClip: new MidiClip({
 			events: List(),
 			length: 0,
 			loop: false,
@@ -142,7 +142,7 @@ export class InfiniteSequencerState implements ISequencerState, IConnectable, No
 		this.color = colorFunc(hashbow(this.id)).desaturate(0.2).hsl().string()
 		this.style = style
 		this.isPlaying = isPlaying
-		this.midiClip = makeMidiClip({
+		this.midiClip = new MidiClip({
 			events,
 			length: events.count(),
 			loop: true,

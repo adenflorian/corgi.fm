@@ -34,6 +34,7 @@
 				- act   varies
 		- [ ] sequencer animations
 		- [ ] master clock play button animation
+		- [ ] infinite seq loop length
 		- [x] rate knob on infinite sequencer
 			- removed for now, not sure how to implement
 		- [√] release all notes on stop
@@ -57,6 +58,8 @@
 			- [√] osc type
 				- [√] normal
 				- [√] noise
+	- [ ] animate active connections in the direction that data is flowing
+
 	- **Bugs**
 		- [ ] 2019-03-10 Not getting stuck when playing keyboard really fast with mouse
 			- haven't been able to reproduce

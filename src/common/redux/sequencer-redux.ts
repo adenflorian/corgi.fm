@@ -1,6 +1,6 @@
 import {List} from 'immutable'
 import {IMultiStateThing} from '../common-types'
-import {makeMidiClip, makeMidiClipEvent, MidiClip, MidiClipEvent, MidiClipEvents} from '../midi-types'
+import {makeMidiClipEvent, MidiClip, MidiClipEvent, MidiClipEvents} from '../midi-types'
 import {emptyMidiNotes, MidiNotes} from '../MidiNote'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './index'
 
@@ -75,7 +75,7 @@ export function deserializeSequencerState<T extends ISequencerState>(state: IMul
 	const x = state as T
 	const y = {
 		...x,
-		midiClip: makeMidiClip({
+		midiClip: new MidiClip({
 			length: x.midiClip.length,
 			loop: x.midiClip.loop,
 			events: deserializeEvents(x.midiClip.events),

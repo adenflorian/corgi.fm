@@ -3,7 +3,7 @@ import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 import {createThisShouldntHappenError} from '../common/common-utils'
 import {logger} from '../common/logger'
-import {makeMidiClip, makeMidiClipEvent, MidiClip} from '../common/midi-types'
+import {makeMidiClipEvent, MidiClip} from '../common/midi-types'
 import {IMidiNotes} from '../common/MidiNote'
 import {midiNoteToFrequency} from './WebAudio/music-functions'
 
@@ -55,7 +55,7 @@ class Experiment extends React.PureComponent {
 	}
 }
 
-const longDemoMidiClip = makeMidiClip({
+const longDemoMidiClip = new MidiClip({
 	length: 2 * 1000,
 	loop: false,
 	events: List([
@@ -326,7 +326,7 @@ const longDemoMidiClip = makeMidiClip({
 	]),
 })
 
-const shortLoopedMidiClip = makeMidiClip({
+const shortLoopedMidiClip = new MidiClip({
 	length: 2 * 1000,
 	loop: true,
 	events: List([

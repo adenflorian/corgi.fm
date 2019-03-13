@@ -23,15 +23,14 @@ export function makeMidiClipEvent(event: MidiClipEvent): Readonly<MidiClipEvent>
 	})
 }
 
-/** In clip time (beats); Means BPM has not been applied */
-export const makeMidiClip = Record({
+const makeMidiClip = Record({
 	length: 0,
 	loop: false,
 	events: List<MidiClipEvent>(),
 })
 
 /** In clip time (beats); Means BPM has not been applied */
-export type MidiClip = ReturnType<typeof makeMidiClip>
+export class MidiClip extends makeMidiClip {}
 
 /** In clip time (beats); Means BPM has not been applied */
 export type MidiClipEvents = MidiClip['events']

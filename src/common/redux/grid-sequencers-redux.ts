@@ -3,7 +3,7 @@ import {AnyAction} from 'redux'
 import {createSelector} from 'reselect'
 import * as uuid from 'uuid'
 import {ConnectionNodeType} from '../common-types'
-import {makeMidiClip, MidiClip, MidiClipEvents} from '../midi-types'
+import {MidiClip, MidiClipEvents} from '../midi-types'
 import {emptyMidiNotes, IMidiNote} from '../MidiNote'
 import {MAX_MIDI_NOTE_NUMBER_127} from '../server-constants'
 import {colorFunc, hashbow} from '../shamu-color'
@@ -109,7 +109,7 @@ export class GridSequencerState implements IGridSequencerState, NodeSpecialState
 		height: GridSequencerState.defaultHeight,
 		type: ConnectionNodeType.gridSequencer,
 		rate: 1,
-		midiClip: makeMidiClip({
+		midiClip: new MidiClip({
 			events: List(),
 			length: 0,
 			loop: false,
@@ -138,7 +138,7 @@ export class GridSequencerState implements IGridSequencerState, NodeSpecialState
 		this.color = colorFunc(hashbow(this.id)).desaturate(0.2).hsl().string()
 		this.notesToShow = notesToShow
 		this.isPlaying = isPlaying
-		this.midiClip = makeMidiClip({
+		this.midiClip = new MidiClip({
 			events: events.map(x => ({...x, startBeat: x.startBeat / 4, durationBeats: x.durationBeats / 4})),
 			length: events.count() / 4,
 			loop: true,
