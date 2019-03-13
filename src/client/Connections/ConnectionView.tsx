@@ -137,6 +137,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 						>
 							<g>
 								<path
+									className="ghostPath"
 									d={pathDPart1Ghost}
 									strokeWidth={longLineStrokeWidth + 'px'}
 									strokeDasharray={4}

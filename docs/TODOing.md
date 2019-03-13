@@ -34,7 +34,7 @@
 				- act   varies
 		- [ ] sequencer animations
 		- [ ] master clock play button animation
-		- [ ] infinite seq loop length
+		- [√] infinite seq loop length
 		- [x] rate knob on infinite sequencer
 			- removed for now, not sure how to implement
 		- [√] release all notes on stop
@@ -94,6 +94,9 @@
 # Soon
 - [√] put limits on virtual keyboard octave
 - [√] add gain knob on instruments
+- [ ] make an ECS system for real time stuff
+	- real time loop that reads redux state, or some other state, and renders stuff to canvases and what not
+	- have a component for rendering to a canvas, one for DOM, text, audio even, etc.
 - [ ] play note when placed in grid sequencer
 - [ ] don't change current notes on keyboard when changing octave (at least not by default; something to put in options?)
 	- not sure if possible/easy to make this an option

@@ -301,6 +301,7 @@ instrument manager already handles all creation and destruction of instruments
 - [√] different icon for drag handle so people don't think it's a menu
 - [ ] auto organize button
 - [√] center master clock node vertically in create server stuff
+- [ ] allow moving multiple nodes at once (like blender or unit shader graph?)
 
 # Bugs
 - [√] shift click note not showing on other clients
