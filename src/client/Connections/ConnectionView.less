@@ -39,7 +39,7 @@
         stroke: gray;
 
         .longLine path.ghostPath {
-        animation: dash 60s infinite linear;
+            animation: dash 60s infinite linear;
         }
 
         &.hidden {
@@ -48,8 +48,16 @@
     }
 }
 
+path.animatedLongLine {
+    animation-name: dash;
+    // animation-duration: 60s;
+    animation-duration: inherit;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+}
+
 @keyframes dash {
     to {
-      stroke-dashoffset: -1000;
+        stroke-dashoffset: -1000;
     }
-  }
+}

@@ -90,14 +90,14 @@ export const NodeInfoMap = Map({
 	[ConnectionNodeType.masterClock]: NodeInfoRecord({
 		stateSelector: () => ({
 			id: MASTER_CLOCK_SOURCE_ID,
-			color: CssColor.blue,
+			color: CssColor.brightBlue,
 			type: ConnectionNodeType.masterClock,
 		}),
 		selectIsActive: selectGlobalClockIsPlaying,
 		selectIsSending: selectGlobalClockIsPlaying,
 		width: 256,
 		height: 128,
-		color: CssColor.blue,
+		color: CssColor.brightBlue,
 	}),
 })
 

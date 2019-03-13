@@ -51,7 +51,7 @@ function _applyEnvelopeToGain(
 			previousScheduledEnvelope,
 		)
 
-	logger.log('EnvelopeStage: ', stage)
+	// logger.log('EnvelopeStage: ', stage)
 
 	if (stage === EnvelopeStage.beforeAttack) {
 		// gain.gain.cancelScheduledValues(audioContext.currentTime)
@@ -73,10 +73,10 @@ function _applyEnvelopeToGain(
 	}
 
 	if (stage === EnvelopeStage.attack) {
-		logger.log('stage === EnvelopeStage.attack')
+		// logger.log('stage === EnvelopeStage.attack')
 		_cancelAndHoldOrJustCancelAtTime(gain, audioContext.currentTime + 0.001)
-		logger.log('audioContext.currentTime: ', audioContext.currentTime)
-		logger.log('attackEnd: ', attackEnd)
+		// logger.log('audioContext.currentTime: ', audioContext.currentTime)
+		// logger.log('attackEnd: ', attackEnd)
 
 		// Attack
 		gain.gain.linearRampToValueAtTime(sustain, attackEnd)

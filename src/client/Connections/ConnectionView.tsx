@@ -4,7 +4,8 @@ import Draggable, {DraggableEventHandler} from 'react-draggable'
 import {Dispatch} from 'redux'
 import {
 	connectionsActions, GhostConnectorRecord, GhostConnectorStatus,
-	GhostConnectorType, IClientAppState, selectUserInputKeys, shamuConnect,
+	GhostConnectorType, IClientAppState, selectGlobalClockState,
+	selectUserInputKeys, shamuConnect,
 } from '../../common/redux'
 import {saturateColor} from '../../common/shamu-color'
 import {simpleGlobalClientState} from '../SimpleGlobalClientState'
@@ -27,6 +28,8 @@ export interface IConnectionViewProps {
 
 interface IConnectionViewReduxProps {
 	isAddMode: boolean
+	speed?: number
+	isGlobalPlaying: boolean
 }
 
 type IConnectionViewAllProps = IConnectionViewProps & IConnectionViewReduxProps & {dispatch: Dispatch}
@@ -57,7 +60,8 @@ const joint = 8
 export class ConnectionView extends React.PureComponent<IConnectionViewAllProps> {
 	public render() {
 		const {color, saturateSource, saturateTarget, id, sourceX, sourceY, targetX, targetY,
-			ghostConnector, targetStackOrder = 0, sourceStackOrder = 0} = this.props
+			ghostConnector, targetStackOrder = 0, sourceStackOrder = 0, speed = 1,
+			isGlobalPlaying} = this.props
 
 		const sourceConnectorLeft = sourceX + (connectorWidth * sourceStackOrder)
 		const sourceConnectorRight = sourceX + connectorWidth + (connectorWidth * sourceStackOrder)
@@ -96,7 +100,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 		const isGhostHidden = ghostConnector.status === GhostConnectorStatus.hidden
 
 		return (
-			<div className="connection">
+			<div className={`connection ${saturateSource ? 'playing' : ''}`}>
 				<ConnectionLine
 					id={id}
 					color={color}
@@ -106,6 +110,8 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 					pathDPart1={pathDPart1}
 					pathDFull={pathDFull}
 					connectedLine={connectedLine}
+					speed={speed}
+					isGlobalPlaying={isGlobalPlaying}
 				/>
 				<Connector
 					width={connectorWidth}
@@ -249,12 +255,16 @@ interface ConnectionLineProps {
 	pathDPart1: string
 	pathDFull: string
 	connectedLine: LineState
+	speed?: number
+	isGlobalPlaying: boolean
 }
 
 const ConnectionLine = React.memo(
 	function _ConnectionLine({id, color, saturateSource, saturateTarget, pathDPart1,
-		pathDFull, dispatch, connectedLine}: ConnectionLineProps,
+		pathDFull, dispatch, connectedLine, speed = 1, isGlobalPlaying}: ConnectionLineProps,
 	) {
+		const saturatedColor = saturateColor(color)
+
 		return (
 			<svg
 				className={`colorize longLine`}
@@ -276,8 +286,8 @@ const ConnectionLine = React.memo(
 						gradientUnits="userSpaceOnUse"
 					// gradientUnits="objectBoundingBox"
 					>
-						<stop stopColor={saturateSource ? saturateColor(color) : color} offset="0%" />
-						<stop stopColor={saturateTarget ? saturateColor(color) : color} offset="100%" />
+						<stop stopColor={saturateSource ? saturatedColor : color} offset="0%" />
+						<stop stopColor={saturateTarget ? saturatedColor : color} offset="100%" />
 					</linearGradient>
 					<filter id="saturate">
 						<feColorMatrix in="SourceGraphic"
@@ -292,6 +302,7 @@ const ConnectionLine = React.memo(
 					}}
 				>
 					<path
+						className="mainLongLine"
 						d={pathDPart1}
 						stroke={`url(#${id})`}
 						strokeWidth={longLineStrokeWidth + 'px'}
@@ -308,6 +319,18 @@ const ConnectionLine = React.memo(
 						stroke={`url(#${id})`}
 						strokeWidth={4 + 'px'}
 					/>
+					{isGlobalPlaying && saturateSource &&
+						<path
+							style={{
+								animationDuration: (3600 / speed) + 's',
+							}}
+							className="animatedLongLine"
+							d={pathDPart1}
+							stroke={saturatedColor}
+							strokeWidth={longLineStrokeWidth * 2 + 'px'}
+							strokeDasharray="4 8"
+						/>
+					}
 				</g>
 			</svg>
 		)
@@ -386,7 +409,13 @@ class GhostConnector extends React.PureComponent<IGhostConnectorProps> {
 }
 
 export const ConnectedConnectionView = shamuConnect(
-	(state: IClientAppState): IConnectionViewReduxProps => ({
-		isAddMode: selectUserInputKeys(state).ctrl,
-	}),
+	(state: IClientAppState): IConnectionViewReduxProps => {
+		const globalClockState = selectGlobalClockState(state.room)
+
+		return {
+			isAddMode: selectUserInputKeys(state).ctrl,
+			speed: globalClockState.bpm,
+			isGlobalPlaying: globalClockState.isPlaying,
+		}
+	},
 )(ConnectionView)

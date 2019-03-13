@@ -58,7 +58,7 @@
 			- [√] osc type
 				- [√] normal
 				- [√] noise
-	- [ ] animate active connections in the direction that data is flowing
+	- [√] animate active connections in the direction that data is flowing
 
 	- **Bugs**
 		- [ ] 2019-03-10 Not getting stuck when playing keyboard really fast with mouse
