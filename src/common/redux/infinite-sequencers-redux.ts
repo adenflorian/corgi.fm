@@ -178,23 +178,26 @@ function infiniteSequencerReducer(
 		case SET_INFINITE_SEQUENCER_NOTE: {
 			return {
 				...infiniteSequencer,
-				midiClip: infiniteSequencer.midiClip.set('events', infiniteSequencer.midiClip.events.map((event, eventIndex) => {
-					if (eventIndex === action.index) {
-						if (action.enabled) {
-							return {
-								...event,
-								notes: event.notes.add(action.note),
+				midiClip: infiniteSequencer.midiClip.withMutations(mutable => {
+					mutable.set('events', mutable.events.map((event, eventIndex) => {
+						if (eventIndex === action.index) {
+							if (action.enabled) {
+								return {
+									...event,
+									notes: event.notes.add(action.note),
+								}
+							} else {
+								return {
+									...event,
+									notes: event.notes.filter(x => x !== action.note),
+								}
 							}
 						} else {
-							return {
-								...event,
-								notes: event.notes.filter(x => x !== action.note),
-							}
+							return event
 						}
-					} else {
-						return event
-					}
-				})),
+					}))
+					mutable.set('length', mutable.events.count())
+				}),
 				previousEvents: infiniteSequencer.previousEvents.unshift(infiniteSequencer.midiClip.events),
 			}
 		}
@@ -229,7 +232,10 @@ function infiniteSequencerReducer(
 
 			return {
 				...infiniteSequencer,
-				midiClip: infiniteSequencer.midiClip.set('events', prv.first()),
+				midiClip: infiniteSequencer.midiClip.withMutations(mutable => {
+					mutable.set('events', prv.first())
+					mutable.set('length', mutable.events.count())
+				}),
 				previousEvents: prv.shift().toList(),
 			}
 		}
@@ -238,7 +244,10 @@ function infiniteSequencerReducer(
 
 			return {
 				...infiniteSequencer,
-				midiClip: infiniteSequencer.midiClip.set('events', createSequencerEvents(0)),
+				midiClip: infiniteSequencer.midiClip.withMutations(mutable => {
+					mutable.set('events', createSequencerEvents(0))
+					mutable.set('length', mutable.events.count())
+				}),
 				previousEvents: infiniteSequencer.previousEvents.unshift(infiniteSequencer.midiClip.events),
 			}
 		}
@@ -248,13 +257,16 @@ function infiniteSequencerReducer(
 			if (infiniteSequencer.isRecording) {
 				return {
 					...infiniteSequencer,
-					midiClip: infiniteSequencer.midiClip.set('events', infiniteSequencer.midiClip.events
-						.concat(makeMidiClipEvent({
-							notes: MidiNotes([action.midiNote]),
-							startBeat: infiniteSequencer.midiClip.events.count(),
-							durationBeats: 1,
-						})),
-					),
+					midiClip: infiniteSequencer.midiClip.withMutations(mutable => {
+						mutable.set('events', mutable.events
+							.concat(makeMidiClipEvent({
+								notes: MidiNotes([action.midiNote]),
+								startBeat: mutable.events.count(),
+								durationBeats: 1,
+							})),
+						)
+						mutable.set('length', mutable.events.count())
+					}),
 					previousEvents: infiniteSequencer.previousEvents.unshift(infiniteSequencer.midiClip.events),
 				}
 			} else {
@@ -264,13 +276,16 @@ function infiniteSequencerReducer(
 			if (infiniteSequencer.isRecording) {
 				return {
 					...infiniteSequencer,
-					midiClip: infiniteSequencer.midiClip.set('events', infiniteSequencer.midiClip.events
-						.concat({
-							notes: MidiNotes(),
-							startBeat: infiniteSequencer.midiClip.events.count(),
-							durationBeats: 1,
-						}),
-					),
+					midiClip: infiniteSequencer.midiClip.withMutations(mutable => {
+						mutable.set('events', mutable.events
+							.concat({
+								notes: MidiNotes(),
+								startBeat: mutable.events.count(),
+								durationBeats: 1,
+							}),
+						)
+						mutable.set('length', mutable.events.count())
+					}),
 					previousEvents: infiniteSequencer.previousEvents.unshift(infiniteSequencer.midiClip.events),
 				}
 			} else {

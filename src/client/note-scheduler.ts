@@ -1,3 +1,4 @@
+import {List} from 'immutable'
 import {logger} from '../common/logger'
 import {
 	makeMidiGlobalClipEvent, MidiClip, MidiGlobalClipEvent, MidiGlobalClipEvents, midiPrecision, MidiRange,
@@ -19,11 +20,13 @@ export function applyBPMToEvents(events: MidiGlobalClipEvents, bpm: number) {
 	return events.map(applyBPMMapper(bpm))
 }
 
+const emptyGlobalClipEvents = List()
+
 // Maybe range should only ever be a simple number, divisible by 10 or something
 /** Must apply BPM on result */
 export function getEvents(clip: MidiClip, initialRange: MidiRange): MidiGlobalClipEvents {
 	logger.trace('getNotes')
-	if (clip.length <= 0) throw new Error('clip length must be > 0: ' + JSON.stringify(clip))
+	if (clip.length <= 0) return emptyGlobalClipEvents
 
 	return _getNotes(initialRange, 0)
 
