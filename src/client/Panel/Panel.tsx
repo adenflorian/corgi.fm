@@ -14,7 +14,7 @@ export interface IPanelProps {
 }
 
 export const Panel: React.FC<IPanelProps> =
-	React.memo(({autoSize = false, children, className = '', color = CssColor.defaultGray, id, label, labelTitle, saturate = false}) => {
+	React.memo(function _Panel({autoSize = false, children, className = '', color = CssColor.defaultGray, id, label, labelTitle, saturate = false}) {
 
 		const renderLabel = label !== undefined && label !== ''
 
@@ -54,23 +54,25 @@ export const Panel: React.FC<IPanelProps> =
 		)
 	})
 
-const ShamuBorder = React.memo(({saturate}: {saturate: boolean}) =>
-	<svg
-		style={{
-			position: 'absolute',
-			width: '100%',
-			height: '100%',
-			stroke: 'none',
-			fill: 'currentColor',
-			strokeWidth: 4,
-			top: 2,
-			left: -2,
-			zIndex: -1,
-			filter: `drop-shadow(-1px 1px 4px rgb(24, 24, 24))` + (saturate ? ' saturate(3)' : ''),
-		}}
-	>
-		<g>
-			<rect x="0" y="0" width="100%" height="100%" />
-		</g>
-	</svg>,
-)
+const ShamuBorder = React.memo(function _ShamuBorder({saturate}: {saturate: boolean}) {
+	return (
+		<svg
+			style={{
+				position: 'absolute',
+				width: '100%',
+				height: '100%',
+				stroke: 'none',
+				fill: 'currentColor',
+				strokeWidth: 4,
+				top: 2,
+				left: -2,
+				zIndex: -1,
+				filter: `drop-shadow(-1px 1px 4px rgb(24, 24, 24))` + (saturate ? ' saturate(3)' : ''),
+			}}
+		>
+			<g>
+				<rect x="0" y="0" width="100%" height="100%" />
+			</g>
+		</svg>
+	)
+})

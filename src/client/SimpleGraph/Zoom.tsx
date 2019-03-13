@@ -126,19 +126,21 @@ export class Zoom extends React.PureComponent<IZoomAllProps, IZoomState> {
 		Math.min(maxPan * zoom, Math.max(-maxPan * zoom, pan))
 }
 
-const ZoomBackground = React.memo(() =>
-	<div
-		className="zoomBackground"
-		style={{
-			position: 'fixed',
-			width: `${bgSize}vw`,
-			height: `${bgSize}vh`,
-			top: `-${bgSize / 2}vh`,
-			left: `-${bgSize / 2}vw`,
-			backgroundImage: `url(${PlusSVG})`,
-		}}
-	/>,
-)
+const ZoomBackground = React.memo(function _ZoomBackground() {
+	return (
+		<div
+			className="zoomBackground"
+			style={{
+				position: 'fixed',
+				width: `${bgSize}vw`,
+				height: `${bgSize}vh`,
+				top: `-${bgSize / 2}vh`,
+				left: `-${bgSize / 2}vw`,
+				backgroundImage: `url(${PlusSVG})`,
+			}}
+		/>
+	)
+})
 
 export const ConnectedZoom = shamuConnect(
 	(state): IZoomReduxProps => ({

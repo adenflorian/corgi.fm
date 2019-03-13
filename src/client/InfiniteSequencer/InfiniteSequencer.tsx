@@ -38,114 +38,117 @@ interface IInfiniteSequencerReduxProps {
 type IInfiniteSequencerAllProps =
 	IInfiniteSequencerProps & IInfiniteSequencerReduxProps & {dispatch: Dispatch}
 
-export const InfiniteSequencer: React.FC<IInfiniteSequencerAllProps> = React.memo(props => {
-	const {color, isPlaying, id, isRecording, style, events, name, rate, dispatch} = props
+export const InfiniteSequencer: React.FC<IInfiniteSequencerAllProps> = React.memo(
+	function _InfiniteSequencer(props) {
+		const {color, isPlaying, id, isRecording, style, events, name, rate, dispatch} = props
 
-	const {lowestNote, highestNote} = findLowestAndHighestNotes(events)
-	const numberOfPossibleNotes = highestNote - lowestNote + 1
-	const noteHeightPercentage = 100 / numberOfPossibleNotes
-	const rows = [] as any[]
+		const {lowestNote, highestNote} = findLowestAndHighestNotes(events)
+		const numberOfPossibleNotes = highestNote - lowestNote + 1
+		const noteHeightPercentage = 100 / numberOfPossibleNotes
+		const rows = [] as any[]
 
-	for (let i = highestNote; i >= lowestNote; i--) {
-		rows.push(i)
-	}
+		for (let i = highestNote; i >= lowestNote; i--) {
+			rows.push(i)
+		}
 
-	const dispatchInfiniteSeqParam = (paramType: InfiniteSequencerFields, value: number | boolean | string) =>
-		dispatch(setInfiniteSequencerField(id, paramType, value))
+		const dispatchInfiniteSeqParam = (paramType: InfiniteSequencerFields, value: number | boolean | string) =>
+			dispatch(setInfiniteSequencerField(id, paramType, value))
 
-	const ColorGridNote = React.memo(({note, index}: {note: IMidiNote, index: number}) =>
-		<div
-			className={`event ${props.activeIndex === index ? 'active' : ''}`}
-			style={{
-				backgroundColor: note === -1 ? 'none' : getColorStringForMidiNote(note),
-				height: `${noteHeightPercentage + (note === lowestNote ? 1 : 0)}%`,
-				top: `${(highestNote - note) * noteHeightPercentage}%`,
-			}}
-		/>,
-	)
+		const ColorGridNote = React.memo(function _ColorGridNote({note, index}: {note: IMidiNote, index: number}) {
+			return (
+				<div
+					className={`event ${props.activeIndex === index ? 'active' : ''}`}
+					style={{
+						backgroundColor: note === -1 ? 'none' : getColorStringForMidiNote(note),
+						height: `${noteHeightPercentage + (note === lowestNote ? 1 : 0)}%`,
+						top: `${(highestNote - note) * noteHeightPercentage}%`,
+					}}
+				/>
+			)
+		})
 
-	return render()
+		return render()
 
-	function render() {
-		return (
-			<div
-				className={
-					`infiniteSequencer ` +
-					`${isPlaying ? 'isPlaying saturate' : 'isNotPlaying'}` + ` ` +
-					`${isRecording ? `isRecording` : ''}`
-				}
-			>
-				<Panel
-					id={props.id}
-					label={name}
-					color={isRecording ? 'red' : color}
-					saturate={isPlaying}
+		function render() {
+			return (
+				<div
+					className={
+						`infiniteSequencer ` +
+						`${isPlaying ? 'isPlaying saturate' : 'isNotPlaying'}` + ` ` +
+						`${isRecording ? `isRecording` : ''}`
+					}
 				>
-					<div className="controls">
-						<div
-							className="play"
-							onClick={() => {
-								dispatchInfiniteSeqParam(InfiniteSequencerFields.isPlaying, true)
-								dispatch(globalClockActions.start())
-							}}
-						>
-							<Play />
-						</div>
-						<div
-							className="stop"
-							onClick={() => dispatchInfiniteSeqParam(InfiniteSequencerFields.isPlaying, false)}
-						>
-							<Stop />
-						</div>
-						<div
-							className="record"
-							onClick={() => dispatchInfiniteSeqParam(InfiniteSequencerFields.isRecording, !isRecording)}
-						>
-							<Record />
-						</div>
-						<div
-							className="export"
-							onClick={() => dispatch(
-								exportSequencerMidi(id))}
-						>
-							<Download />
-						</div>
-						<div
-							className="erase"
-							onClick={() => dispatch(clearSequencer(props.id))}
-						>
-							<Clear />
-						</div>
-						<div
-							className="undo"
-							onClick={() => dispatch(undoSequencer(props.id))}
-							title="undo (hit backspace to undo while recording)"
-						>
-							<Undo />
-						</div>
+					<Panel
+						id={props.id}
+						label={name}
+						color={isRecording ? 'red' : color}
+						saturate={isPlaying}
+					>
+						<div className="controls">
+							<div
+								className="play"
+								onClick={() => {
+									dispatchInfiniteSeqParam(InfiniteSequencerFields.isPlaying, true)
+									dispatch(globalClockActions.start())
+								}}
+							>
+								<Play />
+							</div>
+							<div
+								className="stop"
+								onClick={() => dispatchInfiniteSeqParam(InfiniteSequencerFields.isPlaying, false)}
+							>
+								<Stop />
+							</div>
+							<div
+								className="record"
+								onClick={() => dispatchInfiniteSeqParam(InfiniteSequencerFields.isRecording, !isRecording)}
+							>
+								<Record />
+							</div>
+							<div
+								className="export"
+								onClick={() => dispatch(
+									exportSequencerMidi(id))}
+							>
+								<Download />
+							</div>
+							<div
+								className="erase"
+								onClick={() => dispatch(clearSequencer(props.id))}
+							>
+								<Clear />
+							</div>
+							<div
+								className="undo"
+								onClick={() => dispatch(undoSequencer(props.id))}
+								title="undo (hit backspace to undo while recording)"
+							>
+								<Undo />
+							</div>
 
-						<div
-							className="style"
-							onClick={() => dispatchInfiniteSeqParam(
-								InfiniteSequencerFields.style,
-								props.style === InfiniteSequencerStyle.colorBars
-									? InfiniteSequencerStyle.colorGrid
-									: InfiniteSequencerStyle.colorBars,
-							)}
-						>
-							<Star />
-						</div>
-						<div
-							className={`showRows ${props.style === InfiniteSequencerStyle.colorGrid ? '' : 'disabled'}`}
-							onClick={() => props.style === InfiniteSequencerStyle.colorGrid && dispatchInfiniteSeqParam(
-								InfiniteSequencerFields.showRows,
-								!props.showRows,
-							)}
-						>
-							<Rows />
-						</div>
+							<div
+								className="style"
+								onClick={() => dispatchInfiniteSeqParam(
+									InfiniteSequencerFields.style,
+									props.style === InfiniteSequencerStyle.colorBars
+										? InfiniteSequencerStyle.colorGrid
+										: InfiniteSequencerStyle.colorBars,
+								)}
+							>
+								<Star />
+							</div>
+							<div
+								className={`showRows ${props.style === InfiniteSequencerStyle.colorGrid ? '' : 'disabled'}`}
+								onClick={() => props.style === InfiniteSequencerStyle.colorGrid && dispatchInfiniteSeqParam(
+									InfiniteSequencerFields.showRows,
+									!props.showRows,
+								)}
+							>
+								<Rows />
+							</div>
 
-						{/* <Knob
+							{/* <Knob
 							min={1}
 							max={8}
 							value={rate}
@@ -153,65 +156,66 @@ export const InfiniteSequencer: React.FC<IInfiniteSequencerAllProps> = React.mem
 							label="rate"
 							onChangeId={InfiniteSequencerFields.rate}
 						/> */}
-					</div>
-					{style === InfiniteSequencerStyle.colorBars &&
-						<div className={`display ${props.events.count() > 8 ? 'small' : ''}`}>
-							<div className="notes">
-								{props.events.map((event, index) => {
-									const note = event.notes.first(-1)
+						</div>
+						{style === InfiniteSequencerStyle.colorBars &&
+							<div className={`display ${props.events.count() > 8 ? 'small' : ''}`}>
+								<div className="notes">
+									{props.events.map((event, index) => {
+										const note = event.notes.first(-1)
 
-									return (
-										< div
-											key={index}
-											className={`event ${props.activeIndex === index ? 'active' : ''}`}
-											style={{
-												backgroundColor: note === -1 ? 'none' : getColorStringForMidiNote(note),
-											}}
-										>
-											{
-												note === -1
-													? undefined
-													: props.events.count() <= 8
-														? midiNoteToNoteName(note) + getOctaveFromMidiNote(note)
-														: undefined
-											}
-										</div>
-									)
-								},
-								)}
-							</div>
-						</div>
-					}
-					{style === InfiniteSequencerStyle.colorGrid &&
-						<div className={`display ${props.events.count() > 8 ? 'small' : ''}`}>
-							<div className="notes">
-								{props.events.map(x => x.notes.first(-1)).map((note, index) =>
-									<ColorGridNote note={note} index={index} key={index} />,
-								)}
-							</div>
-							{props.showRows &&
-								<div className="rows">
-									{rows.map((_, index) =>
-										(
-											<div
+										return (
+											< div
 												key={index}
-												className={`row ${isWhiteKey(index) ? 'white' : 'black'}`}
+												className={`event ${props.activeIndex === index ? 'active' : ''}`}
 												style={{
-													height: `${noteHeightPercentage + (index === lowestNote ? 1 : 0)}%`,
-													top: `${(highestNote - index) * noteHeightPercentage}%`,
-													width: '100%',
+													backgroundColor: note === -1 ? 'none' : getColorStringForMidiNote(note),
 												}}
-											/>
-										))}
+											>
+												{
+													note === -1
+														? undefined
+														: props.events.count() <= 8
+															? midiNoteToNoteName(note) + getOctaveFromMidiNote(note)
+															: undefined
+												}
+											</div>
+										)
+									},
+									)}
 								</div>
-							}
-						</div>
-					}
-				</Panel>
-			</div >
-		)
-	}
-})
+							</div>
+						}
+						{style === InfiniteSequencerStyle.colorGrid &&
+							<div className={`display ${props.events.count() > 8 ? 'small' : ''}`}>
+								<div className="notes">
+									{props.events.map(x => x.notes.first(-1)).map((note, index) =>
+										<ColorGridNote note={note} index={index} key={index} />,
+									)}
+								</div>
+								{props.showRows &&
+									<div className="rows">
+										{rows.map((_, index) =>
+											(
+												<div
+													key={index}
+													className={`row ${isWhiteKey(index) ? 'white' : 'black'}`}
+													style={{
+														height: `${noteHeightPercentage + (index === lowestNote ? 1 : 0)}%`,
+														top: `${(highestNote - index) * noteHeightPercentage}%`,
+														width: '100%',
+													}}
+												/>
+											))}
+									</div>
+								}
+							</div>
+						}
+					</Panel>
+				</div >
+			)
+		}
+	},
+)
 
 export const ConnectedInfiniteSequencer = connect(
 	(state: IClientAppState, props: IInfiniteSequencerProps): IInfiniteSequencerReduxProps => {

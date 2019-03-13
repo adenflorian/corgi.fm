@@ -23,25 +23,27 @@ function foo() {
 		)
 }
 
-export const SvgGradients = React.memo(() =>
-	<React.Fragment>
-		<svg
-			style={{
-				width: 0,
-				height: 0,
-				position: 'absolute',
-			}}
-			aria-hidden="true"
-			focusable="false"
-		>
-			<linearGradient id="my-cool-gradient" x2="1" y2="1">
-				<stop offset="0%" stopColor="#447799" />
-				<stop offset="50%" stopColor="#224488" />
-				<stop offset="100%" stopColor="#112266" />
-			</linearGradient>
-			<linearGradient xmlns="http://www.w3.org/2000/svg" id="rainbow" x2="1" y2="1">
-				{foo()}
-			</linearGradient>
-		</svg>
-	</React.Fragment >,
-)
+export const SvgGradients = React.memo(function _SvgGradients() {
+	return (
+		<React.Fragment>
+			<svg
+				style={{
+					width: 0,
+					height: 0,
+					position: 'absolute',
+				}}
+				aria-hidden="true"
+				focusable="false"
+			>
+				<linearGradient id="my-cool-gradient" x2="1" y2="1">
+					<stop offset="0%" stopColor="#447799" />
+					<stop offset="50%" stopColor="#224488" />
+					<stop offset="100%" stopColor="#112266" />
+				</linearGradient>
+				<linearGradient xmlns="http://www.w3.org/2000/svg" id="rainbow" x2="1" y2="1">
+					{foo()}
+				</linearGradient>
+			</svg>
+		</React.Fragment>
+	)
+})

@@ -12,7 +12,7 @@ interface IKnobViewProps {
 	size: number
 }
 
-export const KnobView: React.FC<IKnobViewProps> = React.memo(props => {
+export const KnobView: React.FC<IKnobViewProps> = React.memo(function _KnobView(props) {
 	const {handleMouseDown, percentage, adjustedPercentage, label, readOnly = false, markColor = 'gray'} = props
 
 	return (

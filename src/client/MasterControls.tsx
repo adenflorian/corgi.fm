@@ -30,7 +30,7 @@ interface IMasterControlsDispatchProps {
 }
 
 export const MasterControls: React.FC<IMasterControlsProps & IMasterControlsReduxProps & IMasterControlsDispatchProps> =
-	React.memo(({onPlay, restart, onStop, setField, masterClockState, color}) => {
+	React.memo(function _MasterControls({onPlay, restart, onStop, setField, masterClockState, color}) {
 
 		const knobs = <div className="knobs">
 			<Knob

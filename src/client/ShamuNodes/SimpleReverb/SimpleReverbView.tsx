@@ -22,7 +22,7 @@ interface ISimpleReverbDispatchProps {
 type ISimpleReverbAllProps = ISimpleReverbProps & ISimpleReverbReduxProps & ISimpleReverbDispatchProps
 
 export const SimpleReverbView: React.FC<ISimpleReverbAllProps> =
-	React.memo(({id, color, isPlaying, time, lpf, changeParam}) => {
+	React.memo(function _SimpleReverbView({id, color, isPlaying, time, lpf, changeParam}) {
 		return (
 			<Panel
 				className={`${isPlaying ? 'isPlaying' : 'isNotPlaying'}`}

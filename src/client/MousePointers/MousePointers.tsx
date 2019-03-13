@@ -10,18 +10,20 @@ interface IMousePointersViewProps {
 }
 
 export const MousePointers: React.FC<IMousePointersViewProps> =
-	React.memo(({clientIds}) =>
-		<div className="pointers">
-			{clientIds
-				.map(clientId =>
-					<ConnectedMousePointer
-						key={clientId}
-						clientId={clientId}
-					/>,
-				)
-			}
-		</div>,
-	)
+	React.memo(function _MousePointers({clientIds}) {
+		return (
+			<div className="pointers">
+				{clientIds
+					.map(clientId =>
+						<ConnectedMousePointer
+							key={clientId}
+							clientId={clientId}
+						/>,
+					)
+				}
+			</div>
+		)
+	})
 
 const mapStateToProps = (state: IClientAppState): IMousePointersViewProps => {
 	return {

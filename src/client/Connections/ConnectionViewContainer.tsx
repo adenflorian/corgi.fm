@@ -28,11 +28,11 @@ type IConnectionViewContainerAllProps =
 	IConnectionViewContainerReduxProps
 
 export const ConnectionViewContainer: React.FC<IConnectionViewContainerAllProps> =
-	({
+	function _ConnectionViewContainer({
 		sourceStackOrder, targetStackOrder, sourceColor, isSourceActive, isSourceSending, id,
 		sourcePosition, targetPosition, ghostConnector,
-	}) =>
-		<ConnectedConnectionView
+	}) {
+		return <ConnectedConnectionView
 			color={sourceColor}
 			sourceX={sourcePosition.x + sourcePosition.width}
 			sourceY={sourcePosition.y + (sourcePosition.height / 2)}
@@ -45,6 +45,7 @@ export const ConnectionViewContainer: React.FC<IConnectionViewContainerAllProps>
 			targetStackOrder={targetStackOrder}
 			sourceStackOrder={sourceStackOrder}
 		/>
+	}
 
 export const ConnectedConnectionViewContainer = shamuConnect(
 	(state, props: IConnectionViewContainerProps): IConnectionViewContainerReduxProps => {

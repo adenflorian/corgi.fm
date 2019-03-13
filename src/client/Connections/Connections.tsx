@@ -15,7 +15,7 @@ interface IConnectionsReduxProps {
 
 type IConnectionsAllProps = IConnectionsProps & IConnectionsReduxProps
 
-export const Connections = ({connectionIds}: IConnectionsAllProps) => {
+export const Connections = function _Connections({connectionIds}: IConnectionsAllProps) {
 	return (
 		<div className="connections">
 			{connectionIds.map(connectionId =>
