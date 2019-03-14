@@ -4,10 +4,11 @@ import * as ReactGA from 'react-ga'
 import {setupAudioContext} from '../common/setup-audio-context'
 import {BrowserWarning} from './BrowserWarning'
 import {configureStore} from './client-store'
+import {startECS} from './ECS/ECS'
 import {startFpsLoop} from './fps-loop'
 import {setupInputEventListeners} from './input-events'
 import {setupInstrumentManager} from './instrument-manager'
-import {isLocalDevClient, isNewNoteScannerEnabled, logClientEnv} from './is-prod-client'
+import {isECSEnabled, isLocalDevClient, isNewNoteScannerEnabled, logClientEnv} from './is-prod-client'
 import {loadExperiment} from './main-experiment'
 import {startNoteScanner} from './note-scanner'
 import {renderApp, renderOther} from './react-main'
@@ -76,6 +77,8 @@ async function setupAsync() {
 	setupInstrumentManager(store, audioContext, preFx, isNewNoteScannerEnabled())
 
 	renderApp(store)
+
+	if (isECSEnabled()) startECS(store)
 
 	startFpsLoop()
 

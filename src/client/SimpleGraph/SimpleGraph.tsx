@@ -5,6 +5,7 @@ import {IClientAppState} from '../../common/redux'
 import {selectAllPositionIds} from '../../common/redux'
 import {mainBoardsId} from '../client-constants'
 import {ConnectedConnections, ConnectionsUsage} from '../Connections/Connections'
+import {ECSCanvasRenderSystem} from '../ECS/ECS'
 import {ConnectedMousePointers} from '../MousePointers/MousePointers'
 import {ConnectedSimpleGraphNode} from './SimpleGraphNode'
 import {ConnectedZoom} from './Zoom'
@@ -12,6 +13,8 @@ import {ConnectedZoom} from './Zoom'
 interface ISimpleGraphReduxProps {
 	positionIds: Seq.Indexed<string>
 }
+
+const canvasSize = ECSCanvasRenderSystem.canvasSize
 
 export const SimpleGraph: React.FC<ISimpleGraphReduxProps> =
 	React.memo(function _SimpleGraph({positionIds}) {
@@ -27,6 +30,18 @@ export const SimpleGraph: React.FC<ISimpleGraphReduxProps> =
 			>
 				<ConnectedZoom>
 					<div id={mainBoardsId} className="boards">
+						<canvas
+							id="ECSCanvasRenderSystemCanvas"
+							style={{
+								position: 'absolute',
+								width: canvasSize,
+								height: canvasSize,
+								top: -canvasSize / 2,
+								left: -canvasSize / 2,
+							}}
+							width={canvasSize}
+							height={canvasSize}
+						></canvas>
 						<ConnectedMousePointers />
 						<ConnectedConnections />
 						{positionIds.map(positionId =>

@@ -19,3 +19,5 @@ export function logClientEnv() {
 }
 
 export const isNewNoteScannerEnabled = () => window.location.pathname.replace('/', '') === 'scan'
+
+export const isECSEnabled = () => window.location.pathname.replace('/', '') === 'ecs'
