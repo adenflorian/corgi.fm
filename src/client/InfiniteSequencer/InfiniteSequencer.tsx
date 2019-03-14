@@ -16,6 +16,7 @@ import {getColorStringForMidiNote} from '../../common/shamu-color'
 import {isWhiteKey} from '../Keyboard/Keyboard'
 import {Knob} from '../Knob/Knob'
 import {Panel} from '../Panel/Panel'
+import {ConnectedSequencerTimeBar} from '../SequencerTimeBar'
 import {getOctaveFromMidiNote, midiNoteToNoteName} from '../WebAudio/music-functions'
 import './InfiniteSequencer.less'
 
@@ -208,6 +209,10 @@ export const InfiniteSequencer: React.FC<IInfiniteSequencerAllProps> = React.mem
 											))}
 									</div>
 								}
+								{/* <ConnectedSequencerTimeBar
+									isArmed={isPlaying}
+									lengthBeats={props.events.count()}
+								/> */}
 							</div>
 						}
 					</Panel>

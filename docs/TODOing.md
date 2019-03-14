@@ -33,6 +33,25 @@
 				- exp   [== = =  ] (ableton)
 				- act   varies
 		- [ ] sequencer animations
+			- css animation
+				- cons
+					- little control
+					- hard to keep perfectly in sync
+				- pros
+					- simple?
+					- little code
+				- notes
+					- who should render it?
+						- the sequencer?
+							- annoying to redo on all new sequencers
+							- don't have to since it's absolutely positioned
+						- something else?
+			- javascript/canvas
+				- haven't done this yet
+			- javascript/svg
+				- have done, but its sloppy
+			- [...] ECS
+				- could take a while to get started
 		- [ ] master clock play button animation
 		- [√] infinite seq loop length
 		- [x] rate knob on infinite sequencer
