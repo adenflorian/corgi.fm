@@ -184,15 +184,15 @@ describe('note-scheduler', () => {
 			})
 				.to.throw(`length must be >= 0`)
 		})
-		it('should fail when clipLength is negative', () => {
-			expect(() => {
-				getEvents(new MidiClip({length: -1}), new MidiRange(0, 1))
-			})
-				.to.throw('clip length must be > 0')
-			expect(() => {
-				getEvents(new MidiClip({length: 0}), new MidiRange(0, 1))
-			})
-				.to.throw('clip length must be > 0')
+		it('should return empty list when clipLength is negative', () => {
+			expect(
+				getEvents(new MidiClip({length: -1}), new MidiRange(0, 1)).toJSON(),
+			)
+				.to.deep.equal(List().toJSON())
+			expect(
+				getEvents(new MidiClip({length: 0}), new MidiRange(0, 1)).toJSON(),
+			)
+				.to.deep.equal(List().toJSON())
 		})
 	})
 	describe('stuff', () => {
