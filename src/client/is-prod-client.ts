@@ -6,6 +6,12 @@ export const isTestClient = () => window.location.hostname.toLowerCase() === 'sh
 
 export const isLocalDevClient = () => window.location.hostname.toLowerCase() === 'localhost'
 
+export const getEnvDisplayName = () => isLocalDevClient()
+	? 'dev'
+	: isTestClient()
+		? 'test'
+		: 'prod'
+
 export function logClientEnv() {
 	logger.log(
 		isProdClient()

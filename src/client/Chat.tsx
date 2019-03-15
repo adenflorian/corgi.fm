@@ -3,9 +3,10 @@ import {Component} from 'react'
 import AutosizeInput from 'react-input-autosize'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
-import {chatSubmit} from '../common/redux'
+import packageJson from '../../package.json'
 import {maxUsernameLength, selectLocalClient, setClientName} from '../common/redux'
 import {IClientAppState} from '../common/redux'
+import {chatSubmit} from '../common/redux'
 import './Chat.less'
 import {ConnectedChatMessages} from './Chat/ChatMessages'
 import {saveUsernameToLocalStorage} from './username'
@@ -89,6 +90,11 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 								autoComplete="off"
 							/>
 						</form>
+						<div className="bottomInfo">
+							{/* <div className="info-env">{getEnvDisplayName()}</div> */}
+							<div className="info-milestone">pre-alpha</div>
+							<div className="info-version">v{packageJson.version}</div>
+						</div>
 					</div>
 				</div>
 			</div>
