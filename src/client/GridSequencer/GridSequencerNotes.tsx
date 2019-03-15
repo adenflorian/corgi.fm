@@ -10,9 +10,9 @@ import {
 } from '../../common/redux'
 import {MAX_MIDI_NOTE_NUMBER_127, MIN_MIDI_NOTE_NUMBER_0} from '../../common/server-constants'
 import {getColorStringForMidiNote} from '../../common/shamu-color'
+import {isLeftMouseButtonDown} from '../client-utils'
 import {isWhiteKey} from '../Keyboard/Keyboard'
 import {VerticalScrollBar} from '../Knob/VerticalScrollBar'
-import {isLeftMouseButtonDown} from '../utils'
 
 type GridSequencerEventHandler = (index: number, isEnabled: boolean, i2: number, e: React.MouseEvent) => void
 
