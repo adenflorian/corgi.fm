@@ -6,3 +6,4 @@
 - https://github.com/indexiatech/redux-immutablejs
 - https://github.com/erikras/multireducer
 - https://github.com/trimstray/nginx-quick-reference
+- https://github.com/mugi-uno/parcel-plugin-bundle-manifest
