@@ -2,8 +2,6 @@
 
 # https://zaiste.net/a_few_ways_to_execute_commands_remotely_using_ssh/
 
-yarn version --patch
-
 source secrets.sh
 
 echo host: ${SSH_HOST_TEST} user: ${SSH_USER_TEST}
