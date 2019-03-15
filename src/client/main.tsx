@@ -4,17 +4,18 @@ import * as ReactGA from 'react-ga'
 import {setupAudioContext} from '../common/setup-audio-context'
 import {BrowserWarning} from './BrowserWarning'
 import {configureStore} from './client-store'
-import {startECS} from './ECS/ECS'
-import {startFpsLoop} from './fps-loop'
+import {getECSLoop} from './ECS/ECS'
+import {getFpsLoop} from './fps-loop'
 import {setupInputEventListeners} from './input-events'
 import {setupInstrumentManager} from './instrument-manager'
 import {isECSEnabled, isLocalDevClient, isNewNoteScannerEnabled, logClientEnv} from './is-prod-client'
 import {loadExperiment} from './main-experiment'
+import {startMainRealTimeLoop} from './main-real-time-loop'
 import {startNoteScanner} from './note-scanner'
 import {renderApp, renderOther} from './react-main'
 import {setupMidiSupport} from './setup-midi-support'
 import {SamplesManager} from './WebAudio/SamplesManager'
-import {setStoreForSchedulerVisual} from './WebAudio/SchedulerVisual'
+import {setStoreForSchedulerVisual, startSchedulerVisualLoop} from './WebAudio/SchedulerVisual'
 import {setupWebsocketAndListeners, socket} from './websocket-listeners'
 
 ReactGA.initialize('UA-50585312-6')
@@ -74,17 +75,29 @@ async function setupAsync() {
 
 	setupWebsocketAndListeners(store)
 
-	setupInstrumentManager(store, audioContext, preFx, isNewNoteScannerEnabled())
+	const globalClockTick = setupInstrumentManager(store, audioContext, preFx, isNewNoteScannerEnabled())
 
 	renderApp(store)
 
-	if (isECSEnabled()) startECS(store)
+	const ecsLoop = isECSEnabled()
+		? getECSLoop(store)
+		: () => {}
 
-	startFpsLoop()
+	const fpsLoop = getFpsLoop()
 
-	if (isNewNoteScannerEnabled()) {
-		startNoteScanner(store, audioContext)
-	}
+	const schedulerVisualLoop = startSchedulerVisualLoop()
+
+	const noteScannerLoop = isNewNoteScannerEnabled()
+		? startNoteScanner(store, audioContext)
+		: () => {}
+
+	startMainRealTimeLoop(Object.freeze([
+		noteScannerLoop,
+		globalClockTick,
+		ecsLoop,
+		schedulerVisualLoop,
+		fpsLoop,
+	]))
 
 	if (module.hot) {
 		module.hot.dispose(() => {

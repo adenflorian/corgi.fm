@@ -52,6 +52,7 @@
 				- have done, but its sloppy
 			- [...] ECS
 				- could take a while to get started
+				- [√] remove all but one RAF loop
 		- [ ] master clock play button animation
 		- [√] infinite seq loop length
 		- [x] rate knob on infinite sequencer

@@ -5,8 +5,8 @@ let lastLoop = performance.now()
 let thisLoop
 let thisFrameTime
 
-export function startFpsLoop() {
-	window.requestAnimationFrame(fpsLoop)
+export function getFpsLoop() {
+	return fpsLoop
 }
 
 const fpsLoop: FrameRequestCallback = time => {
@@ -16,8 +16,6 @@ const fpsLoop: FrameRequestCallback = time => {
 	thisFrameTime = thisLoop - lastLoop
 	frameTime += (thisFrameTime - frameTime) / filterStrength
 	lastLoop = thisLoop
-
-	window.requestAnimationFrame(fpsLoop)
 }
 
 const fpsUpdateInterval = setInterval(updateFpsDisplay, 250)

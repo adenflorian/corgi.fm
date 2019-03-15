@@ -18,7 +18,7 @@ export class Arp {
 	public start(onNewNotes: OnNewNotes) {
 		this._onNewNotes = onNewNotes
 		this._setStartTime()
-		requestAnimationFrame(this._loop)
+		// requestAnimationFrame(this._loop)
 	}
 
 	public dispose = () => undefined
@@ -32,7 +32,7 @@ export class Arp {
 		const newNotes = arp(this._notes, this._rate, this._startTime, timestamp)
 		this._onNewNotes(newNotes)
 
-		requestAnimationFrame(this._loop)
+		// requestAnimationFrame(this._loop)
 	}
 }
 

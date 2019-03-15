@@ -76,6 +76,8 @@ export const setupInstrumentManager = (
 
 	store.subscribe(updateInstrumentLayer)
 
+	return globalClock.getTickFunction()
+
 	function updateInstrumentLayer() {
 		const state = store.getState()
 

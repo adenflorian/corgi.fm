@@ -35,7 +35,10 @@ export class GridSequencerPlayer {
 		this._playCount = playCount
 		this._startTime = this._audioContext.currentTime
 		this._isPlaying = true
-		window.requestAnimationFrame(this._onTick)
+	}
+
+	public getTickFunction() {
+		return this._onTick
 	}
 
 	// public readonly restart = () => {
@@ -58,11 +61,9 @@ export class GridSequencerPlayer {
 	public readonly isPlaying = () => this._isPlaying
 
 	private readonly _onTick: FrameRequestCallback = () => {
-		this._doTick()
+		if (!this._isPlaying) return
 
-		if (this._isPlaying) {
-			window.requestAnimationFrame(this._onTick)
-		}
+		this._doTick()
 	}
 
 	private readonly _doTick = () => {

@@ -18,43 +18,15 @@ export function startNoteScanner(store: ClientStore, audioContext: AudioContext)
 	_store = store
 	_audioContext = audioContext
 	stop = false
-	requestAnimationFrame(() => mainLoop(currentLoopId))
+	return mainLoop
 }
 
 let stop = true
 
-let isActiveTab = true
-
-window.addEventListener('blur', () => {
-	isActiveTab = false
-	// Make sure this doesn't cause multiple loops
-	currentLoopId++
-	mainLoop(currentLoopId)
-}, false)
-
-window.addEventListener('focus', () => {
-	isActiveTab = true
-}, false)
-
-let currentLoopId = 0
-
-function mainLoop(loopId: number) {
+function mainLoop() {
 	if (stop === true) return
-	if (loopId < currentLoopId) return
 
 	scheduleNotes()
-
-	if (isActiveTab) {
-		requestAnimationFrame(() => mainLoop(loopId))
-	} else {
-		setTimeout(() => mainLoop(loopId), 16)
-	}
-}
-
-if (module.hot) {
-	module.hot.dispose(() => {
-		stop = true
-	})
 }
 
 const clip = shortDemoMidiClip

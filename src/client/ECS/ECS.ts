@@ -110,10 +110,10 @@ _entities = List([new ECSSimpleGraphNodeEntity(
 	new ECSGraphPositionComponent({x: 200, y: 900}),
 )])
 
-export function startECS(store: Store<IClientAppState>) {
+export function getECSLoop(store: Store<IClientAppState>) {
 	_store = store
 
-	requestAnimationFrame(ecsLoop)
+	return ecsLoop
 }
 
 function ecsLoop() {
@@ -130,8 +130,6 @@ function ecsLoop() {
 				system.execute(entity)
 			})
 	})
-
-	requestAnimationFrame(ecsLoop)
 }
 
 function entityHasComponentsRequiredBySystem(entity: ECSEntity, system: ECSSystem) {

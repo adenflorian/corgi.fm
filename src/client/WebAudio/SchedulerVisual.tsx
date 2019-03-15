@@ -161,7 +161,9 @@ export function registerInstrumentWithSchedulerVisual(id: string, getScheduledVo
 	_instruments = _instruments.set(id, getScheduledVoices)
 }
 
-_renderLoop()
+export function startSchedulerVisualLoop() {
+	return _renderLoop
+}
 
 function _renderLoop() {
 	if (
@@ -171,8 +173,6 @@ function _renderLoop() {
 	) {
 		_renderSchedulerVisualForAllInstruments()
 	}
-
-	requestAnimationFrame(_renderLoop)
 }
 
 function _renderSchedulerVisualForAllInstruments() {
