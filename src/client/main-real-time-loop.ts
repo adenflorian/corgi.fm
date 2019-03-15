@@ -23,7 +23,6 @@ const mainRealTimeLoop = (highResTimestamp: number, loopId: number) => {
 	if (_stop) return
 	if (loopId < _currentLoopId) return
 
-	// Call other loops
 	_thingsToUpdate.forEach(x => x(highResTimestamp))
 
 	if (_isActiveTab) {

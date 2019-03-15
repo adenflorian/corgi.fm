@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+yarn version --patch
+
 source secrets.sh
 
 echo host: ${SSH_HOST} user: ${SSH_USER}
