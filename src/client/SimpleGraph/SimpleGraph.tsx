@@ -38,6 +38,7 @@ export const SimpleGraph: React.FC<ISimpleGraphReduxProps> =
 								height: canvasSize,
 								top: -canvasSize / 2,
 								left: -canvasSize / 2,
+								pointerEvents: 'none',
 							}}
 							width={canvasSize}
 							height={canvasSize}
