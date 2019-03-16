@@ -1,4 +1,5 @@
 import {OrderedMap} from 'immutable'
+import {logger} from '../../common/logger'
 import {IMidiNote} from '../../common/MidiNote'
 import {Voice} from './index'
 
@@ -56,25 +57,41 @@ export abstract class Voices<V extends Voice> {
 	}
 
 	public scheduleNote(note: IMidiNote, delaySeconds: number, attackTimeInSeconds: number, invincible: boolean) {
+		// if delay is 0 then the scheduler isn't working properly
+		if (delaySeconds < 0) logger.error('delay <= 0: ' + delaySeconds)
 
 		const newNoteStartTime = this._getAudioContext().currentTime + delaySeconds
 
 		const scheduledVoicesSameNote = this._scheduledVoices.filter(x => x.playingNote === note)
 
 		// It's only possible for there to be one conflicting voice, because of this function
-		const conflictingVoice = scheduledVoicesSameNote.find(
-			x => x.scheduledAttackStartTime <= newNoteStartTime && newNoteStartTime < x.scheduledReleaseEndTimeSeconds)
+		const conflictingVoices = scheduledVoicesSameNote.filter(
+			x => x.scheduledAttackStartTime <= newNoteStartTime && newNoteStartTime < x.scheduledReleaseEndTimeSeconds,
+		)
+
+		if (conflictingVoices.count() > 1) {
+			logger.error('[Voices][scheduleNote] conflictingVoices.count() > 1: ' + JSON.stringify(conflictingVoices, undefined, 2))
+			logger.error('[Voices][scheduleNote] conflictingVoices.count() > 1 | note: ' + note + ' | newNoteStartTime: ' + newNoteStartTime)
+		}
+
+		const conflictingVoice = conflictingVoices.first(undefined)
 
 		if (conflictingVoice) {
 			if (conflictingVoice.scheduledAttackStartTime === newNoteStartTime) return
 
 			// schedule hard cutoff of existing note
-			conflictingVoice.scheduleRelease(delaySeconds, 0.001)
+			conflictingVoice.scheduleRelease(newNoteStartTime, 0)
+
+			if (conflictingVoice.scheduledReleaseEndTimeSeconds > newNoteStartTime) {
+				logger.error('[Voices][scheduleNote] conflictingVoice.scheduledReleaseEndTimeSeconds: ' + conflictingVoice.scheduledReleaseEndTimeSeconds)
+				logger.error('[Voices][scheduleNote] newNoteStartTime: ' + newNoteStartTime)
+				logger.error(`[Voices][scheduleNote] conflictingVoice.scheduledReleaseEndTimeSeconds >= newNoteStartTime`)
+			}
 		}
 
 		const newVoice = this._createVoice(true, invincible)
 
-		newVoice.scheduleNote(note, attackTimeInSeconds, delaySeconds)
+		newVoice.scheduleNote(note, attackTimeInSeconds, newNoteStartTime)
 
 		this._scheduledVoices = this._scheduledVoices.set(newVoice.id, newVoice)
 
@@ -86,13 +103,16 @@ export abstract class Voices<V extends Voice> {
 
 		if (nextScheduledVoiceStartSeconds) {
 			newVoice.scheduleRelease(
-				nextScheduledVoiceStartSeconds - this._getAudioContext().currentTime,
-				0.001,
+				nextScheduledVoiceStartSeconds,
+				0,
 			)
 		}
 	}
 
 	public scheduleRelease(note: number, delaySeconds: number, releaseSeconds: number) {
+		// if delay is 0 then the scheduler isn't working properly
+		if (delaySeconds < 0) logger.error('delay <= 0: ' + delaySeconds)
+
 		const currentTime = this._getAudioContext().currentTime
 
 		const releaseStartTime = currentTime + delaySeconds
@@ -100,7 +120,7 @@ export abstract class Voices<V extends Voice> {
 		const scheduledVoicesSameNote = this._scheduledVoices.filter(x => x.playingNote === note)
 
 		// It's only possible for there to be one conflicting voice, because of this function
-		const voiceToRelease = scheduledVoicesSameNote.find(voice => {
+		const voicesToRelease = scheduledVoicesSameNote.filter(voice => {
 			const voiceStartsBeforeRelease = voice.scheduledAttackStartTime <= releaseStartTime
 
 			const voiceEndsAfterRelease = releaseStartTime < voice.scheduledReleaseEndTimeSeconds
@@ -110,13 +130,29 @@ export abstract class Voices<V extends Voice> {
 			return voiceIsInWindow
 		})
 
-		if (!voiceToRelease) return
+		if (voicesToRelease.count() > 1) {
+			logger.error(`voicesToRelease.count() > 1 | voicesToRelease: `, JSON.stringify(voicesToRelease, null, 2))
+			logger.error(`note: `, note)
+			logger.error(`delaySeconds: `, delaySeconds)
+			logger.error(`releaseSeconds: `, releaseSeconds)
+			logger.error(`currentTime: `, currentTime)
+			logger.error(`releaseStartTime: `, releaseStartTime)
+		}
 
-		// Don't bother if release is exactly on attack
-		// TODO This might be wrong...
-		if (voiceToRelease.scheduledAttackStartTime === releaseStartTime) return
+		const voiceToRelease = voicesToRelease.first(undefined)
 
-		voiceToRelease.scheduleRelease(delaySeconds, releaseSeconds)
+		if (!voiceToRelease) {
+			logger.warn('[Voices][scheduleRelease] !voiceToRelease note: ', note)
+			return
+		}
+
+		// If release is exactly on attack, release it
+		//   because if the voice was already scheduled,
+		//   then the release must have come after the attack
+		// theres a chance that this might cause issues where someones note is played on another client
+		// if (voiceToRelease.scheduledAttackStartTime === releaseStartTime) { }
+
+		voiceToRelease.scheduleRelease(releaseStartTime, releaseSeconds)
 
 		// Check if release crosses into another voice
 		// Check same note voices, where voice attack start is in our release window
@@ -129,15 +165,14 @@ export abstract class Voices<V extends Voice> {
 		})
 
 		if (conflictingVoice) {
-			const hardCutoffDelay = conflictingVoice.scheduledAttackStartTime - currentTime
-			voiceToRelease.scheduleRelease(hardCutoffDelay, 0.001)
+			voiceToRelease.scheduleRelease(conflictingVoice.scheduledAttackStartTime, 0.001)
 		}
 	}
 
 	public releaseAllScheduled(releaseSeconds: number) {
 		this._scheduledVoices.filter(x => x.invincible === false)
 			.forEach(x => {
-				x.scheduleRelease(0, releaseSeconds, true)
+				x.scheduleRelease(this._getAudioContext().currentTime, releaseSeconds, true)
 			})
 	}
 

@@ -1,15 +1,23 @@
 import {Map} from 'immutable'
-import {string} from 'prop-types'
 import {Dispatch, Middleware} from 'redux'
 import {ConnectionNodeType} from '../common/common-types'
-import {isClient} from '../common/is-client-or-server'
 import {logger} from '../common/logger'
 import {emptyMidiNotes, IMidiNote} from '../common/MidiNote'
 import {IClientRoomState} from '../common/redux/common-redux-types'
 import {selectConnectionsWithSourceIds} from '../common/redux/connections-redux'
-import {addBasicSampler, addBasicSynthesizer, addPosition, addVirtualKeyboard, BasicSamplerState, BasicSynthesizerState, Connection, connectionsActions, deleteAllPositions, deleteAllThings, IClientAppState, makeActionCreator, makePosition, MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID, READY, selectActiveRoom, selectLocalClient, selectPositionExtremes, selectVirtualKeyboardById, selectVirtualKeyboardIdByOwner, SET_ACTIVE_ROOM, VIRTUAL_KEY_PRESSED, VIRTUAL_KEY_UP, VIRTUAL_OCTAVE_CHANGE, VirtualKeyboardState, virtualKeyPressed, VirtualKeyPressedAction, virtualKeyUp, VirtualKeyUpAction, virtualOctaveChange, VirtualOctaveChangeAction} from '../common/redux/index'
+import {
+	addBasicSampler, addBasicSynthesizer, addPosition, addVirtualKeyboard,
+	BasicSamplerState, BasicSynthesizerState, Connection, connectionsActions,
+	deleteAllPositions, deleteAllThings, IClientAppState, makeActionCreator,
+	makePosition, MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID, READY,
+	selectActiveRoom, selectLocalClient, selectPositionExtremes,
+	selectVirtualKeyboardById, selectVirtualKeyboardByOwner,
+	SET_ACTIVE_ROOM, VIRTUAL_KEY_PRESSED, VIRTUAL_KEY_UP, VIRTUAL_OCTAVE_CHANGE,
+	VirtualKeyboardState, virtualKeyPressed, VirtualKeyPressedAction,
+	virtualKeyUp, VirtualKeyUpAction, virtualOctaveChange,
+	VirtualOctaveChangeAction,
+} from '../common/redux/index'
 import {pointersActions} from '../common/redux/pointers-redux'
-import {useSchedulerForKeyboards} from './client-toggles'
 import {getAllInstruments} from './instrument-manager'
 import {MidiNotes} from './Instruments/BasicSynthesizerView'
 import {isNewNoteScannerEnabled} from './is-prod-client'
@@ -143,8 +151,7 @@ export const createLocalMiddleware: () => Middleware<{}, IClientAppState> = () =
 let _previousNotesForSourceId = Map<string, MidiNotes>()
 
 function scheduleNote(note: IMidiNote, sourceId: string, roomState: IClientRoomState, onOrOff: 'on' | 'off') {
-	if (isClient() && isNewNoteScannerEnabled() === false) return
-	if (useSchedulerForKeyboards() === false) return
+	if (isNewNoteScannerEnabled() === false) return
 
 	if (_previousNotesForSourceId.has(sourceId) === false) {
 		_previousNotesForSourceId = _previousNotesForSourceId.set(sourceId, emptyMidiNotes)
@@ -182,11 +189,11 @@ function scheduleNote(note: IMidiNote, sourceId: string, roomState: IClientRoomS
 }
 
 function getLocalVirtualKeyboardId(state: IClientAppState) {
-	return selectVirtualKeyboardIdByOwner(state.room, selectLocalClient(state).id)
+	return getLocalVirtualKeyboard(state).id
 }
 
 function getLocalVirtualKeyboard(state: IClientAppState) {
-	return selectVirtualKeyboardById(state.room, getLocalVirtualKeyboardId(state))
+	return selectVirtualKeyboardByOwner(state.room, selectLocalClient(state).id)
 }
 
 // TODO Refactor to use functions in create-server-stuff.ts

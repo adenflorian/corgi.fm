@@ -18,6 +18,7 @@ export class BasicSamplerInstrument extends Instrument<SamplerVoices, SamplerVoi
 			this._audioContext,
 			this._panNode,
 			this._detune,
+			options.forScheduling,
 		)
 	}
 
@@ -30,8 +31,11 @@ class SamplerVoices extends Voices<SamplerVoice> {
 		private readonly _audioContext: AudioContext,
 		private readonly _destination: AudioNode,
 		_detune: number,
+		forScheduling = true,
 	) {
 		super(_detune)
+
+		if (forScheduling) return
 
 		for (let i = 0; i < this._voiceCount; i++) {
 			const newVoice = this._createVoice(false, false)

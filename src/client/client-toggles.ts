@@ -1,1 +1,1 @@
-export const useSchedulerForKeyboards = () => true
+// export const useSchedulerForKeyboards = () => true

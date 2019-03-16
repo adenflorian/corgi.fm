@@ -1,31 +1,34 @@
 import {logger} from '../common/logger'
 
-export const isProdClient = () => window.location.hostname.toLowerCase() === 'shamu.adenflorian.com'
+export const isProdClient = () => _isProdClient
+const _isProdClient = window.location.hostname.toLowerCase() === 'shamu.adenflorian.com'
 
-export const isTestClient = () => window.location.hostname.toLowerCase() === 'shamu-test.adenflorian.com'
+export const isTestClient = () => _isTestClient
+const _isTestClient = window.location.hostname.toLowerCase() === 'shamu-test.adenflorian.com'
 
-export const isLocalDevClient = () => window.location.hostname.toLowerCase() === 'localhost'
+export const isLocalDevClient = () => _isLocalDevClient
+const _isLocalDevClient = window.location.hostname.toLowerCase() === 'localhost'
 
-export const getEnvDisplayName = () => isLocalDevClient()
+export const getEnvDisplayName = () => _getEnvDisplayName
+const _getEnvDisplayName = isLocalDevClient()
 	? 'dev'
 	: isTestClient()
 		? 'test'
 		: 'prod'
 
-export function logClientEnv() {
-	logger.log(
-		isProdClient()
-			? 'isProd'
-			: isTestClient()
-				? 'isTest'
-				: isLocalDevClient()
-					? 'isLocalDevClient'
-					: 'unknown env',
-	)
-}
+export function logClientEnv() {logger.log(_logClientEnv)}
+const _logClientEnv = isProdClient()
+	? 'isProd'
+	: isTestClient()
+		? 'isTest'
+		: isLocalDevClient()
+			? 'isLocalDevClient'
+			: 'unknown env'
 
-export const isNewNoteScannerEnabled = () => getPath() === 'scan' || isECSEnabled()
+const _getPath = () => window.location.pathname.replace('/', '')
 
-export const isECSEnabled = () => getPath() === 'ecs'
+export const isECSEnabled = () => _isECSEnabled
+const _isECSEnabled = _getPath() === 'ecs'
 
-const getPath = () => window.location.pathname.replace('/', '')
+export const isNewNoteScannerEnabled = () => _isNewNoteScannerEnabled
+const _isNewNoteScannerEnabled = _getPath() === 'scan' || isECSEnabled()

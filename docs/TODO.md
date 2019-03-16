@@ -103,6 +103,8 @@
 - [ ] audio rack node
 	- a node group that can have multiple nodes stacked on top of eachother with them connecting top down
 - [ ] show build datetime in tooltip on version in bottom right
+- [ ] twitch makes music
+	- stream shamu that listens to commands from twitch chat
 
 # Optimizations
 - [ ] use debounce for some network updates like mouse cursors and node positions?

@@ -10,7 +10,6 @@ import {
 	selectConnectionSourceNotesByTargetId, selectConnectionsWithSourceIds, selectGlobalClockState,
 	selectSampler, selectSimpleReverb, SimpleReverbState,
 } from '../common/redux'
-import {useSchedulerForKeyboards} from './client-toggles'
 import {GridSequencerPlayer} from './GridSequencerPlayer'
 import {
 	AudioNodeWrapper, IAudioNodeWrapperOptions, IInstrumentOptions,
@@ -170,6 +169,7 @@ export const setupInstrumentManager = (
 						audioContext,
 						voiceCount: 1,
 						detune: 0,	// TODO Shouldn't have to do this
+						forScheduling: isNewNoteScannerEnabled,
 					}, instrumentState),
 				)
 
@@ -184,7 +184,7 @@ export const setupInstrumentManager = (
 		}
 
 		function getSourceNotes(instrumentId: string) {
-			if (isNewNoteScannerEnabled && useSchedulerForKeyboards()) {
+			if (isNewNoteScannerEnabled) {
 				return emptyMidiNotes
 			} else {
 				return selectConnectionSourceNotesByTargetId(state.room, instrumentId, false)

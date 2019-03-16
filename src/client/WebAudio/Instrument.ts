@@ -123,4 +123,5 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 export interface IInstrumentOptions extends IAudioNodeWrapperOptions {
 	voiceCount: number
 	detune: number
+	forScheduling: boolean
 }

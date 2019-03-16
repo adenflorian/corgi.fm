@@ -1,4 +1,5 @@
 import uuid = require('uuid')
+import {logger} from '../../common/logger'
 import {applyEnvelope, calculateScheduledEnvelope, IScheduledEnvelope} from './envelope'
 import {OnEndedCallback} from './index'
 
@@ -33,6 +34,7 @@ export abstract class Voice {
 	protected _sustainLevel = 1
 	protected _scheduledEnvelope: IScheduledEnvelope | undefined
 	protected _detune: number = 0
+	protected _ended = false
 
 	constructor(
 		audioContext: AudioContext,
@@ -104,9 +106,7 @@ export abstract class Voice {
 		return this._releaseId
 	}
 
-	public scheduleNote(note: number, attackTimeInSeconds: number, delaySeconds: number): void {
-		// if delay is 0 then the scheduler isn't working properly
-		if (delaySeconds < 0) throw new Error('delay <= 0: ' + delaySeconds)
+	public scheduleNote(note: number, attackTimeInSeconds: number, attackStart: number): void {
 
 		this._scheduleNoteSpecific(note)
 
@@ -118,7 +118,7 @@ export abstract class Voice {
 		this.playingNote = note
 
 		this._scheduledEnvelope = calculateScheduledEnvelope({
-			attackStart: this._audioContext.currentTime + delaySeconds,
+			attackStart,
 			attackLength: attackTimeInSeconds,
 			sustain: this._sustainLevel,
 			releaseStart: Number.MAX_VALUE,
@@ -145,11 +145,41 @@ export abstract class Voice {
 	protected abstract _scheduleNoteSpecific(note: number): void
 
 	public scheduleRelease(
-		delaySeconds: number,
+		newReleaseStartTime: number,
 		releaseSeconds: number,
 		releaseIfNotCurrentlyReleasing = false,
 	) {
+		if (this._ended) return
+
 		const audioNode = this.getAudioScheduledSourceNode()!
+
+		if (releaseIfNotCurrentlyReleasing) {
+			if (this._audioContext.currentTime < this._scheduledAttackStartTimeSeconds) {
+				this._gain.gain.cancelScheduledValues(this._audioContext.currentTime)
+				audioNode.onended = () => {
+					this._onEnded(this.id)
+				}
+				audioNode.stop()
+				audioNode.disconnect()
+				this._gain.disconnect()
+				delete this._gain
+				this._ended = true
+				this._onEnded(this.id)
+				return
+			}
+			if (this._audioContext.currentTime > this._scheduledReleaseStartTimeSeconds) {
+				return
+			}
+			if (newReleaseStartTime > this.scheduledReleaseEndTimeSeconds) {
+				return
+			}
+		}
+
+		const newReleaseEndTime = newReleaseStartTime + releaseSeconds
+
+		if (newReleaseEndTime > this._scheduledReleaseEndTimeSeconds) {
+			return
+		}
 
 		if (this._isReleaseScheduled) {
 			// trying to re-release a voice
@@ -157,23 +187,20 @@ export abstract class Voice {
 			// is new release start before or after original release start?
 			// if after, then assume hard cutoff
 			// if before, need to redo all release stuff
-			const newReleaseStartTime = this._audioContext.currentTime + delaySeconds
 
 			if (newReleaseStartTime >= this._scheduledReleaseStartTimeSeconds) {
-
-				if (releaseIfNotCurrentlyReleasing) return
 
 				const originalReleaseEndTime = this._scheduledReleaseEndTimeSeconds
 				const originalReleaseLength = originalReleaseEndTime - this._scheduledReleaseStartTimeSeconds
 
-				this._scheduledReleaseEndTimeSeconds = this._audioContext.currentTime + delaySeconds + releaseSeconds
+				this._scheduledReleaseEndTimeSeconds = newReleaseEndTime
 
 				const newReleaseLength = this._scheduledReleaseEndTimeSeconds - this._scheduledReleaseStartTimeSeconds
 				const ratio = newReleaseLength / originalReleaseLength
 				// Not accurate for a curved release, will be too high
 				this._scheduledSustainAtReleaseEnd = this._scheduledSustainAtReleaseStart - (ratio * this._scheduledSustainAtReleaseStart)
 
-				audioNode.stop(this._scheduledReleaseEndTimeSeconds)
+				audioNode.stop(Math.max(this._audioContext.currentTime + 0.001, this._scheduledReleaseEndTimeSeconds))
 				return
 			} else {
 				// Let it do normal release stuff
@@ -182,8 +209,8 @@ export abstract class Voice {
 			this._isReleaseScheduled = true
 		}
 
-		this._scheduledReleaseStartTimeSeconds = this._audioContext.currentTime + delaySeconds
-		this._scheduledReleaseEndTimeSeconds = this._audioContext.currentTime + delaySeconds + releaseSeconds
+		this._scheduledReleaseStartTimeSeconds = newReleaseStartTime
+		this._scheduledReleaseEndTimeSeconds = newReleaseEndTime
 
 		this._cancelAndHoldOrJustCancelAtTime(
 			releaseIfNotCurrentlyReleasing
@@ -207,7 +234,7 @@ export abstract class Voice {
 			this._gain.gain.linearRampToValueAtTime(this._scheduledSustainAtAttackEnd, this._scheduledReleaseStartTimeSeconds)
 		}
 
-		this._gain.gain.exponentialRampToValueAtTime(0.00001, this._scheduledReleaseEndTimeSeconds)
+		this._gain.gain.exponentialRampToValueAtTime(0.00001, Math.max(this._audioContext.currentTime + 0.001, this._scheduledReleaseEndTimeSeconds))
 
 		audioNode.stop(this._scheduledReleaseEndTimeSeconds)
 		audioNode.onended = () => {

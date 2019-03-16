@@ -2,7 +2,21 @@ BUGS
 ====
 - [√] when a note is playing and you switch tabs, the note gets stuck as on
 	- fixed in 735a86f03a9d07f1baf1d4801e7d649829f33e8b
+- [√] stuck notes on 1 client and not others
+	- mitigate:
+		- maybe periodically check if a note is held down on client and send update to everyone if changes
+	- how could this happen?
+		- events getting sent or received out of order?
+		- key up event not getting sent at all?
+	- what's responsible for stopping notes from other users?
+		- receive VIRTUAL_KEY_UP action
+	- repro
+		- 2 clients
+- [√] stuck notes when refreshing and a song is playing
+- [ ] filters getting stuck
+- [ ] piano roll lines on infinite sequencer are off by one
 - [ ] changing room thru selector doesn't completely pick up new user name if changed in previous room?
 - [ ] when hooking up reverb and changing filter to 0 it can cause a loud sound which triggers the master volume safety
 - [ ] when ableton is open, shamu wont recognize midi keyboard
 - [ ] new options are getting wiped by options from localstorage
+- [ ] when 2 people join around same time, they spawn on top of each other

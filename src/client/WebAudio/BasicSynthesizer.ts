@@ -24,6 +24,7 @@ export class BasicSynthesizer extends Instrument<SynthVoices, SynthVoice> {
 			this._panNode,
 			options.oscillatorType,
 			this._detune,
+			options.forScheduling,
 		)
 	}
 
@@ -43,8 +44,11 @@ class SynthVoices extends Voices<SynthVoice> {
 		private readonly _destination: AudioNode,
 		private _oscType: ShamuOscillatorType,
 		_detune: number,
+		forScheduling = true,
 	) {
 		super(_detune)
+
+		if (forScheduling) return
 
 		for (let i = 0; i < this._voiceCount; i++) {
 			const newVoice = this._createVoice(false, false)

@@ -187,7 +187,11 @@ export function selectVirtualKeyboardsByOwner(state: IClientRoomState, ownerId: 
 }
 
 export function selectVirtualKeyboardIdByOwner(state: IClientRoomState, ownerId: ClientId) {
+	return selectVirtualKeyboardByOwner(state, ownerId).id
+}
+
+export function selectVirtualKeyboardByOwner(state: IClientRoomState, ownerId: ClientId) {
 	const keyboard = selectAllVirtualKeyboardsArray(state)
 		.find(x => x.ownerId === ownerId)
-	return keyboard ? keyboard.id : 'fakeKeyboardId'
+	return keyboard || VirtualKeyboardState.dummy
 }
