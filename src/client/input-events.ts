@@ -1,5 +1,6 @@
 import {Map} from 'immutable'
 import {Action, AnyAction, Store} from 'redux'
+import {rateLimitedDebounce} from '../common/common-utils'
 import {
 	globalClockActions, IClientAppState, pointersActions,
 	selectGlobalClockIsPlaying, selectIsLocalClientReady, selectLocalClient,
@@ -166,16 +167,20 @@ export function setupInputEventListeners(
 		}
 	}
 
-	window.addEventListener('mousemove', e => sendMouseUpdate(e.clientX, e.clientY))
+	const mouseMoveUpdateIntervalMs = 50
 
-	window.addEventListener('wheel', _ => setTimeout(() => sendMouseUpdate(), 0))
+	const onMouseMove = (e: MouseEvent) => dispatchPointersUpdate(e.clientX, e.clientY)
+	window.addEventListener('mousemove', rateLimitedDebounce(onMouseMove, mouseMoveUpdateIntervalMs))
+
+	const onWheel = () => setTimeout(() => dispatchPointersUpdate(), 0)
+	window.addEventListener('wheel', rateLimitedDebounce(onWheel, mouseMoveUpdateIntervalMs))
 
 	let lastMousePosition = {
 		x: 0,
 		y: 0,
 	}
 
-	function sendMouseUpdate(x?: number, y?: number) {
+	function dispatchPointersUpdate(x?: number, y?: number) {
 		const state = store.getState()
 
 		if (!selectIsLocalClientReady(state)) return

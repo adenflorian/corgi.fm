@@ -1,3 +1,5 @@
+import {debounce} from 'lodash'
+
 export function pickRandomArrayElement<T>(array: T[]): T {
 	return array[Math.floor(Math.random() * array.length)]
 }
@@ -19,3 +21,16 @@ export function assertArrayHasNoUndefinedElements(array: any[]): void {
 }
 
 export const createThisShouldntHappenError = () => new Error(`this shouldn't happen`)
+
+export const rateLimitedDebounce = <T extends (...args: any[]) => any>(
+	func: T,
+	intervalMs: number,
+) => debounce(
+	func,
+	intervalMs,
+	{
+		leading: true,
+		trailing: true,
+		maxWait: intervalMs,
+	},
+)

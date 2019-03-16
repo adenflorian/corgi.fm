@@ -63,6 +63,7 @@
         "autosize",
         "callout",
         "contenteditable",
+        "debounced",
         "desaturate",
         "deserialize",
         "desmos",
