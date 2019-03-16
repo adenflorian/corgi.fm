@@ -3,8 +3,9 @@ import {Component} from 'react'
 import AutosizeInput from 'react-input-autosize'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
-import packageJson from '../../package.json'
-import {maxUsernameLength, selectLocalClient, setClientName} from '../common/redux'
+import {
+	maxUsernameLength, selectClientInfo, selectLocalClient, setClientName,
+} from '../common/redux'
 import {IClientAppState} from '../common/redux'
 import {chatSubmit} from '../common/redux'
 import './Chat.less'
@@ -17,14 +18,17 @@ interface IChatComponentState {
 	username: string
 }
 
-interface IChatProps {
+interface ReduxProps {
 	author: string
 	authorColor: string
 	authorId: string
-	dispatch: Dispatch
+	clientVersion: string
+	serverVersion: string
 }
 
-export class Chat extends Component<IChatProps, IChatComponentState> {
+type AllProps = ReduxProps & {dispatch: Dispatch}
+
+export class Chat extends Component<AllProps, IChatComponentState> {
 	public state: IChatComponentState = {
 		chatMessage: '',
 		isChatFocused: false,
@@ -34,7 +38,7 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 	public chatInputRef: React.RefObject<HTMLInputElement>
 	public chatRef: React.RefObject<HTMLDivElement>
 
-	constructor(props: IChatProps) {
+	constructor(props: AllProps) {
 		super(props)
 		this.chatInputRef = React.createRef()
 		this.chatRef = React.createRef()
@@ -90,11 +94,10 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 								autoComplete="off"
 							/>
 						</form>
-						<div className="bottomInfo">
-							{/* <div className="info-env">{getEnvDisplayName()}</div> */}
-							<div className="info-milestone">pre-alpha</div>
-							<div className="info-version">v{packageJson.version}</div>
-						</div>
+						<BottomInfo
+							clientVersion={this.props.clientVersion}
+							serverVersion={this.props.serverVersion}
+						/>
 					</div>
 				</div>
 			</div>
@@ -164,8 +167,46 @@ export class Chat extends Component<IChatProps, IChatComponentState> {
 	}
 }
 
-export const ConnectedChat = connect((state: IClientAppState) => ({
+interface BottomInfoProps {
+	clientVersion: string
+	serverVersion: string
+}
+
+const BottomInfo = React.memo(function _BottomInfo(props: BottomInfoProps) {
+	const isVersionMismatch = props.clientVersion !== props.serverVersion
+
+	return (
+		<div className="bottomInfo">
+			{/* <div className="info-env">{getEnvDisplayName()}</div> */}
+			<div
+				className="info-milestone"
+			>
+				pre-alpha
+							</div>
+			<div
+				className={`info-version ${isVersionMismatch ? 'info-versionMismatch' : ''}`}
+				title={isVersionMismatch
+					? `client is out of date, click to reload\nserver version: ${props.serverVersion}`
+					: 'up to date!'
+				}
+				style={{
+					cursor: isVersionMismatch ? 'pointer' : 'inherit',
+				}}
+				onClick={isVersionMismatch
+					? () => location.reload()
+					: undefined
+				}
+			>
+				v{props.clientVersion}
+			</div>
+		</div>
+	)
+})
+
+export const ConnectedChat = connect((state: IClientAppState): ReduxProps => ({
 	author: selectLocalClient(state).name,
 	authorColor: selectLocalClient(state).color,
 	authorId: selectLocalClient(state).id,
+	clientVersion: selectClientInfo(state).clientVersion,
+	serverVersion: selectClientInfo(state).serverVersion,
 }))(Chat)

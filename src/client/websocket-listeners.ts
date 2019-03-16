@@ -2,8 +2,12 @@ import {Store} from 'redux'
 import * as io from 'socket.io-client'
 import {maxRoomNameLength} from '../common/common-constants'
 import {logger} from '../common/logger'
-import {BroadcastAction, maxUsernameLength, selfDisconnected, setInfo, setSocketId} from '../common/redux'
+import {
+	BroadcastAction, clientInfoActions, maxUsernameLength, selfDisconnected,
+	setInfo, setSocketId,
+} from '../common/redux'
 import {WebSocketEvent} from '../common/server-constants'
+import {getCurrentClientVersion} from './client-utils'
 import {isLocalDevClient} from './is-prod-client'
 import {deleteAllTheThings} from './local-middleware'
 import {getUsernameFromLocalStorage} from './username'
@@ -29,6 +33,19 @@ export function setupWebsocketAndListeners(store: Store) {
 		logger.log('socket: disconnect')
 		store.dispatch(selfDisconnected())
 		deleteAllTheThings(store.dispatch)
+	})
+
+	socket.on('version', (serverVersion: string) => {
+		logger.log('received serverVersion:', serverVersion)
+
+		const clientVersion = getCurrentClientVersion()
+
+		store.dispatch(clientInfoActions.setServerVersion(serverVersion))
+
+		if (serverVersion !== clientVersion) {
+			logger.warn(`client server version mismatch! client is ${clientVersion}, server is ${serverVersion}`)
+			// TODO Analytics event
+		}
 	})
 
 	socket.on(WebSocketEvent.broadcast, (action: BroadcastAction) => {

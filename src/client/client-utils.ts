@@ -1,3 +1,5 @@
+import packageJson from '../../package.json'
+
 /** @param buttons The buttons property from a mouse event */
 export function isLeftMouseButtonDown(buttons: number): boolean {
 	// buttons is not implemented in safari :(
@@ -36,4 +38,8 @@ function getMainBoardsRect() {
 	} else {
 		return {x: 0, y: 0}
 	}
+}
+
+export function getCurrentClientVersion() {
+	return packageJson.version
 }

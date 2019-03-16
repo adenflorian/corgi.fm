@@ -1,9 +1,11 @@
 import 'babel-polyfill'
 import * as React from 'react'
 import * as ReactGA from 'react-ga'
+import {clientInfoActions} from '../common/redux'
 import {setupAudioContext} from '../common/setup-audio-context'
 import {BrowserWarning} from './BrowserWarning'
 import {configureStore} from './client-store'
+import {getCurrentClientVersion} from './client-utils'
 import {getECSLoop} from './ECS/ECS'
 import {getFpsLoop} from './fps-loop'
 import {setupInputEventListeners} from './input-events'
@@ -62,6 +64,8 @@ async function setupAsync() {
 	const preFx = audioContext.createGain()
 
 	const store = configureStore()
+
+	store.dispatch(clientInfoActions.setClientVersion(getCurrentClientVersion()))
 
 	setStoreForSchedulerVisual(store)
 

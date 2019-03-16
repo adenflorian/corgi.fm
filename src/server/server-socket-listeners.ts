@@ -12,6 +12,8 @@ export const lobby = 'lobby'
 
 const server = 'server'
 
+const version = process.env.npm_package_version
+
 export function setupServerWebSocketListeners(io: Server, serverStore: Store) {
 	setInterval(() => {
 		const ioRoomNames = Object.keys(io.sockets.adapter.rooms)
@@ -34,6 +36,8 @@ export function setupServerWebSocketListeners(io: Server, serverStore: Store) {
 	}, 5000)
 
 	io.on('connection', socket => {
+		socket.emit('version', version)
+
 		const newConnectionUsername = socket.handshake.query.username
 			.replace(/ +(?= )/g, '')
 			.trim()
