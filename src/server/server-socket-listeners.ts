@@ -7,12 +7,13 @@ import {logger} from '../common/logger'
 import {addClient, addRoomMember, BroadcastAction, BROADCASTER_ACTION, CHANGE_ROOM, clientDisconnected, ClientState, connectionsActions, createRoom, createRoomAction, deletePositions, deleteRoom, deleteRoomMember, deleteThingsAny, getActionsBlacklist, globalClockActions, IClientRoomState, IServerState, maxUsernameLength, pointersActions, ready, REQUEST_CREATE_ROOM, selectAllClients, selectAllConnections, selectAllMessages, selectAllPointers, selectAllPositions, selectAllRoomMemberIds, selectAllRoomNames, selectAllRoomStates, selectClientBySocketId, selectConnectionsWithSourceOrTargetIds, selectGlobalClockState, selectNodeIdsOwnedByClient, selectPositionsWithIds, selectRoomExists, selectRoomStateByName, selectShamuGraphState, setActiveRoom, setChat, setClients, setRoomMembers, setRooms, shamuGraphActions, updatePositions} from '../common/redux'
 import {WebSocketEvent} from '../common/server-constants'
 import {createServerStuff} from './create-server-stuff'
+import {serverInfo} from './server-info'
 
 export const lobby = 'lobby'
 
 const server = 'server'
 
-const version = process.env.npm_package_version
+const version = serverInfo.version
 
 export function setupServerWebSocketListeners(io: Server, serverStore: Store) {
 	setInterval(() => {

@@ -81,6 +81,8 @@
         "onmidimessage",
         "onstatechange",
         "pageview",
+        "pkginfo",
+        "pmodule",
         "polyfill",
         "reselect",
         "respawn",
