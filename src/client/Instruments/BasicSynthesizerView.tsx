@@ -57,7 +57,7 @@ export class BasicSynthesizerView
 					saturate={isPlaying}
 					id={this.props.id}
 				>
-					<div className="basicSynthesizer">
+					<div className="basicSynthesizer" title="Basic Synthesizer">
 						<BasicSynthesizerOscillatorTypes
 							handleClick={this._handleOscillatorTypeClicked}
 							activeType={oscillatorType}

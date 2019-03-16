@@ -102,6 +102,7 @@
 - [ ] warn user if master volume is at or near 0
 - [ ] audio rack node
 	- a node group that can have multiple nodes stacked on top of eachother with them connecting top down
+- [ ] show build datetime in tooltip on version in bottom right
 
 # Optimizations
 - [ ] use debounce for some network updates like mouse cursors and node positions?

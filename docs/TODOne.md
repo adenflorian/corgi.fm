@@ -1,96 +1,99 @@
+- [√] show version and "pre-alpha" in bottom right
+	- [√] make red if client out of date
+	- [√] clicking on it when version mismatch reloads
+	- [√] tooltip
 
-	- [√] prevent multiple oscillators/voices on same instrument from playing same note at same time, including releasing
-		- i have all the info i need to be able to do this right?
-			- note start times
-			- well, when a note is played i dont know when it will end until its release is scheduled
-				- do i need to know?
-		- what should happen when a note is scheduled?
-			- option A
-				- check for any scheduled notes playing same note that will overlap
-					- if any, then, don't schedule? or schedule it in a way that doesn't overlap?
-			- option B (ableton style)
-				- check for any scheduled notes playing same note that will overlap
-					- if any
-						- if new note starts before existing note
-		- what will deal with conflicts?
-			- note scheduler?
-				- i dont think it can, its just a pure function, need state for this?
-				- the scheduler can only predict what the instrument has scheduled
-			- the instrument?
-				- probably
-				- it will need to keep track of all scheduled notes
-				- [√] make instrument keep track of all scheduled notes/events/voices
-					- [√] move AudioNodeWrapper to new file
-		- BUG sometimes two note ons will schedule, but only one note off
-			- with current system, this will end in a stuck note
-			- once i implement the ableton system thing, this shouldnt be a problem, because it will only allow 1 at a time for same note
-		- what does ableton do?
-			- if two tracks play same note at same time, only one will play
-			- if a note is already playing, and a new note from different tracks start to play same note, old note is just stopped and new note starts attack
-			- what about with the user playing a note while a track is playing
-				- same thing, when a note is triggered, if an existing note is playing it is canceled and new note starts with attack
-				- also, when user releases key, ti will trigger release of currently playing note, regardless of who started the note
-		- what does tone.js do?
-			- i dont have an easy way to test this, but i think tone.js will just play whatever you tell it to
+- [√] prevent multiple oscillators/voices on same instrument from playing same note at same time, including releasing
+	- i have all the info i need to be able to do this right?
+		- note start times
+		- well, when a note is played i dont know when it will end until its release is scheduled
+			- do i need to know?
+	- what should happen when a note is scheduled?
+		- option A
+			- check for any scheduled notes playing same note that will overlap
+				- if any, then, don't schedule? or schedule it in a way that doesn't overlap?
+		- option B (ableton style)
+			- check for any scheduled notes playing same note that will overlap
+				- if any
+					- if new note starts before existing note
+	- what will deal with conflicts?
+		- note scheduler?
+			- i dont think it can, its just a pure function, need state for this?
+			- the scheduler can only predict what the instrument has scheduled
+		- the instrument?
+			- probably
+			- it will need to keep track of all scheduled notes
+			- [√] make instrument keep track of all scheduled notes/events/voices
+				- [√] move AudioNodeWrapper to new file
+	- BUG sometimes two note ons will schedule, but only one note off
+		- with current system, this will end in a stuck note
+		- once i implement the ableton system thing, this shouldnt be a problem, because it will only allow 1 at a time for same note
+	- what does ableton do?
+		- if two tracks play same note at same time, only one will play
+		- if a note is already playing, and a new note from different tracks start to play same note, old note is just stopped and new note starts attack
+		- what about with the user playing a note while a track is playing
+			- same thing, when a note is triggered, if an existing note is playing it is canceled and new note starts with attack
+			- also, when user releases key, ti will trigger release of currently playing note, regardless of who started the note
+	- what does tone.js do?
+		- i dont have an easy way to test this, but i think tone.js will just play whatever you tell it to
 
-			
-	- [ ] get stuff working again
-		- [...] keyboard
-			- i want lowest latency possible for live keyboard playing
-			- i also want the keyboard notes to union with the sequencers or other keyboards
-				- this is hard, because the user playing the keyboard needs to be instant
-					but the other sequencers are scheduling notes
-			- first step?
-				- if notes aren't getting combined some how, then things can get loud
-				- not having super low latency is a deal breaker, so lets start there
-			- where does the user input start from?
-				- mouse
-				- keyboard
-					- input-events.ts
-					- LOCAL_MIDI_KEY_PRESS
-					- listen for action dispatch?
-						- if we do, we need to listen for it in middleware
-					- what are we even going to do with the key press?
-						- directly schedule notes to the connected instruments?
-					- what info do we need?
-						- what key was pressed
-						- virtual keyboard state (octave)
-						- access to instruments
-							- instrument-manager
-							- could pass a ref to a middleware creator
-							- or use getAllInstruments?
-						- connections state (or a selector)
-					- **do in local-middleware**
-					- why am i not storing instrument refs in store?
-					- [√] PROBLEM
-						- the way i schedule releases wont work with keyboard?
-							- does it even work with multiple sequencers going to same instrument?
-						- i think the wrong notes might end up getting released
-					- will be able to test this stuff better with a better sequencer
-						- or change keyboard to use scheduler
-					- [√] OCTAVE PROBLEM
-						- switching octave while holding note
-						- how did old system do it?
-							- it releases old note and starts new one with newly triggered envelope
-					- why not just use old system for keyboards only?
-						- this works, but still has issue of playing two oscillators at same freq
-					- how to prevent 2 oscillators playing same freq at same time
-						- only allow one midi input (bad)
-						- use old system (bad?)
-					- Scenario: A
-						- steps
-							- two keyboards routed to same synth
-							- hold C4 on first keyboard
-							- hold C4 on 2nd keyboard
-							- shouldnt hear anything different
-							- release note on 2nd keyboard
-							- shouldnt hear anything different
-						- works on old system
-					- maybe make it required to know the release time when someone schedules
-						- that way notes wont get stuck on
-						- things can extend a release but only by a certain amount
-						- like a heartbeat
-						- this shouldnt be necessary tho right?
+- [ ] get stuff working again
+	- [...] keyboard
+		- i want lowest latency possible for live keyboard playing
+		- i also want the keyboard notes to union with the sequencers or other keyboards
+			- this is hard, because the user playing the keyboard needs to be instant
+				but the other sequencers are scheduling notes
+		- first step?
+			- if notes aren't getting combined some how, then things can get loud
+			- not having super low latency is a deal breaker, so lets start there
+		- where does the user input start from?
+			- mouse
+			- keyboard
+				- input-events.ts
+				- LOCAL_MIDI_KEY_PRESS
+				- listen for action dispatch?
+					- if we do, we need to listen for it in middleware
+				- what are we even going to do with the key press?
+					- directly schedule notes to the connected instruments?
+				- what info do we need?
+					- what key was pressed
+					- virtual keyboard state (octave)
+					- access to instruments
+						- instrument-manager
+						- could pass a ref to a middleware creator
+						- or use getAllInstruments?
+					- connections state (or a selector)
+				- **do in local-middleware**
+				- why am i not storing instrument refs in store?
+				- [√] PROBLEM
+					- the way i schedule releases wont work with keyboard?
+						- does it even work with multiple sequencers going to same instrument?
+					- i think the wrong notes might end up getting released
+				- will be able to test this stuff better with a better sequencer
+					- or change keyboard to use scheduler
+				- [√] OCTAVE PROBLEM
+					- switching octave while holding note
+					- how did old system do it?
+						- it releases old note and starts new one with newly triggered envelope
+				- why not just use old system for keyboards only?
+					- this works, but still has issue of playing two oscillators at same freq
+				- how to prevent 2 oscillators playing same freq at same time
+					- only allow one midi input (bad)
+					- use old system (bad?)
+				- Scenario: A
+					- steps
+						- two keyboards routed to same synth
+						- hold C4 on first keyboard
+						- hold C4 on 2nd keyboard
+						- shouldnt hear anything different
+						- release note on 2nd keyboard
+						- shouldnt hear anything different
+					- works on old system
+				- maybe make it required to know the release time when someone schedules
+					- that way notes wont get stuck on
+					- things can extend a release but only by a certain amount
+					- like a heartbeat
+					- this shouldnt be necessary tho right?
 
 in old setup
 i iterate thru the instruments

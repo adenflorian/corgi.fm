@@ -73,7 +73,7 @@ export class Chat extends Component<AllProps, IChatComponentState> {
 
 				<div className="chatBottom" style={{textAlign: 'initial'}} tabIndex={-1}>
 					<div className="inputWrapper" style={{color: authorColor}} tabIndex={-1}>
-						<form className="nameForm" onSubmit={this._onSubmitNameChange}>
+						<form className="nameForm" onSubmit={this._onSubmitNameChange} title="Change your username here">
 							<AutosizeInput
 								name="nameAutosizeInput"
 								className="author"
@@ -84,7 +84,7 @@ export class Chat extends Component<AllProps, IChatComponentState> {
 								onBlur={this._onNameInputBlur}
 							/>
 						</form>
-						<form className="chatMessageForm" onSubmit={this._onSubmitChat}>
+						<form className="chatMessageForm" onSubmit={this._onSubmitChat} title="chat box input">
 							<input
 								id="chatInput"
 								type="text"

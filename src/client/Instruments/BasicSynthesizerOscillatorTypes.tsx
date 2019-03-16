@@ -12,12 +12,12 @@ interface IBasicSynthesizerOscillatorTypesProps {
 	activeType: ShamuOscillatorType
 }
 
-const oscillatorTypes: Array<{type: ShamuOscillatorType, svgPath: string}> = [
-	{type: BuiltInOscillatorType.sine, svgPath: SineWave},
-	{type: BuiltInOscillatorType.triangle, svgPath: TriangleWave},
-	{type: BuiltInOscillatorType.sawtooth, svgPath: SawWave},
-	{type: BuiltInOscillatorType.square, svgPath: SquareWave},
-	{type: CustomOscillatorType.noise, svgPath: NoiseWave},
+const oscillatorTypes: Array<{type: ShamuOscillatorType, svgPath: string, title: string}> = [
+	{type: BuiltInOscillatorType.sine, svgPath: SineWave, title: 'Sine Wave'},
+	{type: BuiltInOscillatorType.triangle, svgPath: TriangleWave, title: 'Triangle Wave'},
+	{type: BuiltInOscillatorType.sawtooth, svgPath: SawWave, title: 'Saw Wave'},
+	{type: BuiltInOscillatorType.square, svgPath: SquareWave, title: 'Square Wave'},
+	{type: CustomOscillatorType.noise, svgPath: NoiseWave, title: 'Noise Wave'},
 ]
 
 export class BasicSynthesizerOscillatorTypes extends React.PureComponent<IBasicSynthesizerOscillatorTypesProps> {
@@ -26,9 +26,10 @@ export class BasicSynthesizerOscillatorTypes extends React.PureComponent<IBasicS
 
 		return (
 			<div className="oscillatorTypes">
-				{oscillatorTypes.map(({type, svgPath}) =>
+				{oscillatorTypes.map(({type, svgPath, title}) =>
 					<div
 						key={type}
+						title={title}
 						onClick={handleClick.bind(undefined, type)}
 						style={{
 							width: 40,
@@ -36,7 +37,8 @@ export class BasicSynthesizerOscillatorTypes extends React.PureComponent<IBasicS
 							flexDirection: 'column',
 							justifyContent: 'center',
 							alignItems: 'center',
-						}}>
+						}}
+					>
 						<ReactSVG
 							src={svgPath}
 							className={activeType === type ? 'active colorize' : undefined}

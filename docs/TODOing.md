@@ -1,9 +1,4 @@
 # Now
-- [ ] show version and "pre-alpha" in bottom right
-	- [√] make red if client out of date
-	- [√] clicking on it when version mismatch reloads
-	- [√] tooltip
-	- [ ] show build datetime in tooltip
 - [ ] hook up note-scanner with everything
 	- [√] change sequencer state to whole new stuff
 	- [√] respect sequencer isPlaying
