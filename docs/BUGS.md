@@ -1,9 +1,7 @@
 BUGS
 ====
 - [ ] when typing in chat, if someone leaves the input box loses focus
-- [√] when using external midi keyboard, the octaves dont line up right
 - [ ] filters getting stuck
-- [ ] piano roll lines on infinite sequencer are off by one
 - [ ] changing room thru selector doesn't completely pick up new user name if changed in previous room?
 - [ ] when hooking up reverb and changing filter to 0 it can cause a loud sound which triggers the master volume safety
 - [ ] when ableton is open, shamu wont recognize midi keyboard
@@ -13,6 +11,8 @@ BUGS
 	- maybe need a sourceId for each event/note?
 
 ## FIXED
+- [√] piano roll lines on infinite sequencer are off by one
+- [√] when using external midi keyboard, the octaves dont line up right
 - [√] new options are getting wiped by options from localstorage
 - [√] 2019-03-10 Note getting stuck when playing keyboard really fast with mouse
 	- haven't been able to reproduce

@@ -48,8 +48,10 @@ export const InfiniteSequencer: React.FC<IInfiniteSequencerAllProps> = React.mem
 		const noteHeightPercentage = 100 / numberOfPossibleNotes
 		const rows = [] as any[]
 
-		for (let i = highestNote; i >= lowestNote; i--) {
-			rows.push(i)
+		if (events.count() > 0) {
+			for (let i = highestNote; i >= lowestNote; i--) {
+				rows.push(i)
+			}
 		}
 
 		const dispatchInfiniteSeqParam = (paramType: InfiniteSequencerFields, value: number | boolean | string) =>
@@ -109,8 +111,7 @@ export const InfiniteSequencer: React.FC<IInfiniteSequencerAllProps> = React.mem
 							</div>
 							<div
 								className="export"
-								onClick={() => dispatch(
-									exportSequencerMidi(id))}
+								onClick={() => dispatch(exportSequencerMidi(id))}
 							>
 								<Download />
 							</div>
@@ -172,12 +173,11 @@ export const InfiniteSequencer: React.FC<IInfiniteSequencerAllProps> = React.mem
 													backgroundColor: note === -1 ? 'none' : getColorStringForMidiNote(note),
 												}}
 											>
-												{
-													note === -1
-														? undefined
-														: props.events.count() <= 8
-															? midiNoteToNoteName(note) + getOctaveFromMidiNote(note)
-															: undefined
+												{note === -1
+													? undefined
+													: props.events.count() <= 8
+														? midiNoteToNoteName(note) + getOctaveFromMidiNote(note)
+														: undefined
 												}
 											</div>
 										)
@@ -195,18 +195,17 @@ export const InfiniteSequencer: React.FC<IInfiniteSequencerAllProps> = React.mem
 								</div>
 								{props.showRows &&
 									<div className="rows">
-										{rows.map((_, index) =>
-											(
-												<div
-													key={index}
-													className={`row ${isWhiteKey(index) ? 'white' : 'black'}`}
-													style={{
-														height: `${noteHeightPercentage + (index === lowestNote ? 1 : 0)}%`,
-														top: `${(highestNote - index) * noteHeightPercentage}%`,
-														width: '100%',
-													}}
-												/>
-											))}
+										{rows.map(note => (
+											<div
+												key={note}
+												className={`row ${isWhiteKey(note) ? 'white' : 'black'}`}
+												style={{
+													height: `${noteHeightPercentage + (note === lowestNote ? 1 : 0)}%`,
+													top: `${(highestNote - note) * noteHeightPercentage}%`,
+													width: '100%',
+												}}
+											/>
+										))}
 									</div>
 								}
 								{/* <ConnectedSequencerTimeBar
