@@ -20,6 +20,7 @@ interface IZoomState {
 		x: number,
 		y: number,
 	}
+	backgroundClicked: boolean
 }
 
 const maxZoom = 10
@@ -39,6 +40,7 @@ export class Zoom extends React.PureComponent<IZoomAllProps, IZoomState> {
 			x: 0,
 			y: 0,
 		},
+		backgroundClicked: false,
 	}
 
 	public componentDidMount() {
@@ -65,10 +67,20 @@ export class Zoom extends React.PureComponent<IZoomAllProps, IZoomState> {
 					willChange: 'transform',
 				}}
 			>
-				<ZoomBackground />
+				<ZoomBackground
+					onMouseEvent={this._onBgMouseEvent}
+				/>
 				{children}
 			</div>
 		)
+	}
+
+	private readonly _onBgMouseEvent = (e: React.MouseEvent) => {
+		if (e.type === 'mousedown') {
+			this.setState({
+				backgroundClicked: true,
+			})
+		}
 	}
 
 	private readonly _onMouseWheel = (e: WheelEvent) => {
@@ -84,7 +96,13 @@ export class Zoom extends React.PureComponent<IZoomAllProps, IZoomState> {
 
 	private readonly _onMouseMove = (e: MouseEvent) => {
 		// if (e.ctrlKey) this._zoom(e.movementY * mouseZoomMod)
+		if (e.buttons !== 1 && this.state.backgroundClicked) {
+			this.setState({
+				backgroundClicked: false,
+			})
+		}
 		if (e.buttons === 4) this._pan(e.movementX, e.movementY)
+		if (this.state.backgroundClicked && e.buttons === 1) this._pan(e.movementX, e.movementY)
 	}
 
 	private readonly _zoom = (zoom: number, round: boolean = false) => {
@@ -126,21 +144,28 @@ export class Zoom extends React.PureComponent<IZoomAllProps, IZoomState> {
 		Math.min(maxPan * zoom, Math.max(-maxPan * zoom, pan))
 }
 
-const ZoomBackground = React.memo(function _ZoomBackground() {
-	return (
-		<div
-			className="zoomBackground"
-			style={{
-				position: 'fixed',
-				width: `${bgSize}vw`,
-				height: `${bgSize}vh`,
-				top: `-${bgSize / 2}vh`,
-				left: `-${bgSize / 2}vw`,
-				backgroundImage: `url(${PlusSVG})`,
-			}}
-		/>
-	)
-})
+interface ZoomBgProps {
+	onMouseEvent: (e: React.MouseEvent) => void
+}
+
+const ZoomBackground = React.memo(
+	function _ZoomBackground({onMouseEvent}: ZoomBgProps) {
+		return (
+			<div
+				className="zoomBackground"
+				style={{
+					position: 'fixed',
+					width: `${bgSize}vw`,
+					height: `${bgSize}vh`,
+					top: `-${bgSize / 2}vh`,
+					left: `-${bgSize / 2}vw`,
+					backgroundImage: `url(${PlusSVG})`,
+				}}
+				onMouseDown={onMouseEvent}
+			/>
+		)
+	},
+)
 
 export const ConnectedZoom = shamuConnect(
 	(state): IZoomReduxProps => ({

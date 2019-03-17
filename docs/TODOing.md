@@ -1,4 +1,5 @@
 # Now
+- [√] allow panning by clicking and dragging background
 - [ ] add low graphics setting
 	- [ ] notify user to lower graphics if low FPS
 - [ ] mute button next to audio output
