@@ -32,6 +32,9 @@ export const localMidiKeyUp = makeActionCreator(LOCAL_MIDI_KEY_UP, 'midiNote')
 export const LOCAL_MIDI_OCTAVE_CHANGE = 'LOCAL_MIDI_OCTAVE_CHANGE'
 export const localMidiOctaveChange = makeActionCreator(LOCAL_MIDI_OCTAVE_CHANGE, 'delta')
 
+export const WINDOW_BLUR = 'WINDOW_BLUR'
+export const windowBlur = makeActionCreator(WINDOW_BLUR)
+
 export function deleteAllTheThings(dispatch: Dispatch) {
 	dispatch(connectionsActions.deleteAll())
 	dispatch(deleteAllThings(ConnectionNodeType.gridSequencer))
@@ -45,6 +48,22 @@ export const createLocalMiddleware: () => Middleware<{}, IClientAppState> = () =
 	// TODO Do next later so keyboard is more responsive
 
 	switch (action.type) {
+		case WINDOW_BLUR: {
+			next(action)
+
+			const state = getState()
+
+			const localVirtualKeyboard = getLocalVirtualKeyboard(state)
+
+			return localVirtualKeyboard.pressedKeys.forEach(key => {
+				dispatch(
+					virtualKeyUp(
+						localVirtualKeyboard.id,
+						key,
+					),
+				)
+			})
+		}
 		case LOCAL_MIDI_KEY_PRESS: {
 			next(action)
 			const state = getState()

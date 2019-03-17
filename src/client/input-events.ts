@@ -6,7 +6,9 @@ import {
 	selectGlobalClockIsPlaying, selectIsLocalClientReady, selectLocalClient,
 	skipNote, undoRecordingSequencer, userInputActions,
 } from '../common/redux'
-import {localMidiKeyPress, localMidiKeyUp, localMidiOctaveChange} from './local-middleware'
+import {
+	localMidiKeyPress, localMidiKeyUp, localMidiOctaveChange, windowBlur,
+} from './local-middleware'
 import {simpleGlobalClientState} from './SimpleGlobalClientState'
 
 type IKeyBoardShortcuts = Map<string, KeyBoardShortcut>
@@ -143,6 +145,10 @@ export function setupInputEventListeners(
 	window.addEventListener('keypress', e => {
 		if (isInputFocused()) return
 		onKeyEvent(e)
+	})
+
+	window.addEventListener('blur', () => {
+		store.dispatch(windowBlur())
 	})
 
 	function onKeyEvent(event: KeyboardEvent) {
