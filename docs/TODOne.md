@@ -1,3 +1,6 @@
+- [√] put limits on virtual keyboard octave
+- [√] add gain knob on instruments
+
 - [√] show version and "pre-alpha" in bottom right
 	- [√] make red if client out of date
 	- [√] clicking on it when version mismatch reloads

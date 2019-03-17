@@ -1,5 +1,21 @@
 BUGS
 ====
+- [ ] filters getting stuck
+- [ ] piano roll lines on infinite sequencer are off by one
+- [ ] changing room thru selector doesn't completely pick up new user name if changed in previous room?
+- [ ] when hooking up reverb and changing filter to 0 it can cause a loud sound which triggers the master volume safety
+- [ ] when ableton is open, shamu wont recognize midi keyboard
+- [ ] new options are getting wiped by options from localstorage
+- [ ] when 2 people join around same time, they spawn on top of each other
+- [ ] 2019-03-10 Note getting stuck when playing keyboard really fast with mouse
+	- haven't been able to reproduce
+- [ ] 2019-03-03 Note getting stuck on when just sequencers are playing at normal speed
+	- put all 4 sequencers into same synth, with default release
+- [ ] 2019-03-03 When playing note on keyboard and change connection, note keeps playing on previous instrument
+	- need to somehow stop those notes
+	- maybe need a sourceId for each event/note?
+
+## FIXED
 - [√] when a note is playing and you switch tabs, the note gets stuck as on
 	- fixed in 735a86f03a9d07f1baf1d4801e7d649829f33e8b
 - [√] stuck notes on 1 client and not others
@@ -13,10 +29,25 @@ BUGS
 	- repro
 		- 2 clients
 - [√] stuck notes when refreshing and a song is playing
-- [ ] filters getting stuck
-- [ ] piano roll lines on infinite sequencer are off by one
-- [ ] changing room thru selector doesn't completely pick up new user name if changed in previous room?
-- [ ] when hooking up reverb and changing filter to 0 it can cause a loud sound which triggers the master volume safety
-- [ ] when ableton is open, shamu wont recognize midi keyboard
-- [ ] new options are getting wiped by options from localstorage
-- [ ] when 2 people join around same time, they spawn on top of each other
+- [√] 2019-03-03 note getting stuck on when switching synth osc types
+	- no scheduled voice for it in debug visual
+		- maybe audio node is undefined when it shouldnt be?
+		- then when it tries to stop it, its ignoring it because its undefined
+		- how to debug this tho
+		- not sure how to repro
+		- i think its specific to switching to and from noise osc type
+		- can get stuck on noise or other type
+		- where are the spots in the code that this could happen
+		- the voice is getting released, but .stop() isn't getting called on the source node
+		- audioNode is never null, but the issue is still happening
+			- meaning, there is both an osc and noise buffer at same time
+				- but that should never happen
+		- how am i still hearing sound if the gain was disconnected?
+			- maybe it wasn't?
+		- there is still a scheduledVoice, because i can change the osc type
+			- how?
+				- onEnded wasn't called?
+				- onEnded wont be called if audioNode never stops
+				- maybe its from switching osc type during release
+				- [√] make sure audioNode is stopped when switching synth osc type between noise and other
+				- should probably just clean up how the synth voice handles noise vs other types
