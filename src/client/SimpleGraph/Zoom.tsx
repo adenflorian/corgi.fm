@@ -102,7 +102,13 @@ export class Zoom extends React.PureComponent<IZoomAllProps, IZoomState> {
 			})
 		}
 		if (e.buttons === 4) this._pan(e.movementX, e.movementY)
-		if (this.state.backgroundClicked && e.buttons === 1) this._pan(e.movementX, e.movementY)
+		if (this.state.backgroundClicked && e.buttons === 1) {
+			if (e.ctrlKey) {
+				this._zoom(e.movementY * mouseZoomMod)
+			} else {
+				this._pan(e.movementX, e.movementY)
+			}
+		}
 	}
 
 	private readonly _zoom = (zoom: number, round: boolean = false) => {
