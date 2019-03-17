@@ -3,9 +3,9 @@ import * as React from 'react'
 import Draggable, {DraggableEventHandler} from 'react-draggable'
 import {Dispatch} from 'redux'
 import {
-	connectionsActions, GhostConnectorRecord, GhostConnectorStatus,
-	GhostConnectorType, IClientAppState, selectGlobalClockState,
-	selectUserInputKeys, shamuConnect,
+	AppOptions, connectionsActions, GhostConnectorRecord,
+	GhostConnectorStatus, GhostConnectorType, IClientAppState,
+	selectGlobalClockState, selectOption, selectUserInputKeys, shamuConnect,
 } from '../../common/redux'
 import {saturateColor} from '../../common/shamu-color'
 import {simpleGlobalClientState} from '../SimpleGlobalClientState'
@@ -30,6 +30,7 @@ interface IConnectionViewReduxProps {
 	isAddMode: boolean
 	speed?: number
 	isGlobalPlaying: boolean
+	highQuality: boolean
 }
 
 type IConnectionViewAllProps = IConnectionViewProps & IConnectionViewReduxProps & {dispatch: Dispatch}
@@ -61,7 +62,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 	public render() {
 		const {color, saturateSource, saturateTarget, id, sourceX, sourceY, targetX, targetY,
 			ghostConnector, targetStackOrder = 0, sourceStackOrder = 0, speed = 1,
-			isGlobalPlaying} = this.props
+			isGlobalPlaying, highQuality} = this.props
 
 		const sourceConnectorLeft = sourceX + (connectorWidth * sourceStackOrder)
 		const sourceConnectorRight = sourceX + connectorWidth + (connectorWidth * sourceStackOrder)
@@ -112,6 +113,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 					connectedLine={connectedLine}
 					speed={speed}
 					isGlobalPlaying={isGlobalPlaying}
+					highQuality={highQuality}
 				/>
 				<Connector
 					width={connectorWidth}
@@ -257,11 +259,13 @@ interface ConnectionLineProps {
 	connectedLine: LineState
 	speed?: number
 	isGlobalPlaying: boolean
+	highQuality: boolean
 }
 
 const ConnectionLine = React.memo(
 	function _ConnectionLine({id, color, saturateSource, saturateTarget, pathDPart1,
-		pathDFull, dispatch, connectedLine, speed = 1, isGlobalPlaying}: ConnectionLineProps,
+		pathDFull, dispatch, connectedLine, speed = 1,
+		isGlobalPlaying, highQuality}: ConnectionLineProps,
 	) {
 		const saturatedColor = saturateColor(color)
 
@@ -319,7 +323,7 @@ const ConnectionLine = React.memo(
 						stroke={`url(#${id})`}
 						strokeWidth={4 + 'px'}
 					/>
-					{isGlobalPlaying && saturateSource &&
+					{highQuality && isGlobalPlaying && saturateSource &&
 						<path
 							style={{
 								animationDuration: (3600 / speed) + 's',
@@ -416,6 +420,7 @@ export const ConnectedConnectionView = shamuConnect(
 			isAddMode: selectUserInputKeys(state).ctrl,
 			speed: globalClockState.bpm,
 			isGlobalPlaying: globalClockState.isPlaying,
+			highQuality: !selectOption(state, AppOptions.enableEfficientMode),
 		}
 	},
 )(ConnectionView)
