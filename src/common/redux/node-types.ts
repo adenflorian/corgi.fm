@@ -42,7 +42,7 @@ export const NodeInfoMap = Map({
 		selectIsSending: selectVirtualKeyboardIsSending,
 		selectActiveNotes: makeGetKeyboardMidiOutput(),
 		stateDeserializer: VirtualKeyboardState.fromJS,
-		width: 1224,
+		width: 456,
 		height: 56,
 	}),
 	[ConnectionNodeType.gridSequencer]: NodeInfoRecord({

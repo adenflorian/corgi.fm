@@ -9,6 +9,8 @@ BUGS
 - [ ] 2019-03-03 When playing note on keyboard and change connection, note keeps playing on previous instrument
 	- need to somehow stop those notes
 	- maybe need a sourceId for each event/note?
+- [ ] starting in a legacy room, then switching to scan room thru room selector, no bpm knob
+	- wont fix, legacy will be gone soon, not easy to fix
 
 ## FIXED
 - [√] piano roll lines on infinite sequencer are off by one
