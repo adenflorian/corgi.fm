@@ -105,6 +105,8 @@
 - [ ] show build datetime in tooltip on version in bottom right
 - [ ] twitch makes music
 	- stream shamu that listens to commands from twitch chat
+- [ ] show user where there keyboard is when the join a room
+- [ ] dont delete users stuff immediately on disconnect, have a grace period or something in case they reconnect quickly
 
 # Optimizations
 - [ ] use debounce for some network updates like mouse cursors and node positions?
@@ -141,6 +143,7 @@
 - [ ] show move icon on connector on hover
 	- now shows grab icon when moving, but hand icon on hover is too big
 - [ ] visually differentiate between midi and audio connections (and both)
+- [ ] allow temporarily disabling a connection
 
 ## Adding/Changing/Removing Connections
 should anything allow multiple incoming connections?

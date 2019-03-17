@@ -13,7 +13,7 @@ import {applyOctave, KeyColor, keyColors, NoteNameSharps} from '../WebAudio/musi
 import {Octave} from '../WebAudio/music-types'
 import './Keyboard.less'
 
-const defaultNumberOfKeys = 17
+const defaultNumberOfKeys = 52
 
 const globalVirtualMidiKeyboard = createVirtualMidiKeyboard(defaultNumberOfKeys)
 
