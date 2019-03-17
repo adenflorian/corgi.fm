@@ -54,7 +54,7 @@ export const Panel: React.FC<IPanelProps> =
 		)
 	})
 
-const ShamuBorder = React.memo(function _ShamuBorder({saturate}: {saturate: boolean}) {
+export const ShamuBorder = React.memo(function _ShamuBorder({saturate}: {saturate: boolean}) {
 	return (
 		<svg
 			style={{

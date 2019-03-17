@@ -26,14 +26,20 @@ export class Option extends Component<IOptionAllProps> {
 
 		if (typeof value === 'number') throw new Error('numbers are not supported in this component')
 
+		const id = `optionInput-${option}`
+
 		return (
 			<div className="option">
-				{label}
-				<input
-					type="checkbox"
-					onChange={e => dispatch(setOption(option, e.target.checked))}
-					checked={value}
-				/>
+				<label>
+					{label}
+					<input
+						id={id}
+						type="checkbox"
+						onChange={e => dispatch(setOption(option, e.target.checked))}
+						checked={value}
+					/>
+					<span className="checkmark"></span>
+				</label>
 			</div>
 		)
 	}

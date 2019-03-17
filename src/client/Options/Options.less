@@ -16,8 +16,82 @@
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
-	background-color: @panelGray;
-	padding: 16px;
-	user-select: text;
 	z-index: 20;
+	color: @defaultGray;
+
+	.optionsPanelInner {
+		background-color: @panelGray;
+		padding: 16px;
+		font-size: 1.2em;
+	}
+
+	.option {
+		margin: 16px;
+		display: flex;
+		flex-wrap: nowrap;
+		white-space: nowrap;
+		align-items: center;
+		height: 32px;
+
+		label {
+			margin-left: 48px;
+			position: relative;
+			cursor: pointer;
+		}
+
+		input {
+			position: absolute;
+			opacity: 0;
+			cursor: pointer;
+			height: 0;
+			width: 0;
+		}
+
+		.checkmark {
+			position: absolute;
+			top: -8px;
+			left: -48px;
+			height: 32px;
+			width: 32px;
+			background-color: @defaultGray;
+			margin-right: 16px;
+		}
+
+		label:hover input ~ .checkmark {
+			filter: brightness(1.5);
+			background-color: @blue;
+		}
+
+		label:active input ~ .checkmark {
+			filter: brightness(1.8);
+			background-color: @blue;
+		}
+		
+		label input:checked ~ .checkmark {
+			background-color: @blue;
+		}
+		
+		/* Create the checkmark/indicator (hidden when not checked) */
+		.checkmark:after {
+			content: "";
+			position: absolute;
+			display: none;
+		}
+		
+		/* Show the checkmark when checked */
+		label input:checked ~ .checkmark:after {
+			display: block;
+		}
+		
+		/* Style the checkmark/indicator */
+		label .checkmark:after {
+			left: 9px;
+			top: 5px;
+			width: 8px;
+			height: 16px;
+			border: solid @defaultGray;
+			border-width: 0 4px 4px 0;
+			transform: translate(2px, -1px) rotate(45deg);
+		}
+	}
 }

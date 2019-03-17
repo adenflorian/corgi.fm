@@ -3,6 +3,7 @@ import {Fragment} from 'react'
 import {AppOptions} from '../../common/redux'
 import {Button} from '../Button/Button'
 import {ConnectedOption} from '../Option'
+import {ShamuBorder} from '../Panel/Panel'
 import './Options.less'
 
 export class Options extends React.Component {
@@ -29,22 +30,25 @@ export class Options extends React.Component {
 				{this.state.showOptions &&
 					<div className="optionsBG" onClick={() => this._hideOptions()}>
 						<div className="optionsPanel" onClick={e => e.stopPropagation()}>
-							<ConnectedOption
-								option={AppOptions.showNoteNamesOnKeyboard}
-								label="show names on keyboard"
-							/>
-							<ConnectedOption
-								option={AppOptions.requireCtrlToScroll}
+							<div className="optionsPanelInner" >
+								<ConnectedOption
+									option={AppOptions.showNoteNamesOnKeyboard}
+									label="show names on keyboard"
+								/>
+								<ConnectedOption
+									option={AppOptions.requireCtrlToScroll}
 								label="require control key to scroll"
-							/>
-							<ConnectedOption
-								option={AppOptions.showNoteSchedulerDebug}
-								label="show synth note scheduler debug under synth"
-							/>
-							<ConnectedOption
-								option={AppOptions.renderNoteSchedulerDebugWhileStopped}
-								label="keep rendering note scheduler debug even when song is stopped"
-							/>
+								/>
+								<ConnectedOption
+									option={AppOptions.showNoteSchedulerDebug}
+									label="show synth note scheduler debug under synth"
+								/>
+								<ConnectedOption
+									option={AppOptions.renderNoteSchedulerDebugWhileStopped}
+									label="keep rendering note scheduler debug even when song is stopped"
+								/>
+							</div>
+							<ShamuBorder saturate={false} />
 						</div>
 					</div>
 				}
