@@ -40,18 +40,6 @@ export const setClientName = (id: ClientId, newName: string) => {
 	}
 }
 
-export const SET_CLIENT_POINTER = 'SET_CLIENT_POINTER'
-export type SetClientPointerAction = ReturnType<typeof setClientPointer>
-export const setClientPointer = (id: ClientId, pointer: IClientPointer) => {
-	return {
-		type: SET_CLIENT_POINTER,
-		id,
-		pointer,
-		SERVER_ACTION,
-		BROADCASTER_ACTION,
-	}
-}
-
 export const CLIENT_DISCONNECTED = 'CLIENT_DISCONNECTED'
 export type ClientDisconnectedAction = ReturnType<typeof clientDisconnected>
 export const clientDisconnected = (id: ClientId) => {
@@ -81,14 +69,6 @@ export interface IClientState {
 	color: string
 	name: string
 	socketId: string
-	pointer: IClientPointer
-}
-
-export interface IClientPointer {
-	distanceFromCenterX: number
-	distanceFromBoardsTop: number
-	ownerId?: string
-	color?: string
 }
 
 export class ClientState implements IClientState {
@@ -98,7 +78,6 @@ export class ClientState implements IClientState {
 			socketId: 'server',
 			name: 'server',
 			color: 'rgb(89, 122, 166)',
-			pointer: {distanceFromBoardsTop: 0, distanceFromCenterX: 0},
 		}
 	}
 
@@ -106,7 +85,6 @@ export class ClientState implements IClientState {
 	public readonly id: string
 	public readonly color: string
 	public readonly name: string
-	public readonly pointer: IClientPointer
 
 	constructor({socketId, name}: {socketId: string, name: string | ''}) {
 		this.id = v4()
@@ -116,7 +94,6 @@ export class ClientState implements IClientState {
 			.trim()
 			.substring(0, maxUsernameLength)
 		this.color = getColorHslByString(this.id)
-		this.pointer = {distanceFromCenterX: 0, distanceFromBoardsTop: 0, ownerId: this.id}
 	}
 }
 
@@ -156,11 +133,6 @@ export const clientsReducer = createReducer(initialState, {
 					.substring(0, maxUsernameLength),
 			} : x),
 	}),
-	[SET_CLIENT_POINTER]: (state, {id, pointer}: SetClientPointerAction) => ({
-		...state,
-		clients: state.clients
-			.map(x => x.id === id ? {...x, pointer} : x),
-	}),
 	[SELF_DISCONNECTED]: state => ({
 		...state,
 		clients: [],
@@ -178,10 +150,6 @@ export function selectClientById(state: IClientAppState, id: ClientId): IClientS
 			color: 'gray',
 			id: 'fakeClientId',
 			name: 'fakeClient',
-			pointer: {
-				distanceFromBoardsTop: 0,
-				distanceFromCenterX: 0,
-			},
 			socketId: 'fakeClientSocketId',
 		}
 	}
@@ -198,10 +166,6 @@ export function selectClientBySocketId(state: IClientAppState | IServerState, so
 			color: 'gray',
 			id: 'fakeClientId',
 			name: 'fakeClient',
-			pointer: {
-				distanceFromBoardsTop: 0,
-				distanceFromCenterX: 0,
-			},
 			socketId: 'fakeClientSocketId',
 		}
 	}
@@ -221,10 +185,6 @@ export function selectLocalClient(state: IClientAppState): IClientState {
 			color: 'gray',
 			id: 'fakeLocalClientId',
 			name: 'fakeLocalClient',
-			pointer: {
-				distanceFromBoardsTop: 0,
-				distanceFromCenterX: 0,
-			},
 			socketId: 'fakeLocalClientSocketId',
 		}
 	}

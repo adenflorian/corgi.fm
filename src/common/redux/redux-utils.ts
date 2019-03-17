@@ -9,7 +9,7 @@ import {createSelectorCreator, defaultMemoize} from 'reselect'
 import {assertArrayHasNoUndefinedElements} from '../common-utils'
 import {
 	IClientAppState, MOVE_GHOST_CONNECTOR, MOVE_POSITION,
-	REPORT_LEVELS, SET_CLIENT_POINTER, SET_GLOBAL_CLOCK_INDEX,
+	REPORT_LEVELS, SET_GLOBAL_CLOCK_INDEX,
 	SET_INFO, UPDATE_POINTER,
 } from './index'
 
@@ -174,7 +174,6 @@ export const shamuConnect = connect as ShamuConnect2
 
 export const getActionsBlacklist = () => {
 	const x = [
-		SET_CLIENT_POINTER,
 		REPORT_LEVELS,
 		SET_INFO,
 		SET_GLOBAL_CLOCK_INDEX,

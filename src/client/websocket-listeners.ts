@@ -3,8 +3,8 @@ import * as io from 'socket.io-client'
 import {maxRoomNameLength} from '../common/common-constants'
 import {logger} from '../common/logger'
 import {
-	BroadcastAction, clientInfoActions, maxUsernameLength, selfDisconnected,
-	setInfo, setSocketId,
+	BroadcastAction, clientInfoActions, getActionsBlacklist, maxUsernameLength,
+	selfDisconnected, setInfo, setSocketId,
 } from '../common/redux'
 import {WebSocketEvent} from '../common/server-constants'
 import {getCurrentClientVersion} from './client-utils'
@@ -49,7 +49,7 @@ export function setupWebsocketAndListeners(store: Store) {
 	})
 
 	socket.on(WebSocketEvent.broadcast, (action: BroadcastAction) => {
-		if (action.type !== 'SET_CLIENT_POINTER') {
+		if (getActionsBlacklist().includes(action.type) === false) {
 			logger.trace('Received broadcast: ', action.type)
 			logger.trace(action)
 		}
