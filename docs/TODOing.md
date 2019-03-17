@@ -96,7 +96,6 @@
 	- [ ] split up ConnectionView
 		- [ ] Connector component
 		- [ ] ConnectionLine component
-- [ ] fix old view
 - [ ] add ability to add nodes
 - [ ] new graph state
 	- [√] move reducers for the different node types under the shamu graph reducer, but keep them separate

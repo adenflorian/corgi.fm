@@ -227,6 +227,8 @@ instrument manager already handles all creation and destruction of instruments
 - [√] find better way to clear notes
 - [ ] fix recording and playing at same time
 	- what is this problem?
+	- when recording, it records notes from all users at same time
+	- [ ] need to make it only record from specific users
 - [√] undo button
 - [√] record button should be red when recording
 - [√] backspace to undo note while recording
