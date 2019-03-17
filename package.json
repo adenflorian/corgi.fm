@@ -57,7 +57,6 @@
     "react-svg": "^7.2.2",
     "redux": "^4.0.0",
     "redux-devtools-extension": "^2.13.7",
-    "redux-localstorage": "^0.4.1",
     "remote-redux-devtools": "^0.5.14",
     "reselect": "^3.0.1",
     "socket.io": "^2.1.1",

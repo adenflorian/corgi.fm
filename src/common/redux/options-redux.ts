@@ -1,4 +1,5 @@
-import {createReducer, IClientAppState} from './index'
+import {logger} from '../logger'
+import {IClientAppState} from './index'
 
 export enum AppOptions {
 	masterVolume = 'masterVolume',
@@ -9,14 +10,14 @@ export enum AppOptions {
 	enableEfficientMode = 'enableEfficientMode',
 }
 
-const initialState = {
+const initialState = Object.freeze({
 	showNoteNamesOnKeyboard: true,
 	masterVolume: 0.1,
-	requireCtrlToScroll: true,
+	requireCtrlToScroll: false,
 	showNoteSchedulerDebug: false,
 	renderNoteSchedulerDebugWhileStopped: true,
 	enableEfficientMode: false,
-}
+})
 
 export const SET_OPTION = 'SET_OPTION'
 export type SetOptionAction = ReturnType<typeof setOption>
@@ -30,12 +31,41 @@ export const setOptionMasterVolume = setOption.bind(null, AppOptions.masterVolum
 
 export type IOptionsState = typeof initialState
 
-export const optionsReducer = createReducer(initialState, {
-	[SET_OPTION]: (state, {option, value}: SetOptionAction) => ({
-		...state,
-		[option]: value,
-	}),
-})
+const localStorageKey = 'redux'
+
+export function optionsReducer(state: IOptionsState | undefined = initialState, action: SetOptionAction) {
+	if (action.type === '@@INIT' || state === undefined) {
+		try {
+			const optionsJson = window.localStorage.getItem(localStorageKey)
+			const fromLocalStorage = optionsJson
+				? JSON.parse(optionsJson).options
+				: {}
+			const newState = {
+				...initialState,
+				...fromLocalStorage,
+			}
+			const newJson = JSON.stringify({options: newState})
+			window.localStorage.setItem(localStorageKey, newJson)
+			return newState
+		} catch (e) {
+			logger.error(e)
+			logger.error('resetting options...')
+			window.localStorage.setItem(localStorageKey, JSON.stringify({options: initialState}))
+			return initialState
+		}
+	}
+	switch (action.type) {
+		case SET_OPTION: {
+			const newState = {
+				...state,
+				[action.option]: action.value,
+			}
+			window.localStorage.setItem(localStorageKey, JSON.stringify({options: newState}))
+			return newState
+		}
+		default: return state
+	}
+}
 
 export const selectOptions = (state: IClientAppState) => state.options
 
