@@ -280,25 +280,27 @@ const ConnectionLine = React.memo(
 					fill: 'none',
 				}}
 			>
-				<defs>
-					<linearGradient
-						id={id}
-						x1={(connectedLine.x1)}
-						y1={(connectedLine.y1)}
-						x2={(connectedLine.x2)}
-						y2={(connectedLine.y2)}
-						gradientUnits="userSpaceOnUse"
-					// gradientUnits="objectBoundingBox"
-					>
-						<stop stopColor={saturateSource ? saturatedColor : color} offset="0%" />
-						<stop stopColor={saturateTarget ? saturatedColor : color} offset="100%" />
-					</linearGradient>
-					<filter id="saturate">
-						<feColorMatrix in="SourceGraphic"
-							type="saturate"
-							values="3" />
-					</filter>
-				</defs>
+				{highQuality &&
+					<defs>
+						<linearGradient
+							id={id}
+							x1={(connectedLine.x1)}
+							y1={(connectedLine.y1)}
+							x2={(connectedLine.x2)}
+							y2={(connectedLine.y2)}
+							gradientUnits="userSpaceOnUse"
+						// gradientUnits="objectBoundingBox"
+						>
+							<stop stopColor={saturateSource ? saturatedColor : color} offset="0%" />
+							<stop stopColor={saturateTarget ? saturatedColor : color} offset="100%" />
+						</linearGradient>
+						<filter id="saturate">
+							<feColorMatrix in="SourceGraphic"
+								type="saturate"
+								values="3" />
+						</filter>
+					</defs>
+				}
 				<g
 					onContextMenu={(e: React.MouseEvent) => {
 						dispatch(connectionsActions.delete(List([id])))
@@ -308,7 +310,7 @@ const ConnectionLine = React.memo(
 					<path
 						className="mainLongLine"
 						d={pathDPart1}
-						stroke={`url(#${id})`}
+						stroke={highQuality ? `url(#${id})` : saturateSource ? saturatedColor : color}
 						strokeWidth={longLineStrokeWidth + 'px'}
 					/>
 					<path
@@ -320,7 +322,7 @@ const ConnectionLine = React.memo(
 					<path
 						className="blurLine"
 						d={pathDFull}
-						stroke={`url(#${id})`}
+						stroke={highQuality ? `url(#${id})` : saturateSource ? saturatedColor : color}
 						strokeWidth={4 + 'px'}
 					/>
 					{highQuality && isGlobalPlaying && saturateSource &&
