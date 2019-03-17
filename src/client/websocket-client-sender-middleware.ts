@@ -1,17 +1,25 @@
+import {Map} from 'immutable'
 import {AnyAction, Dispatch, Middleware} from 'redux'
+import {rateLimitedDebounce} from '../common/common-utils'
 import {logger} from '../common/logger'
-import {BroadcastAction} from '../common/redux'
-import {BROADCASTER_ACTION, IClientAppState, selectLocalSocketId, SERVER_ACTION, SET_CLIENT_POINTER} from '../common/redux'
+import {
+	BroadcastAction, BROADCASTER_ACTION, getActionsBlacklist,
+	IClientAppState, MOVE_POSITION, selectLocalSocketId, SERVER_ACTION, UPDATE_POINTER,
+} from '../common/redux'
 import {WebSocketEvent} from '../common/server-constants'
 import {socket} from './websocket-listeners'
 
 export const websocketSenderMiddleware: Middleware<{}, IClientAppState, Dispatch> =
 	({getState}) => next => (action: AnyAction | BroadcastAction) => {
+		next(action)
+
 		if (isNetworkAction(action) && !action.alreadyBroadcasted) {
-			return processNetworkAction(action as BroadcastAction, getState, next)
-		} else {
-			// console.log('websocketSenderMiddleware: ', action.type)
-			return next(action)
+			const bar = rateLimitedActionThings.get(action.type)
+			if (bar) {
+				bar(action as BroadcastAction, getState)
+			} else {
+				return processNetworkAction(action as BroadcastAction, getState)
+			}
 		}
 	}
 
@@ -19,23 +27,37 @@ function isNetworkAction(action: AnyAction | BroadcastAction) {
 	return action[BROADCASTER_ACTION] || action[SERVER_ACTION]
 }
 
-function processNetworkAction(action: BroadcastAction, getState: () => IClientAppState, next: Dispatch) {
-	const state = getState()
-	const socketId = selectLocalSocketId(state)
+const processNetworkAction = (action: BroadcastAction, getState: () => IClientAppState) => {
+	action.source = selectLocalSocketId(getState())
 
-	action.source = socketId
-
-	if (action.type !== SET_CLIENT_POINTER) {
+	if (getActionsBlacklist().includes(action.type) === false) {
 		logger.trace('sending action to server: ', action)
 	}
 
+	const event = determineEvent(action)
+
+	socket.emit(event, action)
+}
+
+function determineEvent(action: BroadcastAction) {
 	if (action[BROADCASTER_ACTION]) {
-		socket.emit(WebSocketEvent.broadcast, action)
+		return WebSocketEvent.broadcast
 	} else if (action[SERVER_ACTION]) {
-		socket.emit(WebSocketEvent.serverAction, action)
+		return WebSocketEvent.serverAction
 	} else {
 		throw new Error('invalid network action: ' + JSON.stringify(action, null, 2))
 	}
-
-	return next(action)
 }
+
+const actionTypeRateLimitIntervals = Map<string, number>([
+	[UPDATE_POINTER, 50],
+	[MOVE_POSITION, 100],
+])
+
+const rateLimitedActionThings = actionTypeRateLimitIntervals
+	.map(intervalMs => {
+		return rateLimitedDebounce(
+			processNetworkAction,
+			intervalMs,
+		)
+	})
