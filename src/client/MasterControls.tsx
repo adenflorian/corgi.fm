@@ -41,14 +41,14 @@ export const MasterControls: React.FC<IMasterControlsProps & IMasterControlsRedu
 				value={masterClockState.bpm}
 				onChange={(_, bpm) => setField({bpm})}
 			/>
-			<Knob
+			{/* <Knob
 				label="Max Read Ahead"
 				min={0.0001}
 				max={5}
 				curve={2}
 				value={masterClockState.maxReadAheadSeconds}
 				onChange={(_, maxReadAheadSeconds) => setField({maxReadAheadSeconds})}
-			/>
+			/> */}
 		</div>
 
 		return (

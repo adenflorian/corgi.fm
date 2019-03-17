@@ -2,7 +2,7 @@
 - [ ] add low graphics setting
 	- [ ] notify user to lower graphics if low FPS
 - [ ] mute button next to audio output
-- [ ] remove read ahead knob
+- [√] remove read ahead knob
 - [ ] maybe unpress all key when app loses focus
 - [ ] hook up note-scanner with everything
 	- [√] change sequencer state to whole new stuff
