@@ -1,6 +1,7 @@
 class SimpleGlobalClientState {
 	private _zoom = 1
 	private _pan = {x: 0, y: 0}
+	private _maxFps = 60
 
 	public get zoom() {return this._zoom}
 
@@ -9,6 +10,14 @@ class SimpleGlobalClientState {
 		this._zoom = val
 		const zoomTextElement = document.getElementById('zoomText')
 		if (zoomTextElement) zoomTextElement.innerText = this._zoom.toFixed(2).replace(/([^\.])0*$/, '$1')
+	}
+
+	public get maxFps() {return this._maxFps}
+
+	public setMaxFps(newMaxFps: number) {
+		if (newMaxFps > this._maxFps) {
+			this._maxFps = newMaxFps
+		}
 	}
 
 	public get pan() {return this._pan}

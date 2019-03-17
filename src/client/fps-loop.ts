@@ -1,3 +1,5 @@
+import {simpleGlobalClientState} from './SimpleGlobalClientState'
+
 const filterStrength = 20
 let stop = false
 let frameTime = 1
@@ -23,9 +25,14 @@ const fpsUpdateInterval = setInterval(updateFpsDisplay, 250)
 let fpsNode
 function updateFpsDisplay() {
 	fpsNode = document.getElementById('fps')
+
+	const fps = Math.ceil(1000 / frameTime)
+
 	if (fpsNode) {
-		fpsNode.textContent = 'FPS ' + (1000 / frameTime).toFixed(0)
+		fpsNode.textContent = 'FPS ' + fps
 	}
+
+	simpleGlobalClientState.setMaxFps(fps)
 }
 
 declare global {

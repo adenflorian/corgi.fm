@@ -1,4 +1,5 @@
 import {logger} from '../common/logger'
+import {simpleGlobalClientState} from './SimpleGlobalClientState'
 
 type UpdateFunc = (highResTimestamp: number) => void
 type UpdateFuncs = ReadonlyArray<UpdateFunc>
@@ -28,7 +29,7 @@ const mainRealTimeLoop = (highResTimestamp: number, loopId: number) => {
 	if (_isActiveTab) {
 		requestAnimationFrame(time => mainRealTimeLoop(time, loopId))
 	} else {
-		setTimeout(() => mainRealTimeLoop(performance.now(), loopId), 16)
+		setTimeout(() => mainRealTimeLoop(performance.now(), loopId), 1000 / simpleGlobalClientState.maxFps)
 	}
 }
 
