@@ -7,15 +7,15 @@ BUGS
 - [ ] when ableton is open, shamu wont recognize midi keyboard
 - [ ] new options are getting wiped by options from localstorage
 - [ ] when 2 people join around same time, they spawn on top of each other
-- [ ] 2019-03-10 Note getting stuck when playing keyboard really fast with mouse
-	- haven't been able to reproduce
-- [ ] 2019-03-03 Note getting stuck on when just sequencers are playing at normal speed
-	- put all 4 sequencers into same synth, with default release
 - [ ] 2019-03-03 When playing note on keyboard and change connection, note keeps playing on previous instrument
 	- need to somehow stop those notes
 	- maybe need a sourceId for each event/note?
 
 ## FIXED
+- [√] 2019-03-10 Note getting stuck when playing keyboard really fast with mouse
+	- haven't been able to reproduce
+- [√] 2019-03-03 Note getting stuck on when just sequencers are playing at normal speed
+	- put all 4 sequencers into same synth, with default release
 - [√] when a note is playing and you switch tabs, the note gets stuck as on
 	- fixed in 735a86f03a9d07f1baf1d4801e7d649829f33e8b
 - [√] stuck notes on 1 client and not others
