@@ -6,6 +6,7 @@ export enum AppOptions {
 	requireCtrlToScroll = 'requireCtrlToScroll',
 	showNoteSchedulerDebug = 'showNoteSchedulerDebug',
 	renderNoteSchedulerDebugWhileStopped = 'renderNoteSchedulerDebugWhileStopped',
+	enableEfficientMode = 'enableEfficientMode',
 }
 
 const initialState = {
@@ -14,6 +15,7 @@ const initialState = {
 	requireCtrlToScroll: true,
 	showNoteSchedulerDebug: false,
 	renderNoteSchedulerDebugWhileStopped: true,
+	enableEfficientMode: false,
 }
 
 export const SET_OPTION = 'SET_OPTION'

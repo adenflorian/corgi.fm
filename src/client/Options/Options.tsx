@@ -37,7 +37,7 @@ export class Options extends React.Component {
 								/>
 								<ConnectedOption
 									option={AppOptions.requireCtrlToScroll}
-								label="require control key to scroll"
+									label="require control key to zoom"
 								/>
 								<ConnectedOption
 									option={AppOptions.showNoteSchedulerDebug}
@@ -46,6 +46,10 @@ export class Options extends React.Component {
 								<ConnectedOption
 									option={AppOptions.renderNoteSchedulerDebugWhileStopped}
 									label="keep rendering note scheduler debug even when song is stopped"
+								/>
+								<ConnectedOption
+									option={AppOptions.enableEfficientMode}
+									label="enable efficient mode to improve performance, but lower visual quality"
 								/>
 							</div>
 							<ShamuBorder saturate={false} />
