@@ -1,5 +1,7 @@
 BUGS
 ====
+- [ ] when typing in chat, if someone leaves the input box loses focus
+- [√] when using external midi keyboard, the octaves dont line up right
 - [ ] filters getting stuck
 - [ ] piano roll lines on infinite sequencer are off by one
 - [ ] changing room thru selector doesn't completely pick up new user name if changed in previous room?

@@ -104,7 +104,7 @@ function onMidiMessage(event: MidiMessageEvent) {
 	// const channel = data[0] & 0xf
 	// tslint:disable-next-line:no-bitwise
 	const type = data[0] & 0xf0
-	const note = data[1]
+	const note = data[1] - 36
 	const velocity = data[2]
 
 	// with pressure and tilt off
