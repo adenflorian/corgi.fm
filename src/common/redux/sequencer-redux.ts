@@ -78,7 +78,6 @@ export abstract class SequencerStateBase implements ISequencerState {
 	public readonly isRecording = false
 	public readonly previousEvents = List<MidiClipEvents>()
 	public readonly rate = 1
-	public readonly gate = 1
 
 	constructor(
 		public readonly name: string,
@@ -88,6 +87,7 @@ export abstract class SequencerStateBase implements ISequencerState {
 		public readonly ownerId: string,
 		public readonly type: ConnectionNodeType,
 		public readonly isPlaying = false,
+		public readonly gate = 1,
 	) {
 		this.color = colorFunc(hashbow(this.id)).desaturate(0.2).hsl().string()
 	}

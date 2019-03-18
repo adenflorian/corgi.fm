@@ -49,6 +49,7 @@ export const setInfiniteSequencerField =
 
 function getNetworkFlags(fieldName: InfiniteSequencerFields) {
 	if ([
+		InfiniteSequencerFields.gate,
 		InfiniteSequencerFields.isPlaying,
 		InfiniteSequencerFields.bottomNote,
 		InfiniteSequencerFields.isRecording,
@@ -63,6 +64,7 @@ function getNetworkFlags(fieldName: InfiniteSequencerFields) {
 }
 
 export enum InfiniteSequencerFields {
+	gate = 'gate',
 	isPlaying = 'isPlaying',
 	bottomNote = 'bottomNote',
 	index = 'index',
@@ -117,6 +119,7 @@ export class InfiniteSequencerState extends SequencerStateBase {
 			ownerId,
 			ConnectionNodeType.infiniteSequencer,
 			isPlaying,
+			0.5,
 		)
 
 		this.showRows = false

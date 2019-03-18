@@ -28,6 +28,7 @@ interface IInfiniteSequencerReduxProps {
 	activeIndex: number
 	color: string
 	events: MidiClipEvents
+	gate: number
 	isPlaying: boolean
 	isRecording: boolean
 	name: string
@@ -150,14 +151,23 @@ export const InfiniteSequencer: React.FC<IInfiniteSequencerAllProps> = React.mem
 								<Rows />
 							</div>
 
+							<Knob
+								min={0}
+								max={2}
+								value={props.gate}
+								onChange={dispatchInfiniteSeqParam}
+								label="gate"
+								onChangeId={InfiniteSequencerFields.gate}
+							/>
+
 							{/* <Knob
-							min={1}
-							max={8}
-							value={rate}
-							onChange={dispatchInfiniteSeqParam}
-							label="rate"
-							onChangeId={InfiniteSequencerFields.rate}
-						/> */}
+								min={1}
+								max={8}
+								value={rate}
+								onChange={dispatchInfiniteSeqParam}
+								label="rate"
+								onChangeId={InfiniteSequencerFields.rate}
+							/> */}
 						</div>
 						{style === InfiniteSequencerStyle.colorBars &&
 							<div className={`display ${props.events.count() > 8 ? 'small' : ''}`}>
@@ -233,6 +243,7 @@ export const ConnectedInfiniteSequencer = connect(
 			isPlaying: infiniteSequencerState.isPlaying,
 			isRecording: infiniteSequencerState.isRecording,
 			color: infiniteSequencerState.color,
+			gate: infiniteSequencerState.gate,
 			name: infiniteSequencerState.name,
 			rate: infiniteSequencerState.rate,
 			showRows: infiniteSequencerState.showRows,
