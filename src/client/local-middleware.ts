@@ -1,4 +1,4 @@
-import {Map} from 'immutable'
+import {Map, Set} from 'immutable'
 import {Dispatch, Middleware} from 'redux'
 import {ConnectionNodeType} from '../common/common-types'
 import {logger} from '../common/logger'
@@ -200,7 +200,7 @@ function scheduleNote(note: IMidiNote, sourceId: string, roomState: IClientRoomS
 		if (targetIds.includes(instrument.id) === false) return
 
 		if (onOrOff === 'on') {
-			instrument.scheduleNote(note, 0, true)
+			instrument.scheduleNote(note, 0, true, Set([sourceId]))
 		} else {
 			instrument.scheduleRelease(note, 0)
 		}

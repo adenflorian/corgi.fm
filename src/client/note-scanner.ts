@@ -1,12 +1,10 @@
-import {Map} from 'immutable'
+import {Map, Set} from 'immutable'
 import {logger} from '../common/logger'
-import {MidiClip, MidiGlobalClipEvent, MidiRange} from '../common/midi-types'
-import {IMidiNotes} from '../common/MidiNote'
+import {MidiGlobalClipEvent, MidiRange} from '../common/midi-types'
 import {
 	ClientStore, selectAllSequencers, selectConnectionSourceIdsByTarget,
 	selectGlobalClockState,
 } from '../common/redux'
-import {shortDemoMidiClip} from './clips'
 import {getAllInstruments} from './instrument-manager'
 import {getEvents} from './note-scheduler'
 
@@ -29,8 +27,6 @@ function mainLoop() {
 	scheduleNotes()
 }
 
-const clip = shortDemoMidiClip
-
 // not sure if needed?
 // causes problems with range 0 and repeating notes on start
 const _jumpStartSeconds = 0.0
@@ -49,8 +45,6 @@ export function getCurrentSongTime() {
 export function getCurrentSongIsPlaying() {
 	return _isPlaying
 }
-
-const emptyMidiClip = new MidiClip()
 
 function scheduleNotes() {
 	const roomState = _store.getState().room
@@ -109,58 +103,41 @@ function scheduleNotes() {
 		.filter(x => x.isPlaying)
 		.map(x => getEvents(x.midiClip, readRangeBeats))
 
-	// clip = gridSeq ? gridSeq.midiClip : emptyMidiClip
-	// clip = shortDemoMidiClip
-
-	// const eventsToSchedule = getEvents(clip, readRangeBeats)
-
-	// logger.log('actualBPM: ', actualBPM)
-	// logger.log('maxReadAheadBeats: ', maxReadAheadBeats)
-	// logger.log('currentSongTimeBeats: ', currentSongTimeBeats)
-	// logger.log('_cursorBeats: ', _cursorBeats)
-	// logger.log('cursorDestinationSeconds: ', cursorDestinationBeats)
-	// logger.log('beatsToRead: ', beatsToRead)
-	// logger.log('offset: ', offset)
-	// logger.log('_cursorBeats - currentSongTimeSeconds: ', _cursorBeats - currentSongTimeBeats)
-	// logger.log('clip: ', clip)
-	// logger.log('readRangeBeats: ', readRangeBeats)
-	// logger.log('eventsToSchedule: ', eventsToSchedule)
-
 	const instruments = getAllInstruments()
-
-	// console.log('instruments: ', instruments)
 
 	// then for each instrument
 	// union events from the input sequencers and schedule them
 	instruments.forEach(instrument => {
 		const sourceIds = selectConnectionSourceIdsByTarget(roomState, instrument.id)
 
-		// console.log('sourceIds: ', sourceIds)
-
-		const eventsToSchedule = Map<number, MidiGlobalClipEvent>().withMutations(mutableEvents => {
+		const eventsToSchedule = Map<number, MidiGlobalClipEvent & {sourceIds: Set<string>}>().withMutations(mutableEvents => {
 			sequencersEvents.filter((_, id) => sourceIds.includes(id))
-				.toList()
-				.flatMap(x => x).forEach(event => {
-					if (mutableEvents.has(event.startTime)) {
-						mutableEvents.update(event.startTime, x => ({...x, notes: x.notes.union(event.notes)}))
-					} else {
-						mutableEvents.set(event.startTime, event)
-					}
+				.forEach((list, sourceId) => {
+					list.forEach(event => {
+						if (mutableEvents.has(event.startTime)) {
+							mutableEvents.update(event.startTime, x => ({
+								...x,
+								notes: x.notes.union(event.notes),
+								sourceIds: x.sourceIds.add(sourceId),
+							}))
+						} else {
+							mutableEvents.set(event.startTime, {
+								...event,
+								sourceIds: Set([sourceId]),
+							})
+						}
+					})
 				})
+
 		})
 
 		eventsToSchedule.forEach(event => {
-			// logger.log('scheduleNote currentSongTimeBeats: ', currentSongTimeBeats)
-			// logger.log('offset: ', offset)
-			// logger.log('event.startTime: ', event.startTime)
 			const delaySecondsUntilStart = ((offsetBeats + event.startTime) * (60 / actualBPM))
 
 			const delaySecondsUntilRelease = ((offsetBeats + event.endTime) * (60 / actualBPM))
 
 			event.notes.forEach(note => {
-				// console.log('actualNote: ' + note + ' | delaySeconds: ' + delaySeconds)
-				// console.log('gridSeq: ', gridSeq)
-				instrument.scheduleNote(note, delaySecondsUntilStart, false)
+				instrument.scheduleNote(note, delaySecondsUntilStart, false, event.sourceIds)
 				instrument.scheduleRelease(note, delaySecondsUntilRelease)
 			})
 		})

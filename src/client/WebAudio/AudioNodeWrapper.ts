@@ -91,6 +91,7 @@ function detectFeedbackLoop(nodeWrapper: AudioNodeWrapper, i = 0, nodeIds: List<
 	if (nodeIds.contains(nodeWrapper.id)) return true
 	if (i > 500) return true
 
+	// TODO Why is netNodeIds unused?
 	const netNodeIds = nodeIds.push(nodeWrapper.id)
 
 	if (nodeWrapper.getConnectedTargets().count() === 0) return false

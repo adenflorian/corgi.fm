@@ -1,3 +1,4 @@
+import {Set} from 'immutable'
 import {IDisposable} from '../../common/common-types'
 import {logger} from '../../common/logger'
 import {emptyMidiNotes, IMidiNote, IMidiNotes} from '../../common/MidiNote'
@@ -37,8 +38,8 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 		registerInstrumentWithSchedulerVisual(this.id, () => this._getVoices().getScheduledVoices(), this._audioContext)
 	}
 
-	public scheduleNote(note: IMidiNote, delaySeconds: number, invincible: boolean) {
-		this._getVoices().scheduleNote(note, delaySeconds, this._attackTimeInSeconds, invincible)
+	public scheduleNote(note: IMidiNote, delaySeconds: number, invincible: boolean, sourceIds: Set<string>) {
+		this._getVoices().scheduleNote(note, delaySeconds, this._attackTimeInSeconds, invincible, sourceIds)
 	}
 
 	public scheduleRelease(note: number, delaySeconds: number) {
@@ -47,6 +48,10 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 
 	public releaseAllScheduled() {
 		this._getVoices().releaseAllScheduled(this._releaseTimeInSeconds)
+	}
+
+	public releaseAllScheduledFromSourceId(sourceId: string) {
+		this._getVoices().releaseAllScheduledFromSourceId(this._releaseTimeInSeconds, sourceId)
 	}
 
 	public readonly getInputAudioNode = () => null

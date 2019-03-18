@@ -272,6 +272,10 @@ function updateAudioConnectionsFromSource(roomState: IClientRoomState, sourceId:
 	})
 }
 
+function isConnectionToAudioNode(connection: IConnection) {
+	return isAudioNodeType(connection.targetType)
+}
+
 function createIfNotExisting<T>(nodeType: ConnectionNodeType, id: string, thing: any, thingFactory: () => T): T {
 	if (thing === undefined) {
 		thing = thingFactory()
@@ -281,8 +285,4 @@ function createIfNotExisting<T>(nodeType: ConnectionNodeType, id: string, thing:
 		)
 	}
 	return thing
-}
-
-function isConnectionToAudioNode(connection: IConnection) {
-	return isAudioNodeType(connection.targetType)
 }

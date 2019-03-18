@@ -1,4 +1,4 @@
-import {OrderedMap} from 'immutable'
+import {OrderedMap, Set} from 'immutable'
 import {logger} from '../../common/logger'
 import {IMidiNote} from '../../common/MidiNote'
 import {Voice} from './index'
@@ -56,7 +56,7 @@ export abstract class Voices<V extends Voice> {
 		}
 	}
 
-	public scheduleNote(note: IMidiNote, delaySeconds: number, attackTimeInSeconds: number, invincible: boolean) {
+	public scheduleNote(note: IMidiNote, delaySeconds: number, attackTimeInSeconds: number, invincible: boolean, sourceIds: Set<string>) {
 		// if delay is 0 then the scheduler isn't working properly
 		if (delaySeconds < 0) logger.error('delay <= 0: ' + delaySeconds)
 
@@ -91,7 +91,7 @@ export abstract class Voices<V extends Voice> {
 
 		const newVoice = this._createVoice(true, invincible)
 
-		newVoice.scheduleNote(note, attackTimeInSeconds, newNoteStartTime)
+		newVoice.scheduleNote(note, attackTimeInSeconds, newNoteStartTime, sourceIds)
 
 		this._scheduledVoices = this._scheduledVoices.set(newVoice.id, newVoice)
 
@@ -173,6 +173,17 @@ export abstract class Voices<V extends Voice> {
 		this._scheduledVoices.filter(x => x.invincible === false)
 			.forEach(x => {
 				x.scheduleRelease(this._getAudioContext().currentTime, releaseSeconds, true)
+			})
+	}
+
+	public releaseAllScheduledFromSourceId(releaseSeconds: number, sourceId: string) {
+		this._scheduledVoices.filter(x => x.sourceIds.includes(sourceId))
+			.forEach(x => {
+				if (x.sourceIds.count() > 1) {
+					x.sourceIds = x.sourceIds.remove(sourceId)
+				} else {
+					x.scheduleRelease(this._getAudioContext().currentTime, releaseSeconds, true)
+				}
 			})
 	}
 

@@ -1,3 +1,4 @@
+import {Set} from 'immutable'
 import uuid = require('uuid')
 import {logger} from '../../common/logger'
 import {applyEnvelope, calculateScheduledEnvelope, IScheduledEnvelope} from './envelope'
@@ -17,6 +18,7 @@ export abstract class Voice {
 	public readonly id: number
 	public playingNote: number = -1
 	public playStartTime: number = 0
+	public sourceIds = Set<string>()
 	protected readonly _onEnded: OnEndedCallback
 	protected _audioContext: AudioContext
 	protected _destination: AudioNode
@@ -106,7 +108,8 @@ export abstract class Voice {
 		return this._releaseId
 	}
 
-	public scheduleNote(note: number, attackTimeInSeconds: number, attackStart: number): void {
+	public scheduleNote(note: number, attackTimeInSeconds: number, attackStart: number, sourceIds: Set<string>): void {
+		this.sourceIds = this.sourceIds.concat(sourceIds)
 
 		this._scheduleNoteSpecific(note)
 
