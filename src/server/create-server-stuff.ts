@@ -57,7 +57,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 				type: ConnectionNodeType.gridSequencer,
 				events: getBassNotes(),
 				name: 'Bass',
-				notesToShow: 12,
+				notesToShow: 24,
 			},
 			target: {
 				type: ConnectionNodeType.basicSampler,

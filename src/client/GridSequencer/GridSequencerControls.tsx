@@ -3,18 +3,29 @@ import {
 	IoMdDownload as Download, IoMdPlay as Play, IoMdSquare as Stop,
 	IoMdTrash as Clear, IoMdUndo as Undo,
 } from 'react-icons/io'
-import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 import {
 	clearSequencer, exportSequencerMidi, globalClockActions,
-	GridSequencerFields, setGridSequencerField, undoSequencer,
+	GridSequencerFields, selectGridSequencer,
+	setGridSequencerField, shamuConnect, undoSequencer,
 } from '../../common/redux'
+import {Knob} from '../Knob/Knob'
 
 interface IGridSequencerControlsProps {
 	id: string
 }
 
-export const GridSequencerControls = (props: IGridSequencerControlsProps & {dispatch: Dispatch}) => {
+interface ReduxProps {
+	gate: number
+}
+
+type AllProps = IGridSequencerControlsProps & ReduxProps & {dispatch: Dispatch}
+
+export const GridSequencerControls = (props: AllProps) => {
+
+	const dispatchGridSeqParam = (paramType: GridSequencerFields, value: number | boolean | string) =>
+		props.dispatch(setGridSequencerField(props.id, paramType, value))
+
 	return (
 		<div className="controls unselectable">
 			<div
@@ -28,7 +39,7 @@ export const GridSequencerControls = (props: IGridSequencerControlsProps & {disp
 			</div>
 			<div
 				className="stop"
-				onClick={() => props.dispatch(setGridSequencerField(props.id, GridSequencerFields.isPlaying, false))}
+				onClick={() => dispatchGridSeqParam(GridSequencerFields.isPlaying, false)}
 			>
 				<Stop />
 			</div>
@@ -50,8 +61,20 @@ export const GridSequencerControls = (props: IGridSequencerControlsProps & {disp
 			>
 				<Undo />
 			</div>
+			<Knob
+				min={0}
+				max={2}
+				value={props.gate}
+				onChange={dispatchGridSeqParam}
+				label="gate"
+				onChangeId={GridSequencerFields.gate}
+			/>
 		</div>
 	)
 }
 
-export const GridSequencerControlsConnected = connect()(GridSequencerControls)
+export const GridSequencerControlsConnected = shamuConnect(
+	(state, {id}: IGridSequencerControlsProps): ReduxProps => ({
+		gate: selectGridSequencer(state.room, id).gate,
+	}),
+)(GridSequencerControls)

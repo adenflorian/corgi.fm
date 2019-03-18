@@ -57,6 +57,7 @@ export const setGridSequencerField = (id: string, fieldName: GridSequencerFields
 
 function getNetworkActionThings(fieldName: GridSequencerFields) {
 	if ([
+		GridSequencerFields.gate,
 		GridSequencerFields.isPlaying,
 		GridSequencerFields.scrollY,
 	].includes(fieldName)) {
@@ -67,6 +68,7 @@ function getNetworkActionThings(fieldName: GridSequencerFields) {
 }
 
 export enum GridSequencerFields {
+	gate = 'gate',
 	isPlaying = 'isPlaying',
 	scrollY = 'scrollY',
 	index = 'index',
