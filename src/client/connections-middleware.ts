@@ -1,16 +1,14 @@
 import {Middleware} from 'redux'
-import {handleAddConnection, handleDeleteConnection} from '../color-connections'
-import {calculatePositionsGivenConnections} from '../compute-positions'
-import {logger} from '../logger'
-import {OrganizeGraphAction} from './common-actions'
-import {BroadcastAction} from './common-redux-types'
-import {ADD_CONNECTION, DELETE_CONNECTIONS} from './connections-redux'
-import {handleStopDraggingGhostConnector} from './dragging-connections'
+import {calculatePositionsGivenConnections} from '../common/compute-positions'
+import {logger} from '../common/logger'
+import {OrganizeGraphAction} from '../common/redux/common-actions'
+import {BroadcastAction} from '../common/redux/common-redux-types'
 import {
 	IClientAppState, IConnectionAction,
 	ORGANIZE_GRAPH, selectAllConnections,
 	selectAllPositions, STOP_DRAGGING_GHOST_CONNECTOR, updatePositions,
-} from './index'
+} from '../common/redux/index'
+import {handleStopDraggingGhostConnector} from './dragging-connections'
 
 export const connectionsClientMiddleware: Middleware<{}, IClientAppState> =
 	({dispatch, getState}) => next => (action: IConnectionAction | OrganizeGraphAction) => {

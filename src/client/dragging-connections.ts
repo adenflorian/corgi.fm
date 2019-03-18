@@ -1,11 +1,12 @@
 import {Dispatch} from 'redux'
 import Victor = require('victor')
-import {Point} from '../common-types'
-import {IClientRoomState} from './common-redux-types'
+import {Point} from '../common/common-types'
+import {IClientRoomState} from '../common/redux/common-redux-types'
 import {
 	Connection, connectionsActions, GhostConnectorStatus,
 	GhostConnectorType, IPosition, selectAllPositions, selectConnection,
-} from './index'
+} from '../common/redux/index'
+import {getAllInstruments} from './instrument-manager'
 
 export function handleStopDraggingGhostConnector(
 	roomState: IClientRoomState, dispatch: Dispatch, connectionId: string,
@@ -50,6 +51,8 @@ export function handleStopDraggingGhostConnector(
 			sourceId: position.id,
 			sourceType: position.targetType,
 		}))
+		// getAllInstruments().get(connection.targetId)!
+		// 	.releaseAllScheduledFromSourceId(connection.sourceId)
 	}
 
 	function changeConnectionTarget(position: IPosition) {
@@ -58,6 +61,8 @@ export function handleStopDraggingGhostConnector(
 			targetId: position.id,
 			targetType: position.targetType,
 		}))
+		// getAllInstruments().get(connection.targetId)!
+		// 	.releaseAllScheduledFromSourceId(connection.sourceId)
 	}
 
 	function newConnectionToSource(position: IPosition) {
