@@ -68,7 +68,7 @@ export interface ISequencerState extends IMultiStateThing, NodeSpecialState {
 	width: number
 	height: number
 	rate: number
-	// gate: number
+	gate: number
 }
 
 export abstract class SequencerStateBase implements ISequencerState {
@@ -78,6 +78,7 @@ export abstract class SequencerStateBase implements ISequencerState {
 	public readonly isRecording = false
 	public readonly previousEvents = List<MidiClipEvents>()
 	public readonly rate = 1
+	public readonly gate = 1
 
 	constructor(
 		public readonly name: string,

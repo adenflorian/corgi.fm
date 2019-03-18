@@ -101,7 +101,8 @@ function scheduleNotes() {
 	// run all sequencers events thru scheduler
 	const sequencersEvents = Map(selectAllSequencers(roomState))
 		.filter(x => x.isPlaying)
-		.map(x => getEvents(x.midiClip, readRangeBeats))
+		.map(x => ({seq: x, events: getEvents(x.midiClip, readRangeBeats)}))
+		.map(x => x.events.map(y => applyGateToEvent(x.seq.gate, y)))
 
 	const instruments = getAllInstruments()
 
@@ -146,6 +147,19 @@ function scheduleNotes() {
 
 	_cursorBeats += beatsToRead
 	_justStarted = false
+}
+
+function applyGateToEvent(gate: number, event: MidiGlobalClipEvent): MidiGlobalClipEvent {
+	if (gate === 1) return event
+
+	const length = event.endTime - event.startTime
+	const newLength = length * gate
+	const newEndTime = event.startTime + newLength
+
+	return {
+		...event,
+		endTime: newEndTime,
+	}
 }
 
 function releaseAllNotesOnAllInstruments() {
