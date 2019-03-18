@@ -6,13 +6,13 @@ BUGS
 - [ ] when hooking up reverb and changing filter to 0 it can cause a loud sound which triggers the master volume safety
 - [ ] when ableton is open, shamu wont recognize midi keyboard
 - [ ] when 2 people join around same time, they spawn on top of each other
-- [ ] 2019-03-03 When playing note on keyboard and change connection, note keeps playing on previous instrument
-	- need to somehow stop those notes
-	- maybe need a sourceId for each event/note?
-- [ ] starting in a legacy room, then switching to scan room thru room selector, no bpm knob
+- starting in a legacy room, then switching to scan room thru room selector, no bpm knob
 	- wont fix, legacy will be gone soon, not easy to fix
 
 ## FIXED
+- [√] 2019-03-03 When playing note on keyboard and change connection, note keeps playing on previous instrument
+	- need to somehow stop those notes
+	- maybe need a sourceId for each event/note?
 - [√] piano roll lines on infinite sequencer are off by one
 - [√] when using external midi keyboard, the octaves dont line up right
 - [√] new options are getting wiped by options from localstorage

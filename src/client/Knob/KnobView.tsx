@@ -10,10 +10,14 @@ interface IKnobViewProps {
 	markColor?: string
 	handleMouseDown: (e: React.MouseEvent) => any
 	size: number
+	value: number
 }
 
 export const KnobView: React.FC<IKnobViewProps> = React.memo(function _KnobView(props) {
-	const {handleMouseDown, percentage, adjustedPercentage, label, readOnly = false, markColor = 'gray'} = props
+	const {
+		handleMouseDown, percentage, adjustedPercentage,
+		label, value, readOnly = false, markColor = 'gray',
+	} = props
 
 	return (
 		<div
@@ -26,7 +30,11 @@ export const KnobView: React.FC<IKnobViewProps> = React.memo(function _KnobView(
 					height: props.size,
 				}}
 			>
-				<svg className="arc colorize" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"
+				<svg
+					className="arc colorize"
+					width="100%"
+					height="100%"
+					xmlns="http://www.w3.org/2000/svg"
 					style={{
 						position: 'absolute',
 						overflow: 'visible',
@@ -49,6 +57,7 @@ export const KnobView: React.FC<IKnobViewProps> = React.memo(function _KnobView(
 						transform: `rotate(${_getRotation(percentage)}deg)`,
 					}}
 					onMouseDown={handleMouseDown}
+					title={value.toFixed(3)}
 				>
 					<div className="mark" style={{backgroundColor: markColor}}></div>
 				</div>

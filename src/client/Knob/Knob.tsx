@@ -42,6 +42,7 @@ export class Knob extends React.PureComponent<IKnobProps> {
 						markColor={markColor}
 						handleMouseDown={handleMouseDown}
 						size={size}
+						value={value}
 					/>
 				}
 			</SliderController>
