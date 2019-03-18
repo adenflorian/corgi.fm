@@ -1,5 +1,5 @@
 import {List} from 'immutable'
-import {IMultiStateThing} from '../common-types'
+import {ConnectionNodeType, IMultiStateThing} from '../common-types'
 import {makeMidiClipEvent, MidiClip, MidiClipEvent, MidiClipEvents} from '../midi-types'
 import {emptyMidiNotes, MidiNotes} from '../MidiNote'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './index'
@@ -65,7 +65,29 @@ export interface ISequencerState extends IMultiStateThing {
 	width: number
 	height: number
 	rate: number
+	// gate: number
 }
+
+export const defaultSequencerState: ISequencerState = Object.freeze({
+	ownerId: 'dummyOwner',
+	type: ConnectionNodeType.dummy,
+	midiClip: new MidiClip({
+		events: List(),
+		length: 0,
+		loop: false,
+	}),
+	index: -1,
+	isPlaying: false,
+	id: 'dummy',
+	color: 'gray',
+	name: 'dummy',
+	isRecording: false,
+	previousEvents: List<MidiClipEvents>(),
+	width: 0,
+	height: 0,
+	rate: 1,
+	// gate: 1,
+})
 
 export function isEmptyEvents(events: MidiClipEvents) {
 	return events.some(x => x.notes.count() > 0) === false

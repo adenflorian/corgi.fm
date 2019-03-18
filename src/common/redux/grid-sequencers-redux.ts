@@ -8,9 +8,10 @@ import {emptyMidiNotes, IMidiNote} from '../MidiNote'
 import {MAX_MIDI_NOTE_NUMBER_127} from '../server-constants'
 import {colorFunc, hashbow} from '../shamu-color'
 import {
-	addMultiThing, BROADCASTER_ACTION, CLEAR_SEQUENCER, createSequencerEvents, IClientRoomState, IMultiState,
-	IMultiStateThings, isEmptyEvents, ISequencerState, makeMultiReducer, NetworkActionType, PLAY_ALL,
-	selectAllInfiniteSequencers, selectGlobalClockState, SERVER_ACTION, STOP_ALL, UNDO_SEQUENCER,
+	addMultiThing, BROADCASTER_ACTION, CLEAR_SEQUENCER, createSequencerEvents, defaultSequencerState, IClientRoomState,
+	IMultiState, IMultiStateThings, isEmptyEvents, ISequencerState, makeMultiReducer, NetworkActionType,
+	PLAY_ALL, selectAllInfiniteSequencers, selectGlobalClockState, SERVER_ACTION, STOP_ALL,
+	UNDO_SEQUENCER,
 } from './index'
 import {NodeSpecialState} from './shamu-graph'
 
@@ -95,25 +96,12 @@ export class GridSequencerState implements IGridSequencerState, NodeSpecialState
 	public static controlSize = 40
 
 	public static dummy: IGridSequencerState = {
-		id: 'dummy',
-		ownerId: 'dummyOwner',
-		index: -1,
-		isPlaying: false,
-		color: 'gray',
-		name: 'dummy',
-		scrollY: 0,
-		notesToShow: 0,
-		isRecording: false,
-		previousEvents: List<MidiClipEvents>(),
+		...defaultSequencerState,
+		type: ConnectionNodeType.gridSequencer,
 		width: GridSequencerState.defaultWidth,
 		height: GridSequencerState.defaultHeight,
-		type: ConnectionNodeType.gridSequencer,
-		rate: 1,
-		midiClip: new MidiClip({
-			events: List(),
-			length: 0,
-			loop: false,
-		}),
+		scrollY: 0,
+		notesToShow: 0,
 	}
 
 	public readonly id: string = uuid.v4()
@@ -130,7 +118,7 @@ export class GridSequencerState implements IGridSequencerState, NodeSpecialState
 	public readonly width: number = GridSequencerState.defaultWidth
 	public readonly height: number = GridSequencerState.defaultHeight
 	public readonly type = ConnectionNodeType.gridSequencer
-	public readonly rate = 1
+	public readonly rate: number = 1
 
 	constructor(ownerId: string, name: string, notesToShow: number, events: MidiClipEvents, isPlaying = false) {
 		this.ownerId = ownerId

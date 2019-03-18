@@ -11,7 +11,7 @@ import {
 	IMultiStateThings, ISequencerState, makeMultiReducer, NetworkActionType, PLAY_ALL, selectGlobalClockState,
 	SERVER_ACTION, SKIP_NOTE, STOP_ALL, UNDO_SEQUENCER, VIRTUAL_KEY_PRESSED,
 } from './index'
-import {UNDO_RECORDING_SEQUENCER} from './sequencer-redux'
+import {defaultSequencerState, UNDO_RECORDING_SEQUENCER} from './sequencer-redux'
 import {NodeSpecialState} from './shamu-graph'
 
 export const addInfiniteSequencer = (infiniteSequencer: InfiniteSequencerState) =>
@@ -93,25 +93,12 @@ export class InfiniteSequencerState implements ISequencerState, IConnectable, No
 	public static defaultHeight = 80
 
 	public static dummy: InfiniteSequencerState = {
-		id: 'dummy',
-		ownerId: 'dummyOwner',
-		index: -1,
-		isPlaying: false,
-		color: 'gray',
-		name: 'dummy',
-		isRecording: false,
-		previousEvents: List<MidiClipEvents>(),
+		...defaultSequencerState,
 		type: ConnectionNodeType.infiniteSequencer,
-		style: InfiniteSequencerStyle.colorGrid,
-		showRows: false,
 		width: InfiniteSequencerState.defaultWidth,
 		height: InfiniteSequencerState.defaultHeight,
-		rate: 1,
-		midiClip: new MidiClip({
-			events: List(),
-			length: 0,
-			loop: false,
-		}),
+		style: InfiniteSequencerStyle.colorGrid,
+		showRows: false,
 	}
 
 	public readonly id: string = uuid.v4()
@@ -128,7 +115,7 @@ export class InfiniteSequencerState implements ISequencerState, IConnectable, No
 	public readonly width: number = InfiniteSequencerState.defaultWidth
 	public readonly height: number = InfiniteSequencerState.defaultHeight
 	public readonly type = ConnectionNodeType.infiniteSequencer
-	public readonly rate = 1
+	public readonly rate: number = 1
 
 	constructor(
 		ownerId: string,
