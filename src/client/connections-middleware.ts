@@ -4,11 +4,13 @@ import {logger} from '../common/logger'
 import {OrganizeGraphAction} from '../common/redux/common-actions'
 import {BroadcastAction} from '../common/redux/common-redux-types'
 import {
-	IClientAppState, IConnectionAction,
-	ORGANIZE_GRAPH, selectAllConnections,
-	selectAllPositions, STOP_DRAGGING_GHOST_CONNECTOR, updatePositions,
+	DELETE_CONNECTIONS, IClientAppState,
+	IConnectionAction, ORGANIZE_GRAPH,
+	selectAllConnections, selectAllPositions, selectConnection,
+	STOP_DRAGGING_GHOST_CONNECTOR, updatePositions,
 } from '../common/redux/index'
 import {handleStopDraggingGhostConnector} from './dragging-connections'
+import {getAllInstruments} from './instrument-manager'
 
 export const connectionsClientMiddleware: Middleware<{}, IClientAppState> =
 	({dispatch, getState}) => next => (action: IConnectionAction | OrganizeGraphAction) => {
@@ -43,8 +45,17 @@ export const connectionsClientMiddleware: Middleware<{}, IClientAppState> =
 				)
 			// case ADD_CONNECTION:
 			// 	return handleAddConnection(afterState.room, dispatch, action.connection)
-			// case DELETE_CONNECTIONS:
-			// 	return handleDeleteConnection(beforeState.room, dispatch, action.connectionIds)
+			case DELETE_CONNECTIONS: {
+				const instruments = getAllInstruments()
+				action.connectionIds.forEach(x => {
+					const connection = selectConnection(beforeState.room, x)
+					const instrument = instruments.get(connection.targetId)
+					if (instrument) {
+						instrument.releaseAllScheduledFromSourceId(connection.sourceId)
+					}
+				})
+				// return handleDeleteConnection(beforeState.room, dispatch, action.connectionIds)
+			}
 			default: return
 		}
 	}
