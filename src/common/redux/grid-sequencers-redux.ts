@@ -88,7 +88,9 @@ export class GridSequencerState extends SequencerStateBase {
 	public static noteHeight = 8
 	public static controlSize = 40
 
-	public static dummy = new GridSequencerState('dummy', 'dummy', 0, List(), false)
+	public static dummy = new GridSequencerState(
+		'dummy', 'dummy', 0, List(), false,
+	)
 
 	public readonly scrollY: number
 	public readonly notesToShow: number

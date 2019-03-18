@@ -1,17 +1,15 @@
 import {List, Stack} from 'immutable'
 import {AnyAction} from 'redux'
 import {createSelector} from 'reselect'
-import * as uuid from 'uuid'
 import {ConnectionNodeType} from '../common-types'
 import {makeMidiClipEvent, MidiClip, MidiClipEvents} from '../midi-types'
 import {IMidiNote, MidiNotes} from '../MidiNote'
-import {colorFunc, hashbow} from '../shamu-color'
 import {
 	addMultiThing, BROADCASTER_ACTION, CLEAR_SEQUENCER, createSequencerEvents, IClientRoomState, IMultiState,
-	IMultiStateThings, ISequencerState, makeMultiReducer, NetworkActionType, PLAY_ALL, selectGlobalClockState,
+	IMultiStateThings, makeMultiReducer, NetworkActionType, PLAY_ALL, selectGlobalClockState,
 	SERVER_ACTION, SKIP_NOTE, STOP_ALL, UNDO_SEQUENCER, VIRTUAL_KEY_PRESSED,
 } from './index'
-import {UNDO_RECORDING_SEQUENCER} from './sequencer-redux'
+import {SequencerStateBase, UNDO_RECORDING_SEQUENCER} from './sequencer-redux'
 
 export const addInfiniteSequencer = (infiniteSequencer: InfiniteSequencerState) =>
 	addMultiThing(infiniteSequencer, ConnectionNodeType.infiniteSequencer, NetworkActionType.SERVER_AND_BROADCASTER)
@@ -87,27 +85,16 @@ export enum InfiniteSequencerStyle {
 	colorGrid = 'colorGrid',
 }
 
-export class InfiniteSequencerState implements ISequencerState {
+export class InfiniteSequencerState extends SequencerStateBase {
 	public static defaultWidth = 576
 	public static defaultHeight = 80
 
-	public static dummy = new InfiniteSequencerState('dummy', 'dummy', InfiniteSequencerStyle.colorGrid, List(), false)
+	public static dummy = new InfiniteSequencerState(
+		'dummy', 'dummy', InfiniteSequencerStyle.colorGrid, List(), false,
+	)
 
-	public readonly id: string = uuid.v4()
-	public readonly ownerId: string
-	public readonly midiClip: MidiClip
-	public readonly index: number = -1
-	public readonly isPlaying: boolean = false
-	public readonly color: string
-	public readonly name: string
-	public readonly isRecording: boolean = false
 	public readonly style: InfiniteSequencerStyle
-	public readonly previousEvents = List<MidiClipEvents>()
-	public readonly showRows = false
-	public readonly width: number = InfiniteSequencerState.defaultWidth
-	public readonly height: number = InfiniteSequencerState.defaultHeight
-	public readonly type = ConnectionNodeType.infiniteSequencer
-	public readonly rate: number = 1
+	public readonly showRows: boolean
 
 	constructor(
 		ownerId: string,
@@ -116,16 +103,24 @@ export class InfiniteSequencerState implements ISequencerState {
 		events: MidiClipEvents,
 		isPlaying = false,
 	) {
-		this.ownerId = ownerId
-		this.name = name
-		this.color = colorFunc(hashbow(this.id)).desaturate(0.2).hsl().string()
-		this.style = style
-		this.isPlaying = isPlaying
-		this.midiClip = new MidiClip({
+		const midiClip = new MidiClip({
 			events,
 			length: events.count(),
 			loop: true,
 		})
+
+		super(
+			name,
+			midiClip,
+			InfiniteSequencerState.defaultWidth,
+			InfiniteSequencerState.defaultHeight,
+			ownerId,
+			ConnectionNodeType.infiniteSequencer,
+			isPlaying,
+		)
+
+		this.showRows = false
+		this.style = style
 	}
 }
 
