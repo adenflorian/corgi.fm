@@ -223,7 +223,11 @@ svg {
     filter: drop-shadow(@shadow);
 }
 
-.disabled {
+.readonly {
     filter: brightness(0.5);
+}
+
+.disabled {
+    .readonly();
     pointer-events: none;
 }

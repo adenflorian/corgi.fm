@@ -12,22 +12,34 @@
     .controls {
         display: flex;
         flex-direction: column;
-        flex-flow: wrap;
-        justify-content: space-around;
-        align-items: center;
+        justify-content: space-evenly;
         font-size: 24px;
         color: @defaultGray;
-        flex-wrap: wrap;
-        flex-grow: 1;
-        max-width: 40px * 3;
-        min-width: 40px * 2;
-        
-        & > * {
-            width: 40px;
-            height: 40px;
+        width: 40px * 3;
+
+        .buttons {
             display: flex;
+			flex-direction: column;
+            justify-content: space-around;
             align-items: center;
-            justify-content: center;
+			flex-wrap: wrap;
+            max-height: 40px * 2;
+            
+            & > * {
+                width: 40px;
+                height: 40px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+
+        .knobs {
+            display: flex;
+			flex-direction: row;
+            justify-content: space-around;
+            margin-bottom: 8px;
         }
     }
     

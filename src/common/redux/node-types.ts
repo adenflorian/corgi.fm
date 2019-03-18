@@ -51,8 +51,8 @@ export const NodeInfoMap = Map({
 		selectIsSending: selectGridSequencerIsSending,
 		selectActiveNotes: selectGridSequencerActiveNotes,
 		stateDeserializer: deserializeSequencerState,
-		width: GridSequencerState.defaultWidth,	// TODO Make into a function
-		height: GridSequencerState.defaultHeight,
+		width: 0,	// TODO Make into a function
+		height: 0,
 	}),
 	[ConnectionNodeType.infiniteSequencer]: NodeInfoRecord({
 		stateSelector: selectInfiniteSequencer,

@@ -87,6 +87,7 @@
         "pkginfo",
         "pmodule",
         "polyfill",
+        "readonly",
         "reselect",
         "respawn",
         "selectable",

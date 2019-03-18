@@ -85,12 +85,12 @@ export interface IGridSequencers extends IMultiStateThings {
 }
 
 export class GridSequencerState extends SequencerStateBase {
-	public static defaultWidth = 520
-	public static defaultHeight = 234
+	// public static defaultWidth = 552
+	// public static defaultHeight = 234
 	public static noteWidth = 12
 	public static scrollBarWidth = 16
 	public static noteHeight = 8
-	public static controlSize = 40
+	// public static controlSize = 40
 
 	public static dummy = new GridSequencerState(
 		'dummy', 'dummy', 0, List(), false,
@@ -121,7 +121,7 @@ export class GridSequencerState extends SequencerStateBase {
 
 		const controlsNum = height < 120 ? 3 : 2
 
-		const controlsWidth = GridSequencerState.controlSize * controlsNum
+		const controlsWidth = 120
 
 		const width =
 			controlsWidth +
