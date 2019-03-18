@@ -53,6 +53,7 @@ function getNetworkFlags(fieldName: InfiniteSequencerFields) {
 		InfiniteSequencerFields.isPlaying,
 		InfiniteSequencerFields.bottomNote,
 		InfiniteSequencerFields.isRecording,
+		InfiniteSequencerFields.pitch,
 		InfiniteSequencerFields.style,
 		InfiniteSequencerFields.showRows,
 		InfiniteSequencerFields.rate,
@@ -69,6 +70,7 @@ export enum InfiniteSequencerFields {
 	bottomNote = 'bottomNote',
 	index = 'index',
 	isRecording = 'isRecording',
+	pitch = 'pitch',
 	style = 'style',
 	showRows = 'showRows',
 	rate = 'rate',
@@ -88,7 +90,7 @@ export enum InfiniteSequencerStyle {
 }
 
 export class InfiniteSequencerState extends SequencerStateBase {
-	public static defaultWidth = 576
+	public static defaultWidth = 632
 	public static defaultHeight = 80
 
 	public static dummy = new InfiniteSequencerState(

@@ -32,6 +32,7 @@ interface IInfiniteSequencerReduxProps {
 	isPlaying: boolean
 	isRecording: boolean
 	name: string
+	pitch: number
 	rate: number
 	showRows: boolean
 	style: InfiniteSequencerStyle
@@ -160,6 +161,15 @@ export const InfiniteSequencer: React.FC<IInfiniteSequencerAllProps> = React.mem
 								onChangeId={InfiniteSequencerFields.gate}
 							/>
 
+							<Knob
+								min={-12}
+								max={12}
+								value={props.pitch}
+								onChange={dispatchInfiniteSeqParam}
+								label="pitch"
+								onChangeId={InfiniteSequencerFields.pitch}
+							/>
+
 							{/* <Knob
 								min={1}
 								max={8}
@@ -245,6 +255,7 @@ export const ConnectedInfiniteSequencer = connect(
 			color: infiniteSequencerState.color,
 			gate: infiniteSequencerState.gate,
 			name: infiniteSequencerState.name,
+			pitch: infiniteSequencerState.pitch,
 			rate: infiniteSequencerState.rate,
 			showRows: infiniteSequencerState.showRows,
 			style: infiniteSequencerState.style,

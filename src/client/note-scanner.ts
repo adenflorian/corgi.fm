@@ -100,9 +100,16 @@ function scheduleNotes() {
 
 	// run all sequencers events thru scheduler
 	const sequencersEvents = Map(selectAllSequencers(roomState))
-		.filter(x => x.isPlaying)
-		.map(x => ({seq: x, events: getEvents(x.midiClip, readRangeBeats)}))
-		.map(x => x.events.map(y => applyGateToEvent(x.seq.gate, y)))
+		.filter(seq => seq.isPlaying)
+		.map(seq => ({
+			seq,
+			events: getEvents(seq.midiClip, readRangeBeats)
+				.map(event => applyGateToEvent(seq.gate, event))
+				.map(event => ({
+					...event,
+					notes: event.notes.map(note => note + Math.round(seq.pitch)),
+				})),
+		}))
 
 	const instruments = getAllInstruments()
 
@@ -113,8 +120,9 @@ function scheduleNotes() {
 
 		const eventsToSchedule = Map<number, MidiGlobalClipEvent & {sourceIds: Set<string>}>().withMutations(mutableEvents => {
 			sequencersEvents.filter((_, id) => sourceIds.includes(id))
-				.forEach((list, sourceId) => {
-					list.forEach(event => {
+				.forEach(({seq, events}, sourceId) => {
+					events.forEach(event => {
+						// TODO Need to check end time as well I think
 						if (mutableEvents.has(event.startTime)) {
 							mutableEvents.update(event.startTime, x => ({
 								...x,

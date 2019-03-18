@@ -60,6 +60,7 @@ function getNetworkActionThings(fieldName: GridSequencerFields) {
 		GridSequencerFields.gate,
 		GridSequencerFields.isPlaying,
 		GridSequencerFields.scrollY,
+		GridSequencerFields.pitch,
 	].includes(fieldName)) {
 		return {SERVER_ACTION, BROADCASTER_ACTION}
 	} else {
@@ -72,6 +73,7 @@ export enum GridSequencerFields {
 	isPlaying = 'isPlaying',
 	scrollY = 'scrollY',
 	index = 'index',
+	pitch = 'pitch',
 }
 
 export interface IGridSequencersState extends IMultiState {
