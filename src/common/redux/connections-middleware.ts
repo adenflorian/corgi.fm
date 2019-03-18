@@ -24,12 +24,14 @@ export const connectionsClientMiddleware: Middleware<{}, IClientAppState> =
 		switch (action.type) {
 			case STOP_DRAGGING_GHOST_CONNECTOR: {
 				if ((action as unknown as BroadcastAction).alreadyBroadcasted) return
+
 				try {
 					handleStopDraggingGhostConnector(beforeState.room, dispatch, action.id)
 				} catch (error) {
 					logger.warn('Caught error (will ignore) when handling ' + STOP_DRAGGING_GHOST_CONNECTOR + ': ', error)
 					return
 				}
+
 				return
 			}
 			case ORGANIZE_GRAPH:
