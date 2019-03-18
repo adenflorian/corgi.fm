@@ -1,4 +1,4 @@
-import {Map, Set} from 'immutable'
+import {List, Map, Set} from 'immutable'
 import {logger} from '../common/logger'
 import {MidiGlobalClipEvent, MidiRange} from '../common/midi-types'
 import {
@@ -54,6 +54,8 @@ function scheduleNotes() {
 	} = selectGlobalClockState(roomState)
 
 	const actualBPM = Math.max(0.000001, bpm)
+	const toBeats = (x: number) => x * (actualBPM / 60)
+	const fromBeats = (x: number) => x * (60 / actualBPM)
 
 	if (isPlaying !== _isPlaying) {
 		_isPlaying = isPlaying
@@ -73,7 +75,7 @@ function scheduleNotes() {
 	const deltaTimeSeconds = _audioContext.currentTime - lastAudioContextTime
 	lastAudioContextTime = _audioContext.currentTime
 
-	const deltaBeats = deltaTimeSeconds * (actualBPM / 60)
+	const deltaBeats = toBeats(deltaTimeSeconds)
 
 	currentSongTimeBeats += deltaBeats
 
@@ -82,14 +84,14 @@ function scheduleNotes() {
 		_cursorBeats = 0
 	}
 
-	const maxReadAheadBeats = maxReadAheadSeconds * (actualBPM / 60)
+	const maxReadAheadBeats = toBeats(maxReadAheadSeconds)
 
 	// if playing
 	// read from cursor to next cursor position
 	_cursorBeats = Math.max(_cursorBeats, currentSongTimeBeats)
 	const cursorDestinationBeats = currentSongTimeBeats + maxReadAheadBeats
 	const minBeatsToRead = _justStarted
-		? (_jumpStartSeconds * (actualBPM / 60))
+		? (toBeats(_jumpStartSeconds))
 		: 0
 	const beatsToRead = Math.max(minBeatsToRead, cursorDestinationBeats - _cursorBeats)
 
@@ -108,7 +110,9 @@ function scheduleNotes() {
 				.map(event => ({
 					...event,
 					notes: event.notes.map(note => note + Math.round(seq.pitch)),
-				})),
+				}) as MidiGlobalClipEvent)
+				.map(flattenEventNotes)
+				.flatten() as List<MidiGlobalClipEvent>,
 		}))
 
 	const instruments = getAllInstruments()
@@ -118,34 +122,37 @@ function scheduleNotes() {
 	instruments.forEach(instrument => {
 		const sourceIds = selectConnectionSourceIdsByTarget(roomState, instrument.id)
 
-		const eventsToSchedule = Map<number, MidiGlobalClipEvent & {sourceIds: Set<string>}>().withMutations(mutableEvents => {
-			sequencersEvents.filter((_, id) => sourceIds.includes(id))
-				.forEach(({seq, events}, sourceId) => {
-					events.forEach(event => {
-						// TODO Need to check end time as well I think
-						if (mutableEvents.has(event.startTime)) {
-							mutableEvents.update(event.startTime, x => ({
-								...x,
-								notes: x.notes.union(event.notes),
-								sourceIds: x.sourceIds.add(sourceId),
-							}))
-						} else {
-							mutableEvents.set(event.startTime, {
+		const eventsToSchedule = List<MidiGlobalClipEvent & {sourceIds: Set<string>}>()
+			.withMutations(mutableEvents => {
+				sequencersEvents
+					.filter((_, id) => sourceIds.includes(id))
+					.forEach(({seq, events}, sourceId) => {
+						events.forEach(event => {
+							// Each event at this point has a single note
+							if (event.notes.count() !== 1) logger.error('event.notes.count() !== 1')
+
+							mutableEvents.push({
 								...event,
 								sourceIds: Set([sourceId]),
 							})
-						}
+						})
 					})
-				})
+			})
 
-		})
+		let scheduledNotesWithTimes = List<string>()
 
 		eventsToSchedule.forEach(event => {
-			const delaySecondsUntilStart = ((offsetBeats + event.startTime) * (60 / actualBPM))
+			const delaySecondsUntilStart = (fromBeats(offsetBeats + event.startTime))
 
-			const delaySecondsUntilRelease = ((offsetBeats + event.endTime) * (60 / actualBPM))
+			const delaySecondsUntilRelease = (fromBeats(offsetBeats + event.endTime))
 
 			event.notes.forEach(note => {
+				const slug = event.startTime.toString() + '-' + note.toString()
+
+				if (scheduledNotesWithTimes.includes(slug)) return
+
+				scheduledNotesWithTimes = scheduledNotesWithTimes.push(slug)
+
 				instrument.scheduleNote(note, delaySecondsUntilStart, false, event.sourceIds)
 				instrument.scheduleRelease(note, delaySecondsUntilRelease)
 			})
@@ -168,6 +175,15 @@ function applyGateToEvent(gate: number, event: MidiGlobalClipEvent): MidiGlobalC
 		...event,
 		endTime: newEndTime,
 	}
+}
+
+/** Put each note in it's own event */
+function flattenEventNotes(event: MidiGlobalClipEvent): List<MidiGlobalClipEvent> {
+	return event.notes.toList()
+		.map(note => ({
+			...event,
+			notes: Set([note]),
+		}))
 }
 
 function releaseAllNotesOnAllInstruments() {
