@@ -1,21 +1,19 @@
 import {List, Map, Stack} from 'immutable'
 import {AnyAction} from 'redux'
 import {createSelector} from 'reselect'
-import * as uuid from 'uuid'
 import {ConnectionNodeType} from '../common-types'
 import {MidiClip, MidiClipEvents} from '../midi-types'
 import {emptyMidiNotes, IMidiNote} from '../MidiNote'
 import {MAX_MIDI_NOTE_NUMBER_127} from '../server-constants'
-import {colorFunc, hashbow} from '../shamu-color'
 import {
-	addMultiThing, BROADCASTER_ACTION, CLEAR_SEQUENCER, createSequencerEvents, defaultSequencerState, IClientRoomState,
-	IMultiState, IMultiStateThings, isEmptyEvents, ISequencerState, makeMultiReducer, NetworkActionType,
+	addMultiThing, BROADCASTER_ACTION, CLEAR_SEQUENCER, createSequencerEvents, IClientRoomState,
+	IMultiState, IMultiStateThings, isEmptyEvents, makeMultiReducer, NetworkActionType,
 	PLAY_ALL, selectAllInfiniteSequencers, selectGlobalClockState, SERVER_ACTION, STOP_ALL,
 	UNDO_SEQUENCER,
 } from './index'
-import {NodeSpecialState} from './shamu-graph'
+import {SequencerStateBase} from './sequencer-redux'
 
-export const addGridSequencer = (gridSequencer: IGridSequencerState) =>
+export const addGridSequencer = (gridSequencer: GridSequencerState) =>
 	addMultiThing(gridSequencer, ConnectionNodeType.gridSequencer, NetworkActionType.SERVER_AND_BROADCASTER)
 
 export const SET_GRID_SEQUENCER_NOTE = 'SET_GRID_SEQUENCER_NOTE'
@@ -79,15 +77,10 @@ export interface IGridSequencersState extends IMultiState {
 }
 
 export interface IGridSequencers extends IMultiStateThings {
-	[key: string]: IGridSequencerState
+	[key: string]: GridSequencerState
 }
 
-export interface IGridSequencerState extends ISequencerState {
-	scrollY: number
-	notesToShow: number
-}
-
-export class GridSequencerState implements IGridSequencerState, NodeSpecialState {
+export class GridSequencerState extends SequencerStateBase {
 	public static defaultWidth = 520
 	public static defaultHeight = 234
 	public static noteWidth = 12
@@ -95,66 +88,60 @@ export class GridSequencerState implements IGridSequencerState, NodeSpecialState
 	public static noteHeight = 8
 	public static controlSize = 40
 
-	public static dummy: IGridSequencerState = {
-		...defaultSequencerState,
-		type: ConnectionNodeType.gridSequencer,
-		width: GridSequencerState.defaultWidth,
-		height: GridSequencerState.defaultHeight,
-		scrollY: 0,
-		notesToShow: 0,
-	}
+	public static dummy = new GridSequencerState('dummy', 'dummy', 0, List(), false)
 
-	public readonly id: string = uuid.v4()
-	public readonly ownerId: string
-	public readonly midiClip: MidiClip
-	public readonly index: number = -1
-	public readonly isPlaying: boolean = false
-	public readonly color: string
-	public readonly name: string
 	public readonly scrollY: number
 	public readonly notesToShow: number
-	public readonly isRecording: boolean = false
-	public readonly previousEvents = List<MidiClipEvents>()
-	public readonly width: number = GridSequencerState.defaultWidth
-	public readonly height: number = GridSequencerState.defaultHeight
-	public readonly type = ConnectionNodeType.gridSequencer
-	public readonly rate: number = 1
 
-	constructor(ownerId: string, name: string, notesToShow: number, events: MidiClipEvents, isPlaying = false) {
-		this.ownerId = ownerId
-		this.name = name
-		this.color = colorFunc(hashbow(this.id)).desaturate(0.2).hsl().string()
-		this.notesToShow = notesToShow
-		this.isPlaying = isPlaying
-		this.midiClip = new MidiClip({
-			events: events.map(x => ({...x, startBeat: x.startBeat / 4, durationBeats: x.durationBeats / 4})),
+	constructor(
+		ownerId: string,
+		name: string,
+		notesToShow: number,
+		events: MidiClipEvents,
+		isPlaying = false,
+	) {
+
+		const midiClip = new MidiClip({
+			events: events.map(x => ({
+				...x,
+				startBeat: x.startBeat / 4,
+				durationBeats: x.durationBeats / 4,
+			})),
 			length: events.count() / 4,
 			loop: true,
 		})
 
-		this.scrollY = this._calculateScrollY()
+		const height = GridSequencerState.noteHeight * notesToShow
 
-		this.height = GridSequencerState.noteHeight * notesToShow
-
-		const controlsNum = this.height < 120 ? 3 : 2
+		const controlsNum = height < 120 ? 3 : 2
 
 		const controlsWidth = GridSequencerState.controlSize * controlsNum
 
-		this.width =
+		const width =
 			controlsWidth +
-			(GridSequencerState.noteWidth * this.midiClip.events.count()) +
+			(GridSequencerState.noteWidth * midiClip.events.count()) +
 			GridSequencerState.scrollBarWidth
-	}
 
-	private get maxScrollY() {return MAX_MIDI_NOTE_NUMBER_127 - this.notesToShow}
-	private get lowestNote() {return findLowestNote(this.midiClip.events)}
-	private get highestNote() {return findHighestNote(this.midiClip.events)}
+		super(
+			name,
+			midiClip,
+			width,
+			height,
+			ownerId,
+			ConnectionNodeType.gridSequencer,
+			isPlaying,
+		)
 
-	private _calculateScrollY() {
-		const notesRange = this.highestNote - this.lowestNote
-		const desiredScrollY = Math.round(this.lowestNote - (this.notesToShow / 2) + (notesRange / 2))
+		this.notesToShow = notesToShow
 
-		return Math.min(this.maxScrollY, desiredScrollY)
+		const lowestNote = findLowestNote(this.midiClip.events)
+		const highestNote = findHighestNote(this.midiClip.events)
+		const maxScrollY = MAX_MIDI_NOTE_NUMBER_127 - this.notesToShow
+
+		const notesRange = highestNote - lowestNote
+		const desiredScrollY = Math.round(lowestNote - (this.notesToShow / 2) + (notesRange / 2))
+
+		this.scrollY = Math.min(maxScrollY, desiredScrollY)
 	}
 }
 
@@ -214,7 +201,7 @@ const gridSequencerGlobalActionTypes = [
 ]
 
 const gridSequencerReducer =
-	(gridSequencer: IGridSequencerState, action: AnyAction): IGridSequencerState => {
+	(gridSequencer: GridSequencerState, action: AnyAction): GridSequencerState => {
 		switch (action.type) {
 			case SET_GRID_SEQUENCER_NOTE:
 				if (action.note === undefined) {
@@ -284,7 +271,7 @@ const gridSequencerReducer =
 	}
 
 export const gridSequencersReducer =
-	makeMultiReducer<IGridSequencerState, IGridSequencersState>(
+	makeMultiReducer<GridSequencerState, IGridSequencersState>(
 		gridSequencerReducer, ConnectionNodeType.gridSequencer,
 		gridSequencerActionTypes, gridSequencerGlobalActionTypes,
 	)

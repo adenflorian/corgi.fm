@@ -2,7 +2,7 @@ import {List, Stack} from 'immutable'
 import {AnyAction} from 'redux'
 import {createSelector} from 'reselect'
 import * as uuid from 'uuid'
-import {ConnectionNodeType, IConnectable} from '../common-types'
+import {ConnectionNodeType} from '../common-types'
 import {makeMidiClipEvent, MidiClip, MidiClipEvents} from '../midi-types'
 import {IMidiNote, MidiNotes} from '../MidiNote'
 import {colorFunc, hashbow} from '../shamu-color'
@@ -11,8 +11,7 @@ import {
 	IMultiStateThings, ISequencerState, makeMultiReducer, NetworkActionType, PLAY_ALL, selectGlobalClockState,
 	SERVER_ACTION, SKIP_NOTE, STOP_ALL, UNDO_SEQUENCER, VIRTUAL_KEY_PRESSED,
 } from './index'
-import {defaultSequencerState, UNDO_RECORDING_SEQUENCER} from './sequencer-redux'
-import {NodeSpecialState} from './shamu-graph'
+import {UNDO_RECORDING_SEQUENCER} from './sequencer-redux'
 
 export const addInfiniteSequencer = (infiniteSequencer: InfiniteSequencerState) =>
 	addMultiThing(infiniteSequencer, ConnectionNodeType.infiniteSequencer, NetworkActionType.SERVER_AND_BROADCASTER)
@@ -88,18 +87,11 @@ export enum InfiniteSequencerStyle {
 	colorGrid = 'colorGrid',
 }
 
-export class InfiniteSequencerState implements ISequencerState, IConnectable, NodeSpecialState {
+export class InfiniteSequencerState implements ISequencerState {
 	public static defaultWidth = 576
 	public static defaultHeight = 80
 
-	public static dummy: InfiniteSequencerState = {
-		...defaultSequencerState,
-		type: ConnectionNodeType.infiniteSequencer,
-		width: InfiniteSequencerState.defaultWidth,
-		height: InfiniteSequencerState.defaultHeight,
-		style: InfiniteSequencerStyle.colorGrid,
-		showRows: false,
-	}
+	public static dummy = new InfiniteSequencerState('dummy', 'dummy', InfiniteSequencerStyle.colorGrid, List(), false)
 
 	public readonly id: string = uuid.v4()
 	public readonly ownerId: string

@@ -1,8 +1,11 @@
 import {List} from 'immutable'
+import uuid = require('uuid')
 import {ConnectionNodeType, IMultiStateThing} from '../common-types'
 import {makeMidiClipEvent, MidiClip, MidiClipEvent, MidiClipEvents} from '../midi-types'
 import {emptyMidiNotes, MidiNotes} from '../MidiNote'
+import {colorFunc, hashbow} from '../shamu-color'
 import {BROADCASTER_ACTION, SERVER_ACTION} from './index'
+import {NodeSpecialState} from './shamu-graph'
 
 export const CLEAR_SEQUENCER = 'CLEAR_SEQUENCER'
 export type ClearSequencerAction = ReturnType<typeof clearSequencer>
@@ -53,7 +56,7 @@ export function deserializeEvents(events: MidiClipEvents): MidiClipEvents {
 	return makeSequencerEvents(events.map(x => ({...x, notes: MidiNotes(x.notes)})))
 }
 
-export interface ISequencerState extends IMultiStateThing {
+export interface ISequencerState extends IMultiStateThing, NodeSpecialState {
 	midiClip: MidiClip
 	index: number
 	isPlaying: boolean
@@ -68,26 +71,26 @@ export interface ISequencerState extends IMultiStateThing {
 	// gate: number
 }
 
-export const defaultSequencerState: ISequencerState = Object.freeze({
-	ownerId: 'dummyOwner',
-	type: ConnectionNodeType.dummy,
-	midiClip: new MidiClip({
-		events: List(),
-		length: 0,
-		loop: false,
-	}),
-	index: -1,
-	isPlaying: false,
-	id: 'dummy',
-	color: 'gray',
-	name: 'dummy',
-	isRecording: false,
-	previousEvents: List<MidiClipEvents>(),
-	width: 0,
-	height: 0,
-	rate: 1,
-	// gate: 1,
-})
+export abstract class SequencerStateBase implements ISequencerState {
+	public readonly index = -1
+	public readonly id = uuid.v4()
+	public readonly color: string
+	public readonly isRecording = false
+	public readonly previousEvents = List<MidiClipEvents>()
+	public readonly rate = 1
+
+	constructor(
+		public readonly name: string,
+		public readonly midiClip: MidiClip,
+		public readonly width: number,
+		public readonly height: number,
+		public readonly ownerId: string,
+		public readonly type: ConnectionNodeType,
+		public readonly isPlaying = false,
+	) {
+		this.color = colorFunc(hashbow(this.id)).desaturate(0.2).hsl().string()
+	}
+}
 
 export function isEmptyEvents(events: MidiClipEvents) {
 	return events.some(x => x.notes.count() > 0) === false
