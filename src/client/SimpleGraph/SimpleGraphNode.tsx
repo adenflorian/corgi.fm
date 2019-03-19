@@ -9,7 +9,7 @@ import {
 } from '../../common/redux'
 import {CssColor} from '../../common/shamu-color'
 import {ConnectedBasicSampler} from '../BasicSampler/BasicSampler'
-import {ECSGraphNodeRenderSystem} from '../ECS/ECS'
+import {ECSGraphNodeRenderSystem} from '../ECS/ECSGraphNodeRenderSystem'
 import {ConnectedGridSequencerContainer} from '../GridSequencer/GridSequencerContainer'
 import {ConnectedInfiniteSequencer} from '../InfiniteSequencer/InfiniteSequencer'
 import {ConnectedBasicSynthesizerView} from '../Instruments/BasicSynthesizerView'
