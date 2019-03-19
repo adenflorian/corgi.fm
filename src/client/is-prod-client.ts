@@ -27,8 +27,7 @@ const _logClientEnv = isProdClient()
 
 const _getPath = () => window.location.pathname.replace('/', '')
 
-export const isECSEnabled = () => _isECSEnabled
-const _isECSEnabled = _getPath() === 'ecs'
+export const isECSEnabled = () => isNewNoteScannerEnabled()
 
 export const isNewNoteScannerEnabled = () => _isNewNoteScannerEnabled
-const _isNewNoteScannerEnabled = _getPath() === 'scan' || isECSEnabled()
+const _isNewNoteScannerEnabled = _getPath() === 'scan'

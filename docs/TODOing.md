@@ -66,6 +66,7 @@
 				- [√] only sequencers
 				- [√] only when playing
 				- [√] go with song
+				- [√] merge ecs with scan room toggle thing
 		- [ ] master clock play button animation
 		- [√] infinite seq loop length
 		- [x] rate knob on infinite sequencer
