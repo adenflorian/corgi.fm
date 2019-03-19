@@ -4,8 +4,8 @@ import {IoMdMove as HandleIcon} from 'react-icons/io'
 import {Dispatch} from 'redux'
 import {ConnectionNodeType} from '../../common/common-types'
 import {
-	getConnectionNodeInfo, IPosition, movePosition, nodeClicked,
-	selectConnectionSourceColorByTargetId, selectPosition, shamuConnect,
+	AppOptions, getConnectionNodeInfo, IPosition, movePosition,
+	nodeClicked, selectConnectionSourceColorByTargetId, selectOption, selectPosition, shamuConnect,
 } from '../../common/redux'
 import {CssColor} from '../../common/shamu-color'
 import {ConnectedBasicSampler} from '../BasicSampler/BasicSampler'
@@ -26,6 +26,7 @@ interface ISimpleGraphNodeProps {
 interface ISimpleGraphNodeReduxProps {
 	position: IPosition
 	color: string
+	highQuality: boolean
 }
 
 type ISimpleGraphNodeAllProps = ISimpleGraphNodeProps & ISimpleGraphNodeReduxProps & {dispatch: Dispatch}
@@ -35,7 +36,7 @@ const handleClassName = 'handle'
 export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProps> {
 	public render() {
 		const {
-			positionId, color,
+			positionId, color, highQuality,
 			position: {x, y, width, height, targetType, zIndex},
 		} = this.props
 
@@ -79,6 +80,7 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 							left: 0,
 							pointerEvents: 'none',
 							zIndex: 2,
+							display: highQuality ? undefined : 'none',
 						}}
 						width={width}
 						height={height}
@@ -148,6 +150,7 @@ export const ConnectedSimpleGraphNode = shamuConnect(
 			position,
 			color: getConnectionNodeInfo(position.targetType).color
 				|| selectConnectionSourceColorByTargetId(state.room, positionId),
+			highQuality: !selectOption(state, AppOptions.enableEfficientMode),
 		}
 	},
 )(SimpleGraphNode)

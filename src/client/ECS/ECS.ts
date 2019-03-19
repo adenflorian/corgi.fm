@@ -2,7 +2,7 @@ import {List} from 'immutable'
 import {Store} from 'redux'
 import {isSequencerNodeType} from '../../common/common-types'
 import {
-	IClientAppState, selectAllPositions, selectSequencer,
+	AppOptions, IClientAppState, selectAllPositions, selectOption, selectSequencer,
 } from '../../common/redux'
 import {getSequencersSchedulerInfo} from '../note-scanner'
 import {ECSCanvasRenderSystem} from './ECSCanvasRenderSystem'
@@ -30,8 +30,13 @@ export function getECSLoop(store: Store<IClientAppState>) {
 }
 
 function ecsLoop() {
-	const roomState = _store.getState().room
+	const state = _store.getState()
+	const roomState = state.room
 
+	if (selectOption(state, AppOptions.enableEfficientMode)) return
+
+	// Populate entities
+	// TODO Don't do every frame
 	_entities = selectAllPositions(roomState)
 		.filter(x => isSequencerNodeType(x.targetType))
 		.map(x => selectSequencer(roomState, x.id))
@@ -56,7 +61,7 @@ function ecsLoop() {
 		))
 		.toList()
 
-	// iterate through components, pass them to systems
+	// iterate through _systems, and pass valid entities to them
 	_systems.forEach(system => {
 		system.onBatchStart()
 		_entities.filter(x => entityHasComponentsRequiredBySystem(x, system))
