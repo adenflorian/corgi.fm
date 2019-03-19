@@ -33,3 +33,10 @@ export enum ConnectionNodeType {
 	dummy = 'dummy',
 	simpleReverb = 'simpleReverb',
 }
+
+export function isSequencerNodeType(type: ConnectionNodeType) {
+	return [
+		ConnectionNodeType.gridSequencer,
+		ConnectionNodeType.infiniteSequencer,
+	].includes(type)
+}

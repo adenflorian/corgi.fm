@@ -1,9 +1,11 @@
-import {List, Record, Set} from 'immutable'
+import {List, Set} from 'immutable'
+import {ECSGraphPositionComponent, ECSNodeRendererComponent, ECSSequencerComponent} from './ECSComponents'
 
 export enum ECSComponentType {
 	NodeRenderer = 'NodeRenderer',
 	GraphPosition = 'GraphPosition',
 	GlobalRenderer = 'GlobalRenderer',
+	Sequencer = 'Sequencer',
 }
 
 export interface ECSSystem {
@@ -18,27 +20,5 @@ export abstract class ECSEntity {
 	public getNodeRendererComponent(): ECSNodeRendererComponent | undefined {return undefined}
 	public getGlobalRendererComponent(): ECSNodeRendererComponent | undefined {return undefined}
 	public getGraphPositionComponent(): ECSGraphPositionComponent | undefined {return undefined}
+	public getSequencerComponent(): ECSSequencerComponent | undefined {return undefined}
 }
-
-interface ECSComponent {}
-
-const makeNodeRendererComp = Record({
-	color: 'green',
-})
-
-export class ECSNodeRendererComponent extends makeNodeRendererComp implements ECSComponent {}
-
-const makeGlobalRendererComp = Record({
-	color: 'red',
-})
-
-export class ECSGlobalRendererComponent extends makeGlobalRendererComp implements ECSComponent {}
-
-const makeGraphPosition = Record({
-	id: 'dummy',
-	x: 0,
-	y: 0,
-	height: 0,
-})
-
-export class ECSGraphPositionComponent extends makeGraphPosition implements ECSComponent {}

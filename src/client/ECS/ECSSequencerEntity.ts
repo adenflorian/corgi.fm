@@ -1,11 +1,12 @@
-import {ECSComponentType, ECSEntity, ECSGraphPositionComponent, ECSNodeRendererComponent} from './ECSTypes'
-
 import {List} from 'immutable'
+import {ECSGraphPositionComponent, ECSNodeRendererComponent, ECSSequencerComponent} from './ECSComponents'
+import {ECSComponentType, ECSEntity} from './ECSTypes'
 
-export class ECSSimpleGraphNodeEntity extends ECSEntity {
+export class ECSSequencerEntity extends ECSEntity {
 	constructor(
 		private readonly _rendererComponent: ECSNodeRendererComponent,
 		private readonly _graphPositionComponent: ECSGraphPositionComponent,
+		private readonly _sequencerComponent: ECSSequencerComponent,
 	) {
 		super()
 	}
@@ -14,6 +15,7 @@ export class ECSSimpleGraphNodeEntity extends ECSEntity {
 		return List([
 			ECSComponentType.NodeRenderer,
 			ECSComponentType.GraphPosition,
+			ECSComponentType.Sequencer,
 		])
 	}
 
@@ -23,5 +25,9 @@ export class ECSSimpleGraphNodeEntity extends ECSEntity {
 
 	public getGraphPositionComponent(): ECSGraphPositionComponent | undefined {
 		return this._graphPositionComponent
+	}
+
+	public getSequencerComponent(): ECSSequencerComponent | undefined {
+		return this._sequencerComponent
 	}
 }

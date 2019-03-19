@@ -1,10 +1,12 @@
 import {List} from 'immutable'
 import {Store} from 'redux'
-import {IClientAppState, selectAllPositions} from '../../common/redux'
+import {ConnectionNodeType, isSequencerNodeType} from '../../common/common-types'
+import {IClientAppState, selectAllPositions, selectAllSequencers, selectSequencer} from '../../common/redux'
 import {ECSCanvasRenderSystem} from './ECSCanvasRenderSystem'
-import {ECSGraphNodeRenderSystem} from './ECSGraphNodeRenderSystem'
-import {ECSSimpleGraphNodeEntity} from './ECSSimpleGraphNodeEntity'
-import {ECSEntity, ECSGraphPositionComponent, ECSNodeRendererComponent, ECSSystem} from './ECSTypes'
+import {ECSGraphPositionComponent, ECSNodeRendererComponent, ECSSequencerComponent} from './ECSComponents'
+import {ECSSequencerEntity} from './ECSSequencerEntity'
+import {ECSSequencerRenderSystem} from './ECSSequencerRenderSystem'
+import {ECSEntity, ECSSystem} from './ECSTypes'
 
 let _store: Store<IClientAppState>
 
@@ -13,7 +15,7 @@ let _entities = List<ECSEntity>()
 
 _systems = _systems.concat([
 	new ECSCanvasRenderSystem(),
-	new ECSGraphNodeRenderSystem(),
+	new ECSSequencerRenderSystem(),
 ])
 
 export function getECSLoop(store: Store<IClientAppState>) {
@@ -23,15 +25,25 @@ export function getECSLoop(store: Store<IClientAppState>) {
 }
 
 function ecsLoop() {
+	const roomState = _store.getState().room
 
-	_entities = selectAllPositions(_store.getState().room)
-		.map(position => new ECSSimpleGraphNodeEntity(
-			new ECSNodeRendererComponent({color: 'green'}),
+	_entities = selectAllPositions(roomState)
+		.filter(x => isSequencerNodeType(x.targetType))
+		.map(x => selectSequencer(roomState, x.id))
+		.map(sequencer => new ECSSequencerEntity(
+			new ECSNodeRendererComponent({
+				color: 'green',
+			}),
 			new ECSGraphPositionComponent({
-				id: position.id,
-				x: (((Date.now() / 1000) % 1) * 100),
+				id: sequencer.id,
+				x: 0,
 				y: 0,
-				height: position.height,
+				height: sequencer.height,
+			}),
+			new ECSSequencerComponent({
+				notesDisplayStartX: sequencer.notesDisplayStartX,
+				notesDisplayWidth: sequencer.notesDisplayWidth,
+				ratio: ((performance.now() / 5000) % 1),
 			}),
 		))
 		.toList()

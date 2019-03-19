@@ -123,9 +123,11 @@ export class GridSequencerState extends SequencerStateBase {
 
 		const controlsWidth = 120
 
+		const notesDisplayWidth = GridSequencerState.noteWidth * midiClip.events.count()
+
 		const width =
 			controlsWidth +
-			(GridSequencerState.noteWidth * midiClip.events.count()) +
+			notesDisplayWidth +
 			GridSequencerState.scrollBarWidth
 
 		super(
@@ -135,6 +137,8 @@ export class GridSequencerState extends SequencerStateBase {
 			height,
 			ownerId,
 			ConnectionNodeType.gridSequencer,
+			controlsWidth,
+			notesDisplayWidth,
 			isPlaying,
 		)
 
@@ -305,6 +309,10 @@ export const selectAllSequencers = createSelector(
 	[selectAllGridSequencers, selectAllInfiniteSequencers],
 	(gridSeqs, infSeqs) => ({...gridSeqs, ...infSeqs}),
 )
+
+export function selectSequencer(state: IClientRoomState, id: string) {
+	return selectAllSequencers(state)[id] || GridSequencerState.dummy
+}
 
 export const selectIsAnythingPlaying = createSelector(
 	[selectAllSequencers],

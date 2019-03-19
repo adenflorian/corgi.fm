@@ -62,8 +62,8 @@
 				- [√] render a square at each node position
 				- [√] one canvas per graph node
 				- [√] squares should be in front of nodes
-				- [ ] line should only cover notes area
-				- [ ] only sequencers
+				- [√] line should only cover notes area
+				- [√] only sequencers
 				- [ ] only when playing
 				- [ ] go with song
 		- [ ] master clock play button animation

@@ -70,6 +70,8 @@ export interface ISequencerState extends IMultiStateThing, NodeSpecialState {
 	rate: number
 	gate: number
 	pitch: number
+	notesDisplayStartX: number
+	notesDisplayWidth: number
 }
 
 export abstract class SequencerStateBase implements ISequencerState {
@@ -88,6 +90,8 @@ export abstract class SequencerStateBase implements ISequencerState {
 		public readonly height: number,
 		public readonly ownerId: string,
 		public readonly type: ConnectionNodeType,
+		public readonly notesDisplayStartX: number,
+		public readonly notesDisplayWidth: number,
 		public readonly isPlaying = false,
 		public readonly gate = 1,
 	) {

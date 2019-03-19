@@ -113,6 +113,8 @@ export class InfiniteSequencerState extends SequencerStateBase {
 			loop: true,
 		})
 
+		const controlsWidth = 272
+
 		super(
 			name,
 			midiClip,
@@ -120,6 +122,8 @@ export class InfiniteSequencerState extends SequencerStateBase {
 			InfiniteSequencerState.defaultHeight,
 			ownerId,
 			ConnectionNodeType.infiniteSequencer,
+			controlsWidth,
+			InfiniteSequencerState.defaultWidth - controlsWidth,
 			isPlaying,
 			0.5,
 		)

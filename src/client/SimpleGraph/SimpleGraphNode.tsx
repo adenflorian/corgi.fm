@@ -9,7 +9,7 @@ import {
 } from '../../common/redux'
 import {CssColor} from '../../common/shamu-color'
 import {ConnectedBasicSampler} from '../BasicSampler/BasicSampler'
-import {ECSGraphNodeRenderSystem} from '../ECS/ECSGraphNodeRenderSystem'
+import {ECSSequencerRenderSystem} from '../ECS/ECSSequencerRenderSystem'
 import {ConnectedGridSequencerContainer} from '../GridSequencer/GridSequencerContainer'
 import {ConnectedInfiniteSequencer} from '../InfiniteSequencer/InfiniteSequencer'
 import {ConnectedBasicSynthesizerView} from '../Instruments/BasicSynthesizerView'
@@ -70,7 +70,7 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 					<Handle />
 					{getComponentByNodeType(targetType, positionId, color)}
 					<canvas
-						id={ECSGraphNodeRenderSystem.canvasIdPrefix + positionId}
+						id={ECSSequencerRenderSystem.canvasIdPrefix + positionId}
 						style={{
 							position: 'absolute',
 							width,
@@ -78,6 +78,7 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 							top: 0,
 							left: 0,
 							pointerEvents: 'none',
+							zIndex: 2,
 						}}
 						width={width}
 						height={height}

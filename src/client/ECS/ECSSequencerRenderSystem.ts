@@ -3,7 +3,7 @@ import {CssColor} from '../../common/shamu-color'
 import {ECSCanvasRenderSystem} from './ECSCanvasRenderSystem'
 import {ECSComponentType, ECSEntity, ECSSystem} from './ECSTypes'
 
-export class ECSGraphNodeRenderSystem implements ECSSystem {
+export class ECSSequencerRenderSystem implements ECSSystem {
 	public static readonly canvasIdPrefix = 'ECSCanvasRenderSystemCanvas-node-'
 
 	private _canvasContexts = Map<string, CanvasRenderingContext2D>()
@@ -28,8 +28,9 @@ export class ECSGraphNodeRenderSystem implements ECSSystem {
 
 		canvasContext.fillStyle = CssColor.defaultGray
 		const graphPosition = entity.getGraphPositionComponent()!
+		const sequencerComp = entity.getSequencerComponent()!
 		canvasContext.fillRect(
-			graphPosition.x,
+			sequencerComp.notesDisplayStartX + (sequencerComp.notesDisplayWidth * sequencerComp.ratio),
 			0,
 			1,
 			graphPosition.height,
@@ -43,7 +44,7 @@ export class ECSGraphNodeRenderSystem implements ECSSystem {
 
 		if (canvasContext) return canvasContext
 
-		const canvasElement = document.getElementById(ECSGraphNodeRenderSystem.canvasIdPrefix + nodeId) as HTMLCanvasElement
+		const canvasElement = document.getElementById(ECSSequencerRenderSystem.canvasIdPrefix + nodeId) as HTMLCanvasElement
 
 		if (canvasElement) {
 			const context = canvasElement.getContext('2d')!
