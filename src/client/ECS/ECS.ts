@@ -1,16 +1,18 @@
-import {List, Record} from 'immutable'
+import {List, Map, Record, Set} from 'immutable'
 import {Store} from 'redux'
 import {IClientAppState, selectAllPositions} from '../../common/redux'
+import {CssColor} from '../../common/shamu-color'
 
 let _store: Store<IClientAppState>
 
 enum ECSComponentType {
-	Renderer,
-	GraphPosition,
+	NodeRenderer = 'NodeRenderer',
+	GraphPosition = 'GraphPosition',
+	GlobalRenderer = 'GlobalRenderer',
 }
 
 interface ECSSystem {
-	getRequiredComponents(): List<ECSComponentType>
+	getRequiredComponents(): Set<ECSComponentType>
 	onBatchStart(): void
 	execute(entity: ECSEntity): void
 	onBatchEnd(): void
@@ -21,10 +23,9 @@ export class ECSCanvasRenderSystem implements ECSSystem {
 
 	private _canvasContext: CanvasRenderingContext2D | undefined
 
-	public getRequiredComponents(): List<ECSComponentType> {
-		return List([
-			ECSComponentType.Renderer,
-			ECSComponentType.GraphPosition,
+	public getRequiredComponents(): Set<ECSComponentType> {
+		return Set([
+			ECSComponentType.GlobalRenderer,
 		])
 	}
 
@@ -41,10 +42,10 @@ export class ECSCanvasRenderSystem implements ECSSystem {
 
 		// this._canvasContext.fillStyle = 'green'
 		// this._canvasContext.fillRect(10, 10, 150, 100)
-		this._canvasContext.fillStyle = entity.getRendererComponent()!.color
+		this._canvasContext.fillStyle = entity.getGlobalRendererComponent()!.color
 		this._canvasContext.fillRect(
-			entity.getGraphPositionComponent()!.x + (ECSCanvasRenderSystem.canvasSize / 2),
-			entity.getGraphPositionComponent()!.y + (ECSCanvasRenderSystem.canvasSize / 2),
+			100 + (ECSCanvasRenderSystem.canvasSize / 2),
+			100 + (ECSCanvasRenderSystem.canvasSize / 2),
 			100,
 			100,
 		)
@@ -62,15 +63,68 @@ export class ECSCanvasRenderSystem implements ECSSystem {
 	}
 }
 
+export class ECSGraphNodeRenderSystem implements ECSSystem {
+	public static readonly canvasIdPrefix = 'ECSCanvasRenderSystemCanvas-node-'
+
+	private _canvasContexts = Map<string, CanvasRenderingContext2D>()
+
+	public getRequiredComponents(): Set<ECSComponentType> {
+		return Set([
+			ECSComponentType.NodeRenderer,
+			ECSComponentType.GraphPosition,
+		])
+	}
+
+	public onBatchStart() {}
+
+	public execute(entity: ECSEntity): void {
+		const nodeId = entity.getGraphPositionComponent()!.id
+
+		const canvasContext = this._getContextForNodeId(nodeId)
+
+		if (!canvasContext) return
+
+		canvasContext.clearRect(0, 0, ECSCanvasRenderSystem.canvasSize, ECSCanvasRenderSystem.canvasSize)
+
+		canvasContext.fillStyle = CssColor.defaultGray
+		const graphPosition = entity.getGraphPositionComponent()!
+		canvasContext.fillRect(
+			graphPosition.x,
+			0,
+			1,
+			graphPosition.height,
+		)
+	}
+
+	public onBatchEnd() {}
+
+	private _getContextForNodeId(nodeId: string) {
+		const canvasContext = this._canvasContexts.get(nodeId)
+
+		if (canvasContext) return canvasContext
+
+		const canvasElement = document.getElementById(ECSGraphNodeRenderSystem.canvasIdPrefix + nodeId) as HTMLCanvasElement
+
+		if (canvasElement) {
+			const context = canvasElement.getContext('2d')!
+			this._canvasContexts = this._canvasContexts.set(nodeId, context)
+			return context
+		}
+
+		return null
+	}
+}
+
 abstract class ECSEntity {
 	public abstract getComponents(): List<ECSComponentType>
-	public getRendererComponent(): ECSRendererComponent | undefined {return undefined}
+	public getNodeRendererComponent(): ECSNodeRendererComponent | undefined {return undefined}
+	public getGlobalRendererComponent(): ECSNodeRendererComponent | undefined {return undefined}
 	public getGraphPositionComponent(): ECSGraphPositionComponent | undefined {return undefined}
 }
 
 class ECSSimpleGraphNodeEntity extends ECSEntity {
 	constructor(
-		private readonly _rendererComponent: ECSRendererComponent,
+		private readonly _rendererComponent: ECSNodeRendererComponent,
 		private readonly _graphPositionComponent: ECSGraphPositionComponent,
 	) {
 		super()
@@ -78,12 +132,12 @@ class ECSSimpleGraphNodeEntity extends ECSEntity {
 
 	public getComponents(): List<ECSComponentType> {
 		return List([
-			ECSComponentType.Renderer,
+			ECSComponentType.NodeRenderer,
 			ECSComponentType.GraphPosition,
 		])
 	}
 
-	public getRendererComponent(): ECSRendererComponent | undefined {
+	public getNodeRendererComponent(): ECSNodeRendererComponent | undefined {
 		return this._rendererComponent
 	}
 
@@ -94,33 +148,34 @@ class ECSSimpleGraphNodeEntity extends ECSEntity {
 
 interface ECSComponent {}
 
-const makeRendererComp = Record({
+const makeNodeRendererComp = Record({
+	color: 'green',
+})
+
+class ECSNodeRendererComponent extends makeNodeRendererComp implements ECSComponent {}
+
+const makeGlobalRendererComp = Record({
 	color: 'red',
 })
 
-class ECSRendererComponent extends makeRendererComp implements ECSComponent {
-
-}
+class ECSGlobalRendererComponent extends makeGlobalRendererComp implements ECSComponent {}
 
 const makeGraphPosition = Record({
+	id: 'dummy',
 	x: 0,
 	y: 0,
+	height: 0,
 })
 
-class ECSGraphPositionComponent extends makeGraphPosition implements ECSComponent {
-}
+class ECSGraphPositionComponent extends makeGraphPosition implements ECSComponent {}
 
 let _systems = List<ECSSystem>()
 let _entities = List<ECSEntity>()
 
-_systems = _systems.push(new ECSCanvasRenderSystem())
-
-_entities = List([new ECSSimpleGraphNodeEntity(
-	new ECSRendererComponent({color: 'red'}),
-	new ECSGraphPositionComponent({x: 200, y: 900}),
-)])
-
-// Need to add and remove entities based on shamu graph state
+_systems = _systems.concat([
+	new ECSCanvasRenderSystem(),
+	new ECSGraphNodeRenderSystem(),
+])
 
 export function getECSLoop(store: Store<IClientAppState>) {
 	_store = store
@@ -132,14 +187,15 @@ function ecsLoop() {
 
 	_entities = selectAllPositions(_store.getState().room)
 		.map(position => new ECSSimpleGraphNodeEntity(
-			new ECSRendererComponent({color: 'red'}),
-			new ECSGraphPositionComponent({x: (Math.sin(Date.now() / 1000) * 100) + position.x, y: position.y}),
-		)).toList()
-
-	// _entities = List([new ECSSimpleGraphNodeEntity(
-	// 	new ECSRendererComponent({color: 'red'}),
-	// 	new ECSGraphPositionComponent({x: (Math.sin(Date.now() / 1000) * 100) + 200, y: 900}),
-	// )])
+			new ECSNodeRendererComponent({color: 'green'}),
+			new ECSGraphPositionComponent({
+				id: position.id,
+				x: (((Date.now() / 1000) % 1) * 100),
+				y: 0,
+				height: position.height,
+			}),
+		))
+		.toList()
 
 	// iterate through components, pass them to systems
 	_systems.forEach(system => {

@@ -59,6 +59,13 @@
 			- [...] ECS
 				- could take a while to get started
 				- [√] remove all but one RAF loop
+				- [√] render a square at each node position
+				- [√] one canvas per graph node
+				- [√] squares should be in front of nodes
+				- [ ] line should only cover notes area
+				- [ ] only sequencers
+				- [ ] only when playing
+				- [ ] go with song
 		- [ ] master clock play button animation
 		- [√] infinite seq loop length
 		- [x] rate knob on infinite sequencer

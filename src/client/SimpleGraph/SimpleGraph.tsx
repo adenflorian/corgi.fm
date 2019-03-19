@@ -4,7 +4,7 @@ import {connect} from 'react-redux'
 import {IClientAppState} from '../../common/redux'
 import {selectAllPositionIds} from '../../common/redux'
 import {mainBoardsId} from '../client-constants'
-import {ConnectedConnections, ConnectionsUsage} from '../Connections/Connections'
+import {ConnectedConnections} from '../Connections/Connections'
 import {ECSCanvasRenderSystem} from '../ECS/ECS'
 import {ConnectedMousePointers} from '../MousePointers/MousePointers'
 import {ConnectedSimpleGraphNode} from './SimpleGraphNode'
@@ -30,6 +30,11 @@ export const SimpleGraph: React.FC<ISimpleGraphReduxProps> =
 			>
 				<ConnectedZoom>
 					<div id={mainBoardsId} className="boards">
+						<ConnectedMousePointers />
+						<ConnectedConnections />
+						{positionIds.map(positionId =>
+							<ConnectedSimpleGraphNode key={positionId} positionId={positionId} />,
+						)}
 						<canvas
 							id="ECSCanvasRenderSystemCanvas"
 							style={{
@@ -43,11 +48,6 @@ export const SimpleGraph: React.FC<ISimpleGraphReduxProps> =
 							width={canvasSize}
 							height={canvasSize}
 						></canvas>
-						<ConnectedMousePointers />
-						<ConnectedConnections />
-						{positionIds.map(positionId =>
-							<ConnectedSimpleGraphNode key={positionId} positionId={positionId} />,
-						)}
 					</div>
 				</ConnectedZoom>
 			</div>

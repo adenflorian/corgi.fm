@@ -9,6 +9,7 @@ import {
 } from '../../common/redux'
 import {CssColor} from '../../common/shamu-color'
 import {ConnectedBasicSampler} from '../BasicSampler/BasicSampler'
+import {ECSGraphNodeRenderSystem} from '../ECS/ECS'
 import {ConnectedGridSequencerContainer} from '../GridSequencer/GridSequencerContainer'
 import {ConnectedInfiniteSequencer} from '../InfiniteSequencer/InfiniteSequencer'
 import {ConnectedBasicSynthesizerView} from '../Instruments/BasicSynthesizerView'
@@ -68,6 +69,19 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 				>
 					<Handle />
 					{getComponentByNodeType(targetType, positionId, color)}
+					<canvas
+						id={ECSGraphNodeRenderSystem.canvasIdPrefix + positionId}
+						style={{
+							position: 'absolute',
+							width,
+							height,
+							top: 0,
+							left: 0,
+							pointerEvents: 'none',
+						}}
+						width={width}
+						height={height}
+					></canvas>
 				</div>
 			</Draggable >
 		)
