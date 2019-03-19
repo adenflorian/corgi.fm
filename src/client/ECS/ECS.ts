@@ -1,9 +1,14 @@
 import {List} from 'immutable'
 import {Store} from 'redux'
-import {ConnectionNodeType, isSequencerNodeType} from '../../common/common-types'
-import {IClientAppState, selectAllPositions, selectAllSequencers, selectSequencer} from '../../common/redux'
+import {isSequencerNodeType} from '../../common/common-types'
+import {
+	IClientAppState, selectAllPositions, selectSequencer,
+} from '../../common/redux'
+import {getSequencersSchedulerInfo} from '../note-scanner'
 import {ECSCanvasRenderSystem} from './ECSCanvasRenderSystem'
-import {ECSGraphPositionComponent, ECSNodeRendererComponent, ECSSequencerComponent} from './ECSComponents'
+import {
+	ECSGraphPositionComponent, ECSNodeRendererComponent, ECSSequencerComponent,
+} from './ECSComponents'
 import {ECSSequencerEntity} from './ECSSequencerEntity'
 import {ECSSequencerRenderSystem} from './ECSSequencerRenderSystem'
 import {ECSEntity, ECSSystem} from './ECSTypes'
@@ -43,7 +48,9 @@ function ecsLoop() {
 			new ECSSequencerComponent({
 				notesDisplayStartX: sequencer.notesDisplayStartX,
 				notesDisplayWidth: sequencer.notesDisplayWidth,
-				ratio: ((performance.now() / 5000) % 1),
+				ratio: getSequencersSchedulerInfo()
+					.get(sequencer.id, {loopRatio: 0})
+					.loopRatio,
 				isPlaying: sequencer.isPlaying,
 			}),
 		))

@@ -38,6 +38,12 @@ let lastAudioContextTime = 0
 let _justStarted = false
 let songStartTimeSeconds = 0
 
+let _sequencersInfo = Map<string, {loopRatio: number}>()
+
+export function getSequencersSchedulerInfo() {
+	return _sequencersInfo
+}
+
 export function getCurrentSongTime() {
 	return _audioContext.currentTime - songStartTimeSeconds
 }
@@ -114,6 +120,10 @@ function scheduleNotes() {
 				.map(flattenEventNotes)
 				.flatten() as List<MidiGlobalClipEvent>,
 		}))
+
+	_sequencersInfo = sequencersEvents.map(x => ({
+		loopRatio: (currentSongTimeBeats % x.seq.midiClip.length) / x.seq.midiClip.length,
+	}))
 
 	const instruments = getAllInstruments()
 

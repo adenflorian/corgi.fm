@@ -38,7 +38,7 @@
 				- seq B [==== == ]
 				- exp   [== = =  ] (ableton)
 				- act   varies
-		- [ ] sequencer animations
+		- [√] sequencer animations
 			- css animation
 				- cons
 					- little control
@@ -56,7 +56,7 @@
 				- haven't done this yet
 			- javascript/svg
 				- have done, but its sloppy
-			- [...] ECS
+			- [√] ECS
 				- could take a while to get started
 				- [√] remove all but one RAF loop
 				- [√] render a square at each node position
@@ -65,7 +65,7 @@
 				- [√] line should only cover notes area
 				- [√] only sequencers
 				- [√] only when playing
-				- [ ] go with song
+				- [√] go with song
 		- [ ] master clock play button animation
 		- [√] infinite seq loop length
 		- [x] rate knob on infinite sequencer
