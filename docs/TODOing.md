@@ -64,7 +64,7 @@
 				- [√] squares should be in front of nodes
 				- [√] line should only cover notes area
 				- [√] only sequencers
-				- [ ] only when playing
+				- [√] only when playing
 				- [ ] go with song
 		- [ ] master clock play button animation
 		- [√] infinite seq loop length

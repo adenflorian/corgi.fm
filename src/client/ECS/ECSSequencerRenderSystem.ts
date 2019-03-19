@@ -26,9 +26,13 @@ export class ECSSequencerRenderSystem implements ECSSystem {
 
 		canvasContext.clearRect(0, 0, ECSCanvasRenderSystem.canvasSize, ECSCanvasRenderSystem.canvasSize)
 
-		canvasContext.fillStyle = CssColor.defaultGray
-		const graphPosition = entity.getGraphPositionComponent()!
 		const sequencerComp = entity.getSequencerComponent()!
+
+		if (sequencerComp.isPlaying === false) return
+
+		const graphPosition = entity.getGraphPositionComponent()!
+
+		canvasContext.fillStyle = CssColor.defaultGray
 		canvasContext.fillRect(
 			sequencerComp.notesDisplayStartX + (sequencerComp.notesDisplayWidth * sequencerComp.ratio),
 			0,

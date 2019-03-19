@@ -24,5 +24,6 @@ const makeSequencerComp = Record({
 	notesDisplayStartX: 0,
 	notesDisplayWidth: 0,
 	ratio: 0,
+	isPlaying: false,
 })
 export class ECSSequencerComponent extends makeSequencerComp implements ECSComponent {}

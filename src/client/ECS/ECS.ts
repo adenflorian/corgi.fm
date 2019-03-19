@@ -44,6 +44,7 @@ function ecsLoop() {
 				notesDisplayStartX: sequencer.notesDisplayStartX,
 				notesDisplayWidth: sequencer.notesDisplayWidth,
 				ratio: ((performance.now() / 5000) % 1),
+				isPlaying: sequencer.isPlaying,
 			}),
 		))
 		.toList()
