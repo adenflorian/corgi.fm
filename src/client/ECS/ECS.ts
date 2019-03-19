@@ -1,6 +1,6 @@
 import {List, Record} from 'immutable'
 import {Store} from 'redux'
-import {IClientAppState} from '../../common/redux'
+import {IClientAppState, selectAllPositions} from '../../common/redux'
 
 let _store: Store<IClientAppState>
 
@@ -11,7 +11,9 @@ enum ECSComponentType {
 
 interface ECSSystem {
 	getRequiredComponents(): List<ECSComponentType>
+	onBatchStart(): void
 	execute(entity: ECSEntity): void
+	onBatchEnd(): void
 }
 
 export class ECSCanvasRenderSystem implements ECSSystem {
@@ -26,22 +28,30 @@ export class ECSCanvasRenderSystem implements ECSSystem {
 		])
 	}
 
-	public execute(entity: ECSEntity): void {
+	public onBatchStart() {
 		if (!this._canvasContext) {
 			this._updateContext()
 		}
 		if (!this._canvasContext) return
+		this._canvasContext.clearRect(0, 0, ECSCanvasRenderSystem.canvasSize, ECSCanvasRenderSystem.canvasSize)
+	}
+
+	public execute(entity: ECSEntity): void {
+		if (!this._canvasContext) return
 
 		// this._canvasContext.fillStyle = 'green'
 		// this._canvasContext.fillRect(10, 10, 150, 100)
-		this._canvasContext.clearRect(0, 0, ECSCanvasRenderSystem.canvasSize, ECSCanvasRenderSystem.canvasSize)
 		this._canvasContext.fillStyle = entity.getRendererComponent()!.color
 		this._canvasContext.fillRect(
-			entity.getGraphPositionComponent()!.x,
-			entity.getGraphPositionComponent()!.y,
+			entity.getGraphPositionComponent()!.x + (ECSCanvasRenderSystem.canvasSize / 2),
+			entity.getGraphPositionComponent()!.y + (ECSCanvasRenderSystem.canvasSize / 2),
 			100,
 			100,
 		)
+	}
+
+	public onBatchEnd() {
+
 	}
 
 	private _updateContext() {
@@ -110,6 +120,8 @@ _entities = List([new ECSSimpleGraphNodeEntity(
 	new ECSGraphPositionComponent({x: 200, y: 900}),
 )])
 
+// Need to add and remove entities based on shamu graph state
+
 export function getECSLoop(store: Store<IClientAppState>) {
 	_store = store
 
@@ -118,13 +130,20 @@ export function getECSLoop(store: Store<IClientAppState>) {
 
 function ecsLoop() {
 
-	_entities = List([new ECSSimpleGraphNodeEntity(
-		new ECSRendererComponent({color: 'red'}),
-		new ECSGraphPositionComponent({x: (Math.sin(Date.now() / 1000) * 100) + 200, y: 900}),
-	)])
+	_entities = selectAllPositions(_store.getState().room)
+		.map(position => new ECSSimpleGraphNodeEntity(
+			new ECSRendererComponent({color: 'red'}),
+			new ECSGraphPositionComponent({x: (Math.sin(Date.now() / 1000) * 100) + position.x, y: position.y}),
+		)).toList()
+
+	// _entities = List([new ECSSimpleGraphNodeEntity(
+	// 	new ECSRendererComponent({color: 'red'}),
+	// 	new ECSGraphPositionComponent({x: (Math.sin(Date.now() / 1000) * 100) + 200, y: 900}),
+	// )])
 
 	// iterate through components, pass them to systems
 	_systems.forEach(system => {
+		system.onBatchStart()
 		_entities.filter(x => entityHasComponentsRequiredBySystem(x, system))
 			.forEach(entity => {
 				system.execute(entity)
