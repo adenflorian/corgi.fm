@@ -379,11 +379,17 @@ instrument manager already handles all creation and destruction of instruments
 - [√] newsletter (a way for users to sign up to get future updates)
 - [...] let user change name (need better UX design)
 - [√] https
-- [...] options view
-- [...] better pointer
+- [√] options view
+- [√] better pointer
 - [...] favicon (better icon?)
-- [...] feedback button
+- [√] feedback button
 	- added link to the discord
+- [ ] help button
+- [ ] figure out donations
+- [ ] prepare answer to questions or a FAQ
+	- [ ] monetization?
+	- [ ] open source?
+	- [ ] roadmap?
 
 # Ballad
 - [ ] login system
