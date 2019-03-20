@@ -22,7 +22,7 @@ export * from './simple-reverb-redux'
 export * from './chat-redux'
 export * from './clients-redux'
 export * from './configure-server-store'
-export * from './grid-sequencer-player-middleware'
+export * from './sequencer-middleware'
 
 export * from './infinite-sequencers-redux'
 export * from './grid-sequencers-redux'
