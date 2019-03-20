@@ -1,11 +1,11 @@
 import {applyMiddleware, createStore, Store} from 'redux'
 import {composeWithDevTools} from 'redux-devtools-extension/developmentOnly'
 import {
-	createSequencerMiddleware,
 	getActionsBlacklist, getClientReducers, IClientAppState,
 } from '../common/redux'
 import {connectionsClientMiddleware} from './connections-middleware'
 import {createLocalMiddleware} from './local-middleware'
+import {createSequencerMiddleware} from './sequencer-middleware'
 import {websocketSenderMiddleware} from './websocket-client-sender-middleware'
 
 const composeEnhancers = composeWithDevTools({

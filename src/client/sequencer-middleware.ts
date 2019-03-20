@@ -1,23 +1,22 @@
 import {saveAs} from 'file-saver'
 import * as MidiWriter from 'midi-writer-js'
 import {Dispatch, Middleware, MiddlewareAPI} from 'redux'
-import {IClientAppState} from './index'
 import {
-	EXPORT_SEQUENCER_MIDI, selectAllSequencers,
-} from './index'
-import {isEmptyEvents} from './index'
-import {sequencerActions} from './sequencer-redux'
+	EXPORT_SEQUENCER_MIDI, IClientAppState, isEmptyEvents,
+	selectAllSequencers, SequencerAction, sequencerActions,
+} from '../common/redux/index'
 
 export const createSequencerMiddleware = () => {
 
-	const sequencerMiddleware: Middleware<{}, IClientAppState> = store => next => action => {
-		next(action)
+	const sequencerMiddleware: Middleware<{}, IClientAppState> =
+		store => next => (action: SequencerAction) => {
+			next(action)
 
-		switch (action.type) {
-			case EXPORT_SEQUENCER_MIDI:
-				return exportSequencerMidi(action, store)
+			switch (action.type) {
+				case EXPORT_SEQUENCER_MIDI:
+					return exportSequencerMidi(action, store)
+			}
 		}
-	}
 
 	return sequencerMiddleware
 }
