@@ -12,6 +12,8 @@ export const CLEAR_SEQUENCER = 'CLEAR_SEQUENCER'
 export const UNDO_SEQUENCER = 'UNDO_SEQUENCER'
 export const UNDO_RECORDING_SEQUENCER = 'UNDO_RECORDING_SEQUENCER'
 export const SKIP_NOTE = 'SKIP_NOTE'
+export const PLAY_SEQUENCER = 'PLAY_SEQUENCER'
+export const STOP_SEQUENCER = 'STOP_SEQUENCER'
 export const PLAY_ALL = 'PLAY_ALL'
 export const STOP_ALL = 'STOP_ALL'
 export const EXPORT_SEQUENCER_MIDI = 'EXPORT_SEQUENCER_MIDI'
@@ -38,6 +40,18 @@ export const sequencerActions = Object.freeze({
 		type: SKIP_NOTE as typeof SKIP_NOTE,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
+	}),
+	play: (id: string) => ({
+		type: PLAY_SEQUENCER as typeof PLAY_SEQUENCER,
+		id,
+		BROADCASTER_ACTION,
+		SERVER_ACTION,
+	}),
+	stop: (id: string) => ({
+		type: STOP_SEQUENCER as typeof STOP_SEQUENCER,
+		id,
+		BROADCASTER_ACTION,
+		SERVER_ACTION,
 	}),
 	playAll: () => ({
 		type: PLAY_ALL as typeof PLAY_ALL,

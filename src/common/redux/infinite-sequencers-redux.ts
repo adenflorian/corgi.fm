@@ -2,6 +2,7 @@ import {List, Stack} from 'immutable'
 import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
 import {ConnectionNodeType} from '../common-types'
+import {assertArrayHasNoUndefinedElements} from '../common-utils'
 import {makeMidiClipEvent, MidiClip, MidiClipEvents} from '../midi-types'
 import {IMidiNote, MidiNotes} from '../MidiNote'
 import {
@@ -9,7 +10,7 @@ import {
 	IMultiStateThings, makeMultiReducer, NetworkActionType, PLAY_ALL, selectGlobalClockState,
 	SERVER_ACTION, SKIP_NOTE, STOP_ALL, UNDO_SEQUENCER, VIRTUAL_KEY_PRESSED,
 } from './index'
-import {SequencerAction, SequencerStateBase, UNDO_RECORDING_SEQUENCER} from './sequencer-redux'
+import {PLAY_SEQUENCER, SequencerAction, SequencerStateBase, STOP_SEQUENCER, UNDO_RECORDING_SEQUENCER} from './sequencer-redux'
 import {VirtualKeyPressedAction} from './virtual-keyboard-redux'
 
 export const addInfiniteSequencer = (infiniteSequencer: InfiniteSequencerState) =>
@@ -47,7 +48,6 @@ export const infiniteSequencerActions = Object.freeze({
 function getNetworkFlags(fieldName: InfiniteSequencerFields) {
 	if ([
 		InfiniteSequencerFields.gate,
-		InfiniteSequencerFields.isPlaying,
 		InfiniteSequencerFields.bottomNote,
 		InfiniteSequencerFields.isRecording,
 		InfiniteSequencerFields.pitch,
@@ -63,7 +63,6 @@ function getNetworkFlags(fieldName: InfiniteSequencerFields) {
 
 export enum InfiniteSequencerFields {
 	gate = 'gate',
-	isPlaying = 'isPlaying',
 	bottomNote = 'bottomNote',
 	index = 'index',
 	isRecording = 'isRecording',
@@ -135,7 +134,11 @@ const infiniteSequencerActionTypes = [
 	SET_INFINITE_SEQUENCER_FIELD,
 	CLEAR_SEQUENCER,
 	UNDO_SEQUENCER,
+	PLAY_SEQUENCER,
+	STOP_SEQUENCER,
 ]
+
+assertArrayHasNoUndefinedElements(infiniteSequencerActionTypes)
 
 const infiniteSequencerGlobalActionTypes = [
 	PLAY_ALL,
@@ -144,6 +147,8 @@ const infiniteSequencerGlobalActionTypes = [
 	SKIP_NOTE,
 	UNDO_RECORDING_SEQUENCER,
 ]
+
+assertArrayHasNoUndefinedElements(infiniteSequencerGlobalActionTypes)
 
 type InfiniteSequencerAction = SequencerAction | ActionType<typeof infiniteSequencerActions> | VirtualKeyPressedAction
 
@@ -194,12 +199,6 @@ function infiniteSequencerReducer(
 					...infiniteSequencer,
 					[action.fieldName]: action.data % infiniteSequencer.midiClip.events.count(),
 				}
-			} else if (action.fieldName === InfiniteSequencerFields.isPlaying) {
-				return {
-					...infiniteSequencer,
-					[action.fieldName]: action.data,
-					isRecording: false,
-				}
 			} else {
 				return {
 					...infiniteSequencer,
@@ -233,6 +232,8 @@ function infiniteSequencerReducer(
 				previousEvents: infiniteSequencer.previousEvents.unshift(infiniteSequencer.midiClip.events),
 			}
 		}
+		case PLAY_SEQUENCER: return {...infiniteSequencer, isPlaying: true, isRecording: false}
+		case STOP_SEQUENCER: return {...infiniteSequencer, isPlaying: false, isRecording: false}
 		case PLAY_ALL: return {...infiniteSequencer, isPlaying: true}
 		case STOP_ALL: return {...infiniteSequencer, isPlaying: false, isRecording: false}
 		case VIRTUAL_KEY_PRESSED:

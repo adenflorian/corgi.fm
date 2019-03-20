@@ -2,6 +2,7 @@ import {List, Map, Stack} from 'immutable'
 import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
 import {ConnectionNodeType} from '../common-types'
+import {assertArrayHasNoUndefinedElements} from '../common-utils'
 import {MidiClip, MidiClipEvents} from '../midi-types'
 import {emptyMidiNotes, IMidiNote} from '../MidiNote'
 import {MAX_MIDI_NOTE_NUMBER_127} from '../server-constants'
@@ -11,7 +12,7 @@ import {
 	PLAY_ALL, selectAllInfiniteSequencers, selectGlobalClockState, SERVER_ACTION, STOP_ALL,
 	UNDO_SEQUENCER,
 } from './index'
-import {SequencerAction, SequencerStateBase} from './sequencer-redux'
+import {PLAY_SEQUENCER, SequencerAction, SequencerStateBase, STOP_SEQUENCER} from './sequencer-redux'
 
 export const addGridSequencer = (gridSequencer: GridSequencerState) =>
 	addMultiThing(gridSequencer, ConnectionNodeType.gridSequencer, NetworkActionType.SERVER_AND_BROADCASTER)
@@ -48,7 +49,6 @@ export const gridSequencerActions = Object.freeze({
 function getNetworkActionThings(fieldName: GridSequencerFields) {
 	if ([
 		GridSequencerFields.gate,
-		GridSequencerFields.isPlaying,
 		GridSequencerFields.scrollY,
 		GridSequencerFields.pitch,
 	].includes(fieldName)) {
@@ -60,7 +60,6 @@ function getNetworkActionThings(fieldName: GridSequencerFields) {
 
 export enum GridSequencerFields {
 	gate = 'gate',
-	isPlaying = 'isPlaying',
 	scrollY = 'scrollY',
 	index = 'index',
 	pitch = 'pitch',
@@ -193,12 +192,18 @@ const gridSequencerActionTypes = [
 	SET_GRID_SEQUENCER_FIELD,
 	CLEAR_SEQUENCER,
 	UNDO_SEQUENCER,
+	PLAY_SEQUENCER,
+	STOP_SEQUENCER,
 ]
+
+assertArrayHasNoUndefinedElements(gridSequencerActionTypes)
 
 const gridSequencerGlobalActionTypes = [
 	PLAY_ALL,
 	STOP_ALL,
 ]
+
+assertArrayHasNoUndefinedElements(gridSequencerGlobalActionTypes)
 
 type GridSequencerAction = SequencerAction | ActionType<typeof gridSequencerActions>
 
@@ -265,8 +270,10 @@ const gridSequencerReducer =
 					previousEvents: gridSequencer.previousEvents.unshift(gridSequencer.midiClip.events),
 				}
 			}
+			case PLAY_SEQUENCER: return {...gridSequencer, isPlaying: true, isRecording: false}
+			case STOP_SEQUENCER: return {...gridSequencer, isPlaying: false, isRecording: false}
 			case PLAY_ALL: return {...gridSequencer, isPlaying: true}
-			case STOP_ALL: return {...gridSequencer, isPlaying: false}
+			case STOP_ALL: return {...gridSequencer, isPlaying: false, isRecording: false}
 			default:
 				return gridSequencer
 		}

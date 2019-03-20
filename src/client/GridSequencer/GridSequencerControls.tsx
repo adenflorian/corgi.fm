@@ -32,7 +32,7 @@ export const GridSequencerControls = (props: AllProps) => {
 				<div
 					className="play"
 					onClick={() => {
-						props.dispatch(gridSequencerActions.setField(props.id, GridSequencerFields.isPlaying, true))
+						props.dispatch(sequencerActions.play(props.id))
 						props.dispatch(globalClockActions.start())
 					}}
 				>
@@ -40,7 +40,7 @@ export const GridSequencerControls = (props: AllProps) => {
 				</div>
 				<div
 					className="stop"
-					onClick={() => dispatchGridSeqParam(GridSequencerFields.isPlaying, false)}
+					onClick={() => props.dispatch(sequencerActions.stop(props.id))}
 				>
 					<Stop />
 				</div>

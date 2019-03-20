@@ -93,7 +93,7 @@ export const InfiniteSequencer: React.FC<IInfiniteSequencerAllProps> = React.mem
 							<div
 								className="play"
 								onClick={() => {
-									dispatchInfiniteSeqParam(InfiniteSequencerFields.isPlaying, true)
+									dispatch(sequencerActions.play(id))
 									dispatch(globalClockActions.start())
 								}}
 							>
@@ -101,7 +101,7 @@ export const InfiniteSequencer: React.FC<IInfiniteSequencerAllProps> = React.mem
 							</div>
 							<div
 								className="stop"
-								onClick={() => dispatchInfiniteSeqParam(InfiniteSequencerFields.isPlaying, false)}
+								onClick={() => dispatch(sequencerActions.stop(id))}
 							>
 								<Stop />
 							</div>
