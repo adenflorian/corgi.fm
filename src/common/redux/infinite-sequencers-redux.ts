@@ -1,6 +1,6 @@
 import {List, Stack} from 'immutable'
-import {AnyAction} from 'redux'
 import {createSelector} from 'reselect'
+import {ActionType} from 'typesafe-actions'
 import {ConnectionNodeType} from '../common-types'
 import {makeMidiClipEvent, MidiClip, MidiClipEvents} from '../midi-types'
 import {IMidiNote, MidiNotes} from '../MidiNote'
@@ -9,43 +9,40 @@ import {
 	IMultiStateThings, makeMultiReducer, NetworkActionType, PLAY_ALL, selectGlobalClockState,
 	SERVER_ACTION, SKIP_NOTE, STOP_ALL, UNDO_SEQUENCER, VIRTUAL_KEY_PRESSED,
 } from './index'
-import {SequencerStateBase, UNDO_RECORDING_SEQUENCER} from './sequencer-redux'
+import {SequencerAction, SequencerStateBase, UNDO_RECORDING_SEQUENCER} from './sequencer-redux'
+import {VirtualKeyPressedAction} from './virtual-keyboard-redux'
 
 export const addInfiniteSequencer = (infiniteSequencer: InfiniteSequencerState) =>
 	addMultiThing(infiniteSequencer, ConnectionNodeType.infiniteSequencer, NetworkActionType.SERVER_AND_BROADCASTER)
 
 export const SET_INFINITE_SEQUENCER_NOTE = 'SET_INFINITE_SEQUENCER_NOTE'
-export const setInfiniteSequencerNote =
-	(infiniteSequencerId: string, index: number, enabled: boolean, note: IMidiNote) => {
-		return {
-			type: SET_INFINITE_SEQUENCER_NOTE,
-			id: infiniteSequencerId,
-			index,
-			enabled,
-			note,
-			SERVER_ACTION,
-			BROADCASTER_ACTION,
-		}
-	}
-
 export const RESTART_INFINITE_SEQUENCER = 'RESTART_INFINITE_SEQUENCER'
-export const restartInfiniteSequencer = (id: string) => ({
-	type: RESTART_INFINITE_SEQUENCER,
-	id,
-	SERVER_ACTION,
-	BROADCASTER_ACTION,
-})
-
 export const SET_INFINITE_SEQUENCER_FIELD = 'SET_INFINITE_SEQUENCER_FIELD'
-export type SetInfiniteSequencerField = ReturnType<typeof setInfiniteSequencerField>
-export const setInfiniteSequencerField =
-	(id: string, fieldName: InfiniteSequencerFields, data: any) => ({
-		type: SET_INFINITE_SEQUENCER_FIELD,
+
+export const infiniteSequencerActions = Object.freeze({
+	setNote: (infiniteSequencerId: string, index: number, enabled: boolean, note: IMidiNote) => ({
+		type: SET_INFINITE_SEQUENCER_NOTE as typeof SET_INFINITE_SEQUENCER_NOTE,
+		id: infiniteSequencerId,
+		index,
+		enabled,
+		note,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	}),
+	restart: (id: string) => ({
+		type: RESTART_INFINITE_SEQUENCER as typeof RESTART_INFINITE_SEQUENCER,
+		id,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	}),
+	setField: (id: string, fieldName: InfiniteSequencerFields, data: any) => ({
+		type: SET_INFINITE_SEQUENCER_FIELD as typeof SET_INFINITE_SEQUENCER_FIELD,
 		id,
 		fieldName,
 		data,
 		...getNetworkFlags(fieldName),
-	})
+	}),
+})
 
 function getNetworkFlags(fieldName: InfiniteSequencerFields) {
 	if ([
@@ -148,6 +145,8 @@ const infiniteSequencerGlobalActionTypes = [
 	UNDO_RECORDING_SEQUENCER,
 ]
 
+type InfiniteSequencerAction = SequencerAction | ActionType<typeof infiniteSequencerActions> | VirtualKeyPressedAction
+
 export const infiniteSequencersReducer =
 	makeMultiReducer<InfiniteSequencerState, IInfiniteSequencersState>(
 		infiniteSequencerReducer, ConnectionNodeType.infiniteSequencer,
@@ -155,7 +154,7 @@ export const infiniteSequencersReducer =
 	)
 
 function infiniteSequencerReducer(
-	infiniteSequencer: InfiniteSequencerState, action: AnyAction,
+	infiniteSequencer: InfiniteSequencerState, action: InfiniteSequencerAction,
 ): InfiniteSequencerState {
 	switch (action.type) {
 		case SET_INFINITE_SEQUENCER_NOTE: {

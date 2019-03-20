@@ -3,9 +3,10 @@ import * as MidiWriter from 'midi-writer-js'
 import {Dispatch, Middleware, MiddlewareAPI} from 'redux'
 import {IClientAppState} from './index'
 import {
-	EXPORT_SEQUENCER_MIDI, ExportSequencerMidiAction, selectAllSequencers,
+	EXPORT_SEQUENCER_MIDI, selectAllSequencers,
 } from './index'
 import {isEmptyEvents} from './index'
+import {sequencerActions} from './sequencer-redux'
 
 export const createSequencerMiddleware = () => {
 
@@ -22,7 +23,8 @@ export const createSequencerMiddleware = () => {
 }
 
 function exportSequencerMidi(
-	action: ExportSequencerMidiAction, store: MiddlewareAPI<Dispatch, IClientAppState>,
+	action: ReturnType<typeof sequencerActions.exportMidi>,
+	store: MiddlewareAPI<Dispatch, IClientAppState>,
 ) {
 	const roomState = store.getState().room
 

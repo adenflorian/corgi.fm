@@ -24,7 +24,7 @@ export const VIRTUAL_KEY_PRESSED = 'VIRTUAL_KEY_PRESSED'
 export type VirtualKeyPressedAction = ReturnType<typeof virtualKeyPressed>
 export const virtualKeyPressed = (id: string, number: number, octave: Octave, midiNote: IMidiNote) => {
 	return {
-		type: VIRTUAL_KEY_PRESSED,
+		type: VIRTUAL_KEY_PRESSED as typeof VIRTUAL_KEY_PRESSED,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 		id,
@@ -38,7 +38,7 @@ export const VIRTUAL_KEY_UP = 'VIRTUAL_KEY_UP'
 export type VirtualKeyUpAction = ReturnType<typeof virtualKeyUp>
 export const virtualKeyUp = (id: string, number: number) => {
 	return {
-		type: VIRTUAL_KEY_UP,
+		type: VIRTUAL_KEY_UP as typeof VIRTUAL_KEY_UP,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 		id,
@@ -50,7 +50,7 @@ export const VIRTUAL_OCTAVE_CHANGE = 'VIRTUAL_OCTAVE_CHANGE'
 export type VirtualOctaveChangeAction = ReturnType<typeof virtualOctaveChange>
 export const virtualOctaveChange = (id: string, delta: number) => {
 	return {
-		type: VIRTUAL_OCTAVE_CHANGE,
+		type: VIRTUAL_OCTAVE_CHANGE as typeof VIRTUAL_OCTAVE_CHANGE,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 		id,

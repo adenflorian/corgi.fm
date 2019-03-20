@@ -5,8 +5,8 @@ import {Dispatch} from 'redux'
 import {MidiClipEvents} from '../../common/midi-types'
 import {IMidiNotes} from '../../common/MidiNote'
 import {
-	GridSequencerFields, IClientAppState, selectGlobalClockState,
-	selectGridSequencer, setGridSequencerField, setGridSequencerNote,
+	gridSequencerActions, GridSequencerFields, IClientAppState,
+	selectGlobalClockState, selectGridSequencer,
 } from '../../common/redux'
 import {MAX_MIDI_NOTE_NUMBER_127, MIN_MIDI_NOTE_NUMBER_0} from '../../common/server-constants'
 import {getColorStringForMidiNote} from '../../common/shamu-color'
@@ -164,20 +164,20 @@ const mapStateToProps = (state: IClientAppState, props: IGridSequencerNotesProps
 
 const mapDispatchToProps = (dispatch: Dispatch, {id}: IGridSequencerNotesProps): IGridSequencerNotesDispatchProps => ({
 	handleNoteClicked: (index, isEnabled, noteNumber) => {
-		dispatch(setGridSequencerNote(id, index, !isEnabled, noteNumber))
+		dispatch(gridSequencerActions.setNote(id, index, !isEnabled, noteNumber))
 	},
 	handleMouseEnter: (index, isEnabled, noteNumber, e) => {
 		if (e.ctrlKey && isEnabled === true && isLeftMouseButtonDown(e.buttons)) {
-			dispatch(setGridSequencerNote(id, index, false, noteNumber))
+			dispatch(gridSequencerActions.setNote(id, index, false, noteNumber))
 		}
 	},
 	handleMouseDown: (index, isEnabled, noteNumber, e) => {
 		if (e.ctrlKey && isEnabled === true && isLeftMouseButtonDown(e.buttons)) {
-			dispatch(setGridSequencerNote(id, index, false, noteNumber))
+			dispatch(gridSequencerActions.setNote(id, index, false, noteNumber))
 		}
 	},
 	handleScrollChange: newValue => {
-		dispatch(setGridSequencerField(id, GridSequencerFields.scrollY, Math.round(newValue)))
+		dispatch(gridSequencerActions.setField(id, GridSequencerFields.scrollY, Math.round(newValue)))
 	},
 })
 

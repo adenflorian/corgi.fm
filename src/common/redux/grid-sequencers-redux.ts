@@ -1,6 +1,6 @@
 import {List, Map, Stack} from 'immutable'
-import {AnyAction} from 'redux'
 import {createSelector} from 'reselect'
+import {ActionType} from 'typesafe-actions'
 import {ConnectionNodeType} from '../common-types'
 import {MidiClip, MidiClipEvents} from '../midi-types'
 import {emptyMidiNotes, IMidiNote} from '../MidiNote'
@@ -11,48 +11,38 @@ import {
 	PLAY_ALL, selectAllInfiniteSequencers, selectGlobalClockState, SERVER_ACTION, STOP_ALL,
 	UNDO_SEQUENCER,
 } from './index'
-import {SequencerStateBase} from './sequencer-redux'
+import {SequencerAction, SequencerStateBase} from './sequencer-redux'
 
 export const addGridSequencer = (gridSequencer: GridSequencerState) =>
 	addMultiThing(gridSequencer, ConnectionNodeType.gridSequencer, NetworkActionType.SERVER_AND_BROADCASTER)
 
 export const SET_GRID_SEQUENCER_NOTE = 'SET_GRID_SEQUENCER_NOTE'
-export const setGridSequencerNote =
-	(gridSequencerId: string, index: number, enabled: boolean, note: IMidiNote) => {
-		return {
-			type: SET_GRID_SEQUENCER_NOTE,
-			id: gridSequencerId,
-			index,
-			enabled,
-			note,
-			SERVER_ACTION,
-			BROADCASTER_ACTION,
-		}
-	}
-
 export const RESTART_GRID_SEQUENCER = 'RESTART_GRID_SEQUENCER'
-export const restartGridSequencer = (id: string) => ({
-	type: RESTART_GRID_SEQUENCER,
-	id,
-	SERVER_ACTION,
-	BROADCASTER_ACTION,
-})
-
-export const EXPORT_SEQUENCER_MIDI = 'EXPORT_SEQUENCER_MIDI'
-export type ExportSequencerMidiAction = ReturnType<typeof exportSequencerMidi>
-export const exportSequencerMidi = (sequencerId: string) => ({
-	type: EXPORT_SEQUENCER_MIDI,
-	sequencerId,
-})
-
 export const SET_GRID_SEQUENCER_FIELD = 'SET_GRID_SEQUENCER_FIELD'
-export type SetGridSequencerField = ReturnType<typeof setGridSequencerField>
-export const setGridSequencerField = (id: string, fieldName: GridSequencerFields, data: any) => ({
-	type: SET_GRID_SEQUENCER_FIELD,
-	id,
-	fieldName,
-	data,
-	...getNetworkActionThings(fieldName),
+
+export const gridSequencerActions = Object.freeze({
+	setNote: (gridSequencerId: string, index: number, enabled: boolean, note: IMidiNote) => ({
+		type: SET_GRID_SEQUENCER_NOTE as typeof SET_GRID_SEQUENCER_NOTE,
+		id: gridSequencerId,
+		index,
+		enabled,
+		note,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	}),
+	restart: (id: string) => ({
+		type: RESTART_GRID_SEQUENCER as typeof RESTART_GRID_SEQUENCER,
+		id,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	}),
+	setField: (id: string, fieldName: GridSequencerFields, data: any) => ({
+		type: SET_GRID_SEQUENCER_FIELD as typeof SET_GRID_SEQUENCER_FIELD,
+		id,
+		fieldName,
+		data,
+		...getNetworkActionThings(fieldName),
+	}),
 })
 
 function getNetworkActionThings(fieldName: GridSequencerFields) {
@@ -210,8 +200,10 @@ const gridSequencerGlobalActionTypes = [
 	STOP_ALL,
 ]
 
+type GridSequencerAction = SequencerAction | ActionType<typeof gridSequencerActions>
+
 const gridSequencerReducer =
-	(gridSequencer: GridSequencerState, action: AnyAction): GridSequencerState => {
+	(gridSequencer: GridSequencerState, action: GridSequencerAction): GridSequencerState => {
 		switch (action.type) {
 			case SET_GRID_SEQUENCER_NOTE:
 				if (action.note === undefined) {

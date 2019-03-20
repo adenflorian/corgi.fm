@@ -5,9 +5,8 @@ import {
 } from 'react-icons/io'
 import {Dispatch} from 'redux'
 import {
-	clearSequencer, exportSequencerMidi, globalClockActions,
-	GridSequencerFields, selectGridSequencer,
-	setGridSequencerField, shamuConnect, undoSequencer,
+	globalClockActions, gridSequencerActions, GridSequencerFields,
+	selectGridSequencer, sequencerActions, shamuConnect,
 } from '../../common/redux'
 import {Knob} from '../Knob/Knob'
 
@@ -25,7 +24,7 @@ type AllProps = IGridSequencerControlsProps & ReduxProps & {dispatch: Dispatch}
 export const GridSequencerControls = (props: AllProps) => {
 
 	const dispatchGridSeqParam = (paramType: GridSequencerFields, value: number | boolean | string) =>
-		props.dispatch(setGridSequencerField(props.id, paramType, value))
+		props.dispatch(gridSequencerActions.setField(props.id, paramType, value))
 
 	return (
 		<div className="controls unselectable">
@@ -33,7 +32,7 @@ export const GridSequencerControls = (props: AllProps) => {
 				<div
 					className="play"
 					onClick={() => {
-						props.dispatch(setGridSequencerField(props.id, GridSequencerFields.isPlaying, true))
+						props.dispatch(gridSequencerActions.setField(props.id, GridSequencerFields.isPlaying, true))
 						props.dispatch(globalClockActions.start())
 					}}
 				>
@@ -53,19 +52,19 @@ export const GridSequencerControls = (props: AllProps) => {
 				</div>
 				<div
 					className="export"
-					onClick={() => props.dispatch(exportSequencerMidi(props.id))}
+					onClick={() => props.dispatch(sequencerActions.exportMidi(props.id))}
 				>
 					<Download />
 				</div>
 				<div
 					className="erase"
-					onClick={() => props.dispatch(clearSequencer(props.id))}
+					onClick={() => props.dispatch(sequencerActions.clear(props.id))}
 				>
 					<Clear />
 				</div>
 				<div
 					className="undo"
-					onClick={() => props.dispatch(undoSequencer(props.id))}
+					onClick={() => props.dispatch(sequencerActions.undo(props.id))}
 				>
 					<Undo />
 				</div>

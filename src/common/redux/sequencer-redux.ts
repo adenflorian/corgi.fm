@@ -1,4 +1,5 @@
 import {List} from 'immutable'
+import {ActionType} from 'typesafe-actions'
 import uuid = require('uuid')
 import {ConnectionNodeType, IMultiStateThing} from '../common-types'
 import {makeMidiClipEvent, MidiClip, MidiClipEvent, MidiClipEvents} from '../midi-types'
@@ -8,38 +9,53 @@ import {BROADCASTER_ACTION, SERVER_ACTION} from './index'
 import {NodeSpecialState} from './shamu-graph'
 
 export const CLEAR_SEQUENCER = 'CLEAR_SEQUENCER'
-export type ClearSequencerAction = ReturnType<typeof clearSequencer>
-export const clearSequencer = (id: string) => ({
-	type: CLEAR_SEQUENCER as typeof CLEAR_SEQUENCER,
-	id,
-	SERVER_ACTION,
-	BROADCASTER_ACTION,
-})
-
 export const UNDO_SEQUENCER = 'UNDO_SEQUENCER'
-export type UndoSequencerAction = ReturnType<typeof undoSequencer>
-export const undoSequencer = (id: string) => ({
-	type: UNDO_SEQUENCER as typeof UNDO_SEQUENCER,
-	id,
-	SERVER_ACTION,
-	BROADCASTER_ACTION,
-})
-
 export const UNDO_RECORDING_SEQUENCER = 'UNDO_RECORDING_SEQUENCER'
-export type UndoRecordingSequencerAction = ReturnType<typeof undoRecordingSequencer>
-export const undoRecordingSequencer = () => ({
-	type: UNDO_RECORDING_SEQUENCER as typeof UNDO_RECORDING_SEQUENCER,
-	SERVER_ACTION,
-	BROADCASTER_ACTION,
+export const SKIP_NOTE = 'SKIP_NOTE'
+export const PLAY_ALL = 'PLAY_ALL'
+export const STOP_ALL = 'STOP_ALL'
+export const EXPORT_SEQUENCER_MIDI = 'EXPORT_SEQUENCER_MIDI'
+
+export const sequencerActions = Object.freeze({
+	clear: (id: string) => ({
+		type: CLEAR_SEQUENCER as typeof CLEAR_SEQUENCER,
+		id,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	}),
+	undo: (id: string) => ({
+		type: UNDO_SEQUENCER as typeof UNDO_SEQUENCER,
+		id,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	}),
+	undoRecordingSequencer: () => ({
+		type: UNDO_RECORDING_SEQUENCER as typeof UNDO_RECORDING_SEQUENCER,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	}),
+	skipNote: () => ({
+		type: SKIP_NOTE as typeof SKIP_NOTE,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	}),
+	playAll: () => ({
+		type: PLAY_ALL as typeof PLAY_ALL,
+		BROADCASTER_ACTION,
+		SERVER_ACTION,
+	}),
+	stopAll: () => ({
+		type: STOP_ALL as typeof STOP_ALL,
+		BROADCASTER_ACTION,
+		SERVER_ACTION,
+	}),
+	exportMidi: (sequencerId: string) => ({
+		type: EXPORT_SEQUENCER_MIDI as typeof EXPORT_SEQUENCER_MIDI,
+		sequencerId,
+	}),
 })
 
-export const SKIP_NOTE = 'SKIP_NOTE'
-export type SkipNoteAction = ReturnType<typeof skipNote>
-export const skipNote = () => ({
-	type: SKIP_NOTE as typeof SKIP_NOTE,
-	SERVER_ACTION,
-	BROADCASTER_ACTION,
-})
+export type SequencerAction = ActionType<typeof sequencerActions>
 
 export const createSequencerEvents = (length: number, ratio = 1): MidiClipEvents => {
 	return makeSequencerEvents(
@@ -75,7 +91,7 @@ export interface ISequencerState extends IMultiStateThing, NodeSpecialState {
 }
 
 export abstract class SequencerStateBase implements ISequencerState {
-	public readonly index = -1
+	public readonly index: number = -1
 	public readonly id = uuid.v4()
 	public readonly color: string
 	public readonly isRecording = false

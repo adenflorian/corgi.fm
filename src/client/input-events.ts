@@ -2,9 +2,9 @@ import {Map} from 'immutable'
 import {Action, AnyAction, Store} from 'redux'
 import {rateLimitedDebounce} from '../common/common-utils'
 import {
-	globalClockActions, IClientAppState, pointersActions,
-	selectGlobalClockIsPlaying, selectIsLocalClientReady, selectLocalClient,
-	skipNote, undoRecordingSequencer, userInputActions,
+	globalClockActions, IClientAppState,
+	pointersActions, selectGlobalClockIsPlaying, selectIsLocalClientReady,
+	selectLocalClient, sequencerActions, userInputActions,
 } from '../common/redux'
 import {
 	localMidiKeyPress, localMidiKeyUp, localMidiOctaveChange, windowBlur,
@@ -78,12 +78,12 @@ const keyboardShortcuts: IKeyBoardShortcuts = Map<KeyBoardShortcut>({
 		preventDefault: true,
 	},
 	'ArrowRight': {
-		actionOnKeyDown: () => skipNote(),
+		actionOnKeyDown: () => sequencerActions.skipNote(),
 		allowRepeat: true,
 		preventDefault: true,
 	},
 	'Backspace': {
-		actionOnKeyDown: () => undoRecordingSequencer(),
+		actionOnKeyDown: () => sequencerActions.undoRecordingSequencer(),
 		allowRepeat: false,
 		preventDefault: true,
 	},

@@ -8,9 +8,9 @@ import {Dispatch} from 'redux'
 import {MidiClipEvents} from '../../common/midi-types'
 import {IMidiNote} from '../../common/MidiNote'
 import {
-	clearSequencer, exportSequencerMidi, findLowestAndHighestNotes, globalClockActions, IClientAppState,
-	InfiniteSequencerFields, InfiniteSequencerStyle, selectGlobalClockState, selectInfiniteSequencer,
-	setInfiniteSequencerField, undoSequencer,
+	findLowestAndHighestNotes, globalClockActions, IClientAppState,
+	infiniteSequencerActions, InfiniteSequencerFields, InfiniteSequencerStyle,
+	selectGlobalClockState, selectInfiniteSequencer, sequencerActions,
 } from '../../common/redux'
 import {getColorStringForMidiNote} from '../../common/shamu-color'
 import {isWhiteKey} from '../Keyboard/Keyboard'
@@ -57,7 +57,7 @@ export const InfiniteSequencer: React.FC<IInfiniteSequencerAllProps> = React.mem
 		}
 
 		const dispatchInfiniteSeqParam = (paramType: InfiniteSequencerFields, value: number | boolean | string) =>
-			dispatch(setInfiniteSequencerField(id, paramType, value))
+			dispatch(infiniteSequencerActions.setField(id, paramType, value))
 
 		const ColorGridNote = React.memo(function _ColorGridNote({note, index}: {note: IMidiNote, index: number}) {
 			return (
@@ -113,19 +113,19 @@ export const InfiniteSequencer: React.FC<IInfiniteSequencerAllProps> = React.mem
 							</div>
 							<div
 								className="export"
-								onClick={() => dispatch(exportSequencerMidi(id))}
+								onClick={() => dispatch(sequencerActions.exportMidi(id))}
 							>
 								<Download />
 							</div>
 							<div
 								className="erase"
-								onClick={() => dispatch(clearSequencer(props.id))}
+								onClick={() => dispatch(sequencerActions.clear(props.id))}
 							>
 								<Clear />
 							</div>
 							<div
 								className="undo"
-								onClick={() => dispatch(undoSequencer(props.id))}
+								onClick={() => dispatch(sequencerActions.undo(props.id))}
 								title="undo (hit backspace to undo while recording)"
 							>
 								<Undo />
