@@ -5,7 +5,7 @@
 - [ ] mute button next to audio output
 - [√] remove read ahead knob
 - [√] maybe unpress all key when app loses focus
-- [ ] hook up note-scanner with everything
+- [√] hook up note-scanner with everything
 	- [√] change sequencer state to whole new stuff
 	- [√] respect sequencer isPlaying
 	- [√] get sampler to support scheduled notes
@@ -15,7 +15,7 @@
 		- places to toggle:
 			- [√] synth view tsx
 			- [√] in the visual tsx file
-	- [ ] get stuff working again
+	- [√] get stuff working again
 		- [√] keyboard
 			- [√] computer keyboard
 			- [√] mouse
@@ -26,19 +26,6 @@
 		- [√] make note-scanner use note length from event
 		- [√] stopping a specific sequencer should immediately cancel scheduled notes from that sequencer
 		- [√] fix ctrl space
-		- [ ] handle conflicting note lengths scenarios
-			- scenario A
-				- steps
-					- 2 sequencers going to same synth
-					- 1 note in each, same note, same start, but different length
-				- expected
-					- only the shorter note should be played, every time (ableton way)
-			- scenario B
-				- 2 sequencers going to same synth
-				- seq A [== ===  ]
-				- seq B [==== == ]
-				- exp   [== = =  ] (ableton)
-				- act   varies
 		- [√] sequencer animations
 			- css animation
 				- cons
@@ -68,10 +55,7 @@
 				- [√] only when playing
 				- [√] go with song
 				- [√] merge ecs with scan room toggle thing
-		- [ ] master clock play button animation
 		- [√] infinite seq loop length
-		- [x] rate knob on infinite sequencer
-			- removed for now, not sure how to implement
 		- [√] release all notes on stop
 		- [√] stopping song shouldn't release notes being played by user
 		- what does ableton do when you stop and there is a note with a really long release
@@ -81,14 +65,6 @@
 		- [√] make instrument params affect currently playing notes
 			- [√] pan
 			- [√] filter
-			- [x] attack
-				- chrome bug preventing impl
-				- how?
-				- cancelAndHold?
-				- how to know when to adjust?
-				- [ ] applyEnvelope function
-			- [x] release
-				- chrome bug preventing impl
 			- [√] detune
 			- [√] osc type
 				- [√] normal

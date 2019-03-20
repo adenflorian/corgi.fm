@@ -315,6 +315,34 @@ instrument manager already handles all creation and destruction of instruments
 - [√] center master clock node vertically in create server stuff
 - [ ] allow moving multiple nodes at once (like blender or unit shader graph?)
 
+# Note Scanner
+- [ ] master clock play button animation
+- [ ] handle conflicting note lengths scenarios
+	- low priority
+	- scenario A
+		- steps
+			- 2 sequencers going to same synth
+			- 1 note in each, same note, same start, but different length
+		- expected
+			- only the shorter note should be played, every time (ableton way)
+	- scenario B
+		- 2 sequencers going to same synth
+		- seq A [== ===  ]
+		- seq B [==== == ]
+		- exp   [== = =  ] (ableton)
+		- act   varies
+- [ ] make instrument params affect currently playing notes
+	- [ ] attack
+		- [ ] chrome bug preventing impl
+		- how?
+		- cancelAndHold?
+		- how to know when to adjust?
+		- [√] applyEnvelope function
+	- [ ] release
+		- [ ] chrome bug preventing impl
+- [ ] rate knob on infinite sequencer
+	- removed for now, not sure how to implement
+
 # Bugs
 - [√] shift click note not showing on other clients
 - [√] long usernames mess up the keyboard
