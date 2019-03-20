@@ -3,8 +3,10 @@ import * as MidiWriter from 'midi-writer-js'
 import {Dispatch, Middleware, MiddlewareAPI} from 'redux'
 import {
 	EXPORT_SEQUENCER_MIDI, IClientAppState, isEmptyEvents,
-	selectAllSequencers, SequencerAction, sequencerActions,
+	selectAllSequencers, selectConnectionsWithSourceIds,
+	SequencerAction, sequencerActions, STOP_SEQUENCER,
 } from '../common/redux/index'
+import {getAllInstruments} from './instrument-manager'
 
 export const createSequencerMiddleware = () => {
 
@@ -15,6 +17,8 @@ export const createSequencerMiddleware = () => {
 			switch (action.type) {
 				case EXPORT_SEQUENCER_MIDI:
 					return exportSequencerMidi(action, store)
+				case STOP_SEQUENCER:
+					return handleStopSequencer(action, store)
 			}
 		}
 
@@ -62,4 +66,16 @@ function exportSequencerMidi(
 	const write = new MidiWriter.Writer([midiSequencer])
 
 	saveAs(write.dataUri(), sequencer.name + '.mid')
+}
+
+function handleStopSequencer(
+	action: ReturnType<typeof sequencerActions.stop>,
+	store: MiddlewareAPI<Dispatch, IClientAppState>,
+) {
+	const instruments = getAllInstruments()
+
+	selectConnectionsWithSourceIds(store.getState().room, [action.id])
+		.map(x => instruments.get(x.targetId))
+		.filter(x => x !== undefined)
+		.forEach(x => x!.releaseAllScheduledFromSourceId(action.id))
 }
