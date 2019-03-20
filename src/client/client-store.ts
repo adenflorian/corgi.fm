@@ -1,7 +1,7 @@
 import {applyMiddleware, createStore, Store} from 'redux'
 import {composeWithDevTools} from 'redux-devtools-extension/developmentOnly'
 import {
-	createGridSequencerPlayerMiddleware,
+	createSequencerMiddleware,
 	getActionsBlacklist, getClientReducers, IClientAppState,
 } from '../common/redux'
 import {connectionsClientMiddleware} from './connections-middleware'
@@ -21,7 +21,7 @@ export function configureStore(initialState: Partial<IClientAppState> = {})
 		composeEnhancers(
 			applyMiddleware(
 				createLocalMiddleware(),
-				createGridSequencerPlayerMiddleware(),
+				createSequencerMiddleware(),
 				connectionsClientMiddleware,
 				websocketSenderMiddleware,
 			),

@@ -7,9 +7,9 @@ import {
 } from './index'
 import {isEmptyEvents} from './index'
 
-export const createGridSequencerPlayerMiddleware = () => {
+export const createSequencerMiddleware = () => {
 
-	const gridSequencerPlayerMiddleware: Middleware<{}, IClientAppState> = store => next => action => {
+	const sequencerMiddleware: Middleware<{}, IClientAppState> = store => next => action => {
 		next(action)
 
 		switch (action.type) {
@@ -18,7 +18,7 @@ export const createGridSequencerPlayerMiddleware = () => {
 		}
 	}
 
-	return gridSequencerPlayerMiddleware
+	return sequencerMiddleware
 }
 
 function exportSequencerMidi(
@@ -33,7 +33,7 @@ function exportSequencerMidi(
 	if (events.count() === 0) return
 	if (isEmptyEvents(events)) return
 
-	const midiGridSequencer = new MidiWriter.Track()
+	const midiSequencer = new MidiWriter.Track()
 
 	const duration = '8'
 
@@ -51,14 +51,14 @@ function exportSequencerMidi(
 		return x
 	})
 
-	midiGridSequencer.setTempo(120)
+	midiSequencer.setTempo(120)
 
-	midiGridSequencer.addEvent(
+	midiSequencer.addEvent(
 		eventsToMidi,
 		// () => ({sequential: true}),
 	)
 
-	const write = new MidiWriter.Writer([midiGridSequencer])
+	const write = new MidiWriter.Writer([midiSequencer])
 
 	saveAs(write.dataUri(), sequencer.name + '.mid')
 }
