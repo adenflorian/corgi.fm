@@ -25,7 +25,7 @@
 			- [√] check performance
 		- [√] make note-scanner use note length from event
 		- [√] stopping a specific sequencer should immediately cancel scheduled notes from that sequencer
-		- [ ] fix ctrl space
+		- [√] fix ctrl space
 		- [ ] handle conflicting note lengths scenarios
 			- scenario A
 				- steps

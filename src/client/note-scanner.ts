@@ -37,6 +37,8 @@ let currentSongTimeBeats = 0
 let lastAudioContextTime = 0
 let _justStarted = false
 let songStartTimeSeconds = 0
+/** Used for knowing when to restart */
+let _playCount = 0
 
 let _sequencersInfo = Map<string, {loopRatio: number}>()
 
@@ -56,7 +58,7 @@ function scheduleNotes() {
 	const roomState = _store.getState().room
 
 	const {
-		isPlaying, bpm, maxReadAheadSeconds,
+		isPlaying, bpm, maxReadAheadSeconds, playCount,
 	} = selectGlobalClockState(roomState)
 
 	const actualBPM = Math.max(0.000001, bpm)
@@ -85,9 +87,10 @@ function scheduleNotes() {
 
 	currentSongTimeBeats += deltaBeats
 
-	if (_justStarted) {
+	if (_justStarted || _playCount !== playCount) {
 		currentSongTimeBeats = 0
 		_cursorBeats = 0
+		_playCount = playCount
 	}
 
 	const maxReadAheadBeats = toBeats(maxReadAheadSeconds)
