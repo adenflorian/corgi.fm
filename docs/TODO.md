@@ -1,57 +1,22 @@
 # TODO
-- [√] only left click to play note
-- [√] put z and x markings for octave
-- [√] don't show keyboard letters on the track or remote keyboards
-- [√] made virtual keyboard keys clickable
-- [√] only unpress note when mouse moves out if left mouse button is down
-- [√] use shift to hold down keys when clicking keyboard
-- [√] figure out how to share code between client and server
-- [√] four note track, only one possible note and length
-- [√] allow two different notes at once
-- [√] setup redux for server
-- [√] have server keep track of play status
 - [ ] store index of simpleGridSequencer on server for new clients
-- [√] need way to bypass virtual keyboard
 - [ ] fine grained note start times and lengths
-- [√] don't unnecessarily change osc freq when diff notes are set
-- [√] make it so you have to click on keyboard first for the hold and play to work
-- [√] visual for instrument
-- [√] visual for master volume amp thing
 - [ ] midi timeline thing
 - [ ] maybe use automerge? https://github.com/automerge/automerge
-- [√] maybe use requestAnimationFrame()
 - [ ] make use of `'` key
 - [...] add `+` and `-` for octave
 	- [ ] [bug] pressing shift `=` (`+`) increases the octave by 2
 - [ ] create way for user to decide whether they want changing virtual keyboard octaves to change currently playing notes or not
-- [√] persist keyboard state on server, and don't store notes and octaves on clients
-- [ ] TONE.js (on hold, not needed so far)
-	- [√] master volume
-	- [ ] synth
-	- [ ] sampler
-	- [ ] sequencer data structures
 - [ ] immer js
-- [...] ADSR
-	- [√] A
-	- [ ] D
-	- [ ] S
-	- [√] R
-- [√] track mouse pointers
 - [ ] LFO
 - [ ] Automation
-- [√] triangle wave
 - [ ] different filter types
 - [ ] arp
 - [ ] keyboard keys to adjust synth params
-- [√] noise wave type
-	- https://noisehack.com/generate-noise-web-audio-api
-- [ ] LFO
 - [ ] make a simple version that's just keyboards, or a single keyboard
-- [√] op1 arp sequencer thing
 - [ ] have a midi library
 - [ ] mute audio on join and show popup letting know user that it might be loud
 - [ ] let players send hearts and claps and stuff to show that they like what the person is playing
-- [√] disallow browsers that aren't chrome
 - [ ] offline mode
 - [ ] simple mode
 - [ ] make usable on mobile
@@ -67,8 +32,6 @@
 	- so chrome auto updating can't break the whole app
 - [ ] turn off audio after 30 minutes and show dialog asking if user is still there
 - [ ] note velocity from external midi keyboard
-- [ ] program velocity into sequencer
-- [ ] download an open source font
 - [ ] Define purpose/goals/mission of this app
 	- collaboration
 	- learning?
@@ -105,21 +68,25 @@
 - [ ] show build datetime in tooltip on version in bottom right
 - [ ] twitch makes music
 	- stream shamu that listens to commands from twitch chat
-- [ ] show user where there keyboard is when the join a room
-- [ ] dont delete users stuff immediately on disconnect, have a grace period or something in case they reconnect quickly
+- [ ] don't delete users stuff immediately on disconnect, have a grace period or something in case they reconnect quickly
+- [ ] notification/flash/toast system for displaying system messages
+	- or put these messages in chat like how an MMO does it?
+	- like vscode notifications in bottom right
+	- some will fade away automatically
+	- others require user interaction
 
 # Optimizations
-- [ ] use debounce for some network updates like mouse cursors and node positions?
+- [√] use debounce for some network updates like mouse cursors and node positions?
 
 # DevOps
 - [ ] figure out how to do `yarn build` without stopping parcel and the server
 
 # Shared Cursors
-- [ ] make shared cursor not block pointer events
+- [√] make shared cursor not block pointer events
 - [√] use relative positioning like the connections so it doesn't have to rerender on scroll
-- [ ] optimize
-	- [ ] less updates over network
-	- [ ] less dispatches
+- [√] optimize
+	- [√] less updates over network
+	- [√] less dispatches
 - [ ] interpolate
 
 # Sampler
@@ -130,13 +97,13 @@
 - [ ] `tslint:all`
 
 # Connections
-- [ ] make it obvious which direction data flows
+- [ ] make it obvious which direction data flows when not playing (without an animation)
 - [√] brighten the connectors and line when data is going across it
 - [√] make them moveable
 - [√] fix invisible long line when vertical (kind of fixed by only being curved lines now?)
 - [√] make input connector look like a stack cable when multiple inputs
 - [√] animate dashed ghost connector
-- [ ] animate active connections in the direction that data is flowing
+- [√] animate active connections in the direction that data is flowing
 - [ ] show ghost connector for adding connections when mouse is near, and put it at top of connector stack, don't require ctrl to be held down
 - [ ] have a node that hands out connections
 	- [ ] like a needle cushion
@@ -161,42 +128,9 @@ possible starting points:
 - creating new connections from the output of a node
 
 - [ ] adding new connections
-	- [√] control click and drag on connector to mak new connector
+	- [√] control click and drag on connector to make new connector
 	- [ ] show icon with message when hovering over a connector saying to hold control to add new connection
 	- [ ] allow making new connections from a node with no connections on it
-
-## Updating web audio graph
-when i break the connection from an instrument to the audio output i want sound to stop
-i want the instrument to disconnect from w/e audio node it is connected to
-
-- [√] give instruments a disconnect and connect function
-
-connections middleware?
-when a connection source or target is changed, or is a new connection or a connection was deleted
-if the source or target of the connection was changed, (or new or deleted conection)
-	then call the necessary functions on the instruments involved to update the web audio graph
-	
-instrument manager?
-
-what are the types of nodes that have an audio graph component?
-- intruments
-- audio output
-- future
-	- effects
-	- audio inputs (microphone, external instruments)
-
-how to tell what to connect to what in the instrument manager?
-
-make Instrument implement the AudioNode interface?
-	pass through stuff to the underlying audio node
-
-make it so intsrument doesnt take a destination at construction
-instead all connections must be done my the instrument manager
-instrument manager already handles all creation and destruction of instruments
-- [√] when an instrument gets created, look to see if it has an outgoing connection
-- [√] see if connection is connected to anything
-- [√] see if connection target is an audio node thing?
-- [√] if it is, use the targets input audio node as the output audio node for the new instrument
 
 # Keyboard
 - [ ] do something to visualize external midi keyboard notes
@@ -205,15 +139,26 @@ instrument manager already handles all creation and destruction of instruments
 # Knob
 - [ ] Allow for arc to go both directions
 	- like a pan knob, when centered should have no arc, and arc can go left or right from center
+- [ ] show value somewhere around label
+- [ ] different knob style depending on size (like ableton)
+	- small
+	- medium
+	- large
 
-# Sequencers
+# References
+- https://github.com/grimmdude/MidiPlayerJS/blob/master/src/player.js
+
+# Nodes
+
+## Sequencers
 - [ ] limit undo history
 - [ ] redo button
 - [ ] click and drag midi to ableton from shamu
 - [ ] click and drag midi from ableton to shamu
 - [ ] click and drag midi files from computer to shamu
+- [ ] velocity
 
-## GridSequencer
+### GridSequencer
 - [ ] make size adjustable
 	- use react-draggable
 	- drop down with size options?
@@ -221,26 +166,57 @@ instrument manager already handles all creation and destruction of instruments
 - [ ] input notes from keyboard
 - [ ] allow using scroll wheel
 
-### GridSequencer Scroll Bar
+#### GridSequencer Scroll Bar
 - [ ] make slider stay with mouse 1:1
 - [√] mini map
 
-## Infinite Sequencer
+### Infinite Sequencer
 - [ ] click and drag notes left and right to change order, up and down to change note
 - [√] find better way to clear notes
 - [ ] fix recording and playing at same time
 	- what is this problem?
 	- when recording, it records notes from all users at same time
 	- [ ] need to make it only record from specific users
+		- maybe require users to plug their keyboard into the sequencer?
 - [√] undo button
 - [√] record button should be red when recording
 - [√] backspace to undo note while recording
 
-# References
-- https://github.com/grimmdude/MidiPlayerJS/blob/master/src/player.js
+### Future Sequencers
+- [ ] full featured piano roll midi editor like ableton
+- [ ] something that randomly generates notes
+- [ ] scriptable? like you program it with text
+- [ ] cthulu
 
-# BasicSynthesizer
+## Instruments
+- [...] ADSR
+	- [√] A
+	- [ ] D
+	- [ ] S
+	- [√] R
+- [ ] velocity
+- [ ] portamento
+
+### BasicSynthesizer
 - [√] voices still round robin, instead it should pick voices that aren't playing
+
+### BasicSampler
+
+### Future Instruments
+- [ ] drum rack
+- [ ] wavetable synth
+
+## Audio Effects
+- [ ] delay
+- [ ] filter
+- [ ] distortion
+- [ ] compressor
+	- OTT
+
+## Midi Effects
+- [ ] ARP
+- [ ] random
+- [ ] pitch
 
 # Rooms
 - [√] switch rooms
@@ -265,6 +241,9 @@ instrument manager already handles all creation and destruction of instruments
 	- [ ] advanced
 	- etc.
 - [ ] show member count for each room in room selector
+
+# Efficient Mode
+- [ ] notify user to lower graphics if low FPS
 
 # Global Clock
 - [√] clicking play should reset global index to 0
@@ -343,6 +322,15 @@ instrument manager already handles all creation and destruction of instruments
 - [ ] rate knob on infinite sequencer
 	- removed for now, not sure how to implement
 
+# Discord Feedback
+- [ ] For some sequencers, it plays the note when you place it. I'd like this, anyone else? (EliTheCoder)
+- [ ] you should make it so when you change the waveform it doesn't make it quieter (Huday)
+	- i need to change the gain knob to have some headroom
+	- so u can turn it up for quiet waves
+	- ill compare it to serum as well
+- [ ] maybe make so if you press backspace when hovering over a knob, it resets it to its default state (EliTheCoder)
+- [ ] mute button next to audio output
+
 # Bugs
 - [√] shift click note not showing on other clients
 - [√] long usernames mess up the keyboard
@@ -390,6 +378,9 @@ instrument manager already handles all creation and destruction of instruments
 	- [ ] monetization?
 	- [ ] open source?
 	- [ ] roadmap?
+- [ ] show user where their keyboard is when the join a room
+- [ ] pick final product name
+- [ ] get domain
 
 # Ballad
 - [ ] login system
@@ -403,5 +394,3 @@ instrument manager already handles all creation and destruction of instruments
 - [...] export midi
 - [ ] import midi
 - [...] Docker?
-- [ ] pick final product name
-- [ ] get domain

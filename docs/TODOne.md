@@ -1,11 +1,114 @@
+## Updating web audio graph
+when i break the connection from an instrument to the audio output i want sound to stop
+i want the instrument to disconnect from w/e audio node it is connected to
+
+- [√] give instruments a disconnect and connect function
+
+connections middleware?
+when a connection source or target is changed, or is a new connection or a connection was deleted
+if the source or target of the connection was changed, (or new or deleted connection)
+	then call the necessary functions on the instruments involved to update the web audio graph
+	
+instrument manager?
+
+what are the types of nodes that have an audio graph component?
+- instruments
+- audio output
+- future
+	- effects
+	- audio inputs (microphone, external instruments)
+
+how to tell what to connect to what in the instrument manager?
+
+make Instrument implement the AudioNode interface?
+	pass through stuff to the underlying audio node
+
+make it so instrument doesn't take a destination at construction
+instead all connections must be done my the instrument manager
+instrument manager already handles all creation and destruction of instruments
+- [√] when an instrument gets created, look to see if it has an outgoing connection
+- [√] see if connection is connected to anything
+- [√] see if connection target is an audio node thing?
+- [√] if it is, use the targets input audio node as the output audio node for the new instrument
+
+- [√] make an ECS system for real time stuff
+	- real time loop that reads redux state, or some other state, and renders stuff to canvases and what not
+	- have a component for rendering to a canvas, one for DOM, text, audio even, etc.
+- [√] allow panning by clicking and dragging background
+- [√] add low graphics setting
+- [√] remove read ahead knob
+- [√] maybe unpress all key when app loses focus
+- [√] hook up note-scanner with everything
+	- [√] change sequencer state to whole new stuff
+	- [√] respect sequencer isPlaying
+	- [√] get sampler to support scheduled notes
+	- [√] prevent multiple oscillators/voices on same instrument from playing same note at same time, including releasing
+	- [√] make option for displaying note scheduler visual debug thing
+		- [√] make option
+		- places to toggle:
+			- [√] synth view tsx
+			- [√] in the visual tsx file
+	- [√] get stuff working again
+		- [√] keyboard
+			- [√] computer keyboard
+			- [√] mouse
+				- this is a bit tricky
+				- need logic in local middleware, but that logic is currently only for local user
+			- [√] midi keyboard
+			- [√] check performance
+		- [√] make note-scanner use note length from event
+		- [√] stopping a specific sequencer should immediately cancel scheduled notes from that sequencer
+		- [√] fix ctrl space
+		- [√] sequencer animations
+			- css animation
+				- cons
+					- little control
+					- hard to keep perfectly in sync
+				- pros
+					- simple?
+					- little code
+				- notes
+					- who should render it?
+						- the sequencer?
+							- annoying to redo on all new sequencers
+							- don't have to since it's absolutely positioned
+						- something else?
+			- javascript/canvas
+				- haven't done this yet
+			- javascript/svg
+				- have done, but its sloppy
+			- [√] ECS
+				- could take a while to get started
+				- [√] remove all but one RAF loop
+				- [√] render a square at each node position
+				- [√] one canvas per graph node
+				- [√] squares should be in front of nodes
+				- [√] line should only cover notes area
+				- [√] only sequencers
+				- [√] only when playing
+				- [√] go with song
+				- [√] merge ecs with scan room toggle thing
+		- [√] infinite seq loop length
+		- [√] release all notes on stop
+		- [√] stopping song shouldn't release notes being played by user
+		- what does ableton do when you stop and there is a note with a really long release
+			- it just keeps on releasing, even when you hit play again
+			- but you can adjust release of note that are already releasing, in serum at least
+		- [√] get noise osc on synth working with schedules
+		- [√] make instrument params affect currently playing notes
+			- [√] pan
+			- [√] filter
+			- [√] detune
+			- [√] osc type
+				- [√] normal
+				- [√] noise
+	- [√] animate active connections in the direction that data is flowing
 - [√] put limits on virtual keyboard octave
 - [√] add gain knob on instruments
-
 - [√] show version and "pre-alpha" in bottom right
 	- [√] make red if client out of date
 	- [√] clicking on it when version mismatch reloads
 	- [√] tooltip
-
 - [√] prevent multiple oscillators/voices on same instrument from playing same note at same time, including releasing
 	- i have all the info i need to be able to do this right?
 		- note start times
@@ -39,7 +142,6 @@
 			- also, when user releases key, ti will trigger release of currently playing note, regardless of who started the note
 	- what does tone.js do?
 		- i dont have an easy way to test this, but i think tone.js will just play whatever you tell it to
-
 - [ ] get stuff working again
 	- [...] keyboard
 		- i want lowest latency possible for live keyboard playing
@@ -166,3 +268,29 @@ union events from the input sequencers and schedule them
 	- [√] 'Maximum call stack size exceeded' issue again with looped connections
 		- sampler -> reverb -> same sampler
 
+
+- [√] download an open source font (Roboto)
+- [√] disallow browsers that aren't chrome
+- [√] op1 arp sequencer thing
+- [√] noise wave type
+	- https://noisehack.com/generate-noise-web-audio-api
+- [√] triangle wave
+- [√] track mouse pointers
+- [√] maybe use requestAnimationFrame()
+- [√] persist keyboard state on server, and don't store notes and octaves on clients
+- [√] only left click to play note
+- [√] put z and x markings for octave
+- [√] don't show keyboard letters on the track or remote keyboards
+- [√] made virtual keyboard keys clickable
+- [√] only unpress note when mouse moves out if left mouse button is down
+- [√] use shift to hold down keys when clicking keyboard
+- [√] figure out how to share code between client and server
+- [√] four note track, only one possible note and length
+- [√] allow two different notes at once
+- [√] setup redux for server
+- [√] have server keep track of play status
+- [√] need way to bypass virtual keyboard
+- [√] don't unnecessarily change osc freq when diff notes are set
+- [√] make it so you have to click on keyboard first for the hold and play to work
+- [√] visual for instrument
+- [√] visual for master volume amp thing
