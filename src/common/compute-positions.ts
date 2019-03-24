@@ -11,28 +11,34 @@ export function calculatePositionsGivenConnections(positions: IPositions, connec
 	const connectionsToMasterAudioOutput = selectConnectionsWithTargetIds2(connections, [MASTER_AUDIO_OUTPUT_TARGET_ID]).toList()
 
 	const newPositions = originalPositions.withMutations(mutablePositions => {
-		const xSpacing = 128
-		const ySpacing = 192
+		const columnWidth = 128
+		const rowHeight = 192
 
+		// Center root node
 		mutablePositions.update(MASTER_AUDIO_OUTPUT_TARGET_ID, x => ({...x, x: 0, y: 0}))
 
-		const calculatePosition = (prevX = 0, prevY = 0) => (connection: IConnection, i: number) => {
-			const position = mutablePositions.get(connection.sourceId)!
-			const newX = Math.min(prevX - position.width - xSpacing, position.x)
-			mutablePositions.update(
-				connection.sourceId,
-				z => ({
-					...z,
+		const calculatePosition = (parentX = 0, parentRow = 0) => (connectionToParent: IConnection, currentRow: number) => {
+			const currentId = connectionToParent.sourceId
+
+			const currentPosition = mutablePositions.get(currentId)!
+
+			const newX = Math.min(parentX - currentPosition.width - columnWidth, currentPosition.x)
+
+			mutablePositions.set(
+				currentId,
+				{
+					...currentPosition,
 					x: newX,
-					y: (i * ySpacing) + (prevY * ySpacing) - (position.height / 2),
-				}),
+					y: (currentRow * rowHeight) + (parentRow * rowHeight) - (currentPosition.height / 2),
+				},
 			)
-			selectConnectionsWithTargetIds2(connections, [connection.sourceId])
+
+			selectConnectionsWithTargetIds2(connections, [currentId])
 				.toList()
-				.forEach(calculatePosition(newX, i))
+				.forEach(calculatePosition(newX, currentRow))
 		}
 
-		connectionsToMasterAudioOutput.forEach(calculatePosition(mutablePositions.get(MASTER_AUDIO_OUTPUT_TARGET_ID)!.width - xSpacing, 0))
+		connectionsToMasterAudioOutput.forEach(calculatePosition(mutablePositions.get(MASTER_AUDIO_OUTPUT_TARGET_ID)!.width - columnWidth, 0))
 	})
 
 	// Centering graph
