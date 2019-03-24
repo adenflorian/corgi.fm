@@ -96,6 +96,14 @@
 - [√] use `strictNullChecks` typescript config
 - [ ] `tslint:all`
 
+# Refactoring
+- [ ] new graph state
+	- [√] move reducers for the different node types under the shamu graph reducer, but keep them separate
+	- [ ] update positions calculations to update positions in new graph state
+		- keeping positions state where it is for now, the important thing is the actual node types
+	- [ ] change all the old multi things to use new graph state
+		- [ ] change selectors to grab from new graph state
+
 # Connections
 - [ ] make it obvious which direction data flows when not playing (without an animation)
 - [√] brighten the connectors and line when data is going across it
@@ -111,6 +119,10 @@
 	- now shows grab icon when moving, but hand icon on hover is too big
 - [ ] visually differentiate between midi and audio connections (and both)
 - [ ] allow temporarily disabling a connection
+- [ ] allow adding connections from a node with no connections on it already
+	- [ ] split up ConnectionView
+		- [ ] Connector component
+		- [ ] ConnectionLine component
 
 ## Adding/Changing/Removing Connections
 should anything allow multiple incoming connections?
@@ -135,6 +147,8 @@ possible starting points:
 # Keyboard
 - [ ] do something to visualize external midi keyboard notes
 - [ ] show icon or something to show which users are using an external midi keyboard
+- [ ] don't change current notes on keyboard when changing octave (at least not by default; something to put in options?)
+	- not sure if possible/easy to make this an option
 
 # Knob
 - [ ] Allow for arc to go both directions
@@ -212,6 +226,8 @@ possible starting points:
 - [ ] distortion
 - [ ] compressor
 	- OTT
+- [ ] look into using an algorithmic reverb
+	- https://itnext.io/algorithmic-reverb-and-web-audio-api-e1ccec94621a
 
 ## Midi Effects
 - [ ] ARP
