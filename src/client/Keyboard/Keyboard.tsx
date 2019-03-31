@@ -117,7 +117,10 @@ export class Keyboard extends React.PureComponent<IKeyboardAllProps, IKeyboardSt
 					}
 				</div>
 				{virtualMidiKeyboard.map((value, index) => {
-					const isKeyPressed = pressedMidiKeys.some(x => x === index)
+					const isKeyPressed = pressedMidiKeys
+						.map(x => x >= virtualMidiKeyboard.length ? x % 12 : x)
+						.some(x => x === index)
+
 					return (
 						<div
 							key={index}
