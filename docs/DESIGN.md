@@ -1,4 +1,4 @@
-sha-mu design
+corgi.fm design
 =============
 
 # Goals

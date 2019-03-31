@@ -1,4 +1,4 @@
-How extensible is sha-mu?
+How extensible is corgi.fm?
 =========================
 
 Let's say we want to make a new audio effect node called Delay (*folder* **new file**):
