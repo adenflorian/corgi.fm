@@ -1,6 +1,6 @@
 {
   "name": "sha-mu",
-  "version": "0.2.18",
+  "version": "0.2.19",
   "main": "server.js",
   "license": "UNLICENSED",
   "scripts": {
@@ -24,8 +24,8 @@
     "build-client": "parcel build src/client/index.html src/client/newsletter.html --out-dir built/public --no-source-maps",
     "build-server": "tsc --project src/server/tsconfig.json --outDir built --noEmit false",
     "build-other": "cp package.json yarn.lock built && cp src/public/* built/public",
-    "build-docker": "docker build -t shamu .",
-    "start-docker": "yarn build-docker && docker run -p 3000:3000 shamu",
+    "build-docker": "docker build -t corgi.fm .",
+    "start-docker": "yarn build-docker && docker run -p 3000:3000 corgi.fm",
     "setup-test-server": "bash scripts/setup-test-server.sh",
     "setup-prod-server": "bash scripts/setup-prod-server.sh"
   },
