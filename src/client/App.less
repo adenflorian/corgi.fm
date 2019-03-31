@@ -3,6 +3,8 @@
 
 body {
     background-color: @appBackground;
+    color: @defaultGray;
+    font-family: 'Roboto', sans-serif;
     overflow: auto;
     .unselectable();
 }
@@ -20,10 +22,6 @@ body {
     text-align: center;
     letter-spacing: 2px;
     .textShadow()
-}
-
-* {
-    font-family: inherit;
 }
 
 #title {
@@ -230,4 +228,35 @@ svg {
 .disabled {
     .readonly();
     pointer-events: none;
+}
+
+// Cookie consent
+.cc-bottom {
+    bottom: 3em;
+}
+.cc-right {
+    right: 1em;
+}
+
+.cc-revoke, .cc-window {
+    position: fixed;
+    overflow: hidden;
+    box-sizing: border-box;
+    font-family:inherit;
+    font-size: 16px;
+    line-height: 1.5em;
+    display: flex;
+    flex-wrap: nowrap;
+    z-index: 9999;
+}
+.cc-window.cc-floating {
+    padding: 2em;
+    max-width: 24em;
+    -ms-flex-direction: column;
+    flex-direction: column;
+}
+.cc-link {
+    opacity: .8;
+    display: inline-block;
+    padding: 0;
 }

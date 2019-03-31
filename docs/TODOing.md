@@ -1,9 +1,9 @@
 # Now
 - [√] external midi notes should always highlight keys
 	- [ ] but make it make more sense, like visualize the octave somehow
+- [√] add cookies banner thing for GDPR
 
 # Soon
-- [ ] add cookies banner thing for GDPR
 - [ ] increase room deletion timeout
 	- [ ] and make it so it's actually based on room lifetime instead of a loop
 - [ ] put sequencer timeline animation as separate setting in options

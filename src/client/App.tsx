@@ -3,8 +3,10 @@ import {hot} from 'react-hot-loader'
 import {connect} from 'react-redux'
 import {selectIsLocalClientReady} from '../common/redux'
 import {IClientAppState} from '../common/redux'
-import './App.less'
+// css-reset must be first
 import './css-reset.css'
+// tslint:disable-next-line:ordered-imports
+import './App.less'
 import {isLocalDevClient} from './is-prod-client'
 import {OnlineApp} from './OnlineApp'
 import {Options} from './Options/Options'

@@ -8,6 +8,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" type="image/png" href="../public/favicon.ico" />
     <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+    <link rel="stylesheet" type="text/css"
+        href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.1.0/cookieconsent.min.css" />
+    <script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.1.0/cookieconsent.min.js"></script>
+    <script>
+        window.addEventListener("load", function () {
+            window.cookieconsent.initialise({
+                palette: {
+                    popup: {
+                        background: "#282832",
+                        text: "#CDCBE1"
+                    },
+                    button: {
+                        background: "transparent",
+                        text: "#CDCBE1",
+                        border: "#CDCBE1"
+                    }
+                },
+                position: "bottom-right",
+                content: {
+                    // header: 'header',
+                    message: 'corgi.fm uses cookies for google analytics',
+                    dismiss: 'Okay',
+                    // allow: 'Allow cookies',
+                    // deny: 'Decline',
+                    // link: 'Learn more',
+                    // href: 'http://cookiesandyou.com',
+                    // close: '&#x274c;',
+                    // policy: 'Cookie Policy',
+                    // target: '_blank',
+                }
+            })
+        });
+    </script>
 </head>
 
 <body>
