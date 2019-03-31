@@ -29,5 +29,4 @@ const _getPath = () => window.location.pathname.replace('/', '')
 
 export const isECSEnabled = () => isNewNoteScannerEnabled()
 
-export const isNewNoteScannerEnabled = () => _isNewNoteScannerEnabled
-const _isNewNoteScannerEnabled = _getPath() === 'scan'
+export const isNewNoteScannerEnabled = () => true

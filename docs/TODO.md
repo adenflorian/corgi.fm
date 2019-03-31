@@ -150,6 +150,7 @@ possible starting points:
 - [ ] show icon or something to show which users are using an external midi keyboard
 - [ ] don't change current notes on keyboard when changing octave (at least not by default; something to put in options?)
 	- not sure if possible/easy to make this an option
+- [ ] can you make it when you change the octave it doesn't affect notes from a midi keyboard
 
 # Knob
 - [ ] Allow for arc to go both directions
