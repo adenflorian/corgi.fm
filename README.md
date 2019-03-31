@@ -1,6 +1,7 @@
-# sha-mu
-Real time online music collaboration.
-"Multiplayer DAW".
+# corgi.fm
+Collaborative Online Real-time Graphical Interface For Music
+
+A "multiplayer DAW"
 
 ## Required Software
 - node 10.14.1

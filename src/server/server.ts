@@ -29,4 +29,4 @@ const port = 3000
 
 server.listen(port)
 
-logger.log('shamu server listening on port ' + port)
+logger.log('corgi.fm server listening on port ' + port)

@@ -4,7 +4,7 @@ BUGS
 - [ ] filters getting stuck
 - [ ] changing room thru selector doesn't completely pick up new user name if changed in previous room?
 - [ ] when hooking up reverb and changing filter to 0 it can cause a loud sound which triggers the master volume safety
-- [ ] when ableton is open, shamu wont recognize midi keyboard
+- [ ] when ableton is open, corgi.fm wont recognize midi keyboard
 - [ ] when 2 people join around same time, they spawn on top of each other
 - starting in a legacy room, then switching to scan room thru room selector, no bpm knob
 	- wont fix, legacy will be gone soon, not easy to fix

@@ -49,7 +49,7 @@
 - [ ] make instruments that run around the screen
 	- nyan cat
 - [ ] try to use decorators on action types to generate a giant combined action type
-- [ ] when someone first joins, show them a list of demos that that can copy into a new room to quickly show people what shamu can do
+- [ ] when someone first joins, show them a list of demos that that can copy into a new room to quickly show people what corgi.fm can do
 - [ ] on the borwser warning screen, show why chrome is the only supported browser, like what is missing from firefox
 - [ ] use gzip on nginx
 	- https://expressjs.com/en/advanced/best-practice-performance.html#use-gzip-compression
@@ -67,13 +67,14 @@
 	- a node group that can have multiple nodes stacked on top of eachother with them connecting top down
 - [ ] show build datetime in tooltip on version in bottom right
 - [ ] twitch makes music
-	- stream shamu that listens to commands from twitch chat
+	- stream corgi.fm that listens to commands from twitch chat
 - [ ] don't delete users stuff immediately on disconnect, have a grace period or something in case they reconnect quickly
 - [ ] notification/flash/toast system for displaying system messages
 	- or put these messages in chat like how an MMO does it?
 	- like vscode notifications in bottom right
 	- some will fade away automatically
 	- others require user interaction
+- [ ] highlight keys in the current key
 
 # Optimizations
 - [√] use debounce for some network updates like mouse cursors and node positions?
@@ -167,9 +168,9 @@ possible starting points:
 ## Sequencers
 - [ ] limit undo history
 - [ ] redo button
-- [ ] click and drag midi to ableton from shamu
-- [ ] click and drag midi from ableton to shamu
-- [ ] click and drag midi files from computer to shamu
+- [ ] click and drag midi to ableton from corgi.fm
+- [ ] click and drag midi from ableton to corgi.fm
+- [ ] click and drag midi files from computer to corgi.fm
 - [ ] velocity
 
 ### GridSequencer

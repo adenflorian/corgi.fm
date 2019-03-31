@@ -1,9 +1,9 @@
-# /etc/nginx/sites-available/shamu-test.adenflorian.com
+# /etc/nginx/sites-available/corgi.fm
 server {
-	root /var/www/shamu-test.adenflorian.com/html;
+	root /var/www/corgi.fm/html;
 	index index.html index.htm index.nginx-debian.html;
 
-	server_name shamu-test.adenflorian.com;
+	server_name corgi.fm;
 
 	location / {
 		proxy_pass http://localhost:3000;
@@ -14,6 +14,22 @@ server {
 		proxy_set_header Host $host;
 		proxy_cache_bypass $http_upgrade;
 	}
+
+	listen 443 ssl; # managed by Certbot
+	ssl_certificate /etc/letsencrypt/live/corgi.fm/fullchain.pem; # managed by Certbot
+	ssl_certificate_key /etc/letsencrypt/live/corgi.fm/privkey.pem; # managed by Certbot
+	include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+	ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+}
+
+server {
+	if ($host = corgi.fm) {
+		return 301 https://$host$request_uri;
+	} # managed by Certbot
+
+	server_name corgi.fm;
+	listen 80;
+	return 404; # managed by Certbot
 }
 
 # /etc/nginx/nginx.conf
