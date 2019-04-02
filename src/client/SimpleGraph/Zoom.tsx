@@ -44,7 +44,7 @@ export class Zoom extends React.PureComponent<IZoomAllProps, IZoomState> {
 	}
 
 	public componentDidMount() {
-		window.addEventListener('wheel', this._onMouseWheel)
+		window.addEventListener('wheel', this._onMouseWheel, {passive: false})
 		window.addEventListener('mousemove', this._onMouseMove)
 	}
 
