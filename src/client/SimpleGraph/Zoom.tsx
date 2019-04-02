@@ -1,8 +1,10 @@
 import * as React from 'react'
-import {AppOptions, selectOption, selectOptions} from '../../common/redux'
+import {selectOptions} from '../../common/redux'
 import {shamuConnect} from '../../common/redux'
 import PlusSVG from '../OtherSVG/plus.svg'
 import {simpleGlobalClientState} from '../SimpleGlobalClientState'
+import {zoomBackgroundClass, backgroundMenuId} from '../client-constants'
+import {ContextMenuTrigger} from 'react-contextmenu'
 
 interface IZoomProps {
 	children: React.ReactNode
@@ -157,18 +159,24 @@ interface ZoomBgProps {
 const ZoomBackground = React.memo(
 	function _ZoomBackground({onMouseEvent}: ZoomBgProps) {
 		return (
-			<div
-				className="zoomBackground"
-				style={{
-					position: 'fixed',
-					width: `${bgSize}vw`,
-					height: `${bgSize}vh`,
-					top: `-${bgSize / 2}vh`,
-					left: `-${bgSize / 2}vw`,
-					backgroundImage: `url(${PlusSVG})`,
-				}}
-				onMouseDown={onMouseEvent}
-			/>
+			// @ts-ignore disableIfShiftIsPressed
+			<ContextMenuTrigger
+				id={backgroundMenuId}
+				disableIfShiftIsPressed={true}
+			>
+				<div
+					className={zoomBackgroundClass}
+					style={{
+						position: 'fixed',
+						width: `${bgSize}vw`,
+						height: `${bgSize}vh`,
+						top: `-${bgSize / 2}vh`,
+						left: `-${bgSize / 2}vw`,
+						backgroundImage: `url(${PlusSVG})`,
+					}}
+					onMouseDown={onMouseEvent}
+				/>
+			</ContextMenuTrigger>
 		)
 	},
 )

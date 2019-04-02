@@ -1,0 +1,41 @@
+@import '../colors.less';
+@import '../AppCommon.less';
+
+.react-contextmenu {
+	background-color: @panelGray;
+	min-width: 100px;
+	max-width: 400px;
+	min-height: 32px;
+	.boxShadow();
+
+	.contextMenuTop {
+		height: 16px !important;
+		background-color: @overlayGray;
+		font-size: 0.7em;
+		font-weight: 400;
+		box-shadow: 0 1px 1px rgb(24, 24, 24);
+		justify-content: center;
+
+		&:hover, &:active {
+			background-color: @knobGray !important;
+		}
+	}
+
+	.react-contextmenu-item {
+		height: 32px;
+		text-align: left;
+		display: flex;
+		align-items: center;
+		padding: 0 8px;
+		white-space: nowrap;
+		overflow: hidden;
+
+		&:hover {
+			background-color: @gray3;
+		}
+
+		&:active {
+			background-color: @blue;
+		}
+	}
+}

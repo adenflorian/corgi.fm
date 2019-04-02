@@ -1,7 +1,6 @@
 import {Seq} from 'immutable'
 import * as React from 'react'
-import {connect} from 'react-redux'
-import {IClientAppState} from '../../common/redux'
+import {shamuConnect} from '../../common/redux'
 import {selectAllPositionIds} from '../../common/redux'
 import {mainBoardsId} from '../client-constants'
 import {ConnectedConnections} from '../Connections/Connections'
@@ -16,8 +15,8 @@ interface ISimpleGraphReduxProps {
 
 const canvasSize = ECSCanvasRenderSystem.canvasSize
 
-export const SimpleGraph: React.FC<ISimpleGraphReduxProps> =
-	React.memo(function _SimpleGraph({positionIds}) {
+export const SimpleGraph =
+	function _SimpleGraph({positionIds}: ISimpleGraphReduxProps) {
 		return (
 			<div
 				className="simpleGraph"
@@ -56,10 +55,10 @@ export const SimpleGraph: React.FC<ISimpleGraphReduxProps> =
 		// (prev, next) => {
 		// 	return next.positionIds.count() === prev.positionIds.count()
 		// },
-	})
+	}
 
-export const ConnectedSimpleGraph = connect(
-	(state: IClientAppState): ISimpleGraphReduxProps => ({
+export const ConnectedSimpleGraph = shamuConnect(
+	(state): ISimpleGraphReduxProps => ({
 		positionIds: selectAllPositionIds(state.room),
 	}),
 )(SimpleGraph)

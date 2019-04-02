@@ -47,6 +47,7 @@
     "query-string": "^6.1.0",
     "rc-slider": "^8.6.1",
     "react": "^16.8.6",
+    "react-contextmenu": "^2.11.0",
     "react-dom": "^16.8.6",
     "react-draggable": "^3.2.1",
     "react-ga": "^2.5.6",

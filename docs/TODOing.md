@@ -2,6 +2,8 @@
 - [√] external midi notes should always highlight keys
 	- [ ] but make it make more sense, like visualize the octave somehow
 - [√] add cookies banner thing for GDPR
+- [ ] right click menu
+	- [ ] ContextMenu component
 
 # Soon
 - [ ] increase room deletion timeout

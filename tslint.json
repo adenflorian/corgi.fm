@@ -16,7 +16,7 @@
         "typedef": [
             true,
             "property-declaration",
-            "array-destructuring"
+            // "array-destructuring"
         ],
         "no-submodule-imports": [
             true,
