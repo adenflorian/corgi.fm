@@ -9,6 +9,7 @@ import {
 	IClientAppState, IServerState, selectLocalSocketId,
 	SELF_DISCONNECTED, SERVER_ACTION,
 } from './index'
+import {serverClientId} from '../common-constants';
 
 export const ADD_CLIENT = 'ADD_CLIENT'
 export type AddClientAction = ReturnType<typeof addClient>
@@ -74,7 +75,7 @@ export interface IClientState {
 export class ClientState implements IClientState {
 	public static createServerClient(): IClientState {
 		return {
-			id: 'server',
+			id: serverClientId,
 			socketId: 'server',
 			name: 'server',
 			color: 'rgb(89, 122, 166)',
