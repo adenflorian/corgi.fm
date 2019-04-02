@@ -10,6 +10,9 @@ module.exports = {
     "parserOptions": {
         "sourceType": "module",
     },
+    "plugins": [
+        "react-hooks"
+    ],
     "rules": {
         "indent": [
             "error",
@@ -28,5 +31,7 @@ module.exports = {
             "error",
             "never",
         ],
+        "react-hooks/rules-of-hooks": "error",
+        "react-hooks/exhaustive-deps": "warn"
     },
 };

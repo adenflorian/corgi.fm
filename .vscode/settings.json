@@ -83,6 +83,7 @@
         "initialise",
         "input",
         "keyframes",
+        "linebreak",
         "localstorage",
         "lowpass",
         "nginx",
