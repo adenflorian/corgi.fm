@@ -104,7 +104,13 @@ export type IPositionAction = AddPositionAction | DeletePositionsAction | NodeCl
 const positionsSpecificReducer: Reducer<IPositions, IPositionAction> =
 	(positions = Positions(), action) => {
 		switch (action.type) {
-			case ADD_POSITION: return sortPositions(positions.set(action.position.id, action.position))
+			case ADD_POSITION: return sortPositions(positions.set(
+				action.position.id,
+				{
+					...action.position,
+					zIndex: getNewZIndex(positions, 0),
+				}
+			))
 			case DELETE_POSITIONS: return sortPositions(positions.deleteAll(action.positionIds))
 			case DELETE_ALL_POSITIONS: return positions.clear()
 			case UPDATE_POSITIONS: return sortPositions(positions.merge(action.positions))
@@ -182,7 +188,7 @@ export function calculateExtremes(positions: IPositions) {
 
 const selectHighestZIndexOfAllPositionsLocal = createSelector(
 	(positions: IPositions) => positions,
-	positions => positions.reduce(maxPositionZIndex, Number.MIN_SAFE_INTEGER),
+	positions => positions.reduce(maxPositionZIndex, 0),
 )
 
 function maxPositionZIndex(highestZIndex: number, pos: IPosition) {
