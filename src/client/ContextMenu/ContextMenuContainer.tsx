@@ -3,11 +3,8 @@ import {backgroundMenuId} from '../client-constants';
 import {MenuItem, ContextMenu} from 'react-contextmenu';
 import './ContextMenu.less'
 import {
-	shamuConnect, addBasicSynthesizer, BasicSynthesizerState, addPosition,
-	makePosition, GridSequencerState, addGridSequencer,
-	BasicSamplerState, addBasicSampler,
-	InfiniteSequencerState, addInfiniteSequencer,
-	SimpleReverbState, addSimpleReverb
+	shamuConnect, addPosition,
+	makePosition, getAddableNodeInfos
 } from '../../common/redux';
 import {Dispatch, AnyAction} from 'redux';
 import {serverClientId} from '../../common/common-constants';
@@ -27,6 +24,43 @@ export function ContextMenuContainer({dispatch}: AllProps) {
 }
 
 const MenuItems = React.memo(function _MenuItems({dispatch}: {dispatch: Dispatch}) {
+	return (
+		<Fragment>
+			<TopMenuBar />
+			<AddNodeMenuItems />
+		</Fragment>
+	)
+
+	function TopMenuBar() {
+		return (
+			<MenuItem
+				attributes={{
+					className: 'contextMenuTop',
+					title: 'shift + right click to get browser context menu',
+				}}
+				preventClose={true}
+			>
+				do stuff
+			</MenuItem>
+		)
+	}
+
+	function AddNodeMenuItems() {
+		return (
+			<Fragment>
+				{getAddableNodeInfos().map(nodeInfo => {
+					return (
+						<AddNodeMenuItem
+							key={nodeInfo.typeName}
+							label={nodeInfo.typeName}
+							stateConstructor={nodeInfo.stateConstructor}
+							actionCreator={nodeInfo.addNodeActionCreator}
+						/>
+					)
+				}).toList()}
+			</Fragment>
+		)
+	}
 
 	function AddNodeMenuItem(props: AddNodeMenuItemProps) {
 		return (
@@ -39,45 +73,6 @@ const MenuItems = React.memo(function _MenuItems({dispatch}: {dispatch: Dispatch
 			</MenuItem>
 		)
 	}
-
-	return (
-		<Fragment>
-			<MenuItem
-				attributes={{
-					className: 'contextMenuTop',
-					title: 'shift + right click to get browser context menu',
-				}}
-				preventClose={true}
-			>
-				do stuff
-			</MenuItem>
-			<AddNodeMenuItem
-				label="Add Synth"
-				stateConstructor={BasicSynthesizerState}
-				actionCreator={addBasicSynthesizer}
-			/>
-			<AddNodeMenuItem
-				label="Add Piano Sampler"
-				stateConstructor={BasicSamplerState}
-				actionCreator={addBasicSampler}
-			/>
-			<AddNodeMenuItem
-				label="Add Grid Sequencer"
-				stateConstructor={GridSequencerState}
-				actionCreator={addGridSequencer}
-			/>
-			<AddNodeMenuItem
-				label="Add Infinite Sequencer"
-				stateConstructor={InfiniteSequencerState}
-				actionCreator={addInfiniteSequencer}
-			/>
-			<AddNodeMenuItem
-				label="Add R E V E R B"
-				stateConstructor={SimpleReverbState}
-				actionCreator={addSimpleReverb}
-			/>
-		</Fragment>
-	)
 })
 
 interface AddNodeMenuItemProps {

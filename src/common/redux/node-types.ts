@@ -58,6 +58,7 @@ const _makeNodeInfo = Record({
 	typeName: 'Default Type Name',
 	stateConstructor: (DummyConnectable) as new (ownerId: string) => IConnectable,
 	addNodeActionCreator: ((state: IClientAppState) => {type: 'dummy add node action type'}) as (state: any) => AnyAction,
+	showOnAddNodeMenu: false,
 })
 
 type NodeInfo = ReturnType<typeof _makeNodeInfo>
@@ -112,6 +113,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		selectIsSending: selectGridSequencerIsSending,
 		selectActiveNotes: selectGridSequencerActiveNotes,
 		stateDeserializer: deserializeSequencerState,
+		showOnAddNodeMenu: true,
 	})],
 	[ConnectionNodeType.infiniteSequencer, makeNodeInfo({
 		typeName: 'Infinite Sequencer',
@@ -122,24 +124,28 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		selectIsSending: selectInfiniteSequencerIsSending,
 		selectActiveNotes: selectInfiniteSequencerActiveNotes,
 		stateDeserializer: deserializeSequencerState,
+		showOnAddNodeMenu: true,
 	})],
 	[ConnectionNodeType.basicSynthesizer, makeNodeInfo({
 		typeName: 'Basic Synthesizer',
 		stateConstructor: BasicSynthesizerState,
 		addNodeActionCreator: addBasicSynthesizer,
 		stateSelector: selectBasicSynthesizer,
+		showOnAddNodeMenu: true,
 	})],
 	[ConnectionNodeType.basicSampler, makeNodeInfo({
 		typeName: 'Basic Piano Sampler',
 		stateConstructor: BasicSamplerState,
 		addNodeActionCreator: addBasicSampler,
 		stateSelector: selectSampler,
+		showOnAddNodeMenu: true,
 	})],
 	[ConnectionNodeType.simpleReverb, makeNodeInfo({
 		typeName: 'R E V E R B',
 		stateConstructor: SimpleReverbState,
 		addNodeActionCreator: addSimpleReverb,
 		stateSelector: selectSimpleReverb,
+		showOnAddNodeMenu: true,
 	})],
 	[ConnectionNodeType.audioOutput, makeNodeInfo({
 		typeName: 'Audio Output',
@@ -171,4 +177,8 @@ const dummyNodeInfo = _makeNodeInfo()
 
 export const getConnectionNodeInfo = (type: ConnectionNodeType): IConnectionNodeInfo => {
 	return NodeInfoMap.get(type) || dummyNodeInfo
+}
+
+export function getAddableNodeInfos() {
+	return NodeInfoMap.filter(x => x.showOnAddNodeMenu)
 }
