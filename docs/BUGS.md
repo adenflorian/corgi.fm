@@ -1,6 +1,7 @@
 BUGS
 ====
-- [ ] !!!NODE_CLICKED takes long time for infinite sequencer, check performance
+- [√] !!!NODE_CLICKED takes long time for infinite sequencer, check performance
+	- enableUserSelectHack={false} on Draggable
 - [ ] when typing in chat, if someone leaves the input box loses focus
 - [ ] filters getting stuck
 - [ ] changing room thru selector doesn't completely pick up new user name if changed in previous room?

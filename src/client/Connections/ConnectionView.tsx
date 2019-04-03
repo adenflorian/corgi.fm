@@ -363,6 +363,7 @@ class GhostConnector extends React.PureComponent<IGhostConnectorProps> {
 
 		return (
 			<Draggable
+				enableUserSelectHack={false}
 				scale={simpleGlobalClientState.zoom}
 				onStart={this._handleStartDrag}
 				onStop={this._handleStopDrag}

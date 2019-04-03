@@ -42,6 +42,7 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 
 		return (
 			<Draggable
+				enableUserSelectHack={false}
 				onDrag={this._handleDrag}
 				position={{
 					x,
