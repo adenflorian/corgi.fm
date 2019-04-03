@@ -10,7 +10,7 @@ BUGS
 - [ ] when 2 people join around same time, they spawn on top of each other
 - starting in a legacy room, then switching to scan room thru room selector, no bpm knob
 	- wont fix, legacy will be gone soon, not easy to fix
-- [ ] ctrl click drag a connector, let go of control, connector gets stuck in midair
+- [ ] shift click drag a connector, let go of control, connector gets stuck in midair
 
 ## FIXED
 - [√] 2019-03-03 When playing note on keyboard and change connection, note keeps playing on previous instrument

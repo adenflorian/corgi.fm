@@ -113,7 +113,7 @@
 - [√] make input connector look like a stack cable when multiple inputs
 - [√] animate dashed ghost connector
 - [√] animate active connections in the direction that data is flowing
-- [ ] show ghost connector for adding connections when mouse is near, and put it at top of connector stack, don't require ctrl to be held down
+- [ ] show ghost connector for adding connections when mouse is near, and put it at top of connector stack, don't require shift to be held down
 - [ ] have a node that hands out connections
 	- [ ] like a needle cushion
 - [ ] show move icon on connector on hover

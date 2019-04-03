@@ -136,7 +136,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 					className={`ghost ${ghostConnector.status === GhostConnectorStatus.hidden ? 'hidden' : 'active'}`}
 					title={stripIndent`
 						click + drag to move connector
-						ctrl + click + drag to make a new connection
+						shift + click + drag to make a new connection
 					`}
 				>
 					{!isGhostHidden &&
@@ -434,7 +434,7 @@ export const ConnectedConnectionView = shamuConnect(
 		const globalClockState = selectGlobalClockState(state.room)
 
 		return {
-			isAddMode: selectUserInputKeys(state).ctrl,
+			isAddMode: selectUserInputKeys(state).shift,
 			speed: globalClockState.bpm,
 			isGlobalPlaying: globalClockState.isPlaying,
 			highQuality: !selectOption(state, AppOptions.enableEfficientMode),
