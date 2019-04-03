@@ -87,6 +87,7 @@ export class VirtualKeyboardState implements IVirtualKeyboardState, NodeSpecialS
 		type: ConnectionNodeType.virtualKeyboard,
 		width: VirtualKeyboardState.defaultWidth,
 		height: VirtualKeyboardState.defaultHeight,
+		name: 'Dummy Virtual Keyboard',
 	}
 
 	public static fromJS: IMultiStateThingDeserializer = state => {
@@ -106,6 +107,7 @@ export class VirtualKeyboardState implements IVirtualKeyboardState, NodeSpecialS
 	public readonly type = ConnectionNodeType.virtualKeyboard
 	public readonly width: number = VirtualKeyboardState.defaultWidth
 	public readonly height: number = VirtualKeyboardState.defaultHeight
+	public readonly name: string = 'Virtual Keyboard'
 
 	constructor(ownerId: ClientId, color: string) {
 		this.ownerId = ownerId

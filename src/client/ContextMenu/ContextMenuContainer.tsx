@@ -1,20 +1,18 @@
-import React, {MouseEvent} from 'react'
+import React, {MouseEvent, Fragment} from 'react'
 import {backgroundMenuId} from '../client-constants';
 import {MenuItem, ContextMenu} from 'react-contextmenu';
 import './ContextMenu.less'
 import {
 	shamuConnect, addBasicSynthesizer, BasicSynthesizerState, addPosition,
 	makePosition, GridSequencerState, addGridSequencer,
-	createSequencerEvents, BasicSamplerState, addBasicSampler,
-	InfiniteSequencerState, InfiniteSequencerStyle, addInfiniteSequencer,
+	BasicSamplerState, addBasicSampler,
+	InfiniteSequencerState, addInfiniteSequencer,
 	SimpleReverbState, addSimpleReverb
 } from '../../common/redux';
-import {Dispatch} from 'redux';
+import {Dispatch, AnyAction} from 'redux';
 import {serverClientId} from '../../common/common-constants';
-import {ConnectionNodeType, Point, IConnectable} from '../../common/common-types';
+import {Point, IConnectable} from '../../common/common-types';
 import {simpleGlobalClientState} from '../SimpleGlobalClientState';
-import {MidiNotes} from '../../common/MidiNote';
-import {makeMidiClipEvent} from '../../common/midi-types';
 
 interface AllProps {
 	dispatch: Dispatch
@@ -23,6 +21,27 @@ interface AllProps {
 export function ContextMenuContainer({dispatch}: AllProps) {
 	return (
 		<ContextMenu id={backgroundMenuId}>
+			<MenuItems dispatch={dispatch} />
+		</ContextMenu>
+	)
+}
+
+const MenuItems = React.memo(function _MenuItems({dispatch}: {dispatch: Dispatch}) {
+
+	function AddNodeMenuItem(props: AddNodeMenuItemProps) {
+		return (
+			<MenuItem onClick={(e) => {
+				const newState = new props.stateConstructor(serverClientId)
+				dispatch(props.actionCreator(newState))
+				createPosition(dispatch, newState, e)
+			}}>
+				{props.label}
+			</MenuItem>
+		)
+	}
+
+	return (
+		<Fragment>
 			<MenuItem
 				attributes={{
 					className: 'contextMenuTop',
@@ -32,58 +51,39 @@ export function ContextMenuContainer({dispatch}: AllProps) {
 			>
 				do stuff
 			</MenuItem>
-			<MenuItem onClick={(e) => {
-				const newState = new BasicSynthesizerState(serverClientId)
-				dispatch(addBasicSynthesizer(newState))
-				createPosition(dispatch, newState, e)
-			}}>
-				Add Synth
-			</MenuItem>
-			<MenuItem onClick={(e) => {
-				const newState = new BasicSamplerState(serverClientId)
-				dispatch(addBasicSampler(newState))
-				createPosition(dispatch, newState, e)
-			}}>
-				Add Piano Sampler
-			</MenuItem>
-			<MenuItem onClick={(e) => {
-				const newState = new GridSequencerState(serverClientId, 'sally', 24, createSequencerEvents(32)
-					.map((_, i) => (makeMidiClipEvent({
-						notes: MidiNotes(i % 2 === 1 ? [] : [36]),
-						startBeat: i,
-						durationBeats: 1,
-					}))))
-				dispatch(addGridSequencer(newState))
-				createPosition(dispatch, newState, e)
-			}}>
-				Add Grid Sequencer
-			</MenuItem>
-			<MenuItem onClick={(e) => {
-				const newState = new InfiniteSequencerState(
-					serverClientId,
-					'bob',
-					InfiniteSequencerStyle.colorGrid,
-					createSequencerEvents(4)
-						.map((_, i) => (makeMidiClipEvent({
-							notes: MidiNotes(i % 2 === 1 ? [] : [36]),
-							startBeat: i,
-							durationBeats: 1,
-						})))
-				)
-				dispatch(addInfiniteSequencer(newState))
-				createPosition(dispatch, newState, e)
-			}}>
-				Add Infinite Sequencer
-			</MenuItem>
-			<MenuItem onClick={(e) => {
-				const newState = new SimpleReverbState(serverClientId)
-				dispatch(addSimpleReverb(newState))
-				createPosition(dispatch, newState, e)
-			}}>
-				Add R E V E R B
-			</MenuItem>
-		</ContextMenu>
+			<AddNodeMenuItem
+				label="Add Synth"
+				stateConstructor={BasicSynthesizerState}
+				actionCreator={addBasicSynthesizer}
+			/>
+			<AddNodeMenuItem
+				label="Add Piano Sampler"
+				stateConstructor={BasicSamplerState}
+				actionCreator={addBasicSampler}
+			/>
+			<AddNodeMenuItem
+				label="Add Grid Sequencer"
+				stateConstructor={GridSequencerState}
+				actionCreator={addGridSequencer}
+			/>
+			<AddNodeMenuItem
+				label="Add Infinite Sequencer"
+				stateConstructor={InfiniteSequencerState}
+				actionCreator={addInfiniteSequencer}
+			/>
+			<AddNodeMenuItem
+				label="Add R E V E R B"
+				stateConstructor={SimpleReverbState}
+				actionCreator={addSimpleReverb}
+			/>
+		</Fragment>
 	)
+})
+
+interface AddNodeMenuItemProps {
+	label: string
+	stateConstructor: new (id: string) => IConnectable
+	actionCreator: (state: any) => AnyAction
 }
 
 function createPosition(dispatch: Dispatch, state: IConnectable, e: React.TouchEvent<HTMLDivElement> | React.MouseEvent<HTMLDivElement>) {

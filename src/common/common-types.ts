@@ -15,6 +15,7 @@ export interface IConnectable {
 	type: ConnectionNodeType
 	width: number
 	height: number
+	name: string
 }
 
 export interface IMultiStateThing extends IConnectable {

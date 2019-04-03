@@ -98,9 +98,14 @@ export class InfiniteSequencerState extends SequencerStateBase {
 
 	constructor(
 		ownerId: string,
-		name: string,
-		style: InfiniteSequencerStyle,
-		events: MidiClipEvents,
+		name = 'infinite sequencer',
+		style = InfiniteSequencerStyle.colorGrid,
+		events = createSequencerEvents(4)
+			.map((_, i) => (makeMidiClipEvent({
+				notes: MidiNotes(i % 2 === 1 ? [] : [36]),
+				startBeat: i,
+				durationBeats: 1,
+			}))),
 		isPlaying = false,
 	) {
 		const midiClip = new MidiClip({

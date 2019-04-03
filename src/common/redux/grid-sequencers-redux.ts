@@ -3,8 +3,8 @@ import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
 import {ConnectionNodeType} from '../common-types'
 import {assertArrayHasNoUndefinedElements} from '../common-utils'
-import {MidiClip, MidiClipEvents} from '../midi-types'
-import {emptyMidiNotes, IMidiNote} from '../MidiNote'
+import {MidiClip, MidiClipEvents, makeMidiClipEvent} from '../midi-types'
+import {emptyMidiNotes, IMidiNote, MidiNotes} from '../MidiNote'
 import {MAX_MIDI_NOTE_NUMBER_127} from '../server-constants'
 import {
 	addMultiThing, BROADCASTER_ACTION, CLEAR_SEQUENCER, createSequencerEvents, IClientRoomState,
@@ -90,9 +90,14 @@ export class GridSequencerState extends SequencerStateBase {
 
 	constructor(
 		ownerId: string,
-		name: string,
-		notesToShow: number,
-		events: MidiClipEvents,
+		name = 'grid sequencer',
+		notesToShow = 24,
+		events = createSequencerEvents(32)
+			.map((_, i) => (makeMidiClipEvent({
+				notes: MidiNotes(i % 2 === 1 ? [] : [36]),
+				startBeat: i,
+				durationBeats: 1,
+			}))),
 		isPlaying = false,
 	) {
 

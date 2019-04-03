@@ -53,6 +53,7 @@ export class BasicSamplerState implements IConnectable, NodeSpecialState {
 		type: ConnectionNodeType.basicSampler,
 		width: BasicSamplerState.defaultWidth,
 		height: BasicSamplerState.defaultHeight,
+		name: 'Dummy Basic Piano Sampler',
 	}
 
 	public readonly id = uuid.v4()
@@ -67,6 +68,7 @@ export class BasicSamplerState implements IConnectable, NodeSpecialState {
 	public readonly type = ConnectionNodeType.basicSampler
 	public readonly width: number = BasicSamplerState.defaultWidth
 	public readonly height: number = BasicSamplerState.defaultHeight
+	public readonly name: string = 'Basic Piano Sampler'
 
 	constructor(ownerId: ClientId) {
 		this.ownerId = ownerId
