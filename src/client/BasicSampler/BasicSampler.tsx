@@ -10,6 +10,8 @@ import {Knob} from '../Knob/Knob'
 import {Panel} from '../Panel/Panel'
 import {ConnectedNoteSchedulerVisualPlaceholder} from '../WebAudio/SchedulerVisual'
 import './BasicSampler.less'
+import {stripIndent} from 'common-tags';
+import {panToolTip, lpfToolTip, attackToolTip, releaseToolTip, detuneToolTip, gainToolTip} from '../client-constants';
 
 interface IBasicSamplerProps {
 	color: string
@@ -51,6 +53,7 @@ export class BasicSampler extends React.PureComponent<IBasicSamplerAllProps> {
 								onChange={this._dispatchChangeInstrumentParam}
 								label="pan"
 								onChangeId={BasicSamplerParam.pan}
+								tooltip={panToolTip}
 							/>
 							<Knob
 								min={0}
@@ -60,6 +63,7 @@ export class BasicSampler extends React.PureComponent<IBasicSamplerAllProps> {
 								onChange={this._dispatchChangeInstrumentParam}
 								label="lpf"
 								onChangeId={BasicSamplerParam.lowPassFilterCutoffFrequency}
+								tooltip={lpfToolTip}
 							/>
 							<Knob
 								min={0.01}
@@ -69,6 +73,7 @@ export class BasicSampler extends React.PureComponent<IBasicSamplerAllProps> {
 								onChange={this._dispatchChangeInstrumentParam}
 								label="attack"
 								onChangeId={BasicSamplerParam.attack}
+								tooltip={attackToolTip}
 							/>
 							<Knob
 								min={0.01}
@@ -78,6 +83,7 @@ export class BasicSampler extends React.PureComponent<IBasicSamplerAllProps> {
 								onChange={this._dispatchChangeInstrumentParam}
 								label="release"
 								onChangeId={BasicSamplerParam.release}
+								tooltip={releaseToolTip}
 							/>
 							<Knob
 								min={-100}
@@ -86,6 +92,7 @@ export class BasicSampler extends React.PureComponent<IBasicSamplerAllProps> {
 								onChange={this._dispatchChangeInstrumentParam}
 								label="detune"
 								onChangeId={BasicSamplerParam.detune}
+								tooltip={detuneToolTip}
 							/>
 							<Knob
 								min={0}
@@ -95,6 +102,7 @@ export class BasicSampler extends React.PureComponent<IBasicSamplerAllProps> {
 								onChange={this._dispatchChangeInstrumentParam}
 								label="gain"
 								onChangeId={BasicSamplerParam.gain}
+								tooltip={gainToolTip}
 							/>
 						</div>
 					</div>

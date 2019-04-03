@@ -11,6 +11,7 @@ import {saturateColor} from '../../common/shamu-color'
 import {simpleGlobalClientState} from '../SimpleGlobalClientState'
 import './ConnectionView.less'
 import {Connector} from './Connector'
+import {stripIndent} from 'common-tags';
 
 export interface IConnectionViewProps {
 	color: string
@@ -131,7 +132,13 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 					color={color}
 					saturate={saturateTarget}
 				/>
-				<div className={`ghost ${ghostConnector.status === GhostConnectorStatus.hidden ? 'hidden' : 'active'}`}>
+				<div
+					className={`ghost ${ghostConnector.status === GhostConnectorStatus.hidden ? 'hidden' : 'active'}`}
+					title={stripIndent`
+						click + drag to move connector
+						ctrl + click + drag to make a new connection
+					`}
+				>
 					{!isGhostHidden &&
 						<svg
 							className={`colorize longLine`}
@@ -220,10 +227,10 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 
 		const curveStrength2 = Math.max(10, diff2)
 
-		return `
-				M ${line.x1} ${line.y1}
-				C ${line.x1 + joint + curveStrength2} ${line.y1} ${line.x2 - joint - curveStrength2} ${line.y2} ${line.x2} ${line.y2}
-			`
+		return stripIndent`
+			M ${line.x1} ${line.y1}
+			C ${line.x1 + joint + curveStrength2} ${line.y1} ${line.x2 - joint - curveStrength2} ${line.y2} ${line.x2} ${line.y2}
+		`
 	}
 
 	private readonly _getGhostLine = (sourceConnectorRight: number, targetConnectorLeft: number) => {
@@ -261,6 +268,8 @@ interface ConnectionLineProps {
 	isGlobalPlaying: boolean
 	highQuality: boolean
 }
+
+const longLineTooltip = 'right click to delete'
 
 const ConnectionLine = React.memo(
 	function _ConnectionLine({id, color, saturateSource, saturateTarget, pathDPart1,
@@ -312,19 +321,24 @@ const ConnectionLine = React.memo(
 						d={pathDPart1}
 						stroke={highQuality ? `url(#${id})` : saturateSource ? saturatedColor : color}
 						strokeWidth={longLineStrokeWidth + 'px'}
-					/>
+					>
+					</path>
 					<path
 						className="invisibleLongLine"
 						d={pathDPart1}
 						stroke="#0000"
 						strokeWidth={24 + 'px'}
-					/>
+					>
+						<title>{longLineTooltip}</title>
+					</path>
 					<path
 						className="blurLine"
 						d={pathDFull}
 						stroke={highQuality ? `url(#${id})` : saturateSource ? saturatedColor : color}
 						strokeWidth={4 + 'px'}
-					/>
+					>
+						<title>{longLineTooltip}</title>
+					</path>
 					{highQuality && isGlobalPlaying && saturateSource &&
 						<path
 							style={{

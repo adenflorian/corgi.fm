@@ -16,6 +16,7 @@ import {Panel} from '../Panel/Panel'
 import {ConnectedNoteSchedulerVisualPlaceholder} from '../WebAudio/SchedulerVisual'
 import {BasicSynthesizerOscillatorTypes} from './BasicSynthesizerOscillatorTypes'
 import './BasicSynthesizerView.less'
+import {panToolTip, lpfToolTip, attackToolTip, releaseToolTip, detuneToolTip, gainToolTip} from '../client-constants';
 
 export type MidiNotes = IMidiNotes
 
@@ -70,6 +71,7 @@ export class BasicSynthesizerView
 								onChange={this._dispatchChangeInstrumentParam}
 								label="pan"
 								onChangeId={BasicSynthesizerParam.pan}
+								tooltip={panToolTip}
 							/>
 							<Knob
 								min={0}
@@ -79,6 +81,7 @@ export class BasicSynthesizerView
 								onChange={this._dispatchChangeInstrumentParam}
 								label="lpf"
 								onChangeId={BasicSynthesizerParam.lowPassFilterCutoffFrequency}
+								tooltip={lpfToolTip}
 							/>
 							<Knob
 								min={0.01}
@@ -88,6 +91,7 @@ export class BasicSynthesizerView
 								onChange={this._dispatchChangeInstrumentParam}
 								label="attack"
 								onChangeId={BasicSynthesizerParam.attack}
+								tooltip={attackToolTip}
 							/>
 							<Knob
 								min={0.01}
@@ -97,6 +101,7 @@ export class BasicSynthesizerView
 								onChange={this._dispatchChangeInstrumentParam}
 								label="release"
 								onChangeId={BasicSynthesizerParam.release}
+								tooltip={releaseToolTip}
 							/>
 							<Knob
 								min={-100}
@@ -105,6 +110,7 @@ export class BasicSynthesizerView
 								onChange={this._dispatchChangeInstrumentParam}
 								label="detune"
 								onChangeId={BasicSynthesizerParam.fineTuning}
+								tooltip={detuneToolTip}
 							/>
 							<Knob
 								min={0}
@@ -113,6 +119,7 @@ export class BasicSynthesizerView
 								onChange={this._dispatchChangeInstrumentParam}
 								label="gain"
 								onChangeId={BasicSynthesizerParam.gain}
+								tooltip={gainToolTip}
 							/>
 						</div>
 					</div>

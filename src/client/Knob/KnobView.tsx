@@ -1,6 +1,7 @@
 import * as React from 'react'
 import {CssColor} from '../../common/shamu-color'
 import './Knob.less'
+import {stripIndent} from 'common-tags';
 
 interface IKnobViewProps {
 	label: string
@@ -10,13 +11,14 @@ interface IKnobViewProps {
 	markColor?: string
 	handleMouseDown: (e: React.MouseEvent) => any
 	size: number
+	tooltip: string
 	value: number
 }
 
 export const KnobView: React.FC<IKnobViewProps> = React.memo(function _KnobView(props) {
 	const {
 		handleMouseDown, percentage, adjustedPercentage,
-		label, value, readOnly = false, markColor = 'gray',
+		label, value, readOnly = false, markColor = 'gray', tooltip,
 	} = props
 
 	return (
@@ -57,7 +59,7 @@ export const KnobView: React.FC<IKnobViewProps> = React.memo(function _KnobView(
 						transform: `rotate(${_getRotation(percentage)}deg)`,
 					}}
 					onMouseDown={handleMouseDown}
-					title={value.toFixed(3)}
+					title={value.toFixed(3) + '\n' + tooltip}
 				>
 					<div className="mark" style={{backgroundColor: markColor}}></div>
 				</div>
