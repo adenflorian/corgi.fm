@@ -13,6 +13,8 @@ export interface IConnectable {
 	id: string
 	color: string | false
 	type: ConnectionNodeType
+	width: number
+	height: number
 }
 
 export interface IMultiStateThing extends IConnectable {

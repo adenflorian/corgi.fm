@@ -16,6 +16,8 @@ export const dummyMultiStateThing: IMultiStateThing = Object.freeze({
 	ownerId: '-2',
 	color: 'black',
 	type: ConnectionNodeType.dummy,
+	width: 0,
+	height: 0,
 })
 
 export const ADD_MULTI_THING = 'ADD_MULTI_THING'

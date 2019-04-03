@@ -11,7 +11,7 @@ import {
 } from '../../common/redux';
 import {Dispatch} from 'redux';
 import {serverClientId} from '../../common/common-constants';
-import {ConnectionNodeType, Point} from '../../common/common-types';
+import {ConnectionNodeType, Point, IConnectable} from '../../common/common-types';
 import {simpleGlobalClientState} from '../SimpleGlobalClientState';
 import {MidiNotes} from '../../common/MidiNote';
 import {makeMidiClipEvent} from '../../common/midi-types';
@@ -35,26 +35,14 @@ export function ContextMenuContainer({dispatch}: AllProps) {
 			<MenuItem onClick={(e) => {
 				const newState = new BasicSynthesizerState(serverClientId)
 				dispatch(addBasicSynthesizer(newState))
-				dispatch(addPosition(
-					makePosition({
-						id: newState.id,
-						targetType: ConnectionNodeType.basicSynthesizer,
-						...getPositionFromMouseOrTouchEvent(e)
-					})
-				))
+				createPosition(dispatch, newState, e)
 			}}>
 				Add Synth
 			</MenuItem>
 			<MenuItem onClick={(e) => {
 				const newState = new BasicSamplerState(serverClientId)
 				dispatch(addBasicSampler(newState))
-				dispatch(addPosition(
-					makePosition({
-						id: newState.id,
-						targetType: ConnectionNodeType.basicSampler,
-						...getPositionFromMouseOrTouchEvent(e)
-					})
-				))
+				createPosition(dispatch, newState, e)
 			}}>
 				Add Piano Sampler
 			</MenuItem>
@@ -66,15 +54,7 @@ export function ContextMenuContainer({dispatch}: AllProps) {
 						durationBeats: 1,
 					}))))
 				dispatch(addGridSequencer(newState))
-				dispatch(addPosition(
-					makePosition({
-						id: newState.id,
-						targetType: ConnectionNodeType.gridSequencer,
-						width: newState.width,
-						height: newState.height,
-						...getPositionFromMouseOrTouchEvent(e)
-					})
-				))
+				createPosition(dispatch, newState, e)
 			}}>
 				Add Grid Sequencer
 			</MenuItem>
@@ -91,31 +71,31 @@ export function ContextMenuContainer({dispatch}: AllProps) {
 						})))
 				)
 				dispatch(addInfiniteSequencer(newState))
-				dispatch(addPosition(
-					makePosition({
-						id: newState.id,
-						targetType: ConnectionNodeType.infiniteSequencer,
-						...getPositionFromMouseOrTouchEvent(e)
-					})
-				))
+				createPosition(dispatch, newState, e)
 			}}>
 				Add Infinite Sequencer
 			</MenuItem>
 			<MenuItem onClick={(e) => {
 				const newState = new SimpleReverbState(serverClientId)
 				dispatch(addSimpleReverb(newState))
-				dispatch(addPosition(
-					makePosition({
-						id: newState.id,
-						targetType: ConnectionNodeType.simpleReverb,
-						...getPositionFromMouseOrTouchEvent(e)
-					})
-				))
+				createPosition(dispatch, newState, e)
 			}}>
 				Add R E V E R B
 			</MenuItem>
 		</ContextMenu>
 	)
+}
+
+function createPosition(dispatch: Dispatch, state: IConnectable, e: React.TouchEvent<HTMLDivElement> | React.MouseEvent<HTMLDivElement>) {
+	dispatch(addPosition(
+		makePosition({
+			id: state.id,
+			targetType: state.type,
+			width: state.width,
+			height: state.height,
+			...getPositionFromMouseOrTouchEvent(e)
+		})
+	))
 }
 
 function getPositionFromMouseOrTouchEvent(e: React.TouchEvent<HTMLDivElement> | React.MouseEvent<HTMLDivElement>): Point {
@@ -124,7 +104,7 @@ function getPositionFromMouseOrTouchEvent(e: React.TouchEvent<HTMLDivElement> | 
 	return toGraphSpace(x, y)
 }
 
-function toGraphSpace(x = 0, y = 0): Point {
+function toGraphSpace(x = 0, y = 0): Readonly<Point> {
 	const zoom = simpleGlobalClientState.zoom
 	const pan = simpleGlobalClientState.pan
 

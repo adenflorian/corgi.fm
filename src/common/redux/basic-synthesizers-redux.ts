@@ -6,6 +6,7 @@ import {pickRandomArrayElement} from '../common-utils'
 import {BuiltInOscillatorType, ShamuOscillatorType} from '../OscillatorTypes'
 import {addMultiThing, BROADCASTER_ACTION, createSelectAllOfThingAsArray, IClientRoomState, IMultiState, makeMultiReducer, NetworkActionType, SERVER_ACTION} from './index'
 import {NodeSpecialState} from './shamu-graph'
+import {getConnectionNodeInfo} from './node-types';
 
 export const addBasicSynthesizer = (instrument: BasicSynthesizerState) =>
 	addMultiThing(instrument, ConnectionNodeType.basicSynthesizer, NetworkActionType.SERVER_AND_BROADCASTER)
@@ -54,6 +55,9 @@ export interface IBasicSynthesizers {
 }
 
 export class BasicSynthesizerState implements IConnectable, NodeSpecialState {
+	public static defaultWidth = 304
+	public static defaultHeight = 112
+
 	public static dummy: BasicSynthesizerState = {
 		oscillatorType: BuiltInOscillatorType.sine,
 		id: 'dummy',
@@ -66,6 +70,8 @@ export class BasicSynthesizerState implements IConnectable, NodeSpecialState {
 		type: ConnectionNodeType.basicSynthesizer,
 		fineTuning: 0,
 		gain: 1,
+		width: BasicSynthesizerState.defaultWidth,
+		height: BasicSynthesizerState.defaultHeight,
 	}
 
 	public readonly oscillatorType: ShamuOscillatorType
@@ -80,6 +86,8 @@ export class BasicSynthesizerState implements IConnectable, NodeSpecialState {
 	public readonly gain = 1
 	public readonly color: false = false
 	public readonly type = ConnectionNodeType.basicSynthesizer
+	public readonly width: number = BasicSynthesizerState.defaultWidth
+	public readonly height: number = BasicSynthesizerState.defaultHeight
 
 	constructor(ownerId: ClientId) {
 		this.ownerId = ownerId	// TODO Is this still needed?

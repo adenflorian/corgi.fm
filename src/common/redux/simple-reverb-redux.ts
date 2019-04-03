@@ -33,6 +33,9 @@ export interface ISimpleReverbs {
 }
 
 export class SimpleReverbState implements IConnectable, NodeSpecialState {
+	public static defaultWidth = 256 + 16 // main width plus padding
+	public static defaultHeight = 56
+
 	public static dummy: SimpleReverbState = {
 		id: 'dummy',
 		ownerId: 'dummyOwner',
@@ -40,16 +43,16 @@ export class SimpleReverbState implements IConnectable, NodeSpecialState {
 		time: 0,
 		color: false,
 		type: ConnectionNodeType.simpleReverb,
-		width: 256,
-		height: 80,
+		width: SimpleReverbState.defaultWidth,
+		height: SimpleReverbState.defaultHeight,
 	}
 
 	public readonly id = uuid.v4()
 	public readonly ownerId: string
 	public readonly lowPassFilterCutoffFrequency: number = 2000
 	public readonly time: number = 5
-	public readonly width: number = 256
-	public readonly height: number = 80
+	public readonly width: number = SimpleReverbState.defaultWidth
+	public readonly height: number = SimpleReverbState.defaultHeight
 	public readonly color: false = false
 	public readonly type = ConnectionNodeType.simpleReverb
 

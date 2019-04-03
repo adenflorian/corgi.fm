@@ -92,13 +92,9 @@ const defaultPosition = {
 const makePositionRecord = Record(defaultPosition)
 
 export const makePosition = (
-	position: Pick<IPosition, 'id' | 'targetType'> & Partial<IPosition>,
+	position: Pick<IPosition, 'id' | 'targetType' | 'width' | 'height'> & Partial<IPosition>,
 ): Readonly<IPosition> => {
-	return makePositionRecord({
-		...position,
-		width: position.width === undefined ? getConnectionNodeInfo(position.targetType).width : position.width,
-		height: position.height === undefined ? getConnectionNodeInfo(position.targetType).height : position.height,
-	}).toJS()
+	return makePositionRecord(position).toJS()
 }
 
 export type IPositionAction = AddPositionAction | DeletePositionsAction | NodeClickedAction

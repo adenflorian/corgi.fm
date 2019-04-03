@@ -3,6 +3,7 @@ import * as uuid from 'uuid'
 import {ClientId, ConnectionNodeType, IConnectable} from '../common-types'
 import {addMultiThing, BROADCASTER_ACTION, createSelectAllOfThingAsArray, IClientRoomState, IMultiState, makeMultiReducer, NetworkActionType, SERVER_ACTION} from './index'
 import {NodeSpecialState} from './shamu-graph'
+import {getConnectionNodeInfo} from './node-types';
 
 export const addBasicSampler = (sampler: BasicSamplerState) =>
 	addMultiThing(sampler, ConnectionNodeType.basicSampler, NetworkActionType.SERVER_AND_BROADCASTER)
@@ -36,6 +37,9 @@ export interface IBasicSamplers {
 }
 
 export class BasicSamplerState implements IConnectable, NodeSpecialState {
+	public static defaultWidth = 304
+	public static defaultHeight = 112
+
 	public static dummy: BasicSamplerState = {
 		id: 'dummy',
 		ownerId: 'dummyOwner',
@@ -47,6 +51,8 @@ export class BasicSamplerState implements IConnectable, NodeSpecialState {
 		gain: 1,
 		color: false,
 		type: ConnectionNodeType.basicSampler,
+		width: BasicSamplerState.defaultWidth,
+		height: BasicSamplerState.defaultHeight,
 	}
 
 	public readonly id = uuid.v4()
@@ -59,6 +65,8 @@ export class BasicSamplerState implements IConnectable, NodeSpecialState {
 	public readonly gain = 1
 	public readonly color: false = false
 	public readonly type = ConnectionNodeType.basicSampler
+	public readonly width: number = BasicSamplerState.defaultWidth
+	public readonly height: number = BasicSamplerState.defaultHeight
 
 	constructor(ownerId: ClientId) {
 		this.ownerId = ownerId

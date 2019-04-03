@@ -237,6 +237,8 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 		targetType: ConnectionNodeType.virtualKeyboard,
 		x: -556,
 		y: extremes.bottomMost + y,
+		width: VirtualKeyboardState.defaultWidth,
+		height: VirtualKeyboardState.defaultHeight,
 	})
 	dispatch(addPosition({
 		...keyboardPosition,
@@ -254,6 +256,8 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 		const samplerPosition = makePosition({
 			id: newSampler.id,
 			targetType: ConnectionNodeType.basicSampler,
+			width: BasicSamplerState.defaultWidth,
+			height: BasicSamplerState.defaultHeight,
 			...nextPosition,
 		})
 		dispatch(addPosition({
@@ -290,6 +294,8 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 		const instrumentPosition = makePosition({
 			id: newInstrument.id,
 			targetType: ConnectionNodeType.basicSynthesizer,
+			width: BasicSynthesizerState.defaultWidth,
+			height: BasicSynthesizerState.defaultHeight,
 			...nextPosition,
 		})
 		dispatch(addPosition({

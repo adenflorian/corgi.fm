@@ -12,21 +12,12 @@ import {
 	createRoomAction, createSequencerEvents, GridSequencerState,
 	InfiniteSequencerState, InfiniteSequencerStyle, IServerState,
 	makePosition, makeSequencerEvents,
-	MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID, selectAllConnections,
-	selectAllPositions, SimpleReverbState, updatePositions,
+	MASTER_AUDIO_OUTPUT_TARGET_ID,
+	selectAllPositions, SimpleReverbState, updatePositions, getConnectionNodeInfo, selectAllConnections,
 } from '../common/redux'
 
-const masterAudioOutput: IConnectable = Object.freeze({
-	id: MASTER_AUDIO_OUTPUT_TARGET_ID,
-	type: ConnectionNodeType.audioOutput,
-	color: '',
-})
-
-const masterClock: IConnectable = Object.freeze({
-	id: MASTER_CLOCK_SOURCE_ID,
-	type: ConnectionNodeType.masterClock,
-	color: '',
-})
+const masterAudioOutput: IConnectable = getConnectionNodeInfo(ConnectionNodeType.audioOutput).stateSelector({} as any, '')
+const masterClock: IConnectable = getConnectionNodeInfo(ConnectionNodeType.masterClock).stateSelector({} as any, '')
 
 export function createServerStuff(room: string, serverStore: Store<IServerState>) {
 	const serverClient = ClientState.createServerClient()
@@ -35,10 +26,16 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 	dispatchToRoom(addClientAction)
 
 	dispatchToRoom(addPosition(
-		makePosition({id: MASTER_CLOCK_SOURCE_ID, targetType: ConnectionNodeType.masterClock})))
+		makePosition({
+			...masterClock,
+			targetType: masterClock.type,
+		})))
 
 	dispatchToRoom(addPosition(
-		makePosition({id: MASTER_AUDIO_OUTPUT_TARGET_ID, targetType: ConnectionNodeType.audioOutput})))
+		makePosition({
+			...masterAudioOutput,
+			targetType: masterAudioOutput.type,
+		})))
 
 	// Reverb
 	const simpleReverb = createSource({
@@ -47,7 +44,10 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 	}) as SimpleReverbState
 
 	dispatchToRoom(addPosition(
-		makePosition({id: simpleReverb.id, targetType: ConnectionNodeType.simpleReverb})))
+		makePosition({
+			...simpleReverb,
+			targetType: simpleReverb.type,
+		})))
 
 	connectNodes(simpleReverb, masterAudioOutput)
 
@@ -146,11 +146,17 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 	function createSourceAndTarget(options: CreateSourceAndTargetArgs) {
 		const target = createTarget(options.target.type)
 		dispatchToRoom(addPosition(
-			makePosition({id: target.id, targetType: options.target.type})))
+			makePosition({
+				...target,
+				targetType: target.type,
+			})))
 
-		const source = createSource({...options.source})
+		const source = createSource(options.source)
 		dispatchToRoom(addPosition(
-			makePosition({id: source.id, targetType: options.source.type, width: source.width, height: source.height})))
+			makePosition({
+				...source,
+				targetType: source.type,
+			})))
 
 		connectNodes(source, target)
 
