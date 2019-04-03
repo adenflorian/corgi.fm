@@ -2,7 +2,13 @@ import React, {MouseEvent} from 'react'
 import {backgroundMenuId} from '../client-constants';
 import {MenuItem, ContextMenu} from 'react-contextmenu';
 import './ContextMenu.less'
-import {shamuConnect, addBasicSynthesizer, BasicSynthesizerState, addPosition, makePosition, GridSequencerState, addGridSequencer, makeSequencerEvents, createSequencerEvents, BasicSamplerState, addBasicSampler, InfiniteSequencerState, InfiniteSequencerStyle, addInfiniteSequencer, SimpleReverbState, addSimpleReverb} from '../../common/redux';
+import {
+	shamuConnect, addBasicSynthesizer, BasicSynthesizerState, addPosition,
+	makePosition, GridSequencerState, addGridSequencer,
+	createSequencerEvents, BasicSamplerState, addBasicSampler,
+	InfiniteSequencerState, InfiniteSequencerStyle, addInfiniteSequencer,
+	SimpleReverbState, addSimpleReverb
+} from '../../common/redux';
 import {Dispatch} from 'redux';
 import {serverClientId} from '../../common/common-constants';
 import {ConnectionNodeType, Point} from '../../common/common-types';
@@ -29,13 +35,11 @@ export function ContextMenuContainer({dispatch}: AllProps) {
 			<MenuItem onClick={(e) => {
 				const newState = new BasicSynthesizerState(serverClientId)
 				dispatch(addBasicSynthesizer(newState))
-				const x = (e as MouseEvent).clientX || 0
-				const y = (e as MouseEvent).clientY || 0
 				dispatch(addPosition(
 					makePosition({
 						id: newState.id,
 						targetType: ConnectionNodeType.basicSynthesizer,
-						...toGraphSpace(x, y)
+						...getPositionFromMouseOrTouchEvent(e)
 					})
 				))
 			}}>
@@ -44,13 +48,11 @@ export function ContextMenuContainer({dispatch}: AllProps) {
 			<MenuItem onClick={(e) => {
 				const newState = new BasicSamplerState(serverClientId)
 				dispatch(addBasicSampler(newState))
-				const x = (e as MouseEvent).clientX || 0
-				const y = (e as MouseEvent).clientY || 0
 				dispatch(addPosition(
 					makePosition({
 						id: newState.id,
 						targetType: ConnectionNodeType.basicSampler,
-						...toGraphSpace(x, y)
+						...getPositionFromMouseOrTouchEvent(e)
 					})
 				))
 			}}>
@@ -64,15 +66,13 @@ export function ContextMenuContainer({dispatch}: AllProps) {
 						durationBeats: 1,
 					}))))
 				dispatch(addGridSequencer(newState))
-				const x = (e as MouseEvent).clientX || 0
-				const y = (e as MouseEvent).clientY || 0
 				dispatch(addPosition(
 					makePosition({
 						id: newState.id,
 						targetType: ConnectionNodeType.gridSequencer,
 						width: newState.width,
 						height: newState.height,
-						...toGraphSpace(x, y)
+						...getPositionFromMouseOrTouchEvent(e)
 					})
 				))
 			}}>
@@ -91,15 +91,11 @@ export function ContextMenuContainer({dispatch}: AllProps) {
 						})))
 				)
 				dispatch(addInfiniteSequencer(newState))
-				const x = (e as MouseEvent).clientX || 0
-				const y = (e as MouseEvent).clientY || 0
 				dispatch(addPosition(
 					makePosition({
 						id: newState.id,
 						targetType: ConnectionNodeType.infiniteSequencer,
-						width: newState.width,
-						height: newState.height,
-						...toGraphSpace(x, y)
+						...getPositionFromMouseOrTouchEvent(e)
 					})
 				))
 			}}>
@@ -108,13 +104,11 @@ export function ContextMenuContainer({dispatch}: AllProps) {
 			<MenuItem onClick={(e) => {
 				const newState = new SimpleReverbState(serverClientId)
 				dispatch(addSimpleReverb(newState))
-				const x = (e as MouseEvent).clientX || 0
-				const y = (e as MouseEvent).clientY || 0
 				dispatch(addPosition(
 					makePosition({
 						id: newState.id,
 						targetType: ConnectionNodeType.simpleReverb,
-						...toGraphSpace(x, y)
+						...getPositionFromMouseOrTouchEvent(e)
 					})
 				))
 			}}>
@@ -122,6 +116,12 @@ export function ContextMenuContainer({dispatch}: AllProps) {
 			</MenuItem>
 		</ContextMenu>
 	)
+}
+
+function getPositionFromMouseOrTouchEvent(e: React.TouchEvent<HTMLDivElement> | React.MouseEvent<HTMLDivElement>): Point {
+	const x = (e as MouseEvent).clientX || 0
+	const y = (e as MouseEvent).clientY || 0
+	return toGraphSpace(x, y)
 }
 
 function toGraphSpace(x = 0, y = 0): Point {
