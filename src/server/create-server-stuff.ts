@@ -12,8 +12,8 @@ import {
 	createRoomAction, createSequencerEvents, GridSequencerState,
 	InfiniteSequencerState, InfiniteSequencerStyle, IServerState,
 	makePosition, makeSequencerEvents,
-	MASTER_AUDIO_OUTPUT_TARGET_ID,
-	selectAllPositions, SimpleReverbState, updatePositions, getConnectionNodeInfo, selectAllConnections,
+	selectAllPositions, SimpleReverbState, updatePositions,
+	getConnectionNodeInfo, selectAllConnections,
 } from '../common/redux'
 
 const masterAudioOutput: IConnectable = getConnectionNodeInfo(ConnectionNodeType.audioOutput).stateSelector({} as any, '')

@@ -102,17 +102,15 @@ export class VirtualKeyboardState implements IVirtualKeyboardState, NodeSpecialS
 	public readonly pressedKeys: IMidiNotes = Set()
 	public readonly octave: number = 4
 	public readonly id: string = uuid.v4()
-	public readonly ownerId: ClientId
-	public readonly color: string
 	public readonly type = ConnectionNodeType.virtualKeyboard
 	public readonly width: number = VirtualKeyboardState.defaultWidth
 	public readonly height: number = VirtualKeyboardState.defaultHeight
 	public readonly name: string = 'Virtual Keyboard'
 
-	constructor(ownerId: ClientId, color: string) {
-		this.ownerId = ownerId
-		this.color = color
-	}
+	constructor(
+		public readonly ownerId: ClientId,
+		public readonly color: string = 'black'
+	) {}
 }
 
 const keyboardActionTypes = [

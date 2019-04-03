@@ -82,7 +82,7 @@ const MenuItems = React.memo(function _MenuItems({dispatch}: {dispatch: Dispatch
 
 interface AddNodeMenuItemProps {
 	label: string
-	stateConstructor: new (id: string) => IConnectable
+	stateConstructor: new (ownerId: string) => IConnectable
 	actionCreator: (state: any) => AnyAction
 }
 
