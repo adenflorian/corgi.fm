@@ -1,4 +1,4 @@
-import {Set} from 'immutable'
+import {Set, List} from 'immutable'
 import {ECSComponentType, ECSEntity, ECSSystem} from './ECSTypes'
 
 export class ECSCanvasRenderSystem implements ECSSystem {
@@ -12,15 +12,19 @@ export class ECSCanvasRenderSystem implements ECSSystem {
 		])
 	}
 
-	public onBatchStart() {
+	public execute(entities: List<ECSEntity>): void {
 		if (!this._canvasContext) {
 			this._updateContext()
 		}
+
 		if (!this._canvasContext) return
+
 		this._canvasContext.clearRect(0, 0, ECSCanvasRenderSystem.canvasSize, ECSCanvasRenderSystem.canvasSize)
+
+		entities.forEach(this._processEntity)
 	}
 
-	public execute(entity: ECSEntity): void {
+	private _processEntity(entity: ECSEntity) {
 		if (!this._canvasContext) return
 
 		// this._canvasContext.fillStyle = 'green'
@@ -32,10 +36,6 @@ export class ECSCanvasRenderSystem implements ECSSystem {
 			100,
 			100,
 		)
-	}
-
-	public onBatchEnd() {
-
 	}
 
 	private _updateContext() {

@@ -63,11 +63,8 @@ function ecsLoop() {
 
 	// iterate through _systems, and pass valid entities to them
 	_systems.forEach(system => {
-		system.onBatchStart()
-		_entities.filter(x => entityHasComponentsRequiredBySystem(x, system))
-			.forEach(entity => {
-				system.execute(entity)
-			})
+		const entitiesForSystem = _entities.filter(x => entityHasComponentsRequiredBySystem(x, system))
+		system.execute(entitiesForSystem)
 	})
 }
 

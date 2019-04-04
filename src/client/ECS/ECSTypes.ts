@@ -10,9 +10,7 @@ export enum ECSComponentType {
 
 export interface ECSSystem {
 	getRequiredComponents(): Set<ECSComponentType>
-	onBatchStart(): void
-	execute(entity: ECSEntity): void
-	onBatchEnd(): void
+	execute(entities: List<ECSEntity>): void
 }
 
 export abstract class ECSEntity {

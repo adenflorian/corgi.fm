@@ -1,4 +1,4 @@
-import {Map, Set} from 'immutable'
+import {Map, Set, List} from 'immutable'
 import {CssColor} from '../../common/shamu-color'
 import {ECSCanvasRenderSystem} from './ECSCanvasRenderSystem'
 import {ECSComponentType, ECSEntity, ECSSystem} from './ECSTypes'
@@ -15,9 +15,11 @@ export class ECSSequencerRenderSystem implements ECSSystem {
 		])
 	}
 
-	public onBatchStart() {}
+	public execute(entities: List<ECSEntity>): void {
+		entities.forEach(this.processEntity)
+	}
 
-	public execute(entity: ECSEntity): void {
+	private readonly processEntity = (entity: ECSEntity) => {
 		const nodeId = entity.getGraphPositionComponent()!.id
 
 		const canvasContext = this._getContextForNodeId(nodeId)
@@ -40,8 +42,6 @@ export class ECSSequencerRenderSystem implements ECSSystem {
 			graphPosition.height,
 		)
 	}
-
-	public onBatchEnd() {}
 
 	private _getContextForNodeId(nodeId: string) {
 		const canvasContext = this._canvasContexts.get(nodeId)
