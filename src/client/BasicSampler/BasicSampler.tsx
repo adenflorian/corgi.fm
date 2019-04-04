@@ -1,17 +1,17 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
-import {BasicSamplerParam, selectSampler, setBasicSamplerParam} from '../../common/redux'
-import {IClientAppState} from '../../common/redux'
 import {
-	selectConnectionSourceNotesByTargetId,
+	BasicSamplerParam, selectSampler, setBasicSamplerParam, getConnectionNodeInfo
 } from '../../common/redux'
+import {IClientAppState} from '../../common/redux'
 import {Knob} from '../Knob/Knob'
 import {Panel} from '../Panel/Panel'
 import {ConnectedNoteSchedulerVisualPlaceholder} from '../WebAudio/SchedulerVisual'
 import './BasicSampler.less'
-import {stripIndent} from 'common-tags';
-import {panToolTip, lpfToolTip, attackToolTip, releaseToolTip, detuneToolTip, gainToolTip} from '../client-constants';
+import {
+	panToolTip, lpfToolTip, attackToolTip, releaseToolTip, detuneToolTip, gainToolTip
+} from '../client-constants';
 
 interface IBasicSamplerProps {
 	color: string
@@ -121,7 +121,8 @@ export const ConnectedBasicSampler = connect(
 		const samplerState = selectSampler(state.room, id)
 
 		return {
-			isPlaying: selectConnectionSourceNotesByTargetId(state.room, id).count() > 0,
+			isPlaying: getConnectionNodeInfo(samplerState.type)
+				.selectIsPlaying(state.room, id),
 			pan: samplerState.pan,
 			lowPassFilterCutoffFrequency: samplerState.lowPassFilterCutoffFrequency,
 			attack: samplerState.attack,

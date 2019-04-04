@@ -1,22 +1,22 @@
-import {Set} from 'immutable'
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 import {IMidiNotes} from '../../common/MidiNote'
 import {ShamuOscillatorType} from '../../common/OscillatorTypes'
 import {
-	BasicSynthesizerParam, selectBasicSynthesizer, setBasicSynthesizerOscillatorType, setBasicSynthesizerParam,
+	BasicSynthesizerParam, selectBasicSynthesizer,
+	setBasicSynthesizerOscillatorType, setBasicSynthesizerParam,
+	getConnectionNodeInfo,
 } from '../../common/redux'
 import {IClientAppState} from '../../common/redux'
-import {
-	selectConnectionSourceNotesByTargetId,
-} from '../../common/redux'
 import {Knob} from '../Knob/Knob'
 import {Panel} from '../Panel/Panel'
 import {ConnectedNoteSchedulerVisualPlaceholder} from '../WebAudio/SchedulerVisual'
 import {BasicSynthesizerOscillatorTypes} from './BasicSynthesizerOscillatorTypes'
 import './BasicSynthesizerView.less'
-import {panToolTip, lpfToolTip, attackToolTip, releaseToolTip, detuneToolTip, gainToolTip} from '../client-constants';
+import {
+	panToolTip, lpfToolTip, attackToolTip, releaseToolTip, detuneToolTip, gainToolTip
+} from '../client-constants';
 
 export type MidiNotes = IMidiNotes
 
@@ -28,7 +28,6 @@ interface IBasicSynthesizerViewProps {
 }
 
 interface IBasicSynthesizerViewReduxProps {
-	rawMidiNotes: MidiNotes
 	pan: number
 	isPlaying: boolean
 	oscillatorType: ShamuOscillatorType
@@ -44,7 +43,6 @@ export class BasicSynthesizerView
 
 	public static defaultProps = {
 		pan: 0,
-		rawMidiNotes: Set(),
 	}
 
 	public render() {
@@ -142,12 +140,11 @@ export class BasicSynthesizerView
 
 export const ConnectedBasicSynthesizerView = connect(
 	(state: IClientAppState, props: IBasicSynthesizerViewProps): IBasicSynthesizerViewReduxProps => {
-		const rawMidiNotes = selectConnectionSourceNotesByTargetId(state.room, props.id)
 		const instrumentState = selectBasicSynthesizer(state.room, props.id)
 
 		return {
-			rawMidiNotes,
-			isPlaying: rawMidiNotes.count() > 0,
+			isPlaying: getConnectionNodeInfo(instrumentState.type)
+				.selectIsPlaying(state.room, props.id),
 			oscillatorType: instrumentState.oscillatorType,
 			pan: instrumentState.pan,
 			lowPassFilterCutoffFrequency: instrumentState.lowPassFilterCutoffFrequency,

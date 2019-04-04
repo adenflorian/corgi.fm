@@ -173,11 +173,7 @@ export const selectVirtualKeyboardById = (state: IClientRoomState, id: string) =
 	return selectAllVirtualKeyboards(state)[id] || VirtualKeyboardState.dummy
 }
 
-export const selectVirtualKeyboardIsActive = (state: IClientRoomState, id: string) => {
-	return selectVirtualKeyboardById(state, id).pressedKeys.count() > 0
-}
-
-export const selectVirtualKeyboardIsSending = (state: IClientRoomState, id: string) => {
+export const selectVirtualKeyboardHasPressedKeys = (state: IClientRoomState, id: string) => {
 	return selectVirtualKeyboardById(state, id).pressedKeys.count() > 0
 }
 

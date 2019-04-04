@@ -15,6 +15,7 @@ import {stripIndent} from 'common-tags';
 
 export interface IConnectionViewProps {
 	color: string
+	isSourcePlaying: boolean
 	sourceX: number
 	sourceY: number
 	targetX: number
@@ -30,7 +31,6 @@ export interface IConnectionViewProps {
 interface IConnectionViewReduxProps {
 	isAddMode: boolean
 	speed?: number
-	isGlobalPlaying: boolean
 	highQuality: boolean
 }
 
@@ -63,7 +63,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 	public render() {
 		const {color, saturateSource, saturateTarget, id, sourceX, sourceY, targetX, targetY,
 			ghostConnector, targetStackOrder = 0, sourceStackOrder = 0, speed = 1,
-			isGlobalPlaying, highQuality} = this.props
+			isSourcePlaying, highQuality} = this.props
 
 		const sourceConnectorLeft = sourceX + (connectorWidth * sourceStackOrder)
 		const sourceConnectorRight = sourceX + connectorWidth + (connectorWidth * sourceStackOrder)
@@ -113,7 +113,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 					pathDFull={pathDFull}
 					connectedLine={connectedLine}
 					speed={speed}
-					isGlobalPlaying={isGlobalPlaying}
+					isSourcePlaying={isSourcePlaying}
 					highQuality={highQuality}
 				/>
 				<Connector
@@ -122,7 +122,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 					x={sourceConnectorLeft}
 					y={sourceY}
 					color={color}
-					saturate={saturateSource}
+					saturate={highQuality ? (saturateSource || isSourcePlaying) : isSourcePlaying}
 				/>
 				<Connector
 					width={connectorWidth}
@@ -130,7 +130,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 					x={targetConnectorLeft}
 					y={targetY}
 					color={color}
-					saturate={saturateTarget}
+					saturate={highQuality ? (saturateTarget || isSourcePlaying) : isSourcePlaying}
 				/>
 				<div
 					className={`ghost ${ghostConnector.status === GhostConnectorStatus.hidden ? 'hidden' : 'active'}`}
@@ -173,7 +173,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 								sourceOrTarget={GhostConnectorStatus.activeSource}
 								movingOrAdding={GhostConnectorType.moving}
 								color={ghostConnector.status === GhostConnectorStatus.activeTarget ? '#0000' : color}
-								saturate={saturateSource}
+								saturate={highQuality ? (saturateSource || isSourcePlaying) : isSourcePlaying}
 							/>
 							<GhostConnector
 								dispatch={this.props.dispatch}
@@ -185,7 +185,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 								sourceOrTarget={GhostConnectorStatus.activeTarget}
 								movingOrAdding={GhostConnectorType.moving}
 								color={ghostConnector.status === GhostConnectorStatus.activeSource ? '#0000' : color}
-								saturate={saturateTarget}
+								saturate={highQuality ? (saturateTarget || isSourcePlaying) : isSourcePlaying}
 							/>
 						</React.Fragment>
 					}
@@ -265,7 +265,7 @@ interface ConnectionLineProps {
 	pathDFull: string
 	connectedLine: LineState
 	speed?: number
-	isGlobalPlaying: boolean
+	isSourcePlaying: boolean
 	highQuality: boolean
 }
 
@@ -274,7 +274,7 @@ const longLineTooltip = 'right click to delete'
 const ConnectionLine = React.memo(
 	function _ConnectionLine({id, color, saturateSource, saturateTarget, pathDPart1,
 		pathDFull, dispatch, connectedLine, speed = 1,
-		isGlobalPlaying, highQuality}: ConnectionLineProps,
+		isSourcePlaying, highQuality}: ConnectionLineProps,
 	) {
 		const saturatedColor = saturateColor(color)
 
@@ -289,8 +289,8 @@ const ConnectionLine = React.memo(
 					fill: 'none',
 				}}
 			>
-				{highQuality &&
-					<defs>
+				<defs>
+					{highQuality &&
 						<linearGradient
 							id={id}
 							x1={(connectedLine.x1)}
@@ -300,16 +300,16 @@ const ConnectionLine = React.memo(
 							gradientUnits="userSpaceOnUse"
 						// gradientUnits="objectBoundingBox"
 						>
-							<stop stopColor={saturateSource ? saturatedColor : color} offset="0%" />
-							<stop stopColor={saturateTarget ? saturatedColor : color} offset="100%" />
+							<stop stopColor={(saturateSource || isSourcePlaying) ? saturatedColor : color} offset="0%" />
+							<stop stopColor={(saturateTarget || isSourcePlaying) ? saturatedColor : color} offset="100%" />
 						</linearGradient>
-						<filter id="saturate">
-							<feColorMatrix in="SourceGraphic"
-								type="saturate"
-								values="3" />
-						</filter>
-					</defs>
-				}
+					}
+					<filter id="saturate">
+						<feColorMatrix in="SourceGraphic"
+							type="saturate"
+							values="3" />
+					</filter>
+				</defs>
 				<g
 					onContextMenu={(e: React.MouseEvent) => {
 						dispatch(connectionsActions.delete(List([id])))
@@ -319,7 +319,7 @@ const ConnectionLine = React.memo(
 					<path
 						className="mainLongLine"
 						d={pathDPart1}
-						stroke={highQuality ? `url(#${id})` : saturateSource ? saturatedColor : color}
+						stroke={highQuality ? `url(#${id})` : isSourcePlaying ? saturatedColor : color}
 						strokeWidth={longLineStrokeWidth + 'px'}
 					>
 					</path>
@@ -334,12 +334,12 @@ const ConnectionLine = React.memo(
 					<path
 						className="blurLine"
 						d={pathDFull}
-						stroke={highQuality ? `url(#${id})` : saturateSource ? saturatedColor : color}
+						stroke={highQuality ? `url(#${id})` : isSourcePlaying ? saturatedColor : color}
 						strokeWidth={4 + 'px'}
 					>
 						<title>{longLineTooltip}</title>
 					</path>
-					{highQuality && isGlobalPlaying && saturateSource &&
+					{highQuality && isSourcePlaying &&
 						<path
 							style={{
 								animationDuration: (3600 / speed) + 's',
@@ -436,7 +436,6 @@ export const ConnectedConnectionView = shamuConnect(
 		return {
 			isAddMode: selectUserInputKeys(state).shift,
 			speed: globalClockState.bpm,
-			isGlobalPlaying: globalClockState.isPlaying,
 			highQuality: !selectOption(state, AppOptions.enableEfficientMode),
 		}
 	},

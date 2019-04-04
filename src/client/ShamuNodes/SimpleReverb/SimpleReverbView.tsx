@@ -1,6 +1,9 @@
 import * as React from 'react'
 import {Dispatch} from 'redux'
-import {selectConnectionSourceNotesByTargetId, selectSimpleReverb, setSimpleReverbParam, shamuConnect, SimpleReverbParam} from '../../../common/redux'
+import {
+	selectSimpleReverb, setSimpleReverbParam, shamuConnect,
+	SimpleReverbParam, getConnectionNodeInfo,
+} from '../../../common/redux'
 import {Knob} from '../../Knob/Knob'
 import {Panel} from '../../Panel/Panel'
 
@@ -76,7 +79,8 @@ export const ConnectedSimpleReverb = shamuConnect(
 		const simpleReverbState = selectSimpleReverb(state.room, id)
 
 		return {
-			isPlaying: selectConnectionSourceNotesByTargetId(state.room, id).count() > 0,
+			isPlaying: getConnectionNodeInfo(simpleReverbState.type)
+				.selectIsPlaying(state.room, id),
 			lpf: simpleReverbState.lowPassFilterCutoffFrequency,
 			time: simpleReverbState.time,
 		}

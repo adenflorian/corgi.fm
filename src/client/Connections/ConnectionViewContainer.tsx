@@ -5,6 +5,7 @@ import {
 	selectConnectionSourceIsActive,
 	selectConnectionSourceIsSending, selectConnectionStackOrderForSource,
 	selectConnectionStackOrderForTarget, selectPosition, shamuConnect,
+	getConnectionNodeInfo,
 } from '../../common/redux'
 import {ConnectedConnectionView} from './ConnectionView'
 
@@ -20,6 +21,7 @@ interface IConnectionViewContainerReduxProps {
 	sourceColor: string
 	isSourceActive: boolean
 	isSourceSending: boolean
+	isSourcePlaying: boolean
 	ghostConnector: GhostConnectorRecord
 }
 
@@ -29,11 +31,13 @@ type IConnectionViewContainerAllProps =
 
 export const ConnectionViewContainer: React.FC<IConnectionViewContainerAllProps> =
 	function _ConnectionViewContainer({
-		sourceStackOrder, targetStackOrder, sourceColor, isSourceActive, isSourceSending, id,
-		sourcePosition, targetPosition, ghostConnector,
+		sourceStackOrder, targetStackOrder, sourceColor,
+		isSourceActive, isSourceSending, id,
+		sourcePosition, targetPosition, ghostConnector, isSourcePlaying,
 	}) {
 		return <ConnectedConnectionView
 			color={sourceColor}
+			isSourcePlaying={isSourcePlaying}
 			sourceX={sourcePosition.x + sourcePosition.width}
 			sourceY={sourcePosition.y + (sourcePosition.height / 2)}
 			targetX={targetPosition.x}
@@ -50,8 +54,9 @@ export const ConnectionViewContainer: React.FC<IConnectionViewContainerAllProps>
 export const ConnectedConnectionViewContainer = shamuConnect(
 	(state, props: IConnectionViewContainerProps): IConnectionViewContainerReduxProps => {
 		const connection = selectConnection(state.room, props.id)
-		const isSourceActive = selectConnectionSourceIsActive(state.room, connection.id)
 		const isSourceSending = selectConnectionSourceIsSending(state.room, connection.id)
+		const isSourceActive =
+			isSourceSending || selectConnectionSourceIsActive(state.room, connection.id)
 		const sourcePosition = selectPosition(state.room, connection.sourceId)
 		const targetPosition = selectPosition(state.room, connection.targetId)
 		const sourceColor = selectConnectionSourceColor(state.room, props.id)
@@ -60,6 +65,8 @@ export const ConnectedConnectionViewContainer = shamuConnect(
 			sourceColor,
 			isSourceActive,
 			isSourceSending,
+			isSourcePlaying: getConnectionNodeInfo(connection.sourceType)
+				.selectIsPlaying(state.room, connection.sourceId),
 			ghostConnector: connection.ghostConnector,
 			sourcePosition,
 			targetPosition,

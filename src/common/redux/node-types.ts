@@ -11,7 +11,7 @@ import {
 	selectInfiniteSequencerActiveNotes, selectInfiniteSequencerIsActive,
 	selectInfiniteSequencerIsSending, selectSampler,
 	selectSimpleReverb, selectVirtualKeyboardById,
-	selectVirtualKeyboardIsActive, selectVirtualKeyboardIsSending, VirtualKeyboardState,
+	selectVirtualKeyboardHasPressedKeys, VirtualKeyboardState,
 } from './index'
 import {IClientAppState} from './common-redux-types';
 import {addVirtualKeyboard} from './virtual-keyboard-redux';
@@ -21,6 +21,8 @@ import {InfiniteSequencerState, addInfiniteSequencer} from './infinite-sequencer
 import {BasicSynthesizerState, addBasicSynthesizer} from './basic-synthesizers-redux';
 import {BasicSamplerState, addBasicSampler} from './basic-sampler-redux';
 import {SimpleReverbState, addSimpleReverb} from './simple-reverb-redux';
+import {selectSequencerIsPlaying} from './sequencer-redux';
+import {selectConnectionsWithTargetIds} from './connections-redux';
 
 export const MASTER_AUDIO_OUTPUT_TARGET_ID = 'MASTER_AUDIO_OUTPUT_TARGET_ID'
 
@@ -52,6 +54,7 @@ const _makeNodeInfo = Record({
 	stateSelector: ((roomState: IClientRoomState, id: string) => dummyIConnectable),
 	selectIsActive: (() => null) as (roomState: IClientRoomState, id: string) => boolean | null,
 	selectIsSending: (() => null) as (roomState: IClientRoomState, id: string) => boolean | null,
+	selectIsPlaying: (() => false) as (roomState: IClientRoomState, id: string, processedIds?: Set<string>) => boolean,
 	selectActiveNotes: (_: IClientRoomState, __: string) => Set<IMidiNote>(),
 	stateDeserializer: ((state: IMultiStateThing) => state) as (state: IMultiStateThing) => IMultiStateThing,
 	color: false as string | false,
@@ -99,8 +102,9 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		stateConstructor: VirtualKeyboardState,
 		addNodeActionCreator: addVirtualKeyboard,
 		stateSelector: selectVirtualKeyboardById,
-		selectIsActive: selectVirtualKeyboardIsActive,
-		selectIsSending: selectVirtualKeyboardIsSending,
+		selectIsActive: selectVirtualKeyboardHasPressedKeys,
+		selectIsSending: selectVirtualKeyboardHasPressedKeys,
+		selectIsPlaying: selectVirtualKeyboardHasPressedKeys,
 		selectActiveNotes: makeGetKeyboardMidiOutput(),
 		stateDeserializer: VirtualKeyboardState.fromJS,
 	})],
@@ -111,6 +115,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		stateSelector: selectGridSequencer,
 		selectIsActive: selectGridSequencerIsActive,
 		selectIsSending: selectGridSequencerIsSending,
+		selectIsPlaying: selectSequencerIsPlaying,
 		selectActiveNotes: selectGridSequencerActiveNotes,
 		stateDeserializer: deserializeSequencerState,
 		showOnAddNodeMenu: true,
@@ -122,6 +127,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		stateSelector: selectInfiniteSequencer,
 		selectIsActive: selectInfiniteSequencerIsActive,
 		selectIsSending: selectInfiniteSequencerIsSending,
+		selectIsPlaying: selectSequencerIsPlaying,
 		selectActiveNotes: selectInfiniteSequencerActiveNotes,
 		stateDeserializer: deserializeSequencerState,
 		showOnAddNodeMenu: true,
@@ -130,6 +136,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		typeName: 'Basic Synthesizer',
 		stateConstructor: BasicSynthesizerState,
 		addNodeActionCreator: addBasicSynthesizer,
+		selectIsPlaying: selectIsUpstreamNodePlaying,
 		stateSelector: selectBasicSynthesizer,
 		showOnAddNodeMenu: true,
 	})],
@@ -137,6 +144,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		typeName: 'Basic Piano Sampler',
 		stateConstructor: BasicSamplerState,
 		addNodeActionCreator: addBasicSampler,
+		selectIsPlaying: selectIsUpstreamNodePlaying,
 		stateSelector: selectSampler,
 		showOnAddNodeMenu: true,
 	})],
@@ -144,6 +152,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		typeName: 'R E V E R B',
 		stateConstructor: SimpleReverbState,
 		addNodeActionCreator: addSimpleReverb,
+		selectIsPlaying: selectIsUpstreamNodePlaying,
 		stateSelector: selectSimpleReverb,
 		showOnAddNodeMenu: true,
 	})],
@@ -151,6 +160,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		typeName: 'Audio Output',
 		stateConstructor: AudioOutputState,
 		addNodeActionCreator: () => ({type: 'dummy audioOutput type'}),
+		selectIsPlaying: selectIsUpstreamNodePlaying,
 		stateSelector: () => audioOutputState,
 	})],
 	[ConnectionNodeType.masterClock, makeNodeInfo({
@@ -160,6 +170,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		stateSelector: () => masterClockState,
 		selectIsActive: selectGlobalClockIsPlaying,
 		selectIsSending: selectGlobalClockIsPlaying,
+		selectIsPlaying: selectGlobalClockIsPlaying,
 		color: CssColor.brightBlue,
 	})],
 ])
@@ -181,4 +192,41 @@ export const getConnectionNodeInfo = (type: ConnectionNodeType): IConnectionNode
 
 export function getAddableNodeInfos() {
 	return NodeInfoMap.filter(x => x.showOnAddNodeMenu)
+}
+
+function selectIsUpstreamNodePlaying(state: IClientRoomState, id: string, processedNodeIds = Set<string>()): boolean {
+	return memoizedIsUpstreamNodePlaying(state, id, processedNodeIds)
+}
+
+// let previousConnectionsState = {}
+// let previousResult = false
+
+function memoizedIsUpstreamNodePlaying(state: IClientRoomState, nodeId: string, processedNodeIds: Set<string>) {
+	return isUpstreamNodePlaying(state, nodeId, processedNodeIds)
+
+	// const newConnectionsState = selectAllConnections(state)
+
+	// if (newConnectionsState === previousConnectionsState) {
+	// 	return previousResult
+	// } else {
+	// 	previousConnectionsState = newConnectionsState
+
+	// 	const newResult = isUpstreamNodePlaying(state, nodeId)
+
+	// 	previousResult = newResult
+
+	// 	return newResult
+	// }
+}
+
+function isUpstreamNodePlaying(
+	state: IClientRoomState, nodeId: string, processedNodeIds = Set<string>()
+): boolean {
+	if (processedNodeIds.includes(nodeId)) return false
+
+	return selectConnectionsWithTargetIds(state, [nodeId])
+		.some(connection => {
+			return getConnectionNodeInfo(connection.sourceType)
+				.selectIsPlaying(state, connection.sourceId, processedNodeIds.add(nodeId))
+		})
 }

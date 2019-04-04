@@ -183,29 +183,31 @@ export function selectSequencer(state: IClientRoomState, id: string) {
 	return selectAllSequencers(state)[id] || dummySequencerState
 }
 
-export const selectSequencerIsPlaying = (state: IClientRoomState, id: string) => {
-	if (selectSequencer(state, id).isPlaying === false) return
-	if (selectGlobalClockIsPlaying(state) === false) return
+export const selectSequencerIsPlaying = (state: IClientRoomState, id: string): boolean => {
+	if (selectSequencer(state, id).isPlaying === false) return false
+	if (selectGlobalClockIsPlaying(state) === false) return false
 
 	return memoizedIsUpstreamClockFromNode(state, id)
 }
 
 let previousConnectionsState = {}
-let previousResult = false
+let previousResults = Map<string, boolean>()
 
 function memoizedIsUpstreamClockFromNode(state: IClientRoomState, nodeId: string) {
 	const newConnectionsState = selectAllConnections(state)
 
-	if (newConnectionsState === previousConnectionsState) {
-		return previousResult
+	if (newConnectionsState === previousConnectionsState && previousResults.has(nodeId)) {
+		return previousResults.get(nodeId)!
 	} else {
 		previousConnectionsState = newConnectionsState
 
-		const newResult = isUpstreamClockFromNode(state, nodeId)
+		previousResults = previousResults.clear().withMutations(mutable => {
+			Map(selectAllSequencers(state)).forEach(sequencer => {
+				mutable.set(sequencer.id, isUpstreamClockFromNode(state, sequencer.id))
+			})
+		})
 
-		previousResult = newResult
-
-		return newResult
+		return previousResults.get(nodeId)!
 	}
 }
 
