@@ -4,6 +4,7 @@
 - [√] add cookies banner thing for GDPR
 - [√] right click menu to add nodes
 - [√] sequencers should only play if connected to a playing master clock, even if indirectly
+- [ ] move ghost connectors state to its own state so connections memoizations will be more effective
 
 # Soon
 - [ ] increase room deletion timeout

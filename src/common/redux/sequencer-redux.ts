@@ -8,7 +8,7 @@ import {colorFunc, hashbow} from '../shamu-color'
 import {BROADCASTER_ACTION, SERVER_ACTION, IClientRoomState} from './index'
 import {NodeSpecialState} from './shamu-graph'
 import {createSelector} from 'reselect';
-import {selectConnectionsWithTargetIds} from './connections-redux';
+import {selectConnectionsWithTargetIds, selectAllConnections} from './connections-redux';
 import {selectGlobalClockIsPlaying} from './global-clock-redux';
 
 export const CLEAR_SEQUENCER = 'CLEAR_SEQUENCER'
@@ -185,11 +185,31 @@ export function selectSequencer(state: IClientRoomState, id: string) {
 
 export const selectSequencerIsPlaying = (state: IClientRoomState, id: string) => {
 	if (selectSequencer(state, id).isPlaying === false) return
+	if (selectGlobalClockIsPlaying(state) === false) return
 
-	return isUpstreamClockPlayingFromNode(state, id)
+	return memoizedIsUpstreamClockFromNode(state, id)
 }
 
-function isUpstreamClockPlayingFromNode(
+let previousConnectionsState = {}
+let previousResult = false
+
+function memoizedIsUpstreamClockFromNode(state: IClientRoomState, nodeId: string) {
+	const newConnectionsState = selectAllConnections(state)
+
+	if (newConnectionsState === previousConnectionsState) {
+		return previousResult
+	} else {
+		previousConnectionsState = newConnectionsState
+
+		const newResult = isUpstreamClockFromNode(state, nodeId)
+
+		previousResult = newResult
+
+		return newResult
+	}
+}
+
+function isUpstreamClockFromNode(
 	state: IClientRoomState, nodeId: string, processedNodeIds = Set<string>()
 ): boolean {
 	if (processedNodeIds.includes(nodeId)) return false
@@ -197,9 +217,9 @@ function isUpstreamClockPlayingFromNode(
 	return selectConnectionsWithTargetIds(state, [nodeId])
 		.some(connection => {
 			if (connection.sourceType === ConnectionNodeType.masterClock) {
-				return selectGlobalClockIsPlaying(state)
+				return true
 			} else {
-				return isUpstreamClockPlayingFromNode(state, connection.sourceId, processedNodeIds.add(nodeId))
+				return isUpstreamClockFromNode(state, connection.sourceId, processedNodeIds.add(nodeId))
 			}
 		})
 }

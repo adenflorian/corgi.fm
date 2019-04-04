@@ -87,6 +87,8 @@
         "linebreak",
         "localstorage",
         "lowpass",
+        "memoizations",
+        "memoized",
         "nginx",
         "notroot",
         "onmidimessage",
