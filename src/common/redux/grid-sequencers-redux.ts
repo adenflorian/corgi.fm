@@ -1,4 +1,4 @@
-import {List, Map, Stack} from 'immutable'
+import {List, Stack} from 'immutable'
 import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
 import {ConnectionNodeType} from '../common-types'
@@ -9,10 +9,10 @@ import {MAX_MIDI_NOTE_NUMBER_127} from '../server-constants'
 import {
 	addMultiThing, BROADCASTER_ACTION, CLEAR_SEQUENCER, createSequencerEvents, IClientRoomState,
 	IMultiState, IMultiStateThings, isEmptyEvents, makeMultiReducer, NetworkActionType,
-	PLAY_ALL, selectAllInfiniteSequencers, selectGlobalClockState, SERVER_ACTION, STOP_ALL,
+	PLAY_ALL, selectGlobalClockState, SERVER_ACTION, STOP_ALL,
 	UNDO_SEQUENCER,
 } from './index'
-import {PLAY_SEQUENCER, SequencerAction, SequencerStateBase, STOP_SEQUENCER} from './sequencer-redux'
+import {PLAY_SEQUENCER, SequencerAction, SequencerStateBase, STOP_SEQUENCER, selectAllGridSequencers} from './sequencer-redux'
 
 export const addGridSequencer = (gridSequencer: GridSequencerState) =>
 	addMultiThing(gridSequencer, ConnectionNodeType.gridSequencer, NetworkActionType.SERVER_AND_BROADCASTER)
@@ -290,8 +290,6 @@ export const gridSequencersReducer =
 		gridSequencerActionTypes, gridSequencerGlobalActionTypes,
 	)
 
-export const selectAllGridSequencers = (state: IClientRoomState) => state.shamuGraph.nodes.gridSequencers.things
-
 export const selectAllGridSequencerIds = createSelector(
 	selectAllGridSequencers,
 	gridSequencers => Object.keys(gridSequencers),
@@ -308,20 +306,6 @@ export const selectGridSequencerIsActive = (state: IClientRoomState, id: string)
 
 export const selectGridSequencerIsSending = (state: IClientRoomState, id: string) =>
 	selectGridSequencerActiveNotes(state, id).count() > 0
-
-export const selectAllSequencers = createSelector(
-	[selectAllGridSequencers, selectAllInfiniteSequencers],
-	(gridSeqs, infSeqs) => ({...gridSeqs, ...infSeqs}),
-)
-
-export function selectSequencer(state: IClientRoomState, id: string) {
-	return selectAllSequencers(state)[id] || GridSequencerState.dummy
-}
-
-export const selectIsAnythingPlaying = createSelector(
-	[selectAllSequencers],
-	allSeqs => Map(allSeqs).some(x => x.isPlaying),
-)
 
 export const selectGridSequencerActiveNotes = createSelector(
 	[selectGridSequencer, selectGlobalClockState],

@@ -3,14 +3,14 @@ import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
 import {ConnectionNodeType} from '../common-types'
 import {assertArrayHasNoUndefinedElements} from '../common-utils'
-import {makeMidiClipEvent, MidiClip, MidiClipEvents} from '../midi-types'
+import {makeMidiClipEvent, MidiClip} from '../midi-types'
 import {IMidiNote, MidiNotes} from '../MidiNote'
 import {
 	addMultiThing, BROADCASTER_ACTION, CLEAR_SEQUENCER, createSequencerEvents, IClientRoomState, IMultiState,
 	IMultiStateThings, makeMultiReducer, NetworkActionType, PLAY_ALL, selectGlobalClockState,
 	SERVER_ACTION, SKIP_NOTE, STOP_ALL, UNDO_SEQUENCER, VIRTUAL_KEY_PRESSED,
 } from './index'
-import {PLAY_SEQUENCER, SequencerAction, SequencerStateBase, STOP_SEQUENCER, UNDO_RECORDING_SEQUENCER} from './sequencer-redux'
+import {PLAY_SEQUENCER, SequencerAction, SequencerStateBase, STOP_SEQUENCER, UNDO_RECORDING_SEQUENCER, selectAllInfiniteSequencers} from './sequencer-redux'
 import {VirtualKeyPressedAction} from './virtual-keyboard-redux'
 
 export const addInfiniteSequencer = (infiniteSequencer: InfiniteSequencerState) =>
@@ -283,8 +283,6 @@ function infiniteSequencerReducer(
 			return infiniteSequencer
 	}
 }
-
-export const selectAllInfiniteSequencers = (state: IClientRoomState) => state.shamuGraph.nodes.infiniteSequencers.things
 
 export const selectInfiniteSequencer = (state: IClientRoomState, id: string) => selectAllInfiniteSequencers(state)[id] || InfiniteSequencerState.dummy
 

@@ -23,7 +23,7 @@ export function makeMidiClipEvent(event: MidiClipEvent): Readonly<MidiClipEvent>
 	})
 }
 
-const makeMidiClip = Record({
+export const makeMidiClip = Record({
 	length: 0,
 	loop: false,
 	events: List<MidiClipEvent>(),

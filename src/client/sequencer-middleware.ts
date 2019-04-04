@@ -5,7 +5,7 @@ import {
 	EXPORT_SEQUENCER_MIDI, IClientAppState, isEmptyEvents,
 	selectAllSequencers, selectConnectionsWithSourceIds,
 	SequencerAction, sequencerActions, STOP_SEQUENCER,
-} from '../common/redux/index'
+} from '../common/redux'
 import {getAllInstruments} from './instrument-manager'
 
 export const createSequencerMiddleware = () => {

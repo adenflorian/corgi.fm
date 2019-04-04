@@ -1,12 +1,13 @@
-import {List} from 'immutable'
+import {List, Map} from 'immutable'
 import {ActionType} from 'typesafe-actions'
 import uuid = require('uuid')
 import {ConnectionNodeType, IMultiStateThing} from '../common-types'
-import {makeMidiClipEvent, MidiClip, MidiClipEvent, MidiClipEvents} from '../midi-types'
+import {makeMidiClipEvent, MidiClip, MidiClipEvent, MidiClipEvents, makeMidiClip} from '../midi-types'
 import {emptyMidiNotes, MidiNotes} from '../MidiNote'
 import {colorFunc, hashbow} from '../shamu-color'
-import {BROADCASTER_ACTION, SERVER_ACTION} from './index'
+import {BROADCASTER_ACTION, SERVER_ACTION, IClientRoomState} from './index'
 import {NodeSpecialState} from './shamu-graph'
+import {createSelector} from 'reselect';
 
 export const CLEAR_SEQUENCER = 'CLEAR_SEQUENCER'
 export const UNDO_SEQUENCER = 'UNDO_SEQUENCER'
@@ -104,14 +105,34 @@ export interface ISequencerState extends IMultiStateThing, NodeSpecialState {
 	notesDisplayWidth: number
 }
 
+export const dummySequencerState: Readonly<SequencerStateBase> = Object.freeze({
+	index: -1,
+	id: 'dummy sequencer id',
+	color: 'black',
+	isRecording: false,
+	previousEvents: List<MidiClipEvents>(),
+	rate: 1,
+	pitch: 0,
+	name: 'dummy sequencer name',
+	midiClip: makeMidiClip(),
+	width: 0,
+	height: 0,
+	ownerId: 'dummy owner id',
+	type: ConnectionNodeType.gridSequencer,
+	notesDisplayStartX: 1,
+	notesDisplayWidth: 1,
+	isPlaying: false,
+	gate: 1,
+})
+
 export abstract class SequencerStateBase implements ISequencerState {
 	public readonly index: number = -1
 	public readonly id = uuid.v4()
 	public readonly color: string
-	public readonly isRecording = false
-	public readonly previousEvents = List<MidiClipEvents>()
-	public readonly rate = 1
-	public readonly pitch = 0
+	public readonly isRecording: boolean = false
+	public readonly previousEvents: List<MidiClipEvents> = List<MidiClipEvents>()
+	public readonly rate: number = 1
+	public readonly pitch: number = 0
 
 	constructor(
 		public readonly name: string,
@@ -122,8 +143,8 @@ export abstract class SequencerStateBase implements ISequencerState {
 		public readonly type: ConnectionNodeType,
 		public readonly notesDisplayStartX: number,
 		public readonly notesDisplayWidth: number,
-		public readonly isPlaying = false,
-		public readonly gate = 1,
+		public readonly isPlaying: boolean = false,
+		public readonly gate: number = 1,
 	) {
 		this.color = colorFunc(hashbow(this.id)).desaturate(0.2).hsl().string()
 	}
@@ -146,3 +167,21 @@ export function deserializeSequencerState<T extends ISequencerState>(state: IMul
 	} as T
 	return y
 }
+
+export const selectAllGridSequencers = (state: IClientRoomState) => state.shamuGraph.nodes.gridSequencers.things
+
+export const selectAllInfiniteSequencers = (state: IClientRoomState) => state.shamuGraph.nodes.infiniteSequencers.things
+
+export const selectAllSequencers = createSelector(
+	[selectAllGridSequencers, selectAllInfiniteSequencers],
+	(gridSeqs, infSeqs) => ({...gridSeqs, ...infSeqs}),
+)
+
+export function selectSequencer(state: IClientRoomState, id: string) {
+	return selectAllSequencers(state)[id] || dummySequencerState
+}
+
+export const selectIsAnythingPlaying = createSelector(
+	[selectAllSequencers],
+	allSeqs => Map(allSeqs).some(x => x.isPlaying),
+)
