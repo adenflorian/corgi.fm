@@ -4,7 +4,7 @@ import {Server, Socket} from 'socket.io'
 import {maxRoomNameLength} from '../common/common-constants'
 import {ClientId} from '../common/common-types'
 import {logger} from '../common/logger'
-import {addClient, addRoomMember, BroadcastAction, BROADCASTER_ACTION, CHANGE_ROOM, clientDisconnected, ClientState, connectionsActions, createRoom, createRoomAction, deletePositions, deleteRoom, deleteRoomMember, deleteThingsAny, getActionsBlacklist, globalClockActions, IClientRoomState, IServerState, maxUsernameLength, pointersActions, ready, REQUEST_CREATE_ROOM, selectAllClients, selectAllConnections, selectAllMessages, selectAllPointers, selectAllPositions, selectAllRoomMemberIds, selectAllRoomNames, selectAllRoomStates, selectClientBySocketId, selectConnectionsWithSourceOrTargetIds, selectGlobalClockState, selectNodeIdsOwnedByClient, selectPositionsWithIds, selectRoomExists, selectRoomStateByName, selectShamuGraphState, setActiveRoom, setChat, setClients, setRoomMembers, setRooms, shamuGraphActions, updatePositions} from '../common/redux'
+import {addClient, addRoomMember, BroadcastAction, CHANGE_ROOM, clientDisconnected, ClientState, connectionsActions, createRoom, createRoomAction, deletePositions, deleteRoom, deleteRoomMember, deleteThingsAny, getActionsBlacklist, globalClockActions, IClientRoomState, IServerState, maxUsernameLength, pointersActions, ready, REQUEST_CREATE_ROOM, selectAllClients, selectAllConnections, selectAllMessages, selectAllPointers, selectAllPositions, selectAllRoomMemberIds, selectAllRoomNames, selectAllRoomStates, selectClientBySocketId, selectConnectionsWithSourceOrTargetIds, selectGlobalClockState, selectNodeIdsOwnedByClient, selectPositionsWithIds, selectRoomExists, selectRoomStateByName, selectShamuGraphState, setActiveRoom, setChat, setClients, setRoomMembers, setRooms, shamuGraphActions, updatePositions, SERVER_ACTION} from '../common/redux'
 import {WebSocketEvent} from '../common/server-constants'
 import {createServerStuff} from './create-server-stuff'
 import {serverInfo} from './server-info'
@@ -77,7 +77,7 @@ export function setupServerWebSocketListeners(io: Server, serverStore: Store) {
 				if (getActionsBlacklist().includes(action.type) === false) {
 					logger.trace(`${WebSocketEvent.broadcast}: ${socket.id} | `, action)
 				}
-				if (action[BROADCASTER_ACTION]) {
+				if (action[SERVER_ACTION]) {
 					serverStore.dispatch(createRoomAction(action, getRoom(socket)))
 				}
 				socket.broadcast.to(getRoom(socket)).emit(WebSocketEvent.broadcast, {...action, alreadyBroadcasted: true})
