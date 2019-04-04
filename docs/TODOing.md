@@ -3,6 +3,7 @@
 	- [ ] but make it make more sense, like visualize the octave somehow
 - [√] add cookies banner thing for GDPR
 - [√] right click menu to add nodes
+- [√] sequencers should only play if connected to a playing master clock, even if indirectly
 
 # Soon
 - [ ] increase room deletion timeout

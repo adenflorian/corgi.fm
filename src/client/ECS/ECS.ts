@@ -2,7 +2,8 @@ import {List} from 'immutable'
 import {Store} from 'redux'
 import {isSequencerNodeType} from '../../common/common-types'
 import {
-	AppOptions, IClientAppState, selectAllPositions, selectOption, selectSequencer,
+	AppOptions, IClientAppState, selectAllPositions, selectOption,
+	selectSequencer, selectSequencerIsPlaying,
 } from '../../common/redux'
 import {getSequencersSchedulerInfo} from '../note-scanner'
 import {ECSCanvasRenderSystem} from './ECSCanvasRenderSystem'
@@ -56,7 +57,7 @@ function ecsLoop() {
 				ratio: getSequencersSchedulerInfo()
 					.get(sequencer.id, {loopRatio: 0})
 					.loopRatio,
-				isPlaying: sequencer.isPlaying,
+				isPlaying: selectSequencerIsPlaying(state.room, sequencer.id),
 			}),
 		))
 		.toList()

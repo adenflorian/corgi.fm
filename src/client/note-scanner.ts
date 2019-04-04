@@ -4,6 +4,7 @@ import {MidiGlobalClipEvent, MidiRange} from '../common/midi-types'
 import {
 	ClientStore, selectAllSequencers, selectConnectionSourceIdsByTarget,
 	selectGlobalClockState,
+	selectSequencerIsPlaying,
 } from '../common/redux'
 import {getAllInstruments} from './instrument-manager'
 import {getEvents} from './note-scheduler'
@@ -111,7 +112,7 @@ function scheduleNotes() {
 
 	// run all sequencers events thru scheduler
 	const sequencersEvents = Map(selectAllSequencers(roomState))
-		.filter(seq => seq.isPlaying)
+		.filter(seq => selectSequencerIsPlaying(roomState, seq.id))
 		.map(seq => ({
 			seq,
 			events: getEvents(seq.midiClip, readRangeBeats)

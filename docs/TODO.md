@@ -75,6 +75,7 @@
 	- some will fade away automatically
 	- others require user interaction
 - [ ] highlight keys in the current key
+- [ ] show message to user if an error is detected (like if console.error was called)
 
 # Optimizations
 - [√] use debounce for some network updates like mouse cursors and node positions?

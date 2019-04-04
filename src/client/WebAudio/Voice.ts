@@ -241,9 +241,9 @@ export abstract class Voice {
 
 		audioNode.stop(this._scheduledReleaseEndTimeSeconds)
 		audioNode.onended = () => {
-			audioNode.disconnect()
-			this._gain.disconnect()
-			delete this._gain
+			audioNode && audioNode.disconnect()
+			this._gain && this._gain.disconnect()
+			this._gain && delete this._gain
 			this._onEnded(this.id)
 		}
 	}

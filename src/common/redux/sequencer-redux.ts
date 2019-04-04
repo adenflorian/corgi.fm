@@ -1,4 +1,4 @@
-import {List, Map} from 'immutable'
+import {List, Map, Set} from 'immutable'
 import {ActionType} from 'typesafe-actions'
 import uuid = require('uuid')
 import {ConnectionNodeType, IMultiStateThing} from '../common-types'
@@ -8,6 +8,8 @@ import {colorFunc, hashbow} from '../shamu-color'
 import {BROADCASTER_ACTION, SERVER_ACTION, IClientRoomState} from './index'
 import {NodeSpecialState} from './shamu-graph'
 import {createSelector} from 'reselect';
+import {selectConnectionsWithTargetIds} from './connections-redux';
+import {selectGlobalClockIsPlaying} from './global-clock-redux';
 
 export const CLEAR_SEQUENCER = 'CLEAR_SEQUENCER'
 export const UNDO_SEQUENCER = 'UNDO_SEQUENCER'
@@ -179,6 +181,27 @@ export const selectAllSequencers = createSelector(
 
 export function selectSequencer(state: IClientRoomState, id: string) {
 	return selectAllSequencers(state)[id] || dummySequencerState
+}
+
+export const selectSequencerIsPlaying = (state: IClientRoomState, id: string) => {
+	if (selectSequencer(state, id).isPlaying === false) return
+
+	return isUpstreamClockPlayingFromNode(state, id)
+}
+
+function isUpstreamClockPlayingFromNode(
+	state: IClientRoomState, nodeId: string, processedNodeIds = Set<string>()
+): boolean {
+	if (processedNodeIds.includes(nodeId)) return false
+
+	return selectConnectionsWithTargetIds(state, [nodeId])
+		.some(connection => {
+			if (connection.sourceType === ConnectionNodeType.masterClock) {
+				return selectGlobalClockIsPlaying(state)
+			} else {
+				return isUpstreamClockPlayingFromNode(state, connection.sourceId, processedNodeIds.add(nodeId))
+			}
+		})
 }
 
 export const selectIsAnythingPlaying = createSelector(
