@@ -44,6 +44,12 @@ export const SERVER_ACTION = 'SERVER_ACTION'
  */
 export const BROADCASTER_ACTION = 'BROADCASTER_ACTION'
 
+/**
+ * Will dispatch on the server.
+ * Will dispatch to high level server state, and not room state.
+ */
+export const GLOBAL_SERVER_ACTION = 'GLOBAL_SERVER_ACTION'
+
 export enum NetworkActionType {
 	SERVER_ACTION = 'SERVER_ACTION',
 	BROADCASTER = 'BROADCASTER_ACTION',

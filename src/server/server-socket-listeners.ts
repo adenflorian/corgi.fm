@@ -18,7 +18,7 @@ import {
 	selectPositionsWithIds, selectRoomExists, selectRoomStateByName,
 	selectShamuGraphState, setActiveRoom, setChat, setClients,
 	setRoomMembers, setRooms, shamuGraphActions, updatePositions,
-	SERVER_ACTION, SET_CLIENT_NAME
+	SERVER_ACTION, GLOBAL_SERVER_ACTION
 } from '../common/redux'
 import {WebSocketEvent} from '../common/server-constants'
 import {createServerStuff} from './create-server-stuff'
@@ -93,22 +93,24 @@ export function setupServerWebSocketListeners(io: Server, serverStore: Store) {
 					logger.trace(`${WebSocketEvent.broadcast}: ${socket.id} | `, action)
 				}
 
-				if (action[SERVER_ACTION]) {
-					if (action.type === SET_CLIENT_NAME) {
-						// TODO This is bad, need cleaner way for this, or refactor clients redux
-						serverStore.dispatch(action)
-					} else {
-						serverStore.dispatch(createRoomAction(action, getRoom(socket)))
-					}
+				if (action[GLOBAL_SERVER_ACTION]) {
+					serverStore.dispatch(action)
+				} else if (action[SERVER_ACTION]) {
+					serverStore.dispatch(createRoomAction(action, getRoom(socket)))
 				}
 
 				socket.broadcast.to(getRoom(socket)).emit(WebSocketEvent.broadcast, {...action, alreadyBroadcasted: true})
 			})
 
+			// TODO Merge with broadcast event above
 			socket.on(WebSocketEvent.serverAction, (action: AnyAction) => {
 				logger.trace(`${WebSocketEvent.serverAction}: ${socket.id} | `, action)
 
-				serverStore.dispatch(createRoomAction(action, getRoom(socket)))
+				if (action[GLOBAL_SERVER_ACTION]) {
+					serverStore.dispatch(action)
+				} else if (action[SERVER_ACTION]) {
+					serverStore.dispatch(createRoomAction(action, getRoom(socket)))
+				}
 
 				if (action.type === CHANGE_ROOM) {
 					changeRooms(action.room)

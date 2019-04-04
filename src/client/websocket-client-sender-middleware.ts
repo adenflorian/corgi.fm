@@ -5,7 +5,7 @@ import {logger} from '../common/logger'
 import {
 	BroadcastAction, BROADCASTER_ACTION, getActionsBlacklist,
 	IClientAppState, MOVE_GHOST_CONNECTOR, MOVE_POSITION,
-	selectLocalSocketId, SERVER_ACTION, UPDATE_POINTER,
+	selectLocalSocketId, SERVER_ACTION, UPDATE_POINTER, GLOBAL_SERVER_ACTION,
 } from '../common/redux'
 import {WebSocketEvent} from '../common/server-constants'
 import {socket} from './websocket-listeners'
@@ -43,7 +43,7 @@ const processNetworkAction = (action: BroadcastAction, getState: () => IClientAp
 function determineEvent(action: BroadcastAction) {
 	if (action[BROADCASTER_ACTION]) {
 		return WebSocketEvent.broadcast
-	} else if (action[SERVER_ACTION]) {
+	} else if (action[SERVER_ACTION] || action[GLOBAL_SERVER_ACTION]) {
 		return WebSocketEvent.serverAction
 	} else {
 		throw new Error('invalid network action: ' + JSON.stringify(action, null, 2))

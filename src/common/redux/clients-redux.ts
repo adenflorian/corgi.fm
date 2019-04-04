@@ -7,7 +7,7 @@ import {getColorHslByString} from '../shamu-color'
 import {
 	BROADCASTER_ACTION, createDeepEqualSelector, createReducer,
 	IClientAppState, IServerState, selectLocalSocketId,
-	SELF_DISCONNECTED, SERVER_ACTION,
+	SELF_DISCONNECTED, GLOBAL_SERVER_ACTION,
 } from './index'
 import {serverClientId} from '../common-constants';
 
@@ -36,7 +36,7 @@ export const setClientName = (id: ClientId, newName: string) => {
 		type: SET_CLIENT_NAME,
 		id,
 		newName: newName.substring(0, maxUsernameLength).trim(),
-		SERVER_ACTION,
+		GLOBAL_SERVER_ACTION,
 		BROADCASTER_ACTION,
 	}
 }
