@@ -166,7 +166,7 @@ export const ConnectedSimpleGraphNode = shamuConnect(
 			position,
 			color: getConnectionNodeInfo(position.targetType).color
 				|| selectConnectionSourceColorByTargetId(state.room, positionId),
-			highQuality: !selectOption(state, AppOptions.enableEfficientMode),
+			highQuality: selectOption(state, AppOptions.graphics_ECS) as boolean,
 		}
 	},
 )(SimpleGraphNode)

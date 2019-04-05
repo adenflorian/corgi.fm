@@ -438,7 +438,7 @@ export const ConnectedConnectionView = shamuConnect(
 			speed: 120,
 			// Disabled for now because of performance issues
 			// speed: globalClockState.bpm,
-			highQuality: !selectOption(state, AppOptions.enableEfficientMode),
+			highQuality: selectOption(state, AppOptions.graphics_fancyConnections) as boolean,
 		}
 	},
 )(ConnectionView)

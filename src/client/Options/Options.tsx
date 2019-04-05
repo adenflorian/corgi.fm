@@ -33,23 +33,27 @@ export class Options extends React.Component {
 							<div className="optionsPanelInner" >
 								<ConnectedOption
 									option={AppOptions.showNoteNamesOnKeyboard}
-									label="show names on keyboard"
+									label="show note names on keyboard"
 								/>
 								<ConnectedOption
 									option={AppOptions.requireCtrlToScroll}
-									label="require control key to zoom"
+									label="require control key to zoom (might be needed by laptop users)"
 								/>
 								<ConnectedOption
 									option={AppOptions.showNoteSchedulerDebug}
-									label="show synth note scheduler debug under synth"
+									label="note scheduler debug: enable"
 								/>
 								<ConnectedOption
 									option={AppOptions.renderNoteSchedulerDebugWhileStopped}
-									label="keep rendering note scheduler debug even when song is stopped"
+									label="note scheduler debug: keep rendering even when song is stopped"
 								/>
 								<ConnectedOption
-									option={AppOptions.enableEfficientMode}
-									label="enable efficient mode to improve performance, but lower visual quality"
+									option={AppOptions.graphics_fancyConnections}
+									label="graphics: enable fancy connections"
+								/>
+								<ConnectedOption
+									option={AppOptions.graphics_ECS}
+									label="graphics: enable ECS animations (sequencer time marker thing)"
 								/>
 							</div>
 							<ShamuBorder saturate={false} />

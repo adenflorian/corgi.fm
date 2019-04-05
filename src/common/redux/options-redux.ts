@@ -9,7 +9,8 @@ export enum AppOptions {
 	requireCtrlToScroll = 'requireCtrlToScroll',
 	showNoteSchedulerDebug = 'showNoteSchedulerDebug',
 	renderNoteSchedulerDebugWhileStopped = 'renderNoteSchedulerDebugWhileStopped',
-	enableEfficientMode = 'enableEfficientMode',
+	graphics_fancyConnections = 'graphics_fancyConnections',
+	graphics_ECS = 'graphics_ECS',
 }
 
 export const initialOptionsState = Object.freeze({
@@ -18,7 +19,8 @@ export const initialOptionsState = Object.freeze({
 	requireCtrlToScroll: false,
 	showNoteSchedulerDebug: false,
 	renderNoteSchedulerDebugWhileStopped: true,
-	enableEfficientMode: false,
+	graphics_fancyConnections: false,
+	graphics_ECS: true,
 })
 
 export const SET_OPTION = 'SET_OPTION'
@@ -33,18 +35,22 @@ export const setOptionMasterVolume = setOption.bind(null, AppOptions.masterVolum
 
 export type IOptionsState = typeof initialOptionsState
 
-export function optionsReducer(state = initialOptionsState, action: SetOptionAction) {
+export function optionsReducer(state = initialOptionsState, action: SetOptionAction): IOptionsState {
 	switch (action.type) {
 		case SET_OPTION: {
-			const newState = {
-				...state,
-				[action.option]: action.value,
-			}
+			const newState = getNewState(state, action)
 			window.localStorage.setItem(localStorageKey, JSON.stringify({options: newState}))
 			return newState
 		}
 		default: return state
 	}
+}
+
+function getNewState(state: IOptionsState, action: SetOptionAction): IOptionsState {
+	return Object.freeze({
+		...state,
+		[action.option]: action.value,
+	})
 }
 
 export function loadOptionsState(): Readonly<IOptionsState> {
@@ -85,4 +91,6 @@ export function validateOptionsState(store: Store<IClientAppState>, loadedOption
 
 export const selectOptions = (state: IClientAppState) => state.options
 
-export const selectOption = (state: IClientAppState, option: AppOptions) => selectOptions(state)[option]
+export const selectOption = (state: IClientAppState, option: AppOptions) => {
+	return selectOptions(state)[option]
+}
