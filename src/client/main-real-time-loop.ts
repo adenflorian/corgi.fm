@@ -35,7 +35,6 @@ const mainRealTimeLoop = (highResTimestamp: number, loopId: number) => {
 
 window.addEventListener('blur', () => {
 	_isActiveTab = false
-	logger.log('_isActiveTab: ', _isActiveTab)
 	// Make sure this doesn't cause multiple loops
 	_currentLoopId++
 	mainRealTimeLoop(performance.now(), _currentLoopId)
@@ -43,7 +42,6 @@ window.addEventListener('blur', () => {
 
 window.addEventListener('focus', () => {
 	_isActiveTab = true
-	logger.log('_isActiveTab: ', _isActiveTab)
 }, false)
 
 if (module.hot) {
