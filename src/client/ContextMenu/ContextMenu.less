@@ -13,6 +13,29 @@
 		display: block;
 	}
 
+	&.deleteSubMenu {
+		top: 100% !important;
+		left: 32px !important;
+
+		&.deleteSubMenu-first {
+			top: 0 !important;
+			left: 100% !important;
+		}
+
+		&.deleteSubMenu-last {
+			background-color: @orange;
+	
+			.react-contextmenu-item {
+				&:hover {
+					background-color: @red;
+				}
+				&:active {
+					background-color: @brightRed;
+				}
+			}
+		}
+	}
+
 	.contextMenuTop {
 		height: 16px !important;
 		background-color: @overlayGray;

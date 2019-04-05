@@ -12,6 +12,7 @@ import {Point, IConnectable, ConnectionNodeType} from '../../common/common-types
 import {simpleGlobalClientState} from '../SimpleGlobalClientState';
 import {deleteNode} from '../local-middleware';
 import {List} from 'immutable';
+import {oneLine} from 'common-tags';
 
 interface AllProps {
 	dispatch: Dispatch
@@ -169,7 +170,15 @@ const NodeMenuItems = React.memo(function _MenuItems({dispatch, nodeType}: NodeM
 		if (labels.count() === 0) return tree
 
 		return generateDeleteSubMenus(
-			<SubMenu title={<div>{labels.last()}</div>} hoverDelay={hoverDelayMs}>
+			<SubMenu
+				title={<div>{labels.last()}</div>}
+				hoverDelay={hoverDelayMs}
+				className={oneLine`deleteSubMenu
+					deleteSubMenu-${labels.count()}
+					${labels.count() === deleteMenuLabels.count() ? 'deleteSubMenu-last' : ''}
+					${labels.count() === 1 ? 'deleteSubMenu-first' : ''}
+				`}
+			>
 				{tree}
 			</SubMenu>,
 			labels.pop(),

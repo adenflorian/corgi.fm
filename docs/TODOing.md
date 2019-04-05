@@ -18,6 +18,7 @@
 				- please no
 
 # Soon
+- [ ] deploy script should check if anyone is on the server first
 - [ ] move ghost connectors state to its own state so connections memoizations will be more effective
 - [ ] chained sequencers should only play if upstream sequencer is playing
 - [ ] efficient mode in options not saving
