@@ -18,6 +18,7 @@ import {ConnectedMasterControls} from '../MasterControls'
 import {ConnectedSimpleReverb} from '../ShamuNodes/SimpleReverb/SimpleReverbView'
 import {simpleGlobalClientState} from '../SimpleGlobalClientState'
 import {ConnectedVolumeControl} from '../Volume/VolumeControl'
+import {graphSizeX, graphSizeY} from '../client-constants';
 
 interface ISimpleGraphNodeProps {
 	positionId: string
@@ -50,10 +51,10 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 				}}
 				scale={simpleGlobalClientState.zoom}
 				bounds={{
-					top: -2000,
-					right: 2000,
-					bottom: 2000,
-					left: -2000,
+					top: -(graphSizeY / 2),
+					right: (graphSizeX / 2),
+					bottom: (graphSizeY / 2),
+					left: -(graphSizeX / 2),
 				}}
 				handle={`.${handleClassName}`}
 				cancel={`.actualKnob, .note, .key, .controls > *, .oscillatorTypes > *, .verticalScrollBar`}

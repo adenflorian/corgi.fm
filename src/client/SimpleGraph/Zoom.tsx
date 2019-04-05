@@ -3,7 +3,7 @@ import {selectOptions} from '../../common/redux'
 import {shamuConnect} from '../../common/redux'
 import PlusSVG from '../OtherSVG/plus.svg'
 import {simpleGlobalClientState} from '../SimpleGlobalClientState'
-import {zoomBackgroundClass, backgroundMenuId} from '../client-constants'
+import {zoomBackgroundClass, backgroundMenuId, graphSizeX} from '../client-constants'
 import {ContextMenuTrigger} from 'react-contextmenu'
 
 interface IZoomProps {
@@ -30,7 +30,7 @@ const minZoom = 0.1
 const scrollZoomMod = 0.001
 const mouseZoomMod = 0.001
 const mousePanMod = 1
-const maxPan = 1000
+const maxPan = graphSizeX
 // const zoomTextLength = Math.max(scrollZoomMod.toString().length, mouseZoomMod.toString().length)
 
 const bgSize = 10000
