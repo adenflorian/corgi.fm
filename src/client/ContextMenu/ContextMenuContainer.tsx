@@ -176,6 +176,7 @@ const NodeMenuItems = React.memo(function _MenuItems({dispatch, nodeType}: NodeM
 				className={oneLine`deleteSubMenu
 					deleteSubMenu-${labels.count()}
 					${labels.count() === deleteMenuLabels.count() ? 'deleteSubMenu-last' : ''}
+					${labels.count() === deleteMenuLabels.count() - 1 ? 'deleteSubMenu-secondToLast' : ''}
 					${labels.count() === 1 ? 'deleteSubMenu-first' : ''}
 				`}
 			>
