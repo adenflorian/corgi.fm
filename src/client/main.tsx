@@ -1,7 +1,7 @@
 import 'babel-polyfill'
 import * as React from 'react'
 import * as ReactGA from 'react-ga'
-import {clientInfoActions} from '../common/redux'
+import {clientInfoActions, loadOptionsState, validateOptionsState} from '../common/redux'
 import {setupAudioContext} from '../common/setup-audio-context'
 import {BrowserWarning} from './BrowserWarning'
 import {configureStore} from './client-store'
@@ -63,7 +63,13 @@ async function setupAsync() {
 	const audioContext = new AudioContext()
 	const preFx = audioContext.createGain()
 
-	const store = configureStore()
+	const loadedOptionsState = loadOptionsState()
+
+	const store = configureStore({
+		options: loadedOptionsState
+	})
+
+	validateOptionsState(store, loadedOptionsState)
 
 	store.dispatch(clientInfoActions.setClientVersion(getCurrentClientVersion()))
 
