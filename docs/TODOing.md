@@ -4,7 +4,7 @@
 		- delete button on node
 		- [√] delete menu option when right clicking a node
 			- [√] don't show delete option if not deletable
-			- [ ] do some kind of confirmation dialog
+			- [√] sub menu hell
 		- move to trash can
 	- confirmation?
 		- modal

@@ -1,6 +1,6 @@
 import React, {MouseEvent, Fragment} from 'react'
 import {backgroundMenuId, nodeMenuId} from '../client-constants';
-import {MenuItem, ContextMenu, connectMenu} from 'react-contextmenu';
+import {MenuItem, ContextMenu, connectMenu, SubMenu} from 'react-contextmenu';
 import './ContextMenu.less'
 import {
 	shamuConnect, addPosition,
@@ -11,6 +11,7 @@ import {serverClientId} from '../../common/common-constants';
 import {Point, IConnectable, ConnectionNodeType} from '../../common/common-types';
 import {simpleGlobalClientState} from '../SimpleGlobalClientState';
 import {deleteNode} from '../local-middleware';
+import {List} from 'immutable';
 
 interface AllProps {
 	dispatch: Dispatch
@@ -113,6 +114,16 @@ interface NodeMenuItemsProps {
 	nodeType: ConnectionNodeType
 }
 
+const hoverDelayMs = 100
+
+const deleteMenuLabels = List([
+	`Delete Node`,
+	`what are you doing...`,
+	`please don't do this`,
+	`you can't undo this (yet)`,
+	`😰`,
+])
+
 const NodeMenuItems = React.memo(function _MenuItems({dispatch, nodeType}: NodeMenuItemsProps) {
 	const isNodeDeletable = getConnectionNodeInfo(nodeType).isDeletable
 
@@ -139,12 +150,29 @@ const NodeMenuItems = React.memo(function _MenuItems({dispatch, nodeType}: NodeM
 	}
 
 	function DeleteNodeMenuItem() {
-		return (
-			<MenuItem onClick={(_, {nodeId}: DeleteMenuData) => {
-				dispatch(deleteNode(nodeId))
-			}}>
-				KILL ME
-			</MenuItem>
+		return generateDeleteSubMenus(
+			<MenuItem
+				onClick={(_, {nodeId}: DeleteMenuData) => {
+					dispatch(deleteNode(nodeId))
+				}}
+				attributes={{
+					title: 'dew it',
+				}}
+			>
+				🔪
+			</MenuItem>,
+			deleteMenuLabels,
+		)
+	}
+
+	function generateDeleteSubMenus(tree: React.ReactElement<any>, labels: List<string>): React.ReactElement<any> {
+		if (labels.count() === 0) return tree
+
+		return generateDeleteSubMenus(
+			<SubMenu title={<div>{labels.last()}</div>} hoverDelay={hoverDelayMs}>
+				{tree}
+			</SubMenu>,
+			labels.pop(),
 		)
 	}
 
