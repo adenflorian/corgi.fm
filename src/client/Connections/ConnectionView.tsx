@@ -431,11 +431,13 @@ class GhostConnector extends React.PureComponent<IGhostConnectorProps> {
 
 export const ConnectedConnectionView = shamuConnect(
 	(state: IClientAppState): IConnectionViewReduxProps => {
-		const globalClockState = selectGlobalClockState(state.room)
+		// const globalClockState = selectGlobalClockState(state.room)
 
 		return {
 			isAddMode: selectUserInputKeys(state).shift,
-			speed: globalClockState.bpm,
+			speed: 120,
+			// Disabled for now because of performance issues
+			// speed: globalClockState.bpm,
 			highQuality: !selectOption(state, AppOptions.enableEfficientMode),
 		}
 	},
