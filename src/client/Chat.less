@@ -10,15 +10,15 @@
     }
 
     .author {
+        margin-left: 4px;
         margin-right: 4px;
         white-space: nowrap;
     }
 
-    #chatMessages {
+    .chatMessages {
         position: fixed;
         padding: 0 8px 0 8px;
-        opacity: 0.5;
-        height: 50%;
+        height: 100%;
         .spacing();
         left: 2px;
         bottom: 42px;
@@ -28,16 +28,39 @@
         z-index: -2;
         overflow: hidden;
 
+        &#chatMessagesFront {
+            z-index: 2400;
+            pointer-events: none;
+
+            li {
+                animation-duration: 10s;
+                animation-timing-function: ease-in;
+                animation-name: fadeOut;
+                animation-fill-mode: forwards;
+
+                .selectable {
+                    background-color: @panelGray;
+                }
+            }
+        }
+
+        &#chatMessagesBack {
+            opacity: 0.5;
+
+            .focused& {
+                opacity: 1;
+            }
+        }
+
         .focused& {
-            opacity: 1;
             z-index: 15;
-            height: 100%;
         }
     
         li {
             text-align: left;
             z-index: 0;
             pointer-events: none;
+            min-height: 20px;
 
             .selectable {
                 width: fit-content;
@@ -45,6 +68,9 @@
                 margin-right: auto;
                 margin-left: 0;
                 cursor: text;
+                display: flex;
+                align-items: center;
+                height: 100%;
 
                 .author {
                 }
@@ -53,6 +79,7 @@
                     font-weight: initial;
                     text-transform: initial;
                     letter-spacing: 0.4px;
+                    margin-right: 4px;
                 }
             }
 
@@ -146,5 +173,20 @@
     .info-versionMismatch {
         color: @defaultGray;
         background-color: @red;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        display: block;
+    }
+    50% {
+        opacity: 1;
+        display: block;
+    }
+    to {
+        opacity: 0;
+        display: none;
     }
 }

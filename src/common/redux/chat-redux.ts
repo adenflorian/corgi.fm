@@ -30,6 +30,7 @@ export interface IChatMessage {
 	authorName: string
 	color: string
 	text: string
+	isOldMessage?: boolean
 }
 
 const initialState: IChatState = {
@@ -46,7 +47,7 @@ export const chatReducer = createReducer(initialState, {
 	[SET_CHAT]: (state, {messages}: SetChatAction) => {
 		return {
 			...state,
-			messages,
+			messages: messages.map(x => ({...x, isOldMessage: true})),
 		}
 	},
 })
