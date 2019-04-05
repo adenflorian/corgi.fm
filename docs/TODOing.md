@@ -7,7 +7,7 @@
 - [ ] move ghost connectors state to its own state so connections memoizations will be more effective
 - [ ] chained sequencers should only play if upstream sequencer is playing
 - [ ] make board bigger
-- [ ] disable long click menu
+- [√] disable long click menu (w/o breaking it for touch screens) (not sure if broke touchscreens, need to test)
 - [ ] efficient mode in options not saving
 - [√] change ctrl + click for deleting notes in grid seq to shift click
 - [√] allow alt click drag to create notes in grid seq

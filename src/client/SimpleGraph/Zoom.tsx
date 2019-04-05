@@ -163,6 +163,7 @@ const ZoomBackground = React.memo(
 			<ContextMenuTrigger
 				id={backgroundMenuId}
 				disableIfShiftIsPressed={true}
+				holdToDisplay={-1}
 			>
 				<div
 					className={zoomBackgroundClass}
