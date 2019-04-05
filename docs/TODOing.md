@@ -2,6 +2,7 @@
 - [ ] require user to plug keyboard into sequencer to record
 	
 # Soon
+- [ ] don't lose focus on chat when sending message, only lose focus on enter if message is empty
 - [ ] make submenu for creating grid sequencer with preset sizes
 - [ ] allow saving of graph somewhere (server, browser local storage, download and upload)
 - [ ] deploy script should check if anyone is on the server first

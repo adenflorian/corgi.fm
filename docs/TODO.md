@@ -275,7 +275,7 @@ possible starting points:
 - [ ] delete old chat messages
 - [√] Hit enter to focus chat
 - [ ] play sound when new message?
-- [ ] make new messages start at full opacity then fade to whatever the normal opacity is
+- [√] make new messages start at full opacity then fade to whatever the normal opacity is
 - [√] make chat bottom bar always in front?
 
 # Username
