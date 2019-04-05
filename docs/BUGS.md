@@ -1,18 +1,25 @@
 BUGS
 ====
-- [√] !!!NODE_CLICKED takes long time for infinite sequencer, check performance
-	- enableUserSelectHack={false} on Draggable
+
+## High
+- [ ] options not saving correctly again
+
+## Medium
 - [ ] ECS animations break when switching rooms
 - [ ] filters getting stuck
 - [ ] changing room thru selector doesn't completely pick up new user name if changed in previous room?
 - [ ] shift click drag a connector, let go of control, connector gets stuck in midair
 - [ ] when hooking up reverb and changing filter to 0 it can cause a loud sound which triggers the master volume safety
 - [ ] when 2 people join around same time, they spawn on top of each other
-- [ ] when ableton is open, corgi.fm wont recognize midi keyboard
-- [√] username on keyboard not showing up to date one for other users always
+
+## Low
 - [ ] when typing in chat, if someone leaves the input box loses focus
+- [ ] when ableton is open, corgi.fm wont recognize midi keyboard
 
 ## FIXED
+- [√] username on keyboard not showing up to date one for other users always
+- [√] !!!NODE_CLICKED takes long time for infinite sequencer, check performance
+	- enableUserSelectHack={false} on Draggable
 - [√] 2019-03-03 When playing note on keyboard and change connection, note keeps playing on previous instrument
 	- need to somehow stop those notes
 	- maybe need a sourceId for each event/note?

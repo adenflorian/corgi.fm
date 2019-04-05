@@ -1,3 +1,14 @@
+- [√] allow deleting nodes
+	- how?
+		- delete button on node
+		- [√] delete menu option when right clicking a node
+			- [√] don't show delete option if not deletable
+			- [√] sub menu hell
+		- move to trash can
+	- confirmation?
+		- modal
+		- long click
+		- click and drag slider
 - [√] external midi notes should always highlight keys
 - [√] add cookies banner thing for GDPR
 - [√] right click menu to add nodes
