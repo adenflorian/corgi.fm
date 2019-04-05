@@ -18,7 +18,8 @@ import {ConnectedMasterControls} from '../MasterControls'
 import {ConnectedSimpleReverb} from '../ShamuNodes/SimpleReverb/SimpleReverbView'
 import {simpleGlobalClientState} from '../SimpleGlobalClientState'
 import {ConnectedVolumeControl} from '../Volume/VolumeControl'
-import {graphSizeX, graphSizeY} from '../client-constants';
+import {graphSizeX, graphSizeY, nodeMenuId} from '../client-constants';
+import {ContextMenuTrigger} from 'react-contextmenu';
 
 interface ISimpleGraphNodeProps {
 	positionId: string
@@ -42,53 +43,66 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 		} = this.props
 
 		return (
-			<Draggable
-				enableUserSelectHack={false}
-				onDrag={this._handleDrag}
-				position={{
-					x,
-					y,
-				}}
-				scale={simpleGlobalClientState.zoom}
-				bounds={{
-					top: -(graphSizeY / 2),
-					right: (graphSizeX / 2),
-					bottom: (graphSizeY / 2),
-					left: -(graphSizeX / 2),
-				}}
-				handle={`.${handleClassName}`}
-				cancel={`.actualKnob, .note, .key, .controls > *, .oscillatorTypes > *, .verticalScrollBar`}
-				onMouseDown={this._handleMouseDown}
+			// @ts-ignore disableIfShiftIsPressed
+			<ContextMenuTrigger
+				id={nodeMenuId}
+				disableIfShiftIsPressed={true}
+				holdToDisplay={-1}
+				nodeId={positionId}
+				nodeType={targetType}
+				collect={({nodeId, nodeType}) => ({
+					nodeId,
+					nodeType,
+				})}
 			>
-				<div
-					className="simpleGraphNode"
-					style={{
-						position: 'absolute',
-						willChange: 'transform',
-						width,
-						height,
-						zIndex,
+				<Draggable
+					enableUserSelectHack={false}
+					onDrag={this._handleDrag}
+					position={{
+						x,
+						y,
 					}}
+					scale={simpleGlobalClientState.zoom}
+					bounds={{
+						top: -(graphSizeY / 2),
+						right: (graphSizeX / 2),
+						bottom: (graphSizeY / 2),
+						left: -(graphSizeX / 2),
+					}}
+					handle={`.${handleClassName}`}
+					cancel={`.actualKnob, .note, .key, .controls > *, .oscillatorTypes > *, .verticalScrollBar`}
+					onMouseDown={this._handleMouseDown}
 				>
-					<Handle />
-					{getComponentByNodeType(targetType, positionId, color)}
-					<canvas
-						id={ECSSequencerRenderSystem.canvasIdPrefix + positionId}
+					<div
+						className="simpleGraphNode"
 						style={{
 							position: 'absolute',
+							willChange: 'transform',
 							width,
 							height,
-							top: 0,
-							left: 0,
-							pointerEvents: 'none',
-							zIndex: 2,
-							display: highQuality ? undefined : 'none',
+							zIndex,
 						}}
-						width={width}
-						height={height}
-					></canvas>
-				</div>
-			</Draggable >
+					>
+						<Handle />
+						{getComponentByNodeType(targetType, positionId, color)}
+						<canvas
+							id={ECSSequencerRenderSystem.canvasIdPrefix + positionId}
+							style={{
+								position: 'absolute',
+								width,
+								height,
+								top: 0,
+								left: 0,
+								pointerEvents: 'none',
+								zIndex: 2,
+								display: highQuality ? undefined : 'none',
+							}}
+							width={width}
+							height={height}
+						></canvas>
+					</div>
+				</Draggable>
+			</ContextMenuTrigger>
 		)
 	}
 

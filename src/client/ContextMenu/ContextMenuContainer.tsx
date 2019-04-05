@@ -1,15 +1,16 @@
 import React, {MouseEvent, Fragment} from 'react'
-import {backgroundMenuId} from '../client-constants';
+import {backgroundMenuId, nodeMenuId} from '../client-constants';
 import {MenuItem, ContextMenu} from 'react-contextmenu';
 import './ContextMenu.less'
 import {
 	shamuConnect, addPosition,
-	makePosition, getAddableNodeInfos
+	makePosition, getAddableNodeInfos, getConnectionNodeInfo
 } from '../../common/redux';
 import {Dispatch, AnyAction} from 'redux';
 import {serverClientId} from '../../common/common-constants';
-import {Point, IConnectable} from '../../common/common-types';
+import {Point, IConnectable, ConnectionNodeType} from '../../common/common-types';
 import {simpleGlobalClientState} from '../SimpleGlobalClientState';
+import {deleteNode} from '../local-middleware';
 
 interface AllProps {
 	dispatch: Dispatch
@@ -17,13 +18,18 @@ interface AllProps {
 
 export function ContextMenuContainer({dispatch}: AllProps) {
 	return (
-		<ContextMenu id={backgroundMenuId}>
-			<MenuItems dispatch={dispatch} />
-		</ContextMenu>
+		<Fragment>
+			<ContextMenu id={backgroundMenuId}>
+				<BackgroundMenuItems dispatch={dispatch} />
+			</ContextMenu>
+			<ContextMenu id={nodeMenuId}>
+				<NodeMenuItems dispatch={dispatch} />
+			</ContextMenu>
+		</Fragment>
 	)
 }
 
-const MenuItems = React.memo(function _MenuItems({dispatch}: {dispatch: Dispatch}) {
+const BackgroundMenuItems = React.memo(function _MenuItems({dispatch}: {dispatch: Dispatch}) {
 	return (
 		<Fragment>
 			<TopMenuBar />
@@ -75,9 +81,56 @@ const MenuItems = React.memo(function _MenuItems({dispatch}: {dispatch: Dispatch
 	}
 })
 
-interface AddNodeMenuItemProps {
+interface DeleteMenuData {
+	nodeId: string
+	nodeType: ConnectionNodeType
+}
+
+const NodeMenuItems = React.memo(function _MenuItems({dispatch}: {dispatch: Dispatch}) {
+	return (
+		<Fragment>
+			<TopMenuBar />
+			<DeleteNodeMenuItem />
+		</Fragment>
+	)
+
+	function TopMenuBar() {
+		return (
+			<MenuItem
+				attributes={{
+					className: 'contextMenuTop',
+					title: 'shift + right click to get browser context menu',
+				}}
+				preventClose={true}
+			>
+				do node specific stuff
+			</MenuItem>
+		)
+	}
+
+	function DeleteNodeMenuItem() {
+		return (
+			<MenuItem onClick={(e, {nodeId, nodeType}: DeleteMenuData) => {
+				if (getConnectionNodeInfo(nodeType).isDeletable) {
+					dispatch(deleteNode(nodeId))
+				}
+			}}>
+				KILL ME
+			</MenuItem>
+		)
+	}
+})
+
+interface MenuItemProps {
 	label: string
+}
+
+interface AddNodeMenuItemProps extends MenuItemProps {
 	stateConstructor: new (ownerId: string) => IConnectable
+	actionCreator: (state: any) => AnyAction
+}
+
+interface DeleteNodeMenuItemProps extends MenuItemProps {
 	actionCreator: (state: any) => AnyAction
 }
 

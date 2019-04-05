@@ -4,7 +4,7 @@ import {ConnectionNodeType} from '../common/common-types'
 import {logger} from '../common/logger'
 import {emptyMidiNotes, IMidiNote} from '../common/MidiNote'
 import {IClientRoomState} from '../common/redux/common-redux-types'
-import {selectConnectionsWithSourceIds} from '../common/redux/connections-redux'
+import {selectConnectionsWithSourceIds, selectConnectionsWithSourceOrTargetIds} from '../common/redux/connections-redux'
 import {
 	addBasicSampler, addBasicSynthesizer, addPosition, addVirtualKeyboard,
 	BasicSamplerState, BasicSynthesizerState, Connection, connectionsActions,
@@ -16,6 +16,9 @@ import {
 	VirtualKeyboardState, virtualKeyPressed, VirtualKeyPressedAction,
 	virtualKeyUp, VirtualKeyUpAction, virtualOctaveChange,
 	VirtualOctaveChangeAction,
+	deleteThingsAny,
+	deletePositions,
+	NetworkActionType,
 } from '../common/redux/index'
 import {pointersActions} from '../common/redux/pointers-redux'
 import {getAllInstruments} from './instrument-manager'
@@ -34,6 +37,9 @@ export const localMidiOctaveChange = makeActionCreator(LOCAL_MIDI_OCTAVE_CHANGE,
 
 export const WINDOW_BLUR = 'WINDOW_BLUR'
 export const windowBlur = makeActionCreator(WINDOW_BLUR)
+
+export const DELETE_NODE = 'DELETE_NODE'
+export const deleteNode = makeActionCreator(DELETE_NODE, 'nodeId')
 
 export function deleteAllTheThings(dispatch: Dispatch) {
 	dispatch(connectionsActions.deleteAll())
@@ -162,6 +168,25 @@ export const createLocalMiddleware: () => Middleware<{}, IClientAppState> = () =
 		case READY: {
 			next(action)
 			return createLocalStuff(dispatch, getState())
+		}
+		case DELETE_NODE: {
+			next(action)
+
+			const newState = getState()
+
+			const nodeId = action.nodeId
+
+			dispatch(deleteThingsAny([nodeId], NetworkActionType.SERVER_AND_BROADCASTER))
+			dispatch(deletePositions([nodeId]))
+			dispatch(
+				connectionsActions.delete(
+					selectConnectionsWithSourceOrTargetIds(newState.room, [nodeId])
+						.map(x => x.id)
+						.toList()
+				)
+			)
+
+			return
 		}
 		default: return next(action)
 	}

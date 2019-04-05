@@ -1,3 +1,13 @@
+- [√] external midi notes should always highlight keys
+- [√] add cookies banner thing for GDPR
+- [√] right click menu to add nodes
+- [√] sequencers should only play if connected to a playing master clock, even if indirectly
+- [√] make board bigger
+- [√] disable long click menu (w/o breaking it for touch screens) (not sure if broke touchscreens, need to test)
+- [√] change ctrl + click for deleting notes in grid seq to shift click
+- [√] allow alt click drag to create notes in grid seq
+- [√] GET /api/users/count
+
 ## Updating web audio graph
 when i break the connection from an instrument to the audio output i want sound to stop
 i want the instrument to disconnect from w/e audio node it is connected to

@@ -62,6 +62,7 @@ const _makeNodeInfo = Record({
 	stateConstructor: (DummyConnectable) as new (ownerId: string) => IConnectable,
 	addNodeActionCreator: ((state: IClientAppState) => {type: 'dummy add node action type'}) as (state: any) => AnyAction,
 	showOnAddNodeMenu: false,
+	isDeletable: false,
 })
 
 type NodeInfo = ReturnType<typeof _makeNodeInfo>
@@ -119,6 +120,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		selectActiveNotes: selectGridSequencerActiveNotes,
 		stateDeserializer: deserializeSequencerState,
 		showOnAddNodeMenu: true,
+		isDeletable: true,
 	})],
 	[ConnectionNodeType.infiniteSequencer, makeNodeInfo({
 		typeName: 'Infinite Sequencer',
@@ -131,6 +133,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		selectActiveNotes: selectInfiniteSequencerActiveNotes,
 		stateDeserializer: deserializeSequencerState,
 		showOnAddNodeMenu: true,
+		isDeletable: true,
 	})],
 	[ConnectionNodeType.basicSynthesizer, makeNodeInfo({
 		typeName: 'Basic Synthesizer',
@@ -139,6 +142,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		selectIsPlaying: selectIsUpstreamNodePlaying,
 		stateSelector: selectBasicSynthesizer,
 		showOnAddNodeMenu: true,
+		isDeletable: true,
 	})],
 	[ConnectionNodeType.basicSampler, makeNodeInfo({
 		typeName: 'Basic Piano Sampler',
@@ -147,6 +151,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		selectIsPlaying: selectIsUpstreamNodePlaying,
 		stateSelector: selectSampler,
 		showOnAddNodeMenu: true,
+		isDeletable: true,
 	})],
 	[ConnectionNodeType.simpleReverb, makeNodeInfo({
 		typeName: 'R E V E R B',
@@ -155,6 +160,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		selectIsPlaying: selectIsUpstreamNodePlaying,
 		stateSelector: selectSimpleReverb,
 		showOnAddNodeMenu: true,
+		isDeletable: true,
 	})],
 	[ConnectionNodeType.audioOutput, makeNodeInfo({
 		typeName: 'Audio Output',
