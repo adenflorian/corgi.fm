@@ -2,7 +2,7 @@ import * as cors from 'cors'
 import * as express from 'express'
 import * as path from 'path'
 import {Store} from 'redux'
-import {selectRoomStateByName} from '../common/redux'
+import {selectRoomStateByName, selectAllClients} from '../common/redux'
 import {isProdServer} from './is-prod-server'
 
 export function setupExpressApp(app: express.Application, serverStore: Store) {
@@ -22,6 +22,14 @@ export function setupExpressApp(app: express.Application, serverStore: Store) {
 			res.json(selectRoomStateByName(serverStore.getState(), req.params.room))
 		})
 	}
+
+	const apiRouter = express.Router()
+
+	apiRouter.get('/users/count', (_, res) => {
+		res.json(selectAllClients(serverStore.getState()).length)
+	})
+
+	app.use('/api', apiRouter)
 
 	app.get('/*', (_, res) => {
 		res.sendFile(path.join(__dirname, '../public/index.html'))

@@ -8,10 +8,9 @@ BUGS
 - [ ] when hooking up reverb and changing filter to 0 it can cause a loud sound which triggers the master volume safety
 - [ ] when ableton is open, corgi.fm wont recognize midi keyboard
 - [ ] when 2 people join around same time, they spawn on top of each other
-- starting in a legacy room, then switching to scan room thru room selector, no bpm knob
-	- wont fix, legacy will be gone soon, not easy to fix
 - [ ] shift click drag a connector, let go of control, connector gets stuck in midair
 - [√] username on keyboard not showing up to date one for other users always
+- [ ] ECS animations break when switching rooms
 
 ## FIXED
 - [√] 2019-03-03 When playing note on keyboard and change connection, note keeps playing on previous instrument
