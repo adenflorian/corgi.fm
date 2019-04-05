@@ -1,4 +1,5 @@
 # Now
+- [ ] require user to plug keyboard into sequencer to record
 	
 # Soon
 - [ ] make submenu for creating grid sequencer with preset sizes

@@ -6,7 +6,10 @@ import * as uuid from 'uuid'
 import {ConnectionNodeType} from '../common-types'
 import {IMidiNotes} from '../MidiNote'
 import {CssColor, mixColors} from '../shamu-color'
-import {BROADCASTER_ACTION, getConnectionNodeInfo, IClientRoomState, IVirtualKeyboardState, selectVirtualKeyboardById, SERVER_ACTION} from './index'
+import {
+	BROADCASTER_ACTION, getConnectionNodeInfo, IClientRoomState,
+	VirtualKeyboardState, selectVirtualKeyboardById, SERVER_ACTION,
+} from './index'
 
 export const ADD_CONNECTION = 'ADD_CONNECTION'
 export const DELETE_CONNECTIONS = 'DELETE_CONNECTIONS'
@@ -169,7 +172,7 @@ export const selectAllConnections = (state: IClientRoomState) =>
 export const selectConnection = (state: IClientRoomState, id: string) =>
 	selectAllConnections(state).get(id) || Connection.dummy
 
-export const selectSourceByConnectionId = (state: IClientRoomState, id: string): IVirtualKeyboardState =>
+export const selectSourceByConnectionId = (state: IClientRoomState, id: string): VirtualKeyboardState =>
 	selectVirtualKeyboardById(state, selectConnection(state, id)!.sourceId)
 
 export const selectAllConnectionIds = createSelector(

@@ -17,7 +17,7 @@ export interface VirtualKeyAction {
 	keys?: IMidiNotes
 }
 
-export const addVirtualKeyboard = (virtualKeyboard: IVirtualKeyboardState) =>
+export const addVirtualKeyboard = (virtualKeyboard: VirtualKeyboardState) =>
 	addMultiThing(virtualKeyboard, ConnectionNodeType.virtualKeyboard, NetworkActionType.SERVER_AND_BROADCASTER)
 
 export const VIRTUAL_KEY_PRESSED = 'VIRTUAL_KEY_PRESSED'
@@ -63,22 +63,14 @@ export interface IVirtualKeyboardsState extends IMultiState {
 }
 
 export interface IVirtualKeyboards extends IMultiStateThings {
-	[clientId: string]: IVirtualKeyboardState,
+	[clientId: string]: VirtualKeyboardState,
 }
 
-export interface IVirtualKeyboardState extends IMultiStateThing {
-	pressedKeys: IMidiNotes
-	octave: Octave
-	id: string
-	ownerId: ClientId
-	color: string
-}
-
-export class VirtualKeyboardState implements IVirtualKeyboardState, NodeSpecialState {
+export class VirtualKeyboardState implements IMultiStateThing, NodeSpecialState {
 	public static defaultWidth = 456
 	public static defaultHeight = 56
 
-	public static dummy: IVirtualKeyboardState = {
+	public static dummy: VirtualKeyboardState = {
 		pressedKeys: emptyMidiNotes,
 		octave: 0,
 		id: 'dummy',
@@ -119,10 +111,10 @@ const keyboardActionTypes = [
 	VIRTUAL_OCTAVE_CHANGE,
 ]
 
-export const virtualKeyboardsReducer = makeMultiReducer<IVirtualKeyboardState, IVirtualKeyboardsState>(
+export const virtualKeyboardsReducer = makeMultiReducer<VirtualKeyboardState, IVirtualKeyboardsState>(
 	virtualKeyboardReducer, ConnectionNodeType.virtualKeyboard, keyboardActionTypes)
 
-function virtualKeyboardReducer(virtualKeyboard: IVirtualKeyboardState, action: AnyAction): IVirtualKeyboardState {
+function virtualKeyboardReducer(virtualKeyboard: VirtualKeyboardState, action: AnyAction): VirtualKeyboardState {
 	switch (action.type) {
 		case VIRTUAL_KEY_PRESSED:
 			return {

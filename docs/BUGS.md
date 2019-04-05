@@ -2,7 +2,6 @@ BUGS
 ====
 
 ## High
-- [ ] options not saving correctly again
 
 ## Medium
 - [ ] ECS animations break when switching rooms
@@ -17,6 +16,7 @@ BUGS
 - [ ] when ableton is open, corgi.fm wont recognize midi keyboard
 
 ## FIXED
+- [√] options not saving correctly again
 - [√] username on keyboard not showing up to date one for other users always
 - [√] !!!NODE_CLICKED takes long time for infinite sequencer, check performance
 	- enableUserSelectHack={false} on Draggable
