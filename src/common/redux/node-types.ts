@@ -194,6 +194,7 @@ export function getAddableNodeInfos() {
 	return NodeInfoMap.filter(x => x.showOnAddNodeMenu)
 }
 
+// TODO Memoize?
 function selectIsUpstreamNodePlaying(state: IClientRoomState, id: string, processedNodeIds = Set<string>()): boolean {
 	return memoizedIsUpstreamNodePlaying(state, id, processedNodeIds)
 }

@@ -162,24 +162,28 @@ const mapStateToProps = (state: IClientAppState, props: IGridSequencerNotesProps
 	}
 }
 
-const mapDispatchToProps = (dispatch: Dispatch, {id}: IGridSequencerNotesProps): IGridSequencerNotesDispatchProps => ({
-	handleNoteClicked: (index, isEnabled, noteNumber) => {
-		dispatch(gridSequencerActions.setNote(id, index, !isEnabled, noteNumber))
-	},
-	handleMouseEnter: (index, isEnabled, noteNumber, e) => {
-		if (e.ctrlKey && isEnabled === true && isLeftMouseButtonDown(e.buttons)) {
+const mapDispatchToProps = (dispatch: Dispatch, {id}: IGridSequencerNotesProps): IGridSequencerNotesDispatchProps => {
+	const onMouse: GridSequencerEventHandler = (index, isEnabled, noteNumber, e) => {
+		if (e.shiftKey && e.altKey && isLeftMouseButtonDown(e.buttons)) {
+			dispatch(gridSequencerActions.setNote(id, index, !isEnabled, noteNumber))
+		} else if (e.shiftKey && isEnabled === true && isLeftMouseButtonDown(e.buttons)) {
 			dispatch(gridSequencerActions.setNote(id, index, false, noteNumber))
+		} else if (e.altKey && isEnabled === false && isLeftMouseButtonDown(e.buttons)) {
+			dispatch(gridSequencerActions.setNote(id, index, true, noteNumber))
 		}
-	},
-	handleMouseDown: (index, isEnabled, noteNumber, e) => {
-		if (e.ctrlKey && isEnabled === true && isLeftMouseButtonDown(e.buttons)) {
-			dispatch(gridSequencerActions.setNote(id, index, false, noteNumber))
-		}
-	},
-	handleScrollChange: newValue => {
-		dispatch(gridSequencerActions.setField(id, GridSequencerFields.scrollY, Math.round(newValue)))
-	},
-})
+	}
+
+	return {
+		handleNoteClicked: (index, isEnabled, noteNumber) => {
+			dispatch(gridSequencerActions.setNote(id, index, !isEnabled, noteNumber))
+		},
+		handleMouseEnter: onMouse,
+		handleMouseDown: onMouse,
+		handleScrollChange: newValue => {
+			dispatch(gridSequencerActions.setField(id, GridSequencerFields.scrollY, Math.round(newValue)))
+		},
+	}
+}
 
 export const GridSequencerNotesConnected = connect(
 	mapStateToProps,

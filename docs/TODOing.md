@@ -5,6 +5,12 @@
 - [√] right click menu to add nodes
 - [√] sequencers should only play if connected to a playing master clock, even if indirectly
 - [ ] move ghost connectors state to its own state so connections memoizations will be more effective
+- [ ] chained sequencers should only play if upstream sequencer is playing
+- [ ] make board bigger
+- [ ] disable long click menu
+- [ ] efficient mode in options not saving
+- [√] change ctrl + click for deleting notes in grid seq to shift click
+- [√] allow alt click drag to create notes in grid seq
 - [√] GET /api/users/count
 
 # Soon
