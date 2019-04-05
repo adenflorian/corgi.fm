@@ -3,7 +3,7 @@
 	- how?
 		- delete button on node
 		- [√] delete menu option when right clicking a node
-			- [ ] don't show delete option if not deletable
+			- [√] don't show delete option if not deletable
 			- [ ] do some kind of confirmation dialog
 		- move to trash can
 	- confirmation?

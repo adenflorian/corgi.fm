@@ -1,6 +1,6 @@
 import React, {MouseEvent, Fragment} from 'react'
 import {backgroundMenuId, nodeMenuId} from '../client-constants';
-import {MenuItem, ContextMenu} from 'react-contextmenu';
+import {MenuItem, ContextMenu, connectMenu} from 'react-contextmenu';
 import './ContextMenu.less'
 import {
 	shamuConnect, addPosition,
@@ -20,14 +20,36 @@ export function ContextMenuContainer({dispatch}: AllProps) {
 	return (
 		<Fragment>
 			<ContextMenu id={backgroundMenuId}>
-				<BackgroundMenuItems dispatch={dispatch} />
+				<BackgroundMenuItems
+					dispatch={dispatch}
+				/>
 			</ContextMenu>
-			<ContextMenu id={nodeMenuId}>
-				<NodeMenuItems dispatch={dispatch} />
-			</ContextMenu>
+			<ConnectedNodeMenu
+				dispatch={dispatch}
+			/>
 		</Fragment>
 	)
 }
+
+interface NodeMenuProps {
+	dispatch: Dispatch
+	trigger: {
+		nodeType: ConnectionNodeType
+	}
+}
+
+function NodeMenu({dispatch, trigger}: NodeMenuProps) {
+	return (
+		<ContextMenu id={nodeMenuId}>
+			<NodeMenuItems
+				dispatch={dispatch}
+				nodeType={trigger ? trigger.nodeType : ConnectionNodeType.dummy}
+			/>
+		</ContextMenu>
+	)
+}
+
+const ConnectedNodeMenu = connectMenu(nodeMenuId)(NodeMenu)
 
 const BackgroundMenuItems = React.memo(function _MenuItems({dispatch}: {dispatch: Dispatch}) {
 	return (
@@ -86,11 +108,19 @@ interface DeleteMenuData {
 	nodeType: ConnectionNodeType
 }
 
-const NodeMenuItems = React.memo(function _MenuItems({dispatch}: {dispatch: Dispatch}) {
+interface NodeMenuItemsProps {
+	dispatch: Dispatch
+	nodeType: ConnectionNodeType
+}
+
+const NodeMenuItems = React.memo(function _MenuItems({dispatch, nodeType}: NodeMenuItemsProps) {
+	const isNodeDeletable = getConnectionNodeInfo(nodeType).isDeletable
+
 	return (
 		<Fragment>
 			<TopMenuBar />
-			<DeleteNodeMenuItem />
+			{isNodeDeletable && <DeleteNodeMenuItem />}
+			{!isNodeDeletable && <DontDeleteMeMenuItem />}
 		</Fragment>
 	)
 
@@ -103,19 +133,25 @@ const NodeMenuItems = React.memo(function _MenuItems({dispatch}: {dispatch: Disp
 				}}
 				preventClose={true}
 			>
-				do node specific stuff
+				do specific node stuff
 			</MenuItem>
 		)
 	}
 
 	function DeleteNodeMenuItem() {
 		return (
-			<MenuItem onClick={(e, {nodeId, nodeType}: DeleteMenuData) => {
-				if (getConnectionNodeInfo(nodeType).isDeletable) {
-					dispatch(deleteNode(nodeId))
-				}
+			<MenuItem onClick={(_, {nodeId}: DeleteMenuData) => {
+				dispatch(deleteNode(nodeId))
 			}}>
 				KILL ME
+			</MenuItem>
+		)
+	}
+
+	function DontDeleteMeMenuItem() {
+		return (
+			<MenuItem disabled>
+				I'M INVINCIBLE
 			</MenuItem>
 		)
 	}
