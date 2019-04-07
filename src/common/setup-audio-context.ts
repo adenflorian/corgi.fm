@@ -1,8 +1,6 @@
 import {Store} from 'redux'
-import {Master} from 'tone'
 import {logger} from './logger'
-import {reportLevels} from './redux/audio-redux'
-import {IClientAppState, setOptionMasterVolume} from './redux/index'
+import {IClientAppState} from './redux/index'
 
 declare global {
 	interface Window {
@@ -22,46 +20,6 @@ export function setupAudioContext(audioContext: AudioContext, preFx: GainNode, s
 	const analyser = audioContext.createAnalyser()
 	analyser.smoothingTimeConstant = 0.3
 	analyser.fftSize = 1024
-
-	const javascriptNode = audioContext.createScriptProcessor(2048, 1, 1)
-
-	javascriptNode.connect(audioContext.destination)
-
-	const updateInterval = 250
-	let lastUpdateTime = Date.now()
-
-	let lastReportedValue = -999
-	const deltaThreshold = 0.5
-
-	javascriptNode.onaudioprocess = checkAudioLevels
-
-	function checkAudioLevels() {
-		const timeSinceLastUpdate = Date.now() - lastUpdateTime
-
-		if (audioContext.currentTime > 1 && masterLimiter.reduction < -10 && store.getState().options.masterVolume !== 0) {
-			store.dispatch(setOptionMasterVolume(0))
-			logger.warn(`Feedback loop detected, setting master volume to 0 (masterLimiter.reduction: ${masterLimiter.reduction}`)
-		}
-
-		if (timeSinceLastUpdate >= updateInterval) {
-			const array = new Uint8Array(analyser.frequencyBinCount)
-			analyser.getByteFrequencyData(array)
-			const average = sumArray(array) / array.length
-			if (Math.abs(average - lastReportedValue) > deltaThreshold) {
-				store.dispatch(reportLevels(average))
-				// store.dispatch(reportLevels(arrayMax(array) - 128))
-				// logger.log('array: ', array)
-				lastReportedValue = average
-			}
-			lastUpdateTime = Date.now()
-		}
-	}
-
-	function sumArray(arr: Uint8Array) {
-		return arr.reduce((sum, num) => {
-			return sum + num
-		})
-	}
 
 	const masterLimiter = audioContext.createDynamicsCompressor()
 	masterLimiter.threshold.value = -3.0 // this is the pitfall, leave some headroom

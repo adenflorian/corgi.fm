@@ -3,21 +3,21 @@ import {Component} from 'react'
 import React = require('react')
 import {connect} from 'react-redux'
 import {Action, Dispatch} from 'redux'
-import {IClientAppState} from '../../common/redux'
+import {IClientAppState, getConnectionNodeInfo} from '../../common/redux'
 import {MASTER_AUDIO_OUTPUT_TARGET_ID} from '../../common/redux'
 import {setOptionMasterVolume} from '../../common/redux'
-import {colorFunc} from '../../common/shamu-color'
 import {Knob} from '../Knob/Knob'
 import {Panel} from '../Panel/Panel'
 import './VolumeControl.less'
+import {ConnectionNodeType} from '../../common/common-types';
 
 interface IVolumeControlProps {
 	color: string
 }
 
 interface IVolumeControlReduxProps {
+	isPlaying: boolean,
 	masterVolume: number,
-	reportedMasterVolume: number
 }
 
 interface IVolumeControlDispatchProps {
@@ -28,14 +28,12 @@ type IVolumeControlAllProps = IVolumeControlProps & IVolumeControlReduxProps & I
 
 export class VolumeControl extends Component<IVolumeControlAllProps> {
 	public render() {
-		const {color, reportedMasterVolume} = this.props
-
-		const newColor = colorFunc(color).saturate(reportedMasterVolume / 25).hsl().string()
+		const {color, isPlaying} = this.props
 
 		return (
-			<Panel id={MASTER_AUDIO_OUTPUT_TARGET_ID} className="volume" color={newColor}>
+			<Panel id={MASTER_AUDIO_OUTPUT_TARGET_ID} className="volume" color={color} saturate={isPlaying}>
 				<div
-					className="volume-label"
+					className="volume-label colorize"
 					title="will only change the volume for you, it won't affect other users"
 				>
 					Local Audio Output
@@ -45,7 +43,7 @@ export class VolumeControl extends Component<IVolumeControlAllProps> {
 					onChange={this.props.changeMasterVolume}
 					min={0}
 					max={0.5}
-					markColor={newColor}
+					markColor={color}
 					size={56}
 				/>
 			</Panel>
@@ -57,7 +55,8 @@ export const ConnectedVolumeControl = connect(
 	(state: IClientAppState): IVolumeControlReduxProps => {
 		return {
 			masterVolume: state.options.masterVolume,
-			reportedMasterVolume: Math.floor(state.audio.reportedMasterLevel),
+			isPlaying: getConnectionNodeInfo(ConnectionNodeType.audioOutput)
+				.selectIsPlaying(state.room, MASTER_AUDIO_OUTPUT_TARGET_ID),
 		}
 	},
 	(dispatch: Dispatch): IVolumeControlDispatchProps => ({
