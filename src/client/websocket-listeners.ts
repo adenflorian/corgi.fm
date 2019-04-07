@@ -20,7 +20,10 @@ export function setupWebsocketAndListeners(store: Store) {
 	socket = io.connect(window.location.hostname + `:${port}/`, {
 		query: {
 			username: getUsernameFromLocalStorage().substring(0, maxUsernameLength),
-			room: window.location.pathname.trim().substring(0, maxRoomNameLength),
+			room: window.location.pathname
+				.replace(/%3F.*/, '')
+				.trim()
+				.substring(0, maxRoomNameLength),
 		},
 	})
 
