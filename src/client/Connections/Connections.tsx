@@ -1,6 +1,6 @@
 import * as React from 'react'
 import {selectAllConnectionIds, shamuConnect} from '../../common/redux'
-import {ConnectedConnectionViewContainer} from './ConnectionViewContainer'
+import {ConnectedConnectionView} from './ConnectionView'
 
 export enum ConnectionsUsage {
 	normal = 'normal',
@@ -19,7 +19,7 @@ export const Connections = function _Connections({connectionIds}: IConnectionsAl
 	return (
 		<div className="connections">
 			{connectionIds.map(connectionId =>
-				<ConnectedConnectionViewContainer key={connectionId} id={connectionId} />,
+				<ConnectedConnectionView key={connectionId} id={connectionId} />,
 			)}
 		</div>
 	)

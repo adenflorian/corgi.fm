@@ -5,7 +5,10 @@ import {Dispatch} from 'redux'
 import {
 	AppOptions, connectionsActions, GhostConnectorRecord,
 	GhostConnectorStatus, GhostConnectorType, IClientAppState,
-	selectGlobalClockState, selectOption, selectUserInputKeys, shamuConnect,
+	selectOption, selectUserInputKeys, shamuConnect, getConnectionNodeInfo,
+	selectConnectionStackOrderForSource, selectConnectionStackOrderForTarget,
+	selectConnection, selectConnectionSourceIsSending,
+	selectConnectionSourceIsActive, selectPosition, selectConnectionSourceColor,
 } from '../../common/redux'
 import {saturateColor} from '../../common/shamu-color'
 import {simpleGlobalClientState} from '../SimpleGlobalClientState'
@@ -14,6 +17,13 @@ import {Connector} from './Connector'
 import {stripIndent} from 'common-tags';
 
 export interface IConnectionViewProps {
+	id: string
+}
+
+interface IConnectionViewReduxProps {
+	isAddMode: boolean
+	speed?: number
+	highQuality: boolean
 	color: string
 	isSourcePlaying: boolean
 	sourceX: number
@@ -23,15 +33,8 @@ export interface IConnectionViewProps {
 	ghostConnector: GhostConnectorRecord
 	saturateSource: boolean
 	saturateTarget: boolean
-	id: string
 	sourceStackOrder?: number
 	targetStackOrder?: number
-}
-
-interface IConnectionViewReduxProps {
-	isAddMode: boolean
-	speed?: number
-	highQuality: boolean
 }
 
 type IConnectionViewAllProps = IConnectionViewProps & IConnectionViewReduxProps & {dispatch: Dispatch}
@@ -430,8 +433,14 @@ class GhostConnector extends React.PureComponent<IGhostConnectorProps> {
 }
 
 export const ConnectedConnectionView = shamuConnect(
-	(state: IClientAppState): IConnectionViewReduxProps => {
+	(state: IClientAppState, props: IConnectionViewProps): IConnectionViewReduxProps => {
 		// const globalClockState = selectGlobalClockState(state.room)
+		const connection = selectConnection(state.room, props.id)
+		const isSourceSending = selectConnectionSourceIsSending(state.room, connection.id)
+		const isSourceActive = isSourceSending || selectConnectionSourceIsActive(state.room, connection.id)
+		const sourcePosition = selectPosition(state.room, connection.sourceId)
+		const targetPosition = selectPosition(state.room, connection.targetId)
+		const sourceColor = selectConnectionSourceColor(state.room, props.id)
 
 		return {
 			isAddMode: selectUserInputKeys(state).shift,
@@ -439,6 +448,18 @@ export const ConnectedConnectionView = shamuConnect(
 			// Disabled for now because of performance issues
 			// speed: globalClockState.bpm,
 			highQuality: selectOption(state, AppOptions.graphics_fancyConnections) as boolean,
+			isSourcePlaying: getConnectionNodeInfo(connection.sourceType)
+				.selectIsPlaying(state.room, connection.sourceId),
+			ghostConnector: connection.ghostConnector,
+			sourceStackOrder: selectConnectionStackOrderForSource(state.room, props.id),
+			targetStackOrder: selectConnectionStackOrderForTarget(state.room, props.id),
+			color: sourceColor,
+			sourceX: sourcePosition.x + sourcePosition.width,
+			sourceY: sourcePosition.y + (sourcePosition.height / 2),
+			targetX: targetPosition.x,
+			targetY: targetPosition.y + (targetPosition.height / 2),
+			saturateSource: isSourceActive || isSourceSending,
+			saturateTarget: isSourceSending,
 		}
 	},
 )(ConnectionView)
