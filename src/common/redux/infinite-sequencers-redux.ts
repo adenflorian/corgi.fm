@@ -211,6 +211,7 @@ function infiniteSequencerReducer(
 				}
 			}
 		case UNDO_RECORDING_SEQUENCER:
+			if (infiniteSequencer.isRecording !== true) return infiniteSequencer
 		case UNDO_SEQUENCER: {
 			if (infiniteSequencer.previousEvents.count() === 0) return infiniteSequencer
 
