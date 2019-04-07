@@ -22,6 +22,7 @@ export function setupWebsocketAndListeners(store: Store) {
 			username: getUsernameFromLocalStorage().substring(0, maxUsernameLength),
 			room: window.location.pathname
 				.replace(/%3F.*/, '')
+				.replace(/\/.*/, '')
 				.trim()
 				.substring(0, maxRoomNameLength),
 		},

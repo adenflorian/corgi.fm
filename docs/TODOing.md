@@ -1,9 +1,9 @@
 # Now
 - [√] change default names for sequencers
 - [√] require user to plug keyboard into sequencer to record
+- [ ] need to be able to draw new connections from no connections for new nodes
 	
 # Soon
-- [ ] need to be able to draw new connections from no connections for new nodes
 - [ ] don't lose focus on chat when sending message, only lose focus on enter if message is empty
 - [ ] make submenu for creating grid sequencer with preset sizes
 - [ ] allow saving of graph somewhere (server, browser local storage, download and upload)
