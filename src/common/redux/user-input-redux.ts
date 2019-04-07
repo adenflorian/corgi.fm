@@ -4,11 +4,20 @@ import {ActionType} from 'typesafe-actions'
 import {IClientAppState} from './index'
 
 export const SET_USER_INPUT = 'SET_USER_INPUT'
+export const USER_KEY_PRESS = 'USER_KEY_PRESS'
+
+export enum UserKeys {
+	Backspace = 'Backspace',
+}
 
 export const userInputActions = Object.freeze({
 	setKeys: (keys: Partial<UserInputKeysState>) => ({
 		type: SET_USER_INPUT as typeof SET_USER_INPUT,
 		keys,
+	}),
+	keyPress: (key: string) => ({
+		type: USER_KEY_PRESS as typeof USER_KEY_PRESS,
+		key,
 	}),
 })
 

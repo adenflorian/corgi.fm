@@ -2,6 +2,7 @@ BUGS
 ====
 
 ## High
+- [ ] strip query params from room names when creating rooms
 
 ## Medium
 - [ ] ECS animations break when switching rooms

@@ -83,7 +83,7 @@ const keyboardShortcuts: IKeyBoardShortcuts = Map<KeyBoardShortcut>({
 		preventDefault: true,
 	},
 	'Backspace': {
-		actionOnKeyDown: () => sequencerActions.undoRecordingSequencer(),
+		actionOnKeyDown: e => userInputActions.keyPress(e.key),
 		allowRepeat: false,
 		preventDefault: true,
 	},

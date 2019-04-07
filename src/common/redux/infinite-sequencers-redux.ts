@@ -10,8 +10,12 @@ import {
 	IMultiStateThings, makeMultiReducer, NetworkActionType, PLAY_ALL, selectGlobalClockState,
 	SERVER_ACTION, SKIP_NOTE, STOP_ALL, UNDO_SEQUENCER, VIRTUAL_KEY_PRESSED,
 } from './index'
-import {PLAY_SEQUENCER, SequencerAction, SequencerStateBase, STOP_SEQUENCER, UNDO_RECORDING_SEQUENCER, selectAllInfiniteSequencers} from './sequencer-redux'
+import {
+	PLAY_SEQUENCER, SequencerAction, SequencerStateBase, STOP_SEQUENCER,
+	selectAllInfiniteSequencers, RECORD_SEQUENCER_NOTE, RECORD_SEQUENCER_REST,
+} from './sequencer-redux'
 import {VirtualKeyPressedAction} from './virtual-keyboard-redux'
+import {logger} from '../logger';
 
 export const addInfiniteSequencer = (infiniteSequencer: InfiniteSequencerState) =>
 	addMultiThing(infiniteSequencer, ConnectionNodeType.infiniteSequencer, NetworkActionType.SERVER_AND_BROADCASTER)
@@ -141,6 +145,8 @@ const infiniteSequencerActionTypes = [
 	UNDO_SEQUENCER,
 	PLAY_SEQUENCER,
 	STOP_SEQUENCER,
+	RECORD_SEQUENCER_NOTE,
+	RECORD_SEQUENCER_REST,
 ]
 
 assertArrayHasNoUndefinedElements(infiniteSequencerActionTypes)
@@ -150,7 +156,6 @@ const infiniteSequencerGlobalActionTypes = [
 	STOP_ALL,
 	VIRTUAL_KEY_PRESSED,
 	SKIP_NOTE,
-	UNDO_RECORDING_SEQUENCER,
 ]
 
 assertArrayHasNoUndefinedElements(infiniteSequencerGlobalActionTypes)
@@ -210,8 +215,6 @@ function infiniteSequencerReducer(
 					[action.fieldName]: action.data,
 				}
 			}
-		case UNDO_RECORDING_SEQUENCER:
-			if (infiniteSequencer.isRecording !== true) return infiniteSequencer
 		case UNDO_SEQUENCER: {
 			if (infiniteSequencer.previousEvents.count() === 0) return infiniteSequencer
 
@@ -242,36 +245,22 @@ function infiniteSequencerReducer(
 		case STOP_SEQUENCER: return {...infiniteSequencer, isPlaying: false, isRecording: false}
 		case PLAY_ALL: return {...infiniteSequencer, isPlaying: true}
 		case STOP_ALL: return {...infiniteSequencer, isPlaying: false, isRecording: false}
-		case VIRTUAL_KEY_PRESSED:
+		case RECORD_SEQUENCER_REST:
+		case RECORD_SEQUENCER_NOTE:
 			if (infiniteSequencer.isRecording) {
 				return {
 					...infiniteSequencer,
 					midiClip: infiniteSequencer.midiClip.withMutations(mutable => {
 						mutable.set('events', mutable.events
 							.concat(makeMidiClipEvent({
-								notes: MidiNotes([action.midiNote]),
+								notes: action.type === RECORD_SEQUENCER_NOTE
+									? MidiNotes([action.note])
+									: action.type === RECORD_SEQUENCER_REST
+										? MidiNotes()
+										: (() => {logger.error('nope'); return MidiNotes()})(),
 								startBeat: mutable.events.count(),
 								durationBeats: 1,
 							})),
-						)
-						mutable.set('length', mutable.events.count())
-					}),
-					previousEvents: infiniteSequencer.previousEvents.unshift(infiniteSequencer.midiClip.events),
-				}
-			} else {
-				return infiniteSequencer
-			}
-		case SKIP_NOTE:
-			if (infiniteSequencer.isRecording) {
-				return {
-					...infiniteSequencer,
-					midiClip: infiniteSequencer.midiClip.withMutations(mutable => {
-						mutable.set('events', mutable.events
-							.concat({
-								notes: MidiNotes(),
-								startBeat: mutable.events.count(),
-								durationBeats: 1,
-							}),
 						)
 						mutable.set('length', mutable.events.count())
 					}),

@@ -1,25 +1,26 @@
 import {List, Map, Set} from 'immutable'
 import {ActionType} from 'typesafe-actions'
 import uuid = require('uuid')
-import {ConnectionNodeType, IMultiStateThing} from '../common-types'
+import {ConnectionNodeType, IMultiStateThing, isSequencerNodeType} from '../common-types'
 import {makeMidiClipEvent, MidiClip, MidiClipEvent, MidiClipEvents, makeMidiClip} from '../midi-types'
-import {emptyMidiNotes, MidiNotes} from '../MidiNote'
+import {emptyMidiNotes, MidiNotes, IMidiNote} from '../MidiNote'
 import {colorFunc, hashbow} from '../shamu-color'
 import {BROADCASTER_ACTION, SERVER_ACTION, IClientRoomState} from './index'
 import {NodeSpecialState} from './shamu-graph'
 import {createSelector} from 'reselect';
-import {selectConnectionsWithTargetIds, selectAllConnections} from './connections-redux';
+import {selectConnectionsWithTargetIds, selectAllConnections, selectConnectionsWithSourceIds} from './connections-redux';
 import {selectGlobalClockIsPlaying} from './global-clock-redux';
 
 export const CLEAR_SEQUENCER = 'CLEAR_SEQUENCER'
 export const UNDO_SEQUENCER = 'UNDO_SEQUENCER'
-export const UNDO_RECORDING_SEQUENCER = 'UNDO_RECORDING_SEQUENCER'
 export const SKIP_NOTE = 'SKIP_NOTE'
+export const RECORD_SEQUENCER_REST = 'RECORD_SEQUENCER_REST'
 export const PLAY_SEQUENCER = 'PLAY_SEQUENCER'
 export const STOP_SEQUENCER = 'STOP_SEQUENCER'
 export const PLAY_ALL = 'PLAY_ALL'
 export const STOP_ALL = 'STOP_ALL'
 export const EXPORT_SEQUENCER_MIDI = 'EXPORT_SEQUENCER_MIDI'
+export const RECORD_SEQUENCER_NOTE = 'RECORD_SEQUENCER_NOTE'
 
 export const sequencerActions = Object.freeze({
 	clear: (id: string) => ({
@@ -34,15 +35,12 @@ export const sequencerActions = Object.freeze({
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	}),
-	undoRecordingSequencer: () => ({
-		type: UNDO_RECORDING_SEQUENCER as typeof UNDO_RECORDING_SEQUENCER,
-		SERVER_ACTION,
-		BROADCASTER_ACTION,
-	}),
 	skipNote: () => ({
 		type: SKIP_NOTE as typeof SKIP_NOTE,
-		SERVER_ACTION,
-		BROADCASTER_ACTION,
+	}),
+	recordRest: (id: string) => ({
+		type: RECORD_SEQUENCER_REST as typeof RECORD_SEQUENCER_REST,
+		id,
 	}),
 	play: (id: string) => ({
 		type: PLAY_SEQUENCER as typeof PLAY_SEQUENCER,
@@ -66,9 +64,16 @@ export const sequencerActions = Object.freeze({
 		BROADCASTER_ACTION,
 		SERVER_ACTION,
 	}),
-	exportMidi: (sequencerId: string) => ({
+	exportMidi: (id: string) => ({
 		type: EXPORT_SEQUENCER_MIDI as typeof EXPORT_SEQUENCER_MIDI,
-		sequencerId,
+		id,
+	}),
+	recordNote: (id: string, note: IMidiNote) => ({
+		type: RECORD_SEQUENCER_NOTE as typeof RECORD_SEQUENCER_NOTE,
+		id,
+		note,
+		BROADCASTER_ACTION,
+		SERVER_ACTION,
 	}),
 })
 
@@ -183,6 +188,11 @@ export function selectSequencer(state: IClientRoomState, id: string) {
 	return selectAllSequencers(state)[id] || dummySequencerState
 }
 
+export const selectIsAnythingPlaying = createSelector(
+	[selectAllSequencers],
+	allSeqs => Map(allSeqs).some(x => x.isPlaying),
+)
+
 export const selectSequencerIsPlaying = (state: IClientRoomState, id: string): boolean => {
 	if (selectSequencer(state, id).isPlaying === false) return false
 	if (selectGlobalClockIsPlaying(state) === false) return false
@@ -226,7 +236,16 @@ function isUpstreamClockFromNode(
 		})
 }
 
-export const selectIsAnythingPlaying = createSelector(
-	[selectAllSequencers],
-	allSeqs => Map(allSeqs).some(x => x.isPlaying),
-)
+export const selectDirectDownstreamSequencerIds = (state: IClientRoomState, id: string): List<SequencerId> => {
+	return _getDirectDownstreamSequencerIds(state, id)
+}
+
+type SequencerId = string
+
+function _getDirectDownstreamSequencerIds(
+	state: IClientRoomState, nodeId: string
+): List<SequencerId> {
+	return selectConnectionsWithSourceIds(state, [nodeId])
+		.filter(connection => isSequencerNodeType(connection.targetType))
+		.map(x => x.targetId).toList()
+}

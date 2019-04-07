@@ -1,6 +1,6 @@
 # Now
 - [√] change default names for sequencers
-- [ ] require user to plug keyboard into sequencer to record
+- [√] require user to plug keyboard into sequencer to record
 	
 # Soon
 - [ ] need to be able to draw new connections from no connections for new nodes

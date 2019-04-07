@@ -1,9 +1,9 @@
-import {Map, Set} from 'immutable'
+import {Map, Set, List} from 'immutable'
 import {Dispatch, Middleware} from 'redux'
 import {ConnectionNodeType} from '../common/common-types'
 import {logger} from '../common/logger'
 import {emptyMidiNotes, IMidiNote} from '../common/MidiNote'
-import {IClientRoomState} from '../common/redux/common-redux-types'
+import {IClientRoomState, BroadcastAction} from '../common/redux/common-redux-types'
 import {selectConnectionsWithSourceIds, selectConnectionsWithSourceOrTargetIds} from '../common/redux/connections-redux'
 import {
 	addBasicSampler, addBasicSynthesizer, addPosition, addVirtualKeyboard,
@@ -19,6 +19,14 @@ import {
 	deleteThingsAny,
 	deletePositions,
 	NetworkActionType,
+	ISequencerState,
+	selectDirectDownstreamSequencerIds,
+	selectSequencer,
+	sequencerActions,
+	SKIP_NOTE,
+	USER_KEY_PRESS,
+	UserInputAction,
+	UserKeys,
 } from '../common/redux/index'
 import {pointersActions} from '../common/redux/pointers-redux'
 import {getAllInstruments} from './instrument-manager'
@@ -59,7 +67,7 @@ export const createLocalMiddleware: () => Middleware<{}, IClientAppState> = () =
 
 			const state = getState()
 
-			const localVirtualKeyboard = getLocalVirtualKeyboard(state)
+			const localVirtualKeyboard = selectLocalVirtualKeyboard(state)
 
 			return localVirtualKeyboard.pressedKeys.forEach(key => {
 				dispatch(
@@ -74,7 +82,7 @@ export const createLocalMiddleware: () => Middleware<{}, IClientAppState> = () =
 			next(action)
 			const state = getState()
 
-			const localVirtualKeyboard = getLocalVirtualKeyboard(state)
+			const localVirtualKeyboard = selectLocalVirtualKeyboard(state)
 
 			const noteToPlay = applyOctave(action.midiNote, localVirtualKeyboard.octave)
 
@@ -92,13 +100,48 @@ export const createLocalMiddleware: () => Middleware<{}, IClientAppState> = () =
 
 			scheduleNote(virtualKeyPressedAction.midiNote, virtualKeyPressedAction.id, getState().room, 'on')
 
+			if ((action as unknown as BroadcastAction).alreadyBroadcasted) return
+
+			// add note to sequencer if downstream recording sequencer
+			_getDownstreamRecordingSequencers(getState(), virtualKeyPressedAction.id)
+				.forEach(x => {
+					dispatch(sequencerActions.recordNote(x.id, virtualKeyPressedAction.midiNote))
+				})
+
+			return next(action)
+		}
+		case SKIP_NOTE: {
+			const state = getState()
+
+			// add rest to sequencer if downstream recording sequencer
+			_getDownstreamRecordingSequencers(state, selectLocalVirtualKeyboardId(state))
+				.forEach(x => {
+					dispatch(sequencerActions.recordRest(x.id))
+				})
+
+			return next(action)
+		}
+		case USER_KEY_PRESS: {
+			const userKeyPressAction = action as UserInputAction
+			if (userKeyPressAction.type === USER_KEY_PRESS) {
+				if (userKeyPressAction.key === UserKeys.Backspace) {
+					const state = getState()
+
+					// add rest to sequencer if downstream recording sequencer
+					_getDownstreamRecordingSequencers(state, selectLocalVirtualKeyboardId(state))
+						.forEach(x => {
+							dispatch(sequencerActions.undo(x.id))
+						})
+				}
+			}
+
 			return next(action)
 		}
 		case LOCAL_MIDI_KEY_UP: {
 			next(action)
 			const state = getState()
 
-			const localVirtualKeyboard = getLocalVirtualKeyboard(state)
+			const localVirtualKeyboard = selectLocalVirtualKeyboard(state)
 
 			const noteToRelease = applyOctave(action.midiNote, localVirtualKeyboard.octave)
 
@@ -142,7 +185,7 @@ export const createLocalMiddleware: () => Middleware<{}, IClientAppState> = () =
 			// 	scheduleNote(noteToSchedule, localVirtualKeyboard.id, state.room, 'on')
 			// })
 
-			return dispatch(virtualOctaveChange(getLocalVirtualKeyboardId(state), action.delta))
+			return dispatch(virtualOctaveChange(selectLocalVirtualKeyboardId(state), action.delta))
 		}
 		case VIRTUAL_OCTAVE_CHANGE: {
 			const virtualOctaveChangeAction = action as VirtualOctaveChangeAction
@@ -232,11 +275,11 @@ function scheduleNote(note: IMidiNote, sourceId: string, roomState: IClientRoomS
 	})
 }
 
-function getLocalVirtualKeyboardId(state: IClientAppState) {
-	return getLocalVirtualKeyboard(state).id
+function selectLocalVirtualKeyboardId(state: IClientAppState) {
+	return selectLocalVirtualKeyboard(state).id
 }
 
-function getLocalVirtualKeyboard(state: IClientAppState) {
+function selectLocalVirtualKeyboard(state: IClientAppState) {
 	return selectVirtualKeyboardByOwner(state.room, selectLocalClient(state).id)
 }
 
@@ -352,4 +395,10 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 			ConnectionNodeType.virtualKeyboard,
 		)))
 	}
+}
+
+function _getDownstreamRecordingSequencers(state: IClientAppState, nodeId: string): List<ISequencerState> {
+	return selectDirectDownstreamSequencerIds(state.room, nodeId)
+		.map(x => selectSequencer(state.room, x))
+		.filter(x => x.isRecording)
 }
