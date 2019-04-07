@@ -56,7 +56,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 			source: {
 				type: ConnectionNodeType.gridSequencer,
 				events: getBassNotes(),
-				name: 'Bass',
+				name: getConnectionNodeInfo(ConnectionNodeType.gridSequencer).typeName,
 				notesToShow: 18,
 			},
 			target: {
@@ -67,7 +67,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 			source: {
 				type: ConnectionNodeType.gridSequencer,
 				events: getMelodyNotes(),
-				name: 'Melody',
+				name: getConnectionNodeInfo(ConnectionNodeType.gridSequencer).typeName,
 				notesToShow: 24,
 			},
 			target: {
@@ -78,7 +78,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 			source: {
 				type: ConnectionNodeType.infiniteSequencer,
 				events: getInitialInfiniteSequencerEvents(),
-				name: 'Arp',
+				name: getConnectionNodeInfo(ConnectionNodeType.infiniteSequencer).typeName,
 				infinityStyle: InfiniteSequencerStyle.colorGrid,
 				isPlaying: true,
 			},
@@ -90,7 +90,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 			source: {
 				type: ConnectionNodeType.infiniteSequencer,
 				events: getInitialInfiniteSequencerEvents(),
-				name: 'Arp 2',
+				name: getConnectionNodeInfo(ConnectionNodeType.infiniteSequencer).typeName,
 				infinityStyle: InfiniteSequencerStyle.colorBars,
 			},
 			target: {

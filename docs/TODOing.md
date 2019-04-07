@@ -1,7 +1,9 @@
 # Now
+- [√] change default names for sequencers
 - [ ] require user to plug keyboard into sequencer to record
 	
 # Soon
+- [ ] need to be able to draw new connections from no connections for new nodes
 - [ ] don't lose focus on chat when sending message, only lose focus on enter if message is empty
 - [ ] make submenu for creating grid sequencer with preset sizes
 - [ ] allow saving of graph somewhere (server, browser local storage, download and upload)
@@ -20,3 +22,18 @@
 		- i dont want to write undo logic for each node
 		- maybe do in multi reducer?
 			- please no
+- [ ] make option for proper vector graphics regarding on zoom levels
+- [ ] high level sequencer
+	- doesn't control notes, but whole song sections
+	- different colored sections
+	- colored wires for each section
+	- can draw wires from 2 diff sections into same sequencer
+- [ ] global mod matrix
+- [ ] suggest notes
+- [ ] compressor
+- VSTs
+	- everyone would have to have the same VSTs
+	- or record the output of the VST and send to server
+	- FOSS VSTs
+- is there a limit on an individual chat message
+- add option to disable cable highlighting
