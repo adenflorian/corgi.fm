@@ -84,7 +84,7 @@ const keyboardShortcuts: IKeyBoardShortcuts = Map<KeyBoardShortcut>({
 	},
 	'Backspace': {
 		actionOnKeyDown: e => userInputActions.keyPress(e.key),
-		allowRepeat: false,
+		allowRepeat: true,
 		preventDefault: true,
 	},
 	'Control': {
