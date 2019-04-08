@@ -56,32 +56,64 @@ export class GhostConnectionView extends PureComponent<AllProps, State> {
 
 		const position = mousePosition
 
+		const activeConnectorPosition: Point =
+			activeSourceOrTarget === ActiveGhostConnectorSourceOrTarget.Source
+				? {
+					x: position.x + (connectorWidth / 2),
+					y: position.y,
+				}
+				: {
+					x: position.x - (connectorWidth / 2),
+					y: position.y,
+				}
+
+		const anchorConnectorPosition: Point =
+			activeSourceOrTarget === ActiveGhostConnectorSourceOrTarget.Source
+				? {
+					x: parentPosition.x - (parentConnectionCount * connectorWidth) - connectorWidth,
+					y: parentPosition.y + (parentPosition.height / 2),
+				}
+				: {
+					x: parentPosition.x + parentPosition.width + (parentConnectionCount * connectorWidth) + connectorWidth,
+					y: parentPosition.y + (parentPosition.height / 2),
+				}
+
 		const connectedLine =
 			activeSourceOrTarget === ActiveGhostConnectorSourceOrTarget.Source
 				? new LineState(
-					position.x + (connectorWidth / 2),
-					position.y,
-					parentPosition.x - (parentConnectionCount * connectorWidth) - connectorWidth,
-					parentPosition.y + (parentPosition.height / 2),
+					activeConnectorPosition.x,
+					activeConnectorPosition.y,
+					anchorConnectorPosition.x,
+					anchorConnectorPosition.y,
 				)
 				: new LineState(
-					parentPosition.x + parentPosition.width + (parentConnectionCount * connectorWidth) + connectorWidth,
-					parentPosition.y + (parentPosition.height / 2),
-					position.x - (connectorWidth / 2),
-					position.y,
+					anchorConnectorPosition.x,
+					anchorConnectorPosition.y,
+					activeConnectorPosition.x,
+					activeConnectorPosition.y,
 				)
 
 		const pathDPart1 = makeCurvedPath(connectedLine)
 
 		return (
-			<div>
+			<div style={{color: 'orange'}}>
 				<Connector
 					width={connectorWidth}
 					height={connectorHeight}
-					color={'green'}
 					saturate={false}
 					x={position.x - (connectorWidth / 2)}
 					y={position.y}
+				/>
+				<Connector
+					width={connectorWidth}
+					height={connectorHeight}
+					saturate={false}
+					x={
+						activeSourceOrTarget === ActiveGhostConnectorSourceOrTarget.Source
+							? anchorConnectorPosition.x
+							: anchorConnectorPosition.x - connectorWidth
+					}
+					y={anchorConnectorPosition.y}
 				/>
 				<GhostConnectionLine
 					color={'orange'}

@@ -7,6 +7,7 @@
 
     .connector {
         z-index: 0;
+        stroke: currentColor;
 
         &:hover {
             filter: saturate(300%);
@@ -14,6 +15,13 @@
         &:active {
             cursor: grabbing;
             filter: saturate(400%);
+        }
+
+        &.newConnectionPlaceholder {
+            &:not(:hover) {
+                // display: none;
+                color: #0000;
+            }
         }
     }
 

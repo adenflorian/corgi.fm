@@ -43,9 +43,9 @@ interface IConnectionViewReduxProps {
 
 type IConnectionViewAllProps = IConnectionViewProps & IConnectionViewReduxProps & {dispatch: Dispatch}
 
-export const longLineStrokeWidth = 2
-export const connectorWidth = 16
-export const connectorHeight = 8
+export const longLineStrokeWidth = 3
+export const connectorWidth = 24
+export const connectorHeight = 12
 
 const line0 = new LineState(0, 0, 0, 0)
 
@@ -105,7 +105,7 @@ export const ConnectionView =
 		}
 
 		return (
-			<div className={`connection ${saturateSource ? 'playing' : ''}`}>
+			<div className={`connection ${saturateSource ? 'playing' : ''}`} style={{color}}>
 				<ConnectionLine
 					id={id}
 					color={color}
@@ -124,7 +124,6 @@ export const ConnectionView =
 					height={connectorHeight}
 					x={sourceConnectorLeft}
 					y={sourceY}
-					color={color}
 					saturate={highQuality ? (saturateSource || isSourcePlaying) : isSourcePlaying}
 					svgProps={{
 						onMouseDown: () => onMouseDown(
@@ -140,7 +139,6 @@ export const ConnectionView =
 					height={connectorHeight}
 					x={targetConnectorLeft}
 					y={targetY}
-					color={color}
 					saturate={highQuality ? (saturateTarget || isSourcePlaying) : isSourcePlaying}
 					svgProps={{
 						onMouseDown: () => onMouseDown(

@@ -50,17 +50,17 @@ export const ConnectorPlaceholders =
 		})
 
 		return (
-			<div className="connection">
+			<div className="connection" style={{color: 'orange'}}>
 				<div>
 					<Connector
 						width={connectorWidth}
 						height={connectorHeight}
-						color={'red'}
 						saturate={false}
 						x={relativePosition.xLeft}
 						y={relativePosition.y}
 						svgProps={{
-							onMouseDown: () => onMouseDown(
+							className: 'newConnectionPlaceholder',
+							onMouseDown: e => e.button === 0 && onMouseDown(
 								parentPosition.x + relativePosition.xLeft,
 								ActiveGhostConnectorSourceOrTarget.Source,
 							),
@@ -71,12 +71,12 @@ export const ConnectorPlaceholders =
 					<Connector
 						width={connectorWidth}
 						height={connectorHeight}
-						color={'magenta'}
 						saturate={false}
 						x={relativePosition.xRight}
 						y={relativePosition.y}
 						svgProps={{
-							onMouseDown: () => onMouseDown(
+							className: 'newConnectionPlaceholder',
+							onMouseDown: e => e.button === 0 && onMouseDown(
 								parentPosition.x + relativePosition.xRight,
 								ActiveGhostConnectorSourceOrTarget.Target,
 							),
