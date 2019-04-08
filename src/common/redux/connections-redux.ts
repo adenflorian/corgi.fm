@@ -16,9 +16,6 @@ export const DELETE_CONNECTIONS = 'DELETE_CONNECTIONS'
 export const DELETE_ALL_CONNECTIONS = 'DELETE_ALL_CONNECTIONS'
 export const UPDATE_CONNECTIONS = 'UPDATE_CONNECTIONS'
 export const UPDATE_CONNECTION = 'UPDATE_CONNECTION'
-export const UPDATE_GHOST_CONNECTOR = 'UPDATE_GHOST_CONNECTOR'
-export const MOVE_GHOST_CONNECTOR = 'MOVE_GHOST_CONNECTOR'
-export const STOP_DRAGGING_GHOST_CONNECTOR = 'STOP_DRAGGING_GHOST_CONNECTOR'
 
 export const connectionsActions = Object.freeze({
 	add: (connection: IConnection) => ({
@@ -48,27 +45,6 @@ export const connectionsActions = Object.freeze({
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	}),
-	updateGhostConnector: (id: string, connector: Partial<GhostConnectorRecord>) => ({
-		type: UPDATE_GHOST_CONNECTOR as typeof UPDATE_GHOST_CONNECTOR,
-		id,
-		connector,
-		SERVER_ACTION,
-		BROADCASTER_ACTION,
-	}),
-	moveGhostConnector: (id: string, x: number, y: number) => ({
-		type: MOVE_GHOST_CONNECTOR as typeof MOVE_GHOST_CONNECTOR,
-		id,
-		x,
-		y,
-		SERVER_ACTION,
-		BROADCASTER_ACTION,
-	}),
-	stopDraggingGhostConnector: (id: string) => ({
-		type: STOP_DRAGGING_GHOST_CONNECTOR as typeof STOP_DRAGGING_GHOST_CONNECTOR,
-		id,
-		SERVER_ACTION,
-		BROADCASTER_ACTION,
-	}),
 })
 
 export interface IConnectionsState {
@@ -79,35 +55,12 @@ export type IConnections = Map<string, IConnection>
 
 export const Connections = Map
 
-export enum GhostConnectorStatus {
-	hidden = 'hidden',
-	activeSource = 'activeSource',
-	activeTarget = 'activeTarget',
-}
-
-export enum GhostConnectorType {
-	moving,
-	adding,
-}
-
-const makeGhostConnectorRecord = Record({
-	x: 0,
-	y: 0,
-	status: GhostConnectorStatus.hidden,
-	addingOrMoving: GhostConnectorType.moving,
-})
-
-export type GhostConnectorRecord = ReturnType<typeof makeGhostConnectorRecord>
-
-export const defaultGhostConnector = makeGhostConnectorRecord()
-
 export interface IConnection {
 	sourceId: string
 	sourceType: ConnectionNodeType
 	targetId: string
 	targetType: ConnectionNodeType
 	id: string
-	ghostConnector: GhostConnectorRecord
 }
 
 export class Connection implements IConnection {
@@ -117,11 +70,9 @@ export class Connection implements IConnection {
 		targetId: '-1',
 		targetType: ConnectionNodeType.dummy,
 		id: '-1',
-		ghostConnector: makeGhostConnectorRecord(),
 	}
 
 	public readonly id = uuid.v4()
-	public readonly ghostConnector = makeGhostConnectorRecord()
 
 	constructor(
 		public sourceId: string,
@@ -141,23 +92,6 @@ const connectionsSpecificReducer: Reducer<IConnections, IConnectionAction> =
 			case DELETE_ALL_CONNECTIONS: return connections.clear()
 			case UPDATE_CONNECTIONS: return connections.merge(action.connections)
 			case UPDATE_CONNECTION: return connections.update(action.id, x => ({...x, ...action.connection}))
-			case UPDATE_GHOST_CONNECTOR: return connections.update(action.id,
-				x => ({...x, ghostConnector: {...x.ghostConnector, ...action.connector}}),
-			)
-			case MOVE_GHOST_CONNECTOR: return connections.update(action.id,
-				x => ({...x, ghostConnector: {...x.ghostConnector, x: action.x, y: action.y}}),
-			)
-			case STOP_DRAGGING_GHOST_CONNECTOR: {
-				return connections.update(action.id,
-					x => ({
-						...x,
-						ghostConnector: {
-							...x.ghostConnector,
-							status: GhostConnectorStatus.hidden,
-						},
-					}),
-				)
-			}
 			default: return connections
 		}
 	}

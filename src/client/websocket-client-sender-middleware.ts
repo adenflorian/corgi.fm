@@ -4,7 +4,7 @@ import {rateLimitedDebounce} from '../common/common-utils'
 import {logger} from '../common/logger'
 import {
 	BroadcastAction, BROADCASTER_ACTION, getActionsBlacklist,
-	IClientAppState, MOVE_GHOST_CONNECTOR, MOVE_POSITION,
+	IClientAppState, MOVE_POSITION,
 	selectLocalSocketId, SERVER_ACTION, UPDATE_POINTER, GLOBAL_SERVER_ACTION,
 } from '../common/redux'
 import {WebSocketEvent} from '../common/server-constants'
@@ -53,7 +53,6 @@ function determineEvent(action: BroadcastAction) {
 const actionTypeRateLimitIntervals = Map<string, number>([
 	[UPDATE_POINTER, 50],
 	[MOVE_POSITION, 100],
-	[MOVE_GHOST_CONNECTOR, 100],
 ])
 
 const rateLimitedActionThings = actionTypeRateLimitIntervals

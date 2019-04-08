@@ -1,17 +1,15 @@
 import {List} from 'immutable'
 import * as React from 'react'
-import Draggable, {DraggableEventHandler} from 'react-draggable'
 import {Dispatch} from 'redux'
 import {
-	AppOptions, connectionsActions, GhostConnectorRecord,
-	GhostConnectorStatus, GhostConnectorType, IClientAppState,
+	AppOptions, connectionsActions,
+	IClientAppState,
 	selectOption, selectUserInputKeys, shamuConnect, getConnectionNodeInfo,
 	selectConnectionStackOrderForSource, selectConnectionStackOrderForTarget,
 	selectConnection, selectConnectionSourceIsSending,
 	selectConnectionSourceIsActive, selectPosition, selectConnectionSourceColor,
 } from '../../common/redux'
 import {saturateColor} from '../../common/shamu-color'
-import {simpleGlobalClientState} from '../SimpleGlobalClientState'
 import './ConnectionView.less'
 import {Connector} from './Connector'
 import {stripIndent} from 'common-tags';
@@ -30,7 +28,6 @@ interface IConnectionViewReduxProps {
 	sourceY: number
 	targetX: number
 	targetY: number
-	ghostConnector: GhostConnectorRecord
 	saturateSource: boolean
 	saturateTarget: boolean
 	sourceStackOrder?: number
@@ -65,7 +62,7 @@ const joint = 8
 export class ConnectionView extends React.PureComponent<IConnectionViewAllProps> {
 	public render() {
 		const {color, saturateSource, saturateTarget, id, sourceX, sourceY, targetX, targetY,
-			ghostConnector, targetStackOrder = 0, sourceStackOrder = 0, speed = 1,
+			targetStackOrder = 0, sourceStackOrder = 0, speed = 1,
 			isSourcePlaying, highQuality} = this.props
 
 		const sourceConnectorLeft = sourceX + (connectorWidth * sourceStackOrder)
@@ -80,11 +77,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 			targetY,
 		)
 
-		const ghostLine = this._getGhostLine(sourceConnectorRight, targetConnectorLeft)
-
 		const pathDPart1 = this._makeCurvedPath(connectedLine)
-
-		const pathDPart1Ghost = this._makeCurvedPath(ghostLine)
 
 		// function makeStraightPath(line: LineState) {
 		// 	return `
@@ -101,8 +94,6 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 			+ `M ${connectedLine.x1 - buffer} ${connectedLine.y1 - buffer} M ${connectedLine.x2 - buffer} ${connectedLine.y2 - buffer}`
 
 		const pathDFull = pathDPart1 + ' ' + pathDPart2
-
-		const isGhostHidden = ghostConnector.status === GhostConnectorStatus.hidden
 
 		return (
 			<div className={`connection ${saturateSource ? 'playing' : ''}`}>
@@ -135,92 +126,6 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 					color={color}
 					saturate={highQuality ? (saturateTarget || isSourcePlaying) : isSourcePlaying}
 				/>
-				<div
-					className={`ghost ${ghostConnector.status === GhostConnectorStatus.hidden ? 'hidden' : 'active'}`}
-					title={stripIndent`
-						click + drag to move connector
-						shift + click + drag to make a new connection
-					`}
-				>
-					{!isGhostHidden &&
-						<svg
-							className={`colorize longLine`}
-							xmlns="http://www.w3.org/2000/svg"
-							style={{
-								position: 'fixed',
-								pointerEvents: 'none',
-								color,
-								fill: 'none',
-							}}
-						>
-							<g>
-								<path
-									className="ghostPath"
-									d={pathDPart1Ghost}
-									strokeWidth={longLineStrokeWidth + 'px'}
-									strokeDasharray={4}
-									stroke={color}
-								/>
-							</g>
-						</svg>
-					}
-					{this.props.isAddMode === false &&
-						<React.Fragment>
-							<GhostConnector
-								dispatch={this.props.dispatch}
-								isActive={ghostConnector.status === GhostConnectorStatus.activeSource}
-								ghostConnector={ghostConnector}
-								parentX={sourceConnectorLeft}
-								parentY={sourceY}
-								connectionId={id}
-								sourceOrTarget={GhostConnectorStatus.activeSource}
-								movingOrAdding={GhostConnectorType.moving}
-								color={ghostConnector.status === GhostConnectorStatus.activeTarget ? '#0000' : color}
-								saturate={highQuality ? (saturateSource || isSourcePlaying) : isSourcePlaying}
-							/>
-							<GhostConnector
-								dispatch={this.props.dispatch}
-								isActive={ghostConnector.status === GhostConnectorStatus.activeTarget}
-								ghostConnector={ghostConnector}
-								parentX={targetConnectorLeft}
-								parentY={targetY}
-								connectionId={id}
-								sourceOrTarget={GhostConnectorStatus.activeTarget}
-								movingOrAdding={GhostConnectorType.moving}
-								color={ghostConnector.status === GhostConnectorStatus.activeSource ? '#0000' : color}
-								saturate={highQuality ? (saturateTarget || isSourcePlaying) : isSourcePlaying}
-							/>
-						</React.Fragment>
-					}
-					{this.props.isAddMode === true &&
-						<React.Fragment>
-							<GhostConnector
-								dispatch={this.props.dispatch}
-								isActive={ghostConnector.status === GhostConnectorStatus.activeTarget}
-								ghostConnector={ghostConnector}
-								parentX={sourceConnectorLeft}
-								parentY={sourceY}
-								connectionId={id}
-								sourceOrTarget={GhostConnectorStatus.activeTarget}
-								movingOrAdding={GhostConnectorType.adding}
-								color={color}
-								saturate={saturateSource}
-							/>
-							<GhostConnector
-								dispatch={this.props.dispatch}
-								isActive={ghostConnector.status === GhostConnectorStatus.activeSource}
-								ghostConnector={ghostConnector}
-								parentX={targetConnectorLeft}
-								parentY={targetY}
-								connectionId={id}
-								sourceOrTarget={GhostConnectorStatus.activeSource}
-								movingOrAdding={GhostConnectorType.adding}
-								color={color}
-								saturate={saturateTarget}
-							/>
-						</React.Fragment>
-					}
-				</div>
 			</div>
 		)
 	}
@@ -234,27 +139,6 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 			M ${line.x1} ${line.y1}
 			C ${line.x1 + joint + curveStrength2} ${line.y1} ${line.x2 - joint - curveStrength2} ${line.y2} ${line.x2} ${line.y2}
 		`
-	}
-
-	private readonly _getGhostLine = (sourceConnectorRight: number, targetConnectorLeft: number) => {
-		switch (this.props.ghostConnector.status) {
-			case GhostConnectorStatus.activeSource:
-				return new LineState(
-					this.props.ghostConnector.x + connectorWidth,
-					this.props.ghostConnector.y,
-					targetConnectorLeft,
-					this.props.targetY,
-				)
-			case GhostConnectorStatus.activeTarget:
-				return new LineState(
-					sourceConnectorRight,
-					this.props.sourceY,
-					this.props.ghostConnector.x,
-					this.props.ghostConnector.y,
-				)
-			default:
-				return line0
-		}
 	}
 }
 
@@ -360,78 +244,6 @@ const ConnectionLine = React.memo(
 	},
 )
 
-interface IGhostConnectorProps {
-	dispatch: Dispatch
-	isActive: boolean
-	ghostConnector: GhostConnectorRecord
-	parentX: number
-	parentY: number
-	connectionId: string
-	sourceOrTarget: GhostConnectorStatus
-	movingOrAdding: GhostConnectorType
-	color: string
-	saturate: boolean
-}
-
-class GhostConnector extends React.PureComponent<IGhostConnectorProps> {
-	public render() {
-		const {isActive, ghostConnector,
-			parentX, parentY, color, saturate} = this.props
-
-		return (
-			<Draggable
-				enableUserSelectHack={false}
-				scale={simpleGlobalClientState.zoom}
-				onStart={this._handleStartDrag}
-				onStop={this._handleStopDrag}
-				onDrag={this._handleDrag}
-				position={isActive
-					? {
-						x: ghostConnector.x,
-						y: ghostConnector.y,
-					}
-					: {
-						x: parentX,
-						y: parentY,
-					}
-				}
-			>
-				<div>
-					<Connector
-						width={connectorWidth}
-						height={connectorHeight}
-						color={color}
-						saturate={saturate}
-					/>
-				</div>
-			</Draggable>
-		)
-	}
-
-	private readonly _handleDrag: DraggableEventHandler = (_, data) => {
-		this.props.dispatch(connectionsActions.moveGhostConnector(
-			this.props.connectionId,
-			data.x,
-			data.y,
-		))
-	}
-
-	private readonly _handleStartDrag: DraggableEventHandler = (_, __) => {
-		this.props.dispatch(connectionsActions.updateGhostConnector(
-			this.props.connectionId, {
-				addingOrMoving: this.props.movingOrAdding,
-				status: this.props.sourceOrTarget,
-				x: this.props.parentX,
-				y: this.props.parentY,
-			}))
-	}
-
-	private readonly _handleStopDrag: DraggableEventHandler = (_, __) => {
-		this.props.dispatch(connectionsActions.stopDraggingGhostConnector(
-			this.props.connectionId))
-	}
-}
-
 export const ConnectedConnectionView = shamuConnect(
 	(state: IClientAppState, props: IConnectionViewProps): IConnectionViewReduxProps => {
 		// const globalClockState = selectGlobalClockState(state.room)
@@ -450,7 +262,6 @@ export const ConnectedConnectionView = shamuConnect(
 			highQuality: selectOption(state, AppOptions.graphics_fancyConnections) as boolean,
 			isSourcePlaying: getConnectionNodeInfo(connection.sourceType)
 				.selectIsPlaying(state.room, connection.sourceId),
-			ghostConnector: connection.ghostConnector,
 			sourceStackOrder: selectConnectionStackOrderForSource(state.room, props.id),
 			targetStackOrder: selectConnectionStackOrderForTarget(state.room, props.id),
 			color: sourceColor,
