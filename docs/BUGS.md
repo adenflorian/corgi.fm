@@ -2,6 +2,7 @@ BUGS
 ====
 
 ## High
+- [ ] cant see other people playing on keyboards
 
 ## Medium
 - [ ] ECS animations break when switching rooms
