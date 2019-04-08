@@ -1,6 +1,7 @@
 import {Dispatch} from 'redux'
 import Victor = require('victor')
 import {Point} from '../common/common-types'
+import {logger} from '../common/logger'
 import {IClientRoomState} from '../common/redux/common-redux-types'
 import {
 	ActiveGhostConnectorSourceOrTarget, Connection,
@@ -11,6 +12,8 @@ export function handleStopDraggingGhostConnector(
 	roomState: IClientRoomState, dispatch: Dispatch, ghostConnectionId: string,
 ) {
 	const ghostConnection = selectGhostConnection(roomState, ghostConnectionId)
+
+	const movingConnectionId = ghostConnection.movingConnectionId
 
 	const parentNodePosition = selectPosition(roomState, ghostConnection.inactiveConnector.parentNodeId)
 
@@ -43,7 +46,10 @@ export function handleStopDraggingGhostConnector(
 
 	function changeConnectionSource(position: IPosition) {
 		if (validatePosition(position) === false) return
-		dispatch(connectionsActions.update(ghostConnectionId, {
+		if (movingConnectionId === undefined) {
+			return logger.error('[changeConnectionSource] movingConnectionId is undefined but should never be right here')
+		}
+		dispatch(connectionsActions.update(movingConnectionId, {
 			sourceId: position.id,
 			sourceType: position.targetType,
 		}))
@@ -53,7 +59,10 @@ export function handleStopDraggingGhostConnector(
 
 	function changeConnectionTarget(position: IPosition) {
 		if (validatePosition(position) === false) return
-		dispatch(connectionsActions.update(ghostConnectionId, {
+		if (movingConnectionId === undefined) {
+			return logger.error('[changeConnectionTarget] movingConnectionId is undefined but should never be right here')
+		}
+		dispatch(connectionsActions.update(movingConnectionId, {
 			targetId: position.id,
 			targetType: position.targetType,
 		}))

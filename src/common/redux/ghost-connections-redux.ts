@@ -67,6 +67,7 @@ export class GhostConnection {
 		public readonly activeSourceOrTarget: ActiveGhostConnectorSourceOrTarget,
 		public readonly ownerId: ClientId,
 		public readonly addingOrMoving: GhostConnectorAddingOrMoving,
+		public readonly movingConnectionId?: string,
 	) {}
 }
 

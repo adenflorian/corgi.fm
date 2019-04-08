@@ -1,13 +1,18 @@
 import {stripIndent} from 'common-tags'
 import * as React from 'react'
 import {Dispatch} from 'redux'
+import {ClientId} from '../../common/common-types'
 import {
+	ActiveGhostConnectorSourceOrTarget,
 	AppOptions,
-	getConnectionNodeInfo,
-	IClientAppState, selectConnection, selectConnectionSourceColor, selectConnectionSourceIsActive,
-	selectConnectionSourceIsSending, selectConnectionStackOrderForSource,
-	selectConnectionStackOrderForTarget, selectOption,
-	selectPosition, selectUserInputKeys, shamuConnect,
+	getConnectionNodeInfo, GhostConnection, ghostConnectorActions,
+	GhostConnectorAddingOrMoving,
+	IClientAppState, IConnection,
+	selectConnection, selectConnectionSourceColor,
+	selectConnectionSourceIsActive, selectConnectionSourceIsSending,
+	selectConnectionStackOrderForSource, selectConnectionStackOrderForTarget,
+	selectLocalClientId, selectOption, selectPosition,
+	selectUserInputKeys, shamuConnect,
 } from '../../common/redux'
 import {ConnectionLine} from './ConnectionLine'
 import './ConnectionView.less'
@@ -24,6 +29,7 @@ interface IConnectionViewReduxProps {
 	highQuality: boolean
 	color: string
 	isSourcePlaying: boolean
+	localClientId: ClientId
 	sourceX: number
 	sourceY: number
 	targetX: number
@@ -32,6 +38,7 @@ interface IConnectionViewReduxProps {
 	saturateTarget: boolean
 	sourceStackOrder?: number
 	targetStackOrder?: number
+	connection: IConnection
 }
 
 type IConnectionViewAllProps = IConnectionViewProps & IConnectionViewReduxProps & {dispatch: Dispatch}
@@ -45,11 +52,11 @@ const line0 = new LineState(0, 0, 0, 0)
 const buffer = 50
 const joint = 8
 
-export class ConnectionView extends React.PureComponent<IConnectionViewAllProps> {
-	public render() {
+export const ConnectionView =
+	React.memo(function _ConnectionView(props: IConnectionViewAllProps) {
 		const {color, saturateSource, saturateTarget, id, sourceX, sourceY, targetX, targetY,
 			targetStackOrder = 0, sourceStackOrder = 0, speed = 1,
-			isSourcePlaying, highQuality} = this.props
+			isSourcePlaying, highQuality, dispatch, localClientId, connection} = props
 
 		const sourceConnectorLeft = sourceX + (connectorWidth * sourceStackOrder)
 		const sourceConnectorRight = sourceX + connectorWidth + (connectorWidth * sourceStackOrder)
@@ -81,6 +88,22 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 
 		const pathDFull = pathDPart1 + ' ' + pathDPart2
 
+		function onMouseDown(
+			connectorPositionX: number,
+			connectorPositionY: number,
+			sourceOrTarget: ActiveGhostConnectorSourceOrTarget,
+			parentNodeId: string,
+		) {
+			dispatch(ghostConnectorActions.create(new GhostConnection(
+				{x: connectorPositionX, y: connectorPositionY},
+				{parentNodeId},
+				sourceOrTarget,
+				localClientId,
+				GhostConnectorAddingOrMoving.Moving,
+				connection.id,
+			)))
+		}
+
 		return (
 			<div className={`connection ${saturateSource ? 'playing' : ''}`}>
 				<ConnectionLine
@@ -88,7 +111,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 					color={color}
 					saturateSource={saturateSource}
 					saturateTarget={saturateTarget}
-					dispatch={this.props.dispatch}
+					dispatch={props.dispatch}
 					pathDPart1={pathDPart1}
 					pathDFull={pathDFull}
 					connectedLine={connectedLine}
@@ -103,6 +126,14 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 					y={sourceY}
 					color={color}
 					saturate={highQuality ? (saturateSource || isSourcePlaying) : isSourcePlaying}
+					svgProps={{
+						onMouseDown: () => onMouseDown(
+							sourceConnectorLeft,
+							sourceY,
+							ActiveGhostConnectorSourceOrTarget.Source,
+							connection.targetId,
+						),
+					}}
 				/>
 				<Connector
 					width={connectorWidth}
@@ -111,11 +142,18 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 					y={targetY}
 					color={color}
 					saturate={highQuality ? (saturateTarget || isSourcePlaying) : isSourcePlaying}
+					svgProps={{
+						onMouseDown: () => onMouseDown(
+							targetConnectorLeft,
+							targetY,
+							ActiveGhostConnectorSourceOrTarget.Target,
+							connection.sourceId,
+						),
+					}}
 				/>
 			</div>
 		)
-	}
-}
+	})
 
 export function makeCurvedPath(line: LineState) {
 	const diff2 = Math.abs((line.x2 - line.x1) / 2)
@@ -146,6 +184,7 @@ export const ConnectedConnectionView = shamuConnect(
 			highQuality: selectOption(state, AppOptions.graphics_fancyConnections) as boolean,
 			isSourcePlaying: getConnectionNodeInfo(connection.sourceType)
 				.selectIsPlaying(state.room, connection.sourceId),
+			localClientId: selectLocalClientId(state),
 			sourceStackOrder: selectConnectionStackOrderForSource(state.room, props.id),
 			targetStackOrder: selectConnectionStackOrderForTarget(state.room, props.id),
 			color: sourceColor,
@@ -155,6 +194,7 @@ export const ConnectedConnectionView = shamuConnect(
 			targetY: targetPosition.y + (targetPosition.height / 2),
 			saturateSource: isSourceActive || isSourceSending,
 			saturateTarget: isSourceSending,
+			connection,
 		}
 	},
 )(ConnectionView)
