@@ -4,16 +4,16 @@ import {logger} from '../common/logger'
 import {OrganizeGraphAction} from '../common/redux/common-actions'
 import {BroadcastAction} from '../common/redux/common-redux-types'
 import {
-	DELETE_CONNECTIONS, IClientAppState,
-	IConnectionAction, ORGANIZE_GRAPH,
-	selectAllConnections, selectAllPositions, selectConnection,
-	STOP_DRAGGING_GHOST_CONNECTOR, updatePositions,
+	DELETE_CONNECTIONS, GHOST_CONNECTION_DELETE,
+	GhostConnectorAction, IClientAppState,
+	IConnectionAction, ORGANIZE_GRAPH, selectAllConnections,
+	selectAllPositions, selectConnection, updatePositions,
 } from '../common/redux/index'
 import {handleStopDraggingGhostConnector} from './dragging-connections'
 import {getAllInstruments} from './instrument-manager'
 
 export const connectionsClientMiddleware: Middleware<{}, IClientAppState> =
-	({dispatch, getState}) => next => (action: IConnectionAction | OrganizeGraphAction) => {
+	({dispatch, getState}) => next => (action: IConnectionAction | OrganizeGraphAction | GhostConnectorAction) => {
 
 		const beforeState = getState()
 
@@ -22,13 +22,13 @@ export const connectionsClientMiddleware: Middleware<{}, IClientAppState> =
 		const afterState = getState()
 
 		switch (action.type) {
-			case STOP_DRAGGING_GHOST_CONNECTOR: {
+			case GHOST_CONNECTION_DELETE: {
 				if ((action as unknown as BroadcastAction).alreadyBroadcasted) return
 
 				try {
 					handleStopDraggingGhostConnector(beforeState.room, dispatch, action.id)
 				} catch (error) {
-					logger.warn('Caught error (will ignore) when handling ' + STOP_DRAGGING_GHOST_CONNECTOR + ': ', error)
+					logger.warn('Caught error (will ignore) when handling ' + GHOST_CONNECTION_DELETE + ': ', error)
 					return
 				}
 

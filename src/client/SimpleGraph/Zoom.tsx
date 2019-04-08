@@ -1,10 +1,11 @@
 import * as React from 'react'
+import {ContextMenuTrigger} from 'react-contextmenu'
+import {Point} from '../../common/common-types'
 import {selectOptions} from '../../common/redux'
 import {shamuConnect} from '../../common/redux'
+import {backgroundMenuId, graphSizeX, zoomBackgroundClass} from '../client-constants'
 import PlusSVG from '../OtherSVG/plus.svg'
 import {simpleGlobalClientState} from '../SimpleGlobalClientState'
-import {zoomBackgroundClass, backgroundMenuId, graphSizeX} from '../client-constants'
-import {ContextMenuTrigger} from 'react-contextmenu'
 
 interface IZoomProps {
 	children: React.ReactNode
@@ -187,3 +188,23 @@ export const ConnectedZoom = shamuConnect(
 		requireCtrlToZoom: selectOptions(state).requireCtrlToScroll,
 	}),
 )(Zoom)
+
+export function toGraphSpace(x = 0, y = 0): Readonly<Point> {
+	const zoom = simpleGlobalClientState.zoom
+	const pan = simpleGlobalClientState.pan
+
+	return Object.freeze({
+		x: ((x - (window.innerWidth / 2)) / zoom) - pan.x,
+		y: ((y - (window.innerHeight / 2)) / zoom) - pan.y,
+	})
+}
+
+export function fromGraphSpace(x = 0, y = 0): Readonly<Point> {
+	const zoom = simpleGlobalClientState.zoom
+	const pan = simpleGlobalClientState.pan
+
+	return Object.freeze({
+		x: ((x + pan.x) * zoom) + (window.innerWidth / 2),
+		y: ((y + pan.y) * zoom) + (window.innerHeight / 2),
+	})
+}

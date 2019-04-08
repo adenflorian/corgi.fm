@@ -1,4 +1,5 @@
 import * as React from 'react'
+import {ContextMenuTrigger} from 'react-contextmenu'
 import Draggable, {DraggableEventHandler} from 'react-draggable'
 import {IoMdMove as HandleIcon} from 'react-icons/io'
 import {Dispatch} from 'redux'
@@ -9,6 +10,8 @@ import {
 } from '../../common/redux'
 import {CssColor} from '../../common/shamu-color'
 import {ConnectedBasicSampler} from '../BasicSampler/BasicSampler'
+import {graphSizeX, graphSizeY, nodeMenuId} from '../client-constants'
+import {ConnectedConnectorPlaceholders} from '../Connections/ConnectorPlaceholders'
 import {ECSSequencerRenderSystem} from '../ECS/ECSSequencerRenderSystem'
 import {ConnectedGridSequencerContainer} from '../GridSequencer/GridSequencerContainer'
 import {ConnectedInfiniteSequencer} from '../InfiniteSequencer/InfiniteSequencer'
@@ -18,8 +21,6 @@ import {ConnectedMasterControls} from '../MasterControls'
 import {ConnectedSimpleReverb} from '../ShamuNodes/SimpleReverb/SimpleReverbView'
 import {simpleGlobalClientState} from '../SimpleGlobalClientState'
 import {ConnectedVolumeControl} from '../Volume/VolumeControl'
-import {graphSizeX, graphSizeY, nodeMenuId} from '../client-constants';
-import {ContextMenuTrigger} from 'react-contextmenu';
 
 interface ISimpleGraphNodeProps {
 	positionId: string
@@ -43,66 +44,73 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 		} = this.props
 
 		return (
-			// @ts-ignore disableIfShiftIsPressed
-			<ContextMenuTrigger
-				id={nodeMenuId}
-				disableIfShiftIsPressed={true}
-				holdToDisplay={-1}
-				nodeId={positionId}
-				nodeType={targetType}
-				collect={({nodeId, nodeType}) => ({
-					nodeId,
-					nodeType,
-				})}
+			<Draggable
+				enableUserSelectHack={false}
+				onDrag={this._handleDrag}
+				position={{
+					x,
+					y,
+				}}
+				scale={simpleGlobalClientState.zoom}
+				bounds={{
+					top: -(graphSizeY / 2),
+					right: (graphSizeX / 2),
+					bottom: (graphSizeY / 2),
+					left: -(graphSizeX / 2),
+				}}
+				handle={`.${handleClassName}`}
+				cancel={`.actualKnob, .note, .key, .controls > *, .oscillatorTypes > *, .verticalScrollBar`}
+				onMouseDown={this._handleMouseDown}
 			>
-				<Draggable
-					enableUserSelectHack={false}
-					onDrag={this._handleDrag}
-					position={{
-						x,
-						y,
+				<div
+					className="simpleGraphNode"
+					style={{
+						position: 'absolute',
+						willChange: 'transform',
+						width,
+						height,
+						zIndex,
 					}}
-					scale={simpleGlobalClientState.zoom}
-					bounds={{
-						top: -(graphSizeY / 2),
-						right: (graphSizeX / 2),
-						bottom: (graphSizeY / 2),
-						left: -(graphSizeX / 2),
-					}}
-					handle={`.${handleClassName}`}
-					cancel={`.actualKnob, .note, .key, .controls > *, .oscillatorTypes > *, .verticalScrollBar`}
-					onMouseDown={this._handleMouseDown}
 				>
-					<div
-						className="simpleGraphNode"
+					<Handle />
+					<ConnectedConnectorPlaceholders
+						parentId={positionId}
+						parentPosition={{x, y}}
+						parentSize={{x: width, y: height}}
+					/>
+					{
+						// @ts-ignore disableIfShiftIsPressed
+						<ContextMenuTrigger
+							id={nodeMenuId}
+							disableIfShiftIsPressed={true}
+							holdToDisplay={-1}
+							nodeId={positionId}
+							nodeType={targetType}
+							collect={({nodeId, nodeType}) => ({
+								nodeId,
+								nodeType,
+							})}
+						>
+							{getComponentByNodeType(targetType, positionId, color)}
+						</ContextMenuTrigger>
+					}
+					<canvas
+						id={ECSSequencerRenderSystem.canvasIdPrefix + positionId}
 						style={{
 							position: 'absolute',
-							willChange: 'transform',
 							width,
 							height,
-							zIndex,
+							top: 0,
+							left: 0,
+							pointerEvents: 'none',
+							zIndex: 2,
+							display: highQuality ? undefined : 'none',
 						}}
-					>
-						<Handle />
-						{getComponentByNodeType(targetType, positionId, color)}
-						<canvas
-							id={ECSSequencerRenderSystem.canvasIdPrefix + positionId}
-							style={{
-								position: 'absolute',
-								width,
-								height,
-								top: 0,
-								left: 0,
-								pointerEvents: 'none',
-								zIndex: 2,
-								display: highQuality ? undefined : 'none',
-							}}
-							width={width}
-							height={height}
-						></canvas>
-					</div>
-				</Draggable>
-			</ContextMenuTrigger>
+						width={width}
+						height={height}
+					></canvas>
+				</div>
+			</Draggable>
 		)
 	}
 

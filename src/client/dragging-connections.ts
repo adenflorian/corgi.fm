@@ -3,17 +3,16 @@ import Victor = require('victor')
 import {Point} from '../common/common-types'
 import {IClientRoomState} from '../common/redux/common-redux-types'
 import {
-	Connection, connectionsActions, GhostConnectorStatus,
-	GhostConnectorType, IPosition, selectAllPositions, selectConnection,
+	ActiveGhostConnectorSourceOrTarget, Connection,
+	connectionsActions, GhostConnectorAddingOrMoving, IPosition, selectAllPositions, selectGhostConnection, selectPosition,
 } from '../common/redux/index'
-import {getAllInstruments} from './instrument-manager'
 
 export function handleStopDraggingGhostConnector(
-	roomState: IClientRoomState, dispatch: Dispatch, connectionId: string,
+	roomState: IClientRoomState, dispatch: Dispatch, ghostConnectionId: string,
 ) {
-	const connection = selectConnection(roomState, connectionId)
+	const ghostConnection = selectGhostConnection(roomState, ghostConnectionId)
 
-	const ghostConnector = connection.ghostConnector
+	const parentNodePosition = selectPosition(roomState, ghostConnection.inactiveConnector.parentNodeId)
 
 	// Find nodes within threshold
 	const newConnectionCandidates = selectAllPositions(roomState)
@@ -35,10 +34,7 @@ export function handleStopDraggingGhostConnector(
 	}
 
 	function validatePosition(position: IPosition) {
-		if (
-			position.id === connection.sourceId ||
-			position.id === connection.targetId
-		) {
+		if (position.id === parentNodePosition.id) {
 			return false
 		} else {
 			return true
@@ -47,7 +43,7 @@ export function handleStopDraggingGhostConnector(
 
 	function changeConnectionSource(position: IPosition) {
 		if (validatePosition(position) === false) return
-		dispatch(connectionsActions.update(connectionId, {
+		dispatch(connectionsActions.update(ghostConnectionId, {
 			sourceId: position.id,
 			sourceType: position.targetType,
 		}))
@@ -57,7 +53,7 @@ export function handleStopDraggingGhostConnector(
 
 	function changeConnectionTarget(position: IPosition) {
 		if (validatePosition(position) === false) return
-		dispatch(connectionsActions.update(connectionId, {
+		dispatch(connectionsActions.update(ghostConnectionId, {
 			targetId: position.id,
 			targetType: position.targetType,
 		}))
@@ -70,51 +66,51 @@ export function handleStopDraggingGhostConnector(
 		dispatch(connectionsActions.add(new Connection(
 			position.id,
 			position.targetType,
-			connection.targetId,
-			connection.targetType,
+			parentNodePosition.id,
+			parentNodePosition.targetType,
 		)))
 	}
 
 	function newConnectionToTarget(position: IPosition) {
 		if (validatePosition(position) === false) return
 		dispatch(connectionsActions.add(new Connection(
-			connection.sourceId,
-			connection.sourceType,
+			parentNodePosition.id,
+			parentNodePosition.targetType,
 			position.id,
 			position.targetType,
 		)))
 	}
 
 	function getChangeConnectionFunc() {
-		if (ghostConnector.addingOrMoving === GhostConnectorType.moving) {
-			switch (ghostConnector.status) {
-				case GhostConnectorStatus.activeSource: return changeConnectionSource
-				case GhostConnectorStatus.activeTarget: return changeConnectionTarget
-				default: throw new Error('Unexpected ghost connector status (moving)(changeConnection): ' + ghostConnector.status)
+		if (ghostConnection.addingOrMoving === GhostConnectorAddingOrMoving.Moving) {
+			switch (ghostConnection.activeSourceOrTarget) {
+				case ActiveGhostConnectorSourceOrTarget.Source: return changeConnectionSource
+				case ActiveGhostConnectorSourceOrTarget.Target: return changeConnectionTarget
+				default: throw new Error('Unexpected ghost connector status (moving)(changeConnection): ' + ghostConnection.activeSourceOrTarget)
 			}
-		} else if (ghostConnector.addingOrMoving === GhostConnectorType.adding) {
-			switch (ghostConnector.status) {
-				case GhostConnectorStatus.activeSource: return newConnectionToSource
-				case GhostConnectorStatus.activeTarget: return newConnectionToTarget
-				default: throw new Error('Unexpected ghost connector status (adding)(changeConnection): ' + ghostConnector.status)
+		} else if (ghostConnection.addingOrMoving === GhostConnectorAddingOrMoving.Adding) {
+			switch (ghostConnection.activeSourceOrTarget) {
+				case ActiveGhostConnectorSourceOrTarget.Source: return newConnectionToSource
+				case ActiveGhostConnectorSourceOrTarget.Target: return newConnectionToTarget
+				default: throw new Error('Unexpected ghost connector status (adding)(changeConnection): ' + ghostConnection.activeSourceOrTarget)
 			}
 		} else {
-			throw new Error('Unexpected ghost connector addingOrMoving (changeConnection): ' + ghostConnector.addingOrMoving)
+			throw new Error('Unexpected ghost connector addingOrMoving (changeConnection): ' + ghostConnection.addingOrMoving)
 		}
 	}
 
 	function getPositionFunc() {
-		switch (ghostConnector.status) {
-			case GhostConnectorStatus.activeSource: return moveToOutputPosition
-			case GhostConnectorStatus.activeTarget: return moveToInputPosition
-			default: throw new Error('Unexpected ghost connector status (getPositionFunc): ' + ghostConnector.status)
+		switch (ghostConnection.activeSourceOrTarget) {
+			case ActiveGhostConnectorSourceOrTarget.Source: return moveToOutputPosition
+			case ActiveGhostConnectorSourceOrTarget.Target: return moveToInputPosition
+			default: throw new Error('Unexpected ghost connector status (getPositionFunc): ' + ghostConnection.activeSourceOrTarget)
 		}
 	}
 
 	function getDistanceFromGhostConnector(position: IPosition) {
 		return {
 			...position,
-			distanceFromGhostConnector: getDistanceBetweenPoints(position, ghostConnector),
+			distanceFromGhostConnector: getDistanceBetweenPoints(position, ghostConnection.activeConnector),
 		}
 	}
 }

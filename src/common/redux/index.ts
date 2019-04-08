@@ -9,6 +9,7 @@ export * from './sequencer-redux'
 export * from './global-clock-redux'
 export * from './virtual-keyboard-redux'
 export * from './connections-redux'
+export * from './ghost-connections-redux'
 export * from './audio-redux'
 
 export * from './redux-utils'

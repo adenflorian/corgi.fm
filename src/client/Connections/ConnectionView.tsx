@@ -1,18 +1,18 @@
-import {List} from 'immutable'
+import {stripIndent} from 'common-tags'
 import * as React from 'react'
 import {Dispatch} from 'redux'
 import {
-	AppOptions, connectionsActions,
-	IClientAppState,
-	selectOption, selectUserInputKeys, shamuConnect, getConnectionNodeInfo,
-	selectConnectionStackOrderForSource, selectConnectionStackOrderForTarget,
-	selectConnection, selectConnectionSourceIsSending,
-	selectConnectionSourceIsActive, selectPosition, selectConnectionSourceColor,
+	AppOptions,
+	getConnectionNodeInfo,
+	IClientAppState, selectConnection, selectConnectionSourceColor, selectConnectionSourceIsActive,
+	selectConnectionSourceIsSending, selectConnectionStackOrderForSource,
+	selectConnectionStackOrderForTarget, selectOption,
+	selectPosition, selectUserInputKeys, shamuConnect,
 } from '../../common/redux'
-import {saturateColor} from '../../common/shamu-color'
+import {ConnectionLine} from './ConnectionLine'
 import './ConnectionView.less'
 import {Connector} from './Connector'
-import {stripIndent} from 'common-tags';
+import {LineState} from './LineState'
 
 export interface IConnectionViewProps {
 	id: string
@@ -36,23 +36,9 @@ interface IConnectionViewReduxProps {
 
 type IConnectionViewAllProps = IConnectionViewProps & IConnectionViewReduxProps & {dispatch: Dispatch}
 
-class LineState {
-	constructor(
-		public readonly x1: number,
-		public readonly y1: number,
-		public readonly x2: number,
-		public readonly y2: number,
-	) {}
-
-	public readonly width = () => Math.abs(this.x1 - this.x2)
-	public readonly height = () => Math.abs(this.y1 - this.y2)
-	public readonly leftMost = () => Math.min(this.x1, this.x2)
-	public readonly topMost = () => Math.min(this.y1, this.y2)
-}
-
-const longLineStrokeWidth = 2
-const connectorWidth = 16
-const connectorHeight = 8
+export const longLineStrokeWidth = 2
+export const connectorWidth = 16
+export const connectorHeight = 8
 
 const line0 = new LineState(0, 0, 0, 0)
 
@@ -77,7 +63,7 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 			targetY,
 		)
 
-		const pathDPart1 = this._makeCurvedPath(connectedLine)
+		const pathDPart1 = makeCurvedPath(connectedLine)
 
 		// function makeStraightPath(line: LineState) {
 		// 	return `
@@ -129,120 +115,18 @@ export class ConnectionView extends React.PureComponent<IConnectionViewAllProps>
 			</div>
 		)
 	}
-
-	private readonly _makeCurvedPath = (line: LineState) => {
-		const diff2 = Math.abs((line.x2 - line.x1) / 2)
-
-		const curveStrength2 = Math.max(10, diff2)
-
-		return stripIndent`
-			M ${line.x1} ${line.y1}
-			C ${line.x1 + joint + curveStrength2} ${line.y1} ${line.x2 - joint - curveStrength2} ${line.y2} ${line.x2} ${line.y2}
-		`
-	}
 }
 
-interface ConnectionLineProps {
-	id: string
-	color: string
-	saturateSource: boolean
-	saturateTarget: boolean
-	dispatch: Dispatch
-	pathDPart1: string
-	pathDFull: string
-	connectedLine: LineState
-	speed?: number
-	isSourcePlaying: boolean
-	highQuality: boolean
+export function makeCurvedPath(line: LineState) {
+	const diff2 = Math.abs((line.x2 - line.x1) / 2)
+
+	const curveStrength2 = Math.max(10, diff2)
+
+	return stripIndent`
+		M ${line.x1} ${line.y1}
+		C ${line.x1 + joint + curveStrength2} ${line.y1} ${line.x2 - joint - curveStrength2} ${line.y2} ${line.x2} ${line.y2}
+	`
 }
-
-const longLineTooltip = 'right click to delete'
-
-const ConnectionLine = React.memo(
-	function _ConnectionLine({id, color, saturateSource, saturateTarget, pathDPart1,
-		pathDFull, dispatch, connectedLine, speed = 1,
-		isSourcePlaying, highQuality}: ConnectionLineProps,
-	) {
-		const saturatedColor = saturateColor(color)
-
-		return (
-			<svg
-				className={`colorize longLine`}
-				xmlns="http://www.w3.org/2000/svg"
-				style={{
-					position: 'fixed',
-					pointerEvents: 'none',
-					color,
-					fill: 'none',
-				}}
-			>
-				<defs>
-					{highQuality &&
-						<linearGradient
-							id={id}
-							x1={(connectedLine.x1)}
-							y1={(connectedLine.y1)}
-							x2={(connectedLine.x2)}
-							y2={(connectedLine.y2)}
-							gradientUnits="userSpaceOnUse"
-						// gradientUnits="objectBoundingBox"
-						>
-							<stop stopColor={(saturateSource || isSourcePlaying) ? saturatedColor : color} offset="0%" />
-							<stop stopColor={(saturateTarget || isSourcePlaying) ? saturatedColor : color} offset="100%" />
-						</linearGradient>
-					}
-					<filter id="saturate">
-						<feColorMatrix in="SourceGraphic"
-							type="saturate"
-							values="3" />
-					</filter>
-				</defs>
-				<g
-					onContextMenu={(e: React.MouseEvent) => {
-						dispatch(connectionsActions.delete(List([id])))
-						e.preventDefault()
-					}}
-				>
-					<path
-						className="mainLongLine"
-						d={pathDPart1}
-						stroke={highQuality ? `url(#${id})` : isSourcePlaying ? saturatedColor : color}
-						strokeWidth={longLineStrokeWidth + 'px'}
-					>
-					</path>
-					<path
-						className="invisibleLongLine"
-						d={pathDPart1}
-						stroke="#0000"
-						strokeWidth={24 + 'px'}
-					>
-						<title>{longLineTooltip}</title>
-					</path>
-					<path
-						className="blurLine"
-						d={pathDFull}
-						stroke={highQuality ? `url(#${id})` : isSourcePlaying ? saturatedColor : color}
-						strokeWidth={4 + 'px'}
-					>
-						<title>{longLineTooltip}</title>
-					</path>
-					{highQuality && isSourcePlaying &&
-						<path
-							style={{
-								animationDuration: (3600 / speed) + 's',
-							}}
-							className="animatedLongLine"
-							d={pathDPart1}
-							stroke={saturatedColor}
-							strokeWidth={longLineStrokeWidth * 2 + 'px'}
-							strokeDasharray="4 8"
-						/>
-					}
-				</g>
-			</svg>
-		)
-	},
-)
 
 export const ConnectedConnectionView = shamuConnect(
 	(state: IClientAppState, props: IConnectionViewProps): IConnectionViewReduxProps => {

@@ -7,12 +7,13 @@ interface ConnectorProps {
 	x?: number
 	y?: number
 	color?: string
+	svgProps?: React.SVGProps<SVGSVGElement>
 }
 
 const connectorStrokeWidth = 8
 
 export const Connector: React.FC<ConnectorProps> =
-	React.memo(function _Connector({width, height, saturate = false, x = 0, y = 0, color}) {
+	React.memo(function _Connector({width, height, saturate = false, x = 0, y = 0, color, svgProps = {}}) {
 		return (
 			<svg
 				className={`colorize connector${saturate ? ' saturate' : ''}`}
@@ -23,6 +24,7 @@ export const Connector: React.FC<ConnectorProps> =
 					top: y - (height / 2),
 					left: x,
 				}}
+				{...svgProps}
 			>
 				<line
 					x1={0}

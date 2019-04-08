@@ -109,7 +109,7 @@ const positionsSpecificReducer: Reducer<IPositions, IPositionAction> =
 				{
 					...action.position,
 					zIndex: getNewZIndex(positions, 0),
-				}
+				},
 			))
 			case DELETE_POSITIONS: return sortPositions(positions.deleteAll(action.positionIds))
 			case DELETE_ALL_POSITIONS: return positions.clear()

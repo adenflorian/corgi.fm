@@ -8,7 +8,7 @@ import {IMidiNotes} from '../MidiNote'
 import {CssColor, mixColors} from '../shamu-color'
 import {
 	BROADCASTER_ACTION, getConnectionNodeInfo, IClientRoomState,
-	VirtualKeyboardState, selectVirtualKeyboardById, SERVER_ACTION,
+	selectVirtualKeyboardById, SERVER_ACTION, VirtualKeyboardState,
 } from './index'
 
 export const ADD_CONNECTION = 'ADD_CONNECTION'

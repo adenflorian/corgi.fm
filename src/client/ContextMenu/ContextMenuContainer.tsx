@@ -1,18 +1,18 @@
-import React, {MouseEvent, Fragment} from 'react'
-import {backgroundMenuId, nodeMenuId} from '../client-constants';
-import {MenuItem, ContextMenu, connectMenu, SubMenu} from 'react-contextmenu';
-import './ContextMenu.less'
+import {oneLine} from 'common-tags'
+import {List} from 'immutable'
+import React, {Fragment, MouseEvent} from 'react'
+import {connectMenu, ContextMenu, MenuItem, SubMenu} from 'react-contextmenu'
+import {AnyAction, Dispatch} from 'redux'
+import {serverClientId} from '../../common/common-constants'
+import {ConnectionNodeType, IConnectable, Point} from '../../common/common-types'
 import {
-	shamuConnect, addPosition,
-	makePosition, getAddableNodeInfos, getConnectionNodeInfo
-} from '../../common/redux';
-import {Dispatch, AnyAction} from 'redux';
-import {serverClientId} from '../../common/common-constants';
-import {Point, IConnectable, ConnectionNodeType} from '../../common/common-types';
-import {simpleGlobalClientState} from '../SimpleGlobalClientState';
-import {deleteNode} from '../local-middleware';
-import {List} from 'immutable';
-import {oneLine} from 'common-tags';
+	addPosition, getAddableNodeInfos,
+	getConnectionNodeInfo, makePosition, shamuConnect,
+} from '../../common/redux'
+import {backgroundMenuId, nodeMenuId} from '../client-constants'
+import {deleteNode} from '../local-middleware'
+import {toGraphSpace} from '../SimpleGraph/Zoom'
+import './ContextMenu.less'
 
 interface AllProps {
 	dispatch: Dispatch
@@ -36,7 +36,7 @@ export function ContextMenuContainer({dispatch}: AllProps) {
 interface NodeMenuProps {
 	dispatch: Dispatch
 	trigger: {
-		nodeType: ConnectionNodeType
+		nodeType: ConnectionNodeType,
 	}
 }
 
@@ -94,7 +94,7 @@ const BackgroundMenuItems = React.memo(function _MenuItems({dispatch}: {dispatch
 
 	function AddNodeMenuItem(props: AddNodeMenuItemProps) {
 		return (
-			<MenuItem onClick={(e) => {
+			<MenuItem onClick={e => {
 				const newState = new props.stateConstructor(serverClientId)
 				dispatch(props.actionCreator(newState))
 				createPosition(dispatch, newState, e)
@@ -215,8 +215,8 @@ function createPosition(dispatch: Dispatch, state: IConnectable, e: React.TouchE
 			targetType: state.type,
 			width: state.width,
 			height: state.height,
-			...getPositionFromMouseOrTouchEvent(e)
-		})
+			...getPositionFromMouseOrTouchEvent(e),
+		}),
 	))
 }
 
@@ -224,16 +224,6 @@ function getPositionFromMouseOrTouchEvent(e: React.TouchEvent<HTMLDivElement> | 
 	const x = (e as MouseEvent).clientX || 0
 	const y = (e as MouseEvent).clientY || 0
 	return toGraphSpace(x, y)
-}
-
-function toGraphSpace(x = 0, y = 0): Readonly<Point> {
-	const zoom = simpleGlobalClientState.zoom
-	const pan = simpleGlobalClientState.pan
-
-	return Object.freeze({
-		x: ((x - (window.innerWidth / 2)) / zoom) - pan.x,
-		y: ((y - (window.innerHeight / 2)) / zoom) - pan.y,
-	})
 }
 
 export const ConnectedContextMenuContainer = shamuConnect()(ContextMenuContainer)

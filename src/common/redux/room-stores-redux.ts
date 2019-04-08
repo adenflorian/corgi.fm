@@ -6,6 +6,7 @@ import {
 	pointersStateReducer, positionsReducer, roomMembersReducer,
 	RoomsReduxAction, shamuGraphReducer,
 } from './index'
+import {ghostConnectionsReducer} from './ghost-connections-redux';
 
 export const ROOM_ACTION = 'ROOM_ACTION'
 type RoomAction = ReturnType<typeof createRoomAction>
@@ -20,6 +21,7 @@ export const roomReducers = combineReducers({
 	chat: chatReducer,
 	connections: connectionsReducer,
 	globalClock: globalClockReducer,
+	ghostConnections: ghostConnectionsReducer,
 	members: roomMembersReducer,
 	positions: positionsReducer,
 	shamuGraph: shamuGraphReducer,

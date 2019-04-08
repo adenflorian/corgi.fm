@@ -15,8 +15,7 @@
         "no-magic-numbers": false,
         "typedef": [
             true,
-            "property-declaration",
-            // "array-destructuring"
+            "property-declaration"
         ],
         "no-submodule-imports": [
             true,
