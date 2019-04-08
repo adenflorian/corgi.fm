@@ -31,7 +31,7 @@
             "type": "chrome",
             "request": "launch",
             "name": "Launch Chrome",
-            "url": "http://localhost",
+            "url": "http://localhost:1234",
             "webRoot": "${workspaceFolder}/client"
         },
         {
