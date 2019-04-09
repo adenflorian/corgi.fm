@@ -18,12 +18,13 @@
         }
 
         &.newConnectionPlaceholder {
-            &:not(:hover) {
-                // display: none;
-                color: #0000;
-                // .addConnectionPlusSymbol {
-                //     stroke: #0000;
-                // }
+            color: #0000;
+            &:hover {
+                color: white;
+                opacity: 0.75 !important;
+            }
+            &.newConnectionPlaceholder-visible {
+                color: white;
             }
         }
 
@@ -35,7 +36,7 @@
     }
 
     .longLine {
-        z-index: -1;
+        z-index: -15;
 
         g {
             pointer-events: all;

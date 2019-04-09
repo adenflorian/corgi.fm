@@ -1,4 +1,4 @@
-import React, {Fragment} from 'react'
+import React, {Fragment, useEffect, useState} from 'react'
 import {
 	ActiveGhostConnectorSourceOrTarget,
 } from '../../common/redux'
@@ -14,10 +14,15 @@ interface Props {
 
 type AllProps = Props
 
+const hitBoxSize = 80
+
 export const ConnectorPlaceholder = React.memo(
 	function _ConnectorPlaceholder({
 		sourceOrTarget, x, y, onMouseDown,
 	}: AllProps) {
+
+		const [isMouseOver, setIsMouseOver] = useState(false)
+
 		return (
 			<Fragment>
 				<Connector
@@ -28,16 +33,27 @@ export const ConnectorPlaceholder = React.memo(
 					y={y}
 					isPlaceHolderForNewConnection={true}
 					svgProps={{
-						className: 'newConnectionPlaceholder',
+						className: `newConnectionPlaceholder ${isMouseOver ? 'newConnectionPlaceholder-visible' : ''}`,
 						onMouseDown: e => e.button === 0 && onMouseDown(
 							x,
 							sourceOrTarget,
 						),
 					}}
 				/>
-				{/* <div
+				<div
 					className="newConnectionPlaceholder-hitbox"
-				/> */}
+					style={{
+						width: 80,
+						height: 80,
+						backgroundColor: 'magenta',
+						position: 'absolute',
+						transform: `translate(${x - (hitBoxSize / 2)}px, ${y - (hitBoxSize / 2)}px)`,
+						opacity: 0,
+						zIndex: -10,
+					}}
+					onMouseEnter={() => setIsMouseOver(true)}
+					onMouseLeave={() => setIsMouseOver(false)}
+				/>
 			</Fragment>
 		)
 	},
