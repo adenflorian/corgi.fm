@@ -7,10 +7,11 @@ import {
 	selectConnectionsWithSourceIds,
 	selectConnectionsWithTargetIds,
 	selectGhostConnection,
+	selectLocalClientId,
 	selectPosition,
 	shamuConnect,
 } from '../../common/redux'
-import {fromGraphSpace, toGraphSpace} from '../SimpleGraph/Zoom'
+import {toGraphSpace} from '../SimpleGraph/Zoom'
 import {connectorHeight, connectorWidth, makeCurvedPath} from './ConnectionView'
 import {Connector} from './Connector'
 import {GhostConnectionLine} from './GhostConnectionLine'
@@ -24,6 +25,7 @@ interface ReduxProps {
 	ghostConnection: GhostConnection
 	parentPosition: IPosition
 	parentConnectionCount: number
+	localClientId: string
 }
 
 type AllProps = Props & ReduxProps & {dispatch: Dispatch}
@@ -41,20 +43,24 @@ export class GhostConnectionView extends PureComponent<AllProps, State> {
 	}
 
 	public componentDidMount() {
+		if (this._isLocallyOwned() !== true) return
 		window.addEventListener('mousemove', this._updateMousePosition)
 		window.addEventListener('mouseup', this._handleMouseUp)
 	}
 
 	public componentWillUnmount() {
+		if (this._isLocallyOwned() !== true) return
 		window.removeEventListener('mousemove', this._updateMousePosition)
 		window.removeEventListener('mouseup', this._handleMouseUp)
 	}
 
 	public render() {
 		const {mousePosition} = this.state
-		const {ghostConnection: {activeSourceOrTarget}, parentPosition, parentConnectionCount} = this.props
+		const {ghostConnection: {activeConnector, activeSourceOrTarget}, parentPosition, parentConnectionCount} = this.props
 
-		const position = mousePosition
+		const position = this._isLocallyOwned()
+			? mousePosition
+			: activeConnector
 
 		const activeConnectorPosition: Point =
 			activeSourceOrTarget === ActiveGhostConnectorSourceOrTarget.Source
@@ -141,6 +147,8 @@ export class GhostConnectionView extends PureComponent<AllProps, State> {
 	private readonly _handleMouseUp = (ev: MouseEvent) => {
 		this.props.dispatch(ghostConnectorActions.delete(this.props.ghostConnection.id))
 	}
+
+	private readonly _isLocallyOwned = () => this.props.ghostConnection.ownerId === this.props.localClientId
 }
 
 export const ConnectedGhostConnectionView = shamuConnect(
@@ -155,6 +163,7 @@ export const ConnectedGhostConnectionView = shamuConnect(
 				ghostConnection.activeSourceOrTarget === ActiveGhostConnectorSourceOrTarget.Source
 					? selectConnectionsWithTargetIds(state.room, [parentNodeId]).count()
 					: selectConnectionsWithSourceIds(state.room, [parentNodeId]).count(),
+			localClientId: selectLocalClientId(state),
 		}
 	},
 )(GhostConnectionView)

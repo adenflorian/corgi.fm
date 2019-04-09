@@ -32,6 +32,21 @@ export const Connector: React.FC<ConnectorProps> =
 					y2={height / 2}
 					strokeWidth={height}
 				/>
+				{/* <line
+					x1={0}
+					y1={height / 2}
+					x2={width}
+					y2={height / 2}
+					strokeWidth={height / 4}
+					stroke="black"
+				/> */}
+				{/* <line
+					x1={0}
+					y1={height / 2}
+					x2={width}
+					y2={height / 2}
+					strokeWidth={height}
+				/> */}
 			</svg>
 		)
 	})
