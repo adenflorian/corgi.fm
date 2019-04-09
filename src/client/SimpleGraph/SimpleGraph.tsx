@@ -4,6 +4,7 @@ import {shamuConnect} from '../../common/redux'
 import {selectAllPositionIds} from '../../common/redux'
 import {mainBoardsId} from '../client-constants'
 import {ConnectedConnections} from '../Connections/Connections'
+import {ConnectedConnectorPlaceholders} from '../Connections/ConnectorPlaceholders'
 import {ConnectedGhostConnectionsView} from '../Connections/GhostConnections'
 import {ECSCanvasRenderSystem} from '../ECS/ECSCanvasRenderSystem'
 import {ConnectedMousePointers} from '../MousePointers/MousePointers'
@@ -34,7 +35,16 @@ export const SimpleGraph =
 						<ConnectedConnections />
 						<ConnectedGhostConnectionsView />
 						{positionIds.map(positionId =>
-							<ConnectedSimpleGraphNode key={positionId} positionId={positionId} />,
+							<ConnectedConnectorPlaceholders
+								key={positionId}
+								parentId={positionId}
+							/>,
+						)}
+						{positionIds.map(positionId =>
+							<ConnectedSimpleGraphNode
+								key={positionId}
+								positionId={positionId}
+							/>,
 						)}
 						<canvas
 							id="ECSCanvasRenderSystemCanvas"

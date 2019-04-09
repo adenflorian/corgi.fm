@@ -75,11 +75,6 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 					}}
 				>
 					<Handle />
-					<ConnectedConnectorPlaceholders
-						parentId={positionId}
-						parentPosition={position}
-						parentSize={{x: width, y: height}}
-					/>
 					{
 						// @ts-ignore disableIfShiftIsPressed
 						<ContextMenuTrigger

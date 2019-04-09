@@ -1,8 +1,8 @@
 import * as React from 'react'
 import {ConnectedChat} from './Chat'
+import {ConnectedContextMenuContainer} from './ContextMenu/ContextMenuContainer'
 import {ConnectedSimpleGraph} from './SimpleGraph/SimpleGraph'
 import {ConnectedTopDiv} from './TopDiv'
-import {ConnectedContextMenuContainer} from './ContextMenu/ContextMenuContainer';
 
 interface IOnlineAppProps {}
 
