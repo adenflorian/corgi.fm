@@ -3,6 +3,7 @@ BUGS
 
 ## High
 - [ ] cant see other people playing on keyboards
+- [ ] midi downloading broken
 
 ## Medium
 - [ ] ECS animations break when switching rooms

@@ -40,8 +40,10 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 	public render() {
 		const {
 			positionId, color, highQuality,
-			position: {x, y, width, height, targetType, zIndex},
+			position,
 		} = this.props
+
+		const {x, y, width, height, targetType, zIndex} = position
 
 		return (
 			<Draggable
@@ -75,7 +77,7 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 					<Handle />
 					<ConnectedConnectorPlaceholders
 						parentId={positionId}
-						parentPosition={{x, y}}
+						parentPosition={position}
 						parentSize={{x: width, y: height}}
 					/>
 					{

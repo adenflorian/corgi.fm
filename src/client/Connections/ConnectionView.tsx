@@ -43,9 +43,9 @@ interface IConnectionViewReduxProps {
 
 type IConnectionViewAllProps = IConnectionViewProps & IConnectionViewReduxProps & {dispatch: Dispatch}
 
-export const longLineStrokeWidth = 3
-export const connectorWidth = 24
-export const connectorHeight = 12
+export const longLineStrokeWidth = 2
+export const connectorWidth = 16
+export const connectorHeight = 8
 
 const line0 = new LineState(0, 0, 0, 0)
 

@@ -8,17 +8,17 @@ import {
 	addClient, addRoomMember, BroadcastAction, CHANGE_ROOM,
 	clientDisconnected, ClientState, connectionsActions, createRoom,
 	createRoomAction, deletePositions, deleteRoom, deleteRoomMember,
-	deleteThingsAny, getActionsBlacklist, globalClockActions,
-	IClientRoomState, IServerState, maxUsernameLength, pointersActions,
-	ready, REQUEST_CREATE_ROOM, selectAllClients, selectAllConnections,
-	selectAllMessages, selectAllPointers, selectAllPositions,
-	selectAllRoomMemberIds, selectAllRoomNames, selectAllRoomStates,
-	selectClientBySocketId, selectConnectionsWithSourceOrTargetIds,
-	selectGlobalClockState, selectNodeIdsOwnedByClient,
-	selectPositionsWithIds, selectRoomExists, selectRoomStateByName,
-	selectShamuGraphState, setActiveRoom, setChat, setClients,
-	setRoomMembers, setRooms, shamuGraphActions, updatePositions,
-	SERVER_ACTION, GLOBAL_SERVER_ACTION
+	deleteThingsAny, getActionsBlacklist, GLOBAL_SERVER_ACTION,
+	globalClockActions, IClientRoomState, IServerState, maxUsernameLength,
+	pointersActions, ready, REQUEST_CREATE_ROOM, selectAllClients,
+	selectAllConnections, selectAllMessages, selectAllPointers,
+	selectAllPositions, selectAllRoomMemberIds, selectAllRoomNames,
+	selectAllRoomStates, selectClientBySocketId,
+	selectConnectionsWithSourceOrTargetIds, selectGlobalClockState,
+	selectNodeIdsOwnedByClient, selectPositionsWithIds, selectRoomExists,
+	selectRoomStateByName, selectShamuGraphState, SERVER_ACTION, setActiveRoom,
+	setChat, setClients, setRoomMembers, setRooms,
+	shamuGraphActions, updatePositions,
 } from '../common/redux'
 import {WebSocketEvent} from '../common/server-constants'
 import {createServerStuff} from './create-server-stuff'
@@ -142,8 +142,6 @@ export function setupServerWebSocketListeners(io: Server, serverStore: Store) {
 				const clientDisconnectedAction = clientDisconnected(clientId)
 				serverStore.dispatch(clientDisconnectedAction)
 				io.local.emit(WebSocketEvent.broadcast, clientDisconnectedAction)
-
-				logger.log(`done cleaning: ${socket.id}`)
 			})
 		}
 
