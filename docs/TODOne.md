@@ -1,3 +1,36 @@
+## Adding/Changing/Removing Connections
+should anything allow multiple incoming connections?
+- yes, instruments will union the incoming notes together
+	- for an audio node it would need a mixer node or something
+
+if you click and drag the output side of a connection, it moves it
+if you click and drag from the input side of a connection and starts a new connection
+
+- [√] allow multiple inputs and multiple outputs
+
+possible starting points:
+- deleting connections
+- moving output side of connection
+- creating new connections from the output of a node
+
+- [√] adding new connections
+	- [√] control click and drag on connector to make new connector
+	- [√] allow making new connections from a node with no connections on it
+
+
+- [√] change default names for sequencers
+- [√] require user to plug keyboard into sequencer to record
+- [√] need to be able to draw new connections from no connections for new nodes
+- [√] new ghost connector stuff
+	- [√] ghost-connections-redux.ts
+	- [√] middleware
+	- [√] placeholder react component
+		- [√] when click on placeholder, create a ghost connection
+		- [√] when click and drag placeholder, move ghost connection
+		- [√] when let go of placeholder, delete ghost connection
+	- [√] ghost connections react component
+	- [√] styling
+
 - [√] allow deleting nodes
 	- how?
 		- delete button on node

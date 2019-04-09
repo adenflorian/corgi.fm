@@ -107,44 +107,22 @@
 		- [ ] change selectors to grab from new graph state
 
 # Connections
-- [ ] make it obvious which direction data flows when not playing (without an animation)
 - [√] brighten the connectors and line when data is going across it
 - [√] make them moveable
 - [√] fix invisible long line when vertical (kind of fixed by only being curved lines now?)
 - [√] make input connector look like a stack cable when multiple inputs
 - [√] animate dashed ghost connector
 - [√] animate active connections in the direction that data is flowing
-- [ ] show ghost connector for adding connections when mouse is near, and put it at top of connector stack, don't require shift to be held down
-- [ ] have a node that hands out connections
-	- [ ] like a needle cushion
+- [√] show ghost connector for adding connections when mouse is near, and put it at top of connector stack, don't require shift to be held down
+- [√] allow adding connections from a node with no connections on it already
+	- [√] split up ConnectionView
+		- [√] Connector component
+		- [√] ConnectionLine component
+- [ ] make it obvious which direction data flows when not playing (without an animation)
 - [ ] show move icon on connector on hover
 	- now shows grab icon when moving, but hand icon on hover is too big
 - [ ] visually differentiate between midi and audio connections (and both)
 - [ ] allow temporarily disabling a connection
-- [ ] allow adding connections from a node with no connections on it already
-	- [ ] split up ConnectionView
-		- [ ] Connector component
-		- [ ] ConnectionLine component
-
-## Adding/Changing/Removing Connections
-should anything allow multiple incoming connections?
-- yes, instruments will union the incoming notes together
-	- for an audio node it would need a mixer node or something
-
-if you click and drag the output side of a connection, it moves it
-if you click and drag from the input side of a connection and starts a new connection
-
-- [√] allow multiple inputs and multiple outputs
-
-possible starting points:
-- deleting connections
-- moving output side of connection
-- creating new connections from the output of a node
-
-- [ ] adding new connections
-	- [√] control click and drag on connector to make new connector
-	- [ ] show icon with message when hovering over a connector saying to hold control to add new connection
-	- [ ] allow making new connections from a node with no connections on it
 
 # Keyboard
 - [ ] do something to visualize external midi keyboard notes
@@ -360,7 +338,7 @@ possible starting points:
 	- https://developers.google.com/web/updates/2017/09/autoplay-policy-changes#webaudio
 - [√] instrument keeps playing afer owner leaves
 - [√] stop drag ghost connector running middleware func on all clients
-- [ ] when adding a new connector, one ghost connector is in wrong place
+- [√] when adding a new connector, one ghost connector is in wrong place
 
 # Warnings
 - [ ] [Violation] 'readystatechange' handler took 727ms - polling-xhr.js:242
@@ -391,6 +369,7 @@ possible starting points:
 - [...] favicon (better icon?)
 - [√] feedback button
 	- added link to the discord
+- [ ] tooltips for all the things
 - [ ] help button
 - [ ] figure out donations
 - [ ] prepare answer to questions or a FAQ
@@ -398,8 +377,8 @@ possible starting points:
 	- [ ] open source?
 	- [ ] roadmap?
 - [ ] show user where their keyboard is when the join a room
-- [ ] pick final product name
-- [ ] get domain
+- [√] pick final product name
+- [√] get domain
 
 # Ballad
 - [ ] login system

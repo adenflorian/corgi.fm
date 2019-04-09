@@ -1,16 +1,4 @@
 # Now
-- [√] change default names for sequencers
-- [√] require user to plug keyboard into sequencer to record
-- [√] need to be able to draw new connections from no connections for new nodes
-- [ ] new ghost connector stuff
-	- [√] ghost-connections-redux.ts
-	- [√] middleware
-	- [√] placeholder react component
-		- [√] when click on placeholder, create a ghost connection
-		- [√] when click and drag placeholder, move ghost connection
-		- [√] when let go of placeholder, delete ghost connection
-	- [√] ghost connections react component
-	- [ ] styling
 	
 # Soon
 - [ ] things shouldn't be blurry at zoom 1
