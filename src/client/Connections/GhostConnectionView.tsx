@@ -109,6 +109,11 @@ export class GhostConnectionView extends PureComponent<AllProps, State> {
 					saturate={false}
 					x={position.x - (connectorWidth / 2)}
 					y={position.y}
+					svgProps={{
+						style: {
+							pointerEvents: 'none',
+						},
+					}}
 				/>
 				<Connector
 					width={connectorWidth}

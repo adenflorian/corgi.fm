@@ -30,6 +30,7 @@ export const Connector: React.FC<ConnectorProps> =
 						opacity: isPlaceHolderForNewConnection
 							? 0.5
 							: 1,
+						...svgProps.style,
 						// zIndex: isPlaceHolderForNewConnection
 						// 	? -10
 						// 	: 0,
