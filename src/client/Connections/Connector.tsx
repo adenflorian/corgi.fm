@@ -42,38 +42,27 @@ export const Connector: React.FC<ConnectorProps> =
 						y2={height / 2}
 						strokeWidth={height}
 					/>
-				</svg>
-				{/* {isPlaceHolderForNewConnection &&
-					<svg
-						{...svgProps}
-						className={`colorize connector ${saturate ? 'saturate' : ''} ${svgProps.className}`}
-						xmlns="http://www.w3.org/2000/svg"
-						style={{
-							width,
-							height,
-							top: y - (height / 2),
-							left: x,
-							opacity: isPlaceHolderForNewConnection
-								? 0.5
-								: 1,
-							// zIndex: isPlaceHolderForNewConnection
-							// 	? -10
-							// 	: 0,
-						}}
-					>
-						{isPlaceHolderForNewConnection &&
+					{isPlaceHolderForNewConnection &&
+						<g
+							stroke={CssColor.subtleGrayBlackBg}
+							strokeWidth={2}
+							className="addConnectionPlusSymbol"
+						>
 							<line
-								className="placeHolderConnectorHitBox"
-								x1={-(width * 4)}
-								y1={(height / 2)}
-								x2={width * 4}
-								y2={(height / 2)}
-								strokeWidth={height * 8}
-								stroke="magenta"
+								x1={5}
+								y1={height / 2}
+								x2={11}
+								y2={height / 2}
 							/>
-						}
-					</svg>
-				} */}
+							<line
+								x1={width / 2}
+								y1={1}
+								x2={width / 2}
+								y2={7}
+							/>
+						</g>
+					}
+				</svg>
 			</React.Fragment>
 		)
 	})
