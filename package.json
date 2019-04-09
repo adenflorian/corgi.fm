@@ -1,6 +1,6 @@
 {
   "name": "corgi.fm",
-  "version": "0.3.31",
+  "version": "0.3.32",
   "main": "server.js",
   "license": "UNLICENSED",
   "scripts": {
@@ -47,12 +47,12 @@
     "prop-types": "^15.6.1",
     "query-string": "^6.1.0",
     "rc-slider": "^8.6.1",
-    "react": "^16.4.0",
+    "react": "^16.8.6",
     "react-contextmenu": "^2.11.0",
-    "react-dom": "^16.4.0",
+    "react-dom": "^16.8.6",
     "react-draggable": "^3.2.1",
     "react-ga": "^2.5.6",
-    "react-hot-loader": "4.3.0",
+    "react-hot-loader": "^4.8.3",
     "react-icons": "^3.3.0",
     "react-input-autosize": "^2.2.1",
     "react-redux": "^5.0.7",
