@@ -9,12 +9,13 @@ interface ConnectorProps {
 	y?: number
 	svgProps?: React.SVGProps<SVGSVGElement>
 	isPlaceHolderForNewConnection?: boolean
+	title?: string
 }
 
 export const Connector: React.FC<ConnectorProps> =
 	React.memo(function _Connector({
 		width, height, saturate = false, x = 0, y = 0, svgProps = {},
-		isPlaceHolderForNewConnection,
+		isPlaceHolderForNewConnection, title,
 	}) {
 		return (
 			<React.Fragment>
@@ -31,11 +32,9 @@ export const Connector: React.FC<ConnectorProps> =
 							? 0.5
 							: 1,
 						...svgProps.style,
-						// zIndex: isPlaceHolderForNewConnection
-						// 	? -10
-						// 	: 0,
 					}}
 				>
+					{title && <title>{title}</title>}
 					<line
 						x1={0}
 						y1={height / 2}
@@ -43,17 +42,6 @@ export const Connector: React.FC<ConnectorProps> =
 						y2={height / 2}
 						strokeWidth={height}
 					/>
-					{/* {isPlaceHolderForNewConnection &&
-						<line
-							className="placeHolderConnectorHitBox"
-							x1={-(width * 4)}
-							y1={(height / 2)}
-							x2={width * 4}
-							y2={(height / 2)}
-							strokeWidth={height * 8}
-							stroke="magenta"
-						/>
-					} */}
 				</svg>
 				{/* {isPlaceHolderForNewConnection &&
 					<svg

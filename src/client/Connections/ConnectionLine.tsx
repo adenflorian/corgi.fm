@@ -3,6 +3,7 @@ import React from 'react'
 import {Dispatch} from 'redux'
 import {connectionsActions} from '../../common/redux'
 import {saturateColor} from '../../common/shamu-color'
+import {longLineTooltip} from '../client-constants'
 import {longLineStrokeWidth} from './ConnectionView'
 import {LineState} from './LineState'
 
@@ -19,8 +20,6 @@ interface ConnectionLineProps {
 	isSourcePlaying: boolean
 	highQuality: boolean
 }
-
-const longLineTooltip = 'right click to delete'
 
 export const ConnectionLine = React.memo(
 	function _ConnectionLine({id, color, saturateSource, saturateTarget, pathDPart1,
@@ -63,6 +62,7 @@ export const ConnectionLine = React.memo(
 				</defs>
 				<g
 					onContextMenu={(e: React.MouseEvent) => {
+						if (e.shiftKey) return
 						dispatch(connectionsActions.delete(List([id])))
 						e.preventDefault()
 					}}

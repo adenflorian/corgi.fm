@@ -1,4 +1,4 @@
-import {stripIndent} from 'common-tags';
+import {stripIndent} from 'common-tags'
 
 export const mainBoardsId = 'mainBoards'
 export const zoomBackgroundClass = 'zoomBackground'
@@ -30,3 +30,5 @@ export const detuneToolTip = stripIndent`
 `
 export const graphSizeX = 12800
 export const graphSizeY = 7200
+
+export const longLineTooltip = 'right click to delete'

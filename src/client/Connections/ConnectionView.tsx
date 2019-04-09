@@ -1,19 +1,21 @@
 import {stripIndent} from 'common-tags'
+import {List} from 'immutable'
 import * as React from 'react'
 import {Dispatch} from 'redux'
 import {ClientId} from '../../common/common-types'
 import {
 	ActiveGhostConnectorSourceOrTarget,
 	AppOptions,
-	getConnectionNodeInfo, GhostConnection, ghostConnectorActions,
-	GhostConnectorAddingOrMoving,
-	IClientAppState, IConnection,
-	selectConnection, selectConnectionSourceColor,
-	selectConnectionSourceIsActive, selectConnectionSourceIsSending,
-	selectConnectionStackOrderForSource, selectConnectionStackOrderForTarget,
-	selectLocalClientId, selectOption, selectPosition,
-	selectUserInputKeys, shamuConnect,
+	connectionsActions, getConnectionNodeInfo, GhostConnection,
+	ghostConnectorActions,
+	GhostConnectorAddingOrMoving, IClientAppState,
+	IConnection, selectConnection,
+	selectConnectionSourceColor, selectConnectionSourceIsActive,
+	selectConnectionSourceIsSending, selectConnectionStackOrderForSource,
+	selectConnectionStackOrderForTarget, selectLocalClientId, selectOption,
+	selectPosition, selectUserInputKeys, shamuConnect,
 } from '../../common/redux'
+import {longLineTooltip} from '../client-constants'
 import {ConnectionLine} from './ConnectionLine'
 import './ConnectionView.less'
 import {Connector} from './Connector'
@@ -125,13 +127,19 @@ export const ConnectionView =
 					x={sourceConnectorLeft}
 					y={sourceY}
 					saturate={highQuality ? (saturateSource || isSourcePlaying) : isSourcePlaying}
+					title={longLineTooltip}
 					svgProps={{
-						onMouseDown: () => onMouseDown(
+						onMouseDown: e => e.button === 0 && onMouseDown(
 							sourceConnectorLeft,
 							sourceY,
 							ActiveGhostConnectorSourceOrTarget.Source,
 							connection.targetId,
 						),
+						onContextMenu: (e: React.MouseEvent) => {
+							if (e.shiftKey) return
+							dispatch(connectionsActions.delete(List([id])))
+							e.preventDefault()
+						},
 					}}
 				/>
 				<Connector
@@ -140,13 +148,19 @@ export const ConnectionView =
 					x={targetConnectorLeft}
 					y={targetY}
 					saturate={highQuality ? (saturateTarget || isSourcePlaying) : isSourcePlaying}
+					title={longLineTooltip}
 					svgProps={{
-						onMouseDown: () => onMouseDown(
+						onMouseDown: e => e.button === 0 && onMouseDown(
 							targetConnectorLeft,
 							targetY,
 							ActiveGhostConnectorSourceOrTarget.Target,
 							connection.sourceId,
 						),
+						onContextMenu: (e: React.MouseEvent) => {
+							if (e.shiftKey) return
+							dispatch(connectionsActions.delete(List([id])))
+							e.preventDefault()
+						},
 					}}
 				/>
 			</div>
