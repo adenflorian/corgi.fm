@@ -1,4 +1,4 @@
-import {Set, List} from 'immutable'
+import {List, Set} from 'immutable'
 import {ECSComponentType, ECSEntity, ECSSystem} from './ECSTypes'
 
 export class ECSCanvasRenderSystem implements ECSSystem {
@@ -13,6 +13,8 @@ export class ECSCanvasRenderSystem implements ECSSystem {
 	}
 
 	public execute(entities: List<ECSEntity>): void {
+		if (entities.count() === 0) return
+
 		if (!this._canvasContext) {
 			this._updateContext()
 		}
