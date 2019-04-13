@@ -68,7 +68,7 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 					className="simpleGraphNode"
 					style={{
 						position: 'absolute',
-						willChange: 'transform',
+						// willChange: 'transform',
 						width,
 						height,
 						zIndex,
