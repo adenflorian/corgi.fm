@@ -17,14 +17,18 @@ const port = isLocalDevClient() ? 3000 : 443
 export let socket: SocketIOClient.Socket
 
 export function setupWebsocketAndListeners(store: Store) {
+
+	const room = window.location.pathname
+		.replace(/^\//, '')
+		.replace(/%3F.*/, '')
+		.replace(/\/.*/, '')
+		.trim()
+		.substring(0, maxRoomNameLength)
+
 	socket = io.connect(window.location.hostname + `:${port}/`, {
 		query: {
 			username: getUsernameFromLocalStorage().substring(0, maxUsernameLength),
-			room: window.location.pathname
-				.replace(/%3F.*/, '')
-				.replace(/\/.*/, '')
-				.trim()
-				.substring(0, maxRoomNameLength),
+			room,
 		},
 	})
 
