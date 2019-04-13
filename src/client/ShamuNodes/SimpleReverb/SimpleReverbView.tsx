@@ -1,8 +1,8 @@
 import * as React from 'react'
 import {Dispatch} from 'redux'
 import {
-	selectSimpleReverb, setSimpleReverbParam, shamuConnect,
-	SimpleReverbParam, getConnectionNodeInfo,
+	getConnectionNodeInfo, selectSimpleReverb, setSimpleReverbParam,
+	shamuConnect, SimpleReverbParam,
 } from '../../../common/redux'
 import {Knob} from '../../Knob/Knob'
 import {Panel} from '../../Panel/Panel'
@@ -41,7 +41,7 @@ export const SimpleReverbView: React.FC<ISimpleReverbAllProps> =
 					}}
 				>
 					<div
-						className={`colorize`}
+						className={`colorize largeFont`}
 						style={{
 							display: 'flex',
 							flexDirection: 'column',

@@ -1,15 +1,15 @@
 import 'rc-slider/assets/index.css'
-import {Component} from 'react'
 import React = require('react')
+import {Component} from 'react'
 import {connect} from 'react-redux'
 import {Action, Dispatch} from 'redux'
-import {IClientAppState, getConnectionNodeInfo} from '../../common/redux'
-import {MASTER_AUDIO_OUTPUT_TARGET_ID} from '../../common/redux'
+import {ConnectionNodeType} from '../../common/common-types'
+import {getConnectionNodeInfo, IClientAppState} from '../../common/redux'
 import {setOptionMasterVolume} from '../../common/redux'
+import {MASTER_AUDIO_OUTPUT_TARGET_ID} from '../../common/redux'
 import {Knob} from '../Knob/Knob'
 import {Panel} from '../Panel/Panel'
 import './VolumeControl.less'
-import {ConnectionNodeType} from '../../common/common-types';
 
 interface IVolumeControlProps {
 	color: string
@@ -33,7 +33,7 @@ export class VolumeControl extends Component<IVolumeControlAllProps> {
 		return (
 			<Panel id={MASTER_AUDIO_OUTPUT_TARGET_ID} className="volume" color={color} saturate={isPlaying}>
 				<div
-					className="volume-label colorize"
+					className="volume-label colorize largeFont"
 					title="will only change the volume for you, it won't affect other users"
 				>
 					Local Audio Output

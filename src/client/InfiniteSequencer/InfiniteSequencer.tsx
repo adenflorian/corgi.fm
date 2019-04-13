@@ -188,7 +188,7 @@ export const InfiniteSequencer: React.FC<IInfiniteSequencerAllProps> = React.mem
 										return (
 											< div
 												key={index}
-												className={`event ${props.activeIndex === index ? 'active' : ''}`}
+												className={`event ${props.activeIndex === index ? 'active' : ''} largeFont`}
 												style={{
 													backgroundColor: note === -1 ? 'none' : getColorStringForMidiNote(note),
 												}}

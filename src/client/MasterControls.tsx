@@ -59,9 +59,9 @@ export const MasterControls: React.FC<IMasterControlsProps & IMasterControlsRedu
 				className={`${masterClockState.isPlaying ? 'isPlaying' : 'isNotPlaying'}`}
 			>
 				<div className="masterControls">
-					<div className="masterControls-label colorize">
+					<div className="masterControls-label colorize largeFont">
 						Master Clock
-				</div>
+					</div>
 					<div className="controls">
 						<span
 							className={`play ${masterClockState.index % 2 === 0 ? 'highlight' : ''}`}

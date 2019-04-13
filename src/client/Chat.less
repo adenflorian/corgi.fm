@@ -1,4 +1,5 @@
 @import "./colors.less";
+@import "./AppCommon.less";
 
 .padding() {
     padding: 0px 0px 2px 2px;
@@ -13,6 +14,7 @@
         margin-left: 4px;
         margin-right: 4px;
         white-space: nowrap;
+        .largeFont();
     }
 
     .chatMessages {
@@ -78,8 +80,9 @@
                 .text {
                     font-weight: initial;
                     text-transform: initial;
-                    letter-spacing: 0.4px;
+                    // letter-spacing: 0.4px;
                     margin-right: 4px;
+                    margin-top: -2px;
                 }
             }
 
@@ -133,6 +136,7 @@
                     width: 100%;
                     color: @defaultGray;
                     letter-spacing: initial;
+                    margin-top: -2px;
                 }
             }
         }
@@ -163,6 +167,7 @@
     // background-color: @gray2;
     display: flex;
     flex-direction: row;
+    .largeFont();
 
     & > * {
         display: flex;

@@ -32,6 +32,7 @@ class App extends React.Component<IAppProps, {}> {
 			return <OnlineApp />
 		} else {
 			return <div
+				className="largeFont"
 				style={{
 					display: 'flex',
 					justifyContent: 'center',
