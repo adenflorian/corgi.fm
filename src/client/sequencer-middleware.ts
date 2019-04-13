@@ -3,8 +3,8 @@ import * as MidiWriter from 'midi-writer-js'
 import {Dispatch, Middleware, MiddlewareAPI} from 'redux'
 import {
 	EXPORT_SEQUENCER_MIDI, IClientAppState, isEmptyEvents,
-	selectAllSequencers, selectConnectionsWithSourceIds,
-	SequencerAction, sequencerActions, STOP_SEQUENCER,
+	selectConnectionsWithSourceIds,
+	selectSequencer, SequencerAction, sequencerActions, STOP_SEQUENCER,
 } from '../common/redux'
 import {getAllInstruments} from './instrument-manager'
 
@@ -31,7 +31,7 @@ function exportSequencerMidi(
 ) {
 	const roomState = store.getState().room
 
-	const sequencer = selectAllSequencers(roomState)[action.sequencerId]
+	const sequencer = selectSequencer(roomState, action.id)
 
 	const events = sequencer.midiClip.events
 
@@ -40,6 +40,7 @@ function exportSequencerMidi(
 
 	const midiSequencer = new MidiWriter.Track()
 
+	// 8 for 8th note
 	const duration = '8'
 
 	let nextWait = '0'
@@ -54,7 +55,7 @@ function exportSequencerMidi(
 		nextWait = event.notes.count() === 0 ? duration : '0'
 
 		return x
-	})
+	}).toArray()
 
 	midiSequencer.setTempo(120)
 

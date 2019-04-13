@@ -2,9 +2,9 @@ BUGS
 ====
 
 ## High
-- [ ] midi downloading broken
 
 ## Medium
+- [ ] midi download not respecting long rests correctly
 - [ ] ECS animations break when switching rooms
 - [ ] filters getting stuck
 - [ ] changing room thru selector doesn't completely pick up new user name if changed in previous room?
@@ -17,6 +17,9 @@ BUGS
 - [ ] when ableton is open, corgi.fm wont recognize midi keyboard
 
 ## FIXED
+- [√] midi downloading broken
+	- [√] button doesn't do anything
+	- [√] downloaded midi is invalid
 - [√] skip note isn't going across network
 - [√] cant see other people playing on keyboards
 - [√] strip query params from room names when creating rooms
