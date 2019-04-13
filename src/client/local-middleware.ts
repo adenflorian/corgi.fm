@@ -1,32 +1,32 @@
-import {Map, Set, List} from 'immutable'
+import {List, Map, Set} from 'immutable'
 import {Dispatch, Middleware} from 'redux'
 import {ConnectionNodeType} from '../common/common-types'
 import {logger} from '../common/logger'
 import {emptyMidiNotes, IMidiNote} from '../common/MidiNote'
-import {IClientRoomState, BroadcastAction} from '../common/redux/common-redux-types'
+import {BroadcastAction, IClientRoomState} from '../common/redux/common-redux-types'
 import {selectConnectionsWithSourceIds, selectConnectionsWithSourceOrTargetIds} from '../common/redux/connections-redux'
 import {
 	addBasicSampler, addBasicSynthesizer, addPosition, addVirtualKeyboard,
 	BasicSamplerState, BasicSynthesizerState, Connection, connectionsActions,
-	deleteAllPositions, deleteAllThings, IClientAppState, makeActionCreator,
-	makePosition, MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID, READY,
-	selectActiveRoom, selectLocalClient, selectPositionExtremes,
-	selectVirtualKeyboardById, selectVirtualKeyboardByOwner,
-	SET_ACTIVE_ROOM, VIRTUAL_KEY_PRESSED, VIRTUAL_KEY_UP, VIRTUAL_OCTAVE_CHANGE,
-	VirtualKeyboardState, virtualKeyPressed, VirtualKeyPressedAction,
-	virtualKeyUp, VirtualKeyUpAction, virtualOctaveChange,
-	VirtualOctaveChangeAction,
-	deleteThingsAny,
-	deletePositions,
-	NetworkActionType,
-	ISequencerState,
-	selectDirectDownstreamSequencerIds,
-	selectSequencer,
-	sequencerActions,
-	SKIP_NOTE,
-	USER_KEY_PRESS,
+	deleteAllPositions, deleteAllThings, deletePositions, deleteThingsAny,
+	IClientAppState, ISequencerState, makeActionCreator, makePosition,
+	MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID, NetworkActionType,
+	READY, selectActiveRoom,
+	selectDirectDownstreamSequencerIds, selectLocalClient, selectPositionExtremes, selectSequencer,
+	selectVirtualKeyboardById, selectVirtualKeyboardByOwner, sequencerActions,
+	SET_ACTIVE_ROOM, SKIP_NOTE, USER_KEY_PRESS,
 	UserInputAction,
 	UserKeys,
+	VIRTUAL_KEY_PRESSED,
+	VIRTUAL_KEY_UP,
+	VIRTUAL_OCTAVE_CHANGE,
+	VirtualKeyboardState,
+	virtualKeyPressed,
+	VirtualKeyPressedAction,
+	virtualKeyUp,
+	VirtualKeyUpAction,
+	virtualOctaveChange,
+	VirtualOctaveChangeAction,
 } from '../common/redux/index'
 import {pointersActions} from '../common/redux/pointers-redux'
 import {getAllInstruments} from './instrument-manager'
@@ -100,6 +100,8 @@ export const createLocalMiddleware: () => Middleware<{}, IClientAppState> = () =
 
 			scheduleNote(virtualKeyPressedAction.midiNote, virtualKeyPressedAction.id, getState().room, 'on')
 
+			next(action)
+
 			if ((action as unknown as BroadcastAction).alreadyBroadcasted) return
 
 			// add note to sequencer if downstream recording sequencer
@@ -108,7 +110,7 @@ export const createLocalMiddleware: () => Middleware<{}, IClientAppState> = () =
 					dispatch(sequencerActions.recordNote(x.id, virtualKeyPressedAction.midiNote))
 				})
 
-			return next(action)
+			return
 		}
 		case SKIP_NOTE: {
 			const state = getState()
@@ -225,8 +227,8 @@ export const createLocalMiddleware: () => Middleware<{}, IClientAppState> = () =
 				connectionsActions.delete(
 					selectConnectionsWithSourceOrTargetIds(newState.room, [nodeId])
 						.map(x => x.id)
-						.toList()
-				)
+						.toList(),
+				),
 			)
 
 			return

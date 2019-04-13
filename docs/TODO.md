@@ -209,11 +209,15 @@
 	- OTT
 - [ ] look into using an algorithmic reverb
 	- https://itnext.io/algorithmic-reverb-and-web-audio-api-e1ccec94621a
+- [ ] code node
+	- audio worklet
 
 ## Midi Effects
 - [ ] ARP
 - [ ] random
 - [ ] pitch
+- [ ] code node
+	- function that takes in midi events and outputs midi events, like a middleware func
 
 # Rooms
 - [√] switch rooms

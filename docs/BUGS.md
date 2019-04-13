@@ -2,7 +2,6 @@ BUGS
 ====
 
 ## High
-- [ ] cant see other people playing on keyboards
 - [ ] midi downloading broken
 
 ## Medium
@@ -18,6 +17,8 @@ BUGS
 - [ ] when ableton is open, corgi.fm wont recognize midi keyboard
 
 ## FIXED
+- [√] skip note isn't going across network
+- [√] cant see other people playing on keyboards
 - [√] strip query params from room names when creating rooms
 - [√] backspace undoes all sequencers even if not recording
 - [√] options not saving correctly again

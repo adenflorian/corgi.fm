@@ -1,15 +1,15 @@
 import {List, Map, Set} from 'immutable'
+import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
 import uuid = require('uuid')
 import {ConnectionNodeType, IMultiStateThing, isSequencerNodeType} from '../common-types'
-import {makeMidiClipEvent, MidiClip, MidiClipEvent, MidiClipEvents, makeMidiClip} from '../midi-types'
-import {emptyMidiNotes, MidiNotes, IMidiNote} from '../MidiNote'
+import {makeMidiClip, makeMidiClipEvent, MidiClip, MidiClipEvent, MidiClipEvents} from '../midi-types'
+import {emptyMidiNotes, IMidiNote, MidiNotes} from '../MidiNote'
 import {colorFunc, hashbow} from '../shamu-color'
-import {BROADCASTER_ACTION, SERVER_ACTION, IClientRoomState} from './index'
+import {selectAllConnections, selectConnectionsWithSourceIds, selectConnectionsWithTargetIds} from './connections-redux'
+import {selectGlobalClockIsPlaying} from './global-clock-redux'
+import {BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION} from './index'
 import {NodeSpecialState} from './shamu-graph'
-import {createSelector} from 'reselect';
-import {selectConnectionsWithTargetIds, selectAllConnections, selectConnectionsWithSourceIds} from './connections-redux';
-import {selectGlobalClockIsPlaying} from './global-clock-redux';
 
 export const CLEAR_SEQUENCER = 'CLEAR_SEQUENCER'
 export const UNDO_SEQUENCER = 'UNDO_SEQUENCER'
@@ -41,6 +41,8 @@ export const sequencerActions = Object.freeze({
 	recordRest: (id: string) => ({
 		type: RECORD_SEQUENCER_REST as typeof RECORD_SEQUENCER_REST,
 		id,
+		BROADCASTER_ACTION,
+		SERVER_ACTION,
 	}),
 	play: (id: string) => ({
 		type: PLAY_SEQUENCER as typeof PLAY_SEQUENCER,
@@ -222,7 +224,7 @@ function memoizedIsUpstreamClockFromNode(state: IClientRoomState, nodeId: string
 }
 
 function isUpstreamClockFromNode(
-	state: IClientRoomState, nodeId: string, processedNodeIds = Set<string>()
+	state: IClientRoomState, nodeId: string, processedNodeIds = Set<string>(),
 ): boolean {
 	if (processedNodeIds.includes(nodeId)) return false
 
@@ -243,7 +245,7 @@ export const selectDirectDownstreamSequencerIds = (state: IClientRoomState, id: 
 type SequencerId = string
 
 function _getDirectDownstreamSequencerIds(
-	state: IClientRoomState, nodeId: string
+	state: IClientRoomState, nodeId: string,
 ): List<SequencerId> {
 	return selectConnectionsWithSourceIds(state, [nodeId])
 		.filter(connection => isSequencerNodeType(connection.targetType))
