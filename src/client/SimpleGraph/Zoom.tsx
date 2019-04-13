@@ -29,7 +29,7 @@ interface IZoomState {
 
 const maxZoom = 10
 const minZoom = 0.1
-const scrollZoomMod = 0.001
+const scrollZoomMod = 0.002
 const mouseZoomMod = 0.001
 const mousePanMod = 1
 const maxPan = graphSizeX
