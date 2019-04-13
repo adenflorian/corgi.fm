@@ -1,6 +1,6 @@
 {
   "name": "corgi.fm",
-  "version": "0.3.37",
+  "version": "0.3.38",
   "main": "server.js",
   "license": "UNLICENSED",
   "scripts": {
