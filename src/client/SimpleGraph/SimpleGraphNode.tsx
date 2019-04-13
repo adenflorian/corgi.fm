@@ -5,13 +5,13 @@ import {IoMdMove as HandleIcon} from 'react-icons/io'
 import {Dispatch} from 'redux'
 import {ConnectionNodeType} from '../../common/common-types'
 import {
-	AppOptions, getConnectionNodeInfo, IPosition, movePosition,
-	nodeClicked, selectConnectionSourceColorByTargetId, selectOption, selectPosition, shamuConnect,
+	getConnectionNodeInfo, IPosition, movePosition,
+	nodeClicked, selectConnectionSourceColorByTargetId,
+	selectOptions, selectPosition, shamuConnect,
 } from '../../common/redux'
 import {CssColor} from '../../common/shamu-color'
 import {ConnectedBasicSampler} from '../BasicSampler/BasicSampler'
 import {graphSizeX, graphSizeY, nodeMenuId} from '../client-constants'
-import {ConnectedConnectorPlaceholders} from '../Connections/ConnectorPlaceholders'
 import {ECSSequencerRenderSystem} from '../ECS/ECSSequencerRenderSystem'
 import {ConnectedGridSequencerContainer} from '../GridSequencer/GridSequencerContainer'
 import {ConnectedInfiniteSequencer} from '../InfiniteSequencer/InfiniteSequencer'
@@ -30,6 +30,7 @@ interface ISimpleGraphNodeReduxProps {
 	position: IPosition
 	color: string
 	highQuality: boolean
+	fancyZoomPan: boolean
 }
 
 type ISimpleGraphNodeAllProps = ISimpleGraphNodeProps & ISimpleGraphNodeReduxProps & {dispatch: Dispatch}
@@ -40,7 +41,7 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 	public render() {
 		const {
 			positionId, color, highQuality,
-			position,
+			position, fancyZoomPan,
 		} = this.props
 
 		const {x, y, width, height, targetType, zIndex} = position
@@ -68,7 +69,7 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 					className="simpleGraphNode"
 					style={{
 						position: 'absolute',
-						// willChange: 'transform',
+						willChange: fancyZoomPan ? '' : 'transform',
 						width,
 						height,
 						zIndex,
@@ -171,7 +172,8 @@ export const ConnectedSimpleGraphNode = shamuConnect(
 			position,
 			color: getConnectionNodeInfo(position.targetType).color
 				|| selectConnectionSourceColorByTargetId(state.room, positionId),
-			highQuality: selectOption(state, AppOptions.graphics_ECS) as boolean,
+			highQuality: selectOptions(state).graphics_ECS,
+			fancyZoomPan: selectOptions(state).graphics_expensiveZoomPan,
 		}
 	},
 )(SimpleGraphNode)

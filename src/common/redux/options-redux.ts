@@ -1,7 +1,7 @@
+import {Store} from 'redux'
+import {localStorageKey} from '../common-constants'
+import {logger} from '../logger'
 import {IClientAppState} from './index'
-import {localStorageKey} from '../common-constants';
-import {logger} from '../logger';
-import {Store} from 'redux';
 
 export enum AppOptions {
 	masterVolume = 'masterVolume',
@@ -11,6 +11,7 @@ export enum AppOptions {
 	renderNoteSchedulerDebugWhileStopped = 'renderNoteSchedulerDebugWhileStopped',
 	graphics_fancyConnections = 'graphics_fancyConnections',
 	graphics_ECS = 'graphics_ECS',
+	graphics_expensiveZoomPan = 'graphics_expensiveZoomPan',
 }
 
 export const initialOptionsState = Object.freeze({
@@ -21,6 +22,7 @@ export const initialOptionsState = Object.freeze({
 	renderNoteSchedulerDebugWhileStopped: true,
 	graphics_fancyConnections: false,
 	graphics_ECS: true,
+	graphics_expensiveZoomPan: true,
 })
 
 export const SET_OPTION = 'SET_OPTION'
@@ -83,9 +85,9 @@ export function loadOptionsState(): Readonly<IOptionsState> {
 
 export function validateOptionsState(store: Store<IClientAppState>, loadedOptionsState: IOptionsState) {
 	if (store.getState().options.masterVolume !== loadedOptionsState.masterVolume) {
-		logger.error('something went wrong with loading options from localStorage');
-		logger.error('store.getState().options: ', store.getState().options);
-		logger.error('loadedOptionsState: ', loadedOptionsState);
+		logger.error('something went wrong with loading options from localStorage')
+		logger.error('store.getState().options: ', store.getState().options)
+		logger.error('loadedOptionsState: ', loadedOptionsState)
 	}
 }
 

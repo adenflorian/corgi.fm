@@ -13,6 +13,7 @@ interface IZoomProps {
 
 interface IZoomReduxProps {
 	requireCtrlToZoom: boolean
+	fancyZoomPan: boolean
 }
 
 type IZoomAllProps = IZoomProps & IZoomReduxProps
@@ -59,7 +60,7 @@ export class Zoom extends React.PureComponent<IZoomAllProps, IZoomState> {
 	}
 
 	public render() {
-		const {children} = this.props
+		const {children, fancyZoomPan} = this.props
 		const {zoom, pan} = this.state
 
 		return (
@@ -67,7 +68,7 @@ export class Zoom extends React.PureComponent<IZoomAllProps, IZoomState> {
 				className="zoom"
 				style={{
 					transform: `scale(${zoom}) translate(${pan.x}px, ${pan.y}px)`,
-					willChange: 'transform',
+					willChange: fancyZoomPan ? '' : 'transform',
 				}}
 			>
 				<ZoomBackground
@@ -186,6 +187,7 @@ const ZoomBackground = React.memo(
 export const ConnectedZoom = shamuConnect(
 	(state): IZoomReduxProps => ({
 		requireCtrlToZoom: selectOptions(state).requireCtrlToScroll,
+		fancyZoomPan: selectOptions(state).graphics_expensiveZoomPan,
 	}),
 )(Zoom)
 

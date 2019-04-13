@@ -55,6 +55,10 @@ export class Options extends React.Component {
 									option={AppOptions.graphics_ECS}
 									label="graphics: enable ECS animations (sequencer time marker thing)"
 								/>
+								<ConnectedOption
+									option={AppOptions.graphics_expensiveZoomPan}
+									label="graphics: enable expensive/fancy zoom and pan (sharper render, but slower)"
+								/>
 							</div>
 							<ShamuBorder saturate={false} />
 						</div>
