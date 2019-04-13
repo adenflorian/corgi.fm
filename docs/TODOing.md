@@ -13,6 +13,11 @@
 - [ ] play note when placed in grid sequencer
 
 # Later
+- [ ] try out new fonts (again)
+	- https://fonts.google.com/specimen/Questrial
+	- https://fonts.google.com/specimen/Didact+Gothic
+	- https://fonts.google.com/specimen/Muli
+	- current font: https://fonts.google.com/specimen/Roboto
 - [ ] move ghost connectors state to its own state so connections memoizations will be more effective
 - [ ] support undo of node delete
 	- [ ] redux
