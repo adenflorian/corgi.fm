@@ -22,7 +22,7 @@
 - [ ] support undo of node delete
 	- [ ] redux
 		- oof, not easy until i finish the major graph redux refactor stuff
-		- i dont want to write undo logic for each node
+		- i don't want to write undo logic for each node
 		- maybe do in multi reducer?
 			- please no
 - [ ] make option for proper vector graphics regarding on zoom levels
