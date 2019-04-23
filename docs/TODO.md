@@ -42,7 +42,7 @@
 - [ ] keep track of what object is selected and route keyboard commands like ctrl + z to the selected object
 - [ ] resolve // TODOs
 - [ ] show different stuff at different zoom levels
-	- at small zoom show small music intrument parts
+	- at small zoom show small music instrument parts
 	- at big zoom level show big music things
 - [ ] make webgl visualization bg that reacts to that music
 - [ ] use discord for chat somehow?
@@ -50,7 +50,7 @@
 	- nyan cat
 - [ ] try to use decorators on action types to generate a giant combined action type
 - [ ] when someone first joins, show them a list of demos that that can copy into a new room to quickly show people what corgi.fm can do
-- [ ] on the borwser warning screen, show why chrome is the only supported browser, like what is missing from firefox
+- [ ] on the browser warning screen, show why chrome is the only supported browser, like what is missing from firefox
 - [ ] use gzip on nginx
 	- https://expressjs.com/en/advanced/best-practice-performance.html#use-gzip-compression
 	- http://nginx.org/en/docs/http/ngx_http_gzip_module.html
@@ -64,7 +64,7 @@
 - [ ] look into mobx
 - [ ] warn user if master volume is at or near 0
 - [ ] audio rack node
-	- a node group that can have multiple nodes stacked on top of eachother with them connecting top down
+	- a node group that can have multiple nodes stacked on top of each other with them connecting top down
 - [ ] show build datetime in tooltip on version in bottom right
 - [ ] twitch makes music
 	- stream corgi.fm that listens to commands from twitch chat
@@ -85,7 +85,7 @@
 
 # Shared Cursors
 - [√] make shared cursor not block pointer events
-- [√] use relative positioning like the connections so it doesn't have to rerender on scroll
+- [√] use relative positioning like the connections so it doesn't have to re-render on scroll
 - [√] optimize
 	- [√] less updates over network
 	- [√] less dispatches
@@ -181,7 +181,7 @@
 - [ ] full featured piano roll midi editor like ableton
 - [ ] something that randomly generates notes
 - [ ] scriptable? like you program it with text
-- [ ] cthulu
+- [ ] cthulhu
 
 ## Instruments
 - [...] ADSR
@@ -276,7 +276,7 @@
 			- that means redux
 	- [√] positions redux
 		- [√] lastTouchedId
-	- to make sure that the zindex order renders the same on everyones computer,
+	- to make sure that the z-index order renders the same on everyone's computer,
 		we need to make sure that things are rendered in order
 		sort by id in selector? or in reducer?
 	- maybe use an ordered map?
@@ -288,7 +288,7 @@
 		- will automatically get synced to server
 		- allows for more complex ordering
 	- [√] mark as last touched immediately after clicking on node
-- [√] support trackpad zoom and pan
+- [√] support track pad zoom and pan
 - [ ] add buttons on side of screen for zoom and pan and show keyboard shortcuts when hovering over icon
 - [√] different icon for drag handle so people don't think it's a menu
 - [ ] auto organize button
@@ -340,7 +340,7 @@
 - [√] can't click chat on short window
 - [ ] review chrome autoplay fix
 	- https://developers.google.com/web/updates/2017/09/autoplay-policy-changes#webaudio
-- [√] instrument keeps playing afer owner leaves
+- [√] instrument keeps playing after owner leaves
 - [√] stop drag ghost connector running middleware func on all clients
 - [√] when adding a new connector, one ghost connector is in wrong place
 

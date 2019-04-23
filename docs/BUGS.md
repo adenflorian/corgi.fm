@@ -32,7 +32,7 @@ BUGS
 	- need to somehow stop those notes
 	- maybe need a sourceId for each event/note?
 - [√] piano roll lines on infinite sequencer are off by one
-- [√] when using external midi keyboard, the octaves dont line up right
+- [√] when using external midi keyboard, the octaves don't line up right
 - [√] new options are getting wiped by options from localstorage
 - [√] 2019-03-10 Note getting stuck when playing keyboard really fast with mouse
 	- haven't been able to reproduce

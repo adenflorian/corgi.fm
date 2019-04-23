@@ -1,4 +1,4 @@
-creating connections from nodes that dont have any connections
+creating connections from nodes that don't have any connections
 
 visual connections are currently handled by ConnectionView component
 
