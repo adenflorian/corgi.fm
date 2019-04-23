@@ -3,10 +3,10 @@ import {AnyAction} from 'redux'
 import uuid = require('uuid')
 import {ConnectionNodeType, IConnectable, Id, IMultiStateThing} from '../common-types'
 import {CssColor} from '../shamu-color'
-import {IClientRoomState} from './common-redux-types'
-import {addMultiThing, IMultiState, makeMultiReducer} from './multi-reducer'
-import {NetworkActionType} from './redux-utils'
-import {NodeSpecialState} from './shamu-graph'
+import {
+	addMultiThing, getConnectionNodeInfo, IClientRoomState,
+	IMultiState, makeMultiReducer, NetworkActionType, NodeSpecialState,
+} from './index'
 
 export const addGroupSequencer = (groupSequencer: GroupSequencer) =>
 	addMultiThing(groupSequencer, ConnectionNodeType.groupSequencer, NetworkActionType.SERVER_AND_BROADCASTER)
@@ -44,7 +44,7 @@ export class GroupSequencer implements IConnectable, NodeSpecialState, IMultiSta
 	public readonly type = ConnectionNodeType.groupSequencer
 	public readonly width = GroupSequencer.defaultWidth
 	public readonly height = GroupSequencer.defaultHeight
-	public readonly name: string = 'group seq'
+	public readonly name: string = getConnectionNodeInfo(ConnectionNodeType.groupSequencer).typeName
 	public readonly groups: Groups
 	public readonly length: number = 16
 	public readonly groupEventBeatLength: number = 16
@@ -54,6 +54,15 @@ export class GroupSequencer implements IConnectable, NodeSpecialState, IMultiSta
 	) {
 		this.groups = makeGroups(3, this.length)
 	}
+}
+
+export function deserializeGroupSequencerState(state: IMultiStateThing): IMultiStateThing {
+	const x = state as GroupSequencer
+	const y = {
+		...x,
+		groups: OrderedMap<Id, Group>(x.groups),
+	} as GroupSequencer
+	return y
 }
 
 export function makeGroups(count: number, length: number): Groups {
@@ -79,7 +88,7 @@ export function makeGroupEvents(count: number): GroupEvents {
 export type Groups = OrderedMap<Id, Group>
 
 export interface Group {
-	color: string,
+	color: string
 	events: GroupEvents
 }
 

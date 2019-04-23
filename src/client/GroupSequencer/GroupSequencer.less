@@ -1,0 +1,23 @@
+.groupSequencer {
+	display: flex;
+	flex-direction: column;
+
+	.groupRow {
+		width: 100%;
+		background-color: blue;
+		flex-grow: 1;
+		display: flex;
+
+		&:nth-child(odd) {
+			background-color: red;
+		}
+
+		.groupEvent {
+			flex-grow: 1;
+
+			&:nth-child(odd) {
+				background-color: #5555;
+			}
+		}
+	}
+}

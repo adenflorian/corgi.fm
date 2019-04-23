@@ -14,7 +14,7 @@ import {ConnectedBasicSampler} from '../BasicSampler/BasicSampler'
 import {graphSizeX, graphSizeY, nodeMenuId} from '../client-constants'
 import {ECSSequencerRenderSystem} from '../ECS/ECSSequencerRenderSystem'
 import {ConnectedGridSequencerContainer} from '../GridSequencer/GridSequencerContainer'
-import {ConnectedGroupSequencer} from '../GroupSequencer/GroupSequencer'
+import {ConnectedGroupSequencerView} from '../GroupSequencer/GroupSequencer'
 import {ConnectedInfiniteSequencer} from '../InfiniteSequencer/InfiniteSequencer'
 import {ConnectedBasicSynthesizerView} from '../Instruments/BasicSynthesizerView'
 import {ConnectedKeyboard} from '../Keyboard/Keyboard'
@@ -152,7 +152,7 @@ export function getComponentByNodeType(type: ConnectionNodeType, id: string, col
 		case ConnectionNodeType.masterClock: return <ConnectedMasterControls color={color} />
 		case ConnectionNodeType.audioOutput: return <ConnectedVolumeControl color={color} />
 
-		case ConnectionNodeType.groupSequencer: return <ConnectedGroupSequencer id={id} />
+		case ConnectionNodeType.groupSequencer: return <ConnectedGroupSequencerView id={id} />
 
 		case ConnectionNodeType.gridSequencer: return <ConnectedGridSequencerContainer id={id} />
 		case ConnectionNodeType.infiniteSequencer: return <ConnectedInfiniteSequencer id={id} />

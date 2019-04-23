@@ -8,7 +8,7 @@ import {addBasicSynthesizer, BasicSynthesizerState} from './basic-synthesizers-r
 import {IClientAppState} from './common-redux-types'
 import {selectConnectionsWithTargetIds} from './connections-redux'
 import {addGridSequencer, GridSequencerState} from './grid-sequencers-redux'
-import {addGroupSequencer, GroupSequencer, groupSequencerActions, selectGroupSequencer} from './group-sequencers-redux'
+import {addGroupSequencer, deserializeGroupSequencerState, GroupSequencer, groupSequencerActions, selectGroupSequencer} from './group-sequencers-redux'
 import {
 	deserializeSequencerState, IClientRoomState,
 	makeGetKeyboardMidiOutput, selectBasicSynthesizer,
@@ -145,7 +145,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		// selectIsSending: () => false,	// TODO
 		// selectIsPlaying: () => false,	// TODO
 		// selectActiveNotes: () => [],	// TODO
-		// stateDeserializer: deserializeSequencerState,	// TODO
+		stateDeserializer: deserializeGroupSequencerState,	// TODO
 		showOnAddNodeMenu: true,
 		isDeletable: true,
 	})],
