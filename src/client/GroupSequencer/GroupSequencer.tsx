@@ -22,7 +22,7 @@ export function GroupSequencerView(props: AllProps) {
 		>
 			{props.groupSequencer.groups.map((group, id) => {
 				return (
-					<div key={id} className="groupRow">
+					<div key={id} className="groupRow" style={{color: group.color}}>
 						{group.events.map((event, i) => {
 							return (
 								<div key={i} className="groupEvent"></div>

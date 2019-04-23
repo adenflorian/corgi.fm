@@ -34,7 +34,7 @@ export class GroupSequencer implements IConnectable, NodeSpecialState, IMultiSta
 		width: GroupSequencer.defaultWidth,
 		height: GroupSequencer.defaultHeight,
 		name: 'Dummy Group Sequencer',
-		groups: makeGroups(2, 2),
+		groups: makeGroups([CssColor.red, CssColor.green], 2),
 		length: 2,
 		groupEventBeatLength: 1,
 	}
@@ -52,7 +52,7 @@ export class GroupSequencer implements IConnectable, NodeSpecialState, IMultiSta
 	constructor(
 		public readonly ownerId: string,
 	) {
-		this.groups = makeGroups(3, this.length)
+		this.groups = makeGroups([CssColor.red, CssColor.green, CssColor.blue], this.length)
 	}
 }
 
@@ -65,17 +65,15 @@ export function deserializeGroupSequencerState(state: IMultiStateThing): IMultiS
 	return y
 }
 
-export function makeGroups(count: number, length: number): Groups {
+export function makeGroups(colors: string[], length: number): Groups {
 	return OrderedMap<Id, Group>(
-		new Array(count)
-			.fill(0)
-			.map((_, i) => ([
-				uuid.v4(),
-				{
-					color: CssColor.red,
-					events: makeGroupEvents(length),
-				},
-			])) as unknown as Iterable<[string, Group]>,
+		colors.map(color => ([
+			uuid.v4(),
+			{
+				color,
+				events: makeGroupEvents(length),
+			},
+		])) as unknown as Iterable<[string, Group]>,
 	)
 }
 
