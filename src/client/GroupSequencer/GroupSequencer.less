@@ -1,18 +1,24 @@
+@import "../colors.less";
+
 .groupSequencer {
 	display: flex;
 	flex-direction: column;
 
 	.groupRow {
 		width: 100%;
-		background-color: currentColor;
 		flex-grow: 1;
 		display: flex;
 
 		.groupEvent {
 			flex-grow: 1;
+			background-color: @panelGray;
 
 			&:nth-child(odd) {
-				background-color: #5555;
+				filter: brightness(1.5);
+			}
+
+			&.on {
+				background-color: currentColor;
 			}
 		}
 	}

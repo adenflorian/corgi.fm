@@ -25,7 +25,7 @@ export function GroupSequencerView(props: AllProps) {
 					<div key={id} className="groupRow" style={{color: group.color}}>
 						{group.events.map((event, i) => {
 							return (
-								<div key={i} className="groupEvent"></div>
+								<div key={i} className={`groupEvent ${event.on ? 'on' : 'off'}`}></div>
 							)
 						})}
 					</div>

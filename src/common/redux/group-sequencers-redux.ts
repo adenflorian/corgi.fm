@@ -67,20 +67,20 @@ export function deserializeGroupSequencerState(state: IMultiStateThing): IMultiS
 
 export function makeGroups(colors: string[], length: number): Groups {
 	return OrderedMap<Id, Group>(
-		colors.map(color => ([
+		colors.map((color, i) => ([
 			uuid.v4(),
 			{
 				color,
-				events: makeGroupEvents(length),
+				events: makeGroupEvents(length, i),
 			},
 		])) as unknown as Iterable<[string, Group]>,
 	)
 }
 
-export function makeGroupEvents(count: number): GroupEvents {
+export function makeGroupEvents(count: number, mod: number): GroupEvents {
 	return List<GroupEvent>(new Array(count)
 		.fill(0)
-		.map((_, i) => ({on: i % 2 === 0})))
+		.map((_, i) => ({on: i % (mod + 2) === 0})))
 }
 
 export type Groups = OrderedMap<Id, Group>
