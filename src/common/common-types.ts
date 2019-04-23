@@ -1,5 +1,7 @@
 export type ClientId = string
 
+export type Id = string
+
 export interface IDisposable {
 	dispose: () => void
 }

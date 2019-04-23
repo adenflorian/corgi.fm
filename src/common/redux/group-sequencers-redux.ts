@@ -1,6 +1,7 @@
+import {List, Map, OrderedMap} from 'immutable'
 import {AnyAction} from 'redux'
 import uuid = require('uuid')
-import {ConnectionNodeType, IConnectable, IMultiStateThing} from '../common-types'
+import {ConnectionNodeType, IConnectable, Id, IMultiStateThing} from '../common-types'
 import {CssColor} from '../shamu-color'
 import {IClientRoomState} from './common-redux-types'
 import {addMultiThing, IMultiState, makeMultiReducer} from './multi-reducer'
@@ -33,6 +34,9 @@ export class GroupSequencer implements IConnectable, NodeSpecialState, IMultiSta
 		width: GroupSequencer.defaultWidth,
 		height: GroupSequencer.defaultHeight,
 		name: 'Dummy Group Sequencer',
+		groups: makeGroups(2, 2),
+		length: 2,
+		groupEventBeatLength: 1,
 	}
 
 	public readonly id = uuid.v4()
@@ -41,10 +45,48 @@ export class GroupSequencer implements IConnectable, NodeSpecialState, IMultiSta
 	public readonly width = GroupSequencer.defaultWidth
 	public readonly height = GroupSequencer.defaultHeight
 	public readonly name: string = 'group seq'
+	public readonly groups: Groups
+	public readonly length: number = 16
+	public readonly groupEventBeatLength: number = 16
 
 	constructor(
 		public readonly ownerId: string,
-	) {}
+	) {
+		this.groups = makeGroups(3, this.length)
+	}
+}
+
+export function makeGroups(count: number, length: number): Groups {
+	return OrderedMap<Id, Group>(
+		new Array(count)
+			.fill(0)
+			.map((_, i) => ([
+				uuid.v4(),
+				{
+					color: CssColor.red,
+					events: makeGroupEvents(length),
+				},
+			])) as unknown as Iterable<[string, Group]>,
+	)
+}
+
+export function makeGroupEvents(count: number): GroupEvents {
+	return List<GroupEvent>(new Array(count)
+		.fill(0)
+		.map((_, i) => ({on: i % 2 === 0})))
+}
+
+export type Groups = OrderedMap<Id, Group>
+
+export interface Group {
+	color: string,
+	events: GroupEvents
+}
+
+export type GroupEvents = List<GroupEvent>
+
+export interface GroupEvent {
+	on: boolean
 }
 
 export type GroupSequencerAction = AnyAction
