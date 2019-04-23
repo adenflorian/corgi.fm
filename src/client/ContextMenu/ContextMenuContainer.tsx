@@ -115,7 +115,7 @@ interface NodeMenuItemsProps {
 	nodeType: ConnectionNodeType
 }
 
-const hoverDelayMs = 100
+const hoverDelayMs = 1
 
 const deleteMenuLabels = List([
 	`Delete Node`,
