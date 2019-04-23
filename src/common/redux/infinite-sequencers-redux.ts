@@ -3,6 +3,7 @@ import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
 import {ConnectionNodeType} from '../common-types'
 import {assertArrayHasNoUndefinedElements} from '../common-utils'
+import {logger} from '../logger'
 import {makeMidiClipEvent, MidiClip} from '../midi-types'
 import {IMidiNote, MidiNotes} from '../MidiNote'
 import {
@@ -11,11 +12,10 @@ import {
 	SERVER_ACTION, SKIP_NOTE, STOP_ALL, UNDO_SEQUENCER, VIRTUAL_KEY_PRESSED,
 } from './index'
 import {
-	PLAY_SEQUENCER, SequencerAction, SequencerStateBase, STOP_SEQUENCER,
-	selectAllInfiniteSequencers, RECORD_SEQUENCER_NOTE, RECORD_SEQUENCER_REST,
+	PLAY_SEQUENCER, RECORD_SEQUENCER_NOTE, RECORD_SEQUENCER_REST, selectAllInfiniteSequencers,
+	SequencerAction, SequencerStateBase, STOP_SEQUENCER,
 } from './sequencer-redux'
 import {VirtualKeyPressedAction} from './virtual-keyboard-redux'
-import {logger} from '../logger';
 
 export const addInfiniteSequencer = (infiniteSequencer: InfiniteSequencerState) =>
 	addMultiThing(infiniteSequencer, ConnectionNodeType.infiniteSequencer, NetworkActionType.SERVER_AND_BROADCASTER)

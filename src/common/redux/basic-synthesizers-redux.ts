@@ -6,7 +6,6 @@ import {pickRandomArrayElement} from '../common-utils'
 import {BuiltInOscillatorType, ShamuOscillatorType} from '../OscillatorTypes'
 import {addMultiThing, BROADCASTER_ACTION, createSelectAllOfThingAsArray, IClientRoomState, IMultiState, makeMultiReducer, NetworkActionType, SERVER_ACTION} from './index'
 import {NodeSpecialState} from './shamu-graph'
-import {getConnectionNodeInfo} from './node-types';
 
 export const addBasicSynthesizer = (instrument: BasicSynthesizerState) =>
 	addMultiThing(instrument, ConnectionNodeType.basicSynthesizer, NetworkActionType.SERVER_AND_BROADCASTER)

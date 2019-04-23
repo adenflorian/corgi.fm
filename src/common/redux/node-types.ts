@@ -1,7 +1,14 @@
 import {Map, Record, Set} from 'immutable'
+import {AnyAction} from 'redux'
 import {ConnectionNodeType, IConnectable, IMultiStateThing} from '../common-types'
 import {IMidiNote} from '../MidiNote'
 import {CssColor} from '../shamu-color'
+import {addBasicSampler, BasicSamplerState} from './basic-sampler-redux'
+import {addBasicSynthesizer, BasicSynthesizerState} from './basic-synthesizers-redux'
+import {IClientAppState} from './common-redux-types'
+import {selectConnectionsWithTargetIds} from './connections-redux'
+import {addGridSequencer, GridSequencerState} from './grid-sequencers-redux'
+import {addGroupSequencer, GroupSequencer, groupSequencerActions, selectGroupSequencer} from './group-sequencers-redux'
 import {
 	deserializeSequencerState, IClientRoomState,
 	makeGetKeyboardMidiOutput, selectBasicSynthesizer,
@@ -13,16 +20,10 @@ import {
 	selectSimpleReverb, selectVirtualKeyboardById,
 	selectVirtualKeyboardHasPressedKeys, VirtualKeyboardState,
 } from './index'
-import {IClientAppState} from './common-redux-types';
-import {addVirtualKeyboard} from './virtual-keyboard-redux';
-import {AnyAction} from 'redux';
-import {GridSequencerState, addGridSequencer} from './grid-sequencers-redux';
-import {InfiniteSequencerState, addInfiniteSequencer} from './infinite-sequencers-redux';
-import {BasicSynthesizerState, addBasicSynthesizer} from './basic-synthesizers-redux';
-import {BasicSamplerState, addBasicSampler} from './basic-sampler-redux';
-import {SimpleReverbState, addSimpleReverb} from './simple-reverb-redux';
-import {selectSequencerIsPlaying} from './sequencer-redux';
-import {selectConnectionsWithTargetIds} from './connections-redux';
+import {addInfiniteSequencer, InfiniteSequencerState} from './infinite-sequencers-redux'
+import {selectSequencerIsPlaying} from './sequencer-redux'
+import {addSimpleReverb, SimpleReverbState} from './simple-reverb-redux'
+import {addVirtualKeyboard} from './virtual-keyboard-redux'
 
 export const MASTER_AUDIO_OUTPUT_TARGET_ID = 'MASTER_AUDIO_OUTPUT_TARGET_ID'
 
@@ -60,7 +61,7 @@ const _makeNodeInfo = Record({
 	color: false as string | false,
 	typeName: 'Default Type Name',
 	stateConstructor: (DummyConnectable) as new (ownerId: string) => IConnectable,
-	addNodeActionCreator: ((state: IClientAppState) => {type: 'dummy add node action type'}) as (state: any) => AnyAction,
+	addNodeActionCreator: ((state: IClientAppState) => ({type: 'dummy add node action type'})) as (state: any) => AnyAction,
 	showOnAddNodeMenu: false,
 	isDeletable: false,
 })
@@ -132,6 +133,19 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		selectIsPlaying: selectSequencerIsPlaying,
 		selectActiveNotes: selectInfiniteSequencerActiveNotes,
 		stateDeserializer: deserializeSequencerState,
+		showOnAddNodeMenu: true,
+		isDeletable: true,
+	})],
+	[ConnectionNodeType.groupSequencer, makeNodeInfo({
+		typeName: 'Group Sequencer',
+		stateConstructor: GroupSequencer,
+		addNodeActionCreator: addGroupSequencer,
+		stateSelector: selectGroupSequencer,
+		// selectIsActive: () => false,	// TODO
+		// selectIsSending: () => false,	// TODO
+		// selectIsPlaying: () => false,	// TODO
+		// selectActiveNotes: () => [],	// TODO
+		// stateDeserializer: deserializeSequencerState,	// TODO
 		showOnAddNodeMenu: true,
 		isDeletable: true,
 	})],
@@ -227,7 +241,7 @@ function memoizedIsUpstreamNodePlaying(state: IClientRoomState, nodeId: string, 
 }
 
 function isUpstreamNodePlaying(
-	state: IClientRoomState, nodeId: string, processedNodeIds = Set<string>()
+	state: IClientRoomState, nodeId: string, processedNodeIds = Set<string>(),
 ): boolean {
 	if (processedNodeIds.includes(nodeId)) return false
 

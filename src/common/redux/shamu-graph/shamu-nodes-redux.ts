@@ -1,4 +1,5 @@
 import {combineReducers} from 'redux'
+import {groupSequencersReducer} from '../group-sequencers-redux'
 import {
 	basicSamplersReducer, basicSynthesizersReducer, gridSequencersReducer,
 	IClientRoomState, IMultiState, infiniteSequencersReducer,
@@ -72,6 +73,7 @@ export const nodesReducer = combineReducers(Object.freeze({
 	basicSamplers: basicSamplersReducer,
 	gridSequencers: gridSequencersReducer,
 	infiniteSequencers: infiniteSequencersReducer,
+	groupSequencers: groupSequencersReducer,
 	simpleReverbs: simpleReverbsReducer,
 	virtualKeyboards: virtualKeyboardsReducer,
 }))
