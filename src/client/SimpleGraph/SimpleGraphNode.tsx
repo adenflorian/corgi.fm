@@ -63,7 +63,7 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 					left: -(graphSizeX / 2),
 				}}
 				handle={`.${handleClassName}`}
-				cancel={`.actualKnob, .note, .key, .controls > *, .oscillatorTypes > *, .verticalScrollBar`}
+				cancel={`.actualKnob, .note, .key, .controls > *, .oscillatorTypes > *, .verticalScrollBar, .groupEvent`}
 				onMouseDown={this._handleMouseDown}
 			>
 				<div

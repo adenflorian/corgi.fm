@@ -19,6 +19,25 @@
 
 			&.on {
 				background-color: currentColor;
+
+				&:hover {
+					filter: brightness(1.2);
+				}
+
+				&:active {
+					filter: brightness(1.5);
+				}
+			}
+
+			&.off {
+				&:hover {
+					background-color: currentColor;
+					filter: brightness(0.8);
+				}
+				&:active {
+					background-color: currentColor;
+					filter: brightness(1.5);
+				}
 			}
 		}
 	}

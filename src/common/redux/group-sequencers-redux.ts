@@ -1,17 +1,29 @@
-import {List, Map, OrderedMap} from 'immutable'
-import {AnyAction} from 'redux'
+import {List} from 'immutable'
+import {ActionType} from 'typesafe-actions'
 import uuid = require('uuid')
 import {ConnectionNodeType, IConnectable, Id, IMultiStateThing} from '../common-types'
 import {CssColor} from '../shamu-color'
 import {
-	addMultiThing, getConnectionNodeInfo, IClientRoomState,
-	IMultiState, makeMultiReducer, NetworkActionType, NodeSpecialState,
+	addMultiThing, BROADCASTER_ACTION, getConnectionNodeInfo,
+	IClientRoomState, IMultiState, makeMultiReducer, NetworkActionType,
+	NodeSpecialState, SERVER_ACTION,
 } from './index'
+
+export const GROUP_SEQ_SET_ENABLED = 'GROUP_SEQ_SET_ENABLED'
 
 export const addGroupSequencer = (groupSequencer: GroupSequencer) =>
 	addMultiThing(groupSequencer, ConnectionNodeType.groupSequencer, NetworkActionType.SERVER_AND_BROADCASTER)
 
 export const groupSequencerActions = Object.freeze({
+	setEnabled: (id: Id, port: number, index: number, enabled: boolean) => ({
+		type: GROUP_SEQ_SET_ENABLED as typeof GROUP_SEQ_SET_ENABLED,
+		id,
+		port,
+		index,
+		enabled,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	}),
 })
 
 export interface GroupSequencersState extends IMultiState {
@@ -69,21 +81,22 @@ export function deserializeGroupSequencerState(state: IMultiStateThing): IMultiS
 	const x = state as GroupSequencer
 	const y = {
 		...x,
-		groups: OrderedMap<Id, Group>(x.groups),
+		groups: List<Group>(x.groups)
+			.map(group => ({
+				...group,
+				events: List(group.events),
+			})),
 		color: List(x.color),
 	} as GroupSequencer
 	return y
 }
 
 export function makeGroups(colors: string[], length: number, eventLength: number): Groups {
-	return OrderedMap<Id, Group>(
-		colors.map((color, i) => ([
-			uuid.v4(),
-			{
-				color,
-				events: makeGroupEvents(length, i, eventLength),
-			},
-		])) as unknown as Iterable<[string, Group]>,
+	return List<Group>(
+		colors.map((color, i) => ({
+			color,
+			events: makeGroupEvents(length, i, eventLength),
+		})),
 	)
 }
 
@@ -97,7 +110,7 @@ export function makeGroupEvents(count: number, mod: number, eventLength: number)
 		})))
 }
 
-export type Groups = OrderedMap<Id, Group>
+export type Groups = List<Group>
 
 export interface Group {
 	color: string
@@ -112,9 +125,10 @@ export interface GroupEvent {
 	length: number,
 }
 
-export type GroupSequencerAction = AnyAction
+export type GroupSequencerAction = ActionType<typeof groupSequencerActions>
 
 const groupSequencerActionTypes: string[] = [
+	GROUP_SEQ_SET_ENABLED,
 ]
 
 export const groupSequencersReducer = makeMultiReducer<GroupSequencer, GroupSequencersState>(
@@ -123,10 +137,40 @@ export const groupSequencersReducer = makeMultiReducer<GroupSequencer, GroupSequ
 	groupSequencerActionTypes,
 )
 
-function groupSequencerReducer(groupSequencer: GroupSequencer, action: AnyAction) {
+function groupSequencerReducer(groupSequencer: GroupSequencer, action: GroupSequencerAction): GroupSequencer {
 	switch (action.type) {
-		default:
-			return groupSequencer
+		case GROUP_SEQ_SET_ENABLED: return {
+			...groupSequencer,
+			groups: groupsReducer(groupSequencer.groups, action),
+		}
+		default: return groupSequencer
+	}
+}
+
+function groupsReducer(groups: Groups, action: GroupSequencerAction): Groups {
+	switch (action.type) {
+		case GROUP_SEQ_SET_ENABLED: return groups.update(action.port, x => groupReducer(x, action))
+		default: return groups
+	}
+}
+
+function groupReducer(group: Group, action: GroupSequencerAction): Group {
+	switch (action.type) {
+		case GROUP_SEQ_SET_ENABLED: return {
+			...group,
+			events: group.events.update(action.index, x => eventReducer(x, action)),
+		}
+		default: return group
+	}
+}
+
+function eventReducer(event: GroupEvent, action: GroupSequencerAction): GroupEvent {
+	switch (action.type) {
+		case GROUP_SEQ_SET_ENABLED: return {
+			...event,
+			on: action.enabled,
+		}
+		default: return event
 	}
 }
 

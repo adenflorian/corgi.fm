@@ -1,6 +1,6 @@
 import React from 'react'
 import {Dispatch} from 'redux'
-import {GroupSequencer, selectGroupSequencer, shamuConnect} from '../../common/redux'
+import {GroupSequencer, groupSequencerActions, selectGroupSequencer, shamuConnect} from '../../common/redux'
 import {Panel} from '../Panel/Panel'
 import './GroupSequencer.less'
 
@@ -20,12 +20,18 @@ export function GroupSequencerView(props: AllProps) {
 			label={props.groupSequencer.name}
 			className="groupSequencer"
 		>
-			{props.groupSequencer.groups.map((group, id) => {
+			{props.groupSequencer.groups.map((group, port) => {
 				return (
-					<div key={id} className="groupRow" style={{color: group.color}}>
+					<div key={port} className="groupRow" style={{color: group.color}}>
 						{group.events.map((event, i) => {
 							return (
-								<div key={i} className={`groupEvent ${event.on ? 'on' : 'off'}`}></div>
+								<div
+									key={i}
+									className={`groupEvent ${event.on ? 'on' : 'off'}`}
+									onClick={() => {
+										props.dispatch(groupSequencerActions.setEnabled(props.id, port, i, !event.on))
+									}}
+								/>
 							)
 						})}
 					</div>
