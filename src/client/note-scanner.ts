@@ -3,7 +3,7 @@ import {Id} from '../common/common-types'
 import {logger} from '../common/logger'
 import {MidiGlobalClipEvent, midiPrecision, MidiRange} from '../common/midi-types'
 import {
-	ClientStore, GroupSequencer, GroupSequencers,
+	ClientStore, GroupSequencers,
 	IClientRoomState,
 	selectAllConnections,
 	selectAllGroupSequencers,
@@ -14,7 +14,7 @@ import {
 	selectSequencerIsPlaying,
 } from '../common/redux'
 import {getAllInstruments} from './instrument-manager'
-import {getEvents, getEventsForMultipleRanges} from './note-scheduler'
+import {getEvents} from './note-scheduler'
 
 let _store: ClientStore
 let _audioContext: AudioContext
@@ -126,7 +126,6 @@ function scheduleNotes() {
 		.filter(seq => selectSequencerIsPlaying(roomState, seq.id))
 		.map(seq => ({
 			seq,
-			// events: getEventsForMultipleRanges(seq.midiClip, getRangesUsingGroups(readRangeBeats, groupSequencers, roomState, seq.id))
 			events: getEvents(seq.midiClip, readRangeBeats)
 				.filter(getGroupEventsFilter(groupSequencers, roomState, seq.id, currentSongTimeBeats + offsetBeats))
 				.map(event => applyGateToEvent(seq.gate, event))
@@ -203,6 +202,9 @@ const getGroupEventsFilter = (groupSequencers: GroupSequencers, roomState: IClie
 
 	const sourceGroupSequencers = Map(groupSequencers).filter(x => connectionSourceIds.includes(x.id))
 
+	// Sequencers should play if not connected to a group sequencer
+	if (sourceGroupSequencers.count() === 0) return true
+
 	return sourceGroupSequencers.some(groupSeq => {
 		const portsUsed = connectionsToSequencer
 			.filter(x => x.sourceId === groupSeq.id)
@@ -221,46 +223,10 @@ const getGroupEventsFilter = (groupSequencers: GroupSequencers, roomState: IClie
 						const eventStartGlobal = currentBeats + event.startTime
 						const eventStartGlobalActual = ((eventStartGlobal * midiPrecision) % (groupTotalLengthBeats * midiPrecision)) / midiPrecision
 
-						// console.log('event.startTime: ', event.startTime)
-						// console.log('eventStartGlobal: ', eventStartGlobal)
-						// console.log('eventStartGlobalActual: ', eventStartGlobalActual)
-						// console.log('groupEvent.startBeat: ', groupEvent.startBeat)
-
-						if (groupEvent.startBeat <= eventStartGlobalActual && eventStartGlobalActual < endBeat) {
-							// console.log('NOTE')
-							return true
-						} else {
-							return false
-						}
+						return groupEvent.startBeat <= eventStartGlobalActual && eventStartGlobalActual < endBeat
 					})
 			})
 	})
-}
-
-function getRangesUsingGroups(initialRange: MidiRange, groupSequencers: GroupSequencers, roomState: IClientRoomState, seqId: Id): List<MidiRange> {
-	const connectionsToSequencer = selectConnectionsWithTargetIds(roomState, [seqId])
-	const connectionSourceIds = connectionsToSequencer.map(x => x.sourceId)
-
-	const sourceGroupSequencers = Map(groupSequencers).filter(x => connectionSourceIds.includes(x.id))
-
-	return sourceGroupSequencers.reduce((all, current) => {
-		const portsUsed = connectionsToSequencer
-			.filter(x => x.sourceId === current.id)
-			.map(x => x.sourcePort)
-			.toList()
-
-		return all.concat(getRangesUsingGroup(current, portsUsed))
-	}, List<MidiRange>())
-}
-
-function getRangesUsingGroup(groupSeq: GroupSequencer, portsUsed: List<number>): List<MidiRange> {
-	if (portsUsed.count() < 1) throw new Error('this shouldnt happen :(')
-
-	const events = groupSeq.groups.toList()
-		.filter((_, i) => portsUsed.includes(i))
-		.map(x => x.events)
-
-	return List<MidiRange>()
 }
 
 function applyGateToEvent(gate: number, event: MidiGlobalClipEvent): MidiGlobalClipEvent {
