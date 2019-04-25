@@ -1,7 +1,7 @@
 import {List, Map, Set} from 'immutable'
 import {Id} from '../common/common-types'
 import {logger} from '../common/logger'
-import {MidiGlobalClipEvent, MidiRange} from '../common/midi-types'
+import {MidiGlobalClipEvent, midiPrecision, MidiRange} from '../common/midi-types'
 import {
 	ClientStore, GroupSequencer, GroupSequencers,
 	IClientRoomState,
@@ -14,7 +14,7 @@ import {
 	selectSequencerIsPlaying,
 } from '../common/redux'
 import {getAllInstruments} from './instrument-manager'
-import {getEventsForMultipleRanges} from './note-scheduler'
+import {getEvents, getEventsForMultipleRanges} from './note-scheduler'
 
 let _store: ClientStore
 let _audioContext: AudioContext
@@ -126,7 +126,9 @@ function scheduleNotes() {
 		.filter(seq => selectSequencerIsPlaying(roomState, seq.id))
 		.map(seq => ({
 			seq,
-			events: getEventsForMultipleRanges(seq.midiClip, getRangesUsingGroups(readRangeBeats, groupSequencers, roomState, seq.id))
+			// events: getEventsForMultipleRanges(seq.midiClip, getRangesUsingGroups(readRangeBeats, groupSequencers, roomState, seq.id))
+			events: getEvents(seq.midiClip, readRangeBeats)
+				.filter(getGroupEventsFilter(groupSequencers, roomState, seq.id, currentSongTimeBeats + offsetBeats))
 				.map(event => applyGateToEvent(seq.gate, event))
 				.map(event => ({
 					...event,
@@ -193,6 +195,46 @@ function scheduleNotes() {
 
 	_cursorBeats += beatsToRead
 	_justStarted = false
+}
+
+const getGroupEventsFilter = (groupSequencers: GroupSequencers, roomState: IClientRoomState, seqId: Id, currentBeats: number) => (event: MidiGlobalClipEvent): boolean => {
+	const connectionsToSequencer = selectConnectionsWithTargetIds(roomState, [seqId])
+	const connectionSourceIds = connectionsToSequencer.map(x => x.sourceId)
+
+	const sourceGroupSequencers = Map(groupSequencers).filter(x => connectionSourceIds.includes(x.id))
+
+	return sourceGroupSequencers.some(groupSeq => {
+		const portsUsed = connectionsToSequencer
+			.filter(x => x.sourceId === groupSeq.id)
+			.map(x => x.sourcePort)
+			.toList()
+
+		const groupTotalLengthBeats = groupSeq.length * groupSeq.groupEventBeatLength
+
+		return groupSeq.groups.toList()
+			.filter((_, i) => portsUsed.includes(i))
+			.some(group => {
+				return group.events
+					.filter(x => x.on)
+					.some(groupEvent => {
+						const endBeat = groupEvent.startBeat + groupEvent.length
+						const eventStartGlobal = currentBeats + event.startTime
+						const eventStartGlobalActual = ((eventStartGlobal * midiPrecision) % (groupTotalLengthBeats * midiPrecision)) / midiPrecision
+
+						// console.log('event.startTime: ', event.startTime)
+						// console.log('eventStartGlobal: ', eventStartGlobal)
+						// console.log('eventStartGlobalActual: ', eventStartGlobalActual)
+						// console.log('groupEvent.startBeat: ', groupEvent.startBeat)
+
+						if (groupEvent.startBeat <= eventStartGlobalActual && eventStartGlobalActual < endBeat) {
+							// console.log('NOTE')
+							return true
+						} else {
+							return false
+						}
+					})
+			})
+	})
 }
 
 function getRangesUsingGroups(initialRange: MidiRange, groupSequencers: GroupSequencers, roomState: IClientRoomState, seqId: Id): List<MidiRange> {

@@ -34,7 +34,7 @@ export class GroupSequencer implements IConnectable, NodeSpecialState, IMultiSta
 		width: GroupSequencer.defaultWidth,
 		height: GroupSequencer.defaultHeight,
 		name: 'Dummy Group Sequencer',
-		groups: makeGroups([CssColor.red, CssColor.green], 2),
+		groups: makeGroups([CssColor.red, CssColor.green], 2, 4),
 		length: 2,
 		groupEventBeatLength: 1,
 		outputPortCount: 2,
@@ -58,7 +58,7 @@ export class GroupSequencer implements IConnectable, NodeSpecialState, IMultiSta
 	constructor(
 		public readonly ownerId: string,
 	) {
-		this.groups = makeGroups([CssColor.red, CssColor.green, CssColor.blue], this.length)
+		this.groups = makeGroups([CssColor.red, CssColor.green, CssColor.blue], this.length, this.groupEventBeatLength)
 		this.outputPortCount = this.groups.count()
 		this.color = this.groups.map(x => x.color).toList()
 		this.notesDisplayWidth = GroupSequencer.defaultWidth
@@ -75,22 +75,26 @@ export function deserializeGroupSequencerState(state: IMultiStateThing): IMultiS
 	return y
 }
 
-export function makeGroups(colors: string[], length: number): Groups {
+export function makeGroups(colors: string[], length: number, eventLength: number): Groups {
 	return OrderedMap<Id, Group>(
 		colors.map((color, i) => ([
 			uuid.v4(),
 			{
 				color,
-				events: makeGroupEvents(length, i),
+				events: makeGroupEvents(length, i, eventLength),
 			},
 		])) as unknown as Iterable<[string, Group]>,
 	)
 }
 
-export function makeGroupEvents(count: number, mod: number): GroupEvents {
+export function makeGroupEvents(count: number, mod: number, eventLength: number): GroupEvents {
 	return List<GroupEvent>(new Array(count)
 		.fill(0)
-		.map((_, i) => ({on: i % (mod + 2) === 0})))
+		.map((_, i) => ({
+			on: i % (mod + 2) === 0,
+			startBeat: i * eventLength,
+			length: eventLength,
+		})))
 }
 
 export type Groups = OrderedMap<Id, Group>
@@ -104,6 +108,8 @@ export type GroupEvents = List<GroupEvent>
 
 export interface GroupEvent {
 	on: boolean
+	startBeat: number,
+	length: number,
 }
 
 export type GroupSequencerAction = AnyAction
