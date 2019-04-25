@@ -1,9 +1,15 @@
 import {List, Map, Set} from 'immutable'
+import {Id} from '../common/common-types'
 import {logger} from '../common/logger'
 import {MidiGlobalClipEvent, MidiRange} from '../common/midi-types'
 import {
-	ClientStore, selectAllGroupSequencers, selectAllSequencers,
+	ClientStore, GroupSequencer, GroupSequencers,
+	IClientRoomState,
+	selectAllConnections,
+	selectAllGroupSequencers,
+	selectAllSequencers,
 	selectConnectionSourceIdsByTarget,
+	selectConnectionsWithTargetIds,
 	selectGlobalClockState,
 	selectSequencerIsPlaying,
 } from '../common/redux'
@@ -111,12 +117,16 @@ function scheduleNotes() {
 
 	const readRangeBeats = new MidiRange(_cursorBeats, beatsToRead)
 
+	const groupSequencers = selectAllGroupSequencers(roomState)
+
+	const connections = selectAllConnections(roomState)
+
 	// run all sequencers events thru scheduler
 	const sequencersEvents = Map(selectAllSequencers(roomState))
 		.filter(seq => selectSequencerIsPlaying(roomState, seq.id))
 		.map(seq => ({
 			seq,
-			events: getEventsForMultipleRanges(seq.midiClip, getRangesUsingGroups(readRangeBeats))
+			events: getEventsForMultipleRanges(seq.midiClip, getRangesUsingGroups(readRangeBeats, groupSequencers, roomState, seq.id))
 				.map(event => applyGateToEvent(seq.gate, event))
 				.map(event => ({
 					...event,
@@ -185,8 +195,30 @@ function scheduleNotes() {
 	_justStarted = false
 }
 
-function getRangesUsingGroups(range: MidiRange): List<MidiRange> {
-	return List<MidiRange>([range])
+function getRangesUsingGroups(initialRange: MidiRange, groupSequencers: GroupSequencers, roomState: IClientRoomState, seqId: Id): List<MidiRange> {
+	const connectionsToSequencer = selectConnectionsWithTargetIds(roomState, [seqId])
+	const connectionSourceIds = connectionsToSequencer.map(x => x.sourceId)
+
+	const sourceGroupSequencers = Map(groupSequencers).filter(x => connectionSourceIds.includes(x.id))
+
+	return sourceGroupSequencers.reduce((all, current) => {
+		const portsUsed = connectionsToSequencer
+			.filter(x => x.sourceId === current.id)
+			.map(x => x.sourcePort)
+			.toList()
+
+		return all.concat(getRangesUsingGroup(current, portsUsed))
+	}, List<MidiRange>())
+}
+
+function getRangesUsingGroup(groupSeq: GroupSequencer, portsUsed: List<number>): List<MidiRange> {
+	if (portsUsed.count() < 1) throw new Error('this shouldnt happen :(')
+
+	const events = groupSeq.groups.toList()
+		.filter((_, i) => portsUsed.includes(i))
+		.map(x => x.events)
+
+	return List<MidiRange>()
 }
 
 function applyGateToEvent(gate: number, event: MidiGlobalClipEvent): MidiGlobalClipEvent {
