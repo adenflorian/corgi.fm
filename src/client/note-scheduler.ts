@@ -3,7 +3,6 @@ import {logger} from '../common/logger'
 import {
 	makeMidiGlobalClipEvent, MidiClip, MidiGlobalClipEvent, MidiGlobalClipEvents, midiPrecision, MidiRange,
 } from '../common/midi-types'
-import {GroupEvents} from '../common/redux'
 
 export const applyBPM = (beat: number, bpm: number) => {
 	return ((beat * midiPrecision) * ((60 * midiPrecision) / (bpm * midiPrecision))) / midiPrecision
@@ -22,6 +21,12 @@ export function applyBPMToEvents(events: MidiGlobalClipEvents, bpm: number) {
 }
 
 const emptyGlobalClipEvents = List()
+
+export function getEventsForMultipleRanges(clip: MidiClip, initialRanges: List<MidiRange>): MidiGlobalClipEvents {
+	return initialRanges.reduce((all, current) => {
+		return all.concat(getEvents(clip, current))
+	}, List<MidiGlobalClipEvent>())
+}
 
 // TODO Will this work for triplets?
 

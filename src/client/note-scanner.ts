@@ -8,7 +8,7 @@ import {
 	selectSequencerIsPlaying,
 } from '../common/redux'
 import {getAllInstruments} from './instrument-manager'
-import {getEvents} from './note-scheduler'
+import {getEventsForMultipleRanges} from './note-scheduler'
 
 let _store: ClientStore
 let _audioContext: AudioContext
@@ -116,7 +116,7 @@ function scheduleNotes() {
 		.filter(seq => selectSequencerIsPlaying(roomState, seq.id))
 		.map(seq => ({
 			seq,
-			events: getEvents(seq.midiClip, readRangeBeats)
+			events: getEventsForMultipleRanges(seq.midiClip, List([readRangeBeats]))
 				.map(event => applyGateToEvent(seq.gate, event))
 				.map(event => ({
 					...event,
