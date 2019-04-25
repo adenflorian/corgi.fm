@@ -3,6 +3,7 @@ import {logger} from '../common/logger'
 import {
 	makeMidiGlobalClipEvent, MidiClip, MidiGlobalClipEvent, MidiGlobalClipEvents, midiPrecision, MidiRange,
 } from '../common/midi-types'
+import {GroupEvents} from '../common/redux'
 
 export const applyBPM = (beat: number, bpm: number) => {
 	return ((beat * midiPrecision) * ((60 * midiPrecision) / (bpm * midiPrecision))) / midiPrecision
@@ -22,6 +23,8 @@ export function applyBPMToEvents(events: MidiGlobalClipEvents, bpm: number) {
 
 const emptyGlobalClipEvents = List()
 
+// TODO Will this work for triplets?
+
 // Maybe range should only ever be a simple number, divisible by 10 or something
 /** Must apply BPM on result */
 export function getEvents(clip: MidiClip, initialRange: MidiRange): MidiGlobalClipEvents {
@@ -31,28 +34,11 @@ export function getEvents(clip: MidiClip, initialRange: MidiRange): MidiGlobalCl
 	return _getNotes(initialRange, 0)
 
 	function _getNotes(range: MidiRange, offset = 0): MidiGlobalClipEvents {
-		if (range.length === 0) {
-			return _checkSingleBeat(range.normalize(clip.length), offset)
-		}
-
-		if (range.length > 0) {
+		if (range.length >= 0) {
 			return _checkBeatRange(range, offset)
 		}
 
 		throw new Error('invalid range: ' + JSON.stringify(range))
-	}
-
-	function _checkSingleBeat({start}: MidiRange, _offset: number): MidiGlobalClipEvents {
-		logger.trace('_checkSingleBeat')
-
-		return clip.events.filter(x => {
-			return x.startBeat === start
-		})
-			.map(x => (makeMidiGlobalClipEvent({
-				notes: x.notes,
-				startTime: _offset,
-				endTime: ((_offset * midiPrecision) + (x.durationBeats * midiPrecision)) / midiPrecision,
-			})))
 	}
 
 	function _checkBeatRange(_range: MidiRange, _offset: number): MidiGlobalClipEvents {
@@ -77,7 +63,9 @@ export function getEvents(clip: MidiClip, initialRange: MidiRange): MidiGlobalCl
 		logger.trace('_checkWithinClipBounds')
 
 		return clip.events.filter(x => {
-			return start <= x.startBeat && x.startBeat < end
+			return start === end
+				? start === x.startBeat
+				: start <= x.startBeat && x.startBeat < end
 		})
 			.map(x => (makeMidiGlobalClipEvent({
 				notes: x.notes,
