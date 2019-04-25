@@ -116,7 +116,7 @@ function scheduleNotes() {
 		.filter(seq => selectSequencerIsPlaying(roomState, seq.id))
 		.map(seq => ({
 			seq,
-			events: getEventsForMultipleRanges(seq.midiClip, List([readRangeBeats]))
+			events: getEventsForMultipleRanges(seq.midiClip, getRangesUsingGroups(readRangeBeats))
 				.map(event => applyGateToEvent(seq.gate, event))
 				.map(event => ({
 					...event,
@@ -183,6 +183,10 @@ function scheduleNotes() {
 
 	_cursorBeats += beatsToRead
 	_justStarted = false
+}
+
+function getRangesUsingGroups(range: MidiRange): List<MidiRange> {
+	return List<MidiRange>([range])
 }
 
 function applyGateToEvent(gate: number, event: MidiGlobalClipEvent): MidiGlobalClipEvent {
