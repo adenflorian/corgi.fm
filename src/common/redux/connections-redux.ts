@@ -61,6 +61,8 @@ export interface IConnection {
 	targetId: string
 	targetType: ConnectionNodeType
 	id: string
+	sourcePort: ConnectionPortId
+	targetPort: ConnectionPortId
 }
 
 export class Connection implements IConnection {
@@ -70,17 +72,23 @@ export class Connection implements IConnection {
 		targetId: '-1',
 		targetType: ConnectionNodeType.dummy,
 		id: '-1',
+		sourcePort: 0,
+		targetPort: 0,
 	}
 
 	public readonly id = uuid.v4()
 
 	constructor(
-		public sourceId: string,
-		public sourceType: ConnectionNodeType,
-		public targetId: string,
-		public targetType: ConnectionNodeType,
+		public readonly sourceId: string,
+		public readonly sourceType: ConnectionNodeType,
+		public readonly targetId: string,
+		public readonly targetType: ConnectionNodeType,
+		public readonly sourcePort: ConnectionPortId = 0,
+		public readonly targetPort: ConnectionPortId = 0,
 	) {}
 }
+
+export type ConnectionPortId = number
 
 export type IConnectionAction = ActionType<typeof connectionsActions>
 
@@ -167,16 +175,22 @@ export const selectConnectionSourceColor = (state: IClientRoomState, id: string)
 }
 
 const makeConnectionSourceColorSelector =
-	(roomState: IClientRoomState, processedIds = List<string>()) => (connection: IConnection) => {
+	(roomState: IClientRoomState, processedIds = List<string>()) => (connection: IConnection): string => {
 		// If in a loop
 		if (processedIds.contains(connection.id)) return CssColor.subtleGrayBlackBg
 
 		return (
-			getConnectionNodeInfo(connection.sourceType).stateSelector(roomState, connection.sourceId).color
+			tryGetColorFromState(getConnectionNodeInfo(connection.sourceType).stateSelector(roomState, connection.sourceId).color, connection.sourcePort)
 			||
 			selectConnectionSourceColorByTargetId(roomState, connection.sourceId, processedIds.push(connection.id))
 		)
 	}
+
+function tryGetColorFromState(colorFromState: string | false | List<string>, portNumber: number): string | false {
+	if (!colorFromState) return false
+	if (typeof colorFromState === 'string') return colorFromState
+	return colorFromState.get(portNumber, CssColor.defaultGray)
+}
 
 /** For use by a node */
 export const selectConnectionSourceNotesByTargetId = (state: IClientRoomState, targetId: string, onlyFromKeyboards = false): IMidiNotes => {

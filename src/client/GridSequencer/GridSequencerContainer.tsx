@@ -1,6 +1,6 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
-import {IClientAppState} from '../../common/redux'
+import {IClientAppState, selectConnectionSourceColorByTargetId} from '../../common/redux'
 import {selectGridSequencer} from '../../common/redux'
 import {GridSequencer} from './GridSequencer'
 import './GridSequencer.less'
@@ -34,7 +34,7 @@ const mapStateToProps = (state: IClientAppState, props: IConnectedGridSequencerC
 
 	return {
 		isPlaying: gridSequencer.isPlaying,
-		color: gridSequencer.color,
+		color: selectConnectionSourceColorByTargetId(state.room, props.id),
 		name: gridSequencer.name,
 	}
 }

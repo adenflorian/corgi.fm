@@ -141,11 +141,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		stateConstructor: GroupSequencer,
 		addNodeActionCreator: addGroupSequencer,
 		stateSelector: selectGroupSequencer,
-		// selectIsActive: () => false,	// TODO
-		// selectIsSending: () => false,	// TODO
-		// selectIsPlaying: () => false,	// TODO
-		// selectActiveNotes: () => [],	// TODO
-		stateDeserializer: deserializeGroupSequencerState,	// TODO
+		stateDeserializer: deserializeGroupSequencerState,
 		showOnAddNodeMenu: true,
 		isDeletable: true,
 	})],

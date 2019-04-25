@@ -29,7 +29,7 @@ export class GroupSequencer implements IConnectable, NodeSpecialState, IMultiSta
 	public static dummy: GroupSequencer = {
 		id: 'dummy',
 		ownerId: 'dummyOwner',
-		color: CssColor.defaultGray,
+		color: List([CssColor.defaultGray]),
 		type: ConnectionNodeType.groupSequencer,
 		width: GroupSequencer.defaultWidth,
 		height: GroupSequencer.defaultHeight,
@@ -37,10 +37,13 @@ export class GroupSequencer implements IConnectable, NodeSpecialState, IMultiSta
 		groups: makeGroups([CssColor.red, CssColor.green], 2),
 		length: 2,
 		groupEventBeatLength: 1,
+		outputPortCount: 2,
+		notesDisplayStartX: 0,
+		notesDisplayWidth: GroupSequencer.defaultWidth,
 	}
 
 	public readonly id = uuid.v4()
-	public readonly color: string = CssColor.green
+	public readonly color: List<string>
 	public readonly type = ConnectionNodeType.groupSequencer
 	public readonly width = GroupSequencer.defaultWidth
 	public readonly height = GroupSequencer.defaultHeight
@@ -48,11 +51,17 @@ export class GroupSequencer implements IConnectable, NodeSpecialState, IMultiSta
 	public readonly groups: Groups
 	public readonly length: number = 16
 	public readonly groupEventBeatLength: number = 16
+	public readonly outputPortCount: number
+	public readonly notesDisplayStartX = 0
+	public readonly notesDisplayWidth: number
 
 	constructor(
 		public readonly ownerId: string,
 	) {
 		this.groups = makeGroups([CssColor.red, CssColor.green, CssColor.blue], this.length)
+		this.outputPortCount = this.groups.count()
+		this.color = this.groups.map(x => x.color).toList()
+		this.notesDisplayWidth = GroupSequencer.defaultWidth
 	}
 }
 
@@ -61,6 +70,7 @@ export function deserializeGroupSequencerState(state: IMultiStateThing): IMultiS
 	const y = {
 		...x,
 		groups: OrderedMap<Id, Group>(x.groups),
+		color: List(x.color),
 	} as GroupSequencer
 	return y
 }

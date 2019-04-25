@@ -211,6 +211,7 @@ interface DeleteNodeMenuItemProps extends MenuItemProps {
 function createPosition(dispatch: Dispatch, state: IConnectable, e: React.TouchEvent<HTMLDivElement> | React.MouseEvent<HTMLDivElement>) {
 	dispatch(addPosition(
 		makePosition({
+			...state,
 			id: state.id,
 			targetType: state.type,
 			width: state.width,

@@ -303,6 +303,7 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 	const newVirtualKeyboard = new VirtualKeyboardState(localClient.id, localClient.color)
 	dispatch(addVirtualKeyboard(newVirtualKeyboard))
 	const keyboardPosition = makePosition({
+		...newVirtualKeyboard,
 		id: newVirtualKeyboard.id,
 		targetType: ConnectionNodeType.virtualKeyboard,
 		x: -556,
@@ -324,6 +325,7 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 		const newSampler = new BasicSamplerState(localClient.id)
 		dispatch(addBasicSampler(newSampler))
 		const samplerPosition = makePosition({
+			...newSampler,
 			id: newSampler.id,
 			targetType: ConnectionNodeType.basicSampler,
 			width: BasicSamplerState.defaultWidth,
@@ -362,6 +364,7 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 		const newInstrument = new BasicSynthesizerState(localClient.id)
 		dispatch(addBasicSynthesizer(newInstrument))
 		const instrumentPosition = makePosition({
+			...newInstrument,
 			id: newInstrument.id,
 			targetType: ConnectionNodeType.basicSynthesizer,
 			width: BasicSynthesizerState.defaultWidth,

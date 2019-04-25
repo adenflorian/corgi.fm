@@ -1,3 +1,5 @@
+import {List} from 'immutable'
+
 export type ClientId = string
 
 export type Id = string
@@ -13,11 +15,13 @@ export interface Point {
 
 export interface IConnectable {
 	id: string
-	color: string | false
+	color: string | false | List<string>
 	type: ConnectionNodeType
 	width: number
 	height: number
 	name: string
+	inputPortCount?: number
+	outputPortCount?: number
 }
 
 export interface IMultiStateThing extends IConnectable {

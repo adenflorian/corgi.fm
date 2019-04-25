@@ -87,6 +87,8 @@ const defaultPosition = {
 	x: Math.random() * 1600 - 800,
 	y: Math.random() * 1000 - 500,
 	zIndex: 0,
+	inputPortCount: 1,
+	outputPortCount: 1,
 }
 
 const makePositionRecord = Record(defaultPosition)

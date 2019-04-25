@@ -10,7 +10,7 @@ import {IMidiNote} from '../../common/MidiNote'
 import {
 	findLowestAndHighestNotes, globalClockActions, IClientAppState,
 	infiniteSequencerActions, InfiniteSequencerFields, InfiniteSequencerStyle,
-	selectGlobalClockState, selectInfiniteSequencer, sequencerActions,
+	selectConnectionSourceColorByTargetId, selectGlobalClockState, selectInfiniteSequencer, sequencerActions,
 } from '../../common/redux'
 import {getColorStringForMidiNote} from '../../common/shamu-color'
 import {isWhiteKey} from '../Keyboard/Keyboard'
@@ -252,7 +252,7 @@ export const ConnectedInfiniteSequencer = connect(
 				: -1,
 			isPlaying: infiniteSequencerState.isPlaying,
 			isRecording: infiniteSequencerState.isRecording,
-			color: infiniteSequencerState.color,
+			color: selectConnectionSourceColorByTargetId(state.room, props.id),
 			gate: infiniteSequencerState.gate,
 			name: infiniteSequencerState.name,
 			pitch: infiniteSequencerState.pitch,

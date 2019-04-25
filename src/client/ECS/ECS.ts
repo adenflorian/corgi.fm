@@ -1,9 +1,9 @@
 import {List} from 'immutable'
 import {Store} from 'redux'
-import {isSequencerNodeType} from '../../common/common-types'
+import {ConnectionNodeType, isSequencerNodeType} from '../../common/common-types'
 import {
-	AppOptions, IClientAppState, selectAllPositions, selectOption,
-	selectSequencer, selectSequencerIsPlaying,
+	AppOptions, IClientAppState, selectAllPositions, selectGroupSequencer,
+	selectOption, selectSequencer, selectSequencerIsPlaying,
 } from '../../common/redux'
 import {getSequencersSchedulerInfo} from '../note-scanner'
 import {ECSCanvasRenderSystem} from './ECSCanvasRenderSystem'
@@ -39,8 +39,11 @@ function ecsLoop() {
 	// Populate entities
 	// TODO Don't do every frame
 	_entities = selectAllPositions(roomState)
-		.filter(x => isSequencerNodeType(x.targetType))
-		.map(x => selectSequencer(roomState, x.id))
+		.filter(x => isSequencerNodeType(x.targetType) || x.targetType === ConnectionNodeType.groupSequencer)
+		.map(x => isSequencerNodeType(x.targetType)
+			? selectSequencer(roomState, x.id)
+			: selectGroupSequencer(roomState, x.id),
+		)
 		.map(sequencer => new ECSSequencerEntity(
 			new ECSNodeRendererComponent({
 				color: 'green',
@@ -57,7 +60,9 @@ function ecsLoop() {
 				ratio: getSequencersSchedulerInfo()
 					.get(sequencer.id, {loopRatio: 0})
 					.loopRatio,
-				isPlaying: selectSequencerIsPlaying(state.room, sequencer.id),
+				isPlaying: isSequencerNodeType(sequencer.type)
+					? selectSequencerIsPlaying(state.room, sequencer.id)
+					: true,
 			}),
 		))
 		.toList()

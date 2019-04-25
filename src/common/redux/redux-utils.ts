@@ -7,6 +7,7 @@ import {
 import {Action} from 'redux'
 import {createSelectorCreator, defaultMemoize} from 'reselect'
 import {assertArrayHasNoUndefinedElements} from '../common-utils'
+import {GHOST_CONNECTION_MOVE} from './ghost-connections-redux'
 import {
 	IClientAppState, MOVE_POSITION,
 	REPORT_LEVELS, SET_GLOBAL_CLOCK_INDEX,
@@ -185,6 +186,7 @@ export const getActionsBlacklist = () => {
 		SET_GLOBAL_CLOCK_INDEX,
 		UPDATE_POINTER,
 		MOVE_POSITION,
+		GHOST_CONNECTION_MOVE,
 	]
 
 	// If anything is undefined in the blacklist the redux dev tools breaks

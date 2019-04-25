@@ -101,7 +101,7 @@ export interface ISequencerState extends IMultiStateThing, NodeSpecialState {
 	index: number
 	isPlaying: boolean
 	id: string
-	color: string
+	color: string | false
 	name: string
 	isRecording: boolean
 	previousEvents: List<MidiClipEvents>
@@ -137,7 +137,7 @@ export const dummySequencerState: Readonly<SequencerStateBase> = Object.freeze({
 export abstract class SequencerStateBase implements ISequencerState {
 	public readonly index: number = -1
 	public readonly id = uuid.v4()
-	public readonly color: string
+	public readonly color: string | false = false
 	public readonly isRecording: boolean = false
 	public readonly previousEvents: List<MidiClipEvents> = List<MidiClipEvents>()
 	public readonly rate: number = 1
@@ -155,7 +155,7 @@ export abstract class SequencerStateBase implements ISequencerState {
 		public readonly isPlaying: boolean = false,
 		public readonly gate: number = 1,
 	) {
-		this.color = colorFunc(hashbow(this.id)).desaturate(0.2).hsl().string()
+		// this.color = colorFunc(hashbow(this.id)).desaturate(0.2).hsl().string()
 	}
 }
 

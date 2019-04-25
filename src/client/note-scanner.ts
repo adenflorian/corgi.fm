@@ -2,7 +2,8 @@ import {List, Map, Set} from 'immutable'
 import {logger} from '../common/logger'
 import {MidiGlobalClipEvent, MidiRange} from '../common/midi-types'
 import {
-	ClientStore, selectAllSequencers, selectConnectionSourceIdsByTarget,
+	ClientStore, selectAllGroupSequencers, selectAllSequencers,
+	selectConnectionSourceIdsByTarget,
 	selectGlobalClockState,
 	selectSequencerIsPlaying,
 } from '../common/redux'
@@ -127,7 +128,13 @@ function scheduleNotes() {
 
 	_sequencersInfo = sequencersEvents.map(x => ({
 		loopRatio: (currentSongTimeBeats % x.seq.midiClip.length) / x.seq.midiClip.length,
-	}))
+	})).concat(
+		Map(selectAllGroupSequencers(roomState))
+			.map(x => {
+				const totalLength = x.length * x.groupEventBeatLength
+				return {loopRatio: (currentSongTimeBeats % totalLength) / totalLength}
+			}),
+	)
 
 	const instruments = getAllInstruments()
 
