@@ -13,12 +13,12 @@ import {
 	pointersActions, ready, REQUEST_CREATE_ROOM, selectAllClients,
 	selectAllConnections, selectAllMessages, selectAllPointers,
 	selectAllPositions, selectAllRoomMemberIds, selectAllRoomNames,
-	selectAllRoomStates, selectClientBySocketId,
-	selectConnectionsWithSourceOrTargetIds, selectGlobalClockState,
-	selectNodeIdsOwnedByClient, selectPositionsWithIds, selectRoomExists,
-	selectRoomStateByName, selectShamuGraphState, SERVER_ACTION, setActiveRoom,
-	setChat, setClients, setRoomMembers, setRooms,
-	shamuGraphActions, updatePositions,
+	selectAllRooms, selectAllRoomStates,
+	selectClientBySocketId, selectConnectionsWithSourceOrTargetIds,
+	selectGlobalClockState, selectNodeIdsOwnedByClient, selectPositionsWithIds,
+	selectRoomExists, selectRoomStateByName, selectShamuGraphState, SERVER_ACTION,
+	setActiveRoom, setChat, setClients, setRoomMembers,
+	setRooms, shamuGraphActions, updatePositions,
 } from '../common/redux'
 import {WebSocketEvent} from '../common/server-constants'
 import {createServerStuff} from './create-server-stuff'
@@ -179,7 +179,7 @@ export function setupServerWebSocketListeners(io: Server, serverStore: Store) {
 				createServerStuff(newRoomName, serverStore)
 
 				io.local.emit(WebSocketEvent.broadcast, {
-					...setRooms(selectAllRoomNames(serverStore.getState())),
+					...setRooms(selectAllRooms(serverStore.getState())),
 					alreadyBroadcasted: true,
 					source: server,
 				})
@@ -234,7 +234,7 @@ function onLeaveRoom(io: Server, socket: Socket, roomToLeave: string, serverStor
 
 function syncState(newSocket: Socket, roomState: IClientRoomState, serverState: IServerState, activeRoom: string) {
 	newSocket.emit(WebSocketEvent.broadcast, {
-		...setRooms(selectAllRoomNames(serverState)),
+		...setRooms(selectAllRooms(serverState)),
 		alreadyBroadcasted: true,
 		source: server,
 	})

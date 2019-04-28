@@ -101,7 +101,7 @@ export class VirtualKeyboardState implements IMultiStateThing, NodeSpecialState 
 
 	constructor(
 		public readonly ownerId: ClientId,
-		public readonly color: string = 'black'
+		public readonly color: string = 'black',
 	) {}
 }
 

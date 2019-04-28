@@ -1,7 +1,7 @@
 import {Store} from 'redux'
 import {Server} from 'socket.io'
 import {logger} from '../common/logger'
-import {deleteRoom, selectAllRoomNames, setRooms} from '../common/redux'
+import {deleteRoom, selectAllRoomNames, selectAllRooms, setRooms} from '../common/redux'
 import {WebSocketEvent} from '../common/server-constants'
 import {lobby} from './server-socket-listeners'
 
@@ -21,7 +21,7 @@ export function startRoomWatcher(io: Server, serverStore: Store) {
 			logger.log('deleting empty rooms: ', emptyRooms)
 
 			io.local.emit(WebSocketEvent.broadcast, {
-				...setRooms(selectAllRoomNames(serverStore.getState())),
+				...setRooms(selectAllRooms(serverStore.getState())),
 				alreadyBroadcasted: true,
 				source: 'server',
 			})
