@@ -68,7 +68,7 @@ export class BasicSynthesizerState implements IConnectable, NodeSpecialState {
 		color: false,
 		type: ConnectionNodeType.basicSynthesizer,
 		fineTuning: 0,
-		gain: 1,
+		gain: 0.5,
 		width: BasicSynthesizerState.defaultWidth,
 		height: BasicSynthesizerState.defaultHeight,
 		name: 'Dummy Basic Synth',
@@ -83,7 +83,7 @@ export class BasicSynthesizerState implements IConnectable, NodeSpecialState {
 	public readonly attack: number = 0.01
 	public readonly release: number = 1
 	public readonly fineTuning: number = 0
-	public readonly gain = 1
+	public readonly gain: number = 0.5
 	public readonly color: false = false
 	public readonly type = ConnectionNodeType.basicSynthesizer
 	public readonly width: number = BasicSynthesizerState.defaultWidth

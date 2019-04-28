@@ -51,7 +51,7 @@ export class BasicSamplerState implements IConnectable, NodeSpecialState {
 		attack: 0,
 		release: 0,
 		detune: 0,
-		gain: 1,
+		gain: 0.5,
 		color: false,
 		type: ConnectionNodeType.basicSampler,
 		width: BasicSamplerState.defaultWidth,
@@ -65,8 +65,8 @@ export class BasicSamplerState implements IConnectable, NodeSpecialState {
 	public readonly lowPassFilterCutoffFrequency: number = Math.min(10000, Math.random() * 10000 + 1000)
 	public readonly attack: number = 0.01
 	public readonly release: number = 1
-	public readonly detune = 0
-	public readonly gain = 1
+	public readonly detune: number = 0
+	public readonly gain: number = 0.5
 	public readonly color: false = false
 	public readonly type = ConnectionNodeType.basicSampler
 	public readonly width: number = BasicSamplerState.defaultWidth
