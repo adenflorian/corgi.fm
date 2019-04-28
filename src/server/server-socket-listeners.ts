@@ -18,7 +18,7 @@ import {
 	selectGlobalClockState, selectNodeIdsOwnedByClient, selectPositionsWithIds,
 	selectRoomExists, selectRoomStateByName, selectShamuGraphState, SERVER_ACTION,
 	setActiveRoom, setChat, setClients, setRoomMembers,
-	setRooms, shamuGraphActions, updatePositions,
+	setRooms, shamuGraphActions, updatePositions, userLeftRoom,
 } from '../common/redux'
 import {WebSocketEvent} from '../common/server-constants'
 import {createServerStuff} from './create-server-stuff'
@@ -175,7 +175,7 @@ export function setupServerWebSocketListeners(io: Server, serverStore: Store) {
 			if (selectRoomExists(serverStore.getState(), newRoomName)) {
 				throw new Error(`room exists, this shouldn't happen`)
 			} else {
-				serverStore.dispatch(createRoom(newRoomName))
+				serverStore.dispatch(createRoom(newRoomName, Date.now()))
 				createServerStuff(newRoomName, serverStore)
 
 				io.local.emit(WebSocketEvent.broadcast, {
@@ -203,6 +203,8 @@ function onLeaveRoom(io: Server, socket: Socket, roomToLeave: string, serverStor
 	const roomState = selectRoomStateByName(serverStore.getState(), roomToLeave)
 	if (!roomState) return logger.warn(`onLeaveRoom-couldn't find room state: roomToLeave: ${roomToLeave}`)
 	const clientId = selectClientBySocketId(serverStore.getState(), socket.id).id
+
+	serverStore.dispatch(userLeftRoom(roomToLeave, Date.now()))
 
 	{
 		const nodeIdsOwnedByClient = selectNodeIdsOwnedByClient(roomState, clientId)

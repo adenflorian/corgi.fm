@@ -1,7 +1,7 @@
 import {Store} from 'redux'
 import {Server} from 'socket.io'
 import {logger} from '../common/logger'
-import {deleteRoom, selectAllRoomNames, selectAllRooms, setRooms} from '../common/redux'
+import {deleteRoom, Room, selectAllRooms, setRooms} from '../common/redux'
 import {WebSocketEvent} from '../common/server-constants'
 import {lobby} from './server-socket-listeners'
 
@@ -9,16 +9,22 @@ export function startRoomWatcher(io: Server, serverStore: Store) {
 	setInterval(checkRooms, 5000)
 
 	function checkRooms() {
+		const notLobby = (room: Room) => room.name !== lobby
+		const isEmpty = (room: Room) => ioRoomNames.includes(room.name) === false
+		const emptyForTooLong = (room: Room) => (Date.now() - room.lastTimeUserLeftTimestamp!) > 60 * 1000
+		const destroy = (room: Room) => serverStore.dispatch(deleteRoom(room.name))
+
 		const ioRoomNames = Object.keys(io.sockets.adapter.rooms)
 
-		const reduxRooms = selectAllRoomNames(serverStore.getState())
+		const emptyRooms = selectAllRooms(serverStore.getState())
+			.filter(notLobby)
+			.filter(isEmpty)
+			.filter(emptyForTooLong)
 
-		const emptyRooms = reduxRooms.filter(x => ioRoomNames.includes(x) === false && x !== lobby)
-
-		emptyRooms.forEach(x => serverStore.dispatch(deleteRoom(x)))
+		emptyRooms.forEach(destroy)
 
 		if (emptyRooms.count() > 0) {
-			logger.log('deleting empty rooms: ', emptyRooms)
+			logger.log('deleting empty rooms: ', emptyRooms.toJS())
 
 			io.local.emit(WebSocketEvent.broadcast, {
 				...setRooms(selectAllRooms(serverStore.getState())),

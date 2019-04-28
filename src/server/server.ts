@@ -14,7 +14,7 @@ logServerEnv()
 
 const serverStore = configureServerStore()
 
-serverStore.dispatch(createRoom(lobby))
+serverStore.dispatch(createRoom(lobby, Date.now()))
 
 createServerStuff(lobby, serverStore)
 

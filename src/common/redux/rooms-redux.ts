@@ -27,10 +27,20 @@ export const changeRoom = (room: string) => ({
 
 export const CREATE_ROOM = 'CREATE_ROOM'
 export type CreateRoomAction = ReturnType<typeof createRoom>
-export const createRoom = (name: string) => ({
+export const createRoom = (name: string, timestamp: number) => ({
 	type: CREATE_ROOM as typeof CREATE_ROOM,
 	SERVER_ACTION,
 	name,
+	timestamp,
+})
+
+export const USER_LEFT_ROOM = 'USER_LEFT_ROOM'
+export type UserLeftRoomAction = ReturnType<typeof userLeftRoom>
+export const userLeftRoom = (name: string, timestamp: number) => ({
+	type: USER_LEFT_ROOM as typeof USER_LEFT_ROOM,
+	SERVER_ACTION,
+	name,
+	timestamp,
 })
 
 export const REQUEST_CREATE_ROOM = 'REQUEST_CREATE_ROOM'
@@ -49,7 +59,7 @@ export const deleteRoom = (name: string) => ({
 })
 
 export type RoomsReduxAction = SetRoomsAction | SetActiveRoomAction |
-	ChangeRoomAction | CreateRoomAction | DeleteRoomAction
+	ChangeRoomAction | CreateRoomAction | DeleteRoomAction | UserLeftRoomAction
 
 const initialState = Object.freeze({
 	all: Map<RoomName, Room>(),
@@ -63,7 +73,9 @@ export type Rooms = Map<RoomName, Room>
 export type RoomName = string
 
 export interface Room {
-	name: RoomName
+	name: RoomName,
+	creationTimestamp: number,
+	lastTimeUserLeftTimestamp?: number,
 }
 
 export const roomsReducer: Reducer<IRoomsState, RoomsReduxAction> = combineReducers({
@@ -73,8 +85,9 @@ export const roomsReducer: Reducer<IRoomsState, RoomsReduxAction> = combineReduc
 
 function allRoomsReducer(rooms: Rooms = initialState.all, action: RoomsReduxAction) {
 	switch (action.type) {
-		case CREATE_ROOM: return rooms.set(action.name, {name: action.name})
+		case CREATE_ROOM: return rooms.set(action.name, {name: action.name, creationTimestamp: action.timestamp})
 		case DELETE_ROOM: return rooms.delete(action.name)
+		case USER_LEFT_ROOM: return rooms.update(action.name, room => ({...room, lastTimeUserLeftTimestamp: action.timestamp}))
 		case SET_ROOMS: return Map<RoomName, Room>(action.rooms)
 		default: return rooms
 	}
