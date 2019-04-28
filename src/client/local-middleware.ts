@@ -12,9 +12,10 @@ import {
 	gridSequencerActions, IClientAppState, ISequencerState, makeActionCreator,
 	makePosition, MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID,
 	NetworkActionType, READY,
-	selectActiveRoom, selectDirectDownstreamSequencerIds, selectLocalClient, selectPositionExtremes,
-	selectSequencer, selectVirtualKeyboardById, selectVirtualKeyboardByOwner,
-	sequencerActions, SET_ACTIVE_ROOM, SET_GRID_SEQUENCER_NOTE,
+	RECORD_SEQUENCER_NOTE, selectActiveRoom, selectDirectDownstreamSequencerIds, selectLocalClient,
+	selectPositionExtremes, selectSequencer, selectVirtualKeyboardById,
+	selectVirtualKeyboardByOwner, sequencerActions, SET_ACTIVE_ROOM,
+	SET_GRID_SEQUENCER_NOTE,
 	SKIP_NOTE,
 	USER_KEY_PRESS,
 	UserInputAction,
@@ -120,6 +121,15 @@ export const createLocalMiddleware: () => Middleware<{}, IClientAppState> = () =
 			if (setGridSeqNoteAction.enabled) {
 				playShortNote(setGridSeqNoteAction.note, setGridSeqNoteAction.id, getState().room)
 			}
+
+			next(action)
+
+			return
+		}
+		case RECORD_SEQUENCER_NOTE: {
+			const recordSeqNoteAction = action as ReturnType<typeof sequencerActions.recordNote>
+
+			playShortNote(recordSeqNoteAction.note, recordSeqNoteAction.id, getState().room)
 
 			next(action)
 
