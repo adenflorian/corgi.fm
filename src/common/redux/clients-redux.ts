@@ -1,15 +1,15 @@
 import * as animal from 'animal-id'
 import {createSelector} from 'reselect'
 import {v4} from 'uuid'
+import {serverClientId} from '../common-constants'
 import {ClientId} from '../common-types'
 import {logger} from '../logger'
 import {getColorHslByString} from '../shamu-color'
 import {
 	BROADCASTER_ACTION, createDeepEqualSelector, createReducer,
-	IClientAppState, IServerState, selectLocalSocketId,
-	SELF_DISCONNECTED, GLOBAL_SERVER_ACTION,
+	GLOBAL_SERVER_ACTION, IClientAppState, IServerState,
+	selectLocalSocketId, SELF_DISCONNECTED,
 } from './index'
-import {serverClientId} from '../common-constants';
 
 export const ADD_CLIENT = 'ADD_CLIENT'
 export type AddClientAction = ReturnType<typeof addClient>

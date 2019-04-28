@@ -9,11 +9,11 @@ import {
 	addGridSequencer, addInfiniteSequencer, addPosition,
 	addSimpleReverb, BasicSamplerState,
 	BasicSynthesizerState, ClientState, Connection, connectionsActions,
-	createRoomAction, createSequencerEvents, GridSequencerState,
-	InfiniteSequencerState, InfiniteSequencerStyle, IServerState,
-	makePosition, makeSequencerEvents,
-	selectAllPositions, SimpleReverbState, updatePositions,
-	getConnectionNodeInfo, selectAllConnections,
+	createRoomAction, createSequencerEvents, getConnectionNodeInfo,
+	GridSequencerState, InfiniteSequencerState, InfiniteSequencerStyle,
+	IServerState, makePosition,
+	makeSequencerEvents, selectAllConnections, selectAllPositions,
+	SimpleReverbState, updatePositions,
 } from '../common/redux'
 
 const masterAudioOutput: IConnectable = getConnectionNodeInfo(ConnectionNodeType.audioOutput).stateSelector({} as any, '')

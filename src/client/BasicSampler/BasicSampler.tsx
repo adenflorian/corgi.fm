@@ -2,16 +2,16 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 import {
-	BasicSamplerParam, selectSampler, setBasicSamplerParam, getConnectionNodeInfo
+	BasicSamplerParam, getConnectionNodeInfo, selectSampler, setBasicSamplerParam,
 } from '../../common/redux'
 import {IClientAppState} from '../../common/redux'
+import {
+	attackToolTip, detuneToolTip, gainToolTip, lpfToolTip, panToolTip, releaseToolTip,
+} from '../client-constants'
 import {Knob} from '../Knob/Knob'
 import {Panel} from '../Panel/Panel'
 import {ConnectedNoteSchedulerVisualPlaceholder} from '../WebAudio/SchedulerVisual'
 import './BasicSampler.less'
-import {
-	panToolTip, lpfToolTip, attackToolTip, releaseToolTip, detuneToolTip, gainToolTip
-} from '../client-constants';
 
 interface IBasicSamplerProps {
 	color: string

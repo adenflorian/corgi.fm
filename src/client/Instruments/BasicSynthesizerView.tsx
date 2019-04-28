@@ -4,19 +4,19 @@ import {Dispatch} from 'redux'
 import {IMidiNotes} from '../../common/MidiNote'
 import {ShamuOscillatorType} from '../../common/OscillatorTypes'
 import {
-	BasicSynthesizerParam, selectBasicSynthesizer,
-	setBasicSynthesizerOscillatorType, setBasicSynthesizerParam,
-	getConnectionNodeInfo,
+	BasicSynthesizerParam, getConnectionNodeInfo,
+	selectBasicSynthesizer, setBasicSynthesizerOscillatorType,
+	setBasicSynthesizerParam,
 } from '../../common/redux'
 import {IClientAppState} from '../../common/redux'
+import {
+	attackToolTip, detuneToolTip, gainToolTip, lpfToolTip, panToolTip, releaseToolTip,
+} from '../client-constants'
 import {Knob} from '../Knob/Knob'
 import {Panel} from '../Panel/Panel'
 import {ConnectedNoteSchedulerVisualPlaceholder} from '../WebAudio/SchedulerVisual'
 import {BasicSynthesizerOscillatorTypes} from './BasicSynthesizerOscillatorTypes'
 import './BasicSynthesizerView.less'
-import {
-	panToolTip, lpfToolTip, attackToolTip, releaseToolTip, detuneToolTip, gainToolTip
-} from '../client-constants';
 
 export type MidiNotes = IMidiNotes
 

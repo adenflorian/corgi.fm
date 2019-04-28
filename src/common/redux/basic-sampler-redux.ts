@@ -1,9 +1,12 @@
 import {AnyAction} from 'redux'
 import * as uuid from 'uuid'
 import {ClientId, ConnectionNodeType, IConnectable} from '../common-types'
-import {addMultiThing, BROADCASTER_ACTION, createSelectAllOfThingAsArray, IClientRoomState, IMultiState, makeMultiReducer, NetworkActionType, SERVER_ACTION} from './index'
+import {
+	addMultiThing, BROADCASTER_ACTION, createSelectAllOfThingAsArray,
+	IClientRoomState, IMultiState, makeMultiReducer, NetworkActionType,
+	SERVER_ACTION,
+} from './index'
 import {NodeSpecialState} from './shamu-graph'
-import {getConnectionNodeInfo} from './node-types';
 
 export const addBasicSampler = (sampler: BasicSamplerState) =>
 	addMultiThing(sampler, ConnectionNodeType.basicSampler, NetworkActionType.SERVER_AND_BROADCASTER)

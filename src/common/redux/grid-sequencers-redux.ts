@@ -3,7 +3,7 @@ import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
 import {ConnectionNodeType} from '../common-types'
 import {assertArrayHasNoUndefinedElements} from '../common-utils'
-import {MidiClip, MidiClipEvents, makeMidiClipEvent} from '../midi-types'
+import {makeMidiClipEvent, MidiClip, MidiClipEvents} from '../midi-types'
 import {emptyMidiNotes, IMidiNote, MidiNotes} from '../MidiNote'
 import {MAX_MIDI_NOTE_NUMBER_127} from '../server-constants'
 import {
@@ -12,7 +12,7 @@ import {
 	PLAY_ALL, selectGlobalClockState, SERVER_ACTION, STOP_ALL,
 	UNDO_SEQUENCER,
 } from './index'
-import {PLAY_SEQUENCER, SequencerAction, SequencerStateBase, STOP_SEQUENCER, selectAllGridSequencers} from './sequencer-redux'
+import {PLAY_SEQUENCER, selectAllGridSequencers, SequencerAction, SequencerStateBase, STOP_SEQUENCER} from './sequencer-redux'
 
 export const addGridSequencer = (gridSequencer: GridSequencerState) =>
 	addMultiThing(gridSequencer, ConnectionNodeType.gridSequencer, NetworkActionType.SERVER_AND_BROADCASTER)

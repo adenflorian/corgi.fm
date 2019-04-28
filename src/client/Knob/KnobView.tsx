@@ -1,7 +1,7 @@
+import {stripIndent} from 'common-tags'
 import * as React from 'react'
 import {CssColor} from '../../common/shamu-color'
 import './Knob.less'
-import {stripIndent} from 'common-tags';
 
 interface IKnobViewProps {
 	label: string

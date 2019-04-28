@@ -68,7 +68,7 @@ async function setupAsync() {
 	const loadedOptionsState = loadOptionsState()
 
 	const store = configureStore({
-		options: loadedOptionsState
+		options: loadedOptionsState,
 	})
 
 	validateOptionsState(store, loadedOptionsState)

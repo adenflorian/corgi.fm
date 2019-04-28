@@ -4,8 +4,8 @@ import {rateLimitedDebounce} from '../common/common-utils'
 import {logger} from '../common/logger'
 import {
 	BroadcastAction, BROADCASTER_ACTION, getActionsBlacklist,
-	IClientAppState, MOVE_POSITION,
-	selectLocalSocketId, SERVER_ACTION, UPDATE_POINTER, GLOBAL_SERVER_ACTION,
+	GLOBAL_SERVER_ACTION, IClientAppState,
+	MOVE_POSITION, selectLocalSocketId, SERVER_ACTION, UPDATE_POINTER,
 } from '../common/redux'
 import {WebSocketEvent} from '../common/server-constants'
 import {socket} from './websocket-listeners'

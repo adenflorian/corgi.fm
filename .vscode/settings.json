@@ -145,7 +145,8 @@
         "typings",
         "built/**/*",
         ".cache",
-        "TODO.md"
+        "TODO.md",
+        "nginx-site-config"
     ],
     "less.lint.emptyRules": "ignore",
     "files.associations": {
