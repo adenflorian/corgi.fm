@@ -4,6 +4,17 @@
 - [√] things shouldn't be blurry at zoom 1
 - [√] increase room deletion timeout
 	- [√] and make it so it's actually based on room lifetime instead of a loop
+- [√] make option for proper vector graphics regarding on zoom levels
+- [√] try out new fonts (again)
+	- https://fonts.google.com/specimen/Questrial
+	- https://fonts.google.com/specimen/Didact+Gothic
+	- https://fonts.google.com/specimen/Muli
+	- current font: https://fonts.google.com/specimen/Roboto
+- [...] high level sequencer (Group Sequencer)
+	- doesn't control notes, but whole song sections
+	- different colored sections
+	- colored wires for each section
+	- can draw wires from 2 diff sections into same sequencer
 	
 # Soon
 - [ ] make submenu for creating grid sequencer with preset sizes
@@ -11,13 +22,9 @@
 - [ ] deploy script should check if anyone is on the server first
 - [ ] chained sequencers should only play if upstream sequencer is playing
 - [ ] put sequencer timeline animation as separate setting in options
+- [ ] redo on sequencers
 
 # Later
-- [√] try out new fonts (again)
-	- https://fonts.google.com/specimen/Questrial
-	- https://fonts.google.com/specimen/Didact+Gothic
-	- https://fonts.google.com/specimen/Muli
-	- current font: https://fonts.google.com/specimen/Roboto
 - [ ] move ghost connectors state to its own state so connections memoizations will be more effective
 - [ ] support undo of node delete
 	- [ ] redux
@@ -25,12 +32,6 @@
 		- i don't want to write undo logic for each node
 		- maybe do in multi reducer?
 			- please no
-- [ ] make option for proper vector graphics regarding on zoom levels
-- [ ] high level sequencer
-	- doesn't control notes, but whole song sections
-	- different colored sections
-	- colored wires for each section
-	- can draw wires from 2 diff sections into same sequencer
 - [ ] global mod matrix
 - [ ] suggest notes
 - [ ] compressor
