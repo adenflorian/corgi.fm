@@ -1,8 +1,8 @@
 # Now
+- [√] don't lose focus on chat when sending message, only lose focus on enter if message is empty
 	
 # Soon
 - [ ] things shouldn't be blurry at zoom 1
-- [ ] don't lose focus on chat when sending message, only lose focus on enter if message is empty
 - [ ] make submenu for creating grid sequencer with preset sizes
 - [ ] allow saving of graph somewhere (server, browser local storage, download and upload)
 - [ ] deploy script should check if anyone is on the server first

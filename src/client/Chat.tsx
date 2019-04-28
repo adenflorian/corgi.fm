@@ -161,6 +161,9 @@ export class Chat extends Component<AllProps, IChatComponentState> {
 			}))
 
 			this.setState({chatMessage: ''})
+
+			// Don't blur if a message was sent, so user can easily send another message
+			return
 		}
 
 		return (document.activeElement as HTMLElement).blur()
