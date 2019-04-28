@@ -1,15 +1,15 @@
 # Now
 - [√] don't lose focus on chat when sending message, only lose focus on enter if message is empty
 - [√] play note when placed in grid sequencer
+- [√] things shouldn't be blurry at zoom 1
+- [ ] increase room deletion timeout
+	- [ ] and make it so it's actually based on room lifetime instead of a loop
 	
 # Soon
-- [ ] things shouldn't be blurry at zoom 1
 - [ ] make submenu for creating grid sequencer with preset sizes
 - [ ] allow saving of graph somewhere (server, browser local storage, download and upload)
 - [ ] deploy script should check if anyone is on the server first
 - [ ] chained sequencers should only play if upstream sequencer is playing
-- [ ] increase room deletion timeout
-	- [ ] and make it so it's actually based on room lifetime instead of a loop
 - [ ] put sequencer timeline animation as separate setting in options
 
 # Later

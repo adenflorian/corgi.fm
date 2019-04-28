@@ -7,7 +7,7 @@ import {logger} from '../common/logger'
 import {
 	addClient, addRoomMember, BroadcastAction, CHANGE_ROOM,
 	clientDisconnected, ClientState, connectionsActions, createRoom,
-	createRoomAction, deletePositions, deleteRoom, deleteRoomMember,
+	createRoomAction, deletePositions, deleteRoomMember,
 	deleteThingsAny, getActionsBlacklist, GLOBAL_SERVER_ACTION,
 	globalClockActions, IClientRoomState, IServerState, maxUsernameLength,
 	pointersActions, ready, REQUEST_CREATE_ROOM, selectAllClients,
@@ -31,26 +31,6 @@ const server = 'server'
 const version = serverInfo.version
 
 export function setupServerWebSocketListeners(io: Server, serverStore: Store) {
-	setInterval(() => {
-		const ioRoomNames = Object.keys(io.sockets.adapter.rooms)
-
-		const reduxRooms = selectAllRoomNames(serverStore.getState())
-
-		const emptyRooms = reduxRooms.filter(x => ioRoomNames.includes(x) === false && x !== lobby)
-
-		emptyRooms.forEach(x => serverStore.dispatch(deleteRoom(x)))
-
-		if (emptyRooms.count() > 0) {
-			logger.log('deleting empty rooms: ', emptyRooms)
-
-			io.local.emit(WebSocketEvent.broadcast, {
-				...setRooms(selectAllRoomNames(serverStore.getState())),
-				alreadyBroadcasted: true,
-				source: 'server',
-			})
-		}
-	}, 5000)
-
 	io.on('connection', socket => {
 		socket.emit('version', version)
 
