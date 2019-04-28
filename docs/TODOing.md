@@ -1,5 +1,6 @@
 # Now
 - [√] don't lose focus on chat when sending message, only lose focus on enter if message is empty
+- [√] play note when placed in grid sequencer
 	
 # Soon
 - [ ] things shouldn't be blurry at zoom 1
@@ -10,7 +11,6 @@
 - [ ] increase room deletion timeout
 	- [ ] and make it so it's actually based on room lifetime instead of a loop
 - [ ] put sequencer timeline animation as separate setting in options
-- [ ] play note when placed in grid sequencer
 
 # Later
 - [√] try out new fonts (again)

@@ -9,12 +9,14 @@ import {
 	addBasicSampler, addBasicSynthesizer, addPosition, addVirtualKeyboard,
 	BasicSamplerState, BasicSynthesizerState, Connection, connectionsActions,
 	deleteAllPositions, deleteAllThings, deletePositions, deleteThingsAny,
-	IClientAppState, ISequencerState, makeActionCreator, makePosition,
-	MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID, NetworkActionType,
-	READY, selectActiveRoom,
-	selectDirectDownstreamSequencerIds, selectLocalClient, selectPositionExtremes, selectSequencer,
-	selectVirtualKeyboardById, selectVirtualKeyboardByOwner, sequencerActions,
-	SET_ACTIVE_ROOM, SKIP_NOTE, USER_KEY_PRESS,
+	gridSequencerActions, IClientAppState, ISequencerState, makeActionCreator,
+	makePosition, MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID,
+	NetworkActionType, READY,
+	selectActiveRoom, selectDirectDownstreamSequencerIds, selectLocalClient, selectPositionExtremes,
+	selectSequencer, selectVirtualKeyboardById, selectVirtualKeyboardByOwner,
+	sequencerActions, SET_ACTIVE_ROOM, SET_GRID_SEQUENCER_NOTE,
+	SKIP_NOTE,
+	USER_KEY_PRESS,
 	UserInputAction,
 	UserKeys,
 	VIRTUAL_KEY_PRESSED,
@@ -109,6 +111,17 @@ export const createLocalMiddleware: () => Middleware<{}, IClientAppState> = () =
 				.forEach(x => {
 					dispatch(sequencerActions.recordNote(x.id, virtualKeyPressedAction.midiNote))
 				})
+
+			return
+		}
+		case SET_GRID_SEQUENCER_NOTE: {
+			const setGridSeqNoteAction = action as ReturnType<typeof gridSequencerActions.setNote>
+
+			if (setGridSeqNoteAction.enabled) {
+				playShortNote(setGridSeqNoteAction.note, setGridSeqNoteAction.id, getState().room)
+			}
+
+			next(action)
 
 			return
 		}
@@ -274,6 +287,18 @@ function scheduleNote(note: IMidiNote, sourceId: string, roomState: IClientRoomS
 		} else {
 			instrument.scheduleRelease(note, 0)
 		}
+	})
+}
+
+function playShortNote(note: IMidiNote, sourceId: string, roomState: IClientRoomState) {
+	const targetIds = selectConnectionsWithSourceIds(roomState, [sourceId]).map(x => x.targetId)
+
+	getAllInstruments().forEach(instrument => {
+		if (targetIds.includes(instrument.id) === false) return
+
+		instrument.scheduleNote(note, 0, true, Set([sourceId]))
+
+		instrument.scheduleRelease(note, 0.25)
 	})
 }
 
