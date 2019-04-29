@@ -30,6 +30,7 @@ export * from './group-sequencers-redux'
 
 export * from './node-types'
 export * from './options-redux'
+export * from './room-settings-redux'
 export * from './positions-redux'
 export * from './room-members-redux'
 export * from './shamu-graph'

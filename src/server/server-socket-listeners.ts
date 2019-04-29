@@ -10,15 +10,15 @@ import {
 	createRoomAction, deletePositions, deleteRoomMember,
 	deleteThingsAny, getActionsBlacklist, GLOBAL_SERVER_ACTION,
 	globalClockActions, IClientRoomState, IServerState, maxUsernameLength,
-	pointersActions, ready, REQUEST_CREATE_ROOM, selectAllClients,
-	selectAllConnections, selectAllMessages, selectAllPointers,
-	selectAllPositions, selectAllRoomMemberIds, selectAllRoomNames,
-	selectAllRooms, selectAllRoomStates,
-	selectClientBySocketId, selectConnectionsWithSourceOrTargetIds,
-	selectGlobalClockState, selectNodeIdsOwnedByClient, selectPositionsWithIds,
-	selectRoomExists, selectRoomStateByName, selectShamuGraphState, SERVER_ACTION,
-	setActiveRoom, setChat, setClients, setRoomMembers,
-	setRooms, shamuGraphActions, updatePositions, userLeftRoom,
+	pointersActions, ready, REQUEST_CREATE_ROOM, roomSettingsActions,
+	selectAllClients, selectAllConnections, selectAllMessages,
+	selectAllPointers, selectAllPositions, selectAllRoomMemberIds,
+	selectAllRoomNames, selectAllRooms,
+	selectAllRoomStates, selectClientBySocketId,
+	selectConnectionsWithSourceOrTargetIds, selectGlobalClockState, selectNodeIdsOwnedByClient,
+	selectPositionsWithIds, selectRoomExists, selectRoomSettings, selectRoomStateByName,
+	selectShamuGraphState, SERVER_ACTION, setActiveRoom, setChat,
+	setClients, setRoomMembers, setRooms, shamuGraphActions, updatePositions, userLeftRoom,
 } from '../common/redux'
 import {WebSocketEvent} from '../common/server-constants'
 import {createServerStuff} from './create-server-stuff'
@@ -259,6 +259,7 @@ function syncState(newSocket: Socket, roomState: IClientRoomState, serverState: 
 		[setChat, selectAllMessages],
 		[connectionsActions.updateAll, selectAllConnections],
 		[updatePositions, selectAllPositions],
+		[roomSettingsActions.replaceAll, selectRoomSettings],
 		[shamuGraphActions.replace, selectShamuGraphState],
 		[globalClockActions.replace, selectGlobalClockState],
 	]
