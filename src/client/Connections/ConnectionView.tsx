@@ -9,11 +9,11 @@ import {
 	connectionsActions, getConnectionNodeInfo, GhostConnection,
 	ghostConnectorActions,
 	GhostConnectorAddingOrMoving, IClientAppState,
-	IConnection, selectConnection,
-	selectConnectionSourceColor, selectConnectionSourceIsActive,
-	selectConnectionSourceIsSending, selectConnectionStackOrderForSource,
-	selectConnectionStackOrderForTarget, selectLocalClientId, selectOption,
-	selectPosition, selectUserInputKeys, shamuConnect,
+	IConnection, LineType,
+	selectConnection, selectConnectionSourceColor,
+	selectConnectionSourceIsActive, selectConnectionSourceIsSending,
+	selectConnectionStackOrderForSource, selectConnectionStackOrderForTarget, selectLocalClientId,
+	selectOption, selectPosition, selectRoomSettings, selectUserInputKeys, shamuConnect,
 } from '../../common/redux'
 import {longLineTooltip} from '../client-constants'
 import {ConnectionLine} from './ConnectionLine'
@@ -41,6 +41,7 @@ interface IConnectionViewReduxProps {
 	sourceStackOrder?: number
 	targetStackOrder?: number
 	connection: IConnection
+	lineType: LineType
 }
 
 type IConnectionViewAllProps = IConnectionViewProps & IConnectionViewReduxProps & {dispatch: Dispatch}
@@ -49,15 +50,13 @@ export const longLineStrokeWidth = 2
 export const connectorWidth = 16
 export const connectorHeight = 8
 
-const line0 = new LineState(0, 0, 0, 0)
-
 const buffer = 50
 const joint = 8
 
 export const ConnectionView =
 	React.memo(function _ConnectionView(props: IConnectionViewAllProps) {
 		const {color, saturateSource, saturateTarget, id, sourceX, sourceY, targetX, targetY,
-			targetStackOrder = 0, sourceStackOrder = 0, speed = 1,
+			targetStackOrder = 0, sourceStackOrder = 0, speed = 1, lineType,
 			isSourcePlaying, highQuality, dispatch, localClientId, connection} = props
 
 		const sourceConnectorLeft = sourceX + (connectorWidth * sourceStackOrder)
@@ -72,16 +71,9 @@ export const ConnectionView =
 			targetY,
 		)
 
-		const pathDPart1 = makeCurvedPath(connectedLine)
-
-		// function makeStraightPath(line: LineState) {
-		// 	return `
-		// 		M ${line.x1} ${line.y1}
-		// 		L ${line.x1 + joint} ${line.y1}
-		// 		L ${line.x2 - joint} ${line.y2}
-		// 		L ${line.x2} ${line.y2}
-		// 	`
-		// }
+		const pathDPart1 = lineType === LineType.Straight
+			? makeStraightPath(connectedLine)
+			: makeCurvedPath(connectedLine)
 
 		// This path is a hack to get the filter to work properly
 		// It forces the "render box?" to be bigger than the actual drawn path
@@ -178,6 +170,15 @@ export function makeCurvedPath(line: LineState) {
 	`
 }
 
+export function makeStraightPath(line: LineState) {
+	return stripIndent`
+		M ${line.x1} ${line.y1}
+		L ${line.x1 + joint} ${line.y1}
+		L ${line.x2 - joint} ${line.y2}
+		L ${line.x2} ${line.y2}
+	`
+}
+
 export const ConnectedConnectionView = shamuConnect(
 	(state: IClientAppState, props: IConnectionViewProps): IConnectionViewReduxProps => {
 		// const globalClockState = selectGlobalClockState(state.room)
@@ -207,6 +208,7 @@ export const ConnectedConnectionView = shamuConnect(
 			saturateSource: isSourceActive || isSourceSending,
 			saturateTarget: isSourceSending,
 			connection,
+			lineType: selectRoomSettings(state.room).lineType,
 		}
 	},
 )(ConnectionView)
