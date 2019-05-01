@@ -89,7 +89,7 @@ class MasterClockState implements IConnectable {
 	public readonly id = MASTER_CLOCK_SOURCE_ID
 	public readonly color = CssColor.brightBlue
 	public readonly type = ConnectionNodeType.masterClock
-	public readonly width = 256
+	public readonly width = 172
 	public readonly height = 128
 	public readonly name = 'master clock'
 
