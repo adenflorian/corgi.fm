@@ -52,17 +52,17 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 	connectNodes(simpleReverb, masterAudioOutput)
 
 	const serverStuffDefinitions = Object.freeze({
-		bass: {
-			source: {
-				type: ConnectionNodeType.gridSequencer,
-				events: getBassNotes(),
-				name: getConnectionNodeInfo(ConnectionNodeType.gridSequencer).typeName,
-				notesToShow: 18,
-			},
-			target: {
-				type: ConnectionNodeType.basicSampler,
-			},
-		},
+		// bass: {
+		// 	source: {
+		// 		type: ConnectionNodeType.gridSequencer,
+		// 		events: getBassNotes(),
+		// 		name: getConnectionNodeInfo(ConnectionNodeType.gridSequencer).typeName,
+		// 		notesToShow: 18,
+		// 	},
+		// 	target: {
+		// 		type: ConnectionNodeType.basicSampler,
+		// 	},
+		// },
 		melody: {
 			source: {
 				type: ConnectionNodeType.gridSequencer,
@@ -86,17 +86,17 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 				type: ConnectionNodeType.basicSampler,
 			},
 		},
-		arp2: {
-			source: {
-				type: ConnectionNodeType.infiniteSequencer,
-				events: getInitialInfiniteSequencerEvents(),
-				name: getConnectionNodeInfo(ConnectionNodeType.infiniteSequencer).typeName,
-				infinityStyle: InfiniteSequencerStyle.colorBars,
-			},
-			target: {
-				type: ConnectionNodeType.basicSynthesizer,
-			},
-		},
+		// arp2: {
+		// 	source: {
+		// 		type: ConnectionNodeType.infiniteSequencer,
+		// 		events: getInitialInfiniteSequencerEvents(),
+		// 		name: getConnectionNodeInfo(ConnectionNodeType.infiniteSequencer).typeName,
+		// 		infinityStyle: InfiniteSequencerStyle.colorBars,
+		// 	},
+		// 	target: {
+		// 		type: ConnectionNodeType.basicSynthesizer,
+		// 	},
+		// },
 	})
 
 	const serverStuff = createSourceAndTargets(serverStuffDefinitions)
@@ -114,7 +114,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 	)
 
 	// Do extra connections after calculating positions, so that it doesn't mess up positions
-	connectNodes(serverStuff.get('arp')!.source, serverStuff.get('arp2')!.target)
+	// connectNodes(serverStuff.get('arp')!.source, serverStuff.get('arp2')!.target)
 
 	serverStuff.forEach(x => {
 		connectNodes(x.target, masterAudioOutput)
