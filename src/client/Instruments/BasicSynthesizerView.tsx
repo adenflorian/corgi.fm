@@ -66,6 +66,7 @@ export class BasicSynthesizerView
 								min={-1}
 								max={1}
 								value={pan}
+								defaultValue={0}
 								onChange={this._dispatchChangeInstrumentParam}
 								label="pan"
 								onChangeId={BasicSynthesizerParam.pan}
@@ -76,6 +77,7 @@ export class BasicSynthesizerView
 								max={10000}
 								curve={2}
 								value={this.props.lowPassFilterCutoffFrequency}
+								defaultValue={10000}
 								onChange={this._dispatchChangeInstrumentParam}
 								label="lpf"
 								onChangeId={BasicSynthesizerParam.lowPassFilterCutoffFrequency}
@@ -86,6 +88,7 @@ export class BasicSynthesizerView
 								max={10}
 								curve={3}
 								value={this.props.attack}
+								defaultValue={0.05}
 								onChange={this._dispatchChangeInstrumentParam}
 								label="attack"
 								onChangeId={BasicSynthesizerParam.attack}
@@ -96,6 +99,7 @@ export class BasicSynthesizerView
 								max={60}
 								curve={2}
 								value={this.props.release}
+								defaultValue={0.1}
 								onChange={this._dispatchChangeInstrumentParam}
 								label="release"
 								onChangeId={BasicSynthesizerParam.release}
@@ -105,6 +109,7 @@ export class BasicSynthesizerView
 								min={-100}
 								max={100}
 								value={this.props.fineTuning}
+								defaultValue={0}
 								onChange={this._dispatchChangeInstrumentParam}
 								label="detune"
 								onChangeId={BasicSynthesizerParam.fineTuning}
@@ -114,6 +119,7 @@ export class BasicSynthesizerView
 								min={0}
 								max={1}
 								value={this.props.gain}
+								defaultValue={0.5}
 								onChange={this._dispatchChangeInstrumentParam}
 								label="gain"
 								onChangeId={BasicSynthesizerParam.gain}

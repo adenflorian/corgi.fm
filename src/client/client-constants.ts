@@ -28,7 +28,19 @@ export const detuneToolTip = stripIndent`
 	detune in percentage of a half step
 	fine grained pitch control, where 100% is 1 half step above the current note
 `
+export const sequencerGateToolTip = stripIndent`
+	controls note length
+`
+export const sequencerPitchToolTip = stripIndent`
+	controls note midi pitch in half steps
+`
 export const graphSizeX = 12800
 export const graphSizeY = 7200
 
 export const longLineTooltip = 'right click to delete'
+
+export function panValueToString(pan: number) {
+	if (pan === 0) return 'C'
+	if (pan < 0) return Math.abs(pan).toFixed(2) + 'L'
+	return pan.toFixed(2) + 'R'
+}

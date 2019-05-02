@@ -8,6 +8,7 @@ import {
 	globalClockActions, gridSequencerActions, GridSequencerFields,
 	selectGridSequencer, sequencerActions, shamuConnect,
 } from '../../common/redux'
+import {sequencerGateToolTip, sequencerPitchToolTip} from '../client-constants'
 import {Knob} from '../Knob/Knob'
 
 interface IGridSequencerControlsProps {
@@ -74,17 +75,21 @@ export const GridSequencerControls = (props: AllProps) => {
 					min={0}
 					max={2}
 					value={props.gate}
+					defaultValue={0.5}
 					onChange={dispatchGridSeqParam}
 					label="gate"
 					onChangeId={GridSequencerFields.gate}
+					tooltip={sequencerGateToolTip}
 				/>
 				<Knob
 					min={-12}
 					max={12}
 					value={props.pitch}
+					defaultValue={0}
 					onChange={dispatchGridSeqParam}
 					label="pitch"
 					onChangeId={GridSequencerFields.pitch}
+					tooltip={sequencerPitchToolTip}
 				/>
 			</div>
 		</div>

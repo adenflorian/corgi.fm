@@ -1,4 +1,3 @@
-import {stripIndent} from 'common-tags'
 import * as React from 'react'
 import {CssColor} from '../../common/shamu-color'
 import './Knob.less'
@@ -13,11 +12,12 @@ interface IKnobViewProps {
 	size: number
 	tooltip: string
 	value: number
+	valueString?: (value: number) => string
 }
 
-export const KnobView: React.FC<IKnobViewProps> = React.memo(function _KnobView(props) {
+export const KnobView = React.memo(function _KnobView(props: IKnobViewProps) {
 	const {
-		handleMouseDown, percentage, adjustedPercentage,
+		handleMouseDown, percentage, adjustedPercentage, size = 32, valueString,
 		label, value, readOnly = false, markColor = 'gray', tooltip,
 	} = props
 
@@ -28,8 +28,8 @@ export const KnobView: React.FC<IKnobViewProps> = React.memo(function _KnobView(
 			<div
 				className="actualKnobContainer"
 				style={{
-					width: props.size,
-					height: props.size,
+					width: size,
+					height: size,
 				}}
 			>
 				<svg
@@ -59,19 +59,16 @@ export const KnobView: React.FC<IKnobViewProps> = React.memo(function _KnobView(
 						transform: `rotate(${_getRotation(percentage)}deg)`,
 					}}
 					onMouseDown={handleMouseDown}
-					title={value.toFixed(3) + '\n' + tooltip}
+					title={tooltip + '\n' + 'ctrl + click to reset'}
 				>
 					<div className="mark" style={{backgroundColor: markColor}}></div>
 				</div>
 			</div>
+			<div className="valueBox">{valueString ? valueString(value) : value.toFixed(2)}</div>
 			<div className="knobLabel unselectable">{label}</div>
 		</div>
 	)
 })
-
-KnobView.defaultProps = {
-	size: 32,
-}
 
 function _getRotation(normalizedInput: number): number {
 	const minDegrees = 220

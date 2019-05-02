@@ -4,57 +4,54 @@ import {KnobView} from './KnobView'
 import {SliderController} from './SliderController'
 
 interface IKnobProps {
-	curve: number
+	curve?: number
 	label: string
-	markColor: string
+	markColor?: string
 	max: number
 	min: number
 	onChange: (onChangeId: any, newValue: number) => any
 	onChangeId?: any
-	readOnly: boolean
+	readOnly?: boolean
 	value: number
-	size: number
+	defaultValue: number
+	size?: number
 	tooltip: string
+	valueString?: (value: number) => string
 }
 
-export class Knob extends React.PureComponent<IKnobProps> {
-	public static defaultProps: Partial<IKnobProps> = {
-		curve: 1,
-		label: '',
-		markColor: 'currentColor',
-		max: 1,
-		min: 0,
-		onChange: () => undefined,
-		readOnly: false,
-		size: 32,
+export const Knob = React.memo(function _Knob(props: IKnobProps) {
+	const {
+		value, label = '', readOnly = false, markColor = 'currentColor', defaultValue, onChangeId,
+		min = 0, max = 1, curve = 1, size = 32, tooltip, valueString, onChange = () => undefined,
+	} = props
+
+	const _handleOnChange = (newValue: number) => {
+		onChange(onChangeId, newValue)
 	}
 
-	public render() {
-		const {
-			value, label, readOnly, markColor,
-			min, max, curve, size, tooltip,
-		} = this.props
-
-		return (
-			<SliderController min={min} max={max} curve={curve} onChange={this._handleOnChange} value={value}>
-				{(handleMouseDown, percentage, adjustedPercentage) =>
-					<KnobView
-						percentage={percentage}
-						adjustedPercentage={adjustedPercentage}
-						label={label}
-						readOnly={readOnly}
-						markColor={markColor}
-						handleMouseDown={handleMouseDown}
-						size={size}
-						tooltip={tooltip}
-						value={value}
-					/>
-				}
-			</SliderController>
-		)
-	}
-
-	private readonly _handleOnChange = (newValue: number) => {
-		this.props.onChange(this.props.onChangeId, newValue)
-	}
-}
+	return (
+		<SliderController
+			min={min}
+			max={max}
+			curve={curve}
+			onChange={_handleOnChange}
+			value={value}
+			defaultValue={defaultValue}
+		>
+			{(handleMouseDown, percentage, adjustedPercentage) =>
+				<KnobView
+					percentage={percentage}
+					adjustedPercentage={adjustedPercentage}
+					label={label}
+					readOnly={readOnly}
+					markColor={markColor}
+					handleMouseDown={handleMouseDown}
+					size={size}
+					tooltip={tooltip}
+					value={value}
+					valueString={valueString}
+				/>
+			}
+		</SliderController>
+	)
+})

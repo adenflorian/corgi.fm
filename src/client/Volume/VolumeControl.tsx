@@ -40,11 +40,14 @@ export class VolumeControl extends Component<IVolumeControlAllProps> {
 				</div>
 				<Knob
 					value={this.props.masterVolume}
+					defaultValue={0.1}
 					onChange={this.props.changeMasterVolume}
 					min={0}
 					max={0.5}
 					markColor={color}
 					size={56}
+					tooltip="local master volume\nwill only control the volume for you"
+					label=""
 				/>
 			</Panel>
 		)

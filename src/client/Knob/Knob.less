@@ -7,9 +7,14 @@
     align-items: center;
     margin: 12px 8px;
     position: relative;
+    font-size: 16px;
 
-    &:hover {
+    &:hover, &:active {
         filter: brightness(125%);
+
+        .valueBox {
+            display: block;
+        }
     }
     
     .actualKnobContainer {
@@ -47,6 +52,13 @@
             bottom: 0;
             right: 0;
         }
+    }
+
+    .valueBox {
+        background-color: @appBackground;
+        position: absolute;
+        top: -24px;
+        display: none;
     }
 
     .knobLabel {

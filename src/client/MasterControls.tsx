@@ -39,7 +39,9 @@ export const MasterControls: React.FC<IMasterControlsProps & IMasterControlsRedu
 				max={999}
 				curve={2}
 				value={masterClockState.bpm}
+				defaultValue={120}
 				onChange={(_, bpm) => setField({bpm})}
+				tooltip="beats per minute"
 			/>
 			{/* <Knob
 				label="Max Read Ahead"

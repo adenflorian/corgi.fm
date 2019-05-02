@@ -6,7 +6,8 @@ import {
 } from '../../common/redux'
 import {IClientAppState} from '../../common/redux'
 import {
-	attackToolTip, detuneToolTip, gainToolTip, lpfToolTip, panToolTip, releaseToolTip,
+	attackToolTip, detuneToolTip, gainToolTip, lpfToolTip, panToolTip,
+	panValueToString, releaseToolTip,
 } from '../client-constants'
 import {Knob} from '../Knob/Knob'
 import {Panel} from '../Panel/Panel'
@@ -50,16 +51,19 @@ export class BasicSampler extends React.PureComponent<IBasicSamplerAllProps> {
 								min={-1}
 								max={1}
 								value={this.props.pan}
+								defaultValue={0}
 								onChange={this._dispatchChangeInstrumentParam}
 								label="pan"
 								onChangeId={BasicSamplerParam.pan}
 								tooltip={panToolTip}
+								valueString={panValueToString}
 							/>
 							<Knob
 								min={0}
 								max={10000}
 								curve={2}
 								value={this.props.lowPassFilterCutoffFrequency}
+								defaultValue={10000}
 								onChange={this._dispatchChangeInstrumentParam}
 								label="lpf"
 								onChangeId={BasicSamplerParam.lowPassFilterCutoffFrequency}
@@ -70,6 +74,7 @@ export class BasicSampler extends React.PureComponent<IBasicSamplerAllProps> {
 								max={10}
 								curve={3}
 								value={this.props.attack}
+								defaultValue={0.05}
 								onChange={this._dispatchChangeInstrumentParam}
 								label="attack"
 								onChangeId={BasicSamplerParam.attack}
@@ -80,6 +85,7 @@ export class BasicSampler extends React.PureComponent<IBasicSamplerAllProps> {
 								max={60}
 								curve={2}
 								value={this.props.release}
+								defaultValue={0.1}
 								onChange={this._dispatchChangeInstrumentParam}
 								label="release"
 								onChangeId={BasicSamplerParam.release}
@@ -89,6 +95,7 @@ export class BasicSampler extends React.PureComponent<IBasicSamplerAllProps> {
 								min={-100}
 								max={100}
 								value={this.props.detune}
+								defaultValue={0}
 								onChange={this._dispatchChangeInstrumentParam}
 								label="detune"
 								onChangeId={BasicSamplerParam.detune}
@@ -99,6 +106,7 @@ export class BasicSampler extends React.PureComponent<IBasicSamplerAllProps> {
 								max={1}
 								curve={2}
 								value={this.props.gain}
+								defaultValue={0.5}
 								onChange={this._dispatchChangeInstrumentParam}
 								label="gain"
 								onChangeId={BasicSamplerParam.gain}

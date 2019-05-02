@@ -13,10 +13,10 @@ import {
 	selectConnectionSourceColorByTargetId, selectGlobalClockState, selectInfiniteSequencer, sequencerActions,
 } from '../../common/redux'
 import {getColorStringForMidiNote} from '../../common/shamu-color'
+import {sequencerGateToolTip, sequencerPitchToolTip} from '../client-constants'
 import {isWhiteKey} from '../Keyboard/Keyboard'
 import {Knob} from '../Knob/Knob'
 import {Panel} from '../Panel/Panel'
-import {ConnectedSequencerTimeBar} from '../SequencerTimeBar'
 import {getOctaveFromMidiNote, midiNoteToNoteName} from '../WebAudio/music-functions'
 import './InfiniteSequencer.less'
 
@@ -156,18 +156,22 @@ export const InfiniteSequencer: React.FC<IInfiniteSequencerAllProps> = React.mem
 								min={0}
 								max={2}
 								value={props.gate}
+								defaultValue={0.5}
 								onChange={dispatchInfiniteSeqParam}
 								label="gate"
 								onChangeId={InfiniteSequencerFields.gate}
+								tooltip={sequencerGateToolTip}
 							/>
 
 							<Knob
 								min={-12}
 								max={12}
 								value={props.pitch}
+								defaultValue={0}
 								onChange={dispatchInfiniteSeqParam}
 								label="pitch"
 								onChangeId={InfiniteSequencerFields.pitch}
+								tooltip={sequencerPitchToolTip}
 							/>
 
 							{/* <Knob

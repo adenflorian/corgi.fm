@@ -57,8 +57,10 @@ export const SimpleReverbView: React.FC<ISimpleReverbAllProps> =
 						max={30}
 						curve={3}
 						value={time}
+						defaultValue={5}
 						onChange={changeParam}
 						onChangeId={SimpleReverbParam.time}
+						tooltip="length or reverb in seconds"
 					/>
 					<Knob
 						label="lpf"
@@ -66,8 +68,10 @@ export const SimpleReverbView: React.FC<ISimpleReverbAllProps> =
 						max={10000}
 						curve={2}
 						value={lpf}
+						defaultValue={2000}
 						onChange={changeParam}
 						onChangeId={SimpleReverbParam.lowPassFilterCutoffFrequency}
+						tooltip="low pass filter"
 					/>
 				</div>
 			</Panel>

@@ -6,6 +6,7 @@ interface ISliderControllerProps {
 	max: number
 	onChange: (newValue: number) => any
 	value: number
+	defaultValue: number
 	curve: number
 	children: (handleMouseDown: any, percentage: number, adjustedPercentage: number) => any
 }
@@ -108,12 +109,17 @@ export class SliderController extends React.Component<ISliderControllerProps, IS
 	}
 
 	private readonly _handleMouseDown = (e: React.MouseEvent) => {
-		this.setState({
-			mouseDownPosition: {
-				x: e.screenX,
-				y: e.screenY,
-			},
-			isMouseDown: true,
-		})
+		if (e.ctrlKey) {
+			this.setState({normalizedValue: this._normalize(this.props.defaultValue)})
+			this.props.onChange(this.props.defaultValue)
+		} else {
+			this.setState({
+				mouseDownPosition: {
+					x: e.screenX,
+					y: e.screenY,
+				},
+				isMouseDown: true,
+			})
+		}
 	}
 }
