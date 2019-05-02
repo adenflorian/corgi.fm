@@ -6,8 +6,8 @@ import {
 } from '../../common/redux'
 import {IClientAppState} from '../../common/redux'
 import {
-	attackToolTip, detuneToolTip, gainToolTip, lpfToolTip, panToolTip,
-	panValueToString, releaseToolTip,
+	adsrValueToString, attackToolTip, detuneToolTip, filterValueToString, gainToolTip,
+	lpfToolTip, panToolTip, panValueToString, releaseToolTip,
 } from '../client-constants'
 import {Knob} from '../Knob/Knob'
 import {Panel} from '../Panel/Panel'
@@ -68,6 +68,7 @@ export class BasicSampler extends React.PureComponent<IBasicSamplerAllProps> {
 								label="lpf"
 								onChangeId={BasicSamplerParam.lowPassFilterCutoffFrequency}
 								tooltip={lpfToolTip}
+								valueString={filterValueToString}
 							/>
 							<Knob
 								min={0.01}
@@ -79,6 +80,7 @@ export class BasicSampler extends React.PureComponent<IBasicSamplerAllProps> {
 								label="attack"
 								onChangeId={BasicSamplerParam.attack}
 								tooltip={attackToolTip}
+								valueString={adsrValueToString}
 							/>
 							<Knob
 								min={0.01}
@@ -90,6 +92,7 @@ export class BasicSampler extends React.PureComponent<IBasicSamplerAllProps> {
 								label="release"
 								onChangeId={BasicSamplerParam.release}
 								tooltip={releaseToolTip}
+								valueString={adsrValueToString}
 							/>
 							<Knob
 								min={-100}

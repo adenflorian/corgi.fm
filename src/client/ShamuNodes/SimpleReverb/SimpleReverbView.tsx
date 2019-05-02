@@ -4,6 +4,7 @@ import {
 	getConnectionNodeInfo, selectSimpleReverb, setSimpleReverbParam,
 	shamuConnect, SimpleReverbParam,
 } from '../../../common/redux'
+import {filterValueToString} from '../../client-constants'
 import {Knob} from '../../Knob/Knob'
 import {Panel} from '../../Panel/Panel'
 
@@ -72,6 +73,7 @@ export const SimpleReverbView: React.FC<ISimpleReverbAllProps> =
 						onChange={changeParam}
 						onChangeId={SimpleReverbParam.lowPassFilterCutoffFrequency}
 						tooltip="low pass filter"
+						valueString={filterValueToString}
 					/>
 				</div>
 			</Panel>

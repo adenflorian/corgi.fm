@@ -10,7 +10,7 @@ import {
 } from '../../common/redux'
 import {IClientAppState} from '../../common/redux'
 import {
-	attackToolTip, detuneToolTip, gainToolTip, lpfToolTip, panToolTip, releaseToolTip,
+	adsrValueToString, attackToolTip, detuneToolTip, filterValueToString, gainToolTip, lpfToolTip, panToolTip, panValueToString, releaseToolTip,
 } from '../client-constants'
 import {Knob} from '../Knob/Knob'
 import {Panel} from '../Panel/Panel'
@@ -71,6 +71,7 @@ export class BasicSynthesizerView
 								label="pan"
 								onChangeId={BasicSynthesizerParam.pan}
 								tooltip={panToolTip}
+								valueString={panValueToString}
 							/>
 							<Knob
 								min={0}
@@ -82,6 +83,7 @@ export class BasicSynthesizerView
 								label="lpf"
 								onChangeId={BasicSynthesizerParam.lowPassFilterCutoffFrequency}
 								tooltip={lpfToolTip}
+								valueString={filterValueToString}
 							/>
 							<Knob
 								min={0.01}
@@ -93,6 +95,7 @@ export class BasicSynthesizerView
 								label="attack"
 								onChangeId={BasicSynthesizerParam.attack}
 								tooltip={attackToolTip}
+								valueString={adsrValueToString}
 							/>
 							<Knob
 								min={0.01}
@@ -104,6 +107,7 @@ export class BasicSynthesizerView
 								label="release"
 								onChangeId={BasicSynthesizerParam.release}
 								tooltip={releaseToolTip}
+								valueString={adsrValueToString}
 							/>
 							<Knob
 								min={-100}

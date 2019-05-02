@@ -41,6 +41,18 @@ export const longLineTooltip = 'right click to delete'
 
 export function panValueToString(pan: number) {
 	if (pan === 0) return 'C'
-	if (pan < 0) return Math.abs(pan).toFixed(2) + 'L'
-	return pan.toFixed(2) + 'R'
+	if (pan < 0) return Math.abs(pan).toFixed(2) + ' L'
+	return pan.toFixed(2) + ' R'
+}
+
+export function filterValueToString(frequencyHz: number) {
+	return (frequencyHz / 1000).toFixed(0) + ' kHz'
+}
+
+export function adsrValueToString(ms: number) {
+	if (ms < 0.01) return (ms * 1000).toFixed(2) + ' ms'
+	if (ms < 0.1) return (ms * 1000).toFixed(1) + ' ms'
+	if (ms < 1) return (ms * 1000).toFixed(0) + ' ms'
+	if (ms < 10) return (ms).toFixed(2) + ' s'
+	return (ms).toFixed(1) + ' s'
 }
