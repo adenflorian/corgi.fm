@@ -1,135 +1,91 @@
 @import "../colors.less";
 @import "../AppCommon.less";
 
-.optionsBG {
-	position: fixed;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	background-color: @overlayGray;
-	z-index: 2;
-	margin: 0 !important;
-}
+.options {
+	.localOptions {
+		color: @brightBlue;
+	}
 
-.optionsPanel {
-	position: fixed;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	z-index: 20;
-	color: @defaultGray;
-	user-select: text;
+	.roomOptions {
+		color: @orange;
 
-	.optionsPanelInner {
-		background-color: @panelGray;
-		padding: 16px;
-		font-size: 1.2em;
-
-		.optionsSection {
-			margin: 32px 0;
-
-			&:first-child {
-				margin-top: 0;
+		.option {
+			label:hover input ~ .checkmark,
+			label:active input ~ .checkmark,
+			label input:checked ~ .checkmark {
+				background-color: @orange;
 			}
-			&:last-child {
-				margin-bottom: 0;
-			}
-			.optionsSectionLabel {
-				text-align: left;
-				.largeFont();
-				font-size: 1.4em;
-				line-height: 1.2em;
-			}
-			.optionsSectionSubLabel {
-				text-align: left;
-				font-size: 1.0em;
-				color: @subtleGrayBlackBg;
-			}
-			&.localOptions {
-				color: @brightBlue;
-			}
-			&.roomOptions {
-				color: @orange;
+		}
+	}
 
-				.option {
-					label:hover input ~ .checkmark,
-					label:active input ~ .checkmark,
-					label input:checked ~ .checkmark {
-						background-color: @orange;
-					}
-				}
-			}
-			.option {
-				margin: 16px 0;
-				display: flex;
-				flex-wrap: nowrap;
-				white-space: nowrap;
-				align-items: center;
-				height: 32px;
+	.option {
+		margin: 16px 0;
+		display: flex;
+		flex-wrap: nowrap;
+		white-space: nowrap;
+		align-items: center;
+		height: 32px;
 
-				label {
-					margin-left: 48px;
-					position: relative;
-					cursor: pointer;
-					color: @defaultGray;
-				}
+		label {
+			margin-left: 48px;
+			position: relative;
+			cursor: pointer;
+			color: @defaultGray;
+		}
 
-				input {
-					position: absolute;
-					opacity: 0;
-					cursor: pointer;
-					height: 0;
-					width: 0;
-				}
+		input {
+			position: absolute;
+			opacity: 0;
+			cursor: pointer;
+			height: 0;
+			width: 0;
+		}
 
-				.checkmark {
-					position: absolute;
-					top: -8px;
-					left: -48px;
-					height: 32px;
-					width: 32px;
-					background-color: @defaultGray;
-					margin-right: 16px;
-				}
+		.checkmark {
+			position: absolute;
+			top: -8px;
+			left: -48px;
+			height: 32px;
+			width: 32px;
+			background-color: @defaultGray;
+			margin-right: 16px;
+		}
 
-				label:hover input ~ .checkmark {
-					filter: brightness(1.5);
-					background-color: @blue;
-				}
+		label:hover input ~ .checkmark {
+			filter: brightness(1.5);
+			background-color: @blue;
+		}
 
-				label:active input ~ .checkmark {
-					filter: brightness(1.8);
-					background-color: @blue;
-				}
-				
-				label input:checked ~ .checkmark {
-					background-color: @blue;
-				}
-				
-				/* Create the checkmark/indicator (hidden when not checked) */
-				.checkmark:after {
-					content: "";
-					position: absolute;
-					display: none;
-				}
-				
-				/* Show the checkmark when checked */
-				label input:checked ~ .checkmark:after {
-					display: block;
-				}
-				
-				/* Style the checkmark/indicator */
-				label .checkmark:after {
-					left: 9px;
-					top: 5px;
-					width: 8px;
-					height: 16px;
-					border: solid @defaultGray;
-					border-width: 0 4px 4px 0;
-					transform: translate(2px, -1px) rotate(45deg);
-				}
-			}
+		label:active input ~ .checkmark {
+			filter: brightness(1.8);
+			background-color: @blue;
+		}
+		
+		label input:checked ~ .checkmark {
+			background-color: @blue;
+		}
+		
+		/* Create the checkmark/indicator (hidden when not checked) */
+		.checkmark:after {
+			content: "";
+			position: absolute;
+			display: none;
+		}
+		
+		/* Show the checkmark when checked */
+		label input:checked ~ .checkmark:after {
+			display: block;
+		}
+		
+		/* Style the checkmark/indicator */
+		label .checkmark:after {
+			left: 9px;
+			top: 5px;
+			width: 8px;
+			height: 16px;
+			border: solid @defaultGray;
+			border-width: 0 4px 4px 0;
+			transform: translate(2px, -1px) rotate(45deg);
 		}
 	}
 }

@@ -1,0 +1,53 @@
+@import "../colors.less";
+@import "../AppCommon.less";
+
+.modal {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: @overlayGray;
+	z-index: 2;
+	margin: 0 !important;
+}
+
+.modalPanel {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	z-index: 20;
+	color: @defaultGray;
+	user-select: text;
+
+	.modalPanelInner {
+		background-color: @panelGray;
+		padding: 16px;
+		font-size: 1.2em;
+
+		.modalSection {
+			margin: 32px 0;
+
+			&:first-child {
+				margin-top: 0;
+			}
+			&:last-child {
+				margin-bottom: 0;
+			}
+			.modalSectionLabel {
+				text-align: left;
+				.largeFont();
+				font-size: 1.4em;
+				line-height: 1.2em;
+			}
+			.modalSectionSubLabel {
+				text-align: left;
+				font-size: 1.0em;
+				color: @subtleGrayBlackBg;
+			}
+		}
+	}
+}
+
+		
