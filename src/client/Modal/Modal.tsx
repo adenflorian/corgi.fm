@@ -24,8 +24,8 @@ export const Modal = React.memo(function _Modal({onHide, children, className}: P
 	})
 
 	return (
-		<div className={`modal ${className}`} onClick={onHide}>
-			<div className="modalPanel" onClick={e => e.stopPropagation()}>
+		<div className={`modal ${className}`} onMouseDown={onHide}>
+			<div className="modalPanel" onMouseDown={e => e.stopPropagation()}>
 				<div className="modalPanelInner" >
 					{children}
 				</div>
