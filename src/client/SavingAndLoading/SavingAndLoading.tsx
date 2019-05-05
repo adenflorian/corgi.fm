@@ -40,8 +40,7 @@ function LoadRoomModalInner({dispatch}: {dispatch: Dispatch}) {
 	return (
 		<div className="modalSection localSaves">
 			<div className="modalSectionLabel">Load Room</div>
-			<div className="modalSectionSubLabel">select a saved room to load into the current room</div>
-			<div className="modalSectionSubLabel">(will not delete anything currently in this room)</div>
+			<div className="modalSectionSubLabel">select a saved room to load into a new room</div>
 			<div className="saves">
 				{saves.count() === 0 &&
 					<div className="noSaves">no saves found</div>
