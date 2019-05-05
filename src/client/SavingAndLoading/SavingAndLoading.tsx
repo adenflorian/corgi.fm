@@ -50,13 +50,28 @@ function LoadRoomModalInner({dispatch}: {dispatch: Dispatch}) {
 					saves.map((saveData, saveId) => {
 						return (
 							<div key={saveId} className="localSave">
-								<Button
-									key={saveId}
-									style="flatButton"
-									buttonProps={{onClick: () => dispatch(loadRoom(saveData))}}
-								>
-									{saveData.saveDateTime} - {saveData.room}
+								<div className="loadSave">
+									<Button
+										style="flatButton"
+										buttonProps={{onClick: () => dispatch(loadRoom(saveData))}}
+									>
+										{saveData.saveDateTime + ' - ' + saveData.room}
+									</Button>
+								</div>
+								<div className="deleteSave">
+									<Button
+										style="flatButton"
+										buttonProps={{
+											onClick: () => {
+												dispatch(localActions.deleteSavedRoom(saveId))
+												setSaveStorage(getOrCreateLocalSavesStorage())
+											},
+											title: 'this cannot be undone',
+										}}
+									>
+										Delete
 								</Button>
+								</div>
 							</div>
 						)
 					}).toList()

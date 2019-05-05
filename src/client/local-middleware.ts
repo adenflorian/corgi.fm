@@ -2,7 +2,7 @@ import {List, Map, Set} from 'immutable'
 import {Dispatch, Middleware} from 'redux'
 import {ActionType} from 'typesafe-actions'
 import uuid from 'uuid'
-import {ConnectionNodeType} from '../common/common-types'
+import {ConnectionNodeType, Id} from '../common/common-types'
 import {logger} from '../common/logger'
 import {emptyMidiNotes, IMidiNote} from '../common/MidiNote'
 import {BroadcastAction, IClientRoomState} from '../common/redux/common-redux-types'
@@ -57,10 +57,15 @@ export const DELETE_NODE = 'DELETE_NODE'
 export const deleteNode = makeActionCreator(DELETE_NODE, 'nodeId')
 
 export const SAVE_ROOM = 'SAVE_ROOM'
+export const DELETE_SAVED_ROOM = 'DELETE_SAVED_ROOM'
 
 export const localActions = Object.freeze({
 	saveRoom: () => ({
 		type: SAVE_ROOM as typeof SAVE_ROOM,
+	}),
+	deleteSavedRoom: (id: Id) => ({
+		type: DELETE_SAVED_ROOM as typeof DELETE_SAVED_ROOM,
+		id,
 	}),
 })
 
@@ -279,7 +284,7 @@ export const createLocalMiddleware: () => Middleware<{}, IClientAppState> = () =
 
 			const localSaves = getOrCreateLocalSavesStorage()
 
-			localStorage.setItem(graphStateSavesLocalStorageKey, JSON.stringify({
+			setLocalSavesToLocalStorage({
 				...localSaves,
 				all: {
 					...localSaves.all,
@@ -293,12 +298,29 @@ export const createLocalMiddleware: () => Middleware<{}, IClientAppState> = () =
 						room,
 					},
 				},
-			} as LocalSaves))
+			} as LocalSaves)
+
+			return
+		}
+		case DELETE_SAVED_ROOM: {
+			next(action)
+
+			const deleteSavedRoomAction = action as ReturnType<typeof localActions.deleteSavedRoom>
+
+			const localSaves = getOrCreateLocalSavesStorage()
+
+			delete localSaves.all[deleteSavedRoomAction.id]
+
+			setLocalSavesToLocalStorage(localSaves)
 
 			return
 		}
 		default: return next(action)
 	}
+}
+
+function setLocalSavesToLocalStorage(localSaves: LocalSaves) {
+	localStorage.setItem(graphStateSavesLocalStorageKey, JSON.stringify(localSaves))
 }
 
 export function getOrCreateLocalSavesStorage(): LocalSaves {
