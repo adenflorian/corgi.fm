@@ -8,6 +8,7 @@ import {Button} from './Button/Button'
 import {localActions} from './local-middleware'
 import {Options} from './Options/Options'
 import {ConnectedRoomSelector} from './RoomSelector'
+import {SavingAndLoading} from './SavingAndLoading/SavingAndLoading'
 import './TopDiv.less'
 
 interface ReduxProps {
@@ -39,6 +40,7 @@ export const TopDiv = ({memberCount, clientCount, info, dispatch}: AllProps) =>
 			>
 				Save Room
 			</Button>
+			<SavingAndLoading />
 			<Options />
 			<a href="/newsletter" target="_blank">Newsletter</a>
 			<a href="https://discord.gg/qADwrxd" target="_blank">Discord</a>

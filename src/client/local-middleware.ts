@@ -19,6 +19,7 @@ import {
 	selectVirtualKeyboardById, selectVirtualKeyboardByOwner, sequencerActions,
 	SET_ACTIVE_ROOM,
 	SET_GRID_SEQUENCER_NOTE,
+	ShamuGraphState,
 	SKIP_NOTE,
 	USER_KEY_PRESS,
 	UserInputAction,
@@ -277,9 +278,7 @@ export const createLocalMiddleware: () => Middleware<{}, IClientAppState> = () =
 
 			const graphState = selectShamuGraphState(state.room)
 
-			const roomName = selectActiveRoom(state)
-
-			const saveName = new Date().toISOString() + ' | room: ' + roomName
+			const room = selectActiveRoom(state)
 
 			const localSaves = getOrCreateLocalSavesStorage()
 
@@ -287,9 +286,13 @@ export const createLocalMiddleware: () => Middleware<{}, IClientAppState> = () =
 				...localSaves,
 				all: {
 					...localSaves.all,
-					[uuid.v4()]: graphState,
+					[uuid.v4()]: {
+						data: graphState,
+						saveDateTime: new Date().toISOString(),
+						room,
+					},
 				},
-			}))
+			} as LocalSaves))
 
 			return
 		}
@@ -297,7 +300,7 @@ export const createLocalMiddleware: () => Middleware<{}, IClientAppState> = () =
 	}
 }
 
-function getOrCreateLocalSavesStorage(): LocalSaves {
+export function getOrCreateLocalSavesStorage(): LocalSaves {
 	const localSavesJSON = localStorage.getItem(graphStateSavesLocalStorageKey)
 
 	if (localSavesJSON === null) return makeInitialLocalSavesStorage()
@@ -324,9 +327,17 @@ function parseLocalSavesJSON(localSavesJSON: string): LocalSaves {
 	}
 }
 
-export type LocalSaves = ReturnType<typeof makeInitialLocalSavesStorage>
+export interface LocalSaves {
+	all: {
+		[key: string]: {
+			saveDateTime: string,
+			data: ShamuGraphState,
+			room: string,
+		},
+	}
+}
 
-const makeInitialLocalSavesStorage = () => Object.freeze({
+const makeInitialLocalSavesStorage = (): LocalSaves => Object.freeze({
 	all: {},
 })
 

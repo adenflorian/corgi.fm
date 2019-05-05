@@ -1,19 +1,31 @@
 @import "../colors.less";
 
 .buttonContainer {
-    &:hover {
-        .isometricBoxShadow, button {
-            filter: brightness(125%)
+    &.fancyButton {
+        &:hover {
+            .isometricBoxShadow, button {
+                filter: brightness(125%)
+            }
+        }
+
+        &:active {
+            top: 1px;
+            left: -1px;
+    
+            .isometricBoxShadow {
+                top: -1px;
+                left: 1px;
+            }
         }
     }
 
-    &:active {
-        top: 1px;
-        left: -1px;
+    &.flatButton {
+        &:hover {
+            background-color: @panelGrayLight;
+        }
 
-        .isometricBoxShadow {
-            top: -1px;
-            left: 1px;
+        &:active {
+            background-color: @blue;
         }
     }
 
