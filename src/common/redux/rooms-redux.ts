@@ -1,7 +1,12 @@
 import {Map} from 'immutable'
 import {combineReducers, Reducer} from 'redux'
 import {createSelector} from 'reselect'
+import {selectAllConnections} from './connections-redux'
+import {selectGlobalClockState} from './global-clock-redux'
 import {SERVER_ACTION} from './index'
+import {selectAllPositions} from './positions-redux'
+import {selectRoomSettings} from './room-settings-redux'
+import {selectShamuGraphState} from './shamu-graph'
 
 export const SET_ROOMS = 'SET_ROOMS'
 export type SetRoomsAction = ReturnType<typeof setRooms>
@@ -58,8 +63,32 @@ export const deleteRoom = (name: string) => ({
 	name,
 })
 
+export const LOAD_ROOM = 'LOAD_ROOM'
+export type LoadRoomAction = ReturnType<typeof loadRoom>
+export const loadRoom = (savedRoom: SavedRoom) => ({
+	type: LOAD_ROOM as typeof LOAD_ROOM,
+	savedRoom,
+	SERVER_ACTION,
+})
+
 export type RoomsReduxAction = SetRoomsAction | SetActiveRoomAction |
 	ChangeRoomAction | CreateRoomAction | DeleteRoomAction | UserLeftRoomAction
+
+export interface LocalSaves {
+	all: {
+		[key: string]: SavedRoom,
+	}
+}
+
+export interface SavedRoom {
+	connections: ReturnType<typeof selectAllConnections>,
+	globalClock: ReturnType<typeof selectGlobalClockState>,
+	positions: ReturnType<typeof selectAllPositions>,
+	roomSettings: ReturnType<typeof selectRoomSettings>,
+	shamuGraph: ReturnType<typeof selectShamuGraphState>,
+	saveDateTime: string,
+	room: string,
+}
 
 const initialState = Object.freeze({
 	all: Map<RoomName, Room>(),

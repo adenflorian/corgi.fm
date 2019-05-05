@@ -6,20 +6,22 @@ import {ConnectionNodeType} from '../common/common-types'
 import {logger} from '../common/logger'
 import {emptyMidiNotes, IMidiNote} from '../common/MidiNote'
 import {BroadcastAction, IClientRoomState} from '../common/redux/common-redux-types'
-import {selectConnectionsWithSourceIds, selectConnectionsWithSourceOrTargetIds} from '../common/redux/connections-redux'
+import {selectAllConnections, selectConnectionsWithSourceIds, selectConnectionsWithSourceOrTargetIds} from '../common/redux/connections-redux'
 import {
 	addBasicSampler, addBasicSynthesizer, addPosition, addVirtualKeyboard,
 	BasicSamplerState, BasicSynthesizerState, Connection, connectionsActions,
 	deleteAllPositions, deleteAllThings, deletePositions, deleteThingsAny,
-	gridSequencerActions, IClientAppState, ISequencerState, makeActionCreator,
-	makePosition, MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID,
-	NetworkActionType, READY,
-	RECORD_SEQUENCER_NOTE, selectActiveRoom, selectDirectDownstreamSequencerIds, selectLocalClient,
-	selectPositionExtremes, selectSequencer, selectShamuGraphState,
-	selectVirtualKeyboardById, selectVirtualKeyboardByOwner, sequencerActions,
+	gridSequencerActions, IClientAppState, ISequencerState, LOAD_ROOM,
+	LocalSaves, makeActionCreator, makePosition,
+	MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID,
+	NetworkActionType, READY, RECORD_SEQUENCER_NOTE, selectActiveRoom,
+	selectAllPositions, selectDirectDownstreamSequencerIds, selectGlobalClockState,
+	selectLocalClient, selectPositionExtremes, selectRoomSettings,
+	selectSequencer, selectShamuGraphState,
+	selectVirtualKeyboardById, selectVirtualKeyboardByOwner,
+	sequencerActions,
 	SET_ACTIVE_ROOM,
 	SET_GRID_SEQUENCER_NOTE,
-	ShamuGraphState,
 	SKIP_NOTE,
 	USER_KEY_PRESS,
 	UserInputAction,
@@ -30,13 +32,10 @@ import {
 	VirtualKeyboardState,
 	virtualKeyPressed,
 	VirtualKeyPressedAction,
-	virtualKeyUp,
-	VirtualKeyUpAction,
-	virtualOctaveChange,
-	VirtualOctaveChangeAction,
+	virtualKeyUp, VirtualKeyUpAction, virtualOctaveChange, VirtualOctaveChangeAction,
 } from '../common/redux/index'
 import {pointersActions} from '../common/redux/pointers-redux'
-import {graphStateSaveLocalStorageKeyPrefix, graphStateSavesLocalStorageKey} from './client-constants'
+import {graphStateSavesLocalStorageKey} from './client-constants'
 import {getAllInstruments} from './instrument-manager'
 import {MidiNotes} from './Instruments/BasicSynthesizerView'
 import {isNewNoteScannerEnabled} from './is-prod-client'
@@ -276,8 +275,6 @@ export const createLocalMiddleware: () => Middleware<{}, IClientAppState> = () =
 
 			const state = getState()
 
-			const graphState = selectShamuGraphState(state.room)
-
 			const room = selectActiveRoom(state)
 
 			const localSaves = getOrCreateLocalSavesStorage()
@@ -287,7 +284,11 @@ export const createLocalMiddleware: () => Middleware<{}, IClientAppState> = () =
 				all: {
 					...localSaves.all,
 					[uuid.v4()]: {
-						data: graphState,
+						connections: selectAllConnections(state.room),
+						globalClock: selectGlobalClockState(state.room),
+						positions: selectAllPositions(state.room),
+						roomSettings: selectRoomSettings(state.room),
+						shamuGraph: selectShamuGraphState(state.room),
 						saveDateTime: new Date().toISOString(),
 						room,
 					},
@@ -324,16 +325,6 @@ function parseLocalSavesJSON(localSavesJSON: string): LocalSaves {
 		logger.error('error caught while trying to parse localSavesJSON: ', error)
 		logger.error('localSavesJSON: ', localSavesJSON)
 		return makeInitialLocalSavesStorage()
-	}
-}
-
-export interface LocalSaves {
-	all: {
-		[key: string]: {
-			saveDateTime: string,
-			data: ShamuGraphState,
-			room: string,
-		},
 	}
 }
 

@@ -9,19 +9,19 @@ import {
 	clientDisconnected, ClientState, connectionsActions, createRoom,
 	createRoomAction, deletePositions, deleteRoomMember,
 	deleteThingsAny, getActionsBlacklist, GLOBAL_SERVER_ACTION,
-	globalClockActions, IClientRoomState, IServerState, maxUsernameLength,
-	pointersActions, ready, REQUEST_CREATE_ROOM, roomSettingsActions,
+	globalClockActions, IClientRoomState, IServerState, LOAD_ROOM,
+	LoadRoomAction, maxUsernameLength, pointersActions, ready,
+	REQUEST_CREATE_ROOM, roomSettingsActions, SavedRoom,
 	selectAllClients, selectAllConnections, selectAllMessages,
-	selectAllPointers, selectAllPositions, selectAllRoomMemberIds,
-	selectAllRoomNames, selectAllRooms,
-	selectAllRoomStates, selectClientBySocketId,
-	selectConnectionsWithSourceOrTargetIds, selectGlobalClockState, selectNodeIdsOwnedByClient,
-	selectPositionsWithIds, selectRoomExists, selectRoomSettings, selectRoomStateByName,
-	selectShamuGraphState, SERVER_ACTION, setActiveRoom, setChat,
-	setClients, setRoomMembers, setRooms, shamuGraphActions, updatePositions, userLeftRoom,
+	selectAllPointers, selectAllPositions,
+	selectAllRoomMemberIds, selectAllRoomNames,
+	selectAllRooms, selectAllRoomStates, selectClientBySocketId,
+	selectConnectionsWithSourceOrTargetIds, selectGlobalClockState, selectNodeIdsOwnedByClient, selectPositionsWithIds,
+	selectRoomExists, selectRoomSettings, selectRoomStateByName, selectShamuGraphState,
+	SERVER_ACTION, setActiveRoom, setChat, setClients, setRoomMembers, setRooms, shamuGraphActions, updatePositions, userLeftRoom,
 } from '../common/redux'
 import {WebSocketEvent} from '../common/server-constants'
-import {createServerStuff} from './create-server-stuff'
+import {createServerStuff, loadServerStuff} from './create-server-stuff'
 import {serverInfo} from './server-info'
 
 export const lobby = 'lobby'
@@ -86,18 +86,16 @@ export function setupServerWebSocketListeners(io: Server, serverStore: Store) {
 			socket.on(WebSocketEvent.serverAction, (action: AnyAction) => {
 				logger.trace(`${WebSocketEvent.serverAction}: ${socket.id} | `, action)
 
-				if (action[GLOBAL_SERVER_ACTION]) {
+				if (action.type === CHANGE_ROOM) {
+					changeRooms(action.room)
+				} else if (action.type === REQUEST_CREATE_ROOM) {
+					makeAndJoinNewRoom(animal.getId())
+				} else if (action.type === LOAD_ROOM) {
+					makeAndJoinNewRoom(animal.getId(), (action as LoadRoomAction).savedRoom)
+				} else if (action[GLOBAL_SERVER_ACTION]) {
 					serverStore.dispatch(action)
 				} else if (action[SERVER_ACTION]) {
 					serverStore.dispatch(createRoomAction(action, getRoom(socket)))
-				}
-
-				if (action.type === CHANGE_ROOM) {
-					changeRooms(action.room)
-				}
-
-				if (action.type === REQUEST_CREATE_ROOM) {
-					makeAndJoinNewRoom(animal.getId())
 				}
 			})
 
@@ -163,20 +161,25 @@ export function setupServerWebSocketListeners(io: Server, serverStore: Store) {
 			})
 		}
 
-		function makeAndJoinNewRoom(newRoomName: string) {
+		function makeAndJoinNewRoom(newRoomName: string, roomDataToLoad?: SavedRoom) {
 			if (selectRoomExists(serverStore.getState(), newRoomName) === false) {
-				makeNewRoom(newRoomName)
+				makeNewRoom(newRoomName, roomDataToLoad)
 			}
 
 			changeRooms(newRoomName)
 		}
 
-		function makeNewRoom(newRoomName: string) {
+		function makeNewRoom(newRoomName: string, roomDataToLoad?: SavedRoom) {
 			if (selectRoomExists(serverStore.getState(), newRoomName)) {
 				throw new Error(`room exists, this shouldn't happen`)
 			} else {
 				serverStore.dispatch(createRoom(newRoomName, Date.now()))
-				createServerStuff(newRoomName, serverStore)
+
+				if (roomDataToLoad) {
+					loadServerStuff(newRoomName, serverStore, roomDataToLoad)
+				} else {
+					createServerStuff(newRoomName, serverStore)
+				}
 
 				io.local.emit(WebSocketEvent.broadcast, {
 					...setRooms(selectAllRooms(serverStore.getState())),

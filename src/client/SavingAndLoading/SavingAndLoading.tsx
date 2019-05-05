@@ -1,12 +1,14 @@
 import {Map} from 'immutable'
 import React from 'react'
 import {Fragment} from 'react'
+import {Dispatch} from 'redux'
+import {loadRoom} from '../../common/redux'
 import {Button} from '../Button/Button'
-import {getOrCreateLocalSavesStorage} from '../local-middleware'
+import {getOrCreateLocalSavesStorage, localActions} from '../local-middleware'
 import {Modal} from '../Modal/Modal'
 import './SavingAndLoading.less'
 
-export const SavingAndLoading = React.memo(function _SavingAndLoading() {
+export const SavingAndLoading = React.memo(function _SavingAndLoading({dispatch}: {dispatch: Dispatch}) {
 	const [visible, setVisible] = React.useState(false)
 
 	return (
@@ -21,14 +23,16 @@ export const SavingAndLoading = React.memo(function _SavingAndLoading() {
 					onHide={() => setVisible(false)}
 					className="loadRoomUI"
 				>
-					<LoadRoomModalInner />
+					<LoadRoomModalInner
+						dispatch={dispatch}
+					/>
 				</Modal>
 			}
 		</Fragment>
 	)
 })
 
-function LoadRoomModalInner() {
+function LoadRoomModalInner({dispatch}: {dispatch: Dispatch}) {
 	const [saveStorage, setSaveStorage] = React.useState(getOrCreateLocalSavesStorage())
 
 	const saves = Map(saveStorage.all)
@@ -49,6 +53,7 @@ function LoadRoomModalInner() {
 								<Button
 									key={saveId}
 									style="flatButton"
+									buttonProps={{onClick: () => dispatch(loadRoom(saveData))}}
 								>
 									{saveData.saveDateTime} - {saveData.room}
 								</Button>

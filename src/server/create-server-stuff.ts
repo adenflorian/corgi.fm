@@ -9,11 +9,11 @@ import {
 	addGridSequencer, addInfiniteSequencer, addPosition,
 	addSimpleReverb, BasicSamplerState,
 	BasicSynthesizerState, ClientState, Connection, connectionsActions,
-	createRoomAction, createSequencerEvents, getConnectionNodeInfo,
-	GridSequencerState, InfiniteSequencerState, InfiniteSequencerStyle,
-	IServerState, makePosition,
-	makeSequencerEvents, selectAllConnections, selectAllPositions,
-	SimpleReverbState, updatePositions,
+	createRoomAction, createSequencerEvents, deletePositions,
+	deleteThingsAny, getConnectionNodeInfo, globalClockActions,
+	GridSequencerState, InfiniteSequencerState,
+	InfiniteSequencerStyle, IServerState, makePosition,
+	makeSequencerEvents, REPLACE_SHAMU_GRAPH_STATE, roomSettingsActions, SavedRoom, selectAllConnections, selectAllPositions, selectAllVirtualKeyboardIds, selectConnectionsWithSourceOrTargetIds, shamuGraphActions, ShamuGraphState, SimpleReverbState, updatePositions,
 } from '../common/redux'
 
 const masterAudioOutput: IConnectable = getConnectionNodeInfo(ConnectionNodeType.audioOutput).stateSelector({} as any, '')
@@ -309,4 +309,32 @@ function getInitialInfiniteSequencerEvents() {
 		{notes: MidiNotes([67]), startBeat: 6, durationBeats: 1},
 		{notes: MidiNotes([64]), startBeat: 7, durationBeats: 1},
 	])
+}
+
+export function loadServerStuff(room: string, serverStore: Store<IServerState>, roomDataToLoad: SavedRoom) {
+	const serverClient = ClientState.createServerClient()
+	const addClientAction = addClient(serverClient)
+
+	dispatchToRoom(addClientAction)
+
+	dispatchToRoom(connectionsActions.updateAll(roomDataToLoad.connections))
+	dispatchToRoom(shamuGraphActions.replace(roomDataToLoad.shamuGraph))
+	dispatchToRoom(updatePositions(roomDataToLoad.positions))
+	dispatchToRoom(roomSettingsActions.replaceAll(roomDataToLoad.roomSettings))
+	dispatchToRoom(globalClockActions.replace(roomDataToLoad.globalClock))
+
+	const getRoomState = () => serverStore.getState().roomStores.get(room)!
+
+	const keyboardIds = selectAllVirtualKeyboardIds(getRoomState())
+	const keyboardConnectionIds = selectConnectionsWithSourceOrTargetIds(getRoomState(), keyboardIds)
+		.toList()
+		.map(x => x.id)
+
+	dispatchToRoom(connectionsActions.delete(keyboardConnectionIds))
+	dispatchToRoom(deleteThingsAny(keyboardIds))
+	dispatchToRoom(deletePositions(keyboardIds))
+
+	function dispatchToRoom(action: Action) {
+		return serverStore.dispatch(createRoomAction(action, room))
+	}
 }

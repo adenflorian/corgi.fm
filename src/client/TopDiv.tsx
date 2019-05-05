@@ -40,7 +40,7 @@ export const TopDiv = ({memberCount, clientCount, info, dispatch}: AllProps) =>
 			>
 				Save Room
 			</Button>
-			<SavingAndLoading />
+			<SavingAndLoading dispatch={dispatch} />
 			<Options />
 			<a href="/newsletter" target="_blank">Newsletter</a>
 			<a href="https://discord.gg/qADwrxd" target="_blank">Discord</a>
