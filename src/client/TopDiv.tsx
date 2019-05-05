@@ -1,21 +1,24 @@
 import * as React from 'react'
-import {selectClientCount} from '../common/redux'
+import {Dispatch} from 'redux'
 import {shamuConnect} from '../common/redux'
 import {selectMemberCount} from '../common/redux'
 import {requestCreateRoom} from '../common/redux'
+import {selectClientCount} from '../common/redux'
 import {Button} from './Button/Button'
+import {localActions} from './local-middleware'
 import {Options} from './Options/Options'
 import {ConnectedRoomSelector} from './RoomSelector'
 import './TopDiv.less'
 
-interface ITopDivProps {
+interface ReduxProps {
 	memberCount: number
 	clientCount: number
 	info: string
-	createRoom: typeof requestCreateRoom
 }
 
-export const TopDiv = ({memberCount, clientCount, info, createRoom}: ITopDivProps) =>
+type AllProps = ReduxProps & {dispatch: Dispatch}
+
+export const TopDiv = ({memberCount, clientCount, info, dispatch}: AllProps) =>
 	<div id="topDiv" style={{marginBottom: 'auto'}}>
 		<div className="left">
 			<div>{info}</div>
@@ -27,9 +30,14 @@ export const TopDiv = ({memberCount, clientCount, info, createRoom}: ITopDivProp
 		<div className="right">
 			<ConnectedRoomSelector />
 			<Button
-				buttonProps={{id: 'newRoomButton', onClick: createRoom}}
+				buttonProps={{id: 'newRoomButton', onClick: () => dispatch(requestCreateRoom())}}
 			>
 				New Room
+			</Button>
+			<Button
+				buttonProps={{className: 'saveRoomButton', onClick: () => dispatch(localActions.saveRoom())}}
+			>
+				Save Room
 			</Button>
 			<Options />
 			<a href="/newsletter" target="_blank">Newsletter</a>
@@ -38,12 +46,9 @@ export const TopDiv = ({memberCount, clientCount, info, createRoom}: ITopDivProp
 	</div>
 
 export const ConnectedTopDiv = shamuConnect(
-	state => ({
+	(state): ReduxProps => ({
 		clientCount: selectClientCount(state),
 		info: state.websocket.info,
 		memberCount: selectMemberCount(state.room),
 	}),
-	{
-		createRoom: requestCreateRoom,
-	},
 )(TopDiv)

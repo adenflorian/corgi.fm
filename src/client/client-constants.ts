@@ -56,3 +56,6 @@ export function adsrValueToString(ms: number) {
 	if (ms < 10) return (ms).toFixed(2) + ' s'
 	return (ms).toFixed(1) + ' s'
 }
+
+export const graphStateSaveLocalStorageKeyPrefix = 'localSave_'
+export const graphStateSavesLocalStorageKey = 'localSaves'

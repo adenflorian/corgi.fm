@@ -1,5 +1,7 @@
 import {List, Map, Set} from 'immutable'
 import {Dispatch, Middleware} from 'redux'
+import {ActionType} from 'typesafe-actions'
+import uuid from 'uuid'
 import {ConnectionNodeType} from '../common/common-types'
 import {logger} from '../common/logger'
 import {emptyMidiNotes, IMidiNote} from '../common/MidiNote'
@@ -13,8 +15,9 @@ import {
 	makePosition, MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID,
 	NetworkActionType, READY,
 	RECORD_SEQUENCER_NOTE, selectActiveRoom, selectDirectDownstreamSequencerIds, selectLocalClient,
-	selectPositionExtremes, selectSequencer, selectVirtualKeyboardById,
-	selectVirtualKeyboardByOwner, sequencerActions, SET_ACTIVE_ROOM,
+	selectPositionExtremes, selectSequencer, selectShamuGraphState,
+	selectVirtualKeyboardById, selectVirtualKeyboardByOwner, sequencerActions,
+	SET_ACTIVE_ROOM,
 	SET_GRID_SEQUENCER_NOTE,
 	SKIP_NOTE,
 	USER_KEY_PRESS,
@@ -32,6 +35,7 @@ import {
 	VirtualOctaveChangeAction,
 } from '../common/redux/index'
 import {pointersActions} from '../common/redux/pointers-redux'
+import {graphStateSaveLocalStorageKeyPrefix, graphStateSavesLocalStorageKey} from './client-constants'
 import {getAllInstruments} from './instrument-manager'
 import {MidiNotes} from './Instruments/BasicSynthesizerView'
 import {isNewNoteScannerEnabled} from './is-prod-client'
@@ -51,6 +55,16 @@ export const windowBlur = makeActionCreator(WINDOW_BLUR)
 
 export const DELETE_NODE = 'DELETE_NODE'
 export const deleteNode = makeActionCreator(DELETE_NODE, 'nodeId')
+
+export const SAVE_ROOM = 'SAVE_ROOM'
+
+export const localActions = Object.freeze({
+	saveRoom: () => ({
+		type: SAVE_ROOM as typeof SAVE_ROOM,
+	}),
+})
+
+export type LocalAction = ActionType<typeof localActions>
 
 export function deleteAllTheThings(dispatch: Dispatch) {
 	dispatch(connectionsActions.deleteAll())
@@ -256,9 +270,65 @@ export const createLocalMiddleware: () => Middleware<{}, IClientAppState> = () =
 
 			return
 		}
+		case SAVE_ROOM: {
+			next(action)
+
+			const state = getState()
+
+			const graphState = selectShamuGraphState(state.room)
+
+			const roomName = selectActiveRoom(state)
+
+			const saveName = new Date().toISOString() + ' | room: ' + roomName
+
+			const localSaves = getOrCreateLocalSavesStorage()
+
+			localStorage.setItem(graphStateSavesLocalStorageKey, JSON.stringify({
+				...localSaves,
+				all: {
+					...localSaves.all,
+					[uuid.v4()]: graphState,
+				},
+			}))
+
+			return
+		}
 		default: return next(action)
 	}
 }
+
+function getOrCreateLocalSavesStorage(): LocalSaves {
+	const localSavesJSON = localStorage.getItem(graphStateSavesLocalStorageKey)
+
+	if (localSavesJSON === null) return makeInitialLocalSavesStorage()
+
+	const localSaves = parseLocalSavesJSON(localSavesJSON)
+
+	return localSaves
+}
+
+function parseLocalSavesJSON(localSavesJSON: string): LocalSaves {
+	try {
+		const localSaves = JSON.parse(localSavesJSON) as LocalSaves
+
+		if (!localSaves) {
+			logger.warn('failed to parse localSavesJSON, was null after casting: ', localSavesJSON)
+			return makeInitialLocalSavesStorage()
+		} else {
+			return localSaves
+		}
+	} catch (error) {
+		logger.error('error caught while trying to parse localSavesJSON: ', error)
+		logger.error('localSavesJSON: ', localSavesJSON)
+		return makeInitialLocalSavesStorage()
+	}
+}
+
+export type LocalSaves = ReturnType<typeof makeInitialLocalSavesStorage>
+
+const makeInitialLocalSavesStorage = () => Object.freeze({
+	all: {},
+})
 
 let _previousNotesForSourceId = Map<string, MidiNotes>()
 
