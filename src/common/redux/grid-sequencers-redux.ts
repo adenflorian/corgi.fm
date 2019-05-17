@@ -51,6 +51,7 @@ function getNetworkActionThings(fieldName: GridSequencerFields) {
 		GridSequencerFields.gate,
 		GridSequencerFields.scrollY,
 		GridSequencerFields.pitch,
+		GridSequencerFields.rate,
 	].includes(fieldName)) {
 		return {SERVER_ACTION, BROADCASTER_ACTION}
 	} else {
@@ -63,6 +64,7 @@ export enum GridSequencerFields {
 	scrollY = 'scrollY',
 	index = 'index',
 	pitch = 'pitch',
+	rate = 'rate',
 }
 
 export interface IGridSequencersState extends IMultiState {
@@ -79,7 +81,7 @@ export class GridSequencerState extends SequencerStateBase {
 	public static noteWidth = 12
 	public static scrollBarWidth = 16
 	public static noteHeight = 8
-	// public static controlSize = 40
+	public static controlsWidth = 180
 
 	public static dummy = new GridSequencerState(
 		'dummy', 'dummy', 0, List(), false,
@@ -104,23 +106,19 @@ export class GridSequencerState extends SequencerStateBase {
 		const midiClip = new MidiClip({
 			events: events.map(x => ({
 				...x,
-				startBeat: x.startBeat / 4,
-				durationBeats: x.durationBeats / 4,
+				startBeat: x.startBeat,
+				durationBeats: x.durationBeats,
 			})),
-			length: events.count() / 4,
+			length: events.count(),
 			loop: true,
 		})
 
 		const height = GridSequencerState.noteHeight * notesToShow
 
-		const controlsNum = height < 120 ? 3 : 2
-
-		const controlsWidth = 120
-
 		const notesDisplayWidth = GridSequencerState.noteWidth * midiClip.events.count()
 
 		const width =
-			controlsWidth +
+			GridSequencerState.controlsWidth +
 			notesDisplayWidth +
 			GridSequencerState.scrollBarWidth
 
@@ -131,7 +129,7 @@ export class GridSequencerState extends SequencerStateBase {
 			height,
 			ownerId,
 			ConnectionNodeType.gridSequencer,
-			controlsWidth,
+			GridSequencerState.controlsWidth,
 			notesDisplayWidth,
 			isPlaying,
 		)

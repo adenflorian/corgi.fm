@@ -47,7 +47,7 @@ export class ECSSequencerRenderSystem implements ECSSystem {
 		canvasContext.fillStyle = CssColor.defaultGray
 
 		canvasContext.fillRect(
-			sequencerComp.notesDisplayStartX + (sequencerComp.notesDisplayWidth * sequencerComp.ratio),
+			sequencerComp.notesDisplayStartX + (sequencerComp.notesDisplayWidth * sequencerComp.ratio) - 1,
 			0,
 			1,
 			graphPosition.height,

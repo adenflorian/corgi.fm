@@ -17,12 +17,14 @@ interface IKnobProps {
 	size?: number
 	tooltip: string
 	valueString?: (value: number) => string
+	snapFunction?: (value: number) => number
 }
 
 export const Knob = React.memo(function _Knob(props: IKnobProps) {
 	const {
 		value, label = '', readOnly = false, markColor = 'currentColor', defaultValue, onChangeId,
 		min = 0, max = 1, curve = 1, size = 32, tooltip, valueString, onChange = () => undefined,
+		snapFunction,
 	} = props
 
 	const _handleOnChange = (newValue: number) => {
@@ -37,6 +39,7 @@ export const Knob = React.memo(function _Knob(props: IKnobProps) {
 			onChange={_handleOnChange}
 			value={value}
 			defaultValue={defaultValue}
+			snapFunction={snapFunction}
 		>
 			{(handleMouseDown, percentage, adjustedPercentage) =>
 				<KnobView

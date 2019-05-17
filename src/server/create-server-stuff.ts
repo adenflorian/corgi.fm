@@ -52,17 +52,6 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 	connectNodes(simpleReverb, masterAudioOutput)
 
 	const serverStuffDefinitions = Object.freeze({
-		// bass: {
-		// 	source: {
-		// 		type: ConnectionNodeType.gridSequencer,
-		// 		events: getBassNotes(),
-		// 		name: getConnectionNodeInfo(ConnectionNodeType.gridSequencer).typeName,
-		// 		notesToShow: 18,
-		// 	},
-		// 	target: {
-		// 		type: ConnectionNodeType.basicSampler,
-		// 	},
-		// },
 		melody: {
 			source: {
 				type: ConnectionNodeType.gridSequencer,
@@ -86,17 +75,6 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 				type: ConnectionNodeType.basicSampler,
 			},
 		},
-		// arp2: {
-		// 	source: {
-		// 		type: ConnectionNodeType.infiniteSequencer,
-		// 		events: getInitialInfiniteSequencerEvents(),
-		// 		name: getConnectionNodeInfo(ConnectionNodeType.infiniteSequencer).typeName,
-		// 		infinityStyle: InfiniteSequencerStyle.colorBars,
-		// 	},
-		// 	target: {
-		// 		type: ConnectionNodeType.basicSynthesizer,
-		// 	},
-		// },
 	})
 
 	const serverStuff = createSourceAndTargets(serverStuffDefinitions)
@@ -250,15 +228,6 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 	function dispatchToRoom(action: Action) {
 		return serverStore.dispatch(createRoomAction(action, room))
 	}
-}
-
-function getBassNotes(): MidiClipEvents {
-	return createSequencerEvents(16)
-		.map((_, i) => (makeMidiClipEvent({
-			notes: MidiNotes(i % 2 === 1 ? [] : [36]),
-			startBeat: i,
-			durationBeats: 1,
-		})))
 }
 
 function getMelodyNotes() {

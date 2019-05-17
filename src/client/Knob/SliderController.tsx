@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React, {useEffect, useState} from 'react'
 import './Knob.less'
 
 interface ISliderControllerProps {
@@ -9,117 +9,102 @@ interface ISliderControllerProps {
 	defaultValue: number
 	curve: number
 	children: (handleMouseDown: any, percentage: number, adjustedPercentage: number) => any
+	snapFunction?: (value: number) => number
 }
 
-interface ISliderControllerState {
-	mouseDownPosition: {
-		x: number,
-		y: number,
-	}
-	isMouseDown: boolean,
-	normalizedValue: number
-}
+export function SliderController(props: ISliderControllerProps) {
+	const {
+		value, defaultValue, onChange = () => undefined,
+		snapFunction, min = 0, max = 1, curve = 1,
+	} = props
 
-export class SliderController extends React.Component<ISliderControllerProps, ISliderControllerState> {
-	public static defaultProps = {
-		onChange: () => undefined,
-		min: 0,
-		max: 1,
-		curve: 1,
-	}
+	const [isMouseDown, setIsMouseDown] = useState(false)
+	const [tempValue, setTempValue] = useState(0)
 
-	public state: ISliderControllerState = {
-		mouseDownPosition: {
-			x: 0,
-			y: 0,
-		},
-		isMouseDown: false,
-		normalizedValue: 0.5,
-	}
+	useEffect(() => {
+		window.addEventListener('mousemove', _handleMouseMove)
+		window.addEventListener('mouseup', _handleMouseUp)
 
-	constructor(props: ISliderControllerProps) {
-		super(props)
-		this.state.normalizedValue = this._normalize(this.props.value)
-		window.addEventListener('mousemove', this._handleMouseMove)
-		window.addEventListener('mouseup', this._handleMouseUp)
-	}
+		return () => {
+			window.removeEventListener('mousemove', _handleMouseMove)
+			window.removeEventListener('mouseup', _handleMouseUp)
+		}
+	})
 
-	public componentWillReceiveProps(nextProps: ISliderControllerProps) {
-		const normalizedNextValue = this._normalize(nextProps.value)
-		if (normalizedNextValue !== this.state.normalizedValue) {
-			this.setState({normalizedValue: normalizedNextValue})
+	const _handleMouseUp = () => {
+		if (isMouseDown) {
+			setIsMouseDown(false)
 		}
 	}
 
-	public componentWillUnmount() {
-		window.removeEventListener('mousemove', this._handleMouseMove)
-		window.removeEventListener('mouseup', this._handleMouseUp)
-	}
+	const _handleMouseMove = (e: MouseEvent) => {
+		if (isMouseDown) {
+			if (e.buttons !== 1) {
+				return setIsMouseDown(false)
+			}
 
-	public render() {
-		return this.props.children(
-			this._handleMouseDown,
-			this.state.normalizedValue,
-			this._normalize(this.props.value, false),
-		)
-	}
-
-	private readonly _handleMouseUp = () => {
-		if (this.state.isMouseDown) {
-			this.setState({
-				isMouseDown: false,
-			})
-		}
-	}
-
-	private readonly _handleMouseMove = (e: MouseEvent) => {
-		if (this.state.isMouseDown) {
 			let sensitivity = 0.005
 			if (e.shiftKey) {
 				sensitivity *= 2
 			} else if (e.altKey) {
 				sensitivity *= 0.25
 			}
+
 			const mouseYDelta = e.movementY * sensitivity
 
-			const normalizedValue = this.state.normalizedValue
+			if (snapFunction) {
+				const newNormalizedValue = Math.max(0, Math.min(1, _normalize(tempValue) - mouseYDelta))
 
-			const newNormalizedValue = Math.max(0, Math.min(1, normalizedValue - mouseYDelta))
+				const newValue = _deNormalize(newNormalizedValue)
 
-			if (newNormalizedValue !== normalizedValue) {
-				this.setState({normalizedValue: newNormalizedValue})
-				this.props.onChange(this._deNormalize(newNormalizedValue))
+				const snappedValue = snapFunction(newValue)
+
+				if (snappedValue !== value) {
+					onChange(snappedValue)
+					setTempValue(snappedValue)
+				} else {
+					setTempValue(newValue)
+				}
+			} else {
+				const newNormalizedValue = Math.max(0, Math.min(1, _normalize(value) - mouseYDelta))
+
+				const newValue = _deNormalize(newNormalizedValue)
+
+				if (newValue !== value) {
+					onChange(newValue)
+					setTempValue(newValue)
+				}
 			}
 		}
 	}
 
-	private readonly _normalize = (value: number, curve = true) => {
-		const normalizedValue = (value - this.props.min) / (this.props.max - this.props.min)
-		if (curve) {
-			return Math.pow(normalizedValue, 1 / this.props.curve)
+	function _normalize(n: number, useCurve = true) {
+		const x = (n - min) / (max - min)
+		if (useCurve) {
+			return Math.pow(x, 1 / curve)
 		} else {
-			return normalizedValue
+			return x
 		}
 	}
 
-	private readonly _deNormalize = (value: number) => {
-		const deCurvedValue = Math.pow(value, this.props.curve)
-		const deNormalizedValue = (deCurvedValue * (this.props.max - this.props.min)) + this.props.min
+	const _deNormalize = (n: number) => {
+		const deCurvedValue = Math.pow(n, curve)
+		const deNormalizedValue = (deCurvedValue * (max - min)) + min
 		return deNormalizedValue
 	}
 
-	private readonly _handleMouseDown = (e: React.MouseEvent) => {
+	const _handleMouseDown = (e: React.MouseEvent) => {
 		if (e.ctrlKey) {
-			this.setState({normalizedValue: this._normalize(this.props.defaultValue)})
-			this.props.onChange(this.props.defaultValue)
+			onChange(defaultValue)
 		} else {
-			this.setState({
-				mouseDownPosition: {
-					x: e.screenX,
-					y: e.screenY,
-				},
-				isMouseDown: true,
-			})
+			setTempValue(value)
+			setIsMouseDown(true)
 		}
 	}
+
+	return props.children(
+		_handleMouseDown,
+		_normalize(value, true),
+		_normalize(value, false),
+	)
 }

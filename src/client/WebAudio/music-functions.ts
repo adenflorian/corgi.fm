@@ -63,3 +63,11 @@ export const keyColors: Readonly<IKeyColors> = Object.freeze({
 	10: {color: 'black', name: 'A#'},
 	11: {color: 'white', name: 'B'},
 } as IKeyColors)
+
+export function roundRate(rawRate: number) {
+	return nearestPow2(rawRate)
+}
+
+function nearestPow2(aSize: number) {
+	return Math.pow(2, Math.round(Math.log(aSize) / Math.log(2)))
+}

@@ -6,10 +6,11 @@ import {
 import {Dispatch} from 'redux'
 import {
 	globalClockActions, gridSequencerActions, GridSequencerFields,
-	selectGridSequencer, sequencerActions, shamuConnect,
+	GridSequencerState, selectGridSequencer, sequencerActions, shamuConnect,
 } from '../../common/redux'
-import {sequencerGateToolTip, sequencerPitchToolTip} from '../client-constants'
+import {seqRateValueToString, sequencerGateToolTip, sequencerPitchToolTip, sequencerRateToolTip} from '../client-constants'
 import {Knob} from '../Knob/Knob'
+import {roundRate} from '../WebAudio'
 
 interface IGridSequencerControlsProps {
 	id: string
@@ -18,6 +19,7 @@ interface IGridSequencerControlsProps {
 interface ReduxProps {
 	gate: number
 	pitch: number
+	rate: number
 }
 
 type AllProps = IGridSequencerControlsProps & ReduxProps & {dispatch: Dispatch}
@@ -28,7 +30,7 @@ export const GridSequencerControls = (props: AllProps) => {
 		props.dispatch(gridSequencerActions.setField(props.id, paramType, value))
 
 	return (
-		<div className="controls unselectable">
+		<div className="controls unselectable" style={{width: GridSequencerState.controlsWidth}}>
 			<div className="buttons">
 				<div
 					className="play"
@@ -91,6 +93,18 @@ export const GridSequencerControls = (props: AllProps) => {
 					onChangeId={GridSequencerFields.pitch}
 					tooltip={sequencerPitchToolTip}
 				/>
+				<Knob
+					min={1 / 32}
+					max={4}
+					value={props.rate}
+					defaultValue={1 / 8}
+					onChange={dispatchGridSeqParam}
+					label="rate"
+					onChangeId={GridSequencerFields.rate}
+					tooltip={sequencerRateToolTip}
+					valueString={seqRateValueToString}
+					snapFunction={roundRate}
+				/>
 			</div>
 		</div>
 	)
@@ -103,6 +117,7 @@ export const GridSequencerControlsConnected = shamuConnect(
 		return {
 			gate: gridSequencerState.gate,
 			pitch: gridSequencerState.pitch,
+			rate: gridSequencerState.rate,
 		}
 	},
 )(GridSequencerControls)

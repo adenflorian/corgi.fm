@@ -26,9 +26,12 @@ const emptyGlobalClipEvents = List()
 
 // Maybe range should only ever be a simple number, divisible by 10 or something
 /** Must apply BPM on result */
-export function getEvents(clip: MidiClip, initialRange: MidiRange): MidiGlobalClipEvents {
+export function getEvents(clip: MidiClip, initialRange: MidiRange, rate: number): MidiGlobalClipEvents {
 	logger.trace('getNotes')
-	if (clip.length <= 0) return emptyGlobalClipEvents
+
+	const clipLength = clip.length * rate
+
+	if (clipLength <= 0) return emptyGlobalClipEvents
 
 	return _getNotes(initialRange, 0)
 
@@ -42,17 +45,17 @@ export function getEvents(clip: MidiClip, initialRange: MidiRange): MidiGlobalCl
 
 	function _checkBeatRange(_range: MidiRange, _offset: number): MidiGlobalClipEvents {
 		if (_rangeIsWithinBounds(_range)) {
-			return _checkWithinClipBounds(_range.normalize(clip.length), _offset)
+			return _checkWithinClipBounds(_range.normalize(clipLength), _offset)
 		} else {
-			return _checkCrossingClipBounds(_range.normalize(clip.length), _offset)
+			return _checkCrossingClipBounds(_range.normalize(clipLength), _offset)
 		}
 	}
 
 	function _rangeIsWithinBounds(_range: MidiRange) {
-		if (_range.length <= clip.length) {
-			const {start, end} = _range.normalize(clip.length)
+		if (_range.length <= clipLength) {
+			const {start, end} = _range.normalize(clipLength)
 
-			return 0 <= start && end <= clip.length
+			return 0 <= start && end <= clipLength
 		} else {
 			return false
 		}
@@ -62,21 +65,26 @@ export function getEvents(clip: MidiClip, initialRange: MidiRange): MidiGlobalCl
 		logger.trace('_checkWithinClipBounds')
 
 		return clip.events.filter(x => {
+			const adjustedStartBeat = x.startBeat * rate
 			return start === end
-				? start === x.startBeat
-				: start <= x.startBeat && x.startBeat < end
+				? start === adjustedStartBeat
+				: start <= adjustedStartBeat && adjustedStartBeat < end
 		})
-			.map(x => (makeMidiGlobalClipEvent({
-				notes: x.notes,
-				startTime: ((x.startBeat * midiPrecision) - (start * midiPrecision) + (_offset * midiPrecision)) / midiPrecision,
-				endTime: ((x.startBeat * midiPrecision) - (start * midiPrecision) + (_offset * midiPrecision) + (x.durationBeats * midiPrecision)) / midiPrecision, // TODO
-			})))
+			.map(x => {
+				const adjustedStartBeat = x.startBeat * rate
+				const adjustedDurationBeats = x.durationBeats * rate
+				return (makeMidiGlobalClipEvent({
+					notes: x.notes,
+					startTime: ((adjustedStartBeat * midiPrecision) - (start * midiPrecision) + (_offset * midiPrecision)) / midiPrecision,
+					endTime: ((adjustedStartBeat * midiPrecision) - (start * midiPrecision) + (_offset * midiPrecision) + (adjustedDurationBeats * midiPrecision)) / midiPrecision, // TODO
+				}))
+			})
 	}
 
 	function _checkCrossingClipBounds(_range: MidiRange, _offset: number): MidiGlobalClipEvents {
 		logger.trace('_checkCrossingClipBounds')
 
-		const newLength = ((clip.length * midiPrecision) - (_range.start * midiPrecision)) / midiPrecision
+		const newLength = ((clipLength * midiPrecision) - (_range.start * midiPrecision)) / midiPrecision
 		const newEnd = ((_range.start * midiPrecision) + (newLength * midiPrecision)) / midiPrecision
 		const excess = ((_range.end * midiPrecision) - (newEnd * midiPrecision)) / midiPrecision
 
@@ -90,7 +98,7 @@ export function getEvents(clip: MidiClip, initialRange: MidiRange): MidiGlobalCl
 		} else {
 			return events.concat(_getNotes(
 				new MidiRange(0, excess),
-				((_offset * midiPrecision) + (clip.length * midiPrecision) - (_range.start * midiPrecision)) / midiPrecision,
+				((_offset * midiPrecision) + (clipLength * midiPrecision) - (_range.start * midiPrecision)) / midiPrecision,
 			))
 		}
 	}

@@ -5,7 +5,6 @@ import {MidiGlobalClipEvent, midiPrecision, MidiRange} from '../common/midi-type
 import {
 	ClientStore, GroupSequencers,
 	IClientRoomState,
-	selectAllConnections,
 	selectAllGroupSequencers,
 	selectAllSequencers,
 	selectConnectionSourceIdsByTarget,
@@ -119,14 +118,12 @@ function scheduleNotes() {
 
 	const groupSequencers = selectAllGroupSequencers(roomState)
 
-	const connections = selectAllConnections(roomState)
-
 	// run all sequencers events thru scheduler
 	const sequencersEvents = Map(selectAllSequencers(roomState))
 		.filter(seq => selectSequencerIsPlaying(roomState, seq.id))
 		.map(seq => ({
 			seq,
-			events: getEvents(seq.midiClip, readRangeBeats)
+			events: getEvents(seq.midiClip, readRangeBeats, seq.rate)
 				.filter(getGroupEventsFilter(groupSequencers, roomState, seq.id, currentSongTimeBeats + offsetBeats))
 				.map(event => applyGateToEvent(seq.gate, event))
 				.map(event => ({
@@ -138,7 +135,7 @@ function scheduleNotes() {
 		}))
 
 	_sequencersInfo = sequencersEvents.map(x => ({
-		loopRatio: (currentSongTimeBeats % x.seq.midiClip.length) / x.seq.midiClip.length,
+		loopRatio: (currentSongTimeBeats % (x.seq.midiClip.length * x.seq.rate)) / (x.seq.midiClip.length * x.seq.rate),
 	})).concat(
 		Map(selectAllGroupSequencers(roomState))
 			.map(x => {

@@ -1,4 +1,5 @@
 import {stripIndent} from 'common-tags'
+import {roundRate} from './WebAudio'
 
 export const mainBoardsId = 'mainBoards'
 export const zoomBackgroundClass = 'zoomBackground'
@@ -34,6 +35,9 @@ export const sequencerGateToolTip = stripIndent`
 export const sequencerPitchToolTip = stripIndent`
 	controls note midi pitch in half steps
 `
+export const sequencerRateToolTip = stripIndent`
+	makes sequence go faster or slower
+`
 export const graphSizeX = 12800
 export const graphSizeY = 7200
 
@@ -47,6 +51,12 @@ export function panValueToString(pan: number) {
 
 export function filterValueToString(frequencyHz: number) {
 	return (frequencyHz / 1000).toFixed(0) + ' kHz'
+}
+
+export function seqRateValueToString(rate: number) {
+	const roundedRate = roundRate(rate)
+	if (roundedRate >= 1) return roundedRate.toFixed(0)
+	return '1/' + (1 / roundedRate)
 }
 
 export function adsrValueToString(ms: number) {
