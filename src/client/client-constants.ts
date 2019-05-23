@@ -1,5 +1,4 @@
 import {stripIndent} from 'common-tags'
-import {roundRate} from './WebAudio'
 
 export const mainBoardsId = 'mainBoards'
 export const zoomBackgroundClass = 'zoomBackground'
@@ -54,9 +53,8 @@ export function filterValueToString(frequencyHz: number) {
 }
 
 export function seqRateValueToString(rate: number) {
-	const roundedRate = roundRate(rate)
-	if (roundedRate >= 1) return roundedRate.toFixed(0)
-	return '1/' + (1 / roundedRate)
+	if (rate >= 1) return rate.toFixed(0)
+	return '1/' + (1 / rate)
 }
 
 export function adsrValueToString(ms: number) {

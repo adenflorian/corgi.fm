@@ -10,7 +10,8 @@ import {
 } from '../../common/redux'
 import {seqRateValueToString, sequencerGateToolTip, sequencerPitchToolTip, sequencerRateToolTip} from '../client-constants'
 import {Knob} from '../Knob/Knob'
-import {roundRate} from '../WebAudio'
+import {KnobSnapping} from '../Knob/KnobSnapping'
+import {rateValues} from '../WebAudio'
 
 interface IGridSequencerControlsProps {
 	id: string
@@ -93,17 +94,15 @@ export const GridSequencerControls = (props: AllProps) => {
 					onChangeId={GridSequencerFields.pitch}
 					tooltip={sequencerPitchToolTip}
 				/>
-				<Knob
-					min={1 / 32}
-					max={4}
+				<KnobSnapping
 					value={props.rate}
-					defaultValue={1 / 8}
+					defaultIndex={rateValues.indexOf(1 / 8)}
 					onChange={dispatchGridSeqParam}
 					label="rate"
 					onChangeId={GridSequencerFields.rate}
 					tooltip={sequencerRateToolTip}
 					valueString={seqRateValueToString}
-					snapFunction={roundRate}
+					possibleValues={rateValues}
 				/>
 			</div>
 		</div>

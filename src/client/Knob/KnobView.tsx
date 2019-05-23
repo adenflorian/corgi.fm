@@ -11,7 +11,7 @@ interface IKnobViewProps {
 	handleMouseDown: (e: React.MouseEvent) => any
 	size: number
 	tooltip: string
-	value: number
+	value: number | string
 	valueString?: (value: number) => string
 }
 
@@ -20,6 +20,12 @@ export const KnobView = React.memo(function _KnobView(props: IKnobViewProps) {
 		handleMouseDown, percentage, adjustedPercentage, size = 32, valueString,
 		label, value, readOnly = false, markColor = 'gray', tooltip,
 	} = props
+
+	const displayValue = typeof value === 'number'
+		? valueString
+			? valueString(value)
+			: value.toFixed(2)
+		: value
 
 	return (
 		<div
@@ -64,7 +70,7 @@ export const KnobView = React.memo(function _KnobView(props: IKnobViewProps) {
 					<div className="mark" style={{backgroundColor: markColor}}></div>
 				</div>
 			</div>
-			<div className="valueBox">{valueString ? valueString(value) : value.toFixed(2)}</div>
+			<div className="valueBox">{displayValue}</div>
 			<div className="knobLabel unselectable">{label}</div>
 		</div>
 	)

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, {useLayoutEffect, useState} from 'react'
 import './Knob.less'
 
 interface ISliderControllerProps {
@@ -21,27 +21,19 @@ export function SliderController(props: ISliderControllerProps) {
 	const [isMouseDown, setIsMouseDown] = useState(false)
 	const [tempValue, setTempValue] = useState(0)
 
-	useEffect(() => {
-		window.addEventListener('mousemove', _handleMouseMove)
-		window.addEventListener('mouseup', _handleMouseUp)
+	useLayoutEffect(() => {
+		if (isMouseDown) {
+			window.addEventListener('mousemove', _handleMouseMove)
+		}
 
 		return () => {
 			window.removeEventListener('mousemove', _handleMouseMove)
-			window.removeEventListener('mouseup', _handleMouseUp)
 		}
-	})
-
-	const _handleMouseUp = () => {
-		if (isMouseDown) {
-			setIsMouseDown(false)
-		}
-	}
+	}, [isMouseDown, tempValue, value])
 
 	const _handleMouseMove = (e: MouseEvent) => {
 		if (isMouseDown) {
-			if (e.buttons !== 1) {
-				return setIsMouseDown(false)
-			}
+			if (e.buttons !== 1) return setIsMouseDown(false)
 
 			let sensitivity = 0.005
 			if (e.shiftKey) {
@@ -53,7 +45,7 @@ export function SliderController(props: ISliderControllerProps) {
 			const mouseYDelta = e.movementY * sensitivity
 
 			if (snapFunction) {
-				const newNormalizedValue = Math.max(0, Math.min(1, _normalize(tempValue) - mouseYDelta))
+				const newNormalizedValue = clamp(_normalize(tempValue) - mouseYDelta)
 
 				const newValue = _deNormalize(newNormalizedValue)
 
@@ -81,9 +73,9 @@ export function SliderController(props: ISliderControllerProps) {
 	function _normalize(n: number, useCurve = true) {
 		const x = (n - min) / (max - min)
 		if (useCurve) {
-			return Math.pow(x, 1 / curve)
+			return clamp(Math.pow(x, 1 / curve))
 		} else {
-			return x
+			return clamp(x)
 		}
 	}
 
@@ -107,4 +99,8 @@ export function SliderController(props: ISliderControllerProps) {
 		_normalize(value, true),
 		_normalize(value, false),
 	)
+}
+
+function clamp(value: number): number {
+	return Math.min(1, Math.max(0, value))
 }

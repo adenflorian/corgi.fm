@@ -1,3 +1,4 @@
+import {List} from 'immutable'
 import {IMidiNote} from '../../common/MidiNote'
 import {Octave} from './music-types'
 
@@ -65,9 +66,38 @@ export const keyColors: Readonly<IKeyColors> = Object.freeze({
 } as IKeyColors)
 
 export function roundRate(rawRate: number) {
-	return nearestPow2(rawRate)
+	return rateValues.find(x => rawRate <= x) || rateValues.last(4)
 }
 
 function nearestPow2(aSize: number) {
 	return Math.pow(2, Math.round(Math.log(aSize) / Math.log(2)))
 }
+
+function nearestPow3(aSize: number) {
+	return Math.pow(6, Math.round(Math.log(aSize) / Math.log(6)))
+}
+
+export const rateValues = List([
+	4,
+	3,
+	2,
+	// 1.5,
+	1,
+	// 3 / 4,
+	1 / 2,
+	1 / 3,
+	1 / 4,
+	// 3 / 8,
+	// 3 / 16,
+	1 / 6,
+	1 / 8,
+	// 3 / 32,
+	1 / 12,
+	1 / 16,
+	1 / 24,
+	1 / 32,
+	// 1 / 48,
+	// 1 / 64,
+	// 1 / 96,
+	// 1 / 128,
+]).reverse()
