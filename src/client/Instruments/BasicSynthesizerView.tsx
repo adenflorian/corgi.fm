@@ -10,7 +10,7 @@ import {
 } from '../../common/redux'
 import {IClientAppState} from '../../common/redux'
 import {
-	adsrValueToString, attackToolTip, detuneToolTip, filterValueToString, gainToolTip, lpfToolTip, panToolTip, panValueToString, releaseToolTip,
+	adsrValueToString, attackToolTip, detuneToolTip, detuneValueToString, filterValueToString, gainToolTip, lpfToolTip, panToolTip, panValueToString, releaseToolTip,
 } from '../client-constants'
 import {Knob} from '../Knob/Knob'
 import {Panel} from '../Panel/Panel'
@@ -75,10 +75,10 @@ export class BasicSynthesizerView
 							/>
 							<Knob
 								min={0}
-								max={10000}
+								max={20000}
 								curve={2}
 								value={this.props.lowPassFilterCutoffFrequency}
-								defaultValue={10000}
+								defaultValue={20000}
 								onChange={this._dispatchChangeInstrumentParam}
 								label="lpf"
 								onChangeId={BasicSynthesizerParam.lowPassFilterCutoffFrequency}
@@ -118,6 +118,7 @@ export class BasicSynthesizerView
 								label="detune"
 								onChangeId={BasicSynthesizerParam.fineTuning}
 								tooltip={detuneToolTip}
+								valueString={detuneValueToString}
 							/>
 							<Knob
 								min={0}

@@ -66,7 +66,7 @@ export const SimpleReverbView: React.FC<ISimpleReverbAllProps> =
 					<Knob
 						label="lpf"
 						min={0}
-						max={10000}
+						max={20000}
 						curve={2}
 						value={lpf}
 						defaultValue={2000}

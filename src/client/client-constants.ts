@@ -49,12 +49,26 @@ export function panValueToString(pan: number) {
 }
 
 export function filterValueToString(frequencyHz: number) {
-	return (frequencyHz / 1000).toFixed(0) + ' kHz'
+	return frequencyHz.toFixed(0) + ' Hz'
+}
+
+export function detuneValueToString(detune: number) {
+	return detune.toFixed(0) + ' cents'
+}
+
+export function seqGateValueToString(pitch: number) {
+	return pitch.toFixed(2).replace(/\.00$/, '')
 }
 
 export function seqRateValueToString(rate: number) {
-	if (rate >= 1) return rate.toFixed(0)
+	if (rate > 1) return rate.toFixed(0) + ' bars'
+	if (rate === 1) return rate.toFixed(0) + ' bar'
 	return '1/' + (1 / rate)
+}
+
+export function seqPitchValueToString(pitch: number) {
+	if (pitch > 0) return '+' + pitch.toFixed(0) + ' semitones'
+	return pitch.toFixed(0) + ' semitones'
 }
 
 export function adsrValueToString(ms: number) {

@@ -17,7 +17,6 @@ interface IKnobProps {
 	size?: number
 	tooltip: string
 	valueString?: (value: number) => string
-	snapFunction?: (value: number) => number
 }
 
 export const Knob = React.memo(function _Knob(props: IKnobProps) {

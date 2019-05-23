@@ -1,3 +1,5 @@
+import {List} from 'immutable'
+import _ from 'lodash'
 import * as React from 'react'
 import {
 	IoMdDownload as Download, IoMdPlay as Play, IoMdRecording as Record,
@@ -8,7 +10,7 @@ import {
 	globalClockActions, gridSequencerActions, GridSequencerFields,
 	GridSequencerState, selectGridSequencer, sequencerActions, shamuConnect,
 } from '../../common/redux'
-import {seqRateValueToString, sequencerGateToolTip, sequencerPitchToolTip, sequencerRateToolTip} from '../client-constants'
+import {seqGateValueToString, seqPitchValueToString, seqRateValueToString, sequencerGateToolTip, sequencerPitchToolTip, sequencerRateToolTip} from '../client-constants'
 import {Knob} from '../Knob/Knob'
 import {KnobSnapping} from '../Knob/KnobSnapping'
 import {rateValues} from '../WebAudio'
@@ -83,16 +85,17 @@ export const GridSequencerControls = (props: AllProps) => {
 					label="gate"
 					onChangeId={GridSequencerFields.gate}
 					tooltip={sequencerGateToolTip}
+					valueString={seqGateValueToString}
 				/>
-				<Knob
-					min={-12}
-					max={12}
+				<KnobSnapping
 					value={props.pitch}
-					defaultValue={0}
+					defaultIndex={12}
 					onChange={dispatchGridSeqParam}
 					label="pitch"
 					onChangeId={GridSequencerFields.pitch}
 					tooltip={sequencerPitchToolTip}
+					valueString={seqPitchValueToString}
+					possibleValues={List(_.range(-12, 13))}
 				/>
 				<KnobSnapping
 					value={props.rate}

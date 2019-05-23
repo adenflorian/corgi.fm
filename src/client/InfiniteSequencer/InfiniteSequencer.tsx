@@ -1,3 +1,5 @@
+import {List} from 'immutable'
+import _ from 'lodash'
 import * as React from 'react'
 import {
 	IoMdDownload as Download, IoMdGrid as Rows, IoMdPlay as Play, IoMdRecording as Record, IoMdSquare as Stop,
@@ -13,7 +15,7 @@ import {
 	InfiniteSequencerStyle, selectConnectionSourceColorByTargetId, selectGlobalClockState, selectInfiniteSequencer, sequencerActions,
 } from '../../common/redux'
 import {getColorStringForMidiNote} from '../../common/shamu-color'
-import {seqRateValueToString, sequencerGateToolTip, sequencerPitchToolTip, sequencerRateToolTip} from '../client-constants'
+import {seqGateValueToString, seqPitchValueToString, seqRateValueToString, sequencerGateToolTip, sequencerPitchToolTip, sequencerRateToolTip} from '../client-constants'
 import {isWhiteKey} from '../Keyboard/Keyboard'
 import {Knob} from '../Knob/Knob'
 import {KnobSnapping} from '../Knob/KnobSnapping'
@@ -162,17 +164,18 @@ export const InfiniteSequencer: React.FC<IInfiniteSequencerAllProps> = React.mem
 								label="gate"
 								onChangeId={InfiniteSequencerFields.gate}
 								tooltip={sequencerGateToolTip}
+								valueString={seqGateValueToString}
 							/>
 
-							<Knob
-								min={-12}
-								max={12}
+							<KnobSnapping
 								value={props.pitch}
-								defaultValue={0}
+								defaultIndex={12}
 								onChange={dispatchInfiniteSeqParam}
 								label="pitch"
 								onChangeId={InfiniteSequencerFields.pitch}
 								tooltip={sequencerPitchToolTip}
+								valueString={seqPitchValueToString}
+								possibleValues={List(_.range(-12, 13))}
 							/>
 
 							<KnobSnapping
