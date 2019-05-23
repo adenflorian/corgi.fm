@@ -9,15 +9,16 @@ import {MidiClipEvents} from '../../common/midi-types'
 import {IMidiNote} from '../../common/MidiNote'
 import {
 	findLowestAndHighestNotes, globalClockActions, IClientAppState,
-	infiniteSequencerActions, InfiniteSequencerFields, InfiniteSequencerStyle,
-	selectConnectionSourceColorByTargetId, selectGlobalClockState, selectInfiniteSequencer, sequencerActions,
+	infiniteSequencerActions, InfiniteSequencerFields, InfiniteSequencerState,
+	InfiniteSequencerStyle, selectConnectionSourceColorByTargetId, selectGlobalClockState, selectInfiniteSequencer, sequencerActions,
 } from '../../common/redux'
 import {getColorStringForMidiNote} from '../../common/shamu-color'
-import {sequencerGateToolTip, sequencerPitchToolTip} from '../client-constants'
+import {seqRateValueToString, sequencerGateToolTip, sequencerPitchToolTip, sequencerRateToolTip} from '../client-constants'
 import {isWhiteKey} from '../Keyboard/Keyboard'
 import {Knob} from '../Knob/Knob'
+import {KnobSnapping} from '../Knob/KnobSnapping'
 import {Panel} from '../Panel/Panel'
-import {getOctaveFromMidiNote, midiNoteToNoteName} from '../WebAudio/music-functions'
+import {getOctaveFromMidiNote, midiNoteToNoteName, rateValues} from '../WebAudio/music-functions'
 import './InfiniteSequencer.less'
 
 interface IInfiniteSequencerProps {
@@ -89,7 +90,7 @@ export const InfiniteSequencer: React.FC<IInfiniteSequencerAllProps> = React.mem
 						color={isRecording ? 'red' : color}
 						saturate={isPlaying}
 					>
-						<div className="controls">
+						<div className="controls" style={{maxWidth: InfiniteSequencerState.controlsWidth}}>
 							<div
 								className="play"
 								onClick={() => {
@@ -174,14 +175,16 @@ export const InfiniteSequencer: React.FC<IInfiniteSequencerAllProps> = React.mem
 								tooltip={sequencerPitchToolTip}
 							/>
 
-							{/* <Knob
-								min={1}
-								max={8}
-								value={rate}
+							<KnobSnapping
+								value={props.rate}
+								defaultIndex={rateValues.indexOf(1 / 4)}
 								onChange={dispatchInfiniteSeqParam}
 								label="rate"
 								onChangeId={InfiniteSequencerFields.rate}
-							/> */}
+								tooltip={sequencerRateToolTip}
+								valueString={seqRateValueToString}
+								possibleValues={rateValues}
+							/>
 						</div>
 						{style === InfiniteSequencerStyle.colorBars &&
 							<div className={`display ${props.events.count() > 8 ? 'small' : ''}`}>

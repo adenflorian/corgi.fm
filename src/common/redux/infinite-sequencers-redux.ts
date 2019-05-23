@@ -90,8 +90,9 @@ export enum InfiniteSequencerStyle {
 }
 
 export class InfiniteSequencerState extends SequencerStateBase {
-	public static defaultWidth = 632
+	public static defaultWidth = 688
 	public static defaultHeight = 80
+	public static controlsWidth = 272 + 56
 
 	public static dummy = new InfiniteSequencerState(
 		'dummy', 'dummy', InfiniteSequencerStyle.colorGrid, List(), false,
@@ -118,8 +119,6 @@ export class InfiniteSequencerState extends SequencerStateBase {
 			loop: true,
 		})
 
-		const controlsWidth = 272
-
 		super(
 			name,
 			midiClip,
@@ -127,8 +126,8 @@ export class InfiniteSequencerState extends SequencerStateBase {
 			InfiniteSequencerState.defaultHeight,
 			ownerId,
 			ConnectionNodeType.infiniteSequencer,
-			controlsWidth,
-			InfiniteSequencerState.defaultWidth - controlsWidth,
+			InfiniteSequencerState.controlsWidth,
+			InfiniteSequencerState.defaultWidth - InfiniteSequencerState.controlsWidth,
 			isPlaying,
 			0.5,
 		)
