@@ -19,6 +19,7 @@ import {ConnectedInfiniteSequencer} from '../InfiniteSequencer/InfiniteSequencer
 import {ConnectedBasicSynthesizerView} from '../Instruments/BasicSynthesizerView'
 import {ConnectedKeyboard} from '../Keyboard/Keyboard'
 import {ConnectedMasterControls} from '../MasterControls'
+import {ConnectedSimpleCompressor} from '../ShamuNodes/SimpleCompressor/SimpleCompressorView'
 import {ConnectedSimpleReverb} from '../ShamuNodes/SimpleReverb/SimpleReverbView'
 import {simpleGlobalClientState} from '../SimpleGlobalClientState'
 import {ConnectedVolumeControl} from '../Volume/VolumeControl'
@@ -162,6 +163,7 @@ export function getComponentByNodeType(type: ConnectionNodeType, id: string, col
 		case ConnectionNodeType.basicSampler: return <ConnectedBasicSampler id={id} color={color} />
 
 		case ConnectionNodeType.simpleReverb: return <ConnectedSimpleReverb id={id} color={color} />
+		case ConnectionNodeType.simpleCompressor: return <ConnectedSimpleCompressor id={id} color={color} />
 
 		default: throw new Error('invalid type: ' + type.toString() + ' ' + id)
 	}

@@ -22,6 +22,7 @@ import {
 } from './index'
 import {addInfiniteSequencer, InfiniteSequencerState} from './infinite-sequencers-redux'
 import {selectSequencerIsPlaying} from './sequencer-redux'
+import {addSimpleCompressor, selectSimpleCompressor, SimpleCompressorState} from './simple-compressor-redux'
 import {addSimpleReverb, SimpleReverbState} from './simple-reverb-redux'
 import {addVirtualKeyboard} from './virtual-keyboard-redux'
 
@@ -172,6 +173,15 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		showOnAddNodeMenu: true,
 		isDeletable: true,
 	})],
+	[ConnectionNodeType.simpleCompressor, makeNodeInfo({
+		typeName: 'Compressor',
+		stateConstructor: SimpleCompressorState,
+		addNodeActionCreator: addSimpleCompressor,
+		selectIsPlaying: selectIsUpstreamNodePlaying,
+		stateSelector: selectSimpleCompressor,
+		showOnAddNodeMenu: true,
+		isDeletable: true,
+	})],
 	[ConnectionNodeType.audioOutput, makeNodeInfo({
 		typeName: 'Audio Output',
 		stateConstructor: AudioOutputState,
@@ -197,6 +207,7 @@ export function isAudioNodeType(type: ConnectionNodeType) {
 		ConnectionNodeType.basicSampler,
 		ConnectionNodeType.audioOutput,
 		ConnectionNodeType.simpleReverb,
+		ConnectionNodeType.simpleCompressor,
 	].includes(type)
 }
 

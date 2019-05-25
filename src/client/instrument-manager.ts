@@ -6,14 +6,14 @@ import {
 	BasicSamplerState, BasicSynthesizerState, globalClockActions, IClientAppState,
 	IClientRoomState, IConnection, isAudioNodeType,
 	MASTER_AUDIO_OUTPUT_TARGET_ID, selectAllBasicSynthesizerIds, selectAllSamplerIds,
-	selectAllSimpleReverbIds, selectBasicSynthesizer,
-	selectConnectionSourceNotesByTargetId, selectConnectionsWithSourceIds, selectGlobalClockState,
-	selectSampler, selectSimpleReverb, SimpleReverbState,
+	selectAllSimpleCompressorIds, selectAllSimpleReverbIds,
+	selectBasicSynthesizer, selectConnectionSourceNotesByTargetId, selectConnectionsWithSourceIds,
+	selectGlobalClockState, selectSampler, selectSimpleCompressor, selectSimpleReverb, SimpleCompressorState, SimpleReverbState,
 } from '../common/redux'
 import {GridSequencerPlayer} from './GridSequencerPlayer'
 import {
 	AudioNodeWrapper, IAudioNodeWrapperOptions, IInstrumentOptions,
-	Instrument, MasterAudioOutput, Voice, Voices,
+	Instrument, MasterAudioOutput, SimpleCompressor, Voice, Voices,
 } from './WebAudio'
 import {BasicSamplerInstrument} from './WebAudio/BasicSamplerInstrument'
 import {BasicSynthesizer} from './WebAudio/BasicSynthesizer'
@@ -41,6 +41,7 @@ let stuffMaps = Map<ConnectionNodeType, StuffMap>([
 	[ConnectionNodeType.basicSynthesizer, Map()],
 	[ConnectionNodeType.audioOutput, Map()],
 	[ConnectionNodeType.simpleReverb, Map()],
+	[ConnectionNodeType.simpleCompressor, Map()],
 ])
 
 export function getAllInstruments() {
@@ -101,6 +102,7 @@ export const setupInstrumentManager = (
 		handleSamplers()
 		handleBasicSynthesizers()
 		handleSimpleReverbs()
+		handleSimpleCompressors()
 
 		function handleSamplers() {
 			updateInstrumentType(
@@ -203,6 +205,25 @@ export const setupInstrumentManager = (
 				(effect: SimpleReverb, effectState: SimpleReverbState) => {
 					effect.setTime(effectState.time)
 					effect.setCutoff(effectState.lowPassFilterCutoffFrequency)
+				},
+			)
+		}
+
+		function handleSimpleCompressors() {
+			updateEffectType(
+				selectAllSimpleCompressorIds,
+				selectSimpleCompressor,
+				(options, effectState) => new SimpleCompressor({
+					...options,
+					...effectState,
+				}),
+				ConnectionNodeType.simpleCompressor,
+				(effect: SimpleCompressor, effectState: SimpleCompressorState) => {
+					effect.setThreshold(effectState.threshold)
+					effect.setKnee(effectState.knee)
+					effect.setRatio(effectState.ratio)
+					effect.setAttack(effectState.attack)
+					effect.setRelease(effectState.release)
 				},
 			)
 		}

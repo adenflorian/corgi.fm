@@ -25,8 +25,8 @@ export function setupAudioContext(audioContext: AudioContext, preFx: GainNode, s
 	masterLimiter.threshold.value = -3.0 // this is the pitfall, leave some headroom
 	masterLimiter.knee.value = 0.0 // brute force
 	masterLimiter.ratio.value = 20.0 // max compression
-	masterLimiter.attack.value = 0.000 // 5ms attack
-	masterLimiter.release.value = 0.000 // 50ms release
+	masterLimiter.attack.value = 0.005 // 5ms attack
+	masterLimiter.release.value = 0.050 // 50ms release
 	// limiter.attack.value = 0.005 // 5ms attack
 	// limiter.release.value = 0.050 // 50ms release
 

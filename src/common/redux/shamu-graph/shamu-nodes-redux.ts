@@ -3,7 +3,7 @@ import {groupSequencersReducer} from '../group-sequencers-redux'
 import {
 	basicSamplersReducer, basicSynthesizersReducer, gridSequencersReducer,
 	IClientRoomState, IMultiState, infiniteSequencersReducer,
-	simpleReverbsReducer, virtualKeyboardsReducer,
+	simpleCompressorsReducer, simpleReverbsReducer, virtualKeyboardsReducer,
 } from '../index'
 
 // export const ADD_SHAMU_NODE = 'ADD_SHAMU_NODE'
@@ -75,6 +75,7 @@ export const nodesReducer = combineReducers(Object.freeze({
 	infiniteSequencers: infiniteSequencersReducer,
 	groupSequencers: groupSequencersReducer,
 	simpleReverbs: simpleReverbsReducer,
+	simpleCompressors: simpleCompressorsReducer,
 	virtualKeyboards: virtualKeyboardsReducer,
 }))
 

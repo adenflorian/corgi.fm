@@ -42,6 +42,7 @@ export enum ConnectionNodeType {
 	masterClock = 'masterClock',
 	dummy = 'dummy',
 	simpleReverb = 'simpleReverb',
+	simpleCompressor = 'simpleCompressor',
 }
 
 export function isSequencerNodeType(type: ConnectionNodeType) {

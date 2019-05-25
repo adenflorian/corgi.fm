@@ -86,7 +86,7 @@ export class BasicSynthesizerView
 								valueString={filterValueToString}
 							/>
 							<Knob
-								min={0.01}
+								min={0}
 								max={10}
 								curve={3}
 								value={this.props.attack}
