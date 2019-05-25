@@ -42,6 +42,8 @@ export const SimpleCompressorView: React.FC<ISimpleCompressorAllProps> =
 						display: 'flex',
 						flexDirection: 'row',
 						padding: '0 8px',
+						width: '100%',
+						justifyContent: 'space-around',
 					}}
 				>
 					<div
@@ -53,7 +55,7 @@ export const SimpleCompressorView: React.FC<ISimpleCompressorAllProps> =
 							alignItems: 'center',
 						}}
 					>
-						Simple Compressor (Convolution)
+						Simple Compressor
 				</div>
 					<Knob
 						label="threshold"
