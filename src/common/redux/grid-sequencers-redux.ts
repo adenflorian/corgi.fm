@@ -268,7 +268,7 @@ const gridSequencerReducer =
 					...gridSequencer,
 					midiClip: gridSequencer.midiClip.set(
 						'events',
-						createSequencerEvents(gridSequencer.midiClip.events.count(), 1 / 4),
+						createSequencerEvents(gridSequencer.midiClip.events.count(), 1),
 					),
 					previousEvents: gridSequencer.previousEvents.unshift(gridSequencer.midiClip.events),
 				}
