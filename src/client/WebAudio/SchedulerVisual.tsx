@@ -131,7 +131,7 @@ function _getPathDForVoice(voice: Voice) {
 		`   ${_height}` +
 		` L ` +
 		`   ${((voice.scheduledAttackEndTime + xShift) * _xScale) + xOffset} ` +
-		`   ${(-_height * voice.scheduledSustainAtAttackEnd) + _height}` +
+		`   ${(-_height * voice.scheduledSustainAtDecayEnd) + _height}` +
 		` L ` +
 		`   ${Math.min(1000, ((voice.scheduledReleaseStartTimeSeconds + xShift) * _xScale) + xOffset)} ` +
 		`   ${(-_height * voice.scheduledSustainAtReleaseStart) + _height}` +

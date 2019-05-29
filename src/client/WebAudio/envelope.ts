@@ -34,7 +34,7 @@ function _applyEnvelopeToGain(
 	audioContext: AudioContext,
 	gain: GainNode,
 	previousScheduledEnvelope: ScheduledEnvelope | undefined,
-	{attackStart, attackEnd, sustain, releaseStart, releaseEnd}: ScheduledEnvelope,
+	{attackStart, attackEnd, decayEnd, sustain, releaseStart, releaseEnd}: ScheduledEnvelope,
 ) {
 	/*
 	id need to calculate the current sustain at any time
@@ -61,7 +61,10 @@ function _applyEnvelopeToGain(
 		gain.gain.linearRampToValueAtTime(0, attackStart)
 
 		// Attack
-		gain.gain.linearRampToValueAtTime(sustain, attackEnd)
+		gain.gain.linearRampToValueAtTime(1, attackEnd)
+
+		// Decay
+		gain.gain.linearRampToValueAtTime(sustain, decayEnd)
 
 		// Sustain until release start
 		gain.gain.linearRampToValueAtTime(sustain, releaseStart)
@@ -80,6 +83,28 @@ function _applyEnvelopeToGain(
 
 		// Attack
 		gain.gain.linearRampToValueAtTime(sustain, attackEnd)
+
+		// TODO
+		// Decay?
+		// It clicks when rescheduled during decay i think
+		gain.gain.linearRampToValueAtTime(sustain, decayEnd)
+
+		// // Sustain until release start
+		// gain.gain.linearRampToValueAtTime(sustain, releaseStart)
+
+		// // Release
+		// gain.gain.exponentialRampToValueAtTime(0.00001, releaseEnd)
+
+		return
+	}
+
+	// TODO
+	if (stage === EnvelopeStage.decay) {
+		_cancelAndHoldOrJustCancelAtTime(gain, audioContext.currentTime + 0.001)
+
+		// TODO
+		// Decay?
+		gain.gain.linearRampToValueAtTime(sustain, decayEnd)
 
 		// // Sustain until release start
 		// gain.gain.linearRampToValueAtTime(sustain, releaseStart)
@@ -120,13 +145,15 @@ function _applyEnvelopeToGain(
 
 function _determineEnvelopeStage(
 	audioContext: AudioContext,
-	{attackStart, attackEnd, releaseStart, releaseEnd}: ScheduledEnvelope,
+	{attackStart, attackEnd, decayEnd, releaseStart, releaseEnd}: ScheduledEnvelope,
 ) {
 	const currentTime = audioContext.currentTime
 
 	if (currentTime < attackStart) return EnvelopeStage.beforeAttack
 
 	if (currentTime < attackEnd) return EnvelopeStage.attack
+
+	if (currentTime < decayEnd) return EnvelopeStage.decay
 
 	if (currentTime < releaseStart) return EnvelopeStage.sustain
 
@@ -138,6 +165,7 @@ function _determineEnvelopeStage(
 enum EnvelopeStage {
 	beforeAttack = 'beforeAttack',
 	attack = 'attack',
+	decay = 'decay',
 	sustain = 'sustain',
 	release = 'release',
 	afterRelease = 'afterRelease',
@@ -168,6 +196,8 @@ export function calculateScheduledEnvelope(
 
 	const actualAttackEnd = Math.min(desiredAttackEnd, releaseStart)
 
+	const actualDecayEnd = actualAttackEnd + decayLength
+
 	const actualSustain = _calculateSustain(actualAttackEnd, attackStart, sustain, releaseStart)
 
 	// TODO Handle cutoff attack and cutoff release
@@ -175,7 +205,7 @@ export function calculateScheduledEnvelope(
 	return new ScheduledEnvelope({
 		attackStart,
 		attackEnd: actualAttackEnd,
-		decayLength,
+		decayEnd: actualDecayEnd,
 		sustain: actualSustain,
 		releaseStart,
 		releaseEnd: releaseStart + releaseLength,
@@ -183,7 +213,9 @@ export function calculateScheduledEnvelope(
 	})
 }
 
+// TODO Make it account for decay (if needed?)
 function _calculateSustain(actualAttackEnd: number, attackStart: number, sustain: number, releaseStart: number) {
+	if (sustain === 0) return 0
 	const originalAttackLength = actualAttackEnd - attackStart
 	const actualAttackLength = releaseStart - attackStart
 	const ratio = actualAttackLength / originalAttackLength
@@ -197,7 +229,7 @@ export type IScheduledEnvelope = ScheduledEnvelope
 class ScheduledEnvelope {
 	public readonly attackStart: number
 	public readonly attackEnd: number
-	public readonly decayLength: number
+	public readonly decayEnd: number
 	public readonly sustain: number
 	public readonly releaseStart: number
 	public readonly releaseEnd: number
@@ -207,7 +239,7 @@ class ScheduledEnvelope {
 		env: {
 			attackStart: number,
 			attackEnd: number,
-			decayLength: number,
+			decayEnd: number,
 			sustain: number,
 			releaseStart: number,
 			releaseEnd: number,
@@ -216,7 +248,7 @@ class ScheduledEnvelope {
 	) {
 		this.attackStart = env.attackStart
 		this.attackEnd = env.attackEnd
-		this.decayLength = env.decayLength
+		this.decayEnd = env.decayEnd
 		this.sustain = env.sustain
 		this.releaseStart = env.releaseStart
 		this.releaseEnd = env.releaseEnd

@@ -28,6 +28,7 @@ export abstract class Voice {
 	protected _isReleaseScheduled = false
 	protected _scheduledAttackStartTimeSeconds = 0
 	protected _scheduledAttackEndTimeSeconds = 0
+	protected _scheduledDecayEndTimeSeconds = 0
 	protected _scheduledSustainAtDecayEnd = 1
 	protected _scheduledSustainAtReleaseStart = 1
 	protected _scheduledSustainAtReleaseEnd = 0
@@ -57,7 +58,8 @@ export abstract class Voice {
 
 	public get scheduledAttackStartTime() {return this._scheduledAttackStartTimeSeconds}
 	public get scheduledAttackEndTime() {return this._scheduledAttackEndTimeSeconds}
-	public get scheduledSustainAtAttackEnd() {return this._scheduledSustainAtDecayEnd}
+	public get scheduledDecayEndTime() {return this._scheduledDecayEndTimeSeconds}
+	public get scheduledSustainAtDecayEnd() {return this._scheduledSustainAtDecayEnd}
 	public get scheduledSustainAtReleaseStart() {return this._scheduledSustainAtReleaseStart}
 	public get scheduledSustainAtReleaseEnd() {return this._scheduledSustainAtReleaseEnd}
 	public get scheduledReleaseStartTimeSeconds() {return this._scheduledReleaseStartTimeSeconds}
@@ -139,6 +141,7 @@ export abstract class Voice {
 
 		this._scheduledAttackStartTimeSeconds = this._scheduledEnvelope!.attackStart
 		this._scheduledAttackEndTimeSeconds = this._scheduledEnvelope!.attackEnd
+		this._scheduledDecayEndTimeSeconds = this._scheduledEnvelope!.decayEnd
 		this._scheduledSustainAtDecayEnd = this._scheduledEnvelope!.sustain
 
 		this.getAudioScheduledSourceNode()!.start(this._scheduledEnvelope!.attackStart)
@@ -230,9 +233,10 @@ export abstract class Voice {
 				: Math.max(this._audioContext.currentTime + 0.0001, this._scheduledReleaseStartTimeSeconds),
 		)
 
-		const releaseStartIsDuringAttack = this._scheduledReleaseStartTimeSeconds <= this._scheduledAttackEndTimeSeconds
+		const releaseStartIsDuringAttack = () => this._scheduledReleaseStartTimeSeconds <= this._scheduledAttackEndTimeSeconds
+		const releaseStartIsDuringDecay = () => !releaseStartIsDuringAttack && this._scheduledReleaseStartTimeSeconds <= this._scheduledDecayEndTimeSeconds
 
-		if (releaseStartIsDuringAttack) {
+		if (releaseStartIsDuringAttack()) {
 			// for linear attack only, need different math for other attack curves
 			const originalAttackLength = this._scheduledAttackEndTimeSeconds - this._scheduledAttackStartTimeSeconds
 			const newAttackLength = this._scheduledReleaseStartTimeSeconds - this._scheduledAttackStartTimeSeconds
@@ -240,6 +244,17 @@ export abstract class Voice {
 			const targetSustainAtReleaseStart = ratio * this._scheduledSustainAtDecayEnd
 
 			this._scheduledAttackEndTimeSeconds = this._scheduledReleaseStartTimeSeconds
+			this._scheduledSustainAtDecayEnd = targetSustainAtReleaseStart
+			this._scheduledSustainAtReleaseStart = targetSustainAtReleaseStart
+		} else if (releaseStartIsDuringDecay()) {
+			// for linear decay only, need different math for other decay curves
+			// Not sure if this is actually doing anything...
+			const originalDecayLength = this._scheduledDecayEndTimeSeconds - this._scheduledAttackEndTimeSeconds
+			const newDecayLength = this._scheduledReleaseStartTimeSeconds - this._scheduledAttackEndTimeSeconds
+			const ratio = newDecayLength / originalDecayLength
+			const targetSustainAtReleaseStart = ratio * this._scheduledSustainAtDecayEnd
+
+			this._scheduledDecayEndTimeSeconds = this._scheduledReleaseStartTimeSeconds
 			this._scheduledSustainAtDecayEnd = targetSustainAtReleaseStart
 			this._scheduledSustainAtReleaseStart = targetSustainAtReleaseStart
 		} else {
@@ -268,7 +283,7 @@ export abstract class Voice {
 		const newEnv = calculateScheduledEnvelope({
 			attackStart: this.scheduledEnvelope!.attackStart,
 			attackLength: newAttackSeconds,
-			decayLength: this.scheduledEnvelope!.decayLength,
+			decayLength: this.scheduledEnvelope!.decayEnd,
 			sustain: this.scheduledEnvelope!.sustain,
 			releaseStart: this.scheduledEnvelope!.releaseStart,
 			releaseLength: this.scheduledEnvelope!.releaseLength,

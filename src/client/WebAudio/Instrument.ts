@@ -98,12 +98,14 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 	public readonly setDecay = (decayTimeInSeconds: number) => {
 		if (this._decayTimeInSeconds === decayTimeInSeconds) return
 		this._decayTimeInSeconds = decayTimeInSeconds
+		// TODO?
 		// this._getVoices().changeDecayLengthForScheduledVoices(this._decayTimeInSeconds)
 	}
 
 	public readonly setSustain = (sustain: number) => {
 		if (this._sustain === sustain) return
 		this._sustain = sustain
+		// TODO?
 		// this._getVoices().changeSustainLengthForScheduledVoices(this._sustain)
 	}
 
