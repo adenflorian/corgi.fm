@@ -10,6 +10,8 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 	protected readonly _audioContext: AudioContext
 	protected readonly _lowPassFilter: BiquadFilterNode
 	protected _attackTimeInSeconds: number = 0.01
+	protected _decayTimeInSeconds: number = 0.25
+	protected _sustain: number = 0.8
 	protected _releaseTimeInSeconds: number = 3
 	protected _detune: number
 	private readonly _gain: GainNode
@@ -39,7 +41,7 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 	}
 
 	public scheduleNote(note: IMidiNote, delaySeconds: number, invincible: boolean, sourceIds: Set<string>) {
-		this._getVoices().scheduleNote(note, delaySeconds, this._attackTimeInSeconds, invincible, sourceIds)
+		this._getVoices().scheduleNote(note, delaySeconds, this._attackTimeInSeconds, this._decayTimeInSeconds, this._sustain, invincible, sourceIds)
 	}
 
 	public scheduleRelease(note: number, delaySeconds: number) {
@@ -91,6 +93,18 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 		if (this._attackTimeInSeconds === attackTimeInSeconds) return
 		this._attackTimeInSeconds = attackTimeInSeconds
 		this._getVoices().changeAttackLengthForScheduledVoices(this._attackTimeInSeconds)
+	}
+
+	public readonly setDecay = (decayTimeInSeconds: number) => {
+		if (this._decayTimeInSeconds === decayTimeInSeconds) return
+		this._decayTimeInSeconds = decayTimeInSeconds
+		// this._getVoices().changeDecayLengthForScheduledVoices(this._decayTimeInSeconds)
+	}
+
+	public readonly setSustain = (sustain: number) => {
+		if (this._sustain === sustain) return
+		this._sustain = sustain
+		// this._getVoices().changeSustainLengthForScheduledVoices(this._sustain)
 	}
 
 	public readonly setRelease = (releaseTimeInSeconds: number) => this._releaseTimeInSeconds = releaseTimeInSeconds

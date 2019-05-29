@@ -10,7 +10,7 @@ import {
 } from '../../common/redux'
 import {IClientAppState} from '../../common/redux'
 import {
-	adsrValueToString, attackToolTip, detuneToolTip, detuneValueToString, filterValueToString, gainToolTip, lpfToolTip, panToolTip, panValueToString, releaseToolTip,
+	adsrValueToString, attackToolTip, decayToolTip, detuneToolTip, detuneValueToString, filterValueToString, gainToolTip, lpfToolTip, panToolTip, panValueToString, releaseToolTip, sustainToolTip,
 } from '../client-constants'
 import {Knob} from '../Knob/Knob'
 import {Panel} from '../Panel/Panel'
@@ -33,6 +33,8 @@ interface IBasicSynthesizerViewReduxProps {
 	oscillatorType: ShamuOscillatorType
 	lowPassFilterCutoffFrequency: number
 	attack: number
+	decay: number
+	sustain: number
 	release: number
 	fineTuning: number
 	gain: number
@@ -63,6 +65,54 @@ export class BasicSynthesizerView
 						/>
 						<div className="knobs">
 							<Knob
+								min={0}
+								max={10}
+								curve={3}
+								value={this.props.attack}
+								defaultValue={0.05}
+								onChange={this._dispatchChangeInstrumentParam}
+								label="attack"
+								onChangeId={BasicSynthesizerParam.attack}
+								tooltip={attackToolTip}
+								valueString={adsrValueToString}
+							/>
+							<Knob
+								min={0}
+								max={30}
+								curve={3}
+								value={this.props.decay}
+								defaultValue={0.25}
+								onChange={this._dispatchChangeInstrumentParam}
+								label="decay"
+								onChangeId={BasicSynthesizerParam.decay}
+								tooltip={decayToolTip}
+								valueString={adsrValueToString}
+							/>
+							<Knob
+								min={0}
+								max={1}
+								value={this.props.sustain}
+								defaultValue={0.8}
+								onChange={this._dispatchChangeInstrumentParam}
+								label="sustain"
+								onChangeId={BasicSynthesizerParam.sustain}
+								tooltip={sustainToolTip}
+							/>
+							<Knob
+								min={0.01}
+								max={60}
+								curve={2}
+								value={this.props.release}
+								defaultValue={0.1}
+								onChange={this._dispatchChangeInstrumentParam}
+								label="release"
+								onChangeId={BasicSynthesizerParam.release}
+								tooltip={releaseToolTip}
+								valueString={adsrValueToString}
+							/>
+						</div>
+						<div className="knobs">
+							<Knob
 								min={-1}
 								max={1}
 								value={pan}
@@ -84,30 +134,6 @@ export class BasicSynthesizerView
 								onChangeId={BasicSynthesizerParam.lowPassFilterCutoffFrequency}
 								tooltip={lpfToolTip}
 								valueString={filterValueToString}
-							/>
-							<Knob
-								min={0}
-								max={10}
-								curve={3}
-								value={this.props.attack}
-								defaultValue={0.05}
-								onChange={this._dispatchChangeInstrumentParam}
-								label="attack"
-								onChangeId={BasicSynthesizerParam.attack}
-								tooltip={attackToolTip}
-								valueString={adsrValueToString}
-							/>
-							<Knob
-								min={0.01}
-								max={60}
-								curve={2}
-								value={this.props.release}
-								defaultValue={0.1}
-								onChange={this._dispatchChangeInstrumentParam}
-								label="release"
-								onChangeId={BasicSynthesizerParam.release}
-								tooltip={releaseToolTip}
-								valueString={adsrValueToString}
 							/>
 							<Knob
 								min={-100}
@@ -160,6 +186,8 @@ export const ConnectedBasicSynthesizerView = connect(
 			pan: instrumentState.pan,
 			lowPassFilterCutoffFrequency: instrumentState.lowPassFilterCutoffFrequency,
 			attack: instrumentState.attack,
+			decay: instrumentState.decay,
+			sustain: instrumentState.sustain,
 			release: instrumentState.release,
 			fineTuning: instrumentState.fineTuning,
 			gain: instrumentState.gain,

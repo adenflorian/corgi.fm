@@ -28,7 +28,7 @@ export abstract class Voice {
 	protected _isReleaseScheduled = false
 	protected _scheduledAttackStartTimeSeconds = 0
 	protected _scheduledAttackEndTimeSeconds = 0
-	protected _scheduledSustainAtAttackEnd = 1
+	protected _scheduledSustainAtDecayEnd = 1
 	protected _scheduledSustainAtReleaseStart = 1
 	protected _scheduledSustainAtReleaseEnd = 0
 	protected _scheduledReleaseStartTimeSeconds = Number.MAX_VALUE
@@ -57,7 +57,7 @@ export abstract class Voice {
 
 	public get scheduledAttackStartTime() {return this._scheduledAttackStartTimeSeconds}
 	public get scheduledAttackEndTime() {return this._scheduledAttackEndTimeSeconds}
-	public get scheduledSustainAtAttackEnd() {return this._scheduledSustainAtAttackEnd}
+	public get scheduledSustainAtAttackEnd() {return this._scheduledSustainAtDecayEnd}
 	public get scheduledSustainAtReleaseStart() {return this._scheduledSustainAtReleaseStart}
 	public get scheduledSustainAtReleaseEnd() {return this._scheduledSustainAtReleaseEnd}
 	public get scheduledReleaseStartTimeSeconds() {return this._scheduledReleaseStartTimeSeconds}
@@ -108,7 +108,14 @@ export abstract class Voice {
 		return this._releaseId
 	}
 
-	public scheduleNote(note: number, attackTimeInSeconds: number, attackStart: number, sourceIds: Set<string>): void {
+	public scheduleNote(
+		note: number,
+		attackTimeInSeconds: number,
+		decayTimeInSeconds: number,
+		sustain: number,
+		attackStart: number,
+		sourceIds: Set<string>,
+	): void {
 		this.sourceIds = this.sourceIds.concat(sourceIds)
 
 		this._scheduleNoteSpecific(note)
@@ -123,7 +130,8 @@ export abstract class Voice {
 		this._scheduledEnvelope = calculateScheduledEnvelope({
 			attackStart,
 			attackLength: attackTimeInSeconds,
-			sustain: this._sustainLevel,
+			decayLength: decayTimeInSeconds,
+			sustain,
 			releaseStart: Number.MAX_VALUE,
 			releaseLength: 0,
 			hardCutoffTime: Number.MAX_VALUE,
@@ -131,6 +139,7 @@ export abstract class Voice {
 
 		this._scheduledAttackStartTimeSeconds = this._scheduledEnvelope!.attackStart
 		this._scheduledAttackEndTimeSeconds = this._scheduledEnvelope!.attackEnd
+		this._scheduledSustainAtDecayEnd = this._scheduledEnvelope!.sustain
 
 		this.getAudioScheduledSourceNode()!.start(this._scheduledEnvelope!.attackStart)
 
@@ -228,13 +237,13 @@ export abstract class Voice {
 			const originalAttackLength = this._scheduledAttackEndTimeSeconds - this._scheduledAttackStartTimeSeconds
 			const newAttackLength = this._scheduledReleaseStartTimeSeconds - this._scheduledAttackStartTimeSeconds
 			const ratio = newAttackLength / originalAttackLength
-			const targetSustainAtReleaseStart = ratio * this._scheduledSustainAtAttackEnd
+			const targetSustainAtReleaseStart = ratio * this._scheduledSustainAtDecayEnd
 
 			this._scheduledAttackEndTimeSeconds = this._scheduledReleaseStartTimeSeconds
-			this._scheduledSustainAtAttackEnd = targetSustainAtReleaseStart
+			this._scheduledSustainAtDecayEnd = targetSustainAtReleaseStart
 			this._scheduledSustainAtReleaseStart = targetSustainAtReleaseStart
 		} else {
-			this._gain.gain.linearRampToValueAtTime(this._scheduledSustainAtAttackEnd, this._scheduledReleaseStartTimeSeconds)
+			this._gain.gain.linearRampToValueAtTime(this._scheduledSustainAtDecayEnd, this._scheduledReleaseStartTimeSeconds)
 		}
 
 		this._gain.gain.exponentialRampToValueAtTime(0.00001, Math.max(this._audioContext.currentTime + 0.001, this._scheduledReleaseEndTimeSeconds))
@@ -259,6 +268,7 @@ export abstract class Voice {
 		const newEnv = calculateScheduledEnvelope({
 			attackStart: this.scheduledEnvelope!.attackStart,
 			attackLength: newAttackSeconds,
+			decayLength: this.scheduledEnvelope!.decayLength,
 			sustain: this.scheduledEnvelope!.sustain,
 			releaseStart: this.scheduledEnvelope!.releaseStart,
 			releaseLength: this.scheduledEnvelope!.releaseLength,

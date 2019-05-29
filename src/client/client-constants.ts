@@ -18,7 +18,14 @@ export const gainToolTip = stripIndent`
 `
 export const attackToolTip = stripIndent`
 	attack time in seconds
-	the time between starting a note and the amplitude reaching the sustain
+	the time between starting a note and it reaching max volume
+`
+export const decayToolTip = stripIndent`
+	decay time in seconds
+	the time it takes from the end of the attack until the sustain volume
+`
+export const sustainToolTip = stripIndent`
+	amplitude of note after decay
 `
 export const releaseToolTip = stripIndent`
 	release time in seconds

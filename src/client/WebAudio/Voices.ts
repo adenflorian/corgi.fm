@@ -56,7 +56,15 @@ export abstract class Voices<V extends Voice> {
 		}
 	}
 
-	public scheduleNote(note: IMidiNote, delaySeconds: number, attackTimeInSeconds: number, invincible: boolean, sourceIds: Set<string>) {
+	public scheduleNote(
+		note: IMidiNote,
+		delaySeconds: number,
+		attackTimeInSeconds: number,
+		decayTimeInSeconds: number,
+		sustain: number,
+		invincible: boolean,
+		sourceIds: Set<string>,
+	) {
 		// if delay is 0 then the scheduler isn't working properly
 		if (delaySeconds < 0) logger.error('delay <= 0: ' + delaySeconds)
 
@@ -91,7 +99,7 @@ export abstract class Voices<V extends Voice> {
 
 		const newVoice = this._createVoice(true, invincible)
 
-		newVoice.scheduleNote(note, attackTimeInSeconds, newNoteStartTime, sourceIds)
+		newVoice.scheduleNote(note, attackTimeInSeconds, decayTimeInSeconds, sustain, newNoteStartTime, sourceIds)
 
 		this._scheduledVoices = this._scheduledVoices.set(newVoice.id, newVoice)
 

@@ -146,7 +146,7 @@ enum EnvelopeStage {
 interface CreateScheduledEnvelopeArgs {
 	attackStart: number
 	attackLength: number
-	// decay: number
+	decayLength: number
 	sustain: number
 	releaseStart: number
 	releaseLength: number
@@ -157,6 +157,7 @@ export function calculateScheduledEnvelope(
 	{
 		attackStart,
 		attackLength,
+		decayLength,
 		sustain,
 		releaseStart,
 		releaseLength,
@@ -174,6 +175,7 @@ export function calculateScheduledEnvelope(
 	return new ScheduledEnvelope({
 		attackStart,
 		attackEnd: actualAttackEnd,
+		decayLength,
 		sustain: actualSustain,
 		releaseStart,
 		releaseEnd: releaseStart + releaseLength,
@@ -195,7 +197,7 @@ export type IScheduledEnvelope = ScheduledEnvelope
 class ScheduledEnvelope {
 	public readonly attackStart: number
 	public readonly attackEnd: number
-	// public readonly decay: number
+	public readonly decayLength: number
 	public readonly sustain: number
 	public readonly releaseStart: number
 	public readonly releaseEnd: number
@@ -205,6 +207,7 @@ class ScheduledEnvelope {
 		env: {
 			attackStart: number,
 			attackEnd: number,
+			decayLength: number,
 			sustain: number,
 			releaseStart: number,
 			releaseEnd: number,
@@ -213,7 +216,7 @@ class ScheduledEnvelope {
 	) {
 		this.attackStart = env.attackStart
 		this.attackEnd = env.attackEnd
-		//  this.decay  = env.decay
+		this.decayLength = env.decayLength
 		this.sustain = env.sustain
 		this.releaseStart = env.releaseStart
 		this.releaseEnd = env.releaseEnd

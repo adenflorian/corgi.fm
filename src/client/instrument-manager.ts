@@ -141,6 +141,8 @@ export const setupInstrumentManager = (
 					instrument.setPan(instrumentState.pan)
 					instrument.setLowPassFilterCutoffFrequency(instrumentState.lowPassFilterCutoffFrequency)
 					instrument.setAttack(instrumentState.attack)
+					instrument.setDecay(instrumentState.decay)
+					instrument.setSustain(instrumentState.sustain)
 					instrument.setRelease(instrumentState.release)
 					instrument.setDetune(instrumentState.fineTuning)
 					instrument.setGain(instrumentState.gain)
