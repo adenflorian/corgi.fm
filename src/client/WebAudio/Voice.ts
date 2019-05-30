@@ -1,14 +1,7 @@
 import {Set} from 'immutable'
-import uuid = require('uuid')
 import {logger} from '../../common/logger'
 import {applyEnvelope, calculateScheduledEnvelope, IScheduledEnvelope} from './envelope'
 import {OnEndedCallback} from './index'
-
-enum VoiceStatus {
-	playing,
-	releasing,
-	off,
-}
 
 export type TunableAudioScheduledSourceNode = AudioScheduledSourceNode & Pick<OscillatorNode, 'detune'>
 
@@ -23,7 +16,6 @@ export abstract class Voice {
 	protected _audioContext: AudioContext
 	protected _destination: AudioNode
 	protected _releaseId: string = ''
-	protected _status: VoiceStatus = VoiceStatus.off
 	protected _gain: GainNode
 	protected _isReleaseScheduled = false
 	protected _scheduledAttackStartTimeSeconds = 0
@@ -73,41 +65,12 @@ export abstract class Voice {
 
 	public abstract getAudioScheduledSourceNode(): TunableAudioScheduledSourceNode | undefined
 
-	public abstract playNote(note: number, attackTimeInSeconds: number): void
-
 	public setDetune(detune: number) {
 		if (detune === this._detune) return
 
 		this._detune = detune
 
 		this.getAudioScheduledSourceNode()!.detune.value = detune
-	}
-
-	protected _beforePlayNote(attackTimeInSeconds: number) {
-		this._cancelAndHoldOrJustCancelAtTime()
-
-		// Never go straight to 0 or you'll probably get a click sound
-		this._gain.gain.linearRampToValueAtTime(0, this._audioContext.currentTime + 0.001)
-
-		// this._gain.gain.setValueAtTime(0, this._audioContext.currentTime)
-		this._gain.gain.linearRampToValueAtTime(this._sustainLevel, this._audioContext.currentTime + attackTimeInSeconds)
-	}
-
-	protected _afterPlayNote(note: number) {
-		this.playStartTime = this._audioContext.currentTime
-		this.playingNote = note
-		this._status = VoiceStatus.playing
-	}
-
-	public release(timeToReleaseInSeconds: number) {
-		this._cancelAndHoldOrJustCancelAtTime()
-		this._gain.gain.setValueAtTime(this._gain.gain.value, this._audioContext.currentTime)
-		this._gain.gain.exponentialRampToValueAtTime(0.00001, this._audioContext.currentTime + timeToReleaseInSeconds)
-		this._gain.gain.setValueAtTime(0, this._audioContext.currentTime + timeToReleaseInSeconds)
-
-		this._status = VoiceStatus.releasing
-		this._releaseId = uuid.v4()
-		return this._releaseId
 	}
 
 	public scheduleNote(

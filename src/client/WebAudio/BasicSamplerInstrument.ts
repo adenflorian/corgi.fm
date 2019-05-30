@@ -14,11 +14,9 @@ export class BasicSamplerInstrument extends Instrument<SamplerVoices, SamplerVoi
 		super(options)
 
 		this._voices = new SamplerVoices(
-			options.voiceCount,
 			this._audioContext,
 			this._panNode,
 			this._detune,
-			options.forScheduling,
 		)
 	}
 
@@ -27,27 +25,17 @@ export class BasicSamplerInstrument extends Instrument<SamplerVoices, SamplerVoi
 
 class SamplerVoices extends Voices<SamplerVoice> {
 	constructor(
-		private readonly _voiceCount: number,
 		private readonly _audioContext: AudioContext,
 		private readonly _destination: AudioNode,
 		_detune: number,
-		forScheduling = true,
 	) {
 		super(_detune)
-
-		if (forScheduling) return
-
-		for (let i = 0; i < this._voiceCount; i++) {
-			const newVoice = this._createVoice(false, false)
-			this._inactiveVoices = this._inactiveVoices.set(newVoice.id, newVoice)
-		}
 	}
 
-	protected _createVoice(forScheduling: boolean, invincible: boolean) {
+	protected _createVoice(invincible: boolean) {
 		return new SamplerVoice(
 			this._audioContext,
 			this._destination,
-			forScheduling,
 			this._getOnEndedCallback(),
 			this._detune,
 			invincible,
@@ -62,8 +50,9 @@ class SamplerVoice extends Voice {
 	private _isStarted = false
 
 	constructor(
-		audioContext: AudioContext, destination: AudioNode,
-		forScheduling: boolean, onEnded: OnEndedCallback,
+		audioContext: AudioContext,
+		destination: AudioNode,
+		onEnded: OnEndedCallback,
 		detune: number,
 		invincible: boolean,
 	) {
@@ -78,14 +67,6 @@ class SamplerVoice extends Voice {
 		return this._audioBufferSource
 	}
 
-	public playNote(note: number, attackTimeInSeconds: number) {
-		this._beforePlayNote(attackTimeInSeconds)
-
-		this._playSamplerNote(note)
-
-		this._afterPlayNote(note)
-	}
-
 	public dispose() {
 		this._disposeAudioBufferSource()
 		this._dispose()
@@ -95,16 +76,6 @@ class SamplerVoice extends Voice {
 		this._disposeAudioBufferSource()
 		this._audioBufferSource = this._audioContext.createBufferSource()
 		this._audioBufferSource.buffer = SamplesManager.getSample(midiNoteToNoteName(note), getOctaveFromMidiNote(note))
-		this._isStarted = true
-	}
-
-	private _playSamplerNote(note: number) {
-		this._disposeAudioBufferSource()
-		this._audioBufferSource = this._audioContext.createBufferSource()
-		this._audioBufferSource.buffer = SamplesManager.getSample(midiNoteToNoteName(note), getOctaveFromMidiNote(note))
-		this._audioBufferSource.detune.value = this._detune
-		this._audioBufferSource.connect(this._gain)
-		this._audioBufferSource.start()
 		this._isStarted = true
 	}
 

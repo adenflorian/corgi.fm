@@ -6,9 +6,6 @@ import {Voice} from './index'
 export type OnEndedCallback = (id: number) => void
 
 export abstract class Voices<V extends Voice> {
-	protected _inactiveVoices = OrderedMap<number, V>()
-	protected _activeVoices = OrderedMap<number, V>()
-	protected _releasingVoices = OrderedMap<number, V>()
 	protected _scheduledVoices = OrderedMap<number, V>()
 
 	constructor(
@@ -16,44 +13,16 @@ export abstract class Voices<V extends Voice> {
 	) {}
 
 	protected get _allVoices() {
-		return this._inactiveVoices
-			.concat(this._activeVoices)
-			.concat(this._releasingVoices)
-			.concat(this._scheduledVoices)
+		return this._scheduledVoices
 	}
 
-	protected abstract _createVoice(forScheduling: boolean, invincible: boolean): V
+	protected abstract _createVoice(invincible: boolean): V
 
 	public getScheduledVoices() {return this._scheduledVoices}
 
 	public setDetune(detune: number) {
 		this._detune = detune
 		this._allVoices.forEach(x => x.setDetune(detune))
-	}
-
-	public playNote(note: number, attackTimeInSeconds: number) {
-		const voice = this._getVoice(note)
-
-		voice.playNote(note, attackTimeInSeconds)
-	}
-
-	public releaseNote = (note: number, timeToReleaseInSeconds: number) => {
-		const voice = this._activeVoices.find(x => x.playingNote === note)
-
-		if (voice) {
-			const releaseId = voice.release(timeToReleaseInSeconds)
-
-			this._activeVoices = this._activeVoices.delete(voice.id)
-			this._releasingVoices = this._releasingVoices.set(voice.id, voice)
-
-			setTimeout(() => {
-				const releasingVoice = this._releasingVoices.find(x => x.getReleaseId() === releaseId)
-				if (releasingVoice) {
-					this._releasingVoices = this._releasingVoices.filter(x => x.getReleaseId() !== releaseId)
-					this._inactiveVoices = this._inactiveVoices.set(releasingVoice.id, releasingVoice)
-				}
-			}, timeToReleaseInSeconds * 1000)
-		}
 	}
 
 	public scheduleNote(
@@ -97,7 +66,7 @@ export abstract class Voices<V extends Voice> {
 			}
 		}
 
-		const newVoice = this._createVoice(true, invincible)
+		const newVoice = this._createVoice(invincible)
 
 		newVoice.scheduleNote(note, attackTimeInSeconds, decayTimeInSeconds, sustain, newNoteStartTime, sourceIds)
 
@@ -205,56 +174,11 @@ export abstract class Voices<V extends Voice> {
 		})
 	}
 
-	public getActivityLevel = () => {
-		if (this._activeVoices.count() > 0) return 1
-		if (this._releasingVoices.count() > 0) return 0.5
-		return 0
-	}
-
 	public dispose() {
 		this._allVoices.forEach(x => x.dispose())
 	}
 
 	protected abstract _getAudioContext(): AudioContext
-
-	protected _getVoice(note: number): V {
-		// Look for active voice that is playing same note
-		const sameNoteActiveVoice = this._activeVoices.find(x => x.playingNote === note)
-
-		if (sameNoteActiveVoice) {
-			this._activeVoices = this._activeVoices.filter(x => x !== sameNoteActiveVoice)
-			this._activeVoices = this._activeVoices.set(sameNoteActiveVoice.id, sameNoteActiveVoice)
-			return sameNoteActiveVoice
-		}
-
-		// Look for releasing voice that is playing same note
-		const sameNoteReleasingVoice = this._releasingVoices.find(x => x.playingNote === note)
-
-		if (sameNoteReleasingVoice) {
-			this._releasingVoices = this._releasingVoices.filter(x => x !== sameNoteReleasingVoice)
-			this._activeVoices = this._activeVoices.set(sameNoteReleasingVoice.id, sameNoteReleasingVoice)
-			return sameNoteReleasingVoice
-		}
-
-		if (this._inactiveVoices.count() > 0) {
-			// Try to return inactive voice first
-			const voice = this._inactiveVoices.first() as V
-			this._inactiveVoices = this._inactiveVoices.delete(voice.id)
-			this._activeVoices = this._activeVoices.set(voice.id, voice)
-			return voice
-		} else if (this._releasingVoices.count() > 0) {
-			// Next try releasing voices
-			const voice = this._releasingVoices.first() as V
-			this._releasingVoices = this._releasingVoices.delete(voice.id)
-			this._activeVoices = this._activeVoices.set(voice.id, voice)
-			return voice
-		} else {
-			// Lastly use active voices
-			const voice = this._activeVoices.first() as V
-			this._activeVoices = this._activeVoices.delete(voice.id).set(voice.id, voice)
-			return voice
-		}
-	}
 
 	protected _getOnEndedCallback(): OnEndedCallback {
 		return (id: number) => (this._scheduledVoices = this._scheduledVoices.delete(id))

@@ -31,6 +31,18 @@ export const releaseToolTip = stripIndent`
 	release time in seconds
 	the time between releasing a note and the amplitude reaching 0
 `
+export const filterAttackToolTip = stripIndent`
+	attack time in seconds
+`
+export const filterDecayToolTip = stripIndent`
+	decay time in seconds
+`
+export const filterSustainToolTip = stripIndent`
+	amount of filter to apply?
+`
+export const filterReleaseToolTip = stripIndent`
+	release time in seconds
+`
 export const detuneToolTip = stripIndent`
 	detune in percentage of a half step
 	fine grained pitch control, where 100% is 1 half step above the current note

@@ -10,7 +10,10 @@ import {
 } from '../../common/redux'
 import {IClientAppState} from '../../common/redux'
 import {
-	adsrValueToString, attackToolTip, decayToolTip, detuneToolTip, detuneValueToString, filterValueToString, gainToolTip, lpfToolTip, panToolTip, panValueToString, releaseToolTip, sustainToolTip,
+	adsrValueToString, attackToolTip, decayToolTip, detuneToolTip, detuneValueToString,
+	filterAttackToolTip, filterDecayToolTip, filterReleaseToolTip, filterSustainToolTip,
+	filterValueToString, gainToolTip, lpfToolTip, panToolTip, panValueToString,
+	releaseToolTip, sustainToolTip,
 } from '../client-constants'
 import {Knob} from '../Knob/Knob'
 import {Panel} from '../Panel/Panel'
@@ -36,6 +39,10 @@ interface IBasicSynthesizerViewReduxProps {
 	decay: number
 	sustain: number
 	release: number
+	filterAttack: number
+	filterDecay: number
+	filterSustain: number
+	filterRelease: number
 	fineTuning: number
 	gain: number
 }
@@ -108,6 +115,54 @@ export class BasicSynthesizerView
 								label="release"
 								onChangeId={BasicSynthesizerParam.release}
 								tooltip={releaseToolTip}
+								valueString={adsrValueToString}
+							/>
+						</div>
+						<div className="knobs">
+							<Knob
+								min={0}
+								max={10}
+								curve={3}
+								value={this.props.filterAttack}
+								defaultValue={0.05}
+								onChange={this._dispatchChangeInstrumentParam}
+								label="filterAttack"
+								onChangeId={BasicSynthesizerParam.filterAttack}
+								tooltip={filterAttackToolTip}
+								valueString={adsrValueToString}
+							/>
+							<Knob
+								min={0}
+								max={30}
+								curve={3}
+								value={this.props.filterDecay}
+								defaultValue={0.25}
+								onChange={this._dispatchChangeInstrumentParam}
+								label="filterDecay"
+								onChangeId={BasicSynthesizerParam.filterDecay}
+								tooltip={filterDecayToolTip}
+								valueString={adsrValueToString}
+							/>
+							<Knob
+								min={0}
+								max={1}
+								value={this.props.filterSustain}
+								defaultValue={0.8}
+								onChange={this._dispatchChangeInstrumentParam}
+								label="filterSustain"
+								onChangeId={BasicSynthesizerParam.filterSustain}
+								tooltip={filterSustainToolTip}
+							/>
+							<Knob
+								min={0.01}
+								max={60}
+								curve={2}
+								value={this.props.filterRelease}
+								defaultValue={0.1}
+								onChange={this._dispatchChangeInstrumentParam}
+								label="filterRelease"
+								onChangeId={BasicSynthesizerParam.filterRelease}
+								tooltip={filterReleaseToolTip}
 								valueString={adsrValueToString}
 							/>
 						</div>
@@ -189,6 +244,10 @@ export const ConnectedBasicSynthesizerView = connect(
 			decay: instrumentState.decay,
 			sustain: instrumentState.sustain,
 			release: instrumentState.release,
+			filterAttack: instrumentState.filterAttack,
+			filterDecay: instrumentState.filterDecay,
+			filterSustain: instrumentState.filterSustain,
+			filterRelease: instrumentState.filterRelease,
 			fineTuning: instrumentState.fineTuning,
 			gain: instrumentState.gain,
 		}

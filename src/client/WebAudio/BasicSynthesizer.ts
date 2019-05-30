@@ -19,12 +19,10 @@ export class BasicSynthesizer extends Instrument<SynthVoices, SynthVoice> {
 		this._oscillatorType = options.oscillatorType
 
 		this._voices = new SynthVoices(
-			options.voiceCount,
 			this._audioContext,
 			this._panNode,
 			options.oscillatorType,
 			this._detune,
-			options.forScheduling,
 		)
 	}
 
@@ -39,30 +37,19 @@ export class BasicSynthesizer extends Instrument<SynthVoices, SynthVoice> {
 
 class SynthVoices extends Voices<SynthVoice> {
 	constructor(
-		private readonly _voiceCount: number,
 		private readonly _audioContext: AudioContext,
 		private readonly _destination: AudioNode,
 		private _oscType: ShamuOscillatorType,
 		_detune: number,
-		forScheduling = true,
 	) {
 		super(_detune)
-
-		if (forScheduling) return
-
-		for (let i = 0; i < this._voiceCount; i++) {
-			const newVoice = this._createVoice(false, false)
-
-			this._inactiveVoices = this._inactiveVoices.set(newVoice.id, newVoice)
-		}
 	}
 
-	protected _createVoice(forScheduling: boolean, invincible: boolean) {
+	protected _createVoice(invincible: boolean) {
 		return new SynthVoice(
 			this._audioContext,
 			this._destination,
 			this._oscType,
-			forScheduling,
 			this._detune,
 			this._getOnEndedCallback(),
 			invincible,
@@ -83,11 +70,12 @@ class SynthVoice extends Voice {
 	private _oscillatorType: ShamuOscillatorType
 	private _nextOscillatorType: ShamuOscillatorType
 	private _whiteNoise: AudioBufferSourceNode | undefined
-	private _frequency: number = 0
 
 	constructor(
-		audioContext: AudioContext, destination: AudioNode,
-		oscType: ShamuOscillatorType, forScheduling: boolean, detune: number,
+		audioContext: AudioContext,
+		destination: AudioNode,
+		oscType: ShamuOscillatorType,
+		detune: number,
 		onEnded: OnEndedCallback,
 		invincible: boolean,
 	) {
@@ -98,10 +86,6 @@ class SynthVoice extends Voice {
 
 		if (!SynthVoice._noiseBuffer) {
 			SynthVoice._noiseBuffer = this._generateNoiseBuffer()
-		}
-
-		if (forScheduling === false) {
-			this._buildChain()
 		}
 	}
 
@@ -114,21 +98,10 @@ class SynthVoice extends Voice {
 		}
 	}
 
-	public playNote(note: number, attackTimeInSeconds: number) {
-		this._beforePlayNote(attackTimeInSeconds)
-
-		this._playSynthNote(note)
-
-		this._afterPlayNote(note)
-	}
-
 	public setOscillatorType(newOscType: ShamuOscillatorType) {
 		this._nextOscillatorType = newOscType
 
-		// TODO This might be needed for old system
-		// if (this._status === VoiceStatus.playing) {
 		this._refreshOscillatorType()
-		// }
 
 		// if release is scheduled, need to call stop on new node
 		if (this._isReleaseScheduled) {
@@ -167,14 +140,6 @@ class SynthVoice extends Voice {
 		this._whiteNoise = this._audioContext.createBufferSource()
 		this._whiteNoise.buffer = SynthVoice._noiseBuffer
 		this._whiteNoise.loop = true
-	}
-
-	private _playSynthNote(note: number) {
-		this._frequency = midiNoteToFrequency(note)
-		if (this._oscillator) {
-			this._oscillator.frequency.value = this._frequency
-		}
-		this._refreshOscillatorType()
 	}
 
 	private _refreshOscillatorType() {

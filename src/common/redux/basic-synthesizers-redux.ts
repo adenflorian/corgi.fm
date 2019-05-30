@@ -38,6 +38,10 @@ export enum BasicSynthesizerParam {
 	decay = 'decay',
 	sustain = 'sustain',
 	release = 'release',
+	filterAttack = 'filterAttack',
+	filterDecay = 'filterDecay',
+	filterSustain = 'filterSustain',
+	filterRelease = 'filterRelease',
 	fineTuning = 'fineTuning',
 	gain = 'gain',
 }
@@ -57,7 +61,7 @@ export interface IBasicSynthesizers {
 
 export class BasicSynthesizerState implements IConnectable, NodeSpecialState {
 	public static defaultWidth = 304
-	public static defaultHeight = 112 + 56
+	public static defaultHeight = 112 + 56 + 56
 
 	public static dummy: BasicSynthesizerState = {
 		oscillatorType: BuiltInOscillatorType.sine,
@@ -69,6 +73,10 @@ export class BasicSynthesizerState implements IConnectable, NodeSpecialState {
 		decay: 0,
 		sustain: 0,
 		release: 0,
+		filterAttack: 0,
+		filterDecay: 0,
+		filterSustain: 0,
+		filterRelease: 0,
 		color: false,
 		type: ConnectionNodeType.basicSynthesizer,
 		fineTuning: 0,
@@ -88,6 +96,10 @@ export class BasicSynthesizerState implements IConnectable, NodeSpecialState {
 	public readonly decay: number = 0.25
 	public readonly sustain: number = 0.8
 	public readonly release: number = 1
+	public readonly filterAttack: number = 0.01
+	public readonly filterDecay: number = 0.25
+	public readonly filterSustain: number = 0.8
+	public readonly filterRelease: number = 1
 	public readonly fineTuning: number = 0
 	public readonly gain: number = 0.5
 	public readonly color: false = false

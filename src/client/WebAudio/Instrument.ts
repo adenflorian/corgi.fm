@@ -1,7 +1,7 @@
 import {Set} from 'immutable'
 import {IDisposable} from '../../common/common-types'
 import {logger} from '../../common/logger'
-import {emptyMidiNotes, IMidiNote, IMidiNotes} from '../../common/MidiNote'
+import {IMidiNote} from '../../common/MidiNote'
 import {AudioNodeWrapper, IAudioNodeWrapperOptions, registerInstrumentWithSchedulerVisual, Voice, Voices} from './index'
 
 export abstract class Instrument<T extends Voices<V>, V extends Voice> extends AudioNodeWrapper implements IDisposable {
@@ -13,9 +13,12 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 	protected _decayTimeInSeconds: number = 0.25
 	protected _sustain: number = 0.8
 	protected _releaseTimeInSeconds: number = 3
+	protected _filterAttackTimeInSeconds: number = 0.01
+	protected _filterDecayTimeInSeconds: number = 0.25
+	protected _filterSustain: number = 0.8
+	protected _filterReleaseTimeInSeconds: number = 3
 	protected _detune: number
 	private readonly _gain: GainNode
-	private _previousNotes = emptyMidiNotes
 
 	constructor(options: IInstrumentOptions) {
 		super(options)
@@ -73,22 +76,6 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 		this._lowPassFilter.frequency.linearRampToValueAtTime(newFreq, this._audioContext.currentTime + 0.004)
 	}
 
-	// TODO Check if changed before iterating through previous notes
-	public readonly setMidiNotes = (midiNotes: IMidiNotes) => {
-		const newNotes = midiNotes.filter(x => this._previousNotes.includes(x) === false)
-		const offNotes = this._previousNotes.filter(x => midiNotes.includes(x) === false)
-
-		offNotes.forEach(note => {
-			this._getVoices().releaseNote(note, this._releaseTimeInSeconds)
-		})
-
-		newNotes.forEach(note => {
-			this._getVoices().playNote(note, this._attackTimeInSeconds)
-		})
-
-		this._previousNotes = midiNotes
-	}
-
 	public readonly setAttack = (attackTimeInSeconds: number) => {
 		if (this._attackTimeInSeconds === attackTimeInSeconds) return
 		this._attackTimeInSeconds = attackTimeInSeconds
@@ -109,7 +96,39 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 		// this._getVoices().changeSustainLengthForScheduledVoices(this._sustain)
 	}
 
-	public readonly setRelease = (releaseTimeInSeconds: number) => this._releaseTimeInSeconds = releaseTimeInSeconds
+	public readonly setRelease = (releaseTimeInSeconds: number) => {
+		if (this._releaseTimeInSeconds === releaseTimeInSeconds) return
+		this._releaseTimeInSeconds = releaseTimeInSeconds
+		// TODO?
+		// this._getVoices().changeSustainLengthForScheduledVoices(this._releaseTimeInSeconds)
+	}
+
+	public readonly setFilterAttack = (filterAttackTimeInSeconds: number) => {
+		if (this._filterAttackTimeInSeconds === filterAttackTimeInSeconds) return
+		this._filterAttackTimeInSeconds = filterAttackTimeInSeconds
+		this._getVoices().changeAttackLengthForScheduledVoices(this._filterAttackTimeInSeconds)
+	}
+
+	public readonly setFilterDecay = (filterDecayTimeInSeconds: number) => {
+		if (this._filterDecayTimeInSeconds === filterDecayTimeInSeconds) return
+		this._filterDecayTimeInSeconds = filterDecayTimeInSeconds
+		// TODO?
+		// this._getVoices().changeDecayLengthForScheduledVoices(this._filterDecayTimeInSeconds)
+	}
+
+	public readonly setFilterSustain = (filterSustain: number) => {
+		if (this._filterSustain === filterSustain) return
+		this._filterSustain = filterSustain
+		// TODO?
+		// this._getVoices().changeSustainLengthForScheduledVoices(this._filterSustain)
+	}
+
+	public readonly setFilterRelease = (filterReleaseTimeInSeconds: number) => {
+		if (this._filterReleaseTimeInSeconds === filterReleaseTimeInSeconds) return
+		this._filterReleaseTimeInSeconds = filterReleaseTimeInSeconds
+		// TODO?
+		// this._getVoices().changeSustainLengthForScheduledVoices(this._filterReleaseTimeInSeconds)
+	}
 
 	public setDetune = (detune: number) => {
 		if (detune === this._detune) return
@@ -124,11 +143,8 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 		this._gain.gain.linearRampToValueAtTime(newGain, this._audioContext.currentTime + 0.004)
 	}
 
-	public readonly getActivityLevel = () => this._getVoices().getActivityLevel()
-
 	public dispose = () => {
 		this._getVoices().dispose()
-
 		this._dispose()
 	}
 
@@ -142,7 +158,5 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 }
 
 export interface IInstrumentOptions extends IAudioNodeWrapperOptions {
-	voiceCount: number
 	detune: number
-	forScheduling: boolean
 }

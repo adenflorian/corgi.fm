@@ -7,7 +7,7 @@ import {
 	IClientRoomState, IConnection, isAudioNodeType,
 	MASTER_AUDIO_OUTPUT_TARGET_ID, selectAllBasicSynthesizerIds, selectAllSamplerIds,
 	selectAllSimpleCompressorIds, selectAllSimpleReverbIds,
-	selectBasicSynthesizer, selectConnectionSourceNotesByTargetId, selectConnectionsWithSourceIds,
+	selectBasicSynthesizer, selectConnectionsWithSourceIds,
 	selectGlobalClockState, selectSampler, selectSimpleCompressor, selectSimpleReverb, SimpleCompressorState, SimpleReverbState,
 } from '../common/redux'
 import {GridSequencerPlayer} from './GridSequencerPlayer'
@@ -110,7 +110,6 @@ export const setupInstrumentManager = (
 				selectSampler,
 				(options, instrumentState) => new BasicSamplerInstrument({
 					...options,
-					voiceCount: 20,
 					detune: instrumentState.detune,
 				}),
 				ConnectionNodeType.basicSampler,
@@ -131,7 +130,6 @@ export const setupInstrumentManager = (
 				selectBasicSynthesizer,
 				(options, instrumentState) => new BasicSynthesizer({
 					...options,
-					voiceCount: 9,
 					detune: instrumentState.fineTuning,
 					...instrumentState,
 				}),
@@ -171,28 +169,14 @@ export const setupInstrumentManager = (
 					() => instrumentCreator({
 						id: instrumentId,
 						audioContext,
-						voiceCount: 1,
 						detune: 0,	// TODO Shouldn't have to do this
-						forScheduling: isNewNoteScannerEnabled,
 					}, instrumentState),
 				)
 
 				updateAudioConnectionsFromSource(state.room, instrumentId, instrument)
 
-				const sourceNotes = getSourceNotes(instrumentId)
-
-				instrument.setMidiNotes(sourceNotes)
-
 				if (updateSpecificInstrument) updateSpecificInstrument(instrument, instrumentState)
 			})
-		}
-
-		function getSourceNotes(instrumentId: string) {
-			if (isNewNoteScannerEnabled) {
-				return emptyMidiNotes
-			} else {
-				return selectConnectionSourceNotesByTargetId(state.room, instrumentId, false)
-			}
 		}
 
 		function handleSimpleReverbs() {
