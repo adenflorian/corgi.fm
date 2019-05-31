@@ -97,9 +97,8 @@ export const setupInstrumentManager = (
 			updateInstrumentType(
 				selectAllSamplerIds,
 				selectSampler,
-				(options, instrumentState) => new BasicSamplerInstrument({
+				options => new BasicSamplerInstrument({
 					...options,
-					detune: instrumentState.detune,
 				}),
 				ConnectionNodeType.basicSampler,
 				(instrument: BasicSamplerInstrument, instrumentState: BasicSamplerState) => {
@@ -119,7 +118,6 @@ export const setupInstrumentManager = (
 				selectBasicSynthesizer,
 				(options, instrumentState) => new BasicSynthesizer({
 					...options,
-					detune: instrumentState.fineTuning,
 					...instrumentState,
 				}),
 				ConnectionNodeType.basicSynthesizer,
@@ -158,7 +156,6 @@ export const setupInstrumentManager = (
 					() => instrumentCreator({
 						id: instrumentId,
 						audioContext,
-						detune: 0,	// TODO Shouldn't have to do this
 					}, instrumentState),
 				)
 

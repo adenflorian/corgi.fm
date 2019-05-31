@@ -5,7 +5,6 @@ import {midiNoteToFrequency, Voice, Voices} from './index'
 
 interface IBasicSynthesizerOptions extends IInstrumentOptions {
 	oscillatorType: ShamuOscillatorType
-	detune: number
 }
 
 // TODO Make into a BasicSynthesizerAudioNode?
@@ -23,6 +22,7 @@ export class BasicSynthesizer extends Instrument<SynthVoices, SynthVoice> {
 			this._panNode,
 			options.oscillatorType,
 			this._detune,
+			this._lowPassFilterCutoffFrequency,
 		)
 	}
 
@@ -41,8 +41,9 @@ class SynthVoices extends Voices<SynthVoice> {
 		private readonly _destination: AudioNode,
 		private _oscType: ShamuOscillatorType,
 		_detune: number,
+		_lowPassFilterCutoffFrequency: number,
 	) {
-		super(_detune)
+		super(_detune, _lowPassFilterCutoffFrequency)
 	}
 
 	protected _createVoice(invincible: boolean) {
@@ -51,6 +52,7 @@ class SynthVoices extends Voices<SynthVoice> {
 			this._destination,
 			this._oscType,
 			this._detune,
+			this._lowPassFilterCutoffFrequency,
 			this._getOnEndedCallback(),
 			invincible,
 		)
@@ -76,10 +78,11 @@ class SynthVoice extends Voice {
 		destination: AudioNode,
 		oscType: ShamuOscillatorType,
 		detune: number,
+		lowPassFilterCutoffFrequency: number,
 		onEnded: OnEndedCallback,
 		invincible: boolean,
 	) {
-		super(audioContext, destination, onEnded, detune, invincible)
+		super(audioContext, destination, onEnded, detune, lowPassFilterCutoffFrequency, invincible)
 
 		this._oscillatorType = oscType
 		this._nextOscillatorType = oscType

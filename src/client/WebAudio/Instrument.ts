@@ -8,7 +8,6 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 
 	protected readonly _panNode: StereoPannerNode
 	protected readonly _audioContext: AudioContext
-	protected readonly _lowPassFilter: BiquadFilterNode
 	protected _attackTimeInSeconds: number = 0.01
 	protected _decayTimeInSeconds: number = 0.25
 	protected _sustain: number = 0.8
@@ -17,7 +16,8 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 	protected _filterDecayTimeInSeconds: number = 0.25
 	protected _filterSustain: number = 0.8
 	protected _filterReleaseTimeInSeconds: number = 3
-	protected _detune: number
+	protected _lowPassFilterCutoffFrequency: number = 20000
+	protected _detune: number = 0
 	private readonly _gain: GainNode
 
 	constructor(options: IInstrumentOptions) {
@@ -27,18 +27,11 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 
 		this._panNode = this._audioContext.createStereoPanner()
 
-		this._lowPassFilter = this._audioContext.createBiquadFilter()
-		this._lowPassFilter.type = 'lowpass'
-		this._lowPassFilter.frequency.value = 10000
-
 		this._gain = this._audioContext.createGain()
 		// Just below 1 to help mitigate an infinite feedback loop
 		this._gain.gain.value = 1
 
-		this._detune = options.detune
-
-		this._panNode.connect(this._lowPassFilter)
-		this._lowPassFilter.connect(this._gain)
+		this._panNode.connect(this._gain)
 
 		registerInstrumentWithSchedulerVisual(this.id, () => this._getVoices().getScheduledVoices(), this._audioContext)
 	}
@@ -72,8 +65,9 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 	public readonly setLowPassFilterCutoffFrequency = (frequency: number) => {
 		// Rounding to nearest to 32 bit number because AudioParam values are 32 bit floats
 		const newFreq = Math.fround(frequency)
-		if (newFreq === this._lowPassFilter.frequency.value) return
-		this._lowPassFilter.frequency.linearRampToValueAtTime(newFreq, this._audioContext.currentTime + 0.004)
+		if (newFreq === this._lowPassFilterCutoffFrequency) return
+		this._lowPassFilterCutoffFrequency = newFreq
+		this._getVoices().setLowPassFilterCutoffFrequency(newFreq)
 	}
 
 	public readonly setAttack = (attackTimeInSeconds: number) => {
@@ -151,12 +145,10 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 	protected _dispose = () => {
 		this._panNode.disconnect()
 		this._gain.disconnect()
-		this._lowPassFilter.disconnect()
 	}
 
 	protected abstract _getVoices(): T
 }
 
 export interface IInstrumentOptions extends IAudioNodeWrapperOptions {
-	detune: number
 }

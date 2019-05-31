@@ -10,6 +10,7 @@ export abstract class Voices<V extends Voice> {
 
 	constructor(
 		protected _detune: number,
+		protected _lowPassFilterCutoffFrequency: number,
 	) {}
 
 	protected get _allVoices() {
@@ -23,6 +24,11 @@ export abstract class Voices<V extends Voice> {
 	public setDetune(detune: number) {
 		this._detune = detune
 		this._allVoices.forEach(x => x.setDetune(detune))
+	}
+
+	public setLowPassFilterCutoffFrequency(frequency: number) {
+		this._lowPassFilterCutoffFrequency = frequency
+		this._allVoices.forEach(x => x.setLowPassFilterCutoffFrequency(frequency))
 	}
 
 	public scheduleNote(

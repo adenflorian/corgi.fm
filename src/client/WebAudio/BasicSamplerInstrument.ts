@@ -17,6 +17,7 @@ export class BasicSamplerInstrument extends Instrument<SamplerVoices, SamplerVoi
 			this._audioContext,
 			this._panNode,
 			this._detune,
+			this._lowPassFilterCutoffFrequency,
 		)
 	}
 
@@ -28,8 +29,9 @@ class SamplerVoices extends Voices<SamplerVoice> {
 		private readonly _audioContext: AudioContext,
 		private readonly _destination: AudioNode,
 		_detune: number,
+		_lowPassFilterCutoffFrequency: number,
 	) {
-		super(_detune)
+		super(_detune, _lowPassFilterCutoffFrequency)
 	}
 
 	protected _createVoice(invincible: boolean) {
@@ -38,6 +40,7 @@ class SamplerVoices extends Voices<SamplerVoice> {
 			this._destination,
 			this._getOnEndedCallback(),
 			this._detune,
+			this._lowPassFilterCutoffFrequency,
 			invincible,
 		)
 	}
@@ -54,9 +57,10 @@ class SamplerVoice extends Voice {
 		destination: AudioNode,
 		onEnded: OnEndedCallback,
 		detune: number,
+		lowPassFilterCutoffFrequency: number,
 		invincible: boolean,
 	) {
-		super(audioContext, destination, onEnded, detune, invincible)
+		super(audioContext, destination, onEnded, detune, lowPassFilterCutoffFrequency, invincible)
 
 		this._audioBufferSource = this._audioContext.createBufferSource()
 
