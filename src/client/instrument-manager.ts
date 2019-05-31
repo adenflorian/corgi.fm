@@ -57,7 +57,6 @@ export const setupInstrumentManager = (
 	store: Store<IClientAppState>,
 	audioContext: AudioContext,
 	preFx: GainNode,
-	isNewNoteScannerEnabled: boolean,
 ) => {
 
 	stuffMaps = stuffMaps.set(ConnectionNodeType.audioOutput, Map([[
@@ -85,16 +84,6 @@ export const setupInstrumentManager = (
 		if (!previousState || state.room === previousState.room) {
 			previousState = state
 			return
-		}
-
-		if (isNewNoteScannerEnabled === false) {
-			const newGlobalClockState = selectGlobalClockState(state.room)
-
-			if (newGlobalClockState.isPlaying) {
-				globalClock.play(newGlobalClockState.playCount)
-			} else {
-				globalClock.stop()
-			}
 		}
 
 		previousState = state

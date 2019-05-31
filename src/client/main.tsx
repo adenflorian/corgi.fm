@@ -10,7 +10,7 @@ import {getECSLoop} from './ECS/ECS'
 import {getFpsLoop} from './fps-loop'
 import {setupInputEventListeners} from './input-events'
 import {setupInstrumentManager} from './instrument-manager'
-import {isECSEnabled, isLocalDevClient, isNewNoteScannerEnabled, logClientEnv} from './is-prod-client'
+import {isLocalDevClient, logClientEnv} from './is-prod-client'
 import {startMainRealTimeLoop} from './main-real-time-loop'
 import {startNoteScanner} from './note-scanner'
 import {renderApp, renderOther} from './react-main'
@@ -87,21 +87,17 @@ async function setupAsync() {
 
 	setupWebsocketAndListeners(store)
 
-	const globalClockTick = setupInstrumentManager(store, audioContext, preFx, isNewNoteScannerEnabled())
+	const globalClockTick = setupInstrumentManager(store, audioContext, preFx)
 
 	renderApp(store)
 
-	const ecsLoop = isECSEnabled()
-		? getECSLoop(store)
-		: () => {}
+	const ecsLoop = getECSLoop(store)
 
 	const fpsLoop = getFpsLoop()
 
 	const schedulerVisualLoop = startSchedulerVisualLoop()
 
-	const noteScannerLoop = isNewNoteScannerEnabled()
-		? startNoteScanner(store, audioContext)
-		: () => {}
+	const noteScannerLoop = startNoteScanner(store, audioContext)
 
 	startMainRealTimeLoop(Object.freeze([
 		noteScannerLoop,

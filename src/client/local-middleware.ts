@@ -38,7 +38,6 @@ import {pointersActions} from '../common/redux/pointers-redux'
 import {graphStateSavesLocalStorageKey} from './client-constants'
 import {getAllInstruments} from './instrument-manager'
 import {MidiNotes} from './Instruments/BasicSynthesizerView'
-import {isNewNoteScannerEnabled} from './is-prod-client'
 import {applyOctave} from './WebAudio/music-functions'
 
 export const LOCAL_MIDI_KEY_PRESS = 'LOCAL_MIDI_KEY_PRESS'
@@ -357,8 +356,6 @@ const makeInitialLocalSavesStorage = (): LocalSaves => Object.freeze({
 let _previousNotesForSourceId = Map<string, MidiNotes>()
 
 function scheduleNote(note: IMidiNote, sourceId: string, roomState: IClientRoomState, onOrOff: 'on' | 'off') {
-	if (isNewNoteScannerEnabled() === false) return
-
 	if (_previousNotesForSourceId.has(sourceId) === false) {
 		_previousNotesForSourceId = _previousNotesForSourceId.set(sourceId, emptyMidiNotes)
 	}

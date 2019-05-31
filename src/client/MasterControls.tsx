@@ -9,7 +9,6 @@ import {
 	MASTER_CLOCK_SOURCE_ID,
 	selectGlobalClockState,
 } from '../common/redux'
-import {isNewNoteScannerEnabled} from './is-prod-client'
 import {Knob} from './Knob/Knob'
 import './MasterControls.less'
 import {Panel} from './Panel/Panel'
@@ -80,9 +79,7 @@ export const MasterControls: React.FC<IMasterControlsProps & IMasterControlsRedu
 							<Stop />
 						</span>
 					</div>
-					{isNewNoteScannerEnabled() &&
-						knobs
-					}
+					{knobs}
 				</div>
 			</Panel>
 		)

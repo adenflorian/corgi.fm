@@ -26,7 +26,3 @@ const _logClientEnv = isProdClient()
 			: 'unknown env'
 
 const _getPath = () => window.location.pathname.replace('/', '')
-
-export const isECSEnabled = () => isNewNoteScannerEnabled()
-
-export const isNewNoteScannerEnabled = () => true
