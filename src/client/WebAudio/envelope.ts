@@ -3,9 +3,11 @@ import {logger} from '../../common/logger'
 export function applyEnvelope(
 	previousScheduledEnvelope: ScheduledEnvelope | undefined,
 	envelope: ScheduledEnvelope,
-	gain: GainNode,
+	audioParam: AudioParam,
 	sourceNode: AudioScheduledSourceNode,
 	audioContext: AudioContext,
+	peak: number = 1,
+	sustainMultiplier?: number,
 ) {
 	// TODO If need to change start time of a note that's already scheduled
 	//   you have to trash the old oscillator and make a new one
@@ -22,9 +24,11 @@ export function applyEnvelope(
 
 	_applyEnvelopeToGain(
 		audioContext,
-		gain,
+		audioParam,
 		previousScheduledEnvelope,
 		envelope,
+		peak,
+		sustainMultiplier,
 	)
 
 	sourceNode.stop(envelope.releaseEnd)
@@ -32,9 +36,11 @@ export function applyEnvelope(
 
 function _applyEnvelopeToGain(
 	audioContext: AudioContext,
-	gain: GainNode,
+	audioParam: AudioParam,
 	previousScheduledEnvelope: ScheduledEnvelope | undefined,
 	{attackStart, attackEnd, decayEnd, sustain, releaseStart, releaseEnd}: ScheduledEnvelope,
+	peak: number,
+	sustainMultiplier?: number,
 ) {
 	/*
 	id need to calculate the current sustain at any time
@@ -53,64 +59,66 @@ function _applyEnvelopeToGain(
 
 	// logger.log('EnvelopeStage: ', stage)
 
+	const actualSustain = sustainMultiplier || sustain
+
 	if (stage === EnvelopeStage.beforeAttack) {
-		// gain.gain.cancelScheduledValues(audioContext.currentTime)
+		// audioParam.cancelScheduledValues(audioContext.currentTime)
 
 		// Before attack
-		gain.gain.value = 0
-		gain.gain.linearRampToValueAtTime(0, attackStart)
+		audioParam.value = 0
+		audioParam.linearRampToValueAtTime(0, attackStart)
 
 		// Attack
-		gain.gain.linearRampToValueAtTime(1, attackEnd)
+		audioParam.linearRampToValueAtTime(peak, attackEnd)
 
 		// Decay
-		gain.gain.linearRampToValueAtTime(sustain, decayEnd)
+		audioParam.linearRampToValueAtTime(actualSustain, decayEnd)
 
 		// Sustain until release start
-		gain.gain.linearRampToValueAtTime(sustain, releaseStart)
+		audioParam.linearRampToValueAtTime(actualSustain, releaseStart)
 
 		// Release
-		gain.gain.exponentialRampToValueAtTime(0.00001, releaseEnd)
+		audioParam.exponentialRampToValueAtTime(0.00001, releaseEnd)
 
 		return
 	}
 
 	if (stage === EnvelopeStage.attack) {
 		// logger.log('stage === EnvelopeStage.attack')
-		_cancelAndHoldOrJustCancelAtTime(gain, audioContext.currentTime + 0.001)
+		_cancelAndHoldOrJustCancelAtTime(audioParam, audioContext.currentTime + 0.001)
 		// logger.log('audioContext.currentTime: ', audioContext.currentTime)
 		// logger.log('attackEnd: ', attackEnd)
 
 		// Attack
-		gain.gain.linearRampToValueAtTime(sustain, attackEnd)
+		audioParam.linearRampToValueAtTime(actualSustain, attackEnd)
 
 		// TODO
 		// Decay?
 		// It clicks when rescheduled during decay i think
-		gain.gain.linearRampToValueAtTime(sustain, decayEnd)
+		audioParam.linearRampToValueAtTime(actualSustain, decayEnd)
 
 		// // Sustain until release start
-		// gain.gain.linearRampToValueAtTime(sustain, releaseStart)
+		// audioParam.linearRampToValueAtTime(actualSustain, releaseStart)
 
 		// // Release
-		// gain.gain.exponentialRampToValueAtTime(0.00001, releaseEnd)
+		// audioParam.exponentialRampToValueAtTime(0.00001, releaseEnd)
 
 		return
 	}
 
 	// TODO
 	if (stage === EnvelopeStage.decay) {
-		_cancelAndHoldOrJustCancelAtTime(gain, audioContext.currentTime + 0.001)
+		_cancelAndHoldOrJustCancelAtTime(audioParam, audioContext.currentTime + 0.001)
 
 		// TODO
 		// Decay?
-		gain.gain.linearRampToValueAtTime(sustain, decayEnd)
+		audioParam.linearRampToValueAtTime(actualSustain, decayEnd)
 
 		// // Sustain until release start
-		// gain.gain.linearRampToValueAtTime(sustain, releaseStart)
+		// audioParam.linearRampToValueAtTime(actualSustain, releaseStart)
 
 		// // Release
-		// gain.gain.exponentialRampToValueAtTime(0.00001, releaseEnd)
+		// audioParam.exponentialRampToValueAtTime(0.00001, releaseEnd)
 
 		return
 	}
@@ -118,22 +126,22 @@ function _applyEnvelopeToGain(
 	return
 
 	if (stage === EnvelopeStage.sustain) {
-		_cancelAndHoldOrJustCancelAtTime(gain, audioContext.currentTime)
+		_cancelAndHoldOrJustCancelAtTime(audioParam, audioContext.currentTime)
 
 		// Sustain until release start
-		gain.gain.linearRampToValueAtTime(sustain, releaseStart)
+		audioParam.linearRampToValueAtTime(actualSustain, releaseStart)
 
 		// Release
-		gain.gain.exponentialRampToValueAtTime(0.00001, releaseEnd)
+		audioParam.exponentialRampToValueAtTime(0.00001, releaseEnd)
 
 		return
 	}
 
 	if (stage === EnvelopeStage.release) {
-		_cancelAndHoldOrJustCancelAtTime(gain, audioContext.currentTime)
+		_cancelAndHoldOrJustCancelAtTime(audioParam, audioContext.currentTime)
 
 		// Release
-		gain.gain.exponentialRampToValueAtTime(0.00001, releaseEnd)
+		audioParam.exponentialRampToValueAtTime(0.00001, releaseEnd)
 
 		return
 	}
@@ -267,11 +275,11 @@ class ScheduledEnvelope {
 }
 
 /** If cancelAndHold is called with a past time it doesn't work */
-function _cancelAndHoldOrJustCancelAtTime(gain: GainNode, time: number) {
+function _cancelAndHoldOrJustCancelAtTime(audioParam: AudioParam, time: number) {
 	// cancelAndHoldAtTime is not implemented in firefox
-	if (gain.gain.cancelAndHoldAtTime) {
-		gain.gain.cancelAndHoldAtTime(time)
+	if (audioParam.cancelAndHoldAtTime) {
+		audioParam.cancelAndHoldAtTime(time)
 	} else {
-		gain.gain.cancelScheduledValues(time)
+		audioParam.cancelScheduledValues(time)
 	}
 }

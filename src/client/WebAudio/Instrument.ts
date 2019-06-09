@@ -37,7 +37,13 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 	}
 
 	public scheduleNote(note: IMidiNote, delaySeconds: number, invincible: boolean, sourceIds: Set<string>) {
-		this._getVoices().scheduleNote(note, delaySeconds, this._attackTimeInSeconds, this._decayTimeInSeconds, this._sustain, invincible, sourceIds)
+		this._getVoices()
+			.scheduleNote(
+				note, delaySeconds,
+				this._attackTimeInSeconds, this._decayTimeInSeconds, this._sustain,
+				this._filterAttackTimeInSeconds, this._filterDecayTimeInSeconds, this._filterSustain,
+				invincible, sourceIds,
+			)
 	}
 
 	public scheduleRelease(note: number, delaySeconds: number) {

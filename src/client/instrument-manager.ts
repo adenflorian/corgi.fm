@@ -129,6 +129,10 @@ export const setupInstrumentManager = (
 					instrument.setDecay(instrumentState.decay)
 					instrument.setSustain(instrumentState.sustain)
 					instrument.setRelease(instrumentState.release)
+					instrument.setFilterAttack(instrumentState.filterAttack)
+					instrument.setFilterDecay(instrumentState.filterDecay)
+					instrument.setFilterSustain(instrumentState.filterSustain)
+					instrument.setFilterRelease(instrumentState.filterRelease)
 					instrument.setDetune(instrumentState.fineTuning)
 					instrument.setGain(instrumentState.gain)
 				},

@@ -127,10 +127,21 @@ export abstract class Voice {
 		applyEnvelope(
 			undefined,
 			this._scheduledEnvelope!,
-			this._gain,
+			this._gain.gain,
 			this.getAudioScheduledSourceNode()!,
 			this._audioContext,
 		)
+
+		// TODO Filter envelope
+		// applyEnvelope(
+		// 	undefined,
+		// 	this._scheduledEnvelope!,
+		// 	this._lowPassFilter.frequency,
+		// 	this.getAudioScheduledSourceNode()!,
+		// 	this._audioContext,
+		// 	2000,
+		// 	100,
+		// )
 
 		this.getAudioScheduledSourceNode()!.onended = () => this._onEnded(this.id)
 	}
@@ -271,7 +282,7 @@ export abstract class Voice {
 		applyEnvelope(
 			this.scheduledEnvelope,
 			newEnv,
-			this._gain,
+			this._gain.gain,
 			this.getAudioScheduledSourceNode()!,
 			this._audioContext,
 		)

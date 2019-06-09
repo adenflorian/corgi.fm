@@ -37,6 +37,9 @@ export abstract class Voices<V extends Voice> {
 		attackTimeInSeconds: number,
 		decayTimeInSeconds: number,
 		sustain: number,
+		filterAttackTimeInSeconds: number,
+		filterDecayTimeInSeconds: number,
+		filterSustain: number,
 		invincible: boolean,
 		sourceIds: Set<string>,
 	) {
