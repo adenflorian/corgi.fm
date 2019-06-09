@@ -246,8 +246,6 @@ export abstract class Voice {
 			this._scheduledDecayEndTimeSeconds = this._scheduledReleaseStartTimeSeconds
 			this._scheduledSustainAtDecayEnd = targetSustainAtReleaseStart
 			this._scheduledSustainAtReleaseStart = targetSustainAtReleaseStart
-		} else {
-			this._gain.gain.linearRampToValueAtTime(this._scheduledSustainAtDecayEnd, this._scheduledReleaseStartTimeSeconds)
 		}
 
 		this._gain.gain.exponentialRampToValueAtTime(0.00001, Math.max(this._audioContext.currentTime + 0.001, this._scheduledReleaseEndTimeSeconds))
