@@ -223,7 +223,7 @@ export abstract class Voice {
 		)
 
 		const releaseStartIsDuringAttack = () => this._scheduledReleaseStartTimeSeconds <= this._scheduledAttackEndTimeSeconds
-		const releaseStartIsDuringDecay = () => !releaseStartIsDuringAttack && this._scheduledReleaseStartTimeSeconds <= this._scheduledDecayEndTimeSeconds
+		const releaseStartIsDuringDecay = () => !releaseStartIsDuringAttack() && this._scheduledReleaseStartTimeSeconds <= this._scheduledDecayEndTimeSeconds
 
 		if (releaseStartIsDuringAttack()) {
 			// for linear attack only, need different math for other attack curves
