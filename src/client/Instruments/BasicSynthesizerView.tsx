@@ -118,7 +118,7 @@ export class BasicSynthesizerView
 								valueString={adsrValueToString}
 							/>
 						</div>
-						<div className="knobs">
+						{/* <div className="knobs">
 							<Knob
 								min={0}
 								max={10}
@@ -165,7 +165,7 @@ export class BasicSynthesizerView
 								tooltip={filterReleaseToolTip}
 								valueString={adsrValueToString}
 							/>
-						</div>
+						</div> */}
 						<div className="knobs">
 							<Knob
 								min={-1}
