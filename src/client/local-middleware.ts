@@ -329,6 +329,8 @@ export function getOrCreateLocalSavesStorage(): LocalSaves {
 
 	const localSaves = parseLocalSavesJSON(localSavesJSON)
 
+	// TODO Properly deserialize, checking for null stuff and versions, etc.
+
 	return localSaves
 }
 

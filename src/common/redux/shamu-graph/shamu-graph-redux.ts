@@ -101,6 +101,12 @@ const shamuGraphCombinedReducers = combineReducers({
 })
 
 function deserialize<T extends IMultiState>(type: ConnectionNodeType, multiState: T): T {
+	if (!multiState) {
+		return Object.freeze({
+			things: {},
+		}) as T
+	}
+
 	return Object.freeze({
 		...multiState,
 		things: Map(multiState.things)
