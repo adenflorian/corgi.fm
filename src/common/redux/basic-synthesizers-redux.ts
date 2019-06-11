@@ -1,7 +1,7 @@
 import {AnyAction} from 'redux'
 import {createSelector} from 'reselect'
 import * as uuid from 'uuid'
-import {ClientId, ConnectionNodeType, IConnectable} from '../common-types'
+import {ClientId, ConnectionNodeType, IConnectable, IMultiStateThing} from '../common-types'
 import {pickRandomArrayElement} from '../common-utils'
 import {BuiltInOscillatorType, ShamuOscillatorType} from '../OscillatorTypes'
 import {addMultiThing, BROADCASTER_ACTION, createSelectAllOfThingAsArray, IClientRoomState, IMultiState, makeMultiReducer, NetworkActionType, SERVER_ACTION} from './index'
@@ -111,6 +111,15 @@ export class BasicSynthesizerState implements IConnectable, NodeSpecialState {
 	constructor(ownerId: ClientId) {
 		this.ownerId = ownerId	// TODO Is this still needed?
 	}
+}
+
+export function deserializeBasicSynthesizerState(state: IMultiStateThing): IMultiStateThing {
+	const x = state as BasicSynthesizerState
+	const y = {
+		...(new BasicSynthesizerState(x.ownerId)),
+		...x,
+	} as BasicSynthesizerState
+	return y
 }
 
 const basicSynthesizerActionTypes = [

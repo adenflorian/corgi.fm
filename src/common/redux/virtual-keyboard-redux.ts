@@ -85,6 +85,7 @@ export class VirtualKeyboardState implements IMultiStateThing, NodeSpecialState 
 	public static fromJS: IMultiStateThingDeserializer = state => {
 		const x = state as VirtualKeyboardState
 		const y = {
+			...(new VirtualKeyboardState(x.ownerId, x.color)),
 			...state,
 			pressedKeys: MidiNotes(x.pressedKeys),
 		} as VirtualKeyboardState

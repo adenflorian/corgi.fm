@@ -3,27 +3,27 @@ import {AnyAction} from 'redux'
 import {ConnectionNodeType, IConnectable, IMultiStateThing} from '../common-types'
 import {IMidiNote} from '../MidiNote'
 import {CssColor} from '../shamu-color'
-import {addBasicSampler, BasicSamplerState} from './basic-sampler-redux'
-import {addBasicSynthesizer, BasicSynthesizerState} from './basic-synthesizers-redux'
 import {IClientAppState} from './common-redux-types'
 import {selectConnectionsWithTargetIds} from './connections-redux'
-import {addGridSequencer, GridSequencerState} from './grid-sequencers-redux'
-import {addGroupSequencer, deserializeGroupSequencerState, GroupSequencer, groupSequencerActions, selectGroupSequencer} from './group-sequencers-redux'
+import {addGridSequencer, deserializeGridSequencerState, GridSequencerState} from './grid-sequencers-redux'
+import {addGroupSequencer, deserializeGroupSequencerState, GroupSequencer, selectGroupSequencer} from './group-sequencers-redux'
 import {
-	deserializeSequencerState, IClientRoomState,
+	addBasicSampler, addBasicSynthesizer,
+	BasicSamplerState, BasicSynthesizerState,
+	deserializeBasicSamplerState, deserializeBasicSynthesizerState,
+	IClientRoomState,
 	makeGetKeyboardMidiOutput, selectBasicSynthesizer,
 	selectGlobalClockIsPlaying, selectGridSequencer,
 	selectGridSequencerActiveNotes, selectGridSequencerIsActive,
 	selectGridSequencerIsSending, selectInfiniteSequencer,
 	selectInfiniteSequencerActiveNotes, selectInfiniteSequencerIsActive,
-	selectInfiniteSequencerIsSending, selectSampler,
-	selectSimpleReverb, selectVirtualKeyboardById,
+	selectInfiniteSequencerIsSending, selectSampler, selectSimpleReverb, selectVirtualKeyboardById,
 	selectVirtualKeyboardHasPressedKeys, VirtualKeyboardState,
 } from './index'
-import {addInfiniteSequencer, InfiniteSequencerState} from './infinite-sequencers-redux'
+import {addInfiniteSequencer, deserializeInfiniteSequencerState, InfiniteSequencerState} from './infinite-sequencers-redux'
 import {selectSequencerIsPlaying} from './sequencer-redux'
-import {addSimpleCompressor, selectSimpleCompressor, SimpleCompressorState} from './simple-compressor-redux'
-import {addSimpleReverb, SimpleReverbState} from './simple-reverb-redux'
+import {addSimpleCompressor, deserializeSimpleCompressorState, selectSimpleCompressor, SimpleCompressorState} from './simple-compressor-redux'
+import {addSimpleReverb, deserializeSimpleReverbState, SimpleReverbState} from './simple-reverb-redux'
 import {addVirtualKeyboard} from './virtual-keyboard-redux'
 
 export const MASTER_AUDIO_OUTPUT_TARGET_ID = 'MASTER_AUDIO_OUTPUT_TARGET_ID'
@@ -120,7 +120,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		selectIsSending: selectGridSequencerIsSending,
 		selectIsPlaying: selectSequencerIsPlaying,
 		selectActiveNotes: selectGridSequencerActiveNotes,
-		stateDeserializer: deserializeSequencerState,
+		stateDeserializer: deserializeGridSequencerState,
 		showOnAddNodeMenu: true,
 		isDeletable: true,
 	})],
@@ -133,7 +133,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		selectIsSending: selectInfiniteSequencerIsSending,
 		selectIsPlaying: selectSequencerIsPlaying,
 		selectActiveNotes: selectInfiniteSequencerActiveNotes,
-		stateDeserializer: deserializeSequencerState,
+		stateDeserializer: deserializeInfiniteSequencerState,
 		showOnAddNodeMenu: true,
 		isDeletable: true,
 	})],
@@ -152,6 +152,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		addNodeActionCreator: addBasicSynthesizer,
 		selectIsPlaying: selectIsUpstreamNodePlaying,
 		stateSelector: selectBasicSynthesizer,
+		stateDeserializer: deserializeBasicSynthesizerState,
 		showOnAddNodeMenu: true,
 		isDeletable: true,
 	})],
@@ -161,6 +162,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		addNodeActionCreator: addBasicSampler,
 		selectIsPlaying: selectIsUpstreamNodePlaying,
 		stateSelector: selectSampler,
+		stateDeserializer: deserializeBasicSamplerState,
 		showOnAddNodeMenu: true,
 		isDeletable: true,
 	})],
@@ -170,6 +172,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		addNodeActionCreator: addSimpleReverb,
 		selectIsPlaying: selectIsUpstreamNodePlaying,
 		stateSelector: selectSimpleReverb,
+		stateDeserializer: deserializeSimpleReverbState,
 		showOnAddNodeMenu: true,
 		isDeletable: true,
 	})],
@@ -179,6 +182,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		addNodeActionCreator: addSimpleCompressor,
 		selectIsPlaying: selectIsUpstreamNodePlaying,
 		stateSelector: selectSimpleCompressor,
+		stateDeserializer: deserializeSimpleCompressorState,
 		showOnAddNodeMenu: true,
 		isDeletable: true,
 	})],

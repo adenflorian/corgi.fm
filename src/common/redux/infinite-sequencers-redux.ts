@@ -1,7 +1,7 @@
 import {List, Stack} from 'immutable'
 import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
-import {ConnectionNodeType} from '../common-types'
+import {ConnectionNodeType, IMultiStateThing} from '../common-types'
 import {assertArrayHasNoUndefinedElements} from '../common-utils'
 import {logger} from '../logger'
 import {makeMidiClipEvent, MidiClip} from '../midi-types'
@@ -12,8 +12,8 @@ import {
 	SERVER_ACTION, SKIP_NOTE, STOP_ALL, UNDO_SEQUENCER, VIRTUAL_KEY_PRESSED,
 } from './index'
 import {
-	PLAY_SEQUENCER, RECORD_SEQUENCER_NOTE, RECORD_SEQUENCER_REST, selectAllInfiniteSequencers,
-	SequencerAction, SequencerStateBase, STOP_SEQUENCER,
+	deserializeSequencerState, PLAY_SEQUENCER, RECORD_SEQUENCER_NOTE, RECORD_SEQUENCER_REST,
+	selectAllInfiniteSequencers, SequencerAction, SequencerStateBase, STOP_SEQUENCER,
 } from './sequencer-redux'
 import {VirtualKeyPressedAction} from './virtual-keyboard-redux'
 
@@ -135,6 +135,15 @@ export class InfiniteSequencerState extends SequencerStateBase {
 		this.showRows = false
 		this.style = style
 	}
+}
+
+export function deserializeInfiniteSequencerState(state: IMultiStateThing): IMultiStateThing {
+	const x = state as InfiniteSequencerState
+	const y = {
+		...(new InfiniteSequencerState(x.ownerId)),
+		...(deserializeSequencerState(x)),
+	} as InfiniteSequencerState
+	return y
 }
 
 const infiniteSequencerActionTypes = [

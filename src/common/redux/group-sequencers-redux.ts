@@ -80,6 +80,7 @@ export class GroupSequencer implements IConnectable, NodeSpecialState, IMultiSta
 export function deserializeGroupSequencerState(state: IMultiStateThing): IMultiStateThing {
 	const x = state as GroupSequencer
 	const y = {
+		...(new GroupSequencer(x.ownerId)),
 		...x,
 		groups: List<Group>(x.groups)
 			.map(group => ({

@@ -1,7 +1,7 @@
 import {List, Stack} from 'immutable'
 import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
-import {ConnectionNodeType} from '../common-types'
+import {ConnectionNodeType, IMultiStateThing} from '../common-types'
 import {assertArrayHasNoUndefinedElements} from '../common-utils'
 import {makeMidiClipEvent, MidiClip, MidiClipEvents} from '../midi-types'
 import {emptyMidiNotes, IMidiNote, MidiNotes} from '../MidiNote'
@@ -12,7 +12,7 @@ import {
 	PLAY_ALL, selectGlobalClockState, SERVER_ACTION, STOP_ALL,
 	UNDO_SEQUENCER,
 } from './index'
-import {PLAY_SEQUENCER, selectAllGridSequencers, SequencerAction, SequencerStateBase, STOP_SEQUENCER} from './sequencer-redux'
+import {deserializeSequencerState, PLAY_SEQUENCER, selectAllGridSequencers, SequencerAction, SequencerStateBase, STOP_SEQUENCER} from './sequencer-redux'
 
 export const addGridSequencer = (gridSequencer: GridSequencerState) =>
 	addMultiThing(gridSequencer, ConnectionNodeType.gridSequencer, NetworkActionType.SERVER_AND_BROADCASTER)
@@ -145,6 +145,15 @@ export class GridSequencerState extends SequencerStateBase {
 
 		this.scrollY = Math.min(maxScrollY, desiredScrollY)
 	}
+}
+
+export function deserializeGridSequencerState(state: IMultiStateThing): IMultiStateThing {
+	const x = state as GridSequencerState
+	const y = {
+		...(new GridSequencerState(x.ownerId)),
+		...(deserializeSequencerState(x)),
+	} as GridSequencerState
+	return y
 }
 
 export function findLowestAndHighestNotes(events: MidiClipEvents) {

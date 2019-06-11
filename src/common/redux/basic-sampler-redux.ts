@@ -1,6 +1,6 @@
 import {AnyAction} from 'redux'
 import * as uuid from 'uuid'
-import {ClientId, ConnectionNodeType, IConnectable} from '../common-types'
+import {ClientId, ConnectionNodeType, IConnectable, IMultiStateThing} from '../common-types'
 import {
 	addMultiThing, BROADCASTER_ACTION, createSelectAllOfThingAsArray,
 	IClientRoomState, IMultiState, makeMultiReducer, NetworkActionType,
@@ -76,6 +76,15 @@ export class BasicSamplerState implements IConnectable, NodeSpecialState {
 	constructor(ownerId: ClientId) {
 		this.ownerId = ownerId
 	}
+}
+
+export function deserializeBasicSamplerState(state: IMultiStateThing): IMultiStateThing {
+	const x = state as BasicSamplerState
+	const y = {
+		...(new BasicSamplerState(x.ownerId)),
+		...x,
+	} as BasicSamplerState
+	return y
 }
 
 const basicSamplerActionTypes = [
