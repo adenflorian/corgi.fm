@@ -174,23 +174,23 @@ describe('note-scheduler', () => {
 	describe('invalid inputs', () => {
 		it('should fail when start time is negative', () => {
 			expect(() => {
-				getEvents(new MidiClip(), new MidiRange(-1, 1))
+				getEvents(new MidiClip(), new MidiRange(-1, 1), 1)
 			})
 				.to.throw('start must be >= 0')
 		})
 		it('should fail when length is negative', () => {
 			expect(() => {
-				getEvents(new MidiClip(), new MidiRange(2, -1))
+				getEvents(new MidiClip(), new MidiRange(2, -1), 1)
 			})
 				.to.throw(`length must be >= 0`)
 		})
 		it('should return empty list when clipLength is negative', () => {
 			expect(
-				getEvents(new MidiClip({length: -1}), new MidiRange(0, 1)).toJSON(),
+				getEvents(new MidiClip({length: -1}), new MidiRange(0, 1), 1).toJSON(),
 			)
 				.to.deep.equal(List().toJSON())
 			expect(
-				getEvents(new MidiClip({length: 0}), new MidiRange(0, 1)).toJSON(),
+				getEvents(new MidiClip({length: 0}), new MidiRange(0, 1), 1).toJSON(),
 			)
 				.to.deep.equal(List().toJSON())
 		})
@@ -363,7 +363,7 @@ describe('note-scheduler', () => {
 		)
 			.forEach(({name, start, length, expected}) => {
 				it(name, () => {
-					const result = getEvents(testClip, new MidiRange(start, length)).toArray()
+					const result = getEvents(testClip, new MidiRange(start, length), 1).toArray()
 
 					expect(result).to.deep.equal(expected)
 				})
