@@ -87,6 +87,8 @@ export interface SavedRoom {
 	roomSettings: ReturnType<typeof selectRoomSettings>,
 	shamuGraph: ReturnType<typeof selectShamuGraphState>,
 	saveDateTime: string,
+	saveClientVersion: string,
+	saveServerVersion: string,
 	room: string,
 }
 

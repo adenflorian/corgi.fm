@@ -15,11 +15,11 @@
 	- different colored sections
 	- colored wires for each section
 	- can draw wires from 2 diff sections into same sequencer
-- [ ] fix saving and loading
-	- [ ] save app version in save object
+- [√] fix saving and loading
 	- [√] ramp problem
 		- [√] use class constructors when deserializing
-	- [ ] fix node size issues
+	- [√] fix node size issues
+- [√] save app version in save object
 	
 # Soon
 - [ ] make submenu for creating grid sequencer with preset sizes

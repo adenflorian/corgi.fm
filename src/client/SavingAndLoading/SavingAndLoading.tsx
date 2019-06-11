@@ -54,7 +54,7 @@ function LoadRoomModalInner({dispatch}: {dispatch: Dispatch}) {
 										style="flatButton"
 										buttonProps={{onClick: () => dispatch(loadRoom(saveData))}}
 									>
-										{saveData.saveDateTime + ' - ' + saveData.room}
+										{`${saveData.saveDateTime} - ${saveData.room} - v${saveData.saveClientVersion || '?'}`}
 									</Button>
 								</div>
 								<div className="deleteSave">

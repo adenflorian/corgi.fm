@@ -6,19 +6,22 @@ import {ConnectionNodeType, Id} from '../common/common-types'
 import {logger} from '../common/logger'
 import {emptyMidiNotes, IMidiNote} from '../common/MidiNote'
 import {BroadcastAction, IClientRoomState} from '../common/redux/common-redux-types'
-import {selectAllConnections, selectConnectionsWithSourceIds, selectConnectionsWithSourceOrTargetIds} from '../common/redux/connections-redux'
+import {
+	selectAllConnections, selectConnectionsWithSourceIds, selectConnectionsWithSourceOrTargetIds,
+} from '../common/redux/connections-redux'
 import {
 	addBasicSampler, addBasicSynthesizer, addPosition, addVirtualKeyboard,
 	BasicSamplerState, BasicSynthesizerState, Connection, connectionsActions,
 	deleteAllPositions, deleteAllThings, deletePositions, deleteThingsAny,
 	getConnectionNodeInfo, gridSequencerActions, IClientAppState, IPosition,
-	ISequencerState, LOAD_ROOM, LocalSaves,
+	ISequencerState, LocalSaves,
 	makeActionCreator, makePosition,
 	MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID, NetworkActionType, READY,
 	RECORD_SEQUENCER_NOTE, selectActiveRoom, selectAllPositions,
-	selectDirectDownstreamSequencerIds, selectGlobalClockState, selectLocalClient,
-	selectPositionExtremes, selectRoomSettings,
-	selectSequencer, selectShamuGraphState,
+	selectClientInfo, selectDirectDownstreamSequencerIds, selectGlobalClockState,
+	selectLocalClient, selectPositionExtremes,
+	selectRoomSettings, selectSequencer,
+	selectShamuGraphState,
 	selectVirtualKeyboardById,
 	selectVirtualKeyboardByOwner,
 	sequencerActions,
@@ -31,8 +34,9 @@ import {
 	UserInputAction,
 	UserKeys,
 	VIRTUAL_KEY_PRESSED,
-	VIRTUAL_KEY_UP,
-	VIRTUAL_OCTAVE_CHANGE, VirtualKeyboardState, virtualKeyPressed, VirtualKeyPressedAction, virtualKeyUp, VirtualKeyUpAction, virtualOctaveChange, VirtualOctaveChangeAction,
+	VIRTUAL_KEY_UP, VIRTUAL_OCTAVE_CHANGE, VirtualKeyboardState, virtualKeyPressed,
+	VirtualKeyPressedAction, virtualKeyUp, VirtualKeyUpAction, virtualOctaveChange,
+	VirtualOctaveChangeAction,
 } from '../common/redux/index'
 import {pointersActions} from '../common/redux/pointers-redux'
 import {graphStateSavesLocalStorageKey} from './client-constants'
@@ -119,7 +123,8 @@ export const createLocalMiddleware: () => Middleware<{}, IClientAppState> = () =
 		case VIRTUAL_KEY_PRESSED: {
 			const virtualKeyPressedAction = action as VirtualKeyPressedAction
 
-			scheduleNote(virtualKeyPressedAction.midiNote, virtualKeyPressedAction.id, getState().room, 'on')
+			scheduleNote(
+				virtualKeyPressedAction.midiNote, virtualKeyPressedAction.id, getState().room, 'on')
 
 			next(action)
 
@@ -294,6 +299,8 @@ export const createLocalMiddleware: () => Middleware<{}, IClientAppState> = () =
 						roomSettings: selectRoomSettings(state.room),
 						shamuGraph: selectShamuGraphState(state.room),
 						saveDateTime: new Date().toISOString(),
+						saveClientVersion: selectClientInfo(state).clientVersion,
+						saveServerVersion: selectClientInfo(state).serverVersion,
 						room,
 					},
 				},
@@ -380,7 +387,9 @@ const makeInitialLocalSavesStorage = (): LocalSaves => Object.freeze({
 
 let _previousNotesForSourceId = Map<string, MidiNotes>()
 
-function scheduleNote(note: IMidiNote, sourceId: string, roomState: IClientRoomState, onOrOff: 'on' | 'off') {
+function scheduleNote(
+	note: IMidiNote, sourceId: string, roomState: IClientRoomState, onOrOff: 'on' | 'off') {
+
 	if (_previousNotesForSourceId.has(sourceId) === false) {
 		_previousNotesForSourceId = _previousNotesForSourceId.set(sourceId, emptyMidiNotes)
 	}
@@ -553,7 +562,9 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 	}
 }
 
-function _getDownstreamRecordingSequencers(state: IClientAppState, nodeId: string): List<ISequencerState> {
+function _getDownstreamRecordingSequencers(
+	state: IClientAppState, nodeId: string): List<ISequencerState> {
+
 	return selectDirectDownstreamSequencerIds(state.room, nodeId)
 		.map(x => selectSequencer(state.room, x))
 		.filter(x => x.isRecording)
