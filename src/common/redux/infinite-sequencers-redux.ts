@@ -142,6 +142,8 @@ export function deserializeInfiniteSequencerState(state: IMultiStateThing): IMul
 	const y = {
 		...(new InfiniteSequencerState(x.ownerId)),
 		...(deserializeSequencerState(x)),
+		width: Math.max(x.width, InfiniteSequencerState.defaultWidth),
+		height: Math.max(x.height, InfiniteSequencerState.defaultHeight),
 	} as InfiniteSequencerState
 	return y
 }

@@ -88,6 +88,8 @@ export class VirtualKeyboardState implements IMultiStateThing, NodeSpecialState 
 			...(new VirtualKeyboardState(x.ownerId, x.color)),
 			...state,
 			pressedKeys: MidiNotes(x.pressedKeys),
+			width: Math.max(x.width, VirtualKeyboardState.defaultWidth),
+			height: Math.max(x.height, VirtualKeyboardState.defaultHeight),
 		} as VirtualKeyboardState
 		return y
 	}

@@ -77,6 +77,8 @@ export function deserializeSimpleCompressorState(state: IMultiStateThing): IMult
 	const y = {
 		...(new SimpleCompressorState(x.ownerId)),
 		...x,
+		width: Math.max(x.width, SimpleCompressorState.defaultWidth),
+		height: Math.max(x.height, SimpleCompressorState.defaultHeight),
 	} as SimpleCompressorState
 	return y
 }

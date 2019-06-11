@@ -261,10 +261,11 @@ function syncState(newSocket: Socket, roomState: IClientRoomState, serverState: 
 		[setRoomMembers, selectAllRoomMemberIds],
 		[setChat, selectAllMessages],
 		[connectionsActions.updateAll, selectAllConnections],
-		[updatePositions, selectAllPositions],
 		[roomSettingsActions.replaceAll, selectRoomSettings],
 		[shamuGraphActions.replace, selectShamuGraphState],
 		[globalClockActions.replace, selectGlobalClockState],
+		// Sync positions after shamuGraph
+		[updatePositions, selectAllPositions],
 	]
 
 	updaters.forEach(([actionCreator, selector]: any[]) => {

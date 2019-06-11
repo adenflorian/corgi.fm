@@ -83,6 +83,8 @@ export function deserializeBasicSamplerState(state: IMultiStateThing): IMultiSta
 	const y = {
 		...(new BasicSamplerState(x.ownerId)),
 		...x,
+		width: Math.max(x.width, BasicSamplerState.defaultWidth),
+		height: Math.max(x.height, BasicSamplerState.defaultHeight),
 	} as BasicSamplerState
 	return y
 }

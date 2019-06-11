@@ -12,7 +12,7 @@ import {
 	PLAY_ALL, selectGlobalClockState, SERVER_ACTION, STOP_ALL,
 	UNDO_SEQUENCER,
 } from './index'
-import {deserializeSequencerState, PLAY_SEQUENCER, selectAllGridSequencers, SequencerAction, SequencerStateBase, STOP_SEQUENCER} from './sequencer-redux'
+import {deserializeSequencerState, ISequencerState, PLAY_SEQUENCER, selectAllGridSequencers, SequencerAction, SequencerStateBase, STOP_SEQUENCER} from './sequencer-redux'
 
 export const addGridSequencer = (gridSequencer: GridSequencerState) =>
 	addMultiThing(gridSequencer, ConnectionNodeType.gridSequencer, NetworkActionType.SERVER_AND_BROADCASTER)
@@ -82,6 +82,9 @@ export class GridSequencerState extends SequencerStateBase {
 	public static scrollBarWidth = 16
 	public static noteHeight = 8
 	public static controlsWidth = 180
+	public static getWidth = (notesDisplayWidth: number) => GridSequencerState.controlsWidth +
+		notesDisplayWidth +
+		GridSequencerState.scrollBarWidth
 
 	public static dummy = new GridSequencerState(
 		'dummy', 'dummy', 0, List(), false,
@@ -117,10 +120,7 @@ export class GridSequencerState extends SequencerStateBase {
 
 		const notesDisplayWidth = GridSequencerState.noteWidth * midiClip.events.count()
 
-		const width =
-			GridSequencerState.controlsWidth +
-			notesDisplayWidth +
-			GridSequencerState.scrollBarWidth
+		const width = GridSequencerState.getWidth(notesDisplayWidth)
 
 		super(
 			name,
@@ -149,9 +149,12 @@ export class GridSequencerState extends SequencerStateBase {
 
 export function deserializeGridSequencerState(state: IMultiStateThing): IMultiStateThing {
 	const x = state as GridSequencerState
+	const z = deserializeSequencerState(x) as ISequencerState
 	const y = {
 		...(new GridSequencerState(x.ownerId)),
-		...(deserializeSequencerState(x)),
+		...z,
+		width: Math.max(x.width, GridSequencerState.getWidth(GridSequencerState.noteWidth * z.midiClip.events.count())),
+		height: Math.max(x.height, GridSequencerState.noteHeight * x.notesToShow),
 	} as GridSequencerState
 	return y
 }

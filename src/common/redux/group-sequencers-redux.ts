@@ -88,6 +88,8 @@ export function deserializeGroupSequencerState(state: IMultiStateThing): IMultiS
 				events: List(group.events),
 			})),
 		color: List(x.color),
+		width: Math.max(x.width, GroupSequencer.defaultWidth),
+		height: Math.max(x.height, GroupSequencer.defaultHeight),
 	} as GroupSequencer
 	return y
 }

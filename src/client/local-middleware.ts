@@ -11,28 +11,28 @@ import {
 	addBasicSampler, addBasicSynthesizer, addPosition, addVirtualKeyboard,
 	BasicSamplerState, BasicSynthesizerState, Connection, connectionsActions,
 	deleteAllPositions, deleteAllThings, deletePositions, deleteThingsAny,
-	gridSequencerActions, IClientAppState, ISequencerState, LOAD_ROOM,
-	LocalSaves, makeActionCreator, makePosition,
-	MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID,
-	NetworkActionType, READY, RECORD_SEQUENCER_NOTE, selectActiveRoom,
-	selectAllPositions, selectDirectDownstreamSequencerIds, selectGlobalClockState,
-	selectLocalClient, selectPositionExtremes, selectRoomSettings,
+	getConnectionNodeInfo, gridSequencerActions, IClientAppState, IPosition,
+	ISequencerState, LOAD_ROOM, LocalSaves,
+	makeActionCreator, makePosition,
+	MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID, NetworkActionType, READY,
+	RECORD_SEQUENCER_NOTE, selectActiveRoom, selectAllPositions,
+	selectDirectDownstreamSequencerIds, selectGlobalClockState, selectLocalClient,
+	selectPositionExtremes, selectRoomSettings,
 	selectSequencer, selectShamuGraphState,
-	selectVirtualKeyboardById, selectVirtualKeyboardByOwner,
+	selectVirtualKeyboardById,
+	selectVirtualKeyboardByOwner,
 	sequencerActions,
 	SET_ACTIVE_ROOM,
 	SET_GRID_SEQUENCER_NOTE,
 	SKIP_NOTE,
+	UPDATE_POSITIONS,
+	updatePositions,
 	USER_KEY_PRESS,
 	UserInputAction,
 	UserKeys,
 	VIRTUAL_KEY_PRESSED,
 	VIRTUAL_KEY_UP,
-	VIRTUAL_OCTAVE_CHANGE,
-	VirtualKeyboardState,
-	virtualKeyPressed,
-	VirtualKeyPressedAction,
-	virtualKeyUp, VirtualKeyUpAction, virtualOctaveChange, VirtualOctaveChangeAction,
+	VIRTUAL_OCTAVE_CHANGE, VirtualKeyboardState, virtualKeyPressed, VirtualKeyPressedAction, virtualKeyUp, VirtualKeyUpAction, virtualOctaveChange, VirtualOctaveChangeAction,
 } from '../common/redux/index'
 import {pointersActions} from '../common/redux/pointers-redux'
 import {graphStateSavesLocalStorageKey} from './client-constants'
@@ -311,6 +311,29 @@ export const createLocalMiddleware: () => Middleware<{}, IClientAppState> = () =
 			delete localSaves.all[deleteSavedRoomAction.id]
 
 			setLocalSavesToLocalStorage(localSaves)
+
+			return
+		}
+		case UPDATE_POSITIONS: {
+			const updatePositionsAction = action as ReturnType<typeof updatePositions>
+
+			// Mainly to handle loading old saves with smaller sizes
+			// Not perfect
+			const foo = {
+				...updatePositionsAction,
+				positions: Map(updatePositionsAction.positions).map(position => {
+					const nodeInfo = getConnectionNodeInfo(position.targetType)
+					const nodeState = nodeInfo.stateSelector(getState().room, position.id)
+
+					return {
+						...position,
+						width: Math.max(position.width, nodeState.width),
+						height: Math.max(position.height, nodeState.height),
+					} as IPosition
+				}),
+			} as ReturnType<typeof updatePositions>
+
+			next(foo)
 
 			return
 		}

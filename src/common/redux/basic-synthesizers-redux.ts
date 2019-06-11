@@ -118,6 +118,8 @@ export function deserializeBasicSynthesizerState(state: IMultiStateThing): IMult
 	const y = {
 		...(new BasicSynthesizerState(x.ownerId)),
 		...x,
+		width: Math.max(x.width, BasicSynthesizerState.defaultWidth),
+		height: Math.max(x.height, BasicSynthesizerState.defaultHeight),
 	} as BasicSynthesizerState
 	return y
 }

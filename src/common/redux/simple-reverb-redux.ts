@@ -68,6 +68,8 @@ export function deserializeSimpleReverbState(state: IMultiStateThing): IMultiSta
 	const y = {
 		...(new SimpleReverbState(x.ownerId)),
 		...x,
+		width: Math.max(x.width, SimpleReverbState.defaultWidth),
+		height: Math.max(x.height, SimpleReverbState.defaultHeight),
 	} as SimpleReverbState
 	return y
 }
