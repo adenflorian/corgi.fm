@@ -150,11 +150,14 @@ export class GridSequencerState extends SequencerStateBase {
 export function deserializeGridSequencerState(state: IMultiStateThing): IMultiStateThing {
 	const x = state as GridSequencerState
 	const z = deserializeSequencerState(x) as ISequencerState
+	const notesDisplayWidth = GridSequencerState.noteWidth * z.midiClip.events.count()
 	const y = {
 		...(new GridSequencerState(x.ownerId)),
 		...z,
-		width: Math.max(x.width, GridSequencerState.getWidth(GridSequencerState.noteWidth * z.midiClip.events.count())),
+		width: Math.max(x.width, GridSequencerState.getWidth(notesDisplayWidth)),
 		height: Math.max(x.height, GridSequencerState.noteHeight * x.notesToShow),
+		notesDisplayStartX: GridSequencerState.controlsWidth,
+		notesDisplayWidth,
 	} as GridSequencerState
 	return y
 }

@@ -144,6 +144,8 @@ export function deserializeInfiniteSequencerState(state: IMultiStateThing): IMul
 		...(deserializeSequencerState(x)),
 		width: Math.max(x.width, InfiniteSequencerState.defaultWidth),
 		height: Math.max(x.height, InfiniteSequencerState.defaultHeight),
+		notesDisplayStartX: InfiniteSequencerState.controlsWidth,
+		notesDisplayWidth: InfiniteSequencerState.defaultWidth - InfiniteSequencerState.controlsWidth,
 	} as InfiniteSequencerState
 	return y
 }

@@ -90,6 +90,8 @@ export function deserializeGroupSequencerState(state: IMultiStateThing): IMultiS
 		color: List(x.color),
 		width: Math.max(x.width, GroupSequencer.defaultWidth),
 		height: Math.max(x.height, GroupSequencer.defaultHeight),
+		notesDisplayStartX: 0,
+		notesDisplayWidth: GroupSequencer.defaultWidth,
 	} as GroupSequencer
 	return y
 }
