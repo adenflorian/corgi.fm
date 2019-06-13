@@ -7,11 +7,11 @@
 - [√] dont connect keyboards to master clock
 - [√] connect sequencers to master clock automatically
 - [√] connect instruments to output automatically
-- [ ] confirm deletion of room saves
+- [√] confirm deletion of room saves
+- [√] allow saving graph to file
 	
 # Soon
 - [ ] make submenu for creating grid sequencer with preset sizes
-- [ ] allow saving graph to file
 - [ ] deploy script should check if anyone is on the server first
 - [ ] chained sequencers should only play if upstream sequencer is playing
 - [ ] put sequencer timeline animation as separate setting in options
@@ -38,7 +38,7 @@ to be able to load from a template?
 
 how?
 - [√] localstorage
-- [ ] save as file
+- [√] save as file
 - [ ] save to server
 
 how to load?
@@ -68,7 +68,7 @@ do i need to be able to support older version?
 		- maybe do in multi reducer?
 			- please no
 - [ ] global mod matrix
-- [ ] suggest notes
+- [ ] suggest notes (?)
 - [√] compressor
 - VSTs
 	- everyone would have to have the same VSTs
