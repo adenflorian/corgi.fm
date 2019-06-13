@@ -9,6 +9,7 @@
 - [√] connect instruments to output automatically
 - [√] confirm deletion of room saves
 - [√] allow saving graph to file
+- [√] sort saves on load modal
 	
 # Soon
 - [ ] make submenu for creating grid sequencer with preset sizes

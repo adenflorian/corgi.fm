@@ -3,7 +3,7 @@ import {Map} from 'immutable'
 import React from 'react'
 import {Fragment} from 'react'
 import {Dispatch} from 'redux'
-import {loadRoom} from '../../common/redux'
+import {loadRoom, SavedRoom} from '../../common/redux'
 import {Button} from '../Button/Button'
 import {getOrCreateLocalSavesStorage, localActions} from '../local-middleware'
 import {Modal} from '../Modal/Modal'
@@ -48,7 +48,7 @@ function LoadRoomModalInner({dispatch}: {dispatch: Dispatch}) {
 					<div className="noSaves">no saves found</div>
 				}
 				{saves.count() > 0 &&
-					saves.map((saveData, saveId) => {
+					saves.sort(savedRoomComparator).map((saveData, saveId) => {
 						const saveName = `${saveData.saveDateTime} - ${saveData.room} - v${saveData.saveClientVersion || '?'}`
 						return (
 							<div key={saveId} className="localSave">
@@ -87,4 +87,8 @@ function LoadRoomModalInner({dispatch}: {dispatch: Dispatch}) {
 			</div>
 		</div>
 	)
+}
+
+function savedRoomComparator(a: SavedRoom, b: SavedRoom): number {
+	return a.saveDateTime.localeCompare(b.saveDateTime)
 }
