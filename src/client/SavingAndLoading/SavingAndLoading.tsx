@@ -1,3 +1,4 @@
+import {stripIndents} from 'common-tags'
 import {Map} from 'immutable'
 import React from 'react'
 import {Fragment} from 'react'
@@ -48,6 +49,7 @@ function LoadRoomModalInner({dispatch}: {dispatch: Dispatch}) {
 				}
 				{saves.count() > 0 &&
 					saves.map((saveData, saveId) => {
+						const saveName = `${saveData.saveDateTime} - ${saveData.room} - v${saveData.saveClientVersion || '?'}`
 						return (
 							<div key={saveId} className="localSave">
 								<div className="loadSave">
@@ -55,10 +57,9 @@ function LoadRoomModalInner({dispatch}: {dispatch: Dispatch}) {
 										style="flatButton"
 										buttonProps={{
 											onClick: () => dispatch(loadRoom(saveData)),
-											style: {paddingLeft: 0},
 										}}
 									>
-										{`${saveData.saveDateTime} - ${saveData.room} - v${saveData.saveClientVersion || '?'}`}
+										{saveName}
 									</Button>
 								</div>
 								<div className="deleteSave">
@@ -66,10 +67,13 @@ function LoadRoomModalInner({dispatch}: {dispatch: Dispatch}) {
 										style="flatButton"
 										buttonProps={{
 											onClick: () => {
-												dispatch(localActions.deleteSavedRoom(saveId))
-												setSaveStorage(getOrCreateLocalSavesStorage())
+												if (window.confirm(stripIndents`Are you sure you want to delete this save?
+													${saveName}
+													This cannot be undone.`)) {
+														dispatch(localActions.deleteSavedRoom(saveId))
+														setSaveStorage(getOrCreateLocalSavesStorage())
+												}
 											},
-											style: {paddingRight: 0},
 											title: 'this cannot be undone',
 										}}
 									>
