@@ -5,7 +5,7 @@
 	- colored wires for each section
 	- can draw wires from 2 diff sections into same sequencer
 - [√] dont connect keyboards to master clock
-- [ ] connect sequencers to master clock automatically
+- [√] connect sequencers to master clock automatically
 	
 # Soon
 - [ ] make submenu for creating grid sequencer with preset sizes

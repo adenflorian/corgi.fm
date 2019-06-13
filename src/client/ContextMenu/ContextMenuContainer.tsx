@@ -6,8 +6,9 @@ import {AnyAction, Dispatch} from 'redux'
 import {serverClientId} from '../../common/common-constants'
 import {ConnectionNodeType, IConnectable, Point} from '../../common/common-types'
 import {
-	addPosition, getAddableNodeInfos,
-	getConnectionNodeInfo, makePosition, shamuConnect,
+	addPosition, Connection,
+	connectionsActions, getAddableNodeInfos, getConnectionNodeInfo, makePosition,
+	MASTER_CLOCK_SOURCE_ID, shamuConnect,
 } from '../../common/redux'
 import {backgroundMenuId, nodeMenuId} from '../client-constants'
 import {deleteNode} from '../local-middleware'
@@ -98,6 +99,14 @@ const BackgroundMenuItems = React.memo(function _MenuItems({dispatch}: {dispatch
 				const newState = new props.stateConstructor(serverClientId)
 				dispatch(props.actionCreator(newState))
 				createPosition(dispatch, newState, e)
+				if (getConnectionNodeInfo(newState.type).connectsToClock) {
+					dispatch(connectionsActions.add(new Connection(
+						MASTER_CLOCK_SOURCE_ID,
+						ConnectionNodeType.masterClock,
+						newState.id,
+						newState.type,
+					)))
+				}
 			}}>
 				{props.label}
 			</MenuItem>

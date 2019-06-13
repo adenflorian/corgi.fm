@@ -65,6 +65,7 @@ const _makeNodeInfo = Record({
 	addNodeActionCreator: ((state: IClientAppState) => ({type: 'dummy add node action type'})) as (state: any) => AnyAction,
 	showOnAddNodeMenu: false,
 	isDeletable: false,
+	connectsToClock: false,
 })
 
 type NodeInfo = ReturnType<typeof _makeNodeInfo>
@@ -123,6 +124,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		stateDeserializer: deserializeGridSequencerState,
 		showOnAddNodeMenu: true,
 		isDeletable: true,
+		connectsToClock: true,
 	})],
 	[ConnectionNodeType.infiniteSequencer, makeNodeInfo({
 		typeName: 'Infinite Sequencer',
@@ -136,6 +138,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		stateDeserializer: deserializeInfiniteSequencerState,
 		showOnAddNodeMenu: true,
 		isDeletable: true,
+		connectsToClock: true,
 	})],
 	[ConnectionNodeType.groupSequencer, makeNodeInfo({
 		typeName: 'Group Sequencer',
@@ -145,6 +148,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		stateDeserializer: deserializeGroupSequencerState,
 		showOnAddNodeMenu: true,
 		isDeletable: true,
+		connectsToClock: true,
 	})],
 	[ConnectionNodeType.basicSynthesizer, makeNodeInfo({
 		typeName: 'Basic Synthesizer',
