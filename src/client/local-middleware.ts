@@ -4,6 +4,7 @@ import {ActionType} from 'typesafe-actions'
 import uuid from 'uuid'
 import {ConnectionNodeType, Id} from '../common/common-types'
 import {logger} from '../common/logger'
+import {MidiClipEvent} from '../common/midi-types'
 import {emptyMidiNotes, IMidiNote} from '../common/MidiNote'
 import {BroadcastAction, IClientRoomState} from '../common/redux/common-redux-types'
 import {
@@ -17,25 +18,27 @@ import {
 	ISequencerState, LocalSaves,
 	makeActionCreator, makePosition,
 	MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID, NetworkActionType, READY,
-	RECORD_SEQUENCER_NOTE, selectActiveRoom, selectAllPositions,
-	selectClientInfo, selectDirectDownstreamSequencerIds, selectGlobalClockState,
-	selectLocalClient, selectPositionExtremes,
-	selectRoomSettings, selectSequencer,
+	RECORD_SEQUENCER_NOTE, SavedRoom, selectActiveRoom,
+	selectAllPositions, selectClientInfo, selectDirectDownstreamSequencerIds,
+	selectGlobalClockState, selectLocalClient,
+	selectPositionExtremes, selectRoomSettings,
+	selectSequencer,
 	selectShamuGraphState,
 	selectVirtualKeyboardById,
 	selectVirtualKeyboardByOwner,
 	sequencerActions,
 	SET_ACTIVE_ROOM,
 	SET_GRID_SEQUENCER_NOTE,
+	ShamuGraphState,
 	SKIP_NOTE,
 	UPDATE_POSITIONS,
 	updatePositions,
 	USER_KEY_PRESS,
 	UserInputAction,
-	UserKeys,
-	VIRTUAL_KEY_PRESSED,
-	VIRTUAL_KEY_UP, VIRTUAL_OCTAVE_CHANGE, VirtualKeyboardState, virtualKeyPressed,
-	VirtualKeyPressedAction, virtualKeyUp, VirtualKeyUpAction, virtualOctaveChange,
+	UserKeys, VIRTUAL_KEY_PRESSED, VIRTUAL_KEY_UP, VIRTUAL_OCTAVE_CHANGE,
+	VirtualKeyboardState, virtualKeyPressed, VirtualKeyPressedAction, virtualKeyUp,
+	VirtualKeyUpAction,
+	virtualOctaveChange,
 	VirtualOctaveChangeAction,
 } from '../common/redux/index'
 import {pointersActions} from '../common/redux/pointers-redux'
@@ -59,12 +62,16 @@ export const windowBlur = makeActionCreator(WINDOW_BLUR)
 export const DELETE_NODE = 'DELETE_NODE'
 export const deleteNode = makeActionCreator(DELETE_NODE, 'nodeId')
 
-export const SAVE_ROOM = 'SAVE_ROOM'
+export const SAVE_ROOM_TO_BROWSER = 'SAVE_ROOM_TO_BROWSER'
+export const SAVE_ROOM_TO_FILE = 'SAVE_ROOM_TO_FILE'
 export const DELETE_SAVED_ROOM = 'DELETE_SAVED_ROOM'
 
 export const localActions = Object.freeze({
-	saveRoom: () => ({
-		type: SAVE_ROOM as typeof SAVE_ROOM,
+	saveRoomToBrowser: () => ({
+		type: SAVE_ROOM_TO_BROWSER as typeof SAVE_ROOM_TO_BROWSER,
+	}),
+	saveRoomToFile: () => ({
+		type: SAVE_ROOM_TO_FILE as typeof SAVE_ROOM_TO_FILE,
 	}),
 	deleteSavedRoom: (id: Id) => ({
 		type: DELETE_SAVED_ROOM as typeof DELETE_SAVED_ROOM,
@@ -279,7 +286,7 @@ export const createLocalMiddleware: () => Middleware<{}, IClientAppState> = () =
 
 			return
 		}
-		case SAVE_ROOM: {
+		case SAVE_ROOM_TO_BROWSER: {
 			next(action)
 
 			const state = getState()
@@ -292,19 +299,22 @@ export const createLocalMiddleware: () => Middleware<{}, IClientAppState> = () =
 				...localSaves,
 				all: {
 					...localSaves.all,
-					[uuid.v4()]: {
-						connections: selectAllConnections(state.room),
-						globalClock: selectGlobalClockState(state.room),
-						positions: selectAllPositions(state.room),
-						roomSettings: selectRoomSettings(state.room),
-						shamuGraph: selectShamuGraphState(state.room),
-						saveDateTime: new Date().toISOString(),
-						saveClientVersion: selectClientInfo(state).clientVersion,
-						saveServerVersion: selectClientInfo(state).serverVersion,
-						room,
-					},
+					[uuid.v4()]: createRoomSave(state, room),
 				},
 			} as LocalSaves)
+
+			return
+		}
+		case SAVE_ROOM_TO_FILE: {
+			next(action)
+
+			const state = getState()
+
+			const room = selectActiveRoom(state)
+
+			const roomSave = createRoomSave(state, room)
+
+			downloadObjectAsJson(roomSave, `${roomSave.saveDateTime.substring(0, 10)}-room`)
 
 			return
 		}
@@ -348,8 +358,58 @@ export const createLocalMiddleware: () => Middleware<{}, IClientAppState> = () =
 	}
 }
 
+function createRoomSave(state: IClientAppState, roomName: string): SavedRoom {
+	return Object.freeze({
+		connections: selectAllConnections(state.room),
+		globalClock: selectGlobalClockState(state.room),
+		positions: selectAllPositions(state.room),
+		roomSettings: selectRoomSettings(state.room),
+		shamuGraph: stripShamuGraphForSaving(selectShamuGraphState(state.room)),
+		saveDateTime: new Date().toISOString(),
+		saveClientVersion: selectClientInfo(state).clientVersion,
+		saveServerVersion: selectClientInfo(state).serverVersion,
+		room: roomName,
+	})
+}
+
+function stripShamuGraphForSaving(shamuGraphState: ShamuGraphState): ShamuGraphState {
+	return {
+		...shamuGraphState,
+		nodes: {
+			...shamuGraphState.nodes,
+			gridSequencers: {
+				things: Map(shamuGraphState.nodes.gridSequencers.things)
+					.map(x => ({
+						...x,
+						previousEvents: List<List<MidiClipEvent>>(),
+					}))
+					.toObject(),
+			},
+			infiniteSequencers: {
+				things: Map(shamuGraphState.nodes.infiniteSequencers.things)
+					.map(x => ({
+						...x,
+						previousEvents: List<List<MidiClipEvent>>(),
+					}))
+					.toObject(),
+			},
+		},
+	}
+}
+
 function setLocalSavesToLocalStorage(localSaves: LocalSaves) {
 	localStorage.setItem(graphStateSavesLocalStorageKey, JSON.stringify(localSaves))
+}
+
+// https://stackoverflow.com/questions/19721439/download-json-object-as-a-file-from-browser
+function downloadObjectAsJson(exportObj: any, exportName: string) {
+	const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(exportObj))
+	const downloadAnchorNode = document.createElement('a')
+	downloadAnchorNode.setAttribute('href', dataStr)
+	downloadAnchorNode.setAttribute('download', exportName + '.json')
+	document.body.appendChild(downloadAnchorNode) // required for firefox
+	downloadAnchorNode.click()
+	downloadAnchorNode.remove()
 }
 
 export function getOrCreateLocalSavesStorage(): LocalSaves {

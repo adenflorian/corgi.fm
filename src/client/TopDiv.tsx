@@ -36,9 +36,18 @@ export const TopDiv = ({memberCount, clientCount, info, dispatch}: AllProps) =>
 				New Room
 			</Button>
 			<Button
-				buttonProps={{className: 'saveRoomButton', onClick: () => dispatch(localActions.saveRoom())}}
+				buttonProps={{className: 'saveRoomButton', onClick: () => dispatch(localActions.saveRoomToBrowser())}}
 			>
-				Save Room
+				Save Room To Browser
+			</Button>
+			<Button
+				buttonProps={{
+					className: 'saveRoomButton',
+					onClick: () => dispatch(localActions.saveRoomToFile()),
+					title: 'Will be able to load from file at a later date',
+				}}
+			>
+				Save Room To File
 			</Button>
 			<SavingAndLoading dispatch={dispatch} />
 			<Options />

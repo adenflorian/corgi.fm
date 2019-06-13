@@ -41,6 +41,7 @@ function LoadRoomModalInner({dispatch}: {dispatch: Dispatch}) {
 		<div className="modalSection localSaves">
 			<div className="modalSectionLabel">Load Room</div>
 			<div className="modalSectionSubLabel">select a saved room to load into a new room</div>
+			<div className="modalSectionSubLabel">will be able to load from a file soon...</div>
 			<div className="saves">
 				{saves.count() === 0 &&
 					<div className="noSaves">no saves found</div>
@@ -52,7 +53,10 @@ function LoadRoomModalInner({dispatch}: {dispatch: Dispatch}) {
 								<div className="loadSave">
 									<Button
 										style="flatButton"
-										buttonProps={{onClick: () => dispatch(loadRoom(saveData))}}
+										buttonProps={{
+											onClick: () => dispatch(loadRoom(saveData)),
+											style: {paddingLeft: 0},
+										}}
 									>
 										{`${saveData.saveDateTime} - ${saveData.room} - v${saveData.saveClientVersion || '?'}`}
 									</Button>
@@ -65,6 +69,7 @@ function LoadRoomModalInner({dispatch}: {dispatch: Dispatch}) {
 												dispatch(localActions.deleteSavedRoom(saveId))
 												setSaveStorage(getOrCreateLocalSavesStorage())
 											},
+											style: {paddingRight: 0},
 											title: 'this cannot be undone',
 										}}
 									>

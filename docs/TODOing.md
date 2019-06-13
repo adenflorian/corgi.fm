@@ -7,6 +7,7 @@
 - [√] dont connect keyboards to master clock
 - [√] connect sequencers to master clock automatically
 - [√] connect instruments to output automatically
+- [ ] confirm deletion of room saves
 	
 # Soon
 - [ ] make submenu for creating grid sequencer with preset sizes
