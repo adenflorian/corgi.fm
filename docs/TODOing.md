@@ -1,45 +1,28 @@
 # Now
-- [√] don't lose focus on chat when sending message, only lose focus on enter if message is empty
-- [√] play note when placed in grid sequencer
-- [√] things shouldn't be blurry at zoom 1
-- [√] increase room deletion timeout
-	- [√] and make it so it's actually based on room lifetime instead of a loop
-- [√] make option for proper vector graphics regarding on zoom levels
-- [√] try out new fonts (again)
-	- https://fonts.google.com/specimen/Questrial
-	- https://fonts.google.com/specimen/Didact+Gothic
-	- https://fonts.google.com/specimen/Muli
-	- current font: https://fonts.google.com/specimen/Roboto
 - [...] high level sequencer (Group Sequencer)
 	- doesn't control notes, but whole song sections
 	- different colored sections
 	- colored wires for each section
 	- can draw wires from 2 diff sections into same sequencer
-- [√] fix saving and loading
-	- [√] ramp problem
-		- [√] use class constructors when deserializing
-	- [√] fix node size issues
-- [√] save app version in save object
+- [√] dont connect keyboards to master clock
+- [ ] connect sequencers to master clock automatically
 	
 # Soon
 - [ ] make submenu for creating grid sequencer with preset sizes
-- [ ] allow saving of graph somewhere (server, browser local storage, download and upload)
+- [ ] allow saving graph to file
 - [ ] deploy script should check if anyone is on the server first
 - [ ] chained sequencers should only play if upstream sequencer is playing
 - [ ] put sequencer timeline animation as separate setting in options
 - [ ] redo on sequencers
+- [ ] when placing note in seq, use gate to determine how long placed note should play
 
-when placing not in seq , use gate to determine how long placed note should play
 note length knob on sequencers
 
 gate - note length
 note length - 
 
-dont delete players instrument if other stuff is plugged into it
+dont delete player's instrument when they leave if other stuff is plugged into it
 
-maybe put handle on left side?
-
-dont connect keyboards to master clock
 
 coarse knob to instruments
 

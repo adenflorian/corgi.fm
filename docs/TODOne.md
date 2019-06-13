@@ -1,3 +1,20 @@
+- [√] fix saving and loading
+	- [√] ramp problem
+		- [√] use class constructors when deserializing
+	- [√] fix node size issues
+- [√] save app version in save object
+- [√] don't lose focus on chat when sending message, only lose focus on enter if message is empty
+- [√] play note when placed in grid sequencer
+- [√] things shouldn't be blurry at zoom 1
+- [√] increase room deletion timeout
+	- [√] and make it so it's actually based on room lifetime instead of a loop
+- [√] make option for proper vector graphics regarding on zoom levels
+- [√] try out new fonts (again)
+	- https://fonts.google.com/specimen/Questrial
+	- https://fonts.google.com/specimen/Didact+Gothic
+	- https://fonts.google.com/specimen/Muli
+	- current font: https://fonts.google.com/specimen/Roboto
+
 ## Adding/Changing/Removing Connections
 should anything allow multiple incoming connections?
 - yes, instruments will union the incoming notes together

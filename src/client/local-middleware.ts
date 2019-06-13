@@ -512,14 +512,6 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 			MASTER_AUDIO_OUTPUT_TARGET_ID,
 			ConnectionNodeType.audioOutput,
 		)))
-
-		// Master clock to source
-		dispatch(connectionsActions.add(new Connection(
-			MASTER_CLOCK_SOURCE_ID,
-			ConnectionNodeType.masterClock,
-			newVirtualKeyboard.id,
-			ConnectionNodeType.virtualKeyboard,
-		)))
 	} else {
 		const newInstrument = new BasicSynthesizerState(localClient.id)
 		dispatch(addBasicSynthesizer(newInstrument))
@@ -550,14 +542,6 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 			ConnectionNodeType.basicSynthesizer,
 			MASTER_AUDIO_OUTPUT_TARGET_ID,
 			ConnectionNodeType.audioOutput,
-		)))
-
-		// Master clock to source
-		dispatch(connectionsActions.add(new Connection(
-			MASTER_CLOCK_SOURCE_ID,
-			ConnectionNodeType.masterClock,
-			newVirtualKeyboard.id,
-			ConnectionNodeType.virtualKeyboard,
 		)))
 	}
 }
