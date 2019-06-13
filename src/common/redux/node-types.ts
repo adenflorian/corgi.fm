@@ -65,7 +65,8 @@ const _makeNodeInfo = Record({
 	addNodeActionCreator: ((state: IClientAppState) => ({type: 'dummy add node action type'})) as (state: any) => AnyAction,
 	showOnAddNodeMenu: false,
 	isDeletable: false,
-	connectsToClock: false,
+	autoConnectToClock: false,
+	autoConnectToAudioOutput: false,
 })
 
 type NodeInfo = ReturnType<typeof _makeNodeInfo>
@@ -124,7 +125,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		stateDeserializer: deserializeGridSequencerState,
 		showOnAddNodeMenu: true,
 		isDeletable: true,
-		connectsToClock: true,
+		autoConnectToClock: true,
 	})],
 	[ConnectionNodeType.infiniteSequencer, makeNodeInfo({
 		typeName: 'Infinite Sequencer',
@@ -138,7 +139,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		stateDeserializer: deserializeInfiniteSequencerState,
 		showOnAddNodeMenu: true,
 		isDeletable: true,
-		connectsToClock: true,
+		autoConnectToClock: true,
 	})],
 	[ConnectionNodeType.groupSequencer, makeNodeInfo({
 		typeName: 'Group Sequencer',
@@ -148,7 +149,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		stateDeserializer: deserializeGroupSequencerState,
 		showOnAddNodeMenu: true,
 		isDeletable: true,
-		connectsToClock: true,
+		autoConnectToClock: true,
 	})],
 	[ConnectionNodeType.basicSynthesizer, makeNodeInfo({
 		typeName: 'Basic Synthesizer',
@@ -159,6 +160,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		stateDeserializer: deserializeBasicSynthesizerState,
 		showOnAddNodeMenu: true,
 		isDeletable: true,
+		autoConnectToAudioOutput: true,
 	})],
 	[ConnectionNodeType.basicSampler, makeNodeInfo({
 		typeName: 'Basic Piano Sampler',
@@ -169,6 +171,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		stateDeserializer: deserializeBasicSamplerState,
 		showOnAddNodeMenu: true,
 		isDeletable: true,
+		autoConnectToAudioOutput: true,
 	})],
 	[ConnectionNodeType.simpleReverb, makeNodeInfo({
 		typeName: 'R E V E R B',
@@ -179,6 +182,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		stateDeserializer: deserializeSimpleReverbState,
 		showOnAddNodeMenu: true,
 		isDeletable: true,
+		autoConnectToAudioOutput: true,
 	})],
 	[ConnectionNodeType.simpleCompressor, makeNodeInfo({
 		typeName: 'Compressor',
@@ -189,6 +193,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		stateDeserializer: deserializeSimpleCompressorState,
 		showOnAddNodeMenu: true,
 		isDeletable: true,
+		autoConnectToAudioOutput: true,
 	})],
 	[ConnectionNodeType.audioOutput, makeNodeInfo({
 		typeName: 'Audio Output',

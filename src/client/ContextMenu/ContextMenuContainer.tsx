@@ -8,7 +8,7 @@ import {ConnectionNodeType, IConnectable, Point} from '../../common/common-types
 import {
 	addPosition, Connection,
 	connectionsActions, getAddableNodeInfos, getConnectionNodeInfo, makePosition,
-	MASTER_CLOCK_SOURCE_ID, shamuConnect,
+	MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID, shamuConnect,
 } from '../../common/redux'
 import {backgroundMenuId, nodeMenuId} from '../client-constants'
 import {deleteNode} from '../local-middleware'
@@ -99,12 +99,21 @@ const BackgroundMenuItems = React.memo(function _MenuItems({dispatch}: {dispatch
 				const newState = new props.stateConstructor(serverClientId)
 				dispatch(props.actionCreator(newState))
 				createPosition(dispatch, newState, e)
-				if (getConnectionNodeInfo(newState.type).connectsToClock) {
+				const nodeInfo = getConnectionNodeInfo(newState.type)
+				if (nodeInfo.autoConnectToClock) {
 					dispatch(connectionsActions.add(new Connection(
 						MASTER_CLOCK_SOURCE_ID,
 						ConnectionNodeType.masterClock,
 						newState.id,
 						newState.type,
+					)))
+				}
+				if (nodeInfo.autoConnectToAudioOutput) {
+					dispatch(connectionsActions.add(new Connection(
+						newState.id,
+						newState.type,
+						MASTER_AUDIO_OUTPUT_TARGET_ID,
+						ConnectionNodeType.audioOutput,
 					)))
 				}
 			}}>

@@ -6,6 +6,7 @@
 	- can draw wires from 2 diff sections into same sequencer
 - [√] dont connect keyboards to master clock
 - [√] connect sequencers to master clock automatically
+- [√] connect instruments to output automatically
 	
 # Soon
 - [ ] make submenu for creating grid sequencer with preset sizes
@@ -23,7 +24,6 @@ note length -
 
 dont delete player's instrument when they leave if other stuff is plugged into it
 
-
 coarse knob to instruments
 
 
@@ -36,14 +36,14 @@ to be able to work on a song over multiple sessions
 to be able to load from a template?
 
 how?
-- localstorage
-- save as file
-- save to server
+- [√] localstorage
+- [ ] save as file
+- [ ] save to server
 
 how to load?
-- from local storage
-- from file upload
-- from server
+- [√] from local storage
+- [ ] from file upload
+- [ ] from server
 
 which is easiest?
 - local storage, then saving as file
@@ -68,7 +68,7 @@ do i need to be able to support older version?
 			- please no
 - [ ] global mod matrix
 - [ ] suggest notes
-- [ ] compressor
+- [√] compressor
 - VSTs
 	- everyone would have to have the same VSTs
 	- or record the output of the VST and send to server
