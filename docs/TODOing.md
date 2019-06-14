@@ -10,6 +10,7 @@
 - [√] confirm deletion of room saves
 - [√] allow saving graph to file
 - [√] sort saves on load modal
+- [√] when placing note in seq, use gate, rate, and bpm to determine how long placed note should play
 	
 # Soon
 - [ ] make submenu for creating grid sequencer with preset sizes
@@ -17,7 +18,6 @@
 - [ ] chained sequencers should only play if upstream sequencer is playing
 - [ ] put sequencer timeline animation as separate setting in options
 - [ ] redo on sequencers
-- [ ] when placing note in seq, use gate to determine how long placed note should play
 
 note length knob on sequencers
 

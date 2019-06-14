@@ -487,13 +487,17 @@ function scheduleNote(
 
 function playShortNote(note: IMidiNote, sourceId: string, roomState: IClientRoomState) {
 	const targetIds = selectConnectionsWithSourceIds(roomState, [sourceId]).map(x => x.targetId)
+	const {gate, rate} = selectSequencer(roomState, sourceId)
+	const bpm = selectGlobalClockState(roomState).bpm
+
+	const delay = (60 / bpm) * rate * gate
 
 	getAllInstruments().forEach(instrument => {
 		if (targetIds.includes(instrument.id) === false) return
 
 		instrument.scheduleNote(note, 0, true, Set([sourceId]))
 
-		instrument.scheduleRelease(note, 0.25)
+		instrument.scheduleRelease(note, delay)
 	})
 }
 
