@@ -239,25 +239,8 @@ function selectIsUpstreamNodePlaying(state: IClientRoomState, id: string, proces
 	return memoizedIsUpstreamNodePlaying(state, id, processedNodeIds)
 }
 
-// let previousConnectionsState = {}
-// let previousResult = false
-
 function memoizedIsUpstreamNodePlaying(state: IClientRoomState, nodeId: string, processedNodeIds: Set<string>) {
 	return isUpstreamNodePlaying(state, nodeId, processedNodeIds)
-
-	// const newConnectionsState = selectAllConnections(state)
-
-	// if (newConnectionsState === previousConnectionsState) {
-	// 	return previousResult
-	// } else {
-	// 	previousConnectionsState = newConnectionsState
-
-	// 	const newResult = isUpstreamNodePlaying(state, nodeId)
-
-	// 	previousResult = newResult
-
-	// 	return newResult
-	// }
 }
 
 function isUpstreamNodePlaying(
