@@ -87,7 +87,7 @@ async function setupAsync() {
 
 	setupWebsocketAndListeners(store)
 
-	const globalClockTick = setupInstrumentManager(store, audioContext, preFx)
+	setupInstrumentManager(store, audioContext, preFx)
 
 	renderApp(store)
 
@@ -101,7 +101,6 @@ async function setupAsync() {
 
 	startMainRealTimeLoop(Object.freeze([
 		noteScannerLoop,
-		globalClockTick,
 		ecsLoop,
 		schedulerVisualLoop,
 		fpsLoop,

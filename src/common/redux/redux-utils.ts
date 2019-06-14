@@ -10,7 +10,7 @@ import {assertArrayHasNoUndefinedElements} from '../common-utils'
 import {GHOST_CONNECTION_MOVE} from './ghost-connections-redux'
 import {
 	IClientAppState, MOVE_POSITION,
-	REPORT_LEVELS, SET_GLOBAL_CLOCK_INDEX,
+	REPORT_LEVELS,
 	SET_INFO, UPDATE_POINTER,
 } from './index'
 
@@ -183,7 +183,6 @@ export const getActionsBlacklist = () => {
 	const x = [
 		REPORT_LEVELS,
 		SET_INFO,
-		SET_GLOBAL_CLOCK_INDEX,
 		UPDATE_POINTER,
 		MOVE_POSITION,
 		GHOST_CONNECTION_MOVE,

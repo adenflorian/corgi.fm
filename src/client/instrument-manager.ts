@@ -10,7 +10,6 @@ import {
 	selectBasicSynthesizer, selectConnectionsWithSourceIds,
 	selectGlobalClockState, selectSampler, selectSimpleCompressor, selectSimpleReverb, SimpleCompressorState, SimpleReverbState,
 } from '../common/redux'
-import {GridSequencerPlayer} from './GridSequencerPlayer'
 import {
 	AudioNodeWrapper, IAudioNodeWrapperOptions, IInstrumentOptions,
 	Instrument, MasterAudioOutput, SimpleCompressor, Voice, Voices,
@@ -36,13 +35,7 @@ type StuffMap = Map<string, AudioNodeWrapper>
 // Need separate properties to match up with what IDs selector is used
 // so that we can delete stuff properly
 // This might be able to be simplified if we can simplify the shamuGraph redux state
-let stuffMaps = Map<ConnectionNodeType, StuffMap>([
-	[ConnectionNodeType.basicSampler, Map()],
-	[ConnectionNodeType.basicSynthesizer, Map()],
-	[ConnectionNodeType.audioOutput, Map()],
-	[ConnectionNodeType.simpleReverb, Map()],
-	[ConnectionNodeType.simpleCompressor, Map()],
-])
+let stuffMaps = Map<ConnectionNodeType, StuffMap>()
 
 export function getAllInstruments() {
 	return stuffMaps.get(ConnectionNodeType.basicSampler)!
@@ -59,23 +52,22 @@ export const setupInstrumentManager = (
 	preFx: GainNode,
 ) => {
 
-	stuffMaps = stuffMaps.set(ConnectionNodeType.audioOutput, Map([[
-		MASTER_AUDIO_OUTPUT_TARGET_ID,
-		new MasterAudioOutput({
-			audioNode: preFx,
-			audioContext,
-			id: MASTER_AUDIO_OUTPUT_TARGET_ID,
-		}),
-	]]))
-
-	const globalClock = new GridSequencerPlayer(
-		audioContext,
-		index => store.dispatch(globalClockActions.setIndex(index)),
-	)
+	stuffMaps = Map<ConnectionNodeType, StuffMap>([
+		[ConnectionNodeType.basicSampler, Map()],
+		[ConnectionNodeType.basicSynthesizer, Map()],
+		[ConnectionNodeType.simpleReverb, Map()],
+		[ConnectionNodeType.simpleCompressor, Map()],
+		[ConnectionNodeType.audioOutput, Map([[
+			MASTER_AUDIO_OUTPUT_TARGET_ID,
+			new MasterAudioOutput({
+				audioNode: preFx,
+				audioContext,
+				id: MASTER_AUDIO_OUTPUT_TARGET_ID,
+			}),
+		]])],
+	])
 
 	store.subscribe(updateInstrumentLayer)
-
-	return globalClock.getTickFunction()
 
 	function updateInstrumentLayer() {
 		const state = store.getState()
