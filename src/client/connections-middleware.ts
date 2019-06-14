@@ -10,10 +10,10 @@ import {
 	selectAllPositions, selectConnection, updatePositions,
 } from '../common/redux/index'
 import {handleStopDraggingGhostConnector} from './dragging-connections'
-import {getAllInstruments} from './instrument-manager'
+import {GetAllInstruments} from './instrument-manager'
 
-export const connectionsClientMiddleware: Middleware<{}, IClientAppState> =
-	({dispatch, getState}) => next => (action: IConnectionAction | OrganizeGraphAction | GhostConnectorAction) => {
+export const connectionsClientMiddleware: (getAllInstruments: GetAllInstruments) => Middleware<{}, IClientAppState> =
+	(getAllInstruments: GetAllInstruments) => ({dispatch, getState}) => next => (action: IConnectionAction | OrganizeGraphAction | GhostConnectorAction) => {
 
 		const beforeState = getState()
 

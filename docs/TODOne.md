@@ -1,3 +1,17 @@
+- [√] high level sequencer (Group Sequencer)
+	- doesn't control notes, but whole song sections
+	- different colored sections
+	- colored wires for each section
+	- can draw wires from 2 diff sections into same sequencer
+
+- [√] dont connect keyboards to master clock
+- [√] connect sequencers to master clock automatically
+- [√] connect instruments to output automatically
+- [√] confirm deletion of room saves
+- [√] allow saving graph to file
+- [√] sort saves on load modal
+- [√] when placing note in seq, use gate, rate, and bpm to determine how long placed note should play
+
 - [√] fix saving and loading
 	- [√] ramp problem
 		- [√] use class constructors when deserializing

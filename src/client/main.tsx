@@ -9,7 +9,7 @@ import {getCurrentClientVersion} from './client-utils'
 import {getECSLoop} from './ECS/ECS'
 import {getFpsLoop} from './fps-loop'
 import {setupInputEventListeners} from './input-events'
-import {setupInstrumentManager} from './instrument-manager'
+import {GetAllInstruments, setupInstrumentManager} from './instrument-manager'
 import {isLocalDevClient, logClientEnv} from './is-prod-client'
 import {startMainRealTimeLoop} from './main-real-time-loop'
 import {startNoteScanner} from './note-scanner'
@@ -67,9 +67,11 @@ async function setupAsync() {
 
 	const loadedOptionsState = loadOptionsState()
 
+	const foo: GetAllInstruments = () => getAllInstruments()
+
 	const store = configureStore({
 		options: loadedOptionsState,
-	})
+	}, foo)
 
 	validateOptionsState(store, loadedOptionsState)
 
@@ -87,7 +89,7 @@ async function setupAsync() {
 
 	setupWebsocketAndListeners(store)
 
-	setupInstrumentManager(store, audioContext, preFx)
+	const {getAllInstruments} = setupInstrumentManager(store, audioContext, preFx)
 
 	renderApp(store)
 
@@ -97,7 +99,7 @@ async function setupAsync() {
 
 	const schedulerVisualLoop = startSchedulerVisualLoop()
 
-	const noteScannerLoop = startNoteScanner(store, audioContext)
+	const noteScannerLoop = startNoteScanner(store, audioContext, getAllInstruments)
 
 	startMainRealTimeLoop(Object.freeze([
 		noteScannerLoop,

@@ -1,38 +1,17 @@
 # Now
-- [...] high level sequencer (Group Sequencer)
-	- doesn't control notes, but whole song sections
-	- different colored sections
-	- colored wires for each section
-	- can draw wires from 2 diff sections into same sequencer
-- [√] dont connect keyboards to master clock
-- [√] connect sequencers to master clock automatically
-- [√] connect instruments to output automatically
-- [√] confirm deletion of room saves
-- [√] allow saving graph to file
-- [√] sort saves on load modal
-- [√] when placing note in seq, use gate, rate, and bpm to determine how long placed note should play
+- [ ] polish group sequencer
 	
 # Soon
+- [ ] sync client clocks
 - [ ] make submenu for creating grid sequencer with preset sizes
 - [ ] deploy script should check if anyone is on the server first
 - [ ] chained sequencers should only play if upstream sequencer is playing
 - [ ] put sequencer timeline animation as separate setting in options
 - [ ] redo on sequencers
-
-note length knob on sequencers
-
-gate - note length
-note length - 
-
-dont delete player's instrument when they leave if other stuff is plugged into it
-
-coarse knob to instruments
-
+- [ ] dont delete player's instrument when they leave if other stuff is plugged into it
+- [ ] coarse knob to instruments
 
 ## Saving
-
-saving
-
 why?
 to be able to work on a song over multiple sessions
 to be able to load from a template?

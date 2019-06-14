@@ -6,9 +6,9 @@ import {
 	selectConnectionsWithSourceIds,
 	selectSequencer, SequencerAction, sequencerActions, STOP_SEQUENCER,
 } from '../common/redux'
-import {getAllInstruments} from './instrument-manager'
+import {GetAllInstruments} from './instrument-manager'
 
-export const createSequencerMiddleware = () => {
+export const createSequencerMiddleware = (getAllInstruments: GetAllInstruments) => {
 
 	const sequencerMiddleware: Middleware<{}, IClientAppState> =
 		store => next => (action: SequencerAction) => {
@@ -18,7 +18,7 @@ export const createSequencerMiddleware = () => {
 				case EXPORT_SEQUENCER_MIDI:
 					return exportSequencerMidi(action, store)
 				case STOP_SEQUENCER:
-					return handleStopSequencer(action, store)
+					return handleStopSequencer(action, store, getAllInstruments)
 			}
 		}
 
@@ -72,6 +72,7 @@ function exportSequencerMidi(
 function handleStopSequencer(
 	action: ReturnType<typeof sequencerActions.stop>,
 	store: MiddlewareAPI<Dispatch, IClientAppState>,
+	getAllInstruments: GetAllInstruments,
 ) {
 	const instruments = getAllInstruments()
 

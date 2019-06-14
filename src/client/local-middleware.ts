@@ -43,7 +43,7 @@ import {
 } from '../common/redux/index'
 import {pointersActions} from '../common/redux/pointers-redux'
 import {graphStateSavesLocalStorageKey} from './client-constants'
-import {getAllInstruments} from './instrument-manager'
+import {GetAllInstruments} from './instrument-manager'
 import {MidiNotes} from './Instruments/BasicSynthesizerView'
 import {applyOctave} from './WebAudio/music-functions'
 
@@ -90,7 +90,8 @@ export function deleteAllTheThings(dispatch: Dispatch) {
 	dispatch(deleteAllPositions())
 }
 
-export const createLocalMiddleware: () => Middleware<{}, IClientAppState> = () => ({dispatch, getState}) => next => action => {
+export const createLocalMiddleware: (getAllInstruments: GetAllInstruments) => Middleware<{}, IClientAppState> =
+	(getAllInstruments: GetAllInstruments) => ({dispatch, getState}) => next => action => {
 	// TODO Do next later so keyboard is more responsive
 
 	switch (action.type) {
@@ -131,7 +132,7 @@ export const createLocalMiddleware: () => Middleware<{}, IClientAppState> = () =
 			const virtualKeyPressedAction = action as VirtualKeyPressedAction
 
 			scheduleNote(
-				virtualKeyPressedAction.midiNote, virtualKeyPressedAction.id, getState().room, 'on')
+				virtualKeyPressedAction.midiNote, virtualKeyPressedAction.id, getState().room, 'on', getAllInstruments)
 
 			next(action)
 
@@ -149,7 +150,7 @@ export const createLocalMiddleware: () => Middleware<{}, IClientAppState> = () =
 			const setGridSeqNoteAction = action as ReturnType<typeof gridSequencerActions.setNote>
 
 			if (setGridSeqNoteAction.enabled) {
-				playShortNote(setGridSeqNoteAction.note, setGridSeqNoteAction.id, getState().room)
+				playShortNote(setGridSeqNoteAction.note, setGridSeqNoteAction.id, getState().room, getAllInstruments)
 			}
 
 			next(action)
@@ -159,7 +160,7 @@ export const createLocalMiddleware: () => Middleware<{}, IClientAppState> = () =
 		case RECORD_SEQUENCER_NOTE: {
 			const recordSeqNoteAction = action as ReturnType<typeof sequencerActions.recordNote>
 
-			playShortNote(recordSeqNoteAction.note, recordSeqNoteAction.id, getState().room)
+			playShortNote(recordSeqNoteAction.note, recordSeqNoteAction.id, getState().room, getAllInstruments)
 
 			next(action)
 
@@ -200,7 +201,7 @@ export const createLocalMiddleware: () => Middleware<{}, IClientAppState> = () =
 
 			const noteToRelease = applyOctave(action.midiNote, localVirtualKeyboard.octave)
 
-			scheduleNote(noteToRelease, localVirtualKeyboard.id, state.room, 'off')
+			scheduleNote(noteToRelease, localVirtualKeyboard.id, state.room, 'off', getAllInstruments)
 
 			return dispatch(
 				virtualKeyUp(
@@ -219,7 +220,7 @@ export const createLocalMiddleware: () => Middleware<{}, IClientAppState> = () =
 				selectVirtualKeyboardById(state.room, virtualKeyUpAction.id).octave,
 			)
 
-			scheduleNote(noteToRelease, virtualKeyUpAction.id, state.room, 'off')
+			scheduleNote(noteToRelease, virtualKeyUpAction.id, state.room, 'off', getAllInstruments)
 
 			return next(action)
 		}
@@ -252,8 +253,8 @@ export const createLocalMiddleware: () => Middleware<{}, IClientAppState> = () =
 			keyboard.pressedKeys.forEach(key => {
 				const noteToRelease = applyOctave(key, keyboard.octave)
 				const noteToSchedule = applyOctave(key, keyboard.octave + action.delta)
-				scheduleNote(noteToRelease, keyboard.id, state.room, 'off')
-				scheduleNote(noteToSchedule, keyboard.id, state.room, 'on')
+				scheduleNote(noteToRelease, keyboard.id, state.room, 'off', getAllInstruments)
+				scheduleNote(noteToSchedule, keyboard.id, state.room, 'on', getAllInstruments)
 			})
 
 			return next(action)
@@ -448,8 +449,12 @@ const makeInitialLocalSavesStorage = (): LocalSaves => Object.freeze({
 let _previousNotesForSourceId = Map<string, MidiNotes>()
 
 function scheduleNote(
-	note: IMidiNote, sourceId: string, roomState: IClientRoomState, onOrOff: 'on' | 'off') {
-
+	note: IMidiNote,
+	sourceId: string,
+	roomState: IClientRoomState,
+	onOrOff: 'on' | 'off',
+	getAllInstruments: GetAllInstruments,
+) {
 	if (_previousNotesForSourceId.has(sourceId) === false) {
 		_previousNotesForSourceId = _previousNotesForSourceId.set(sourceId, emptyMidiNotes)
 	}
@@ -485,7 +490,10 @@ function scheduleNote(
 	})
 }
 
-function playShortNote(note: IMidiNote, sourceId: string, roomState: IClientRoomState) {
+function playShortNote(
+	note: IMidiNote, sourceId: string, roomState: IClientRoomState,
+	getAllInstruments: GetAllInstruments,
+) {
 	const targetIds = selectConnectionsWithSourceIds(roomState, [sourceId]).map(x => x.targetId)
 	const {gate, rate} = selectSequencer(roomState, sourceId)
 	const bpm = selectGlobalClockState(roomState).bpm

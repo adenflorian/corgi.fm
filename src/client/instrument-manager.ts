@@ -1,14 +1,14 @@
 import {Map} from 'immutable'
 import {Store} from 'redux'
 import {ConnectionNodeType, IConnectable} from '../common/common-types'
-import {emptyMidiNotes} from '../common/MidiNote'
 import {
-	BasicSamplerState, BasicSynthesizerState, globalClockActions, IClientAppState,
+	BasicSamplerState, BasicSynthesizerState, IClientAppState,
 	IClientRoomState, IConnection, isAudioNodeType,
 	MASTER_AUDIO_OUTPUT_TARGET_ID, selectAllBasicSynthesizerIds, selectAllSamplerIds,
 	selectAllSimpleCompressorIds, selectAllSimpleReverbIds,
 	selectBasicSynthesizer, selectConnectionsWithSourceIds,
-	selectGlobalClockState, selectSampler, selectSimpleCompressor, selectSimpleReverb, SimpleCompressorState, SimpleReverbState,
+	selectSampler, selectSimpleCompressor, selectSimpleReverb,
+	SimpleCompressorState, SimpleReverbState,
 } from '../common/redux'
 import {
 	AudioNodeWrapper, IAudioNodeWrapperOptions, IInstrumentOptions,
@@ -32,19 +32,7 @@ type UpdateSpecificEffect<E, S> = (effect: E, effectState: S) => void
 
 type StuffMap = Map<string, AudioNodeWrapper>
 
-// Need separate properties to match up with what IDs selector is used
-// so that we can delete stuff properly
-// This might be able to be simplified if we can simplify the shamuGraph redux state
-let stuffMaps = Map<ConnectionNodeType, StuffMap>()
-
-export function getAllInstruments() {
-	return stuffMaps.get(ConnectionNodeType.basicSampler)!
-		.concat(
-			stuffMaps.get(ConnectionNodeType.basicSynthesizer)!,
-		) as Map<string, Instrument<Voices<Voice>, Voice>>
-}
-
-let previousState: IClientAppState | undefined
+export type GetAllInstruments = () => Map<string, Instrument<Voices<Voice>, Voice>>
 
 export const setupInstrumentManager = (
 	store: Store<IClientAppState>,
@@ -52,7 +40,10 @@ export const setupInstrumentManager = (
 	preFx: GainNode,
 ) => {
 
-	stuffMaps = Map<ConnectionNodeType, StuffMap>([
+	// Need separate properties to match up with what IDs selector is used
+	// so that we can delete stuff properly
+	// This might be able to be simplified if we can simplify the shamuGraph redux state
+	let stuffMaps = Map<ConnectionNodeType, StuffMap>([
 		[ConnectionNodeType.basicSampler, Map()],
 		[ConnectionNodeType.basicSynthesizer, Map()],
 		[ConnectionNodeType.simpleReverb, Map()],
@@ -67,7 +58,11 @@ export const setupInstrumentManager = (
 		]])],
 	])
 
+	let previousState: IClientAppState | undefined
+
 	store.subscribe(updateInstrumentLayer)
+
+	return {getAllInstruments} as {getAllInstruments: GetAllInstruments}
 
 	function updateInstrumentLayer() {
 		const state = store.getState()
@@ -226,52 +221,59 @@ export const setupInstrumentManager = (
 			})
 		}
 	}
-}
 
-function deleteStuffThatNeedsToBe(nodeType: ConnectionNodeType, thingIds: string[]) {
-	stuffMaps = stuffMaps.set(nodeType, stuffMaps.get(nodeType)!.withMutations(mutable => {
-		mutable.forEach((_, key) => {
-			if (thingIds.includes(key) === false) {
-				mutable.get(key)!.dispose()
-				mutable.delete(key)
-			}
-		})
-	}))
-}
-
-function updateAudioConnectionsFromSource(roomState: IClientRoomState, sourceId: string, audioNodeWrapper: AudioNodeWrapper) {
-	const outgoingConnections = selectConnectionsWithSourceIds(roomState, [sourceId])
-
-	if (outgoingConnections.count() === 0) {
-		return audioNodeWrapper.disconnectAll()
+	function getAllInstruments() {
+		return stuffMaps.get(ConnectionNodeType.basicSampler)!
+			.concat(
+				stuffMaps.get(ConnectionNodeType.basicSynthesizer)!,
+			) as Map<string, Instrument<Voices<Voice>, Voice>>
 	}
 
-	const validOutgoingConnections = outgoingConnections.filter(isConnectionToAudioNode)
-	const newConnections = validOutgoingConnections.filter(x => audioNodeWrapper.getConnectedTargets().has(x.targetId) === false)
-	const deletedTargetIds = audioNodeWrapper.getConnectedTargets().keySeq().filter(id => validOutgoingConnections.some(x => x.targetId === id) === false)
+	function deleteStuffThatNeedsToBe(nodeType: ConnectionNodeType, thingIds: string[]) {
+		stuffMaps = stuffMaps.set(nodeType, stuffMaps.get(nodeType)!.withMutations(mutable => {
+			mutable.forEach((_, key) => {
+				if (thingIds.includes(key) === false) {
+					mutable.get(key)!.dispose()
+					mutable.delete(key)
+				}
+			})
+		}))
+	}
 
-	newConnections.forEach(newConnection => {
-		const targetAudioNodeWrapper = stuffMaps.get(newConnection.targetType)!.get(newConnection.targetId)
-		if (!targetAudioNodeWrapper) return
-		audioNodeWrapper.connect(targetAudioNodeWrapper, newConnection.targetId)
-	})
+	function updateAudioConnectionsFromSource(roomState: IClientRoomState, sourceId: string, audioNodeWrapper: AudioNodeWrapper) {
+		const outgoingConnections = selectConnectionsWithSourceIds(roomState, [sourceId])
 
-	deletedTargetIds.forEach(deletedTargetId => {
-		audioNodeWrapper.disconnect(deletedTargetId)
-	})
+		if (outgoingConnections.count() === 0) {
+			return audioNodeWrapper.disconnectAll()
+		}
+
+		const validOutgoingConnections = outgoingConnections.filter(isConnectionToAudioNode)
+		const newConnections = validOutgoingConnections.filter(x => audioNodeWrapper.getConnectedTargets().has(x.targetId) === false)
+		const deletedTargetIds = audioNodeWrapper.getConnectedTargets().keySeq().filter(id => validOutgoingConnections.some(x => x.targetId === id) === false)
+
+		newConnections.forEach(newConnection => {
+			const targetAudioNodeWrapper = stuffMaps.get(newConnection.targetType)!.get(newConnection.targetId)
+			if (!targetAudioNodeWrapper) return
+			audioNodeWrapper.connect(targetAudioNodeWrapper, newConnection.targetId)
+		})
+
+		deletedTargetIds.forEach(deletedTargetId => {
+			audioNodeWrapper.disconnect(deletedTargetId)
+		})
+	}
+
+	function createIfNotExisting<T>(nodeType: ConnectionNodeType, id: string, thing: any, thingFactory: () => T): T {
+		if (thing === undefined) {
+			thing = thingFactory()
+			stuffMaps = stuffMaps.set(
+				nodeType,
+				stuffMaps.get(nodeType)!.set(id, thing),
+			)
+		}
+		return thing
+	}
 }
 
 function isConnectionToAudioNode(connection: IConnection) {
 	return isAudioNodeType(connection.targetType)
-}
-
-function createIfNotExisting<T>(nodeType: ConnectionNodeType, id: string, thing: any, thingFactory: () => T): T {
-	if (thing === undefined) {
-		thing = thingFactory()
-		stuffMaps = stuffMaps.set(
-			nodeType,
-			stuffMaps.get(nodeType)!.set(id, thing),
-		)
-	}
-	return thing
 }

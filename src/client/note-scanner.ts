@@ -12,26 +12,17 @@ import {
 	selectGlobalClockState,
 	selectSequencerIsPlaying,
 } from '../common/redux'
-import {getAllInstruments} from './instrument-manager'
+import {GetAllInstruments} from './instrument-manager'
 import {getEvents} from './note-scheduler'
 
 let _store: ClientStore
 let _audioContext: AudioContext
 
-export function startNoteScanner(store: ClientStore, audioContext: AudioContext) {
+export function startNoteScanner(store: ClientStore, audioContext: AudioContext, getAllInstruments: GetAllInstruments) {
 	logger.log('startNoteScanner')
 	_store = store
 	_audioContext = audioContext
-	stop = false
-	return mainLoop
-}
-
-let stop = true
-
-function mainLoop() {
-	if (stop === true) return
-
-	scheduleNotes()
+	return () => scheduleNotes(getAllInstruments)
 }
 
 // not sure if needed?
@@ -61,7 +52,7 @@ export function getCurrentSongIsPlaying() {
 	return _isPlaying
 }
 
-function scheduleNotes() {
+function scheduleNotes(getAllInstruments: GetAllInstruments) {
 	const roomState = _store.getState().room
 
 	const {
@@ -81,7 +72,7 @@ function scheduleNotes() {
 		} else {
 			// song stopped
 			// release all notes on all instruments
-			releaseAllNotesOnAllInstruments()
+			releaseAllNotesOnAllInstruments(getAllInstruments)
 		}
 	}
 
@@ -248,6 +239,6 @@ function flattenEventNotes(event: MidiGlobalClipEvent): List<MidiGlobalClipEvent
 		}))
 }
 
-function releaseAllNotesOnAllInstruments() {
+function releaseAllNotesOnAllInstruments(getAllInstruments: GetAllInstruments) {
 	getAllInstruments().forEach(x => x.releaseAllScheduled())
 }
