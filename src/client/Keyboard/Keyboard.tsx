@@ -79,14 +79,13 @@ export class Keyboard extends React.PureComponent<IKeyboardAllProps, IKeyboardSt
 
 	public componentDidMount() {
 		if (this.props.isLocal) {
+			window.removeEventListener('mouseup', this.handleWindowMouseUp)
 			window.addEventListener('mouseup', this.handleWindowMouseUp)
 		}
 	}
 
 	public componentWillUnmount() {
-		if (this.props.isLocal) {
-			window.removeEventListener('mouseup', this.handleWindowMouseUp)
-		}
+		window.removeEventListener('mouseup', this.handleWindowMouseUp)
 	}
 
 	public render() {
