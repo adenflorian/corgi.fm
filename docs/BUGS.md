@@ -11,6 +11,7 @@ BUGS
 - [ ] shift click drag a connector, let go of control, connector gets stuck in midair
 - [ ] when hooking up reverb and changing filter to 0 it can cause a loud sound which triggers the master volume safety
 - [ ] when 2 people join around same time, they spawn on top of each other
+	- [ ] server should choose their position
 
 ## Low
 - [ ] when typing in chat, if someone leaves the input box loses focus
