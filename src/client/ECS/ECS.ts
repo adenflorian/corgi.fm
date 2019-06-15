@@ -15,19 +15,23 @@ import {ECSSequencerRenderSystem} from './ECSSequencerRenderSystem'
 import {ECSEntity, ECSSystem} from './ECSTypes'
 
 let _store: Store<IClientAppState>
-
-let _systems = List<ECSSystem>()
-let _entities = List<ECSEntity>()
-
-_systems = _systems.concat([
-	new ECSCanvasRenderSystem(),
-	new ECSSequencerRenderSystem(),
-])
+let _systems: List<ECSSystem>
+let _entities: List<ECSEntity>
 
 export function getECSLoop(store: Store<IClientAppState>) {
 	_store = store
 
-	return ecsLoop
+	_systems = List<ECSSystem>([
+		new ECSCanvasRenderSystem(),
+		new ECSSequencerRenderSystem(),
+	])
+
+	_entities = List<ECSEntity>()
+
+	return {
+		ecsLoop,
+		onSetActiveRoom: () => _systems.forEach(x => x.onSetActiveRoom()),
+	}
 }
 
 function ecsLoop() {

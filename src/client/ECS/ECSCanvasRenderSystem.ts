@@ -1,7 +1,7 @@
 import {List, Set} from 'immutable'
 import {ECSComponentType, ECSEntity, ECSSystem} from './ECSTypes'
 
-export class ECSCanvasRenderSystem implements ECSSystem {
+export class ECSCanvasRenderSystem extends ECSSystem {
 	public static canvasSize = 2048
 
 	private _canvasContext: CanvasRenderingContext2D | undefined

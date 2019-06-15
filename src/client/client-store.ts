@@ -1,4 +1,4 @@
-import {applyMiddleware, createStore, Store} from 'redux'
+import {applyMiddleware, createStore, Middleware, Store} from 'redux'
 import {composeWithDevTools} from 'redux-devtools-extension/developmentOnly'
 import {
 	getActionsBlacklist, getClientReducers, IClientAppState,
@@ -16,6 +16,7 @@ const composeEnhancers = composeWithDevTools({
 export function configureStore(
 	initialState: Partial<IClientAppState> = {},
 	getAllInstruments: GetAllInstruments,
+	onReduxMiddleware: Middleware,
 ): Store<IClientAppState> {
 
 	return createStore(
@@ -23,6 +24,7 @@ export function configureStore(
 		initialState,
 		composeEnhancers(
 			applyMiddleware(
+				onReduxMiddleware,
 				createLocalMiddleware(getAllInstruments),
 				createSequencerMiddleware(getAllInstruments),
 				connectionsClientMiddleware(getAllInstruments),

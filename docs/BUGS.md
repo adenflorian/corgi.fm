@@ -4,8 +4,8 @@ BUGS
 ## High
 
 ## Medium
+- [ ] synth envelope occasionally doing a medium length attack even though attack is around 0
 - [ ] midi download not respecting long rests correctly
-- [ ] ECS animations break when switching rooms
 - [ ] filters getting stuck
 - [ ] changing room thru selector doesn't completely pick up new user name if changed in previous room?
 - [ ] shift click drag a connector, let go of control, connector gets stuck in midair
@@ -17,6 +17,7 @@ BUGS
 - [ ] when ableton is open, corgi.fm wont recognize midi keyboard
 
 ## FIXED
+- [√] ECS animations break when switching rooms
 - [√] midi downloading broken
 	- [√] button doesn't do anything
 	- [√] downloaded midi is invalid

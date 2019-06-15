@@ -1,7 +1,10 @@
 import 'babel-polyfill'
 import * as React from 'react'
 import * as ReactGA from 'react-ga'
-import {clientInfoActions, loadOptionsState, validateOptionsState} from '../common/redux'
+import {Middleware} from 'redux'
+import {
+	clientInfoActions, loadOptionsState, SET_ACTIVE_ROOM, validateOptionsState,
+} from '../common/redux'
 import {setupAudioContext} from '../common/setup-audio-context'
 import {BrowserWarning} from './BrowserWarning'
 import {configureStore} from './client-store'
@@ -69,9 +72,16 @@ async function setupAsync() {
 
 	const foo: GetAllInstruments = () => getAllInstruments()
 
+	const onReduxMiddleware: Middleware = () => next => action => {
+		next(action)
+		switch (action.type) {
+			case SET_ACTIVE_ROOM: onSetActiveRoom()
+		}
+	}
+
 	const store = configureStore({
 		options: loadedOptionsState,
-	}, foo)
+	}, foo, onReduxMiddleware)
 
 	validateOptionsState(store, loadedOptionsState)
 
@@ -93,7 +103,7 @@ async function setupAsync() {
 
 	renderApp(store)
 
-	const ecsLoop = getECSLoop(store)
+	const {ecsLoop, onSetActiveRoom} = getECSLoop(store)
 
 	const fpsLoop = getFpsLoop()
 

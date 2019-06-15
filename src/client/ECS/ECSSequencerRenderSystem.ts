@@ -3,7 +3,7 @@ import {CssColor} from '../../common/shamu-color'
 import {ECSCanvasRenderSystem} from './ECSCanvasRenderSystem'
 import {ECSComponentType, ECSEntity, ECSSystem} from './ECSTypes'
 
-export class ECSSequencerRenderSystem implements ECSSystem {
+export class ECSSequencerRenderSystem extends ECSSystem {
 	public static readonly canvasIdPrefix = 'ECSCanvasRenderSystemCanvas-node-'
 
 	private _canvasContexts = Map<string, CanvasRenderingContext2D>()
@@ -14,6 +14,10 @@ export class ECSSequencerRenderSystem implements ECSSystem {
 			ECSComponentType.NodeRenderer,
 			ECSComponentType.GraphPosition,
 		])
+	}
+
+	public onSetActiveRoom = () => {
+		this._canvasContexts = this._canvasContexts.clear()
 	}
 
 	public execute(entities: List<ECSEntity>): void {

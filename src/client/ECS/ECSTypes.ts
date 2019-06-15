@@ -8,9 +8,10 @@ export enum ECSComponentType {
 	Sequencer = 'Sequencer',
 }
 
-export interface ECSSystem {
-	getRequiredComponents(): Set<ECSComponentType>
-	execute(entities: List<ECSEntity>): void
+export abstract class ECSSystem {
+	public abstract getRequiredComponents(): Set<ECSComponentType>
+	public abstract execute(entities: List<ECSEntity>): void
+	public onSetActiveRoom = () => {}
 }
 
 export abstract class ECSEntity {
