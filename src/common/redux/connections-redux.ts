@@ -14,7 +14,7 @@ import {
 export const ADD_CONNECTION = 'ADD_CONNECTION'
 export const DELETE_CONNECTIONS = 'DELETE_CONNECTIONS'
 export const DELETE_ALL_CONNECTIONS = 'DELETE_ALL_CONNECTIONS'
-export const UPDATE_CONNECTIONS = 'UPDATE_CONNECTIONS'
+export const REPLACE_CONNECTIONS = 'REPLACE_CONNECTIONS'
 export const UPDATE_CONNECTION = 'UPDATE_CONNECTION'
 
 export const connectionsActions = Object.freeze({
@@ -33,8 +33,8 @@ export const connectionsActions = Object.freeze({
 	deleteAll: () => ({
 		type: DELETE_ALL_CONNECTIONS as typeof DELETE_ALL_CONNECTIONS,
 	}),
-	updateAll: (connections: IConnections) => ({
-		type: UPDATE_CONNECTIONS as typeof UPDATE_CONNECTIONS,
+	replaceAll: (connections: IConnections) => ({
+		type: REPLACE_CONNECTIONS as typeof REPLACE_CONNECTIONS,
 		connections,
 		BROADCASTER_ACTION,
 	}),
@@ -98,7 +98,7 @@ const connectionsSpecificReducer: Reducer<IConnections, IConnectionAction> =
 			case ADD_CONNECTION: return connections.set(action.connection.id, action.connection)
 			case DELETE_CONNECTIONS: return connections.deleteAll(action.connectionIds)
 			case DELETE_ALL_CONNECTIONS: return connections.clear()
-			case UPDATE_CONNECTIONS: return connections.merge(action.connections)
+			case REPLACE_CONNECTIONS: return Map<string, IConnection>().merge(action.connections)
 			case UPDATE_CONNECTION: return connections.update(action.id, x => ({...x, ...action.connection}))
 			default: return connections
 		}

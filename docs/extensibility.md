@@ -17,7 +17,7 @@ Let's say we want to make a new audio effect node called Delay (*folder* **new f
 		- **delay-redux.ts** (reducer, action creators, selectors, state types)
 		- [ ] create-server-stuff.ts (createServerStuff)
 		- [ ] index.ts (module loading order)
-		- [ ] local-middleware.ts (deleteAllTheThings, createLocalStuff)
+		- [ ] local-middleware.ts (createLocalStuff)
 		- [ ] node-types.ts (NodeInfoMap)
 		- [√] room-stores-redux.ts (roomReducers)
 			- moved to shamu-nodes-redux.ts 2019-02-09

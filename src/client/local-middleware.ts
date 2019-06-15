@@ -81,283 +81,274 @@ export const localActions = Object.freeze({
 
 export type LocalAction = ActionType<typeof localActions>
 
-export function deleteAllTheThings(dispatch: Dispatch) {
-	dispatch(connectionsActions.deleteAll())
-	dispatch(deleteAllThings(ConnectionNodeType.gridSequencer))
-	dispatch(deleteAllThings(ConnectionNodeType.virtualKeyboard))
-	dispatch(deleteAllThings(ConnectionNodeType.basicSynthesizer))
-	dispatch(deleteAllThings(ConnectionNodeType.basicSampler))
-	dispatch(deleteAllPositions())
-}
-
 export const createLocalMiddleware: (getAllInstruments: GetAllInstruments) => Middleware<{}, IClientAppState> =
 	(getAllInstruments: GetAllInstruments) => ({dispatch, getState}) => next => action => {
-	// TODO Do next later so keyboard is more responsive
+		// TODO Do next later so keyboard is more responsive
 
-	switch (action.type) {
-		case WINDOW_BLUR: {
-			next(action)
+		switch (action.type) {
+			case WINDOW_BLUR: {
+				next(action)
 
-			const state = getState()
+				const state = getState()
 
-			const localVirtualKeyboard = selectLocalVirtualKeyboard(state)
+				const localVirtualKeyboard = selectLocalVirtualKeyboard(state)
 
-			return localVirtualKeyboard.pressedKeys.forEach(key => {
-				dispatch(
-					virtualKeyUp(
+				return localVirtualKeyboard.pressedKeys.forEach(key => {
+					dispatch(
+						virtualKeyUp(
+							localVirtualKeyboard.id,
+							key,
+						),
+					)
+				})
+			}
+			case LOCAL_MIDI_KEY_PRESS: {
+				next(action)
+				const state = getState()
+
+				const localVirtualKeyboard = selectLocalVirtualKeyboard(state)
+
+				const noteToPlay = applyOctave(action.midiNote, localVirtualKeyboard.octave)
+
+				return dispatch(
+					virtualKeyPressed(
 						localVirtualKeyboard.id,
-						key,
+						action.midiNote,
+						localVirtualKeyboard.octave,
+						noteToPlay,
 					),
 				)
-			})
-		}
-		case LOCAL_MIDI_KEY_PRESS: {
-			next(action)
-			const state = getState()
-
-			const localVirtualKeyboard = selectLocalVirtualKeyboard(state)
-
-			const noteToPlay = applyOctave(action.midiNote, localVirtualKeyboard.octave)
-
-			return dispatch(
-				virtualKeyPressed(
-					localVirtualKeyboard.id,
-					action.midiNote,
-					localVirtualKeyboard.octave,
-					noteToPlay,
-				),
-			)
-		}
-		case VIRTUAL_KEY_PRESSED: {
-			const virtualKeyPressedAction = action as VirtualKeyPressedAction
-
-			scheduleNote(
-				virtualKeyPressedAction.midiNote, virtualKeyPressedAction.id, getState().room, 'on', getAllInstruments)
-
-			next(action)
-
-			if ((action as unknown as BroadcastAction).alreadyBroadcasted) return
-
-			// add note to sequencer if downstream recording sequencer
-			_getDownstreamRecordingSequencers(getState(), virtualKeyPressedAction.id)
-				.forEach(x => {
-					dispatch(sequencerActions.recordNote(x.id, virtualKeyPressedAction.midiNote))
-				})
-
-			return
-		}
-		case SET_GRID_SEQUENCER_NOTE: {
-			const setGridSeqNoteAction = action as ReturnType<typeof gridSequencerActions.setNote>
-
-			if (setGridSeqNoteAction.enabled) {
-				playShortNote(setGridSeqNoteAction.note, setGridSeqNoteAction.id, getState().room, getAllInstruments)
 			}
+			case VIRTUAL_KEY_PRESSED: {
+				const virtualKeyPressedAction = action as VirtualKeyPressedAction
 
-			next(action)
+				scheduleNote(
+					virtualKeyPressedAction.midiNote, virtualKeyPressedAction.id, getState().room, 'on', getAllInstruments)
 
-			return
-		}
-		case RECORD_SEQUENCER_NOTE: {
-			const recordSeqNoteAction = action as ReturnType<typeof sequencerActions.recordNote>
+				next(action)
 
-			playShortNote(recordSeqNoteAction.note, recordSeqNoteAction.id, getState().room, getAllInstruments)
+				if ((action as unknown as BroadcastAction).alreadyBroadcasted) return
 
-			next(action)
+				// add note to sequencer if downstream recording sequencer
+				_getDownstreamRecordingSequencers(getState(), virtualKeyPressedAction.id)
+					.forEach(x => {
+						dispatch(sequencerActions.recordNote(x.id, virtualKeyPressedAction.midiNote))
+					})
 
-			return
-		}
-		case SKIP_NOTE: {
-			const state = getState()
+				return
+			}
+			case SET_GRID_SEQUENCER_NOTE: {
+				const setGridSeqNoteAction = action as ReturnType<typeof gridSequencerActions.setNote>
 
-			// add rest to sequencer if downstream recording sequencer
-			_getDownstreamRecordingSequencers(state, selectLocalVirtualKeyboardId(state))
-				.forEach(x => {
-					dispatch(sequencerActions.recordRest(x.id))
-				})
-
-			return next(action)
-		}
-		case USER_KEY_PRESS: {
-			const userKeyPressAction = action as UserInputAction
-			if (userKeyPressAction.type === USER_KEY_PRESS) {
-				if (userKeyPressAction.key === UserKeys.Backspace) {
-					const state = getState()
-
-					// add rest to sequencer if downstream recording sequencer
-					_getDownstreamRecordingSequencers(state, selectLocalVirtualKeyboardId(state))
-						.forEach(x => {
-							dispatch(sequencerActions.undo(x.id))
-						})
+				if (setGridSeqNoteAction.enabled) {
+					playShortNote(setGridSeqNoteAction.note, setGridSeqNoteAction.id, getState().room, getAllInstruments)
 				}
+
+				next(action)
+
+				return
 			}
+			case RECORD_SEQUENCER_NOTE: {
+				const recordSeqNoteAction = action as ReturnType<typeof sequencerActions.recordNote>
 
-			return next(action)
+				playShortNote(recordSeqNoteAction.note, recordSeqNoteAction.id, getState().room, getAllInstruments)
+
+				next(action)
+
+				return
+			}
+			case SKIP_NOTE: {
+				const state = getState()
+
+				// add rest to sequencer if downstream recording sequencer
+				_getDownstreamRecordingSequencers(state, selectLocalVirtualKeyboardId(state))
+					.forEach(x => {
+						dispatch(sequencerActions.recordRest(x.id))
+					})
+
+				return next(action)
+			}
+			case USER_KEY_PRESS: {
+				const userKeyPressAction = action as UserInputAction
+				if (userKeyPressAction.type === USER_KEY_PRESS) {
+					if (userKeyPressAction.key === UserKeys.Backspace) {
+						const state = getState()
+
+						// add rest to sequencer if downstream recording sequencer
+						_getDownstreamRecordingSequencers(state, selectLocalVirtualKeyboardId(state))
+							.forEach(x => {
+								dispatch(sequencerActions.undo(x.id))
+							})
+					}
+				}
+
+				return next(action)
+			}
+			case LOCAL_MIDI_KEY_UP: {
+				next(action)
+				const state = getState()
+
+				const localVirtualKeyboard = selectLocalVirtualKeyboard(state)
+
+				const noteToRelease = applyOctave(action.midiNote, localVirtualKeyboard.octave)
+
+				scheduleNote(noteToRelease, localVirtualKeyboard.id, state.room, 'off', getAllInstruments)
+
+				return dispatch(
+					virtualKeyUp(
+						localVirtualKeyboard.id,
+						action.midiNote,
+					),
+				)
+			}
+			case VIRTUAL_KEY_UP: {
+				const virtualKeyUpAction = action as VirtualKeyUpAction
+
+				const state = getState()
+
+				const noteToRelease = applyOctave(
+					virtualKeyUpAction.number,
+					selectVirtualKeyboardById(state.room, virtualKeyUpAction.id).octave,
+				)
+
+				scheduleNote(noteToRelease, virtualKeyUpAction.id, state.room, 'off', getAllInstruments)
+
+				return next(action)
+			}
+			case LOCAL_MIDI_OCTAVE_CHANGE: {
+				next(action)
+				// what do for scheduled keyboard notes?
+				// release then schedule new ones
+				// which ones?
+				// all the pressed keys from keyboard state
+				const state = getState()
+
+				// const localVirtualKeyboard = getLocalVirtualKeyboard(state)
+
+				// localVirtualKeyboard.pressedKeys.forEach(key => {
+				// 	const noteToRelease = applyOctave(key, localVirtualKeyboard.octave)
+				// 	const noteToSchedule = applyOctave(key, localVirtualKeyboard.octave + action.delta)
+				// 	scheduleNote(noteToRelease, localVirtualKeyboard.id, state.room, 'off')
+				// 	scheduleNote(noteToSchedule, localVirtualKeyboard.id, state.room, 'on')
+				// })
+
+				return dispatch(virtualOctaveChange(selectLocalVirtualKeyboardId(state), action.delta))
+			}
+			case VIRTUAL_OCTAVE_CHANGE: {
+				const virtualOctaveChangeAction = action as VirtualOctaveChangeAction
+
+				const state = getState()
+
+				const keyboard = selectVirtualKeyboardById(state.room, virtualOctaveChangeAction.id)
+
+				keyboard.pressedKeys.forEach(key => {
+					const noteToRelease = applyOctave(key, keyboard.octave)
+					const noteToSchedule = applyOctave(key, keyboard.octave + action.delta)
+					scheduleNote(noteToRelease, keyboard.id, state.room, 'off', getAllInstruments)
+					scheduleNote(noteToSchedule, keyboard.id, state.room, 'on', getAllInstruments)
+				})
+
+				return next(action)
+			}
+			case SET_ACTIVE_ROOM: {
+				next(action)
+				window.history.pushState({}, document.title, '/' + selectActiveRoom(getState()))
+				return
+			}
+			case READY: {
+				next(action)
+				return createLocalStuff(dispatch, getState())
+			}
+			case DELETE_NODE: {
+				next(action)
+
+				const newState = getState()
+
+				const nodeId = action.nodeId
+
+				dispatch(deleteThingsAny([nodeId], NetworkActionType.SERVER_AND_BROADCASTER))
+				dispatch(deletePositions([nodeId]))
+				dispatch(
+					connectionsActions.delete(
+						selectConnectionsWithSourceOrTargetIds(newState.room, [nodeId])
+							.map(x => x.id)
+							.toList(),
+					),
+				)
+
+				return
+			}
+			case SAVE_ROOM_TO_BROWSER: {
+				next(action)
+
+				const state = getState()
+
+				const room = selectActiveRoom(state)
+
+				const localSaves = getOrCreateLocalSavesStorage()
+
+				setLocalSavesToLocalStorage({
+					...localSaves,
+					all: {
+						...localSaves.all,
+						[uuid.v4()]: createRoomSave(state, room),
+					},
+				} as LocalSaves)
+
+				return
+			}
+			case SAVE_ROOM_TO_FILE: {
+				next(action)
+
+				const state = getState()
+
+				const room = selectActiveRoom(state)
+
+				const roomSave = createRoomSave(state, room)
+
+				downloadObjectAsJson(roomSave, `${roomSave.saveDateTime.substring(0, 10)}-room`)
+
+				return
+			}
+			case DELETE_SAVED_ROOM: {
+				next(action)
+
+				const deleteSavedRoomAction = action as ReturnType<typeof localActions.deleteSavedRoom>
+
+				const localSaves = getOrCreateLocalSavesStorage()
+
+				delete localSaves.all[deleteSavedRoomAction.id]
+
+				setLocalSavesToLocalStorage(localSaves)
+
+				return
+			}
+			case UPDATE_POSITIONS: {
+				const updatePositionsAction = action as ReturnType<typeof updatePositions>
+
+				// Mainly to handle loading old saves with smaller sizes
+				// Not perfect
+				const foo = {
+					...updatePositionsAction,
+					positions: Map(updatePositionsAction.positions).map(position => {
+						const nodeInfo = getConnectionNodeInfo(position.targetType)
+						const nodeState = nodeInfo.stateSelector(getState().room, position.id)
+
+						return {
+							...position,
+							width: Math.max(position.width, nodeState.width),
+							height: Math.max(position.height, nodeState.height),
+						} as IPosition
+					}),
+				} as ReturnType<typeof updatePositions>
+
+				next(foo)
+
+				return
+			}
+			default: return next(action)
 		}
-		case LOCAL_MIDI_KEY_UP: {
-			next(action)
-			const state = getState()
-
-			const localVirtualKeyboard = selectLocalVirtualKeyboard(state)
-
-			const noteToRelease = applyOctave(action.midiNote, localVirtualKeyboard.octave)
-
-			scheduleNote(noteToRelease, localVirtualKeyboard.id, state.room, 'off', getAllInstruments)
-
-			return dispatch(
-				virtualKeyUp(
-					localVirtualKeyboard.id,
-					action.midiNote,
-				),
-			)
-		}
-		case VIRTUAL_KEY_UP: {
-			const virtualKeyUpAction = action as VirtualKeyUpAction
-
-			const state = getState()
-
-			const noteToRelease = applyOctave(
-				virtualKeyUpAction.number,
-				selectVirtualKeyboardById(state.room, virtualKeyUpAction.id).octave,
-			)
-
-			scheduleNote(noteToRelease, virtualKeyUpAction.id, state.room, 'off', getAllInstruments)
-
-			return next(action)
-		}
-		case LOCAL_MIDI_OCTAVE_CHANGE: {
-			next(action)
-			// what do for scheduled keyboard notes?
-			// release then schedule new ones
-			// which ones?
-			// all the pressed keys from keyboard state
-			const state = getState()
-
-			// const localVirtualKeyboard = getLocalVirtualKeyboard(state)
-
-			// localVirtualKeyboard.pressedKeys.forEach(key => {
-			// 	const noteToRelease = applyOctave(key, localVirtualKeyboard.octave)
-			// 	const noteToSchedule = applyOctave(key, localVirtualKeyboard.octave + action.delta)
-			// 	scheduleNote(noteToRelease, localVirtualKeyboard.id, state.room, 'off')
-			// 	scheduleNote(noteToSchedule, localVirtualKeyboard.id, state.room, 'on')
-			// })
-
-			return dispatch(virtualOctaveChange(selectLocalVirtualKeyboardId(state), action.delta))
-		}
-		case VIRTUAL_OCTAVE_CHANGE: {
-			const virtualOctaveChangeAction = action as VirtualOctaveChangeAction
-
-			const state = getState()
-
-			const keyboard = selectVirtualKeyboardById(state.room, virtualOctaveChangeAction.id)
-
-			keyboard.pressedKeys.forEach(key => {
-				const noteToRelease = applyOctave(key, keyboard.octave)
-				const noteToSchedule = applyOctave(key, keyboard.octave + action.delta)
-				scheduleNote(noteToRelease, keyboard.id, state.room, 'off', getAllInstruments)
-				scheduleNote(noteToSchedule, keyboard.id, state.room, 'on', getAllInstruments)
-			})
-
-			return next(action)
-		}
-		case SET_ACTIVE_ROOM: {
-			next(action)
-			window.history.pushState({}, document.title, '/' + selectActiveRoom(getState()))
-			return deleteAllTheThings(dispatch)
-		}
-		case READY: {
-			next(action)
-			return createLocalStuff(dispatch, getState())
-		}
-		case DELETE_NODE: {
-			next(action)
-
-			const newState = getState()
-
-			const nodeId = action.nodeId
-
-			dispatch(deleteThingsAny([nodeId], NetworkActionType.SERVER_AND_BROADCASTER))
-			dispatch(deletePositions([nodeId]))
-			dispatch(
-				connectionsActions.delete(
-					selectConnectionsWithSourceOrTargetIds(newState.room, [nodeId])
-						.map(x => x.id)
-						.toList(),
-				),
-			)
-
-			return
-		}
-		case SAVE_ROOM_TO_BROWSER: {
-			next(action)
-
-			const state = getState()
-
-			const room = selectActiveRoom(state)
-
-			const localSaves = getOrCreateLocalSavesStorage()
-
-			setLocalSavesToLocalStorage({
-				...localSaves,
-				all: {
-					...localSaves.all,
-					[uuid.v4()]: createRoomSave(state, room),
-				},
-			} as LocalSaves)
-
-			return
-		}
-		case SAVE_ROOM_TO_FILE: {
-			next(action)
-
-			const state = getState()
-
-			const room = selectActiveRoom(state)
-
-			const roomSave = createRoomSave(state, room)
-
-			downloadObjectAsJson(roomSave, `${roomSave.saveDateTime.substring(0, 10)}-room`)
-
-			return
-		}
-		case DELETE_SAVED_ROOM: {
-			next(action)
-
-			const deleteSavedRoomAction = action as ReturnType<typeof localActions.deleteSavedRoom>
-
-			const localSaves = getOrCreateLocalSavesStorage()
-
-			delete localSaves.all[deleteSavedRoomAction.id]
-
-			setLocalSavesToLocalStorage(localSaves)
-
-			return
-		}
-		case UPDATE_POSITIONS: {
-			const updatePositionsAction = action as ReturnType<typeof updatePositions>
-
-			// Mainly to handle loading old saves with smaller sizes
-			// Not perfect
-			const foo = {
-				...updatePositionsAction,
-				positions: Map(updatePositionsAction.positions).map(position => {
-					const nodeInfo = getConnectionNodeInfo(position.targetType)
-					const nodeState = nodeInfo.stateSelector(getState().room, position.id)
-
-					return {
-						...position,
-						width: Math.max(position.width, nodeState.width),
-						height: Math.max(position.height, nodeState.height),
-					} as IPosition
-				}),
-			} as ReturnType<typeof updatePositions>
-
-			next(foo)
-
-			return
-		}
-		default: return next(action)
 	}
-}
 
 function createRoomSave(state: IClientAppState, roomName: string): SavedRoom {
 	return Object.freeze({

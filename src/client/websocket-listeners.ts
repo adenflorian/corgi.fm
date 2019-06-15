@@ -9,7 +9,6 @@ import {
 import {WebSocketEvent} from '../common/server-constants'
 import {getCurrentClientVersion} from './client-utils'
 import {isLocalDevClient} from './is-prod-client'
-import {deleteAllTheThings} from './local-middleware'
 import {getUsernameFromLocalStorage} from './username'
 
 const port = isLocalDevClient() ? 3000 : 443
@@ -40,7 +39,6 @@ export function setupWebsocketAndListeners(store: Store) {
 	socket.on('disconnect', () => {
 		logger.log('socket: disconnect')
 		store.dispatch(selfDisconnected())
-		deleteAllTheThings(store.dispatch)
 	})
 
 	socket.on('version', (serverVersion: string) => {

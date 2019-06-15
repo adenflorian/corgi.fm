@@ -40,6 +40,15 @@ export const updatePositions = (positions: IPositions) => ({
 	BROADCASTER_ACTION,
 })
 
+export const REPLACE_POSITIONS = 'REPLACE_POSITIONS'
+export type ReplacePositionsAction = ReturnType<typeof replacePositions>
+export const replacePositions = (positions: IPositions) => ({
+	type: REPLACE_POSITIONS as typeof REPLACE_POSITIONS,
+	positions,
+	SERVER_ACTION,
+	BROADCASTER_ACTION,
+})
+
 export const UPDATE_POSITION = 'UPDATE_POSITION'
 export type UpdatePositionAction = ReturnType<typeof updatePosition>
 export const updatePosition = (id: string, position: Partial<IPosition>) => ({
@@ -101,6 +110,7 @@ export const makePosition = (
 
 export type IPositionAction = AddPositionAction | DeletePositionsAction | NodeClickedAction
 	| DeleteAllPositionsAction | UpdatePositionsAction | UpdatePositionAction | MovePositionAction
+	| ReplacePositionsAction
 
 // Reducers
 const positionsSpecificReducer: Reducer<IPositions, IPositionAction> =
@@ -115,6 +125,7 @@ const positionsSpecificReducer: Reducer<IPositions, IPositionAction> =
 			))
 			case DELETE_POSITIONS: return sortPositions(positions.deleteAll(action.positionIds))
 			case DELETE_ALL_POSITIONS: return positions.clear()
+			case REPLACE_POSITIONS: return sortPositions(Map<string, IPosition>().merge(action.positions))
 			case UPDATE_POSITIONS: return sortPositions(positions.merge(action.positions))
 			case UPDATE_POSITION: return positions.update(action.id, x => ({...x, ...action.position}))
 			case MOVE_POSITION: return positions.update(action.id, x => ({...x, ...action.position}))

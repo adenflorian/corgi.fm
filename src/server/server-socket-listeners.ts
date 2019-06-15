@@ -11,14 +11,16 @@ import {
 	deleteThingsAny, getActionsBlacklist, GLOBAL_SERVER_ACTION,
 	globalClockActions, IClientRoomState, IServerState, LOAD_ROOM,
 	LoadRoomAction, maxUsernameLength, pointersActions, ready,
-	REQUEST_CREATE_ROOM, roomSettingsActions, SavedRoom,
-	selectAllClients, selectAllConnections, selectAllMessages,
-	selectAllPointers, selectAllPositions,
-	selectAllRoomMemberIds, selectAllRoomNames,
-	selectAllRooms, selectAllRoomStates, selectClientBySocketId,
-	selectConnectionsWithSourceOrTargetIds, selectGlobalClockState, selectNodeIdsOwnedByClient, selectPositionsWithIds,
-	selectRoomExists, selectRoomSettings, selectRoomStateByName, selectShamuGraphState,
-	SERVER_ACTION, setActiveRoom, setChat, setClients, setRoomMembers, setRooms, shamuGraphActions, updatePositions, userLeftRoom,
+	replacePositions, REQUEST_CREATE_ROOM, roomSettingsActions,
+	SavedRoom, selectAllClients, selectAllConnections,
+	selectAllMessages, selectAllPointers,
+	selectAllPositions, selectAllRoomMemberIds,
+	selectAllRooms, selectAllRoomStates,
+	selectClientBySocketId, selectConnectionsWithSourceOrTargetIds, selectGlobalClockState,
+	selectNodeIdsOwnedByClient,
+	selectPositionsWithIds, selectRoomExists, selectRoomSettings, selectRoomStateByName,
+	selectShamuGraphState, SERVER_ACTION, setActiveRoom, setChat, setClients, setRoomMembers,
+	setRooms, shamuGraphActions, userLeftRoom,
 } from '../common/redux'
 import {WebSocketEvent} from '../common/server-constants'
 import {createServerStuff, loadServerStuff} from './create-server-stuff'
@@ -260,12 +262,12 @@ function syncState(newSocket: Socket, roomState: IClientRoomState, serverState: 
 		[pointersActions.replaceAll, selectAllPointers],
 		[setRoomMembers, selectAllRoomMemberIds],
 		[setChat, selectAllMessages],
-		[connectionsActions.updateAll, selectAllConnections],
+		[connectionsActions.replaceAll, selectAllConnections],
 		[roomSettingsActions.replaceAll, selectRoomSettings],
 		[shamuGraphActions.replace, selectShamuGraphState],
 		[globalClockActions.replace, selectGlobalClockState],
 		// Sync positions after shamuGraph
-		[updatePositions, selectAllPositions],
+		[replacePositions, selectAllPositions],
 	]
 
 	updaters.forEach(([actionCreator, selector]: any[]) => {

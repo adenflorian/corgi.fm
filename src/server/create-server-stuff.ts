@@ -2,18 +2,21 @@ import {Map} from 'immutable'
 import {Action, Store} from 'redux'
 import {ConnectionNodeType, IConnectable} from '../common/common-types'
 import {calculatePositionsGivenConnections} from '../common/compute-positions'
-import {makeMidiClipEvent, MidiClipEvents} from '../common/midi-types'
+import {MidiClipEvents} from '../common/midi-types'
 import {MidiNotes} from '../common/MidiNote'
 import {
 	addBasicSampler, addBasicSynthesizer, addClient,
 	addGridSequencer, addInfiniteSequencer, addPosition,
 	addSimpleReverb, BasicSamplerState,
 	BasicSynthesizerState, ClientState, Connection, connectionsActions,
-	createRoomAction, createSequencerEvents, deletePositions,
+	createRoomAction, deletePositions,
 	deleteThingsAny, getConnectionNodeInfo, globalClockActions,
 	GridSequencerState, InfiniteSequencerState,
 	InfiniteSequencerStyle, IServerState, makePosition,
-	makeSequencerEvents, REPLACE_SHAMU_GRAPH_STATE, roomSettingsActions, SavedRoom, selectAllConnections, selectAllPositions, selectAllVirtualKeyboardIds, selectConnectionsWithSourceOrTargetIds, shamuGraphActions, ShamuGraphState, SimpleReverbState, updatePositions,
+	makeSequencerEvents, replacePositions, roomSettingsActions, SavedRoom,
+	selectAllConnections, selectAllPositions, selectAllVirtualKeyboardIds,
+	selectConnectionsWithSourceOrTargetIds, shamuGraphActions,
+	SimpleReverbState, updatePositions,
 } from '../common/redux'
 
 const masterAudioOutput: IConnectable = getConnectionNodeInfo(ConnectionNodeType.audioOutput).stateSelector({} as any, '')
@@ -286,9 +289,9 @@ export function loadServerStuff(room: string, serverStore: Store<IServerState>, 
 
 	dispatchToRoom(addClientAction)
 
-	dispatchToRoom(connectionsActions.updateAll(roomDataToLoad.connections))
+	dispatchToRoom(connectionsActions.replaceAll(roomDataToLoad.connections))
 	dispatchToRoom(shamuGraphActions.replace(roomDataToLoad.shamuGraph))
-	dispatchToRoom(updatePositions(roomDataToLoad.positions))
+	dispatchToRoom(replacePositions(roomDataToLoad.positions))
 	dispatchToRoom(roomSettingsActions.replaceAll(roomDataToLoad.roomSettings))
 	dispatchToRoom(globalClockActions.replace(roomDataToLoad.globalClock))
 
