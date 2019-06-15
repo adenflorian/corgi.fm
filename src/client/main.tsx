@@ -3,7 +3,7 @@ import * as React from 'react'
 import * as ReactGA from 'react-ga'
 import {Middleware} from 'redux'
 import {
-	clientInfoActions, loadOptionsState, SET_ACTIVE_ROOM, validateOptionsState,
+	clientInfoActions, createUsername, loadOptionsState, SET_ACTIVE_ROOM, validateOptionsState,
 } from '../common/redux'
 import {setupAudioContext} from '../common/setup-audio-context'
 import {BrowserWarning} from './BrowserWarning'
@@ -18,6 +18,7 @@ import {startMainRealTimeLoop} from './main-real-time-loop'
 import {startNoteScanner} from './note-scanner'
 import {renderApp, renderOther} from './react-main'
 import {setupMidiSupport} from './setup-midi-support'
+import {getUsernameFromLocalStorage, saveUsernameToLocalStorage} from './username'
 import {SamplesManager} from './WebAudio/SamplesManager'
 import {setStoreForSchedulerVisual, startSchedulerVisualLoop} from './WebAudio/SchedulerVisual'
 import {setupWebsocketAndListeners, socket} from './websocket-listeners'
@@ -62,6 +63,10 @@ async function setupAsync() {
 	}
 
 	logClientEnv()
+
+	if (getUsernameFromLocalStorage() === '') {
+		saveUsernameToLocalStorage(createUsername())
+	}
 
 	// Might be needed for safari
 	const AudioContext = window.AudioContext || window.webkitAudioContext

@@ -4,13 +4,12 @@ import AutosizeInput from 'react-input-autosize'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 import {
-	maxUsernameLength, selectClientInfo, selectLocalClient, setClientName,
+	maxUsernameLength, selectClientInfo, selectLocalClient, setLocalClientName,
 } from '../common/redux'
 import {IClientAppState} from '../common/redux'
 import {chatSubmit} from '../common/redux'
 import './Chat.less'
 import {ConnectedChatMessages} from './Chat/ChatMessages'
-import {saveUsernameToLocalStorage} from './username'
 
 interface IChatComponentState {
 	chatMessage: string
@@ -45,14 +44,9 @@ export class Chat extends Component<AllProps, IChatComponentState> {
 		this.state.username = props.author
 	}
 
-	public componentDidMount = () => {
-		window.addEventListener('keydown', this._onKeydown)
-		saveUsernameToLocalStorage(this.props.author)
-	}
+	public componentDidMount = () => window.addEventListener('keydown', this._onKeydown)
 
 	public componentWillUnmount = () => window.removeEventListener('keydown', this._onKeydown)
-
-	public componentDidUpdate = () => saveUsernameToLocalStorage(this.props.author)
 
 	public render() {
 		const {authorColor} = this.props
@@ -131,7 +125,7 @@ export class Chat extends Component<AllProps, IChatComponentState> {
 
 		if (newValue === '' || newValue.length !== newValue.trim().length) return
 
-		this.props.dispatch(setClientName(this.props.authorId, newValue))
+		this.props.dispatch(setLocalClientName(newValue))
 	}
 
 	private readonly _onSubmitNameChange = (e: React.FormEvent<HTMLFormElement>) => {
@@ -141,7 +135,7 @@ export class Chat extends Component<AllProps, IChatComponentState> {
 
 		this.setState({username: this.state.username.trim()})
 
-		this.props.dispatch(setClientName(this.props.authorId, this.state.username))
+		this.props.dispatch(setLocalClientName(this.state.username))
 
 		return (document.activeElement as HTMLElement).blur()
 	}

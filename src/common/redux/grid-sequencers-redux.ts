@@ -223,7 +223,7 @@ const gridSequencerGlobalActionTypes = [
 
 assertArrayHasNoUndefinedElements(gridSequencerGlobalActionTypes)
 
-type GridSequencerAction = SequencerAction | ActionType<typeof gridSequencerActions>
+export type GridSequencerAction = SequencerAction | ActionType<typeof gridSequencerActions>
 
 const gridSequencerReducer =
 	(gridSequencer: GridSequencerState, action: GridSequencerAction): GridSequencerState => {

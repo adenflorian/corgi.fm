@@ -1,6 +1,7 @@
 import {Record} from 'immutable'
 import {Reducer} from 'redux'
 import {ActionType} from 'typesafe-actions'
+import {READY, ReadyAction, SELF_DISCONNECTED, SelfDisconnectedAction} from './common-actions'
 import {IClientAppState} from './common-redux-types'
 
 export const SET_CLIENT_VERSION = 'SET_CLIENT_VERSION'
@@ -20,17 +21,21 @@ export const clientInfoActions = Object.freeze({
 const makeClientInfoState = Record({
 	clientVersion: '0',
 	serverVersion: '0',
+	isConnectingForFirstTime: true,
+	isClientReady: false,
 })
 
 export type ClientInfoState = ReturnType<typeof makeClientInfoState>
 
-export type ClientInfoAction = ActionType<typeof clientInfoActions>
+export type ClientInfoAction = ActionType<typeof clientInfoActions> | ReadyAction | SelfDisconnectedAction
 
 export const clientInfoReducer: Reducer<ClientInfoState, ClientInfoAction> =
 	(clientInfo = makeClientInfoState(), action) => {
 		switch (action.type) {
 			case SET_CLIENT_VERSION: return clientInfo.set('clientVersion', action.clientVersion)
 			case SET_SERVER_VERSION: return clientInfo.set('serverVersion', action.serverVersion)
+			case READY: return clientInfo.set('isConnectingForFirstTime', false).set('isClientReady', true)
+			case SELF_DISCONNECTED: return clientInfo.set('isClientReady', false)
 			default: return clientInfo
 		}
 	}

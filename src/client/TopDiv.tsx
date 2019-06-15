@@ -1,9 +1,10 @@
 import * as React from 'react'
 import {Dispatch} from 'redux'
-import {shamuConnect} from '../common/redux'
+import {selectClientInfo, shamuConnect} from '../common/redux'
 import {selectMemberCount} from '../common/redux'
 import {requestCreateRoom} from '../common/redux'
 import {selectClientCount} from '../common/redux'
+import {CssColor} from '../common/shamu-color'
 import {Button} from './Button/Button'
 import {localActions} from './local-middleware'
 import {Options} from './Options/Options'
@@ -15,11 +16,12 @@ interface ReduxProps {
 	memberCount: number
 	clientCount: number
 	info: string
+	isClientReady: boolean
 }
 
 type AllProps = ReduxProps & {dispatch: Dispatch}
 
-export const TopDiv = ({memberCount, clientCount, info, dispatch}: AllProps) =>
+export const TopDiv = ({memberCount, clientCount, info, isClientReady, dispatch}: AllProps) =>
 	<div id="topDiv" style={{marginBottom: 'auto'}}>
 		<div className="left">
 			<div>{info}</div>
@@ -27,6 +29,19 @@ export const TopDiv = ({memberCount, clientCount, info, dispatch}: AllProps) =>
 			<div style={{width: 180, overflow: 'hidden'}}>Zoom <span id="zoomText">1</span></div>
 			<div>{memberCount} Room Member{memberCount > 1 ? 's' : ''}</div>
 			<div>{clientCount} Total User{clientCount > 1 ? 's' : ''}</div>
+			{!isClientReady &&
+				<div
+					style={{
+						fontSize: '1.4em',
+						lineHeight: '1.2em',
+						color: CssColor.brightRed,
+					}}
+				>
+					<p>Not connected!</p>
+					<p>Save your work before it reconnects!</p>
+					<p>All unsaved work might get lost!</p>
+				</div>
+			}
 		</div>
 		<div className="right">
 			<ConnectedRoomSelector />
@@ -61,5 +76,6 @@ export const ConnectedTopDiv = shamuConnect(
 		clientCount: selectClientCount(state),
 		info: state.websocket.info,
 		memberCount: selectMemberCount(state.room),
+		isClientReady: selectClientInfo(state).isClientReady,
 	}),
 )(TopDiv)

@@ -2,21 +2,30 @@ import * as animal from 'animal-id'
 import {createSelector} from 'reselect'
 import {v4} from 'uuid'
 import {serverClientId} from '../common-constants'
-import {ClientId} from '../common-types'
+import {ClientId, Id} from '../common-types'
 import {logger} from '../logger'
 import {getColorHslByString} from '../shamu-color'
 import {
 	BROADCASTER_ACTION, createDeepEqualSelector, createReducer,
 	GLOBAL_SERVER_ACTION, IClientAppState, IServerState,
-	selectLocalSocketId, SELF_DISCONNECTED,
+	SELF_DISCONNECTED,
 } from './index'
 
 export const ADD_CLIENT = 'ADD_CLIENT'
 export type AddClientAction = ReturnType<typeof addClient>
 export const addClient = (client: IClientState) => {
 	return {
-		type: ADD_CLIENT,
+		type: ADD_CLIENT as typeof ADD_CLIENT,
 		client,
+	}
+}
+
+export const SET_LOCAL_CLIENT_ID = 'SET_LOCAL_CLIENT_ID'
+export type SetLocalClientIdAction = ReturnType<typeof setLocalClientId>
+export const setLocalClientId = (localClientId: Id) => {
+	return {
+		type: SET_LOCAL_CLIENT_ID as typeof SET_LOCAL_CLIENT_ID,
+		localClientId,
 	}
 }
 
@@ -24,7 +33,7 @@ export const SET_CLIENTS = 'SET_CLIENTS'
 export type SetClientsAction = ReturnType<typeof setClients>
 export const setClients = (clients: IClientState[]) => {
 	return {
-		type: SET_CLIENTS,
+		type: SET_CLIENTS as typeof SET_CLIENTS,
 		clients,
 	}
 }
@@ -33,7 +42,7 @@ export const SET_CLIENT_NAME = 'SET_CLIENT_NAME'
 export type SetClientNameAction = ReturnType<typeof setClientName>
 export const setClientName = (id: ClientId, newName: string) => {
 	return {
-		type: SET_CLIENT_NAME,
+		type: SET_CLIENT_NAME as typeof SET_CLIENT_NAME,
 		id,
 		newName: newName.substring(0, maxUsernameLength).trim(),
 		GLOBAL_SERVER_ACTION,
@@ -41,11 +50,20 @@ export const setClientName = (id: ClientId, newName: string) => {
 	}
 }
 
+export const SET_LOCAL_CLIENT_NAME = 'SET_LOCAL_CLIENT_NAME'
+export type SetLocalClientNameAction = ReturnType<typeof setLocalClientName>
+export const setLocalClientName = (newName: string) => {
+	return {
+		type: SET_LOCAL_CLIENT_NAME as typeof SET_LOCAL_CLIENT_NAME,
+		newName: newName.substring(0, maxUsernameLength).trim(),
+	}
+}
+
 export const CLIENT_DISCONNECTED = 'CLIENT_DISCONNECTED'
 export type ClientDisconnectedAction = ReturnType<typeof clientDisconnected>
 export const clientDisconnected = (id: ClientId) => {
 	return {
-		type: CLIENT_DISCONNECTED,
+		type: CLIENT_DISCONNECTED as typeof CLIENT_DISCONNECTED,
 		id,
 	}
 }
@@ -54,7 +72,7 @@ export const CLIENT_DISCONNECTING = 'CLIENT_DISCONNECTING'
 export type ClientDisconnectingAction = ReturnType<typeof clientDisconnecting>
 export const clientDisconnecting = (id: ClientId) => {
 	return {
-		type: CLIENT_DISCONNECTING,
+		type: CLIENT_DISCONNECTING as typeof CLIENT_DISCONNECTING,
 		id,
 	}
 }
@@ -63,6 +81,7 @@ export const maxUsernameLength = 42
 
 export interface IClientsState {
 	clients: IClientState[]
+	localClientId?: Id
 }
 
 export interface IClientState {
@@ -90,7 +109,7 @@ export class ClientState implements IClientState {
 	constructor({socketId, name}: {socketId: string, name: string | ''}) {
 		this.id = v4()
 		this.socketId = socketId
-		this.name = name === '' ? animal.getId() + '-' + this.id[0] : name
+		this.name = name === '' ? createUsername(this.id) : name
 			.replace(/ +(?= )/g, '')
 			.trim()
 			.substring(0, maxUsernameLength)
@@ -98,8 +117,13 @@ export class ClientState implements IClientState {
 	}
 }
 
+export function createUsername(id = '0') {
+	return animal.getId() + '-' + (id[0] || '9')
+}
+
 const initialState: IClientsState = {
 	clients: [],
+	localClientId: undefined,
 }
 
 export const clientsReducer = createReducer(initialState, {
@@ -109,6 +133,10 @@ export const clientsReducer = createReducer(initialState, {
 			...state.clients,
 			client,
 		],
+	}),
+	[SET_LOCAL_CLIENT_ID]: (state, {localClientId}: SetLocalClientIdAction) => ({
+		...state,
+		localClientId,
 	}),
 	[SET_CLIENTS]: (state, {clients}: SetClientsAction) => ({
 		...state,
@@ -136,7 +164,8 @@ export const clientsReducer = createReducer(initialState, {
 	}),
 	[SELF_DISCONNECTED]: state => ({
 		...state,
-		clients: [],
+		// Leave local client or empty array
+		clients: state.clients.filter(x => x.id === state.localClientId),
 	}),
 })
 
@@ -145,8 +174,9 @@ export function selectClientById(state: IClientAppState, id: ClientId): IClientS
 	if (client) {
 		return client
 	} else {
-		logger.warn(`selectClientById was called with id '${id}'`
-			+ `, but no client with that id was found, returning fake`)
+		// Use for debugging fake client issues
+		// logger.warn(`selectClientById was called with id '${id}'`
+		// 	+ `, but no client with that id was found, returning fake`)
 		return {
 			color: 'gray',
 			id: 'fakeClientId',
@@ -172,13 +202,10 @@ export function selectClientBySocketId(state: IClientAppState | IServerState, so
 	}
 }
 
-export function selectIsLocalClientReady(state: IClientAppState): boolean {
-	return selectAllClients(state).some(x => x.socketId === selectLocalSocketId(state))
-}
-
 export function selectLocalClient(state: IClientAppState): IClientState {
-	const localClient = selectAllClients(state).find(x => x.socketId === selectLocalSocketId(state))
-	if (localClient) {
+	const localClient = selectClientById(state, selectLocalClientId(state))
+
+	if (!localClient.id.startsWith('fake')) {
 		return localClient
 	} else {
 		logger.warn('selectLocalClient was called but localClient is not set, returning fake')
@@ -192,7 +219,7 @@ export function selectLocalClient(state: IClientAppState): IClientState {
 }
 
 export function selectLocalClientId(state: IClientAppState): string {
-	return selectLocalClient(state).id
+	return state.clients.localClientId || 'fakeLocalClientId'
 }
 
 export const selectAllClients = (state: IClientAppState | IServerState) => state.clients.clients
@@ -200,7 +227,7 @@ export const selectAllClients = (state: IClientAppState | IServerState) => state
 export const selectClientCount = (state: IClientAppState | IServerState) => selectAllClients(state).length
 
 export const selectAllClientsAsMap = (state: IClientAppState | IServerState) =>
-	state.clients.clients.reduce((map, client) => {
+	selectAllClients(state).reduce((map, client) => {
 		return {
 			...map,
 			[client.id]: client,

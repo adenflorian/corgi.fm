@@ -4,7 +4,7 @@ import {maxRoomNameLength} from '../common/common-constants'
 import {logger} from '../common/logger'
 import {
 	BroadcastAction, clientInfoActions, getActionsBlacklist, maxUsernameLength,
-	selfDisconnected, setInfo, setSocketId,
+	selectActiveRoom, selfDisconnected, setInfo, setSocketId,
 } from '../common/redux'
 import {WebSocketEvent} from '../common/server-constants'
 import {getCurrentClientVersion} from './client-utils'
@@ -25,6 +25,7 @@ export function setupWebsocketAndListeners(store: Store) {
 		.substring(0, maxRoomNameLength)
 
 	socket = io.connect(window.location.hostname + `:${port}/`, {
+		// Make sure to add any new query params to the reconnect_attempt handler
 		query: {
 			username: getUsernameFromLocalStorage().substring(0, maxUsernameLength),
 			room,
@@ -34,6 +35,13 @@ export function setupWebsocketAndListeners(store: Store) {
 	socket.on('connect', () => {
 		logger.log('socket: connect')
 		store.dispatch(setSocketId(socket.id))
+	})
+
+	socket.on('reconnect_attempt', () => {
+		socket.io.opts.query = {
+			username: getUsernameFromLocalStorage().substring(0, maxUsernameLength),
+			room: selectActiveRoom(store.getState()),
+		}
 	})
 
 	socket.on('disconnect', () => {

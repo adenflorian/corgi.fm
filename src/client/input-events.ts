@@ -3,8 +3,8 @@ import {Action, AnyAction, Store} from 'redux'
 import {rateLimitedDebounce} from '../common/common-utils'
 import {
 	globalClockActions, IClientAppState,
-	pointersActions, selectGlobalClockIsPlaying, selectIsLocalClientReady,
-	selectLocalClient, sequencerActions, userInputActions,
+	pointersActions, selectClientInfo,
+	selectGlobalClockIsPlaying, selectLocalClient, sequencerActions, userInputActions,
 } from '../common/redux'
 import {
 	localMidiKeyPress, localMidiKeyUp, localMidiOctaveChange, windowBlur,
@@ -189,7 +189,7 @@ export function setupInputEventListeners(
 	function dispatchPointersUpdate(x?: number, y?: number) {
 		const state = store.getState()
 
-		if (!selectIsLocalClientReady(state)) return
+		if (selectClientInfo(state).isClientReady !== true) return
 
 		const localClientId = selectLocalClient(state).id
 

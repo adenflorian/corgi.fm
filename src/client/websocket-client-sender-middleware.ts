@@ -5,7 +5,7 @@ import {logger} from '../common/logger'
 import {
 	BroadcastAction, BROADCASTER_ACTION, getActionsBlacklist,
 	GLOBAL_SERVER_ACTION, IClientAppState,
-	MOVE_POSITION, selectLocalSocketId, SERVER_ACTION, UPDATE_POINTER,
+	MOVE_POSITION, selectClientInfo, selectLocalSocketId, SERVER_ACTION, UPDATE_POINTER,
 } from '../common/redux'
 import {WebSocketEvent} from '../common/server-constants'
 import {socket} from './websocket-listeners'
@@ -13,6 +13,9 @@ import {socket} from './websocket-listeners'
 export const websocketSenderMiddleware: Middleware<{}, IClientAppState, Dispatch> =
 	({getState}) => next => (action: AnyAction | BroadcastAction) => {
 		next(action)
+
+		// Don't try to send stuff over network if we're not ready (disconnected/offline)
+		if (!selectClientInfo(getState()).isClientReady) return
 
 		if (isNetworkAction(action) && !action.alreadyBroadcasted) {
 			const bar = rateLimitedActionThings.get(action.type)
