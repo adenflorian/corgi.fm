@@ -15,7 +15,7 @@ export function setupMidiSupport(store: Store) {
 
 	if (navigator.requestMIDIAccess) {
 		navigator.requestMIDIAccess({
-			sysex: false, // this defaults to 'false' and we won't be covering sysex in this article.
+			sysex: false, // Ignore the deprecation warning, should go away in future chrome, and then will start prompting user for permission
 		})
 			.then(onMidiSuccess, onMidiFailure)
 	} else {

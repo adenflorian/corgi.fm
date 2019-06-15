@@ -10,6 +10,7 @@
 - [ ] redo on sequencers
 - [ ] dont delete player's instrument when they leave if other stuff is plugged into it
 - [ ] coarse knob to instruments
+- [ ] only enable audio after user acknowledges what they are getting themselves into
 
 ## Saving
 why?
