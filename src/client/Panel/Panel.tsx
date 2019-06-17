@@ -24,6 +24,8 @@ export const Panel: React.FC<IPanelProps> =
 
 		const renderLabel = label !== undefined && label !== ''
 
+		specialLabel = false
+
 		return (
 			<div
 				style={{
@@ -43,6 +45,7 @@ export const Panel: React.FC<IPanelProps> =
 							textTransform: specialLabel ? undefined : 'uppercase',
 						}}
 					>
+						<div className="colorDot"></div>
 						<div className="label" style={{color: specialLabel ? color : CssColor.defaultGray}}>{label}</div>
 						{helpText &&
 							<div className="helpText" title={helpText}>?</div>

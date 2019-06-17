@@ -12,6 +12,9 @@
 	<path stroke="hsla(0, 0%, 40%, 40%)" stroke-width="1px"
 		d="M 24,32 L 40,32 M 32,24 L 32,40"
 	/>
+	<!-- <path stroke="hsla(0, 0%, 40%, 40%)" stroke-width="1px"
+		d="M 24,24 L 16,16 M 40,40 L 48,48 M 24,24 L 16,16 M 40,40 L 48,48"
+	/> -->
 	<!-- <path stroke="hsla(0, 0%, 60%, 5%)" stroke-width="1px"
 		d="M 31,32 L 33,32 M 32,31 L 32,33"
 	/> -->

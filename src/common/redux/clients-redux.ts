@@ -3,8 +3,9 @@ import {createSelector} from 'reselect'
 import {v4} from 'uuid'
 import {serverClientId} from '../common-constants'
 import {ClientId, Id} from '../common-types'
+import {pickRandomArrayElement} from '../common-utils'
 import {logger} from '../logger'
-import {getColorHslByString} from '../shamu-color'
+import {CssColor, getColorHslByString} from '../shamu-color'
 import {
 	BROADCASTER_ACTION, createDeepEqualSelector, createReducer,
 	GLOBAL_SERVER_ACTION, IClientAppState, IServerState,
@@ -113,7 +114,7 @@ export class ClientState implements IClientState {
 			.replace(/ +(?= )/g, '')
 			.trim()
 			.substring(0, maxUsernameLength)
-		this.color = getColorHslByString(this.id)
+		this.color = pickRandomArrayElement([CssColor.brightBlue, CssColor.brightGreen, CssColor.brightOrange, CssColor.brightPurple, CssColor.brightYellow])
 	}
 }
 

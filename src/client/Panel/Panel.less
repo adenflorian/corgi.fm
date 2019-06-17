@@ -24,7 +24,7 @@
     .header {
         display: flex;
         flex-direction: row;
-        justify-content: space-between;
+        justify-content: auto;
         align-items: center;
         // .smallFont();
         .largeFont();
@@ -40,14 +40,24 @@
         border-top-right-radius: @cornerRadius;
         // border-bottom: none;
 
+        .colorDot {
+            // justify-self: flex-start;
+            width: 8px;
+            height: 8px;
+            border-radius: 4px;
+            background-color: currentColor;
+            margin-left: 8px;
+        }
+
         .label {
-            justify-self: flex-start;
+            // justify-self: flex-start;
             margin-left: 6px;
             // font-weight: 600;
         }
 
         .helpText {
-            justify-self: flex-end;
+            // justify-self: flex-end;
+            margin-left: auto;
             color: @panelGrayLight;
             width: 32px;
             // font-size: small;

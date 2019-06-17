@@ -14,6 +14,7 @@
 - [ ] dont delete player's instrument when they leave if other stuff is plugged into it
 - [ ] coarse knob to instruments
 - [ ] only enable audio after user acknowledges what they are getting themselves into
+- [ ] project wide macro knobs/control panel
 
 ## Saving
 why?
