@@ -54,6 +54,7 @@ export const MousePointer: React.FC<MousePointerAllProps> =
 					style={{
 						color,
 						marginLeft: 14,
+						whiteSpace: 'nowrap',
 					}}
 				>
 					{name}
