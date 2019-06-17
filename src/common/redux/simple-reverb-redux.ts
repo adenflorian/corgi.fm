@@ -33,8 +33,8 @@ export interface ISimpleReverbs {
 }
 
 export class SimpleReverbState implements IConnectable, NodeSpecialState {
-	public static defaultWidth = 256 + 16 // main width plus padding
-	public static defaultHeight = 56
+	public static defaultWidth = 64 * 2 // main width plus padding
+	public static defaultHeight = 88
 
 	public static dummy: SimpleReverbState = {
 		id: 'dummy',

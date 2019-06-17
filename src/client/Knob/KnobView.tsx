@@ -30,7 +30,12 @@ export const KnobView = React.memo(function _KnobView(props: IKnobViewProps) {
 	return (
 		<div
 			className={`knob ${readOnly ? 'readOnly' : ''}`}
+			style={{
+				width: 64,
+				height: 88,
+			}}
 		>
+			<div className="knobLabel unselectable">{label}</div>
 			<div
 				className="actualKnobContainer"
 				style={{
@@ -47,18 +52,23 @@ export const KnobView = React.memo(function _KnobView(props: IKnobViewProps) {
 						position: 'absolute',
 						overflow: 'visible',
 						transform: `rotate(90deg)`,
+						strokeLinecap: 'round',
 					}}
 				>
+					{/* <circle cx="50%" cy="50%" r="64%"
+						fill="none" stroke={CssColor.panelGrayLight} strokeWidth="3"
+						strokeDasharray={`0 50% ${percentage * 300}% 100000`} strokeDashoffset="1"
+					/> */}
 					<circle cx="50%" cy="50%" r="64%"
-						fill="none" stroke={CssColor.panelGrayLight} strokeWidth="2"
+						fill="none" stroke={CssColor.panelGrayLight} strokeWidth="3"
+						strokeDasharray={`0 50% ${1 * 300}% 100000`} strokeDashoffset="1"
+					/>
+					<circle cx="50%" cy="50%" r="64%"
+						fill="none" stroke="currentColor" strokeWidth="3"
 						strokeDasharray={`0 50% ${percentage * 300}% 100000`} strokeDashoffset="1"
 					/>
-					<circle cx="50%" cy="50%" r="64%"
-						fill="none" stroke="currentColor" strokeWidth="2"
-						strokeDasharray={`0 50% ${adjustedPercentage * 300}% 100000`} strokeDashoffset="1"
-					/>
 				</svg>
-				<div className="knobShadow" />
+				{/* <div className="knobShadow" /> */}
 				<div
 					className="actualKnob"
 					style={{
@@ -67,11 +77,11 @@ export const KnobView = React.memo(function _KnobView(props: IKnobViewProps) {
 					onMouseDown={handleMouseDown}
 					title={tooltip + '\n' + 'ctrl + click to reset'}
 				>
-					<div className="mark" style={{backgroundColor: markColor}}></div>
+					<div className="mark" style={{backgroundColor: 'currentColor', borderRadius: 2}}></div>
 				</div>
 			</div>
-			<div className="valueBox">{displayValue}</div>
-			<div className="knobLabel unselectable">{label}</div>
+			{/* <div className="valueBox">{displayValue}</div> */}
+			<div className="knobValue unselectable">{displayValue}</div>
 		</div>
 	)
 })

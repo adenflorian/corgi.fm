@@ -104,6 +104,7 @@ export class Keyboard extends React.PureComponent<IKeyboardAllProps, IKeyboardSt
 				labelTitle={isOwnerNameTooLong ? ownerName.toUpperCase() : ''}
 				id={this.props.id}
 				saturate={isPlaying}
+				specialLabel={true}
 			>
 				<div className="octave black unselectable">
 					<div className="octaveNumber">

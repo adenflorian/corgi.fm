@@ -75,6 +75,10 @@ export function detuneValueToString(detune: number) {
 	return detune.toFixed(0) + ' cents'
 }
 
+export function percentageValueString(num: number) {
+	return (num * 100).toFixed(0) + '%'
+}
+
 export function seqGateValueToString(pitch: number) {
 	return pitch.toFixed(2).replace(/\.00$/, '')
 }
@@ -86,8 +90,8 @@ export function seqRateValueToString(rate: number) {
 }
 
 export function seqPitchValueToString(pitch: number) {
-	if (pitch > 0) return '+' + pitch.toFixed(0) + ' semitones'
-	return pitch.toFixed(0) + ' semitones'
+	if (pitch > 0) return '+' + pitch.toFixed(0) + ' semi'
+	return pitch.toFixed(0) + ' semi'
 }
 
 export function adsrValueToString(ms: number) {
@@ -100,3 +104,6 @@ export function adsrValueToString(ms: number) {
 
 export const graphStateSaveLocalStorageKeyPrefix = 'localSave_'
 export const graphStateSavesLocalStorageKey = 'localSaves'
+
+export const handleClassName = 'handle'
+export const handleVisualClassName = 'handleVisual'

@@ -1,3 +1,4 @@
+import {stripIndent, stripIndents} from 'common-tags'
 import {List} from 'immutable'
 import _ from 'lodash'
 import * as React from 'react'
@@ -15,7 +16,7 @@ import {
 	InfiniteSequencerStyle, selectConnectionSourceColorByTargetId, selectGlobalClockState, selectInfiniteSequencer, sequencerActions,
 } from '../../common/redux'
 import {getColorStringForMidiNote} from '../../common/shamu-color'
-import {seqGateValueToString, seqPitchValueToString, seqRateValueToString, sequencerGateToolTip, sequencerPitchToolTip, sequencerRateToolTip} from '../client-constants'
+import {percentageValueString, seqGateValueToString, seqPitchValueToString, seqRateValueToString, sequencerGateToolTip, sequencerPitchToolTip, sequencerRateToolTip} from '../client-constants'
 import {isWhiteKey} from '../Keyboard/Keyboard'
 import {Knob} from '../Knob/Knob'
 import {KnobSnapping} from '../Knob/KnobSnapping'
@@ -70,6 +71,7 @@ export const InfiniteSequencer: React.FC<IInfiniteSequencerAllProps> = React.mem
 						backgroundColor: note === -1 ? 'none' : getColorStringForMidiNote(note),
 						height: `${noteHeightPercentage + (note === lowestNote ? 1 : 0)}%`,
 						top: `${(highestNote - note) * noteHeightPercentage}%`,
+						borderRadius: 2,
 					}}
 				/>
 			)
@@ -91,103 +93,106 @@ export const InfiniteSequencer: React.FC<IInfiniteSequencerAllProps> = React.mem
 						label={name}
 						color={isRecording ? 'red' : color}
 						saturate={isPlaying}
+						helpText={stripIndents`Plug your keyboard into the infinite sequencer, hit record, and play notes
+							Hit backspace to undo and right arrow key to insert a rest`}
 					>
-						<div className="controls" style={{maxWidth: InfiniteSequencerState.controlsWidth}}>
-							<div
-								className="play"
-								onClick={() => {
-									dispatch(sequencerActions.play(id))
-									dispatch(globalClockActions.start())
-								}}
-							>
-								<Play />
-							</div>
-							<div
-								className="stop"
-								onClick={() => dispatch(sequencerActions.stop(id))}
-							>
-								<Stop />
-							</div>
-							<div
-								className="record"
-								onClick={() => dispatchInfiniteSeqParam(InfiniteSequencerFields.isRecording, !isRecording)}
-							>
-								<Record />
-							</div>
-							<div
-								className="export"
-								onClick={() => dispatch(sequencerActions.exportMidi(id))}
-							>
-								<Download />
-							</div>
-							<div
-								className="erase"
-								onClick={() => dispatch(sequencerActions.clear(props.id))}
-							>
-								<Clear />
-							</div>
-							<div
-								className="undo"
-								onClick={() => dispatch(sequencerActions.undo(props.id))}
-								title="undo (hit backspace to undo while recording)"
-							>
-								<Undo />
-							</div>
+						<div className="controls" style={{width: InfiniteSequencerState.controlsWidth}}>
+							<div className="buttons">
+								<div
+									className="play"
+									onClick={() => {
+										dispatch(sequencerActions.play(id))
+										dispatch(globalClockActions.start())
+									}}
+								>
+									<Play />
+								</div>
+								<div
+									className="stop"
+									onClick={() => dispatch(sequencerActions.stop(id))}
+								>
+									<Stop />
+								</div>
+								<div
+									className="record"
+									onClick={() => dispatchInfiniteSeqParam(InfiniteSequencerFields.isRecording, !isRecording)}
+								>
+									<Record />
+								</div>
+								<div
+									className="export"
+									onClick={() => dispatch(sequencerActions.exportMidi(id))}
+								>
+									<Download />
+								</div>
+								<div
+									className="erase"
+									onClick={() => dispatch(sequencerActions.clear(props.id))}
+								>
+									<Clear />
+								</div>
+								<div
+									className="undo"
+									onClick={() => dispatch(sequencerActions.undo(props.id))}
+									title="undo (hit backspace to undo while recording)"
+								>
+									<Undo />
+								</div>
 
-							<div
-								className="style"
-								onClick={() => dispatchInfiniteSeqParam(
-									InfiniteSequencerFields.style,
-									props.style === InfiniteSequencerStyle.colorBars
-										? InfiniteSequencerStyle.colorGrid
-										: InfiniteSequencerStyle.colorBars,
-								)}
-							>
-								<Star />
+								<div
+									className="style"
+									onClick={() => dispatchInfiniteSeqParam(
+										InfiniteSequencerFields.style,
+										props.style === InfiniteSequencerStyle.colorBars
+											? InfiniteSequencerStyle.colorGrid
+											: InfiniteSequencerStyle.colorBars,
+									)}
+								>
+									<Star />
+								</div>
+								<div
+									className={`showRows ${props.style === InfiniteSequencerStyle.colorGrid ? '' : 'disabled'}`}
+									onClick={() => props.style === InfiniteSequencerStyle.colorGrid && dispatchInfiniteSeqParam(
+										InfiniteSequencerFields.showRows,
+										!props.showRows,
+									)}
+								>
+									<Rows />
+								</div>
 							</div>
-							<div
-								className={`showRows ${props.style === InfiniteSequencerStyle.colorGrid ? '' : 'disabled'}`}
-								onClick={() => props.style === InfiniteSequencerStyle.colorGrid && dispatchInfiniteSeqParam(
-									InfiniteSequencerFields.showRows,
-									!props.showRows,
-								)}
-							>
-								<Rows />
+							<div className="knobs">
+								<Knob
+									min={0}
+									max={2}
+									value={props.gate}
+									defaultValue={0.5}
+									onChange={dispatchInfiniteSeqParam}
+									label="Gate"
+									onChangeId={InfiniteSequencerFields.gate}
+									tooltip={sequencerGateToolTip}
+									valueString={percentageValueString}
+								/>
+								<KnobSnapping
+									value={props.pitch}
+									defaultIndex={12}
+									onChange={dispatchInfiniteSeqParam}
+									label="Pitch"
+									onChangeId={InfiniteSequencerFields.pitch}
+									tooltip={sequencerPitchToolTip}
+									valueString={seqPitchValueToString}
+									possibleValues={List(_.range(-12, 13))}
+								/>
+								<KnobSnapping
+									value={props.rate}
+									defaultIndex={rateValues.indexOf(1 / 4)}
+									onChange={dispatchInfiniteSeqParam}
+									label="Rate"
+									onChangeId={InfiniteSequencerFields.rate}
+									tooltip={sequencerRateToolTip}
+									valueString={seqRateValueToString}
+									possibleValues={rateValues}
+								/>
 							</div>
-
-							<Knob
-								min={0}
-								max={2}
-								value={props.gate}
-								defaultValue={0.5}
-								onChange={dispatchInfiniteSeqParam}
-								label="gate"
-								onChangeId={InfiniteSequencerFields.gate}
-								tooltip={sequencerGateToolTip}
-								valueString={seqGateValueToString}
-							/>
-
-							<KnobSnapping
-								value={props.pitch}
-								defaultIndex={12}
-								onChange={dispatchInfiniteSeqParam}
-								label="pitch"
-								onChangeId={InfiniteSequencerFields.pitch}
-								tooltip={sequencerPitchToolTip}
-								valueString={seqPitchValueToString}
-								possibleValues={List(_.range(-12, 13))}
-							/>
-
-							<KnobSnapping
-								value={props.rate}
-								defaultIndex={rateValues.indexOf(1 / 4)}
-								onChange={dispatchInfiniteSeqParam}
-								label="rate"
-								onChangeId={InfiniteSequencerFields.rate}
-								tooltip={sequencerRateToolTip}
-								valueString={seqRateValueToString}
-								possibleValues={rateValues}
-							/>
 						</div>
 						{style === InfiniteSequencerStyle.colorBars &&
 							<div className={`display ${props.events.count() > 8 ? 'small' : ''}`}>
@@ -201,6 +206,7 @@ export const InfiniteSequencer: React.FC<IInfiniteSequencerAllProps> = React.mem
 												className={`event ${props.activeIndex === index ? 'active' : ''} largeFont`}
 												style={{
 													backgroundColor: note === -1 ? 'none' : getColorStringForMidiNote(note),
+													borderRadius: 4,
 												}}
 											>
 												{note === -1

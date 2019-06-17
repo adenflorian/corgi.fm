@@ -48,20 +48,36 @@ export const GridSequencerNotes = (props: IGridSequencerNotesAllProps) => {
 	}, List<number>())
 
 	return (
-		<div className="events">
-			{events.map((event, eventIndex) => {
-				return <Event
-					key={eventIndex}
-					notes={event.notes}
-					eventIndex={eventIndex}
-					notesToShow={notesToShow}
-					bottomNote={bottomNote}
-					isActive={activeIndex === eventIndex}
-					handleNoteClicked={handleNoteClicked}
-					handleMouseEnter={handleMouseEnter}
-					handleMouseDown={handleMouseDown}
-				/>
-			})}
+		<React.Fragment>
+			<div className="eventsBox">
+				<div className="pianoRoll">
+					{new Array(notesToShow).fill(0).map((_, i) => {
+						const note = i + bottomNote
+						return <div
+							key={i}
+							className={`row ${isWhiteKey(note) ? 'white' : 'black'}`}
+							style={{
+								// borderRadius: 4,
+							}}
+						/>
+					})}
+				</div>
+				<div className="events">
+					{events.map((event, eventIndex) => {
+						return <Event
+							key={eventIndex}
+							notes={event.notes}
+							eventIndex={eventIndex}
+							notesToShow={notesToShow}
+							bottomNote={bottomNote}
+							isActive={activeIndex === eventIndex}
+							handleNoteClicked={handleNoteClicked}
+							handleMouseEnter={handleMouseEnter}
+							handleMouseDown={handleMouseDown}
+						/>
+					})}
+				</div>
+			</div>
 			<VerticalScrollBar
 				min={MIN_MIDI_NOTE_NUMBER_0}
 				max={MAX_MIDI_NOTE_NUMBER_127 - notesToShow}
@@ -70,7 +86,7 @@ export const GridSequencerNotes = (props: IGridSequencerNotesAllProps) => {
 				marks={marks}
 				sliderGrabberHeightPercentage={notesToShow * 100 / MAX_MIDI_NOTE_NUMBER_127}
 			/>
-		</div>
+		</React.Fragment>
 	)
 }
 
@@ -135,6 +151,7 @@ class Note extends React.PureComponent<INoteProps> {
 			style={{
 				backgroundColor: isEnabled ? getColorStringForMidiNote(note) : undefined,
 				color: getColorStringForMidiNote(note),
+				borderRadius: 4,
 			}}
 		/>
 	}

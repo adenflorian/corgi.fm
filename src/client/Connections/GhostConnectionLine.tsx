@@ -28,6 +28,7 @@ export const GhostConnectionLine = React.memo(
 						stroke={color}
 						strokeWidth={longLineStrokeWidth + 'px'}
 						strokeDasharray={'8 4'}
+						strokeLinecap="round"
 					>
 					</path>
 				</g>

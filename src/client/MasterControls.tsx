@@ -33,7 +33,7 @@ export const MasterControls: React.FC<IMasterControlsProps & IMasterControlsRedu
 
 		const knobs = <div className="knobs">
 			<Knob
-				label="BPM"
+				label="Tempo"
 				min={0.000001}
 				max={999}
 				curve={2}
@@ -41,6 +41,7 @@ export const MasterControls: React.FC<IMasterControlsProps & IMasterControlsRedu
 				defaultValue={120}
 				onChange={(_, bpm) => setField({bpm})}
 				tooltip="beats per minute"
+				valueString={v => `${v.toFixed(2)} bpm`}
 			/>
 			{/* <Knob
 				label="Max Read Ahead"
@@ -58,11 +59,9 @@ export const MasterControls: React.FC<IMasterControlsProps & IMasterControlsRedu
 				color={color}
 				saturate={masterClockState.isPlaying}
 				className={`${masterClockState.isPlaying ? 'isPlaying' : 'isNotPlaying'}`}
+				label="Master Clock"
 			>
 				<div className="masterControls">
-					<div className="masterControls-label colorize largeFont">
-						Master Clock
-					</div>
 					<div className="controls">
 						<span
 							className={`play ${masterClockState.index % 2 === 0 ? 'highlight' : ''}`}

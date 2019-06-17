@@ -1,12 +1,13 @@
 import 'rc-slider/assets/index.css'
-import React = require('react')
 import {Component} from 'react'
+import React = require('react')
 import {connect} from 'react-redux'
 import {Action, Dispatch} from 'redux'
 import {ConnectionNodeType} from '../../common/common-types'
 import {getConnectionNodeInfo, IClientAppState} from '../../common/redux'
 import {setOptionMasterVolume} from '../../common/redux'
 import {MASTER_AUDIO_OUTPUT_TARGET_ID} from '../../common/redux'
+import {percentageValueString} from '../client-constants'
 import {Knob} from '../Knob/Knob'
 import {Panel} from '../Panel/Panel'
 import './VolumeControl.less'
@@ -31,13 +32,13 @@ export class VolumeControl extends Component<IVolumeControlAllProps> {
 		const {color, isPlaying} = this.props
 
 		return (
-			<Panel id={MASTER_AUDIO_OUTPUT_TARGET_ID} className="volume" color={color} saturate={isPlaying}>
-				<div
-					className="volume-label colorize largeFont"
-					title="will only change the volume for you, it won't affect other users"
-				>
-					Local Audio Output
-				</div>
+			<Panel
+				id={MASTER_AUDIO_OUTPUT_TARGET_ID}
+				className="volume"
+				color={color}
+				saturate={isPlaying}
+				label="Audio Out"
+			>
 				<Knob
 					value={this.props.masterVolume}
 					defaultValue={0.1}
@@ -45,9 +46,10 @@ export class VolumeControl extends Component<IVolumeControlAllProps> {
 					min={0}
 					max={0.5}
 					markColor={color}
-					size={56}
-					tooltip="local master volume\nwill only control the volume for you"
+					size={80}
+					tooltip="local master volume\nwill only control the volume for you\nit won't affect other users"
 					label=""
+					valueString={percentageValueString}
 				/>
 			</Panel>
 		)

@@ -36,6 +36,7 @@ export const SimpleCompressorView: React.FC<ISimpleCompressorAllProps> =
 				id={id}
 				color={color}
 				saturate={isPlaying}
+				label="Compressor"
 			>
 				<div
 					style={{
@@ -46,19 +47,8 @@ export const SimpleCompressorView: React.FC<ISimpleCompressorAllProps> =
 						justifyContent: 'space-around',
 					}}
 				>
-					<div
-						className={`colorize largeFont`}
-						style={{
-							display: 'flex',
-							flexDirection: 'column',
-							justifyContent: 'center',
-							alignItems: 'center',
-						}}
-					>
-						Simple Compressor
-				</div>
 					<Knob
-						label="threshold"
+						label="Threshold"
 						min={-100}
 						max={0}
 						value={threshold}
@@ -68,7 +58,7 @@ export const SimpleCompressorView: React.FC<ISimpleCompressorAllProps> =
 						tooltip="the decibel value above which the compression will start taking effect"
 					/>
 					<Knob
-						label="knee"
+						label="Knee"
 						min={0}
 						max={40}
 						value={knee}
@@ -78,7 +68,7 @@ export const SimpleCompressorView: React.FC<ISimpleCompressorAllProps> =
 						tooltip="decibel value representing the range above the threshold where the curve smoothly transitions to the compressed portion"
 					/>
 					<Knob
-						label="ratio"
+						label="Ratio"
 						min={1}
 						max={20}
 						value={ratio}
@@ -88,7 +78,7 @@ export const SimpleCompressorView: React.FC<ISimpleCompressorAllProps> =
 						tooltip="the amount of change, in dB, needed in the input for a 1 dB change in the output"
 					/>
 					<Knob
-						label="attack"
+						label="Attack"
 						min={0}
 						max={1}
 						value={attack}
@@ -99,7 +89,7 @@ export const SimpleCompressorView: React.FC<ISimpleCompressorAllProps> =
 						valueString={adsrValueToString}
 					/>
 					<Knob
-						label="release"
+						label="Release"
 						min={0.005}
 						max={1}
 						value={release}

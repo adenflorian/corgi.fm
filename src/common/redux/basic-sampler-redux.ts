@@ -26,6 +26,8 @@ export enum BasicSamplerParam {
 	pan = 'pan',
 	lowPassFilterCutoffFrequency = 'lowPassFilterCutoffFrequency',
 	attack = 'attack',
+	decay = 'decay',
+	sustain = 'sustain',
 	release = 'release',
 	detune = 'detune',
 	gain = 'gain',
@@ -40,8 +42,8 @@ export interface IBasicSamplers {
 }
 
 export class BasicSamplerState implements IConnectable, NodeSpecialState {
-	public static defaultWidth = 304
-	public static defaultHeight = 112
+	public static defaultWidth = 256
+	public static defaultHeight = 88 * 2
 
 	public static dummy: BasicSamplerState = {
 		id: 'dummy',
@@ -49,6 +51,8 @@ export class BasicSamplerState implements IConnectable, NodeSpecialState {
 		pan: 0,
 		lowPassFilterCutoffFrequency: 0,
 		attack: 0,
+		decay: 0,
+		sustain: 0,
 		release: 0,
 		detune: 0,
 		gain: 0.5,
@@ -64,6 +68,8 @@ export class BasicSamplerState implements IConnectable, NodeSpecialState {
 	public readonly pan: number = Math.random() - 0.5
 	public readonly lowPassFilterCutoffFrequency: number = Math.min(10000, Math.random() * 10000 + 1000)
 	public readonly attack: number = 0.01
+	public readonly decay: number = 0.25
+	public readonly sustain: number = 0.8
 	public readonly release: number = 1
 	public readonly detune: number = 0
 	public readonly gain: number = 0.5

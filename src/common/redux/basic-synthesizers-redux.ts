@@ -60,8 +60,8 @@ export interface IBasicSynthesizers {
 }
 
 export class BasicSynthesizerState implements IConnectable, NodeSpecialState {
-	public static defaultWidth = 304
-	public static defaultHeight = 112 + 56
+	public static defaultWidth = 256
+	public static defaultHeight = 56 + (88 * 2)
 
 	public static dummy: BasicSynthesizerState = {
 		oscillatorType: BuiltInOscillatorType.sine,

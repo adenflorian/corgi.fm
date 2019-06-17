@@ -114,6 +114,7 @@ const SchedulerVisual = function SchedulerVisual_({scheduledVoices}: SchedulerVi
 						stroke="lime"
 						strokeWidth={1}
 						strokeDasharray={4}
+						strokeLinecap="round"
 					/>
 				</svg>
 			</div>

@@ -1,5 +1,6 @@
 import * as React from 'react'
 import {CssColor} from '../../common/shamu-color'
+import {handleClassName, handleVisualClassName} from '../client-constants'
 import './Panel.less'
 
 export interface IPanelProps {
@@ -11,14 +12,17 @@ export interface IPanelProps {
 	labelTitle?: string
 	saturate?: boolean
 	autoSize?: boolean
+	specialLabel?: boolean
+	helpText?: string
 }
 
 export const Panel: React.FC<IPanelProps> =
-	React.memo(function _Panel({autoSize = false, children, className = '', color = CssColor.defaultGray, id, label, labelTitle, saturate = false}) {
+	React.memo(function _Panel({
+		autoSize = false, children, className = '', color = CssColor.defaultGray,
+		id, label, labelTitle, saturate = false, specialLabel = false, helpText,
+	}) {
 
 		const renderLabel = label !== undefined && label !== ''
-
-		const labelHeight = 20
 
 		return (
 			<div
@@ -28,26 +32,28 @@ export const Panel: React.FC<IPanelProps> =
 					width: autoSize ? 'auto' : undefined,
 					height: autoSize ? 'auto' : undefined,
 				}}
-				className={`panelContainer handle ${saturate ? 'saturate' : ''}`}
+				className={`panelContainer ${handleClassName} ${saturate ? 'saturate' : ''}`}
 			>
 				{renderLabel &&
 					<div
-						className="label colorize"
+						className={`header ${handleClassName} ${handleVisualClassName}`}
 						title={labelTitle}
 						style={{
-							position: 'absolute',
-							top: -labelHeight,
-							width: '100%',
+							color,
+							textTransform: specialLabel ? undefined : 'uppercase',
 						}}
 					>
-						{label}
+						<div className="label" style={{color: specialLabel ? color : CssColor.defaultGray}}>{label}</div>
+						{helpText &&
+							<div className="helpText" title={helpText}>?</div>
+						}
 					</div>
 				}
 				<div
 					id={id}
-					className={`panel ${className} ${renderLabel ? 'renderLabel' : ''}`}
+					className={`panel ${className}`}
 				>
-					<ShamuBorder saturate={saturate} />
+					{/* <ShamuBorder saturate={saturate} /> */}
 					{children}
 				</div>
 			</div>

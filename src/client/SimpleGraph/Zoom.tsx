@@ -1,3 +1,4 @@
+import {red} from 'color-name'
 import * as React from 'react'
 import {ContextMenuTrigger} from 'react-contextmenu'
 import {Point} from '../../common/common-types'

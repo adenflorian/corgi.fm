@@ -31,6 +31,7 @@ export const VerticalScrollBarView = (props: IVerticalScrollBarViewProps) => {
 					width: '100%',
 					height: `${sliderGrabberHeightPercentage}%`,
 					backgroundColor: CssColor.panelGrayLight,
+					borderRadius: 4,
 				}}
 				onMouseDown={handleMouseDown}
 			/>
@@ -44,10 +45,11 @@ export const VerticalScrollBarView = (props: IVerticalScrollBarViewProps) => {
 							top: `${99 - Math.floor(mark * 100)}%`,
 							backgroundColor: 'currentColor',
 							width: '100%',
-							height: '1%',
+							height: '2%',
 							filter: 'opacity(0.4)',
 							zIndex: 2,
 							pointerEvents: 'none',
+							borderRadius: 2,
 						}}
 					/>
 				)

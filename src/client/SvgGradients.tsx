@@ -1,8 +1,8 @@
 import * as React from 'react'
 
 const startHue = 180
-const saturation = 60
-const lightness = 60
+const saturation = 90
+const lightness = 50
 const x = 360 * 2
 const stopCount = 16
 

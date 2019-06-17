@@ -91,8 +91,10 @@ export enum InfiniteSequencerStyle {
 
 export class InfiniteSequencerState extends SequencerStateBase {
 	public static defaultWidth = 688
-	public static defaultHeight = 80
-	public static controlsWidth = 272 + 56
+	public static defaultHeight = 88
+	public static controlsWidth = (40 * 4) + (64 * 3)
+	public static notesStartX = InfiniteSequencerState.controlsWidth + 4
+	public static notesWidth = InfiniteSequencerState.defaultWidth - InfiniteSequencerState.controlsWidth - 8
 
 	public static dummy = new InfiniteSequencerState(
 		'dummy', 'dummy', InfiniteSequencerStyle.colorGrid, List(), false,
@@ -126,8 +128,8 @@ export class InfiniteSequencerState extends SequencerStateBase {
 			InfiniteSequencerState.defaultHeight,
 			ownerId,
 			ConnectionNodeType.infiniteSequencer,
-			InfiniteSequencerState.controlsWidth,
-			InfiniteSequencerState.defaultWidth - InfiniteSequencerState.controlsWidth,
+			InfiniteSequencerState.notesStartX,
+			InfiniteSequencerState.notesWidth,
 			isPlaying,
 			0.5,
 		)
@@ -144,8 +146,8 @@ export function deserializeInfiniteSequencerState(state: IMultiStateThing): IMul
 		...(deserializeSequencerState(x)),
 		width: Math.max(x.width, InfiniteSequencerState.defaultWidth),
 		height: Math.max(x.height, InfiniteSequencerState.defaultHeight),
-		notesDisplayStartX: InfiniteSequencerState.controlsWidth,
-		notesDisplayWidth: InfiniteSequencerState.defaultWidth - InfiniteSequencerState.controlsWidth,
+		notesDisplayStartX: InfiniteSequencerState.notesStartX,
+		notesDisplayWidth: InfiniteSequencerState.notesWidth,
 	} as InfiniteSequencerState
 	return y
 }

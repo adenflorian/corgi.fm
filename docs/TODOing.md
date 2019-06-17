@@ -3,6 +3,8 @@
 - [√] don't delete everything on disconnect
 	
 # Soon
+- [ ] pan and detune knob arcs should start from center
+- [ ] title bar on nodes
 - [ ] sync client clocks
 - [ ] make submenu for creating grid sequencer with preset sizes
 - [ ] deploy script should check if anyone is on the server first

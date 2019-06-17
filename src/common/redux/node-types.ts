@@ -79,8 +79,8 @@ class AudioOutputState implements IConnectable {
 	public readonly id = MASTER_AUDIO_OUTPUT_TARGET_ID
 	public readonly color = CssColor.green
 	public readonly type = ConnectionNodeType.audioOutput
-	public readonly width = 192
-	public readonly height = 88
+	public readonly width = 128
+	public readonly height = 112
 	public readonly name = 'audio output'
 
 	constructor() {}
@@ -93,7 +93,7 @@ class MasterClockState implements IConnectable {
 	public readonly color = CssColor.brightBlue
 	public readonly type = ConnectionNodeType.masterClock
 	public readonly width = 172
-	public readonly height = 128
+	public readonly height = 88
 	public readonly name = 'master clock'
 
 	constructor() {}

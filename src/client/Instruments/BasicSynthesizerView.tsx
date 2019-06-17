@@ -13,7 +13,7 @@ import {
 	adsrValueToString, attackToolTip, decayToolTip, detuneToolTip, detuneValueToString,
 	filterAttackToolTip, filterDecayToolTip, filterReleaseToolTip, filterSustainToolTip,
 	filterValueToString, gainToolTip, lpfToolTip, panToolTip, panValueToString,
-	releaseToolTip, sustainToolTip,
+	percentageValueString, releaseToolTip, sustainToolTip,
 } from '../client-constants'
 import {Knob} from '../Knob/Knob'
 import {Panel} from '../Panel/Panel'
@@ -64,6 +64,7 @@ export class BasicSynthesizerView
 					color={color}
 					saturate={isPlaying}
 					id={this.props.id}
+					label="Basic Synthesizer"
 				>
 					<div className="basicSynthesizer" title="Basic Synthesizer">
 						<BasicSynthesizerOscillatorTypes
@@ -78,7 +79,7 @@ export class BasicSynthesizerView
 								value={this.props.attack}
 								defaultValue={0.05}
 								onChange={this._dispatchChangeInstrumentParam}
-								label="attack"
+								label="Attack"
 								onChangeId={BasicSynthesizerParam.attack}
 								tooltip={attackToolTip}
 								valueString={adsrValueToString}
@@ -90,7 +91,7 @@ export class BasicSynthesizerView
 								value={this.props.decay}
 								defaultValue={0.25}
 								onChange={this._dispatchChangeInstrumentParam}
-								label="decay"
+								label="Decay"
 								onChangeId={BasicSynthesizerParam.decay}
 								tooltip={decayToolTip}
 								valueString={adsrValueToString}
@@ -101,7 +102,7 @@ export class BasicSynthesizerView
 								value={this.props.sustain}
 								defaultValue={0.8}
 								onChange={this._dispatchChangeInstrumentParam}
-								label="sustain"
+								label="Sustain"
 								onChangeId={BasicSynthesizerParam.sustain}
 								tooltip={sustainToolTip}
 							/>
@@ -112,7 +113,7 @@ export class BasicSynthesizerView
 								value={this.props.release}
 								defaultValue={0.1}
 								onChange={this._dispatchChangeInstrumentParam}
-								label="release"
+								label="Release"
 								onChangeId={BasicSynthesizerParam.release}
 								tooltip={releaseToolTip}
 								valueString={adsrValueToString}
@@ -126,7 +127,7 @@ export class BasicSynthesizerView
 								value={this.props.filterAttack}
 								defaultValue={0.05}
 								onChange={this._dispatchChangeInstrumentParam}
-								label="filterAttack"
+								label="FilterAttack"
 								onChangeId={BasicSynthesizerParam.filterAttack}
 								tooltip={filterAttackToolTip}
 								valueString={adsrValueToString}
@@ -138,7 +139,7 @@ export class BasicSynthesizerView
 								value={this.props.filterDecay}
 								defaultValue={0.25}
 								onChange={this._dispatchChangeInstrumentParam}
-								label="filterDecay"
+								label="FilterDecay"
 								onChangeId={BasicSynthesizerParam.filterDecay}
 								tooltip={filterDecayToolTip}
 								valueString={adsrValueToString}
@@ -149,7 +150,7 @@ export class BasicSynthesizerView
 								value={this.props.filterSustain}
 								defaultValue={0.8}
 								onChange={this._dispatchChangeInstrumentParam}
-								label="filterSustain"
+								label="FilterSustain"
 								onChangeId={BasicSynthesizerParam.filterSustain}
 								tooltip={filterSustainToolTip}
 							/>
@@ -160,7 +161,7 @@ export class BasicSynthesizerView
 								value={this.props.filterRelease}
 								defaultValue={0.1}
 								onChange={this._dispatchChangeInstrumentParam}
-								label="filterRelease"
+								label="FilterRelease"
 								onChangeId={BasicSynthesizerParam.filterRelease}
 								tooltip={filterReleaseToolTip}
 								valueString={adsrValueToString}
@@ -173,7 +174,7 @@ export class BasicSynthesizerView
 								value={pan}
 								defaultValue={0}
 								onChange={this._dispatchChangeInstrumentParam}
-								label="pan"
+								label="Pan"
 								onChangeId={BasicSynthesizerParam.pan}
 								tooltip={panToolTip}
 								valueString={panValueToString}
@@ -185,7 +186,7 @@ export class BasicSynthesizerView
 								value={this.props.lowPassFilterCutoffFrequency}
 								defaultValue={20000}
 								onChange={this._dispatchChangeInstrumentParam}
-								label="lpf"
+								label="Filter"
 								onChangeId={BasicSynthesizerParam.lowPassFilterCutoffFrequency}
 								tooltip={lpfToolTip}
 								valueString={filterValueToString}
@@ -196,7 +197,7 @@ export class BasicSynthesizerView
 								value={this.props.fineTuning}
 								defaultValue={0}
 								onChange={this._dispatchChangeInstrumentParam}
-								label="detune"
+								label="Detune"
 								onChangeId={BasicSynthesizerParam.fineTuning}
 								tooltip={detuneToolTip}
 								valueString={detuneValueToString}
@@ -204,12 +205,14 @@ export class BasicSynthesizerView
 							<Knob
 								min={0}
 								max={1}
+								curve={2}
 								value={this.props.gain}
 								defaultValue={0.5}
 								onChange={this._dispatchChangeInstrumentParam}
-								label="gain"
+								label="Gain"
 								onChangeId={BasicSynthesizerParam.gain}
 								tooltip={gainToolTip}
+								valueString={percentageValueString}
 							/>
 						</div>
 					</div>

@@ -160,9 +160,11 @@ export const ConnectionView =
 	})
 
 export function makeCurvedPath(line: LineState) {
-	const diff2 = Math.abs((line.x2 - line.x1) / 2)
+	const distance = Math.sqrt(Math.pow((line.x1 - line.x2), 2) + Math.pow((line.y1 - line.y2), 2))
+	// const diff2 = Math.abs((line.x2 - line.x1) / 10)
 
-	const curveStrength2 = Math.max(10, diff2)
+	const curveStrength2 = distance / 4
+	// const curveStrength2 = 64
 
 	return stripIndent`
 		M ${line.x1} ${line.y1}

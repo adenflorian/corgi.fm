@@ -14,7 +14,7 @@
         box-shadow: inset 1px 0 0 fade(@frenchGray, 60%);
     }
     .black {
-        background-color: @panelGray;
+        background-color: @panelGrayDark;
     }
     &.isLocal {
         .white:hover {
@@ -48,6 +48,9 @@
         &.black .noteName {
             color: rgba(235, 235, 246, 0.925);
         }
+        &:last-child {
+            border-bottom-right-radius: 4px;
+        }
     }
     .octave {
         position: relative;
@@ -56,6 +59,7 @@
         align-items: center;
         justify-content: flex-end;
         flex-direction: column;
+        border-bottom-left-radius: 4px;
         .octaveNumber {
             position: absolute;
             width: 100%;

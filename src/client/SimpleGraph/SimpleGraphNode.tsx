@@ -11,7 +11,7 @@ import {
 } from '../../common/redux'
 import {CssColor} from '../../common/shamu-color'
 import {ConnectedBasicSampler} from '../BasicSampler/BasicSampler'
-import {graphSizeX, graphSizeY, nodeMenuId} from '../client-constants'
+import {graphSizeX, graphSizeY, handleClassName, nodeMenuId} from '../client-constants'
 import {ECSSequencerRenderSystem} from '../ECS/ECSSequencerRenderSystem'
 import {ConnectedGridSequencerContainer} from '../GridSequencer/GridSequencerContainer'
 import {ConnectedGroupSequencerView} from '../GroupSequencer/GroupSequencer'
@@ -36,8 +36,6 @@ interface ISimpleGraphNodeReduxProps {
 }
 
 type ISimpleGraphNodeAllProps = ISimpleGraphNodeProps & ISimpleGraphNodeReduxProps & {dispatch: Dispatch}
-
-const handleClassName = 'handle'
 
 export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProps> {
 	public render() {
@@ -73,11 +71,11 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 						position: 'absolute',
 						willChange: fancyZoomPan ? '' : 'transform',
 						width,
-						height,
+						height: height + 24,
 						zIndex,
+						top: -24,
 					}}
 				>
-					<Handle />
 					{
 						// @ts-ignore disableIfShiftIsPressed
 						<ContextMenuTrigger
@@ -100,7 +98,7 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 							position: 'absolute',
 							width,
 							height,
-							top: 0,
+							bottom: 0,
 							left: 0,
 							pointerEvents: 'none',
 							zIndex: 2,
@@ -122,31 +120,6 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 		this.props.dispatch(nodeClicked(this.props.positionId))
 	}
 }
-
-const handleSize = 24
-const borderRadius = 4
-
-const Handle = React.memo(function Handle_() {
-	return <div
-		className={handleClassName + ' handleVisual'}
-		style={{
-			display: 'flex',
-			justifyContent: 'center',
-			alignItems: 'center',
-			width: handleSize,
-			height: handleSize,
-			backgroundColor: CssColor.panelGray,
-			position: 'absolute',
-			bottom: '100%',
-			left: 8,
-			borderTopLeftRadius: borderRadius,
-			borderTopRightRadius: borderRadius,
-			boxShadow: 'inset 0px -6px 8px -5px #000000c2',
-		}}
-	>
-		<HandleIcon />
-	</div>
-})
 
 export function getComponentByNodeType(type: ConnectionNodeType, id: string, color: string) {
 	switch (type) {

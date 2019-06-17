@@ -4,7 +4,7 @@ import {
 	getConnectionNodeInfo, selectSimpleReverb, setSimpleReverbParam,
 	shamuConnect, SimpleReverbParam,
 } from '../../../common/redux'
-import {filterValueToString} from '../../client-constants'
+import {adsrValueToString, filterValueToString} from '../../client-constants'
 import {Knob} from '../../Knob/Knob'
 import {Panel} from '../../Panel/Panel'
 
@@ -33,25 +33,14 @@ export const SimpleReverbView: React.FC<ISimpleReverbAllProps> =
 				id={id}
 				color={color}
 				saturate={isPlaying}
+				label="Reverb"
 			>
 				<div
 					style={{
 						display: 'flex',
 						flexDirection: 'row',
-						padding: '0 8px',
 					}}
 				>
-					<div
-						className={`colorize largeFont`}
-						style={{
-							display: 'flex',
-							flexDirection: 'column',
-							justifyContent: 'center',
-							alignItems: 'center',
-						}}
-					>
-						Simple Reverb (Convolution)
-				</div>
 					<Knob
 						label="time"
 						min={0}
@@ -62,9 +51,10 @@ export const SimpleReverbView: React.FC<ISimpleReverbAllProps> =
 						onChange={changeParam}
 						onChangeId={SimpleReverbParam.time}
 						tooltip="length or reverb in seconds"
+						valueString={adsrValueToString}
 					/>
 					<Knob
-						label="lpf"
+						label="filter"
 						min={0}
 						max={20000}
 						curve={2}

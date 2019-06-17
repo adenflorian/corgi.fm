@@ -1,5 +1,7 @@
 @import "../colors.less";
 
+@rowHeight: 8px;
+
 .gridSequencer {
     max-width: 580px;
 
@@ -12,7 +14,6 @@
         flex-direction: column;
         justify-content: space-evenly;
         font-size: 24px;
-        color: @defaultGray;
         width: 40px * 3;
 
         .buttons {
@@ -22,6 +23,7 @@
             align-items: center;
 			flex-wrap: wrap;
             max-height: 40px * 2;
+            color: @defaultGray;
             
             & > * {
                 width: 40px;
@@ -40,19 +42,51 @@
             margin-bottom: 8px;
         }
     }
+
+    .eventsBox {
+        position: relative;
+
+        .pianoRoll {
+            display: flex;
+            flex-direction: column-reverse;
+            pointer-events: none;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            // z-index: -1;
+            .row {
+                height: @rowHeight;
+                // border-radius: 1px;
+
+                &.black {
+                    // background-color: @panelGrayDark;
+                }
+
+                &.white {
+                    height: 1px;
+                    margin: 3.5px;
+                    background-color: @panelGrayLight;
+                }
+            }
+        }
+    }
     
     .events {
         display: flex;
         justify-content: space-between;
+        position: relative;
 
         .event {
-            min-width: 12px;
-            max-width: 32px;
+            // min-width: 12px;
+            // max-width: 32px;
+            width: 8px;
             min-height: 48px * 2;
             max-height: 256px;
             margin: 0px 0;
             display: flex;
             flex-direction: column-reverse;
+            align-items: center;
             &:first-child {
                 margin-left: 0;
             }
@@ -63,22 +97,37 @@
                 filter: brightness(120%)
             }
             &:nth-child(odd) {
-                filter: brightness(110%)
+                // filter: brightness(110%)
+            }
+            &:nth-child(8n) {
+                // filter: brightness(110%)
+                border-right: 1px solid @panelGrayLight;
+            }
+            &:last-child {
+                // filter: brightness(110%)
+                border-right: none;
             }
             .note {
-                height: 8px;
-                width: 12px;
+                margin: 1px;
+                width: 6px;
+                height: 6px;
+                // box-shadow: inset 0 0 0px 2px @panelGray;
+                // border: 1px solid @panelGrayLight;
                 &.white {
-                    background-color: @gray2;
+                    // background-color: @gray2;
+                    // filter: brightness(110%);
+                    // background-color: @panelGrayLight;
                 }
                 &.black {
-                    background-color: @panelGray;
+                    // background-color: @panelGrayDark;
                 }
                 &:hover {
+                    // box-shadow: none;
                     background-color: currentColor;
                     filter: brightness(60%)
                 }
                 &.on {
+                    // box-shadow: none;
                     background-color: currentColor;
                     &:hover {
                         filter: saturate(300%)

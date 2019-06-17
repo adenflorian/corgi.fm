@@ -8,11 +8,11 @@ import {IMidiNote} from './MidiNote'
 export const colorFunc: typeof ColorAll = ColorDefault || ColorAll
 
 export function getColorHslByString(str: string): string {
-	return colorFunc(hashbow(str)).desaturate(0.2).hsl().string()
+	return colorFunc(hashbow(str)).hsl().string()
 }
 
 export function getColorHslByHex(hex: string): string {
-	return colorFunc(hex).desaturate(0.4).hsl().string()
+	return colorFunc(hex).hsl().string()
 }
 
 export function saturateColor(color: string, amount = 3): string {
@@ -20,21 +20,21 @@ export function saturateColor(color: string, amount = 3): string {
 }
 
 export function getColorStringForMidiNote(note: IMidiNote): string {
-	return `hsl(${removeOctave(note) * 23}, 60%, 60%)`
+	return `hsl(${removeOctave(note) * 23}, 90%, 60%)`
 }
 
 export function mixColors(colors: List<string>): string {
 	// console.log('colors.count(): ', colors.count())
 	if (colors.count() === 0) return 'black'
 	if (colors.count() === 1) return colors.first()
-	return `hsl(${colorFunc(colors.reduce(mix2Colors)).hue()}, 40%, 50%)`
+	return `hsl(${colorFunc(colors.reduce(mix2Colors)).hue()}, 90%, 50%)`
 }
 
 export function mix2Colors(colorA: string, colorB: string): string {
 	return colorFunc(colorA).mix(colorFunc(colorB)).toString()
 }
 
-export function hashbow(input: IHashable, saturation = 50, lightness = 50) {
+export function hashbow(input: IHashable, saturation = 90, lightness = 50) {
 	const greyValues = [null, undefined, [], {}, '']
 
 	if (greyValues.indexOf(input) !== -1) {
@@ -51,31 +51,30 @@ export function hashbow(input: IHashable, saturation = 50, lightness = 50) {
 // Keep in sync with colors.less
 export enum CssColor {
 	frenchGray = '#BDBDC6',
-	panelGray = '#282832',
-	panelGrayLight = '#41414d',
+	panelGray = '#252525',
+	panelGrayLight = 'hsl(0, 0%, 25%)',
 	panelGrayTransparent = 'rgba(40, 40, 50, 0.5)',
 	gray2 = '#31313d',
 	gray3 = '#424258',
 	knobGray = '#33333b',
 	keyWhite = '#EBEBF6',
-	defaultGray = '#CDCBE1',
+	defaultGray = 'rgb(226, 226, 226)',
 	subtleGrayWhiteBg = '#a0a0ab',
 	subtleGrayBlackBg = '#8C8C99',
 	orange = 'rgb(191, 111, 64)',
 	brightOrange = 'rgb(226, 123, 75)',
-	red = 'rgb(191, 64, 64)',
-	brightRed = 'rgb(226, 75, 83)',
-	green = '#40bf42',
-	darkGreen = '#2f6330',
-	brightGreen = '#4fe751',
+	red = 'hsl(-8, 90%, 50%)',
+	brightRed = 'hsl(-8, 100%, 50%)',
+	green = 'hsl(92, 90%, 50%)',
+	brightGreen = 'hsl(92, 100%, 50%)',
 	purple = 'rgb(168, 64, 191)',
 	brightPurple = 'rgb(199, 79, 226)',
-	blue = 'rgb(64, 87, 191)',
-	brightBlue = 'rgb(79, 106, 226)',
+	blue = 'hsl(202, 90%, 50%)',
+	brightBlue = 'hsl(202, 100%, 50%)',
 	yellow = '#ccd65c',
 	brightYellow = '#ddeb47',
 	darkTextShadow = 'rgb(20, 20, 22)',
-	appBackground = '#121621',
+	appBackground = 'hsl(0, 0%, 7%)',
 	overlayGray = 'rgba(20, 20, 24, 0.6)',
 }
 

@@ -12,7 +12,7 @@ export function calculatePositionsGivenConnections(positions: IPositions, connec
 
 	const newPositions = originalPositions.withMutations(mutablePositions => {
 		const columnWidth = 128
-		const rowHeight = 192
+		const rowHeight = 256 - 8
 
 		// Center root node
 		mutablePositions.update(MASTER_AUDIO_OUTPUT_TARGET_ID, x => ({...x, x: 0, y: 0}))

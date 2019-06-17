@@ -10,7 +10,7 @@ import {
 	globalClockActions, gridSequencerActions, GridSequencerFields,
 	GridSequencerState, selectGridSequencer, sequencerActions, shamuConnect,
 } from '../../common/redux'
-import {seqGateValueToString, seqPitchValueToString, seqRateValueToString, sequencerGateToolTip, sequencerPitchToolTip, sequencerRateToolTip} from '../client-constants'
+import {percentageValueString, seqGateValueToString, seqPitchValueToString, seqRateValueToString, sequencerGateToolTip, sequencerPitchToolTip, sequencerRateToolTip} from '../client-constants'
 import {Knob} from '../Knob/Knob'
 import {KnobSnapping} from '../Knob/KnobSnapping'
 import {rateValues} from '../WebAudio'
@@ -82,16 +82,16 @@ export const GridSequencerControls = (props: AllProps) => {
 					value={props.gate}
 					defaultValue={0.5}
 					onChange={dispatchGridSeqParam}
-					label="gate"
+					label="Gate"
 					onChangeId={GridSequencerFields.gate}
 					tooltip={sequencerGateToolTip}
-					valueString={seqGateValueToString}
+					valueString={percentageValueString}
 				/>
 				<KnobSnapping
 					value={props.pitch}
 					defaultIndex={12}
 					onChange={dispatchGridSeqParam}
-					label="pitch"
+					label="Pitch"
 					onChangeId={GridSequencerFields.pitch}
 					tooltip={sequencerPitchToolTip}
 					valueString={seqPitchValueToString}
@@ -101,7 +101,7 @@ export const GridSequencerControls = (props: AllProps) => {
 					value={props.rate}
 					defaultIndex={rateValues.indexOf(1 / 8)}
 					onChange={dispatchGridSeqParam}
-					label="rate"
+					label="Rate"
 					onChangeId={GridSequencerFields.rate}
 					tooltip={sequencerRateToolTip}
 					valueString={seqRateValueToString}

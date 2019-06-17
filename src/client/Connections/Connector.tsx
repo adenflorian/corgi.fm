@@ -41,12 +41,14 @@ export const Connector: React.FC<ConnectorProps> =
 						x2={width}
 						y2={height / 2}
 						strokeWidth={height}
+						strokeLinecap="round"
 					/>
 					{isPlaceHolderForNewConnection &&
 						<g
 							stroke={CssColor.subtleGrayBlackBg}
 							strokeWidth={2}
 							className="addConnectionPlusSymbol"
+							strokeLinecap="round"
 						>
 							<line
 								x1={5}
