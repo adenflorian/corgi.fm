@@ -34,3 +34,11 @@ export const rateLimitedDebounce = <T extends (...args: any[]) => any>(
 		maxWait: intervalMs,
 	},
 )
+
+/** Returns a number from 0 to length - 1 */
+export function getNumberInRangeFromString(str: string, length: number) {
+	return str
+		.split('')
+		.reduce((sum, letter) => sum + letter.charCodeAt(0), 0)
+		% length
+}

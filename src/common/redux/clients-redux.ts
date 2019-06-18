@@ -3,9 +3,9 @@ import {createSelector} from 'reselect'
 import {v4} from 'uuid'
 import {serverClientId} from '../common-constants'
 import {ClientId, Id} from '../common-types'
-import {pickRandomArrayElement} from '../common-utils'
+import {getNumberInRangeFromString} from '../common-utils'
 import {logger} from '../logger'
-import {CssColor, getColorHslByString} from '../shamu-color'
+import {CssColor} from '../shamu-color'
 import {
 	BROADCASTER_ACTION, createDeepEqualSelector, createReducer,
 	GLOBAL_SERVER_ACTION, IClientAppState, IServerState,
@@ -92,6 +92,8 @@ export interface IClientState {
 	socketId: string
 }
 
+const colors = [CssColor.brightBlue, CssColor.brightGreen, CssColor.brightOrange, CssColor.brightPurple, CssColor.brightYellow]
+
 export class ClientState implements IClientState {
 	public static createServerClient(): IClientState {
 		return {
@@ -114,7 +116,7 @@ export class ClientState implements IClientState {
 			.replace(/ +(?= )/g, '')
 			.trim()
 			.substring(0, maxUsernameLength)
-		this.color = pickRandomArrayElement([CssColor.brightBlue, CssColor.brightGreen, CssColor.brightOrange, CssColor.brightPurple, CssColor.brightYellow])
+		this.color = colors[getNumberInRangeFromString(this.name, colors.length)]
 	}
 }
 

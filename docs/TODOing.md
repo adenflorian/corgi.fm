@@ -10,6 +10,7 @@
 - [ ] "show older messages" button
 	
 # Soon
+- [ ] switch to jest
 - [ ] pan and detune knob arcs should start from center
 - [ ] title bar on nodes
 - [ ] sync client clocks
