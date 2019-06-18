@@ -1,6 +1,13 @@
+# Redesign
+- [ ] put "corgi.fm" in bottom right by version
+- [ ] chat
+
 # Now
 - [ ] polish group sequencer
 - [√] don't delete everything on disconnect
+- [ ] smooth scroll in steps like google maps
+- [ ] add button to clear chat
+- [ ] "show older messages" button
 	
 # Soon
 - [ ] pan and detune knob arcs should start from center
@@ -15,6 +22,12 @@
 - [ ] coarse knob to instruments
 - [ ] only enable audio after user acknowledges what they are getting themselves into
 - [ ] project wide macro knobs/control panel
+
+# Goals
+- [ ] be able to recreate certain songs
+	- [ ] hot cross buns
+	- [ ] claire de lune
+	- [ ] Spoiler - Hyper
 
 ## Saving
 why?

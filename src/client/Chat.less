@@ -1,8 +1,14 @@
 @import "./colors.less";
 @import "./AppCommon.less";
 
-.padding() {
-    padding: 0px 0px 2px 2px;
+@borderRadius: 8px;
+
+@boxyThing: {
+    background-color: @panelGray;
+    border-radius: @borderRadius;
+    @panelShadow();
+    padding: 0 8px;
+    min-height: 32px;
 }
 
 #chat {
@@ -10,20 +16,12 @@
         user-select: text;
     }
 
-    .author {
-        margin-left: 4px;
-        margin-right: 4px;
-        white-space: nowrap;
-        .largeFont();
-    }
-
     .chatMessages {
         position: fixed;
         padding: 0 8px 0 8px;
         height: 100%;
         .spacing();
-        left: 2px;
-        bottom: 42px;
+        bottom: 40px;
         display: flex;
         flex-direction: column;
         justify-content: flex-end;
@@ -62,7 +60,7 @@
             text-align: left;
             z-index: 0;
             pointer-events: none;
-            min-height: 20px;
+            margin-bottom: 8px;
 
             .selectable {
                 width: fit-content;
@@ -71,18 +69,31 @@
                 margin-left: 0;
                 cursor: text;
                 display: flex;
-                align-items: center;
-                height: 100%;
+                min-height: 32px;
+                border-radius: @borderRadius;
+                @panelShadow();
 
                 .author {
+                    white-space: nowrap;
+                    .largeFont();
+                    font-weight: 600;
+                    padding: 8px;
+                    background-color: @panelGrayDark;
+                    border-top-left-radius: @borderRadius;
+                    border-bottom-left-radius: @borderRadius;
                 }
 
                 .text {
+                    padding: 8px;
+                    background-color: @panelGray;
+                    border-top-right-radius: @borderRadius;
+                    border-bottom-right-radius: @borderRadius;
                     font-weight: initial;
                     text-transform: initial;
                     // letter-spacing: 0.4px;
-                    margin-right: 4px;
-                    margin-top: -2px;
+                    // margin-top: -1px;
+                    overflow: auto;
+                    overflow-wrap: break-word;
                 }
             }
 
@@ -95,18 +106,16 @@
     .chatBottom {
         position: fixed;
         z-index: 15;
-        bottom: 2px;
-        left: 2px;
+        bottom: 0;
         width: 100%;
 
         .inputWrapper {
             display: flex;
-            background-color: @panelGrayTransparent;
-            padding: 6px 8px 6px 8px;
+            // background-color: @panelGrayTransparent;
+            height: 32px;
 
             // Color outline
-            margin-top: 8px;
-            box-shadow: currentColor -1px 1px, currentColor -2px 2px;
+            margin: 8px;
             .saturate & {
                 filter: saturate(300%);
             }
@@ -121,6 +130,7 @@
             }
 
             form.nameForm {
+
                 input {
                     letter-spacing: inherit;
                     text-transform: inherit;
@@ -136,7 +146,7 @@
                     width: 100%;
                     color: @defaultGray;
                     letter-spacing: initial;
-                    margin-top: -2px;
+                    @boxyThing();
                 }
             }
         }
@@ -168,16 +178,43 @@
     display: flex;
     flex-direction: row;
     .largeFont();
+    font-weight: 600;
+    border-radius: @borderRadius;
+    @panelShadow();
+    min-height: 32px;
 
     & > * {
         display: flex;
+        padding: 0 8px;
         align-items: center;
-        margin-left: 8px;
     }
 
-    .info-versionMismatch {
+    .info-corgi {
+        color: @brightBlue;
+        background-color: @panelGrayDark;
+        border-top-left-radius: @borderRadius;
+        border-bottom-left-radius: @borderRadius;
+        
+        &.info-corgiTest {
+            // color: @green;
+        }
+    }
+
+    .info-milestone {
+        color: #FF33A1;
+        background-color: @panelGray;
+    }
+
+    .info-version {
         color: @defaultGray;
-        background-color: @red;
+        background-color: @panelGrayDark;
+        border-top-right-radius: @borderRadius;
+        border-bottom-right-radius: @borderRadius;
+
+        &.info-versionMismatch {
+            color: @defaultGray;
+            background-color: @red;
+        }
     }
 }
 

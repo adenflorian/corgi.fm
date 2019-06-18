@@ -10,6 +10,7 @@ import {IClientAppState} from '../common/redux'
 import {chatSubmit} from '../common/redux'
 import './Chat.less'
 import {ConnectedChatMessages} from './Chat/ChatMessages'
+import {isTestClient} from './is-prod-client'
 
 interface IChatComponentState {
 	chatMessage: string
@@ -34,12 +35,11 @@ export class Chat extends Component<AllProps, IChatComponentState> {
 		username: '',
 	}
 
-	public chatInputRef: React.RefObject<HTMLInputElement>
+	public chatInputRef?: HTMLInputElement
 	public chatRef: React.RefObject<HTMLDivElement>
 
 	constructor(props: AllProps) {
 		super(props)
-		this.chatInputRef = React.createRef()
 		this.chatRef = React.createRef()
 		this.state.username = props.author
 	}
@@ -67,7 +67,7 @@ export class Chat extends Component<AllProps, IChatComponentState> {
 
 				<div className="chatBottom" style={{textAlign: 'initial'}} tabIndex={-1}>
 					<div className="inputWrapper" style={{color: authorColor}} tabIndex={-1}>
-						<form className="nameForm" onSubmit={this._onSubmitNameChange} title="Change your username here">
+						{/* <form className="nameForm" onSubmit={this._onSubmitNameChange} title="Change your username here">
 							<AutosizeInput
 								name="nameAutosizeInput"
 								className="author"
@@ -77,17 +77,26 @@ export class Chat extends Component<AllProps, IChatComponentState> {
 								style={{color: authorColor}}
 								onBlur={this._onNameInputBlur}
 							/>
-						</form>
+						</form> */}
 						<form className="chatMessageForm" onSubmit={this._onSubmitChat} title="chat box input">
+							<AutosizeInput
+								id="chatInput"
+								onChange={this._onInputChange}
+								value={this.state.chatMessage}
+								autoComplete="off"
+								placeholder="Type message here..."
+								inputRef={ref => (this.chatInputRef = ref || undefined)}
+							/>
+						</form>
+						{/* <form className="chatMessageForm" onSubmit={this._onSubmitChat} title="chat box input">
 							<input
 								id="chatInput"
 								type="text"
-								ref={this.chatInputRef}
 								onChange={this._onInputChange}
 								value={this.state.chatMessage}
 								autoComplete="off"
 							/>
-						</form>
+						</form> */}
 						<BottomInfo
 							clientVersion={this.props.clientVersion}
 							serverVersion={this.props.serverVersion}
@@ -100,8 +109,8 @@ export class Chat extends Component<AllProps, IChatComponentState> {
 
 	private readonly _onKeydown = (e: KeyboardEvent) => {
 		if (e.repeat) return
-		if (e.key === 'Enter' && this.state.isChatFocused === false && this.chatInputRef.current !== null) {
-			this.chatInputRef.current.focus()
+		if (e.key === 'Enter' && this.state.isChatFocused === false && this.chatInputRef) {
+			this.chatInputRef.focus()
 			e.preventDefault()
 		}
 		if (e.key === 'Escape') (document.activeElement as HTMLElement).blur()
@@ -176,10 +185,15 @@ const BottomInfo = React.memo(function _BottomInfo(props: BottomInfoProps) {
 		<div className="bottomInfo">
 			{/* <div className="info-env">{getEnvDisplayName()}</div> */}
 			<div
+				className={`info-corgi ${isTestClient() ? 'info-corgiTest' : ''}`}
+			>
+				{isTestClient() ? 'test.' : ''}corgi.fm
+			</div>
+			<div
 				className="info-milestone"
 			>
 				pre-alpha
-							</div>
+			</div>
 			<div
 				className={`info-version ${isVersionMismatch ? 'info-versionMismatch' : ''}`}
 				title={isVersionMismatch
