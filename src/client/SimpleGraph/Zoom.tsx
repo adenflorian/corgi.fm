@@ -1,4 +1,3 @@
-import {red} from 'color-name'
 import * as React from 'react'
 import {ContextMenuTrigger} from 'react-contextmenu'
 import {Point} from '../../common/common-types'
@@ -66,16 +65,25 @@ export class Zoom extends React.PureComponent<IZoomAllProps, IZoomState> {
 
 		return (
 			<div
-				className="zoom"
+				className="zoomZoom"
 				style={{
-					transform: `scale(${zoom}) translate(${pan.x}px, ${pan.y}px)`,
+					transform: `scale(${zoom})`,
 					willChange: fancyZoomPan ? '' : 'transform',
+					transition: 'transform 0.15s',
 				}}
 			>
-				<ZoomBackground
-					onMouseEvent={this._onBgMouseEvent}
-				/>
-				{children}
+				<div
+					className="zoomPan"
+					style={{
+						transform: `translate(${pan.x}px, ${pan.y}px)`,
+						willChange: fancyZoomPan ? '' : 'transform',
+					}}
+				>
+					<ZoomBackground
+						onMouseEvent={this._onBgMouseEvent}
+					/>
+					{children}
+				</div>
 			</div>
 		)
 	}

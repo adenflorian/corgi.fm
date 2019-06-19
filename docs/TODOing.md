@@ -16,7 +16,7 @@
 
 # Now
 - [√] don't delete everything on disconnect
-- [ ] smooth scroll in steps like google maps
+- [√] smooth scroll in steps like google maps
 - [ ] add button to clear chat
 - [ ] "show older messages" button
 	
