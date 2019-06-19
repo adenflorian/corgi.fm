@@ -29,6 +29,7 @@ export const MousePointer: React.FC<MousePointerAllProps> =
 					pointerEvents: 'none',
 					transform: `translate(${x - 16}px, ${y - 8}px)`,
 					willChange: 'transform',
+					transition: 'transform 0.1s',
 				}}
 			>
 				<svg
@@ -51,6 +52,7 @@ export const MousePointer: React.FC<MousePointerAllProps> =
 					/>
 				</svg>
 				<div
+					className="pointerName"
 					style={{
 						color,
 						marginLeft: 14,
