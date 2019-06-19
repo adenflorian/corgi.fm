@@ -106,7 +106,7 @@ const keyboardShortcuts: IKeyBoardShortcuts = Map<KeyBoardShortcut>({
 		preventDefault: false,
 	},
 	' ': {
-		actionOnKeyPress: (e, state) => {
+		actionOnKeyDown: (e, state) => {
 			return e.ctrlKey
 				? globalClockActions.restart()
 				: selectGlobalClockIsPlaying(state.room)
