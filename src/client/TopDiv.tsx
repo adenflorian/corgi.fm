@@ -6,6 +6,7 @@ import {requestCreateRoom} from '../common/redux'
 import {selectClientCount} from '../common/redux'
 import {CssColor} from '../common/shamu-color'
 import {Button} from './Button/Button'
+import {ButtonLink} from './Button/ButtonLink'
 import {localActions} from './local-middleware'
 import {ConnectedNameChanger} from './NameChanger'
 import {Options} from './Options/Options'
@@ -68,8 +69,8 @@ export const TopDiv = ({memberCount, clientCount, info, isClientReady, dispatch}
 			</Button>
 			<SavingAndLoading dispatch={dispatch} />
 			<Options />
-			<a href="/newsletter" target="_blank">Newsletter</a>
-			<a href="https://discord.gg/qADwrxd" target="_blank">Discord</a>
+			<ButtonLink href="/newsletter" newTab={true}>Newsletter</ButtonLink>
+			<ButtonLink href="https://discord.gg/qADwrxd" newTab={true}>Discord</ButtonLink>
 		</div>
 	</div>
 
