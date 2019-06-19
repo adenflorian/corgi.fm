@@ -10,7 +10,7 @@
 - [ ] grid sequencer
 - [√] options
 - [√] loading modal
-- [ ] Connecting...
+- [√] Connecting...
 - [ ] pan and detune knob arcs should start from center
 
 # Now

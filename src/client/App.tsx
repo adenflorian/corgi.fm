@@ -8,6 +8,7 @@ import './css-reset.css'
 // tslint:disable-next-line:ordered-imports
 import './App.less'
 import {isLocalDevClient} from './is-prod-client'
+import {LoadingScreen} from './LoadingScreen'
 import {OnlineApp} from './OnlineApp'
 import {Options} from './Options/Options'
 import {SimpleReverbView} from './ShamuNodes/SimpleReverb/SimpleReverbView'
@@ -29,22 +30,14 @@ class App extends React.Component<IAppProps, {}> {
 			}
 		}
 
-		if (!isClientReady && isConnectingForFirstTime) {
-			return <div
-				className="largeFont"
-				style={{
-					display: 'flex',
-					justifyContent: 'center',
-					alignItems: 'center',
-					height: '100%',
-					fontSize: '2em',
-				}}
-			>
-				Connecting...
-			</div>
-		} else {
-			return <OnlineApp />
-		}
+		const isLoading = !isClientReady && isConnectingForFirstTime
+
+		return (
+			<React.Fragment>
+				<LoadingScreen loading={isLoading} />
+				{!isLoading && <OnlineApp />}
+			</React.Fragment>
+		)
 	}
 }
 
