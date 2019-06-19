@@ -129,24 +129,17 @@
                 padding: 0;
             }
 
-            form.nameForm {
-
-                input {
-                    letter-spacing: inherit;
-                    text-transform: inherit;
-                    font-weight: inherit;
-                    color: inherit;
-                }
-            }
-
             form.chatMessageForm {
                 flex-grow: 1;
 
                 #chatInput {
-                    width: 100%;
                     color: @defaultGray;
                     letter-spacing: initial;
                     @boxyThing();
+                    min-width: 156px;
+                    &:focus::placeholder {
+                        opacity: 0;
+                    }
                 }
             }
         }

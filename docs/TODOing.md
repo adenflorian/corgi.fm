@@ -3,8 +3,13 @@
 - [√] chat
 - [√] put name in top right
 	- [ ] show edit icon to left of name on hover
-- [ ] put button links in a button with out link icon
+- [√] put button links in a button with out link icon
+- [√] chat input min width
 - [ ] make select have label on left side with darker background
+- [ ] grid sequencer
+- [ ] options
+- [ ] loading modal
+- [ ] Connecting...
 
 # Now
 - [ ] polish group sequencer
