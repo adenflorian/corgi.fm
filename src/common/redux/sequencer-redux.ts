@@ -140,7 +140,6 @@ export abstract class SequencerStateBase implements ISequencerState {
 	public readonly color: string | false = false
 	public readonly isRecording: boolean = false
 	public readonly previousEvents: List<MidiClipEvents> = List<MidiClipEvents>()
-	public readonly rate: number = 1
 	public readonly pitch: number = 0
 
 	constructor(
@@ -154,6 +153,7 @@ export abstract class SequencerStateBase implements ISequencerState {
 		public readonly notesDisplayWidth: number,
 		public readonly isPlaying: boolean = false,
 		public readonly gate: number = 1,
+		public readonly rate: number = 1,
 	) {
 		// this.color = colorFunc(hashbow(this.id)).desaturate(0.2).hsl().string()
 	}

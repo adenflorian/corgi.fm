@@ -132,6 +132,8 @@ export class GridSequencerState extends SequencerStateBase {
 			GridSequencerState.controlsWidth,
 			notesDisplayWidth,
 			isPlaying,
+			1,
+			1 / 4,
 		)
 
 		this.notesToShow = notesToShow
