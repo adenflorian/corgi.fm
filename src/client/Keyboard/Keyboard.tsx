@@ -100,11 +100,11 @@ export class Keyboard extends React.PureComponent<IKeyboardAllProps, IKeyboardSt
 			<Panel
 				color={color}
 				className={`keyboard ${isLocal ? 'isLocal' : ''}  ${isPlaying ? 'isPlaying' : 'isNotPlaying'}`}
-				label={ownerNameDisplay}
+				label="Virtual Keyboard"
 				labelTitle={isOwnerNameTooLong ? ownerName.toUpperCase() : ''}
 				id={this.props.id}
 				saturate={isPlaying}
-				specialLabel={true}
+				ownerName={ownerNameDisplay}
 			>
 				<div className="octave black unselectable">
 					<div className="octaveNumber">

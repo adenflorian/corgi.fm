@@ -12,19 +12,17 @@ export interface IPanelProps {
 	labelTitle?: string
 	saturate?: boolean
 	autoSize?: boolean
-	specialLabel?: boolean
 	helpText?: string
+	ownerName?: string
 }
 
 export const Panel: React.FC<IPanelProps> =
 	React.memo(function _Panel({
 		autoSize = false, children, className = '', color = CssColor.defaultGray,
-		id, label, labelTitle, saturate = false, specialLabel = false, helpText,
+		id, label, labelTitle, saturate = false, helpText, ownerName,
 	}) {
 
 		const renderLabel = label !== undefined && label !== ''
-
-		specialLabel = false
 
 		return (
 			<div
@@ -40,13 +38,13 @@ export const Panel: React.FC<IPanelProps> =
 					<div
 						className={`header ${handleClassName} ${handleVisualClassName}`}
 						title={labelTitle}
-						style={{
-							color,
-							textTransform: specialLabel ? undefined : 'uppercase',
-						}}
+						style={{color}}
 					>
 						<div className="colorDot"></div>
-						<div className="label" style={{color: specialLabel ? color : CssColor.defaultGray}}>{label}</div>
+						<div className="label">{label}</div>
+						{ownerName &&
+							<div className="ownerName" title={ownerName}>{ownerName}</div>
+						}
 						{helpText &&
 							<div className="helpText" title={helpText}>?</div>
 						}

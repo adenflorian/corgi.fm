@@ -6,15 +6,15 @@
 	- [ ] show edit icon to left of name on hover
 - [√] put button links in a button with out link icon
 - [√] chat input min width
-- [ ] make select have label on left side with darker background
-- [ ] grid sequencer
 - [√] options
 - [√] loading modal
 - [√] Connecting...
+- [√] keyboard label
+- [ ] grid sequencer
 - [ ] pan and detune knob arcs should start from center
+- [ ] make select have label on left side with darker background
 
 # Now
-- [ ] polish group sequencer
 - [√] don't delete everything on disconnect
 - [ ] smooth scroll in steps like google maps
 - [ ] add button to clear chat

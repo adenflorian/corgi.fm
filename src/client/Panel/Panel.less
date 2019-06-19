@@ -16,8 +16,6 @@
         flex-direction: row;
         justify-content: auto;
         align-items: center;
-        .largeFont();
-        font-weight: 400;
         background-color: @panelGrayDark;
         height: @labelHeight;
         width: 100%;
@@ -34,7 +32,16 @@
         }
 
         .label {
+            .largeFont();
+            font-weight: 400;
             margin-left: 6px;
+            color: @defaultGray;
+        }
+
+        .ownerName {
+            .largeFont();
+            margin-left: auto;
+            margin-right: 8px;
         }
 
         .helpText {
