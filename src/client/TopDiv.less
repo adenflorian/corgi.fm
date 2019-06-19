@@ -1,3 +1,6 @@
+@import "./AppCommon.less";
+@import "./colors.less";
+
 #topDiv {
     margin-top: 0;
     z-index: 1;
@@ -33,5 +36,20 @@
         & > * {
             margin: 8px 8px 0 0;
         }
+    }
+
+    .nameForm input {
+        .largeFont();
+        background-color: unset;
+        font-size: inherit;
+        text-decoration: inherit;
+        border: none;
+        background-color: @panelGrayDark;
+        border-radius: 8px;
+        @panelShadow();
+        padding: 0 8px;
+        height: 32px;
+        color: currentColor;
+        font-weight: 600;
     }
 }

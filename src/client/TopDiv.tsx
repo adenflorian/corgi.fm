@@ -7,6 +7,7 @@ import {selectClientCount} from '../common/redux'
 import {CssColor} from '../common/shamu-color'
 import {Button} from './Button/Button'
 import {localActions} from './local-middleware'
+import {ConnectedNameChanger} from './NameChanger'
 import {Options} from './Options/Options'
 import {ConnectedRoomSelector} from './RoomSelector'
 import {SavingAndLoading} from './SavingAndLoading/SavingAndLoading'
@@ -44,6 +45,7 @@ export const TopDiv = ({memberCount, clientCount, info, isClientReady, dispatch}
 			}
 		</div>
 		<div className="right">
+			<ConnectedNameChanger />
 			<ConnectedRoomSelector />
 			<Button
 				buttonProps={{id: 'newRoomButton', onClick: () => dispatch(requestCreateRoom())}}

@@ -1,6 +1,10 @@
 # Redesign
-- [ ] put "corgi.fm" in bottom right by version
-- [ ] chat
+- [√] put "corgi.fm" in bottom right by version
+- [√] chat
+- [√] put name in top right
+	- [ ] show edit icon to left of name on hover
+- [ ] put button links in a button with out link icon
+- [ ] make select have label on left side with darker background
 
 # Now
 - [ ] polish group sequencer

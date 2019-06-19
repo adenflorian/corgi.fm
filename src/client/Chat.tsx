@@ -4,7 +4,7 @@ import AutosizeInput from 'react-input-autosize'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 import {
-	maxUsernameLength, selectClientInfo, selectLocalClient, setLocalClientName,
+	selectClientInfo, selectLocalClient,
 } from '../common/redux'
 import {IClientAppState} from '../common/redux'
 import {chatSubmit} from '../common/redux'
@@ -15,13 +15,11 @@ import {isTestClient} from './is-prod-client'
 interface IChatComponentState {
 	chatMessage: string
 	isChatFocused: boolean
-	username: string
 }
 
 interface ReduxProps {
 	author: string
 	authorColor: string
-	authorId: string
 	clientVersion: string
 	serverVersion: string
 }
@@ -32,7 +30,6 @@ export class Chat extends Component<AllProps, IChatComponentState> {
 	public state: IChatComponentState = {
 		chatMessage: '',
 		isChatFocused: false,
-		username: '',
 	}
 
 	public chatInputRef?: HTMLInputElement
@@ -41,7 +38,6 @@ export class Chat extends Component<AllProps, IChatComponentState> {
 	constructor(props: AllProps) {
 		super(props)
 		this.chatRef = React.createRef()
-		this.state.username = props.author
 	}
 
 	public componentDidMount = () => window.addEventListener('keydown', this._onKeydown)
@@ -67,17 +63,6 @@ export class Chat extends Component<AllProps, IChatComponentState> {
 
 				<div className="chatBottom" style={{textAlign: 'initial'}} tabIndex={-1}>
 					<div className="inputWrapper" style={{color: authorColor}} tabIndex={-1}>
-						{/* <form className="nameForm" onSubmit={this._onSubmitNameChange} title="Change your username here">
-							<AutosizeInput
-								name="nameAutosizeInput"
-								className="author"
-								value={this.state.username}
-								onChange={this._onNameInputChange}
-								autoComplete="off"
-								style={{color: authorColor}}
-								onBlur={this._onNameInputBlur}
-							/>
-						</form> */}
 						<form className="chatMessageForm" onSubmit={this._onSubmitChat} title="chat box input">
 							<AutosizeInput
 								id="chatInput"
@@ -88,15 +73,6 @@ export class Chat extends Component<AllProps, IChatComponentState> {
 								inputRef={ref => (this.chatInputRef = ref || undefined)}
 							/>
 						</form>
-						{/* <form className="chatMessageForm" onSubmit={this._onSubmitChat} title="chat box input">
-							<input
-								id="chatInput"
-								type="text"
-								onChange={this._onInputChange}
-								value={this.state.chatMessage}
-								autoComplete="off"
-							/>
-						</form> */}
 						<BottomInfo
 							clientVersion={this.props.clientVersion}
 							serverVersion={this.props.serverVersion}
@@ -110,6 +86,7 @@ export class Chat extends Component<AllProps, IChatComponentState> {
 	private readonly _onKeydown = (e: KeyboardEvent) => {
 		if (e.repeat) return
 		if (e.key === 'Enter' && this.state.isChatFocused === false && this.chatInputRef) {
+			if (document.activeElement && document.activeElement.tagName.toLowerCase() === 'input') return
 			this.chatInputRef.focus()
 			e.preventDefault()
 		}
@@ -119,35 +96,6 @@ export class Chat extends Component<AllProps, IChatComponentState> {
 	private readonly _onBlur = () => this.setState({isChatFocused: false})
 
 	private readonly _onFocus = () => this.setState({isChatFocused: true})
-
-	// Name
-	private readonly _onNameInputBlur = () => this.setState({username: this.props.author})
-
-	private readonly _onNameInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const newValue = e.target.value
-			.replace(/ +(?= )/g, '')
-			.substring(0, maxUsernameLength)
-
-		if (newValue === this.state.username) return
-
-		this.setState({username: newValue})
-
-		if (newValue === '' || newValue.length !== newValue.trim().length) return
-
-		this.props.dispatch(setLocalClientName(newValue))
-	}
-
-	private readonly _onSubmitNameChange = (e: React.FormEvent<HTMLFormElement>) => {
-		e.preventDefault()
-
-		if (this.state.username === '') return
-
-		this.setState({username: this.state.username.trim()})
-
-		this.props.dispatch(setLocalClientName(this.state.username))
-
-		return (document.activeElement as HTMLElement).blur()
-	}
 
 	// Chat
 	private readonly _onInputChange = (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -217,7 +165,6 @@ const BottomInfo = React.memo(function _BottomInfo(props: BottomInfoProps) {
 export const ConnectedChat = connect((state: IClientAppState): ReduxProps => ({
 	author: selectLocalClient(state).name,
 	authorColor: selectLocalClient(state).color,
-	authorId: selectLocalClient(state).id,
 	clientVersion: selectClientInfo(state).clientVersion,
 	serverVersion: selectClientInfo(state).serverVersion,
 }))(Chat)
