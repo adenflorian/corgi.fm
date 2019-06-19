@@ -1,6 +1,5 @@
 import * as React from 'react'
 import {useEffect} from 'react'
-import {ShamuBorder} from '../Panel/Panel'
 import './Modal.less'
 
 interface Props {
@@ -29,7 +28,6 @@ export const Modal = React.memo(function _Modal({onHide, children, className}: P
 				<div className="modalPanelInner" >
 					{children}
 				</div>
-				<ShamuBorder saturate={false} />
 			</div>
 		</div>
 	)

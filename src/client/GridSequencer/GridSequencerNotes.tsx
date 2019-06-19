@@ -56,9 +56,6 @@ export const GridSequencerNotes = (props: IGridSequencerNotesAllProps) => {
 						return <div
 							key={i}
 							className={`row ${isWhiteKey(note) ? 'white' : 'black'}`}
-							style={{
-								// borderRadius: 4,
-							}}
 						/>
 					})}
 				</div>

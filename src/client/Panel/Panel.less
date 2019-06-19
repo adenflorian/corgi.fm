@@ -3,7 +3,6 @@
 
 @labelHeight: 24px;
 @labelBorderSize: 0px;
-@cornerRadius: 8px;
 
 // @panelBorder: {
 //     border: 2px solid white;
@@ -14,7 +13,7 @@
     width: 100%;
     height: 100%;
     background-color: @panelGray;
-    border-radius: @cornerRadius;
+    border-radius: @mainBorderRadius;
     @panelShadow();
 
     // .label, .panel {
@@ -36,8 +35,8 @@
         pointer-events: all;
         // border-bottom: @labelBorderSize solid currentColor;
         // text-align: left;
-        border-top-left-radius: @cornerRadius;
-        border-top-right-radius: @cornerRadius;
+        border-top-left-radius: @mainBorderRadius;
+        border-top-right-radius: @mainBorderRadius;
         // border-bottom: none;
 
         .colorDot {

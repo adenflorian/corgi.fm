@@ -1,4 +1,5 @@
 @import "../colors.less";
+@import "../AppCommon.less";
 
 .groupSequencer {
 	display: flex;
@@ -13,7 +14,7 @@
 		.groupEvent {
 			flex-grow: 1;
 			background-color: @panelGray;
-			border-radius: 8px;
+			border-radius: @mainBorderRadius;
 
 			// &:nth-child(odd) {
 			// 	filter: brightness(1.2);

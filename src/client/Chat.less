@@ -1,11 +1,9 @@
 @import "./colors.less";
 @import "./AppCommon.less";
 
-@borderRadius: 8px;
-
 @boxyThing: {
     background-color: @panelGray;
-    border-radius: @borderRadius;
+    border-radius: @mainBorderRadius;
     @panelShadow();
     padding: 0 8px;
     min-height: 32px;
@@ -70,7 +68,7 @@
                 cursor: text;
                 display: flex;
                 min-height: 32px;
-                border-radius: @borderRadius;
+                border-radius: @mainBorderRadius;
                 @panelShadow();
 
                 .author {
@@ -79,15 +77,15 @@
                     font-weight: 600;
                     padding: 8px;
                     background-color: @panelGrayDark;
-                    border-top-left-radius: @borderRadius;
-                    border-bottom-left-radius: @borderRadius;
+                    border-top-left-radius: @mainBorderRadius;
+                    border-bottom-left-radius: @mainBorderRadius;
                 }
 
                 .text {
                     padding: 8px;
                     background-color: @panelGray;
-                    border-top-right-radius: @borderRadius;
-                    border-bottom-right-radius: @borderRadius;
+                    border-top-right-radius: @mainBorderRadius;
+                    border-bottom-right-radius: @mainBorderRadius;
                     font-weight: initial;
                     text-transform: initial;
                     // letter-spacing: 0.4px;
@@ -172,7 +170,7 @@
     flex-direction: row;
     .largeFont();
     font-weight: 600;
-    border-radius: @borderRadius;
+    border-radius: @mainBorderRadius;
     @panelShadow();
     min-height: 32px;
 
@@ -185,8 +183,8 @@
     .info-corgi {
         color: @brightBlue;
         background-color: @panelGrayDark;
-        border-top-left-radius: @borderRadius;
-        border-bottom-left-radius: @borderRadius;
+        border-top-left-radius: @mainBorderRadius;
+        border-bottom-left-radius: @mainBorderRadius;
         
         &.info-corgiTest {
             // color: @green;
@@ -201,8 +199,8 @@
     .info-version {
         color: @defaultGray;
         background-color: @panelGrayDark;
-        border-top-right-radius: @borderRadius;
-        border-bottom-right-radius: @borderRadius;
+        border-top-right-radius: @mainBorderRadius;
+        border-bottom-right-radius: @mainBorderRadius;
 
         &.info-versionMismatch {
             color: @defaultGray;
