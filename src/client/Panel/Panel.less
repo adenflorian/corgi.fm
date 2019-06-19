@@ -4,11 +4,6 @@
 @labelHeight: 24px;
 @labelBorderSize: 0px;
 
-// @panelBorder: {
-//     border: 2px solid white;
-//     box-sizing: border-box;
-// }
-
 .panelContainer{
     width: 100%;
     height: 100%;
@@ -16,31 +11,21 @@
     border-radius: @mainBorderRadius;
     @panelShadow();
 
-    // .label, .panel {
-    //     @panelBorder();
-    // }
-
     .header {
         display: flex;
         flex-direction: row;
         justify-content: auto;
         align-items: center;
-        // .smallFont();
         .largeFont();
+        font-weight: 400;
         background-color: @panelGrayDark;
         height: @labelHeight;
-        // position: absolute;
-        // top: -@labelHeight - @labelBorderSize + 1;
         width: 100%;
         pointer-events: all;
-        // border-bottom: @labelBorderSize solid currentColor;
-        // text-align: left;
         border-top-left-radius: @mainBorderRadius;
         border-top-right-radius: @mainBorderRadius;
-        // border-bottom: none;
 
         .colorDot {
-            // justify-self: flex-start;
             width: 8px;
             height: 8px;
             border-radius: 4px;
@@ -49,17 +34,13 @@
         }
 
         .label {
-            // justify-self: flex-start;
             margin-left: 6px;
-            // font-weight: 600;
         }
 
         .helpText {
-            // justify-self: flex-end;
             margin-left: auto;
             color: @panelGrayLight;
             width: 32px;
-            // font-size: small;
         }
     }
 

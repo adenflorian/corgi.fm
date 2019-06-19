@@ -30,6 +30,7 @@
     "setup-prod-server": "bash scripts/setup-prod-server.sh"
   },
   "dependencies": {
+    "@types/moment": "^2.13.0",
     "adsr": "^1.0.1",
     "animal-id": "^0.0.1",
     "autoprefixer": "^9.4.2",
@@ -43,6 +44,7 @@
     "immutable": "^4.0.0-rc.12",
     "lodash": "^4.17.11",
     "midi-writer-js": "^1.6.0",
+    "moment": "^2.24.0",
     "pkginfo": "^0.4.1",
     "prop-types": "^15.6.1",
     "query-string": "^6.1.0",

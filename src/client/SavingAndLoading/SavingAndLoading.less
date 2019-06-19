@@ -2,24 +2,109 @@
 @import "../AppCommon.less";
 
 .loadRoomUI {
+	.modalSectionLabel {
+		color: @green;
+	}
 	.saves {
-		margin-top: 16px;
-		
-		.localSave, .noSaves {
-			margin: 16px 0;
-			display: flex;
-			flex-wrap: nowrap;
-			white-space: nowrap;
-			align-items: center;
-			height: 32px;
-			justify-content: space-between;
+		margin: 16px 0;
 
-			.deleteSave {
-				color: @red;
+		& > * + * {
+			margin-top: 16px;
+		}
+		
+		.localSave {
+			display: flex;
+			border-radius: @mainBorderRadius;
+			height: 32px;
+			background-color: @panelGray;
+			@panelShadow();
+
+			.load {
+				display: flex;
+				border-top-left-radius: @mainBorderRadius;
+				border-bottom-left-radius:  @mainBorderRadius;
+
+				&:hover {
+					border: 2px solid @brightBlue;
+					border-right: none;
+					box-sizing: border-box;
+					& > *:first-child {
+						padding-left: 6px;
+					}
+				}
 			}
 
-			button {
-				font-size: 1em;
+			&:hover .load:not(:hover) {
+				border: 2px solid @red;
+				border-right: none;
+				box-sizing: border-box;
+				& > *:first-child {
+					padding-left: 6px;
+				}
+			}
+
+			.load:hover + .delete {
+				background-color: @brightBlue;
+
+				& span {
+					display: none;
+				}
+			}
+
+			.load:hover + .delete::after {
+				content: 'Load';
+			}
+
+			.delete, .load > * {
+				padding: 0 8px;
+				display: flex;
+				align-items: center;
+				white-space: nowrap;
+				cursor: pointer;
+
+				&:first-child {
+					border-top-left-radius: @mainBorderRadius;
+					border-bottom-left-radius:  @mainBorderRadius;
+				}
+				&:last-child {
+					border-top-right-radius: @mainBorderRadius;
+					border-bottom-right-radius:  @mainBorderRadius;
+				}
+			}
+
+			.blue {
+			}
+
+			.room {
+				background-color: @panelGray;
+				font-weight: 600;
+				color: @brightBlue;
+				width: 192px;
+				&:hover {
+					border-right: none;
+				}
+			}
+			.date {
+				background-color: @panelGray;
+				width: 288px;
+				&:hover {
+					border-right: none;
+					border-left: none;
+				}
+			}
+			.version {
+				background-color: @panelGray;
+				width: 96px;
+				&:hover {
+					border-right: none;
+					border-left: none;
+				}
+			}
+			.delete {
+				background-color: @red;
+				color: @panelGray;
+				font-weight: 600;
+				min-width: 56px;
 			}
 		}
 	}

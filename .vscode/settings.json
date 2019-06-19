@@ -91,6 +91,7 @@
         "graphviz",
         "hashbow",
         "hitbox",
+        "hsla",
         "immer",
         "initialise",
         "input",

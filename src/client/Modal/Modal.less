@@ -22,12 +22,15 @@
 	user-select: text;
 
 	.modalPanelInner {
-		background-color: @panelGray;
-		padding: 16px;
 		font-size: 1.2em;
 
 		.modalSection {
 			margin: 32px 0;
+			background-color: @panelGray;
+			border-radius: @mainBorderRadius;
+			padding: 16px;
+			padding-bottom: 1px;
+			@panelShadow();
 
 			&:first-child {
 				margin-top: 0;
@@ -40,12 +43,20 @@
 				.largeFont();
 				font-size: 1.4em;
 				line-height: 1.2em;
+				background-color: @panelGrayDark;
+				margin: -16px -16px 0 -16px;
+				padding: 16px 16px 0 16px;
+				border-top-left-radius: @mainBorderRadius;
+				border-top-right-radius: @mainBorderRadius;
 			}
 			.modalSectionSubLabel {
 				text-align: left;
 				font-size: 1.0em;
 				line-height: 1.2em;
 				color: @subtleGrayBlackBg;
+				background-color: @panelGrayDark;
+				margin: 0 -16px;
+				padding: 0 16px 16px 16px;
 			}
 		}
 	}

@@ -8,8 +8,8 @@
 - [√] chat input min width
 - [ ] make select have label on left side with darker background
 - [ ] grid sequencer
-- [ ] options
-- [ ] loading modal
+- [√] options
+- [√] loading modal
 - [ ] Connecting...
 - [ ] pan and detune knob arcs should start from center
 
@@ -32,6 +32,10 @@
 - [ ] coarse knob to instruments
 - [ ] only enable audio after user acknowledges what they are getting themselves into
 - [ ] project wide macro knobs/control panel
+
+# Later
+- [ ] save picture of room in save file
+- [ ] make little illustrations for empty stuff, like for when you have no friends or no saves
 
 # Goals
 - [ ] be able to recreate certain songs
