@@ -1,4 +1,5 @@
 # Redesign
+- [√] title bar on nodes
 - [√] put "corgi.fm" in bottom right by version
 - [√] chat
 - [√] put name in top right
@@ -10,6 +11,7 @@
 - [ ] options
 - [ ] loading modal
 - [ ] Connecting...
+- [ ] pan and detune knob arcs should start from center
 
 # Now
 - [ ] polish group sequencer
@@ -20,8 +22,6 @@
 	
 # Soon
 - [ ] switch to jest
-- [ ] pan and detune knob arcs should start from center
-- [ ] title bar on nodes
 - [ ] sync client clocks
 - [ ] make submenu for creating grid sequencer with preset sizes
 - [ ] deploy script should check if anyone is on the server first
