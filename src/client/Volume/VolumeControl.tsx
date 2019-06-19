@@ -1,11 +1,12 @@
+import {stripIndents} from 'common-tags'
 import 'rc-slider/assets/index.css'
-import {Component} from 'react'
 import React = require('react')
+import {Component} from 'react'
 import {connect} from 'react-redux'
 import {Action, Dispatch} from 'redux'
 import {ConnectionNodeType} from '../../common/common-types'
-import {getConnectionNodeInfo, IClientAppState} from '../../common/redux'
 import {setOptionMasterVolume} from '../../common/redux'
+import {getConnectionNodeInfo, IClientAppState} from '../../common/redux'
 import {MASTER_AUDIO_OUTPUT_TARGET_ID} from '../../common/redux'
 import {percentageValueString} from '../client-constants'
 import {Knob} from '../Knob/Knob'
@@ -47,7 +48,9 @@ export class VolumeControl extends Component<IVolumeControlAllProps> {
 					max={0.5}
 					markColor={color}
 					size={80}
-					tooltip="local master volume\nwill only control the volume for you\nit won't affect other users"
+					tooltip={stripIndents`local master volume
+						will only control the volume for you
+						it won't affect other users`}
 					label=""
 					valueString={percentageValueString}
 				/>

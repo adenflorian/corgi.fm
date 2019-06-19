@@ -42,7 +42,7 @@ export const SimpleReverbView: React.FC<ISimpleReverbAllProps> =
 					}}
 				>
 					<Knob
-						label="time"
+						label="Time"
 						min={0}
 						max={30}
 						curve={3}
@@ -54,7 +54,7 @@ export const SimpleReverbView: React.FC<ISimpleReverbAllProps> =
 						valueString={adsrValueToString}
 					/>
 					<Knob
-						label="filter"
+						label="Filter"
 						min={0}
 						max={20000}
 						curve={2}
