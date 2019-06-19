@@ -29,7 +29,7 @@ function updateFpsDisplay() {
 	const fps = Math.ceil(1000 / frameTime)
 
 	if (fpsNode) {
-		fpsNode.textContent = 'FPS ' + fps
+		fpsNode.textContent = fps.toString()
 	}
 
 	simpleGlobalClientState.setMaxFps(fps)

@@ -26,13 +26,29 @@ type AllProps = ReduxProps & {dispatch: Dispatch}
 export const TopDiv = ({memberCount, clientCount, info, isClientReady, dispatch}: AllProps) =>
 	<div id="topDiv" style={{marginBottom: 'auto'}}>
 		<div className="left">
-			<div>{info}</div>
-			<div id="fps" style={{width: 180, overflow: 'hidden'}}>FPS</div>
-			<div style={{width: 180, overflow: 'hidden'}}>Zoom <span id="zoomText">1</span></div>
-			<div>{memberCount} Room Member{memberCount > 1 ? 's' : ''}</div>
-			<div>{clientCount} Total User{clientCount > 1 ? 's' : ''}</div>
+			<div className="blob">
+				<div className="blobDark">WebSocket</div>
+				<div>{info}</div>
+			</div>
+			<div className="blob">
+				<div className="blobDark" title="frames per second">FPS</div>
+				<div id="fps" style={{width: 32, overflow: 'hidden'}}></div>
+			</div>
+			<div className="blob" style={{overflow: 'hidden'}}>
+				<span className="blobDark">Zoom</span>
+				<span id="zoomText">1</span>
+			</div>
+			<div className="blob">
+				<div className="blobDark">Room Members</div>
+				<div>{memberCount}</div>
+			</div>
+			<div className="blob">
+				<div className="blobDark">Total Members</div>
+				<div>{clientCount}</div>
+			</div>
 			{!isClientReady &&
 				<div
+					className="blob"
 					style={{
 						fontSize: '1.4em',
 						lineHeight: '1.2em',
