@@ -71,7 +71,10 @@ export function SliderController(props: ISliderControllerProps) {
 	}
 
 	function _normalize(n: number, useCurve = true) {
+		if (n === 0) return 0
+
 		const x = (n - min) / (max - min)
+
 		if (useCurve) {
 			return clamp(Math.pow(x, 1 / curve))
 		} else {
