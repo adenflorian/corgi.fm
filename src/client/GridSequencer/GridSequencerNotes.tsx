@@ -13,6 +13,7 @@ import {getColorStringForMidiNote} from '../../common/shamu-color'
 import {isLeftMouseButtonDown} from '../client-utils'
 import {isWhiteKey} from '../Keyboard/Keyboard'
 import {VerticalScrollBar} from '../Knob/VerticalScrollBar'
+import {getOctaveFromMidiNote, midiNoteToNoteName} from '../WebAudio'
 
 type GridSequencerEventHandler = (index: number, isEnabled: boolean, i2: number, e: React.MouseEvent) => void
 
@@ -49,6 +50,20 @@ export const GridSequencerNotes = (props: IGridSequencerNotesAllProps) => {
 
 	return (
 		<React.Fragment>
+			<div className="noteNamesSidebar">
+				{new Array(notesToShow).fill(0).map((_, i) => {
+					const note = i + bottomNote
+					const noteName = midiNoteToNoteName(note)
+					return (
+						<div
+							key={i}
+							className={`noteName ${isWhiteKey(note) ? 'white' : 'black'} ${noteName.toLowerCase() === 'c' ? 'c' : ''}`}
+						>
+							{noteName + getOctaveFromMidiNote(note)}
+						</div>
+					)
+				})}
+			</div>
 			<div className="eventsBox">
 				<div className="pianoRoll">
 					{new Array(notesToShow).fill(0).map((_, i) => {

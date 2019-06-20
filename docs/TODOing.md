@@ -22,6 +22,7 @@
 - [ ] "show older messages" button
 	
 # Soon
+- [ ] use synesthesia colors
 - [ ] refactor shamu graph state to be able to enable/disable any node
 - [ ] switch to jest
 - [ ] sync client clocks

@@ -43,6 +43,33 @@
         }
     }
 
+    .noteNamesSidebar {
+        display: flex;
+        flex-direction: column-reverse;
+        .noteName {
+            width: 16px;
+            height: @rowHeight;
+            font-size: 8px;
+            line-height: 1em;
+            color: #0000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            &.black {
+                background-color: @panelGrayDark;
+            }
+
+            &.white {
+                background-color: @panelGrayLight;
+            }
+
+            &:hover {
+                color: @defaultGray;
+            }
+        }
+    }
+
     .eventsBox {
         position: relative;
 

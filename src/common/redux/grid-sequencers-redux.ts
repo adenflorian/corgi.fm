@@ -78,11 +78,13 @@ export interface IGridSequencers extends IMultiStateThings {
 export class GridSequencerState extends SequencerStateBase {
 	// public static defaultWidth = 552
 	// public static defaultHeight = 234
+	public static noteNamesSideBarWidth = 16
 	public static noteWidth = 8
 	public static scrollBarWidth = 16
 	public static noteHeight = 8
 	public static controlsWidth = 180
 	public static getWidth = (notesDisplayWidth: number) => GridSequencerState.controlsWidth +
+		GridSequencerState.noteNamesSideBarWidth +
 		notesDisplayWidth +
 		GridSequencerState.scrollBarWidth
 
