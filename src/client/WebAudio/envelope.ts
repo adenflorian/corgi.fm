@@ -31,7 +31,7 @@ export function applyEnvelope(
 		sustainMultiplier,
 	)
 
-	sourceNode.stop(envelope.releaseEnd)
+	if (envelope.releaseEnd !== undefined) sourceNode.stop(envelope.releaseEnd)
 }
 
 function _applyEnvelopeToGain(
@@ -65,7 +65,6 @@ function _applyEnvelopeToGain(
 		// audioParam.cancelScheduledValues(audioContext.currentTime)
 
 		// Before attack
-		audioParam.value = 0
 		audioParam.linearRampToValueAtTime(0, attackStart)
 
 		// Attack
@@ -73,6 +72,8 @@ function _applyEnvelopeToGain(
 
 		// Decay
 		audioParam.linearRampToValueAtTime(actualSustain, decayEnd)
+
+		if (releaseStart === undefined || releaseEnd === undefined) return
 
 		// Sustain until release start
 		audioParam.linearRampToValueAtTime(actualSustain, releaseStart)
@@ -125,30 +126,30 @@ function _applyEnvelopeToGain(
 
 	return
 
-	if (stage === EnvelopeStage.sustain) {
-		_cancelAndHoldOrJustCancelAtTime(audioParam, audioContext.currentTime)
+	// if (stage === EnvelopeStage.sustain) {
+	// 	_cancelAndHoldOrJustCancelAtTime(audioParam, audioContext.currentTime)
 
-		// Sustain until release start
-		audioParam.linearRampToValueAtTime(actualSustain, releaseStart)
+	// 	// Sustain until release start
+	// 	audioParam.linearRampToValueAtTime(actualSustain, releaseStart)
 
-		// Release
-		audioParam.exponentialRampToValueAtTime(0.00001, releaseEnd)
+	// 	// Release
+	// 	audioParam.exponentialRampToValueAtTime(0.00001, releaseEnd)
 
-		return
-	}
+	// 	return
+	// }
 
-	if (stage === EnvelopeStage.release) {
-		_cancelAndHoldOrJustCancelAtTime(audioParam, audioContext.currentTime)
+	// if (stage === EnvelopeStage.release) {
+	// 	_cancelAndHoldOrJustCancelAtTime(audioParam, audioContext.currentTime)
 
-		// Release
-		audioParam.exponentialRampToValueAtTime(0.00001, releaseEnd)
+	// 	// Release
+	// 	audioParam.exponentialRampToValueAtTime(0.00001, releaseEnd)
 
-		return
-	}
+	// 	return
+	// }
 
-	if (stage === EnvelopeStage.afterRelease) {
-		return
-	}
+	// if (stage === EnvelopeStage.afterRelease) {
+	// 	return
+	// }
 }
 
 function _determineEnvelopeStage(
@@ -162,6 +163,8 @@ function _determineEnvelopeStage(
 	if (currentTime < attackEnd) return EnvelopeStage.attack
 
 	if (currentTime < decayEnd) return EnvelopeStage.decay
+
+	if (releaseStart === undefined || releaseEnd === undefined) return EnvelopeStage.sustain
 
 	if (currentTime < releaseStart) return EnvelopeStage.sustain
 
@@ -184,8 +187,8 @@ interface CreateScheduledEnvelopeArgs {
 	attackLength: number
 	decayLength: number
 	sustain: number
-	releaseStart: number
-	releaseLength: number
+	releaseStart?: number
+	releaseLength?: number
 	hardCutoffTime: number
 }
 
@@ -202,11 +205,11 @@ export function calculateScheduledEnvelope(
 ) {
 	const desiredAttackEnd = attackStart + attackLength
 
-	const actualAttackEnd = Math.min(desiredAttackEnd, releaseStart)
+	const actualAttackEnd = Math.min(desiredAttackEnd, releaseStart || Number.MAX_SAFE_INTEGER)
 
 	const actualDecayEnd = actualAttackEnd + decayLength
 
-	const actualSustain = _calculateSustain(actualAttackEnd, attackStart, sustain, releaseStart)
+	const actualSustain = _calculateSustain(actualAttackEnd, attackStart, sustain, releaseStart || Number.MAX_SAFE_INTEGER)
 
 	// TODO Handle cutoff attack and cutoff release
 
@@ -216,7 +219,7 @@ export function calculateScheduledEnvelope(
 		decayEnd: actualDecayEnd,
 		sustain: actualSustain,
 		releaseStart,
-		releaseEnd: releaseStart + releaseLength,
+		releaseEnd: releaseStart === undefined || releaseLength === undefined ? undefined : releaseStart + releaseLength,
 		hardCutoffTime,
 	})
 }
@@ -239,8 +242,8 @@ class ScheduledEnvelope {
 	public readonly attackEnd: number
 	public readonly decayEnd: number
 	public readonly sustain: number
-	public readonly releaseStart: number
-	public readonly releaseEnd: number
+	public readonly releaseStart?: number
+	public readonly releaseEnd?: number
 	public readonly hardCutoffTime: number
 
 	constructor(
@@ -249,8 +252,8 @@ class ScheduledEnvelope {
 			attackEnd: number,
 			decayEnd: number,
 			sustain: number,
-			releaseStart: number,
-			releaseEnd: number,
+			releaseStart?: number,
+			releaseEnd?: number,
 			hardCutoffTime: number,
 		},
 	) {
@@ -270,6 +273,7 @@ class ScheduledEnvelope {
 	// }
 
 	public get releaseLength() {
+		if (this.releaseStart === undefined || this.releaseEnd === undefined) return Number.MAX_VALUE
 		return this.releaseEnd - this.releaseStart
 	}
 }

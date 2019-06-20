@@ -77,14 +77,16 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 	}
 
 	public readonly setAttack = (attackTimeInSeconds: number) => {
-		if (this._attackTimeInSeconds === attackTimeInSeconds) return
-		this._attackTimeInSeconds = attackTimeInSeconds
+		const clampedInput = Math.max(0.0001, attackTimeInSeconds)
+		if (this._attackTimeInSeconds === clampedInput) return
+		this._attackTimeInSeconds = clampedInput
 		this._getVoices().changeAttackLengthForScheduledVoices(this._attackTimeInSeconds)
 	}
 
 	public readonly setDecay = (decayTimeInSeconds: number) => {
-		if (this._decayTimeInSeconds === decayTimeInSeconds) return
-		this._decayTimeInSeconds = decayTimeInSeconds
+		const clampedInput = Math.max(0.0001, decayTimeInSeconds)
+		if (this._decayTimeInSeconds === clampedInput) return
+		this._decayTimeInSeconds = clampedInput
 		// TODO?
 		// this._getVoices().changeDecayLengthForScheduledVoices(this._decayTimeInSeconds)
 	}

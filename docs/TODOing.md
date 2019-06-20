@@ -34,6 +34,7 @@
 - [ ] project wide macro knobs/control panel
 
 # Later
+- [ ] Let people record midi from keyboard live, but don't play notes for others until it loops
 - [ ] save picture of room in save file
 - [ ] make little illustrations for empty stuff, like for when you have no friends or no saves
 

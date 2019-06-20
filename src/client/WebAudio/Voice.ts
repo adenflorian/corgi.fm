@@ -51,7 +51,6 @@ export abstract class Voice {
 		this._lowPassFilter.frequency.value = lowPassFilterCutoffFrequency
 
 		this._gain = this._audioContext.createGain()
-		this._gain.gain.setValueAtTime(0, this._audioContext.currentTime)
 
 		this._lowPassFilter.connect(this._gain)
 	}
@@ -112,8 +111,6 @@ export abstract class Voice {
 			attackLength: attackTimeInSeconds,
 			decayLength: decayTimeInSeconds,
 			sustain,
-			releaseStart: Number.MAX_VALUE,
-			releaseLength: 0,
 			hardCutoffTime: Number.MAX_VALUE,
 		})
 
@@ -204,23 +201,33 @@ export abstract class Voice {
 				// Not accurate for a curved release, will be too high
 				this._scheduledSustainAtReleaseEnd = this._scheduledSustainAtReleaseStart - (ratio * this._scheduledSustainAtReleaseStart)
 
+				const shortReleaseLength = 0.001
+				const cancelTime = this._scheduledReleaseEndTimeSeconds - shortReleaseLength
+
+				// TODO This won't work until that chrome bug fix goes live in chrome 72
+				this._cancelAndHoldOrJustCancelAtTime(cancelTime)
+				this._gain.gain.linearRampToValueAtTime(0, this._scheduledReleaseEndTimeSeconds)
+
 				audioNode.stop(Math.max(this._audioContext.currentTime + 0.001, this._scheduledReleaseEndTimeSeconds))
 				return
 			} else {
 				// Let it do normal release stuff
 			}
-		} else {
-			this._isReleaseScheduled = true
 		}
 
 		this._scheduledReleaseStartTimeSeconds = newReleaseStartTime
 		this._scheduledReleaseEndTimeSeconds = newReleaseEndTime
 
-		this._cancelAndHoldOrJustCancelAtTime(
-			releaseIfNotCurrentlyReleasing
-				? undefined
-				: Math.max(this._audioContext.currentTime + 0.0001, this._scheduledReleaseStartTimeSeconds),
-		)
+		let cancelled = false
+
+		if (this._isReleaseScheduled) {
+			this._cancelAndHoldOrJustCancelAtTime(
+				releaseIfNotCurrentlyReleasing
+					? undefined
+					: Math.max(this._audioContext.currentTime + 0.0001, this._scheduledReleaseStartTimeSeconds),
+			)
+			cancelled = true
+		}
 
 		const releaseStartIsDuringAttack = () => this._scheduledReleaseStartTimeSeconds <= this._scheduledAttackEndTimeSeconds
 		const releaseStartIsDuringDecay = () => !releaseStartIsDuringAttack() && this._scheduledReleaseStartTimeSeconds <= this._scheduledDecayEndTimeSeconds
@@ -235,6 +242,13 @@ export abstract class Voice {
 			this._scheduledAttackEndTimeSeconds = this._scheduledReleaseStartTimeSeconds
 			this._scheduledSustainAtDecayEnd = targetSustainAtReleaseStart
 			this._scheduledSustainAtReleaseStart = targetSustainAtReleaseStart
+
+			if (!cancelled) {
+				this._cancelAndHoldOrJustCancelAtTime(
+					Math.max(this._audioContext.currentTime + 0.0001, this._scheduledReleaseStartTimeSeconds),
+				)
+				cancelled = true
+			}
 		} else if (releaseStartIsDuringDecay()) {
 			// for linear decay only, need different math for other decay curves
 			// Not sure if this is actually doing anything...
@@ -246,9 +260,20 @@ export abstract class Voice {
 			this._scheduledDecayEndTimeSeconds = this._scheduledReleaseStartTimeSeconds
 			this._scheduledSustainAtDecayEnd = targetSustainAtReleaseStart
 			this._scheduledSustainAtReleaseStart = targetSustainAtReleaseStart
+
+			if (!cancelled) {
+				this._cancelAndHoldOrJustCancelAtTime(
+					Math.max(this._audioContext.currentTime + 0.0001, this._scheduledReleaseStartTimeSeconds),
+				)
+				cancelled = true
+			}
+		} else {
+			// if release is during sustain
+			this._gain.gain.linearRampToValueAtTime(this._scheduledSustainAtDecayEnd, this._scheduledReleaseStartTimeSeconds)
 		}
 
-		this._gain.gain.exponentialRampToValueAtTime(0.00001, Math.max(this._audioContext.currentTime + 0.001, this._scheduledReleaseEndTimeSeconds))
+		const rampEndTime = Math.max(this._audioContext.currentTime + 0.001, this._scheduledReleaseEndTimeSeconds)
+		this._gain.gain.exponentialRampToValueAtTime(0.00001, rampEndTime)
 
 		audioNode.stop(this._scheduledReleaseEndTimeSeconds)
 		audioNode.onended = () => {
@@ -257,6 +282,7 @@ export abstract class Voice {
 			if (this._gain) delete this._gain
 			this._onEnded(this.id)
 		}
+		this._isReleaseScheduled = true
 	}
 
 	public changeScheduledAttack(newAttackSeconds: number) {
@@ -265,27 +291,27 @@ export abstract class Voice {
 		return
 
 		// If attack already finished
-		if (this.scheduledEnvelope!.attackEnd < this._audioContext.currentTime) return
+		// if (this.scheduledEnvelope!.attackEnd < this._audioContext.currentTime) return
 
-		const newEnv = calculateScheduledEnvelope({
-			attackStart: this.scheduledEnvelope!.attackStart,
-			attackLength: newAttackSeconds,
-			decayLength: this.scheduledEnvelope!.decayEnd,
-			sustain: this.scheduledEnvelope!.sustain,
-			releaseStart: this.scheduledEnvelope!.releaseStart,
-			releaseLength: this.scheduledEnvelope!.releaseLength,
-			hardCutoffTime: this.scheduledEnvelope!.hardCutoffTime,
-		})
+		// const newEnv = calculateScheduledEnvelope({
+		// 	attackStart: this.scheduledEnvelope!.attackStart,
+		// 	attackLength: newAttackSeconds,
+		// 	decayLength: this.scheduledEnvelope!.decayEnd,
+		// 	sustain: this.scheduledEnvelope!.sustain,
+		// 	releaseStart: this.scheduledEnvelope!.releaseStart,
+		// 	releaseLength: this.scheduledEnvelope!.releaseLength,
+		// 	hardCutoffTime: this.scheduledEnvelope!.hardCutoffTime,
+		// })
 
-		applyEnvelope(
-			this.scheduledEnvelope,
-			newEnv,
-			this._gain.gain,
-			this.getAudioScheduledSourceNode()!,
-			this._audioContext,
-		)
+		// applyEnvelope(
+		// 	this.scheduledEnvelope,
+		// 	newEnv,
+		// 	this._gain.gain,
+		// 	this.getAudioScheduledSourceNode()!,
+		// 	this._audioContext,
+		// )
 
-		this._scheduledEnvelope = newEnv
+		// this._scheduledEnvelope = newEnv
 	}
 
 	public abstract dispose(): void

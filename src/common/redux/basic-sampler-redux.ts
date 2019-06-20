@@ -68,8 +68,8 @@ export class BasicSamplerState implements IConnectable, NodeSpecialState {
 	public readonly pan: number = Math.random() - 0.5
 	public readonly lowPassFilterCutoffFrequency: number = Math.min(10000, Math.random() * 10000 + 1000)
 	public readonly attack: number = 0.01
-	public readonly decay: number = 0.25
-	public readonly sustain: number = 0.8
+	public readonly decay: number = 0
+	public readonly sustain: number = 1
 	public readonly release: number = 1
 	public readonly detune: number = 0
 	public readonly gain: number = 0.5
