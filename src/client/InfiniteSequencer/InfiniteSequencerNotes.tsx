@@ -1,8 +1,11 @@
-import React from 'react'
+import React, {useLayoutEffect, useState} from 'react'
 import {Dispatch} from 'redux'
 import {MidiClipEvents} from '../../common/midi-types'
 import {IMidiNote} from '../../common/MidiNote'
-import {findLowestAndHighestNotes, InfiniteSequencerStyle, selectInfiniteSequencer, shamuConnect} from '../../common/redux'
+import {
+	findLowestAndHighestNotes, infiniteSequencerActions,
+	InfiniteSequencerStyle, selectInfiniteSequencer, shamuConnect,
+} from '../../common/redux'
 import {getColorStringForMidiNote} from '../../common/shamu-color'
 import {isWhiteKey} from '../Keyboard/Keyboard'
 import {getOctaveFromMidiNote, midiNoteToNoteName} from '../WebAudio'
@@ -19,7 +22,17 @@ interface ReduxProps {
 
 type AllProps = Props & ReduxProps & {dispatch: Dispatch}
 
-export function InfiniteSequencerNotes({style, events, showRows}: AllProps) {
+const sensitivity = 0.1
+const threshold = 1
+
+export function InfiniteSequencerNotes({id, style, events, showRows, dispatch}: AllProps) {
+
+	const [selectedEvent, setSelectedEvent] = useState({
+		isSelected: false,
+		index: -1,
+	})
+
+	const [mouseDelta, setMouseDelta] = useState({x: 0, y: 0})
 
 	const {lowestNote, highestNote} = findLowestAndHighestNotes(events)
 	const numberOfPossibleNotes = highestNote - lowestNote + 1
@@ -30,6 +43,51 @@ export function InfiniteSequencerNotes({style, events, showRows}: AllProps) {
 		for (let i = highestNote; i >= lowestNote; i--) {
 			rows.push(i)
 		}
+	}
+
+	useLayoutEffect(() => {
+		if (selectedEvent.isSelected) {
+			window.addEventListener('mousemove', handleMouseMove)
+		}
+
+		return () => {
+			window.removeEventListener('mousemove', handleMouseMove)
+		}
+	}, [selectedEvent, mouseDelta, events])
+
+	const handleMouseDown = (event: React.MouseEvent, note: IMidiNote, index: number) => {
+		if (note < 0) return
+
+		setSelectedEvent({
+			isSelected: true,
+			index,
+		})
+
+	}
+
+	const handleMouseMove = (event: MouseEvent) => {
+		if (!selectedEvent.isSelected) return
+
+		if (event.buttons !== 1) return setSelectedEvent({isSelected: false, index: -1})
+
+		const newMouseDelta = {
+			x: mouseDelta.x + event.movementX,
+			y: mouseDelta.y - event.movementY,
+		}
+
+		const delta = newMouseDelta.y * sensitivity
+
+		if (Math.abs(delta) > threshold) {
+			const index = selectedEvent.index
+			const oldNote = events.get(index)!.notes.first(-1)
+
+			const newNote = oldNote + (delta > 0 ? 1 : -1)
+			dispatch(infiniteSequencerActions.setNote(id, selectedEvent.index, true, newNote))
+			setMouseDelta({x: 0, y: 0})
+		} else {
+			setMouseDelta(newMouseDelta)
+		}
+
 	}
 
 	if (style === InfiniteSequencerStyle.colorBars) {
@@ -68,9 +126,11 @@ export function InfiniteSequencerNotes({style, events, showRows}: AllProps) {
 					{events.map(x => x.notes.first(-1)).map((note, index) =>
 						<ColorGridNote
 							note={note}
+							index={index}
 							key={index}
 							height={noteHeightPercentage + (note === lowestNote ? 1 : 0)}
 							top={(highestNote - note) * noteHeightPercentage}
+							onMouseDown={handleMouseDown}
 						/>,
 					)}
 				</div>
@@ -94,10 +154,15 @@ export function InfiniteSequencerNotes({style, events, showRows}: AllProps) {
 	}
 }
 
+type HandleMouseDown = (event: React.MouseEvent, note: IMidiNote, index: number) => void
+
 const ColorGridNote = React.memo(
-	function _ColorGridNote({note, height, top}: {note: IMidiNote, height: number, top: number}) {
+	function _ColorGridNote({note, index, height, top, onMouseDown}: {note: IMidiNote, index: number, height: number, top: number, onMouseDown: HandleMouseDown}) {
 		return (
-			<div className={`event noDrag`}>
+			<div
+				className={`event noDrag`}
+				onMouseDown={e => onMouseDown(e, note, index)}
+			>
 				<div
 					className={`note`}
 					style={{

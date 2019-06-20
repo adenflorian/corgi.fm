@@ -1,4 +1,4 @@
-import {List, Stack} from 'immutable'
+import {List, Set, Stack} from 'immutable'
 import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
 import {ConnectionNodeType, IMultiStateThing} from '../common-types'
@@ -195,7 +195,7 @@ function infiniteSequencerReducer(
 							if (action.enabled) {
 								return {
 									...event,
-									notes: event.notes.add(action.note),
+									notes: Set([action.note]),
 								}
 							} else {
 								return {
