@@ -59,15 +59,26 @@
 				.event {
 					min-width: 1px;
 					min-height: 1px;
+					height: 100%;
 					width: 100%;
-					display: flex;
-					justify-content: center;
-					align-items: center;
-					position: relative;
-					flex-grow: 1;
+
+					.note {
+						display: flex;
+						justify-content: center;
+						align-items: center;
+						flex-grow: 1;
+						position: relative;
+						min-height: 1px;
+						width: 100%;
+						border-radius: 2px,
+					}
 
 					&.active {
 						filter: brightness(120%)
+					}
+
+					&:hover {
+						background-color: @panelGrayLight;
 					}
 				}
 

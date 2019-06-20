@@ -1,4 +1,4 @@
-import {stripIndent, stripIndents} from 'common-tags'
+import {stripIndents} from 'common-tags'
 import {List} from 'immutable'
 import _ from 'lodash'
 import * as React from 'react'
@@ -8,30 +8,25 @@ import {
 } from 'react-icons/io'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
-import {MidiClipEvents} from '../../common/midi-types'
-import {IMidiNote} from '../../common/MidiNote'
 import {
-	findLowestAndHighestNotes, globalClockActions, IClientAppState,
+	globalClockActions, IClientAppState,
 	infiniteSequencerActions, InfiniteSequencerFields, InfiniteSequencerState,
 	InfiniteSequencerStyle, selectConnectionSourceColorByTargetId, selectGlobalClockState, selectInfiniteSequencer, sequencerActions,
 } from '../../common/redux'
-import {getColorStringForMidiNote} from '../../common/shamu-color'
-import {percentageValueString, seqGateValueToString, seqPitchValueToString, seqRateValueToString, sequencerGateToolTip, sequencerPitchToolTip, sequencerRateToolTip} from '../client-constants'
-import {isWhiteKey} from '../Keyboard/Keyboard'
+import {percentageValueString, seqPitchValueToString, seqRateValueToString, sequencerGateToolTip, sequencerPitchToolTip, sequencerRateToolTip} from '../client-constants'
 import {Knob} from '../Knob/Knob'
 import {KnobSnapping} from '../Knob/KnobSnapping'
 import {Panel} from '../Panel/Panel'
-import {getOctaveFromMidiNote, midiNoteToNoteName, rateValues} from '../WebAudio/music-functions'
+import {rateValues} from '../WebAudio/music-functions'
 import './InfiniteSequencer.less'
+import {ConnectedInfiniteSequencerNotes} from './InfiniteSequencerNotes'
 
 interface IInfiniteSequencerProps {
 	id: string
 }
 
 interface IInfiniteSequencerReduxProps {
-	activeIndex: number
 	color: string
-	events: MidiClipEvents
 	gate: number
 	isPlaying: boolean
 	isRecording: boolean
@@ -47,35 +42,10 @@ type IInfiniteSequencerAllProps =
 
 export const InfiniteSequencer: React.FC<IInfiniteSequencerAllProps> = React.memo(
 	function _InfiniteSequencer(props) {
-		const {color, isPlaying, id, isRecording, style, events, name, rate, dispatch} = props
-
-		const {lowestNote, highestNote} = findLowestAndHighestNotes(events)
-		const numberOfPossibleNotes = highestNote - lowestNote + 1
-		const noteHeightPercentage = 100 / numberOfPossibleNotes
-		const rows = [] as any[]
-
-		if (events.count() > 0) {
-			for (let i = highestNote; i >= lowestNote; i--) {
-				rows.push(i)
-			}
-		}
+		const {color, isPlaying, id, isRecording, name, dispatch} = props
 
 		const dispatchInfiniteSeqParam = (paramType: InfiniteSequencerFields, value: number | boolean | string) =>
 			dispatch(infiniteSequencerActions.setField(id, paramType, value))
-
-		const ColorGridNote = React.memo(function _ColorGridNote({note, index}: {note: IMidiNote, index: number}) {
-			return (
-				<div
-					className={`event ${props.activeIndex === index ? 'active' : ''}`}
-					style={{
-						backgroundColor: note === -1 ? 'none' : getColorStringForMidiNote(note),
-						height: `${noteHeightPercentage + (note === lowestNote ? 1 : 0)}%`,
-						top: `${(highestNote - note) * noteHeightPercentage}%`,
-						borderRadius: 2,
-					}}
-				/>
-			)
-		})
 
 		return render()
 
@@ -194,62 +164,7 @@ export const InfiniteSequencer: React.FC<IInfiniteSequencerAllProps> = React.mem
 								/>
 							</div>
 						</div>
-						{style === InfiniteSequencerStyle.colorBars &&
-							<div className={`display ${props.events.count() > 8 ? 'small' : ''}`}>
-								<div className="notes">
-									{props.events.map((event, index) => {
-										const note = event.notes.first(-1)
-
-										return (
-											< div
-												key={index}
-												className={`event ${props.activeIndex === index ? 'active' : ''} largeFont`}
-												style={{
-													backgroundColor: note === -1 ? 'none' : getColorStringForMidiNote(note),
-													borderRadius: 4,
-												}}
-											>
-												{note === -1
-													? undefined
-													: props.events.count() <= 8
-														? midiNoteToNoteName(note) + getOctaveFromMidiNote(note)
-														: undefined
-												}
-											</div>
-										)
-									},
-									)}
-								</div>
-							</div>
-						}
-						{style === InfiniteSequencerStyle.colorGrid &&
-							<div className={`display ${props.events.count() > 8 ? 'small' : ''}`}>
-								<div className="notes">
-									{props.events.map(x => x.notes.first(-1)).map((note, index) =>
-										<ColorGridNote note={note} index={index} key={index} />,
-									)}
-								</div>
-								{props.showRows &&
-									<div className="rows">
-										{rows.map(note => (
-											<div
-												key={note}
-												className={`row ${isWhiteKey(note) ? 'white' : 'black'}`}
-												style={{
-													height: `${noteHeightPercentage + (note === lowestNote ? 1 : 0)}%`,
-													top: `${(highestNote - note) * noteHeightPercentage}%`,
-													width: '100%',
-												}}
-											/>
-										))}
-									</div>
-								}
-								{/* <ConnectedSequencerTimeBar
-									isArmed={isPlaying}
-									lengthBeats={props.events.count()}
-								/> */}
-							</div>
-						}
+						<ConnectedInfiniteSequencerNotes id={id} />
 					</Panel>
 				</div >
 			)
@@ -262,10 +177,6 @@ export const ConnectedInfiniteSequencer = connect(
 		const infiniteSequencerState = selectInfiniteSequencer(state.room, props.id)
 
 		return {
-			events: infiniteSequencerState.midiClip.events,
-			activeIndex: infiniteSequencerState.isPlaying
-				? (selectGlobalClockState(state.room).index / Math.round(infiniteSequencerState.rate)) % infiniteSequencerState.midiClip.events.count()
-				: -1,
 			isPlaying: infiniteSequencerState.isPlaying,
 			isRecording: infiniteSequencerState.isRecording,
 			color: selectConnectionSourceColorByTargetId(state.room, props.id),
