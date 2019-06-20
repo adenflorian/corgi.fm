@@ -131,7 +131,7 @@ export class GridSequencerState extends SequencerStateBase {
 			height,
 			ownerId,
 			ConnectionNodeType.gridSequencer,
-			GridSequencerState.controlsWidth,
+			GridSequencerState.controlsWidth + GridSequencerState.noteNamesSideBarWidth,
 			notesDisplayWidth,
 			isPlaying,
 			1,
@@ -160,7 +160,7 @@ export function deserializeGridSequencerState(state: IMultiStateThing): IMultiSt
 		...z,
 		width: Math.max(x.width, GridSequencerState.getWidth(notesDisplayWidth)),
 		height: Math.max(x.height, GridSequencerState.noteHeight * x.notesToShow),
-		notesDisplayStartX: GridSequencerState.controlsWidth,
+		notesDisplayStartX: GridSequencerState.controlsWidth + GridSequencerState.noteNamesSideBarWidth,
 		notesDisplayWidth,
 	} as GridSequencerState
 	return y
