@@ -84,6 +84,7 @@ export class BasicSynthesizerState implements IConnectable, NodeSpecialState {
 		width: BasicSynthesizerState.defaultWidth,
 		height: BasicSynthesizerState.defaultHeight,
 		name: 'Dummy Basic Synth',
+		enabled: false,
 	}
 
 	public readonly oscillatorType: ShamuOscillatorType
@@ -107,6 +108,7 @@ export class BasicSynthesizerState implements IConnectable, NodeSpecialState {
 	public readonly width: number = BasicSynthesizerState.defaultWidth
 	public readonly height: number = BasicSynthesizerState.defaultHeight
 	public readonly name: string = 'Basic Synth'
+	public readonly enabled: boolean = true
 
 	constructor(ownerId: ClientId) {
 		this.ownerId = ownerId	// TODO Is this still needed?

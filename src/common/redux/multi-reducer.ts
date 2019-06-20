@@ -19,6 +19,7 @@ export const dummyMultiStateThing: IMultiStateThing = Object.freeze({
 	width: 0,
 	height: 0,
 	name: 'dummy multi state thing',
+	enabled: false,
 })
 
 export const ADD_MULTI_THING = 'ADD_MULTI_THING'

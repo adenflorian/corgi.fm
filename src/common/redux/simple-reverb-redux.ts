@@ -46,17 +46,19 @@ export class SimpleReverbState implements IConnectable, NodeSpecialState {
 		width: SimpleReverbState.defaultWidth,
 		height: SimpleReverbState.defaultHeight,
 		name: 'Dummy Simple Reverb',
+		enabled: false,
 	}
 
 	public readonly id = uuid.v4()
 	public readonly ownerId: string
 	public readonly lowPassFilterCutoffFrequency: number = 2000
-	public readonly time: number = 5
+	public readonly time: number = 4
 	public readonly width: number = SimpleReverbState.defaultWidth
 	public readonly height: number = SimpleReverbState.defaultHeight
 	public readonly color: false = false
 	public readonly type = ConnectionNodeType.simpleReverb
 	public readonly name: string = 'Simple Reverb'
+	public readonly enabled: boolean = true
 
 	constructor(ownerId: ClientId) {
 		this.ownerId = ownerId

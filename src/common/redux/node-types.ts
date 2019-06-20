@@ -39,6 +39,7 @@ export const dummyIConnectable: IConnectable = Object.freeze({
 	width: 0,
 	height: 0,
 	name: 'default node name',
+	enabled: false,
 })
 
 class DummyConnectable implements IConnectable {
@@ -49,6 +50,7 @@ class DummyConnectable implements IConnectable {
 		public readonly width: 0,
 		public readonly height: 0,
 		public readonly name: 'default node name',
+		public readonly enabled: false,
 	) {}
 }
 
@@ -82,6 +84,7 @@ class AudioOutputState implements IConnectable {
 	public readonly width = 128
 	public readonly height = 112
 	public readonly name = 'audio output'
+	public readonly enabled = true
 
 	constructor() {}
 }
@@ -95,6 +98,7 @@ class MasterClockState implements IConnectable {
 	public readonly width = 172
 	public readonly height = 88
 	public readonly name = 'master clock'
+	public readonly enabled = true
 
 	constructor() {}
 }

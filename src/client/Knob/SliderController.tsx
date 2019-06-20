@@ -6,7 +6,7 @@ interface ISliderControllerProps {
 	max: number
 	onChange: (newValue: number) => any
 	value: number
-	defaultValue: number
+	defaultValue?: number
 	curve: number
 	children: (handleMouseDown: any, percentage: number, adjustedPercentage: number) => any
 	snapFunction?: (value: number) => number
@@ -86,7 +86,7 @@ export function SliderController(props: ISliderControllerProps) {
 	}
 
 	const _handleMouseDown = (e: React.MouseEvent) => {
-		if (e.ctrlKey) {
+		if (e.ctrlKey && defaultValue !== undefined) {
 			onChange(defaultValue)
 		} else {
 			setTempValue(value)

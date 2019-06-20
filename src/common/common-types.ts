@@ -22,6 +22,7 @@ export interface IConnectable {
 	name: string
 	inputPortCount?: number
 	outputPortCount?: number
+	enabled: boolean
 }
 
 export interface IMultiStateThing extends IConnectable {

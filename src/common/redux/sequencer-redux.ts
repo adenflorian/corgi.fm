@@ -132,6 +132,7 @@ export const dummySequencerState: Readonly<SequencerStateBase> = Object.freeze({
 	notesDisplayWidth: 1,
 	isPlaying: false,
 	gate: 1,
+	enabled: false,
 })
 
 export abstract class SequencerStateBase implements ISequencerState {
@@ -141,6 +142,7 @@ export abstract class SequencerStateBase implements ISequencerState {
 	public readonly isRecording: boolean = false
 	public readonly previousEvents: List<MidiClipEvents> = List<MidiClipEvents>()
 	public readonly pitch: number = 0
+	public readonly enabled: boolean = true
 
 	constructor(
 		public readonly name: string,

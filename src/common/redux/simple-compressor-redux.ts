@@ -52,6 +52,7 @@ export class SimpleCompressorState implements IConnectable, NodeSpecialState {
 		width: SimpleCompressorState.defaultWidth,
 		height: SimpleCompressorState.defaultHeight,
 		name: 'Dummy Simple Compressor',
+		enabled: false,
 	}
 
 	public readonly id = uuid.v4()
@@ -66,6 +67,7 @@ export class SimpleCompressorState implements IConnectable, NodeSpecialState {
 	public readonly color: false = false
 	public readonly type = ConnectionNodeType.simpleCompressor
 	public readonly name: string = 'Simple Compressor'
+	public readonly enabled: boolean = true
 
 	constructor(ownerId: ClientId) {
 		this.ownerId = ownerId

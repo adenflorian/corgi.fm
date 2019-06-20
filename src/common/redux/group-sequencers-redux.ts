@@ -52,6 +52,7 @@ export class GroupSequencer implements IConnectable, NodeSpecialState, IMultiSta
 		outputPortCount: 2,
 		notesDisplayStartX: 0,
 		notesDisplayWidth: GroupSequencer.defaultWidth,
+		enabled: false,
 	}
 
 	public readonly id = uuid.v4()
@@ -66,6 +67,7 @@ export class GroupSequencer implements IConnectable, NodeSpecialState, IMultiSta
 	public readonly outputPortCount: number
 	public readonly notesDisplayStartX = 0
 	public readonly notesDisplayWidth: number
+	public readonly enabled: boolean = true
 
 	constructor(
 		public readonly ownerId: string,
