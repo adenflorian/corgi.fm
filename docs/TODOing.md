@@ -13,6 +13,7 @@
 - [ ] grid sequencer
 - [ ] pan and detune knob arcs should start from center
 - [ ] make select have label on left side with darker background
+- [ ] remove color dots if they aren't going to do anything
 
 # Now
 - [√] don't delete everything on disconnect
@@ -21,6 +22,7 @@
 - [ ] "show older messages" button
 	
 # Soon
+- [ ] refactor shamu graph state to be able to enable/disable any node
 - [ ] switch to jest
 - [ ] sync client clocks
 - [ ] make submenu for creating grid sequencer with preset sizes

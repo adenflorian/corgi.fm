@@ -77,7 +77,7 @@ export class BasicSynthesizerView
 								max={10}
 								curve={3}
 								value={this.props.attack}
-								defaultValue={0.05}
+								defaultValue={0.01}
 								onChange={this._dispatchChangeInstrumentParam}
 								label="Attack"
 								onChangeId={BasicSynthesizerParam.attack}
@@ -89,7 +89,7 @@ export class BasicSynthesizerView
 								max={30}
 								curve={3}
 								value={this.props.decay}
-								defaultValue={0.25}
+								defaultValue={0}
 								onChange={this._dispatchChangeInstrumentParam}
 								label="Decay"
 								onChangeId={BasicSynthesizerParam.decay}
@@ -100,18 +100,18 @@ export class BasicSynthesizerView
 								min={0}
 								max={1}
 								value={this.props.sustain}
-								defaultValue={0.8}
+								defaultValue={1}
 								onChange={this._dispatchChangeInstrumentParam}
 								label="Sustain"
 								onChangeId={BasicSynthesizerParam.sustain}
 								tooltip={sustainToolTip}
 							/>
 							<Knob
-								min={0.01}
+								min={0.001}
 								max={60}
 								curve={2}
 								value={this.props.release}
-								defaultValue={0.1}
+								defaultValue={1}
 								onChange={this._dispatchChangeInstrumentParam}
 								label="Release"
 								onChangeId={BasicSynthesizerParam.release}

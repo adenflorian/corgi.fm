@@ -49,11 +49,11 @@ export class BasicSampler extends React.PureComponent<IBasicSamplerAllProps> {
 					<div className="basicSampler">
 						<div className="knobs">
 							<Knob
-								min={0.01}
+								min={0}
 								max={10}
 								curve={3}
 								value={this.props.attack}
-								defaultValue={0.05}
+								defaultValue={0.01}
 								onChange={this._dispatchChangeInstrumentParam}
 								label="Attack"
 								onChangeId={BasicSamplerParam.attack}
@@ -61,11 +61,11 @@ export class BasicSampler extends React.PureComponent<IBasicSamplerAllProps> {
 								valueString={adsrValueToString}
 							/>
 							<Knob
-								min={0.01}
-								max={10}
+								min={0}
+								max={30}
 								curve={3}
 								value={this.props.decay}
-								defaultValue={0.05}
+								defaultValue={0}
 								onChange={this._dispatchChangeInstrumentParam}
 								label="Decay"
 								onChangeId={BasicSamplerParam.decay}
@@ -73,11 +73,10 @@ export class BasicSampler extends React.PureComponent<IBasicSamplerAllProps> {
 								valueString={adsrValueToString}
 							/>
 							<Knob
-								min={0.01}
-								max={10}
-								curve={3}
+								min={0}
+								max={1}
 								value={this.props.sustain}
-								defaultValue={0.05}
+								defaultValue={1}
 								onChange={this._dispatchChangeInstrumentParam}
 								label="Sustain"
 								onChangeId={BasicSamplerParam.sustain}
@@ -85,11 +84,11 @@ export class BasicSampler extends React.PureComponent<IBasicSamplerAllProps> {
 								valueString={adsrValueToString}
 							/>
 							<Knob
-								min={0.01}
+								min={0.001}
 								max={60}
 								curve={2}
 								value={this.props.release}
-								defaultValue={0.1}
+								defaultValue={1}
 								onChange={this._dispatchChangeInstrumentParam}
 								label="Release"
 								onChangeId={BasicSamplerParam.release}
