@@ -57,7 +57,7 @@ export function InfiniteSequencerNotes({id, style, events, showRows, dispatch}: 
 		}
 	}, [selectedEvent, mouseDelta, events])
 
-	const handleMouseDown = (event: React.MouseEvent, note: IMidiNote, index: number) => {
+	const handleMouseDown: HandleMouseEvent = (event: React.MouseEvent, note: IMidiNote, index: number) => {
 		if (event.button === 0) {
 			if (note >= 0) {
 				dispatch(localActions.playShortNote(id, note))
@@ -76,6 +76,14 @@ export function InfiniteSequencerNotes({id, style, events, showRows, dispatch}: 
 				event.preventDefault()
 				dispatch(infiniteSequencerActions.deleteNote(id, index))
 			}
+		}
+	}
+
+	const handleMouseEnter: HandleMouseEvent = (event: React.MouseEvent, note: IMidiNote, index: number) => {
+		if (event.buttons !== 1) return
+
+		if (note >= 0) {
+			dispatch(localActions.playShortNote(id, note))
 		}
 	}
 
@@ -146,6 +154,7 @@ export function InfiniteSequencerNotes({id, style, events, showRows, dispatch}: 
 							height={noteHeightPercentage + (note === lowestNote ? 1 : 0)}
 							top={(highestNote - note) * noteHeightPercentage}
 							onMouseDown={handleMouseDown}
+							onMouseEnter={handleMouseEnter}
 						/>,
 					)}
 				</div>
@@ -169,14 +178,17 @@ export function InfiniteSequencerNotes({id, style, events, showRows, dispatch}: 
 	}
 }
 
-type HandleMouseDown = (event: React.MouseEvent, note: IMidiNote, index: number) => void
+type HandleMouseEvent = (event: React.MouseEvent, note: IMidiNote, index: number) => void
 
 const ColorGridNote = React.memo(
-	function _ColorGridNote({note, index, height, top, onMouseDown}: {note: IMidiNote, index: number, height: number, top: number, onMouseDown: HandleMouseDown}) {
+	function _ColorGridNote({note, index, height, top, onMouseDown, onMouseEnter}:
+		{note: IMidiNote, index: number, height: number, top: number, onMouseDown: HandleMouseEvent, onMouseEnter: HandleMouseEvent},
+	) {
 		return (
 			<div
 				className={`event noDrag`}
 				onMouseDown={e => onMouseDown(e, note, index)}
+				onMouseEnter={e => onMouseEnter(e, note, index)}
 				title={stripIndents`left click and drag to play notes
 					shift + left click and drag up and down to change note
 					shift + right click to delete`}

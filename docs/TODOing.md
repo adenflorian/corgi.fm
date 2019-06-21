@@ -21,8 +21,8 @@
 - [ ] track selected node
 	- [ ] ctrl z should send undo to selected node
 - [ ] toggle note click audio for sequencers on title bar
-- infinite sequencer
-	- [ ] click and drag to play all notes
+- [ ] infinite sequencer
+	- [√] click and drag to play all notes
 
 # Now
 - [√] don't delete everything on disconnect
