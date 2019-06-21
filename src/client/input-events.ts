@@ -2,9 +2,10 @@ import {Map} from 'immutable'
 import {Action, AnyAction, Store} from 'redux'
 import {rateLimitedDebounce} from '../common/common-utils'
 import {
-	globalClockActions, IClientAppState,
-	pointersActions, selectClientInfo,
-	selectGlobalClockIsPlaying, selectLocalClient, sequencerActions, userInputActions,
+	getConnectionNodeInfo, globalClockActions,
+	IClientAppState, pointersActions,
+	selectClientInfo, selectGlobalClockIsPlaying, selectLocalClient, selectPosition,
+	selectShamuMetaState, sequencerActions, userInputActions,
 } from '../common/redux'
 import {
 	localMidiKeyPress, localMidiKeyUp, localMidiOctaveChange, windowBlur,
@@ -21,7 +22,7 @@ interface KeyBoardShortcut {
 	preventDefault: boolean
 }
 
-type keyboardActionCreator = (e: KeyboardEvent, state: IClientAppState) => AnyAction
+type keyboardActionCreator = (e: KeyboardEvent, state: IClientAppState) => AnyAction | undefined
 
 const midiKeyShortcuts: {[key: string]: KeyBoardShortcut} = {}
 
@@ -58,7 +59,15 @@ keyToMidiMap.forEach((val, key) => {
 
 const keyboardShortcuts: IKeyBoardShortcuts = Map<KeyBoardShortcut>({
 	'z': {
-		actionOnKeyDown: e => localMidiOctaveChange(e.shiftKey ? -2 : -1),
+		actionOnKeyDown: (e, state) => {
+			if (e.ctrlKey) {
+				const selectedNodeId = selectShamuMetaState(state.room).selectedNodeId
+				if (selectedNodeId === undefined) return
+				return getConnectionNodeInfo(selectPosition(state.room, selectedNodeId).targetType).undoAction(selectedNodeId)
+			} else {
+				return localMidiOctaveChange(e.shiftKey ? -2 : -1)
+			}
+		},
 		allowRepeat: true,
 		preventDefault: true,
 	},
@@ -163,7 +172,10 @@ export function setupInputEventListeners(
 		if (!action) return
 
 		if (typeof action === 'function') {
-			store.dispatch(action(event, store.getState()))
+			const actualAction = action(event, store.getState())
+			if (actualAction !== undefined) {
+				store.dispatch(actualAction)
+			}
 		} else {
 			store.dispatch(action)
 		}

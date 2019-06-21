@@ -1,6 +1,6 @@
 import {Map, Record, Set} from 'immutable'
 import {AnyAction} from 'redux'
-import {ConnectionNodeType, IConnectable, IMultiStateThing} from '../common-types'
+import {ConnectionNodeType, IConnectable, Id, IMultiStateThing} from '../common-types'
 import {IMidiNote} from '../MidiNote'
 import {CssColor} from '../shamu-color'
 import {IClientAppState} from './common-redux-types'
@@ -21,7 +21,7 @@ import {
 	selectVirtualKeyboardHasPressedKeys, VirtualKeyboardState,
 } from './index'
 import {addInfiniteSequencer, deserializeInfiniteSequencerState, InfiniteSequencerState} from './infinite-sequencers-redux'
-import {selectSequencerIsPlaying} from './sequencer-redux'
+import {selectSequencerIsPlaying, sequencerActions} from './sequencer-redux'
 import {addSimpleCompressor, deserializeSimpleCompressorState, selectSimpleCompressor, SimpleCompressorState} from './simple-compressor-redux'
 import {addSimpleReverb, deserializeSimpleReverbState, SimpleReverbState} from './simple-reverb-redux'
 import {addVirtualKeyboard} from './virtual-keyboard-redux'
@@ -69,6 +69,7 @@ const _makeNodeInfo = Record({
 	isDeletable: false,
 	autoConnectToClock: false,
 	autoConnectToAudioOutput: false,
+	undoAction: ((id: Id) => undefined) as (id: Id) => AnyAction | undefined,
 })
 
 type NodeInfo = ReturnType<typeof _makeNodeInfo>
@@ -130,6 +131,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		showOnAddNodeMenu: true,
 		isDeletable: true,
 		autoConnectToClock: true,
+		undoAction: id => sequencerActions.undo(id),
 	})],
 	[ConnectionNodeType.infiniteSequencer, makeNodeInfo({
 		typeName: 'Infinite Sequencer',
@@ -144,6 +146,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		showOnAddNodeMenu: true,
 		isDeletable: true,
 		autoConnectToClock: true,
+		undoAction: id => sequencerActions.undo(id),
 	})],
 	[ConnectionNodeType.groupSequencer, makeNodeInfo({
 		typeName: 'Group Sequencer',
