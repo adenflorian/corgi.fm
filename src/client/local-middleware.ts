@@ -16,12 +16,13 @@ import {
 	Connection, connectionsActions,
 	deletePositions, deleteThingsAny, getConnectionNodeInfo, GridSequencerAction,
 	IClientAppState,
-	IPosition, ISequencerState,
-	LocalSaves, makePosition, MASTER_AUDIO_OUTPUT_TARGET_ID,
-	NetworkActionType, READY,
-	ReadyAction, RECORD_SEQUENCER_NOTE, SavedRoom,
-	selectActiveRoom, selectAllPositions,
-	selectClientInfo, selectDirectDownstreamSequencerIds,
+	IPosition,
+	ISequencerState, LocalSaves, makePosition,
+	MASTER_AUDIO_OUTPUT_TARGET_ID, NetworkActionType,
+	READY, ReadyAction, RECORD_SEQUENCER_NOTE,
+	SavedRoom, selectActiveRoom,
+	selectAllPositions, selectClientInfo,
+	selectDirectDownstreamSequencerIds,
 	selectGlobalClockState,
 	selectLocalClient,
 	selectLocalClientId,
@@ -34,9 +35,9 @@ import {
 	selectVirtualKeyboardByOwner,
 	sequencerActions,
 	SET_ACTIVE_ROOM,
-	SET_GRID_SEQUENCER_NOTE,
-	SET_LOCAL_CLIENT_NAME, SetActiveRoomAction, setClientName, setLocalClientId,
-	SetLocalClientNameAction, ShamuGraphState, SKIP_NOTE, UPDATE_POSITIONS,
+	SET_GRID_SEQUENCER_NOTE, SET_LOCAL_CLIENT_NAME, SetActiveRoomAction, setClientName,
+	setLocalClientId, SetLocalClientNameAction, ShamuGraphState, SKIP_NOTE,
+	UPDATE_POSITIONS,
 	updatePositions,
 	UpdatePositionsAction,
 	USER_KEY_PRESS,
@@ -97,6 +98,7 @@ export const deleteNode = (nodeId: Id) => ({
 export const SAVE_ROOM_TO_BROWSER = 'SAVE_ROOM_TO_BROWSER'
 export const SAVE_ROOM_TO_FILE = 'SAVE_ROOM_TO_FILE'
 export const DELETE_SAVED_ROOM = 'DELETE_SAVED_ROOM'
+export const PLAY_SHORT_NOTE = 'PLAY_SHORT_NOTE'
 
 export const localActions = Object.freeze({
 	saveRoomToBrowser: () => ({
@@ -108,6 +110,11 @@ export const localActions = Object.freeze({
 	deleteSavedRoom: (id: Id) => ({
 		type: DELETE_SAVED_ROOM as typeof DELETE_SAVED_ROOM,
 		id,
+	}),
+	playShortNote: (sourceId: Id, note: IMidiNote) => ({
+		type: PLAY_SHORT_NOTE as typeof PLAY_SHORT_NOTE,
+		sourceId,
+		note,
 	}),
 })
 
@@ -176,6 +183,13 @@ export const createLocalMiddleware: (getAllInstruments: GetAllInstruments) => Mi
 				if (action.enabled) {
 					playShortNote(action.note, action.id, getState().room, getAllInstruments)
 				}
+
+				next(action)
+
+				return
+			}
+			case PLAY_SHORT_NOTE: {
+				playShortNote(action.note, action.sourceId, getState().room, getAllInstruments)
 
 				next(action)
 

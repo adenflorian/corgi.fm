@@ -9,6 +9,7 @@ import {
 } from '../../common/redux'
 import {getColorStringForMidiNote} from '../../common/shamu-color'
 import {isWhiteKey} from '../Keyboard/Keyboard'
+import {localActions} from '../local-middleware'
 import {getOctaveFromMidiNote, midiNoteToNoteName} from '../WebAudio'
 
 interface Props {
@@ -58,6 +59,10 @@ export function InfiniteSequencerNotes({id, style, events, showRows, dispatch}: 
 
 	const handleMouseDown = (event: React.MouseEvent, note: IMidiNote, index: number) => {
 		if (event.button === 0) {
+			if (note >= 0) {
+				dispatch(localActions.playShortNote(id, note))
+			}
+
 			if (event.shiftKey) {
 				event.preventDefault()
 				dispatch(infiniteSequencerActions.deleteNote(id, index))
@@ -90,6 +95,7 @@ export function InfiniteSequencerNotes({id, style, events, showRows, dispatch}: 
 
 			const newNote = oldNote + (delta > 0 ? 1 : -1)
 			dispatch(infiniteSequencerActions.setNote(id, selectedEvent.index, true, newNote))
+			dispatch(localActions.playShortNote(id, newNote))
 			setMouseDelta({x: 0, y: 0})
 		} else {
 			setMouseDelta(newMouseDelta)
