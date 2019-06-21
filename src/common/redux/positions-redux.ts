@@ -2,10 +2,10 @@ import {Map, Record} from 'immutable'
 import {combineReducers, Reducer} from 'redux'
 import {createSelector} from 'reselect'
 import {ConnectionNodeType} from '../common-types'
-import {CssColor} from '../shamu-color'
 import {
-	BROADCASTER_ACTION, getConnectionNodeInfo, IClientRoomState, IConnection, SERVER_ACTION,
+	BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION,
 } from './index'
+import {shamuMetaReducer} from './shamu-graph'
 
 export const ADD_POSITION = 'ADD_POSITION'
 export type AddPositionAction = ReturnType<typeof addPosition>
@@ -80,6 +80,7 @@ export const nodeClicked = (id: string) => ({
 
 export interface IPositionsState {
 	all: IPositions
+	meta: ReturnType<typeof shamuMetaReducer>
 }
 
 export type IPositions = Map<string, IPosition>
@@ -149,6 +150,7 @@ function sortPositions(positions: IPositions) {
 
 export const positionsReducer: Reducer<IPositionsState, IPositionAction> = combineReducers({
 	all: positionsSpecificReducer,
+	meta: shamuMetaReducer,
 })
 
 // Selectors

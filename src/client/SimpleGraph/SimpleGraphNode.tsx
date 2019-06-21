@@ -1,15 +1,13 @@
 import * as React from 'react'
 import {ContextMenuTrigger} from 'react-contextmenu'
 import Draggable, {DraggableEventHandler} from 'react-draggable'
-import {IoMdMove as HandleIcon} from 'react-icons/io'
 import {Dispatch} from 'redux'
-import {ConnectionNodeType} from '../../common/common-types'
+import {ConnectionNodeType, Id} from '../../common/common-types'
 import {
 	getConnectionNodeInfo, IPosition, movePosition,
 	nodeClicked, selectConnectionSourceColorByTargetId,
-	selectOptions, selectPosition, shamuConnect,
+	selectOptions, selectPosition, selectShamuMetaState, shamuConnect, shamuMetaActions,
 } from '../../common/redux'
-import {CssColor} from '../../common/shamu-color'
 import {ConnectedBasicSampler} from '../BasicSampler/BasicSampler'
 import {graphSizeX, graphSizeY, handleClassName, nodeMenuId} from '../client-constants'
 import {ECSSequencerRenderSystem} from '../ECS/ECSSequencerRenderSystem'
@@ -33,6 +31,7 @@ interface ISimpleGraphNodeReduxProps {
 	color: string
 	highQuality: boolean
 	fancyZoomPan: boolean
+	selectedNodeId?: Id
 }
 
 type ISimpleGraphNodeAllProps = ISimpleGraphNodeProps & ISimpleGraphNodeReduxProps & {dispatch: Dispatch}
@@ -41,7 +40,7 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 	public render() {
 		const {
 			positionId, color, highQuality,
-			position, fancyZoomPan,
+			position, fancyZoomPan, selectedNodeId,
 		} = this.props
 
 		const {x, y, width, height, targetType, zIndex} = position
@@ -66,7 +65,10 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 				onMouseDown={this._handleMouseDown}
 			>
 				<div
-					className="simpleGraphNode"
+					className={`simpleGraphNode ${selectedNodeId === positionId ? 'selectedNode' : ''}`}
+					onBlur={() => this.props.dispatch(shamuMetaActions.clearSelectedNodeId())}
+					tabIndex={0}
+					onFocus={this._handleMouseDown}
 					style={{
 						position: 'absolute',
 						willChange: fancyZoomPan ? '' : 'transform',
@@ -118,6 +120,7 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 
 	private readonly _handleMouseDown = () => {
 		this.props.dispatch(nodeClicked(this.props.positionId))
+		this.props.dispatch(shamuMetaActions.setSelectedNodeId(this.props.positionId))
 	}
 }
 
@@ -152,6 +155,7 @@ export const ConnectedSimpleGraphNode = shamuConnect(
 				|| selectConnectionSourceColorByTargetId(state.room, positionId),
 			highQuality: selectOptions(state).graphics_ECS,
 			fancyZoomPan: selectOptions(state).graphics_expensiveZoomPan,
+			selectedNodeId: selectShamuMetaState(state.room).selectedNodeId,
 		}
 	},
 )(SimpleGraphNode)

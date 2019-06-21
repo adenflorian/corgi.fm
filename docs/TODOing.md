@@ -18,11 +18,14 @@
 - [ ] add enable/disable to positions state
 - [ ] add button to clear chat
 - [ ] "show older messages" button
-- [ ] track selected node
+- [√] track selected node
 	- [ ] ctrl z should send undo to selected node
 - [ ] toggle note click audio for sequencers on title bar
 - [ ] infinite sequencer
 	- [√] click and drag to play all notes
+	- [ ] add a way to insert notes left and right
+	- [ ] way to start song from any point in sequencer
+	- [ ] design
 
 # Now
 - [√] don't delete everything on disconnect
