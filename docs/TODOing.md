@@ -13,17 +13,23 @@
 - [ ] grid sequencer
 - [ ] pan and detune knob arcs should start from center
 - [ ] make select have label on left side with darker background
-- [ ] remove color dots if they aren't going to do anything
+
+# 0.4.0
+- [ ] add enable/disable to positions state
+- [ ] add button to clear chat
+- [ ] "show older messages" button
+- [ ] track selected node
+	- [ ] ctrl z should send undo to selected node
+- [ ] toggle note click audio for sequencers on title bar
+- infinite sequencer
+	- [ ] click and drag to play all notes
 
 # Now
 - [√] don't delete everything on disconnect
 - [√] smooth scroll in steps like google maps
-- [ ] add button to clear chat
-- [ ] "show older messages" button
 	
 # Soon
 - [ ] use synesthesia colors
-- [ ] refactor shamu graph state to be able to enable/disable any node
 - [ ] switch to jest
 - [ ] sync client clocks
 - [ ] make submenu for creating grid sequencer with preset sizes

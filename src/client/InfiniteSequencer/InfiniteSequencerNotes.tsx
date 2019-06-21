@@ -64,15 +64,17 @@ export function InfiniteSequencerNotes({id, style, events, showRows, dispatch}: 
 			}
 
 			if (event.shiftKey) {
-				event.preventDefault()
-				dispatch(infiniteSequencerActions.deleteNote(id, index))
-			} else {
 				if (note < 0) return
 
 				setSelectedEvent({
 					isSelected: true,
 					index,
 				})
+			}
+		} else if (event.button === 2) {
+			if (event.shiftKey) {
+				event.preventDefault()
+				dispatch(infiniteSequencerActions.deleteNote(id, index))
 			}
 		}
 	}
@@ -175,8 +177,10 @@ const ColorGridNote = React.memo(
 			<div
 				className={`event noDrag`}
 				onMouseDown={e => onMouseDown(e, note, index)}
-				title={stripIndents`drag up and down with left mouse
-					shift + left click to delete`}
+				title={stripIndents`left click and drag to play notes
+					shift + left click and drag up and down to change note
+					shift + right click to delete`}
+				onContextMenu={e => e.preventDefault()}
 			>
 				<div
 					className={`note`}
