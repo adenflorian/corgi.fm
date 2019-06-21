@@ -1,7 +1,7 @@
 import {List, Set, Stack} from 'immutable'
 import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
-import {ConnectionNodeType, IMultiStateThing} from '../common-types'
+import {ConnectionNodeType, Id, IMultiStateThing} from '../common-types'
 import {assertArrayHasNoUndefinedElements} from '../common-utils'
 import {logger} from '../logger'
 import {makeMidiClipEvent, MidiClip} from '../midi-types'
@@ -21,11 +21,12 @@ export const addInfiniteSequencer = (infiniteSequencer: InfiniteSequencerState) 
 	addMultiThing(infiniteSequencer, ConnectionNodeType.infiniteSequencer, NetworkActionType.SERVER_AND_BROADCASTER)
 
 export const SET_INFINITE_SEQUENCER_NOTE = 'SET_INFINITE_SEQUENCER_NOTE'
+export const DELETE_INFINITE_SEQUENCER_NOTE = 'DELETE_INFINITE_SEQUENCER_NOTE'
 export const RESTART_INFINITE_SEQUENCER = 'RESTART_INFINITE_SEQUENCER'
 export const SET_INFINITE_SEQUENCER_FIELD = 'SET_INFINITE_SEQUENCER_FIELD'
 
 export const infiniteSequencerActions = Object.freeze({
-	setNote: (infiniteSequencerId: string, index: number, enabled: boolean, note: IMidiNote) => ({
+	setNote: (infiniteSequencerId: Id, index: number, enabled: boolean, note: IMidiNote) => ({
 		type: SET_INFINITE_SEQUENCER_NOTE as typeof SET_INFINITE_SEQUENCER_NOTE,
 		id: infiniteSequencerId,
 		index,
@@ -34,13 +35,20 @@ export const infiniteSequencerActions = Object.freeze({
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	}),
-	restart: (id: string) => ({
+	deleteNote: (infiniteSequencerId: Id, index: number) => ({
+		type: DELETE_INFINITE_SEQUENCER_NOTE as typeof DELETE_INFINITE_SEQUENCER_NOTE,
+		id: infiniteSequencerId,
+		index,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	}),
+	restart: (id: Id) => ({
 		type: RESTART_INFINITE_SEQUENCER as typeof RESTART_INFINITE_SEQUENCER,
 		id,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	}),
-	setField: (id: string, fieldName: InfiniteSequencerFields, data: any) => ({
+	setField: (id: Id, fieldName: InfiniteSequencerFields, data: any) => ({
 		type: SET_INFINITE_SEQUENCER_FIELD as typeof SET_INFINITE_SEQUENCER_FIELD,
 		id,
 		fieldName,
@@ -154,6 +162,7 @@ export function deserializeInfiniteSequencerState(state: IMultiStateThing): IMul
 
 const infiniteSequencerActionTypes = [
 	SET_INFINITE_SEQUENCER_NOTE,
+	DELETE_INFINITE_SEQUENCER_NOTE,
 	SET_INFINITE_SEQUENCER_FIELD,
 	CLEAR_SEQUENCER,
 	UNDO_SEQUENCER,
@@ -207,6 +216,19 @@ function infiniteSequencerReducer(
 							return event
 						}
 					}))
+					mutable.set('length', mutable.events.count())
+				}),
+				previousEvents: infiniteSequencer.previousEvents.unshift(infiniteSequencer.midiClip.events),
+			}
+		}
+		case DELETE_INFINITE_SEQUENCER_NOTE: {
+			return {
+				...infiniteSequencer,
+				midiClip: infiniteSequencer.midiClip.withMutations(mutable => {
+					mutable.set(
+						'events',
+						mutable.events.filter(({startBeat}) => startBeat !== action.index)
+							.map(event => event.startBeat > action.index ? {...event, startBeat: event.startBeat - 1} : event))
 					mutable.set('length', mutable.events.count())
 				}),
 				previousEvents: infiniteSequencer.previousEvents.unshift(infiniteSequencer.midiClip.events),
