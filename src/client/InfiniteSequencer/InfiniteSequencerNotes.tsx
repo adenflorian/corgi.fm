@@ -82,7 +82,7 @@ export function InfiniteSequencerNotes({id, style, events, showRows, dispatch}: 
 	const handleMouseMove = (event: MouseEvent) => {
 		if (!selectedEvent.isSelected) return
 
-		if (event.buttons !== 1) return setSelectedEvent({isSelected: false, index: -1})
+		if (event.buttons !== 1 || !event.shiftKey) return setSelectedEvent({isSelected: false, index: -1})
 
 		const newMouseDelta = {
 			x: mouseDelta.x + event.movementX,
