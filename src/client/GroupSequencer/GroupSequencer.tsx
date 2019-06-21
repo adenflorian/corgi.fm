@@ -6,6 +6,7 @@ import './GroupSequencer.less'
 
 interface Props {
 	id: string
+	color: string
 }
 
 interface ReduxProps {
@@ -17,8 +18,10 @@ type AllProps = Props & ReduxProps & {dispatch: Dispatch}
 export function GroupSequencerView(props: AllProps) {
 	return (
 		<Panel
+			id={props.id}
 			label={props.groupSequencer.name}
 			className="groupSequencer"
+			color={props.color}
 		>
 			{props.groupSequencer.groups.map((group, port) => {
 				return (

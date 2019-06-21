@@ -15,11 +15,12 @@
 - [ ] make select have label on left side with darker background
 
 # 0.4.0
-- [ ] add enable/disable to positions state
+- [√] add enable/disable to positions state
+	- [ ] make disabling do something for every node
 - [ ] add button to clear chat
 - [ ] "show older messages" button
 - [√] track selected node
-	- [ ] ctrl z should send undo to selected node
+	- [√] ctrl z should send undo to selected node
 - [ ] toggle note click audio for sequencers on title bar
 - [ ] infinite sequencer
 	- [√] click and drag to play all notes

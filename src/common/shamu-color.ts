@@ -52,6 +52,7 @@ export function hashbow(input: IHashable, saturation = 90, lightness = 50) {
 export enum CssColor {
 	frenchGray = '#BDBDC6',
 	panelGray = '#252525',
+	panelGrayDark = '#1A1A1A',
 	panelGrayLight = 'hsl(0, 0%, 25%)',
 	panelGrayTransparent = 'rgba(40, 40, 50, 0.5)',
 	gray2 = '#31313d',

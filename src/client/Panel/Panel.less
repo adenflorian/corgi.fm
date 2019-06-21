@@ -27,18 +27,22 @@
         border-top-left-radius: @mainBorderRadius;
         border-top-right-radius: @mainBorderRadius;
 
-        .colorDot {
-            width: 8px;
-            height: 8px;
-            border-radius: 4px;
-            background-color: currentColor;
-            margin-left: 8px;
+        .colorDotContainer {
+            padding: 8px;
+            cursor: pointer;
+
+            .colorDot {
+                background-color: currentColor;
+                width: 8px;
+                height: 8px;
+                border-radius: 4px;
+            }
         }
 
         .label {
             .largeFont();
             font-weight: 400;
-            margin-left: 6px;
+            margin-left: -1px;
             color: @defaultGray;
         }
 

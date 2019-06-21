@@ -1,11 +1,24 @@
 import {Map, Record} from 'immutable'
 import {combineReducers, Reducer} from 'redux'
 import {createSelector} from 'reselect'
-import {ConnectionNodeType} from '../common-types'
+import {ActionType} from 'typesafe-actions'
+import {ConnectionNodeType, Id} from '../common-types'
 import {
 	BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION,
 } from './index'
 import {shamuMetaReducer} from './shamu-graph'
+
+export const SET_ENABLED_NODE = 'SET_ENABLED_NODE'
+
+export const positionActions = Object.freeze({
+	setEnabled: (id: Id, enabled: boolean) => ({
+		type: SET_ENABLED_NODE as typeof SET_ENABLED_NODE,
+		id,
+		enabled,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	}),
+})
 
 export const ADD_POSITION = 'ADD_POSITION'
 export type AddPositionAction = ReturnType<typeof addPosition>
@@ -99,6 +112,7 @@ const defaultPosition = {
 	zIndex: 0,
 	inputPortCount: 1,
 	outputPortCount: 1,
+	enabled: true,
 }
 
 const makePositionRecord = Record(defaultPosition)
@@ -111,7 +125,7 @@ export const makePosition = (
 
 export type IPositionAction = AddPositionAction | DeletePositionsAction | NodeClickedAction
 	| DeleteAllPositionsAction | UpdatePositionsAction | UpdatePositionAction | MovePositionAction
-	| ReplacePositionsAction
+	| ReplacePositionsAction | ActionType<typeof positionActions>
 
 // Reducers
 const positionsSpecificReducer: Reducer<IPositions, IPositionAction> =
@@ -134,6 +148,7 @@ const positionsSpecificReducer: Reducer<IPositions, IPositionAction> =
 				...x,
 				zIndex: getNewZIndex(positions, x.zIndex),
 			}))
+			case SET_ENABLED_NODE: return positions.update(action.id, x => ({...x, enabled: action.enabled}))
 			default: return positions
 		}
 	}

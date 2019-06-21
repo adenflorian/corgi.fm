@@ -129,7 +129,7 @@ export function getComponentByNodeType(type: ConnectionNodeType, id: string, col
 		case ConnectionNodeType.masterClock: return <ConnectedMasterControls color={color} />
 		case ConnectionNodeType.audioOutput: return <ConnectedVolumeControl color={color} />
 
-		case ConnectionNodeType.groupSequencer: return <ConnectedGroupSequencerView id={id} />
+		case ConnectionNodeType.groupSequencer: return <ConnectedGroupSequencerView id={id} color={color} />
 
 		case ConnectionNodeType.gridSequencer: return <ConnectedGridSequencerContainer id={id} />
 		case ConnectionNodeType.infiniteSequencer: return <ConnectedInfiniteSequencer id={id} />
