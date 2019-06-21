@@ -32,7 +32,7 @@ export const ConnectorPlaceholder = React.memo(
 					x={x}
 					y={y}
 					isPlaceHolderForNewConnection={true}
-					title="click and drag to make a new connection"
+					title="Click and drag to make a new connection"
 					svgProps={{
 						className: `newConnectionPlaceholder ${isMouseOver ? 'newConnectionPlaceholder-visible' : ''}`,
 						onMouseDown: e => e.button === 0 && onMouseDown(

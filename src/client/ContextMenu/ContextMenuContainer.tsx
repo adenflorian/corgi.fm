@@ -137,7 +137,7 @@ const hoverDelayMs = 1
 
 const deleteMenuLabels = List([
 	`Delete Node`,
-	`you can't undo this (yet)`,
+	`You can't undo this (yet)`,
 ])
 
 const NodeMenuItems = React.memo(function _MenuItems({dispatch, nodeType}: NodeMenuItemsProps) {

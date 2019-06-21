@@ -17,8 +17,8 @@ interface IKnobViewProps {
 
 export const KnobView = React.memo(function _KnobView(props: IKnobViewProps) {
 	const {
-		handleMouseDown, percentage, adjustedPercentage, size = 32, valueString,
-		label, value, readOnly = false, markColor = 'gray', tooltip,
+		handleMouseDown, percentage, size = 32, valueString,
+		label, value, readOnly = false, tooltip,
 	} = props
 
 	const displayValue = typeof value === 'number'
@@ -34,7 +34,7 @@ export const KnobView = React.memo(function _KnobView(props: IKnobViewProps) {
 				width: 64,
 				height: 88,
 			}}
-			title={tooltip + '\n' + 'ctrl + click to reset'}
+			title={tooltip + '\n' + 'Ctrl + click to reset'}
 		>
 			<div className="knobLabel unselectable">{label}</div>
 			<div

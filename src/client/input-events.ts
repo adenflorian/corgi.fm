@@ -60,7 +60,7 @@ keyToMidiMap.forEach((val, key) => {
 const keyboardShortcuts: IKeyBoardShortcuts = Map<KeyBoardShortcut>({
 	'z': {
 		actionOnKeyDown: (e, state) => {
-			if (e.ctrlKey) {
+			if (e.ctrlKey || e.metaKey) {
 				const selectedNodeId = selectShamuMetaState(state.room).selectedNodeId
 				if (selectedNodeId === undefined) return
 				return getConnectionNodeInfo(selectPosition(state.room, selectedNodeId).targetType).undoAction(selectedNodeId)

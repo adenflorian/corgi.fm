@@ -56,9 +56,9 @@ function LoadRoomModalInner({dispatch}: {dispatch: Dispatch}) {
 						return (
 							<div key={saveId} className="localSave">
 								<div className="load">
-									<div className="room" title={`load ${saveData.room}`} onClick={onClick}>{saveData.room}</div>
+									<div className="room" title={`Load ${saveData.room}`} onClick={onClick}>{saveData.room}</div>
 									<div className="date" title={date} onClick={onClick}>{date}</div>
-									<div className="version" title={`version ${version}`} onClick={onClick}>{version}</div>
+									<div className="version" title={`Version ${version}`} onClick={onClick}>{version}</div>
 								</div>
 								<div
 									className="delete"
@@ -71,7 +71,7 @@ function LoadRoomModalInner({dispatch}: {dispatch: Dispatch}) {
 											setSaveStorage(getOrCreateLocalSavesStorage())
 										}
 									}}
-									title="this cannot be undone"
+									title="This cannot be undone"
 								>
 									<span>Delete</span>
 								</div>

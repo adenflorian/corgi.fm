@@ -189,9 +189,9 @@ const ColorGridNote = React.memo(
 				className={`event noDrag`}
 				onMouseDown={e => onMouseDown(e, note, index)}
 				onMouseEnter={e => onMouseEnter(e, note, index)}
-				title={stripIndents`left click and drag to play notes
-					shift + left click and drag up and down to change note
-					shift + right click to delete`}
+				title={stripIndents`Left click and drag to play notes
+					Shift + left click and drag up and down to change note
+					Shift + right click to delete`}
 				onContextMenu={e => e.preventDefault()}
 			>
 				<div

@@ -48,9 +48,9 @@ export class VolumeControl extends Component<IVolumeControlAllProps> {
 					max={0.5}
 					markColor={color}
 					size={80}
-					tooltip={stripIndents`local master volume
-						will only control the volume for you
-						it won't affect other users`}
+					tooltip={stripIndents`Local master volume
+						Will only control the volume for you
+						It won't affect other users`}
 					label=""
 					valueString={percentageValueString}
 				/>

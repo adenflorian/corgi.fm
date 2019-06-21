@@ -31,7 +31,7 @@ export const TopDiv = ({memberCount, clientCount, info, isClientReady, dispatch}
 				<div>{info}</div>
 			</div>
 			<div className="blob">
-				<div className="blobDark" title="frames per second">FPS</div>
+				<div className="blobDark" title="Frames per second">FPS</div>
 				<div id="fps" style={{width: 32, overflow: 'hidden'}}></div>
 			</div>
 			<div className="blob" style={{overflow: 'hidden'}}>

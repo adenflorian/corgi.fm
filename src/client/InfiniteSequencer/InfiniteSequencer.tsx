@@ -11,9 +11,9 @@ import {Dispatch} from 'redux'
 import {
 	globalClockActions, IClientAppState,
 	infiniteSequencerActions, InfiniteSequencerFields, InfiniteSequencerState,
-	InfiniteSequencerStyle, selectConnectionSourceColorByTargetId, selectGlobalClockState, selectInfiniteSequencer, sequencerActions,
+	InfiniteSequencerStyle, selectConnectionSourceColorByTargetId, selectInfiniteSequencer, sequencerActions,
 } from '../../common/redux'
-import {percentageValueString, seqPitchValueToString, seqRateValueToString, sequencerGateToolTip, sequencerPitchToolTip, sequencerRateToolTip} from '../client-constants'
+import {percentageValueString, seqPitchValueToString, seqRateValueToString, sequencerDownloadToolTip, sequencerEraseToolTip, sequencerGateToolTip, sequencerPitchToolTip, sequencerPlayToolTip, sequencerRateToolTip, sequencerRecordToolTip, sequencerStopToolTip, sequencerUndoToolTip} from '../client-constants'
 import {Knob} from '../Knob/Knob'
 import {KnobSnapping} from '../Knob/KnobSnapping'
 import {Panel} from '../Panel/Panel'
@@ -74,37 +74,42 @@ export const InfiniteSequencer: React.FC<IInfiniteSequencerAllProps> = React.mem
 										dispatch(sequencerActions.play(id))
 										dispatch(globalClockActions.start())
 									}}
+									title={sequencerPlayToolTip}
 								>
 									<Play />
 								</div>
 								<div
 									className="stop"
 									onClick={() => dispatch(sequencerActions.stop(id))}
+									title={sequencerStopToolTip}
 								>
 									<Stop />
 								</div>
 								<div
 									className="record"
 									onClick={() => dispatchInfiniteSeqParam(InfiniteSequencerFields.isRecording, !isRecording)}
+									title={sequencerRecordToolTip}
 								>
 									<Record />
 								</div>
 								<div
 									className="export"
 									onClick={() => dispatch(sequencerActions.exportMidi(id))}
+									title={sequencerDownloadToolTip}
 								>
 									<Download />
 								</div>
 								<div
 									className="erase"
 									onClick={() => dispatch(sequencerActions.clear(props.id))}
+									title={sequencerEraseToolTip}
 								>
 									<Clear />
 								</div>
 								<div
 									className="undo"
 									onClick={() => dispatch(sequencerActions.undo(props.id))}
-									title="undo (hit backspace to undo while recording)"
+									title={sequencerUndoToolTip + `\nBackspace to undo while recording and your keyboard is plugged in`}
 								>
 									<Undo />
 								</div>
@@ -117,6 +122,7 @@ export const InfiniteSequencer: React.FC<IInfiniteSequencerAllProps> = React.mem
 											? InfiniteSequencerStyle.colorGrid
 											: InfiniteSequencerStyle.colorBars,
 									)}
+									title={stripIndents`Toggle display styles`}
 								>
 									<Star />
 								</div>
@@ -126,6 +132,7 @@ export const InfiniteSequencer: React.FC<IInfiniteSequencerAllProps> = React.mem
 										InfiniteSequencerFields.showRows,
 										!props.showRows,
 									)}
+									title={stripIndents`Toggle piano roll lines`}
 								>
 									<Rows />
 								</div>

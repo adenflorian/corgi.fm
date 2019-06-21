@@ -55,7 +55,7 @@ export const SimpleCompressorView: React.FC<ISimpleCompressorAllProps> =
 						defaultValue={-24}
 						onChange={changeParam}
 						onChangeId={SimpleCompressorParam.threshold}
-						tooltip="the decibel value above which the compression will start taking effect"
+						tooltip="The decibel value above which the compression will start taking effect"
 					/>
 					<Knob
 						label="Knee"
@@ -65,7 +65,7 @@ export const SimpleCompressorView: React.FC<ISimpleCompressorAllProps> =
 						defaultValue={30}
 						onChange={changeParam}
 						onChangeId={SimpleCompressorParam.knee}
-						tooltip="decibel value representing the range above the threshold where the curve smoothly transitions to the compressed portion"
+						tooltip="Decibel value representing the range above the threshold where the curve smoothly transitions to the compressed portion"
 					/>
 					<Knob
 						label="Ratio"
@@ -75,7 +75,7 @@ export const SimpleCompressorView: React.FC<ISimpleCompressorAllProps> =
 						defaultValue={12}
 						onChange={changeParam}
 						onChangeId={SimpleCompressorParam.ratio}
-						tooltip="the amount of change, in dB, needed in the input for a 1 dB change in the output"
+						tooltip="The amount of change, in dB, needed in the input for a 1 dB change in the output"
 					/>
 					<Knob
 						label="Attack"
@@ -85,7 +85,7 @@ export const SimpleCompressorView: React.FC<ISimpleCompressorAllProps> =
 						defaultValue={0.003}
 						onChange={changeParam}
 						onChangeId={SimpleCompressorParam.attack}
-						tooltip="the amount of time, in seconds, required to reduce the gain by 10 dB"
+						tooltip="The amount of time, in seconds, required to reduce the gain by 10 dB"
 						valueString={adsrValueToString}
 					/>
 					<Knob
@@ -96,7 +96,7 @@ export const SimpleCompressorView: React.FC<ISimpleCompressorAllProps> =
 						defaultValue={0.25}
 						onChange={changeParam}
 						onChangeId={SimpleCompressorParam.release}
-						tooltip="the amount of time, in seconds, required to increase the gain by 10 dB"
+						tooltip="The amount of time, in seconds, required to increase the gain by 10 dB"
 						valueString={adsrValueToString}
 					/>
 				</div>

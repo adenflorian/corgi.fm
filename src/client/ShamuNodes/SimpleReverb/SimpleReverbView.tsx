@@ -50,7 +50,7 @@ export const SimpleReverbView: React.FC<ISimpleReverbAllProps> =
 						defaultValue={5}
 						onChange={changeParam}
 						onChangeId={SimpleReverbParam.time}
-						tooltip="length or reverb in seconds"
+						tooltip="Length or reverb in seconds"
 						valueString={adsrValueToString}
 					/>
 					<Knob
@@ -62,7 +62,7 @@ export const SimpleReverbView: React.FC<ISimpleReverbAllProps> =
 						defaultValue={2000}
 						onChange={changeParam}
 						onChangeId={SimpleReverbParam.lowPassFilterCutoffFrequency}
-						tooltip="low pass filter"
+						tooltip="Low pass filter"
 						valueString={filterValueToString}
 					/>
 				</div>

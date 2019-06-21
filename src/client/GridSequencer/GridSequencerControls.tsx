@@ -10,7 +10,7 @@ import {
 	globalClockActions, gridSequencerActions, GridSequencerFields,
 	GridSequencerState, selectGridSequencer, sequencerActions, shamuConnect,
 } from '../../common/redux'
-import {percentageValueString, seqGateValueToString, seqPitchValueToString, seqRateValueToString, sequencerGateToolTip, sequencerPitchToolTip, sequencerRateToolTip} from '../client-constants'
+import {percentageValueString, seqGateValueToString, seqPitchValueToString, seqRateValueToString, sequencerDownloadToolTip, sequencerEraseToolTip, sequencerGateToolTip, sequencerPitchToolTip, sequencerPlayToolTip, sequencerRateToolTip, sequencerRecordToolTip, sequencerStopToolTip, sequencerUndoToolTip} from '../client-constants'
 import {Knob} from '../Knob/Knob'
 import {KnobSnapping} from '../Knob/KnobSnapping'
 import {rateValues} from '../WebAudio'
@@ -41,36 +41,41 @@ export const GridSequencerControls = (props: AllProps) => {
 						props.dispatch(sequencerActions.play(props.id))
 						props.dispatch(globalClockActions.start())
 					}}
+					title={sequencerPlayToolTip}
 				>
 					<Play />
 				</div>
 				<div
 					className="stop"
 					onClick={() => props.dispatch(sequencerActions.stop(props.id))}
+					title={sequencerStopToolTip}
 				>
 					<Stop />
 				</div>
 				<div
 					className="readonly"
-					title="coming soon™️"
+					title="Coming soon™️"
 				>
 					<Record />
 				</div>
 				<div
 					className="export"
 					onClick={() => props.dispatch(sequencerActions.exportMidi(props.id))}
+					title={sequencerDownloadToolTip}
 				>
 					<Download />
 				</div>
 				<div
 					className="erase"
 					onClick={() => props.dispatch(sequencerActions.clear(props.id))}
+					title={sequencerEraseToolTip}
 				>
 					<Clear />
 				</div>
 				<div
 					className="undo"
 					onClick={() => props.dispatch(sequencerActions.undo(props.id))}
+					title={sequencerUndoToolTip}
 				>
 					<Undo />
 				</div>

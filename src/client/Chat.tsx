@@ -63,7 +63,7 @@ export class Chat extends Component<AllProps, IChatComponentState> {
 
 				<div className="chatBottom" style={{textAlign: 'initial'}} tabIndex={-1}>
 					<div className="inputWrapper" style={{color: authorColor}} tabIndex={-1}>
-						<form className="chatMessageForm" onSubmit={this._onSubmitChat} title="chat box input">
+						<form className="chatMessageForm" onSubmit={this._onSubmitChat} title="Chat box input">
 							<AutosizeInput
 								id="chatInput"
 								onChange={this._onInputChange}
@@ -145,8 +145,8 @@ const BottomInfo = React.memo(function _BottomInfo(props: BottomInfoProps) {
 			<div
 				className={`info-version ${isVersionMismatch ? 'info-versionMismatch' : ''}`}
 				title={isVersionMismatch
-					? `client is out of date, click to reload\nserver version: ${props.serverVersion}`
-					: 'up to date!'
+					? `Client is out of date, click to reload\nServer version: ${props.serverVersion}`
+					: 'Up to date!'
 				}
 				style={{
 					cursor: isVersionMismatch ? 'pointer' : 'inherit',

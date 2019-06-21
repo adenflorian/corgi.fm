@@ -40,7 +40,7 @@ export const MasterControls: React.FC<IMasterControlsProps & IMasterControlsRedu
 				value={masterClockState.bpm}
 				defaultValue={120}
 				onChange={(_, bpm) => setField({bpm})}
-				tooltip="beats per minute"
+				tooltip="Beats per minute"
 				valueString={v => `${v.toFixed(2)} bpm`}
 			/>
 			{/* <Knob
