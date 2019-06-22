@@ -10,6 +10,7 @@ import {AudioNodeWrapper, IAudioNodeWrapperOptions} from './index'
 //   - [ ] filterType: BiquadFilterType
 export class SimpleCompressor extends AudioNodeWrapper {
 	private readonly _compressorNode: DynamicsCompressorNode
+	private readonly _inputGain: GainNode
 
 	constructor(options: IAudioNodeWrapperOptions) {
 		super(options)
@@ -19,9 +20,14 @@ export class SimpleCompressor extends AudioNodeWrapper {
 		this._compressorNode.ratio.value = 12
 		this._compressorNode.attack.value = 0.003
 		this._compressorNode.release.value = 0.25
+
+		this._inputGain = options.audioContext.createGain()
+		this._inputGain.gain.value = 1
+
+		this._inputGain.connect(this._compressorNode)
 	}
 
-	public readonly getInputAudioNode = () => this._compressorNode
+	public readonly getInputAudioNode = () => this._inputGain
 	public readonly getOutputAudioNode = () => this._compressorNode
 
 	public readonly setThreshold = (threshold: number) => {

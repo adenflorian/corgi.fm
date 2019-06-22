@@ -11,6 +11,7 @@ import {AudioNodeWrapper, IAudioNodeWrapperOptions} from './index'
 //   - [ ] filterType: BiquadFilterType
 export class SimpleReverb extends AudioNodeWrapper {
 	private readonly _reverbNode: ReturnType<typeof Reverb>
+	private readonly _inputGain: GainNode
 
 	constructor(options: IAudioNodeWrapperOptions) {
 		super(options)
@@ -19,9 +20,14 @@ export class SimpleReverb extends AudioNodeWrapper {
 		this._reverbNode.cutoff.value = 2000
 		this._reverbNode.dry.value = 0
 		this._reverbNode.wet.value = 1
+
+		this._inputGain = options.audioContext.createGain()
+		this._inputGain.gain.value = 1
+
+		this._inputGain.connect(this._reverbNode)
 	}
 
-	public readonly getInputAudioNode = () => this._reverbNode
+	public readonly getInputAudioNode = () => this._inputGain
 	public readonly getOutputAudioNode = () => this._reverbNode
 
 	public readonly setTime = (time: number) => {

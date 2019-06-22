@@ -154,6 +154,10 @@ export const setupInstrumentManager = (
 
 				updateAudioNodeWrapper(instrumentId, instrument)
 
+				const {enabled} = selectPosition(state.room, instrumentId)
+
+				instrument.setEnabled(enabled)
+
 				if (updateSpecificInstrument) updateSpecificInstrument(instrument, instrumentState)
 			})
 		}
@@ -219,16 +223,16 @@ export const setupInstrumentManager = (
 
 				updateAudioNodeWrapper(effectId, effect)
 
+				const {enabled} = selectPosition(state.room, effectId)
+
+				effect.setPassthroughMode(!enabled)
+
 				if (updateSpecificEffect) updateSpecificEffect(effect, effectState)
 			})
 		}
 
 		function updateAudioNodeWrapper(id: Id, audioNodeWrapper: AudioNodeWrapper) {
 			updateAudioConnectionsFromSource(state.room, id, audioNodeWrapper)
-
-			const {enabled} = selectPosition(state.room, id)
-
-			audioNodeWrapper.setEnabled(enabled)
 		}
 	}
 

@@ -15,6 +15,7 @@ export abstract class AudioNodeWrapper implements IDisposable {
 	protected readonly _audioContext: AudioContext
 	private _connectedTargets = Map<string, AudioNodeWrapper>()
 	private _enabled: boolean = true
+	private _passthroughModeEnabled: boolean = true
 
 	constructor(options: IAudioNodeWrapperOptions) {
 		this.id = options.id
@@ -99,22 +100,32 @@ export abstract class AudioNodeWrapper implements IDisposable {
 		}
 	}
 
+	public readonly setPassthroughMode = (passthroughModeEnabled: boolean) => {
+		if (passthroughModeEnabled === this._passthroughModeEnabled) return
+
+		this._passthroughModeEnabled = passthroughModeEnabled
+
+		this._passthroughModeEnabled
+			? this._enablePassthroughMode()
+			: this._disablePassThroughMode()
+	}
+
 	private readonly _enable = () => {
 		const outputAudioNode = this.getOutputAudioNode()
 
 		if (!outputAudioNode) return
 
 		this._connectedTargets.forEach(destination => {
-			const inputAudioNode = destination.getInputAudioNode()
+			const destinationInput = destination.getInputAudioNode()
 
-			if (!inputAudioNode) return
+			if (!destinationInput) return
 
 			if (detectFeedbackLoop(this)) {
 				logger.warn('Feedback loop detected, preventing connection')
 				return
 			}
 
-			outputAudioNode.connect(inputAudioNode)
+			outputAudioNode.connect(destinationInput)
 		})
 	}
 
@@ -126,6 +137,75 @@ export abstract class AudioNodeWrapper implements IDisposable {
 		if (!output) return
 
 		output.disconnect()
+	}
+
+	private readonly _enablePassthroughMode = () => {
+		// disconnect output from destinations
+		if (this._connectedTargets.count() === 0) return
+
+		const output = this.getOutputAudioNode()
+
+		if (!output) return
+
+		output.disconnect()
+
+		// connect input to destinations
+
+		const input = this.getInputAudioNode()
+
+		if (!input) return
+
+		// might as well disconnect input from output
+		input.disconnect()
+
+		this._connectedTargets.forEach(destination => {
+			const destinationInput = destination.getInputAudioNode()
+
+			if (!destinationInput) return
+
+			if (detectFeedbackLoop(this)) {
+				logger.warn('Feedback loop detected, preventing connection')
+				return
+			}
+
+			input.connect(destinationInput)
+		})
+	}
+
+	// TODO For future effect nodes, we weill have to call something on them
+	// to have them connect their input to their output again
+	private readonly _disablePassThroughMode = () => {
+		// disconnect input from destinations
+		const input = this.getInputAudioNode()
+
+		if (!input) return
+
+		input.disconnect()
+
+		// connect input to output
+		const output = this.getOutputAudioNode()
+
+		if (!output) return
+
+		input.connect(output)
+
+		// connect output to destinations
+		const outputAudioNode = this.getOutputAudioNode()
+
+		if (!outputAudioNode) return
+
+		this._connectedTargets.forEach(destination => {
+			const destinationInput = destination.getInputAudioNode()
+
+			if (!destinationInput) return
+
+			if (detectFeedbackLoop(this)) {
+				logger.warn('Feedback loop detected, preventing connection')
+				return
+			}
+
+			outputAudioNode.connect(destinationInput)
+		})
 	}
 }
 
