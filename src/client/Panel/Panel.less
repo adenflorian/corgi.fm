@@ -62,16 +62,25 @@
             color: @defaultGray;
         }
 
+        .label + * {
+            margin-left: auto;
+        }
+
+        .label ~ * {
+            margin-right: 8px;
+            .smallFont();
+        }
+
         .ownerName {
             .largeFont();
-            margin-left: auto;
-            margin-right: 8px;
+        }
+
+        .extra {
         }
 
         .helpText {
-            margin-left: auto;
             color: @panelGrayLight;
-            width: 32px;
+            width: 8px;
         }
     }
 

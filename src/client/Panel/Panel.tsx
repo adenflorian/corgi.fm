@@ -20,6 +20,7 @@ export interface IPanelProps {
 	autoSize?: boolean
 	helpText?: string
 	ownerName?: string
+	extra?: string
 }
 
 interface ReduxProps {
@@ -32,7 +33,7 @@ type AllProps = IPanelProps & ReduxProps & {dispatch: Dispatch}
 export const DumbPanel: React.FC<AllProps> =
 	React.memo(function _Panel({
 		autoSize = false, children, className = '', color = CssColor.disabledGray, nodeType,
-		id, label, labelTitle, saturate = false, helpText, ownerName, dispatch, enabled,
+		id, label, labelTitle, saturate = false, helpText, ownerName, dispatch, enabled, extra,
 	}) {
 
 		const renderLabel = label !== undefined && label !== ''
@@ -66,6 +67,9 @@ export const DumbPanel: React.FC<AllProps> =
 						<div className="label">{label}</div>
 						{ownerName &&
 							<div className="ownerName" title={ownerName}>{ownerName}</div>
+						}
+						{extra &&
+							<div className="extra" title={extra}>{extra}</div>
 						}
 						{helpText &&
 							<div className="helpText" title={helpText}>?</div>

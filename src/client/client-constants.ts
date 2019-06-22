@@ -112,6 +112,14 @@ export function seqRateValueToString(rate: number) {
 	return '1/' + (1 / adjustedRate)
 }
 
+export function seqLengthValueToString(length: number) {
+	if (length === 1) return `1 bar`
+
+	return (length.toFixed(2) + ` bars`)
+		.replace('.00', '')
+		.replace('.67', '.66')
+}
+
 export function seqPitchValueToString(pitch: number) {
 	if (pitch > 0) return '+' + pitch.toFixed(0) + ' semi'
 	return pitch.toFixed(0) + ' semi'

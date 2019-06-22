@@ -13,7 +13,7 @@ import {
 	infiniteSequencerActions, InfiniteSequencerFields, InfiniteSequencerState,
 	InfiniteSequencerStyle, selectConnectionSourceColorByTargetId, selectInfiniteSequencer, sequencerActions,
 } from '../../common/redux'
-import {percentageValueString, seqPitchValueToString, seqRateValueToString, sequencerDownloadToolTip, sequencerEraseToolTip, sequencerGateToolTip, sequencerPitchToolTip, sequencerPlayToolTip, sequencerRateToolTip, sequencerRecordToolTip, sequencerStopToolTip, sequencerUndoToolTip} from '../client-constants'
+import {percentageValueString, seqLengthValueToString, seqPitchValueToString, seqRateValueToString, sequencerDownloadToolTip, sequencerEraseToolTip, sequencerGateToolTip, sequencerPitchToolTip, sequencerPlayToolTip, sequencerRateToolTip, sequencerRecordToolTip, sequencerStopToolTip, sequencerUndoToolTip} from '../client-constants'
 import {Knob} from '../Knob/Knob'
 import {KnobSnapping} from '../Knob/KnobSnapping'
 import {Panel} from '../Panel/Panel'
@@ -35,6 +35,7 @@ interface IInfiniteSequencerReduxProps {
 	rate: number
 	showRows: boolean
 	style: InfiniteSequencerStyle
+	length: number
 }
 
 type IInfiniteSequencerAllProps =
@@ -42,7 +43,7 @@ type IInfiniteSequencerAllProps =
 
 export const InfiniteSequencer: React.FC<IInfiniteSequencerAllProps> = React.memo(
 	function _InfiniteSequencer(props) {
-		const {color, isPlaying, id, isRecording, name, dispatch} = props
+		const {color, isPlaying, id, isRecording, name, dispatch, length, rate} = props
 
 		const dispatchInfiniteSeqParam = (paramType: InfiniteSequencerFields, value: number | boolean | string) =>
 			dispatch(infiniteSequencerActions.setField(id, paramType, value))
@@ -65,6 +66,7 @@ export const InfiniteSequencer: React.FC<IInfiniteSequencerAllProps> = React.mem
 						saturate={isPlaying}
 						helpText={stripIndents`Plug your keyboard into the infinite sequencer, hit record, and play notes
 							Hit backspace to undo and right arrow key to insert a rest`}
+						extra={seqLengthValueToString(rate / 4 * length)}
 					>
 						<div className="controls" style={{width: InfiniteSequencerState.controlsWidth}}>
 							<div className="buttons">
@@ -193,6 +195,7 @@ export const ConnectedInfiniteSequencer = connect(
 			rate: infiniteSequencerState.rate,
 			showRows: infiniteSequencerState.showRows,
 			style: infiniteSequencerState.style,
+			length: infiniteSequencerState.midiClip.length,
 		}
 	},
 )(InfiniteSequencer)

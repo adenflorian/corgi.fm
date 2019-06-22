@@ -31,14 +31,21 @@
 - [ ] infinite sequencer
 	- [√] click and drag to play all notes
 	- [√] don't play other notes when holding shift
+	- [ ] only play notes if infinite seq selected
 	- [ ] add a way to insert notes left and right
 	- [ ] way to start song from any point in sequencer
 	- [ ] design
-- [ ] fix seq rate knob
-	- [ ] make rate value string display proper stuff
-	- [ ] display note length and sequencer length
+- [√] fix seq rate knob
+	- [√] make rate value string display proper stuff
+	- [√] display note length and sequencer length
 - [ ] show icon on volume to show it is local only
 - [ ] fix up group sequencer
+- [ ] welcome screen for new users
+	- [ ] welcome button on right side
+- [ ] changelog screen
+	- [ ] changelog button on right side
+- [ ] LFO
+- [ ] long notes mixed with short notes
 
 # 0.5.0
 - [ ] reverb dry/wet knobs
