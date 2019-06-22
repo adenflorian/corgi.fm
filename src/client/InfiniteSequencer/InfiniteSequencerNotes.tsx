@@ -33,6 +33,7 @@ export function InfiniteSequencerNotes({id, style, events, showRows, dispatch}: 
 		isSelected: false,
 		index: -1,
 	})
+	const [isAreaSelected, setIsAreaSelected] = useState(false)
 
 	const [mouseDelta, setMouseDelta] = useState({x: 0, y: 0})
 
@@ -48,17 +49,19 @@ export function InfiniteSequencerNotes({id, style, events, showRows, dispatch}: 
 	}
 
 	useLayoutEffect(() => {
-		if (selectedEvent.isSelected) {
+		if (selectedEvent.isSelected || isAreaSelected) {
 			window.addEventListener('mousemove', handleMouseMove)
 		}
 
 		return () => {
 			window.removeEventListener('mousemove', handleMouseMove)
 		}
-	}, [selectedEvent, mouseDelta, events])
+	}, [selectedEvent, mouseDelta, events, isAreaSelected])
 
 	const handleMouseDown: HandleMouseEvent = (event: React.MouseEvent, note: IMidiNote, index: number) => {
 		if (event.button === 0) {
+			setIsAreaSelected(true)
+
 			if (note >= 0) {
 				dispatch(localActions.playShortNote(id, note))
 			}
@@ -80,7 +83,7 @@ export function InfiniteSequencerNotes({id, style, events, showRows, dispatch}: 
 	}
 
 	const handleMouseEnter: HandleMouseEvent = (event: React.MouseEvent, note: IMidiNote, index: number) => {
-		if (event.buttons !== 1 || event.shiftKey) return
+		if (event.buttons !== 1 || event.shiftKey || !isAreaSelected) return
 
 		if (note >= 0) {
 			dispatch(localActions.playShortNote(id, note))
@@ -88,6 +91,8 @@ export function InfiniteSequencerNotes({id, style, events, showRows, dispatch}: 
 	}
 
 	const handleMouseMove = (event: MouseEvent) => {
+		if (isAreaSelected && event.buttons !== 1) setIsAreaSelected(false)
+
 		if (!selectedEvent.isSelected) return
 
 		if (event.buttons !== 1 || !event.shiftKey) return setSelectedEvent({isSelected: false, index: -1})

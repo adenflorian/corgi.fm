@@ -31,7 +31,7 @@
 - [ ] infinite sequencer
 	- [√] click and drag to play all notes
 	- [√] don't play other notes when holding shift
-	- [ ] only play notes if infinite seq selected
+	- [√] only play notes if infinite seq selected*****
 	- [ ] add a way to insert notes left and right
 	- [ ] way to start song from any point in sequencer
 	- [ ] design
