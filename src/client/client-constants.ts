@@ -48,13 +48,15 @@ export const detuneToolTip = stripIndents`
 	Fine grained pitch control, where 100% is 1 half step above the current note
 `
 export const sequencerGateToolTip = stripIndents`
-	Controls note length
+	Controls how long each note is held down before releasing
 `
 export const sequencerPitchToolTip = stripIndents`
 	Controls note midi pitch in half steps
 `
 export const sequencerRateToolTip = stripIndents`
-	Makes sequence go faster or slower
+	Controls note length and sequencer length
+	Rate is for each note
+	Meaning, at 1/4, each note is a quarter note
 `
 export const sequencerPlayToolTip = stripIndents`
 	Play this sequencer and the Master Clock
@@ -104,9 +106,10 @@ export function seqGateValueToString(pitch: number) {
 }
 
 export function seqRateValueToString(rate: number) {
-	if (rate > 1) return rate.toFixed(0) + ' bars'
-	if (rate === 1) return rate.toFixed(0) + ' bar'
-	return '1/' + (1 / rate)
+	const adjustedRate = rate / 4
+	if (adjustedRate > 1) return adjustedRate.toFixed(0) + ' bars'
+	if (adjustedRate === 1) return adjustedRate.toFixed(0) + ' bar'
+	return '1/' + (1 / adjustedRate)
 }
 
 export function seqPitchValueToString(pitch: number) {

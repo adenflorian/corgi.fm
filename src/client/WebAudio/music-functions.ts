@@ -77,13 +77,15 @@ function nearestPow3(aSize: number) {
 	return Math.pow(6, Math.round(Math.log(aSize) / Math.log(6)))
 }
 
+// In beat units
 export const rateValues = List([
+	16,
+	8,
 	4,
-	3,
 	2,
-	// 1.5,
+	1 + 1 / 3,
 	1,
-	// 3 / 4,
+	2 / 3,
 	1 / 2,
 	1 / 3,
 	1 / 4,
