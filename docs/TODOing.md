@@ -30,6 +30,7 @@
 - [ ] toggle note click audio for sequencers on title bar
 - [ ] infinite sequencer
 	- [√] click and drag to play all notes
+	- [√] don't play other notes when holding shift
 	- [ ] add a way to insert notes left and right
 	- [ ] way to start song from any point in sequencer
 	- [ ] design

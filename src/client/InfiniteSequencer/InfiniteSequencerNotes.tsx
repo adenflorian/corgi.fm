@@ -80,7 +80,7 @@ export function InfiniteSequencerNotes({id, style, events, showRows, dispatch}: 
 	}
 
 	const handleMouseEnter: HandleMouseEvent = (event: React.MouseEvent, note: IMidiNote, index: number) => {
-		if (event.buttons !== 1) return
+		if (event.buttons !== 1 || event.shiftKey) return
 
 		if (note >= 0) {
 			dispatch(localActions.playShortNote(id, note))
