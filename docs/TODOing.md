@@ -32,7 +32,7 @@
 - [√] fix seq rate knob
 	- [√] make rate value string display proper stuff
 	- [√] display note length and sequencer length
-- [ ] chat input bottom is taking clicks
+- [√] chat input bottom is taking clicks
 - [ ] fix up group sequencer
 	- [√] fix spacing with multiple connections
 	- [ ] be able to drag new connector from each port
@@ -55,6 +55,7 @@
 - [ ] dragging something to edge of screen should pan for you
 
 # 0.5.0
+- [ ] put bottom right info in own component outside chat stuff so you can click without activating chat
 - [ ] reverb dry/wet knobs
 - [ ] compressor dry/wet knobs
 - [ ] show progress bar on reverb when loading new impulse
