@@ -93,7 +93,8 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 
 	public readonly setSustain = (sustain: number) => {
 		if (this._sustain === sustain) return
-		this._sustain = sustain
+		// Keep min above 0 as workaround for possible chrome bug causing audio context to die
+		this._sustain = Math.max(0.01, sustain)
 		// TODO?
 		// this._getVoices().changeSustainLengthForScheduledVoices(this._sustain)
 	}
