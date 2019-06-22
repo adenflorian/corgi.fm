@@ -5,6 +5,7 @@ import {MidiGlobalClipEvent, midiPrecision, MidiRange} from '../common/midi-type
 import {
 	ClientStore, GroupSequencers,
 	IClientRoomState,
+	MASTER_CLOCK_SOURCE_ID,
 	selectAllGroupSequencers,
 	selectAllSequencers,
 	selectConnectionSourceIdsByTarget,
@@ -31,6 +32,7 @@ export function startNoteScanner(store: ClientStore, audioContext: AudioContext,
 const _jumpStartSeconds = 0.0
 
 let _isPlaying = false
+let _isMasterClockEnabled = true
 let _cursorBeats = 0
 let currentSongTimeBeats = 0
 let lastAudioContextTime = 0
@@ -39,7 +41,9 @@ let songStartTimeSeconds = 0
 /** Used for knowing when to restart */
 let _playCount = 0
 
-let _sequencersInfo = Map<string, {loopRatio: number}>()
+const makeSequencersInfo = () => Map<string, {loopRatio: number}>()
+
+let _sequencersInfo = makeSequencersInfo()
 
 export function getSequencersSchedulerInfo() {
 	return _sequencersInfo
@@ -74,10 +78,24 @@ function scheduleNotes(getAllInstruments: GetAllInstruments) {
 			// song stopped
 			// release all notes on all instruments
 			releaseAllNotesOnAllInstruments(getAllInstruments)
+			_sequencersInfo = makeSequencersInfo()
 		}
 	}
 
 	if (isPlaying === false) return
+
+	const isMasterClockEnabled = selectPosition(roomState, MASTER_CLOCK_SOURCE_ID).enabled
+
+	if (isMasterClockEnabled !== _isMasterClockEnabled) {
+		_isMasterClockEnabled = isMasterClockEnabled
+		if (_isMasterClockEnabled) {
+			lastAudioContextTime = _audioContext.currentTime
+		} else {
+
+		}
+	}
+
+	if (_isMasterClockEnabled === false) return
 
 	const deltaTimeSeconds = _audioContext.currentTime - lastAudioContextTime
 	lastAudioContextTime = _audioContext.currentTime
