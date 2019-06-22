@@ -1,6 +1,7 @@
 import * as React from 'react'
 import {Dispatch} from 'redux'
-import {positionActions, selectPosition, shamuConnect} from '../../common/redux'
+import {ConnectionNodeType} from '../../common/common-types'
+import {getConnectionNodeInfo, IPosition, positionActions, selectPosition, shamuConnect} from '../../common/redux'
 import {CssColor} from '../../common/shamu-color'
 import {handleClassName, handleVisualClassName} from '../client-constants'
 import './Panel.less'
@@ -20,22 +21,25 @@ export interface IPanelProps {
 
 interface ReduxProps {
 	enabled: boolean
+	nodeType: ConnectionNodeType
 }
 
 type AllProps = IPanelProps & ReduxProps & {dispatch: Dispatch}
 
 export const DumbPanel: React.FC<AllProps> =
 	React.memo(function _Panel({
-		autoSize = false, children, className = '', color = CssColor.defaultGray,
+		autoSize = false, children, className = '', color = CssColor.disabledGray, nodeType,
 		id, label, labelTitle, saturate = false, helpText, ownerName, dispatch, enabled,
 	}) {
 
 		const renderLabel = label !== undefined && label !== ''
 
+		const nodeInfo = getConnectionNodeInfo(nodeType)
+
 		return (
 			<div
 				style={{
-					color: enabled ? color : CssColor.defaultGray,
+					color: enabled ? color : CssColor.disabledGray,
 					position: 'relative',
 					width: autoSize ? 'auto' : undefined,
 					height: autoSize ? 'auto' : undefined,
@@ -50,6 +54,7 @@ export const DumbPanel: React.FC<AllProps> =
 						<div
 							className={`colorDotContainer noDrag ${enabled ? 'enabled' : ''}`}
 							onClick={() => id !== undefined ? dispatch(positionActions.setEnabled(id, !enabled)) : undefined}
+							title={(enabled ? 'Enabled' : 'Disabled') + `\nDisable or enable this node\n` + nodeInfo.disabledText + ' when disabled'}
 						>
 							<div className="colorDot"></div>
 						</div>
@@ -74,8 +79,10 @@ export const DumbPanel: React.FC<AllProps> =
 
 export const Panel = shamuConnect(
 	(state, {id}: IPanelProps): ReduxProps => {
+		const position = selectPosition(state.room, id === undefined ? '' : id)
 		return {
-			enabled: id === undefined ? false : selectPosition(state.room, id).enabled,
+			enabled: position.enabled,
+			nodeType: position.targetType,
 		}
 	},
 )(DumbPanel)

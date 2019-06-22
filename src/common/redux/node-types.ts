@@ -70,6 +70,7 @@ const _makeNodeInfo = Record({
 	autoConnectToClock: false,
 	autoConnectToAudioOutput: false,
 	undoAction: ((id: Id) => undefined) as (id: Id) => AnyAction | undefined,
+	disabledText: '',
 })
 
 type NodeInfo = ReturnType<typeof _makeNodeInfo>
@@ -106,6 +107,10 @@ class MasterClockState implements IConnectable {
 
 const masterClockState = new MasterClockState()
 
+const sequencerDisabledText = 'Will stop emitting notes'
+const instrumentDisabledText = 'Will stop emitting audio'
+const effectDisabledText = 'Will let audio pass through unaltered'
+
 const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 	[ConnectionNodeType.virtualKeyboard, makeNodeInfo({
 		typeName: 'Virtual Keyboard',
@@ -117,6 +122,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		selectIsPlaying: selectVirtualKeyboardHasPressedKeys,
 		selectActiveNotes: makeGetKeyboardMidiOutput(),
 		stateDeserializer: VirtualKeyboardState.fromJS,
+		disabledText: 'Will stop emitting notes',
 	})],
 	[ConnectionNodeType.gridSequencer, makeNodeInfo({
 		typeName: 'Grid Sequencer',
@@ -132,6 +138,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		isDeletable: true,
 		autoConnectToClock: true,
 		undoAction: id => sequencerActions.undo(id),
+		disabledText: sequencerDisabledText,
 	})],
 	[ConnectionNodeType.infiniteSequencer, makeNodeInfo({
 		typeName: 'Infinite Sequencer',
@@ -147,6 +154,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		isDeletable: true,
 		autoConnectToClock: true,
 		undoAction: id => sequencerActions.undo(id),
+		disabledText: sequencerDisabledText,
 	})],
 	[ConnectionNodeType.groupSequencer, makeNodeInfo({
 		typeName: 'Group Sequencer',
@@ -157,6 +165,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		showOnAddNodeMenu: true,
 		isDeletable: true,
 		autoConnectToClock: true,
+		disabledText: 'Will prevent connected nodes from playing',
 	})],
 	[ConnectionNodeType.basicSynthesizer, makeNodeInfo({
 		typeName: 'Basic Synthesizer',
@@ -168,6 +177,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		showOnAddNodeMenu: true,
 		isDeletable: true,
 		autoConnectToAudioOutput: true,
+		disabledText: instrumentDisabledText,
 	})],
 	[ConnectionNodeType.basicSampler, makeNodeInfo({
 		typeName: 'Basic Piano Sampler',
@@ -179,6 +189,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		showOnAddNodeMenu: true,
 		isDeletable: true,
 		autoConnectToAudioOutput: true,
+		disabledText: instrumentDisabledText,
 	})],
 	[ConnectionNodeType.simpleReverb, makeNodeInfo({
 		typeName: 'R E V E R B',
@@ -190,6 +201,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		showOnAddNodeMenu: true,
 		isDeletable: true,
 		autoConnectToAudioOutput: true,
+		disabledText: effectDisabledText,
 	})],
 	[ConnectionNodeType.simpleCompressor, makeNodeInfo({
 		typeName: 'Compressor',
@@ -201,6 +213,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		showOnAddNodeMenu: true,
 		isDeletable: true,
 		autoConnectToAudioOutput: true,
+		disabledText: effectDisabledText,
 	})],
 	[ConnectionNodeType.audioOutput, makeNodeInfo({
 		typeName: 'Audio Output',
@@ -208,6 +221,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		addNodeActionCreator: () => ({type: 'dummy audioOutput type'}),
 		selectIsPlaying: selectIsUpstreamNodePlaying,
 		stateSelector: () => audioOutputState,
+		disabledText: 'Will mute',
 	})],
 	[ConnectionNodeType.masterClock, makeNodeInfo({
 		typeName: 'Master Clock',
@@ -218,6 +232,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		selectIsSending: selectGlobalClockIsPlaying,
 		selectIsPlaying: selectGlobalClockIsPlaying,
 		color: CssColor.brightBlue,
+		disabledText: 'Will stop ticking',
 	})],
 ])
 

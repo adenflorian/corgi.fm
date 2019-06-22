@@ -17,6 +17,12 @@
 # 0.4.0
 - [√] add enable/disable to positions state
 	- [ ] make disabling do something for every node
+		- [ ] effects should pass thru
+		- [ ] instruments shouldn't output anything
+		- [ ] sequencers shouldnt play notes
+		- [ ] master volume should mute
+		- [ ] master clock should not run
+		- [ ] group seq should not let anything connected play
 - [ ] add button to clear chat
 - [ ] "show older messages" button
 - [√] track selected node
