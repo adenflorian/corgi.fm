@@ -1,14 +1,14 @@
 import {Map} from 'immutable'
 import {Store} from 'redux'
-import {ConnectionNodeType, IConnectable} from '../common/common-types'
+import {ConnectionNodeType, IConnectable, Id} from '../common/common-types'
 import {
 	BasicSamplerState, BasicSynthesizerState, IClientAppState,
 	IClientRoomState, IConnection, isAudioNodeType,
 	MASTER_AUDIO_OUTPUT_TARGET_ID, selectAllBasicSynthesizerIds, selectAllSamplerIds,
 	selectAllSimpleCompressorIds, selectAllSimpleReverbIds,
 	selectBasicSynthesizer, selectConnectionsWithSourceIds,
-	selectSampler, selectSimpleCompressor, selectSimpleReverb,
-	SimpleCompressorState, SimpleReverbState,
+	selectPosition, selectSampler, selectSimpleCompressor,
+	selectSimpleReverb, SimpleCompressorState, SimpleReverbState,
 } from '../common/redux'
 import {
 	AudioNodeWrapper, IAudioNodeWrapperOptions, IInstrumentOptions,
@@ -152,7 +152,7 @@ export const setupInstrumentManager = (
 					}, instrumentState),
 				)
 
-				updateAudioConnectionsFromSource(state.room, instrumentId, instrument)
+				updateAudioNodeWrapper(instrumentId, instrument)
 
 				if (updateSpecificInstrument) updateSpecificInstrument(instrument, instrumentState)
 			})
@@ -217,10 +217,18 @@ export const setupInstrumentManager = (
 					}, effectState),
 				)
 
-				updateAudioConnectionsFromSource(state.room, effectId, effect)
+				updateAudioNodeWrapper(effectId, effect)
 
 				if (updateSpecificEffect) updateSpecificEffect(effect, effectState)
 			})
+		}
+
+		function updateAudioNodeWrapper(id: Id, audioNodeWrapper: AudioNodeWrapper) {
+			updateAudioConnectionsFromSource(state.room, id, audioNodeWrapper)
+
+			const {enabled} = selectPosition(state.room, id)
+
+			audioNodeWrapper.setEnabled(enabled)
 		}
 	}
 

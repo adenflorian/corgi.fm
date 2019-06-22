@@ -14,6 +14,7 @@ export abstract class AudioNodeWrapper implements IDisposable {
 	protected abstract getOutputAudioNode: () => AudioNode | null
 	protected readonly _audioContext: AudioContext
 	private _connectedTargets = Map<string, AudioNodeWrapper>()
+	private _enabled: boolean = true
 
 	constructor(options: IAudioNodeWrapperOptions) {
 		this.id = options.id
@@ -78,6 +79,47 @@ export abstract class AudioNodeWrapper implements IDisposable {
 		if (this._connectedTargets.count() === 0) return
 
 		this._connectedTargets = this._connectedTargets.clear()
+
+		const output = this.getOutputAudioNode()
+
+		if (!output) return
+
+		output.disconnect()
+	}
+
+	public readonly setEnabled = (enabled: boolean) => {
+		if (enabled === this._enabled) return
+
+		this._enabled = enabled
+
+		if (this._enabled) {
+			this._enable()
+		} else {
+			this._disable()
+		}
+	}
+
+	private readonly _enable = () => {
+		const outputAudioNode = this.getOutputAudioNode()
+
+		if (!outputAudioNode) return
+
+		this._connectedTargets.forEach(destination => {
+			const inputAudioNode = destination.getInputAudioNode()
+
+			if (!inputAudioNode) return
+
+			if (detectFeedbackLoop(this)) {
+				logger.warn('Feedback loop detected, preventing connection')
+				return
+			}
+
+			outputAudioNode.connect(inputAudioNode)
+		})
+	}
+
+	private readonly _disable = () => {
+		if (this._connectedTargets.count() === 0) return
 
 		const output = this.getOutputAudioNode()
 
