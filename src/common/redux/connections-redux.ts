@@ -264,11 +264,13 @@ export function sortConnection(connA: IConnection, connB: IConnection) {
 export const selectConnectionStackOrderForTarget = (roomState: IClientRoomState, id: string) => {
 	const connection = selectConnection(roomState, id)
 	const connections = selectConnectionsWithTargetIds(roomState, [connection.targetId])
+		.filter(x => x.targetPort === connection.targetPort)
 	return connections.toIndexedSeq().indexOf(connection)
 }
 
 export const selectConnectionStackOrderForSource = (roomState: IClientRoomState, id: string) => {
 	const connection = selectConnection(roomState, id)
 	const connections = selectConnectionsWithSourceIds(roomState, [connection.sourceId])
+		.filter(x => x.sourcePort === connection.sourcePort)
 	return connections.toIndexedSeq().indexOf(connection)
 }

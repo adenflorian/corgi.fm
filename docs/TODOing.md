@@ -3,16 +3,13 @@
 - [√] put "corgi.fm" in bottom right by version
 - [√] chat
 - [√] put name in top right
-	- [ ] show edit icon to left of name on hover
 - [√] put button links in a button with out link icon
 - [√] chat input min width
 - [√] options
 - [√] loading modal
 - [√] Connecting...
 - [√] keyboard label
-- [ ] grid sequencer
-- [ ] pan and detune knob arcs should start from center
-- [ ] make select have label on left side with darker background
+- [√] grid sequencer
 
 # 0.4.0
 - [√] add enable/disable to positions state
@@ -23,11 +20,8 @@
 		- [√] master volume should mute
 		- [√] master clock should not run
 		- [√] group seq should not let anything connected play
-- [ ] add button to clear chat
-- [ ] "show older messages" button
 - [√] track selected node
 	- [√] ctrl z should send undo to selected node
-- [ ] toggle note click audio for sequencers on title bar
 - [ ] infinite sequencer
 	- [√] click and drag to play all notes
 	- [√] don't play other notes when holding shift
@@ -38,14 +32,27 @@
 - [√] fix seq rate knob
 	- [√] make rate value string display proper stuff
 	- [√] display note length and sequencer length
-- [ ] show icon on volume to show it is local only
+- [ ] chat input bottom is taking clicks
 - [ ] fix up group sequencer
+	- [√] fix spacing with multiple connections
+	- [ ] be able to drag new connector from each port
+	- [ ] connected nodes should prefer group sequencer color
+	- [ ] maybe show color dots in a corner of node to show what groups it's in?
+- [ ] delay node
+- [ ] toggle note click audio for sequencers on title bar
+- [ ] LFO
 - [ ] welcome screen for new users
 	- [ ] welcome button on right side
 - [ ] changelog screen
 	- [ ] changelog button on right side
-- [ ] LFO
+- [ ] add button to clear chat
+- [ ] "show older messages" button
+- [ ] show icon on volume to show it is local only
 - [ ] long notes mixed with short notes
+- [ ] pan and detune knob arcs should start from center
+- [ ] make select have label on left side with darker background
+- [ ] show edit icon to left of name on hover in top right
+- [ ] dragging something to edge of screen should pan for you
 
 # 0.5.0
 - [ ] reverb dry/wet knobs
