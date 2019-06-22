@@ -1,5 +1,6 @@
 import {List} from 'immutable'
 import * as React from 'react'
+import {CssColor} from '../../common/shamu-color'
 import {Panel} from '../Panel/Panel'
 import './Select.less'
 
@@ -21,7 +22,10 @@ export const Select = ({label, name, onChange, options, value}: ISelectProps) =>
 			}}>
 			{label}
 		</label> */}
-		<Panel className="selectContainer">
+		<Panel
+			className="selectContainer"
+			color={CssColor.defaultGray}
+		>
 			<select name={name} value={value} onChange={onChange}>
 				{options.map(choice =>
 					<option key={choice} value={choice} label={choice}>{choice}</option>,

@@ -1,4 +1,5 @@
 import * as React from 'react'
+import {CssColor} from '../../common/shamu-color'
 import {Panel} from '../Panel/Panel'
 import './Button.less'
 
@@ -15,6 +16,7 @@ export const Button = React.memo(
 				<Panel
 					className={'buttonContainer ' + style}
 					autoSize={true}
+					color={CssColor.defaultGray}
 				>
 					<button
 						{...buttonProps}
