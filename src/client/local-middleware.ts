@@ -592,69 +592,36 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 		y: extremes.bottomMost + y,
 	}
 
-	if (localClient.name.toLowerCase() === '$sampler') {
-		const newSampler = new BasicSamplerState(localClient.id)
-		dispatch(addBasicSampler(newSampler))
-		const samplerPosition = makePosition({
-			...newSampler,
-			id: newSampler.id,
-			targetType: ConnectionNodeType.basicSampler,
-			width: BasicSamplerState.defaultWidth,
-			height: BasicSamplerState.defaultHeight,
-			...nextPosition,
-		})
-		dispatch(addPosition({
-			...samplerPosition,
-			y: samplerPosition.y - (samplerPosition.height / 2),
-		}))
+	const newInstrument = new BasicSynthesizerState(localClient.id)
+	dispatch(addBasicSynthesizer(newInstrument))
+	const instrumentPosition = makePosition({
+		...newInstrument,
+		id: newInstrument.id,
+		targetType: ConnectionNodeType.basicSynthesizer,
+		width: BasicSynthesizerState.defaultWidth,
+		height: BasicSynthesizerState.defaultHeight,
+		...nextPosition,
+	})
+	dispatch(addPosition({
+		...instrumentPosition,
+		y: instrumentPosition.y - (instrumentPosition.height / 2),
+	}))
 
-		// Source to target
-		dispatch(connectionsActions.add(new Connection(
-			newVirtualKeyboard.id,
-			ConnectionNodeType.virtualKeyboard,
-			newSampler.id,
-			ConnectionNodeType.basicSampler,
-		)))
+	// Source to target
+	dispatch(connectionsActions.add(new Connection(
+		newVirtualKeyboard.id,
+		ConnectionNodeType.virtualKeyboard,
+		newInstrument.id,
+		ConnectionNodeType.basicSynthesizer,
+	)))
 
-		// Target to audio output
-		dispatch(connectionsActions.add(new Connection(
-			newSampler.id,
-			ConnectionNodeType.basicSampler,
-			MASTER_AUDIO_OUTPUT_TARGET_ID,
-			ConnectionNodeType.audioOutput,
-		)))
-	} else {
-		const newInstrument = new BasicSynthesizerState(localClient.id)
-		dispatch(addBasicSynthesizer(newInstrument))
-		const instrumentPosition = makePosition({
-			...newInstrument,
-			id: newInstrument.id,
-			targetType: ConnectionNodeType.basicSynthesizer,
-			width: BasicSynthesizerState.defaultWidth,
-			height: BasicSynthesizerState.defaultHeight,
-			...nextPosition,
-		})
-		dispatch(addPosition({
-			...instrumentPosition,
-			y: instrumentPosition.y - (instrumentPosition.height / 2),
-		}))
-
-		// Source to target
-		dispatch(connectionsActions.add(new Connection(
-			newVirtualKeyboard.id,
-			ConnectionNodeType.virtualKeyboard,
-			newInstrument.id,
-			ConnectionNodeType.basicSynthesizer,
-		)))
-
-		// Target to audio output
-		dispatch(connectionsActions.add(new Connection(
-			newInstrument.id,
-			ConnectionNodeType.basicSynthesizer,
-			MASTER_AUDIO_OUTPUT_TARGET_ID,
-			ConnectionNodeType.audioOutput,
-		)))
-	}
+	// Target to audio output
+	dispatch(connectionsActions.add(new Connection(
+		newInstrument.id,
+		ConnectionNodeType.basicSynthesizer,
+		MASTER_AUDIO_OUTPUT_TARGET_ID,
+		ConnectionNodeType.audioOutput,
+	)))
 }
 
 function _getDownstreamRecordingSequencers(
