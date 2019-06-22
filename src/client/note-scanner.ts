@@ -10,6 +10,7 @@ import {
 	selectConnectionSourceIdsByTarget,
 	selectConnectionsWithTargetIds,
 	selectGlobalClockState,
+	selectPosition,
 	selectSequencerIsPlaying,
 } from '../common/redux'
 import {GetAllInstruments} from './instrument-manager'
@@ -112,6 +113,7 @@ function scheduleNotes(getAllInstruments: GetAllInstruments) {
 	// run all sequencers events thru scheduler
 	const sequencersEvents = Map(selectAllSequencers(roomState))
 		.filter(seq => selectSequencerIsPlaying(roomState, seq.id))
+		.filter(seq => selectPosition(roomState, seq.id).enabled)
 		.map(seq => ({
 			seq,
 			events: getEvents(seq.midiClip, readRangeBeats, seq.rate)

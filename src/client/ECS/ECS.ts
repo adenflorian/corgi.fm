@@ -3,7 +3,7 @@ import {Store} from 'redux'
 import {ConnectionNodeType, isSequencerNodeType} from '../../common/common-types'
 import {
 	AppOptions, IClientAppState, selectAllPositions, selectGroupSequencer,
-	selectOption, selectSequencer, selectSequencerIsPlaying,
+	selectOption, selectPosition, selectSequencer, selectSequencerIsPlaying,
 } from '../../common/redux'
 import {getSequencersSchedulerInfo} from '../note-scanner'
 import {ECSCanvasRenderSystem} from './ECSCanvasRenderSystem'
@@ -65,7 +65,7 @@ function ecsLoop() {
 					.get(sequencer.id, {loopRatio: 0})
 					.loopRatio,
 				isPlaying: isSequencerNodeType(sequencer.type)
-					? selectSequencerIsPlaying(state.room, sequencer.id)
+					? selectSequencerIsPlaying(state.room, sequencer.id) && selectPosition(state.room, sequencer.id).enabled
 					: true,
 			}),
 		))

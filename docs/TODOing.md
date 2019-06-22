@@ -17,9 +17,9 @@
 # 0.4.0
 - [√] add enable/disable to positions state
 	- [ ] make disabling do something for every node
-		- [ ] effects should pass thru
-		- [ ] instruments shouldn't output anything
-		- [ ] sequencers shouldnt play notes
+		- [√] effects should pass thru
+		- [√] instruments shouldn't output anything
+		- [√] sequencers shouldnt play notes
 		- [ ] master volume should mute
 		- [ ] master clock should not run
 		- [ ] group seq should not let anything connected play
@@ -33,12 +33,17 @@
 	- [ ] add a way to insert notes left and right
 	- [ ] way to start song from any point in sequencer
 	- [ ] design
+- [ ] fix seq rate knob
+	- [ ] make rate value string display proper stuff
+	- [ ] display note length and sequencer length
 
 # Now
 - [√] don't delete everything on disconnect
 - [√] smooth scroll in steps like google maps
 	
 # Soon
+- [ ] be able to move multiple nodes at once
+	- [ ] maybe select multiple nodes at once with shift + click or drawing a selection box?
 - [ ] use synesthesia colors
 - [ ] switch to jest
 - [ ] sync client clocks

@@ -123,12 +123,12 @@ export const makePosition = (
 	return makePositionRecord(position).toJS()
 }
 
-export type IPositionAction = AddPositionAction | DeletePositionsAction | NodeClickedAction
+export type PositionAction = AddPositionAction | DeletePositionsAction | NodeClickedAction
 	| DeleteAllPositionsAction | UpdatePositionsAction | UpdatePositionAction | MovePositionAction
 	| ReplacePositionsAction | ActionType<typeof positionActions>
 
 // Reducers
-const positionsSpecificReducer: Reducer<IPositions, IPositionAction> =
+const positionsSpecificReducer: Reducer<IPositions, PositionAction> =
 	(positions = Positions(), action) => {
 		switch (action.type) {
 			case ADD_POSITION: return sortPositions(positions.set(
@@ -163,7 +163,7 @@ function sortPositions(positions: IPositions) {
 	return positions.sortBy(x => x.id)
 }
 
-export const positionsReducer: Reducer<IPositionsState, IPositionAction> = combineReducers({
+export const positionsReducer: Reducer<IPositionsState, PositionAction> = combineReducers({
 	all: positionsSpecificReducer,
 	meta: shamuMetaReducer,
 })

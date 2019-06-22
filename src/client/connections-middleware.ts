@@ -6,14 +6,20 @@ import {BroadcastAction} from '../common/redux/common-redux-types'
 import {
 	DELETE_CONNECTIONS, GHOST_CONNECTION_DELETE,
 	GhostConnectorAction, IClientAppState,
-	IConnectionAction, ORGANIZE_GRAPH, selectAllConnections,
-	selectAllPositions, selectConnection, updatePositions,
+	IConnectionAction, ORGANIZE_GRAPH, PositionAction,
+	selectAllConnections, selectAllPositions, selectConnection,
+	selectConnectionsWithSourceIds, SET_ENABLED_NODE, updatePositions,
 } from '../common/redux/index'
 import {handleStopDraggingGhostConnector} from './dragging-connections'
 import {GetAllInstruments} from './instrument-manager'
 
-export const connectionsClientMiddleware: (getAllInstruments: GetAllInstruments) => Middleware<{}, IClientAppState> =
-	(getAllInstruments: GetAllInstruments) => ({dispatch, getState}) => next => (action: IConnectionAction | OrganizeGraphAction | GhostConnectorAction) => {
+type ConnectionClientMiddleWareAction = IConnectionAction | OrganizeGraphAction |
+	GhostConnectorAction | PositionAction
+
+// TODO Merge with local middleware?
+export const connectionsClientMiddleware
+	: (getAllInstruments: GetAllInstruments) => Middleware<{}, IClientAppState> =
+	(getAllInstruments: GetAllInstruments) => ({dispatch, getState}) => next => (action: ConnectionClientMiddleWareAction) => {
 
 		const beforeState = getState()
 
@@ -55,6 +61,20 @@ export const connectionsClientMiddleware: (getAllInstruments: GetAllInstruments)
 					}
 				})
 				// return handleDeleteConnection(beforeState.room, dispatch, action.connectionIds)
+				return
+			}
+			case SET_ENABLED_NODE: {
+				if (action.enabled) return
+
+				const instruments = getAllInstruments()
+
+				return selectConnectionsWithSourceIds(getState().room, [action.id])
+					.forEach(connection => {
+						const instrument = instruments.get(connection.targetId)
+						if (instrument) {
+							instrument.releaseAllScheduledFromSourceId(connection.sourceId)
+						}
+					})
 			}
 			default: return
 		}
