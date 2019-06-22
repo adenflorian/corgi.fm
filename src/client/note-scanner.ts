@@ -213,6 +213,9 @@ const getGroupEventsFilter = (groupSequencers: GroupSequencers, roomState: IClie
 	// Sequencers should play if not connected to a group sequencer
 	if (sourceGroupSequencers.count() === 0) return true
 
+	// Sequencers should not play if all connected group sequencers are disabled
+	if (sourceGroupSequencers.every(x => selectPosition(roomState, x.id).enabled === false)) return false
+
 	return sourceGroupSequencers.some(groupSeq => {
 		const portsUsed = connectionsToSequencer
 			.filter(x => x.sourceId === groupSeq.id)

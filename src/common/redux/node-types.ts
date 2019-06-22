@@ -165,7 +165,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		showOnAddNodeMenu: true,
 		isDeletable: true,
 		autoConnectToClock: true,
-		disabledText: 'Will prevent connected nodes from playing',
+		disabledText: 'Will prevent connected nodes from playing, unless they are connected to a different, enabled group sequencer',
 	})],
 	[ConnectionNodeType.basicSynthesizer, makeNodeInfo({
 		typeName: 'Basic Synthesizer',
