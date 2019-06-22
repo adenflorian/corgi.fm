@@ -113,7 +113,7 @@ export class InfiniteSequencerState extends SequencerStateBase {
 
 	constructor(
 		ownerId: string,
-		name = 'infinite sequencer',
+		name = 'Infinite Sequencer',
 		style = InfiniteSequencerStyle.colorGrid,
 		events = createSequencerEvents(4)
 			.map((_, i) => (makeMidiClipEvent({

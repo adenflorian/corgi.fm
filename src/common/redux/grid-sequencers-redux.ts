@@ -97,7 +97,7 @@ export class GridSequencerState extends SequencerStateBase {
 
 	constructor(
 		ownerId: string,
-		name = 'grid sequencer',
+		name = 'Grid Sequencer',
 		notesToShow = 24,
 		events = createSequencerEvents(32)
 			.map((_, i) => (makeMidiClipEvent({

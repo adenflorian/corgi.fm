@@ -180,7 +180,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		disabledText: instrumentDisabledText,
 	})],
 	[ConnectionNodeType.basicSampler, makeNodeInfo({
-		typeName: 'Basic Piano Sampler',
+		typeName: 'Piano Sampler',
 		stateConstructor: BasicSamplerState,
 		addNodeActionCreator: addBasicSampler,
 		selectIsPlaying: selectIsUpstreamNodePlaying,
@@ -192,7 +192,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		disabledText: instrumentDisabledText,
 	})],
 	[ConnectionNodeType.simpleReverb, makeNodeInfo({
-		typeName: 'R E V E R B',
+		typeName: 'Reverb',
 		stateConstructor: SimpleReverbState,
 		addNodeActionCreator: addSimpleReverb,
 		selectIsPlaying: selectIsUpstreamNodePlaying,
