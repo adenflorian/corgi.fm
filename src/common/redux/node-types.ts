@@ -221,7 +221,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		addNodeActionCreator: () => ({type: 'dummy audioOutput type'}),
 		selectIsPlaying: selectIsUpstreamNodePlaying,
 		stateSelector: () => audioOutputState,
-		disabledText: 'Will mute',
+		disabledText: 'Will mute for you only',
 	})],
 	[ConnectionNodeType.masterClock, makeNodeInfo({
 		typeName: 'Master Clock',
