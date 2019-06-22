@@ -38,10 +38,10 @@ export function handleStopDraggingGhostConnector(
 	} else if (newConnectionCandidates.count() === 1) {
 		const onlyCandidate = newConnectionCandidates.first(false)
 		if (onlyCandidate === false) return
-		return getChangeConnectionFunc()(onlyCandidate)
+		return getChangeConnectionFunc()(onlyCandidate, ghostConnection.port)
 	} else {
 		const closest = newConnectionCandidates.reduce(getClosest)
-		return getChangeConnectionFunc()(closest)
+		return getChangeConnectionFunc()(closest, ghostConnection.port)
 	}
 
 	function validatePosition(position: IPosition) {
@@ -79,7 +79,7 @@ export function handleStopDraggingGhostConnector(
 		// 	.releaseAllScheduledFromSourceId(connection.sourceId)
 	}
 
-	function newConnectionToSource(position: ConnectionCandidate) {
+	function newConnectionToSource(position: ConnectionCandidate, port: number) {
 		if (validatePosition(position) === false) return
 		dispatch(connectionsActions.add(new Connection(
 			position.id,
@@ -87,18 +87,18 @@ export function handleStopDraggingGhostConnector(
 			parentNodePosition.id,
 			parentNodePosition.targetType,
 			position.portNumber,
-			0,
+			port,
 		)))
 	}
 
-	function newConnectionToTarget(position: ConnectionCandidate) {
+	function newConnectionToTarget(position: ConnectionCandidate, port: number) {
 		if (validatePosition(position) === false) return
 		dispatch(connectionsActions.add(new Connection(
 			parentNodePosition.id,
 			parentNodePosition.targetType,
 			position.id,
 			position.targetType,
-			0,
+			port,
 			position.portNumber,
 		)))
 	}

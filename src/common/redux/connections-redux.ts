@@ -3,7 +3,7 @@ import {combineReducers, Reducer} from 'redux'
 import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
 import * as uuid from 'uuid'
-import {ConnectionNodeType} from '../common-types'
+import {ConnectionNodeType, Id} from '../common-types'
 import {IMidiNotes} from '../MidiNote'
 import {CssColor, mixColors} from '../shamu-color'
 import {
@@ -133,17 +133,19 @@ export const selectConnectionsWithSourceOrTargetIds = (state: IClientRoomState, 
 }
 
 export const selectConnectionsWithTargetIds2 = (connections: IConnections, targetIds: string[]) => {
-	return connections
-		.filter(x => targetIds.includes(x.targetId))
+	return connections.filter(x => targetIds.includes(x.targetId))
 }
 
 export const selectConnectionsWithTargetIds = (state: IClientRoomState, targetIds: string[]) => {
 	return selectConnectionsWithTargetIds2(selectAllConnections(state), targetIds)
 }
 
+export const selectConnectionsWithSourceIds2 = (connections: IConnections, sourceIds: string[]) => {
+	return connections.filter(x => sourceIds.includes(x.sourceId))
+}
+
 export const selectConnectionsWithSourceIds = (state: IClientRoomState, sourceIds: string[]) => {
-	return selectAllConnections(state)
-		.filter(x => sourceIds.includes(x.sourceId))
+	return selectConnectionsWithSourceIds2(selectAllConnections(state), sourceIds)
 }
 
 export const selectFirstConnectionByTargetId = (state: IClientRoomState, targetId: string) =>
@@ -154,6 +156,17 @@ export const selectFirstConnectionIdByTargetId = (state: IClientRoomState, targe
 	const conn = selectFirstConnectionByTargetId(state, targetId)
 	return conn ? conn.id : 'fakeConnectionId'
 }
+
+export const createSelectPlaceholdersInfo = () => createSelector(
+	(state: IClientRoomState, _: any) => selectAllConnections(state),
+	(_, parentId: Id) => parentId,
+	(allConnections, parentId: Id) => {
+		return {
+			leftConnections: selectConnectionsWithTargetIds2(allConnections, [parentId]),
+			rightConnections: selectConnectionsWithSourceIds2(allConnections, [parentId]),
+		}
+	},
+)
 
 /** For use by a node */
 export const selectConnectionSourceColorByTargetId =
@@ -273,4 +286,8 @@ export const selectConnectionStackOrderForSource = (roomState: IClientRoomState,
 	const connections = selectConnectionsWithSourceIds(roomState, [connection.sourceId])
 		.filter(x => x.sourcePort === connection.sourcePort)
 	return connections.toIndexedSeq().indexOf(connection)
+}
+
+export const calculateConnectorPositionY = (parentY: number, parentHeight: number, portCount: number, port: number) => {
+	return parentY + ((parentHeight / (1 + portCount)) * (port + 1))
 }

@@ -6,14 +6,14 @@ import {ClientId} from '../../common/common-types'
 import {
 	ActiveGhostConnectorSourceOrTarget,
 	AppOptions,
-	connectionsActions, getConnectionNodeInfo, GhostConnection,
-	ghostConnectorActions,
-	GhostConnectorAddingOrMoving, IClientAppState,
-	IConnection, LineType,
-	selectConnection, selectConnectionSourceColor,
-	selectConnectionSourceIsActive, selectConnectionSourceIsSending,
-	selectConnectionStackOrderForSource, selectConnectionStackOrderForTarget, selectLocalClientId,
-	selectOption, selectPosition, selectRoomSettings, selectUserInputKeys, shamuConnect,
+	calculateConnectorPositionY, connectionsActions, getConnectionNodeInfo,
+	GhostConnection,
+	ghostConnectorActions, GhostConnectorAddingOrMoving,
+	IClientAppState, IConnection,
+	LineType, selectConnection,
+	selectConnectionSourceColor, selectConnectionSourceIsActive,
+	selectConnectionSourceIsSending, selectConnectionStackOrderForSource, selectConnectionStackOrderForTarget,
+	selectLocalClientId, selectOption, selectPosition, selectRoomSettings, selectUserInputKeys, shamuConnect,
 } from '../../common/redux'
 import {longLineTooltip} from '../client-constants'
 import {ConnectionLine} from './ConnectionLine'
@@ -94,6 +94,9 @@ export const ConnectionView =
 				sourceOrTarget,
 				localClientId,
 				GhostConnectorAddingOrMoving.Moving,
+				sourceOrTarget === ActiveGhostConnectorSourceOrTarget.Source
+					? connection.sourcePort
+					: connection.targetPort,
 				connection.id,
 			)))
 		}
@@ -204,9 +207,9 @@ export const ConnectedConnectionView = shamuConnect(
 			targetStackOrder: selectConnectionStackOrderForTarget(state.room, props.id),
 			color: sourceColor,
 			sourceX: sourcePosition.x + sourcePosition.width,
-			sourceY: sourcePosition.y + ((sourcePosition.height / (1 + sourcePosition.outputPortCount)) * (connection.sourcePort + 1)),
+			sourceY: calculateConnectorPositionY(sourcePosition.y, sourcePosition.height, sourcePosition.outputPortCount, connection.sourcePort),
 			targetX: targetPosition.x,
-			targetY: targetPosition.y + ((targetPosition.height / (1 + targetPosition.inputPortCount)) * (connection.targetPort + 1)),
+			targetY: calculateConnectorPositionY(targetPosition.y, targetPosition.height, targetPosition.inputPortCount, connection.targetPort),
 			saturateSource: isSourceActive || isSourceSending,
 			saturateTarget: isSourceSending,
 			connection,

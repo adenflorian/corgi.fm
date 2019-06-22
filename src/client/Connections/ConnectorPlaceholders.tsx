@@ -2,9 +2,9 @@ import React from 'react'
 import {Dispatch} from 'redux'
 import {ClientId} from '../../common/common-types'
 import {
-	ActiveGhostConnectorSourceOrTarget, GhostConnection, ghostConnectorActions,
-	GhostConnectorAddingOrMoving, IPosition, selectConnectionsWithSourceIds,
-	selectConnectionsWithTargetIds,
+	ActiveGhostConnectorSourceOrTarget, calculateConnectorPositionY, createSelectPlaceholdersInfo,
+	GhostConnection, ghostConnectorActions,
+	GhostConnectorAddingOrMoving, IClientAppState,
 	selectLocalClientId, selectPosition, shamuConnect,
 } from '../../common/redux'
 import {connectorWidth} from './ConnectionView'
@@ -15,71 +15,89 @@ interface Props {
 }
 
 interface ReduxProps {
-	leftConnections: number
-	rightConnections: number
 	localClientId: ClientId
-	parentPosition: IPosition
+	parentX: number
+	parentY: number
+	parentWidth: number
+	parentHeight: number
+	placeholdersInfo: ReturnType<ReturnType<typeof createSelectPlaceholdersInfo>>
+	leftPortCount: number
+	rightPortCount: number
 }
 
 type AllProps = Props & ReduxProps & {dispatch: Dispatch}
 
 export const ConnectorPlaceholders =
 	function _ConnectorPlaceholders({
-		parentPosition, leftConnections, rightConnections, dispatch, parentId,
-		localClientId,
+		dispatch, parentId, placeholdersInfo, leftPortCount, rightPortCount,
+		localClientId, parentX, parentY, parentWidth, parentHeight,
 	}: AllProps) {
 
-		function onMouseDown(
+		const {leftConnections, rightConnections} = placeholdersInfo
+
+		const onMouseDown = (y: number, port: number) => (
 			connectorPositionX: number,
 			sourceOrTarget: ActiveGhostConnectorSourceOrTarget,
-		) {
+		) => {
 			dispatch(ghostConnectorActions.create(new GhostConnection(
-				{x: connectorPositionX, y: parentPosition.y + relativePosition.y},
+				{x: connectorPositionX, y},
 				{parentNodeId: parentId},
 				sourceOrTarget,
 				localClientId,
 				GhostConnectorAddingOrMoving.Adding,
+				port,
 			)))
 		}
-
-		const relativePosition = Object.freeze({
-			xLeft: (leftConnections * -connectorWidth) - connectorWidth,
-			xRight: parentPosition.width + (rightConnections * connectorWidth),
-			y: parentPosition.height / 2,
-		})
 
 		return (
 			<div
 				className="connection"
 				style={{color: 'white'}}
 			>
-				<div>
-					<ConnectorPlaceholder
-						onMouseDown={onMouseDown}
-						x={parentPosition.x + relativePosition.xLeft}
-						y={parentPosition.y + relativePosition.y}
-						sourceOrTarget={ActiveGhostConnectorSourceOrTarget.Source}
-					/>
-				</div>
-				<div>
-					<ConnectorPlaceholder
-						onMouseDown={onMouseDown}
-						x={parentPosition.x + relativePosition.xRight}
-						y={parentPosition.y + relativePosition.y}
-						sourceOrTarget={ActiveGhostConnectorSourceOrTarget.Target}
-					/>
-				</div>
+				{new Array(leftPortCount).fill(0).map((_, port) => {
+					const y = calculateConnectorPositionY(parentY, parentHeight, leftPortCount, port)
+					return <div key={'left-' + port}>
+						<ConnectorPlaceholder
+							onMouseDown={onMouseDown(y, port)}
+							x={parentX + (leftConnections.filter(x => x.targetPort === port).count() * -connectorWidth) - connectorWidth}
+							y={y}
+							sourceOrTarget={ActiveGhostConnectorSourceOrTarget.Source}
+						/>
+					</div>
+				})}
+				{new Array(rightPortCount).fill(0).map((_, port) => {
+					const y = calculateConnectorPositionY(parentY, parentHeight, rightPortCount, port)
+					return <div key={'right-' + port}>
+						<ConnectorPlaceholder
+							onMouseDown={onMouseDown(y, port)}
+							x={parentX + parentWidth + (rightConnections.filter(x => x.sourcePort === port).count() * connectorWidth)}
+							y={y}
+							sourceOrTarget={ActiveGhostConnectorSourceOrTarget.Target}
+						/>
+					</div>
+				})}
 			</div>
 		)
 	}
 
-export const ConnectedConnectorPlaceholders = shamuConnect(
-	(state, {parentId}: Props): ReduxProps => {
+const makeMapStateToProps = () => {
+	const selectPlaceholdersInfo = createSelectPlaceholdersInfo()
+	const mapStateToProps = (state: IClientAppState, props: Props): ReduxProps => {
+		const parentPosition = selectPosition(state.room, props.parentId)
 		return {
-			leftConnections: selectConnectionsWithTargetIds(state.room, [parentId]).count(),
-			rightConnections: selectConnectionsWithSourceIds(state.room, [parentId]).count(),
+			placeholdersInfo: selectPlaceholdersInfo(state.room, props.parentId),
 			localClientId: selectLocalClientId(state),
-			parentPosition: selectPosition(state.room, parentId),
+			parentX: parentPosition.x,
+			parentY: parentPosition.y,
+			parentWidth: parentPosition.width,
+			parentHeight: parentPosition.height,
+			leftPortCount: parentPosition.inputPortCount,
+			rightPortCount: parentPosition.outputPortCount,
 		}
-	},
+	}
+	return mapStateToProps
+}
+
+export const ConnectedConnectorPlaceholders = shamuConnect(
+	makeMapStateToProps,
 )(ConnectorPlaceholders)

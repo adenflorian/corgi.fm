@@ -26,18 +26,19 @@
 	- [√] click and drag to play all notes
 	- [√] don't play other notes when holding shift
 	- [√] only play notes if infinite seq selected*****
-	- [ ] add a way to insert notes left and right
-	- [ ] way to start song from any point in sequencer
-	- [ ] design
 - [√] fix seq rate knob
 	- [√] make rate value string display proper stuff
 	- [√] display note length and sequencer length
 - [√] chat input bottom is taking clicks
 - [ ] fix up group sequencer
 	- [√] fix spacing with multiple connections
-	- [ ] be able to drag new connector from each port
+	- [√] be able to drag new connector from each port
 	- [ ] connected nodes should prefer group sequencer color
 	- [ ] maybe show color dots in a corner of node to show what groups it's in?
+- [ ] infinite sequencer more
+	- [ ] add a way to insert notes left and right
+	- [ ] way to start song from any point in sequencer
+	- [ ] design
 - [ ] delay node
 - [ ] toggle note click audio for sequencers on title bar
 - [ ] LFO

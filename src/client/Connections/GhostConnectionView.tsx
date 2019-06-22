@@ -2,8 +2,9 @@ import React, {PureComponent} from 'react'
 import {Dispatch} from 'redux'
 import {Point} from '../../common/common-types'
 import {
-	ActiveGhostConnectorSourceOrTarget, GhostConnection,
-	ghostConnectorActions, IPosition,
+	ActiveGhostConnectorSourceOrTarget, calculateConnectorPositionY,
+	GhostConnection, ghostConnectorActions,
+	IPosition,
 	selectConnectionsWithSourceIds,
 	selectConnectionsWithTargetIds,
 	selectGhostConnection,
@@ -56,7 +57,7 @@ export class GhostConnectionView extends PureComponent<AllProps, State> {
 
 	public render() {
 		const {mousePosition} = this.state
-		const {ghostConnection: {activeConnector, activeSourceOrTarget}, parentPosition, parentConnectionCount} = this.props
+		const {ghostConnection: {activeConnector, activeSourceOrTarget, port}, parentPosition, parentConnectionCount} = this.props
 
 		const position = this._isLocallyOwned()
 			? mousePosition
@@ -77,11 +78,11 @@ export class GhostConnectionView extends PureComponent<AllProps, State> {
 			activeSourceOrTarget === ActiveGhostConnectorSourceOrTarget.Source
 				? {
 					x: parentPosition.x - (parentConnectionCount * connectorWidth) - connectorWidth,
-					y: parentPosition.y + (parentPosition.height / 2),
+					y: calculateConnectorPositionY(parentPosition.y, parentPosition.height, parentPosition.inputPortCount, port),
 				}
 				: {
 					x: parentPosition.x + parentPosition.width + (parentConnectionCount * connectorWidth) + connectorWidth,
-					y: parentPosition.y + (parentPosition.height / 2),
+					y: calculateConnectorPositionY(parentPosition.y, parentPosition.height, parentPosition.outputPortCount, port),
 				}
 
 		const connectedLine =
@@ -166,8 +167,8 @@ export const ConnectedGhostConnectionView = shamuConnect(
 			parentPosition: selectPosition(state.room, parentNodeId),
 			parentConnectionCount:
 				ghostConnection.activeSourceOrTarget === ActiveGhostConnectorSourceOrTarget.Source
-					? selectConnectionsWithTargetIds(state.room, [parentNodeId]).count()
-					: selectConnectionsWithSourceIds(state.room, [parentNodeId]).count(),
+					? selectConnectionsWithTargetIds(state.room, [parentNodeId]).filter(x => x.targetPort === ghostConnection.port).count()
+					: selectConnectionsWithSourceIds(state.room, [parentNodeId]).filter(x => x.sourcePort === ghostConnection.port).count(),
 			localClientId: selectLocalClientId(state),
 		}
 	},

@@ -56,6 +56,7 @@ export class GhostConnection {
 		activeSourceOrTarget: ActiveGhostConnectorSourceOrTarget.Source,
 		ownerId: 'dummy owner id',
 		id: 'dummy id',
+		port: 0,
 		addingOrMoving: GhostConnectorAddingOrMoving.Adding,
 	}
 
@@ -67,6 +68,7 @@ export class GhostConnection {
 		public readonly activeSourceOrTarget: ActiveGhostConnectorSourceOrTarget,
 		public readonly ownerId: ClientId,
 		public readonly addingOrMoving: GhostConnectorAddingOrMoving,
+		public readonly port: number,
 		public readonly movingConnectionId?: string,
 	) {}
 }
