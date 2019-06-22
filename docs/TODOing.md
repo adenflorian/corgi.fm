@@ -20,7 +20,7 @@
 		- [√] effects should pass thru
 		- [√] instruments shouldn't output anything
 		- [√] sequencers shouldnt play notes
-		- [ ] master volume should mute
+		- [√] master volume should mute
 		- [ ] master clock should not run
 		- [ ] group seq should not let anything connected play
 - [ ] add button to clear chat
@@ -36,6 +36,10 @@
 - [ ] fix seq rate knob
 	- [ ] make rate value string display proper stuff
 	- [ ] display note length and sequencer length
+- [ ] show icon on volume to show it is local only
+
+# 0.5.0
+- [ ] show progress bar on reverb when loading new impulse
 
 # Now
 - [√] don't delete everything on disconnect

@@ -1,7 +1,10 @@
 import * as React from 'react'
 import {Dispatch} from 'redux'
 import {ConnectionNodeType} from '../../common/common-types'
-import {getConnectionNodeInfo, IPosition, positionActions, selectPosition, shamuConnect} from '../../common/redux'
+import {
+	AppOptions, getConnectionNodeInfo, MASTER_AUDIO_OUTPUT_TARGET_ID,
+	positionActions, selectOption, selectPosition, setOption, shamuConnect,
+} from '../../common/redux'
 import {CssColor} from '../../common/shamu-color'
 import {handleClassName, handleVisualClassName} from '../client-constants'
 import './Panel.less'
@@ -53,8 +56,10 @@ export const DumbPanel: React.FC<AllProps> =
 					>
 						<div
 							className={`colorDotContainer noDrag ${enabled ? 'enabled' : ''}`}
-							onClick={() => id !== undefined ? dispatch(positionActions.setEnabled(id, !enabled)) : undefined}
-							title={(enabled ? 'Enabled' : 'Disabled') + `\nDisable or enable this node\n` + nodeInfo.disabledText + ' when disabled'}
+							onClick={onColorDotClick}
+							title={(enabled ? 'Enabled' : 'Disabled') +
+								`\nDisable or enable this node\n` +
+								nodeInfo.disabledText + ' when disabled'}
 						>
 							<div className="colorDot"></div>
 						</div>
@@ -75,13 +80,25 @@ export const DumbPanel: React.FC<AllProps> =
 				</div>
 			</div>
 		)
+
+		function onColorDotClick() {
+			if (id === undefined) return
+
+			if (id === MASTER_AUDIO_OUTPUT_TARGET_ID) {
+				dispatch(setOption(AppOptions.masterVolumeMute, enabled))
+			} else {
+				dispatch(positionActions.setEnabled(id, !enabled))
+			}
+		}
 	})
 
 export const Panel = shamuConnect(
 	(state, {id}: IPanelProps): ReduxProps => {
 		const position = selectPosition(state.room, id === undefined ? '' : id)
 		return {
-			enabled: position.enabled,
+			enabled: position.targetType === ConnectionNodeType.audioOutput
+				? (selectOption(state, AppOptions.masterVolumeMute) as boolean) === false
+				: position.enabled,
 			nodeType: position.targetType,
 		}
 	},

@@ -5,6 +5,7 @@ import {IClientAppState} from './index'
 
 export enum AppOptions {
 	masterVolume = 'masterVolume',
+	masterVolumeMute = 'masterVolumeMute',
 	showNoteNamesOnKeyboard = 'showNoteNamesOnKeyboard',
 	requireCtrlToScroll = 'requireCtrlToScroll',
 	showNoteSchedulerDebug = 'showNoteSchedulerDebug',
@@ -17,6 +18,7 @@ export enum AppOptions {
 export const initialOptionsState = Object.freeze({
 	showNoteNamesOnKeyboard: true,
 	masterVolume: 0.1,
+	masterVolumeMute: false,
 	requireCtrlToScroll: false,
 	showNoteSchedulerDebug: false,
 	renderNoteSchedulerDebugWhileStopped: true,

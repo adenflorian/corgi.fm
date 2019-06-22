@@ -40,10 +40,12 @@ export function setupAudioContext(audioContext: AudioContext, preFx: GainNode, s
 	preFx.gain.value = 0.5
 
 	let previousMasterVolume: number
+	let previousMasterVolumeMuted: boolean
 
 	store.subscribe(() => {
 		const state: IClientAppState = store.getState()
 		const newVolume = state.options.masterVolume
+		const newMuted = state.options.masterVolumeMute
 		if (previousMasterVolume !== newVolume) {
 			// master.gain.value = state.options.masterVolume
 			masterGain.gain.value = Math.min(0.5, state.options.masterVolume)
@@ -52,8 +54,17 @@ export function setupAudioContext(audioContext: AudioContext, preFx: GainNode, s
 			// console.log('state.options.masterVolume: ', state.options.masterVolume)
 			// console.log('tone.js master volume: ', Master.volume.value)
 			// limiter.threshold.value = Math.min(-12, state.options.masterVolume)
+			previousMasterVolume = newVolume
 		}
-		previousMasterVolume = newVolume
+		if (previousMasterVolumeMuted !== newMuted) {
+			if (newMuted) {
+				masterGain.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.1)
+			} else {
+				masterGain.gain.linearRampToValueAtTime(previousMasterVolume, audioContext.currentTime + 0.1)
+			}
+
+			previousMasterVolumeMuted = newMuted
+		}
 		// console.log('limiter.reduction: ' + masterLimiter.reduction)
 		// console.log('audioContext.currentTime: ' + audioContext.currentTime)
 	})
