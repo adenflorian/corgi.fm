@@ -33,7 +33,7 @@ export const MASTER_CLOCK_SOURCE_ID = 'MASTER_CLOCK_SOURCE_ID'
 export type IConnectionNodeInfo = ReturnType<typeof makeNodeInfo>
 
 export const dummyIConnectable: IConnectable = Object.freeze({
-	color: CssColor.subtleGrayBlackBg,
+	color: CssColor.disabledGray,
 	id: 'oh no',
 	type: ConnectionNodeType.dummy,
 	width: 0,
@@ -44,7 +44,7 @@ export const dummyIConnectable: IConnectable = Object.freeze({
 
 class DummyConnectable implements IConnectable {
 	constructor(
-		public readonly color: CssColor.subtleGrayBlackBg,
+		public readonly color: CssColor.disabledGray,
 		public readonly id: 'oh no',
 		public readonly type: ConnectionNodeType.dummy,
 		public readonly width: 0,

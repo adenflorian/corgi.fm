@@ -36,6 +36,22 @@
                 width: 8px;
                 height: 8px;
                 border-radius: 4px;
+                position: relative;
+
+                &::after {
+                    content: '';
+                    position: absolute;
+                    width: 4px;
+                    height: 4px;
+                    background-color: @panelGrayDark;
+                    margin: 2px;
+                    left: 0;
+                    border-radius: 2px;
+                }
+            }
+
+            &.enabled .colorDot::after {
+                display: none;
             }
         }
 

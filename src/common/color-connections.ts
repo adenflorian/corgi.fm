@@ -15,7 +15,7 @@ export function handleAddConnection(roomState: IClientRoomState, dispatch: Dispa
 export function handleDeleteConnection(beforeState: IClientRoomState, dispatch: Dispatch, connectionIds: List<string>) {
 	connectionIds.forEach(connectionId => {
 		const connection = selectConnection(beforeState, connectionId)
-		updateConnectionTargetColor(beforeState, dispatch, connection, CssColor.subtleGrayBlackBg)
+		updateConnectionTargetColor(beforeState, dispatch, connection, CssColor.disabledGray)
 	})
 }
 

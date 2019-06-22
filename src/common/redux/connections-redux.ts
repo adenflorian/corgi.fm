@@ -177,7 +177,7 @@ export const selectConnectionSourceColor = (state: IClientRoomState, id: string)
 const makeConnectionSourceColorSelector =
 	(roomState: IClientRoomState, processedIds = List<string>()) => (connection: IConnection): string => {
 		// If in a loop
-		if (processedIds.contains(connection.id)) return CssColor.subtleGrayBlackBg
+		if (processedIds.contains(connection.id)) return CssColor.disabledGray
 
 		return (
 			tryGetColorFromState(getConnectionNodeInfo(connection.sourceType).stateSelector(roomState, connection.sourceId).color, connection.sourcePort)
