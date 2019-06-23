@@ -1,4 +1,4 @@
-import {List, Map} from 'immutable'
+import {List} from 'immutable'
 import {Dispatch} from 'redux'
 import Victor = require('victor')
 import {Point} from '../common/common-types'
@@ -6,8 +6,10 @@ import {logger} from '../common/logger'
 import {IClientRoomState} from '../common/redux/common-redux-types'
 import {
 	ActiveGhostConnectorSourceOrTarget, Connection,
-	connectionsActions, GhostConnectorAddingOrMoving, IPosition, selectAllPositions, selectGhostConnection, selectPosition,
+	connectionsActions, GhostConnectorAddingOrMoving, IPosition, selectAllPositions,
+	selectConnectionsWithSourceIds, selectConnectionsWithTargetIds, selectGhostConnection, selectPosition,
 } from '../common/redux/index'
+import {connectorWidth} from './Connections/ConnectionView'
 
 interface ConnectionCandidate extends IPosition {
 	portNumber: number
@@ -138,8 +140,8 @@ export function handleStopDraggingGhostConnector(
 
 	function getPositionFunc() {
 		switch (ghostConnection.activeSourceOrTarget) {
-			case ActiveGhostConnectorSourceOrTarget.Source: return moveToOutputPosition
-			case ActiveGhostConnectorSourceOrTarget.Target: return moveToInputPosition
+			case ActiveGhostConnectorSourceOrTarget.Source: return moveToOutputPosition(roomState)
+			case ActiveGhostConnectorSourceOrTarget.Target: return moveToInputPosition(roomState)
 			default: throw new Error('Unexpected ghost connector status (getPositionFunc): ' + ghostConnection.activeSourceOrTarget)
 		}
 	}
@@ -156,18 +158,22 @@ function getDistanceBetweenPoints(a: Point, b: Point): number {
 	return new Victor(a.x, a.y).distance(new Victor(b.x, b.y))
 }
 
-function moveToOutputPosition(position: ConnectionCandidate): ConnectionCandidate {
+const moveToOutputPosition = (roomState: IClientRoomState) => (position: ConnectionCandidate): ConnectionCandidate => {
+	const connections = selectConnectionsWithSourceIds(roomState, [position.id])
+	const stackCountOnPort = connections.filter(x => x.sourcePort === position.portNumber).count()
 	return {
 		...position,
-		x: position.x + position.width,
+		x: position.x + position.width + (connectorWidth * (stackCountOnPort + 1)),
 		y: position.y + ((position.height / (1 + position.outputPortCount)) * (position.portNumber + 1)),
 	}
 }
 
-function moveToInputPosition(position: ConnectionCandidate): ConnectionCandidate {
+const moveToInputPosition = (roomState: IClientRoomState) => (position: ConnectionCandidate): ConnectionCandidate => {
+	const connections = selectConnectionsWithTargetIds(roomState, [position.id])
+	const stackCountOnPort = connections.filter(x => x.targetPort === position.portNumber).count()
 	return {
 		...position,
-		x: position.x,
+		x: position.x - (connectorWidth * (stackCountOnPort + 1)),
 		y: position.y + ((position.height / (1 + position.outputPortCount)) * (position.portNumber + 1)),
 	}
 }

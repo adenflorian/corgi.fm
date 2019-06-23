@@ -22,7 +22,7 @@
 		- [√] group seq should not let anything connected play
 - [√] track selected node
 	- [√] ctrl z should send undo to selected node
-- [ ] infinite sequencer
+- [√] infinite sequencer
 	- [√] click and drag to play all notes
 	- [√] don't play other notes when holding shift
 	- [√] only play notes if infinite seq selected*****
@@ -30,11 +30,28 @@
 	- [√] make rate value string display proper stuff
 	- [√] display note length and sequencer length
 - [√] chat input bottom is taking clicks
-- [ ] fix up group sequencer
+- [√] fix up group sequencer
 	- [√] fix spacing with multiple connections
 	- [√] be able to drag new connector from each port
+
+# 0.5.0
+- [√] fix dropping on connections on something with a lot of connections already
+- [ ] duplicate nodes
+- [ ] do something about peoples synths deleting when they leave
+- [ ] purge button to delete unused nodes
+- [ ] record into grid sequencer
+- [ ] permissions
+	- when you create a room you are owner
+	- [ ] in room options you can set it so
+- [ ] solo
+- [ ] fix up group sequencer
 	- [ ] connected nodes should prefer group sequencer color
 	- [ ] maybe show color dots in a corner of node to show what groups it's in?
+	- [ ] labels
+	- [ ] choose colors
+	- [ ] jump to parts of song
+	- [ ] click and drag to add things
+- [ ] audio still cutting out for people (brinch)
 - [ ] infinite sequencer more
 	- [ ] add a way to insert notes left and right
 	- [ ] way to start song from any point in sequencer
@@ -54,12 +71,25 @@
 - [ ] make select have label on left side with darker background
 - [ ] show edit icon to left of name on hover in top right
 - [ ] dragging something to edge of screen should pan for you
-
-# 0.5.0
 - [ ] put bottom right info in own component outside chat stuff so you can click without activating chat
 - [ ] reverb dry/wet knobs
 - [ ] compressor dry/wet knobs
 - [ ] show progress bar on reverb when loading new impulse
+- [ ] display musical key in sequencer title bar
+- [ ] background looking bad when zooming out
+- [ ] display error message when save fails
+- [ ] error reporting
+- [ ] disabling keyboard
+- [ ] make it so you can only drag the title bar
+- [ ] allow typing in knob values
+- [ ] auditioning notes should limit to a half second or so
+- [ ] fix order of node menu
+- [ ] drum sampler?
+
+# 0.6.0
+- [ ] FM synth
+- [ ] master mixer
+- [ ] add colored icons on node add menu
 
 # Now
 - [√] don't delete everything on disconnect
@@ -85,6 +115,7 @@
 - [ ] Let people record midi from keyboard live, but don't play notes for others until it loops
 - [ ] save picture of room in save file
 - [ ] make little illustrations for empty stuff, like for when you have no friends or no saves
+- [ ] control stuff with external midi knobs
 
 # Goals
 - [ ] be able to recreate certain songs
