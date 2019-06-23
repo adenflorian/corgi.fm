@@ -82,6 +82,6 @@ export function SliderControllerSnapping(props: Props) {
 	)
 }
 
-function clamp(value: number, min = 0, max = 1): number {
+function clamp(value: number): number {
 	return Math.min(1, Math.max(0, value))
 }

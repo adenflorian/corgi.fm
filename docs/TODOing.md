@@ -52,7 +52,7 @@
 - [√] when keyboard is connected to seq, it should always send midi thru to downstream instruments, even when not recording
 - [√] placed notes in grid seq should respect pitch knob
 - [√] auditioning notes should limit to a half second or so
-- [ ] you could have it snap to whole numbers for bpm by default but have that allow the decimals - bean
+- [√] you could have it snap to whole numbers for bpm by default but have that allow the decimals - bean
 - [ ] r key to record
 - [ ] permissions
 	- [ ] when you create a room you are owner

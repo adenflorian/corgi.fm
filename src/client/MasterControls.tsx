@@ -9,7 +9,7 @@ import {
 	MASTER_CLOCK_SOURCE_ID,
 	selectGlobalClockState,
 } from '../common/redux'
-import {Knob} from './Knob/Knob'
+import {KnobIncremental} from './Knob/KnobIncremental'
 import './MasterControls.less'
 import {Panel} from './Panel/Panel'
 
@@ -32,16 +32,16 @@ export const MasterControls: React.FC<IMasterControlsProps & IMasterControlsRedu
 	React.memo(function _MasterControls({onPlay, restart, onStop, setField, masterClockState, color}) {
 
 		const knobs = <div className="knobs">
-			<Knob
+			<KnobIncremental
 				label="Tempo"
-				min={0.000001}
+				min={1}
 				max={999}
-				curve={2}
 				value={masterClockState.bpm}
 				defaultValue={120}
 				onChange={(_, bpm) => setField({bpm})}
 				tooltip="Beats per minute"
-				valueString={v => `${v.toFixed(2)} bpm`}
+				valueString={v => `${v.toFixed(2).replace('.00', '')} bpm`}
+				increment={1}
 			/>
 			{/* <Knob
 				label="Max Read Ahead"
