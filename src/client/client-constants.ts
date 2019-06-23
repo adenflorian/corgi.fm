@@ -66,6 +66,7 @@ export const sequencerStopToolTip = stripIndents`
 `
 export const sequencerRecordToolTip = stripIndents`
 	Toggle record mode
+	You must plugin a keyboard into this sequencer to record notes
 `
 export const sequencerDownloadToolTip = stripIndents`
 	Download MIDI

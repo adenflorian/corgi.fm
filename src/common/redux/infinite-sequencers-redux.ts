@@ -13,7 +13,7 @@ import {
 } from './index'
 import {
 	deserializeSequencerState, PLAY_SEQUENCER, RECORD_SEQUENCER_NOTE, RECORD_SEQUENCER_REST,
-	selectAllInfiniteSequencers, SequencerAction, SequencerStateBase, STOP_SEQUENCER,
+	selectAllInfiniteSequencers, SequencerAction, SequencerStateBase, STOP_SEQUENCER, TOGGLE_SEQUENCER_RECORDING,
 } from './sequencer-redux'
 import {VirtualKeyPressedAction} from './virtual-keyboard-redux'
 
@@ -61,7 +61,6 @@ function getNetworkFlags(fieldName: InfiniteSequencerFields) {
 	if ([
 		InfiniteSequencerFields.gate,
 		InfiniteSequencerFields.bottomNote,
-		InfiniteSequencerFields.isRecording,
 		InfiniteSequencerFields.pitch,
 		InfiniteSequencerFields.style,
 		InfiniteSequencerFields.showRows,
@@ -77,7 +76,6 @@ export enum InfiniteSequencerFields {
 	gate = 'gate',
 	bottomNote = 'bottomNote',
 	index = 'index',
-	isRecording = 'isRecording',
 	pitch = 'pitch',
 	style = 'style',
 	showRows = 'showRows',
@@ -170,6 +168,7 @@ const infiniteSequencerActionTypes = [
 	STOP_SEQUENCER,
 	RECORD_SEQUENCER_NOTE,
 	RECORD_SEQUENCER_REST,
+	TOGGLE_SEQUENCER_RECORDING,
 ]
 
 assertArrayHasNoUndefinedElements(infiniteSequencerActionTypes)
@@ -234,13 +233,9 @@ function infiniteSequencerReducer(
 				previousEvents: infiniteSequencer.previousEvents.unshift(infiniteSequencer.midiClip.events),
 			}
 		}
+		case TOGGLE_SEQUENCER_RECORDING: return {...infiniteSequencer, isRecording: action.isRecording}
 		case SET_INFINITE_SEQUENCER_FIELD:
-			if (action.fieldName === InfiniteSequencerFields.isRecording && action.data === true) {
-				return {
-					...infiniteSequencer,
-					[action.fieldName]: action.data,
-				}
-			} else if (action.fieldName === InfiniteSequencerFields.index) {
+			if (action.fieldName === InfiniteSequencerFields.index) {
 				return {
 					...infiniteSequencer,
 					[action.fieldName]: action.data % infiniteSequencer.midiClip.events.count(),

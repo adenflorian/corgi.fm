@@ -13,7 +13,13 @@ import {
 	infiniteSequencerActions, InfiniteSequencerFields, InfiniteSequencerState,
 	InfiniteSequencerStyle, selectConnectionSourceColorByTargetId, selectInfiniteSequencer, sequencerActions,
 } from '../../common/redux'
-import {percentageValueString, seqLengthValueToString, seqPitchValueToString, seqRateValueToString, sequencerDownloadToolTip, sequencerEraseToolTip, sequencerGateToolTip, sequencerPitchToolTip, sequencerPlayToolTip, sequencerRateToolTip, sequencerRecordToolTip, sequencerStopToolTip, sequencerUndoToolTip} from '../client-constants'
+import {
+	percentageValueString, seqLengthValueToString, seqPitchValueToString,
+	seqRateValueToString, sequencerDownloadToolTip, sequencerEraseToolTip,
+	sequencerGateToolTip, sequencerPitchToolTip, sequencerPlayToolTip,
+	sequencerRateToolTip, sequencerRecordToolTip, sequencerStopToolTip,
+	sequencerUndoToolTip,
+} from '../client-constants'
 import {Knob} from '../Knob/Knob'
 import {KnobSnapping} from '../Knob/KnobSnapping'
 import {Panel} from '../Panel/Panel'
@@ -89,7 +95,7 @@ export const InfiniteSequencer: React.FC<IInfiniteSequencerAllProps> = React.mem
 								</div>
 								<div
 									className="record"
-									onClick={() => dispatchInfiniteSeqParam(InfiniteSequencerFields.isRecording, !isRecording)}
+									onClick={() => dispatch(sequencerActions.toggleRecording(id, !isRecording))}
 									title={sequencerRecordToolTip}
 								>
 									<Record />

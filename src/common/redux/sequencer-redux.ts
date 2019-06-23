@@ -2,7 +2,7 @@ import {List, Map, Set} from 'immutable'
 import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
 import uuid = require('uuid')
-import {ConnectionNodeType, IMultiStateThing, isSequencerNodeType} from '../common-types'
+import {ConnectionNodeType, Id, IMultiStateThing, isSequencerNodeType} from '../common-types'
 import {makeMidiClip, makeMidiClipEvent, MidiClip, MidiClipEvent, MidiClipEvents} from '../midi-types'
 import {emptyMidiNotes, IMidiNote, MidiNotes} from '../MidiNote'
 import {colorFunc, hashbow} from '../shamu-color'
@@ -21,6 +21,7 @@ export const PLAY_ALL = 'PLAY_ALL'
 export const STOP_ALL = 'STOP_ALL'
 export const EXPORT_SEQUENCER_MIDI = 'EXPORT_SEQUENCER_MIDI'
 export const RECORD_SEQUENCER_NOTE = 'RECORD_SEQUENCER_NOTE'
+export const TOGGLE_SEQUENCER_RECORDING = 'TOGGLE_SEQUENCER_RECORDING'
 
 export const sequencerActions = Object.freeze({
 	clear: (id: string) => ({
@@ -74,6 +75,13 @@ export const sequencerActions = Object.freeze({
 		type: RECORD_SEQUENCER_NOTE as typeof RECORD_SEQUENCER_NOTE,
 		id,
 		note,
+		BROADCASTER_ACTION,
+		SERVER_ACTION,
+	}),
+	toggleRecording: (id: Id, isRecording: boolean) => ({
+		type: TOGGLE_SEQUENCER_RECORDING as typeof TOGGLE_SEQUENCER_RECORDING,
+		id,
+		isRecording,
 		BROADCASTER_ACTION,
 		SERVER_ACTION,
 	}),
