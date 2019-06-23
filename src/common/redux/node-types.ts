@@ -74,6 +74,7 @@ const _makeNodeInfo = Record({
 	undoAction: ((id: Id) => undefined) as (id: Id) => AnyAction | undefined,
 	disabledText: '',
 	isNodeCloneable: false,
+	type: ConnectionNodeType.dummy,
 })
 
 type NodeInfo = ReturnType<typeof _makeNodeInfo>
@@ -118,6 +119,7 @@ const effectDisabledText = 'Will let audio pass through unaltered'
 
 const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 	[ConnectionNodeType.virtualKeyboard, makeNodeInfo({
+		type: ConnectionNodeType.virtualKeyboard,
 		typeName: 'Virtual Keyboard',
 		stateConstructor: VirtualKeyboardState,
 		addNodeActionCreator: addVirtualKeyboard,
@@ -127,9 +129,12 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		selectIsPlaying: selectVirtualKeyboardHasPressedKeys,
 		selectActiveNotes: makeGetKeyboardMidiOutput(),
 		stateDeserializer: VirtualKeyboardState.fromJS,
+		showOnAddNodeMenu: true,
+		isDeletable: true,
 		disabledText: 'Will stop emitting notes',
 	})],
 	[ConnectionNodeType.gridSequencer, makeNodeInfo({
+		type: ConnectionNodeType.gridSequencer,
 		typeName: 'Grid Sequencer',
 		stateConstructor: GridSequencerState,
 		addNodeActionCreator: addGridSequencer,
@@ -147,6 +152,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		isNodeCloneable: true,
 	})],
 	[ConnectionNodeType.infiniteSequencer, makeNodeInfo({
+		type: ConnectionNodeType.infiniteSequencer,
 		typeName: 'Infinite Sequencer',
 		stateConstructor: InfiniteSequencerState,
 		addNodeActionCreator: addInfiniteSequencer,
@@ -164,6 +170,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		isNodeCloneable: true,
 	})],
 	[ConnectionNodeType.groupSequencer, makeNodeInfo({
+		type: ConnectionNodeType.groupSequencer,
 		typeName: 'Group Sequencer',
 		stateConstructor: GroupSequencer,
 		addNodeActionCreator: addGroupSequencer,
@@ -176,6 +183,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		isNodeCloneable: true,
 	})],
 	[ConnectionNodeType.basicSynthesizer, makeNodeInfo({
+		type: ConnectionNodeType.basicSynthesizer,
 		typeName: 'Basic Synthesizer',
 		stateConstructor: BasicSynthesizerState,
 		addNodeActionCreator: addBasicSynthesizer,
@@ -189,6 +197,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		isNodeCloneable: true,
 	})],
 	[ConnectionNodeType.basicSampler, makeNodeInfo({
+		type: ConnectionNodeType.basicSampler,
 		typeName: 'Piano Sampler',
 		stateConstructor: BasicSamplerState,
 		addNodeActionCreator: addBasicSampler,
@@ -202,6 +211,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		isNodeCloneable: true,
 	})],
 	[ConnectionNodeType.simpleReverb, makeNodeInfo({
+		type: ConnectionNodeType.simpleReverb,
 		typeName: 'Reverb',
 		stateConstructor: SimpleReverbState,
 		addNodeActionCreator: addSimpleReverb,
@@ -215,6 +225,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		isNodeCloneable: true,
 	})],
 	[ConnectionNodeType.simpleCompressor, makeNodeInfo({
+		type: ConnectionNodeType.simpleCompressor,
 		typeName: 'Compressor',
 		stateConstructor: SimpleCompressorState,
 		addNodeActionCreator: addSimpleCompressor,
@@ -228,6 +239,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		isNodeCloneable: true,
 	})],
 	[ConnectionNodeType.audioOutput, makeNodeInfo({
+		type: ConnectionNodeType.audioOutput,
 		typeName: 'Audio Output',
 		stateConstructor: AudioOutputState,
 		addNodeActionCreator: () => ({type: 'dummy audioOutput type'}),
@@ -236,6 +248,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		disabledText: 'Will mute for you only',
 	})],
 	[ConnectionNodeType.masterClock, makeNodeInfo({
+		type: ConnectionNodeType.masterClock,
 		typeName: 'Master Clock',
 		stateConstructor: MasterClockState,
 		addNodeActionCreator: () => ({type: 'dummy masterClock type'}),

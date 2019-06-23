@@ -374,9 +374,9 @@
 - [...] favicon (better icon?)
 - [√] feedback button
 	- added link to the discord
-- [ ] tooltips for all the things
+- [...] tooltips for all the things
 - [ ] help button
-- [ ] figure out donations
+- [ ] figure out donations/patreon
 - [ ] prepare answer to questions or a FAQ
 	- [ ] monetization?
 	- [ ] open source?
@@ -387,7 +387,7 @@
 
 # Ballad
 - [ ] login system
-- [ ] permission system
+- [...] permission system
 - [...] new sequencers
 - [ ] new instruments
 	- [...] sampler

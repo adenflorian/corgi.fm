@@ -64,7 +64,7 @@
 		- [ ] at redux level (not realistic to do this)
 		- [√] at css
 		- [√] at input events
-	- [ ] let users create keyboard if they dont have one
+	- [√] let users create keyboard if they dont have one
 	- [ ] allow changing mode by click room status in top left
 	- [ ] give people permission to do stuff (based on client id)
 	- [ ] do something about when you refresh and lose ownership
@@ -102,11 +102,8 @@
 - [ ] make select have label on left side with darker background
 - [ ] show edit icon to left of name on hover in top right
 - [ ] dragging something to edge of screen should pan for you
-- [ ] put bottom right info in own component outside chat stuff so you can click without activating chat
 - [ ] reverb dry/wet knobs
 - [ ] compressor dry/wet knobs
-- [ ] show progress bar on reverb when loading new impulse
-- [ ] display musical key in sequencer title bar
 - [ ] background looking bad when zooming out
 - [ ] display error message when save fails
 - [ ] error reporting
@@ -116,9 +113,12 @@
 - [ ] fix order of node menu
 - [ ] drum sampler?
 - [ ] give feedback when saving to browser
-- [ ] disable save button until something changes?
 
 # 0.6.0
+- [ ] put bottom right info in own component outside chat stuff so you can click without activating chat
+- [ ] show progress bar on reverb when loading new impulse
+- [ ] disable save button until something changes?
+- [ ] display musical key in sequencer title bar
 - [ ] FM synth
 - [ ] master mixer
 - [ ] add colored icons on node add menu
