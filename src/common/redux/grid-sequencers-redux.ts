@@ -312,7 +312,7 @@ const gridSequencerReducer =
 				} else {
 					return gridSequencer
 				}
-			case PLAY_SEQUENCER: return {...gridSequencer, isPlaying: true, isRecording: false}
+			case PLAY_SEQUENCER: return {...gridSequencer, isPlaying: true}
 			case STOP_SEQUENCER: return {...gridSequencer, isPlaying: false, isRecording: false}
 			case PLAY_ALL: return {...gridSequencer, isPlaying: true}
 			case STOP_ALL: return {...gridSequencer, isPlaying: false, isRecording: false}
