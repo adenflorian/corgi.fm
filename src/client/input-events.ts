@@ -5,7 +5,7 @@ import {
 	getConnectionNodeInfo, globalClockActions,
 	IClientAppState, pointersActions,
 	selectClientInfo, selectGlobalClockIsPlaying, selectLocalClient, selectPosition,
-	selectShamuMetaState, sequencerActions, userInputActions,
+	selectSequencer, selectShamuMetaState, sequencerActions, userInputActions,
 } from '../common/redux'
 import {
 	localMidiKeyPress, localMidiKeyUp, localMidiOctaveChange, windowBlur,
@@ -69,6 +69,17 @@ const keyboardShortcuts: IKeyBoardShortcuts = Map<KeyBoardShortcut>({
 			}
 		},
 		allowRepeat: true,
+		preventDefault: true,
+	},
+	'r': {
+		actionOnKeyDown: (_, state) => {
+			const selectedNodeId = selectShamuMetaState(state.room).selectedNodeId
+			if (selectedNodeId === undefined) return
+			const sequencer = selectSequencer(state.room, selectedNodeId)
+			if (sequencer.ownerId.startsWith('dummy')) return
+			return sequencerActions.toggleRecording(selectedNodeId, !sequencer.isRecording)
+		},
+		allowRepeat: false,
 		preventDefault: true,
 	},
 	'x': {
