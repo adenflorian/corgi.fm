@@ -71,6 +71,7 @@
 	- [ ] take ownership if you are last member?
 - [ ] pan to center when making new room
 - [ ] more prominent message about version being out of date
+- [ ] tap tempo
 - [ ] list usernames of room members somewhere
 - [ ] metronome
 - [ ] solo

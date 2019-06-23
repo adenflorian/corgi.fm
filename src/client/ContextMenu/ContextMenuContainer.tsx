@@ -136,7 +136,7 @@ interface NodeMenuItemsProps {
 const hoverDelayMs = 1
 
 const deleteMenuLabels = List([
-	`Delete Node`,
+	`Delete`,
 	`You can't undo this (yet)`,
 ])
 
