@@ -1,4 +1,5 @@
 import {combineReducers} from 'redux'
+import {ConnectionNodeType, Id} from '../../common-types'
 import {groupSequencersReducer} from '../group-sequencers-redux'
 import {
 	basicSamplersReducer, basicSynthesizersReducer, gridSequencersReducer,
@@ -140,13 +141,13 @@ export const nodesReducer = combineReducers(Object.freeze({
 export const selectNodeIdsOwnedByClient = (state: IClientRoomState, clientId: string) => {
 	const nodes = state.shamuGraph.nodes as unknown as {[key: string]: IMultiState}
 
-	const ids: string[] = []
+	const ids: Array<{id: Id, type: ConnectionNodeType}> = []
 
 	Object.keys(nodes).forEach(nodeKey => {
 		const things = nodes[nodeKey].things
 		Object.keys(things).forEach(thingKey => {
 			const thing = things[thingKey]
-			if (thing.ownerId === clientId) ids.push(thing.id)
+			if (thing.ownerId === clientId) ids.push({id: thing.id, type: thing.type})
 		})
 	})
 

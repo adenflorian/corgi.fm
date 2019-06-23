@@ -36,8 +36,14 @@
 
 # 0.5.0
 - [√] fix dropping on connections on something with a lot of connections already
-- [ ] duplicate nodes
-- [ ] do something about peoples synths deleting when they leave
+- [] duplicate nodes
+	- [√] basic cloning
+	- [ ] menu items for
+		- [ ] cloning with all connections
+		- [ ] cloning with connections as if it were new
+		- [ ] cloning with no connections
+- [√] do something about peoples synths deleting when they leave
+	- [√] only delete if owner is the only person connected to it
 - [ ] purge button to delete unused nodes
 - [ ] record into grid sequencer
 - [ ] permissions

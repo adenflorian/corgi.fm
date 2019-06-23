@@ -2,7 +2,7 @@ import * as animal from 'animal-id'
 import {AnyAction, Store} from 'redux'
 import {Server, Socket} from 'socket.io'
 import {maxRoomNameLength} from '../common/common-constants'
-import {ClientId} from '../common/common-types'
+import {ClientId, ConnectionNodeType} from '../common/common-types'
 import {logger} from '../common/logger'
 import {
 	addClient, addRoomMember, BroadcastAction, CHANGE_ROOM,
@@ -16,11 +16,11 @@ import {
 	selectAllMessages, selectAllPointers,
 	selectAllPositions, selectAllRoomMemberIds,
 	selectAllRooms, selectAllRoomStates,
-	selectClientBySocketId, selectConnectionsWithSourceOrTargetIds, selectGlobalClockState,
-	selectNodeIdsOwnedByClient,
-	selectPositionsWithIds, selectRoomExists, selectRoomSettings, selectRoomStateByName,
-	selectShamuGraphState, SERVER_ACTION, setActiveRoom, setChat, setClients, setRoomMembers,
-	setRooms, shamuGraphActions, userLeftRoom,
+	selectClientBySocketId, selectConnectionsWithSourceOrTargetIds, selectConnectionsWithTargetIds,
+	selectGlobalClockState,
+	selectNodeIdsOwnedByClient, selectPositionsWithIds, selectRoomExists, selectRoomSettings,
+	selectRoomStateByName, selectShamuGraphState, SERVER_ACTION, setActiveRoom, setChat, setClients,
+	setRoomMembers, setRooms, shamuGraphActions, userLeftRoom,
 } from '../common/redux'
 import {WebSocketEvent} from '../common/server-constants'
 import {createServerStuff, loadServerStuff} from './create-server-stuff'
@@ -212,20 +212,43 @@ function onLeaveRoom(io: Server, socket: Socket, roomToLeave: string, serverStor
 	serverStore.dispatch(userLeftRoom(roomToLeave, Date.now()))
 
 	{
-		const nodeIdsOwnedByClient = selectNodeIdsOwnedByClient(roomState, clientId)
-		const connectionIdsToDelete = selectConnectionsWithSourceOrTargetIds(roomState, nodeIdsOwnedByClient)
+		const nodesOwnedByClient = selectNodeIdsOwnedByClient(roomState, clientId)
+
+		// filter out nodes that we don't want to delete
+
+		const keyboardIds = nodesOwnedByClient
+			.filter(x => x.type === ConnectionNodeType.virtualKeyboard)
+			.map(x => x.id)
+
+		const otherNodes = nodesOwnedByClient
+			.filter(x => x.type !== ConnectionNodeType.virtualKeyboard)
+			.filter(x => {
+				const incomingConnections = selectConnectionsWithTargetIds(roomState, [x.id])
+
+				// return true if it has no incoming connections
+				if (incomingConnections.count() === 0) return true
+
+				// return true if all incoming connections are from owner's keyboards
+				if (incomingConnections.every(y => keyboardIds.includes(y.sourceId))) return true
+
+				return false
+			})
+
+		const nodeIdsToDelete = otherNodes.map(x => x.id).concat(keyboardIds)
+
+		const connectionIdsToDelete = selectConnectionsWithSourceOrTargetIds(roomState, nodeIdsToDelete)
 			.map(x => x.id)
 			.toList()
 		const deleteConnectionsAction = connectionsActions.delete(connectionIdsToDelete)
 		serverStore.dispatch(createRoomAction(deleteConnectionsAction, roomToLeave))
 		io.to(roomToLeave).emit(WebSocketEvent.broadcast, deleteConnectionsAction)
 
-		const positionIdsToDelete = selectPositionsWithIds(roomState, nodeIdsOwnedByClient).map(x => x.id)
+		const positionIdsToDelete = selectPositionsWithIds(roomState, nodeIdsToDelete).map(x => x.id)
 		const deletePositionsAction = deletePositions(positionIdsToDelete)
 		serverStore.dispatch(createRoomAction(deletePositionsAction, roomToLeave))
 		io.to(roomToLeave).emit(WebSocketEvent.broadcast, deletePositionsAction)
 
-		const deleteNodes = deleteThingsAny(nodeIdsOwnedByClient)
+		const deleteNodes = deleteThingsAny(nodeIdsToDelete)
 		serverStore.dispatch(createRoomAction(deleteNodes, roomToLeave))
 		io.to(roomToLeave).emit(WebSocketEvent.broadcast, deleteNodes)
 
