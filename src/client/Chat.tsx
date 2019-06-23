@@ -69,7 +69,7 @@ export class Chat extends Component<AllProps, IChatComponentState> {
 								onChange={this._onInputChange}
 								value={this.state.chatMessage}
 								autoComplete="off"
-								placeholder="Type message here..."
+								placeholder="Hit enter to begin a message..."
 								inputRef={ref => (this.chatInputRef = ref || undefined)}
 							/>
 						</form>
