@@ -36,12 +36,12 @@
 
 # 0.5.0
 - [√] fix dropping on connections on something with a lot of connections already
-- [ ] duplicate nodes
+- [√] duplicate nodes
 	- [√] basic cloning
 	- [√] offset position of clone slightly
-	- [ ] menu items for
+	- [√] menu items for
 		- [√] cloning with all connections
-		- [ ] cloning with connections as if it were new
+		- [√] cloning with connections as if it were new
 		- [√] cloning with no connections
 - [√] do something about peoples synths deleting when they leave
 	- [√] only delete if owner is the only person connected to it
@@ -69,6 +69,7 @@
 	- [ ] give people permission to do stuff (based on client id)
 	- [ ] do something about when you refresh and lose ownership
 	- [ ] take ownership if you are last member?
+- [ ] clone node with ctrl + D
 - [ ] pan to center when making new room
 - [ ] more prominent message about version being out of date
 - [ ] tap tempo

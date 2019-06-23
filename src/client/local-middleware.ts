@@ -21,8 +21,9 @@ import {
 	GridSequencerAction,
 	gridSequencerActions, GridSequencerFields, GridSequencerState, IClientAppState,
 	IPosition, ISequencerState, LocalSaves, makePosition,
-	MASTER_AUDIO_OUTPUT_TARGET_ID, NetworkActionType,
-	READY, ReadyAction, SavedRoom, selectActiveRoom, selectAllPositions,
+	MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID,
+	NetworkActionType, READY, ReadyAction, SavedRoom, selectActiveRoom,
+	selectAllPositions,
 	selectClientInfo,
 	selectDirectDownstreamSequencerIds,
 	selectGlobalClockState,
@@ -31,10 +32,10 @@ import {
 	selectLocalSocketId,
 	selectPosition,
 	selectPositionExtremes,
-	selectRoomSettings,
-	selectSequencer, selectShamuGraphState, selectVirtualKeyboardById, selectVirtualKeyboardByOwner,
-	sequencerActions, SET_ACTIVE_ROOM, SET_GRID_SEQUENCER_NOTE, SET_LOCAL_CLIENT_NAME,
-	SetActiveRoomAction, setClientName, setLocalClientId, SetLocalClientNameAction,
+	selectRoomSettings, selectSequencer, selectShamuGraphState, selectVirtualKeyboardById,
+	selectVirtualKeyboardByOwner, sequencerActions, SET_ACTIVE_ROOM, SET_GRID_SEQUENCER_NOTE,
+	SET_LOCAL_CLIENT_NAME, SetActiveRoomAction, setClientName, setLocalClientId,
+	SetLocalClientNameAction,
 	ShamuGraphState,
 	SKIP_NOTE,
 	UPDATE_POSITIONS,
@@ -421,6 +422,23 @@ export const createLocalMiddleware: (getAllInstruments: GetAllInstruments) => Mi
 						.toList()
 
 					if (newConnections.count() > 0) dispatch(connectionsActions.addMultiple(newConnections))
+				} else if (action.withConnections === 'default') {
+					if (nodeInfo.autoConnectToClock) {
+						dispatch(connectionsActions.add(new Connection(
+							MASTER_CLOCK_SOURCE_ID,
+							ConnectionNodeType.masterClock,
+							clone.id,
+							clone.type,
+						)))
+					}
+					if (nodeInfo.autoConnectToAudioOutput) {
+						dispatch(connectionsActions.add(new Connection(
+							clone.id,
+							clone.type,
+							MASTER_AUDIO_OUTPUT_TARGET_ID,
+							ConnectionNodeType.audioOutput,
+						)))
+					}
 				}
 
 				return

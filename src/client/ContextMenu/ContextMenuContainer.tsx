@@ -217,9 +217,9 @@ const NodeMenuItems = React.memo(function _MenuItems({dispatch, nodeType}: NodeM
 			<MenuItem onClick={onClick('none')}>
 				With no connections
 			</MenuItem>
-			{/* <MenuItem onClick={onClick('default')}>
+			<MenuItem onClick={onClick('default')}>
 				With default connections
-			</MenuItem> */}
+			</MenuItem>
 		</SubMenu>
 	}
 
