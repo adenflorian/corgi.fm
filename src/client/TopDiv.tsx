@@ -52,12 +52,11 @@ export const TopDiv = ({memberCount, clientCount, info, isClientReady, roomOwner
 			</div>
 			<div className="blob">
 				<div className="blobDark">Room Owner</div>
-				<div><span className="largeFont" style={{color: roomOwner.color}}>{roomOwner.name}</span>{isLocalClientRoomOwner ? <span style={{marginLeft: 8, color: CssColor.disabledGray}}>(You)</span> : ''}</div>
+				<div><span className="usernameFont" style={{color: roomOwner.color}}>{roomOwner.name}</span>{isLocalClientRoomOwner ? <span style={{marginLeft: 8, color: CssColor.disabledGray}}>(You)</span> : ''}</div>
 			</div>
 			<div className="blob">
 				<div className="blobDark">Room Status</div>
 				<div
-					className="largeFont"
 					style={{color: onlyOwnerCanDoStuff ? CssColor.orange : CssColor.green}}
 					title={onlyOwnerCanDoStuff ? 'Limited: anyone can join, but only room owner can do stuff' : 'Public: anyone can join and do stuff'}
 				>

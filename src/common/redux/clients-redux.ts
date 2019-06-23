@@ -96,13 +96,15 @@ const colors = [CssColor.brightBlue, CssColor.brightGreen, CssColor.brightOrange
 
 export class ClientState implements IClientState {
 	public static createServerClient(): IClientState {
-		return {
-			id: serverClientId,
-			socketId: 'server',
-			name: 'server',
-			color: 'rgb(89, 122, 166)',
-		}
+		return ClientState.serverClient
 	}
+
+	public static serverClient: IClientState = Object.freeze({
+		id: serverClientId,
+		socketId: 'server',
+		name: 'Server',
+		color: CssColor.defaultGray,
+	})
 
 	public readonly socketId: string
 	public readonly id: string
@@ -173,14 +175,7 @@ export const clientsReducer = createReducer(initialState, {
 })
 
 export function selectClientById(state: IClientAppState, id: ClientId): IClientState {
-	if (id === serverClientId) {
-		return {
-			color: CssColor.defaultGray,
-			id: serverClientId,
-			name: 'server',
-			socketId: 'no socket for server',
-		}
-	}
+	if (id === serverClientId) return ClientState.serverClient
 
 	const client = selectAllClients(state).find(x => x.id === id)
 

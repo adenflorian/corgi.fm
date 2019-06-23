@@ -65,9 +65,11 @@
 		- [√] at css
 		- [√] at input events
 	- [ ] let users create keyboard if they dont have one
+	- [ ] allow changing mode by click room status in top left
 	- [ ] give people permission to do stuff (based on client id)
 	- [ ] do something about when you refresh and lose ownership
 	- [ ] take ownership if you are last member?
+- [ ] more prominent message about version being out of date
 - [ ] list usernames of room members somewhere
 - [ ] metronome
 - [ ] solo

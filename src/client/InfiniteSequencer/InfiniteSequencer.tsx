@@ -13,6 +13,7 @@ import {
 	infiniteSequencerActions, InfiniteSequencerFields, InfiniteSequencerState,
 	InfiniteSequencerStyle, selectConnectionSourceColorByTargetId, selectInfiniteSequencer, sequencerActions,
 } from '../../common/redux'
+import {CssColor} from '../../common/shamu-color'
 import {
 	percentageValueString, seqLengthValueToString, seqPitchValueToString,
 	seqRateValueToString, sequencerDownloadToolTip, sequencerEraseToolTip,
@@ -68,7 +69,7 @@ export const InfiniteSequencer: React.FC<IInfiniteSequencerAllProps> = React.mem
 					<Panel
 						id={props.id}
 						label={name}
-						color={isRecording ? 'red' : color}
+						color={isRecording ? CssColor.red : color}
 						saturate={isPlaying}
 						helpText={stripIndents`Plug your keyboard into the infinite sequencer, hit record, and play notes
 							Hit backspace to undo and right arrow key to insert a rest`}
