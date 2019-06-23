@@ -1,11 +1,11 @@
 import {List, Stack} from 'immutable'
 import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
+import {MAX_MIDI_NOTE_NUMBER_127} from '../common-constants'
 import {ConnectionNodeType, IMultiStateThing} from '../common-types'
 import {assertArrayHasNoUndefinedElements} from '../common-utils'
 import {makeMidiClipEvent, MidiClip, MidiClipEvents} from '../midi-types'
 import {emptyMidiNotes, IMidiNote, MidiNotes} from '../MidiNote'
-import {MAX_MIDI_NOTE_NUMBER_127} from '../server-constants'
 import {
 	addMultiThing, BROADCASTER_ACTION, CLEAR_SEQUENCER, createSequencerEvents, IClientRoomState,
 	IMultiState, IMultiStateThings, isEmptyEvents, makeMultiReducer, NetworkActionType,

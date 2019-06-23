@@ -2,6 +2,7 @@ import {List, Map, Set} from 'immutable'
 import {Dispatch, Middleware} from 'redux'
 import {ActionType} from 'typesafe-actions'
 import uuid from 'uuid'
+import {MAX_MIDI_NOTE_NUMBER_127} from '../common/common-constants'
 import {ConnectionNodeType, Id, IMultiStateThing} from '../common/common-types'
 import {createNodeId} from '../common/common-utils'
 import {logger} from '../common/logger'
@@ -17,12 +18,10 @@ import {
 	BasicSynthesizerState, Connection,
 	connectionsActions, deletePositions, deleteThingsAny, getConnectionNodeInfo,
 	GridSequencerAction,
-	IClientAppState,
-	IPosition, ISequencerState, LocalSaves,
-	makePosition, MASTER_AUDIO_OUTPUT_TARGET_ID,
-	NetworkActionType, READY, ReadyAction,
-	RECORD_SEQUENCER_NOTE, SavedRoom,
-	selectActiveRoom, selectAllPositions,
+	gridSequencerActions, GridSequencerFields, GridSequencerState, IClientAppState,
+	IPosition, ISequencerState, LocalSaves, makePosition,
+	MASTER_AUDIO_OUTPUT_TARGET_ID, NetworkActionType,
+	READY, ReadyAction, SavedRoom, selectActiveRoom, selectAllPositions,
 	selectClientInfo,
 	selectDirectDownstreamSequencerIds,
 	selectGlobalClockState,
@@ -32,10 +31,7 @@ import {
 	selectPosition,
 	selectPositionExtremes,
 	selectRoomSettings,
-	selectSequencer,
-	selectShamuGraphState,
-	selectVirtualKeyboardById,
-	selectVirtualKeyboardByOwner,
+	selectSequencer, selectShamuGraphState, selectVirtualKeyboardById, selectVirtualKeyboardByOwner,
 	sequencerActions, SET_ACTIVE_ROOM, SET_GRID_SEQUENCER_NOTE, SET_LOCAL_CLIENT_NAME,
 	SetActiveRoomAction, setClientName, setLocalClientId, SetLocalClientNameAction,
 	ShamuGraphState,
@@ -189,18 +185,41 @@ export const createLocalMiddleware: (getAllInstruments: GetAllInstruments) => Mi
 
 				// add note to sequencer if downstream recording sequencer
 				_getDownstreamRecordingSequencers(state, action.id)
-					.forEach(x => {
-						const info = getSequencersSchedulerInfo().get(x.id, null)
+					.forEach(sequencer => {
+						const info = getSequencersSchedulerInfo().get(sequencer.id, null)
 
-						if (!info) return dispatch(sequencerActions.recordNote(x.id, action.midiNote))
+						if (!info) return dispatch(sequencerActions.recordNote(sequencer.id, action.midiNote))
 
-						const eventCount = x.midiClip.events.count()
+						const eventCount = sequencer.midiClip.events.count()
 
 						const index = Math.ceil((eventCount * info.loopRatio) + 0.5) - 1
 
 						const actualIndex = index >= eventCount ? 0 : index
 
-						return dispatch(sequencerActions.recordNote(x.id, action.midiNote, actualIndex))
+						if (sequencer.type === ConnectionNodeType.gridSequencer) {
+							const gridSequencer = sequencer as GridSequencerState
+
+							const actualMidiNote = Math.min(MAX_MIDI_NOTE_NUMBER_127 - 1, Math.max(0, action.midiNote))
+
+							const topNote = gridSequencer.scrollY + gridSequencer.notesToShow - 1
+
+							let needToScroll = 0
+
+							// determine if new note is out of view
+							if (actualMidiNote < gridSequencer.scrollY) {
+								needToScroll = actualMidiNote - gridSequencer.scrollY
+							} else if (actualMidiNote > topNote) {
+								needToScroll = actualMidiNote - topNote
+							}
+
+							if (needToScroll !== 0) {
+								dispatch(gridSequencerActions.setField(gridSequencer.id, GridSequencerFields.scrollY, gridSequencer.scrollY + needToScroll))
+							}
+
+							return dispatch(sequencerActions.recordNote(sequencer.id, actualMidiNote, actualIndex))
+						} else {
+							return dispatch(sequencerActions.recordNote(sequencer.id, action.midiNote, actualIndex))
+						}
 					})
 
 				return

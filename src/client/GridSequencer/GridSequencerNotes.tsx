@@ -2,13 +2,13 @@ import {List} from 'immutable'
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
+import {MAX_MIDI_NOTE_NUMBER_127, MIN_MIDI_NOTE_NUMBER_0} from '../../common/common-constants'
 import {MidiClipEvents} from '../../common/midi-types'
 import {IMidiNotes} from '../../common/MidiNote'
 import {
 	gridSequencerActions, GridSequencerFields, IClientAppState,
 	selectGlobalClockState, selectGridSequencer,
 } from '../../common/redux'
-import {MAX_MIDI_NOTE_NUMBER_127, MIN_MIDI_NOTE_NUMBER_0} from '../../common/server-constants'
 import {getColorStringForMidiNote} from '../../common/shamu-color'
 import {isLeftMouseButtonDown} from '../client-utils'
 import {isWhiteKey} from '../Keyboard/Keyboard'

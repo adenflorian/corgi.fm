@@ -48,10 +48,11 @@
 - [√] purge button to delete unused nodes
 - [√] prevent people from spamming save buttons (debounce)
 - [√] record into grid sequencer
-	- [ ] scroll to new notes?
+	- [√] scroll to new notes?
 - [√] when keyboard is connected to seq, it should always send midi thru to downstream instruments, even when not recording
 - [√] placed notes in grid seq should respect pitch knob
 - [√] auditioning notes should limit to a half second or so
+- [ ] you could have it snap to whole numbers for bpm by default but have that allow the decimals - bean
 - [ ] permissions
 	- [ ] when you create a room you are owner
 	- [ ] in room options you can set it so only you can do stuff, or allow other people to do stuff
