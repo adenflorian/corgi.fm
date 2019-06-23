@@ -1,4 +1,4 @@
-import {List, Map, Record, Set} from 'immutable'
+import {List, Map, Set} from 'immutable'
 import {combineReducers, Reducer} from 'redux'
 import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
@@ -12,6 +12,7 @@ import {
 } from './index'
 
 export const ADD_CONNECTION = 'ADD_CONNECTION'
+export const ADD_CONNECTIONS = 'ADD_CONNECTIONS'
 export const DELETE_CONNECTIONS = 'DELETE_CONNECTIONS'
 export const DELETE_ALL_CONNECTIONS = 'DELETE_ALL_CONNECTIONS'
 export const REPLACE_CONNECTIONS = 'REPLACE_CONNECTIONS'
@@ -21,6 +22,12 @@ export const connectionsActions = Object.freeze({
 	add: (connection: IConnection) => ({
 		type: ADD_CONNECTION as typeof ADD_CONNECTION,
 		connection,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	}),
+	addMultiple: (connections: List<IConnection>) => ({
+		type: ADD_CONNECTIONS as typeof ADD_CONNECTIONS,
+		connections,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	}),
@@ -96,6 +103,7 @@ const connectionsSpecificReducer: Reducer<IConnections, IConnectionAction> =
 	(connections = Connections(), action) => {
 		switch (action.type) {
 			case ADD_CONNECTION: return connections.set(action.connection.id, action.connection)
+			case ADD_CONNECTIONS: return connections.concat(action.connections.reduce((map, val) => map.set(val.id, val), Map<string, IConnection>()))
 			case DELETE_CONNECTIONS: return connections.deleteAll(action.connectionIds)
 			case DELETE_ALL_CONNECTIONS: return connections.clear()
 			case REPLACE_CONNECTIONS: return Map<string, IConnection>().merge(action.connections)

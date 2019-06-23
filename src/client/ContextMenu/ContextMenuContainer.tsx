@@ -7,7 +7,8 @@ import {ConnectionNodeType, IConnectable, Id, Point} from '../../common/common-t
 import {
 	addPosition, Connection,
 	connectionsActions, getAddableNodeInfos, getConnectionNodeInfo, IConnectionNodeInfo,
-	makePosition, MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID, selectLocalClient, selectLocalClientId, selectVirtualKeyboardsByOwner, shamuConnect, VirtualKeyboardState,
+	makePosition, MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID,
+	selectLocalClient, selectVirtualKeyboardsByOwner, shamuConnect, VirtualKeyboardState,
 } from '../../common/redux'
 import {backgroundMenuId, nodeMenuId} from '../client-constants'
 import {deleteNode, localActions} from '../local-middleware'
@@ -200,13 +201,26 @@ const NodeMenuItems = React.memo(function _MenuItems({dispatch, nodeType}: NodeM
 	}
 
 	function CloneNodeMenuItem() {
-		return <MenuItem
-			onClick={(_, {nodeId}: DeleteMenuData) => {
-				dispatch(localActions.cloneNode(nodeId, nodeType))
-			}}
+
+		const onClick = (withConnections: Parameters<typeof localActions.cloneNode>[2]) =>
+			(_: any, {nodeId}: DeleteMenuData) => {
+				dispatch(localActions.cloneNode(nodeId, nodeType, withConnections))
+			}
+
+		return <SubMenu
+			title={<div>Clone...</div>}
+			hoverDelay={hoverDelayMs}
 		>
-			Clone
-		</MenuItem>
+			<MenuItem onClick={onClick('all')}>
+				With all connections
+			</MenuItem>
+			<MenuItem onClick={onClick('none')}>
+				With no connections
+			</MenuItem>
+			{/* <MenuItem onClick={onClick('default')}>
+				With default connections
+			</MenuItem> */}
+		</SubMenu>
 	}
 
 	function generateDeleteSubMenus(tree: React.ReactElement<any>, labels: List<string>): React.ReactElement<any> {

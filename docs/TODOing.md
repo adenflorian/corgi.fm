@@ -40,9 +40,9 @@
 	- [√] basic cloning
 	- [√] offset position of clone slightly
 	- [ ] menu items for
-		- [ ] cloning with all connections
+		- [√] cloning with all connections
 		- [ ] cloning with connections as if it were new
-		- [ ] cloning with no connections
+		- [√] cloning with no connections
 - [√] do something about peoples synths deleting when they leave
 	- [√] only delete if owner is the only person connected to it
 - [√] purge button to delete unused nodes

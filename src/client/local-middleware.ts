@@ -10,7 +10,8 @@ import {MidiClipEvent} from '../common/midi-types'
 import {emptyMidiNotes, IMidiNote} from '../common/MidiNote'
 import {BroadcastAction, IClientRoomState} from '../common/redux/common-redux-types'
 import {
-	selectAllConnections, selectConnectionsWithSourceIds, selectConnectionsWithSourceOrTargetIds,
+	selectAllConnections, selectConnectionsWithSourceIds,
+	selectConnectionsWithSourceOrTargetIds, selectConnectionsWithTargetIds,
 } from '../common/redux/connections-redux'
 import {
 	ADD_CLIENT, addBasicSynthesizer, AddClientAction,
@@ -118,10 +119,11 @@ export const localActions = Object.freeze({
 		sourceId,
 		note,
 	}),
-	cloneNode: (nodeId: Id, nodeType: ConnectionNodeType) => ({
+	cloneNode: (nodeId: Id, nodeType: ConnectionNodeType, withConnections: 'none' | 'all' | 'default') => ({
 		type: CLONE_NODE as typeof CLONE_NODE,
 		nodeId,
 		nodeType,
+		withConnections,
 	}),
 	pruneRoom: () => ({
 		type: PRUNE_ROOM as typeof PRUNE_ROOM,
@@ -400,6 +402,26 @@ export const createLocalMiddleware: (getAllInstruments: GetAllInstruments) => Mi
 				} as IPosition
 
 				dispatch(addPosition(clonePosition))
+
+				if (action.withConnections === 'all') {
+					const newConnections = selectConnectionsWithSourceIds(newState.room, [nodeId])
+						.map(x => ({
+							...x,
+							id: createNodeId(),
+							sourceId: clone.id,
+						}))
+						.concat(
+							selectConnectionsWithTargetIds(newState.room, [nodeId])
+								.map(x => ({
+									...x,
+									id: createNodeId(),
+									targetId: clone.id,
+								})),
+						)
+						.toList()
+
+					if (newConnections.count() > 0) dispatch(connectionsActions.addMultiple(newConnections))
+				}
 
 				return
 			}
