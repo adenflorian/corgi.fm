@@ -1,4 +1,5 @@
 import {debounce} from 'lodash'
+import uuid = require('uuid')
 
 export function pickRandomArrayElement<T>(array: T[]): T {
 	return array[Math.floor(Math.random() * array.length)]
@@ -41,4 +42,8 @@ export function getNumberInRangeFromString(str: string, length: number) {
 		.split('')
 		.reduce((sum, letter) => sum + letter.charCodeAt(0), 0)
 		% length
+}
+
+export function createNodeId() {
+	return uuid.v4()
 }

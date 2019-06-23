@@ -11,7 +11,7 @@ import {
 	MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID, shamuConnect,
 } from '../../common/redux'
 import {backgroundMenuId, nodeMenuId} from '../client-constants'
-import {deleteNode} from '../local-middleware'
+import {deleteNode, localActions} from '../local-middleware'
 import {toGraphSpace} from '../SimpleGraph/Zoom'
 import './ContextMenu.less'
 
@@ -141,13 +141,14 @@ const deleteMenuLabels = List([
 ])
 
 const NodeMenuItems = React.memo(function _MenuItems({dispatch, nodeType}: NodeMenuItemsProps) {
-	const isNodeDeletable = getConnectionNodeInfo(nodeType).isDeletable
+	const {isDeletable, isNodeCloneable} = getConnectionNodeInfo(nodeType)
 
 	return (
 		<Fragment>
 			<TopMenuBar />
-			{isNodeDeletable && <DeleteNodeMenuItem />}
-			{!isNodeDeletable && <DontDeleteMeMenuItem />}
+			{isDeletable && <DeleteNodeMenuItem />}
+			{!isDeletable && <DontDeleteMeMenuItem />}
+			{isNodeCloneable && <CloneNodeMenuItem />}
 		</Fragment>
 	)
 
@@ -179,6 +180,16 @@ const NodeMenuItems = React.memo(function _MenuItems({dispatch, nodeType}: NodeM
 			</MenuItem>,
 			deleteMenuLabels,
 		)
+	}
+
+	function CloneNodeMenuItem() {
+		return <MenuItem
+			onClick={(_, {nodeId}: DeleteMenuData) => {
+				dispatch(localActions.cloneNode(nodeId, nodeType))
+			}}
+		>
+			Clone
+		</MenuItem>
 	}
 
 	function generateDeleteSubMenus(tree: React.ReactElement<any>, labels: List<string>): React.ReactElement<any> {

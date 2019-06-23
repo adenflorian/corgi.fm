@@ -1,5 +1,6 @@
 import {Map, Record, Set} from 'immutable'
 import {AnyAction} from 'redux'
+import {serverClientId} from '../common-constants'
 import {ConnectionNodeType, IConnectable, Id, IMultiStateThing} from '../common-types'
 import {IMidiNote} from '../MidiNote'
 import {CssColor} from '../shamu-color'
@@ -32,7 +33,7 @@ export const MASTER_CLOCK_SOURCE_ID = 'MASTER_CLOCK_SOURCE_ID'
 
 export type IConnectionNodeInfo = ReturnType<typeof makeNodeInfo>
 
-export const dummyIConnectable: IConnectable = Object.freeze({
+export const dummyIConnectable: IMultiStateThing = Object.freeze({
 	color: CssColor.disabledGray,
 	id: 'oh no',
 	type: ConnectionNodeType.dummy,
@@ -40,6 +41,7 @@ export const dummyIConnectable: IConnectable = Object.freeze({
 	height: 0,
 	name: 'default node name',
 	enabled: false,
+	ownerId: 'dummyOwnerId',
 })
 
 class DummyConnectable implements IConnectable {
@@ -71,6 +73,7 @@ const _makeNodeInfo = Record({
 	autoConnectToAudioOutput: false,
 	undoAction: ((id: Id) => undefined) as (id: Id) => AnyAction | undefined,
 	disabledText: '',
+	isNodeCloneable: false,
 })
 
 type NodeInfo = ReturnType<typeof _makeNodeInfo>
@@ -79,7 +82,7 @@ function makeNodeInfo(x: Pick<NodeInfo, 'stateSelector' | 'typeName' | 'stateCon
 	return _makeNodeInfo(x)
 }
 
-class AudioOutputState implements IConnectable {
+class AudioOutputState implements IMultiStateThing {
 	public readonly id = MASTER_AUDIO_OUTPUT_TARGET_ID
 	public readonly color = CssColor.green
 	public readonly type = ConnectionNodeType.audioOutput
@@ -87,13 +90,14 @@ class AudioOutputState implements IConnectable {
 	public readonly height = 112
 	public readonly name = 'audio output'
 	public readonly enabled = true
+	public readonly ownerId = serverClientId
 
 	constructor() {}
 }
 
 const audioOutputState = new AudioOutputState()
 
-class MasterClockState implements IConnectable {
+class MasterClockState implements IMultiStateThing {
 	public readonly id = MASTER_CLOCK_SOURCE_ID
 	public readonly color = CssColor.brightBlue
 	public readonly type = ConnectionNodeType.masterClock
@@ -101,6 +105,7 @@ class MasterClockState implements IConnectable {
 	public readonly height = 88
 	public readonly name = 'master clock'
 	public readonly enabled = true
+	public readonly ownerId = serverClientId
 
 	constructor() {}
 }
@@ -139,6 +144,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		autoConnectToClock: true,
 		undoAction: id => sequencerActions.undo(id),
 		disabledText: sequencerDisabledText,
+		isNodeCloneable: true,
 	})],
 	[ConnectionNodeType.infiniteSequencer, makeNodeInfo({
 		typeName: 'Infinite Sequencer',
@@ -155,6 +161,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		autoConnectToClock: true,
 		undoAction: id => sequencerActions.undo(id),
 		disabledText: sequencerDisabledText,
+		isNodeCloneable: true,
 	})],
 	[ConnectionNodeType.groupSequencer, makeNodeInfo({
 		typeName: 'Group Sequencer',
@@ -166,6 +173,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		isDeletable: true,
 		autoConnectToClock: true,
 		disabledText: 'Will prevent connected nodes from playing, unless they are connected to a different, enabled group sequencer',
+		isNodeCloneable: true,
 	})],
 	[ConnectionNodeType.basicSynthesizer, makeNodeInfo({
 		typeName: 'Basic Synthesizer',
@@ -178,6 +186,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		isDeletable: true,
 		autoConnectToAudioOutput: true,
 		disabledText: instrumentDisabledText,
+		isNodeCloneable: true,
 	})],
 	[ConnectionNodeType.basicSampler, makeNodeInfo({
 		typeName: 'Piano Sampler',
@@ -190,6 +199,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		isDeletable: true,
 		autoConnectToAudioOutput: true,
 		disabledText: instrumentDisabledText,
+		isNodeCloneable: true,
 	})],
 	[ConnectionNodeType.simpleReverb, makeNodeInfo({
 		typeName: 'Reverb',
@@ -202,6 +212,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		isDeletable: true,
 		autoConnectToAudioOutput: true,
 		disabledText: effectDisabledText,
+		isNodeCloneable: true,
 	})],
 	[ConnectionNodeType.simpleCompressor, makeNodeInfo({
 		typeName: 'Compressor',
@@ -214,6 +225,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		isDeletable: true,
 		autoConnectToAudioOutput: true,
 		disabledText: effectDisabledText,
+		isNodeCloneable: true,
 	})],
 	[ConnectionNodeType.audioOutput, makeNodeInfo({
 		typeName: 'Audio Output',

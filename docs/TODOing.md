@@ -41,8 +41,9 @@
 - [ ] purge button to delete unused nodes
 - [ ] record into grid sequencer
 - [ ] permissions
-	- when you create a room you are owner
-	- [ ] in room options you can set it so
+	- [ ] when you create a room you are owner
+	- [ ] in room options you can set it so only you can do stuff, or allow other people to do stuff
+	- [ ] give people permission to do stuff (based on client id)
 - [ ] solo
 - [ ] fix up group sequencer
 	- [ ] connected nodes should prefer group sequencer color

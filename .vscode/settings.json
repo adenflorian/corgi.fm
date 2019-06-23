@@ -43,6 +43,7 @@
     },
     "typescript.tsdk": "node_modules\\typescript\\lib",
     "cSpell.words": [
+        "Cloneable",
         "Comparator",
         "DEVTOOLS",
         "Deletable",

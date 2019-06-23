@@ -2,7 +2,8 @@ import {List, Map, Set} from 'immutable'
 import {Dispatch, Middleware} from 'redux'
 import {ActionType} from 'typesafe-actions'
 import uuid from 'uuid'
-import {ConnectionNodeType, Id} from '../common/common-types'
+import {ConnectionNodeType, Id, IMultiStateThing} from '../common/common-types'
+import {createNodeId} from '../common/common-utils'
 import {logger} from '../common/logger'
 import {MidiClipEvent} from '../common/midi-types'
 import {emptyMidiNotes, IMidiNote} from '../common/MidiNote'
@@ -11,32 +12,34 @@ import {
 	selectAllConnections, selectConnectionsWithSourceIds, selectConnectionsWithSourceOrTargetIds,
 } from '../common/redux/connections-redux'
 import {
-	ADD_CLIENT, addBasicSampler, addBasicSynthesizer, AddClientAction,
-	addPosition, addVirtualKeyboard, BasicSamplerState, BasicSynthesizerState,
-	Connection, connectionsActions,
-	deletePositions, deleteThingsAny, getConnectionNodeInfo, GridSequencerAction,
+	ADD_CLIENT, addBasicSynthesizer, AddClientAction,
+	addMultiThing, addPosition, addVirtualKeyboard,
+	BasicSynthesizerState, Connection,
+	connectionsActions, deletePositions, deleteThingsAny, getConnectionNodeInfo,
+	GridSequencerAction,
 	IClientAppState,
-	IPosition,
-	ISequencerState, LocalSaves, makePosition,
-	MASTER_AUDIO_OUTPUT_TARGET_ID, NetworkActionType,
-	READY, ReadyAction, RECORD_SEQUENCER_NOTE,
-	SavedRoom, selectActiveRoom,
-	selectAllPositions, selectClientInfo,
+	IPosition, ISequencerState, LocalSaves,
+	makePosition, MASTER_AUDIO_OUTPUT_TARGET_ID,
+	NetworkActionType, READY, ReadyAction,
+	RECORD_SEQUENCER_NOTE, SavedRoom,
+	selectActiveRoom, selectAllPositions,
+	selectClientInfo,
 	selectDirectDownstreamSequencerIds,
 	selectGlobalClockState,
 	selectLocalClient,
 	selectLocalClientId,
 	selectLocalSocketId,
+	selectPosition,
 	selectPositionExtremes,
 	selectRoomSettings,
 	selectSequencer,
 	selectShamuGraphState,
 	selectVirtualKeyboardById,
 	selectVirtualKeyboardByOwner,
-	sequencerActions,
-	SET_ACTIVE_ROOM,
-	SET_GRID_SEQUENCER_NOTE, SET_LOCAL_CLIENT_NAME, SetActiveRoomAction, setClientName,
-	setLocalClientId, SetLocalClientNameAction, ShamuGraphState, SKIP_NOTE,
+	sequencerActions, SET_ACTIVE_ROOM, SET_GRID_SEQUENCER_NOTE, SET_LOCAL_CLIENT_NAME,
+	SetActiveRoomAction, setClientName, setLocalClientId, SetLocalClientNameAction,
+	ShamuGraphState,
+	SKIP_NOTE,
 	UPDATE_POSITIONS,
 	updatePositions,
 	UpdatePositionsAction,
@@ -99,6 +102,7 @@ export const SAVE_ROOM_TO_BROWSER = 'SAVE_ROOM_TO_BROWSER'
 export const SAVE_ROOM_TO_FILE = 'SAVE_ROOM_TO_FILE'
 export const DELETE_SAVED_ROOM = 'DELETE_SAVED_ROOM'
 export const PLAY_SHORT_NOTE = 'PLAY_SHORT_NOTE'
+export const CLONE_NODE = 'CLONE_NODE'
 
 export const localActions = Object.freeze({
 	saveRoomToBrowser: () => ({
@@ -115,6 +119,11 @@ export const localActions = Object.freeze({
 		type: PLAY_SHORT_NOTE as typeof PLAY_SHORT_NOTE,
 		sourceId,
 		note,
+	}),
+	cloneNode: (nodeId: Id, nodeType: ConnectionNodeType) => ({
+		type: CLONE_NODE as typeof CLONE_NODE,
+		nodeId,
+		nodeType,
 	}),
 })
 
@@ -327,6 +336,49 @@ export const createLocalMiddleware: (getAllInstruments: GetAllInstruments) => Mi
 							.toList(),
 					),
 				)
+
+				return
+			}
+			case CLONE_NODE: {
+				next(action)
+
+				const newState = getState()
+
+				const nodeId = action.nodeId
+				const nodeType = action.nodeType
+
+				// Select multiThing
+				const nodeInfo = getConnectionNodeInfo(action.nodeType)
+
+				const stateToClone = nodeInfo.stateSelector(newState.room, nodeId)
+
+				const clone = {
+					...stateToClone,
+					id: createNodeId(),
+				} as IMultiStateThing
+
+				// dispatch add multi thing
+				dispatch(addMultiThing(clone, nodeType, NetworkActionType.SERVER_AND_BROADCASTER))
+
+				// clone position
+				const positionToClone = selectPosition(newState.room, nodeId)
+
+				const clonePosition = {
+					...positionToClone,
+					id: clone.id,
+				} as IPosition
+
+				dispatch(addPosition(clonePosition))
+
+				// dispatch(deleteThingsAny([nodeId], NetworkActionType.SERVER_AND_BROADCASTER))
+				// dispatch(deletePositions([nodeId]))
+				// dispatch(
+				// 	connectionsActions.delete(
+				// 		selectConnectionsWithSourceOrTargetIds(newState.room, [nodeId])
+				// 			.map(x => x.id)
+				// 			.toList(),
+				// 	),
+				// )
 
 				return
 			}
