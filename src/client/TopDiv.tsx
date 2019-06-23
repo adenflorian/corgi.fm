@@ -10,7 +10,7 @@ import {Button} from './Button/Button'
 import {ButtonLink} from './Button/ButtonLink'
 import {localActions} from './local-middleware'
 import {ConnectedNameChanger} from './NameChanger'
-import {Options} from './Options/Options'
+import {ConnectedOptions} from './Options/Options'
 import {ConnectedRoomSelector} from './RoomSelector'
 import {SavingAndLoading} from './SavingAndLoading/SavingAndLoading'
 import './TopDiv.less'
@@ -97,7 +97,7 @@ export const TopDiv = ({memberCount, clientCount, info, isClientReady, roomOwner
 			>
 				Prune Room
 			</Button>
-			<Options />
+			<ConnectedOptions />
 			<ButtonLink href="/newsletter" newTab={true}>Newsletter</ButtonLink>
 			<ButtonLink href="https://discord.gg/qADwrxd" newTab={true}>Discord</ButtonLink>
 		</div>

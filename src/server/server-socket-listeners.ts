@@ -1,28 +1,32 @@
 import * as animal from 'animal-id'
+import {stripIndents} from 'common-tags'
 import {Store} from 'redux'
 import {Server, Socket} from 'socket.io'
 import {maxRoomNameLength, serverClientId} from '../common/common-constants'
 import {ClientId, ConnectionNodeType} from '../common/common-types'
 import {logger} from '../common/logger'
 import {
-	addClient, addRoomMember, BroadcastAction, CHANGE_ROOM,
-	clientDisconnected, ClientState, connectionsActions, createRoom,
-	createRoomAction, deletePositions, deleteRoomMember,
-	deleteThingsAny, getActionsBlacklist, GLOBAL_SERVER_ACTION,
-	globalClockActions, IClientRoomState, IServerState, LOAD_ROOM,
-	LoadRoomAction, maxUsernameLength, pointersActions, ready,
-	replacePositions, REQUEST_CREATE_ROOM, RoomSettingsAction,
-	roomSettingsActions, RoomsReduxAction, SavedRoom,
+	addClient, addRoomMember, BroadcastAction,
+	CHANGE_ROOM, clientDisconnected, ClientState, connectionsActions,
+	createRoom, createRoomAction, deletePositions,
+	deleteRoomMember, deleteThingsAny, getActionsBlacklist,
+	GLOBAL_SERVER_ACTION, globalClockActions, IClientRoomState, IServerState,
+	LOAD_ROOM, LoadRoomAction, maxUsernameLength, pointersActions,
+	ready, replacePositions, REQUEST_CREATE_ROOM,
+	roomOwnerRoomActions, RoomSettingsAction, roomSettingsActions,
+	RoomsReduxAction, SavedRoom,
 	selectAllClients, selectAllConnections,
 	selectAllMessages, selectAllPointers,
-	selectAllPositions, selectAllRoomMemberIds,
-	selectAllRooms, selectAllRoomStates, selectClientBySocketId,
-	selectConnectionsWithSourceOrTargetIds,
-	selectConnectionsWithTargetIds, selectGlobalClockState, selectNodeIdsOwnedByClient,
-	selectPositionsWithIds,
-	selectRoomExists, selectRoomSettings, selectRoomStateByName, selectShamuGraphState,
-	SERVER_ACTION, SET_ROOM_OWNER,
-	setActiveRoom, setChat, setClients, setRoomMembers, setRooms, shamuGraphActions,
+	selectAllPositions, selectAllRoomMemberIds, selectAllRooms,
+	selectAllRoomStates,
+	selectClientById, selectClientBySocketId, selectConnectionsWithSourceOrTargetIds,
+	selectConnectionsWithTargetIds,
+	selectGlobalClockState, selectNodeIdsOwnedByClient, selectPositionsWithIds, selectRoomExists,
+	selectRoomSettings, selectRoomStateByName,
+	selectShamuGraphState, SERVER_ACTION, setActiveRoom, setChat, setClients,
+	setRoomMembers,
+	setRooms,
+	shamuGraphActions,
 	userLeftRoom,
 } from '../common/redux'
 import {WebSocketEvent} from '../common/server-constants'
@@ -80,13 +84,30 @@ export function setupServerWebSocketListeners(io: Server, serverStore: Store) {
 					logger.trace(`${WebSocketEvent.broadcast}: ${socket.id} | `, action)
 				}
 
-				if (action[GLOBAL_SERVER_ACTION]) {
+				const room = getRoom(socket)
+
+				const isRoomOwnerAction = roomOwnerRoomActions.includes(action.type)
+
+				if (isRoomOwnerAction) {
+					const roomOwnerId = getRoomOwnerId(serverStore, room)
+
+					// Only do it if the current client is the current room owner
+					if (clientId !== roomOwnerId) {
+						const client = selectClientById(serverStore.getState(), clientId)
+						logger.warn(stripIndents`user attempted to run a restricted room action while not room owner.
+							clientId: ${clientId} username: ${client.name} room: ${room} action: ${JSON.stringify(action, null, 2)}`)
+						return
+					}
+
+					// Assume client is room owner past this point
+					serverStore.dispatch(createRoomAction(action, room))
+				} else if (action[GLOBAL_SERVER_ACTION]) {
 					serverStore.dispatch(action)
 				} else if (action[SERVER_ACTION]) {
-					serverStore.dispatch(createRoomAction(action, getRoom(socket)))
+					serverStore.dispatch(createRoomAction(action, room))
 				}
 
-				socket.broadcast.to(getRoom(socket)).emit(WebSocketEvent.broadcast, {...action, alreadyBroadcasted: true})
+				socket.broadcast.to(room).emit(WebSocketEvent.broadcast, {...action, alreadyBroadcasted: true})
 			})
 
 			// TODO Merge with broadcast event above
@@ -95,15 +116,16 @@ export function setupServerWebSocketListeners(io: Server, serverStore: Store) {
 
 				const room = getRoom(socket)
 
-				if (action.type === SET_ROOM_OWNER) {
-					const roomOwnerId = getRoomOwnerId(serverStore, room)
+				const isRestrictedRoomAction = roomOwnerRoomActions.includes(action.type)
 
-					// Only do it if the current client is the current room owner
-					if (roomOwnerId === clientId) {
-						serverStore.dispatch(
-							createRoomAction(roomSettingsActions.setOwner(action.ownerId), room))
-					}
-				} else if (action.type === CHANGE_ROOM) {
+				if (isRestrictedRoomAction) {
+					const client = selectClientById(serverStore.getState(), clientId)
+					logger.warn(stripIndents`user attempted to run a restricted room action as a server only action.
+						clientId: ${clientId} username: ${client.name} room: ${room} action: ${JSON.stringify(action, null, 2)}`)
+					return
+				}
+
+				if (action.type === CHANGE_ROOM) {
 					changeRooms(action.room)
 				} else if (action.type === REQUEST_CREATE_ROOM) {
 					makeAndJoinNewRoom(animal.getId())
@@ -281,6 +303,10 @@ function onLeaveRoom(io: Server, socket: Socket, roomToLeave: string, serverStor
 		const setRoomOwnerAction = roomSettingsActions.setOwner(serverClientId)
 		serverStore.dispatch(createRoomAction(setRoomOwnerAction, roomToLeave))
 		io.to(roomToLeave).emit(WebSocketEvent.broadcast, setRoomOwnerAction)
+
+		const unlockAction = roomSettingsActions.changeOnlyOwnerCanDoStuff(false)
+		serverStore.dispatch(createRoomAction(unlockAction, roomToLeave))
+		io.to(roomToLeave).emit(WebSocketEvent.broadcast, unlockAction)
 	}
 }
 

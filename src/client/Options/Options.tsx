@@ -1,13 +1,21 @@
 import * as React from 'react'
 import {Fragment} from 'react'
-import {AppOptions, LineType, roomSettingsActions, selectRoomSettings} from '../../common/redux'
+import {
+	AppOptions, LineType, roomSettingsActions, selectLocalClientId,
+	selectRoomSettings, shamuConnect,
+} from '../../common/redux'
 import {Button} from '../Button/Button'
 import {Modal} from '../Modal/Modal'
 import {ConnectedOption} from '../Option'
 import {ConnectedOptionCheckbox} from '../RoomSetting'
 import './Options.less'
 
-export const Options = React.memo(function _Options() {
+interface ReduxProps {
+	isLocalClientRoomOwner: boolean
+	onlyOwnerCanDoStuff: boolean
+}
+
+export const Options = ({isLocalClientRoomOwner, onlyOwnerCanDoStuff}: ReduxProps) => {
 	const [visible, setVisible] = React.useState(false)
 
 	return (
@@ -54,25 +62,51 @@ export const Options = React.memo(function _Options() {
 							label="graphics: enable expensive/fancy zoom and pan (sharper render, but slower)"
 						/>
 					</div>
-					<div className="modalSection roomOptions">
-						<div className="modalSectionLabel">Room Options</div>
-						<div className="modalSectionSubLabel">other people in this room will see these changes</div>
-						<ConnectedOptionCheckbox
-							label="straight connection lines"
-							onChange={dispatch => e =>
-								dispatch(roomSettingsActions.changeLineType(e.target.checked
-									? LineType.Straight
-									: LineType.Curved,
-								))}
-							valueSelector={state =>
-								selectRoomSettings(state.room).lineType === LineType.Straight
-									? true
-									: false
+					{!isLocalClientRoomOwner && onlyOwnerCanDoStuff ?
+						<div className="modalSection roomOptions">
+							<div className="modalSectionLabel">Room Options</div>
+							<div className="modalSectionSubLabel">the room owner has locked this room to where only the room owner can change room settings</div>
+						</div>
+						:
+						<div className="modalSection roomOptions">
+							<div className="modalSectionLabel">Room Options</div>
+							<div className="modalSectionSubLabel">other people in this room will see these changes</div>
+							<ConnectedOptionCheckbox
+								label="straight connection lines"
+								onChange={dispatch => e =>
+									dispatch(roomSettingsActions.changeLineType(e.target.checked
+										? LineType.Straight
+										: LineType.Curved,
+									))}
+								valueSelector={state =>
+									selectRoomSettings(state.room).lineType === LineType.Straight
+										? true
+										: false
+								}
+							/>
+							{isLocalClientRoomOwner &&
+								<ConnectedOptionCheckbox
+									label="only owner can do stuff"
+									onChange={dispatch => e =>
+										dispatch(roomSettingsActions.changeOnlyOwnerCanDoStuff(e.target.checked))}
+									valueSelector={state => selectRoomSettings(state.room).onlyOwnerCanDoStuff}
+								/>
 							}
-						/>
-					</div>
+						</div>
+					}
 				</Modal>
 			}
 		</Fragment>
 	)
-})
+}
+
+export const ConnectedOptions = shamuConnect(
+	(state): ReduxProps => {
+		const roomSettings = selectRoomSettings(state.room)
+
+		return {
+			isLocalClientRoomOwner: selectLocalClientId(state) === roomSettings.ownerId,
+			onlyOwnerCanDoStuff: roomSettings.onlyOwnerCanDoStuff,
+		}
+	},
+)(Options)

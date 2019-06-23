@@ -57,7 +57,11 @@
 - [ ] permissions
 	- [√] when you create a room you are owner
 	- [√] make server owner when room is empty
-	- [ ] in room options you can set it so only you can do stuff, or allow other people to do stuff
+	- [√] in room options you can set it so only you can do stuff, or allow other people to do stuff
+	- [√] unlock room when server becomes owner
+	- [ ] restrict room setting on back end
+	- [ ] restrict all room things on backend
+	- [ ] restrict all room things on front end
 	- [ ] give people permission to do stuff (based on client id)
 	- [ ] do something about when you refresh and lose ownership
 	- [ ] take ownership if you are last member?
