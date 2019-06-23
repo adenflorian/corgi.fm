@@ -1,4 +1,4 @@
-import {Map, Record} from 'immutable'
+import {List, Map, Record} from 'immutable'
 import {combineReducers} from 'redux'
 import {ActionType} from 'typesafe-actions'
 import {BROADCASTER_ACTION, SERVER_ACTION} from '.'
@@ -8,6 +8,11 @@ export const ADD_POINTER = 'ADD_POINTER'
 export const UPDATE_POINTER = 'UPDATE_POINTER'
 export const DELETE_POINTER = 'DELETE_POINTER'
 export const REPLACE_ALL_POINTERS = 'REPLACE_ALL_POINTERS'
+
+export const pointerActionTypesWhitelist = List([
+	ADD_POINTER,
+	UPDATE_POINTER,
+])
 
 export const pointersActions = Object.freeze({
 	add: (ownerId: string) => ({

@@ -7,23 +7,25 @@ import {ClientId, ConnectionNodeType} from '../common/common-types'
 import {logger} from '../common/logger'
 import {
 	addClient, addRoomMember, BroadcastAction,
-	CHANGE_ROOM, clientDisconnected, ClientState, connectionsActions,
-	createRoom, createRoomAction, deletePositions,
-	deleteRoomMember, deleteThingsAny, getActionsBlacklist,
-	GLOBAL_SERVER_ACTION, globalClockActions, IClientRoomState, IServerState,
-	LOAD_ROOM, LoadRoomAction, maxUsernameLength, pointersActions,
-	ready, replacePositions, REQUEST_CREATE_ROOM,
-	roomOwnerRoomActions, RoomSettingsAction, roomSettingsActions,
+	CHANGE_ROOM, chatActionTypesWhitelist, clientDisconnected, ClientState,
+	connectionsActions, createRoom, createRoomAction,
+	deletePositions, deleteRoomMember, deleteThingsAny,
+	getActionsBlacklist, GLOBAL_SERVER_ACTION, globalClockActions, IClientRoomState,
+	IServerState, LOAD_ROOM, LoadRoomAction, maxUsernameLength,
+	pointerActionTypesWhitelist, pointersActions, ready,
+	replacePositions, REQUEST_CREATE_ROOM, roomOwnerRoomActions,
+	RoomSettingsAction, roomSettingsActions,
 	RoomsReduxAction, SavedRoom,
 	selectAllClients, selectAllConnections,
-	selectAllMessages, selectAllPointers,
-	selectAllPositions, selectAllRoomMemberIds, selectAllRooms,
-	selectAllRoomStates,
-	selectClientById, selectClientBySocketId, selectConnectionsWithSourceOrTargetIds,
-	selectConnectionsWithTargetIds,
-	selectGlobalClockState, selectNodeIdsOwnedByClient, selectPositionsWithIds, selectRoomExists,
-	selectRoomSettings, selectRoomStateByName,
-	selectShamuGraphState, SERVER_ACTION, setActiveRoom, setChat, setClients,
+	selectAllMessages, selectAllPointers, selectAllPositions,
+	selectAllRoomMemberIds,
+	selectAllRooms, selectAllRoomStates, selectClientById,
+	selectClientBySocketId,
+	selectConnectionsWithSourceOrTargetIds, selectConnectionsWithTargetIds, selectGlobalClockState, selectNodeIdsOwnedByClient,
+	selectPositionsWithIds, selectRoomExists,
+	selectRoomSettings, selectRoomStateByName, selectShamuGraphState, SERVER_ACTION, setActiveRoom,
+	setChat,
+	setClients,
 	setRoomMembers,
 	setRooms,
 	shamuGraphActions,
@@ -38,6 +40,9 @@ export const lobby = 'lobby'
 const server = 'server'
 
 const version = serverInfo.version
+
+const whitelistedRoomActionTypes = chatActionTypesWhitelist
+	.concat(pointerActionTypesWhitelist)
 
 export function setupServerWebSocketListeners(io: Server, serverStore: Store) {
 	io.on('connection', socket => {
@@ -85,10 +90,26 @@ export function setupServerWebSocketListeners(io: Server, serverStore: Store) {
 				}
 
 				const room = getRoom(socket)
+				const roomState = selectRoomStateByName(serverStore.getState(), room)
 
-				const isRoomOwnerAction = roomOwnerRoomActions.includes(action.type)
+				if (!roomState) {
+					logger.error(`can't find room state on server for room ${room}`)
+					return
+				}
 
-				if (isRoomOwnerAction) {
+				// Don't allow non-whitelisted actions to be dispatch by non-owners when only owner can do stuff
+				if (!whitelistedRoomActionTypes.includes(action.type) && selectRoomSettings(roomState).onlyOwnerCanDoStuff) {
+					const roomOwnerId = getRoomOwnerId(serverStore, room)
+
+					if (clientId !== roomOwnerId) {
+						const client = selectClientById(serverStore.getState(), clientId)
+						logger.warn(stripIndents`user attempted to run a room action while not room owner and room is locked.
+							clientId: ${clientId} username: ${client.name} room: ${room} action: ${JSON.stringify(action, null, 2)}`)
+						return
+					}
+				}
+
+				if (roomOwnerRoomActions.includes(action.type)) {
 					const roomOwnerId = getRoomOwnerId(serverStore, room)
 
 					// Only do it if the current client is the current room owner

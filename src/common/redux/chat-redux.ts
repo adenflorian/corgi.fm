@@ -1,3 +1,4 @@
+import {List} from 'immutable'
 import {IClientRoomState} from './index'
 import {BROADCASTER_ACTION, createReducer, SERVER_ACTION} from './index'
 
@@ -21,6 +22,10 @@ export const setChat = (messages: IChatMessage[]) => {
 		messages,
 	}
 }
+
+export const chatActionTypesWhitelist = List([
+	CHAT_SUBMIT,
+])
 
 export interface IChatState {
 	messages: IChatMessage[]
