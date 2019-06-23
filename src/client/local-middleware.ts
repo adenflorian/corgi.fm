@@ -608,17 +608,19 @@ function playShortNote(
 	getAllInstruments: GetAllInstruments,
 ) {
 	const targetIds = selectConnectionsWithSourceIds(roomState, [sourceId]).map(x => x.targetId)
-	const {gate, rate} = selectSequencer(roomState, sourceId)
+	const {gate, rate, pitch} = selectSequencer(roomState, sourceId)
 	const bpm = selectGlobalClockState(roomState).bpm
 
 	const delay = (60 / bpm) * rate * gate
 
+	const actualNote = note + pitch
+
 	getAllInstruments().forEach(instrument => {
 		if (targetIds.includes(instrument.id) === false) return
 
-		instrument.scheduleNote(note, 0, true, Set([sourceId]))
+		instrument.scheduleNote(actualNote, 0, true, Set([sourceId]))
 
-		instrument.scheduleRelease(note, delay)
+		instrument.scheduleRelease(actualNote, delay)
 	})
 }
 

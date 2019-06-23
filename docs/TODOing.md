@@ -50,7 +50,7 @@
 - [√] record into grid sequencer
 	- [ ] scroll to new notes?
 - [√] when keyboard is connected to seq, it should always send midi thru to downstream instruments, even when not recording
-- [ ] placed notes in seq should respect pitch knob
+- [√] placed notes in grid seq should respect pitch knob
 - [ ] permissions
 	- [ ] when you create a room you are owner
 	- [ ] in room options you can set it so only you can do stuff, or allow other people to do stuff
