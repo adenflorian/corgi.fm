@@ -36,7 +36,7 @@
 
 # 0.5.0
 - [√] fix dropping on connections on something with a lot of connections already
-- [] duplicate nodes
+- [ ] duplicate nodes
 	- [√] basic cloning
 	- [√] offset position of clone slightly
 	- [ ] menu items for
@@ -49,6 +49,8 @@
 - [√] prevent people from spamming save buttons (debounce)
 - [√] record into grid sequencer
 	- [ ] scroll to new notes?
+- [√] when keyboard is connected to seq, it should always send midi thru to downstream instruments, even when not recording
+- [ ] placed notes in seq should respect pitch knob
 - [ ] permissions
 	- [ ] when you create a room you are owner
 	- [ ] in room options you can set it so only you can do stuff, or allow other people to do stuff

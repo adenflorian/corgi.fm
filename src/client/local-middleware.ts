@@ -221,13 +221,6 @@ export const createLocalMiddleware: (getAllInstruments: GetAllInstruments) => Mi
 
 				return
 			}
-			case RECORD_SEQUENCER_NOTE: {
-				playShortNote(action.note, action.id, getState().room, getAllInstruments)
-
-				next(action)
-
-				return
-			}
 			case SKIP_NOTE: {
 				const state = getState()
 
@@ -594,7 +587,10 @@ function scheduleNote(
 
 	// logger.log('[local-middleware.scheduleNote] note: ' + note + ' | onOrOff: ' + onOrOff)
 
-	const targetIds = selectConnectionsWithSourceIds(roomState, [sourceId]).map(x => x.targetId)
+	const directlyConnectedSequencerIds = selectDirectDownstreamSequencerIds(roomState, sourceId).toArray()
+
+	const targetIds = selectConnectionsWithSourceIds(roomState, [sourceId].concat(directlyConnectedSequencerIds))
+		.map(x => x.targetId)
 
 	getAllInstruments().forEach(instrument => {
 		if (targetIds.includes(instrument.id) === false) return
