@@ -14,12 +14,13 @@ interface ReduxProps {
 	name: string
 	length: number
 	rate: number
+	isRecording: boolean
 }
 
 type AllProps = Props & ReduxProps
 
 export const GridSequencerContainer = (props: AllProps) => {
-	const {id, color, isPlaying, name, length, rate} = props
+	const {id, color, isPlaying, name, length, rate, isRecording} = props
 
 	return (
 		<GridSequencer
@@ -29,6 +30,7 @@ export const GridSequencerContainer = (props: AllProps) => {
 			name={name}
 			length={length}
 			rate={rate}
+			isRecording={isRecording}
 		/>
 	)
 }
@@ -43,6 +45,7 @@ export const ConnectedGridSequencerContainer = shamuConnect(
 			name: gridSequencer.name,
 			length: gridSequencer.midiClip.length,
 			rate: gridSequencer.rate,
+			isRecording: gridSequencer.isRecording,
 		}
 	},
 )(GridSequencerContainer)

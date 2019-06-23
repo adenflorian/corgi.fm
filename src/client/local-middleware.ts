@@ -61,6 +61,7 @@ import {pointersActions} from '../common/redux/pointers-redux'
 import {graphStateSavesLocalStorageKey} from './client-constants'
 import {GetAllInstruments} from './instrument-manager'
 import {MidiNotes} from './Instruments/BasicSynthesizerView'
+import {getSequencersSchedulerInfo} from './note-scanner'
 import {saveUsernameToLocalStorage} from './username'
 import {applyOctave} from './WebAudio/music-functions'
 
@@ -184,10 +185,22 @@ export const createLocalMiddleware: (getAllInstruments: GetAllInstruments) => Mi
 
 				if ((action as unknown as BroadcastAction).alreadyBroadcasted) return
 
+				const state = getState()
+
 				// add note to sequencer if downstream recording sequencer
-				_getDownstreamRecordingSequencers(getState(), action.id)
+				_getDownstreamRecordingSequencers(state, action.id)
 					.forEach(x => {
-						dispatch(sequencerActions.recordNote(x.id, action.midiNote))
+						const info = getSequencersSchedulerInfo().get(x.id, null)
+
+						if (!info) return dispatch(sequencerActions.recordNote(x.id, action.midiNote))
+
+						const eventCount = x.midiClip.events.count()
+
+						const index = Math.ceil((eventCount * info.loopRatio) + 0.5) - 1
+
+						const actualIndex = index >= eventCount ? 0 : index
+
+						return dispatch(sequencerActions.recordNote(x.id, action.midiNote, actualIndex))
 					})
 
 				return

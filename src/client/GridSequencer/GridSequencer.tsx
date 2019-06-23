@@ -12,17 +12,18 @@ interface IGridSequencerProps {
 	name: string
 	length: number
 	rate: number
+	isRecording: boolean
 }
 
 export const GridSequencer = (props: IGridSequencerProps) => {
-	const {id, color, isPlaying, name, rate, length} = props
+	const {id, color, isPlaying, name, rate, length, isRecording} = props
 
 	return (
 		<Panel
 			id={id}
-			color={color}
+			color={isRecording ? 'red' : color}
 			label={name}
-			className={`gridSequencer ${isPlaying ? 'isPlaying' : 'isNotPlaying'}`}
+			className={`gridSequencer ${isPlaying ? 'isPlaying' : 'isNotPlaying'} ${isRecording ? `isRecording` : ''}`}
 			saturate={isPlaying}
 			extra={seqLengthValueToString(rate / 4 * length)}
 			helpText={stripIndents`

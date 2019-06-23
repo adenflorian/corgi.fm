@@ -23,6 +23,7 @@ interface ReduxProps {
 	gate: number
 	pitch: number
 	rate: number
+	isRecording: boolean
 }
 
 type AllProps = IGridSequencerControlsProps & ReduxProps & {dispatch: Dispatch}
@@ -53,8 +54,9 @@ export const GridSequencerControls = (props: AllProps) => {
 					<Stop />
 				</div>
 				<div
-					className="readonly"
-					title="Coming soon™️"
+					className="record"
+					onClick={() => props.dispatch(sequencerActions.toggleRecording(props.id, !props.isRecording))}
+					title={sequencerRecordToolTip}
 				>
 					<Record />
 				</div>
@@ -125,6 +127,7 @@ export const GridSequencerControlsConnected = shamuConnect(
 			gate: gridSequencerState.gate,
 			pitch: gridSequencerState.pitch,
 			rate: gridSequencerState.rate,
+			isRecording: gridSequencerState.isRecording,
 		}
 	},
 )(GridSequencerControls)

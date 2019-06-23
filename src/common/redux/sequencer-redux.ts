@@ -71,10 +71,11 @@ export const sequencerActions = Object.freeze({
 		type: EXPORT_SEQUENCER_MIDI as typeof EXPORT_SEQUENCER_MIDI,
 		id,
 	}),
-	recordNote: (id: string, note: IMidiNote) => ({
+	recordNote: (id: string, note: IMidiNote, index?: number) => ({
 		type: RECORD_SEQUENCER_NOTE as typeof RECORD_SEQUENCER_NOTE,
 		id,
 		note,
+		index,
 		BROADCASTER_ACTION,
 		SERVER_ACTION,
 	}),

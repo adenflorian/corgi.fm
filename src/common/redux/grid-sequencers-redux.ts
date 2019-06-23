@@ -12,7 +12,7 @@ import {
 	PLAY_ALL, selectGlobalClockState, SERVER_ACTION, STOP_ALL,
 	UNDO_SEQUENCER,
 } from './index'
-import {deserializeSequencerState, ISequencerState, PLAY_SEQUENCER, selectAllGridSequencers, SequencerAction, SequencerStateBase, STOP_SEQUENCER} from './sequencer-redux'
+import {deserializeSequencerState, ISequencerState, PLAY_SEQUENCER, RECORD_SEQUENCER_NOTE, selectAllGridSequencers, SequencerAction, SequencerStateBase, STOP_SEQUENCER, TOGGLE_SEQUENCER_RECORDING} from './sequencer-redux'
 
 export const addGridSequencer = (gridSequencer: GridSequencerState) =>
 	addMultiThing(gridSequencer, ConnectionNodeType.gridSequencer, NetworkActionType.SERVER_AND_BROADCASTER)
@@ -216,6 +216,8 @@ const gridSequencerActionTypes = [
 	UNDO_SEQUENCER,
 	PLAY_SEQUENCER,
 	STOP_SEQUENCER,
+	TOGGLE_SEQUENCER_RECORDING,
+	RECORD_SEQUENCER_NOTE,
 ]
 
 assertArrayHasNoUndefinedElements(gridSequencerActionTypes)
@@ -269,6 +271,7 @@ const gridSequencerReducer =
 						[action.fieldName]: action.data,
 					}
 				}
+			case TOGGLE_SEQUENCER_RECORDING: return {...gridSequencer, isRecording: action.isRecording}
 			case UNDO_SEQUENCER: {
 				if (gridSequencer.previousEvents.count() === 0) return gridSequencer
 
@@ -292,6 +295,23 @@ const gridSequencerReducer =
 					previousEvents: gridSequencer.previousEvents.unshift(gridSequencer.midiClip.events),
 				}
 			}
+			case RECORD_SEQUENCER_NOTE:
+				const index = action.index
+				if (index === undefined) return gridSequencer
+				if (gridSequencer.isRecording) {
+					return {
+						...gridSequencer,
+						midiClip: gridSequencer.midiClip.withMutations(mutable => {
+							mutable.set('events',
+								mutable.events.update(
+									index,
+									x => ({...x, notes: x.notes.add(action.note)})))
+						}),
+						previousEvents: gridSequencer.previousEvents.unshift(gridSequencer.midiClip.events),
+					}
+				} else {
+					return gridSequencer
+				}
 			case PLAY_SEQUENCER: return {...gridSequencer, isPlaying: true, isRecording: false}
 			case STOP_SEQUENCER: return {...gridSequencer, isPlaying: false, isRecording: false}
 			case PLAY_ALL: return {...gridSequencer, isPlaying: true}

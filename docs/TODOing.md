@@ -47,7 +47,8 @@
 	- [√] only delete if owner is the only person connected to it
 - [√] purge button to delete unused nodes
 - [√] prevent people from spamming save buttons (debounce)
-- [ ] record into grid sequencer
+- [√] record into grid sequencer
+	- [ ] scroll to new notes?
 - [ ] permissions
 	- [ ] when you create a room you are owner
 	- [ ] in room options you can set it so only you can do stuff, or allow other people to do stuff
@@ -94,6 +95,8 @@
 - [ ] auditioning notes should limit to a half second or so
 - [ ] fix order of node menu
 - [ ] drum sampler?
+- [ ] give feedback when saving to browser
+- [ ] disable save button until something changes?
 
 # 0.6.0
 - [ ] FM synth
