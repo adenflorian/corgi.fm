@@ -611,7 +611,8 @@ function playShortNote(
 	const {gate, rate, pitch} = selectSequencer(roomState, sourceId)
 	const bpm = selectGlobalClockState(roomState).bpm
 
-	const delay = (60 / bpm) * rate * gate
+	// Limit note length to 0.25 seconds
+	const delayUntilRelease = Math.min(0.25, (60 / bpm) * rate * gate)
 
 	const actualNote = note + pitch
 
@@ -620,7 +621,7 @@ function playShortNote(
 
 		instrument.scheduleNote(actualNote, 0, true, Set([sourceId]))
 
-		instrument.scheduleRelease(actualNote, delay)
+		instrument.scheduleRelease(actualNote, delayUntilRelease)
 	})
 }
 
