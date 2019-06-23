@@ -128,7 +128,7 @@ export function InfiniteSequencerNotes({id, style, events, showRows, dispatch}: 
 						return (
 							< div
 								key={index}
-								className={`event usernameFont`}
+								className={`event usernameFont colorBars`}
 								style={{
 									backgroundColor: note === -1 ? 'none' : getColorStringForMidiNote(note),
 									borderRadius: 4,

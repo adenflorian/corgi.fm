@@ -69,6 +69,7 @@
 	- [ ] give people permission to do stuff (based on client id)
 	- [ ] do something about when you refresh and lose ownership
 	- [ ] take ownership if you are last member?
+- [ ] pan to center when making new room
 - [ ] more prominent message about version being out of date
 - [ ] list usernames of room members somewhere
 - [ ] metronome
