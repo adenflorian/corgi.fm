@@ -366,19 +366,11 @@ export const createLocalMiddleware: (getAllInstruments: GetAllInstruments) => Mi
 				const clonePosition = {
 					...positionToClone,
 					id: clone.id,
+					x: positionToClone.x + 32,
+					y: positionToClone.y + 32,
 				} as IPosition
 
 				dispatch(addPosition(clonePosition))
-
-				// dispatch(deleteThingsAny([nodeId], NetworkActionType.SERVER_AND_BROADCASTER))
-				// dispatch(deletePositions([nodeId]))
-				// dispatch(
-				// 	connectionsActions.delete(
-				// 		selectConnectionsWithSourceOrTargetIds(newState.room, [nodeId])
-				// 			.map(x => x.id)
-				// 			.toList(),
-				// 	),
-				// )
 
 				return
 			}

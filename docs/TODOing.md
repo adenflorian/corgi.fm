@@ -38,6 +38,7 @@
 - [√] fix dropping on connections on something with a lot of connections already
 - [] duplicate nodes
 	- [√] basic cloning
+	- [√] offset position of clone slightly
 	- [ ] menu items for
 		- [ ] cloning with all connections
 		- [ ] cloning with connections as if it were new
