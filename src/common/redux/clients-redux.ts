@@ -173,7 +173,17 @@ export const clientsReducer = createReducer(initialState, {
 })
 
 export function selectClientById(state: IClientAppState, id: ClientId): IClientState {
+	if (id === serverClientId) {
+		return {
+			color: CssColor.defaultGray,
+			id: serverClientId,
+			name: 'server',
+			socketId: 'no socket for server',
+		}
+	}
+
 	const client = selectAllClients(state).find(x => x.id === id)
+
 	if (client) {
 		return client
 	} else {
@@ -181,7 +191,7 @@ export function selectClientById(state: IClientAppState, id: ClientId): IClientS
 		// logger.warn(`selectClientById was called with id '${id}'`
 		// 	+ `, but no client with that id was found, returning fake`)
 		return {
-			color: 'gray',
+			color: CssColor.disabledGray,
 			id: 'fakeClientId',
 			name: 'fakeClient',
 			socketId: 'fakeClientSocketId',
@@ -197,7 +207,7 @@ export function selectClientBySocketId(state: IClientAppState | IServerState, so
 		logger.warn(`selectClientBySocketId was called with socketId '${socketId}'`
 			+ `, but no client with that socket id was found, returning fake`)
 		return {
-			color: 'gray',
+			color: CssColor.disabledGray,
 			id: 'fakeClientId',
 			name: 'fakeClient',
 			socketId: 'fakeClientSocketId',
@@ -213,7 +223,7 @@ export function selectLocalClient(state: IClientAppState): IClientState {
 	} else {
 		logger.warn('selectLocalClient was called but localClient is not set, returning fake')
 		return {
-			color: 'gray',
+			color: CssColor.disabledGray,
 			id: 'fakeLocalClientId',
 			name: 'fakeLocalClient',
 			socketId: 'fakeLocalClientSocketId',

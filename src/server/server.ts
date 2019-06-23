@@ -1,8 +1,9 @@
 import * as express from 'express'
 import * as http from 'http'
 import * as socketIO from 'socket.io'
+import {serverClientId} from '../common/common-constants'
 import {logger} from '../common/logger'
-import {configureServerStore} from '../common/redux'
+import {configureServerStore, createRoomAction, roomSettingsActions} from '../common/redux'
 import {createRoom} from '../common/redux'
 import {createServerStuff} from './create-server-stuff'
 import {logServerEnv} from './is-prod-server'
@@ -15,6 +16,7 @@ logServerEnv()
 const serverStore = configureServerStore()
 
 serverStore.dispatch(createRoom(lobby, Date.now()))
+serverStore.dispatch(createRoomAction(roomSettingsActions.setOwner(serverClientId), lobby))
 
 createServerStuff(lobby, serverStore)
 

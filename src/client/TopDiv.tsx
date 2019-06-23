@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {Dispatch} from 'redux'
 import {rateLimitedDebounceNoTrail} from '../common/common-utils'
-import {selectMemberCount} from '../common/redux'
+import {IClientState, selectClientById, selectMemberCount, selectRoomSettings} from '../common/redux'
 import {selectClientCount} from '../common/redux'
 import {selectClientInfo, shamuConnect} from '../common/redux'
 import {requestCreateRoom} from '../common/redux'
@@ -20,11 +20,12 @@ interface ReduxProps {
 	clientCount: number
 	info: string
 	isClientReady: boolean
+	roomOwner: IClientState
 }
 
 type AllProps = ReduxProps & {dispatch: Dispatch}
 
-export const TopDiv = ({memberCount, clientCount, info, isClientReady, dispatch}: AllProps) =>
+export const TopDiv = ({memberCount, clientCount, info, isClientReady, roomOwner, dispatch}: AllProps) =>
 	<div id="topDiv" style={{marginBottom: 'auto'}}>
 		<div className="left">
 			<div className="blob">
@@ -46,6 +47,10 @@ export const TopDiv = ({memberCount, clientCount, info, isClientReady, dispatch}
 			<div className="blob">
 				<div className="blobDark">Total Members</div>
 				<div>{clientCount}</div>
+			</div>
+			<div className="blob">
+				<div className="blobDark">Room Owner</div>
+				<div className="largeFont" style={{color: roomOwner.color}}>{roomOwner.name}</div>
 			</div>
 			{!isClientReady &&
 				<div
@@ -104,5 +109,6 @@ export const ConnectedTopDiv = shamuConnect(
 		info: state.websocket.info,
 		memberCount: selectMemberCount(state.room),
 		isClientReady: selectClientInfo(state).isClientReady,
+		roomOwner: selectClientById(state, selectRoomSettings(state.room).ownerId),
 	}),
 )(TopDiv)

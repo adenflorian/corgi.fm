@@ -1,8 +1,10 @@
 import {ActionType} from 'typesafe-actions'
+import {Id} from '../common-types'
 import {BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION} from './index'
 
 export const REPLACE_ALL_ROOM_SETTINGS = 'REPLACE_ALL_ROOM_SETTINGS'
 export const CHANGE_LINE_TYPE_ROOM_SETTING = 'CHANGE_LINE_TYPE_ROOM_SETTING'
+export const SET_ROOM_OWNER = 'SET_ROOM_OWNER'
 
 export const roomSettingsActions = Object.freeze({
 	replaceAll: (settings: RoomSettings) => ({
@@ -15,6 +17,11 @@ export const roomSettingsActions = Object.freeze({
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	}),
+	setOwner: (ownerId: Id) => ({
+		type: SET_ROOM_OWNER as typeof SET_ROOM_OWNER,
+		ownerId,
+		SERVER_ACTION,
+	}),
 })
 
 export enum LineType {
@@ -24,6 +31,7 @@ export enum LineType {
 
 const initialState = Object.freeze({
 	lineType: LineType.Curved,
+	ownerId: '-1',
 })
 
 export type RoomSettings = typeof initialState
@@ -34,6 +42,7 @@ export function roomSettingsReducer(settings = initialState, action: RoomSetting
 	switch (action.type) {
 		case REPLACE_ALL_ROOM_SETTINGS: return action.settings
 		case CHANGE_LINE_TYPE_ROOM_SETTING: return {...settings, lineType: action.newLineType}
+		case SET_ROOM_OWNER: return {...settings, ownerId: action.ownerId}
 		default: return settings
 	}
 }

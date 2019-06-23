@@ -55,9 +55,14 @@
 - [√] you could have it snap to whole numbers for bpm by default but have that allow the decimals - bean
 - [√] r key to record
 - [ ] permissions
-	- [ ] when you create a room you are owner
+	- [√] when you create a room you are owner
+	- [√] make server owner when room is empty
 	- [ ] in room options you can set it so only you can do stuff, or allow other people to do stuff
 	- [ ] give people permission to do stuff (based on client id)
+	- [ ] do something about when you refresh and lose ownership
+	- [ ] take ownership if you are last member?
+- [ ] list usernames of room members somewhere
+- [ ] metronome
 - [ ] solo
 - [ ] fix up group sequencer
 	- [ ] connected nodes should prefer group sequencer color

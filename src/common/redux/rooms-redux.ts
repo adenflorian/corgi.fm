@@ -71,8 +71,8 @@ export const loadRoom = (savedRoom: SavedRoom) => ({
 	SERVER_ACTION,
 })
 
-export type RoomsReduxAction = SetRoomsAction | SetActiveRoomAction |
-	ChangeRoomAction | CreateRoomAction | DeleteRoomAction | UserLeftRoomAction
+export type RoomsReduxAction = SetRoomsAction | SetActiveRoomAction | RequestCreateRoomAction |
+	ChangeRoomAction | CreateRoomAction | DeleteRoomAction | UserLeftRoomAction | LoadRoomAction
 
 export interface LocalSaves {
 	all: {

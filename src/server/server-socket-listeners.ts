@@ -1,7 +1,7 @@
 import * as animal from 'animal-id'
-import {AnyAction, Store} from 'redux'
+import {Store} from 'redux'
 import {Server, Socket} from 'socket.io'
-import {maxRoomNameLength} from '../common/common-constants'
+import {maxRoomNameLength, serverClientId} from '../common/common-constants'
 import {ClientId, ConnectionNodeType} from '../common/common-types'
 import {logger} from '../common/logger'
 import {
@@ -11,16 +11,19 @@ import {
 	deleteThingsAny, getActionsBlacklist, GLOBAL_SERVER_ACTION,
 	globalClockActions, IClientRoomState, IServerState, LOAD_ROOM,
 	LoadRoomAction, maxUsernameLength, pointersActions, ready,
-	replacePositions, REQUEST_CREATE_ROOM, roomSettingsActions,
-	SavedRoom, selectAllClients, selectAllConnections,
+	replacePositions, REQUEST_CREATE_ROOM, RoomSettingsAction,
+	roomSettingsActions, RoomsReduxAction, SavedRoom,
+	selectAllClients, selectAllConnections,
 	selectAllMessages, selectAllPointers,
 	selectAllPositions, selectAllRoomMemberIds,
-	selectAllRooms, selectAllRoomStates,
-	selectClientBySocketId, selectConnectionsWithSourceOrTargetIds, selectConnectionsWithTargetIds,
-	selectGlobalClockState,
-	selectNodeIdsOwnedByClient, selectPositionsWithIds, selectRoomExists, selectRoomSettings,
-	selectRoomStateByName, selectShamuGraphState, SERVER_ACTION, setActiveRoom, setChat, setClients,
-	setRoomMembers, setRooms, shamuGraphActions, userLeftRoom,
+	selectAllRooms, selectAllRoomStates, selectClientBySocketId,
+	selectConnectionsWithSourceOrTargetIds,
+	selectConnectionsWithTargetIds, selectGlobalClockState, selectNodeIdsOwnedByClient,
+	selectPositionsWithIds,
+	selectRoomExists, selectRoomSettings, selectRoomStateByName, selectShamuGraphState,
+	SERVER_ACTION, SET_ROOM_OWNER,
+	setActiveRoom, setChat, setClients, setRoomMembers, setRooms, shamuGraphActions,
+	userLeftRoom,
 } from '../common/redux'
 import {WebSocketEvent} from '../common/server-constants'
 import {createServerStuff, loadServerStuff} from './create-server-stuff'
@@ -51,7 +54,9 @@ export function setupServerWebSocketListeners(io: Server, serverStore: Store) {
 
 		const newClient = new ClientState({socketId: socket.id, name: newConnectionUsername})
 
-		joinOrCreateRoom(newConnectionRoom || lobby, newClient.id)
+		const clientId = newClient.id
+
+		joinOrCreateRoom(newConnectionRoom || lobby)
 
 		const addClientAction = addClient(newClient)
 		serverStore.dispatch(addClientAction)
@@ -85,19 +90,29 @@ export function setupServerWebSocketListeners(io: Server, serverStore: Store) {
 			})
 
 			// TODO Merge with broadcast event above
-			socket.on(WebSocketEvent.serverAction, (action: AnyAction) => {
+			socket.on(WebSocketEvent.serverAction, (action: RoomSettingsAction | RoomsReduxAction) => {
 				logger.trace(`${WebSocketEvent.serverAction}: ${socket.id} | `, action)
 
-				if (action.type === CHANGE_ROOM) {
+				const room = getRoom(socket)
+
+				if (action.type === SET_ROOM_OWNER) {
+					const roomOwnerId = getRoomOwnerId(serverStore, room)
+
+					// Only do it if the current client is the current room owner
+					if (roomOwnerId === clientId) {
+						serverStore.dispatch(
+							createRoomAction(roomSettingsActions.setOwner(action.ownerId), room))
+					}
+				} else if (action.type === CHANGE_ROOM) {
 					changeRooms(action.room)
 				} else if (action.type === REQUEST_CREATE_ROOM) {
 					makeAndJoinNewRoom(animal.getId())
 				} else if (action.type === LOAD_ROOM) {
 					makeAndJoinNewRoom(animal.getId(), (action as LoadRoomAction).savedRoom)
-				} else if (action[GLOBAL_SERVER_ACTION]) {
+				} else if ((action as any)[GLOBAL_SERVER_ACTION]) {
 					serverStore.dispatch(action)
-				} else if (action[SERVER_ACTION]) {
-					serverStore.dispatch(createRoomAction(action, getRoom(socket)))
+				} else if ((action as any)[SERVER_ACTION]) {
+					serverStore.dispatch(createRoomAction(action, room))
 				}
 			})
 
@@ -106,8 +121,6 @@ export function setupServerWebSocketListeners(io: Server, serverStore: Store) {
 
 				const serverState = serverStore.getState()
 				const roomStates = selectAllRoomStates(serverState)
-
-				const clientId = selectClientBySocketId(serverState, socket.id).id
 
 				const roomToLeave = roomStates.findKey(x => selectAllRoomMemberIds(x).includes(clientId))
 
@@ -125,7 +138,7 @@ export function setupServerWebSocketListeners(io: Server, serverStore: Store) {
 			})
 		}
 
-		function joinOrCreateRoom(newRoom: string, clientId: ClientId) {
+		function joinOrCreateRoom(newRoom: string) {
 			socket.join(newRoom, err => {
 				if (err) throw new Error(err)
 
@@ -176,6 +189,7 @@ export function setupServerWebSocketListeners(io: Server, serverStore: Store) {
 				throw new Error(`room exists, this shouldn't happen`)
 			} else {
 				serverStore.dispatch(createRoom(newRoomName, Date.now()))
+				serverStore.dispatch(createRoomAction(roomSettingsActions.setOwner(clientId), newRoomName))
 
 				if (roomDataToLoad) {
 					loadServerStuff(newRoomName, serverStore, roomDataToLoad)
@@ -260,6 +274,14 @@ function onLeaveRoom(io: Server, socket: Socket, roomToLeave: string, serverStor
 	const deleteRoomMemberAction = deleteRoomMember(clientId)
 	serverStore.dispatch(createRoomAction(deleteRoomMemberAction, roomToLeave))
 	io.to(roomToLeave).emit(WebSocketEvent.broadcast, deleteRoomMemberAction)
+
+	// Select new room owner if needed
+	const currentRoomOwnerId = getRoomOwnerId(serverStore, roomToLeave)
+	if (clientId === currentRoomOwnerId) {
+		const setRoomOwnerAction = roomSettingsActions.setOwner(serverClientId)
+		serverStore.dispatch(createRoomAction(setRoomOwnerAction, roomToLeave))
+		io.to(roomToLeave).emit(WebSocketEvent.broadcast, setRoomOwnerAction)
+	}
 }
 
 function syncState(newSocket: Socket, roomState: IClientRoomState, serverState: IServerState, activeRoom: string) {
@@ -314,4 +336,13 @@ function syncState(newSocket: Socket, roomState: IClientRoomState, serverState: 
 function getRoom(socket: Socket) {
 	const realRooms = Object.keys(socket.rooms).filter(x => x !== socket.id)
 	return realRooms[0]
+}
+
+function getRoomOwnerId(serverStore: Store<IServerState>, room: string) {
+	const roomState = selectRoomStateByName(serverStore.getState(), room)
+
+	if (!roomState) return `couldn't find room state`
+
+	// Only do it if the current client is the current room owner
+	return selectRoomSettings(roomState).ownerId
 }
