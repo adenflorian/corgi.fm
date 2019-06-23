@@ -7,10 +7,11 @@ interface IButtonProps {
 	buttonProps?: any
 	style?: 'fancyButton' | 'flatButton'
 	children: any
+	disabled?: boolean
 }
 
 export const Button = React.memo(
-	function _Button({buttonProps = {}, style = 'fancyButton', children}: IButtonProps) {
+	function _Button({buttonProps = {}, style = 'fancyButton', children, disabled = false}: IButtonProps) {
 		if (style === 'fancyButton') {
 			return (
 				<Panel
@@ -20,6 +21,7 @@ export const Button = React.memo(
 				>
 					<button
 						{...buttonProps}
+						disabled={disabled}
 					>
 						{children}
 					</button>
@@ -30,6 +32,7 @@ export const Button = React.memo(
 				<div className="buttonContainer flatButton">
 					<button
 						{...buttonProps}
+						disabled={disabled}
 					>
 						{children}
 					</button>

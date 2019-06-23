@@ -4,8 +4,8 @@ import {rateLimitedDebounce} from '../common/common-utils'
 import {
 	getConnectionNodeInfo, globalClockActions,
 	IClientAppState, pointersActions,
-	selectClientInfo, selectGlobalClockIsPlaying, selectLocalClient, selectPosition,
-	selectSequencer, selectShamuMetaState, sequencerActions, userInputActions,
+	selectClientInfo, selectGlobalClockIsPlaying, selectIsLocalClientInLimitedMode, selectLocalClient,
+	selectPosition, selectSequencer, selectShamuMetaState, sequencerActions, userInputActions,
 } from '../common/redux'
 import {
 	localMidiKeyPress, localMidiKeyUp, localMidiOctaveChange, windowBlur,
@@ -20,6 +20,7 @@ interface KeyBoardShortcut {
 	actionOnKeyPress?: Action | keyboardActionCreator
 	allowRepeat: boolean
 	preventDefault: boolean
+	allowInLimitedMode?: boolean
 }
 
 type keyboardActionCreator = (e: KeyboardEvent, state: IClientAppState) => AnyAction | undefined
@@ -175,7 +176,10 @@ export function setupInputEventListeners(
 		const keyboardShortcut = keyboardShortcuts.get(event.key.toLowerCase())
 
 		if (!keyboardShortcut) return
+
 		if (event.repeat && keyboardShortcut.allowRepeat === false) return
+
+		if (selectIsLocalClientInLimitedMode(store.getState()) && keyboardShortcut.allowInLimitedMode !== true) return
 
 		const actionPropToUse = getPropNameForEventType(event.type)
 		const action = keyboardShortcut[actionPropToUse]

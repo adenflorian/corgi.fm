@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {Dispatch} from 'redux'
 import {rateLimitedDebounceNoTrail} from '../common/common-utils'
-import {IClientState, selectClientById, selectMemberCount, selectRoomSettings} from '../common/redux'
+import {IClientState, selectClientById, selectLocalClientId, selectMemberCount, selectRoomSettings} from '../common/redux'
 import {selectClientCount} from '../common/redux'
 import {selectClientInfo, shamuConnect} from '../common/redux'
 import {requestCreateRoom} from '../common/redux'
@@ -21,11 +21,13 @@ interface ReduxProps {
 	info: string
 	isClientReady: boolean
 	roomOwner: IClientState
+	onlyOwnerCanDoStuff: boolean
+	isLocalClientRoomOwner: boolean
 }
 
 type AllProps = ReduxProps & {dispatch: Dispatch}
 
-export const TopDiv = ({memberCount, clientCount, info, isClientReady, roomOwner, dispatch}: AllProps) =>
+export const TopDiv = ({memberCount, clientCount, info, isClientReady, roomOwner, onlyOwnerCanDoStuff, isLocalClientRoomOwner, dispatch}: AllProps) =>
 	<div id="topDiv" style={{marginBottom: 'auto'}}>
 		<div className="left">
 			<div className="blob">
@@ -41,16 +43,26 @@ export const TopDiv = ({memberCount, clientCount, info, isClientReady, roomOwner
 				<span id="zoomText">1</span>
 			</div>
 			<div className="blob">
+				<div className="blobDark">Online Users</div>
+				<div>{clientCount}</div>
+			</div>
+			<div className="blob">
 				<div className="blobDark">Room Members</div>
 				<div>{memberCount}</div>
 			</div>
 			<div className="blob">
-				<div className="blobDark">Total Members</div>
-				<div>{clientCount}</div>
+				<div className="blobDark">Room Owner</div>
+				<div><span className="largeFont" style={{color: roomOwner.color}}>{roomOwner.name}</span>{isLocalClientRoomOwner ? <span style={{marginLeft: 8, color: CssColor.disabledGray}}>(You)</span> : ''}</div>
 			</div>
 			<div className="blob">
-				<div className="blobDark">Room Owner</div>
-				<div className="largeFont" style={{color: roomOwner.color}}>{roomOwner.name}</div>
+				<div className="blobDark">Room Status</div>
+				<div
+					className="largeFont"
+					style={{color: onlyOwnerCanDoStuff ? CssColor.orange : CssColor.green}}
+					title={onlyOwnerCanDoStuff ? 'Limited: anyone can join, but only room owner can do stuff' : 'Public: anyone can join and do stuff'}
+				>
+					{onlyOwnerCanDoStuff ? 'Limited' : 'Public'}
+				</div>
 			</div>
 			{!isClientReady &&
 				<div
@@ -92,8 +104,9 @@ export const TopDiv = ({memberCount, clientCount, info, isClientReady, roomOwner
 			<Button
 				buttonProps={{
 					onClick: () => confirm('Are you sure you want to delete all nodes with no connections in this room?\nThis cannot be undone!') ? dispatch(localActions.pruneRoom()) : undefined,
-					title: 'Will delete nodes with no connections on them',
+					title: 'Will delete nodes with no connections on them' + (onlyOwnerCanDoStuff && !isLocalClientRoomOwner ? '\nOnly room owner can prune at this time' : ''),
 				}}
+				disabled={onlyOwnerCanDoStuff && !isLocalClientRoomOwner}
 			>
 				Prune Room
 			</Button>
@@ -104,11 +117,17 @@ export const TopDiv = ({memberCount, clientCount, info, isClientReady, roomOwner
 	</div>
 
 export const ConnectedTopDiv = shamuConnect(
-	(state): ReduxProps => ({
-		clientCount: selectClientCount(state),
-		info: state.websocket.info,
-		memberCount: selectMemberCount(state.room),
-		isClientReady: selectClientInfo(state).isClientReady,
-		roomOwner: selectClientById(state, selectRoomSettings(state.room).ownerId),
-	}),
+	(state): ReduxProps => {
+		const roomSettings = selectRoomSettings(state.room)
+
+		return {
+			clientCount: selectClientCount(state),
+			info: state.websocket.info,
+			memberCount: selectMemberCount(state.room),
+			isClientReady: selectClientInfo(state).isClientReady,
+			roomOwner: selectClientById(state, roomSettings.ownerId),
+			onlyOwnerCanDoStuff: roomSettings.onlyOwnerCanDoStuff,
+			isLocalClientRoomOwner: selectLocalClientId(state) === roomSettings.ownerId,
+		}
+	},
 )(TopDiv)

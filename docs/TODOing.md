@@ -60,7 +60,11 @@
 	- [√] in room options you can set it so only you can do stuff, or allow other people to do stuff
 	- [√] unlock room when server becomes owner
 	- [√] restrict all room things on backend except whitelist
-	- [ ] restrict all room things on front end
+	- [√] restrict all room things on front end
+		- [ ] at redux level (not realistic to do this)
+		- [√] at css
+		- [√] at input events
+	- [ ] let users create keyboard if they dont have one
 	- [ ] give people permission to do stuff (based on client id)
 	- [ ] do something about when you refresh and lose ownership
 	- [ ] take ownership if you are last member?

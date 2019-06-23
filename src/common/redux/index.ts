@@ -16,6 +16,7 @@ export * from './redux-utils'
 export * from './websocket-redux'
 
 export * from './common-actions'
+export * from './common-selectors'
 
 // Instruments & Effects
 export * from './basic-synthesizers-redux'

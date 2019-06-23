@@ -9,7 +9,7 @@ import './css-reset.css'
 import './App.less'
 import {isLocalDevClient} from './is-prod-client'
 import {LoadingScreen} from './LoadingScreen'
-import {OnlineApp} from './OnlineApp'
+import {ConnectedOnlineApp} from './OnlineApp'
 
 interface IAppProps {
 	isConnectingForFirstTime: boolean
@@ -30,7 +30,7 @@ class App extends React.Component<IAppProps, {}> {
 		return (
 			<React.Fragment>
 				<LoadingScreen loading={isLoading} />
-				{!isLoading && <OnlineApp />}
+				{!isLoading && <ConnectedOnlineApp />}
 			</React.Fragment>
 		)
 	}

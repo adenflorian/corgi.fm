@@ -1,11 +1,9 @@
 import {AnyAction, combineReducers, Store} from 'redux'
 import {StateType} from 'typesafe-actions'
-import {clientInfoReducer} from './client-info-redux'
 import {
-	audioReducer, clientsReducer, optionsReducer, roomReducers,
-	roomsReducer, userInputReducer, websocketReducer,
+	audioReducer, BROADCASTER_ACTION, chatActionTypesWhitelist, clientInfoReducer, clientsReducer, optionsReducer,
+	pointerActionTypesWhitelist, roomReducers, roomsReducer, userInputReducer, websocketReducer,
 } from './index'
-import {BROADCASTER_ACTION} from './redux-utils'
 
 export type IClientAppState = StateType<ReturnType<typeof getClientReducers>>
 
@@ -30,3 +28,6 @@ export interface BroadcastAction extends AnyAction {
 	alreadyBroadcasted: boolean
 	[BROADCASTER_ACTION]: any
 }
+
+export const whitelistedRoomActionTypes = chatActionTypesWhitelist
+	.concat(pointerActionTypesWhitelist)

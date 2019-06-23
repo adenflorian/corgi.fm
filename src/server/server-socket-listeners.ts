@@ -30,6 +30,7 @@ import {
 	setRooms,
 	shamuGraphActions,
 	userLeftRoom,
+	whitelistedRoomActionTypes,
 } from '../common/redux'
 import {WebSocketEvent} from '../common/server-constants'
 import {createServerStuff, loadServerStuff} from './create-server-stuff'
@@ -40,9 +41,6 @@ export const lobby = 'lobby'
 const server = 'server'
 
 const version = serverInfo.version
-
-const whitelistedRoomActionTypes = chatActionTypesWhitelist
-	.concat(pointerActionTypesWhitelist)
 
 export function setupServerWebSocketListeners(io: Server, serverStore: Store) {
 	io.on('connection', socket => {

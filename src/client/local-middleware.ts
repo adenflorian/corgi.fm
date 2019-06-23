@@ -663,6 +663,10 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 
 	dispatch(pointersActions.add(localClient.id))
 
+	// Don't do anything else if only room owner can do stuff
+	const roomSettings = selectRoomSettings(state.room)
+	if (roomSettings.onlyOwnerCanDoStuff && selectLocalClientId(state) !== roomSettings.ownerId) return
+
 	const extremes = selectPositionExtremes(state.room)
 
 	const y = 128 + 32

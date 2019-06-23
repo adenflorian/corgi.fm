@@ -1,4 +1,5 @@
 import * as React from 'react'
+import {selectLocalClientId, selectRoomSettings, shamuConnect} from '../common/redux'
 import {ConnectedChat} from './Chat'
 import {ConnectedContextMenuContainer} from './ContextMenu/ContextMenuContainer'
 import {ConnectedSimpleGraph} from './SimpleGraph/SimpleGraph'
@@ -6,15 +7,33 @@ import {ConnectedTopDiv} from './TopDiv'
 
 interface IOnlineAppProps {}
 
-export class OnlineApp extends React.PureComponent<IOnlineAppProps> {
+interface ReduxProps {
+	onlyOwnerCanDoStuff: boolean
+	isLocalClientRoomOwner: boolean
+}
+
+type AllProps = IOnlineAppProps & ReduxProps
+
+export class OnlineApp extends React.PureComponent<AllProps> {
 	public render() {
 		return (
-			<React.Fragment>
+			<div className={this.props.onlyOwnerCanDoStuff && !this.props.isLocalClientRoomOwner ? 'restricted' : ''}>
 				<ConnectedChat />
 				<ConnectedTopDiv />
 				<ConnectedSimpleGraph />
 				<ConnectedContextMenuContainer />
-			</React.Fragment>
+			</div>
 		)
 	}
 }
+
+export const ConnectedOnlineApp = shamuConnect(
+	(state): ReduxProps => {
+		const roomSettings = selectRoomSettings(state.room)
+
+		return {
+			isLocalClientRoomOwner: selectLocalClientId(state) === roomSettings.ownerId,
+			onlyOwnerCanDoStuff: roomSettings.onlyOwnerCanDoStuff,
+		}
+	},
+)(OnlineApp)

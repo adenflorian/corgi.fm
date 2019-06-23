@@ -3,7 +3,7 @@
 .buttonContainer {
     &.fancyButton {
         &:hover {
-            button {
+            button:not(:disabled) {
                 filter: brightness(125%)
             }
         }
@@ -36,5 +36,9 @@
         color: currentColor;
         text-shadow: inherit;
         height: 32px;
+
+        &:disabled {
+            color: @disabledGray;
+        }
     }
 }

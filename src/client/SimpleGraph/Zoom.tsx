@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {ContextMenuTrigger} from 'react-contextmenu'
 import {Point} from '../../common/common-types'
-import {selectOptions} from '../../common/redux'
+import {selectLocalClientId, selectOptions, selectRoomSettings} from '../../common/redux'
 import {shamuConnect} from '../../common/redux'
 import {backgroundMenuId, graphSizeX, zoomBackgroundClass} from '../client-constants'
 import PlusSVG from '../OtherSVG/plus.svg'
@@ -14,6 +14,7 @@ interface IZoomProps {
 interface IZoomReduxProps {
 	requireCtrlToZoom: boolean
 	fancyZoomPan: boolean
+	disableMenu: boolean
 }
 
 type IZoomAllProps = IZoomProps & IZoomReduxProps
@@ -81,6 +82,7 @@ export class Zoom extends React.PureComponent<IZoomAllProps, IZoomState> {
 				>
 					<ZoomBackground
 						onMouseEvent={this._onBgMouseEvent}
+						disableMenu={this.props.disableMenu}
 					/>
 					{children}
 				</div>
@@ -165,16 +167,18 @@ export class Zoom extends React.PureComponent<IZoomAllProps, IZoomState> {
 
 interface ZoomBgProps {
 	onMouseEvent: (e: React.MouseEvent) => void
+	disableMenu: boolean
 }
 
 const ZoomBackground = React.memo(
-	function _ZoomBackground({onMouseEvent}: ZoomBgProps) {
+	function _ZoomBackground({onMouseEvent, disableMenu}: ZoomBgProps) {
 		return (
 			// @ts-ignore disableIfShiftIsPressed
 			<ContextMenuTrigger
 				id={backgroundMenuId}
 				disableIfShiftIsPressed={true}
 				holdToDisplay={-1}
+				disable={disableMenu}
 			>
 				<div
 					className={zoomBackgroundClass}
@@ -194,10 +198,15 @@ const ZoomBackground = React.memo(
 )
 
 export const ConnectedZoom = shamuConnect(
-	(state): IZoomReduxProps => ({
-		requireCtrlToZoom: selectOptions(state).requireCtrlToScroll,
-		fancyZoomPan: selectOptions(state).graphics_expensiveZoomPan,
-	}),
+	(state): IZoomReduxProps => {
+		const roomSettings = selectRoomSettings(state.room)
+
+		return {
+			requireCtrlToZoom: selectOptions(state).requireCtrlToScroll,
+			fancyZoomPan: selectOptions(state).graphics_expensiveZoomPan,
+			disableMenu: selectLocalClientId(state) !== roomSettings.ownerId && roomSettings.onlyOwnerCanDoStuff,
+		}
+	},
 )(Zoom)
 
 export function toGraphSpace(x = 0, y = 0): Readonly<Point> {
