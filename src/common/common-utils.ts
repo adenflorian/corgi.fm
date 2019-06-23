@@ -36,6 +36,19 @@ export const rateLimitedDebounce = <T extends (...args: any[]) => any>(
 	},
 )
 
+export const rateLimitedDebounceNoTrail = <T extends (...args: any[]) => any>(
+	func: T,
+	intervalMs: number,
+) => debounce(
+	func,
+	intervalMs,
+	{
+		leading: true,
+		trailing: false,
+		maxWait: intervalMs,
+	},
+)
+
 /** Returns a number from 0 to length - 1 */
 export function getNumberInRangeFromString(str: string, length: number) {
 	return str

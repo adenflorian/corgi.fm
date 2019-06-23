@@ -1,9 +1,10 @@
 import * as React from 'react'
 import {Dispatch} from 'redux'
-import {selectClientInfo, shamuConnect} from '../common/redux'
+import {rateLimitedDebounceNoTrail} from '../common/common-utils'
 import {selectMemberCount} from '../common/redux'
-import {requestCreateRoom} from '../common/redux'
 import {selectClientCount} from '../common/redux'
+import {selectClientInfo, shamuConnect} from '../common/redux'
+import {requestCreateRoom} from '../common/redux'
 import {CssColor} from '../common/shamu-color'
 import {Button} from './Button/Button'
 import {ButtonLink} from './Button/ButtonLink'
@@ -70,13 +71,13 @@ export const TopDiv = ({memberCount, clientCount, info, isClientReady, dispatch}
 				New Room
 			</Button>
 			<Button
-				buttonProps={{onClick: () => dispatch(localActions.saveRoomToBrowser())}}
+				buttonProps={{onClick: rateLimitedDebounceNoTrail(() => dispatch(localActions.saveRoomToBrowser()), 1000)}}
 			>
 				Save Room To Browser
 			</Button>
 			<Button
 				buttonProps={{
-					onClick: () => dispatch(localActions.saveRoomToFile()),
+					onClick: rateLimitedDebounceNoTrail(() => dispatch(localActions.saveRoomToFile()), 2000),
 					title: 'Will be able to load from file at a later date',
 				}}
 			>

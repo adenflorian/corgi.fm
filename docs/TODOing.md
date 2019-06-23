@@ -46,7 +46,7 @@
 - [√] do something about peoples synths deleting when they leave
 	- [√] only delete if owner is the only person connected to it
 - [√] purge button to delete unused nodes
-- [ ] prevent people from spamming save buttons
+- [√] prevent people from spamming save buttons (debounce)
 - [ ] record into grid sequencer
 - [ ] permissions
 	- [ ] when you create a room you are owner
