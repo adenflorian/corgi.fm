@@ -103,6 +103,7 @@ export const SAVE_ROOM_TO_FILE = 'SAVE_ROOM_TO_FILE'
 export const DELETE_SAVED_ROOM = 'DELETE_SAVED_ROOM'
 export const PLAY_SHORT_NOTE = 'PLAY_SHORT_NOTE'
 export const CLONE_NODE = 'CLONE_NODE'
+export const PRUNE_ROOM = 'PRUNE_ROOM'
 
 export const localActions = Object.freeze({
 	saveRoomToBrowser: () => ({
@@ -124,6 +125,9 @@ export const localActions = Object.freeze({
 		type: CLONE_NODE as typeof CLONE_NODE,
 		nodeId,
 		nodeType,
+	}),
+	pruneRoom: () => ({
+		type: PRUNE_ROOM as typeof PRUNE_ROOM,
 	}),
 })
 
@@ -373,6 +377,23 @@ export const createLocalMiddleware: (getAllInstruments: GetAllInstruments) => Mi
 				dispatch(addPosition(clonePosition))
 
 				return
+			}
+			case PRUNE_ROOM: {
+				next(action)
+
+				const state = getState()
+
+				const nodesToDelete = selectAllPositions(state.room)
+					.filter(x => [ConnectionNodeType.masterClock, ConnectionNodeType.audioOutput, ConnectionNodeType.virtualKeyboard].includes(x.targetType) === false)
+					.filter(position => {
+						return selectConnectionsWithSourceOrTargetIds(state.room, [position.id]).count() === 0
+					})
+					.map(x => x.id)
+					.toIndexedSeq()
+					.toArray()
+
+				dispatch(deleteThingsAny(nodesToDelete, NetworkActionType.SERVER_AND_BROADCASTER))
+				dispatch(deletePositions(nodesToDelete))
 			}
 			case SAVE_ROOM_TO_BROWSER: {
 				next(action)

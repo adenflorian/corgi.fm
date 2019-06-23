@@ -70,13 +70,12 @@ export const TopDiv = ({memberCount, clientCount, info, isClientReady, dispatch}
 				New Room
 			</Button>
 			<Button
-				buttonProps={{className: 'saveRoomButton', onClick: () => dispatch(localActions.saveRoomToBrowser())}}
+				buttonProps={{onClick: () => dispatch(localActions.saveRoomToBrowser())}}
 			>
 				Save Room To Browser
 			</Button>
 			<Button
 				buttonProps={{
-					className: 'saveRoomButton',
 					onClick: () => dispatch(localActions.saveRoomToFile()),
 					title: 'Will be able to load from file at a later date',
 				}}
@@ -84,6 +83,14 @@ export const TopDiv = ({memberCount, clientCount, info, isClientReady, dispatch}
 				Save Room To File
 			</Button>
 			<SavingAndLoading dispatch={dispatch} />
+			<Button
+				buttonProps={{
+					onClick: () => confirm('Are you sure you want to delete all nodes with no connections in this room?\nThis cannot be undone!') ? dispatch(localActions.pruneRoom()) : undefined,
+					title: 'Will delete nodes with no connections on them',
+				}}
+			>
+				Prune Room
+			</Button>
 			<Options />
 			<ButtonLink href="/newsletter" newTab={true}>Newsletter</ButtonLink>
 			<ButtonLink href="https://discord.gg/qADwrxd" newTab={true}>Discord</ButtonLink>
