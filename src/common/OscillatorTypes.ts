@@ -10,3 +10,11 @@ export enum BuiltInOscillatorType {
 export enum CustomOscillatorType {
 	noise = 'noise',
 }
+
+export enum LfoOscillatorType {
+	sine = 'sine',
+	square = 'square',
+	sawtooth = 'sawtooth',
+	reverseSawtooth = 'reverseSawtooth',
+	triangle = 'triangle',
+}

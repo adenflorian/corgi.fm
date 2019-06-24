@@ -71,15 +71,24 @@
 	- [ ] take ownership if you are last member?
 - [√] clone node with ctrl + D
 - [√] new clone should be selected
+- [ ] LFO
+	- [√] basic synth LFO
+	- [ ] fix wave value string
+	- [ ] pitch target
+	- [ ] filter target
+- [ ] fix issue with noise getting stuck on
+- [ ] filter envelope
+- [ ] fix loading old saves
+- [ ] button on sequencer to plugin keyboard
 - [ ] pan to center when making new room
 - [ ] more prominent message about version being out of date
 - [ ] delay node
-- [ ] LFO
 - [ ] tap tempo
 - [ ] list usernames of room members somewhere
 - [ ] metronome
 - [ ] solo
 - [ ] fix up group sequencer
+	- [ ] connector placements aren't perfect
 	- [ ] connected nodes should prefer group sequencer color
 	- [ ] maybe show color dots in a corner of node to show what groups it's in?
 	- [ ] labels
@@ -125,6 +134,7 @@
 - [ ] FM synth
 - [ ] master mixer
 - [ ] add colored icons on node add menu
+- [ ] positional audio
 
 # Now
 - [√] don't delete everything on disconnect

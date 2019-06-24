@@ -124,6 +124,10 @@ export const setupInstrumentManager = (
 					instrument.setFilterRelease(instrumentState.filterRelease)
 					instrument.setDetune(instrumentState.fineTuning)
 					instrument.setGain(instrumentState.gain)
+					instrument.setLfoRate(instrumentState.lfoRate)
+					instrument.setLfoAmount(instrumentState.lfoAmount)
+					instrument.setLfoWave(instrumentState.lfoWave)
+					instrument.setLfoTarget(instrumentState.lfoTarget)
 				},
 			)
 		}

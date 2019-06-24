@@ -711,7 +711,7 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 
 	const extremes = selectPositionExtremes(state.room)
 
-	const y = 128 + 32
+	const y = 128 + 32 + 44
 
 	const newVirtualKeyboard = new VirtualKeyboardState(localClient.id, localClient.color)
 	dispatch(addVirtualKeyboard(newVirtualKeyboard))

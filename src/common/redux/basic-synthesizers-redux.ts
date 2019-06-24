@@ -3,7 +3,7 @@ import {createSelector} from 'reselect'
 import * as uuid from 'uuid'
 import {ClientId, ConnectionNodeType, IConnectable, IMultiStateThing} from '../common-types'
 import {pickRandomArrayElement} from '../common-utils'
-import {BuiltInOscillatorType, ShamuOscillatorType} from '../OscillatorTypes'
+import {BuiltInOscillatorType, LfoOscillatorType, ShamuOscillatorType} from '../OscillatorTypes'
 import {addMultiThing, BROADCASTER_ACTION, createSelectAllOfThingAsArray, IClientRoomState, IMultiState, makeMultiReducer, NetworkActionType, SERVER_ACTION} from './index'
 import {NodeSpecialState} from './shamu-graph'
 
@@ -44,6 +44,17 @@ export enum BasicSynthesizerParam {
 	filterRelease = 'filterRelease',
 	fineTuning = 'fineTuning',
 	gain = 'gain',
+	lfoRate = 'lfoRate',
+	lfoAmount = 'lfoAmount',
+	lfoTarget = 'lfoTarget',
+	lfoWave = 'lfoWave',
+}
+
+export enum SynthLfoTarget {
+	Gain = 'Gain',
+	Pitch = 'Pitch',
+	Pan = 'Pan',
+	Filter = 'Filter',
 }
 
 export interface BasicSynthesizerAction extends AnyAction {
@@ -61,7 +72,7 @@ export interface IBasicSynthesizers {
 
 export class BasicSynthesizerState implements IConnectable, NodeSpecialState {
 	public static defaultWidth = 256
-	public static defaultHeight = 56 + (88 * 2)
+	public static defaultHeight = 56 + (88 * 3)
 
 	public static dummy: BasicSynthesizerState = {
 		oscillatorType: BuiltInOscillatorType.sine,
@@ -85,6 +96,10 @@ export class BasicSynthesizerState implements IConnectable, NodeSpecialState {
 		height: BasicSynthesizerState.defaultHeight,
 		name: 'Dummy Basic Synth',
 		enabled: false,
+		lfoRate: 0,
+		lfoAmount: 0,
+		lfoTarget: SynthLfoTarget.Gain,
+		lfoWave: LfoOscillatorType.sine,
 	}
 
 	public readonly oscillatorType: ShamuOscillatorType
@@ -109,6 +124,10 @@ export class BasicSynthesizerState implements IConnectable, NodeSpecialState {
 	public readonly height: number = BasicSynthesizerState.defaultHeight
 	public readonly name: string = 'Basic Synth'
 	public readonly enabled: boolean = true
+	public readonly lfoRate: number = 0
+	public readonly lfoAmount: number = 0.1
+	public readonly lfoTarget: SynthLfoTarget = SynthLfoTarget.Gain
+	public readonly lfoWave: LfoOscillatorType = LfoOscillatorType.sine
 
 	constructor(ownerId: ClientId) {
 		this.ownerId = ownerId	// TODO Is this still needed?

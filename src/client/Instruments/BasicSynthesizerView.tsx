@@ -1,21 +1,24 @@
+import {List} from 'immutable'
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 import {IMidiNotes} from '../../common/MidiNote'
-import {ShamuOscillatorType} from '../../common/OscillatorTypes'
+import {LfoOscillatorType, ShamuOscillatorType} from '../../common/OscillatorTypes'
 import {
 	BasicSynthesizerParam, getConnectionNodeInfo,
 	selectBasicSynthesizer, setBasicSynthesizerOscillatorType,
 	setBasicSynthesizerParam,
+	SynthLfoTarget,
 } from '../../common/redux'
 import {IClientAppState} from '../../common/redux'
 import {
 	adsrValueToString, attackToolTip, decayToolTip, detuneToolTip, detuneValueToString,
 	filterAttackToolTip, filterDecayToolTip, filterReleaseToolTip, filterSustainToolTip,
-	filterValueToString, gainToolTip, lpfToolTip, panToolTip, panValueToString,
-	percentageValueString, releaseToolTip, sustainToolTip,
+	filterValueToString, gainToolTip, lfoRateValueToString, lpfToolTip,
+	panToolTip, panValueToString, percentageValueString, releaseToolTip, sustainToolTip,
 } from '../client-constants'
 import {Knob} from '../Knob/Knob'
+import {KnobSnapping} from '../Knob/KnobSnapping'
 import {Panel} from '../Panel/Panel'
 import {ConnectedNoteSchedulerVisualPlaceholder} from '../WebAudio/SchedulerVisual'
 import {BasicSynthesizerOscillatorTypes} from './BasicSynthesizerOscillatorTypes'
@@ -45,6 +48,10 @@ interface IBasicSynthesizerViewReduxProps {
 	filterRelease: number
 	fineTuning: number
 	gain: number
+	lfoRate: number
+	lfoAmount: number
+	lfoTarget: SynthLfoTarget
+	lfoWave: LfoOscillatorType
 }
 
 export class BasicSynthesizerView
@@ -169,6 +176,55 @@ export class BasicSynthesizerView
 						</div> */}
 						<div className="knobs">
 							<Knob
+								min={0}
+								max={12000}
+								curve={4}
+								value={this.props.lfoRate}
+								defaultValue={0}
+								onChange={this._dispatchChangeInstrumentParam}
+								label="Rate"
+								onChangeId={BasicSynthesizerParam.lfoRate}
+								tooltip={'how fast it wobble'}
+								valueString={lfoRateValueToString}
+							/>
+							<Knob
+								min={0}
+								max={1}
+								value={this.props.lfoAmount}
+								defaultValue={0.1}
+								onChange={this._dispatchChangeInstrumentParam}
+								label="Amount"
+								onChangeId={BasicSynthesizerParam.lfoAmount}
+								tooltip={'how big it wobble'}
+								valueString={percentageValueString}
+							/>
+							<KnobSnapping
+								value={this.props.lfoWave}
+								defaultIndex={0}
+								onChange={this._dispatchChangeInstrumentParam}
+								label="Wave"
+								onChangeId={BasicSynthesizerParam.lfoWave}
+								tooltip={'the shape of the wobble'}
+								possibleValues={List<LfoOscillatorType>([
+									LfoOscillatorType.sine,
+									LfoOscillatorType.sawtooth,
+									LfoOscillatorType.reverseSawtooth,
+									LfoOscillatorType.square,
+									LfoOscillatorType.triangle,
+								])}
+							/>
+							<KnobSnapping
+								value={this.props.lfoTarget}
+								defaultIndex={0}
+								onChange={this._dispatchChangeInstrumentParam}
+								label="Target"
+								onChangeId={BasicSynthesizerParam.lfoTarget}
+								tooltip={'what it wobbles'}
+								possibleValues={List<SynthLfoTarget>([SynthLfoTarget.Gain, SynthLfoTarget.Pan])}
+							/>
+						</div>
+						<div className="knobs">
+							<Knob
 								min={-1}
 								max={1}
 								value={pan}
@@ -253,6 +309,10 @@ export const ConnectedBasicSynthesizerView = connect(
 			filterRelease: instrumentState.filterRelease,
 			fineTuning: instrumentState.fineTuning,
 			gain: instrumentState.gain,
+			lfoRate: instrumentState.lfoRate,
+			lfoAmount: instrumentState.lfoAmount,
+			lfoTarget: instrumentState.lfoTarget,
+			lfoWave: instrumentState.lfoWave,
 		}
 	},
 )(

@@ -94,6 +94,13 @@ export function filterValueToString(frequencyHz: number) {
 	return frequencyHz.toFixed(0) + ' Hz'
 }
 
+export function lfoRateValueToString(rate: number) {
+	if (rate < 10) return rate.toFixed(3) + ' Hz'
+	if (rate < 100) return rate.toFixed(2) + ' Hz'
+	if (rate < 1000) return rate.toFixed(1) + ' Hz'
+	return rate.toFixed(0) + ' Hz'
+}
+
 export function detuneValueToString(detune: number) {
 	return detune.toFixed(0) + ' cents'
 }
