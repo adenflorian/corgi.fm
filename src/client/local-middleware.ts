@@ -490,7 +490,7 @@ export const createLocalMiddleware: (getAllInstruments: GetAllInstruments) => Mi
 
 				const roomSave = createRoomSave(state, room)
 
-				downloadObjectAsJson(roomSave, `${roomSave.saveDateTime.substring(0, 10)}-room`)
+				downloadObjectAsJson(roomSave, `${roomSave.saveDateTime.substring(0, 10)}-${room}`.replace(/ /g, '_'))
 
 				return
 			}
