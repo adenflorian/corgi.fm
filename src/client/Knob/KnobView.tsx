@@ -34,7 +34,7 @@ export const KnobView = React.memo(function _KnobView(props: IKnobViewProps) {
 				width: 64,
 				height: 88,
 			}}
-			title={tooltip + '\n' + 'Ctrl + click to reset'}
+			title={tooltip + '\n' + 'Ctrl + click or Cmd + click to reset'}
 		>
 			<div className="knobLabel unselectable">{label}</div>
 			<div
