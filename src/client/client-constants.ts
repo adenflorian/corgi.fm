@@ -102,7 +102,7 @@ export function lfoRateValueToString(rate: number) {
 }
 
 export function detuneValueToString(detune: number) {
-	return detune.toFixed(0) + ' cents'
+	return detune.toFixed(0).replace(/^-0$/, '0') + ' cents'
 }
 
 export function percentageValueString(num: number) {
