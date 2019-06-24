@@ -70,7 +70,7 @@
 	- [ ] do something about when you refresh and lose ownership
 	- [ ] take ownership if you are last member?
 - [√] clone node with ctrl + D
-- [ ] new clone should be selected
+- [√] new clone should be selected
 - [ ] pan to center when making new room
 - [ ] more prominent message about version being out of date
 - [ ] tap tempo

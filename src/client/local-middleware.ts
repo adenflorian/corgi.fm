@@ -37,6 +37,7 @@ import {
 	SET_LOCAL_CLIENT_NAME, SetActiveRoomAction, setClientName, setLocalClientId,
 	SetLocalClientNameAction,
 	ShamuGraphState,
+	shamuMetaActions,
 	SKIP_NOTE,
 	UPDATE_POSITIONS,
 	updatePositions,
@@ -391,6 +392,7 @@ export const createLocalMiddleware: (getAllInstruments: GetAllInstruments) => Mi
 
 				// dispatch add multi thing
 				dispatch(addMultiThing(clone, nodeType, NetworkActionType.SERVER_AND_BROADCASTER))
+				dispatch(shamuMetaActions.setSelectedNode({id: clone.id, type: clone.type}))
 
 				// clone position
 				const positionToClone = selectPosition(newState.room, nodeId)
