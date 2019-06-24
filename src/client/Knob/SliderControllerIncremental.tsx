@@ -67,7 +67,7 @@ export function SliderControllerIncremental(props: Props) {
 	}
 
 	const _handleMouseDown = (e: React.MouseEvent) => {
-		if (e.ctrlKey) {
+		if ((e.ctrlKey || e.metaKey)) {
 			onChange(defaultValue)
 		} else {
 			setTempValue(value)

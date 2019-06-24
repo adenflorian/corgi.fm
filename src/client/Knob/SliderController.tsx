@@ -89,7 +89,7 @@ export function SliderController(props: ISliderControllerProps) {
 	}
 
 	const _handleMouseDown = (e: React.MouseEvent) => {
-		if (e.ctrlKey && defaultValue !== undefined) {
+		if ((e.ctrlKey || e.metaKey) && defaultValue !== undefined) {
 			onChange(defaultValue)
 		} else {
 			setTempValue(value)

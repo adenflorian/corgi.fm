@@ -96,6 +96,8 @@
 	- [ ] jump to parts of song
 	- [ ] click and drag to add things
 - [ ] audio still cutting out for people (brinch)
+	- If you're using Chrome canary, you can open up the WebAudio inspector in the dev console to examine audio load and callback timing.
+	- Or use chrome://tracing to get a trace of the audio processing.
 - [ ] infinite sequencer more
 	- [ ] add a way to insert notes left and right
 	- [ ] way to start song from any point in sequencer

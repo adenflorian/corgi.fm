@@ -67,7 +67,7 @@ export function SliderControllerSnapping(props: Props) {
 	}
 
 	const _handleMouseDown = (e: React.MouseEvent) => {
-		if (e.ctrlKey) {
+		if ((e.ctrlKey || e.metaKey)) {
 			onChange(possibleValues.get(defaultIndex, 0))
 		} else {
 			setTempValue(_normalize(value))
