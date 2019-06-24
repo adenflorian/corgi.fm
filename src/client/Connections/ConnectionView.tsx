@@ -13,7 +13,7 @@ import {
 	LineType, selectConnection,
 	selectConnectionSourceColor, selectConnectionSourceIsActive,
 	selectConnectionSourceIsSending, selectConnectionStackOrderForSource, selectConnectionStackOrderForTarget,
-	selectLocalClientId, selectOption, selectPosition, selectRoomSettings, selectUserInputKeys, shamuConnect,
+	selectLocalClientId, selectOption, selectPosition, selectRoomSettings, shamuConnect,
 } from '../../common/redux'
 import {longLineTooltip} from '../client-constants'
 import {ConnectionLine} from './ConnectionLine'
@@ -26,7 +26,6 @@ export interface IConnectionViewProps {
 }
 
 interface IConnectionViewReduxProps {
-	isAddMode: boolean
 	speed?: number
 	highQuality: boolean
 	color: string
@@ -195,7 +194,6 @@ export const ConnectedConnectionView = shamuConnect(
 		const sourceColor = selectConnectionSourceColor(state.room, props.id)
 
 		return {
-			isAddMode: selectUserInputKeys(state).shift,
 			speed: 120,
 			// Disabled for now because of performance issues
 			// speed: globalClockState.bpm,

@@ -8,7 +8,7 @@ import {
 	selectPosition, selectSequencer, selectShamuMetaState, sequencerActions, userInputActions,
 } from '../common/redux'
 import {
-	localMidiKeyPress, localMidiKeyUp, localMidiOctaveChange, windowBlur,
+	localActions, localMidiKeyPress, localMidiKeyUp, localMidiOctaveChange, windowBlur,
 } from './local-middleware'
 import {simpleGlobalClientState} from './SimpleGlobalClientState'
 
@@ -58,48 +58,57 @@ keyToMidiMap.forEach((val, key) => {
 	}
 })
 
+const Control = 'control'
+const Alt = 'alt'
+const Shift = 'shift'
+const Plus = '+'
+
+const changeOctaveShortcut = (delta: number) => ({
+	actionOnKeyDown: localMidiOctaveChange(delta),
+	allowRepeat: true,
+	preventDefault: true,
+})
+
 const keyboardShortcuts: IKeyBoardShortcuts = Map<KeyBoardShortcut>({
-	'z': {
-		actionOnKeyDown: (e, state) => {
-			if (e.ctrlKey || e.metaKey) {
-				const selectedNodeId = selectShamuMetaState(state.room).selectedNodeId
-				if (selectedNodeId === undefined) return
-				return getConnectionNodeInfo(selectPosition(state.room, selectedNodeId).targetType).undoAction(selectedNodeId)
-			} else {
-				return localMidiOctaveChange(e.shiftKey ? -2 : -1)
-			}
+	'z': changeOctaveShortcut(-1),
+	[Shift + Plus + 'z']: changeOctaveShortcut(-2),
+	'-': changeOctaveShortcut(-1),
+	[Shift + Plus + '-']: changeOctaveShortcut(-2),
+	'x': changeOctaveShortcut(1),
+	[Shift + Plus + 'x']: changeOctaveShortcut(2),
+	'+': changeOctaveShortcut(1),
+	[Shift + Plus + '+']: changeOctaveShortcut(2),
+	[Control + Plus + 'z']: {
+		actionOnKeyDown: (_, state) => {
+			const selectedNode = selectShamuMetaState(state.room).selectedNode
+			if (selectedNode === undefined) return
+			return getConnectionNodeInfo(selectPosition(state.room, selectedNode.id).targetType).undoAction(selectedNode.id)
 		},
 		allowRepeat: true,
 		preventDefault: true,
 	},
-	'r': {
+	[Control + Plus + 'd']: {
 		actionOnKeyDown: (_, state) => {
-			const selectedNodeId = selectShamuMetaState(state.room).selectedNodeId
-			if (selectedNodeId === undefined) return
-			const sequencer = selectSequencer(state.room, selectedNodeId)
-			if (sequencer.ownerId.startsWith('dummy')) return
-			return sequencerActions.toggleRecording(selectedNodeId, !sequencer.isRecording)
+			const selectedNode = selectShamuMetaState(state.room).selectedNode
+			if (selectedNode === undefined) return
+			return localActions.cloneNode(selectedNode.id, selectedNode.type, 'all')
 		},
 		allowRepeat: false,
 		preventDefault: true,
 	},
-	'x': {
-		actionOnKeyDown: e => localMidiOctaveChange(e.shiftKey ? 2 : 1),
-		allowRepeat: true,
-		preventDefault: true,
-	},
-	'-': {
-		actionOnKeyDown: e => localMidiOctaveChange(e.shiftKey ? -2 : -1),
-		allowRepeat: true,
-		preventDefault: true,
-	},
-	'+': {
-		actionOnKeyDown: e => localMidiOctaveChange(e.shiftKey ? 2 : 1),
-		allowRepeat: true,
+	'r': {
+		actionOnKeyDown: (_, state) => {
+			const selectedNode = selectShamuMetaState(state.room).selectedNode
+			if (selectedNode === undefined) return
+			const sequencer = selectSequencer(state.room, selectedNode.id)
+			if (sequencer.ownerId.startsWith('dummy')) return
+			return sequencerActions.toggleRecording(selectedNode.id, !sequencer.isRecording)
+		},
+		allowRepeat: false,
 		preventDefault: true,
 	},
 	'ArrowRight': {
-		actionOnKeyDown: () => sequencerActions.skipNote(),
+		actionOnKeyDown: sequencerActions.skipNote(),
 		allowRepeat: true,
 		preventDefault: true,
 	},
@@ -108,32 +117,34 @@ const keyboardShortcuts: IKeyBoardShortcuts = Map<KeyBoardShortcut>({
 		allowRepeat: true,
 		preventDefault: true,
 	},
-	'Control': {
-		actionOnKeyDown: userInputActions.setKeys({ctrl: true}),
-		actionOnKeyUp: userInputActions.setKeys({ctrl: false}),
-		allowRepeat: false,
-		preventDefault: false,
-	},
-	'Alt': {
-		actionOnKeyDown: userInputActions.setKeys({alt: true}),
-		actionOnKeyUp: userInputActions.setKeys({alt: false}),
-		allowRepeat: false,
-		preventDefault: false,
-	},
-	'Shift': {
-		actionOnKeyDown: userInputActions.setKeys({shift: true}),
-		actionOnKeyUp: userInputActions.setKeys({shift: false}),
-		allowRepeat: false,
-		preventDefault: false,
-	},
+	// Disabling these until needed again
+	// 'Control': {
+	// 	actionOnKeyDown: userInputActions.setKeys({ctrl: true}),
+	// 	actionOnKeyUp: userInputActions.setKeys({ctrl: false}),
+	// 	allowRepeat: false,
+	// 	preventDefault: false,
+	// },
+	// 'Alt': {
+	// 	actionOnKeyDown: userInputActions.setKeys({alt: true}),
+	// 	actionOnKeyUp: userInputActions.setKeys({alt: false}),
+	// 	allowRepeat: false,
+	// 	preventDefault: false,
+	// },
+	// 'Shift': {
+	// 	actionOnKeyDown: userInputActions.setKeys({shift: true}),
+	// 	actionOnKeyUp: userInputActions.setKeys({shift: false}),
+	// 	allowRepeat: false,
+	// 	preventDefault: false,
+	// },
 	' ': {
-		actionOnKeyDown: (e, state) => {
-			return e.ctrlKey
-				? globalClockActions.restart()
-				: selectGlobalClockIsPlaying(state.room)
-					? globalClockActions.stop()
-					: globalClockActions.start()
-		},
+		actionOnKeyDown: (_, state) => selectGlobalClockIsPlaying(state.room)
+			? globalClockActions.stop()
+			: globalClockActions.start(),
+		allowRepeat: false,
+		preventDefault: false,
+	},
+	[Control + Plus + ' ']: {
+		actionOnKeyDown: globalClockActions.restart(),
 		allowRepeat: false,
 		preventDefault: false,
 	},
@@ -173,7 +184,15 @@ export function setupInputEventListeners(
 	})
 
 	function onKeyEvent(event: KeyboardEvent) {
-		const keyboardShortcut = keyboardShortcuts.get(event.key.toLowerCase())
+		const prefix = event.shiftKey
+			? Shift + Plus
+			: event.ctrlKey || event.metaKey
+				? Control + Plus
+				: event.altKey
+					? Alt + Plus
+					: ''
+
+		const keyboardShortcut = keyboardShortcuts.get(prefix + event.key.toLowerCase())
 
 		if (!keyboardShortcut) return
 

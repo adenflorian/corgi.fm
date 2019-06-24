@@ -69,7 +69,8 @@
 	- [ ] give people permission to do stuff (based on client id)
 	- [ ] do something about when you refresh and lose ownership
 	- [ ] take ownership if you are last member?
-- [ ] clone node with ctrl + D
+- [√] clone node with ctrl + D
+- [ ] new clone should be selected
 - [ ] pan to center when making new room
 - [ ] more prominent message about version being out of date
 - [ ] tap tempo
@@ -116,6 +117,7 @@
 - [ ] give feedback when saving to browser
 
 # 0.6.0
+- [ ] allow replacing nodes in place to keep connections
 - [ ] put bottom right info in own component outside chat stuff so you can click without activating chat
 - [ ] show progress bar on reverb when loading new impulse
 - [ ] disable save button until something changes?
