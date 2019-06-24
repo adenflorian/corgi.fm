@@ -91,6 +91,7 @@ const keyboardShortcuts: IKeyBoardShortcuts = Map<KeyBoardShortcut>({
 		actionOnKeyDown: (_, state) => {
 			const selectedNode = selectShamuMetaState(state.room).selectedNode
 			if (selectedNode === undefined) return
+			if (getConnectionNodeInfo(selectedNode.type).isNodeCloneable !== true) return
 			return localActions.cloneNode(selectedNode.id, selectedNode.type, 'all')
 		},
 		allowRepeat: false,
