@@ -73,6 +73,8 @@
 - [√] new clone should be selected
 - [ ] pan to center when making new room
 - [ ] more prominent message about version being out of date
+- [ ] delay node
+- [ ] LFO
 - [ ] tap tempo
 - [ ] list usernames of room members somewhere
 - [ ] metronome
@@ -89,9 +91,7 @@
 	- [ ] add a way to insert notes left and right
 	- [ ] way to start song from any point in sequencer
 	- [ ] design
-- [ ] delay node
 - [ ] toggle note click audio for sequencers on title bar
-- [ ] LFO
 - [ ] welcome screen for new users
 	- [ ] welcome button on right side
 - [ ] changelog screen

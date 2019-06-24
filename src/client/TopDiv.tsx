@@ -112,6 +112,7 @@ export const TopDiv = ({memberCount, clientCount, info, isClientReady, roomOwner
 			<ConnectedOptions />
 			<ButtonLink href="/newsletter" newTab={true}>Newsletter</ButtonLink>
 			<ButtonLink href="https://discord.gg/qADwrxd" newTab={true}>Discord</ButtonLink>
+			<ButtonLink href="https://www.patreon.com/corgifm" newTab={true}>Patreon</ButtonLink>
 		</div>
 	</div>
 
