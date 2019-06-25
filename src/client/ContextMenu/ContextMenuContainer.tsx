@@ -3,6 +3,7 @@ import {List} from 'immutable'
 import React, {Fragment, MouseEvent} from 'react'
 import {connectMenu, ContextMenu, MenuItem, SubMenu} from 'react-contextmenu'
 import {Dispatch} from 'redux'
+import {serverClientId} from '../../common/common-constants'
 import {ConnectionNodeType, IConnectable, Id, Point} from '../../common/common-types'
 import {
 	addPosition, Connection,
@@ -114,7 +115,9 @@ const BackgroundMenuItems = React.memo(
 						dispatch(nodeInfo.addNodeActionCreator(newState))
 						createPosition(dispatch, newState, e)
 					} else {
-						const newState = new nodeInfo.stateConstructor(localClientId)
+						// Be careful when changing the id to be local client
+						// The server currently deletes most things that a user owns when they disconnect
+						const newState = new nodeInfo.stateConstructor(serverClientId)
 						dispatch(nodeInfo.addNodeActionCreator(newState))
 						createPosition(dispatch, newState, e)
 						if (nodeInfo.autoConnectToClock) {
