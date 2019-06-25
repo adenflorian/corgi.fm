@@ -1,6 +1,7 @@
 import {AnyAction} from 'redux'
 import * as uuid from 'uuid'
 import {ClientId, ConnectionNodeType, IConnectable, IMultiStateThing} from '../common-types'
+import {BuiltInBQFilterType} from '../OscillatorTypes'
 import {addMultiThing, BROADCASTER_ACTION, createSelectAllOfThingAsArray, IClientRoomState, IMultiState, makeMultiReducer, NetworkActionType, SERVER_ACTION} from './index'
 import {NodeSpecialState} from './shamu-graph'
 
@@ -22,6 +23,11 @@ export const setSimpleReverbParam =
 export enum SimpleReverbParam {
 	lowPassFilterCutoffFrequency = 'lowPassFilterCutoffFrequency',
 	time = 'time',
+	dry = 'dry',
+	wet = 'wet',
+	reverse = 'reverse',
+	decay = 'decay',
+	filterType = 'filterType',
 }
 
 export interface ISimpleReverbsState extends IMultiState {
@@ -33,14 +39,26 @@ export interface ISimpleReverbs {
 }
 
 export class SimpleReverbState implements IConnectable, NodeSpecialState {
-	public static defaultWidth = 64 * 2 // main width plus padding
+	public static defaultWidth = 64 * 7 // main width plus padding
 	public static defaultHeight = 88
+	public static defaultLpfFreq = 2000
+	public static defaultTime = 4
+	public static defaultDry = 0.6
+	public static defaultWet = 0.4
+	public static defaultReverse = false
+	public static defaultDecay = 2
+	public static defaultFilterType: BuiltInBQFilterType = BuiltInBQFilterType.lowpass
 
 	public static dummy: SimpleReverbState = {
 		id: 'dummy',
 		ownerId: 'dummyOwner',
 		lowPassFilterCutoffFrequency: 0,
 		time: 0,
+		dry: 0,
+		wet: 1,
+		reverse: false,
+		decay: 2,
+		filterType: BuiltInBQFilterType.lowpass,
 		color: false,
 		type: ConnectionNodeType.simpleReverb,
 		width: SimpleReverbState.defaultWidth,
@@ -51,8 +69,13 @@ export class SimpleReverbState implements IConnectable, NodeSpecialState {
 
 	public readonly id = uuid.v4()
 	public readonly ownerId: string
-	public readonly lowPassFilterCutoffFrequency: number = 2000
-	public readonly time: number = 4
+	public readonly lowPassFilterCutoffFrequency: number = SimpleReverbState.defaultLpfFreq
+	public readonly time: number = SimpleReverbState.defaultTime
+	public readonly dry: number = SimpleReverbState.defaultDry
+	public readonly wet: number = SimpleReverbState.defaultWet
+	public readonly reverse: boolean = SimpleReverbState.defaultReverse
+	public readonly decay: number = SimpleReverbState.defaultDecay
+	public readonly filterType: BuiltInBQFilterType = SimpleReverbState.defaultFilterType
 	public readonly width: number = SimpleReverbState.defaultWidth
 	public readonly height: number = SimpleReverbState.defaultHeight
 	public readonly color: false = false

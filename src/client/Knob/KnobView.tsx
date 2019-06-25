@@ -11,7 +11,7 @@ interface IKnobViewProps {
 	handleMouseDown: (e: React.MouseEvent) => any
 	size: number
 	tooltip: string
-	value: number | string
+	value: number | string | boolean
 	valueString?: (value: number) => string
 }
 
@@ -25,7 +25,9 @@ export const KnobView = React.memo(function _KnobView(props: IKnobViewProps) {
 		? valueString
 			? valueString(value)
 			: value.toFixed(2)
-		: value
+		: typeof value === 'boolean'
+			? value ? 'on' : 'off'
+			: value
 
 	return (
 		<div

@@ -3,8 +3,8 @@ import React, {useLayoutEffect, useState} from 'react'
 import './Knob.less'
 
 interface Props {
-	onChange: (newValue: number | string) => any
-	value: number | string
+	onChange: (newValue: number | string | boolean) => any
+	value: number | string | boolean
 	defaultIndex: number
 	children: (handleMouseDown: any, percentage: number, adjustedPercentage: number) => any
 	possibleValues: List<any>
@@ -60,7 +60,7 @@ export function SliderControllerSnapping(props: Props) {
 		}
 	}
 
-	function _normalize(v: number | string): number {
+	function _normalize(v: number | string | boolean): number {
 		const index = possibleValues.indexOf(v)
 		if (index === -1) return 0
 		return index / (possibleValues.count() - 1)

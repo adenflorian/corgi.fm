@@ -178,6 +178,11 @@ export const setupInstrumentManager = (
 				(effect: SimpleReverb, effectState: SimpleReverbState) => {
 					effect.setTime(effectState.time)
 					effect.setCutoff(effectState.lowPassFilterCutoffFrequency)
+					effect.setDry(effectState.dry)
+					effect.setWet(effectState.wet)
+					effect.setReverse(effectState.reverse)
+					effect.setDecay(effectState.decay)
+					effect.setFilterType(effectState.filterType)
 				},
 			)
 		}

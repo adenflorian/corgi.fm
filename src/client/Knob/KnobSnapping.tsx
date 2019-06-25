@@ -8,10 +8,10 @@ interface Props {
 	curve?: number
 	label: string
 	markColor?: string
-	onChange: (onChangeId: any, newValue: number | string) => any
+	onChange: (onChangeId: any, newValue: number | string | boolean) => any
 	onChangeId?: any
 	readOnly?: boolean
-	value: number | string
+	value: number | string | boolean
 	defaultIndex: number
 	size?: number
 	tooltip: string
@@ -26,7 +26,7 @@ export const KnobSnapping = React.memo(function _KnobSnapping(props: Props) {
 		possibleValues, defaultIndex,
 	} = props
 
-	const _handleOnChange = (newValue: number | string) => {
+	const _handleOnChange = (newValue: number | string | boolean) => {
 		onChange(onChangeId, newValue)
 	}
 

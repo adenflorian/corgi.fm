@@ -1,3 +1,5 @@
+import {List} from 'immutable'
+
 export type ShamuOscillatorType = BuiltInOscillatorType | CustomOscillatorType.noise
 
 export enum BuiltInOscillatorType {
@@ -18,3 +20,25 @@ export enum LfoOscillatorType {
 	reverseSawtooth = 'reverseSawtooth',
 	triangle = 'triangle',
 }
+
+export enum BuiltInBQFilterType {
+	lowpass = 'lowpass',
+	highpass = 'highpass',
+	bandpass = 'bandpass',
+	lowshelf = 'lowshelf',
+	highshelf = 'highshelf',
+	peaking = 'peaking',
+	notch = 'notch',
+	allpass = 'allpass',
+}
+
+export const allBuiltInBQFilterTypes = List([
+	BuiltInBQFilterType.lowpass,
+	BuiltInBQFilterType.highpass,
+	BuiltInBQFilterType.bandpass,
+	BuiltInBQFilterType.lowshelf,
+	BuiltInBQFilterType.highshelf,
+	BuiltInBQFilterType.peaking,
+	BuiltInBQFilterType.notch,
+	BuiltInBQFilterType.allpass,
+])
