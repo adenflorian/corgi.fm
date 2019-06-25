@@ -719,7 +719,7 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 		...newVirtualKeyboard,
 		id: newVirtualKeyboard.id,
 		targetType: ConnectionNodeType.virtualKeyboard,
-		x: -556 + 150,
+		x: -556 + 150 - ((64 * 6) / 2),
 		y: extremes.bottomMost + y,
 		width: VirtualKeyboardState.defaultWidth,
 		height: VirtualKeyboardState.defaultHeight,
@@ -730,7 +730,7 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 	}))
 
 	const nextPosition = {
-		x: 174,
+		x: 174 - ((64 * 6) / 2),
 		y: extremes.bottomMost + y,
 	}
 

@@ -76,6 +76,8 @@
 	- [ ] fix wave value string
 	- [ ] pitch target
 	- [ ] filter target
+- [√] filter type knob for synth
+- [√] filter type knob for sampler
 - [ ] fix issue with noise getting stuck on
 - [ ] filter envelope
 - [ ] fix loading old saves

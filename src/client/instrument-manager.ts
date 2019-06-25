@@ -97,6 +97,7 @@ export const setupInstrumentManager = (
 					instrument.setRelease(instrumentState.release)
 					instrument.setDetune(instrumentState.detune)
 					instrument.setGain(instrumentState.gain)
+					instrument.setFilterType(instrumentState.filterType)
 				},
 			)
 		}
@@ -128,6 +129,7 @@ export const setupInstrumentManager = (
 					instrument.setLfoAmount(instrumentState.lfoAmount)
 					instrument.setLfoWave(instrumentState.lfoWave)
 					instrument.setLfoTarget(instrumentState.lfoTarget)
+					instrument.setFilterType(instrumentState.filterType)
 				},
 			)
 		}

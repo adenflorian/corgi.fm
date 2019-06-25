@@ -8,9 +8,8 @@ export const panToolTip = stripIndents`
 	Panning
 	Controls how far left and right the sound is
 `
-export const lpfToolTip = stripIndents`
-	Low pass filter
-	Removes the higher frequencies
+export const filterToolTip = stripIndents`
+	Shapes the sound, usually by attenuating certain frequencies
 `
 export const gainToolTip = stripIndents`
 	Gain (volume)

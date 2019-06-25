@@ -3,7 +3,7 @@ import {createSelector} from 'reselect'
 import * as uuid from 'uuid'
 import {ClientId, ConnectionNodeType, IConnectable, IMultiStateThing} from '../common-types'
 import {pickRandomArrayElement} from '../common-utils'
-import {BuiltInOscillatorType, LfoOscillatorType, ShamuOscillatorType} from '../OscillatorTypes'
+import {BuiltInBQFilterType, BuiltInOscillatorType, LfoOscillatorType, ShamuOscillatorType} from '../OscillatorTypes'
 import {addMultiThing, BROADCASTER_ACTION, createSelectAllOfThingAsArray, IClientRoomState, IMultiState, makeMultiReducer, NetworkActionType, SERVER_ACTION} from './index'
 import {NodeSpecialState} from './shamu-graph'
 
@@ -48,6 +48,7 @@ export enum BasicSynthesizerParam {
 	lfoAmount = 'lfoAmount',
 	lfoTarget = 'lfoTarget',
 	lfoWave = 'lfoWave',
+	filterType = 'filterType',
 }
 
 export enum SynthLfoTarget {
@@ -71,8 +72,9 @@ export interface IBasicSynthesizers {
 }
 
 export class BasicSynthesizerState implements IConnectable, NodeSpecialState {
-	public static defaultWidth = 256
+	public static defaultWidth = 64 * 5
 	public static defaultHeight = 56 + (88 * 3)
+	public static defaultFilterType = BuiltInBQFilterType.lowpass
 
 	public static dummy: BasicSynthesizerState = {
 		oscillatorType: BuiltInOscillatorType.sine,
@@ -100,6 +102,7 @@ export class BasicSynthesizerState implements IConnectable, NodeSpecialState {
 		lfoAmount: 0,
 		lfoTarget: SynthLfoTarget.Gain,
 		lfoWave: LfoOscillatorType.sine,
+		filterType: BasicSynthesizerState.defaultFilterType,
 	}
 
 	public readonly oscillatorType: ShamuOscillatorType
@@ -128,6 +131,7 @@ export class BasicSynthesizerState implements IConnectable, NodeSpecialState {
 	public readonly lfoAmount: number = 0.1
 	public readonly lfoTarget: SynthLfoTarget = SynthLfoTarget.Gain
 	public readonly lfoWave: LfoOscillatorType = LfoOscillatorType.sine
+	public readonly filterType: BuiltInBQFilterType = BasicSynthesizerState.defaultFilterType
 
 	constructor(ownerId: ClientId) {
 		this.ownerId = ownerId	// TODO Is this still needed?

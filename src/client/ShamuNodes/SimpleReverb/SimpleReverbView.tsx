@@ -86,7 +86,7 @@ export const SimpleReverbView: React.FC<ISimpleReverbAllProps> =
 						valueString={filterValueToString}
 					/>
 					<KnobSnapping
-						label="FilterType"
+						label="Filter Type"
 						value={filterType}
 						defaultIndex={0}
 						onChange={changeParam}

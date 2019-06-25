@@ -1,15 +1,18 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
+import {allBuiltInBQFilterTypes, BuiltInBQFilterType} from '../../common/OscillatorTypes'
+import {IClientAppState} from '../../common/redux'
 import {
 	BasicSamplerParam, getConnectionNodeInfo, selectSampler, setBasicSamplerParam,
 } from '../../common/redux'
-import {IClientAppState} from '../../common/redux'
 import {
 	adsrValueToString, attackToolTip, decayToolTip, detuneToolTip, detuneValueToString,
-	filterValueToString, gainToolTip, lpfToolTip, panToolTip, panValueToString, percentageValueString, releaseToolTip, sustainToolTip,
+	filterToolTip, filterValueToString, gainToolTip, panToolTip, panValueToString,
+	percentageValueString, releaseToolTip, sustainToolTip,
 } from '../client-constants'
 import {Knob} from '../Knob/Knob'
+import {KnobSnapping} from '../Knob/KnobSnapping'
 import {Panel} from '../Panel/Panel'
 import {ConnectedNoteSchedulerVisualPlaceholder} from '../WebAudio/SchedulerVisual'
 import './BasicSampler.less'
@@ -21,14 +24,15 @@ interface IBasicSamplerProps {
 
 interface IBasicSamplerReduxProps {
 	isPlaying: boolean
-	pan: number,
-	lowPassFilterCutoffFrequency: number,
-	attack: number,
-	decay: number,
-	sustain: number,
-	release: number,
-	detune: number,
-	gain: number,
+	pan: number
+	lowPassFilterCutoffFrequency: number
+	attack: number
+	decay: number
+	sustain: number
+	release: number
+	detune: number
+	gain: number
+	filterType: BuiltInBQFilterType
 }
 
 type IBasicSamplerAllProps = IBasicSamplerProps & IBasicSamplerReduxProps & {dispatch: Dispatch}
@@ -117,8 +121,17 @@ export class BasicSampler extends React.PureComponent<IBasicSamplerAllProps> {
 								onChange={this._dispatchChangeInstrumentParam}
 								label="Filter"
 								onChangeId={BasicSamplerParam.lowPassFilterCutoffFrequency}
-								tooltip={lpfToolTip}
+								tooltip={filterToolTip}
 								valueString={filterValueToString}
+							/>
+							<KnobSnapping
+								label="Filter Type"
+								value={this.props.filterType}
+								defaultIndex={0}
+								onChange={this._dispatchChangeInstrumentParam}
+								onChangeId={BasicSamplerParam.filterType}
+								tooltip="So many filters..."
+								possibleValues={allBuiltInBQFilterTypes}
 							/>
 							<Knob
 								min={-100}
@@ -170,6 +183,7 @@ export const ConnectedBasicSampler = connect(
 			release: samplerState.release,
 			detune: samplerState.detune,
 			gain: samplerState.gain,
+			filterType: samplerState.filterType,
 		}
 	},
 )(BasicSampler)

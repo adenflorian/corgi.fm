@@ -3,7 +3,7 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 import {IMidiNotes} from '../../common/MidiNote'
-import {LfoOscillatorType, ShamuOscillatorType} from '../../common/OscillatorTypes'
+import {allBuiltInBQFilterTypes, BuiltInBQFilterType, LfoOscillatorType, ShamuOscillatorType} from '../../common/OscillatorTypes'
 import {
 	BasicSynthesizerParam, getConnectionNodeInfo,
 	selectBasicSynthesizer, setBasicSynthesizerOscillatorType,
@@ -14,7 +14,7 @@ import {IClientAppState} from '../../common/redux'
 import {
 	adsrValueToString, attackToolTip, decayToolTip, detuneToolTip, detuneValueToString,
 	filterAttackToolTip, filterDecayToolTip, filterReleaseToolTip, filterSustainToolTip,
-	filterValueToString, gainToolTip, lfoRateValueToString, lpfToolTip,
+	filterToolTip, filterValueToString, gainToolTip, lfoRateValueToString,
 	panToolTip, panValueToString, percentageValueString, releaseToolTip, sustainToolTip,
 } from '../client-constants'
 import {Knob} from '../Knob/Knob'
@@ -52,6 +52,7 @@ interface IBasicSynthesizerViewReduxProps {
 	lfoAmount: number
 	lfoTarget: SynthLfoTarget
 	lfoWave: LfoOscillatorType
+	filterType: BuiltInBQFilterType
 }
 
 export class BasicSynthesizerView
@@ -244,8 +245,17 @@ export class BasicSynthesizerView
 								onChange={this._dispatchChangeInstrumentParam}
 								label="Filter"
 								onChangeId={BasicSynthesizerParam.lowPassFilterCutoffFrequency}
-								tooltip={lpfToolTip}
+								tooltip={filterToolTip}
 								valueString={filterValueToString}
+							/>
+							<KnobSnapping
+								label="Filter Type"
+								value={this.props.filterType}
+								defaultIndex={0}
+								onChange={this._dispatchChangeInstrumentParam}
+								onChangeId={BasicSynthesizerParam.filterType}
+								tooltip="So many filters..."
+								possibleValues={allBuiltInBQFilterTypes}
 							/>
 							<Knob
 								min={-100}
@@ -313,6 +323,7 @@ export const ConnectedBasicSynthesizerView = connect(
 			lfoAmount: instrumentState.lfoAmount,
 			lfoTarget: instrumentState.lfoTarget,
 			lfoWave: instrumentState.lfoWave,
+			filterType: instrumentState.filterType,
 		}
 	},
 )(

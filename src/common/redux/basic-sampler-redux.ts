@@ -1,6 +1,7 @@
 import {AnyAction} from 'redux'
 import * as uuid from 'uuid'
 import {ClientId, ConnectionNodeType, IConnectable, IMultiStateThing} from '../common-types'
+import {BuiltInBQFilterType} from '../OscillatorTypes'
 import {
 	addMultiThing, BROADCASTER_ACTION, createSelectAllOfThingAsArray,
 	IClientRoomState, IMultiState, makeMultiReducer, NetworkActionType,
@@ -31,6 +32,7 @@ export enum BasicSamplerParam {
 	release = 'release',
 	detune = 'detune',
 	gain = 'gain',
+	filterType = 'filterType',
 }
 
 export interface IBasicSamplersState extends IMultiState {
@@ -42,8 +44,9 @@ export interface IBasicSamplers {
 }
 
 export class BasicSamplerState implements IConnectable, NodeSpecialState {
-	public static defaultWidth = 256
+	public static defaultWidth = 64 * 5
 	public static defaultHeight = 88 * 2
+	public static defaultFilterType = BuiltInBQFilterType.lowpass
 
 	public static dummy: BasicSamplerState = {
 		id: 'dummy',
@@ -62,6 +65,7 @@ export class BasicSamplerState implements IConnectable, NodeSpecialState {
 		height: BasicSamplerState.defaultHeight,
 		name: 'Dummy Basic Piano Sampler',
 		enabled: false,
+		filterType: BasicSamplerState.defaultFilterType,
 	}
 
 	public readonly id = uuid.v4()
@@ -80,6 +84,7 @@ export class BasicSamplerState implements IConnectable, NodeSpecialState {
 	public readonly height: number = BasicSamplerState.defaultHeight
 	public readonly name: string = 'Basic Piano Sampler'
 	public readonly enabled: boolean = true
+	public readonly filterType: BuiltInBQFilterType = BasicSamplerState.defaultFilterType
 
 	constructor(ownerId: ClientId) {
 		this.ownerId = ownerId
