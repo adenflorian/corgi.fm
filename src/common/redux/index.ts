@@ -23,6 +23,7 @@ export * from './basic-synthesizers-redux'
 export * from './basic-sampler-redux'
 export * from './simple-reverb-redux'
 export * from './simple-compressor-redux'
+export * from './simple-delay-redux'
 
 export * from './chat-redux'
 export * from './clients-redux'

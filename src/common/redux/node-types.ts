@@ -10,16 +10,16 @@ import {addGridSequencer, deserializeGridSequencerState, GridSequencerState} fro
 import {addGroupSequencer, deserializeGroupSequencerState, GroupSequencer, selectGroupSequencer} from './group-sequencers-redux'
 import {
 	addBasicSampler, addBasicSynthesizer,
-	BasicSamplerState, BasicSynthesizerState,
-	deserializeBasicSamplerState, deserializeBasicSynthesizerState,
-	IClientRoomState,
+	addSimpleDelay, BasicSamplerState,
+	BasicSynthesizerState, deserializeBasicSamplerState,
+	deserializeBasicSynthesizerState,
+	deserializeSimpleDelayState, IClientRoomState,
 	makeGetKeyboardMidiOutput, selectBasicSynthesizer,
 	selectGlobalClockIsPlaying, selectGridSequencer,
 	selectGridSequencerActiveNotes, selectGridSequencerIsActive,
 	selectGridSequencerIsSending, selectInfiniteSequencer,
-	selectInfiniteSequencerActiveNotes, selectInfiniteSequencerIsActive,
-	selectInfiniteSequencerIsSending, selectSampler, selectSimpleReverb, selectVirtualKeyboardById,
-	selectVirtualKeyboardHasPressedKeys, VirtualKeyboardState,
+	selectInfiniteSequencerActiveNotes, selectInfiniteSequencerIsActive, selectInfiniteSequencerIsSending, selectSampler,
+	selectSimpleDelay, selectSimpleReverb, selectVirtualKeyboardById, selectVirtualKeyboardHasPressedKeys, SimpleDelayState, VirtualKeyboardState,
 } from './index'
 import {addInfiniteSequencer, deserializeInfiniteSequencerState, InfiniteSequencerState} from './infinite-sequencers-redux'
 import {selectSequencerIsPlaying, sequencerActions} from './sequencer-redux'
@@ -238,6 +238,20 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		disabledText: effectDisabledText,
 		isNodeCloneable: true,
 	})],
+	[ConnectionNodeType.simpleDelay, makeNodeInfo({
+		type: ConnectionNodeType.simpleDelay,
+		typeName: 'Delay',
+		stateConstructor: SimpleDelayState,
+		addNodeActionCreator: addSimpleDelay,
+		selectIsPlaying: selectIsUpstreamNodePlaying,
+		stateSelector: selectSimpleDelay,
+		stateDeserializer: deserializeSimpleDelayState,
+		showOnAddNodeMenu: true,
+		isDeletable: true,
+		autoConnectToAudioOutput: true,
+		disabledText: effectDisabledText,
+		isNodeCloneable: true,
+	})],
 	[ConnectionNodeType.audioOutput, makeNodeInfo({
 		type: ConnectionNodeType.audioOutput,
 		typeName: 'Audio Output',
@@ -268,6 +282,7 @@ export function isAudioNodeType(type: ConnectionNodeType) {
 		ConnectionNodeType.audioOutput,
 		ConnectionNodeType.simpleReverb,
 		ConnectionNodeType.simpleCompressor,
+		ConnectionNodeType.simpleDelay,
 	].includes(type)
 }
 

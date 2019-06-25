@@ -80,13 +80,19 @@
 - [√] filter type knob for synth
 - [√] filter type knob for sampler
 - [√] fix knob arc not being inline
+- [ ] delay node
+	- [√] get basic delay node working
+	- [ ] feedback loop
+	- [ ] feedback %
+	- [ ] ping pong delay
+	- [ ] feedback filter
+- [ ] connect new nodes to nearest nodes?
 - [ ] fix issue with noise getting stuck on
 - [ ] filter envelope
 - [ ] fix loading old saves
 - [ ] button on sequencer to plugin keyboard
 - [ ] pan to center when making new room
 - [ ] more prominent message about version being out of date
-- [ ] delay node
 - [ ] tap tempo
 - [ ] list usernames of room members somewhere
 - [ ] metronome

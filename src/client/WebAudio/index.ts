@@ -13,5 +13,6 @@ export * from './BasicSamplerInstrument'
 export * from './BasicSynthesizer'
 export * from './SimpleReverb'
 export * from './SimpleCompressor'
+export * from './SimpleDelay'
 
 export * from './SchedulerVisual'

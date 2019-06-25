@@ -6,6 +6,7 @@ import {
 	IClientRoomState, IMultiState, infiniteSequencersReducer,
 	simpleCompressorsReducer, simpleReverbsReducer, virtualKeyboardsReducer,
 } from '../index'
+import {simpleDelaysReducer} from '../simple-delay-redux'
 
 // export const ADD_SHAMU_NODE = 'ADD_SHAMU_NODE'
 // export const DELETE_SHAMU_NODES = 'DELETE_SHAMU_NODES'
@@ -77,6 +78,7 @@ export const nodesReducer = combineReducers(Object.freeze({
 	groupSequencers: groupSequencersReducer,
 	simpleReverbs: simpleReverbsReducer,
 	simpleCompressors: simpleCompressorsReducer,
+	simpleDelays: simpleDelaysReducer,
 	virtualKeyboards: virtualKeyboardsReducer,
 }))
 

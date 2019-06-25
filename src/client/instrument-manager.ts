@@ -5,10 +5,10 @@ import {
 	BasicSamplerState, BasicSynthesizerState, IClientAppState,
 	IClientRoomState, IConnection, isAudioNodeType,
 	MASTER_AUDIO_OUTPUT_TARGET_ID, selectAllBasicSynthesizerIds, selectAllSamplerIds,
-	selectAllSimpleCompressorIds, selectAllSimpleReverbIds,
-	selectBasicSynthesizer, selectConnectionsWithSourceIds,
-	selectPosition, selectSampler, selectSimpleCompressor,
-	selectSimpleReverb, SimpleCompressorState, SimpleReverbState,
+	selectAllSimpleCompressorIds, selectAllSimpleDelayIds,
+	selectAllSimpleReverbIds, selectBasicSynthesizer,
+	selectConnectionsWithSourceIds, selectPosition, selectSampler,
+	selectSimpleCompressor, selectSimpleDelay, selectSimpleReverb, SimpleCompressorState, SimpleDelayState, SimpleReverbState,
 } from '../common/redux'
 import {
 	AudioNodeWrapper, IAudioNodeWrapperOptions, IInstrumentOptions,
@@ -16,6 +16,7 @@ import {
 } from './WebAudio'
 import {BasicSamplerInstrument} from './WebAudio/BasicSamplerInstrument'
 import {BasicSynthesizer} from './WebAudio/BasicSynthesizer'
+import {SimpleDelay} from './WebAudio/SimpleDelay'
 import {SimpleReverb} from './WebAudio/SimpleReverb'
 
 type IdsSelector = (roomState: IClientRoomState) => string[]
@@ -48,6 +49,7 @@ export const setupInstrumentManager = (
 		[ConnectionNodeType.basicSynthesizer, Map()],
 		[ConnectionNodeType.simpleReverb, Map()],
 		[ConnectionNodeType.simpleCompressor, Map()],
+		[ConnectionNodeType.simpleDelay, Map()],
 		[ConnectionNodeType.audioOutput, Map([[
 			MASTER_AUDIO_OUTPUT_TARGET_ID,
 			new MasterAudioOutput({
@@ -79,6 +81,7 @@ export const setupInstrumentManager = (
 		handleBasicSynthesizers()
 		handleSimpleReverbs()
 		handleSimpleCompressors()
+		handleSimpleDelays()
 
 		function handleSamplers() {
 			updateInstrumentType(
@@ -204,6 +207,21 @@ export const setupInstrumentManager = (
 					effect.setRatio(effectState.ratio)
 					effect.setAttack(effectState.attack)
 					effect.setRelease(effectState.release)
+				},
+			)
+		}
+
+		function handleSimpleDelays() {
+			updateEffectType(
+				selectAllSimpleDelayIds,
+				selectSimpleDelay,
+				(options, effectState) => new SimpleDelay({
+					...options,
+					...effectState,
+				}),
+				ConnectionNodeType.simpleDelay,
+				(effect: SimpleDelay, effectState: SimpleDelayState) => {
+					effect.setDelayTime(effectState.time)
 				},
 			)
 		}

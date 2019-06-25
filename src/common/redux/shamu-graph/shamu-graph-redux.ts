@@ -42,6 +42,7 @@ export function shamuGraphReducer(state: ShamuGraphState | undefined, action: Sh
 				infiniteSequencers: deserialize(ConnectionNodeType.infiniteSequencer, action.shamuGraphState.nodes.infiniteSequencers),
 				simpleReverbs: deserialize(ConnectionNodeType.simpleReverb, action.shamuGraphState.nodes.simpleReverbs),
 				simpleCompressors: deserialize(ConnectionNodeType.simpleCompressor, action.shamuGraphState.nodes.simpleCompressors),
+				simpleDelays: deserialize(ConnectionNodeType.simpleDelay, action.shamuGraphState.nodes.simpleDelays),
 				virtualKeyboards: deserialize(ConnectionNodeType.virtualKeyboard, action.shamuGraphState.nodes.virtualKeyboards),
 			}),
 			edges: makeShamuEdgesState().merge(action.shamuGraphState.edges),
@@ -81,6 +82,10 @@ export function shamuGraphReducer(state: ShamuGraphState | undefined, action: Sh
 		// 			simpleCompressors: {
 		// 				...state.nodes.simpleCompressors,
 		// 				...deserialize(ConnectionNodeType.simpleCompressor, action.shamuGraphState.nodes.simpleCompressors),
+		// 			},
+		// 			simpleDelays: {
+		// 				...state.nodes.simpleDelays,
+		// 				...deserialize(ConnectionNodeType.simpleDelay, action.shamuGraphState.nodes.simpleDelays),
 		// 			},
 		// 			// Don't merge keyboards
 		// 			virtualKeyboards: state.nodes.virtualKeyboards,
