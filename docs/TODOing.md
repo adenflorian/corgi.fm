@@ -75,7 +75,8 @@
 	- [√] basic synth LFO
 	- [ ] fix wave value string
 	- [ ] pitch target
-	- [ ] filter target
+	- [√] filter target
+		- [ ] fix clicks in sound
 - [√] filter type knob for synth
 - [√] filter type knob for sampler
 - [√] fix knob arc not being inline

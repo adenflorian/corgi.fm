@@ -221,7 +221,7 @@ export class BasicSynthesizerView
 								label="Target"
 								onChangeId={BasicSynthesizerParam.lfoTarget}
 								tooltip={'what it wobbles'}
-								possibleValues={List<SynthLfoTarget>([SynthLfoTarget.Gain, SynthLfoTarget.Pan])}
+								possibleValues={List<SynthLfoTarget>([SynthLfoTarget.Gain, SynthLfoTarget.Pan, SynthLfoTarget.Filter])}
 							/>
 						</div>
 						<div className="knobs">

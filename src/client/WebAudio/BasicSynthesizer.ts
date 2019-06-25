@@ -17,6 +17,7 @@ export class BasicSynthesizer extends Instrument<SynthVoices, SynthVoice> {
 	private readonly _voices: SynthVoices
 	private readonly _lfo: OscillatorNode
 	private readonly _lfoGain: GainNode
+	private _lfoAmountMultiplier: number = 1
 	private _oscillatorType: ShamuOscillatorType
 	private _lfoRate: number
 	private _lfoAmount: number
@@ -39,7 +40,7 @@ export class BasicSynthesizer extends Instrument<SynthVoices, SynthVoice> {
 		this._lfo.start()
 
 		this._lfoGain = options.audioContext.createGain()
-		this._lfoGain.gain.value = this._lfoAmount
+		this._updateLfoAmount()
 
 		this._lfo.connect(this._lfoGain)
 
@@ -87,7 +88,11 @@ export class BasicSynthesizer extends Instrument<SynthVoices, SynthVoice> {
 		if (newAmount === this._lfoAmount) return
 		this._lfoAmount = newAmount
 		this._getVoices().setLfoAmount(newAmount)
-		this._lfoGain.gain.linearRampToValueAtTime(newAmount, this._audioContext.currentTime + 0.004)
+		this._updateLfoAmount()
+	}
+
+	private readonly _updateLfoAmount = () => {
+		this._lfoGain.gain.linearRampToValueAtTime(this._lfoAmount * this._lfoAmountMultiplier, this._audioContext.currentTime + 0.004)
 	}
 
 	public readonly setLfoWave = (wave: LfoOscillatorType) => {
@@ -116,12 +121,23 @@ export class BasicSynthesizer extends Instrument<SynthVoices, SynthVoice> {
 	private readonly _updateLfoTarget = () => {
 		this._lfoGain.disconnect()
 
-		if (this._lfoTarget === SynthLfoTarget.Gain) {
+		switch (this._lfoTarget) {
 			// Will output node always be the gain?
-			this._lfoGain.connect(this.getOutputAudioNode().gain)
-		} else if (this._lfoTarget === SynthLfoTarget.Pan) {
-			this._lfoGain.connect(this._panNode.pan)
+			case SynthLfoTarget.Gain:
+				this._lfoAmountMultiplier = 1
+				this._lfoGain.connect(this.getOutputAudioNode().gain)
+				break
+			case SynthLfoTarget.Pan:
+				this._lfoAmountMultiplier = 1
+				this._lfoGain.connect(this._panNode.pan)
+				break
+			case SynthLfoTarget.Filter:
+				this._lfoAmountMultiplier = 600
+				this._lfoGain.connect(this._filter.frequency)
+				break
 		}
+
+		this._updateLfoAmount()
 	}
 
 	protected _getVoices = () => this._voices

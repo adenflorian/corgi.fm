@@ -9,7 +9,7 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 
 	protected readonly _panNode: StereoPannerNode
 	protected readonly _audioContext: AudioContext
-	protected readonly _lowPassFilter: BiquadFilterNode
+	protected readonly _filter: BiquadFilterNode
 	protected _attackTimeInSeconds: number = 0.01
 	protected _decayTimeInSeconds: number = 0.25
 	protected _sustain: number = 0.8
@@ -29,16 +29,16 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 
 		this._panNode = this._audioContext.createStereoPanner()
 
-		this._lowPassFilter = this._audioContext.createBiquadFilter()
-		this._lowPassFilter.type = 'lowpass'
-		this._lowPassFilter.frequency.value = 10000
+		this._filter = this._audioContext.createBiquadFilter()
+		this._filter.type = 'lowpass'
+		this._filter.frequency.value = 10000
 
 		this._gain = this._audioContext.createGain()
 		// Just below 1 to help mitigate an infinite feedback loop
 		this._gain.gain.value = 1
 
-		this._panNode.connect(this._lowPassFilter)
-		this._lowPassFilter.connect(this._gain)
+		this._panNode.connect(this._filter)
+		this._filter.connect(this._gain)
 
 		registerInstrumentWithSchedulerVisual(this.id, () => this._getVoices().getScheduledVoices(), this._audioContext)
 	}
@@ -75,16 +75,16 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 		this._panNode.pan.setValueAtTime(newPan, this._audioContext.currentTime)
 	}
 
-	public readonly setLowPassFilterCutoffFrequency = (frequency: number) => {
+	public readonly setFilterCutoffFrequency = (frequency: number) => {
 		// Rounding to nearest to 32 bit number because AudioParam values are 32 bit floats
 		const newFreq = Math.fround(frequency)
-		if (newFreq === this._lowPassFilter.frequency.value) return
-		this._lowPassFilter.frequency.linearRampToValueAtTime(newFreq, this._audioContext.currentTime + 0.004)
+		if (newFreq === this._filter.frequency.value) return
+		this._filter.frequency.linearRampToValueAtTime(newFreq, this._audioContext.currentTime + 0.004)
 	}
 
 	public readonly setFilterType = (filterType: BuiltInBQFilterType) => {
-		if (filterType !== this._lowPassFilter.type) {
-			this._lowPassFilter.type = filterType
+		if (filterType !== this._filter.type) {
+			this._filter.type = filterType
 		}
 	}
 
@@ -175,7 +175,7 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 	protected _dispose = () => {
 		this._panNode.disconnect()
 		this._gain.disconnect()
-		this._lowPassFilter.disconnect()
+		this._filter.disconnect()
 	}
 
 	protected abstract _getVoices(): T

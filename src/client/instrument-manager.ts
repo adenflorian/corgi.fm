@@ -90,7 +90,7 @@ export const setupInstrumentManager = (
 				ConnectionNodeType.basicSampler,
 				(instrument: BasicSamplerInstrument, instrumentState: BasicSamplerState) => {
 					instrument.setPan(instrumentState.pan)
-					instrument.setLowPassFilterCutoffFrequency(instrumentState.lowPassFilterCutoffFrequency)
+					instrument.setFilterCutoffFrequency(instrumentState.lowPassFilterCutoffFrequency)
 					instrument.setAttack(instrumentState.attack)
 					instrument.setDecay(instrumentState.decay)
 					instrument.setSustain(instrumentState.sustain)
@@ -114,7 +114,7 @@ export const setupInstrumentManager = (
 				(instrument: BasicSynthesizer, instrumentState: BasicSynthesizerState) => {
 					instrument.setOscillatorType(instrumentState.oscillatorType)
 					instrument.setPan(instrumentState.pan)
-					instrument.setLowPassFilterCutoffFrequency(instrumentState.lowPassFilterCutoffFrequency)
+					instrument.setFilterCutoffFrequency(instrumentState.lowPassFilterCutoffFrequency)
 					instrument.setAttack(instrumentState.attack)
 					instrument.setDecay(instrumentState.decay)
 					instrument.setSustain(instrumentState.sustain)
