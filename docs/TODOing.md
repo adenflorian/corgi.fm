@@ -78,6 +78,7 @@
 	- [ ] filter target
 - [√] filter type knob for synth
 - [√] filter type knob for sampler
+- [√] fix knob arc not being inline
 - [ ] fix issue with noise getting stuck on
 - [ ] filter envelope
 - [ ] fix loading old saves

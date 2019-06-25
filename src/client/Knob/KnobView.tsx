@@ -60,15 +60,15 @@ export const KnobView = React.memo(function _KnobView(props: IKnobViewProps) {
 				>
 					{/* <circle cx="50%" cy="50%" r="64%"
 						fill="none" stroke={CssColor.panelGrayLight} strokeWidth="3"
-						strokeDasharray={`0 50% ${percentage * 300}% 100000`} strokeDashoffset="1"
+						strokeDasharray={`0 50% ${percentage * 308.2}% 100000`} strokeDashoffset="1"
 					/> */}
 					<circle cx="50%" cy="50%" r="64%"
 						fill="none" stroke={CssColor.panelGrayLight} strokeWidth="3"
-						strokeDasharray={`0 50% ${1 * 300}% 100000`} strokeDashoffset="1"
+						strokeDasharray={`0 50% ${1 * 308.2}% 100000`} strokeDashoffset="1"
 					/>
 					<circle cx="50%" cy="50%" r="64%"
 						fill="none" stroke="currentColor" strokeWidth="3"
-						strokeDasharray={`0 50% ${percentage * 300}% 100000`} strokeDashoffset="1"
+						strokeDasharray={`0 50% ${percentage * 308.2}% 100000`} strokeDashoffset="1"
 					/>
 				</svg>
 				{/* <div className="knobShadow" /> */}
