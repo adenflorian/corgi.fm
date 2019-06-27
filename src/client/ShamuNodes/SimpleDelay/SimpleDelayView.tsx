@@ -54,7 +54,7 @@ export const SimpleDelayView: React.FC<ISimpleDelayAllProps> =
 					}}
 				>
 					<Knob
-						label="Left Time"
+						label="Time"
 						min={0.001}
 						max={5}
 						curve={4}

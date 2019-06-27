@@ -82,11 +82,11 @@
 - [√] fix knob arc not being inline
 - [ ] delay node
 	- [√] get basic delay node working
-	- [ ] feedback loop
-	- [ ] feedback %
-	- [ ] ping pong delay
+	- [√] feedback loop
+	- [√] feedback %
 	- [ ] feedback filter
-- [ ] connect new nodes to nearest nodes?
+	- [ ] ping pong delay
+- [ ] make it so you can only drag the title bar
 - [ ] fix issue with noise getting stuck on
 - [ ] filter envelope
 - [ ] fix loading old saves
@@ -97,6 +97,9 @@
 - [ ] list usernames of room members somewhere
 - [ ] metronome
 - [ ] solo
+	- [ ] disable all audio nodes except for:
+		- [ ] soloed nodes
+		- [ ] any downstream nodes from soloed nodes
 - [ ] fix up group sequencer
 	- [ ] connector placements aren't perfect
 	- [ ] connected nodes should prefer group sequencer color
@@ -119,6 +122,7 @@
 	- [ ] changelog button on right side
 - [ ] add button to clear chat
 - [ ] "show older messages" button
+- [ ] connect new nodes to nearest nodes?
 - [ ] show icon on volume to show it is local only
 - [ ] long notes mixed with short notes
 - [ ] pan and detune knob arcs should start from center
@@ -131,7 +135,6 @@
 - [ ] display error message when save fails
 - [ ] error reporting
 - [ ] disabling keyboard
-- [ ] make it so you can only drag the title bar
 - [ ] allow typing in knob values
 - [ ] fix order of node menu
 - [ ] drum sampler?
