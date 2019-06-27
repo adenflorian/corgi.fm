@@ -4,6 +4,7 @@ import {
 	getConnectionNodeInfo, selectSimpleDelay, setSimpleDelayParam,
 	shamuConnect, SimpleDelayParam, SimpleDelayState,
 } from '../../../common/redux'
+import {adsrValueToString} from '../../client-constants'
 import {Knob} from '../../Knob/Knob'
 import {Panel} from '../../Panel/Panel'
 
@@ -44,13 +45,15 @@ export const SimpleDelayView: React.FC<ISimpleDelayAllProps> =
 				>
 					<Knob
 						label="Time"
-						min={0}
+						min={0.001}
 						max={5}
+						curve={4}
 						value={time}
 						defaultValue={SimpleDelayState.defaultTime}
 						onChange={changeParam}
 						onChangeId={SimpleDelayParam.time}
 						tooltip="How long the audio is delayed before you hear it again"
+						valueString={adsrValueToString}
 					/>
 				</div>
 			</Panel>

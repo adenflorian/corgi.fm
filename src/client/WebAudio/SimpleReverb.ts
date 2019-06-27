@@ -28,11 +28,15 @@ export class SimpleReverb extends AudioNodeWrapper {
 		this._inputGain = options.audioContext.createGain()
 		this._inputGain.gain.value = 1
 
-		this._inputGain.connect(this._reverbNode)
+		this._specificDisablePassthroughMode()
 	}
 
 	public readonly getInputAudioNode = () => this._inputGain
 	public readonly getOutputAudioNode = () => this._reverbNode
+
+	protected readonly _specificDisablePassthroughMode = () => {
+		this._inputGain.connect(this._reverbNode)
+	}
 
 	public readonly setTime = (time: number) => {
 		// Rounding to nearest to 32 bit number because AudioParam values are 32 bit floats

@@ -34,7 +34,7 @@ export interface ISimpleDelays {
 export class SimpleDelayState implements IConnectable, NodeSpecialState {
 	public static defaultWidth = 80
 	public static defaultHeight = 88
-	public static defaultTime = 0.5
+	public static defaultTime = 0.25
 
 	public static dummy: SimpleDelayState = {
 		id: 'dummy',

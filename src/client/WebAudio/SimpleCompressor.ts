@@ -24,11 +24,15 @@ export class SimpleCompressor extends AudioNodeWrapper {
 		this._inputGain = options.audioContext.createGain()
 		this._inputGain.gain.value = 1
 
-		this._inputGain.connect(this._compressorNode)
+		this._specificDisablePassthroughMode()
 	}
 
 	public readonly getInputAudioNode = () => this._inputGain
 	public readonly getOutputAudioNode = () => this._compressorNode
+
+	protected readonly _specificDisablePassthroughMode = () => {
+		this._inputGain.connect(this._compressorNode)
+	}
 
 	public readonly setThreshold = (threshold: number) => {
 		// Rounding to nearest to 32 bit number because AudioParam values are 32 bit floats

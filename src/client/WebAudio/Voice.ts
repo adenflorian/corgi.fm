@@ -16,7 +16,7 @@ export abstract class Voice {
 	protected _audioContext: AudioContext
 	protected _destination: AudioNode
 	protected _releaseId: string = ''
-	protected readonly _lowPassFilter: BiquadFilterNode
+	// protected readonly _lowPassFilter: BiquadFilterNode
 	protected _gain: GainNode
 	protected _isReleaseScheduled = false
 	protected _scheduledAttackStartTimeSeconds = 0
@@ -46,13 +46,13 @@ export abstract class Voice {
 		this._onEnded = onEnded
 		this._detune = detune
 
-		this._lowPassFilter = this._audioContext.createBiquadFilter()
-		this._lowPassFilter.type = 'lowpass'
-		this._lowPassFilter.frequency.value = lowPassFilterCutoffFrequency
+		// this._lowPassFilter = this._audioContext.createBiquadFilter()
+		// this._lowPassFilter.type = 'lowpass'
+		// this._lowPassFilter.frequency.value = lowPassFilterCutoffFrequency
 
 		this._gain = this._audioContext.createGain()
 
-		this._lowPassFilter.connect(this._gain)
+		// this._lowPassFilter.connect(this._gain)
 	}
 
 	public get scheduledAttackStartTime() {return this._scheduledAttackStartTimeSeconds}
@@ -81,9 +81,9 @@ export abstract class Voice {
 	}
 
 	public setLowPassFilterCutoffFrequency(frequency: number) {
-		if (frequency === this._lowPassFilter.frequency.value) return
+		// if (frequency === this._lowPassFilter.frequency.value) return
 
-		this._lowPassFilter.frequency.value = frequency
+		// this._lowPassFilter.frequency.value = frequency
 	}
 
 	public scheduleNote(
@@ -100,7 +100,8 @@ export abstract class Voice {
 
 		this.getAudioScheduledSourceNode()!.detune.value = this._detune
 
-		this.getAudioScheduledSourceNode()!.connect(this._lowPassFilter)
+		// this.getAudioScheduledSourceNode()!.connect(this._lowPassFilter)
+		this.getAudioScheduledSourceNode()!
 			.connect(this._gain)
 			.connect(this._destination)
 

@@ -187,12 +187,7 @@ export abstract class AudioNodeWrapper implements IDisposable {
 
 		if (!output) return
 
-		input.connect(output)
-
-		// connect output to destinations
-		const outputAudioNode = this.getOutputAudioNode()
-
-		if (!outputAudioNode) return
+		this._specificDisablePassthroughMode()
 
 		this._connectedTargets.forEach(destination => {
 			const destinationInput = destination.getInputAudioNode()
@@ -204,8 +199,20 @@ export abstract class AudioNodeWrapper implements IDisposable {
 				return
 			}
 
-			outputAudioNode.connect(destinationInput)
+			output.connect(destinationInput)
 		})
+	}
+
+	protected readonly _specificDisablePassthroughMode = () => {
+		const input = this.getInputAudioNode()
+
+		if (!input) return
+
+		const output = this.getOutputAudioNode()
+
+		if (!output) return
+
+		input.connect(output)
 	}
 }
 
