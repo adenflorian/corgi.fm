@@ -1,6 +1,7 @@
 import {AnyAction} from 'redux'
 import * as uuid from 'uuid'
 import {ClientId, ConnectionNodeType, IConnectable, IMultiStateThing} from '../common-types'
+import {BuiltInBQFilterType} from '../OscillatorTypes'
 import {addMultiThing, BROADCASTER_ACTION, createSelectAllOfThingAsArray, IClientRoomState, IMultiState, makeMultiReducer, NetworkActionType, SERVER_ACTION} from './index'
 import {NodeSpecialState} from './shamu-graph'
 
@@ -20,7 +21,16 @@ export const setSimpleDelayParam =
 	})
 
 export enum SimpleDelayParam {
-	time = 'time',
+	timeLeft = 'timeLeft',
+	timeRight = 'timeRight',
+	feedback = 'feedback',
+	bpmSync = 'bpmSync',
+	mix = 'mix',
+	link = 'link',
+	filterFreq = 'filterFreq',
+	filterQ = 'filterQ',
+	filterType = 'filterType',
+	pingPong = 'pingPong',
 }
 
 export interface ISimpleDelaysState extends IMultiState {
@@ -32,14 +42,32 @@ export interface ISimpleDelays {
 }
 
 export class SimpleDelayState implements IConnectable, NodeSpecialState {
-	public static defaultWidth = 80
+	public static defaultWidth = 80 * 3
 	public static defaultHeight = 88
-	public static defaultTime = 0.25
+	public static defaultTimeLeft = 0.25
+	public static defaultTimeRight = 0.25
+	public static defaultFeedback = 0.42
+	public static defaultBpmSync = true
+	public static defaultMix = 0.3
+	public static defaultLink = true
+	public static defaultFilterFreq = 920
+	public static defaultFilterQ = 6.6
+	public static defaultFilterType = BuiltInBQFilterType.bandpass
+	public static defaultPingPong = false
 
 	public static dummy: SimpleDelayState = {
 		id: 'dummy',
 		ownerId: 'dummyOwner',
-		time: SimpleDelayState.defaultTime,
+		timeLeft: SimpleDelayState.defaultTimeLeft,
+		timeRight: SimpleDelayState.defaultTimeRight,
+		feedback: SimpleDelayState.defaultFeedback,
+		bpmSync: SimpleDelayState.defaultBpmSync,
+		mix: SimpleDelayState.defaultMix,
+		link: SimpleDelayState.defaultLink,
+		filterFreq: SimpleDelayState.defaultFilterFreq,
+		filterQ: SimpleDelayState.defaultFilterQ,
+		filterType: SimpleDelayState.defaultFilterType,
+		pingPong: SimpleDelayState.defaultPingPong,
 		color: false,
 		type: ConnectionNodeType.simpleDelay,
 		width: SimpleDelayState.defaultWidth,
@@ -50,7 +78,16 @@ export class SimpleDelayState implements IConnectable, NodeSpecialState {
 
 	public readonly id = uuid.v4()
 	public readonly ownerId: string
-	public readonly time: number = SimpleDelayState.defaultTime
+	public readonly timeLeft: number = SimpleDelayState.defaultTimeLeft
+	public readonly timeRight: number = SimpleDelayState.defaultTimeRight
+	public readonly feedback: number = SimpleDelayState.defaultFeedback
+	public readonly bpmSync: boolean = SimpleDelayState.defaultBpmSync
+	public readonly mix: number = SimpleDelayState.defaultMix
+	public readonly link: boolean = SimpleDelayState.defaultLink
+	public readonly filterFreq: number = SimpleDelayState.defaultFilterFreq
+	public readonly filterQ: number = SimpleDelayState.defaultFilterQ
+	public readonly filterType: BuiltInBQFilterType = SimpleDelayState.defaultFilterType
+	public readonly pingPong: boolean = SimpleDelayState.defaultPingPong
 	public readonly width: number = SimpleDelayState.defaultWidth
 	public readonly height: number = SimpleDelayState.defaultHeight
 	public readonly color: false = false

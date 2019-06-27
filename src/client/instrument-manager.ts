@@ -218,10 +218,13 @@ export const setupInstrumentManager = (
 				(options, effectState) => new SimpleDelay({
 					...options,
 					...effectState,
+					time: effectState.timeLeft,
 				}),
 				ConnectionNodeType.simpleDelay,
 				(effect: SimpleDelay, effectState: SimpleDelayState) => {
-					effect.setDelayTime(effectState.time)
+					effect.setDelayTime(effectState.timeLeft)
+					effect.setFeedback(effectState.feedback)
+					effect.setMix(effectState.mix)
 				},
 			)
 		}
