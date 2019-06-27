@@ -49,7 +49,7 @@ export const SimpleCompressorView: React.FC<ISimpleCompressorAllProps> =
 				>
 					<Knob
 						label="Threshold"
-						min={-100}
+						min={-50}
 						max={0}
 						value={threshold}
 						defaultValue={-24}
