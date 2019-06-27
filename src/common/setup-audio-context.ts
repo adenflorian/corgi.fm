@@ -30,9 +30,10 @@ export function setupAudioContext(audioContext: AudioContext, preFx: GainNode, s
 	// limiter.attack.value = 0.005 // 5ms attack
 	// limiter.release.value = 0.050 // 50ms release
 
-	const finalNode = preFx.connect(masterGain)
+	const finalNode = preFx
 		.connect(masterLimiter)
 		.connect(masterFilter)
+		.connect(masterGain)
 
 	finalNode.connect(analyser)
 	finalNode.connect(audioContext.destination)
