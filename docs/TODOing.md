@@ -86,7 +86,7 @@
 	- [√] feedback %
 	- [ ] feedback filter
 	- [ ] ping pong delay
-- [ ] make it so you can only drag the title bar
+- [√] make it so you can only drag the title bar
 - [ ] fix issue with noise getting stuck on
 - [ ] filter envelope
 - [ ] fix loading old saves
