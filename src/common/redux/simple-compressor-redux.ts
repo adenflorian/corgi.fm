@@ -36,7 +36,7 @@ export interface ISimpleCompressors {
 }
 
 export class SimpleCompressorState implements IConnectable, NodeSpecialState {
-	public static defaultWidth = 380 // main width plus padding
+	public static defaultWidth = 64 * 5 // main width plus padding
 	public static defaultHeight = 88
 
 	public static dummy: SimpleCompressorState = {
