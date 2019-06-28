@@ -1,20 +1,14 @@
 import {List} from 'immutable'
 import * as React from 'react'
 import './Knob.less'
+import {KnobBaseProps} from './KnobTypes'
 import {KnobView} from './KnobView'
 import {SliderControllerSnapping} from './SliderControllerSnapping'
 
-interface Props {
+interface Props extends KnobBaseProps {
 	curve?: number
-	label: string
-	markColor?: string
 	onChange: (onChangeId: any, newValue: number | string | boolean) => any
-	onChangeId?: any
-	readOnly?: boolean
-	value: number | string | boolean
 	defaultIndex: number
-	size?: number
-	tooltip: string
 	valueString?: (value: number) => string
 	possibleValues: List<any>
 }

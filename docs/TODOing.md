@@ -88,6 +88,7 @@
 	- [ ] ping pong delay
 - [√] make it so you can only drag the title bar
 - [√] make knob drag area bigger
+- [ ] allow typing in knob values
 - [ ] fix issue with noise getting stuck on
 - [ ] filter envelope
 - [ ] fix loading old saves
@@ -136,7 +137,6 @@
 - [ ] display error message when save fails
 - [ ] error reporting
 - [ ] disabling keyboard
-- [ ] allow typing in knob values
 - [ ] fix order of node menu
 - [ ] drum sampler?
 - [ ] give feedback when saving to browser

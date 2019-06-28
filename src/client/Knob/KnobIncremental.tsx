@@ -1,20 +1,14 @@
 import React from 'react'
 import './Knob.less'
+import {KnobBaseProps} from './KnobTypes'
 import {KnobView} from './KnobView'
 import {SliderControllerIncremental} from './SliderControllerIncremental'
 
-interface Props {
-	label: string
-	markColor?: string
+interface Props extends KnobBaseProps {
 	max: number
 	min: number
 	onChange: (onChangeId: any, newValue: number) => any
-	onChangeId?: any
-	readOnly?: boolean
-	value: number
 	defaultValue: number
-	size?: number
-	tooltip: string
 	valueString?: (value: number) => string
 	increment: number
 }

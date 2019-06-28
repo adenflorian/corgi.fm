@@ -1,21 +1,15 @@
 import * as React from 'react'
 import './Knob.less'
+import {KnobBaseProps} from './KnobTypes'
 import {KnobView} from './KnobView'
 import {SliderController} from './SliderController'
 
-interface IKnobProps {
+interface IKnobProps extends KnobBaseProps {
 	curve?: number
-	label: string
-	markColor?: string
 	max: number
 	min: number
 	onChange: (onChangeId: any, newValue: number) => any
-	onChangeId?: any
-	readOnly?: boolean
-	value: number
 	defaultValue: number
-	size?: number
-	tooltip: string
 	valueString?: (value: number) => string
 }
 
