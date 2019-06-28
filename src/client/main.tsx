@@ -94,7 +94,7 @@ async function setupAsync() {
 
 	setStoreForSchedulerVisual(store)
 
-	setupAudioContext(audioContext, preFx, store)
+	const {masterLimiter} = setupAudioContext(audioContext, preFx, store)
 
 	await SamplesManager.initAsync(audioContext)
 
@@ -108,7 +108,7 @@ async function setupAsync() {
 
 	renderApp(store)
 
-	const {ecsLoop, onSetActiveRoom} = getECSLoop(store)
+	const {ecsLoop, onSetActiveRoom} = getECSLoop(store, masterLimiter)
 
 	const fpsLoop = getFpsLoop()
 

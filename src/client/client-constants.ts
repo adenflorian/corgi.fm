@@ -145,3 +145,10 @@ export const graphStateSavesLocalStorageKey = 'localSaves'
 
 export const handleClassName = 'handle'
 export const handleVisualClassName = 'handleVisual'
+
+export const limiterRenderSystemConstants = Object.freeze({
+	width: 8,
+	height: 40,
+	id: 'masterVolumeLimiterCanvas',
+	valueId: 'masterVolumeLimiterValueId',
+})

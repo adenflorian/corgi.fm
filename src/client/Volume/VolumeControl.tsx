@@ -8,7 +8,7 @@ import {ConnectionNodeType} from '../../common/common-types'
 import {setOptionMasterVolume} from '../../common/redux'
 import {getConnectionNodeInfo, IClientAppState} from '../../common/redux'
 import {MASTER_AUDIO_OUTPUT_TARGET_ID} from '../../common/redux'
-import {percentageValueString} from '../client-constants'
+import {limiterRenderSystemConstants, percentageValueString} from '../client-constants'
 import {Knob} from '../Knob/Knob'
 import {Panel} from '../Panel/Panel'
 import './VolumeControl.less'
@@ -40,6 +40,30 @@ export class VolumeControl extends Component<IVolumeControlAllProps> {
 				saturate={isPlaying}
 				label="Audio Out"
 			>
+				<div
+					className="limiterDisplay knob"
+					style={{
+						width: 64,
+						height: 88,
+						justifyContent: 'end',
+					}}
+					title={stripIndents`Show how much the master limiter is reducing the audio
+						Usually you don't want to see any red`}
+				>
+					<div className="knobLabel">Limiter</div>
+					<canvas
+						id={limiterRenderSystemConstants.id}
+						width={limiterRenderSystemConstants.width}
+						height={limiterRenderSystemConstants.height}
+						style={{
+							marginTop: 6,
+						}}
+					></canvas>
+					<div className="value knobValue" style={{bottom: -2}}>
+						<span id={limiterRenderSystemConstants.valueId}>0.0</span>
+						<span> dB</span>
+					</div>
+				</div>
 				<Knob
 					value={this.props.masterVolume}
 					defaultValue={0.1}
@@ -47,11 +71,10 @@ export class VolumeControl extends Component<IVolumeControlAllProps> {
 					min={0}
 					max={0.5}
 					markColor={color}
-					size={80}
 					tooltip={stripIndents`Local master volume
 						Will only control the volume for you
 						It won't affect other users`}
-					label=""
+					label="Gain"
 					valueString={percentageValueString}
 				/>
 			</Panel>

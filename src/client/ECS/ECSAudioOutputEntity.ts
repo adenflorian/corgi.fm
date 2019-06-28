@@ -1,20 +1,19 @@
 import {List} from 'immutable'
-import {ECSGraphPositionComponent, ECSSequencerComponent} from './ECSComponents'
+import {ECSAudioOutputComponent, ECSGraphPositionComponent} from './ECSComponents'
 import {ECSComponentType, ECSEntity} from './ECSTypes'
 
-export class ECSSequencerEntity extends ECSEntity {
+export class ECSAudioOutputEntity extends ECSEntity {
 	constructor(
 		private readonly _graphPositionComponent: ECSGraphPositionComponent,
-		private readonly _sequencerComponent: ECSSequencerComponent,
+		private readonly _audioOutputComponent: ECSAudioOutputComponent,
 	) {
 		super()
 	}
 
 	public getComponents(): List<ECSComponentType> {
 		return List([
-			ECSComponentType.NodeRenderer,
 			ECSComponentType.GraphPosition,
-			ECSComponentType.Sequencer,
+			ECSComponentType.AudioOutput,
 		])
 	}
 
@@ -22,7 +21,7 @@ export class ECSSequencerEntity extends ECSEntity {
 		return this._graphPositionComponent
 	}
 
-	public getSequencerComponent(): ECSSequencerComponent | undefined {
-		return this._sequencerComponent
+	public getAudioOutputComponent(): ECSAudioOutputComponent | undefined {
+		return this._audioOutputComponent
 	}
 }

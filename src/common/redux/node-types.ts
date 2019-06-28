@@ -87,8 +87,8 @@ class AudioOutputState implements IMultiStateThing {
 	public readonly id = MASTER_AUDIO_OUTPUT_TARGET_ID
 	public readonly color = CssColor.green
 	public readonly type = ConnectionNodeType.audioOutput
-	public readonly width = 128
-	public readonly height = 112
+	public readonly width = 64 * 2
+	public readonly height = 88
 	public readonly name = 'audio output'
 	public readonly enabled = true
 	public readonly ownerId = serverClientId

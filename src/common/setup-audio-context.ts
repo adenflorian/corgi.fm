@@ -151,5 +151,8 @@ export function setupAudioContext(audioContext: AudioContext, preFx: GainNode, s
 	// oscGain.gain.linearRampToValueAtTime(0.2, audioContext.currentTime + 8)
 	// oscGain.gain.linearRampToValueAtTime(0, audioContext.currentTime + 10)
 
-	return audioContext
+	return {
+		audioContext,
+		masterLimiter,
+	}
 }

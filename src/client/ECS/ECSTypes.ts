@@ -1,11 +1,15 @@
 import {List, Set} from 'immutable'
-import {ECSGraphPositionComponent, ECSNodeRendererComponent, ECSSequencerComponent} from './ECSComponents'
+import {
+	ECSGraphPositionComponent, ECSLimiterComponent,
+	ECSNodeRendererComponent, ECSSequencerComponent,
+} from './ECSComponents'
 
 export enum ECSComponentType {
 	NodeRenderer = 'NodeRenderer',
 	GraphPosition = 'GraphPosition',
 	GlobalRenderer = 'GlobalRenderer',
 	Sequencer = 'Sequencer',
+	AudioOutput = 'AudioOutput',
 }
 
 export abstract class ECSSystem {
@@ -20,4 +24,5 @@ export abstract class ECSEntity {
 	public getGlobalRendererComponent(): ECSNodeRendererComponent | undefined {return undefined}
 	public getGraphPositionComponent(): ECSGraphPositionComponent | undefined {return undefined}
 	public getSequencerComponent(): ECSSequencerComponent | undefined {return undefined}
+	public getAudioOutputComponent(): ECSLimiterComponent | undefined {return undefined}
 }

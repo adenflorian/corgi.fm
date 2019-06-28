@@ -2,14 +2,17 @@ import {List} from 'immutable'
 import {Store} from 'redux'
 import {ConnectionNodeType, isSequencerNodeType} from '../../common/common-types'
 import {
-	AppOptions, IClientAppState, selectAllPositions, selectGroupSequencer,
-	selectOption, selectPosition, selectSequencer, selectSequencerIsPlaying,
+	AppOptions, IClientAppState, MASTER_AUDIO_OUTPUT_TARGET_ID, selectAllPositions,
+	selectGroupSequencer, selectOption, selectPosition, selectSequencer, selectSequencerIsPlaying,
 } from '../../common/redux'
+import {limiterRenderSystemConstants} from '../client-constants'
 import {getSequencersSchedulerInfo} from '../note-scanner'
+import {ECSAudioOutputEntity} from './ECSAudioOutputEntity'
 import {ECSCanvasRenderSystem} from './ECSCanvasRenderSystem'
 import {
-	ECSGraphPositionComponent, ECSNodeRendererComponent, ECSSequencerComponent,
+	ECSGraphPositionComponent, ECSLimiterComponent, ECSSequencerComponent,
 } from './ECSComponents'
+import {ECSLimiterRenderSystem} from './ECSLimiterRenderSystem'
 import {ECSSequencerEntity} from './ECSSequencerEntity'
 import {ECSSequencerRenderSystem} from './ECSSequencerRenderSystem'
 import {ECSEntity, ECSSystem} from './ECSTypes'
@@ -17,16 +20,31 @@ import {ECSEntity, ECSSystem} from './ECSTypes'
 let _store: Store<IClientAppState>
 let _systems: List<ECSSystem>
 let _entities: List<ECSEntity>
+let audioOutputEntities = List()
 
-export function getECSLoop(store: Store<IClientAppState>) {
+export function getECSLoop(store: Store<IClientAppState>, masterLimiter: DynamicsCompressorNode) {
 	_store = store
 
 	_systems = List<ECSSystem>([
 		new ECSCanvasRenderSystem(),
 		new ECSSequencerRenderSystem(),
+		new ECSLimiterRenderSystem(),
 	])
 
 	_entities = List<ECSEntity>()
+
+	audioOutputEntities = List([
+		new ECSAudioOutputEntity(
+			new ECSGraphPositionComponent({
+				id: MASTER_AUDIO_OUTPUT_TARGET_ID,
+			}),
+			new ECSLimiterComponent({
+				limiter: masterLimiter,
+				canvasId: limiterRenderSystemConstants.id,
+				valueId: limiterRenderSystemConstants.valueId,
+			}),
+		),
+	])
 
 	return {
 		ecsLoop,
@@ -49,9 +67,6 @@ function ecsLoop() {
 			: selectGroupSequencer(roomState, x.id),
 		)
 		.map(sequencer => new ECSSequencerEntity(
-			new ECSNodeRendererComponent({
-				color: 'green',
-			}),
 			new ECSGraphPositionComponent({
 				id: sequencer.id,
 				x: 0,
@@ -70,6 +85,7 @@ function ecsLoop() {
 			}),
 		))
 		.toList()
+		.concat(audioOutputEntities)
 
 	// iterate through _systems, and pass valid entities to them
 	_systems.forEach(system => {

@@ -27,3 +27,10 @@ const makeSequencerComp = Record({
 	isPlaying: false,
 })
 export class ECSSequencerComponent extends makeSequencerComp implements ECSComponent {}
+
+const makeLimiterComp = Record({
+	limiter: null as DynamicsCompressorNode | null,
+	canvasId: '',
+	valueId: '',
+})
+export class ECSLimiterComponent extends makeLimiterComp implements ECSComponent {}
