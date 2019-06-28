@@ -87,6 +87,7 @@
 	- [ ] feedback filter
 	- [ ] ping pong delay
 - [√] make it so you can only drag the title bar
+- [√] make knob drag area bigger
 - [ ] fix issue with noise getting stuck on
 - [ ] filter envelope
 - [ ] fix loading old saves
@@ -129,7 +130,7 @@
 - [ ] make select have label on left side with darker background
 - [ ] show edit icon to left of name on hover in top right
 - [ ] dragging something to edge of screen should pan for you
-- [ ] reverb dry/wet knobs
+- [√] reverb dry/wet knobs
 - [ ] compressor dry/wet knobs
 - [ ] background looking bad when zooming out
 - [ ] display error message when save fails

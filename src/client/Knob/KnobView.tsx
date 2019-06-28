@@ -37,6 +37,7 @@ export const KnobView = React.memo(function _KnobView(props: IKnobViewProps) {
 				height: 88,
 			}}
 			title={tooltip + '\n' + 'Ctrl + click or Cmd + click to reset'}
+			onMouseDown={handleMouseDown}
 		>
 			<div className="knobLabel unselectable">{label}</div>
 			<div
@@ -77,7 +78,6 @@ export const KnobView = React.memo(function _KnobView(props: IKnobViewProps) {
 					style={{
 						transform: `rotate(${_getRotation(percentage)}deg)`,
 					}}
-					onMouseDown={handleMouseDown}
 				>
 					<div className="mark" style={{backgroundColor: 'currentColor', borderRadius: 2}}></div>
 				</div>
