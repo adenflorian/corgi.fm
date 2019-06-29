@@ -32,15 +32,18 @@ function isNetworkAction(action: AnyAction | BroadcastAction) {
 }
 
 const processNetworkAction = (action: BroadcastAction, getState: () => IClientAppState) => {
-	action.source = selectLocalSocketId(getState())
-
-	if (getActionsBlacklist().includes(action.type) === false) {
-		logger.trace('sending action to server: ', action)
+	const actionToSend = {
+		...action,
+		source: selectLocalSocketId(getState()),
 	}
 
-	const event = determineEvent(action)
+	if (getActionsBlacklist().includes(actionToSend.type) === false) {
+		logger.trace('sending action to server: ', actionToSend)
+	}
 
-	socket.emit(event, action)
+	const event = determineEvent(actionToSend)
+
+	socket.emit(event, actionToSend)
 }
 
 function determineEvent(action: BroadcastAction) {

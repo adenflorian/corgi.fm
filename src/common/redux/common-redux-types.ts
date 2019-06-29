@@ -24,7 +24,7 @@ export function getClientReducers() {
 	}))
 }
 
-export interface BroadcastAction extends AnyAction {
+export interface BroadcastAction extends Readonly<AnyAction> {
 	alreadyBroadcasted: boolean
 	[BROADCASTER_ACTION]: any
 }
