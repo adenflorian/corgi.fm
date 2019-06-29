@@ -14,17 +14,22 @@ import {
 	selectPosition,
 	selectSequencerIsPlaying,
 } from '../common/redux'
-import {GetAllInstruments} from './instrument-manager'
+import {GetAllAudioNodes, GetAllInstruments} from './instrument-manager'
 import {getEvents} from './note-scheduler'
 
 let _store: ClientStore
 let _audioContext: AudioContext
 
-export function startNoteScanner(store: ClientStore, audioContext: AudioContext, getAllInstruments: GetAllInstruments) {
+export function startNoteScanner(
+	store: ClientStore,
+	audioContext: AudioContext,
+	getAllInstruments: GetAllInstruments,
+	getAllAudioNodes: GetAllAudioNodes,
+) {
 	logger.log('startNoteScanner')
 	_store = store
 	_audioContext = audioContext
-	return () => scheduleNotes(getAllInstruments)
+	return () => scheduleNotes(getAllInstruments, getAllAudioNodes)
 }
 
 // not sure if needed?
@@ -57,7 +62,10 @@ export function getCurrentSongIsPlaying() {
 	return _isPlaying
 }
 
-function scheduleNotes(getAllInstruments: GetAllInstruments) {
+function scheduleNotes(
+	getAllInstruments: GetAllInstruments,
+	getAllAudioNodes: GetAllAudioNodes,
+) {
 	const roomState = _store.getState().room
 
 	const {
@@ -68,12 +76,15 @@ function scheduleNotes(getAllInstruments: GetAllInstruments) {
 	const toBeats = (x: number) => x * (actualBPM / 60)
 	const fromBeats = (x: number) => x * (60 / actualBPM)
 
+	const currentAudioContextTime = _audioContext.currentTime
+
 	if (isPlaying !== _isPlaying) {
 		_isPlaying = isPlaying
 		logger.log('[note-scanner] isPlaying: ', isPlaying)
 		if (isPlaying) {
 			_justStarted = true
-			songStartTimeSeconds = _audioContext.currentTime
+			songStartTimeSeconds = currentAudioContextTime
+			// getAllAudioNodes().forEach(x => x.syncOscillatorStartTimes(songStartTimeSeconds, bpm))
 		} else {
 			// song stopped
 			// release all notes on all instruments
@@ -89,7 +100,7 @@ function scheduleNotes(getAllInstruments: GetAllInstruments) {
 	if (isMasterClockEnabled !== _isMasterClockEnabled) {
 		_isMasterClockEnabled = isMasterClockEnabled
 		if (_isMasterClockEnabled) {
-			lastAudioContextTime = _audioContext.currentTime
+			lastAudioContextTime = currentAudioContextTime
 		} else {
 
 		}
@@ -97,8 +108,8 @@ function scheduleNotes(getAllInstruments: GetAllInstruments) {
 
 	if (_isMasterClockEnabled === false) return
 
-	const deltaTimeSeconds = _audioContext.currentTime - lastAudioContextTime
-	lastAudioContextTime = _audioContext.currentTime
+	const deltaTimeSeconds = currentAudioContextTime - lastAudioContextTime
+	lastAudioContextTime = currentAudioContextTime
 
 	const deltaBeats = toBeats(deltaTimeSeconds)
 

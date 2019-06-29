@@ -15,8 +15,8 @@ interface IBasicSynthesizerOptions extends IInstrumentOptions {
 // TODO Make into a BasicSynthesizerAudioNode?
 export class BasicSynthesizer extends Instrument<SynthVoices, SynthVoice> {
 	private readonly _voices: SynthVoices
-	private readonly _lfo: OscillatorNode
 	private readonly _lfoGain: GainNode
+	private _lfo: OscillatorNode
 	private _lfoAmountMultiplier: number = 1
 	private _oscillatorType: ShamuOscillatorType
 	private _lfoRate: number
@@ -116,6 +116,19 @@ export class BasicSynthesizer extends Instrument<SynthVoices, SynthVoice> {
 		this._getVoices().setLfoTarget(target)
 
 		this._updateLfoTarget()
+	}
+
+	public readonly syncOscillatorStartTimes = (startTime: number, bpm: number) => {
+		this._lfo.stop()
+		this._lfo.disconnect()
+		this._lfo = this._audioContext.createOscillator()
+		this._lfo.connect(this._lfoGain)
+		// this._lfo.frequency.setValueAtTime(this._lfoRate, startTime)
+		this._updateLfoRate()
+		this._updateLfoWave()
+		this._updateLfoTarget()
+		this._updateLfoAmount()
+		this._lfo.start(startTime + (((bpm / 60) * this._lfoRate) / 16))
 	}
 
 	private readonly _updateLfoTarget = () => {

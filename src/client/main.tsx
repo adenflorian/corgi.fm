@@ -104,7 +104,7 @@ async function setupAsync() {
 
 	setupWebsocketAndListeners(store)
 
-	const {getAllInstruments} = setupInstrumentManager(store, audioContext, preFx)
+	const {getAllInstruments, getAllAudioNodes} = setupInstrumentManager(store, audioContext, preFx)
 
 	renderApp(store)
 
@@ -114,7 +114,7 @@ async function setupAsync() {
 
 	const schedulerVisualLoop = startSchedulerVisualLoop()
 
-	const noteScannerLoop = startNoteScanner(store, audioContext, getAllInstruments)
+	const noteScannerLoop = startNoteScanner(store, audioContext, getAllInstruments, getAllAudioNodes)
 
 	startMainRealTimeLoop(Object.freeze([
 		noteScannerLoop,

@@ -86,13 +86,19 @@
 	- [√] feedback %
 	- [ ] feedback filter
 	- [ ] ping pong delay
+	- [ ] bpm synced time knob
+	- [ ] separate left and right
 - [√] make it so you can only drag the title bar
 - [√] make knob drag area bigger
 - [ ] lock down audio node params min/max at instrument level
-- [ ] allow typing in knob values
-	- [ ] enforce min/max
+- [√] allow typing in knob values
+	- [√] enforce min/max
 	- [ ] make value look as similar to display value as possible
 	- [ ] make use of the existing value string functions
+- [ ] need visual to show that feedback loops are not possible
+- [ ] lfo re-trigger
+- [ ] zoom in and out from mouse position
+- [ ] test on android
 - [ ] fix issue with noise getting stuck on
 - [ ] filter envelope
 - [ ] fix loading old saves
@@ -157,6 +163,17 @@
 - [ ] master mixer
 - [ ] add colored icons on node add menu
 - [ ] positional audio
+- [ ] chorus
+- [ ] phaser
+- [ ] flanger
+- [ ] distortion
+
+
+
+# Ideas
+- https://github.com/danigb/soundfont-player
+- https://github.com/gleitz/midi-js-soundfonts
+- https://github.com/colinbdclark/sf2-parser
 
 # Now
 - [√] don't delete everything on disconnect

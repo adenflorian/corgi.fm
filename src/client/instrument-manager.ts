@@ -7,8 +7,8 @@ import {
 	MASTER_AUDIO_OUTPUT_TARGET_ID, selectAllBasicSynthesizerIds, selectAllSamplerIds,
 	selectAllSimpleCompressorIds, selectAllSimpleDelayIds,
 	selectAllSimpleReverbIds, selectBasicSynthesizer,
-	selectConnectionsWithSourceIds, selectPosition, selectSampler,
-	selectSimpleCompressor, selectSimpleDelay, selectSimpleReverb, SimpleCompressorState, SimpleDelayState, SimpleReverbState,
+	selectConnectionsWithSourceIds, selectGlobalClockState, selectPosition,
+	selectSampler, selectSimpleCompressor, selectSimpleDelay, selectSimpleReverb, SimpleCompressorState, SimpleDelayState, SimpleReverbState,
 } from '../common/redux'
 import {
 	AudioNodeWrapper, IAudioNodeWrapperOptions, IInstrumentOptions,
@@ -34,6 +34,8 @@ type UpdateSpecificEffect<E, S> = (effect: E, effectState: S) => void
 type StuffMap = Map<string, AudioNodeWrapper>
 
 export type GetAllInstruments = () => Map<string, Instrument<Voices<Voice>, Voice>>
+
+export type GetAllAudioNodes = () => StuffMap
 
 export const setupInstrumentManager = (
 	store: Store<IClientAppState>,
@@ -64,7 +66,7 @@ export const setupInstrumentManager = (
 
 	store.subscribe(updateInstrumentLayer)
 
-	return {getAllInstruments} as {getAllInstruments: GetAllInstruments}
+	return {getAllInstruments, getAllAudioNodes} as {getAllInstruments: GetAllInstruments, getAllAudioNodes: GetAllAudioNodes}
 
 	function updateInstrumentLayer() {
 		const state = store.getState()
@@ -76,6 +78,8 @@ export const setupInstrumentManager = (
 		}
 
 		previousState = state
+
+		const bpm = selectGlobalClockState(state.room).bpm
 
 		handleSamplers()
 		handleBasicSynthesizers()
@@ -129,6 +133,7 @@ export const setupInstrumentManager = (
 					instrument.setDetune(instrumentState.fineTuning)
 					instrument.setGain(instrumentState.gain)
 					instrument.setLfoRate(instrumentState.lfoRate)
+					// instrument.setLfoRate((bpm / 60) * instrumentState.lfoRate)
 					instrument.setLfoAmount(instrumentState.lfoAmount)
 					instrument.setLfoWave(instrumentState.lfoWave)
 					instrument.setLfoTarget(instrumentState.lfoTarget)
@@ -273,6 +278,10 @@ export const setupInstrumentManager = (
 			.concat(
 				stuffMaps.get(ConnectionNodeType.basicSynthesizer)!,
 			) as Map<string, Instrument<Voices<Voice>, Voice>>
+	}
+
+	function getAllAudioNodes() {
+		return stuffMaps.flatMap(x => x)
 	}
 
 	function deleteStuffThatNeedsToBe(nodeType: ConnectionNodeType, thingIds: string[]) {

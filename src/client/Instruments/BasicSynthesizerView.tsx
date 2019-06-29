@@ -15,11 +15,12 @@ import {
 	adsrValueToString, attackToolTip, decayToolTip, detuneToolTip, detuneValueToString,
 	filterAttackToolTip, filterDecayToolTip, filterReleaseToolTip, filterSustainToolTip,
 	filterToolTip, filterValueToString, gainToolTip, lfoRateValueToString,
-	panToolTip, panValueToString, percentageValueString, releaseToolTip, sustainToolTip,
+	panToolTip, panValueToString, percentageValueString, releaseToolTip, seqRateValueToString, sustainToolTip,
 } from '../client-constants'
 import {Knob} from '../Knob/Knob'
 import {KnobSnapping} from '../Knob/KnobSnapping'
 import {Panel} from '../Panel/Panel'
+import {rateValues} from '../WebAudio'
 import {ConnectedNoteSchedulerVisualPlaceholder} from '../WebAudio/SchedulerVisual'
 import {BasicSynthesizerOscillatorTypes} from './BasicSynthesizerOscillatorTypes'
 import './BasicSynthesizerView.less'
@@ -188,6 +189,16 @@ export class BasicSynthesizerView
 								tooltip={'how fast it wobble'}
 								valueString={lfoRateValueToString}
 							/>
+							{/* <KnobSnapping
+								value={this.props.lfoRate}
+								defaultIndex={rateValues.indexOf(1 / 4)}
+								onChange={this._dispatchChangeInstrumentParam}
+								label="Rate"
+								onChangeId={BasicSynthesizerParam.lfoRate}
+								tooltip={'how fast it wobble'}
+								valueString={seqRateValueToString}
+								possibleValues={rateValues}
+							/> */}
 							<Knob
 								min={0}
 								max={1}

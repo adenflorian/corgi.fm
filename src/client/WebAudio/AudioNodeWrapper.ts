@@ -214,6 +214,8 @@ export abstract class AudioNodeWrapper implements IDisposable {
 
 		input.connect(output)
 	}
+
+	public readonly syncOscillatorStartTimes = (startTime: number, bpm: number) => {}
 }
 
 function detectFeedbackLoop(nodeWrapper: AudioNodeWrapper, i = 0, nodeIds: List<string> = List<string>()): boolean {
