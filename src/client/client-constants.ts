@@ -9,6 +9,7 @@ export const panToolTip = stripIndents`
 	Controls how far left and right the sound is
 `
 export const filterToolTip = stripIndents`
+	Filter
 	Shapes the sound, usually by attenuating certain frequencies
 `
 export const gainToolTip = stripIndents`
@@ -24,6 +25,7 @@ export const decayToolTip = stripIndents`
 	The time it takes from the end of the attack until the sustain volume
 `
 export const sustainToolTip = stripIndents`
+	Sustain
 	Amplitude of note after decay
 `
 export const releaseToolTip = stripIndents`
@@ -47,12 +49,15 @@ export const detuneToolTip = stripIndents`
 	Fine grained pitch control, where 100% is 1 half step above the current note
 `
 export const sequencerGateToolTip = stripIndents`
+	Gate
 	Controls how long each note is held down before releasing
 `
 export const sequencerPitchToolTip = stripIndents`
+	Pitch
 	Controls note midi pitch in half steps
 `
 export const sequencerRateToolTip = stripIndents`
+	Rate
 	Controls note length and sequencer length
 	Rate is for each note
 	Meaning, at 1/4, each note is a quarter note
@@ -64,8 +69,9 @@ export const sequencerStopToolTip = stripIndents`
 	Stop this sequencer
 `
 export const sequencerRecordToolTip = stripIndents`
-	Toggle record mode
-	You must plugin a keyboard into this sequencer to record notes
+	Record
+	Toggles record mode
+	You must connect a virtual keyboard into this sequencer to record notes
 `
 export const sequencerDownloadToolTip = stripIndents`
 	Download MIDI

@@ -42,6 +42,8 @@ export const MasterControls: React.FC<IMasterControlsProps & IMasterControlsRedu
 				tooltip="Beats per minute"
 				valueString={v => `${v.toFixed(2).replace('.00', '')} bpm`}
 				increment={1}
+				fineIncrement={0.01}
+				allowAltKey={true}
 			/>
 			{/* <Knob
 				label="Max Read Ahead"

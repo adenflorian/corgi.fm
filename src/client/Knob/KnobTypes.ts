@@ -2,7 +2,6 @@ export interface KnobBaseProps {
 	label: string
 	onChangeId?: any
 	readOnly?: boolean
-	value: KnobValues
 	tooltip: string
 }
 

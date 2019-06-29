@@ -2,6 +2,7 @@ import {List} from 'immutable'
 import * as React from 'react'
 import './Knob.less'
 import {KnobBaseProps} from './KnobTypes'
+import {KnobValueOther} from './KnobValueOther'
 import {KnobView} from './KnobView'
 import {SliderControllerSnapping} from './SliderControllerSnapping'
 
@@ -11,6 +12,7 @@ interface Props extends KnobBaseProps {
 	defaultIndex: number
 	valueString?: (value: number) => string
 	possibleValues: List<any>
+	value: any
 }
 
 export const KnobSnapping = React.memo(function _KnobSnapping(props: Props) {
@@ -39,9 +41,10 @@ export const KnobSnapping = React.memo(function _KnobSnapping(props: Props) {
 					readOnly={readOnly}
 					handleMouseDown={handleMouseDown}
 					tooltip={tooltip}
-					value={value}
-					valueString={valueString}
-				/>
+					canEdit={false}
+				>
+					<KnobValueOther value={value} valueString={valueString} />
+				</KnobView>
 			}
 		</SliderControllerSnapping>
 	)

@@ -1,4 +1,5 @@
 import React, {useLayoutEffect, useState} from 'react'
+import {incrementalRound} from '../../common/common-utils'
 import './Knob.less'
 
 interface Props {
@@ -9,11 +10,14 @@ interface Props {
 	defaultValue: number
 	children: (handleMouseDown: any, percentage: number, adjustedPercentage: number) => any
 	increment: number
+	fineIncrement?: number
+	allowAltKey?: boolean
 }
 
 export function SliderControllerIncremental(props: Props) {
 	const {
 		value, onChange, increment, defaultValue, children, min, max,
+		allowAltKey = false, fineIncrement,
 	} = props
 
 	const [isMouseDown, setIsMouseDown] = useState(false)
@@ -47,7 +51,9 @@ export function SliderControllerIncremental(props: Props) {
 
 			const newTempValue = clamp(tempValue - mouseYDelta, min, max)
 
-			const roundedValue = e.altKey ? newTempValue : clamp(_round(newTempValue), min, max)
+			const roundedValue = (allowAltKey && e.altKey && fineIncrement !== undefined)
+				? clamp(incrementalRound(newTempValue, fineIncrement), min, max)
+				: clamp(incrementalRound(newTempValue, increment), min, max)
 
 			if (roundedValue !== value) {
 				onChange(roundedValue)
@@ -55,9 +61,6 @@ export function SliderControllerIncremental(props: Props) {
 
 			setTempValue(newTempValue)
 		}
-	}
-	function _round(v: number): number {
-		return Math.round(v / increment) * increment
 	}
 
 	function _normalize(v: number): number {

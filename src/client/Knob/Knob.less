@@ -97,21 +97,34 @@
         .smallFont();
         position: relative;
         bottom: 8px;
-
-        .saturate & {
-            filter: saturate(300%);
-        }
-    }
-
-    .knobValueForm {
         display: flex;
 
-        input.knobValue {
+        input {
             background-color: @panelGrayDark;
             border: none;
             text-align: center;
             width: 48px;
             padding: 0;
+            color: inherit;
+            font-size: inherit;
+            font-family: inherit;
+            word-spacing: inherit;
+            text-transform: inherit;
+            text-indent: inherit;
+            text-shadow: inherit;
+            display: inherit;
+            -webkit-rtl-ordering: inherit;
+            cursor: inherit;
+            margin: inherit;
+            font: inherit;
+            appearance: inherit;
+            letter-spacing: inherit;
+            writing-mode: inherit;
+            text-rendering: inherit;
+        }
+
+        .saturate & {
+            filter: saturate(300%);
         }
     }
 

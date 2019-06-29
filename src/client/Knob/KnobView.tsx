@@ -1,7 +1,7 @@
+import {stripIndents} from 'common-tags'
 import * as React from 'react'
 import {ActualKnob} from './ActualKnob'
 import './Knob.less'
-import {KnobValue} from './KnobValue'
 
 interface IKnobViewProps {
 	label: string
@@ -11,17 +11,14 @@ interface IKnobViewProps {
 	markColor?: string
 	handleMouseDown: (e: React.MouseEvent) => any
 	tooltip: string
-	value: number | string | boolean
-	valueString?: (value: number) => string
-	onValueChange?: (value: number) => void
-	max?: number
-	min?: number
+	children: React.ReactNode
+	canEdit: boolean
 }
 
 export const KnobView = React.memo(function _KnobView(props: IKnobViewProps) {
 	const {
-		handleMouseDown, percentage, valueString, onValueChange,
-		label, value, readOnly = false, tooltip, min, max,
+		handleMouseDown, percentage, canEdit,
+		label, readOnly = false, tooltip, children,
 	} = props
 
 	return (
@@ -31,12 +28,16 @@ export const KnobView = React.memo(function _KnobView(props: IKnobViewProps) {
 				width: 64,
 				height: 88,
 			}}
-			title={tooltip + '\n' + 'Ctrl + click or Cmd + click to reset'}
+			title={tooltip + '\n\n' + stripIndents`
+				Ctrl + click or Cmd + click to reset
+				Hold Alt for fine control
+				Hold Shift for coarse control
+				${canEdit ? `Click value to edit` : ``}`}
 			onMouseDown={handleMouseDown}
 		>
 			<div className="knobLabel unselectable">{label}</div>
 			<ActualKnob percentage={percentage} />
-			<KnobValue value={value} valueString={valueString} onValueChange={onValueChange} min={min} max={max} />
+			{children}
 		</div>
 	)
 })

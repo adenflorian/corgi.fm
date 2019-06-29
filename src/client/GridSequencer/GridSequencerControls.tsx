@@ -1,6 +1,5 @@
-import {List} from 'immutable'
 import _ from 'lodash'
-import * as React from 'react'
+import React from 'react'
 import {
 	IoMdDownload as Download, IoMdPlay as Play, IoMdRecording as Record,
 	IoMdSquare as Stop, IoMdTrash as Clear, IoMdUndo as Undo,

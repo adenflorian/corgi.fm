@@ -1,6 +1,7 @@
-import * as React from 'react'
+import React from 'react'
 import './Knob.less'
 import {KnobBaseProps} from './KnobTypes'
+import {KnobValueNumber} from './KnobValueNumber'
 import {KnobView} from './KnobView'
 import {SliderController} from './SliderController'
 
@@ -41,10 +42,16 @@ export const Knob = React.memo(function _Knob(props: IKnobProps) {
 					readOnly={readOnly}
 					handleMouseDown={handleMouseDown}
 					tooltip={tooltip}
-					value={value}
-					valueString={valueString}
-					onValueChange={_handleOnChange}
-				/>
+					canEdit={true}
+				>
+					<KnobValueNumber
+						value={value}
+						valueString={valueString}
+						onValueChange={_handleOnChange}
+						min={min}
+						max={max}
+					/>
+				</KnobView>
 			}
 		</SliderController>
 	)

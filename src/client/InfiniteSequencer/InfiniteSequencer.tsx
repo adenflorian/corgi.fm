@@ -22,6 +22,7 @@ import {
 	sequencerUndoToolTip,
 } from '../client-constants'
 import {Knob} from '../Knob/Knob'
+import {KnobIncremental} from '../Knob/KnobIncremental'
 import {KnobSnapping} from '../Knob/KnobSnapping'
 import {Panel} from '../Panel/Panel'
 import {rateValues} from '../WebAudio/music-functions'
@@ -158,15 +159,17 @@ export const InfiniteSequencer: React.FC<IInfiniteSequencerAllProps> = React.mem
 									tooltip={sequencerGateToolTip}
 									valueString={percentageValueString}
 								/>
-								<KnobSnapping
+								<KnobIncremental
+									min={-12}
+									max={12}
 									value={props.pitch}
-									defaultIndex={12}
+									defaultValue={0}
 									onChange={dispatchInfiniteSeqParam}
 									label="Pitch"
 									onChangeId={InfiniteSequencerFields.pitch}
 									tooltip={sequencerPitchToolTip}
 									valueString={seqPitchValueToString}
-									possibleValues={List(_.range(-12, 13))}
+									increment={1}
 								/>
 								<KnobSnapping
 									value={props.rate}

@@ -60,3 +60,7 @@ export function getNumberInRangeFromString(str: string, length: number) {
 export function createNodeId() {
 	return uuid.v4()
 }
+
+export const clamp = (val: number, min: number, max: number) => Math.min(max, Math.max(min, val))
+
+export const incrementalRound = (v: number, increment: number) => Math.round(v / increment) * increment
