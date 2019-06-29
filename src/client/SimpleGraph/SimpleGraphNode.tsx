@@ -63,7 +63,6 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 				}}
 				handle={`.${handleClassName}`}
 				cancel={/*`.actualKnob, .note, .key, .controls > *, .oscillatorTypes > *, .verticalScrollBar, .groupEvent, */`.noDrag, .panel`}
-				onMouseDown={this._handleMouseDown}
 			>
 				<div
 					className={`simpleGraphNode ${selectedNode && selectedNode.id === positionId ? 'selectedNode' : ''}`}
