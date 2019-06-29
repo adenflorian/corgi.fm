@@ -15,8 +15,8 @@ interface Props extends KnobBaseProps {
 
 export const KnobSnapping = React.memo(function _KnobSnapping(props: Props) {
 	const {
-		value, label = '', readOnly = false, markColor = 'currentColor', onChangeId,
-		size = 32, tooltip, valueString, onChange,
+		value, label = '', readOnly = false, onChangeId,
+		tooltip, valueString, onChange,
 		possibleValues, defaultIndex,
 	} = props
 
@@ -37,9 +37,7 @@ export const KnobSnapping = React.memo(function _KnobSnapping(props: Props) {
 					adjustedPercentage={adjustedPercentage}
 					label={label}
 					readOnly={readOnly}
-					markColor={markColor}
 					handleMouseDown={handleMouseDown}
-					size={size}
 					tooltip={tooltip}
 					value={value}
 					valueString={valueString}

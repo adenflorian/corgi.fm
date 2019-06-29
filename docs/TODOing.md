@@ -88,7 +88,11 @@
 	- [ ] ping pong delay
 - [√] make it so you can only drag the title bar
 - [√] make knob drag area bigger
+- [ ] lock down audio node params min/max at instrument level
 - [ ] allow typing in knob values
+	- [ ] enforce min/max
+	- [ ] make value look as similar to display value as possible
+	- [ ] make use of the existing value string functions
 - [ ] fix issue with noise getting stuck on
 - [ ] filter envelope
 - [ ] fix loading old saves
@@ -142,6 +146,8 @@
 - [ ] give feedback when saving to browser
 
 # 0.6.0
+- [ ] if user plays mary had a little lamb, the lick, or megalovania, do something
+- [ ] if user programs a sequence that references an existing song, do something
 - [ ] allow replacing nodes in place to keep connections
 - [ ] put bottom right info in own component outside chat stuff so you can click without activating chat
 - [ ] show progress bar on reverb when loading new impulse

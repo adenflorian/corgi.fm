@@ -11,12 +11,13 @@ interface Props extends KnobBaseProps {
 	defaultValue: number
 	valueString?: (value: number) => string
 	increment: number
+	value: number
 }
 
 export const KnobIncremental = React.memo(function _KnobIncremental(props: Props) {
 	const {
-		value, label = '', readOnly = false, markColor = 'currentColor', onChangeId,
-		size = 32, tooltip, valueString, onChange,
+		value, label = '', readOnly = false, onChangeId,
+		tooltip, valueString, onChange,
 		increment, defaultValue, min, max,
 	} = props
 
@@ -39,9 +40,7 @@ export const KnobIncremental = React.memo(function _KnobIncremental(props: Props
 					adjustedPercentage={adjustedPercentage}
 					label={label}
 					readOnly={readOnly}
-					markColor={markColor}
 					handleMouseDown={handleMouseDown}
-					size={size}
 					tooltip={tooltip}
 					value={value}
 					valueString={valueString}

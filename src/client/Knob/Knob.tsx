@@ -11,12 +11,13 @@ interface IKnobProps extends KnobBaseProps {
 	onChange: (onChangeId: any, newValue: number) => any
 	defaultValue: number
 	valueString?: (value: number) => string
+	value: number
 }
 
 export const Knob = React.memo(function _Knob(props: IKnobProps) {
 	const {
-		value, label = '', readOnly = false, markColor = 'currentColor', defaultValue, onChangeId,
-		min = 0, max = 1, curve = 1, size = 32, tooltip, valueString, onChange = () => undefined,
+		value, label = '', readOnly = false, defaultValue, onChangeId,
+		min = 0, max = 1, curve = 1, tooltip, valueString, onChange = () => undefined,
 	} = props
 
 	const _handleOnChange = (newValue: number) => {
@@ -38,12 +39,11 @@ export const Knob = React.memo(function _Knob(props: IKnobProps) {
 					adjustedPercentage={adjustedPercentage}
 					label={label}
 					readOnly={readOnly}
-					markColor={markColor}
 					handleMouseDown={handleMouseDown}
-					size={size}
 					tooltip={tooltip}
 					value={value}
 					valueString={valueString}
+					onValueChange={_handleOnChange}
 				/>
 			}
 		</SliderController>

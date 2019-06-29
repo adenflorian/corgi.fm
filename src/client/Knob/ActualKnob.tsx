@@ -3,11 +3,12 @@ import {CssColor} from '../../common/shamu-color'
 
 interface Props {
 	percentage: number
-	size: number
 }
 
 export const ActualKnob = React.memo(function _ActualKnob(props: Props) {
-	const {percentage, size = 32} = props
+	const {percentage} = props
+
+	const size = 32
 
 	return (
 		<div

@@ -10,16 +10,18 @@ interface IKnobViewProps {
 	readOnly?: boolean
 	markColor?: string
 	handleMouseDown: (e: React.MouseEvent) => any
-	size: number
 	tooltip: string
 	value: number | string | boolean
 	valueString?: (value: number) => string
+	onValueChange?: (value: number) => void
+	max?: number
+	min?: number
 }
 
 export const KnobView = React.memo(function _KnobView(props: IKnobViewProps) {
 	const {
-		handleMouseDown, percentage, size = 32, valueString,
-		label, value, readOnly = false, tooltip,
+		handleMouseDown, percentage, valueString, onValueChange,
+		label, value, readOnly = false, tooltip, min, max,
 	} = props
 
 	return (
@@ -33,8 +35,8 @@ export const KnobView = React.memo(function _KnobView(props: IKnobViewProps) {
 			onMouseDown={handleMouseDown}
 		>
 			<div className="knobLabel unselectable">{label}</div>
-			<ActualKnob percentage={percentage} size={size} />
-			<KnobValue value={value} valueString={valueString} />
+			<ActualKnob percentage={percentage} />
+			<KnobValue value={value} valueString={valueString} onValueChange={onValueChange} min={min} max={max} />
 		</div>
 	)
 })
