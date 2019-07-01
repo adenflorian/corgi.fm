@@ -8,6 +8,7 @@
 			"type": "process",
 			"dependsOn": [
 				"watch-parcel",
+				"watch-ts-client",
 				"watch-server"
 			],
 			"problemMatcher": []
@@ -36,6 +37,24 @@
 			"command": [
 				"yarn",
 				"watch-server"
+			],
+			"presentation": {
+				"group": "groupA",
+				"showReuseMessage": false,
+				"panel": "dedicated",
+				"focus": true
+			},
+			"problemMatcher": [],
+			"runOptions": {
+				"runOn": "folderOpen"
+			}
+		},
+		{
+			"label": "watch-ts-client",
+			"type": "shell",
+			"command": [
+				"yarn",
+				"watch-ts-client"
 			],
 			"presentation": {
 				"group": "groupA",
