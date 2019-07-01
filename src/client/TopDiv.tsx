@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React from 'react'
 import {Dispatch} from 'redux'
 import {rateLimitedDebounceNoTrail} from '../common/common-utils'
 import {IClientState, selectClientById, selectLocalClientId, selectMemberCount, selectRoomSettings} from '../common/redux'

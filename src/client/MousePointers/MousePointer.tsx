@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React from 'react'
 import {connect} from 'react-redux'
 import {IClientAppState, selectClientById, selectPointer} from '../../common/redux'
 import {CssColor} from '../../common/shamu-color'

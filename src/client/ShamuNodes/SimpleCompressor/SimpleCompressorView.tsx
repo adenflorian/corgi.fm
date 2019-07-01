@@ -1,5 +1,5 @@
 import {stripIndents} from 'common-tags'
-import * as React from 'react'
+import React from 'react'
 import {Dispatch} from 'redux'
 import {
 	getConnectionNodeInfo, selectSimpleCompressor, setSimpleCompressorParam,

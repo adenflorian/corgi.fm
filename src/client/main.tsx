@@ -1,5 +1,5 @@
 import 'babel-polyfill'
-import * as React from 'react'
+import React from 'react'
 import * as ReactGA from 'react-ga'
 import {Middleware} from 'redux'
 import {

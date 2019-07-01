@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React from 'react'
 import {Component} from 'react'
 import AutosizeInput from 'react-input-autosize'
 import {connect} from 'react-redux'

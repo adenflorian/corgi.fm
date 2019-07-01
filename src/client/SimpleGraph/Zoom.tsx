@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React from 'react'
 import {ContextMenuTrigger} from 'react-contextmenu'
 import {Point} from '../../common/common-types'
 import {selectLocalClientId, selectOptions, selectRoomSettings} from '../../common/redux'

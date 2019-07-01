@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React from 'react'
 import {ContextMenuTrigger} from 'react-contextmenu'
 import Draggable, {DraggableEventHandler} from 'react-draggable'
 import {Dispatch} from 'redux'

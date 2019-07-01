@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React from 'react'
 import {
 	IoMdPlay as Play, IoMdSquare as Stop,
 } from 'react-icons/io'

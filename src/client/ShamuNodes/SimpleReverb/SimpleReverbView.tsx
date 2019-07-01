@@ -1,6 +1,6 @@
 import {stripIndents} from 'common-tags'
 import {List} from 'immutable'
-import * as React from 'react'
+import React from 'react'
 import {Dispatch} from 'redux'
 import {allBuiltInBQFilterTypes} from '../../../common/OscillatorTypes'
 import {

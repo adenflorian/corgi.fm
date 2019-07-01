@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React from 'react'
 import {selectAllConnectionIds, shamuConnect} from '../../common/redux'
 import {ConnectedConnectionView} from './ConnectionView'
 

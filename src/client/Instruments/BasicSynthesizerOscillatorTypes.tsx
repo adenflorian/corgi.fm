@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React from 'react'
 import ReactSVG from 'react-svg'
 import {BuiltInOscillatorType, CustomOscillatorType, ShamuOscillatorType} from '../../common/OscillatorTypes'
 import NoiseWave from './NoiseWave.svg'

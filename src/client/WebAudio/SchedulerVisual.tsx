@@ -1,5 +1,5 @@
 import {Map, OrderedMap} from 'immutable'
-import * as React from 'react'
+import React from 'react'
 import ReactDOM from 'react-dom'
 import {Store} from 'redux'
 import {logger} from '../../common/logger'

@@ -1,5 +1,5 @@
 import {List} from 'immutable'
-import * as React from 'react'
+import React from 'react'
 import {Component} from 'react'
 import {changeRoom, selectActiveRoom, selectAllRoomNames, shamuConnect} from '../common/redux'
 import {Select} from './Select/Select'

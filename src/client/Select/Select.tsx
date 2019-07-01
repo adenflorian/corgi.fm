@@ -1,5 +1,5 @@
 import {List} from 'immutable'
-import * as React from 'react'
+import React from 'react'
 import {CssColor} from '../../common/shamu-color'
 import {Panel} from '../Panel/Panel'
 import './Select.less'

@@ -1,5 +1,5 @@
 import {List} from 'immutable'
-import * as React from 'react'
+import React from 'react'
 import './Knob.less'
 import {KnobBaseProps} from './KnobTypes'
 import {KnobValueOther} from './KnobValueOther'

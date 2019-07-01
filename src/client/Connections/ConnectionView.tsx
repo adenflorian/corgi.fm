@@ -1,6 +1,6 @@
 import {stripIndent} from 'common-tags'
 import {List} from 'immutable'
-import * as React from 'react'
+import React from 'react'
 import {Dispatch} from 'redux'
 import {ClientId} from '../../common/common-types'
 import {

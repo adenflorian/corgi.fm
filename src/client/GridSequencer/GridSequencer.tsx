@@ -1,5 +1,5 @@
 import {stripIndents} from 'common-tags'
-import * as React from 'react'
+import React from 'react'
 import {seqLengthValueToString} from '../client-constants'
 import {Panel} from '../Panel/Panel'
 import {GridSequencerControlsConnected} from './GridSequencerControls'

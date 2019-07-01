@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React from 'react'
 import {selectLocalClientId, selectRoomSettings, shamuConnect} from '../common/redux'
 import {ConnectedChat} from './Chat'
 import {ConnectedContextMenuContainer} from './ContextMenu/ContextMenuContainer'

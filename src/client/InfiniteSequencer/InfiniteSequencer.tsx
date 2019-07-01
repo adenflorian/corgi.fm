@@ -1,7 +1,7 @@
 import {stripIndents} from 'common-tags'
 import {List} from 'immutable'
 import _ from 'lodash'
-import * as React from 'react'
+import React from 'react'
 import {
 	IoMdDownload as Download, IoMdGrid as Rows, IoMdPlay as Play, IoMdRecording as Record, IoMdSquare as Stop,
 	IoMdStar as Star, IoMdTrash as Clear, IoMdUndo as Undo,

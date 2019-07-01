@@ -1,5 +1,5 @@
 import {Seq} from 'immutable'
-import * as React from 'react'
+import React from 'react'
 import {shamuConnect} from '../../common/redux'
 import {selectAllPositionIds} from '../../common/redux'
 import {mainBoardsId} from '../client-constants'
