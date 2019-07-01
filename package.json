@@ -6,7 +6,8 @@
   "scripts": {
     "start": "yarn clean && concurrently --names \"parcel,server\" \"yarn watch-parcel\" \"yarn watch-server\"",
     "watch-parcel": "parcel src/client/index.html",
-    "watch-server": "ts-node-dev --respawn --transpileOnly --notify false --inspect --project src/server/tsconfig.json src/server/server.ts",
+    "watch-server": "ts-node-dev --respawn --notify false --inspect --project src/server/tsconfig.json src/server/server.ts",
+    "watch-server-old": "ts-node-dev --respawn --transpileOnly --notify false --inspect --project src/server/tsconfig.json src/server/server.ts",
     "start-prod": "NODE_ENV=production pm2 start server/server.js",
     "start-prod-docker": "NODE_ENV=production pm2-runtime built/server/server.js",
     "lint": "eslint . && tslint src/client/**/*.ts* --project src/client/tsconfig.json && tslint src/server/**/*.ts* --project src/server/tsconfig.json && tslint src/common/**/*.ts* --project src/common/tsconfig.json ",
