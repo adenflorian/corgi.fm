@@ -1,3 +1,41 @@
+# Redesign
+- [√] title bar on nodes
+- [√] put "corgi.fm" in bottom right by version
+- [√] chat
+- [√] put name in top right
+- [√] put button links in a button with out link icon
+- [√] chat input min width
+- [√] options
+- [√] loading modal
+- [√] Connecting...
+- [√] keyboard label
+- [√] grid sequencer
+
+# 0.4.0
+- [√] add enable/disable to positions state
+	- [√] make disabling do something for every node
+		- [√] effects should pass thru
+		- [√] instruments shouldn't output anything
+		- [√] sequencers shouldnt play notes
+		- [√] master volume should mute
+		- [√] master clock should not run
+		- [√] group seq should not let anything connected play
+- [√] track selected node
+	- [√] ctrl z should send undo to selected node
+- [√] infinite sequencer
+	- [√] click and drag to play all notes
+	- [√] don't play other notes when holding shift
+	- [√] only play notes if infinite seq selected*****
+- [√] fix seq rate knob
+	- [√] make rate value string display proper stuff
+	- [√] display note length and sequencer length
+- [√] chat input bottom is taking clicks
+- [√] fix up group sequencer
+	- [√] fix spacing with multiple connections
+	- [√] be able to drag new connector from each port
+
+
+
 - [√] high level sequencer (Group Sequencer)
 	- doesn't control notes, but whole song sections
 	- different colored sections
