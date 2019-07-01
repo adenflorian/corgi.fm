@@ -70,7 +70,6 @@ export class VolumeControl extends Component<IVolumeControlAllProps> {
 					onChange={this.props.changeMasterVolume}
 					min={0}
 					max={0.5}
-					markColor={color}
 					tooltip={stripIndents`Local master volume
 						Will only control the volume for you
 						It won't affect other users`}

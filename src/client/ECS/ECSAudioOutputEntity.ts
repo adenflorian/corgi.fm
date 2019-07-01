@@ -1,11 +1,11 @@
 import {List} from 'immutable'
-import {ECSAudioOutputComponent, ECSGraphPositionComponent} from './ECSComponents'
+import {ECSGraphPositionComponent, ECSLimiterComponent} from './ECSComponents'
 import {ECSComponentType, ECSEntity} from './ECSTypes'
 
 export class ECSAudioOutputEntity extends ECSEntity {
 	constructor(
 		private readonly _graphPositionComponent: ECSGraphPositionComponent,
-		private readonly _audioOutputComponent: ECSAudioOutputComponent,
+		private readonly _audioOutputComponent: ECSLimiterComponent,
 	) {
 		super()
 	}
@@ -21,7 +21,7 @@ export class ECSAudioOutputEntity extends ECSEntity {
 		return this._graphPositionComponent
 	}
 
-	public getAudioOutputComponent(): ECSAudioOutputComponent | undefined {
+	public getAudioOutputComponent(): ECSLimiterComponent | undefined {
 		return this._audioOutputComponent
 	}
 }
