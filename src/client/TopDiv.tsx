@@ -40,7 +40,7 @@ export const TopDiv = ({memberCount, clientCount, info, isClientReady, roomOwner
 			</div>
 			<div className="blob" style={{overflow: 'hidden'}}>
 				<span className="blobDark">Zoom</span>
-				<span id="zoomText">1</span>
+				<span id="zoomText">0.0</span>
 			</div>
 			<div className="blob">
 				<div className="blobDark">Online Users</div>
