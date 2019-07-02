@@ -21,6 +21,7 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 	protected _lowPassFilterCutoffFrequency: number = 20000
 	protected _detune: number = 0
 	private readonly _gain: GainNode
+	protected readonly _lfoGainTarget: GainNode
 
 	constructor(options: IInstrumentOptions) {
 		super(options)
@@ -33,12 +34,16 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 		this._filter.type = 'lowpass'
 		this._filter.frequency.value = 10000
 
+		this._lfoGainTarget = this._audioContext.createGain()
+		this._lfoGainTarget.gain.value = 1
+
 		this._gain = this._audioContext.createGain()
 		// Just below 1 to help mitigate an infinite feedback loop
 		this._gain.gain.value = 1
 
 		this._panNode.connect(this._filter)
-		this._filter.connect(this._gain)
+		this._filter.connect(this._lfoGainTarget)
+		this._lfoGainTarget.connect(this._gain)
 
 		registerInstrumentWithSchedulerVisual(this.id, () => this._getVoices().getScheduledVoices(), this._audioContext)
 	}

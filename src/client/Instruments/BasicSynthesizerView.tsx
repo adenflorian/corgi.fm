@@ -179,8 +179,8 @@ export class BasicSynthesizerView
 						<div className="knobs">
 							<Knob
 								min={0}
-								max={12000}
-								curve={4}
+								max={32}
+								curve={3}
 								value={this.props.lfoRate}
 								defaultValue={0}
 								onChange={this._dispatchChangeInstrumentParam}

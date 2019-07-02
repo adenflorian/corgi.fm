@@ -16,13 +16,14 @@ interface IBasicSynthesizerOptions extends IInstrumentOptions {
 export class BasicSynthesizer extends Instrument<SynthVoices, SynthVoice> {
 	private readonly _voices: SynthVoices
 	private readonly _lfoGain: GainNode
-	private _lfo: OscillatorNode
+	private readonly _lfo: OscillatorNode
 	private _lfoAmountMultiplier: number = 1
 	private _oscillatorType: ShamuOscillatorType
 	private _lfoRate: number
 	private _lfoAmount: number
 	private _lfoTarget: SynthLfoTarget
 	private _lfoWave: LfoOscillatorType
+	private readonly _lfoWaveShaper: WaveShaperNode
 
 	constructor(options: IBasicSynthesizerOptions) {
 		super(options)
@@ -42,7 +43,10 @@ export class BasicSynthesizer extends Instrument<SynthVoices, SynthVoice> {
 		this._lfoGain = options.audioContext.createGain()
 		this._updateLfoAmount()
 
-		this._lfo.connect(this._lfoGain)
+		this._lfoWaveShaper = this._audioContext.createWaveShaper()
+
+		this._lfo.connect(this._lfoWaveShaper)
+		this._lfoWaveShaper.connect(this._lfoGain)
 
 		this._updateLfoTarget()
 
@@ -119,16 +123,16 @@ export class BasicSynthesizer extends Instrument<SynthVoices, SynthVoice> {
 	}
 
 	public readonly syncOscillatorStartTimes = (startTime: number, bpm: number) => {
-		this._lfo.stop()
-		this._lfo.disconnect()
-		this._lfo = this._audioContext.createOscillator()
-		this._lfo.connect(this._lfoGain)
-		// this._lfo.frequency.setValueAtTime(this._lfoRate, startTime)
-		this._updateLfoRate()
-		this._updateLfoWave()
-		this._updateLfoTarget()
-		this._updateLfoAmount()
-		this._lfo.start(startTime + (((bpm / 60) * this._lfoRate) / 16))
+		// this._lfo.stop()
+		// this._lfo.disconnect()
+		// this._lfo = this._audioContext.createOscillator()
+		// this._lfo.connect(this._lfoGain)
+		// // this._lfo.frequency.setValueAtTime(this._lfoRate, startTime)
+		// this._updateLfoRate()
+		// this._updateLfoWave()
+		// this._updateLfoTarget()
+		// this._updateLfoAmount()
+		// this._lfo.start(startTime + (((bpm / 60) * this._lfoRate) / 16))
 	}
 
 	private readonly _updateLfoTarget = () => {
@@ -138,14 +142,17 @@ export class BasicSynthesizer extends Instrument<SynthVoices, SynthVoice> {
 			// Will output node always be the gain?
 			case SynthLfoTarget.Gain:
 				this._lfoAmountMultiplier = 1
-				this._lfoGain.connect(this.getOutputAudioNode().gain)
+				this._lfoWaveShaper.curve = new Float32Array([-1, 0])
+				this._lfoGain.connect(this._lfoGainTarget.gain)
 				break
 			case SynthLfoTarget.Pan:
 				this._lfoAmountMultiplier = 1
+				this._lfoWaveShaper.curve = new Float32Array([-1, 1])
 				this._lfoGain.connect(this._panNode.pan)
 				break
 			case SynthLfoTarget.Filter:
-				this._lfoAmountMultiplier = 600
+				this._lfoAmountMultiplier = 20000
+				this._lfoWaveShaper.curve = new Float32Array([-1, 1])
 				this._lfoGain.connect(this._filter.frequency)
 				break
 		}
@@ -180,10 +187,10 @@ class SynthVoices extends Voices<SynthVoice> {
 			this._lowPassFilterCutoffFrequency,
 			this._getOnEndedCallback(),
 			invincible,
-			this._lfoRate,
-			this._lfoAmount,
-			this._lfoTarget,
-			this._lfoWave,
+			// this._lfoRate,
+			// this._lfoAmount,
+			// this._lfoTarget,
+			// this._lfoWave,
 		)
 	}
 
@@ -230,10 +237,10 @@ class SynthVoice extends Voice {
 		lowPassFilterCutoffFrequency: number,
 		onEnded: OnEndedCallback,
 		invincible: boolean,
-		private _lfoRate: number,
-		private _lfoAmount: number,
-		private _lfoTarget: SynthLfoTarget,
-		private _lfoWave: LfoOscillatorType,
+		// private _lfoRate: number,
+		// private _lfoAmount: number,
+		// private _lfoTarget: SynthLfoTarget,
+		// private _lfoWave: LfoOscillatorType,
 	) {
 		super(audioContext, destination, onEnded, detune, lowPassFilterCutoffFrequency, invincible)
 

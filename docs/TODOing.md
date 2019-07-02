@@ -59,6 +59,10 @@
 	- [√] enforce min/max
 	- [ ] make value look as similar to display value as possible
 	- [ ] make use of the existing value string functions
+- [ ] fix noise wave getting stuck
+- [ ] refactor
+	- [ ] cleanup up express app code
+- [ ] disallow visual connection to be made if it causes a feedback loop
 - [ ] need visual to show that feedback loops are not possible
 - [ ] lfo re-trigger
 - [ ] zoom in and out from mouse position
@@ -118,6 +122,12 @@
 - [ ] fix order of node menu
 - [ ] drum sampler?
 - [ ] give feedback when saving to browser
+- [ ] schedule groups of notes all at same time, so that we can determine the entire envelope ahead of time and avoid using cancelAndHoldAtTime
+
+padenot [4:47 AM]
+You need to add 1 and divide by two the signal coming out of the LFO, so it is between 0 and 1. You can do that with a ConstantSource, and a gain
+It's just following the values of the sine, really, but you can adjust as you see fit, those values are added to the value of the parameter you connect to, so you can, for example, have the cutoff of a filter oscillate around a central frequency
+Yes, https://mmckegg.github.io/web-audio-school/, exercise 13 is exactly what you need
 
 # 0.6.0
 - [ ] if user plays mary had a little lamb, the lick, or megalovania, do something
