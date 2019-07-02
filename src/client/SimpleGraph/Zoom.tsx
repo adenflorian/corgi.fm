@@ -70,7 +70,7 @@ export class Zoom extends React.PureComponent<IZoomAllProps, IZoomState> {
 				style={{
 					transform: `scale(${zoom})`,
 					willChange: fancyZoomPan ? '' : 'transform',
-					transition: 'transform 0.15s',
+					// transition: 'transform 0.15s',
 				}}
 			>
 				<div
@@ -102,7 +102,7 @@ export class Zoom extends React.PureComponent<IZoomAllProps, IZoomState> {
 		// Turning off rounding so that two finger track pad scrolling will be smooth
 		// TODO Detect if scroll amount is small or large, if large, round it
 		if (this.props.requireCtrlToZoom === false || e.ctrlKey) {
-			this._zoom(e.deltaY * scrollZoomMod, false)
+			this._zoom(e.deltaY * scrollZoomMod, false, e.clientX, e.clientY)
 		} else {
 			this._pan(-e.deltaX, -e.deltaY)
 		}
@@ -119,20 +119,32 @@ export class Zoom extends React.PureComponent<IZoomAllProps, IZoomState> {
 		if (e.buttons === 4) this._pan(e.movementX, e.movementY)
 		if (this.state.backgroundClicked && e.buttons === 1) {
 			if (e.ctrlKey) {
-				this._zoom(e.movementY * mouseZoomMod)
+				this._zoom(e.movementY * mouseZoomMod, false, e.clientX, e.clientY)
 			} else {
 				this._pan(e.movementX, e.movementY)
 			}
 		}
 	}
 
-	private readonly _zoom = (zoom: number, round: boolean = false) => {
+	private readonly _zoom = (zoom: number, round: boolean, clientX: number, clientY: number) => {
 		let newZoom = this._clampZoom(this.state.zoom - zoom)
 		if (round) newZoom = Math.round(newZoom * 10) / 10
 
+		const zoomDelta = newZoom - this.state.zoom
+
+		if (zoomDelta === 0) return
+
+		const zoomPercentChange = (newZoom - this.state.zoom) / this.state.zoom
+
+		const distanceFromCenterX = clientX - (window.innerWidth / 2)
+		const distanceFromCenterY = clientY - (window.innerHeight / 2)
+
+		const panX = ((distanceFromCenterX * zoomPercentChange) / newZoom)
+		const panY = ((distanceFromCenterY * zoomPercentChange) / newZoom)
+
 		const newPan = {
-			x: this._clampPan(this.state.pan.x, newZoom),
-			y: this._clampPan(this.state.pan.y, newZoom),
+			x: this._clampPan(this.state.pan.x - panX, newZoom),
+			y: this._clampPan(this.state.pan.y - panY, newZoom),
 		}
 
 		simpleGlobalClientState.zoom = newZoom
@@ -140,10 +152,7 @@ export class Zoom extends React.PureComponent<IZoomAllProps, IZoomState> {
 
 		this.setState({
 			zoom: newZoom,
-			pan: {
-				x: this._clampPan(this.state.pan.x, newZoom),
-				y: this._clampPan(this.state.pan.y, newZoom),
-			},
+			pan: newPan,
 		})
 	}
 

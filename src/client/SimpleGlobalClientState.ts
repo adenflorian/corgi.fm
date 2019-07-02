@@ -1,3 +1,5 @@
+import {Point} from '../common/common-types'
+
 class SimpleGlobalClientState {
 	private _zoom = 1
 	private _pan = {x: 0, y: 0}
@@ -28,3 +30,11 @@ class SimpleGlobalClientState {
 }
 
 export const simpleGlobalClientState = new SimpleGlobalClientState()
+
+export function mouseFromScreenToBoard({x, y}: Point) {
+	const {pan, zoom} = simpleGlobalClientState
+	return {
+		x: ((x - (window.innerWidth / 2)) / zoom) - pan.x,
+		y: ((y - (window.innerHeight / 2)) / zoom) - pan.y,
+	}
+}

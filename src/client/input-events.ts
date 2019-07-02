@@ -10,7 +10,7 @@ import {
 import {
 	localActions, localMidiKeyPress, localMidiKeyUp, localMidiOctaveChange, windowBlur,
 } from './local-middleware'
-import {simpleGlobalClientState} from './SimpleGlobalClientState'
+import {mouseFromScreenToBoard} from './SimpleGlobalClientState'
 
 type IKeyBoardShortcuts = Map<string, KeyBoardShortcut>
 
@@ -247,12 +247,7 @@ export function setupInputEventListeners(
 			lastMousePosition = {x, y}
 		}
 
-		const {pan, zoom} = simpleGlobalClientState
-
-		store.dispatch(pointersActions.update(localClientId, {
-			x: ((x - (window.innerWidth / 2)) / zoom) - pan.x,
-			y: ((y - (window.innerHeight / 2)) / zoom) - pan.y,
-		}))
+		store.dispatch(pointersActions.update(localClientId, mouseFromScreenToBoard({x, y})))
 	}
 }
 
