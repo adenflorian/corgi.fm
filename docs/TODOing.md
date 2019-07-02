@@ -18,60 +18,45 @@
 - [√] auditioning notes should limit to a half second or so
 - [√] you could have it snap to whole numbers for bpm by default but have that allow the decimals - bean
 - [√] r key to record
-- [ ] permissions
+- [√] permissions
 	- [√] when you create a room you are owner
 	- [√] make server owner when room is empty
 	- [√] in room options you can set it so only you can do stuff, or allow other people to do stuff
 	- [√] unlock room when server becomes owner
 	- [√] restrict all room things on backend except whitelist
 	- [√] restrict all room things on front end
-		- [ ] at redux level (not realistic to do this)
 		- [√] at css
 		- [√] at input events
 	- [√] let users create keyboard if they dont have one
-	- [ ] allow changing mode by click room status in top left
-	- [ ] give people permission to do stuff (based on client id)
-	- [ ] do something about when you refresh and lose ownership
-	- [ ] take ownership if you are last member?
 - [√] clone node with ctrl + D
 - [√] new clone should be selected
 - [ ] LFO
 	- [√] basic synth LFO
-	- [ ] fix wave value string
-	- [ ] pitch target
 	- [√] filter target
-		- [ ] fix clicks in sound
+	- [ ] fix wave value string
 - [√] filter type knob for synth
 - [√] filter type knob for sampler
 - [√] fix knob arc not being inline
-- [ ] delay node
+- [√] delay node
 	- [√] get basic delay node working
 	- [√] feedback loop
 	- [√] feedback %
-	- [ ] feedback filter
-	- [ ] ping pong delay
-	- [ ] bpm synced time knob
-	- [ ] separate left and right
 - [√] make it so you can only drag the title bar
 - [√] make knob drag area bigger
-- [ ] lock down audio node params min/max at instrument level
+- [√] zoom in and out from mouse position
 - [√] allow typing in knob values
 	- [√] enforce min/max
-	- [ ] make value look as similar to display value as possible
-	- [ ] make use of the existing value string functions
+- [ ] lock down audio node params min/max at instrument level
 - [ ] fix noise wave getting stuck
 - [ ] refactor
 	- [ ] cleanup up express app code
 - [ ] disallow visual connection to be made if it causes a feedback loop
 - [ ] need visual to show that feedback loops are not possible
-- [ ] lfo re-trigger
-- [ ] zoom in and out from mouse position
 - [ ] test on android
-- [ ] fix issue with noise getting stuck on
 - [ ] filter envelope
 - [ ] fix loading old saves
 - [ ] button on sequencer to plugin keyboard
-- [ ] pan to center when making new room
+- [ ] pan to center when making new room or changing rooms
 - [ ] more prominent message about version being out of date
 - [ ] tap tempo
 - [ ] list usernames of room members somewhere
@@ -130,6 +115,23 @@ It's just following the values of the sine, really, but you can adjust as you se
 Yes, https://mmckegg.github.io/web-audio-school/, exercise 13 is exactly what you need
 
 # 0.6.0
+
+- [ ] allow typing in knob values
+	- [ ] make value look as similar to display value as possible
+	- [ ] make use of the existing value string functions
+- [ ] delay node
+	- [ ] feedback filter
+	- [ ] ping pong delay
+	- [ ] bpm synced time knob
+	- [ ] separate left and right
+- [ ] LFO
+	- [ ] pitch target
+	- [ ] re-trigger
+- [ ] permissions
+	- [ ] allow changing mode by click room status in top left
+	- [ ] give people permission to do stuff (based on client id)
+	- [ ] do something about when you refresh and lose ownership
+	- [ ] take ownership if you are last member?
 - [ ] if user plays mary had a little lamb, the lick, or megalovania, do something
 - [ ] if user programs a sequence that references an existing song, do something
 - [ ] allow replacing nodes in place to keep connections
