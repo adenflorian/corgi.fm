@@ -20,11 +20,10 @@ serverStore.dispatch(createRoomAction(roomSettingsActions.setOwner(serverClientI
 
 createServerStuff(lobby, serverStore)
 
-const app: express.Application = express()
+const app = setupExpressApp(serverStore)
+
 const server: http.Server = new http.Server(app)
 const io: socketIO.Server = socketIO(server)
-
-setupExpressApp(app, serverStore)
 
 setupServerWebSocketListeners(io, serverStore)
 

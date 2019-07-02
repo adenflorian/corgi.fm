@@ -6,7 +6,9 @@ import {stateRouter} from './api/state-router'
 import {isProdServer} from './is-prod-server'
 import {ServerStore} from './server-redux-types'
 
-export function setupExpressApp(app: express.Application, serverStore: ServerStore) {
+export function setupExpressApp(serverStore: ServerStore) {
+	const app: express.Application = express()
+
 	app.use(cors())
 	app.use(express.static(path.join(__dirname, '../public')))
 
@@ -23,4 +25,6 @@ export function setupExpressApp(app: express.Application, serverStore: ServerSto
 	app.get('/*', (_, res) => {
 		res.sendFile(path.join(__dirname, '../public/index.html'))
 	})
+
+	return app
 }

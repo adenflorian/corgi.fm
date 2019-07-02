@@ -1,15 +1,15 @@
 
 import {Router} from 'express'
-import {selectAllClients} from '../../common/redux'
 import {ServerStore} from '../server-redux-types'
+import {authRouter} from './auth-router'
+import {usersRouter} from './users-router'
 
 export const apiRouter = (serverStore: ServerStore): Router => {
 
 	const router = Router()
 
-	router.get('/users/count', (_, res) => {
-		res.json(selectAllClients(serverStore.getState()).length)
-	})
+	router.use('/users', usersRouter(serverStore))
+	router.use('/auth', authRouter(serverStore))
 
 	return router
 }
