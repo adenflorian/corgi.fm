@@ -105,7 +105,7 @@ export class Zoom extends React.PureComponent<IZoomAllProps, IZoomState> {
 		// Turning off rounding so that two finger track pad scrolling will be smooth
 		// TODO Detect if scroll amount is small or large, if large, round it
 		if (this.props.requireCtrlToZoom === false || e.ctrlKey) {
-			this._zoom(e.deltaY * scrollZoomMod, false, e.clientX, e.clientY)
+			this._zoom(e.deltaY * scrollZoomMod, e.clientX, e.clientY, e.ctrlKey)
 		} else {
 			this._pan(-e.deltaX, -e.deltaY)
 		}
@@ -113,7 +113,6 @@ export class Zoom extends React.PureComponent<IZoomAllProps, IZoomState> {
 	}
 
 	private readonly _onMouseMove = (e: MouseEvent) => {
-		// if (e.ctrlKey) this._zoom(e.movementY * mouseZoomMod)
 		if (e.buttons !== 1 && this.state.backgroundClicked) {
 			this.setState({
 				backgroundClicked: false,
@@ -122,16 +121,15 @@ export class Zoom extends React.PureComponent<IZoomAllProps, IZoomState> {
 		if (e.buttons === 4) this._pan(e.movementX, e.movementY)
 		if (this.state.backgroundClicked && e.buttons === 1) {
 			if (e.ctrlKey) {
-				this._zoom(e.movementY * mouseZoomMod, false, e.clientX, e.clientY)
+				this._zoom(e.movementY * mouseZoomMod)
 			} else {
 				this._pan(e.movementX, e.movementY)
 			}
 		}
 	}
 
-	private readonly _zoom = (zoom: number, round: boolean, clientX: number, clientY: number) => {
-		let newZoom = this._clampZoom(this.state.zoom - zoom)
-		if (round) newZoom = Math.round(newZoom * 10) / 10
+	private readonly _zoom = (zoom: number, clientX?: number, clientY?: number, controlKey = false) => {
+		const newZoom = this._clampZoom(this.state.zoom - zoom)
 
 		const newZoomReal = 2 ** newZoom
 
@@ -141,8 +139,8 @@ export class Zoom extends React.PureComponent<IZoomAllProps, IZoomState> {
 
 		const zoomPercentChange = (newZoomReal - this.state.zoomReal) / this.state.zoomReal
 
-		const distanceFromCenterX = clientX - (window.innerWidth / 2)
-		const distanceFromCenterY = clientY - (window.innerHeight / 2)
+		const distanceFromCenterX = clientX && !controlKey ? clientX - (window.innerWidth / 2) : 0
+		const distanceFromCenterY = clientY && !controlKey ? clientY - (window.innerHeight / 2) : 0
 
 		const panX = ((distanceFromCenterX * zoomPercentChange) / newZoomReal)
 		const panY = ((distanceFromCenterY * zoomPercentChange) / newZoomReal)
