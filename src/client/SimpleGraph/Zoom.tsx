@@ -65,30 +65,22 @@ export class Zoom extends React.PureComponent<IZoomAllProps, IZoomState> {
 
 	public render() {
 		const {children, fancyZoomPan} = this.props
-		const {zoomReal, pan} = this.state
+		const {zoomReal, pan, backgroundClicked} = this.state
 
 		return (
 			<div
 				className="zoomZoom"
 				style={{
-					transform: `scale(${zoomReal})`,
+					transform: `scale(${zoomReal}) translate(${pan.x}px, ${pan.y}px)`,
 					willChange: fancyZoomPan ? '' : 'transform',
-					// transition: 'transform 0.15s',
+					// transition: backgroundClicked ? '' : 'transform 0.05s ease 0s',
 				}}
 			>
-				<div
-					className="zoomPan"
-					style={{
-						transform: `translate(${pan.x}px, ${pan.y}px)`,
-						willChange: fancyZoomPan ? '' : 'transform',
-					}}
-				>
-					<ZoomBackground
-						onMouseEvent={this._onBgMouseEvent}
-						disableMenu={this.props.disableMenu}
-					/>
-					{children}
-				</div>
+				<ZoomBackground
+					onMouseEvent={this._onBgMouseEvent}
+					disableMenu={this.props.disableMenu}
+				/>
+				{children}
 			</div>
 		)
 	}
