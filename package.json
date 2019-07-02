@@ -33,7 +33,6 @@
   },
   "dependencies": {
     "@types/moment": "^2.13.0",
-    "adsr": "^1.0.1",
     "animal-id": "^0.0.1",
     "autoprefixer": "^9.4.2",
     "babel-polyfill": "^6.26.0",
@@ -89,7 +88,6 @@
     "@types/sinon": "^7.0.0",
     "@types/socket.io": "^2.1.2",
     "@types/socket.io-client": "^1.4.32",
-    "@types/tone": "https://github.com/Tonejs/TypeScript.git",
     "@types/uuid": "^3.4.4",
     "@types/victor": "^1.1.0",
     "chai": "^4.1.2",
