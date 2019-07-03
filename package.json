@@ -12,13 +12,7 @@
     "start-prod": "NODE_ENV=production pm2 start server/server.js",
     "start-prod-docker": "NODE_ENV=production pm2-runtime built/server/server.js",
     "lint": "eslint . && tslint src/client/**/*.ts* --project src/client/tsconfig.json && tslint src/server/**/*.ts* --project src/server/tsconfig.json && tslint src/common/**/*.ts* --project src/common/tsconfig.json ",
-    "test": "yarn test-client && yarn test-server && yarn test-common",
-    "test-client": "cross-env TS_NODE_PROJECT=\"src/client/tsconfig.json\" mocha --opts src/client/mocha.opts",
-    "tdd-client": "cross-env TS_NODE_PROJECT=\"src/client/tsconfig.json\" mocha --opts src/client/mocha.opts --watch --watch-extensions ts",
-    "test-server": "cross-env TS_NODE_PROJECT=\"src/server/tsconfig.json\" mocha --opts src/server/mocha.opts",
-    "test-common": "cross-env TS_NODE_PROJECT=\"src/common/tsconfig.json\" mocha --opts src/common/mocha.opts",
-    "test-debug": "mocha --inspect --opts src/mocha.opts",
-    "tdd": "mocha --watch src/**/*.ts* --reporter dot --opts src/mocha.opts",
+    "test": "jest",
     "clean": "rm -rf .cache built dist yarn-error.log",
     "deploy-test": "yarn version --patch && yarn build && bash scripts/deploy-test.sh",
     "deploy-prod": "yarn version --patch && yarn build && bash scripts/deploy-prod.sh",
@@ -30,6 +24,28 @@
     "start-docker": "yarn build-docker && docker run -p 3000:3000 corgi.fm",
     "setup-test-server": "bash scripts/setup-test-server.sh",
     "setup-prod-server": "bash scripts/setup-prod-server.sh"
+  },
+  "jest": {
+    "projects": [
+      {
+        "displayName": "client",
+        "preset": "ts-jest",
+        "testEnvironment": "jsdom",
+        "rootDir": "src/client"
+      },
+      {
+        "displayName": "common",
+        "preset": "ts-jest",
+        "testEnvironment": "node",
+        "rootDir": "src/common"
+      },
+      {
+        "displayName": "server",
+        "preset": "ts-jest",
+        "testEnvironment": "node",
+        "rootDir": "src/server"
+      }
+    ]
   },
   "dependencies": {
     "@types/moment": "^2.13.0",
@@ -77,8 +93,8 @@
     "@types/cors": "^2.8.4",
     "@types/express": "^4.16.0",
     "@types/file-saver": "^2.0.0",
+    "@types/jest": "^24.0.15",
     "@types/lodash": "^4.14.119",
-    "@types/mocha": "^5.2.5",
     "@types/react": "^16.3.16",
     "@types/react-dom": "^16.0.6",
     "@types/react-input-autosize": "^2.0.0",
@@ -96,11 +112,12 @@
     "del": "^3.0.0",
     "eslint": "^4.19.1",
     "eslint-plugin-react-hooks": "^1.6.0",
+    "jest": "^24.8.0",
     "less": "^3.0.4",
-    "mocha": "^5.2.0",
     "parcel-bundler": "^1.12.3",
     "pm2": "^2.10.4",
     "sinon": "^7.2.2",
+    "ts-jest": "^24.0.2",
     "ts-node": "^6.1.0",
     "ts-node-dev": "^1.0.0-pre.26",
     "tslint": "^5.13.0",

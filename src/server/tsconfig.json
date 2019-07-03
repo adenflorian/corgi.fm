@@ -18,6 +18,9 @@
 				"name": "typescript-tslint-plugin",
 				"alwaysShowRuleFailuresAsWarnings": false
 			}
+		],
+		"types": [
+			"jest"
 		]
 	},
 	"include": [
