@@ -19,7 +19,6 @@ describe('API Tests', () => {
 			})
 		})
 	})
-
 	describe('/newsletter', () => {
 		it('should work', async () => {
 			const result = await request(setupExpressApp(configureServerStore())).get('/newsletter')

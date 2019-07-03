@@ -48,7 +48,6 @@
     ]
   },
   "dependencies": {
-    "@types/moment": "^2.13.0",
     "animal-id": "^0.0.1",
     "autoprefixer": "^9.4.2",
     "babel-polyfill": "^6.26.0",
@@ -62,6 +61,7 @@
     "lodash": "^4.17.11",
     "midi-writer-js": "^1.6.0",
     "moment": "^2.24.0",
+    "mongodb": "^3.2.7",
     "pkginfo": "^0.4.1",
     "prop-types": "^15.6.1",
     "query-string": "^6.1.0",
@@ -95,6 +95,9 @@
     "@types/file-saver": "^2.0.0",
     "@types/jest": "^24.0.15",
     "@types/lodash": "^4.14.119",
+    "@types/moment": "^2.13.0",
+    "@types/mongodb": "^3.1.28",
+    "@types/mongodb-memory-server": "^1.8.0",
     "@types/react": "^16.3.16",
     "@types/react-dom": "^16.0.6",
     "@types/react-input-autosize": "^2.0.0",
@@ -115,6 +118,7 @@
     "eslint-plugin-react-hooks": "^1.6.0",
     "jest": "^24.8.0",
     "less": "^3.0.4",
+    "mongodb-memory-server": "^5.1.5",
     "parcel-bundler": "^1.12.3",
     "pm2": "^2.10.4",
     "sinon": "^7.2.2",

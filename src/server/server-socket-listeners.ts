@@ -34,6 +34,7 @@ import {
 } from '../common/redux'
 import {WebSocketEvent} from '../common/server-constants'
 import {createServerStuff, loadServerStuff} from './create-server-stuff'
+import {DBStore} from './database/database'
 import {serverInfo} from './server-info'
 
 export const lobby = 'lobby'
@@ -42,28 +43,30 @@ const server = 'server'
 
 const version = serverInfo.version
 
-export function setupServerWebSocketListeners(io: Server, serverStore: Store) {
+export function setupServerWebSocketListeners(io: Server, serverStore: Store, dbStore: DBStore) {
 	io.on('connection', socket => {
 		socket.emit('version', version)
 
-		const newConnectionUsername = socket.handshake.query.username
+		const username = socket.handshake.query.username
 			.replace(/ +(?= )/g, '')
 			.trim()
 			.substring(0, maxUsernameLength)
 
-		const newConnectionRoom = getRoomName(socket.handshake.query.room)
+		const room = getRoomName(socket.handshake.query.room)
+
+		dbStore.saveUserConnectEventAsync({username, room, time: new Date()})
 
 		logger.log(
-			`new connection | socketId: '${socket.id}' | username: '${newConnectionUsername}' | room: '${newConnectionRoom}'`,
+			`new connection | socketId: '${socket.id}' | username: '${username}' | room: '${room}'`,
 		)
 
 		registerCallBacks()
 
-		const newClient = new ClientState({socketId: socket.id, name: newConnectionUsername})
+		const newClient = new ClientState({socketId: socket.id, name: username})
 
 		const clientId = newClient.id
 
-		joinOrCreateRoom(newConnectionRoom || lobby)
+		joinOrCreateRoom(room || lobby)
 
 		const addClientAction = addClient(newClient)
 		serverStore.dispatch(addClientAction)
@@ -87,60 +90,60 @@ export function setupServerWebSocketListeners(io: Server, serverStore: Store) {
 					logger.trace(`${WebSocketEvent.broadcast}: ${socket.id} | `, action)
 				}
 
-				const room = getRoom(socket)
-				const roomState = selectRoomStateByName(serverStore.getState(), room)
+				const currentRoom = getRoom(socket)
+				const roomState = selectRoomStateByName(serverStore.getState(), currentRoom)
 
 				if (!roomState) {
-					logger.error(`can't find room state on server for room ${room}`)
+					logger.error(`can't find room state on server for room ${currentRoom}`)
 					return
 				}
 
 				// Don't allow non-whitelisted actions to be dispatch by non-owners when only owner can do stuff
 				if (!whitelistedRoomActionTypes.includes(action.type) && selectRoomSettings(roomState).onlyOwnerCanDoStuff) {
-					const roomOwnerId = getRoomOwnerId(serverStore, room)
+					const roomOwnerId = getRoomOwnerId(serverStore, currentRoom)
 
 					if (clientId !== roomOwnerId) {
 						const client = selectClientById(serverStore.getState(), clientId)
 						logger.warn(stripIndents`user attempted to run a room action while not room owner and room is locked.
-							clientId: ${clientId} username: ${client.name} room: ${room} action: ${JSON.stringify(action, null, 2)}`)
+							clientId: ${clientId} username: ${client.name} room: ${currentRoom} action: ${JSON.stringify(action, null, 2)}`)
 						return
 					}
 				}
 
 				if (roomOwnerRoomActions.includes(action.type)) {
-					const roomOwnerId = getRoomOwnerId(serverStore, room)
+					const roomOwnerId = getRoomOwnerId(serverStore, currentRoom)
 
 					// Only do it if the current client is the current room owner
 					if (clientId !== roomOwnerId) {
 						const client = selectClientById(serverStore.getState(), clientId)
 						logger.warn(stripIndents`user attempted to run a restricted room action while not room owner.
-							clientId: ${clientId} username: ${client.name} room: ${room} action: ${JSON.stringify(action, null, 2)}`)
+							clientId: ${clientId} username: ${client.name} room: ${currentRoom} action: ${JSON.stringify(action, null, 2)}`)
 						return
 					}
 
 					// Assume client is room owner past this point
-					serverStore.dispatch(createRoomAction(action, room))
+					serverStore.dispatch(createRoomAction(action, currentRoom))
 				} else if (action[GLOBAL_SERVER_ACTION]) {
 					serverStore.dispatch(action)
 				} else if (action[SERVER_ACTION]) {
-					serverStore.dispatch(createRoomAction(action, room))
+					serverStore.dispatch(createRoomAction(action, currentRoom))
 				}
 
-				socket.broadcast.to(room).emit(WebSocketEvent.broadcast, {...action, alreadyBroadcasted: true})
+				socket.broadcast.to(currentRoom).emit(WebSocketEvent.broadcast, {...action, alreadyBroadcasted: true})
 			})
 
 			// TODO Merge with broadcast event above
 			socket.on(WebSocketEvent.serverAction, (action: RoomSettingsAction | RoomsReduxAction) => {
 				logger.trace(`${WebSocketEvent.serverAction}: ${socket.id} | `, action)
 
-				const room = getRoom(socket)
+				const currentRoom = getRoom(socket)
 
 				const isRestrictedRoomAction = roomOwnerRoomActions.includes(action.type)
 
 				if (isRestrictedRoomAction) {
 					const client = selectClientById(serverStore.getState(), clientId)
 					logger.warn(stripIndents`user attempted to run a restricted room action as a server only action.
-						clientId: ${clientId} username: ${client.name} room: ${room} action: ${JSON.stringify(action, null, 2)}`)
+						clientId: ${clientId} username: ${client.name} room: ${currentRoom} action: ${JSON.stringify(action, null, 2)}`)
 					return
 				}
 
@@ -153,7 +156,7 @@ export function setupServerWebSocketListeners(io: Server, serverStore: Store) {
 				} else if ((action as any)[GLOBAL_SERVER_ACTION]) {
 					serverStore.dispatch(action)
 				} else if ((action as any)[SERVER_ACTION]) {
-					serverStore.dispatch(createRoomAction(action, room))
+					serverStore.dispatch(createRoomAction(action, currentRoom))
 				}
 			})
 

@@ -15,7 +15,8 @@
         "semicolon",
         "space-before-function-paren",
         "trailing-comma",
-        "eofline"
+        "eofline",
+        "only-arrow-functions"
     ],
     "tslint.jsEnable": true,
     "tslint.packageManager": "yarn",

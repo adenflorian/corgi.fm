@@ -46,6 +46,10 @@
 - [√] zoom in and out from mouse position
 - [√] allow typing in knob values
 	- [√] enforce min/max
+- [ ] stats database
+	- [√] connect to memory db in local
+	- [ ] connect to real database in test and prod
+- [ ] tslint rule to require awaiting promises
 - [ ] lock down audio node params min/max at instrument level
 - [ ] fix noise wave getting stuck
 - [ ] refactor
