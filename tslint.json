@@ -85,7 +85,8 @@
             {
                 "ignore-pattern": "^import |^export {(.*?)}|class [a-zA-Z]+ implements |//"
             }
-        ]
+        ],
+        "no-floating-promises": true
     },
     "rulesDirectory": [],
     "linterOptions": {

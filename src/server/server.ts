@@ -1,4 +1,3 @@
-import * as express from 'express'
 import * as http from 'http'
 import * as socketIO from 'socket.io'
 import {serverClientId} from '../common/common-constants'
@@ -6,24 +5,20 @@ import {logger} from '../common/logger'
 import {configureServerStore, createRoomAction, roomSettingsActions} from '../common/redux'
 import {createRoom} from '../common/redux'
 import {createServerStuff} from './create-server-stuff'
-import {connectDB, DBStore} from './database/database'
+import {connectDB, DBStore, dummyDb} from './database/database'
 import {logServerEnv} from './is-prod-server'
 import {startRoomWatcher} from './room-watcher'
 import {lobby, setupServerWebSocketListeners} from './server-socket-listeners'
 import {setupExpressApp} from './setup-express-app'
 
+// tslint:disable-next-line: no-floating-promises
 start()
 
 async function start() {
 
 	logServerEnv()
 
-	let dbStore: DBStore = {
-		async close() {},
-		events: {
-			async saveUserConnectEventAsync() {return 0},
-		},
-	}
+	let dbStore: DBStore = dummyDb
 
 	try {
 		dbStore = await connectDB()
@@ -38,7 +33,7 @@ async function start() {
 
 	createServerStuff(lobby, serverStore)
 
-	const app = setupExpressApp(serverStore)
+	const app = setupExpressApp(serverStore, dbStore)
 
 	const server: http.Server = new http.Server(app)
 	const io: socketIO.Server = socketIO(server)

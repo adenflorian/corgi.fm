@@ -171,4 +171,5 @@
         "tsconfig.json": "json"
     },
     "tslint.ignoreDefinitionFiles": false,
+    "jest.autoEnable": false,
 }
