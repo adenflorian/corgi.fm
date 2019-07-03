@@ -54,7 +54,7 @@ export function setupServerWebSocketListeners(io: Server, serverStore: Store, db
 
 		const room = getRoomName(socket.handshake.query.room)
 
-		dbStore.saveUserConnectEventAsync({username, room, time: new Date()})
+		dbStore.events.saveUserConnectEventAsync({username, room, time: new Date()})
 
 		logger.log(
 			`new connection | socketId: '${socket.id}' | username: '${username}' | room: '${room}'`,

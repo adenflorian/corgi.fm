@@ -13,7 +13,11 @@ describe('Database Tests', () => {
 
 	describe('saveUserConnectEventAsync', () => {
 		it('should work', async () => {
-			const result = await db.saveUserConnectEventAsync({username: 'test user', room: 'the room', time: new Date(123)})
+			const result = await db.events.saveUserConnectEventAsync({
+				username: 'test user',
+				room: 'the room',
+				time: new Date(123),
+			})
 			expect(result.insertedCount).toEqual(1)
 		})
 	})

@@ -1,6 +1,7 @@
 import {MongoClient} from 'mongodb'
-import {MongoMemoryServer} from 'mongodb-memory-server'
 import {logger} from '../../common/logger'
+import {eventsQueries} from './events'
+import {startInMemoryDB} from './memory-database'
 
 export type DBStore = ThenArg<typeof connectDB>
 
@@ -10,14 +11,8 @@ type ThenArg<T> = T extends Promise<infer U> ? U :
 
 const dbName = 'test'
 
-const eventsCollectionName = 'events'
-
 export async function connectDB() {
-	const mongo = new MongoMemoryServer({instance: {dbName, port: 27017}})
-
-	const uri = await mongo.getConnectionString()
-
-	logger.log('started mongo in memory: ', uri)
+	const uri = await startInMemoryDB(dbName)
 
 	const client = await MongoClient.connect(uri, {useNewUrlParser: true})
 
@@ -25,26 +20,11 @@ export async function connectDB() {
 
 	const db = client.db(dbName)
 
-	// TODO When to close? If ever?
-	// client.close()
-
 	return {
-		async saveUserConnectEventAsync(event: UserConnectedEvent) {
-			const startTime = Date.now()
-			logger.log('saveUserConnectEvent: ', {event})
-			const result = await db.collection(eventsCollectionName).insertOne(event)
-			logger.log('saveUserConnectEvent result: ', {insertedCount: result.insertedCount, time: `${Date.now() - startTime}ms`})
-			return result
-		},
+		events: eventsQueries(db),
 		async close() {
 			await client.close()
 			logger.log('db closed')
 		},
 	}
-}
-
-interface UserConnectedEvent {
-	username: string
-	room: string
-	time: Date
 }
