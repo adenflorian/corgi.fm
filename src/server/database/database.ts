@@ -25,7 +25,7 @@ export async function connectDB() {
 
 	const client = await MongoClient.connect(uri, {useNewUrlParser: true})
 
-	logger.log('Connected successfully to mongo server')
+	logger.debug('Connected successfully to mongo server')
 
 	const db = client.db(dbName)
 
@@ -34,7 +34,7 @@ export async function connectDB() {
 		users: usersQueries(db),
 		async close() {
 			await client.close()
-			logger.log('db closed')
+			logger.debug('db closed')
 		},
 	}
 }

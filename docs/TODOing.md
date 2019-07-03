@@ -50,6 +50,17 @@
 	- [√] connect to memory db in local
 	- [√] connect to real database in test and prod
 	- [√] setup db in prod
+- [ ] auth
+	- [ ] register
+		- [√] save user to DB
+		- [ ] hash pw
+		- [ ] return token
+		- [ ] put token in secret place and load in
+		- [ ] check for existing user first
+	- [ ] login
+		- [ ] return token
+	- [ ] jwt
+		- [ ] make it expire
 - [ ] tslint rule to require awaiting promises
 - [ ] lock down audio node params min/max at instrument level
 - [ ] fix noise wave getting stuck

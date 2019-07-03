@@ -3,7 +3,7 @@ const logLevel = {
 	error: true,
 	warn: true,
 	log: true,
-	debug: true,
+	debug: false,
 	trace: false,
 }
 

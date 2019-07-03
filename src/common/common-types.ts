@@ -58,3 +58,11 @@ export type ThenArg<T> = T extends Promise<infer U>
 	: T extends (...args: any[]) => Promise<infer V>
 	? V
 	: T
+
+export interface TokenHolder {
+	token: string
+}
+
+export function isTokenHolder(arg: any): arg is TokenHolder {
+	return arg && arg.token && typeof arg.token === 'string'
+}

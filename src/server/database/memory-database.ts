@@ -8,7 +8,7 @@ export async function startInMemoryDB(dbName: string) {
 
 	const uri = await mongo.getConnectionString()
 
-	logger.log('started mongo in memory: ', uri)
+	logger.debug('started mongo in memory: ', uri)
 
 	return uri
 }

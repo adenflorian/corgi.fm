@@ -6,22 +6,20 @@ const usersCollectionName = 'users'
 export const usersQueries = (db: Db) => Object.freeze({
 	async getUserByEmail(email: string) {
 		const startTime = Date.now()
-		logger.log('getUserByEmail: ', {email})
+		logger.debug('getUserByEmail: ', {email})
 		const result: Register | null = await db.collection(usersCollectionName).findOne({email})
 		if (!isRegister(result)) return null
-		logger.log('getUserByEmail result: ', {result, time: `${Date.now() - startTime}ms`})
+		logger.debug('getUserByEmail result: ', {result, time: `${Date.now() - startTime}ms`})
 		return {
 			email: result.email,
 		}
 	},
 	async register(register: Register) {
 		const startTime = Date.now()
-		logger.log('register: ', {register})
+		logger.debug('register: ', {email: register.email})
 		const result = await db.collection(usersCollectionName).insertOne(register)
-		logger.log('register result: ', {result, time: `${Date.now() - startTime}ms`})
-		return {
-			token: 'TODO',
-		}
+		logger.debug('register result: ', {email: register.email, insertedId: result.insertedId, time: `${Date.now() - startTime}ms`})
+		return result.insertedId
 	},
 })
 

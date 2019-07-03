@@ -1,5 +1,6 @@
 import {Application} from 'express'
 import * as request from 'supertest'
+import {isTokenHolder} from '../../common/common-types'
 import {configureServerStore} from '../../common/redux'
 import {connectDB, DBStore} from '../database/database'
 import {setupExpressApp} from '../setup-express-app'
@@ -43,9 +44,13 @@ describe('API Tests', () => {
 						.expect('Content-Type', /application\/json/)
 						.then(async response => {
 							expect(await db.users.getUserByEmail(email)).toEqual({email})
-							expect(response.body).toEqual({
-								token: 'a token',
+							expect(isTokenHolder(response.body)).toBeTruthy()
+							if (!isTokenHolder(response.body)) throw fail('not a TokenHolder')
+							expect(response.body).toMatchObject({
+								/* cspell: disable-next-line */
+								token: expect.stringMatching(/^eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9/),
 							})
+							expect(Object.keys(response.body).sort()).toEqual(['token'])
 						})
 				})
 			})
