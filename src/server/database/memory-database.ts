@@ -1,9 +1,9 @@
-import {MongoMemoryServer} from 'mongodb-memory-server'
 import {logger} from '../../common/logger'
 
-const eventsCollectionName = 'events'
-
 export async function startInMemoryDB(dbName: string) {
+	// Only require if called, because it's a dev dependency
+	// Should only be user for local development
+	const {MongoMemoryServer} = require('mongodb-memory-server')
 	const mongo = new MongoMemoryServer({instance: {dbName, port: 27017}})
 
 	const uri = await mongo.getConnectionString()

@@ -46,14 +46,15 @@
 - [√] zoom in and out from mouse position
 - [√] allow typing in knob values
 	- [√] enforce min/max
-- [ ] stats database
+- [√] stats database
 	- [√] connect to memory db in local
-	- [ ] connect to real database in test and prod
+	- [√] connect to real database in test and prod
+	- [√] setup db in prod
 - [ ] tslint rule to require awaiting promises
 - [ ] lock down audio node params min/max at instrument level
 - [ ] fix noise wave getting stuck
 - [ ] refactor
-	- [ ] cleanup up express app code
+	- [√] cleanup up express app code
 - [ ] disallow visual connection to be made if it causes a feedback loop
 - [ ] need visual to show that feedback loops are not possible
 - [ ] test on android

@@ -7,22 +7,25 @@ describe('API Tests', () => {
 		describe('/auth', () => {
 			describe('/register', () => {
 				it('should work', async () => {
-					const result = await request(setupExpressApp(configureServerStore())).post('/api/auth/register')
-					expect(result.status).toEqual(200)
+					await request(setupExpressApp(configureServerStore()))
+						.post('/api/auth/register')
+						.expect(200)
 				})
 			})
 			describe('/login', () => {
 				it('should work', async () => {
-					const result = await request(setupExpressApp(configureServerStore())).post('/api/auth/login')
-					expect(result.status).toEqual(200)
+					await request(setupExpressApp(configureServerStore()))
+						.post('/api/auth/login')
+						.expect(200)
 				})
 			})
 		})
 	})
 	describe('/newsletter', () => {
 		it('should work', async () => {
-			const result = await request(setupExpressApp(configureServerStore())).get('/newsletter')
-			expect(result.status).toEqual(200)
+			await request(setupExpressApp(configureServerStore()))
+				.get('/newsletter')
+				.expect(200)
 		})
 	})
 })
