@@ -9,7 +9,7 @@ export const eventsQueries = (db: Db) => Object.freeze({
 		logger.log('saveUserConnectEvent: ', {event})
 		const result = await db.collection(eventsCollectionName).insertOne(event)
 		logger.log('saveUserConnectEvent result: ', {insertedCount: result.insertedCount, time: `${Date.now() - startTime}ms`})
-		return result
+		return result.insertedCount
 	},
 })
 

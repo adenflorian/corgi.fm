@@ -18,7 +18,18 @@ async function start() {
 
 	logServerEnv()
 
-	const dbStore: DBStore = await connectDB()
+	let dbStore: DBStore = {
+		async close() {},
+		events: {
+			async saveUserConnectEventAsync() {return 0},
+		},
+	}
+
+	try {
+		dbStore = await connectDB()
+	} catch (e) {
+		logger.warn('failed to connect to database! ', e)
+	}
 
 	const serverStore = configureServerStore()
 

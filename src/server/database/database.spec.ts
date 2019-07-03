@@ -18,7 +18,7 @@ describe('Database Tests', () => {
 				room: 'the room',
 				time: new Date(123),
 			})
-			expect(result.insertedCount).toEqual(1)
+			expect(result).toEqual(1)
 		})
 	})
 })
