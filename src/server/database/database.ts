@@ -1,18 +1,16 @@
 import {MongoClient} from 'mongodb'
+import {ThenArg} from '../../common/common-types'
 import {logger} from '../../common/logger'
+import {getDbConnector} from '../server-config'
 import {eventsQueries} from './events'
-import {startInMemoryDB} from './memory-database'
 
 export type DBStore = ThenArg<typeof connectDB>
-
-type ThenArg<T> = T extends Promise<infer U> ? U :
-	T extends (...args: any[]) => Promise<infer V> ? V :
-	T
 
 const dbName = 'test'
 
 export async function connectDB() {
-	const uri = await startInMemoryDB(dbName)
+
+	const uri = await getDbConnector()(dbName)
 
 	const client = await MongoClient.connect(uri, {useNewUrlParser: true})
 

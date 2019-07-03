@@ -52,3 +52,9 @@ export function isSequencerNodeType(type: ConnectionNodeType) {
 		ConnectionNodeType.infiniteSequencer,
 	].includes(type)
 }
+
+export type ThenArg<T> = T extends Promise<infer U>
+	? U
+	: T extends (...args: any[]) => Promise<infer V>
+	? V
+	: T
