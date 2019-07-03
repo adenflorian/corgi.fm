@@ -61,6 +61,9 @@
 		- [ ] return token
 	- [ ] jwt
 		- [ ] make it expire
+		- [ ] do i need to store the tokens in the DB?
+		- [ ] revoking access
+		- [ ] logging out (just delete token from client?)
 - [ ] tslint rule to require awaiting promises
 - [ ] lock down audio node params min/max at instrument level
 - [ ] fix noise wave getting stuck
