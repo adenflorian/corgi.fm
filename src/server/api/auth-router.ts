@@ -17,6 +17,7 @@ export const authRouter = (serverStore: ServerStore, dbStore: DBStore): Router =
 
 	router.post('/register', async (req, res) => {
 		if (!isRegister(req.body)) return res.status(400).json({message: 'oops'})
+		if (req.body.password.length > 50) return res.status(400).json({message: 'oops'})
 
 		const startTime = Date.now()
 		const hash = await bcrypt.hash(req.body.password, 12)

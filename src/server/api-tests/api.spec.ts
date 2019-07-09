@@ -22,10 +22,24 @@ describe('API Tests', () => {
 		describe('/auth', () => {
 			describe('/register', () => {
 				it('should fail when password is number', async () => {
-					const email = 'corgi@random.dog'
+					const email = 'pit@random.dog'
 					await request(app)
 						.post('/api/auth/register')
 						.send({email, password: 123})
+						.expect(400)
+						.expect('Content-Type', /application\/json/)
+						.then(async response => {
+							expect(await db.users.getUserByEmail(email)).toBeNull()
+							expect(response.body).toEqual({
+								message: 'oops',
+							})
+						})
+				})
+				it('should fail when password is > 50', async () => {
+					const email = 'lab@random.dog'
+					await request(app)
+						.post('/api/auth/register')
+						.send({email, password: '111111111122222222223333333333444444444455555555556'})
 						.expect(400)
 						.expect('Content-Type', /application\/json/)
 						.then(async response => {
