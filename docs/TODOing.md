@@ -53,7 +53,8 @@
 - [ ] auth
 	- [ ] register
 		- [√] save user to DB
-		- [ ] hash pw
+		- [√] hash pw
+		- [ ] limit pw to 50 chars
 		- [ ] return token
 		- [ ] put token in secret place and load in
 		- [ ] check for existing user first
@@ -64,6 +65,8 @@
 		- [ ] do i need to store the tokens in the DB?
 		- [ ] revoking access
 		- [ ] logging out (just delete token from client?)
+- [ ] https://github.com/TrillCyborg/fullstack
+- [ ] https://github.com/accounts-js/accounts
 - [ ] tslint rule to require awaiting promises
 - [ ] lock down audio node params min/max at instrument level
 - [ ] fix noise wave getting stuck

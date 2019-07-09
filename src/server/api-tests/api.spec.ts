@@ -37,13 +37,20 @@ describe('API Tests', () => {
 				})
 				it('should work', async () => {
 					const email = 'corgi@random.dog'
+					const password = 'woof'
 					await request(app)
 						.post('/api/auth/register')
-						.send({email, password: 'woof'})
+						.send({email, password})
 						.expect(200)
 						.expect('Content-Type', /application\/json/)
 						.then(async response => {
-							expect(await db.users.getUserByEmail(email)).toEqual({email})
+							// Make sure email was saved
+							const result = await db.users.getUserByEmail(email)
+							expect(result!.email).toEqual(email)
+
+							// Make sure password is hashed
+							expect(result!.password).not.toEqual(password)
+
 							expect(isTokenHolder(response.body)).toBeTruthy()
 							if (!isTokenHolder(response.body)) throw fail('not a TokenHolder')
 							expect(response.body).toMatchObject({

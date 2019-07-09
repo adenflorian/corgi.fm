@@ -1,5 +1,6 @@
 import {Db} from 'mongodb'
 import {logger} from '../../common/logger'
+import {isLocalDevServer} from '../is-prod-server'
 
 const usersCollectionName = 'users'
 
@@ -12,6 +13,7 @@ export const usersQueries = (db: Db) => Object.freeze({
 		logger.debug('getUserByEmail result: ', {result, time: `${Date.now() - startTime}ms`})
 		return {
 			email: result.email,
+			password: isLocalDevServer() ? result.password : undefined,
 		}
 	},
 	async register(register: Register) {
@@ -22,12 +24,6 @@ export const usersQueries = (db: Db) => Object.freeze({
 		return result.insertedId
 	},
 })
-
-interface UserConnectedEvent {
-	username: string
-	room: string
-	time: Date
-}
 
 interface Register {
 	email: string
