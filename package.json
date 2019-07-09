@@ -13,7 +13,7 @@
     "start-prod-docker": "NODE_ENV=production pm2-runtime built/server/server.js",
     "lint": "eslint . && tslint src/client/**/*.ts* --project src/client/tsconfig.json && tslint src/server/**/*.ts* --project src/server/tsconfig.json && tslint src/common/**/*.ts* --project src/common/tsconfig.json ",
     "test": "jest",
-    "clean": "rm -rf .cache built dist yarn-error.log",
+    "clean": "rm -rf .cache built dist yarn-error.log && jest --clearCache",
     "deploy-test": "yarn version --patch && yarn build && bash scripts/deploy-test.sh",
     "deploy-prod": "yarn version --patch && yarn build && bash scripts/deploy-prod.sh",
     "build": "rm -rf built && yarn build-server && yarn build-client && yarn build-other",
