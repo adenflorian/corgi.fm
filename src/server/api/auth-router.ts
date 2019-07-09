@@ -7,13 +7,17 @@ import {logger} from '../../common/logger'
 import {DBStore} from '../database/database'
 import {isRegister} from '../database/users'
 import {ServerStore} from '../server-redux-types'
+import {ServerSecrets} from '../server-secrets'
 
-// TODO Make secret
-const privateKey = 'woo foo'
-
-export const authRouter = (serverStore: ServerStore, dbStore: DBStore): Router => {
+export const authRouter = async (
+	serverStore: ServerStore,
+	dbStore: DBStore,
+	serverSecrets: ServerSecrets,
+): Promise<Router> => {
 
 	const router = Router()
+
+	const {jwtSecret} = serverSecrets
 
 	router.post('/register', async (req, res) => {
 		if (!isRegister(req.body)) return res.status(400).json({message: 'oops'})
@@ -29,7 +33,7 @@ export const authRouter = (serverStore: ServerStore, dbStore: DBStore): Router =
 		})
 
 		const tokenHolder: TokenHolder = {
-			token: await sign({id}, privateKey),
+			token: await sign({id}, jwtSecret),
 		}
 
 		return res.json(tokenHolder)

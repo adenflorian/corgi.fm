@@ -16,4 +16,7 @@ ssh ${SSH_USER}@${SSH_HOST} '
     # mongo
     apt update
     apt install -y mongodb
+
+    # create corgiSecrets.json
+    touch ~/corgiSecrets.json
 '

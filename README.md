@@ -20,3 +20,8 @@ SSH_USER=notroot
 SSH_HOST_TEST=test.example.com
 SSH_USER_TEST=notroot
 ```
+
+## Server Setup
+Run `setup-test-server` or `setup-prod-server`.
+
+Add `jwtSecret` to `~/corgiSecrets.json` on server.

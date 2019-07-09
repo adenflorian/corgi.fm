@@ -11,7 +11,9 @@ describe('API Tests', () => {
 
 	beforeEach(async () => {
 		db = await connectDB()
-		app = setupExpressApp(configureServerStore(), db)
+		app = await setupExpressApp(configureServerStore(), db, {
+			jwtSecret: 'the jwtSecret',
+		})
 	})
 
 	afterEach(async () => {
@@ -65,6 +67,7 @@ describe('API Tests', () => {
 							// Make sure password is hashed
 							expect(result!.password).not.toEqual(password)
 
+							// Make sure we got our token back
 							expect(isTokenHolder(response.body)).toBeTruthy()
 							if (!isTokenHolder(response.body)) throw fail('not a TokenHolder')
 							expect(response.body).toMatchObject({

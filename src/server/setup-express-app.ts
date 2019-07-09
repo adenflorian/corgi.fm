@@ -7,8 +7,13 @@ import {stateRouter} from './api/state-router'
 import {DBStore} from './database/database'
 import {isProdServer} from './is-prod-server'
 import {ServerStore} from './server-redux-types'
+import {ServerSecrets} from './server-secrets'
 
-export function setupExpressApp(serverStore: ServerStore, dbStore: DBStore) {
+export async function setupExpressApp(
+	serverStore: ServerStore,
+	dbStore: DBStore,
+	serverSecrets: ServerSecrets,
+) {
 	const app: express.Application = express()
 
 	app.use(cors())
@@ -24,7 +29,7 @@ export function setupExpressApp(serverStore: ServerStore, dbStore: DBStore) {
 		app.use('/state', stateRouter(serverStore))
 	}
 
-	app.use('/api', apiRouter(serverStore, dbStore))
+	app.use('/api', await apiRouter(serverStore, dbStore, serverSecrets))
 
 	app.get('/*', (_, res) => {
 		res.sendFile(path.join(__dirname, '../public/index.html'))

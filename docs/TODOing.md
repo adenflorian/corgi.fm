@@ -55,8 +55,8 @@
 		- [√] save user to DB
 		- [√] hash pw
 		- [√] limit pw to 50 chars
-		- [ ] return token
-		- [ ] put token in secret place and load in
+		- [√] return token
+		- [√] put token secret in secret place and load in
 		- [ ] check for existing user first
 	- [ ] login
 		- [ ] return token
