@@ -57,7 +57,8 @@
 		- [√] limit pw to 50 chars
 		- [√] return token
 		- [√] put token secret in secret place and load in
-		- [ ] check for existing user first
+		- [√] check for existing user first
+		- [√] min password length
 	- [ ] login
 		- [ ] return token
 	- [ ] jwt

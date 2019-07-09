@@ -21,7 +21,7 @@ export const dummyDb: DBStore = Object.freeze({
 })
 
 export async function connectDB() {
-	const uri = await getDbConnector()(dbName)
+	const {uri, stop} = await getDbConnector()(dbName)
 
 	const client = await MongoClient.connect(uri, {useNewUrlParser: true})
 
@@ -34,6 +34,7 @@ export async function connectDB() {
 		users: usersQueries(db),
 		async close() {
 			await client.close()
+			await stop()
 			logger.debug('db closed')
 		},
 	}

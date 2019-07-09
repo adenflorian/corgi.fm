@@ -27,13 +27,13 @@ describe('API Tests', () => {
 					const email = 'pit@random.dog'
 					await request(app)
 						.post('/api/auth/register')
-						.send({email, password: 123})
+						.send({email, password: 123453789})
 						.expect(400)
 						.expect('Content-Type', /application\/json/)
 						.then(async response => {
 							expect(await db.users.getUserByEmail(email)).toBeNull()
 							expect(response.body).toEqual({
-								message: 'oops',
+								message: 'password must be a string',
 							})
 						})
 				})
@@ -47,13 +47,46 @@ describe('API Tests', () => {
 						.then(async response => {
 							expect(await db.users.getUserByEmail(email)).toBeNull()
 							expect(response.body).toEqual({
-								message: 'oops',
+								message: 'password must be gte 8 and lte 50',
+							})
+						})
+				})
+				it('should fail when password is < 8', async () => {
+					const email = 'lab@random.dog'
+					await request(app)
+						.post('/api/auth/register')
+						.send({email, password: '1234567'})
+						.expect(400)
+						.expect('Content-Type', /application\/json/)
+						.then(async response => {
+							expect(await db.users.getUserByEmail(email)).toBeNull()
+							expect(response.body).toEqual({
+								message: 'password must be gte 8 and lte 50',
+							})
+						})
+				})
+				it('should fail when email exists', async () => {
+					const email = 'bloodhound@random.dog'
+					await request(app)
+						.post('/api/auth/register')
+						.send({email, password: 'bloodhound1'})
+						.expect(200)
+
+					await request(app)
+						.post('/api/auth/register')
+						.send({email, password: 'bloodhound2'})
+						.expect(400)
+						.expect('Content-Type', /application\/json/)
+						.then(async response => {
+							expect(await db.users.getUserByEmail(email)).toMatchObject({email})
+							expect(response.body).toEqual({
+								message: 'email exists',
 							})
 						})
 				})
 				it('should work', async () => {
 					const email = 'corgi@random.dog'
-					const password = 'woof'
+					const password = 'corgi@random.dog123'
 					await request(app)
 						.post('/api/auth/register')
 						.send({email, password})

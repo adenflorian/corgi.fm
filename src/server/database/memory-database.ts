@@ -10,5 +10,8 @@ export async function startInMemoryDB(dbName: string) {
 
 	logger.debug('started mongo in memory: ', uri)
 
-	return uri
+	return {
+		uri,
+		stop: async () => await mongo.stop(),
+	}
 }
