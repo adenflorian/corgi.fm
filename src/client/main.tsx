@@ -10,7 +10,7 @@ import {BrowserWarning} from './BrowserWarning'
 import {configureStore} from './client-store'
 import {getCurrentClientVersion} from './client-utils'
 import {getECSLoop} from './ECS/ECS'
-import {initializeFirebase} from './Firebase/FirebaseContext'
+import {initializeFirebase, wireUpFirebaseToRedux} from './Firebase/FirebaseContext'
 import {getFpsLoop} from './fps-loop'
 import {setupInputEventListeners} from './input-events'
 import {GetAllInstruments, setupInstrumentManager} from './instrument-manager'
@@ -79,6 +79,8 @@ async function setupAsync() {
 
 	const foo: GetAllInstruments = () => getAllInstruments()
 
+	const firebaseContextStuff = initializeFirebase()
+
 	const onReduxMiddleware: Middleware = () => next => action => {
 		next(action)
 		switch (action.type) {
@@ -88,9 +90,9 @@ async function setupAsync() {
 
 	const store = configureStore({
 		options: loadedOptionsState,
-	}, foo, onReduxMiddleware)
+	}, foo, onReduxMiddleware, firebaseContextStuff)
 
-	const firebaseContextStuff = initializeFirebase(store)
+	wireUpFirebaseToRedux(firebaseContextStuff, store)
 
 	validateOptionsState(store, loadedOptionsState)
 

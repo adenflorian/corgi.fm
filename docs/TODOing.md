@@ -73,6 +73,8 @@
 - [ ] firebase auth
 	- [ ] local
 		- [ ] UI
+			- [ ] register
+				- [√] send verification email
 			- [√] login
 				- [ ] styling
 			- [√] logout

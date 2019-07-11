@@ -13,18 +13,10 @@ export const FirebaseContext = React.createContext<FirebaseContextStuff>({
 
 export type FirebaseContextStuff = ReturnType<typeof initializeFirebase>
 
-export function initializeFirebase(store: Store<IClientAppState>) {
+export function initializeFirebase() {
 	const app = firebase.initializeApp(getFirebaseConfig())
 
 	const auth = firebase.auth(app)
-
-	auth.onAuthStateChanged(user => {
-		if (user) {
-			store.dispatch(authActions.logIn(user.uid))
-		} else {
-			store.dispatch(authActions.logOut())
-		}
-	})
 
 	const authUi = new firebaseui.auth.AuthUI(auth)
 
@@ -33,6 +25,16 @@ export function initializeFirebase(store: Store<IClientAppState>) {
 		auth,
 		authUi,
 	}
+}
+
+export function wireUpFirebaseToRedux(firebaseContext: FirebaseContextStuff, store: Store<IClientAppState>) {
+	firebaseContext.auth.onAuthStateChanged(async user => {
+		if (user) {
+			store.dispatch(authActions.logIn(user))
+		} else {
+			store.dispatch(authActions.logOut())
+		}
+	})
 }
 
 export function useFirebase() {

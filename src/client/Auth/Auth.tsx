@@ -60,11 +60,17 @@ export const Auth = React.memo(
 			return {
 				callbacks: {
 					signInSuccessWithAuthResult: authResult => {
+						// See wireUpFirebaseToRedux() in FirebaseContext.ts for more callbacks when a user signs in
+						logger.log({authResult})
+						if (authResult && authResult.additionalUserInfo && authResult.additionalUserInfo.isNewUser) {
+							dispatch(authActions.onRegister())
+						}
 						setVisible(false)
 						return false
 					},
 					signInFailure: error => {
 						logger.error('signInFailure: ', {error})
+						dispatch(authActions.logInError())
 						setVisible(false)
 						return Promise.resolve()
 					},
