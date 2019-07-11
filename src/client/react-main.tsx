@@ -4,16 +4,19 @@ import {hot} from 'react-hot-loader'
 import {Provider} from 'react-redux'
 import {Store} from 'redux'
 import {ConnectedApp} from './App'
+import {FirebaseContext, FirebaseContextStuff} from './Firebase/FirebaseContext'
 import {SvgGradients} from './SvgGradients'
 
-export function renderApp(store: Store) {
+export function renderApp(store: Store, firebaseContextStuff: FirebaseContextStuff) {
 	const HotProvider = hot(module)(Provider)
 	ReactDOM.render(
 		<HotProvider store={store}>
-			<React.Fragment>
-				<ConnectedApp />
-				<SvgGradients />
-			</React.Fragment>
+			<FirebaseContext.Provider value={firebaseContextStuff}>
+				<React.Fragment>
+					<ConnectedApp />
+					<SvgGradients />
+				</React.Fragment>
+			</FirebaseContext.Provider>
 		</HotProvider>,
 		document.getElementById('react-app'),
 	)

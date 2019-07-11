@@ -11,6 +11,7 @@ export * from './virtual-keyboard-redux'
 export * from './connections-redux'
 export * from './ghost-connections-redux'
 export * from './audio-redux'
+export * from './auth-redux'
 
 export * from './redux-utils'
 export * from './websocket-redux'

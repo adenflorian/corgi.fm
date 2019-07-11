@@ -1,5 +1,6 @@
 import {AnyAction, combineReducers, Store} from 'redux'
 import {StateType} from 'typesafe-actions'
+import {authReducer} from './auth-redux'
 import {
 	audioReducer, BROADCASTER_ACTION, chatActionTypesWhitelist, clientInfoReducer, clientsReducer, optionsReducer,
 	pointerActionTypesWhitelist, roomReducers, roomsReducer, userInputReducer, websocketReducer,
@@ -14,6 +15,7 @@ export type ClientStore = Store<IClientAppState>
 export function getClientReducers() {
 	return combineReducers(Object.freeze({
 		audio: audioReducer,
+		auth: authReducer,
 		clientInfo: clientInfoReducer,
 		clients: clientsReducer,
 		options: optionsReducer,

@@ -6,6 +6,7 @@ import {selectClientCount} from '../common/redux'
 import {selectClientInfo, shamuConnect} from '../common/redux'
 import {requestCreateRoom} from '../common/redux'
 import {CssColor} from '../common/shamu-color'
+import {ConnectedAuth} from './Auth/Auth'
 import {Button} from './Button/Button'
 import {ButtonLink} from './Button/ButtonLink'
 import {localActions} from './local-middleware'
@@ -80,6 +81,7 @@ export const TopDiv = ({memberCount, clientCount, info, isClientReady, roomOwner
 		</div>
 		<div className="right">
 			<ConnectedNameChanger />
+			<ConnectedAuth />
 			<ConnectedRoomSelector />
 			<Button
 				buttonProps={{id: 'newRoomButton', onClick: () => dispatch(requestCreateRoom())}}

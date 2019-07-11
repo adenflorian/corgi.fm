@@ -10,6 +10,7 @@ import {BrowserWarning} from './BrowserWarning'
 import {configureStore} from './client-store'
 import {getCurrentClientVersion} from './client-utils'
 import {getECSLoop} from './ECS/ECS'
+import {initializeFirebase} from './Firebase/FirebaseContext'
 import {getFpsLoop} from './fps-loop'
 import {setupInputEventListeners} from './input-events'
 import {GetAllInstruments, setupInstrumentManager} from './instrument-manager'
@@ -25,6 +26,7 @@ import {setupWebsocketAndListeners, socket} from './websocket-listeners'
 
 initializeAnalytics()
 
+// tslint:disable-next-line: no-floating-promises
 start()
 
 declare global {
@@ -88,6 +90,8 @@ async function setupAsync() {
 		options: loadedOptionsState,
 	}, foo, onReduxMiddleware)
 
+	const firebaseContextStuff = initializeFirebase(store)
+
 	validateOptionsState(store, loadedOptionsState)
 
 	store.dispatch(clientInfoActions.setClientVersion(getCurrentClientVersion()))
@@ -106,7 +110,7 @@ async function setupAsync() {
 
 	const {getAllInstruments, getAllAudioNodes} = setupInstrumentManager(store, audioContext, preFx)
 
-	renderApp(store)
+	renderApp(store, firebaseContextStuff)
 
 	const {ecsLoop, onSetActiveRoom} = getECSLoop(store, masterLimiter)
 

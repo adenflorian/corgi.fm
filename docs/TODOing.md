@@ -50,7 +50,7 @@
 	- [√] connect to memory db in local
 	- [√] connect to real database in test and prod
 	- [√] setup db in prod
-- [ ] auth
+- [ ] auth back end
 	- [ ] register
 		- [√] save user to DB
 		- [√] hash pw
@@ -59,13 +59,34 @@
 		- [√] put token secret in secret place and load in
 		- [√] check for existing user first
 		- [√] min password length
+		- [ ] validate email
+			- [ ] on register, send email with verification link
+		- [ ] verify email
 	- [ ] login
 		- [ ] return token
+	- [ ] password reset
 	- [ ] jwt
 		- [ ] make it expire
 		- [ ] do i need to store the tokens in the DB?
 		- [ ] revoking access
 		- [ ] logging out (just delete token from client?)
+- [ ] firebase auth
+	- [ ] local
+		- [ ] UI
+			- [√] login
+				- [ ] styling
+			- [√] logout
+			- [ ] reset password
+		- [ ] server
+		- [ ] ToS
+			- [√] create html
+			- [ ] make it proper
+		- [ ] Privacy policy
+			- [√] create html
+			- [ ] make it proper
+		- [ ] open source licenses
+	- [ ] test
+	- [ ] prod
 - [ ] https://github.com/TrillCyborg/fullstack
 - [ ] https://github.com/accounts-js/accounts
 - [ ] tslint rule to require awaiting promises

@@ -21,7 +21,8 @@
             true,
             "react-icons",
             "rc-slider",
-            "redux-devtools-extension"
+            "redux-devtools-extension",
+            "firebase"
         ],
         "completed-docs": false,
         "no-import-side-effect": [

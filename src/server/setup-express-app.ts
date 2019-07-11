@@ -21,6 +21,7 @@ export async function setupExpressApp(
 
 	app.use(express.static(path.join(__dirname, '../public')))
 
+	// TODO Is this need since we are using the static middleware above?
 	app.get('/newsletter', (_, res) => {
 		res.sendFile(path.join(__dirname, '../public/newsletter.html'))
 	})
