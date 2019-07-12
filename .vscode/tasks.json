@@ -8,7 +8,7 @@
 			"type": "process",
 			"dependsOn": [
 				"watch-parcel",
-				"watch-ts-client",
+				// "watch-ts-client",
 				"watch-server"
 			],
 			"problemMatcher": []
