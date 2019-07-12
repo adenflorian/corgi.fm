@@ -3,7 +3,22 @@
     "extends": [
         "tslint:recommended"
     ],
-    "jsRules": {},
+    "jsRules": {
+        "quotemark": [
+            true,
+            "single",
+            "jsx-double"
+        ],
+        "semicolon": [
+            true,
+            "never"
+        ],
+        "indent": [
+            true,
+            "tabs"
+        ],
+        "object-literal-sort-keys": false,
+    },
     "rules": {
         "ban-types": false,
         "member-ordering": false,

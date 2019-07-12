@@ -10,7 +10,7 @@ describe('API Tests', () => {
 
 	beforeEach(async () => {
 		db = await connectDB()
-		app = await setupExpressApp(configureServerStore(), db, {})
+		app = await setupExpressApp(configureServerStore(), db)
 	})
 
 	afterEach(async () => {
