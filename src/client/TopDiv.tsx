@@ -6,6 +6,7 @@ import {selectClientCount} from '../common/redux'
 import {selectClientInfo, shamuConnect} from '../common/redux'
 import {requestCreateRoom} from '../common/redux'
 import {CssColor} from '../common/shamu-color'
+import {eventNewRoomButtonClick, eventPruneRoomButtonClick, eventPruneRoomConfirmed, eventSaveRoomToBrowserButtonClick, eventSaveRoomToFileButtonClick} from './analytics/analytics'
 import {ConnectedAuth} from './Auth/Auth'
 import {Button} from './Button/Button'
 import {ButtonLink} from './Button/ButtonLink'
@@ -84,18 +85,31 @@ export const TopDiv = ({memberCount, clientCount, info, isClientReady, roomOwner
 			<ConnectedAuth />
 			<ConnectedRoomSelector />
 			<Button
-				buttonProps={{id: 'newRoomButton', onClick: () => dispatch(requestCreateRoom())}}
+				buttonProps={{
+					id: 'newRoomButton', onClick: () => {
+						dispatch(requestCreateRoom())
+						eventNewRoomButtonClick()
+					},
+				}}
 			>
 				New Room
 			</Button>
 			<Button
-				buttonProps={{onClick: rateLimitedDebounceNoTrail(() => dispatch(localActions.saveRoomToBrowser()), 1000)}}
+				buttonProps={{
+					onClick: rateLimitedDebounceNoTrail(() => {
+						dispatch(localActions.saveRoomToBrowser())
+						eventSaveRoomToBrowserButtonClick()
+					}, 1000),
+				}}
 			>
 				Save Room To Browser
 			</Button>
 			<Button
 				buttonProps={{
-					onClick: rateLimitedDebounceNoTrail(() => dispatch(localActions.saveRoomToFile()), 2000),
+					onClick: rateLimitedDebounceNoTrail(() => {
+						dispatch(localActions.saveRoomToFile())
+						eventSaveRoomToFileButtonClick()
+					}, 2000),
 					title: 'Will be able to load from file at a later date',
 				}}
 			>
@@ -104,7 +118,13 @@ export const TopDiv = ({memberCount, clientCount, info, isClientReady, roomOwner
 			<SavingAndLoading dispatch={dispatch} />
 			<Button
 				buttonProps={{
-					onClick: () => confirm('Are you sure you want to delete all nodes with no connections in this room?\nThis cannot be undone!') ? dispatch(localActions.pruneRoom()) : undefined,
+					onClick: () => {
+						if (confirm('Are you sure you want to delete all nodes with no connections in this room?\nThis cannot be undone!')) {
+							dispatch(localActions.pruneRoom())
+							eventPruneRoomConfirmed()
+						}
+						eventPruneRoomButtonClick()
+					},
 					title: 'Will delete nodes with no connections on them' + (onlyOwnerCanDoStuff && !isLocalClientRoomOwner ? '\nOnly room owner can prune at this time' : ''),
 				}}
 				disabled={onlyOwnerCanDoStuff && !isLocalClientRoomOwner}
