@@ -82,7 +82,7 @@ export const TopDiv = ({memberCount, clientCount, info, isClientReady, roomOwner
 		</div>
 		<div className="right">
 			<ConnectedNameChanger />
-			<ConnectedAuth />
+			{/* <ConnectedAuth /> */}
 			<ConnectedRoomSelector />
 			<Button
 				buttonProps={{
