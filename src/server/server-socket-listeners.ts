@@ -7,12 +7,13 @@ import {ClientId, ConnectionNodeType} from '../common/common-types'
 import {logger} from '../common/logger'
 import {
 	addClient, addRoomMember, BroadcastAction,
-	CHANGE_ROOM, chatActionTypesWhitelist, clientDisconnected, ClientState,
+	CHANGE_ROOM, clientDisconnected, ClientState,
 	connectionsActions, createRoom, createRoomAction,
 	deletePositions, deleteRoomMember, deleteThingsAny,
-	getActionsBlacklist, GLOBAL_SERVER_ACTION, globalClockActions, IClientRoomState,
+	getActionsBlacklist, GLOBAL_SERVER_ACTION, globalClockActions,
+	IClientRoomState,
 	IServerState, LOAD_ROOM, LoadRoomAction, maxUsernameLength,
-	pointerActionTypesWhitelist, pointersActions, ready,
+	pointersActions, ready,
 	replacePositions, REQUEST_CREATE_ROOM, roomOwnerRoomActions,
 	RoomSettingsAction, roomSettingsActions,
 	RoomsReduxAction, SavedRoom,
@@ -21,9 +22,11 @@ import {
 	selectAllRoomMemberIds,
 	selectAllRooms, selectAllRoomStates, selectClientById,
 	selectClientBySocketId,
-	selectConnectionsWithSourceOrTargetIds, selectConnectionsWithTargetIds, selectGlobalClockState, selectNodeIdsOwnedByClient,
+	selectConnectionsWithSourceOrTargetIds, selectConnectionsWithTargetIds,
+	selectGlobalClockState, selectNodeIdsOwnedByClient,
 	selectPositionsWithIds, selectRoomExists,
-	selectRoomSettings, selectRoomStateByName, selectShamuGraphState, SERVER_ACTION, setActiveRoom,
+	selectRoomSettings, selectRoomStateByName, selectShamuGraphState,
+	SERVER_ACTION, setActiveRoom,
 	setChat,
 	setClients,
 	setRoomMembers,
@@ -35,13 +38,13 @@ import {
 import {WebSocketEvent} from '../common/server-constants'
 import {createServerStuff, loadServerStuff} from './create-server-stuff'
 import {DBStore} from './database/database'
-import {serverInfo} from './server-info'
+import {getServerVersion} from './server-version'
 
 export const lobby = 'lobby'
 
 const server = 'server'
 
-const version = serverInfo.version
+const version = getServerVersion()
 
 export function setupServerWebSocketListeners(io: Server, serverStore: Store, dbStore: DBStore) {
 	io.on('connection', socket => {
@@ -54,6 +57,8 @@ export function setupServerWebSocketListeners(io: Server, serverStore: Store, db
 
 		const room = getRoomName(socket.handshake.query.room)
 
+		// Fire and forget, not worth waiting for
+		// tslint:disable-next-line: no-floating-promises
 		dbStore.events.saveUserConnectEventAsync({username, room, time: new Date()})
 
 		logger.log(

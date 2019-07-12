@@ -4,7 +4,6 @@
 		"noEmit": true,
 		"noUnusedLocals": false,
 		"noUnusedParameters": false,
-		"sourceMap": false,
 		"strict": true,
 		"noImplicitReturns": true,
 		"target": "esnext",

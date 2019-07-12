@@ -64,7 +64,7 @@
 			},
 			"problemMatcher": [],
 			"runOptions": {
-				"runOn": "folderOpen"
+				// "runOn": "folderOpen"
 			}
 		},
 		{

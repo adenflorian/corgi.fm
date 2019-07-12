@@ -1,15 +1,25 @@
 import {logger} from '../common/logger'
 
-export const isProdServer = () => process.env.NODE_ENV === 'production'
+export const isProdServer = () => process.env.CORGI_ENV === 'prod'
 
-export const isLocalDevServer = () => ['test', 'development'].includes(process.env.NODE_ENV || '')
+export const isTestServer = () => process.env.CORGI_ENV === 'test'
+
+export const isLocalDevServer = () => process.env.CORGI_ENV === undefined && process.env.NODE_ENV !== 'production'
 
 export function logServerEnv() {
 	logger.log(
-		isProdServer()
-			? 'isProd'
-			: isLocalDevServer()
-				? 'isLocalDev'
-				: 'unknown env',
+		isLocalDevServer()
+			? 'isLocalDev'
+			: isTestServer()
+				? 'isTest'
+				: 'isProd',
 	)
+}
+
+export function getServerEnv() {
+	return isLocalDevServer()
+		? 'dev'
+		: isTestServer()
+			? 'test'
+			: 'prod'
 }

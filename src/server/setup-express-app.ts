@@ -1,3 +1,5 @@
+import * as Sentry from '@sentry/node'
+import {logger} from '@sentry/utils'
 import * as bodyParser from 'body-parser'
 import * as cors from 'cors'
 import * as express from 'express'
@@ -15,6 +17,8 @@ export async function setupExpressApp(
 	serverSecrets: ServerSecrets,
 ) {
 	const app: express.Application = express()
+
+	app.use(Sentry.Handlers.requestHandler())
 
 	app.use(cors())
 	app.use(bodyParser.json())
@@ -34,6 +38,16 @@ export async function setupExpressApp(
 
 	app.get('/*', (_, res) => {
 		res.sendFile(path.join(__dirname, '../public/index.html'))
+	})
+
+	app.use(Sentry.Handlers.errorHandler())
+
+	app.use(function onError(err: any, req: express.Request, res: any, next: any) {
+		// The error id is attached to `res.sentry` to be returned
+		// and optionally displayed to the user for support.
+		logger.error(err)
+		res.statusCode = 500
+		return res.end(`something borked, here is an error code that the support people might find useful: ` + res.sentry + '\n')
 	})
 
 	return app
