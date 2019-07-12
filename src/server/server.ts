@@ -9,7 +9,6 @@ import {createServerStuff} from './create-server-stuff'
 import {connectDB, DBStore, dummyDb} from './database/database'
 import {getServerEnv, logServerEnv} from './is-prod-server'
 import {startRoomWatcher} from './room-watcher'
-import {getServerSecrets} from './server-secrets'
 import {lobby, setupServerWebSocketListeners} from './server-socket-listeners'
 import {setupExpressApp} from './setup-express-app'
 
@@ -41,9 +40,7 @@ async function start() {
 
 	createServerStuff(lobby, serverStore)
 
-	const serverSecrets = await getServerSecrets()
-
-	const app = await setupExpressApp(serverStore, dbStore, serverSecrets)
+	const app = await setupExpressApp(serverStore, dbStore)
 
 	const server: http.Server = new http.Server(app)
 	const io: socketIO.Server = socketIO(server)
