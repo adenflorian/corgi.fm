@@ -20,7 +20,6 @@
         "no-submodule-imports": [
             true,
             "react-icons",
-            "rc-slider",
             "redux-devtools-extension",
             "firebase"
         ],
