@@ -1,5 +1,5 @@
 import {stripIndents} from 'common-tags'
-import React = require('react')
+import React from 'react'
 import {Component} from 'react'
 import {connect} from 'react-redux'
 import {Action, Dispatch} from 'redux'

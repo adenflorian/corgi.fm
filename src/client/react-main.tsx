@@ -1,4 +1,4 @@
-import React = require('react')
+import React from 'react'
 import ReactDOM = require('react-dom')
 import {hot} from 'react-hot-loader'
 import {Provider} from 'react-redux'
