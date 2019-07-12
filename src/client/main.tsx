@@ -25,7 +25,7 @@ import {SamplesManager} from './WebAudio/SamplesManager'
 import {setStoreForSchedulerVisual, startSchedulerVisualLoop} from './WebAudio/SchedulerVisual'
 import {setupWebsocketAndListeners, socket} from './websocket-listeners'
 
-initSentry()
+if (!isLocalDevClient()) initSentry()
 
 initializeAnalytics()
 

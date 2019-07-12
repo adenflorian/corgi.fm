@@ -2,6 +2,7 @@ import * as Sentry from '@sentry/browser'
 import {CaptureConsole} from '@sentry/integrations'
 import {getCurrentClientVersion} from '../client-utils'
 import {getEnvName} from '../is-prod-client'
+import {logger} from '@sentry/utils';
 
 export function initSentry() {
 	Sentry.init({
@@ -14,4 +15,5 @@ export function initSentry() {
 			}),
 		],
 	})
+	logger.log('sentry client initialized')
 }
