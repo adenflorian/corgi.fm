@@ -1,5 +1,6 @@
 import * as firebase from 'firebase/app'
-import * as firebaseui from 'firebaseui'
+// tslint:disable-next-line:no-import-side-effect
+import 'firebase/auth'
 import React, {useContext} from 'react'
 import {Store} from 'redux'
 import {authActions, IClientAppState} from '../../common/redux'
@@ -8,7 +9,6 @@ import {getFirebaseConfig} from './firebase-config'
 export const FirebaseContext = React.createContext<FirebaseContextStuff>({
 	app: {} as any,
 	auth: {} as any,
-	authUi: {} as any,
 })
 
 export type FirebaseContextStuff = ReturnType<typeof initializeFirebase>
@@ -18,12 +18,9 @@ export function initializeFirebase() {
 
 	const auth = firebase.auth(app)
 
-	const authUi = new firebaseui.auth.AuthUI(auth)
-
 	return {
 		app,
 		auth,
-		authUi,
 	}
 }
 

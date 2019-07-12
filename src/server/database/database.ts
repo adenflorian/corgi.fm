@@ -3,7 +3,6 @@ import {ThenArg} from '../../common/common-types'
 import {logger} from '../../common/logger'
 import {getDbConnector} from '../server-config'
 import {eventsQueries} from './events'
-import {usersQueries} from './users'
 
 export type DBStore = ThenArg<typeof connectDB>
 
@@ -13,10 +12,6 @@ export const dummyDb: DBStore = Object.freeze({
 	async close() {},
 	events: {
 		async saveUserConnectEventAsync() {return 0},
-	},
-	users: {
-		async getUserByEmail() {throw new Error('no db for getUserByEmail')},
-		async register() {throw new Error('no db for register')},
 	},
 })
 
@@ -31,7 +26,6 @@ export async function connectDB() {
 
 	return {
 		events: eventsQueries(db),
-		users: usersQueries(db),
 		async close() {
 			await client.close()
 			await stop()

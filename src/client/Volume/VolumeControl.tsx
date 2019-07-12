@@ -1,4 +1,5 @@
 import {stripIndents} from 'common-tags'
+// TODO Remove
 import 'rc-slider/assets/index.css'
 import React = require('react')
 import {Component} from 'react'

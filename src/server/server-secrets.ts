@@ -26,9 +26,8 @@ export async function getServerSecrets(): Promise<ServerSecrets> {
 }
 
 export interface ServerSecrets {
-	jwtSecret: string
 }
 
 function isServerSecrets(arg: any): arg is ServerSecrets {
-	return arg && arg.jwtSecret && typeof arg.jwtSecret === 'string'
+	return arg
 }

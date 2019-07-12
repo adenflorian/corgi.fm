@@ -3,7 +3,6 @@ import {Router} from 'express'
 import {DBStore} from '../database/database'
 import {ServerStore} from '../server-redux-types'
 import {ServerSecrets} from '../server-secrets'
-import {authRouter} from './auth-router'
 import {usersRouter} from './users-router'
 
 export const apiRouter = async (
@@ -15,7 +14,6 @@ export const apiRouter = async (
 	const router = Router()
 
 	router.use('/users', usersRouter(serverStore))
-	router.use('/auth', await authRouter(serverStore, dbStore, serverSecrets))
 
 	return router
 }
