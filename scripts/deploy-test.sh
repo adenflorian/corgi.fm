@@ -20,5 +20,5 @@ echo 'nvm' | ssh ${SSH_USER_TEST}@${SSH_HOST_TEST} '
     tar -xzvf corgi.fm.tar.gz --directory corgi.fm;
     cd corgi.fm/built;
     yarn --prod;
-    yarn start-prod;
+    yarn start-test;
 '
