@@ -115,7 +115,7 @@
     "eslint-plugin-react-hooks": "^1.6.0",
     "jest": "^24.8.0",
     "less": "^3.0.4",
-    "mongodb-memory-server": "^5.1.5",
+    "mongodb-memory-server-global": "^5.1.5",
     "parcel-bundler": "^1.12.3",
     "pm2": "^2.10.4",
     "sinon": "^7.2.2",

@@ -5968,7 +5968,15 @@ mongodb-memory-server-core@5.1.5:
   optionalDependencies:
     mongodb ">=3.2.7"
 
-mongodb-memory-server@^5.1.5:
+mongodb-memory-server-global@^5.1.5:
+  version "5.1.5"
+  resolved "https://registry.yarnpkg.com/mongodb-memory-server-global/-/mongodb-memory-server-global-5.1.5.tgz#5402ed82497f969ce1113245089f7f02c8cd5ca4"
+  integrity sha512-aBRRuge2lLgTt4GgVN5GmF66NPxB/BOT4h/L0SOdi6u/G1ZWaBhMJUzcQ5+GuyNB1G1c0NgcBYl8ssLwvpZA9Q==
+  dependencies:
+    mongodb-memory-server "5.1.5"
+    os "^0.1.1"
+
+mongodb-memory-server@5.1.5:
   version "5.1.5"
   resolved "https://registry.yarnpkg.com/mongodb-memory-server/-/mongodb-memory-server-5.1.5.tgz#3ceb8ec9024a0fb36717c6f2c7ea25e197e0907e"
   integrity sha512-FvpX7+eLjEeGowkU/vyVDVLC4hT/VnWwWja7H6XmEkx9+os6IekgJCNGlVcsOZSBxn1OFdpxHTD8IzHn4us7Mw==
@@ -6449,6 +6457,11 @@ os-locale@^3.0.0:
 os-tmpdir@^1.0.0, os-tmpdir@~1.0.2:
   version "1.0.2"
   resolved "http://registry.npmjs.org/os-tmpdir/-/os-tmpdir-1.0.2.tgz#bbe67406c79aa85c5cfec766fe5734555dfa1274"
+
+os@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/os/-/os-0.1.1.tgz#208845e89e193ad4d971474b93947736a56d13f3"
+  integrity sha1-IIhF6J4ZOtTZcUdLk5R3NqVtE/M=
 
 osenv@^0.1.4:
   version "0.1.5"
