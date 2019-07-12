@@ -6,7 +6,7 @@ module.exports = {
 	apps: [
 		{
 			name: 'corgi-fm-server',
-			script: 'server.js',
+			script: 'server/server.js',
 			env_test: {
 				NODE_ENV: 'production',
 				CORGI_ENV: 'test',
