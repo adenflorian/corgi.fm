@@ -6,6 +6,7 @@ import {
 	clientInfoActions, createUsername, loadOptionsState, SET_ACTIVE_ROOM, validateOptionsState,
 } from '../common/redux'
 import {setupAudioContext} from '../common/setup-audio-context'
+import {initSentry} from './analytics/sentry'
 import {BrowserWarning} from './BrowserWarning'
 import {configureStore} from './client-store'
 import {getCurrentClientVersion} from './client-utils'
@@ -23,6 +24,8 @@ import {getUsernameFromLocalStorage, saveUsernameToLocalStorage} from './usernam
 import {SamplesManager} from './WebAudio/SamplesManager'
 import {setStoreForSchedulerVisual, startSchedulerVisualLoop} from './WebAudio/SchedulerVisual'
 import {setupWebsocketAndListeners, socket} from './websocket-listeners'
+
+initSentry()
 
 initializeAnalytics()
 

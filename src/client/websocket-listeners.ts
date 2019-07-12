@@ -7,7 +7,7 @@ import {
 	selectActiveRoom, selfDisconnected, setInfo, setSocketId,
 } from '../common/redux'
 import {WebSocketEvent} from '../common/server-constants'
-import {eventClientServerVersionMismatch} from './analytics'
+import {eventClientServerVersionMismatch} from './analytics/analytics'
 import {getCurrentClientVersion} from './client-utils'
 import {isLocalDevClient} from './is-prod-client'
 import {getUsernameFromLocalStorage} from './username'

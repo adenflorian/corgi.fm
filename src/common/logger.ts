@@ -1,4 +1,4 @@
-import {eventError} from '../client/analytics'
+import {eventError} from '../client/analytics/analytics'
 
 // tslint:disable:no-console
 const logLevel = {
