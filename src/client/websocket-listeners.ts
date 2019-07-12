@@ -7,6 +7,7 @@ import {
 	selectActiveRoom, selfDisconnected, setInfo, setSocketId,
 } from '../common/redux'
 import {WebSocketEvent} from '../common/server-constants'
+import {eventClientServerVersionMismatch} from './analytics'
 import {getCurrentClientVersion} from './client-utils'
 import {isLocalDevClient} from './is-prod-client'
 import {getUsernameFromLocalStorage} from './username'
@@ -58,7 +59,8 @@ export function setupWebsocketAndListeners(store: Store) {
 
 		if (serverVersion !== clientVersion) {
 			logger.warn(`client server version mismatch! client is ${clientVersion}, server is ${serverVersion}`)
-			// TODO Analytics event
+
+			eventClientServerVersionMismatch(clientVersion, serverVersion)
 		}
 	})
 
