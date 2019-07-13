@@ -12,3 +12,15 @@ export function useBoolean(init: boolean): [boolean, Enabler, Disabler] {
 
 type Enabler = () => void
 type Disabler = () => void
+
+export function useResettableState<T>(init: T): [T, React.Dispatch<React.SetStateAction<T>>, Resetter] {
+	const [value, setValue] = useState(init)
+
+	return [
+		value,
+		setValue,
+		() => setValue(init),
+	]
+}
+
+type Resetter = () => void
