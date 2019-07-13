@@ -75,9 +75,13 @@
 		- [ ] UI
 			- [√] register
 				- [√] send verification email
-			- [ ] login
+			- [√] login
 				- [√] styling
-				- [ ] reset password
+				- [√] reset password
+				- [√] with google
+				- [ ] facebook
+				- [ ] twitter
+				- [ ] with sound cloud
 			- [√] logout
 		- [ ] server
 		- [ ] ToS

@@ -1,5 +1,6 @@
-import {Fragment, useState} from 'react'
+import * as firebase from 'firebase/app'
 import React from 'react'
+import {Fragment, useState} from 'react'
 import {Dispatch} from 'redux'
 import {AuthConstants} from '../../common/auth-constants'
 import {
@@ -30,7 +31,6 @@ function _Auth({dispatch, loggedIn}: AllProps) {
 	const [authInfo, setAuthInfo, clearAuthInfo] = useResettableState<[string, 'error' | 'info']>(['', 'error'])
 	const [inputsDisabled, disableInputs, enableInputs] = useBoolean(false)
 	const firebaseContext = useFirebase()
-	const firebase = useFirebase()
 
 	return (
 		<Fragment>
@@ -92,6 +92,13 @@ function _Auth({dispatch, loggedIn}: AllProps) {
 									onClick={handleResetPassword}
 								/>
 							</div>
+							<input
+								type="button"
+								className="button googleLogin"
+								value={'Login with Google'}
+								disabled={inputsDisabled}
+								onClick={handleGoogleLogin}
+							/>
 						</form>
 						{authInfo[0] &&
 							<div className={`${authInfo[1]}`}>
@@ -108,8 +115,20 @@ function _Auth({dispatch, loggedIn}: AllProps) {
 		e.preventDefault()
 		disableInputs()
 
-		return firebase.auth
-			.signInWithEmailAndPassword(email, password)
+		return handleLoginPromise(
+			firebaseContext.auth.signInWithEmailAndPassword(email, password))
+	}
+
+	function handleGoogleLogin() {
+		disableInputs()
+
+		return handleLoginPromise(
+			firebaseContext.auth.signInWithPopup(
+				new firebase.auth.GoogleAuthProvider()))
+	}
+
+	function handleLoginPromise(promise: Promise<any>) {
+		return promise
 			.then(() => dispatch(chatSystemMessage('Logged in!')))
 			.then(handleAuthSuccess)
 			.catch(handleAuthError)
@@ -119,7 +138,7 @@ function _Auth({dispatch, loggedIn}: AllProps) {
 	function handleResetPassword() {
 		disableInputs()
 
-		return firebase.auth
+		return firebaseContext.auth
 			.sendPasswordResetEmail(email)
 			.then(() => setAuthInfo(['Password reset email sent!', 'info']))
 			.catch(handleAuthError)
@@ -136,7 +155,7 @@ function _Auth({dispatch, loggedIn}: AllProps) {
 	}
 
 	function handleRegister() {
-		return firebase.auth
+		return firebaseContext.auth
 			.createUserWithEmailAndPassword(email, password)
 			.then(dispatchOnRegister)
 			.then(handleAuthSuccess)
