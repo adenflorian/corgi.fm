@@ -4,22 +4,26 @@ import {isProdServer} from './is-prod-server'
 describe('is-prod-server', () => {
 	let originalNodeEnv: any
 
-	beforeEach(() => (originalNodeEnv = process.env.NODE_ENV))
-	afterEach(() => (process.env.NODE_ENV = originalNodeEnv))
+	beforeEach(() => (originalNodeEnv = process.env.CORGI_ENV))
+	afterEach(() => (process.env.CORGI_ENV = originalNodeEnv))
 
 	describe('isProdServer', () => {
 		[
 			{
-				NODE_ENV: 'development',
+				CORGI_ENV: 'dev',
 				expected: false,
 			},
 			{
-				NODE_ENV: 'production',
+				CORGI_ENV: 'test',
+				expected: false,
+			},
+			{
+				CORGI_ENV: 'prod',
 				expected: true,
 			},
 		].forEach(test => {
-			it(test.NODE_ENV, () => {
-				process.env.NODE_ENV = test.NODE_ENV
+			it(test.CORGI_ENV, () => {
+				process.env.CORGI_ENV = test.CORGI_ENV
 				expect(isProdServer()).to.equal(test.expected)
 			})
 		})
