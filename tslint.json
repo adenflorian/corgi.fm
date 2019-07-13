@@ -2,7 +2,8 @@
     "defaultSeverity": "error",
     "extends": [
         "tslint:recommended",
-        "tslint-react"
+        "tslint-react",
+        "tslint-react-hooks"
     ],
     "jsRules": {
         "quotemark": [
@@ -106,7 +107,8 @@
         "jsx-boolean-value": false,
         "jsx-no-lambda": false,
         "jsx-no-multiline-js": false,
-        "jsx-wrap-multiline": false
+        "jsx-wrap-multiline": false,
+        "react-hooks-nesting": "error"
     },
     "rulesDirectory": [],
     "linterOptions": {
