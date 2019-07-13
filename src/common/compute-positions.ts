@@ -5,23 +5,28 @@ import {
 } from './redux'
 
 // TODO Take position width and height into account
-export function calculatePositionsGivenConnections(positions: IPositions, connections: IConnections) {
-	const originalPositions = positions
+export function calculatePositionsGivenConnections(originalPositions: IPositions, connections: IConnections) {
 
-	const connectionsToMasterAudioOutput = selectConnectionsWithTargetIds2(connections, [MASTER_AUDIO_OUTPUT_TARGET_ID]).toList()
+	const rootPositionId = MASTER_AUDIO_OUTPUT_TARGET_ID
+
+	// Master audio output should be the root node on the right side
+	// Everything should flow to/from it
+	const connectionsToRoot = selectConnectionsWithTargetIds2(connections, [rootPositionId]).toList()
 
 	const newPositions = originalPositions.withMutations(mutablePositions => {
 		const columnWidth = 128
 		const rowHeight = 256 - 8 + 44
 
 		// Center root node
-		mutablePositions.update(MASTER_AUDIO_OUTPUT_TARGET_ID, x => ({...x, x: 0, y: 0}))
+		mutablePositions.update(rootPositionId, x => ({...x, x: 0, y: 0}))
 
-		const calculatePosition = (parentX = 0, parentRow = 0) => (connectionToParent: IConnection, currentRow: number) => {
+		const calculatePosition = (parentX: number, parentRow: number) => (connectionToParent: IConnection, currentRow: number) => {
 			const currentId = connectionToParent.sourceId
 
 			const currentPosition = mutablePositions.get(currentId)!
 
+			// If current position is further left then the new position, prefer current
+			// This means the position was already processed
 			const newX = Math.min(parentX - currentPosition.width - columnWidth, currentPosition.x)
 
 			mutablePositions.set(
@@ -38,7 +43,11 @@ export function calculatePositionsGivenConnections(positions: IPositions, connec
 				.forEach(calculatePosition(newX, currentRow))
 		}
 
-		connectionsToMasterAudioOutput.forEach(calculatePosition(mutablePositions.get(MASTER_AUDIO_OUTPUT_TARGET_ID)!.width - columnWidth, 0))
+		const rootPosition = mutablePositions.get(rootPositionId)!
+
+		connectionsToRoot.forEach(
+			calculatePosition(
+				rootPosition.width - columnWidth, 0))
 	})
 
 	// Centering graph
