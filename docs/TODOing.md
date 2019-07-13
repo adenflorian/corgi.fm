@@ -79,7 +79,7 @@
 				- [√] styling
 				- [√] reset password
 				- [√] with google
-				- [ ] facebook
+				- [√] facebook
 				- [ ] twitter
 				- [ ] with sound cloud
 			- [√] logout

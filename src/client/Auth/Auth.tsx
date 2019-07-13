@@ -97,8 +97,27 @@ function _Auth({dispatch, loggedIn}: AllProps) {
 								className="button googleLogin"
 								value={'Login with Google'}
 								disabled={inputsDisabled}
-								onClick={handleGoogleLogin}
+								onClick={() => handleProviderLogin(
+									firebase.auth.GoogleAuthProvider)}
 							/>
+							<input
+								type="button"
+								className="button googleLogin"
+								value={'Login with Facebook'}
+								disabled={inputsDisabled}
+								onClick={() => handleProviderLogin(
+									firebase.auth.FacebookAuthProvider)}
+							/>
+							{false &&
+								<input
+									type="button"
+									className="button googleLogin"
+									value={'Login with Twitter'}
+									disabled={inputsDisabled}
+									onClick={() => handleProviderLogin(
+										firebase.auth.TwitterAuthProvider)}
+								/>
+							}
 						</form>
 						{authInfo[0] &&
 							<div className={`${authInfo[1]}`}>
@@ -119,15 +138,17 @@ function _Auth({dispatch, loggedIn}: AllProps) {
 			firebaseContext.auth.signInWithEmailAndPassword(email, password))
 	}
 
-	function handleGoogleLogin() {
+	function handleProviderLogin(authProviderMaker: AuthProviderMaker) {
 		disableInputs()
 
 		return handleLoginPromise(
 			firebaseContext.auth.signInWithPopup(
-				new firebase.auth.GoogleAuthProvider()))
+				new authProviderMaker()))
 	}
 
-	function handleLoginPromise(promise: Promise<any>) {
+	function handleLoginPromise(
+		promise: Promise<firebase.auth.UserCredential>,
+	) {
 		return promise
 			.then(() => dispatch(chatSystemMessage('Logged in!')))
 			.then(handleAuthSuccess)
@@ -182,6 +203,8 @@ function _Auth({dispatch, loggedIn}: AllProps) {
 		dispatch(chatSystemMessage('Logged out!'))
 	}
 }
+
+type AuthProviderMaker = new () => firebase.auth.AuthProvider
 
 export const ConnectedAuth = shamuConnect(
 	(state): ReduxProps => {
