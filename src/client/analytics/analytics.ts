@@ -40,6 +40,14 @@ export function eventPruneRoomButtonClick() {
 	})
 }
 
+export function eventOrganizeRoomButtonClick() {
+	event({
+		category: 'rooms',
+		action: 'clickOrganizeRoomButton',
+		label: 'clickOrganizeRoomButton',
+	})
+}
+
 export function eventPruneRoomConfirmed() {
 	event({
 		category: 'rooms',
@@ -48,7 +56,17 @@ export function eventPruneRoomConfirmed() {
 	})
 }
 
-export function eventClientServerVersionMismatch(clientVersion: string, serverVersion: string) {
+export function eventOrganizeRoomConfirmed() {
+	event({
+		category: 'rooms',
+		action: 'clickOrganizeRoomConfirmed',
+		label: 'clickOrganizeRoomConfirmed',
+	})
+}
+
+export function eventClientServerVersionMismatch(
+	clientVersion: string, serverVersion: string
+) {
 	eventError({
 		description: 'ClientServerVersionMismatch',
 		fatal: false,
