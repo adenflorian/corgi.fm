@@ -1,4 +1,5 @@
 import {List} from 'immutable'
+import {CssColor} from '../shamu-color'
 import {IClientRoomState} from './index'
 import {BROADCASTER_ACTION, createReducer, SERVER_ACTION} from './index'
 
@@ -10,6 +11,19 @@ export const chatSubmit = (message: IChatMessage) => {
 		BROADCASTER_ACTION,
 		SERVER_ACTION,
 		message,
+	}
+}
+
+export const CHAT_SYSTEM_MESSAGE = 'CHAT_SYSTEM_MESSAGE'
+export type ChatSystemMessageAction = ReturnType<typeof chatSystemMessage>
+export const chatSystemMessage = (message: string) => {
+	return {
+		type: CHAT_SYSTEM_MESSAGE,
+		message: new IChatMessage(
+			'System',
+			CssColor.defaultGray,
+			message,
+		),
 	}
 }
 
@@ -31,11 +45,13 @@ export interface IChatState {
 	messages: IChatMessage[]
 }
 
-export interface IChatMessage {
-	authorName: string
-	color: string
-	text: string
-	isOldMessage?: boolean
+export class IChatMessage {
+	constructor(
+		public readonly authorName: string,
+		public readonly color: string,
+		public readonly text: string,
+		public readonly isOldMessage?: boolean,
+	) {}
 }
 
 const initialState: IChatState = {
@@ -44,6 +60,12 @@ const initialState: IChatState = {
 
 export const chatReducer = createReducer(initialState, {
 	[CHAT_SUBMIT]: (state, {message}: ChatSubmitAction) => {
+		return {
+			...state,
+			messages: state.messages.concat(message),
+		}
+	},
+	[CHAT_SYSTEM_MESSAGE]: (state, {message}: ChatSystemMessageAction) => {
 		return {
 			...state,
 			messages: state.messages.concat(message),

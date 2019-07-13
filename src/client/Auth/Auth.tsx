@@ -2,7 +2,7 @@ import {Fragment, useState} from 'react'
 import React from 'react'
 import {Dispatch} from 'redux'
 import {AuthConstants} from '../../common/auth-constants'
-import {authActions, selectAuthState, shamuConnect} from '../../common/redux'
+import {authActions, chatSystemMessage, selectAuthState, shamuConnect} from '../../common/redux'
 import {Button} from '../Button/Button'
 import {
 	FirebaseAuthError, FirebaseAuthErrorCode,
@@ -35,7 +35,7 @@ function _Auth({dispatch, loggedIn}: AllProps) {
 			<Button
 				buttonProps={{
 					onClick: loggedIn
-						? () => firebaseContext.auth.signOut()
+						? logout
 						: showModal,
 				}}
 			>
@@ -99,6 +99,7 @@ function _Auth({dispatch, loggedIn}: AllProps) {
 
 		return firebase.auth
 			.signInWithEmailAndPassword(email, password)
+			.then(() => dispatch(chatSystemMessage('Logged in!')))
 			.then(handleAuthSuccess)
 			.catch(handleAuthError)
 			.then(enableInputs)
@@ -141,6 +142,16 @@ function _Auth({dispatch, loggedIn}: AllProps) {
 	function clearPassword() {
 		setPassword('')
 	}
+
+	async function logout() {
+		await firebaseContext.auth.signOut()
+		dispatch(chatSystemMessage('Logged out!'))
+	}
+}
+
+enum AuthUiFlow {
+	Login = 'Login',
+	Forgot = 'Forgot',
 }
 
 export const ConnectedAuth = shamuConnect(

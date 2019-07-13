@@ -73,18 +73,18 @@
 - [ ] firebase auth
 	- [ ] local
 		- [ ] UI
-			- [ ] register
+			- [√] register
 				- [√] send verification email
-			- [√] login
-				- [ ] styling
+			- [ ] login
+				- [√] styling
+				- [ ] reset password
 			- [√] logout
-			- [ ] reset password
 		- [ ] server
 		- [ ] ToS
-			- [√] create html
+			- [ ] create html
 			- [ ] make it proper
 		- [ ] Privacy policy
-			- [√] create html
+			- [ ] create html
 			- [ ] make it proper
 		- [ ] open source licenses
 	- [ ] test

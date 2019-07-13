@@ -1,6 +1,6 @@
 import {Middleware} from 'redux'
 import {
-	AUTH_ON_REGISTER, AuthAction, IClientAppState,
+	AUTH_ON_REGISTER, AuthAction, chatSystemMessage, IClientAppState,
 } from '../../common/redux'
 import {FirebaseContextStuff} from './FirebaseContext'
 
@@ -23,10 +23,13 @@ export const createAuthMiddleware:
 
 				if (!currentUser) return
 
+				dispatch(chatSystemMessage('Registered!'))
+
 				await currentUser.reload()
 
 				if (currentUser.emailVerified !== true) {
 					await currentUser.sendEmailVerification()
+					dispatch(chatSystemMessage('Verification email sent!'))
 				}
 			}
 		}
