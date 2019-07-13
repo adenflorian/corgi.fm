@@ -1,28 +1,32 @@
 import {Middleware} from 'redux'
-import {AUTH_ON_REGISTER, AuthAction, IClientAppState} from '../../common/redux'
+import {
+	AUTH_ON_REGISTER, AuthAction, IClientAppState,
+} from '../../common/redux'
 import {FirebaseContextStuff} from './FirebaseContext'
 
 type AuthMiddlewareActions = AuthAction
 
-export const createAuthMiddleware: (firebase: FirebaseContextStuff) => Middleware<{}, IClientAppState> =
-	(firebase: FirebaseContextStuff) => ({dispatch, getState}) => next => async (action: AuthMiddlewareActions) => {
+export const createAuthMiddleware:
+	(firebase: FirebaseContextStuff) => Middleware<{}, IClientAppState> =
+	(firebase: FirebaseContextStuff) => ({dispatch, getState}) =>
+		next => async (action: AuthMiddlewareActions) => {
 
-		next(action)
+			next(action)
 
-		switch (action.type) {
-			case AUTH_ON_REGISTER: return await onAuthRegister()
-			default: return
-		}
+			switch (action.type) {
+				case AUTH_ON_REGISTER: return await onAuthRegister()
+				default: return
+			}
 
-		async function onAuthRegister() {
-			const {currentUser} = firebase.auth
+			async function onAuthRegister() {
+				const {currentUser} = firebase.auth
 
-			if (!currentUser) return
+				if (!currentUser) return
 
-			await currentUser.reload()
+				await currentUser.reload()
 
-			if (currentUser.emailVerified !== true) {
-				await currentUser.sendEmailVerification()
+				if (currentUser.emailVerified !== true) {
+					await currentUser.sendEmailVerification()
+				}
 			}
 		}
-	}

@@ -2,18 +2,18 @@ import React from 'react'
 import {Dispatch} from 'redux'
 import {rateLimitedDebounceNoTrail} from '../common/common-utils'
 import {
-	IClientState, selectClientById, selectLocalClientId, selectMemberCount,
-	selectRoomSettings, organizeGraph
+	IClientState, organizeGraph, selectClientById, selectLocalClientId,
+	selectMemberCount, selectRoomSettings,
 } from '../common/redux'
 import {selectClientCount} from '../common/redux'
 import {selectClientInfo, shamuConnect} from '../common/redux'
 import {requestCreateRoom} from '../common/redux'
 import {CssColor} from '../common/shamu-color'
 import {
-	eventNewRoomButtonClick, eventPruneRoomButtonClick,
+	eventNewRoomButtonClick, eventOrganizeRoomButtonClick,
+	eventOrganizeRoomConfirmed, eventPruneRoomButtonClick,
 	eventPruneRoomConfirmed, eventSaveRoomToBrowserButtonClick,
-	eventSaveRoomToFileButtonClick, eventOrganizeRoomConfirmed,
-	eventOrganizeRoomButtonClick
+	eventSaveRoomToFileButtonClick,
 } from './analytics/analytics'
 import {ConnectedAuth} from './Auth/Auth'
 import {Button} from './Button/Button'
@@ -75,7 +75,7 @@ export const TopDiv = ({memberCount, clientCount, info, isClientReady,
 						? <span
 							style={{
 								marginLeft: 8,
-								color: CssColor.disabledGray
+								color: CssColor.disabledGray,
 							}}
 						>(You)</span>
 						: ''}
@@ -87,7 +87,7 @@ export const TopDiv = ({memberCount, clientCount, info, isClientReady,
 					style={{
 						color: onlyOwnerCanDoStuff
 							? CssColor.orange
-							: CssColor.green
+							: CssColor.green,
 					}}
 					title={onlyOwnerCanDoStuff
 						? 'Limited: anyone can join, '
@@ -114,7 +114,7 @@ export const TopDiv = ({memberCount, clientCount, info, isClientReady,
 		</div>
 		<div className="right">
 			<ConnectedNameChanger />
-			{/* <ConnectedAuth /> */}
+			<ConnectedAuth />
 			<ConnectedRoomSelector />
 			<Button
 				buttonProps={{

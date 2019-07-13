@@ -17,7 +17,7 @@
             true,
             "tabs"
         ],
-        "object-literal-sort-keys": false,
+        "object-literal-sort-keys": false
     },
     "rules": {
         "ban-types": false,
