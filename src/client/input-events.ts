@@ -160,13 +160,13 @@ export function setupInputEventListeners(
 		? document.activeElement.tagName === 'INPUT'
 		: false
 
-	window.addEventListener('mousedown', _ => {
-		if (audioContext.state === 'suspended') audioContext.resume()
+	window.addEventListener('mousedown', async _ => {
+		if (audioContext.state === 'suspended') await audioContext.resume()
 	})
 
-	window.addEventListener('keydown', e => {
+	window.addEventListener('keydown', async e => {
 		if (isInputFocused()) return
-		if (audioContext.state === 'suspended') audioContext.resume()
+		if (audioContext.state === 'suspended') await audioContext.resume()
 		onKeyEvent(e)
 	})
 

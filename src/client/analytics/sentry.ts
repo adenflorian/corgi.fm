@@ -1,8 +1,8 @@
 import * as Sentry from '@sentry/browser'
 import {CaptureConsole} from '@sentry/integrations'
+import {logger} from '@sentry/utils'
 import {getCurrentClientVersion} from '../client-utils'
 import {getEnvName} from '../is-prod-client'
-import {logger} from '@sentry/utils';
 
 export function initSentry() {
 	Sentry.init({

@@ -65,7 +65,7 @@ export function eventOrganizeRoomConfirmed() {
 }
 
 export function eventClientServerVersionMismatch(
-	clientVersion: string, serverVersion: string
+	clientVersion: string, serverVersion: string,
 ) {
 	eventError({
 		description: 'ClientServerVersionMismatch',

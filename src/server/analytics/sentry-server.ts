@@ -1,8 +1,8 @@
 import {CaptureConsole} from '@sentry/integrations'
 import * as Sentry from '@sentry/node'
+import {logger} from '@sentry/utils'
 import {getServerEnv} from '../is-prod-server'
 import {getServerVersion} from '../server-version'
-import {logger} from '@sentry/utils';
 
 export function initSentryServer() {
 	Sentry.init({
