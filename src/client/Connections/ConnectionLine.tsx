@@ -55,9 +55,11 @@ export const ConnectionLine = React.memo(
 						</linearGradient>
 					}
 					<filter id="saturate">
-						<feColorMatrix in="SourceGraphic"
+						<feColorMatrix
+							in="SourceGraphic"
 							type="saturate"
-							values="3" />
+							values="3"
+						/>
 					</filter>
 				</defs>
 				<g
@@ -72,8 +74,7 @@ export const ConnectionLine = React.memo(
 						d={pathDPart1}
 						stroke={highQuality ? `url(#${id})` : isSourcePlaying ? saturatedColor : color}
 						strokeWidth={longLineStrokeWidth + 'px'}
-					>
-					</path>
+					/>
 					<path
 						className="invisibleLongLine"
 						d={pathDPart1}

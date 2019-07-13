@@ -49,7 +49,7 @@ export const TopDiv = ({memberCount, clientCount, info, isClientReady,
 			</div>
 			<div className="blob">
 				<div className="blobDark" title="Frames per second">FPS</div>
-				<div id="fps" style={{width: 32, overflow: 'hidden'}}></div>
+				<div id="fps" style={{width: 32, overflow: 'hidden'}} />
 			</div>
 			<div className="blob" style={{overflow: 'hidden'}}>
 				<span className="blobDark">Zoom</span>
@@ -68,7 +68,8 @@ export const TopDiv = ({memberCount, clientCount, info, isClientReady,
 				<div>
 					<span
 						className="usernameFont"
-						style={{color: roomOwner.color}}>
+						style={{color: roomOwner.color}}
+					>
 						{roomOwner.name}
 					</span>
 					{isLocalClientRoomOwner
@@ -77,7 +78,9 @@ export const TopDiv = ({memberCount, clientCount, info, isClientReady,
 								marginLeft: 8,
 								color: CssColor.disabledGray,
 							}}
-						>(You)</span>
+						>
+							(You)
+						</span>
 						: ''}
 				</div>
 			</div>

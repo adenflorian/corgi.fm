@@ -83,7 +83,7 @@ const BackgroundMenuItems = React.memo(
 					preventClose={true}
 				>
 					do stuff
-			</MenuItem>
+				</MenuItem>
 			)
 		}
 
@@ -107,37 +107,39 @@ const BackgroundMenuItems = React.memo(
 
 		function AddNodeMenuItem({nodeInfo}: {nodeInfo: IConnectionNodeInfo}) {
 			return (
-				<MenuItem onClick={e => {
-					if (nodeInfo.type === ConnectionNodeType.virtualKeyboard) {
-						if (localClientKeyboardCount !== 0) return
+				<MenuItem
+					onClick={e => {
+						if (nodeInfo.type === ConnectionNodeType.virtualKeyboard) {
+							if (localClientKeyboardCount !== 0) return
 
-						const newState = new VirtualKeyboardState(localClientId, localClientColor)
-						dispatch(nodeInfo.addNodeActionCreator(newState))
-						createPosition(dispatch, newState, e)
-					} else {
-						// Be careful when changing the id to be local client
-						// The server currently deletes most things that a user owns when they disconnect
-						const newState = new nodeInfo.stateConstructor(serverClientId)
-						dispatch(nodeInfo.addNodeActionCreator(newState))
-						createPosition(dispatch, newState, e)
-						if (nodeInfo.autoConnectToClock) {
-							dispatch(connectionsActions.add(new Connection(
-								MASTER_CLOCK_SOURCE_ID,
-								ConnectionNodeType.masterClock,
-								newState.id,
-								newState.type,
-							)))
+							const newState = new VirtualKeyboardState(localClientId, localClientColor)
+							dispatch(nodeInfo.addNodeActionCreator(newState))
+							createPosition(dispatch, newState, e)
+						} else {
+							// Be careful when changing the id to be local client
+							// The server currently deletes most things that a user owns when they disconnect
+							const newState = new nodeInfo.stateConstructor(serverClientId)
+							dispatch(nodeInfo.addNodeActionCreator(newState))
+							createPosition(dispatch, newState, e)
+							if (nodeInfo.autoConnectToClock) {
+								dispatch(connectionsActions.add(new Connection(
+									MASTER_CLOCK_SOURCE_ID,
+									ConnectionNodeType.masterClock,
+									newState.id,
+									newState.type,
+								)))
+							}
+							if (nodeInfo.autoConnectToAudioOutput) {
+								dispatch(connectionsActions.add(new Connection(
+									newState.id,
+									newState.type,
+									MASTER_AUDIO_OUTPUT_TARGET_ID,
+									ConnectionNodeType.audioOutput,
+								)))
+							}
 						}
-						if (nodeInfo.autoConnectToAudioOutput) {
-							dispatch(connectionsActions.add(new Connection(
-								newState.id,
-								newState.type,
-								MASTER_AUDIO_OUTPUT_TARGET_ID,
-								ConnectionNodeType.audioOutput,
-							)))
-						}
-					}
-				}}>
+					}}
+				>
 					{nodeInfo.typeName}
 				</MenuItem>
 			)

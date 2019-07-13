@@ -1,7 +1,8 @@
 {
     "defaultSeverity": "error",
     "extends": [
-        "tslint:recommended"
+        "tslint:recommended",
+        "tslint-react"
     ],
     "jsRules": {
         "quotemark": [
@@ -101,7 +102,11 @@
                 "ignore-pattern": "^import |^export {(.*?)}|class [a-zA-Z]+ implements |//"
             }
         ],
-        "no-floating-promises": true
+        "no-floating-promises": true,
+        "jsx-boolean-value": false,
+        "jsx-no-lambda": false,
+        "jsx-no-multiline-js": false,
+        "jsx-wrap-multiline": false
     },
     "rulesDirectory": [],
     "linterOptions": {

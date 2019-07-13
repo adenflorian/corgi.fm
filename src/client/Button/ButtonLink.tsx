@@ -13,7 +13,8 @@ export const ButtonLink = React.memo(
 		return (
 			<a
 				className="buttonLink"
-				target={newTab ? '_blank' : undefined} {...rest}
+				target={newTab ? '_blank' : undefined}
+				{...rest}
 			>
 				{children}&nbsp;<Open />
 			</a>

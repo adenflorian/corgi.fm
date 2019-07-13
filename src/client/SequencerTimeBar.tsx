@@ -39,8 +39,7 @@ export const SequencerTimeBar
 						animationDuration: ((60 / props.bpm) * props.lengthBeats).toString() + 's',
 						// willChange: 'transform',
 					}}
-				>
-				</div>
+				/>
 			</div>
 		)
 	}

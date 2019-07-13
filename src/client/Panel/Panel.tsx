@@ -62,7 +62,7 @@ export const DumbPanel: React.FC<AllProps> =
 								`\nDisable or enable this node\n` +
 								nodeInfo.disabledText + ' when disabled'}
 						>
-							<div className="colorDot"></div>
+							<div className="colorDot"/>
 						</div>
 						<div className="label">{label}</div>
 						{ownerName &&

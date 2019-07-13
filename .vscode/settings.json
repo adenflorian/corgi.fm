@@ -16,7 +16,8 @@
         "space-before-function-paren",
         "trailing-comma",
         "eofline",
-        "only-arrow-functions"
+        "only-arrow-functions",
+        "jsx-self-close"
     ],
     "tslint.jsEnable": true,
     "tslint.packageManager": "yarn",

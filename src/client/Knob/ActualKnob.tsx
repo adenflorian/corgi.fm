@@ -30,13 +30,25 @@ export const ActualKnob = React.memo(function _ActualKnob(props: Props) {
 					strokeLinecap: 'round',
 				}}
 			>
-				<circle cx="50%" cy="50%" r="64%"
-					fill="none" stroke={CssColor.panelGrayLight} strokeWidth="3"
-					strokeDasharray={`0 50% ${1 * 308.2}% 100000`} strokeDashoffset="1"
+				<circle
+					cx="50%"
+					cy="50%"
+					r="64%"
+					fill="none"
+					stroke={CssColor.panelGrayLight}
+					strokeWidth="3"
+					strokeDasharray={`0 50% ${1 * 308.2}% 100000`}
+					strokeDashoffset="1"
 				/>
-				<circle cx="50%" cy="50%" r="64%"
-					fill="none" stroke="currentColor" strokeWidth="3"
-					strokeDasharray={`0 50% ${percentage * 308.2}% 100000`} strokeDashoffset="1"
+				<circle
+					cx="50%"
+					cy="50%"
+					r="64%"
+					fill="none"
+					stroke="currentColor"
+					strokeWidth="3"
+					strokeDasharray={`0 50% ${percentage * 308.2}% 100000`}
+					strokeDashoffset="1"
 				/>
 			</svg>
 			<div
@@ -45,7 +57,7 @@ export const ActualKnob = React.memo(function _ActualKnob(props: Props) {
 					transform: `rotate(${_getRotation(percentage)}deg)`,
 				}}
 			>
-				<div className="mark" style={{backgroundColor: 'currentColor', borderRadius: 2}}></div>
+				<div className="mark" style={{backgroundColor: 'currentColor', borderRadius: 2}} />
 			</div>
 		</div>
 	)

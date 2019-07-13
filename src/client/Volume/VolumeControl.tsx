@@ -57,7 +57,7 @@ export class VolumeControl extends Component<IVolumeControlAllProps> {
 						style={{
 							marginTop: 6,
 						}}
-					></canvas>
+					/>
 					<div className="value knobValue" style={{bottom: -2}}>
 						<span id={limiterRenderSystemConstants.valueId}>0.0</span>
 						<span> dB</span>

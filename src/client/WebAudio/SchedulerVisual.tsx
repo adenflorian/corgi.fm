@@ -40,8 +40,7 @@ export const NoteSchedulerVisualPlaceholder =
 						backgroundColor: '#29292f40',
 						height: 50,
 					}}
-				>
-				</div>
+				/>
 			)
 		} else {
 			return null

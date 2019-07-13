@@ -58,7 +58,7 @@ export const SimpleGraph =
 							}}
 							width={canvasSize}
 							height={canvasSize}
-						></canvas>
+						/>
 					</div>
 				</ConnectedZoom>
 			</div>

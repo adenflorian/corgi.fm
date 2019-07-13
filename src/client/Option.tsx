@@ -38,7 +38,7 @@ export class Option extends Component<IOptionAllProps> {
 						onChange={e => dispatch(setOption(option, e.target.checked))}
 						checked={value}
 					/>
-					<span className="checkmark"></span>
+					<span className="checkmark"/>
 				</label>
 			</div>
 		)

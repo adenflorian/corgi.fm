@@ -27,7 +27,7 @@ export function OptionCheckbox(props: AllProps) {
 					onChange={onChange(dispatch)}
 					checked={value}
 				/>
-				<span className="checkmark"></span>
+				<span className="checkmark"/>
 			</label>
 		</div>
 	)

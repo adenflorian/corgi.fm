@@ -108,7 +108,7 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 						}}
 						width={width}
 						height={height}
-					></canvas>
+					/>
 				</div>
 			</Draggable>
 		)
