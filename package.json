@@ -55,7 +55,7 @@
     "color": "^3.0.0",
     "common-tags": "^1.8.0",
     "cors": "^2.8.5",
-    "express": "^4.16.3",
+    "express": "^4.17.1",
     "file-saver": "^2.0.0",
     "firebase": "^6.2.4",
     "immutable": "^4.0.0-rc.12",
