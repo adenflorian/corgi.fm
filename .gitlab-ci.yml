@@ -8,3 +8,9 @@ build:
     - PATH=$PATH:$HOME/.cargo/bin
     - yarn
     - yarn build
+
+test:
+  image: "node:10.14.1"
+  script:
+    - yarn
+    - yarn test
