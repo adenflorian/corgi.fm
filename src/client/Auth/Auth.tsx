@@ -1,6 +1,9 @@
 import * as firebase from 'firebase/app'
-import React from 'react'
 import {Fragment, useState} from 'react'
+import React from 'react'
+import {
+	IoLogoFacebook as Facebook, IoLogoGoogle as Google,
+} from 'react-icons/io'
 import {Dispatch} from 'redux'
 import {AuthConstants} from '../../common/auth-constants'
 import {
@@ -90,34 +93,25 @@ function _Auth({dispatch, loggedIn}: AllProps) {
 									value={'Reset Password'}
 									disabled={inputsDisabled}
 									onClick={handleResetPassword}
+									readOnly
 								/>
 							</div>
-							<input
-								type="button"
-								className="button googleLogin"
-								value={'Login with Google'}
+							<button
+								className="button google"
 								disabled={inputsDisabled}
 								onClick={() => handleProviderLogin(
 									firebase.auth.GoogleAuthProvider)}
-							/>
-							<input
-								type="button"
-								className="button googleLogin"
-								value={'Login with Facebook'}
+							>
+								<Google /><span>Sign in with Google</span>
+							</button>
+							<button
+								className="button facebook"
 								disabled={inputsDisabled}
 								onClick={() => handleProviderLogin(
 									firebase.auth.FacebookAuthProvider)}
-							/>
-							{false &&
-								<input
-									type="button"
-									className="button googleLogin"
-									value={'Login with Twitter'}
-									disabled={inputsDisabled}
-									onClick={() => handleProviderLogin(
-										firebase.auth.TwitterAuthProvider)}
-								/>
-							}
+							>
+								<Facebook /><span>Sign in with Facebook</span>
+							</button>
 						</form>
 						{authInfo[0] &&
 							<div className={`${authInfo[1]}`}>

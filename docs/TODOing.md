@@ -81,7 +81,9 @@
 				- [√] with google
 				- [√] facebook
 				- [ ] twitter
+					- have to apply for a dev account
 				- [ ] with sound cloud
+					- sound cloud not allowing new apps at this time 2019-07-13
 			- [√] logout
 		- [ ] server
 		- [ ] ToS
