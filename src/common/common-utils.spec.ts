@@ -1,5 +1,5 @@
 import {expect} from 'chai'
-import {applyOctave} from './music-functions'
+import {applyOctave} from './common-utils'
 
 describe('input-middleware', () => {
 	describe('applyOctave', () => {

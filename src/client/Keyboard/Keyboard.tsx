@@ -1,7 +1,7 @@
 import React from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
-import {getKeyByValue} from '../../common/common-utils'
+import {applyOctave, getKeyByValue} from '../../common/common-utils'
 import {IMidiNotes} from '../../common/MidiNote'
 import {selectClientById, selectLocalClient} from '../../common/redux'
 import {IClientAppState} from '../../common/redux'
@@ -9,7 +9,7 @@ import {selectVirtualKeyboardById, virtualKeyPressed, virtualKeyUp} from '../../
 import {isLeftMouseButtonDown} from '../client-utils'
 import {keyToMidiMap} from '../input-events'
 import {Panel} from '../Panel/Panel'
-import {applyOctave, KeyColor, keyColors, NoteNameSharps} from '../WebAudio/music-functions'
+import {KeyColor, keyColors, NoteNameSharps} from '../WebAudio/music-functions'
 import {Octave} from '../WebAudio/music-types'
 import './Keyboard.less'
 

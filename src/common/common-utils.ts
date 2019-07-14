@@ -64,3 +64,13 @@ export function createNodeId() {
 export const clamp = (val: number, min: number, max: number) => Math.min(max, Math.max(min, val))
 
 export const incrementalRound = (v: number, increment: number) => Math.round(v / increment) * increment
+
+export function applyOctave(midiNumber: number, octave: number) {
+	if (octave === -1) return midiNumber
+
+	return midiNumber + (octave * 12) + 12
+}
+
+export function removeOctave(midiNumber: number) {
+	return midiNumber % 12
+}
