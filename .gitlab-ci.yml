@@ -6,5 +6,5 @@ build:
   script:
     - curl https://sh.rustup.rs -sSf | sh -s -- -y
     - PATH=$PATH:$HOME/.cargo/bin
-    - yarn --prod
+    - yarn
     - yarn build
