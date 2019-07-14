@@ -3,20 +3,25 @@
 
 .authModal {
 	text-align: left;
-
-	.modalPanel {
-		width: 400px;
+	
+	.modalSection {
+		&.login {
+			width: 400px;
+			.modalSectionLabel {
+				color: @blue;
+			}
+		}
+		&.other {
+			width: 300px;
+			.modalSectionLabel {
+				color: @green;
+			}
+		}
 	}
 	
-	.content {
-		padding: 16px 0;
-
+	.modalSectionContent {
 		& > * + * {
 			margin-top: 16px;
-		}
-
-		.error {
-			color: @red;
 		}
 	}
 
@@ -42,27 +47,16 @@
 			display: inherit;
 			-webkit-rtl-ordering: inherit;
 			cursor: inherit;
-			// margin: inherit;
 			font: inherit;
 			appearance: inherit;
 			letter-spacing: inherit;
 			writing-mode: inherit;
 			text-rendering: inherit;
 			border: none;
-	
 			background-color: @panelGrayLight;
 			border-radius: @mainBorderRadius;
-
-
-			// color: #e2e2e2;
-			// letter-spacing: initial;
-			// background-color: #252525;
-			// box-shadow: 0 0 12px hsl(0, 0%, 2%);
 			padding: 0 8px;
 			min-height: 32px;
-			// min-width: 226px;
-			// pointer-events: all;
-
 			width: fill;
 
 			&:focus {
@@ -85,60 +79,81 @@
 				}
 			}
 		}
+	}
 
-		button {
-			color: inherit;
-			font-size: inherit;
-			font-family: inherit;
-			word-spacing: inherit;
-			text-transform: inherit;
-			text-indent: inherit;
-			text-shadow: inherit;
-			display: flex;
-			align-items: center;
-			-webkit-rtl-ordering: inherit;
-			cursor: inherit;
-			// margin: inherit;
-			font: inherit;
-			appearance: inherit;
-			letter-spacing: inherit;
-			writing-mode: inherit;
-			text-rendering: inherit;
-			border: none;
-			padding: 0 8px;
-			min-height: 32px;
+	button {
+		color: inherit;
+		font-size: inherit;
+		font-family: inherit;
+		word-spacing: inherit;
+		text-transform: inherit;
+		text-indent: inherit;
+		text-shadow: inherit;
+		display: flex;
+		align-items: center;
+		-webkit-rtl-ordering: inherit;
+		cursor: inherit;
+		font: inherit;
+		appearance: inherit;
+		letter-spacing: inherit;
+		writing-mode: inherit;
+		text-rendering: inherit;
+		border: none;
+		padding: 0 8px 0 0;
+		min-height: 32px;
+		width: 100%;
+		background-color: @panelGrayLight;
 
-			&:not(:disabled):hover {
-				cursor: pointer;
-				filter: brightness(1.2);
+		&:not(:disabled):hover {
+			cursor: pointer;
+			filter: brightness(1.2);
+		}
+
+		&:disabled {
+			color: @panelGray !important;
+			background-color: @panelGrayLight !important;
+		}
+
+		border-radius: @mainBorderRadius;
+
+		&:focus {
+			@colorBorder();
+		}
+
+		&.google {
+			svg {
+				background-color: #DB4437;
 			}
+		}
 
-			&:disabled {
-				color: @panelGray !important;
-				background-color: @panelGrayLight !important;
-			}
-
-			border-radius: @mainBorderRadius;
-
-			&:focus {
-				@colorBorder();
-			}
-
-			&.google {
-				font-weight: 600;
-				color: white;
-				background-color: #4285F4;
-			}
-
-			&.facebook {
-				font-weight: 600;
-				color: white;
+		&.facebook {
+			svg {
 				background-color: #3C5A99;
 			}
+		}
 
-			svg {
-				margin-right: 6px;
-			}
+		svg {
+			margin-right: 6px;
+			padding: 6px;
+			border-top-left-radius: @mainBorderRadius;
+			border-bottom-left-radius: @mainBorderRadius;
+		}
+	}
+
+	.providers {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+
+		& > * + * {
+			margin-top: 16px;
+		}
+	}
+
+	.bottom {
+		&.error {
+			font-weight: 600;
+			color: @brightRed;
 		}
 	}
 }

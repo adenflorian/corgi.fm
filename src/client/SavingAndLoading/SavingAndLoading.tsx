@@ -43,7 +43,7 @@ function LoadRoomModalInner({dispatch}: {dispatch: Dispatch}) {
 		<div className="modalSection localSaves">
 			<div className="modalSectionLabel">Load Room</div>
 			<div className="modalSectionSubLabel">select a saved room to load into a new room<br />will be able to load from a file soon...</div>
-			<div className="saves">
+			<div className="modalSectionContent saves">
 				{saves.count() === 0 &&
 					<div className="noSaves">no saves found</div>
 				}

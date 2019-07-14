@@ -40,7 +40,7 @@ function _Auth({dispatch, loggedIn}: AllProps) {
 			<Button
 				buttonProps={{onClick: loggedIn ? logout : showModal}}
 			>
-				{loggedIn ? `Log Out` : `Log In / Register`}
+				{loggedIn ? `Log Out` : `Register / Login`}
 			</Button>
 			{isModalVisible && modal()}
 		</Fragment>
@@ -52,14 +52,14 @@ function _Auth({dispatch, loggedIn}: AllProps) {
 				onHide={hideModal}
 				className="authModal"
 			>
-				<div className="modalSection">
+				<div className="modalSection login">
 					<div className="modalSectionLabel">
-						Login or Register
-						</div>
+						Register or Login
+					</div>
 					<div className="modalSectionSubLabel">
 						Remember to drink water!
-						</div>
-					<div className="content">
+					</div>
+					<div className="modalSectionContent">
 						<form onSubmit={handleLogin}>
 							<input
 								type="email"
@@ -84,7 +84,7 @@ function _Auth({dispatch, loggedIn}: AllProps) {
 								<input
 									type="submit"
 									className="button register"
-									value={'Login/Register'}
+									value={'Register / Login'}
 									disabled={inputsDisabled}
 								/>
 								<input
@@ -96,28 +96,40 @@ function _Auth({dispatch, loggedIn}: AllProps) {
 									readOnly
 								/>
 							</div>
-							<button
-								className="button google"
-								disabled={inputsDisabled}
-								onClick={() => handleProviderLogin(
-									firebase.auth.GoogleAuthProvider)}
-							>
-								<Google /><span>Sign in with Google</span>
-							</button>
-							<button
-								className="button facebook"
-								disabled={inputsDisabled}
-								onClick={() => handleProviderLogin(
-									firebase.auth.FacebookAuthProvider)}
-							>
-								<Facebook /><span>Sign in with Facebook</span>
-							</button>
 						</form>
-						{authInfo[0] &&
-							<div className={`${authInfo[1]}`}>
+					</div>
+					{authInfo[0] &&
+						<div className="modalSectionFooter">
+							<div className={`bottom ${authInfo[1]}`}>
 								{authInfo[0]}
 							</div>
-						}
+						</div>
+					}
+				</div>
+				<div className="modalSection other">
+					<div className="modalSectionLabel">
+						Other Login Methods
+					</div>
+					<div className="modalSectionSubLabel">
+						Woof
+					</div>
+					<div className="modalSectionContent providers">
+						<button
+							className="button google"
+							disabled={inputsDisabled}
+							onClick={() => handleProviderLogin(
+								firebase.auth.GoogleAuthProvider)}
+						>
+							<Google /><span>Sign in with Google</span>
+						</button>
+						<button
+							className="button facebook"
+							disabled={inputsDisabled}
+							onClick={() => handleProviderLogin(
+								firebase.auth.FacebookAuthProvider)}
+						>
+							<Facebook /><span>Sign in with Facebook</span>
+						</button>
 					</div>
 				</div>
 			</Modal>

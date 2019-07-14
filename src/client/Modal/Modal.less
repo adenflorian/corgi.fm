@@ -23,13 +23,14 @@
 
 	.modalPanelInner {
 		font-size: 1.2em;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
 
 		.modalSection {
 			margin: 32px 0;
 			background-color: @panelGray;
 			border-radius: @mainBorderRadius;
-			padding: 16px;
-			padding-bottom: 1px;
 			@panelShadow();
 
 			&:first-child {
@@ -44,7 +45,7 @@
 				font-size: 1.4em;
 				line-height: 1.2em;
 				background-color: @panelGrayDark;
-				margin: -16px -16px 0 -16px;
+				// margin: -16px -16px 0 -16px;
 				padding: 16px 16px 0 16px;
 				border-top-left-radius: @mainBorderRadius;
 				border-top-right-radius: @mainBorderRadius;
@@ -55,8 +56,19 @@
 				line-height: 1.2em;
 				color: @subtleGrayBlackBg;
 				background-color: @panelGrayDark;
-				margin: 0 -16px;
+				// margin: 0 -16px;
 				padding: 0 16px 16px 16px;
+			}
+			.modalSectionContent {
+				padding: 16px;
+			}
+			.modalSectionFooter {
+				color: @subtleGrayBlackBg;
+				background-color: @panelGrayDark;
+				padding: 16px;
+				border-bottom-left-radius: @mainBorderRadius;
+				border-bottom-right-radius: @mainBorderRadius;
+				line-height: normal;
 			}
 		}
 	}

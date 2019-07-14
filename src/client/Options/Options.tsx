@@ -33,34 +33,36 @@ export const Options = ({isLocalClientRoomOwner, onlyOwnerCanDoStuff}: ReduxProp
 					<div className="modalSection localOptions">
 						<div className="modalSectionLabel">Local Options</div>
 						<div className="modalSectionSubLabel">won't affect anyone else</div>
-						<ConnectedOption
-							option={AppOptions.showNoteNamesOnKeyboard}
-							label="show note names on keyboard"
-						/>
-						<ConnectedOption
-							option={AppOptions.requireCtrlToScroll}
-							label="require control key to zoom (might be needed by laptop users)"
-						/>
-						<ConnectedOption
-							option={AppOptions.showNoteSchedulerDebug}
-							label="note scheduler debug: enable"
-						/>
-						<ConnectedOption
-							option={AppOptions.renderNoteSchedulerDebugWhileStopped}
-							label="note scheduler debug: keep rendering even when song is stopped"
-						/>
-						<ConnectedOption
-							option={AppOptions.graphics_fancyConnections}
-							label="graphics: enable fancy connections"
-						/>
-						<ConnectedOption
-							option={AppOptions.graphics_ECS}
-							label="graphics: enable ECS animations (sequencer time marker thing)"
-						/>
-						<ConnectedOption
-							option={AppOptions.graphics_expensiveZoomPan}
-							label="graphics: enable expensive/fancy zoom and pan (sharper render, but slower)"
-						/>
+						<div className="modalSectionContent">
+							<ConnectedOption
+								option={AppOptions.showNoteNamesOnKeyboard}
+								label="show note names on keyboard"
+							/>
+							<ConnectedOption
+								option={AppOptions.requireCtrlToScroll}
+								label="require control key to zoom (might be needed by laptop users)"
+							/>
+							<ConnectedOption
+								option={AppOptions.showNoteSchedulerDebug}
+								label="note scheduler debug: enable"
+							/>
+							<ConnectedOption
+								option={AppOptions.renderNoteSchedulerDebugWhileStopped}
+								label="note scheduler debug: keep rendering even when song is stopped"
+							/>
+							<ConnectedOption
+								option={AppOptions.graphics_fancyConnections}
+								label="graphics: enable fancy connections"
+							/>
+							<ConnectedOption
+								option={AppOptions.graphics_ECS}
+								label="graphics: enable ECS animations (sequencer time marker thing)"
+							/>
+							<ConnectedOption
+								option={AppOptions.graphics_expensiveZoomPan}
+								label="graphics: enable expensive/fancy zoom and pan (sharper render, but slower)"
+							/>
+						</div>
 					</div>
 					{!isLocalClientRoomOwner && onlyOwnerCanDoStuff ?
 						<div className="modalSection roomOptions">
@@ -71,27 +73,29 @@ export const Options = ({isLocalClientRoomOwner, onlyOwnerCanDoStuff}: ReduxProp
 						<div className="modalSection roomOptions">
 							<div className="modalSectionLabel">Room Options</div>
 							<div className="modalSectionSubLabel">other people in this room will see these changes</div>
-							<ConnectedOptionCheckbox
-								label="straight connection lines"
-								onChange={dispatch => e =>
-									dispatch(roomSettingsActions.changeLineType(e.target.checked
-										? LineType.Straight
-										: LineType.Curved,
-									))}
-								valueSelector={state =>
-									selectRoomSettings(state.room).lineType === LineType.Straight
-										? true
-										: false
-								}
-							/>
-							{isLocalClientRoomOwner &&
+							<div className="modalSectionContent">
 								<ConnectedOptionCheckbox
-									label="only owner can do stuff"
+									label="straight connection lines"
 									onChange={dispatch => e =>
-										dispatch(roomSettingsActions.changeOnlyOwnerCanDoStuff(e.target.checked))}
-									valueSelector={state => selectRoomSettings(state.room).onlyOwnerCanDoStuff}
+										dispatch(roomSettingsActions.changeLineType(e.target.checked
+											? LineType.Straight
+											: LineType.Curved,
+										))}
+									valueSelector={state =>
+										selectRoomSettings(state.room).lineType === LineType.Straight
+											? true
+											: false
+									}
 								/>
-							}
+								{isLocalClientRoomOwner &&
+									<ConnectedOptionCheckbox
+										label="only owner can do stuff"
+										onChange={dispatch => e =>
+											dispatch(roomSettingsActions.changeOnlyOwnerCanDoStuff(e.target.checked))}
+										valueSelector={state => selectRoomSettings(state.room).onlyOwnerCanDoStuff}
+									/>
+								}
+							</div>
 						</div>
 					}
 				</Modal>
