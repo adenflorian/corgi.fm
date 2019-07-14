@@ -1,12 +1,11 @@
 import {List} from 'immutable'
+// @ts-ignore
+import {getFrequencyUsingHalfStepsFromA4 as getFrequencyUsingHalfStepsFromA4Rust} from '../../client-rust/lib.rs'
 import {IMidiNote} from '../../common/MidiNote'
 import {Octave} from './music-types'
 
 export function getFrequencyUsingHalfStepsFromA4(halfSteps: number) {
-	const fixedNoteFrequency = 440
-	const twelfthRootOf2 = Math.pow(2, 1 / 12) // 1.059463094359...
-
-	return fixedNoteFrequency * Math.pow(twelfthRootOf2, halfSteps)
+	return getFrequencyUsingHalfStepsFromA4Rust(halfSteps)
 }
 
 export const A4 = 69
