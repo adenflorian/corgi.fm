@@ -25,9 +25,7 @@ interface ReduxProps {
 
 type AllProps = ReduxProps & {dispatch: Dispatch}
 
-export const Auth = React.memo(_Auth)
-
-function _Auth({dispatch, loggedIn}: AllProps) {
+export function Auth({dispatch, loggedIn}: AllProps) {
 	const [isModalVisible, showModal, hideModal2] = useBoolean(false)
 	const [email, setEmail] = useState('')
 	const [password, setPassword, clearPassword] = useResettableState('')
