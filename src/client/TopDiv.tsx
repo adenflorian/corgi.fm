@@ -17,13 +17,14 @@ import {
 } from './analytics/analytics'
 import {ConnectedAuth} from './Auth/Auth'
 import {Button} from './Button/Button'
-import {ButtonLink} from './Button/ButtonLink'
+import {DiscordLink, NewsletterLink, PatreonLink} from './Links'
 import {localActions} from './local-middleware'
 import {ConnectedNameChanger} from './NameChanger'
 import {ConnectedOptions} from './Options/Options'
 import {ConnectedRoomSelector} from './RoomSelector'
 import {SavingAndLoading} from './SavingAndLoading/SavingAndLoading'
 import './TopDiv.less'
+import {ConnectedWelcome} from './Welcome/Welcome'
 
 interface ReduxProps {
 	memberCount: number
@@ -118,6 +119,7 @@ export const TopDiv = ({memberCount, clientCount, info, isClientReady,
 		<div className="right">
 			<ConnectedNameChanger />
 			<ConnectedAuth />
+			<ConnectedWelcome />
 			<ConnectedRoomSelector />
 			<Button
 				buttonProps={{
@@ -196,12 +198,9 @@ export const TopDiv = ({memberCount, clientCount, info, isClientReady,
 				Organize Room
 			</Button>}
 			<ConnectedOptions />
-			<ButtonLink href="/newsletter" newTab={true}>
-				Newsletter</ButtonLink>
-			<ButtonLink href="https://discord.gg/qADwrxd" newTab={true}>
-				Discord</ButtonLink>
-			<ButtonLink href="https://www.patreon.com/corgifm" newTab={true}>
-				Patreon</ButtonLink>
+			<NewsletterLink />
+			<DiscordLink />
+			<PatreonLink />
 		</div>
 	</div>
 

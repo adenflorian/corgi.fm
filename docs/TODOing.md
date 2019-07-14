@@ -95,6 +95,21 @@
 		- [ ] open source licenses
 	- [ ] test
 	- [ ] prod
+- [ ] welcome modal
+	- [ ] change username
+	- [ ] create account/login
+	- [ ] tutorial
+	- [ ] newsletter
+	- [ ] discord
+	- [ ] patreon
+	- [ ] news
+	- [ ] recent projects
+	- [ ] what would you like to do?
+		- [ ] new room
+		- [ ] load room
+		- [ ] lobby
+		- [ ] join friend
+	- [ ] adjust volume
 - [ ] https://github.com/TrillCyborg/fullstack
 - [ ] https://github.com/accounts-js/accounts
 - [ ] tslint rule to require awaiting promises

@@ -2,13 +2,12 @@
 @import "../AppCommon.less";
 
 .buttonLink {
-    padding: 0 8px;
+    padding: 0 8px 0 0;
     font-size: 16px;
     height: 32px;
     background-color: @panelGray;
     border-radius: @mainBorderRadius;
     @panelShadow();
-    padding: 0 8px;
     height: 32px;
     display: flex;
     align-items: center;
@@ -20,5 +19,14 @@
 
     &:active {
         top: 1px;
+    }
+
+    svg {
+        font-size: 20px;
+        margin-right: 8px;
+        padding: 6px;
+        border-top-left-radius: @mainBorderRadius;
+        border-bottom-left-radius: @mainBorderRadius;
+        background-color: @panelGrayDark;
     }
 }

@@ -50,7 +50,7 @@ function NameChanger({author, authorColor, dispatch}: AllProps) {
 		>
 			<AutosizeInput
 				name="nameAutosizeInput"
-				className="author"
+				className="author nameAutosizeInput"
 				value={username}
 				onChange={_onNameInputChange}
 				autoComplete="off"

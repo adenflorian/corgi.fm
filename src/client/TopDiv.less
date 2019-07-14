@@ -12,7 +12,7 @@
     width: 100%;
     pointer-events: none;
 
-    .left, .right {
+    & > .left, & > .right {
         display: flex;
         flex-direction: column;
 
@@ -22,7 +22,7 @@
         }
     }
 
-    .left {
+    & > .left {
         text-align: left;
 
         & > * {
@@ -30,7 +30,7 @@
         }
     }
 
-    .right {
+    & > .right {
         align-items: flex-end;
 
         & > * {
