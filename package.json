@@ -11,7 +11,6 @@
     "watch-server-old": "ts-node-dev --respawn --transpileOnly --notify false --inspect --project src/server/tsconfig.json src/server/server.ts",
     "start-test": "pm2 start server/ecosystem.config.js --env test",
     "start-prod": "pm2 start server/ecosystem.config.js --env prod",
-    "start-prod-docker": "NODE_ENV=production pm2-runtime built/server/server.js",
     "lint": "eslint . && tslint src/client/**/*.ts* --project src/client/tsconfig.json && tslint src/server/**/*.ts* --project src/server/tsconfig.json && tslint src/common/**/*.ts* --project src/common/tsconfig.json ",
     "test": "jest",
     "clean": "rm -rf .cache built dist yarn-error.log && jest --clearCache",
@@ -21,8 +20,6 @@
     "build-client": "parcel build src/client/index.html --out-dir built/public --no-source-maps",
     "build-server": "tsc --project src/server/tsconfig.json --outDir built --noEmit false && cp src/server/ecosystem.config.js built/server",
     "build-other": "cp package.json yarn.lock built && cp src/public/* built/public",
-    "build-docker": "docker build -t corgi.fm .",
-    "start-docker": "yarn build-docker && docker run -p 3000:3000 corgi.fm",
     "setup-test-server": "bash scripts/setup-test-server.sh",
     "setup-prod-server": "bash scripts/setup-prod-server.sh"
   },
