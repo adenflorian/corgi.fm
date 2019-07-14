@@ -2,6 +2,7 @@ include:
   - template: Auto-DevOps.gitlab-ci.yml
 
 build:
+  image: "node:10.14.1"
   script:
     - curl https://sh.rustup.rs -sSf | sh -s -- -y
     - yarn
