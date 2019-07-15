@@ -12,6 +12,8 @@ export * from './connections-redux'
 export * from './ghost-connections-redux'
 export * from './audio-redux'
 export * from './auth-redux'
+export * from './in-progress-redux'
+export * from './modals-redux'
 
 export * from './redux-utils'
 export * from './websocket-redux'

@@ -2,8 +2,10 @@ import {AnyAction, combineReducers, Store} from 'redux'
 import {StateType} from 'typesafe-actions'
 import {authReducer} from './auth-redux'
 import {
-	audioReducer, BROADCASTER_ACTION, chatActionTypesWhitelist, clientInfoReducer, clientsReducer, optionsReducer,
-	pointerActionTypesWhitelist, roomReducers, roomsReducer, userInputReducer, websocketReducer,
+	audioReducer, BROADCASTER_ACTION, chatActionTypesWhitelist,
+	clientInfoReducer, clientsReducer, inProgressReducer,
+	modalsReducer, optionsReducer, pointerActionTypesWhitelist,
+	roomReducers, roomsReducer, userInputReducer, websocketReducer,
 } from './index'
 
 export type IClientAppState = StateType<ReturnType<typeof getClientReducers>>
@@ -18,6 +20,8 @@ export function getClientReducers() {
 		auth: authReducer,
 		clientInfo: clientInfoReducer,
 		clients: clientsReducer,
+		inProgress: inProgressReducer,
+		modals: modalsReducer,
 		options: optionsReducer,
 		rooms: roomsReducer,
 		websocket: websocketReducer,
