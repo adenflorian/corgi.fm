@@ -110,6 +110,9 @@
 		- [ ] lobby
 		- [ ] join friend
 	- [ ] adjust volume
+- [ ] look into using `~` for parcel typescript resolution
+- [ ] look into generating new react components and redux reducers
+- [ ] use `useCallback()` hook
 - [ ] https://github.com/TrillCyborg/fullstack
 - [ ] https://github.com/accounts-js/accounts
 - [ ] tslint rule to require awaiting promises
