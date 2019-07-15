@@ -16,11 +16,11 @@ type InProgressState = Map<InProgressId, InProgress>
 
 const makeInProgressState = () => Map<InProgressId, InProgress>()
 
-interface InProgress {
+export interface InProgress {
 	inProgress: boolean
 }
 
-enum InProgressId {
+export enum InProgressId {
 	NewRoom = 'NewRoom',
 }
 

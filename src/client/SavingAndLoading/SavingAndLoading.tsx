@@ -1,46 +1,31 @@
 import {stripIndents} from 'common-tags'
 import {Map} from 'immutable'
 import moment from 'moment'
-import {Fragment} from 'react'
 import React from 'react'
+import {IoMdFolder} from 'react-icons/io'
 import {Dispatch} from 'redux'
-import {loadRoom, SavedRoom} from '../../common/redux'
-import {Button} from '../Button/Button'
+import {loadRoom, ModalId, SavedRoom} from '../../common/redux'
 import {getOrCreateLocalSavesStorage, localActions} from '../local-middleware'
-import {Modal} from '../Modal/Modal'
+import {ModalButton} from '../Modal/ModalButton'
 import './SavingAndLoading.less'
 
-export const SavingAndLoading = React.memo(function _SavingAndLoading({dispatch}: {dispatch: Dispatch}) {
-	const [visible, setVisible] = React.useState(false)
-
+export function LoadRoomModalButton() {
 	return (
-		<Fragment>
-			<Button
-				buttonProps={{onClick: () => setVisible(!visible)}}
-			>
-				Load Room
-			</Button>
-			{visible &&
-				<Modal
-					onHide={() => setVisible(false)}
-					className="loadRoomUI"
-				>
-					<LoadRoomModalInner
-						dispatch={dispatch}
-					/>
-				</Modal>
-			}
-		</Fragment>
+		<ModalButton
+			label="Load Room"
+			modalId={ModalId.LoadRoom}
+			icon={IoMdFolder}
+		/>
 	)
-})
+}
 
-function LoadRoomModalInner({dispatch}: {dispatch: Dispatch}) {
+export function LoadRoomModalContent({dispatch}: {dispatch: Dispatch}) {
 	const [saveStorage, setSaveStorage] = React.useState(getOrCreateLocalSavesStorage())
 
 	const saves = Map(saveStorage.all)
 
 	return (
-		<div className="modalSection localSaves">
+		<div className="loadRoomUI modalSection localSaves">
 			<div className="modalSectionLabel">Load Room</div>
 			<div className="modalSectionSubLabel">select a saved room to load into a new room<br />will be able to load from a file soon...</div>
 			<div className="modalSectionContent saves">

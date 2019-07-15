@@ -5,10 +5,10 @@ import './Modal.less'
 interface Props {
 	onHide: () => void
 	children: React.ReactNode
-	className: string
+	className?: string
 }
 
-export const Modal = React.memo(function _Modal({onHide, children, className}: Props) {
+export const Modal = React.memo(function _Modal({onHide, children, className = ''}: Props) {
 	const _onKeyDown = (e: KeyboardEvent) => {
 		if (e.key === 'Escape') {
 			onHide()

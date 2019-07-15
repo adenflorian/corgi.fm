@@ -16,8 +16,8 @@ const makeModalsState = () => Object.freeze({
 
 type ModalsState = ReturnType<typeof makeModalsState>
 
-enum ModalId {
-	NewRoom = 'NewRoom',
+export enum ModalId {
+	LoadRoom = 'LoadRoom',
 	None = 'None',
 }
 

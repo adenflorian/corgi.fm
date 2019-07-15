@@ -1,8 +1,6 @@
 import {Fragment} from 'react'
 import React from 'react'
-import {
-	IoMdAdd as AddIcon, IoMdFolder as OpenIcon, IoMdPeople as PeopleIcon,
-} from 'react-icons/io'
+import {IoMdPeople} from 'react-icons/io'
 import {Dispatch} from 'redux'
 import {
 	selectAuthState, shamuConnect,
@@ -14,6 +12,7 @@ import {DiscordLink, NewsletterLink, PatreonLink} from '../Links'
 import {Modal} from '../Modal/Modal'
 import {ConnectedNameChanger} from '../NameChanger'
 import {useBoolean} from '../react-hooks'
+import {LoadRoomModalButton} from '../SavingAndLoading/SavingAndLoading'
 import './Welcome.less'
 
 interface ReduxProps {
@@ -58,13 +57,14 @@ function Welcome({dispatch, loggedIn}: AllProps) {
 						</div>
 						<div className="left">
 							<div className="roomActions vert-space-16">
-								<button className="joinLobby">
-									<PeopleIcon /> Join Lobby
+								<button
+									className="joinLobby"
+									onClick={hideModal}
+								>
+									<IoMdPeople /> Join Lobby
 								</button>
-								<NewRoomButton dispatch={dispatch} />
-								<button className="joinLobby">
-									<OpenIcon /> Load Room
-								</button>
+								<NewRoomButton onClick={hideModal} />
+								<LoadRoomModalButton />
 							</div>
 						</div>
 						<div className="right">

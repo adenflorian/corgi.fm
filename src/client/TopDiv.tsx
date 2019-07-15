@@ -2,8 +2,9 @@ import React from 'react'
 import {Dispatch} from 'redux'
 import {rateLimitedDebounceNoTrail} from '../common/common-utils'
 import {
-	IClientState, organizeGraph, selectClientById, selectLocalClientId,
-	selectMemberCount, selectRoomSettings,
+	IClientState, organizeGraph,
+	selectClientById, selectLocalClientId, selectMemberCount,
+	selectRoomSettings,
 } from '../common/redux'
 import {selectClientCount} from '../common/redux'
 import {selectClientInfo, shamuConnect} from '../common/redux'
@@ -19,10 +20,11 @@ import {Button} from './Button/Button'
 import {NewRoomButton} from './Button/CommonButtons'
 import {DiscordLink, NewsletterLink, PatreonLink} from './Links'
 import {localActions} from './local-middleware'
+import {ModalButton} from './Modal/ModalButton'
 import {ConnectedNameChanger} from './NameChanger'
 import {ConnectedOptions} from './Options/Options'
 import {ConnectedRoomSelector} from './RoomSelector'
-import {SavingAndLoading} from './SavingAndLoading/SavingAndLoading'
+import {LoadRoomModalButton} from './SavingAndLoading/SavingAndLoading'
 import './TopDiv.less'
 import {ConnectedWelcome} from './Welcome/Welcome'
 
@@ -121,7 +123,8 @@ export const TopDiv = ({memberCount, clientCount, info, isClientReady,
 			<ConnectedAuth />
 			<ConnectedWelcome />
 			<ConnectedRoomSelector />
-			<NewRoomButton dispatch={dispatch} />
+			<NewRoomButton />
+			<LoadRoomModalButton />
 			<Button
 				buttonProps={{
 					onClick: rateLimitedDebounceNoTrail(() => {
@@ -143,7 +146,6 @@ export const TopDiv = ({memberCount, clientCount, info, isClientReady,
 			>
 				Save Room To File
 			</Button>
-			<SavingAndLoading dispatch={dispatch} />
 			<Button
 				buttonProps={{
 					onClick: () => {
