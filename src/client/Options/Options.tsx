@@ -21,7 +21,7 @@ export const Options = ({isLocalClientRoomOwner, onlyOwnerCanDoStuff}: ReduxProp
 	return (
 		<Fragment>
 			<Button
-				buttonProps={{onClick: () => setVisible(!visible)}}
+				onClick={() => setVisible(!visible)}
 			>
 				Options
 			</Button>

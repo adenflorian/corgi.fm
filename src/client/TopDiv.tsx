@@ -15,18 +15,17 @@ import {
 	eventPruneRoomConfirmed, eventSaveRoomToBrowserButtonClick,
 	eventSaveRoomToFileButtonClick,
 } from './analytics/analytics'
-import {ConnectedAuth} from './Auth/Auth'
+import {AuthModalButton} from './Auth/Auth'
 import {Button} from './Button/Button'
 import {NewRoomButton} from './Button/CommonButtons'
 import {DiscordLink, NewsletterLink, PatreonLink} from './Links'
 import {localActions} from './local-middleware'
-import {ModalButton} from './Modal/ModalButton'
 import {ConnectedNameChanger} from './NameChanger'
 import {ConnectedOptions} from './Options/Options'
 import {ConnectedRoomSelector} from './RoomSelector'
 import {LoadRoomModalButton} from './SavingAndLoading/SavingAndLoading'
 import './TopDiv.less'
-import {ConnectedWelcome} from './Welcome/Welcome'
+import {Welcome} from './Welcome/Welcome'
 
 interface ReduxProps {
 	memberCount: number
@@ -120,35 +119,37 @@ export const TopDiv = ({memberCount, clientCount, info, isClientReady,
 		</div>
 		<div className="right">
 			<ConnectedNameChanger />
-			<ConnectedAuth />
-			<ConnectedWelcome />
+			<AuthModalButton />
+			<Welcome />
 			<ConnectedRoomSelector />
 			<NewRoomButton />
 			<LoadRoomModalButton />
 			<Button
-				buttonProps={{
-					onClick: rateLimitedDebounceNoTrail(() => {
+				onClick={
+					rateLimitedDebounceNoTrail(() => {
 						dispatch(localActions.saveRoomToBrowser())
 						eventSaveRoomToBrowserButtonClick()
-					}, 1000),
-				}}
+					}, 1000)
+				}
 			>
 				Save Room To Browser
 			</Button>
 			<Button
 				buttonProps={{
-					onClick: rateLimitedDebounceNoTrail(() => {
-						dispatch(localActions.saveRoomToFile())
-						eventSaveRoomToFileButtonClick()
-					}, 2000),
 					title: 'Will be able to load from file at a later date',
 				}}
+				onClick={
+					rateLimitedDebounceNoTrail(() => {
+						dispatch(localActions.saveRoomToFile())
+						eventSaveRoomToFileButtonClick()
+					}, 2000)
+				}
 			>
 				Save Room To File
 			</Button>
 			<Button
-				buttonProps={{
-					onClick: () => {
+				onClick={
+					() => {
 						if (
 							confirm('Are you sure you want to delete all '
 								+ 'nodes with no connections in this room?'
@@ -158,7 +159,9 @@ export const TopDiv = ({memberCount, clientCount, info, isClientReady,
 							eventPruneRoomConfirmed()
 						}
 						eventPruneRoomButtonClick()
-					},
+					}
+				}
+				buttonProps={{
 					title: 'Will delete nodes with no connections on them'
 						+ (onlyOwnerCanDoStuff && !isLocalClientRoomOwner
 							? '\nOnly room owner can prune at this time'
@@ -169,8 +172,8 @@ export const TopDiv = ({memberCount, clientCount, info, isClientReady,
 				Prune Room
 			</Button>
 			{false && <Button
-				buttonProps={{
-					onClick: () => {
+				onClick={
+					() => {
 						if (
 							confirm('Are you sure you want to organize all '
 								+ 'nodes in this room?'
@@ -180,7 +183,9 @@ export const TopDiv = ({memberCount, clientCount, info, isClientReady,
 							eventOrganizeRoomConfirmed()
 						}
 						eventOrganizeRoomButtonClick()
-					},
+					}
+				}
+				buttonProps={{
 					title: 'Will organize nodes'
 						+ (onlyOwnerCanDoStuff && !isLocalClientRoomOwner
 							? '\nOnly room owner can organize at this time'

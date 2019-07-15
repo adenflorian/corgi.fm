@@ -20,8 +20,8 @@ export function NewRoomButton({onClick}: {onClick?: () => any}) {
 		<Button
 			buttonProps={{
 				className: 'newRoomButton',
-				onClick: handleClick,
 			}}
+			onClick={handleClick}
 		>
 			<IoMdAdd /> New Room
 		</Button>

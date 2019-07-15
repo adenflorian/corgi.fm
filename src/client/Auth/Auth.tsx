@@ -1,56 +1,64 @@
 import * as firebase from 'firebase/app'
-import {Fragment, useState} from 'react'
-import React from 'react'
+import {useCallback, useState} from 'react'
+import React, {Fragment} from 'react'
 import {
 	IoLogoFacebook as Facebook, IoLogoGoogle as Google,
 } from 'react-icons/io'
-import {Dispatch} from 'redux'
+import {useDispatch, useSelector} from 'react-redux'
 import {AuthConstants} from '../../common/auth-constants'
 import {
-	authActions, chatSystemMessage, selectAuthState, shamuConnect,
+	authActions, chatSystemMessage, ModalId, modalsAction, selectLoggedIn,
 } from '../../common/redux'
 import {Button} from '../Button/Button'
 import {
 	FirebaseAuthError, FirebaseAuthErrorCode,
 } from '../Firebase/firebase-types'
 import {useFirebase} from '../Firebase/FirebaseContext'
-import {Modal} from '../Modal/Modal'
+import {ModalProps} from '../Modal/ModalManager'
 import {useBoolean, useResettableState} from '../react-hooks'
 import './Auth.less'
 
-interface ReduxProps {
-	loggedIn: boolean
-	logInError: boolean
+export function AuthModalButton() {
+	const loggedIn = useSelector(selectLoggedIn)
+	const firebaseContext = useFirebase()
+	const dispatch = useDispatch()
+	const onClick = useCallback(
+		loggedIn ? logout : showModal,
+		[loggedIn],
+	)
+
+	return (
+		<Button
+			onClick={onClick}
+		>
+			{loggedIn ? `Log Out` : `Register / Login`}
+		</Button>
+	)
+
+	async function logout() {
+		await firebaseContext.auth.signOut()
+		dispatch(chatSystemMessage('Logged out!'))
+	}
+
+	function showModal() {
+		dispatch(modalsAction.set(ModalId.Auth))
+	}
 }
 
-type AllProps = ReduxProps & {dispatch: Dispatch}
-
-export function Auth({dispatch, loggedIn}: AllProps) {
-	const [isModalVisible, showModal, hideModal2] = useBoolean(false)
+export function AuthModal({hideModal}: ModalProps) {
 	const [email, setEmail] = useState('')
 	const [password, setPassword, clearPassword] = useResettableState('')
 	const [authInfo, setAuthInfo, clearAuthInfo] = useResettableState<[string, 'error' | 'info']>(['', 'error'])
 	const [inputsDisabled, disableInputs, enableInputs] = useBoolean(false)
 	const firebaseContext = useFirebase()
+	const dispatch = useDispatch()
 
-	return (
-		<Fragment>
-			<Button
-				buttonProps={{onClick: loggedIn ? logout : showModal}}
-			>
-				{loggedIn ? `Log Out` : `Register / Login`}
-			</Button>
-			{isModalVisible && modal()}
-		</Fragment>
-	)
+	return modal()
 
 	function modal() {
 		return (
-			<Modal
-				onHide={hideModal}
-				className="authModal"
-			>
-				<div className="modalSection login">
+			<Fragment>
+				<div className="modalSection authModal login">
 					<div className="modalSectionLabel">
 						Register or Login
 					</div>
@@ -104,7 +112,7 @@ export function Auth({dispatch, loggedIn}: AllProps) {
 						</div>
 					}
 				</div>
-				<div className="modalSection other">
+				<div className="modalSection authModal other">
 					<div className="modalSectionLabel">
 						Other Login Methods
 					</div>
@@ -130,7 +138,7 @@ export function Auth({dispatch, loggedIn}: AllProps) {
 						</button>
 					</div>
 				</div>
-			</Modal>
+			</Fragment>
 		)
 	}
 
@@ -192,30 +200,15 @@ export function Auth({dispatch, loggedIn}: AllProps) {
 	}
 
 	function handleAuthSuccess() {
-		hideModal()
+		_hideModal()
 		clearAuthInfo()
 		clearPassword()
 	}
 
-	function hideModal() {
-		hideModal2()
+	function _hideModal() {
+		hideModal()
 		clearPassword()
-	}
-
-	async function logout() {
-		await firebaseContext.auth.signOut()
-		dispatch(chatSystemMessage('Logged out!'))
 	}
 }
 
 type AuthProviderMaker = new () => firebase.auth.AuthProvider
-
-export const ConnectedAuth = shamuConnect(
-	(state): ReduxProps => {
-		const authState = selectAuthState(state)
-		return {
-			loggedIn: authState.loggedIn,
-			logInError: authState.logInError,
-		}
-	},
-)(Auth)

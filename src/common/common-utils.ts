@@ -74,3 +74,5 @@ export function applyOctave(midiNumber: number, octave: number) {
 export function removeOctave(midiNumber: number) {
 	return midiNumber % 12
 }
+
+export const noop = () => {}

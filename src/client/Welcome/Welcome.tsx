@@ -1,10 +1,6 @@
 import {Fragment} from 'react'
 import React from 'react'
 import {IoMdPeople} from 'react-icons/io'
-import {Dispatch} from 'redux'
-import {
-	selectAuthState, shamuConnect,
-} from '../../common/redux'
 import {CssColor} from '../../common/shamu-color'
 import {Button} from '../Button/Button'
 import {NewRoomButton} from '../Button/CommonButtons'
@@ -15,19 +11,13 @@ import {useBoolean} from '../react-hooks'
 import {LoadRoomModalButton} from '../SavingAndLoading/SavingAndLoading'
 import './Welcome.less'
 
-interface ReduxProps {
-	loggedIn: boolean
-}
-
-type AllProps = ReduxProps & {dispatch: Dispatch}
-
-function Welcome({dispatch, loggedIn}: AllProps) {
+export function Welcome() {
 	const [isModalVisible, showModal, hideModal] = useBoolean(true)
 
 	return (
 		<Fragment>
 			<Button
-				buttonProps={{onClick: showModal}}
+				onClick={showModal}
 			>
 				Show Welcome
 			</Button>
@@ -83,12 +73,3 @@ function Welcome({dispatch, loggedIn}: AllProps) {
 		)
 	}
 }
-
-export const ConnectedWelcome = shamuConnect(
-	(state): ReduxProps => {
-		const authState = selectAuthState(state)
-		return {
-			loggedIn: authState.loggedIn,
-		}
-	},
-)(Welcome)

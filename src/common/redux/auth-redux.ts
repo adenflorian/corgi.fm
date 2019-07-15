@@ -51,3 +51,5 @@ export function authReducer(state = new AuthState(), action: AuthAction): AuthSt
 
 // Selectors
 export const selectAuthState = (state: IClientAppState) => state.auth
+
+export const selectLoggedIn = (state: IClientAppState) => state.auth.loggedIn

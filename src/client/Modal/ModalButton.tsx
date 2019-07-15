@@ -19,7 +19,7 @@ export function ModalButton({modalId, label, icon: Icon}: Props) {
 
 	return (
 		<Button
-			buttonProps={{onClick}}
+			onClick={onClick}
 		>
 			<Icon />{label}
 		</Button>

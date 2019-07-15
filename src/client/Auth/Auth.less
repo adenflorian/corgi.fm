@@ -1,21 +1,20 @@
 @import "../AppCommon.less";
 @import "../colors.less";
 
-.authModal {
+.authModal.modalSection {
 	text-align: left;
 	
-	.modalSection {
-		&.login {
-			width: 400px;
-			.modalSectionLabel {
-				color: @blue;
-			}
+	&.login {
+		width: 400px;
+		.modalSectionLabel {
+			color: @blue;
 		}
-		&.other {
-			width: 300px;
-			.modalSectionLabel {
-				color: @green;
-			}
+	}
+	
+	&.other {
+		width: 300px;
+		.modalSectionLabel {
+			color: @green;
 		}
 	}
 	

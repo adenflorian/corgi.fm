@@ -8,7 +8,7 @@ import {
 	roomReducers, roomsReducer, userInputReducer, websocketReducer,
 } from './index'
 
-export type IClientAppState = StateType<ReturnType<typeof getClientReducers>>
+export interface IClientAppState extends StateType<ReturnType<typeof getClientReducers>> {}
 
 export type IClientRoomState = StateType<typeof roomReducers>
 
