@@ -53,94 +53,90 @@ export const AuthModalContent: ModalContent = ({hideModal}) => {
 	const firebaseContext = useFirebase()
 	const dispatch = useDispatch()
 
-	return modal()
-
-	function modal() {
-		return (
-			<Fragment>
-				<div className="modalSection authModal login">
-					<div className="modalSectionLabel">
-						Register or Login
-					</div>
-					<div className="modalSectionSubLabel">
-						Remember to drink water!
-					</div>
-					<div className="modalSectionContent">
-						<form onSubmit={handleLogin}>
+	return (
+		<Fragment>
+			<div className="modalSection authModal login">
+				<div className="modalSectionLabel">
+					Register or Login
+				</div>
+				<div className="modalSectionSubLabel">
+					Remember to drink water!
+				</div>
+				<div className="modalSectionContent">
+					<form onSubmit={handleLogin}>
+						<input
+							type="email"
+							placeholder="Email"
+							className="email"
+							value={email}
+							onChange={e => setEmail(e.target.value)}
+							disabled={inputsDisabled}
+							required
+						/>
+						<input
+							type="password"
+							placeholder="Password"
+							className="password"
+							value={password}
+							onChange={e => setPassword(e.target.value)}
+							disabled={inputsDisabled}
+							required
+							{...AuthConstants.password}
+						/>
+						<div className="submitRow">
 							<input
-								type="email"
-								placeholder="Email"
-								className="email"
-								value={email}
-								onChange={e => setEmail(e.target.value)}
+								type="submit"
+								className="button register"
+								value={'Register / Login'}
 								disabled={inputsDisabled}
-								required
 							/>
 							<input
-								type="password"
-								placeholder="Password"
-								className="password"
-								value={password}
-								onChange={e => setPassword(e.target.value)}
+								type="button"
+								className="button resetPassword"
+								value={'Reset Password'}
 								disabled={inputsDisabled}
-								required
-								{...AuthConstants.password}
+								onClick={handleResetPassword}
+								readOnly
 							/>
-							<div className="submitRow">
-								<input
-									type="submit"
-									className="button register"
-									value={'Register / Login'}
-									disabled={inputsDisabled}
-								/>
-								<input
-									type="button"
-									className="button resetPassword"
-									value={'Reset Password'}
-									disabled={inputsDisabled}
-									onClick={handleResetPassword}
-									readOnly
-								/>
-							</div>
-						</form>
-					</div>
-					{authInfo[0] &&
-						<div className="modalSectionFooter">
-							<div className={`bottom ${authInfo[1]}`}>
-								{authInfo[0]}
-							</div>
 						</div>
-					}
+					</form>
 				</div>
-				<div className="modalSection authModal other">
-					<div className="modalSectionLabel">
-						Other Login Methods
+				{authInfo[0] &&
+					<div className="modalSectionFooter">
+						<div className={`bottom ${authInfo[1]}`}>
+							{authInfo[0]}
+						</div>
 					</div>
-					<div className="modalSectionSubLabel">
-						Woof
-					</div>
-					<div className="modalSectionContent providers">
-						<button
-							className="button google"
-							disabled={inputsDisabled}
-							onClick={() => handleProviderLogin(
-								firebase.auth.GoogleAuthProvider)}
-						>
-							<Google /><span>Sign in with Google</span>
-						</button>
-						<button
-							className="button facebook"
-							disabled={inputsDisabled}
-							onClick={() => handleProviderLogin(
-								firebase.auth.FacebookAuthProvider)}
-						>
-							<Facebook /><span>Sign in with Facebook</span>
-						</button>
-					</div>
+				}
+			</div>
+			<div className="modalSection authModal other">
+				<div className="modalSectionLabel">
+					Other Login Methods
 				</div>
-			</Fragment>
-		)
-	}
+				<div className="modalSectionSubLabel">
+					Woof
+				</div>
+				<div className="modalSectionContent providers">
+					<button
+						className="button google"
+						disabled={inputsDisabled}
+						onClick={() => handleProviderLogin(
+							firebase.auth.GoogleAuthProvider)}
+					>
+						<Google /><span>Sign in with Google</span>
+					</button>
+					<button
+						className="button facebook"
+						disabled={inputsDisabled}
+						onClick={() => handleProviderLogin(
+							firebase.auth.FacebookAuthProvider)}
+					>
+						<Facebook /><span>Sign in with Facebook</span>
+					</button>
+				</div>
+			</div>
+		</Fragment>
+	)
 
 	function handleLogin(e: React.FormEvent) {
 		e.preventDefault()
@@ -165,7 +161,6 @@ export const AuthModalContent: ModalContent = ({hideModal}) => {
 			.then(() => dispatch(chatSystemMessage('Logged in!')))
 			.then(handleAuthSuccess)
 			.catch(handleAuthError)
-			.then(enableInputs)
 	}
 
 	function handleResetPassword() {
@@ -174,12 +169,13 @@ export const AuthModalContent: ModalContent = ({hideModal}) => {
 		return firebaseContext.auth
 			.sendPasswordResetEmail(email)
 			.then(() => setAuthInfo(['Password reset email sent!', 'info']))
-			.catch(handleAuthError)
 			.then(enableInputs)
+			.catch(handleAuthError)
 	}
 
 	function handleAuthError(error: FirebaseAuthError): any {
 		clearAuthInfo()
+		enableInputs()
 
 		switch (error.code) {
 			case FirebaseAuthErrorCode.USER_DELETED: return handleRegister()
@@ -200,14 +196,14 @@ export const AuthModalContent: ModalContent = ({hideModal}) => {
 	}
 
 	function handleAuthSuccess() {
+		enableInputs()
 		_hideModal()
-		clearAuthInfo()
-		clearPassword()
 	}
 
 	function _hideModal() {
-		hideModal()
 		clearPassword()
+		clearAuthInfo()
+		hideModal()
 	}
 }
 
