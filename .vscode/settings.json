@@ -127,6 +127,7 @@
         "onstatechange",
         "padenot",
         "pageview",
+        "parens",
         "pkginfo",
         "pmodule",
         "polyfill",

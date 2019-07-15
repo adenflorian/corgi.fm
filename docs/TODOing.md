@@ -113,6 +113,9 @@
 - [ ] look into using `~` for parcel typescript resolution
 - [ ] look into generating new react components and redux reducers
 - [ ] use `useCallback()` hook
+- [ ] lint, react function components should be arrow functions
+	- so that when you import them it won't add the parens
+- [ ] lint, disallow dispatch prop
 - [ ] https://github.com/TrillCyborg/fullstack
 - [ ] https://github.com/accounts-js/accounts
 - [ ] tslint rule to require awaiting promises

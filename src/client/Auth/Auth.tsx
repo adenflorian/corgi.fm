@@ -14,7 +14,7 @@ import {
 	FirebaseAuthError, FirebaseAuthErrorCode,
 } from '../Firebase/firebase-types'
 import {useFirebase} from '../Firebase/FirebaseContext'
-import {ModalProps} from '../Modal/ModalManager'
+import {ModalContent} from '../Modal/ModalManager'
 import {useBoolean, useResettableState} from '../react-hooks'
 import './Auth.less'
 
@@ -45,7 +45,7 @@ export function AuthModalButton() {
 	}
 }
 
-export function AuthModal({hideModal}: ModalProps) {
+export const AuthModalContent: ModalContent = ({hideModal}) => {
 	const [email, setEmail] = useState('')
 	const [password, setPassword, clearPassword] = useResettableState('')
 	const [authInfo, setAuthInfo, clearAuthInfo] = useResettableState<[string, 'error' | 'info']>(['', 'error'])

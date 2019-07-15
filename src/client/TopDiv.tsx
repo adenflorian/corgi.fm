@@ -25,7 +25,7 @@ import {ConnectedOptions} from './Options/Options'
 import {ConnectedRoomSelector} from './RoomSelector'
 import {LoadRoomModalButton} from './SavingAndLoading/SavingAndLoading'
 import './TopDiv.less'
-import {Welcome} from './Welcome/Welcome'
+import {WelcomeModalButton} from './Welcome/Welcome'
 
 interface ReduxProps {
 	memberCount: number
@@ -120,7 +120,7 @@ export const TopDiv = ({memberCount, clientCount, info, isClientReady,
 		<div className="right">
 			<ConnectedNameChanger />
 			<AuthModalButton />
-			<Welcome />
+			<WelcomeModalButton />
 			<ConnectedRoomSelector />
 			<NewRoomButton />
 			<LoadRoomModalButton />

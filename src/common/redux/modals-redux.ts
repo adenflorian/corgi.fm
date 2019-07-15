@@ -11,7 +11,7 @@ export const modalsAction = Object.freeze({
 })
 
 const makeModalsState = () => Object.freeze({
-	activeModal: ModalId.None,
+	activeModal: ModalId.Welcome,
 })
 
 type ModalsState = ReturnType<typeof makeModalsState>
@@ -40,3 +40,6 @@ export function modalsReducer(
 
 export const selectModalsState = (state: IClientAppState) =>
 	state.modals
+
+export const selectActiveModalId = (state: IClientAppState) =>
+	state.modals.activeModal

@@ -108,6 +108,13 @@
         "jsx-no-lambda": false,
         "jsx-no-multiline-js": false,
         "jsx-wrap-multiline": false,
+        // "jsx-ban-props": [
+        //     true,
+        //     [
+        //         "dispatch",
+        //         "use useDispatch"
+        //     ]
+        // ],
         "react-hooks-nesting": "error",
         "import-blacklist": [
             true,

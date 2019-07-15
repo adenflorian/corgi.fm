@@ -1,28 +1,26 @@
 import React from 'react'
-import {useDispatch} from 'react-redux'
-import {Dispatch} from 'redux'
+import {useDispatch, useSelector} from 'react-redux'
+import {AnyFunction} from '../../common/common-types'
 import {
-	IClientAppState, ModalId, modalsAction, selectModalsState, shamuConnect,
+	ModalId, modalsAction, selectActiveModalId,
 } from '../../common/redux'
-import {AuthModal} from '../Auth/Auth'
+import {AuthModalContent} from '../Auth/Auth'
 import {LoadRoomModalContent} from '../SavingAndLoading/SavingAndLoading'
+import {WelcomeModalContent} from '../Welcome/Welcome'
 import {Modal} from './Modal'
 
-type Props = ReturnType<typeof mapStateToProps> & {dispatch: Dispatch}
+export interface ModalContent extends React.FunctionComponent<{
+	hideModal: AnyFunction,
+}> {}
 
-export interface ModalProps {
-	hideModal: Function
-}
-
-export function ModalManager({activeModal}: Props) {
-	const modalComponent = getModalComponent()
+export function ModalManager() {
 	const dispatch = useDispatch()
+	const activeModal = useSelector(selectActiveModalId)
+	const modalComponent = getModalComponent()
 
 	return modalComponent
 		? (
-			<Modal
-				onHide={hideModal}
-			>
+			<Modal onHide={hideModal}>
 				{modalComponent}
 			</Modal>
 		)
@@ -33,7 +31,9 @@ export function ModalManager({activeModal}: Props) {
 			case ModalId.LoadRoom:
 				return <LoadRoomModalContent {...{hideModal}} />
 			case ModalId.Auth:
-				return <AuthModal {...{hideModal}} />
+				return <AuthModalContent {...{hideModal}} />
+			case ModalId.Welcome:
+				return <WelcomeModalContent {...{hideModal}} />
 			default: return null
 		}
 	}
@@ -42,11 +42,3 @@ export function ModalManager({activeModal}: Props) {
 		dispatch(modalsAction.set(ModalId.None))
 	}
 }
-
-function mapStateToProps(state: IClientAppState) {
-	return selectModalsState(state)
-}
-
-export const ConnectedModalManager = shamuConnect(
-	mapStateToProps,
-)(ModalManager)

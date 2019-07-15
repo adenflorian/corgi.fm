@@ -1,8 +1,10 @@
 import React from 'react'
-import {selectLocalClientId, selectRoomSettings, shamuConnect} from '../common/redux'
+import {
+	selectLocalClientId, selectRoomSettings, shamuConnect,
+} from '../common/redux'
 import {ConnectedChat} from './Chat'
 import {ConnectedContextMenuContainer} from './ContextMenu/ContextMenuContainer'
-import {ConnectedModalManager} from './Modal/ModalManager'
+import {ModalManager} from './Modal/ModalManager'
 import {ConnectedSimpleGraph} from './SimpleGraph/SimpleGraph'
 import {ConnectedTopDiv} from './TopDiv'
 
@@ -19,7 +21,7 @@ export class OnlineApp extends React.PureComponent<AllProps> {
 	public render() {
 		return (
 			<div className={this.props.onlyOwnerCanDoStuff && !this.props.isLocalClientRoomOwner ? 'restricted' : ''}>
-				<ConnectedModalManager />
+				<ModalManager />
 				<ConnectedChat />
 				<ConnectedTopDiv />
 				<ConnectedSimpleGraph />

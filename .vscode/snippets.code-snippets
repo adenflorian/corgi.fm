@@ -19,18 +19,26 @@
 		"scope": "javascriptreact,typescriptreact",
 		"prefix": "useDispatch",
 		"body": [
-			"const dispatch = useDispatch()"
+			"const dispatch = useDispatch$0()",
 		],
 	},
 	"useCallback": {
 		"scope": "javascriptreact,typescriptreact",
 		"prefix": "useCallback",
 		"body": [
-			"const $1 = useCallback(",
+			"const $1 = useCallback$0(",
 			"\t() => $2,",
 			"\t[$3],",
 			")",
-			"$0"
 		],
-	}
+	},
+	"reactFunctionComponent": {
+		"scope": "javascriptreact,typescriptreact",
+		"prefix": "rfc",
+		"body": [
+			"export function $1() {",
+			"\treturn $2",
+			"}",
+		],
+	},
 }

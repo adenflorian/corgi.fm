@@ -7,7 +7,7 @@ import {useDispatch} from 'react-redux'
 import {loadRoom, ModalId, SavedRoom} from '../../common/redux'
 import {getOrCreateLocalSavesStorage, localActions} from '../local-middleware'
 import {ModalButton} from '../Modal/ModalButton'
-import {ModalProps} from '../Modal/ModalManager'
+import {ModalContent} from '../Modal/ModalManager'
 import './SavingAndLoading.less'
 
 export function LoadRoomModalButton() {
@@ -20,7 +20,7 @@ export function LoadRoomModalButton() {
 	)
 }
 
-export function LoadRoomModalContent({}: ModalProps) {
+export const LoadRoomModalContent: ModalContent = ({}) => {
 	const [saveStorage, setSaveStorage] = React.useState(getOrCreateLocalSavesStorage())
 	const dispatch = useDispatch()
 
