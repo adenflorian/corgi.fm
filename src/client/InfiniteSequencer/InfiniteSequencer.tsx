@@ -1,17 +1,17 @@
 import {stripIndents} from 'common-tags'
-import {List} from 'immutable'
 import _ from 'lodash'
 import React from 'react'
 import {
-	IoMdDownload as Download, IoMdGrid as Rows, IoMdPlay as Play, IoMdRecording as Record, IoMdSquare as Stop,
+	IoMdDownload as Download, IoMdGrid as Rows, IoMdPlay as Play,
+	IoMdRecording as Record, IoMdSquare as Stop,
 	IoMdStar as Star, IoMdTrash as Clear, IoMdUndo as Undo,
 } from 'react-icons/io'
-import {connect} from 'react-redux'
-import {Dispatch} from 'redux'
+import {connect, useDispatch} from 'react-redux'
 import {
 	globalClockActions, IClientAppState,
 	infiniteSequencerActions, InfiniteSequencerFields, InfiniteSequencerState,
-	InfiniteSequencerStyle, selectConnectionSourceColorByTargetId, selectInfiniteSequencer, sequencerActions,
+	InfiniteSequencerStyle, selectConnectionSourceColorByTargetId,
+	selectInfiniteSequencer, sequencerActions,
 } from '../../common/redux'
 import {CssColor} from '../../common/shamu-color'
 import {
@@ -47,11 +47,13 @@ interface IInfiniteSequencerReduxProps {
 }
 
 type IInfiniteSequencerAllProps =
-	IInfiniteSequencerProps & IInfiniteSequencerReduxProps & {dispatch: Dispatch}
+	IInfiniteSequencerProps & IInfiniteSequencerReduxProps
 
 export const InfiniteSequencer: React.FC<IInfiniteSequencerAllProps> = React.memo(
 	function _InfiniteSequencer(props) {
-		const {color, isPlaying, id, isRecording, name, dispatch, length, rate} = props
+		const {color, isPlaying, id, isRecording, name, length, rate} = props
+
+		const dispatch = useDispatch()
 
 		const dispatchInfiniteSeqParam = (paramType: InfiniteSequencerFields, value: number | boolean | string) =>
 			dispatch(infiniteSequencerActions.setField(id, paramType, value))

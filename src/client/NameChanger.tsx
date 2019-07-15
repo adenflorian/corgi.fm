@@ -1,6 +1,6 @@
 import React, {useState} from 'react'
 import AutosizeInput from 'react-input-autosize'
-import {Dispatch} from 'redux'
+import {useDispatch} from 'react-redux'
 import {
 	maxUsernameLength, selectLocalClient, setLocalClientName, shamuConnect,
 } from '../common/redux'
@@ -11,9 +11,10 @@ interface ReduxProps {
 	authorColor: string
 }
 
-type AllProps = ReduxProps & {dispatch: Dispatch}
+type AllProps = ReduxProps
 
-function NameChanger({author, authorColor, dispatch}: AllProps) {
+function NameChanger({author, authorColor}: AllProps) {
+	const dispatch = useDispatch()
 	const [username, setUsername] = useState(author)
 	const [isFocused, onFocus, onBlur] = useBoolean(false)
 	const [inputRef, setInputRef] =

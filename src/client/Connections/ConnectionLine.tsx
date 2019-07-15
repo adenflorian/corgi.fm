@@ -1,6 +1,6 @@
 import {List} from 'immutable'
 import React from 'react'
-import {Dispatch} from 'redux'
+import {useDispatch} from 'react-redux'
 import {connectionsActions} from '../../common/redux'
 import {saturateColor} from '../../common/shamu-color'
 import {longLineTooltip} from '../client-constants'
@@ -12,7 +12,6 @@ interface ConnectionLineProps {
 	color: string
 	saturateSource: boolean
 	saturateTarget: boolean
-	dispatch: Dispatch
 	pathDPart1: string
 	pathDFull: string
 	connectedLine: LineState
@@ -23,10 +22,11 @@ interface ConnectionLineProps {
 
 export const ConnectionLine = React.memo(
 	function _ConnectionLine({id, color, saturateSource, saturateTarget, pathDPart1,
-		pathDFull, dispatch, connectedLine, speed = 1,
+		pathDFull, connectedLine, speed = 1,
 		isSourcePlaying, highQuality}: ConnectionLineProps,
 	) {
 		const saturatedColor = saturateColor(color)
+		const dispatch = useDispatch()
 
 		return (
 			<svg

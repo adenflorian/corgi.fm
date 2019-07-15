@@ -1,5 +1,5 @@
 import React from 'react'
-import {Dispatch} from 'redux'
+import {useDispatch} from 'react-redux'
 import {ConnectionNodeType} from '../../common/common-types'
 import {
 	AppOptions, getConnectionNodeInfo, MASTER_AUDIO_OUTPUT_TARGET_ID,
@@ -28,13 +28,14 @@ interface ReduxProps {
 	nodeType: ConnectionNodeType
 }
 
-type AllProps = IPanelProps & ReduxProps & {dispatch: Dispatch}
+type AllProps = IPanelProps & ReduxProps
 
 export const DumbPanel: React.FC<AllProps> =
 	React.memo(function _Panel({
 		autoSize = false, children, className = '', color = CssColor.disabledGray, nodeType,
-		id, label, labelTitle, saturate = false, helpText, ownerName, dispatch, enabled, extra,
+		id, label, labelTitle, saturate = false, helpText, ownerName, enabled, extra,
 	}) {
+		const dispatch = useDispatch()
 
 		const renderLabel = label !== undefined && label !== ''
 
@@ -62,7 +63,7 @@ export const DumbPanel: React.FC<AllProps> =
 								`\nDisable or enable this node\n` +
 								nodeInfo.disabledText + ' when disabled'}
 						>
-							<div className="colorDot"/>
+							<div className="colorDot" />
 						</div>
 						<div className="label">{label}</div>
 						{ownerName &&

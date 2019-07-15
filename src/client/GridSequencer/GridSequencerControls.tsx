@@ -4,7 +4,7 @@ import {
 	IoMdDownload as Download, IoMdPlay as Play, IoMdRecording as Record,
 	IoMdSquare as Stop, IoMdTrash as Clear, IoMdUndo as Undo,
 } from 'react-icons/io'
-import {Dispatch} from 'redux'
+import {useDispatch} from 'react-redux'
 import {
 	globalClockActions, gridSequencerActions, GridSequencerFields,
 	GridSequencerState, selectGridSequencer, sequencerActions, shamuConnect,
@@ -32,12 +32,13 @@ interface ReduxProps {
 	isRecording: boolean
 }
 
-type AllProps = IGridSequencerControlsProps & ReduxProps & {dispatch: Dispatch}
+type AllProps = IGridSequencerControlsProps & ReduxProps
 
 export const GridSequencerControls = (props: AllProps) => {
+	const dispatch = useDispatch()
 
 	const dispatchGridSeqParam = (paramType: GridSequencerFields, value: number | boolean | string) =>
-		props.dispatch(gridSequencerActions.setField(props.id, paramType, value))
+		dispatch(gridSequencerActions.setField(props.id, paramType, value))
 
 	return (
 		<div className="controls unselectable" style={{width: GridSequencerState.controlsWidth}}>
@@ -45,8 +46,8 @@ export const GridSequencerControls = (props: AllProps) => {
 				<div
 					className="play"
 					onClick={() => {
-						props.dispatch(sequencerActions.play(props.id))
-						props.dispatch(globalClockActions.start())
+						dispatch(sequencerActions.play(props.id))
+						dispatch(globalClockActions.start())
 					}}
 					title={sequencerPlayToolTip}
 				>
@@ -54,35 +55,35 @@ export const GridSequencerControls = (props: AllProps) => {
 				</div>
 				<div
 					className="stop"
-					onClick={() => props.dispatch(sequencerActions.stop(props.id))}
+					onClick={() => dispatch(sequencerActions.stop(props.id))}
 					title={sequencerStopToolTip}
 				>
 					<Stop />
 				</div>
 				<div
 					className="record"
-					onClick={() => props.dispatch(sequencerActions.toggleRecording(props.id, !props.isRecording))}
+					onClick={() => dispatch(sequencerActions.toggleRecording(props.id, !props.isRecording))}
 					title={sequencerRecordToolTip}
 				>
 					<Record />
 				</div>
 				<div
 					className="export"
-					onClick={() => props.dispatch(sequencerActions.exportMidi(props.id))}
+					onClick={() => dispatch(sequencerActions.exportMidi(props.id))}
 					title={sequencerDownloadToolTip}
 				>
 					<Download />
 				</div>
 				<div
 					className="erase"
-					onClick={() => props.dispatch(sequencerActions.clear(props.id))}
+					onClick={() => dispatch(sequencerActions.clear(props.id))}
 					title={sequencerEraseToolTip}
 				>
 					<Clear />
 				</div>
 				<div
 					className="undo"
-					onClick={() => props.dispatch(sequencerActions.undo(props.id))}
+					onClick={() => dispatch(sequencerActions.undo(props.id))}
 					title={sequencerUndoToolTip}
 				>
 					<Undo />

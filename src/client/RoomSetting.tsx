@@ -1,5 +1,5 @@
 import React from 'react'
-import {connect} from 'react-redux'
+import {connect, useDispatch} from 'react-redux'
 import {Dispatch} from 'redux'
 import {IClientAppState} from '../common/redux'
 
@@ -13,10 +13,12 @@ interface ReduxProps {
 	value: any
 }
 
-type AllProps = Props & ReduxProps & {dispatch: Dispatch}
+type AllProps = Props & ReduxProps
 
 export function OptionCheckbox(props: AllProps) {
-	const {dispatch, label, onChange, value} = props
+	const {label, onChange, value} = props
+
+	const dispatch = useDispatch()
 
 	return (
 		<div className="option">
@@ -27,7 +29,7 @@ export function OptionCheckbox(props: AllProps) {
 					onChange={onChange(dispatch)}
 					checked={value}
 				/>
-				<span className="checkmark"/>
+				<span className="checkmark" />
 			</label>
 		</div>
 	)

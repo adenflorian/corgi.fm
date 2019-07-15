@@ -2,6 +2,7 @@ import {oneLine} from 'common-tags'
 import {List} from 'immutable'
 import React, {Fragment, MouseEvent} from 'react'
 import {connectMenu, ContextMenu, MenuItem, SubMenu} from 'react-contextmenu'
+import {useDispatch} from 'react-redux'
 import {Dispatch} from 'redux'
 import {serverClientId} from '../../common/common-constants'
 import {ConnectionNodeType, IConnectable, Id, Point} from '../../common/common-types'
@@ -22,38 +23,33 @@ interface ReduxProps {
 	localClientColor: string
 }
 
-type AllProps = ReduxProps & {dispatch: Dispatch}
+type AllProps = ReduxProps
 
-export function ContextMenuContainer({localClientId, localClientKeyboardCount, localClientColor, dispatch}: AllProps) {
+export function ContextMenuContainer({localClientId, localClientKeyboardCount, localClientColor}: AllProps) {
 	return (
 		<Fragment>
 			<ContextMenu id={backgroundMenuId}>
 				<BackgroundMenuItems
-					dispatch={dispatch}
 					localClientId={localClientId}
 					localClientKeyboardCount={localClientKeyboardCount}
 					localClientColor={localClientColor}
 				/>
 			</ContextMenu>
-			<ConnectedNodeMenu
-				dispatch={dispatch}
-			/>
+			<ConnectedNodeMenu />
 		</Fragment>
 	)
 }
 
 interface NodeMenuProps {
-	dispatch: Dispatch
 	trigger: {
 		nodeType: ConnectionNodeType,
 	}
 }
 
-function NodeMenu({dispatch, trigger}: NodeMenuProps) {
+function NodeMenu({trigger}: NodeMenuProps) {
 	return (
 		<ContextMenu id={nodeMenuId}>
 			<NodeMenuItems
-				dispatch={dispatch}
 				nodeType={trigger ? trigger.nodeType : ConnectionNodeType.dummy}
 			/>
 		</ContextMenu>
@@ -63,9 +59,11 @@ function NodeMenu({dispatch, trigger}: NodeMenuProps) {
 const ConnectedNodeMenu = connectMenu(nodeMenuId)(NodeMenu)
 
 const BackgroundMenuItems = React.memo(
-	function _MenuItems({localClientId, localClientKeyboardCount, localClientColor, dispatch}
-		: {localClientId: Id, localClientKeyboardCount: number, localClientColor: string, dispatch: Dispatch},
+	function _MenuItems({localClientId, localClientKeyboardCount, localClientColor}
+		: {localClientId: Id, localClientKeyboardCount: number, localClientColor: string},
 	) {
+		const dispatch = useDispatch()
+
 		return (
 			<Fragment>
 				<TopMenuBar />
@@ -152,7 +150,6 @@ interface DeleteMenuData {
 }
 
 interface NodeMenuItemsProps {
-	dispatch: Dispatch
 	nodeType: ConnectionNodeType
 }
 
@@ -163,8 +160,9 @@ const deleteMenuLabels = List([
 	`You can't undo this (yet)`,
 ])
 
-const NodeMenuItems = React.memo(function _MenuItems({dispatch, nodeType}: NodeMenuItemsProps) {
+const NodeMenuItems = React.memo(function _MenuItems({nodeType}: NodeMenuItemsProps) {
 	const {isDeletable, isNodeCloneable} = getConnectionNodeInfo(nodeType)
+	const dispatch = useDispatch()
 
 	return (
 		<Fragment>

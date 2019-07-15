@@ -1,6 +1,6 @@
 import {stripIndents} from 'common-tags'
 import React, {useLayoutEffect, useState} from 'react'
-import {Dispatch} from 'redux'
+import {useDispatch} from 'react-redux'
 import {MidiClipEvents} from '../../common/midi-types'
 import {IMidiNote} from '../../common/MidiNote'
 import {
@@ -22,13 +22,14 @@ interface ReduxProps {
 	style: InfiniteSequencerStyle
 }
 
-type AllProps = Props & ReduxProps & {dispatch: Dispatch}
+type AllProps = Props & ReduxProps
 
 const sensitivity = 0.1
 const threshold = 1
 
-export function InfiniteSequencerNotes({id, style, events, showRows, dispatch}: AllProps) {
+export function InfiniteSequencerNotes({id, style, events, showRows}: AllProps) {
 
+	const dispatch = useDispatch()
 	const [selectedEvent, setSelectedEvent] = useState({
 		isSelected: false,
 		index: -1,

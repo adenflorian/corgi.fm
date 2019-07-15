@@ -1,5 +1,5 @@
 import React from 'react'
-import {Dispatch} from 'redux'
+import {useDispatch} from 'react-redux'
 import {ClientId} from '../../common/common-types'
 import {
 	ActiveGhostConnectorSourceOrTarget, calculateConnectorPositionY, createSelectPlaceholdersInfo,
@@ -25,15 +25,16 @@ interface ReduxProps {
 	rightPortCount: number
 }
 
-type AllProps = Props & ReduxProps & {dispatch: Dispatch}
+type AllProps = Props & ReduxProps
 
 export const ConnectorPlaceholders =
 	function _ConnectorPlaceholders({
-		dispatch, parentId, placeholdersInfo, leftPortCount, rightPortCount,
+		parentId, placeholdersInfo, leftPortCount, rightPortCount,
 		localClientId, parentX, parentY, parentWidth, parentHeight,
 	}: AllProps) {
 
 		const {leftConnections, rightConnections} = placeholdersInfo
+		const dispatch = useDispatch()
 
 		const onMouseDown = (y: number, port: number) => (
 			connectorPositionX: number,

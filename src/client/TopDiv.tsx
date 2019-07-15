@@ -1,13 +1,13 @@
 import React from 'react'
-import {Dispatch} from 'redux'
+import {useDispatch} from 'react-redux'
 import {rateLimitedDebounceNoTrail} from '../common/common-utils'
 import {
 	IClientState, organizeGraph,
 	selectClientById, selectLocalClientId, selectMemberCount,
 	selectRoomSettings,
 } from '../common/redux'
-import {selectClientCount} from '../common/redux'
 import {selectClientInfo, shamuConnect} from '../common/redux'
+import {selectClientCount} from '../common/redux'
 import {CssColor} from '../common/shamu-color'
 import {
 	eventOrganizeRoomButtonClick,
@@ -37,170 +37,178 @@ interface ReduxProps {
 	isLocalClientRoomOwner: boolean
 }
 
-type AllProps = ReduxProps & {dispatch: Dispatch}
+type AllProps = ReduxProps
 
-export const TopDiv = ({memberCount, clientCount, info, isClientReady,
-	roomOwner, onlyOwnerCanDoStuff,
-	isLocalClientRoomOwner, dispatch}: AllProps) =>
+export const TopDiv = ({
+	memberCount, clientCount, info, isClientReady,
+	roomOwner, onlyOwnerCanDoStuff, isLocalClientRoomOwner,
+}: AllProps) => {
 
-	<div className="topDiv" style={{marginBottom: 'auto'}}>
-		<div className="left">
-			<div className="blob">
-				<div className="blobDark">WebSocket</div>
-				<div>{info}</div>
-			</div>
-			<div className="blob">
-				<div className="blobDark" title="Frames per second">FPS</div>
-				<div id="fps" style={{width: 32, overflow: 'hidden'}} />
-			</div>
-			<div className="blob" style={{overflow: 'hidden'}}>
-				<span className="blobDark">Zoom</span>
-				<span id="zoomText">0.0</span>
-			</div>
-			<div className="blob">
-				<div className="blobDark">Online Users</div>
-				<div>{clientCount}</div>
-			</div>
-			<div className="blob">
-				<div className="blobDark">Room Members</div>
-				<div>{memberCount}</div>
-			</div>
-			<div className="blob">
-				<div className="blobDark">Room Owner</div>
-				<div>
-					<span
-						className="usernameFont"
-						style={{color: roomOwner.color}}
-					>
-						{roomOwner.name}
-					</span>
-					{isLocalClientRoomOwner
-						? <span
-							style={{
-								marginLeft: 8,
-								color: CssColor.disabledGray,
-							}}
+	const dispatch = useDispatch()
+
+	return (
+		<div className="topDiv" style={{marginBottom: 'auto'}}>
+			<div className="left">
+				<div className="blob">
+					<div className="blobDark">WebSocket</div>
+					<div>{info}</div>
+				</div>
+				<div className="blob">
+					<div className="blobDark" title="Frames per second">
+						FPS
+					</div>
+					<div id="fps" style={{width: 32, overflow: 'hidden'}} />
+				</div>
+				<div className="blob" style={{overflow: 'hidden'}}>
+					<span className="blobDark">Zoom</span>
+					<span id="zoomText">0.0</span>
+				</div>
+				<div className="blob">
+					<div className="blobDark">Online Users</div>
+					<div>{clientCount}</div>
+				</div>
+				<div className="blob">
+					<div className="blobDark">Room Members</div>
+					<div>{memberCount}</div>
+				</div>
+				<div className="blob">
+					<div className="blobDark">Room Owner</div>
+					<div>
+						<span
+							className="usernameFont"
+							style={{color: roomOwner.color}}
 						>
-							(You)
+							{roomOwner.name}
 						</span>
-						: ''}
+						{isLocalClientRoomOwner
+							? <span
+								style={{
+									marginLeft: 8,
+									color: CssColor.disabledGray,
+								}}
+							>
+								(You)
+							</span>
+							: ''}
+					</div>
 				</div>
+				<div className="blob">
+					<div className="blobDark">Room Status</div>
+					<div
+						style={{
+							color: onlyOwnerCanDoStuff
+								? CssColor.orange
+								: CssColor.green,
+						}}
+						title={onlyOwnerCanDoStuff
+							? 'Limited: anyone can join, '
+							+ 'but only room owner can do stuff'
+							: 'Public: anyone can join and do stuff'}
+					>
+						{onlyOwnerCanDoStuff ? 'Limited' : 'Public'}
+					</div>
+				</div>
+				{!isClientReady &&
+					<div
+						className="blob"
+						style={{
+							fontSize: '1.4em',
+							lineHeight: '1.2em',
+							color: CssColor.brightRed,
+						}}
+					>
+						<p>Not connected!</p>
+						<p>Save your work before it reconnects!</p>
+						<p>All unsaved work might get lost!</p>
+					</div>
+				}
 			</div>
-			<div className="blob">
-				<div className="blobDark">Room Status</div>
-				<div
-					style={{
-						color: onlyOwnerCanDoStuff
-							? CssColor.orange
-							: CssColor.green,
-					}}
-					title={onlyOwnerCanDoStuff
-						? 'Limited: anyone can join, '
-						+ 'but only room owner can do stuff'
-						: 'Public: anyone can join and do stuff'}
+			<div className="right">
+				<ConnectedNameChanger />
+				<AuthModalButton />
+				<WelcomeModalButton />
+				<ConnectedRoomSelector />
+				<NewRoomButton />
+				<LoadRoomModalButton />
+				<Button
+					onClick={
+						rateLimitedDebounceNoTrail(() => {
+							dispatch(localActions.saveRoomToBrowser())
+							eventSaveRoomToBrowserButtonClick()
+						}, 1000)
+					}
 				>
-					{onlyOwnerCanDoStuff ? 'Limited' : 'Public'}
-				</div>
+					Save Room To Browser
+				</Button>
+				<Button
+					buttonProps={{
+						title: 'Will be able to load from file at a later date',
+					}}
+					onClick={
+						rateLimitedDebounceNoTrail(() => {
+							dispatch(localActions.saveRoomToFile())
+							eventSaveRoomToFileButtonClick()
+						}, 2000)
+					}
+				>
+					Save Room To File
+				</Button>
+				<Button
+					onClick={
+						() => {
+							if (
+								confirm('Are you sure you want to delete all '
+									+ 'nodes with no connections in this room?'
+									+ '\nThis cannot be undone!')
+							) {
+								dispatch(localActions.pruneRoom())
+								eventPruneRoomConfirmed()
+							}
+							eventPruneRoomButtonClick()
+						}
+					}
+					buttonProps={{
+						title: 'Will delete nodes with no connections on them'
+							+ (onlyOwnerCanDoStuff && !isLocalClientRoomOwner
+								? '\nOnly room owner can prune at this time'
+								: ''),
+					}}
+					disabled={onlyOwnerCanDoStuff && !isLocalClientRoomOwner}
+				>
+					Prune Room
+				</Button>
+				{false && <Button
+					onClick={
+						() => {
+							if (
+								confirm('Are you sure you want to organize all '
+									+ 'nodes in this room?'
+									+ '\nThis cannot be undone!')
+							) {
+								dispatch(organizeGraph())
+								eventOrganizeRoomConfirmed()
+							}
+							eventOrganizeRoomButtonClick()
+						}
+					}
+					buttonProps={{
+						title: 'Will organize nodes'
+							+ (onlyOwnerCanDoStuff && !isLocalClientRoomOwner
+								? '\nOnly room owner can organize at this time'
+								: ''),
+					}}
+					disabled={onlyOwnerCanDoStuff && !isLocalClientRoomOwner}
+				>
+					Organize Room
+				</Button>}
+				<ConnectedOptions />
+				<DiscordLink />
+				<PatreonLink />
+				<NewsletterLink />
 			</div>
-			{!isClientReady &&
-				<div
-					className="blob"
-					style={{
-						fontSize: '1.4em',
-						lineHeight: '1.2em',
-						color: CssColor.brightRed,
-					}}
-				>
-					<p>Not connected!</p>
-					<p>Save your work before it reconnects!</p>
-					<p>All unsaved work might get lost!</p>
-				</div>
-			}
 		</div>
-		<div className="right">
-			<ConnectedNameChanger />
-			<AuthModalButton />
-			<WelcomeModalButton />
-			<ConnectedRoomSelector />
-			<NewRoomButton />
-			<LoadRoomModalButton />
-			<Button
-				onClick={
-					rateLimitedDebounceNoTrail(() => {
-						dispatch(localActions.saveRoomToBrowser())
-						eventSaveRoomToBrowserButtonClick()
-					}, 1000)
-				}
-			>
-				Save Room To Browser
-			</Button>
-			<Button
-				buttonProps={{
-					title: 'Will be able to load from file at a later date',
-				}}
-				onClick={
-					rateLimitedDebounceNoTrail(() => {
-						dispatch(localActions.saveRoomToFile())
-						eventSaveRoomToFileButtonClick()
-					}, 2000)
-				}
-			>
-				Save Room To File
-			</Button>
-			<Button
-				onClick={
-					() => {
-						if (
-							confirm('Are you sure you want to delete all '
-								+ 'nodes with no connections in this room?'
-								+ '\nThis cannot be undone!')
-						) {
-							dispatch(localActions.pruneRoom())
-							eventPruneRoomConfirmed()
-						}
-						eventPruneRoomButtonClick()
-					}
-				}
-				buttonProps={{
-					title: 'Will delete nodes with no connections on them'
-						+ (onlyOwnerCanDoStuff && !isLocalClientRoomOwner
-							? '\nOnly room owner can prune at this time'
-							: ''),
-				}}
-				disabled={onlyOwnerCanDoStuff && !isLocalClientRoomOwner}
-			>
-				Prune Room
-			</Button>
-			{false && <Button
-				onClick={
-					() => {
-						if (
-							confirm('Are you sure you want to organize all '
-								+ 'nodes in this room?'
-								+ '\nThis cannot be undone!')
-						) {
-							dispatch(organizeGraph())
-							eventOrganizeRoomConfirmed()
-						}
-						eventOrganizeRoomButtonClick()
-					}
-				}
-				buttonProps={{
-					title: 'Will organize nodes'
-						+ (onlyOwnerCanDoStuff && !isLocalClientRoomOwner
-							? '\nOnly room owner can organize at this time'
-							: ''),
-				}}
-				disabled={onlyOwnerCanDoStuff && !isLocalClientRoomOwner}
-			>
-				Organize Room
-			</Button>}
-			<ConnectedOptions />
-			<DiscordLink />
-			<PatreonLink />
-			<NewsletterLink />
-		</div>
-	</div>
+	)
+}
 
 export const ConnectedTopDiv = shamuConnect(
 	(state): ReduxProps => {

@@ -1,7 +1,7 @@
 import {stripIndent} from 'common-tags'
 import {List} from 'immutable'
 import React from 'react'
-import {Dispatch} from 'redux'
+import {useDispatch} from 'react-redux'
 import {ClientId} from '../../common/common-types'
 import {
 	ActiveGhostConnectorSourceOrTarget,
@@ -43,7 +43,7 @@ interface IConnectionViewReduxProps {
 	lineType: LineType
 }
 
-type IConnectionViewAllProps = IConnectionViewProps & IConnectionViewReduxProps & {dispatch: Dispatch}
+type IConnectionViewAllProps = IConnectionViewProps & IConnectionViewReduxProps
 
 export const longLineStrokeWidth = 2
 export const connectorWidth = 16
@@ -56,7 +56,9 @@ export const ConnectionView =
 	React.memo(function _ConnectionView(props: IConnectionViewAllProps) {
 		const {color, saturateSource, saturateTarget, id, sourceX, sourceY, targetX, targetY,
 			targetStackOrder = 0, sourceStackOrder = 0, speed = 1, lineType,
-			isSourcePlaying, highQuality, dispatch, localClientId, connection} = props
+			isSourcePlaying, highQuality, localClientId, connection} = props
+
+		const dispatch = useDispatch()
 
 		const sourceConnectorLeft = sourceX + (connectorWidth * sourceStackOrder)
 		const sourceConnectorRight = sourceX + connectorWidth + (connectorWidth * sourceStackOrder)
@@ -107,7 +109,6 @@ export const ConnectionView =
 					color={color}
 					saturateSource={saturateSource}
 					saturateTarget={saturateTarget}
-					dispatch={props.dispatch}
 					pathDPart1={pathDPart1}
 					pathDFull={pathDFull}
 					connectedLine={connectedLine}
