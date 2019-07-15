@@ -66,40 +66,35 @@
 				// "watch-ts-client",
 				"watch-server"
 			],
+			"isBackground": true,
 			"problemMatcher": []
 		},
 		{
-			"label": "watch-parcel",
-			"type": "shell",
-			"command": [
-				"yarn",
-				"watch-parcel"
-			],
+			"type": "npm",
+			"script": "watch-parcel",
 			"presentation": {
 				"group": "groupA",
 				"showReuseMessage": false,
 				"panel": "dedicated",
 				"focus": true
 			},
+			"isBackground": true,
 			"problemMatcher": [],
 			"runOptions": {
 				"runOn": "folderOpen"
 			}
 		},
 		{
-			"label": "watch-server",
-			"type": "shell",
-			"command": [
-				"yarn",
-				"watch-server"
-			],
+			"type": "npm",
+			"script": "watch-server",
 			"presentation": {
 				"group": "groupA",
 				"showReuseMessage": false,
 				"panel": "dedicated",
 				"focus": true
 			},
-			"problemMatcher": [],
+			"isBackground": true,
+			"problemMatcher": "$tsc-watch",
 			"runOptions": {
 				"runOn": "folderOpen"
 			}
