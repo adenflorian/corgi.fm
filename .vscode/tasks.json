@@ -70,6 +70,7 @@
 			"problemMatcher": []
 		},
 		{
+			"label": "watch-parcel",
 			"type": "npm",
 			"script": "watch-parcel",
 			"presentation": {
@@ -85,6 +86,7 @@
 			}
 		},
 		{
+			"label": "watch-server",
 			"type": "npm",
 			"script": "watch-server",
 			"presentation": {
