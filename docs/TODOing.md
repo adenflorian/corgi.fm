@@ -182,7 +182,7 @@ It's just following the values of the sine, really, but you can adjust as you se
 Yes, https://mmckegg.github.io/web-audio-school/, exercise 13 is exactly what you need
 
 # 0.6.0
-
+- [ ] do CORS correctly, only allow corgi.fm origin
 - [ ] allow typing in knob values
 	- [ ] make value look as similar to display value as possible
 	- [ ] make use of the existing value string functions
