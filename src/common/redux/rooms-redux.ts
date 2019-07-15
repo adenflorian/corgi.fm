@@ -1,6 +1,7 @@
 import {Map} from 'immutable'
 import {combineReducers, Reducer} from 'redux'
 import {createSelector} from 'reselect'
+import {IClientAppState} from './common-redux-types'
 import {selectAllConnections} from './connections-redux'
 import {selectGlobalClockState} from './global-clock-redux'
 import {SERVER_ACTION} from './index'
@@ -142,8 +143,8 @@ export const selectAllRoomNames = createSelector(
 	rooms => rooms.all.keySeq().toList(),
 )
 
-export const selectActiveRoom = (state: {rooms: IRoomsState}): string =>
-	selectRoomsState(state).activeRoom
+export const selectActiveRoom = ({rooms: {activeRoom}}: IClientAppState) =>
+	activeRoom
 
 export const selectRoomExists = (state: {rooms: IRoomsState}, name: string): boolean =>
 	selectAllRoomNames(state).includes(name)

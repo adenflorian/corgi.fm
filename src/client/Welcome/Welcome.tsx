@@ -1,8 +1,8 @@
 import {useCallback} from 'react'
 import React from 'react'
 import {IoMdPeople} from 'react-icons/io'
-import {useDispatch} from 'react-redux'
-import {ModalId, modalsAction} from '../../common/redux'
+import {useDispatch, useSelector} from 'react-redux'
+import {ModalId, modalsAction, selectActiveRoom} from '../../common/redux'
 import {Button} from '../Button/Button'
 import {NewRoomButton} from '../Button/CommonButtons'
 import {DiscordLink, NewsletterLink, PatreonLink} from '../Links'
@@ -26,6 +26,8 @@ export function WelcomeModalButton() {
 }
 
 export const WelcomeModalContent: ModalContent = ({hideModal}) => {
+	const activeRoom = useSelector(selectActiveRoom)
+
 	return (
 		<div className="welcomeModal">
 			<div className="modalSection login">
@@ -48,7 +50,7 @@ export const WelcomeModalContent: ModalContent = ({hideModal}) => {
 								className="joinLobby"
 								onClick={hideModal}
 							>
-								<IoMdPeople /> Join Lobby
+								<IoMdPeople /> Join {activeRoom}
 							</button>
 							<NewRoomButton onClick={hideModal} />
 							<LoadRoomModalButton />
