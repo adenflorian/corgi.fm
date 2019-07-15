@@ -21,7 +21,7 @@ import {NewRoomButton} from './Button/CommonButtons'
 import {DiscordLink, NewsletterLink, PatreonLink} from './Links'
 import {localActions} from './local-middleware'
 import {ConnectedNameChanger} from './NameChanger'
-import {ConnectedOptions} from './Options/Options'
+import {OptionsModalButton} from './Options/Options'
 import {ConnectedRoomSelector} from './RoomSelector'
 import {LoadRoomModalButton} from './SavingAndLoading/SavingAndLoading'
 import './TopDiv.less'
@@ -201,7 +201,7 @@ export const TopDiv = ({
 				>
 					Organize Room
 				</Button>}
-				<ConnectedOptions />
+				<OptionsModalButton />
 				<DiscordLink />
 				<PatreonLink />
 				<NewsletterLink />

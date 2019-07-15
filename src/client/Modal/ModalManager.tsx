@@ -5,6 +5,7 @@ import {
 	ModalId, modalsAction, selectActiveModalId,
 } from '../../common/redux'
 import {AuthModalContent} from '../Auth/Auth'
+import {OptionsModalContent} from '../Options/Options'
 import {LoadRoomModalContent} from '../SavingAndLoading/SavingAndLoading'
 import {WelcomeModalContent} from '../Welcome/Welcome'
 import {Modal} from './Modal'
@@ -34,6 +35,8 @@ export function ModalManager() {
 				return <AuthModalContent {...{hideModal}} />
 			case ModalId.Welcome:
 				return <WelcomeModalContent {...{hideModal}} />
+			case ModalId.Options:
+				return <OptionsModalContent {...{hideModal}} />
 			default: return null
 		}
 	}
