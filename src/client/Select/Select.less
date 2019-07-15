@@ -28,14 +28,10 @@
             select, .arrow {
                 filter: brightness(125%)
             }
-        }
-
-        &:active {
-            top: 1px;
-        }
-        
+        }        
 
         select {
+            font-family: inherit;
             position: relative;
             background-color: transparent;
             border: none;
@@ -55,6 +51,10 @@
             box-sizing: border-box;
             -webkit-appearance:none;
             -moz-appearance:none;
+
+            &:not(:disabled) {
+                cursor: pointer;
+            }
 
             option {
                 background-color: @panelGray;
