@@ -96,12 +96,12 @@
 	- [ ] test
 	- [ ] prod
 - [ ] welcome modal
-	- [ ] change username
+	- [√] change username
 	- [ ] create account/login
 	- [ ] tutorial
-	- [ ] newsletter
-	- [ ] discord
-	- [ ] patreon
+	- [√] newsletter
+	- [√] discord
+	- [√] patreon
 	- [ ] news
 	- [ ] recent projects
 	- [ ] what would you like to do?

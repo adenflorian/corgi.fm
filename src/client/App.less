@@ -75,7 +75,7 @@ a {
     min-width: 600px;
 }
 
-.nameAutosizeInput {
+.nameAutosizeInput input {
     min-width: 80px;
 }
 
@@ -241,6 +241,13 @@ svg {
 .disabled {
     .readonly();
     pointer-events: none;
+}
+
+// Utility classes
+.vert-space-16 {
+    & > * + * {
+        margin-top: 16px;
+    }
 }
 
 // Cookie consent

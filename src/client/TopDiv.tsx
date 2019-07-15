@@ -42,7 +42,7 @@ export const TopDiv = ({memberCount, clientCount, info, isClientReady,
 	roomOwner, onlyOwnerCanDoStuff,
 	isLocalClientRoomOwner, dispatch}: AllProps) =>
 
-	<div id="topDiv" style={{marginBottom: 'auto'}}>
+	<div className="topDiv" style={{marginBottom: 'auto'}}>
 		<div className="left">
 			<div className="blob">
 				<div className="blobDark">WebSocket</div>
@@ -198,9 +198,9 @@ export const TopDiv = ({memberCount, clientCount, info, isClientReady,
 				Organize Room
 			</Button>}
 			<ConnectedOptions />
-			<NewsletterLink />
 			<DiscordLink />
 			<PatreonLink />
+			<NewsletterLink />
 		</div>
 	</div>
 

@@ -5,6 +5,11 @@
 	.modalSectionContent {
 		display: flex;
 		flex-wrap: wrap;
+		padding: 32px 16px !important;
+
+		& > * + * {
+			margin-top: 32px;
+		}
 
 		& > .first {
 			width: 100%;
@@ -23,8 +28,6 @@
 			display: flex;
 			align-items: center;
 			font-size: 16px;
-			padding-bottom: 16px;
-			height: 80px;
 
 			label {
 				background-color: @panelGrayLight;
@@ -41,14 +44,15 @@
 				border-bottom-left-radius: 0 !important;
 			}
 		}
+		.roomActions {
+			width: 160px;
+
+			button {
+				width: 100%;
+			}
+		}
 		.links {
 			width: 160px;
-		}
-		a, button, input {
-			box-shadow: none !important;
-		}
-		a, button {
-			background-color: @panelGrayLight !important;
 		}
 	}
 }

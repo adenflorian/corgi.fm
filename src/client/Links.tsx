@@ -6,6 +6,7 @@ import {
 	IoMdMail as MailIcon,
 } from 'react-icons/io'
 import {IconType} from 'react-icons/lib/iconBase'
+import {CssColor} from '../common/shamu-color'
 import {ButtonLink} from './Button/ButtonLink'
 
 export function DiscordLink() {
@@ -13,7 +14,7 @@ export function DiscordLink() {
 }
 
 export function NewsletterLink() {
-	return getLink('/newsletter', 'Newsletter', MailIcon)
+	return getLink('/newsletter', 'Newsletter', MailIcon, CssColor.yellow)
 }
 
 export function PatreonLink() {
@@ -22,14 +23,14 @@ export function PatreonLink() {
 
 function getLink(url: string, label: string, Icon: IconType, backgroundColor?: string) {
 	return (
-		<ButtonLink href={url} newTab={true} >
+		<ButtonLink href={url} newTab={true} style={{color: backgroundColor}}>
 			<Icon
 				style={{
-					marginRight: 8,
 					backgroundColor,
+					color: CssColor.panelGrayDark,
 				}}
 			/>
-			<span>{label}</span>
+			<span style={{color: CssColor.defaultGray}}>{label}</span>
 		</ButtonLink>
 	)
 }

@@ -1,5 +1,8 @@
 import {Fragment} from 'react'
 import React from 'react'
+import {
+	IoMdAdd as AddIcon, IoMdFolder as OpenIcon, IoMdPeople as PeopleIcon,
+} from 'react-icons/io'
 import {Dispatch} from 'redux'
 import {
 	selectAuthState, shamuConnect,
@@ -53,13 +56,23 @@ function Welcome({dispatch, loggedIn}: AllProps) {
 							</div>
 						</div>
 						<div className="left">
-							left
+							<div className="roomActions vert-space-16">
+								<button className="joinLobby">
+									<PeopleIcon /> Join Lobby
+							</button>
+								<button className="newRoom">
+									<AddIcon /> New Room
+							</button>
+								<button className="joinLobby">
+									<OpenIcon /> Load Room
+							</button>
+							</div>
 						</div>
 						<div className="right">
 							<div className="links vert-space-16">
-								<NewsletterLink />
 								<DiscordLink />
 								<PatreonLink />
+								<NewsletterLink />
 							</div>
 						</div>
 					</div>

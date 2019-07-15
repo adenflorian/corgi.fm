@@ -83,43 +83,11 @@
 	}
 
 	button {
-		color: inherit;
-		font-size: inherit;
-		font-family: inherit;
-		word-spacing: inherit;
-		text-transform: inherit;
-		text-indent: inherit;
-		text-shadow: inherit;
-		display: flex;
-		align-items: center;
-		-webkit-rtl-ordering: inherit;
-		cursor: inherit;
-		font: inherit;
-		appearance: inherit;
-		letter-spacing: inherit;
-		writing-mode: inherit;
-		text-rendering: inherit;
-		border: none;
-		padding: 0 8px 0 0;
-		min-height: 32px;
 		width: 100%;
-		background-color: @panelGrayLight;
-		font-size: 16px;
-
-		&:not(:disabled):hover {
-			cursor: pointer;
-			filter: brightness(1.2);
-		}
 
 		&:disabled {
 			color: @panelGray !important;
 			background-color: @panelGrayLight !important;
-		}
-
-		border-radius: @mainBorderRadius;
-
-		&:focus {
-			@colorBorder();
 		}
 
 		&.google {
@@ -132,14 +100,6 @@
 			svg {
 				background-color: #3C5A99;
 			}
-		}
-
-		svg {
-			font-size: 20px;
-			margin-right: 8px;
-			padding: 6px;
-			border-top-left-radius: @mainBorderRadius;
-			border-bottom-left-radius: @mainBorderRadius;
 		}
 	}
 

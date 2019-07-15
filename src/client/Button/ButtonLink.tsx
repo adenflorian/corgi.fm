@@ -1,8 +1,6 @@
-import React from 'react'
-import {IoMdOpen as Open} from 'react-icons/io'
-import './ButtonLink.less'
+import React, {HTMLAttributes} from 'react'
 
-interface Props {
+interface Props extends HTMLAttributes<HTMLAnchorElement> {
 	newTab?: boolean
 	href: string
 	children: any
