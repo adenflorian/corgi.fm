@@ -4,6 +4,60 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
+			"type": "npm",
+			"script": "lint-client-watch",
+			"isBackground": true,
+			"problemMatcher": {
+				"base": "$tslint5",
+				"fileLocation": "absolute"
+			},
+			"runOptions": {
+				"runOn": "folderOpen"
+			},
+			"presentation": {
+				"group": "groupB",
+				"showReuseMessage": false,
+				"panel": "dedicated",
+				"reveal": "never",
+			},
+		},
+		{
+			"type": "npm",
+			"script": "lint-common-watch",
+			"isBackground": true,
+			"problemMatcher": {
+				"base": "$tslint5",
+				"fileLocation": "absolute"
+			},
+			"runOptions": {
+				"runOn": "folderOpen"
+			},
+			"presentation": {
+				"group": "groupB",
+				"showReuseMessage": false,
+				"panel": "dedicated",
+				"reveal": "never",
+			},
+		},
+		{
+			"type": "npm",
+			"script": "lint-server-watch",
+			"isBackground": true,
+			"problemMatcher": {
+				"base": "$tslint5",
+				"fileLocation": "absolute"
+			},
+			"runOptions": {
+				"runOn": "folderOpen"
+			},
+			"presentation": {
+				"group": "groupB",
+				"showReuseMessage": false,
+				"panel": "dedicated",
+				"reveal": "never",
+			},
+		},
+		{
 			"command": "",
 			"label": "go",
 			"type": "process",
@@ -51,129 +105,19 @@
 			}
 		},
 		{
-			"label": "watch-ts-client",
-			"type": "shell",
-			"command": [
-				"yarn",
-				"watch-ts-client"
-			],
+			"type": "npm",
+			"script": "watch-ts-client",
 			"presentation": {
-				"group": "groupA",
+				"group": "groupC",
 				"showReuseMessage": false,
 				"panel": "dedicated",
-				"focus": true
+				"focus": false
 			},
-			"problemMatcher": [],
+			"isBackground": true,
+			"problemMatcher": "$tsc-watch",
 			"runOptions": {
-				// "runOn": "folderOpen"
+				"runOn": "folderOpen"
 			}
 		},
-		{
-			"label": "scan client for typescript problems",
-			"command": "./node_modules/.bin/tsc",
-			"type": "shell",
-			"options": {
-				"shell": {
-					"executable": "bash"
-				}
-			},
-			"args": [
-				"-w",
-				"-p",
-				"${workspaceFolder}\\src\\client",
-				"--noEmit"
-			],
-			"presentation": {
-				"echo": true,
-				"reveal": "always",
-				"focus": false,
-				"panel": "shared",
-				"clear": false
-			},
-			"isBackground": true,
-			"problemMatcher": "$tsc-watch"
-		},
-		{
-			"label": "scan server for typescript problems",
-			"command": "./node_modules/.bin/tsc",
-			"type": "shell",
-			"options": {
-				"shell": {
-					"executable": "bash"
-				}
-			},
-			"args": [
-				"-w",
-				"-p",
-				"${workspaceFolder}\\src\\server",
-				"--noEmit"
-			],
-			"presentation": {
-				"echo": true,
-				"reveal": "always",
-				"focus": false,
-				"panel": "shared",
-				"showReuseMessage": true,
-				"clear": false
-			},
-			"isBackground": true,
-			"problemMatcher": "$tsc-watch"
-		},
-		{
-			"type": "npm",
-			"script": "lint-client-watch",
-			"isBackground": true,
-			"problemMatcher": {
-				"base": "$tslint5",
-				"fileLocation": "absolute"
-			},
-			"runOptions": {
-				"runOn": "folderOpen"
-			},
-			"presentation": {
-				"group": "groupB",
-				"showReuseMessage": false,
-				"panel": "dedicated"
-			},
-		},
-		{
-			"type": "npm",
-			"script": "lint-common-watch",
-			"isBackground": true,
-			"problemMatcher": {
-				"base": "$tslint5",
-				"fileLocation": "absolute"
-			},
-			"runOptions": {
-				"runOn": "folderOpen"
-			},
-			"presentation": {
-				"group": "groupB",
-				"showReuseMessage": false,
-				"panel": "dedicated"
-			},
-		},
-		{
-			"type": "npm",
-			"script": "lint-server-watch",
-			"isBackground": true,
-			"problemMatcher": {
-				"base": "$tslint5",
-				"fileLocation": "absolute"
-			},
-			"runOptions": {
-				"runOn": "folderOpen"
-			},
-			"presentation": {
-				"group": "groupB",
-				"showReuseMessage": false,
-				"panel": "dedicated"
-			},
-		},
-		{
-			"type": "npm",
-			"script": "deploy-test",
-			"problemMatcher": []
-		}
 	]
 }
