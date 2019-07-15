@@ -108,7 +108,12 @@
         "jsx-no-lambda": false,
         "jsx-no-multiline-js": false,
         "jsx-wrap-multiline": false,
-        "react-hooks-nesting": "error"
+        "react-hooks-nesting": "error",
+        "import-blacklist": [
+            true,
+            // To prevent accidental use of sentry logger
+            "@sentry/utils"
+        ]
     },
     "rulesDirectory": [],
     "linterOptions": {
