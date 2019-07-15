@@ -4,6 +4,7 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
+			"command": "",
 			"label": "go",
 			"type": "process",
 			"dependsOn": [
@@ -117,6 +118,57 @@
 			},
 			"isBackground": true,
 			"problemMatcher": "$tsc-watch"
+		},
+		{
+			"type": "npm",
+			"script": "lint-client-watch",
+			"isBackground": true,
+			"problemMatcher": {
+				"base": "$tslint5",
+				"fileLocation": "absolute"
+			},
+			"runOptions": {
+				"runOn": "folderOpen"
+			},
+			"presentation": {
+				"group": "groupB",
+				"showReuseMessage": false,
+				"panel": "dedicated"
+			},
+		},
+		{
+			"type": "npm",
+			"script": "lint-common-watch",
+			"isBackground": true,
+			"problemMatcher": {
+				"base": "$tslint5",
+				"fileLocation": "absolute"
+			},
+			"runOptions": {
+				"runOn": "folderOpen"
+			},
+			"presentation": {
+				"group": "groupB",
+				"showReuseMessage": false,
+				"panel": "dedicated"
+			},
+		},
+		{
+			"type": "npm",
+			"script": "lint-server-watch",
+			"isBackground": true,
+			"problemMatcher": {
+				"base": "$tslint5",
+				"fileLocation": "absolute"
+			},
+			"runOptions": {
+				"runOn": "folderOpen"
+			},
+			"presentation": {
+				"group": "groupB",
+				"showReuseMessage": false,
+				"panel": "dedicated"
+			},
 		},
 		{
 			"type": "npm",
