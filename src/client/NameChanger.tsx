@@ -1,7 +1,9 @@
 import React, {useState} from 'react'
 import AutosizeInput from 'react-input-autosize'
 import {Dispatch} from 'redux'
-import {maxUsernameLength, selectLocalClient, setLocalClientName, shamuConnect} from '../common/redux'
+import {
+	maxUsernameLength, selectLocalClient, setLocalClientName, shamuConnect,
+} from '../common/redux'
 import {useBoolean} from './react-hooks'
 
 interface ReduxProps {
@@ -14,6 +16,8 @@ type AllProps = ReduxProps & {dispatch: Dispatch}
 function NameChanger({author, authorColor, dispatch}: AllProps) {
 	const [username, setUsername] = useState(author)
 	const [isFocused, onFocus, onBlur] = useBoolean(false)
+	const [inputRef, setInputRef] =
+		useState<HTMLInputElement | null>(null)
 
 	if (!isFocused && username !== author) {
 		setUsername(author)
@@ -65,9 +69,18 @@ function NameChanger({author, authorColor, dispatch}: AllProps) {
 				autoComplete="off"
 				style={{color: authorColor}}
 				onBlur={_onNameInputBlur}
-				onFocus={onFocus}
+				onFocus={handleFocus}
+				inputRef={setInputRef}
 			/>
-		</form>)
+		</form>
+	)
+
+	function handleFocus() {
+		onFocus()
+		if (inputRef) {
+			inputRef.select()
+		}
+	}
 }
 
 export const ConnectedNameChanger = shamuConnect(
