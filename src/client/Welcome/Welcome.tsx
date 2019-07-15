@@ -9,6 +9,7 @@ import {
 } from '../../common/redux'
 import {CssColor} from '../../common/shamu-color'
 import {Button} from '../Button/Button'
+import {NewRoomButton} from '../Button/CommonButtons'
 import {DiscordLink, NewsletterLink, PatreonLink} from '../Links'
 import {Modal} from '../Modal/Modal'
 import {ConnectedNameChanger} from '../NameChanger'
@@ -59,13 +60,11 @@ function Welcome({dispatch, loggedIn}: AllProps) {
 							<div className="roomActions vert-space-16">
 								<button className="joinLobby">
 									<PeopleIcon /> Join Lobby
-							</button>
-								<button className="newRoom">
-									<AddIcon /> New Room
-							</button>
+								</button>
+								<NewRoomButton dispatch={dispatch} />
 								<button className="joinLobby">
 									<OpenIcon /> Load Room
-							</button>
+								</button>
 							</div>
 						</div>
 						<div className="right">

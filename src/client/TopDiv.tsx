@@ -7,16 +7,16 @@ import {
 } from '../common/redux'
 import {selectClientCount} from '../common/redux'
 import {selectClientInfo, shamuConnect} from '../common/redux'
-import {requestCreateRoom} from '../common/redux'
 import {CssColor} from '../common/shamu-color'
 import {
-	eventNewRoomButtonClick, eventOrganizeRoomButtonClick,
+	eventOrganizeRoomButtonClick,
 	eventOrganizeRoomConfirmed, eventPruneRoomButtonClick,
 	eventPruneRoomConfirmed, eventSaveRoomToBrowserButtonClick,
 	eventSaveRoomToFileButtonClick,
 } from './analytics/analytics'
 import {ConnectedAuth} from './Auth/Auth'
 import {Button} from './Button/Button'
+import {NewRoomButton} from './Button/CommonButtons'
 import {DiscordLink, NewsletterLink, PatreonLink} from './Links'
 import {localActions} from './local-middleware'
 import {ConnectedNameChanger} from './NameChanger'
@@ -121,16 +121,7 @@ export const TopDiv = ({memberCount, clientCount, info, isClientReady,
 			<ConnectedAuth />
 			<ConnectedWelcome />
 			<ConnectedRoomSelector />
-			<Button
-				buttonProps={{
-					id: 'newRoomButton', onClick: () => {
-						dispatch(requestCreateRoom())
-						eventNewRoomButtonClick()
-					},
-				}}
-			>
-				New Room
-			</Button>
+			<NewRoomButton dispatch={dispatch} />
 			<Button
 				buttonProps={{
 					onClick: rateLimitedDebounceNoTrail(() => {

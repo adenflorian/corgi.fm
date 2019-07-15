@@ -60,14 +60,6 @@
 			width: fill;
 			font-size: 16px;
 
-			&:focus {
-				@colorBorder();
-			}
-
-			&:disabled {
-				color: @panelGray;
-			}
-
 			&.button {
 				width: auto;
 
@@ -85,20 +77,25 @@
 	button {
 		width: 100%;
 
-		&:disabled {
-			color: @panelGray !important;
-			background-color: @panelGrayLight !important;
-		}
-
 		&.google {
+			color: #DB4437;
 			svg {
+				color: @defaultGray;
 				background-color: #DB4437;
+			}
+			span {
+				color: @defaultGray;
 			}
 		}
 
 		&.facebook {
+			color: #3C5A99;
 			svg {
+				color: @defaultGray;
 				background-color: #3C5A99;
+			}
+			span {
+				color: @defaultGray;
 			}
 		}
 	}

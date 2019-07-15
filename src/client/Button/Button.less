@@ -1,6 +1,10 @@
 @import "../AppCommon.less";
 @import "../colors.less";
 
+@disabled: {
+    filter: brightness(0.4) saturate(0.5);
+}
+
 .buttonContainer {
     &.fancyButton {
         &:hover {
@@ -84,7 +88,9 @@
     }
 
     &:disabled {
-        color: @disabledGray;
+        &, span {
+            @disabled();
+        }
     }
 }
 
@@ -108,10 +114,14 @@ input, select {
     &:focus {
         @colorBorder();
     }
+
+    &:disabled {
+        @disabled();
+    }
 }
 
 .panel, .modal {
-    .buttonLink {
+    .buttonLink, button {
         @button();
         text-decoration: none;
         box-shadow: none !important;
