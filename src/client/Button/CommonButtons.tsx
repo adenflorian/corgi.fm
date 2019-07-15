@@ -1,5 +1,5 @@
 import React, {useCallback} from 'react'
-import {IoMdAdd} from 'react-icons/io'
+import {IoMdAddCircle} from 'react-icons/io'
 import {useDispatch} from 'react-redux'
 import {requestCreateRoom} from '../../common/redux'
 import {eventNewRoomButtonClick} from '../analytics/analytics'
@@ -23,7 +23,7 @@ export function NewRoomButton({onClick}: {onClick?: () => any}) {
 			}}
 			onClick={handleClick}
 		>
-			<IoMdAdd /> New Room
+			<IoMdAddCircle /> New Room
 		</Button>
 	)
 }

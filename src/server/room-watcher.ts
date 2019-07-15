@@ -1,9 +1,9 @@
 import {Store} from 'redux'
 import {Server} from 'socket.io'
+import {lobby} from '../common/common-constants'
 import {logger} from '../common/logger'
 import {deleteRoom, Room, selectAllRooms, setRooms} from '../common/redux'
 import {WebSocketEvent} from '../common/server-constants'
-import {lobby} from './server-socket-listeners'
 
 export function startRoomWatcher(io: Server, serverStore: Store) {
 	setInterval(checkRooms, 5000)

@@ -1,8 +1,11 @@
 import {useCallback} from 'react'
 import React from 'react'
-import {IoMdPeople} from 'react-icons/io'
+import {IoMdArrowRoundForward, IoMdGlobe} from 'react-icons/io'
 import {useDispatch, useSelector} from 'react-redux'
-import {ModalId, modalsAction, selectActiveRoom} from '../../common/redux'
+import {lobby} from '../../common/common-constants'
+import {
+	changeRoom, ModalId, modalsAction, selectActiveRoom,
+} from '../../common/redux'
 import {Button} from '../Button/Button'
 import {NewRoomButton} from '../Button/CommonButtons'
 import {DiscordLink, NewsletterLink, PatreonLink} from '../Links'
@@ -27,6 +30,11 @@ export function WelcomeModalButton() {
 
 export const WelcomeModalContent: ModalContent = ({hideModal}) => {
 	const activeRoom = useSelector(selectActiveRoom)
+	const dispatch = useDispatch()
+	const joinLobby = useCallback(() => {
+		dispatch(changeRoom(lobby))
+		hideModal()
+	}, [])
 
 	return (
 		<div className="welcomeModal">
@@ -47,11 +55,23 @@ export const WelcomeModalContent: ModalContent = ({hideModal}) => {
 					<div className="left">
 						<div className="roomActions vert-space-16">
 							<button
-								className="joinLobby"
+								className="joinActiveRoom"
 								onClick={hideModal}
 							>
-								<IoMdPeople /> Join {activeRoom}
+								<IoMdArrowRoundForward />
+								<span>Continue to room&nbsp;</span>
+								<span className="room">{activeRoom}</span>
 							</button>
+							{activeRoom !== lobby &&
+								<button
+									className="joinLobby"
+									onClick={joinLobby}
+								>
+									<IoMdGlobe />
+									<span>Join&nbsp;</span>
+									<span className="room">lobby</span>
+								</button>
+							}
 							<NewRoomButton onClick={hideModal} />
 							<LoadRoomModalButton />
 						</div>

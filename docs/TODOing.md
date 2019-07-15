@@ -105,14 +105,16 @@
 	- [ ] news
 	- [ ] recent projects
 	- [ ] what would you like to do?
-		- [ ] new room
-		- [ ] load room
-		- [ ] lobby
+		- [√] new room
+		- [√] load room
+		- [√] join current room
+		- [√] lobby
 		- [ ] join friend
 	- [ ] adjust volume
 - [ ] look into using `~` for parcel typescript resolution
 - [ ] look into generating new react components and redux reducers
 - [ ] use `useCallback()` hook
+- [ ] change Button to extends button props
 - [ ] lint, react function components should be arrow functions
 	- so that when you import them it won't add the parens
 - [ ] lint, disallow dispatch prop

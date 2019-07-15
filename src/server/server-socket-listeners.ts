@@ -2,7 +2,9 @@ import * as animal from 'animal-id'
 import {stripIndents} from 'common-tags'
 import {Store} from 'redux'
 import {Server, Socket} from 'socket.io'
-import {maxRoomNameLength, serverClientId} from '../common/common-constants'
+import {
+	lobby, maxRoomNameLength, serverClientId,
+} from '../common/common-constants'
 import {ClientId, ConnectionNodeType} from '../common/common-types'
 import {logger} from '../common/logger'
 import {
@@ -40,13 +42,13 @@ import {createServerStuff, loadServerStuff} from './create-server-stuff'
 import {DBStore} from './database/database'
 import {getServerVersion} from './server-version'
 
-export const lobby = 'lobby'
-
 const server = 'server'
 
 const version = getServerVersion()
 
-export function setupServerWebSocketListeners(io: Server, serverStore: Store, dbStore: DBStore) {
+export function setupServerWebSocketListeners(
+	io: Server, serverStore: Store, dbStore: DBStore,
+) {
 	io.on('connection', socket => {
 		socket.emit('version', version)
 

@@ -1,15 +1,17 @@
 import * as http from 'http'
 import * as socketIO from 'socket.io'
-import {serverClientId} from '../common/common-constants'
+import {lobby, serverClientId} from '../common/common-constants'
 import {logger} from '../common/logger'
-import {configureServerStore, createRoomAction, roomSettingsActions} from '../common/redux'
+import {
+	configureServerStore, createRoomAction, roomSettingsActions,
+} from '../common/redux'
 import {createRoom} from '../common/redux'
 import {initSentryServer} from './analytics/sentry-server'
 import {createServerStuff} from './create-server-stuff'
 import {connectDB, DBStore, dummyDb} from './database/database'
 import {getServerEnv, isLocalDevServer, logServerEnv} from './is-prod-server'
 import {startRoomWatcher} from './room-watcher'
-import {lobby, setupServerWebSocketListeners} from './server-socket-listeners'
+import {setupServerWebSocketListeners} from './server-socket-listeners'
 import {setupExpressApp} from './setup-express-app'
 
 if (!isLocalDevServer()) initSentryServer()

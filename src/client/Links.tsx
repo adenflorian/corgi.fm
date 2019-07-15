@@ -21,16 +21,25 @@ export function PatreonLink() {
 	return getLink('https://www.patreon.com/corgifm', 'Patreon', PatreonIcon, '#f96854')
 }
 
-function getLink(url: string, label: string, Icon: IconType, backgroundColor?: string) {
+function getLink(
+	url: string, label: string, Icon: IconType, backgroundColor?: string,
+) {
 	return (
-		<ButtonLink href={url} newTab={true} style={{color: backgroundColor}}>
+		<ButtonLink
+			href={url}
+			newTab={true}
+			style={{color: backgroundColor}}
+			title={`Will open in a new tab`}
+		>
 			<Icon
 				style={{
 					backgroundColor,
 					color: CssColor.panelGrayDark,
 				}}
 			/>
-			<span style={{color: CssColor.defaultGray}}>{label}</span>
+			<span style={{color: CssColor.defaultGray}}>
+				{label}
+			</span>
 		</ButtonLink>
 	)
 }
