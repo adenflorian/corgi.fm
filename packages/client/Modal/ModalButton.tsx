@@ -1,7 +1,7 @@
 import React, {ReactNode, useCallback} from 'react'
 import {IconType} from 'react-icons/lib/iconBase'
 import {useDispatch} from 'react-redux'
-import {ModalId, modalsAction} from '../../common/redux'
+import {ModalId, modalsAction} from '@corgifm/common/redux'
 import {Button} from '../Button/Button'
 
 interface Props {

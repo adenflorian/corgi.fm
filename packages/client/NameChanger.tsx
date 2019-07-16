@@ -3,7 +3,7 @@ import AutosizeInput from 'react-input-autosize'
 import {useDispatch} from 'react-redux'
 import {
 	maxUsernameLength, selectLocalClient, setLocalClientName, shamuConnect,
-} from '../common/redux'
+} from '@corgifm/common/redux'
 import {useBoolean} from './react-hooks'
 
 interface ReduxProps {

@@ -1,12 +1,12 @@
 import {Map} from 'immutable'
 import {Action, AnyAction, Store} from 'redux'
-import {rateLimitedDebounce} from '../common/common-utils'
+import {rateLimitedDebounce} from '@corgifm/common/common-utils'
 import {
 	getConnectionNodeInfo, globalClockActions,
 	IClientAppState, pointersActions,
 	selectClientInfo, selectGlobalClockIsPlaying, selectIsLocalClientInLimitedMode, selectLocalClient,
 	selectPosition, selectSequencer, selectShamuMetaState, sequencerActions, userInputActions,
-} from '../common/redux'
+} from '@corgifm/common/redux'
 import {
 	localActions, localMidiKeyPress, localMidiKeyUp, localMidiOctaveChange, windowBlur,
 } from './local-middleware'

@@ -1,5 +1,5 @@
 import {List, Set} from 'immutable'
-import {makeMidiClipEvent, MidiClip} from '../common/midi-types'
+import {makeMidiClipEvent, MidiClip} from '@corgifm/common/midi-types'
 
 export const shortDemoMidiClip = new MidiClip({
 	length: 2,

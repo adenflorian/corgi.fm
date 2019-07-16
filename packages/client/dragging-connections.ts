@@ -1,14 +1,14 @@
 import {List} from 'immutable'
 import {Dispatch} from 'redux'
 import Victor = require('victor')
-import {Point} from '../common/common-types'
-import {logger} from '../common/logger'
-import {IClientRoomState} from '../common/redux/common-redux-types'
+import {Point} from '@corgifm/common/common-types'
+import {logger} from '@corgifm/common/logger'
+import {IClientRoomState} from '@corgifm/common/redux/common-redux-types'
 import {
 	ActiveGhostConnectorSourceOrTarget, Connection,
 	connectionsActions, GhostConnectorAddingOrMoving, IPosition, selectAllPositions,
 	selectConnectionsWithSourceIds, selectConnectionsWithTargetIds, selectGhostConnection, selectPosition,
-} from '../common/redux/index'
+} from '@corgifm/common/redux/index'
 import {connectorWidth} from './Connections/ConnectionView'
 
 interface ConnectionCandidate extends IPosition {

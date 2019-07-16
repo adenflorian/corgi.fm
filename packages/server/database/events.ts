@@ -1,5 +1,5 @@
 import {Db} from 'mongodb'
-import {logger} from '../../common/logger'
+import {logger} from '@corgifm/common/logger'
 
 const eventsCollectionName = 'events'
 

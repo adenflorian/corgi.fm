@@ -5,10 +5,10 @@ import {
 	IoLogoFacebook as Facebook, IoLogoGoogle as Google,
 } from 'react-icons/io'
 import {useDispatch, useSelector} from 'react-redux'
-import {AuthConstants} from '../../common/auth-constants'
+import {AuthConstants} from '@corgifm/common/auth-constants'
 import {
 	authActions, chatSystemMessage, ModalId, modalsAction, selectLoggedIn,
-} from '../../common/redux'
+} from '@corgifm/common/redux'
 import {Button} from '../Button/Button'
 import {
 	FirebaseAuthError, FirebaseAuthErrorCode,

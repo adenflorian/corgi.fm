@@ -1,9 +1,9 @@
 import {Map} from 'immutable'
 import {Action, Store} from 'redux'
-import {ConnectionNodeType, IConnectable} from '../common/common-types'
-import {calculatePositionsGivenConnections} from '../common/compute-positions'
-import {MidiClipEvents} from '../common/midi-types'
-import {MidiNotes} from '../common/MidiNote'
+import {ConnectionNodeType, IConnectable} from '@corgifm/common/common-types'
+import {calculatePositionsGivenConnections} from '@corgifm/common/compute-positions'
+import {MidiClipEvents} from '@corgifm/common/midi-types'
+import {MidiNotes} from '@corgifm/common/MidiNote'
 import {
 	addBasicSampler, addBasicSynthesizer, addClient,
 	addGridSequencer, addInfiniteSequencer, addPosition,
@@ -17,7 +17,7 @@ import {
 	selectAllConnections, selectAllPositions, selectAllVirtualKeyboardIds,
 	selectConnectionsWithSourceOrTargetIds, shamuGraphActions,
 	SimpleReverbState, updatePositions,
-} from '../common/redux'
+} from '@corgifm/common/redux'
 
 const masterAudioOutput: IConnectable = getConnectionNodeInfo(ConnectionNodeType.audioOutput).stateSelector({} as any, '')
 const masterClock: IConnectable = getConnectionNodeInfo(ConnectionNodeType.masterClock).stateSelector({} as any, '')

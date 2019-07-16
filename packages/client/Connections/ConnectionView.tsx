@@ -2,7 +2,7 @@ import {stripIndent} from 'common-tags'
 import {List} from 'immutable'
 import React from 'react'
 import {useDispatch} from 'react-redux'
-import {ClientId} from '../../common/common-types'
+import {ClientId} from '@corgifm/common/common-types'
 import {
 	ActiveGhostConnectorSourceOrTarget,
 	AppOptions,
@@ -14,7 +14,7 @@ import {
 	selectConnectionSourceColor, selectConnectionSourceIsActive,
 	selectConnectionSourceIsSending, selectConnectionStackOrderForSource, selectConnectionStackOrderForTarget,
 	selectLocalClientId, selectOption, selectPosition, selectRoomSettings, shamuConnect,
-} from '../../common/redux'
+} from '@corgifm/common/redux'
 import {longLineTooltip} from '../client-constants'
 import {ConnectionLine} from './ConnectionLine'
 import './ConnectionView.less'

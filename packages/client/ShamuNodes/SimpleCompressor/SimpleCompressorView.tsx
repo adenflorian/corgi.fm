@@ -4,7 +4,7 @@ import {Dispatch} from 'redux'
 import {
 	getConnectionNodeInfo, selectSimpleCompressor, setSimpleCompressorParam,
 	shamuConnect, SimpleCompressorParam,
-} from '../../../common/redux'
+} from '@corgifm/common/redux'
 import {adsrValueToString, filterValueToString} from '../../client-constants'
 import {Knob} from '../../Knob/Knob'
 import {Panel} from '../../Panel/Panel'

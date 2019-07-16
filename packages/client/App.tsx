@@ -1,8 +1,8 @@
 import React from 'react'
 import {hot} from 'react-hot-loader'
 import {connect} from 'react-redux'
-import {selectClientInfo} from '../common/redux'
-import {IClientAppState} from '../common/redux'
+import {selectClientInfo} from '@corgifm/common/redux'
+import {IClientAppState} from '@corgifm/common/redux'
 // css-reset must be first
 import './css-reset.css'
 // tslint:disable-next-line:ordered-imports

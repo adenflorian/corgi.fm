@@ -1,11 +1,11 @@
 import React from 'react'
 import {useDispatch} from 'react-redux'
-import {ConnectionNodeType} from '../../common/common-types'
+import {ConnectionNodeType} from '@corgifm/common/common-types'
 import {
 	AppOptions, getConnectionNodeInfo, MASTER_AUDIO_OUTPUT_TARGET_ID,
 	positionActions, selectOption, selectPosition, setOption, shamuConnect,
-} from '../../common/redux'
-import {CssColor} from '../../common/shamu-color'
+} from '@corgifm/common/redux'
+import {CssColor} from '@corgifm/common/shamu-color'
 import {handleClassName, handleVisualClassName} from '../client-constants'
 import './Panel.less'
 

@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactSVG from 'react-svg'
-import {BuiltInOscillatorType, CustomOscillatorType, ShamuOscillatorType} from '../../common/OscillatorTypes'
+import {BuiltInOscillatorType, CustomOscillatorType, ShamuOscillatorType} from '@corgifm/common/OscillatorTypes'
 import NoiseWave from './NoiseWave.svg'
 import SawWave from './SawWave.svg'
 import SineWave from './SineWave.svg'

@@ -2,8 +2,8 @@ import React from 'react'
 import {Component} from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
-import {IClientAppState} from '../common/redux'
-import {AppOptions, selectOption, setOption} from '../common/redux'
+import {IClientAppState} from '@corgifm/common/redux'
+import {AppOptions, selectOption, setOption} from '@corgifm/common/redux'
 
 interface IOptionProps {
 	option: AppOptions

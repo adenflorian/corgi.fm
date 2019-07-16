@@ -1,6 +1,6 @@
 import {List} from 'immutable'
 import React from 'react'
-import {CssColor} from '../../common/shamu-color'
+import {CssColor} from '@corgifm/common/shamu-color'
 import {Panel} from '../Panel/Panel'
 import './Select.less'
 

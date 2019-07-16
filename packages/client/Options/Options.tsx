@@ -4,7 +4,7 @@ import {useDispatch, useSelector} from 'react-redux'
 import {
 	AppOptions, IClientAppState, LineType, ModalId,
 	modalsAction, roomSettingsActions, selectLocalClientId, selectRoomSettings,
-} from '../../common/redux'
+} from '@corgifm/common/redux'
 import {Button} from '../Button/Button'
 import {ModalContent} from '../Modal/ModalManager'
 import {ConnectedOption} from '../Option'

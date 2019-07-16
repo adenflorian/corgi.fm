@@ -5,7 +5,7 @@ import {
 	EXPORT_SEQUENCER_MIDI, IClientAppState, isEmptyEvents,
 	selectConnectionsWithSourceIds,
 	selectSequencer, SequencerAction, sequencerActions, STOP_SEQUENCER,
-} from '../common/redux'
+} from '@corgifm/common/redux'
 import {GetAllInstruments} from './instrument-manager'
 
 export const createSequencerMiddleware = (getAllInstruments: GetAllInstruments) => {

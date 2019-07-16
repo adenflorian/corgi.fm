@@ -3,7 +3,7 @@ import * as firebase from 'firebase/app'
 import 'firebase/auth'
 import React, {useContext} from 'react'
 import {Store} from 'redux'
-import {authActions, IClientAppState} from '../../common/redux'
+import {authActions, IClientAppState} from '@corgifm/common/redux'
 import {getFirebaseConfig} from './firebase-config'
 
 export const FirebaseContext = React.createContext<FirebaseContextStuff>({

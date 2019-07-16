@@ -1,6 +1,6 @@
 import {Application} from 'express'
 import * as request from 'supertest'
-import {configureServerStore} from '../../common/redux'
+import {configureServerStore} from '@corgifm/common/redux'
 import {connectDB, DBStore} from '../database/database'
 import {setupExpressApp} from '../setup-express-app'
 

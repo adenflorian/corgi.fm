@@ -1,7 +1,7 @@
 import {Middleware} from 'redux'
 import {
 	AUTH_ON_REGISTER, AuthAction, chatSystemMessage, IClientAppState,
-} from '../../common/redux'
+} from '@corgifm/common/redux'
 import {FirebaseContextStuff} from './FirebaseContext'
 
 type AuthMiddlewareActions = AuthAction

@@ -1,4 +1,4 @@
-import {logger} from '../../common/logger'
+import {logger} from '@corgifm/common/logger'
 import {
 	getOctaveFromMidiNote, IInstrumentOptions, Instrument,
 	midiNoteToNoteName, OnEndedCallback, SamplesManager,

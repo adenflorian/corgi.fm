@@ -1,17 +1,17 @@
 import React from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
-import {applyOctave, getKeyByValue} from '../../common/common-utils'
-import {IMidiNotes} from '../../common/MidiNote'
-import {selectClientById, selectLocalClient} from '../../common/redux'
-import {IClientAppState} from '../../common/redux'
-import {selectVirtualKeyboardById, virtualKeyPressed, virtualKeyUp} from '../../common/redux'
+import {applyOctave, getKeyByValue} from '@corgifm/common/common-utils'
+import {IMidiNotes} from '@corgifm/common/MidiNote'
+import {selectClientById, selectLocalClient} from '@corgifm/common/redux'
+import {IClientAppState} from '@corgifm/common/redux'
+import {selectVirtualKeyboardById, virtualKeyPressed, virtualKeyUp} from '@corgifm/common/redux'
 import {isLeftMouseButtonDown} from '../client-utils'
 import {keyToMidiMap} from '../input-events'
 import {Panel} from '../Panel/Panel'
 import {KeyColor, keyColors, NoteNameSharps} from '../WebAudio/music-functions'
-import {Octave} from '../WebAudio/music-types'
 import './Keyboard.less'
+import {Octave} from '@corgifm/common/common-types';
 
 const defaultNumberOfKeys = 17
 

@@ -4,8 +4,8 @@ import * as ReactGA from 'react-ga'
 import {Middleware} from 'redux'
 import {
 	clientInfoActions, createUsername, loadOptionsState, SET_ACTIVE_ROOM, validateOptionsState,
-} from '../common/redux'
-import {setupAudioContext} from '../common/setup-audio-context'
+} from '@corgifm/common/redux'
+import {setupAudioContext} from '@corgifm/common/setup-audio-context'
 import {initSentry} from './analytics/sentry'
 import {BrowserWarning} from './BrowserWarning'
 import {configureStore} from './client-store'

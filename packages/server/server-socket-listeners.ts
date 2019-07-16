@@ -4,9 +4,9 @@ import {Store} from 'redux'
 import {Server, Socket} from 'socket.io'
 import {
 	lobby, maxRoomNameLength, serverClientId,
-} from '../common/common-constants'
-import {ClientId, ConnectionNodeType} from '../common/common-types'
-import {logger} from '../common/logger'
+} from '@corgifm/common/common-constants'
+import {ClientId, ConnectionNodeType} from '@corgifm/common/common-types'
+import {logger} from '@corgifm/common/logger'
 import {
 	addClient, addRoomMember, BroadcastAction,
 	CHANGE_ROOM, clientDisconnected, ClientState,
@@ -36,8 +36,8 @@ import {
 	shamuGraphActions,
 	userLeftRoom,
 	whitelistedRoomActionTypes,
-} from '../common/redux'
-import {WebSocketEvent} from '../common/server-constants'
+} from '@corgifm/common/redux'
+import {WebSocketEvent} from '@corgifm/common/server-constants'
 import {createServerStuff, loadServerStuff} from './create-server-stuff'
 import {DBStore} from './database/database'
 import {getServerVersion} from './server-version'

@@ -1,7 +1,7 @@
 import React, {useCallback} from 'react'
 import {IoMdAddCircle} from 'react-icons/io'
 import {useDispatch} from 'react-redux'
-import {requestCreateRoom} from '../../common/redux'
+import {requestCreateRoom} from '@corgifm/common/redux'
 import {eventNewRoomButtonClick} from '../analytics/analytics'
 import {Button} from './Button'
 

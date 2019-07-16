@@ -1,10 +1,10 @@
 import React from 'react'
 import {Dispatch} from 'redux'
-import {BuiltInBQFilterType} from '../../../common/OscillatorTypes'
+import {BuiltInBQFilterType} from '@corgifm/common/OscillatorTypes'
 import {
 	getConnectionNodeInfo, selectSimpleDelay, setSimpleDelayParam,
 	shamuConnect, SimpleDelayParam, SimpleDelayState,
-} from '../../../common/redux'
+} from '@corgifm/common/redux'
 import {adsrValueToString, percentageValueString} from '../../client-constants'
 import {Knob} from '../../Knob/Knob'
 import {Panel} from '../../Panel/Panel'

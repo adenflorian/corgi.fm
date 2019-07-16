@@ -1,11 +1,11 @@
 import * as http from 'http'
 import * as socketIO from 'socket.io'
-import {lobby, serverClientId} from '../common/common-constants'
-import {logger} from '../common/logger'
+import {lobby, serverClientId} from '@corgifm/common/common-constants'
+import {logger} from '@corgifm/common/logger'
 import {
 	configureServerStore, createRoomAction, roomSettingsActions,
-} from '../common/redux'
-import {createRoom} from '../common/redux'
+} from '@corgifm/common/redux'
+import {createRoom} from '@corgifm/common/redux'
 import {initSentryServer} from './analytics/sentry-server'
 import {createServerStuff} from './create-server-stuff'
 import {connectDB, DBStore, dummyDb} from './database/database'

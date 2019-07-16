@@ -2,11 +2,11 @@ import {stripIndents} from 'common-tags'
 import {List} from 'immutable'
 import React from 'react'
 import {Dispatch} from 'redux'
-import {allBuiltInBQFilterTypes} from '../../../common/OscillatorTypes'
+import {allBuiltInBQFilterTypes} from '@corgifm/common/OscillatorTypes'
 import {
 	getConnectionNodeInfo, selectSimpleReverb, setSimpleReverbParam,
 	shamuConnect, SimpleReverbParam, SimpleReverbState,
-} from '../../../common/redux'
+} from '@corgifm/common/redux'
 import {adsrValueToString, filterValueToString, percentageValueString} from '../../client-constants'
 import {Knob} from '../../Knob/Knob'
 import {KnobSnapping} from '../../Knob/KnobSnapping'

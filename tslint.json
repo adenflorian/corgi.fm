@@ -38,7 +38,8 @@
             true,
             "react-icons",
             "redux-devtools-extension",
-            "firebase"
+            "firebase",
+            "@corgifm"
         ],
         "completed-docs": false,
         "no-import-side-effect": [

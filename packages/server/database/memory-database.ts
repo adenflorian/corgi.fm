@@ -1,4 +1,4 @@
-import {logger} from '../../common/logger'
+import {logger} from '@corgifm/common/logger'
 
 export async function startInMemoryDB(dbName: string) {
 	// Only require if called, because it's a dev dependency

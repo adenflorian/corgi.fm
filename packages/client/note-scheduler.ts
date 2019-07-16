@@ -1,8 +1,8 @@
 import {List} from 'immutable'
-import {logger} from '../common/logger'
+import {logger} from '@corgifm/common/logger'
 import {
 	makeMidiGlobalClipEvent, MidiClip, MidiGlobalClipEvent, MidiGlobalClipEvents, midiPrecision, MidiRange,
-} from '../common/midi-types'
+} from '@corgifm/common/midi-types'
 
 export const applyBPM = (beat: number, bpm: number) => {
 	return ((beat * midiPrecision) * ((60 * midiPrecision) / (bpm * midiPrecision))) / midiPrecision

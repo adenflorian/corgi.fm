@@ -1,6 +1,6 @@
 import {Map} from 'immutable'
 import {Store} from 'redux'
-import {ConnectionNodeType, IConnectable, Id} from '../common/common-types'
+import {ConnectionNodeType, IConnectable, Id} from '@corgifm/common/common-types'
 import {
 	BasicSamplerState, BasicSynthesizerState, IClientAppState,
 	IClientRoomState, IConnection, isAudioNodeType,
@@ -9,7 +9,7 @@ import {
 	selectAllSimpleReverbIds, selectBasicSynthesizer,
 	selectConnectionsWithSourceIds, selectGlobalClockState, selectPosition,
 	selectSampler, selectSimpleCompressor, selectSimpleDelay, selectSimpleReverb, SimpleCompressorState, SimpleDelayState, SimpleReverbState,
-} from '../common/redux'
+} from '@corgifm/common/redux'
 import {
 	AudioNodeWrapper, IAudioNodeWrapperOptions, IInstrumentOptions,
 	Instrument, MasterAudioOutput, SimpleCompressor, Voice, Voices,

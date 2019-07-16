@@ -1,7 +1,7 @@
 import React from 'react'
 import {connect} from 'react-redux'
-import {IClientAppState, selectClientById, selectPointer} from '../../common/redux'
-import {CssColor} from '../../common/shamu-color'
+import {IClientAppState, selectClientById, selectPointer} from '@corgifm/common/redux'
+import {CssColor} from '@corgifm/common/shamu-color'
 
 interface MousePointerProps {
 	clientId: string

@@ -1,5 +1,5 @@
 import React from 'react'
-import {selectGlobalClockState, shamuConnect} from '../common/redux'
+import {selectGlobalClockState, shamuConnect} from '@corgifm/common/redux'
 import './SequencerTimeBar.less'
 
 interface Props {

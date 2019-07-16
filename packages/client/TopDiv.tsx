@@ -1,14 +1,14 @@
 import React from 'react'
 import {useDispatch} from 'react-redux'
-import {rateLimitedDebounceNoTrail} from '../common/common-utils'
+import {rateLimitedDebounceNoTrail} from '@corgifm/common/common-utils'
 import {
 	IClientState, organizeGraph,
 	selectClientById, selectLocalClientId, selectMemberCount,
 	selectRoomSettings,
-} from '../common/redux'
-import {selectClientInfo, shamuConnect} from '../common/redux'
-import {selectClientCount} from '../common/redux'
-import {CssColor} from '../common/shamu-color'
+} from '@corgifm/common/redux'
+import {selectClientInfo, shamuConnect} from '@corgifm/common/redux'
+import {selectClientCount} from '@corgifm/common/redux'
+import {CssColor} from '@corgifm/common/shamu-color'
 import {
 	eventOrganizeRoomButtonClick,
 	eventOrganizeRoomConfirmed, eventPruneRoomButtonClick,

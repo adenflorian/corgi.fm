@@ -5,9 +5,9 @@ import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 import {
 	selectClientInfo, selectLocalClient,
-} from '../common/redux'
-import {IClientAppState} from '../common/redux'
-import {chatSubmit} from '../common/redux'
+} from '@corgifm/common/redux'
+import {IClientAppState} from '@corgifm/common/redux'
+import {chatSubmit} from '@corgifm/common/redux'
 import './Chat.less'
 import {ConnectedChatMessages} from './Chat/ChatMessages'
 import {isTestClient} from './is-prod-client'

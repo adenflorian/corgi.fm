@@ -2,17 +2,17 @@ import {List, Map, Set} from 'immutable'
 import {Dispatch, Middleware} from 'redux'
 import {ActionType} from 'typesafe-actions'
 import uuid from 'uuid'
-import {MAX_MIDI_NOTE_NUMBER_127} from '../common/common-constants'
-import {ConnectionNodeType, Id, IMultiStateThing} from '../common/common-types'
-import {applyOctave, createNodeId} from '../common/common-utils'
-import {logger} from '../common/logger'
-import {MidiClipEvent} from '../common/midi-types'
-import {emptyMidiNotes, IMidiNote} from '../common/MidiNote'
-import {BroadcastAction, IClientRoomState} from '../common/redux/common-redux-types'
+import {MAX_MIDI_NOTE_NUMBER_127} from '@corgifm/common/common-constants'
+import {ConnectionNodeType, Id, IMultiStateThing} from '@corgifm/common/common-types'
+import {applyOctave, createNodeId} from '@corgifm/common/common-utils'
+import {logger} from '@corgifm/common/logger'
+import {MidiClipEvent} from '@corgifm/common/midi-types'
+import {emptyMidiNotes, IMidiNote} from '@corgifm/common/MidiNote'
+import {BroadcastAction, IClientRoomState} from '@corgifm/common/redux/common-redux-types'
 import {
 	selectAllConnections, selectConnectionsWithSourceIds,
 	selectConnectionsWithSourceOrTargetIds, selectConnectionsWithTargetIds,
-} from '../common/redux/connections-redux'
+} from '@corgifm/common/redux/connections-redux'
 import {
 	ADD_CLIENT, addBasicSynthesizer, AddClientAction,
 	addMultiThing, addPosition, addVirtualKeyboard,
@@ -55,8 +55,8 @@ import {
 	VirtualKeyUpAction,
 	virtualOctaveChange,
 	VirtualOctaveChangeAction,
-} from '../common/redux/index'
-import {pointersActions} from '../common/redux/pointers-redux'
+} from '@corgifm/common/redux/index'
+import {pointersActions} from '@corgifm/common/redux/pointers-redux'
 import {graphStateSavesLocalStorageKey} from './client-constants'
 import {GetAllInstruments} from './instrument-manager'
 import {MidiNotes} from './Instruments/BasicSynthesizerView'

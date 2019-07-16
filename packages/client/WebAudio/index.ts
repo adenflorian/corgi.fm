@@ -1,5 +1,4 @@
 export * from './music-functions'
-export * from './music-types'
 
 export * from './SamplesManager'
 

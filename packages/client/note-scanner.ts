@@ -1,7 +1,7 @@
 import {List, Map, Set} from 'immutable'
-import {Id} from '../common/common-types'
-import {logger} from '../common/logger'
-import {MidiGlobalClipEvent, midiPrecision, MidiRange} from '../common/midi-types'
+import {Id} from '@corgifm/common/common-types'
+import {logger} from '@corgifm/common/logger'
+import {MidiGlobalClipEvent, midiPrecision, MidiRange} from '@corgifm/common/midi-types'
 import {
 	ClientStore, GroupSequencers,
 	IClientRoomState,
@@ -13,7 +13,7 @@ import {
 	selectGlobalClockState,
 	selectPosition,
 	selectSequencerIsPlaying,
-} from '../common/redux'
+} from '@corgifm/common/redux'
 import {GetAllAudioNodes, GetAllInstruments} from './instrument-manager'
 import {getEvents} from './note-scheduler'
 

@@ -17,6 +17,7 @@ echo 'nvm' | ssh ${SSH_USER}@${SSH_HOST} '
     mkdir corgi.fm;
     tar -xzvf corgi.fm.tar.gz --directory corgi.fm;
     cd corgi.fm/built;
-    yarn --prod;
+    yarn;
+    yarn bootstrap;
     yarn start-prod;
 '

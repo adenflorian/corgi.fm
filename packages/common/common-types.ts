@@ -62,3 +62,5 @@ export type ThenArg<T> = T extends Promise<infer U>
 export type OmitStrict<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 
 export type AnyFunction = (...args: any[]) => any
+
+export type Octave = number

@@ -1,7 +1,7 @@
 import React from 'react'
 import {
 	selectLocalClientId, selectRoomSettings, shamuConnect,
-} from '../common/redux'
+} from '@corgifm/common/redux'
 import {ConnectedChat} from './Chat'
 import {ConnectedContextMenuContainer} from './ContextMenu/ContextMenuContainer'
 import {ModalManager} from './Modal/ModalManager'

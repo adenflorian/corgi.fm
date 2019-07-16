@@ -1,8 +1,8 @@
 import {List} from 'immutable'
 // @ts-ignore
-import {getFrequencyUsingHalfStepsFromA4 as getFrequencyUsingHalfStepsFromA4Rust} from '../../client-rust/lib.rs'
-import {IMidiNote} from '../../common/MidiNote'
-import {Octave} from './music-types'
+import {getFrequencyUsingHalfStepsFromA4 as getFrequencyUsingHalfStepsFromA4Rust} from '../client-rust/lib.rs'
+import {IMidiNote} from '@corgifm/common/MidiNote'
+import {Octave} from '@corgifm/common/common-types';
 
 export function getFrequencyUsingHalfStepsFromA4(halfSteps: number) {
 	return getFrequencyUsingHalfStepsFromA4Rust(halfSteps)

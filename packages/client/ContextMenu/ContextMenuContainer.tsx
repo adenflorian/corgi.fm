@@ -4,14 +4,14 @@ import React, {Fragment, MouseEvent} from 'react'
 import {connectMenu, ContextMenu, MenuItem, SubMenu} from 'react-contextmenu'
 import {useDispatch} from 'react-redux'
 import {Dispatch} from 'redux'
-import {serverClientId} from '../../common/common-constants'
-import {ConnectionNodeType, IConnectable, Id, Point} from '../../common/common-types'
+import {serverClientId} from '@corgifm/common/common-constants'
+import {ConnectionNodeType, IConnectable, Id, Point} from '@corgifm/common/common-types'
 import {
 	addPosition, Connection,
 	connectionsActions, getAddableNodeInfos, getConnectionNodeInfo, IConnectionNodeInfo,
 	makePosition, MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID,
 	selectLocalClient, selectVirtualKeyboardsByOwner, shamuConnect, VirtualKeyboardState,
-} from '../../common/redux'
+} from '@corgifm/common/redux'
 import {backgroundMenuId, nodeMenuId} from '../client-constants'
 import {deleteNode, localActions} from '../local-middleware'
 import {toGraphSpace} from '../SimpleGraph/Zoom'

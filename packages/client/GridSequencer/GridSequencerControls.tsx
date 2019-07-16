@@ -8,7 +8,7 @@ import {useDispatch} from 'react-redux'
 import {
 	globalClockActions, gridSequencerActions, GridSequencerFields,
 	GridSequencerState, selectGridSequencer, sequencerActions, shamuConnect,
-} from '../../common/redux'
+} from '@corgifm/common/redux'
 import {
 	percentageValueString, seqPitchValueToString, seqRateValueToString,
 	sequencerDownloadToolTip, sequencerEraseToolTip,

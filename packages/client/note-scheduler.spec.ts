@@ -2,7 +2,7 @@ import {expect} from 'chai'
 import {List, Set} from 'immutable'
 import {
 	makeMidiClipEvent, makeMidiGlobalClipEvent, MidiClip, MidiGlobalClipEvent, MidiGlobalClipEvents, MidiRange,
-} from '../common/midi-types'
+} from '@corgifm/common/midi-types'
 import {applyBPM, applyBPMToEvents, getEvents} from './note-scheduler'
 
 type Tests = Array<{

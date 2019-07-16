@@ -1,6 +1,6 @@
 import {CaptureConsole} from '@sentry/integrations'
 import * as Sentry from '@sentry/node'
-import {logger} from '../../common/logger'
+import {logger} from '@corgifm/common/logger'
 import {getServerEnv} from '../is-prod-server'
 import {getServerVersion} from '../server-version'
 

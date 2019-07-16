@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/browser'
 import {CaptureConsole} from '@sentry/integrations'
-import {logger} from '../../common/logger'
+import {logger} from '@corgifm/common/logger'
 import {getCurrentClientVersion} from '../client-utils'
 import {getEnvName} from '../is-prod-client'
 

@@ -1,5 +1,5 @@
 import {List, Map, Set} from 'immutable'
-import {CssColor} from '../../common/shamu-color'
+import {CssColor} from '@corgifm/common/shamu-color'
 import {limiterRenderSystemConstants} from '../client-constants'
 import {ECSComponentType, ECSEntity, ECSSystem} from './ECSTypes'
 

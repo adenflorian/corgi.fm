@@ -1,6 +1,6 @@
 import React, {HTMLAttributes, MouseEvent} from 'react'
-import {OmitStrict} from '../../common/common-types'
-import {noop} from '../../common/common-utils'
+import {OmitStrict} from '@corgifm/common/common-types'
+import {noop} from '@corgifm/common/common-utils'
 import './Button.less'
 
 interface IButtonProps {

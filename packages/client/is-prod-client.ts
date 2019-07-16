@@ -1,4 +1,4 @@
-import {logger} from '../common/logger'
+import {logger} from '@corgifm/common/logger'
 
 export const isProdClient = () => _isProdClient
 const _isProdClient = window.location.hostname.toLowerCase() === 'corgi.fm'

@@ -1,12 +1,12 @@
 import {Store} from 'redux'
 import * as io from 'socket.io-client'
-import {maxRoomNameLength} from '../common/common-constants'
-import {logger} from '../common/logger'
+import {maxRoomNameLength} from '@corgifm/common/common-constants'
+import {logger} from '@corgifm/common/logger'
 import {
 	BroadcastAction, clientInfoActions, getActionsBlacklist, maxUsernameLength,
 	selectActiveRoom, selfDisconnected, setInfo, setSocketId,
-} from '../common/redux'
-import {WebSocketEvent} from '../common/server-constants'
+} from '@corgifm/common/redux'
+import {WebSocketEvent} from '@corgifm/common/server-constants'
 import {eventClientServerVersionMismatch} from './analytics/analytics'
 import {getCurrentClientVersion} from './client-utils'
 import {isLocalDevClient} from './is-prod-client'

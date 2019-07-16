@@ -1,7 +1,7 @@
 import React, {Fragment, useState} from 'react'
 import {
 	ActiveGhostConnectorSourceOrTarget,
-} from '../../common/redux'
+} from '@corgifm/common/redux'
 import {connectorHeight, connectorWidth} from './ConnectionView'
 import {Connector} from './Connector'
 

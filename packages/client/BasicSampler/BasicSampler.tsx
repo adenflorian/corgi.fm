@@ -1,11 +1,11 @@
 import React from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
-import {allBuiltInBQFilterTypes, BuiltInBQFilterType} from '../../common/OscillatorTypes'
-import {IClientAppState} from '../../common/redux'
+import {allBuiltInBQFilterTypes, BuiltInBQFilterType} from '@corgifm/common/OscillatorTypes'
+import {IClientAppState} from '@corgifm/common/redux'
 import {
 	BasicSamplerParam, getConnectionNodeInfo, selectSampler, setBasicSamplerParam,
-} from '../../common/redux'
+} from '@corgifm/common/redux'
 import {
 	adsrValueToString, attackToolTip, decayToolTip, detuneToolTip, detuneValueToString,
 	filterToolTip, filterValueToString, gainToolTip, panToolTip, panValueToString,

@@ -2,10 +2,10 @@ import {useCallback} from 'react'
 import React from 'react'
 import {IoMdArrowRoundForward, IoMdGlobe} from 'react-icons/io'
 import {useDispatch, useSelector} from 'react-redux'
-import {lobby} from '../../common/common-constants'
+import {lobby} from '@corgifm/common/common-constants'
 import {
 	changeRoom, ModalId, modalsAction, selectActiveRoom,
-} from '../../common/redux'
+} from '@corgifm/common/redux'
 import {Button} from '../Button/Button'
 import {NewRoomButton} from '../Button/CommonButtons'
 import {DiscordLink, NewsletterLink, PatreonLink} from '../Links'

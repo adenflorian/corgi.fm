@@ -2,7 +2,7 @@ import {applyMiddleware, createStore, Middleware, Store} from 'redux'
 import {composeWithDevTools} from 'redux-devtools-extension/developmentOnly'
 import {
 	getActionsBlacklist, getClientReducers, IClientAppState,
-} from '../common/redux'
+} from '@corgifm/common/redux'
 import {connectionsClientMiddleware} from './connections-middleware'
 import {createAuthMiddleware} from './Firebase/auth-middleware'
 import {FirebaseContextStuff} from './Firebase/FirebaseContext'

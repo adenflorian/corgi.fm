@@ -1,6 +1,6 @@
 import {List, Map} from 'immutable'
-import {IDisposable} from '../../common/common-types'
-import {logger} from '../../common/logger'
+import {IDisposable} from '@corgifm/common/common-types'
+import {logger} from '@corgifm/common/logger'
 
 export interface IAudioNodeWrapperOptions {
 	audioContext: AudioContext

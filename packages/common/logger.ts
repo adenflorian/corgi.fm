@@ -1,5 +1,3 @@
-import {eventError} from '../client/analytics/analytics'
-
 // tslint:disable:no-console
 const logLevel = {
 	error: true,
@@ -14,19 +12,11 @@ export const logger = {
 		if (logLevel.error) {
 			console.error(...args)
 		}
-		eventError({
-			description: args[0],
-			fatal: true,
-		})
 	},
 	warn: (...args: any[]) => {
 		if (logLevel.warn) {
 			console.warn(...args)
 		}
-		eventError({
-			description: args[0],
-			fatal: false,
-		})
 	},
 	log: (...args: any[]) => {
 		if (logLevel.log) {

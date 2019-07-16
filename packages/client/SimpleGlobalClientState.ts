@@ -1,4 +1,4 @@
-import {Point} from '../common/common-types'
+import {Point} from '@corgifm/common/common-types'
 
 class SimpleGlobalClientState {
 	private _zoom = 1

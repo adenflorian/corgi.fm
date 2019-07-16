@@ -1,10 +1,10 @@
 import {List} from 'immutable'
 import {Store} from 'redux'
-import {ConnectionNodeType, isSequencerNodeType} from '../../common/common-types'
+import {ConnectionNodeType, isSequencerNodeType} from '@corgifm/common/common-types'
 import {
 	AppOptions, IClientAppState, MASTER_AUDIO_OUTPUT_TARGET_ID, selectAllPositions,
 	selectGroupSequencer, selectOption, selectPosition, selectSequencer, selectSequencerIsPlaying,
-} from '../../common/redux'
+} from '@corgifm/common/redux'
 import {limiterRenderSystemConstants} from '../client-constants'
 import {getSequencersSchedulerInfo} from '../note-scanner'
 import {ECSAudioOutputEntity} from './ECSAudioOutputEntity'

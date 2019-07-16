@@ -1,5 +1,5 @@
 import React from 'react'
-import {incrementalRound} from '../../common/common-utils'
+import {incrementalRound} from '@corgifm/common/common-utils'
 import './Knob.less'
 import {KnobBaseProps} from './KnobTypes'
 import {KnobValueNumber} from './KnobValueNumber'

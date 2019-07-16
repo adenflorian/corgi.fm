@@ -1,9 +1,9 @@
 import React from 'react'
 import {useDispatch, useSelector} from 'react-redux'
-import {AnyFunction} from '../../common/common-types'
+import {AnyFunction} from '@corgifm/common/common-types'
 import {
 	ModalId, modalsAction, selectActiveModalId,
-} from '../../common/redux'
+} from '@corgifm/common/redux'
 import {AuthModalContent} from '../Auth/Auth'
 import {OptionsModalContent} from '../Options/Options'
 import {LoadRoomModalContent} from '../SavingAndLoading/SavingAndLoading'

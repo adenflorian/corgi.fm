@@ -1,5 +1,5 @@
 import React from 'react'
-import {GhostConnections, selectGhostConnectionsState, shamuConnect} from '../../common/redux'
+import {GhostConnections, selectGhostConnectionsState, shamuConnect} from '@corgifm/common/redux'
 import {ConnectedGhostConnectionView} from './GhostConnectionView'
 
 interface ReduxProps {

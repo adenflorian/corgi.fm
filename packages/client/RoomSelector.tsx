@@ -1,7 +1,7 @@
 import {List} from 'immutable'
 import React from 'react'
 import {Component} from 'react'
-import {changeRoom, selectActiveRoom, selectAllRoomNames, shamuConnect} from '../common/redux'
+import {changeRoom, selectActiveRoom, selectAllRoomNames, shamuConnect} from '@corgifm/common/redux'
 import {Select} from './Select/Select'
 
 interface IRoomSelectorReduxProps {

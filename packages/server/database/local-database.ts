@@ -1,4 +1,4 @@
-import {logger} from '../../common/logger'
+import {logger} from '@corgifm/common/logger'
 
 export function connectToLocalDB(dbName: string) {
 	logger.log('using local DB')

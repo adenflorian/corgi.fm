@@ -1,13 +1,13 @@
 import {stripIndents} from 'common-tags'
 import React, {useLayoutEffect, useState} from 'react'
 import {useDispatch} from 'react-redux'
-import {MidiClipEvents} from '../../common/midi-types'
-import {IMidiNote} from '../../common/MidiNote'
+import {MidiClipEvents} from '@corgifm/common/midi-types'
+import {IMidiNote} from '@corgifm/common/MidiNote'
 import {
 	findLowestAndHighestNotes, infiniteSequencerActions,
 	InfiniteSequencerStyle, selectInfiniteSequencer, shamuConnect,
-} from '../../common/redux'
-import {getColorStringForMidiNote} from '../../common/shamu-color'
+} from '@corgifm/common/redux'
+import {getColorStringForMidiNote} from '@corgifm/common/shamu-color'
 import {isWhiteKey} from '../Keyboard/Keyboard'
 import {localActions} from '../local-middleware'
 import {getOctaveFromMidiNote, midiNoteToNoteName} from '../WebAudio'

@@ -1,7 +1,7 @@
 import React from 'react'
 import {connect, useDispatch} from 'react-redux'
 import {Dispatch} from 'redux'
-import {IClientAppState} from '../common/redux'
+import {IClientAppState} from '@corgifm/common/redux'
 
 interface Props {
 	label: string

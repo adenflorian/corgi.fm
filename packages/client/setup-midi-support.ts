@@ -1,5 +1,5 @@
 import {Store} from 'redux'
-import {logger} from '../common/logger'
+import {logger} from '@corgifm/common/logger'
 import {localMidiKeyPress, localMidiKeyUp} from './local-middleware'
 
 declare global {

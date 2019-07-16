@@ -2,15 +2,15 @@ import {List} from 'immutable'
 import React from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
-import {IMidiNotes} from '../../common/MidiNote'
-import {allBuiltInBQFilterTypes, BuiltInBQFilterType, LfoOscillatorType, ShamuOscillatorType} from '../../common/OscillatorTypes'
+import {IMidiNotes} from '@corgifm/common/MidiNote'
+import {allBuiltInBQFilterTypes, BuiltInBQFilterType, LfoOscillatorType, ShamuOscillatorType} from '@corgifm/common/OscillatorTypes'
 import {
 	BasicSynthesizerParam, getConnectionNodeInfo,
 	selectBasicSynthesizer, setBasicSynthesizerOscillatorType,
 	setBasicSynthesizerParam,
 	SynthLfoTarget,
-} from '../../common/redux'
-import {IClientAppState} from '../../common/redux'
+} from '@corgifm/common/redux'
+import {IClientAppState} from '@corgifm/common/redux'
 import {
 	adsrValueToString, attackToolTip, decayToolTip, detuneToolTip, detuneValueToString,
 	filterAttackToolTip, filterDecayToolTip, filterReleaseToolTip, filterSustainToolTip,

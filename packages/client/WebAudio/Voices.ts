@@ -1,6 +1,6 @@
 import {OrderedMap, Set} from 'immutable'
-import {logger} from '../../common/logger'
-import {IMidiNote} from '../../common/MidiNote'
+import {logger} from '@corgifm/common/logger'
+import {IMidiNote} from '@corgifm/common/MidiNote'
 import {Voice} from './index'
 
 export type OnEndedCallback = (id: number) => void

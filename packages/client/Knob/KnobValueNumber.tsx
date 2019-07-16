@@ -1,5 +1,5 @@
 import React, {FormEvent, useEffect, useRef, useState} from 'react'
-import {clamp} from '../../common/common-utils'
+import {clamp} from '@corgifm/common/common-utils'
 
 interface Props {
 	value: number

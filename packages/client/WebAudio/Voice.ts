@@ -1,5 +1,5 @@
 import {Set} from 'immutable'
-import {logger} from '../../common/logger'
+import {logger} from '@corgifm/common/logger'
 import {applyEnvelope, calculateScheduledEnvelope, IScheduledEnvelope} from './envelope'
 import {OnEndedCallback} from './index'
 

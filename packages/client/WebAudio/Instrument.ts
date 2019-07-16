@@ -1,8 +1,8 @@
 import {Set} from 'immutable'
-import {IDisposable} from '../../common/common-types'
-import {logger} from '../../common/logger'
-import {IMidiNote} from '../../common/MidiNote'
-import {BuiltInBQFilterType} from '../../common/OscillatorTypes'
+import {IDisposable} from '@corgifm/common/common-types'
+import {logger} from '@corgifm/common/logger'
+import {IMidiNote} from '@corgifm/common/MidiNote'
+import {BuiltInBQFilterType} from '@corgifm/common/OscillatorTypes'
 import {AudioNodeWrapper, IAudioNodeWrapperOptions, registerInstrumentWithSchedulerVisual, Voice, Voices} from './index'
 
 export abstract class Instrument<T extends Voices<V>, V extends Voice> extends AudioNodeWrapper implements IDisposable {

@@ -2,12 +2,12 @@ import React from 'react'
 import {ContextMenuTrigger} from 'react-contextmenu'
 import Draggable, {DraggableEventHandler} from 'react-draggable'
 import {Dispatch} from 'redux'
-import {ConnectionNodeType} from '../../common/common-types'
+import {ConnectionNodeType} from '@corgifm/common/common-types'
 import {
 	getConnectionNodeInfo, IPosition, movePosition,
 	nodeClicked, selectConnectionSourceColorByTargetId,
 	SelectedNode, selectOptions, selectPosition, selectShamuMetaState, shamuConnect, shamuMetaActions,
-} from '../../common/redux'
+} from '@corgifm/common/redux'
 import {ConnectedBasicSampler} from '../BasicSampler/BasicSampler'
 import {graphSizeX, graphSizeY, handleClassName, nodeMenuId} from '../client-constants'
 import {ECSSequencerRenderSystem} from '../ECS/ECSSequencerRenderSystem'

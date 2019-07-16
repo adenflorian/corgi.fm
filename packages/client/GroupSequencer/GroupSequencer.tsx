@@ -2,7 +2,7 @@ import React from 'react'
 import {useDispatch, useSelector} from 'react-redux'
 import {
 	groupSequencerActions, IClientAppState, selectGroupSequencer,
-} from '../../common/redux'
+} from '@corgifm/common/redux'
 import {Panel} from '../Panel/Panel'
 import './GroupSequencer.less'
 

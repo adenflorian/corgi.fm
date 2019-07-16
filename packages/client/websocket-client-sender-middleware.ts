@@ -1,13 +1,13 @@
 import {Map} from 'immutable'
 import {AnyAction, Dispatch, Middleware} from 'redux'
-import {rateLimitedDebounce} from '../common/common-utils'
-import {logger} from '../common/logger'
+import {rateLimitedDebounce} from '@corgifm/common/common-utils'
+import {logger} from '@corgifm/common/logger'
 import {
 	BroadcastAction, BROADCASTER_ACTION, getActionsBlacklist,
 	GLOBAL_SERVER_ACTION, IClientAppState,
 	MOVE_POSITION, selectClientInfo, selectLocalSocketId, SERVER_ACTION, UPDATE_POINTER,
-} from '../common/redux'
-import {WebSocketEvent} from '../common/server-constants'
+} from '@corgifm/common/redux'
+import {WebSocketEvent} from '@corgifm/common/server-constants'
 import {socket} from './websocket-listeners'
 
 export const websocketSenderMiddleware: Middleware<{}, IClientAppState, Dispatch> =

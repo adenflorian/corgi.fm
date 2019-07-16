@@ -1,12 +1,12 @@
 import React from 'react'
 import {useDispatch} from 'react-redux'
-import {ClientId} from '../../common/common-types'
+import {ClientId} from '@corgifm/common/common-types'
 import {
 	ActiveGhostConnectorSourceOrTarget, calculateConnectorPositionY, createSelectPlaceholdersInfo,
 	GhostConnection, ghostConnectorActions,
 	GhostConnectorAddingOrMoving, IClientAppState,
 	selectLocalClientId, selectPosition, shamuConnect,
-} from '../../common/redux'
+} from '@corgifm/common/redux'
 import {connectorWidth} from './ConnectionView'
 import {ConnectorPlaceholder} from './ConnectorPlaceholder'
 

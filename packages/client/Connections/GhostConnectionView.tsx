@@ -1,6 +1,6 @@
 import React, {PureComponent} from 'react'
 import {Dispatch} from 'redux'
-import {Point} from '../../common/common-types'
+import {Point} from '@corgifm/common/common-types'
 import {
 	ActiveGhostConnectorSourceOrTarget, calculateConnectorPositionY,
 	GhostConnection, ghostConnectorActions,
@@ -11,7 +11,7 @@ import {
 	selectLocalClientId,
 	selectPosition,
 	shamuConnect,
-} from '../../common/redux'
+} from '@corgifm/common/redux'
 import {toGraphSpace} from '../SimpleGraph/Zoom'
 import {connectorHeight, connectorWidth, makeCurvedPath} from './ConnectionView'
 import {Connector} from './Connector'

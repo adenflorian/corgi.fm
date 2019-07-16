@@ -17,7 +17,7 @@
                 "--colors",
                 "--require",
                 "ts-node/register",
-                "${workspaceFolder}/src/**/*.spec.ts*"
+                "${workspaceFolder}/packages/**/*.spec.ts*"
             ],
             "internalConsoleOptions": "openOnSessionStart"
         },

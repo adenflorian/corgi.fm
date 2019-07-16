@@ -12,8 +12,8 @@ import {
 	infiniteSequencerActions, InfiniteSequencerFields, InfiniteSequencerState,
 	InfiniteSequencerStyle, selectConnectionSourceColorByTargetId,
 	selectInfiniteSequencer, sequencerActions,
-} from '../../common/redux'
-import {CssColor} from '../../common/shamu-color'
+} from '@corgifm/common/redux'
+import {CssColor} from '@corgifm/common/shamu-color'
 import {
 	percentageValueString, seqLengthValueToString, seqPitchValueToString,
 	seqRateValueToString, sequencerDownloadToolTip, sequencerEraseToolTip,

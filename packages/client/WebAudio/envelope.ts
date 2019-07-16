@@ -1,4 +1,4 @@
-import {logger} from '../../common/logger'
+import {logger} from '@corgifm/common/logger'
 
 export function applyEnvelope(
 	previousScheduledEnvelope: ScheduledEnvelope | undefined,

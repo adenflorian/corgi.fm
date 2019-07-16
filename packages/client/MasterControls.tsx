@@ -8,7 +8,7 @@ import {
 	IGlobalClockState,
 	MASTER_CLOCK_SOURCE_ID,
 	selectGlobalClockState,
-} from '../common/redux'
+} from '@corgifm/common/redux'
 import {KnobIncremental} from './Knob/KnobIncremental'
 import './MasterControls.less'
 import {Panel} from './Panel/Panel'

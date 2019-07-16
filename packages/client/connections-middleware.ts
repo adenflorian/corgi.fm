@@ -1,15 +1,15 @@
 import {Middleware} from 'redux'
-import {calculatePositionsGivenConnections} from '../common/compute-positions'
-import {logger} from '../common/logger'
-import {OrganizeGraphAction} from '../common/redux/common-actions'
-import {BroadcastAction} from '../common/redux/common-redux-types'
+import {calculatePositionsGivenConnections} from '@corgifm/common/compute-positions'
+import {logger} from '@corgifm/common/logger'
+import {OrganizeGraphAction} from '@corgifm/common/redux/common-actions'
+import {BroadcastAction} from '@corgifm/common/redux/common-redux-types'
 import {
 	DELETE_CONNECTIONS, GHOST_CONNECTION_DELETE,
 	GhostConnectorAction, IClientAppState,
 	IConnectionAction, ORGANIZE_GRAPH, PositionAction,
 	selectAllConnections, selectAllPositions, selectConnection,
 	selectConnectionsWithSourceIds, SET_ENABLED_NODE, updatePositions,
-} from '../common/redux/index'
+} from '@corgifm/common/redux/index'
 import {handleStopDraggingGhostConnector} from './dragging-connections'
 import {GetAllInstruments} from './instrument-manager'
 
