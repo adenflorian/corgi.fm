@@ -3,7 +3,8 @@ import React from 'react'
 import * as ReactGA from 'react-ga'
 import {Middleware} from 'redux'
 import {
-	clientInfoActions, createUsername, loadOptionsState, SET_ACTIVE_ROOM, validateOptionsState,
+	clientInfoActions, createUsername, loadOptionsState,
+	SET_ACTIVE_ROOM, validateOptionsState,
 } from '@corgifm/common/redux'
 import {setupAudioContext} from '@corgifm/common/setup-audio-context'
 import {initSentry} from './analytics/sentry'
@@ -87,7 +88,8 @@ async function setupAsync() {
 	const onReduxMiddleware: Middleware = () => next => action => {
 		next(action)
 		switch (action.type) {
-			case SET_ACTIVE_ROOM: onSetActiveRoom()
+			case SET_ACTIVE_ROOM: return onSetActiveRoom()
+			default: return
 		}
 	}
 

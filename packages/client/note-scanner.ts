@@ -101,8 +101,6 @@ function scheduleNotes(
 		_isMasterClockEnabled = isMasterClockEnabled
 		if (_isMasterClockEnabled) {
 			lastAudioContextTime = currentAudioContextTime
-		} else {
-
 		}
 	}
 

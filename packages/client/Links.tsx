@@ -29,7 +29,7 @@ function getLink(
 			href={url}
 			newTab={true}
 			style={{color: backgroundColor}}
-			title={`Will open in a new tab`}
+			title="Will open in a new tab"
 		>
 			<Icon
 				style={{

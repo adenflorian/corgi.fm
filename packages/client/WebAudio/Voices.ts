@@ -166,6 +166,8 @@ export abstract class Voices<V extends Voice> {
 		this._scheduledVoices.filter(x => x.sourceIds.includes(sourceId))
 			.forEach(x => {
 				if (x.sourceIds.count() > 1) {
+					// TODO
+					// eslint-disable-next-line no-param-reassign
 					x.sourceIds = x.sourceIds.remove(sourceId)
 				} else {
 					x.scheduleRelease(this._getAudioContext().currentTime, releaseSeconds, true)

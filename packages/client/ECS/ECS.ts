@@ -56,7 +56,7 @@ function ecsLoop() {
 	const state = _store.getState()
 	const roomState = state.room
 
-	if (selectOption(state, AppOptions.graphics_ECS) !== true) return
+	if (selectOption(state, AppOptions.graphicsECS) !== true) return
 
 	// Populate entities
 	// TODO Don't do every frame

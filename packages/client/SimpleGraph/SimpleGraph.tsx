@@ -1,7 +1,6 @@
 import {Seq} from 'immutable'
 import React from 'react'
-import {shamuConnect} from '@corgifm/common/redux'
-import {selectAllPositionIds} from '@corgifm/common/redux'
+import {shamuConnect, selectAllPositionIds} from '@corgifm/common/redux'
 import {mainBoardsId} from '../client-constants'
 import {ConnectedConnections} from '../Connections/Connections'
 import {ConnectedConnectorPlaceholders} from '../Connections/ConnectorPlaceholders'

@@ -7,12 +7,16 @@ import {assertArrayHasNoUndefinedElements} from '../common-utils'
 import {makeMidiClipEvent, MidiClip, MidiClipEvents} from '../midi-types'
 import {emptyMidiNotes, IMidiNote, MidiNotes} from '../MidiNote'
 import {
+	deserializeSequencerState, ISequencerState, PLAY_SEQUENCER,
+	RECORD_SEQUENCER_NOTE, selectAllGridSequencers, SequencerAction,
+	SequencerStateBase, STOP_SEQUENCER, TOGGLE_SEQUENCER_RECORDING,
+} from './sequencer-redux'
+import {
 	addMultiThing, BROADCASTER_ACTION, CLEAR_SEQUENCER, createSequencerEvents, IClientRoomState,
 	IMultiState, IMultiStateThings, isEmptyEvents, makeMultiReducer, NetworkActionType,
 	PLAY_ALL, selectGlobalClockState, SERVER_ACTION, STOP_ALL,
 	UNDO_SEQUENCER,
 } from './index'
-import {deserializeSequencerState, ISequencerState, PLAY_SEQUENCER, RECORD_SEQUENCER_NOTE, selectAllGridSequencers, SequencerAction, SequencerStateBase, STOP_SEQUENCER, TOGGLE_SEQUENCER_RECORDING} from './sequencer-redux'
 
 export const addGridSequencer = (gridSequencer: GridSequencerState) =>
 	addMultiThing(gridSequencer, ConnectionNodeType.gridSequencer, NetworkActionType.SERVER_AND_BROADCASTER)

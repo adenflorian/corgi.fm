@@ -4,8 +4,8 @@ import * as uuid from 'uuid'
 import {ClientId, ConnectionNodeType, IConnectable, IMultiStateThing} from '../common-types'
 import {pickRandomArrayElement} from '../common-utils'
 import {BuiltInBQFilterType, BuiltInOscillatorType, LfoOscillatorType, ShamuOscillatorType} from '../OscillatorTypes'
-import {addMultiThing, BROADCASTER_ACTION, createSelectAllOfThingAsArray, IClientRoomState, IMultiState, makeMultiReducer, NetworkActionType, SERVER_ACTION} from './index'
 import {NodeSpecialState} from './shamu-graph'
+import {addMultiThing, BROADCASTER_ACTION, createSelectAllOfThingAsArray, IClientRoomState, IMultiState, makeMultiReducer, NetworkActionType, SERVER_ACTION} from './index'
 
 export const addBasicSynthesizer = (instrument: BasicSynthesizerState) =>
 	addMultiThing(instrument, ConnectionNodeType.basicSynthesizer, NetworkActionType.SERVER_AND_BROADCASTER)
@@ -107,6 +107,7 @@ export class BasicSynthesizerState implements IConnectable, NodeSpecialState {
 
 	public readonly oscillatorType: ShamuOscillatorType
 		= pickRandomArrayElement(['sine', 'sawtooth', 'square', 'triangle']) as ShamuOscillatorType
+
 	public readonly id = uuid.v4()
 	public readonly ownerId: string
 	public readonly pan: number = Math.random() - 0.5

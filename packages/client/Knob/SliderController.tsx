@@ -76,14 +76,14 @@ export function SliderController(props: ISliderControllerProps) {
 		const x = (n - min) / (max - min)
 
 		if (useCurve) {
-			return clamp(Math.pow(x, 1 / curve))
+			return clamp(x ** (1 / curve))
 		} else {
 			return clamp(x)
 		}
 	}
 
 	const _deNormalize = (n: number) => {
-		const deCurvedValue = Math.pow(n, curve)
+		const deCurvedValue = n ** curve
 		const deNormalizedValue = (deCurvedValue * (max - min)) + min
 		return deNormalizedValue
 	}

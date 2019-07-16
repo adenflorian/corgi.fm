@@ -1,6 +1,5 @@
 import {List} from 'immutable'
 import {Dispatch} from 'redux'
-import Victor = require('victor')
 import {Point} from '@corgifm/common/common-types'
 import {logger} from '@corgifm/common/logger'
 import {IClientRoomState} from '@corgifm/common/redux/common-redux-types'
@@ -10,6 +9,8 @@ import {
 	selectConnectionsWithSourceIds, selectConnectionsWithTargetIds, selectGhostConnection, selectPosition,
 } from '@corgifm/common/redux/index'
 import {connectorWidth} from './Connections/ConnectionView'
+
+import Victor = require('victor')
 
 interface ConnectionCandidate extends IPosition {
 	portNumber: number

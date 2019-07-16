@@ -1,5 +1,4 @@
-import {useCallback} from 'react'
-import React from 'react'
+import React, {useCallback} from 'react'
 import {IoMdArrowRoundForward, IoMdGlobe} from 'react-icons/io'
 import {useDispatch, useSelector} from 'react-redux'
 import {lobby} from '@corgifm/common/common-constants'
@@ -55,6 +54,7 @@ export const WelcomeModalContent: ModalContent = ({hideModal}) => {
 					<div className="left">
 						<div className="roomActions vert-space-16">
 							<button
+								type="button"
 								className="joinActiveRoom"
 								onClick={hideModal}
 							>
@@ -62,8 +62,9 @@ export const WelcomeModalContent: ModalContent = ({hideModal}) => {
 								<span>Continue to room&nbsp;</span>
 								<span className="room">{activeRoom}</span>
 							</button>
-							{activeRoom !== lobby &&
+							{activeRoom !== lobby && (
 								<button
+									type="button"
 									className="joinLobby"
 									onClick={joinLobby}
 								>
@@ -71,7 +72,7 @@ export const WelcomeModalContent: ModalContent = ({hideModal}) => {
 									<span>Join&nbsp;</span>
 									<span className="room">lobby</span>
 								</button>
-							}
+							)}
 							<NewRoomButton onClick={hideModal} />
 							<LoadRoomModalButton />
 						</div>

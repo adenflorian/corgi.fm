@@ -151,5 +151,5 @@ export const ConnectedSimpleReverb = shamuConnect(
 	}),
 )(SimpleReverbView)
 
-	// private readonly _dispatchChangeInstrumentParam = (paramType: BasicSamplerParam, value: any) =>
-	// this.props.dispatch(setBasicSamplerParam(this.props.id, paramType, value))
+// private readonly _dispatchChangeInstrumentParam = (paramType: BasicSamplerParam, value: any) =>
+// this.props.dispatch(setBasicSamplerParam(this.props.id, paramType, value))

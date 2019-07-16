@@ -2,8 +2,12 @@ import {AnyAction} from 'redux'
 import * as uuid from 'uuid'
 import {ClientId, ConnectionNodeType, IConnectable, IMultiStateThing} from '../common-types'
 import {BuiltInBQFilterType} from '../OscillatorTypes'
-import {addMultiThing, BROADCASTER_ACTION, createSelectAllOfThingAsArray, IClientRoomState, IMultiState, makeMultiReducer, NetworkActionType, SERVER_ACTION} from './index'
 import {NodeSpecialState} from './shamu-graph'
+import {
+	addMultiThing, BROADCASTER_ACTION, createSelectAllOfThingAsArray,
+	IClientRoomState, IMultiState, makeMultiReducer,
+	NetworkActionType, SERVER_ACTION,
+} from './index'
 
 export const addSimpleReverb = (sampler: SimpleReverbState) =>
 	addMultiThing(sampler, ConnectionNodeType.simpleReverb, NetworkActionType.SERVER_AND_BROADCASTER)

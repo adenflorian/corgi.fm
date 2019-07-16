@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import React from 'react'
 import {ContextMenuTrigger} from 'react-contextmenu'
 import Draggable, {DraggableEventHandler} from 'react-draggable'
@@ -62,11 +63,12 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 					left: -(graphSizeX / 2),
 				}}
 				handle={`.${handleClassName}`}
-				cancel={/*`.actualKnob, .note, .key, .controls > *, .oscillatorTypes > *, .verticalScrollBar, .groupEvent, */`.noDrag, .panel`}
+				cancel={`.noDrag, .panel`}
 			>
 				<div
 					className={`simpleGraphNode ${selectedNode && selectedNode.id === positionId ? 'selectedNode' : ''}`}
 					onBlur={() => this.props.dispatch(shamuMetaActions.clearSelectedNode())}
+					// TODO
 					tabIndex={0}
 					onFocus={this._handleMouseDown}
 					style={{
@@ -154,8 +156,8 @@ export const ConnectedSimpleGraphNode = shamuConnect(
 			position,
 			color: getConnectionNodeInfo(position.targetType).color
 				|| selectConnectionSourceColorByTargetId(state.room, positionId),
-			highQuality: selectOptions(state).graphics_ECS,
-			fancyZoomPan: selectOptions(state).graphics_expensiveZoomPan,
+			highQuality: selectOptions(state).graphicsECS,
+			fancyZoomPan: selectOptions(state).graphicsExpensiveZoomPan,
 			selectedNode: selectShamuMetaState(state.room).selectedNode,
 		}
 	},

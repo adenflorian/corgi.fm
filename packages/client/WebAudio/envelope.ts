@@ -1,5 +1,3 @@
-import {logger} from '@corgifm/common/logger'
-
 export function applyEnvelope(
 	previousScheduledEnvelope: ScheduledEnvelope | undefined,
 	envelope: ScheduledEnvelope,

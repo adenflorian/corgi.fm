@@ -1,8 +1,6 @@
-import React from 'react'
-import {Component} from 'react'
+import React, {Component} from 'react'
 import {connect} from 'react-redux'
-import {IChatMessage, selectAllMessages} from '@corgifm/common/redux'
-import {IClientAppState} from '@corgifm/common/redux'
+import {IChatMessage, selectAllMessages, IClientAppState} from '@corgifm/common/redux'
 
 interface IChatMessagesProps {
 	messages: IChatMessage[]
@@ -24,12 +22,13 @@ export class ChatMessages extends Component<IChatMessagesProps> {
 						if (opacity <= 0) return null
 						return (
 							// TODO Bad key
+							// eslint-disable-next-line react/no-array-index-key
 							<li key={i} style={{opacity: determineOpacity(i, messages.length)}}>
 								<div className="selectable" tabIndex={-1}>
 									<span className="author" style={{color: x.color}}>
 										{x.authorName}
 									</span>
-									<span className="text" >
+									<span className="text">
 										{x.text}
 									</span>
 								</div>
@@ -40,12 +39,13 @@ export class ChatMessages extends Component<IChatMessagesProps> {
 				<ul id="chatMessagesFront" className="chatMessages">
 					{messages.filter(x => !x.isOldMessage).map((x, i) =>
 						// TODO Bad key
+						// eslint-disable-next-line react/no-array-index-key
 						<li key={i}>
 							<div className="selectable" tabIndex={-1}>
 								<span className="author" style={{color: x.color}}>
 									{x.authorName}
 								</span>
-								<span className="text" >
+								<span className="text">
 									{x.text}
 								</span>
 							</div>
@@ -60,7 +60,7 @@ export class ChatMessages extends Component<IChatMessagesProps> {
 function determineOpacity(index: number, max: number) {
 	const x = max - index - 1
 	const a = -0.001
-	return Math.max(0, (a * Math.pow(x, 2)) + 1)
+	return Math.max(0, (a * (x ** 2)) + 1)
 }
 
 export const ConnectedChatMessages = connect((state: IClientAppState) => ({

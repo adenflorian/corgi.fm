@@ -1,4 +1,3 @@
-import {logger} from '@corgifm/common/logger'
 import {simpleGlobalClientState} from './SimpleGlobalClientState'
 
 type UpdateFunc = (highResTimestamp: number) => void

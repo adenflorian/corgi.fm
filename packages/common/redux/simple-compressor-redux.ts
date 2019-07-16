@@ -1,8 +1,8 @@
 import {AnyAction} from 'redux'
 import * as uuid from 'uuid'
 import {ClientId, ConnectionNodeType, IConnectable, IMultiStateThing} from '../common-types'
-import {addMultiThing, BROADCASTER_ACTION, createSelectAllOfThingAsArray, IClientRoomState, IMultiState, makeMultiReducer, NetworkActionType, SERVER_ACTION} from './index'
 import {NodeSpecialState} from './shamu-graph'
+import {addMultiThing, BROADCASTER_ACTION, createSelectAllOfThingAsArray, IClientRoomState, IMultiState, makeMultiReducer, NetworkActionType, SERVER_ACTION} from './index'
 
 export const addSimpleCompressor = (sampler: SimpleCompressorState) =>
 	addMultiThing(sampler, ConnectionNodeType.simpleCompressor, NetworkActionType.SERVER_AND_BROADCASTER)

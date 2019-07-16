@@ -40,7 +40,7 @@ export const KnobValueNumber = React.memo(
 				>
 					<input
 						value={tempValue}
-						onChange={e => setTempValue(e.target.value.replace(/[^0-9-\.]/g, ''))}
+						onChange={e => setTempValue(e.target.value.replace(/[^0-9-.]/g, ''))}
 						ref={inputRef}
 					/>
 				</form>
@@ -65,7 +65,7 @@ export const KnobValueNumber = React.memo(
 
 			const parsedFloat = Number.parseFloat(tempValue)
 
-			if (isNaN(parsedFloat)) return
+			if (Number.isNaN(parsedFloat)) return
 
 			onValueChange(clamp(round(parsedFloat), min, max))
 		}

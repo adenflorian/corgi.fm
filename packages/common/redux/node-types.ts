@@ -8,6 +8,11 @@ import {IClientAppState} from './common-redux-types'
 import {selectConnectionsWithTargetIds} from './connections-redux'
 import {addGridSequencer, deserializeGridSequencerState, GridSequencerState} from './grid-sequencers-redux'
 import {addGroupSequencer, deserializeGroupSequencerState, GroupSequencer, selectGroupSequencer} from './group-sequencers-redux'
+import {addInfiniteSequencer, deserializeInfiniteSequencerState, InfiniteSequencerState} from './infinite-sequencers-redux'
+import {selectSequencerIsPlaying, sequencerActions} from './sequencer-redux'
+import {addSimpleCompressor, deserializeSimpleCompressorState, selectSimpleCompressor, SimpleCompressorState} from './simple-compressor-redux'
+import {addSimpleReverb, deserializeSimpleReverbState, SimpleReverbState} from './simple-reverb-redux'
+import {addVirtualKeyboard} from './virtual-keyboard-redux'
 import {
 	addBasicSampler, addBasicSynthesizer,
 	addSimpleDelay, BasicSamplerState,
@@ -21,11 +26,6 @@ import {
 	selectInfiniteSequencerActiveNotes, selectInfiniteSequencerIsActive, selectInfiniteSequencerIsSending, selectSampler,
 	selectSimpleDelay, selectSimpleReverb, selectVirtualKeyboardById, selectVirtualKeyboardHasPressedKeys, SimpleDelayState, VirtualKeyboardState,
 } from './index'
-import {addInfiniteSequencer, deserializeInfiniteSequencerState, InfiniteSequencerState} from './infinite-sequencers-redux'
-import {selectSequencerIsPlaying, sequencerActions} from './sequencer-redux'
-import {addSimpleCompressor, deserializeSimpleCompressorState, selectSimpleCompressor, SimpleCompressorState} from './simple-compressor-redux'
-import {addSimpleReverb, deserializeSimpleReverbState, SimpleReverbState} from './simple-reverb-redux'
-import {addVirtualKeyboard} from './virtual-keyboard-redux'
 
 export const MASTER_AUDIO_OUTPUT_TARGET_ID = 'MASTER_AUDIO_OUTPUT_TARGET_ID'
 
@@ -65,7 +65,7 @@ const _makeNodeInfo = Record({
 	stateDeserializer: ((state: IMultiStateThing) => state) as (state: IMultiStateThing) => IMultiStateThing,
 	color: false as string | false,
 	typeName: 'Default Type Name',
-	stateConstructor: (DummyConnectable) as new (ownerId: string) => IConnectable,
+	StateConstructor: (DummyConnectable) as new (ownerId: string) => IConnectable,
 	addNodeActionCreator: ((state: IClientAppState) => ({type: 'dummy add node action type'})) as (state: any) => AnyAction,
 	showOnAddNodeMenu: false,
 	isDeletable: false,
@@ -79,7 +79,7 @@ const _makeNodeInfo = Record({
 
 type NodeInfo = ReturnType<typeof _makeNodeInfo>
 
-function makeNodeInfo(x: Pick<NodeInfo, 'stateSelector' | 'typeName' | 'stateConstructor' | 'addNodeActionCreator'> & Partial<NodeInfo>) {
+function makeNodeInfo(x: Pick<NodeInfo, 'stateSelector' | 'typeName' | 'StateConstructor' | 'addNodeActionCreator'> & Partial<NodeInfo>) {
 	return _makeNodeInfo(x)
 }
 
@@ -92,8 +92,6 @@ class AudioOutputState implements IMultiStateThing {
 	public readonly name = 'audio output'
 	public readonly enabled = true
 	public readonly ownerId = serverClientId
-
-	constructor() {}
 }
 
 const audioOutputState = new AudioOutputState()
@@ -107,8 +105,6 @@ class MasterClockState implements IMultiStateThing {
 	public readonly name = 'master clock'
 	public readonly enabled = true
 	public readonly ownerId = serverClientId
-
-	constructor() {}
 }
 
 const masterClockState = new MasterClockState()
@@ -121,7 +117,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 	[ConnectionNodeType.virtualKeyboard, makeNodeInfo({
 		type: ConnectionNodeType.virtualKeyboard,
 		typeName: 'Virtual Keyboard',
-		stateConstructor: VirtualKeyboardState,
+		StateConstructor: VirtualKeyboardState,
 		addNodeActionCreator: addVirtualKeyboard,
 		stateSelector: selectVirtualKeyboardById,
 		selectIsActive: selectVirtualKeyboardHasPressedKeys,
@@ -136,7 +132,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 	[ConnectionNodeType.gridSequencer, makeNodeInfo({
 		type: ConnectionNodeType.gridSequencer,
 		typeName: 'Grid Sequencer',
-		stateConstructor: GridSequencerState,
+		StateConstructor: GridSequencerState,
 		addNodeActionCreator: addGridSequencer,
 		stateSelector: selectGridSequencer,
 		selectIsActive: selectGridSequencerIsActive,
@@ -154,7 +150,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 	[ConnectionNodeType.infiniteSequencer, makeNodeInfo({
 		type: ConnectionNodeType.infiniteSequencer,
 		typeName: 'Infinite Sequencer',
-		stateConstructor: InfiniteSequencerState,
+		StateConstructor: InfiniteSequencerState,
 		addNodeActionCreator: addInfiniteSequencer,
 		stateSelector: selectInfiniteSequencer,
 		selectIsActive: selectInfiniteSequencerIsActive,
@@ -172,7 +168,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 	[ConnectionNodeType.groupSequencer, makeNodeInfo({
 		type: ConnectionNodeType.groupSequencer,
 		typeName: 'Group Sequencer',
-		stateConstructor: GroupSequencer,
+		StateConstructor: GroupSequencer,
 		addNodeActionCreator: addGroupSequencer,
 		stateSelector: selectGroupSequencer,
 		stateDeserializer: deserializeGroupSequencerState,
@@ -185,7 +181,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 	[ConnectionNodeType.basicSynthesizer, makeNodeInfo({
 		type: ConnectionNodeType.basicSynthesizer,
 		typeName: 'Basic Synthesizer',
-		stateConstructor: BasicSynthesizerState,
+		StateConstructor: BasicSynthesizerState,
 		addNodeActionCreator: addBasicSynthesizer,
 		selectIsPlaying: selectIsUpstreamNodePlaying,
 		stateSelector: selectBasicSynthesizer,
@@ -199,7 +195,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 	[ConnectionNodeType.basicSampler, makeNodeInfo({
 		type: ConnectionNodeType.basicSampler,
 		typeName: 'Piano Sampler',
-		stateConstructor: BasicSamplerState,
+		StateConstructor: BasicSamplerState,
 		addNodeActionCreator: addBasicSampler,
 		selectIsPlaying: selectIsUpstreamNodePlaying,
 		stateSelector: selectSampler,
@@ -213,7 +209,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 	[ConnectionNodeType.simpleReverb, makeNodeInfo({
 		type: ConnectionNodeType.simpleReverb,
 		typeName: 'Reverb',
-		stateConstructor: SimpleReverbState,
+		StateConstructor: SimpleReverbState,
 		addNodeActionCreator: addSimpleReverb,
 		selectIsPlaying: selectIsUpstreamNodePlaying,
 		stateSelector: selectSimpleReverb,
@@ -227,7 +223,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 	[ConnectionNodeType.simpleCompressor, makeNodeInfo({
 		type: ConnectionNodeType.simpleCompressor,
 		typeName: 'Compressor',
-		stateConstructor: SimpleCompressorState,
+		StateConstructor: SimpleCompressorState,
 		addNodeActionCreator: addSimpleCompressor,
 		selectIsPlaying: selectIsUpstreamNodePlaying,
 		stateSelector: selectSimpleCompressor,
@@ -241,7 +237,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 	[ConnectionNodeType.simpleDelay, makeNodeInfo({
 		type: ConnectionNodeType.simpleDelay,
 		typeName: 'Delay',
-		stateConstructor: SimpleDelayState,
+		StateConstructor: SimpleDelayState,
 		addNodeActionCreator: addSimpleDelay,
 		selectIsPlaying: selectIsUpstreamNodePlaying,
 		stateSelector: selectSimpleDelay,
@@ -255,7 +251,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 	[ConnectionNodeType.audioOutput, makeNodeInfo({
 		type: ConnectionNodeType.audioOutput,
 		typeName: 'Audio Output',
-		stateConstructor: AudioOutputState,
+		StateConstructor: AudioOutputState,
 		addNodeActionCreator: () => ({type: 'dummy audioOutput type'}),
 		selectIsPlaying: selectIsUpstreamNodePlaying,
 		stateSelector: () => audioOutputState,
@@ -264,7 +260,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 	[ConnectionNodeType.masterClock, makeNodeInfo({
 		type: ConnectionNodeType.masterClock,
 		typeName: 'Master Clock',
-		stateConstructor: MasterClockState,
+		StateConstructor: MasterClockState,
 		addNodeActionCreator: () => ({type: 'dummy masterClock type'}),
 		stateSelector: () => masterClockState,
 		selectIsActive: selectGlobalClockIsPlaying,

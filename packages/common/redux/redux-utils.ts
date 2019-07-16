@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import {isEqual} from 'lodash'
 import {
 	connect, DispatchProp, InferableComponentEnhancer,
@@ -52,6 +53,8 @@ export const BROADCASTER_ACTION = 'BROADCASTER_ACTION'
 export const GLOBAL_SERVER_ACTION = 'GLOBAL_SERVER_ACTION'
 
 export enum NetworkActionType {
+	// TODO
+	// eslint-disable-next-line no-shadow
 	SERVER_ACTION = 'SERVER_ACTION',
 	BROADCASTER = 'BROADCASTER_ACTION',
 	SERVER_AND_BROADCASTER = 'SERVER_AND_BROADCASTER',

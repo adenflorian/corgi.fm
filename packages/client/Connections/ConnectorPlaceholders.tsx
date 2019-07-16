@@ -28,11 +28,12 @@ interface ReduxProps {
 type AllProps = Props & ReduxProps
 
 export const ConnectorPlaceholders =
-	function _ConnectorPlaceholders({
-		parentId, placeholdersInfo, leftPortCount, rightPortCount,
-		localClientId, parentX, parentY, parentWidth, parentHeight,
-	}: AllProps) {
-
+	function _ConnectorPlaceholders(
+		{
+			parentId, placeholdersInfo, leftPortCount, rightPortCount,
+			localClientId, parentX, parentY, parentWidth, parentHeight,
+		}: AllProps
+	) {
 		const {leftConnections, rightConnections} = placeholdersInfo
 		const dispatch = useDispatch()
 
@@ -57,25 +58,29 @@ export const ConnectorPlaceholders =
 			>
 				{new Array(leftPortCount).fill(0).map((_, port) => {
 					const y = calculateConnectorPositionY(parentY, parentHeight, leftPortCount, port)
-					return <div key={'left-' + port}>
-						<ConnectorPlaceholder
-							onMouseDown={onMouseDown(y, port)}
-							x={parentX + (leftConnections.filter(x => x.targetPort === port).count() * -connectorWidth) - connectorWidth}
-							y={y}
-							sourceOrTarget={ActiveGhostConnectorSourceOrTarget.Source}
-						/>
-					</div>
+					return (
+						<div key={'left-' + port}>
+							<ConnectorPlaceholder
+								onMouseDown={onMouseDown(y, port)}
+								x={parentX + (leftConnections.filter(x => x.targetPort === port).count() * -connectorWidth) - connectorWidth}
+								y={y}
+								sourceOrTarget={ActiveGhostConnectorSourceOrTarget.Source}
+							/>
+						</div>
+					)
 				})}
 				{new Array(rightPortCount).fill(0).map((_, port) => {
 					const y = calculateConnectorPositionY(parentY, parentHeight, rightPortCount, port)
-					return <div key={'right-' + port}>
-						<ConnectorPlaceholder
-							onMouseDown={onMouseDown(y, port)}
-							x={parentX + parentWidth + (rightConnections.filter(x => x.sourcePort === port).count() * connectorWidth)}
-							y={y}
-							sourceOrTarget={ActiveGhostConnectorSourceOrTarget.Target}
-						/>
-					</div>
+					return (
+						<div key={'right-' + port}>
+							<ConnectorPlaceholder
+								onMouseDown={onMouseDown(y, port)}
+								x={parentX + parentWidth + (rightConnections.filter(x => x.sourcePort === port).count() * connectorWidth)}
+								y={y}
+								sourceOrTarget={ActiveGhostConnectorSourceOrTarget.Target}
+							/>
+						</div>
+					)
 				})}
 			</div>
 		)

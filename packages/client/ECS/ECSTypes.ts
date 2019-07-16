@@ -1,4 +1,6 @@
+/* eslint-disable class-methods-use-this */
 import {List, Set} from 'immutable'
+import {noop} from '@corgifm/common/common-utils'
 import {
 	ECSGraphPositionComponent, ECSLimiterComponent,
 	ECSNodeRendererComponent, ECSSequencerComponent,
@@ -15,7 +17,7 @@ export enum ECSComponentType {
 export abstract class ECSSystem {
 	public abstract getRequiredComponents(): Set<ECSComponentType>
 	public abstract execute(entities: List<ECSEntity>): void
-	public onSetActiveRoom = () => {}
+	public onSetActiveRoom = noop
 }
 
 export abstract class ECSEntity {

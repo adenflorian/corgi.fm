@@ -18,14 +18,6 @@
     //     "only-arrow-functions",
     //     "jsx-self-close"
     // ],
-    // "tslint.jsEnable": true,
-    // "tslint.packageManager": "yarn",
-    // "tslint.run": "onType",
-    // "tslint.configFile": "./tslint.json",
-    // "tslint.exclude": [
-    //     "node_modules",
-    //     "**/node_modules/*"
-    // ],
     // "tslint.ignoreDefinitionFiles": false,
     "files.eol": "\n",
     "javascript.preferences.quoteStyle": "single",
@@ -83,6 +75,7 @@
         "borked",
         "brinch",
         "callout",
+        "camelcase",
         "captcha",
         "cdnjs",
         "checkmark",
@@ -122,6 +115,7 @@
         "mobx",
         "monetization",
         "nginx",
+        "noninteractive",
         "notroot",
         "nyan",
         "onmidimessage",
@@ -180,4 +174,31 @@
         "tsconfig.json": "json"
     },
     "jest.autoEnable": false,
+    "eslint.alwaysShowStatus": true,
+    "eslint.validate": [
+        {"language": "javascript", "autoFix": true},
+        {"language": "javascriptreact", "autoFix": true},
+        {"language": "typescript", "autoFix": true},
+        {"language": "typescriptreact", "autoFix": true},
+    ],
+    "eslint.enable": true,
+    "eslint.autoFixOnSave": true,
+    "eslint.options": {
+        "ignorePath": ".gitignore",
+        "extensions": [".js",".jsx",".ts",".tsx",]
+    },
+    "editor.formatOnSave": false,
+    // "eslint.autoFixOnSave": true,
+    // "eslint.validate": [
+    //     "javascript",
+    //     "javascriptreact",
+    //     {
+    //         "language": "typescript",
+    //         "autoFix": true
+    //     },
+    //     {
+    //         "language": "typescriptreact",
+    //         "autoFix": true
+    //     }
+    // ]
 }

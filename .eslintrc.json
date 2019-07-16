@@ -1,0 +1,257 @@
+{
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "ecmaFeatures": {
+            "jsx": true
+        },
+        "ecmaVersion": 2018,
+        "sourceType": "module"
+    },
+    "env": {
+        "browser": true,
+        "es6": true,
+        "node": true
+    },
+    "globals": {
+        "Atomics": "readonly",
+        "SharedArrayBuffer": "readonly"
+    },
+    "extends": [
+        "eslint:recommended",
+        "plugin:react/recommended",
+        "plugin:jest/recommended",
+        "plugin:import/errors",
+        "plugin:import/warnings",
+        "plugin:import/typescript",
+        "airbnb"
+    ],
+    "plugins": [
+        "@typescript-eslint",
+        "react",
+        "jest",
+        "import"
+    ],
+    "overrides": [
+        {
+            "files": "*.spec.*",
+            "env": {
+                "jest": true
+            }
+        },
+        {
+            "files": "*.ts*",
+            "rules": {
+                "react/prop-types": "off"
+            }
+        }
+    ],
+    "rules": {
+        "indent": [
+            "error",
+            "tab",
+            {
+                "SwitchCase": 1
+            }
+        ],
+        "quotes": [
+            "error",
+            "single",
+            {
+                "allowTemplateLiterals": true
+            }
+        ],
+        "semi": [
+            "error",
+            "never"
+        ],
+        // TODO Make sure typsecript version of this rule works
+        "no-unused-vars": "off",
+        "no-case-declarations": "off",
+        // Shouldn't need when using typescript
+        "no-prototype-builtins": "off",
+        "react/display-name": "off",
+        "no-console": "error",
+        "no-trailing-spaces": "error",
+        "no-multiple-empty-lines": [
+            "error",
+            {
+                "max": 1,
+                "maxBOF": 0,
+                "maxEOF": 0
+            }
+        ],
+        "import/newline-after-import": [
+            "error",
+            {
+                "count": 1
+            }
+        ],
+        "import/order": [
+            "error",
+            {
+                "newlines-between": "never"
+            }
+        ],
+        "comma-dangle": [
+            "error",
+            "always-multiline"
+        ],
+        "comma-spacing": [
+            "error",
+            {
+                "before": false,
+                "after": true
+            }
+        ],
+        "object-curly-spacing": [
+            "error",
+            "never"
+        ],
+        "import/no-unresolved": "off",
+        "no-useless-constructor": "off",
+        "@typescript-eslint/no-useless-constructor": "error",
+        "react/jsx-filename-extension": [
+            "error",
+            {
+                "extensions": [
+                    ".js",
+                    ".jsx",
+                    ".ts",
+                    ".tsx"
+                ]
+            }
+        ],
+        "import/prefer-default-export": "off",
+        "object-curly-newline": [
+            "error",
+            {
+                "multiline": true,
+                "minProperties": 99,
+                "consistent": true
+            }
+        ],
+        "no-use-before-define": "off",
+        "func-call-spacing": "off",
+        "@typescript-eslint/func-call-spacing": "error",
+        "no-spaced-func": "off",
+        "import/no-extraneous-dependencies": [
+            "error",
+            {
+                "devDependencies": [
+                    "**/*.spec.*"
+                ]
+            }
+        ],
+        // My personal style
+        "arrow-parens": [
+            "error",
+            "as-needed"
+        ],
+        "no-underscore-dangle": "off",
+        "lines-between-class-members": [
+            "error",
+            "always",
+            {
+                "exceptAfterSingleLine": true
+            }
+        ],
+        "no-confusing-arrow": "off",
+        "no-return-assign": "off",
+        "no-nested-ternary": "off",
+        "block-spacing": [
+            "error",
+            "never"
+        ],
+        "no-plusplus": "off",
+        "@typescript-eslint/no-unused-vars": [
+            "error",
+            {
+                "vars": "all",
+                "args": "none",
+                "ignoreRestSiblings": false
+            }
+        ],
+        "react/jsx-wrap-multilines": "off",
+        "quote-props": [
+            "error",
+            "consistent-as-needed"
+        ],
+        "no-alert": "off",
+        // To be turned on at future time
+        "no-tabs": "off",
+        "react/prefer-stateless-function": "off",
+        "react/jsx-indent": [
+            "error",
+            "tab"
+        ],
+        "react/jsx-indent-props": [
+            "error",
+            "tab"
+        ],
+        "linebreak-style": "off",
+        "max-len": "off",
+        "operator-linebreak": "off",
+        "function-paren-newline": "off",
+        "consistent-return": "off",
+        "no-else-return": "off",
+        "prefer-template": "off",
+        "prefer-destructuring": "off",
+        "arrow-body-style": "off",
+        "implicit-arrow-linebreak": "off",
+        "no-empty-function": [
+            "error",
+            {
+                "allow": [
+                    "constructors"
+                ]
+            }
+        ],
+        "prefer-arrow-callback": "off",
+        "react/sort-comp": "off",
+        "react/destructuring-assignment": "off",
+        "react/no-access-state-in-setstate": "off",
+        "react/jsx-boolean-value": "off",
+        "jsx-a11y/no-static-element-interactions": "off",
+        "jsx-a11y/click-events-have-key-events": "off",
+        "class-methods-use-this": "off",
+        "jsx-a11y/label-has-associated-control": "off",
+        "jsx-a11y/label-has-for": "off",
+        "no-useless-return":"off",
+        "react/no-array-index-key": "off",
+        "padded-blocks": "off",
+        "react/jsx-curly-brace-presence": "off",
+        "no-path-concat": "off",
+        "default-case": "off"
+    },
+    "settings": {
+        "react": {
+            "createClass": "createReactClass", // Regex for Component Factory to use,
+            // default to "createReactClass"
+            "pragma": "React", // Pragma to use, default to "React"
+            "version": "detect", // React version. "detect" automatically picks the version you have installed.
+            // You can also use `16.0`, `16.3`, etc, if you want to override the detected value.
+            // default to latest and warns if missing
+            // It will default to "detect" in the future
+            "flowVersion": "0.53" // Flow version
+        },
+        "propWrapperFunctions": [
+            // The names of any function used to wrap propTypes, e.g. `forbidExtraProps`. If this isn't set, any propTypes wrapped in a function will be skipped.
+            "forbidExtraProps",
+            {
+                "property": "freeze",
+                "object": "Object"
+            },
+            {
+                "property": "myFavoriteWrapper"
+            }
+        ],
+        "linkComponents": [
+            // Components used as alternatives to <a> for linking, eg. <Link to={ url } />
+            "Hyperlink",
+            {
+                "name": "Link",
+                "linkAttribute": "to"
+            }
+        ]
+    }
+}

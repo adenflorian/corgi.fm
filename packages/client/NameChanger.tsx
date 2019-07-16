@@ -53,7 +53,9 @@ function NameChanger({author, authorColor}: AllProps) {
 
 		dispatch(setLocalClientName(username))
 
-		{(document.activeElement as HTMLElement).blur()}
+		if (document.activeElement) {
+			(document.activeElement as HTMLElement).blur()
+		}
 	}
 
 	return (

@@ -1,8 +1,7 @@
 import React from 'react'
 import {hot} from 'react-hot-loader'
 import {connect} from 'react-redux'
-import {selectClientInfo} from '@corgifm/common/redux'
-import {IClientAppState} from '@corgifm/common/redux'
+import {selectClientInfo, IClientAppState} from '@corgifm/common/redux'
 // css-reset must be first
 import './css-reset.css'
 // tslint:disable-next-line:ordered-imports
@@ -22,11 +21,11 @@ class App extends React.Component<IAppProps, {}> {
 
 		if (isLocalDevClient()) {
 			switch (window.location.pathname.replace('/', '')) {
+				default: break
 			}
 		}
 
 		const isLoading = !isClientReady && isConnectingForFirstTime
-
 		return (
 			<React.Fragment>
 				<LoadingScreen loading={isLoading} />

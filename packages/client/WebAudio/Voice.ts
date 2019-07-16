@@ -1,12 +1,10 @@
 import {Set} from 'immutable'
-import {logger} from '@corgifm/common/logger'
 import {applyEnvelope, calculateScheduledEnvelope, IScheduledEnvelope} from './envelope'
 import {OnEndedCallback} from './index'
 
 export type TunableAudioScheduledSourceNode = AudioScheduledSourceNode & Pick<OscillatorNode, 'detune'>
 
 export abstract class Voice {
-
 	protected static _nextId = 0
 	public readonly id: number
 	public playingNote: number = -1
@@ -80,6 +78,7 @@ export abstract class Voice {
 		this.getAudioScheduledSourceNode()!.detune.value = detune
 	}
 
+	// eslint-disable-next-line class-methods-use-this
 	public setLowPassFilterCutoffFrequency(frequency: number) {
 		// if (frequency === this._lowPassFilter.frequency.value) return
 
@@ -191,7 +190,6 @@ export abstract class Voice {
 			// if before, need to redo all release stuff
 
 			if (newReleaseStartTime >= this._scheduledReleaseStartTimeSeconds) {
-
 				const originalReleaseEndTime = this._scheduledReleaseEndTimeSeconds
 				const originalReleaseLength = originalReleaseEndTime - this._scheduledReleaseStartTimeSeconds
 
@@ -286,10 +284,11 @@ export abstract class Voice {
 		this._isReleaseScheduled = true
 	}
 
+	// eslint-disable-next-line class-methods-use-this
 	public changeScheduledAttack(newAttackSeconds: number) {
 		// Can't do this until this chrome bug is fixed:
 		// https://bugs.chromium.org/p/chromium/issues/detail?id=904244
-		return
+		// return
 
 		// If attack already finished
 		// if (this.scheduledEnvelope!.attackEnd < this._audioContext.currentTime) return

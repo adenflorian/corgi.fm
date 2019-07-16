@@ -54,16 +54,18 @@ const joint = 8
 
 export const ConnectionView =
 	React.memo(function _ConnectionView(props: IConnectionViewAllProps) {
-		const {color, saturateSource, saturateTarget, id, sourceX, sourceY, targetX, targetY,
+		const {
+			color, saturateSource, saturateTarget, id, sourceX, sourceY, targetX, targetY,
 			targetStackOrder = 0, sourceStackOrder = 0, speed = 1, lineType,
-			isSourcePlaying, highQuality, localClientId, connection} = props
+			isSourcePlaying, highQuality, localClientId, connection,
+		} = props
 
 		const dispatch = useDispatch()
 
 		const sourceConnectorLeft = sourceX + (connectorWidth * sourceStackOrder)
 		const sourceConnectorRight = sourceX + connectorWidth + (connectorWidth * sourceStackOrder)
 		const targetConnectorLeft = targetX - connectorWidth - (connectorWidth * targetStackOrder)
-		const targetConnectorRight = targetX - (connectorWidth * targetStackOrder)
+		// const targetConnectorRight = targetX - (connectorWidth * targetStackOrder)
 
 		const connectedLine = new LineState(
 			sourceConnectorRight,
@@ -163,7 +165,7 @@ export const ConnectionView =
 	})
 
 export function makeCurvedPath(line: LineState) {
-	const distance = Math.sqrt(Math.pow((line.x1 - line.x2), 2) + Math.pow((line.y1 - line.y2), 2))
+	const distance = Math.sqrt(((line.x1 - line.x2) ** 2) + ((line.y1 - line.y2) ** 2))
 	// const diff2 = Math.abs((line.x2 - line.x1) / 10)
 
 	const curveStrength2 = distance / 4
@@ -198,7 +200,7 @@ export const ConnectedConnectionView = shamuConnect(
 			speed: 120,
 			// Disabled for now because of performance issues
 			// speed: globalClockState.bpm,
-			highQuality: selectOption(state, AppOptions.graphics_fancyConnections) as boolean,
+			highQuality: selectOption(state, AppOptions.graphicsFancyConnections) as boolean,
 			isSourcePlaying: getConnectionNodeInfo(connection.sourceType)
 				.selectIsPlaying(state.room, connection.sourceId),
 			localClientId: selectLocalClientId(state),

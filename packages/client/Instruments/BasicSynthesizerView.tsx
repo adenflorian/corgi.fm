@@ -7,20 +7,16 @@ import {allBuiltInBQFilterTypes, BuiltInBQFilterType, LfoOscillatorType, ShamuOs
 import {
 	BasicSynthesizerParam, getConnectionNodeInfo,
 	selectBasicSynthesizer, setBasicSynthesizerOscillatorType,
-	setBasicSynthesizerParam,
-	SynthLfoTarget,
+	setBasicSynthesizerParam, SynthLfoTarget, IClientAppState,
 } from '@corgifm/common/redux'
-import {IClientAppState} from '@corgifm/common/redux'
 import {
 	adsrValueToString, attackToolTip, decayToolTip, detuneToolTip, detuneValueToString,
-	filterAttackToolTip, filterDecayToolTip, filterReleaseToolTip, filterSustainToolTip,
 	filterToolTip, filterValueToString, gainToolTip, lfoRateValueToString,
-	panToolTip, panValueToString, percentageValueString, releaseToolTip, seqRateValueToString, sustainToolTip,
+	panToolTip, panValueToString, percentageValueString, releaseToolTip, sustainToolTip,
 } from '../client-constants'
 import {Knob} from '../Knob/Knob'
 import {KnobSnapping} from '../Knob/KnobSnapping'
 import {Panel} from '../Panel/Panel'
-import {rateValues} from '../WebAudio'
 import {ConnectedNoteSchedulerVisualPlaceholder} from '../WebAudio/SchedulerVisual'
 import {BasicSynthesizerOscillatorTypes} from './BasicSynthesizerOscillatorTypes'
 import './BasicSynthesizerView.less'
@@ -58,7 +54,6 @@ interface IBasicSynthesizerViewReduxProps {
 
 export class BasicSynthesizerView
 	extends React.PureComponent<IBasicSynthesizerViewAllProps> {
-
 	public static defaultProps = {
 		pan: 0,
 	}
@@ -186,7 +181,7 @@ export class BasicSynthesizerView
 								onChange={this._dispatchChangeInstrumentParam}
 								label="Rate"
 								onChangeId={BasicSynthesizerParam.lfoRate}
-								tooltip={'how fast it wobble'}
+								tooltip="how fast it wobble"
 								valueString={lfoRateValueToString}
 							/>
 							{/* <KnobSnapping
@@ -207,7 +202,7 @@ export class BasicSynthesizerView
 								onChange={this._dispatchChangeInstrumentParam}
 								label="Amount"
 								onChangeId={BasicSynthesizerParam.lfoAmount}
-								tooltip={'how big it wobble'}
+								tooltip="how big it wobble"
 								valueString={percentageValueString}
 							/>
 							<KnobSnapping
@@ -216,7 +211,7 @@ export class BasicSynthesizerView
 								onChange={this._dispatchChangeInstrumentParam}
 								label="Wave"
 								onChangeId={BasicSynthesizerParam.lfoWave}
-								tooltip={'the shape of the wobble'}
+								tooltip="the shape of the wobble"
 								possibleValues={List<LfoOscillatorType>([
 									LfoOscillatorType.sine,
 									LfoOscillatorType.sawtooth,
@@ -231,7 +226,7 @@ export class BasicSynthesizerView
 								onChange={this._dispatchChangeInstrumentParam}
 								label="Target"
 								onChangeId={BasicSynthesizerParam.lfoTarget}
-								tooltip={'what it wobbles'}
+								tooltip="what it wobbles"
 								possibleValues={List<SynthLfoTarget>([SynthLfoTarget.Gain, SynthLfoTarget.Pan, SynthLfoTarget.Filter])}
 							/>
 						</div>

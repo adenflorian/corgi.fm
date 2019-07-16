@@ -3,10 +3,10 @@ import {combineReducers, Reducer} from 'redux'
 import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
 import {ConnectionNodeType, Id} from '../common-types'
+import {shamuMetaReducer} from './shamu-graph'
 import {
 	BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION,
 } from './index'
-import {shamuMetaReducer} from './shamu-graph'
 
 export const SET_ENABLED_NODE = 'SET_ENABLED_NODE'
 

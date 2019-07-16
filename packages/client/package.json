@@ -2,9 +2,11 @@
 	"name": "@corgifm/web",
 	"version": "0.4.40",
 	"license": "UNLICENSED",
+	"private": true,
 	"scripts": {},
 	"dependencies": {
 		"@sentry/browser": "^5.5.0",
+		"@sentry/integrations": "^5.5.0",
 		"autoprefixer": "^9.4.2",
 		"babel-polyfill": "^6.26.0",
 		"common-tags": "^1.8.0",
@@ -29,6 +31,7 @@
 		"redux-devtools-extension": "^2.13.7",
 		"socket.io": "^2.1.1",
 		"soundbank-reverb": "^1.1.2",
+		"typesafe-actions": "^3.0.0",
 		"uuid": "^3.3.2",
 		"victor": "^1.1.0"
 	},

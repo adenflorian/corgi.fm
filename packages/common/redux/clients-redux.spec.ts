@@ -1,9 +1,7 @@
-import {expect} from 'chai'
 import * as sinon from 'sinon'
+import * as uuid from 'uuid'
 import * as shamuColor from '../shamu-color'
 import {addClient, clientsReducer, ClientState} from './index'
-
-import * as uuid from 'uuid'
 
 describe('clients-redux', () => {
 	describe('clientsReducer', () => {
@@ -62,7 +60,7 @@ describe('clients-redux', () => {
 			tests.forEach(test => {
 				it(test.name, () => {
 					expect(clientsReducer(test.initialState(), test.action()))
-						.to.deep.equal(test.expectedState())
+						.toEqual(test.expectedState())
 				})
 			})
 		})

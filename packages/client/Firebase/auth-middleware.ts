@@ -10,11 +10,10 @@ export const createAuthMiddleware:
 	(firebase: FirebaseContextStuff) => Middleware<{}, IClientAppState> =
 	(firebase: FirebaseContextStuff) => ({dispatch, getState}) =>
 		next => async (action: AuthMiddlewareActions) => {
-
 			next(action)
 
 			switch (action.type) {
-				case AUTH_ON_REGISTER: return await onAuthRegister()
+				case AUTH_ON_REGISTER: return onAuthRegister()
 				default: return
 			}
 

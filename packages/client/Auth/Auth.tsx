@@ -1,6 +1,5 @@
 import * as firebase from 'firebase/app'
-import {useCallback, useState} from 'react'
-import React, {Fragment} from 'react'
+import React, {Fragment, useCallback, useState} from 'react'
 import {
 	IoLogoFacebook as Facebook, IoLogoGoogle as Google,
 } from 'react-icons/io'
@@ -87,13 +86,13 @@ export const AuthModalContent: ModalContent = ({hideModal}) => {
 							<input
 								type="submit"
 								className="button register"
-								value={'Register / Login'}
+								value="Register / Login"
 								disabled={inputsDisabled}
 							/>
 							<input
 								type="button"
 								className="button resetPassword"
-								value={'Reset Password'}
+								value="Reset Password"
 								disabled={inputsDisabled}
 								onClick={handleResetPassword}
 								readOnly
@@ -118,20 +117,24 @@ export const AuthModalContent: ModalContent = ({hideModal}) => {
 				</div>
 				<div className="modalSectionContent providers">
 					<button
+						type="button"
 						className="button google"
 						disabled={inputsDisabled}
 						onClick={() => handleProviderLogin(
 							firebase.auth.GoogleAuthProvider)}
 					>
-						<Google /><span>Sign in with Google</span>
+						<Google />
+						<span>Sign in with Google</span>
 					</button>
 					<button
+						type="button"
 						className="button facebook"
 						disabled={inputsDisabled}
 						onClick={() => handleProviderLogin(
 							firebase.auth.FacebookAuthProvider)}
 					>
-						<Facebook /><span>Sign in with Facebook</span>
+						<Facebook />
+						<span>Sign in with Facebook</span>
 					</button>
 				</div>
 			</div>
@@ -146,12 +149,12 @@ export const AuthModalContent: ModalContent = ({hideModal}) => {
 			firebaseContext.auth.signInWithEmailAndPassword(email, password))
 	}
 
-	function handleProviderLogin(authProviderMaker: AuthProviderMaker) {
+	function handleProviderLogin(AuthProviderMaker: AuthProviderMaker) {
 		disableInputs()
 
 		return handleLoginPromise(
 			firebaseContext.auth.signInWithPopup(
-				new authProviderMaker()))
+				new AuthProviderMaker()))
 	}
 
 	function handleLoginPromise(

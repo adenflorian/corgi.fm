@@ -1,5 +1,4 @@
-import React, {useCallback} from 'react'
-import {Fragment} from 'react'
+import React, {Fragment, useCallback} from 'react'
 import {useDispatch, useSelector} from 'react-redux'
 import {
 	AppOptions, IClientAppState, LineType, ModalId,
@@ -35,7 +34,7 @@ const selectProps = (state: IClientAppState) => {
 	}
 }
 
-export const OptionsModalContent: ModalContent = ({}) => {
+export const OptionsModalContent: ModalContent = () => {
 	const {isLocalClientRoomOwner, onlyOwnerCanDoStuff} =
 		useSelector(selectProps)
 
@@ -43,7 +42,7 @@ export const OptionsModalContent: ModalContent = ({}) => {
 		<Fragment>
 			<div className="modalSection options localOptions">
 				<div className="modalSectionLabel">Local Options</div>
-				<div className="modalSectionSubLabel">won't affect anyone else</div>
+				<div className="modalSectionSubLabel">{`won't affect anyone else`}</div>
 				<div className="modalSectionContent">
 					<ConnectedOption
 						option={AppOptions.showNoteNamesOnKeyboard}
@@ -62,15 +61,15 @@ export const OptionsModalContent: ModalContent = ({}) => {
 						label="note scheduler debug: keep rendering even when song is stopped"
 					/>
 					<ConnectedOption
-						option={AppOptions.graphics_fancyConnections}
+						option={AppOptions.graphicsFancyConnections}
 						label="graphics: enable fancy connections"
 					/>
 					<ConnectedOption
-						option={AppOptions.graphics_ECS}
+						option={AppOptions.graphicsECS}
 						label="graphics: enable ECS animations (sequencer time marker thing)"
 					/>
 					<ConnectedOption
-						option={AppOptions.graphics_expensiveZoomPan}
+						option={AppOptions.graphicsExpensiveZoomPan}
 						label="graphics: enable expensive/fancy zoom and pan (sharper render, but slower)"
 					/>
 				</div>
@@ -94,8 +93,6 @@ export const OptionsModalContent: ModalContent = ({}) => {
 								))}
 							valueSelector={state =>
 								selectRoomSettings(state.room).lineType === LineType.Straight
-									? true
-									: false
 							}
 						/>
 						{isLocalClientRoomOwner &&

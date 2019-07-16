@@ -3,15 +3,16 @@ import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 import {applyOctave, getKeyByValue} from '@corgifm/common/common-utils'
 import {IMidiNotes} from '@corgifm/common/MidiNote'
-import {selectClientById, selectLocalClient} from '@corgifm/common/redux'
-import {IClientAppState} from '@corgifm/common/redux'
-import {selectVirtualKeyboardById, virtualKeyPressed, virtualKeyUp} from '@corgifm/common/redux'
+import {Octave} from '@corgifm/common/common-types'
+import {
+	selectClientById, selectLocalClient, IClientAppState,
+	selectVirtualKeyboardById, virtualKeyPressed, virtualKeyUp,
+} from '@corgifm/common/redux'
 import {isLeftMouseButtonDown} from '../client-utils'
 import {keyToMidiMap} from '../input-events'
 import {Panel} from '../Panel/Panel'
 import {KeyColor, keyColors, NoteNameSharps} from '../WebAudio/music-functions'
 import './Keyboard.less'
-import {Octave} from '@corgifm/common/common-types';
 
 const defaultNumberOfKeys = 17
 
@@ -73,10 +74,6 @@ export class Keyboard extends React.PureComponent<IKeyboardAllProps, IKeyboardSt
 		wasMouseClickedOnKeyboard: false,
 	}
 
-	constructor(props: IKeyboardAllProps) {
-		super(props)
-	}
-
 	public componentDidMount() {
 		if (this.props.isLocal) {
 			window.removeEventListener('mouseup', this.handleWindowMouseUp)
@@ -89,8 +86,10 @@ export class Keyboard extends React.PureComponent<IKeyboardAllProps, IKeyboardSt
 	}
 
 	public render() {
-		const {ownerName, pressedMidiKeys, octave, color, isPlaying,
-			virtualMidiKeyboard, isLocal, showNoteNames} = this.props
+		const {
+			ownerName, pressedMidiKeys, octave, color, isPlaying,
+			virtualMidiKeyboard, isLocal, showNoteNames,
+		} = this.props
 
 		const isOwnerNameTooLong = ownerName.length > maxUsernameDisplayLength
 
@@ -112,7 +111,8 @@ export class Keyboard extends React.PureComponent<IKeyboardAllProps, IKeyboardSt
 					</div>
 					{isLocal &&
 						<div className="octaveKeys smallText">
-							<span>z</span><span>x</span>
+							<span>z</span>
+							<span>x</span>
 						</div>
 					}
 				</div>
@@ -122,7 +122,9 @@ export class Keyboard extends React.PureComponent<IKeyboardAllProps, IKeyboardSt
 						.some(x => x === index)
 
 					return (
+						// eslint-disable-next-line jsx-a11y/mouse-events-have-key-events
 						<div
+							// eslint-disable-next-line react/no-array-index-key
 							key={index}
 							className={`key ${value.color} ${isKeyPressed ? 'pressed' : 'notPressed'}`}
 							onMouseOver={e => this.handleMouseOver(e, index)}

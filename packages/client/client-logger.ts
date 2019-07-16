@@ -1,5 +1,5 @@
-import {eventError} from './analytics/analytics'
 import {logger as commonLogger} from '@corgifm/common/logger'
+import {eventError} from './analytics/analytics'
 
 export const logger = {
 	error: (...args: any[]) => {

@@ -98,6 +98,8 @@ export class MidiRange {
 
 	public normalize(max: number) {
 		return new MidiRange(
+			// TODO
+			// eslint-disable-next-line no-mixed-operators
 			((this.start * midiPrecision) % (max * midiPrecision) / midiPrecision),
 			this.length,
 		)

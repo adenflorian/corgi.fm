@@ -4,11 +4,13 @@ import {ConnectionNodeType, IConnectable, Id} from '@corgifm/common/common-types
 import {
 	BasicSamplerState, BasicSynthesizerState, IClientAppState,
 	IClientRoomState, IConnection, isAudioNodeType,
-	MASTER_AUDIO_OUTPUT_TARGET_ID, selectAllBasicSynthesizerIds, selectAllSamplerIds,
-	selectAllSimpleCompressorIds, selectAllSimpleDelayIds,
+	MASTER_AUDIO_OUTPUT_TARGET_ID, selectAllBasicSynthesizerIds,
+	selectAllSamplerIds, selectAllSimpleCompressorIds, selectAllSimpleDelayIds,
 	selectAllSimpleReverbIds, selectBasicSynthesizer,
-	selectConnectionsWithSourceIds, selectGlobalClockState, selectPosition,
-	selectSampler, selectSimpleCompressor, selectSimpleDelay, selectSimpleReverb, SimpleCompressorState, SimpleDelayState, SimpleReverbState,
+	selectConnectionsWithSourceIds, selectPosition,
+	selectSampler, selectSimpleCompressor, selectSimpleDelay,
+	selectSimpleReverb, SimpleCompressorState, SimpleDelayState,
+	SimpleReverbState,
 } from '@corgifm/common/redux'
 import {
 	AudioNodeWrapper, IAudioNodeWrapperOptions, IInstrumentOptions,
@@ -79,7 +81,7 @@ export const setupInstrumentManager = (
 
 		previousState = state
 
-		const bpm = selectGlobalClockState(state.room).bpm
+		// const bpm = selectGlobalClockState(state.room).bpm
 
 		handleSamplers()
 		handleBasicSynthesizers()
@@ -319,6 +321,7 @@ export const setupInstrumentManager = (
 
 	function createIfNotExisting<T>(nodeType: ConnectionNodeType, id: string, thing: any, thingFactory: () => T): T {
 		if (thing === undefined) {
+			// eslint-disable-next-line no-param-reassign
 			thing = thingFactory()
 			stuffMaps = stuffMaps.set(
 				nodeType,

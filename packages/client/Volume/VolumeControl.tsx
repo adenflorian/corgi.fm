@@ -1,12 +1,12 @@
 import {stripIndents} from 'common-tags'
-import React from 'react'
-import {Component} from 'react'
+import React, {Component} from 'react'
 import {connect} from 'react-redux'
 import {Action, Dispatch} from 'redux'
 import {ConnectionNodeType} from '@corgifm/common/common-types'
-import {setOptionMasterVolume} from '@corgifm/common/redux'
-import {getConnectionNodeInfo, IClientAppState} from '@corgifm/common/redux'
-import {MASTER_AUDIO_OUTPUT_TARGET_ID} from '@corgifm/common/redux'
+import {
+	setOptionMasterVolume, getConnectionNodeInfo, IClientAppState,
+	MASTER_AUDIO_OUTPUT_TARGET_ID,
+} from '@corgifm/common/redux'
 import {limiterRenderSystemConstants, percentageValueString} from '../client-constants'
 import {Knob} from '../Knob/Knob'
 import {Panel} from '../Panel/Panel'

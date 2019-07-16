@@ -1,15 +1,15 @@
 import {List, Map, Set} from 'immutable'
 import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
-import uuid = require('uuid')
 import {ConnectionNodeType, Id, IMultiStateThing, isSequencerNodeType} from '../common-types'
 import {makeMidiClip, makeMidiClipEvent, MidiClip, MidiClipEvent, MidiClipEvents} from '../midi-types'
 import {emptyMidiNotes, IMidiNote, MidiNotes} from '../MidiNote'
-import {colorFunc, hashbow} from '../shamu-color'
 import {selectAllConnections, selectConnectionsWithSourceIds, selectConnectionsWithTargetIds} from './connections-redux'
 import {selectGlobalClockIsPlaying} from './global-clock-redux'
-import {BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION} from './index'
 import {NodeSpecialState} from './shamu-graph'
+import {BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION} from './index'
+
+import uuid = require('uuid')
 
 export const CLEAR_SEQUENCER = 'CLEAR_SEQUENCER'
 export const UNDO_SEQUENCER = 'UNDO_SEQUENCER'
@@ -99,7 +99,7 @@ export const createSequencerEvents = (length: number, ratio = 1): MidiClipEvents
 }
 
 export const makeSequencerEvents =
-	(x: MidiClipEvent[] | List<MidiClipEvent> = Array<MidiClipEvent>()): MidiClipEvents => List<MidiClipEvent>(x)
+	(x: MidiClipEvent[] | List<MidiClipEvent> = List<MidiClipEvent>()): MidiClipEvents => List<MidiClipEvent>(x)
 
 export function deserializeEvents(events: MidiClipEvents): MidiClipEvents {
 	return makeSequencerEvents(events.map(x => ({...x, notes: MidiNotes(x.notes)})))

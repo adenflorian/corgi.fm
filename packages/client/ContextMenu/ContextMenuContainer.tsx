@@ -116,7 +116,7 @@ const BackgroundMenuItems = React.memo(
 						} else {
 							// Be careful when changing the id to be local client
 							// The server currently deletes most things that a user owns when they disconnect
-							const newState = new nodeInfo.stateConstructor(serverClientId)
+							const newState = new nodeInfo.StateConstructor(serverClientId)
 							dispatch(nodeInfo.addNodeActionCreator(newState))
 							createPosition(dispatch, newState, e)
 							if (nodeInfo.autoConnectToClock) {
@@ -197,7 +197,7 @@ const NodeMenuItems = React.memo(function _MenuItems({nodeType}: NodeMenuItemsPr
 					title: 'dew it',
 				}}
 			>
-				🔪
+				<span role="img" aria-label="delete">🔪</span>
 			</MenuItem>,
 			deleteMenuLabels,
 		)
@@ -210,20 +210,22 @@ const NodeMenuItems = React.memo(function _MenuItems({nodeType}: NodeMenuItemsPr
 				dispatch(localActions.cloneNode(nodeId, nodeType, withConnections))
 			}
 
-		return <SubMenu
-			title={<div>Clone...</div>}
-			hoverDelay={hoverDelayMs}
-		>
-			<MenuItem onClick={onClick('all')}>
-				With all connections
-			</MenuItem>
-			<MenuItem onClick={onClick('none')}>
-				With no connections
-			</MenuItem>
-			<MenuItem onClick={onClick('default')}>
-				With default connections
-			</MenuItem>
-		</SubMenu>
+		return (
+			<SubMenu
+				title={<div>Clone...</div>}
+				hoverDelay={hoverDelayMs}
+			>
+				<MenuItem onClick={onClick('all')}>
+					With all connections
+				</MenuItem>
+				<MenuItem onClick={onClick('none')}>
+					With no connections
+				</MenuItem>
+				<MenuItem onClick={onClick('default')}>
+					With default connections
+				</MenuItem>
+			</SubMenu>
+		)
 	}
 
 	function generateDeleteSubMenus(tree: React.ReactElement<any>, labels: List<string>): React.ReactElement<any> {
@@ -249,7 +251,7 @@ const NodeMenuItems = React.memo(function _MenuItems({nodeType}: NodeMenuItemsPr
 	function DontDeleteMeMenuItem() {
 		return (
 			<MenuItem disabled>
-				I'M INVINCIBLE
+				{`I'M INVINCIBLE`}
 			</MenuItem>
 		)
 	}

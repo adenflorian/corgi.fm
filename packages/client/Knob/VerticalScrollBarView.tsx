@@ -16,7 +16,7 @@ export const VerticalScrollBarView = (props: IVerticalScrollBarViewProps) => {
 
 	return (
 		<div
-			className={`verticalScrollBar`}
+			className="verticalScrollBar"
 			style={{
 				width: 16,
 				position: 'relative',

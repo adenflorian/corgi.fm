@@ -1,4 +1,3 @@
-import {expect} from 'chai'
 import {isProdServer} from './is-prod-server'
 
 describe('is-prod-server', () => {
@@ -24,7 +23,7 @@ describe('is-prod-server', () => {
 		].forEach(test => {
 			it(test.CORGI_ENV, () => {
 				process.env.CORGI_ENV = test.CORGI_ENV
-				expect(isProdServer()).to.equal(test.expected)
+				expect(isProdServer()).toEqual(test.expected)
 			})
 		})
 	})

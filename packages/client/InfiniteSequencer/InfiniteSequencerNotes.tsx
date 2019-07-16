@@ -1,3 +1,4 @@
+/* eslint-disable react/no-array-index-key */
 import {stripIndents} from 'common-tags'
 import React, {useLayoutEffect, useState} from 'react'
 import {useDispatch} from 'react-redux'
@@ -27,8 +28,9 @@ type AllProps = Props & ReduxProps
 const sensitivity = 0.1
 const threshold = 1
 
-export function InfiniteSequencerNotes({id, style, events, showRows}: AllProps) {
-
+export function InfiniteSequencerNotes(
+	{id, style, events, showRows}: AllProps
+) {
 	const dispatch = useDispatch()
 	const [selectedEvent, setSelectedEvent] = useState({
 		isSelected: false,
@@ -116,7 +118,6 @@ export function InfiniteSequencerNotes({id, style, events, showRows}: AllProps) 
 		} else {
 			setMouseDelta(newMouseDelta)
 		}
-
 	}
 
 	if (style === InfiniteSequencerStyle.colorBars) {
@@ -127,9 +128,9 @@ export function InfiniteSequencerNotes({id, style, events, showRows}: AllProps) 
 						const note = event.notes.first(-1)
 
 						return (
-							< div
+							<div
 								key={index}
-								className={`event usernameFont colorBars`}
+								className="event usernameFont colorBars"
 								style={{
 									backgroundColor: note === -1 ? 'none' : getColorStringForMidiNote(note),
 									borderRadius: 4,
@@ -192,7 +193,7 @@ const ColorGridNote = React.memo(
 	) {
 		return (
 			<div
-				className={`event noDrag`}
+				className="event noDrag"
 				onMouseDown={e => onMouseDown(e, note, index)}
 				onMouseEnter={e => onMouseEnter(e, note, index)}
 				title={stripIndents`Left click and drag to play notes
@@ -201,7 +202,7 @@ const ColorGridNote = React.memo(
 				onContextMenu={e => e.preventDefault()}
 			>
 				<div
-					className={`note`}
+					className="note"
 					style={{
 						backgroundColor: note === -1 ? 'none' : getColorStringForMidiNote(note),
 						height: `${height}%`,

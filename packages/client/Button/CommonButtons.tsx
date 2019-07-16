@@ -23,7 +23,8 @@ export function NewRoomButton({onClick}: {onClick?: () => any}) {
 			}}
 			onClick={handleClick}
 		>
-			<IoMdAddCircle /> New Room
+			<IoMdAddCircle />
+			New Room
 		</Button>
 	)
 }

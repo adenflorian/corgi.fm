@@ -7,15 +7,15 @@ import {logger} from '../logger'
 import {makeMidiClipEvent, MidiClip} from '../midi-types'
 import {IMidiNote, MidiNotes} from '../MidiNote'
 import {
-	addMultiThing, BROADCASTER_ACTION, CLEAR_SEQUENCER, createSequencerEvents, IClientRoomState, IMultiState,
-	IMultiStateThings, makeMultiReducer, NetworkActionType, PLAY_ALL, selectGlobalClockState,
-	SERVER_ACTION, SKIP_NOTE, STOP_ALL, UNDO_SEQUENCER, VIRTUAL_KEY_PRESSED,
-} from './index'
-import {
 	deserializeSequencerState, PLAY_SEQUENCER, RECORD_SEQUENCER_NOTE, RECORD_SEQUENCER_REST,
 	selectAllInfiniteSequencers, SequencerAction, SequencerStateBase, STOP_SEQUENCER, TOGGLE_SEQUENCER_RECORDING,
 } from './sequencer-redux'
 import {VirtualKeyPressedAction} from './virtual-keyboard-redux'
+import {
+	addMultiThing, BROADCASTER_ACTION, CLEAR_SEQUENCER, createSequencerEvents, IClientRoomState, IMultiState,
+	IMultiStateThings, makeMultiReducer, NetworkActionType, PLAY_ALL, selectGlobalClockState,
+	SERVER_ACTION, SKIP_NOTE, STOP_ALL, UNDO_SEQUENCER, VIRTUAL_KEY_PRESSED,
+} from './index'
 
 export const addInfiniteSequencer = (infiniteSequencer: InfiniteSequencerState) =>
 	addMultiThing(infiniteSequencer, ConnectionNodeType.infiniteSequencer, NetworkActionType.SERVER_AND_BROADCASTER)

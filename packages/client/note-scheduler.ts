@@ -55,7 +55,7 @@ export function getEvents(clip: MidiClip, initialRange: MidiRange, rate: number)
 		if (_range.length <= clipLength) {
 			const {start, end} = _range.normalize(clipLength)
 
-			return 0 <= start && end <= clipLength
+			return start >= 0 && end <= clipLength
 		} else {
 			return false
 		}

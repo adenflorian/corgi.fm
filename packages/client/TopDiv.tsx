@@ -5,9 +5,8 @@ import {
 	IClientState, organizeGraph,
 	selectClientById, selectLocalClientId, selectMemberCount,
 	selectRoomSettings,
+	selectClientInfo, shamuConnect, selectClientCount,
 } from '@corgifm/common/redux'
-import {selectClientInfo, shamuConnect} from '@corgifm/common/redux'
-import {selectClientCount} from '@corgifm/common/redux'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {
 	eventOrganizeRoomButtonClick,
@@ -43,7 +42,6 @@ export const TopDiv = ({
 	memberCount, clientCount, info, isClientReady,
 	roomOwner, onlyOwnerCanDoStuff, isLocalClientRoomOwner,
 }: AllProps) => {
-
 	const dispatch = useDispatch()
 
 	return (
@@ -81,14 +79,16 @@ export const TopDiv = ({
 							{roomOwner.name}
 						</span>
 						{isLocalClientRoomOwner
-							? <span
-								style={{
-									marginLeft: 8,
-									color: CssColor.disabledGray,
-								}}
-							>
-								(You)
-							</span>
+							? (
+								<span
+									style={{
+										marginLeft: 8,
+										color: CssColor.disabledGray,
+									}}
+								>
+									(You)
+								</span>
+							)
 							: ''}
 					</div>
 				</div>
@@ -157,7 +157,7 @@ export const TopDiv = ({
 					onClick={
 						() => {
 							if (
-								confirm('Are you sure you want to delete all '
+								window.confirm('Are you sure you want to delete all '
 									+ 'nodes with no connections in this room?'
 									+ '\nThis cannot be undone!')
 							) {
@@ -177,30 +177,32 @@ export const TopDiv = ({
 				>
 					Prune Room
 				</Button>
-				{false && <Button
-					onClick={
-						() => {
-							if (
-								confirm('Are you sure you want to organize all '
-									+ 'nodes in this room?'
-									+ '\nThis cannot be undone!')
-							) {
-								dispatch(organizeGraph())
-								eventOrganizeRoomConfirmed()
+				{false &&
+					<Button
+						onClick={
+							() => {
+								if (
+									window.confirm('Are you sure you want to organize all '
+										+ 'nodes in this room?'
+										+ '\nThis cannot be undone!')
+								) {
+									dispatch(organizeGraph())
+									eventOrganizeRoomConfirmed()
+								}
+								eventOrganizeRoomButtonClick()
 							}
-							eventOrganizeRoomButtonClick()
 						}
-					}
-					buttonProps={{
-						title: 'Will organize nodes'
-							+ (onlyOwnerCanDoStuff && !isLocalClientRoomOwner
-								? '\nOnly room owner can organize at this time'
-								: ''),
-					}}
-					disabled={onlyOwnerCanDoStuff && !isLocalClientRoomOwner}
-				>
-					Organize Room
-				</Button>}
+						buttonProps={{
+							title: 'Will organize nodes'
+								+ (onlyOwnerCanDoStuff && !isLocalClientRoomOwner
+									? '\nOnly room owner can organize at this time'
+									: ''),
+						}}
+						disabled={onlyOwnerCanDoStuff && !isLocalClientRoomOwner}
+					>
+						Organize Room
+					</Button>
+				}
 				<OptionsModalButton />
 				<DiscordLink />
 				<PatreonLink />

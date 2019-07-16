@@ -4,10 +4,10 @@ import {createSelector} from 'reselect'
 import {IClientAppState} from './common-redux-types'
 import {selectAllConnections} from './connections-redux'
 import {selectGlobalClockState} from './global-clock-redux'
-import {SERVER_ACTION} from './index'
 import {selectAllPositions} from './positions-redux'
 import {selectRoomSettings} from './room-settings-redux'
 import {selectShamuGraphState} from './shamu-graph'
+import {SERVER_ACTION} from './index'
 
 export const SET_ROOMS = 'SET_ROOMS'
 export type SetRoomsAction = ReturnType<typeof setRooms>

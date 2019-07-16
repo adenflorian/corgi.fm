@@ -105,7 +105,7 @@ export abstract class AudioNodeWrapper implements IDisposable {
 
 		this._passthroughModeEnabled = passthroughModeEnabled
 
-		this._passthroughModeEnabled
+		return this._passthroughModeEnabled
 			? this._enablePassthroughMode()
 			: this._disablePassThroughMode()
 	}
@@ -215,6 +215,7 @@ export abstract class AudioNodeWrapper implements IDisposable {
 		input.connect(output)
 	}
 
+	// eslint-disable-next-line no-empty-function
 	public readonly syncOscillatorStartTimes = (startTime: number, bpm: number) => {}
 }
 
@@ -223,7 +224,7 @@ function detectFeedbackLoop(nodeWrapper: AudioNodeWrapper, i = 0, nodeIds: List<
 	if (i > 500) return true
 
 	// TODO Why is netNodeIds unused?
-	const netNodeIds = nodeIds.push(nodeWrapper.id)
+	// const netNodeIds = nodeIds.push(nodeWrapper.id)
 
 	if (nodeWrapper.getConnectedTargets().count() === 0) return false
 

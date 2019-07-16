@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import React from 'react'
 import {
 	IoMdDownload as Download, IoMdPlay as Play, IoMdRecording as Record,

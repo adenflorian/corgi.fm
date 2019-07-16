@@ -29,23 +29,25 @@ interface IMasterControlsDispatchProps {
 }
 
 export const MasterControls: React.FC<IMasterControlsProps & IMasterControlsReduxProps & IMasterControlsDispatchProps> =
-	React.memo(function _MasterControls({onPlay, restart, onStop, setField, masterClockState, color}) {
-
-		const knobs = <div className="knobs">
-			<KnobIncremental
-				label="Tempo"
-				min={1}
-				max={999}
-				value={masterClockState.bpm}
-				defaultValue={120}
-				onChange={(_, bpm) => setField({bpm})}
-				tooltip="Beats per minute"
-				valueString={v => `${v.toFixed(2).replace('.00', '')} bpm`}
-				increment={1}
-				fineIncrement={0.01}
-				allowAltKey={true}
-			/>
-			{/* <Knob
+	React.memo(function _MasterControls(
+		{onPlay, restart, onStop, setField, masterClockState, color}
+	) {
+		const knobs = (
+			<div className="knobs">
+				<KnobIncremental
+					label="Tempo"
+					min={1}
+					max={999}
+					value={masterClockState.bpm}
+					defaultValue={120}
+					onChange={(_, bpm) => setField({bpm})}
+					tooltip="Beats per minute"
+					valueString={v => `${v.toFixed(2).replace('.00', '')} bpm`}
+					increment={1}
+					fineIncrement={0.01}
+					allowAltKey={true}
+				/>
+				{/* <Knob
 				label="Max Read Ahead"
 				min={0.0001}
 				max={5}
@@ -53,7 +55,8 @@ export const MasterControls: React.FC<IMasterControlsProps & IMasterControlsRedu
 				value={masterClockState.maxReadAheadSeconds}
 				onChange={(_, maxReadAheadSeconds) => setField({maxReadAheadSeconds})}
 			/> */}
-		</div>
+			</div>
+		)
 
 		return (
 			<Panel

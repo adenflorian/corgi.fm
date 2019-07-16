@@ -1,6 +1,5 @@
 import {List} from 'immutable'
-import React from 'react'
-import {Component} from 'react'
+import React, {Component} from 'react'
 import {changeRoom, selectActiveRoom, selectAllRoomNames, shamuConnect} from '@corgifm/common/redux'
 import {Select} from './Select/Select'
 
@@ -16,7 +15,7 @@ interface IRoomSelectorDispatchProps {
 type IRoomSelectorAllProps = IRoomSelectorReduxProps & IRoomSelectorDispatchProps
 
 export class RoomSelector extends Component<IRoomSelectorAllProps> {
-	public readonly render = () =>
+	public readonly render = () => (
 		<Select
 			label="Room"
 			name="roomSelect"
@@ -24,6 +23,7 @@ export class RoomSelector extends Component<IRoomSelectorAllProps> {
 			options={this.props.rooms}
 			value={this.props.activeRoom}
 		/>
+	)
 
 	private readonly onRoomSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
 		const newRoom = e.target.value

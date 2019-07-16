@@ -1,3 +1,4 @@
+/* eslint-disable react/no-array-index-key */
 import {List} from 'immutable'
 import React from 'react'
 import {connect} from 'react-redux'
@@ -41,8 +42,10 @@ type IGridSequencerNotesAllProps =
 	IGridSequencerNotesProps & IGridSequencerNotesReduxProps & IGridSequencerNotesDispatchProps
 
 export const GridSequencerNotes = (props: IGridSequencerNotesAllProps) => {
-	const {activeIndex, bottomNote, events, handleNoteClicked,
-		handleMouseEnter, handleMouseDown, notesToShow, handleScrollChange} = props
+	const {
+		activeIndex, bottomNote, events, handleNoteClicked,
+		handleMouseEnter, handleMouseDown, notesToShow, handleScrollChange,
+	} = props
 
 	const marks = events.reduce((allMarks, event) => {
 		return allMarks.concat(event.notes.map(note => note / 127))
@@ -119,12 +122,14 @@ class Event extends React.PureComponent<IEventProps> {
 
 		const placeholderNotesArray = Array.apply(0, new Array(notesToShow))
 
-		return <div
-			key={eventIndex}
-			className={`event ${isActive ? 'active' : 'transitionAllColor'}`}
-		>
-			{placeholderNotesArray.map(this._renderNote)}
-		</div>
+		return (
+			<div
+				key={eventIndex}
+				className={`event ${isActive ? 'active' : 'transitionAllColor'}`}
+			>
+				{placeholderNotesArray.map(this._renderNote)}
+			</div>
+		)
 	}
 
 	private readonly _renderNote = (_: any, i: number) => {

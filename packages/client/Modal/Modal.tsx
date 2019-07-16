@@ -1,5 +1,4 @@
-import React from 'react'
-import {useEffect} from 'react'
+import React, {useEffect} from 'react'
 import './Modal.less'
 
 interface Props {
@@ -25,7 +24,7 @@ export const Modal = React.memo(function _Modal({onHide, children, className = '
 	return (
 		<div className={`modal ${className}`} onMouseDown={onHide}>
 			<div className="modalPanel" onMouseDown={e => e.stopPropagation()}>
-				<div className="modalPanelInner" >
+				<div className="modalPanelInner">
 					{children}
 				</div>
 			</div>

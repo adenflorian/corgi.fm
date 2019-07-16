@@ -1,3 +1,4 @@
+/* eslint-disable no-bitwise */
 import {Store} from 'redux'
 import {logger} from '@corgifm/common/logger'
 import {localMidiKeyPress, localMidiKeyUp} from './local-middleware'
@@ -59,11 +60,14 @@ interface MIDIInput {
 function onMidiSuccess(midiAccess: MidiAccess) {
 	logger.log('success: ', midiAccess)
 
+	// TODO
+	// eslint-disable-next-line no-restricted-syntax
 	for (const input of midiAccess.inputs.values()) {
 		logger.log('input: ', input)
 		input.valueOf().onmidimessage = onMidiMessage
 	}
 
+	// eslint-disable-next-line no-param-reassign
 	midiAccess.onstatechange = onStateChange
 }
 
@@ -89,6 +93,7 @@ function onInputDisconnected(input: MIDIInput) {
 
 function onInputConnected(input: MIDIInput) {
 	logger.log('input connected: ', input)
+	// eslint-disable-next-line no-param-reassign
 	input.valueOf().onmidimessage = onMidiMessage
 }
 
@@ -98,11 +103,8 @@ function onMidiMessage(event: MidiMessageEvent) {
 	// const velocity = message.data[0]
 
 	const data = event.data
-	// tslint:disable-next-line:no-bitwise
 	// const cmd = data[0] >> 4
-	// tslint:disable-next-line:no-bitwise
 	// const channel = data[0] & 0xf
-	// tslint:disable-next-line:no-bitwise
 	const type = data[0] & 0xf0
 	const note = data[1] - 36
 	const velocity = data[2]

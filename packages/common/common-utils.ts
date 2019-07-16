@@ -1,4 +1,5 @@
 import {debounce} from 'lodash'
+
 import uuid = require('uuid')
 
 export function pickRandomArrayElement<T>(array: T[]): T {
@@ -27,27 +28,27 @@ export const rateLimitedDebounce = <T extends (...args: any[]) => any>(
 	func: T,
 	intervalMs: number,
 ) => debounce(
-	func,
-	intervalMs,
-	{
-		leading: true,
-		trailing: true,
-		maxWait: intervalMs,
-	},
-)
+		func,
+		intervalMs,
+		{
+			leading: true,
+			trailing: true,
+			maxWait: intervalMs,
+		},
+	)
 
 export const rateLimitedDebounceNoTrail = <T extends (...args: any[]) => any>(
 	func: T,
 	intervalMs: number,
 ) => debounce(
-	func,
-	intervalMs,
-	{
-		leading: true,
-		trailing: false,
-		maxWait: intervalMs,
-	},
-)
+		func,
+		intervalMs,
+		{
+			leading: true,
+			trailing: false,
+			maxWait: intervalMs,
+		},
+	)
 
 /** Returns a number from 0 to length - 1 */
 export function getNumberInRangeFromString(str: string, length: number) {
@@ -75,4 +76,5 @@ export function removeOctave(midiNumber: number) {
 	return midiNumber % 12
 }
 
+// eslint-disable-next-line no-empty-function
 export const noop = () => {}

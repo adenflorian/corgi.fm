@@ -2,14 +2,13 @@ import {Map} from 'immutable'
 import {combineReducers} from 'redux'
 import {ActionType, StateType} from 'typesafe-actions'
 import {ConnectionNodeType} from '../../common-types'
-import {logger} from '../../logger'
 import {BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION} from '../index'
 import {IMultiState} from '../multi-reducer'
 import {getConnectionNodeInfo} from '../node-types'
+import {makeShamuEdgesState} from './shamu-edges-redux'
 import {
 	edgesReducer, nodesReducer,
 } from './index'
-import {makeShamuEdgesState} from './shamu-edges-redux'
 
 export const REPLACE_SHAMU_GRAPH_STATE = 'REPLACE_SHAMU_GRAPH_STATE'
 export const MERGE_SHAMU_GRAPH_STATE = 'MERGE_SHAMU_GRAPH_STATE'

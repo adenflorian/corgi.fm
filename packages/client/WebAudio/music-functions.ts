@@ -1,8 +1,8 @@
 import {List} from 'immutable'
+import {IMidiNote} from '@corgifm/common/MidiNote'
+import {Octave} from '@corgifm/common/common-types'
 // @ts-ignore
 import {getFrequencyUsingHalfStepsFromA4 as getFrequencyUsingHalfStepsFromA4Rust} from '../client-rust/lib.rs'
-import {IMidiNote} from '@corgifm/common/MidiNote'
-import {Octave} from '@corgifm/common/common-types';
 
 export function getFrequencyUsingHalfStepsFromA4(halfSteps: number) {
 	return getFrequencyUsingHalfStepsFromA4Rust(halfSteps)
@@ -58,13 +58,13 @@ export function roundRate(rawRate: number) {
 	return rateValues.find(x => rawRate <= x) || rateValues.last(4)
 }
 
-function nearestPow2(aSize: number) {
-	return Math.pow(2, Math.round(Math.log(aSize) / Math.log(2)))
-}
+// function nearestPow2(aSize: number) {
+// 	return Math.pow(2, Math.round(Math.log(aSize) / Math.log(2)))
+// }
 
-function nearestPow3(aSize: number) {
-	return Math.pow(6, Math.round(Math.log(aSize) / Math.log(6)))
-}
+// function nearestPow3(aSize: number) {
+// 	return Math.pow(6, Math.round(Math.log(aSize) / Math.log(6)))
+// }
 
 // In beat units
 export const rateValues = List([

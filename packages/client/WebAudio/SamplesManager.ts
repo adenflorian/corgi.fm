@@ -1,6 +1,6 @@
+import {Octave} from '@corgifm/common/common-types'
 import {isLocalDevClient} from '../is-prod-client'
 import {NoteNameSharps} from '../WebAudio/music-functions'
-import {Octave} from '@corgifm/common/common-types';
 
 // const octaveToGet = '4'
 const octavesToGet = [1, 2, 3, 4, 5, 6, 7]
@@ -52,7 +52,7 @@ export class SamplesManager {
 
 				const sample = await fetch(`${getUrl()}/${noteName}-49-96.mp3`)
 					.then(async response => {
-						return await audioContext.decodeAudioData(await response.arrayBuffer())
+						return audioContext.decodeAudioData(await response.arrayBuffer())
 					})
 
 				SamplesManager._samples.set(noteName, sample)

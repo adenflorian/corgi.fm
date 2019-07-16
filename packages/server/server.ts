@@ -3,9 +3,8 @@ import * as socketIO from 'socket.io'
 import {lobby, serverClientId} from '@corgifm/common/common-constants'
 import {logger} from '@corgifm/common/logger'
 import {
-	configureServerStore, createRoomAction, roomSettingsActions,
+	configureServerStore, createRoomAction, roomSettingsActions, createRoom,
 } from '@corgifm/common/redux'
-import {createRoom} from '@corgifm/common/redux'
 import {initSentryServer} from './analytics/sentry-server'
 import {createServerStuff} from './create-server-stuff'
 import {connectDB, DBStore, dummyDb} from './database/database'
@@ -24,7 +23,6 @@ logger.log('getServerEnv: ', getServerEnv())
 start()
 
 async function start() {
-
 	logServerEnv()
 
 	let dbStore: DBStore = dummyDb

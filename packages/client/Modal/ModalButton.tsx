@@ -21,7 +21,8 @@ export function ModalButton({modalId, label, icon: Icon}: Props) {
 		<Button
 			onClick={onClick}
 		>
-			<Icon />{label}
+			<Icon />
+			{label}
 		</Button>
 	)
 }

@@ -18,7 +18,7 @@ class SimpleGlobalClientState {
 	public set zoomDisplay(val) {
 		this._zoomDisplay = val
 		const zoomTextElement = document.getElementById('zoomText')
-		if (zoomTextElement) zoomTextElement.innerText = this._zoomDisplay.toFixed(2).replace(/([^\.])0*$/, '$1')
+		if (zoomTextElement) zoomTextElement.innerText = this._zoomDisplay.toFixed(2).replace(/([^.])0*$/, '$1')
 	}
 
 	public get maxFps() {return this._maxFps}

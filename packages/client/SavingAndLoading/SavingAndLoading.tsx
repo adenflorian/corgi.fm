@@ -1,3 +1,4 @@
+/* eslint-disable react/no-array-index-key */
 import {stripIndents} from 'common-tags'
 import {Map} from 'immutable'
 import moment from 'moment'
@@ -20,7 +21,7 @@ export function LoadRoomModalButton() {
 	)
 }
 
-export const LoadRoomModalContent: ModalContent = ({}) => {
+export const LoadRoomModalContent: ModalContent = () => {
 	const [saveStorage, setSaveStorage] = React.useState(getOrCreateLocalSavesStorage())
 	const dispatch = useDispatch()
 
@@ -29,7 +30,11 @@ export const LoadRoomModalContent: ModalContent = ({}) => {
 	return (
 		<div className="loadRoomUI modalSection localSaves">
 			<div className="modalSectionLabel">Load Room</div>
-			<div className="modalSectionSubLabel">select a saved room to load into a new room<br />will be able to load from a file soon...</div>
+			<div className="modalSectionSubLabel">
+				select a saved room to load into a new room
+				<br />
+				will be able to load from a file soon...
+			</div>
 			<div className="modalSectionContent saves">
 				{saves.count() === 0 &&
 					<div className="noSaves">no saves found</div>

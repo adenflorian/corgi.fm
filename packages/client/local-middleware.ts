@@ -334,7 +334,7 @@ export const createLocalMiddleware: (getAllInstruments: GetAllInstruments) => Mi
 			case SET_LOCAL_CLIENT_NAME: {
 				next(action)
 				dispatch(setClientName(selectLocalClientId(getState()), action.newName))
-				saveUsernameToLocalStorage(action.newName)
+				return saveUsernameToLocalStorage(action.newName)
 			}
 			case SET_ACTIVE_ROOM: {
 				next(action)
@@ -459,7 +459,7 @@ export const createLocalMiddleware: (getAllInstruments: GetAllInstruments) => Mi
 					.toArray()
 
 				dispatch(deleteThingsAny(nodesToDelete, NetworkActionType.SERVER_AND_BROADCASTER))
-				dispatch(deletePositions(nodesToDelete))
+				return dispatch(deletePositions(nodesToDelete))
 			}
 			case SAVE_ROOM_TO_BROWSER: {
 				next(action)
@@ -637,12 +637,10 @@ function scheduleNote(
 		} else {
 			_previousNotesForSourceId = _previousNotesForSourceId.update(sourceId, x => x.add(note))
 		}
+	} else if (previousNotes.includes(note)) {
+		_previousNotesForSourceId = _previousNotesForSourceId.update(sourceId, x => x.remove(note))
 	} else {
-		if (previousNotes.includes(note)) {
-			_previousNotesForSourceId = _previousNotesForSourceId.update(sourceId, x => x.remove(note))
-		} else {
-			return
-		}
+		return
 	}
 
 	// logger.log('[local-middleware.scheduleNote] note: ' + note + ' | onOrOff: ' + onOrOff)
@@ -766,8 +764,8 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 }
 
 function _getDownstreamRecordingSequencers(
-	state: IClientAppState, nodeId: string): List<ISequencerState> {
-
+	state: IClientAppState, nodeId: string
+): List<ISequencerState> {
 	return selectDirectDownstreamSequencerIds(state.room, nodeId)
 		.map(x => selectSequencer(state.room, x))
 		.filter(x => x.isRecording)

@@ -1,3 +1,5 @@
+/* eslint-disable import/no-extraneous-dependencies */
+/* eslint-disable global-require */
 import {logger} from '@corgifm/common/logger'
 
 export async function startInMemoryDB(dbName: string) {
@@ -12,6 +14,6 @@ export async function startInMemoryDB(dbName: string) {
 
 	return {
 		uri,
-		stop: async () => await mongo.stop(),
+		stop: async () => mongo.stop(),
 	}
 }

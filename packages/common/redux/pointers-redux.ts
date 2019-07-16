@@ -1,8 +1,8 @@
 import {List, Map, Record} from 'immutable'
 import {combineReducers} from 'redux'
 import {ActionType} from 'typesafe-actions'
-import {BROADCASTER_ACTION, SERVER_ACTION} from '.'
 import {IClientRoomState} from './common-redux-types'
+import {BROADCASTER_ACTION, SERVER_ACTION} from '.'
 
 export const ADD_POINTER = 'ADD_POINTER'
 export const UPDATE_POINTER = 'UPDATE_POINTER'

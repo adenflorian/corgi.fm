@@ -128,7 +128,7 @@ export class GhostConnectionView extends PureComponent<AllProps, State> {
 					y={anchorConnectorPosition.y}
 				/>
 				<GhostConnectionLine
-					color={'orange'}
+					color="orange"
 					pathDPart1={pathDPart1}
 				/>
 			</div>

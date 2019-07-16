@@ -1,8 +1,9 @@
-import {IInstrumentOptions, Instrument, OnEndedCallback, TunableAudioScheduledSourceNode} from '.'
-import {logger} from '@corgifm/common/logger'
 import {BuiltInOscillatorType, CustomOscillatorType, LfoOscillatorType, ShamuOscillatorType} from '@corgifm/common/OscillatorTypes'
 import {SynthLfoTarget} from '@corgifm/common/redux'
-import {midiNoteToFrequency, Voice, Voices} from './index'
+import {
+	midiNoteToFrequency, Voice, Voices, IInstrumentOptions, Instrument,
+	OnEndedCallback, TunableAudioScheduledSourceNode,
+} from './index'
 
 interface IBasicSynthesizerOptions extends IInstrumentOptions {
 	oscillatorType: ShamuOscillatorType

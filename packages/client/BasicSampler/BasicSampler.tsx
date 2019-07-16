@@ -2,9 +2,9 @@ import React from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 import {allBuiltInBQFilterTypes, BuiltInBQFilterType} from '@corgifm/common/OscillatorTypes'
-import {IClientAppState} from '@corgifm/common/redux'
 import {
-	BasicSamplerParam, getConnectionNodeInfo, selectSampler, setBasicSamplerParam,
+	IClientAppState, BasicSamplerParam, getConnectionNodeInfo, selectSampler,
+	setBasicSamplerParam,
 } from '@corgifm/common/redux'
 import {
 	adsrValueToString, attackToolTip, decayToolTip, detuneToolTip, detuneValueToString,

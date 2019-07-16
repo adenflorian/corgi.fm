@@ -2,11 +2,11 @@ import {List} from 'immutable'
 import {Dispatch} from 'redux'
 import {
 	IClientRoomState, IConnection, selectConnection,
-	selectConnectionsWithSourceIds, selectPosition, updatePosition,
+	selectConnectionsWithSourceIds,
 } from './redux'
 import {CssColor} from './shamu-color'
 
-export function handleAddConnection(roomState: IClientRoomState, dispatch: Dispatch, originalConnection: IConnection) {
+export function handleAddConnection(/* roomState: IClientRoomState, dispatch: Dispatch, originalConnection: IConnection */) {
 	// const sourceColor = selectPosition(roomState, originalConnection.sourceId).color
 
 	// updateConnectionTargetColor(roomState, dispatch, originalConnection, sourceColor)

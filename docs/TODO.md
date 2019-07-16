@@ -97,7 +97,7 @@
 
 # Clean Code
 - [√] use `strictNullChecks` typescript config
-- [ ] `tslint:all`
+- [ ] `eslint:all`
 
 # Refactoring
 - [ ] new graph state

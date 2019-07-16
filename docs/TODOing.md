@@ -134,7 +134,7 @@
 - [ ] lint, disallow dispatch prop
 - [ ] https://github.com/TrillCyborg/fullstack
 - [ ] https://github.com/accounts-js/accounts
-- [ ] tslint rule to require awaiting promises
+- [ ] eslint rule to require awaiting promises
 - [ ] lock down audio node params min/max at instrument level
 - [ ] fix noise wave getting stuck
 - [ ] refactor
@@ -204,6 +204,7 @@ It's just following the values of the sine, really, but you can adjust as you se
 Yes, https://mmckegg.github.io/web-audio-school/, exercise 13 is exactly what you need
 
 # 0.6.0
+- [ ] husky pre-commit
 - [ ] do CORS correctly, only allow corgi.fm origin
 - [ ] allow typing in knob values
 	- [ ] make value look as similar to display value as possible

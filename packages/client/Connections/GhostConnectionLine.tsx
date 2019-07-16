@@ -12,7 +12,7 @@ export const GhostConnectionLine = React.memo(
 	}: GhostConnectionLineProps) {
 		return (
 			<svg
-				className={`colorize longLine`}
+				className="colorize longLine"
 				xmlns="http://www.w3.org/2000/svg"
 				style={{
 					position: 'fixed',
@@ -27,7 +27,7 @@ export const GhostConnectionLine = React.memo(
 						d={pathDPart1}
 						stroke={color}
 						strokeWidth={longLineStrokeWidth + 'px'}
-						strokeDasharray={'8 4'}
+						strokeDasharray="8 4"
 						strokeLinecap="round"
 					/>
 				</g>

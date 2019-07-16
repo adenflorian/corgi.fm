@@ -1,9 +1,7 @@
-import React from 'react'
-import {Component} from 'react'
+import React, {Component} from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
-import {IClientAppState} from '@corgifm/common/redux'
-import {AppOptions, selectOption, setOption} from '@corgifm/common/redux'
+import {IClientAppState, AppOptions, selectOption, setOption} from '@corgifm/common/redux'
 
 interface IOptionProps {
 	option: AppOptions
@@ -38,7 +36,7 @@ export class Option extends Component<IOptionAllProps> {
 						onChange={e => dispatch(setOption(option, e.target.checked))}
 						checked={value}
 					/>
-					<span className="checkmark"/>
+					<span className="checkmark" />
 				</label>
 			</div>
 		)

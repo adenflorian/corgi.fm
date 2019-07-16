@@ -101,8 +101,6 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 		connectNodes(x.target, masterAudioOutput)
 	})
 
-	return
-
 	interface CreateSourceAndTargetArgs {
 		source: CreateSourceArgs
 		target: {

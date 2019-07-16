@@ -38,6 +38,7 @@ export function setupAudioContext(audioContext: AudioContext, preFx: GainNode, s
 	finalNode.connect(analyser)
 	finalNode.connect(audioContext.destination)
 
+	// eslint-disable-next-line no-param-reassign
 	preFx.gain.value = 0.5
 
 	let previousMasterVolume: number

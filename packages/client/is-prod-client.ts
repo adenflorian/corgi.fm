@@ -33,5 +33,3 @@ const _logClientEnv = isProdClient()
 		: isLocalDevClient()
 			? 'isLocalDevClient'
 			: 'unknown env'
-
-const _getPath = () => window.location.pathname.replace('/', '')

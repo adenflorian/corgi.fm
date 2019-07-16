@@ -1,6 +1,7 @@
 import React from 'react'
-import {selectConnectionSourceColorByTargetId, shamuConnect} from '@corgifm/common/redux'
-import {selectGridSequencer} from '@corgifm/common/redux'
+import {
+	selectConnectionSourceColorByTargetId, shamuConnect, selectGridSequencer,
+} from '@corgifm/common/redux'
 import {GridSequencer} from './GridSequencer'
 import './GridSequencer.less'
 

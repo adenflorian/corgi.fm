@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 declare module 'soundbank-reverb' {
 	interface ReverbNode extends AudioNode {
 		time: number

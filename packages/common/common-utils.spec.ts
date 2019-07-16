@@ -1,4 +1,3 @@
-import {expect} from 'chai'
 import {applyOctave} from './common-utils'
 
 describe('input-middleware', () => {
@@ -13,7 +12,7 @@ describe('input-middleware', () => {
 			[11, 4, 71],
 		].forEach(arr => {
 			it(`should return ${arr[2]} when ${arr[0]} and ${arr[1]}`, () => {
-				expect(applyOctave(arr[0], arr[1])).to.equal(arr[2])
+				expect(applyOctave(arr[0], arr[1])).toEqual(arr[2])
 			})
 		})
 	})

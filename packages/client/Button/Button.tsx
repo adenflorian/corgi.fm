@@ -14,6 +14,7 @@ export const Button = React.memo(
 	function _Button({buttonProps = {}, children, disabled = false, onClick = noop}: IButtonProps) {
 		return (
 			<button
+				type="button"
 				{...{
 					...buttonProps,
 					onClick,

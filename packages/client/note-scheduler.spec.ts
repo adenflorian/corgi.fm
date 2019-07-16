@@ -1,4 +1,3 @@
-import {expect} from 'chai'
 import {List, Set} from 'immutable'
 import {
 	makeMidiClipEvent, makeMidiGlobalClipEvent, MidiClip, MidiGlobalClipEvent, MidiGlobalClipEvents, MidiRange,
@@ -28,7 +27,7 @@ describe('note-scheduler', () => {
 			]
 				.forEach(({time, bpm, expected}) => {
 					it(`time: ${time} | bpm: ${bpm}`, () => {
-						expect(applyBPM(time, bpm)).to.equal(expected)
+						expect(applyBPM(time, bpm)).toEqual(expected)
 					})
 				})
 		})
@@ -84,7 +83,7 @@ describe('note-scheduler', () => {
 					it(`name: ${name}`, () => {
 						expect(
 							applyBPMToEvents(events, bpm).toArray(),
-						).to.deep.equal(expected.toArray())
+						).toEqual(expected.toArray())
 					})
 				})
 		})
@@ -93,18 +92,18 @@ describe('note-scheduler', () => {
 		describe('bad args', () => {
 			it('should throw when start too big', () => {
 				expect(() => new MidiRange(100000000))
-					.to.throw('too big')
+					.toThrow('too big')
 			})
 			it('should throw when end too big', () => {
 				expect(() => new MidiRange(0, 100000000))
-					.to.throw('too big')
+					.toThrow('too big')
 			})
 		})
 		describe('end', () => {
 			it('should be start plus length', () => {
-				expect(new MidiRange(0).end).to.equal(0)
-				expect(new MidiRange(0, 1).end).to.equal(1)
-				expect(new MidiRange(0.000001, 3.333333).end).to.equal(3.333334)
+				expect(new MidiRange(0).end).toEqual(0)
+				expect(new MidiRange(0, 1).end).toEqual(1)
+				expect(new MidiRange(0.000001, 3.333333).end).toEqual(3.333334)
 			})
 		})
 		describe('normalize', () => {
@@ -164,8 +163,8 @@ describe('note-scheduler', () => {
 					it(`${length} ${JSON.stringify(input)} -> ${JSON.stringify(output)}`,
 						() => {
 							const normalizedRange = input.normalize(length)
-							expect(normalizedRange.start).to.equal(output.start)
-							expect(normalizedRange.length).to.equal(output.length)
+							expect(normalizedRange.start).toEqual(output.start)
+							expect(normalizedRange.length).toEqual(output.length)
 						},
 					)
 				})
@@ -176,23 +175,23 @@ describe('note-scheduler', () => {
 			expect(() => {
 				getEvents(new MidiClip(), new MidiRange(-1, 1), 1)
 			})
-				.to.throw('start must be >= 0')
+				.toThrow('start must be >= 0')
 		})
 		it('should fail when length is negative', () => {
 			expect(() => {
 				getEvents(new MidiClip(), new MidiRange(2, -1), 1)
 			})
-				.to.throw(`length must be >= 0`)
+				.toThrow(`length must be >= 0`)
 		})
 		it('should return empty list when clipLength is negative', () => {
 			expect(
 				getEvents(new MidiClip({length: -1}), new MidiRange(0, 1), 1).toJSON(),
 			)
-				.to.deep.equal(List().toJSON())
+				.toEqual(List().toJSON())
 			expect(
 				getEvents(new MidiClip({length: 0}), new MidiRange(0, 1), 1).toJSON(),
 			)
-				.to.deep.equal(List().toJSON())
+				.toEqual(List().toJSON())
 		})
 	})
 	describe('stuff', () => {
@@ -245,17 +244,20 @@ describe('note-scheduler', () => {
 				// start 0 range < clip.length
 				{
 					name: 'start 0 range < clip.length - A',
-					start: 0.00, length: 0.01,
+					start: 0.00,
+					length: 0.01,
 					expected: [makeMidiGlobalClipEvent({startTime: 0.0, endTime: 0.25, notes: Set([60])})],
 				},
 				{
 					name: 'start 0 range < clip.length - B',
-					start: 0.00, length: 0.25,
+					start: 0.00,
+					length: 0.25,
 					expected: [makeMidiGlobalClipEvent({startTime: 0.0, endTime: 0.25, notes: Set([60])})],
 				},
 				{
 					name: 'start 0 range < clip.length - C',
-					start: 0.00, length: 0.250000001,
+					start: 0.00,
+					length: 0.250000001,
 					expected: [
 						makeMidiGlobalClipEvent({startTime: 0.00, endTime: 0.25, notes: Set([60])}),
 						makeMidiGlobalClipEvent({startTime: 0.25, endTime: 0.50, notes: Set([64])}),
@@ -264,7 +266,8 @@ describe('note-scheduler', () => {
 
 				{
 					name: 'exact length of clip',
-					start: 0.00, length: 2.00,
+					start: 0.00,
+					length: 2.00,
 					expected: [
 						makeMidiGlobalClipEvent({startTime: 0.00, endTime: 0.25, notes: Set([60])}),
 						makeMidiGlobalClipEvent({startTime: 0.25, endTime: 0.50, notes: Set([64])}),
@@ -275,7 +278,8 @@ describe('note-scheduler', () => {
 				},
 				{
 					name: 'half length, start halfway',
-					start: 1.00, length: 1.00,
+					start: 1.00,
+					length: 1.00,
 					expected: [
 						makeMidiGlobalClipEvent({startTime: 0.00, endTime: 0.45, notes: Set([67])}),
 						makeMidiGlobalClipEvent({startTime: 0.50, endTime: 0.83, notes: Set([71])}),
@@ -284,7 +288,8 @@ describe('note-scheduler', () => {
 				},
 				{
 					name: 'exact length, 1st loop',
-					start: 2.00, length: 2.00,
+					start: 2.00,
+					length: 2.00,
 					expected: [
 						makeMidiGlobalClipEvent({startTime: 0.00, endTime: 0.25, notes: Set([60])}),
 						makeMidiGlobalClipEvent({startTime: 0.25, endTime: 0.50, notes: Set([64])}),
@@ -295,7 +300,8 @@ describe('note-scheduler', () => {
 				},
 				{
 					name: 'exact length, start halfway',
-					start: 1.00, length: 2.00,
+					start: 1.00,
+					length: 2.00,
 					expected: [
 						makeMidiGlobalClipEvent({startTime: 0.00, endTime: 0.45, notes: Set([67])}),
 						makeMidiGlobalClipEvent({startTime: 0.50, endTime: 0.83, notes: Set([71])}),
@@ -306,7 +312,8 @@ describe('note-scheduler', () => {
 				},
 				{
 					name: 'twice length of clip',
-					start: 0.00, length: 4.00,
+					start: 0.00,
+					length: 4.00,
 					expected: [
 						makeMidiGlobalClipEvent({startTime: 0.00, endTime: 0.25, notes: Set([60])}),
 						makeMidiGlobalClipEvent({startTime: 0.25, endTime: 0.50, notes: Set([64])}),
@@ -322,7 +329,8 @@ describe('note-scheduler', () => {
 				},
 				{
 					name: 'thrice length of clip',
-					start: 0.00, length: 6.00,
+					start: 0.00,
+					length: 6.00,
 					expected: [
 						makeMidiGlobalClipEvent({startTime: 0.00, endTime: 0.25, notes: Set([60])}),
 						makeMidiGlobalClipEvent({startTime: 0.25, endTime: 0.50, notes: Set([64])}),
@@ -343,7 +351,8 @@ describe('note-scheduler', () => {
 				},
 				{
 					name: 'thrice and a half length of clip',
-					start: 0.00, length: 5.00,
+					start: 0.00,
+					length: 5.00,
 					expected: [
 						makeMidiGlobalClipEvent({startTime: 0.00, endTime: 0.25, notes: Set([60])}),
 						makeMidiGlobalClipEvent({startTime: 0.25, endTime: 0.50, notes: Set([64])}),
@@ -365,7 +374,7 @@ describe('note-scheduler', () => {
 				it(name, () => {
 					const result = getEvents(testClip, new MidiRange(start, length), 1).toArray()
 
-					expect(result).to.deep.equal(expected)
+					expect(result).toEqual(expected)
 				})
 			})
 	})

@@ -1,13 +1,10 @@
-import React from 'react'
-import {Component} from 'react'
+import React, {Component} from 'react'
 import AutosizeInput from 'react-input-autosize'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 import {
-	selectClientInfo, selectLocalClient,
+	selectClientInfo, selectLocalClient, IClientAppState, chatSubmit,
 } from '@corgifm/common/redux'
-import {IClientAppState} from '@corgifm/common/redux'
-import {chatSubmit} from '@corgifm/common/redux'
 import './Chat.less'
 import {ConnectedChatMessages} from './Chat/ChatMessages'
 import {isTestClient} from './is-prod-client'
@@ -135,7 +132,7 @@ const BottomInfo = React.memo(function _BottomInfo(props: BottomInfoProps) {
 			<div
 				className={`info-corgi ${isTestClient() ? 'info-corgiTest' : ''}`}
 			>
-				{isTestClient() ? 'test.' : ''}corgi.fm
+				{`${isTestClient() ? 'test.' : ''}corgi.fm`}
 			</div>
 			<div
 				className="info-milestone"
@@ -152,11 +149,11 @@ const BottomInfo = React.memo(function _BottomInfo(props: BottomInfoProps) {
 					cursor: isVersionMismatch ? 'pointer' : 'inherit',
 				}}
 				onClick={isVersionMismatch
-					? () => location.reload()
+					? () => window.location.reload()
 					: undefined
 				}
 			>
-				v{props.clientVersion}
+				{`v${props.clientVersion}`}
 			</div>
 		</div>
 	)

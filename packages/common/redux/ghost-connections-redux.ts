@@ -1,12 +1,13 @@
 import {Map} from 'immutable'
 import {combineReducers, Reducer} from 'redux'
 import {ActionType} from 'typesafe-actions'
-import uuid = require('uuid')
 import {ClientId} from '../common-types'
 import {IClientRoomState} from './common-redux-types'
 import {
 	BROADCASTER_ACTION, SERVER_ACTION,
 } from './index'
+
+import uuid = require('uuid')
 
 export const GHOST_CONNECTION_CREATE = 'GHOST_CONNECTION_CREATE'
 export const GHOST_CONNECTION_DELETE = 'GHOST_CONNECTION_DELETE'

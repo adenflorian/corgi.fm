@@ -5,7 +5,7 @@ import {
 	getConnectionNodeInfo, selectSimpleCompressor, setSimpleCompressorParam,
 	shamuConnect, SimpleCompressorParam,
 } from '@corgifm/common/redux'
-import {adsrValueToString, filterValueToString} from '../../client-constants'
+import {adsrValueToString} from '../../client-constants'
 import {Knob} from '../../Knob/Knob'
 import {Panel} from '../../Panel/Panel'
 

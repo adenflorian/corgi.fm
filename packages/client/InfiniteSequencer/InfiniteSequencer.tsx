@@ -1,5 +1,4 @@
 import {stripIndents} from 'common-tags'
-import _ from 'lodash'
 import React from 'react'
 import {
 	IoMdDownload as Download, IoMdGrid as Rows, IoMdPlay as Play,
@@ -65,7 +64,7 @@ export const InfiniteSequencer: React.FC<IInfiniteSequencerAllProps> = React.mem
 				<div
 					className={
 						`infiniteSequencer ` +
-						`${isPlaying ? 'isPlaying saturate' : 'isNotPlaying'}` + ` ` +
+						`${isPlaying ? 'isPlaying saturate ' : 'isNotPlaying '}` +
 						`${isRecording ? `isRecording` : ''}`
 					}
 				>
@@ -187,7 +186,7 @@ export const InfiniteSequencer: React.FC<IInfiniteSequencerAllProps> = React.mem
 						</div>
 						<ConnectedInfiniteSequencerNotes id={id} />
 					</Panel>
-				</div >
+				</div>
 			)
 		}
 	},

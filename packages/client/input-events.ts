@@ -233,19 +233,16 @@ export function setupInputEventListeners(
 		y: 0,
 	}
 
-	function dispatchPointersUpdate(x?: number, y?: number) {
+	function dispatchPointersUpdate(
+		x = lastMousePosition.x, y = lastMousePosition.y
+	) {
 		const state = store.getState()
 
 		if (selectClientInfo(state).isClientReady !== true) return
 
 		const localClientId = selectLocalClient(state).id
 
-		if (!x || !y) {
-			x = lastMousePosition.x
-			y = lastMousePosition.y
-		} else {
-			lastMousePosition = {x, y}
-		}
+		lastMousePosition = {x, y}
 
 		store.dispatch(pointersActions.update(localClientId, mouseFromScreenToBoard({x, y})))
 	}
@@ -256,6 +253,6 @@ function getPropNameForEventType(eventType: string) {
 		case 'keydown': return 'actionOnKeyDown'
 		case 'keyup': return 'actionOnKeyUp'
 		case 'keypress': return 'actionOnKeyPress'
+		default: throw new Error('unsupported eventType: ' + eventType)
 	}
-	throw new Error('unsupported eventType: ' + eventType)
 }

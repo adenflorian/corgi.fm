@@ -1,6 +1,5 @@
 import {Set} from 'immutable'
 import {IDisposable} from '@corgifm/common/common-types'
-import {logger} from '@corgifm/common/logger'
 import {IMidiNote} from '@corgifm/common/MidiNote'
 import {BuiltInBQFilterType} from '@corgifm/common/OscillatorTypes'
 import {AudioNodeWrapper, IAudioNodeWrapperOptions, registerInstrumentWithSchedulerVisual, Voice, Voices} from './index'

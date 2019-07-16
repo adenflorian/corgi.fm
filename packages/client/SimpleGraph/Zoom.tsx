@@ -1,8 +1,9 @@
 import React from 'react'
 import {ContextMenuTrigger} from 'react-contextmenu'
 import {Point} from '@corgifm/common/common-types'
-import {selectLocalClientId, selectOptions, selectRoomSettings} from '@corgifm/common/redux'
-import {shamuConnect} from '@corgifm/common/redux'
+import {
+	selectLocalClientId, selectOptions, selectRoomSettings, shamuConnect,
+} from '@corgifm/common/redux'
 import {backgroundMenuId, graphSizeX, zoomBackgroundClass} from '../client-constants'
 import PlusSVG from '../OtherSVG/plus.svg'
 import {simpleGlobalClientState} from '../SimpleGlobalClientState'
@@ -64,8 +65,8 @@ export class Zoom extends React.PureComponent<IZoomAllProps, IZoomState> {
 	}
 
 	public render() {
-		const {children, fancyZoomPan} = this.props
-		const {zoomReal, pan, backgroundClicked} = this.state
+		const {children, fancyZoomPan, disableMenu} = this.props
+		const {zoomReal, pan} = this.state
 
 		return (
 			<div
@@ -78,7 +79,7 @@ export class Zoom extends React.PureComponent<IZoomAllProps, IZoomState> {
 			>
 				<ZoomBackground
 					onMouseEvent={this._onBgMouseEvent}
-					disableMenu={this.props.disableMenu}
+					disableMenu={disableMenu}
 				/>
 				{children}
 			</div>
@@ -209,7 +210,7 @@ export const ConnectedZoom = shamuConnect(
 
 		return {
 			requireCtrlToZoom: selectOptions(state).requireCtrlToScroll,
-			fancyZoomPan: selectOptions(state).graphics_expensiveZoomPan,
+			fancyZoomPan: selectOptions(state).graphicsExpensiveZoomPan,
 			disableMenu: selectLocalClientId(state) !== roomSettings.ownerId && roomSettings.onlyOwnerCanDoStuff,
 		}
 	},

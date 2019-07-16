@@ -5,7 +5,7 @@ import {ECSComponentType, ECSEntity, ECSSystem} from './ECSTypes'
 
 const {width, height} = limiterRenderSystemConstants
 const maxReduction = 10
-const warningThreshold = 2
+// const warningThreshold = 2
 const maxReductionFirstBar = maxReduction / 2
 const maxFirstBarHeight = height / 2
 const maxSecondBarHeight = maxFirstBarHeight

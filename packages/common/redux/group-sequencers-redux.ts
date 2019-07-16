@@ -1,6 +1,5 @@
 import {List} from 'immutable'
 import {ActionType} from 'typesafe-actions'
-import uuid = require('uuid')
 import {ConnectionNodeType, IConnectable, Id, IMultiStateThing} from '../common-types'
 import {CssColor} from '../shamu-color'
 import {
@@ -8,6 +7,8 @@ import {
 	IClientRoomState, IMultiState, makeMultiReducer, NetworkActionType,
 	NodeSpecialState, SERVER_ACTION,
 } from './index'
+
+import uuid = require('uuid')
 
 export const GROUP_SEQ_SET_ENABLED = 'GROUP_SEQ_SET_ENABLED'
 

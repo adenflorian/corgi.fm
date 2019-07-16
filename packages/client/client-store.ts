@@ -1,4 +1,5 @@
 import {applyMiddleware, createStore, Middleware, Store} from 'redux'
+// eslint-disable-next-line import/named
 import {composeWithDevTools} from 'redux-devtools-extension/developmentOnly'
 import {
 	getActionsBlacklist, getClientReducers, IClientAppState,
@@ -21,7 +22,6 @@ export function configureStore(
 	onReduxMiddleware: Middleware,
 	firebase: FirebaseContextStuff,
 ): Store<IClientAppState> {
-
 	return createStore(
 		getClientReducers(),
 		initialState,

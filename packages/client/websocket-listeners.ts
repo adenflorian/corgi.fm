@@ -1,4 +1,5 @@
 import {Store} from 'redux'
+// eslint-disable-next-line import/no-extraneous-dependencies
 import * as io from 'socket.io-client'
 import {maxRoomNameLength} from '@corgifm/common/common-constants'
 import {logger} from '@corgifm/common/logger'
@@ -14,6 +15,8 @@ import {getUsernameFromLocalStorage} from './username'
 
 const port = isLocalDevClient() ? 3000 : 443
 
+// TODO
+// eslint-disable-next-line import/no-mutable-exports
 export let socket: SocketIOClient.Socket
 
 export function setupWebsocketAndListeners(store: Store) {

@@ -21,16 +21,19 @@ interface ConnectionLineProps {
 }
 
 export const ConnectionLine = React.memo(
-	function _ConnectionLine({id, color, saturateSource, saturateTarget, pathDPart1,
-		pathDFull, connectedLine, speed = 1,
-		isSourcePlaying, highQuality}: ConnectionLineProps,
+	function _ConnectionLine(
+		{
+			id, color, saturateSource, saturateTarget, pathDPart1,
+			pathDFull, connectedLine, speed = 1,
+			isSourcePlaying, highQuality,
+		}: ConnectionLineProps,
 	) {
 		const saturatedColor = saturateColor(color)
 		const dispatch = useDispatch()
 
 		return (
 			<svg
-				className={`colorize longLine`}
+				className="colorize longLine"
 				xmlns="http://www.w3.org/2000/svg"
 				style={{
 					position: 'fixed',

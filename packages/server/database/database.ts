@@ -9,7 +9,7 @@ export type DBStore = ThenArg<typeof connectDB>
 const dbName = 'test'
 
 export const dummyDb: DBStore = Object.freeze({
-	async close() {},
+	async close() {/* noop */},
 	events: {
 		async saveUserConnectEventAsync() {return 0},
 	},

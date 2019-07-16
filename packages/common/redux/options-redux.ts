@@ -10,9 +10,9 @@ export enum AppOptions {
 	requireCtrlToScroll = 'requireCtrlToScroll',
 	showNoteSchedulerDebug = 'showNoteSchedulerDebug',
 	renderNoteSchedulerDebugWhileStopped = 'renderNoteSchedulerDebugWhileStopped',
-	graphics_fancyConnections = 'graphics_fancyConnections',
-	graphics_ECS = 'graphics_ECS',
-	graphics_expensiveZoomPan = 'graphics_expensiveZoomPan',
+	graphicsFancyConnections = 'graphicsFancyConnections',
+	graphicsECS = 'graphicsECS',
+	graphicsExpensiveZoomPan = 'graphicsExpensiveZoomPan',
 }
 
 export const initialOptionsState = Object.freeze({
@@ -22,9 +22,9 @@ export const initialOptionsState = Object.freeze({
 	requireCtrlToScroll: false,
 	showNoteSchedulerDebug: false,
 	renderNoteSchedulerDebugWhileStopped: true,
-	graphics_fancyConnections: false,
-	graphics_ECS: true,
-	graphics_expensiveZoomPan: true,
+	graphicsFancyConnections: false,
+	graphicsECS: true,
+	graphicsExpensiveZoomPan: true,
 })
 
 export const SET_OPTION = 'SET_OPTION'

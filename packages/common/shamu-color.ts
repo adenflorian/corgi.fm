@@ -1,9 +1,9 @@
-// tslint:disable-next-line:no-var-requires
-const ColorDefault = require('color')
+/* eslint-disable import/newline-after-import */
 import * as ColorAll from 'color'
 import {List} from 'immutable'
 import {removeOctave} from './common-utils'
 import {IMidiNote} from './MidiNote'
+const ColorDefault = require('color')
 
 export const colorFunc: typeof ColorAll = ColorDefault || ColorAll
 
@@ -106,6 +106,7 @@ const sum = (a: number, b: number): number => a + b
 
 const toCharCode = (char: string): number => char.charCodeAt(0)
 
+/* eslint-disable no-param-reassign */
 function hslToHex(hue: number, saturation: number, luminosity: number) {
 	// resolve degrees to 0 - 359 range
 	hue = cycle(hue)
