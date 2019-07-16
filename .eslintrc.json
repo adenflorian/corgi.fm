@@ -28,6 +28,7 @@
     "plugins": [
         "@typescript-eslint",
         "react",
+        "react-hooks",
         "jest",
         "import"
     ],
@@ -142,6 +143,9 @@
                 ]
             }
         ],
+        // React
+        "react-hooks/rules-of-hooks": "error",
+        "react-hooks/exhaustive-deps": "error",
         // My personal style
         "arrow-parens": [
             "error",

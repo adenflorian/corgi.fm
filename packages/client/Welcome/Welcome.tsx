@@ -17,7 +17,7 @@ export function WelcomeModalButton() {
 	const dispatch = useDispatch()
 	const showModal = useCallback(
 		() => dispatch(modalsAction.set(ModalId.Welcome)),
-		[],
+		[dispatch],
 	)
 
 	return (
@@ -33,7 +33,7 @@ export const WelcomeModalContent: ModalContent = ({hideModal}) => {
 	const joinLobby = useCallback(() => {
 		dispatch(changeRoom(lobby))
 		hideModal()
-	}, [])
+	}, [dispatch, hideModal])
 
 	return (
 		<div className="welcomeModal">

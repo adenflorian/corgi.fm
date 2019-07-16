@@ -14,7 +14,7 @@ export function OptionsModalButton() {
 	const dispatch = useDispatch()
 	const showModal = useCallback(
 		() => dispatch(modalsAction.set(ModalId.Options)),
-		[],
+		[dispatch],
 	)
 
 	return (

@@ -24,6 +24,36 @@ export function SliderControllerIncremental(props: Props) {
 	const [tempValue, setTempValue] = useState(0)
 
 	useLayoutEffect(() => {
+		const _handleMouseMove = (e: MouseEvent) => {
+
+			if (isMouseDown) {
+				if (e.buttons !== 1) {
+					return setIsMouseDown(false)
+				}
+
+				let sensitivity = 0.5
+				if (e.shiftKey) {
+					sensitivity = 4
+				} else if (e.altKey) {
+					sensitivity = 0.01
+				}
+
+				const mouseYDelta = e.movementY * sensitivity
+
+				const newTempValue = clamp(tempValue - mouseYDelta, min, max)
+
+				const roundedValue = (allowAltKey && e.altKey && fineIncrement !== undefined)
+					? clamp(incrementalRound(newTempValue, fineIncrement), min, max)
+					: clamp(incrementalRound(newTempValue, increment), min, max)
+
+				if (roundedValue !== value) {
+					onChange(roundedValue)
+				}
+
+				setTempValue(newTempValue)
+			}
+		}
+
 		if (isMouseDown) {
 			window.addEventListener('mousemove', _handleMouseMove)
 		}
@@ -31,37 +61,7 @@ export function SliderControllerIncremental(props: Props) {
 		return () => {
 			window.removeEventListener('mousemove', _handleMouseMove)
 		}
-	}, [isMouseDown, tempValue, value, increment])
-
-	const _handleMouseMove = (e: MouseEvent) => {
-
-		if (isMouseDown) {
-			if (e.buttons !== 1) {
-				return setIsMouseDown(false)
-			}
-
-			let sensitivity = 0.5
-			if (e.shiftKey) {
-				sensitivity = 4
-			} else if (e.altKey) {
-				sensitivity = 0.01
-			}
-
-			const mouseYDelta = e.movementY * sensitivity
-
-			const newTempValue = clamp(tempValue - mouseYDelta, min, max)
-
-			const roundedValue = (allowAltKey && e.altKey && fineIncrement !== undefined)
-				? clamp(incrementalRound(newTempValue, fineIncrement), min, max)
-				: clamp(incrementalRound(newTempValue, increment), min, max)
-
-			if (roundedValue !== value) {
-				onChange(roundedValue)
-			}
-
-			setTempValue(newTempValue)
-		}
-	}
+	}, [isMouseDown, tempValue, value, increment, min, max, allowAltKey, fineIncrement, onChange])
 
 	function _normalize(v: number): number {
 		const x = (v - min) / (max - min)

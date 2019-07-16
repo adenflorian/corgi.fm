@@ -13,7 +13,7 @@ export function NewRoomButton({onClick}: {onClick?: () => any}) {
 			eventNewRoomButtonClick()
 			if (onClick) onClick()
 		},
-		[onClick],
+		[dispatch, onClick],
 	)
 
 	return (

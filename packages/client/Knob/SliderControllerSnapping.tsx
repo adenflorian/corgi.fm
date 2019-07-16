@@ -19,6 +19,37 @@ export function SliderControllerSnapping(props: Props) {
 	const [tempValue, setTempValue] = useState(0)
 
 	useLayoutEffect(() => {
+		const _handleMouseMove = (e: MouseEvent) => {
+			if (isMouseDown) {
+				if (e.buttons !== 1) {
+					return setIsMouseDown(false)
+				}
+
+				let sensitivity = 0.005
+				if (e.shiftKey) {
+					sensitivity *= 2
+				} else if (e.altKey) {
+					sensitivity *= 0.25
+				}
+
+				const mouseYDelta = e.movementY * sensitivity
+
+				const newNormalizedValue = clamp(tempValue - mouseYDelta)
+
+				const newScaledValue = newNormalizedValue * (possibleValues.count() - 1)
+
+				const roundedScaledValue = Math.round(newScaledValue)
+
+				const newValue = possibleValues.get(roundedScaledValue, 0)
+
+				if (newValue !== value) {
+					onChange(newValue)
+				}
+
+				setTempValue(newNormalizedValue)
+			}
+		}
+
 		if (isMouseDown) {
 			window.addEventListener('mousemove', _handleMouseMove)
 		}
@@ -26,39 +57,7 @@ export function SliderControllerSnapping(props: Props) {
 		return () => {
 			window.removeEventListener('mousemove', _handleMouseMove)
 		}
-	}, [isMouseDown, tempValue, value, possibleValues])
-
-	const _handleMouseMove = (e: MouseEvent) => {
-
-		if (isMouseDown) {
-			if (e.buttons !== 1) {
-				return setIsMouseDown(false)
-			}
-
-			let sensitivity = 0.005
-			if (e.shiftKey) {
-				sensitivity *= 2
-			} else if (e.altKey) {
-				sensitivity *= 0.25
-			}
-
-			const mouseYDelta = e.movementY * sensitivity
-
-			const newNormalizedValue = clamp(tempValue - mouseYDelta)
-
-			const newScaledValue = newNormalizedValue * (possibleValues.count() - 1)
-
-			const roundedScaledValue = Math.round(newScaledValue)
-
-			const newValue = possibleValues.get(roundedScaledValue, 0)
-
-			if (newValue !== value) {
-				onChange(newValue)
-			}
-
-			setTempValue(newNormalizedValue)
-		}
-	}
+	}, [isMouseDown, tempValue, value, possibleValues, onChange])
 
 	function _normalize(v: number | string | boolean): number {
 		const index = possibleValues.indexOf(v)

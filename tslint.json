@@ -3,24 +3,7 @@
     // "extends": [
     //     "tslint:recommended",
     //     "tslint-react",
-    //     "tslint-react-hooks"
     // ],
-    // "jsRules": {
-    //     "quotemark": [
-    //         true,
-    //         "single",
-    //         "jsx-double"
-    //     ],
-    //     "semicolon": [
-    //         true,
-    //         "never"
-    //     ],
-    //     "indent": [
-    //         true,
-    //         "tabs"
-    //     ],
-    //     "object-literal-sort-keys": false
-    // },
     // "rules": {
     //     "ban-types": false,
     //     "member-ordering": false,
@@ -115,7 +98,6 @@
     //     //         "use useDispatch"
     //     //     ]
     //     // ],
-    //     "react-hooks-nesting": "error",
     //     "import-blacklist": [
     //         true,
     //         // To prevent accidental use of sentry logger

@@ -14,7 +14,7 @@ export function ModalButton({modalId, label, icon: Icon}: Props) {
 	const dispatch = useDispatch()
 	const onClick = useCallback(
 		() => dispatch(modalsAction.set(modalId)),
-		[modalId],
+		[dispatch, modalId],
 	)
 
 	return (

@@ -52,6 +52,33 @@ export function InfiniteSequencerNotes(
 	}
 
 	useLayoutEffect(() => {
+		const handleMouseMove = (event: MouseEvent) => {
+			if (isAreaSelected && event.buttons !== 1) setIsAreaSelected(false)
+
+			if (!selectedEvent.isSelected) return
+
+			if (event.buttons !== 1 || !event.shiftKey) return setSelectedEvent({isSelected: false, index: -1})
+
+			const newMouseDelta = {
+				x: mouseDelta.x + event.movementX,
+				y: mouseDelta.y - event.movementY,
+			}
+
+			const delta = newMouseDelta.y * sensitivity
+
+			if (Math.abs(delta) > threshold) {
+				const index = selectedEvent.index
+				const oldNote = events.get(index)!.notes.first(-1)
+
+				const newNote = oldNote + (delta > 0 ? 1 : -1)
+				dispatch(infiniteSequencerActions.setNote(id, selectedEvent.index, true, newNote))
+				dispatch(localActions.playShortNote(id, newNote))
+				setMouseDelta({x: 0, y: 0})
+			} else {
+				setMouseDelta(newMouseDelta)
+			}
+		}
+
 		if (selectedEvent.isSelected || isAreaSelected) {
 			window.addEventListener('mousemove', handleMouseMove)
 		}
@@ -59,7 +86,7 @@ export function InfiniteSequencerNotes(
 		return () => {
 			window.removeEventListener('mousemove', handleMouseMove)
 		}
-	}, [selectedEvent, mouseDelta, events, isAreaSelected])
+	}, [selectedEvent, mouseDelta, events, isAreaSelected, dispatch, id])
 
 	const handleMouseDown: HandleMouseEvent = (event: React.MouseEvent, note: IMidiNote, index: number) => {
 		if (event.button === 0) {
@@ -90,33 +117,6 @@ export function InfiniteSequencerNotes(
 
 		if (note >= 0) {
 			dispatch(localActions.playShortNote(id, note))
-		}
-	}
-
-	const handleMouseMove = (event: MouseEvent) => {
-		if (isAreaSelected && event.buttons !== 1) setIsAreaSelected(false)
-
-		if (!selectedEvent.isSelected) return
-
-		if (event.buttons !== 1 || !event.shiftKey) return setSelectedEvent({isSelected: false, index: -1})
-
-		const newMouseDelta = {
-			x: mouseDelta.x + event.movementX,
-			y: mouseDelta.y - event.movementY,
-		}
-
-		const delta = newMouseDelta.y * sensitivity
-
-		if (Math.abs(delta) > threshold) {
-			const index = selectedEvent.index
-			const oldNote = events.get(index)!.notes.first(-1)
-
-			const newNote = oldNote + (delta > 0 ? 1 : -1)
-			dispatch(infiniteSequencerActions.setNote(id, selectedEvent.index, true, newNote))
-			dispatch(localActions.playShortNote(id, newNote))
-			setMouseDelta({x: 0, y: 0})
-		} else {
-			setMouseDelta(newMouseDelta)
 		}
 	}
 
