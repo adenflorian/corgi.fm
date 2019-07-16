@@ -1,23 +1,21 @@
 {
 	"compilerOptions": {
-		"allowSyntheticDefaultImports": true,
+		"resolveJsonModule": true,
 		"noEmit": true,
+		"allowSyntheticDefaultImports": true,
 		"noUnusedLocals": false,
 		"noUnusedParameters": false,
+		"sourceMap": true,
 		"strict": true,
 		"noImplicitReturns": true,
-		"target": "esnext",
+		"target": "es6",
 		"module": "commonjs",
 		"lib": [
 			"dom",
 			"es7"
 		],
-		"plugins": [
-			{
-				"name": "typescript-tslint-plugin",
-				"alwaysShowRuleFailuresAsWarnings": false
-			}
-		],
+		"experimentalDecorators": true,
+		"jsx": "react",
 		"types": [
 			"jest"
 		]
