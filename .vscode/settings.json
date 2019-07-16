@@ -1,32 +1,32 @@
 {
-    "eslint.autoFixOnSave": true,
-    "tslint.autoFixOnSave": [
-        "array-type",
-        "arrow-parens",
-        "indent",
-        "member-ordering",
-        "no-consecutive-blank-lines",
-        "no-var-keyword",
-        "object-literal-key-quotes",
-        "one-variable-per-declaration",
-        "ordered-imports",
-        "prefer-const",
-        "quotemark",
-        "semicolon",
-        "space-before-function-paren",
-        "trailing-comma",
-        "eofline",
-        "only-arrow-functions",
-        "jsx-self-close"
-    ],
-    "tslint.jsEnable": true,
-    "tslint.packageManager": "yarn",
-    "tslint.run": "onType",
-    "tslint.configFile": "./tslint.json",
-    "tslint.exclude": [
-        "node_modules",
-        "**/node_modules/*"
-    ],
+    // "tslint.autoFixOnSave": [
+    //     "array-type",
+    //     "arrow-parens",
+    //     "indent",
+    //     "member-ordering",
+    //     "no-consecutive-blank-lines",
+    //     "no-var-keyword",
+    //     "object-literal-key-quotes",
+    //     "one-variable-per-declaration",
+    //     "ordered-imports",
+    //     "prefer-const",
+    //     "quotemark",
+    //     "semicolon",
+    //     "space-before-function-paren",
+    //     "trailing-comma",
+    //     "eofline",
+    //     "only-arrow-functions",
+    //     "jsx-self-close"
+    // ],
+    // "tslint.jsEnable": true,
+    // "tslint.packageManager": "yarn",
+    // "tslint.run": "onType",
+    // "tslint.configFile": "./tslint.json",
+    // "tslint.exclude": [
+    //     "node_modules",
+    //     "**/node_modules/*"
+    // ],
+    // "tslint.ignoreDefinitionFiles": false,
     "files.eol": "\n",
     "javascript.preferences.quoteStyle": "single",
     "typescript.preferences.quoteStyle": "single",
@@ -178,6 +178,5 @@
     "files.associations": {
         "tsconfig.json": "json"
     },
-    "tslint.ignoreDefinitionFiles": false,
     "jest.autoEnable": false,
 }

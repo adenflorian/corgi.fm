@@ -12,7 +12,7 @@
 				"fileLocation": "absolute"
 			},
 			"runOptions": {
-				"runOn": "folderOpen"
+				// "runOn": "folderOpen"
 			},
 			"presentation": {
 				"group": "groupB",
@@ -30,7 +30,7 @@
 				"fileLocation": "absolute"
 			},
 			"runOptions": {
-				"runOn": "folderOpen"
+				// "runOn": "folderOpen"
 			},
 			"presentation": {
 				"group": "groupB",
@@ -48,7 +48,7 @@
 				"fileLocation": "absolute"
 			},
 			"runOptions": {
-				"runOn": "folderOpen"
+				// "runOn": "folderOpen"
 			},
 			"presentation": {
 				"group": "groupB",
