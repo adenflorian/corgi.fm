@@ -111,6 +111,20 @@
 		- [√] lobby
 		- [ ] join friend
 	- [ ] adjust volume
+- [ ] do stuff with accounts system
+	- [ ] save username
+	- [ ] save room
+	- [ ] load room
+	- [ ] friends
+	- [ ] upload samples
+	- [ ] referral system
+	- [ ] sharing room saves
+	- [ ] restrict rooms to email verified users
+	- [ ] direct messages
+	- [ ] avatars
+	- [ ] profile
+	- [ ] link to patreon account
+	- [ ] link to discord
 - [ ] look into using `~` for parcel typescript resolution
 - [ ] look into generating new react components and redux reducers
 - [ ] use `useCallback()` hook
