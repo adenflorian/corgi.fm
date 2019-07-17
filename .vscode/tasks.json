@@ -22,7 +22,7 @@
 					"code": 6
 				},
 				"background": {
-					"activeOnStart": true,
+					"activeOnStart": false,
 					"beginsPattern": "^\\$ eslint.*$",
 					"endsPattern": "^onchange: command completed"
 				}
