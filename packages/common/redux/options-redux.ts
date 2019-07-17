@@ -75,8 +75,8 @@ export function loadOptionsState(): Readonly<IOptionsState> {
 		window.localStorage.setItem(localStorageKey, newJson)
 
 		return newState
-	} catch (e) {
-		logger.error(e)
+	} catch (error) {
+		logger.error(error)
 		logger.error('[loadOptionsState] resetting options...')
 
 		window.localStorage.setItem(localStorageKey, JSON.stringify({options: initialOptionsState}))

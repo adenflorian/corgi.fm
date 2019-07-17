@@ -18,6 +18,8 @@ class SimpleGlobalClientState {
 	public set zoomDisplay(val) {
 		this._zoomDisplay = val
 		const zoomTextElement = document.getElementById('zoomText')
+		// TODO
+		// eslint-disable-next-line unicorn/prefer-text-content
 		if (zoomTextElement) zoomTextElement.innerText = this._zoomDisplay.toFixed(2).replace(/([^.])0*$/, '$1')
 	}
 

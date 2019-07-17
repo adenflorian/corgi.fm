@@ -578,6 +578,8 @@ function downloadObjectAsJson(exportObj: any, exportName: string) {
 	const downloadAnchorNode = document.createElement('a')
 	downloadAnchorNode.setAttribute('href', dataStr)
 	downloadAnchorNode.setAttribute('download', exportName + '.json')
+	// TODO
+	// eslint-disable-next-line unicorn/prefer-node-append
 	document.body.appendChild(downloadAnchorNode) // required for firefox
 	downloadAnchorNode.click()
 	downloadAnchorNode.remove()

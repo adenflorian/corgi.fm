@@ -67,11 +67,11 @@ export abstract class AudioNodeWrapper implements IDisposable {
 
 		try {
 			output.disconnect(audioNodeToDisconnect)
-		} catch (e) {
-			if (e instanceof Error && e.message.includes('the given destination is not connected')) {
+		} catch (error) {
+			if (error instanceof Error && error.message.includes('the given destination is not connected')) {
 				// Do nothing, this is expected in prevented feedback loop situations
 			} else {
-				throw new Error(e)
+				throw new Error(error)
 			}
 		}
 	}

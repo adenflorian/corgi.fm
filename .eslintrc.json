@@ -24,6 +24,7 @@
         "plugin:import/warnings",
         "plugin:import/typescript",
         "plugin:@typescript-eslint/recommended",
+        "plugin:unicorn/recommended",
         "airbnb"
     ],
     "plugins": [
@@ -326,7 +327,12 @@
         "@typescript-eslint/interface-name-prefix": "off",
         "@typescript-eslint/no-explicit-any": "off",
         // Unicorn
-        "unicorn/import-index": "error"
+        "unicorn/prevent-abbreviations": "off",
+        "unicorn/new-for-builtins": "off",
+        "unicorn/no-zero-fractions": "off",
+        "unicorn/filename-case": "off",
+        "unicorn/prefer-add-event-listener": "off",
+        "unicorn/prefer-query-selector": "off"
     },
     "settings": {
         "react": {

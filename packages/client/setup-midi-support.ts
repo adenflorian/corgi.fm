@@ -105,7 +105,7 @@ function onMidiMessage(event: MidiMessageEvent) {
 	const data = event.data
 	// const cmd = data[0] >> 4
 	// const channel = data[0] & 0xf
-	const type = data[0] & 0xf0
+	const type = data[0] & 0xF0
 	const note = data[1] - 36
 	const velocity = data[2]
 

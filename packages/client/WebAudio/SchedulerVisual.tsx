@@ -145,13 +145,13 @@ let _instruments = Map<string, () => OrderedMap<number, Voice>>()
 let _audioContext: AudioContext
 
 function _renderSchedulerVisual(id: string, scheduledVoices: OrderedMap<number, Voice>) {
-	const element = document.getElementById('scheduleVisual-' + id)
+	const element = document.querySelector('#scheduleVisual-' + id)
 
-	if (!element) return logger.warn('missing placeholder element for debug visual: scheduleVisual -' + id)
+	if (!element) return logger.warn('missing placeholder element for debug visual: #scheduleVisual -' + id)
 
 	ReactDOM.render(
 		<SchedulerVisual scheduledVoices={scheduledVoices} />,
-		document.getElementById('scheduleVisual-' + id),
+		document.querySelector('#scheduleVisual-' + id),
 	)
 }
 

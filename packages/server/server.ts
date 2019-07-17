@@ -29,8 +29,8 @@ async function start() {
 
 	try {
 		dbStore = await connectDB()
-	} catch (e) {
-		logger.warn('failed to connect to database! ', e)
+	} catch (error) {
+		logger.warn('failed to connect to database! ', error)
 	}
 
 	const serverStore = configureServerStore()

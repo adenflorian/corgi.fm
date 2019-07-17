@@ -18,13 +18,13 @@ export function renderApp(store: Store, firebaseContextStuff: FirebaseContextStu
 				</React.Fragment>
 			</FirebaseContext.Provider>
 		</HotProvider>,
-		document.getElementById('react-app'),
+		document.querySelector('#react-app'),
 	)
 }
 
 export function renderOther(other: any) {
 	ReactDOM.render(
 		other,
-		document.getElementById('react-app'),
+		document.querySelector('#react-app'),
 	)
 }
