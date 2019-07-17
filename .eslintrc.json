@@ -93,18 +93,26 @@
                 ]
             }
         ],
-        "import/no-internal-modules": [
-            "error",
-            {
-                "allow": [
-                    "react-icons/**",
-                    "redux-devtools-extension/*",
-                    "firebase/*"
-                ]
-            }
-        ],
+        // SLOW
+        // "import/no-internal-modules": [
+        //     "error",
+        //     {
+        //         "allow": [
+        //             "react-icons/**",
+        //             "redux-devtools-extension/*",
+        //             "firebase/*"
+        //         ]
+        //     }
+        // ],
+        // SLOW and doesn't even work
+        "import/no-self-import": "off",
+        // SLOW and doesn't even work most the time
+        "import/no-useless-path-segments": "off",
         // Shouldn't need when using typescript
         "no-prototype-builtins": "off",
+        "import/named": "off",
+        "react/prop-types": "off",
+        // Other
         "react/display-name": "off",
         "no-console": "error",
         "no-trailing-spaces": "error",

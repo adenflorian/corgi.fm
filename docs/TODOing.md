@@ -136,6 +136,8 @@
 	- [√] use `useCallback()` hook
 	- [ ] change Button to extends button props
 	- [√] lint, disallow dispatch prop
+	- [ ] redux starter kit
+	- [ ] eslint_d
 - [√] eslint rule to require awaiting promises
 - [ ] disallow visual connection to be made if it causes a feedback loop
 - [ ] need visual to show that feedback loops are not possible
