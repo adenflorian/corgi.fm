@@ -14,11 +14,9 @@ import {
 	deletePositions, deleteRoomMember, deleteThingsAny,
 	getActionsBlacklist, GLOBAL_SERVER_ACTION, globalClockActions,
 	IClientRoomState,
-	IServerState, LOAD_ROOM, LoadRoomAction, maxUsernameLength,
-	pointersActions, ready,
+	IServerState, LOAD_ROOM, maxUsernameLength, pointersActions, ready,
 	replacePositions, REQUEST_CREATE_ROOM, roomOwnerRoomActions,
-	RoomSettingsAction, roomSettingsActions,
-	RoomsReduxAction, SavedRoom,
+	RoomSettingsAction, roomSettingsActions, RoomsReduxAction, SavedRoom,
 	selectAllClients, selectAllConnections,
 	selectAllMessages, selectAllPointers, selectAllPositions,
 	selectAllRoomMemberIds,
@@ -29,13 +27,8 @@ import {
 	selectPositionsWithIds, selectRoomExists,
 	selectRoomSettings, selectRoomStateByName, selectShamuGraphState,
 	SERVER_ACTION, setActiveRoom,
-	setChat,
-	setClients,
-	setRoomMembers,
-	setRooms,
-	shamuGraphActions,
-	userLeftRoom,
-	whitelistedRoomActionTypes,
+	setChat, setClients, setRoomMembers, setRooms, shamuGraphActions,
+	userLeftRoom, whitelistedRoomActionTypes,
 } from '@corgifm/common/redux'
 import {WebSocketEvent} from '@corgifm/common/server-constants'
 import {createServerStuff, loadServerStuff} from './create-server-stuff'
@@ -60,6 +53,7 @@ export function setupServerWebSocketListeners(
 		const room = getRoomName(socket.handshake.query.room)
 
 		// Fire and forget, not worth waiting for
+		// eslint-disable-next-line @typescript-eslint/no-floating-promises
 		dbStore.events.saveUserConnectEventAsync({username, room, time: new Date()})
 
 		logger.log(
@@ -158,7 +152,7 @@ export function setupServerWebSocketListeners(
 				} else if (action.type === REQUEST_CREATE_ROOM) {
 					makeAndJoinNewRoom(animal.getId())
 				} else if (action.type === LOAD_ROOM) {
-					makeAndJoinNewRoom(animal.getId(), (action as LoadRoomAction).savedRoom)
+					makeAndJoinNewRoom(animal.getId(), action.savedRoom)
 				} else if ((action as any)[GLOBAL_SERVER_ACTION]) {
 					serverStore.dispatch(action)
 				} else if ((action as any)[SERVER_ACTION]) {

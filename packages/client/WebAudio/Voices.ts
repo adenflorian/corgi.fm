@@ -44,7 +44,7 @@ export abstract class Voices<V extends Voice> {
 		sourceIds: Set<string>,
 	) {
 		// if delay is 0 then the scheduler isn't working properly
-		if (delaySeconds < 0) logger.error('delay <= 0: ' + delaySeconds)
+		if (delaySeconds < 0) logger.error('delay <= 0: ', delaySeconds)
 
 		const newNoteStartTime = this._getAudioContext().currentTime + delaySeconds
 
@@ -57,7 +57,7 @@ export abstract class Voices<V extends Voice> {
 
 		if (conflictingVoices.count() > 1) {
 			logger.error('[Voices][scheduleNote] conflictingVoices.count() > 1: ' + JSON.stringify(conflictingVoices, undefined, 2))
-			logger.error('[Voices][scheduleNote] conflictingVoices.count() > 1 | note: ' + note + ' | newNoteStartTime: ' + newNoteStartTime)
+			logger.error(`[Voices][scheduleNote] conflictingVoices.count() > 1 | note: ${note} | newNoteStartTime: ${newNoteStartTime}`)
 		}
 
 		const conflictingVoice = conflictingVoices.first(undefined)
@@ -69,8 +69,8 @@ export abstract class Voices<V extends Voice> {
 			conflictingVoice.scheduleRelease(newNoteStartTime, 0)
 
 			if (conflictingVoice.scheduledReleaseEndTimeSeconds > newNoteStartTime) {
-				logger.error('[Voices][scheduleNote] conflictingVoice.scheduledReleaseEndTimeSeconds: ' + conflictingVoice.scheduledReleaseEndTimeSeconds)
-				logger.error('[Voices][scheduleNote] newNoteStartTime: ' + newNoteStartTime)
+				logger.error('[Voices][scheduleNote] conflictingVoice.scheduledReleaseEndTimeSeconds: ', conflictingVoice.scheduledReleaseEndTimeSeconds)
+				logger.error('[Voices][scheduleNote] newNoteStartTime: ', newNoteStartTime)
 				logger.error(`[Voices][scheduleNote] conflictingVoice.scheduledReleaseEndTimeSeconds >= newNoteStartTime`)
 			}
 		}
@@ -97,7 +97,7 @@ export abstract class Voices<V extends Voice> {
 
 	public scheduleRelease(note: number, delaySeconds: number, releaseSeconds: number) {
 		// if delay is 0 then the scheduler isn't working properly
-		if (delaySeconds < 0) logger.error('delay <= 0: ' + delaySeconds)
+		if (delaySeconds < 0) logger.error('delay <= 0: ', delaySeconds)
 
 		const currentTime = this._getAudioContext().currentTime
 

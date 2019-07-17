@@ -114,16 +114,16 @@ export abstract class Voice {
 			hardCutoffTime: Number.MAX_VALUE,
 		})
 
-		this._scheduledAttackStartTimeSeconds = this._scheduledEnvelope!.attackStart
-		this._scheduledAttackEndTimeSeconds = this._scheduledEnvelope!.attackEnd
-		this._scheduledDecayEndTimeSeconds = this._scheduledEnvelope!.decayEnd
-		this._scheduledSustainAtDecayEnd = this._scheduledEnvelope!.sustain
+		this._scheduledAttackStartTimeSeconds = this._scheduledEnvelope.attackStart
+		this._scheduledAttackEndTimeSeconds = this._scheduledEnvelope.attackEnd
+		this._scheduledDecayEndTimeSeconds = this._scheduledEnvelope.decayEnd
+		this._scheduledSustainAtDecayEnd = this._scheduledEnvelope.sustain
 
-		this.getAudioScheduledSourceNode()!.start(this._scheduledEnvelope!.attackStart)
+		this.getAudioScheduledSourceNode()!.start(this._scheduledEnvelope.attackStart)
 
 		applyEnvelope(
 			undefined,
-			this._scheduledEnvelope!,
+			this._scheduledEnvelope,
 			this._gain.gain,
 			this.getAudioScheduledSourceNode()!,
 			this._audioContext,
@@ -132,7 +132,7 @@ export abstract class Voice {
 		// TODO Filter envelope
 		// applyEnvelope(
 		// 	undefined,
-		// 	this._scheduledEnvelope!,
+		// 	this._scheduledEnvelope,
 		// 	this._lowPassFilter.frequency,
 		// 	this.getAudioScheduledSourceNode()!,
 		// 	this._audioContext,

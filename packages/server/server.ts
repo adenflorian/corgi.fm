@@ -19,6 +19,7 @@ logger.log('CORGI_ENV: ', process.env.CORGI_ENV)
 logger.log('NODE_ENV: ', process.env.NODE_ENV)
 logger.log('getServerEnv: ', getServerEnv())
 
+// eslint-disable-next-line @typescript-eslint/no-floating-promises
 start()
 
 async function start() {
@@ -52,5 +53,5 @@ async function start() {
 
 	server.listen(port)
 
-	logger.log('corgi.fm server listening on port ' + port)
+	logger.log(`corgi.fm server listening on port ${port}`)
 }

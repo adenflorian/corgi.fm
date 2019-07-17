@@ -155,7 +155,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 					serverClient.id,
 					args.name,
 					args.notesToShow || 24,
-					args.events!,
+					args.events,
 					args.isPlaying,
 				)
 				dispatchToRoom(addGridSequencer(x))
@@ -166,7 +166,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 					serverClient.id,
 					args.name,
 					args.infinityStyle || InfiniteSequencerStyle.colorGrid,
-					args.events!,
+					args.events,
 					args.isPlaying,
 				)
 				dispatchToRoom(addInfiniteSequencer(y))

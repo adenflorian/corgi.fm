@@ -1,5 +1,4 @@
 import {Set} from 'immutable'
-import {AnyAction} from 'redux'
 import {createSelector} from 'reselect'
 import * as uuid from 'uuid'
 import {ClientId, ConnectionNodeType, IMultiStateThing, IMultiStateThingDeserializer, Octave} from '../common-types'
@@ -109,6 +108,8 @@ export class VirtualKeyboardState implements IMultiStateThing, NodeSpecialState 
 	) {}
 }
 
+export type VirtualKeyboardAction = VirtualOctaveChangeAction | VirtualKeyUpAction | VirtualKeyPressedAction
+
 const keyboardActionTypes = [
 	VIRTUAL_KEY_PRESSED,
 	VIRTUAL_KEY_UP,
@@ -118,7 +119,7 @@ const keyboardActionTypes = [
 export const virtualKeyboardsReducer = makeMultiReducer<VirtualKeyboardState, IVirtualKeyboardsState>(
 	virtualKeyboardReducer, ConnectionNodeType.virtualKeyboard, keyboardActionTypes)
 
-function virtualKeyboardReducer(virtualKeyboard: VirtualKeyboardState, action: AnyAction): VirtualKeyboardState {
+function virtualKeyboardReducer(virtualKeyboard: VirtualKeyboardState, action: VirtualKeyboardAction): VirtualKeyboardState {
 	switch (action.type) {
 		case VIRTUAL_KEY_PRESSED:
 			return {

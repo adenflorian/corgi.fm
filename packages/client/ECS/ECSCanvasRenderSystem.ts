@@ -26,7 +26,7 @@ export class ECSCanvasRenderSystem extends ECSSystem {
 		entities.forEach(this._processEntity)
 	}
 
-	private _processEntity(entity: ECSEntity) {
+	private readonly _processEntity = (entity: ECSEntity) => {
 		if (!this._canvasContext) return
 
 		// this._canvasContext.fillStyle = 'green'

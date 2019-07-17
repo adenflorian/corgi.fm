@@ -7,7 +7,7 @@ import {assertArrayHasNoUndefinedElements} from '../common-utils'
 import {makeMidiClipEvent, MidiClip, MidiClipEvents} from '../midi-types'
 import {emptyMidiNotes, IMidiNote, MidiNotes} from '../MidiNote'
 import {
-	deserializeSequencerState, ISequencerState, PLAY_SEQUENCER,
+	deserializeSequencerState, PLAY_SEQUENCER,
 	RECORD_SEQUENCER_NOTE, selectAllGridSequencers, SequencerAction,
 	SequencerStateBase, STOP_SEQUENCER, TOGGLE_SEQUENCER_RECORDING,
 } from './sequencer-redux'
@@ -156,7 +156,7 @@ export class GridSequencerState extends SequencerStateBase {
 
 export function deserializeGridSequencerState(state: IMultiStateThing): IMultiStateThing {
 	const x = state as GridSequencerState
-	const z = deserializeSequencerState(x) as ISequencerState
+	const z = deserializeSequencerState(x)
 	const notesDisplayWidth = GridSequencerState.noteWidth * z.midiClip.events.count()
 	const y: GridSequencerState = {
 		...(new GridSequencerState(x.ownerId)),

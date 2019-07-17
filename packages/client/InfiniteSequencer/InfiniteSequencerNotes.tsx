@@ -139,7 +139,7 @@ export function InfiniteSequencerNotes(
 								{note === -1
 									? undefined
 									: events.count() <= 8
-										? midiNoteToNoteName(note) + getOctaveFromMidiNote(note)
+										? midiNoteToNoteName(note) + getOctaveFromMidiNote(note).toString()
 										: undefined
 								}
 							</div>

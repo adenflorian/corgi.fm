@@ -59,7 +59,7 @@ export const ConnectorPlaceholders =
 				{new Array(leftPortCount).fill(0).map((_, port) => {
 					const y = calculateConnectorPositionY(parentY, parentHeight, leftPortCount, port)
 					return (
-						<div key={'left-' + port}>
+						<div key={`left-${port}`}>
 							<ConnectorPlaceholder
 								onMouseDown={onMouseDown(y, port)}
 								x={parentX + (leftConnections.filter(x => x.targetPort === port).count() * -connectorWidth) - connectorWidth}
@@ -72,7 +72,7 @@ export const ConnectorPlaceholders =
 				{new Array(rightPortCount).fill(0).map((_, port) => {
 					const y = calculateConnectorPositionY(parentY, parentHeight, rightPortCount, port)
 					return (
-						<div key={'right-' + port}>
+						<div key={`right-${port}`}>
 							<ConnectorPlaceholder
 								onMouseDown={onMouseDown(y, port)}
 								x={parentX + parentWidth + (rightConnections.filter(x => x.sourcePort === port).count() * connectorWidth)}

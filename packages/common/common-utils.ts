@@ -21,7 +21,7 @@ export function assertArrayHasNoUndefinedElements(array: unknown[]): void {
 
 export const createThisShouldntHappenError = () => new Error(`this shouldn't happen`)
 
-export const rateLimitedDebounce = <T extends (...args: unknown[]) => unknown>(
+export const rateLimitedDebounce = <T extends (...args: any[]) => unknown>(
 	func: T,
 	intervalMs: number,
 ) => debounce(

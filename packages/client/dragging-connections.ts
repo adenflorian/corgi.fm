@@ -111,16 +111,16 @@ export function handleStopDraggingGhostConnector(
 			switch (ghostConnection.activeSourceOrTarget) {
 				case ActiveGhostConnectorSourceOrTarget.Source: return changeConnectionSource
 				case ActiveGhostConnectorSourceOrTarget.Target: return changeConnectionTarget
-				default: throw new Error('Unexpected ghost connector status (moving)(changeConnection): ' + ghostConnection.activeSourceOrTarget)
+				default: throw new Error(`Unexpected ghost connector status (moving)(changeConnection): ${ghostConnection.activeSourceOrTarget}`)
 			}
 		} else if (ghostConnection.addingOrMoving === GhostConnectorAddingOrMoving.Adding) {
 			switch (ghostConnection.activeSourceOrTarget) {
 				case ActiveGhostConnectorSourceOrTarget.Source: return newConnectionToSource
 				case ActiveGhostConnectorSourceOrTarget.Target: return newConnectionToTarget
-				default: throw new Error('Unexpected ghost connector status (adding)(changeConnection): ' + ghostConnection.activeSourceOrTarget)
+				default: throw new Error(`Unexpected ghost connector status (adding)(changeConnection): ${ghostConnection.activeSourceOrTarget}`)
 			}
 		} else {
-			throw new Error('Unexpected ghost connector addingOrMoving (changeConnection): ' + ghostConnection.addingOrMoving)
+			throw new Error(`Unexpected ghost connector addingOrMoving (changeConnection): ${ghostConnection.addingOrMoving}`)
 		}
 	}
 
@@ -143,7 +143,7 @@ export function handleStopDraggingGhostConnector(
 		switch (ghostConnection.activeSourceOrTarget) {
 			case ActiveGhostConnectorSourceOrTarget.Source: return moveToOutputPosition(roomState)
 			case ActiveGhostConnectorSourceOrTarget.Target: return moveToInputPosition(roomState)
-			default: throw new Error('Unexpected ghost connector status (getPositionFunc): ' + ghostConnection.activeSourceOrTarget)
+			default: throw new Error(`Unexpected ghost connector status (getPositionFunc): ${ghostConnection.activeSourceOrTarget}`)
 		}
 	}
 

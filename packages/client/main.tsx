@@ -31,6 +31,7 @@ if (!isLocalDevClient()) initSentry()
 
 initializeAnalytics()
 
+// eslint-disable-next-line @typescript-eslint/no-floating-promises
 start()
 
 declare global {
@@ -53,7 +54,7 @@ function initializeAnalytics() {
 	ReactGA.pageview(window.location.pathname + window.location.search)
 }
 
-function start() {
+async function start() {
 	switch (window.location.pathname.replace('/', '')) {
 		default: return setupAsync()
 	}

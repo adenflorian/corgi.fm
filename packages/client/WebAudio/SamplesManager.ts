@@ -44,9 +44,9 @@ export class SamplesManager {
 
 		SamplesManager._emptyAudioBuffer = new AudioBuffer({length: 1, sampleRate: audioContext.sampleRate})
 
-		await samplesToGet.forEach(async sampleName => {
-			await octavesToGet.forEach(async octave => {
-				const noteName = sampleName + octave
+		samplesToGet.forEach(async sampleName => {
+			octavesToGet.forEach(async octave => {
+				const noteName = sampleName + octave.toString()
 
 				if (noteName === 'Gb7' || noteName === 'Ab3') return
 
@@ -62,7 +62,7 @@ export class SamplesManager {
 
 	public static getSample(noteName: NoteNameSharps, octave: Octave = 4) {
 		const convertedName = convertNoteNameToFlatsName(noteName)
-		const foo = SamplesManager._samples.get(convertedName + octave)
+		const foo = SamplesManager._samples.get(convertedName + octave.toString())
 		return foo || SamplesManager._emptyAudioBuffer
 	}
 

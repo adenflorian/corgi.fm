@@ -62,7 +62,7 @@ export const GridSequencerNotes = (props: IGridSequencerNotesAllProps) => {
 							key={i}
 							className={`noteName ${isWhiteKey(note) ? 'white' : 'black'} ${noteName.toLowerCase() === 'c' ? 'c' : ''}`}
 						>
-							{noteName + getOctaveFromMidiNote(note)}
+							{noteName + getOctaveFromMidiNote(note).toString()}
 						</div>
 					)
 				})}

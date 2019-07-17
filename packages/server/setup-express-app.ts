@@ -40,12 +40,12 @@ export async function setupExpressApp(
 
 	app.use(Sentry.Handlers.errorHandler())
 
-	app.use(function onError(err: any, req: express.Request, res: any, next: any) {
+	app.use(async function onError(err: any, req: express.Request, res: any, next: any) {
 		// The error id is attached to `res.sentry` to be returned
 		// and optionally displayed to the user for support.
 		logger.error('unhandled express error: ', err)
 		res.statusCode = 500
-		return res.end(`something borked, here is an error code that the support people might find useful: ` + res.sentry + '\n')
+		return res.end(`something borked, here is an error code that the support people might find useful: ${res.sentry}`)
 	})
 
 	return app

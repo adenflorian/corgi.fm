@@ -76,13 +76,13 @@ export const ConnectionLine = React.memo(
 						className="mainLongLine"
 						d={pathDPart1}
 						stroke={highQuality ? `url(#${id})` : isSourcePlaying ? saturatedColor : color}
-						strokeWidth={longLineStrokeWidth + 'px'}
+						strokeWidth={`${longLineStrokeWidth}px`}
 					/>
 					<path
 						className="invisibleLongLine"
 						d={pathDPart1}
 						stroke="#0000"
-						strokeWidth={24 + 'px'}
+						strokeWidth="24px"
 					>
 						<title>{longLineTooltip}</title>
 					</path>
@@ -90,19 +90,19 @@ export const ConnectionLine = React.memo(
 						className="blurLine"
 						d={pathDFull}
 						stroke={highQuality ? `url(#${id})` : isSourcePlaying ? saturatedColor : color}
-						strokeWidth={4 + 'px'}
+						strokeWidth="4px"
 					>
 						<title>{longLineTooltip}</title>
 					</path>
 					{highQuality && isSourcePlaying &&
 						<path
 							style={{
-								animationDuration: (3600 / speed) + 's',
+								animationDuration: `${3600 / speed}s`,
 							}}
 							className="animatedLongLine"
 							d={pathDPart1}
 							stroke={saturatedColor}
-							strokeWidth={longLineStrokeWidth * 2 + 'px'}
+							strokeWidth={`${longLineStrokeWidth * 2}px`}
 							strokeDasharray="4 8"
 						/>
 					}

@@ -122,7 +122,7 @@ export function seqRateValueToString(rate: number) {
 	const adjustedRate = rate / 4
 	if (adjustedRate > 1) return adjustedRate.toFixed(0) + ' bars'
 	if (adjustedRate === 1) return adjustedRate.toFixed(0) + ' bar'
-	return '1/' + (1 / adjustedRate)
+	return `1/${1 / adjustedRate}`
 }
 
 export function seqLengthValueToString(length: number) {

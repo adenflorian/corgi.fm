@@ -39,7 +39,7 @@ export function mix2Colors(colorA: string, colorB: string): string {
 export function hashbow(input: IHashable, saturation = 90, lightness = 50) {
 	const greyValues = [null, undefined, [], {}, '']
 
-	if (greyValues.indexOf(input) !== -1) {
+	if (greyValues.includes(input)) {
 		return hslToHex(0, 0, lightness)
 	}
 

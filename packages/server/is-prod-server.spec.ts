@@ -4,7 +4,7 @@ describe('is-prod-server', () => {
 	let originalNodeEnv: any
 
 	beforeEach(() => (originalNodeEnv = process.env.CORGI_ENV))
-	afterEach(() => (process.env.CORGI_ENV = originalNodeEnv))
+	afterEach(async () => (process.env.CORGI_ENV = originalNodeEnv))
 
 	describe('isProdServer', () => {
 		[

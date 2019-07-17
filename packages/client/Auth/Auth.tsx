@@ -120,7 +120,7 @@ export const AuthModalContent: ModalContent = ({hideModal}) => {
 						type="button"
 						className="button google"
 						disabled={inputsDisabled}
-						onClick={() => handleProviderLogin(
+						onClick={async () => handleProviderLogin(
 							firebase.auth.GoogleAuthProvider)}
 					>
 						<Google />
@@ -130,7 +130,7 @@ export const AuthModalContent: ModalContent = ({hideModal}) => {
 						type="button"
 						className="button facebook"
 						disabled={inputsDisabled}
-						onClick={() => handleProviderLogin(
+						onClick={async () => handleProviderLogin(
 							firebase.auth.FacebookAuthProvider)}
 					>
 						<Facebook />
@@ -141,7 +141,7 @@ export const AuthModalContent: ModalContent = ({hideModal}) => {
 		</Fragment>
 	)
 
-	function handleLogin(e: React.FormEvent) {
+	async function handleLogin(e: React.FormEvent) {
 		e.preventDefault()
 		disableInputs()
 
@@ -149,7 +149,7 @@ export const AuthModalContent: ModalContent = ({hideModal}) => {
 			firebaseContext.auth.signInWithEmailAndPassword(email, password))
 	}
 
-	function handleProviderLogin(AuthProviderMaker: AuthProviderMaker) {
+	async function handleProviderLogin(AuthProviderMaker: AuthProviderMaker) {
 		disableInputs()
 
 		return handleLoginPromise(
@@ -157,7 +157,7 @@ export const AuthModalContent: ModalContent = ({hideModal}) => {
 				new AuthProviderMaker()))
 	}
 
-	function handleLoginPromise(
+	async function handleLoginPromise(
 		promise: Promise<firebase.auth.UserCredential>,
 	) {
 		return promise
@@ -166,7 +166,7 @@ export const AuthModalContent: ModalContent = ({hideModal}) => {
 			.catch(handleAuthError)
 	}
 
-	function handleResetPassword() {
+	async function handleResetPassword() {
 		disableInputs()
 
 		return firebaseContext.auth
@@ -176,7 +176,7 @@ export const AuthModalContent: ModalContent = ({hideModal}) => {
 			.catch(handleAuthError)
 	}
 
-	function handleAuthError(error: FirebaseAuthError): any {
+	async function handleAuthError(error: FirebaseAuthError): Promise<any> {
 		clearAuthInfo()
 		enableInputs()
 
@@ -186,7 +186,7 @@ export const AuthModalContent: ModalContent = ({hideModal}) => {
 		}
 	}
 
-	function handleRegister() {
+	async function handleRegister() {
 		return firebaseContext.auth
 			.createUserWithEmailAndPassword(email, password)
 			.then(dispatchOnRegister)

@@ -179,7 +179,7 @@ export const createSelectAllOfThingAsArray =
 	<T extends IThings, U>(selectAllOfThing: SelectAllOfThing<T>) => (state: IClientRoomState) => {
 		const things = selectAllOfThing(state)
 		return Object.keys(things)
-			.map(x => things[x]) as U[]
+			.map((x): U => things[x])
 	}
 
 export type SelectAllOfThing<T extends IThings> = (clientRoomState: IClientRoomState) => T

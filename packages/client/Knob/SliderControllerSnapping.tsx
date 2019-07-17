@@ -1,12 +1,12 @@
 import {List} from 'immutable'
-import React, {useLayoutEffect, useState} from 'react'
+import React, {useLayoutEffect, useState, ReactNode} from 'react'
 import './Knob.less'
 
 interface Props {
 	onChange: (newValue: number | string | boolean) => any
 	value: number | string | boolean
 	defaultIndex: number
-	children: (handleMouseDown: any, percentage: number, adjustedPercentage: number) => any
+	children: (handleMouseDown: any, percentage: number, adjustedPercentage: number) => ReactNode
 	possibleValues: List<any>
 }
 

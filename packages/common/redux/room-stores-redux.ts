@@ -12,7 +12,7 @@ import {
 export const ROOM_ACTION = 'ROOM_ACTION'
 type RoomAction = ReturnType<typeof createRoomAction>
 export const createRoomAction = (action: Action, room: string) => ({
-	type: ROOM_ACTION + '_' + room + '_' + action.type,
+	type: `${ROOM_ACTION}_${room}_${action.type}`,
 	room,
 	action,
 })

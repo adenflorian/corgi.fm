@@ -27,7 +27,7 @@ export const websocketSenderMiddleware: Middleware<{}, IClientAppState, Dispatch
 		}
 	}
 
-function isNetworkAction(action: AnyAction | BroadcastAction) {
+function isNetworkAction(action: AnyAction | BroadcastAction): boolean {
 	return action[BROADCASTER_ACTION] || action[SERVER_ACTION]
 }
 
