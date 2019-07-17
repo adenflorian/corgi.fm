@@ -125,25 +125,25 @@
 	- [ ] profile
 	- [ ] link to patreon account
 	- [ ] link to discord
-- [ ] https://github.com/TrillCyborg/fullstack
-- [ ] https://github.com/accounts-js/accounts
-- [ ] lock down audio node params min/max at instrument level
 - [ ] fix noise wave getting stuck
+- [ ] lock down audio node params min/max at instrument level
 - [ ] refactor
 	- [√] cleanup up express app code
 	- [√] look into using `~` for parcel typescript resolution (using lerna now with yarn workspaces)
 	- [√] look into generating new react components and redux reducers (use vscode snippets)
 	- [√] use `useCallback()` hook
-	- [ ] change Button to extends button props
 	- [√] lint, disallow dispatch prop
+	- [√] eslint_d
+	- [ ] change Button to extends button props
 	- [ ] redux starter kit
-	- [ ] eslint_d
 - [√] eslint rule to require awaiting promises
 - [ ] disallow visual connection to be made if it causes a feedback loop
 - [ ] need visual to show that feedback loops are not possible
 - [ ] test on android
 - [ ] filter envelope
 - [ ] fix loading old saves
+- [ ] https://github.com/TrillCyborg/fullstack
+- [ ] https://github.com/accounts-js/accounts
 - [ ] button on sequencer to plugin keyboard
 - [ ] pan to center when making new room or changing rooms
 - [ ] more prominent message about version being out of date
