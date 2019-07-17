@@ -125,20 +125,18 @@
 	- [ ] profile
 	- [ ] link to patreon account
 	- [ ] link to discord
-- [ ] look into using `~` for parcel typescript resolution
-- [ ] look into generating new react components and redux reducers
-- [ ] use `useCallback()` hook
-- [ ] change Button to extends button props
-- [ ] lint, react function components should be arrow functions
-	- so that when you import them it won't add the parens
-- [ ] lint, disallow dispatch prop
 - [ ] https://github.com/TrillCyborg/fullstack
 - [ ] https://github.com/accounts-js/accounts
-- [ ] eslint rule to require awaiting promises
 - [ ] lock down audio node params min/max at instrument level
 - [ ] fix noise wave getting stuck
 - [ ] refactor
 	- [√] cleanup up express app code
+	- [√] look into using `~` for parcel typescript resolution (using lerna now with yarn workspaces)
+	- [√] look into generating new react components and redux reducers (use vscode snippets)
+	- [√] use `useCallback()` hook
+	- [ ] change Button to extends button props
+	- [√] lint, disallow dispatch prop
+- [√] eslint rule to require awaiting promises
 - [ ] disallow visual connection to be made if it causes a feedback loop
 - [ ] need visual to show that feedback loops are not possible
 - [ ] test on android
@@ -204,7 +202,13 @@ It's just following the values of the sine, really, but you can adjust as you se
 Yes, https://mmckegg.github.io/web-audio-school/, exercise 13 is exactly what you need
 
 # 0.6.0
-- [ ] husky pre-commit
+- [ ] refactor / clean code
+	- [ ] convert all components to function components with hooks
+	- [ ] remove connect() and shamuConnect()
+	- [ ] use `useCallback()` hook everywhere
+	- [ ] husky pre-commit
+	- [ ] lint, react function components should be arrow functions
+		- so that when you import them it won't add the parens
 - [ ] do CORS correctly, only allow corgi.fm origin
 - [ ] allow typing in knob values
 	- [ ] make value look as similar to display value as possible

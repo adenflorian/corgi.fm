@@ -4,63 +4,44 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
+			"label": "lint-watch",
 			"type": "npm",
-			"script": "lint-client-watch",
+			"script": "lint-watch",
 			"isBackground": true,
 			"problemMatcher": {
-				"base": "$eslint",
+				"base": "$eslint-stylish",
 				"fileLocation": "absolute"
 			},
 			"runOptions": {
-				// "runOn": "folderOpen"
+				"runOn": "folderOpen"
 			},
 			"presentation": {
-				"group": "groupB",
+				"group": "groupA",
 				"showReuseMessage": false,
 				"panel": "dedicated",
 				"reveal": "never",
 			},
 		},
 		{
+			"label": "watch-ts-client",
 			"type": "npm",
-			"script": "lint-common-watch",
-			"isBackground": true,
-			"problemMatcher": {
-				"base": "$eslint",
-				"fileLocation": "absolute"
-			},
-			"runOptions": {
-				// "runOn": "folderOpen"
-			},
+			"script": "watch-ts-client",
 			"presentation": {
-				"group": "groupB",
+				"group": "groupA",
 				"showReuseMessage": false,
 				"panel": "dedicated",
 				"reveal": "never",
 			},
-		},
-		{
-			"type": "npm",
-			"script": "lint-server-watch",
 			"isBackground": true,
-			"problemMatcher": {
-				"base": "$eslint",
-				"fileLocation": "absolute"
-			},
+			"problemMatcher": "$tsc-watch",
 			"runOptions": {
-				// "runOn": "folderOpen"
-			},
-			"presentation": {
-				"group": "groupB",
-				"showReuseMessage": false,
-				"panel": "dedicated",
-				"reveal": "never",
-			},
+				"runOn": "folderOpen"
+			}
 		},
 		{
-			"command": "",
 			"label": "go",
 			"type": "process",
+			"command": "",
 			"dependsOn": [
 				"watch-parcel",
 				"watch-server"
@@ -73,10 +54,9 @@
 			"type": "npm",
 			"script": "watch-parcel",
 			"presentation": {
-				"group": "groupA",
+				"group": "groupB",
 				"showReuseMessage": false,
-				"panel": "dedicated",
-				"focus": true
+				"panel": "dedicated"
 			},
 			"isBackground": true,
 			"problemMatcher": [],
@@ -89,25 +69,9 @@
 			"type": "npm",
 			"script": "watch-server",
 			"presentation": {
-				"group": "groupA",
+				"group": "groupB",
 				"showReuseMessage": false,
-				"panel": "dedicated",
-				"focus": true
-			},
-			"isBackground": true,
-			"problemMatcher": "$tsc-watch",
-			"runOptions": {
-				"runOn": "folderOpen"
-			}
-		},
-		{
-			"type": "npm",
-			"script": "watch-ts-client",
-			"presentation": {
-				"group": "groupC",
-				"showReuseMessage": false,
-				"panel": "dedicated",
-				"focus": false
+				"panel": "dedicated"
 			},
 			"isBackground": true,
 			"problemMatcher": "$tsc-watch",
