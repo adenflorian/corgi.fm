@@ -106,7 +106,7 @@ export class BasicSynthesizerState implements IConnectable, NodeSpecialState {
 	}
 
 	public readonly oscillatorType: ShamuOscillatorType
-		= pickRandomArrayElement(['sine', 'sawtooth', 'square', 'triangle']) as ShamuOscillatorType
+	= pickRandomArrayElement(['sine', 'sawtooth', 'square', 'triangle']) as ShamuOscillatorType
 
 	public readonly id = uuid.v4()
 	public readonly ownerId: string
@@ -134,19 +134,19 @@ export class BasicSynthesizerState implements IConnectable, NodeSpecialState {
 	public readonly lfoWave: LfoOscillatorType = LfoOscillatorType.sine
 	public readonly filterType: BuiltInBQFilterType = BasicSynthesizerState.defaultFilterType
 
-	constructor(ownerId: ClientId) {
+	public constructor(ownerId: ClientId) {
 		this.ownerId = ownerId	// TODO Is this still needed?
 	}
 }
 
 export function deserializeBasicSynthesizerState(state: IMultiStateThing): IMultiStateThing {
 	const x = state as BasicSynthesizerState
-	const y = {
+	const y: BasicSynthesizerState = {
 		...(new BasicSynthesizerState(x.ownerId)),
 		...x,
 		width: Math.max(x.width, BasicSynthesizerState.defaultWidth),
 		height: Math.max(x.height, BasicSynthesizerState.defaultHeight),
-	} as BasicSynthesizerState
+	}
 	return y
 }
 

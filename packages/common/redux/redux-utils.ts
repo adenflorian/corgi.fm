@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/camelcase */
 /* eslint-disable camelcase */
 import {isEqual} from 'lodash'
 import {
@@ -96,8 +97,8 @@ interface ShamuConnect2 {
 		mapStateToProps: null | undefined,
 		mapDispatchToProps: TDispatchProps,
 	): InferableComponentEnhancerWithProps<
-		ResolveThunks<TDispatchProps>,
-		TOwnProps
+	ResolveThunks<TDispatchProps>,
+	TOwnProps
 	>
 
 	<TStateProps = {}, TDispatchProps = {}, TOwnProps = {}, State = IClientAppState>(
@@ -109,8 +110,8 @@ interface ShamuConnect2 {
 		mapStateToProps: MapStateToPropsParam<TStateProps, TOwnProps, State>,
 		mapDispatchToProps: TDispatchProps,
 	): InferableComponentEnhancerWithProps<
-		TStateProps & ResolveThunks<TDispatchProps>,
-		TOwnProps
+	TStateProps & ResolveThunks<TDispatchProps>,
+	TOwnProps
 	>
 
 	<TStateProps = {}, no_dispatch = {}, TOwnProps = {}, TMergedProps = {}, State = IClientAppState>(
@@ -158,8 +159,8 @@ interface ShamuConnect2 {
 		mergeProps: null | undefined,
 		options: Options<{}, TStateProps, TOwnProps>,
 	): InferableComponentEnhancerWithProps<
-		ResolveThunks<TDispatchProps>,
-		TOwnProps
+	ResolveThunks<TDispatchProps>,
+	TOwnProps
 	>
 
 	<TStateProps = {}, TDispatchProps = {}, TOwnProps = {}, State = IClientAppState>(
@@ -175,8 +176,8 @@ interface ShamuConnect2 {
 		mergeProps: null | undefined,
 		options: Options<State, TStateProps, TOwnProps>,
 	): InferableComponentEnhancerWithProps<
-		TStateProps & ResolveThunks<TDispatchProps>,
-		TOwnProps
+	TStateProps & ResolveThunks<TDispatchProps>,
+	TOwnProps
 	>
 }
 

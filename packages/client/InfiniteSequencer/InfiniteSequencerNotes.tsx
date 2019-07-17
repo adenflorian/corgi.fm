@@ -189,7 +189,7 @@ type HandleMouseEvent = (event: React.MouseEvent, note: IMidiNote, index: number
 
 const ColorGridNote = React.memo(
 	function _ColorGridNote({note, index, height, top, onMouseDown, onMouseEnter}:
-		{note: IMidiNote, index: number, height: number, top: number, onMouseDown: HandleMouseEvent, onMouseEnter: HandleMouseEvent},
+	{note: IMidiNote, index: number, height: number, top: number, onMouseDown: HandleMouseEvent, onMouseEnter: HandleMouseEvent},
 	) {
 		return (
 			<div

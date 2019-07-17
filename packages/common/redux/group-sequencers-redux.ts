@@ -70,7 +70,7 @@ export class GroupSequencer implements IConnectable, NodeSpecialState, IMultiSta
 	public readonly notesDisplayWidth: number
 	public readonly enabled: boolean = true
 
-	constructor(
+	public constructor(
 		public readonly ownerId: string,
 	) {
 		this.groups = makeGroups([CssColor.red, CssColor.green, CssColor.blue], this.length, this.groupEventBeatLength)
@@ -82,7 +82,7 @@ export class GroupSequencer implements IConnectable, NodeSpecialState, IMultiSta
 
 export function deserializeGroupSequencerState(state: IMultiStateThing): IMultiStateThing {
 	const x = state as GroupSequencer
-	const y = {
+	const y: GroupSequencer = {
 		...(new GroupSequencer(x.ownerId)),
 		...x,
 		groups: List<Group>(x.groups)
@@ -95,7 +95,7 @@ export function deserializeGroupSequencerState(state: IMultiStateThing): IMultiS
 		height: Math.max(x.height, GroupSequencer.defaultHeight),
 		notesDisplayStartX: 0,
 		notesDisplayWidth: GroupSequencer.defaultWidth,
-	} as GroupSequencer
+	}
 	return y
 }
 
@@ -129,8 +129,8 @@ export type GroupEvents = List<GroupEvent>
 
 export interface GroupEvent {
 	on: boolean
-	startBeat: number,
-	length: number,
+	startBeat: number
+	length: number
 }
 
 export type GroupSequencerAction = ActionType<typeof groupSequencerActions>

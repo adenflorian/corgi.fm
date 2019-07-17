@@ -99,7 +99,7 @@ export class GridSequencerState extends SequencerStateBase {
 	public readonly scrollY: number
 	public readonly notesToShow: number
 
-	constructor(
+	public constructor(
 		ownerId: string,
 		name = 'Grid Sequencer',
 		notesToShow = 24,
@@ -111,7 +111,6 @@ export class GridSequencerState extends SequencerStateBase {
 			}))),
 		isPlaying = false,
 	) {
-
 		const midiClip = new MidiClip({
 			events: events.map(x => ({
 				...x,
@@ -159,14 +158,14 @@ export function deserializeGridSequencerState(state: IMultiStateThing): IMultiSt
 	const x = state as GridSequencerState
 	const z = deserializeSequencerState(x) as ISequencerState
 	const notesDisplayWidth = GridSequencerState.noteWidth * z.midiClip.events.count()
-	const y = {
+	const y: GridSequencerState = {
 		...(new GridSequencerState(x.ownerId)),
 		...z,
 		width: Math.max(x.width, GridSequencerState.getWidth(notesDisplayWidth)),
 		height: Math.max(x.height, GridSequencerState.noteHeight * x.notesToShow),
 		notesDisplayStartX: GridSequencerState.controlsWidth + GridSequencerState.noteNamesSideBarWidth,
 		notesDisplayWidth,
-	} as GridSequencerState
+	}
 	return y
 }
 

@@ -79,7 +79,7 @@ export class MidiRange {
 	public static readonly maxSafeNumber = 100000000
 	public readonly end: number
 
-	constructor(
+	public constructor(
 		/** Always 0 or greater, defaults to 0 */
 		public readonly start = 0,
 		/** Always 0 or greater, defaults to 0 */

@@ -86,19 +86,19 @@ export class BasicSamplerState implements IConnectable, NodeSpecialState {
 	public readonly enabled: boolean = true
 	public readonly filterType: BuiltInBQFilterType = BasicSamplerState.defaultFilterType
 
-	constructor(ownerId: ClientId) {
+	public constructor(ownerId: ClientId) {
 		this.ownerId = ownerId
 	}
 }
 
 export function deserializeBasicSamplerState(state: IMultiStateThing): IMultiStateThing {
 	const x = state as BasicSamplerState
-	const y = {
+	const y: BasicSamplerState = {
 		...(new BasicSamplerState(x.ownerId)),
 		...x,
 		width: Math.max(x.width, BasicSamplerState.defaultWidth),
 		height: Math.max(x.height, BasicSamplerState.defaultHeight),
-	} as BasicSamplerState
+	}
 	return y
 }
 

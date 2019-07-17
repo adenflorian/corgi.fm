@@ -32,7 +32,7 @@ export class Chat extends Component<AllProps, IChatComponentState> {
 	public chatInputRef?: HTMLInputElement
 	public chatRef: React.RefObject<HTMLDivElement>
 
-	constructor(props: AllProps) {
+	public constructor(props: AllProps) {
 		super(props)
 		this.chatRef = React.createRef()
 	}

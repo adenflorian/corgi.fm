@@ -6,8 +6,9 @@ import {FirebaseContextStuff} from './FirebaseContext'
 
 type AuthMiddlewareActions = AuthAction
 
-export const createAuthMiddleware:
-	(firebase: FirebaseContextStuff) => Middleware<{}, IClientAppState> =
+type AuthMiddleware = (firebase: FirebaseContextStuff) => Middleware<{}, IClientAppState>
+
+export const createAuthMiddleware: AuthMiddleware =
 	(firebase: FirebaseContextStuff) => ({dispatch, getState}) =>
 		next => async (action: AuthMiddlewareActions) => {
 			next(action)

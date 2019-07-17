@@ -6,7 +6,7 @@ interface IVerticalScrollBarViewProps {
 	percentage: number
 	handleMouseDown: (e: React.MouseEvent) => any
 	marks: List<number>
-	sliderGrabberHeightPercentage?: number,
+	sliderGrabberHeightPercentage?: number
 }
 
 export const VerticalScrollBarView = (props: IVerticalScrollBarViewProps) => {

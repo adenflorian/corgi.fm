@@ -111,7 +111,7 @@ export class ClientState implements IClientState {
 	public readonly color: string
 	public readonly name: string
 
-	constructor({socketId, name}: {socketId: string, name: string | ''}) {
+	public constructor({socketId, name}: {socketId: string, name: string | ''}) {
 		this.id = v4()
 		this.socketId = socketId
 		this.name = name === '' ? createUsername(this.id) : name

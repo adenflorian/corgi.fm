@@ -34,8 +34,8 @@ export type KeyColor = 'white' | 'black'
 
 export interface IKeyColors {
 	[key: number]: {
-		color: KeyColor,
-		name: NoteNameSharps,
+		color: KeyColor
+		name: NoteNameSharps
 	}
 }
 
@@ -52,7 +52,7 @@ export const keyColors: Readonly<IKeyColors> = Object.freeze({
 	9: {color: 'white', name: 'A'},
 	10: {color: 'black', name: 'A#'},
 	11: {color: 'white', name: 'B'},
-} as IKeyColors)
+})
 
 export function roundRate(rawRate: number) {
 	return rateValues.find(x => rawRate <= x) || rateValues.last(4)

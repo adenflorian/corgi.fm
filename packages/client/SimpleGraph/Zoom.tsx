@@ -24,8 +24,8 @@ interface IZoomState {
 	zoom: number
 	zoomReal: number
 	pan: {
-		x: number,
-		y: number,
+		x: number
+		y: number
 	}
 	backgroundClicked: boolean
 }

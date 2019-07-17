@@ -1,7 +1,7 @@
 import {simpleGlobalClientState} from './SimpleGlobalClientState'
 
 type UpdateFunc = (highResTimestamp: number) => void
-type UpdateFuncs = ReadonlyArray<UpdateFunc>
+type UpdateFuncs = readonly UpdateFunc[]
 
 let _thingsToUpdate: UpdateFuncs = []
 let _stop = false

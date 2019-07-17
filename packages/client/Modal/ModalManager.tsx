@@ -11,7 +11,7 @@ import {WelcomeModalContent} from '../Welcome/Welcome'
 import {Modal} from './Modal'
 
 export interface ModalContent extends React.FunctionComponent<{
-	hideModal: AnyFunction,
+	hideModal: AnyFunction
 }> {}
 
 export function ModalManager() {

@@ -14,11 +14,10 @@ import {handleStopDraggingGhostConnector} from './dragging-connections'
 import {GetAllInstruments} from './instrument-manager'
 
 type ConnectionClientMiddleWareAction = IConnectionAction | OrganizeGraphAction |
-	GhostConnectorAction | PositionAction
+GhostConnectorAction | PositionAction
 
 // TODO Merge with local middleware?
-export const connectionsClientMiddleware
-	: (getAllInstruments: GetAllInstruments) => Middleware<{}, IClientAppState> =
+export const connectionsClientMiddleware: (getAllInstruments: GetAllInstruments) => Middleware<{}, IClientAppState> =
 	(getAllInstruments: GetAllInstruments) => ({dispatch, getState}) => next => (action: ConnectionClientMiddleWareAction) => {
 
 		const beforeState = getState()

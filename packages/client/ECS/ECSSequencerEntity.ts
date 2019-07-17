@@ -3,7 +3,7 @@ import {ECSGraphPositionComponent, ECSSequencerComponent} from './ECSComponents'
 import {ECSComponentType, ECSEntity} from './ECSTypes'
 
 export class ECSSequencerEntity extends ECSEntity {
-	constructor(
+	public constructor(
 		private readonly _graphPositionComponent: ECSGraphPositionComponent,
 		private readonly _sequencerComponent: ECSSequencerComponent,
 	) {

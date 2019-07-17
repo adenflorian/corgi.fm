@@ -69,19 +69,19 @@ export class SimpleCompressorState implements IConnectable, NodeSpecialState {
 	public readonly name: string = 'Simple Compressor'
 	public readonly enabled: boolean = true
 
-	constructor(ownerId: ClientId) {
+	public constructor(ownerId: ClientId) {
 		this.ownerId = ownerId
 	}
 }
 
 export function deserializeSimpleCompressorState(state: IMultiStateThing): IMultiStateThing {
 	const x = state as SimpleCompressorState
-	const y = {
+	const y: SimpleCompressorState = {
 		...(new SimpleCompressorState(x.ownerId)),
 		...x,
 		width: Math.max(x.width, SimpleCompressorState.defaultWidth),
 		height: Math.max(x.height, SimpleCompressorState.defaultHeight),
-	} as SimpleCompressorState
+	}
 	return y
 }
 

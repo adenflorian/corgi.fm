@@ -124,8 +124,8 @@ export const makePosition = (
 }
 
 export type PositionAction = AddPositionAction | DeletePositionsAction | NodeClickedAction
-	| DeleteAllPositionsAction | UpdatePositionsAction | UpdatePositionAction | MovePositionAction
-	| ReplacePositionsAction | ActionType<typeof positionActions>
+| DeleteAllPositionsAction | UpdatePositionsAction | UpdatePositionAction | MovePositionAction
+| ReplacePositionsAction | ActionType<typeof positionActions>
 
 // Reducers
 const positionsSpecificReducer: Reducer<IPositions, PositionAction> =

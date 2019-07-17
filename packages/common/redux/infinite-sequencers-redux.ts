@@ -109,7 +109,7 @@ export class InfiniteSequencerState extends SequencerStateBase {
 	public readonly style: InfiniteSequencerStyle
 	public readonly showRows: boolean
 
-	constructor(
+	public constructor(
 		ownerId: string,
 		name = 'Infinite Sequencer',
 		style = InfiniteSequencerStyle.colorGrid,
@@ -147,14 +147,14 @@ export class InfiniteSequencerState extends SequencerStateBase {
 
 export function deserializeInfiniteSequencerState(state: IMultiStateThing): IMultiStateThing {
 	const x = state as InfiniteSequencerState
-	const y = {
+	const y: InfiniteSequencerState = {
 		...(new InfiniteSequencerState(x.ownerId)),
 		...(deserializeSequencerState(x)),
 		width: Math.max(x.width, InfiniteSequencerState.defaultWidth),
 		height: Math.max(x.height, InfiniteSequencerState.defaultHeight),
 		notesDisplayStartX: InfiniteSequencerState.notesStartX,
 		notesDisplayWidth: InfiniteSequencerState.notesWidth,
-	} as InfiniteSequencerState
+	}
 	return y
 }
 

@@ -87,19 +87,19 @@ export class SimpleReverbState implements IConnectable, NodeSpecialState {
 	public readonly name: string = 'Simple Reverb'
 	public readonly enabled: boolean = true
 
-	constructor(ownerId: ClientId) {
+	public constructor(ownerId: ClientId) {
 		this.ownerId = ownerId
 	}
 }
 
 export function deserializeSimpleReverbState(state: IMultiStateThing): IMultiStateThing {
 	const x = state as SimpleReverbState
-	const y = {
+	const y: SimpleReverbState = {
 		...(new SimpleReverbState(x.ownerId)),
 		...x,
 		width: Math.max(x.width, SimpleReverbState.defaultWidth),
 		height: Math.max(x.height, SimpleReverbState.defaultHeight),
-	} as SimpleReverbState
+	}
 	return y
 }
 

@@ -42,7 +42,7 @@ export function ContextMenuContainer({localClientId, localClientKeyboardCount, l
 
 interface NodeMenuProps {
 	trigger: {
-		nodeType: ConnectionNodeType,
+		nodeType: ConnectionNodeType
 	}
 }
 
@@ -59,8 +59,7 @@ function NodeMenu({trigger}: NodeMenuProps) {
 const ConnectedNodeMenu = connectMenu(nodeMenuId)(NodeMenu)
 
 const BackgroundMenuItems = React.memo(
-	function _MenuItems({localClientId, localClientKeyboardCount, localClientColor}
-		: {localClientId: Id, localClientKeyboardCount: number, localClientColor: string},
+	function _MenuItems({localClientId, localClientKeyboardCount, localClientColor}: {localClientId: Id, localClientKeyboardCount: number, localClientColor: string},
 	) {
 		const dispatch = useDispatch()
 

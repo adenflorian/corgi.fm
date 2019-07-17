@@ -45,7 +45,7 @@ export interface IChatState {
 }
 
 export class IChatMessage {
-	constructor(
+	public constructor(
 		public readonly authorName: string,
 		public readonly color: string,
 		public readonly text: string,

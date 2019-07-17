@@ -57,8 +57,8 @@ interface IKeyboardReduxProps {
 	isLocal: boolean
 	isPlaying: boolean
 	octave: Octave
-	ownerName: string,
-	pressedMidiKeys: IMidiNotes,
+	ownerName: string
+	pressedMidiKeys: IMidiNotes
 	showNoteNames: boolean
 	virtualMidiKeyboard: IVirtualMidiKeyboard
 }

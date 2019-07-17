@@ -92,7 +92,7 @@ export function setupWebsocketAndListeners(store: Store) {
 		['clientDisconnected'],
 	])
 
-	function setupDefaultListeners(events: Array<[string, string] | [string]>) {
+	function setupDefaultListeners(events: ([string, string] | [string])[]) {
 		events.forEach(event => setupDefaultEventListener(event[0], event[1]))
 	}
 

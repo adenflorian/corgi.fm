@@ -1,6 +1,6 @@
 import {List} from 'immutable'
 import React, {Component} from 'react'
-import {changeRoom, selectActiveRoom, selectAllRoomNames, shamuConnect} from '@corgifm/common/redux'
+import {changeRoom, selectActiveRoom, selectAllRoomNames, shamuConnect, IClientAppState} from '@corgifm/common/redux'
 import {Select} from './Select/Select'
 
 interface IRoomSelectorReduxProps {
@@ -34,11 +34,11 @@ export class RoomSelector extends Component<IRoomSelectorAllProps> {
 	}
 }
 
-export const ConnectedRoomSelector = shamuConnect(
-	(state): IRoomSelectorReduxProps => ({
+export const ConnectedRoomSelector = shamuConnect<IRoomSelectorReduxProps, IRoomSelectorDispatchProps, {}, IClientAppState>(
+	state => ({
 		activeRoom: selectActiveRoom(state),
 		rooms: selectAllRoomNames(state),
 	}), {
 		changeRoom,
-	} as IRoomSelectorDispatchProps,
+	},
 )(RoomSelector)

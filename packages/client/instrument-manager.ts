@@ -43,7 +43,7 @@ export const setupInstrumentManager = (
 	store: Store<IClientAppState>,
 	audioContext: AudioContext,
 	preFx: GainNode,
-) => {
+): {getAllInstruments: GetAllInstruments, getAllAudioNodes: GetAllAudioNodes} => {
 
 	// Need separate properties to match up with what IDs selector is used
 	// so that we can delete stuff properly
@@ -68,7 +68,7 @@ export const setupInstrumentManager = (
 
 	store.subscribe(updateInstrumentLayer)
 
-	return {getAllInstruments, getAllAudioNodes} as {getAllInstruments: GetAllInstruments, getAllAudioNodes: GetAllAudioNodes}
+	return {getAllInstruments, getAllAudioNodes}
 
 	function updateInstrumentLayer() {
 		const state = store.getState()

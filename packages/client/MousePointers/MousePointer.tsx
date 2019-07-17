@@ -8,10 +8,10 @@ interface MousePointerProps {
 }
 
 interface MousePointerReduxProps {
-	color: string,
-	name: string,
-	x: number,
-	y: number,
+	color: string
+	name: string
+	x: number
+	y: number
 }
 
 type MousePointerAllProps = MousePointerProps & MousePointerReduxProps

@@ -104,7 +104,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 	interface CreateSourceAndTargetArgs {
 		source: CreateSourceArgs
 		target: {
-			type: ConnectionNodeType,
+			type: ConnectionNodeType
 		}
 	}
 

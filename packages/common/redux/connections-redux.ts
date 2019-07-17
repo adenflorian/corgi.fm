@@ -85,7 +85,7 @@ export class Connection implements IConnection {
 
 	public readonly id = uuid.v4()
 
-	constructor(
+	public constructor(
 		public readonly sourceId: string,
 		public readonly sourceType: ConnectionNodeType,
 		public readonly targetId: string,

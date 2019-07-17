@@ -45,7 +45,7 @@ export const dummyIConnectable: IMultiStateThing = Object.freeze({
 })
 
 class DummyConnectable implements IConnectable {
-	constructor(
+	public constructor(
 		public readonly color: CssColor.disabledGray,
 		public readonly id: 'oh no',
 		public readonly type: ConnectionNodeType.dummy,

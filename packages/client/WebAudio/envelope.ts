@@ -244,15 +244,15 @@ class ScheduledEnvelope {
 	public readonly releaseEnd?: number
 	public readonly hardCutoffTime: number
 
-	constructor(
+	public constructor(
 		env: {
-			attackStart: number,
-			attackEnd: number,
-			decayEnd: number,
-			sustain: number,
-			releaseStart?: number,
-			releaseEnd?: number,
-			hardCutoffTime: number,
+			attackStart: number
+			attackEnd: number
+			decayEnd: number
+			sustain: number
+			releaseStart?: number
+			releaseEnd?: number
+			hardCutoffTime: number
 		},
 	) {
 		this.attackStart = env.attackStart

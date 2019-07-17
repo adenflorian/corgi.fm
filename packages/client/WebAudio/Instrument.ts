@@ -22,7 +22,7 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 	private readonly _gain: GainNode
 	protected readonly _lfoGainTarget: GainNode
 
-	constructor(options: IInstrumentOptions) {
+	public constructor(options: IInstrumentOptions) {
 		super(options)
 
 		this._audioContext = options.audioContext

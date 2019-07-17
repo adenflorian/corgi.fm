@@ -8,7 +8,7 @@ export type OnEndedCallback = (id: number) => void
 export abstract class Voices<V extends Voice> {
 	protected _scheduledVoices = OrderedMap<number, V>()
 
-	constructor(
+	public constructor(
 		protected _detune: number,
 		protected _lowPassFilterCutoffFrequency: number,
 	) {}

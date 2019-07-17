@@ -95,19 +95,19 @@ export class SimpleDelayState implements IConnectable, NodeSpecialState {
 	public readonly name: string = 'Simple Delay'
 	public readonly enabled: boolean = true
 
-	constructor(ownerId: ClientId) {
+	public constructor(ownerId: ClientId) {
 		this.ownerId = ownerId
 	}
 }
 
 export function deserializeSimpleDelayState(state: IMultiStateThing): IMultiStateThing {
 	const x = state as SimpleDelayState
-	const y = {
+	const y: SimpleDelayState = {
 		...(new SimpleDelayState(x.ownerId)),
 		...x,
 		width: Math.max(x.width, SimpleDelayState.defaultWidth),
 		height: Math.max(x.height, SimpleDelayState.defaultHeight),
-	} as SimpleDelayState
+	}
 	return y
 }
 

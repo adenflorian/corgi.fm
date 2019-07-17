@@ -17,7 +17,7 @@ declare module 'midi-writer-js' {
 	}
 
 	export class NoteEvent {
-		constructor(args: INoteEventOptions)
+		public constructor(args: INoteEventOptions)
 	}
 
 	export interface INoteEventOptions {
@@ -29,7 +29,7 @@ declare module 'midi-writer-js' {
 	export class Writer {
 		public dataUri: () => any
 
-		constructor(tracks: Track[])
+		public constructor(tracks: Track[])
 	}
 
 	export type mapFunction = (event: Track, index: number) => any

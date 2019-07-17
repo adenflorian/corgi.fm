@@ -62,7 +62,7 @@ export interface IVirtualKeyboardsState extends IMultiState {
 }
 
 export interface IVirtualKeyboards extends IMultiStateThings {
-	[clientId: string]: VirtualKeyboardState,
+	[clientId: string]: VirtualKeyboardState
 }
 
 export class VirtualKeyboardState implements IMultiStateThing, NodeSpecialState {
@@ -84,13 +84,13 @@ export class VirtualKeyboardState implements IMultiStateThing, NodeSpecialState 
 
 	public static fromJS: IMultiStateThingDeserializer = state => {
 		const x = state as VirtualKeyboardState
-		const y = {
+		const y: VirtualKeyboardState = {
 			...(new VirtualKeyboardState(x.ownerId, x.color)),
-			...state,
+			...(state as VirtualKeyboardState),
 			pressedKeys: MidiNotes(x.pressedKeys),
 			width: Math.max(x.width, VirtualKeyboardState.defaultWidth),
 			height: Math.max(x.height, VirtualKeyboardState.defaultHeight),
-		} as VirtualKeyboardState
+		}
 		return y
 	}
 
@@ -103,7 +103,7 @@ export class VirtualKeyboardState implements IMultiStateThing, NodeSpecialState 
 	public readonly name: string = 'Virtual Keyboard'
 	public readonly enabled: boolean = true
 
-	constructor(
+	public constructor(
 		public readonly ownerId: ClientId,
 		public readonly color: string = 'black',
 	) {}

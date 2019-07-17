@@ -36,8 +36,8 @@ start()
 declare global {
 	interface NodeModule {
 		hot: {
-			dispose: (_: () => any) => any,
-			accept: (_: () => any) => any,
+			dispose: (_: () => any) => any
+			accept: (_: () => any) => any
 		}
 	}
 }

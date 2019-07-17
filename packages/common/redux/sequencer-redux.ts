@@ -153,7 +153,7 @@ export abstract class SequencerStateBase implements ISequencerState {
 	public readonly pitch: number = 0
 	public readonly enabled: boolean = true
 
-	constructor(
+	public constructor(
 		public readonly name: string,
 		public readonly midiClip: MidiClip,
 		public readonly width: number,
@@ -174,9 +174,9 @@ export function isEmptyEvents(events: MidiClipEvents) {
 	return events.some(x => x.notes.count() > 0) === false
 }
 
-export function deserializeSequencerState<T extends ISequencerState>(state: IMultiStateThing): IMultiStateThing {
+export function deserializeSequencerState<T extends ISequencerState>(state: IMultiStateThing): T {
 	const x = state as T
-	const y = {
+	const y: T = {
 		...x,
 		midiClip: new MidiClip({
 			length: x.midiClip.length,
@@ -184,7 +184,7 @@ export function deserializeSequencerState<T extends ISequencerState>(state: IMul
 			events: deserializeEvents(x.midiClip.events),
 		}),
 		previousEvents: List(x.previousEvents.map(deserializeEvents)),
-	} as T
+	}
 	return y
 }
 

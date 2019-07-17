@@ -23,6 +23,7 @@
         "plugin:import/errors",
         "plugin:import/warnings",
         "plugin:import/typescript",
+        "plugin:@typescript-eslint/recommended",
         "airbnb"
     ],
     "plugins": [
@@ -47,13 +48,6 @@
         }
     ],
     "rules": {
-        "indent": [
-            "error",
-            "tab",
-            {
-                "SwitchCase": 1
-            }
-        ],
         "quotes": [
             "error",
             "single",
@@ -143,6 +137,18 @@
                 ]
             }
         ],
+        // Typescript
+        "indent": "off",
+        "@typescript-eslint/indent": [
+            "error",
+            "tab",
+            {
+                "SwitchCase": 1
+            }
+        ],
+        "@typescript-eslint/explicit-function-return-type": "off",
+        "@typescript-eslint/no-parameter-properties": "off",
+        "@typescript-eslint/no-empty-interface": "off",
         // React
         "react-hooks/rules-of-hooks": "error",
         "react-hooks/exhaustive-deps": "error",
@@ -181,6 +187,19 @@
             "consistent-as-needed"
         ],
         "no-alert": "off",
+        "@typescript-eslint/no-use-before-define": "off",
+        "@typescript-eslint/member-delimiter-style": [
+            "error",
+            {
+                "multiline": {
+                    "delimiter": "none"
+                },
+                "singleline": {
+                    "delimiter": "comma"
+                }
+            }
+        ],
+        "@typescript-eslint/camelcase": "off",
         // To be turned on at future time
         "no-tabs": "off",
         "react/prefer-stateless-function": "off",
@@ -225,7 +244,10 @@
         "padded-blocks": "off",
         "react/jsx-curly-brace-presence": "off",
         "no-path-concat": "off",
-        "default-case": "off"
+        "default-case": "off",
+        "@typescript-eslint/no-non-null-assertion": "off",
+        "@typescript-eslint/interface-name-prefix": "off",
+        "@typescript-eslint/no-explicit-any": "off"
     },
     "settings": {
         "react": {

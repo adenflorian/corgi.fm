@@ -16,13 +16,13 @@ export const shamuMetaActions = Object.freeze({
 })
 
 class ShamuMetaState {
-	constructor(
+	public constructor(
 		public readonly selectedNode?: SelectedNode,
 	) {}
 }
 
 export class SelectedNode {
-	constructor(
+	public constructor(
 		public readonly id: Id,
 		public readonly type: ConnectionNodeType,
 	) {}

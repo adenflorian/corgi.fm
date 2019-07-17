@@ -73,24 +73,24 @@ export const loadRoom = (savedRoom: SavedRoom) => ({
 })
 
 export type RoomsReduxAction = SetRoomsAction | SetActiveRoomAction | RequestCreateRoomAction |
-	ChangeRoomAction | CreateRoomAction | DeleteRoomAction | UserLeftRoomAction | LoadRoomAction
+ChangeRoomAction | CreateRoomAction | DeleteRoomAction | UserLeftRoomAction | LoadRoomAction
 
 export interface LocalSaves {
 	all: {
-		[key: string]: SavedRoom,
+		[key: string]: SavedRoom
 	}
 }
 
 export interface SavedRoom {
-	connections: ReturnType<typeof selectAllConnections>,
-	globalClock: ReturnType<typeof selectGlobalClockState>,
-	positions: ReturnType<typeof selectAllPositions>,
-	roomSettings: ReturnType<typeof selectRoomSettings>,
-	shamuGraph: ReturnType<typeof selectShamuGraphState>,
-	saveDateTime: string,
-	saveClientVersion: string,
-	saveServerVersion: string,
-	room: string,
+	connections: ReturnType<typeof selectAllConnections>
+	globalClock: ReturnType<typeof selectGlobalClockState>
+	positions: ReturnType<typeof selectAllPositions>
+	roomSettings: ReturnType<typeof selectRoomSettings>
+	shamuGraph: ReturnType<typeof selectShamuGraphState>
+	saveDateTime: string
+	saveClientVersion: string
+	saveServerVersion: string
+	room: string
 }
 
 const initialState = Object.freeze({
@@ -105,9 +105,9 @@ export type Rooms = Map<RoomName, Room>
 export type RoomName = string
 
 export interface Room {
-	name: RoomName,
-	creationTimestamp: number,
-	lastTimeUserLeftTimestamp?: number,
+	name: RoomName
+	creationTimestamp: number
+	lastTimeUserLeftTimestamp?: number
 }
 
 export const roomsReducer: Reducer<IRoomsState, RoomsReduxAction> = combineReducers({

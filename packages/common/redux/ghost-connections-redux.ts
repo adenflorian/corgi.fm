@@ -63,7 +63,7 @@ export class GhostConnection {
 
 	public readonly id: GhostConnectionId = uuid.v4()
 
-	constructor(
+	public constructor(
 		public readonly activeConnector: ActiveConnector,
 		public readonly inactiveConnector: InactiveConnector,
 		public readonly activeSourceOrTarget: ActiveGhostConnectorSourceOrTarget,

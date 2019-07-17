@@ -6,15 +6,12 @@ export function pickRandomArrayElement<T>(array: T[]): T {
 	return array[Math.floor(Math.random() * array.length)]
 }
 
-export function toArray(obj: any) {
-	return Object.keys(obj).map(x => obj[x])
-}
-
-export function getKeyByValue(object: any, value: any) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function getKeyByValue(object: any, value: unknown) {
 	return Object.keys(object).find(key => object[key] === value)
 }
 
-export function assertArrayHasNoUndefinedElements(array: any[]): void {
+export function assertArrayHasNoUndefinedElements(array: unknown[]): void {
 	array.forEach(x => {
 		if (x === undefined) {
 			throw new Error('assertArrayHasNoUndefinedElements failed: ' + JSON.stringify(array))
@@ -24,31 +21,31 @@ export function assertArrayHasNoUndefinedElements(array: any[]): void {
 
 export const createThisShouldntHappenError = () => new Error(`this shouldn't happen`)
 
-export const rateLimitedDebounce = <T extends (...args: any[]) => any>(
+export const rateLimitedDebounce = <T extends (...args: unknown[]) => unknown>(
 	func: T,
 	intervalMs: number,
 ) => debounce(
-		func,
-		intervalMs,
-		{
-			leading: true,
-			trailing: true,
-			maxWait: intervalMs,
-		},
-	)
+	func,
+	intervalMs,
+	{
+		leading: true,
+		trailing: true,
+		maxWait: intervalMs,
+	},
+)
 
-export const rateLimitedDebounceNoTrail = <T extends (...args: any[]) => any>(
+export const rateLimitedDebounceNoTrail = <T extends (...args: unknown[]) => unknown>(
 	func: T,
 	intervalMs: number,
 ) => debounce(
-		func,
-		intervalMs,
-		{
-			leading: true,
-			trailing: false,
-			maxWait: intervalMs,
-		},
-	)
+	func,
+	intervalMs,
+	{
+		leading: true,
+		trailing: false,
+		maxWait: intervalMs,
+	},
+)
 
 /** Returns a number from 0 to length - 1 */
 export function getNumberInRangeFromString(str: string, length: number) {

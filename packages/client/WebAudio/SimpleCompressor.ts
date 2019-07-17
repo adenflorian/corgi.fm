@@ -12,7 +12,7 @@ export class SimpleCompressor extends AudioNodeWrapper {
 	private readonly _compressorNode: DynamicsCompressorNode
 	private readonly _inputGain: GainNode
 
-	constructor(options: IAudioNodeWrapperOptions) {
+	public constructor(options: IAudioNodeWrapperOptions) {
 		super(options)
 		this._compressorNode = options.audioContext.createDynamicsCompressor()
 		this._compressorNode.threshold.value = -24

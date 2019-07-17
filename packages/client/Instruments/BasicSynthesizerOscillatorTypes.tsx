@@ -12,7 +12,7 @@ interface IBasicSynthesizerOscillatorTypesProps {
 	activeType: ShamuOscillatorType
 }
 
-const oscillatorTypes: Array<{type: ShamuOscillatorType, svgPath: string, title: string}> = [
+const oscillatorTypes: {type: ShamuOscillatorType, svgPath: string, title: string}[] = [
 	{type: BuiltInOscillatorType.sine, svgPath: SineWave, title: 'Sine Wave'},
 	{type: BuiltInOscillatorType.triangle, svgPath: TriangleWave, title: 'Triangle Wave'},
 	{type: BuiltInOscillatorType.sawtooth, svgPath: SawWave, title: 'Saw Wave'},

@@ -17,8 +17,8 @@ interface IVolumeControlProps {
 }
 
 interface IVolumeControlReduxProps {
-	isPlaying: boolean,
-	masterVolume: number,
+	isPlaying: boolean
+	masterVolume: number
 }
 
 interface IVolumeControlDispatchProps {

@@ -103,6 +103,7 @@ export function makeMultiReducer<T extends IMultiStateThing, U extends IMultiSta
 ) {
 	assertArrayHasNoUndefinedElements(globalActionTypes)
 
+	// eslint-disable-next-line @typescript-eslint/no-object-literal-type-assertion
 	return (state: U = {things: {}} as U, action: MultiThingAction): U => {
 		switch (action.type) {
 			case ADD_MULTI_THING:

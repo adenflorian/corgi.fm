@@ -56,8 +56,8 @@ export function isSequencerNodeType(type: ConnectionNodeType) {
 export type ThenArg<T> = T extends Promise<infer U>
 	? U
 	: T extends (...args: any[]) => Promise<infer V>
-	? V
-	: T
+		? V
+		: T
 
 export type OmitStrict<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 

@@ -50,10 +50,10 @@ type MIDIInputMap = Readonly<Map<any, any>>
 interface MIDIInput {
 	name: string
 	manufacturer: string
-	state: string,
+	state: string
 	type: 'input' | string
 	valueOf: () => {
-		onmidimessage: (e: MidiMessageEvent) => void,
+		onmidimessage: (e: MidiMessageEvent) => void
 	}
 }
 

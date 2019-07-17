@@ -146,10 +146,10 @@ function scheduleNotes(
 			events: getEvents(seq.midiClip, readRangeBeats, seq.rate)
 				.filter(getGroupEventsFilter(groupSequencers, roomState, seq.id, currentSongTimeBeats + offsetBeats))
 				.map(event => applyGateToEvent(seq.gate, event))
-				.map(event => ({
+				.map((event): MidiGlobalClipEvent => ({
 					...event,
 					notes: event.notes.map(note => note + Math.round(seq.pitch)),
-				}) as MidiGlobalClipEvent)
+				}))
 				.map(flattenEventNotes)
 				.flatten() as List<MidiGlobalClipEvent>,
 		}))

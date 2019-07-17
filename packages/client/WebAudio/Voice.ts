@@ -30,7 +30,7 @@ export abstract class Voice {
 	protected _detune: number = 0
 	protected _ended = false
 
-	constructor(
+	public constructor(
 		audioContext: AudioContext,
 		destination: AudioNode,
 		onEnded: OnEndedCallback,

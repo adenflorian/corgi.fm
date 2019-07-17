@@ -17,7 +17,7 @@ export abstract class AudioNodeWrapper implements IDisposable {
 	private _enabled: boolean = true
 	private _passthroughModeEnabled: boolean = true
 
-	constructor(options: IAudioNodeWrapperOptions) {
+	public constructor(options: IAudioNodeWrapperOptions) {
 		this.id = options.id
 		this._audioContext = options.audioContext
 	}
@@ -240,7 +240,7 @@ interface MasterAudioOutputOptions extends IAudioNodeWrapperOptions {
 export class MasterAudioOutput extends AudioNodeWrapper {
 	private readonly _audioNode: AudioNode
 
-	constructor(options: MasterAudioOutputOptions) {
+	public constructor(options: MasterAudioOutputOptions) {
 		super(options)
 		this._audioNode = options.audioNode
 	}

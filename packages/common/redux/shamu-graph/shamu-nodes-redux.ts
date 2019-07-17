@@ -143,7 +143,7 @@ export const nodesReducer = combineReducers(Object.freeze({
 export const selectNodeIdsOwnedByClient = (state: IClientRoomState, clientId: string) => {
 	const nodes = state.shamuGraph.nodes as unknown as {[key: string]: IMultiState}
 
-	const ids: Array<{id: Id, type: ConnectionNodeType}> = []
+	const ids: {id: Id, type: ConnectionNodeType}[] = []
 
 	Object.keys(nodes).forEach(nodeKey => {
 		const things = nodes[nodeKey].things

@@ -132,11 +132,11 @@ export const localActions = Object.freeze({
 })
 
 export type LocalAction = ActionType<typeof localActions> | LocalMidiKeyPressAction | LocalMidiKeyUpAction
-	| LocalMidiOctaveChangeAction | WindowBlurAction | DeleteNodeAction
+| LocalMidiOctaveChangeAction | WindowBlurAction | DeleteNodeAction
 
 type LocalMiddlewareActions = LocalAction | AddClientAction | VirtualKeyPressedAction | GridSequencerAction
-	| UserInputAction | VirtualKeyUpAction | VirtualOctaveChangeAction | SetActiveRoomAction | ReadyAction
-	| UpdatePositionsAction | SetLocalClientNameAction
+| UserInputAction | VirtualKeyUpAction | VirtualOctaveChangeAction | SetActiveRoomAction | ReadyAction
+| UpdatePositionsAction | SetLocalClientNameAction
 
 export const createLocalMiddleware: (getAllInstruments: GetAllInstruments) => Middleware<{}, IClientAppState> =
 	(getAllInstruments: GetAllInstruments) => ({dispatch, getState}) => next => (action: LocalMiddlewareActions) => {
@@ -384,10 +384,10 @@ export const createLocalMiddleware: (getAllInstruments: GetAllInstruments) => Mi
 
 				const stateToClone = nodeInfo.stateSelector(newState.room, nodeId)
 
-				const clone = {
+				const clone: IMultiStateThing = {
 					...stateToClone,
 					id: createNodeId(),
-				} as IMultiStateThing
+				}
 
 				// dispatch add multi thing
 				dispatch(addMultiThing(clone, nodeType, NetworkActionType.SERVER_AND_BROADCASTER))
@@ -396,12 +396,12 @@ export const createLocalMiddleware: (getAllInstruments: GetAllInstruments) => Mi
 				// clone position
 				const positionToClone = selectPosition(newState.room, nodeId)
 
-				const clonePosition = {
+				const clonePosition: IPosition = {
 					...positionToClone,
 					id: clone.id,
 					x: positionToClone.x + 32,
 					y: positionToClone.y + 32,
-				} as IPosition
+				}
 
 				dispatch(addPosition(clonePosition))
 
@@ -476,7 +476,7 @@ export const createLocalMiddleware: (getAllInstruments: GetAllInstruments) => Mi
 						...localSaves.all,
 						[uuid.v4()]: createRoomSave(state, room),
 					},
-				} as LocalSaves)
+				})
 
 				return
 			}
@@ -507,9 +507,9 @@ export const createLocalMiddleware: (getAllInstruments: GetAllInstruments) => Mi
 			case UPDATE_POSITIONS: {
 				// Mainly to handle loading old saves with smaller sizes
 				// Not perfect
-				const foo = {
+				const foo: ReturnType<typeof updatePositions> = {
 					...action,
-					positions: Map(action.positions).map(position => {
+					positions: Map(action.positions).map((position): IPosition => {
 						const nodeInfo = getConnectionNodeInfo(position.targetType)
 						const nodeState = nodeInfo.stateSelector(getState().room, position.id)
 
@@ -517,9 +517,9 @@ export const createLocalMiddleware: (getAllInstruments: GetAllInstruments) => Mi
 							...position,
 							width: Math.max(position.width, nodeState.width),
 							height: Math.max(position.height, nodeState.height),
-						} as IPosition
+						}
 					}),
-				} as ReturnType<typeof updatePositions>
+				}
 
 				next(foo)
 

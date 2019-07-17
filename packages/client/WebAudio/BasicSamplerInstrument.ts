@@ -9,7 +9,7 @@ export type IBasicSamplerOptions = IInstrumentOptions
 export class BasicSamplerInstrument extends Instrument<SamplerVoices, SamplerVoice> {
 	private readonly _voices: SamplerVoices
 
-	constructor(options: IBasicSamplerOptions) {
+	public constructor(options: IBasicSamplerOptions) {
 		super(options)
 
 		this._voices = new SamplerVoices(
@@ -24,7 +24,7 @@ export class BasicSamplerInstrument extends Instrument<SamplerVoices, SamplerVoi
 }
 
 class SamplerVoices extends Voices<SamplerVoice> {
-	constructor(
+	public constructor(
 		private readonly _audioContext: AudioContext,
 		private readonly _destination: AudioNode,
 		_detune: number,
@@ -51,7 +51,7 @@ class SamplerVoice extends Voice {
 	private _audioBufferSource: AudioBufferSourceNode
 	private _isStarted = false
 
-	constructor(
+	public constructor(
 		audioContext: AudioContext,
 		destination: AudioNode,
 		onEnded: OnEndedCallback,

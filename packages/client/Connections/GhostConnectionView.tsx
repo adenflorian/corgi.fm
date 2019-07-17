@@ -36,7 +36,7 @@ interface State {
 }
 
 export class GhostConnectionView extends PureComponent<AllProps, State> {
-	constructor(props: AllProps) {
+	public constructor(props: AllProps) {
 		super(props)
 		this.state = {
 			mousePosition: props.ghostConnection.activeConnector,

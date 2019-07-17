@@ -3,6 +3,8 @@ import * as ColorAll from 'color'
 import {List} from 'immutable'
 import {removeOctave} from './common-utils'
 import {IMidiNote} from './MidiNote'
+// TODO
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const ColorDefault = require('color')
 
 export const colorFunc: typeof ColorAll = ColorDefault || ColorAll

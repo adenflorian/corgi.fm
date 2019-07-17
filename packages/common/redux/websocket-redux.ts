@@ -1,7 +1,7 @@
 import {createReducer, IClientAppState} from './index'
 
 export interface IWebsocketState {
-	id?: string,
+	id?: string
 	info: string
 }
 
@@ -21,8 +21,8 @@ export const setInfo = (info: string) => ({
 
 export type WebsocketReduxActions = SetInfoAction | SetSocketIdAction
 
-export const websocketReducer = createReducer(
-	{info: '_'} as IWebsocketState,
+export const websocketReducer = createReducer<IWebsocketState>(
+	{info: '_'},
 	{
 		[SET_SOCKET_ID]: (state, {id}: SetSocketIdAction) => ({...state, id}),
 		[SET_INFO]: (state, {info}: SetInfoAction) => ({...state, info}),

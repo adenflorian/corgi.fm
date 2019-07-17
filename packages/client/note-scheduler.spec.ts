@@ -4,12 +4,12 @@ import {
 } from '@corgifm/common/midi-types'
 import {applyBPM, applyBPMToEvents, getEvents} from './note-scheduler'
 
-type Tests = Array<{
-	name: string,
-	start: number,
-	length: number,
-	expected: MidiGlobalClipEvent[],
-}>
+type Tests = {
+	name: string
+	start: number
+	length: number
+	expected: MidiGlobalClipEvent[]
+}[]
 
 describe('note-scheduler', () => {
 	describe('bpm functions', () => {
@@ -73,12 +73,12 @@ describe('note-scheduler', () => {
 						makeMidiGlobalClipEvent({startTime: 3.000, endTime: 4.500, notes: Set([71])}),
 					]),
 				},
-			] as Array<{
-				name: string,
-				events: MidiGlobalClipEvents,
-				bpm: number,
-				expected: MidiGlobalClipEvents,
-			}>)
+			] as {
+				name: string
+				events: MidiGlobalClipEvents
+				bpm: number
+				expected: MidiGlobalClipEvents
+			}[])
 				.forEach(({name, events, bpm, expected}) => {
 					it(`name: ${name}`, () => {
 						expect(

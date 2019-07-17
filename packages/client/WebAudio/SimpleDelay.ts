@@ -13,7 +13,7 @@ export class SimpleDelay extends AudioNodeWrapper {
 	private readonly _wetGain: GainNode
 	private _mix: number = 0.5
 
-	constructor(options: SimpleDelayOptions) {
+	public constructor(options: SimpleDelayOptions) {
 		super(options)
 		this._delayNode = options.audioContext.createDelay(5)
 		this._delayNode.delayTime.value = options.time

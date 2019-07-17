@@ -3,18 +3,18 @@ import {BuiltInBQFilterType} from '@corgifm/common/OscillatorTypes'
 import {AudioNodeWrapper, IAudioNodeWrapperOptions} from './index'
 
 interface SimpleReverbOptions extends IAudioNodeWrapperOptions {
-	dry: number,
-	wet: number,
-	reverse: boolean,
-	decay: number,
-	filterType: BuiltInBQFilterType,
+	dry: number
+	wet: number
+	reverse: boolean
+	decay: number
+	filterType: BuiltInBQFilterType
 }
 
 export class SimpleReverb extends AudioNodeWrapper {
 	private readonly _reverbNode: ReturnType<typeof Reverb>
 	private readonly _inputGain: GainNode
 
-	constructor(options: SimpleReverbOptions) {
+	public constructor(options: SimpleReverbOptions) {
 		super(options)
 		this._reverbNode = Reverb(options.audioContext)
 		this._reverbNode.time = 3.5

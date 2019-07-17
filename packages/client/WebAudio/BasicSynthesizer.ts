@@ -26,7 +26,7 @@ export class BasicSynthesizer extends Instrument<SynthVoices, SynthVoice> {
 	private _lfoWave: LfoOscillatorType
 	private readonly _lfoWaveShaper: WaveShaperNode
 
-	constructor(options: IBasicSynthesizerOptions) {
+	public constructor(options: IBasicSynthesizerOptions) {
 		super(options)
 
 		this._oscillatorType = options.oscillatorType
@@ -165,7 +165,7 @@ export class BasicSynthesizer extends Instrument<SynthVoices, SynthVoice> {
 }
 
 class SynthVoices extends Voices<SynthVoice> {
-	constructor(
+	public constructor(
 		private readonly _audioContext: AudioContext,
 		private readonly _destination: AudioNode,
 		private _oscType: ShamuOscillatorType,
@@ -230,7 +230,7 @@ class SynthVoice extends Voice {
 	private _nextOscillatorType: ShamuOscillatorType
 	private _whiteNoise: AudioBufferSourceNode | undefined
 
-	constructor(
+	public constructor(
 		audioContext: AudioContext,
 		destination: AudioNode,
 		oscType: ShamuOscillatorType,

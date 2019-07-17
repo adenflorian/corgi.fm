@@ -148,11 +148,11 @@ class Event extends React.PureComponent<IEventProps> {
 }
 
 interface INoteProps {
-	note: number,
-	eventIndex: number,
-	isEnabled: boolean,
-	onClick: GridSequencerEventHandler,
-	onMouseEnter: GridSequencerEventHandler,
+	note: number
+	eventIndex: number
+	isEnabled: boolean
+	onClick: GridSequencerEventHandler
+	onMouseEnter: GridSequencerEventHandler
 	onMouseDown: GridSequencerEventHandler
 }
 
@@ -173,14 +173,14 @@ class Note extends React.PureComponent<INoteProps> {
 		/>
 	}
 
-	private readonly _onClick: MouseEventHandler =
-		e => this.props.onClick(this.props.eventIndex, this.props.isEnabled, this.props.note, e)
+	private readonly _onClick: MouseEventHandler = e =>
+		this.props.onClick(this.props.eventIndex, this.props.isEnabled, this.props.note, e)
 
-	private readonly _onMouseEnter: MouseEventHandler =
-		e => this.props.onMouseEnter(this.props.eventIndex, this.props.isEnabled, this.props.note, e)
+	private readonly _onMouseEnter: MouseEventHandler = e =>
+		this.props.onMouseEnter(this.props.eventIndex, this.props.isEnabled, this.props.note, e)
 
-	private readonly _onMouseDown: MouseEventHandler =
-		e => this.props.onMouseDown(this.props.eventIndex, this.props.isEnabled, this.props.note, e)
+	private readonly _onMouseDown: MouseEventHandler = e =>
+		this.props.onMouseDown(this.props.eventIndex, this.props.isEnabled, this.props.note, e)
 }
 
 const mapStateToProps = (state: IClientAppState, props: IGridSequencerNotesProps): IGridSequencerNotesReduxProps => {
