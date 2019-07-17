@@ -1,4 +1,4 @@
-import React, {useLayoutEffect, useState, ReactNode} from 'react'
+import React, {useLayoutEffect, useState, ReactElement} from 'react'
 import './Knob.less'
 
 interface ISliderControllerProps {
@@ -8,7 +8,7 @@ interface ISliderControllerProps {
 	value: number
 	defaultValue?: number
 	curve: number
-	children: (handleMouseDown: any, percentage: number, adjustedPercentage: number) => ReactNode
+	children: (handleMouseDown: any, percentage: number, adjustedPercentage: number) => ReactElement<any>
 	snapFunction?: (value: number) => number
 }
 

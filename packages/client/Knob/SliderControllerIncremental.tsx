@@ -1,4 +1,4 @@
-import React, {useLayoutEffect, useState, ReactNode} from 'react'
+import React, {useLayoutEffect, useState, ReactElement} from 'react'
 import {incrementalRound} from '@corgifm/common/common-utils'
 import './Knob.less'
 
@@ -8,7 +8,7 @@ interface Props {
 	onChange: (newValue: number) => any
 	value: number
 	defaultValue: number
-	children: (handleMouseDown: any, percentage: number, adjustedPercentage: number) => ReactNode
+	children: (handleMouseDown: any, percentage: number, adjustedPercentage: number) => ReactElement<any>
 	increment: number
 	fineIncrement?: number
 	allowAltKey?: boolean
