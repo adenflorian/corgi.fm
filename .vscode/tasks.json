@@ -9,8 +9,23 @@
 			"script": "lint-watch",
 			"isBackground": true,
 			"problemMatcher": {
-				"base": "$eslint-stylish",
-				"fileLocation": "absolute"
+				"owner": "eslint",
+				"fileLocation": "absolute",
+				"pattern": {
+					"regexp": "^(.+):\\sline\\s(\\d+),\\scol\\s(\\d+),\\s(Error|Warning|Info)\\s-\\s(.+)\\s\\((.+)\\)$",
+					"file": 1,
+					"kind": "location",
+					"line": 2,
+					"column": 3,
+					"severity": 4,
+					"message": 5,
+					"code": 6
+				},
+				"background": {
+					"activeOnStart": true,
+					"beginsPattern": "^\\$ eslint.*$",
+					"endsPattern": "^onchange: command completed"
+				}
 			},
 			"runOptions": {
 				"runOn": "folderOpen"
