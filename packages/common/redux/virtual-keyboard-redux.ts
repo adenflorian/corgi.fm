@@ -5,7 +5,7 @@ import {ClientId, ConnectionNodeType, IMultiStateThing, IMultiStateThingDeserial
 import {applyOctave} from '../common-utils'
 import {emptyMidiNotes, IMidiNote, IMidiNotes, MidiNotes} from '../MidiNote'
 import {NodeSpecialState} from './shamu-graph'
-import {addMultiThing, BROADCASTER_ACTION, IClientRoomState, IMultiState, IMultiStateThings, makeMultiReducer, NetworkActionType, SERVER_ACTION} from './index'
+import {addMultiThing, BROADCASTER_ACTION, IClientRoomState, IMultiState, IMultiStateThings, makeMultiReducer, NetworkActionType, SERVER_ACTION} from '.'
 
 export interface VirtualKeyAction {
 	type: string

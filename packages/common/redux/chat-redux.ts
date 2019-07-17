@@ -1,6 +1,6 @@
 import {List} from 'immutable'
 import {CssColor} from '../shamu-color'
-import {IClientRoomState, BROADCASTER_ACTION, createReducer, SERVER_ACTION} from './index'
+import {IClientRoomState, BROADCASTER_ACTION, createReducer, SERVER_ACTION} from '.'
 
 export const CHAT_SUBMIT = 'CHAT_SUBMIT'
 export type ChatSubmitAction = ReturnType<typeof chatSubmit>

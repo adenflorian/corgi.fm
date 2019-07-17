@@ -1,6 +1,6 @@
 import {combineReducers, createStore, Store} from 'redux'
 import {composeWithDevTools} from 'remote-redux-devtools'
-import {clientsReducer, getActionsBlacklist, IClientsState, IRoomsState, IRoomStoresState, roomsReducer, roomStoresReducer} from './index'
+import {clientsReducer, getActionsBlacklist, IClientsState, IRoomsState, IRoomStoresState, roomsReducer, roomStoresReducer} from '.'
 
 export interface IServerState {
 	clients: IClientsState

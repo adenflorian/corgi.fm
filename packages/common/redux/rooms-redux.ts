@@ -7,7 +7,7 @@ import {selectGlobalClockState} from './global-clock-redux'
 import {selectAllPositions} from './positions-redux'
 import {selectRoomSettings} from './room-settings-redux'
 import {selectShamuGraphState} from './shamu-graph'
-import {SERVER_ACTION} from './index'
+import {SERVER_ACTION} from '.'
 
 export const SET_ROOMS = 'SET_ROOMS'
 export type SetRoomsAction = ReturnType<typeof setRooms>

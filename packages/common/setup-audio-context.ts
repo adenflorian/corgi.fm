@@ -1,6 +1,6 @@
 import {Store} from 'redux'
 import {logger} from './logger'
-import {IClientAppState} from './redux/index'
+import {IClientAppState} from './redux'
 
 declare global {
 	interface Window {

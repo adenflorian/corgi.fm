@@ -1,4 +1,4 @@
-import {AudioNodeWrapper, IAudioNodeWrapperOptions} from './index'
+import {AudioNodeWrapper, IAudioNodeWrapperOptions} from '.'
 
 interface SimpleDelayOptions extends IAudioNodeWrapperOptions {
 	time: number

@@ -1,7 +1,7 @@
 import * as sinon from 'sinon'
 import * as uuid from 'uuid'
 import * as shamuColor from '../shamu-color'
-import {addClient, clientsReducer, ClientState} from './index'
+import {addClient, clientsReducer, ClientState} from '.'
 
 describe('clients-redux', () => {
 	describe('clientsReducer', () => {

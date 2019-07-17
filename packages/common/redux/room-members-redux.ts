@@ -1,7 +1,7 @@
 import {List} from 'immutable'
 import {createSelector} from 'reselect'
 import {ClientId} from '../common-types'
-import {createReducer, IClientRoomState, selectLocalClientId} from './index'
+import {createReducer, IClientRoomState, selectLocalClientId} from '.'
 
 export interface IRoomMembersState {
 	ids: IRoomMembersIds

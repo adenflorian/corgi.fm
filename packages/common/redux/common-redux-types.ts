@@ -6,7 +6,7 @@ import {
 	clientInfoReducer, clientsReducer, inProgressReducer,
 	modalsReducer, optionsReducer, pointerActionTypesWhitelist,
 	roomReducers, roomsReducer, userInputReducer, websocketReducer,
-} from './index'
+} from '.'
 
 export interface IClientAppState extends StateType<ReturnType<typeof getClientReducers>> {}
 

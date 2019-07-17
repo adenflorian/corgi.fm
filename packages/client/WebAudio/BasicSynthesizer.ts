@@ -3,7 +3,7 @@ import {SynthLfoTarget} from '@corgifm/common/redux'
 import {
 	midiNoteToFrequency, Voice, Voices, IInstrumentOptions, Instrument,
 	OnEndedCallback, TunableAudioScheduledSourceNode,
-} from './index'
+} from '.'
 
 interface IBasicSynthesizerOptions extends IInstrumentOptions {
 	oscillatorType: ShamuOscillatorType

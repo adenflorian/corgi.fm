@@ -1,7 +1,7 @@
 import {Map} from 'immutable'
 import {ConnectionNodeType, IMultiStateThing} from '../common-types'
 import {assertArrayHasNoUndefinedElements} from '../common-utils'
-import {BROADCASTER_ACTION, getConnectionNodeInfo, IClientRoomState, NetworkActionType, SERVER_ACTION} from './index'
+import {BROADCASTER_ACTION, getConnectionNodeInfo, IClientRoomState, NetworkActionType, SERVER_ACTION} from '.'
 
 export interface IMultiState {
 	things: IMultiStateThings

@@ -6,7 +6,7 @@ import {
 	addMultiThing, BROADCASTER_ACTION, getConnectionNodeInfo,
 	IClientRoomState, IMultiState, makeMultiReducer, NetworkActionType,
 	NodeSpecialState, SERVER_ACTION,
-} from './index'
+} from '.'
 
 import uuid = require('uuid')
 

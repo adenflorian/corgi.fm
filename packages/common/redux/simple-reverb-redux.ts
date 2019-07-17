@@ -7,7 +7,7 @@ import {
 	addMultiThing, BROADCASTER_ACTION, createSelectAllOfThingAsArray,
 	IClientRoomState, IMultiState, makeMultiReducer,
 	NetworkActionType, SERVER_ACTION,
-} from './index'
+} from '.'
 
 export const addSimpleReverb = (sampler: SimpleReverbState) =>
 	addMultiThing(sampler, ConnectionNodeType.simpleReverb, NetworkActionType.SERVER_AND_BROADCASTER)

@@ -1,6 +1,6 @@
 import Reverb from 'soundbank-reverb'
 import {BuiltInBQFilterType} from '@corgifm/common/OscillatorTypes'
-import {AudioNodeWrapper, IAudioNodeWrapperOptions} from './index'
+import {AudioNodeWrapper, IAudioNodeWrapperOptions} from '.'
 
 interface SimpleReverbOptions extends IAudioNodeWrapperOptions {
 	dry: number

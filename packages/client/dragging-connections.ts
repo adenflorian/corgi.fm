@@ -7,7 +7,7 @@ import {
 	ActiveGhostConnectorSourceOrTarget, Connection,
 	connectionsActions, GhostConnectorAddingOrMoving, IPosition, selectAllPositions,
 	selectConnectionsWithSourceIds, selectConnectionsWithTargetIds, selectGhostConnection, selectPosition,
-} from '@corgifm/common/redux/index'
+} from '@corgifm/common/redux'
 import {connectorWidth} from './Connections/ConnectionView'
 
 import Victor = require('victor')

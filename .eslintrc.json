@@ -4,7 +4,7 @@
         "ecmaFeatures": {
             "jsx": true
         },
-        "ecmaVersion": 2018,
+        "ecmaVersion": 2019,
         "sourceType": "module"
     },
     "env": {
@@ -31,7 +31,8 @@
         "react",
         "react-hooks",
         "jest",
-        "import"
+        "import",
+        "unicorn"
     ],
     "overrides": [
         {
@@ -323,7 +324,9 @@
         "default-case": "off",
         "@typescript-eslint/no-non-null-assertion": "off",
         "@typescript-eslint/interface-name-prefix": "off",
-        "@typescript-eslint/no-explicit-any": "off"
+        "@typescript-eslint/no-explicit-any": "off",
+        // Unicorn
+        "unicorn/import-index": "error"
     },
     "settings": {
         "react": {

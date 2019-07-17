@@ -2,7 +2,7 @@ import {
 	getOctaveFromMidiNote, IInstrumentOptions, Instrument,
 	midiNoteToNoteName, OnEndedCallback, SamplesManager,
 	Voice, Voices,
-} from './index'
+} from '.'
 
 export type IBasicSamplerOptions = IInstrumentOptions
 

@@ -14,7 +14,7 @@ import {
 	IClientAppState, MOVE_POSITION,
 	REPORT_LEVELS,
 	SET_INFO, UPDATE_POINTER,
-} from './index'
+} from '.'
 
 export function makeActionCreator(type: string, ...argNames: any[]) {
 	argNames.forEach(arg => {

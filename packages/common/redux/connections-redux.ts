@@ -9,7 +9,7 @@ import {CssColor, mixColors} from '../shamu-color'
 import {
 	BROADCASTER_ACTION, getConnectionNodeInfo, IClientRoomState,
 	selectVirtualKeyboardById, SERVER_ACTION, VirtualKeyboardState,
-} from './index'
+} from '.'
 
 export const ADD_CONNECTION = 'ADD_CONNECTION'
 export const ADD_CONNECTIONS = 'ADD_CONNECTIONS'

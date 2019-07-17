@@ -7,7 +7,7 @@ import {
 	addMultiThing, BROADCASTER_ACTION, createSelectAllOfThingAsArray,
 	IClientRoomState, IMultiState, makeMultiReducer, NetworkActionType,
 	SERVER_ACTION,
-} from './index'
+} from '.'
 
 export const addBasicSampler = (sampler: BasicSamplerState) =>
 	addMultiThing(sampler, ConnectionNodeType.basicSampler, NetworkActionType.SERVER_AND_BROADCASTER)

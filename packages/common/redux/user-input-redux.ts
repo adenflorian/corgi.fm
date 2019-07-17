@@ -1,7 +1,7 @@
 import {Record} from 'immutable'
 import {combineReducers, Reducer} from 'redux'
 import {ActionType} from 'typesafe-actions'
-import {IClientAppState} from './index'
+import {IClientAppState} from '.'
 
 export const SET_USER_INPUT = 'SET_USER_INPUT'
 export const USER_KEY_PRESS = 'USER_KEY_PRESS'

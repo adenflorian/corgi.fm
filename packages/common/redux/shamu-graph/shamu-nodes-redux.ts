@@ -1,12 +1,12 @@
 import {combineReducers} from 'redux'
 import {ConnectionNodeType, Id} from '../../common-types'
 import {groupSequencersReducer} from '../group-sequencers-redux'
+import {simpleDelaysReducer} from '../simple-delay-redux'
 import {
 	basicSamplersReducer, basicSynthesizersReducer, gridSequencersReducer,
 	IClientRoomState, IMultiState, infiniteSequencersReducer,
 	simpleCompressorsReducer, simpleReverbsReducer, virtualKeyboardsReducer,
-} from '../index'
-import {simpleDelaysReducer} from '../simple-delay-redux'
+} from '..'
 
 // export const ADD_SHAMU_NODE = 'ADD_SHAMU_NODE'
 // export const DELETE_SHAMU_NODES = 'DELETE_SHAMU_NODES'

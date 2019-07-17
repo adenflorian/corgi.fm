@@ -1,6 +1,6 @@
 import {Set} from 'immutable'
 import {applyEnvelope, calculateScheduledEnvelope, IScheduledEnvelope} from './envelope'
-import {OnEndedCallback} from './index'
+import {OnEndedCallback} from '.'
 
 export type TunableAudioScheduledSourceNode = AudioScheduledSourceNode & Pick<OscillatorNode, 'detune'>
 

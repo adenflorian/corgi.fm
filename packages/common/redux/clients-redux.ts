@@ -10,7 +10,7 @@ import {
 	BROADCASTER_ACTION, createDeepEqualSelector, createReducer,
 	GLOBAL_SERVER_ACTION, IClientAppState, IServerState,
 	SELF_DISCONNECTED,
-} from './index'
+} from '.'
 
 export const ADD_CLIENT = 'ADD_CLIENT'
 export type AddClientAction = ReturnType<typeof addClient>

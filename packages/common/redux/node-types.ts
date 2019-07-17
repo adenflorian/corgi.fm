@@ -25,7 +25,7 @@ import {
 	selectGridSequencerIsSending, selectInfiniteSequencer,
 	selectInfiniteSequencerActiveNotes, selectInfiniteSequencerIsActive, selectInfiniteSequencerIsSending, selectSampler,
 	selectSimpleDelay, selectSimpleReverb, selectVirtualKeyboardById, selectVirtualKeyboardHasPressedKeys, SimpleDelayState, VirtualKeyboardState,
-} from './index'
+} from '.'
 
 export const MASTER_AUDIO_OUTPUT_TARGET_ID = 'MASTER_AUDIO_OUTPUT_TARGET_ID'
 

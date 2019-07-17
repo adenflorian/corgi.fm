@@ -1,7 +1,7 @@
 import {Store} from 'redux'
 import {localStorageKey} from '../common-constants'
 import {logger} from '../logger'
-import {IClientAppState} from './index'
+import {IClientAppState} from '.'
 
 export enum AppOptions {
 	masterVolume = 'masterVolume',

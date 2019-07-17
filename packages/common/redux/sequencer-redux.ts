@@ -7,7 +7,7 @@ import {emptyMidiNotes, IMidiNote, MidiNotes} from '../MidiNote'
 import {selectAllConnections, selectConnectionsWithSourceIds, selectConnectionsWithTargetIds} from './connections-redux'
 import {selectGlobalClockIsPlaying} from './global-clock-redux'
 import {NodeSpecialState} from './shamu-graph'
-import {BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION} from './index'
+import {BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION} from '.'
 
 import uuid = require('uuid')
 

@@ -5,7 +5,7 @@ import {ClientId} from '../common-types'
 import {IClientRoomState} from './common-redux-types'
 import {
 	BROADCASTER_ACTION, SERVER_ACTION,
-} from './index'
+} from '.'
 
 import uuid = require('uuid')
 

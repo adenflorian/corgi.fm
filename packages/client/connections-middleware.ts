@@ -9,7 +9,7 @@ import {
 	IConnectionAction, ORGANIZE_GRAPH, PositionAction,
 	selectAllConnections, selectAllPositions, selectConnection,
 	selectConnectionsWithSourceIds, SET_ENABLED_NODE, updatePositions,
-} from '@corgifm/common/redux/index'
+} from '@corgifm/common/redux'
 import {handleStopDraggingGhostConnector} from './dragging-connections'
 import {GetAllInstruments} from './instrument-manager'
 

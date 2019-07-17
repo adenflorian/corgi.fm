@@ -7,7 +7,7 @@ import {
 	globalClockReducer, IClientRoomState, IServerState,
 	pointersStateReducer, positionsReducer, roomMembersReducer,
 	RoomsReduxAction, shamuGraphReducer,
-} from './index'
+} from '.'
 
 export const ROOM_ACTION = 'ROOM_ACTION'
 type RoomAction = ReturnType<typeof createRoomAction>

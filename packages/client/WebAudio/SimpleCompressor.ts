@@ -1,4 +1,4 @@
-import {AudioNodeWrapper, IAudioNodeWrapperOptions} from './index'
+import {AudioNodeWrapper, IAudioNodeWrapperOptions} from '.'
 
 // TODO Add other Compressor params
 //   - [√] time: number

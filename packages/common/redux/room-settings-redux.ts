@@ -1,7 +1,7 @@
 import {List} from 'immutable'
 import {ActionType} from 'typesafe-actions'
 import {Id} from '../common-types'
-import {BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION} from './index'
+import {BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION} from '.'
 
 export const REPLACE_ALL_ROOM_SETTINGS = 'REPLACE_ALL_ROOM_SETTINGS'
 export const CHANGE_LINE_TYPE_ROOM_SETTING = 'CHANGE_LINE_TYPE_ROOM_SETTING'

@@ -1,4 +1,4 @@
-import {createReducer, IClientAppState} from './index'
+import {createReducer, IClientAppState} from '.'
 
 export interface IWebsocketState {
 	id?: string

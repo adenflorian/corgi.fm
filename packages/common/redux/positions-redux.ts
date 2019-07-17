@@ -6,7 +6,7 @@ import {ConnectionNodeType, Id} from '../common-types'
 import {shamuMetaReducer} from './shamu-graph'
 import {
 	BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION,
-} from './index'
+} from '.'
 
 export const SET_ENABLED_NODE = 'SET_ENABLED_NODE'
 

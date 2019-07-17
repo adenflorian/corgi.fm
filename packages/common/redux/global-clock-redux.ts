@@ -1,6 +1,6 @@
 import {Record} from 'immutable'
 import {ActionType} from 'typesafe-actions'
-import {BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION} from './index'
+import {BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION} from '.'
 
 export const REPLACE_GLOBAL_CLOCK_STATE = 'REPLACE_GLOBAL_CLOCK_STATE'
 export const START_GLOBAL_CLOCK = 'START_GLOBAL_CLOCK'
