@@ -1,5 +1,5 @@
 import * as firebase from 'firebase/app'
-// tslint:disable-next-line:no-import-side-effect
+// eslint-disable-next-line import/no-unassigned-import
 import 'firebase/auth'
 import React, {useContext} from 'react'
 import {Store} from 'redux'

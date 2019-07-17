@@ -4,7 +4,6 @@ import {connect} from 'react-redux'
 import {selectClientInfo, IClientAppState} from '@corgifm/common/redux'
 // css-reset must be first
 import './css-reset.css'
-// tslint:disable-next-line:ordered-imports
 import './App.less'
 import {isLocalDevClient} from './is-prod-client'
 import {LoadingScreen} from './LoadingScreen'

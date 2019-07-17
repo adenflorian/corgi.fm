@@ -5,6 +5,7 @@ import {
 	selectLocalClientId, selectOptions, selectRoomSettings, shamuConnect,
 } from '@corgifm/common/redux'
 import {backgroundMenuId, graphSizeX, zoomBackgroundClass} from '../client-constants'
+// eslint-disable-next-line import/no-internal-modules
 import PlusSVG from '../OtherSVG/plus.svg'
 import {simpleGlobalClientState} from '../SimpleGlobalClientState'
 

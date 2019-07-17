@@ -60,7 +60,6 @@ export function setupServerWebSocketListeners(
 		const room = getRoomName(socket.handshake.query.room)
 
 		// Fire and forget, not worth waiting for
-		// tslint:disable-next-line: no-floating-promises
 		dbStore.events.saveUserConnectEventAsync({username, room, time: new Date()})
 
 		logger.log(

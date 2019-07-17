@@ -48,6 +48,7 @@
         }
     ],
     "rules": {
+        // The basics
         "quotes": [
             "error",
             "single",
@@ -59,9 +60,29 @@
             "error",
             "never"
         ],
-        // TODO Make sure typsecript version of this rule works
-        "no-unused-vars": "off",
         "no-case-declarations": "off",
+        // import
+        "import/no-unassigned-import": [
+            "error",
+            {
+                "allow": [
+                    "**/*.html",
+                    "**/*.css",
+                    "**/*.less",
+                    "babel-polyfill"
+                ]
+            }
+        ],
+        "import/no-internal-modules": [
+            "error",
+            {
+                "allow": [
+                    "react-icons/**",
+                    "redux-devtools-extension/*",
+                    "firebase/*"
+                ]
+            }
+        ],
         // Shouldn't need when using typescript
         "no-prototype-builtins": "off",
         "react/display-name": "off",
@@ -137,6 +158,10 @@
                 ]
             }
         ],
+        "no-restricted-imports": [
+            "error",
+            "@sentry/utils"
+        ],
         // Typescript
         "indent": "off",
         "@typescript-eslint/indent": [
@@ -149,9 +174,21 @@
         "@typescript-eslint/explicit-function-return-type": "off",
         "@typescript-eslint/no-parameter-properties": "off",
         "@typescript-eslint/no-empty-interface": "off",
+        // TODO
+        // "@typescript-eslint/no-floating-promises": "error",
+        // TODO
+        // "@typescript-eslint/prefer-readonly": "error",
         // React
         "react-hooks/rules-of-hooks": "error",
         "react-hooks/exhaustive-deps": "error",
+        "react/forbid-component-props": [
+            "error",
+            {
+                "forbid": [
+                    "dispatch"
+                ]
+            }
+        ],
         // My personal style
         "arrow-parens": [
             "error",
@@ -173,6 +210,7 @@
             "never"
         ],
         "no-plusplus": "off",
+        "no-unused-vars": "off",
         "@typescript-eslint/no-unused-vars": [
             "error",
             {
@@ -212,6 +250,13 @@
             "tab"
         ],
         "linebreak-style": "off",
+        // TODO
+        // "max-len": [
+        //     "error",
+        //     {
+        //         "ignorePattern": "^import |^export {(.*?)}|class [a-zA-Z]+ implements |//"
+        //     }
+        // ],
         "max-len": "off",
         "operator-linebreak": "off",
         "function-paren-newline": "off",

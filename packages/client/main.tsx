@@ -1,3 +1,4 @@
+// TODO Is this still needed?
 import 'babel-polyfill'
 import React from 'react'
 import * as ReactGA from 'react-ga'
@@ -30,7 +31,6 @@ if (!isLocalDevClient()) initSentry()
 
 initializeAnalytics()
 
-// tslint:disable-next-line: no-floating-promises
 start()
 
 declare global {

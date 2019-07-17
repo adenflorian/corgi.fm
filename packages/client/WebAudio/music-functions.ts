@@ -2,6 +2,7 @@ import {List} from 'immutable'
 import {IMidiNote} from '@corgifm/common/MidiNote'
 import {Octave} from '@corgifm/common/common-types'
 // @ts-ignore
+// eslint-disable-next-line import/no-internal-modules
 import {getFrequencyUsingHalfStepsFromA4 as getFrequencyUsingHalfStepsFromA4Rust} from '../client-rust/lib.rs'
 
 export function getFrequencyUsingHalfStepsFromA4(halfSteps: number) {

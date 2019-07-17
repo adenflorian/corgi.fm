@@ -19,7 +19,6 @@ logger.log('CORGI_ENV: ', process.env.CORGI_ENV)
 logger.log('NODE_ENV: ', process.env.NODE_ENV)
 logger.log('getServerEnv: ', getServerEnv())
 
-// tslint:disable-next-line: no-floating-promises
 start()
 
 async function start() {
