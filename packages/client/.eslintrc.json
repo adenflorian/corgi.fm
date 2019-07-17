@@ -1,0 +1,11 @@
+{
+    "parserOptions": {
+        "ecmaFeatures": {
+            "jsx": true
+        },
+        "project": "packages/client/tsconfig.json"
+    },
+    "env": {
+        "browser": true
+    }
+}

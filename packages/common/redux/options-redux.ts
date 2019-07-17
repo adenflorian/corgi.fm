@@ -39,6 +39,7 @@ export const setOptionMasterVolume = setOption.bind(null, AppOptions.masterVolum
 
 export type IOptionsState = typeof initialOptionsState
 
+// TODO Move to client package
 export function optionsReducer(state = initialOptionsState, action: SetOptionAction): IOptionsState {
 	switch (action.type) {
 		case SET_OPTION: {

@@ -1,16 +1,11 @@
 {
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
-        "ecmaFeatures": {
-            "jsx": true
-        },
         "ecmaVersion": 2019,
         "sourceType": "module"
     },
     "env": {
-        "browser": true,
-        "es6": true,
-        "node": true
+        "es6": true
     },
     "globals": {
         "Atomics": "readonly",
@@ -40,30 +35,6 @@
             "files": "*.spec.*",
             "env": {
                 "jest": true
-            }
-        },
-        {
-            "files": "*.ts*",
-            "rules": {
-                "react/prop-types": "off"
-            }
-        },
-        {
-            "files": "packages/client/**/*",
-            "parserOptions": {
-                "project": "packages/client/tsconfig.json"
-            }
-        },
-        {
-            "files": "packages/common/**/*",
-            "parserOptions": {
-                "project": "packages/common/tsconfig.json"
-            }
-        },
-        {
-            "files": "packages/server/**/*",
-            "parserOptions": {
-                "project": "packages/server/tsconfig.json"
             }
         }
     ],
