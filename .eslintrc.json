@@ -13,7 +13,6 @@
     },
     "extends": [
         "eslint:recommended",
-        "plugin:react/recommended",
         "plugin:jest/recommended",
         "plugin:import/errors",
         "plugin:import/warnings",
@@ -24,8 +23,6 @@
     ],
     "plugins": [
         "@typescript-eslint",
-        "react",
-        "react-hooks",
         "jest",
         "import",
         "unicorn"
@@ -82,9 +79,7 @@
         // Shouldn't need when using typescript
         "no-prototype-builtins": "off",
         "import/named": "off",
-        "react/prop-types": "off",
         // Other
-        "react/display-name": "off",
         "no-console": "error",
         "no-trailing-spaces": "error",
         "no-multiple-empty-lines": [
@@ -125,17 +120,6 @@
         "import/no-unresolved": "off",
         "no-useless-constructor": "off",
         "@typescript-eslint/no-useless-constructor": "error",
-        "react/jsx-filename-extension": [
-            "error",
-            {
-                "extensions": [
-                    ".js",
-                    ".jsx",
-                    ".ts",
-                    ".tsx"
-                ]
-            }
-        ],
         "import/prefer-default-export": "off",
         "object-curly-newline": [
             "error",
@@ -190,17 +174,6 @@
         // TODO
         // "@typescript-eslint/strict-boolean-expressions": "error",
         "@typescript-eslint/unbound-method": "error",
-        // React
-        "react-hooks/rules-of-hooks": "error",
-        "react-hooks/exhaustive-deps": "error",
-        "react/forbid-component-props": [
-            "error",
-            {
-                "forbid": [
-                    "dispatch"
-                ]
-            }
-        ],
         // My personal style
         "arrow-parens": [
             "error",
@@ -231,7 +204,6 @@
                 "ignoreRestSiblings": false
             }
         ],
-        "react/jsx-wrap-multilines": "off",
         "quote-props": [
             "error",
             "consistent-as-needed"
@@ -252,15 +224,6 @@
         "@typescript-eslint/camelcase": "off",
         // To be turned on at future time
         "no-tabs": "off",
-        "react/prefer-stateless-function": "off",
-        "react/jsx-indent": [
-            "error",
-            "tab"
-        ],
-        "react/jsx-indent-props": [
-            "error",
-            "tab"
-        ],
         "linebreak-style": "off",
         // TODO
         // "max-len": [
@@ -287,19 +250,13 @@
             }
         ],
         "prefer-arrow-callback": "off",
-        "react/sort-comp": "off",
-        "react/destructuring-assignment": "off",
-        "react/no-access-state-in-setstate": "off",
-        "react/jsx-boolean-value": "off",
         "jsx-a11y/no-static-element-interactions": "off",
         "jsx-a11y/click-events-have-key-events": "off",
         "class-methods-use-this": "off",
         "jsx-a11y/label-has-associated-control": "off",
         "jsx-a11y/label-has-for": "off",
         "no-useless-return":"off",
-        "react/no-array-index-key": "off",
         "padded-blocks": "off",
-        "react/jsx-curly-brace-presence": "off",
         "no-path-concat": "off",
         "default-case": "off",
         "@typescript-eslint/no-non-null-assertion": "off",
@@ -312,36 +269,5 @@
         "unicorn/filename-case": "off",
         "unicorn/prefer-add-event-listener": "off",
         "unicorn/prefer-query-selector": "off"
-    },
-    "settings": {
-        "react": {
-            "createClass": "createReactClass", // Regex for Component Factory to use,
-            // default to "createReactClass"
-            "pragma": "React", // Pragma to use, default to "React"
-            "version": "detect", // React version. "detect" automatically picks the version you have installed.
-            // You can also use `16.0`, `16.3`, etc, if you want to override the detected value.
-            // default to latest and warns if missing
-            // It will default to "detect" in the future
-            "flowVersion": "0.53" // Flow version
-        },
-        "propWrapperFunctions": [
-            // The names of any function used to wrap propTypes, e.g. `forbidExtraProps`. If this isn't set, any propTypes wrapped in a function will be skipped.
-            "forbidExtraProps",
-            {
-                "property": "freeze",
-                "object": "Object"
-            },
-            {
-                "property": "myFavoriteWrapper"
-            }
-        ],
-        "linkComponents": [
-            // Components used as alternatives to <a> for linking, eg. <Link to={ url } />
-            "Hyperlink",
-            {
-                "name": "Link",
-                "linkAttribute": "to"
-            }
-        ]
     }
 }
