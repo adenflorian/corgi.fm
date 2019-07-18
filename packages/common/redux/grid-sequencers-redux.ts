@@ -7,48 +7,42 @@ import {assertArrayHasNoUndefinedElements} from '../common-utils'
 import {makeMidiClipEvent, MidiClip, MidiClipEvents} from '../midi-types'
 import {emptyMidiNotes, IMidiNote, MidiNotes} from '../MidiNote'
 import {
-	deserializeSequencerState, PLAY_SEQUENCER,
-	RECORD_SEQUENCER_NOTE, selectAllGridSequencers, SequencerAction,
-	SequencerStateBase, STOP_SEQUENCER, TOGGLE_SEQUENCER_RECORDING,
+	deserializeSequencerState, selectAllGridSequencers, SequencerAction,
+	SequencerStateBase,
 } from './sequencer-redux'
 import {
-	addMultiThing, BROADCASTER_ACTION, CLEAR_SEQUENCER, createSequencerEvents, IClientRoomState,
+	addMultiThing, BROADCASTER_ACTION, createSequencerEvents, IClientRoomState,
 	IMultiState, IMultiStateThings, isEmptyEvents, makeMultiReducer, NetworkActionType,
-	PLAY_ALL, selectGlobalClockState, SERVER_ACTION, STOP_ALL,
-	UNDO_SEQUENCER,
+	selectGlobalClockState, SERVER_ACTION,
 } from '.'
 
 export const addGridSequencer = (gridSequencer: GridSequencerState) =>
 	addMultiThing(gridSequencer, ConnectionNodeType.gridSequencer, NetworkActionType.SERVER_AND_BROADCASTER)
 
-export const SET_GRID_SEQUENCER_NOTE = 'SET_GRID_SEQUENCER_NOTE'
-export const RESTART_GRID_SEQUENCER = 'RESTART_GRID_SEQUENCER'
-export const SET_GRID_SEQUENCER_FIELD = 'SET_GRID_SEQUENCER_FIELD'
-
-export const gridSequencerActions = Object.freeze({
+export const gridSequencerActions = {
 	setNote: (gridSequencerId: string, index: number, enabled: boolean, note: IMidiNote) => ({
-		type: SET_GRID_SEQUENCER_NOTE as typeof SET_GRID_SEQUENCER_NOTE,
+		type: 'SET_GRID_SEQUENCER_NOTE',
 		id: gridSequencerId,
 		index,
 		enabled,
 		note,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
-	}),
+	} as const),
 	restart: (id: string) => ({
-		type: RESTART_GRID_SEQUENCER as typeof RESTART_GRID_SEQUENCER,
+		type: 'RESTART_GRID_SEQUENCER',
 		id,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
-	}),
+	} as const),
 	setField: (id: string, fieldName: GridSequencerFields, data: any) => ({
-		type: SET_GRID_SEQUENCER_FIELD as typeof SET_GRID_SEQUENCER_FIELD,
+		type: 'SET_GRID_SEQUENCER_FIELD',
 		id,
 		fieldName,
 		data,
 		...getNetworkActionThings(fieldName),
-	}),
-})
+	} as const),
+} as const
 
 function getNetworkActionThings(fieldName: GridSequencerFields) {
 	if ([
@@ -213,21 +207,21 @@ export function findHighestNote(events: MidiClipEvents): number {
 }
 
 const gridSequencerActionTypes = [
-	SET_GRID_SEQUENCER_NOTE,
-	SET_GRID_SEQUENCER_FIELD,
-	CLEAR_SEQUENCER,
-	UNDO_SEQUENCER,
-	PLAY_SEQUENCER,
-	STOP_SEQUENCER,
-	TOGGLE_SEQUENCER_RECORDING,
-	RECORD_SEQUENCER_NOTE,
+	'SET_GRID_SEQUENCER_NOTE',
+	'SET_GRID_SEQUENCER_FIELD',
+	'CLEAR_SEQUENCER',
+	'UNDO_SEQUENCER',
+	'PLAY_SEQUENCER',
+	'STOP_SEQUENCER',
+	'TOGGLE_SEQUENCER_RECORDING',
+	'RECORD_SEQUENCER_NOTE',
 ]
 
 assertArrayHasNoUndefinedElements(gridSequencerActionTypes)
 
 const gridSequencerGlobalActionTypes = [
-	PLAY_ALL,
-	STOP_ALL,
+	'PLAY_ALL',
+	'STOP_ALL',
 ]
 
 assertArrayHasNoUndefinedElements(gridSequencerGlobalActionTypes)
@@ -237,7 +231,7 @@ export type GridSequencerAction = SequencerAction | ActionType<typeof gridSequen
 const gridSequencerReducer =
 	(gridSequencer: GridSequencerState, action: GridSequencerAction): GridSequencerState => {
 		switch (action.type) {
-			case SET_GRID_SEQUENCER_NOTE:
+			case 'SET_GRID_SEQUENCER_NOTE':
 				if (action.note === undefined) {
 					throw new Error('action.notes === undefined')
 				}
@@ -262,7 +256,7 @@ const gridSequencerReducer =
 					})),
 					previousEvents: gridSequencer.previousEvents.unshift(gridSequencer.midiClip.events),
 				}
-			case SET_GRID_SEQUENCER_FIELD:
+			case 'SET_GRID_SEQUENCER_FIELD':
 				if (action.fieldName === 'index') {
 					return {
 						...gridSequencer,
@@ -274,8 +268,8 @@ const gridSequencerReducer =
 						[action.fieldName]: action.data,
 					}
 				}
-			case TOGGLE_SEQUENCER_RECORDING: return {...gridSequencer, isRecording: action.isRecording}
-			case UNDO_SEQUENCER: {
+			case 'TOGGLE_SEQUENCER_RECORDING': return {...gridSequencer, isRecording: action.isRecording}
+			case 'UNDO_SEQUENCER': {
 				if (gridSequencer.previousEvents.count() === 0) return gridSequencer
 
 				const prv = Stack(gridSequencer.previousEvents)
@@ -286,7 +280,7 @@ const gridSequencerReducer =
 					previousEvents: prv.shift().toList(),
 				}
 			}
-			case CLEAR_SEQUENCER: {
+			case 'CLEAR_SEQUENCER': {
 				if (isEmptyEvents(gridSequencer.midiClip.events)) return gridSequencer
 
 				return {
@@ -298,7 +292,7 @@ const gridSequencerReducer =
 					previousEvents: gridSequencer.previousEvents.unshift(gridSequencer.midiClip.events),
 				}
 			}
-			case RECORD_SEQUENCER_NOTE:
+			case 'RECORD_SEQUENCER_NOTE':
 				const index = action.index
 				if (index === undefined) return gridSequencer
 				if (gridSequencer.isRecording) {
@@ -315,10 +309,10 @@ const gridSequencerReducer =
 				} else {
 					return gridSequencer
 				}
-			case PLAY_SEQUENCER: return {...gridSequencer, isPlaying: true}
-			case STOP_SEQUENCER: return {...gridSequencer, isPlaying: false, isRecording: false}
-			case PLAY_ALL: return {...gridSequencer, isPlaying: true}
-			case STOP_ALL: return {...gridSequencer, isPlaying: false, isRecording: false}
+			case 'PLAY_SEQUENCER': return {...gridSequencer, isPlaying: true}
+			case 'STOP_SEQUENCER': return {...gridSequencer, isPlaying: false, isRecording: false}
+			case 'PLAY_ALL': return {...gridSequencer, isPlaying: true}
+			case 'STOP_ALL': return {...gridSequencer, isPlaying: false, isRecording: false}
 			default:
 				return gridSequencer
 		}

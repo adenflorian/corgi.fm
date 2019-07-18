@@ -4,11 +4,10 @@ import {logger} from '@corgifm/common/logger'
 import {OrganizeGraphAction} from '@corgifm/common/redux/common-actions'
 import {BroadcastAction} from '@corgifm/common/redux/common-redux-types'
 import {
-	DELETE_CONNECTIONS, GHOST_CONNECTION_DELETE,
 	GhostConnectorAction, IClientAppState,
-	IConnectionAction, ORGANIZE_GRAPH, PositionAction,
+	IConnectionAction, PositionAction,
 	selectAllConnections, selectAllPositions, selectConnection,
-	selectConnectionsWithSourceIds, SET_ENABLED_NODE, updatePositions,
+	selectConnectionsWithSourceIds, updatePositions,
 } from '@corgifm/common/redux'
 import {handleStopDraggingGhostConnector} from './dragging-connections'
 import {GetAllInstruments} from './instrument-manager'
@@ -27,19 +26,19 @@ export const connectionsClientMiddleware: (getAllInstruments: GetAllInstruments)
 		const afterState = getState()
 
 		switch (action.type) {
-			case GHOST_CONNECTION_DELETE: {
+			case 'GHOST_CONNECTION_DELETE': {
 				if ((action as unknown as BroadcastAction).alreadyBroadcasted) return
 
 				try {
 					handleStopDraggingGhostConnector(beforeState.room, dispatch, action.id)
 				} catch (error) {
-					logger.warn('Caught error (will ignore) when handling ' + GHOST_CONNECTION_DELETE + ': ', error)
+					logger.warn('Caught error (will ignore) when handling GHOST_CONNECTION_DELETE: ', error)
 					return
 				}
 
 				return
 			}
-			case ORGANIZE_GRAPH:
+			case 'ORGANIZE_GRAPH':
 				return dispatch(
 					updatePositions(
 						calculatePositionsGivenConnections(
@@ -50,7 +49,7 @@ export const connectionsClientMiddleware: (getAllInstruments: GetAllInstruments)
 				)
 			// case ADD_CONNECTION:
 			// 	return handleAddConnection(afterState.room, dispatch, action.connection)
-			case DELETE_CONNECTIONS: {
+			case 'DELETE_CONNECTIONS': {
 				const instruments = getAllInstruments()
 				action.connectionIds.forEach(x => {
 					const connection = selectConnection(beforeState.room, x)
@@ -62,7 +61,7 @@ export const connectionsClientMiddleware: (getAllInstruments: GetAllInstruments)
 				// return handleDeleteConnection(beforeState.room, dispatch, action.connectionIds)
 				return
 			}
-			case SET_ENABLED_NODE: {
+			case 'SET_ENABLED_NODE': {
 				if (action.enabled) return
 
 				const instruments = getAllInstruments()

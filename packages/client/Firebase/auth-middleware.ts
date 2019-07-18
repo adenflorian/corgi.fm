@@ -1,6 +1,6 @@
 import {Middleware} from 'redux'
 import {
-	AUTH_ON_REGISTER, AuthAction, chatSystemMessage, IClientAppState,
+	AuthAction, chatSystemMessage, IClientAppState,
 } from '@corgifm/common/redux'
 import {FirebaseContextStuff} from './FirebaseContext'
 
@@ -14,7 +14,7 @@ export const createAuthMiddleware: AuthMiddleware =
 			next(action)
 
 			switch (action.type) {
-				case AUTH_ON_REGISTER: return onAuthRegister()
+				case 'AUTH_ON_REGISTER': return onAuthRegister()
 				default: return
 			}
 

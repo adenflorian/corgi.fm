@@ -34,13 +34,13 @@ export type NoteNameFlats = 'C' | 'Db' | 'D' | 'Eb' | 'E' | 'F' | 'Gb' | 'G' | '
 export type KeyColor = 'white' | 'black'
 
 export interface IKeyColors {
-	[key: number]: {
-		color: KeyColor
-		name: NoteNameSharps
+	readonly [key: number]: {
+		readonly color: KeyColor
+		readonly name: NoteNameSharps
 	}
 }
 
-export const keyColors: Readonly<IKeyColors> = Object.freeze({
+export const keyColors: IKeyColors = {
 	0: {color: 'white', name: 'C'},
 	1: {color: 'black', name: 'C#'},
 	2: {color: 'white', name: 'D'},
@@ -53,7 +53,7 @@ export const keyColors: Readonly<IKeyColors> = Object.freeze({
 	9: {color: 'white', name: 'A'},
 	10: {color: 'black', name: 'A#'},
 	11: {color: 'white', name: 'B'},
-})
+}
 
 export function roundRate(rawRate: number) {
 	return rateValues.find(x => rawRate <= x) || rateValues.last(4)

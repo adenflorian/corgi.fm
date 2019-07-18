@@ -28,7 +28,7 @@ import {
 	selectRoomSettings, selectRoomStateByName, selectShamuGraphState,
 	SERVER_ACTION, setActiveRoom,
 	setChat, setClients, setRoomMembers, setRooms, shamuGraphActions,
-	userLeftRoom, whitelistedRoomActionTypes,
+	userLeftRoom, whitelistedRoomActionTypes, isRoomOwnerRoomAction,
 } from '@corgifm/common/redux'
 import {WebSocketEvent} from '@corgifm/common/server-constants'
 import {createServerStuff, loadServerStuff} from './create-server-stuff'
@@ -138,7 +138,7 @@ export function setupServerWebSocketListeners(
 
 				const currentRoom = getRoom(socket)
 
-				const isRestrictedRoomAction = roomOwnerRoomActions.includes(action.type)
+				const isRestrictedRoomAction = isRoomOwnerRoomAction(action.type)
 
 				if (isRestrictedRoomAction) {
 					const client = selectClientById(serverStore.getState(), clientId)

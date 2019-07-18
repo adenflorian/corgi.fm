@@ -10,22 +10,20 @@ import {
 
 import uuid = require('uuid')
 
-export const GROUP_SEQ_SET_ENABLED = 'GROUP_SEQ_SET_ENABLED'
-
 export const addGroupSequencer = (groupSequencer: GroupSequencer) =>
 	addMultiThing(groupSequencer, ConnectionNodeType.groupSequencer, NetworkActionType.SERVER_AND_BROADCASTER)
 
-export const groupSequencerActions = Object.freeze({
+export const groupSequencerActions = {
 	setEnabled: (id: Id, port: number, index: number, enabled: boolean) => ({
-		type: GROUP_SEQ_SET_ENABLED as typeof GROUP_SEQ_SET_ENABLED,
+		type: 'GROUP_SEQ_SET_ENABLED',
 		id,
 		port,
 		index,
 		enabled,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
-	}),
-})
+	} as const),
+}
 
 export interface GroupSequencersState extends IMultiState {
 	things: GroupSequencers
@@ -136,7 +134,7 @@ export interface GroupEvent {
 export type GroupSequencerAction = ActionType<typeof groupSequencerActions>
 
 const groupSequencerActionTypes: string[] = [
-	GROUP_SEQ_SET_ENABLED,
+	'GROUP_SEQ_SET_ENABLED',
 ]
 
 export const groupSequencersReducer = makeMultiReducer<GroupSequencer, GroupSequencersState>(
@@ -147,7 +145,7 @@ export const groupSequencersReducer = makeMultiReducer<GroupSequencer, GroupSequ
 
 function groupSequencerReducer(groupSequencer: GroupSequencer, action: GroupSequencerAction): GroupSequencer {
 	switch (action.type) {
-		case GROUP_SEQ_SET_ENABLED: return {
+		case 'GROUP_SEQ_SET_ENABLED': return {
 			...groupSequencer,
 			groups: groupsReducer(groupSequencer.groups, action),
 		}
@@ -157,14 +155,14 @@ function groupSequencerReducer(groupSequencer: GroupSequencer, action: GroupSequ
 
 function groupsReducer(groups: Groups, action: GroupSequencerAction): Groups {
 	switch (action.type) {
-		case GROUP_SEQ_SET_ENABLED: return groups.update(action.port, x => groupReducer(x, action))
+		case 'GROUP_SEQ_SET_ENABLED': return groups.update(action.port, x => groupReducer(x, action))
 		default: return groups
 	}
 }
 
 function groupReducer(group: Group, action: GroupSequencerAction): Group {
 	switch (action.type) {
-		case GROUP_SEQ_SET_ENABLED: return {
+		case 'GROUP_SEQ_SET_ENABLED': return {
 			...group,
 			events: group.events.update(action.index, x => eventReducer(x, action)),
 		}
@@ -174,7 +172,7 @@ function groupReducer(group: Group, action: GroupSequencerAction): Group {
 
 function eventReducer(event: GroupEvent, action: GroupSequencerAction): GroupEvent {
 	switch (action.type) {
-		case GROUP_SEQ_SET_ENABLED: return {
+		case 'GROUP_SEQ_SET_ENABLED': return {
 			...event,
 			on: action.enabled,
 		}

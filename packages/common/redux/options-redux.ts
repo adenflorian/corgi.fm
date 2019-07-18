@@ -27,22 +27,23 @@ export const initialOptionsState = Object.freeze({
 	graphicsExpensiveZoomPan: true,
 })
 
-export const SET_OPTION = 'SET_OPTION'
-export type SetOptionAction = ReturnType<typeof setOption>
+type SetOptionAction = ReturnType<typeof setOption>
 export const setOption = (option: AppOptions, value: any) => ({
-	type: SET_OPTION,
+	type: 'SET_OPTION',
 	option,
 	value,
-})
+} as const)
+
+export type OptionsAction = SetOptionAction
 
 export const setOptionMasterVolume = setOption.bind(null, AppOptions.masterVolume)
 
 export type IOptionsState = typeof initialOptionsState
 
 // TODO Move to client package
-export function optionsReducer(state = initialOptionsState, action: SetOptionAction): IOptionsState {
+export function optionsReducer(state = initialOptionsState, action: OptionsAction): IOptionsState {
 	switch (action.type) {
-		case SET_OPTION: {
+		case 'SET_OPTION': {
 			const newState = getNewState(state, action)
 			window.localStorage.setItem(localStorageKey, JSON.stringify({options: newState}))
 			return newState
@@ -51,14 +52,14 @@ export function optionsReducer(state = initialOptionsState, action: SetOptionAct
 	}
 }
 
-function getNewState(state: IOptionsState, action: SetOptionAction): IOptionsState {
-	return Object.freeze({
+function getNewState(state: IOptionsState, action: OptionsAction): IOptionsState {
+	return {
 		...state,
 		[action.option]: action.value,
-	})
+	}
 }
 
-export function loadOptionsState(): Readonly<IOptionsState> {
+export function loadOptionsState(): IOptionsState {
 	try {
 		const optionsJson = window.localStorage.getItem(localStorageKey)
 
@@ -66,10 +67,10 @@ export function loadOptionsState(): Readonly<IOptionsState> {
 			? JSON.parse(optionsJson).options
 			: {}
 
-		const newState = Object.freeze({
+		const newState: IOptionsState = {
 			...initialOptionsState,
 			...fromLocalStorage,
-		})
+		}
 
 		const newJson = JSON.stringify({options: newState})
 

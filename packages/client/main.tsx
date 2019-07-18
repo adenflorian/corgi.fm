@@ -128,12 +128,12 @@ async function setupAsync() {
 
 	const noteScannerLoop = startNoteScanner(store, audioContext, getAllInstruments, getAllAudioNodes)
 
-	startMainRealTimeLoop(Object.freeze([
+	startMainRealTimeLoop([
 		noteScannerLoop,
 		ecsLoop,
 		schedulerVisualLoop,
 		fpsLoop,
-	]))
+	])
 
 	if (module.hot) {
 		module.hot.dispose(() => {

@@ -8,12 +8,12 @@ export type DBStore = ThenArg<typeof connectDB>
 
 const dbName = 'test'
 
-export const dummyDb: DBStore = Object.freeze({
+export const dummyDb: DBStore = {
 	async close() {/* noop */},
 	events: {
 		async saveUserConnectEventAsync() {return 0},
 	},
-})
+}
 
 export async function connectDB() {
 	const {uri, stop} = await getDbConnector()(dbName)
@@ -33,5 +33,5 @@ export async function connectDB() {
 			await stop()
 			logger.debug('db closed')
 		},
-	}
+	} as const
 }

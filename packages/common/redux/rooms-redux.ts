@@ -76,27 +76,25 @@ export type RoomsReduxAction = SetRoomsAction | SetActiveRoomAction | RequestCre
 ChangeRoomAction | CreateRoomAction | DeleteRoomAction | UserLeftRoomAction | LoadRoomAction
 
 export interface LocalSaves {
-	all: {
-		[key: string]: SavedRoom
-	}
+	readonly all: Map<string, SavedRoom>
 }
 
 export interface SavedRoom {
-	connections: ReturnType<typeof selectAllConnections>
-	globalClock: ReturnType<typeof selectGlobalClockState>
-	positions: ReturnType<typeof selectAllPositions>
-	roomSettings: ReturnType<typeof selectRoomSettings>
-	shamuGraph: ReturnType<typeof selectShamuGraphState>
-	saveDateTime: string
-	saveClientVersion: string
-	saveServerVersion: string
-	room: string
+	readonly connections: ReturnType<typeof selectAllConnections>
+	readonly globalClock: ReturnType<typeof selectGlobalClockState>
+	readonly positions: ReturnType<typeof selectAllPositions>
+	readonly roomSettings: ReturnType<typeof selectRoomSettings>
+	readonly shamuGraph: ReturnType<typeof selectShamuGraphState>
+	readonly saveDateTime: string
+	readonly saveClientVersion: string
+	readonly saveServerVersion: string
+	readonly room: string
 }
 
-const initialState = Object.freeze({
+const initialState = {
 	all: Map<RoomName, Room>(),
-	activeRoom: '',
-})
+	activeRoom: '' as string,
+} as const
 
 export type IRoomsState = typeof initialState
 
@@ -115,7 +113,7 @@ export const roomsReducer: Reducer<IRoomsState, RoomsReduxAction> = combineReduc
 	activeRoom: activeRoomReducer,
 })
 
-function allRoomsReducer(rooms: Rooms = initialState.all, action: RoomsReduxAction) {
+function allRoomsReducer(rooms: Rooms = initialState.all, action: RoomsReduxAction): IRoomsState['all'] {
 	switch (action.type) {
 		case CREATE_ROOM: return rooms.set(action.name, {name: action.name, creationTimestamp: action.timestamp})
 		case DELETE_ROOM: return rooms.delete(action.name)
@@ -125,7 +123,7 @@ function allRoomsReducer(rooms: Rooms = initialState.all, action: RoomsReduxActi
 	}
 }
 
-function activeRoomReducer(activeRoom: RoomName = initialState.activeRoom, action: RoomsReduxAction) {
+function activeRoomReducer(activeRoom: RoomName = initialState.activeRoom, action: RoomsReduxAction): IRoomsState['activeRoom'] {
 	switch (action.type) {
 		case SET_ACTIVE_ROOM: return action.room
 		default: return activeRoom

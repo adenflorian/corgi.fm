@@ -2,9 +2,9 @@ import {saveAs} from 'file-saver'
 import * as MidiWriter from 'midi-writer-js'
 import {Dispatch, Middleware, MiddlewareAPI} from 'redux'
 import {
-	EXPORT_SEQUENCER_MIDI, IClientAppState, isEmptyEvents,
+	IClientAppState, isEmptyEvents,
 	selectConnectionsWithSourceIds,
-	selectSequencer, SequencerAction, sequencerActions, STOP_SEQUENCER,
+	selectSequencer, SequencerAction, sequencerActions,
 } from '@corgifm/common/redux'
 import {GetAllInstruments} from './instrument-manager'
 
@@ -15,9 +15,9 @@ export const createSequencerMiddleware = (getAllInstruments: GetAllInstruments) 
 			next(action)
 
 			switch (action.type) {
-				case EXPORT_SEQUENCER_MIDI:
+				case 'EXPORT_SEQUENCER_MIDI':
 					return exportSequencerMidi(action, store)
-				case STOP_SEQUENCER:
+				case 'STOP_SEQUENCER':
 					return handleStopSequencer(action, store, getAllInstruments)
 			}
 		}

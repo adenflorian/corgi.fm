@@ -2,15 +2,13 @@ import {Map} from 'immutable'
 import {ActionType} from 'typesafe-actions'
 import {IClientAppState} from '.'
 
-export const SET_IN_PROGRESS = 'SET_IN_PROGRESS'
-
-export const inProgressAction = Object.freeze({
+export const inProgressAction = {
 	set: (id: InProgressId, data: InProgress) => ({
-		type: SET_IN_PROGRESS as typeof SET_IN_PROGRESS,
+		type: 'SET_IN_PROGRESS',
 		id,
 		data,
-	}),
-})
+	} as const),
+} as const
 
 type InProgressState = Map<InProgressId, InProgress>
 
@@ -33,7 +31,7 @@ export function inProgressReducer(
 ): InProgressState {
 
 	switch (action.type) {
-		case SET_IN_PROGRESS: return state.set(action.id, action.data)
+		case 'SET_IN_PROGRESS': return state.set(action.id, action.data)
 		default: return state
 	}
 }

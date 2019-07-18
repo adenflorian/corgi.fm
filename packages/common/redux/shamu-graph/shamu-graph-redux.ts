@@ -10,30 +10,27 @@ import {
 } from '.'
 import {BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION} from '..'
 
-export const REPLACE_SHAMU_GRAPH_STATE = 'REPLACE_SHAMU_GRAPH_STATE'
-export const MERGE_SHAMU_GRAPH_STATE = 'MERGE_SHAMU_GRAPH_STATE'
-
-export const shamuGraphActions = Object.freeze({
+export const shamuGraphActions = {
 	replace: (shamuGraphState: ShamuGraphState) => ({
-		type: REPLACE_SHAMU_GRAPH_STATE as typeof REPLACE_SHAMU_GRAPH_STATE,
+		type: 'REPLACE_SHAMU_GRAPH_STATE',
 		shamuGraphState,
-	}),
+	} as const),
 	merge: (shamuGraphState: ShamuGraphState) => ({
-		type: MERGE_SHAMU_GRAPH_STATE as typeof MERGE_SHAMU_GRAPH_STATE,
+		type: 'MERGE_SHAMU_GRAPH_STATE',
 		shamuGraphState,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
-	}),
-})
+	} as const),
+} as const
 
 export type ShamuGraphAction = ActionType<typeof shamuGraphActions>
 
 export type ShamuGraphState = StateType<typeof shamuGraphCombinedReducers>
 
-export function shamuGraphReducer(state: ShamuGraphState | undefined, action: ShamuGraphAction) {
+export function shamuGraphReducer(state: ShamuGraphState | undefined, action: ShamuGraphAction): ShamuGraphState {
 	switch (action.type) {
-		case REPLACE_SHAMU_GRAPH_STATE: return {
-			nodes: Object.freeze({
+		case 'REPLACE_SHAMU_GRAPH_STATE': return {
+			nodes: {
 				basicSynthesizers: deserialize(ConnectionNodeType.basicSynthesizer, action.shamuGraphState.nodes.basicSynthesizers),
 				basicSamplers: deserialize(ConnectionNodeType.basicSampler, action.shamuGraphState.nodes.basicSamplers),
 				gridSequencers: deserialize(ConnectionNodeType.gridSequencer, action.shamuGraphState.nodes.gridSequencers),
@@ -43,17 +40,17 @@ export function shamuGraphReducer(state: ShamuGraphState | undefined, action: Sh
 				simpleCompressors: deserialize(ConnectionNodeType.simpleCompressor, action.shamuGraphState.nodes.simpleCompressors),
 				simpleDelays: deserialize(ConnectionNodeType.simpleDelay, action.shamuGraphState.nodes.simpleDelays),
 				virtualKeyboards: deserialize(ConnectionNodeType.virtualKeyboard, action.shamuGraphState.nodes.virtualKeyboards),
-			}),
+			},
 			edges: makeShamuEdgesState().merge(action.shamuGraphState.edges),
 		}
-		// case MERGE_SHAMU_GRAPH_STATE: {
+		// case 'MERGE_SHAMU_GRAPH_STATE': {
 		// 	if (!state) {
 		// 		logger.warn('MERGE_SHAMU_GRAPH_STATE - tried to merge with non-existent state')
 		// 		return state
 		// 	}
 
 		// 	return {
-		// 		nodes: Object.freeze({
+		// 		nodes: {
 		// 			basicSynthesizers: {
 		// 				...state.nodes.basicSynthesizers,
 		// 				...deserialize(ConnectionNodeType.basicSynthesizer, action.shamuGraphState.nodes.basicSynthesizers),
@@ -88,7 +85,7 @@ export function shamuGraphReducer(state: ShamuGraphState | undefined, action: Sh
 		// 			},
 		// 			// Don't merge keyboards
 		// 			virtualKeyboards: state.nodes.virtualKeyboards,
-		// 		}),
+		// 		},
 		// 		edges: {
 		// 			...state.edges,
 		// 			...makeShamuEdgesState().merge(action.shamuGraphState.edges),
@@ -102,21 +99,22 @@ export function shamuGraphReducer(state: ShamuGraphState | undefined, action: Sh
 const shamuGraphCombinedReducers = combineReducers({
 	nodes: nodesReducer,
 	edges: edgesReducer,
-})
+} as const)
 
 function deserialize<T extends IMultiState>(type: ConnectionNodeType, multiState: T): T {
 	if (!multiState) {
-		return Object.freeze({
+		// eslint-disable-next-line @typescript-eslint/no-object-literal-type-assertion
+		return {
 			things: {},
-		}) as T
+		} as T
 	}
 
-	return Object.freeze({
+	return {
 		...multiState,
 		things: Map(multiState.things)
 			.map(getConnectionNodeInfo(type).stateDeserializer)
 			.toObject(),
-	})
+	}
 }
 
 export const selectShamuGraphState = (state: IClientRoomState) => state.shamuGraph

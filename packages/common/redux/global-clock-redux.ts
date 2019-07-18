@@ -2,41 +2,35 @@ import {Record} from 'immutable'
 import {ActionType} from 'typesafe-actions'
 import {BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION} from '.'
 
-export const REPLACE_GLOBAL_CLOCK_STATE = 'REPLACE_GLOBAL_CLOCK_STATE'
-export const START_GLOBAL_CLOCK = 'START_GLOBAL_CLOCK'
-export const STOP_GLOBAL_CLOCK = 'STOP_GLOBAL_CLOCK'
-export const RESTART_GLOBAL_CLOCK = 'RESTART_GLOBAL_CLOCK'
-export const UPDATE_GLOBAL_CLOCK = 'UPDATE_GLOBAL_CLOCK'
-
-export const globalClockActions = Object.freeze({
+export const globalClockActions = {
 	replace: (globalClockState: IGlobalClockState) => ({
-		type: REPLACE_GLOBAL_CLOCK_STATE as typeof REPLACE_GLOBAL_CLOCK_STATE,
+		type: 'REPLACE_GLOBAL_CLOCK_STATE',
 		globalClockState,
-	}),
+	} as const),
 	start: () => ({
-		type: START_GLOBAL_CLOCK as typeof START_GLOBAL_CLOCK,
+		type: 'START_GLOBAL_CLOCK',
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
-	}),
+	} as const),
 	stop: () => ({
-		type: STOP_GLOBAL_CLOCK as typeof STOP_GLOBAL_CLOCK,
+		type: 'STOP_GLOBAL_CLOCK',
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
-	}),
+	} as const),
 	restart: () => ({
-		type: RESTART_GLOBAL_CLOCK as typeof RESTART_GLOBAL_CLOCK,
+		type: 'RESTART_GLOBAL_CLOCK',
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
-	}),
+	} as const),
 	update: (
 		update: Partial<Pick<IGlobalClockState, 'bpm' | 'maxReadAheadSeconds'>>,
 	) => ({
-		type: UPDATE_GLOBAL_CLOCK as typeof UPDATE_GLOBAL_CLOCK,
+		type: 'UPDATE_GLOBAL_CLOCK',
 		update,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
-	}),
-})
+	} as const),
+} as const
 
 const defaultGlobalClockState = {
 	index: -1,
@@ -57,11 +51,11 @@ export type IGlobalClockState = typeof initialState
 export const globalClockReducer =
 	(state = initialState, action: GlobalClockAction) => {
 		switch (action.type) {
-			case REPLACE_GLOBAL_CLOCK_STATE: return makeGlobalClockState(action.globalClockState)
-			case START_GLOBAL_CLOCK: return state.set('isPlaying', true)
-			case STOP_GLOBAL_CLOCK: return state.set('isPlaying', false).set('index', -1)
-			case RESTART_GLOBAL_CLOCK: return state.set('isPlaying', true).update('playCount', x => x + 1)
-			case UPDATE_GLOBAL_CLOCK: return state.merge(action.update)
+			case 'REPLACE_GLOBAL_CLOCK_STATE': return makeGlobalClockState(action.globalClockState)
+			case 'START_GLOBAL_CLOCK': return state.set('isPlaying', true)
+			case 'STOP_GLOBAL_CLOCK': return state.set('isPlaying', false).set('index', -1)
+			case 'RESTART_GLOBAL_CLOCK': return state.set('isPlaying', true).update('playCount', x => x + 1)
+			case 'UPDATE_GLOBAL_CLOCK': return state.merge(action.update)
 			default: return state
 		}
 	}

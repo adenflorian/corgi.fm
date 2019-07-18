@@ -5,7 +5,7 @@ import {logger} from '@corgifm/common/logger'
 import {
 	BroadcastAction, BROADCASTER_ACTION, getActionsBlacklist,
 	GLOBAL_SERVER_ACTION, IClientAppState,
-	MOVE_POSITION, selectClientInfo, selectLocalSocketId, SERVER_ACTION, UPDATE_POINTER,
+	selectClientInfo, selectLocalSocketId, SERVER_ACTION,
 } from '@corgifm/common/redux'
 import {WebSocketEvent} from '@corgifm/common/server-constants'
 import {socket} from './websocket-listeners'
@@ -57,8 +57,8 @@ function determineEvent(action: BroadcastAction) {
 }
 
 const actionTypeRateLimitIntervals = Map<string, number>([
-	[UPDATE_POINTER, 50],
-	[MOVE_POSITION, 100],
+	['UPDATE_POINTER', 50],
+	['MOVE_POSITION', 100],
 ])
 
 const rateLimitedActionThings = actionTypeRateLimitIntervals

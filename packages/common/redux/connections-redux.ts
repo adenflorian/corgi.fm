@@ -11,48 +11,41 @@ import {
 	selectVirtualKeyboardById, SERVER_ACTION, VirtualKeyboardState,
 } from '.'
 
-export const ADD_CONNECTION = 'ADD_CONNECTION'
-export const ADD_CONNECTIONS = 'ADD_CONNECTIONS'
-export const DELETE_CONNECTIONS = 'DELETE_CONNECTIONS'
-export const DELETE_ALL_CONNECTIONS = 'DELETE_ALL_CONNECTIONS'
-export const REPLACE_CONNECTIONS = 'REPLACE_CONNECTIONS'
-export const UPDATE_CONNECTION = 'UPDATE_CONNECTION'
-
-export const connectionsActions = Object.freeze({
+export const connectionsActions = {
 	add: (connection: IConnection) => ({
-		type: ADD_CONNECTION as typeof ADD_CONNECTION,
+		type: 'ADD_CONNECTION',
 		connection,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
-	}),
+	} as const),
 	addMultiple: (connections: List<IConnection>) => ({
-		type: ADD_CONNECTIONS as typeof ADD_CONNECTIONS,
+		type: 'ADD_CONNECTIONS',
 		connections,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
-	}),
+	} as const),
 	delete: (connectionIds: List<string>) => ({
-		type: DELETE_CONNECTIONS as typeof DELETE_CONNECTIONS,
+		type: 'DELETE_CONNECTIONS',
 		connectionIds,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
-	}),
+	} as const),
 	deleteAll: () => ({
-		type: DELETE_ALL_CONNECTIONS as typeof DELETE_ALL_CONNECTIONS,
-	}),
+		type: 'DELETE_ALL_CONNECTIONS',
+	} as const),
 	replaceAll: (connections: IConnections) => ({
-		type: REPLACE_CONNECTIONS as typeof REPLACE_CONNECTIONS,
+		type: 'REPLACE_CONNECTIONS',
 		connections,
 		BROADCASTER_ACTION,
-	}),
+	} as const),
 	update: (id: string, connection: Partial<IConnection>) => ({
-		type: UPDATE_CONNECTION as typeof UPDATE_CONNECTION,
+		type: 'UPDATE_CONNECTION',
 		id,
 		connection,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
-	}),
-})
+	} as const),
+} as const
 
 export interface IConnectionsState {
 	connections: IConnections
@@ -102,12 +95,12 @@ export type IConnectionAction = ActionType<typeof connectionsActions>
 const connectionsSpecificReducer: Reducer<IConnections, IConnectionAction> =
 	(connections = Connections(), action) => {
 		switch (action.type) {
-			case ADD_CONNECTION: return connections.set(action.connection.id, action.connection)
-			case ADD_CONNECTIONS: return connections.concat(action.connections.reduce((map, val) => map.set(val.id, val), Map<string, IConnection>()))
-			case DELETE_CONNECTIONS: return connections.deleteAll(action.connectionIds)
-			case DELETE_ALL_CONNECTIONS: return connections.clear()
-			case REPLACE_CONNECTIONS: return Map<string, IConnection>().merge(action.connections)
-			case UPDATE_CONNECTION: return connections.update(action.id, x => ({...x, ...action.connection}))
+			case 'ADD_CONNECTION': return connections.set(action.connection.id, action.connection)
+			case 'ADD_CONNECTIONS': return connections.concat(action.connections.reduce((map, val) => map.set(val.id, val), Map<string, IConnection>()))
+			case 'DELETE_CONNECTIONS': return connections.deleteAll(action.connectionIds)
+			case 'DELETE_ALL_CONNECTIONS': return connections.clear()
+			case 'REPLACE_CONNECTIONS': return Map<string, IConnection>().merge(action.connections)
+			case 'UPDATE_CONNECTION': return connections.update(action.id, x => ({...x, ...action.connection}))
 			default: return connections
 		}
 	}

@@ -1,6 +1,5 @@
 import React from 'react'
 import {ContextMenuTrigger} from 'react-contextmenu'
-import {Point} from '@corgifm/common/common-types'
 import {
 	selectLocalClientId, selectOptions, selectRoomSettings, shamuConnect,
 } from '@corgifm/common/redux'
@@ -217,22 +216,22 @@ export const ConnectedZoom = shamuConnect(
 	},
 )(Zoom)
 
-export function toGraphSpace(x = 0, y = 0): Readonly<Point> {
+export function toGraphSpace(x = 0, y = 0) {
 	const zoom = simpleGlobalClientState.zoom
 	const pan = simpleGlobalClientState.pan
 
-	return Object.freeze({
+	return {
 		x: ((x - (window.innerWidth / 2)) / zoom) - pan.x,
 		y: ((y - (window.innerHeight / 2)) / zoom) - pan.y,
-	})
+	} as const
 }
 
-export function fromGraphSpace(x = 0, y = 0): Readonly<Point> {
+export function fromGraphSpace(x = 0, y = 0) {
 	const zoom = simpleGlobalClientState.zoom
 	const pan = simpleGlobalClientState.pan
 
-	return Object.freeze({
+	return {
 		x: ((x + pan.x) * zoom) + (window.innerWidth / 2),
 		y: ((y + pan.y) * zoom) + (window.innerHeight / 2),
-	})
+	} as const
 }

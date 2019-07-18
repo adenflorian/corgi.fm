@@ -1,18 +1,16 @@
 import {ActionType} from 'typesafe-actions'
 import {IClientAppState} from '.'
 
-export const SET_ACTIVE_MODAL = 'SET_ACTIVE_MODAL'
-
-export const modalsAction = Object.freeze({
+export const modalsAction = {
 	set: (modalId: ModalId) => ({
-		type: SET_ACTIVE_MODAL as typeof SET_ACTIVE_MODAL,
+		type: 'SET_ACTIVE_MODAL',
 		modalId,
-	}),
-})
+	} as const),
+} as const
 
-const makeModalsState = () => Object.freeze({
-	activeModal: ModalId.Welcome,
-})
+const makeModalsState = () => ({
+	activeModal: ModalId.Welcome as ModalId,
+} as const)
 
 type ModalsState = ReturnType<typeof makeModalsState>
 
@@ -33,7 +31,7 @@ export function modalsReducer(
 ): ModalsState {
 
 	switch (action.type) {
-		case SET_ACTIVE_MODAL: return {...state, activeModal: action.modalId}
+		case 'SET_ACTIVE_MODAL': return {...state, activeModal: action.modalId}
 		default: return state
 	}
 }

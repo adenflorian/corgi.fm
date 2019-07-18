@@ -5,22 +5,22 @@ import {IMidiNotes} from './MidiNote'
 
 /** In clip time (beats); Means BPM has not been applied */
 export interface MidiClipEvent {
-	notes: IMidiNotes
-	startBeat: number
-	durationBeats: number
+	readonly notes: IMidiNotes
+	readonly startBeat: number
+	readonly durationBeats: number
 }
 
 /** In clip time (beats); Means BPM has not been applied */
-export function makeMidiClipEvent(event: MidiClipEvent): Readonly<MidiClipEvent> {
+export function makeMidiClipEvent(event: MidiClipEvent): MidiClipEvent {
 	if (event.notes === undefined) throw new Error('why')
 	if (event.startBeat === undefined) throw new Error('why')
 	if (event.durationBeats === undefined) throw new Error('why')
 
-	return Object.freeze({
+	return {
 		notes: event.notes,
 		startBeat: event.startBeat,
 		durationBeats: event.durationBeats,
-	})
+	}
 }
 
 export const makeMidiClip = Record({
@@ -39,21 +39,21 @@ export type MidiClipEvents = MidiClip['events']
 
 /** In audio context time (seconds); Means BPM is already applied */
 export interface MidiGlobalClipEvent {
-	notes: IMidiNotes
-	startTime: number
-	endTime: number
+	readonly notes: IMidiNotes
+	readonly startTime: number
+	readonly endTime: number
 }
 
-export function makeMidiGlobalClipEvent(event: MidiGlobalClipEvent): Readonly<MidiGlobalClipEvent> {
+export function makeMidiGlobalClipEvent(event: MidiGlobalClipEvent): MidiGlobalClipEvent {
 	if (event.notes === undefined) throw new Error('why')
 	if (event.startTime === undefined) throw new Error('why')
 	if (event.endTime === undefined) throw new Error('why')
 
-	return Object.freeze({
+	return {
 		notes: event.notes,
 		startTime: event.startTime,
 		endTime: event.endTime,
-	})
+	}
 }
 
 /** In audio context time (seconds); Means BPM is already applied */

@@ -9,87 +9,65 @@ import {CssColor} from '../shamu-color'
 import {
 	BROADCASTER_ACTION, createDeepEqualSelector, createReducer,
 	GLOBAL_SERVER_ACTION, IClientAppState, IServerState,
-	SELF_DISCONNECTED,
 } from '.'
 
-export const ADD_CLIENT = 'ADD_CLIENT'
 export type AddClientAction = ReturnType<typeof addClient>
-export const addClient = (client: IClientState) => {
-	return {
-		type: ADD_CLIENT as typeof ADD_CLIENT,
-		client,
-	}
-}
+export const addClient = (client: IClientState) => ({
+	type: 'ADD_CLIENT',
+	client,
+} as const)
 
-export const SET_LOCAL_CLIENT_ID = 'SET_LOCAL_CLIENT_ID'
 export type SetLocalClientIdAction = ReturnType<typeof setLocalClientId>
-export const setLocalClientId = (localClientId: Id) => {
-	return {
-		type: SET_LOCAL_CLIENT_ID as typeof SET_LOCAL_CLIENT_ID,
-		localClientId,
-	}
-}
+export const setLocalClientId = (localClientId: Id) => ({
+	type: 'SET_LOCAL_CLIENT_ID',
+	localClientId,
+} as const)
 
-export const SET_CLIENTS = 'SET_CLIENTS'
 export type SetClientsAction = ReturnType<typeof setClients>
-export const setClients = (clients: IClientState[]) => {
-	return {
-		type: SET_CLIENTS as typeof SET_CLIENTS,
-		clients,
-	}
-}
+export const setClients = (clients: IClientState[]) => ({
+	type: 'SET_CLIENTS',
+	clients,
+} as const)
 
-export const SET_CLIENT_NAME = 'SET_CLIENT_NAME'
 export type SetClientNameAction = ReturnType<typeof setClientName>
-export const setClientName = (id: ClientId, newName: string) => {
-	return {
-		type: SET_CLIENT_NAME as typeof SET_CLIENT_NAME,
-		id,
-		newName: newName.substring(0, maxUsernameLength).trim(),
-		GLOBAL_SERVER_ACTION,
-		BROADCASTER_ACTION,
-	}
-}
+export const setClientName = (id: ClientId, newName: string) => ({
+	type: 'SET_CLIENT_NAME',
+	id,
+	newName: newName.substring(0, maxUsernameLength).trim(),
+	GLOBAL_SERVER_ACTION,
+	BROADCASTER_ACTION,
+} as const)
 
-export const SET_LOCAL_CLIENT_NAME = 'SET_LOCAL_CLIENT_NAME'
 export type SetLocalClientNameAction = ReturnType<typeof setLocalClientName>
-export const setLocalClientName = (newName: string) => {
-	return {
-		type: SET_LOCAL_CLIENT_NAME as typeof SET_LOCAL_CLIENT_NAME,
-		newName: newName.substring(0, maxUsernameLength).trim(),
-	}
-}
+export const setLocalClientName = (newName: string) => ({
+	type: 'SET_LOCAL_CLIENT_NAME',
+	newName: newName.substring(0, maxUsernameLength).trim(),
+} as const)
 
-export const CLIENT_DISCONNECTED = 'CLIENT_DISCONNECTED'
 export type ClientDisconnectedAction = ReturnType<typeof clientDisconnected>
-export const clientDisconnected = (id: ClientId) => {
-	return {
-		type: CLIENT_DISCONNECTED as typeof CLIENT_DISCONNECTED,
-		id,
-	}
-}
+export const clientDisconnected = (id: ClientId) => ({
+	type: 'CLIENT_DISCONNECTED',
+	id,
+} as const)
 
-export const CLIENT_DISCONNECTING = 'CLIENT_DISCONNECTING'
 export type ClientDisconnectingAction = ReturnType<typeof clientDisconnecting>
-export const clientDisconnecting = (id: ClientId) => {
-	return {
-		type: CLIENT_DISCONNECTING as typeof CLIENT_DISCONNECTING,
-		id,
-	}
-}
+export const clientDisconnecting = (id: ClientId) => ({
+	type: 'CLIENT_DISCONNECTING',
+	id,
+} as const)
 
 export const maxUsernameLength = 42
 
 export interface IClientsState {
-	clients: IClientState[]
-	localClientId?: Id
+	readonly clients: IClientState[]
+	readonly localClientId?: Id
 }
 
 export interface IClientState {
-	id: string
-	color: string
-	name: string
-	socketId: string
+	readonly id: string
+	readonly color: string
+	readonly name: string
+	readonly socketId: string
 }
 
 const colors = [CssColor.brightBlue, CssColor.brightGreen, CssColor.brightOrange, CssColor.brightPurple, CssColor.brightYellow]
@@ -99,12 +77,12 @@ export class ClientState implements IClientState {
 		return ClientState.serverClient
 	}
 
-	public static serverClient: IClientState = Object.freeze({
+	public static serverClient: IClientState = {
 		id: serverClientId,
 		socketId: 'server',
 		name: 'Server',
 		color: CssColor.defaultGray,
-	})
+	}
 
 	public readonly socketId: string
 	public readonly id: string
@@ -132,31 +110,31 @@ const initialState: IClientsState = {
 }
 
 export const clientsReducer = createReducer(initialState, {
-	[ADD_CLIENT]: (state, {client}: AddClientAction) => ({
+	ADD_CLIENT: (state, {client}: AddClientAction) => ({
 		...state,
 		clients: [
 			...state.clients,
 			client,
 		],
 	}),
-	[SET_LOCAL_CLIENT_ID]: (state, {localClientId}: SetLocalClientIdAction) => ({
+	SET_LOCAL_CLIENT_ID: (state, {localClientId}: SetLocalClientIdAction) => ({
 		...state,
 		localClientId,
 	}),
-	[SET_CLIENTS]: (state, {clients}: SetClientsAction) => ({
+	SET_CLIENTS: (state, {clients}: SetClientsAction) => ({
 		...state,
 		clients,
 	}),
-	[CLIENT_DISCONNECTED]: (state, {id}: ClientDisconnectedAction) => ({
+	CLIENT_DISCONNECTED: (state, {id}: ClientDisconnectedAction) => ({
 		...state,
 		clients: state.clients.filter(x => x.id !== id),
 	}),
-	[CLIENT_DISCONNECTING]: (state, {id}: ClientDisconnectingAction) => ({
+	CLIENT_DISCONNECTING: (state, {id}: ClientDisconnectingAction) => ({
 		...state,
 		clients: state.clients
 			.map(x => x.id === id ? {...x, disconnecting: true} : x),
 	}),
-	[SET_CLIENT_NAME]: (state, {id, newName}: SetClientNameAction) => ({
+	SET_CLIENT_NAME: (state, {id, newName}: SetClientNameAction) => ({
 		...state,
 		clients: state.clients
 			.map(x => x.id === id ? {
@@ -167,7 +145,7 @@ export const clientsReducer = createReducer(initialState, {
 					.substring(0, maxUsernameLength),
 			} : x),
 	}),
-	[SELF_DISCONNECTED]: state => ({
+	SELF_DISCONNECTED: state => ({
 		...state,
 		// Leave local client or empty array
 		clients: state.clients.filter(x => x.id === state.localClientId),

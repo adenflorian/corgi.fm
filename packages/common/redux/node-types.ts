@@ -33,7 +33,7 @@ export const MASTER_CLOCK_SOURCE_ID = 'MASTER_CLOCK_SOURCE_ID'
 
 export type IConnectionNodeInfo = ReturnType<typeof makeNodeInfo>
 
-export const dummyIConnectable: IMultiStateThing = Object.freeze({
+export const dummyIConnectable: IMultiStateThing = {
 	color: CssColor.disabledGray,
 	id: 'oh no',
 	type: ConnectionNodeType.dummy,
@@ -42,7 +42,7 @@ export const dummyIConnectable: IMultiStateThing = Object.freeze({
 	name: 'default node name',
 	enabled: false,
 	ownerId: 'dummyOwnerId',
-})
+}
 
 class DummyConnectable implements IConnectable {
 	public constructor(

@@ -5,27 +5,25 @@ export interface IWebsocketState {
 	info: string
 }
 
-export const SET_SOCKET_ID = 'SET_SOCKET_ID'
 export type SetSocketIdAction = ReturnType<typeof setSocketId>
 export const setSocketId = (id: string) => ({
-	type: SET_SOCKET_ID,
+	type: 'SET_SOCKET_ID',
 	id,
-})
+} as const)
 
-export const SET_INFO = 'SET_INFO'
 export type SetInfoAction = ReturnType<typeof setInfo>
 export const setInfo = (info: string) => ({
-	type: SET_INFO as typeof SET_INFO,
+	type: 'SET_INFO',
 	info,
-})
+} as const)
 
 export type WebsocketReduxActions = SetInfoAction | SetSocketIdAction
 
 export const websocketReducer = createReducer<IWebsocketState>(
 	{info: '_'},
 	{
-		[SET_SOCKET_ID]: (state, {id}: SetSocketIdAction) => ({...state, id}),
-		[SET_INFO]: (state, {info}: SetInfoAction) => ({...state, info}),
+		SET_SOCKET_ID: (state, {id}: SetSocketIdAction) => ({...state, id}),
+		SET_INFO: (state, {info}: SetInfoAction) => ({...state, info}),
 	},
 )
 

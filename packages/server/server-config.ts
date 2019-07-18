@@ -8,9 +8,9 @@ export function getDbConnector() {
 		: serverConfig.db.prod
 }
 
-const serverConfig = Object.freeze({
+const serverConfig = {
 	db: {
 		local: startInMemoryDB,
 		prod: connectToLocalDB,
 	},
-})
+} as const

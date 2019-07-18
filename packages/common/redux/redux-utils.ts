@@ -9,12 +9,7 @@ import {
 import {Action} from 'redux'
 import {createSelectorCreator, defaultMemoize} from 'reselect'
 import {assertArrayHasNoUndefinedElements} from '../common-utils'
-import {GHOST_CONNECTION_MOVE} from './ghost-connections-redux'
-import {
-	IClientAppState, MOVE_POSITION,
-	REPORT_LEVELS,
-	SET_INFO, UPDATE_POINTER,
-} from '.'
+import {IClientAppState} from '.'
 
 export function makeActionCreator(type: string, ...argNames: any[]) {
 	argNames.forEach(arg => {
@@ -185,11 +180,11 @@ export const shamuConnect = connect as ShamuConnect2
 
 export const getActionsBlacklist = () => {
 	const x = [
-		REPORT_LEVELS,
-		SET_INFO,
-		UPDATE_POINTER,
-		MOVE_POSITION,
-		GHOST_CONNECTION_MOVE,
+		'REPORT_LEVELS',
+		'SET_INFO',
+		'UPDATE_POINTER',
+		'MOVE_POSITION',
+		'GHOST_CONNECTION_MOVE',
 	]
 
 	// If anything is undefined in the blacklist the redux dev tools breaks

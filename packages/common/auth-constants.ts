@@ -1,5 +1,5 @@
-export const AuthConstants = Object.freeze({
-	password: Object.freeze({
+export const AuthConstants = {
+	password: {
 		minLength: 8,
-	}),
-})
+	},
+} as const

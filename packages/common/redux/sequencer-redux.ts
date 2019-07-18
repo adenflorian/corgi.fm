@@ -1,92 +1,87 @@
 import {List, Map, Set} from 'immutable'
 import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
-import {ConnectionNodeType, Id, IMultiStateThing, isSequencerNodeType} from '../common-types'
-import {makeMidiClip, makeMidiClipEvent, MidiClip, MidiClipEvent, MidiClipEvents} from '../midi-types'
+import {
+	ConnectionNodeType, Id, IMultiStateThing, isSequencerNodeType,
+} from '../common-types'
+import {
+	makeMidiClip, makeMidiClipEvent, MidiClip, MidiClipEvent, MidiClipEvents,
+} from '../midi-types'
 import {emptyMidiNotes, IMidiNote, MidiNotes} from '../MidiNote'
-import {selectAllConnections, selectConnectionsWithSourceIds, selectConnectionsWithTargetIds} from './connections-redux'
+import {
+	selectAllConnections, selectConnectionsWithSourceIds,
+	selectConnectionsWithTargetIds,
+} from './connections-redux'
 import {selectGlobalClockIsPlaying} from './global-clock-redux'
 import {NodeSpecialState} from './shamu-graph'
 import {BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION} from '.'
 
 import uuid = require('uuid')
 
-export const CLEAR_SEQUENCER = 'CLEAR_SEQUENCER'
-export const UNDO_SEQUENCER = 'UNDO_SEQUENCER'
-export const SKIP_NOTE = 'SKIP_NOTE'
-export const RECORD_SEQUENCER_REST = 'RECORD_SEQUENCER_REST'
-export const PLAY_SEQUENCER = 'PLAY_SEQUENCER'
-export const STOP_SEQUENCER = 'STOP_SEQUENCER'
-export const PLAY_ALL = 'PLAY_ALL'
-export const STOP_ALL = 'STOP_ALL'
-export const EXPORT_SEQUENCER_MIDI = 'EXPORT_SEQUENCER_MIDI'
-export const RECORD_SEQUENCER_NOTE = 'RECORD_SEQUENCER_NOTE'
-export const TOGGLE_SEQUENCER_RECORDING = 'TOGGLE_SEQUENCER_RECORDING'
-
-export const sequencerActions = Object.freeze({
+export const sequencerActions = {
 	clear: (id: string) => ({
-		type: CLEAR_SEQUENCER as typeof CLEAR_SEQUENCER,
+		type: 'CLEAR_SEQUENCER',
 		id,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
-	}),
+	} as const),
 	undo: (id: string) => ({
-		type: UNDO_SEQUENCER as typeof UNDO_SEQUENCER,
+		type: 'UNDO_SEQUENCER',
 		id,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
-	}),
+	} as const),
 	skipNote: () => ({
-		type: SKIP_NOTE as typeof SKIP_NOTE,
-	}),
+		type: 'SKIP_NOTE',
+	} as const),
 	recordRest: (id: string) => ({
-		type: RECORD_SEQUENCER_REST as typeof RECORD_SEQUENCER_REST,
+		type: 'RECORD_SEQUENCER_REST',
 		id,
 		BROADCASTER_ACTION,
 		SERVER_ACTION,
-	}),
+	} as const),
 	play: (id: string) => ({
-		type: PLAY_SEQUENCER as typeof PLAY_SEQUENCER,
+		type: 'PLAY_SEQUENCER',
 		id,
 		BROADCASTER_ACTION,
 		SERVER_ACTION,
-	}),
+	} as const),
 	stop: (id: string) => ({
-		type: STOP_SEQUENCER as typeof STOP_SEQUENCER,
+		type: 'STOP_SEQUENCER',
 		id,
 		BROADCASTER_ACTION,
 		SERVER_ACTION,
-	}),
+	} as const),
 	playAll: () => ({
-		type: PLAY_ALL as typeof PLAY_ALL,
+		type: 'PLAY_ALL',
 		BROADCASTER_ACTION,
 		SERVER_ACTION,
-	}),
+	} as const),
 	stopAll: () => ({
-		type: STOP_ALL as typeof STOP_ALL,
+		type: 'STOP_ALL',
 		BROADCASTER_ACTION,
 		SERVER_ACTION,
-	}),
+	} as const),
 	exportMidi: (id: string) => ({
-		type: EXPORT_SEQUENCER_MIDI as typeof EXPORT_SEQUENCER_MIDI,
+		type: 'EXPORT_SEQUENCER_MIDI',
 		id,
-	}),
+	} as const),
 	recordNote: (id: string, note: IMidiNote, index?: number) => ({
-		type: RECORD_SEQUENCER_NOTE as typeof RECORD_SEQUENCER_NOTE,
+		type: 'RECORD_SEQUENCER_NOTE',
 		id,
 		note,
 		index,
 		BROADCASTER_ACTION,
 		SERVER_ACTION,
-	}),
+	} as const),
 	toggleRecording: (id: Id, isRecording: boolean) => ({
-		type: TOGGLE_SEQUENCER_RECORDING as typeof TOGGLE_SEQUENCER_RECORDING,
+		type: 'TOGGLE_SEQUENCER_RECORDING',
 		id,
 		isRecording,
 		BROADCASTER_ACTION,
 		SERVER_ACTION,
-	}),
-})
+	} as const),
+} as const
 
 export type SequencerAction = ActionType<typeof sequencerActions>
 
@@ -106,24 +101,24 @@ export function deserializeEvents(events: MidiClipEvents): MidiClipEvents {
 }
 
 export interface ISequencerState extends IMultiStateThing, NodeSpecialState {
-	midiClip: MidiClip
-	index: number
-	isPlaying: boolean
-	id: string
-	color: string | false
-	name: string
-	isRecording: boolean
-	previousEvents: List<MidiClipEvents>
-	width: number
-	height: number
-	rate: number
-	gate: number
-	pitch: number
-	notesDisplayStartX: number
-	notesDisplayWidth: number
+	readonly midiClip: MidiClip
+	readonly index: number
+	readonly isPlaying: boolean
+	readonly id: string
+	readonly color: string | false
+	readonly name: string
+	readonly isRecording: boolean
+	readonly previousEvents: List<MidiClipEvents>
+	readonly width: number
+	readonly height: number
+	readonly rate: number
+	readonly gate: number
+	readonly pitch: number
+	readonly notesDisplayStartX: number
+	readonly notesDisplayWidth: number
 }
 
-export const dummySequencerState: Readonly<SequencerStateBase> = Object.freeze({
+export const dummySequencerState: SequencerStateBase = {
 	index: -1,
 	id: 'dummy sequencer id',
 	color: 'black',
@@ -142,7 +137,7 @@ export const dummySequencerState: Readonly<SequencerStateBase> = Object.freeze({
 	isPlaying: false,
 	gate: 1,
 	enabled: false,
-})
+}
 
 export abstract class SequencerStateBase implements ISequencerState {
 	public readonly index: number = -1

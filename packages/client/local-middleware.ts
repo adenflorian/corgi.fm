@@ -14,7 +14,7 @@ import {
 	selectConnectionsWithSourceOrTargetIds, selectConnectionsWithTargetIds,
 } from '@corgifm/common/redux/connections-redux'
 import {
-	ADD_CLIENT, addBasicSynthesizer, AddClientAction,
+	addBasicSynthesizer, AddClientAction,
 	addMultiThing, addPosition, addVirtualKeyboard,
 	BasicSynthesizerState, Connection,
 	connectionsActions, deletePositions, deleteThingsAny, getConnectionNodeInfo,
@@ -22,7 +22,7 @@ import {
 	gridSequencerActions, GridSequencerFields, GridSequencerState, IClientAppState,
 	IPosition, ISequencerState, LocalSaves, makePosition,
 	MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID,
-	NetworkActionType, READY, ReadyAction, SavedRoom, selectActiveRoom,
+	NetworkActionType, ReadyAction, SavedRoom, selectActiveRoom,
 	selectAllPositions,
 	selectClientInfo,
 	selectDirectDownstreamSequencerIds,
@@ -33,21 +33,15 @@ import {
 	selectPosition,
 	selectPositionExtremes,
 	selectRoomSettings, selectSequencer, selectShamuGraphState, selectVirtualKeyboardById,
-	selectVirtualKeyboardByOwner, sequencerActions, SET_ACTIVE_ROOM, SET_GRID_SEQUENCER_NOTE,
-	SET_LOCAL_CLIENT_NAME, SetActiveRoomAction, setClientName, setLocalClientId,
+	selectVirtualKeyboardByOwner, sequencerActions,
+	SetActiveRoomAction, setClientName, setLocalClientId,
 	SetLocalClientNameAction,
 	ShamuGraphState,
 	shamuMetaActions,
-	SKIP_NOTE,
-	UPDATE_POSITIONS,
 	updatePositions,
 	UpdatePositionsAction,
-	USER_KEY_PRESS,
 	UserInputAction,
 	UserKeys,
-	VIRTUAL_KEY_PRESSED,
-	VIRTUAL_KEY_UP,
-	VIRTUAL_OCTAVE_CHANGE,
 	VirtualKeyboardState,
 	virtualKeyPressed,
 	VirtualKeyPressedAction,
@@ -63,73 +57,61 @@ import {MidiNotes} from './Instruments/BasicSynthesizerView'
 import {getSequencersSchedulerInfo} from './note-scanner'
 import {saveUsernameToLocalStorage} from './username'
 
-export const LOCAL_MIDI_KEY_PRESS = 'LOCAL_MIDI_KEY_PRESS'
 export type LocalMidiKeyPressAction = ReturnType<typeof localMidiKeyPress>
 export const localMidiKeyPress = (midiNote: IMidiNote) => ({
-	type: LOCAL_MIDI_KEY_PRESS as typeof LOCAL_MIDI_KEY_PRESS,
+	type: 'LOCAL_MIDI_KEY_PRESS',
 	midiNote,
-})
+} as const)
 
-export const LOCAL_MIDI_KEY_UP = 'LOCAL_MIDI_KEY_UP'
 export type LocalMidiKeyUpAction = ReturnType<typeof localMidiKeyUp>
 export const localMidiKeyUp = (midiNote: IMidiNote) => ({
-	type: LOCAL_MIDI_KEY_UP as typeof LOCAL_MIDI_KEY_UP,
+	type: 'LOCAL_MIDI_KEY_UP',
 	midiNote,
-})
+} as const)
 
-export const LOCAL_MIDI_OCTAVE_CHANGE = 'LOCAL_MIDI_OCTAVE_CHANGE'
 export type LocalMidiOctaveChangeAction = ReturnType<typeof localMidiOctaveChange>
 export const localMidiOctaveChange = (delta: number) => ({
-	type: LOCAL_MIDI_OCTAVE_CHANGE as typeof LOCAL_MIDI_OCTAVE_CHANGE,
+	type: 'LOCAL_MIDI_OCTAVE_CHANGE',
 	delta,
-})
+} as const)
 
-export const WINDOW_BLUR = 'WINDOW_BLUR'
 export type WindowBlurAction = ReturnType<typeof windowBlur>
 export const windowBlur = () => ({
-	type: WINDOW_BLUR as typeof WINDOW_BLUR,
-})
+	type: 'WINDOW_BLUR',
+} as const)
 
-export const DELETE_NODE = 'DELETE_NODE'
 export type DeleteNodeAction = ReturnType<typeof deleteNode>
 export const deleteNode = (nodeId: Id) => ({
-	type: DELETE_NODE as typeof DELETE_NODE,
+	type: 'DELETE_NODE',
 	nodeId,
-})
+} as const)
 
-export const SAVE_ROOM_TO_BROWSER = 'SAVE_ROOM_TO_BROWSER'
-export const SAVE_ROOM_TO_FILE = 'SAVE_ROOM_TO_FILE'
-export const DELETE_SAVED_ROOM = 'DELETE_SAVED_ROOM'
-export const PLAY_SHORT_NOTE = 'PLAY_SHORT_NOTE'
-export const CLONE_NODE = 'CLONE_NODE'
-export const PRUNE_ROOM = 'PRUNE_ROOM'
-
-export const localActions = Object.freeze({
+export const localActions = {
 	saveRoomToBrowser: () => ({
-		type: SAVE_ROOM_TO_BROWSER as typeof SAVE_ROOM_TO_BROWSER,
-	}),
+		type: 'SAVE_ROOM_TO_BROWSER',
+	} as const),
 	saveRoomToFile: () => ({
-		type: SAVE_ROOM_TO_FILE as typeof SAVE_ROOM_TO_FILE,
-	}),
+		type: 'SAVE_ROOM_TO_FILE',
+	} as const),
 	deleteSavedRoom: (id: Id) => ({
-		type: DELETE_SAVED_ROOM as typeof DELETE_SAVED_ROOM,
+		type: 'DELETE_SAVED_ROOM',
 		id,
-	}),
+	} as const),
 	playShortNote: (sourceId: Id, note: IMidiNote) => ({
-		type: PLAY_SHORT_NOTE as typeof PLAY_SHORT_NOTE,
+		type: 'PLAY_SHORT_NOTE',
 		sourceId,
 		note,
-	}),
+	} as const),
 	cloneNode: (nodeId: Id, nodeType: ConnectionNodeType, withConnections: 'none' | 'all' | 'default') => ({
-		type: CLONE_NODE as typeof CLONE_NODE,
+		type: 'CLONE_NODE',
 		nodeId,
 		nodeType,
 		withConnections,
-	}),
+	} as const),
 	pruneRoom: () => ({
-		type: PRUNE_ROOM as typeof PRUNE_ROOM,
-	}),
-})
+		type: 'PRUNE_ROOM',
+	} as const),
+} as const
 
 export type LocalAction = ActionType<typeof localActions> | LocalMidiKeyPressAction | LocalMidiKeyUpAction
 | LocalMidiOctaveChangeAction | WindowBlurAction | DeleteNodeAction
@@ -143,7 +125,7 @@ export const createLocalMiddleware: (getAllInstruments: GetAllInstruments) => Mi
 		// TODO Do next later so keyboard is more responsive
 
 		switch (action.type) {
-			case WINDOW_BLUR: {
+			case 'WINDOW_BLUR': {
 				next(action)
 
 				const state = getState()
@@ -159,7 +141,7 @@ export const createLocalMiddleware: (getAllInstruments: GetAllInstruments) => Mi
 					)
 				})
 			}
-			case LOCAL_MIDI_KEY_PRESS: {
+			case 'LOCAL_MIDI_KEY_PRESS': {
 				next(action)
 				const state = getState()
 
@@ -176,7 +158,7 @@ export const createLocalMiddleware: (getAllInstruments: GetAllInstruments) => Mi
 					),
 				)
 			}
-			case VIRTUAL_KEY_PRESSED: {
+			case 'VIRTUAL_KEY_PRESSED': {
 				scheduleNote(
 					action.midiNote, action.id, getState().room, 'on', getAllInstruments)
 
@@ -227,7 +209,7 @@ export const createLocalMiddleware: (getAllInstruments: GetAllInstruments) => Mi
 
 				return
 			}
-			case SET_GRID_SEQUENCER_NOTE: {
+			case 'SET_GRID_SEQUENCER_NOTE': {
 				if (action.enabled) {
 					playShortNote(action.note, action.id, getState().room, getAllInstruments)
 				}
@@ -236,14 +218,14 @@ export const createLocalMiddleware: (getAllInstruments: GetAllInstruments) => Mi
 
 				return
 			}
-			case PLAY_SHORT_NOTE: {
+			case 'PLAY_SHORT_NOTE': {
 				playShortNote(action.note, action.sourceId, getState().room, getAllInstruments)
 
 				next(action)
 
 				return
 			}
-			case SKIP_NOTE: {
+			case 'SKIP_NOTE': {
 				const state = getState()
 
 				// add rest to sequencer if downstream recording sequencer
@@ -254,22 +236,20 @@ export const createLocalMiddleware: (getAllInstruments: GetAllInstruments) => Mi
 
 				return next(action)
 			}
-			case USER_KEY_PRESS: {
-				if (action.type === USER_KEY_PRESS) {
-					if (action.key === UserKeys.Backspace) {
-						const state = getState()
+			case 'USER_KEY_PRESS': {
+				if (action.key === UserKeys.Backspace) {
+					const state = getState()
 
-						// add rest to sequencer if downstream recording sequencer
-						_getDownstreamRecordingSequencers(state, selectLocalVirtualKeyboardId(state))
-							.forEach(x => {
-								dispatch(sequencerActions.undo(x.id))
-							})
-					}
+					// add rest to sequencer if downstream recording sequencer
+					_getDownstreamRecordingSequencers(state, selectLocalVirtualKeyboardId(state))
+						.forEach(x => {
+							dispatch(sequencerActions.undo(x.id))
+						})
 				}
 
 				return next(action)
 			}
-			case LOCAL_MIDI_KEY_UP: {
+			case 'LOCAL_MIDI_KEY_UP': {
 				next(action)
 				const state = getState()
 
@@ -286,7 +266,7 @@ export const createLocalMiddleware: (getAllInstruments: GetAllInstruments) => Mi
 					),
 				)
 			}
-			case VIRTUAL_KEY_UP: {
+			case 'VIRTUAL_KEY_UP': {
 				const state = getState()
 
 				const noteToRelease = applyOctave(
@@ -298,7 +278,7 @@ export const createLocalMiddleware: (getAllInstruments: GetAllInstruments) => Mi
 
 				return next(action)
 			}
-			case LOCAL_MIDI_OCTAVE_CHANGE: {
+			case 'LOCAL_MIDI_OCTAVE_CHANGE': {
 				next(action)
 				// what do for scheduled keyboard notes?
 				// release then schedule new ones
@@ -317,7 +297,7 @@ export const createLocalMiddleware: (getAllInstruments: GetAllInstruments) => Mi
 
 				return dispatch(virtualOctaveChange(selectLocalVirtualKeyboardId(state), action.delta))
 			}
-			case VIRTUAL_OCTAVE_CHANGE: {
+			case 'VIRTUAL_OCTAVE_CHANGE': {
 				const state = getState()
 
 				const keyboard = selectVirtualKeyboardById(state.room, action.id)
@@ -331,28 +311,28 @@ export const createLocalMiddleware: (getAllInstruments: GetAllInstruments) => Mi
 
 				return next(action)
 			}
-			case SET_LOCAL_CLIENT_NAME: {
+			case 'SET_LOCAL_CLIENT_NAME': {
 				next(action)
 				dispatch(setClientName(selectLocalClientId(getState()), action.newName))
 				return saveUsernameToLocalStorage(action.newName)
 			}
-			case SET_ACTIVE_ROOM: {
+			case 'SET_ACTIVE_ROOM': {
 				next(action)
 				window.history.pushState({}, document.title, '/' + selectActiveRoom(getState()))
 				return
 			}
-			case ADD_CLIENT: {
+			case 'ADD_CLIENT': {
 				next(action)
 				if (action.client.socketId === selectLocalSocketId(getState())) {
 					dispatch(setLocalClientId(action.client.id))
 				}
 				return
 			}
-			case READY: {
+			case 'READY': {
 				next(action)
 				return createLocalStuff(dispatch, getState())
 			}
-			case DELETE_NODE: {
+			case 'DELETE_NODE': {
 				next(action)
 
 				const newState = getState()
@@ -371,7 +351,7 @@ export const createLocalMiddleware: (getAllInstruments: GetAllInstruments) => Mi
 
 				return
 			}
-			case CLONE_NODE: {
+			case 'CLONE_NODE': {
 				next(action)
 
 				const newState = getState()
@@ -444,7 +424,7 @@ export const createLocalMiddleware: (getAllInstruments: GetAllInstruments) => Mi
 
 				return
 			}
-			case PRUNE_ROOM: {
+			case 'PRUNE_ROOM': {
 				next(action)
 
 				const state = getState()
@@ -461,7 +441,7 @@ export const createLocalMiddleware: (getAllInstruments: GetAllInstruments) => Mi
 				dispatch(deleteThingsAny(nodesToDelete, NetworkActionType.SERVER_AND_BROADCASTER))
 				return dispatch(deletePositions(nodesToDelete))
 			}
-			case SAVE_ROOM_TO_BROWSER: {
+			case 'SAVE_ROOM_TO_BROWSER': {
 				next(action)
 
 				const state = getState()
@@ -480,7 +460,7 @@ export const createLocalMiddleware: (getAllInstruments: GetAllInstruments) => Mi
 
 				return
 			}
-			case SAVE_ROOM_TO_FILE: {
+			case 'SAVE_ROOM_TO_FILE': {
 				next(action)
 
 				const state = getState()
@@ -493,18 +473,19 @@ export const createLocalMiddleware: (getAllInstruments: GetAllInstruments) => Mi
 
 				return
 			}
-			case DELETE_SAVED_ROOM: {
+			case 'DELETE_SAVED_ROOM': {
 				next(action)
 
 				const localSaves = getOrCreateLocalSavesStorage()
 
-				delete localSaves.all[action.id]
-
-				setLocalSavesToLocalStorage(localSaves)
+				setLocalSavesToLocalStorage({
+					...localSaves,
+					all: localSaves.all.delete(action.id),
+				})
 
 				return
 			}
-			case UPDATE_POSITIONS: {
+			case 'UPDATE_POSITIONS': {
 				// Mainly to handle loading old saves with smaller sizes
 				// Not perfect
 				const foo: ReturnType<typeof updatePositions> = {
@@ -530,7 +511,7 @@ export const createLocalMiddleware: (getAllInstruments: GetAllInstruments) => Mi
 	}
 
 function createRoomSave(state: IClientAppState, roomName: string): SavedRoom {
-	return Object.freeze({
+	return {
 		connections: selectAllConnections(state.room),
 		globalClock: selectGlobalClockState(state.room),
 		positions: selectAllPositions(state.room),
@@ -540,7 +521,7 @@ function createRoomSave(state: IClientAppState, roomName: string): SavedRoom {
 		saveClientVersion: selectClientInfo(state).clientVersion,
 		saveServerVersion: selectClientInfo(state).serverVersion,
 		room: roomName,
-	})
+	} as const
 }
 
 function stripShamuGraphForSaving(shamuGraphState: ShamuGraphState): ShamuGraphState {
@@ -614,8 +595,8 @@ function parseLocalSavesJSON(localSavesJSON: string): LocalSaves {
 	}
 }
 
-const makeInitialLocalSavesStorage = (): LocalSaves => Object.freeze({
-	all: {},
+const makeInitialLocalSavesStorage = (): LocalSaves => ({
+	all: Map(),
 })
 
 let _previousNotesForSourceId = Map<string, MidiNotes>()

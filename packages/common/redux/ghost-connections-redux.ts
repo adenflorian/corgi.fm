@@ -9,32 +9,28 @@ import {
 
 import uuid = require('uuid')
 
-export const GHOST_CONNECTION_CREATE = 'GHOST_CONNECTION_CREATE'
-export const GHOST_CONNECTION_DELETE = 'GHOST_CONNECTION_DELETE'
-export const GHOST_CONNECTION_MOVE = 'GHOST_CONNECTION_MOVE'
-
-export const ghostConnectorActions = Object.freeze({
+export const ghostConnectorActions = {
 	create: (newGhostConnection: GhostConnection) => ({
-		type: GHOST_CONNECTION_CREATE as typeof GHOST_CONNECTION_CREATE,
+		type: 'GHOST_CONNECTION_CREATE',
 		newGhostConnection,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
-	}),
+	} as const),
 	delete: (id: GhostConnectionId) => ({
-		type: GHOST_CONNECTION_DELETE as typeof GHOST_CONNECTION_DELETE,
+		type: 'GHOST_CONNECTION_DELETE',
 		id,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
-	}),
+	} as const),
 	move: (id: GhostConnectionId, x: number, y: number) => ({
-		type: GHOST_CONNECTION_MOVE as typeof GHOST_CONNECTION_MOVE,
+		type: 'GHOST_CONNECTION_MOVE',
 		id,
 		x,
 		y,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
-	}),
-})
+	} as const),
+} as const
 
 export interface GhostConnectionsState {
 	all: Map<GhostConnectionId, GhostConnection>
@@ -98,9 +94,9 @@ function _allGhostConnectionsReducer(
 	action: GhostConnectorAction,
 ): GhostConnections {
 	switch (action.type) {
-		case GHOST_CONNECTION_CREATE: return state.set(action.newGhostConnection.id, action.newGhostConnection)
-		case GHOST_CONNECTION_DELETE: return state.delete(action.id)
-		case GHOST_CONNECTION_MOVE: return state.update(action.id, x => ({
+		case 'GHOST_CONNECTION_CREATE': return state.set(action.newGhostConnection.id, action.newGhostConnection)
+		case 'GHOST_CONNECTION_DELETE': return state.delete(action.id)
+		case 'GHOST_CONNECTION_MOVE': return state.update(action.id, x => ({
 			...x,
 			activeConnector: {
 				x: action.x,

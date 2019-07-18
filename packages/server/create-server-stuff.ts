@@ -54,7 +54,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 
 	connectNodes(simpleReverb, masterAudioOutput)
 
-	const serverStuffDefinitions = Object.freeze({
+	const serverStuffDefinitions = {
 		melody: {
 			source: {
 				type: ConnectionNodeType.gridSequencer,
@@ -78,7 +78,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 				type: ConnectionNodeType.basicSampler,
 			},
 		},
-	})
+	} as const
 
 	const serverStuff = createSourceAndTargets(serverStuffDefinitions)
 

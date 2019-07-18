@@ -4,41 +4,36 @@ import {ActionType} from 'typesafe-actions'
 import {IClientRoomState} from './common-redux-types'
 import {BROADCASTER_ACTION, SERVER_ACTION} from '.'
 
-export const ADD_POINTER = 'ADD_POINTER'
-export const UPDATE_POINTER = 'UPDATE_POINTER'
-export const DELETE_POINTER = 'DELETE_POINTER'
-export const REPLACE_ALL_POINTERS = 'REPLACE_ALL_POINTERS'
-
 export const pointerActionTypesWhitelist = List([
-	ADD_POINTER,
-	UPDATE_POINTER,
-])
+	'ADD_POINTER',
+	'UPDATE_POINTER',
+] as const)
 
-export const pointersActions = Object.freeze({
+export const pointersActions = {
 	add: (ownerId: string) => ({
-		type: ADD_POINTER as typeof ADD_POINTER,
+		type: 'ADD_POINTER',
 		ownerId,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
-	}),
+	} as const),
 	update: (ownerId: string, pointer: Partial<Pointer>) => ({
-		type: UPDATE_POINTER as typeof UPDATE_POINTER,
+		type: 'UPDATE_POINTER',
 		ownerId,
 		pointer,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
-	}),
+	} as const),
 	delete: (ownerId: string) => ({
-		type: DELETE_POINTER as typeof DELETE_POINTER,
+		type: 'DELETE_POINTER',
 		ownerId,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
-	}),
+	} as const),
 	replaceAll: (pointers: Pointers) => ({
-		type: REPLACE_ALL_POINTERS as typeof REPLACE_ALL_POINTERS,
+		type: 'REPLACE_ALL_POINTERS',
 		pointers,
-	}),
-})
+	} as const),
+} as const
 
 export type Pointers = typeof defaultPointers
 
@@ -58,10 +53,10 @@ export type PointersAction = ActionType<typeof pointersActions>
 
 const _pointersReducer = (state = defaultPointers, action: PointersAction): Pointers => {
 	switch (action.type) {
-		case ADD_POINTER: return state.set(action.ownerId, makePointer({ownerId: action.ownerId}))
-		case UPDATE_POINTER: return state.update(action.ownerId, x => ({...x, ...action.pointer}))
-		case DELETE_POINTER: return state.delete(action.ownerId)
-		case REPLACE_ALL_POINTERS: return state.clear().merge(action.pointers)
+		case 'ADD_POINTER': return state.set(action.ownerId, makePointer({ownerId: action.ownerId}))
+		case 'UPDATE_POINTER': return state.update(action.ownerId, x => ({...x, ...action.pointer}))
+		case 'DELETE_POINTER': return state.delete(action.ownerId)
+		case 'REPLACE_ALL_POINTERS': return state.clear().merge(action.pointers)
 		default: return state
 	}
 }

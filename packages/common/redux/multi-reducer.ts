@@ -4,14 +4,14 @@ import {assertArrayHasNoUndefinedElements} from '../common-utils'
 import {BROADCASTER_ACTION, getConnectionNodeInfo, IClientRoomState, NetworkActionType, SERVER_ACTION} from '.'
 
 export interface IMultiState {
-	things: IMultiStateThings
+	readonly things: IMultiStateThings
 }
 
 export interface IMultiStateThings {
-	[key: string]: IMultiStateThing
+	readonly [key: string]: IMultiStateThing
 }
 
-export const dummyMultiStateThing: IMultiStateThing = Object.freeze({
+export const dummyMultiStateThing: IMultiStateThing = {
 	id: '-1',
 	ownerId: '-2',
 	color: 'black',
@@ -20,7 +20,7 @@ export const dummyMultiStateThing: IMultiStateThing = Object.freeze({
 	height: 0,
 	name: 'dummy multi state thing',
 	enabled: false,
-})
+}
 
 export const ADD_MULTI_THING = 'ADD_MULTI_THING'
 type AddMultiThingAction = ReturnType<typeof addMultiThing>
@@ -96,7 +96,7 @@ export type MultiThingAction =
 
 // TODO Use immutable js like connections redux
 export function makeMultiReducer<T extends IMultiStateThing, U extends IMultiState>(
-	innerReducer: (state: T, action: any) => any,
+	innerReducer: (state: T, action: any) => T,
 	thingType: ConnectionNodeType,
 	actionTypes: string[],
 	globalActionTypes: string[] = [],
@@ -156,7 +156,7 @@ export function makeMultiReducer<T extends IMultiStateThing, U extends IMultiSta
 						}
 					}
 				} else if (globalActionTypes.includes(action.type)) {
-					const newThings: IMultiStateThings = {}
+					const newThings: {[key: string]: T} = {}
 					Object.keys(state.things).forEach(id => {
 						const thing = state.things[id]
 						newThings[id] = innerReducer(thing as T, action)

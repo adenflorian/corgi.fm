@@ -8,29 +8,24 @@ import {
 	simpleCompressorsReducer, simpleReverbsReducer, virtualKeyboardsReducer,
 } from '..'
 
-// export const ADD_SHAMU_NODE = 'ADD_SHAMU_NODE'
-// export const DELETE_SHAMU_NODES = 'DELETE_SHAMU_NODES'
-// export const UPDATE_SHAMU_NODES = 'UPDATE_SHAMU_NODES'
-// export const SET_ALL_SHAMU_NODES = 'SET_ALL_SHAMU_NODES'
-
-// export const shamuNodesActions = Object.freeze({
+// export const shamuNodesActions = {
 // 	add: (newNode: NodeState) => ({
-// 		type: ADD_SHAMU_NODE as typeof ADD_SHAMU_NODE,
+// 		type: 'ADD_SHAMU_NODE',
 // 		newNode,
-// 	}),
+// 	} as const),
 // 	delete: (ids: string[]) => ({
-// 		type: DELETE_SHAMU_NODES as typeof DELETE_SHAMU_NODES,
+// 		type: 'DELETE_SHAMU_NODES',
 // 		ids,
-// 	}),
+// 	} as const),
 // 	update: (nodes: ShamuNodesState) => ({
-// 		type: UPDATE_SHAMU_NODES as typeof UPDATE_SHAMU_NODES,
+// 		type: 'UPDATE_SHAMU_NODES',
 // 		nodes,
-// 	}),
+// 	} as const),
 // 	setAll: (nodes: ShamuNodesState) => ({
-// 		type: SET_ALL_SHAMU_NODES as typeof SET_ALL_SHAMU_NODES,
+// 		type: 'SET_ALL_SHAMU_NODES',
 // 		nodes,
-// 	}),
-// })
+// 	} as const),
+// } as const
 
 // export type ShamuNodesState = ReturnType<typeof makeShamuNodesState>
 
@@ -49,7 +44,7 @@ import {
 // export function makeNodeState({ownerId, type, specialState}: Pick<NodeState, 'ownerId' | 'type' | 'specialState'>) {
 // 	const id = uuid.v4()
 
-// 	return Object.freeze({
+// 	return {
 // 		id,
 // 		ownerId,
 // 		type,
@@ -58,19 +53,19 @@ import {
 // 		// 	id, // TODO Is this still needed?
 // 		// 	targetType: type, // TODO Is this still needed?
 // 		// }),
-// 	})
+// 	} as const
 // }
 
 // export type NodeSpecialState2 = BasicSynthesizerState | BasicSamplerState |
 // 	VirtualKeyboardState | GridSequencerState | InfiniteSequencerState
 
 export interface NodeSpecialState {
-	id: string
+	readonly id: string
 }
 
 // export type ShamuNodesAction = ActionType<typeof shamuNodesActions> | UpdatePositionsAction
 
-export const nodesReducer = combineReducers(Object.freeze({
+export const nodesReducer = combineReducers({
 	basicSynthesizers: basicSynthesizersReducer,
 	basicSamplers: basicSamplersReducer,
 	gridSequencers: gridSequencersReducer,
@@ -80,14 +75,14 @@ export const nodesReducer = combineReducers(Object.freeze({
 	simpleCompressors: simpleCompressorsReducer,
 	simpleDelays: simpleDelaysReducer,
 	virtualKeyboards: virtualKeyboardsReducer,
-}))
+} as const)
 
 // export function nodesReducer(state = makeShamuNodesState(), action: ShamuNodesAction) {
 // 	switch (action.type) {
-// 		case ADD_SHAMU_NODE: return state.set(action.newNode.id, action.newNode)
-// 		case DELETE_SHAMU_NODES: return state.deleteAll(action.ids)
-// 		case UPDATE_SHAMU_NODES: return state.merge(action.nodes)
-// 		case SET_ALL_SHAMU_NODES: return state.clear().merge(action.nodes)
+// 		case 'ADD_SHAMU_NODE': return state.set(action.newNode.id, action.newNode)
+// 		case 'DELETE_SHAMU_NODES': return state.deleteAll(action.ids)
+// 		case 'UPDATE_SHAMU_NODES': return state.merge(action.nodes)
+// 		case 'SET_ALL_SHAMU_NODES': return state.clear().merge(action.nodes)
 // 		default: return state
 // 	}
 // }

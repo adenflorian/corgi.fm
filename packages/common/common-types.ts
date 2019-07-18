@@ -5,28 +5,28 @@ export type ClientId = string
 export type Id = string
 
 export interface IDisposable {
-	dispose: () => void
+	readonly dispose: () => void
 }
 
 export interface Point {
-	x: number
-	y: number
+	readonly x: number
+	readonly y: number
 }
 
 export interface IConnectable {
-	id: string
-	color: string | false | List<string>
-	type: ConnectionNodeType
-	width: number
-	height: number
-	name: string
-	inputPortCount?: number
-	outputPortCount?: number
-	enabled: boolean
+	readonly id: string
+	readonly color: string | false | List<string>
+	readonly type: ConnectionNodeType
+	readonly width: number
+	readonly height: number
+	readonly name: string
+	readonly inputPortCount?: number
+	readonly outputPortCount?: number
+	readonly enabled: boolean
 }
 
 export interface IMultiStateThing extends IConnectable {
-	ownerId: string
+	readonly ownerId: string
 }
 
 export type IMultiStateThingDeserializer = (state: IMultiStateThing) => IMultiStateThing

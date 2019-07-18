@@ -8,88 +8,78 @@ import {
 	BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION,
 } from '.'
 
-export const SET_ENABLED_NODE = 'SET_ENABLED_NODE'
-
-export const positionActions = Object.freeze({
+export const positionActions = {
 	setEnabled: (id: Id, enabled: boolean) => ({
-		type: SET_ENABLED_NODE as typeof SET_ENABLED_NODE,
+		type: 'SET_ENABLED_NODE',
 		id,
 		enabled,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
-	}),
-})
+	} as const),
+} as const
 
-export const ADD_POSITION = 'ADD_POSITION'
 export type AddPositionAction = ReturnType<typeof addPosition>
 export const addPosition = (position: IPosition) => ({
-	type: ADD_POSITION as typeof ADD_POSITION,
+	type: 'ADD_POSITION',
 	position,
 	SERVER_ACTION,
 	BROADCASTER_ACTION,
-})
+} as const)
 
-export const DELETE_POSITIONS = 'DELETE_POSITIONS'
 export type DeletePositionsAction = ReturnType<typeof deletePositions>
 export const deletePositions = (positionIds: string[]) => ({
-	type: DELETE_POSITIONS as typeof DELETE_POSITIONS,
+	type: 'DELETE_POSITIONS',
 	positionIds,
 	SERVER_ACTION,
 	BROADCASTER_ACTION,
-})
+} as const)
 
-export const DELETE_ALL_POSITIONS = 'DELETE_ALL_POSITIONS'
 export type DeleteAllPositionsAction = ReturnType<typeof deleteAllPositions>
 export const deleteAllPositions = () => ({
-	type: DELETE_ALL_POSITIONS as typeof DELETE_ALL_POSITIONS,
-})
+	type: 'DELETE_ALL_POSITIONS',
+} as const)
 
-export const UPDATE_POSITIONS = 'UPDATE_POSITIONS'
 export type UpdatePositionsAction = ReturnType<typeof updatePositions>
 export const updatePositions = (positions: IPositions) => ({
-	type: UPDATE_POSITIONS as typeof UPDATE_POSITIONS,
+	type: 'UPDATE_POSITIONS',
 	positions,
 	SERVER_ACTION,
 	BROADCASTER_ACTION,
-})
+} as const)
 
-export const REPLACE_POSITIONS = 'REPLACE_POSITIONS'
 export type ReplacePositionsAction = ReturnType<typeof replacePositions>
 export const replacePositions = (positions: IPositions) => ({
-	type: REPLACE_POSITIONS as typeof REPLACE_POSITIONS,
+	type: 'REPLACE_POSITIONS',
 	positions,
 	SERVER_ACTION,
 	BROADCASTER_ACTION,
-})
+} as const)
 
-export const UPDATE_POSITION = 'UPDATE_POSITION'
 export type UpdatePositionAction = ReturnType<typeof updatePosition>
 export const updatePosition = (id: string, position: Partial<IPosition>) => ({
-	type: UPDATE_POSITION as typeof UPDATE_POSITION,
+	type: 'UPDATE_POSITION',
 	id,
 	position,
 	SERVER_ACTION,
 	BROADCASTER_ACTION,
-})
+} as const)
 
-export const MOVE_POSITION = 'MOVE_POSITION'
 export type MovePositionAction = ReturnType<typeof movePosition>
 export const movePosition = (id: string, position: Pick<IPosition, 'x' | 'y'>) => ({
-	type: MOVE_POSITION as typeof MOVE_POSITION,
+	type: 'MOVE_POSITION',
 	id,
 	position,
 	SERVER_ACTION,
 	BROADCASTER_ACTION,
-})
+} as const)
 
-export const NODE_CLICKED = 'NODE_CLICKED'
 export type NodeClickedAction = ReturnType<typeof nodeClicked>
 export const nodeClicked = (id: string) => ({
-	type: NODE_CLICKED as typeof NODE_CLICKED,
+	type: 'NODE_CLICKED',
 	id,
 	SERVER_ACTION,
 	BROADCASTER_ACTION,
-})
+} as const)
 
 export interface IPositionsState {
 	all: IPositions
@@ -131,24 +121,24 @@ export type PositionAction = AddPositionAction | DeletePositionsAction | NodeCli
 const positionsSpecificReducer: Reducer<IPositions, PositionAction> =
 	(positions = Positions(), action) => {
 		switch (action.type) {
-			case ADD_POSITION: return sortPositions(positions.set(
+			case 'ADD_POSITION': return sortPositions(positions.set(
 				action.position.id,
 				{
 					...action.position,
 					zIndex: getNewZIndex(positions, 0),
 				},
 			))
-			case DELETE_POSITIONS: return sortPositions(positions.deleteAll(action.positionIds))
-			case DELETE_ALL_POSITIONS: return positions.clear()
-			case REPLACE_POSITIONS: return sortPositions(Map<string, IPosition>().merge(action.positions))
-			case UPDATE_POSITIONS: return sortPositions(positions.merge(action.positions))
-			case UPDATE_POSITION: return positions.update(action.id, x => ({...x, ...action.position}))
-			case MOVE_POSITION: return positions.update(action.id, x => ({...x, ...action.position}))
-			case NODE_CLICKED: return positions.update(action.id, x => ({
+			case 'DELETE_POSITIONS': return sortPositions(positions.deleteAll(action.positionIds))
+			case 'DELETE_ALL_POSITIONS': return positions.clear()
+			case 'REPLACE_POSITIONS': return sortPositions(Map<string, IPosition>().merge(action.positions))
+			case 'UPDATE_POSITIONS': return sortPositions(positions.merge(action.positions))
+			case 'UPDATE_POSITION': return positions.update(action.id, x => ({...x, ...action.position}))
+			case 'MOVE_POSITION': return positions.update(action.id, x => ({...x, ...action.position}))
+			case 'NODE_CLICKED': return positions.update(action.id, x => ({
 				...x,
 				zIndex: getNewZIndex(positions, x.zIndex),
 			}))
-			case SET_ENABLED_NODE: return positions.update(action.id, x => ({...x, enabled: action.enabled}))
+			case 'SET_ENABLED_NODE': return positions.update(action.id, x => ({...x, enabled: action.enabled}))
 			default: return positions
 		}
 	}
@@ -208,12 +198,12 @@ export function calculateExtremes(positions: IPositions) {
 		if (x.y + x.height > bottomMost) bottomMost = x.y + x.height
 	})
 
-	return Object.freeze({
+	return {
 		leftMost,
 		rightMost,
 		topMost,
 		bottomMost,
-	})
+	} as const
 }
 
 const selectHighestZIndexOfAllPositionsLocal = createSelector(
