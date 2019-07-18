@@ -49,6 +49,8 @@
             "never"
         ],
         "no-case-declarations": "off",
+        // jest
+        "jest/valid-describe": "off",
         // import
         "import/no-unassigned-import": [
             "error",

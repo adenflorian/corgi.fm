@@ -18,7 +18,7 @@ export const dummyDb: DBStore = Object.freeze({
 export async function connectDB() {
 	const {uri, stop} = await getDbConnector()(dbName)
 
-	logger.log('connecting to mongo: ', {uri})
+	logger.debug('connecting to mongo: ', {uri})
 
 	const client = await MongoClient.connect(uri, {useNewUrlParser: true})
 

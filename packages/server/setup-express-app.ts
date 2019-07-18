@@ -4,6 +4,7 @@ import * as bodyParser from 'body-parser'
 import * as cors from 'cors'
 import * as express from 'express'
 import {logger} from '@corgifm/common/logger'
+import {apiResourcePathName} from '@corgifm/common/common-constants'
 import {apiRouter} from './api/api-router'
 import {stateRouter} from './api/state-router'
 import {DBStore} from './database/database'
@@ -32,7 +33,7 @@ export async function setupExpressApp(
 		app.use('/state', stateRouter(serverStore))
 	}
 
-	app.use('/api', await apiRouter(serverStore, dbStore))
+	app.use(`/${apiResourcePathName}`, await apiRouter(serverStore, dbStore))
 
 	app.get('/*', (_, res) => {
 		res.sendFile(path.join(__dirname, '../public/index.html'))

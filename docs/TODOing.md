@@ -113,6 +113,8 @@
 	- [ ] adjust volume
 - [ ] do stuff with accounts system
 	- [ ] save username
+		- [ ] on register
+		- [ ] load on login
 	- [ ] save room
 	- [ ] load room
 	- [ ] friends
