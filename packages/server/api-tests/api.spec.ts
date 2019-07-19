@@ -2,6 +2,7 @@ import {Application} from 'express'
 import * as supertest from 'supertest'
 import {configureServerStore} from '@corgifm/common/redux'
 import {testApi, path, get, del, ContentTypes, put} from '@corgifm/api-tester'
+import {logger} from '@corgifm/common/logger'
 import {connectDB, DBStore} from '../database/database'
 import {setupExpressApp} from '../setup-express-app'
 
@@ -15,12 +16,14 @@ describe('API Tests', () => {
 	const getApp = () => app
 
 	beforeAll(async () => {
+		logger.disable()
 		db = await connectDB()
 		app = await setupExpressApp(configureServerStore(), db)
 	})
 
 	afterAll(async () => {
 		await db.close()
+		logger.enable()
 	})
 
 	it('should use CORS', async () => {
