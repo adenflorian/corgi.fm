@@ -49,6 +49,12 @@
         "preset": "ts-jest",
         "testEnvironment": "node",
         "rootDir": "packages/server"
+      },
+      {
+        "displayName": "api-tester",
+        "preset": "ts-jest",
+        "testEnvironment": "node",
+        "rootDir": "packages/api-tester"
       }
     ]
   },

@@ -1,0 +1,23 @@
+{
+	"compilerOptions": {
+		"noEmit": true,
+		"allowSyntheticDefaultImports": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"sourceMap": true,
+		"strict": true,
+		"noImplicitReturns": true,
+		"target": "esnext",
+		"module": "commonjs",
+		"lib": [
+			"es7"
+		],
+		"types": [
+			"jest"
+		]
+	},
+	"include": [
+		"./**/*.ts*",
+		"./**/*.js*"
+	]
+}

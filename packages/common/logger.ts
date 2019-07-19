@@ -41,5 +41,5 @@ export const logger = {
 	disable: () => {
 		enabled = false
 	},
-	isEnabled: () => enabled
+	isEnabled: () => enabled,
 }

@@ -135,14 +135,15 @@
         "func-call-spacing": "off",
         "@typescript-eslint/func-call-spacing": "error",
         "no-spaced-func": "off",
-        "import/no-extraneous-dependencies": [
-            "error",
-            {
-                "devDependencies": [
-                    "**/*.spec.*"
-                ]
-            }
-        ],
+        // "import/no-extraneous-dependencies": [
+        //     "error",
+        //     {
+        //         "devDependencies": [
+        //             "**/*.spec.*"
+        //         ]
+        //     }
+        // ],
+        "import/no-extraneous-dependencies": "off",
         "no-restricted-imports": [
             "error",
             "@sentry/utils"

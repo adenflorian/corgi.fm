@@ -1,0 +1,11 @@
+{
+    "parserOptions": {
+        "project": "packages/api-tester/tsconfig.json"
+    },
+    "env": {
+        "node": true
+    },
+    "rules": {
+        "no-console": "off"
+    }
+}

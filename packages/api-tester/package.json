@@ -1,0 +1,22 @@
+{
+	"name": "@corgifm/api-tester",
+	"version": "0.4.40",
+	"license": "MIT",
+	"private": false,
+	"main": "index.ts",
+	"author": {
+		"email": "AdenFlorian@gmail.com",
+		"name": "David Valachovic"
+	},
+	"dependencies": {
+		"chalk": "^2.4.2",
+		"common-tags": "^1.8.0",
+		"express": "^4.17.1",
+		"supertest": "^4.0.2",
+		"jest": "^24.8.0"
+	},
+	"devDependencies": {
+		"@types/jest": "^24.0.15",
+		"@types/supertest": "^2.0.8"
+	}
+}
