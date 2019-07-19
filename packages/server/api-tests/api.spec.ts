@@ -1,7 +1,6 @@
 import {Application} from 'express'
 import * as supertest from 'supertest'
 import {configureServerStore} from '@corgifm/common/redux'
-import {logger} from '@corgifm/common/logger'
 import {connectDB, DBStore} from '../database/database'
 import {setupExpressApp} from '../setup-express-app'
 
@@ -18,6 +17,8 @@ enum Method {
 	DELETE = 'DELETE',
 }
 
+type Status = 200 | 201 | 204 | 404 | 500 | 501
+
 function ContentTypeRegEx(type: ContentTypes): RegExp {
 	switch (type) {
 		case ContentTypes.ApplicationJson: return /application\/json/
@@ -26,9 +27,18 @@ function ContentTypeRegEx(type: ContentTypes): RegExp {
 	}
 }
 
+// const noRoute = {
+// 	message: `couldn't find a route matching PUT /api/users/unknownUserId`,
+// } as const
+
+const userNotFound = {
+	message: `userNotFound`,
+} as const
+
 describe('API Tests', () => {
 	let db: DBStore
 	let app: Application
+	const getApp = () => app
 
 	beforeEach(async () => {
 		db = await connectDB()
@@ -40,11 +50,12 @@ describe('API Tests', () => {
 	})
 
 	describe('tests', () => {
-		testApi([
+		testApi(getApp, [
 			path('newsletter', [
 				get({
 					status: 200,
 					contentType: ContentTypes.TextHtml,
+					resBody: {},
 				}),
 			]),
 			path('api', [
@@ -53,101 +64,147 @@ describe('API Tests', () => {
 						get({
 							status: 200,
 							contentType: ContentTypes.ApplicationJson,
+							resBody: 0,
 						}),
 					]),
-					path('123', [
+					path('unknownUserId', [
 						get({
-							status: 200,
+							status: 404,
 							contentType: ContentTypes.ApplicationJson,
+							resBody: userNotFound,
 						}),
 						put({
-							status: 204,
+							request: {
+								body: {
+									displayName: '',
+								},
+								contentType: ContentTypes.ApplicationJson,
+							},
+							status: 501,
+							contentType: ContentTypes.ApplicationJson,
+							resBody: {
+								message: `userNotFound`,
+							},
 						}),
 					]),
 				]),
 			]),
 		])
-
-		interface Request {
-			status: 200 | 204
-			contentType?: ContentTypes
-		}
-
-		type RequestTest = (path: string) => void
-
-		function testApi(requests: RequestTest[]) {
-			requests.forEach(invokeRequest())
-		}
-
-		function invokeRequest(path1 = '') {
-			return (test2: RequestTest) => {
-				test2(path1)
-			}
-		}
-
-		function path(pathLeaf: string, requests: RequestTest[]): RequestTest {
-			return (pathTrunk: string) => {
-				requests.forEach(invokeRequest(pathTrunk + '/' + pathLeaf))
-			}
-		}
-
-		function get(args: Request): RequestTest {
-			return (finalPath: string) => {
-				request({
-					...args,
-					method: Method.GET,
-					// eslint-disable-next-line @typescript-eslint/promise-function-async
-					m: a => a.get(finalPath),
-					finalPath,
-				})
-			}
-		}
-
-		function put(args: Request): RequestTest {
-			return (finalPath: string) => {
-				request({
-					...args,
-					method: Method.PUT,
-					// eslint-disable-next-line @typescript-eslint/promise-function-async
-					m: a => a.put(finalPath),
-					finalPath,
-				})
-			}
-		}
-
-		interface FinalRequest extends Request {
-			method: Method
-			m: (a: supertest.SuperTest<supertest.Test>) => supertest.Test
-			finalPath: string
-		}
-
-		function request(args: FinalRequest): void {
-			const {method, finalPath, m} = args
-			const testName = `${method} ${finalPath}`
-			it(
-				testName,
-				async done => {
-					// eslint-disable-next-line @typescript-eslint/no-floating-promises
-					m(supertest(app))
-						.expect(res => {
-							expect(res.status).toEqual(args.status)
-							if (args.contentType) {
-								expect(res.header[ContentType])
-									.toMatch(ContentTypeRegEx(args.contentType))
-							}
-						})
-						.end(async (err, res) => {
-							if (err) {
-								logger.error({
-									testName,
-									responseHeaders: res.header,
-								})
-								done(err)
-							}
-							done()
-						})
-				}
-			)
-		}
 	})
 })
+
+interface Request {
+	readonly status: Status
+	readonly contentType: ContentTypes
+	readonly resBody: number | object
+}
+
+interface PutRequest extends Request {
+	readonly request: {
+		readonly contentType: ContentTypes
+		readonly body: object
+	}
+}
+
+type RequestTest = (getApp: GetApp, path: string) => void
+
+type GetApp = () => Application
+
+function testApi(getApp: GetApp, requests: RequestTest[]) {
+	requests.forEach(invokeRequest(getApp))
+}
+
+function invokeRequest(getApp: GetApp, path1 = '') {
+	return (test2: RequestTest) => {
+		test2(getApp, path1)
+	}
+}
+
+function path(pathLeaf: string, requests: RequestTest[]): RequestTest {
+	return (getApp: GetApp, pathTrunk: string) => {
+		requests.forEach(invokeRequest(getApp, pathTrunk + '/' + pathLeaf))
+	}
+}
+
+function get(args: Request): RequestTest {
+	return (getApp: GetApp, finalPath: string) => {
+		request({
+			...args,
+			method: Method.GET,
+			finalPath,
+			getApp,
+		})
+	}
+}
+
+function put(args: PutRequest): RequestTest {
+	return (getApp: GetApp, finalPath: string) => {
+		request({
+			...args,
+			method: Method.PUT,
+			finalPath,
+			getApp,
+		})
+	}
+}
+
+type FinalRequest = Request & Partial<PutRequest> & {
+	method: Method
+	finalPath: string
+	getApp: GetApp
+}
+
+function request(args: FinalRequest): void {
+	const {method, finalPath} = args
+	const testName = `${method} ${finalPath}`
+
+	it(testName, done => doTest(args, testName, done))
+}
+
+function doTest(args: FinalRequest, testName: string, done: jest.DoneCallback) {
+	const {getApp, contentType, resBody, status, finalPath, method} = args
+
+	let theTest = callHttpMethod(supertest(getApp()), method, finalPath)
+
+	if (args.request) {
+		theTest = theTest.send(args.request.body)
+			.set(ContentType, args.request.contentType)
+	}
+
+	theTest = theTest.expect(status)
+
+	if (contentType) {
+		theTest = theTest.expect(
+			ContentType, ContentTypeRegEx(args.contentType))
+	}
+
+	if (resBody) {
+		theTest = theTest.expect(resBody)
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-floating-promises
+	theTest
+		.end(async (err, res) => {
+			if (err) {
+				// logger.error({
+				// 	testName,
+				// 	responseHeaders: res.header,
+				// 	responseBody: res.body,
+				// })
+				done(err)
+			}
+			done()
+		})
+}
+
+// eslint-disable-next-line @typescript-eslint/promise-function-async
+function callHttpMethod(
+	st: supertest.SuperTest<supertest.Test>, method: Method, url: string
+) {
+	switch (method) {
+		case Method.GET: return st.get(url)
+		case Method.PUT: return st.put(url)
+		case Method.DELETE: return st.delete(url)
+		default: throw new Error(`bad callHttpMethod: ${method}`)
+	}
+}

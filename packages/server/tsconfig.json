@@ -1,9 +1,10 @@
 {
 	"compilerOptions": {
-		"allowSyntheticDefaultImports": true,
 		"noEmit": true,
+		"allowSyntheticDefaultImports": true,
 		"noUnusedLocals": false,
 		"noUnusedParameters": false,
+		"sourceMap": true,
 		"strict": true,
 		"noImplicitReturns": true,
 		"target": "esnext",
@@ -12,6 +13,7 @@
 			"dom",
 			"es7"
 		],
+		"experimentalDecorators": true,
 		"types": [
 			"jest"
 		]

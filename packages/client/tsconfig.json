@@ -1,6 +1,5 @@
 {
 	"compilerOptions": {
-		"resolveJsonModule": true,
 		"noEmit": true,
 		"allowSyntheticDefaultImports": true,
 		"noUnusedLocals": false,
@@ -15,10 +14,11 @@
 			"es7"
 		],
 		"experimentalDecorators": true,
-		"jsx": "react",
 		"types": [
 			"jest"
-		]
+		],
+		"resolveJsonModule": true,
+		"jsx": "react"
 	},
 	"include": [
 		"./**/*.ts*",

@@ -9,6 +9,8 @@
 		"@sentry/integrations": "^5.5.0",
 		"autoprefixer": "^9.4.2",
 		"babel-polyfill": "^6.26.0",
+		"class-transformer": "^0.2.3",
+		"class-validator": "^0.9.1",
 		"common-tags": "^1.8.0",
 		"file-saver": "^2.0.0",
 		"firebase": "^6.2.4",

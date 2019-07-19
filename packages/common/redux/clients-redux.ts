@@ -57,6 +57,7 @@ export const clientDisconnecting = (id: ClientId) => ({
 } as const)
 
 export const maxUsernameLength = 42
+export const minUsernameLength = 1
 
 export interface IClientsState {
 	readonly clients: IClientState[]

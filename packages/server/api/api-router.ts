@@ -10,7 +10,7 @@ export const apiRouter = async (
 ): Promise<Router> => {
 	const router = Router()
 
-	router.use('/' + usersResourcePathName, usersRouter(serverStore))
+	router.use('/' + usersResourcePathName, usersRouter(serverStore, dbStore))
 
 	return router
 }

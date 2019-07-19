@@ -139,6 +139,8 @@
 	- [ ] change Button to extends button props
 	- [ ] redux starter kit
 - [√] eslint rule to require awaiting promises
+- [ ] look at https://github.com/typestack/routing-controllers
+- [ ] look at https://github.com/typestack/socket-controllers
 - [ ] disallow visual connection to be made if it causes a feedback loop
 - [ ] need visual to show that feedback loops are not possible
 - [ ] test on android
