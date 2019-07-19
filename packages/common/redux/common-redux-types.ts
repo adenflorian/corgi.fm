@@ -12,7 +12,7 @@ import {
 
 export interface IClientAppState extends StateType<ReturnType<typeof getClientReducers>> {}
 
-export type IClientRoomState = StateType<typeof roomReducers>
+export interface IClientRoomState extends StateType<typeof roomReducers> {}
 
 export type ClientStore = Store<IClientAppState>
 

@@ -10,7 +10,8 @@ export const stateRouter = (serverStore: ServerStore): Router => {
 	})
 
 	router.get('/:room', (req, res) => {
-		res.json(selectRoomStateByName(serverStore.getState(), req.params.room))
+		res.json(
+			selectRoomStateByName(serverStore.getState(), req.params.room) || {})
 	})
 
 	return router

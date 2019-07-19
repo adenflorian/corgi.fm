@@ -52,4 +52,4 @@ export const selectAllRoomStatesAsArray = (state: IServerState): IClientRoomStat
 	selectAllRoomStates(state).toIndexedSeq().toArray()
 
 export const selectRoomStateByName = (state: IServerState, name: string) =>
-	selectAllRoomStates(state).get(name) || {}
+	selectAllRoomStates(state).get(name)
