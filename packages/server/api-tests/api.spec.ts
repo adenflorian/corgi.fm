@@ -1,10 +1,12 @@
 import {Application} from 'express'
 import * as supertest from 'supertest'
 import {configureServerStore} from '@corgifm/common/redux'
+import {logger} from '@corgifm/common/logger'
+import {RequiredField} from '@corgifm/common/common-types'
+import chalk from 'chalk'
+import {oneLine} from 'common-tags'
 import {connectDB, DBStore} from '../database/database'
 import {setupExpressApp} from '../setup-express-app'
-
-const ContentType = 'content-type'
 
 enum ContentTypes {
 	ApplicationJson = 'application/json',
@@ -27,10 +29,6 @@ function ContentTypeRegEx(type: ContentTypes): RegExp {
 	}
 }
 
-// const noRoute = {
-// 	message: `couldn't find a route matching PUT /api/users/unknownUserId`,
-// } as const
-
 const userNotFound = {
 	message: `userNotFound`,
 } as const
@@ -40,23 +38,89 @@ describe('API Tests', () => {
 	let app: Application
 	const getApp = () => app
 
-	beforeEach(async () => {
+	beforeAll(async () => {
 		db = await connectDB()
 		app = await setupExpressApp(configureServerStore(), db)
 	})
 
-	afterEach(async () => {
+	afterAll(async () => {
 		await db.close()
+	})
+
+	it('should use CORS', async () => {
+		await supertest(app)
+			.get('/')
+			.expect('Access-Control-Allow-Origin', '*')
 	})
 
 	describe('tests', () => {
 		testApi(getApp, [
+			path('error', [
+				get({
+					name: 'should handle errors',
+					status: 500,
+					contentType: ContentTypes.ApplicationJson,
+					resBody: /something borked.*useful: [0-9a-z]{32}/,
+					disableConsole: true,
+				}),
+			]),
+			path('fake-path', [
+				del({
+					name: 'should 404 when no matching route',
+					status: 404,
+					contentType: ContentTypes.ApplicationJson,
+					resBody: /couldn't find a route/,
+				}),
+				get({
+					name: 'should serve index.html by default for GET',
+					status: 200,
+					contentType: ContentTypes.TextHtml,
+					resBody: /<title>corgi\.fm<\/title>/,
+				}),
+			]),
+			path('', [
+				get({
+					name: 'should use CORS',
+					status: 200,
+					contentType: ContentTypes.TextHtml,
+					resBody: /<title>corgi\.fm<\/title>/,
+					headers: {
+						'Access-Control-Allow-Origin': '*',
+					},
+				}),
+			]),
+			path('terms.html', [
+				get({
+					name: 'should serve static files',
+					status: 200,
+					contentType: ContentTypes.TextHtml,
+					resBody: /Terms of Service/,
+				}),
+			]),
 			path('newsletter', [
 				get({
 					status: 200,
 					contentType: ContentTypes.TextHtml,
-					resBody: {},
+					resBody: /Begin Mailchimp Signup Form/,
 				}),
+			]),
+			path('state', [
+				get({
+					status: 200,
+					contentType: ContentTypes.ApplicationJson,
+					resBody: {
+						clients: {clients: []},
+						rooms: {all: {}, activeRoom: ''},
+						roomStores: {},
+					},
+				}),
+				path('lobby', [
+					get({
+						status: 200,
+						contentType: ContentTypes.ApplicationJson,
+						resBody: {},
+					}),
+				]),
 			]),
 			path('api', [
 				path('users', [
@@ -94,17 +158,29 @@ describe('API Tests', () => {
 })
 
 interface Request {
+	readonly name?: string
+	readonly headers?: HeadersAssert
 	readonly status: Status
 	readonly contentType: ContentTypes
-	readonly resBody: number | object
-}
-
-interface PutRequest extends Request {
-	readonly request: {
+	readonly resBody: number | object | RegExp
+	readonly log?: boolean
+	readonly disableConsole?: boolean
+	readonly request?: {
 		readonly contentType: ContentTypes
 		readonly body: object
 	}
 }
+
+enum Header {
+	AccessControlAllowOrigin = 'Access-Control-Allow-Origin',
+	ContentType = 'Content-Type',
+}
+
+type HeadersAssert = {
+	[P in Header]?: RegExp | string
+}
+
+interface PutRequest extends RequiredField<Request, 'request'> {}
 
 type RequestTest = (getApp: GetApp, path: string) => void
 
@@ -126,6 +202,7 @@ function path(pathLeaf: string, requests: RequestTest[]): RequestTest {
 	}
 }
 
+/** GET */
 function get(args: Request): RequestTest {
 	return (getApp: GetApp, finalPath: string) => {
 		request({
@@ -137,6 +214,7 @@ function get(args: Request): RequestTest {
 	}
 }
 
+/** PUT */
 function put(args: PutRequest): RequestTest {
 	return (getApp: GetApp, finalPath: string) => {
 		request({
@@ -148,34 +226,66 @@ function put(args: PutRequest): RequestTest {
 	}
 }
 
-type FinalRequest = Request & Partial<PutRequest> & {
+/** DELETE */
+function del(args: Request): RequestTest {
+	return (getApp: GetApp, finalPath: string) => {
+		request({
+			...args,
+			method: Method.DELETE,
+			finalPath,
+			getApp,
+		})
+	}
+}
+
+type FinalRequest = Request & {
 	method: Method
 	finalPath: string
 	getApp: GetApp
 }
 
 function request(args: FinalRequest): void {
-	const {method, finalPath} = args
-	const testName = `${method} ${finalPath}`
+	const {name = '', method, finalPath, status} = args
 
-	it(testName, done => doTest(args, testName, done))
+	const testName = oneLine`
+		${chalk.magentaBright(method)}
+		${finalPath}
+		${chalk.magenta(status.toString())}
+		${chalk.blue(name)}
+	`.trim()
+
+	it(testName, done => 	doTest(args, testName, done))
 }
 
-function doTest(args: FinalRequest, testName: string, done: jest.DoneCallback) {
-	const {getApp, contentType, resBody, status, finalPath, method} = args
+function doTest(
+	args: FinalRequest, testName: string, done: jest.DoneCallback
+) {
+	const {
+		getApp, contentType, resBody, status, finalPath, method, log, headers,
+	} = args
+
+	if (args.disableConsole) logger.disable()
 
 	let theTest = callHttpMethod(supertest(getApp()), method, finalPath)
 
 	if (args.request) {
 		theTest = theTest.send(args.request.body)
-			.set(ContentType, args.request.contentType)
+			.set(Header.ContentType, args.request.contentType)
 	}
 
 	theTest = theTest.expect(status)
 
 	if (contentType) {
 		theTest = theTest.expect(
-			ContentType, ContentTypeRegEx(args.contentType))
+			Header.ContentType, ContentTypeRegEx(args.contentType))
+	}
+
+	if (headers) {
+		Object.keys(headers).forEach(name => {
+			const value = headers[name as Header]!
+			// @ts-ignore
+			theTest = theTest.expect(name, value)
+		})
 	}
 
 	if (resBody) {
@@ -185,12 +295,15 @@ function doTest(args: FinalRequest, testName: string, done: jest.DoneCallback) {
 	// eslint-disable-next-line @typescript-eslint/no-floating-promises
 	theTest
 		.end(async (err, res) => {
+			logger.enable()
+			if (log) {
+				logger.log({
+					testName,
+					responseHeaders: res.header,
+					responseBody: res.body,
+				})
+			}
 			if (err) {
-				// logger.error({
-				// 	testName,
-				// 	responseHeaders: res.header,
-				// 	responseBody: res.body,
-				// })
 				done(err)
 			}
 			done()

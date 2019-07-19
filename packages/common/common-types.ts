@@ -64,3 +64,7 @@ export type OmitStrict<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 export type AnyFunction = (...args: any[]) => any
 
 export type Octave = number
+
+export type RequiredField<T, K extends keyof T> = {
+	[P in K]-?: T[P];
+} & T

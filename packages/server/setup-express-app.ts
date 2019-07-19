@@ -33,6 +33,12 @@ export async function setupExpressApp(
 		app.use('/state', stateRouter(serverStore))
 	}
 
+	if (isLocalDevServer()) {
+		app.get('/error', () => {
+			throw new Error('test error please ignore')
+		})
+	}
+
 	app.use(`/${apiResourcePathName}`, await apiRouter(serverStore, dbStore))
 
 	app.get('/*', (req, res, next) => {
@@ -49,14 +55,23 @@ export async function setupExpressApp(
 
 	app.use(Sentry.Handlers.errorHandler())
 
-	app.use(async function onError(
-		err: any, req: express.Request, res: any, next: any
-	) {
+	// eslint-disable-next-line @typescript-eslint/promise-function-async
+	app.use((
+		err: any,
+		req: express.Request,
+		res: express.Response,
+		next: express.NextFunction
+	) => {
 		// The error id is attached to `res.sentry` to be returned
 		// and optionally displayed to the user for support.
 		logger.error('unhandled express error: ', {err})
-		res.statusCode = 500
-		return res.end(`something borked, here is an error code that the support people might find useful: ${res.sentry}`)
+
+		return res.status(500).json({
+			message: `something borked, here is an error code `
+				+ `that the support people might`
+				// @ts-ignore
+				+ `find useful: ${res.sentry}`,
+		})
 	})
 
 	return app

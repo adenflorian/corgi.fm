@@ -111,6 +111,12 @@
 		- [√] lobby
 		- [ ] join friend
 	- [ ] adjust volume
+- [ ] koa
+	- [ ] before
+		- [√] tests
+- [ ] refactor
+	- [ ] move test api stuff to on file
+	- [ ] move index.html to public folder
 - [ ] do stuff with accounts system
 	- [ ] save username
 		- [ ] on register

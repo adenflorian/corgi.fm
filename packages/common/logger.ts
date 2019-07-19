@@ -7,30 +7,39 @@ const logLevel = {
 	trace: false,
 }
 
+let enabled = true
+
 export const logger = {
 	error: (...args: any[]) => {
-		if (logLevel.error) {
+		if (logLevel.error && enabled) {
 			console.error(...args)
 		}
 	},
 	warn: (...args: any[]) => {
-		if (logLevel.warn) {
+		if (logLevel.warn && enabled) {
 			console.warn(...args)
 		}
 	},
 	log: (...args: any[]) => {
-		if (logLevel.log) {
+		if (logLevel.log && enabled) {
 			console.log(...args)
 		}
 	},
 	debug: (...args: any[]) => {
-		if (logLevel.debug) {
+		if (logLevel.debug && enabled) {
 			console.log(...args)
 		}
 	},
 	trace: (...args: any[]) => {
-		if (logLevel.trace) {
+		if (logLevel.trace && enabled) {
 			console.log(...args)
 		}
 	},
+	enable: () => {
+		enabled = true
+	},
+	disable: () => {
+		enabled = false
+	},
+	isEnabled: () => enabled
 }
