@@ -15,7 +15,6 @@ describe('API Tests', () => {
 	const getApp = () => app
 
 	beforeAll(async () => {
-		logger.disable()
 		db = await connectDB()
 		app = (await setupExpressApp(configureServerStore(), db)).listen()
 	})
@@ -23,7 +22,6 @@ describe('API Tests', () => {
 	afterAll(async () => {
 		app.close()
 		await db.close()
-		logger.enable()
 	})
 
 	describe('tests', () => {
@@ -34,6 +32,8 @@ describe('API Tests', () => {
 					status: 500,
 					contentType: ContentTypes.ApplicationJson,
 					resBody: /something borked.*useful: [0-9a-z]{32}/,
+					before: logger.disable,
+					after: logger.enable,
 				}),
 			]),
 			path('fake-path', [
@@ -44,7 +44,7 @@ describe('API Tests', () => {
 					resBody: /couldn't find a route/,
 				}),
 				get({
-					name: 'should serve index.html by default for GET',
+					name: 'should default to index.html',
 					status: 200,
 					contentType: ContentTypes.TextHtml,
 					resBody: /<title>corgi\.fm<\/title>/,
@@ -55,10 +55,18 @@ describe('API Tests', () => {
 					name: 'should use CORS',
 					status: 200,
 					contentType: ContentTypes.TextHtml,
-					resBody: /<title>corgi\.fm<\/title>/,
+					resBody: /.*/,
 					headers: {
 						'Access-Control-Allow-Origin': '*',
 					},
+				}),
+			]),
+			path(['', 'index.html'], [
+				get({
+					name: 'should serve index.html',
+					status: 200,
+					contentType: ContentTypes.TextHtml,
+					resBody: /<title>corgi\.fm<\/title>/,
 				}),
 			]),
 			path('terms.html', [

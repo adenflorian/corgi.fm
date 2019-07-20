@@ -30,6 +30,8 @@ interface TestRequest {
 	readonly contentType: ContentTypes
 	readonly resBody: number | object | RegExp
 	readonly log?: boolean
+	readonly before?: () => any
+	readonly after?: () => any
 	readonly request?: {
 		readonly contentType: ContentTypes
 		readonly body: object
@@ -66,16 +68,25 @@ function invokeRequest(getApp: GetApp, path1 = '') {
 	}
 }
 
-export function path(pathLeaf: string, requests: RequestTest[]): RequestTest {
+export function path(
+	pathLeaf: string[] | string, requests: RequestTest[]
+): RequestTest {
+	const paths = typeof pathLeaf === 'string'
+		? [pathLeaf]
+		: pathLeaf
 	return (getApp: GetApp, pathTrunk: string) => {
-		requests.forEach(invokeRequest(getApp, pathTrunk + '/' + pathLeaf))
+		requests.forEach(request => {
+			paths.forEach(p => {
+				invokeRequest(getApp, pathTrunk + '/' + p)(request)
+			})
+		})
 	}
 }
 
 /** GET */
 export function get(args: TestRequest): RequestTest {
 	return (getApp: GetApp, finalPath: string) => {
-		request({
+		doRequest({
 			...args,
 			method: Method.GET,
 			finalPath,
@@ -87,7 +98,7 @@ export function get(args: TestRequest): RequestTest {
 /** PUT */
 export function put(args: PutRequest): RequestTest {
 	return (getApp: GetApp, finalPath: string) => {
-		request({
+		doRequest({
 			...args,
 			method: Method.PUT,
 			finalPath,
@@ -99,7 +110,7 @@ export function put(args: PutRequest): RequestTest {
 /** DELETE */
 export function del(args: TestRequest): RequestTest {
 	return (getApp: GetApp, finalPath: string) => {
-		request({
+		doRequest({
 			...args,
 			method: Method.DELETE,
 			finalPath,
@@ -114,7 +125,7 @@ type FinalRequest = TestRequest & {
 	getApp: GetApp
 }
 
-function request(args: FinalRequest): void {
+function doRequest(args: FinalRequest): void {
 	const {name = '', method, finalPath, status} = args
 
 	const testName = oneLine`
@@ -127,12 +138,17 @@ function request(args: FinalRequest): void {
 	it(testName, done => doTest(args, testName, done))
 }
 
+const noop = () => {}
+
 function doTest(
 	args: FinalRequest, testName: string, done: jest.DoneCallback
 ) {
 	const {
 		getApp, contentType, resBody, status, finalPath, method, log, headers,
+		before = noop, after = noop,
 	} = args
+
+	before()
 
 	let theTest = callHttpMethod(supertest(getApp()), method, finalPath)
 
@@ -165,6 +181,7 @@ function doTest(
 	// eslint-disable-next-line @typescript-eslint/no-floating-promises
 	theTest
 		.end(async (err, res) => {
+			after()
 			if (log) {
 				console.log({
 					testName,

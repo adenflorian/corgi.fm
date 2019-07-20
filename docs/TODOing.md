@@ -111,15 +111,13 @@
 		- [√] lobby
 		- [ ] join friend
 	- [ ] adjust volume
-- [ ] koa
+- [√] koa
 	- [√] before
 		- [√] tests
-	- [ ] migrate
+	- [√] migrate
 		- [√] cors
-		- [ ] https://github.com/koajs/compress
 - [ ] refactor
-	- [ ] move test api stuff to on file
-	- [ ] move index.html to public folder
+	- [√] move test api stuff to own file
 - [ ] do stuff with accounts system
 	- [ ] save username
 		- [ ] on register
@@ -217,6 +215,7 @@ It's just following the values of the sine, really, but you can adjust as you se
 Yes, https://mmckegg.github.io/web-audio-school/, exercise 13 is exactly what you need
 
 # 0.6.0
+- [ ] https://github.com/koajs/compress
 - [ ] refactor / clean code
 	- [ ] convert all components to function components with hooks
 	- [ ] remove connect() and shamuConnect()
