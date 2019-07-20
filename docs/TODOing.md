@@ -112,8 +112,11 @@
 		- [ ] join friend
 	- [ ] adjust volume
 - [ ] koa
-	- [ ] before
+	- [√] before
 		- [√] tests
+	- [ ] migrate
+		- [√] cors
+		- [ ] https://github.com/koajs/compress
 - [ ] refactor
 	- [ ] move test api stuff to on file
 	- [ ] move index.html to public folder

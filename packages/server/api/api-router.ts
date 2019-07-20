@@ -1,16 +1,21 @@
-import {Router} from 'express'
 import {usersResourcePathName} from '@corgifm/common/common-constants'
+import * as Router from '@koa/router'
 import {ServerStore} from '../server-redux-types'
 import {DBStore} from '../database/database'
 import {usersRouter} from './users-router'
 
-export const apiRouter = async (
+export const apiRouter = (
 	serverStore: ServerStore,
 	dbStore: DBStore,
-): Promise<Router> => {
-	const router = Router()
+): Router => {
+	const router = new Router()
 
-	router.use('/' + usersResourcePathName, usersRouter(serverStore, dbStore))
+	const usersThing = usersRouter(serverStore, dbStore)
+
+	router.use(
+		'/' + usersResourcePathName,
+		usersThing.routes(),
+		usersThing.allowedMethods())
 
 	return router
 }

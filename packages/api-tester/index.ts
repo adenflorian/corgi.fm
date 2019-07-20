@@ -1,7 +1,7 @@
 import * as supertest from 'supertest'
 import {oneLine} from 'common-tags'
-import {Application} from 'express'
 import chalk from 'chalk'
+import * as Koa from 'koa'
 
 export enum ContentTypes {
 	ApplicationJson = 'application/json',
@@ -30,7 +30,6 @@ interface TestRequest {
 	readonly contentType: ContentTypes
 	readonly resBody: number | object | RegExp
 	readonly log?: boolean
-	readonly disableConsole?: boolean
 	readonly request?: {
 		readonly contentType: ContentTypes
 		readonly body: object
@@ -40,6 +39,7 @@ interface TestRequest {
 enum Header {
 	AccessControlAllowOrigin = 'Access-Control-Allow-Origin',
 	ContentType = 'Content-Type',
+	Origin = 'Origin',
 }
 
 type HeadersAssert = {
@@ -54,7 +54,7 @@ interface PutRequest extends RequiredField<TestRequest, 'request'> {}
 
 type RequestTest = (getApp: GetApp, path: string) => void
 
-type GetApp = () => Application
+type GetApp = () => Koa
 
 export function testApi(getApp: GetApp, requests: RequestTest[]) {
 	requests.forEach(invokeRequest(getApp))
@@ -134,7 +134,9 @@ function doTest(
 		getApp, contentType, resBody, status, finalPath, method, log, headers,
 	} = args
 
-	let theTest = callHttpMethod(supertest(getApp()), method, finalPath)
+	let theTest = callHttpMethod(supertest(getApp().listen()), method, finalPath)
+
+	theTest = theTest.set(Header.Origin, 'localhost')
 
 	if (args.request) {
 		theTest = theTest.send(args.request.body)
@@ -166,8 +168,11 @@ function doTest(
 			if (log) {
 				console.log({
 					testName,
-					responseHeaders: res.header,
-					responseBody: res.body,
+					response: {
+						status: res.status,
+						headers: res.header,
+						body: res.body,
+					},
 				})
 			}
 			if (err) {

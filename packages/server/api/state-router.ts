@@ -1,17 +1,17 @@
-import {Router} from 'express'
 import {selectRoomStateByName} from '@corgifm/common/redux'
+import * as Router from '@koa/router'
 import {ServerStore} from '../server-redux-types'
 
 export const stateRouter = (serverStore: ServerStore): Router => {
-	const router = Router()
+	const router = new Router()
 
-	router.get('/', (_, res) => {
-		res.json(serverStore.getState())
+	router.get('/', ctx => {
+		ctx.body = serverStore.getState()
 	})
 
-	router.get('/:room', (req, res) => {
-		res.json(
-			selectRoomStateByName(serverStore.getState(), req.params.room) || {})
+	router.get('/:room', ctx => {
+		ctx.body = selectRoomStateByName(
+			serverStore.getState(), ctx.params.room) || {}
 	})
 
 	return router
