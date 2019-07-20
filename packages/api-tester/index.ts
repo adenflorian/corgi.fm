@@ -1,7 +1,7 @@
+import {Server} from 'http'
 import * as supertest from 'supertest'
 import {oneLine} from 'common-tags'
 import chalk from 'chalk'
-import * as Koa from 'koa'
 
 export enum ContentTypes {
 	ApplicationJson = 'application/json',
@@ -54,7 +54,7 @@ interface PutRequest extends RequiredField<TestRequest, 'request'> {}
 
 type RequestTest = (getApp: GetApp, path: string) => void
 
-type GetApp = () => Koa
+type GetApp = () => Server
 
 export function testApi(getApp: GetApp, requests: RequestTest[]) {
 	requests.forEach(invokeRequest(getApp))
@@ -134,7 +134,7 @@ function doTest(
 		getApp, contentType, resBody, status, finalPath, method, log, headers,
 	} = args
 
-	let theTest = callHttpMethod(supertest(getApp().listen()), method, finalPath)
+	let theTest = callHttpMethod(supertest(getApp()), method, finalPath)
 
 	theTest = theTest.set(Header.Origin, 'localhost')
 

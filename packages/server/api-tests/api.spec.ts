@@ -1,7 +1,7 @@
+import {Server} from 'http'
 import {configureServerStore} from '@corgifm/common/redux'
 import {testApi, path, get, del, ContentTypes, put} from '@corgifm/api-tester'
 import {logger} from '@corgifm/common/logger'
-import * as Koa from 'koa'
 import {connectDB, DBStore} from '../database/database'
 import {setupExpressApp} from '../setup-express-app'
 
@@ -11,16 +11,17 @@ const userNotFound = {
 
 describe('API Tests', () => {
 	let db: DBStore
-	let app: Koa
+	let app: Server
 	const getApp = () => app
 
 	beforeAll(async () => {
 		logger.disable()
 		db = await connectDB()
-		app = await setupExpressApp(configureServerStore(), db)
+		app = (await setupExpressApp(configureServerStore(), db)).listen()
 	})
 
 	afterAll(async () => {
+		app.close()
 		await db.close()
 		logger.enable()
 	})
