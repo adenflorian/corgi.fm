@@ -118,6 +118,10 @@
 		- [√] cors
 - [ ] refactor
 	- [√] move test api stuff to own file
+- [ ] REST API
+	- [ ] users
+		- [ ] PUT
+		- [ ] GET :userId
 - [ ] do stuff with accounts system
 	- [ ] save username
 		- [ ] on register

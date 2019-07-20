@@ -3,5 +3,5 @@ import {maxUsernameLength, minUsernameLength} from '../redux'
 
 export class User {
 	@Length(minUsernameLength, maxUsernameLength)
-	public readonly displayName?: string
+	public readonly displayName: string = ''
 }

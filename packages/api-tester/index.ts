@@ -14,7 +14,7 @@ enum Method {
 	DELETE = 'DELETE',
 }
 
-type Status = 200 | 201 | 204 | 404 | 500 | 501
+type Status = 200 | 201 | 204 | 400 | 404 | 500 | 501
 
 function ContentTypeRegEx(type: ContentTypes): RegExp {
 	switch (type) {
@@ -33,7 +33,7 @@ interface TestRequest {
 	readonly before?: () => any
 	readonly after?: () => any
 	readonly request?: {
-		readonly contentType: ContentTypes
+		readonly contentType?: ContentTypes
 		readonly body: object
 	}
 }
@@ -138,6 +138,7 @@ function doRequest(args: FinalRequest): void {
 	it(testName, done => doTest(args, testName, done))
 }
 
+// eslint-disable-next-line no-empty-function
 const noop = () => {}
 
 function doTest(
@@ -156,7 +157,9 @@ function doTest(
 
 	if (args.request) {
 		theTest = theTest.send(args.request.body)
-			.set(Header.ContentType, args.request.contentType)
+			.set(
+				Header.ContentType,
+				args.request.contentType || ContentTypes.ApplicationJson)
 	}
 
 	theTest = theTest.expect(status)
@@ -183,14 +186,14 @@ function doTest(
 		.end(async (err, res) => {
 			after()
 			if (log) {
-				console.log({
+				console.log(JSON.stringify({
 					testName,
 					response: {
 						status: res.status,
 						headers: res.header,
 						body: res.body,
 					},
-				})
+				}, null, 2))
 			}
 			if (err) {
 				done(err)

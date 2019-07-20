@@ -118,16 +118,43 @@ describe('API Tests', () => {
 							resBody: userNotFound,
 						}),
 						put({
+							name: 'invalid display name type',
 							request: {
-								body: {
-									displayName: '',
-								},
-								contentType: ContentTypes.ApplicationJson,
+								body: {displayName: ['a', 'a', 'a', 'a', 'a,']},
 							},
-							status: 501,
+							status: 400,
 							contentType: ContentTypes.ApplicationJson,
 							resBody: {
-								message: `userNotFound`,
+								validationError: [
+									{
+										value: ['a', 'a', 'a', 'a', 'a,'],
+										property: 'displayName',
+										children: [],
+										constraints: {
+											length: 'displayName must be longer than or equal to 1 and shorter than or equal to 42 characters',
+										},
+									},
+								],
+							},
+						}),
+						put({
+							name: 'too short display name',
+							request: {
+								body: {displayName: ''},
+							},
+							status: 400,
+							contentType: ContentTypes.ApplicationJson,
+							resBody: {
+								validationError: [
+									{
+										value: '',
+										property: 'displayName',
+										children: [],
+										constraints: {
+											length: 'displayName must be longer than or equal to 1 characters',
+										},
+									},
+								],
 							},
 						}),
 					]),
