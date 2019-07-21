@@ -9,6 +9,8 @@ const userNotFound = {
 	message: `userNotFound`,
 } as const
 
+const apiRouteNotFound = /couldn't find an api route/
+
 describe('API Tests', () => {
 	let db: DBStore
 	let app: Server
@@ -103,6 +105,14 @@ describe('API Tests', () => {
 				]),
 			]),
 			path('api', [
+				path(['', 'fake-api-path', 'fake/api/path'], [
+					get({
+						name: 'should 404 when no matching route',
+						status: 404,
+						contentType: ContentTypes.ApplicationJson,
+						resBody: apiRouteNotFound,
+					}),
+				]),
 				path('users', [
 					path('count', [
 						get({
@@ -156,6 +166,19 @@ describe('API Tests', () => {
 									},
 								],
 							},
+						}),
+					]),
+					path('', [
+						get({
+							status: 404,
+							contentType: ContentTypes.ApplicationJson,
+							resBody: apiRouteNotFound,
+						}),
+						put({
+							status: 404,
+							contentType: ContentTypes.ApplicationJson,
+							resBody: apiRouteNotFound,
+							request: {body: {}},
 						}),
 					]),
 				]),

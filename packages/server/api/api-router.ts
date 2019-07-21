@@ -17,5 +17,13 @@ export const apiRouter = (
 		usersThing.routes(),
 		usersThing.allowedMethods())
 
+	router.all('/*', ctx => {
+		ctx.status = 404
+
+		ctx.body = {
+			message: `couldn't find an api route matching ${ctx.method} ${ctx.path}`,
+		}
+	})
+
 	return router
 }
