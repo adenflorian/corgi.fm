@@ -7,6 +7,7 @@ import {Context} from 'koa'
 import {ClassType} from 'class-transformer/ClassTransformer'
 import {ServerStore} from '../server-redux-types'
 import {DBStore} from '../database/database'
+import {secure} from '../security-middleware'
 
 export const usersRouter = (
 	serverStore: ServerStore,
@@ -18,7 +19,11 @@ export const usersRouter = (
 		ctx.body = selectAllClients(serverStore.getState()).length
 	})
 
-	router.get('/:userId', ctx => {
+	const secureRouter = new Router()
+
+	secureRouter.use(secure)
+
+	secureRouter.get('/:userId', ctx => {
 		// if missing userId return 400
 		// if user not found, return 404
 		// if not data for user, return empty object
@@ -29,12 +34,16 @@ export const usersRouter = (
 		}
 	})
 
-	router.put('/:userId', validate(User, putUser))
+	secureRouter.put('/:userId', validate(User, putUser))
+
+	router.use(secureRouter.routes(), secureRouter.allowedMethods())
 
 	return router
 }
 
 async function putUser(ctx: Context, user: User) {
+	// Make sure caller is authorized to update this user
+
 	// if missing userId return 400
 	// const userId = ctx.params.userId
 	// if (!userId) {

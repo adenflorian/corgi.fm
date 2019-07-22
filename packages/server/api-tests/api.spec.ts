@@ -4,6 +4,7 @@ import {testApi, path, get, del, ContentTypes, put} from '@corgifm/api-tester'
 import {logger} from '@corgifm/common/logger'
 import {connectDB, DBStore} from '../database/database'
 import {setupExpressApp} from '../setup-express-app'
+import * as serverAuth from '../auth/server-auth'
 
 const userNotFound = {
 	message: `userNotFound`,
@@ -11,7 +12,23 @@ const userNotFound = {
 
 const apiRouteNotFound = /couldn't find an api route/
 
-describe('API Tests', () => {
+jest.mock('../auth/server-auth')
+
+const verifyAuthHeaderMock =
+	serverAuth.verifyAuthHeader as
+	unknown as
+	jest.Mock<ReturnType<typeof serverAuth.verifyAuthHeader>>
+
+mockAuthToFail()
+
+function mockAuthToFail() {
+	verifyAuthHeaderMock.mockResolvedValue({
+		authenticated: false,
+		emailVerified: false,
+	})
+}
+
+describe('API Tests2', () => {
 	let db: DBStore
 	let app: Server
 	const getApp = () => app
@@ -19,6 +36,10 @@ describe('API Tests', () => {
 	beforeAll(async () => {
 		db = await connectDB()
 		app = (await setupExpressApp(configureServerStore(), db)).listen()
+	})
+
+	afterEach(() => {
+		mockAuthToFail()
 	})
 
 	afterAll(async () => {
@@ -122,6 +143,45 @@ describe('API Tests', () => {
 						}),
 					]),
 					path('unknownUserId', [
+						put({
+							name: 'missing Authorization header',
+							authorized: false,
+							status: 401,
+							contentType: ContentTypes.ApplicationJson,
+							resBody: /missing Authorization header/,
+							request: {body: {}},
+						}),
+						put({
+							name: 'invalid Authorization header2',
+							authorized: false,
+							status: 401,
+							contentType: ContentTypes.ApplicationJson,
+							resBody: /invalid\/expired token/,
+							request: {
+								headers: {
+									Authorization: 'Bearer fake-token',
+								},
+								body: {},
+							},
+							log: true,
+						}),
+						put({
+							name: 'email not verified',
+							authorized: false,
+							before: () => verifyAuthHeaderMock.mockResolvedValue({
+								authenticated: true,
+								emailVerified: false,
+							}),
+							status: 403,
+							contentType: ContentTypes.ApplicationJson,
+							resBody: /not authorized/,
+							request: {
+								headers: {
+									Authorization: 'Bearer valid-token-but-email-not-verified',
+								},
+								body: {},
+							},
+						}),
 						get({
 							status: 404,
 							contentType: ContentTypes.ApplicationJson,
@@ -183,6 +243,18 @@ describe('API Tests', () => {
 					]),
 				]),
 			]),
-		])
+		], {
+			authorizedRequests: {
+				before: () => verifyAuthHeaderMock.mockResolvedValue({
+					authenticated: true,
+					emailVerified: true,
+				}),
+				request: {
+					headers: {
+						Authorization: 'Bearer valid-token',
+					},
+				},
+			},
+		})
 	})
 })

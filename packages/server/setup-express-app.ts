@@ -23,6 +23,7 @@ export async function setupExpressApp(
 	app.use(handleError)
 
 	app.use(cors({origin: '*'}))
+
 	app.use(bodyParser())
 
 	// TODO Use extensions options when github issue is resolved

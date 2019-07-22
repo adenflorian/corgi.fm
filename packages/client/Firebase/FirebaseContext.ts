@@ -4,6 +4,7 @@ import 'firebase/auth'
 import React, {useContext} from 'react'
 import {Store} from 'redux'
 import {authActions, IClientAppState} from '@corgifm/common/redux'
+import {logger} from '@corgifm/common/logger'
 import {getFirebaseConfig} from './firebase-config'
 
 export const FirebaseContext = React.createContext<FirebaseContextStuff>({
@@ -27,6 +28,7 @@ export function initializeFirebase() {
 export function wireUpFirebaseToRedux(firebaseContext: FirebaseContextStuff, store: Store<IClientAppState>) {
 	firebaseContext.auth.onAuthStateChanged(async user => {
 		if (user) {
+			logger.log({x: user.getIdToken()})
 			store.dispatch(authActions.logIn(user))
 		} else {
 			store.dispatch(authActions.logOut())

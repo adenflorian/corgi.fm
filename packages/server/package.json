@@ -21,6 +21,7 @@
 		"common-tags": "^1.8.0",
 		"cors": "^2.8.5",
 		"firebase": "^6.2.4",
+		"firebase-admin": "^8.2.0",
 		"immutable": "^4.0.0-rc.12",
 		"koa": "^2.7.0",
 		"koa-bodyparser": "^4.2.1",

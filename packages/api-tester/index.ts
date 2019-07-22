@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import {Server} from 'http'
 import * as supertest from 'supertest'
 import {oneLine} from 'common-tags'
@@ -14,7 +15,7 @@ enum Method {
 	DELETE = 'DELETE',
 }
 
-type Status = 200 | 201 | 204 | 400 | 404 | 500 | 501
+type Status = 200 | 201 | 204 | 400 | 401 | 403 | 404 | 500 | 501
 
 function ContentTypeRegEx(type: ContentTypes): RegExp {
 	switch (type) {
@@ -25,6 +26,8 @@ function ContentTypeRegEx(type: ContentTypes): RegExp {
 
 interface TestRequest {
 	readonly name?: string
+	/** Defaults to true */
+	readonly authorized?: boolean
 	readonly headers?: HeadersAssert
 	readonly status: Status
 	readonly contentType: ContentTypes
@@ -32,20 +35,28 @@ interface TestRequest {
 	readonly log?: boolean
 	readonly before?: () => any
 	readonly after?: () => any
-	readonly request?: {
-		readonly contentType?: ContentTypes
-		readonly body: object
-	}
+	readonly request?: RequestArgs
 }
 
-enum Header {
+interface RequestArgs {
+	readonly headers?: Headers
+	readonly contentType?: ContentTypes
+	readonly body: object
+}
+
+export enum Header {
 	AccessControlAllowOrigin = 'Access-Control-Allow-Origin',
 	ContentType = 'Content-Type',
 	Origin = 'Origin',
+	Authorization = 'Authorization',
+}
+
+type Headers = {
+	[P in Header]?: string
 }
 
 type HeadersAssert = {
-	[P in Header]?: RegExp | string
+	[P in keyof Headers]: RegExp | string
 }
 
 type RequiredField<T, K extends keyof T> = {
@@ -54,17 +65,32 @@ type RequiredField<T, K extends keyof T> = {
 
 interface PutRequest extends RequiredField<TestRequest, 'request'> {}
 
-type RequestTest = (getApp: GetApp, path: string) => void
+type RequestTest =
+	(getApp: GetApp, path: string, options: TestApiOptions) => void
 
 type GetApp = () => Server
 
-export function testApi(getApp: GetApp, requests: RequestTest[]) {
-	requests.forEach(invokeRequest(getApp))
+interface TestApiOptions {
+	/** Will be merged into authorized requests. Requests are authorized
+	 * by default. */
+	authorizedRequests: AuthorizedRequests
 }
 
-function invokeRequest(getApp: GetApp, path1 = '') {
+interface AuthorizedRequests extends Pick<TestRequest, 'before' | 'after'> {
+	request: Partial<Pick<RequestArgs, 'headers'>>
+}
+
+export function testApi(
+	getApp: GetApp, requests: RequestTest[], options: TestApiOptions
+) {
+	requests.forEach(invokeRequest(getApp, '', options))
+}
+
+function invokeRequest(
+	getApp: GetApp, path1: string, options: TestApiOptions
+) {
 	return (test2: RequestTest) => {
-		test2(getApp, path1)
+		test2(getApp, path1, options)
 	}
 }
 
@@ -74,10 +100,10 @@ export function path(
 	const paths = typeof pathLeaf === 'string'
 		? [pathLeaf]
 		: pathLeaf
-	return (getApp: GetApp, pathTrunk: string) => {
+	return (getApp: GetApp, pathTrunk: string, options: TestApiOptions) => {
 		requests.forEach(request => {
 			paths.forEach(p => {
-				invokeRequest(getApp, pathTrunk + '/' + p)(request)
+				invokeRequest(getApp, pathTrunk + '/' + p, options)(request)
 			})
 		})
 	}
@@ -85,36 +111,39 @@ export function path(
 
 /** GET */
 export function get(args: TestRequest): RequestTest {
-	return (getApp: GetApp, finalPath: string) => {
+	return (getApp: GetApp, finalPath: string, options: TestApiOptions) => {
 		doRequest({
 			...args,
 			method: Method.GET,
 			finalPath,
 			getApp,
+			options,
 		})
 	}
 }
 
 /** PUT */
 export function put(args: PutRequest): RequestTest {
-	return (getApp: GetApp, finalPath: string) => {
+	return (getApp: GetApp, finalPath: string, options: TestApiOptions) => {
 		doRequest({
 			...args,
 			method: Method.PUT,
 			finalPath,
 			getApp,
+			options,
 		})
 	}
 }
 
 /** DELETE */
 export function del(args: TestRequest): RequestTest {
-	return (getApp: GetApp, finalPath: string) => {
+	return (getApp: GetApp, finalPath: string, options: TestApiOptions) => {
 		doRequest({
 			...args,
 			method: Method.DELETE,
 			finalPath,
 			getApp,
+			options,
 		})
 	}
 }
@@ -123,6 +152,7 @@ type FinalRequest = TestRequest & {
 	method: Method
 	finalPath: string
 	getApp: GetApp
+	options: TestApiOptions
 }
 
 function doRequest(args: FinalRequest): void {
@@ -146,21 +176,29 @@ function doTest(
 ) {
 	const {
 		getApp, contentType, resBody, status, finalPath, method, log, headers,
-		before = noop, after = noop,
+		before = noop, after = noop, request, authorized = true, options,
 	} = args
 
 	before()
+
+	if (authorized && options.authorizedRequests.before) {
+		options.authorizedRequests.before()
+	}
 
 	let theTest = callHttpMethod(supertest(getApp()), method, finalPath)
 
 	theTest = theTest.set(Header.Origin, 'localhost')
 
-	if (args.request) {
-		theTest = theTest.send(args.request.body)
-			.set(
-				Header.ContentType,
-				args.request.contentType || ContentTypes.ApplicationJson)
+	const newHeaders = {
+		...((request && request.headers) || {}),
+		...(
+			authorized
+				? options.authorizedRequests.request.headers || {}
+				: {}
+		),
 	}
+
+	theTest = doRequestStuff()
 
 	theTest = theTest.expect(status)
 
@@ -185,9 +223,18 @@ function doTest(
 	theTest
 		.end(async (err, res) => {
 			after()
+
+			if (authorized && options.authorizedRequests.after) {
+				options.authorizedRequests.after()
+			}
+
 			if (log) {
-				console.log(JSON.stringify({
-					testName,
+				console.log(testName + ': ' + JSON.stringify({
+					status: err ? 'fail' : 'pass',
+					request: {
+						authorized,
+						headers: newHeaders,
+					},
 					response: {
 						status: res.status,
 						headers: res.header,
@@ -200,6 +247,24 @@ function doTest(
 			}
 			done()
 		})
+
+	// eslint-disable-next-line @typescript-eslint/promise-function-async
+	function doRequestStuff(): supertest.Test {
+		if (request) {
+			theTest = theTest
+				.send(request.body)
+				.set(
+					Header.ContentType,
+					request.contentType || ContentTypes.ApplicationJson
+				)
+		}
+
+		Object.keys(newHeaders).forEach(name => {
+			theTest = theTest.set(name, newHeaders[name as Header]!)
+		})
+
+		return theTest
+	}
 }
 
 // eslint-disable-next-line @typescript-eslint/promise-function-async
