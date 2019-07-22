@@ -5,7 +5,9 @@ import {logger} from '@corgifm/common/logger'
 import {connectDB, DBStore} from '../database/database'
 import {setupExpressApp} from '../setup-express-app'
 import * as serverAuth from '../auth/server-auth'
-import {apiRouteNotFound} from './api-test-common'
+import {
+	apiRouteNotFound, emailVerifiedUidA, validTokenVerifiedEmailUidARequest,
+} from './api-test-common'
 import {getUserApiTests} from './users-api-tests'
 
 jest.mock('../auth/server-auth')
@@ -21,6 +23,7 @@ function mockAuthToFail() {
 	verifyAuthHeaderMock.mockResolvedValue({
 		authenticated: false,
 		emailVerified: false,
+		uid: '',
 	})
 }
 
@@ -44,6 +47,14 @@ describe('API Tests', () => {
 	})
 
 	describe('tests', () => {
+		/**
+		 * Requests are authorized by default.
+		 * Authorized requests have an Authorization header with a valid JWT
+		 * containing a payload with a uid of `uidA` and a verified email.
+		 * Currently the `verifyAuthHeader` function is mocked out for these tests.
+		 * By default, it returns data saying that the caller is authenticated,
+		 * email verified, with a uid of uidA.
+		 */
 		testApi(getApp, [
 			path('error', [
 				get({
@@ -134,15 +145,8 @@ describe('API Tests', () => {
 			]),
 		], {
 			authorizedRequests: {
-				before: () => verifyAuthHeaderMock.mockResolvedValue({
-					authenticated: true,
-					emailVerified: true,
-				}),
-				request: {
-					headers: {
-						Authorization: 'Bearer valid-token',
-					},
-				},
+				before: emailVerifiedUidA(verifyAuthHeaderMock),
+				request: validTokenVerifiedEmailUidARequest,
 			},
 		})
 	})

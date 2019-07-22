@@ -9,15 +9,16 @@ export async function verifyAuthHeader(
 ): Promise<AuthResult> {
 	return admin.auth().verifyIdToken(authHeaderValue)
 		.then((decodedToken): AuthResult => {
-			// const uid = decodedToken.uid
 			return {
 				authenticated: true,
 				emailVerified: decodedToken.email_verified,
+				uid: decodedToken.uid,
 			}
 		}).catch((error): AuthResult => {
 			return {
 				authenticated: false,
 				emailVerified: false,
+				uid: '',
 			}
 		})
 }
@@ -25,4 +26,5 @@ export async function verifyAuthHeader(
 interface AuthResult {
 	authenticated: boolean
 	emailVerified: boolean
+	uid: string
 }

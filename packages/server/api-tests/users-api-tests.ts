@@ -2,8 +2,11 @@ import {
 	RequestTest, path, get, put, ContentTypes,
 } from '@corgifm/api-tester'
 import {
-	apiRouteNotFound, VerifyAuthHeaderMock, putValidationTests,
+	apiRouteNotFound, VerifyAuthHeaderMock, putValidationTests, emailNotVerifiedUidB, emptyObjectBodyRequest, fakeTokenRequest, validTokenUnverifiedEmailUidBRequest, validTokenVerifiedEmailUidARequest, uidZ, uidA,
 } from './api-test-common'
+
+const notAuthorizedA = /not authorized A/
+const notAuthorizedB = /not authorized B/
 
 export function getUserApiTests(
 	verifyAuthHeaderMock: VerifyAuthHeaderMock
@@ -43,7 +46,14 @@ export function getUserApiTests(
 
 	function getUserTests(): RequestTest[] {
 		return [
-			path('unknownUserId', [
+			path(uidZ, [
+				get({
+					status: 403,
+					contentType: ContentTypes.ApplicationJson,
+					resBody: notAuthorizedB,
+				}),
+			]),
+			path(uidA, [
 				get({
 					status: 404,
 					contentType: ContentTypes.ApplicationJson,
@@ -55,7 +65,8 @@ export function getUserApiTests(
 
 	function putUserTests(): RequestTest[] {
 		return [
-			path('unknownUserId', putUnknownUserTests()),
+			path(uidZ, putUnknownUserTests()),
+			path(uidA, putUserATests()),
 		]
 	}
 
@@ -79,13 +90,25 @@ export function getUserApiTests(
 			}),
 			put({
 				name: 'email not verified',
-				before: emailNotVerified(verifyAuthHeaderMock),
-				request: validTokenUnverifiedEmailRequest,
+				before: emailNotVerifiedUidB(verifyAuthHeaderMock),
+				request: validTokenUnverifiedEmailUidBRequest,
 				authorized: false,
 				status: 403,
 				contentType: ContentTypes.ApplicationJson,
-				resBody: /not authorized/,
+				resBody: notAuthorizedA,
 			}),
+			put({
+				name: `uid mismatch - JWT has ${uidA} but path has ${uidZ}`,
+				request: validTokenVerifiedEmailUidARequest,
+				status: 403,
+				contentType: ContentTypes.ApplicationJson,
+				resBody: notAuthorizedB,
+			}),
+		]
+	}
+
+	function putUserATests() {
+		return [
 			...putValidationTests('displayName', [{
 				name: 'invalid display name type',
 				body: {displayName: ['a', 'a', 'a', 'a', 'a,']},
@@ -110,27 +133,4 @@ const displayNameMustBeBetween1And42 = {
 
 const displayNameMustGte1 = {
 	length: 'displayName must be longer than or equal to 1 characters',
-}
-
-const fakeTokenRequest = {
-	headers: {
-		Authorization: 'Bearer fake-token',
-	},
-	body: {},
-}
-
-const validTokenUnverifiedEmailRequest = {
-	headers: {
-		Authorization: 'Bearer valid-token-but-email-not-verified',
-	},
-	body: {},
-}
-
-const emptyObjectBodyRequest = {body: {}}
-
-function emailNotVerified(verifyAuthHeaderMock: VerifyAuthHeaderMock) {
-	return () => verifyAuthHeaderMock.mockResolvedValue({
-		authenticated: true,
-		emailVerified: false,
-	})
 }

@@ -39,3 +39,50 @@ export function putValidationTests(
 		})
 	})
 }
+
+export const uidA = 'uidA'
+export const uidB = 'uidB'
+export const uidZ = 'uidZ'
+
+export function emailNotVerifiedUidB(
+	verifyAuthHeaderMock: VerifyAuthHeaderMock
+) {
+	return () => verifyAuthHeaderMock.mockResolvedValue({
+		authenticated: true,
+		emailVerified: false,
+		uid: uidB,
+	})
+}
+
+export function emailVerifiedUidA(
+	verifyAuthHeaderMock: VerifyAuthHeaderMock
+) {
+	return () => verifyAuthHeaderMock.mockResolvedValue({
+		authenticated: true,
+		emailVerified: true,
+		uid: uidA,
+	})
+}
+
+export const fakeTokenRequest = {
+	headers: {
+		Authorization: 'Bearer fake-token',
+	},
+	body: {},
+}
+
+export const validTokenUnverifiedEmailUidBRequest = {
+	headers: {
+		Authorization: 'Bearer valid-token-but-email-not-verified-uidB',
+	},
+	body: {},
+}
+
+export const validTokenVerifiedEmailUidARequest = {
+	headers: {
+		Authorization: 'Bearer valid-token-but-email-not-verified-uidA',
+	},
+	body: {},
+}
+
+export const emptyObjectBodyRequest = {body: {}}
