@@ -9,9 +9,10 @@ export function getUserApiTests(
 	verifyAuthHeaderMock: VerifyAuthHeaderMock
 ): RequestTest[] {
 	return [
-		path('count', countTests()),
-		path('unknownUserId', unknownUserIdTests()),
 		path('', emptyPathTests()),
+		path('count', countTests()),
+		...getUserTests(),
+		...putUserTests(),
 	]
 
 	function emptyPathTests(): RequestTest[] {
@@ -40,7 +41,25 @@ export function getUserApiTests(
 		]
 	}
 
-	function unknownUserIdTests(): RequestTest[] {
+	function getUserTests(): RequestTest[] {
+		return [
+			path('unknownUserId', [
+				get({
+					status: 404,
+					contentType: ContentTypes.ApplicationJson,
+					resBody: userNotFound,
+				}),
+			]),
+		]
+	}
+
+	function putUserTests(): RequestTest[] {
+		return [
+			path('unknownUserId', putUnknownUserTests()),
+		]
+	}
+
+	function putUnknownUserTests(): RequestTest[] {
 		return [
 			put({
 				name: 'missing Authorization header',
@@ -66,11 +85,6 @@ export function getUserApiTests(
 				status: 403,
 				contentType: ContentTypes.ApplicationJson,
 				resBody: /not authorized/,
-			}),
-			get({
-				status: 404,
-				contentType: ContentTypes.ApplicationJson,
-				resBody: userNotFound,
 			}),
 			...putValidationTests('displayName', [{
 				name: 'invalid display name type',
