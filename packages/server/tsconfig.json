@@ -10,7 +10,6 @@
 		"target": "esnext",
 		"module": "commonjs",
 		"lib": [
-			"dom",
 			"es7"
 		],
 		"experimentalDecorators": true,
