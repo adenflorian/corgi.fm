@@ -1,6 +1,41 @@
+import {RequestTest, put, ContentTypes} from '@corgifm/api-tester'
 import * as serverAuth from '../auth/server-auth'
 
 export const apiRouteNotFound = /couldn't find an api route/
 
 export type VerifyAuthHeaderMock =
 	jest.Mock<ReturnType<typeof serverAuth.verifyAuthHeader>>
+
+export interface ValidationTest {
+	name: string
+	body: {[key: string]: any}
+	constraints: object
+}
+
+/** Reduces boilerplate for writing validation tests */
+export function putValidationTests(
+	property: string,
+	tests: ValidationTest[]
+) {
+	// eslint-disable-next-line @typescript-eslint/promise-function-async
+	return tests.map((t): RequestTest => {
+		return put({
+			name: t.name,
+			contentType: ContentTypes.ApplicationJson,
+			resBody: {
+				validationError: [
+					{
+						value: t.body[property],
+						property,
+						children: [],
+						constraints: t.constraints,
+					},
+				],
+			},
+			status: 400,
+			request: {
+				body: t.body,
+			},
+		})
+	})
+}
