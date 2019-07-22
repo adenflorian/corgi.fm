@@ -219,6 +219,9 @@ It's just following the values of the sine, really, but you can adjust as you se
 Yes, https://mmckegg.github.io/web-audio-school/, exercise 13 is exactly what you need
 
 # 0.6.0
+- [ ] https://github.com/TheLarkInn/Front-End-Checklist
+- [ ] https://developers.google.com/web/progressive-web-apps/checklist
+- [ ] https://12factor.net/
 - [ ] https://github.com/koajs/compress
 - [ ] refactor / clean code
 	- [ ] convert all components to function components with hooks

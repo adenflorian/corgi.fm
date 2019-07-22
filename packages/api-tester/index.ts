@@ -65,7 +65,7 @@ type RequiredField<T, K extends keyof T> = {
 
 interface PutRequest extends RequiredField<TestRequest, 'request'> {}
 
-type RequestTest =
+export type RequestTest =
 	(getApp: GetApp, path: string, options: TestApiOptions) => void
 
 type GetApp = () => Server
