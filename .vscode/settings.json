@@ -131,6 +131,7 @@
         "unmock",
         "unpress",
         "unselectable",
+        "upsert",
         "uuidv",
         "wasm",
         "wavetable",

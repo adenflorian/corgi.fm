@@ -52,7 +52,7 @@
 		"@types/koa__router": "^8.0.0",
 		"@types/lodash": "^4.14.119",
 		"@types/moment": "^2.13.0",
-		"@types/mongodb": "^3.1.28",
+		"@types/mongodb": "^3.1.29",
 		"@types/mongodb-memory-server": "^1.8.0",
 		"@types/redux": "^3.6.0",
 		"@types/sinon": "^7.0.0",

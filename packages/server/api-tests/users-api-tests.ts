@@ -1,14 +1,20 @@
 import {
 	RequestTest, path, get, put, ContentTypes,
 } from '@corgifm/api-tester'
+import {User} from '@corgifm/common/models/User'
+import {DBStore} from '../database/database'
 import {
-	apiRouteNotFound, VerifyAuthHeaderMock, putValidationTests, emailNotVerifiedUidB, emptyObjectBodyRequest, fakeTokenRequest, validTokenUnverifiedEmailUidBRequest, validTokenVerifiedEmailUidARequest, uidZ, uidA,
+	apiRouteNotFound, VerifyAuthHeaderMock, putValidationTests,
+	emailNotVerifiedUidB, emptyObjectBodyRequest, fakeTokenRequest,
+	validTokenUnverifiedEmailUidBRequest, validTokenVerifiedEmailUidARequest,
+	uidZ, uidA,
 } from './api-test-common'
 
 const notAuthorizedA = /not authorized A/
 const notAuthorizedB = /not authorized B/
 
 export function getUserApiTests(
+	getDb: () => DBStore,
 	verifyAuthHeaderMock: VerifyAuthHeaderMock
 ): RequestTest[] {
 	return [
@@ -60,6 +66,21 @@ export function getUserApiTests(
 					resBody: userNotFound,
 				}),
 			]),
+			path(uidA, [
+				get({
+					before: async () => {
+						await getDb().users.updateOrCreate({
+							displayName: 'userAlpha',
+						}, uidA)
+					},
+					status: 200,
+					contentType: ContentTypes.ApplicationJson,
+					resBody: ((): User => ({
+						displayName: 'userAlpha',
+						uid: uidA,
+					}))(),
+				}),
+			]),
 		]
 	}
 
@@ -98,7 +119,7 @@ export function getUserApiTests(
 				resBody: notAuthorizedA,
 			}),
 			put({
-				name: `uid mismatch - JWT has ${uidA} but path has ${uidZ}`,
+				name: `uid mismatch - JWT has uidA but path has uidZ`,
 				request: validTokenVerifiedEmailUidARequest,
 				status: 403,
 				contentType: ContentTypes.ApplicationJson,
@@ -118,6 +139,21 @@ export function getUserApiTests(
 				body: {displayName: ''},
 				constraints: displayNameMustGte1,
 			}]),
+			put({
+				name: 'successful update2',
+				request: {
+					body: {displayName: 'user_A'},
+				},
+				contentType: null,
+				status: 204,
+				resBody: null,
+				after: async () => {
+					expect(await getDb().users.getByUid(uidA)).toEqual({
+						uid: uidA,
+						displayName: 'user_A',
+					})
+				},
+			}),
 		]
 	}
 }

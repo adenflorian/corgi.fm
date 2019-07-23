@@ -10,6 +10,7 @@ export interface ValidationTest {
 	name: string
 	body: {[key: string]: any}
 	constraints: object
+	log?: boolean
 }
 
 /** Reduces boilerplate for writing validation tests */
@@ -36,13 +37,14 @@ export function putValidationTests(
 			request: {
 				body: t.body,
 			},
+			log: t.log || false,
 		})
 	})
 }
 
-export const uidA = 'uidA'
-export const uidB = 'uidB'
-export const uidZ = 'uidZ'
+export const uidA = 'uidA567890123456789012345678'
+export const uidB = 'uidB567890123456789012345678'
+export const uidZ = 'uidZ567890123456789012345678'
 
 export function emailNotVerifiedUidB(
 	verifyAuthHeaderMock: VerifyAuthHeaderMock

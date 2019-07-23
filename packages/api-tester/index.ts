@@ -3,10 +3,11 @@ import {Server} from 'http'
 import * as supertest from 'supertest'
 import {oneLine} from 'common-tags'
 import chalk from 'chalk'
+import {logger} from '@corgifm/common/logger'
 
 export enum ContentTypes {
 	ApplicationJson = 'application/json',
-	TextHtml = 'text/html'
+	TextHtml = 'text/html',
 }
 
 enum Method {
@@ -30,8 +31,8 @@ interface TestRequest {
 	readonly authorized?: boolean
 	readonly headers?: HeadersAssert
 	readonly status: Status
-	readonly contentType: ContentTypes
-	readonly resBody: number | object | RegExp
+	readonly contentType: ContentTypes | null
+	readonly resBody: number | object | RegExp | null
 	readonly log?: boolean
 	readonly before?: () => any
 	readonly after?: () => any
@@ -204,7 +205,11 @@ function doTest(
 
 	if (contentType) {
 		theTest = theTest.expect(
-			Header.ContentType, ContentTypeRegEx(args.contentType))
+			Header.ContentType, ContentTypeRegEx(contentType))
+	} else {
+		theTest = theTest.expect(res => {
+			expect(res.header).not.toHaveProperty(Header.ContentType)
+		})
 	}
 
 	if (headers) {
@@ -222,7 +227,13 @@ function doTest(
 	// eslint-disable-next-line @typescript-eslint/no-floating-promises
 	theTest
 		.end(async (err, res) => {
-			after()
+			try {
+				// eslint-disable-next-line @typescript-eslint/await-thenable
+				await after()
+			} catch (error) {
+				logger.error('Error caught in the after hook: ', error)
+				throw error
+			}
 
 			if (authorized && options.authorizedRequests.after) {
 				options.authorizedRequests.after()

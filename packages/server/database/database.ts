@@ -3,6 +3,7 @@ import {ThenArg} from '@corgifm/common/common-types'
 import {logger} from '@corgifm/common/logger'
 import {getDbConnector} from '../server-config'
 import {eventsQueries} from './events'
+import {usersQueries} from './users'
 
 export type DBStore = ThenArg<typeof connectDB>
 
@@ -12,6 +13,10 @@ export const dummyDb: DBStore = {
 	async close() {/* noop */},
 	events: {
 		async saveUserConnectEventAsync() {return 0},
+	},
+	users: {
+		async updateOrCreate() {return},
+		async getByUid() {return null},
 	},
 }
 
@@ -28,6 +33,7 @@ export async function connectDB() {
 
 	return {
 		events: eventsQueries(db),
+		users: usersQueries(db),
 		async close() {
 			await client.close()
 			await stop()

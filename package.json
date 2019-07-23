@@ -18,7 +18,8 @@
     "start-prod": "pm2 start ecosystem.config.js --env prod",
     "lint": "eslint_d . --ext .js,.ts,.jsx,.tsx --ignore-path .gitignore --color --cache",
     "lint-watch": "watch \"echo linting... && (eslint_d . --ext .js,.ts,.jsx,.tsx --ignore-path .gitignore --cache --format compact || true) && echo done!\" packages",
-    "test": "jest -i --no-cache",
+    "test": "jest -i",
+    "test-server": "jest -i --config packages/server/jest.config.js",
     "clean": "rm -rf .cache built dist *.log .eslintcache && jest --clearCache",
     "deploy-test": "yarn version --patch && yarn build && bash scripts/deploy-test.sh",
     "deploy-prod": "yarn version --patch && yarn build && bash scripts/deploy-prod.sh",
@@ -29,34 +30,6 @@
     "build-other": "cp package.json yarn.lock lerna.json packages/server/ecosystem.config.js built && cp packages/public/* built/packages/public",
     "setup-test-server": "bash scripts/setup-test-server.sh",
     "setup-prod-server": "bash scripts/setup-prod-server.sh"
-  },
-  "jest": {
-    "projects": [
-      {
-        "displayName": "client",
-        "preset": "ts-jest",
-        "testEnvironment": "jsdom",
-        "rootDir": "packages/client"
-      },
-      {
-        "displayName": "common",
-        "preset": "ts-jest",
-        "testEnvironment": "node",
-        "rootDir": "packages/common"
-      },
-      {
-        "displayName": "server",
-        "preset": "ts-jest",
-        "testEnvironment": "node",
-        "rootDir": "packages/server"
-      },
-      {
-        "displayName": "api-tester",
-        "preset": "ts-jest",
-        "testEnvironment": "node",
-        "rootDir": "packages/api-tester"
-      }
-    ]
   },
   "dependencies": {},
   "devDependencies": {

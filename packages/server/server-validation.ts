@@ -12,19 +12,28 @@ export function validate<T extends object>(
 	targetClass: ClassType<T>, callback: ValidateCB<T>
 ) {
 	return async (ctx: Context): Promise<T> => {
-		const transformed = plainToClass(targetClass, ctx.request.body)
-
-		await validateOrRejectCustom(transformed)
-
-		return callback(ctx, transformed)
+		return callback(
+			ctx,
+			await transformAndValidate(targetClass, ctx.request.body))
 	}
 }
 
-async function validateOrRejectCustom(object: object) {
+export async function transformAndValidate<T extends object>(
+	targetClass: ClassType<T>, data: any,
+): Promise<T> {
+	return validateOrRejectCustom(
+		plainToClass(targetClass, data))
+}
+
+async function validateOrRejectCustom<T>(object: T): Promise<T> {
 	await validateOrReject(object, {
 		validationError: {
 			target: false,
 		},
 		forbidUnknownValues: true,
+		// forbidNonWhitelisted: true,
+		whitelist: true,
 	})
+
+	return object
 }

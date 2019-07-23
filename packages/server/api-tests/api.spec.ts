@@ -31,6 +31,7 @@ describe('API Tests', () => {
 	let db: DBStore
 	let app: Server
 	const getApp = () => app
+	const getDb = () => db
 
 	beforeAll(async () => {
 		db = await connectDB()
@@ -141,7 +142,7 @@ describe('API Tests', () => {
 						resBody: apiRouteNotFound,
 					}),
 				]),
-				path('users', getUserApiTests(verifyAuthHeaderMock)),
+				path('users', getUserApiTests(getDb, verifyAuthHeaderMock)),
 			]),
 		], {
 			authorizedRequests: {

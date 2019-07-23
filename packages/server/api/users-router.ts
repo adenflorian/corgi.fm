@@ -1,5 +1,5 @@
 import {selectAllClients} from '@corgifm/common/redux'
-import {User} from '@corgifm/common/models/User'
+import {UserUpdate} from '@corgifm/common/models/User'
 import * as Router from '@koa/router'
 import {Context} from 'koa'
 import {ServerStore} from '../server-redux-types'
@@ -15,7 +15,7 @@ export const usersRouter = (
 	const secureRouter = new Router()
 		.use(requireEmailVerifiedUser)
 		.get('/:uid', checkUid, getUser)
-		.put('/:uid', checkUid, validate(User, putUser))
+		.put('/:uid', checkUid, validate(UserUpdate, putUser))
 
 	const publicRouter = new Router()
 		.get(`/count`, getCount)
@@ -28,21 +28,24 @@ export const usersRouter = (
 	}
 
 	async function getUser(ctx: Context) {
-		// if user not found, return 404
-		// if not data for user, return empty object
-		// otherwise return data
-		ctx.status = 404
-		ctx.body = {
-			message: `userNotFound`,
+		const user = await dbStore.users.getByUid(ctx.params.uid)
+
+		if (user === null) {
+			ctx.status = 404
+			ctx.body = {
+				message: `userNotFound`,
+			}
+		} else {
+			ctx.status = 200
+			ctx.body = user
 		}
 	}
 
-	async function putUser(ctx: Context, user: User) {
-		// save to DB and return 200
-		ctx.status = 501
+	async function putUser(ctx: Context, user: UserUpdate) {
+		// save to DB and return 204
+		// TODO I don't like that we're pulling the uid out of the params here
+		await dbStore.users.updateOrCreate(user, ctx.params.uid)
 
-		ctx.body = {
-			user: user.displayName.toUpperCase(),
-		}
+		ctx.status = 204
 	}
 }
