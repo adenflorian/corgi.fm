@@ -14,6 +14,11 @@ export const handleError = async (
 			ctx.body = {
 				validationError: error,
 			}
+		} else if (error instanceof CorgiBadRequestError) {
+			ctx.status = 400
+			ctx.body = {
+				message: error.message,
+			}
 		} else {
 			Sentry.withScope(scope => {
 				scope.addEventProcessor(event => {
@@ -34,4 +39,8 @@ export const handleError = async (
 			})
 		}
 	}
+}
+
+/** Message will be displayed to user */
+export class CorgiBadRequestError extends Error {
 }

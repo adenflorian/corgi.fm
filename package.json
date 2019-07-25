@@ -20,6 +20,7 @@
     "lint-watch": "watch \"echo linting... && (eslint_d . --ext .js,.ts,.jsx,.tsx --ignore-path .gitignore --cache --format compact || true) && echo done!\" packages",
     "test": "jest -i",
     "test-server": "jest -i --config packages/server/jest.config.js",
+    "test-api": "yarn test-server --testPathPattern api",
     "clean": "rm -rf .cache built dist *.log .eslintcache && jest --clearCache",
     "deploy-test": "yarn version --patch && yarn build && bash scripts/deploy-test.sh",
     "deploy-prod": "yarn version --patch && yarn build && bash scripts/deploy-prod.sh",
