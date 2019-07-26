@@ -1,17 +1,16 @@
 import * as path from 'path'
 import * as Koa from 'koa'
-import {apiResourcePathName} from '@corgifm/common/common-constants'
 import * as cors from '@koa/cors'
 import * as Router from '@koa/router'
 import * as send from 'koa-send'
 import * as serve from 'koa-static'
 import * as bodyParser from 'koa-bodyparser'
 import {stateRouter} from './api/state-router'
-import {apiRouter} from './api/api-router'
 import {DBStore} from './database/database'
 import {isProdServer, isLocalDevServer} from './is-prod-server'
 import {ServerStore} from './server-redux-types'
 import {handleError} from './api-error'
+import {apiRouter} from './api/api-router'
 
 export async function setupExpressApp(
 	serverStore: ServerStore,
@@ -45,10 +44,7 @@ export async function setupExpressApp(
 		})
 	}
 
-	const apiThing = apiRouter(serverStore, dbStore)
-
-	router.use(`/${apiResourcePathName}`,
-		apiThing.routes(), apiThing.allowedMethods())
+	router.use('/api', apiRouter(serverStore, dbStore))
 
 	router.get('/*', async (ctx, next) => {
 		await send(ctx, '/index.html', {

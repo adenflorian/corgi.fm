@@ -1,29 +1,46 @@
-import {usersResourcePathName} from '@corgifm/common/common-constants'
-import * as Router from '@koa/router'
+import {logger} from '@corgifm/common/logger'
+import {Context} from 'koa'
+import {selectAllClients} from '@corgifm/common/redux'
+import {Next} from '../server-types'
 import {ServerStore} from '../server-redux-types'
 import {DBStore} from '../database/database'
-import {usersRouter} from './users-router'
 
-export const apiRouter = (
-	serverStore: ServerStore,
-	dbStore: DBStore,
-): Router => {
-	const router = new Router()
+enum Method {
+	GET = 'GET',
+	PUT = 'PUT',
+}
 
-	const usersThing = usersRouter(serverStore, dbStore)
+export function apiRouter(serverStore: ServerStore, dbStore: DBStore) {
+	return async (ctx: Context, next: Next) => {
+		logger.log('Hello API!')
 
-	router.use(
-		'/' + usersResourcePathName,
-		usersThing.routes(),
-		usersThing.allowedMethods())
-
-	router.all('/*', ctx => {
-		ctx.status = 404
-
-		ctx.body = {
-			message: `couldn't find an api route matching ${ctx.method} ${ctx.path}`,
+		if (!isSupportedMethod(ctx.method)) {
+			return ctx.status = 405
 		}
-	})
 
-	return router
+		if (!ctx.path.startsWith('/api/')) {
+			throw new Error(`this shouldn't happen`)
+		}
+
+		const method: Method = ctx.method
+		const path = ctx.path.replace(/^\/api/, '')
+
+		logger.log('Hello API!', {method, path})
+
+		if (path === '/users/count' && method === Method.GET) {
+			ctx.status = 200
+			ctx.body = selectAllClients(serverStore.getState()).length
+			return
+		}
+
+		ctx.status = 404
+		ctx.body = {
+			message: `couldn't find an api route`,
+		}
+		return
+	}
+}
+
+function isSupportedMethod(method: string): method is Method {
+	return method in Method
 }
