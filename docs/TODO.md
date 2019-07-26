@@ -78,6 +78,9 @@
 - [ ] show message to user if an error is detected (like if console.error was called)
 - [ ] GIFs synced with song
 
+# MIDI
+- [ ] handle sustain pedal
+
 # Optimizations
 - [√] use debounce for some network updates like mouse cursors and node positions?
 
