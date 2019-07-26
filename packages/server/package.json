@@ -31,6 +31,7 @@
 		"midi-writer-js": "^1.6.0",
 		"moment": "^2.24.0",
 		"mongodb": "^3.2.7",
+		"path-to-regexp": "^3.0.0",
 		"pkginfo": "^0.4.1",
 		"redux": "^4.0.0",
 		"reselect": "^3.0.1",

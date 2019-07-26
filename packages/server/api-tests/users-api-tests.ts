@@ -4,14 +4,14 @@ import {
 import {User} from '@corgifm/common/models/User'
 import {DBStore} from '../database/database'
 import {
-	apiRouteNotFound, VerifyAuthHeaderMock, putValidationTests,
+	VerifyAuthHeaderMock, putValidationTests,
 	emailNotVerifiedUidB, emptyObjectBodyRequest, fakeTokenRequest,
 	validTokenUnverifiedEmailUidBRequest, validTokenVerifiedEmailUidARequest,
 	uidZ, uidA,
 } from './api-test-common'
 
 const notAuthorizedA = /not authorized A/
-const notAuthorizedB = /not authorized B/
+const notAuthorizedB = /not authorized to access this user/
 
 export function getUserApiTests(
 	getDb: () => DBStore,
@@ -27,14 +27,14 @@ export function getUserApiTests(
 	function emptyPathTests(): RequestTest[] {
 		return [
 			get({
-				status: 404,
+				status: 403,
 				contentType: ContentTypes.ApplicationJson,
-				resBody: apiRouteNotFound,
+				resBody: notAuthorizedB,
 			}),
 			put({
-				status: 404,
+				status: 403,
 				contentType: ContentTypes.ApplicationJson,
-				resBody: apiRouteNotFound,
+				resBody: notAuthorizedB,
 				request: {body: {}},
 			}),
 		]
@@ -54,6 +54,7 @@ export function getUserApiTests(
 		return [
 			path(uidZ, [
 				get({
+					name: 'different uid in path than in JWT',
 					status: 403,
 					contentType: ContentTypes.ApplicationJson,
 					resBody: notAuthorizedB,
@@ -61,6 +62,7 @@ export function getUserApiTests(
 			]),
 			path(uidA, [
 				get({
+					name: 'user not in DB',
 					status: 404,
 					contentType: ContentTypes.ApplicationJson,
 					resBody: userNotFound,

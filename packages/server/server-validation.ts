@@ -1,25 +1,24 @@
-import {Context} from 'koa'
 import {ClassType} from 'class-transformer/ClassTransformer'
 import {plainToClass} from 'class-transformer'
 import {validateOrReject} from 'class-validator'
+import {ApiRequest, ApiResponse} from './api/api-types'
 
-type ValidateCB<T> = (ctx: Context, x: T) => Promise<any>
-
-/** Returns middleware that will transform and validate the request body.
- * Validation errors will cause a rejection that you can handle in higher
- * up middleware. */
-export function validate<T extends object>(
-	targetClass: ClassType<T>, callback: ValidateCB<T>
+/** Transforms and validates the request body which is passed to the
+ * given router. Validation errors will cause a rejection that you can
+ * handle in higher up middleware. */
+export async function validateBodyThenRoute
+<T extends object, R extends ApiRequest>(
+	targetClass: ClassType<T>,
+	router: (request: R, body: T) => Promise<ApiResponse>,
+	request: R,
 ) {
-	return async (ctx: Context): Promise<T> => {
-		return callback(
-			ctx,
-			await transformAndValidate(targetClass, ctx.request.body))
-	}
+	const result = await transformAndValidate(targetClass, request.body)
+
+	return router(request, result)
 }
 
 export async function transformAndValidate<T extends object>(
-	targetClass: ClassType<T>, data: any,
+	targetClass: ClassType<T>, data: unknown,
 ): Promise<T> {
 	return validateOrRejectCustom(
 		plainToClass(targetClass, data))
