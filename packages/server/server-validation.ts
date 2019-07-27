@@ -24,13 +24,23 @@ export async function transformAndValidate<T extends object>(
 		plainToClass(targetClass, data))
 }
 
+export async function transformAndValidateDbResult<T extends object>(
+	targetClass: ClassType<T>, data: unknown,
+): Promise<T> {
+	return transformAndValidate(targetClass, data)
+		.catch(error => {
+			throw new Error(
+				'[transformAndValidateDbResult] error while validating data from DB: '
+				+ JSON.stringify(error, null, 2))
+		})
+}
+
 async function validateOrRejectCustom<T>(object: T): Promise<T> {
 	await validateOrReject(object, {
 		validationError: {
 			target: false,
 		},
 		forbidUnknownValues: true,
-		// forbidNonWhitelisted: true,
 		whitelist: true,
 	})
 

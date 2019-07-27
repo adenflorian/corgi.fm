@@ -9,14 +9,13 @@ export type VerifyAuthHeaderMock =
 export interface ValidationTest<TModel> {
 	name: string
 	body: TModel
-	constraints: object
+	constraints: {[K in keyof TModel]: object}
 	log?: boolean
 }
 
 /** Reduces boilerplate for writing validation tests */
 export function putValidationTests
-<TModel extends object, TKey extends keyof TModel>(
-	property: TKey,
+<TModel extends object>(
 	tests: ValidationTest<TModel>[]
 ) {
 	// eslint-disable-next-line @typescript-eslint/promise-function-async
@@ -25,14 +24,16 @@ export function putValidationTests
 			name: t.name,
 			contentType: ContentTypes.ApplicationJson,
 			resBody: {
-				validationError: [
-					{
+				validationError: Object.keys(t.body).map(property => {
+					return {
+						// @ts-ignore
 						value: t.body[property],
 						property,
 						children: [],
-						constraints: t.constraints,
-					},
-				],
+						// @ts-ignore
+						constraints: t.constraints[property],
+					}
+				}),
 			},
 			status: 400,
 			request: {

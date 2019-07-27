@@ -1,13 +1,13 @@
 import {
 	RequestTest, path, get, put, ContentTypes,
 } from '@corgifm/api-tester'
-import {User, UserUpdate} from '@corgifm/common/models/User'
+import {User, UserUpdate, makeUser} from '@corgifm/common/models/User'
 import {DBStore} from '../database/database'
 import {
-	VerifyAuthHeaderMock, putValidationTests,
+	VerifyAuthHeaderMock,
 	emailNotVerifiedUidB, emptyObjectBodyRequest, fakeTokenRequest,
 	validTokenUnverifiedEmailUidBRequest, validTokenVerifiedEmailUidARequest,
-	uidZ, uidA,
+	uidZ, uidA, putValidationTests,
 } from './api-test-common'
 
 const notAuthorizedA = /not authorized A/
@@ -73,6 +73,7 @@ export function getUserApiTests(
 					before: async () => {
 						await getDb().users.updateOrCreate({
 							displayName: 'userAlpha',
+							color: '#FFFFFF',
 						}, uidA)
 					},
 					status: 200,
@@ -80,6 +81,7 @@ export function getUserApiTests(
 					resBody: ((): User => ({
 						displayName: 'userAlpha',
 						uid: uidA,
+						color: '#FFFFFF',
 					}))(),
 				}),
 			]),
@@ -132,28 +134,36 @@ export function getUserApiTests(
 
 	function putUserATests() {
 		return [
-			...putValidationTests<UserUpdate, 'displayName'>('displayName', [{
+			...putValidationTests<UserUpdate>([{
 				name: 'too long display name',
-				body: {displayName: '123456789012345678901234567890123456789012345678'},
-				constraints: displayNameMustLte42,
+				body: {
+					displayName: '123456789012345678901234567890123456789012345678',
+					color: 'red',
+				},
+				constraints: {
+					displayName: displayNameMustLte42,
+					color: colorMustBeHex,
+				},
 			}, {
 				name: 'too short display name',
-				body: {displayName: ''},
-				constraints: displayNameMustGte1,
+				body: {displayName: '', color: ''},
+				constraints: {
+					displayName: displayNameMustGte1,
+					color: colorMustBeHex,
+				},
 			}]),
 			put<UserUpdate>({
 				name: 'successful update2',
 				request: {
-					body: {displayName: 'user_A'},
+					body: {displayName: 'user_A', color: '#DDDDDD'},
 				},
-				contentType: null,
 				status: 204,
-				resBody: null,
 				after: async () => {
-					expect(await getDb().users.getByUid(uidA)).toEqual({
+					expect(await getDb().users.getByUid(uidA)).toEqual(makeUser({
 						uid: uidA,
 						displayName: 'user_A',
-					})
+						color: '#DDDDDD',
+					}))
 				},
 			}),
 		]
@@ -166,8 +176,12 @@ const userNotFound = {
 
 const displayNameMustLte42 = {
 	length: 'displayName must be shorter than or equal to 42 characters',
-}
+} as const
+
+const colorMustBeHex = {
+	matches: 'color must match /#[0-9A-F]{6}/ regular expression',
+} as const
 
 const displayNameMustGte1 = {
 	length: 'displayName must be longer than or equal to 1 characters',
-}
+} as const

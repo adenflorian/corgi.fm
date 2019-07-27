@@ -25,19 +25,24 @@ function ContentTypeRegEx(type: ContentTypes): RegExp {
 	}
 }
 
-interface TestRequest<TModel = object> {
+type TestRequest<TModel = object> = {
 	readonly name?: string
 	/** Defaults to true */
 	readonly authorized?: boolean
 	readonly headers?: HeadersAssert
-	readonly status: Status
-	readonly contentType: ContentTypes | null
-	readonly resBody: number | object | RegExp | null
 	readonly log?: boolean
 	readonly before?: () => any
 	readonly after?: () => any
 	readonly request?: RequestArgs<TModel>
-}
+} & ({
+	readonly status: Exclude<Status, 204>
+	readonly contentType: ContentTypes
+	readonly resBody: number | object | RegExp
+} | {
+	readonly status: 204
+	readonly contentType?: undefined
+	readonly resBody?: undefined
+})
 
 interface RequestArgs<TModel = object> {
 	readonly headers?: Headers
@@ -64,7 +69,7 @@ type RequiredField<T, K extends keyof T> = {
 	[P in K]-?: T[P];
 } & T
 
-interface PutRequest<TModel> extends RequiredField<TestRequest<TModel>, 'request'> {}
+type PutRequest<TModel> = RequiredField<TestRequest<TModel>, 'request'>
 
 export type RequestTest =
 	(getApp: GetApp, path: string, options: TestApiOptions) => void
