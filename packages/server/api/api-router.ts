@@ -1,34 +1,17 @@
 import {Context} from 'koa'
-import * as pathToRegexp from 'path-to-regexp'
-import {selectAllClients} from '@corgifm/common/redux'
-import {UserUpdate} from '@corgifm/common/models/User'
-import {Next} from '../server-types'
 import {ServerStore} from '../server-redux-types'
 import {DBStore} from '../database/database'
-import {routeIfSecure} from '../security-middleware'
-import {validateBodyThenRoute} from '../server-validation'
+import {CorgiMethodNotAllowedError} from '../api-error'
 import {
-	isSupportedMethod, ApiRequest, ApiResponse, Method,
-	SecureApiRequest,
-	SecureUsersApiRequest,
+	isSupportedMethod, ApiRequest, ApiResponse, defaultResponse,
 } from './api-types'
+import {getUsersRouter} from './users-controller'
 
 export function apiRouter(serverStore: ServerStore, dbStore: DBStore) {
-	return async (ctx: Context, next: Next) => {
-		if (!isSupportedMethod(ctx.method)) {
-			return ctx.status = 405
-		}
+	const usersRouter = getUsersRouter(serverStore, dbStore)
 
-		if (!ctx.path.startsWith('/api/')) {
-			throw new Error(`this shouldn't happen`)
-		}
-
-		const request: ApiRequest = {
-			method: ctx.method,
-			path: ctx.path.replace(/^\/api/, ''),
-			headers: ctx.headers,
-			body: ctx.request.body,
-		}
+	return async (ctx: Context) => {
+		const request = createApiRequestFromContext(ctx)
 
 		const response: ApiResponse = await topRouter(request)
 
@@ -46,91 +29,21 @@ export function apiRouter(serverStore: ServerStore, dbStore: DBStore) {
 			return defaultResponse
 		}
 	}
-
-	async function usersRouter(request: ApiRequest): Promise<ApiResponse> {
-		if (request.path === '/users/count' && request.method === Method.GET) {
-			return {
-				status: 200,
-				body: selectAllClients(serverStore.getState()).length,
-			}
-		} else {
-			return routeIfSecure(request, secureUsersRouter)
-		}
-	}
-
-	async function secureUsersRouter(
-		request: SecureApiRequest
-	): Promise<ApiResponse> {
-		// assert path matches /users/:uid
-		const matches = usersUidPathRegEx.exec(request.path)
-		if (!matches) return pathUidMismatchResponse
-
-		// extract uid from path
-		const callerUid = request.callerUid
-		const pathUid = matches[1]
-
-		if (callerUid !== pathUid) {
-			return pathUidMismatchResponse
-		} else {
-			return secureUsersUidRouter({
-				...request,
-				pathUid,
-			})
-		}
-	}
-
-	async function secureUsersUidRouter(
-		request: SecureUsersApiRequest
-	): Promise<ApiResponse> {
-		if (request.method === Method.GET) {
-			return getUser(request)
-		} else if (request.method === Method.PUT) {
-			return validateBodyThenRoute(UserUpdate, putUser, request)
-		}
-		return defaultResponse
-	}
-
-	async function getUser(request: SecureUsersApiRequest): Promise<ApiResponse> {
-		const user = await dbStore.users.getByUid(request.pathUid)
-
-		if (user === null) {
-			return {
-				status: 404,
-				body: {
-					message: `userNotFound`,
-				},
-			}
-		} else {
-			return {
-				status: 200,
-				body: user,
-			}
-		}
-	}
-
-	async function putUser(
-		request: SecureUsersApiRequest, user: UserUpdate
-	): Promise<ApiResponse> {
-		await dbStore.users.updateOrCreate(user, request.pathUid)
-
-		return {
-			status: 204,
-		}
-	}
 }
 
-const usersUidPathRegEx = pathToRegexp('/users/:uid')
+function createApiRequestFromContext(ctx: Context): ApiRequest {
+	if (!isSupportedMethod(ctx.method)) {
+		throw new CorgiMethodNotAllowedError()
+	}
 
-const defaultResponse: ApiResponse = {
-	status: 404,
-	body: {
-		message: `couldn't find an api route`,
-	},
-}
+	if (!ctx.path.startsWith('/api/')) {
+		throw new Error(`this shouldn't happen`)
+	}
 
-const pathUidMismatchResponse: ApiResponse = {
-	status: 403,
-	body: {
-		message: 'not authorized to access this user',
-	},
+	return {
+		method: ctx.method,
+		path: ctx.path.replace(/^\/api/, ''),
+		headers: ctx.headers,
+		body: ctx.request.body,
+	}
 }

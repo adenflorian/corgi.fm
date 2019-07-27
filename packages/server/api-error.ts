@@ -19,6 +19,9 @@ export const handleError = async (
 			ctx.body = {
 				message: error.message,
 			}
+		} else if (error instanceof CorgiMethodNotAllowedError) {
+			ctx.status = 405
+			ctx.body = {}
 		} else {
 			Sentry.withScope(scope => {
 				scope.addEventProcessor(event => {
@@ -43,4 +46,8 @@ export const handleError = async (
 
 /** Message will be displayed to user */
 export class CorgiBadRequestError extends Error {
+}
+
+/** Message will be displayed to user */
+export class CorgiMethodNotAllowedError extends Error {
 }

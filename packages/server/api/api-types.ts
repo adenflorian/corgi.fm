@@ -50,3 +50,10 @@ export enum Header {
 export type Headers = {
 	[P in Header]?: string
 }
+
+export const defaultResponse: ApiResponse = {
+	status: 404,
+	body: {
+		message: `couldn't find an api route`,
+	},
+}
