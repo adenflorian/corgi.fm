@@ -7,6 +7,7 @@ import {transformAndValidate} from '../server-validation'
 const usersCollectionName = 'users'
 
 export const usersQueries = (db: Db) => ({
+	usersCollectionName,
 	async updateOrCreate(userUpdate: UserUpdate, uid: string) {
 		const startTime = Date.now()
 		logger.debug('updateOrCreate: ', {user: userUpdate})

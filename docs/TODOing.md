@@ -120,8 +120,15 @@
 	- [√] move test api stuff to own file
 - [ ] REST API
 	- [ ] users
-		- [ ] PUT
+		- [.] PUT
+			- [ ] display name
+			- [ ] color
+			- [ ] soundcloud
 		- [ ] GET :userId
+- [ ] REST Client
+	- [ ] users
+		- [ ] PUT
+		- [ ] GET
 - [ ] do stuff with accounts system
 	- [ ] save username
 		- [ ] on register

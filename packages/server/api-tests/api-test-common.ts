@@ -6,21 +6,22 @@ export const apiRouteNotFound = /couldn't find an api route/
 export type VerifyAuthHeaderMock =
 	jest.Mock<ReturnType<typeof serverAuth.verifyAuthHeader>>
 
-export interface ValidationTest {
+export interface ValidationTest<TModel> {
 	name: string
-	body: {[key: string]: any}
+	body: TModel
 	constraints: object
 	log?: boolean
 }
 
 /** Reduces boilerplate for writing validation tests */
-export function putValidationTests(
-	property: string,
-	tests: ValidationTest[]
+export function putValidationTests
+<TModel extends object, TKey extends keyof TModel>(
+	property: TKey,
+	tests: ValidationTest<TModel>[]
 ) {
 	// eslint-disable-next-line @typescript-eslint/promise-function-async
 	return tests.map((t): RequestTest => {
-		return put({
+		return put<TModel>({
 			name: t.name,
 			contentType: ContentTypes.ApplicationJson,
 			resBody: {

@@ -25,7 +25,7 @@ function ContentTypeRegEx(type: ContentTypes): RegExp {
 	}
 }
 
-interface TestRequest {
+interface TestRequest<TModel = object> {
 	readonly name?: string
 	/** Defaults to true */
 	readonly authorized?: boolean
@@ -36,13 +36,13 @@ interface TestRequest {
 	readonly log?: boolean
 	readonly before?: () => any
 	readonly after?: () => any
-	readonly request?: RequestArgs
+	readonly request?: RequestArgs<TModel>
 }
 
-interface RequestArgs {
+interface RequestArgs<TModel = object> {
 	readonly headers?: Headers
 	readonly contentType?: ContentTypes
-	readonly body: object
+	readonly body: TModel
 }
 
 export enum Header {
@@ -64,7 +64,7 @@ type RequiredField<T, K extends keyof T> = {
 	[P in K]-?: T[P];
 } & T
 
-interface PutRequest extends RequiredField<TestRequest, 'request'> {}
+interface PutRequest<TModel> extends RequiredField<TestRequest<TModel>, 'request'> {}
 
 export type RequestTest =
 	(getApp: GetApp, path: string, options: TestApiOptions) => void
@@ -124,7 +124,9 @@ export function get(args: TestRequest): RequestTest {
 }
 
 /** PUT */
-export function put(args: PutRequest): RequestTest {
+export function put<TModel extends object>(
+	args: PutRequest<TModel>
+): RequestTest {
 	return (getApp: GetApp, finalPath: string, options: TestApiOptions) => {
 		doRequest({
 			...args,
@@ -221,7 +223,13 @@ function doTest(
 	}
 
 	if (resBody) {
-		theTest = theTest.expect(resBody)
+		if (resBody instanceof RegExp) {
+			theTest = theTest.expect(resBody)
+		} else {
+			theTest = theTest.expect(res => {
+				expect(res.body).toEqual(resBody)
+			})
+		}
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-floating-promises

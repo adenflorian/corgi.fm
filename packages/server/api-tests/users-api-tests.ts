@@ -1,7 +1,7 @@
 import {
 	RequestTest, path, get, put, ContentTypes,
 } from '@corgifm/api-tester'
-import {User} from '@corgifm/common/models/User'
+import {User, UserUpdate} from '@corgifm/common/models/User'
 import {DBStore} from '../database/database'
 import {
 	VerifyAuthHeaderMock, putValidationTests,
@@ -132,16 +132,16 @@ export function getUserApiTests(
 
 	function putUserATests() {
 		return [
-			...putValidationTests('displayName', [{
-				name: 'invalid display name type',
-				body: {displayName: ['a', 'a', 'a', 'a', 'a,']},
-				constraints: displayNameMustBeBetween1And42,
+			...putValidationTests<UserUpdate, 'displayName'>('displayName', [{
+				name: 'too long display name',
+				body: {displayName: '123456789012345678901234567890123456789012345678'},
+				constraints: displayNameMustLte42,
 			}, {
 				name: 'too short display name',
 				body: {displayName: ''},
 				constraints: displayNameMustGte1,
 			}]),
-			put({
+			put<UserUpdate>({
 				name: 'successful update2',
 				request: {
 					body: {displayName: 'user_A'},
@@ -164,9 +164,8 @@ const userNotFound = {
 	message: `userNotFound`,
 } as const
 
-const displayNameMustBeBetween1And42 = {
-	length: 'displayName must be longer than or equal to 1 '
-		+ 'and shorter than or equal to 42 characters',
+const displayNameMustLte42 = {
+	length: 'displayName must be shorter than or equal to 42 characters',
 }
 
 const displayNameMustGte1 = {

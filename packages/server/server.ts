@@ -7,7 +7,7 @@ import {
 } from '@corgifm/common/redux'
 import {initSentryServer} from './analytics/sentry-server'
 import {createServerStuff} from './create-server-stuff'
-import {connectDB, DBStore, dummyDb} from './database/database'
+import {connectDB, DBStore} from './database/database'
 import {getServerEnv, isLocalDevServer, logServerEnv} from './is-prod-server'
 import {startRoomWatcher} from './room-watcher'
 import {setupServerWebSocketListeners} from './server-socket-listeners'
@@ -25,12 +25,13 @@ start()
 async function start() {
 	logServerEnv()
 
-	let dbStore: DBStore = dummyDb
+	let dbStore: DBStore
 
 	try {
 		dbStore = await connectDB()
 	} catch (error) {
-		logger.warn('failed to connect to database! ', error)
+		logger.error('failed to connect to database! ', error)
+		throw error
 	}
 
 	const serverStore = configureServerStore()

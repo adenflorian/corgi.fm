@@ -1,6 +1,5 @@
 import {Context} from 'koa'
 import * as pathToRegexp from 'path-to-regexp'
-import {logger} from '@corgifm/common/logger'
 import {selectAllClients} from '@corgifm/common/redux'
 import {UserUpdate} from '@corgifm/common/models/User'
 import {Next} from '../server-types'
@@ -16,8 +15,6 @@ import {
 
 export function apiRouter(serverStore: ServerStore, dbStore: DBStore) {
 	return async (ctx: Context, next: Next) => {
-		logger.log('Hello API!')
-
 		if (!isSupportedMethod(ctx.method)) {
 			return ctx.status = 405
 		}
@@ -32,8 +29,6 @@ export function apiRouter(serverStore: ServerStore, dbStore: DBStore) {
 			headers: ctx.headers,
 			body: ctx.request.body,
 		}
-
-		logger.log('Hello from the API router!', {request})
 
 		const response: ApiResponse = await topRouter(request)
 
@@ -73,7 +68,6 @@ export function apiRouter(serverStore: ServerStore, dbStore: DBStore) {
 		// extract uid from path
 		const callerUid = request.callerUid
 		const pathUid = matches[1]
-		logger.log('secureUsersRouter:', {callerUid, pathUid, matches})
 
 		if (callerUid !== pathUid) {
 			return pathUidMismatchResponse

@@ -9,17 +9,6 @@ export type DBStore = ThenArg<typeof connectDB>
 
 const dbName = 'test'
 
-export const dummyDb: DBStore = {
-	async close() {/* noop */},
-	events: {
-		async saveUserConnectEventAsync() {return 0},
-	},
-	users: {
-		async updateOrCreate() {return},
-		async getByUid() {return null},
-	},
-}
-
 export async function connectDB() {
 	const {uri, stop} = await getDbConnector()(dbName)
 
@@ -32,6 +21,7 @@ export async function connectDB() {
 	const db = client.db(dbName)
 
 	return {
+		db,
 		events: eventsQueries(db),
 		users: usersQueries(db),
 		async close() {

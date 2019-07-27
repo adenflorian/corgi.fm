@@ -17,16 +17,6 @@ const verifyAuthHeaderMock =
 	unknown as
 	jest.Mock<ReturnType<typeof serverAuth.verifyAuthHeader>>
 
-mockAuthToFail()
-
-function mockAuthToFail() {
-	verifyAuthHeaderMock.mockResolvedValue({
-		authenticated: false,
-		emailVerified: false,
-		uid: '',
-	})
-}
-
 describe('API Tests', () => {
 	let db: DBStore
 	let app: Server
@@ -38,8 +28,12 @@ describe('API Tests', () => {
 		app = (await setupExpressApp(configureServerStore(), db)).listen()
 	})
 
-	afterEach(() => {
+	beforeEach(() => {
 		mockAuthToFail()
+	})
+
+	afterEach(async () => {
+		await dropCollections()
 	})
 
 	afterAll(async () => {
@@ -151,4 +145,16 @@ describe('API Tests', () => {
 			},
 		})
 	})
+
+	function mockAuthToFail() {
+		verifyAuthHeaderMock.mockResolvedValue({
+			authenticated: false,
+			emailVerified: false,
+			uid: '',
+		})
+	}
+
+	async function dropCollections() {
+		await db.db.dropDatabase()
+	}
 })
