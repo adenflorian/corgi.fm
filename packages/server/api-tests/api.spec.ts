@@ -58,7 +58,7 @@ describe('API Tests', () => {
 					contentType: ContentTypes.ApplicationJson,
 					resBody: /something borked.*useful: [0-9a-z]{32}/,
 					before: logger.disable,
-					after: logger.enable,
+					after: async () => logger.enable(),
 				}),
 			]),
 			path('fake-path', [

@@ -1,5 +1,5 @@
 import {Context} from 'koa'
-import {Header} from '@corgifm/api-tester'
+import {Header} from '@corgifm/common/common-types'
 import {Next} from './server-types'
 import {verifyAuthHeader} from './auth/server-auth'
 import {

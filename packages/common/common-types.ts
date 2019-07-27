@@ -68,3 +68,14 @@ export type Octave = number
 export type RequiredField<T, K extends keyof T> = {
 	[P in K]-?: T[P];
 } & T
+
+export enum Header {
+	AccessControlAllowOrigin = 'access-control-allow-origin',
+	ContentType = 'content-type',
+	Origin = 'origin',
+	Authorization = 'authorization',
+}
+
+export type Headers = {
+	[P in Header]?: string
+}

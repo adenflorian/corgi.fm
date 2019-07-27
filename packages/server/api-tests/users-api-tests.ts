@@ -103,7 +103,7 @@ export function getUserApiTests(
 				authorized: false,
 				status: 401,
 				contentType: ContentTypes.ApplicationJson,
-				resBody: /missing Authorization header/,
+				resBody: /missing authorization header/,
 			}),
 			put({
 				name: 'invalid Authorization header',
@@ -155,14 +155,14 @@ export function getUserApiTests(
 			put<UserUpdate>({
 				name: 'successful update2',
 				request: {
-					body: {displayName: 'user_A', color: '#DDDDDD'},
+					body: {displayName: 'user_A', color: 'hsl(0, 19%, 100%)'},
 				},
 				status: 204,
 				after: async () => {
 					expect(await getDb().users.getByUid(uidA)).toEqual(makeUser({
 						uid: uidA,
 						displayName: 'user_A',
-						color: '#DDDDDD',
+						color: 'hsl(0, 19%, 100%)',
 					}))
 				},
 			}),
@@ -179,7 +179,10 @@ const displayNameMustLte42 = {
 } as const
 
 const colorMustBeHex = {
-	matches: 'color must match /#[0-9A-F]{6}/ regular expression',
+	matches: 'color must match '
+		+ '/^('
+		+ '#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})|'
+		+ 'hsl\\(\\d{1,3}, ?\\d{1,3}%, ?\\d{1,3}%\\))$/ regular expression',
 } as const
 
 const displayNameMustGte1 = {

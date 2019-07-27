@@ -1,6 +1,6 @@
 import {Db} from 'mongodb'
 import {UserUpdate, User} from '@corgifm/common/models/User'
-import {transformAndValidateDbResult} from '../server-validation'
+import {transformAndValidateDbResult} from '@corgifm/common/validation'
 
 export const usersQueries = (db: Db) => {
 	const usersCollection = db.collection('users')

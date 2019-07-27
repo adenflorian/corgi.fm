@@ -26,8 +26,8 @@ export function putValidationTests
 			resBody: {
 				validationError: Object.keys(t.body).map(property => {
 					return {
-						// @ts-ignore
-						value: t.body[property],
+						// // @ts-ignore
+						// value: t.body[property],
 						property,
 						children: [],
 						// @ts-ignore

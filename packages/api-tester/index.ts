@@ -32,7 +32,7 @@ type TestRequest<TModel = object> = {
 	readonly headers?: HeadersAssert
 	readonly log?: boolean
 	readonly before?: () => any
-	readonly after?: () => any
+	readonly after?: () => Promise<any>
 	readonly request?: RequestArgs<TModel>
 } & ({
 	readonly status: Exclude<Status, 204>
@@ -177,7 +177,7 @@ function doRequest(args: FinalRequest): void {
 }
 
 // eslint-disable-next-line no-empty-function
-const noop = () => {}
+const noop = async () => {}
 
 function doTest(
 	args: FinalRequest, testName: string, done: jest.DoneCallback
@@ -240,18 +240,6 @@ function doTest(
 	// eslint-disable-next-line @typescript-eslint/no-floating-promises
 	theTest
 		.end(async (err, res) => {
-			try {
-				// eslint-disable-next-line @typescript-eslint/await-thenable
-				await after()
-			} catch (error) {
-				logger.error('Error caught in the after hook: ', error)
-				throw error
-			}
-
-			if (authorized && options.authorizedRequests.after) {
-				options.authorizedRequests.after()
-			}
-
 			if (log) {
 				console.log(testName + ': ' + JSON.stringify({
 					status: err ? 'fail' : 'pass',
@@ -266,11 +254,29 @@ function doTest(
 					},
 				}, null, 2))
 			}
+
+			await doAfterAuthRequest()
+
+			try {
+				// eslint-disable-next-line @typescript-eslint/await-thenable
+				await after()
+			} catch (error) {
+				logger.error('Error caught in the after hook: ', error)
+				if (!err) throw error
+			}
+
 			if (err) {
 				done(err)
+			} else {
+				done()
 			}
-			done()
 		})
+
+	async function doAfterAuthRequest() {
+		if (authorized && options.authorizedRequests.after) {
+			await options.authorizedRequests.after()
+		}
+	}
 
 	// eslint-disable-next-line @typescript-eslint/promise-function-async
 	function doRequestStuff(): supertest.Test {

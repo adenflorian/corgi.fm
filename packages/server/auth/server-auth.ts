@@ -1,13 +1,17 @@
 import * as admin from 'firebase-admin'
+import {logger} from '@corgifm/common/logger'
+import {getFirebaseServerConfig} from '../firebase-server-config'
 
-admin.initializeApp()
+admin.initializeApp(getFirebaseServerConfig())
 
 // TODO Make better
 // TODO Test
 export async function verifyAuthHeader(
 	authHeaderValue: string
 ): Promise<AuthResult> {
-	return admin.auth().verifyIdToken(authHeaderValue)
+	const jwt = authHeaderValue.replace(/Bearer /, '')
+
+	return admin.auth().verifyIdToken(jwt)
 		.then((decodedToken): AuthResult => {
 			return {
 				authenticated: true,
@@ -15,6 +19,7 @@ export async function verifyAuthHeader(
 				uid: decodedToken.uid,
 			}
 		}).catch((error): AuthResult => {
+			logger.log({authError: error})
 			return {
 				authenticated: false,
 				emailVerified: false,

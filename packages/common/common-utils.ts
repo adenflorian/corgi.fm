@@ -75,3 +75,11 @@ export function removeOctave(midiNumber: number) {
 
 // eslint-disable-next-line no-empty-function
 export const noop = () => {}
+
+// https://stackoverflow.com/a/30835667
+export function multilineRegExp(regExps: RegExp[], flags?: string) {
+	return new RegExp(
+		regExps.map(reg => reg.source).join(''),
+		flags
+	)
+}

@@ -7,10 +7,11 @@ import * as serve from 'koa-static'
 import * as bodyParser from 'koa-bodyparser'
 import {stateRouter} from './api/state-router'
 import {DBStore} from './database/database'
-import {isProdServer, isLocalDevServer} from './is-prod-server'
+import {isProdServer, isLocalDevServer, getOrigin} from './is-prod-server'
 import {ServerStore} from './server-redux-types'
 import {handleError} from './api-error'
 import {apiRouter} from './api/api-router'
+import {Method} from './api/api-types'
 
 export async function setupExpressApp(
 	serverStore: ServerStore,
@@ -21,7 +22,7 @@ export async function setupExpressApp(
 
 	app.use(handleError)
 
-	app.use(cors({origin: '*'}))
+	app.use(cors({origin: getOrigin(), allowMethods: [Method.GET, Method.PUT]}))
 
 	app.use(bodyParser())
 

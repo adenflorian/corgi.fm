@@ -1,3 +1,5 @@
+import {Headers} from '@corgifm/common/common-types'
+
 export enum Method {
 	GET = 'GET',
 	PUT = 'PUT',
@@ -39,17 +41,6 @@ export type SecureRouter =
 
 export type SecureBodyRouter<T> =
 	(request: SecureApiRequest, body: T) => Promise<ApiResponse>
-
-export enum Header {
-	AccessControlAllowOrigin = 'access-control-allow-origin',
-	ContentType = 'content-type',
-	Origin = 'origin',
-	Authorization = 'authorization',
-}
-
-export type Headers = {
-	[P in Header]?: string
-}
 
 export const defaultResponse: ApiResponse = {
 	status: 404,

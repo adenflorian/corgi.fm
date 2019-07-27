@@ -29,3 +29,11 @@ export function getServerEnv() {
 			? 'test'
 			: 'prod'
 }
+
+export function getOrigin() {
+	return isLocalDevServer()
+		? '*'
+		: isTestServer()
+			? 'test.corgi.fm'
+			: 'corgi.fm'
+}

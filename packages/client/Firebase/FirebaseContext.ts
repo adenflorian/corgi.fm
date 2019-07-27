@@ -5,7 +5,7 @@ import React, {useContext} from 'react'
 import {Store} from 'redux'
 import {authActions, IClientAppState} from '@corgifm/common/redux'
 import {logger} from '@corgifm/common/logger'
-import {getFirebaseConfig} from './firebase-config'
+import {getFirebaseConfig} from './firebase-client-config'
 
 export const FirebaseContext = React.createContext<FirebaseContextStuff>({
 	app: {} as any,

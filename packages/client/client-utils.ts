@@ -1,4 +1,5 @@
 import packageJson from '../../package.json'
+import {isLocalDevClient} from './is-prod-client'
 
 /** @param buttons The buttons property from a mouse event */
 export function isLeftMouseButtonDown(buttons: number): boolean {
@@ -42,4 +43,12 @@ function getMainBoardsRect() {
 
 export function getCurrentClientVersion() {
 	return packageJson.version
+}
+
+export function getUrl() {
+	if (isLocalDevClient()) {
+		return `http://${window.location.hostname}:3000`
+	} else {
+		return ``
+	}
 }

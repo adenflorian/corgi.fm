@@ -1,6 +1,6 @@
 import {Octave} from '@corgifm/common/common-types'
-import {isLocalDevClient} from '../is-prod-client'
 import {NoteNameSharps} from '../WebAudio/music-functions'
+import {getUrl} from '../client-utils'
 
 // const octaveToGet = '4'
 const octavesToGet = [1, 2, 3, 4, 5, 6, 7]
@@ -69,14 +69,6 @@ export class SamplesManager {
 	private static _emptyAudioBuffer: AudioBuffer
 	private static _isInitialized = false
 	private static readonly _samples = new Map<string, AudioBuffer>()
-}
-
-function getUrl() {
-	if (isLocalDevClient()) {
-		return `http://${window.location.hostname}:3000`
-	} else {
-		return `https://${window.location.host}`
-	}
 }
 
 function convertNoteNameToFlatsName(noteName: NoteNameSharps) {
