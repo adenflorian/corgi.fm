@@ -1,11 +1,8 @@
 import {Middleware} from 'redux'
 import {
 	AuthAction, chatSystemMessage, IClientAppState,
-	setClientName, selectLocalClient,
 } from '@corgifm/common/redux'
-import {User} from '@corgifm/common/models/User'
-import {getUserByUid} from '../RestClient/corgi-api-client'
-import {logger} from '../client-logger'
+import {corgiApiActions} from '../RestClient/corgi-api-middleware'
 import {FirebaseContextStuff} from './FirebaseContext'
 
 type AuthMiddlewareActions = AuthAction
@@ -40,25 +37,6 @@ export const createAuthMiddleware: AuthMiddleware =
 			}
 
 			async function onAuthLogin() {
-				const {currentUser} = firebase.auth
-
-				if (!currentUser) return logger.error('[onAuthLogin] expected a user')
-
-				const uid = currentUser.uid
-
-				let user: User
-
-				const localClient = selectLocalClient(getState())
-
-				try {
-					user = await getUserByUid(
-						uid, await currentUser.getIdToken(), localClient)
-				} catch (error) {
-					logger.error('[onAuthLogin] error while getUserByUid: ', error)
-					return
-				}
-
-				// TODO color
-				dispatch(setClientName(localClient.id, user.displayName))
+				dispatch(corgiApiActions.loadLocalUser())
 			}
 		}

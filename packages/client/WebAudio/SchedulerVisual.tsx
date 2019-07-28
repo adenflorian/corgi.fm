@@ -182,7 +182,7 @@ function _renderSchedulerVisualForAllInstruments() {
 }
 
 window.addEventListener('keydown', e => {
-	if (e.key === 'b') {
+	if (e.key === 'b' && e.shiftKey && e.ctrlKey) {
 		_instruments.forEach((val, key) => {
 			logger.log(`instrument ${key}: `, val().toJS())
 		})

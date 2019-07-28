@@ -11,6 +11,7 @@ import {GetAllInstruments} from './instrument-manager'
 import {createLocalMiddleware} from './local-middleware'
 import {createSequencerMiddleware} from './sequencer-middleware'
 import {websocketSenderMiddleware} from './websocket-client-sender-middleware'
+import {createCorgiApiMiddleware} from './RestClient/corgi-api-middleware'
 
 const composeEnhancers = composeWithDevTools({
 	actionsBlacklist: getActionsBlacklist(),
@@ -28,8 +29,9 @@ export function configureStore(
 		composeEnhancers(
 			applyMiddleware(
 				onReduxMiddleware,
-				createLocalMiddleware(getAllInstruments),
+				createLocalMiddleware(getAllInstruments, firebase),
 				createAuthMiddleware(firebase),
+				createCorgiApiMiddleware(firebase),
 				createSequencerMiddleware(getAllInstruments),
 				connectionsClientMiddleware(getAllInstruments),
 				websocketSenderMiddleware,

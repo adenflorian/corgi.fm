@@ -20,6 +20,7 @@ export interface ApiRequest {
 
 export interface SecureApiRequest extends ApiRequest {
 	callerUid: string
+	emailVerified: boolean
 }
 
 export interface SecureUsersApiRequest extends SecureApiRequest {

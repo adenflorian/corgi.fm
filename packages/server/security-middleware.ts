@@ -7,7 +7,7 @@ import {
 } from './api/api-types'
 
 /** Asserts there is an Authorization header containing
- * a valid, signed, and not expired, JWT for an email verified user. */
+ * a valid, signed, and not expired, JWT. */
 export async function routeIfSecure(
 	request: ApiRequest, secureRouter: SecureRouter
 ): Promise<ApiResponse> {
@@ -24,30 +24,17 @@ export async function routeIfSecure(
 
 	const {authenticated, emailVerified, uid} = await verifyAuthHeader(authHeader)
 
-	if (authenticated === true && emailVerified === true) {
+	if (authenticated === true) {
 		return secureRouter({
 			...request,
 			callerUid: uid,
+			emailVerified,
 		})
-	} else if (authenticated !== true) {
-		return {
-			status: 401,
-			body: {
-				message: 'invalid/expired token',
-			},
-		}
-	} else if (emailVerified !== true) {
-		return {
-			status: 403,
-			body: {
-				message: 'not authorized A',
-			},
-		}
 	} else {
 		return {
 			status: 401,
 			body: {
-				message: 'not authenticated',
+				message: 'invalid/expired token',
 			},
 		}
 	}

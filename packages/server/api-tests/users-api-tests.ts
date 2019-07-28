@@ -5,13 +5,12 @@ import {User, UserUpdate, makeUser} from '@corgifm/common/models/User'
 import {DBStore} from '../database/database'
 import {
 	VerifyAuthHeaderMock,
-	emailNotVerifiedUidB, emptyObjectBodyRequest, fakeTokenRequest,
-	validTokenUnverifiedEmailUidBRequest, validTokenVerifiedEmailUidARequest,
+	emailNotVerifiedUidA, emptyObjectBodyRequest, fakeTokenRequest,
+	validTokenUnverifiedEmailUidARequest, validTokenVerifiedEmailUidARequest,
 	uidZ, uidA, putValidationTests,
 } from './api-test-common'
 
-const notAuthorizedA = /not authorized A/
-const notAuthorizedB = /not authorized to access this user/
+const notAuthorizedToAccessUser = /not authorized to access this user/
 
 export function getUserApiTests(
 	getDb: () => DBStore,
@@ -29,12 +28,12 @@ export function getUserApiTests(
 			get({
 				status: 403,
 				contentType: ContentTypes.ApplicationJson,
-				resBody: notAuthorizedB,
+				resBody: notAuthorizedToAccessUser,
 			}),
 			put({
 				status: 403,
 				contentType: ContentTypes.ApplicationJson,
-				resBody: notAuthorizedB,
+				resBody: notAuthorizedToAccessUser,
 				request: {body: {}},
 			}),
 		]
@@ -57,7 +56,7 @@ export function getUserApiTests(
 					name: 'different uid in path than in JWT',
 					status: 403,
 					contentType: ContentTypes.ApplicationJson,
-					resBody: notAuthorizedB,
+					resBody: notAuthorizedToAccessUser,
 				}),
 			]),
 			path(uidA, [
@@ -115,19 +114,19 @@ export function getUserApiTests(
 			}),
 			put({
 				name: 'email not verified',
-				before: emailNotVerifiedUidB(verifyAuthHeaderMock),
-				request: validTokenUnverifiedEmailUidBRequest,
+				before: emailNotVerifiedUidA(verifyAuthHeaderMock),
+				request: validTokenUnverifiedEmailUidARequest,
 				authorized: false,
 				status: 403,
 				contentType: ContentTypes.ApplicationJson,
-				resBody: notAuthorizedA,
+				resBody: notAuthorizedToAccessUser,
 			}),
 			put({
 				name: `uid mismatch - JWT has uidA but path has uidZ`,
 				request: validTokenVerifiedEmailUidARequest,
 				status: 403,
 				contentType: ContentTypes.ApplicationJson,
-				resBody: notAuthorizedB,
+				resBody: notAuthorizedToAccessUser,
 			}),
 		]
 	}

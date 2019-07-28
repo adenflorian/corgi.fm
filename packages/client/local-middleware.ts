@@ -56,6 +56,8 @@ import {GetAllInstruments} from './instrument-manager'
 import {MidiNotes} from './Instruments/BasicSynthesizerView'
 import {getSequencersSchedulerInfo} from './note-scanner'
 import {saveUsernameToLocalStorage} from './username'
+import {corgiApiActions} from './RestClient/corgi-api-middleware'
+import {FirebaseContextStuff} from './Firebase/FirebaseContext'
 
 export type LocalMidiKeyPressAction = ReturnType<typeof localMidiKeyPress>
 export const localMidiKeyPress = (midiNote: IMidiNote) => ({
@@ -120,8 +122,10 @@ type LocalMiddlewareActions = LocalAction | AddClientAction | VirtualKeyPressedA
 | UserInputAction | VirtualKeyUpAction | VirtualOctaveChangeAction | SetActiveRoomAction | ReadyAction
 | UpdatePositionsAction | SetLocalClientNameAction
 
-export const createLocalMiddleware: (getAllInstruments: GetAllInstruments) => Middleware<{}, IClientAppState> =
-	(getAllInstruments: GetAllInstruments) => ({dispatch, getState}) => next => (action: LocalMiddlewareActions) => {
+export function createLocalMiddleware(
+	getAllInstruments: GetAllInstruments, firebase: FirebaseContextStuff
+): Middleware<{}, IClientAppState> {
+	return ({dispatch, getState}) => next => async (action: LocalMiddlewareActions) => {
 		// TODO Do next later so keyboard is more responsive
 
 		switch (action.type) {
@@ -313,8 +317,11 @@ export const createLocalMiddleware: (getAllInstruments: GetAllInstruments) => Mi
 			}
 			case 'SET_LOCAL_CLIENT_NAME': {
 				next(action)
-				dispatch(setClientName(selectLocalClientId(getState()), action.newName))
-				return saveUsernameToLocalStorage(action.newName)
+				const localClient = selectLocalClient(getState())
+				dispatch(setClientName(localClient.id, action.newName))
+				saveUsernameToLocalStorage(action.newName)
+				if (firebase.auth.currentUser) dispatch(corgiApiActions.saveLocalUser())
+				return
 			}
 			case 'SET_ACTIVE_ROOM': {
 				next(action)
@@ -509,6 +516,7 @@ export const createLocalMiddleware: (getAllInstruments: GetAllInstruments) => Mi
 			default: return next(action)
 		}
 	}
+}
 
 function createRoomSave(state: IClientAppState, roomName: string): SavedRoom {
 	return {

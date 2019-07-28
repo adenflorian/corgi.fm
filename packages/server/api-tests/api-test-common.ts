@@ -48,13 +48,13 @@ export const uidA = 'uidA567890123456789012345678'
 export const uidB = 'uidB567890123456789012345678'
 export const uidZ = 'uidZ567890123456789012345678'
 
-export function emailNotVerifiedUidB(
+export function emailNotVerifiedUidA(
 	verifyAuthHeaderMock: VerifyAuthHeaderMock
 ) {
 	return () => verifyAuthHeaderMock.mockResolvedValue({
 		authenticated: true,
 		emailVerified: false,
-		uid: uidB,
+		uid: uidA,
 	})
 }
 
@@ -75,9 +75,9 @@ export const fakeTokenRequest = {
 	body: {},
 }
 
-export const validTokenUnverifiedEmailUidBRequest = {
+export const validTokenUnverifiedEmailUidARequest = {
 	headers: {
-		Authorization: 'Bearer valid-token-but-email-not-verified-uidB',
+		Authorization: 'Bearer valid-token-but-email-not-verified-uidA',
 	},
 	body: {},
 }
