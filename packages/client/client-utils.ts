@@ -52,3 +52,12 @@ export function getUrl() {
 		return ``
 	}
 }
+
+export function getCdnUrl() {
+	if (isLocalDevClient()) {
+		return `http://${window.location.hostname}:3000`
+	} else {
+		// TODO Need prod cdn
+		return `https://cdn.test.corgi.fm`
+	}
+}

@@ -85,6 +85,8 @@
 				- [ ] with sound cloud
 					- sound cloud not allowing new apps at this time 2019-07-13
 			- [√] logout
+		- [ ] client
+			- [ ] do Accepts headers properly
 		- [√] server
 			- [√] verify jwt
 		- [ ] ToS
@@ -148,6 +150,7 @@
 	- [ ] link to patreon account
 	- [ ] link to discord
 - [ ] fix noise wave getting stuck
+- [ ] return proper cache headers for samples
 - [ ] lock down audio node params min/max at instrument level
 - [ ] refactor
 	- [√] cleanup up express app code
