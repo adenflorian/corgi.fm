@@ -1,4 +1,4 @@
-import packageJson from '../../package.json'
+import packageJson from './package.json'
 import {isLocalDevClient} from './is-prod-client'
 
 /** @param buttons The buttons property from a mouse event */
