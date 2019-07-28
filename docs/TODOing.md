@@ -50,7 +50,7 @@
 	- [√] connect to memory db in local
 	- [√] connect to real database in test and prod
 	- [√] setup db in prod
-- [ ] auth back end
+- [-] auth back end (abandoned, went with firebase auth)
 	- [ ] register
 		- [√] save user to DB
 		- [√] hash pw
@@ -72,7 +72,7 @@
 		- [ ] logging out (just delete token from client?)
 - [ ] firebase auth
 	- [ ] local
-		- [ ] UI
+		- [√] UI
 			- [√] register
 				- [√] send verification email
 			- [√] login
@@ -85,16 +85,21 @@
 				- [ ] with sound cloud
 					- sound cloud not allowing new apps at this time 2019-07-13
 			- [√] logout
-		- [ ] server
+		- [√] server
+			- [√] verify jwt
 		- [ ] ToS
-			- [ ] create html
+			- [√] create html
 			- [ ] make it proper
 		- [ ] Privacy policy
-			- [ ] create html
+			- [√] create html
 			- [ ] make it proper
 		- [ ] open source licenses
 	- [ ] test
+		- [ ] enable sign in methods in firebase console
+		- [ ] google sign in stuff
 	- [ ] prod
+		- [ ] google sign in stuff
+		- [ ] enable sign in methods in firebase console
 - [ ] welcome modal
 	- [√] change username
 	- [ ] create account/login
@@ -116,22 +121,15 @@
 		- [√] tests
 	- [√] migrate
 		- [√] cors
-- [ ] refactor
-	- [√] move test api stuff to own file
-- [ ] REST API
-	- [ ] users
-		- [.] PUT
-			- [ ] display name
-			- [ ] color
-			- [ ] soundcloud
-		- [ ] GET :userId
-- [ ] REST Client
-	- [ ] users
-		- [ ] PUT
-		- [ ] GET
+- [√] move test api stuff to own file
 - [ ] do stuff with accounts system
-	- [ ] save username
-		- [ ] on register
+	- [√] save username
+		- [√] on register
+		- [√] load on login
+		- [√] when change name (debounced)
+	- [ ] user color
+		- [ ] save on register
+		- [ ] save when change color
 		- [ ] load on login
 	- [ ] save room
 	- [ ] load room
