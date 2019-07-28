@@ -95,11 +95,15 @@
 			- [ ] make it proper
 		- [ ] open source licenses
 	- [ ] test
-		- [ ] enable sign in methods in firebase console
+		- [√] enable sign in methods in firebase console
 		- [ ] google sign in stuff
+			- [ ] submit consent screen for verification
+		- [ ] facebook sign in stuff
 	- [ ] prod
+		- [√] enable sign in methods in firebase console
 		- [ ] google sign in stuff
-		- [ ] enable sign in methods in firebase console
+			- [ ] submit consent screen for verification
+		- [ ] facebook sign in stuff
 - [ ] welcome modal
 	- [√] change username
 	- [ ] create account/login
