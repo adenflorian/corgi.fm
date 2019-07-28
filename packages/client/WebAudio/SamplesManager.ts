@@ -42,13 +42,14 @@ export class SamplesManager {
 
 		SamplesManager._isInitialized = true
 
-		SamplesManager._emptyAudioBuffer = new AudioBuffer({length: 1, sampleRate: audioContext.sampleRate})
+		SamplesManager._emptyAudioBuffer =
+			new AudioBuffer({length: 1, sampleRate: audioContext.sampleRate})
 
 		samplesToGet.forEach(async sampleName => {
 			octavesToGet.forEach(async octave => {
 				const noteName = sampleName + octave.toString()
 
-				if (noteName === 'Gb7' || noteName === 'Ab3') return
+				// if (noteName === 'Gb7' || noteName === 'Ab3') return
 
 				const sample = await fetch(
 					`${getCdnUrl()}/samples/basic-piano/${noteName}-49-96.mp3`,
