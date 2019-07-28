@@ -8,8 +8,19 @@ A "multiplayer DAW"
 - yarn
 - graphviz (for viewing diagrams in docs folder)
 
+## Local Development
+Add `127.0.0.1 local.corgi.fm` to your `hosts` file for local development.
+
+```bash
+yarn
+yarn start
+```
+
+Then open `local.corgi.fm` in a browser.
+
 ## Secrets setup
 Create `secrets.sh` in project root.
+Used by server setup and deploy scripts.
 
 ```bash
 #!/usr/bin/env bash
@@ -22,6 +33,4 @@ SSH_USER_TEST=notroot
 ```
 
 ## Server Setup
-Run `setup-test-server` or `setup-prod-server`.
-
-Add ? to `~/corgiSecrets.json` on server.
+Run `yarn setup-test-server` or `yarn setup-prod-server`.

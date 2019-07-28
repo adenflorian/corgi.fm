@@ -7,7 +7,7 @@ export const isTestClient = () => _isTestClient
 const _isTestClient = window.location.hostname.toLowerCase() === 'test.corgi.fm'
 
 export const isLocalDevClient = () => _isLocalDevClient
-const _isLocalDevClient = window.location.hostname.toLowerCase() === 'localhost'
+const _isLocalDevClient = ['localhost', 'local.corgi.fm'].includes(window.location.hostname.toLowerCase())
 
 /** Use for displaying to user */
 export const getEnvDisplayName = () => _getEnvDisplayName

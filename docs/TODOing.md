@@ -150,8 +150,9 @@
 	- [ ] link to patreon account
 	- [ ] link to discord
 - [ ] fix noise wave getting stuck
-- [ ] return proper cache headers for samples
+- [ ] DeprecationWarning: collection.update is deprecated. Use updateOne, updateMany, or bulkWrite instead.
 - [ ] remove samples from the build
+- [√] setup local.corgi.fm in hosts file so CORS will work maybe with the CDN
 - [ ] lock down audio node params min/max at instrument level
 - [ ] refactor
 	- [√] cleanup up express app code
