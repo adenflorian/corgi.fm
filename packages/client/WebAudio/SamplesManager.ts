@@ -50,7 +50,10 @@ export class SamplesManager {
 
 				if (noteName === 'Gb7' || noteName === 'Ab3') return
 
-				const sample = await fetch(`${getCdnUrl()}/${noteName}-49-96.mp3`, {mode: 'cors'})
+				const sample = await fetch(
+					`${getCdnUrl()}/samples/basic-piano/${noteName}-49-96.mp3`,
+					{mode: 'cors'}
+				)
 					.then(async response => {
 						return audioContext.decodeAudioData(await response.arrayBuffer())
 					})
