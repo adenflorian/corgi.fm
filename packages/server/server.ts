@@ -43,7 +43,7 @@ async function start() {
 
 	const app = await setupExpressApp(serverStore, dbStore)
 
-	const server: http.Server = new http.Server(app.callback())
+	const server: http.Server = new http.Server(app)
 	const io: socketIO.Server = socketIO(server)
 
 	setupServerWebSocketListeners(io, serverStore, dbStore)

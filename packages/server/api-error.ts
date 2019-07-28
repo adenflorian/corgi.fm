@@ -1,47 +1,35 @@
-import * as Koa from 'koa'
-import * as Sentry from '@sentry/node'
 import {logger} from '@corgifm/common/logger'
 import {CorgiValidationError} from '@corgifm/common/validation'
+import {ErrorRequestHandler} from 'express'
 
-export const handleError = async (
-	ctx: Koa.ParameterizedContext<any, {}>, next: () => Promise<any>
+export const handleError: ErrorRequestHandler = async (
+	error, req, res, next
 ) => {
-	try {
-		await next()
-	} catch (error) {
-		if (error instanceof CorgiValidationError) {
-			ctx.status = 400
-			ctx.body = {
-				validationError: error.validationError,
-			}
-		} else if (error instanceof CorgiBadRequestError) {
-			ctx.status = 400
-			ctx.body = {
-				message: error.message,
-			}
-		} else if (error instanceof CorgiMethodNotAllowedError) {
-			ctx.status = 405
-			ctx.body = {}
-		} else {
-			logger.error('error[0]: ', error[0])
-			Sentry.withScope(scope => {
-				scope.addEventProcessor(event => {
-					return Sentry.Handlers.parseRequest(event, ctx.request)
-				})
+	if (res.headersSent) {
+		return next(error)
+	} else if (error instanceof CorgiValidationError) {
+		return res.status(400).json({
+			validationError: error.validationError,
+		})
+	} else if (error instanceof CorgiBadRequestError) {
+		return res.status(400).json({
+			message: error.message,
+		})
+	} else if (error instanceof CorgiMethodNotAllowedError) {
+		return res.status(405).json({})
+	} else {
+		// @ts-ignore
+		const errorCode = res.sentry
 
-				const errorCode = Sentry.captureException(error)
+		logger.error('unhandled api error: ', {error, errorCode})
 
-				logger.error('unhandled api error: ', {error, errorCode})
-
-				ctx.status = error.statusCode || error.status || 500
-
-				ctx.body = {
-					message: `something borked, here is an error code `
-						+ `that the support people might `
-						+ `find useful: ${errorCode}`,
-				}
+		return res
+			.status(error.statusCode || error.status || 500)
+			.json({
+				message: `something borked, here is an error code `
+					+ `that the support people might `
+					+ `find useful: ${errorCode}`,
 			})
-		}
 	}
 }
 

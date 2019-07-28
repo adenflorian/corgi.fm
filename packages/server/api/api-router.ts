@@ -1,4 +1,4 @@
-import {Context} from 'koa'
+import {RequestHandler, Request} from 'express'
 import {ServerStore} from '../server-redux-types'
 import {DBStore} from '../database/database'
 import {CorgiMethodNotAllowedError} from '../api-error'
@@ -7,19 +7,23 @@ import {
 } from './api-types'
 import {getUsersRouter} from './users-controller'
 
-export function apiRouter(serverStore: ServerStore, dbStore: DBStore) {
+export function apiRouter(serverStore: ServerStore, dbStore: DBStore): RequestHandler {
 	const usersRouter = getUsersRouter(serverStore, dbStore)
 
-	return async (ctx: Context) => {
-		const request = createApiRequestFromContext(ctx)
+	return async (req, res, next) => {
+		try {
+			const request = createApiRequestFromContext(req)
 
-		const response: ApiResponse = await topRouter(request)
+			const response: ApiResponse = await topRouter(request)
 
-		ctx.status = response.status
-		if (response.status !== 204) {
-			ctx.body = response.body
+			if (response.status === 204) {
+				return res.sendStatus(response.status)
+			} else {
+				return res.status(response.status).json(response.body)
+			}
+		} catch (error) {
+			return next(error)
 		}
-		return
 	}
 
 	async function topRouter(request: ApiRequest): Promise<ApiResponse> {
@@ -31,19 +35,15 @@ export function apiRouter(serverStore: ServerStore, dbStore: DBStore) {
 	}
 }
 
-function createApiRequestFromContext(ctx: Context): ApiRequest {
-	if (!isSupportedMethod(ctx.method)) {
+function createApiRequestFromContext(req: Request): ApiRequest {
+	if (!isSupportedMethod(req.method)) {
 		throw new CorgiMethodNotAllowedError()
 	}
 
-	if (!ctx.path.startsWith('/api/')) {
-		throw new Error(`this shouldn't happen`)
-	}
-
 	return {
-		method: ctx.method,
-		path: ctx.path.replace(/^\/api/, ''),
-		headers: ctx.headers,
-		body: ctx.request.body,
+		method: req.method,
+		path: req.path,
+		headers: req.headers,
+		body: req.body,
 	}
 }

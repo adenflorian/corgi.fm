@@ -1,11 +1,8 @@
 import * as path from 'path'
-import * as Koa from 'koa'
-import * as cors from '@koa/cors'
-import * as Router from '@koa/router'
-import * as send from 'koa-send'
-import * as serve from 'koa-static'
-import * as bodyParser from 'koa-bodyparser'
-import {Header} from '@corgifm/common/common-types'
+import * as bodyParser from 'body-parser'
+import * as cors from 'cors'
+import * as express from 'express'
+import * as Sentry from '@sentry/node'
 import {stateRouter} from './api/state-router'
 import {DBStore} from './database/database'
 import {isProdServer, isLocalDevServer, getOrigin} from './is-prod-server'
@@ -18,64 +15,48 @@ export async function setupExpressApp(
 	serverStore: ServerStore,
 	dbStore: DBStore,
 ) {
-	const app = new Koa()
-	const router = new Router()
+	const app: express.Application = express()
 
-	app.use(handleError)
+	app.use(Sentry.Handlers.requestHandler())
 
-	app.use(cors({origin: getOrigin(), allowMethods: [Method.GET, Method.PUT]}))
+	app.use(cors({origin: getOrigin(), methods: [Method.GET, Method.PUT]}))
 
-	app.use(bodyParser())
+	app.use(bodyParser.json())
 
-	// TODO Use extensions options when github issue is resolved
-	app.use(
-		serve(
-			path.join(__dirname, '../public'),
-			{
-				setHeaders: res => {
-					res.setHeader(Header.CacheControl, 'public, max-age=0')
-				},
-			}
-		)
-	)
+	app.use(express.static(path.join(__dirname, '../public')))
 
-	router.get('/newsletter', async ctx => {
-		await send(
-			ctx, '/newsletter.html', {root: path.join(__dirname, '../public')})
+	// TODO Is this need since we are using the static middleware above?
+	app.get('/newsletter', (_, res) => {
+		res.sendFile(path.join(__dirname, '../public/newsletter.html'))
 	})
 
 	if (!isProdServer()) {
-		const stateThing = stateRouter(serverStore)
-		router.use('/state', stateThing.routes(), stateThing.allowedMethods())
+		app.use('/state', stateRouter(serverStore))
 	}
 
 	if (isLocalDevServer()) {
-		router.get('/error', () => {
+		app.get('/error', () => {
 			throw new Error('test error please ignore')
 		})
 	}
 
-	router.use('/api', apiRouter(serverStore, dbStore))
+	app.use('/api', apiRouter(serverStore, dbStore))
 
-	router.get('/*', async (ctx, next) => {
-		await send(ctx, '/index.html', {
-			root: path.join(__dirname, isLocalDevServer()
-				? '../client'
-				: '../public'),
+	app.get('/*', (req, res, next) => {
+		res.sendFile(path.join(__dirname, isLocalDevServer()
+			? '../client/index.html'
+			: '../public/index.html'))
+	})
+
+	app.all('/*', (req, res, next) => {
+		return res.status(404).json({
+			message: `couldn't find a route matching ${req.method} ${req.path}`,
 		})
 	})
 
-	router.all('/*', ctx => {
-		ctx.status = 404
+	app.use(Sentry.Handlers.errorHandler())
 
-		ctx.body = {
-			message: `couldn't find a route matching ${ctx.method} ${ctx.path}`,
-		}
-	})
-
-	app
-		.use(router.routes())
-		.use(router.allowedMethods())
+	app.use(handleError)
 
 	return app
 }

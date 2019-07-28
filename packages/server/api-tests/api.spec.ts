@@ -1,7 +1,7 @@
-import {Server} from 'http'
 import {configureServerStore} from '@corgifm/common/redux'
 import {testApi, path, get, del, ContentTypes} from '@corgifm/api-tester'
 import {logger} from '@corgifm/common/logger'
+import {Application} from 'express'
 import {connectDB, DBStore} from '../database/database'
 import {setupExpressApp} from '../setup-express-app'
 import * as serverAuth from '../auth/server-auth'
@@ -19,13 +19,13 @@ const verifyAuthHeaderMock =
 
 describe('API Tests', () => {
 	let db: DBStore
-	let app: Server
+	let app: Application
 	const getApp = () => app
 	const getDb = () => db
 
 	beforeAll(async () => {
 		db = await connectDB()
-		app = (await setupExpressApp(configureServerStore(), db)).listen()
+		app = await setupExpressApp(configureServerStore(), db)
 	})
 
 	beforeEach(() => {
@@ -37,7 +37,6 @@ describe('API Tests', () => {
 	})
 
 	afterAll(async () => {
-		app.close()
 		await db.close()
 	})
 

@@ -1,9 +1,9 @@
 /* eslint-disable no-param-reassign */
-import {Server} from 'http'
 import * as supertest from 'supertest'
 import {oneLine} from 'common-tags'
 import chalk from 'chalk'
 import {logger} from '@corgifm/common/logger'
+import {Application} from 'express'
 
 export enum ContentTypes {
 	ApplicationJson = 'application/json',
@@ -74,7 +74,7 @@ type PutRequest<TModel> = RequiredField<TestRequest<TModel>, 'request'>
 export type RequestTest =
 	(getApp: GetApp, path: string, options: TestApiOptions) => void
 
-type GetApp = () => Server
+type GetApp = () => Application
 
 interface TestApiOptions {
 	/** Will be merged into authorized requests. Requests are authorized

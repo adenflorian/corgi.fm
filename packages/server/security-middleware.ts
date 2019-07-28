@@ -1,6 +1,4 @@
-import {Context} from 'koa'
 import {Header} from '@corgifm/common/common-types'
-import {Next} from './server-types'
 import {verifyAuthHeader} from './auth/server-auth'
 import {
 	ApiRequest, ApiResponse, SecureRouter,
@@ -37,23 +35,5 @@ export async function routeIfSecure(
 				message: 'invalid/expired token',
 			},
 		}
-	}
-}
-
-/**
- * Middleware that asserts that uid in params matches uid of authorized caller
- */
-export const checkUid = async (ctx: Context, next: Next) => {
-	const callerUid = ctx.state.authenticatedCaller.uid
-	const pathUid = ctx.params.uid
-
-	if (callerUid !== pathUid) {
-		ctx.status = 403
-		ctx.body = {
-			message: 'not authorized B',
-		}
-		return
-	} else {
-		await next()
 	}
 }
