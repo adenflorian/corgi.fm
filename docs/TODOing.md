@@ -151,6 +151,7 @@
 	- [ ] link to discord
 - [ ] fix noise wave getting stuck
 - [ ] return proper cache headers for samples
+- [ ] remove samples from the build
 - [ ] lock down audio node params min/max at instrument level
 - [ ] refactor
 	- [√] cleanup up express app code
