@@ -74,6 +74,7 @@ export enum Header {
 	ContentType = 'content-type',
 	Origin = 'origin',
 	Authorization = 'authorization',
+	CacheControl = 'cache-control',
 }
 
 export type Headers = {

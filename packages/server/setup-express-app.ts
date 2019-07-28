@@ -5,6 +5,7 @@ import * as Router from '@koa/router'
 import * as send from 'koa-send'
 import * as serve from 'koa-static'
 import * as bodyParser from 'koa-bodyparser'
+import {Header} from '@corgifm/common/common-types'
 import {stateRouter} from './api/state-router'
 import {DBStore} from './database/database'
 import {isProdServer, isLocalDevServer, getOrigin} from './is-prod-server'
@@ -27,7 +28,16 @@ export async function setupExpressApp(
 	app.use(bodyParser())
 
 	// TODO Use extensions options when github issue is resolved
-	app.use(serve(path.join(__dirname, '../public')))
+	app.use(
+		serve(
+			path.join(__dirname, '../public'),
+			{
+				setHeaders: res => {
+					res.setHeader(Header.CacheControl, 'public, max-age=0')
+				},
+			}
+		)
+	)
 
 	router.get('/newsletter', async ctx => {
 		await send(
