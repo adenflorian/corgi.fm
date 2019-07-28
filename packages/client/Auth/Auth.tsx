@@ -1,7 +1,8 @@
 import * as firebase from 'firebase/app'
 import React, {Fragment, useCallback, useState} from 'react'
 import {
-	IoLogoFacebook as Facebook, IoLogoGoogle as Google,
+	// IoLogoFacebook as Facebook,
+	IoLogoGoogle as Google,
 } from 'react-icons/io'
 import {useDispatch, useSelector} from 'react-redux'
 import {AuthConstants} from '@corgifm/common/auth-constants'
@@ -126,7 +127,7 @@ export const AuthModalContent: ModalContent = ({hideModal}) => {
 						<Google />
 						<span>Sign in with Google</span>
 					</button>
-					<button
+					{/* <button
 						type="button"
 						className="button facebook"
 						disabled={inputsDisabled}
@@ -135,7 +136,7 @@ export const AuthModalContent: ModalContent = ({hideModal}) => {
 					>
 						<Facebook />
 						<span>Sign in with Facebook</span>
-					</button>
+					</button> */}
 				</div>
 			</div>
 		</Fragment>
