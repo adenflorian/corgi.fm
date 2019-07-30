@@ -1,5 +1,5 @@
 import packageJson from './package.json'
-import {isLocalDevClient} from './is-prod-client'
+import {isLocalDevClient, isTestClient} from './is-prod-client'
 
 /** @param buttons The buttons property from a mouse event */
 export function isLeftMouseButtonDown(buttons: number): boolean {
@@ -54,6 +54,11 @@ export function getUrl() {
 }
 
 export function getCdnUrl() {
-	// TODO Need prod and local dev CDNs
-	return `https://cdn.test.corgi.fm`
+	if (isLocalDevClient()) {
+		return `https://cdn.test.corgi.fm/dev`
+	} else if (isTestClient()) {
+		return `https://cdn.test.corgi.fm/test`
+	} else {
+		return `https://cdn.test.corgi.fm/prod`
+	}
 }
