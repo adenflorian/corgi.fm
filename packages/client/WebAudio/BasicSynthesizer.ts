@@ -265,19 +265,21 @@ class SynthVoice extends Voice {
 	public setOscillatorType(newOscType: ShamuOscillatorType) {
 		this._nextOscillatorType = newOscType
 
+		this.getAudioScheduledSourceNode()!.onended = null
+
 		this._refreshOscillatorType()
 
 		// if release is scheduled, need to call stop on new node
 		if (this._isReleaseScheduled) {
 			if (this._whiteNoise) {
 				this._whiteNoise.stop(this.scheduledReleaseEndTimeSeconds)
-				this._whiteNoise.onended = () => this._onEnded(this.id)
 			}
 			if (this._oscillator) {
 				this._oscillator.stop(this.scheduledReleaseEndTimeSeconds)
-				this._oscillator.onended = () => this._onEnded(this.id)
 			}
 		}
+
+		this.getAudioScheduledSourceNode()!.onended = () => this.dispose()
 	}
 
 	public setLfoRate(rate: number) {

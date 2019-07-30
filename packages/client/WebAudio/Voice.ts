@@ -140,7 +140,7 @@ export abstract class Voice {
 		// 	100,
 		// )
 
-		this.getAudioScheduledSourceNode()!.onended = () => this._onEnded(this.id)
+		this.getAudioScheduledSourceNode()!.onended = () => this.dispose()
 	}
 
 	protected abstract _scheduleNoteSpecific(note: number): void
@@ -157,9 +157,6 @@ export abstract class Voice {
 		if (releaseIfNotCurrentlyReleasing) {
 			if (this._audioContext.currentTime < this._scheduledAttackStartTimeSeconds) {
 				this._gain.gain.cancelScheduledValues(this._audioContext.currentTime)
-				audioNode.onended = () => {
-					this._onEnded(this.id)
-				}
 				audioNode.stop()
 				audioNode.disconnect()
 				this._gain.disconnect()
@@ -275,12 +272,6 @@ export abstract class Voice {
 		this._gain.gain.exponentialRampToValueAtTime(0.00001, rampEndTime)
 
 		audioNode.stop(this._scheduledReleaseEndTimeSeconds)
-		audioNode.onended = () => {
-			if (audioNode) audioNode.disconnect()
-			if (this._gain) this._gain.disconnect()
-			if (this._gain) delete this._gain
-			this._onEnded(this.id)
-		}
 		this._isReleaseScheduled = true
 	}
 
@@ -317,8 +308,9 @@ export abstract class Voice {
 	public abstract dispose(): void
 
 	protected _dispose() {
-		this._gain.disconnect()
-		delete this._gain
+		if (this._gain) this._gain.disconnect()
+		if (this._gain) delete this._gain
+		this._onEnded(this.id)
 	}
 
 	/** If cancelAndHold is called with a past time it doesn't work */
