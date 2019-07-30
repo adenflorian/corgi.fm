@@ -150,7 +150,7 @@
 	- [ ] link to patreon account
 	- [ ] link to discord
 - [√] fix noise wave getting stuck
-- [ ] DeprecationWarning: collection.update is deprecated. Use updateOne, updateMany, or bulkWrite instead.
+- [√] DeprecationWarning: collection.update is deprecated. Use updateOne, updateMany, or bulkWrite instead.
 - [√] remove samples from the build
 - [ ] !fix security issue where anyone can dispatch any custom action to all other clients
 - [√] setup local.corgi.fm in hosts file so CORS will work maybe with the CDN

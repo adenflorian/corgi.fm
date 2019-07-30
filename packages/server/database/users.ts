@@ -11,7 +11,7 @@ export const usersQueries = (db: Db) => {
 		async updateOrCreate(userUpdate: UserUpdate, uid: string) {
 			const user: User = {...userUpdate, uid}
 
-			await usersCollection.update({uid}, {$set: user}, {upsert: true})
+			await usersCollection.updateOne({uid}, {$set: user}, {upsert: true})
 		},
 
 		async getByUid(uid: string): Promise<User | null> {
