@@ -27,9 +27,9 @@
 					"endsPattern": "^done\\!"
 				}
 			},
-			"runOptions": {
-				"runOn": "folderOpen"
-			},
+			// "runOptions": {
+			// 	"runOn": "folderOpen"
+			// },
 			"presentation": {
 				"group": "groupA",
 				"showReuseMessage": false,
