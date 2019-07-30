@@ -18,7 +18,6 @@ export function putValidationTests
 <TModel extends object>(
 	tests: ValidationTest<TModel>[]
 ) {
-	// eslint-disable-next-line @typescript-eslint/promise-function-async
 	return tests.map((t): RequestTest => {
 		return put<TModel>({
 			name: t.name,

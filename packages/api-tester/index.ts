@@ -278,7 +278,6 @@ function doTest(
 		}
 	}
 
-	// eslint-disable-next-line @typescript-eslint/promise-function-async
 	function doRequestStuff(): supertest.Test {
 		if (request) {
 			theTest = theTest
@@ -297,7 +296,6 @@ function doTest(
 	}
 }
 
-// eslint-disable-next-line @typescript-eslint/promise-function-async
 function callHttpMethod(
 	st: supertest.SuperTest<supertest.Test>, method: Method, url: string
 ) {

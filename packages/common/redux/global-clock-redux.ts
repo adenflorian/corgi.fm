@@ -1,6 +1,10 @@
 import {Record} from 'immutable'
 import {ActionType} from 'typesafe-actions'
+import {clamp} from '../common-utils'
 import {BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION} from '.'
+
+export const MIN_BPM = 1
+export const MAX_BPM = 999
 
 export const globalClockActions = {
 	replace: (globalClockState: IGlobalClockState) => ({
@@ -22,11 +26,9 @@ export const globalClockActions = {
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	} as const),
-	update: (
-		update: Partial<Pick<IGlobalClockState, 'bpm' | 'maxReadAheadSeconds'>>,
-	) => ({
-		type: 'UPDATE_GLOBAL_CLOCK',
-		update,
+	setBpm: (bpm: number) => ({
+		type: 'SET_BPM_GLOBAL_CLOCK',
+		bpm,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	} as const),
@@ -55,7 +57,7 @@ export const globalClockReducer =
 			case 'START_GLOBAL_CLOCK': return state.set('isPlaying', true)
 			case 'STOP_GLOBAL_CLOCK': return state.set('isPlaying', false).set('index', -1)
 			case 'RESTART_GLOBAL_CLOCK': return state.set('isPlaying', true).update('playCount', x => x + 1)
-			case 'UPDATE_GLOBAL_CLOCK': return state.merge(action.update)
+			case 'SET_BPM_GLOBAL_CLOCK': return state.set('bpm', clamp(action.bpm, MIN_BPM, MAX_BPM))
 			default: return state
 		}
 	}

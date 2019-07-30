@@ -149,9 +149,10 @@
 	- [ ] profile
 	- [ ] link to patreon account
 	- [ ] link to discord
-- [ ] fix noise wave getting stuck
+- [√] fix noise wave getting stuck
 - [ ] DeprecationWarning: collection.update is deprecated. Use updateOne, updateMany, or bulkWrite instead.
-- [ ] remove samples from the build
+- [√] remove samples from the build
+- [ ] !fix security issue where anyone can dispatch any custom action to all other clients
 - [√] setup local.corgi.fm in hosts file so CORS will work maybe with the CDN
 - [√] fix chrome cache cors issue (maybe by making a different cdn for each env?)
 - [ ] lock down audio node params min/max at instrument level
