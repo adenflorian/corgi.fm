@@ -50,7 +50,7 @@
 			"isBackground": true,
 			"problemMatcher": "$tsc-watch",
 			"runOptions": {
-				"runOn": "folderOpen"
+				// "runOn": "folderOpen"
 			}
 		},
 		{
@@ -76,7 +76,7 @@
 			"isBackground": true,
 			"problemMatcher": [],
 			"runOptions": {
-				"runOn": "folderOpen"
+				// "runOn": "folderOpen"
 			}
 		},
 		{
@@ -91,7 +91,7 @@
 			"isBackground": true,
 			"problemMatcher": "$tsc-watch",
 			"runOptions": {
-				"runOn": "folderOpen"
+				// "runOn": "folderOpen"
 			}
 		},
 	]
