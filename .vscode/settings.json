@@ -87,6 +87,8 @@
         "immer",
         "initialise",
         "input",
+        "integerize",
+        "integerized",
         "keyframes",
         "linebreak",
         "localstorage",
@@ -167,13 +169,14 @@
         {"language": "typescript", "autoFix": true},
         {"language": "typescriptreact", "autoFix": true},
     ],
-    "eslint.enable": true,
+    "eslint.enable": false,
     "eslint.autoFixOnSave": true,
     "eslint.options": {
         "ignorePath": ".gitignore",
         "extensions": [".js",".jsx",".ts",".tsx",]
     },
     "editor.formatOnSave": false,
+    "eslint.packageManager": "yarn",
     // "eslint.autoFixOnSave": true,
     // "eslint.validate": [
     //     "javascript",

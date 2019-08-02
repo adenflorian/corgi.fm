@@ -234,6 +234,16 @@ You need to add 1 and divide by two the signal coming out of the LFO, so it is b
 It's just following the values of the sine, really, but you can adjust as you see fit, those values are added to the value of the parameter you connect to, so you can, for example, have the cutoff of a filter oscillate around a central frequency
 Yes, https://mmckegg.github.io/web-audio-school/, exercise 13 is exactly what you need
 
+
+# Basic Sampler -> Custom Sampler
+- [ ] UI
+- [ ] Redux
+	- [√] refactor basic sampler redux
+	- [ ] samples data
+- [ ] Web Audio Layer
+- [ ] Networking
+
+
 # 0.6.0
 - [ ] change clients redux so every client only knows about clients in the same room
 - [ ] https://github.com/TheLarkInn/Front-End-Checklist

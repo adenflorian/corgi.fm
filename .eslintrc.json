@@ -82,6 +82,7 @@
         "no-prototype-builtins": "off",
         "import/named": "off",
         // Other
+        "radix": "off",
         "no-console": "error",
         "no-trailing-spaces": "error",
         "no-multiple-empty-lines": [
@@ -200,14 +201,16 @@
         ],
         "no-plusplus": "off",
         "no-unused-vars": "off",
-        "@typescript-eslint/no-unused-vars": [
-            "error",
-            {
-                "vars": "all",
-                "args": "none",
-                "ignoreRestSiblings": false
-            }
-        ],
+        // Don't think this is needed because ts checks it
+        "@typescript-eslint/no-unused-vars": "off",
+        // "@typescript-eslint/no-unused-vars": [
+        //     "error",
+        //     {
+        //         "vars": "all",
+        //         "args": "none",
+        //         "ignoreRestSiblings": false
+        //     }
+        // ],
         "quote-props": [
             "error",
             "consistent-as-needed"

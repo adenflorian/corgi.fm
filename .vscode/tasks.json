@@ -27,9 +27,9 @@
 					"endsPattern": "^done\\!"
 				}
 			},
-			// "runOptions": {
-			// 	"runOn": "folderOpen"
-			// },
+			"runOptions": {
+				// "runOn": "folderOpen"
+			},
 			"presentation": {
 				"group": "groupA",
 				"showReuseMessage": false,
@@ -41,6 +41,22 @@
 			"label": "watch-ts-client",
 			"type": "npm",
 			"script": "watch-ts-client",
+			"presentation": {
+				"group": "groupA",
+				"showReuseMessage": false,
+				"panel": "dedicated",
+				"reveal": "never",
+			},
+			"isBackground": true,
+			"problemMatcher": "$tsc-watch",
+			"runOptions": {
+				// "runOn": "folderOpen"
+			}
+		},
+		{
+			"label": "watch-ts-server",
+			"type": "npm",
+			"script": "watch-ts-server",
 			"presentation": {
 				"group": "groupA",
 				"showReuseMessage": false,
@@ -76,7 +92,7 @@
 			"isBackground": true,
 			"problemMatcher": [],
 			"runOptions": {
-				// "runOn": "folderOpen"
+				"runOn": "folderOpen"
 			}
 		},
 		{
@@ -91,7 +107,7 @@
 			"isBackground": true,
 			"problemMatcher": "$tsc-watch",
 			"runOptions": {
-				// "runOn": "folderOpen"
+				"runOn": "folderOpen"
 			}
 		},
 	]
