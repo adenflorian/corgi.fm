@@ -1,6 +1,5 @@
 import React, {PureComponent} from 'react'
 import {Dispatch} from 'redux'
-import {Point} from '@corgifm/common/common-types'
 import {
 	ActiveGhostConnectorSourceOrTarget, calculateConnectorPositionY,
 	GhostConnection, ghostConnectorActions,
@@ -19,14 +18,14 @@ import {GhostConnectionLine} from './GhostConnectionLine'
 import {LineState} from './LineState'
 
 interface Props {
-	id: string
+	id: Id
 }
 
 interface ReduxProps {
 	ghostConnection: GhostConnection
 	parentPosition: IPosition
 	parentConnectionCount: number
-	localClientId: string
+	localClientId: Id
 }
 
 type AllProps = Props & ReduxProps & {dispatch: Dispatch}

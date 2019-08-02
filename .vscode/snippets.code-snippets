@@ -39,7 +39,7 @@
 			"import React from 'react'",
 			"",
 			"interface Props {",
-			"\tid: string",
+			"\tid: Id",
 			"}",
 			"",
 			"export const $1 = ({id}: Props) => {",

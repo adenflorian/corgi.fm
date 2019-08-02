@@ -1,7 +1,6 @@
 import {Map} from 'immutable'
 import {combineReducers, Reducer} from 'redux'
 import {ActionType} from 'typesafe-actions'
-import {ClientId} from '../common-types'
 import {IClientRoomState} from './common-redux-types'
 import {
 	BROADCASTER_ACTION, SERVER_ACTION,
@@ -16,13 +15,13 @@ export const ghostConnectorActions = {
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	} as const),
-	delete: (id: GhostConnectionId) => ({
+	delete: (id: Id) => ({
 		type: 'GHOST_CONNECTION_DELETE',
 		id,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	} as const),
-	move: (id: GhostConnectionId, x: number, y: number) => ({
+	move: (id: Id, x: number, y: number) => ({
 		type: 'GHOST_CONNECTION_MOVE',
 		id,
 		x,
@@ -33,7 +32,7 @@ export const ghostConnectorActions = {
 } as const
 
 export interface GhostConnectionsState {
-	all: Map<GhostConnectionId, GhostConnection>
+	all: Map<Id, GhostConnection>
 }
 
 export enum ActiveGhostConnectorSourceOrTarget {
@@ -57,7 +56,7 @@ export class GhostConnection {
 		addingOrMoving: GhostConnectorAddingOrMoving.Adding,
 	}
 
-	public readonly id: GhostConnectionId = uuid.v4()
+	public readonly id: Id = uuid.v4()
 
 	public constructor(
 		public readonly activeConnector: ActiveConnector,
@@ -66,11 +65,9 @@ export class GhostConnection {
 		public readonly ownerId: ClientId,
 		public readonly addingOrMoving: GhostConnectorAddingOrMoving,
 		public readonly port: number,
-		public readonly movingConnectionId?: string,
+		public readonly movingConnectionId?: Id,
 	) {}
 }
-
-export type GhostConnectionId = string
 
 export interface ActiveConnector {
 	x: number
@@ -78,19 +75,19 @@ export interface ActiveConnector {
 }
 
 export interface InactiveConnector {
-	parentNodeId: string
+	parentNodeId: Id
 }
 
 export type GhostConnectorAction = ActionType<typeof ghostConnectorActions>
 
-export type GhostConnections = Map<GhostConnectionId, GhostConnection>
+export type GhostConnections = Map<Id, GhostConnection>
 
 export const ghostConnectionsReducer: Reducer<GhostConnectionsState> = combineReducers({
 	all: _allGhostConnectionsReducer,
 })
 
 function _allGhostConnectionsReducer(
-	state: GhostConnections | undefined = Map<GhostConnectionId, GhostConnection>(),
+	state: GhostConnections | undefined = Map<Id, GhostConnection>(),
 	action: GhostConnectorAction,
 ): GhostConnections {
 	switch (action.type) {
@@ -109,5 +106,5 @@ function _allGhostConnectionsReducer(
 
 export const selectGhostConnectionsState = (state: IClientRoomState) => state.ghostConnections
 
-export const selectGhostConnection = (state: IClientRoomState, id: GhostConnectionId): GhostConnection =>
+export const selectGhostConnection = (state: IClientRoomState, id: Id): GhostConnection =>
 	selectGhostConnectionsState(state).all.get(id, GhostConnection.dummy)

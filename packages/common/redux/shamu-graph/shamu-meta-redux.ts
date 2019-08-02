@@ -1,5 +1,5 @@
 import {ActionType} from 'typesafe-actions'
-import {ConnectionNodeType, Id} from '../../common-types'
+import {ConnectionNodeType} from '../../common-types'
 import {IClientRoomState} from '../common-redux-types'
 
 export const shamuMetaActions = {

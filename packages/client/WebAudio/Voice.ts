@@ -9,11 +9,11 @@ export abstract class Voice {
 	public readonly id: number
 	public playingNote: number = -1
 	public playStartTime: number = 0
-	public sourceIds = Set<string>()
+	public sourceIds = Set<Id>()
 	protected readonly _onEnded: OnEndedCallback
 	protected _audioContext: AudioContext
 	protected _destination: AudioNode
-	protected _releaseId: string = ''
+	protected _releaseId: Id = ''
 	// protected readonly _lowPassFilter: BiquadFilterNode
 	protected _gain: GainNode
 	protected _isReleaseScheduled = false
@@ -91,7 +91,7 @@ export abstract class Voice {
 		decayTimeInSeconds: number,
 		sustain: number,
 		attackStart: number,
-		sourceIds: Set<string>,
+		sourceIds: Set<Id>,
 	): void {
 		this.sourceIds = this.sourceIds.concat(sourceIds)
 

@@ -5,7 +5,7 @@ import {Server, Socket} from 'socket.io'
 import {
 	lobby, maxRoomNameLength, serverClientId,
 } from '@corgifm/common/common-constants'
-import {ClientId, ConnectionNodeType} from '@corgifm/common/common-types'
+import {ConnectionNodeType} from '@corgifm/common/common-types'
 import {logger} from '@corgifm/common/logger'
 import {
 	addClient, addRoomMember, BroadcastAction,

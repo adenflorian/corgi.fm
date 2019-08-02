@@ -1,6 +1,5 @@
 import {List} from 'immutable'
 import {ActionType} from 'typesafe-actions'
-import {Id} from '../common-types'
 import {BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION} from '.'
 
 export const roomOwnerRoomActions = List([
@@ -46,7 +45,7 @@ export enum LineType {
 
 const initialState = Object.freeze({
 	lineType: LineType.Curved,
-	ownerId: '-1',
+	ownerId: '-1' as Id,
 	onlyOwnerCanDoStuff: false,
 })
 

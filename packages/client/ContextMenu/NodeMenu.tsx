@@ -27,7 +27,7 @@ function NodeMenu({trigger}: NodeMenuProps) {
 export const ConnectedNodeMenu = connectMenu(nodeMenuId)(NodeMenu)
 
 interface DeleteMenuData {
-	nodeId: string
+	nodeId: Id
 	nodeType: ConnectionNodeType
 }
 

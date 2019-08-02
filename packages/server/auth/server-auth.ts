@@ -31,5 +31,5 @@ export async function verifyAuthHeader(
 interface AuthResult {
 	authenticated: boolean
 	emailVerified: boolean
-	uid: string
+	uid: Id
 }

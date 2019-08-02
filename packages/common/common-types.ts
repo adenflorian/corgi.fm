@@ -1,20 +1,7 @@
 import {List} from 'immutable'
 
-export type ClientId = string
-
-export type Id = string
-
-export interface IDisposable {
-	readonly dispose: () => void
-}
-
-export interface Point {
-	readonly x: number
-	readonly y: number
-}
-
 export interface IConnectable {
-	readonly id: string
+	readonly id: Id
 	readonly color: string | false | List<string>
 	readonly type: ConnectionNodeType
 	readonly width: number
@@ -26,7 +13,7 @@ export interface IConnectable {
 }
 
 export interface IMultiStateThing extends IConnectable {
-	readonly ownerId: string
+	readonly ownerId: Id
 }
 
 export type IMultiStateThingDeserializer = (state: IMultiStateThing) => IMultiStateThing

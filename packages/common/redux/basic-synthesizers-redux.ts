@@ -1,7 +1,7 @@
 import {AnyAction} from 'redux'
 import {createSelector} from 'reselect'
 import * as uuid from 'uuid'
-import {ClientId, ConnectionNodeType, IConnectable, IMultiStateThing} from '../common-types'
+import {ConnectionNodeType, IConnectable, IMultiStateThing} from '../common-types'
 import {pickRandomArrayElement} from '../common-utils'
 import {BuiltInBQFilterType, BuiltInOscillatorType, LfoOscillatorType, ShamuOscillatorType} from '../OscillatorTypes'
 import {NodeSpecialState} from './shamu-graph'
@@ -12,7 +12,7 @@ export const addBasicSynthesizer = (instrument: BasicSynthesizerState) =>
 
 export const SET_BASIC_INSTRUMENT_OSCILLATOR_TYPE = 'SET_BASIC_INSTRUMENT_OSCILLATOR_TYPE'
 export const setBasicSynthesizerOscillatorType =
-	(id: string, oscillatorType: ShamuOscillatorType) => ({
+	(id: Id, oscillatorType: ShamuOscillatorType) => ({
 		type: SET_BASIC_INSTRUMENT_OSCILLATOR_TYPE,
 		id,
 		oscillatorType,
@@ -22,7 +22,7 @@ export const setBasicSynthesizerOscillatorType =
 
 export const SET_BASIC_INSTRUMENT_PARAM = 'SET_BASIC_INSTRUMENT_PARAM'
 export const setBasicSynthesizerParam =
-	(id: string, paramName: BasicSynthesizerParam, value: any) => ({
+	(id: Id, paramName: BasicSynthesizerParam, value: any) => ({
 		type: SET_BASIC_INSTRUMENT_PARAM,
 		id,
 		paramName,
@@ -109,7 +109,7 @@ export class BasicSynthesizerState implements IConnectable, NodeSpecialState {
 	= pickRandomArrayElement(['sine', 'sawtooth', 'square', 'triangle']) as ShamuOscillatorType
 
 	public readonly id = uuid.v4()
-	public readonly ownerId: string
+	public readonly ownerId: Id
 	public readonly pan: number = Math.random() - 0.5
 	public readonly lowPassFilterCutoffFrequency: number = Math.min(10000, Math.random() * 10000 + 1000)
 	public readonly attack: number = 0.01
@@ -191,5 +191,5 @@ export const selectAllBasicSynthesizerIds = createSelector(
 export const selectBasicSynthesizersByOwner = (state: IClientRoomState, ownerId: ClientId) =>
 	selectAllBasicSynthesizersAsArray(state).filter(x => x.ownerId === ownerId)
 
-export const selectBasicSynthesizer = (state: IClientRoomState, id: string) =>
-	selectAllBasicSynthesizers(state)[id] || BasicSynthesizerState.dummy
+export const selectBasicSynthesizer = (state: IClientRoomState, id: Id) =>
+	selectAllBasicSynthesizers(state)[id as string] || BasicSynthesizerState.dummy

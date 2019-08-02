@@ -20,7 +20,7 @@ export const addGridSequencer = (gridSequencer: GridSequencerState) =>
 	addMultiThing(gridSequencer, ConnectionNodeType.gridSequencer, NetworkActionType.SERVER_AND_BROADCASTER)
 
 export const gridSequencerActions = {
-	setNote: (gridSequencerId: string, index: number, enabled: boolean, note: IMidiNote) => ({
+	setNote: (gridSequencerId: Id, index: number, enabled: boolean, note: IMidiNote) => ({
 		type: 'SET_GRID_SEQUENCER_NOTE',
 		id: gridSequencerId,
 		index,
@@ -29,13 +29,13 @@ export const gridSequencerActions = {
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	} as const),
-	restart: (id: string) => ({
+	restart: (id: Id) => ({
 		type: 'RESTART_GRID_SEQUENCER',
 		id,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	} as const),
-	setField: (id: string, fieldName: GridSequencerFields, data: any) => ({
+	setField: (id: Id, fieldName: GridSequencerFields, data: any) => ({
 		type: 'SET_GRID_SEQUENCER_FIELD',
 		id,
 		fieldName,
@@ -94,7 +94,7 @@ export class GridSequencerState extends SequencerStateBase {
 	public readonly notesToShow: number
 
 	public constructor(
-		ownerId: string,
+		ownerId: Id,
 		name = 'Grid Sequencer',
 		notesToShow = 24,
 		events = createSequencerEvents(32)
@@ -329,16 +329,16 @@ export const selectAllGridSequencerIds = createSelector(
 	gridSequencers => Object.keys(gridSequencers),
 )
 
-export const selectGridSequencer = (state: IClientRoomState, id: string) =>
-	selectAllGridSequencers(state)[id] || GridSequencerState.dummy
+export const selectGridSequencer = (state: IClientRoomState, id: Id) =>
+	selectAllGridSequencers(state)[id as string] || GridSequencerState.dummy
 
-export const selectGridSequencerEvents = (state: IClientRoomState, id: string) =>
+export const selectGridSequencerEvents = (state: IClientRoomState, id: Id) =>
 	selectGridSequencer(state, id).midiClip.events
 
-export const selectGridSequencerIsActive = (state: IClientRoomState, id: string) =>
+export const selectGridSequencerIsActive = (state: IClientRoomState, id: Id) =>
 	selectGridSequencer(state, id).isPlaying
 
-export const selectGridSequencerIsSending = (state: IClientRoomState, id: string) =>
+export const selectGridSequencerIsSending = (state: IClientRoomState, id: Id) =>
 	selectGridSequencerActiveNotes(state, id).count() > 0
 
 export const selectGridSequencerActiveNotes = createSelector(

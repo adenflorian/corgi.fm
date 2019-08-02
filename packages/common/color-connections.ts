@@ -24,7 +24,7 @@ function updateConnectionTargetColor(
 	dispatch: Dispatch,
 	connection: IConnection,
 	color: string,
-	processedConnectionIDs = List<string>(),
+	processedConnectionIDs = List<Id>(),
 ) {
 	if (processedConnectionIDs.contains(connection.id)) return
 

@@ -1,7 +1,7 @@
 import {Set} from 'immutable'
 import {createSelector} from 'reselect'
 import * as uuid from 'uuid'
-import {ClientId, ConnectionNodeType, IMultiStateThing, IMultiStateThingDeserializer, Octave} from '../common-types'
+import {ConnectionNodeType, IMultiStateThing, IMultiStateThingDeserializer, Octave} from '../common-types'
 import {applyOctave} from '../common-utils'
 import {emptyMidiNotes, IMidiNote, IMidiNotes, MidiNotes} from '../MidiNote'
 import {NodeSpecialState} from './shamu-graph'
@@ -20,7 +20,7 @@ export const addVirtualKeyboard = (virtualKeyboard: VirtualKeyboardState) =>
 
 export const VIRTUAL_KEY_PRESSED = 'VIRTUAL_KEY_PRESSED'
 export type VirtualKeyPressedAction = ReturnType<typeof virtualKeyPressed>
-export const virtualKeyPressed = (id: string, number: number, octave: Octave, midiNote: IMidiNote) => {
+export const virtualKeyPressed = (id: Id, number: number, octave: Octave, midiNote: IMidiNote) => {
 	return {
 		type: VIRTUAL_KEY_PRESSED as typeof VIRTUAL_KEY_PRESSED,
 		SERVER_ACTION,
@@ -34,7 +34,7 @@ export const virtualKeyPressed = (id: string, number: number, octave: Octave, mi
 
 export const VIRTUAL_KEY_UP = 'VIRTUAL_KEY_UP'
 export type VirtualKeyUpAction = ReturnType<typeof virtualKeyUp>
-export const virtualKeyUp = (id: string, number: number) => {
+export const virtualKeyUp = (id: Id, number: number) => {
 	return {
 		type: VIRTUAL_KEY_UP as typeof VIRTUAL_KEY_UP,
 		SERVER_ACTION,
@@ -46,7 +46,7 @@ export const virtualKeyUp = (id: string, number: number) => {
 
 export const VIRTUAL_OCTAVE_CHANGE = 'VIRTUAL_OCTAVE_CHANGE'
 export type VirtualOctaveChangeAction = ReturnType<typeof virtualOctaveChange>
-export const virtualOctaveChange = (id: string, delta: number) => {
+export const virtualOctaveChange = (id: Id, delta: number) => {
 	return {
 		type: VIRTUAL_OCTAVE_CHANGE as typeof VIRTUAL_OCTAVE_CHANGE,
 		SERVER_ACTION,
@@ -95,7 +95,7 @@ export class VirtualKeyboardState implements IMultiStateThing, NodeSpecialState 
 
 	public readonly pressedKeys: IMidiNotes = Set()
 	public readonly octave: number = 4
-	public readonly id: string = uuid.v4()
+	public readonly id: Id = uuid.v4()
 	public readonly type = ConnectionNodeType.virtualKeyboard
 	public readonly width: number = VirtualKeyboardState.defaultWidth
 	public readonly height: number = VirtualKeyboardState.defaultHeight
@@ -166,11 +166,11 @@ export const selectAllVirtualKeyboardIds = createSelector(
 	virtualKeyboards => Object.keys(virtualKeyboards),
 )
 
-export const selectVirtualKeyboardById = (state: IClientRoomState, id: string) => {
-	return selectAllVirtualKeyboards(state)[id] || VirtualKeyboardState.dummy
+export const selectVirtualKeyboardById = (state: IClientRoomState, id: Id) => {
+	return selectAllVirtualKeyboards(state)[id as string] || VirtualKeyboardState.dummy
 }
 
-export const selectVirtualKeyboardHasPressedKeys = (state: IClientRoomState, id: string) => {
+export const selectVirtualKeyboardHasPressedKeys = (state: IClientRoomState, id: Id) => {
 	return selectVirtualKeyboardById(state, id).pressedKeys.count() > 0
 }
 

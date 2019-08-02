@@ -2,7 +2,6 @@ import * as animal from 'animal-id'
 import {createSelector} from 'reselect'
 import {v4} from 'uuid'
 import {serverClientId} from '../common-constants'
-import {ClientId, Id} from '../common-types'
 import {getNumberInRangeFromString} from '../common-utils'
 import {logger} from '../logger'
 import {CssColor} from '../shamu-color'
@@ -65,7 +64,7 @@ export interface IClientsState {
 }
 
 export interface IClientState {
-	readonly id: string
+	readonly id: Id
 	readonly color: string
 	readonly name: string
 	readonly socketId: string
@@ -86,7 +85,7 @@ export class ClientState implements IClientState {
 	}
 
 	public readonly socketId: string
-	public readonly id: string
+	public readonly id: Id
 	public readonly color: string
 	public readonly name: string
 
@@ -101,7 +100,7 @@ export class ClientState implements IClientState {
 	}
 }
 
-export function createUsername(id = '0') {
+export function createUsername(id: Id = '0') {
 	return animal.getId() + '-' + (id[0] || '9')
 }
 
@@ -205,7 +204,7 @@ export function selectLocalClient(state: IClientAppState): IClientState {
 	}
 }
 
-export function selectLocalClientId(state: IClientAppState): string {
+export function selectLocalClientId(state: IClientAppState): Id {
 	return state.clients.localClientId || 'fakeLocalClientId'
 }
 
@@ -217,7 +216,7 @@ export const selectAllClientsAsMap = (state: IClientAppState | IServerState) =>
 	selectAllClients(state).reduce((map, client) => {
 		return {
 			...map,
-			[client.id]: client,
+			[client.id as string]: client,
 		}
 	})
 

@@ -10,20 +10,20 @@ export const pointerActionTypesWhitelist = List([
 ] as const)
 
 export const pointersActions = {
-	add: (ownerId: string) => ({
+	add: (ownerId: Id) => ({
 		type: 'ADD_POINTER',
 		ownerId,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	} as const),
-	update: (ownerId: string, pointer: Partial<Pointer>) => ({
+	update: (ownerId: Id, pointer: Partial<Pointer>) => ({
 		type: 'UPDATE_POINTER',
 		ownerId,
 		pointer,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	} as const),
-	delete: (ownerId: string) => ({
+	delete: (ownerId: Id) => ({
 		type: 'DELETE_POINTER',
 		ownerId,
 		SERVER_ACTION,
@@ -37,12 +37,12 @@ export const pointersActions = {
 
 export type Pointers = typeof defaultPointers
 
-const defaultPointers = Map<string, Pointer>()
+const defaultPointers = Map<Id, Pointer>()
 
 export type Pointer = typeof defaultPointer
 
 const defaultPointer = Object.freeze({
-	ownerId: '-1',
+	ownerId: '-1' as Id,
 	x: 0,
 	y: 0,
 })
@@ -69,5 +69,5 @@ export const selectPointersState = (state: IClientRoomState) => state.pointers
 
 export const selectAllPointers = (state: IClientRoomState) => state.pointers.all
 
-export const selectPointer = (state: IClientRoomState, ownerId: string) =>
+export const selectPointer = (state: IClientRoomState, ownerId: Id) =>
 	selectAllPointers(state).get(ownerId) || defaultPointer

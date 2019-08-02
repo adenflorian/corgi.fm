@@ -1,5 +1,5 @@
 import {combineReducers} from 'redux'
-import {ConnectionNodeType, Id} from '../../common-types'
+import {ConnectionNodeType} from '../../common-types'
 import {groupSequencersReducer} from '../group-sequencers-redux'
 import {simpleDelaysReducer} from '../simple-delay-redux'
 import {
@@ -34,10 +34,10 @@ import {
 // }
 
 // export interface NodeState {
-// 	id: string
+// 	id: Id
 // 	type: ConnectionNodeType
 // 	// position: IPosition
-// 	ownerId: string
+// 	ownerId: Id
 // 	specialState: NodeSpecialState
 // }
 
@@ -60,7 +60,7 @@ import {
 // 	VirtualKeyboardState | GridSequencerState | InfiniteSequencerState
 
 export interface NodeSpecialState {
-	readonly id: string
+	readonly id: Id
 }
 
 // export type ShamuNodesAction = ActionType<typeof shamuNodesActions> | UpdatePositionsAction
@@ -135,7 +135,7 @@ export const nodesReducer = combineReducers({
 
 // const dummyNodeSpecialState: NodeSpecialState = GridSequencerState.dummy
 
-export const selectNodeIdsOwnedByClient = (state: IClientRoomState, clientId: string) => {
+export const selectNodeIdsOwnedByClient = (state: IClientRoomState, clientId: ClientId) => {
 	const nodes = state.shamuGraph.nodes as unknown as {[key: string]: IMultiState}
 
 	const ids: {id: Id, type: ConnectionNodeType}[] = []

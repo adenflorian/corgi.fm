@@ -1,9 +1,6 @@
 import React, {Fragment} from 'react'
 import {ContextMenu} from 'react-contextmenu'
 import {
-	Id,
-} from '@corgifm/common/common-types'
-import {
 	selectLocalClient, selectVirtualKeyboardsByOwner, shamuConnect,
 } from '@corgifm/common/redux'
 import {backgroundMenuId} from '../client-constants'

@@ -1,6 +1,6 @@
 import {List} from 'immutable'
 import {ActionType} from 'typesafe-actions'
-import {ConnectionNodeType, IConnectable, Id, IMultiStateThing} from '../common-types'
+import {ConnectionNodeType, IConnectable, IMultiStateThing} from '../common-types'
 import {CssColor} from '../shamu-color'
 import {
 	addMultiThing, BROADCASTER_ACTION, getConnectionNodeInfo,
@@ -69,7 +69,7 @@ export class GroupSequencer implements IConnectable, NodeSpecialState, IMultiSta
 	public readonly enabled: boolean = true
 
 	public constructor(
-		public readonly ownerId: string,
+		public readonly ownerId: Id,
 	) {
 		this.groups = makeGroups([CssColor.red, CssColor.green, CssColor.blue], this.length, this.groupEventBeatLength)
 		this.outputPortCount = this.groups.count()
@@ -182,5 +182,5 @@ function eventReducer(event: GroupEvent, action: GroupSequencerAction): GroupEve
 
 export const selectAllGroupSequencers = (state: IClientRoomState) => state.shamuGraph.nodes.groupSequencers.things
 
-export const selectGroupSequencer = (state: IClientRoomState, id: string) =>
-	selectAllGroupSequencers(state)[id] || GroupSequencer.dummy
+export const selectGroupSequencer = (state: IClientRoomState, id: Id): GroupSequencer =>
+	selectAllGroupSequencers(state)[id as string] || GroupSequencer.dummy

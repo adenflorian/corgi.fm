@@ -76,7 +76,7 @@ export type RoomsReduxAction = SetRoomsAction | SetActiveRoomAction | RequestCre
 ChangeRoomAction | CreateRoomAction | DeleteRoomAction | UserLeftRoomAction | LoadRoomAction
 
 export interface LocalSaves {
-	readonly all: Map<string, SavedRoom>
+	readonly all: Map<Id, SavedRoom>
 }
 
 export interface SavedRoom {

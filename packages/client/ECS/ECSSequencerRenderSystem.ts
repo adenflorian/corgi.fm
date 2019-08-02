@@ -6,7 +6,7 @@ import {ECSComponentType, ECSEntity, ECSSystem} from './ECSTypes'
 export class ECSSequencerRenderSystem extends ECSSystem {
 	public static readonly canvasIdPrefix = 'ECSCanvasRenderSystemCanvas-node-'
 
-	private _canvasContexts = Map<string, CanvasRenderingContext2D>()
+	private _canvasContexts = Map<Id, CanvasRenderingContext2D>()
 	private _isPlaying = Map<string, boolean>()
 
 	public getRequiredComponents(): Set<ECSComponentType> {
@@ -58,7 +58,7 @@ export class ECSSequencerRenderSystem extends ECSSystem {
 		)
 	}
 
-	private _getContextForNodeId(nodeId: string) {
+	private _getContextForNodeId(nodeId: Id) {
 		const canvasContext = this._canvasContexts.get(nodeId)
 
 		if (canvasContext) return canvasContext

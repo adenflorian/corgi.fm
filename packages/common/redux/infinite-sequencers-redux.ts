@@ -1,7 +1,7 @@
 import {List, Set, Stack} from 'immutable'
 import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
-import {ConnectionNodeType, Id, IMultiStateThing} from '../common-types'
+import {ConnectionNodeType, IMultiStateThing} from '../common-types'
 import {assertArrayHasNoUndefinedElements} from '../common-utils'
 import {logger} from '../logger'
 import {makeMidiClipEvent, MidiClip} from '../midi-types'
@@ -105,7 +105,7 @@ export class InfiniteSequencerState extends SequencerStateBase {
 	public readonly showRows: boolean
 
 	public constructor(
-		ownerId: string,
+		ownerId: Id,
 		name = 'Infinite Sequencer',
 		style = InfiniteSequencerStyle.colorGrid,
 		events = createSequencerEvents(4)
@@ -300,12 +300,13 @@ function infiniteSequencerReducer(
 	}
 }
 
-export const selectInfiniteSequencer = (state: IClientRoomState, id: string) => selectAllInfiniteSequencers(state)[id] || InfiniteSequencerState.dummy
+export const selectInfiniteSequencer = (state: IClientRoomState, id: Id) =>
+	selectAllInfiniteSequencers(state)[id as string] || InfiniteSequencerState.dummy
 
-export const selectInfiniteSequencerIsActive = (state: IClientRoomState, id: string) =>
+export const selectInfiniteSequencerIsActive = (state: IClientRoomState, id: Id) =>
 	selectInfiniteSequencer(state, id).isPlaying
 
-export const selectInfiniteSequencerIsSending = (state: IClientRoomState, id: string) =>
+export const selectInfiniteSequencerIsSending = (state: IClientRoomState, id: Id) =>
 	selectInfiniteSequencerActiveNotes(state, id).count() > 0
 
 const emptyNotes = MidiNotes()

@@ -16,7 +16,7 @@ import {isWhiteKey} from '../Keyboard/Keyboard'
 import {localActions} from '../local-middleware'
 
 interface Props {
-	id: string
+	id: Id
 }
 
 interface ReduxProps {

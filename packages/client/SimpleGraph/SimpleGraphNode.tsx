@@ -126,7 +126,7 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 	}
 }
 
-export function getComponentByNodeType(type: ConnectionNodeType, id: string, color: string) {
+export function getComponentByNodeType(type: ConnectionNodeType, id: Id, color: string) {
 	switch (type) {
 		case ConnectionNodeType.masterClock: return <ConnectedMasterControls color={color} />
 		case ConnectionNodeType.audioOutput: return <ConnectedVolumeControl color={color} />

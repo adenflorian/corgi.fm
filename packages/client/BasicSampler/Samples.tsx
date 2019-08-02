@@ -3,7 +3,6 @@ import {useSelector, useDispatch} from 'react-redux'
 import {selectSamples} from '@corgifm/common/redux'
 import {IMidiNote} from '@corgifm/common/MidiNote'
 import {Sample} from '@corgifm/common/common-samples-stuff'
-import {Id} from '@corgifm/common/common-types'
 import {localActions} from '../local-middleware'
 
 interface Props {

@@ -2,7 +2,7 @@ import React from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 import {
-	allBuiltInBQFilterTypes, BuiltInBQFilterType
+	allBuiltInBQFilterTypes, BuiltInBQFilterType,
 } from '@corgifm/common/OscillatorTypes'
 import {ConnectionNodeType} from '@corgifm/common/common-types'
 import {
@@ -12,21 +12,21 @@ import {
 import {
 	adsrValueToString, attackToolTip, decayToolTip, detuneToolTip,
 	detuneValueToString, filterToolTip, filterValueToString, gainToolTip,
-	panToolTip, panValueToString, percentageValueString, releaseToolTip, 
+	panToolTip, panValueToString, percentageValueString, releaseToolTip,
 	sustainToolTip,
 } from '../client-constants'
 import {Knob} from '../Knob/Knob'
 import {KnobSnapping} from '../Knob/KnobSnapping'
 import {Panel} from '../Panel/Panel'
 import {
-	ConnectedNoteSchedulerVisualPlaceholder
+	ConnectedNoteSchedulerVisualPlaceholder,
 } from '../WebAudio/SchedulerVisual'
 import './BasicSampler.less'
 import {Samples} from './Samples'
 
 interface Props {
 	color: string
-	id: string
+	id: Id
 }
 
 interface ReduxProps {

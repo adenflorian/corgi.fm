@@ -13,7 +13,7 @@ export interface IPanelProps {
 	children: any
 	className?: string
 	color?: string
-	id?: string
+	id?: Id
 	label?: string
 	labelTitle?: string
 	saturate?: boolean
@@ -78,7 +78,7 @@ export const DumbPanel: React.FC<AllProps> =
 					</div>
 				}
 				<div
-					id={id}
+					id={id as string}
 					className={`panel ${className}`}
 				>
 					{children}

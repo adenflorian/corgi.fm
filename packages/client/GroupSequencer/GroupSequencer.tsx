@@ -7,7 +7,7 @@ import {Panel} from '../Panel/Panel'
 import './GroupSequencer.less'
 
 interface Props {
-	id: string
+	id: Id
 	color: string
 }
 

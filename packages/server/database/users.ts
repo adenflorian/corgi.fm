@@ -8,13 +8,13 @@ export const usersQueries = (db: Db) => {
 	return {
 		collectionName: usersCollection.collectionName,
 
-		async updateOrCreate(userUpdate: UserUpdate, uid: string) {
+		async updateOrCreate(userUpdate: UserUpdate, uid: Id) {
 			const user: User = {...userUpdate, uid}
 
 			await usersCollection.updateOne({uid}, {$set: user}, {upsert: true})
 		},
 
-		async getByUid(uid: string): Promise<User | null> {
+		async getByUid(uid: Id): Promise<User | null> {
 			const result = await usersCollection.findOne<User>({uid})
 
 			if (result === null) return null

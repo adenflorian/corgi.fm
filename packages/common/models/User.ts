@@ -21,7 +21,7 @@ export class User extends UserUpdate {
 	@Length(28, 28)
 	@IsAlphanumeric()
 	/** Example: ca5Ck2RLp7TlwLzH4r2ivWTcu1C2 */
-	public readonly uid: string = ''
+	public readonly uid: Id = ''
 }
 
 export function makeUser(user: User) {

@@ -2,7 +2,7 @@ import {List, Map, Set} from 'immutable'
 import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
 import {
-	ConnectionNodeType, Id, IMultiStateThing, isSequencerNodeType,
+	ConnectionNodeType, IMultiStateThing, isSequencerNodeType,
 } from '../common-types'
 import {
 	makeMidiClip, makeMidiClipEvent, MidiClip, MidiClipEvent, MidiClipEvents,
@@ -19,13 +19,13 @@ import {BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION} from '.'
 import uuid = require('uuid')
 
 export const sequencerActions = {
-	clear: (id: string) => ({
+	clear: (id: Id) => ({
 		type: 'CLEAR_SEQUENCER',
 		id,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	} as const),
-	undo: (id: string) => ({
+	undo: (id: Id) => ({
 		type: 'UNDO_SEQUENCER',
 		id,
 		SERVER_ACTION,
@@ -34,19 +34,19 @@ export const sequencerActions = {
 	skipNote: () => ({
 		type: 'SKIP_NOTE',
 	} as const),
-	recordRest: (id: string) => ({
+	recordRest: (id: Id) => ({
 		type: 'RECORD_SEQUENCER_REST',
 		id,
 		BROADCASTER_ACTION,
 		SERVER_ACTION,
 	} as const),
-	play: (id: string) => ({
+	play: (id: Id) => ({
 		type: 'PLAY_SEQUENCER',
 		id,
 		BROADCASTER_ACTION,
 		SERVER_ACTION,
 	} as const),
-	stop: (id: string) => ({
+	stop: (id: Id) => ({
 		type: 'STOP_SEQUENCER',
 		id,
 		BROADCASTER_ACTION,
@@ -62,11 +62,11 @@ export const sequencerActions = {
 		BROADCASTER_ACTION,
 		SERVER_ACTION,
 	} as const),
-	exportMidi: (id: string) => ({
+	exportMidi: (id: Id) => ({
 		type: 'EXPORT_SEQUENCER_MIDI',
 		id,
 	} as const),
-	recordNote: (id: string, note: IMidiNote, index?: number) => ({
+	recordNote: (id: Id, note: IMidiNote, index?: number) => ({
 		type: 'RECORD_SEQUENCER_NOTE',
 		id,
 		note,
@@ -104,7 +104,7 @@ export interface ISequencerState extends IMultiStateThing, NodeSpecialState {
 	readonly midiClip: MidiClip
 	readonly index: number
 	readonly isPlaying: boolean
-	readonly id: string
+	readonly id: Id
 	readonly color: string | false
 	readonly name: string
 	readonly isRecording: boolean
@@ -141,7 +141,7 @@ export const dummySequencerState: SequencerStateBase = {
 
 export abstract class SequencerStateBase implements ISequencerState {
 	public readonly index: number = -1
-	public readonly id = uuid.v4()
+	public readonly id: Id = uuid.v4()
 	public readonly color: string | false = false
 	public readonly isRecording: boolean = false
 	public readonly previousEvents: List<MidiClipEvents> = List<MidiClipEvents>()
@@ -153,7 +153,7 @@ export abstract class SequencerStateBase implements ISequencerState {
 		public readonly midiClip: MidiClip,
 		public readonly width: number,
 		public readonly height: number,
-		public readonly ownerId: string,
+		public readonly ownerId: Id,
 		public readonly type: ConnectionNodeType,
 		public readonly notesDisplayStartX: number,
 		public readonly notesDisplayWidth: number,
@@ -192,8 +192,8 @@ export const selectAllSequencers = createSelector(
 	(gridSeqs, infSeqs) => ({...gridSeqs, ...infSeqs}),
 )
 
-export function selectSequencer(state: IClientRoomState, id: string) {
-	return selectAllSequencers(state)[id] || dummySequencerState
+export function selectSequencer(state: IClientRoomState, id: Id) {
+	return selectAllSequencers(state)[id as string] || dummySequencerState
 }
 
 export const selectIsAnythingPlaying = createSelector(
@@ -201,7 +201,7 @@ export const selectIsAnythingPlaying = createSelector(
 	allSeqs => Map(allSeqs).some(x => x.isPlaying),
 )
 
-export const selectSequencerIsPlaying = (state: IClientRoomState, id: string): boolean => {
+export const selectSequencerIsPlaying = (state: IClientRoomState, id: Id): boolean => {
 	if (selectSequencer(state, id).isPlaying === false) return false
 	if (selectGlobalClockIsPlaying(state) === false) return false
 
@@ -209,9 +209,9 @@ export const selectSequencerIsPlaying = (state: IClientRoomState, id: string): b
 }
 
 let previousConnectionsState = {}
-let previousResults = Map<string, boolean>()
+let previousResults = Map<Id, boolean>()
 
-function memoizedIsUpstreamClockFromNode(state: IClientRoomState, nodeId: string) {
+function memoizedIsUpstreamClockFromNode(state: IClientRoomState, nodeId: Id) {
 	const newConnectionsState = selectAllConnections(state)
 
 	if (newConnectionsState === previousConnectionsState && previousResults.has(nodeId)) {
@@ -230,7 +230,7 @@ function memoizedIsUpstreamClockFromNode(state: IClientRoomState, nodeId: string
 }
 
 function isUpstreamClockFromNode(
-	state: IClientRoomState, nodeId: string, processedNodeIds = Set<string>(),
+	state: IClientRoomState, nodeId: Id, processedNodeIds = Set<Id>(),
 ): boolean {
 	if (processedNodeIds.includes(nodeId)) return false
 
@@ -244,14 +244,14 @@ function isUpstreamClockFromNode(
 		})
 }
 
-export const selectDirectDownstreamSequencerIds = (state: IClientRoomState, id: string): List<SequencerId> => {
+export const selectDirectDownstreamSequencerIds = (state: IClientRoomState, id: Id): List<SequencerId> => {
 	return _getDirectDownstreamSequencerIds(state, id)
 }
 
-type SequencerId = string
+interface SequencerId extends Id {}
 
 function _getDirectDownstreamSequencerIds(
-	state: IClientRoomState, nodeId: string,
+	state: IClientRoomState, nodeId: Id,
 ): List<SequencerId> {
 	return selectConnectionsWithSourceIds(state, [nodeId])
 		.filter(connection => isSequencerNodeType(connection.targetType))

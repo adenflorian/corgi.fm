@@ -3,7 +3,7 @@ import {Dispatch, Middleware} from 'redux'
 import {ActionType} from 'typesafe-actions'
 import uuid from 'uuid'
 import {MAX_MIDI_NOTE_NUMBER_127} from '@corgifm/common/common-constants'
-import {ConnectionNodeType, Id, IMultiStateThing} from '@corgifm/common/common-types'
+import {ConnectionNodeType, IMultiStateThing} from '@corgifm/common/common-types'
 import {applyOctave, createNodeId} from '@corgifm/common/common-utils'
 import {logger} from '@corgifm/common/logger'
 import {MidiClipEvent} from '@corgifm/common/midi-types'
@@ -619,11 +619,11 @@ const makeInitialLocalSavesStorage = (): LocalSaves => ({
 	all: Map(),
 })
 
-let _previousNotesForSourceId = Map<string, MidiNotes>()
+let _previousNotesForSourceId = Map<Id, MidiNotes>()
 
 function scheduleNote(
 	note: IMidiNote,
-	sourceId: string,
+	sourceId: Id,
 	roomState: IClientRoomState,
 	onOrOff: 'on' | 'off',
 	getAllInstruments: GetAllInstruments,
@@ -665,7 +665,7 @@ function scheduleNote(
 }
 
 function playShortNote(
-	note: IMidiNote, sourceId: string, roomState: IClientRoomState,
+	note: IMidiNote, sourceId: Id, roomState: IClientRoomState,
 	getAllInstruments: GetAllInstruments,
 ) {
 	const targetIds = selectConnectionsWithSourceIds(roomState, [sourceId]).map(x => x.targetId)
@@ -687,7 +687,7 @@ function playShortNote(
 }
 
 function playShortNoteOnTarget(
-	note: IMidiNote, targetId: string, roomState: IClientRoomState,
+	note: IMidiNote, targetId: Id, roomState: IClientRoomState,
 	getAllInstruments: GetAllInstruments,
 ) {
 	const delayUntilRelease = 0.25
@@ -782,7 +782,7 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 }
 
 function _getDownstreamRecordingSequencers(
-	state: IClientAppState, nodeId: string
+	state: IClientAppState, nodeId: Id
 ): List<ISequencerState> {
 	return selectDirectDownstreamSequencerIds(state.room, nodeId)
 		.map(x => selectSequencer(state.room, x))

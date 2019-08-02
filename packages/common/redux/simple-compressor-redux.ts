@@ -1,6 +1,6 @@
 import {AnyAction} from 'redux'
 import * as uuid from 'uuid'
-import {ClientId, ConnectionNodeType, IConnectable, IMultiStateThing} from '../common-types'
+import {ConnectionNodeType, IConnectable, IMultiStateThing} from '../common-types'
 import {NodeSpecialState} from './shamu-graph'
 import {addMultiThing, BROADCASTER_ACTION, createSelectAllOfThingAsArray, IClientRoomState, IMultiState, makeMultiReducer, NetworkActionType, SERVER_ACTION} from '.'
 
@@ -10,7 +10,7 @@ export const addSimpleCompressor = (sampler: SimpleCompressorState) =>
 export const SET_SIMPLE_COMPRESSOR_PARAM = 'SET_SIMPLE_COMPRESSOR_PARAM'
 export type SetSimpleCompressorParamAction = ReturnType<typeof setSimpleCompressorParam>
 export const setSimpleCompressorParam =
-	(id: string, paramName: SimpleCompressorParam, value: any) => ({
+	(id: Id, paramName: SimpleCompressorParam, value: any) => ({
 		type: SET_SIMPLE_COMPRESSOR_PARAM as typeof SET_SIMPLE_COMPRESSOR_PARAM,
 		id,
 		paramName,
@@ -56,7 +56,7 @@ export class SimpleCompressorState implements IConnectable, NodeSpecialState {
 	}
 
 	public readonly id = uuid.v4()
-	public readonly ownerId: string
+	public readonly ownerId: Id
 	public readonly threshold: number = -24
 	public readonly ratio: number = 12
 	public readonly attack: number = 0.003
@@ -117,5 +117,5 @@ export const selectAllSimpleCompressorsAsArray =
 export const selectSimpleCompressorsByOwner = (state: IClientRoomState, ownerId: ClientId) =>
 	selectAllSimpleCompressorsAsArray(state).filter(x => x.ownerId === ownerId)
 
-export const selectSimpleCompressor = (state: IClientRoomState, id: string) =>
-	selectAllSimpleCompressors(state)[id] || SimpleCompressorState.dummy
+export const selectSimpleCompressor = (state: IClientRoomState, id: Id) =>
+	selectAllSimpleCompressors(state)[id as string] || SimpleCompressorState.dummy

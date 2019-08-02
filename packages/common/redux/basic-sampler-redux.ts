@@ -1,7 +1,7 @@
 import * as uuid from 'uuid'
 import {ActionType} from 'typesafe-actions'
 import {OrderedMap} from 'immutable'
-import {ClientId, ConnectionNodeType, IConnectable, IMultiStateThing, Id} from '../common-types'
+import {ConnectionNodeType, IConnectable, IMultiStateThing} from '../common-types'
 import {BuiltInBQFilterType} from '../OscillatorTypes'
 import {samplerBasicPianoNotes, Samples, makeSamples, Sample} from '../common-samples-stuff'
 import {convertToNumberKeyMap} from '../common-utils'
@@ -21,7 +21,7 @@ export const basicSamplerActions = {
 			NetworkActionType.SERVER_AND_BROADCASTER
 		),
 	setParam: (
-		id: string, paramName: BasicSamplerParam, value: BasicSamplerParamTypes
+		id: Id, paramName: BasicSamplerParam, value: BasicSamplerParamTypes
 	) => ({
 		type: 'SET_BASIC_SAMPLER_PARAM',
 		id,
@@ -81,7 +81,7 @@ export class BasicSamplerState implements IConnectable, NodeSpecialState {
 	}
 
 	public readonly id = uuid.v4()
-	public readonly ownerId: string
+	public readonly ownerId: Id
 	public readonly pan: number = Math.random() - 0.5
 	public readonly lowPassFilterCutoffFrequency: number = Math.min(10000, Math.random() * 10000 + 1000)
 	public readonly attack: number = 0.01
@@ -151,8 +151,8 @@ export const selectAllSamplersAsArray =
 export const selectSamplersByOwner = (state: IClientRoomState, ownerId: ClientId) =>
 	selectAllSamplersAsArray(state).filter(x => x.ownerId === ownerId)
 
-export const selectSampler = (state: IClientRoomState, id: string) =>
-	selectAllSamplers(state)[id] || BasicSamplerState.dummy
+export const selectSampler = (state: IClientRoomState, id: Id) =>
+	selectAllSamplers(state)[id as string] || BasicSamplerState.dummy
 
 export const selectSamples = (id: Id) => (state: IClientAppState) =>
 	selectSampler(state.room, id).samples

@@ -1,12 +1,12 @@
 import {createReducer, IClientAppState} from '.'
 
 export interface IWebsocketState {
-	id?: string
+	id?: Id
 	info: string
 }
 
 export type SetSocketIdAction = ReturnType<typeof setSocketId>
-export const setSocketId = (id: string) => ({
+export const setSocketId = (id: Id) => ({
 	type: 'SET_SOCKET_ID',
 	id,
 } as const)

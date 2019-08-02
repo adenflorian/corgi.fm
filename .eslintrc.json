@@ -175,7 +175,7 @@
         // Too many false positives
         "@typescript-eslint/promise-function-async": "off",
         "@typescript-eslint/require-array-sort-compare": "error",
-        "@typescript-eslint/restrict-plus-operands": "error",
+        "@typescript-eslint/restrict-plus-operands": "off",
         // TODO
         // "@typescript-eslint/strict-boolean-expressions": "error",
         "@typescript-eslint/unbound-method": "error",

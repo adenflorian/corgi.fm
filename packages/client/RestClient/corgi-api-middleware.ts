@@ -29,7 +29,7 @@ export function createCorgiApiMiddleware(
 	firebase: FirebaseContextStuff
 ): Middleware<{}, IClientAppState> {
 
-	let localUid: string
+	let localUid: Id
 	let jwt: string
 
 	const putUserDebounced = debounce(_putUser, 2000)
@@ -62,7 +62,7 @@ export function createCorgiApiMiddleware(
 	}
 
 	async function getUserByUid(
-		uid: string, localClient?: IClientState
+		uid: Id, localClient?: IClientState
 	): Promise<User> {
 		const headers = {
 			[Header.Authorization]: getAuthHeader(),
@@ -88,7 +88,7 @@ export function createCorgiApiMiddleware(
 	}
 
 	async function _putUser(
-		uid: string, user: UserUpdate,
+		uid: Id, user: UserUpdate,
 	): Promise<void> {
 		const headers = {
 			[Header.Authorization]: getAuthHeader(),

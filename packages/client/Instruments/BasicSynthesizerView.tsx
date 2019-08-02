@@ -27,7 +27,7 @@ type IBasicSynthesizerViewAllProps = IBasicSynthesizerViewProps & IBasicSynthesi
 
 interface IBasicSynthesizerViewProps {
 	color: string
-	id: string
+	id: Id
 }
 
 interface IBasicSynthesizerViewReduxProps {

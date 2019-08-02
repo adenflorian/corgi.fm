@@ -48,7 +48,7 @@ function expandNetActionType(netActionType: NetworkActionType) {
 export const DELETE_MULTI_THINGS = 'DELETE_MULTI_THINGS'
 type DeleteMultiThingsAction = ReturnType<typeof deleteThings>
 export const deleteThings = (
-	thingIds: string[],
+	thingIds: Id[],
 	thingType: ConnectionNodeType,
 	netActionType: NetworkActionType = NetworkActionType.NO,
 ) => ({
@@ -61,7 +61,7 @@ export const deleteThings = (
 export const DELETE_MULTI_THINGS_ANY = 'DELETE_MULTI_THINGS_ANY'
 type DeleteMultiThingsAnyAction = ReturnType<typeof deleteThingsAny>
 export const deleteThingsAny = (
-	thingIds: string[],
+	thingIds: Id[],
 	netActionType: NetworkActionType = NetworkActionType.NO,
 ) => ({
 	type: DELETE_MULTI_THINGS_ANY as typeof DELETE_MULTI_THINGS_ANY,
@@ -92,7 +92,7 @@ export const updateThings = (
 export type MultiThingAction =
 	UpdateMultiThingsAction | AddMultiThingAction |
 	DeleteMultiThingsAction | DeleteAllThingsAction | DeleteMultiThingsAnyAction
-	| {type: '', id: string}
+	| {type: '', id: Id}
 
 // TODO Use immutable js like connections redux
 export function makeMultiReducer<T extends IMultiStateThing, U extends IMultiState>(
@@ -112,18 +112,18 @@ export function makeMultiReducer<T extends IMultiStateThing, U extends IMultiSta
 					...state,
 					things: {
 						...state.things,
-						[action.thing.id]: getConnectionNodeInfo(thingType).stateDeserializer(action.thing),
+						[action.thing.id as string]: getConnectionNodeInfo(thingType).stateDeserializer(action.thing),
 					},
 				}
 			case DELETE_MULTI_THINGS: {
 				if (action.thingType !== thingType) return state
 				const newState = {...state, things: {...state.things}}
-				action.thingIds.forEach(x => delete newState.things[x])
+				action.thingIds.forEach(x => delete newState.things[x as string])
 				return newState
 			}
 			case DELETE_MULTI_THINGS_ANY: {
 				const newState = {...state, things: {...state.things}}
-				action.thingIds.forEach(x => delete newState.things[x])
+				action.thingIds.forEach(x => delete newState.things[x as string])
 				return newState
 			}
 			case DELETE_ALL_THINGS:
@@ -143,7 +143,7 @@ export function makeMultiReducer<T extends IMultiStateThing, U extends IMultiSta
 				}
 			default:
 				if (actionTypes.includes(action.type)) {
-					const thing = state.things[action.id]
+					const thing = state.things[action.id as string]
 					if (thing === undefined) {
 						return state
 					} else {
@@ -151,7 +151,7 @@ export function makeMultiReducer<T extends IMultiStateThing, U extends IMultiSta
 							...state,
 							things: {
 								...state.things,
-								[action.id]: innerReducer(thing as T, action),
+								[action.id as string]: innerReducer(thing as T, action),
 							},
 						}
 					}

@@ -7,7 +7,7 @@ import {GridSequencerNotesConnected} from './GridSequencerNotes'
 
 interface IGridSequencerProps {
 	color: string
-	id: string
+	id: Id
 	isPlaying: boolean
 	name: string
 	length: number

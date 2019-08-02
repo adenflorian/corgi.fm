@@ -21,7 +21,7 @@ import {KnobIncremental} from '../Knob/KnobIncremental'
 import {KnobSnapping} from '../Knob/KnobSnapping'
 
 interface IGridSequencerControlsProps {
-	id: string
+	id: Id
 }
 
 interface ReduxProps {

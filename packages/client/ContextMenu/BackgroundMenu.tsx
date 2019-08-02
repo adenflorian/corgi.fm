@@ -6,7 +6,7 @@ import {
 	makePosition, MASTER_AUDIO_OUTPUT_TARGET_ID, connectionsActions, Connection,
 	MASTER_CLOCK_SOURCE_ID,
 } from '@corgifm/common/redux'
-import {ConnectionNodeType, IConnectable, Point, Id} from '@corgifm/common/common-types'
+import {ConnectionNodeType, IConnectable} from '@corgifm/common/common-types'
 import {Dispatch} from 'redux'
 import {serverClientId} from '@corgifm/common/common-constants'
 import {toGraphSpace} from '../SimpleGraph/Zoom'

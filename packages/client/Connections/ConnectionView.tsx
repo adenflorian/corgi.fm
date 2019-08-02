@@ -2,7 +2,6 @@ import {stripIndent} from 'common-tags'
 import {List} from 'immutable'
 import React from 'react'
 import {useDispatch} from 'react-redux'
-import {ClientId} from '@corgifm/common/common-types'
 import {
 	ActiveGhostConnectorSourceOrTarget,
 	AppOptions,
@@ -22,7 +21,7 @@ import {Connector} from './Connector'
 import {LineState} from './LineState'
 
 export interface IConnectionViewProps {
-	id: string
+	id: Id
 }
 
 interface IConnectionViewReduxProps {
@@ -89,7 +88,7 @@ export const ConnectionView =
 			connectorPositionX: number,
 			connectorPositionY: number,
 			sourceOrTarget: ActiveGhostConnectorSourceOrTarget,
-			parentNodeId: string,
+			parentNodeId: Id,
 		) {
 			dispatch(ghostConnectorActions.create(new GhostConnection(
 				{x: connectorPositionX, y: connectorPositionY},

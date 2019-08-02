@@ -1,6 +1,6 @@
 import {Map} from 'immutable'
 import {Store} from 'redux'
-import {ConnectionNodeType, IConnectable, Id} from '@corgifm/common/common-types'
+import {ConnectionNodeType, IConnectable} from '@corgifm/common/common-types'
 import {
 	BasicSamplerState, BasicSynthesizerState, IClientAppState,
 	IClientRoomState, IConnection, isAudioNodeType,
@@ -21,8 +21,8 @@ import {BasicSynthesizer} from './WebAudio/BasicSynthesizer'
 import {SimpleDelay} from './WebAudio/SimpleDelay'
 import {SimpleReverb} from './WebAudio/SimpleReverb'
 
-type IdsSelector = (roomState: IClientRoomState) => string[]
-type StateSelector<S> = (roomState: IClientRoomState, id: string) => S
+type IdsSelector = (roomState: IClientRoomState) => Id[]
+type StateSelector<S> = (roomState: IClientRoomState, id: Id) => S
 
 type InstrumentFactory<I extends Instrument<Voices<Voice>, Voice>, S>
 	= (options: IInstrumentOptions, instrumentState: S) => I
@@ -33,9 +33,9 @@ type UpdateSpecificInstrument<I extends Instrument<Voices<Voice>, Voice>, S>
 type EffectFactory<E, S> = (options: IAudioNodeWrapperOptions, effectState: S) => E
 type UpdateSpecificEffect<E, S> = (effect: E, effectState: S) => void
 
-type StuffMap = Map<string, AudioNodeWrapper>
+type StuffMap = Map<Id, AudioNodeWrapper>
 
-export type GetAllInstruments = () => Map<string, Instrument<Voices<Voice>, Voice>>
+export type GetAllInstruments = () => Map<Id, Instrument<Voices<Voice>, Voice>>
 
 export type GetAllAudioNodes = () => StuffMap
 
@@ -286,7 +286,7 @@ export const setupInstrumentManager = (
 		return stuffMaps.flatMap(x => x)
 	}
 
-	function deleteStuffThatNeedsToBe(nodeType: ConnectionNodeType, thingIds: string[]) {
+	function deleteStuffThatNeedsToBe(nodeType: ConnectionNodeType, thingIds: Id[]) {
 		stuffMaps = stuffMaps.set(nodeType, stuffMaps.get(nodeType)!.withMutations(mutable => {
 			mutable.forEach((_, key) => {
 				if (thingIds.includes(key) === false) {
@@ -297,7 +297,7 @@ export const setupInstrumentManager = (
 		}))
 	}
 
-	function updateAudioConnectionsFromSource(roomState: IClientRoomState, sourceId: string, audioNodeWrapper: AudioNodeWrapper) {
+	function updateAudioConnectionsFromSource(roomState: IClientRoomState, sourceId: Id, audioNodeWrapper: AudioNodeWrapper) {
 		const outgoingConnections = selectConnectionsWithSourceIds(roomState, [sourceId])
 
 		if (outgoingConnections.count() === 0) {
@@ -319,7 +319,7 @@ export const setupInstrumentManager = (
 		})
 	}
 
-	function createIfNotExisting<T>(nodeType: ConnectionNodeType, id: string, thing: any, thingFactory: () => T): T {
+	function createIfNotExisting<T>(nodeType: ConnectionNodeType, id: Id, thing: any, thingFactory: () => T): T {
 		if (thing === undefined) {
 			// eslint-disable-next-line no-param-reassign
 			thing = thingFactory()

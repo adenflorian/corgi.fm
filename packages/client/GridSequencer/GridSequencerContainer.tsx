@@ -6,7 +6,7 @@ import {GridSequencer} from './GridSequencer'
 import './GridSequencer.less'
 
 interface Props {
-	id: string
+	id: Id
 }
 
 interface ReduxProps {

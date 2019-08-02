@@ -2,7 +2,7 @@ import {Map, Record} from 'immutable'
 import {combineReducers, Reducer} from 'redux'
 import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
-import {ConnectionNodeType, Id} from '../common-types'
+import {ConnectionNodeType} from '../common-types'
 import {shamuMetaReducer} from './shamu-graph'
 import {
 	BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION,
@@ -27,7 +27,7 @@ export const addPosition = (position: IPosition) => ({
 } as const)
 
 export type DeletePositionsAction = ReturnType<typeof deletePositions>
-export const deletePositions = (positionIds: string[]) => ({
+export const deletePositions = (positionIds: Id[]) => ({
 	type: 'DELETE_POSITIONS',
 	positionIds,
 	SERVER_ACTION,
@@ -56,7 +56,7 @@ export const replacePositions = (positions: IPositions) => ({
 } as const)
 
 export type UpdatePositionAction = ReturnType<typeof updatePosition>
-export const updatePosition = (id: string, position: Partial<IPosition>) => ({
+export const updatePosition = (id: Id, position: Partial<IPosition>) => ({
 	type: 'UPDATE_POSITION',
 	id,
 	position,
@@ -65,7 +65,7 @@ export const updatePosition = (id: string, position: Partial<IPosition>) => ({
 } as const)
 
 export type MovePositionAction = ReturnType<typeof movePosition>
-export const movePosition = (id: string, position: Pick<IPosition, 'x' | 'y'>) => ({
+export const movePosition = (id: Id, position: Pick<IPosition, 'x' | 'y'>) => ({
 	type: 'MOVE_POSITION',
 	id,
 	position,
@@ -74,7 +74,7 @@ export const movePosition = (id: string, position: Pick<IPosition, 'x' | 'y'>) =
 } as const)
 
 export type NodeClickedAction = ReturnType<typeof nodeClicked>
-export const nodeClicked = (id: string) => ({
+export const nodeClicked = (id: Id) => ({
 	type: 'NODE_CLICKED',
 	id,
 	SERVER_ACTION,
@@ -86,14 +86,14 @@ export interface IPositionsState {
 	meta: ReturnType<typeof shamuMetaReducer>
 }
 
-export type IPositions = Map<string, IPosition>
+export type IPositions = Map<Id, IPosition>
 
 export const Positions = Map
 
 export type IPosition = typeof defaultPosition
 
 const defaultPosition = {
-	id: '-1',
+	id: '-1' as Id,
 	targetType: ConnectionNodeType.dummy,
 	width: -1,
 	height: -1,
@@ -162,7 +162,7 @@ export const positionsReducer: Reducer<IPositionsState, PositionAction> = combin
 export const selectAllPositions = (state: IClientRoomState) =>
 	state.positions.all
 
-export const selectPosition = (state: IClientRoomState, id: string) =>
+export const selectPosition = (state: IClientRoomState, id: Id) =>
 	selectAllPositions(state).get(id) || defaultPosition
 
 export const selectAllPositionsAsArray = createSelector(
@@ -175,7 +175,7 @@ export const selectAllPositionIds = createSelector(
 	positions => positions.keySeq(),
 )
 
-export const selectPositionsWithIds = (state: IClientRoomState, ids: string[]) => {
+export const selectPositionsWithIds = (state: IClientRoomState, ids: Id[]) => {
 	return selectAllPositionsAsArray(state)
 		.filter(x => ids.includes(x.id))
 }

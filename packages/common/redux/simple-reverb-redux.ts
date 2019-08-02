@@ -1,6 +1,6 @@
 import {AnyAction} from 'redux'
 import * as uuid from 'uuid'
-import {ClientId, ConnectionNodeType, IConnectable, IMultiStateThing} from '../common-types'
+import {ConnectionNodeType, IConnectable, IMultiStateThing} from '../common-types'
 import {BuiltInBQFilterType} from '../OscillatorTypes'
 import {NodeSpecialState} from './shamu-graph'
 import {
@@ -15,7 +15,7 @@ export const addSimpleReverb = (sampler: SimpleReverbState) =>
 export const SET_SIMPLE_REVERB_PARAM = 'SET_SIMPLE_REVERB_PARAM'
 export type SetSimpleReverbParamAction = ReturnType<typeof setSimpleReverbParam>
 export const setSimpleReverbParam =
-	(id: string, paramName: SimpleReverbParam, value: any) => ({
+	(id: Id, paramName: SimpleReverbParam, value: any) => ({
 		type: SET_SIMPLE_REVERB_PARAM as typeof SET_SIMPLE_REVERB_PARAM,
 		id,
 		paramName,
@@ -72,7 +72,7 @@ export class SimpleReverbState implements IConnectable, NodeSpecialState {
 	}
 
 	public readonly id = uuid.v4()
-	public readonly ownerId: string
+	public readonly ownerId: Id
 	public readonly lowPassFilterCutoffFrequency: number = SimpleReverbState.defaultLpfFreq
 	public readonly time: number = SimpleReverbState.defaultTime
 	public readonly dry: number = SimpleReverbState.defaultDry
@@ -135,5 +135,5 @@ export const selectAllSimpleReverbsAsArray =
 export const selectSimpleReverbsByOwner = (state: IClientRoomState, ownerId: ClientId) =>
 	selectAllSimpleReverbsAsArray(state).filter(x => x.ownerId === ownerId)
 
-export const selectSimpleReverb = (state: IClientRoomState, id: string) =>
-	selectAllSimpleReverbs(state)[id] || SimpleReverbState.dummy
+export const selectSimpleReverb = (state: IClientRoomState, id: Id) =>
+	selectAllSimpleReverbs(state)[id as string] || SimpleReverbState.dummy

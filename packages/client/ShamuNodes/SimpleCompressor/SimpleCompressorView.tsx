@@ -11,7 +11,7 @@ import {Panel} from '../../Panel/Panel'
 
 interface ISimpleCompressorProps {
 	color: string
-	id: string
+	id: Id
 }
 
 interface ISimpleCompressorReduxProps {

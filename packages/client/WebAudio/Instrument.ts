@@ -1,5 +1,4 @@
 import {Set} from 'immutable'
-import {IDisposable} from '@corgifm/common/common-types'
 import {IMidiNote} from '@corgifm/common/MidiNote'
 import {BuiltInBQFilterType} from '@corgifm/common/OscillatorTypes'
 import {AudioNodeWrapper, IAudioNodeWrapperOptions, registerInstrumentWithSchedulerVisual, Voice, Voices} from '.'
@@ -47,7 +46,7 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 		registerInstrumentWithSchedulerVisual(this.id, () => this._getVoices().getScheduledVoices(), this._audioContext)
 	}
 
-	public scheduleNote(note: IMidiNote, delaySeconds: number, invincible: boolean, sourceIds: Set<string>) {
+	public scheduleNote(note: IMidiNote, delaySeconds: number, invincible: boolean, sourceIds: Set<Id>) {
 		this._getVoices()
 			.scheduleNote(
 				note, delaySeconds,
@@ -65,7 +64,7 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 		this._getVoices().releaseAllScheduled(this._releaseTimeInSeconds)
 	}
 
-	public releaseAllScheduledFromSourceId(sourceId: string) {
+	public releaseAllScheduledFromSourceId(sourceId: Id) {
 		this._getVoices().releaseAllScheduledFromSourceId(this._releaseTimeInSeconds, sourceId)
 	}
 

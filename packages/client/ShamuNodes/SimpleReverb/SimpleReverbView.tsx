@@ -14,7 +14,7 @@ import {Panel} from '../../Panel/Panel'
 
 interface ISimpleReverbProps {
 	color: string
-	id: string
+	id: Id
 }
 
 interface ISimpleReverbReduxProps {

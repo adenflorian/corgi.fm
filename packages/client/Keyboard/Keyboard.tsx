@@ -51,7 +51,7 @@ interface IVirtualMidiKey {
 type IKeyboardAllProps = IKeyboardProps & IKeyboardReduxProps & {dispatch: Dispatch}
 
 interface IKeyboardProps {
-	id: string
+	id: Id
 }
 
 interface IKeyboardReduxProps {

@@ -8,7 +8,7 @@ import {longLineStrokeWidth} from './ConnectionView'
 import {LineState} from './LineState'
 
 interface ConnectionLineProps {
-	id: string
+	id: Id
 	color: string
 	saturateSource: boolean
 	saturateTarget: boolean
@@ -45,7 +45,7 @@ export const ConnectionLine = React.memo(
 				<defs>
 					{highQuality &&
 						<linearGradient
-							id={id}
+							id={id as string}
 							x1={(connectedLine.x1)}
 							y1={(connectedLine.y1)}
 							x2={(connectedLine.x2)}

@@ -1,5 +1,4 @@
 import {List, Map, Set} from 'immutable'
-import {Id} from '@corgifm/common/common-types'
 import {logger} from '@corgifm/common/logger'
 import {MidiGlobalClipEvent, midiPrecision, MidiRange} from '@corgifm/common/midi-types'
 import {
@@ -46,7 +45,7 @@ let songStartTimeSeconds = 0
 /** Used for knowing when to restart */
 let _playCount = 0
 
-const makeSequencersInfo = () => Map<string, {loopRatio: number}>()
+const makeSequencersInfo = () => Map<Id, {loopRatio: number}>()
 
 let _sequencersInfo = makeSequencersInfo()
 

@@ -16,7 +16,7 @@
     "start-local": "pm2 start ecosystem.config.js --env local",
     "start-test": "pm2 start ecosystem.config.js --env test",
     "start-prod": "pm2 start ecosystem.config.js --env prod",
-    "lint": "eslint_d . --ext .js,.ts,.jsx,.tsx --ignore-path .gitignore --color --cache",
+    "lint": "eslint . --ext .js,.ts,.jsx,.tsx --ignore-path .gitignore --color --cache",
     "lint-watch": "watch \"echo linting... && (eslint_d . --ext .js,.ts,.jsx,.tsx --ignore-path .gitignore --cache --format compact || true) && echo done!\" packages",
     "test": "yarn test-client && yarn test-common && yarn test-server",
     "test-client": "jest -i --config packages/client/jest.config.js",

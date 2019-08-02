@@ -18,7 +18,7 @@ export function setStoreForSchedulerVisual(store: Store<IClientAppState>) {
 }
 
 interface NoteSchedulerVisualPlaceholderProps {
-	id: string
+	id: Id
 }
 
 interface NoteSchedulerVisualPlaceholderReduxProps {
@@ -141,10 +141,10 @@ function _getPathDForVoice(voice: Voice) {
 	)
 }
 
-let _instruments = Map<string, () => OrderedMap<number, Voice>>()
+let _instruments = Map<Id, () => OrderedMap<number, Voice>>()
 let _audioContext: AudioContext
 
-function _renderSchedulerVisual(id: string, scheduledVoices: OrderedMap<number, Voice>) {
+function _renderSchedulerVisual(id: Id, scheduledVoices: OrderedMap<number, Voice>) {
 	const element = document.querySelector('#scheduleVisual-' + id)
 
 	if (!element) return logger.warn('missing placeholder element for debug visual: #scheduleVisual -' + id)
@@ -155,7 +155,7 @@ function _renderSchedulerVisual(id: string, scheduledVoices: OrderedMap<number, 
 	)
 }
 
-export function registerInstrumentWithSchedulerVisual(id: string, getScheduledVoices: () => OrderedMap<number, Voice>, audioContext: AudioContext) {
+export function registerInstrumentWithSchedulerVisual(id: Id, getScheduledVoices: () => OrderedMap<number, Voice>, audioContext: AudioContext) {
 	if (!_audioContext) _audioContext = audioContext
 
 	_instruments = _instruments.set(id, getScheduledVoices)

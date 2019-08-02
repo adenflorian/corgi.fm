@@ -19,12 +19,12 @@ export interface ApiRequest {
 }
 
 export interface SecureApiRequest extends ApiRequest {
-	callerUid: string
+	callerUid: Id
 	emailVerified: boolean
 }
 
 export interface SecureUsersApiRequest extends SecureApiRequest {
-	pathUid: string
+	pathUid: Id
 }
 
 export type ApiResponse = {

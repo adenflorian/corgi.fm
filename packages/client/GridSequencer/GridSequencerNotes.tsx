@@ -23,7 +23,7 @@ type GridSequencerEventHandler = (index: number, isEnabled: boolean, i2: number,
 type MouseEventHandler = (e: React.MouseEvent) => void
 
 interface IGridSequencerNotesProps {
-	id: string
+	id: Id
 }
 
 interface IGridSequencerNotesReduxProps {

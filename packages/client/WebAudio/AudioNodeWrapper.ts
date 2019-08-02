@@ -1,19 +1,18 @@
 import {List, Map} from 'immutable'
-import {IDisposable} from '@corgifm/common/common-types'
 import {logger} from '@corgifm/common/logger'
 
 export interface IAudioNodeWrapperOptions {
 	audioContext: AudioContext
-	id: string
+	id: Id
 }
 
 export abstract class AudioNodeWrapper implements IDisposable {
 	public abstract dispose: () => void
-	public readonly id: string
+	public readonly id: Id
 	protected abstract getInputAudioNode: () => AudioNode | null
 	protected abstract getOutputAudioNode: () => AudioNode | null
 	protected readonly _audioContext: AudioContext
-	private _connectedTargets = Map<string, AudioNodeWrapper>()
+	private _connectedTargets = Map<Id, AudioNodeWrapper>()
 	private _enabled: boolean = true
 	private _passthroughModeEnabled: boolean = true
 
@@ -24,7 +23,7 @@ export abstract class AudioNodeWrapper implements IDisposable {
 
 	public readonly getConnectedTargets = () => this._connectedTargets
 
-	public readonly connect = (destination: AudioNodeWrapper, targetId: string) => {
+	public readonly connect = (destination: AudioNodeWrapper, targetId: Id) => {
 		if (this._connectedTargets.has(targetId)) return
 
 		// TODO Prevent feedback loop
@@ -48,7 +47,7 @@ export abstract class AudioNodeWrapper implements IDisposable {
 		// logger.debug('AudioNodeWrapper.connect targetId: ', targetId)
 	}
 
-	public readonly disconnect = (targetId: string) => {
+	public readonly disconnect = (targetId: Id) => {
 		if (this._connectedTargets.count() === 0) return
 
 		const targetToDisconnect = this._connectedTargets.get(targetId)
@@ -219,7 +218,7 @@ export abstract class AudioNodeWrapper implements IDisposable {
 	public readonly syncOscillatorStartTimes = (startTime: number, bpm: number) => {}
 }
 
-function detectFeedbackLoop(nodeWrapper: AudioNodeWrapper, i = 0, nodeIds: List<string> = List<string>()): boolean {
+function detectFeedbackLoop(nodeWrapper: AudioNodeWrapper, i = 0, nodeIds: List<Id> = List<Id>()): boolean {
 	if (nodeIds.contains(nodeWrapper.id)) return true
 	if (i > 500) return true
 

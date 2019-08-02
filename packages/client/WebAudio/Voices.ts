@@ -41,7 +41,7 @@ export abstract class Voices<V extends Voice> {
 		filterDecayTimeInSeconds: number,
 		filterSustain: number,
 		invincible: boolean,
-		sourceIds: Set<string>,
+		sourceIds: Set<Id>,
 	) {
 		// if delay is 0 then the scheduler isn't working properly
 		if (delaySeconds < 0) logger.error('delay <= 0: ', delaySeconds)
@@ -162,7 +162,7 @@ export abstract class Voices<V extends Voice> {
 			})
 	}
 
-	public releaseAllScheduledFromSourceId(releaseSeconds: number, sourceId: string) {
+	public releaseAllScheduledFromSourceId(releaseSeconds: number, sourceId: Id) {
 		this._scheduledVoices.filter(x => x.sourceIds.includes(sourceId))
 			.forEach(x => {
 				if (x.sourceIds.count() > 1) {

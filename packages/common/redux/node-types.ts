@@ -1,7 +1,7 @@
 import {Map, Record, Set} from 'immutable'
 import {AnyAction} from 'redux'
 import {serverClientId} from '../common-constants'
-import {ConnectionNodeType, IConnectable, Id, IMultiStateThing} from '../common-types'
+import {ConnectionNodeType, IConnectable, IMultiStateThing} from '../common-types'
 import {IMidiNote} from '../MidiNote'
 import {CssColor} from '../shamu-color'
 import {IClientAppState} from './common-redux-types'
@@ -46,26 +46,26 @@ export const dummyIConnectable: IMultiStateThing = {
 
 class DummyConnectable implements IConnectable {
 	public constructor(
-		public readonly color: CssColor.disabledGray,
-		public readonly id: 'oh no',
-		public readonly type: ConnectionNodeType.dummy,
-		public readonly width: 0,
-		public readonly height: 0,
-		public readonly name: 'default node name',
-		public readonly enabled: false,
+		public readonly color = CssColor.disabledGray,
+		public readonly id: Id = 'oh no',
+		public readonly type = ConnectionNodeType.dummy,
+		public readonly width = 0,
+		public readonly height = 0,
+		public readonly name = 'default node name',
+		public readonly enabled = false,
 	) {}
 }
 
 const _makeNodeInfo = Record({
-	stateSelector: ((roomState: IClientRoomState, id: string) => dummyIConnectable),
-	selectIsActive: (() => null) as (roomState: IClientRoomState, id: string) => boolean | null,
-	selectIsSending: (() => null) as (roomState: IClientRoomState, id: string) => boolean | null,
-	selectIsPlaying: (() => false) as (roomState: IClientRoomState, id: string, processedIds?: Set<string>) => boolean,
-	selectActiveNotes: (_: IClientRoomState, __: string) => Set<IMidiNote>(),
+	stateSelector: ((roomState: IClientRoomState, id: Id) => dummyIConnectable),
+	selectIsActive: (() => null) as (roomState: IClientRoomState, id: Id) => boolean | null,
+	selectIsSending: (() => null) as (roomState: IClientRoomState, id: Id) => boolean | null,
+	selectIsPlaying: (() => false) as (roomState: IClientRoomState, id: Id, processedIds?: Set<Id>) => boolean,
+	selectActiveNotes: (_: IClientRoomState, __: Id) => Set<IMidiNote>(),
 	stateDeserializer: ((state: IMultiStateThing) => state) as (state: IMultiStateThing) => IMultiStateThing,
 	color: false as string | false,
 	typeName: 'Default Type Name',
-	StateConstructor: (DummyConnectable) as new (ownerId: string) => IConnectable,
+	StateConstructor: (DummyConnectable) as new (ownerId: Id) => IConnectable,
 	addNodeActionCreator: ((state: IClientAppState) => ({type: 'dummy add node action type'})) as (state: any) => AnyAction,
 	showOnAddNodeMenu: false,
 	isDeletable: false,
@@ -293,16 +293,16 @@ export function getAddableNodeInfos() {
 }
 
 // TODO Memoize?
-function selectIsUpstreamNodePlaying(state: IClientRoomState, id: string, processedNodeIds = Set<string>()): boolean {
+function selectIsUpstreamNodePlaying(state: IClientRoomState, id: Id, processedNodeIds = Set<Id>()): boolean {
 	return memoizedIsUpstreamNodePlaying(state, id, processedNodeIds)
 }
 
-function memoizedIsUpstreamNodePlaying(state: IClientRoomState, nodeId: string, processedNodeIds: Set<string>) {
+function memoizedIsUpstreamNodePlaying(state: IClientRoomState, nodeId: Id, processedNodeIds: Set<Id>) {
 	return isUpstreamNodePlaying(state, nodeId, processedNodeIds)
 }
 
 function isUpstreamNodePlaying(
-	state: IClientRoomState, nodeId: string, processedNodeIds = Set<string>(),
+	state: IClientRoomState, nodeId: Id, processedNodeIds = Set<Id>(),
 ): boolean {
 	if (processedNodeIds.includes(nodeId)) return false
 

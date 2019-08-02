@@ -29,7 +29,7 @@ import './InfiniteSequencer.less'
 import {ConnectedInfiniteSequencerNotes} from './InfiniteSequencerNotes'
 
 interface IInfiniteSequencerProps {
-	id: string
+	id: Id
 }
 
 interface IInfiniteSequencerReduxProps {
