@@ -8,10 +8,12 @@ import {
 	selectClientById, selectLocalClient, IClientAppState,
 	selectVirtualKeyboardById, virtualKeyPressed, virtualKeyUp,
 } from '@corgifm/common/redux'
+import {
+	keyColors, KeyColor, NoteNameSharps,
+} from '@corgifm/common/common-samples-stuff'
 import {isLeftMouseButtonDown} from '../client-utils'
 import {keyToMidiMap} from '../input-events'
 import {Panel} from '../Panel/Panel'
-import {KeyColor, keyColors, NoteNameSharps} from '../WebAudio/music-functions'
 import './Keyboard.less'
 
 const defaultNumberOfKeys = 17

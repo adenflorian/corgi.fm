@@ -3,16 +3,41 @@
 
 .basicSampler {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
     justify-content: center;
     // padding: 0 8px;
     width: 100%;
 
-    .knobs {
+    .samples {
+        width: 320px;
         display: flex;
-        width: 100%;
-        justify-content: space-around;
+        flex-wrap: wrap;
+        justify-content: center;
+
+        .sample {
+            width: 74px;
+            height: 52px;
+            border-radius: 4px;
+            background-color: @panelGrayLight;
+            box-sizing: border-box;
+            margin: 2px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            &:hover {
+                border: 2px solid currentColor;
+            }
+        }
+    }
+
+    .controls {
+        .knobs {
+            display: flex;
+            width: 100%;
+            justify-content: space-around;
+        }
     }
 
     &.isNotPlaying {

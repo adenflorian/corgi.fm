@@ -11,10 +11,12 @@ import {
 	selectGlobalClockState, selectGridSequencer,
 } from '@corgifm/common/redux'
 import {getColorStringForMidiNote} from '@corgifm/common/shamu-color'
+import {
+	getOctaveFromMidiNote, midiNoteToNoteName,
+} from '@corgifm/common/common-samples-stuff'
 import {isLeftMouseButtonDown} from '../client-utils'
 import {isWhiteKey} from '../Keyboard/Keyboard'
 import {VerticalScrollBar} from '../Knob/VerticalScrollBar'
-import {getOctaveFromMidiNote, midiNoteToNoteName} from '../WebAudio'
 
 type GridSequencerEventHandler = (index: number, isEnabled: boolean, i2: number, e: React.MouseEvent) => void
 

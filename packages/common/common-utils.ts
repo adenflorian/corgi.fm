@@ -1,4 +1,5 @@
 import {debounce} from 'lodash'
+import {OrderedMap} from 'immutable'
 
 import uuid = require('uuid')
 
@@ -82,4 +83,10 @@ export function multilineRegExp(regExps: RegExp[], flags?: string) {
 		regExps.map(reg => reg.source).join(''),
 		flags
 	)
+}
+
+export function convertToNumberKeyMap<T>(obj: OrderedMap<string, T>): OrderedMap<number, T> {
+	return obj.reduce((result, value, key) => {
+		return result.set(Number.parseInt(key), value)
+	}, OrderedMap<number, T>())
 }

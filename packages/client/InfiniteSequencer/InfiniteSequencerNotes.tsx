@@ -9,9 +9,11 @@ import {
 	InfiniteSequencerStyle, selectInfiniteSequencer, shamuConnect,
 } from '@corgifm/common/redux'
 import {getColorStringForMidiNote} from '@corgifm/common/shamu-color'
+import {
+	getOctaveFromMidiNote, midiNoteToNoteName,
+} from '@corgifm/common/common-samples-stuff'
 import {isWhiteKey} from '../Keyboard/Keyboard'
 import {localActions} from '../local-middleware'
-import {getOctaveFromMidiNote, midiNoteToNoteName} from '../WebAudio'
 
 interface Props {
 	id: string

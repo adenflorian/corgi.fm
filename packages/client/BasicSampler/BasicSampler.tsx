@@ -1,28 +1,35 @@
 import React from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
-import {allBuiltInBQFilterTypes, BuiltInBQFilterType} from '@corgifm/common/OscillatorTypes'
+import {
+	allBuiltInBQFilterTypes, BuiltInBQFilterType
+} from '@corgifm/common/OscillatorTypes'
+import {ConnectionNodeType} from '@corgifm/common/common-types'
 import {
 	IClientAppState, BasicSamplerParam, getConnectionNodeInfo, selectSampler,
-	setBasicSamplerParam,
+	basicSamplerActions,
 } from '@corgifm/common/redux'
 import {
-	adsrValueToString, attackToolTip, decayToolTip, detuneToolTip, detuneValueToString,
-	filterToolTip, filterValueToString, gainToolTip, panToolTip, panValueToString,
-	percentageValueString, releaseToolTip, sustainToolTip,
+	adsrValueToString, attackToolTip, decayToolTip, detuneToolTip,
+	detuneValueToString, filterToolTip, filterValueToString, gainToolTip,
+	panToolTip, panValueToString, percentageValueString, releaseToolTip, 
+	sustainToolTip,
 } from '../client-constants'
 import {Knob} from '../Knob/Knob'
 import {KnobSnapping} from '../Knob/KnobSnapping'
 import {Panel} from '../Panel/Panel'
-import {ConnectedNoteSchedulerVisualPlaceholder} from '../WebAudio/SchedulerVisual'
+import {
+	ConnectedNoteSchedulerVisualPlaceholder
+} from '../WebAudio/SchedulerVisual'
 import './BasicSampler.less'
+import {Samples} from './Samples'
 
-interface IBasicSamplerProps {
+interface Props {
 	color: string
 	id: string
 }
 
-interface IBasicSamplerReduxProps {
+interface ReduxProps {
 	isPlaying: boolean
 	pan: number
 	lowPassFilterCutoffFrequency: number
@@ -35,11 +42,13 @@ interface IBasicSamplerReduxProps {
 	filterType: BuiltInBQFilterType
 }
 
-type IBasicSamplerAllProps = IBasicSamplerProps & IBasicSamplerReduxProps & {dispatch: Dispatch}
+type AllProps = Props & ReduxProps & {dispatch: Dispatch}
 
-export class BasicSampler extends React.PureComponent<IBasicSamplerAllProps> {
+const name = getConnectionNodeInfo(ConnectionNodeType.basicSampler).typeName
+
+export class BasicSampler extends React.PureComponent<AllProps> {
 	public render() {
-		const {color, isPlaying} = this.props
+		const {id, color, isPlaying} = this.props
 
 		return (
 			<React.Fragment>
@@ -48,114 +57,117 @@ export class BasicSampler extends React.PureComponent<IBasicSamplerAllProps> {
 					id={this.props.id}
 					color={color}
 					saturate={isPlaying}
-					label="Piano Sampler"
+					label={name}
 				>
 					<div className="basicSampler">
-						<div className="knobs">
-							<Knob
-								min={0}
-								max={10}
-								curve={3}
-								value={this.props.attack}
-								defaultValue={0.01}
-								onChange={this._dispatchChangeInstrumentParam}
-								label="Attack"
-								onChangeId={BasicSamplerParam.attack}
-								tooltip={attackToolTip}
-								valueString={adsrValueToString}
-							/>
-							<Knob
-								min={0}
-								max={30}
-								curve={3}
-								value={this.props.decay}
-								defaultValue={0}
-								onChange={this._dispatchChangeInstrumentParam}
-								label="Decay"
-								onChangeId={BasicSamplerParam.decay}
-								tooltip={decayToolTip}
-								valueString={adsrValueToString}
-							/>
-							<Knob
-								min={0}
-								max={1}
-								value={this.props.sustain}
-								defaultValue={1}
-								onChange={this._dispatchChangeInstrumentParam}
-								label="Sustain"
-								onChangeId={BasicSamplerParam.sustain}
-								tooltip={sustainToolTip}
-								valueString={adsrValueToString}
-							/>
-							<Knob
-								min={0.001}
-								max={60}
-								curve={2}
-								value={this.props.release}
-								defaultValue={1}
-								onChange={this._dispatchChangeInstrumentParam}
-								label="Release"
-								onChangeId={BasicSamplerParam.release}
-								tooltip={releaseToolTip}
-								valueString={adsrValueToString}
-							/>
-						</div>
-						<div className="knobs">
-							<Knob
-								min={-1}
-								max={1}
-								value={this.props.pan}
-								defaultValue={0}
-								onChange={this._dispatchChangeInstrumentParam}
-								label="Pan"
-								onChangeId={BasicSamplerParam.pan}
-								tooltip={panToolTip}
-								valueString={panValueToString}
-							/>
-							<Knob
-								min={0}
-								max={20000}
-								curve={2}
-								value={this.props.lowPassFilterCutoffFrequency}
-								defaultValue={20000}
-								onChange={this._dispatchChangeInstrumentParam}
-								label="Filter"
-								onChangeId={BasicSamplerParam.lowPassFilterCutoffFrequency}
-								tooltip={filterToolTip}
-								valueString={filterValueToString}
-							/>
-							<KnobSnapping
-								label="Filter Type"
-								value={this.props.filterType}
-								defaultIndex={0}
-								onChange={this._dispatchChangeInstrumentParam}
-								onChangeId={BasicSamplerParam.filterType}
-								tooltip="So many filters..."
-								possibleValues={allBuiltInBQFilterTypes}
-							/>
-							<Knob
-								min={-100}
-								max={100}
-								value={this.props.detune}
-								defaultValue={0}
-								onChange={this._dispatchChangeInstrumentParam}
-								label="Detune"
-								onChangeId={BasicSamplerParam.detune}
-								tooltip={detuneToolTip}
-								valueString={detuneValueToString}
-							/>
-							<Knob
-								min={0}
-								max={1}
-								curve={2}
-								value={this.props.gain}
-								defaultValue={0.5}
-								onChange={this._dispatchChangeInstrumentParam}
-								label="Gain"
-								onChangeId={BasicSamplerParam.gain}
-								tooltip={gainToolTip}
-								valueString={percentageValueString}
-							/>
+						<Samples samplerId={id} />
+						<div className="controls">
+							<div className="knobs">
+								<Knob
+									min={0}
+									max={10}
+									curve={3}
+									value={this.props.attack}
+									defaultValue={0.01}
+									onChange={this._dispatchChangeInstrumentParam}
+									label="Attack"
+									onChangeId={BasicSamplerParam.attack}
+									tooltip={attackToolTip}
+									valueString={adsrValueToString}
+								/>
+								<Knob
+									min={0}
+									max={30}
+									curve={3}
+									value={this.props.decay}
+									defaultValue={0}
+									onChange={this._dispatchChangeInstrumentParam}
+									label="Decay"
+									onChangeId={BasicSamplerParam.decay}
+									tooltip={decayToolTip}
+									valueString={adsrValueToString}
+								/>
+								<Knob
+									min={0}
+									max={1}
+									value={this.props.sustain}
+									defaultValue={1}
+									onChange={this._dispatchChangeInstrumentParam}
+									label="Sustain"
+									onChangeId={BasicSamplerParam.sustain}
+									tooltip={sustainToolTip}
+									valueString={adsrValueToString}
+								/>
+								<Knob
+									min={0.001}
+									max={60}
+									curve={2}
+									value={this.props.release}
+									defaultValue={1}
+									onChange={this._dispatchChangeInstrumentParam}
+									label="Release"
+									onChangeId={BasicSamplerParam.release}
+									tooltip={releaseToolTip}
+									valueString={adsrValueToString}
+								/>
+							</div>
+							<div className="knobs">
+								<Knob
+									min={-1}
+									max={1}
+									value={this.props.pan}
+									defaultValue={0}
+									onChange={this._dispatchChangeInstrumentParam}
+									label="Pan"
+									onChangeId={BasicSamplerParam.pan}
+									tooltip={panToolTip}
+									valueString={panValueToString}
+								/>
+								<Knob
+									min={0}
+									max={20000}
+									curve={2}
+									value={this.props.lowPassFilterCutoffFrequency}
+									defaultValue={20000}
+									onChange={this._dispatchChangeInstrumentParam}
+									label="Filter"
+									onChangeId={BasicSamplerParam.lowPassFilterCutoffFrequency}
+									tooltip={filterToolTip}
+									valueString={filterValueToString}
+								/>
+								<KnobSnapping
+									label="Filter Type"
+									value={this.props.filterType}
+									defaultIndex={0}
+									onChange={this._dispatchChangeInstrumentParam}
+									onChangeId={BasicSamplerParam.filterType}
+									tooltip="So many filters..."
+									possibleValues={allBuiltInBQFilterTypes}
+								/>
+								<Knob
+									min={-100}
+									max={100}
+									value={this.props.detune}
+									defaultValue={0}
+									onChange={this._dispatchChangeInstrumentParam}
+									label="Detune"
+									onChangeId={BasicSamplerParam.detune}
+									tooltip={detuneToolTip}
+									valueString={detuneValueToString}
+								/>
+								<Knob
+									min={0}
+									max={1}
+									curve={2}
+									value={this.props.gain}
+									defaultValue={0.5}
+									onChange={this._dispatchChangeInstrumentParam}
+									label="Gain"
+									onChangeId={BasicSamplerParam.gain}
+									tooltip={gainToolTip}
+									valueString={percentageValueString}
+								/>
+							</div>
 						</div>
 					</div>
 				</Panel>
@@ -164,12 +176,14 @@ export class BasicSampler extends React.PureComponent<IBasicSamplerAllProps> {
 		)
 	}
 
-	private readonly _dispatchChangeInstrumentParam = (paramType: BasicSamplerParam, value: any) =>
-		this.props.dispatch(setBasicSamplerParam(this.props.id, paramType, value))
+	private readonly _dispatchChangeInstrumentParam =
+	(paramType: BasicSamplerParam, value: any) =>
+		this.props.dispatch(
+			basicSamplerActions.setParam(this.props.id, paramType, value))
 }
 
 export const ConnectedBasicSampler = connect(
-	(state: IClientAppState, {id}: IBasicSamplerProps): IBasicSamplerReduxProps => {
+	(state: IClientAppState, {id}: Props): ReduxProps => {
 		const samplerState = selectSampler(state.room, id)
 
 		return {

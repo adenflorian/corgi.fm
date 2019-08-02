@@ -13,6 +13,7 @@ import {
 	selectInfiniteSequencer, sequencerActions,
 } from '@corgifm/common/redux'
 import {CssColor} from '@corgifm/common/shamu-color'
+import {rateValues} from '@corgifm/common/common-samples-stuff'
 import {
 	percentageValueString, seqLengthValueToString, seqPitchValueToString,
 	seqRateValueToString, sequencerDownloadToolTip, sequencerEraseToolTip,
@@ -24,7 +25,6 @@ import {Knob} from '../Knob/Knob'
 import {KnobIncremental} from '../Knob/KnobIncremental'
 import {KnobSnapping} from '../Knob/KnobSnapping'
 import {Panel} from '../Panel/Panel'
-import {rateValues} from '../WebAudio/music-functions'
 import './InfiniteSequencer.less'
 import {ConnectedInfiniteSequencerNotes} from './InfiniteSequencerNotes'
 

@@ -8,6 +8,7 @@ import {
 	globalClockActions, gridSequencerActions, GridSequencerFields,
 	GridSequencerState, selectGridSequencer, sequencerActions, shamuConnect,
 } from '@corgifm/common/redux'
+import {rateValues} from '@corgifm/common/common-samples-stuff'
 import {
 	percentageValueString, seqPitchValueToString, seqRateValueToString,
 	sequencerDownloadToolTip, sequencerEraseToolTip,
@@ -18,7 +19,6 @@ import {
 import {Knob} from '../Knob/Knob'
 import {KnobIncremental} from '../Knob/KnobIncremental'
 import {KnobSnapping} from '../Knob/KnobSnapping'
-import {rateValues} from '../WebAudio'
 
 interface IGridSequencerControlsProps {
 	id: string

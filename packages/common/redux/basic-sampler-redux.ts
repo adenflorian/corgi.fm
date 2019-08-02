@@ -1,27 +1,38 @@
-import {AnyAction} from 'redux'
 import * as uuid from 'uuid'
-import {ClientId, ConnectionNodeType, IConnectable, IMultiStateThing} from '../common-types'
+import {ActionType} from 'typesafe-actions'
+import {OrderedMap} from 'immutable'
+import {ClientId, ConnectionNodeType, IConnectable, IMultiStateThing, Id} from '../common-types'
 import {BuiltInBQFilterType} from '../OscillatorTypes'
+import {samplerBasicPianoNotes, Samples, makeSamples, Sample} from '../common-samples-stuff'
+import {convertToNumberKeyMap} from '../common-utils'
 import {NodeSpecialState} from './shamu-graph'
+import {IClientAppState} from './common-redux-types'
 import {
 	addMultiThing, BROADCASTER_ACTION, createSelectAllOfThingAsArray,
 	IClientRoomState, IMultiState, makeMultiReducer, NetworkActionType,
 	SERVER_ACTION,
 } from '.'
 
-export const addBasicSampler = (sampler: BasicSamplerState) =>
-	addMultiThing(sampler, ConnectionNodeType.basicSampler, NetworkActionType.SERVER_AND_BROADCASTER)
-
-export const SET_BASIC_SAMPLER_PARAM = 'SET_BASIC_SAMPLER_PARAM'
-export const setBasicSamplerParam =
-	(id: string, paramName: BasicSamplerParam, value: any) => ({
-		type: SET_BASIC_SAMPLER_PARAM,
+export const basicSamplerActions = {
+	add: (sampler: BasicSamplerState) =>
+		addMultiThing(
+			sampler,
+			ConnectionNodeType.basicSampler,
+			NetworkActionType.SERVER_AND_BROADCASTER
+		),
+	setParam: (
+		id: string, paramName: BasicSamplerParam, value: BasicSamplerParamTypes
+	) => ({
+		type: 'SET_BASIC_SAMPLER_PARAM',
 		id,
 		paramName,
 		value,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
-	})
+	} as const),
+} as const
+
+type BasicSamplerParamTypes = number | BuiltInBQFilterType
 
 export enum BasicSamplerParam {
 	pan = 'pan',
@@ -44,7 +55,7 @@ export interface IBasicSamplers {
 }
 
 export class BasicSamplerState implements IConnectable, NodeSpecialState {
-	public static defaultWidth = 64 * 5
+	public static defaultWidth = (64 * 5) * 2
 	public static defaultHeight = 88 * 2
 	public static defaultFilterType = BuiltInBQFilterType.lowpass
 
@@ -66,6 +77,7 @@ export class BasicSamplerState implements IConnectable, NodeSpecialState {
 		name: 'Dummy Basic Piano Sampler',
 		enabled: false,
 		filterType: BasicSamplerState.defaultFilterType,
+		samples: makeSamples(),
 	}
 
 	public readonly id = uuid.v4()
@@ -85,25 +97,30 @@ export class BasicSamplerState implements IConnectable, NodeSpecialState {
 	public readonly name: string = 'Basic Piano Sampler'
 	public readonly enabled: boolean = true
 	public readonly filterType: BuiltInBQFilterType = BasicSamplerState.defaultFilterType
+	public readonly samples: Samples = samplerBasicPianoNotes
 
 	public constructor(ownerId: ClientId) {
 		this.ownerId = ownerId
 	}
 }
 
-export function deserializeBasicSamplerState(state: IMultiStateThing): IMultiStateThing {
+export function deserializeBasicSamplerState(
+	state: IMultiStateThing
+): BasicSamplerState {
 	const x = state as BasicSamplerState
-	const y: BasicSamplerState = {
+	return {
 		...(new BasicSamplerState(x.ownerId)),
 		...x,
 		width: Math.max(x.width, BasicSamplerState.defaultWidth),
 		height: Math.max(x.height, BasicSamplerState.defaultHeight),
+		samples: convertToNumberKeyMap(OrderedMap<string, Sample>(x.samples as any)),
 	}
-	return y
 }
 
+export type BasicSamplerAction = ActionType<typeof basicSamplerActions>
+
 const basicSamplerActionTypes = [
-	SET_BASIC_SAMPLER_PARAM,
+	'SET_BASIC_SAMPLER_PARAM',
 ]
 
 export const basicSamplersReducer = makeMultiReducer<BasicSamplerState, IBasicSamplersState>(
@@ -112,9 +129,9 @@ export const basicSamplersReducer = makeMultiReducer<BasicSamplerState, IBasicSa
 	basicSamplerActionTypes,
 )
 
-function basicSamplerReducer(basicSampler: BasicSamplerState, action: AnyAction) {
+function basicSamplerReducer(basicSampler: BasicSamplerState, action: BasicSamplerAction) {
 	switch (action.type) {
-		case SET_BASIC_SAMPLER_PARAM:
+		case 'SET_BASIC_SAMPLER_PARAM':
 			return {
 				...basicSampler,
 				[action.paramName]: action.value,
@@ -136,3 +153,6 @@ export const selectSamplersByOwner = (state: IClientRoomState, ownerId: ClientId
 
 export const selectSampler = (state: IClientRoomState, id: string) =>
 	selectAllSamplers(state)[id] || BasicSamplerState.dummy
+
+export const selectSamples = (id: Id) => (state: IClientAppState) =>
+	selectSampler(state.room, id).samples

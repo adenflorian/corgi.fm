@@ -14,7 +14,7 @@ import {addSimpleCompressor, deserializeSimpleCompressorState, selectSimpleCompr
 import {addSimpleReverb, deserializeSimpleReverbState, SimpleReverbState} from './simple-reverb-redux'
 import {addVirtualKeyboard} from './virtual-keyboard-redux'
 import {
-	addBasicSampler, addBasicSynthesizer,
+	basicSamplerActions, addBasicSynthesizer,
 	addSimpleDelay, BasicSamplerState,
 	BasicSynthesizerState, deserializeBasicSamplerState,
 	deserializeBasicSynthesizerState,
@@ -194,9 +194,9 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 	})],
 	[ConnectionNodeType.basicSampler, makeNodeInfo({
 		type: ConnectionNodeType.basicSampler,
-		typeName: 'Piano Sampler',
+		typeName: 'Custom Sampler',
 		StateConstructor: BasicSamplerState,
-		addNodeActionCreator: addBasicSampler,
+		addNodeActionCreator: basicSamplerActions.add,
 		selectIsPlaying: selectIsUpstreamNodePlaying,
 		stateSelector: selectSampler,
 		stateDeserializer: deserializeBasicSamplerState,

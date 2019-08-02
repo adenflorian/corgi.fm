@@ -104,6 +104,11 @@ export const localActions = {
 		sourceId,
 		note,
 	} as const),
+	playShortNoteOnTarget: (targetId: Id, note: IMidiNote) => ({
+		type: 'PLAY_SHORT_NOTE_ON_TARGET',
+		targetId,
+		note,
+	} as const),
 	cloneNode: (nodeId: Id, nodeType: ConnectionNodeType, withConnections: 'none' | 'all' | 'default') => ({
 		type: 'CLONE_NODE',
 		nodeId,
@@ -224,6 +229,13 @@ export function createLocalMiddleware(
 			}
 			case 'PLAY_SHORT_NOTE': {
 				playShortNote(action.note, action.sourceId, getState().room, getAllInstruments)
+
+				next(action)
+
+				return
+			}
+			case 'PLAY_SHORT_NOTE_ON_TARGET': {
+				playShortNoteOnTarget(action.note, action.targetId, getState().room, getAllInstruments)
 
 				next(action)
 
@@ -672,6 +684,21 @@ function playShortNote(
 
 		instrument.scheduleRelease(actualNote, delayUntilRelease)
 	})
+}
+
+function playShortNoteOnTarget(
+	note: IMidiNote, targetId: string, roomState: IClientRoomState,
+	getAllInstruments: GetAllInstruments,
+) {
+	const delayUntilRelease = 0.25
+
+	const instrument = getAllInstruments().get(targetId)
+
+	if (!instrument) return
+
+	instrument.scheduleNote(note, 0, true, Set([]))
+
+	instrument.scheduleRelease(note, delayUntilRelease)
 }
 
 function selectLocalVirtualKeyboardId(state: IClientAppState) {

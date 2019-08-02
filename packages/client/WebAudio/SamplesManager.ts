@@ -1,39 +1,6 @@
 import {Octave} from '@corgifm/common/common-types'
-import {NoteNameSharps} from '../WebAudio/music-functions'
+import {samplesToGet, octavesToGet, sharpToFlatNotes, NoteNameSharps} from '@corgifm/common/common-samples-stuff'
 import {getCdnUrl} from '../client-utils'
-
-// const octaveToGet = '4'
-const octavesToGet = [1, 2, 3, 4, 5, 6, 7]
-
-const samplesToGet = [
-	'C',
-	'Db',
-	'D',
-	'Eb',
-	'E',
-	'F',
-	'Gb',
-	'G',
-	'Ab',
-	'A',
-	'Bb',
-	'B',
-]
-
-const sharpToFlatNotes = {
-	'C': 'C',
-	'C#': 'Db',
-	'D': 'D',
-	'D#': 'Eb',
-	'E': 'E',
-	'F': 'F',
-	'F#': 'Gb',
-	'G': 'G',
-	'G#': 'Ab',
-	'A': 'A',
-	'A#': 'Bb',
-	'B': 'B',
-}
 
 export class SamplesManager {
 
@@ -75,6 +42,6 @@ export class SamplesManager {
 	private static readonly _samples = new Map<string, AudioBuffer>()
 }
 
-function convertNoteNameToFlatsName(noteName: NoteNameSharps) {
+function convertNoteNameToFlatsName(noteName: NoteNameSharps): string {
 	return sharpToFlatNotes[noteName]
 }

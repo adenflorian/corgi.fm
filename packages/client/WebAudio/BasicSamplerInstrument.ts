@@ -1,6 +1,9 @@
 import {
-	getOctaveFromMidiNote, IInstrumentOptions, Instrument,
-	midiNoteToNoteName, OnEndedCallback, SamplesManager,
+	midiNoteToNoteName, getOctaveFromMidiNote,
+} from '@corgifm/common/common-samples-stuff'
+import {
+	IInstrumentOptions, Instrument,
+	OnEndedCallback, SamplesManager,
 	Voice, Voices,
 } from '.'
 
@@ -59,7 +62,9 @@ class SamplerVoice extends Voice {
 		lowPassFilterCutoffFrequency: number,
 		invincible: boolean,
 	) {
-		super(audioContext, destination, onEnded, detune, lowPassFilterCutoffFrequency, invincible)
+		super(
+			audioContext, destination, onEnded, detune,
+			lowPassFilterCutoffFrequency, invincible)
 
 		this._audioBufferSource = this._audioContext.createBufferSource()
 
@@ -78,7 +83,9 @@ class SamplerVoice extends Voice {
 	protected _scheduleNoteSpecific(note: number): void {
 		this._disposeAudioBufferSource()
 		this._audioBufferSource = this._audioContext.createBufferSource()
-		this._audioBufferSource.buffer = SamplesManager.getSample(midiNoteToNoteName(note), getOctaveFromMidiNote(note))
+		this._audioBufferSource.buffer =
+			SamplesManager.getSample(
+				midiNoteToNoteName(note), getOctaveFromMidiNote(note))
 		this._isStarted = true
 	}
 

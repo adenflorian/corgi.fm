@@ -5,7 +5,7 @@ import {calculatePositionsGivenConnections} from '@corgifm/common/compute-positi
 import {MidiClipEvents} from '@corgifm/common/midi-types'
 import {MidiNotes} from '@corgifm/common/MidiNote'
 import {
-	addBasicSampler, addBasicSynthesizer, addClient,
+	basicSamplerActions, addBasicSynthesizer, addClient,
 	addGridSequencer, addInfiniteSequencer, addPosition,
 	addSimpleReverb, BasicSamplerState,
 	BasicSynthesizerState, ClientState, Connection, connectionsActions,
@@ -191,7 +191,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 				return x
 			case ConnectionNodeType.basicSampler:
 				const y = new BasicSamplerState(serverClient.id)
-				dispatchToRoom(addBasicSampler(y))
+				dispatchToRoom(basicSamplerActions.add(y))
 				// makeServerOwnedNode(type, y)
 				return y
 			default:
