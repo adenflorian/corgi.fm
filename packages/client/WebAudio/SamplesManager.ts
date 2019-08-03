@@ -3,6 +3,9 @@ import {samplesToGet, octavesToGet, sharpToFlatNotes, NoteNameSharps} from '@cor
 import {getCdnUrl} from '../client-utils'
 
 export class SamplesManager {
+	private static _emptyAudioBuffer: AudioBuffer
+	private static _isInitialized = false
+	private static readonly _samples = new Map<string, AudioBuffer>()
 
 	public static readonly initAsync = async (audioContext: AudioContext) => {
 		if (SamplesManager._isInitialized) return
@@ -36,10 +39,6 @@ export class SamplesManager {
 		const foo = SamplesManager._samples.get(convertedName + octave.toString())
 		return foo || SamplesManager._emptyAudioBuffer
 	}
-
-	private static _emptyAudioBuffer: AudioBuffer
-	private static _isInitialized = false
-	private static readonly _samples = new Map<string, AudioBuffer>()
 }
 
 function convertNoteNameToFlatsName(noteName: NoteNameSharps): string {

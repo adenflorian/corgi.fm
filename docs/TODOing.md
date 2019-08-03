@@ -161,6 +161,7 @@
 	- [√] change sample colors
 	- [√] octave knob to scroll through all 128 samples
 	- [ ] right click pad > select samples...
+		- [ ] Default samples (built-in samples)
 		- [ ] Public samples
 		- [ ] Upload...
 		- [ ] Your samples

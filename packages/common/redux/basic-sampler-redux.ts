@@ -31,7 +31,9 @@ export const basicSamplerActions = {
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	} as const),
-	setSampleColor: (samplerId: Id, midiNote: IMidiNote, color: string) => ({
+	setSampleColor: (
+		samplerId: Id, midiNote: IMidiNote, color: Sample['color']
+	) => ({
 		type: 'SET_SAMPLE_COLOR',
 		id: samplerId,
 		midiNote,
@@ -43,6 +45,16 @@ export const basicSamplerActions = {
 		type: 'SET_SAMPLER_VIEW_OCTAVE',
 		id: samplerId,
 		octave,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	} as const),
+	setSample: (
+		samplerId: Id, midiNote: IMidiNote, sample: Sample
+	) => ({
+		type: 'SET_SAMPLE',
+		id: samplerId,
+		midiNote,
+		sample,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	} as const),
@@ -144,6 +156,7 @@ const basicSamplerActionTypes = [
 	'SET_BASIC_SAMPLER_PARAM',
 	'SET_SAMPLE_COLOR',
 	'SET_SAMPLER_VIEW_OCTAVE',
+	'SET_SAMPLE',
 ]
 
 export const basicSamplersReducer = makeMultiReducer<BasicSamplerState, IBasicSamplersState>(
@@ -166,6 +179,11 @@ function basicSamplerReducer(basicSampler: BasicSamplerState, action: BasicSampl
 					...sample,
 					color: action.color,
 				})),
+			}
+		case 'SET_SAMPLE':
+			return {
+				...basicSampler,
+				samples: basicSampler.samples.set(action.midiNote, action.sample),
 			}
 		case 'SET_SAMPLER_VIEW_OCTAVE':
 			return {

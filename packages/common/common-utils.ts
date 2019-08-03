@@ -3,7 +3,7 @@ import {Map} from 'immutable'
 
 import uuid = require('uuid')
 
-export function pickRandomArrayElement<T>(array: T[]): T {
+export function pickRandomArrayElement<T>(array: readonly T[]): T {
 	return array[Math.floor(Math.random() * array.length)]
 }
 

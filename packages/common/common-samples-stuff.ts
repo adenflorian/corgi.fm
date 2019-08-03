@@ -85,15 +85,19 @@ export const noteNameToMidi = {
 } as const
 
 /** Key is a midi note as string */
-export type Samples = Map<number, Sample>
+export interface Samples extends Map<number, Sample> {}
 
-export const makeSamples = (arg?: Samples): Samples => Map<number, Sample>(arg || [])
+export const makeSamples =
+	(collection: Iterable<[number, Sample]> = []): Samples =>
+		Map<number, Sample>(collection)
+
+export const sampleColors =
+	['red', 'blue', 'green', 'yellow', 'purple'] as const
 
 export interface Sample {
-	// readonly note: IMidiNote
 	readonly label: string
 	readonly filePath: string
-	readonly color: string
+	readonly color: typeof sampleColors[number] | 'panelGrayDark'
 }
 
 export const samplerBasicPianoNotes: Samples = samplesToGet.reduce(
@@ -105,13 +109,33 @@ export const samplerBasicPianoNotes: Samples = samplesToGet.reduce(
 				mutable.set(midiNote, {
 					label: `${note}${octave}`,
 					filePath: `${sharpToFlatNotes[note]}${octave}-49-96.mp3`,
-					color: pickRandomArrayElement([CssColor.red, CssColor.blue, CssColor.green, CssColor.yellow, CssColor.purple]),
+					color: pickRandomArrayElement(sampleColors),
 				})
 			})
 		})
 	},
 	makeSamples(),
 )
+
+const basicDrumSamples: Samples = makeSamples([
+	[60, {color: 'blue', label: 'kick 135', filePath: 'basic-drums/kick-135.wav'}],
+	[61, {color: 'blue', label: 'kick 125', filePath: 'basic-drums/kick-125.wav'}],
+	[62, {color: 'blue', label: 'kick swedish', filePath: 'basic-drums/kick-swedish.wav'}],
+	[63, {color: 'blue', label: 'kick bump', filePath: 'basic-drums/kick-bump.wav'}],
+	[64, {color: 'green', label: 'snare 20', filePath: 'basic-drums/snare-20.wav'}],
+	[65, {color: 'green', label: 'snare people', filePath: 'basic-drums/snare-people.wav'}],
+	[66, {color: 'green', label: 'snare heavy', filePath: 'basic-drums/snare-heavy.wav'}],
+	[67, {color: 'purple', label: 'hat skiba', filePath: 'basic-drums/hat-skiba.wav'}],
+	[68, {color: 'purple', label: 'hat savannah', filePath: 'basic-drums/hat-savannah.wav'}],
+	[69, {color: 'purple', label: 'clap 1', filePath: 'basic-drums/clap-1.wav'}],
+	[70, {color: 'purple', label: 'rim click', filePath: 'basic-drums/rim-click.wav'}],
+	[71, {color: 'purple', label: 'bark rose', filePath: 'basic-drums/bark-rose.wav'}],
+])
+
+export const defaultSamples = Map({
+	basicPiano: samplerBasicPianoNotes,
+	basicDrums: basicDrumSamples,
+})
 
 export function midiNoteFromNoteName(noteName: NoteNameSharps, octave: Octave): IMidiNote {
 	const midiNoteBase = noteNameToMidi[noteName]

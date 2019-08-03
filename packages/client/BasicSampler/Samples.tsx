@@ -18,7 +18,7 @@ interface Props {
 }
 
 const dummySample: Sample = {
-	color: CssColor.panelGrayDark,
+	color: 'panelGrayDark',
 	filePath: 'n/a',
 	label: '?',
 }
@@ -106,7 +106,7 @@ const SamplePad = ({samplerId, sample, midiNote}: SamplePadProps) => {
 			<div
 				className="sample"
 				onMouseDown={playNote}
-				style={{color: sample.color}}
+				style={{color: CssColor[sample.color]}}
 			>
 				<div className="label">
 					{sample.label}

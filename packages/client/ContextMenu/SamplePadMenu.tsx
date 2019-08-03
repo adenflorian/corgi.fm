@@ -5,6 +5,7 @@ import {basicSamplerActions} from '@corgifm/common/redux'
 import {capitalizeFirstLetter} from '@corgifm/common/common-utils'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {IMidiNote} from '@corgifm/common/MidiNote'
+import {Sample, sampleColors, defaultSamples} from '@corgifm/common/common-samples-stuff'
 import {TopMenuBar} from './TopMenuBar'
 
 interface SamplePadMenuData {
@@ -15,38 +16,89 @@ interface SamplePadMenuData {
 export const samplePadMenuId = 'samplePadMenu'
 
 export const SamplePadMenu = () => {
-	const dispatch = useDispatch()
-
-	const setColor = useCallback(
-		(samplerId: Id, midiNote: IMidiNote, color: string) => {
-			dispatch(basicSamplerActions.setSampleColor(samplerId, midiNote, color))
-		},
-		[dispatch],
-	)
-
 	return (
 		<ContextMenu id={samplePadMenuId}>
 			<TopMenuBar label={'sample pad menu'} />
 			<ColorsMenu />
+			<DefaultSamplesMenu />
 		</ContextMenu>
 	)
+}
 
-	function ColorsMenu() {
-		return <SubMenu
+function DefaultSamplesMenu() {
+	return (
+		<SubMenu
+			title={<div>Default Samples</div>}
+			hoverDelay={0}
+		>
+			{defaultSamples.map((samples, section) => (
+				<SubMenu
+					key={section}
+					title={<div>{section}</div>}
+					hoverDelay={0}
+				>
+					{samples.map((sample, midiNote) => (
+						<DefaultSampleMenuItem key={midiNote} {...{sample}} />
+					)).toList()}
+				</SubMenu>
+			)).toList()}
+		</SubMenu>
+	)
+}
+
+function DefaultSampleMenuItem({sample}: {sample: Sample}) {
+	const dispatch = useDispatch()
+	const setSample = useCallback(
+		(samplerId: Id, midiNote: IMidiNote) => {
+			dispatch(
+				basicSamplerActions.setSample(
+					samplerId, midiNote, sample))
+		},
+		[dispatch, sample],
+	)
+
+	return (
+		<MenuItem
+			onClick={(_, {samplerId, midiNote}: SamplePadMenuData) =>
+				setSample(samplerId, midiNote)}
+		>
+			<span style={{color: CssColor[sample.color]}}>
+				{sample.label}
+			</span>
+		</MenuItem>
+	)
+}
+
+function ColorsMenu() {
+	return (
+		<SubMenu
 			title={<div>Color</div>}
 			hoverDelay={0}
 		>
-			{(['red', 'blue', 'green', 'yellow', 'purple', 'orange'] as const)
-				.map(color => <ColorOption {...{key: color, color}} />)}
+			{sampleColors.map(color => <ColorOption key={color} {...{color}} />)}
 		</SubMenu>
-	}
+	)
+}
 
-	function ColorOption({color}: {color: keyof typeof CssColor}) {
-		return <MenuItem
+function ColorOption({color}: {color: Sample['color']}) {
+	const dispatch = useDispatch()
+	const setColor = useCallback(
+		(samplerId: Id, midiNote: IMidiNote) => {
+			dispatch(
+				basicSamplerActions.setSampleColor(
+					samplerId, midiNote, color))
+		},
+		[dispatch, color],
+	)
+
+	return (
+		<MenuItem
 			onClick={(_, {samplerId, midiNote}: SamplePadMenuData) =>
-				setColor(samplerId, midiNote, CssColor[color])}
+				setColor(samplerId, midiNote)}
 		>
-			<span style={{color: CssColor[color]}}>{capitalizeFirstLetter(color)}</span>
+			<span style={{color: CssColor[color]}}>
+				{capitalizeFirstLetter(color)}
+			</span>
 		</MenuItem>
-	}
+	)
 }
