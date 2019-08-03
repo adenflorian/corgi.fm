@@ -28,7 +28,7 @@ export const SamplePadMenu = () => {
 			<TopMenuBar label={'sample pad menu'} />
 			<SubMenu
 				title={<div>Color</div>}
-				// hoverDelay={0}
+				hoverDelay={0}
 			>
 				<MenuItem onClick={(_, {samplerId, midiNote}: SamplePadMenuData) => setColor(samplerId, midiNote, CssColor.red)}>
 					<span style={{color: CssColor.red}}>Red</span>
