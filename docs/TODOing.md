@@ -152,6 +152,13 @@
 - [√] fix noise wave getting stuck
 - [√] DeprecationWarning: collection.update is deprecated. Use updateOne, updateMany, or bulkWrite instead.
 - [√] remove samples from the build
+- [ ] `Uncaught (in promise) [DEFAULT]: Firebase: Firebase App named '[DEFAULT]' already exists (app/duplicate-app).`
+- [ ] **Custom Sampler**
+	- morphing the piano sampler into a custom sampler
+	- [√] sample pads UI
+	- [√] click on pad to play sample
+	- [√] change sample colors
+	- [ ] octave knob to scroll through all 128 samples
 - [ ] !fix security issue where anyone can dispatch any custom action to all other clients
 - [√] setup local.corgi.fm in hosts file so CORS will work maybe with the CDN
 - [√] fix chrome cache cors issue (maybe by making a different cdn for each env?)
@@ -329,6 +336,13 @@ Yes, https://mmckegg.github.io/web-audio-school/, exercise 13 is exactly what yo
 	- [ ] hot cross buns
 	- [ ] claire de lune
 	- [ ] Spoiler - Hyper
+
+# Before Public Alpha
+- [ ] database backups/replication
+- [ ] host database on own box
+- [ ] host websocket server on own box
+- [ ] ToS
+- [ ] privacy policy
 
 ## Saving
 why?

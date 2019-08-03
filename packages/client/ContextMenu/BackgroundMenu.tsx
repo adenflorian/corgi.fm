@@ -10,6 +10,7 @@ import {ConnectionNodeType, IConnectable} from '@corgifm/common/common-types'
 import {Dispatch} from 'redux'
 import {serverClientId} from '@corgifm/common/common-constants'
 import {toGraphSpace} from '../SimpleGraph/Zoom'
+import {TopMenuBar} from './TopMenuBar'
 
 interface BackgroundMenuItemsProps {
 	localClientId: Id
@@ -26,24 +27,10 @@ export const BackgroundMenuItems = React.memo(
 
 		return (
 			<Fragment>
-				<TopMenuBar />
+				<TopMenuBar label="background menu" />
 				<AddNodeMenuItems />
 			</Fragment>
 		)
-
-		function TopMenuBar() {
-			return (
-				<MenuItem
-					attributes={{
-						className: 'contextMenuTop',
-						title: 'shift + right click to get browser context menu',
-					}}
-					preventClose={true}
-				>
-					do stuff
-				</MenuItem>
-			)
-		}
 
 		function AddNodeMenuItems() {
 			return (

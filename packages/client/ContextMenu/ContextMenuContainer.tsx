@@ -7,6 +7,7 @@ import {backgroundMenuId} from '../client-constants'
 import './ContextMenu.less'
 import {ConnectedNodeMenu} from './NodeMenu'
 import {BackgroundMenuItems} from './BackgroundMenu'
+import {SamplePadMenu} from './SamplePadMenu'
 
 interface ReduxProps {
 	localClientId: Id
@@ -29,6 +30,7 @@ export function ContextMenuContainer(
 				/>
 			</ContextMenu>
 			<ConnectedNodeMenu />
+			<SamplePadMenu />
 		</Fragment>
 	)
 }

@@ -7,6 +7,7 @@ import {ConnectionNodeType} from '@corgifm/common/common-types'
 import {getConnectionNodeInfo} from '@corgifm/common/redux'
 import {nodeMenuId} from '../client-constants'
 import {deleteNode, localActions} from '../local-middleware'
+import {TopMenuBar} from './TopMenuBar'
 
 interface NodeMenuProps {
 	trigger: {
@@ -48,26 +49,12 @@ const NodeMenuItems = React.memo(function _MenuItems({nodeType}: NodeMenuItemsPr
 
 	return (
 		<Fragment>
-			<TopMenuBar />
+			<TopMenuBar label="node menu" />
 			{isDeletable && <DeleteNodeMenuItem />}
 			{!isDeletable && <DontDeleteMeMenuItem />}
 			{isNodeCloneable && <CloneNodeMenuItem />}
 		</Fragment>
 	)
-
-	function TopMenuBar() {
-		return (
-			<MenuItem
-				attributes={{
-					className: 'contextMenuTop',
-					title: 'shift + right click to get browser context menu',
-				}}
-				preventClose={true}
-			>
-				do specific node stuff
-			</MenuItem>
-		)
-	}
 
 	function DeleteNodeMenuItem() {
 		return generateDeleteSubMenus(

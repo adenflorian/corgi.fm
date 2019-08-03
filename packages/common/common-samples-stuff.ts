@@ -1,6 +1,8 @@
 import {List, Map, OrderedMap} from 'immutable'
 import {IMidiNote} from './MidiNote'
 import {Octave} from './common-types'
+import {pickRandomArrayElement} from './common-utils'
+import {CssColor} from './shamu-color'
 
 // const octaveToGet = '4'
 export const octavesToGet = [1, 2, 3, 4, 5, 6, 7]
@@ -87,6 +89,7 @@ export interface Sample {
 	// readonly note: IMidiNote
 	readonly label: string
 	readonly filePath: string
+	readonly color: string
 }
 
 export const samplerBasicPianoNotes: Samples = samplesToGet.reduce(
@@ -97,6 +100,7 @@ export const samplerBasicPianoNotes: Samples = samplesToGet.reduce(
 		return samples.set(midiNote, {
 			label: finalNote,
 			filePath: finalNote + `-49-96.mp3`,
+			color: pickRandomArrayElement([CssColor.red, CssColor.blue, CssColor.green, CssColor.yellow, CssColor.purple]),
 		})
 	},
 	makeSamples(),

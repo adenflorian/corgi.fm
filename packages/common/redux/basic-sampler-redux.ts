@@ -5,6 +5,7 @@ import {ConnectionNodeType, IConnectable, IMultiStateThing} from '../common-type
 import {BuiltInBQFilterType} from '../OscillatorTypes'
 import {samplerBasicPianoNotes, Samples, makeSamples, Sample} from '../common-samples-stuff'
 import {convertToNumberKeyMap} from '../common-utils'
+import {IMidiNote} from '../MidiNote'
 import {NodeSpecialState} from './shamu-graph'
 import {IClientAppState} from './common-redux-types'
 import {
@@ -27,6 +28,14 @@ export const basicSamplerActions = {
 		id,
 		paramName,
 		value,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	} as const),
+	setSampleColor: (samplerId: Id, midiNote: IMidiNote, color: string) => ({
+		type: 'SET_SAMPLE_COLOR',
+		id: samplerId,
+		midiNote,
+		color,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	} as const),
@@ -121,6 +130,7 @@ export type BasicSamplerAction = ActionType<typeof basicSamplerActions>
 
 const basicSamplerActionTypes = [
 	'SET_BASIC_SAMPLER_PARAM',
+	'SET_SAMPLE_COLOR',
 ]
 
 export const basicSamplersReducer = makeMultiReducer<BasicSamplerState, IBasicSamplersState>(
@@ -129,12 +139,20 @@ export const basicSamplersReducer = makeMultiReducer<BasicSamplerState, IBasicSa
 	basicSamplerActionTypes,
 )
 
-function basicSamplerReducer(basicSampler: BasicSamplerState, action: BasicSamplerAction) {
+function basicSamplerReducer(basicSampler: BasicSamplerState, action: BasicSamplerAction): BasicSamplerState {
 	switch (action.type) {
 		case 'SET_BASIC_SAMPLER_PARAM':
 			return {
 				...basicSampler,
 				[action.paramName]: action.value,
+			}
+		case 'SET_SAMPLE_COLOR':
+			return {
+				...basicSampler,
+				samples: basicSampler.samples.update(action.midiNote, sample => ({
+					...sample,
+					color: action.color,
+				})),
 			}
 		default:
 			return basicSampler
