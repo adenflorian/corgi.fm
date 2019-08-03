@@ -14,7 +14,8 @@ export const FirebaseContext = React.createContext<FirebaseContextStuff>({
 export type FirebaseContextStuff = ReturnType<typeof initializeFirebase>
 
 export function initializeFirebase() {
-	const app = firebase.initializeApp(getFirebaseConfig())
+	// Use existing app if there is one (for hot reloading)
+	const app = firebase.apps[0] || firebase.initializeApp(getFirebaseConfig())
 
 	const auth = firebase.auth(app)
 
