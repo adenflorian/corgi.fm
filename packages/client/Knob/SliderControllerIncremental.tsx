@@ -8,16 +8,19 @@ interface Props {
 	onChange: (newValue: number) => any
 	value: number
 	defaultValue: number
-	children: (handleMouseDown: any, percentage: number, adjustedPercentage: number) => ReactElement<any>
+	children: (
+		handleMouseDown: any, percentage: number, adjustedPercentage: number
+	) => ReactElement<any>
 	increment: number
 	fineIncrement?: number
 	allowAltKey?: boolean
+	sensitivity?: number
 }
 
 export function SliderControllerIncremental(props: Props) {
 	const {
 		value, onChange, increment, defaultValue, children, min, max,
-		allowAltKey = false, fineIncrement,
+		allowAltKey = false, fineIncrement, sensitivity = 0.5,
 	} = props
 
 	const [isMouseDown, setIsMouseDown] = useState(false)
@@ -31,20 +34,21 @@ export function SliderControllerIncremental(props: Props) {
 					return setIsMouseDown(false)
 				}
 
-				let sensitivity = 0.5
+				let actualSensitivity = sensitivity
 				if (e.shiftKey) {
-					sensitivity = 4
+					actualSensitivity = sensitivity * 8
 				} else if (e.altKey) {
-					sensitivity = 0.01
+					actualSensitivity = sensitivity * 0.02
 				}
 
-				const mouseYDelta = e.movementY * sensitivity
+				const mouseYDelta = e.movementY * actualSensitivity
 
 				const newTempValue = clamp(tempValue - mouseYDelta, min, max)
 
-				const roundedValue = (allowAltKey && e.altKey && fineIncrement !== undefined)
-					? clamp(incrementalRound(newTempValue, fineIncrement), min, max)
-					: clamp(incrementalRound(newTempValue, increment), min, max)
+				const roundedValue =
+					(allowAltKey && e.altKey && fineIncrement !== undefined)
+						? clamp(incrementalRound(newTempValue, fineIncrement), min, max)
+						: clamp(incrementalRound(newTempValue, increment), min, max)
 
 				if (roundedValue !== value) {
 					onChange(roundedValue)
@@ -61,7 +65,8 @@ export function SliderControllerIncremental(props: Props) {
 		return () => {
 			window.removeEventListener('mousemove', _handleMouseMove)
 		}
-	}, [isMouseDown, tempValue, value, increment, min, max, allowAltKey, fineIncrement, onChange])
+	}, [isMouseDown, tempValue, value, increment, min, max, allowAltKey,
+		fineIncrement, onChange, sensitivity])
 
 	function _normalize(v: number): number {
 		const x = (v - min) / (max - min)

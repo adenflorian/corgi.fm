@@ -1,10 +1,10 @@
 import * as uuid from 'uuid'
 import {ActionType} from 'typesafe-actions'
-import {OrderedMap} from 'immutable'
-import {ConnectionNodeType, IConnectable, IMultiStateThing} from '../common-types'
+import {Map} from 'immutable'
+import {ConnectionNodeType, IConnectable, IMultiStateThing, Octave} from '../common-types'
 import {BuiltInBQFilterType} from '../OscillatorTypes'
 import {samplerBasicPianoNotes, Samples, makeSamples, Sample} from '../common-samples-stuff'
-import {convertToNumberKeyMap} from '../common-utils'
+import {convertToNumberKeyMap, clamp} from '../common-utils'
 import {IMidiNote} from '../MidiNote'
 import {NodeSpecialState} from './shamu-graph'
 import {IClientAppState} from './common-redux-types'
@@ -39,6 +39,13 @@ export const basicSamplerActions = {
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	} as const),
+	setViewOctave: (samplerId: Id, octave: Octave) => ({
+		type: 'SET_SAMPLER_VIEW_OCTAVE',
+		id: samplerId,
+		octave,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	} as const),
 } as const
 
 type BasicSamplerParamTypes = number | BuiltInBQFilterType
@@ -64,9 +71,12 @@ export interface IBasicSamplers {
 }
 
 export class BasicSamplerState implements IConnectable, NodeSpecialState {
-	public static defaultWidth = (64 * 5) * 2
+	public static defaultWidth = 64 + 320 + (64 * 5)
 	public static defaultHeight = 88 * 2
 	public static defaultFilterType = BuiltInBQFilterType.lowpass
+	public static minViewOctave = -1
+	public static maxViewOctave = 9
+	public static defaultViewOctave = 4
 
 	public static dummy: BasicSamplerState = {
 		id: 'dummy',
@@ -87,6 +97,7 @@ export class BasicSamplerState implements IConnectable, NodeSpecialState {
 		enabled: false,
 		filterType: BasicSamplerState.defaultFilterType,
 		samples: makeSamples(),
+		samplesViewOctave: 4,
 	}
 
 	public readonly id = uuid.v4()
@@ -107,6 +118,7 @@ export class BasicSamplerState implements IConnectable, NodeSpecialState {
 	public readonly enabled: boolean = true
 	public readonly filterType: BuiltInBQFilterType = BasicSamplerState.defaultFilterType
 	public readonly samples: Samples = samplerBasicPianoNotes
+	public readonly samplesViewOctave: number = 4
 
 	public constructor(ownerId: ClientId) {
 		this.ownerId = ownerId
@@ -122,7 +134,7 @@ export function deserializeBasicSamplerState(
 		...x,
 		width: Math.max(x.width, BasicSamplerState.defaultWidth),
 		height: Math.max(x.height, BasicSamplerState.defaultHeight),
-		samples: convertToNumberKeyMap(OrderedMap<string, Sample>(x.samples as any)),
+		samples: convertToNumberKeyMap(Map<string, Sample>(x.samples as any)),
 	}
 }
 
@@ -131,6 +143,7 @@ export type BasicSamplerAction = ActionType<typeof basicSamplerActions>
 const basicSamplerActionTypes = [
 	'SET_BASIC_SAMPLER_PARAM',
 	'SET_SAMPLE_COLOR',
+	'SET_SAMPLER_VIEW_OCTAVE',
 ]
 
 export const basicSamplersReducer = makeMultiReducer<BasicSamplerState, IBasicSamplersState>(
@@ -154,6 +167,14 @@ function basicSamplerReducer(basicSampler: BasicSamplerState, action: BasicSampl
 					color: action.color,
 				})),
 			}
+		case 'SET_SAMPLER_VIEW_OCTAVE':
+			return {
+				...basicSampler,
+				samplesViewOctave: clamp(
+					action.octave,
+					BasicSamplerState.minViewOctave,
+					BasicSamplerState.maxViewOctave),
+			}
 		default:
 			return basicSampler
 	}
@@ -174,3 +195,6 @@ export const selectSampler = (state: IClientRoomState, id: Id) =>
 
 export const selectSamples = (id: Id) => (state: IClientAppState) =>
 	selectSampler(state.room, id).samples
+
+export const selectSamplerViewOctave = (id: Id) => (state: IClientAppState) =>
+	selectSampler(state.room, id).samplesViewOctave

@@ -1,26 +1,25 @@
-import {List, Map, OrderedMap} from 'immutable'
+import {List, Map} from 'immutable'
 import {IMidiNote} from './MidiNote'
 import {Octave} from './common-types'
 import {pickRandomArrayElement} from './common-utils'
 import {CssColor} from './shamu-color'
 
-// const octaveToGet = '4'
-export const octavesToGet = [1, 2, 3, 4, 5, 6, 7]
+export const octavesToGet = [1, 2, 3, 4, 5, 6, 7] as const
 
-export const samplesToGet = List([
+export const samplesToGet = [
 	'C',
-	'Db',
+	'C#',
 	'D',
-	'Eb',
+	'D#',
 	'E',
 	'F',
-	'Gb',
+	'F#',
 	'G',
-	'Ab',
+	'G#',
 	'A',
-	'Bb',
+	'A#',
 	'B',
-])
+] as const
 
 export const sharpToFlatNotes = {
 	'C': 'C',
@@ -35,7 +34,7 @@ export const sharpToFlatNotes = {
 	'A': 'A',
 	'A#': 'Bb',
 	'B': 'B',
-}
+} as const
 
 export type NoteNameSharps = 'C' | 'C#' | 'D' | 'D#' | 'E' | 'F' | 'F#' | 'G' | 'G#' | 'A' | 'A#' | 'B'
 
@@ -65,25 +64,30 @@ export const keyColors: IKeyColors = {
 	11: {color: 'white', name: 'B'},
 }
 
-export const noteNameToMidi: {[noteName: string]: number} = {
-	C: 0,
-	Db: 1,
-	D: 2,
-	Eb: 3,
-	E: 4,
-	F: 5,
-	Gb: 6,
-	G: 7,
-	Ab: 8,
-	A: 9,
-	Bb: 10,
-	B: 11,
-}
+export const noteNameToMidi = {
+	'C': 0,
+	'C#': 1,
+	'Db': 1,
+	'D': 2,
+	'D#': 3,
+	'Eb': 3,
+	'E': 4,
+	'F': 5,
+	'F#': 6,
+	'Gb': 6,
+	'G': 7,
+	'G#': 8,
+	'Ab': 8,
+	'A': 9,
+	'A#': 10,
+	'Bb': 10,
+	'B': 11,
+} as const
 
 /** Key is a midi note as string */
-export type Samples = OrderedMap<number, Sample>
+export type Samples = Map<number, Sample>
 
-export const makeSamples = (arg?: Samples): Samples => OrderedMap<number, Sample>(arg || [])
+export const makeSamples = (arg?: Samples): Samples => Map<number, Sample>(arg || [])
 
 export interface Sample {
 	// readonly note: IMidiNote
@@ -94,19 +98,22 @@ export interface Sample {
 
 export const samplerBasicPianoNotes: Samples = samplesToGet.reduce(
 	(samples, note): Samples => {
-		const finalNote = `${note}4`
-		const midiNote = midiNoteFromNoteName(note, 4)
 
-		return samples.set(midiNote, {
-			label: finalNote,
-			filePath: finalNote + `-49-96.mp3`,
-			color: pickRandomArrayElement([CssColor.red, CssColor.blue, CssColor.green, CssColor.yellow, CssColor.purple]),
+		return samples.withMutations(mutable => {
+			octavesToGet.forEach(octave => {
+				const midiNote = midiNoteFromNoteName(note, octave)
+				mutable.set(midiNote, {
+					label: `${note}${octave}`,
+					filePath: `${sharpToFlatNotes[note]}${octave}-49-96.mp3`,
+					color: pickRandomArrayElement([CssColor.red, CssColor.blue, CssColor.green, CssColor.yellow, CssColor.purple]),
+				})
+			})
 		})
 	},
 	makeSamples(),
 )
 
-export function midiNoteFromNoteName(noteName: string, octave: Octave): IMidiNote {
+export function midiNoteFromNoteName(noteName: NoteNameSharps, octave: Octave): IMidiNote {
 	const midiNoteBase = noteNameToMidi[noteName]
 	return midiNoteBase + (octave * 12) + 12
 }
@@ -117,7 +124,7 @@ export function midiNoteToNoteName(midiNote: IMidiNote): NoteNameSharps {
 }
 
 export function getOctaveFromMidiNote(midiNote: IMidiNote): Octave {
-	return Math.floor(midiNote / 12)
+	return Math.floor((midiNote - 12) / 12)
 }
 
 export function roundRate(rawRate: number) {

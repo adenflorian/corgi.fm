@@ -6,29 +6,38 @@
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    // padding: 0 8px;
     width: 100%;
 
-    .samples {
-        width: 320px;
+    .samplesSection {
         display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        flex-flow: wrap-reverse;
-
-        .sample {
-            width: 74px;
-            height: 52px;
-            border-radius: 4px;
-            background-color: @panelGrayLight;
-            box-sizing: border-box;
-            margin: 2px;
+        
+        .samplesControls {
+            width: 64px;
             display: flex;
-            justify-content: center;
             align-items: center;
-            border: 1px solid currentColor;
+        }
 
-            &:hover {
+        .samplePads {
+            width: 320px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            flex-flow: wrap-reverse;
+    
+            .sample {
+                width: 74px;
+                height: 52px;
+                border-radius: 4px;
+                background-color: @panelGrayLight;
+                box-sizing: border-box;
+                margin: 2px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                border: 1px solid currentColor;
+    
+                &:hover {
+                }
             }
         }
     }

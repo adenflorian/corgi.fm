@@ -159,7 +159,10 @@
 	- [√] click on pad to play sample
 	- [√] change sample colors
 	- [ ] octave knob to scroll through all 128 samples
+- [ ] checkbox to hide welcome on start
+- [ ] fix G7 and Gb7 samples
 - [ ] !fix security issue where anyone can dispatch any custom action to all other clients
+- [ ] fix mouse over hold down with alt on grid seq
 - [√] setup local.corgi.fm in hosts file so CORS will work maybe with the CDN
 - [√] fix chrome cache cors issue (maybe by making a different cdn for each env?)
 - [ ] lock down audio node params min/max at instrument level

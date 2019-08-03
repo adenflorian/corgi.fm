@@ -16,12 +16,13 @@ interface Props extends KnobBaseProps {
 	fineIncrement?: number
 	value: number
 	allowAltKey?: boolean
+	sensitivity?: number
 }
 
 export const KnobIncremental = React.memo(function _KnobIncremental(props: Props) {
 	const {
 		value, label = '', readOnly = false, onChangeId,
-		tooltip, valueString, onChange, allowAltKey,
+		tooltip, valueString, onChange, allowAltKey, sensitivity,
 		increment, fineIncrement, defaultValue, min, max,
 	} = props
 
@@ -39,6 +40,7 @@ export const KnobIncremental = React.memo(function _KnobIncremental(props: Props
 			increment={increment}
 			fineIncrement={fineIncrement}
 			allowAltKey={allowAltKey}
+			sensitivity={sensitivity}
 		>
 			{(handleMouseDown, percentage, adjustedPercentage) =>
 				<KnobView

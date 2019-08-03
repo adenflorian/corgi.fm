@@ -14,7 +14,7 @@ export class SamplesManager {
 
 		samplesToGet.forEach(async sampleName => {
 			octavesToGet.forEach(async octave => {
-				const noteName = sampleName + octave.toString()
+				const noteName = sharpToFlatNotes[sampleName] + octave.toString()
 
 				// if (noteName === 'Gb7' || noteName === 'Ab3') return
 
@@ -31,7 +31,7 @@ export class SamplesManager {
 		})
 	}
 
-	public static getSample(noteName: NoteNameSharps, octave: Octave = 4) {
+	public static getSample(noteName: NoteNameSharps, octave: Octave) {
 		const convertedName = convertNoteNameToFlatsName(noteName)
 		const foo = SamplesManager._samples.get(convertedName + octave.toString())
 		return foo || SamplesManager._emptyAudioBuffer
