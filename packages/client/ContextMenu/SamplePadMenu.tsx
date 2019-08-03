@@ -2,6 +2,7 @@ import React, {useCallback} from 'react'
 import {ContextMenu, MenuItem, SubMenu} from 'react-contextmenu'
 import {useDispatch} from 'react-redux'
 import {basicSamplerActions} from '@corgifm/common/redux'
+import {capitalizeFirstLetter} from '@corgifm/common/common-utils'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {IMidiNote} from '@corgifm/common/MidiNote'
 import {TopMenuBar} from './TopMenuBar'
@@ -26,29 +27,26 @@ export const SamplePadMenu = () => {
 	return (
 		<ContextMenu id={samplePadMenuId}>
 			<TopMenuBar label={'sample pad menu'} />
-			<SubMenu
-				title={<div>Color</div>}
-				hoverDelay={0}
-			>
-				<MenuItem onClick={(_, {samplerId, midiNote}: SamplePadMenuData) => setColor(samplerId, midiNote, CssColor.red)}>
-					<span style={{color: CssColor.red}}>Red</span>
-				</MenuItem>
-				<MenuItem onClick={(_, {samplerId, midiNote}: SamplePadMenuData) => setColor(samplerId, midiNote, CssColor.blue)}>
-					<span style={{color: CssColor.blue}}>Blue</span>
-				</MenuItem>
-				<MenuItem onClick={(_, {samplerId, midiNote}: SamplePadMenuData) => setColor(samplerId, midiNote, CssColor.green)}>
-					<span style={{color: CssColor.green}}>Green</span>
-				</MenuItem>
-				<MenuItem onClick={(_, {samplerId, midiNote}: SamplePadMenuData) => setColor(samplerId, midiNote, CssColor.yellow)}>
-					<span style={{color: CssColor.yellow}}>Yellow</span>
-				</MenuItem>
-				<MenuItem onClick={(_, {samplerId, midiNote}: SamplePadMenuData) => setColor(samplerId, midiNote, CssColor.purple)}>
-					<span style={{color: CssColor.purple}}>Purple</span>
-				</MenuItem>
-				<MenuItem onClick={(_, {samplerId, midiNote}: SamplePadMenuData) => setColor(samplerId, midiNote, CssColor.orange)}>
-					<span style={{color: CssColor.orange}}>Orange</span>
-				</MenuItem>
-			</SubMenu>
+			<ColorsMenu />
 		</ContextMenu>
 	)
+
+	function ColorsMenu() {
+		return <SubMenu
+			title={<div>Color</div>}
+			hoverDelay={0}
+		>
+			{(['red', 'blue', 'green', 'yellow', 'purple', 'orange'] as const)
+				.map(color => <ColorOption {...{key: color, color}} />)}
+		</SubMenu>
+	}
+
+	function ColorOption({color}: {color: keyof typeof CssColor}) {
+		return <MenuItem
+			onClick={(_, {samplerId, midiNote}: SamplePadMenuData) =>
+				setColor(samplerId, midiNote, CssColor[color])}
+		>
+			<span style={{color: CssColor[color]}}>{capitalizeFirstLetter(color)}</span>
+		</MenuItem>
+	}
 }

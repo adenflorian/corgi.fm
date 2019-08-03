@@ -153,12 +153,23 @@
 - [√] DeprecationWarning: collection.update is deprecated. Use updateOne, updateMany, or bulkWrite instead.
 - [√] remove samples from the build
 - [ ] `Uncaught (in promise) [DEFAULT]: Firebase: Firebase App named '[DEFAULT]' already exists (app/duplicate-app).`
+
 - [ ] **Custom Sampler**
 	- morphing the piano sampler into a custom sampler
 	- [√] sample pads UI
 	- [√] click on pad to play sample
 	- [√] change sample colors
-	- [ ] octave knob to scroll through all 128 samples
+	- [√] octave knob to scroll through all 128 samples
+	- [ ] right click pad > select samples...
+		- [ ] Public samples
+		- [ ] Upload...
+		- [ ] Your samples
+		- [ ] Samples in room
+	- [ ] drag sample onto pad from computer
+	- [ ] presets
+		- [ ] piano
+	- [ ] styling
+
 - [ ] checkbox to hide welcome on start
 - [ ] fix G7 and Gb7 samples
 - [ ] !fix security issue where anyone can dispatch any custom action to all other clients

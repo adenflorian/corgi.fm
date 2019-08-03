@@ -90,3 +90,7 @@ export function convertToNumberKeyMap<T>(obj: Map<string, T>): Map<number, T> {
 		return result.set(Number.parseInt(key), value)
 	}, Map<number, T>())
 }
+
+export function capitalizeFirstLetter(string: string) {
+	return string.charAt(0).toUpperCase() + string.slice(1)
+}
