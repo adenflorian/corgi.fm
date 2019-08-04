@@ -174,11 +174,12 @@
 	- [ ] UI to show sample loading
 	- Samples Manager
 		- [√] don't fetch same sample twice
-		- [ ] fix weird issue with double fetching when going really fast
+		- [√] fix weird issue with double fetching when going really fast
 		- [ ] pre-load samples based on what is in redux
 		- [ ] samples manager middleware?
 		- [ ] if `getSample` gets called and sample isn't loaded, then that's an error?
 
+- [ ] http://op-101.blogspot.com/2011/09/string-description.html
 - [ ] checkbox to hide welcome on start
 - [ ] fix G7 and Gb7 samples
 - [ ] !fix security issue where anyone can dispatch any custom action to all other clients

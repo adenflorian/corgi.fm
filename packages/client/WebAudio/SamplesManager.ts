@@ -4,9 +4,9 @@ import {getCdnUrl} from '../client-utils'
 // if (noteName === 'Gb7' || noteName === 'Ab3') return
 
 enum SampleStatus {
-	Requested,
-	Loaded,
-	NotLoaded,
+	Requested = 'Requested',
+	Loaded = 'Loaded',
+	NotLoaded = 'NotLoaded',
 }
 
 export class SamplesManager {
