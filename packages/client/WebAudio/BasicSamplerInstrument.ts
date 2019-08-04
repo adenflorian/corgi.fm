@@ -1,15 +1,21 @@
 import {
-	midiNoteToNoteName, getOctaveFromMidiNote,
+	Samples, Sample, dummySample,
 } from '@corgifm/common/common-samples-stuff'
+import {IMidiNote} from '@corgifm/common/MidiNote'
 import {
 	IInstrumentOptions, Instrument,
 	OnEndedCallback, SamplesManager,
 	Voice, Voices,
 } from '.'
 
-export type IBasicSamplerOptions = IInstrumentOptions
+export interface IBasicSamplerOptions extends IInstrumentOptions {
+	samples: Samples
+	samplesManager: SamplesManager
+}
 
-export class BasicSamplerInstrument extends Instrument<SamplerVoices, SamplerVoice> {
+export class BasicSamplerInstrument
+	extends Instrument<SamplerVoices, SamplerVoice> {
+
 	private readonly _voices: SamplerVoices
 
 	public constructor(options: IBasicSamplerOptions) {
@@ -20,7 +26,13 @@ export class BasicSamplerInstrument extends Instrument<SamplerVoices, SamplerVoi
 			this._panNode,
 			this._detune,
 			this._lowPassFilterCutoffFrequency,
+			options.samples,
+			options.samplesManager,
 		)
+	}
+
+	public setSamples(samples: Samples) {
+		this._voices.setSamples(samples)
 	}
 
 	protected _getVoices = () => this._voices
@@ -32,11 +44,19 @@ class SamplerVoices extends Voices<SamplerVoice> {
 		private readonly _destination: AudioNode,
 		_detune: number,
 		_lowPassFilterCutoffFrequency: number,
+		private _samples: Samples,
+		private readonly _samplesManager: SamplesManager,
 	) {
 		super(_detune, _lowPassFilterCutoffFrequency)
 	}
 
-	protected _createVoice(invincible: boolean) {
+	public setSamples(samples: Samples) {
+		if (samples !== this._samples) {
+			this._samples = samples
+		}
+	}
+
+	protected _createVoice(invincible: boolean, note: IMidiNote) {
 		return new SamplerVoice(
 			this._audioContext,
 			this._destination,
@@ -44,6 +64,8 @@ class SamplerVoices extends Voices<SamplerVoice> {
 			this._detune,
 			this._lowPassFilterCutoffFrequency,
 			invincible,
+			this._samples.get(note, dummySample),
+			this._samplesManager,
 		)
 	}
 
@@ -61,6 +83,8 @@ class SamplerVoice extends Voice {
 		detune: number,
 		lowPassFilterCutoffFrequency: number,
 		invincible: boolean,
+		private readonly _sample: Sample,
+		private readonly _samplesManager: SamplesManager,
 	) {
 		super(
 			audioContext, destination, onEnded, detune,
@@ -84,8 +108,7 @@ class SamplerVoice extends Voice {
 		this._disposeAudioBufferSource()
 		this._audioBufferSource = this._audioContext.createBufferSource()
 		this._audioBufferSource.buffer =
-			SamplesManager.getSample(
-				midiNoteToNoteName(note), getOctaveFromMidiNote(note))
+			this._samplesManager.getSample(this._sample.filePath)
 		this._isStarted = true
 	}
 

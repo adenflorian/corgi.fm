@@ -1,46 +1,56 @@
-import {Octave} from '@corgifm/common/common-types'
-import {samplesToGet, octavesToGet, sharpToFlatNotes, NoteNameSharps} from '@corgifm/common/common-samples-stuff'
+import {logger} from '@corgifm/common/logger'
 import {getCdnUrl} from '../client-utils'
 
-export class SamplesManager {
-	private static _emptyAudioBuffer: AudioBuffer
-	private static _isInitialized = false
-	private static readonly _samples = new Map<string, AudioBuffer>()
+// if (noteName === 'Gb7' || noteName === 'Ab3') return
 
-	public static readonly initAsync = async (audioContext: AudioContext) => {
-		if (SamplesManager._isInitialized) return
-
-		SamplesManager._isInitialized = true
-
-		SamplesManager._emptyAudioBuffer =
-			new AudioBuffer({length: 1, sampleRate: audioContext.sampleRate})
-
-		samplesToGet.forEach(async sampleName => {
-			octavesToGet.forEach(async octave => {
-				const noteName = sharpToFlatNotes[sampleName] + octave.toString()
-
-				// if (noteName === 'Gb7' || noteName === 'Ab3') return
-
-				const sample = await fetch(
-					`${getCdnUrl()}/static/samplers/basic-piano/${noteName}-49-96.mp3`,
-					{mode: 'cors'}
-				)
-					.then(async response => {
-						return audioContext.decodeAudioData(await response.arrayBuffer())
-					})
-
-				SamplesManager._samples.set(noteName, sample)
-			})
-		})
-	}
-
-	public static getSample(noteName: NoteNameSharps, octave: Octave) {
-		const convertedName = convertNoteNameToFlatsName(noteName)
-		const foo = SamplesManager._samples.get(convertedName + octave.toString())
-		return foo || SamplesManager._emptyAudioBuffer
-	}
+enum SampleStatus {
+	Requested,
+	Loaded,
+	NotLoaded,
 }
 
-function convertNoteNameToFlatsName(noteName: NoteNameSharps): string {
-	return sharpToFlatNotes[noteName]
+export class SamplesManager {
+	private readonly _audioContext: AudioContext
+	private readonly _emptyAudioBuffer: AudioBuffer
+	private readonly _samplesCache = new Map<string, AudioBuffer>()
+	private readonly _samplesStatus = new Map<string, SampleStatus>()
+
+	public constructor(audioContext: AudioContext) {
+		this._audioContext = audioContext
+		this._emptyAudioBuffer =
+			new AudioBuffer({length: 1, sampleRate: audioContext.sampleRate})
+	}
+
+	public getSample(path: string) {
+		const sample = this._samplesCache.get(path)
+
+		if (sample) {
+			return sample
+		} else {
+			logger.warn(`[SamplesManager.getSample] sample wasn't loaded: `, path)
+			// eslint-disable-next-line @typescript-eslint/no-floating-promises
+			this._loadSample(path)
+			return this._emptyAudioBuffer
+		}
+	}
+
+	private async _loadSample(path: string) {
+		const status = this._samplesStatus.get(path) || SampleStatus.NotLoaded
+
+		if (status !== SampleStatus.NotLoaded) return
+
+		this._samplesStatus.set(path, SampleStatus.Requested)
+
+		const sample = await fetch(
+			`${getCdnUrl()}/static/samplers/${path}`,
+			{mode: 'cors'}
+		)
+			.then(async response => {
+				return this._audioContext.decodeAudioData(
+					await response.arrayBuffer())
+			})
+
+		this._samplesCache.set(path, sample)
+		this._samplesStatus.set(path, SampleStatus.Loaded)
+	}
 }

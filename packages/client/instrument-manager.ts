@@ -14,7 +14,7 @@ import {
 } from '@corgifm/common/redux'
 import {
 	AudioNodeWrapper, IAudioNodeWrapperOptions, IInstrumentOptions,
-	Instrument, MasterAudioOutput, SimpleCompressor, Voice, Voices,
+	Instrument, MasterAudioOutput, SimpleCompressor, Voice, Voices, SamplesManager,
 } from './WebAudio'
 import {BasicSamplerInstrument} from './WebAudio/BasicSamplerInstrument'
 import {BasicSynthesizer} from './WebAudio/BasicSynthesizer'
@@ -43,6 +43,7 @@ export const setupInstrumentManager = (
 	store: Store<IClientAppState>,
 	audioContext: AudioContext,
 	preFx: GainNode,
+	samplesManager: SamplesManager,
 ): {getAllInstruments: GetAllInstruments, getAllAudioNodes: GetAllAudioNodes} => {
 
 	// Need separate properties to match up with what IDs selector is used
@@ -93,8 +94,10 @@ export const setupInstrumentManager = (
 			updateInstrumentType(
 				selectAllSamplerIds,
 				selectSampler,
-				options => new BasicSamplerInstrument({
+				(options, samplerState) => new BasicSamplerInstrument({
 					...options,
+					samples: samplerState.samples,
+					samplesManager,
 				}),
 				ConnectionNodeType.basicSampler,
 				(instrument: BasicSamplerInstrument, instrumentState: BasicSamplerState) => {
@@ -107,6 +110,7 @@ export const setupInstrumentManager = (
 					instrument.setDetune(instrumentState.detune)
 					instrument.setGain(instrumentState.gain)
 					instrument.setFilterType(instrumentState.filterType)
+					instrument.setSamples(instrumentState.samples)
 				},
 			)
 		}

@@ -17,7 +17,7 @@ export abstract class Voices<V extends Voice> {
 		return this._scheduledVoices
 	}
 
-	protected abstract _createVoice(invincible: boolean): V
+	protected abstract _createVoice(invincible: boolean, note: IMidiNote): V
 
 	public getScheduledVoices() {return this._scheduledVoices}
 
@@ -75,7 +75,7 @@ export abstract class Voices<V extends Voice> {
 			}
 		}
 
-		const newVoice = this._createVoice(invincible)
+		const newVoice = this._createVoice(invincible, note)
 
 		newVoice.scheduleNote(note, attackTimeInSeconds, decayTimeInSeconds, sustain, newNoteStartTime, sourceIds)
 

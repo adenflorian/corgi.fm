@@ -5,7 +5,7 @@ import {
 	BasicSamplerState,
 } from '@corgifm/common/redux'
 import {IMidiNote} from '@corgifm/common/MidiNote'
-import {Sample} from '@corgifm/common/common-samples-stuff'
+import {Sample, dummySample} from '@corgifm/common/common-samples-stuff'
 import {ContextMenuTrigger} from 'react-contextmenu'
 import {Octave} from '@corgifm/common/common-types'
 import {CssColor} from '@corgifm/common/shamu-color'
@@ -15,12 +15,6 @@ import {KnobIncremental} from '../Knob/KnobIncremental'
 
 interface Props {
 	samplerId: string
-}
-
-const dummySample: Sample = {
-	color: 'panelGrayDark',
-	filePath: 'n/a',
-	label: '?',
 }
 
 export const Samples = ({samplerId}: Props) => {

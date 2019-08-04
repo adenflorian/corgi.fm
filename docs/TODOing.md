@@ -168,8 +168,16 @@
 		- [ ] Samples in room
 	- [ ] drag sample onto pad from computer
 	- [ ] presets
-		- [ ] piano
+		- [ ] basic-piano
+		- [ ] basic-drums
 	- [ ] styling
+	- [ ] UI to show sample loading
+	- Samples Manager
+		- [√] don't fetch same sample twice
+		- [ ] fix weird issue with double fetching when going really fast
+		- [ ] pre-load samples based on what is in redux
+		- [ ] samples manager middleware?
+		- [ ] if `getSample` gets called and sample isn't loaded, then that's an error?
 
 - [ ] checkbox to hide welcome on start
 - [ ] fix G7 and Gb7 samples

@@ -100,6 +100,12 @@ export interface Sample {
 	readonly color: typeof sampleColors[number] | 'panelGrayDark'
 }
 
+export const dummySample: Sample = {
+	color: 'panelGrayDark',
+	filePath: 'n/a',
+	label: '?',
+}
+
 export const samplerBasicPianoNotes: Samples = samplesToGet.reduce(
 	(samples, note): Samples => {
 
@@ -108,7 +114,7 @@ export const samplerBasicPianoNotes: Samples = samplesToGet.reduce(
 				const midiNote = midiNoteFromNoteName(note, octave)
 				mutable.set(midiNote, {
 					label: `${note}${octave}`,
-					filePath: `${sharpToFlatNotes[note]}${octave}-49-96.mp3`,
+					filePath: `basic-piano/${sharpToFlatNotes[note]}${octave}-49-96.mp3`,
 					color: pickRandomArrayElement(sampleColors),
 				})
 			})

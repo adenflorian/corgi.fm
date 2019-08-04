@@ -108,7 +108,7 @@ async function setupAsync() {
 
 	const {masterLimiter} = setupAudioContext(audioContext, preFx, store)
 
-	await SamplesManager.initAsync(audioContext)
+	const samplesManager = new SamplesManager(audioContext)
 
 	setupMidiSupport(store)
 
@@ -116,7 +116,8 @@ async function setupAsync() {
 
 	setupWebsocketAndListeners(store)
 
-	const {getAllInstruments, getAllAudioNodes} = setupInstrumentManager(store, audioContext, preFx)
+	const {getAllInstruments, getAllAudioNodes} =
+		setupInstrumentManager(store, audioContext, preFx, samplesManager)
 
 	renderApp(store, firebaseContextStuff)
 
@@ -126,7 +127,8 @@ async function setupAsync() {
 
 	const schedulerVisualLoop = startSchedulerVisualLoop()
 
-	const noteScannerLoop = startNoteScanner(store, audioContext, getAllInstruments, getAllAudioNodes)
+	const noteScannerLoop =
+		startNoteScanner(store, audioContext, getAllInstruments, getAllAudioNodes)
 
 	startMainRealTimeLoop([
 		noteScannerLoop,
