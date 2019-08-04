@@ -180,6 +180,12 @@
 			- [√] on room enter (shamu graph replace state)
 			- [√] when pad sample is changed (SET_SAMPLE)
 			- [√] when instrument is added
+		- [ ] clear unused samples when low on space
+			- [ ] track sample sizes
+			- [ ] track unused samples with time last used
+			- [ ] clear samples before loading new sample if over threshold
+			- [ ] clear samples after loading new sample if over threshold
+			- [ ] display this info to the user somehow
 		- [ ] samples manager middleware?
 		- [ ] if `getSample` gets called and sample isn't loaded, then that's an error?
 

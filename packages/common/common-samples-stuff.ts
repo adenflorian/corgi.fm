@@ -115,7 +115,7 @@ export const samplerBasicPianoNotes: Samples = samplesToGet.reduce(
 				mutable.set(midiNote, {
 					label: `${note}${octave}`,
 					filePath: `basic-piano/${sharpToFlatNotes[note]}${octave}-49-96.mp3`,
-					color: pickRandomArrayElement(sampleColors),
+					color: note.includes('#') ? 'green' : 'blue',
 				})
 			})
 		})
