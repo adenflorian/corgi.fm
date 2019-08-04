@@ -1,5 +1,8 @@
 {
 	"compilerOptions": {
+		"noErrorTruncation": true,
+		"noEmitOnError": true,
+		"noFallthroughCasesInSwitch": true,
 		"noEmit": true,
 		"allowSyntheticDefaultImports": true,
 		"noUnusedLocals": false,
