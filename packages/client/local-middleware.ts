@@ -49,6 +49,8 @@ import {
 	VirtualKeyUpAction,
 	virtualOctaveChange,
 	VirtualOctaveChangeAction,
+	SERVER_ACTION,
+	BROADCASTER_ACTION,
 } from '@corgifm/common/redux'
 import {pointersActions} from '@corgifm/common/redux/pointers-redux'
 import {graphStateSavesLocalStorageKey} from './client-constants'
@@ -108,6 +110,8 @@ export const localActions = {
 		type: 'PLAY_SHORT_NOTE_ON_TARGET',
 		targetId,
 		note,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
 	} as const),
 	cloneNode: (nodeId: Id, nodeType: ConnectionNodeType, withConnections: 'none' | 'all' | 'default') => ({
 		type: 'CLONE_NODE',
