@@ -178,7 +178,8 @@
 		- [√] fix weird issue with double fetching when going really fast
 		- [ ] pre-load samples based on what is in redux
 			- [√] on room enter (shamu graph replace state)
-			- [ ] when pad sample is changed (SET_SAMPLE)
+			- [√] when pad sample is changed (SET_SAMPLE)
+			- [√] when instrument is added
 		- [ ] samples manager middleware?
 		- [ ] if `getSample` gets called and sample isn't loaded, then that's an error?
 
