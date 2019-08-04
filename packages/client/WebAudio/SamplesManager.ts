@@ -21,6 +21,8 @@ export class SamplesManager {
 			new AudioBuffer({length: 1, sampleRate: audioContext.sampleRate})
 	}
 
+	/** Returns sample from cache or starts to load it and returns empty
+	 * buffer. */
 	public getSample(path: string) {
 		const sample = this._samplesCache.get(path)
 
@@ -29,12 +31,13 @@ export class SamplesManager {
 		} else {
 			logger.warn(`[SamplesManager.getSample] sample wasn't loaded: `, path)
 			// eslint-disable-next-line @typescript-eslint/no-floating-promises
-			this._loadSample(path)
+			this.loadSampleAsync(path)
 			return this._emptyAudioBuffer
 		}
 	}
 
-	private async _loadSample(path: string) {
+	/** You probably don't want to `await` this. */
+	public async loadSampleAsync(path: string) {
 		const status = this._samplesStatus.get(path) || SampleStatus.NotLoaded
 
 		if (status !== SampleStatus.NotLoaded) return

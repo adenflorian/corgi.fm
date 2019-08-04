@@ -160,8 +160,9 @@
 	- [√] click on pad to play sample
 	- [√] change sample colors
 	- [√] octave knob to scroll through all 128 samples
+	- [ ] right click on pad should not play it
 	- [ ] right click pad > select samples...
-		- [ ] Default samples (built-in samples)
+		- [√] Default samples (built-in samples)
 		- [ ] Public samples
 		- [ ] Upload...
 		- [ ] Your samples
@@ -176,9 +177,12 @@
 		- [√] don't fetch same sample twice
 		- [√] fix weird issue with double fetching when going really fast
 		- [ ] pre-load samples based on what is in redux
+			- [√] on room enter (shamu graph replace state)
+			- [ ] when pad sample is changed (SET_SAMPLE)
 		- [ ] samples manager middleware?
 		- [ ] if `getSample` gets called and sample isn't loaded, then that's an error?
 
+- [ ] setup to use tslint and eslint side by side
 - [ ] http://op-101.blogspot.com/2011/09/string-description.html
 - [ ] checkbox to hide welcome on start
 - [ ] fix G7 and Gb7 samples

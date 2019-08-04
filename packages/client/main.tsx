@@ -80,9 +80,11 @@ async function setupAsync() {
 	const audioContext = new AudioContext()
 	const preFx = audioContext.createGain()
 
+	const samplesManager = new SamplesManager(audioContext)
+
 	const loadedOptionsState = loadOptionsState()
 
-	const foo: GetAllInstruments = () => getAllInstruments()
+	const getGetAllInstruments: GetAllInstruments = () => getAllInstruments()
 
 	const firebaseContextStuff = initializeFirebase()
 
@@ -94,9 +96,13 @@ async function setupAsync() {
 		}
 	}
 
-	const store = configureStore({
+	const initialState = {
 		options: loadedOptionsState,
-	}, foo, onReduxMiddleware, firebaseContextStuff)
+	}
+
+	const store = configureStore(
+		initialState, getGetAllInstruments, onReduxMiddleware,
+		firebaseContextStuff, samplesManager)
 
 	wireUpFirebaseToRedux(firebaseContextStuff, store)
 
@@ -107,8 +113,6 @@ async function setupAsync() {
 	setStoreForSchedulerVisual(store)
 
 	const {masterLimiter} = setupAudioContext(audioContext, preFx, store)
-
-	const samplesManager = new SamplesManager(audioContext)
 
 	setupMidiSupport(store)
 
