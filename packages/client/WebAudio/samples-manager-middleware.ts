@@ -2,36 +2,39 @@ import {Middleware} from 'redux'
 import {
 	IClientAppState, ShamuGraphAction, selectAllSamplersAsArray,
 	BasicSamplerState,
+	BasicSamplerAction,
 } from '@corgifm/common/redux'
 import {Sample} from '@corgifm/common/common-samples-stuff'
 import {SamplesManager} from './SamplesManager'
 
-type Actions = ShamuGraphAction
+type Actions = ShamuGraphAction | BasicSamplerAction
 
-export const samplesManagerMiddleware =
-	(samplesManager: SamplesManager): Middleware<{}, IClientAppState> =>
-		({dispatch, getState}) => next => (action: Actions) => {
+export function createSamplesManagerMiddleware(
+	samplesManager: SamplesManager,
+): Middleware<{}, IClientAppState> {
 
-			const beforeState = getState()
-
-			next(action)
-
-			const afterState = getState()
-
+		return ({dispatch, getState}) => next => (action: Actions) => {
 			switch (action.type) {
 				case 'REPLACE_SHAMU_GRAPH_STATE':
-					return handleReplaceShamuGraphState()
-				default: return
-			}
-
-			function handleReplaceShamuGraphState(): void {
-				const fetchSamplerSamples = ({samples}: BasicSamplerState) =>
-					samples.forEach(fetchSample)
-
-				const fetchSample = ({filePath}: Sample) =>
-					samplesManager.loadSampleAsync(filePath)
-
-				return selectAllSamplersAsArray(afterState.room)
-					.forEach(fetchSamplerSamples)
+					next(action)
+					// Do it after so that stuff will be deserialized
+					return handleReplaceShamuGraphState(getState())
+				case 'SET_SAMPLE':
+					fetchSample(action.sample)
+					return next(action)
+				default: return next(action)
 			}
 		}
+
+		function handleReplaceShamuGraphState(afterState: IClientAppState): void {
+			const fetchSamplerSamples = ({samples}: BasicSamplerState) =>
+				samples.forEach(fetchSample)
+
+			return selectAllSamplersAsArray(afterState.room)
+				.forEach(fetchSamplerSamples)
+		}
+
+		function fetchSample({filePath}: Sample) {
+			return samplesManager.loadSampleAsync(filePath)
+		}
+	}

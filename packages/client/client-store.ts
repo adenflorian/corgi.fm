@@ -12,7 +12,7 @@ import {createLocalMiddleware} from './local-middleware'
 import {createSequencerMiddleware} from './sequencer-middleware'
 import {websocketSenderMiddleware} from './websocket-client-sender-middleware'
 import {createCorgiApiMiddleware} from './RestClient/corgi-api-middleware'
-import {samplesManagerMiddleware} from './WebAudio/samples-manager-middleware'
+import {createSamplesManagerMiddleware} from './WebAudio/samples-manager-middleware'
 import {SamplesManager} from './WebAudio'
 
 const composeEnhancers = composeWithDevTools({
@@ -32,7 +32,7 @@ export function configureStore(
 		composeEnhancers(
 			applyMiddleware(
 				onReduxMiddleware,
-				samplesManagerMiddleware(samplesManager),
+				createSamplesManagerMiddleware(samplesManager),
 				createLocalMiddleware(getAllInstruments, firebase),
 				createAuthMiddleware(firebase),
 				createCorgiApiMiddleware(firebase),
