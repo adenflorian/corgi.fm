@@ -19,6 +19,8 @@ const port = isLocalDevClient() ? 3000 : 443
 // eslint-disable-next-line import/no-mutable-exports
 export let socket: SocketIOClient.Socket
 
+const refreshedToGetNewVersionKey = 'refreshedToGetNewVersion'
+
 export function setupWebsocketAndListeners(store: Store) {
 
 	const room = window.location.pathname
@@ -61,9 +63,20 @@ export function setupWebsocketAndListeners(store: Store) {
 		store.dispatch(clientInfoActions.setServerVersion(serverVersion))
 
 		if (serverVersion !== clientVersion) {
-			logger.warn(`client server version mismatch! client is ${clientVersion}, server is ${serverVersion}`)
+			logger.log(`client server version mismatch! client is ${clientVersion}, server is ${serverVersion}`)
 
 			eventClientServerVersionMismatch(clientVersion, serverVersion)
+
+			const refreshedToGetNewVersion = window.localStorage.getItem(refreshedToGetNewVersionKey)
+				? true : false
+
+			if (refreshedToGetNewVersion) {
+				window.localStorage.removeItem(refreshedToGetNewVersionKey)
+				logger.error(`refreshedToGetNewVersion but still version mismatch! `, {clientVersion, serverVersion})
+			} else {
+				window.localStorage.setItem(refreshedToGetNewVersionKey, 'true')
+				window.location.reload(true)
+			}
 		}
 	})
 
