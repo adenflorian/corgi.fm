@@ -1,5 +1,5 @@
 import * as animal from 'animal-id'
-import {stripIndents} from 'common-tags'
+import {stripIndents, oneLine} from 'common-tags'
 import {Store} from 'redux'
 import {Server, Socket} from 'socket.io'
 import {
@@ -85,31 +85,52 @@ export function setupServerWebSocketListeners(
 		}
 
 		function registerCallBacks() {
-			socket.on(WebSocketEvent.broadcast, (action: BroadcastAction) => {
-				if (getActionsBlacklist().includes(action.type) === false) {
-					logger.trace(`${WebSocketEvent.broadcast}: ${socket.id} | `, action)
+			socket.on(WebSocketEvent.broadcast, handleSocketHandlerError(handleBroadcast))
+
+			// TODO Merge with broadcast event above
+			socket.on(WebSocketEvent.serverAction, handleSocketHandlerError(handleServerAction))
+
+			socket.on('disconnect', handleSocketHandlerError(handleDisconnect))
+		}
+
+		function handleSocketHandlerError(func: (arg: any) => any) {
+			return function (arg: any) {
+				try {
+					return func(arg)
+				} catch (error) {
+					logger.error(oneLine`error in server socket handler: `, {error, arg})
 				}
+			}
+		}
 
-				const currentRoom = getRoom(socket)
-				const roomState = selectRoomStateByName(serverStore.getState(), currentRoom)
+		function handleBroadcast(action: BroadcastAction) {
+			if (getActionsBlacklist().includes(action.type) === false) {
+				logger.trace(`${WebSocketEvent.broadcast}: ${socket.id} | `, action)
+			}
 
-				if (!roomState) {
-					logger.error(`can't find room state on server for room ${currentRoom}`)
+			const currentRoom = getRoom(socket)
+			const roomState = selectRoomStateByName(serverStore.getState(), currentRoom)
+
+			if (!roomState) {
+				logger.error(`can't find room state on server for room ${currentRoom}`)
+				return
+			}
+
+			// Don't allow non-whitelisted actions to be dispatch by non-owners when only owner can do stuff
+			if (!whitelistedRoomActionTypes.includes(action.type) && selectRoomSettings(roomState).onlyOwnerCanDoStuff) {
+				const roomOwnerId = getRoomOwnerId(serverStore, currentRoom)
+
+				if (clientId !== roomOwnerId) {
+					const client = selectClientById(serverStore.getState(), clientId)
+					logger.warn(stripIndents`user attempted to run a room action while not room owner and room is locked.
+							clientId: ${clientId} username: ${client.name} room: ${currentRoom} action: ${JSON.stringify(action, null, 2)}`)
 					return
 				}
-
-				// Don't allow non-whitelisted actions to be dispatch by non-owners when only owner can do stuff
-				if (!whitelistedRoomActionTypes.includes(action.type) && selectRoomSettings(roomState).onlyOwnerCanDoStuff) {
-					const roomOwnerId = getRoomOwnerId(serverStore, currentRoom)
-
-					if (clientId !== roomOwnerId) {
-						const client = selectClientById(serverStore.getState(), clientId)
-						logger.warn(stripIndents`user attempted to run a room action while not room owner and room is locked.
-							clientId: ${clientId} username: ${client.name} room: ${currentRoom} action: ${JSON.stringify(action, null, 2)}`)
-						return
-					}
-				}
-
+			}
+			
+			if (action[GLOBAL_SERVER_ACTION]) {
+				serverStore.dispatch(action)
+			} else {
 				if (roomOwnerRoomActions.includes(action.type)) {
 					const roomOwnerId = getRoomOwnerId(serverStore, currentRoom)
 
@@ -117,69 +138,63 @@ export function setupServerWebSocketListeners(
 					if (clientId !== roomOwnerId) {
 						const client = selectClientById(serverStore.getState(), clientId)
 						logger.warn(stripIndents`user attempted to run a restricted room action while not room owner.
-							clientId: ${clientId} username: ${client.name} room: ${currentRoom} action: ${JSON.stringify(action, null, 2)}`)
+								clientId: ${clientId} username: ${client.name} room: ${currentRoom} action: ${JSON.stringify(action, null, 2)}`)
 						return
 					}
-
-					// Assume client is room owner past this point
-					serverStore.dispatch(createRoomAction(action, currentRoom))
-				} else if (action[GLOBAL_SERVER_ACTION]) {
-					serverStore.dispatch(action)
-				} else if (action[SERVER_ACTION]) {
-					serverStore.dispatch(createRoomAction(action, currentRoom))
 				}
 
-				socket.broadcast.to(currentRoom).emit(WebSocketEvent.broadcast, {...action, alreadyBroadcasted: true})
-			})
+				serverStore.dispatch(createRoomAction(action, currentRoom))
+			}
 
-			// TODO Merge with broadcast event above
-			socket.on(WebSocketEvent.serverAction, (action: RoomSettingsAction | RoomsReduxAction) => {
-				logger.trace(`${WebSocketEvent.serverAction}: ${socket.id} | `, action)
+			socket.broadcast.to(currentRoom).emit(WebSocketEvent.broadcast, {...action, alreadyBroadcasted: true})
+		}
 
-				const currentRoom = getRoom(socket)
+		function handleServerAction(action: RoomSettingsAction | RoomsReduxAction) {
+			logger.trace(`${WebSocketEvent.serverAction}: ${socket.id} | `, action)
 
-				const isRestrictedRoomAction = isRoomOwnerRoomAction(action.type)
+			const currentRoom = getRoom(socket)
 
-				if (isRestrictedRoomAction) {
-					const client = selectClientById(serverStore.getState(), clientId)
-					logger.warn(stripIndents`user attempted to run a restricted room action as a server only action.
+			const isRestrictedRoomAction = isRoomOwnerRoomAction(action.type)
+
+			if (isRestrictedRoomAction) {
+				const client = selectClientById(serverStore.getState(), clientId)
+				logger.warn(stripIndents`user attempted to run a restricted room action as a server only action.
 						clientId: ${clientId} username: ${client.name} room: ${currentRoom} action: ${JSON.stringify(action, null, 2)}`)
-					return
-				}
+				return
+			}
 
-				if (action.type === CHANGE_ROOM) {
-					changeRooms(action.room)
-				} else if (action.type === REQUEST_CREATE_ROOM) {
-					makeAndJoinNewRoom(animal.getId())
-				} else if (action.type === LOAD_ROOM) {
-					makeAndJoinNewRoom(animal.getId(), action.savedRoom)
-				} else if ((action as any)[GLOBAL_SERVER_ACTION]) {
-					serverStore.dispatch(action)
-				} else if ((action as any)[SERVER_ACTION]) {
-					serverStore.dispatch(createRoomAction(action, currentRoom))
-				}
-			})
+			if (action.type === CHANGE_ROOM) {
+				changeRooms(action.room)
+			} else if (action.type === REQUEST_CREATE_ROOM) {
+				makeAndJoinNewRoom(animal.getId())
+			} else if (action.type === LOAD_ROOM) {
+				makeAndJoinNewRoom(animal.getId(), action.savedRoom)
+			} else if ((action as any)[GLOBAL_SERVER_ACTION]) {
+				serverStore.dispatch(action)
+			} else if ((action as any)[SERVER_ACTION]) {
+				serverStore.dispatch(createRoomAction(action, currentRoom))
+			}
+		}
 
-			socket.on('disconnect', () => {
-				logger.log(`client disconnected: ${socket.id}`)
+		function handleDisconnect() {
+			logger.log(`client disconnected: ${socket.id}`)
 
-				const serverState = serverStore.getState()
-				const roomStates = selectAllRoomStates(serverState)
+			const serverState = serverStore.getState()
+			const roomStates = selectAllRoomStates(serverState)
 
-				const roomToLeave = roomStates.findKey(x => selectAllRoomMemberIds(x).includes(clientId))
+			const roomToLeave = roomStates.findKey(x => selectAllRoomMemberIds(x).includes(clientId))
 
-				if (roomToLeave) {
-					onLeaveRoom(
-						io, socket, roomToLeave, serverStore,
-					)
-				} else {
-					logger.warn('hmm')
-				}
+			if (roomToLeave) {
+				onLeaveRoom(
+					io, socket, roomToLeave, serverStore,
+				)
+			} else {
+				logger.warn('hmm')
+			}
 
-				const clientDisconnectedAction = clientDisconnected(clientId)
-				serverStore.dispatch(clientDisconnectedAction)
-				io.local.emit(WebSocketEvent.broadcast, clientDisconnectedAction)
-			})
+			const clientDisconnectedAction = clientDisconnected(clientId)
+			serverStore.dispatch(clientDisconnectedAction)
+			io.local.emit(WebSocketEvent.broadcast, clientDisconnectedAction)
 		}
 
 		function joinOrCreateRoom(newRoom: string) {
