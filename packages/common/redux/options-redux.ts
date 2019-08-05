@@ -11,6 +11,7 @@ export enum AppOptions {
 	showNoteSchedulerDebug = 'showNoteSchedulerDebug',
 	renderNoteSchedulerDebugWhileStopped = 'renderNoteSchedulerDebugWhileStopped',
 	graphicsFancyConnections = 'graphicsFancyConnections',
+	graphicsMultiColoredConnections = 'graphicsMultiColoredConnections',
 	graphicsECS = 'graphicsECS',
 	graphicsExpensiveZoomPan = 'graphicsExpensiveZoomPan',
 }
@@ -23,6 +24,7 @@ export const initialOptionsState = Object.freeze({
 	showNoteSchedulerDebug: false,
 	renderNoteSchedulerDebugWhileStopped: true,
 	graphicsFancyConnections: false,
+	graphicsMultiColoredConnections: true,
 	graphicsECS: true,
 	graphicsExpensiveZoomPan: true,
 })

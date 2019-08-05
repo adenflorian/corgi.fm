@@ -155,7 +155,7 @@ export const ConnectedSimpleGraphNode = shamuConnect(
 		return {
 			position,
 			color: getConnectionNodeInfo(position.targetType).color
-				|| selectConnectionSourceColorByTargetId(state.room, positionId),
+				|| selectConnectionSourceColorByTargetId(state, positionId),
 			highQuality: selectOptions(state).graphicsECS,
 			fancyZoomPan: selectOptions(state).graphicsExpensiveZoomPan,
 			selectedNode: selectShamuMetaState(state.room).selectedNode,

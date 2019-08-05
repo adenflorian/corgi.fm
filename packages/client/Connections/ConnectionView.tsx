@@ -193,7 +193,7 @@ export const ConnectedConnectionView = shamuConnect(
 		const isSourceActive = isSourceSending || selectConnectionSourceIsActive(state.room, connection.id)
 		const sourcePosition = selectPosition(state.room, connection.sourceId)
 		const targetPosition = selectPosition(state.room, connection.targetId)
-		const sourceColor = selectConnectionSourceColor(state.room, props.id)
+		const sourceColor = selectConnectionSourceColor(state, props.id)
 
 		return {
 			speed: 120,

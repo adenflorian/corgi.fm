@@ -65,6 +65,10 @@ export const OptionsModalContent: ModalContent = () => {
 						label="graphics: enable fancy connections"
 					/>
 					<ConnectedOption
+						option={AppOptions.graphicsMultiColoredConnections}
+						label="graphics: enable multi colored connections"
+					/>
+					<ConnectedOption
 						option={AppOptions.graphicsECS}
 						label="graphics: enable ECS animations (sequencer time marker thing)"
 					/>

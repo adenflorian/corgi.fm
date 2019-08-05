@@ -199,6 +199,7 @@
 		- [ ] samples manager middleware?
 		- [ ] if `getSample` gets called and sample isn't loaded, then that's an error?
 
+- [ ] add some graphics settings to welcome menu
 - [ ] when stripping undos for saving, only strip every 10 or so undo states or something
 - [ ] setup to use tslint and eslint side by side
 - [ ] http://op-101.blogspot.com/2011/09/string-description.html

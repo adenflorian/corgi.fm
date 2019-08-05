@@ -52,6 +52,10 @@ export class SamplesManager {
 				return this._audioContext.decodeAudioData(
 					await response.arrayBuffer())
 			})
+		
+		// const MB = sample.length * sample.numberOfChannels * 4 / 1000 / 1000
+
+		// console.log(`${path} ${MB.toFixed(3)}MB`)
 
 		this._samplesCache.set(path, sample)
 		this._samplesStatus.set(path, SampleStatus.Loaded)

@@ -10,6 +10,8 @@ import {
 	BROADCASTER_ACTION, getConnectionNodeInfo, IClientRoomState,
 	selectVirtualKeyboardById, SERVER_ACTION, VirtualKeyboardState,
 } from '.'
+import {selectOption, AppOptions} from './options-redux';
+import {IClientAppState} from './common-redux-types';
 
 export const connectionsActions = {
 	add: (connection: IConnection) => ({
@@ -169,10 +171,14 @@ export const createSelectPlaceholdersInfo = () => createSelector(
 	},
 )
 
+const colorIfLowGraphics = CssColor.blue
+
 /** For use by a node */
 export const selectConnectionSourceColorByTargetId =
-	(state: IClientRoomState, targetId: Id, processedIds = List<Id>()): string => {
-		const connections = selectAllConnections(state).filter(x => x.targetId === targetId)
+	(state: IClientAppState, targetId: Id, processedIds = List<Id>()): string => {
+		if (!selectOption(state, AppOptions.graphicsMultiColoredConnections)) return colorIfLowGraphics
+
+		const connections = selectAllConnections(state.room).filter(x => x.targetId === targetId)
 
 		if (connections.count() === 0) return makeConnectionSourceColorSelector(state, processedIds)(Connection.dummy)
 
@@ -182,21 +188,22 @@ export const selectConnectionSourceColorByTargetId =
 	}
 
 /** For use by a connection */
-export const selectConnectionSourceColor = (state: IClientRoomState, id: Id): string => {
-	const connection = selectConnection(state, id)
+export const selectConnectionSourceColor = (state: IClientAppState, id: Id): string => {
+	if (!selectOption(state, AppOptions.graphicsMultiColoredConnections)) return colorIfLowGraphics
+	const connection = selectConnection(state.room, id)
 
 	return makeConnectionSourceColorSelector(state)(connection)
 }
 
 const makeConnectionSourceColorSelector =
-	(roomState: IClientRoomState, processedIds = List<Id>()) => (connection: IConnection): string => {
+	(state: IClientAppState, processedIds = List<Id>()) => (connection: IConnection): string => {
 		// If in a loop
 		if (processedIds.contains(connection.id)) return CssColor.disabledGray
 
 		return (
-			tryGetColorFromState(getConnectionNodeInfo(connection.sourceType).stateSelector(roomState, connection.sourceId).color, connection.sourcePort)
+			tryGetColorFromState(getConnectionNodeInfo(connection.sourceType).stateSelector(state.room, connection.sourceId).color, connection.sourcePort)
 			||
-			selectConnectionSourceColorByTargetId(roomState, connection.sourceId, processedIds.push(connection.id))
+			selectConnectionSourceColorByTargetId(state, connection.sourceId, processedIds.push(connection.id))
 		)
 	}
 

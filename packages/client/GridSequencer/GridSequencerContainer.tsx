@@ -42,7 +42,7 @@ export const ConnectedGridSequencerContainer = shamuConnect(
 
 		return {
 			isPlaying: gridSequencer.isPlaying,
-			color: selectConnectionSourceColorByTargetId(state.room, props.id),
+			color: selectConnectionSourceColorByTargetId(state, props.id),
 			name: gridSequencer.name,
 			length: gridSequencer.midiClip.length,
 			rate: gridSequencer.rate,

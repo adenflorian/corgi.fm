@@ -199,7 +199,7 @@ export const ConnectedInfiniteSequencer = connect(
 		return {
 			isPlaying: infiniteSequencerState.isPlaying,
 			isRecording: infiniteSequencerState.isRecording,
-			color: selectConnectionSourceColorByTargetId(state.room, props.id),
+			color: selectConnectionSourceColorByTargetId(state, props.id),
 			gate: infiniteSequencerState.gate,
 			name: infiniteSequencerState.name,
 			pitch: infiniteSequencerState.pitch,
