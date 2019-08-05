@@ -6,9 +6,9 @@ import {getCdnUrl} from '../client-utils'
 enum SampleStatus {
 	Requested = 'Requested',
 	Loaded = 'Loaded',
-	NotLoaded = 'NotLoaded',
 }
 
+/** Not room specific. Loads and caches samples. */
 export class SamplesManager {
 	private readonly _audioContext: AudioContext
 	private readonly _emptyAudioBuffer: AudioBuffer
@@ -29,7 +29,9 @@ export class SamplesManager {
 		if (sample) {
 			return sample
 		} else {
-			logger.warn(`[SamplesManager.getSample] sample wasn't loaded: `, path)
+			if (this._samplesStatus.get(path) === undefined) {
+				logger.warn(`sample wasn't requested first: `, path)
+			}
 			// eslint-disable-next-line @typescript-eslint/no-floating-promises
 			this.loadSampleAsync(path)
 			return this._emptyAudioBuffer
@@ -38,9 +40,9 @@ export class SamplesManager {
 
 	/** You probably don't want to `await` this. */
 	public async loadSampleAsync(path: string) {
-		const status = this._samplesStatus.get(path) || SampleStatus.NotLoaded
+		const status = this._samplesStatus.get(path)
 
-		if (status !== SampleStatus.NotLoaded) return
+		if (status !== undefined) return
 
 		this._samplesStatus.set(path, SampleStatus.Requested)
 

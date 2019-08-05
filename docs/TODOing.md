@@ -164,6 +164,21 @@
 - [ ] address sentry logs
 - [ ] performance pass
 
+
+
+remind people to close DAW to have external midi work
+empty column on right side of infinite seq to add new notes
+show note name when hovering on notes in sequencers
+note names on left side of infini seq
+if you save a limited room, when loading it, fakeClient becomes the owner
+and you can't do anything
+issue with loading room and fakeClient becomes owner
+notes on left of grid seq should play on click
+
+
+
+
+
 - [ ] **Custom Sampler**
 	- morphing the piano sampler into a custom sampler
 	- [√] sample pads UI
@@ -186,10 +201,11 @@
 	- Samples Manager
 		- [√] don't fetch same sample twice
 		- [√] fix weird issue with double fetching when going really fast
-		- [ ] pre-load samples based on what is in redux
+		- [√] pre-load samples based on what is in redux
 			- [√] on room enter (shamu graph replace state)
 			- [√] when pad sample is changed (SET_SAMPLE)
 			- [√] when instrument is added
+			- [√] maybe only log warning if sample isn't even requested yet
 		- [ ] clear unused samples when low on space
 			- [ ] track sample sizes
 			- [ ] track unused samples with time last used
