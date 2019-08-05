@@ -116,8 +116,8 @@ class SamplerVoice extends Voice {
 		if (this._isStarted) {
 			this._audioBufferSource.stop()
 		}
-		this._audioBufferSource.disconnect()
-		delete this._audioBufferSource
+		this._audioBufferSource && this._audioBufferSource.disconnect()
+		this._audioBufferSource && delete this._audioBufferSource
 		this._isStarted = false
 	}
 }
