@@ -100,9 +100,11 @@ export interface Sample {
 	readonly color: typeof sampleColors[number] | 'panelGrayDark'
 }
 
+export const dummySamplePath = 'dummySamplePath'
+
 export const dummySample: Sample = {
 	color: 'panelGrayDark',
-	filePath: 'n/a',
+	filePath: dummySamplePath,
 	label: '?',
 }
 

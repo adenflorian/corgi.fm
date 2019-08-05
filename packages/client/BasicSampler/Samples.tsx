@@ -5,13 +5,14 @@ import {
 	BasicSamplerState,
 } from '@corgifm/common/redux'
 import {IMidiNote} from '@corgifm/common/MidiNote'
-import {Sample, dummySample} from '@corgifm/common/common-samples-stuff'
+import {Sample, dummySample, dummySamplePath} from '@corgifm/common/common-samples-stuff'
 import {ContextMenuTrigger} from 'react-contextmenu'
 import {Octave} from '@corgifm/common/common-types'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {localActions} from '../local-middleware'
 import {samplePadMenuId} from '../ContextMenu/SamplePadMenu'
 import {KnobIncremental} from '../Knob/KnobIncremental'
+import {noop} from '@corgifm/common/common-utils';
 
 interface Props {
 	samplerId: string
@@ -99,7 +100,7 @@ const SamplePad = ({samplerId, sample, midiNote}: SamplePadProps) => {
 		>
 			<div
 				className="sample"
-				onMouseDown={playNote}
+				onMouseDown={sample.filePath === dummySamplePath ? noop : playNote}
 				style={{color: CssColor[sample.color]}}
 			>
 				<div className="label">

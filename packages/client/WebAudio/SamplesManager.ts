@@ -1,5 +1,6 @@
 import {logger} from '@corgifm/common/logger'
 import {getCdnUrl} from '../client-utils'
+import {dummySamplePath} from '@corgifm/common/common-samples-stuff';
 
 // if (noteName === 'Gb7' || noteName === 'Ab3') return
 
@@ -30,7 +31,11 @@ export class SamplesManager {
 			return sample
 		} else {
 			if (this._samplesStatus.get(path) === undefined) {
-				logger.warn(`sample wasn't requested first: `, path)
+				if (path === dummySamplePath) {
+					logger.warn(`getSample should not be called with dummy sample, dummy`)
+				} else {
+					logger.warn(`sample wasn't requested first: `, path)
+				}
 			}
 			// eslint-disable-next-line @typescript-eslint/no-floating-promises
 			this.loadSampleAsync(path)

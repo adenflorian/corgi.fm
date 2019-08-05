@@ -192,6 +192,7 @@ notes on left of grid seq should play on click
 		- [ ] Upload...
 		- [ ] Your samples
 		- [ ] Samples in room
+	- [ ] right click pad > clear
 	- [ ] drag sample onto pad from computer
 	- [ ] presets
 		- [ ] basic-piano
