@@ -6,12 +6,12 @@ import * as uuid from 'uuid'
 import {ConnectionNodeType} from '../common-types'
 import {IMidiNotes} from '../MidiNote'
 import {CssColor, mixColors} from '../shamu-color'
+import {selectOption, AppOptions} from './options-redux'
+import {IClientAppState} from './common-redux-types'
 import {
 	BROADCASTER_ACTION, getConnectionNodeInfo, IClientRoomState,
 	selectVirtualKeyboardById, SERVER_ACTION, VirtualKeyboardState,
 } from '.'
-import {selectOption, AppOptions} from './options-redux';
-import {IClientAppState} from './common-redux-types';
 
 export const connectionsActions = {
 	add: (connection: IConnection) => ({

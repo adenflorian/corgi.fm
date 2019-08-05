@@ -11,6 +11,7 @@ import {
 	selectAllInfiniteSequencers, SequencerAction, SequencerStateBase,
 } from './sequencer-redux'
 import {VirtualKeyPressedAction} from './virtual-keyboard-redux'
+import {IClientAppState} from './common-redux-types'
 import {
 	addMultiThing, BROADCASTER_ACTION, createSequencerEvents, IClientRoomState, IMultiState,
 	IMultiStateThings, makeMultiReducer, NetworkActionType, selectGlobalClockState,
@@ -302,6 +303,15 @@ function infiniteSequencerReducer(
 
 export const selectInfiniteSequencer = (state: IClientRoomState, id: Id) =>
 	selectAllInfiniteSequencers(state)[id as string] || InfiniteSequencerState.dummy
+
+export const selectInfiniteSequencerStyle = (id: Id) => (state: IClientAppState) =>
+	selectInfiniteSequencer(state.room, id).style
+
+export const selectInfiniteSequencerShowRows = (id: Id) => (state: IClientAppState) =>
+	selectInfiniteSequencer(state.room, id).showRows
+
+export const selectInfiniteSequencerIsRecording = (id: Id) => (state: IClientAppState) =>
+	selectInfiniteSequencer(state.room, id).isRecording
 
 export const selectInfiniteSequencerIsActive = (state: IClientRoomState, id: Id) =>
 	selectInfiniteSequencer(state, id).isPlaying

@@ -158,3 +158,5 @@ export const limiterRenderSystemConstants = {
 	id: 'masterVolumeLimiterCanvas',
 	valueId: 'masterVolumeLimiterValueId',
 } as const
+
+export const pitchKnobSensitivity = 0.1

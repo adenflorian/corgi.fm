@@ -94,7 +94,7 @@ export function setupServerWebSocketListeners(
 		}
 
 		function handleSocketHandlerError(func: (arg: any) => any) {
-			return function (arg: any) {
+			return (arg: any) => {
 				try {
 					return func(arg)
 				} catch (error) {
@@ -127,7 +127,7 @@ export function setupServerWebSocketListeners(
 					return
 				}
 			}
-			
+
 			if (action[GLOBAL_SERVER_ACTION]) {
 				serverStore.dispatch(action)
 			} else {

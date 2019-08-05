@@ -1,6 +1,6 @@
 /* eslint-disable react/no-array-index-key */
 import {stripIndents} from 'common-tags'
-import React, {useLayoutEffect, useState} from 'react'
+import React, {useLayoutEffect, useState, useCallback} from 'react'
 import {useDispatch} from 'react-redux'
 import {MidiClipEvents} from '@corgifm/common/midi-types'
 import {IMidiNote} from '@corgifm/common/MidiNote'
@@ -90,7 +90,7 @@ export function InfiniteSequencerNotes(
 		}
 	}, [selectedEvent, mouseDelta, events, isAreaSelected, dispatch, id])
 
-	const handleMouseDown: HandleMouseEvent = (event: React.MouseEvent, note: IMidiNote, index: number) => {
+	const handleMouseDown: HandleMouseEvent = useCallback((event: React.MouseEvent, note: IMidiNote, index: number) => {
 		if (event.button === 0) {
 			setIsAreaSelected(true)
 
@@ -112,15 +112,15 @@ export function InfiniteSequencerNotes(
 				dispatch(infiniteSequencerActions.deleteNote(id, index))
 			}
 		}
-	}
+	}, [dispatch, id])
 
-	const handleMouseEnter: HandleMouseEvent = (event: React.MouseEvent, note: IMidiNote, index: number) => {
+	const handleMouseEnter: HandleMouseEvent = useCallback((event: React.MouseEvent, note: IMidiNote, index: number) => {
 		if (event.buttons !== 1 || event.shiftKey || !isAreaSelected) return
 
 		if (note >= 0) {
 			dispatch(localActions.playShortNote(id, note))
 		}
-	}
+	}, [dispatch, isAreaSelected, id])
 
 	if (style === InfiniteSequencerStyle.colorBars) {
 		return (

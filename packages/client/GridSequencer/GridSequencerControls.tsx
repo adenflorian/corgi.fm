@@ -14,7 +14,7 @@ import {
 	sequencerDownloadToolTip, sequencerEraseToolTip,
 	sequencerGateToolTip, sequencerPitchToolTip, sequencerPlayToolTip,
 	sequencerRateToolTip, sequencerRecordToolTip,
-	sequencerStopToolTip, sequencerUndoToolTip,
+	sequencerStopToolTip, sequencerUndoToolTip, pitchKnobSensitivity,
 } from '../client-constants'
 import {Knob} from '../Knob/Knob'
 import {KnobIncremental} from '../Knob/KnobIncremental'
@@ -111,6 +111,7 @@ export const GridSequencerControls = (props: AllProps) => {
 					tooltip={sequencerPitchToolTip}
 					valueString={seqPitchValueToString}
 					increment={1}
+					sensitivity={pitchKnobSensitivity}
 				/>
 				<KnobSnapping
 					value={props.rate}

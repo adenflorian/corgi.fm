@@ -12,29 +12,30 @@ export function createSamplesManagerMiddleware(
 	samplesManager: SamplesManager,
 ): Middleware<{}, IClientAppState> {
 
-		return ({dispatch, getState}) => next => (action: Actions) => {
-			switch (action.type) {
-				case 'ADD_MULTI_THING':
-				case 'REPLACE_SHAMU_GRAPH_STATE':
-					next(action)
-					// Do it after so that stuff will be deserialized
-					return fetchSamplesForAllSamplers(getState())
-				case 'SET_SAMPLE':
-					fetchSample(action.sample)
-					return next(action)
-				default: return next(action)
-			}
-		}
-
-		function fetchSamplesForAllSamplers(afterState: IClientAppState): void {
-			const fetchSamplerSamples = ({samples}: BasicSamplerState) =>
-				samples.forEach(fetchSample)
-
-			return selectAllSamplersAsArray(afterState.room)
-				.forEach(fetchSamplerSamples)
-		}
-
-		function fetchSample({filePath}: Sample) {
-			return samplesManager.loadSampleAsync(filePath)
+	return ({dispatch, getState}) => next => (action: Actions) => {
+		switch (action.type) {
+			case 'ADD_MULTI_THING':
+			case 'REPLACE_SHAMU_GRAPH_STATE':
+				next(action)
+				// Do it after so that stuff will be deserialized
+				return fetchSamplesForAllSamplers(getState())
+			case 'SET_SAMPLE':
+				fetchSample(action.sample)
+				return next(action)
+			default: return next(action)
 		}
 	}
+
+	function fetchSamplesForAllSamplers(afterState: IClientAppState): void {
+		const fetchSamplerSamples = ({samples}: BasicSamplerState) =>
+			samples.forEach(fetchSample)
+
+		selectAllSamplersAsArray(afterState.room)
+			.forEach(fetchSamplerSamples)
+	}
+
+	function fetchSample({filePath}: Sample): void {
+		/* eslint-disable-next-line @typescript-eslint/no-floating-promises */
+		samplesManager.loadSampleAsync(filePath)
+	}
+}

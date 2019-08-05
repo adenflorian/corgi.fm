@@ -125,11 +125,11 @@ export const localActions = {
 } as const
 
 export type LocalAction = ActionType<typeof localActions> | LocalMidiKeyPressAction | LocalMidiKeyUpAction
-	| LocalMidiOctaveChangeAction | WindowBlurAction | DeleteNodeAction
+| LocalMidiOctaveChangeAction | WindowBlurAction | DeleteNodeAction
 
 type LocalMiddlewareActions = LocalAction | AddClientAction | VirtualKeyPressedAction | GridSequencerAction
-	| UserInputAction | VirtualKeyUpAction | VirtualOctaveChangeAction | SetActiveRoomAction | ReadyAction
-	| UpdatePositionsAction | SetLocalClientNameAction
+| UserInputAction | VirtualKeyUpAction | VirtualOctaveChangeAction | SetActiveRoomAction | ReadyAction
+| UpdatePositionsAction | SetLocalClientNameAction
 
 export function createLocalMiddleware(
 	getAllInstruments: GetAllInstruments, firebase: FirebaseContextStuff
@@ -616,7 +616,7 @@ function parseLocalSavesJSON(localSavesJSON: string): LocalSaves {
 						saveServerVersion: save.saveServerVersion || '?',
 						room: save.room || '?',
 					}
-				})
+				}),
 			}
 		}
 	} catch (error) {

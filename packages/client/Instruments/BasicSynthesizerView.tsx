@@ -52,6 +52,20 @@ interface IBasicSynthesizerViewReduxProps {
 	filterType: BuiltInBQFilterType
 }
 
+const lfoWaveTypes = List<LfoOscillatorType>([
+	LfoOscillatorType.sine,
+	LfoOscillatorType.sawtooth,
+	LfoOscillatorType.reverseSawtooth,
+	LfoOscillatorType.square,
+	LfoOscillatorType.triangle,
+])
+
+const lfoTargets = List<SynthLfoTarget>([
+	SynthLfoTarget.Gain,
+	SynthLfoTarget.Pan,
+	SynthLfoTarget.Filter,
+])
+
 export class BasicSynthesizerView
 	extends React.PureComponent<IBasicSynthesizerViewAllProps> {
 	public static defaultProps = {
@@ -212,13 +226,7 @@ export class BasicSynthesizerView
 								label="Wave"
 								onChangeId={BasicSynthesizerParam.lfoWave}
 								tooltip="the shape of the wobble"
-								possibleValues={List<LfoOscillatorType>([
-									LfoOscillatorType.sine,
-									LfoOscillatorType.sawtooth,
-									LfoOscillatorType.reverseSawtooth,
-									LfoOscillatorType.square,
-									LfoOscillatorType.triangle,
-								])}
+								possibleValues={lfoWaveTypes}
 							/>
 							<KnobSnapping
 								value={this.props.lfoTarget}
@@ -227,7 +235,7 @@ export class BasicSynthesizerView
 								label="Target"
 								onChangeId={BasicSynthesizerParam.lfoTarget}
 								tooltip="what it wobbles"
-								possibleValues={List<SynthLfoTarget>([SynthLfoTarget.Gain, SynthLfoTarget.Pan, SynthLfoTarget.Filter])}
+								possibleValues={lfoTargets}
 							/>
 						</div>
 						<div className="knobs">
