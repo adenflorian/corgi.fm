@@ -25,7 +25,7 @@ export const LoadRoomModalContent: ModalContent = () => {
 	const [saveStorage, setSaveStorage] = React.useState(getOrCreateLocalSavesStorage())
 	const dispatch = useDispatch()
 
-	const saves = Map(saveStorage.all)
+	const saves = saveStorage.all
 
 	return (
 		<div className="loadRoomUI modalSection localSaves">
@@ -46,7 +46,7 @@ export const LoadRoomModalContent: ModalContent = () => {
 						const date = moment(saveData.saveDateTime).calendar()
 						const onClick = () => dispatch(loadRoom(saveData))
 						return (
-							<div key={saveId} className="localSave">
+							<div key={saveId as string} className="localSave">
 								<div className="load">
 									<div className="room" title={`Load ${saveData.room}`} onClick={onClick}>{saveData.room}</div>
 									<div className="date" title={date} onClick={onClick}>{date}</div>

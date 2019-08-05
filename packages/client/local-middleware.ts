@@ -125,11 +125,11 @@ export const localActions = {
 } as const
 
 export type LocalAction = ActionType<typeof localActions> | LocalMidiKeyPressAction | LocalMidiKeyUpAction
-| LocalMidiOctaveChangeAction | WindowBlurAction | DeleteNodeAction
+	| LocalMidiOctaveChangeAction | WindowBlurAction | DeleteNodeAction
 
 type LocalMiddlewareActions = LocalAction | AddClientAction | VirtualKeyPressedAction | GridSequencerAction
-| UserInputAction | VirtualKeyUpAction | VirtualOctaveChangeAction | SetActiveRoomAction | ReadyAction
-| UpdatePositionsAction | SetLocalClientNameAction
+	| UserInputAction | VirtualKeyUpAction | VirtualOctaveChangeAction | SetActiveRoomAction | ReadyAction
+	| UpdatePositionsAction | SetLocalClientNameAction
 
 export function createLocalMiddleware(
 	getAllInstruments: GetAllInstruments, firebase: FirebaseContextStuff
@@ -475,10 +475,7 @@ export function createLocalMiddleware(
 
 				setLocalSavesToLocalStorage({
 					...localSaves,
-					all: {
-						...localSaves.all,
-						[uuid.v4()]: createRoomSave(state, room),
-					},
+					all: localSaves.all.set(uuid.v4(), createRoomSave(state, room)),
 				})
 
 				return
@@ -610,7 +607,17 @@ function parseLocalSavesJSON(localSavesJSON: string): LocalSaves {
 			logger.warn('failed to parse localSavesJSON, was null after casting: ', localSavesJSON)
 			return makeInitialLocalSavesStorage()
 		} else {
-			return localSaves
+			return {
+				all: Map<Id, SavedRoom>(localSaves.all).map((save): SavedRoom => {
+					return {
+						...save,
+						saveDateTime: save.saveDateTime || '?',
+						saveClientVersion: save.saveClientVersion || '?',
+						saveServerVersion: save.saveServerVersion || '?',
+						room: save.room || '?',
+					}
+				})
+			}
 		}
 	} catch (error) {
 		logger.error('error caught while trying to parse localSavesJSON: ', error)

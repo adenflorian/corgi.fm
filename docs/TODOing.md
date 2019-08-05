@@ -153,6 +153,16 @@
 - [√] DeprecationWarning: collection.update is deprecated. Use updateOne, updateMany, or bulkWrite instead.
 - [√] remove samples from the build
 - [ ] `Uncaught (in promise) [DEFAULT]: Firebase: Firebase App named '[DEFAULT]' already exists (app/duplicate-app).`
+- [ ] BUG: right click menu breaks when switching rooms?
+	- can't repro
+- [ ] BUG: laggy keyboard when high latency
+	- can't repro
+	- didn't have an issue when using VPN thru australia 400 ping
+	- maybe they were talking about the time it takes to hear a sound from when you play a note?
+	- that might be able to be faster, feels around 100-200 ms latency there
+- [√] BUG: deleting saves is broken
+- [ ] address sentry logs
+- [ ] performance pass
 
 - [ ] **Custom Sampler**
 	- morphing the piano sampler into a custom sampler
@@ -189,6 +199,7 @@
 		- [ ] samples manager middleware?
 		- [ ] if `getSample` gets called and sample isn't loaded, then that's an error?
 
+- [ ] when stripping undos for saving, only strip every 10 or so undo states or something
 - [ ] setup to use tslint and eslint side by side
 - [ ] http://op-101.blogspot.com/2011/09/string-description.html
 - [ ] checkbox to hide welcome on start
@@ -287,6 +298,7 @@ Yes, https://mmckegg.github.io/web-audio-school/, exercise 13 is exactly what yo
 
 
 # 0.6.0
+- [ ] built in synth for keyboard
 - [ ] change clients redux so every client only knows about clients in the same room
 - [ ] https://github.com/TheLarkInn/Front-End-Checklist
 - [ ] https://developers.google.com/web/progressive-web-apps/checklist
@@ -332,6 +344,11 @@ Yes, https://mmckegg.github.io/web-audio-school/, exercise 13 is exactly what yo
 - [ ] flanger
 - [ ] distortion
 - [ ] desktop notifications for chat
+
+# 0.7.0
+- [ ] quick connection mode
+	- [ ] or hold ctr and drag from node title bar to draw connection
+- [ ] karma system
 
 
 
