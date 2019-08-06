@@ -1,6 +1,6 @@
 {
 	"name": "@corgifm/api-tester",
-	"version": "0.5.14",
+	"version": "0.5.15",
 	"license": "MIT",
 	"private": false,
 	"main": "index.ts",
