@@ -4,6 +4,7 @@ import {ConnectionNodeType, IConnectable} from '@corgifm/common/common-types'
 import {calculatePositionsGivenConnections} from '@corgifm/common/compute-positions'
 import {MidiClipEvents} from '@corgifm/common/midi-types'
 import {MidiNotes} from '@corgifm/common/MidiNote'
+import {transformLoadedSave} from '@corgifm/common/saving-and-loading'
 import {
 	basicSamplerActions, addBasicSynthesizer, addClient,
 	addGridSequencer, addInfiniteSequencer, addPosition,
@@ -297,16 +298,18 @@ function getInitialInfiniteSequencerEvents() {
 }
 
 export function loadServerStuff(room: string, serverStore: Store<IServerState>, roomDataToLoad: SavedRoom, ownerId: Id) {
+	const transformedRoomSave = transformLoadedSave(roomDataToLoad)
+
 	const serverClient = ClientState.createServerClient()
 	const addClientAction = addClient(serverClient)
 
 	dispatchToRoom(addClientAction)
 
-	dispatchToRoom(connectionsActions.replaceAll(roomDataToLoad.connections))
-	dispatchToRoom(shamuGraphActions.replace(roomDataToLoad.shamuGraph))
-	dispatchToRoom(replacePositions(roomDataToLoad.positions))
-	dispatchToRoom(roomSettingsActions.replaceAll(roomDataToLoad.roomSettings))
-	dispatchToRoom(globalClockActions.replace(roomDataToLoad.globalClock))
+	dispatchToRoom(connectionsActions.replaceAll(transformedRoomSave.connections))
+	dispatchToRoom(shamuGraphActions.replace(transformedRoomSave.shamuGraph))
+	dispatchToRoom(replacePositions(transformedRoomSave.positions))
+	dispatchToRoom(roomSettingsActions.replaceAll(transformedRoomSave.roomSettings))
+	dispatchToRoom(globalClockActions.replace(transformedRoomSave.globalClock))
 
 	const getRoomState = () => serverStore.getState().roomStores.get(room)!
 
