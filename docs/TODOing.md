@@ -163,6 +163,7 @@
 	- [√] make it so when you load a room, you become owner
 - [√] BUG: errors when switching rooms with debug visual enabled
 - [√] blur new room button after click
+- [√] system message when saving a room
 
 - [ ] **Custom Sampler**
 	- morphing the piano sampler into a custom sampler

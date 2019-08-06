@@ -482,6 +482,8 @@ export function createLocalMiddleware(
 						...localSaves,
 						all: localSaves.all.set(uuid.v4(), createRoomSave(state, room)),
 					})
+
+					return dispatch(chatSystemMessage('Room saved!', 'success'))
 				} catch (error) {
 					if (error instanceof Error) {
 						if (error.name === 'QuotaExceededError') {
@@ -489,10 +491,8 @@ export function createLocalMiddleware(
 						}
 					}
 					logger.error(`failed to save room to browser: `, error)
-					dispatch(chatSystemMessage('Something went wrong! An error has been logged.', 'error'))
+					return dispatch(chatSystemMessage('Something went wrong! An error has been logged.', 'error'))
 				}
-
-				return
 			}
 			case 'SAVE_ROOM_TO_FILE': {
 				next(action)
