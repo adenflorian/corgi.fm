@@ -1,24 +1,10 @@
 {
+	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		"noErrorTruncation": true,
-		"noEmitOnError": true,
-		"noFallthroughCasesInSwitch": true,
-		"noEmit": true,
-		"allowSyntheticDefaultImports": true,
-		"noUnusedLocals": false,
-		"noUnusedParameters": false,
-		"sourceMap": true,
-		"strict": true,
-		"noImplicitReturns": true,
-		"target": "es6",
-		"module": "commonjs",
+		"target": "esnext",
 		"lib": [
 			"dom",
-			"es7"
-		],
-		"experimentalDecorators": true,
-		"types": [
-			"jest"
+			"esnext"
 		],
 		"resolveJsonModule": true,
 		"jsx": "react"
@@ -27,5 +13,9 @@
 		"./**/*.ts*",
 		"./**/*.js*",
 		"../common/common-global.d.ts"
+	],
+	"exclude": [
+		"node_modules",
+		"**/*.spec.ts"
 	]
 }

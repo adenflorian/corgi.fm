@@ -1,29 +1,20 @@
 {
+	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		"noErrorTruncation": true,
-		"noEmitOnError": true,
-		"noFallthroughCasesInSwitch": true,
-		"noEmit": true,
-		"allowSyntheticDefaultImports": true,
-		"noUnusedLocals": false,
-		"noUnusedParameters": false,
-		"sourceMap": true,
-		"strict": true,
-		"noImplicitReturns": true,
 		"target": "esnext",
-		"module": "commonjs",
 		"lib": [
 			"dom",
-			"es7"
-		],
-		"experimentalDecorators": true,
-		"types": [
-			"jest"
+			"esnext"
 		]
 	},
 	"include": [
 		"./**/*.ts*",
 		"./**/*.js*",
 		"../common/common-global.d.ts"
+	],
+	"exclude": [
+		"node_modules",
+		"**/*.spec.ts",
+		"api-tests/**/*"
 	]
 }

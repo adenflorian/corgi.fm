@@ -1,26 +1,19 @@
 {
+	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		"noErrorTruncation": true,
-		"noEmitOnError": true,
-		"noFallthroughCasesInSwitch": true,
-		"noEmit": true,
-		"allowSyntheticDefaultImports": true,
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
-		"sourceMap": true,
-		"strict": true,
-		"noImplicitReturns": true,
 		"target": "esnext",
-		"module": "commonjs",
 		"lib": [
-			"es7"
-		],
-		"types": [
-			"jest"
+			"esnext"
 		]
 	},
 	"include": [
 		"./**/*.ts*",
 		"./**/*.js*"
+	],
+	"exclude": [
+		"node_modules",
+		"**/*.spec.ts"
 	]
 }

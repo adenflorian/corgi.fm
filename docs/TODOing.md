@@ -169,6 +169,7 @@
 - [√] BUG: if you save a limited room, when loading it, fakeClient becomes the owner and you can't do anything
 	- [√] make it so when you load a room, you become owner
 - [ ] stop using socket ID as client ID
+- [ ] BUG: errors when switching rooms with debug visual enabled
 
 
 
