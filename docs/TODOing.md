@@ -166,7 +166,9 @@
 - [ ] BUG: Fix save files from before custom sampler
 	- [ ] visually
 	- [ ] samplers aren't playing the piano notes
-- [ ] BUG: if you save a limited room, when loading it, fakeClient becomes the owner and you can't do anything
+- [√] BUG: if you save a limited room, when loading it, fakeClient becomes the owner and you can't do anything
+	- [√] make it so when you load a room, you become owner
+- [ ] stop using socket ID as client ID
 
 
 

@@ -251,7 +251,7 @@ export function setupServerWebSocketListeners(
 				serverStore.dispatch(createRoomAction(roomSettingsActions.setOwner(clientId), newRoomName))
 
 				if (roomDataToLoad) {
-					loadServerStuff(newRoomName, serverStore, roomDataToLoad)
+					loadServerStuff(newRoomName, serverStore, roomDataToLoad, clientId)
 				} else {
 					createServerStuff(newRoomName, serverStore)
 				}

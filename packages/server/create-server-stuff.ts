@@ -296,7 +296,7 @@ function getInitialInfiniteSequencerEvents() {
 	])
 }
 
-export function loadServerStuff(room: string, serverStore: Store<IServerState>, roomDataToLoad: SavedRoom) {
+export function loadServerStuff(room: string, serverStore: Store<IServerState>, roomDataToLoad: SavedRoom, ownerId: Id) {
 	const serverClient = ClientState.createServerClient()
 	const addClientAction = addClient(serverClient)
 
@@ -318,6 +318,8 @@ export function loadServerStuff(room: string, serverStore: Store<IServerState>, 
 	dispatchToRoom(connectionsActions.delete(keyboardConnectionIds))
 	dispatchToRoom(deleteThingsAny(keyboardIds))
 	dispatchToRoom(deletePositions(keyboardIds))
+
+	dispatchToRoom(roomSettingsActions.setOwner(ownerId))
 
 	function dispatchToRoom(action: Action) {
 		return serverStore.dispatch(createRoomAction(action, room))
