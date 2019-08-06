@@ -49,6 +49,10 @@ export class SamplesManager {
 
 		if (status !== undefined) return
 
+		if (path === dummySamplePath) {
+			return logger.warn(`loadSampleAsync should not be called with dummy sample, dummy`)
+		}
+
 		this._samplesStatus.set(path, SampleStatus.Requested)
 
 		const sample = await fetch(
