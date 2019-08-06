@@ -144,8 +144,8 @@ export function deserializeBasicSamplerState(
 	return {
 		...(new BasicSamplerState(x.ownerId)),
 		...x,
-		width: Math.max(x.width, BasicSamplerState.defaultWidth),
-		height: Math.max(x.height, BasicSamplerState.defaultHeight),
+		width: BasicSamplerState.defaultWidth,
+		height: BasicSamplerState.defaultHeight,
 		samples: convertToNumberKeyMap(Map<string, Sample>(x.samples as any)),
 	}
 }

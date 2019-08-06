@@ -155,8 +155,8 @@ export function deserializeGridSequencerState(state: IMultiStateThing): IMultiSt
 	const y: GridSequencerState = {
 		...(new GridSequencerState(x.ownerId)),
 		...z,
-		width: Math.max(x.width, GridSequencerState.getWidth(notesDisplayWidth)),
-		height: Math.max(x.height, GridSequencerState.noteHeight * x.notesToShow),
+		width: GridSequencerState.getWidth(notesDisplayWidth),
+		height: GridSequencerState.noteHeight * x.notesToShow,
 		notesDisplayStartX: GridSequencerState.controlsWidth + GridSequencerState.noteNamesSideBarWidth,
 		notesDisplayWidth,
 	}

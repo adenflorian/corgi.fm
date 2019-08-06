@@ -303,15 +303,23 @@ export function loadServerStuff(room: string, serverStore: Store<IServerState>, 
 	const serverClient = ClientState.createServerClient()
 	const addClientAction = addClient(serverClient)
 
+	const getRoomState = () => serverStore.getState().roomStores.get(room)!
+
 	dispatchToRoom(addClientAction)
 
 	dispatchToRoom(connectionsActions.replaceAll(transformedRoomSave.connections))
 	dispatchToRoom(shamuGraphActions.replace(transformedRoomSave.shamuGraph))
-	dispatchToRoom(replacePositions(transformedRoomSave.positions))
+	const newPositions = transformedRoomSave.positions.map(position => {
+		const nodeState = getConnectionNodeInfo(position.targetType).stateSelector(getRoomState(), position.id)
+		return {
+			...position,
+			width: nodeState.width,
+			height: nodeState.height
+		}
+	})
+	dispatchToRoom(replacePositions(newPositions))
 	dispatchToRoom(roomSettingsActions.replaceAll(transformedRoomSave.roomSettings))
 	dispatchToRoom(globalClockActions.replace(transformedRoomSave.globalClock))
-
-	const getRoomState = () => serverStore.getState().roomStores.get(room)!
 
 	const keyboardIds = selectAllVirtualKeyboardIds(getRoomState())
 	const keyboardConnectionIds = selectConnectionsWithSourceOrTargetIds(getRoomState(), keyboardIds)
