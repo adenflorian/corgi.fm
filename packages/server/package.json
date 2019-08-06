@@ -1,6 +1,6 @@
 {
 	"name": "@corgifm/server",
-	"version": "0.5.15",
+	"version": "0.5.16",
 	"license": "UNLICENSED",
 	"private": true,
 	"scripts": {
