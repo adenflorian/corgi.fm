@@ -77,6 +77,8 @@ export function setupWebsocketAndListeners(store: Store) {
 				window.localStorage.setItem(refreshedToGetNewVersionKey, 'true')
 				window.location.reload(true)
 			}
+		} else {
+			window.localStorage.removeItem(refreshedToGetNewVersionKey)
 		}
 	})
 

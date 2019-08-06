@@ -161,8 +161,12 @@
 	- maybe they were talking about the time it takes to hear a sound from when you play a note?
 	- that might be able to be faster, feels around 100-200 ms latency there
 - [√] BUG: deleting saves is broken
-- [ ] address sentry logs
-- [ ] performance pass
+- [√] address sentry logs (2019-08-05)
+- [√] performance pass (2019-08-04)
+- [ ] BUG: Fix save files from before custom sampler
+	- [ ] visually
+	- [ ] samplers aren't playing the piano notes
+- [ ] BUG: if you save a limited room, when loading it, fakeClient becomes the owner and you can't do anything
 
 
 
