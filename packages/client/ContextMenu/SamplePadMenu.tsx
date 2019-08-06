@@ -62,7 +62,7 @@ function DefaultSampleMenuItem({sample}: {sample: Sample}) {
 			onClick={(_, {samplerId, midiNote}: SamplePadMenuData) =>
 				setSample(samplerId, midiNote)}
 		>
-			<span style={{color: CssColor[sample.color]}}>
+			<span style={{color: CssColor[sample.color]}} className={`defaultSampleMenuItem`}>
 				{sample.label}
 			</span>
 		</MenuItem>
