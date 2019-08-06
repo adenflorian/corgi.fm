@@ -128,7 +128,9 @@ export abstract class Voices<V extends Voice> {
 		const voiceToRelease = voicesToRelease.first(undefined)
 
 		if (!voiceToRelease) {
-			logger.warn('[Voices][scheduleRelease] !voiceToRelease note: ', note)
+			logger.warn('[Voices][scheduleRelease] !voiceToRelease note: ', {
+				note, voiceToRelease, voicesToRelease, scheduledVoicesSameNote,
+				_scheduledVoices: this._scheduledVoices, currentTime, releaseStartTime})
 			return
 		}
 
