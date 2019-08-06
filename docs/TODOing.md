@@ -193,6 +193,7 @@ notes on left of grid seq should play on click
 		- [ ] Your samples
 		- [ ] Samples in room
 	- [ ] right click pad > clear
+	- [ ] allow scrolling thru menu
 	- [ ] drag sample onto pad from computer
 	- [ ] presets
 		- [ ] basic-piano

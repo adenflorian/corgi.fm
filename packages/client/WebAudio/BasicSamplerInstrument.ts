@@ -1,5 +1,5 @@
 import {
-	Samples, Sample, dummySample,
+	Samples, Sample, dummySample, dummySamplePath,
 } from '@corgifm/common/common-samples-stuff'
 import {IMidiNote} from '@corgifm/common/MidiNote'
 import {
@@ -107,8 +107,10 @@ class SamplerVoice extends Voice {
 	protected _scheduleNoteSpecific(note: number): void {
 		this._disposeAudioBufferSource()
 		this._audioBufferSource = this._audioContext.createBufferSource()
-		this._audioBufferSource.buffer =
-			this._samplesManager.getSample(this._sample.filePath)
+		if (this._sample.filePath !== dummySamplePath) {
+			this._audioBufferSource.buffer =
+				this._samplesManager.getSample(this._sample.filePath)
+		}
 		this._isStarted = true
 	}
 

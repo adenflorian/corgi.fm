@@ -33,6 +33,7 @@ export class SamplesManager {
 			if (this._samplesStatus.get(path) === undefined) {
 				if (path === dummySamplePath) {
 					logger.warn(`getSample should not be called with dummy sample, dummy`)
+					return this._emptyAudioBuffer
 				} else {
 					logger.warn(`sample wasn't requested first: `, path)
 				}
