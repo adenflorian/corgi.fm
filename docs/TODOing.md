@@ -168,7 +168,6 @@
 	- [ ] samplers aren't playing the piano notes
 - [√] BUG: if you save a limited room, when loading it, fakeClient becomes the owner and you can't do anything
 	- [√] make it so when you load a room, you become owner
-- [ ] stop using socket ID as client ID
 - [√] BUG: errors when switching rooms with debug visual enabled
 - [√] blur new room button after click
 
@@ -225,6 +224,7 @@ notes on left of grid seq should play on click
 		- [ ] samples manager middleware?
 		- [ ] if `getSample` gets called and sample isn't loaded, then that's an error?
 
+- [ ] stop using socket ID as client ID
 - [ ] add some graphics settings to welcome menu
 - [ ] when stripping undos for saving, only strip every 10 or so undo states or something
 - [ ] setup to use tslint and eslint side by side
