@@ -30,10 +30,10 @@
 	- [√] let users create keyboard if they dont have one
 - [√] clone node with ctrl + D
 - [√] new clone should be selected
-- [ ] LFO
+- [√] LFO
 	- [√] basic synth LFO
 	- [√] filter target
-	- [ ] fix wave value string
+	- [√] fix wave value string
 - [√] filter type knob for synth
 - [√] filter type knob for sampler
 - [√] fix knob arc not being inline
@@ -50,26 +50,6 @@
 	- [√] connect to memory db in local
 	- [√] connect to real database in test and prod
 	- [√] setup db in prod
-- [-] auth back end (abandoned, went with firebase auth)
-	- [ ] register
-		- [√] save user to DB
-		- [√] hash pw
-		- [√] limit pw to 50 chars
-		- [√] return token
-		- [√] put token secret in secret place and load in
-		- [√] check for existing user first
-		- [√] min password length
-		- [ ] validate email
-			- [ ] on register, send email with verification link
-		- [ ] verify email
-	- [ ] login
-		- [ ] return token
-	- [ ] password reset
-	- [ ] jwt
-		- [ ] make it expire
-		- [ ] do i need to store the tokens in the DB?
-		- [ ] revoking access
-		- [ ] logging out (just delete token from client?)
 - [ ] firebase auth
 	- [ ] local
 		- [√] UI
@@ -180,11 +160,14 @@
 		- [ ] Samples in room
 	- [ ] right click pad > clear
 	- [ ] allow scrolling thru menu
+	- [ ] should be able to focus a pad and use tab and arrow keys to navigate
 	- [ ] drag sample onto pad from computer
 	- [ ] presets
 		- [ ] basic-piano
 		- [ ] basic-drums
 	- [ ] styling
+		- [ ] hover
+		- [ ] click
 	- [ ] UI to show sample loading
 	- Samples Manager
 		- [√] don't fetch same sample twice
@@ -200,8 +183,8 @@
 			- [ ] clear samples before loading new sample if over threshold
 			- [ ] clear samples after loading new sample if over threshold
 			- [ ] display this info to the user somehow
-		- [ ] samples manager middleware?
-		- [ ] if `getSample` gets called and sample isn't loaded, then that's an error?
+		- [√] samples manager middleware?
+		- [√] if `getSample` gets called and sample isn't loaded, then that's an error?
 
 - [ ] show note name when hovering on notes in sequencers
 - [ ] notes on left of grid seq should play on click
