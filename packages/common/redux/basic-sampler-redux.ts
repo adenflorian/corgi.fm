@@ -146,7 +146,9 @@ export function deserializeBasicSamplerState(
 		...x,
 		width: BasicSamplerState.defaultWidth,
 		height: BasicSamplerState.defaultHeight,
-		samples: convertToNumberKeyMap(Map<string, Sample>(x.samples as any)),
+		samples: x.samples === undefined
+			? samplerBasicPianoNotes
+			: convertToNumberKeyMap(Map<string, Sample>(x.samples as any)),
 	}
 }
 

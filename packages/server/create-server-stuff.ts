@@ -309,7 +309,7 @@ export function loadServerStuff(room: string, serverStore: Store<IServerState>, 
 
 	dispatchToRoom(connectionsActions.replaceAll(transformedRoomSave.connections))
 	dispatchToRoom(shamuGraphActions.replace(transformedRoomSave.shamuGraph))
-	const newPositions = transformedRoomSave.positions.map(position => {
+	const newPositions = Map(transformedRoomSave.positions).map(position => {
 		const nodeState = getConnectionNodeInfo(position.targetType).stateSelector(getRoomState(), position.id)
 		return {
 			...position,

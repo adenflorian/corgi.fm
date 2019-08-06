@@ -163,9 +163,9 @@
 - [√] BUG: deleting saves is broken
 - [√] address sentry logs (2019-08-05)
 - [√] performance pass (2019-08-04)
-- [ ] BUG: Fix save files from before custom sampler
-	- [ ] visually
-	- [ ] samplers aren't playing the piano notes
+- [√] BUG: Fix save files from before custom sampler
+	- [√] visually
+	- [√] samplers aren't playing the piano notes
 - [√] BUG: if you save a limited room, when loading it, fakeClient becomes the owner and you can't do anything
 	- [√] make it so when you load a room, you become owner
 - [√] BUG: errors when switching rooms with debug visual enabled
