@@ -28,7 +28,7 @@
                 width: 74px;
                 height: 52px;
                 border-radius: 4px;
-                background-color: @panelGrayLight;
+                background-color: @panelGray;
                 box-sizing: border-box;
                 margin: 2px;
                 display: flex;
@@ -37,6 +37,20 @@
                 border: 1px solid currentColor;
     
                 &:hover {
+                    background-color: @panelGrayLight;
+                }
+
+                &:not(:active) {
+                    transition: background-color 0.3s ease-out;
+                }
+    
+                &:active {
+                    background-color: currentColor;
+                }
+
+                .label {
+                    color: @defaultGray;
+                    font-size: 13px;
                 }
             }
         }
