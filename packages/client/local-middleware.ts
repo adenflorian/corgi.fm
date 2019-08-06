@@ -60,6 +60,7 @@ import {getSequencersSchedulerInfo} from './note-scanner'
 import {saveUsernameToLocalStorage} from './username'
 import {corgiApiActions} from './RestClient/corgi-api-middleware'
 import {FirebaseContextStuff} from './Firebase/FirebaseContext'
+import {onChangeRoom} from './WebAudio';
 
 export type LocalMidiKeyPressAction = ReturnType<typeof localMidiKeyPress>
 export const localMidiKeyPress = (midiNote: IMidiNote) => ({
@@ -342,6 +343,7 @@ export function createLocalMiddleware(
 			case 'SET_ACTIVE_ROOM': {
 				next(action)
 				window.history.pushState({}, document.title, '/' + selectActiveRoom(getState()))
+				onChangeRoom()
 				return
 			}
 			case 'ADD_CLIENT': {

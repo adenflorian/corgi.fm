@@ -161,6 +161,10 @@ export function registerInstrumentWithSchedulerVisual(id: Id, getScheduledVoices
 	_instruments = _instruments.set(id, getScheduledVoices)
 }
 
+export function onChangeRoom() {
+	_instruments = _instruments.clear()
+}
+
 export function startSchedulerVisualLoop() {
 	return _renderLoop
 }
