@@ -1,6 +1,15 @@
-import {List} from 'immutable'
+import {List, Map} from 'immutable'
 import {CssColor} from '../shamu-color'
 import {IClientRoomState, BROADCASTER_ACTION, createReducer, SERVER_ACTION} from '.'
+
+export type SystemMessageType = 'info' | 'error' | 'warning' | 'success'
+
+const systemColors = Map<SystemMessageType, string>([
+	['info', CssColor.defaultGray],
+	['warning', CssColor.yellow],
+	['error', CssColor.red],
+	['success', CssColor.green],
+])
 
 export const CHAT_SUBMIT = 'CHAT_SUBMIT'
 export type ChatSubmitAction = ReturnType<typeof chatSubmit>
@@ -15,12 +24,12 @@ export const chatSubmit = (message: IChatMessage) => {
 
 export const CHAT_SYSTEM_MESSAGE = 'CHAT_SYSTEM_MESSAGE'
 export type ChatSystemMessageAction = ReturnType<typeof chatSystemMessage>
-export const chatSystemMessage = (message: string) => {
+export const chatSystemMessage = (message: string, type: SystemMessageType = 'info') => {
 	return {
 		type: CHAT_SYSTEM_MESSAGE,
 		message: new IChatMessage(
 			'System',
-			CssColor.defaultGray,
+			systemColors.get(type, CssColor.defaultGray),
 			message,
 		),
 	}

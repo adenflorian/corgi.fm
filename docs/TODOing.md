@@ -169,7 +169,7 @@
 remind people to close DAW to have external midi work
 empty column on right side of infinite seq to add new notes
 show note name when hovering on notes in sequencers
-note names on left side of infini seq
+note names on left side of infinite seq
 if you save a limited room, when loading it, fakeClient becomes the owner
 and you can't do anything
 issue with loading room and fakeClient becomes owner
@@ -367,6 +367,7 @@ Yes, https://mmckegg.github.io/web-audio-school/, exercise 13 is exactly what yo
 - [ ] quick connection mode
 	- [ ] or hold ctr and drag from node title bar to draw connection
 - [ ] karma system
+- [ ] user status icons
 
 
 

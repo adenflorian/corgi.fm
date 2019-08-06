@@ -50,7 +50,7 @@ import {
 	virtualOctaveChange,
 	VirtualOctaveChangeAction,
 	SERVER_ACTION,
-	BROADCASTER_ACTION,
+	BROADCASTER_ACTION, chatSystemMessage,
 } from '@corgifm/common/redux'
 import {pointersActions} from '@corgifm/common/redux/pointers-redux'
 import {graphStateSavesLocalStorageKey} from './client-constants'
@@ -473,10 +473,20 @@ export function createLocalMiddleware(
 
 				const localSaves = getOrCreateLocalSavesStorage()
 
-				setLocalSavesToLocalStorage({
-					...localSaves,
-					all: localSaves.all.set(uuid.v4(), createRoomSave(state, room)),
-				})
+				try {
+					setLocalSavesToLocalStorage({
+						...localSaves,
+						all: localSaves.all.set(uuid.v4(), createRoomSave(state, room)),
+					})
+				} catch (error) {
+					if (error instanceof Error) {
+						if (error.name === 'QuotaExceededError') {
+							return dispatch(chatSystemMessage('Browser save storage is full! Delete some saves to make room.', 'warning'))
+						}
+					}
+					logger.error(`failed to save room to browser: `, error)
+					dispatch(chatSystemMessage('Something went wrong! An error has been logged.', 'error'))
+				}
 
 				return
 			}
@@ -498,10 +508,15 @@ export function createLocalMiddleware(
 
 				const localSaves = getOrCreateLocalSavesStorage()
 
-				setLocalSavesToLocalStorage({
-					...localSaves,
-					all: localSaves.all.delete(action.id),
-				})
+				try {
+					setLocalSavesToLocalStorage({
+						...localSaves,
+						all: localSaves.all.delete(action.id),
+					})
+				} catch (error) {
+					logger.error(`failed to delete saved room from browser: `, error)
+					dispatch(chatSystemMessage('Something went wrong! An error has been logged.', 'error'))
+				}
 
 				return
 			}
