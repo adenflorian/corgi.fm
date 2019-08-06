@@ -1,13 +1,13 @@
-import {List, Map, Record} from 'immutable'
+import {Map, Record} from 'immutable'
 import {combineReducers} from 'redux'
 import {ActionType} from 'typesafe-actions'
 import {IClientRoomState} from './common-redux-types'
 import {BROADCASTER_ACTION, SERVER_ACTION} from '.'
 
-export const pointerActionTypesWhitelist = List([
+export const pointerActionTypesWhitelist: readonly string[] = [
 	'ADD_POINTER',
 	'UPDATE_POINTER',
-] as const)
+]
 
 export const pointersActions = {
 	add: (ownerId: Id) => ({

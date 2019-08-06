@@ -9,6 +9,7 @@ import {
 	RoomsReduxAction, ModalsAction, InProgressAction, OptionsAction,
 	ClientInfoAction, AudioReduxAction, authReducer, AuthAction,
 } from '.'
+import {clientsActionTypesWhitelist} from './clients-redux';
 
 export interface IClientAppState extends StateType<ReturnType<typeof getClientReducers>> {}
 
@@ -39,6 +40,7 @@ export interface BroadcastAction extends Readonly<AnyAction> {
 
 export const whitelistedRoomActionTypes = chatActionTypesWhitelist
 	.concat(pointerActionTypesWhitelist)
+	.concat(clientsActionTypesWhitelist)
 
 export type CLIENT_APP_ACTION = AudioReduxAction | AuthAction | ClientInfoAction |
 InProgressAction | ModalsAction | OptionsAction | RoomsReduxAction |

@@ -1,4 +1,4 @@
-import {List, Map} from 'immutable'
+import {Map} from 'immutable'
 import {CssColor} from '../shamu-color'
 import {IClientRoomState, BROADCASTER_ACTION, createReducer, SERVER_ACTION} from '.'
 
@@ -45,9 +45,9 @@ export const setChat = (messages: IChatMessage[]) => {
 	}
 }
 
-export const chatActionTypesWhitelist = List([
+export const chatActionTypesWhitelist: readonly string[] = [
 	CHAT_SUBMIT,
-])
+]
 
 export interface IChatState {
 	messages: IChatMessage[]

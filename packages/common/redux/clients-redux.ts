@@ -10,6 +10,10 @@ import {
 	GLOBAL_SERVER_ACTION, IClientAppState, IServerState,
 } from '.'
 
+export const clientsActionTypesWhitelist: readonly string[] = [
+	'SET_CLIENT_NAME',
+]
+
 export type AddClientAction = ReturnType<typeof addClient>
 export const addClient = (client: IClientState) => ({
 	type: 'ADD_CLIENT',
