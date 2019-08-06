@@ -344,6 +344,8 @@ export function createLocalMiddleware(
 				next(action)
 				window.history.pushState({}, document.title, '/' + selectActiveRoom(getState()))
 				onChangeRoom()
+				const active: HTMLElement | null = document.activeElement as HTMLElement
+				active && active.blur && active.blur()
 				return
 			}
 			case 'ADD_CLIENT': {

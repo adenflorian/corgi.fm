@@ -170,7 +170,7 @@
 	- [√] make it so when you load a room, you become owner
 - [ ] stop using socket ID as client ID
 - [√] BUG: errors when switching rooms with debug visual enabled
-- [ ] blur new room button after click
+- [√] blur new room button after click
 
 
 
