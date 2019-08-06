@@ -152,14 +152,7 @@
 - [√] fix noise wave getting stuck
 - [√] DeprecationWarning: collection.update is deprecated. Use updateOne, updateMany, or bulkWrite instead.
 - [√] remove samples from the build
-- [ ] `Uncaught (in promise) [DEFAULT]: Firebase: Firebase App named '[DEFAULT]' already exists (app/duplicate-app).`
-- [ ] BUG: right click menu breaks when switching rooms?
-	- can't repro
-- [ ] BUG: laggy keyboard when high latency
-	- can't repro
-	- didn't have an issue when using VPN thru australia 400 ping
-	- maybe they were talking about the time it takes to hear a sound from when you play a note?
-	- that might be able to be faster, feels around 100-200 ms latency there
+- [√] `Uncaught (in promise) [DEFAULT]: Firebase: Firebase App named '[DEFAULT]' already exists (app/duplicate-app).`
 - [√] BUG: deleting saves is broken
 - [√] address sentry logs (2019-08-05)
 - [√] performance pass (2019-08-04)
@@ -170,21 +163,6 @@
 	- [√] make it so when you load a room, you become owner
 - [√] BUG: errors when switching rooms with debug visual enabled
 - [√] blur new room button after click
-
-
-
-remind people to close DAW to have external midi work
-empty column on right side of infinite seq to add new notes
-show note name when hovering on notes in sequencers
-note names on left side of infinite seq
-if you save a limited room, when loading it, fakeClient becomes the owner
-and you can't do anything
-issue with loading room and fakeClient becomes owner
-notes on left of grid seq should play on click
-
-
-
-
 
 - [ ] **Custom Sampler**
 	- morphing the piano sampler into a custom sampler
@@ -224,6 +202,11 @@ notes on left of grid seq should play on click
 		- [ ] samples manager middleware?
 		- [ ] if `getSample` gets called and sample isn't loaded, then that's an error?
 
+- [ ] show note name when hovering on notes in sequencers
+- [ ] notes on left of grid seq should play on click
+- [ ] empty column on right side of infinite seq to add new notes
+- [ ] note names on left side of infinite seq
+- [ ] remind people to close DAW to have external midi work
 - [ ] stop using socket ID as client ID
 - [ ] add some graphics settings to welcome menu
 - [ ] when stripping undos for saving, only strip every 10 or so undo states or something

@@ -2,6 +2,11 @@ BUGS
 ====
 
 ## High
+- [ ] BUG: laggy keyboard when high latency
+	- can't repro
+	- didn't have an issue when using VPN thru australia 400 ping
+	- maybe they were talking about the time it takes to hear a sound from when you play a note?
+	- that might be able to be faster, feels around 100-200 ms latency there
 
 ## Medium
 - [ ] synth envelope occasionally doing a medium length attack even though attack is around 0
@@ -12,6 +17,8 @@ BUGS
 - [ ] when hooking up reverb and changing filter to 0 it can cause a loud sound which triggers the master volume safety
 - [ ] when 2 people join around same time, they spawn on top of each other
 	- [ ] server should choose their position
+- [ ] BUG: right click menu breaks when switching rooms?
+	- can't repro
 
 ## Low
 - [ ] when typing in chat, if someone leaves the input box loses focus
