@@ -92,7 +92,7 @@ export const makeSamples =
 		Map<number, Sample>(collection)
 
 export const sampleColors =
-	['red', 'blue', 'green', 'yellow', 'purple'] as const
+	['red', 'blue', 'green', 'yellow', 'purple', 'orange'] as const
 
 export interface Sample {
 	readonly label: string
@@ -135,9 +135,10 @@ const basicDrumSamples: Samples = makeSamples([
 	[66, {color: 'green', label: 'snare heavy', filePath: 'basic-drums/snare-heavy.wav'}],
 	[67, {color: 'purple', label: 'hat skiba', filePath: 'basic-drums/hat-skiba.wav'}],
 	[68, {color: 'purple', label: 'hat savannah', filePath: 'basic-drums/hat-savannah.wav'}],
-	[69, {color: 'purple', label: 'clap 1', filePath: 'basic-drums/clap-1.wav'}],
-	[70, {color: 'purple', label: 'rim click', filePath: 'basic-drums/rim-click.wav'}],
-	[71, {color: 'purple', label: 'bark rose', filePath: 'basic-drums/bark-rose.wav'}],
+	[69, {color: 'purple', label: 'hat open', filePath: 'basic-drums/hat-open.wav'}],
+	[70, {color: 'orange', label: 'clap 1', filePath: 'basic-drums/clap-1.wav'}],
+	[71, {color: 'orange', label: 'rim click', filePath: 'basic-drums/rim-click.wav'}],
+	[72, {color: 'orange', label: 'bark rose', filePath: 'basic-drums/bark-rose.wav'}],
 ])
 
 export const defaultSamples = Map({

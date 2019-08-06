@@ -27,4 +27,6 @@
 	- https://freesound.org/people/ntrier/sounds/437266/
 - bark rose
 	- https://freesound.org/people/nfrae/sounds/100032/
+- hat open
+	- https://freesound.org/people/shpira/sounds/317094/
 
