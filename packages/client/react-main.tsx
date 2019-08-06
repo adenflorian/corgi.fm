@@ -7,7 +7,10 @@ import {ConnectedApp} from './App'
 import {FirebaseContext, FirebaseContextStuff} from './Firebase/FirebaseContext'
 import {SvgGradients} from './SvgGradients'
 
-export function renderApp(store: Store, firebaseContextStuff: FirebaseContextStuff) {
+export function renderApp(
+	store: Store,
+	firebaseContextStuff: FirebaseContextStuff,
+) {
 	const HotProvider = hot(module)(Provider)
 	ReactDOM.render(
 		<HotProvider store={store}>

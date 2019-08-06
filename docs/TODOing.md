@@ -144,6 +144,8 @@
 - [√] BUG: errors when switching rooms with debug visual enabled
 - [√] blur new room button after click
 - [√] system message when saving a room
+- [ ] look into if we can not call `next(action)` for middleware actions
+- [ ] menus shouldnt disappear when mouse moves off of it
 
 - [ ] **Custom Sampler**
 	- morphing the piano sampler into a custom sampler

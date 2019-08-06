@@ -4,7 +4,7 @@ import {rateLimitedDebounceNoTrail} from '@corgifm/common/common-utils'
 import {
 	IClientState, organizeGraph,
 	selectClientById, selectLocalClientId, selectMemberCount,
-	selectRoomSettings,
+	selectRoomSettings, localActions,
 	selectClientInfo, shamuConnect, selectClientCount,
 } from '@corgifm/common/redux'
 import {CssColor} from '@corgifm/common/shamu-color'
@@ -18,7 +18,6 @@ import {AuthModalButton} from './Auth/Auth'
 import {Button} from './Button/Button'
 import {NewRoomButton} from './Button/CommonButtons'
 import {DiscordLink, NewsletterLink, PatreonLink} from './Links'
-import {localActions} from './local-middleware'
 import {ConnectedNameChanger} from './NameChanger'
 import {OptionsModalButton} from './Options/Options'
 import {ConnectedRoomSelector} from './RoomSelector'

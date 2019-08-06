@@ -4,12 +4,13 @@ import {rateLimitedDebounce} from '@corgifm/common/common-utils'
 import {
 	getConnectionNodeInfo, globalClockActions,
 	IClientAppState, pointersActions,
-	selectClientInfo, selectGlobalClockIsPlaying, selectIsLocalClientInLimitedMode, selectLocalClient,
-	selectPosition, selectSequencer, selectShamuMetaState, sequencerActions, userInputActions,
+	selectClientInfo, selectGlobalClockIsPlaying,
+	selectIsLocalClientInLimitedMode, selectLocalClient,
+	selectPosition, selectSequencer, selectShamuMetaState, sequencerActions,
+	userInputActions,
+	localActions, localMidiKeyPress, localMidiKeyUp, localMidiOctaveChange,
+	windowBlur,
 } from '@corgifm/common/redux'
-import {
-	localActions, localMidiKeyPress, localMidiKeyUp, localMidiOctaveChange, windowBlur,
-} from './local-middleware'
 import {mouseFromScreenToBoard} from './SimpleGlobalClientState'
 
 type IKeyBoardShortcuts = Map<string, KeyBoardShortcut>

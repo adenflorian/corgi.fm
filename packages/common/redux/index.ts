@@ -3,6 +3,7 @@
 // It controls the module load order
 
 export * from './multi-reducer'
+export * from './local-actions'
 export * from './client-info-redux'
 export * from './pointers-redux'
 export * from './sequencer-redux'
@@ -14,6 +15,7 @@ export * from './audio-redux'
 export * from './auth-redux'
 export * from './in-progress-redux'
 export * from './modals-redux'
+export * from './animation-redux'
 
 export * from './redux-utils'
 export * from './websocket-redux'

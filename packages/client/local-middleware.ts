@@ -1,6 +1,5 @@
 import {List, Map, Set} from 'immutable'
 import {Dispatch, Middleware} from 'redux'
-import {ActionType} from 'typesafe-actions'
 import uuid from 'uuid'
 import {MAX_MIDI_NOTE_NUMBER_127} from '@corgifm/common/common-constants'
 import {ConnectionNodeType, IMultiStateThing} from '@corgifm/common/common-types'
@@ -49,8 +48,7 @@ import {
 	VirtualKeyUpAction,
 	virtualOctaveChange,
 	VirtualOctaveChangeAction,
-	SERVER_ACTION,
-	BROADCASTER_ACTION, chatSystemMessage,
+	LocalAction, chatSystemMessage,
 } from '@corgifm/common/redux'
 import {pointersActions} from '@corgifm/common/redux/pointers-redux'
 import {graphStateSavesLocalStorageKey} from './client-constants'
@@ -61,72 +59,6 @@ import {saveUsernameToLocalStorage} from './username'
 import {corgiApiActions} from './RestClient/corgi-api-middleware'
 import {FirebaseContextStuff} from './Firebase/FirebaseContext'
 import {onChangeRoom} from './WebAudio';
-
-export type LocalMidiKeyPressAction = ReturnType<typeof localMidiKeyPress>
-export const localMidiKeyPress = (midiNote: IMidiNote) => ({
-	type: 'LOCAL_MIDI_KEY_PRESS',
-	midiNote,
-} as const)
-
-export type LocalMidiKeyUpAction = ReturnType<typeof localMidiKeyUp>
-export const localMidiKeyUp = (midiNote: IMidiNote) => ({
-	type: 'LOCAL_MIDI_KEY_UP',
-	midiNote,
-} as const)
-
-export type LocalMidiOctaveChangeAction = ReturnType<typeof localMidiOctaveChange>
-export const localMidiOctaveChange = (delta: number) => ({
-	type: 'LOCAL_MIDI_OCTAVE_CHANGE',
-	delta,
-} as const)
-
-export type WindowBlurAction = ReturnType<typeof windowBlur>
-export const windowBlur = () => ({
-	type: 'WINDOW_BLUR',
-} as const)
-
-export type DeleteNodeAction = ReturnType<typeof deleteNode>
-export const deleteNode = (nodeId: Id) => ({
-	type: 'DELETE_NODE',
-	nodeId,
-} as const)
-
-export const localActions = {
-	saveRoomToBrowser: () => ({
-		type: 'SAVE_ROOM_TO_BROWSER',
-	} as const),
-	saveRoomToFile: () => ({
-		type: 'SAVE_ROOM_TO_FILE',
-	} as const),
-	deleteSavedRoom: (id: Id) => ({
-		type: 'DELETE_SAVED_ROOM',
-		id,
-	} as const),
-	playShortNote: (sourceId: Id, note: IMidiNote) => ({
-		type: 'PLAY_SHORT_NOTE',
-		sourceId,
-		note,
-	} as const),
-	playShortNoteOnTarget: (targetId: Id, note: IMidiNote) => ({
-		type: 'PLAY_SHORT_NOTE_ON_TARGET',
-		targetId,
-		note,
-		SERVER_ACTION,
-		BROADCASTER_ACTION,
-	} as const),
-	cloneNode: (nodeId: Id, nodeType: ConnectionNodeType, withConnections: 'none' | 'all' | 'default') => ({
-		type: 'CLONE_NODE',
-		nodeId,
-		nodeType,
-		withConnections,
-	} as const),
-	pruneRoom: () => ({
-		type: 'PRUNE_ROOM',
-	} as const),
-} as const
-
-export type LocalAction = ActionType<typeof localActions> | LocalMidiKeyPressAction | LocalMidiKeyUpAction
-| LocalMidiOctaveChangeAction | WindowBlurAction | DeleteNodeAction
 
 type LocalMiddlewareActions = LocalAction | AddClientAction | VirtualKeyPressedAction | GridSequencerAction
 | UserInputAction | VirtualKeyUpAction | VirtualOctaveChangeAction | SetActiveRoomAction | ReadyAction

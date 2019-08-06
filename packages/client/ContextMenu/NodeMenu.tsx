@@ -4,9 +4,10 @@ import {ContextMenu, SubMenu, MenuItem, connectMenu} from 'react-contextmenu'
 import {List} from 'immutable'
 import {oneLine} from 'common-tags'
 import {ConnectionNodeType} from '@corgifm/common/common-types'
-import {getConnectionNodeInfo} from '@corgifm/common/redux'
+import {
+	getConnectionNodeInfo, deleteNode, localActions,
+} from '@corgifm/common/redux'
 import {nodeMenuId} from '../client-constants'
-import {deleteNode, localActions} from '../local-middleware'
 import {TopMenuBar} from './TopMenuBar'
 
 interface NodeMenuProps {

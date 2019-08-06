@@ -2,14 +2,13 @@ import React, {useCallback} from 'react'
 import {useSelector, useDispatch} from 'react-redux'
 import {
 	selectSamples, basicSamplerActions, selectSamplerViewOctave,
-	BasicSamplerState,
+	BasicSamplerState, localActions, IClientAppState,
 } from '@corgifm/common/redux'
 import {IMidiNote} from '@corgifm/common/MidiNote'
 import {Sample, dummySample, dummySamplePath} from '@corgifm/common/common-samples-stuff'
 import {ContextMenuTrigger} from 'react-contextmenu'
 import {Octave} from '@corgifm/common/common-types'
 import {CssColor} from '@corgifm/common/shamu-color'
-import {localActions} from '../local-middleware'
 import {samplePadMenuId} from '../ContextMenu/SamplePadMenu'
 import {KnobIncremental} from '../Knob/KnobIncremental'
 import {noop} from '@corgifm/common/common-utils';
