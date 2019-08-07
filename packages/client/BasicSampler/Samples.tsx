@@ -2,7 +2,7 @@ import React, {useCallback} from 'react'
 import {useSelector, useDispatch} from 'react-redux'
 import {
 	selectSamples, basicSamplerActions, selectSamplerViewOctave,
-	BasicSamplerState, localActions, IClientAppState,
+	BasicSamplerState, localActions, createAnimationFrameSelector,
 } from '@corgifm/common/redux'
 import {IMidiNote} from '@corgifm/common/MidiNote'
 import {Sample, dummySample, dummySamplePath} from '@corgifm/common/common-samples-stuff'
@@ -82,6 +82,7 @@ const SamplePad = ({samplerId, sample, midiNote}: SamplePadProps) => {
 	const playNote = useCallback(
 		() => dispatch(localActions.playShortNoteOnTarget(samplerId, midiNote)),
 		[dispatch, midiNote, samplerId])
+	const frame = useSelector(createAnimationFrameSelector(samplerId, midiNote))
 
 	return (
 		/* eslint-disable no-shadow */
@@ -98,7 +99,7 @@ const SamplePad = ({samplerId, sample, midiNote}: SamplePadProps) => {
 			})}
 		>
 			<div
-				className="sample"
+				className={`sample ${frame % 2 === 0 ? 'animate1' : ' animate2'}`}
 				onMouseDown={sample.filePath === dummySamplePath ? noop : playNote}
 				style={{color: CssColor[sample.color]}}
 			>

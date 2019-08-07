@@ -48,7 +48,7 @@ import {
 	VirtualKeyUpAction,
 	virtualOctaveChange,
 	VirtualOctaveChangeAction,
-	LocalAction, chatSystemMessage,
+	LocalAction, chatSystemMessage, animationActions,
 } from '@corgifm/common/redux'
 import {pointersActions} from '@corgifm/common/redux/pointers-redux'
 import {graphStateSavesLocalStorageKey} from './client-constants'
@@ -106,7 +106,8 @@ export function createLocalMiddleware(
 			}
 			case 'VIRTUAL_KEY_PRESSED': {
 				scheduleNote(
-					action.midiNote, action.id, getState().room, 'on', getAllInstruments)
+					action.midiNote, action.id, getState().room, 'on',
+					getAllInstruments, dispatch)
 
 				next(action)
 
@@ -210,7 +211,8 @@ export function createLocalMiddleware(
 
 				const noteToRelease = applyOctave(action.midiNote, localVirtualKeyboard.octave)
 
-				scheduleNote(noteToRelease, localVirtualKeyboard.id, state.room, 'off', getAllInstruments)
+				scheduleNote(noteToRelease, localVirtualKeyboard.id, state.room, 'off',
+					getAllInstruments, dispatch)
 
 				return dispatch(
 					virtualKeyUp(
@@ -227,7 +229,8 @@ export function createLocalMiddleware(
 					selectVirtualKeyboardById(state.room, action.id).octave,
 				)
 
-				scheduleNote(noteToRelease, action.id, state.room, 'off', getAllInstruments)
+				scheduleNote(noteToRelease, action.id, state.room, 'off',
+					getAllInstruments, dispatch)
 
 				return next(action)
 			}
@@ -258,8 +261,10 @@ export function createLocalMiddleware(
 				keyboard.pressedKeys.forEach(key => {
 					const noteToRelease = applyOctave(key, keyboard.octave)
 					const noteToSchedule = applyOctave(key, keyboard.octave + action.delta)
-					scheduleNote(noteToRelease, keyboard.id, state.room, 'off', getAllInstruments)
-					scheduleNote(noteToSchedule, keyboard.id, state.room, 'on', getAllInstruments)
+					scheduleNote(noteToRelease, keyboard.id, state.room, 'off',
+						getAllInstruments, dispatch)
+					scheduleNote(noteToSchedule, keyboard.id, state.room, 'on',
+						getAllInstruments, dispatch)
 				})
 
 				return next(action)
@@ -589,6 +594,7 @@ function scheduleNote(
 	roomState: IClientRoomState,
 	onOrOff: 'on' | 'off',
 	getAllInstruments: GetAllInstruments,
+	dispatch: Dispatch,
 ) {
 	if (_previousNotesForSourceId.has(sourceId) === false) {
 		_previousNotesForSourceId = _previousNotesForSourceId.set(sourceId, emptyMidiNotes)
@@ -620,6 +626,7 @@ function scheduleNote(
 
 		if (onOrOff === 'on') {
 			instrument.scheduleNote(note, 0, true, Set([sourceId]))
+			dispatch(animationActions.trigger(instrument.id, note))
 		} else {
 			instrument.scheduleRelease(note, 0)
 		}

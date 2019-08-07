@@ -35,17 +35,18 @@
                 justify-content: center;
                 align-items: center;
                 border: 1px solid currentColor;
+                animation-duration: 0.5s;
     
                 &:hover {
-                    background-color: @panelGrayLight;
+                    border-width: 2px;
                 }
 
-                &:not(:active) {
-                    transition: background-color 0.3s ease-out;
+                &.animate1 {
+                    animation-name: colorFade1;
                 }
-    
-                &:active {
-                    background-color: currentColor;
+
+                &.animate2 {
+                    animation-name: colorFade2;
                 }
 
                 .label {
@@ -66,5 +67,25 @@
 
     &.isNotPlaying {
         transition: box-shadow 0.3s ease-out;
+    }
+}
+
+@keyframes colorFade1 {
+    from {
+        background-color: currentColor;
+    }
+  
+    to {
+        background-color: @panelGray;
+    }
+}
+
+@keyframes colorFade2 {
+    from {
+        background-color: currentColor;
+    }
+
+    to {
+        background-color: @panelGray;
     }
 }

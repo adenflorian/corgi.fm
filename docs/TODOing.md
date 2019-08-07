@@ -146,6 +146,8 @@
 - [√] system message when saving a room
 - [ ] look into if we can not call `next(action)` for middleware actions
 - [ ] menus shouldnt disappear when mouse moves off of it
+- [ ] cant exit modal by clicking in between modals
+- [ ] add options to disable new animation things
 
 - [ ] **Custom Sampler**
 	- morphing the piano sampler into a custom sampler
