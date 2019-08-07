@@ -48,7 +48,7 @@ import {
 	VirtualKeyUpAction,
 	virtualOctaveChange,
 	VirtualOctaveChangeAction,
-	LocalAction, chatSystemMessage, animationActions,
+	LocalAction, chatSystemMessage, animationActions, selectOption, AppOptions,
 } from '@corgifm/common/redux'
 import {pointersActions} from '@corgifm/common/redux/pointers-redux'
 import {graphStateSavesLocalStorageKey} from './client-constants'
@@ -106,7 +106,7 @@ export function createLocalMiddleware(
 			}
 			case 'VIRTUAL_KEY_PRESSED': {
 				scheduleNote(
-					action.midiNote, action.id, getState().room, 'on',
+					action.midiNote, action.id, getState(), 'on',
 					getAllInstruments, dispatch)
 
 				next(action)
@@ -211,7 +211,7 @@ export function createLocalMiddleware(
 
 				const noteToRelease = applyOctave(action.midiNote, localVirtualKeyboard.octave)
 
-				scheduleNote(noteToRelease, localVirtualKeyboard.id, state.room, 'off',
+				scheduleNote(noteToRelease, localVirtualKeyboard.id, state, 'off',
 					getAllInstruments, dispatch)
 
 				return dispatch(
@@ -229,7 +229,7 @@ export function createLocalMiddleware(
 					selectVirtualKeyboardById(state.room, action.id).octave,
 				)
 
-				scheduleNote(noteToRelease, action.id, state.room, 'off',
+				scheduleNote(noteToRelease, action.id, state, 'off',
 					getAllInstruments, dispatch)
 
 				return next(action)
@@ -261,9 +261,9 @@ export function createLocalMiddleware(
 				keyboard.pressedKeys.forEach(key => {
 					const noteToRelease = applyOctave(key, keyboard.octave)
 					const noteToSchedule = applyOctave(key, keyboard.octave + action.delta)
-					scheduleNote(noteToRelease, keyboard.id, state.room, 'off',
+					scheduleNote(noteToRelease, keyboard.id, state, 'off',
 						getAllInstruments, dispatch)
-					scheduleNote(noteToSchedule, keyboard.id, state.room, 'on',
+					scheduleNote(noteToSchedule, keyboard.id, state, 'on',
 						getAllInstruments, dispatch)
 				})
 
@@ -591,7 +591,7 @@ let _previousNotesForSourceId = Map<Id, MidiNotes>()
 function scheduleNote(
 	note: IMidiNote,
 	sourceId: Id,
-	roomState: IClientRoomState,
+	state: IClientAppState,
 	onOrOff: 'on' | 'off',
 	getAllInstruments: GetAllInstruments,
 	dispatch: Dispatch,
@@ -616,17 +616,19 @@ function scheduleNote(
 
 	// logger.log('[local-middleware.scheduleNote] note: ' + note + ' | onOrOff: ' + onOrOff)
 
-	const directlyConnectedSequencerIds = selectDirectDownstreamSequencerIds(roomState, sourceId).toArray()
+	const directlyConnectedSequencerIds = selectDirectDownstreamSequencerIds(state.room, sourceId).toArray()
 
-	const targetIds = selectConnectionsWithSourceIds(roomState, [sourceId].concat(directlyConnectedSequencerIds))
+	const targetIds = selectConnectionsWithSourceIds(state.room, [sourceId].concat(directlyConnectedSequencerIds))
 		.map(x => x.targetId)
+	
+	const fancy = selectOption(state, AppOptions.graphicsExtraAnimations)
 
 	getAllInstruments().forEach(instrument => {
 		if (targetIds.includes(instrument.id) === false) return
 
 		if (onOrOff === 'on') {
 			instrument.scheduleNote(note, 0, true, Set([sourceId]))
-			dispatch(animationActions.trigger(instrument.id, note))
+			if (fancy) dispatch(animationActions.trigger(instrument.id, note))
 		} else {
 			instrument.scheduleRelease(note, 0)
 		}

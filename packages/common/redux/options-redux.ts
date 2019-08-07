@@ -14,6 +14,7 @@ export enum AppOptions {
 	graphicsMultiColoredConnections = 'graphicsMultiColoredConnections',
 	graphicsECS = 'graphicsECS',
 	graphicsExpensiveZoomPan = 'graphicsExpensiveZoomPan',
+	graphicsExtraAnimations = 'graphicsExtraAnimations',
 }
 
 export const initialOptionsState = Object.freeze({
@@ -27,6 +28,7 @@ export const initialOptionsState = Object.freeze({
 	graphicsMultiColoredConnections: true,
 	graphicsECS: true,
 	graphicsExpensiveZoomPan: true,
+	graphicsExtraAnimations: false,
 })
 
 type SetOptionAction = ReturnType<typeof setOption>

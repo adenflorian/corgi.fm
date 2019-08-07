@@ -145,10 +145,11 @@
 - [√] blur new room button after click
 - [√] system message when saving a room
 - [ ] look into if we can not call `next(action)` for middleware actions
-- [ ] menus shouldnt disappear when mouse moves off of it
 - [ ] cant exit modal by clicking in between modals
-- [ ] add options to disable new animation things
 - [ ] put redux clients in a Map
+
+- [√] add options to disable new animation things
+- [ ] menus shouldnt disappear when mouse moves off of it
 
 - [ ] **Custom Sampler**
 	- morphing the piano sampler into a custom sampler
