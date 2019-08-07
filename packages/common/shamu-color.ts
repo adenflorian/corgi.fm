@@ -1,8 +1,9 @@
 /* eslint-disable import/newline-after-import */
 import * as ColorAll from 'color'
-import {List} from 'immutable'
+import {List, Map} from 'immutable'
 import {removeOctave} from './common-utils'
 import {IMidiNote} from './MidiNote'
+import {string} from 'prop-types';
 // TODO
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const ColorDefault = require('color')
@@ -25,15 +26,41 @@ export function getColorStringForMidiNote(note: IMidiNote): string {
 	return `hsl(${removeOctave(note) * 23}, 90%, 60%)`
 }
 
+let finalMixedColors = Map<string, string>()
+
 export function mixColors(colors: List<string>): string {
 	// console.log('colors.count(): ', colors.count())
 	if (colors.count() === 0) return 'black'
 	if (colors.count() === 1) return colors.first()
-	return `hsl(${colorFunc(colors.reduce(mix2Colors)).hue()}, 90%, 50%)`
+
+	const mixedColorString = colors.reduce(mix2Colors)
+	const cachedColor = finalMixedColors.get(mixedColorString, null)
+
+	if (cachedColor) return cachedColor
+	
+	const finalColor = `hsl(${colorFunc(mixedColorString).hue()}, 90%, 50%)`
+	finalMixedColors = finalMixedColors.set(mixedColorString, finalColor)
+
+	return finalColor
 }
 
+let mixedColors = Map<string, Map<string, string>>()
+
 export function mix2Colors(colorA: string, colorB: string): string {
-	return colorFunc(colorA).mix(colorFunc(colorB)).toString()
+	const cachedColor = mixedColors
+		.get(colorA, Map<string, string>())
+		.get(colorB, null)
+
+	if (cachedColor) return cachedColor
+
+	const mixedColor = colorFunc(colorA).mix(colorFunc(colorB)).toString()
+
+	mixedColors = mixedColors.update(
+		colorA,
+		Map<string, string>(),
+		updater => updater.set(colorB, mixedColor))
+
+	return mixedColor
 }
 
 export function hashbow(input: IHashable, saturation = 90, lightness = 50) {
