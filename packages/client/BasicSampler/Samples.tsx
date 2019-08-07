@@ -17,7 +17,7 @@ interface Props {
 	samplerId: string
 }
 
-export const Samples = ({samplerId}: Props) => {
+export const Samples = React.memo(({samplerId}: Props) => {
 	const samples = useSelector(selectSamples(samplerId))
 	const octave = useSelector(selectSamplerViewOctave(samplerId))
 	const dispatch = useDispatch()
@@ -49,7 +49,7 @@ export const Samples = ({samplerId}: Props) => {
 			</div>
 		</div>
 	)
-}
+})
 
 interface OctaveKnobProps {
 	octave: Octave
@@ -77,7 +77,7 @@ interface SamplePadProps {
 	midiNote: IMidiNote
 }
 
-const SamplePad = ({samplerId, sample, midiNote}: SamplePadProps) => {
+const SamplePad = React.memo(({samplerId, sample, midiNote}: SamplePadProps) => {
 	const dispatch = useDispatch()
 	const playNote = useCallback(
 		() => dispatch(localActions.playShortNoteOnTarget(samplerId, midiNote)),
@@ -109,4 +109,4 @@ const SamplePad = ({samplerId, sample, midiNote}: SamplePadProps) => {
 			</div>
 		</ContextMenuTrigger>
 	)
-}
+})
