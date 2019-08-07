@@ -148,6 +148,7 @@
 - [ ] menus shouldnt disappear when mouse moves off of it
 - [ ] cant exit modal by clicking in between modals
 - [ ] add options to disable new animation things
+- [ ] put redux clients in a Map
 
 - [ ] **Custom Sampler**
 	- morphing the piano sampler into a custom sampler

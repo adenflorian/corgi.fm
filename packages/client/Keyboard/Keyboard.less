@@ -12,17 +12,22 @@
         background-color: @keyWhite;
     }
     .white+.white {
-        box-shadow: inset 1px 0 0 fade(@frenchGray, 60%);
+        box-shadow: inset 1px 0 0 fade(@borderGrayLight, 60%);
     }
     .black {
         background-color: @panelGrayDark;
     }
     &.isLocal {
         .white:hover {
-            background-color: rgb(198, 198, 223);
+            background-color: @defaultGray;
         }
         .black:hover {
             background-color: @gray3;
+        }
+    }
+    &.notLocal {
+        .octaveKeys {
+            display: none !important;
         }
     }
     .key {
@@ -47,7 +52,7 @@
             color: @gray2;
         }
         &.black .noteName {
-            color: rgba(235, 235, 246, 0.925);
+            color: hsla(240, 0%, 94%, 0.925);
         }
         &:last-child {
             border-bottom-right-radius: @mainBorderRadius;

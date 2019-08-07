@@ -37,7 +37,7 @@ export function mixColors(colors: List<string>): string {
 	const cachedColor = finalMixedColors.get(mixedColorString, null)
 
 	if (cachedColor) return cachedColor
-	
+
 	const finalColor = `hsl(${colorFunc(mixedColorString).hue()}, 90%, 50%)`
 	finalMixedColors = finalMixedColors.set(mixedColorString, finalColor)
 
@@ -79,15 +79,13 @@ export function hashbow(input: IHashable, saturation = 90, lightness = 50) {
 
 // Keep in sync with colors.less
 export enum CssColor {
-	frenchGray = '#BDBDC6',
 	panelGray = '#252525',
 	panelGrayDark = '#1A1A1A',
 	panelGrayLight = 'hsl(0, 0%, 25%)',
 	panelGrayTransparent = 'rgba(40, 40, 50, 0.5)',
 	disabledGray = 'hsla(0, 0%, 48%, 1)',
 	gray2 = '#31313d',
-	gray3 = '#424258',
-	knobGray = '#33333b',
+	gray3 = 'hsl(240, 0%, 30%)',
 	keyWhite = '#EBEBF6',
 	defaultGray = 'rgb(226, 226, 226)',
 	subtleGrayWhiteBg = 'hsl(240, 0%, 65%)',

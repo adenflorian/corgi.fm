@@ -174,13 +174,15 @@
         {"language": "typescriptreact", "autoFix": true},
     ],
     "eslint.enable": false,
-    "eslint.autoFixOnSave": true,
     "eslint.options": {
         "ignorePath": ".gitignore",
         "extensions": [".js",".jsx",".ts",".tsx",]
     },
     "editor.formatOnSave": false,
     "eslint.packageManager": "yarn",
+    "eslint.run": "onSave",
+    "eslint.quiet": true,
+    "eslint.autoFixOnSave": false,
     // "eslint.autoFixOnSave": true,
     // "eslint.validate": [
     //     "javascript",

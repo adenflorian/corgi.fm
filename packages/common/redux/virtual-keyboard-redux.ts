@@ -6,6 +6,7 @@ import {applyOctave} from '../common-utils'
 import {emptyMidiNotes, IMidiNote, IMidiNotes, MidiNotes} from '../MidiNote'
 import {NodeSpecialState} from './shamu-graph'
 import {addMultiThing, BROADCASTER_ACTION, IClientRoomState, IMultiState, IMultiStateThings, makeMultiReducer, NetworkActionType, SERVER_ACTION} from '.'
+import {IClientAppState} from './common-redux-types';
 
 export interface VirtualKeyAction {
 	type: string
@@ -168,6 +169,11 @@ export const selectAllVirtualKeyboardIds = createSelector(
 
 export const selectVirtualKeyboardById = (state: IClientRoomState, id: Id) => {
 	return selectAllVirtualKeyboards(state)[id as string] || VirtualKeyboardState.dummy
+}
+
+export function selectVirtualKeyboardOctave(id: Id) {
+	return (state: IClientAppState) =>
+		selectVirtualKeyboardById(state.room, id).octave
 }
 
 export const selectVirtualKeyboardHasPressedKeys = (state: IClientRoomState, id: Id) => {

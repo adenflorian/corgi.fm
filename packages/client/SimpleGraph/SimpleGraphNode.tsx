@@ -16,7 +16,7 @@ import {ConnectedGridSequencerContainer} from '../GridSequencer/GridSequencerCon
 import {GroupSequencerView} from '../GroupSequencer/GroupSequencer'
 import {ConnectedInfiniteSequencer} from '../InfiniteSequencer/InfiniteSequencer'
 import {ConnectedBasicSynthesizerView} from '../Instruments/BasicSynthesizerView'
-import {ConnectedKeyboard} from '../Keyboard/Keyboard'
+import {Keyboard} from '../Keyboard/Keyboard'
 import {ConnectedMasterControls} from '../MasterControls'
 import {ConnectedSimpleCompressor} from '../ShamuNodes/SimpleCompressor/SimpleCompressorView'
 import {ConnectedSimpleDelay} from '../ShamuNodes/SimpleDelay/SimpleDelayView'
@@ -135,7 +135,7 @@ export function getComponentByNodeType(type: ConnectionNodeType, id: Id, color: 
 
 		case ConnectionNodeType.gridSequencer: return <ConnectedGridSequencerContainer id={id} />
 		case ConnectionNodeType.infiniteSequencer: return <ConnectedInfiniteSequencer id={id} />
-		case ConnectionNodeType.virtualKeyboard: return <ConnectedKeyboard id={id} />
+		case ConnectionNodeType.virtualKeyboard: return <Keyboard id={id} />
 
 		case ConnectionNodeType.basicSynthesizer: return <ConnectedBasicSynthesizerView id={id} color={color} />
 		case ConnectionNodeType.basicSampler: return <ConnectedBasicSampler id={id} color={color} />
