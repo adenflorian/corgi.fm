@@ -16,6 +16,7 @@ export * from './auth-redux'
 export * from './in-progress-redux'
 export * from './modals-redux'
 export * from './animation-redux'
+export * from './upload-redux'
 
 export * from './redux-utils'
 export * from './websocket-redux'

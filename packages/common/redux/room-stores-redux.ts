@@ -8,6 +8,7 @@ import {
 	pointersStateReducer, positionsReducer, roomMembersReducer,
 	RoomsReduxAction, shamuGraphReducer,
 } from '.'
+import {uploadReducer} from './upload-redux';
 
 export type RoomAction = ReturnType<typeof createRoomAction>
 export const createRoomAction = (action: Action, room: string) => ({
@@ -26,6 +27,7 @@ export const roomReducers = combineReducers({
 	positions: positionsReducer,
 	roomSettings: roomSettingsReducer,
 	shamuGraph: shamuGraphReducer,
+	upload: uploadReducer,
 	pointers: pointersStateReducer,
 })
 
