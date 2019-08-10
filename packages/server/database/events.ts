@@ -7,7 +7,7 @@ export const eventsQueries = (db: Db) => ({
 	async saveUserConnectEventAsync(event: UserConnectedEvent) {
 		const startTime = Date.now()
 		logger.debug('saveUserConnectEvent: ', {event})
-		const result = await db.collection(eventsCollectionName).insertOne(event)
+		const result = await db.collection<UserConnectedEvent>(eventsCollectionName).insertOne(event)
 		logger.debug('saveUserConnectEvent result: ', {insertedCount: result.insertedCount, time: `${Date.now() - startTime}ms`})
 		return result.insertedCount
 	},

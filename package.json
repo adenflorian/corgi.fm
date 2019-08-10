@@ -23,6 +23,7 @@
     "test-common": "jest -i --config packages/common/jest.config.js",
     "test-server": "jest -i --config packages/server/jest.config.js",
     "test-api": "yarn test-server --testPathPattern api",
+    "test-db": "yarn test-server --testPathPattern database",
     "clean": "rm -rf .cache built dist *.log .eslintcache && jest --clearCache",
     "deploy-test": "yarn version-patch && yarn build && bash scripts/deploy-test.sh",
     "deploy-prod": "yarn version-patch && yarn build && bash scripts/deploy-prod.sh",

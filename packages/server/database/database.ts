@@ -4,6 +4,7 @@ import {logger} from '@corgifm/common/logger'
 import {getDbConnector} from '../server-config'
 import {eventsQueries} from './events'
 import {usersQueries} from './users'
+import {uploadsQueries} from './uploads'
 
 export type DBStore = ThenArg<typeof connectDB>
 
@@ -24,6 +25,7 @@ export async function connectDB() {
 		db,
 		events: eventsQueries(db),
 		users: usersQueries(db),
+		uploads: uploadsQueries(db),
 		async close() {
 			await client.close()
 			await stop()

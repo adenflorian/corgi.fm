@@ -150,6 +150,9 @@
 
 - [√] add options to disable new animation things
 - [ ] menus shouldnt disappear when mouse moves off of it
+	- [ ] requires PR for `react-context`
+- [ ] pass corgi client version on all api requests
+	- [ ] put on uploaded samples
 
 - [ ] **Custom Sampler**
 	- morphing the piano sampler into a custom sampler
@@ -162,7 +165,16 @@
 		- [√] Default samples (built-in samples)
 		- [ ] Public samples
 		- [ ] Upload...
+			- click upload
+			- show file browser
+			- select file
+			- request signed URL from server
+			- upload to signed URL
+				- how will corgi server know if upload was successful?
+				- from corgi server upload to space is free bandwidth, so maybe simpler to upload to corgi?
 		- [ ] Your samples
+			- menu should show all of your uploaded samples
+				- list from corgi DB or DO?
 		- [ ] Samples in room
 	- [ ] right click pad > clear
 	- [ ] allow scrolling thru menu
@@ -192,6 +204,7 @@
 		- [√] samples manager middleware?
 		- [√] if `getSample` gets called and sample isn't loaded, then that's an error?
 
+- [ ] `Store<IClientAppState>` -> `ClientStore`
 - [ ] show note name when hovering on notes in sequencers
 - [ ] notes on left of grid seq should play on click
 - [ ] empty column on right side of infinite seq to add new notes
@@ -298,6 +311,8 @@ Yes, https://mmckegg.github.io/web-audio-school/, exercise 13 is exactly what yo
 
 
 # 0.6.0
+- [ ] https://github.com/pelotom/runtypes
+- [ ] https://github.com/hmil/rest.ts
 - [ ] built in synth for keyboard
 - [ ] change clients redux so every client only knows about clients in the same room
 - [ ] https://github.com/TheLarkInn/Front-End-Checklist
