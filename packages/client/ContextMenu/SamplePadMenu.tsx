@@ -21,9 +21,20 @@ export const SamplePadMenu = () => {
 			<TopMenuBar label={'sample pad menu'} />
 			<ColorsMenu />
 			<DefaultSamplesMenu />
+			{/* <UploadMenuItem /> */}
 		</ContextMenu>
 	)
 }
+
+// function UploadMenuItem() {
+// 	return (
+// 		<MenuItem>
+// 			<span className={`uploadSampleMenuItem`}>
+// 				Upload sample...
+// 			</span>
+// 		</MenuItem>
+// 	)
+// }
 
 function DefaultSamplesMenu() {
 	return (

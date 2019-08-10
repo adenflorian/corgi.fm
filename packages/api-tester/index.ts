@@ -185,8 +185,8 @@ export function del(args: TestRequest): RequestTest {
 }
 
 function getCallerLocation(): string {
-	var e = new Error()
-	var stack = e.stack!.toString().split(/\r\n|\n/)
+	const e = new Error()
+	const stack = e.stack!.toString().split(/\r\n|\n/)
 	return 'failed api test location ' + stack[3]
 }
 

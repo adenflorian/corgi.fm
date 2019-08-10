@@ -19,7 +19,7 @@ export interface ApiRequest {
 	headers: Headers
 	body: unknown
 	originalRequest: Request
-	originalResponse: Response,
+	originalResponse: Response
 }
 
 export interface RoutedRequest extends ApiRequest {

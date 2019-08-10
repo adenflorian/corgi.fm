@@ -314,7 +314,7 @@ export function loadServerStuff(room: string, serverStore: Store<IServerState>, 
 		return {
 			...position,
 			width: nodeState.width,
-			height: nodeState.height
+			height: nodeState.height,
 		}
 	})
 	dispatchToRoom(replacePositions(newPositions))

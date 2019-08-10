@@ -1,8 +1,11 @@
-import {Middleware} from 'redux'
+import {Middleware, Dispatch} from 'redux'
 import {
 	IClientAppState, IClientState, selectLocalClient, setClientName,
+	uploadActions,
+	basicSamplerActions,
 } from '@corgifm/common/redux'
 import {User, UserUpdate} from '@corgifm/common/models/User'
+import {Upload} from '@corgifm/common/models/OtherModels'
 import {Header} from '@corgifm/common/common-types'
 import {ActionType} from 'typesafe-actions'
 import {debounce} from 'lodash'
@@ -21,12 +24,18 @@ export const corgiApiActions = {
 	saveLocalUser: () => ({
 		type: 'CORGI_API_SAVE_LOCAL_USER',
 	} as const),
+	uploadSample: (parentId: Id, childId: number, file: File) => ({
+		type: 'CORGI_API_UPLOAD_SAMPLE',
+		parentId,
+		childId,
+		file,
+	} as const),
 } as const
 
 type CorgiApiAction = ActionType<typeof corgiApiActions>
 
 export function createCorgiApiMiddleware(
-	firebase: FirebaseContextStuff
+	firebase: FirebaseContextStuff,
 ): Middleware<{}, IClientAppState> {
 
 	let localUid: Id
@@ -57,6 +66,9 @@ export function createCorgiApiMiddleware(
 			case 'CORGI_API_SAVE_LOCAL_USER': {
 				const user = makeUserFromClient(selectLocalClient(getState()))
 				return putUserDebounced(localUid, user)
+			}
+			case 'CORGI_API_UPLOAD_SAMPLE': {
+				return uploadSample(dispatch, action)
 			}
 		}
 	}
@@ -106,6 +118,56 @@ export function createCorgiApiMiddleware(
 				if (response.status !== 204) {
 					throw new Error(`[putUser] unexpected status ${response.status}`)
 				}
+			})
+	}
+
+	// TODO Cleanup
+	async function uploadSample(
+		dispatch: Dispatch, action: ReturnType<typeof corgiApiActions.uploadSample>,
+	): Promise<void> {
+
+		dispatch(uploadActions.setStatus(
+			action.parentId, action.childId, 'started'))
+
+		const headers = {
+			[Header.Authorization]: getAuthHeader(),
+		} as const
+
+		const formData = new FormData()
+		formData.append('file', action.file)
+		formData.append('uid', localUid.toString())
+
+		const options: RequestInit = {
+			method: 'POST',
+			headers,
+			body: formData,
+		}
+
+		return fetch(`${getUrl()}/api/samples`, options)
+			.then(response => {
+				if (response.status !== 200) {
+					throw new Error(`unexpected status ${response.status}`)
+				}
+				return response.json()
+			})
+			.then(async data => transformAndValidate(Upload, data))
+			.then(sampleLocator => {
+				dispatch(uploadActions.setStatus(
+					action.parentId, action.childId, 'complete'))
+				dispatch(basicSamplerActions.setSample(
+					action.parentId,
+					action.childId,
+					{
+						filePath: sampleLocator.path,
+						label: action.file.name,
+						color: 'blue',
+					}))
+			})
+			.catch(error => {
+				logger.error('uploadSample fetch error: ',
+					JSON.stringify(error, null, 2))
+				dispatch(uploadActions.setStatus(
+					action.parentId, action.childId, 'failed'))
 			})
 	}
 

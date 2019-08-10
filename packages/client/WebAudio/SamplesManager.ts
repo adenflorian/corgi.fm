@@ -1,6 +1,6 @@
 import {logger} from '@corgifm/common/logger'
+import {dummySamplePath} from '@corgifm/common/common-samples-stuff'
 import {getCdnUrl} from '../client-utils'
-import {dummySamplePath} from '@corgifm/common/common-samples-stuff';
 
 // if (noteName === 'Gb7' || noteName === 'Ab3') return
 
@@ -57,7 +57,7 @@ export class SamplesManager {
 		this._samplesStatus.set(path, SampleStatus.Requested)
 
 		const sample = await fetch(
-			`${getCdnUrl()}/static/samplers/${path}`,
+			`${getCdnUrl()}${path}`,
 			{mode: 'cors'}
 		)
 			.then(async response => {

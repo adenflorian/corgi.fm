@@ -1,4 +1,4 @@
-import {RequestHandler, Request} from 'express'
+import {RequestHandler, Request, Response} from 'express'
 import {ServerStore} from '../server-redux-types'
 import {DBStore} from '../database/database'
 import {CorgiMethodNotAllowedError} from '../api-error'
@@ -6,8 +6,7 @@ import {
 	isSupportedMethod, ApiRequest, ApiResponse, defaultResponse,
 } from './api-types'
 import {getUsersController} from './users-controller'
-import {getSamplesController} from './samples-controller';
-import {Response} from 'express';
+import {getSamplesController} from './samples-controller'
 
 export function apiRouter(serverStore: ServerStore, dbStore: DBStore): RequestHandler {
 	const usersController = getUsersController(serverStore, dbStore)

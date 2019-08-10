@@ -2,13 +2,13 @@ import {Map} from 'immutable'
 import {Action, combineReducers, Reducer} from 'redux'
 import {ghostConnectionsReducer} from './ghost-connections-redux'
 import {roomSettingsReducer} from './room-settings-redux'
+import {uploadReducer} from './upload-redux'
 import {
 	chatReducer, connectionsReducer, CREATE_ROOM, DELETE_ROOM,
 	globalClockReducer, IClientRoomState, IServerState,
 	pointersStateReducer, positionsReducer, roomMembersReducer,
 	RoomsReduxAction, shamuGraphReducer,
 } from '.'
-import {uploadReducer} from './upload-redux';
 
 export type RoomAction = ReturnType<typeof createRoomAction>
 export const createRoomAction = (action: Action, room: string) => ({

@@ -8,13 +8,12 @@ import {DBStore} from '../database/database'
 import {ServerStore} from '../server-redux-types'
 import {routeIfSecure} from '../security-middleware'
 import {CorgiBadRequestError} from '../api-error'
+import {getServerEnv} from '../is-prod-server'
+import {getServerVersion} from '../server-version'
 import {
 	ApiResponse, Method, SecureApiRequest,
 	defaultResponse, RoutedRequest, ApiRequest,
 } from './api-types'
-import {getServerEnv} from '../is-prod-server';
-import {getServerVersion} from '../server-version';
-
 
 const s3 = new S3({
 	apiVersion: '2006-03-01',
@@ -158,7 +157,7 @@ async function uploadToS3(
 }
 
 interface UploadResult {
-	readonly body: unknown,
-	readonly file: Express.Multer.File,
-	readonly validatedExtension: string,
+	readonly body: unknown
+	readonly file: Express.Multer.File
+	readonly validatedExtension: string
 }

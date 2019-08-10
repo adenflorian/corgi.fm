@@ -15,7 +15,8 @@ export const localMidiKeyUp = (midiNote: IMidiNote) => ({
 	midiNote,
 } as const)
 
-export type LocalMidiOctaveChangeAction = ReturnType<typeof localMidiOctaveChange>
+export type LocalMidiOctaveChangeAction =
+	ReturnType<typeof localMidiOctaveChange>
 export const localMidiOctaveChange = (delta: number) => ({
 	type: 'LOCAL_MIDI_OCTAVE_CHANGE',
 	delta,
@@ -55,7 +56,11 @@ export const localActions = {
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	} as const),
-	cloneNode: (nodeId: Id, nodeType: ConnectionNodeType, withConnections: 'none' | 'all' | 'default') => ({
+	cloneNode: (
+		nodeId: Id,
+		nodeType: ConnectionNodeType,
+		withConnections: 'none' | 'all' | 'default'
+	) => ({
 		type: 'CLONE_NODE',
 		nodeId,
 		nodeType,
@@ -66,5 +71,6 @@ export const localActions = {
 	} as const),
 } as const
 
-export type LocalAction = ActionType<typeof localActions> | LocalMidiKeyPressAction | LocalMidiKeyUpAction
-	| LocalMidiOctaveChangeAction | WindowBlurAction | DeleteNodeAction
+export type LocalAction = ActionType<typeof localActions>
+| LocalMidiKeyPressAction | LocalMidiKeyUpAction
+| LocalMidiOctaveChangeAction | WindowBlurAction | DeleteNodeAction

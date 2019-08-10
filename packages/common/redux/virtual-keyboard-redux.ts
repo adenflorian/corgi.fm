@@ -1,12 +1,17 @@
 import {Set} from 'immutable'
 import {createSelector} from 'reselect'
 import * as uuid from 'uuid'
-import {ConnectionNodeType, IMultiStateThing, IMultiStateThingDeserializer, Octave} from '../common-types'
+import {
+	ConnectionNodeType, IMultiStateThing, IMultiStateThingDeserializer, Octave,
+} from '../common-types'
 import {applyOctave} from '../common-utils'
 import {emptyMidiNotes, IMidiNote, IMidiNotes, MidiNotes} from '../MidiNote'
 import {NodeSpecialState} from './shamu-graph'
-import {addMultiThing, BROADCASTER_ACTION, IClientRoomState, IMultiState, IMultiStateThings, makeMultiReducer, NetworkActionType, SERVER_ACTION} from '.'
-import {IClientAppState} from './common-redux-types';
+import {IClientAppState} from './common-redux-types'
+import {
+	addMultiThing, BROADCASTER_ACTION, IClientRoomState, IMultiState,
+	IMultiStateThings, makeMultiReducer, NetworkActionType, SERVER_ACTION,
+} from '.'
 
 export interface VirtualKeyAction {
 	type: string

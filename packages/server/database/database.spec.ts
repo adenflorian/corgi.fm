@@ -1,5 +1,5 @@
+import {makeUser} from '@corgifm/common/models/User'
 import {connectDB, DBStore} from './database'
-import {makeUser} from '@corgifm/common/models/User';
 
 const uidA = 'uidA111Lp7TlwLzH4r2ivWTcu1C2'
 const uidB = 'uidB222Lp7TlwLzH4r2ivWTcu1C2'
@@ -43,7 +43,7 @@ describe('Database Tests', () => {
 
 			const result = await db.users.getByUid(uidA)
 
-			if (!result) fail('expected not null')
+			if (!result) throw new Error('expected not null')
 			expect(result).toEqual(makeUser({
 				color: '#FF0000',
 				displayName: 'bob',

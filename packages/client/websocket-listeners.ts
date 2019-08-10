@@ -67,8 +67,7 @@ export function setupWebsocketAndListeners(store: Store) {
 
 			eventClientServerVersionMismatch(clientVersion, serverVersion)
 
-			const refreshedToGetNewVersion = window.localStorage.getItem(refreshedToGetNewVersionKey)
-				? true : false
+			const refreshedToGetNewVersion = !!window.localStorage.getItem(refreshedToGetNewVersionKey)
 
 			if (refreshedToGetNewVersion) {
 				window.localStorage.removeItem(refreshedToGetNewVersionKey)

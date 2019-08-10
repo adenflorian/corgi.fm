@@ -1,17 +1,29 @@
-import React, {useCallback} from 'react'
+import React, {useCallback, useState} from 'react'
 import {useSelector, useDispatch} from 'react-redux'
 import {
 	selectSamples, basicSamplerActions, selectSamplerViewOctave,
 	BasicSamplerState, localActions, createAnimationFrameSelector,
+	createUploadStatusSelector,
+	chatSystemMessage,
 } from '@corgifm/common/redux'
 import {IMidiNote} from '@corgifm/common/MidiNote'
-import {Sample, dummySample, dummySamplePath} from '@corgifm/common/common-samples-stuff'
+import {
+	Sample, dummySample, dummySamplePath,
+} from '@corgifm/common/common-samples-stuff'
 import {ContextMenuTrigger} from 'react-contextmenu'
 import {Octave} from '@corgifm/common/common-types'
 import {CssColor} from '@corgifm/common/shamu-color'
+import {
+	noop, MBtoBytes, validateSampleFilenameExtension,
+} from '@corgifm/common/common-utils'
+import {oneLine} from 'common-tags'
+import {
+	maxSampleUploadFileSizeMB, allowedSampleUploadFileTypes,
+} from '@corgifm/common/common-constants'
 import {samplePadMenuId} from '../ContextMenu/SamplePadMenu'
 import {KnobIncremental} from '../Knob/KnobIncremental'
-import {noop} from '@corgifm/common/common-utils';
+import {logger} from '../client-logger'
+import {corgiApiActions} from '../RestClient/corgi-api-middleware'
 
 interface Props {
 	samplerId: string
@@ -77,36 +89,104 @@ interface SamplePadProps {
 	midiNote: IMidiNote
 }
 
-const SamplePad = React.memo(({samplerId, sample, midiNote}: SamplePadProps) => {
-	const dispatch = useDispatch()
-	const playNote = useCallback(
-		() => dispatch(localActions.playShortNoteOnTarget(samplerId, midiNote)),
-		[dispatch, midiNote, samplerId])
-	const frame = useSelector(createAnimationFrameSelector(samplerId, midiNote))
+// TODO Clean up
+const SamplePad = React.memo(
+	({samplerId, sample, midiNote}: SamplePadProps) => {
+		const dispatch = useDispatch()
+		const playNote = useCallback(
+			() => dispatch(localActions.playShortNoteOnTarget(samplerId, midiNote)),
+			[dispatch, midiNote, samplerId])
+		const frame = useSelector(createAnimationFrameSelector(samplerId, midiNote))
+		const [dragState, setDragState] = useState<'none' | 'over'>('none')
+		const uploadStatus = useSelector(
+			createUploadStatusSelector(samplerId, midiNote))
 
-	return (
-		/* eslint-disable no-shadow */
-		// @ts-ignore disableIfShiftIsPressed
-		<ContextMenuTrigger
-			id={samplePadMenuId}
-			disableIfShiftIsPressed={true}
-			holdToDisplay={-1}
-			samplerId={samplerId}
-			midiNote={midiNote}
-			collect={({samplerId, midiNote}) => ({
-				samplerId,
-				midiNote,
-			})}
-		>
-			<div
-				className={`sample ${frame % 2 === 0 ? 'animate1' : ' animate2'}`}
-				onMouseDown={sample.filePath === dummySamplePath ? noop : playNote}
-				style={{color: CssColor[sample.color]}}
+		const label = uploadStatus === 'started'
+			? 'Uploading'
+			: uploadStatus === 'failed'
+				? uploadStatus
+				: dragState === 'over'
+					? 'Drop to upload'
+					: sample.label
+
+		return (
+			/* eslint-disable no-shadow */
+			// @ts-ignore disableIfShiftIsPressed
+			<ContextMenuTrigger
+				id={samplePadMenuId}
+				disableIfShiftIsPressed={true}
+				holdToDisplay={-1}
+				samplerId={samplerId}
+				midiNote={midiNote}
+				collect={({samplerId, midiNote}) => ({
+					samplerId,
+					midiNote,
+				})}
 			>
-				<div className="label">
-					{sample.label}
+				<div
+					className={oneLine`
+						sample
+						${frame % 2 === 0 ? 'animate1' : ' animate2'}
+						drag-${dragState}`}
+					onMouseDown={sample.filePath === dummySamplePath ? noop : playNote}
+					style={{color: CssColor[sample.color]}}
+				>
+					<div className="label">
+						{label}
+					</div>
+					<div className="sampleFileForm">
+						<div
+							className="sampleDropZone"
+							onDragEnter={e => {
+								setDragState('over')
+							}}
+							onDragLeave={e => {
+								setDragState('none')
+							}}
+							onDragOver={e => {
+								e.preventDefault()
+								e.dataTransfer.dropEffect = 'move'
+							}}
+							onDrop={e => {
+								e.preventDefault()
+								setDragState('none')
+
+								const file = e.dataTransfer.files.item(0)
+
+								if (!file) {
+									return logger.warn('onDrop file null: ', e.dataTransfer.files)
+								}
+
+								if (file.size > MBtoBytes(maxSampleUploadFileSizeMB)) {
+									logger.log({file})
+									return dispatch(chatSystemMessage(
+										`file size must be under ${maxSampleUploadFileSizeMB}MB`,
+										'warning'))
+								}
+
+								if (!allowedSampleUploadFileTypes.includes(file.type)) {
+									logger.log({file})
+									return dispatch(chatSystemMessage(
+										oneLine`file must be an allowed type:
+											${allowedSampleUploadFileTypes}`,
+										'warning'))
+								}
+
+								const {error, extension} =
+									validateSampleFilenameExtension(file.name)
+
+								if (error) {
+									logger.log({error, extension})
+									return dispatch(chatSystemMessage(error, 'warning'))
+								}
+
+								dispatch(
+									corgiApiActions.uploadSample(samplerId, midiNote, file))
+							}}
+						/>
+					</div>
 				</div>
-			</div>
-		</ContextMenuTrigger>
-	)
-})
+			</ContextMenuTrigger>
+		)
+	}
+)

@@ -1,9 +1,9 @@
+import * as path from 'path'
 import {debounce} from 'lodash'
 import {Map} from 'immutable'
-import * as path from 'path'
+import {allowedSampleUploadFileExtensions} from './common-constants'
 
 import uuid = require('uuid')
-import {allowedSampleUploadFileExtensions} from './common-constants'
 
 export function pickRandomArrayElement<T>(array: readonly T[]): T {
 	return array[Math.floor(Math.random() * array.length)]
@@ -118,7 +118,5 @@ export function validateSampleFilenameExtension(filename: string) {
 			extension,
 		}
 	}
-	return {
-		extension
-	}
+	return {extension}
 }

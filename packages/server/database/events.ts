@@ -3,7 +3,7 @@ import {logger} from '@corgifm/common/logger'
 
 const eventsCollectionName = 'events'
 
-export const eventsQueries = (db: Db) => ({
+export const eventsQueries = async (db: Db) => ({
 	async saveUserConnectEventAsync(event: UserConnectedEvent) {
 		const startTime = Date.now()
 		logger.debug('saveUserConnectEvent: ', {event})

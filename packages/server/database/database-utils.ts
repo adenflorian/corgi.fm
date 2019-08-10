@@ -5,7 +5,7 @@ import {transformAndValidateDbResult} from '@corgifm/common/validation'
 export async function sumField<T>(
 	collection: Collection<T>,
 	$match: Partial<T>,
-	sumField: keyof T,
+	field: keyof T,
 ): Promise<number> {
 	const result = await collection.aggregate<{sum: unknown}>([{
 		$match,
@@ -13,7 +13,7 @@ export async function sumField<T>(
 		$group: {
 			_id: null,
 			sum: {
-				$sum: '$' + sumField,
+				$sum: '$' + field,
 			},
 		},
 	}]).toArray()

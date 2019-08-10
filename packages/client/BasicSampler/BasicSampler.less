@@ -36,6 +36,7 @@
                 align-items: center;
                 border: 1px solid currentColor;
                 animation-duration: 0.5s;
+                position: relative;
     
                 &:hover {
                     border-width: 2px;
@@ -52,6 +53,35 @@
                 .label {
                     color: @defaultGray;
                     font-size: 13px;
+                }
+
+                .sampleFileForm {
+                    position: absolute;
+                    width: 100%;
+                    height: 100%;
+
+                    .sampleDropZone {
+                        width: 100%;
+                        height: 100%;
+                    }
+
+                    .sampleFileInput {
+                        visibility: hidden;
+                        position: absolute;
+                        opacity: 0;
+                        display: none;
+                    }
+                }
+
+                .dragOverMessage {
+                    visibility: hidden;
+                    width: 100%;
+                    height: 100%;
+                }
+
+                &.drag-over .dragOverMessage {
+                    visibility: visible !important;
+                    pointer-events: none;
                 }
             }
         }

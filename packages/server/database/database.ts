@@ -23,9 +23,9 @@ export async function connectDB() {
 
 	return {
 		db,
-		events: eventsQueries(db),
-		users: usersQueries(db),
-		uploads: uploadsQueries(db),
+		events: await eventsQueries(db),
+		users: await usersQueries(db),
+		uploads: await uploadsQueries(db),
 		async close() {
 			await client.close()
 			await stop()

@@ -2,10 +2,10 @@ import {Db} from 'mongodb'
 import {UserUpdate, User} from '@corgifm/common/models/User'
 import {upsertOneWhole, findOne, CorgiIndexes} from './database-utils'
 
-export const usersQueries = (db: Db) => {
+export const usersQueries = async (db: Db) => {
 	const usersCollection = db.collection<User>('users')
 
-	usersCollection.createIndexes([{
+	await usersCollection.createIndexes([{
 		key: {uid: 1},
 		background: true,
 		unique: true,

@@ -3,7 +3,6 @@ import * as ColorAll from 'color'
 import {List, Map} from 'immutable'
 import {removeOctave} from './common-utils'
 import {IMidiNote} from './MidiNote'
-import {string} from 'prop-types';
 // TODO
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const ColorDefault = require('color')

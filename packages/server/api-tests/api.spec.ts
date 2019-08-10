@@ -9,7 +9,7 @@ import {
 	apiRouteNotFoundResponse, emailVerifiedUidA, validTokenVerifiedEmailUidARequest,
 } from './api-test-common'
 import {getUserApiTests} from './users-api-tests'
-import {getSampleApiTests} from './samples-api-tests';
+import {getSampleApiTests} from './samples-api-tests'
 
 jest.mock('../auth/server-auth')
 

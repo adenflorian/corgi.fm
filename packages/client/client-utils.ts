@@ -55,10 +55,10 @@ export function getUrl() {
 
 export function getCdnUrl() {
 	if (isLocalDevClient()) {
-		return `https://cdn.test.corgi.fm/dev`
+		return `https://cdn.test.corgi.fm/dev/`
 	} else if (isTestClient()) {
-		return `https://cdn.test.corgi.fm/test`
+		return `https://cdn.test.corgi.fm/test/`
 	} else {
-		return `https://cdn.test.corgi.fm/prod`
+		return `https://cdn.test.corgi.fm/prod/`
 	}
 }

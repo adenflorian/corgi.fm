@@ -49,6 +49,7 @@ import {
 	virtualOctaveChange,
 	VirtualOctaveChangeAction,
 	LocalAction, chatSystemMessage, animationActions, selectOption, AppOptions,
+	uploadActions,
 } from '@corgifm/common/redux'
 import {pointersActions} from '@corgifm/common/redux/pointers-redux'
 import {graphStateSavesLocalStorageKey} from './client-constants'
@@ -58,7 +59,7 @@ import {getSequencersSchedulerInfo} from './note-scanner'
 import {saveUsernameToLocalStorage} from './username'
 import {corgiApiActions} from './RestClient/corgi-api-middleware'
 import {FirebaseContextStuff} from './Firebase/FirebaseContext'
-import {onChangeRoom} from './WebAudio';
+import {onChangeRoom} from './WebAudio'
 
 type LocalMiddlewareActions = LocalAction | AddClientAction | VirtualKeyPressedAction | GridSequencerAction
 | UserInputAction | VirtualKeyUpAction | VirtualOctaveChangeAction | SetActiveRoomAction | ReadyAction
@@ -282,7 +283,7 @@ export function createLocalMiddleware(
 				window.history.pushState({}, document.title, '/' + selectActiveRoom(getState()))
 				onChangeRoom()
 				const active: HTMLElement | null = document.activeElement as HTMLElement
-				active && active.blur && active.blur()
+				if (active && active.blur) active.blur()
 				return
 			}
 			case 'ADD_CLIENT': {
@@ -464,6 +465,7 @@ export function createLocalMiddleware(
 			case 'UPDATE_POSITIONS': {
 				// Mainly to handle loading old saves with smaller sizes
 				// Not perfect
+				// TODO I think we're doing this in 2 places...
 				const foo: ReturnType<typeof updatePositions> = {
 					...action,
 					positions: Map(action.positions).map((position): IPosition => {
@@ -620,7 +622,7 @@ function scheduleNote(
 
 	const targetIds = selectConnectionsWithSourceIds(state.room, [sourceId].concat(directlyConnectedSequencerIds))
 		.map(x => x.targetId)
-	
+
 	const fancy = selectOption(state, AppOptions.graphicsExtraAnimations)
 
 	getAllInstruments().forEach(instrument => {

@@ -11,7 +11,7 @@ function enableNodesMaybe(save: SavedRoom): SavedRoom {
 	if (positions.some(position => position.enabled === undefined)) {
 		return {
 			...save,
-			positions: positions.map(x => ({...x, enabled: true}))
+			positions: positions.map(x => ({...x, enabled: true})),
 		}
 	} else {
 		return save

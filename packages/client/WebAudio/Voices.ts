@@ -129,8 +129,14 @@ export abstract class Voices<V extends Voice> {
 
 		if (!voiceToRelease) {
 			logger.warn('[Voices][scheduleRelease] !voiceToRelease note: ', {
-				note, voiceToRelease, voicesToRelease, scheduledVoicesSameNote,
-				_scheduledVoices: this._scheduledVoices, currentTime, releaseStartTime})
+				note,
+				voiceToRelease,
+				voicesToRelease,
+				scheduledVoicesSameNote,
+				_scheduledVoices: this._scheduledVoices,
+				currentTime,
+				releaseStartTime,
+			})
 			return
 		}
 
