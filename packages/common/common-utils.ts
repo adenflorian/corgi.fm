@@ -113,7 +113,7 @@ export function validateSampleFilenameExtension(filename: string) {
 	// extension must match allowed extensions
 	if (!allowedSampleUploadFileExtensions.includes(extension.replace('.', ''))) {
 		return {
-			error: 'Invalid extension, must be one of the following: '
+			error: `Invalid extension (${extension}), must be one of the following: `
 				+ JSON.stringify(allowedSampleUploadFileExtensions),
 			extension,
 		}

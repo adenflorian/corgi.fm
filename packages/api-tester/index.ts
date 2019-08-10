@@ -2,8 +2,9 @@
 import * as supertest from 'supertest'
 import {oneLine} from 'common-tags'
 import chalk from 'chalk'
-import {logger} from '@corgifm/common/logger'
 import {Application} from 'express'
+import {ClassType} from 'class-transformer/ClassTransformer';
+import {transformAndValidate, CorgiValidationError} from '@corgifm/common/validation';
 
 export enum ContentTypes {
 	ApplicationJson = 'application/json',
@@ -26,7 +27,7 @@ function ContentTypeRegEx(type: ContentTypes): RegExp {
 	}
 }
 
-type TestRequest<TModel = object> = {
+type TestRequest<TRequestModel = object, TResponseModel = object> = {
 	readonly name?: string
 	/** Defaults to true */
 	readonly authorized?: boolean
@@ -34,21 +35,31 @@ type TestRequest<TModel = object> = {
 	readonly log?: boolean
 	readonly before?: () => any
 	readonly after?: () => Promise<any>
-	readonly request?: RequestArgs<TModel>
+	readonly request?: RequestArgs<TRequestModel>
 } & ({
 	readonly status: Exclude<Status, 204>
 	readonly contentType: ContentTypes
-	readonly resBody: number | object | RegExp
+	readonly resBody: TResponseModel | RegExp
+	readonly validateResponseBodyModel?: ClassType<TResponseModel>
 } | {
 	readonly status: 204
 	readonly contentType?: undefined
 	readonly resBody?: undefined
+	readonly validateResponseBodyModel?: undefined
 })
 
 interface RequestArgs<TModel = object> {
 	readonly headers?: Headers
+	/** Ignored when using upload */
 	readonly contentType?: ContentTypes
-	readonly body: TModel
+	/** Ignored when using upload */
+	readonly body?: TModel
+	readonly upload?: {
+		readonly fileField: string,
+		readonly buffer: Buffer,
+		readonly fileName: string,
+		readonly fields?: {[fieldName: string]: string}
+	}
 }
 
 export enum Header {
@@ -70,7 +81,8 @@ type RequiredField<T, K extends keyof T> = {
 	[P in K]-?: T[P];
 } & T
 
-type PutRequest<TModel> = RequiredField<TestRequest<TModel>, 'request'>
+type PutRequest<TModel, TResponseModel> =
+	RequiredField<TestRequest<TModel, TResponseModel>, 'request'>
 
 export type RequestTest =
 	(getApp: GetApp, path: string, options: TestApiOptions) => void
@@ -133,8 +145,8 @@ export function get(args: TestRequest): RequestTest {
 }
 
 /** POST */
-export function post<TModel extends object>(
-	args: PutRequest<TModel>
+export function post<TModel extends object, TResponseModel extends object>(
+	args: PutRequest<TModel, TResponseModel>
 ): RequestTest {
 	const testLocation = getCallerLocation()
 
@@ -151,8 +163,8 @@ export function post<TModel extends object>(
 }
 
 /** PUT */
-export function put<TModel extends object>(
-	args: PutRequest<TModel>
+export function put<TModel extends object, TResponseModel extends object>(
+	args: PutRequest<TModel, TResponseModel>
 ): RequestTest {
 	const testLocation = getCallerLocation()
 
@@ -220,7 +232,7 @@ function doTest(
 	const {
 		getApp, contentType, resBody, status, finalPath, method, log, headers,
 		before = noop, after = noop, request, authorized = true, options,
-		testLocation,
+		testLocation, validateResponseBodyModel,
 	} = args
 
 	before()
@@ -273,6 +285,19 @@ function doTest(
 		}
 	}
 
+	if (validateResponseBodyModel) {
+		theTest = theTest.expect(async res => {
+			try {
+				await transformAndValidate(validateResponseBodyModel, res.body)
+			} catch (error) {
+				throw new Error('response body failed validation:\n'
+					+ error.message
+					+ '\nresponse body:\n'
+					+ JSON.stringify(res.body, null, 2))
+			}
+		})
+	}
+
 	// eslint-disable-next-line @typescript-eslint/no-floating-promises
 	theTest
 		.end(async (err, res) => {
@@ -297,13 +322,13 @@ function doTest(
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				await after()
 			} catch (error) {
-				logger.error('Error caught in the after hook: ', error)
-				logger.error(testLocation)
+				console.error('Error caught in the after hook: ', error)
+				console.error(testLocation)
 				if (!err) throw error
 			}
 
 			if (err) {
-				logger.error(testLocation)
+				console.error(testLocation)
 				done(err)
 			} else {
 				done()
@@ -318,12 +343,21 @@ function doTest(
 
 	function doRequestStuff(): supertest.Test {
 		if (request) {
-			theTest = theTest
-				.send(request.body)
-				.set(
-					Header.ContentType,
-					request.contentType || ContentTypes.ApplicationJson
-				)
+			if (request.upload) {
+				theTest = theTest
+					.attach(
+						request.upload.fileField,
+						request.upload.buffer,
+						request.upload.fileName)
+					.field(request.upload.fields || {})
+			} else {
+				theTest = theTest
+					.send(request.body)
+					.set(
+						Header.ContentType,
+						request.contentType || ContentTypes.ApplicationJson
+					)
+			}
 		}
 
 		Object.keys(newHeaders).forEach(name => {

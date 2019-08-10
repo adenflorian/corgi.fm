@@ -41,6 +41,6 @@ export class CorgiValidationError extends Error {
 	public constructor(
 		public readonly validationError: ValidationError[]
 	) {
-		super('validation error(s)')
+		super('validation error(s): ' + JSON.stringify(validationError, null, 2))
 	}
 }

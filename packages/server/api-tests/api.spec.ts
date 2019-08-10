@@ -1,7 +1,11 @@
+import {Application} from 'express'
+import * as uuid from 'uuid'
+import {ManagedUpload} from 'aws-sdk/clients/s3'
+import {S3} from 'aws-sdk/clients/all'
 import {configureServerStore} from '@corgifm/common/redux'
+import {mockUuid} from '@corgifm/common/test-common'
 import {testApi, path, get, del, ContentTypes} from '@corgifm/api-tester'
 import {logger} from '@corgifm/common/logger'
-import {Application} from 'express'
 import {connectDB, DBStore} from '../database/database'
 import {setupExpressApp} from '../setup-express-app'
 import * as serverAuth from '../auth/server-auth'
@@ -10,8 +14,28 @@ import {
 } from './api-test-common'
 import {getUserApiTests} from './users-api-tests'
 import {getSampleApiTests} from './samples-api-tests'
+import * as corgiS3 from '../api/s3'
 
+jest.mock('uuid')
+jest.mock('../api/s3')
 jest.mock('../auth/server-auth')
+
+const mockCreateNodeId = uuid.v4 as unknown as jest.Mock<string>
+
+mockCreateNodeId.mockImplementation(() => mockUuid)
+
+const mockS3Upload = corgiS3.s3Upload as unknown as
+	jest.Mock<Promise<ManagedUpload.SendData>, [S3.PutObjectRequest]>
+
+mockS3Upload.mockImplementation(
+	async (params): Promise<ManagedUpload.SendData> => {
+		return {
+			Bucket: 'mockBucket',
+			ETag: 'mockETag',
+			Key: params.Key,
+			Location: 'mockLocation',
+		}
+	})
 
 const verifyAuthHeaderMock =
 	serverAuth.verifyAuthHeader as

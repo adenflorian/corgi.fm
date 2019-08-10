@@ -29,7 +29,7 @@ export async function insertOne<T>(
 	collection: Collection<T>,
 	document: T,
 ): Promise<void> {
-	const result = await collection.insertOne(document)
+	const result = await collection.insertOne({...document})
 
 	if (result.insertedCount !== 1) {
 		throw new Error(

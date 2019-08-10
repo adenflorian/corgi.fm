@@ -135,7 +135,6 @@ export function createCorgiApiMiddleware(
 
 		const formData = new FormData()
 		formData.append('file', action.file)
-		formData.append('uid', localUid.toString())
 
 		const options: RequestInit = {
 			method: 'POST',

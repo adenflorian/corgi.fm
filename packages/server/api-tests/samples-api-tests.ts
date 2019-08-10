@@ -1,9 +1,13 @@
 import {
 	RequestTest, path, get, put, ContentTypes, post,
 } from '@corgifm/api-tester'
+import {Upload} from '@corgifm/common/models/OtherModels'
+import {mockUuid} from '@corgifm/common/test-common'
+import {logger} from '@corgifm/common/logger'
 import {DBStore} from '../database/database'
 import {
 	VerifyAuthHeaderMock, missingAuthHeaderResponse, apiRouteNotFoundResponse,
+	uidA,
 } from './api-test-common'
 
 export function getSampleApiTests(
@@ -42,15 +46,64 @@ export function getSampleApiTests(
 				contentType: ContentTypes.ApplicationJson,
 				resBody: apiRouteNotFoundResponse,
 			}),
-			// TODO
 			post({
-				status: 500,
+				name: 'invalid upload request',
+				status: 400,
 				contentType: ContentTypes.ApplicationJson,
-				resBody: /something borked/,
-				request: {body: {}},
+				resBody: /invalid upload request/,
+				request: {
+					body: {}
+				},
 			}),
-			// TODO File too big
-			// TODO Upload success
+			post({
+				name: 'invalid extension',
+				status: 400,
+				contentType: ContentTypes.ApplicationJson,
+				resBody: /Invalid extension/,
+				request: {
+					upload: {
+						fileField: 'file',
+						buffer: Buffer.from('12345678'),
+						fileName: 'smallFile.ogg',
+					},
+				},
+			}),
+			post({
+				name: 'too big',
+				status: 400,
+				contentType: ContentTypes.ApplicationJson,
+				resBody: /too big/,
+				request: {
+					upload: {
+						fileField: 'file',
+						buffer: makeBigBuffer(11),
+						fileName: 'smallFile.wav',
+					},
+				},
+			}),
+			post({
+				status: 200,
+				contentType: ContentTypes.ApplicationJson,
+				resBody: {
+					ownerUid: uidA,
+					path: `user/${mockUuid}.wav`,
+					sizeBytes: 10 * 1000 * 1000,
+				},
+				validateResponseBodyModel: Upload,
+				request: {
+					upload: {
+						fileField: 'file',
+						buffer: makeBigBuffer(10),
+						fileName: 'smallFile.wav',
+					},
+				},
+				before: logger.disable,
+				after: async () => logger.enable(),
+			}),
 		]
 	}
+}
+
+function makeBigBuffer(megabytes: number) {
+	return Buffer.alloc(megabytes * 1000 * 1000)
 }
