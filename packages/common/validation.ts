@@ -1,6 +1,7 @@
 import {plainToClass} from 'class-transformer'
 import {validate, ValidationError} from 'class-validator'
 import {ClassType} from 'class-transformer/ClassTransformer'
+import {isClient} from '@corgifm/common/is-client-or-server'
 
 export async function transformAndValidate<T extends object>(
 	targetClass: ClassType<T>, data: unknown,
@@ -24,7 +25,7 @@ async function validateOrRejectCustom<T>(object: T): Promise<T> {
 	const errors = await validate(object, {
 		validationError: {
 			target: false,
-			value: false,
+			value: isClient(),
 		},
 		forbidUnknownValues: true,
 		whitelist: true,

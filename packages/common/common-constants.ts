@@ -16,3 +16,13 @@ export enum ContentType {
 	ApplicationJson = 'application/json',
 	TextHtml = 'text/html'
 }
+
+export const maxSampleUploadFileSizeMB = 10
+export const allowedSampleUploadFileTypes: readonly string[] = [
+	'audio/wav',
+	'audio/mp3',
+]
+export const allowedSampleUploadFileExtensions: readonly string[] =
+	allowedSampleUploadFileTypes.map(x => x.replace(/^.*\//, ''))
+
+export const defaultS3BucketName = 'cdn-test-corgi-fm'

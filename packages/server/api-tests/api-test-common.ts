@@ -1,7 +1,9 @@
 import {RequestTest, put, ContentTypes} from '@corgifm/api-tester'
 import * as serverAuth from '../auth/server-auth'
 
-export const apiRouteNotFound = /couldn't find an api route/
+export const apiRouteNotFoundResponse = /couldn't find an api route/
+
+export const missingAuthHeaderResponse = /missing authorization header/
 
 export type VerifyAuthHeaderMock =
 	jest.Mock<ReturnType<typeof serverAuth.verifyAuthHeader>>

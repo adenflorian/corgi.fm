@@ -1,7 +1,9 @@
 import {debounce} from 'lodash'
 import {Map} from 'immutable'
+import * as path from 'path'
 
 import uuid = require('uuid')
+import {allowedSampleUploadFileExtensions} from './common-constants'
 
 export function pickRandomArrayElement<T>(array: readonly T[]): T {
 	return array[Math.floor(Math.random() * array.length)]
@@ -93,4 +95,30 @@ export function convertToNumberKeyMap<T>(obj: Map<string, T>): Map<number, T> {
 
 export function capitalizeFirstLetter(string: string) {
 	return string.charAt(0).toUpperCase() + string.slice(1)
+}
+
+export function MBtoBytes(size: number) {
+	return size * 1000 * 1000
+}
+
+export function validateSampleFilenameExtension(filename: string) {
+	const extension = path.extname(filename)
+	// must have extension
+	if (extension === '') {
+		return {
+			error: 'Filename is missing extension',
+			extension,
+		}
+	}
+	// extension must match allowed extensions
+	if (!allowedSampleUploadFileExtensions.includes(extension.replace('.', ''))) {
+		return {
+			error: 'Invalid extension, must be one of the following: '
+				+ JSON.stringify(allowedSampleUploadFileExtensions),
+			extension,
+		}
+	}
+	return {
+		extension
+	}
 }

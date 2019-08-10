@@ -1,7 +1,9 @@
 import {Headers} from '@corgifm/common/common-types'
+import {Request, Response} from 'express'
 
 export enum Method {
 	GET = 'GET',
+	POST = 'POST',
 	PUT = 'PUT',
 }
 
@@ -16,9 +18,15 @@ export interface ApiRequest {
 	path: string
 	headers: Headers
 	body: unknown
+	originalRequest: Request
+	originalResponse: Response,
 }
 
-export interface SecureApiRequest extends ApiRequest {
+export interface RoutedRequest extends ApiRequest {
+	truncatedPath: string
+}
+
+export interface SecureApiRequest extends RoutedRequest {
 	callerUid: Id
 	emailVerified: boolean
 }
@@ -27,11 +35,11 @@ export interface SecureUsersApiRequest extends SecureApiRequest {
 	pathUid: Id
 }
 
-export type ApiResponse = {
+export type ApiResponse<TBody = object | number> = {
 	status: 204
 } | {
 	status: Exclude<Status, 204>
-	body: object | number
+	body: TBody
 }
 
 export type Router =

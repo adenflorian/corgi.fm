@@ -12,6 +12,7 @@ export enum ContentTypes {
 
 enum Method {
 	GET = 'GET',
+	POST = 'POST',
 	PUT = 'PUT',
 	DELETE = 'DELETE',
 }
@@ -109,7 +110,7 @@ export function path(
 	return (getApp: GetApp, pathTrunk: string, options: TestApiOptions) => {
 		requests.forEach(request => {
 			paths.forEach(p => {
-				invokeRequest(getApp, pathTrunk + '/' + p, options)(request)
+				invokeRequest(getApp, pathTrunk + (p ? `/${p}` : ''), options)(request)
 			})
 		})
 	}
@@ -118,12 +119,33 @@ export function path(
 /** GET */
 export function get(args: TestRequest): RequestTest {
 	return (getApp: GetApp, finalPath: string, options: TestApiOptions) => {
+		const testLocation = getCallerLocation()
+
 		doRequest({
 			...args,
 			method: Method.GET,
 			finalPath,
 			getApp,
 			options,
+			testLocation,
+		})
+	}
+}
+
+/** POST */
+export function post<TModel extends object>(
+	args: PutRequest<TModel>
+): RequestTest {
+	const testLocation = getCallerLocation()
+
+	return (getApp: GetApp, finalPath: string, options: TestApiOptions) => {
+		doRequest({
+			...args,
+			method: Method.POST,
+			finalPath,
+			getApp,
+			options,
+			testLocation,
 		})
 	}
 }
@@ -132,6 +154,8 @@ export function get(args: TestRequest): RequestTest {
 export function put<TModel extends object>(
 	args: PutRequest<TModel>
 ): RequestTest {
+	const testLocation = getCallerLocation()
+
 	return (getApp: GetApp, finalPath: string, options: TestApiOptions) => {
 		doRequest({
 			...args,
@@ -139,12 +163,15 @@ export function put<TModel extends object>(
 			finalPath,
 			getApp,
 			options,
+			testLocation,
 		})
 	}
 }
 
 /** DELETE */
 export function del(args: TestRequest): RequestTest {
+	const testLocation = getCallerLocation()
+
 	return (getApp: GetApp, finalPath: string, options: TestApiOptions) => {
 		doRequest({
 			...args,
@@ -152,15 +179,23 @@ export function del(args: TestRequest): RequestTest {
 			finalPath,
 			getApp,
 			options,
+			testLocation,
 		})
 	}
 }
 
+function getCallerLocation(): string {
+	var e = new Error()
+	var stack = e.stack!.toString().split(/\r\n|\n/)
+	return 'failed api test location ' + stack[3]
+}
+
 type FinalRequest = TestRequest & {
-	method: Method
-	finalPath: string
-	getApp: GetApp
-	options: TestApiOptions
+	readonly method: Method
+	readonly finalPath: string
+	readonly getApp: GetApp
+	readonly options: TestApiOptions
+	readonly testLocation: string
 }
 
 function doRequest(args: FinalRequest): void {
@@ -185,6 +220,7 @@ function doTest(
 	const {
 		getApp, contentType, resBody, status, finalPath, method, log, headers,
 		before = noop, after = noop, request, authorized = true, options,
+		testLocation,
 	} = args
 
 	before()
@@ -262,10 +298,12 @@ function doTest(
 				await after()
 			} catch (error) {
 				logger.error('Error caught in the after hook: ', error)
+				logger.error(testLocation)
 				if (!err) throw error
 			}
 
 			if (err) {
+				logger.error(testLocation)
 				done(err)
 			} else {
 				done()
@@ -301,6 +339,7 @@ function callHttpMethod(
 ) {
 	switch (method) {
 		case Method.GET: return st.get(url)
+		case Method.POST: return st.post(url)
 		case Method.PUT: return st.put(url)
 		case Method.DELETE: return st.delete(url)
 	}

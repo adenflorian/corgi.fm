@@ -6,9 +6,10 @@ import {connectDB, DBStore} from '../database/database'
 import {setupExpressApp} from '../setup-express-app'
 import * as serverAuth from '../auth/server-auth'
 import {
-	apiRouteNotFound, emailVerifiedUidA, validTokenVerifiedEmailUidARequest,
+	apiRouteNotFoundResponse, emailVerifiedUidA, validTokenVerifiedEmailUidARequest,
 } from './api-test-common'
 import {getUserApiTests} from './users-api-tests'
+import {getSampleApiTests} from './samples-api-tests';
 
 jest.mock('../auth/server-auth')
 
@@ -132,10 +133,11 @@ describe('API Tests', () => {
 						name: 'should 404 when no matching route',
 						status: 404,
 						contentType: ContentTypes.ApplicationJson,
-						resBody: apiRouteNotFound,
+						resBody: apiRouteNotFoundResponse,
 					}),
 				]),
 				path('users', getUserApiTests(getDb, verifyAuthHeaderMock)),
+				path('samples', getSampleApiTests(getDb, verifyAuthHeaderMock)),
 			]),
 		], {
 			authorizedRequests: {
