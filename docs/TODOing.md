@@ -190,6 +190,8 @@
 		- [ ] basic-piano
 		- [ ] basic-drums
 	- **Uploading Samples**
+		- [√] try to decode sample before uploading
+		- [ ] clip sample name in pad label
 		- [ ] drag and drop
 			- [√] UI to show that you must be logged in
 				- [√] system message
@@ -202,8 +204,6 @@
 		- [ ] enforce global upload cap
 			- [ ] server
 			- [ ] UI
-		- [ ] clip sample name in pad label
-		- [ ] try to decode sample before uploading
 		- [ ] sample renaming
 	- **Samples Manager**
 		- [√] don't fetch same sample twice

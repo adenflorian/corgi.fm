@@ -15,6 +15,7 @@ import {ContentType} from '@corgifm/common/common-constants'
 import {FirebaseContextStuff} from '../Firebase/FirebaseContext'
 import {getUrl} from '../client-utils'
 import {logger} from '../client-logger'
+import {SamplesManager} from '../WebAudio'
 
 const prefix = 'CORGI_API_'
 
@@ -37,6 +38,7 @@ type CorgiApiAction = ActionType<typeof corgiApiActions>
 
 export function createCorgiApiMiddleware(
 	firebase: FirebaseContextStuff,
+	samplesManager: SamplesManager,
 ): Middleware<{}, IClientAppState> {
 
 	let localUid: Id
@@ -130,6 +132,16 @@ export function createCorgiApiMiddleware(
 		dispatch(uploadActions.setStatus(
 			action.parentId, action.childId, 'started'))
 
+		const isValid = await samplesManager.validateAudioSampleAsync(
+			await new Response(action.file).arrayBuffer())
+
+		if (!isValid) {
+			dispatch(chatSystemMessage('Could not decode audio file', 'warning'))
+			dispatch(
+				uploadActions.setStatus(action.parentId, action.childId, 'failed'))
+			return
+		}
+
 		const headers = {
 			[Header.Authorization]: getAuthHeader(),
 		} as const
@@ -152,7 +164,8 @@ export function createCorgiApiMiddleware(
 							action.parentId, action.childId, 'failed'))
 						const body = await response.json()
 						if (body && typeof body.message === 'string') {
-							return dispatch(chatSystemMessage('Bad upload: ' + body.message))
+							return dispatch(
+								chatSystemMessage('Bad upload: ' + body.message, 'warning'))
 						} else {
 							throw new Error(`unexpected status msg ${response.status}`)
 						}

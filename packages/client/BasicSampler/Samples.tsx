@@ -18,6 +18,7 @@ import {
 import {
 	maxSampleUploadFileSizeMB, allowedSampleUploadFileTypes,
 } from '@corgifm/common/common-constants'
+import {oneLine} from 'common-tags'
 import {samplePadMenuId} from '../ContextMenu/SamplePadMenu'
 import {KnobIncremental} from '../Knob/KnobIncremental'
 import {logger} from '../client-logger'
@@ -125,7 +126,8 @@ const SamplePad = React.memo((props: SamplePadProps) => {
 			})}
 		>
 			<div
-				className={`sample ${getAnimationClass()} drag-${dragState}`}
+				className={oneLine`sample ${getAnimationClass()} drag-${dragState}
+					upload-${uploadStatus}`}
 				onMouseDown={playNote}
 				style={{color: CssColor[sample.color]}}
 			>
@@ -140,13 +142,11 @@ const SamplePad = React.memo((props: SamplePadProps) => {
 	function getLabel() {
 		return uploadStatus === 'started'
 			? 'Uploading'
-			: uploadStatus === 'failed'
-				? uploadStatus
-				: dragState === 'over'
-					? isLoggedIn
-						? 'Drop to upload'
-						: 'Login to upload'
-					: sample.label
+			: dragState === 'over'
+				? isLoggedIn
+					? 'Drop to upload'
+					: 'Login to upload'
+				: sample.label
 	}
 
 	function getAnimationClass() {

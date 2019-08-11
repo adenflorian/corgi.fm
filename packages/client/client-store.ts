@@ -35,7 +35,7 @@ export function configureStore(
 				createSamplesManagerMiddleware(samplesManager),
 				createLocalMiddleware(getAllInstruments, firebase),
 				createAuthMiddleware(firebase),
-				createCorgiApiMiddleware(firebase),
+				createCorgiApiMiddleware(firebase, samplesManager),
 				createSequencerMiddleware(getAllInstruments),
 				connectionsClientMiddleware(getAllInstruments),
 				websocketSenderMiddleware,

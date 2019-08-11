@@ -43,6 +43,12 @@ export class SamplesManager {
 		}
 	}
 
+	public async validateAudioSampleAsync(buffer: ArrayBuffer): Promise<boolean> {
+		return this._audioContext.decodeAudioData(buffer)
+			.then(() => true)
+			.catch(() => false)
+	}
+
 	/** Fire and forget */
 	public loadSample(path: string): void {
 		// eslint-disable-next-line @typescript-eslint/no-floating-promises
