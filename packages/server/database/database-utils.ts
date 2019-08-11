@@ -18,6 +18,8 @@ export async function sumField<T>(
 		},
 	}]).toArray()
 
+	if (result.length === 0) return 0
+
 	const sum = result[0].sum
 
 	if (typeof sum !== 'number') throw new Error('expected number: ' + {sum})

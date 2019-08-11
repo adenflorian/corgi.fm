@@ -9,12 +9,12 @@ import {logger} from '@corgifm/common/logger'
 import {connectDB, DBStore} from '../database/database'
 import {setupExpressApp} from '../setup-express-app'
 import * as serverAuth from '../auth/server-auth'
+import * as corgiS3 from '../api/s3'
 import {
 	apiRouteNotFoundResponse, emailVerifiedUidA, validTokenVerifiedEmailUidARequest,
 } from './api-test-common'
 import {getUserApiTests} from './users-api-tests'
 import {getSampleApiTests} from './samples-api-tests'
-import * as corgiS3 from '../api/s3'
 
 jest.mock('uuid')
 jest.mock('../api/s3')

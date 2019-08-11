@@ -26,3 +26,5 @@ export const allowedSampleUploadFileExtensions: readonly string[] =
 	allowedSampleUploadFileTypes.map(x => x.replace(/^.*\//, ''))
 
 export const defaultS3BucketName = 'cdn-test-corgi-fm'
+
+export const maxTotalSingleUserUploadBytes = 100 * 1000 * 1000

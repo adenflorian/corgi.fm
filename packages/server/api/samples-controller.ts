@@ -1,6 +1,7 @@
 import * as multer from 'multer'
+import {oneLine} from 'common-tags'
 import {
-	maxSampleUploadFileSizeMB, defaultS3BucketName,
+	maxSampleUploadFileSizeMB, defaultS3BucketName, maxTotalSingleUserUploadBytes,
 } from '@corgifm/common/common-constants'
 import {logger} from '@corgifm/common/logger'
 import {Upload} from '@corgifm/common/models/OtherModels'
@@ -34,9 +35,7 @@ const multerOptions: multer.Options = {
 	},
 }
 
-const upload = multer(multerOptions)
-
-const uploadSingle = upload.single('file')
+const multerUploadSingle = multer(multerOptions).single('file')
 
 export function getSamplesController(
 	serverStore: ServerStore, dbStore: DBStore,
@@ -60,11 +59,17 @@ export function getSamplesController(
 		}
 	}
 
+	// TODO Get uploads for user
+
+	// TODO Get total upload bytes for user?
+
 	async function uploadSample(
 		request: SecureApiRequest,
 	): Promise<ApiResponse<Upload>> {
 
 		const receivedUpload = await receiveUpload(request)
+
+		await enforceUploadBytesCap(request, receivedUpload)
 
 		const path = await uploadToS3(request, receivedUpload)
 
@@ -81,12 +86,24 @@ export function getSamplesController(
 			body: upload,
 		}
 	}
+
+	async function enforceUploadBytesCap(request: SecureApiRequest, receivedUpload: UploadResult) {
+		const newTotalUploadedBytes =
+			(await dbStore.uploads.getTotalUploadBytesForUser(request.callerUid))
+			+ receivedUpload.file.size
+
+		if (newTotalUploadedBytes > maxTotalSingleUserUploadBytes) {
+			throw new CorgiBadRequestError(oneLine`this upload would put user's total
+				uploaded bytes at ${newTotalUploadedBytes} which is over the upload
+				cap of ${maxTotalSingleUserUploadBytes} bytes`)
+		}
+	}
 }
 
 async function receiveUpload(request: ApiRequest): Promise<UploadResult> {
 	return new Promise<UploadResult>(
 		(resolve: (result: UploadResult) => void, reject) => {
-			uploadSingle(
+			multerUploadSingle(
 				request.originalRequest,
 				request.originalResponse,
 				(err?: any) => {

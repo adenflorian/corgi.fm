@@ -21,7 +21,7 @@ export function putValidationTests
 	tests: ValidationTest<TModel>[]
 ) {
 	return tests.map((t): RequestTest => {
-		return put<TModel>({
+		return put<TModel, {}>({
 			name: t.name,
 			contentType: ContentTypes.ApplicationJson,
 			resBody: {
@@ -45,6 +45,7 @@ export function putValidationTests
 	})
 }
 
+/** Default test uid for api tests */
 export const uidA = 'uidA567890123456789012345678'
 export const uidB = 'uidB567890123456789012345678'
 export const uidZ = 'uidZ567890123456789012345678'

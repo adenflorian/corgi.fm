@@ -1,7 +1,7 @@
 /* eslint-disable no-bitwise */
 import {Store} from 'redux'
 import {logger} from '@corgifm/common/logger'
-import {localMidiKeyUp, localMidiKeyPress} from '@corgifm/common/redux';
+import {localMidiKeyUp, localMidiKeyPress} from '@corgifm/common/redux'
 
 declare global {
 	interface Navigator {

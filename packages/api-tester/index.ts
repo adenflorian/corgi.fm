@@ -3,8 +3,8 @@ import * as supertest from 'supertest'
 import {oneLine} from 'common-tags'
 import chalk from 'chalk'
 import {Application} from 'express'
-import {ClassType} from 'class-transformer/ClassTransformer';
-import {transformAndValidate, CorgiValidationError} from '@corgifm/common/validation';
+import {ClassType} from 'class-transformer/ClassTransformer'
+import {transformAndValidate} from '@corgifm/common/validation'
 
 export enum ContentTypes {
 	ApplicationJson = 'application/json',
@@ -55,9 +55,9 @@ interface RequestArgs<TModel = object> {
 	/** Ignored when using upload */
 	readonly body?: TModel
 	readonly upload?: {
-		readonly fileField: string,
-		readonly buffer: Buffer,
-		readonly fileName: string,
+		readonly fileField: string
+		readonly buffer: Buffer
+		readonly fileName: string
 		readonly fields?: {[fieldName: string]: string}
 	}
 }
@@ -322,7 +322,7 @@ function doTest(
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				await after()
 			} catch (error) {
-				console.error('Error caught in the after hook: ', error)
+				console.error('Error caught in the after hook:', error)
 				console.error(testLocation)
 				if (!err) throw error
 			}

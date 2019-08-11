@@ -52,7 +52,7 @@ export function getSampleApiTests(
 				contentType: ContentTypes.ApplicationJson,
 				resBody: /invalid upload request/,
 				request: {
-					body: {}
+					body: {},
 				},
 			}),
 			post({
@@ -76,10 +76,32 @@ export function getSampleApiTests(
 				request: {
 					upload: {
 						fileField: 'file',
-						buffer: makeBigBuffer(11),
+						buffer: makeBigBufferMB(11),
+						fileName: 'bigFile.wav',
+					},
+				},
+			}),
+			post({
+				name: 'user hit upload cap',
+				status: 400,
+				contentType: ContentTypes.ApplicationJson,
+				resBody: /this upload would put user's total uploaded bytes/,
+				request: {
+					upload: {
+						fileField: 'file',
+						buffer: makeBigBufferMB(1),
 						fileName: 'smallFile.wav',
 					},
 				},
+				before: async () => {
+					await getDb().uploads.put({
+						ownerUid: uidA,
+						path: 'fakePath',
+						sizeBytes: 100 * 1000 * 1000,
+					})
+					logger.disable()
+				},
+				after: async () => logger.enable(),
 			}),
 			post({
 				status: 200,
@@ -93,17 +115,18 @@ export function getSampleApiTests(
 				request: {
 					upload: {
 						fileField: 'file',
-						buffer: makeBigBuffer(10),
+						buffer: makeBigBufferMB(10),
 						fileName: 'smallFile.wav',
 					},
 				},
 				before: logger.disable,
 				after: async () => logger.enable(),
 			}),
+			// TODO Endpoint to get list of specific user's uploads
 		]
 	}
 }
 
-function makeBigBuffer(megabytes: number) {
+function makeBigBufferMB(megabytes: number) {
 	return Buffer.alloc(megabytes * 1000 * 1000)
 }
