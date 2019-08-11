@@ -181,14 +181,14 @@
 	- [ ] allow scrolling thru menu
 	- [ ] should be able to focus a pad and use tab and arrow keys to navigate
 	- [ ] drag sample onto pad from computer
+	- [ ] styling
+		- [√] hover
+		- [√] click
+		- [ ] pad should stay lit while holding down note
+	- [√] UI to show sample loading
 	- [ ] presets
 		- [ ] basic-piano
 		- [ ] basic-drums
-	- [ ] styling
-		- [ ] hover
-		- [ ] click
-		- [ ] pad should stay lit while holding down note
-	- [ ] UI to show sample loading
 	- **Uploading Samples**
 		- [ ] drag and drop
 			- [ ] UI to show that you must be logged in
