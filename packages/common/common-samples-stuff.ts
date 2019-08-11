@@ -97,13 +97,13 @@ export const sampleColors =
 export interface Sample {
 	readonly label: string
 	readonly filePath: string
-	readonly color: typeof sampleColors[number] | 'panelGrayDark'
+	readonly color: typeof sampleColors[number] | 'panelGrayLight'
 }
 
 export const dummySamplePath = 'dummySamplePath'
 
 export const dummySample: Sample = {
-	color: 'panelGrayDark',
+	color: 'panelGrayLight',
 	filePath: dummySamplePath,
 	label: '?',
 }

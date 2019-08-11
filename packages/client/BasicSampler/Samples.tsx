@@ -101,6 +101,8 @@ const SamplePad = React.memo(
 			},
 			[dispatch, midiNote, sample, samplerId])
 		const frame = useSelector(createAnimationFrameSelector(samplerId, midiNote))
+		// Prevents animation while scrolling through octaves
+		const [initialFrame] = useState(frame)
 		const [dragState, setDragState] = useState<'none' | 'over'>('none')
 		const uploadStatus = useSelector(
 			createUploadStatusSelector(samplerId, midiNote))
@@ -112,6 +114,12 @@ const SamplePad = React.memo(
 				: dragState === 'over'
 					? 'Drop to upload'
 					: sample.label
+
+		const animateClass = frame === initialFrame
+			? ''
+			: frame % 2 === 0
+				? 'animate1'
+				: 'animate2'
 
 		return (
 			/* eslint-disable no-shadow */
@@ -130,7 +138,7 @@ const SamplePad = React.memo(
 				<div
 					className={oneLine`
 						sample
-						${frame % 2 === 0 ? 'animate1' : ' animate2'}
+						${animateClass}
 						drag-${dragState}`}
 					onMouseDown={playNote}
 					style={{color: CssColor[sample.color]}}

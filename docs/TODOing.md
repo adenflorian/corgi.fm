@@ -161,7 +161,7 @@
 	- [√] change sample colors
 	- [√] octave knob to scroll through all 128 samples
 	- [√] right click on pad should not play it
-	- [ ] scrolling thru octaves shouldn't trigger animation
+	- [√] scrolling thru octaves shouldn't trigger animation
 	- [ ] right click pad > select samples...
 		- [√] Default samples (built-in samples)
 		- [ ] Public samples
@@ -187,6 +187,7 @@
 	- [ ] styling
 		- [ ] hover
 		- [ ] click
+		- [ ] pad should stay lit while holding down note
 	- [ ] UI to show sample loading
 	- **Uploading Samples**
 		- [ ] drag and drop
