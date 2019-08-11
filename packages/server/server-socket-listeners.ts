@@ -130,7 +130,7 @@ export function setupServerWebSocketListeners(
 
 			if (action[GLOBAL_SERVER_ACTION]) {
 				serverStore.dispatch(action)
-			} else {
+			} else if (action[SERVER_ACTION]) {
 				if (roomOwnerRoomActions.includes(action.type)) {
 					const roomOwnerId = getRoomOwnerId(serverStore, currentRoom)
 

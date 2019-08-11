@@ -17,7 +17,7 @@ export const chatSubmit = (message: IChatMessage) => {
 	return {
 		type: CHAT_SUBMIT,
 		BROADCASTER_ACTION,
-		SERVER_ACTION,
+		// SERVER_ACTION,
 		message,
 	}
 }
