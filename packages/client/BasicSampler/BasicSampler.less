@@ -31,15 +31,16 @@
                 background-color: @panelGray;
                 box-sizing: border-box;
                 margin: 2px;
-                display: flex;
-                justify-content: center;
-                align-items: center;
                 border: 1px solid currentColor;
                 animation-duration: 0.5s;
                 position: relative;
     
                 &:hover {
                     border-width: 2px;
+
+                    .label {
+                        margin: 0px 1px 0px 1px;
+                    }
                 }
 
                 &.animate1 {
@@ -51,8 +52,15 @@
                 }
 
                 .label {
+                    .smallFont();
                     color: @defaultGray;
-                    font-size: 13px;
+                    font-size: 11px;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    margin: 1px 2px 1px 2px;
+                    text-align: left;
+                    line-height: initial;
                 }
 
                 &.upload-failed::after {
@@ -75,6 +83,7 @@
 
                 .sampleFileForm {
                     position: absolute;
+                    top: 0;
                     width: 100%;
                     height: 100%;
 

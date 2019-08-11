@@ -112,19 +112,6 @@ a {
     transition: color 0.3s ease-out, background-color 0.3s ease-out, border-color 0.3s ease-out, box-shadow 0.3s ease-out, filter 0.3s ease-out;
 }
 
-.label {
-    text-shadow: 0 0 16px @darkTextShadow;
-    height: 16px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    pointer-events: none;
-
-    .isPlaying& {
-        filter: saturate(300%);
-    }
-}
-
 .saturate {
     .colorize {
         .saturate.colorize()

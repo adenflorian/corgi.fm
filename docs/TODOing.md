@@ -191,7 +191,7 @@
 		- [ ] basic-drums
 	- **Uploading Samples**
 		- [√] try to decode sample before uploading
-		- [ ] clip sample name in pad label
+		- [√] clip sample name in pad label
 		- [ ] drag and drop
 			- [√] UI to show that you must be logged in
 				- [√] system message
