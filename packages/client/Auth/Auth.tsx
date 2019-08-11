@@ -7,7 +7,7 @@ import {
 import {useDispatch, useSelector} from 'react-redux'
 import {AuthConstants} from '@corgifm/common/auth-constants'
 import {
-	authActions, chatSystemMessage, ModalId, modalsAction, selectLoggedIn,
+	authActions, chatSystemMessage, ModalId, modalsAction, useLoggedIn,
 } from '@corgifm/common/redux'
 import {Button} from '../Button/Button'
 import {
@@ -19,7 +19,7 @@ import {useBoolean, useResettableState} from '../react-hooks'
 import './Auth.less'
 
 export function AuthModalButton() {
-	const loggedIn = useSelector(selectLoggedIn)
+	const loggedIn = useLoggedIn()
 	const firebaseContext = useFirebase()
 	const dispatch = useDispatch()
 	const onClick = useCallback(

@@ -1,6 +1,7 @@
 import * as firebase from 'firebase'
 import {Record} from 'immutable'
 import {ActionType} from 'typesafe-actions'
+import {useSelector} from 'react-redux'
 import {IClientAppState} from './common-redux-types'
 
 export const authActions = {
@@ -47,4 +48,8 @@ export function authReducer(state = new AuthState(), action: AuthAction): AuthSt
 // Selectors
 export const selectAuthState = (state: IClientAppState) => state.auth
 
-export const selectLoggedIn = (state: IClientAppState) => state.auth.loggedIn
+const selectLoggedIn = (state: IClientAppState) => state.auth.loggedIn
+
+export function useLoggedIn() {
+	return useSelector(selectLoggedIn)
+}

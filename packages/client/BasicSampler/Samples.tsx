@@ -3,8 +3,7 @@ import {useSelector, useDispatch} from 'react-redux'
 import {
 	selectSamples, basicSamplerActions, selectSamplerViewOctave,
 	BasicSamplerState, localActions, createAnimationFrameSelector,
-	createUploadStatusSelector,
-	chatSystemMessage,
+	createUploadStatusSelector, chatSystemMessage, useLoggedIn,
 } from '@corgifm/common/redux'
 import {IMidiNote} from '@corgifm/common/MidiNote'
 import {
@@ -16,7 +15,6 @@ import {CssColor} from '@corgifm/common/shamu-color'
 import {
 	MBtoBytes, validateSampleFilenameExtension,
 } from '@corgifm/common/common-utils'
-import {oneLine} from 'common-tags'
 import {
 	maxSampleUploadFileSizeMB, allowedSampleUploadFileTypes,
 } from '@corgifm/common/common-constants'
@@ -104,6 +102,7 @@ const SamplePad = React.memo((props: SamplePadProps) => {
 		[dispatch, midiNote, sample, samplerId])
 
 	const frame = useSelector(createAnimationFrameSelector(samplerId, midiNote))
+	const isLoggedIn = useLoggedIn()
 	const uploadStatus = useSelector(
 		createUploadStatusSelector(samplerId, midiNote))
 
@@ -144,7 +143,9 @@ const SamplePad = React.memo((props: SamplePadProps) => {
 			: uploadStatus === 'failed'
 				? uploadStatus
 				: dragState === 'over'
-					? 'Drop to upload'
+					? isLoggedIn
+						? 'Drop to upload'
+						: 'Login to upload'
 					: sample.label
 	}
 
@@ -167,6 +168,7 @@ function SampleDropZone(props: SampleDropZoneProps) {
 	const {setDragState, samplerId, midiNote} = props
 
 	const dispatch = useDispatch()
+	const isLoggedIn = useLoggedIn()
 
 	return (
 		<div className="sampleFileForm">
@@ -181,6 +183,11 @@ function SampleDropZone(props: SampleDropZoneProps) {
 				onDrop={e => {
 					e.preventDefault()
 					setDragState('none')
+
+					if (!isLoggedIn) {
+						return dispatch(
+							chatSystemMessage('You must be logged in to upload!', 'warning'))
+					}
 
 					const fileOrError = validateDroppedFile(e)
 

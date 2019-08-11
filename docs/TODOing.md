@@ -192,6 +192,10 @@
 	- **Uploading Samples**
 		- [ ] drag and drop
 			- [ ] UI to show that you must be logged in
+				- [√] system message
+				- [√] sample label on hover
+				- [ ] System message should open login modal when clicked
+			- [ ] change shared pointer to show user is dragging a file
 		- [ ] enforce user upload cap
 			- [ ] server
 			- [ ] UI
