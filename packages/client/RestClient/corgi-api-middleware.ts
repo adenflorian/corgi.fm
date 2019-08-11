@@ -12,6 +12,7 @@ import {ActionType} from 'typesafe-actions'
 import {debounce} from 'lodash'
 import {transformAndValidate} from '@corgifm/common/validation'
 import {ContentType} from '@corgifm/common/common-constants'
+import {removeExtension} from '@corgifm/common/common-utils'
 import {FirebaseContextStuff} from '../Firebase/FirebaseContext'
 import {getUrl} from '../client-utils'
 import {logger} from '../client-logger'
@@ -182,8 +183,8 @@ export function createCorgiApiMiddleware(
 					action.childId,
 					{
 						filePath: sampleLocator.path,
-						label: action.file.name,
-						color: 'blue',
+						label: removeExtension(action.file.name),
+						color: 'purple',
 					}))
 			})
 			.catch(error => {

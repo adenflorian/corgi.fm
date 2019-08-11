@@ -126,3 +126,7 @@ export function validateSampleFilenameExtension(filename: string) {
 	}
 	return {extension}
 }
+
+export function removeExtension(fileName: string) {
+	return fileName.replace(/\.[^/.]+$/, '')
+}
