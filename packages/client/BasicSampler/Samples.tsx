@@ -94,8 +94,12 @@ const SamplePad = React.memo(
 	({samplerId, sample, midiNote}: SamplePadProps) => {
 		const dispatch = useDispatch()
 		const playNote = useCallback(
-			() => dispatch(localActions.playShortNoteOnTarget(samplerId, midiNote)),
-			[dispatch, midiNote, samplerId])
+			(e: React.MouseEvent) => {
+				if (sample.filePath === dummySamplePath) return
+				if (e.button !== 0) return
+				dispatch(localActions.playShortNoteOnTarget(samplerId, midiNote))
+			},
+			[dispatch, midiNote, sample, samplerId])
 		const frame = useSelector(createAnimationFrameSelector(samplerId, midiNote))
 		const [dragState, setDragState] = useState<'none' | 'over'>('none')
 		const uploadStatus = useSelector(
@@ -128,7 +132,7 @@ const SamplePad = React.memo(
 						sample
 						${frame % 2 === 0 ? 'animate1' : ' animate2'}
 						drag-${dragState}`}
-					onMouseDown={sample.filePath === dummySamplePath ? noop : playNote}
+					onMouseDown={playNote}
 					style={{color: CssColor[sample.color]}}
 				>
 					<div className="label">

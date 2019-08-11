@@ -160,7 +160,8 @@
 	- [√] click on pad to play sample
 	- [√] change sample colors
 	- [√] octave knob to scroll through all 128 samples
-	- [ ] right click on pad should not play it
+	- [√] right click on pad should not play it
+	- [ ] scrolling thru octaves shouldn't trigger animation
 	- [ ] right click pad > select samples...
 		- [√] Default samples (built-in samples)
 		- [ ] Public samples
@@ -187,7 +188,17 @@
 		- [ ] hover
 		- [ ] click
 	- [ ] UI to show sample loading
-	- Samples Manager
+	- **Uploading Samples**
+		- [ ] drag and drop
+			- [ ] UI to show that you must be logged in
+		- [ ] enforce user upload cap
+			- [ ] server
+			- [ ] UI
+		- [ ] enforce global upload cap
+			- [ ] server
+			- [ ] UI
+		- [ ] sample renaming
+	- **Samples Manager**
 		- [√] don't fetch same sample twice
 		- [√] fix weird issue with double fetching when going really fast
 		- [√] pre-load samples based on what is in redux
