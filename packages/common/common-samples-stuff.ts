@@ -115,7 +115,7 @@ export const samplerBasicPianoNotes: Samples = samplesToGet.reduce(
 			octavesToGet.forEach(octave => {
 				const midiNote = midiNoteFromNoteName(note, octave)
 				mutable.set(midiNote, {
-					label: `${note}${octave}`,
+					label: `piano ${note}${octave}`,
 					filePath: `static/samplers/basic-piano/${sharpToFlatNotes[note]}${octave}-49-96.mp3`,
 					color: note.includes('#') ? 'green' : 'blue',
 				})
@@ -157,6 +157,12 @@ export function midiNoteFromNoteName(noteName: NoteNameSharps, octave: Octave): 
 export function midiNoteToNoteName(midiNote: IMidiNote): NoteNameSharps {
 	const x = ((midiNote % 12) + 12) % 12
 	return keyColors[x].name
+}
+
+export function midiNoteToNoteNameFull(midiNote: IMidiNote): string {
+	const octave = getOctaveFromMidiNote(midiNote)
+	const x = ((midiNote % 12) + 12) % 12
+	return keyColors[x].name + octave.toString()
 }
 
 export function getOctaveFromMidiNote(midiNote: IMidiNote): Octave {

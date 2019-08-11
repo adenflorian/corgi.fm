@@ -67,7 +67,12 @@ export const DumbPanel: React.FC<AllProps> =
 						</div>
 						<div className="label">{label}</div>
 						{ownerName &&
-							<div className="ownerName" title={ownerName}>{ownerName}</div>
+							<div
+								className="ownerName"
+								title={`This node belongs to ${ownerName}`}
+							>
+								{ownerName}
+							</div>
 						}
 						{extra &&
 							<div className="extra" title={extra}>{extra}</div>

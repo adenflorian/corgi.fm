@@ -7,7 +7,7 @@ import {
 } from '@corgifm/common/redux'
 import {IMidiNote} from '@corgifm/common/MidiNote'
 import {
-	Sample, dummySample, dummySamplePath,
+	Sample, dummySample, dummySamplePath, midiNoteToNoteNameFull,
 } from '@corgifm/common/common-samples-stuff'
 import {ContextMenuTrigger} from 'react-contextmenu'
 import {Octave} from '@corgifm/common/common-types'
@@ -111,6 +111,8 @@ const SamplePad = React.memo((props: SamplePadProps) => {
 	const [initialFrame] = useState(frame)
 	const [dragState, setDragState] = useState<'none' | 'over'>('none')
 
+	const label = getLabel()
+
 	return (
 	/* eslint-disable no-shadow */
 	// @ts-ignore disableIfShiftIsPressed
@@ -130,9 +132,12 @@ const SamplePad = React.memo((props: SamplePadProps) => {
 					upload-${uploadStatus}`}
 				onMouseDown={playNote}
 				style={{color: CssColor[sample.color]}}
+				title={midiNoteToNoteNameFull(midiNote) + '\n"' + label +
+					'"\n\nDrag files from your computer onto a pad to upload them' +
+					'\nTry right clicking'}
 			>
 				<div className="label">
-					{getLabel()}
+					{label}
 				</div>
 				<SampleDropZone {...{setDragState, samplerId, midiNote}} />
 			</div>
