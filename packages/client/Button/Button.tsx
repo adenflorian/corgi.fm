@@ -19,6 +19,7 @@ export const Button = React.memo(
 					...buttonProps,
 					onClick,
 					disabled,
+					className: 'corgiButton ' + buttonProps.className,
 				}}
 			>
 				{children}

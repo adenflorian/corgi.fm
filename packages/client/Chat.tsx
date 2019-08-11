@@ -3,11 +3,15 @@ import AutosizeInput from 'react-input-autosize'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 import {
-	selectClientInfo, selectLocalClient, IClientAppState, chatSubmit,
+	selectClientInfo, selectLocalClient, IClientAppState, chatSubmit, clearChat,
 } from '@corgifm/common/redux'
 import './Chat.less'
+import {
+	IoMdTrash as Clear,
+} from 'react-icons/io'
 import {ConnectedChatMessages} from './Chat/ChatMessages'
 import {isTestClient} from './is-prod-client'
+import {Button} from './Button/Button'
 
 interface IChatComponentState {
 	chatMessage: string
@@ -70,6 +74,17 @@ export class Chat extends Component<AllProps, IChatComponentState> {
 								inputRef={ref => (this.chatInputRef = ref || undefined)}
 							/>
 						</form>
+						<button
+							type="button"
+							className="clearMessages iconButton"
+							title="Clear chat messages (only for you)"
+							onMouseDown={e => {
+								e.preventDefault()
+								this.props.dispatch(clearChat())
+							}}
+						>
+							<Clear />
+						</button>
 						<BottomInfo
 							clientVersion={this.props.clientVersion}
 							serverVersion={this.props.serverVersion}

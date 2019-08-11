@@ -128,8 +128,6 @@
             }
 
             form.chatMessageForm {
-                flex-grow: 1;
-
                 #chatInput {
                     color: @defaultGray;
                     letter-spacing: initial;
@@ -140,6 +138,16 @@
                         opacity: 0;
                     }
                 }
+            }
+        }
+
+        button.clearMessages {
+            margin-left: 8px;
+            pointer-events: all;
+            color: @knobValueGray;
+
+            &:hover, &:focus {
+                color: @red;
             }
         }
     }
@@ -174,6 +182,7 @@
     @panelShadow();
     min-height: 32px;
     pointer-events: all;
+    margin-left: auto;
 
     & > * {
         display: flex;
