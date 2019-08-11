@@ -3,6 +3,7 @@ import {
 	IClientAppState, IClientState, selectLocalClient, setClientName,
 	uploadActions,
 	basicSamplerActions,
+	chatSystemMessage,
 } from '@corgifm/common/redux'
 import {User, UserUpdate} from '@corgifm/common/models/User'
 import {Upload} from '@corgifm/common/models/OtherModels'
@@ -143,11 +144,21 @@ export function createCorgiApiMiddleware(
 		}
 
 		return fetch(`${getUrl()}/api/samples`, options)
-			.then(response => {
-				if (response.status !== 200) {
-					throw new Error(`unexpected status ${response.status}`)
+			.then(async response => {
+				switch (response.status) {
+					case 200: return response.json()
+					case 400: {
+						dispatch(uploadActions.setStatus(
+							action.parentId, action.childId, 'failed'))
+						const body = await response.json()
+						if (body && typeof body.message === 'string') {
+							return dispatch(chatSystemMessage('Bad upload: ' + body.message))
+						} else {
+							throw new Error(`unexpected status msg ${response.status}`)
+						}
+					}
+					default: throw new Error(`unexpected status ${response.status}`)
 				}
-				return response.json()
 			})
 			.then(async data => transformAndValidate(Upload, data))
 			.then(sampleLocator => {

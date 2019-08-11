@@ -191,17 +191,19 @@
 		- [ ] basic-drums
 	- **Uploading Samples**
 		- [ ] drag and drop
-			- [ ] UI to show that you must be logged in
+			- [√] UI to show that you must be logged in
 				- [√] system message
 				- [√] sample label on hover
-				- [ ] System message should open login modal when clicked
-			- [ ] change shared pointer to show user is dragging a file
 		- [ ] enforce user upload cap
-			- [ ] server
-			- [ ] UI
+			- [√] server
+			- [ ] front end
+				- [√] UI
+				- [ ] check if it goes over cap before uploading
 		- [ ] enforce global upload cap
 			- [ ] server
 			- [ ] UI
+		- [ ] clip sample name in pad label
+		- [ ] try to decode sample before uploading
 		- [ ] sample renaming
 	- **Samples Manager**
 		- [√] don't fetch same sample twice
@@ -220,6 +222,12 @@
 		- [√] samples manager middleware?
 		- [√] if `getSample` gets called and sample isn't loaded, then that's an error?
 
+- [ ] change shared pointer to show user is dragging a file
+- [ ] change shared pointer to show user is typing
+- [ ] change shared pointer to show user is in a modal
+- [ ] System messages should open stuff when clicked
+	- [ ] messages about needing to be logged in should open login modal
+- [ ] allow dismissing system chat messages
 - [ ] `Store<IClientAppState>` -> `ClientStore`
 - [ ] show note name when hovering on notes in sequencers
 - [ ] notes on left of grid seq should play on click

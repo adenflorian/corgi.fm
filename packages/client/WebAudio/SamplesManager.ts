@@ -38,32 +38,37 @@ export class SamplesManager {
 					logger.warn(`sample wasn't requested first: `, path)
 				}
 			}
-			// eslint-disable-next-line @typescript-eslint/no-floating-promises
-			this.loadSampleAsync(path)
+			this.loadSample(path)
 			return this._emptyAudioBuffer
 		}
 	}
 
-	/** You probably don't want to `await` this. */
-	public async loadSampleAsync(path: string) {
+	/** Fire and forget */
+	public loadSample(path: string): void {
+		// eslint-disable-next-line @typescript-eslint/no-floating-promises
+		this._loadSample(path)
+			.catch(error => {
+				logger.error('error in _loadSample:', {error})
+			})
+	}
+
+	private async _loadSample(path: string): Promise<void> {
 		const status = this._samplesStatus.get(path)
 
 		if (status !== undefined) return
 
 		if (path === dummySamplePath) {
-			return logger.warn(`loadSampleAsync should not be called with dummy sample, dummy`)
+			return logger.warn(
+				`loadSampleAsync should not be called with dummy sample, dummy`)
 		}
 
 		this._samplesStatus.set(path, SampleStatus.Requested)
 
-		const sample = await fetch(
-			`${getCdnUrl()}${path}`,
-			{mode: 'cors'}
-		)
-			.then(async response => {
-				return this._audioContext.decodeAudioData(
-					await response.arrayBuffer())
-			})
+		const url = `${getCdnUrl()}${path}`
+
+		const sample = await fetch(url, {mode: 'cors'})
+			.then(async response => response.arrayBuffer())
+			.then(async buffer => this._audioContext.decodeAudioData(buffer))
 
 		// const MB = sample.length * sample.numberOfChannels * 4 / 1000 / 1000
 

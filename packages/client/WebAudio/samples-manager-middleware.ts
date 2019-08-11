@@ -35,7 +35,6 @@ export function createSamplesManagerMiddleware(
 	}
 
 	function fetchSample({filePath}: Sample): void {
-		/* eslint-disable-next-line @typescript-eslint/no-floating-promises */
-		samplesManager.loadSampleAsync(filePath)
+		samplesManager.loadSample(filePath)
 	}
 }

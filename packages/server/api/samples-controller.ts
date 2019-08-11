@@ -6,7 +6,7 @@ import {
 import {logger} from '@corgifm/common/logger'
 import {Upload} from '@corgifm/common/models/OtherModels'
 import {
-	MBtoBytes, createNodeId, validateSampleFilenameExtension,
+	MBtoBytes, createNodeId, validateSampleFilenameExtension, bytesToMB,
 } from '@corgifm/common/common-utils'
 import {DBStore} from '../database/database'
 import {ServerStore} from '../server-redux-types'
@@ -87,15 +87,18 @@ export function getSamplesController(
 		}
 	}
 
-	async function enforceUploadBytesCap(request: SecureApiRequest, receivedUpload: UploadResult) {
+	async function enforceUploadBytesCap(
+		request: SecureApiRequest, receivedUpload: UploadResult,
+	) {
 		const newTotalUploadedBytes =
 			(await dbStore.uploads.getTotalUploadBytesForUser(request.callerUid))
 			+ receivedUpload.file.size
 
 		if (newTotalUploadedBytes > maxTotalSingleUserUploadBytes) {
-			throw new CorgiBadRequestError(oneLine`this upload would put user's total
-				uploaded bytes at ${newTotalUploadedBytes} which is over the upload
-				cap of ${maxTotalSingleUserUploadBytes} bytes`)
+			throw new CorgiBadRequestError(oneLine`this upload would put your total
+				uploads at ${bytesToMB(newTotalUploadedBytes).toFixed(0)} MB which is
+				over the upload cap of
+				${bytesToMB(maxTotalSingleUserUploadBytes).toFixed(0)} MB`)
 		}
 	}
 }

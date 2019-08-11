@@ -97,8 +97,14 @@ export function capitalizeFirstLetter(string: string) {
 	return string.charAt(0).toUpperCase() + string.slice(1)
 }
 
-export function MBtoBytes(size: number) {
-	return size * 1000 * 1000
+/** Megabytes to bytes */
+export function MBtoBytes(MB: number) {
+	return MB * 1000 * 1000
+}
+
+/** Bytes to megabytes */
+export function bytesToMB(bytes: number) {
+	return bytes / 1000 / 1000
 }
 
 export function validateSampleFilenameExtension(filename: string) {
