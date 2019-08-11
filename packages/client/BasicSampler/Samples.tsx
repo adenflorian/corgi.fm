@@ -149,8 +149,8 @@ const SamplePad = React.memo((props: SamplePadProps) => {
 			? 'Uploading'
 			: dragState === 'over'
 				? isLoggedIn
-					? 'Drop to upload'
-					: 'Login to upload'
+					? 'Upload...'
+					: 'Login first'
 				: sample.label
 	}
 

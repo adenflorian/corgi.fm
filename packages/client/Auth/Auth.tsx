@@ -162,7 +162,7 @@ export const AuthModalContent: ModalContent = ({hideModal}) => {
 		promise: Promise<firebase.auth.UserCredential>,
 	) {
 		return promise
-			.then(() => dispatch(chatSystemMessage('Logged in!')))
+			.then(() => dispatch(chatSystemMessage('Logged in!', 'success')))
 			.then(handleAuthSuccess)
 			.catch(handleAuthError)
 	}
