@@ -26,7 +26,7 @@ import {logger} from '../client-logger'
 import {corgiApiActions} from '../RestClient/corgi-api-middleware'
 
 interface Props {
-	samplerId: string
+	samplerId: Id
 }
 
 export const Samples = React.memo(({samplerId}: Props) => {

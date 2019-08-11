@@ -11,7 +11,7 @@ import {ConnectedSimpleGraphNode} from './SimpleGraphNode'
 import {ConnectedZoom} from './Zoom'
 
 interface ISimpleGraphReduxProps {
-	positionIds: Seq.Indexed<string>
+	positionIds: Seq.Indexed<Id>
 }
 
 const canvasSize = ECSCanvasRenderSystem.canvasSize
@@ -35,13 +35,13 @@ export const SimpleGraph =
 						<ConnectedGhostConnectionsView />
 						{positionIds.map(positionId =>
 							<ConnectedConnectorPlaceholders
-								key={positionId}
+								key={positionId.toString()}
 								parentId={positionId}
 							/>,
 						)}
 						{positionIds.map(positionId =>
 							<ConnectedSimpleGraphNode
-								key={positionId}
+								key={positionId.toString()}
 								positionId={positionId}
 							/>,
 						)}

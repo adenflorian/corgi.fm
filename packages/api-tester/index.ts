@@ -39,7 +39,7 @@ type TestRequest<TRequestModel = object, TResponseModel = object> = {
 } & ({
 	readonly status: Exclude<Status, 204>
 	readonly contentType: ContentTypes
-	readonly resBody: TResponseModel | RegExp
+	readonly resBody: TResponseModel | RegExp | number
 	readonly validateResponseBodyModel?: ClassType<TResponseModel>
 } | {
 	readonly status: 204
@@ -163,7 +163,7 @@ export function post<TModel extends object, TResponseModel extends object>(
 }
 
 /** PUT */
-export function put<TModel extends object, TResponseModel extends object>(
+export function put<TModel extends object, TResponseModel extends object = object>(
 	args: PutRequest<TModel, TResponseModel>
 ): RequestTest {
 	const testLocation = getCallerLocation()

@@ -7,7 +7,7 @@ import {
 import {ConnectedMousePointer} from './MousePointer'
 
 interface IMousePointersViewProps {
-	clientIds: List<string>
+	clientIds: List<Id>
 }
 
 export const MousePointers: React.FC<IMousePointersViewProps> =
@@ -17,7 +17,7 @@ export const MousePointers: React.FC<IMousePointersViewProps> =
 				{clientIds
 					.map(clientId =>
 						<ConnectedMousePointer
-							key={clientId}
+							key={clientId.toString()}
 							clientId={clientId}
 						/>,
 					)

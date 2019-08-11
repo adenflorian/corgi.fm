@@ -1,5 +1,3 @@
-import {Point} from '@corgifm/common/common-types'
-
 class SimpleGlobalClientState {
 	private _zoom = 1
 	private _zoomDisplay = 0

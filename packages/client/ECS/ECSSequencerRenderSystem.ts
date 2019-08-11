@@ -7,7 +7,7 @@ export class ECSSequencerRenderSystem extends ECSSystem {
 	public static readonly canvasIdPrefix = 'ECSCanvasRenderSystemCanvas-node-'
 
 	private _canvasContexts = Map<Id, CanvasRenderingContext2D>()
-	private _isPlaying = Map<string, boolean>()
+	private _isPlaying = Map<Id, boolean>()
 
 	public getRequiredComponents(): Set<ECSComponentType> {
 		return Set([

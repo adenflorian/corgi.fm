@@ -25,7 +25,7 @@ import {simpleGlobalClientState} from '../SimpleGlobalClientState'
 import {ConnectedVolumeControl} from '../Volume/VolumeControl'
 
 interface ISimpleGraphNodeProps {
-	positionId: string
+	positionId: Id
 }
 
 interface ISimpleGraphNodeReduxProps {

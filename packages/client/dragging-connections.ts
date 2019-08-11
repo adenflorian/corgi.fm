@@ -1,6 +1,5 @@
 import {List} from 'immutable'
 import {Dispatch} from 'redux'
-import {Point} from '@corgifm/common/common-types'
 import {logger} from '@corgifm/common/logger'
 import {IClientRoomState} from '@corgifm/common/redux/common-redux-types'
 import {
@@ -17,7 +16,7 @@ interface ConnectionCandidate extends IPosition {
 }
 
 export function handleStopDraggingGhostConnector(
-	roomState: IClientRoomState, dispatch: Dispatch, ghostConnectionId: string,
+	roomState: IClientRoomState, dispatch: Dispatch, ghostConnectionId: Id,
 ) {
 	const ghostConnection = selectGhostConnection(roomState, ghostConnectionId)
 

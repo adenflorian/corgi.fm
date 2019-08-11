@@ -10,7 +10,7 @@ export enum ConnectionsUsage {
 interface IConnectionsProps {}
 
 interface IConnectionsReduxProps {
-	connectionIds: string[]
+	connectionIds: Id[]
 }
 
 type IConnectionsAllProps = IConnectionsProps & IConnectionsReduxProps
@@ -19,7 +19,7 @@ export const Connections = function _Connections({connectionIds}: IConnectionsAl
 	return (
 		<div className="connections">
 			{connectionIds.map(connectionId =>
-				<ConnectedConnectionView key={connectionId} id={connectionId} />,
+				<ConnectedConnectionView key={connectionId.toString()} id={connectionId} />,
 			)}
 		</div>
 	)

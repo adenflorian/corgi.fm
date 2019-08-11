@@ -12,7 +12,7 @@ export function GhostConnectionsView({ghostConnections}: ReduxProps) {
 			{ghostConnections.map(ghostConnection => {
 				return (
 					<ConnectedGhostConnectionView
-						key={ghostConnection.id}
+						key={ghostConnection.id.toString()}
 						id={ghostConnection.id}
 					/>
 				)

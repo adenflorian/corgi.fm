@@ -1,6 +1,5 @@
 import React from 'react'
 import {useDispatch} from 'react-redux'
-import {ClientId} from '@corgifm/common/common-types'
 import {
 	ActiveGhostConnectorSourceOrTarget, calculateConnectorPositionY, createSelectPlaceholdersInfo,
 	GhostConnection, ghostConnectorActions,
@@ -11,7 +10,7 @@ import {connectorWidth} from './ConnectionView'
 import {ConnectorPlaceholder} from './ConnectorPlaceholder'
 
 interface Props {
-	parentId: string
+	parentId: Id
 }
 
 interface ReduxProps {
