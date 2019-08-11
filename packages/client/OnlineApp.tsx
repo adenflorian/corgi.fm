@@ -20,7 +20,11 @@ type AllProps = IOnlineAppProps & ReduxProps
 export class OnlineApp extends React.PureComponent<AllProps> {
 	public render() {
 		return (
-			<div className={this.props.onlyOwnerCanDoStuff && !this.props.isLocalClientRoomOwner ? 'restricted' : ''}>
+			<div
+				className={this.props.onlyOwnerCanDoStuff && !this.props.isLocalClientRoomOwner ? 'restricted' : ''}
+				onDragOver={e => e.preventDefault()}
+				onDrop={e => e.preventDefault()}
+			>
 				<ModalManager />
 				<ConnectedChat />
 				<ConnectedTopDiv />
