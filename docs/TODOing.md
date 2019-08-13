@@ -162,6 +162,7 @@
 	- [√] octave knob to scroll through all 128 samples
 	- [√] right click on pad should not play it
 	- [√] scrolling thru octaves shouldn't trigger animation
+	- [ ] change create server stuff to create a drum sampler
 	- [ ] right click pad > select samples...
 		- [√] Default samples (built-in samples)
 		- [ ] Public samples
@@ -222,6 +223,14 @@
 		- [√] samples manager middleware?
 		- [√] if `getSample` gets called and sample isn't loaded, then that's an error?
 
+select sample then knobs on right are for that sample
+mimic hardware samplers like the volca sample
+button to toggle HUD
+box select to move or delete multiple things at once
+
+- [ ] ask the user's experience level
+- [ ] ask what the user wants to use corgi for
+- [ ] feedback thru sentry
 - [ ] change shared pointer to show user is dragging a file
 - [ ] change shared pointer to show user is typing
 - [ ] change shared pointer to show user is in a modal
