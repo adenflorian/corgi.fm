@@ -85,7 +85,7 @@ export function getSampleApiTests(
 				name: 'user hit upload cap',
 				status: 400,
 				contentType: ContentTypes.ApplicationJson,
-				resBody: /this upload would put user's total uploaded bytes/,
+				resBody: /this upload would put your total uploads at/,
 				request: {
 					upload: {
 						fileField: 'file',
