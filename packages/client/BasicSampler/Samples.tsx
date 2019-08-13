@@ -4,6 +4,7 @@ import {
 	selectSamples, basicSamplerActions, selectSamplerViewOctave,
 	BasicSamplerState, localActions, createAnimationFrameSelector,
 	createUploadStatusSelector, chatSystemMessage, useLoggedIn,
+	createIsPadSelectedSelector,
 } from '@corgifm/common/redux'
 import {IMidiNote} from '@corgifm/common/MidiNote'
 import {
@@ -99,10 +100,12 @@ const SamplePad = React.memo((props: SamplePadProps) => {
 			if (sample.filePath === dummySamplePath) return
 			if (e.button !== 0) return
 			dispatch(localActions.playShortNoteOnTarget(samplerId, midiNote))
+			dispatch(basicSamplerActions.selectSamplePad(samplerId, midiNote))
 		},
 		[dispatch, midiNote, sample, samplerId])
 
 	const frame = useSelector(createAnimationFrameSelector(samplerId, midiNote))
+	const isSelected = useSelector(createIsPadSelectedSelector(samplerId, midiNote))
 	const isLoggedIn = useLoggedIn()
 	const uploadStatus = useSelector(
 		createUploadStatusSelector(samplerId, midiNote))
@@ -129,7 +132,7 @@ const SamplePad = React.memo((props: SamplePadProps) => {
 		>
 			<div
 				className={oneLine`sample ${getAnimationClass()} drag-${dragState}
-					upload-${uploadStatus}`}
+					upload-${uploadStatus} selected-${isSelected}`}
 				onMouseDown={playNote}
 				style={{color: CssColor[sample.color]}}
 				title={midiNoteToNoteNameFull(midiNote) + '\n"' + label +

@@ -58,6 +58,15 @@ export const basicSamplerActions = {
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	} as const),
+	selectSamplePad: (
+		samplerId: Id, midiNote?: IMidiNote,
+	) => ({
+		type: 'SELECT_SAMPLE_PAD',
+		id: samplerId,
+		midiNote,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	} as const),
 } as const
 
 type BasicSamplerParamTypes = number | BuiltInBQFilterType
@@ -110,6 +119,7 @@ export class BasicSamplerState implements IConnectable, NodeSpecialState {
 		filterType: BasicSamplerState.defaultFilterType,
 		samples: makeSamples(),
 		samplesViewOctave: 4,
+		selectedSamplePad: undefined,
 	}
 
 	public readonly id = uuid.v4()
@@ -131,6 +141,7 @@ export class BasicSamplerState implements IConnectable, NodeSpecialState {
 	public readonly filterType: BuiltInBQFilterType = BasicSamplerState.defaultFilterType
 	public readonly samples: Samples = samplerBasicPianoNotes
 	public readonly samplesViewOctave: number = 4
+	public readonly selectedSamplePad?: IMidiNote = undefined
 
 	public constructor(ownerId: ClientId) {
 		this.ownerId = ownerId
@@ -159,6 +170,7 @@ const basicSamplerActionTypes = [
 	'SET_SAMPLE_COLOR',
 	'SET_SAMPLER_VIEW_OCTAVE',
 	'SET_SAMPLE',
+	'SELECT_SAMPLE_PAD',
 ]
 
 export const basicSamplersReducer = makeMultiReducer<BasicSamplerState, IBasicSamplersState>(
@@ -195,6 +207,11 @@ function basicSamplerReducer(basicSampler: BasicSamplerState, action: BasicSampl
 					BasicSamplerState.minViewOctave,
 					BasicSamplerState.maxViewOctave),
 			}
+		case 'SELECT_SAMPLE_PAD':
+			return {
+				...basicSampler,
+				selectedSamplePad: action.midiNote,
+			}
 		default:
 			return basicSampler
 	}
@@ -218,3 +235,6 @@ export const selectSamples = (id: Id) => (state: IClientAppState) =>
 
 export const selectSamplerViewOctave = (id: Id) => (state: IClientAppState) =>
 	selectSampler(state.room, id).samplesViewOctave
+
+export const createIsPadSelectedSelector = (id: Id, midiNote: IMidiNote) => (state: IClientAppState) =>
+	selectSampler(state.room, id).selectedSamplePad === midiNote

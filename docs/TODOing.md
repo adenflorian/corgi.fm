@@ -227,6 +227,13 @@ select sample then knobs on right are for that sample
 mimic hardware samplers like the volca sample
 button to toggle HUD
 box select to move or delete multiple things at once
+way to clear samples from sampler
+put SVG's on CDN
+double click node to collapse
+instead of smooth timeline animation, show a moving dot or blinking dot
+velocity
+create sampler menu should let you pick from empty/piano/drum kit
+show download progress on pad
 
 - [ ] ask the user's experience level
 - [ ] ask what the user wants to use corgi for
