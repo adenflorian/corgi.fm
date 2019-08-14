@@ -20,6 +20,8 @@ export const setSimpleDelayParam =
 		BROADCASTER_ACTION,
 	})
 
+export type SimpleDelayAction = SetSimpleDelayParamAction
+
 export enum SimpleDelayParam {
 	timeLeft = 'timeLeft',
 	timeRight = 'timeRight',
@@ -111,9 +113,15 @@ export function deserializeSimpleDelayState(state: IMultiStateThing): IMultiStat
 	return y
 }
 
-const simpleDelayActionTypes = [
-	SET_SIMPLE_DELAY_PARAM,
-]
+type SimpleDelayActionTypes = {
+	[key in SimpleDelayAction['type']]: 0
+}
+
+const simpleDelayActionTypes2: SimpleDelayActionTypes = {
+	SET_SIMPLE_DELAY_PARAM: 0,
+}
+
+const simpleDelayActionTypes = Object.keys(simpleDelayActionTypes2)
 
 export const simpleDelaysReducer = makeMultiReducer<SimpleDelayState, ISimpleDelaysState>(
 	simpleDelayReducer,
@@ -121,7 +129,7 @@ export const simpleDelaysReducer = makeMultiReducer<SimpleDelayState, ISimpleDel
 	simpleDelayActionTypes,
 )
 
-function simpleDelayReducer(simpleDelay: SimpleDelayState, action: AnyAction) {
+function simpleDelayReducer(simpleDelay: SimpleDelayState, action: SimpleDelayAction) {
 	switch (action.type) {
 		case SET_SIMPLE_DELAY_PARAM:
 			return {

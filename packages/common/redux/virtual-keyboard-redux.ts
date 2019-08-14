@@ -28,38 +28,38 @@ export const VIRTUAL_KEY_PRESSED = 'VIRTUAL_KEY_PRESSED'
 export type VirtualKeyPressedAction = ReturnType<typeof virtualKeyPressed>
 export const virtualKeyPressed = (id: Id, number: number, octave: Octave, midiNote: IMidiNote) => {
 	return {
-		type: VIRTUAL_KEY_PRESSED as typeof VIRTUAL_KEY_PRESSED,
+		type: VIRTUAL_KEY_PRESSED,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 		id,
 		number,
 		octave,
 		midiNote,
-	}
+	} as const
 }
 
 export const VIRTUAL_KEY_UP = 'VIRTUAL_KEY_UP'
 export type VirtualKeyUpAction = ReturnType<typeof virtualKeyUp>
 export const virtualKeyUp = (id: Id, number: number) => {
 	return {
-		type: VIRTUAL_KEY_UP as typeof VIRTUAL_KEY_UP,
+		type: VIRTUAL_KEY_UP,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 		id,
 		number,
-	}
+	} as const
 }
 
 export const VIRTUAL_OCTAVE_CHANGE = 'VIRTUAL_OCTAVE_CHANGE'
 export type VirtualOctaveChangeAction = ReturnType<typeof virtualOctaveChange>
 export const virtualOctaveChange = (id: Id, delta: number) => {
 	return {
-		type: VIRTUAL_OCTAVE_CHANGE as typeof VIRTUAL_OCTAVE_CHANGE,
+		type: VIRTUAL_OCTAVE_CHANGE,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 		id,
 		delta,
-	}
+	} as const
 }
 
 export interface IVirtualKeyboardsState extends IMultiState {
@@ -116,11 +116,17 @@ export class VirtualKeyboardState implements IMultiStateThing, NodeSpecialState 
 
 export type VirtualKeyboardAction = VirtualOctaveChangeAction | VirtualKeyUpAction | VirtualKeyPressedAction
 
-const keyboardActionTypes = [
-	VIRTUAL_KEY_PRESSED,
-	VIRTUAL_KEY_UP,
-	VIRTUAL_OCTAVE_CHANGE,
-]
+type KeyboardActionTypes = {
+	[key in VirtualKeyboardAction['type']]: 0
+}
+
+const keyboardActionTypes2: KeyboardActionTypes = {
+	VIRTUAL_KEY_PRESSED: 0,
+	VIRTUAL_KEY_UP: 0,
+	VIRTUAL_OCTAVE_CHANGE: 0,
+}
+
+const keyboardActionTypes = Object.keys(keyboardActionTypes2)
 
 export const virtualKeyboardsReducer = makeMultiReducer<VirtualKeyboardState, IVirtualKeyboardsState>(
 	virtualKeyboardReducer, ConnectionNodeType.virtualKeyboard, keyboardActionTypes)

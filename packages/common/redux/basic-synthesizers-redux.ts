@@ -11,6 +11,7 @@ export const addBasicSynthesizer = (instrument: BasicSynthesizerState) =>
 	addMultiThing(instrument, ConnectionNodeType.basicSynthesizer, NetworkActionType.SERVER_AND_BROADCASTER)
 
 export const SET_BASIC_INSTRUMENT_OSCILLATOR_TYPE = 'SET_BASIC_INSTRUMENT_OSCILLATOR_TYPE'
+export type SetBasicSynthesizerOscillatorTypeAction = ReturnType<typeof setBasicSynthesizerOscillatorType>
 export const setBasicSynthesizerOscillatorType =
 	(id: Id, oscillatorType: ShamuOscillatorType) => ({
 		type: SET_BASIC_INSTRUMENT_OSCILLATOR_TYPE,
@@ -18,9 +19,10 @@ export const setBasicSynthesizerOscillatorType =
 		oscillatorType,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
-	})
+	} as const)
 
 export const SET_BASIC_INSTRUMENT_PARAM = 'SET_BASIC_INSTRUMENT_PARAM'
+export type SetBasicSynthesizerParamAction = ReturnType<typeof setBasicSynthesizerParam>
 export const setBasicSynthesizerParam =
 	(id: Id, paramName: BasicSynthesizerParam, value: any) => ({
 		type: SET_BASIC_INSTRUMENT_PARAM,
@@ -29,7 +31,9 @@ export const setBasicSynthesizerParam =
 		value,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
-	})
+	} as const)
+
+export type BasicSynthAction = SetBasicSynthesizerOscillatorTypeAction | SetBasicSynthesizerParamAction
 
 export enum BasicSynthesizerParam {
 	pan = 'pan',
@@ -150,18 +154,22 @@ export function deserializeBasicSynthesizerState(state: IMultiStateThing): IMult
 	return y
 }
 
-const basicSynthesizerActionTypes = [
-	SET_BASIC_INSTRUMENT_OSCILLATOR_TYPE,
-	SET_BASIC_INSTRUMENT_PARAM,
-]
+type BasicSynthActionTypes = {
+	[key in BasicSynthAction['type']]: 0
+}
+
+const basicSynthesizerActionTypes: BasicSynthActionTypes = {
+	SET_BASIC_INSTRUMENT_OSCILLATOR_TYPE: 0,
+	SET_BASIC_INSTRUMENT_PARAM: 0,
+}
 
 export const basicSynthesizersReducer = makeMultiReducer<BasicSynthesizerState, IBasicSynthesizersState>(
 	basicSynthesizerReducer,
 	ConnectionNodeType.basicSynthesizer,
-	basicSynthesizerActionTypes,
+	Object.keys(basicSynthesizerActionTypes),
 )
 
-function basicSynthesizerReducer(basicSynthesizer: BasicSynthesizerState, action: AnyAction) {
+function basicSynthesizerReducer(basicSynthesizer: BasicSynthesizerState, action: BasicSynthAction) {
 	switch (action.type) {
 		case SET_BASIC_INSTRUMENT_OSCILLATOR_TYPE:
 			return {

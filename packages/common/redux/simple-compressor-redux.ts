@@ -2,7 +2,11 @@ import {AnyAction} from 'redux'
 import * as uuid from 'uuid'
 import {ConnectionNodeType, IConnectable, IMultiStateThing} from '../common-types'
 import {NodeSpecialState} from './shamu-graph'
-import {addMultiThing, BROADCASTER_ACTION, createSelectAllOfThingAsArray, IClientRoomState, IMultiState, makeMultiReducer, NetworkActionType, SERVER_ACTION} from '.'
+import {
+	addMultiThing, BROADCASTER_ACTION, createSelectAllOfThingAsArray,
+	IClientRoomState, IMultiState, makeMultiReducer, NetworkActionType,
+	SERVER_ACTION,
+} from '.'
 
 export const addSimpleCompressor = (sampler: SimpleCompressorState) =>
 	addMultiThing(sampler, ConnectionNodeType.simpleCompressor, NetworkActionType.SERVER_AND_BROADCASTER)
@@ -11,13 +15,15 @@ export const SET_SIMPLE_COMPRESSOR_PARAM = 'SET_SIMPLE_COMPRESSOR_PARAM'
 export type SetSimpleCompressorParamAction = ReturnType<typeof setSimpleCompressorParam>
 export const setSimpleCompressorParam =
 	(id: Id, paramName: SimpleCompressorParam, value: any) => ({
-		type: SET_SIMPLE_COMPRESSOR_PARAM as typeof SET_SIMPLE_COMPRESSOR_PARAM,
+		type: SET_SIMPLE_COMPRESSOR_PARAM,
 		id,
 		paramName,
 		value,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
-	})
+	} as const)
+
+export type SimpleCompressorAction = SetSimpleCompressorParamAction
 
 export enum SimpleCompressorParam {
 	threshold = 'threshold',
@@ -85,9 +91,15 @@ export function deserializeSimpleCompressorState(state: IMultiStateThing): IMult
 	return y
 }
 
-const simpleCompressorActionTypes = [
-	SET_SIMPLE_COMPRESSOR_PARAM,
-]
+type SimpleCompressorActionTypes = {
+	[key in SimpleCompressorAction['type']]: 0
+}
+
+const simpleCompressorActionTypes2: SimpleCompressorActionTypes = {
+	SET_SIMPLE_COMPRESSOR_PARAM: 0,
+}
+
+const simpleCompressorActionTypes = Object.keys(simpleCompressorActionTypes2)
 
 export const simpleCompressorsReducer = makeMultiReducer<SimpleCompressorState, ISimpleCompressorsState>(
 	simpleCompressorReducer,
@@ -95,7 +107,7 @@ export const simpleCompressorsReducer = makeMultiReducer<SimpleCompressorState, 
 	simpleCompressorActionTypes,
 )
 
-function simpleCompressorReducer(simpleCompressor: SimpleCompressorState, action: AnyAction) {
+function simpleCompressorReducer(simpleCompressor: SimpleCompressorState, action: SimpleCompressorAction) {
 	switch (action.type) {
 		case SET_SIMPLE_COMPRESSOR_PARAM:
 			return {

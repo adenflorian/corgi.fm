@@ -154,18 +154,30 @@ export function deserializeInfiniteSequencerState(state: IMultiStateThing): IMul
 	return y
 }
 
-const infiniteSequencerActionTypes = [
-	'SET_INFINITE_SEQUENCER_NOTE',
-	'DELETE_INFINITE_SEQUENCER_NOTE',
-	'SET_INFINITE_SEQUENCER_FIELD',
-	'CLEAR_SEQUENCER',
-	'UNDO_SEQUENCER',
-	'PLAY_SEQUENCER',
-	'STOP_SEQUENCER',
-	'RECORD_SEQUENCER_NOTE',
-	'RECORD_SEQUENCER_REST',
-	'TOGGLE_SEQUENCER_RECORDING',
-]
+type InfiniteSequencerActionTypes = {
+	[key in InfiniteSequencerAction['type']]: 0
+}
+
+const infiniteSequencerActionTypes2: InfiniteSequencerActionTypes = {
+	SET_INFINITE_SEQUENCER_NOTE: 0,
+	DELETE_INFINITE_SEQUENCER_NOTE: 0,
+	SET_INFINITE_SEQUENCER_FIELD: 0,
+	CLEAR_SEQUENCER: 0,
+	UNDO_SEQUENCER: 0,
+	PLAY_SEQUENCER: 0,
+	STOP_SEQUENCER: 0,
+	RECORD_SEQUENCER_NOTE: 0,
+	RECORD_SEQUENCER_REST: 0,
+	TOGGLE_SEQUENCER_RECORDING: 0,
+	EXPORT_SEQUENCER_MIDI: 0,
+	PLAY_ALL: 0,
+	RESTART_INFINITE_SEQUENCER: 0,
+	SKIP_NOTE: 0,
+	STOP_ALL: 0,
+	VIRTUAL_KEY_PRESSED: 0,
+}
+
+const infiniteSequencerActionTypes = Object.keys(infiniteSequencerActionTypes2)
 
 assertArrayHasNoUndefinedElements(infiniteSequencerActionTypes)
 

@@ -206,16 +206,28 @@ export function findHighestNote(events: MidiClipEvents): number {
 	return highest
 }
 
-const gridSequencerActionTypes = [
-	'SET_GRID_SEQUENCER_NOTE',
-	'SET_GRID_SEQUENCER_FIELD',
-	'CLEAR_SEQUENCER',
-	'UNDO_SEQUENCER',
-	'PLAY_SEQUENCER',
-	'STOP_SEQUENCER',
-	'TOGGLE_SEQUENCER_RECORDING',
-	'RECORD_SEQUENCER_NOTE',
-]
+type GridSequencerActionTypes = {
+	[key in GridSequencerAction['type']]: 0
+}
+
+const gridSequencerActionTypes2: GridSequencerActionTypes = {
+	SET_GRID_SEQUENCER_NOTE: 0,
+	SET_GRID_SEQUENCER_FIELD: 0,
+	CLEAR_SEQUENCER: 0,
+	UNDO_SEQUENCER: 0,
+	PLAY_SEQUENCER: 0,
+	STOP_SEQUENCER: 0,
+	TOGGLE_SEQUENCER_RECORDING: 0,
+	RECORD_SEQUENCER_NOTE: 0,
+	EXPORT_SEQUENCER_MIDI: 0,
+	PLAY_ALL: 0,
+	RECORD_SEQUENCER_REST: 0,
+	RESTART_GRID_SEQUENCER: 0,
+	SKIP_NOTE: 0,
+	STOP_ALL: 0,
+}
+
+const gridSequencerActionTypes = Object.keys(gridSequencerActionTypes2)
 
 assertArrayHasNoUndefinedElements(gridSequencerActionTypes)
 

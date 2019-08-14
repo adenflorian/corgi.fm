@@ -24,6 +24,8 @@ export const setSimpleReverbParam =
 		BROADCASTER_ACTION,
 	})
 
+export type SimpleReverbAction = SetSimpleReverbParamAction
+
 export enum SimpleReverbParam {
 	lowPassFilterCutoffFrequency = 'lowPassFilterCutoffFrequency',
 	time = 'time',
@@ -103,9 +105,15 @@ export function deserializeSimpleReverbState(state: IMultiStateThing): IMultiSta
 	return y
 }
 
-const simpleReverbActionTypes = [
-	SET_SIMPLE_REVERB_PARAM,
-]
+type SimpleReverbActionTypes = {
+	[key in SimpleReverbAction['type']]: 0
+}
+
+const simpleReverbActionTypes2: SimpleReverbActionTypes = {
+	SET_SIMPLE_REVERB_PARAM: 0,
+}
+
+const simpleReverbActionTypes = Object.keys(simpleReverbActionTypes2)
 
 export const simpleReverbsReducer = makeMultiReducer<SimpleReverbState, ISimpleReverbsState>(
 	simpleReverbReducer,

@@ -133,9 +133,15 @@ export interface GroupEvent {
 
 export type GroupSequencerAction = ActionType<typeof groupSequencerActions>
 
-const groupSequencerActionTypes: string[] = [
-	'GROUP_SEQ_SET_ENABLED',
-]
+type GroupSequencerActionTypes = {
+	[key in GroupSequencerAction['type']]: 0
+}
+
+const groupSequencerActionTypes2: GroupSequencerActionTypes = {
+	GROUP_SEQ_SET_ENABLED: 0,
+}
+
+const groupSequencerActionTypes = Object.keys(groupSequencerActionTypes2)
 
 export const groupSequencersReducer = makeMultiReducer<GroupSequencer, GroupSequencersState>(
 	groupSequencerReducer,
