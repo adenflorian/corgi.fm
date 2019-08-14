@@ -146,6 +146,7 @@ export const SamplerControls = React.memo(({id}: SamplerControlsProps) => {
 					onChangeId={BasicSamplerParam.detune}
 					tooltip={detuneToolTip}
 					valueString={detuneValueToString}
+					readOnly={selectedSampleNote === undefined}
 				/>
 				<Knob
 					min={0}
