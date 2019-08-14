@@ -178,12 +178,12 @@ class SynthVoices extends Voices<SynthVoice> {
 		private _lfoAmount: number,
 		private _lfoTarget: SynthLfoTarget,
 		private _lfoWave: LfoOscillatorType,
-		private _releaseTimeInSeconds: number,
+		release: number,
 	) {
-		super(_detune, _lowPassFilterCutoffFrequency, _filterType)
+		super(_detune, _lowPassFilterCutoffFrequency, _filterType, release)
 	}
 
-	protected _createVoice(invincible: boolean, attack: number, decay: number, sustain: number) {
+	protected _createVoice(invincible: boolean, note: number, attack: number, decay: number, sustain: number) {
 		return new SynthVoice(
 			this._audioContext,
 			this._destination,
@@ -258,7 +258,7 @@ class SynthVoice extends Voice {
 		// private _lfoWave: LfoOscillatorType,
 	) {
 		super(audioContext, destination, onEnded, attackTimeInSeconds,
-			decayTimeInSeconds, detune, sustain,
+			decayTimeInSeconds, sustain, detune,
 			lowPassFilterCutoffFrequency, filterType, invincible)
 
 		this._oscillatorType = oscType

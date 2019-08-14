@@ -128,6 +128,7 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 		this._releaseTimeInSeconds = releaseTimeInSeconds
 		// TODO?
 		// this._getVoices().changeSustainLengthForScheduledVoices(this._releaseTimeInSeconds)
+		this._getVoices().setRelease(this._releaseTimeInSeconds)
 	}
 
 	public readonly setFilterAttack = (filterAttackTimeInSeconds: number) => {

@@ -13,6 +13,7 @@ export abstract class Voices<V extends Voice> {
 		protected _detune: number,
 		protected _lowPassFilterCutoffFrequency: number,
 		protected _filterType: BuiltInBQFilterType,
+		protected _releaseTimeInSeconds: number,
 	) {}
 
 	protected get _allVoices() {
@@ -33,6 +34,10 @@ export abstract class Voices<V extends Voice> {
 	public setLowPassFilterCutoffFrequency(frequency: number) {
 		this._lowPassFilterCutoffFrequency = frequency
 		this._allVoices.forEach(x => x.setLowPassFilterCutoffFrequency(frequency))
+	}
+
+	public readonly setRelease = (release: number) => {
+		this._releaseTimeInSeconds = release
 	}
 
 	public scheduleNote(

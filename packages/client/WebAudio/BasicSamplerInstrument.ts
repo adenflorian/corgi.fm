@@ -30,6 +30,7 @@ export class BasicSamplerInstrument
 			this._filter.type as BuiltInBQFilterType,
 			options.samples,
 			options.samplesManager,
+			this._releaseTimeInSeconds,
 		)
 	}
 
@@ -49,8 +50,9 @@ class SamplerVoices extends Voices<SamplerVoice> {
 		_filterType: BuiltInBQFilterType,
 		private _samples: Samples,
 		private readonly _samplesManager: SamplesManager,
+		releaseTimeInSeconds: number,
 	) {
-		super(_detune, _lowPassFilterCutoffFrequency, _filterType)
+		super(_detune, _lowPassFilterCutoffFrequency, _filterType, releaseTimeInSeconds)
 	}
 
 	public setSamples(samples: Samples) {
