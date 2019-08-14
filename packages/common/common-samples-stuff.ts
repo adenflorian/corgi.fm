@@ -1,8 +1,7 @@
 import {List, Map} from 'immutable'
 import {IMidiNote} from './MidiNote'
 import {Octave} from './common-types'
-import {pickRandomArrayElement} from './common-utils'
-import {CssColor} from './shamu-color'
+import {BuiltInBQFilterType} from './OscillatorTypes'
 
 export const octavesToGet = [1, 2, 3, 4, 5, 6, 7] as const
 
@@ -98,6 +97,23 @@ export interface Sample {
 	readonly label: string
 	readonly filePath: string
 	readonly color: typeof sampleColors[number] | 'panelGrayLight'
+	readonly parameters?: SampleParams
+}
+
+export interface SampleParams extends ReturnType<typeof makeSampleParams> {}
+
+export function makeSampleParams() {
+	return Object.freeze({
+		attack: 0,
+		decay: 0,
+		sustain: 1,
+		release: 1,
+		pan: 0,
+		filterCutoff: 20000,
+		filterType: BuiltInBQFilterType.lowpass,
+		detune: 0,
+		gain: 0.5,
+	})
 }
 
 export const dummySamplePath = 'dummySamplePath'

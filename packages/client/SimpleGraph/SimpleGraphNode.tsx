@@ -7,9 +7,10 @@ import {ConnectionNodeType} from '@corgifm/common/common-types'
 import {
 	getConnectionNodeInfo, IPosition, movePosition,
 	nodeClicked, selectConnectionSourceColorByTargetId,
-	SelectedNode, selectOptions, selectPosition, selectShamuMetaState, shamuConnect, shamuMetaActions,
+	SelectedNode, selectOptions, selectPosition, selectShamuMetaState,
+	shamuConnect, shamuMetaActions,
 } from '@corgifm/common/redux'
-import {ConnectedBasicSampler} from '../BasicSampler/BasicSampler'
+import {BasicSampler} from '../BasicSampler/BasicSampler'
 import {graphSizeX, graphSizeY, handleClassName, nodeMenuId} from '../client-constants'
 import {ECSSequencerRenderSystem} from '../ECS/ECSSequencerRenderSystem'
 import {ConnectedGridSequencerContainer} from '../GridSequencer/GridSequencerContainer'
@@ -138,7 +139,7 @@ export function getComponentByNodeType(type: ConnectionNodeType, id: Id, color: 
 		case ConnectionNodeType.virtualKeyboard: return <Keyboard id={id} />
 
 		case ConnectionNodeType.basicSynthesizer: return <ConnectedBasicSynthesizerView id={id} color={color} />
-		case ConnectionNodeType.basicSampler: return <ConnectedBasicSampler id={id} color={color} />
+		case ConnectionNodeType.basicSampler: return <BasicSampler id={id} color={color} />
 
 		case ConnectionNodeType.simpleReverb: return <ConnectedSimpleReverb id={id} color={color} />
 		case ConnectionNodeType.simpleCompressor: return <ConnectedSimpleCompressor id={id} color={color} />

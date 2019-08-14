@@ -3,7 +3,7 @@ import {ActionType} from 'typesafe-actions'
 import {Map} from 'immutable'
 import {ConnectionNodeType, IConnectable, IMultiStateThing, Octave} from '../common-types'
 import {BuiltInBQFilterType} from '../OscillatorTypes'
-import {samplerBasicPianoNotes, Samples, makeSamples, Sample} from '../common-samples-stuff'
+import {samplerBasicPianoNotes, Samples, makeSamples, Sample, SampleParams, makeSampleParams} from '../common-samples-stuff'
 import {convertToNumberKeyMap, clamp} from '../common-utils'
 import {IMidiNote} from '../MidiNote'
 import {NodeSpecialState} from './shamu-graph'
@@ -13,6 +13,7 @@ import {
 	IClientRoomState, IMultiState, makeMultiReducer, NetworkActionType,
 	SERVER_ACTION,
 } from '.'
+import {createSelector} from 'reselect';
 
 export const basicSamplerActions = {
 	add: (sampler: BasicSamplerState) =>
@@ -73,7 +74,7 @@ type BasicSamplerParamTypes = number | BuiltInBQFilterType
 
 export enum BasicSamplerParam {
 	pan = 'pan',
-	lowPassFilterCutoffFrequency = 'lowPassFilterCutoffFrequency',
+	filterCutoff = 'filterCutoff',
 	attack = 'attack',
 	decay = 'decay',
 	sustain = 'sustain',
@@ -102,14 +103,6 @@ export class BasicSamplerState implements IConnectable, NodeSpecialState {
 	public static dummy: BasicSamplerState = {
 		id: 'dummy',
 		ownerId: 'dummyOwner',
-		pan: 0,
-		lowPassFilterCutoffFrequency: 0,
-		attack: 0,
-		decay: 0,
-		sustain: 0,
-		release: 0,
-		detune: 0,
-		gain: 0.5,
 		color: false,
 		type: ConnectionNodeType.basicSampler,
 		width: BasicSamplerState.defaultWidth,
@@ -120,18 +113,11 @@ export class BasicSamplerState implements IConnectable, NodeSpecialState {
 		samples: makeSamples(),
 		samplesViewOctave: 4,
 		selectedSamplePad: undefined,
+		params: makeSampleParams(),
 	}
 
 	public readonly id = uuid.v4()
 	public readonly ownerId: Id
-	public readonly pan: number = Math.random() - 0.5
-	public readonly lowPassFilterCutoffFrequency: number = Math.min(10000, Math.random() * 10000 + 1000)
-	public readonly attack: number = 0.01
-	public readonly decay: number = 0
-	public readonly sustain: number = 1
-	public readonly release: number = 1
-	public readonly detune: number = 0
-	public readonly gain: number = 0.5
 	public readonly color: false = false
 	public readonly type = ConnectionNodeType.basicSampler
 	public readonly width: number = BasicSamplerState.defaultWidth
@@ -142,11 +128,13 @@ export class BasicSamplerState implements IConnectable, NodeSpecialState {
 	public readonly samples: Samples = samplerBasicPianoNotes
 	public readonly samplesViewOctave: number = 4
 	public readonly selectedSamplePad?: IMidiNote = undefined
+	public readonly params: SampleParams = makeSampleParams()
 
 	public constructor(ownerId: ClientId) {
 		this.ownerId = ownerId
 	}
 }
+
 
 export function deserializeBasicSamplerState(
 	state: IMultiStateThing
@@ -184,7 +172,10 @@ function basicSamplerReducer(basicSampler: BasicSamplerState, action: BasicSampl
 		case 'SET_BASIC_SAMPLER_PARAM':
 			return {
 				...basicSampler,
-				[action.paramName]: action.value,
+				params: {
+					...basicSampler.params,
+					[action.paramName]: action.value,
+				},
 			}
 		case 'SET_SAMPLE_COLOR':
 			return {
@@ -238,3 +229,23 @@ export const selectSamplerViewOctave = (id: Id) => (state: IClientAppState) =>
 
 export const createIsPadSelectedSelector = (id: Id, midiNote: IMidiNote) => (state: IClientAppState) =>
 	selectSampler(state.room, id).selectedSamplePad === midiNote
+
+export const createSelectedPadSelector = (id: Id) => (state: IClientAppState) =>
+	selectSampler(state.room, id).selectedSamplePad
+
+export const samplerParamsSelector = (id: Id) => createSelector(
+	(state: IClientAppState) => selectSampler(state.room, id).params,
+	(params) => {
+		return {
+			pan: params.pan,
+			filterCutoff: params.filterCutoff,
+			attack: params.attack,
+			decay: params.decay,
+			sustain: params.sustain,
+			release: params.release,
+			detune: params.detune,
+			gain: params.gain,
+			filterType: params.filterType,
+		}
+	}
+)
