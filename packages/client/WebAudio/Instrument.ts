@@ -57,15 +57,15 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 	}
 
 	public scheduleRelease(note: number, delaySeconds: number) {
-		this._getVoices().scheduleRelease(note, delaySeconds, this._releaseTimeInSeconds)
+		this._getVoices().scheduleRelease(note, delaySeconds)
 	}
 
 	public releaseAllScheduled() {
-		this._getVoices().releaseAllScheduled(this._releaseTimeInSeconds)
+		this._getVoices().releaseAllScheduled()
 	}
 
 	public releaseAllScheduledFromSourceId(sourceId: Id) {
-		this._getVoices().releaseAllScheduledFromSourceId(this._releaseTimeInSeconds, sourceId)
+		this._getVoices().releaseAllScheduledFromSourceId(sourceId)
 	}
 
 	public readonly getInputAudioNode = () => null

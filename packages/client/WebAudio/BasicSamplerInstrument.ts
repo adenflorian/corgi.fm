@@ -59,6 +59,13 @@ class SamplerVoices extends Voices<SamplerVoice> {
 		}
 	}
 
+	protected getRelease(note: IMidiNote): number {
+		const sample = this._samples.get(note, dummySample)
+		return sample.parameters
+			? sample.parameters.release
+			: 1
+	}
+
 	protected _createVoice(invincible: boolean, note: IMidiNote) {
 		const sample = this._samples.get(note, dummySample)
 		return new SamplerVoice(
@@ -90,6 +97,7 @@ class SamplerVoice extends Voice {
 	) {
 		super(
 			audioContext, destination, onEnded,
+			_sampleParams.attack, _sampleParams.decay, _sampleParams.sustain,
 			_sampleParams.detune, _sampleParams.filterCutoff,
 			_sampleParams.filterType, invincible, _sampleParams.gain,
 			_sampleParams.pan)

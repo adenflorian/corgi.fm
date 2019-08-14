@@ -62,6 +62,7 @@ export class BasicSynthesizer extends Instrument<SynthVoices, SynthVoice> {
 			this._lfoAmount,
 			this._lfoTarget,
 			this._lfoWave,
+			this._releaseTimeInSeconds,
 		)
 	}
 
@@ -177,11 +178,12 @@ class SynthVoices extends Voices<SynthVoice> {
 		private _lfoAmount: number,
 		private _lfoTarget: SynthLfoTarget,
 		private _lfoWave: LfoOscillatorType,
+		private _releaseTimeInSeconds: number,
 	) {
 		super(_detune, _lowPassFilterCutoffFrequency, _filterType)
 	}
 
-	protected _createVoice(invincible: boolean) {
+	protected _createVoice(invincible: boolean, attack: number, decay: number, sustain: number) {
 		return new SynthVoice(
 			this._audioContext,
 			this._destination,
@@ -191,6 +193,7 @@ class SynthVoices extends Voices<SynthVoice> {
 			this._filterType,
 			this._getOnEndedCallback(),
 			invincible,
+			attack, decay, sustain,
 			// this._lfoRate,
 			// this._lfoAmount,
 			// this._lfoTarget,
@@ -223,6 +226,10 @@ class SynthVoices extends Voices<SynthVoice> {
 		this._allVoices.forEach(x => x.setLfoTarget(target))
 	}
 
+	protected getRelease(): number {
+		return this._releaseTimeInSeconds
+	}
+
 	protected _getAudioContext() {return this._audioContext}
 }
 
@@ -242,12 +249,16 @@ class SynthVoice extends Voice {
 		filterType: BuiltInBQFilterType,
 		onEnded: OnEndedCallback,
 		invincible: boolean,
+		attackTimeInSeconds: number,
+		decayTimeInSeconds: number,
+		sustain: number,
 		// private _lfoRate: number,
 		// private _lfoAmount: number,
 		// private _lfoTarget: SynthLfoTarget,
 		// private _lfoWave: LfoOscillatorType,
 	) {
-		super(audioContext, destination, onEnded, detune,
+		super(audioContext, destination, onEnded, attackTimeInSeconds,
+			decayTimeInSeconds, detune, sustain,
 			lowPassFilterCutoffFrequency, filterType, invincible)
 
 		this._oscillatorType = oscType

@@ -61,7 +61,7 @@ export const SamplerControls = React.memo(({id}: SamplerControlsProps) => {
 					onChangeId={BasicSamplerParam.attack}
 					tooltip={attackToolTip}
 					valueString={adsrValueToString}
-					readOnly={selectedSampleNote !== undefined}
+					readOnly={selectedSampleNote === undefined}
 				/>
 				<Knob
 					min={0}
@@ -74,7 +74,7 @@ export const SamplerControls = React.memo(({id}: SamplerControlsProps) => {
 					onChangeId={BasicSamplerParam.decay}
 					tooltip={decayToolTip}
 					valueString={adsrValueToString}
-					readOnly={selectedSampleNote !== undefined}
+					readOnly={selectedSampleNote === undefined}
 				/>
 				<Knob
 					min={0}
@@ -86,7 +86,7 @@ export const SamplerControls = React.memo(({id}: SamplerControlsProps) => {
 					onChangeId={BasicSamplerParam.sustain}
 					tooltip={sustainToolTip}
 					valueString={adsrValueToString}
-					readOnly={selectedSampleNote !== undefined}
+					readOnly={selectedSampleNote === undefined}
 				/>
 				<Knob
 					min={0.001}
@@ -99,7 +99,7 @@ export const SamplerControls = React.memo(({id}: SamplerControlsProps) => {
 					onChangeId={BasicSamplerParam.release}
 					tooltip={releaseToolTip}
 					valueString={adsrValueToString}
-					readOnly={selectedSampleNote !== undefined}
+					readOnly={selectedSampleNote === undefined}
 				/>
 			</div>
 			<div className="knobs">

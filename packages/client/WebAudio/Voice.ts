@@ -28,7 +28,6 @@ export abstract class Voice {
 	protected _scheduledSustainAtReleaseEnd = 0
 	protected _scheduledReleaseStartTimeSeconds = Number.MAX_VALUE
 	protected _scheduledReleaseEndTimeSeconds = Number.MAX_VALUE
-	protected _sustainLevel = 1
 	protected _scheduledEnvelope: IScheduledEnvelope | undefined
 	protected _detune: number = 0
 	protected _ended = false
@@ -37,6 +36,9 @@ export abstract class Voice {
 		audioContext: AudioContext,
 		destination: AudioNode,
 		onEnded: OnEndedCallback,
+		public readonly _attackTimeInSeconds: number,
+		public readonly _decayTimeInSeconds: number,
+		public readonly _sustain: number,
 		detune: number,
 		filterCutoff: number,
 		filterType: BuiltInBQFilterType,
@@ -96,9 +98,6 @@ export abstract class Voice {
 
 	public scheduleNote(
 		note: number,
-		attackTimeInSeconds: number,
-		decayTimeInSeconds: number,
-		sustain: number,
 		attackStart: number,
 		sourceIds: Set<Id>,
 	): void {
@@ -120,9 +119,9 @@ export abstract class Voice {
 
 		this._scheduledEnvelope = calculateScheduledEnvelope({
 			attackStart,
-			attackLength: attackTimeInSeconds,
-			decayLength: decayTimeInSeconds,
-			sustain,
+			attackLength: this._attackTimeInSeconds,
+			decayLength: this._decayTimeInSeconds,
+			sustain: this._sustain,
 			hardCutoffTime: Number.MAX_VALUE,
 		})
 
