@@ -34,7 +34,7 @@ interface ISimpleGraphNodeReduxProps {
 	color: string
 	highQuality: boolean
 	fancyZoomPan: boolean
-	selectedNode?: SelectedNode
+	isSelected: boolean
 }
 
 type ISimpleGraphNodeAllProps = ISimpleGraphNodeProps & ISimpleGraphNodeReduxProps & {dispatch: Dispatch}
@@ -43,7 +43,7 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 	public render() {
 		const {
 			positionId, color, highQuality,
-			position, fancyZoomPan, selectedNode,
+			position, fancyZoomPan, isSelected,
 		} = this.props
 
 		const {x, y, width, height, targetType, zIndex} = position
@@ -67,7 +67,7 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 				cancel={`.noDrag, .panel`}
 			>
 				<div
-					className={`simpleGraphNode ${selectedNode && selectedNode.id === positionId ? 'selectedNode' : ''}`}
+					className={`simpleGraphNode ${isSelected ? 'selectedNode' : ''}`}
 					onBlur={() => this.props.dispatch(shamuMetaActions.clearSelectedNode())}
 					// TODO
 					tabIndex={0}
@@ -152,6 +152,8 @@ export function getComponentByNodeType(type: ConnectionNodeType, id: Id, color: 
 export const ConnectedSimpleGraphNode = shamuConnect(
 	(state, {positionId}: ISimpleGraphNodeProps): ISimpleGraphNodeReduxProps => {
 		const position = selectPosition(state.room, positionId)
+		const selectedNode = selectShamuMetaState(state.room).selectedNode
+		const selectedId = selectedNode ? selectedNode.id : undefined
 
 		return {
 			position,
@@ -159,7 +161,7 @@ export const ConnectedSimpleGraphNode = shamuConnect(
 				|| selectConnectionSourceColorByTargetId(state, positionId),
 			highQuality: selectOptions(state).graphicsECS,
 			fancyZoomPan: selectOptions(state).graphicsExpensiveZoomPan,
-			selectedNode: selectShamuMetaState(state.room).selectedNode,
+			isSelected: positionId === selectedId,
 		}
 	},
 )(SimpleGraphNode)
