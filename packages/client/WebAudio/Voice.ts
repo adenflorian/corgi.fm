@@ -18,6 +18,7 @@ export abstract class Voice {
 	protected _filter: BiquadFilterNode
 	protected _gain: GainNode
 	protected _masterGain: GainNode
+	protected _pan: StereoPannerNode
 	protected _isReleaseScheduled = false
 	protected _scheduledAttackStartTimeSeconds = 0
 	protected _scheduledAttackEndTimeSeconds = 0
@@ -41,6 +42,7 @@ export abstract class Voice {
 		filterType: BuiltInBQFilterType,
 		protected readonly _invincible: boolean,
 		masterGainAmount: number = 0.5,
+		pan: number = 0,
 	) {
 		this.id = Voice._nextId++
 		this._audioContext = audioContext
@@ -54,8 +56,10 @@ export abstract class Voice {
 
 		this._gain = this._audioContext.createGain()
 		this._masterGain = this._audioContext.createGain()
+		this._pan = this._audioContext.createStereoPanner()
 
 		this._masterGain.gain.value = masterGainAmount
+		this._pan.pan.value = pan
 	}
 
 	public get scheduledAttackStartTime() {return this._scheduledAttackStartTimeSeconds}
@@ -109,6 +113,7 @@ export abstract class Voice {
 			.connect(this._filter)
 			.connect(this._masterGain)
 			.connect(this._gain)
+			.connect(this._pan)
 			.connect(this._destination)
 
 		this.playingNote = note
@@ -172,6 +177,8 @@ export abstract class Voice {
 				delete this._gain
 				this._masterGain.disconnect()
 				delete this._masterGain
+				this._pan.disconnect()
+				delete this._pan
 				this._ended = true
 				this._onEnded(this.id)
 				return
@@ -325,6 +332,8 @@ export abstract class Voice {
 		if (this._gain) delete this._gain
 		if (this._masterGain) this._masterGain.disconnect()
 		if (this._masterGain) delete this._masterGain
+		if (this._pan) this._pan.disconnect()
+		if (this._pan) delete this._pan
 		this._onEnded(this.id)
 	}
 

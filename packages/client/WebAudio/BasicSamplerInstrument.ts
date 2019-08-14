@@ -91,7 +91,8 @@ class SamplerVoice extends Voice {
 		super(
 			audioContext, destination, onEnded,
 			_sampleParams.detune, _sampleParams.filterCutoff,
-			_sampleParams.filterType, invincible, _sampleParams.gain)
+			_sampleParams.filterType, invincible, _sampleParams.gain,
+			_sampleParams.pan)
 
 		this._audioBufferSource = this._audioContext.createBufferSource()
 

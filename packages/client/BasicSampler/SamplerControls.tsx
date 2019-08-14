@@ -113,7 +113,6 @@ export const SamplerControls = React.memo(({id}: SamplerControlsProps) => {
 					onChangeId={BasicSamplerParam.pan}
 					tooltip={panToolTip}
 					valueString={panValueToString}
-					readOnly={selectedSampleNote !== undefined}
 				/>
 				<Knob
 					min={0}
