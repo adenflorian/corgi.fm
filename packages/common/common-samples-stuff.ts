@@ -1,6 +1,6 @@
 import {List, Map} from 'immutable'
 import {IMidiNote} from './MidiNote'
-import {Octave} from './common-types'
+import {Octave, IKeyColors, NoteNameSharps} from './common-types'
 import {BuiltInBQFilterType} from './OscillatorTypes'
 
 export const octavesToGet = [1, 2, 3, 4, 5, 6, 7] as const
@@ -34,19 +34,6 @@ export const sharpToFlatNotes = {
 	'A#': 'Bb',
 	'B': 'B',
 } as const
-
-export type NoteNameSharps = 'C' | 'C#' | 'D' | 'D#' | 'E' | 'F' | 'F#' | 'G' | 'G#' | 'A' | 'A#' | 'B'
-
-export type NoteNameFlats = 'C' | 'Db' | 'D' | 'Eb' | 'E' | 'F' | 'Gb' | 'G' | 'Ab' | 'A' | 'Bb' | 'B'
-
-export type KeyColor = 'white' | 'black'
-
-export interface IKeyColors {
-	readonly [key: number]: {
-		readonly color: KeyColor
-		readonly name: NoteNameSharps
-	}
-}
 
 export const keyColors: IKeyColors = {
 	0: {color: 'white', name: 'C'},

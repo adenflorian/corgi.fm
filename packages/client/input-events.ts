@@ -1,6 +1,6 @@
 import {Map} from 'immutable'
 import {Action, AnyAction, Store} from 'redux'
-import {rateLimitedDebounce} from '@corgifm/common/common-utils'
+import {rateLimitedDebounce, keyToMidiMap} from '@corgifm/common/common-utils'
 import {
 	getConnectionNodeInfo, globalClockActions,
 	IClientAppState, pointersActions,
@@ -27,28 +27,6 @@ interface KeyBoardShortcut {
 type keyboardActionCreator = (e: KeyboardEvent, state: IClientAppState) => AnyAction | undefined
 
 const midiKeyShortcuts: {[key: string]: KeyBoardShortcut} = {}
-
-export type IKeyToMidiMap = Map<string, number>
-
-export const keyToMidiMap: IKeyToMidiMap = Map<number>({
-	'a': 0,
-	'w': 1,
-	's': 2,
-	'e': 3,
-	'd': 4,
-	'f': 5,
-	't': 6,
-	'g': 7,
-	'y': 8,
-	'h': 9,
-	'u': 10,
-	'j': 11,
-	'k': 12,
-	'o': 13,
-	'l': 14,
-	'p': 15,
-	';': 16,
-})
 
 keyToMidiMap.forEach((val, key) => {
 	midiKeyShortcuts[key] = {

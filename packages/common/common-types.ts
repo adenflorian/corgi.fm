@@ -67,3 +67,24 @@ export enum Header {
 export type Headers = {
 	[P in Header]?: string
 }
+
+export type IVirtualMidiKeyboard = IVirtualMidiKey[]
+
+export interface IVirtualMidiKey {
+	color: KeyColor
+	keyName: string
+	name: NoteNameSharps
+}
+
+export type NoteNameSharps = 'C' | 'C#' | 'D' | 'D#' | 'E' | 'F' | 'F#' | 'G' | 'G#' | 'A' | 'A#' | 'B'
+
+export type NoteNameFlats = 'C' | 'Db' | 'D' | 'Eb' | 'E' | 'F' | 'Gb' | 'G' | 'Ab' | 'A' | 'Bb' | 'B'
+
+export type KeyColor = 'white' | 'black'
+
+export interface IKeyColors {
+	readonly [key: number]: {
+		readonly color: KeyColor
+		readonly name: NoteNameSharps
+	}
+}

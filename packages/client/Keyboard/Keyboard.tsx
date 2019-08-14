@@ -1,18 +1,25 @@
 import React, {useState, useCallback, useEffect} from 'react'
 import {useSelector, useDispatch} from 'react-redux'
-import {applyOctave, getKeyByValue} from '@corgifm/common/common-utils'
 import {
-	selectClientById, selectLocalClient, IClientAppState,
-	selectVirtualKeyboardById, virtualKeyPressed, virtualKeyUp,
-	selectVirtualKeyboardOctave,
+	applyOctave, getKeyByValue, keyToMidiMap,
+} from '@corgifm/common/common-utils'
+import {
+	virtualKeyPressed, virtualKeyUp, selectVirtualKeyboardOctave, IClientAppState,
+	selectVirtualKeyboardById, selectClientById, selectLocalClientId,
 } from '@corgifm/common/redux'
 import {
-	keyColors, KeyColor, NoteNameSharps,
+	keyColors,
 } from '@corgifm/common/common-samples-stuff'
 import {isLeftMouseButtonDown} from '../client-utils'
-import {keyToMidiMap} from '../input-events'
 import {Panel} from '../Panel/Panel'
 import './Keyboard.less'
+import {IVirtualMidiKeyboard} from '@corgifm/common/common-types';
+
+export function isWhiteKey(keyNumber: number) {
+	const baseNumber = keyNumber % 12
+
+	return keyColors[baseNumber].color === 'white'
+}
 
 const defaultNumberOfKeys = 17
 
@@ -26,24 +33,10 @@ function createVirtualMidiKeyboard(numberOfKeys: number) {
 		newVirtualMidiKeyboard[i] = {
 			...keyColors[baseNumber],
 			keyName: getKeyByValue(keyToMidiMap.toJS(), i)!,
-		}
+		} as const
 	}
 
-	return newVirtualMidiKeyboard
-}
-
-export function isWhiteKey(keyNumber: number) {
-	const baseNumber = keyNumber % 12
-
-	return keyColors[baseNumber].color === 'white'
-}
-
-type IVirtualMidiKeyboard = IVirtualMidiKey[]
-
-interface IVirtualMidiKey {
-	color: KeyColor
-	keyName: string
-	name: NoteNameSharps
+	return Object.freeze(newVirtualMidiKeyboard)
 }
 
 type IKeyboardAllProps = IKeyboardProps
@@ -59,10 +52,21 @@ export const Keyboard = ({id}: IKeyboardAllProps) => {
 	const [wasMouseClickedOnKeyboard, setWasMouseClickedOnKeyboard] =
 		useState(false)
 
-	const {
-		ownerName, pressedMidiKeys, octave, color, isPlaying,
-		virtualMidiKeyboard, isLocal, showNoteNames,
-	} = useSelector(mapStateToProps(id))
+	const ownerId = useSelector((state: IClientAppState) => selectVirtualKeyboardById(state.room, id).ownerId)
+	const pressedMidiKeys = useSelector((state: IClientAppState) => selectVirtualKeyboardById(state.room, id).pressedKeys)
+	const octave = useSelector((state: IClientAppState) => selectVirtualKeyboardById(state.room, id).octave)
+
+	const ownerName = useSelector((state: IClientAppState) => selectClientById(state, ownerId).name)
+	const color = useSelector((state: IClientAppState) => selectClientById(state, ownerId).color)
+
+	const localClientId = useSelector((state: IClientAppState) => selectLocalClientId(state))
+
+	const showNoteNames = useSelector((state: IClientAppState) => state.options.showNoteNamesOnKeyboard)
+
+	const isLocal = localClientId === ownerId
+
+	const isPlaying = pressedMidiKeys.count() > 0
+	const virtualMidiKeyboard = globalVirtualMidiKeyboard
 
 	const dispatch = useDispatch()
 
@@ -193,23 +197,3 @@ const OctaveSection = React.memo(({id}: {id: Id}) => {
 		</div>
 	)
 })
-
-function mapStateToProps(id: Id) {
-	return (state: IClientAppState) => {
-		const virtualKeyboard = selectVirtualKeyboardById(state.room, id)
-		const owner = selectClientById(state, virtualKeyboard.ownerId)
-		const pressedMidiKeys = virtualKeyboard.pressedKeys
-		const localClient = selectLocalClient(state)
-
-		return {
-			color: owner.color,
-			isLocal: localClient.id === owner.id,
-			isPlaying: pressedMidiKeys.count() > 0,
-			octave: virtualKeyboard.octave,
-			ownerName: owner.name,
-			pressedMidiKeys,
-			showNoteNames: state.options.showNoteNamesOnKeyboard,
-			virtualMidiKeyboard: globalVirtualMidiKeyboard,
-		}
-	}
-}
