@@ -38,6 +38,10 @@ export const Samples = React.memo(({samplerId}: Props) => {
 			dispatch(basicSamplerActions.setViewOctave(samplerId, newOctave)),
 		[dispatch, samplerId],
 	)
+	const deselect = useCallback(
+		() => dispatch(basicSamplerActions.selectSamplePad(samplerId, undefined)),
+		[dispatch, samplerId],
+	)
 
 	const notesToShow: readonly IMidiNote[] =
 		new Array(12).fill(0).map((_, i) => i + (octave * 12) + 12)
@@ -46,6 +50,13 @@ export const Samples = React.memo(({samplerId}: Props) => {
 		<div className="samplesSection">
 			<div className="samplesControls">
 				<ViewOctaveKnob setOctave={setOctave} octave={octave} />
+				<button
+					type="button"
+					className="deselect"
+					onClick={deselect}
+				>
+					deselect
+				</button>
 			</div>
 			<div className="samplePads">
 				{notesToShow.map(midiNote =>

@@ -14,6 +14,7 @@ import {
 	SERVER_ACTION,
 } from '.'
 import {createSelector} from 'reselect';
+import {logger} from '../logger';
 
 export const basicSamplerActions = {
 	add: (sampler: BasicSamplerState) =>
@@ -31,7 +32,7 @@ export const basicSamplerActions = {
 		value,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
-	} as const),
+		} as const),
 	setSampleColor: (
 		samplerId: Id, midiNote: IMidiNote, color: Sample['color']
 	) => ({
@@ -39,6 +40,18 @@ export const basicSamplerActions = {
 		id: samplerId,
 		midiNote,
 		color,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	} as const),
+	setSampleParam: (
+		samplerId: Id, midiNote: IMidiNote,
+		paramName: BasicSamplerParam, value: BasicSamplerParamTypes,
+	) => ({
+		type: 'SET_SAMPLE_PARAM',
+		id: samplerId,
+		midiNote,
+		paramName,
+		value,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	} as const),
@@ -70,7 +83,7 @@ export const basicSamplerActions = {
 	} as const),
 } as const
 
-type BasicSamplerParamTypes = number | BuiltInBQFilterType
+export type BasicSamplerParamTypes = number | BuiltInBQFilterType
 
 export enum BasicSamplerParam {
 	pan = 'pan',
@@ -153,18 +166,24 @@ export function deserializeBasicSamplerState(
 
 export type BasicSamplerAction = ActionType<typeof basicSamplerActions>
 
-const basicSamplerActionTypes = [
-	'SET_BASIC_SAMPLER_PARAM',
-	'SET_SAMPLE_COLOR',
-	'SET_SAMPLER_VIEW_OCTAVE',
-	'SET_SAMPLE',
-	'SELECT_SAMPLE_PAD',
-]
+type BasicSamplerActionTypes = {
+	[key in BasicSamplerAction['type']]: 0
+}
+
+const basicSamplerActionTypes: BasicSamplerActionTypes = {
+	SET_BASIC_SAMPLER_PARAM: 0,
+	SET_SAMPLE_COLOR: 0,
+	SET_SAMPLER_VIEW_OCTAVE: 0,
+	SET_SAMPLE: 0,
+	SELECT_SAMPLE_PAD: 0,
+	ADD_MULTI_THING: 0,
+	SET_SAMPLE_PARAM: 0,
+}
 
 export const basicSamplersReducer = makeMultiReducer<BasicSamplerState, IBasicSamplersState>(
 	basicSamplerReducer,
 	ConnectionNodeType.basicSampler,
-	basicSamplerActionTypes,
+	Object.keys(basicSamplerActionTypes),
 )
 
 function basicSamplerReducer(basicSampler: BasicSamplerState, action: BasicSamplerAction): BasicSamplerState {
@@ -183,6 +202,17 @@ function basicSamplerReducer(basicSampler: BasicSamplerState, action: BasicSampl
 				samples: basicSampler.samples.update(action.midiNote, sample => ({
 					...sample,
 					color: action.color,
+				})),
+			}
+		case 'SET_SAMPLE_PARAM':
+			return {
+				...basicSampler,
+				samples: basicSampler.samples.update(action.midiNote, sample => ({
+					...sample,
+					parameters: {
+						...(sample.parameters ? sample.parameters : makeSampleParams()),
+						[action.paramName]: action.value,
+					}
 				})),
 			}
 		case 'SET_SAMPLE':
@@ -230,12 +260,32 @@ export const selectSamplerViewOctave = (id: Id) => (state: IClientAppState) =>
 export const createIsPadSelectedSelector = (id: Id, midiNote: IMidiNote) => (state: IClientAppState) =>
 	selectSampler(state.room, id).selectedSamplePad === midiNote
 
-export const createSelectedPadSelector = (id: Id) => (state: IClientAppState) =>
-	selectSampler(state.room, id).selectedSamplePad
+export const createSelectedPadNumberSelector = (id: Id) => (state: IClientAppState) => {
+	return selectSampler(state.room, id).selectedSamplePad
+}
+
+export const createSelectSamplePadSelector = (id: Id, note?: IMidiNote) => (state: IClientAppState) => {
+	return note === undefined
+		? undefined
+		: selectSampler(state.room, id).samples.get(note, undefined)
+}
 
 export const samplerParamsSelector = (id: Id) => createSelector(
-	(state: IClientAppState) => selectSampler(state.room, id).params,
+	(state: IClientAppState) => {
+		const sampler = selectSampler(state.room, id)
+		if (sampler.selectedSamplePad) {
+			const sample = sampler.samples.get(sampler.selectedSamplePad, undefined)
+			return sample ? sample.parameters : undefined
+		} else {
+			return sampler.params
+		}
+	},
 	(params) => {
+		if (!params) {
+			params = makeSampleParams()
+			logger.log('makeSampleParams')
+		}
+		logger.log('samplerParamsSelector inner')
 		return {
 			pan: params.pan,
 			filterCutoff: params.filterCutoff,

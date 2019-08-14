@@ -1,9 +1,8 @@
-import React, {useCallback} from 'react'
+import React, {useCallback, useMemo} from 'react'
 import {useSelector, useDispatch} from 'react-redux'
 import {
-	IClientAppState, selectSampler, BasicSamplerParam, basicSamplerActions,
-	createSelectedPadSelector,
-	samplerParamsSelector
+	BasicSamplerParam, basicSamplerActions, samplerParamsSelector,
+	createSelectedPadNumberSelector, createSelectSamplePadSelector,
 } from '@corgifm/common/redux';
 import {Knob} from '../Knob/Knob';
 import {
@@ -14,6 +13,7 @@ import {
 } from '../client-constants';
 import {KnobSnapping} from '../Knob/KnobSnapping';
 import {allBuiltInBQFilterTypes} from '@corgifm/common/OscillatorTypes';
+import {CssColor} from '@corgifm/common/shamu-color'
 
 
 interface SamplerControlsProps {
@@ -23,20 +23,33 @@ interface SamplerControlsProps {
 export const SamplerControls = React.memo(({id}: SamplerControlsProps) => {
 	const dispatch = useDispatch()
 
+	const selectedSampleNote = useSelector(createSelectedPadNumberSelector(id))
+	const selectedSample = useSelector(
+		createSelectSamplePadSelector(id, selectedSampleNote))
+
+	const selectParams = useMemo(() => samplerParamsSelector(id), [id])
+
+	const props = useSelector(selectParams)
+
 	const _dispatchChangeInstrumentParam = useCallback(
 		(paramType: BasicSamplerParam, value: any) => {
-			dispatch(basicSamplerActions.setParam(id, paramType, value))
+			if (selectedSampleNote) {
+				dispatch(basicSamplerActions.setSampleParam(
+					id, selectedSampleNote, paramType, value))
+			} else {
+				dispatch(basicSamplerActions.setParam(id, paramType, value))
+			}
 		},
-		[dispatch, id]
+		[dispatch, id, selectedSampleNote],
 	)
 
-
-	// const selectedSample = useSelector(createSelectedPadSelector(id))
-
-	const props = useSelector(samplerParamsSelector(id))
-
 	return (
-		<div className="controls">
+		<div
+			className="controls"
+			style={{
+				color: selectedSample ? CssColor[selectedSample.color] : 'currentColor',
+			}}
+		>
 			<div className="knobs">
 				<Knob
 					min={0}
@@ -49,6 +62,7 @@ export const SamplerControls = React.memo(({id}: SamplerControlsProps) => {
 					onChangeId={BasicSamplerParam.attack}
 					tooltip={attackToolTip}
 					valueString={adsrValueToString}
+					readOnly={selectedSampleNote !== undefined}
 				/>
 				<Knob
 					min={0}
@@ -61,6 +75,7 @@ export const SamplerControls = React.memo(({id}: SamplerControlsProps) => {
 					onChangeId={BasicSamplerParam.decay}
 					tooltip={decayToolTip}
 					valueString={adsrValueToString}
+					readOnly={selectedSampleNote !== undefined}
 				/>
 				<Knob
 					min={0}
@@ -72,6 +87,7 @@ export const SamplerControls = React.memo(({id}: SamplerControlsProps) => {
 					onChangeId={BasicSamplerParam.sustain}
 					tooltip={sustainToolTip}
 					valueString={adsrValueToString}
+					readOnly={selectedSampleNote !== undefined}
 				/>
 				<Knob
 					min={0.001}
@@ -84,6 +100,7 @@ export const SamplerControls = React.memo(({id}: SamplerControlsProps) => {
 					onChangeId={BasicSamplerParam.release}
 					tooltip={releaseToolTip}
 					valueString={adsrValueToString}
+					readOnly={selectedSampleNote !== undefined}
 				/>
 			</div>
 			<div className="knobs">
@@ -97,6 +114,7 @@ export const SamplerControls = React.memo(({id}: SamplerControlsProps) => {
 					onChangeId={BasicSamplerParam.pan}
 					tooltip={panToolTip}
 					valueString={panValueToString}
+					readOnly={selectedSampleNote !== undefined}
 				/>
 				<Knob
 					min={0}
@@ -109,6 +127,7 @@ export const SamplerControls = React.memo(({id}: SamplerControlsProps) => {
 					onChangeId={BasicSamplerParam.filterCutoff}
 					tooltip={filterToolTip}
 					valueString={filterValueToString}
+					readOnly={selectedSampleNote !== undefined}
 				/>
 				<KnobSnapping
 					label="Filter Type"
@@ -118,6 +137,7 @@ export const SamplerControls = React.memo(({id}: SamplerControlsProps) => {
 					onChangeId={BasicSamplerParam.filterType}
 					tooltip="So many filters..."
 					possibleValues={allBuiltInBQFilterTypes}
+					readOnly={selectedSampleNote !== undefined}
 				/>
 				<Knob
 					min={-100}
@@ -141,6 +161,7 @@ export const SamplerControls = React.memo(({id}: SamplerControlsProps) => {
 					onChangeId={BasicSamplerParam.gain}
 					tooltip={gainToolTip}
 					valueString={percentageValueString}
+					readOnly={selectedSampleNote !== undefined}
 				/>
 			</div>
 		</div>

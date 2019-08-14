@@ -87,7 +87,8 @@ class SamplerVoice extends Voice {
 		private readonly _samplesManager: SamplesManager,
 	) {
 		super(
-			audioContext, destination, onEnded, detune,
+			audioContext, destination, onEnded,
+			_sample.parameters ? _sample.parameters.detune : detune,
 			lowPassFilterCutoffFrequency, invincible)
 
 		this._audioBufferSource = this._audioContext.createBufferSource()
@@ -110,8 +111,15 @@ class SamplerVoice extends Voice {
 		if (this._sample.filePath !== dummySamplePath) {
 			this._audioBufferSource.buffer =
 				this._samplesManager.getSample(this._sample.filePath)
+			this._setSampleParams(this._sample.parameters)
 		}
 		this._isStarted = true
+	}
+
+	private _setSampleParams(params: Sample['parameters']) {
+		if (!params) return
+		console.log(params.detune)
+		// this._audioBufferSource.playbackRate.value = params.sustain
 	}
 
 	private _disposeAudioBufferSource() {

@@ -129,13 +129,14 @@
     }
 
     &.readOnly {
-        .mark {
-            width: 4px;
-            height: 8px;
-            margin: auto;
+        color: @panelGrayDark;
+        pointer-events: none;
+
+        .knobLabel {
+            color: @panelGrayLight;
         }
-        .label {
-            color: @subtleGrayBlackBg;
+        .knobValue {
+            color: @panelGrayLight;
         }
     }
 }
