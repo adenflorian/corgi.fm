@@ -152,13 +152,12 @@ export const SamplerControls = React.memo(({id}: SamplerControlsProps) => {
 					max={1}
 					curve={2}
 					value={props.gain}
-					defaultValue={0.5}
+					defaultValue={selectedSampleNote === undefined ? 0.5: 1}
 					onChange={_dispatchChangeInstrumentParam}
 					label="Gain"
 					onChangeId={BasicSamplerParam.gain}
 					tooltip={gainToolTip}
 					valueString={percentageValueString}
-					readOnly={selectedSampleNote !== undefined}
 				/>
 			</div>
 		</div>

@@ -209,6 +209,7 @@ function basicSamplerReducer(basicSampler: BasicSamplerState, action: BasicSampl
 					...sample,
 					parameters: {
 						...(sample.parameters ? sample.parameters : makeSampleParams()),
+						gain: 1,
 						[action.paramName]: action.value,
 					},
 				})),
@@ -279,7 +280,7 @@ export const samplerParamsSelector = (id: Id) => createSelector(
 		}
 	},
 	params => {
-		const finalParams = params || makeSampleParams()
+		const finalParams = params || {...makeSampleParams(), gain: 1}
 		return {
 			pan: finalParams.pan,
 			filterCutoff: finalParams.filterCutoff,

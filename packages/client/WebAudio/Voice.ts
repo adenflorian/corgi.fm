@@ -15,8 +15,9 @@ export abstract class Voice {
 	protected _audioContext: AudioContext
 	protected _destination: AudioNode
 	protected _releaseId: Id = ''
-	protected readonly _filter: BiquadFilterNode
+	protected _filter: BiquadFilterNode
 	protected _gain: GainNode
+	protected _masterGain: GainNode
 	protected _isReleaseScheduled = false
 	protected _scheduledAttackStartTimeSeconds = 0
 	protected _scheduledAttackEndTimeSeconds = 0
@@ -39,6 +40,7 @@ export abstract class Voice {
 		filterCutoff: number,
 		filterType: BuiltInBQFilterType,
 		protected readonly _invincible: boolean,
+		masterGainAmount: number = 0.5,
 	) {
 		this.id = Voice._nextId++
 		this._audioContext = audioContext
@@ -51,8 +53,9 @@ export abstract class Voice {
 		this._filter.frequency.value = filterCutoff
 
 		this._gain = this._audioContext.createGain()
+		this._masterGain = this._audioContext.createGain()
 
-		this._filter.connect(this._gain)
+		this._masterGain.gain.value = masterGainAmount
 	}
 
 	public get scheduledAttackStartTime() {return this._scheduledAttackStartTimeSeconds}
@@ -104,6 +107,7 @@ export abstract class Voice {
 		// this.getAudioScheduledSourceNode()!.connect(this._filter)
 		this.getAudioScheduledSourceNode()!
 			.connect(this._filter)
+			.connect(this._masterGain)
 			.connect(this._gain)
 			.connect(this._destination)
 
@@ -163,8 +167,11 @@ export abstract class Voice {
 				audioNode.stop()
 				audioNode.disconnect()
 				this._filter.disconnect()
+				delete this._filter
 				this._gain.disconnect()
 				delete this._gain
+				this._masterGain.disconnect()
+				delete this._masterGain
 				this._ended = true
 				this._onEnded(this.id)
 				return
@@ -312,9 +319,12 @@ export abstract class Voice {
 	public abstract dispose(): void
 
 	protected _dispose() {
-		this._filter.disconnect()
+		if (this._filter) this._filter.disconnect()
+		if (this._filter) delete this._filter
 		if (this._gain) this._gain.disconnect()
 		if (this._gain) delete this._gain
+		if (this._masterGain) this._masterGain.disconnect()
+		if (this._masterGain) delete this._masterGain
 		this._onEnded(this.id)
 	}
 

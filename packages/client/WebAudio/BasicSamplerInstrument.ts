@@ -67,7 +67,7 @@ class SamplerVoices extends Voices<SamplerVoice> {
 			this._getOnEndedCallback(),
 			invincible,
 			sample,
-			sample.parameters || makeSampleParams(),
+			sample.parameters || {...makeSampleParams(), gain: 1},
 			this._samplesManager,
 		)
 	}
@@ -91,7 +91,7 @@ class SamplerVoice extends Voice {
 		super(
 			audioContext, destination, onEnded,
 			_sampleParams.detune, _sampleParams.filterCutoff,
-			_sampleParams.filterType, invincible)
+			_sampleParams.filterType, invincible, _sampleParams.gain)
 
 		this._audioBufferSource = this._audioContext.createBufferSource()
 
