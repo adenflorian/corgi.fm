@@ -26,21 +26,21 @@ export const BasicSampler = React.memo(({id, color}: Props) => {
 	const isPlaying = useSelector((state: IClientAppState) => samplerInfo
 		.selectIsPlaying(state.room, id))
 
-		return (
-			<React.Fragment>
-				<Panel
-					className={`${isPlaying ? 'isPlaying' : 'isNotPlaying'}`}
-					id={id}
-					color={color}
-					saturate={isPlaying}
-					label={name}
-				>
-					<div className="basicSampler">
-						<Samples samplerId={id} />
-						<SamplerControls id={id} />
-					</div>
-				</Panel>
-				<ConnectedNoteSchedulerVisualPlaceholder id={id} />
-			</React.Fragment>
-		)
+	return (
+		<React.Fragment>
+			<Panel
+				className={`${isPlaying ? 'isPlaying' : 'isNotPlaying'}`}
+				id={id}
+				color={color}
+				saturate={isPlaying}
+				label={name}
+			>
+				<div className="basicSampler">
+					<Samples samplerId={id} />
+					<SamplerControls id={id} />
+				</div>
+			</Panel>
+			<ConnectedNoteSchedulerVisualPlaceholder id={id} />
+		</React.Fragment>
+	)
 })

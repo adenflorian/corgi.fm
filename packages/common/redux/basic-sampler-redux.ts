@@ -1,6 +1,7 @@
 import * as uuid from 'uuid'
 import {ActionType} from 'typesafe-actions'
 import {Map} from 'immutable'
+import {createSelector} from 'reselect'
 import {ConnectionNodeType, IConnectable, IMultiStateThing, Octave} from '../common-types'
 import {BuiltInBQFilterType} from '../OscillatorTypes'
 import {samplerBasicPianoNotes, Samples, makeSamples, Sample, SampleParams, makeSampleParams} from '../common-samples-stuff'
@@ -13,8 +14,6 @@ import {
 	IClientRoomState, IMultiState, makeMultiReducer, NetworkActionType,
 	SERVER_ACTION,
 } from '.'
-import {createSelector} from 'reselect';
-import {logger} from '../logger';
 
 export const basicSamplerActions = {
 	add: (sampler: BasicSamplerState) =>
@@ -32,7 +31,7 @@ export const basicSamplerActions = {
 		value,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
-		} as const),
+	} as const),
 	setSampleColor: (
 		samplerId: Id, midiNote: IMidiNote, color: Sample['color']
 	) => ({
@@ -148,7 +147,6 @@ export class BasicSamplerState implements IConnectable, NodeSpecialState {
 	}
 }
 
-
 export function deserializeBasicSamplerState(
 	state: IMultiStateThing
 ): BasicSamplerState {
@@ -212,7 +210,7 @@ function basicSamplerReducer(basicSampler: BasicSamplerState, action: BasicSampl
 					parameters: {
 						...(sample.parameters ? sample.parameters : makeSampleParams()),
 						[action.paramName]: action.value,
-					}
+					},
 				})),
 			}
 		case 'SET_SAMPLE':
@@ -280,22 +278,18 @@ export const samplerParamsSelector = (id: Id) => createSelector(
 			return sampler.params
 		}
 	},
-	(params) => {
-		if (!params) {
-			params = makeSampleParams()
-			logger.log('makeSampleParams')
-		}
-		logger.log('samplerParamsSelector inner')
+	params => {
+		const finalParams = params || makeSampleParams()
 		return {
-			pan: params.pan,
-			filterCutoff: params.filterCutoff,
-			attack: params.attack,
-			decay: params.decay,
-			sustain: params.sustain,
-			release: params.release,
-			detune: params.detune,
-			gain: params.gain,
-			filterType: params.filterType,
+			pan: finalParams.pan,
+			filterCutoff: finalParams.filterCutoff,
+			attack: finalParams.attack,
+			decay: finalParams.decay,
+			sustain: finalParams.sustain,
+			release: finalParams.release,
+			detune: finalParams.detune,
+			gain: finalParams.gain,
+			filterType: finalParams.filterType,
 		}
 	}
 )

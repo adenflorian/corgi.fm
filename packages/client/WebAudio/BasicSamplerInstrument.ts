@@ -118,7 +118,6 @@ class SamplerVoice extends Voice {
 
 	private _setSampleParams(params: Sample['parameters']) {
 		if (!params) return
-		console.log(params.detune)
 		// this._audioBufferSource.playbackRate.value = params.sustain
 	}
 

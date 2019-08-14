@@ -3,18 +3,17 @@ import {useSelector, useDispatch} from 'react-redux'
 import {
 	BasicSamplerParam, basicSamplerActions, samplerParamsSelector,
 	createSelectedPadNumberSelector, createSelectSamplePadSelector,
-} from '@corgifm/common/redux';
-import {Knob} from '../Knob/Knob';
+} from '@corgifm/common/redux'
+import {allBuiltInBQFilterTypes} from '@corgifm/common/OscillatorTypes'
+import {CssColor} from '@corgifm/common/shamu-color'
+import {Knob} from '../Knob/Knob'
 import {
 	attackToolTip, adsrValueToString, decayToolTip, sustainToolTip,
 	releaseToolTip, panToolTip, panValueToString, filterToolTip,
 	filterValueToString, detuneToolTip, detuneValueToString, gainToolTip,
-	percentageValueString
-} from '../client-constants';
-import {KnobSnapping} from '../Knob/KnobSnapping';
-import {allBuiltInBQFilterTypes} from '@corgifm/common/OscillatorTypes';
-import {CssColor} from '@corgifm/common/shamu-color'
-
+	percentageValueString,
+} from '../client-constants'
+import {KnobSnapping} from '../Knob/KnobSnapping'
 
 interface SamplerControlsProps {
 	id: Id

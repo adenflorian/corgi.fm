@@ -10,10 +10,10 @@ import {
 import {
 	keyColors,
 } from '@corgifm/common/common-samples-stuff'
+import {IVirtualMidiKeyboard} from '@corgifm/common/common-types'
 import {isLeftMouseButtonDown} from '../client-utils'
 import {Panel} from '../Panel/Panel'
 import './Keyboard.less'
-import {IVirtualMidiKeyboard} from '@corgifm/common/common-types';
 
 export function isWhiteKey(keyNumber: number) {
 	const baseNumber = keyNumber % 12
