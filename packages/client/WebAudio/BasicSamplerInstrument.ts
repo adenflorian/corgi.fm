@@ -1,5 +1,5 @@
 import {
-	Samples, Sample, dummySample, dummySamplePath,
+	Samples, Sample, dummySample, dummySamplePath, makeSampleParams,
 } from '@corgifm/common/common-samples-stuff'
 import {IMidiNote} from '@corgifm/common/MidiNote'
 import {
@@ -7,6 +7,7 @@ import {
 	OnEndedCallback, SamplesManager,
 	Voice, Voices,
 } from '.'
+import {BuiltInBQFilterType} from '@corgifm/common/OscillatorTypes';
 
 export interface IBasicSamplerOptions extends IInstrumentOptions {
 	samples: Samples
@@ -26,6 +27,7 @@ export class BasicSamplerInstrument
 			this._panNode,
 			this._detune,
 			this._lowPassFilterCutoffFrequency,
+			this._filter.type as BuiltInBQFilterType,
 			options.samples,
 			options.samplesManager,
 		)
@@ -44,10 +46,11 @@ class SamplerVoices extends Voices<SamplerVoice> {
 		private readonly _destination: AudioNode,
 		_detune: number,
 		_lowPassFilterCutoffFrequency: number,
+		_filterType: BuiltInBQFilterType,
 		private _samples: Samples,
 		private readonly _samplesManager: SamplesManager,
 	) {
-		super(_detune, _lowPassFilterCutoffFrequency)
+		super(_detune, _lowPassFilterCutoffFrequency, _filterType)
 	}
 
 	public setSamples(samples: Samples) {
@@ -57,14 +60,14 @@ class SamplerVoices extends Voices<SamplerVoice> {
 	}
 
 	protected _createVoice(invincible: boolean, note: IMidiNote) {
+		const sample = this._samples.get(note, dummySample)
 		return new SamplerVoice(
 			this._audioContext,
 			this._destination,
 			this._getOnEndedCallback(),
-			this._detune,
-			this._lowPassFilterCutoffFrequency,
 			invincible,
-			this._samples.get(note, dummySample),
+			sample,
+			sample.parameters || makeSampleParams(),
 			this._samplesManager,
 		)
 	}
@@ -80,16 +83,15 @@ class SamplerVoice extends Voice {
 		audioContext: AudioContext,
 		destination: AudioNode,
 		onEnded: OnEndedCallback,
-		detune: number,
-		lowPassFilterCutoffFrequency: number,
 		invincible: boolean,
 		private readonly _sample: Sample,
+		private readonly _sampleParams: Required<Sample>['parameters'],
 		private readonly _samplesManager: SamplesManager,
 	) {
 		super(
 			audioContext, destination, onEnded,
-			_sample.parameters ? _sample.parameters.detune : detune,
-			lowPassFilterCutoffFrequency, invincible)
+			_sampleParams.detune, _sampleParams.filterCutoff,
+			_sampleParams.filterType, invincible)
 
 		this._audioBufferSource = this._audioContext.createBufferSource()
 

@@ -1,6 +1,7 @@
 import {OrderedMap, Set} from 'immutable'
 import {logger} from '@corgifm/common/logger'
 import {IMidiNote} from '@corgifm/common/MidiNote'
+import {BuiltInBQFilterType} from '@corgifm/common/OscillatorTypes'
 import {Voice} from '.'
 
 export type OnEndedCallback = (id: number) => void
@@ -11,6 +12,7 @@ export abstract class Voices<V extends Voice> {
 	public constructor(
 		protected _detune: number,
 		protected _lowPassFilterCutoffFrequency: number,
+		protected _filterType: BuiltInBQFilterType,
 	) {}
 
 	protected get _allVoices() {

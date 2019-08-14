@@ -1,4 +1,4 @@
-import {BuiltInOscillatorType, CustomOscillatorType, LfoOscillatorType, ShamuOscillatorType} from '@corgifm/common/OscillatorTypes'
+import {BuiltInOscillatorType, CustomOscillatorType, LfoOscillatorType, ShamuOscillatorType, BuiltInBQFilterType} from '@corgifm/common/OscillatorTypes'
 import {SynthLfoTarget} from '@corgifm/common/redux'
 import {
 	midiNoteToFrequency, Voice, Voices, IInstrumentOptions, Instrument,
@@ -57,6 +57,7 @@ export class BasicSynthesizer extends Instrument<SynthVoices, SynthVoice> {
 			options.oscillatorType,
 			this._detune,
 			this._lowPassFilterCutoffFrequency,
+			this._filter.type as BuiltInBQFilterType,
 			this._lfoRate,
 			this._lfoAmount,
 			this._lfoTarget,
@@ -171,12 +172,13 @@ class SynthVoices extends Voices<SynthVoice> {
 		private _oscType: ShamuOscillatorType,
 		_detune: number,
 		_lowPassFilterCutoffFrequency: number,
+		_filterType: BuiltInBQFilterType,
 		private _lfoRate: number,
 		private _lfoAmount: number,
 		private _lfoTarget: SynthLfoTarget,
 		private _lfoWave: LfoOscillatorType,
 	) {
-		super(_detune, _lowPassFilterCutoffFrequency)
+		super(_detune, _lowPassFilterCutoffFrequency, _filterType)
 	}
 
 	protected _createVoice(invincible: boolean) {
@@ -186,6 +188,7 @@ class SynthVoices extends Voices<SynthVoice> {
 			this._oscType,
 			this._detune,
 			this._lowPassFilterCutoffFrequency,
+			this._filterType,
 			this._getOnEndedCallback(),
 			invincible,
 			// this._lfoRate,
@@ -236,6 +239,7 @@ class SynthVoice extends Voice {
 		oscType: ShamuOscillatorType,
 		detune: number,
 		lowPassFilterCutoffFrequency: number,
+		filterType: BuiltInBQFilterType,
 		onEnded: OnEndedCallback,
 		invincible: boolean,
 		// private _lfoRate: number,
@@ -243,7 +247,8 @@ class SynthVoice extends Voice {
 		// private _lfoTarget: SynthLfoTarget,
 		// private _lfoWave: LfoOscillatorType,
 	) {
-		super(audioContext, destination, onEnded, detune, lowPassFilterCutoffFrequency, invincible)
+		super(audioContext, destination, onEnded, detune,
+			lowPassFilterCutoffFrequency, filterType, invincible)
 
 		this._oscillatorType = oscType
 		this._nextOscillatorType = oscType

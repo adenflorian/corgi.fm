@@ -126,7 +126,6 @@ export const SamplerControls = React.memo(({id}: SamplerControlsProps) => {
 					onChangeId={BasicSamplerParam.filterCutoff}
 					tooltip={filterToolTip}
 					valueString={filterValueToString}
-					readOnly={selectedSampleNote !== undefined}
 				/>
 				<KnobSnapping
 					label="Filter Type"
@@ -136,7 +135,6 @@ export const SamplerControls = React.memo(({id}: SamplerControlsProps) => {
 					onChangeId={BasicSamplerParam.filterType}
 					tooltip="So many filters..."
 					possibleValues={allBuiltInBQFilterTypes}
-					readOnly={selectedSampleNote !== undefined}
 				/>
 				<Knob
 					min={-100}
