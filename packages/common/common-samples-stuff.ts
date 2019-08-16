@@ -92,7 +92,7 @@ export const sampleColors = allSampleColors.filter(x => x !== 'panelGrayLight')
 
 export interface Sample {
 	readonly label: string
-	readonly filePath: string
+	readonly path: string
 	readonly color: typeof allSampleColors[number]
 	readonly parameters?: SampleParams
 }
@@ -118,7 +118,7 @@ export const dummySamplePath = 'dummySamplePath'
 
 export const dummySample: Sample = {
 	color: 'panelGrayLight',
-	filePath: dummySamplePath,
+	path: dummySamplePath,
 	label: '?',
 }
 
@@ -130,7 +130,7 @@ export const samplerBasicPianoNotes: Samples = samplesToGet.reduce(
 				const midiNote = midiNoteFromNoteName(note, octave)
 				mutable.set(midiNote, {
 					label: `piano ${note}${octave}`,
-					filePath: `static/samplers/basic-piano/${sharpToFlatNotes[note]}${octave}-49-96.mp3`,
+					path: `static/samplers/basic-piano/${sharpToFlatNotes[note]}${octave}-49-96.mp3`,
 					color: note.includes('#') ? 'green' : 'blue',
 				})
 			})
@@ -140,22 +140,22 @@ export const samplerBasicPianoNotes: Samples = samplesToGet.reduce(
 )
 
 const basicDrumSamples: Samples = makeSamples([
-	[60, {color: 'blue', label: 'kick 135', filePath: 'kick-135.wav'}],
-	[61, {color: 'blue', label: 'kick 125', filePath: 'kick-125.wav'}],
-	[62, {color: 'blue', label: 'kick swedish', filePath: 'kick-swedish.wav'}],
-	[63, {color: 'blue', label: 'kick bump', filePath: 'kick-bump.wav'}],
-	[64, {color: 'green', label: 'snare 20', filePath: 'snare-20.wav'}],
-	[65, {color: 'green', label: 'snare people', filePath: 'snare-people.wav'}],
-	[66, {color: 'green', label: 'snare heavy', filePath: 'snare-heavy.wav'}],
-	[67, {color: 'purple', label: 'hat skiba', filePath: 'hat-skiba.wav'}],
-	[68, {color: 'purple', label: 'hat savannah', filePath: 'hat-savannah.wav'}],
-	[69, {color: 'purple', label: 'hat open', filePath: 'hat-open.wav'}],
-	[70, {color: 'orange', label: 'clap 1', filePath: 'clap-1.wav'}],
-	[71, {color: 'orange', label: 'rim click', filePath: 'rim-click.wav'}],
-	[72, {color: 'orange', label: 'bark rose', filePath: 'bark-rose.wav'}],
+	[60, {color: 'blue', label: 'kick 135', path: 'kick-135.wav'}],
+	[61, {color: 'blue', label: 'kick 125', path: 'kick-125.wav'}],
+	[62, {color: 'blue', label: 'kick swedish', path: 'kick-swedish.wav'}],
+	[63, {color: 'blue', label: 'kick bump', path: 'kick-bump.wav'}],
+	[64, {color: 'green', label: 'snare 20', path: 'snare-20.wav'}],
+	[65, {color: 'green', label: 'snare people', path: 'snare-people.wav'}],
+	[66, {color: 'green', label: 'snare heavy', path: 'snare-heavy.wav'}],
+	[67, {color: 'purple', label: 'hat skiba', path: 'hat-skiba.wav'}],
+	[68, {color: 'purple', label: 'hat savannah', path: 'hat-savannah.wav'}],
+	[69, {color: 'purple', label: 'hat open', path: 'hat-open.wav'}],
+	[70, {color: 'orange', label: 'clap 1', path: 'clap-1.wav'}],
+	[71, {color: 'orange', label: 'rim click', path: 'rim-click.wav'}],
+	[72, {color: 'orange', label: 'bark rose', path: 'bark-rose.wav'}],
 ]).map(x => ({
 	...x,
-	filePath: 'static/samplers/basic-drums/' + x.filePath,
+	path: 'static/samplers/basic-drums/' + x.path,
 }))
 
 export const defaultSamples = Map({

@@ -34,7 +34,7 @@ export function createSamplesManagerMiddleware(
 			.forEach(fetchSamplerSamples)
 	}
 
-	function fetchSample({filePath}: Sample): void {
-		samplesManager.loadSample(filePath)
+	function fetchSample({path}: Sample): void {
+		samplesManager.loadSample(path)
 	}
 }

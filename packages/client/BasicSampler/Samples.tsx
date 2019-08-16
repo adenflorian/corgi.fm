@@ -108,7 +108,7 @@ const SamplePad = React.memo((props: SamplePadProps) => {
 
 	const playNote = useCallback(
 		(e: React.MouseEvent) => {
-			if (sample.filePath === dummySamplePath) return
+			if (sample.path === dummySamplePath) return
 			if (e.button !== 0) return
 			dispatch(localActions.playShortNoteOnTarget(samplerId, midiNote))
 			dispatch(basicSamplerActions.selectSamplePad(samplerId, midiNote))

@@ -137,9 +137,9 @@ class SamplerVoice extends Voice {
 	protected _scheduleNoteSpecific(note: number): void {
 		this._disposeAudioBufferSource()
 		this._audioBufferSource = this._audioContext.createBufferSource()
-		if (this._sample.filePath !== dummySamplePath) {
+		if (this._sample.path !== dummySamplePath) {
 			this._audioBufferSource.buffer =
-				this._samplesManager.getSample(this._sample.filePath)
+				this._samplesManager.getSample(this._sample.path)
 			this._setSampleParams(this._sample.parameters)
 		}
 		this._isStarted = true

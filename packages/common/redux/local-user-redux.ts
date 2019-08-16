@@ -32,3 +32,7 @@ export const localUserReducer = (
 
 // Selectors
 export const selectLocalUserState = (state: IClientAppState) => state.localUser
+
+// Selectors
+export const selectLocalUserSamples = (state: IClientAppState) =>
+	state.localUser.userSamples

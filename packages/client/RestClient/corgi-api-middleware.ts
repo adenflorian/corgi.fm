@@ -208,7 +208,7 @@ export function createCorgiApiMiddleware(
 					action.parentId,
 					action.childId,
 					{
-						filePath: sampleLocator.path,
+						path: sampleLocator.path,
 						label: sampleLocator.label,
 						color: sampleLocator.color,
 					}))
