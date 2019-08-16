@@ -152,3 +152,9 @@ export const keyToMidiMap: IKeyToMidiMap = Map<number>({
 	'p': 15,
 	';': 16,
 })
+
+export const colorRegex = multilineRegExp([
+	/^/,
+	/(#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})|hsl\(\d{1,3}, ?\d{1,3}%, ?\d{1,3}%\))/,
+	/$/,
+])

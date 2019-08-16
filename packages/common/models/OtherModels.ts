@@ -1,5 +1,6 @@
-import {Matches, Min, Max, Length, ValidateNested} from 'class-validator'
+import {Matches, Min, Max, Length} from 'class-validator'
 import {multilineRegExp} from '../common-utils'
+import {Sample, sampleColorRegex} from '../common-samples-stuff'
 
 const uploadPathRegex = multilineRegExp([
 	// /^(dev|test|prod)\//,
@@ -8,7 +9,7 @@ const uploadPathRegex = multilineRegExp([
 	/\.[0-9a-zA-Z]{1,5}$/,
 ])
 
-export class Upload {
+export class SampleUpload {
 	@Length(28, 28)
 	public readonly ownerUid: Id = ''
 
@@ -18,9 +19,10 @@ export class Upload {
 	@Min(1)
 	@Max(Number.MAX_SAFE_INTEGER)
 	public readonly sizeBytes: number = 0
-}
 
-export class YourSamples {
-	@ValidateNested()
-	public readonly yourSamples: Upload[] = []
+	@Length(1, 128)
+	public readonly label: string = ''
+
+	@Matches(sampleColorRegex)
+	public readonly color: Sample['color'] = 'blue'
 }

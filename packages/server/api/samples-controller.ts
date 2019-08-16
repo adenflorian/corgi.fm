@@ -4,9 +4,10 @@ import {
 	maxSampleUploadFileSizeMB, defaultS3BucketName, maxTotalSingleUserUploadBytes,
 } from '@corgifm/common/common-constants'
 import {logger} from '@corgifm/common/logger'
-import {Upload, YourSamples} from '@corgifm/common/models/OtherModels'
+import {SampleUpload} from '@corgifm/common/models/OtherModels'
 import {
 	MBtoBytes, createNodeId, validateSampleFilenameExtension, bytesToMB,
+	removeExtension,
 } from '@corgifm/common/common-utils'
 import {DBStore} from '../database/database'
 import {ServerStore} from '../server-redux-types'
@@ -69,7 +70,7 @@ export function getSamplesController(
 
 	async function uploadSample(
 		request: SecureApiRequest,
-	): Promise<ApiResponse<Upload>> {
+	): Promise<ApiResponse<SampleUpload>> {
 
 		const receivedUpload = await receiveUpload(request)
 
@@ -77,10 +78,12 @@ export function getSamplesController(
 
 		const path = await uploadToS3(request, receivedUpload)
 
-		const upload: Upload = {
+		const upload: SampleUpload = {
 			ownerUid: request.callerUid,
 			sizeBytes: receivedUpload.file.size,
 			path,
+			color: 'blue',
+			label: removeExtension(receivedUpload.file.originalname),
 		}
 
 		await dbStore.uploads.put(upload)
@@ -108,12 +111,10 @@ export function getSamplesController(
 
 	async function getMySamples(
 		request: SecureApiRequest,
-	): Promise<ApiResponse<YourSamples>> {
+	): Promise<ApiResponse<SampleUpload[]>> {
 		return {
 			status: 200,
-			body: {
-				yourSamples: await dbStore.uploads.getByOwnerId(request.callerUid),
-			},
+			body: await dbStore.uploads.getByOwnerId(request.callerUid),
 		}
 	}
 }

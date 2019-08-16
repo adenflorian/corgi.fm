@@ -58,16 +58,22 @@ describe('Database Tests', () => {
 				ownerUid: uidA,
 				path: 'user/uidA1.wav',
 				sizeBytes: 350,
+				color: 'red',
+				label: 'my sample1',
 			})
 			await db.uploads.put({
 				ownerUid: uidB,
 				path: 'user/uidB1.wav',
 				sizeBytes: 400,
+				color: 'purple',
+				label: 'my sample2',
 			})
 			await db.uploads.put({
 				ownerUid: uidA,
 				path: 'user/uidA2.wav',
 				sizeBytes: 700,
+				color: 'yellow',
+				label: 'my sample3',
 			})
 			const size = await db.uploads.getTotalUploadBytesForUser(uidA)
 			expect(size).toEqual(1050)

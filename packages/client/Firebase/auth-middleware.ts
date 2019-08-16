@@ -38,5 +38,6 @@ export const createAuthMiddleware: AuthMiddleware =
 
 			async function onAuthLogin() {
 				dispatch(corgiApiActions.loadLocalUser())
+				dispatch(corgiApiActions.loadLocalUserSamples())
 			}
 		}

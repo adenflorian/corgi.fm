@@ -77,14 +77,23 @@ export interface Samples extends Map<number, Sample> {}
 export const makeSamples =
 	(collection: Iterable<[number, Sample]> = []): Samples =>
 		Map<number, Sample>(collection)
+		
+export const allSampleColors =
+	['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'panelGrayLight'] as const
 
-export const sampleColors =
-	['red', 'blue', 'green', 'yellow', 'purple', 'orange'] as const
+export const sampleColorRegex = new RegExp(
+	'^(' +
+	allSampleColors.reduce((result, current) => result + current + '|', '')
+		.replace(/\|$/, '') +
+	')$'
+)
+
+export const sampleColors = allSampleColors.filter(x => x !== 'panelGrayLight')
 
 export interface Sample {
 	readonly label: string
 	readonly filePath: string
-	readonly color: typeof sampleColors[number] | 'panelGrayLight'
+	readonly color: typeof allSampleColors[number]
 	readonly parameters?: SampleParams
 }
 

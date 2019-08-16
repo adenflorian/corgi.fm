@@ -8,7 +8,7 @@ import {
 	UserInputAction, RoomAction, WebsocketReduxActions,
 	RoomsReduxAction, ModalsAction, InProgressAction, OptionsAction,
 	ClientInfoAction, AudioReduxAction, authReducer, AuthAction,
-	animationReducer,	clientsActionTypesWhitelist,
+	animationReducer, clientsActionTypesWhitelist, localUserReducer,
 } from '.'
 
 export interface IClientAppState extends StateType<ReturnType<typeof getClientReducers>> {}
@@ -25,6 +25,7 @@ export function getClientReducers() {
 		clientInfo: clientInfoReducer,
 		clients: clientsReducer,
 		inProgress: inProgressReducer,
+		localUser: localUserReducer,
 		modals: modalsReducer,
 		options: optionsReducer,
 		rooms: roomsReducer,

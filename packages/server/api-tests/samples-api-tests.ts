@@ -1,7 +1,7 @@
 import {
 	RequestTest, path, get, put, ContentTypes, post,
 } from '@corgifm/api-tester'
-import {Upload, YourSamples} from '@corgifm/common/models/OtherModels'
+import {SampleUpload} from '@corgifm/common/models/OtherModels'
 import {mockUuid} from '@corgifm/common/test-common'
 import {logger} from '@corgifm/common/logger'
 import {DBStore} from '../database/database'
@@ -104,6 +104,8 @@ export function getSampleApiTests(
 						ownerUid: uidA,
 						path: 'fakePath',
 						sizeBytes: 100 * 1000 * 1000,
+						color: 'blue',
+						label: 'my sample',
 					})
 					logger.disable()
 				},
@@ -116,8 +118,10 @@ export function getSampleApiTests(
 					ownerUid: uidA,
 					path: `user/${mockUuid}.wav`,
 					sizeBytes: 10 * 1000 * 1000,
+					color: 'blue',
+					label: 'smallFile',
 				},
-				validateResponseBodyModel: Upload,
+				validateResponseBodyModel: SampleUpload,
 				request: {
 					upload: {
 						fileField: 'file',
@@ -133,45 +137,50 @@ export function getSampleApiTests(
 
 	function getMySamplesTests(): RequestTest[] {
 		return [
-			get({
+			get<SampleUpload[]>({
 				status: 200,
 				contentType: ContentTypes.ApplicationJson,
-				validateResponseBodyModel: YourSamples,
-				resBody: {
-					yourSamples: [],
-				},
+				resBody: [],
 			}),
-			get<YourSamples>({
+			get<SampleUpload[]>({
 				before: () => {
 					getDb().uploads.put({
 						ownerUid: uidA,
 						path: `user/${mockUuid}.wav`,
 						sizeBytes: 1000,
+						color: 'blue',
+						label: 'my sample1',
 					})
 					getDb().uploads.put({
 						ownerUid: uidB,
 						path: `user/${mockUuid}.wav`,
 						sizeBytes: 2000,
+						color: 'red',
+						label: 'my sample2',
 					})
 					getDb().uploads.put({
 						ownerUid: uidA,
 						path: `user/${mockUuid}.wav`,
 						sizeBytes: 3000,
+						color: 'green',
+						label: 'my sample3',
 					})
 				},
 				status: 200,
 				contentType: ContentTypes.ApplicationJson,
-				resBody: {
-					yourSamples: [{
-						ownerUid: uidA,
-						path: `user/${mockUuid}.wav`,
-						sizeBytes: 1000,
-					}, {
-						ownerUid: uidA,
-						path: `user/${mockUuid}.wav`,
+				resBody: [{
+					ownerUid: uidA,
+					path: `user/${mockUuid}.wav`,
+					sizeBytes: 1000,
+					color: 'blue',
+					label: 'my sample1',
+				}, {
+					ownerUid: uidA,
+					path: `user/${mockUuid}.wav`,
 						sizeBytes: 3000,
-					}]
-				},
+						color: 'green',
+						label: 'my sample3',
+				}],
 			}),
 		]
 	}

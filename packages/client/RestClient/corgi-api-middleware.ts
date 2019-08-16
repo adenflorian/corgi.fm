@@ -4,15 +4,17 @@ import {
 	uploadActions,
 	basicSamplerActions,
 	chatSystemMessage,
+	localUserActions,
 } from '@corgifm/common/redux'
 import {User, UserUpdate} from '@corgifm/common/models/User'
-import {Upload} from '@corgifm/common/models/OtherModels'
+import {SampleUpload} from '@corgifm/common/models/OtherModels'
 import {Header} from '@corgifm/common/common-types'
 import {ActionType} from 'typesafe-actions'
 import {debounce} from 'lodash'
-import {transformAndValidate} from '@corgifm/common/validation'
+import {
+	transformAndValidate, transformAndValidateArray,
+} from '@corgifm/common/validation'
 import {ContentType} from '@corgifm/common/common-constants'
-import {removeExtension} from '@corgifm/common/common-utils'
 import {FirebaseContextStuff} from '../Firebase/FirebaseContext'
 import {getUrl} from '../client-utils'
 import {logger} from '../client-logger'
@@ -23,6 +25,9 @@ const prefix = 'CORGI_API_'
 export const corgiApiActions = {
 	loadLocalUser: () => ({
 		type: 'CORGI_API_LOAD_LOCAL_USER',
+	} as const),
+	loadLocalUserSamples: () => ({
+		type: 'CORGI_API_LOAD_LOCAL_USER_SAMPLES',
 	} as const),
 	saveLocalUser: () => ({
 		type: 'CORGI_API_SAVE_LOCAL_USER',
@@ -67,6 +72,10 @@ export function createCorgiApiMiddleware(
 				const user = await getUserByUid(localUid, localClient)
 				return dispatch(setClientName(localClient.id, user.displayName))
 			}
+			case 'CORGI_API_LOAD_LOCAL_USER_SAMPLES': {
+				const userSamples = await getLocalUserSamples()
+				return dispatch(localUserActions.setSamples(userSamples))
+			}
 			case 'CORGI_API_SAVE_LOCAL_USER': {
 				const user = makeUserFromClient(selectLocalClient(getState()))
 				return putUserDebounced(localUid, user)
@@ -78,7 +87,7 @@ export function createCorgiApiMiddleware(
 	}
 
 	async function getUserByUid(
-		uid: Id, localClient?: IClientState
+		uid: Id, localClient?: IClientState,
 	): Promise<User> {
 		const headers = {
 			[Header.Authorization]: getAuthHeader(),
@@ -101,6 +110,23 @@ export function createCorgiApiMiddleware(
 				}
 			})
 			.then(async data => transformAndValidate(User, data))
+	}
+
+	async function getLocalUserSamples(): Promise<SampleUpload[]> {
+		const headers = {
+			[Header.Authorization]: getAuthHeader(),
+		} as const
+
+		return fetch(`${getUrl()}/api/samples/mine`, {headers})
+			.then(async response => {
+				if (response.status === 200) {
+					return response.json()
+				} else {
+					throw new Error(
+						`[getUserSamplesByUid] unexpected status ${response.status}`)
+				}
+			})
+			.then(async data => transformAndValidateArray(SampleUpload, data))
 	}
 
 	async function _putUser(
@@ -174,7 +200,7 @@ export function createCorgiApiMiddleware(
 					default: throw new Error(`unexpected status ${response.status}`)
 				}
 			})
-			.then(async data => transformAndValidate(Upload, data))
+			.then(async data => transformAndValidate(SampleUpload, data))
 			.then(sampleLocator => {
 				dispatch(uploadActions.setStatus(
 					action.parentId, action.childId, 'complete'))
@@ -183,9 +209,10 @@ export function createCorgiApiMiddleware(
 					action.childId,
 					{
 						filePath: sampleLocator.path,
-						label: removeExtension(action.file.name),
-						color: 'purple',
+						label: sampleLocator.label,
+						color: sampleLocator.color,
 					}))
+				dispatch(corgiApiActions.loadLocalUserSamples())
 			})
 			.catch(error => {
 				logger.error('uploadSample fetch error: ',

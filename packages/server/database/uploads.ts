@@ -1,19 +1,19 @@
 import {Db} from 'mongodb'
-import {Upload} from '@corgifm/common/models/OtherModels'
+import {SampleUpload} from '@corgifm/common/models/OtherModels'
 import {sumField, insertOne, CorgiIndexes, findMany} from './database-utils'
 
 export const uploadsQueries = async (db: Db) => {
-	const uploadsCollection = db.collection<Upload>('uploads')
+	const uploadsCollection = db.collection<SampleUpload>('uploads')
 
 	await uploadsCollection.createIndexes([{
 		key: {ownerUid: 1},
 		background: true,
-	}] as CorgiIndexes<Upload>[])
+	}] as CorgiIndexes<SampleUpload>[])
 
 	return {
 		collectionName: uploadsCollection.collectionName,
 
-		async put(upload: Upload): Promise<void> {
+		async put(upload: SampleUpload): Promise<void> {
 			return insertOne(uploadsCollection, upload)
 		},
 
@@ -21,8 +21,8 @@ export const uploadsQueries = async (db: Db) => {
 			return sumField(uploadsCollection, {ownerUid}, 'sizeBytes')
 		},
 
-		async getByOwnerId(ownerUid: Id): Promise<Upload[]> {
-			return findMany(uploadsCollection, {ownerUid}, Upload)
+		async getByOwnerId(ownerUid: Id): Promise<SampleUpload[]> {
+			return findMany(uploadsCollection, {ownerUid}, SampleUpload)
 		},
 	} as const
 }
