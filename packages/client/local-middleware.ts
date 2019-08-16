@@ -492,7 +492,7 @@ export function createLocalMiddleware(
 
 				const state = getState()
 				const localKeyboardId = selectLocalVirtualKeyboardId(state)
-				
+
 				const existingConnections = selectConnectionsWithSourceAndTargetId(
 					state.room, localKeyboardId, action.nodeId)
 

@@ -40,12 +40,14 @@ interface NodeMenuItemsProps {
 const hoverDelayMs = 1
 
 const deleteMenuLabels = List([
-	`Delete`,
+	`Delete...`,
 	`You can't undo this (yet)`,
 ])
 
 const NodeMenuItems = React.memo(function _MenuItems({nodeType}: NodeMenuItemsProps) {
-	const {isDeletable, isNodeCloneable} = getConnectionNodeInfo(nodeType)
+	const {
+		isDeletable, isNodeCloneable, canHaveKeyboardConnectedToIt,
+	} = getConnectionNodeInfo(nodeType)
 	const dispatch = useDispatch()
 
 	return (
@@ -54,6 +56,7 @@ const NodeMenuItems = React.memo(function _MenuItems({nodeType}: NodeMenuItemsPr
 			{isDeletable && <DeleteNodeMenuItem />}
 			{!isDeletable && <DontDeleteMeMenuItem />}
 			{isNodeCloneable && <CloneNodeMenuItem />}
+			{canHaveKeyboardConnectedToIt && <ConnectKeyboardMenuItem />}
 		</Fragment>
 	)
 
@@ -122,6 +125,24 @@ const NodeMenuItems = React.memo(function _MenuItems({nodeType}: NodeMenuItemsPr
 		return (
 			<MenuItem disabled>
 				{`I'M INVINCIBLE`}
+			</MenuItem>
+		)
+	}
+
+	function ConnectKeyboardMenuItem() {
+
+		const onClick = (_: any, {nodeId}: DeleteMenuData) => {
+			dispatch(localActions.connectKeyboardToNode(nodeId, nodeType))
+		}
+
+		return (
+			<MenuItem
+				onClick={onClick}
+				attributes={{
+					title: `Shift + click on node header to connect keyboard`,
+				}}
+			>
+				Connect keyboard
 			</MenuItem>
 		)
 	}
