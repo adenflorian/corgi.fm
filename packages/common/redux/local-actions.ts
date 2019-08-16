@@ -69,6 +69,11 @@ export const localActions = {
 	pruneRoom: () => ({
 		type: 'PRUNE_ROOM',
 	} as const),
+	connectKeyboardToNode: (nodeId: Id, targetType: ConnectionNodeType) => ({
+		type: 'CONNECT_KEYBOARD_TO_NODE',
+		nodeId,
+		targetType,
+	} as const)
 } as const
 
 export type LocalAction = ActionType<typeof localActions>

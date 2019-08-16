@@ -75,6 +75,7 @@ const _makeNodeInfo = Record({
 	disabledText: '',
 	isNodeCloneable: false,
 	type: ConnectionNodeType.dummy,
+	canHaveKeyboardConnectedToIt: false,
 })
 
 type NodeInfo = ReturnType<typeof _makeNodeInfo>
@@ -146,6 +147,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		undoAction: id => sequencerActions.undo(id),
 		disabledText: sequencerDisabledText,
 		isNodeCloneable: true,
+		canHaveKeyboardConnectedToIt: true,
 	})],
 	[ConnectionNodeType.infiniteSequencer, makeNodeInfo({
 		type: ConnectionNodeType.infiniteSequencer,
@@ -164,6 +166,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		undoAction: id => sequencerActions.undo(id),
 		disabledText: sequencerDisabledText,
 		isNodeCloneable: true,
+		canHaveKeyboardConnectedToIt: true,
 	})],
 	[ConnectionNodeType.groupSequencer, makeNodeInfo({
 		type: ConnectionNodeType.groupSequencer,
@@ -177,6 +180,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		autoConnectToClock: true,
 		disabledText: 'Will prevent connected nodes from playing, unless they are connected to a different, enabled group sequencer',
 		isNodeCloneable: true,
+		canHaveKeyboardConnectedToIt: true,
 	})],
 	[ConnectionNodeType.basicSynthesizer, makeNodeInfo({
 		type: ConnectionNodeType.basicSynthesizer,
@@ -191,6 +195,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		autoConnectToAudioOutput: true,
 		disabledText: instrumentDisabledText,
 		isNodeCloneable: true,
+		canHaveKeyboardConnectedToIt: true,
 	})],
 	[ConnectionNodeType.basicSampler, makeNodeInfo({
 		type: ConnectionNodeType.basicSampler,
@@ -205,6 +210,7 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		autoConnectToAudioOutput: true,
 		disabledText: instrumentDisabledText,
 		isNodeCloneable: true,
+		canHaveKeyboardConnectedToIt: true,
 	})],
 	[ConnectionNodeType.simpleReverb, makeNodeInfo({
 		type: ConnectionNodeType.simpleReverb,

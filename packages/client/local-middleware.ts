@@ -11,6 +11,7 @@ import {BroadcastAction, IClientRoomState} from '@corgifm/common/redux/common-re
 import {
 	selectAllConnections, selectConnectionsWithSourceIds,
 	selectConnectionsWithSourceOrTargetIds, selectConnectionsWithTargetIds,
+	selectConnectionsWithSourceAndTargetId,
 } from '@corgifm/common/redux/connections-redux'
 import {
 	addBasicSynthesizer, AddClientAction,
@@ -483,6 +484,26 @@ export function createLocalMiddleware(
 				next(foo)
 
 				return
+			}
+			case 'CONNECT_KEYBOARD_TO_NODE': {
+				const nodeInfo = getConnectionNodeInfo(action.targetType)
+
+				if (!nodeInfo.canHaveKeyboardConnectedToIt) return
+
+				const state = getState()
+				const localKeyboardId = selectLocalVirtualKeyboardId(state)
+				
+				const existingConnections = selectConnectionsWithSourceAndTargetId(
+					state.room, localKeyboardId, action.nodeId)
+
+				if (existingConnections.count() > 0) return
+
+				return dispatch(connectionsActions.add(new Connection(
+					localKeyboardId,
+					ConnectionNodeType.virtualKeyboard,
+					action.nodeId,
+					action.targetType,
+				)))
 			}
 			default: return next(action)
 		}

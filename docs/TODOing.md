@@ -234,6 +234,9 @@ instead of smooth timeline animation, show a moving dot or blinking dot
 velocity
 create sampler menu should let you pick from empty/piano/drum kit
 show download progress on pad
+have separate radio selector on pads to select
+dont select pad just by clicking on it
+make button on node's to quickly connect your keyboard to it
 
 - [ ] ask the user's experience level
 - [ ] ask what the user wants to use corgi for

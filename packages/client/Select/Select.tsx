@@ -12,6 +12,7 @@ interface ISelectProps {
 	value: string
 }
 
+// TODO Make it use PanelLite
 export const Select = ({label, name, onChange, options, value}: ISelectProps) =>
 	<div className="shamuSelect">
 		{/* <label

@@ -1,9 +1,10 @@
-import React from 'react'
+import React, {useCallback} from 'react'
 import {useDispatch} from 'react-redux'
 import {ConnectionNodeType} from '@corgifm/common/common-types'
 import {
 	AppOptions, getConnectionNodeInfo, MASTER_AUDIO_OUTPUT_TARGET_ID,
 	positionActions, selectOption, selectPosition, setOption, shamuConnect,
+	localActions,
 } from '@corgifm/common/redux'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {handleClassName, handleVisualClassName} from '../client-constants'
@@ -30,16 +31,22 @@ interface ReduxProps {
 
 type AllProps = IPanelProps & ReduxProps
 
-export const DumbPanel: React.FC<AllProps> =
+export const DumbPanel =
 	React.memo(function _Panel({
 		autoSize = false, children, className = '', color = CssColor.disabledGray, nodeType,
 		id, label, labelTitle, saturate = false, helpText, ownerName, enabled, extra,
-	}) {
+	}: AllProps) {
 		const dispatch = useDispatch()
 
 		const renderLabel = label !== undefined && label !== ''
 
 		const nodeInfo = getConnectionNodeInfo(nodeType)
+
+		const handleMouseDownOnHeader = useCallback((e: React.MouseEvent) => {
+			if (id && e.shiftKey) {
+				dispatch(localActions.connectKeyboardToNode(id, nodeType))
+			}
+		}, [dispatch, id, nodeType])
 
 		return (
 			<div
@@ -55,6 +62,7 @@ export const DumbPanel: React.FC<AllProps> =
 					<div
 						className={`header ${handleClassName} ${handleVisualClassName}`}
 						title={labelTitle}
+						onMouseDown={handleMouseDownOnHeader}
 					>
 						<div
 							className={`colorDotContainer noDrag ${enabled ? 'enabled' : ''}`}

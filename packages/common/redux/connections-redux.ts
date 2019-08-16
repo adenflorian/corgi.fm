@@ -151,6 +151,12 @@ export const selectConnectionsWithSourceIds = (state: IClientRoomState, sourceId
 	return selectConnectionsWithSourceIds2(selectAllConnections(state), sourceIds)
 }
 
+export const selectConnectionsWithSourceAndTargetId = (state: IClientRoomState, sourceId: Id, targetId: Id) => {
+	return selectAllConnections(state)
+		.filter(x => x.sourceId === sourceId)
+		.filter(x => x.targetId === targetId)
+}
+
 export const selectFirstConnectionByTargetId = (state: IClientRoomState, targetId: Id) =>
 	selectAllConnections(state)
 		.find(x => x.targetId === targetId) || Connection.dummy
