@@ -2,12 +2,12 @@ import {
 	Samples, Sample, dummySample, dummySamplePath, makeSampleParams,
 } from '@corgifm/common/common-samples-stuff'
 import {IMidiNote} from '@corgifm/common/MidiNote'
+import {BuiltInBQFilterType} from '@corgifm/common/OscillatorTypes'
 import {
 	IInstrumentOptions, Instrument,
 	OnEndedCallback, SamplesManager,
 	Voice, Voices,
 } from '.'
-import {BuiltInBQFilterType} from '@corgifm/common/OscillatorTypes';
 
 export interface IBasicSamplerOptions extends IInstrumentOptions {
 	samples: Samples
@@ -58,6 +58,15 @@ class SamplerVoices extends Voices<SamplerVoice> {
 	public setSamples(samples: Samples) {
 		if (samples !== this._samples) {
 			this._samples = samples
+			this._scheduledVoices.forEach(voice => {
+				const sample = this._samples.get(voice.playingNote, null)
+				if (!sample || !sample.parameters) return
+				voice.setDetune(sample.parameters.detune)
+				voice.setLowPassFilterCutoffFrequency(sample.parameters.filterCutoff)
+				voice.setFilterType(sample.parameters.filterType)
+				voice.setPan(sample.parameters.pan)
+				voice.setGain(sample.parameters.gain)
+			})
 		}
 	}
 

@@ -31,11 +31,6 @@ export abstract class Voices<V extends Voice> {
 		this._allVoices.forEach(x => x.setDetune(detune))
 	}
 
-	public setLowPassFilterCutoffFrequency(frequency: number) {
-		this._lowPassFilterCutoffFrequency = frequency
-		this._allVoices.forEach(x => x.setLowPassFilterCutoffFrequency(frequency))
-	}
-
 	public readonly setRelease = (release: number) => {
 		this._releaseTimeInSeconds = release
 	}

@@ -89,11 +89,28 @@ export abstract class Voice {
 		this.getAudioScheduledSourceNode()!.detune.value = detune
 	}
 
-	// eslint-disable-next-line class-methods-use-this
 	public setLowPassFilterCutoffFrequency(frequency: number) {
-		// if (frequency === this._filter.frequency.value) return
+		if (frequency === this._filter.frequency.value) return
 
-		// this._filter.frequency.value = frequency
+		this._filter.frequency.value = frequency
+	}
+
+	public setFilterType(type: BuiltInBQFilterType) {
+		if (type === this._filter.type) return
+
+		this._filter.type = type
+	}
+
+	public setPan(pan: number) {
+		if (pan === this._pan.pan.value) return
+
+		this._pan.pan.value = pan
+	}
+
+	public setGain(gain: number) {
+		if (gain === this._masterGain.gain.value) return
+
+		this._masterGain.gain.value = gain
 	}
 
 	public scheduleNote(
