@@ -1,6 +1,8 @@
 import {Collection, IndexSpecification} from 'mongodb'
 import {ClassType} from 'class-transformer/ClassTransformer'
-import {transformAndValidateDbResult} from '@corgifm/common/validation'
+import {
+	transformAndValidateDbResult, transformAndValidateDbResultArray,
+} from '@corgifm/common/validation'
 
 export async function sumField<T>(
 	collection: Collection<T>,
@@ -60,6 +62,16 @@ export async function findOne<T extends object, U extends T>(
 	if (result === null) return null
 
 	return transformAndValidateDbResult(targetClass, result)
+}
+
+export async function findMany<T extends object, U extends T>(
+	collection: Collection<T>,
+	filter: Partial<U>,
+	targetClass: ClassType<T>,
+): Promise<T[]> {
+	const result = await collection.find(filter).toArray()
+
+	return transformAndValidateDbResultArray(targetClass, result)
 }
 
 export interface CorgiIndexes<TSchema> extends IndexSpecification {

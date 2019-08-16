@@ -1,4 +1,4 @@
-import {Matches, Min, Max, Length} from 'class-validator'
+import {Matches, Min, Max, Length, ValidateNested} from 'class-validator'
 import {multilineRegExp} from '../common-utils'
 
 const uploadPathRegex = multilineRegExp([
@@ -18,4 +18,9 @@ export class Upload {
 	@Min(1)
 	@Max(Number.MAX_SAFE_INTEGER)
 	public readonly sizeBytes: number = 0
+}
+
+export class YourSamples {
+	@ValidateNested()
+	public readonly yourSamples: Upload[] = []
 }

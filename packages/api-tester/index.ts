@@ -129,7 +129,9 @@ export function path(
 }
 
 /** GET */
-export function get(args: TestRequest): RequestTest {
+export function get<TResponseModel extends object = object>(
+	args: TestRequest<object, TResponseModel>,
+): RequestTest {
 	return (getApp: GetApp, finalPath: string, options: TestApiOptions) => {
 		const testLocation = getCallerLocation()
 

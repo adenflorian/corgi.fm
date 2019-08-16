@@ -4,7 +4,7 @@ import {
 	maxSampleUploadFileSizeMB, defaultS3BucketName, maxTotalSingleUserUploadBytes,
 } from '@corgifm/common/common-constants'
 import {logger} from '@corgifm/common/logger'
-import {Upload} from '@corgifm/common/models/OtherModels'
+import {Upload, YourSamples} from '@corgifm/common/models/OtherModels'
 import {
 	MBtoBytes, createNodeId, validateSampleFilenameExtension, bytesToMB,
 } from '@corgifm/common/common-utils'
@@ -50,13 +50,17 @@ export function getSamplesController(
 	async function secureSamplesRouter(
 		request: SecureApiRequest,
 	): Promise<ApiResponse> {
-		if (!['', '/'].includes(request.truncatedPath)) return defaultResponse
-
-		if (request.method === Method.POST) {
-			return uploadSample(request)
-		} else {
-			return defaultResponse
+		if (['', '/'].includes(request.truncatedPath)) {
+			if (request.method === Method.POST) {
+				return uploadSample(request)
+			}
 		}
+		if (request.truncatedPath === '/mine') {
+			if (request.method === Method.GET) {
+				return getMySamples(request)
+			}
+		}
+		return defaultResponse
 	}
 
 	// TODO Get uploads for user
@@ -99,6 +103,17 @@ export function getSamplesController(
 				uploads at ${bytesToMB(newTotalUploadedBytes).toFixed(0)} MB which is
 				over the upload cap of
 				${bytesToMB(maxTotalSingleUserUploadBytes).toFixed(0)} MB`)
+		}
+	}
+
+	async function getMySamples(
+		request: SecureApiRequest,
+	): Promise<ApiResponse<YourSamples>> {
+		return {
+			status: 200,
+			body: {
+				yourSamples: await dbStore.uploads.getByOwnerId(request.callerUid),
+			},
 		}
 	}
 }

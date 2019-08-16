@@ -1,13 +1,13 @@
 import {
 	RequestTest, path, get, put, ContentTypes, post,
 } from '@corgifm/api-tester'
-import {Upload} from '@corgifm/common/models/OtherModels'
+import {Upload, YourSamples} from '@corgifm/common/models/OtherModels'
 import {mockUuid} from '@corgifm/common/test-common'
 import {logger} from '@corgifm/common/logger'
 import {DBStore} from '../database/database'
 import {
 	VerifyAuthHeaderMock, missingAuthHeaderResponse, apiRouteNotFoundResponse,
-	uidA,
+	uidA, uidB,
 } from './api-test-common'
 
 export function getSampleApiTests(
@@ -17,6 +17,7 @@ export function getSampleApiTests(
 
 	return [
 		path('', emptyPathTests()),
+		path('mine', getMySamplesTests()),
 	]
 
 	function emptyPathTests(): RequestTest[] {
@@ -46,6 +47,11 @@ export function getSampleApiTests(
 				contentType: ContentTypes.ApplicationJson,
 				resBody: apiRouteNotFoundResponse,
 			}),
+		].concat(postSamplesTests())
+	}
+
+	function postSamplesTests(): RequestTest[] {
+		return [
 			post({
 				name: 'invalid upload request',
 				status: 400,
@@ -122,7 +128,51 @@ export function getSampleApiTests(
 				before: logger.disable,
 				after: async () => logger.enable(),
 			}),
-			// TODO Endpoint to get list of specific user's uploads
+		]
+	}
+
+	function getMySamplesTests(): RequestTest[] {
+		return [
+			get({
+				status: 200,
+				contentType: ContentTypes.ApplicationJson,
+				validateResponseBodyModel: YourSamples,
+				resBody: {
+					yourSamples: [],
+				},
+			}),
+			get<YourSamples>({
+				before: () => {
+					getDb().uploads.put({
+						ownerUid: uidA,
+						path: `user/${mockUuid}.wav`,
+						sizeBytes: 1000,
+					})
+					getDb().uploads.put({
+						ownerUid: uidB,
+						path: `user/${mockUuid}.wav`,
+						sizeBytes: 2000,
+					})
+					getDb().uploads.put({
+						ownerUid: uidA,
+						path: `user/${mockUuid}.wav`,
+						sizeBytes: 3000,
+					})
+				},
+				status: 200,
+				contentType: ContentTypes.ApplicationJson,
+				resBody: {
+					yourSamples: [{
+						ownerUid: uidA,
+						path: `user/${mockUuid}.wav`,
+						sizeBytes: 1000,
+					}, {
+						ownerUid: uidA,
+						path: `user/${mockUuid}.wav`,
+						sizeBytes: 3000,
+					}]
+				},
+			}),
 		]
 	}
 }
