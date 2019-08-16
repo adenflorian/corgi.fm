@@ -16,6 +16,10 @@ export const gainToolTip = stripIndents`
 	Gain (volume)
 	1 is 0 db and 0 is -infinite db
 `
+export const playbackRateToolTip = stripIndents`
+	Playback Rate
+	Controls how fast the sample plays
+`
 export const attackToolTip = stripIndents`
 	Attack time in seconds
 	The time between starting a note and it reaching max volume
@@ -112,6 +116,13 @@ export function detuneValueToString(detune: number) {
 
 export function percentageValueString(num: number) {
 	return (num * 100).toFixed(0) + '%'
+}
+
+export function percentageValueStringCurved(num: number) {
+	const percent = num * 100
+	if (percent < 10) return percent.toFixed(2) + '%'
+	if (percent < 100) return percent.toFixed(1) + '%'
+	return percent.toFixed(0) + '%'
 }
 
 export function seqGateValueToString(pitch: number) {

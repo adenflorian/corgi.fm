@@ -28,3 +28,5 @@ export const allowedSampleUploadFileExtensions: readonly string[] =
 export const defaultS3BucketName = 'cdn-test-corgi-fm'
 
 export const maxTotalSingleUserUploadBytes = 100 * 1000 * 1000
+
+export const defaultSamplePlaybackRate = 1

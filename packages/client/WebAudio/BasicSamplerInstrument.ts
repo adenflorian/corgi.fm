@@ -66,6 +66,7 @@ class SamplerVoices extends Voices<SamplerVoice> {
 				voice.setFilterType(sample.parameters.filterType)
 				voice.setPan(sample.parameters.pan)
 				voice.setGain(sample.parameters.gain)
+				voice.setPlaybackRate(sample.parameters.playbackRate)
 			})
 		}
 	}
@@ -122,6 +123,12 @@ class SamplerVoice extends Voice {
 		return this._audioBufferSource
 	}
 
+	public setPlaybackRate(rate: number) {
+		if (rate === this._audioBufferSource.playbackRate.value) return
+
+		this._audioBufferSource.playbackRate.value = rate
+	}
+
 	public dispose() {
 		this._disposeAudioBufferSource()
 		this._dispose()
@@ -140,7 +147,7 @@ class SamplerVoice extends Voice {
 
 	private _setSampleParams(params: Sample['parameters']) {
 		if (!params) return
-		// this._audioBufferSource.playbackRate.value = params.sustain
+		this.setPlaybackRate(params.playbackRate)
 	}
 
 	private _disposeAudioBufferSource() {

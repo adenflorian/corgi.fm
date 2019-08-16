@@ -6,12 +6,13 @@ import {
 } from '@corgifm/common/redux'
 import {allBuiltInBQFilterTypes} from '@corgifm/common/OscillatorTypes'
 import {CssColor} from '@corgifm/common/shamu-color'
+import {defaultSamplePlaybackRate} from '@corgifm/common/common-constants'
 import {Knob} from '../Knob/Knob'
 import {
 	attackToolTip, adsrValueToString, decayToolTip, sustainToolTip,
 	releaseToolTip, panToolTip, panValueToString, filterToolTip,
 	filterValueToString, detuneToolTip, detuneValueToString, gainToolTip,
-	percentageValueString,
+	percentageValueString, playbackRateToolTip, percentageValueStringCurved,
 } from '../client-constants'
 import {KnobSnapping} from '../Knob/KnobSnapping'
 
@@ -50,6 +51,19 @@ export const SamplerControls = React.memo(({id}: SamplerControlsProps) => {
 			}}
 		>
 			<div className="knobs">
+				<Knob
+					min={0}
+					max={10}
+					curve={2}
+					value={props.playbackRate}
+					defaultValue={defaultSamplePlaybackRate}
+					onChange={_dispatchChangeInstrumentParam}
+					label="Rate"
+					onChangeId={BasicSamplerParam.playbackRate}
+					tooltip={playbackRateToolTip}
+					valueString={percentageValueStringCurved}
+					readOnly={selectedSampleNote === undefined}
+				/>
 				<Knob
 					min={0}
 					max={10}

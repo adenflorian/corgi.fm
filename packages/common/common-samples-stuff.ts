@@ -2,6 +2,7 @@ import {List, Map} from 'immutable'
 import {IMidiNote} from './MidiNote'
 import {Octave, IKeyColors, NoteNameSharps} from './common-types'
 import {BuiltInBQFilterType} from './OscillatorTypes'
+import {defaultSamplePlaybackRate} from './common-constants'
 
 export const octavesToGet = [1, 2, 3, 4, 5, 6, 7] as const
 
@@ -99,6 +100,7 @@ export function makeSampleParams() {
 		filterCutoff: 20000,
 		filterType: BuiltInBQFilterType.lowpass,
 		detune: 0,
+		playbackRate: defaultSamplePlaybackRate,
 		gain: 0.5,
 	})
 }

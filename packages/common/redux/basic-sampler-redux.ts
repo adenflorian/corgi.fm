@@ -94,6 +94,7 @@ export enum BasicSamplerParam {
 	detune = 'detune',
 	gain = 'gain',
 	filterType = 'filterType',
+	playbackRate = 'playbackRate',
 }
 
 export interface IBasicSamplersState extends IMultiState {
@@ -289,6 +290,7 @@ export const samplerParamsSelector = (id: Id) => createSelector(
 			sustain: finalParams.sustain,
 			release: finalParams.release,
 			detune: finalParams.detune,
+			playbackRate: finalParams.playbackRate,
 			gain: finalParams.gain,
 			filterType: finalParams.filterType,
 		}
