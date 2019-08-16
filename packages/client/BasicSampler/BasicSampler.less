@@ -41,16 +41,19 @@
                 background-color: @panelGray;
                 box-sizing: border-box;
                 margin: 2px;
-                border: 1px solid currentColor;
+                border: 1px solid @panelGrayLight;
+                border-bottom-color: currentColor;
+                border-bottom-width: 2px;
                 animation-duration: 0.5s;
                 position: relative;
 
-                &.selected-true .label {
-                    text-decoration: underline;
+                &.selected-true {
+                    border-color: currentColor;
                 }
     
                 &:hover {
                     border-width: 2px;
+                    border-color: currentColor;
 
                     .label {
                         margin: 0px 1px 0px 1px;
