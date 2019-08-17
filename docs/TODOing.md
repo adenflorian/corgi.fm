@@ -239,6 +239,11 @@
 - [√] make button on node's to quickly connect your keyboard to it
 	- shift + click header or right click and select "connect keyboard"
 
+
+snap nodes to grid
+	snap nodes together
+	when moving a node that is snapped to other nodes, move all of them together
+
 - [ ] ask the user's experience level
 - [ ] ask what the user wants to use corgi for
 - [ ] feedback thru sentry

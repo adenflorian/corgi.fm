@@ -206,6 +206,8 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 			source.type,
 			target.id,
 			target.type,
+			0,
+			0,
 		)))
 	}
 

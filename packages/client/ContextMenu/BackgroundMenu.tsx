@@ -77,6 +77,8 @@ export const BackgroundMenuItems = React.memo(
 									ConnectionNodeType.masterClock,
 									newState.id,
 									newState.type,
+									0,
+									0,
 								)))
 							}
 							if (nodeInfo.autoConnectToAudioOutput) {
@@ -85,6 +87,8 @@ export const BackgroundMenuItems = React.memo(
 									newState.type,
 									MASTER_AUDIO_OUTPUT_TARGET_ID,
 									ConnectionNodeType.audioOutput,
+									0,
+									0,
 								)))
 							}
 						}

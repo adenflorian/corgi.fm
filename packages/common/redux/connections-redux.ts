@@ -85,8 +85,8 @@ export class Connection implements IConnection {
 		public readonly sourceType: ConnectionNodeType,
 		public readonly targetId: Id,
 		public readonly targetType: ConnectionNodeType,
-		public readonly sourcePort: ConnectionPortId = 0,
-		public readonly targetPort: ConnectionPortId = 0,
+		public readonly sourcePort: ConnectionPortId,
+		public readonly targetPort: ConnectionPortId,
 	) {}
 }
 
@@ -151,10 +151,17 @@ export const selectConnectionsWithSourceIds = (state: IClientRoomState, sourceId
 	return selectConnectionsWithSourceIds2(selectAllConnections(state), sourceIds)
 }
 
-export const selectConnectionsWithSourceAndTargetId = (state: IClientRoomState, sourceId: Id, targetId: Id) => {
+export const selectConnectionsWithSourceAndTargetId = (
+	state: IClientRoomState, sourceId: Id, sourcePort: number, targetId: Id, targetPort: number
+) => {
 	return selectAllConnections(state)
-		.filter(x => x.sourceId === sourceId)
-		.filter(x => x.targetId === targetId)
+		.filter(x => x.sourceId === sourceId && x.sourcePort === sourcePort && x.targetId === targetId && x.targetPort === targetPort)
+}
+
+export const doesConnectionBetweenNodesExist = (
+	state: IClientRoomState, sourceId: Id, sourcePort: number, targetId: Id, targetPort: number
+): boolean => {
+	return selectConnectionsWithSourceAndTargetId(state, sourceId, sourcePort, targetId, targetPort).count() > 0
 }
 
 export const selectFirstConnectionByTargetId = (state: IClientRoomState, targetId: Id) =>

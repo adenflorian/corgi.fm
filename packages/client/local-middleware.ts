@@ -11,7 +11,7 @@ import {BroadcastAction, IClientRoomState} from '@corgifm/common/redux/common-re
 import {
 	selectAllConnections, selectConnectionsWithSourceIds,
 	selectConnectionsWithSourceOrTargetIds, selectConnectionsWithTargetIds,
-	selectConnectionsWithSourceAndTargetId,
+	doesConnectionBetweenNodesExist,
 } from '@corgifm/common/redux/connections-redux'
 import {
 	addBasicSynthesizer, AddClientAction,
@@ -376,6 +376,8 @@ export function createLocalMiddleware(
 							ConnectionNodeType.masterClock,
 							clone.id,
 							clone.type,
+							0,
+							0,
 						)))
 					}
 					if (nodeInfo.autoConnectToAudioOutput) {
@@ -384,6 +386,8 @@ export function createLocalMiddleware(
 							clone.type,
 							MASTER_AUDIO_OUTPUT_TARGET_ID,
 							ConnectionNodeType.audioOutput,
+							0,
+							0,
 						)))
 					}
 				}
@@ -493,16 +497,18 @@ export function createLocalMiddleware(
 				const state = getState()
 				const localKeyboardId = selectLocalVirtualKeyboardId(state)
 
-				const existingConnections = selectConnectionsWithSourceAndTargetId(
-					state.room, localKeyboardId, action.nodeId)
-
-				if (existingConnections.count() > 0) return
+				if (
+					doesConnectionBetweenNodesExist(
+						state.room, localKeyboardId, 0, action.nodeId, 0)
+				) return
 
 				return dispatch(connectionsActions.add(new Connection(
 					localKeyboardId,
 					ConnectionNodeType.virtualKeyboard,
 					action.nodeId,
 					action.targetType,
+					0,
+					0,
 				)))
 			}
 			default: return next(action)
@@ -764,6 +770,8 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 		ConnectionNodeType.virtualKeyboard,
 		newInstrument.id,
 		ConnectionNodeType.basicSynthesizer,
+		0,
+		0,
 	)))
 
 	// Target to audio output
@@ -772,6 +780,8 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 		ConnectionNodeType.basicSynthesizer,
 		MASTER_AUDIO_OUTPUT_TARGET_ID,
 		ConnectionNodeType.audioOutput,
+		0,
+		0,
 	)))
 }
 

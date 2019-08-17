@@ -180,7 +180,6 @@ const NodeInfoMap = Map<ConnectionNodeType, NodeInfo>([
 		autoConnectToClock: true,
 		disabledText: 'Will prevent connected nodes from playing, unless they are connected to a different, enabled group sequencer',
 		isNodeCloneable: true,
-		canHaveKeyboardConnectedToIt: true,
 	})],
 	[ConnectionNodeType.basicSynthesizer, makeNodeInfo({
 		type: ConnectionNodeType.basicSynthesizer,

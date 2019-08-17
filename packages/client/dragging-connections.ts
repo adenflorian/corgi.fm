@@ -5,7 +5,7 @@ import {IClientRoomState} from '@corgifm/common/redux/common-redux-types'
 import {
 	ActiveGhostConnectorSourceOrTarget, Connection,
 	connectionsActions, GhostConnectorAddingOrMoving, IPosition, selectAllPositions,
-	selectConnectionsWithSourceIds, selectConnectionsWithTargetIds, selectGhostConnection, selectPosition,
+	selectConnectionsWithSourceIds, selectConnectionsWithTargetIds, selectGhostConnection, selectPosition, doesConnectionBetweenNodesExist, selectConnection,
 } from '@corgifm/common/redux'
 import {connectorWidth} from './Connections/ConnectionView'
 
@@ -59,10 +59,18 @@ export function handleStopDraggingGhostConnector(
 		if (movingConnectionId === undefined) {
 			return logger.error('[changeConnectionSource] movingConnectionId is undefined but should never be right here')
 		}
+		const {targetId, targetPort} = selectConnection(roomState, movingConnectionId)
+		const sourceId = position.id
+		const sourceType = position.targetType
+		const sourcePort = position.portNumber
+		if (
+			doesConnectionBetweenNodesExist(
+				roomState, sourceId, sourcePort, targetId, targetPort)
+		) return
 		dispatch(connectionsActions.update(movingConnectionId, {
-			sourceId: position.id,
-			sourceType: position.targetType,
-			sourcePort: position.portNumber,
+			sourceId,
+			sourceType,
+			sourcePort,
 		}))
 		// getAllInstruments().get(connection.targetId)!
 		// 	.releaseAllScheduledFromSourceId(connection.sourceId)
@@ -73,9 +81,18 @@ export function handleStopDraggingGhostConnector(
 		if (movingConnectionId === undefined) {
 			return logger.error('[changeConnectionTarget] movingConnectionId is undefined but should never be right here')
 		}
+		const {sourceId, sourcePort} = selectConnection(roomState, movingConnectionId)
+		const targetId = position.id
+		const targetType = position.targetType
+		const targetPort = position.portNumber
+		if (
+			doesConnectionBetweenNodesExist(
+				roomState, sourceId, sourcePort, targetId, targetPort)
+		) return
 		dispatch(connectionsActions.update(movingConnectionId, {
-			targetId: position.id,
-			targetType: position.targetType,
+			targetId,
+			targetType,
+			targetPort,
 		}))
 		// getAllInstruments().get(connection.targetId)!
 		// 	.releaseAllScheduledFromSourceId(connection.sourceId)
@@ -83,6 +100,12 @@ export function handleStopDraggingGhostConnector(
 
 	function newConnectionToSource(position: ConnectionCandidate, port: number) {
 		if (validatePosition(position) === false) return
+
+		if (
+			doesConnectionBetweenNodesExist(
+				roomState, position.id, position.portNumber, parentNodePosition.id, port)
+		) return
+
 		dispatch(connectionsActions.add(new Connection(
 			position.id,
 			position.targetType,
@@ -95,6 +118,12 @@ export function handleStopDraggingGhostConnector(
 
 	function newConnectionToTarget(position: ConnectionCandidate, port: number) {
 		if (validatePosition(position) === false) return
+
+		if (
+			doesConnectionBetweenNodesExist(
+				roomState, parentNodePosition.id, port, position.id, position.portNumber)
+		) return
+
 		dispatch(connectionsActions.add(new Connection(
 			parentNodePosition.id,
 			parentNodePosition.targetType,
