@@ -36,7 +36,7 @@ export const ActualKnob = React.memo(function _ActualKnob(props: Props) {
 					r="64%"
 					fill="none"
 					stroke={CssColor.panelGrayLight}
-					strokeWidth="3"
+					strokeWidth="1"
 					strokeDasharray={`0 50% ${1 * 308.2}% 100000`}
 					strokeDashoffset="1"
 				/>
@@ -46,7 +46,7 @@ export const ActualKnob = React.memo(function _ActualKnob(props: Props) {
 					r="64%"
 					fill="none"
 					stroke="currentColor"
-					strokeWidth="3"
+					strokeWidth="2"
 					strokeDasharray={`0 50% ${percentage * 308.2}% 100000`}
 					strokeDashoffset="1"
 				/>
