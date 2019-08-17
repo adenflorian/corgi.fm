@@ -1,5 +1,6 @@
 import React, {useState, useCallback, useEffect} from 'react'
 import {useSelector, useDispatch} from 'react-redux'
+import {stripIndents} from 'common-tags'
 import {
 	applyOctave, getKeyByValue, keyToMidiMap,
 } from '@corgifm/common/common-utils'
@@ -186,7 +187,11 @@ const OctaveSection = React.memo(({id}: {id: Id}) => {
 	const octave = useSelector(selectVirtualKeyboardOctave(id))
 
 	return (
-		<div className="octave black unselectable">
+		<div
+			className="octave black unselectable"
+			title={stripIndents`Octave
+				Press Z or - to decrease octave and X or + to increase octave`}
+		>
 			<div className="octaveNumber">
 				<div>{octave}</div>
 			</div>

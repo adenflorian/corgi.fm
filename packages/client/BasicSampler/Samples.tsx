@@ -54,6 +54,8 @@ export const Samples = React.memo(({samplerId}: Props) => {
 					type="button"
 					className="deselect"
 					onClick={deselect}
+					title={oneLine`Deselects all samples allowing you to change the
+						main instrument params`}
 				>
 					deselect
 				</button>
