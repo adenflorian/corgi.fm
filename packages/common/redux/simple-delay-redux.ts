@@ -44,8 +44,6 @@ export interface ISimpleDelays {
 }
 
 export class SimpleDelayState implements IConnectable, NodeSpecialState {
-	public static defaultWidth = 80 * 3
-	public static defaultHeight = 88
 	public static defaultTimeLeft = 0.25
 	public static defaultTimeRight = 0.25
 	public static defaultFeedback = 0.42
@@ -72,8 +70,6 @@ export class SimpleDelayState implements IConnectable, NodeSpecialState {
 		pingPong: SimpleDelayState.defaultPingPong,
 		color: false,
 		type: ConnectionNodeType.simpleDelay,
-		width: SimpleDelayState.defaultWidth,
-		height: SimpleDelayState.defaultHeight,
 		name: 'Dummy Simple Delay',
 		enabled: false,
 	}
@@ -90,8 +86,6 @@ export class SimpleDelayState implements IConnectable, NodeSpecialState {
 	public readonly filterQ: number = SimpleDelayState.defaultFilterQ
 	public readonly filterType: BuiltInBQFilterType = SimpleDelayState.defaultFilterType
 	public readonly pingPong: boolean = SimpleDelayState.defaultPingPong
-	public readonly width: number = SimpleDelayState.defaultWidth
-	public readonly height: number = SimpleDelayState.defaultHeight
 	public readonly color: false = false
 	public readonly type = ConnectionNodeType.simpleDelay
 	public readonly name: string = 'Simple Delay'
@@ -107,8 +101,6 @@ export function deserializeSimpleDelayState(state: IMultiStateThing): IMultiStat
 	const y: SimpleDelayState = {
 		...(new SimpleDelayState(x.ownerId)),
 		...x,
-		width: Math.max(x.width, SimpleDelayState.defaultWidth),
-		height: Math.max(x.height, SimpleDelayState.defaultHeight),
 	}
 	return y
 }

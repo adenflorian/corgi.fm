@@ -8,7 +8,7 @@ import {MidiClipEvents} from '@corgifm/common/midi-types'
 import {IMidiNotes} from '@corgifm/common/MidiNote'
 import {
 	gridSequencerActions, GridSequencerFields, IClientAppState,
-	selectGlobalClockState, selectGridSequencer,
+	selectGlobalClockState, selectGridSequencer, GridSequencerState,
 } from '@corgifm/common/redux'
 import {getColorStringForMidiNote} from '@corgifm/common/shamu-color'
 import {
@@ -194,7 +194,7 @@ const mapStateToProps = (state: IClientAppState, props: IGridSequencerNotesProps
 			? selectGlobalClockState(state.room).index % gridSequencerState.midiClip.events.count()
 			: -1,
 		bottomNote: gridSequencerState.scrollY,
-		notesToShow: gridSequencerState.notesToShow,
+		notesToShow: GridSequencerState.notesToShow,
 	}
 }
 

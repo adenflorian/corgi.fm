@@ -4,8 +4,6 @@ export interface IConnectable {
 	readonly id: Id
 	readonly color: string | false | List<string>
 	readonly type: ConnectionNodeType
-	readonly width: number
-	readonly height: number
 	readonly name: string
 	readonly inputPortCount?: number
 	readonly outputPortCount?: number

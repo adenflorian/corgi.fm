@@ -150,7 +150,6 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 		name: string
 		infinityStyle?: InfiniteSequencerStyle
 		events?: MidiClipEvents
-		notesToShow?: number
 		isPlaying?: boolean
 	}
 
@@ -160,7 +159,6 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 				const x = new GridSequencerState(
 					serverClient.id,
 					args.name,
-					args.notesToShow || 24,
 					args.events,
 					args.isPlaying,
 				)
@@ -317,11 +315,10 @@ export function loadServerStuff(room: string, serverStore: Store<IServerState>, 
 	dispatchToRoom(connectionsActions.replaceAll(transformedRoomSave.connections))
 	dispatchToRoom(shamuGraphActions.replace(transformedRoomSave.shamuGraph))
 	const newPositions = Map(transformedRoomSave.positions).map(position => {
-		const nodeState = findNodeInfo(position.targetType).stateSelector(getRoomState(), position.id)
 		return {
 			...position,
-			width: nodeState.width,
-			height: nodeState.height,
+			// width: nodeState.width,
+			// height: nodeState.height,
 		}
 	})
 	dispatchToRoom(replacePositions(newPositions))

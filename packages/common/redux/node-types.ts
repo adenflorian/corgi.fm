@@ -39,8 +39,6 @@ export const dummyIConnectable: IMultiStateThing = {
 	color: CssColor.disabledGray,
 	id: 'oh no',
 	type: ConnectionNodeType.dummy,
-	width: 0,
-	height: 0,
 	name: 'default node name',
 	enabled: false,
 	ownerId: 'dummyOwnerId',
@@ -51,8 +49,6 @@ class DummyConnectable implements IConnectable {
 		public readonly color = CssColor.disabledGray,
 		public readonly id: Id = 'oh no',
 		public readonly type = ConnectionNodeType.dummy,
-		public readonly width = 0,
-		public readonly height = 0,
 		public readonly name = 'default node name',
 		public readonly enabled = false,
 	) {}
@@ -80,6 +76,9 @@ const _makeNodeInfo = Record({
 	canHaveKeyboardConnectedToIt: false,
 	defaultWidth: 162,
 	defaultHeight: 100,
+	notesDisplayStartX: 0,
+	notesDisplayWidth: 0,
+	isResizable: false,
 })
 
 type NodeInfo = ReturnType<typeof _makeNodeInfo>
@@ -92,8 +91,6 @@ class AudioOutputState implements IMultiStateThing {
 	public readonly id = MASTER_AUDIO_OUTPUT_TARGET_ID
 	public readonly color = CssColor.green
 	public readonly type = ConnectionNodeType.audioOutput
-	public readonly width = 64 * 2
-	public readonly height = 88
 	public readonly name = 'audio output'
 	public readonly enabled = true
 	public readonly ownerId = serverClientId
@@ -105,8 +102,6 @@ class MasterClockState implements IMultiStateThing {
 	public readonly id = MASTER_CLOCK_SOURCE_ID
 	public readonly color = CssColor.brightBlue
 	public readonly type = ConnectionNodeType.masterClock
-	public readonly width = 172
-	public readonly height = 88
 	public readonly name = 'master clock'
 	public readonly enabled = true
 	public readonly ownerId = serverClientId
@@ -161,6 +156,10 @@ const nodeInfo: NodeInfoMap = {
 		disabledText: sequencerDisabledText,
 		isNodeCloneable: true,
 		canHaveKeyboardConnectedToIt: true,
+		defaultWidth: GridSequencerState.getWidth,
+		defaultHeight: GridSequencerState.getHeight,
+		notesDisplayStartX: GridSequencerState.notesStartX,
+		notesDisplayWidth: GridSequencerState.notesDisplayWidth,
 	}),
 	betterSequencer: makeNodeInfo({
 		type: ConnectionNodeType.betterSequencer,
@@ -180,6 +179,10 @@ const nodeInfo: NodeInfoMap = {
 		disabledText: sequencerDisabledText,
 		isNodeCloneable: true,
 		canHaveKeyboardConnectedToIt: true,
+		defaultWidth: 688,
+		defaultHeight: 88,
+		notesDisplayStartX: 0,
+		notesDisplayWidth: 688,
 	}),
 	infiniteSequencer: makeNodeInfo({
 		type: ConnectionNodeType.infiniteSequencer,
@@ -199,6 +202,10 @@ const nodeInfo: NodeInfoMap = {
 		disabledText: sequencerDisabledText,
 		isNodeCloneable: true,
 		canHaveKeyboardConnectedToIt: true,
+		defaultWidth: InfiniteSequencerState.defaultWidth,
+		defaultHeight: InfiniteSequencerState.defaultHeight,
+		notesDisplayStartX: InfiniteSequencerState.notesStartX,
+		notesDisplayWidth: InfiniteSequencerState.notesWidth,
 	}),
 	groupSequencer: makeNodeInfo({
 		type: ConnectionNodeType.groupSequencer,
@@ -212,6 +219,10 @@ const nodeInfo: NodeInfoMap = {
 		autoConnectToClock: true,
 		disabledText: 'Will prevent connected nodes from playing, unless they are connected to a different, enabled group sequencer',
 		isNodeCloneable: true,
+		defaultWidth: 800,
+		defaultHeight: 200,
+		notesDisplayStartX: 0,
+		notesDisplayWidth: 800,
 	}),
 	basicSynthesizer: makeNodeInfo({
 		type: ConnectionNodeType.basicSynthesizer,
@@ -227,6 +238,8 @@ const nodeInfo: NodeInfoMap = {
 		disabledText: instrumentDisabledText,
 		isNodeCloneable: true,
 		canHaveKeyboardConnectedToIt: true,
+		defaultWidth: 64 * 5,
+		defaultHeight: 56 + (88 * 3),
 	}),
 	basicSampler: makeNodeInfo({
 		type: ConnectionNodeType.basicSampler,
@@ -242,6 +255,8 @@ const nodeInfo: NodeInfoMap = {
 		disabledText: instrumentDisabledText,
 		isNodeCloneable: true,
 		canHaveKeyboardConnectedToIt: true,
+		defaultWidth: 64 + 320 + (64 * 5),
+		defaultHeight: 88 * 2,
 	}),
 	simpleReverb: makeNodeInfo({
 		type: ConnectionNodeType.simpleReverb,
@@ -256,6 +271,8 @@ const nodeInfo: NodeInfoMap = {
 		autoConnectToAudioOutput: true,
 		disabledText: effectDisabledText,
 		isNodeCloneable: true,
+		defaultWidth: 64 * 7,
+		defaultHeight: 88,
 	}),
 	simpleCompressor: makeNodeInfo({
 		type: ConnectionNodeType.simpleCompressor,
@@ -270,6 +287,8 @@ const nodeInfo: NodeInfoMap = {
 		autoConnectToAudioOutput: true,
 		disabledText: effectDisabledText,
 		isNodeCloneable: true,
+		defaultWidth: 64 * 5,
+		defaultHeight: 88,
 	}),
 	simpleDelay: makeNodeInfo({
 		type: ConnectionNodeType.simpleDelay,
@@ -284,6 +303,8 @@ const nodeInfo: NodeInfoMap = {
 		autoConnectToAudioOutput: true,
 		disabledText: effectDisabledText,
 		isNodeCloneable: true,
+		defaultWidth: 80 * 3,
+		defaultHeight: 88,
 	}),
 	audioOutput: makeNodeInfo({
 		type: ConnectionNodeType.audioOutput,
@@ -293,6 +314,8 @@ const nodeInfo: NodeInfoMap = {
 		selectIsPlaying: selectIsUpstreamNodePlaying,
 		stateSelector: () => audioOutputState,
 		disabledText: 'Will mute for you only',
+		defaultWidth: 64 * 2,
+		defaultHeight: 88,
 	}),
 	masterClock: makeNodeInfo({
 		type: ConnectionNodeType.masterClock,
@@ -305,6 +328,8 @@ const nodeInfo: NodeInfoMap = {
 		selectIsPlaying: selectGlobalClockIsPlaying,
 		color: CssColor.brightBlue,
 		disabledText: 'Will stop ticking',
+		defaultWidth: 172,
+		defaultHeight: 88,
 	}),
 } as const
 

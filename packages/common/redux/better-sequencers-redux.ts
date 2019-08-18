@@ -1,10 +1,9 @@
 import {List, Stack} from 'immutable'
 import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
-import {MAX_MIDI_NOTE_NUMBER_127} from '../common-constants'
 import {ConnectionNodeType, IMultiStateThing} from '../common-types'
 import {
-	assertArrayHasNoUndefinedElements, findLowestNote, findHighestNote,
+	assertArrayHasNoUndefinedElements,
 } from '../common-utils'
 import {makeMidiClipEvent, MidiClip} from '../midi-types'
 import {emptyMidiNotes, IMidiNote, MidiNotes} from '../MidiNote'
@@ -77,29 +76,13 @@ export interface IBetterSequencers extends IMultiStateThings {
 }
 
 export class BetterSequencerState extends SequencerStateBase {
-	// public static defaultWidth = 552
-	// public static defaultHeight = 234
-	public static noteNamesSideBarWidth = 16
-	public static noteWidth = 8
-	public static scrollBarWidth = 16
-	public static noteHeight = 8
-	public static controlsWidth = 180
-	public static getWidth = (notesDisplayWidth: number) => BetterSequencerState.controlsWidth +
-		BetterSequencerState.noteNamesSideBarWidth +
-		notesDisplayWidth +
-		BetterSequencerState.scrollBarWidth
-
 	public static dummy = new BetterSequencerState(
-		'dummy', 'dummy', 0, List(), false,
+		'dummy', 'dummy', List(), false,
 	)
-
-	public readonly scrollY: number
-	public readonly notesToShow: number
 
 	public constructor(
 		ownerId: Id,
 		name = 'Better Sequencer',
-		notesToShow = 24,
 		events = createSequencerEvents(32)
 			.map((_, i) => (makeMidiClipEvent({
 				notes: MidiNotes(i % 2 === 1 ? [] : [36]),
@@ -118,50 +101,24 @@ export class BetterSequencerState extends SequencerStateBase {
 			loop: true,
 		})
 
-		const height = BetterSequencerState.noteHeight * notesToShow
-
-		const notesDisplayWidth = BetterSequencerState.noteWidth * midiClip.events.count()
-
-		const width = BetterSequencerState.getWidth(notesDisplayWidth)
-
 		super(
 			name,
 			midiClip,
-			width,
-			height,
 			ownerId,
 			ConnectionNodeType.betterSequencer,
-			BetterSequencerState.controlsWidth + BetterSequencerState.noteNamesSideBarWidth,
-			notesDisplayWidth,
 			isPlaying,
 			1,
 			1 / 4,
 		)
-
-		this.notesToShow = notesToShow
-
-		const lowestNote = findLowestNote(this.midiClip.events)
-		const highestNote = findHighestNote(this.midiClip.events)
-		const maxScrollY = MAX_MIDI_NOTE_NUMBER_127 - this.notesToShow
-
-		const notesRange = highestNote - lowestNote
-		const desiredScrollY = Math.round(lowestNote - (this.notesToShow / 2) + (notesRange / 2))
-
-		this.scrollY = Math.min(maxScrollY, desiredScrollY)
 	}
 }
 
 export function deserializeBetterSequencerState(state: IMultiStateThing): IMultiStateThing {
 	const x = state as BetterSequencerState
 	const z = deserializeSequencerState(x)
-	const notesDisplayWidth = BetterSequencerState.noteWidth * z.midiClip.events.count()
 	const y: BetterSequencerState = {
 		...(new BetterSequencerState(x.ownerId)),
 		...z,
-		width: BetterSequencerState.getWidth(notesDisplayWidth),
-		height: BetterSequencerState.noteHeight * x.notesToShow,
-		notesDisplayStartX: BetterSequencerState.controlsWidth + BetterSequencerState.noteNamesSideBarWidth,
-		notesDisplayWidth,
 	}
 	return y
 }

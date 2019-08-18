@@ -135,7 +135,7 @@ export function createLocalMiddleware(
 
 							const actualMidiNote = Math.min(MAX_MIDI_NOTE_NUMBER_127 - 1, Math.max(0, action.midiNote))
 
-							const topNote = gridSequencer.scrollY + gridSequencer.notesToShow - 1
+							const topNote = gridSequencer.scrollY + GridSequencerState.notesToShow - 1
 
 							let needToScroll = 0
 
@@ -467,28 +467,25 @@ export function createLocalMiddleware(
 
 				return
 			}
-			case 'UPDATE_POSITIONS': {
-				// Mainly to handle loading old saves with smaller sizes
-				// Not perfect
-				// TODO I think we're doing this in 2 places...
-				const foo: ReturnType<typeof updatePositions> = {
-					...action,
-					positions: Map(action.positions).map((position): IPosition => {
-						const nodeInfo = findNodeInfo(position.targetType)
-						const nodeState = nodeInfo.stateSelector(getState().room, position.id)
+			// case 'UPDATE_POSITIONS': {
+			// 	// Mainly to handle loading old saves with smaller sizes
+			// 	// Not perfect
+			// 	// TODO I think we're doing this in 2 places...
+			// 	const foo: ReturnType<typeof updatePositions> = {
+			// 		...action,
+			// 		positions: Map(action.positions).map((position): IPosition => {
+			// 			return {
+			// 				...position,
+			// 				width: Math.max(position.width, position.width),
+			// 				height: Math.max(position.height, position.height),
+			// 			}
+			// 		}),
+			// 	}
 
-						return {
-							...position,
-							width: Math.max(position.width, nodeState.width),
-							height: Math.max(position.height, nodeState.height),
-						}
-					}),
-				}
+			// 	next(foo)
 
-				next(foo)
-
-				return
-			}
+			// 	return
+			// }
 			case 'CONNECT_KEYBOARD_TO_NODE': {
 				const nodeInfo = findNodeInfo(action.targetType)
 
@@ -755,8 +752,6 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 		...newInstrument,
 		id: newInstrument.id,
 		targetType: ConnectionNodeType.basicSynthesizer,
-		width: BasicSynthesizerState.defaultWidth,
-		height: BasicSynthesizerState.defaultHeight,
 		color: CssColor.blue,
 		...nextPosition,
 	})

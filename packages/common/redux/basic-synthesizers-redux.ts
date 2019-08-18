@@ -76,8 +76,6 @@ export interface IBasicSynthesizers {
 }
 
 export class BasicSynthesizerState implements IConnectable, NodeSpecialState {
-	public static defaultWidth = 64 * 5
-	public static defaultHeight = 56 + (88 * 3)
 	public static defaultFilterType = BuiltInBQFilterType.lowpass
 
 	public static dummy: BasicSynthesizerState = {
@@ -98,8 +96,6 @@ export class BasicSynthesizerState implements IConnectable, NodeSpecialState {
 		type: ConnectionNodeType.basicSynthesizer,
 		fineTuning: 0,
 		gain: 0.5,
-		width: BasicSynthesizerState.defaultWidth,
-		height: BasicSynthesizerState.defaultHeight,
 		name: 'Dummy Basic Synth',
 		enabled: false,
 		lfoRate: 0,
@@ -128,8 +124,6 @@ export class BasicSynthesizerState implements IConnectable, NodeSpecialState {
 	public readonly gain: number = 0.5
 	public readonly color: false = false
 	public readonly type = ConnectionNodeType.basicSynthesizer
-	public readonly width: number = BasicSynthesizerState.defaultWidth
-	public readonly height: number = BasicSynthesizerState.defaultHeight
 	public readonly name: string = 'Basic Synth'
 	public readonly enabled: boolean = true
 	public readonly lfoRate: number = 0
@@ -148,8 +142,6 @@ export function deserializeBasicSynthesizerState(state: IMultiStateThing): IMult
 	const y: BasicSynthesizerState = {
 		...(new BasicSynthesizerState(x.ownerId)),
 		...x,
-		width: Math.max(x.width, BasicSynthesizerState.defaultWidth),
-		height: Math.max(x.height, BasicSynthesizerState.defaultHeight),
 	}
 	return y
 }

@@ -106,8 +106,6 @@ export interface IBasicSamplers {
 }
 
 export class BasicSamplerState implements IConnectable, NodeSpecialState {
-	public static defaultWidth = 64 + 320 + (64 * 5)
-	public static defaultHeight = 88 * 2
 	public static defaultFilterType = BuiltInBQFilterType.lowpass
 	public static minViewOctave = -1
 	public static maxViewOctave = 9
@@ -118,8 +116,6 @@ export class BasicSamplerState implements IConnectable, NodeSpecialState {
 		ownerId: 'dummyOwner',
 		color: false,
 		type: ConnectionNodeType.basicSampler,
-		width: BasicSamplerState.defaultWidth,
-		height: BasicSamplerState.defaultHeight,
 		name: 'Dummy Basic Piano Sampler',
 		enabled: false,
 		filterType: BasicSamplerState.defaultFilterType,
@@ -133,8 +129,6 @@ export class BasicSamplerState implements IConnectable, NodeSpecialState {
 	public readonly ownerId: Id
 	public readonly color: false = false
 	public readonly type = ConnectionNodeType.basicSampler
-	public readonly width: number = BasicSamplerState.defaultWidth
-	public readonly height: number = BasicSamplerState.defaultHeight
 	public readonly name: string = 'Basic Piano Sampler'
 	public readonly enabled: boolean = true
 	public readonly filterType: BuiltInBQFilterType = BasicSamplerState.defaultFilterType
@@ -155,8 +149,6 @@ export function deserializeBasicSamplerState(
 	return {
 		...(new BasicSamplerState(x.ownerId)),
 		...x,
-		width: BasicSamplerState.defaultWidth,
-		height: BasicSamplerState.defaultHeight,
 		samples: x.samples === undefined
 			? samplerBasicPianoNotes
 			: convertToNumberKeyMap(Map<string, Sample>(x.samples as any)),

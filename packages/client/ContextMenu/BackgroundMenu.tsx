@@ -110,8 +110,6 @@ function createPosition(
 			...state,
 			id: state.id,
 			targetType: state.type,
-			width: state.width,
-			height: state.height,
 			color: CssColor.blue,
 			...getPositionFromMouseOrTouchEvent(e),
 		}),

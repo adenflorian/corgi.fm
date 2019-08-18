@@ -9,6 +9,7 @@ import {IClientAppState} from './common-redux-types'
 import {
 	BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION,
 } from '.'
+import {findNodeInfo} from './node-types';
 
 export const positionActions = {
 	setEnabled: (id: Id, enabled: boolean) => ({
@@ -111,9 +112,13 @@ const defaultPosition = {
 const makePositionRecord = Record(defaultPosition)
 
 export const makePosition = (
-	position: Pick<IPosition, 'id' | 'targetType' | 'width' | 'height'> & Partial<IPosition>,
+	position: Pick<IPosition, 'id' | 'targetType'> & Partial<IPosition>,
 ): Readonly<IPosition> => {
-	return makePositionRecord(position).toJS()
+	return makePositionRecord({
+		...position,
+		width: findNodeInfo(position.targetType).defaultWidth,
+		height: findNodeInfo(position.targetType).defaultHeight,
+	}).toJS()
 }
 
 export type PositionAction = AddPositionAction | DeletePositionsAction | NodeClickedAction
@@ -228,6 +233,9 @@ export const createPositionColorSelector = (id: Id) => (state: IClientAppState) 
 
 export const createPositionTypeSelector = (id: Id) => (state: IClientAppState) =>
 	selectPosition(state.room, id).targetType
+
+export const createPositionHeightSelector = (id: Id) => (state: IClientAppState) =>
+	selectPosition(state.room, id).height
 
 export const createPositionEnabledSelector = (id: Id) => (state: IClientAppState) =>
 	selectPosition(state.room, id).enabled

@@ -5,6 +5,7 @@ import {
 	AppOptions, findNodeInfo, positionActions, setOption,
 	localActions, createPositionEnabledSelector, createPositionTypeSelector,
 	createOptionSelector,
+	createPositionHeightSelector,
 } from '@corgifm/common/redux'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {handleClassName} from '../client-constants'
@@ -34,6 +35,7 @@ export const Panel =
 		const isPositionEnabled = useSelector(createPositionEnabledSelector(id))
 		const nodeType = useSelector(createPositionTypeSelector(id))
 		const isMasterVolumeMuted = useSelector(createOptionSelector(AppOptions.masterVolumeMute)) as boolean
+		const height = useSelector(createPositionHeightSelector(id))
 
 		const enabled = nodeType === ConnectionNodeType.audioOutput
 			? isMasterVolumeMuted === false
@@ -88,6 +90,9 @@ export const Panel =
 				<div
 					id={id as string}
 					className={`panel ${className}`}
+					style={{
+						height,
+					}}
 				>
 					{children}
 				</div>

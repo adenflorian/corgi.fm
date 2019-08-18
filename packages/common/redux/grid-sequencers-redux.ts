@@ -76,30 +76,38 @@ export interface IGridSequencers extends IMultiStateThings {
 }
 
 export class GridSequencerState extends SequencerStateBase {
-	// public static defaultWidth = 552
-	// public static defaultHeight = 234
+	public static defaultWidth = 552
+	public static defaultHeight = 234
 	public static noteNamesSideBarWidth = 16
 	public static noteWidth = 8
 	public static scrollBarWidth = 16
 	public static noteHeight = 8
 	public static controlsWidth = 180
-	public static getWidth = (notesDisplayWidth: number) => GridSequencerState.controlsWidth +
+	public static eventCount = 32
+	public static notesToShow = 24
+	public static notesDisplayWidth =
+		GridSequencerState.noteWidth * GridSequencerState.eventCount
+	public static getWidth =
+		GridSequencerState.controlsWidth +
 		GridSequencerState.noteNamesSideBarWidth +
-		notesDisplayWidth +
+		GridSequencerState.notesDisplayWidth +
 		GridSequencerState.scrollBarWidth
+	public static getHeight =
+		GridSequencerState.noteHeight * GridSequencerState.notesToShow
+	public static notesStartX =
+		GridSequencerState.controlsWidth +
+		GridSequencerState.noteNamesSideBarWidth
 
 	public static dummy = new GridSequencerState(
-		'dummy', 'dummy', 0, List(), false,
+		'dummy', 'dummy', List(), false,
 	)
 
 	public readonly scrollY: number
-	public readonly notesToShow: number
 
 	public constructor(
 		ownerId: Id,
 		name = 'Grid Sequencer',
-		notesToShow = 24,
-		events = createSequencerEvents(32)
+		events = createSequencerEvents(GridSequencerState.eventCount)
 			.map((_, i) => (makeMidiClipEvent({
 				notes: MidiNotes(i % 2 === 1 ? [] : [36]),
 				startBeat: i,
@@ -117,34 +125,22 @@ export class GridSequencerState extends SequencerStateBase {
 			loop: true,
 		})
 
-		const height = GridSequencerState.noteHeight * notesToShow
-
-		const notesDisplayWidth = GridSequencerState.noteWidth * midiClip.events.count()
-
-		const width = GridSequencerState.getWidth(notesDisplayWidth)
-
 		super(
 			name,
 			midiClip,
-			width,
-			height,
 			ownerId,
 			ConnectionNodeType.gridSequencer,
-			GridSequencerState.controlsWidth + GridSequencerState.noteNamesSideBarWidth,
-			notesDisplayWidth,
 			isPlaying,
 			1,
 			1 / 4,
 		)
 
-		this.notesToShow = notesToShow
-
 		const lowestNote = findLowestNote(this.midiClip.events)
 		const highestNote = findHighestNote(this.midiClip.events)
-		const maxScrollY = MAX_MIDI_NOTE_NUMBER_127 - this.notesToShow
+		const maxScrollY = MAX_MIDI_NOTE_NUMBER_127 - GridSequencerState.notesToShow
 
 		const notesRange = highestNote - lowestNote
-		const desiredScrollY = Math.round(lowestNote - (this.notesToShow / 2) + (notesRange / 2))
+		const desiredScrollY = Math.round(lowestNote - (GridSequencerState.notesToShow / 2) + (notesRange / 2))
 
 		this.scrollY = Math.min(maxScrollY, desiredScrollY)
 	}
@@ -153,14 +149,14 @@ export class GridSequencerState extends SequencerStateBase {
 export function deserializeGridSequencerState(state: IMultiStateThing): IMultiStateThing {
 	const x = state as GridSequencerState
 	const z = deserializeSequencerState(x)
-	const notesDisplayWidth = GridSequencerState.noteWidth * z.midiClip.events.count()
+	// const notesDisplayWidth = GridSequencerState.noteWidth * z.midiClip.events.count()
 	const y: GridSequencerState = {
 		...(new GridSequencerState(x.ownerId)),
 		...z,
-		width: GridSequencerState.getWidth(notesDisplayWidth),
-		height: GridSequencerState.noteHeight * x.notesToShow,
-		notesDisplayStartX: GridSequencerState.controlsWidth + GridSequencerState.noteNamesSideBarWidth,
-		notesDisplayWidth,
+		// width: GridSequencerState.getWidth(notesDisplayWidth),
+		// height: GridSequencerState.noteHeight * x.notesToShow,
+		// notesDisplayStartX: GridSequencerState.controlsWidth + GridSequencerState.noteNamesSideBarWidth,
+		// notesDisplayWidth,
 	}
 	return y
 }

@@ -126,12 +126,8 @@ export class InfiniteSequencerState extends SequencerStateBase {
 		super(
 			name,
 			midiClip,
-			InfiniteSequencerState.defaultWidth,
-			InfiniteSequencerState.defaultHeight,
 			ownerId,
 			ConnectionNodeType.infiniteSequencer,
-			InfiniteSequencerState.notesStartX,
-			InfiniteSequencerState.notesWidth,
 			isPlaying,
 			0.5,
 		)
@@ -146,10 +142,10 @@ export function deserializeInfiniteSequencerState(state: IMultiStateThing): IMul
 	const y: InfiniteSequencerState = {
 		...(new InfiniteSequencerState(x.ownerId)),
 		...(deserializeSequencerState(x)),
-		width: Math.max(x.width, InfiniteSequencerState.defaultWidth),
-		height: Math.max(x.height, InfiniteSequencerState.defaultHeight),
-		notesDisplayStartX: InfiniteSequencerState.notesStartX,
-		notesDisplayWidth: InfiniteSequencerState.notesWidth,
+		// width: Math.max(x.width, InfiniteSequencerState.defaultWidth),
+		// height: Math.max(x.height, InfiniteSequencerState.defaultHeight),
+		// notesDisplayStartX: InfiniteSequencerState.notesStartX,
+		// notesDisplayWidth: InfiniteSequencerState.notesWidth,
 	}
 	return y
 }

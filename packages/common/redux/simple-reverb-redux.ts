@@ -45,8 +45,6 @@ export interface ISimpleReverbs {
 }
 
 export class SimpleReverbState implements IConnectable, NodeSpecialState {
-	public static defaultWidth = 64 * 7 // main width plus padding
-	public static defaultHeight = 88
 	public static defaultLpfFreq = 2000
 	public static defaultTime = 4
 	public static defaultDry = 0.6
@@ -67,8 +65,6 @@ export class SimpleReverbState implements IConnectable, NodeSpecialState {
 		filterType: BuiltInBQFilterType.lowpass,
 		color: false,
 		type: ConnectionNodeType.simpleReverb,
-		width: SimpleReverbState.defaultWidth,
-		height: SimpleReverbState.defaultHeight,
 		name: 'Dummy Simple Reverb',
 		enabled: false,
 	}
@@ -82,8 +78,6 @@ export class SimpleReverbState implements IConnectable, NodeSpecialState {
 	public readonly reverse: boolean = SimpleReverbState.defaultReverse
 	public readonly decay: number = SimpleReverbState.defaultDecay
 	public readonly filterType: BuiltInBQFilterType = SimpleReverbState.defaultFilterType
-	public readonly width: number = SimpleReverbState.defaultWidth
-	public readonly height: number = SimpleReverbState.defaultHeight
 	public readonly color: false = false
 	public readonly type = ConnectionNodeType.simpleReverb
 	public readonly name: string = 'Simple Reverb'
@@ -99,8 +93,6 @@ export function deserializeSimpleReverbState(state: IMultiStateThing): IMultiSta
 	const y: SimpleReverbState = {
 		...(new SimpleReverbState(x.ownerId)),
 		...x,
-		width: Math.max(x.width, SimpleReverbState.defaultWidth),
-		height: Math.max(x.height, SimpleReverbState.defaultHeight),
 	}
 	return y
 }

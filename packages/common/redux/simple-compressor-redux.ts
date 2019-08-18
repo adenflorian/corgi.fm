@@ -42,9 +42,6 @@ export interface ISimpleCompressors {
 }
 
 export class SimpleCompressorState implements IConnectable, NodeSpecialState {
-	public static defaultWidth = 64 * 5 // main width plus padding
-	public static defaultHeight = 88
-
 	public static dummy: SimpleCompressorState = {
 		id: 'dummy',
 		ownerId: 'dummyOwner',
@@ -55,8 +52,6 @@ export class SimpleCompressorState implements IConnectable, NodeSpecialState {
 		release: 0,
 		color: false,
 		type: ConnectionNodeType.simpleCompressor,
-		width: SimpleCompressorState.defaultWidth,
-		height: SimpleCompressorState.defaultHeight,
 		name: 'Dummy Simple Compressor',
 		enabled: false,
 	}
@@ -68,8 +63,6 @@ export class SimpleCompressorState implements IConnectable, NodeSpecialState {
 	public readonly attack: number = 0.003
 	public readonly release: number = 0.25
 	public readonly knee: number = 30
-	public readonly width: number = SimpleCompressorState.defaultWidth
-	public readonly height: number = SimpleCompressorState.defaultHeight
 	public readonly color: false = false
 	public readonly type = ConnectionNodeType.simpleCompressor
 	public readonly name: string = 'Simple Compressor'
@@ -85,8 +78,6 @@ export function deserializeSimpleCompressorState(state: IMultiStateThing): IMult
 	const y: SimpleCompressorState = {
 		...(new SimpleCompressorState(x.ownerId)),
 		...x,
-		width: Math.max(x.width, SimpleCompressorState.defaultWidth),
-		height: Math.max(x.height, SimpleCompressorState.defaultHeight),
 	}
 	return y
 }
