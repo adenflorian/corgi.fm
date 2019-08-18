@@ -3,10 +3,9 @@ import {useSelector} from 'react-redux'
 import {stripIndents, oneLine} from 'common-tags'
 import {
 	createPositionColorSelector, createBetterSeqIsRecordingSelector,
-	createBetterSeqIsPlayingSelector, createBetterSeqRateSelector,
+	createBetterSeqIsPlayingSelector, createBetterSeqRateSelector, getNodeInfo,
 } from '@corgifm/common/redux'
 import {Panel} from '../Panel/Panel'
-import {seqLengthValueToString} from '../client-constants'
 
 interface Props {
 	id: Id
@@ -22,14 +21,14 @@ export const BetterSequencer = ({id}: Props) => {
 		<Panel
 			id={id}
 			color={isRecording ? 'red' : color}
-			label={name}
+			label={getNodeInfo().betterSequencer.typeName}
 			className={oneLine`
 				betterSequencer
 				playing-${isPlaying}
 				recording-${isRecording}
 			`}
 			saturate={isPlaying}
-			extra={seqLengthValueToString(rate / 4 * length)}
+			// extra={seqLengthValueToString(rate / 4 * length)}
 			helpText={stripIndents`
 				Better Sequencer
 

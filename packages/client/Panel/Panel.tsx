@@ -42,7 +42,7 @@ export const Panel =
 			? isMasterVolumeMuted === false
 			: isPositionEnabled
 
-		const nodeInfo = findNodeInfo(nodeType)
+		const {disabledText, isResizable} = findNodeInfo(nodeType)
 
 		const handleMouseDownOnHeader = useCallback((e: React.MouseEvent) => {
 			if (id && e.shiftKey) {
@@ -58,7 +58,7 @@ export const Panel =
 				}}
 				className={`panelContainer ${saturate ? 'saturate' : ''}`}
 			>
-				<Resizer id={id} />
+				{isResizable && <Resizer id={id} />}
 				<div
 					className={`header ${handleClassName}`}
 					title={labelTitle}
@@ -69,7 +69,7 @@ export const Panel =
 						onClick={onColorDotClick}
 						title={(enabled ? 'Enabled' : 'Disabled') +
 							`\nDisable or enable this node\n` +
-							nodeInfo.disabledText + ' when disabled'}
+							disabledText + ' when disabled'}
 					>
 						<div className="colorDot" />
 					</div>
@@ -121,7 +121,7 @@ export const PanelLite = React.memo(
 		return (
 			<div
 				style={{
-					color: color,
+					color,
 					position: 'relative',
 				}}
 				className={`panelContainer`}

@@ -183,6 +183,7 @@ const nodeInfo: NodeInfoMap = {
 		defaultHeight: 88,
 		notesDisplayStartX: 0,
 		notesDisplayWidth: 688,
+		isResizable: true,
 	}),
 	infiniteSequencer: makeNodeInfo({
 		type: ConnectionNodeType.infiniteSequencer,
