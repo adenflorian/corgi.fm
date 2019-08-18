@@ -104,3 +104,7 @@ export const selectOptions = (state: IClientAppState) => state.options
 export const selectOption = (state: IClientAppState, option: AppOptions) => {
 	return selectOptions(state)[option]
 }
+
+export const createOptionSelector = (option: AppOptions) => (state: IClientAppState) => {
+	return selectOptions(state)[option]
+}

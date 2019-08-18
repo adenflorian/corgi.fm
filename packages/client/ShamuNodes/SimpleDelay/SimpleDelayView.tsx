@@ -2,7 +2,7 @@ import React from 'react'
 import {Dispatch} from 'redux'
 import {BuiltInBQFilterType} from '@corgifm/common/OscillatorTypes'
 import {
-	getConnectionNodeInfo, selectSimpleDelay, setSimpleDelayParam,
+	findNodeInfo, selectSimpleDelay, setSimpleDelayParam,
 	shamuConnect, SimpleDelayParam, SimpleDelayState,
 } from '@corgifm/common/redux'
 import {adsrValueToString, percentageValueString} from '../../client-constants'
@@ -109,7 +109,7 @@ export const ConnectedSimpleDelay = shamuConnect(
 		const simpleDelayState = selectSimpleDelay(state.room, id)
 
 		return {
-			isPlaying: getConnectionNodeInfo(simpleDelayState.type)
+			isPlaying: findNodeInfo(simpleDelayState.type)
 				.selectIsPlaying(state.room, id),
 			timeLeft: simpleDelayState.timeLeft,
 			timeRight: simpleDelayState.timeRight,

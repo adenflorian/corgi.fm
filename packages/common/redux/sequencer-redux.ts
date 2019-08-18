@@ -185,11 +185,13 @@ export function deserializeSequencerState<T extends ISequencerState>(state: IMul
 
 export const selectAllGridSequencers = (state: IClientRoomState) => state.shamuGraph.nodes.gridSequencers.things
 
+export const selectAllBetterSequencers = (state: IClientRoomState) => state.shamuGraph.nodes.betterSequencers.things
+
 export const selectAllInfiniteSequencers = (state: IClientRoomState) => state.shamuGraph.nodes.infiniteSequencers.things
 
 export const selectAllSequencers = createSelector(
-	[selectAllGridSequencers, selectAllInfiniteSequencers],
-	(gridSeqs, infSeqs) => ({...gridSeqs, ...infSeqs}),
+	[selectAllGridSequencers, selectAllInfiniteSequencers, selectAllBetterSequencers],
+	(gridSeqs, infSeqs, betterSeqs) => ({...gridSeqs, ...infSeqs, ...betterSeqs}),
 )
 
 export function selectSequencer(state: IClientRoomState, id: Id) {

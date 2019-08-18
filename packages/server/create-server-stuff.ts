@@ -11,7 +11,7 @@ import {
 	addSimpleReverb, BasicSamplerState,
 	BasicSynthesizerState, ClientState, Connection, connectionsActions,
 	createRoomAction, deletePositions,
-	deleteThingsAny, getConnectionNodeInfo, globalClockActions,
+	deleteThingsAny, findNodeInfo, globalClockActions,
 	GridSequencerState, InfiniteSequencerState,
 	InfiniteSequencerStyle, IServerState, makePosition,
 	makeSequencerEvents, replacePositions, roomSettingsActions, SavedRoom,
@@ -20,8 +20,8 @@ import {
 	SimpleReverbState, updatePositions,
 } from '@corgifm/common/redux'
 
-const masterAudioOutput: IConnectable = getConnectionNodeInfo(ConnectionNodeType.audioOutput).stateSelector({} as any, '')
-const masterClock: IConnectable = getConnectionNodeInfo(ConnectionNodeType.masterClock).stateSelector({} as any, '')
+const masterAudioOutput: IConnectable = findNodeInfo(ConnectionNodeType.audioOutput).stateSelector({} as any, '')
+const masterClock: IConnectable = findNodeInfo(ConnectionNodeType.masterClock).stateSelector({} as any, '')
 
 export function createServerStuff(room: string, serverStore: Store<IServerState>) {
 	const serverClient = ClientState.createServerClient()
@@ -33,12 +33,14 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 		makePosition({
 			...masterClock,
 			targetType: masterClock.type,
+			color: undefined,
 		})))
 
 	dispatchToRoom(addPosition(
 		makePosition({
 			...masterAudioOutput,
 			targetType: masterAudioOutput.type,
+			color: undefined,
 		})))
 
 	// Reverb
@@ -51,6 +53,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 		makePosition({
 			...simpleReverb,
 			targetType: simpleReverb.type,
+			color: undefined,
 		})))
 
 	connectNodes(simpleReverb, masterAudioOutput)
@@ -60,7 +63,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 			source: {
 				type: ConnectionNodeType.gridSequencer,
 				events: getMelodyNotes(),
-				name: getConnectionNodeInfo(ConnectionNodeType.gridSequencer).typeName,
+				name: findNodeInfo(ConnectionNodeType.gridSequencer).typeName,
 				notesToShow: 24,
 			},
 			target: {
@@ -71,7 +74,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 			source: {
 				type: ConnectionNodeType.infiniteSequencer,
 				events: getInitialInfiniteSequencerEvents(),
-				name: getConnectionNodeInfo(ConnectionNodeType.infiniteSequencer).typeName,
+				name: findNodeInfo(ConnectionNodeType.infiniteSequencer).typeName,
 				infinityStyle: InfiniteSequencerStyle.colorGrid,
 				isPlaying: true,
 			},
@@ -119,6 +122,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 			makePosition({
 				...target,
 				targetType: target.type,
+				color: undefined,
 			})))
 
 		const source = createSource(options.source)
@@ -126,6 +130,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 			makePosition({
 				...source,
 				targetType: source.type,
+				color: undefined,
 			})))
 
 		connectNodes(source, target)
@@ -312,7 +317,7 @@ export function loadServerStuff(room: string, serverStore: Store<IServerState>, 
 	dispatchToRoom(connectionsActions.replaceAll(transformedRoomSave.connections))
 	dispatchToRoom(shamuGraphActions.replace(transformedRoomSave.shamuGraph))
 	const newPositions = Map(transformedRoomSave.positions).map(position => {
-		const nodeState = getConnectionNodeInfo(position.targetType).stateSelector(getRoomState(), position.id)
+		const nodeState = findNodeInfo(position.targetType).stateSelector(getRoomState(), position.id)
 		return {
 			...position,
 			width: nodeState.width,

@@ -5,13 +5,14 @@ import {useDispatch} from 'react-redux'
 import {MidiClipEvents} from '@corgifm/common/midi-types'
 import {IMidiNote} from '@corgifm/common/MidiNote'
 import {
-	findLowestAndHighestNotes, infiniteSequencerActions, localActions,
+	infiniteSequencerActions, localActions,
 	InfiniteSequencerStyle, selectInfiniteSequencer, shamuConnect,
 } from '@corgifm/common/redux'
 import {getColorStringForMidiNote} from '@corgifm/common/shamu-color'
 import {
 	getOctaveFromMidiNote, midiNoteToNoteName,
 } from '@corgifm/common/common-samples-stuff'
+import {findLowestAndHighestNotes} from '@corgifm/common/common-utils'
 import {isWhiteKey} from '../Keyboard/Keyboard'
 
 interface Props {

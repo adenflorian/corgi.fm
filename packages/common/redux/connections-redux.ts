@@ -9,7 +9,7 @@ import {CssColor, mixColors} from '../shamu-color'
 import {selectOption, AppOptions} from './options-redux'
 import {IClientAppState} from './common-redux-types'
 import {
-	BROADCASTER_ACTION, getConnectionNodeInfo, IClientRoomState,
+	BROADCASTER_ACTION, findNodeInfo, IClientRoomState,
 	selectVirtualKeyboardById, SERVER_ACTION, VirtualKeyboardState,
 } from '.'
 
@@ -214,7 +214,7 @@ const makeConnectionSourceColorSelector =
 		if (processedIds.contains(connection.id)) return CssColor.disabledGray
 
 		return (
-			tryGetColorFromState(getConnectionNodeInfo(connection.sourceType).stateSelector(state.room, connection.sourceId).color, connection.sourcePort)
+			tryGetColorFromState(findNodeInfo(connection.sourceType).stateSelector(state.room, connection.sourceId).color, connection.sourcePort)
 			||
 			selectConnectionSourceColorByTargetId(state, connection.sourceId, processedIds.push(connection.id))
 		)
@@ -245,7 +245,7 @@ export const selectConnectionSourceIdsByTarget = (state: IClientRoomState, targe
 }
 
 const makeConnectionSourceNotesSelector = (roomState: IClientRoomState) => (connection: IConnection): IMidiNotes => {
-	return getConnectionNodeInfo(connection.sourceType).selectActiveNotes(roomState, connection.sourceId)
+	return findNodeInfo(connection.sourceType).selectActiveNotes(roomState, connection.sourceId)
 }
 
 // TODO Handle multiple ancestor connections
@@ -254,7 +254,7 @@ export const selectConnectionSourceIsActive = (roomState: IClientRoomState, id: 
 
 	const connection = selectConnection(roomState, id)
 
-	const isPlaying = getConnectionNodeInfo(connection.sourceType).selectIsActive(roomState, connection.sourceId)
+	const isPlaying = findNodeInfo(connection.sourceType).selectIsActive(roomState, connection.sourceId)
 
 	if (isPlaying !== null) {
 		return isPlaying
@@ -272,7 +272,7 @@ export const selectConnectionSourceIsSending = (roomState: IClientRoomState, id:
 
 	const connection = selectConnection(roomState, id)
 
-	const isSending = getConnectionNodeInfo(connection.sourceType).selectIsSending(roomState, connection.sourceId)
+	const isSending = findNodeInfo(connection.sourceType).selectIsSending(roomState, connection.sourceId)
 
 	if (isSending !== null) {
 		return isSending

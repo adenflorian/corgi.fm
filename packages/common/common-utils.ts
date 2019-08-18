@@ -4,6 +4,7 @@ import {Map} from 'immutable'
 import {allowedSampleUploadFileExtensions} from './common-constants'
 
 import uuid = require('uuid')
+import {MidiClipEvents} from './midi-types';
 
 export function pickRandomArrayElement<T>(array: readonly T[]): T {
 	return array[Math.floor(Math.random() * array.length)]
@@ -158,3 +159,46 @@ export const colorRegex = multilineRegExp([
 	/(#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})|hsl\(\d{1,3}, ?\d{1,3}%, ?\d{1,3}%\))/,
 	/$/,
 ])
+
+export function findLowestAndHighestNotes(events: MidiClipEvents) {
+	return {
+		lowestNote: findLowestNote(events),
+		highestNote: findHighestNote(events),
+	}
+}
+
+export function findLowestNote(events: MidiClipEvents): number {
+	let lowest = Number.MAX_VALUE
+
+	events.forEach(event => {
+		event.notes.forEach(note => {
+			if (note < lowest) {
+				lowest = note
+			}
+		})
+	})
+
+	if (lowest === Number.MAX_VALUE) {
+		return 0
+	}
+
+	return lowest
+}
+
+export function findHighestNote(events: MidiClipEvents): number {
+	let highest = Number.MIN_VALUE
+
+	events.forEach(event => {
+		event.notes.forEach(note => {
+			if (note > highest) {
+				highest = note
+			}
+		})
+	})
+
+	if (highest === Number.MIN_VALUE) {
+		return 127
+	}
+
+	return highest
+}

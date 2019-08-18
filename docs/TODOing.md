@@ -223,6 +223,7 @@
 		- [√] samples manager middleware?
 		- [√] if `getSample` gets called and sample isn't loaded, then that's an error?
 
+- [ ] make piano roll notes light up on grid seq when connected keyboard is playing those notes
 - [ ] select sample then knobs on right are for that sample
 - [ ] mimic hardware samplers like the volca sample
 - [ ] button to toggle HUD

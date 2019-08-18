@@ -11,6 +11,7 @@ import {Dispatch} from 'redux'
 import {serverClientId} from '@corgifm/common/common-constants'
 import {toGraphSpace} from '../SimpleGraph/Zoom'
 import {TopMenuBar} from './TopMenuBar'
+import {CssColor} from '@corgifm/common/shamu-color';
 
 interface BackgroundMenuItemsProps {
 	localClientId: Id
@@ -111,6 +112,7 @@ function createPosition(
 			targetType: state.type,
 			width: state.width,
 			height: state.height,
+			color: CssColor.blue,
 			...getPositionFromMouseOrTouchEvent(e),
 		}),
 	))

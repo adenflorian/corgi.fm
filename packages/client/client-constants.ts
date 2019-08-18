@@ -161,7 +161,6 @@ export const graphStateSaveLocalStorageKeyPrefix = 'localSave_'
 export const graphStateSavesLocalStorageKey = 'localSaves'
 
 export const handleClassName = 'handle'
-export const handleVisualClassName = 'handleVisual'
 
 export const limiterRenderSystemConstants = {
 	width: 8,

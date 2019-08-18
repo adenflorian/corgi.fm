@@ -1,7 +1,7 @@
 import {List} from 'immutable'
 import React from 'react'
 import {CssColor} from '@corgifm/common/shamu-color'
-import {Panel} from '../Panel/Panel'
+import {PanelLite} from '../Panel/Panel'
 import './Select.less'
 
 interface ISelectProps {
@@ -23,7 +23,7 @@ export const Select = ({label, name, onChange, options, value}: ISelectProps) =>
 			}}>
 			{label}
 		</label> */}
-		<Panel
+		<PanelLite
 			className="selectContainer"
 			color={CssColor.defaultGray}
 		>
@@ -35,5 +35,5 @@ export const Select = ({label, name, onChange, options, value}: ISelectProps) =>
 			<div className="arrow">
 				<div>▼</div>
 			</div>
-		</Panel>
+		</PanelLite>
 	</div>

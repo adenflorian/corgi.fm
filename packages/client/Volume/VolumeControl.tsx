@@ -4,7 +4,7 @@ import {connect} from 'react-redux'
 import {Action, Dispatch} from 'redux'
 import {ConnectionNodeType} from '@corgifm/common/common-types'
 import {
-	setOptionMasterVolume, getConnectionNodeInfo, IClientAppState,
+	setOptionMasterVolume, findNodeInfo, IClientAppState,
 	MASTER_AUDIO_OUTPUT_TARGET_ID,
 } from '@corgifm/common/redux'
 import {limiterRenderSystemConstants, percentageValueString} from '../client-constants'
@@ -84,7 +84,7 @@ export const ConnectedVolumeControl = connect(
 	(state: IClientAppState): IVolumeControlReduxProps => {
 		return {
 			masterVolume: state.options.masterVolume,
-			isPlaying: getConnectionNodeInfo(ConnectionNodeType.audioOutput)
+			isPlaying: findNodeInfo(ConnectionNodeType.audioOutput)
 				.selectIsPlaying(state.room, MASTER_AUDIO_OUTPUT_TARGET_ID),
 		}
 	},

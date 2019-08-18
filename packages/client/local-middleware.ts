@@ -17,7 +17,7 @@ import {
 	addBasicSynthesizer, AddClientAction,
 	addMultiThing, addPosition, addVirtualKeyboard,
 	BasicSynthesizerState, Connection,
-	connectionsActions, deletePositions, deleteThingsAny, getConnectionNodeInfo,
+	connectionsActions, deletePositions, deleteThingsAny, findNodeInfo,
 	GridSequencerAction,
 	gridSequencerActions, GridSequencerFields, GridSequencerState, IClientAppState,
 	IPosition, ISequencerState, LocalSaves, makePosition,
@@ -49,10 +49,10 @@ import {
 	VirtualKeyUpAction,
 	virtualOctaveChange,
 	VirtualOctaveChangeAction,
-	LocalAction, chatSystemMessage, animationActions, selectOption, AppOptions,
-	uploadActions,
+	LocalAction, chatSystemMessage, animationActions, selectOption, AppOptions, getNodeInfo,
 } from '@corgifm/common/redux'
 import {pointersActions} from '@corgifm/common/redux/pointers-redux'
+import {CssColor} from '@corgifm/common/shamu-color'
 import {graphStateSavesLocalStorageKey} from './client-constants'
 import {GetAllInstruments} from './instrument-manager'
 import {MidiNotes} from './Instruments/BasicSynthesizerView'
@@ -326,7 +326,7 @@ export function createLocalMiddleware(
 				const nodeType = action.nodeType
 
 				// Select multiThing
-				const nodeInfo = getConnectionNodeInfo(action.nodeType)
+				const nodeInfo = findNodeInfo(action.nodeType)
 
 				const stateToClone = nodeInfo.stateSelector(newState.room, nodeId)
 
@@ -474,7 +474,7 @@ export function createLocalMiddleware(
 				const foo: ReturnType<typeof updatePositions> = {
 					...action,
 					positions: Map(action.positions).map((position): IPosition => {
-						const nodeInfo = getConnectionNodeInfo(position.targetType)
+						const nodeInfo = findNodeInfo(position.targetType)
 						const nodeState = nodeInfo.stateSelector(getState().room, position.id)
 
 						return {
@@ -490,7 +490,7 @@ export function createLocalMiddleware(
 				return
 			}
 			case 'CONNECT_KEYBOARD_TO_NODE': {
-				const nodeInfo = getConnectionNodeInfo(action.targetType)
+				const nodeInfo = findNodeInfo(action.targetType)
 
 				if (!nodeInfo.canHaveKeyboardConnectedToIt) return
 
@@ -736,8 +736,8 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 		targetType: ConnectionNodeType.virtualKeyboard,
 		x: -556 + 150 - ((64 * 6) / 2),
 		y: extremes.bottomMost + y,
-		width: VirtualKeyboardState.defaultWidth,
-		height: VirtualKeyboardState.defaultHeight,
+		width: getNodeInfo().virtualKeyboard.defaultWidth,
+		height: getNodeInfo().virtualKeyboard.defaultHeight,
 	})
 	dispatch(addPosition({
 		...keyboardPosition,
@@ -757,6 +757,7 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 		targetType: ConnectionNodeType.basicSynthesizer,
 		width: BasicSynthesizerState.defaultWidth,
 		height: BasicSynthesizerState.defaultHeight,
+		color: CssColor.blue,
 		...nextPosition,
 	})
 	dispatch(addPosition({

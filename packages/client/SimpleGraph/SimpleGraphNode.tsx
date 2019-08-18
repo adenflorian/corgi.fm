@@ -5,9 +5,9 @@ import Draggable, {DraggableEventHandler} from 'react-draggable'
 import {Dispatch} from 'redux'
 import {ConnectionNodeType} from '@corgifm/common/common-types'
 import {
-	getConnectionNodeInfo, IPosition, movePosition,
+	findNodeInfo, IPosition, movePosition,
 	nodeClicked, selectConnectionSourceColorByTargetId,
-	SelectedNode, selectOptions, selectPosition, selectShamuMetaState,
+	selectOptions, selectPosition, selectShamuMetaState,
 	shamuConnect, shamuMetaActions,
 } from '@corgifm/common/redux'
 import {BasicSampler} from '../BasicSampler/BasicSampler'
@@ -24,6 +24,7 @@ import {ConnectedSimpleDelay} from '../ShamuNodes/SimpleDelay/SimpleDelayView'
 import {ConnectedSimpleReverb} from '../ShamuNodes/SimpleReverb/SimpleReverbView'
 import {simpleGlobalClientState} from '../SimpleGlobalClientState'
 import {ConnectedVolumeControl} from '../Volume/VolumeControl'
+import {BetterSequencer} from '../BetterSequencer/BetterSequencer'
 
 interface ISimpleGraphNodeProps {
 	positionId: Id
@@ -134,6 +135,7 @@ export function getComponentByNodeType(type: ConnectionNodeType, id: Id, color: 
 
 		case ConnectionNodeType.groupSequencer: return <GroupSequencerView id={id} color={color} />
 
+		case ConnectionNodeType.betterSequencer: return <BetterSequencer id={id} />
 		case ConnectionNodeType.gridSequencer: return <ConnectedGridSequencerContainer id={id} />
 		case ConnectionNodeType.infiniteSequencer: return <ConnectedInfiniteSequencer id={id} />
 		case ConnectionNodeType.virtualKeyboard: return <Keyboard id={id} />
@@ -157,7 +159,7 @@ export const ConnectedSimpleGraphNode = shamuConnect(
 
 		return {
 			position,
-			color: getConnectionNodeInfo(position.targetType).color
+			color: findNodeInfo(position.targetType).color
 				|| selectConnectionSourceColorByTargetId(state, positionId),
 			highQuality: selectOptions(state).graphicsECS,
 			fancyZoomPan: selectOptions(state).graphicsExpensiveZoomPan,

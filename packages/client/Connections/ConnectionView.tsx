@@ -5,7 +5,7 @@ import {useDispatch} from 'react-redux'
 import {
 	ActiveGhostConnectorSourceOrTarget,
 	AppOptions,
-	calculateConnectorPositionY, connectionsActions, getConnectionNodeInfo,
+	calculateConnectorPositionY, connectionsActions, findNodeInfo,
 	GhostConnection,
 	ghostConnectorActions, GhostConnectorAddingOrMoving,
 	IClientAppState, IConnection,
@@ -200,7 +200,7 @@ export const ConnectedConnectionView = shamuConnect(
 			// Disabled for now because of performance issues
 			// speed: globalClockState.bpm,
 			highQuality: selectOption(state, AppOptions.graphicsFancyConnections) as boolean,
-			isSourcePlaying: getConnectionNodeInfo(connection.sourceType)
+			isSourcePlaying: findNodeInfo(connection.sourceType)
 				.selectIsPlaying(state.room, connection.sourceId),
 			localClientId: selectLocalClientId(state),
 			sourceStackOrder: selectConnectionStackOrderForSource(state.room, props.id),

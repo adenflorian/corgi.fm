@@ -39,6 +39,7 @@ export * from './configure-server-store'
 // Sequencers
 export * from './infinite-sequencers-redux'
 export * from './grid-sequencers-redux'
+export * from './better-sequencers-redux'
 export * from './group-sequencers-redux'
 
 export * from './node-types'

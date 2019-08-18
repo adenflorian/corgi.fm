@@ -2,7 +2,7 @@ import React from 'react'
 import {useSelector} from 'react-redux'
 import {ConnectionNodeType} from '@corgifm/common/common-types'
 import {
-	IClientAppState, getConnectionNodeInfo,
+	IClientAppState, findNodeInfo,
 } from '@corgifm/common/redux'
 import {Panel} from '../Panel/Panel'
 import {
@@ -17,9 +17,9 @@ interface Props {
 	id: Id
 }
 
-const samplerInfo = getConnectionNodeInfo(ConnectionNodeType.basicSampler)
+const samplerInfo = findNodeInfo(ConnectionNodeType.basicSampler)
 
-const name = getConnectionNodeInfo(ConnectionNodeType.basicSampler).typeName
+const name = findNodeInfo(ConnectionNodeType.basicSampler).typeName
 
 export const BasicSampler = React.memo(({id, color}: Props) => {
 

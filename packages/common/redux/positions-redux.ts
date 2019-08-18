@@ -3,7 +3,9 @@ import {combineReducers, Reducer} from 'redux'
 import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
 import {ConnectionNodeType} from '../common-types'
+import {CssColor} from '../shamu-color'
 import {shamuMetaReducer} from './shamu-graph'
+import {IClientAppState} from './common-redux-types'
 import {
 	BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION,
 } from '.'
@@ -103,6 +105,7 @@ const defaultPosition = {
 	inputPortCount: 1,
 	outputPortCount: 1,
 	enabled: true,
+	color: CssColor.blue as string,
 }
 
 const makePositionRecord = Record(defaultPosition)
@@ -219,3 +222,12 @@ export const selectHighestZIndexOfAllPositions = createSelector(
 	selectAllPositions,
 	selectHighestZIndexOfAllPositionsLocal,
 )
+
+export const createPositionColorSelector = (id: Id) => (state: IClientAppState) =>
+	selectPosition(state.room, id).color
+
+export const createPositionTypeSelector = (id: Id) => (state: IClientAppState) =>
+	selectPosition(state.room, id).targetType
+
+export const createPositionEnabledSelector = (id: Id) => (state: IClientAppState) =>
+	selectPosition(state.room, id).enabled

@@ -5,7 +5,7 @@ import {List} from 'immutable'
 import {oneLine} from 'common-tags'
 import {ConnectionNodeType} from '@corgifm/common/common-types'
 import {
-	getConnectionNodeInfo, deleteNode, localActions,
+	findNodeInfo, deleteNode, localActions,
 } from '@corgifm/common/redux'
 import {nodeMenuId} from '../client-constants'
 import {TopMenuBar} from './TopMenuBar'
@@ -47,7 +47,7 @@ const deleteMenuLabels = List([
 const NodeMenuItems = React.memo(function _MenuItems({nodeType}: NodeMenuItemsProps) {
 	const {
 		isDeletable, isNodeCloneable, canHaveKeyboardConnectedToIt,
-	} = getConnectionNodeInfo(nodeType)
+	} = findNodeInfo(nodeType)
 	const dispatch = useDispatch()
 
 	return (

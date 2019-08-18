@@ -3,7 +3,7 @@ import {ActionType} from 'typesafe-actions'
 import {ConnectionNodeType, IConnectable, IMultiStateThing} from '../common-types'
 import {CssColor} from '../shamu-color'
 import {
-	addMultiThing, BROADCASTER_ACTION, getConnectionNodeInfo,
+	addMultiThing, BROADCASTER_ACTION, findNodeInfo,
 	IClientRoomState, IMultiState, makeMultiReducer, NetworkActionType,
 	NodeSpecialState, SERVER_ACTION,
 } from '.'
@@ -59,7 +59,7 @@ export class GroupSequencer implements IConnectable, NodeSpecialState, IMultiSta
 	public readonly type = ConnectionNodeType.groupSequencer
 	public readonly width = GroupSequencer.defaultWidth
 	public readonly height = GroupSequencer.defaultHeight
-	public readonly name: string = getConnectionNodeInfo(ConnectionNodeType.groupSequencer).typeName
+	public readonly name: string = findNodeInfo(ConnectionNodeType.groupSequencer).typeName
 	public readonly groups: Groups
 	public readonly length: number = 16
 	public readonly groupEventBeatLength: number = 16

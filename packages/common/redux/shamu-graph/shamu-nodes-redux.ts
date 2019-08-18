@@ -6,6 +6,7 @@ import {
 	basicSamplersReducer, basicSynthesizersReducer, gridSequencersReducer,
 	IClientRoomState, IMultiState, infiniteSequencersReducer,
 	simpleCompressorsReducer, simpleReverbsReducer, virtualKeyboardsReducer,
+	betterSequencersReducer,
 } from '..'
 
 // export const shamuNodesActions = {
@@ -68,6 +69,7 @@ export interface NodeSpecialState {
 export const nodesReducer = combineReducers({
 	basicSynthesizers: basicSynthesizersReducer,
 	basicSamplers: basicSamplersReducer,
+	betterSequencers: betterSequencersReducer,
 	gridSequencers: gridSequencersReducer,
 	infiniteSequencers: infiniteSequencersReducer,
 	groupSequencers: groupSequencersReducer,

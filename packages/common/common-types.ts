@@ -19,6 +19,7 @@ export interface IMultiStateThing extends IConnectable {
 export type IMultiStateThingDeserializer = (state: IMultiStateThing) => IMultiStateThing
 
 export enum ConnectionNodeType {
+	betterSequencer = 'betterSequencer',
 	virtualKeyboard = 'virtualKeyboard',
 	gridSequencer = 'gridSequencer',
 	infiniteSequencer = 'infiniteSequencer',
@@ -35,6 +36,7 @@ export enum ConnectionNodeType {
 
 export function isSequencerNodeType(type: ConnectionNodeType) {
 	return [
+		ConnectionNodeType.betterSequencer,
 		ConnectionNodeType.gridSequencer,
 		ConnectionNodeType.infiniteSequencer,
 	].includes(type)

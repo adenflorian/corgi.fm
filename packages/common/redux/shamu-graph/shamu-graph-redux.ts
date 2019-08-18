@@ -3,7 +3,7 @@ import {combineReducers} from 'redux'
 import {ActionType, StateType} from 'typesafe-actions'
 import {ConnectionNodeType} from '../../common-types'
 import {IMultiState} from '../multi-reducer'
-import {getConnectionNodeInfo} from '../node-types'
+import {findNodeInfo} from '../node-types'
 import {makeShamuEdgesState} from './shamu-edges-redux'
 import {
 	edgesReducer, nodesReducer,
@@ -33,6 +33,7 @@ export function shamuGraphReducer(state: ShamuGraphState | undefined, action: Sh
 			nodes: {
 				basicSynthesizers: deserialize(ConnectionNodeType.basicSynthesizer, action.shamuGraphState.nodes.basicSynthesizers),
 				basicSamplers: deserialize(ConnectionNodeType.basicSampler, action.shamuGraphState.nodes.basicSamplers),
+				betterSequencers: deserialize(ConnectionNodeType.betterSequencer, action.shamuGraphState.nodes.betterSequencers),
 				gridSequencers: deserialize(ConnectionNodeType.gridSequencer, action.shamuGraphState.nodes.gridSequencers),
 				groupSequencers: deserialize(ConnectionNodeType.groupSequencer, action.shamuGraphState.nodes.groupSequencers),
 				infiniteSequencers: deserialize(ConnectionNodeType.infiniteSequencer, action.shamuGraphState.nodes.infiniteSequencers),
@@ -112,7 +113,7 @@ function deserialize<T extends IMultiState>(type: ConnectionNodeType, multiState
 	return {
 		...multiState,
 		things: Map(multiState.things)
-			.map(getConnectionNodeInfo(type).stateDeserializer)
+			.map(findNodeInfo(type).stateDeserializer)
 			.toObject(),
 	}
 }

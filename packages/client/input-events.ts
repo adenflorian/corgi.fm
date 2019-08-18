@@ -2,7 +2,7 @@ import {Map} from 'immutable'
 import {Action, AnyAction, Store} from 'redux'
 import {rateLimitedDebounce, keyToMidiMap} from '@corgifm/common/common-utils'
 import {
-	getConnectionNodeInfo, globalClockActions,
+	findNodeInfo, globalClockActions,
 	IClientAppState, pointersActions,
 	selectClientInfo, selectGlobalClockIsPlaying,
 	selectIsLocalClientInLimitedMode, selectLocalClient,
@@ -61,7 +61,7 @@ const keyboardShortcuts: IKeyBoardShortcuts = Map<KeyBoardShortcut>({
 		actionOnKeyDown: (_, state) => {
 			const selectedNode = selectShamuMetaState(state.room).selectedNode
 			if (selectedNode === undefined) return
-			return getConnectionNodeInfo(selectPosition(state.room, selectedNode.id).targetType).undoAction(selectedNode.id)
+			return findNodeInfo(selectPosition(state.room, selectedNode.id).targetType).undoAction(selectedNode.id)
 		},
 		allowRepeat: true,
 		preventDefault: true,
@@ -70,7 +70,7 @@ const keyboardShortcuts: IKeyBoardShortcuts = Map<KeyBoardShortcut>({
 		actionOnKeyDown: (_, state) => {
 			const selectedNode = selectShamuMetaState(state.room).selectedNode
 			if (selectedNode === undefined) return
-			if (getConnectionNodeInfo(selectedNode.type).isNodeCloneable !== true) return
+			if (findNodeInfo(selectedNode.type).isNodeCloneable !== true) return
 			return localActions.cloneNode(selectedNode.id, selectedNode.type, 'all')
 		},
 		allowRepeat: false,
