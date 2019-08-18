@@ -10,6 +10,7 @@ import {
 	selectOptions, selectPosition, selectShamuMetaState,
 	shamuConnect, shamuMetaActions,
 } from '@corgifm/common/redux'
+import {panelHeaderHeight} from '@corgifm/common/common-constants'
 import {BasicSampler} from '../BasicSampler/BasicSampler'
 import {graphSizeX, graphSizeY, handleClassName, nodeMenuId} from '../client-constants'
 import {ECSSequencerRenderSystem} from '../ECS/ECSSequencerRenderSystem'
@@ -77,9 +78,9 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 						position: 'absolute',
 						willChange: fancyZoomPan ? '' : 'transform',
 						width,
-						height: height + 24,
+						height: height + panelHeaderHeight,
 						zIndex,
-						top: -24,
+						top: -panelHeaderHeight,
 					}}
 				>
 					{

@@ -19,6 +19,15 @@ export const positionActions = {
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	} as const),
+	resizePosition: (
+		id: Id, position: Pick<IPosition, 'x' | 'y' | 'width' | 'height'>,
+	) => ({
+		type: 'RESIZE_POSITION',
+		id,
+		position,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	} as const),
 } as const
 
 export type AddPositionAction = ReturnType<typeof addPosition>
@@ -142,6 +151,7 @@ const positionsSpecificReducer: Reducer<IPositions, PositionAction> =
 			case 'UPDATE_POSITIONS': return sortPositions(positions.merge(action.positions))
 			case 'UPDATE_POSITION': return positions.update(action.id, x => ({...x, ...action.position}))
 			case 'MOVE_POSITION': return positions.update(action.id, x => ({...x, ...action.position}))
+			case 'RESIZE_POSITION': return positions.update(action.id, x => ({...x, ...action.position}))
 			case 'NODE_CLICKED': return positions.update(action.id, x => ({
 				...x,
 				zIndex: getNewZIndex(positions, x.zIndex),
@@ -228,11 +238,17 @@ export const selectHighestZIndexOfAllPositions = createSelector(
 	selectHighestZIndexOfAllPositionsLocal,
 )
 
+export const createPositionSelector = (id: Id) => (state: IClientAppState) =>
+	selectPosition(state.room, id)
+
 export const createPositionColorSelector = (id: Id) => (state: IClientAppState) =>
 	selectPosition(state.room, id).color
 
 export const createPositionTypeSelector = (id: Id) => (state: IClientAppState) =>
 	selectPosition(state.room, id).targetType
+
+export const createPositionWidthSelector = (id: Id) => (state: IClientAppState) =>
+	selectPosition(state.room, id).width
 
 export const createPositionHeightSelector = (id: Id) => (state: IClientAppState) =>
 	selectPosition(state.room, id).height

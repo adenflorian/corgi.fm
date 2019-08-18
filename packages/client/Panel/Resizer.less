@@ -1,0 +1,31 @@
+.resizer {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	display: flex;
+	flex-direction: column;
+
+	.resizerRow {
+		display: flex;
+
+		&.midRow {
+			flex-grow: 1;
+		}
+	}
+
+	.resizeHandle {
+		opacity: 0.2;
+
+		&.top, &.bottom {
+			height: 8px;
+		}
+
+		&.left, &.right {
+			width: 8px;
+		}
+
+		&.mid {
+			flex-grow: 1;
+		}
+	}
+}

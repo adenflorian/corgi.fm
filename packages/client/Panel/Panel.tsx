@@ -10,6 +10,7 @@ import {
 import {CssColor} from '@corgifm/common/shamu-color'
 import {handleClassName} from '../client-constants'
 import './Panel.less'
+import {Resizer} from './Resizer'
 
 export interface Props {
 	children: any
@@ -57,6 +58,7 @@ export const Panel =
 				}}
 				className={`panelContainer ${saturate ? 'saturate' : ''}`}
 			>
+				<Resizer id={id} />
 				<div
 					className={`header ${handleClassName}`}
 					title={labelTitle}
