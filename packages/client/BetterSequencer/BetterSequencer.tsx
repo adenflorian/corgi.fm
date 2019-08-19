@@ -209,13 +209,11 @@ export const BetterSequencer = ({id}: Props) => {
 						className="scalable"
 					>
 						{midiClip.events.map((event, i) => {
-							const note = event.notes.first(null)
-							if (!note) return null
-							const noteLabel = midiNoteToNoteNameFull(note)
+							const noteLabel = midiNoteToNoteNameFull(event.note)
 							const isSelected = selected.get(event.id) || false
 							return (
 								<div
-									key={event.startBeat.toString() + note}
+									key={event.startBeat.toString() + event.note}
 									className={`note selected-${isSelected}`}
 									title={noteLabel}
 									onMouseDown={() => setSelected(selected.set(event.id, !isSelected))}
@@ -223,7 +221,7 @@ export const BetterSequencer = ({id}: Props) => {
 										width: event.durationBeats * columnWidth,
 										height: noteHeight - 1,
 										left: event.startBeat * columnWidth,
-										top: ((128 - note) * noteHeight) - noteHeight - pan.y,
+										top: ((128 - event.note) * noteHeight) - noteHeight - pan.y,
 										// backgroundColor: note % 4 === 0 ? '#0000' : '#3333',
 									}}
 								>

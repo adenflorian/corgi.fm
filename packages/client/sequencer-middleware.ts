@@ -47,12 +47,12 @@ function exportSequencerMidi(
 
 	const eventsToMidi = events.map(event => {
 		const x = new MidiWriter.NoteEvent({
-			pitch: event.notes.toArray(),
+			pitch: [event.note],
 			duration,
 			wait: nextWait,
 		})
 
-		nextWait = event.notes.count() === 0 ? duration : '0'
+		nextWait = event.note === -1 ? duration : '0'
 
 		return x
 	}).toArray()

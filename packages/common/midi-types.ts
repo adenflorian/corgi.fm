@@ -1,25 +1,25 @@
 import * as uuid from 'uuid'
 import {List, Record} from 'immutable'
-import {IMidiNotes} from './MidiNote'
+import {IMidiNote} from './MidiNote'
 
 // Start Clip Midi Types
 
 /** In clip time (beats); Means BPM has not been applied */
 export interface MidiClipEvent {
-	readonly notes: IMidiNotes
+	readonly note: IMidiNote
 	readonly startBeat: number
 	readonly durationBeats: number
 	readonly id: Id
 }
 
 /** In clip time (beats); Means BPM has not been applied */
-export function makeMidiClipEvent(event: Pick<MidiClipEvent, 'durationBeats' | 'notes' | 'startBeat'>): MidiClipEvent {
-	if (event.notes === undefined) throw new Error('why1')
+export function makeMidiClipEvent(event: Pick<MidiClipEvent, 'durationBeats' | 'note' | 'startBeat'>): MidiClipEvent {
+	if (event.note === undefined) throw new Error('why1')
 	if (event.startBeat === undefined) throw new Error('why2')
 	if (event.durationBeats === undefined) throw new Error('why3')
 
 	return {
-		notes: event.notes,
+		note: event.note,
 		startBeat: event.startBeat,
 		durationBeats: event.durationBeats,
 		id: uuid.v4(),
@@ -42,18 +42,18 @@ export type MidiClipEvents = MidiClip['events']
 
 /** In audio context time (seconds); Means BPM is already applied */
 export interface MidiGlobalClipEvent {
-	readonly notes: IMidiNotes
+	readonly note: IMidiNote
 	readonly startTime: number
 	readonly endTime: number
 }
 
 export function makeMidiGlobalClipEvent(event: MidiGlobalClipEvent): MidiGlobalClipEvent {
-	if (event.notes === undefined) throw new Error('why')
+	if (event.note === undefined) throw new Error('why')
 	if (event.startTime === undefined) throw new Error('why')
 	if (event.endTime === undefined) throw new Error('why')
 
 	return {
-		notes: event.notes,
+		note: event.note,
 		startTime: event.startTime,
 		endTime: event.endTime,
 	}

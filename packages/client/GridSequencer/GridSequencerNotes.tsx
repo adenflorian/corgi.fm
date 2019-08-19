@@ -5,7 +5,7 @@ import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 import {MAX_MIDI_NOTE_NUMBER_127, MIN_MIDI_NOTE_NUMBER_0} from '@corgifm/common/common-constants'
 import {MidiClipEvents} from '@corgifm/common/midi-types'
-import {IMidiNotes} from '@corgifm/common/MidiNote'
+import {IMidiNote} from '@corgifm/common/MidiNote'
 import {
 	gridSequencerActions, GridSequencerFields, IClientAppState,
 	selectGlobalClockState, selectGridSequencer, GridSequencerState,
@@ -50,7 +50,7 @@ export const GridSequencerNotes = (props: IGridSequencerNotesAllProps) => {
 	} = props
 
 	const marks = events.reduce((allMarks, event) => {
-		return allMarks.concat(event.notes.map(note => note / 127))
+		return allMarks.concat(event.note / 127)
 	}, List<number>())
 
 	return (
@@ -83,7 +83,7 @@ export const GridSequencerNotes = (props: IGridSequencerNotesAllProps) => {
 					{events.map((event, eventIndex) => {
 						return <Event
 							key={eventIndex}
-							notes={event.notes}
+							note={event.note}
 							eventIndex={eventIndex}
 							notesToShow={notesToShow}
 							bottomNote={bottomNote}
@@ -108,7 +108,7 @@ export const GridSequencerNotes = (props: IGridSequencerNotesAllProps) => {
 }
 
 interface IEventProps {
-	notes: IMidiNotes
+	note: IMidiNote
 	eventIndex: number
 	notesToShow: number
 	bottomNote: number
@@ -136,7 +136,7 @@ class Event extends React.PureComponent<IEventProps> {
 
 	private readonly _renderNote = (_: any, i: number) => {
 		const note = i + this.props.bottomNote
-		const isEnabled = this.props.notes.includes(note)
+		const isEnabled = this.props.note === note
 		return <Note
 			key={note}
 			note={note}

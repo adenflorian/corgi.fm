@@ -74,7 +74,7 @@ export function getEvents(clip: MidiClip, initialRange: MidiRange, rate: number)
 				const adjustedStartBeat = x.startBeat * rate
 				const adjustedDurationBeats = x.durationBeats * rate
 				return (makeMidiGlobalClipEvent({
-					notes: x.notes,
+					note: x.note,
 					startTime: ((adjustedStartBeat * midiPrecision) - (start * midiPrecision) + (_offset * midiPrecision)) / midiPrecision,
 					endTime: ((adjustedStartBeat * midiPrecision) - (start * midiPrecision) + (_offset * midiPrecision) + (adjustedDurationBeats * midiPrecision)) / midiPrecision, // TODO
 				}))

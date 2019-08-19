@@ -110,7 +110,7 @@ export class GridSequencerState extends SequencerStateBase {
 		name = 'Grid Sequencer',
 		events = createSequencerEvents(GridSequencerState.eventCount)
 			.map((_, i) => (makeMidiClipEvent({
-				notes: MidiNotes(i % 2 === 1 ? [] : [36]),
+				note: i % 2 === 1 ? -1 : 36,
 				startBeat: i,
 				durationBeats: 1,
 			}))),
@@ -212,12 +212,12 @@ const gridSequencerReducer =
 							if (action.enabled) {
 								return {
 									...event,
-									notes: event.notes.add(action.note),
+									note: action.note,
 								}
 							} else {
 								return {
 									...event,
-									notes: event.notes.filter(x => x !== action.note),
+									notes: -1,
 								}
 							}
 						} else {
@@ -272,7 +272,7 @@ const gridSequencerReducer =
 							mutable.set('events',
 								mutable.events.update(
 									index,
-									x => ({...x, notes: x.notes.add(action.note)})))
+									x => ({...x, note: action.note})))
 						}),
 						previousEvents: gridSequencer.previousEvents.unshift(gridSequencer.midiClip.events),
 					}
@@ -309,22 +309,22 @@ export const selectGridSequencerIsActive = (state: IClientRoomState, id: Id) =>
 	selectGridSequencer(state, id).isPlaying
 
 export const selectGridSequencerIsSending = (state: IClientRoomState, id: Id) =>
-	selectGridSequencerActiveNotes(state, id).count() > 0
+	selectGridSequencerActiveNotes(state, id) >= 0
 
 export const selectGridSequencerActiveNotes = createSelector(
 	[selectGridSequencer, selectGlobalClockState],
 	(gridSequencer, globalClockState) => {
-		if (!gridSequencer) return emptyMidiNotes
-		if (!gridSequencer.isPlaying) return emptyMidiNotes
+		if (!gridSequencer) return -1
+		if (!gridSequencer.isPlaying) return -1
 
 		const globalClockIndex = globalClockState.index
 
 		const index = globalClockIndex
 
 		if (index >= 0 && gridSequencer.midiClip.events.count() > 0) {
-			return gridSequencer.midiClip.events.get(index % gridSequencer.midiClip.events.count())!.notes
+			return gridSequencer.midiClip.events.get(index % gridSequencer.midiClip.events.count())!.note
 		} else {
-			return emptyMidiNotes
+			return -1
 		}
 	},
 )

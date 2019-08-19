@@ -4,7 +4,7 @@ import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
 import * as uuid from 'uuid'
 import {ConnectionNodeType} from '../common-types'
-import {IMidiNotes} from '../MidiNote'
+import {IMidiNotes, IMidiNote} from '../MidiNote'
 import {CssColor, mixColors} from '../shamu-color'
 import {selectOption, AppOptions} from './options-redux'
 import {IClientAppState} from './common-redux-types'
@@ -226,26 +226,10 @@ function tryGetColorFromState(colorFromState: string | false | List<string>, por
 	return colorFromState.get(portNumber, CssColor.defaultGray)
 }
 
-/** For use by a node */
-export const selectConnectionSourceNotesByTargetId = (state: IClientRoomState, targetId: Id, onlyFromKeyboards = false): IMidiNotes => {
-	const connections = selectConnectionsWithTargetIds(state, [targetId])
-		.filter(x => x.sourceType === ConnectionNodeType.virtualKeyboard || !onlyFromKeyboards)
-
-	if (connections.count() === 0) return makeConnectionSourceNotesSelector(state)(Connection.dummy)
-
-	const notes = connections.map(makeConnectionSourceNotesSelector(state))
-
-	return Set.union(notes.toList())
-}
-
 export const selectConnectionSourceIdsByTarget = (state: IClientRoomState, targetId: Id): List<Id> => {
 	return selectConnectionsWithTargetIds(state, [targetId])
 		.toList()
 		.map(x => x.sourceId)
-}
-
-const makeConnectionSourceNotesSelector = (roomState: IClientRoomState) => (connection: IConnection): IMidiNotes => {
-	return findNodeInfo(connection.sourceType).selectActiveNotes(roomState, connection.sourceId)
 }
 
 // TODO Handle multiple ancestor connections

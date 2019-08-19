@@ -70,7 +70,7 @@ export function InfiniteSequencerNotes(
 
 			if (Math.abs(delta) > threshold) {
 				const index = selectedEvent.index
-				const oldNote = events.get(index)!.notes.first(-1)
+				const oldNote = events.get(index)!.note
 
 				const newNote = oldNote + (delta > 0 ? 1 : -1)
 				dispatch(infiniteSequencerActions.setNote(id, selectedEvent.index, true, newNote))
@@ -127,7 +127,7 @@ export function InfiniteSequencerNotes(
 			<div className={`display ${events.count() > 8 ? 'small' : ''}`}>
 				<div className="notes">
 					{events.map((event, index) => {
-						const note = event.notes.first(-1)
+						const note = event.note
 
 						return (
 							<div
@@ -155,7 +155,7 @@ export function InfiniteSequencerNotes(
 		return (
 			<div className={`display ${events.count() > 8 ? 'small' : ''}`}>
 				<div className="notes">
-					{events.map(x => x.notes.first(-1)).map((note, index) =>
+					{events.map(({note}, index) =>
 						<ColorGridNote
 							note={note}
 							index={index}

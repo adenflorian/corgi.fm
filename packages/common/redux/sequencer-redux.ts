@@ -103,7 +103,7 @@ export const createSequencerEvents = (length: number, ratio = 1): MidiClipEvents
 	return makeSequencerEvents(
 		new Array(length)
 			.fill(0)
-			.map((_, i) => makeMidiClipEvent({notes: emptyMidiNotes, startBeat: i * ratio, durationBeats: 1 * ratio})),
+			.map((_, i) => makeMidiClipEvent({note: -1, startBeat: i * ratio, durationBeats: 1 * ratio})),
 	)
 }
 
@@ -111,7 +111,7 @@ export const makeSequencerEvents =
 	(x: MidiClipEvent[] | List<MidiClipEvent> = List<MidiClipEvent>()): MidiClipEvents => List<MidiClipEvent>(x)
 
 export function deserializeEvents(events: MidiClipEvents): MidiClipEvents {
-	return makeSequencerEvents(events.map(x => ({...x, notes: MidiNotes(x.notes)})))
+	return makeSequencerEvents(events.map(x => ({...x, note: x.note})))
 }
 
 export interface ISequencerState extends IMultiStateThing, NodeSpecialState {
@@ -172,7 +172,7 @@ export abstract class SequencerStateBase implements ISequencerState {
 }
 
 export function isEmptyEvents(events: MidiClipEvents) {
-	return events.some(x => x.notes.count() > 0) === false
+	return events.some(x => x.note > -1) === false
 }
 
 export function deserializeSequencerState<T extends ISequencerState>(state: IMultiStateThing): T {

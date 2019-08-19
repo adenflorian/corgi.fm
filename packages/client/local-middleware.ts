@@ -38,7 +38,6 @@ import {
 	SetLocalClientNameAction,
 	ShamuGraphState,
 	shamuMetaActions,
-	updatePositions,
 	UpdatePositionsAction,
 	UserInputAction,
 	UserKeys,

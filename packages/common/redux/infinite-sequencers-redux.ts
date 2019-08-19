@@ -111,7 +111,7 @@ export class InfiniteSequencerState extends SequencerStateBase {
 		style = InfiniteSequencerStyle.colorGrid,
 		events = createSequencerEvents(4)
 			.map((_, i) => (makeMidiClipEvent({
-				notes: MidiNotes(i % 2 === 1 ? [] : [36]),
+				note: i % 2 === 1 ? -1 : 36,
 				startBeat: i,
 				durationBeats: 1,
 			}))),
@@ -209,12 +209,12 @@ function infiniteSequencerReducer(
 							if (action.enabled) {
 								return {
 									...event,
-									notes: Set([action.note]),
+									note: action.note,
 								}
 							} else {
 								return {
 									...event,
-									notes: event.notes.filter(x => x !== action.note),
+									note: -1,
 								}
 							}
 						} else {
@@ -290,11 +290,11 @@ function infiniteSequencerReducer(
 					midiClip: infiniteSequencer.midiClip.withMutations(mutable => {
 						mutable.set('events', mutable.events
 							.concat(makeMidiClipEvent({
-								notes: action.type === 'RECORD_SEQUENCER_NOTE'
-									? MidiNotes([action.note])
+								note: action.type === 'RECORD_SEQUENCER_NOTE'
+									? action.note
 									: action.type === 'RECORD_SEQUENCER_REST'
-										? MidiNotes()
-										: (() => {logger.error('nope'); return MidiNotes()})(),
+										? -1
+										: (() => {logger.error('nope'); return -1})(),
 								startBeat: mutable.events.count(),
 								durationBeats: 1,
 							})),
@@ -327,24 +327,22 @@ export const selectInfiniteSequencerIsActive = (state: IClientRoomState, id: Id)
 	selectInfiniteSequencer(state, id).isPlaying
 
 export const selectInfiniteSequencerIsSending = (state: IClientRoomState, id: Id) =>
-	selectInfiniteSequencerActiveNotes(state, id).count() > 0
-
-const emptyNotes = MidiNotes()
+	selectInfiniteSequencerActiveNotes(state, id) >= 0
 
 export const selectInfiniteSequencerActiveNotes = createSelector(
 	[selectInfiniteSequencer, selectGlobalClockState],
 	(infiniteSequencer, globalClockState) => {
-		if (!infiniteSequencer) return emptyNotes
-		if (!infiniteSequencer.isPlaying) return emptyNotes
+		if (!infiniteSequencer) return -1
+		if (!infiniteSequencer.isPlaying) return -1
 
 		const globalClockIndex = globalClockState.index
 
 		const index = globalClockIndex
 
 		if (index >= 0 && infiniteSequencer.midiClip.events.count() > 0) {
-			return infiniteSequencer.midiClip.events.get((index / Math.round(infiniteSequencer.rate)) % infiniteSequencer.midiClip.events.count())!.notes
+			return infiniteSequencer.midiClip.events.get((index / Math.round(infiniteSequencer.rate)) % infiniteSequencer.midiClip.events.count())!.note
 		} else {
-			return emptyNotes
+			return -1
 		}
 	},
 )

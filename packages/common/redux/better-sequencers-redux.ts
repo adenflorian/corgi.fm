@@ -22,15 +22,6 @@ export const addBetterSequencer = (betterSequencer: BetterSequencerState) =>
 	addMultiThing(betterSequencer, ConnectionNodeType.betterSequencer, NetworkActionType.SERVER_AND_BROADCASTER)
 
 export const betterSequencerActions = {
-	setNote: (betterSequencerId: Id, index: number, enabled: boolean, note: IMidiNote) => ({
-		type: 'SET_BETTER_SEQUENCER_NOTE',
-		id: betterSequencerId,
-		index,
-		enabled,
-		note,
-		SERVER_ACTION,
-		BROADCASTER_ACTION,
-	} as const),
 	restart: (id: Id) => ({
 		type: 'RESTART_BETTER_SEQUENCER',
 		id,
@@ -85,7 +76,7 @@ export class BetterSequencerState extends SequencerStateBase {
 		name = 'Better Sequencer',
 		events = createSequencerEvents(32)
 			.map((_, i) => (makeMidiClipEvent({
-				notes: MidiNotes([i + 60]),
+				note: i + 60,
 				startBeat: i / 2,
 				durationBeats: i % 4 === 0 ? 2 : 1,
 			}))),
@@ -129,7 +120,6 @@ type BetterSequencerActionTypes = {
 }
 
 const betterSequencerActionTypes2: BetterSequencerActionTypes = {
-	SET_BETTER_SEQUENCER_NOTE: 0,
 	SET_BETTER_SEQUENCER_FIELD: 0,
 	CLEAR_SEQUENCER: 0,
 	UNDO_SEQUENCER: 0,
@@ -163,31 +153,6 @@ export type BetterSequencerAction = SequencerAction | ActionType<typeof betterSe
 const betterSequencerReducer =
 	(betterSequencer: BetterSequencerState, action: BetterSequencerAction): BetterSequencerState => {
 		switch (action.type) {
-			case 'SET_BETTER_SEQUENCER_NOTE':
-				if (action.note === undefined) {
-					throw new Error('action.notes === undefined')
-				}
-				return {
-					...betterSequencer,
-					midiClip: betterSequencer.midiClip.set('events', betterSequencer.midiClip.events.map((event, eventIndex) => {
-						if (eventIndex === action.index) {
-							if (action.enabled) {
-								return {
-									...event,
-									notes: event.notes.add(action.note),
-								}
-							} else {
-								return {
-									...event,
-									notes: event.notes.filter(x => x !== action.note),
-								}
-							}
-						} else {
-							return event
-						}
-					})),
-					previousEvents: betterSequencer.previousEvents.unshift(betterSequencer.midiClip.events),
-				}
 			case 'SET_BETTER_SEQUENCER_FIELD':
 				if (action.fieldName === 'index') {
 					return {
@@ -236,23 +201,6 @@ const betterSequencerReducer =
 					previousEvents: betterSequencer.previousEvents.unshift(betterSequencer.midiClip.events),
 				}
 			}
-			case 'RECORD_SEQUENCER_NOTE':
-				const index = action.index
-				if (index === undefined) return betterSequencer
-				if (betterSequencer.isRecording) {
-					return {
-						...betterSequencer,
-						midiClip: betterSequencer.midiClip.withMutations(mutable => {
-							mutable.set('events',
-								mutable.events.update(
-									index,
-									x => ({...x, notes: x.notes.add(action.note)})))
-						}),
-						previousEvents: betterSequencer.previousEvents.unshift(betterSequencer.midiClip.events),
-					}
-				} else {
-					return betterSequencer
-				}
 			case 'PLAY_SEQUENCER': return {...betterSequencer, isPlaying: true}
 			case 'STOP_SEQUENCER': return {...betterSequencer, isPlaying: false, isRecording: false}
 			case 'PLAY_ALL': return {...betterSequencer, isPlaying: true}
@@ -304,22 +252,4 @@ export const selectBetterSequencerIsActive = (state: IClientRoomState, id: Id) =
 	selectBetterSequencer(state, id).isPlaying
 
 export const selectBetterSequencerIsSending = (state: IClientRoomState, id: Id) =>
-	selectBetterSequencerActiveNotes(state, id).count() > 0
-
-export const selectBetterSequencerActiveNotes = createSelector(
-	[selectBetterSequencer, selectGlobalClockState],
-	(betterSequencer, globalClockState) => {
-		if (!betterSequencer) return emptyMidiNotes
-		if (!betterSequencer.isPlaying) return emptyMidiNotes
-
-		const globalClockIndex = globalClockState.index
-
-		const index = globalClockIndex
-
-		if (index >= 0 && betterSequencer.midiClip.events.count() > 0) {
-			return betterSequencer.midiClip.events.get(index % betterSequencer.midiClip.events.count())!.notes
-		} else {
-			return emptyMidiNotes
-		}
-	},
-)
+	false
