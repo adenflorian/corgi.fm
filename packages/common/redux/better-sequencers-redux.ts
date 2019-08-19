@@ -1,11 +1,11 @@
-import {List, Stack} from 'immutable'
+import {List, Stack, OrderedMap} from 'immutable'
 import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
 import {ConnectionNodeType, IMultiStateThing} from '../common-types'
 import {
 	assertArrayHasNoUndefinedElements,
 } from '../common-utils'
-import {makeMidiClipEvent, MidiClip, makeEvents} from '../midi-types'
+import {makeMidiClipEvent, MidiClip, makeEvents, MidiClipEvent, MidiClipEvents} from '../midi-types'
 import {emptyMidiNotes, IMidiNote, MidiNotes} from '../MidiNote'
 import {
 	deserializeSequencerState, SequencerAction,
@@ -34,6 +34,13 @@ export const betterSequencerActions = {
 		fieldName,
 		data,
 		...getNetworkActionThings(fieldName),
+	} as const),
+	updateEvents: (id: Id, events: MidiClipEvents) => ({
+		type: 'UPDATE_BETTER_SEQUENCER_EVENTS',
+		id,
+		events,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
 	} as const),
 } as const
 
@@ -140,6 +147,7 @@ const betterSequencerActionTypes2: BetterSequencerActionTypes = {
 	STOP_ALL: 0,
 	SET_SEQUENCER_ZOOM: 0,
 	SET_SEQUENCER_PAN: 0,
+	UPDATE_BETTER_SEQUENCER_EVENTS: 0,
 }
 
 const betterSequencerActionTypes = Object.keys(betterSequencerActionTypes2)
@@ -170,6 +178,14 @@ const betterSequencerReducer =
 						[action.fieldName]: action.data,
 					}
 				}
+			case 'UPDATE_BETTER_SEQUENCER_EVENTS': {
+				return {
+					...betterSequencer,
+					midiClip: betterSequencer.midiClip.update('events', events => {
+						return events.merge(action.events)
+					})
+				}
+			}
 			case 'SET_SEQUENCER_ZOOM': {
 				return {
 					...betterSequencer,

@@ -1,21 +1,22 @@
 import React, {useCallback, useState, useEffect} from 'react'
 import {useSelector, useDispatch} from 'react-redux'
-import {Map} from 'immutable'
+import {Map, OrderedMap} from 'immutable'
 import {stripIndents, oneLine} from 'common-tags'
 import {
 	createPositionColorSelector, createBetterSeqIsRecordingSelector,
 	createBetterSeqIsPlayingSelector, createBetterSeqRateSelector, getNodeInfo,
 	createBetterSeqLengthSelector, createBetterSeqZoomSelector,
 	createBetterSeqMidiClipSelector, createBetterSeqPanSelector,
-	createPositionHeightSelector, createPositionWidthSelector, sequencerActions,
+	createPositionHeightSelector, createPositionWidthSelector, sequencerActions, betterSequencerActions,
 } from '@corgifm/common/redux'
 import {midiNoteToNoteNameFull} from '@corgifm/common/common-samples-stuff'
+import {Key, MAX_MIDI_NOTE_NUMBER_127, MIN_MIDI_NOTE_NUMBER_0} from '@corgifm/common/common-constants'
+import {MidiClipEvent} from '@corgifm/common/midi-types'
 import {Panel} from '../Panel/Panel'
 import {seqLengthValueToString} from '../client-constants'
 import {isWhiteKey} from '../Keyboard/Keyboard'
 import {Knob} from '../Knob/Knob'
 import './BetterSequencer.less'
-import {Key} from '@corgifm/common/common-constants';
 
 interface Props {
 	id: Id
@@ -50,23 +51,25 @@ export const BetterSequencer = ({id}: Props) => {
 
 	const setZoomX = useCallback((_, newZoomX: number) => {
 		dispatch(sequencerActions.setZoom(id, {...zoom, x: newZoomX}))
-	}, [dispatch, id])
+	}, [dispatch, id, zoom])
 
 	const setZoomY = useCallback((_, newZoomY: number) => {
 		dispatch(sequencerActions.setZoom(id, {...zoom, y: newZoomY}))
 		const foo = Math.min(getMaxPanY(height, newZoomY), pan.y)
 		dispatch(sequencerActions.setPan(id, {...pan, y: foo}))
-	}, [dispatch, id, pan, height])
+	}, [dispatch, id, zoom, height, pan])
 
 	const setPanX = useCallback((_, newPanX: number) => {
 		dispatch(sequencerActions.setPan(id, {...pan, x: newPanX}))
-	}, [dispatch, id])
+	}, [dispatch, id, pan])
 
 	const setPanY = useCallback((_, newPanY: number) => {
 		dispatch(sequencerActions.setPan(id, {...pan, y: newPanY}))
-	}, [dispatch, id])
+	}, [dispatch, id, pan])
 
 	const [selected, setSelected] = useState(Map<Id, boolean>())
+
+	const clearSelected = () => setSelected(Map())
 
 	const columns = new Array(length).fill(0)
 
@@ -77,11 +80,50 @@ export const BetterSequencer = ({id}: Props) => {
 			if (e.key === Key.ArrowUp) {
 				if (selected.count() === 0) return
 
-				// dispatch(updateNotes(id, selected.map(event => {
-				// 	return {
-				// 		note
-				// 	}
-				// })))
+				dispatch(betterSequencerActions.updateEvents(id, selected.reduce((events, _, eventId) => {
+					const originalEvent = midiClip.events.get(eventId, null)
+					if (originalEvent === null) throw new Error('originalEvent === null')
+					return events.set(eventId, {
+						...originalEvent,
+						note: Math.min(MAX_MIDI_NOTE_NUMBER_127, originalEvent.note + 1),
+					})
+				}, OrderedMap<Id, MidiClipEvent>())))
+			}
+			if (e.key === Key.ArrowDown) {
+				if (selected.count() === 0) return
+
+				dispatch(betterSequencerActions.updateEvents(id, selected.reduce((events, _, eventId) => {
+					const originalEvent = midiClip.events.get(eventId, null)
+					if (originalEvent === null) throw new Error('originalEvent === null')
+					return events.set(eventId, {
+						...originalEvent,
+						note: Math.max(MIN_MIDI_NOTE_NUMBER_0, originalEvent.note - 1),
+					})
+				}, OrderedMap<Id, MidiClipEvent>())))
+			}
+			if (e.key === Key.ArrowRight) {
+				if (selected.count() === 0) return
+
+				dispatch(betterSequencerActions.updateEvents(id, selected.reduce((events, _, eventId) => {
+					const originalEvent = midiClip.events.get(eventId, null)
+					if (originalEvent === null) throw new Error('originalEvent === null')
+					return events.set(eventId, {
+						...originalEvent,
+						startBeat: Math.min(length - 1, originalEvent.startBeat + 1),
+					})
+				}, OrderedMap<Id, MidiClipEvent>())))
+			}
+			if (e.key === Key.ArrowLeft) {
+				if (selected.count() === 0) return
+
+				dispatch(betterSequencerActions.updateEvents(id, selected.reduce((events, _, eventId) => {
+					const originalEvent = midiClip.events.get(eventId, null)
+					if (originalEvent === null) throw new Error('originalEvent === null')
+					return events.set(eventId, {
+						...originalEvent,
+						startBeat: Math.max(0, originalEvent.startBeat - 1),
+					})
+				}, OrderedMap<Id, MidiClipEvent>())))
 			}
 		}
 
@@ -92,7 +134,7 @@ export const BetterSequencer = ({id}: Props) => {
 		return () => {
 			window.removeEventListener('keydown', onKeyDown)
 		}
-	}, [isNodeSelected])
+	}, [dispatch, id, isNodeSelected, length, midiClip.events, selected])
 
 	return (
 		<Panel
@@ -207,8 +249,11 @@ export const BetterSequencer = ({id}: Props) => {
 				>
 					<div
 						className="scalable"
+						onMouseDown={e => {
+							clearSelected()
+						}}
 					>
-						{midiClip.events.map((event) => {
+						{midiClip.events.map(event => {
 							const noteLabel = midiNoteToNoteNameFull(event.note)
 							const isSelected = selected.get(event.id) || false
 							return (
@@ -216,7 +261,10 @@ export const BetterSequencer = ({id}: Props) => {
 									key={event.id.toString()}
 									className={`note selected-${isSelected}`}
 									title={noteLabel}
-									onMouseDown={() => setSelected(selected.set(event.id, !isSelected))}
+									onMouseDown={e => {
+										e.stopPropagation()
+										setSelected(selected.set(event.id, !isSelected))
+									}}
 									style={{
 										width: event.durationBeats * columnWidth,
 										height: noteHeight - 1,
