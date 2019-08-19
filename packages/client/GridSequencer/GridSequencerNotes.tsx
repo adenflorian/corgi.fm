@@ -80,7 +80,7 @@ export const GridSequencerNotes = (props: IGridSequencerNotesAllProps) => {
 					})}
 				</div>
 				<div className="events">
-					{events.map((event, eventIndex) => {
+					{events.valueSeq().map((event, eventIndex) => {
 						return <Event
 							key={eventIndex}
 							note={event.note}

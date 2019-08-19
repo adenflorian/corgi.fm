@@ -1,4 +1,4 @@
-import {List, Map, Set} from 'immutable'
+import {List, Map, Set, OrderedMap} from 'immutable'
 import {Dispatch, Middleware} from 'redux'
 import uuid from 'uuid'
 import {MAX_MIDI_NOTE_NUMBER_127} from '@corgifm/common/common-constants'
@@ -48,7 +48,7 @@ import {
 	VirtualKeyUpAction,
 	virtualOctaveChange,
 	VirtualOctaveChangeAction,
-	LocalAction, chatSystemMessage, animationActions, selectOption, AppOptions, getNodeInfo,
+	LocalAction, chatSystemMessage, animationActions, selectOption, AppOptions, getNodeInfo, InfiniteSequencerState,
 } from '@corgifm/common/redux'
 import {pointersActions} from '@corgifm/common/redux/pointers-redux'
 import {CssColor} from '@corgifm/common/shamu-color'
@@ -535,16 +535,16 @@ function stripShamuGraphForSaving(shamuGraphState: ShamuGraphState): ShamuGraphS
 				things: Map(shamuGraphState.nodes.gridSequencers.things)
 					.map(x => ({
 						...x,
-						previousEvents: List<List<MidiClipEvent>>(),
-					}))
+						previousEvents: List<OrderedMap<Id, MidiClipEvent>>(),
+					} as GridSequencerState))
 					.toObject(),
 			},
 			infiniteSequencers: {
 				things: Map(shamuGraphState.nodes.infiniteSequencers.things)
 					.map(x => ({
 						...x,
-						previousEvents: List<List<MidiClipEvent>>(),
-					}))
+						previousEvents: List<OrderedMap<Id, MidiClipEvent>>(),
+					} as InfiniteSequencerState))
 					.toObject(),
 			},
 		},

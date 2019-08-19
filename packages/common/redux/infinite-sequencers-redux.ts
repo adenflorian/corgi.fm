@@ -4,7 +4,7 @@ import {ActionType} from 'typesafe-actions'
 import {ConnectionNodeType, IMultiStateThing} from '../common-types'
 import {assertArrayHasNoUndefinedElements} from '../common-utils'
 import {logger} from '../logger'
-import {makeMidiClipEvent, MidiClip} from '../midi-types'
+import {makeMidiClipEvent, MidiClip, makeEvents} from '../midi-types'
 import {IMidiNote, MidiNotes} from '../MidiNote'
 import {
 	deserializeSequencerState,
@@ -91,6 +91,16 @@ export enum InfiniteSequencerStyle {
 	colorGrid = 'colorGrid',
 }
 
+function foo() {
+	let i = 0
+	return createSequencerEvents(4)
+		.map(() => (makeMidiClipEvent({
+			note: i % 2 === 1 ? -1 : 36,
+			startBeat: i++,
+			durationBeats: 1,
+		})))
+}
+
 export class InfiniteSequencerState extends SequencerStateBase {
 	public static defaultWidth = 688
 	public static defaultHeight = 88
@@ -99,7 +109,7 @@ export class InfiniteSequencerState extends SequencerStateBase {
 	public static notesWidth = InfiniteSequencerState.defaultWidth - InfiniteSequencerState.controlsWidth - 8
 
 	public static dummy = new InfiniteSequencerState(
-		'dummy', 'dummy', InfiniteSequencerStyle.colorGrid, List(), false,
+		'dummy', 'dummy', InfiniteSequencerStyle.colorGrid, makeEvents(), false,
 	)
 
 	public readonly style: InfiniteSequencerStyle
@@ -109,12 +119,7 @@ export class InfiniteSequencerState extends SequencerStateBase {
 		ownerId: Id,
 		name = 'Infinite Sequencer',
 		style = InfiniteSequencerStyle.colorGrid,
-		events = createSequencerEvents(4)
-			.map((_, i) => (makeMidiClipEvent({
-				note: i % 2 === 1 ? -1 : 36,
-				startBeat: i,
-				durationBeats: 1,
-			}))),
+		events = foo(),
 		isPlaying = false,
 	) {
 		const midiClip = new MidiClip({
@@ -204,8 +209,8 @@ function infiniteSequencerReducer(
 			return {
 				...infiniteSequencer,
 				midiClip: infiniteSequencer.midiClip.withMutations(mutable => {
-					mutable.set('events', mutable.events.map((event, eventIndex) => {
-						if (eventIndex === action.index) {
+					mutable.set('events', mutable.events.map((event) => {
+						if (event.startBeat === action.index) {
 							if (action.enabled) {
 								return {
 									...event,
@@ -282,30 +287,30 @@ function infiniteSequencerReducer(
 		case 'STOP_SEQUENCER': return {...infiniteSequencer, isPlaying: false, isRecording: false}
 		case 'PLAY_ALL': return {...infiniteSequencer, isPlaying: true}
 		case 'STOP_ALL': return {...infiniteSequencer, isPlaying: false, isRecording: false}
-		case 'RECORD_SEQUENCER_REST':
-		case 'RECORD_SEQUENCER_NOTE':
-			if (infiniteSequencer.isRecording) {
-				return {
-					...infiniteSequencer,
-					midiClip: infiniteSequencer.midiClip.withMutations(mutable => {
-						mutable.set('events', mutable.events
-							.concat(makeMidiClipEvent({
-								note: action.type === 'RECORD_SEQUENCER_NOTE'
-									? action.note
-									: action.type === 'RECORD_SEQUENCER_REST'
-										? -1
-										: (() => {logger.error('nope'); return -1})(),
-								startBeat: mutable.events.count(),
-								durationBeats: 1,
-							})),
-						)
-						mutable.set('length', mutable.events.count())
-					}),
-					previousEvents: infiniteSequencer.previousEvents.unshift(infiniteSequencer.midiClip.events),
-				}
-			} else {
-				return infiniteSequencer
-			}
+		// case 'RECORD_SEQUENCER_REST':
+		// case 'RECORD_SEQUENCER_NOTE':
+		// 	if (infiniteSequencer.isRecording) {
+		// 		return {
+		// 			...infiniteSequencer,
+		// 			midiClip: infiniteSequencer.midiClip.withMutations(mutable => {
+		// 				mutable.set('events', mutable.events
+		// 					.concat(makeMidiClipEvent({
+		// 						note: action.type === 'RECORD_SEQUENCER_NOTE'
+		// 							? action.note
+		// 							: action.type === 'RECORD_SEQUENCER_REST'
+		// 								? -1
+		// 								: (() => {logger.error('nope'); return -1})(),
+		// 						startBeat: mutable.events.count(),
+		// 						durationBeats: 1,
+		// 					})),
+		// 				)
+		// 				mutable.set('length', mutable.events.count())
+		// 			}),
+		// 			previousEvents: infiniteSequencer.previousEvents.unshift(infiniteSequencer.midiClip.events),
+		// 		}
+		// 	} else {
+		// 		return infiniteSequencer
+		// 	}
 		default:
 			return infiniteSequencer
 	}
@@ -327,22 +332,4 @@ export const selectInfiniteSequencerIsActive = (state: IClientRoomState, id: Id)
 	selectInfiniteSequencer(state, id).isPlaying
 
 export const selectInfiniteSequencerIsSending = (state: IClientRoomState, id: Id) =>
-	selectInfiniteSequencerActiveNotes(state, id) >= 0
-
-export const selectInfiniteSequencerActiveNotes = createSelector(
-	[selectInfiniteSequencer, selectGlobalClockState],
-	(infiniteSequencer, globalClockState) => {
-		if (!infiniteSequencer) return -1
-		if (!infiniteSequencer.isPlaying) return -1
-
-		const globalClockIndex = globalClockState.index
-
-		const index = globalClockIndex
-
-		if (index >= 0 && infiniteSequencer.midiClip.events.count() > 0) {
-			return infiniteSequencer.midiClip.events.get((index / Math.round(infiniteSequencer.rate)) % infiniteSequencer.midiClip.events.count())!.note
-		} else {
-			return -1
-		}
-	},
-)
+	false

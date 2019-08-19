@@ -1,5 +1,5 @@
 import * as uuid from 'uuid'
-import {List, Record} from 'immutable'
+import {List, Record, Map, OrderedMap} from 'immutable'
 import {IMidiNote} from './MidiNote'
 
 // Start Clip Midi Types
@@ -29,8 +29,14 @@ export function makeMidiClipEvent(event: Pick<MidiClipEvent, 'durationBeats' | '
 export const makeMidiClip = Record({
 	length: 0,
 	loop: false,
-	events: List<MidiClipEvent>(),
+	events: OrderedMap<Id, MidiClipEvent>(),
 })
+
+export function makeEvents(events = List<MidiClipEvent>()) {
+	return events.reduce((map, event) => {
+		return map.set(event.id, event)
+	}, OrderedMap<Id, MidiClipEvent>())
+}
 
 /** In clip time (beats); Means BPM has not been applied */
 export class MidiClip extends makeMidiClip {}
@@ -63,7 +69,7 @@ export function makeMidiGlobalClipEvent(event: MidiGlobalClipEvent): MidiGlobalC
 export const makeMidiGlobalClip = Record({
 	length: 4,
 	loop: true,
-	events: List<MidiGlobalClipEvent>(),
+	events: OrderedMap<Id, MidiGlobalClipEvent>(),
 })
 
 /** In audio context time (seconds); Means BPM is already applied */

@@ -1,4 +1,4 @@
-import {List} from 'immutable'
+import {OrderedMap} from 'immutable'
 import {logger} from '@corgifm/common/logger'
 import {
 	makeMidiGlobalClipEvent, MidiClip, MidiGlobalClipEvent, MidiGlobalClipEvents, midiPrecision, MidiRange,
@@ -20,7 +20,7 @@ export function applyBPMToEvents(events: MidiGlobalClipEvents, bpm: number) {
 	return events.map(applyBPMMapper(bpm))
 }
 
-const emptyGlobalClipEvents = List()
+const emptyGlobalClipEvents = OrderedMap<Id, MidiGlobalClipEvent>()
 
 // TODO Will this work for triplets?
 

@@ -5,7 +5,7 @@ import {ConnectionNodeType, IMultiStateThing} from '../common-types'
 import {
 	assertArrayHasNoUndefinedElements,
 } from '../common-utils'
-import {makeMidiClipEvent, MidiClip} from '../midi-types'
+import {makeMidiClipEvent, MidiClip, makeEvents} from '../midi-types'
 import {emptyMidiNotes, IMidiNote, MidiNotes} from '../MidiNote'
 import {
 	deserializeSequencerState, SequencerAction,
@@ -66,20 +66,25 @@ export interface IBetterSequencers extends IMultiStateThings {
 	[key: string]: BetterSequencerState
 }
 
+function foo() {
+	let i = 60
+	return createSequencerEvents(32)
+		.map(() => (makeMidiClipEvent({
+			note: i + 60,
+			startBeat: i,
+			durationBeats: i++ % 4 === 0 ? 2 : 1,
+		})))
+}
+
 export class BetterSequencerState extends SequencerStateBase {
 	public static dummy = new BetterSequencerState(
-		'dummy', 'dummy', List(), false,
+		'dummy', 'dummy', makeEvents(), false,
 	)
 
 	public constructor(
 		ownerId: Id,
 		name = 'Better Sequencer',
-		events = createSequencerEvents(32)
-			.map((_, i) => (makeMidiClipEvent({
-				note: i + 60,
-				startBeat: i / 2,
-				durationBeats: i % 4 === 0 ? 2 : 1,
-			}))),
+		events = foo(),
 		isPlaying = true,
 	) {
 
@@ -99,7 +104,7 @@ export class BetterSequencerState extends SequencerStateBase {
 			true,
 			1,
 			1,
-			{x: 2, y: 10},
+			{x: 1, y: 10},
 			{x: 0, y: 1550},
 		)
 	}

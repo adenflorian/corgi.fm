@@ -1,10 +1,12 @@
-import {List, Set} from 'immutable'
-import {makeMidiClipEvent, MidiClip} from '@corgifm/common/midi-types'
+import {List} from 'immutable'
+import {
+	makeMidiClipEvent, MidiClip, makeEvents,
+} from '@corgifm/common/midi-types'
 
 export const shortDemoMidiClip = new MidiClip({
 	length: 2,
 	loop: true,
-	events: List([
+	events: makeEvents(List([
 		makeMidiClipEvent({
 			startBeat: 0,
 			durationBeats: 1 / 8,
@@ -50,13 +52,13 @@ export const shortDemoMidiClip = new MidiClip({
 			durationBeats: 1 / 8,
 			note: 64,
 		}),
-	]),
+	])),
 })
 
 export const longDemoMidiClip = new MidiClip({
 	length: 8,
 	loop: true,
-	events: List([
+	events: makeEvents(List([
 		makeMidiClipEvent({
 			startBeat: 0,
 			durationBeats: 1 / 8,
@@ -321,5 +323,5 @@ export const longDemoMidiClip = new MidiClip({
 			durationBeats: 4 / 8,
 			note: 67,
 		}),
-	]),
+	])),
 })

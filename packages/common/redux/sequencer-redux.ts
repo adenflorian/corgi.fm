@@ -1,11 +1,11 @@
-import {List, Map, Set} from 'immutable'
+import {List, Map, Set, OrderedMap} from 'immutable'
 import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
 import {
 	ConnectionNodeType, IMultiStateThing, isSequencerNodeType,
 } from '../common-types'
 import {
-	makeMidiClip, makeMidiClipEvent, MidiClip, MidiClipEvent, MidiClipEvents,
+	makeMidiClip, makeMidiClipEvent, MidiClip, MidiClipEvent, MidiClipEvents, makeEvents,
 } from '../midi-types'
 import {emptyMidiNotes, IMidiNote, MidiNotes} from '../MidiNote'
 import {
@@ -101,17 +101,19 @@ export type SequencerAction = ActionType<typeof sequencerActions>
 
 export const createSequencerEvents = (length: number, ratio = 1): MidiClipEvents => {
 	return makeSequencerEvents(
-		new Array(length)
-			.fill(0)
-			.map((_, i) => makeMidiClipEvent({note: -1, startBeat: i * ratio, durationBeats: 1 * ratio})),
+		List(
+			new Array(length)
+				.fill(0)
+				.map((_, i) => makeMidiClipEvent({note: -1, startBeat: i * ratio, durationBeats: 1 * ratio}))
+		),
 	)
 }
 
 export const makeSequencerEvents =
-	(x: MidiClipEvent[] | List<MidiClipEvent> = List<MidiClipEvent>()): MidiClipEvents => List<MidiClipEvent>(x)
+	(x: List<MidiClipEvent> = List<MidiClipEvent>()): MidiClipEvents => makeEvents(x)
 
 export function deserializeEvents(events: MidiClipEvents): MidiClipEvents {
-	return makeSequencerEvents(events.map(x => ({...x, note: x.note})))
+	return makeSequencerEvents(OrderedMap(events).map(x => ({...x, note: x.note})).toList())
 }
 
 export interface ISequencerState extends IMultiStateThing, NodeSpecialState {

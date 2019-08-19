@@ -208,12 +208,12 @@ export const BetterSequencer = ({id}: Props) => {
 					<div
 						className="scalable"
 					>
-						{midiClip.events.map((event, i) => {
+						{midiClip.events.map((event) => {
 							const noteLabel = midiNoteToNoteNameFull(event.note)
 							const isSelected = selected.get(event.id) || false
 							return (
 								<div
-									key={event.startBeat.toString() + event.note}
+									key={event.id.toString()}
 									className={`note selected-${isSelected}`}
 									title={noteLabel}
 									onMouseDown={() => setSelected(selected.set(event.id, !isSelected))}
@@ -235,7 +235,7 @@ export const BetterSequencer = ({id}: Props) => {
 									</div>
 								</div>
 							)
-						})}
+						}).toList()}
 					</div>
 				</div>
 			</div>

@@ -2,18 +2,17 @@ import {Map, Record, Set} from 'immutable'
 import {AnyAction} from 'redux'
 import {serverClientId} from '../common-constants'
 import {ConnectionNodeType, IConnectable, IMultiStateThing} from '../common-types'
-import {IMidiNote} from '../MidiNote'
 import {CssColor} from '../shamu-color'
 import {
 	basicSamplerActions, addBasicSynthesizer, addSimpleDelay, BasicSamplerState,
 	BasicSynthesizerState, deserializeBasicSamplerState,
 	deserializeBasicSynthesizerState, addVirtualKeyboard,
 	deserializeSimpleDelayState, IClientRoomState,
-	makeGetKeyboardMidiOutput, selectBasicSynthesizer,
+	selectBasicSynthesizer,
 	selectGlobalClockIsPlaying, selectGridSequencer,
-	selectGridSequencerActiveNotes, selectGridSequencerIsActive,
+	selectGridSequencerIsActive,
 	selectGridSequencerIsSending, selectInfiniteSequencer,
-	selectInfiniteSequencerActiveNotes, selectInfiniteSequencerIsActive,
+	selectInfiniteSequencerIsActive,
 	selectInfiniteSequencerIsSending, selectSampler,
 	selectSimpleDelay, selectSimpleReverb, selectVirtualKeyboardById,
 	selectVirtualKeyboardHasPressedKeys, SimpleDelayState, VirtualKeyboardState,

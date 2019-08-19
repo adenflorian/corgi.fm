@@ -70,7 +70,7 @@ export function InfiniteSequencerNotes(
 
 			if (Math.abs(delta) > threshold) {
 				const index = selectedEvent.index
-				const oldNote = events.get(index)!.note
+				const oldNote = events.toList().get(index)!.note
 
 				const newNote = oldNote + (delta > 0 ? 1 : -1)
 				dispatch(infiniteSequencerActions.setNote(id, selectedEvent.index, true, newNote))
@@ -126,12 +126,12 @@ export function InfiniteSequencerNotes(
 		return (
 			<div className={`display ${events.count() > 8 ? 'small' : ''}`}>
 				<div className="notes">
-					{events.map((event, index) => {
+					{events.map((event) => {
 						const note = event.note
 
 						return (
 							<div
-								key={index}
+								key={event.id.toString()}
 								className="event usernameFont colorBars"
 								style={{
 									backgroundColor: note === -1 ? 'none' : getColorStringForMidiNote(note),
@@ -155,13 +155,13 @@ export function InfiniteSequencerNotes(
 		return (
 			<div className={`display ${events.count() > 8 ? 'small' : ''}`}>
 				<div className="notes">
-					{events.map(({note}, index) =>
+					{events.toList().map((event, index) =>
 						<ColorGridNote
-							note={note}
+							note={event.note}
 							index={index}
-							key={index}
-							height={noteHeightPercentage + (note === lowestNote ? 1 : 0)}
-							top={(highestNote - note) * noteHeightPercentage}
+							key={event.id.toString()}
+							height={noteHeightPercentage + (event.note === lowestNote ? 1 : 0)}
+							top={(highestNote - event.note) * noteHeightPercentage}
 							onMouseDown={handleMouseDown}
 							onMouseEnter={handleMouseEnter}
 						/>,

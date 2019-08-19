@@ -1,9 +1,8 @@
-import {Map} from 'immutable'
+import {List, Map} from 'immutable'
 import {Action, Store} from 'redux'
 import {ConnectionNodeType, IConnectable} from '@corgifm/common/common-types'
 import {calculatePositionsGivenConnections} from '@corgifm/common/compute-positions'
 import {MidiClipEvents, makeMidiClipEvent} from '@corgifm/common/midi-types'
-import {MidiNotes} from '@corgifm/common/MidiNote'
 import {transformLoadedSave} from '@corgifm/common/saving-and-loading'
 import {
 	basicSamplerActions, addBasicSynthesizer, addClient,
@@ -17,7 +16,7 @@ import {
 	makeSequencerEvents, replacePositions, roomSettingsActions, SavedRoom,
 	selectAllConnections, selectAllPositions, selectAllVirtualKeyboardIds,
 	selectConnectionsWithSourceOrTargetIds, shamuGraphActions,
-	SimpleReverbState, updatePositions,
+	SimpleReverbState, updatePositions, BetterSequencerState, addBetterSequencer, createSequencerEvents,
 } from '@corgifm/common/redux'
 
 const masterAudioOutput: IConnectable = findNodeInfo(ConnectionNodeType.audioOutput).stateSelector({} as any, '')
@@ -58,13 +57,22 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 
 	connectNodes(simpleReverb, masterAudioOutput)
 
+	function foo() {
+		let i = 0
+		return createSequencerEvents(32)
+			.map(() => (makeMidiClipEvent({
+				note: i + 60,
+				startBeat: i,
+				durationBeats: i++ % 4 === 0 ? 2 : 1,
+			})))
+	}
+
 	const serverStuffDefinitions = {
 		melody: {
 			source: {
-				type: ConnectionNodeType.gridSequencer,
-				events: getMelodyNotes(),
-				name: findNodeInfo(ConnectionNodeType.gridSequencer).typeName,
-				notesToShow: 24,
+				type: ConnectionNodeType.betterSequencer,
+				events: foo(),
+				name: findNodeInfo(ConnectionNodeType.betterSequencer).typeName,
 			},
 			target: {
 				type: ConnectionNodeType.basicSynthesizer,
@@ -165,6 +173,16 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 				dispatchToRoom(addGridSequencer(x))
 				// makeServerOwnedNode(args.type, x)
 				return x
+			case ConnectionNodeType.betterSequencer:
+				const w = new BetterSequencerState(
+					serverClient.id,
+					args.name,
+					args.events,
+					args.isPlaying,
+				)
+				dispatchToRoom(addBetterSequencer(w))
+				// makeServerOwnedNode(args.type, w)
+				return w
 			case ConnectionNodeType.infiniteSequencer:
 				const y = new InfiniteSequencerState(
 					serverClient.id,
@@ -228,7 +246,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 }
 
 function getMelodyNotes() {
-	return makeSequencerEvents([
+	return makeSequencerEvents(List([
 		makeMidiClipEvent({note: 48, startBeat: 0, durationBeats: 1}),
 		makeMidiClipEvent({note: -1, startBeat: 1, durationBeats: 1}),
 		makeMidiClipEvent({note: -1, startBeat: 2, durationBeats: 1}),
@@ -261,11 +279,11 @@ function getMelodyNotes() {
 		makeMidiClipEvent({note: -1, startBeat: 29, durationBeats: 1}),
 		makeMidiClipEvent({note: 48, startBeat: 30, durationBeats: 1}),
 		makeMidiClipEvent({note: -1, startBeat: 31, durationBeats: 1}),
-	])
+	]))
 }
 
 function getInitialInfiniteSequencerEvents() {
-	return makeSequencerEvents([
+	return makeSequencerEvents(List([
 		makeMidiClipEvent({note: 60, startBeat: 0, durationBeats: 1}),
 		makeMidiClipEvent({note: 67, startBeat: 1, durationBeats: 1}),
 		makeMidiClipEvent({note: 74, startBeat: 2, durationBeats: 1}),
@@ -299,7 +317,7 @@ function getInitialInfiniteSequencerEvents() {
 		makeMidiClipEvent({note: 65, startBeat: 29, durationBeats: 1}),
 		makeMidiClipEvent({note: 72, startBeat: 30, durationBeats: 1}),
 		makeMidiClipEvent({note: 70, startBeat: 31, durationBeats: 1}),
-	])
+	]))
 }
 
 export function loadServerStuff(room: string, serverStore: Store<IServerState>, roomDataToLoad: SavedRoom, ownerId: Id) {
