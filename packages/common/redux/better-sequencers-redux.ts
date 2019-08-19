@@ -42,6 +42,13 @@ export const betterSequencerActions = {
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	} as const),
+	deleteEvents: (id: Id, idsToDelete: Iterable<Id>) => ({
+		type: 'DELETE_BETTER_SEQUENCER_EVENTS',
+		id,
+		idsToDelete,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	} as const),
 } as const
 
 function getNetworkActionThings(fieldName: BetterSequencerFields) {
@@ -148,6 +155,7 @@ const betterSequencerActionTypes2: BetterSequencerActionTypes = {
 	SET_SEQUENCER_ZOOM: 0,
 	SET_SEQUENCER_PAN: 0,
 	UPDATE_BETTER_SEQUENCER_EVENTS: 0,
+	DELETE_BETTER_SEQUENCER_EVENTS: 0,
 }
 
 const betterSequencerActionTypes = Object.keys(betterSequencerActionTypes2)
@@ -178,13 +186,20 @@ const betterSequencerReducer =
 						[action.fieldName]: action.data,
 					}
 				}
-			case 'UPDATE_BETTER_SEQUENCER_EVENTS': {
-				return {
-					...betterSequencer,
-					midiClip: betterSequencer.midiClip.update('events', events => {
-						return events.merge(action.events)
-					})
-				}
+			case 'UPDATE_BETTER_SEQUENCER_EVENTS': return {
+				...betterSequencer,
+				midiClip: betterSequencer.midiClip.update('events', events => {
+					return events.merge(action.events)
+				}),
+				// TODO Not working
+				previousEvents: betterSequencer.previousEvents.unshift(betterSequencer.midiClip.events),
+			}
+			case 'DELETE_BETTER_SEQUENCER_EVENTS': return {
+				...betterSequencer,
+				midiClip: betterSequencer.midiClip.update('events', events => {
+					return events.deleteAll(action.idsToDelete)
+				}),
+				previousEvents: betterSequencer.previousEvents.unshift(betterSequencer.midiClip.events),
 			}
 			case 'SET_SEQUENCER_ZOOM': {
 				return {

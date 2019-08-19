@@ -77,52 +77,90 @@ export const BetterSequencer = ({id}: Props) => {
 
 	useEffect(() => {
 		const onKeyDown = (e: KeyboardEvent) => {
+
+			if (e.key === Key.Delete) {
+				if (selected.count() === 0) return
+
+				dispatch(betterSequencerActions.deleteEvents(id, selected.keySeq()))
+				setSelected(Map())
+			}
+
 			if (e.key === Key.ArrowUp) {
+				e.preventDefault()
 				if (selected.count() === 0) return
 
 				dispatch(betterSequencerActions.updateEvents(id, selected.reduce((events, _, eventId) => {
 					const originalEvent = midiClip.events.get(eventId, null)
 					if (originalEvent === null) throw new Error('originalEvent === null')
+					const delta = e.shiftKey
+						? 12
+						: 1
 					return events.set(eventId, {
 						...originalEvent,
-						note: Math.min(MAX_MIDI_NOTE_NUMBER_127, originalEvent.note + 1),
+						note: Math.min(MAX_MIDI_NOTE_NUMBER_127, originalEvent.note + delta),
 					})
 				}, OrderedMap<Id, MidiClipEvent>())))
 			}
 			if (e.key === Key.ArrowDown) {
+				e.preventDefault()
 				if (selected.count() === 0) return
 
 				dispatch(betterSequencerActions.updateEvents(id, selected.reduce((events, _, eventId) => {
 					const originalEvent = midiClip.events.get(eventId, null)
 					if (originalEvent === null) throw new Error('originalEvent === null')
+					const delta = e.shiftKey
+						? 12
+						: 1
 					return events.set(eventId, {
 						...originalEvent,
-						note: Math.max(MIN_MIDI_NOTE_NUMBER_0, originalEvent.note - 1),
+						note: Math.max(MIN_MIDI_NOTE_NUMBER_0, originalEvent.note - delta),
 					})
 				}, OrderedMap<Id, MidiClipEvent>())))
 			}
 			if (e.key === Key.ArrowRight) {
+				e.preventDefault()
 				if (selected.count() === 0) return
 
 				dispatch(betterSequencerActions.updateEvents(id, selected.reduce((events, _, eventId) => {
 					const originalEvent = midiClip.events.get(eventId, null)
 					if (originalEvent === null) throw new Error('originalEvent === null')
-					return events.set(eventId, {
-						...originalEvent,
-						startBeat: Math.min(length - 1, originalEvent.startBeat + 1),
-					})
+					const delta = e.altKey
+						? 0.1
+						: 1
+					if (e.shiftKey) {
+						return events.set(eventId, {
+							...originalEvent,
+							durationBeats: Math.min(8, originalEvent.durationBeats + delta),
+						})
+					} else {
+						return events.set(eventId, {
+							...originalEvent,
+							startBeat: Math.min(length - 1, originalEvent.startBeat + delta),
+						})
+					}
 				}, OrderedMap<Id, MidiClipEvent>())))
 			}
 			if (e.key === Key.ArrowLeft) {
+				e.preventDefault()
 				if (selected.count() === 0) return
 
 				dispatch(betterSequencerActions.updateEvents(id, selected.reduce((events, _, eventId) => {
 					const originalEvent = midiClip.events.get(eventId, null)
 					if (originalEvent === null) throw new Error('originalEvent === null')
-					return events.set(eventId, {
-						...originalEvent,
-						startBeat: Math.max(0, originalEvent.startBeat - 1),
-					})
+					const delta = e.altKey
+						? 0.1
+						: 1
+					if (e.shiftKey) {
+						return events.set(eventId, {
+							...originalEvent,
+							durationBeats: Math.max(1 / 16, originalEvent.durationBeats - delta),
+						})
+					} else {
+						return events.set(eventId, {
+							...originalEvent,
+							startBeat: Math.max(0, originalEvent.startBeat - delta),
+						})
+					}
 				}, OrderedMap<Id, MidiClipEvent>())))
 			}
 		}
@@ -263,7 +301,14 @@ export const BetterSequencer = ({id}: Props) => {
 									title={noteLabel}
 									onMouseDown={e => {
 										e.stopPropagation()
-										setSelected(selected.set(event.id, !isSelected))
+										if (e.shiftKey) {
+											setSelected(selected.set(event.id, !isSelected))
+										} else {
+											setSelected(selected.clear().set(event.id, true))
+										}
+									}}
+									onDoubleClick={e => {
+										dispatch(betterSequencerActions.deleteEvents(id, [event.id]))
 									}}
 									style={{
 										width: event.durationBeats * columnWidth,
