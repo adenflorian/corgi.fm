@@ -43,8 +43,10 @@ export const BetterSequencer = ({id}: Props) => {
 
 	const panYOffset = (scaledHeight - height) / 2
 
-	const maxPanY = getMaxPanY(height, zoom.y)
+	const maxPanY = getMaxPan(height, zoom.y)
 	const panPixelsY = pan.y * maxPanY
+	const maxPanX = getMaxPan(width, zoom.x)
+	const panPixelsX = pan.x * maxPanX
 
 	const noteHeight = scaledHeight / 128
 
@@ -261,6 +263,9 @@ export const BetterSequencer = ({id}: Props) => {
 				>
 					<div
 						className="scalable"
+						style={{
+							transform: `translateX(${-panPixelsX}px)`,
+						}}
 					>
 						{columns.map((_, beat) => {
 							return (
@@ -314,7 +319,7 @@ export const BetterSequencer = ({id}: Props) => {
 									style={{
 										width: event.durationBeats * columnWidth,
 										height: noteHeight - 1,
-										left: event.startBeat * columnWidth,
+										left: event.startBeat * columnWidth - panPixelsX,
 										top: ((128 - event.note) * noteHeight) - noteHeight - panPixelsY,
 										// backgroundColor: note % 4 === 0 ? '#0000' : '#3333',
 									}}
@@ -337,11 +342,6 @@ export const BetterSequencer = ({id}: Props) => {
 	)
 }
 
-function getMaxPanY(height: number, zoomY: number) {
-
-	const scalableHeight = height * zoomY
-
-	const maxPanY = scalableHeight - height
-
-	return maxPanY
+function getMaxPan(length: number, zoom: number) {
+	return (length * zoom) - length
 }

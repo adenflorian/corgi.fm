@@ -223,6 +223,16 @@
 		- [√] samples manager middleware?
 		- [√] if `getSample` gets called and sample isn't loaded, then that's an error?
 
+**Better Sequencer**
+- [ ] scroll up and down with mouse wheel
+- [ ] hoz zoom with ctrl + scroll
+- [ ] resizing shouldn't zoom
+- [ ] drag box around notes to select
+- [ ] double click to add note
+- [ ] drag ends of notes to resize
+
+
+
 - [ ] filter resonance
 - [ ] make piano roll notes light up on grid seq when connected keyboard is playing those notes
 - [ ] select sample then knobs on right are for that sample
