@@ -81,7 +81,7 @@ function ecsLoop() {
 				notesDisplayWidth: nodeInfo.notesDisplayWidth,
 				ratio: getSequencersSchedulerInfo()
 					.get(sequencer.id, {loopRatio: 0})
-					.loopRatio,
+					.loopRatio * sequencer.zoom.x,
 				isPlaying: isSequencerNodeType(sequencer.type)
 					? selectSequencerIsPlaying(state.room, sequencer.id) && selectPosition(state.room, sequencer.id).enabled
 					: true,

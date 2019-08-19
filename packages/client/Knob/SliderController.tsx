@@ -9,13 +9,12 @@ interface ISliderControllerProps {
 	defaultValue?: number
 	curve: number
 	children: (handleMouseDown: any, percentage: number, adjustedPercentage: number) => ReactElement<any>
-	snapFunction?: (value: number) => number
 }
 
 export function SliderController(props: ISliderControllerProps) {
 	const {
 		value, defaultValue, onChange = () => undefined,
-		snapFunction, min = 0, max = 1, curve = 1,
+		min = 0, max = 1, curve = 1,
 	} = props
 
 	const [isMouseDown, setIsMouseDown] = useState(false)
@@ -42,28 +41,15 @@ export function SliderController(props: ISliderControllerProps) {
 
 				const mouseYDelta = e.movementY * sensitivity
 
-				if (snapFunction) {
-					const newNormalizedValue = clamp(_normalize(tempValue, min, max, curve) - mouseYDelta)
+				const newNormalizedValue = Math.max(0, Math.min(1, _normalize(value, min, max, curve) - mouseYDelta))
 
-					const newValue = _deNormalize(newNormalizedValue)
+				const newValue = _deNormalize(newNormalizedValue)
 
-					const snappedValue = snapFunction(newValue)
+				// if (isNaN(newValue)) throw new Error('nan')
 
-					if (snappedValue !== value) {
-						onChange(snappedValue)
-						setTempValue(snappedValue)
-					} else {
-						setTempValue(newValue)
-					}
-				} else {
-					const newNormalizedValue = Math.max(0, Math.min(1, _normalize(value, min, max, curve) - mouseYDelta))
-
-					const newValue = _deNormalize(newNormalizedValue)
-
-					if (newValue !== value) {
-						onChange(newValue)
-						setTempValue(newValue)
-					}
+				if (newValue !== value) {
+					onChange(newValue)
+					setTempValue(newValue)
 				}
 			}
 		}
@@ -75,7 +61,7 @@ export function SliderController(props: ISliderControllerProps) {
 		return () => {
 			window.removeEventListener('mousemove', _handleMouseMove)
 		}
-	}, [curve, isMouseDown, max, min, onChange, snapFunction, tempValue, value])
+	}, [curve, isMouseDown, max, min, onChange, tempValue, value])
 
 	const _handleMouseDown = (e: React.MouseEvent) => {
 		if ((e.ctrlKey || e.metaKey) && defaultValue !== undefined) {
@@ -95,6 +81,7 @@ export function SliderController(props: ISliderControllerProps) {
 
 function _normalize(n: number, min: number, max: number, curve: number, useCurve = true) {
 	// if (n === 0) return 0
+	if (min === max) return min
 
 	const x = (n - min) / (max - min)
 

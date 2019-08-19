@@ -85,17 +85,18 @@ export class GridSequencerState extends SequencerStateBase {
 	public static controlsWidth = 180
 	public static eventCount = 32
 	public static notesToShow = 24
-	public static notesDisplayWidth =
-		GridSequencerState.noteWidth * GridSequencerState.eventCount
-	public static getWidth =
-		GridSequencerState.controlsWidth +
+	public static notesDisplayWidth = GridSequencerState.noteWidth *
+		GridSequencerState.eventCount
+
+	public static getWidth = GridSequencerState.controlsWidth +
 		GridSequencerState.noteNamesSideBarWidth +
 		GridSequencerState.notesDisplayWidth +
 		GridSequencerState.scrollBarWidth
-	public static getHeight =
-		GridSequencerState.noteHeight * GridSequencerState.notesToShow
-	public static notesStartX =
-		GridSequencerState.controlsWidth +
+
+	public static getHeight = GridSequencerState.noteHeight *
+		GridSequencerState.notesToShow
+
+	public static notesStartX = GridSequencerState.controlsWidth +
 		GridSequencerState.noteNamesSideBarWidth
 
 	public static dummy = new GridSequencerState(
@@ -180,6 +181,8 @@ const gridSequencerActionTypes2: GridSequencerActionTypes = {
 	RESTART_GRID_SEQUENCER: 0,
 	SKIP_NOTE: 0,
 	STOP_ALL: 0,
+	SET_SEQUENCER_PAN: 0,
+	SET_SEQUENCER_ZOOM: 0,
 }
 
 const gridSequencerActionTypes = Object.keys(gridSequencerActionTypes2)

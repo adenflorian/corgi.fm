@@ -69,6 +69,8 @@ export function SliderControllerIncremental(props: Props) {
 		fineIncrement, onChange, sensitivity])
 
 	function _normalize(v: number): number {
+		if (min === max) return min
+
 		const x = (v - min) / (max - min)
 
 		return clamp(x)

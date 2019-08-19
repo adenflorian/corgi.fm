@@ -1,3 +1,4 @@
+import * as uuid from 'uuid'
 import {List, Record} from 'immutable'
 import {IMidiNotes} from './MidiNote'
 
@@ -8,18 +9,20 @@ export interface MidiClipEvent {
 	readonly notes: IMidiNotes
 	readonly startBeat: number
 	readonly durationBeats: number
+	readonly id: Id
 }
 
 /** In clip time (beats); Means BPM has not been applied */
-export function makeMidiClipEvent(event: MidiClipEvent): MidiClipEvent {
-	if (event.notes === undefined) throw new Error('why')
-	if (event.startBeat === undefined) throw new Error('why')
-	if (event.durationBeats === undefined) throw new Error('why')
+export function makeMidiClipEvent(event: Pick<MidiClipEvent, 'durationBeats' | 'notes' | 'startBeat'>): MidiClipEvent {
+	if (event.notes === undefined) throw new Error('why1')
+	if (event.startBeat === undefined) throw new Error('why2')
+	if (event.durationBeats === undefined) throw new Error('why3')
 
 	return {
 		notes: event.notes,
 		startBeat: event.startBeat,
 		durationBeats: event.durationBeats,
+		id: uuid.v4(),
 	}
 }
 

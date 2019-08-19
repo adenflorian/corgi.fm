@@ -85,30 +85,31 @@ export class BetterSequencerState extends SequencerStateBase {
 		name = 'Better Sequencer',
 		events = createSequencerEvents(32)
 			.map((_, i) => (makeMidiClipEvent({
-				notes: MidiNotes(i % 2 === 1 ? [] : [36]),
-				startBeat: i,
-				durationBeats: 1,
+				notes: MidiNotes([i + 60]),
+				startBeat: i / 2,
+				durationBeats: i % 4 === 0 ? 2 : 1,
 			}))),
-		isPlaying = false,
+		isPlaying = true,
 	) {
-		const midiClip = new MidiClip({
-			events: events.map(x => ({
-				...x,
-				startBeat: x.startBeat,
-				durationBeats: x.durationBeats,
-			})),
-			length: events.count(),
-			loop: true,
-		})
 
 		super(
 			name,
-			midiClip,
+			new MidiClip({
+				events: events.map(x => ({
+					...x,
+					startBeat: x.startBeat,
+					durationBeats: x.durationBeats,
+				})),
+				length: 4 * 8,
+				loop: true,
+			}),
 			ownerId,
 			ConnectionNodeType.betterSequencer,
-			isPlaying,
+			true,
 			1,
-			1 / 4,
+			1,
+			{x: 2, y: 10},
+			{x: 0, y: 1550},
 		)
 	}
 }
@@ -142,6 +143,8 @@ const betterSequencerActionTypes2: BetterSequencerActionTypes = {
 	RESTART_BETTER_SEQUENCER: 0,
 	SKIP_NOTE: 0,
 	STOP_ALL: 0,
+	SET_SEQUENCER_ZOOM: 0,
+	SET_SEQUENCER_PAN: 0,
 }
 
 const betterSequencerActionTypes = Object.keys(betterSequencerActionTypes2)
@@ -197,6 +200,18 @@ const betterSequencerReducer =
 						[action.fieldName]: action.data,
 					}
 				}
+			case 'SET_SEQUENCER_ZOOM': {
+				return {
+					...betterSequencer,
+					zoom: action.zoom,
+				}
+			}
+			case 'SET_SEQUENCER_PAN': {
+				return {
+					...betterSequencer,
+					pan: action.pan,
+				}
+			}
 			case 'TOGGLE_SEQUENCER_RECORDING': return {...betterSequencer, isRecording: action.isRecording}
 			case 'UNDO_SEQUENCER': {
 				if (betterSequencer.previousEvents.count() === 0) return betterSequencer
@@ -269,6 +284,18 @@ export const createBetterSeqIsPlayingSelector = (id: Id) => (state: IClientAppSt
 
 export const createBetterSeqRateSelector = (id: Id) => (state: IClientAppState) =>
 	selectBetterSequencer(state.room, id).rate
+
+export const createBetterSeqLengthSelector = (id: Id) => (state: IClientAppState) =>
+	selectBetterSequencer(state.room, id).midiClip.length
+
+export const createBetterSeqZoomSelector = (id: Id) => (state: IClientAppState) =>
+	selectBetterSequencer(state.room, id).zoom
+
+export const createBetterSeqPanSelector = (id: Id) => (state: IClientAppState) =>
+	selectBetterSequencer(state.room, id).pan
+
+export const createBetterSeqMidiClipSelector = (id: Id) => (state: IClientAppState) =>
+	selectBetterSequencer(state.room, id).midiClip
 
 export const selectBetterSequencerEvents = (state: IClientRoomState, id: Id) =>
 	selectBetterSequencer(state, id).midiClip.events

@@ -180,9 +180,9 @@ const nodeInfo: NodeInfoMap = {
 		isNodeCloneable: true,
 		canHaveKeyboardConnectedToIt: true,
 		defaultWidth: 688,
-		defaultHeight: 88,
-		notesDisplayStartX: 0,
-		notesDisplayWidth: 688,
+		defaultHeight: 88 * 4,
+		notesDisplayStartX: 64,
+		notesDisplayWidth: 688 - 64,
 		isResizable: true,
 	}),
 	infiniteSequencer: makeNodeInfo({

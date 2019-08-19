@@ -32,3 +32,10 @@ export const maxTotalSingleUserUploadBytes = 100 * 1000 * 1000
 export const defaultSamplePlaybackRate = 1
 
 export const panelHeaderHeight = 24
+
+export const Key = {
+	ArrowUp: 'ArrowUp',
+	ArrowRight: 'ArrowRight',
+	ArrowDown: 'ArrowDown',
+	ArrowLeft: 'ArrowLeft',
+} as const

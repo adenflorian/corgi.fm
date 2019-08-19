@@ -81,6 +81,20 @@ export const sequencerActions = {
 		BROADCASTER_ACTION,
 		SERVER_ACTION,
 	} as const),
+	setZoom: (id: Id, zoom: Point) => ({
+		type: 'SET_SEQUENCER_ZOOM',
+		id,
+		zoom,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	} as const),
+	setPan: (id: Id, pan: Point) => ({
+		type: 'SET_SEQUENCER_PAN',
+		id,
+		pan,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	} as const),
 } as const
 
 export type SequencerAction = ActionType<typeof sequencerActions>
@@ -129,6 +143,8 @@ export const dummySequencerState: SequencerStateBase = {
 	isPlaying: false,
 	gate: 1,
 	enabled: false,
+	zoom: {x: 1, y: 1} as Point,
+	pan: {x: 0, y: 0} as Point,
 }
 
 export abstract class SequencerStateBase implements ISequencerState {
@@ -148,6 +164,8 @@ export abstract class SequencerStateBase implements ISequencerState {
 		public readonly isPlaying: boolean = false,
 		public readonly gate: number = 1,
 		public readonly rate: number = 1,
+		public readonly zoom: Point = {x: 1, y: 1},
+		public readonly pan: Point = {x: 0, y: 0},
 	) {
 		// this.color = colorFunc(hashbow(this.id)).desaturate(0.2).hsl().string()
 	}

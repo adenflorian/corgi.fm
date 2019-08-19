@@ -1,0 +1,112 @@
+@import "../colors.less";
+@import "../AppCommon.less";
+
+@rightRadius: {
+	border-top-right-radius: 8px;
+	border-bottom-right-radius: 8px;
+}
+
+.betterSequencer {
+	.controls {
+
+	}
+	.editor {
+		flex-grow: 1;
+		position: relative;
+
+		.rows {
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			@rightRadius();
+			overflow: hidden;
+			z-index: 6;
+
+			.scalable {
+				width: 100%;
+				height: 100%;
+				display: flex;
+				flex-direction: column-reverse;
+				// willChange: transform;
+
+				.row {
+					height: 1 / 128 * 100%;
+				}
+			}
+		}
+
+		.columns {
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			@rightRadius();
+			overflow: hidden;
+			z-index: 8;
+
+			.scalable {
+				width: 100%;
+				height: 100%;
+				// display: flex;
+				// flex-direction: row;
+				white-space: nowrap;
+				// willChange: transform;
+
+				.column {
+					flex-grow: 1;
+					height: 100%;
+					width: 100px;
+					display: inline-block;
+
+					.line {
+						background-color: #4446;
+						width: 1px;
+						height: 100%;
+					}
+				}
+			}
+		}
+
+		.notes {
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			@rightRadius();
+			overflow: hidden;
+			z-index: 10;
+
+			.scalable {
+				position: relative;
+				width: 100%;
+				height: 100%;
+				white-space: nowrap;
+				// willChange: transform;
+
+				.note {
+					position: absolute;
+					background-color: currentColor;
+					overflow: hidden;
+					border-radius: 2px;
+					border: 1px solid @panelGrayDark;
+					box-sizing: border-box;
+					margin-bottom: 1px;
+
+					&.selected-true {
+						border-color: @defaultGray;
+					}
+
+					.noteLabel {
+						.smallFont();
+						font-size: 10px;
+						color: @panelGrayDark;
+						text-align: left;
+						line-height: normal;
+						margin-left: 4px;
+						height: 100%;
+						display: flex;
+						align-items: center;
+					}
+				}
+			}
+		}
+	}
+}

@@ -253,5 +253,10 @@ export const createPositionWidthSelector = (id: Id) => (state: IClientAppState) 
 export const createPositionHeightSelector = (id: Id) => (state: IClientAppState) =>
 	selectPosition(state.room, id).height
 
+export const createPositionSelectedSelector = (id: Id) => (state: IClientAppState) =>
+	state.room.positions.meta.selectedNode
+		? state.room.positions.meta.selectedNode.id === id
+		: false
+
 export const createPositionEnabledSelector = (id: Id) => (state: IClientAppState) =>
 	selectPosition(state.room, id).enabled
