@@ -5,8 +5,7 @@ import {ConnectionNodeType, IMultiStateThing} from '../common-types'
 import {
 	assertArrayHasNoUndefinedElements,
 } from '../common-utils'
-import {makeMidiClipEvent, MidiClip, makeEvents, MidiClipEvent, MidiClipEvents} from '../midi-types'
-import {emptyMidiNotes, IMidiNote, MidiNotes} from '../MidiNote'
+import {makeMidiClipEvent, MidiClip, makeEvents, MidiClipEvents} from '../midi-types'
 import {
 	deserializeSequencerState, SequencerAction,
 	SequencerStateBase,
@@ -15,7 +14,7 @@ import {
 import {
 	addMultiThing, BROADCASTER_ACTION, createSequencerEvents, IClientRoomState,
 	IMultiState, IMultiStateThings, isEmptyEvents, makeMultiReducer, NetworkActionType,
-	selectGlobalClockState, SERVER_ACTION, IClientAppState,
+	SERVER_ACTION, IClientAppState,
 } from '.'
 
 export const addBetterSequencer = (betterSequencer: BetterSequencerState) =>
@@ -119,7 +118,7 @@ export class BetterSequencerState extends SequencerStateBase {
 			1,
 			1,
 			{x: 1, y: 10},
-			{x: 0, y: 1550},
+			{x: 0, y: 0.5},
 		)
 	}
 }

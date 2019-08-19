@@ -13,7 +13,7 @@ import {midiNoteToNoteNameFull} from '@corgifm/common/common-samples-stuff'
 import {Key, MAX_MIDI_NOTE_NUMBER_127, MIN_MIDI_NOTE_NUMBER_0} from '@corgifm/common/common-constants'
 import {MidiClipEvent} from '@corgifm/common/midi-types'
 import {Panel} from '../Panel/Panel'
-import {seqLengthValueToString} from '../client-constants'
+import {seqLengthValueToString, percentageValueString} from '../client-constants'
 import {isWhiteKey} from '../Keyboard/Keyboard'
 import {Knob} from '../Knob/Knob'
 import './BetterSequencer.less'
@@ -44,6 +44,7 @@ export const BetterSequencer = ({id}: Props) => {
 	const panYOffset = (scaledHeight - height) / 2
 
 	const maxPanY = getMaxPanY(height, zoom.y)
+	const panPixelsY = pan.y * maxPanY
 
 	const noteHeight = scaledHeight / 128
 
@@ -55,9 +56,7 @@ export const BetterSequencer = ({id}: Props) => {
 
 	const setZoomY = useCallback((_, newZoomY: number) => {
 		dispatch(sequencerActions.setZoom(id, {...zoom, y: newZoomY}))
-		const foo = Math.min(getMaxPanY(height, newZoomY), pan.y)
-		dispatch(sequencerActions.setPan(id, {...pan, y: foo}))
-	}, [dispatch, id, zoom, height, pan])
+	}, [dispatch, id, zoom])
 
 	const setPanX = useCallback((_, newPanX: number) => {
 		dispatch(sequencerActions.setPan(id, {...pan, x: newPanX}))
@@ -219,15 +218,17 @@ export const BetterSequencer = ({id}: Props) => {
 					onChange={setPanX}
 					tooltip={`pan x`}
 					value={pan.x}
+					valueString={percentageValueString}
 				/>
 				<Knob
 					defaultValue={1}
 					label={`Pan Y`}
 					min={0}
-					max={maxPanY}
+					max={1}
 					onChange={setPanY}
 					tooltip={`pan Y`}
 					value={pan.y}
+					valueString={percentageValueString}
 				/>
 			</div>
 			<div
@@ -239,7 +240,7 @@ export const BetterSequencer = ({id}: Props) => {
 					<div
 						className="scalable"
 						style={{
-							transform: `translateY(${-pan.y + panYOffset}px) scaleY(${zoom.y})`,
+							transform: `translateY(${-panPixelsY + panYOffset}px) scaleY(${zoom.y})`,
 						}}
 					>
 						{rows.map((_, note) => {
@@ -314,7 +315,7 @@ export const BetterSequencer = ({id}: Props) => {
 										width: event.durationBeats * columnWidth,
 										height: noteHeight - 1,
 										left: event.startBeat * columnWidth,
-										top: ((128 - event.note) * noteHeight) - noteHeight - pan.y,
+										top: ((128 - event.note) * noteHeight) - noteHeight - panPixelsY,
 										// backgroundColor: note % 4 === 0 ? '#0000' : '#3333',
 									}}
 								>
