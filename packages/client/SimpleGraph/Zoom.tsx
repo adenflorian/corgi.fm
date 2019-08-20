@@ -111,7 +111,10 @@ export class Zoom extends React.PureComponent<IZoomAllProps, IZoomState> {
 				backgroundClicked: false,
 			})
 		}
-		if (e.buttons === 4) this._pan(e.movementX, e.movementY)
+		if (e.buttons === 4 && !e.shiftKey) {
+			// console.log({x: e.defaultPrevented, y: e.bubbles, d: e.detail})
+			this._pan(e.movementX, e.movementY)
+		}
 		if (this.state.backgroundClicked && e.buttons === 1) {
 			if (e.ctrlKey) {
 				this._zoom(e.movementY * mouseZoomMod)

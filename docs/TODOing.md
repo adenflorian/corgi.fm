@@ -227,10 +227,12 @@
 - [√] scroll up and down with mouse wheel
 - [√] hoz zoom with ctrl + scroll
 - [√] double click to add note
-- [ ] drag box around notes to select
-- [ ] dont use transform scale on rows
+- [√] drag box around notes to select
+- [√] dont use transform scale on rows
 - [ ] resizing shouldn't zoom
 - [ ] drag ends of notes to resize
+- [ ] pan with middle mouse
+	- [ ] change cursor to grabby hand
 
 
 

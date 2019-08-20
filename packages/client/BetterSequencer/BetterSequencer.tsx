@@ -10,7 +10,7 @@ import {
 	createPositionHeightSelector, createPositionWidthSelector, sequencerActions, betterSequencerActions, createPositionXSelector, createPositionYSelector, localActions,
 } from '@corgifm/common/redux'
 import {midiNoteToNoteNameFull} from '@corgifm/common/common-samples-stuff'
-import {Key, MAX_MIDI_NOTE_NUMBER_127, MIN_MIDI_NOTE_NUMBER_0, panelHeaderHeight} from '@corgifm/common/common-constants'
+import {Key, MAX_MIDI_NOTE_NUMBER_127, MIN_MIDI_NOTE_NUMBER_0} from '@corgifm/common/common-constants'
 import {clamp} from '@corgifm/common/common-utils'
 import {MidiClipEvent, makeMidiClipEvent} from '@corgifm/common/midi-types'
 import {Panel} from '../Panel/Panel'
@@ -36,6 +36,8 @@ const mouseWheelYSensitivity = 0.001
 const mouseWheelPanXSensitivity = 0.001
 const mouseWheelZoomXSensitivity = 0.01
 const mouseWheelZoomYSensitivity = 0.01
+const middleMousePanXSensitivity = 0.001
+const middleMousePanYSensitivity = 0.001
 
 const minZoomX = 1
 const maxZoomX = 20
@@ -60,11 +62,15 @@ export const BetterSequencer = ({id}: Props) => {
 	const isNodeSelected = useSelector(createPositionHeightSelector(id))
 
 	const [selected, setSelected] = useState(Map<Id, boolean>())
+	const clearSelected = () => setSelected(Map())
+
+	// Box Select
 	const [boxActive, activateBox, deactivateBox] = useBoolean(false)
 	const [boxOrigin, setBoxOrigin] = useState({x: 0, y: 0})
 	const [otherCorner, setOtherCorner] = useState({x: 0, y: 0})
 
-	const clearSelected = () => setSelected(Map())
+	// Middle mouse pan
+	const [middleMouseActive, activateMiddleMouse, deactivateMiddleMouse] = useBoolean(false)
 
 	const nodeInfo = getNodeInfo().betterSequencer
 
@@ -180,6 +186,7 @@ export const BetterSequencer = ({id}: Props) => {
 	// Box Select
 	useLayoutEffect(() => {
 		const onMouseDown = (e: MouseEvent) => {
+			if (e.buttons !== 1) return
 			const editorSpace = clientSpaceToEditorSpace(
 				{x: e.clientX, y: e.clientY}, {x, y})
 			setBoxOrigin(editorSpace)
@@ -217,9 +224,9 @@ export const BetterSequencer = ({id}: Props) => {
 			setSelected(
 				midiClip.events.filter(
 					z => z.note <= box.top &&
-					z.note >= box.bottom &&
-					(z.startBeat + z.durationBeats) >= box.left &&
-					z.startBeat <= box.right
+						z.note >= box.bottom &&
+						(z.startBeat + z.durationBeats) >= box.left &&
+						z.startBeat <= box.right
 				)
 					.map(_ => true)
 			)
@@ -245,6 +252,48 @@ export const BetterSequencer = ({id}: Props) => {
 			window.removeEventListener('mouseup', onMouseUp)
 		}
 	}, [activateBox, boxActive, boxOrigin, deactivateBox, height, length, maxPanX, maxPanY, midiClip.events, otherCorner, panPixels, width, x, y])
+
+	// Middle mouse pan
+	useLayoutEffect(() => {
+		const onMouseDown = (e: MouseEvent) => {
+			if (e.buttons !== 4) return
+
+			activateMiddleMouse()
+		}
+
+		const onMouseUp = (e: MouseEvent) => {
+			deactivateMiddleMouse()
+		}
+
+		const onMouseMove = (e: MouseEvent) => {
+			if (e.buttons !== 4 || !e.shiftKey) return deactivateMiddleMouse()
+
+			dispatch(sequencerActions.setPan(id, {
+				x: clamp(pan.x + (-e.movementX * (1 / width)), minPan, maxPan),
+				y: clamp(pan.y + (-e.movementY * (1 / height)), minPan, maxPan),
+			}))
+		}
+
+		const editorElementNotNull = editorElement.current
+
+		if (editorElementNotNull === null) return
+
+		editorElementNotNull.addEventListener('mousedown', onMouseDown)
+
+		if (middleMouseActive) {
+			window.addEventListener('mousemove', onMouseMove)
+		}
+
+		window.addEventListener('mouseup', onMouseUp)
+
+		return () => {
+			if (editorElementNotNull) {
+				editorElementNotNull.removeEventListener('mousedown', onMouseDown)
+				window.removeEventListener('mousemove', onMouseMove)
+			}
+			window.removeEventListener('mouseup', onMouseUp)
+		}
+	}, [activateMiddleMouse, deactivateMiddleMouse, dispatch, height, id, middleMouseActive, pan, width, zoom])
 
 	const setZoomX = useCallback((_, newZoomX: number) => {
 		dispatch(sequencerActions.setZoom(id, {...zoom, x: newZoomX}))
@@ -449,13 +498,11 @@ export const BetterSequencer = ({id}: Props) => {
 				className="editor"
 				ref={editorElement}
 			>
-				<div
-					className="rows"
-				>
+				<div className="rows">
 					<div
 						className="scalable"
 						style={{
-							transform: `translateY(${-panPixels.y + panYOffset}px) scaleY(${zoom.y})`,
+							transform: `translateY(${-panPixels.y}px)`,
 						}}
 					>
 						{rows.map((_, note) => {
@@ -465,15 +512,14 @@ export const BetterSequencer = ({id}: Props) => {
 									className={`row note-${note}`}
 									style={{
 										backgroundColor: isWhiteKey(note) ? '#4444' : '#0000',
+										height: noteHeight,
 									}}
 								/>
 							)
 						})}
 					</div>
 				</div>
-				<div
-					className="columns"
-				>
+				<div className="columns">
 					<div
 						className="scalable"
 						style={{
