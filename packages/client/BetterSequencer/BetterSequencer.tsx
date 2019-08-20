@@ -24,6 +24,8 @@ interface Props {
 	id: Id
 }
 
+const smallestNoteLength = 1 / 64
+
 const rows = new Array(128).fill(0)
 
 const controlsWidth = 64
@@ -237,13 +239,20 @@ export const BetterSequencer = ({id}: Props) => {
 					const originalEvent = midiClip.events.get(eventId, null)
 					if (originalEvent === null) throw new Error('originalEvent === null')
 					const delta = e.altKey
-						? 0.1
+						? smallestNoteLength
 						: 1
 					if (e.shiftKey) {
-						return events.set(eventId, {
-							...originalEvent,
-							durationBeats: Math.min(8, originalEvent.durationBeats + delta),
-						})
+						if (originalEvent.durationBeats === smallestNoteLength && !e.altKey) {
+							return events.set(eventId, {
+								...originalEvent,
+								durationBeats: 1,
+							})
+						} else {
+							return events.set(eventId, {
+								...originalEvent,
+								durationBeats: Math.min(8, originalEvent.durationBeats + delta),
+							})
+						}
 					} else {
 						return events.set(eventId, {
 							...originalEvent,
@@ -260,12 +269,12 @@ export const BetterSequencer = ({id}: Props) => {
 					const originalEvent = midiClip.events.get(eventId, null)
 					if (originalEvent === null) throw new Error('originalEvent === null')
 					const delta = e.altKey
-						? 0.1
+						? smallestNoteLength
 						: 1
 					if (e.shiftKey) {
 						return events.set(eventId, {
 							...originalEvent,
-							durationBeats: Math.max(1 / 16, originalEvent.durationBeats - delta),
+							durationBeats: Math.max(smallestNoteLength, originalEvent.durationBeats - delta),
 						})
 					} else {
 						return events.set(eventId, {
