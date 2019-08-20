@@ -45,7 +45,7 @@ export const Panel =
 		const {disabledText, isResizable} = findNodeInfo(nodeType)
 
 		const handleMouseDownOnHeader = useCallback((e: React.MouseEvent) => {
-			if (id && e.shiftKey) {
+			if (e.buttons === 1 && e.shiftKey) {
 				dispatch(localActions.connectKeyboardToNode(id, nodeType))
 			}
 		}, [dispatch, id, nodeType])
