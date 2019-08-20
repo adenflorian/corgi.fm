@@ -6,10 +6,10 @@ import {ConnectionNodeType} from '../common-types'
 import {CssColor} from '../shamu-color'
 import {shamuMetaReducer} from './shamu-graph'
 import {IClientAppState} from './common-redux-types'
+import {findNodeInfo} from './node-types'
 import {
 	BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION,
 } from '.'
-import {findNodeInfo} from './node-types';
 
 export const positionActions = {
 	setEnabled: (id: Id, enabled: boolean) => ({
@@ -246,6 +246,12 @@ export const createPositionColorSelector = (id: Id) => (state: IClientAppState) 
 
 export const createPositionTypeSelector = (id: Id) => (state: IClientAppState) =>
 	selectPosition(state.room, id).targetType
+
+export const createPositionXSelector = (id: Id) => (state: IClientAppState) =>
+	selectPosition(state.room, id).x
+
+export const createPositionYSelector = (id: Id) => (state: IClientAppState) =>
+	selectPosition(state.room, id).y
 
 export const createPositionWidthSelector = (id: Id) => (state: IClientAppState) =>
 	selectPosition(state.room, id).width

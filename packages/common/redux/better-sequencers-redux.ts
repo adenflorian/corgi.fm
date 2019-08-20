@@ -5,7 +5,7 @@ import {ConnectionNodeType, IMultiStateThing} from '../common-types'
 import {
 	assertArrayHasNoUndefinedElements,
 } from '../common-utils'
-import {makeMidiClipEvent, MidiClip, makeEvents, MidiClipEvents} from '../midi-types'
+import {makeMidiClipEvent, MidiClip, makeEvents, MidiClipEvents, MidiClipEvent} from '../midi-types'
 import {
 	deserializeSequencerState, SequencerAction,
 	SequencerStateBase,
@@ -38,6 +38,13 @@ export const betterSequencerActions = {
 		type: 'UPDATE_BETTER_SEQUENCER_EVENTS',
 		id,
 		events,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	} as const),
+	addEvent: (id: Id, event: MidiClipEvent) => ({
+		type: 'ADD_BETTER_SEQUENCER_EVENT',
+		id,
+		event,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	} as const),
@@ -155,6 +162,7 @@ const betterSequencerActionTypes2: BetterSequencerActionTypes = {
 	SET_SEQUENCER_PAN: 0,
 	UPDATE_BETTER_SEQUENCER_EVENTS: 0,
 	DELETE_BETTER_SEQUENCER_EVENTS: 0,
+	ADD_BETTER_SEQUENCER_EVENT: 0,
 }
 
 const betterSequencerActionTypes = Object.keys(betterSequencerActionTypes2)
@@ -197,6 +205,13 @@ const betterSequencerReducer =
 				...betterSequencer,
 				midiClip: betterSequencer.midiClip.update('events', events => {
 					return events.deleteAll(action.idsToDelete)
+				}),
+				previousEvents: betterSequencer.previousEvents.unshift(betterSequencer.midiClip.events),
+			}
+			case 'ADD_BETTER_SEQUENCER_EVENT': return {
+				...betterSequencer,
+				midiClip: betterSequencer.midiClip.update('events', events => {
+					return events.set(action.event.id, action.event)
 				}),
 				previousEvents: betterSequencer.previousEvents.unshift(betterSequencer.midiClip.events),
 			}
