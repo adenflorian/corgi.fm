@@ -224,11 +224,12 @@
 		- [√] if `getSample` gets called and sample isn't loaded, then that's an error?
 
 **Better Sequencer**
-- [ ] scroll up and down with mouse wheel
-- [ ] hoz zoom with ctrl + scroll
-- [ ] resizing shouldn't zoom
+- [√] scroll up and down with mouse wheel
+- [√] hoz zoom with ctrl + scroll
+- [√] double click to add note
 - [ ] drag box around notes to select
-- [ ] double click to add note
+- [ ] dont use transform scale on rows
+- [ ] resizing shouldn't zoom
 - [ ] drag ends of notes to resize
 
 
