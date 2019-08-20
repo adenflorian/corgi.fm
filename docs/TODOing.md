@@ -231,8 +231,10 @@
 - [√] dont use transform scale on rows
 - [ ] resizing shouldn't zoom
 - [ ] drag ends of notes to resize
-- [ ] pan with middle mouse
+- [√] pan with middle mouse
 	- [ ] change cursor to grabby hand
+- [ ] disable notes with 0 key
+- [ ] box select while holding shift should flip selected notes like ableton
 
 
 

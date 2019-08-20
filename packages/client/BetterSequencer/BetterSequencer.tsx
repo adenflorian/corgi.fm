@@ -18,7 +18,7 @@ import {seqLengthValueToString, percentageValueString} from '../client-constants
 import {isWhiteKey} from '../Keyboard/Keyboard'
 import {Knob} from '../Knob/Knob'
 import './BetterSequencer.less'
-import {mouseFromScreenToBoard} from '../SimpleGlobalClientState'
+import {mouseFromScreenToBoard, makeMouseMovementAccountForGlobalZoom} from '../SimpleGlobalClientState'
 import {useBoolean} from '../react-hooks'
 import {BoxSelect} from './BoxSelect'
 
@@ -186,7 +186,7 @@ export const BetterSequencer = ({id}: Props) => {
 	// Box Select
 	useLayoutEffect(() => {
 		const onMouseDown = (e: MouseEvent) => {
-			if (e.buttons !== 1) return
+			if (e.button !== 0) return
 			const editorSpace = clientSpaceToEditorSpace(
 				{x: e.clientX, y: e.clientY}, {x, y})
 			setBoxOrigin(editorSpace)
@@ -195,8 +195,9 @@ export const BetterSequencer = ({id}: Props) => {
 		}
 
 		const onMouseUp = (e: MouseEvent) => {
+			if (e.button !== 0) return
 			deactivateBox()
-			selectNotes()
+			selectNotes(undefined, e.shiftKey)
 		}
 
 		const onMouseMove = (e: MouseEvent) => {
@@ -208,10 +209,10 @@ export const BetterSequencer = ({id}: Props) => {
 				y: clamp(editorSpace.y, 0, height),
 			}
 			setOtherCorner(clamped)
-			selectNotes(clamped)
+			selectNotes(clamped, e.shiftKey)
 		}
 
-		function selectNotes(otherCorner2 = otherCorner) {
+		function selectNotes(otherCorner2 = otherCorner, preserve = false) {
 			const originPercentages = editorSpaceToPercentages(boxOrigin, panPixels, maxPanX, maxPanY, width, height)
 			const otherCornerPercentages = editorSpaceToPercentages(otherCorner2, panPixels, maxPanX, maxPanY, width, height)
 			const box = {
@@ -229,6 +230,7 @@ export const BetterSequencer = ({id}: Props) => {
 						z.startBeat <= box.right
 				)
 					.map(_ => true)
+					.concat(preserve ? selected : [])
 			)
 		}
 
@@ -251,26 +253,38 @@ export const BetterSequencer = ({id}: Props) => {
 			}
 			window.removeEventListener('mouseup', onMouseUp)
 		}
-	}, [activateBox, boxActive, boxOrigin, deactivateBox, height, length, maxPanX, maxPanY, midiClip.events, otherCorner, panPixels, width, x, y])
+	}, [activateBox, boxActive, boxOrigin, deactivateBox, height, length, maxPanX, maxPanY, midiClip.events, otherCorner, panPixels, width, x, y, selected])
 
 	// Middle mouse pan
 	useLayoutEffect(() => {
 		const onMouseDown = (e: MouseEvent) => {
-			if (e.buttons !== 4) return
+			if (e.button !== 1) return
 
 			activateMiddleMouse()
 		}
 
 		const onMouseUp = (e: MouseEvent) => {
+			if (e.button !== 1) return
 			deactivateMiddleMouse()
 		}
 
 		const onMouseMove = (e: MouseEvent) => {
 			if (e.buttons !== 4 || !e.shiftKey) return deactivateMiddleMouse()
 
+			const zoomedMovement = makeMouseMovementAccountForGlobalZoom(
+				{x: e.movementX, y: e.movementY})
+
 			dispatch(sequencerActions.setPan(id, {
-				x: clamp(pan.x + (-e.movementX * (1 / width)), minPan, maxPan),
-				y: clamp(pan.y + (-e.movementY * (1 / height)), minPan, maxPan),
+				x: zoom.x === 1
+					? pan.x
+					: clamp(
+						pan.x + ((-zoomedMovement.x) * (1 / (width * (zoom.x - 1)))),
+						minPan, maxPan),
+				y: zoom.y === 1
+					? pan.y
+					: clamp(
+						pan.y + ((-zoomedMovement.y) * (1 / (height * (zoom.y - 1)))),
+						minPan, maxPan),
 			}))
 		}
 
@@ -553,12 +567,14 @@ export const BetterSequencer = ({id}: Props) => {
 					<div
 						className="scalable"
 						onMouseDown={e => {
+							if (e.button !== 0 || e.shiftKey) return
 							clearSelected()
 						}}
 					>
 						{midiClip.events.map(event => {
 							const noteLabel = midiNoteToNoteNameFull(event.note)
 							const isSelected = selected.get(event.id) || false
+							const fontSize = Math.min(16, noteHeight / 2)
 							return (
 								<div
 									key={event.id.toString()}
@@ -566,6 +582,7 @@ export const BetterSequencer = ({id}: Props) => {
 									className={`note selected-${isSelected}`}
 									title={noteLabel}
 									onMouseDown={e => {
+										if (e.button !== 0) return
 										e.stopPropagation()
 										if (e.shiftKey) {
 											setSelected(selected.set(event.id, !isSelected))
@@ -589,7 +606,8 @@ export const BetterSequencer = ({id}: Props) => {
 									<div
 										className="noteLabel"
 										style={{
-											fontSize: Math.min(16, noteHeight - 14.5),
+											fontSize: 14,
+											display: noteHeight <= 15 ? 'none' : undefined,
 										}}
 									>
 										{noteLabel}

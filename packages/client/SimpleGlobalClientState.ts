@@ -45,3 +45,11 @@ export function mouseFromScreenToBoard({x, y}: Point) {
 		y: ((y - (window.innerHeight / 2)) / zoom) - pan.y,
 	}
 }
+
+export function makeMouseMovementAccountForGlobalZoom({x, y}: Point) {
+	const {zoom} = simpleGlobalClientState
+	return {
+		x: x / zoom,
+		y: y / zoom,
+	}
+}
