@@ -1,5 +1,5 @@
 import {ActionType} from 'typesafe-actions'
-import {IMidiNote} from '../MidiNote'
+import {IMidiNote, IMidiNotes} from '../MidiNote'
 import {ConnectionNodeType} from '../common-types'
 import {SERVER_ACTION, BROADCASTER_ACTION} from '.'
 
@@ -44,10 +44,10 @@ export const localActions = {
 		type: 'DELETE_SAVED_ROOM',
 		id,
 	} as const),
-	playShortNote: (sourceId: Id, note: IMidiNote) => ({
+	playShortNote: (sourceId: Id, notes: IMidiNotes) => ({
 		type: 'PLAY_SHORT_NOTE',
 		sourceId,
-		note,
+		notes,
 	} as const),
 	playShortNoteOnTarget: (targetId: Id, note: IMidiNote) => ({
 		type: 'PLAY_SHORT_NOTE_ON_TARGET',
@@ -73,7 +73,7 @@ export const localActions = {
 		type: 'CONNECT_KEYBOARD_TO_NODE',
 		nodeId,
 		targetType,
-	} as const)
+	} as const),
 } as const
 
 export type LocalAction = ActionType<typeof localActions>

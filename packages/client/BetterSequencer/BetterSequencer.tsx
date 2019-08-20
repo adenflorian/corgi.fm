@@ -1,13 +1,13 @@
 import React, {useCallback, useState, useEffect, useRef} from 'react'
 import {useSelector, useDispatch} from 'react-redux'
-import {Map, OrderedMap} from 'immutable'
+import {Map, OrderedMap, Set} from 'immutable'
 import {stripIndents, oneLine} from 'common-tags'
 import {
 	createPositionColorSelector, createBetterSeqIsRecordingSelector,
 	createBetterSeqIsPlayingSelector, createBetterSeqRateSelector, getNodeInfo,
 	createBetterSeqLengthSelector, createBetterSeqZoomSelector,
 	createBetterSeqMidiClipSelector, createBetterSeqPanSelector,
-	createPositionHeightSelector, createPositionWidthSelector, sequencerActions, betterSequencerActions, createPositionXSelector, createPositionYSelector,
+	createPositionHeightSelector, createPositionWidthSelector, sequencerActions, betterSequencerActions, createPositionXSelector, createPositionYSelector, localActions,
 } from '@corgifm/common/redux'
 import {midiNoteToNoteNameFull} from '@corgifm/common/common-samples-stuff'
 import {Key, MAX_MIDI_NOTE_NUMBER_127, MIN_MIDI_NOTE_NUMBER_0, panelHeaderHeight} from '@corgifm/common/common-constants'
@@ -151,6 +151,7 @@ export const BetterSequencer = ({id}: Props) => {
 			})
 
 			dispatch(betterSequencerActions.addEvent(id, newEvent))
+			dispatch(localActions.playShortNote(id, Set([note])))
 			setSelected(selected.clear().set(newEvent.id, true))
 		}
 
@@ -203,7 +204,7 @@ export const BetterSequencer = ({id}: Props) => {
 				e.preventDefault()
 				if (selected.count() === 0) return
 
-				dispatch(betterSequencerActions.updateEvents(id, selected.reduce((events, _, eventId) => {
+				const updatedEvents = selected.reduce((events, _, eventId) => {
 					const originalEvent = midiClip.events.get(eventId, null)
 					if (originalEvent === null) throw new Error('originalEvent === null')
 					const delta = e.shiftKey
@@ -213,13 +214,16 @@ export const BetterSequencer = ({id}: Props) => {
 						...originalEvent,
 						note: Math.min(MAX_MIDI_NOTE_NUMBER_127, originalEvent.note + delta),
 					})
-				}, OrderedMap<Id, MidiClipEvent>())))
+				}, OrderedMap<Id, MidiClipEvent>())
+
+				dispatch(betterSequencerActions.updateEvents(id, updatedEvents))
+				dispatch(localActions.playShortNote(id, updatedEvents.map(eventToNote).toSet()))
 			}
 			if (e.key === Key.ArrowDown) {
 				e.preventDefault()
 				if (selected.count() === 0) return
 
-				dispatch(betterSequencerActions.updateEvents(id, selected.reduce((events, _, eventId) => {
+				const updatedEvents = selected.reduce((events, _, eventId) => {
 					const originalEvent = midiClip.events.get(eventId, null)
 					if (originalEvent === null) throw new Error('originalEvent === null')
 					const delta = e.shiftKey
@@ -229,7 +233,10 @@ export const BetterSequencer = ({id}: Props) => {
 						...originalEvent,
 						note: Math.max(MIN_MIDI_NOTE_NUMBER_0, originalEvent.note - delta),
 					})
-				}, OrderedMap<Id, MidiClipEvent>())))
+				}, OrderedMap<Id, MidiClipEvent>())
+
+				dispatch(betterSequencerActions.updateEvents(id, updatedEvents))
+				dispatch(localActions.playShortNote(id, updatedEvents.map(eventToNote).toSet()))
 			}
 			if (e.key === Key.ArrowRight) {
 				e.preventDefault()
@@ -498,3 +505,5 @@ function mousePositionFromClientSpaceToEditorSpace(
 
 	return panSpace
 }
+
+const eventToNote = (event: MidiClipEvent) => event.note

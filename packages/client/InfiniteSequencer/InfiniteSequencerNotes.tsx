@@ -2,6 +2,7 @@
 import {stripIndents} from 'common-tags'
 import React, {useLayoutEffect, useState, useCallback} from 'react'
 import {useDispatch} from 'react-redux'
+import {Set} from 'immutable'
 import {MidiClipEvents} from '@corgifm/common/midi-types'
 import {IMidiNote} from '@corgifm/common/MidiNote'
 import {
@@ -74,7 +75,7 @@ export function InfiniteSequencerNotes(
 
 				const newNote = oldNote + (delta > 0 ? 1 : -1)
 				dispatch(infiniteSequencerActions.setNote(id, selectedEvent.index, true, newNote))
-				dispatch(localActions.playShortNote(id, newNote))
+				dispatch(localActions.playShortNote(id, Set([newNote])))
 				setMouseDelta({x: 0, y: 0})
 			} else {
 				setMouseDelta(newMouseDelta)
@@ -95,7 +96,7 @@ export function InfiniteSequencerNotes(
 			setIsAreaSelected(true)
 
 			if (note >= 0) {
-				dispatch(localActions.playShortNote(id, note))
+				dispatch(localActions.playShortNote(id, Set([note])))
 			}
 
 			if (event.shiftKey) {
@@ -118,7 +119,7 @@ export function InfiniteSequencerNotes(
 		if (event.buttons !== 1 || event.shiftKey || !isAreaSelected) return
 
 		if (note >= 0) {
-			dispatch(localActions.playShortNote(id, note))
+			dispatch(localActions.playShortNote(id, Set([note])))
 		}
 	}, [dispatch, isAreaSelected, id])
 
@@ -126,7 +127,7 @@ export function InfiniteSequencerNotes(
 		return (
 			<div className={`display ${events.count() > 8 ? 'small' : ''}`}>
 				<div className="notes">
-					{events.map((event) => {
+					{events.map(event => {
 						const note = event.note
 
 						return (

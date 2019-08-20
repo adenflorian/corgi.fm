@@ -6,7 +6,7 @@ import {ConnectionNodeType, IMultiStateThing} from '@corgifm/common/common-types
 import {applyOctave, createNodeId} from '@corgifm/common/common-utils'
 import {logger} from '@corgifm/common/logger'
 import {MidiClipEvent} from '@corgifm/common/midi-types'
-import {emptyMidiNotes, IMidiNote} from '@corgifm/common/MidiNote'
+import {emptyMidiNotes, IMidiNote, IMidiNotes} from '@corgifm/common/MidiNote'
 import {BroadcastAction, IClientRoomState} from '@corgifm/common/redux/common-redux-types'
 import {
 	selectAllConnections, selectConnectionsWithSourceIds,
@@ -159,7 +159,7 @@ export function createLocalMiddleware(
 			}
 			case 'SET_GRID_SEQUENCER_NOTE': {
 				if (action.enabled) {
-					playShortNote(action.note, action.id, getState().room, getAllInstruments)
+					playShortNote(Set([action.note]), action.id, getState().room, getAllInstruments)
 				}
 
 				next(action)
@@ -167,14 +167,14 @@ export function createLocalMiddleware(
 				return
 			}
 			case 'PLAY_SHORT_NOTE': {
-				playShortNote(action.note, action.sourceId, getState().room, getAllInstruments)
+				playShortNote(action.notes, action.sourceId, getState().room, getAllInstruments)
 
 				next(action)
 
 				return
 			}
 			case 'PLAY_SHORT_NOTE_ON_TARGET': {
-				playShortNoteOnTarget(action.note, action.targetId, getState().room, getAllInstruments)
+				playShortNoteOnTarget(action.note, action.targetId, getAllInstruments)
 
 				next(action)
 
@@ -661,7 +661,7 @@ function scheduleNote(
 }
 
 function playShortNote(
-	note: IMidiNote, sourceId: Id, roomState: IClientRoomState,
+	notes: IMidiNotes, sourceId: Id, roomState: IClientRoomState,
 	getAllInstruments: GetAllInstruments,
 ) {
 	const targetIds = selectConnectionsWithSourceIds(roomState, [sourceId]).map(x => x.targetId)
@@ -671,19 +671,20 @@ function playShortNote(
 	// Limit note length to 0.25 seconds
 	const delayUntilRelease = Math.min(0.25, (60 / bpm) * rate * gate)
 
-	const actualNote = note + pitch
+	const actualNotes = notes.map(x => x + pitch)
 
 	getAllInstruments().forEach(instrument => {
 		if (targetIds.includes(instrument.id) === false) return
 
-		instrument.scheduleNote(actualNote, 0, true, Set([sourceId]))
-
-		instrument.scheduleRelease(actualNote, delayUntilRelease)
+		actualNotes.forEach(actualNote => {
+			instrument.scheduleNote(actualNote, 0, true, Set([sourceId]))
+			instrument.scheduleRelease(actualNote, delayUntilRelease)
+		})
 	})
 }
 
 function playShortNoteOnTarget(
-	note: IMidiNote, targetId: Id, roomState: IClientRoomState,
+	note: IMidiNote, targetId: Id,
 	getAllInstruments: GetAllInstruments,
 ) {
 	const delayUntilRelease = 0.25
