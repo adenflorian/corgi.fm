@@ -235,6 +235,9 @@
 	- [ ] change cursor to grabby hand
 - [ ] disable notes with 0 key
 - [ ] box select while holding shift should flip selected notes like ableton
+- [ ] change global pan to require middle clicking on background
+- [ ] click and drag notes around
+- [ ] ctrl + d to duplicate notes
 
 
 

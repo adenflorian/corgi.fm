@@ -28,9 +28,7 @@ export const Resizer = React.memo(({id}: Props) => {
 	const {defaultWidth, defaultHeight} = findNodeInfo(nodeType)
 
 	const [active, setActive] = useState<false | ActiveInfo>(false)
-
 	const [delta, setDelta] = useState({x: 0, y: 0})
-
 	const [start, setStart] = useState({x: 0, y: 0, width: 0, height: 0})
 
 	const dispatch = useDispatch()

@@ -36,6 +36,7 @@
         }
     ],
     "rules": {
+        "no-unused-expressions": "off",
         "@typescript-eslint/no-object-literal-type-assertion": "off",
         // The basics
         "quotes": [

@@ -1,4 +1,6 @@
-import React, {useCallback, useState, useEffect, useRef, useLayoutEffect} from 'react'
+import React, {
+	useCallback, useState, useEffect, useRef, useLayoutEffect,
+} from 'react'
 import {useSelector, useDispatch} from 'react-redux'
 import {Map, OrderedMap, Set} from 'immutable'
 import {stripIndents, oneLine} from 'common-tags'
@@ -7,20 +9,28 @@ import {
 	createBetterSeqIsPlayingSelector, createBetterSeqRateSelector, getNodeInfo,
 	createBetterSeqLengthSelector, createBetterSeqZoomSelector,
 	createBetterSeqMidiClipSelector, createBetterSeqPanSelector,
-	createPositionHeightSelector, createPositionWidthSelector, sequencerActions, betterSequencerActions, createPositionXSelector, createPositionYSelector, localActions,
+	createPositionHeightSelector, createPositionWidthSelector, sequencerActions,
+	betterSequencerActions, createPositionXSelector, createPositionYSelector,
+	localActions,
 } from '@corgifm/common/redux'
-import {midiNoteToNoteNameFull} from '@corgifm/common/common-samples-stuff'
-import {Key, MAX_MIDI_NOTE_NUMBER_127, MIN_MIDI_NOTE_NUMBER_0} from '@corgifm/common/common-constants'
+import {
+	Key, MAX_MIDI_NOTE_NUMBER_127, MIN_MIDI_NOTE_NUMBER_0,
+} from '@corgifm/common/common-constants'
 import {clamp} from '@corgifm/common/common-utils'
 import {MidiClipEvent, makeMidiClipEvent} from '@corgifm/common/midi-types'
 import {Panel} from '../Panel/Panel'
-import {seqLengthValueToString, percentageValueString} from '../client-constants'
+import {
+	seqLengthValueToString, percentageValueString,
+} from '../client-constants'
 import {isWhiteKey} from '../Keyboard/Keyboard'
 import {Knob} from '../Knob/Knob'
 import './BetterSequencer.less'
-import {mouseFromScreenToBoard, makeMouseMovementAccountForGlobalZoom} from '../SimpleGlobalClientState'
+import {
+	mouseFromScreenToBoard, makeMouseMovementAccountForGlobalZoom,
+} from '../SimpleGlobalClientState'
 import {useBoolean} from '../react-hooks'
 import {BoxSelect} from './BoxSelect'
+import {BetterNote} from './BetterNote'
 
 interface Props {
 	id: Id
@@ -450,6 +460,17 @@ export const BetterSequencer = ({id}: Props) => {
 		}
 	}, [dispatch, id, isNodeSelected, length, midiClip.events, selected])
 
+	const onNoteSelect = useCallback(
+		(eventId: Id, select: boolean, clear: boolean) => {
+			if (clear) {
+				setSelected(selected.clear().set(eventId, select))
+			} else {
+				setSelected(selected.set(eventId, select))
+			}
+		},
+		[selected],
+	)
+
 	return (
 		<Panel
 			id={id}
@@ -572,47 +593,20 @@ export const BetterSequencer = ({id}: Props) => {
 						}}
 					>
 						{midiClip.events.map(event => {
-							const noteLabel = midiNoteToNoteNameFull(event.note)
 							const isSelected = selected.get(event.id) || false
-							const fontSize = Math.min(16, noteHeight / 2)
 							return (
-								<div
+								<BetterNote
 									key={event.id.toString()}
-									// Class must start with `note`
-									className={`note selected-${isSelected}`}
-									title={noteLabel}
-									onMouseDown={e => {
-										if (e.button !== 0) return
-										e.stopPropagation()
-										if (e.shiftKey) {
-											setSelected(selected.set(event.id, !isSelected))
-										} else {
-											setSelected(selected.clear().set(event.id, true))
-										}
+									{...{
+										id,
+										event,
+										noteHeight,
+										columnWidth,
+										isSelected,
+										panPixels,
+										onNoteSelect,
 									}}
-									onDoubleClick={e => {
-										e.preventDefault()
-										e.stopPropagation()
-										dispatch(betterSequencerActions.deleteEvents(id, [event.id]))
-									}}
-									style={{
-										width: event.durationBeats * columnWidth,
-										height: noteHeight - 1,
-										left: event.startBeat * columnWidth - panPixels.x,
-										top: ((128 - event.note) * noteHeight) - noteHeight - panPixels.y,
-										// backgroundColor: note % 4 === 0 ? '#0000' : '#3333',
-									}}
-								>
-									<div
-										className="noteLabel"
-										style={{
-											fontSize: 14,
-											display: noteHeight <= 15 ? 'none' : undefined,
-										}}
-									>
-										{noteLabel}
-									</div>
-								</div>
+								/>
 							)
 						}).toList()}
 					</div>

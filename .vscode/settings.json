@@ -188,7 +188,6 @@
     "editor.formatOnSave": false,
     "eslint.packageManager": "yarn",
     "eslint.autoFixOnSave": true,
-    "eslint.run": "onSave",
     // "eslint.autoFixOnSave": true,
     // "eslint.validate": [
     //     "javascript",
