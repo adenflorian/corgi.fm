@@ -20,18 +20,22 @@ import {clamp} from '@corgifm/common/common-utils'
 import {MidiClipEvent, makeMidiClipEvent} from '@corgifm/common/midi-types'
 import {Panel} from '../Panel/Panel'
 import {
-	seqLengthValueToString, percentageValueString,
+	seqLengthValueToString,
 } from '../client-constants'
-import {Knob} from '../Knob/Knob'
 import './BetterSequencer.less'
 import {
-	mouseFromScreenToBoard, makeMouseMovementAccountForGlobalZoom,
+	makeMouseMovementAccountForGlobalZoom,
 } from '../SimpleGlobalClientState'
 import {useBoolean} from '../react-hooks'
 import {BoxSelect} from './BoxSelect'
 import {BetterRows} from './BetterRows'
 import {BetterColumns} from './BetterColumns'
 import {BetterNotes} from './BetterNotes'
+import {
+	minPan, maxPan, minZoomX, maxZoomX, minZoomY, maxZoomY,
+} from './BetterConstants'
+import {BetterSequencerControls} from './BetterSequencerControls'
+import {clientSpaceToPercentages, getMaxPan, eventToNote, editorSpaceToPercentages, clientSpaceToEditorSpace} from './BetterSequencerHelpers'
 
 interface Props {
 	id: Id
@@ -47,13 +51,6 @@ const mouseWheelZoomXSensitivity = 0.01
 const mouseWheelZoomYSensitivity = 0.01
 const middleMousePanXSensitivity = 0.001
 const middleMousePanYSensitivity = 0.001
-
-const minZoomX = 1
-const maxZoomX = 20
-const minZoomY = 1
-const maxZoomY = 10
-const minPan = 0
-const maxPan = 1
 
 export const BetterSequencer = ({id}: Props) => {
 	const color = useSelector(createPositionColorSelector(id))
@@ -314,22 +311,6 @@ export const BetterSequencer = ({id}: Props) => {
 		}
 	}, [activateMiddleMouse, deactivateMiddleMouse, dispatch, height, id, middleMouseActive, pan, width, zoom])
 
-	const setZoomX = useCallback((_, newZoomX: number) => {
-		dispatch(sequencerActions.setZoom(id, {...zoom, x: newZoomX}))
-	}, [dispatch, id, zoom])
-
-	const setZoomY = useCallback((_, newZoomY: number) => {
-		dispatch(sequencerActions.setZoom(id, {...zoom, y: newZoomY}))
-	}, [dispatch, id, zoom])
-
-	const setPanX = useCallback((_, newPanX: number) => {
-		dispatch(sequencerActions.setPan(id, {...pan, x: newPanX}))
-	}, [dispatch, id, pan])
-
-	const setPanY = useCallback((_, newPanY: number) => {
-		dispatch(sequencerActions.setPan(id, {...pan, y: newPanY}))
-	}, [dispatch, id, pan])
-
 	const columnWidth = (width * zoom.x) / lengthBeats
 
 	// Key events
@@ -484,46 +465,7 @@ export const BetterSequencer = ({id}: Props) => {
 				It's better than you
 			`}
 		>
-			<div className="controls">
-				<Knob
-					defaultValue={1}
-					label={`Zoom X`}
-					min={minZoomX}
-					max={maxZoomX}
-					onChange={setZoomX}
-					tooltip={`zoom x`}
-					value={zoom.x}
-				/>
-				<Knob
-					defaultValue={1}
-					label={`Zoom Y`}
-					min={minZoomY}
-					max={maxZoomY}
-					onChange={setZoomY}
-					tooltip={`zoom Y`}
-					value={zoom.y}
-				/>
-				<Knob
-					defaultValue={1}
-					label={`Pan X`}
-					min={minPan}
-					max={maxPan}
-					onChange={setPanX}
-					tooltip={`pan x`}
-					value={pan.x}
-					valueString={percentageValueString}
-				/>
-				<Knob
-					defaultValue={1}
-					label={`Pan Y`}
-					min={minPan}
-					max={maxPan}
-					onChange={setPanY}
-					tooltip={`pan Y`}
-					value={pan.y}
-					valueString={percentageValueString}
-				/>
-			</div>
+			<BetterSequencerControls {...{id}} />
 			<div
 				className="editor"
 				ref={editorElement}
@@ -539,53 +481,3 @@ export const BetterSequencer = ({id}: Props) => {
 		</Panel>
 	)
 }
-
-function getMaxPan(length: number, zoom: number) {
-	return (length * zoom) - length
-}
-
-function clientSpaceToPercentages(
-	clientSpace: Point, nodePosition: Point, panPixels: Point, maxPanX: number,
-	maxPanY: number, width: number, height: number,
-) {
-	const editorSpace = clientSpaceToEditorSpace(clientSpace, nodePosition)
-
-	return editorSpaceToPercentages(
-		editorSpace, panPixels, maxPanX, maxPanY, width, height)
-}
-
-function editorSpaceToPercentages(
-	editorSpace: Point, panPixels: Point, maxPanX: number, maxPanY: number,
-	width: number, height: number,
-): Point {
-	const panSpace = {
-		x: (editorSpace.x + panPixels.x) / (maxPanX + width),
-		y: (editorSpace.y + panPixels.y) / (maxPanY + height),
-		centerY: (height / 2 + panPixels.y) / (maxPanY + height),
-	}
-
-	return panSpace
-}
-
-function clientSpaceToEditorSpace(
-	clientSpace: Point, nodePosition: Point,
-) {
-
-	const boardSpace = mouseFromScreenToBoard(clientSpace)
-
-	const nodeSpace = {
-		x: boardSpace.x - nodePosition.x,
-		y: boardSpace.y - nodePosition.y,
-	}
-
-	const nodeInfo = getNodeInfo().betterSequencer
-
-	const editorSpace = {
-		x: nodeSpace.x - nodeInfo.notesDisplayStartX,
-		y: nodeSpace.y,
-	}
-
-	return editorSpace
-}
-
-const eventToNote = (event: MidiClipEvent) => event.note

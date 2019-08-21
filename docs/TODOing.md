@@ -229,6 +229,7 @@
 - [√] double click to add note
 - [√] drag box around notes to select
 - [√] dont use transform scale on rows
+- [ ] make ECS obey panX
 - [ ] resizing shouldn't zoom
 - [ ] drag ends of notes to resize
 - [√] pan with middle mouse
@@ -240,6 +241,7 @@
 - [ ] ctrl + d to duplicate notes
 - [ ] make double click better
 - [ ] show notes on left side
+- [ ] fix shift box select
 
 
 
