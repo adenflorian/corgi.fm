@@ -2,6 +2,7 @@ import {List, Map, Set} from 'immutable'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {ECSCanvasRenderSystem} from './ECSCanvasRenderSystem'
 import {ECSComponentType, ECSEntity, ECSSystem} from './ECSTypes'
+import {clamp} from '@corgifm/common/common-utils';
 
 export class ECSSequencerRenderSystem extends ECSSystem {
 	public static readonly canvasIdPrefix = 'ECSCanvasRenderSystemCanvas-node-'
@@ -48,10 +49,16 @@ export class ECSSequencerRenderSystem extends ECSSystem {
 
 		const graphPosition = entity.getGraphPositionComponent()!
 
-		canvasContext.fillStyle = CssColor.defaultGray
+		const x = sequencerComp.notesDisplayStartX + (sequencerComp.notesDisplayWidth * sequencerComp.ratio) - 1
+
+		if (x >= sequencerComp.notesDisplayStartX) {
+			canvasContext.fillStyle = CssColor.defaultGray
+		} else {
+			canvasContext.fillStyle = '#0000'
+		}
 
 		canvasContext.fillRect(
-			sequencerComp.notesDisplayStartX + (sequencerComp.notesDisplayWidth * sequencerComp.ratio) - 1,
+			x,
 			0,
 			1,
 			graphPosition.height,

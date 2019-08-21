@@ -229,7 +229,7 @@
 - [√] double click to add note
 - [√] drag box around notes to select
 - [√] dont use transform scale on rows
-- [ ] make ECS obey panX
+- [√] make ECS obey panX
 - [ ] resizing shouldn't zoom
 - [ ] drag ends of notes to resize
 - [√] pan with middle mouse
@@ -242,8 +242,8 @@
 - [ ] make double click better
 - [ ] show notes on left side
 - [ ] fix shift box select
-
-
+- [ ] follow mode where it auto scrolls as song plays
+	- [ ] use request animation frame in an effect
 
 - [ ] filter resonance
 - [ ] make piano roll notes light up on grid seq when connected keyboard is playing those notes
@@ -262,7 +262,12 @@
 - [ ] dont select pad just by clicking on it
 - [√] make button on node's to quickly connect your keyboard to it
 	- shift + click header or right click and select "connect keyboard"
-
+- [ ] view hotkeys, home goes to start of chain and end goes to end
+- [ ] selection group hotkeys
+- [ ] RTS DAW
+	- [ ] order nodes to move around
+	- [ ] have to build new nodes at factories
+	- [ ] harvest resources
 
 snap nodes to grid
 	snap nodes together

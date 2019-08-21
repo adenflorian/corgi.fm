@@ -108,7 +108,7 @@ export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProp
 							bottom: 0,
 							left: 0,
 							pointerEvents: 'none',
-							zIndex: 2,
+							zIndex: 999999,
 							display: highQuality ? undefined : 'none',
 						}}
 						width={width}

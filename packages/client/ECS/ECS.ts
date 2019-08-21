@@ -79,9 +79,9 @@ function ecsLoop() {
 			new ECSSequencerComponent({
 				notesDisplayStartX: nodeInfo.notesDisplayStartX,
 				notesDisplayWidth: nodeInfo.notesDisplayWidth,
-				ratio: getSequencersSchedulerInfo()
+				ratio: (getSequencersSchedulerInfo()
 					.get(sequencer.id, {loopRatio: 0})
-					.loopRatio * sequencer.zoom.x,
+					.loopRatio * sequencer.zoom.x) - (sequencer.pan.x * (sequencer.zoom.x - 1)),
 				isPlaying: isSequencerNodeType(sequencer.type)
 					? selectSequencerIsPlaying(state.room, sequencer.id) && selectPosition(state.room, sequencer.id).enabled
 					: true,
