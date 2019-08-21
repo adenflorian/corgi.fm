@@ -238,6 +238,8 @@
 - [ ] change global pan to require middle clicking on background
 - [ ] click and drag notes around
 - [ ] ctrl + d to duplicate notes
+- [ ] make double click better
+- [ ] show notes on left side
 
 
 

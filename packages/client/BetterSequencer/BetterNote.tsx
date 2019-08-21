@@ -10,13 +10,11 @@ interface Props {
 	noteHeight: number
 	columnWidth: number
 	isSelected: boolean
-	// TODO Don't need this, use transform translate on parent
-	panPixels: Point
 	onNoteSelect: (eventId: Id, select: boolean, clear: boolean) => void
 }
 
 export const BetterNote = React.memo(({
-	id, event, noteHeight, columnWidth, panPixels, isSelected, onNoteSelect,
+	id, event, noteHeight, columnWidth, isSelected, onNoteSelect,
 }: Props) => {
 
 	const dispatch = useDispatch()
@@ -25,7 +23,7 @@ export const BetterNote = React.memo(({
 	return (
 		<div
 			key={event.id.toString()}
-			// Class must start with `note`
+			// Class must start with `note `
 			className={`note selected-${isSelected}`}
 			title={noteLabel}
 			onMouseDown={e => {
@@ -45,8 +43,8 @@ export const BetterNote = React.memo(({
 			style={{
 				width: event.durationBeats * columnWidth,
 				height: noteHeight - 1,
-				left: event.startBeat * columnWidth - panPixels.x,
-				top: ((128 - event.note) * noteHeight) - noteHeight - panPixels.y,
+				left: event.startBeat * columnWidth,
+				top: ((128 - event.note) * noteHeight) - noteHeight,
 			}}
 		>
 			<div

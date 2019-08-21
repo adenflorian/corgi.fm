@@ -156,7 +156,7 @@ export const BetterSequencer = ({id}: Props) => {
 	// Double click events
 	useEffect(() => {
 		const onDoubleClick = (e: MouseEvent) => {
-			if (e.target && typeof (e.target as HTMLElement).className === 'string' && (e.target as HTMLElement).className.startsWith('note')) {
+			if (e.target && typeof (e.target as HTMLElement).className === 'string' && (e.target as HTMLElement).className.startsWith('note ')) {
 				return
 			}
 			e.preventDefault()
@@ -587,6 +587,9 @@ export const BetterSequencer = ({id}: Props) => {
 				>
 					<div
 						className="scalable"
+						style={{
+							transform: `translate(${-panPixels.x}px, ${-panPixels.y}px)`,
+						}}
 						onMouseDown={e => {
 							if (e.button !== 0 || e.shiftKey) return
 							clearSelected()
