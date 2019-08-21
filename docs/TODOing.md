@@ -230,6 +230,7 @@
 - [√] drag box around notes to select
 - [√] dont use transform scale on rows
 - [√] make ECS obey panX
+- [ ] when moving group of notes with arrow keys, don't let them bunch up against bounds
 - [ ] resizing shouldn't zoom
 - [ ] drag ends of notes to resize
 - [√] pan with middle mouse
@@ -245,6 +246,7 @@
 - [ ] follow mode where it auto scrolls as song plays
 	- [ ] use request animation frame in an effect
 
+- [ ] when you control click on a node header, the selected node(s) becomes connected
 - [ ] filter resonance
 - [ ] make piano roll notes light up on grid seq when connected keyboard is playing those notes
 - [ ] select sample then knobs on right are for that sample

@@ -44,6 +44,10 @@ export class MidiClip extends makeMidiClip {}
 /** In clip time (beats); Means BPM has not been applied */
 export type MidiClipEvents = MidiClip['events']
 
+export function MidiClipEvents() {
+	return OrderedMap<Id, MidiClipEvent>()
+}
+
 // Start Global Midi Types
 
 /** In audio context time (seconds); Means BPM is already applied */

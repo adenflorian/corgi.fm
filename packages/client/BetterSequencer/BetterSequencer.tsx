@@ -17,7 +17,7 @@ import {
 	Key, MAX_MIDI_NOTE_NUMBER_127, MIN_MIDI_NOTE_NUMBER_0,
 } from '@corgifm/common/common-constants'
 import {clamp} from '@corgifm/common/common-utils'
-import {MidiClipEvent, makeMidiClipEvent} from '@corgifm/common/midi-types'
+import {MidiClipEvent, makeMidiClipEvent, MidiClipEvents} from '@corgifm/common/midi-types'
 import {Panel} from '../Panel/Panel'
 import {
 	seqLengthValueToString,
@@ -35,7 +35,11 @@ import {
 	minPan, maxPan, minZoomX, maxZoomX, minZoomY, maxZoomY,
 } from './BetterConstants'
 import {BetterSequencerControls} from './BetterSequencerControls'
-import {clientSpaceToPercentages, getMaxPan, eventToNote, editorSpaceToPercentages, clientSpaceToEditorSpace} from './BetterSequencerHelpers'
+import {
+	clientSpaceToPercentages, getMaxPan, eventToNote, editorSpaceToPercentages,
+	clientSpaceToEditorSpace,
+} from './BetterSequencerHelpers'
+import {logger} from '@sentry/utils';
 
 interface Props {
 	id: Id
@@ -313,118 +317,129 @@ export const BetterSequencer = ({id}: Props) => {
 
 	const columnWidth = (width * zoom.x) / lengthBeats
 
-	// Key events
-	useEffect(() => {
-		const onKeyDown = (e: KeyboardEvent) => {
+	const selectAll = useCallback(() => {
+		setSelected(midiClip.events.map(_ => true))
+	}, [setSelected, midiClip.events])
 
-			if (e.ctrlKey && e.key === Key.a) {
-				return setSelected(midiClip.events.map(_ => true))
+	const deleteSelected = useCallback(() => {
+		dispatch(betterSequencerActions.deleteEvents(id, selected.keySeq()))
+		setSelected(Map())
+	}, [dispatch, id, selected, setSelected])
+
+	const moveNotesVertically = useCallback((direction: 1 | -1, shift: boolean) => {
+		const updatedEvents = selected.reduce((events, _, eventId) => {
+			const originalEvent = midiClip.events.get(eventId, null)
+
+			if (originalEvent === null) {
+				logger.warn('[moveNotesVertically] originalEvent === null')
+				return events
 			}
 
-			if (e.key === Key.Delete) {
-				if (selected.count() === 0) return
+			const delta = (shift ? 12 : 1) * direction
 
-				dispatch(betterSequencerActions.deleteEvents(id, selected.keySeq()))
-				return setSelected(Map())
+			return events.set(eventId, {
+				...originalEvent,
+				note: Math.max(MIN_MIDI_NOTE_NUMBER_0, Math.min(MAX_MIDI_NOTE_NUMBER_127, originalEvent.note + delta)),
+			})
+		}, MidiClipEvents())
+
+		dispatch(betterSequencerActions.updateEvents(id, updatedEvents))
+		dispatch(localActions.playShortNote(id, updatedEvents.map(eventToNote).toSet()))
+	}, [dispatch, id, selected, midiClip.events])
+
+	const moveNotesHorizontally = useCallback((direction: 1 | -1, alt: boolean) => {
+		dispatch(betterSequencerActions.updateEvents(id, selected.reduce((events, _, eventId) => {
+			const originalEvent = midiClip.events.get(eventId, null)
+
+			if (originalEvent === null) {
+				logger.warn('[moveNotesHorizontally] originalEvent === null')
+				return events
 			}
 
-			if (e.key === Key.ArrowUp) {
-				e.preventDefault()
-				if (selected.count() === 0) return
+			const delta = (alt ? smallestNoteLength : 1) * direction
 
-				const updatedEvents = selected.reduce((events, _, eventId) => {
-					const originalEvent = midiClip.events.get(eventId, null)
-					if (originalEvent === null) throw new Error('originalEvent === null')
-					const delta = e.shiftKey
-						? 12
-						: 1
-					return events.set(eventId, {
-						...originalEvent,
-						note: Math.min(MAX_MIDI_NOTE_NUMBER_127, originalEvent.note + delta),
-					})
-				}, OrderedMap<Id, MidiClipEvent>())
+			return events.set(eventId, {
+				...originalEvent,
+				startBeat: Math.max(0, Math.min(lengthBeats - 1, originalEvent.startBeat + delta)),
+			})
+		}, MidiClipEvents())))
+	}, [dispatch, id, selected, midiClip.events, lengthBeats])
 
-				dispatch(betterSequencerActions.updateEvents(id, updatedEvents))
-				dispatch(localActions.playShortNote(id, updatedEvents.map(eventToNote).toSet()))
-				return
+	const resizeNotes = useCallback((direction: 1 | -1, alt: boolean) => {
+		dispatch(betterSequencerActions.updateEvents(id, selected.reduce((events, _, eventId) => {
+			const originalEvent = midiClip.events.get(eventId, null)
+
+			if (originalEvent === null) {
+				logger.warn('[resizeNotes] originalEvent === null')
+				return events
 			}
-			if (e.key === Key.ArrowDown) {
-				e.preventDefault()
-				if (selected.count() === 0) return
 
-				const updatedEvents = selected.reduce((events, _, eventId) => {
-					const originalEvent = midiClip.events.get(eventId, null)
-					if (originalEvent === null) throw new Error('originalEvent === null')
-					const delta = e.shiftKey
-						? 12
-						: 1
-					return events.set(eventId, {
-						...originalEvent,
-						note: Math.max(MIN_MIDI_NOTE_NUMBER_0, originalEvent.note - delta),
-					})
-				}, OrderedMap<Id, MidiClipEvent>())
+			const delta = (alt ? smallestNoteLength : 1) * direction
 
-				dispatch(betterSequencerActions.updateEvents(id, updatedEvents))
-				dispatch(localActions.playShortNote(id, updatedEvents.map(eventToNote).toSet()))
-				return
+			if (direction === 1 && originalEvent.durationBeats === smallestNoteLength && !alt) {
+				return events.set(eventId, {
+					...originalEvent,
+					durationBeats: 1,
+				})
+			} else {
+				return events.set(eventId, {
+					...originalEvent,
+					durationBeats: Math.max(smallestNoteLength, Math.min(8, originalEvent.durationBeats + delta))
+				})
 			}
-			if (e.key === Key.ArrowRight) {
-				e.preventDefault()
-				if (selected.count() === 0) return
+		}, OrderedMap<Id, MidiClipEvent>())))
+	}, [dispatch, id, selected, midiClip.events, lengthBeats])
+	
+	const onKeyDown = useCallback((e: KeyboardEvent) => {
 
-				dispatch(betterSequencerActions.updateEvents(id, selected.reduce((events, _, eventId) => {
-					const originalEvent = midiClip.events.get(eventId, null)
-					if (originalEvent === null) throw new Error('originalEvent === null')
-					const delta = e.altKey
-						? smallestNoteLength
-						: 1
-					if (e.shiftKey) {
-						if (originalEvent.durationBeats === smallestNoteLength && !e.altKey) {
-							return events.set(eventId, {
-								...originalEvent,
-								durationBeats: 1,
-							})
-						} else {
-							return events.set(eventId, {
-								...originalEvent,
-								durationBeats: Math.min(8, originalEvent.durationBeats + delta),
-							})
-						}
-					} else {
-						return events.set(eventId, {
-							...originalEvent,
-							startBeat: Math.min(lengthBeats - 1, originalEvent.startBeat + delta),
-						})
-					}
-				}, OrderedMap<Id, MidiClipEvent>())))
-				return
-			}
-			if (e.key === Key.ArrowLeft) {
-				e.preventDefault()
-				if (selected.count() === 0) return
-
-				dispatch(betterSequencerActions.updateEvents(id, selected.reduce((events, _, eventId) => {
-					const originalEvent = midiClip.events.get(eventId, null)
-					if (originalEvent === null) throw new Error('originalEvent === null')
-					const delta = e.altKey
-						? smallestNoteLength
-						: 1
-					if (e.shiftKey) {
-						return events.set(eventId, {
-							...originalEvent,
-							durationBeats: Math.max(smallestNoteLength, originalEvent.durationBeats - delta),
-						})
-					} else {
-						return events.set(eventId, {
-							...originalEvent,
-							startBeat: Math.max(0, originalEvent.startBeat - delta),
-						})
-					}
-				}, OrderedMap<Id, MidiClipEvent>())))
-				return
-			}
+		if (e.ctrlKey && e.key === Key.a) {
+			return selectAll()
 		}
 
+		if (e.key === Key.Delete) {
+			if (selected.count() === 0) return
+			return deleteSelected()
+		}
+
+		if (e.key === Key.ArrowUp) {
+			e.preventDefault()
+			if (selected.count() === 0) return
+			return moveNotesVertically(1, e.shiftKey)
+		}
+
+		if (e.key === Key.ArrowDown) {
+			e.preventDefault()
+			if (selected.count() === 0) return
+			return moveNotesVertically(-1, e.shiftKey)
+		}
+
+		if (e.key === Key.ArrowRight) {
+			e.preventDefault()
+			if (selected.count() === 0) return
+
+			if (e.shiftKey) {
+				resizeNotes(1, e.altKey)
+			} else {
+				moveNotesHorizontally(1, e.altKey)
+			}
+			return
+		}
+
+		if (e.key === Key.ArrowLeft) {
+			e.preventDefault()
+			if (selected.count() === 0) return
+
+			if (e.shiftKey) {
+				resizeNotes(-1, e.altKey)
+			} else {
+				moveNotesHorizontally(-1, e.altKey)
+			}
+			return
+		}
+	}, [id, lengthBeats, midiClip.events, selected, selectAll, deleteSelected, moveNotesVertically, moveNotesHorizontally, resizeNotes])
+
+	// Key events
+	useEffect(() => {
 		if (isNodeSelected) {
 			window.addEventListener('keydown', onKeyDown)
 		}
@@ -432,7 +447,7 @@ export const BetterSequencer = ({id}: Props) => {
 		return () => {
 			window.removeEventListener('keydown', onKeyDown)
 		}
-	}, [dispatch, id, isNodeSelected, lengthBeats, midiClip.events, selected])
+	}, [isNodeSelected, onKeyDown])
 
 	const onNoteSelect = useCallback(
 		(eventId: Id, select: boolean, clear: boolean) => {
