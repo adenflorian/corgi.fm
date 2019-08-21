@@ -22,7 +22,6 @@ import {Panel} from '../Panel/Panel'
 import {
 	seqLengthValueToString, percentageValueString,
 } from '../client-constants'
-import {isWhiteKey} from '../Keyboard/Keyboard'
 import {Knob} from '../Knob/Knob'
 import './BetterSequencer.less'
 import {
@@ -30,15 +29,15 @@ import {
 } from '../SimpleGlobalClientState'
 import {useBoolean} from '../react-hooks'
 import {BoxSelect} from './BoxSelect'
-import {BetterNote} from './BetterNote'
+import {BetterRows} from './BetterRows'
+import {BetterColumns} from './BetterColumns'
+import {BetterNotes} from './BetterNotes'
 
 interface Props {
 	id: Id
 }
 
 const smallestNoteLength = 1 / 64
-
-const rows = new Array(128).fill(0)
 
 const controlsWidth = 64
 
@@ -61,7 +60,7 @@ export const BetterSequencer = ({id}: Props) => {
 	const isRecording = useSelector(createBetterSeqIsRecordingSelector(id))
 	const isPlaying = useSelector(createBetterSeqIsPlayingSelector(id))
 	const rate = useSelector(createBetterSeqRateSelector(id))
-	const length = useSelector(createBetterSeqLengthSelector(id))
+	const lengthBeats = useSelector(createBetterSeqLengthSelector(id))
 	const zoom = useSelector(createBetterSeqZoomSelector(id))
 	const pan = useSelector(createBetterSeqPanSelector(id))
 	const midiClip = useSelector(createBetterSeqMidiClipSelector(id))
@@ -82,13 +81,11 @@ export const BetterSequencer = ({id}: Props) => {
 	// Middle mouse pan
 	const [middleMouseActive, activateMiddleMouse, deactivateMiddleMouse] = useBoolean(false)
 
-	const nodeInfo = getNodeInfo().betterSequencer
-
 	const editorElement = useRef<HTMLDivElement>(null)
 
-	const scaledHeight = height * zoom.y
+	const dispatch = useDispatch()
 
-	const panYOffset = (scaledHeight - height) / 2
+	const scaledHeight = height * zoom.y
 
 	const maxPanY = getMaxPan(height, zoom.y)
 	const maxPanX = getMaxPan(width, zoom.x)
@@ -98,8 +95,6 @@ export const BetterSequencer = ({id}: Props) => {
 	}
 
 	const noteHeight = scaledHeight / 128
-
-	const dispatch = useDispatch()
 
 	// Wheel events
 	useEffect(() => {
@@ -165,7 +160,7 @@ export const BetterSequencer = ({id}: Props) => {
 			const bar = clientSpaceToPercentages({x: e.clientX, y: e.clientY}, {x, y}, panPixels, maxPanX, maxPanY, width, height)
 
 			const note = 127 - Math.floor(bar.y * 128)
-			const startBeat = Math.floor(bar.x * length)
+			const startBeat = Math.floor(bar.x * lengthBeats)
 
 			const newEvent = makeMidiClipEvent({
 				durationBeats: 1,
@@ -191,7 +186,7 @@ export const BetterSequencer = ({id}: Props) => {
 				editorElementNotNull.removeEventListener('dblclick', onDoubleClick)
 			}
 		}
-	}, [dispatch, height, id, length, maxPanX, maxPanY, panPixels, selected, width, x, y])
+	}, [dispatch, height, id, lengthBeats, maxPanX, maxPanY, panPixels, selected, width, x, y])
 
 	// Box Select
 	useLayoutEffect(() => {
@@ -228,8 +223,8 @@ export const BetterSequencer = ({id}: Props) => {
 			const box = {
 				top: 127 - Math.floor(Math.min(originPercentages.y, otherCornerPercentages.y) * 128),
 				bottom: 127 - Math.floor(Math.max(originPercentages.y, otherCornerPercentages.y) * 128),
-				left: Math.min(originPercentages.x, otherCornerPercentages.x) * length,
-				right: Math.max(originPercentages.x, otherCornerPercentages.x) * length,
+				left: Math.min(originPercentages.x, otherCornerPercentages.x) * lengthBeats,
+				right: Math.max(originPercentages.x, otherCornerPercentages.x) * lengthBeats,
 			}
 
 			setSelected(
@@ -263,7 +258,7 @@ export const BetterSequencer = ({id}: Props) => {
 			}
 			window.removeEventListener('mouseup', onMouseUp)
 		}
-	}, [activateBox, boxActive, boxOrigin, deactivateBox, height, length, maxPanX, maxPanY, midiClip.events, otherCorner, panPixels, width, x, y, selected])
+	}, [activateBox, boxActive, boxOrigin, deactivateBox, height, lengthBeats, maxPanX, maxPanY, midiClip.events, otherCorner, panPixels, width, x, y, selected])
 
 	// Middle mouse pan
 	useLayoutEffect(() => {
@@ -335,9 +330,7 @@ export const BetterSequencer = ({id}: Props) => {
 		dispatch(sequencerActions.setPan(id, {...pan, y: newPanY}))
 	}, [dispatch, id, pan])
 
-	const columns = new Array(length).fill(0)
-
-	const columnWidth = (width * zoom.x) / length
+	const columnWidth = (width * zoom.x) / lengthBeats
 
 	// Key events
 	useEffect(() => {
@@ -419,7 +412,7 @@ export const BetterSequencer = ({id}: Props) => {
 					} else {
 						return events.set(eventId, {
 							...originalEvent,
-							startBeat: Math.min(length - 1, originalEvent.startBeat + delta),
+							startBeat: Math.min(lengthBeats - 1, originalEvent.startBeat + delta),
 						})
 					}
 				}, OrderedMap<Id, MidiClipEvent>())))
@@ -458,7 +451,7 @@ export const BetterSequencer = ({id}: Props) => {
 		return () => {
 			window.removeEventListener('keydown', onKeyDown)
 		}
-	}, [dispatch, id, isNodeSelected, length, midiClip.events, selected])
+	}, [dispatch, id, isNodeSelected, lengthBeats, midiClip.events, selected])
 
 	const onNoteSelect = useCallback(
 		(eventId: Id, select: boolean, clear: boolean) => {
@@ -482,9 +475,11 @@ export const BetterSequencer = ({id}: Props) => {
 				recording-${isRecording}
 			`}
 			saturate={isPlaying}
-			extra={seqLengthValueToString(rate / 4 * length)}
+			extra={seqLengthValueToString(rate / 4 * lengthBeats)}
 			helpText={stripIndents`
 				Better Sequencer
+
+				By the Better Beats Bureau
 
 				It's better than you
 			`}
@@ -533,87 +528,9 @@ export const BetterSequencer = ({id}: Props) => {
 				className="editor"
 				ref={editorElement}
 			>
-				<div className="rows">
-					<div
-						className="scalable"
-						style={{
-							transform: `translateY(${-panPixels.y}px)`,
-						}}
-					>
-						{rows.map((_, note) => {
-							return (
-								<div
-									key={note}
-									className={`row note-${note}`}
-									style={{
-										backgroundColor: isWhiteKey(note) ? '#4444' : '#0000',
-										height: noteHeight,
-									}}
-								/>
-							)
-						})}
-					</div>
-				</div>
-				<div className="columns">
-					<div
-						className="scalable"
-						style={{
-							transform: `translateX(${-panPixels.x}px)`,
-						}}
-					>
-						{columns.map((_, beat) => {
-							return (
-								<div
-									key={beat}
-									className={`column beat-${beat}`}
-									style={{
-										width: columnWidth,
-										// backgroundColor: note % 4 === 0 ? '#0000' : '#3333',
-									}}
-								>
-									<div
-										className="line"
-										style={{
-											// backgroundColor: '#3333',
-										}}
-									/>
-								</div>
-							)
-						})}
-					</div>
-				</div>
-				<div
-					className="notes"
-				>
-					<div
-						className="scalable"
-						style={{
-							transform: `translate(${-panPixels.x}px, ${-panPixels.y}px)`,
-						}}
-						onMouseDown={e => {
-							if (e.button !== 0 || e.shiftKey) return
-							clearSelected()
-						}}
-					>
-						{midiClip.events.map(event => {
-							const isSelected = selected.get(event.id) || false
-							return (
-								<BetterNote
-									key={event.id.toString()}
-									{...{
-										id,
-										event,
-										noteHeight,
-										columnWidth,
-										isSelected,
-										panPixels,
-										onNoteSelect,
-									}}
-								/>
-							)
-						}).toList()}
-					</div>
-				</div>
+				<BetterRows {...{noteHeight, panPixelsY: panPixels.y}} />
+				<BetterColumns {...{columnWidth, lengthBeats, panPixelsX: panPixels.x}} />
+				<BetterNotes {...{id, noteHeight, columnWidth, midiClip, onNoteSelect, clearSelected, panPixels, selected}} />
 				{boxActive && <BoxSelect
 					origin={boxOrigin}
 					otherCorner={otherCorner}
