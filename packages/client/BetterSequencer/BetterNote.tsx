@@ -13,7 +13,7 @@ interface Props {
 	columnWidth: number
 	isSelected: boolean
 	onNoteSelect: (eventId: Id, select: boolean, clear: boolean) => void
-	handleMouseDown: (direction: 'left' | 'right', eventId: Id) => void
+	handleMouseDown: (direction: 'left' | 'right' | 'center', eventId: Id) => void
 }
 
 export const BetterNote = React.memo(({
@@ -24,10 +24,6 @@ export const BetterNote = React.memo(({
 	const noteLabel = midiNoteToNoteNameFull(event.note)
 
 	const mainRef = useRef<HTMLDivElement>(null)
-
-	const selectNote = useCallback(() => {
-		onNoteSelect(event.id, true, false)
-	}, [onNoteSelect, event.id])
 
 	useLayoutEffect(() => {
 
@@ -86,7 +82,7 @@ export const BetterNote = React.memo(({
 			>
 				{noteLabel}
 			</div>
-			<BetterNoteResizer {...{id, handleMouseDown, selectNote, eventId: event.id}} />
+			<BetterNoteResizer {...{id, handleMouseDown, eventId: event.id}} />
 		</div>
 	)
 })

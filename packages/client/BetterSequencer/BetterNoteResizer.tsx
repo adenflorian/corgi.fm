@@ -4,20 +4,18 @@ import './BetterNoteResizer.less'
 interface Props {
 	id: Id
 	eventId: Id
-	handleMouseDown: (direction: 'left' | 'right', eventId: Id) => void
-	selectNote: () => void
+	handleMouseDown: (direction: 'left' | 'right' | 'center', eventId: Id) => void
 }
-
-const overlap = 8
 
 const debug = false
 
 export const BetterNoteResizer = React.memo(({
-	id, handleMouseDown, selectNote, eventId,
+	id, handleMouseDown, eventId,
 }: Props) => {
 
 	const leftRef = useRef<HTMLDivElement>(null)
 	const rightRef = useRef<HTMLDivElement>(null)
+	const centerRef = useRef<HTMLDivElement>(null)
 
 	useLayoutEffect(() => {
 		const onMouseDownLeft = (e: MouseEvent) => {
@@ -28,20 +26,27 @@ export const BetterNoteResizer = React.memo(({
 			e.stopPropagation()
 			handleMouseDown('right', eventId)
 		}
+		const onMouseDownCenter = (e: MouseEvent) => {
+			e.stopPropagation()
+			handleMouseDown('center', eventId)
+		}
 
 		const leftElement = leftRef.current
 		const rightElement = rightRef.current
+		const centerElement = centerRef.current
 
-		if (leftElement === null || rightElement === null) return
+		if (leftElement === null || rightElement === null || centerElement === null) return
 
 		leftElement.addEventListener('mousedown', onMouseDownLeft)
 		rightElement.addEventListener('mousedown', onMouseDownRight)
+		centerElement.addEventListener('mousedown', onMouseDownCenter)
 
 		return () => {
 			leftElement.removeEventListener('mousedown', onMouseDownLeft)
 			rightElement.removeEventListener('mousedown', onMouseDownRight)
+			centerElement.removeEventListener('mousedown', onMouseDownCenter)
 		}
-	}, [handleMouseDown])
+	}, [eventId, handleMouseDown])
 
 	return (
 		<div
@@ -68,6 +73,7 @@ export const BetterNoteResizer = React.memo(({
 				/>
 				<div
 					className="resizeHandle mid"
+					ref={centerRef}
 				/>
 				<div
 					style={{pointerEvents: 'all', backgroundColor: debug ? 'green' : undefined, cursor: 'e-resize'}}
