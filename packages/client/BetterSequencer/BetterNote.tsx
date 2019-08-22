@@ -14,6 +14,7 @@ interface Props {
 	onNoteSelect: (eventId: Id, select: boolean, clear: boolean) => void
 	handleMouseDown: (direction: 'left' | 'right', eventId: Id) => void
 }
+const x = []
 
 export const BetterNote = React.memo(({
 	id, event, noteHeight, columnWidth, isSelected, onNoteSelect, handleMouseDown,

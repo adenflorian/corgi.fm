@@ -40,5 +40,6 @@ export const Key = {
 	ArrowLeft: 'ArrowLeft',
 	Delete: 'Delete',
 	a: 'a',
+	d: 'd',
 	Control: 'Control',
 } as const

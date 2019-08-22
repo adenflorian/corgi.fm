@@ -247,6 +247,7 @@
 	- [ ] use request animation frame in an effect
 - [ ] don't save every undo when click drag resizing
 - [ ] remove note border when small
+- [ ] when selected changes in any way, remove overlapped notes and stuff, like ableton
 
 - [ ] when you control click on a node header, the selected node(s) becomes connected
 - [ ] filter resonance

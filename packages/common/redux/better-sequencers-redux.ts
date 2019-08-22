@@ -48,6 +48,13 @@ export const betterSequencerActions = {
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	} as const),
+	addEvents: (id: Id, events: MidiClipEvents) => ({
+		type: 'ADD_BETTER_SEQUENCER_EVENTS',
+		id,
+		events,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	} as const),
 	deleteEvents: (id: Id, idsToDelete: Iterable<Id>) => ({
 		type: 'DELETE_BETTER_SEQUENCER_EVENTS',
 		id,
@@ -163,6 +170,7 @@ const betterSequencerActionTypes2: BetterSequencerActionTypes = {
 	UPDATE_BETTER_SEQUENCER_EVENTS: 0,
 	DELETE_BETTER_SEQUENCER_EVENTS: 0,
 	ADD_BETTER_SEQUENCER_EVENT: 0,
+	ADD_BETTER_SEQUENCER_EVENTS: 0,
 }
 
 const betterSequencerActionTypes = Object.keys(betterSequencerActionTypes2)
@@ -212,6 +220,13 @@ const betterSequencerReducer =
 				...betterSequencer,
 				midiClip: betterSequencer.midiClip.update('events', events => {
 					return events.set(action.event.id, action.event)
+				}),
+				previousEvents: betterSequencer.previousEvents.unshift(betterSequencer.midiClip.events),
+			}
+			case 'ADD_BETTER_SEQUENCER_EVENTS': return {
+				...betterSequencer,
+				midiClip: betterSequencer.midiClip.update('events', events => {
+					return events.merge(action.events)
 				}),
 				previousEvents: betterSequencer.previousEvents.unshift(betterSequencer.midiClip.events),
 			}

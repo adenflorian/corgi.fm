@@ -27,6 +27,7 @@ import {
 	makeMouseMovementAccountForGlobalZoom,
 } from '../SimpleGlobalClientState'
 import {useBoolean} from '../react-hooks'
+import {logger} from '../client-logger'
 import {BoxSelect} from './BoxSelect'
 import {BetterRows} from './BetterRows'
 import {BetterColumns} from './BetterColumns'
@@ -39,7 +40,6 @@ import {
 	clientSpaceToPercentages, getMaxPan, eventToNote, editorSpaceToPercentages,
 	clientSpaceToEditorSpace,
 } from './BetterSequencerHelpers'
-import {logger} from '@sentry/utils';
 
 interface Props {
 	id: Id
@@ -318,6 +318,28 @@ export const BetterSequencer = ({id}: Props) => {
 		setSelected(midiClip.events.map(_ => true))
 	}, [setSelected, midiClip.events])
 
+	const duplicateNotes = useCallback(() => {
+		const eventsToCopy = midiClip.events
+			.filter(event => selected.get(event.id) === true)
+
+		const smallX = eventsToCopy.map(e => e.startBeat).min() || 0
+		const bigX = eventsToCopy.map(e => e.startBeat + e.durationBeats).max() || 0
+		const diff = bigX - smallX
+
+		if (diff === 0) return
+
+		const newEvents = eventsToCopy
+			.reduce((result, event) => {
+				const newEvent = makeMidiClipEvent({
+					...event,
+					startBeat: event.startBeat + diff,
+				})
+				return result.set(newEvent.id, newEvent)
+			}, MidiClipEvents())
+		dispatch(betterSequencerActions.addEvents(id, newEvents))
+		setSelected(newEvents.map(_ => true))
+	}, [midiClip.events, dispatch, id, selected])
+
 	const deleteSelected = useCallback(() => {
 		dispatch(betterSequencerActions.deleteEvents(id, selected.keySeq()))
 		setSelected(Map())
@@ -381,16 +403,24 @@ export const BetterSequencer = ({id}: Props) => {
 			} else {
 				return events.set(eventId, {
 					...originalEvent,
-					durationBeats: Math.max(smallestNoteLength, Math.min(8, originalEvent.durationBeats + delta))
+					durationBeats: Math.max(smallestNoteLength, Math.min(8, originalEvent.durationBeats + delta)),
 				})
 			}
 		}, OrderedMap<Id, MidiClipEvent>())))
-	}, [dispatch, id, selected, midiClip.events, lengthBeats])
-	
+	}, [dispatch, id, selected, midiClip.events])
+
 	const onKeyDown = useCallback((e: KeyboardEvent) => {
 
 		if (e.ctrlKey && e.key === Key.a) {
 			return selectAll()
+		}
+
+		if (e.ctrlKey && e.key === Key.d) {
+			// Prevent the whole node from getting duplicated
+			e.stopPropagation()
+			// Prevent bookmark from being created
+			e.preventDefault()
+			return duplicateNotes()
 		}
 
 		if (e.key === Key.Delete) {
@@ -433,16 +463,20 @@ export const BetterSequencer = ({id}: Props) => {
 			}
 			return
 		}
-	}, [id, lengthBeats, midiClip.events, selected, selectAll, deleteSelected, moveNotesVertically, moveNotesHorizontally, resizeNotes])
+	}, [selected, selectAll, deleteSelected, moveNotesVertically, moveNotesHorizontally, resizeNotes, duplicateNotes])
 
 	// Key events
 	useEffect(() => {
+		const editorElement2 = editorElement.current
+
+		if (editorElement2 === null) return
+
 		if (isNodeSelected) {
-			window.addEventListener('keydown', onKeyDown)
+			editorElement2.addEventListener('keydown', onKeyDown)
 		}
 
 		return () => {
-			window.removeEventListener('keydown', onKeyDown)
+			editorElement2.removeEventListener('keydown', onKeyDown)
 		}
 	}, [isNodeSelected, onKeyDown])
 
@@ -481,6 +515,7 @@ export const BetterSequencer = ({id}: Props) => {
 			<div
 				className="editor"
 				ref={editorElement}
+				tabIndex={-1}
 			>
 				<BetterRows {...{noteHeight, panPixelsY: panPixels.y}} />
 				<BetterColumns {...{columnWidth, lengthBeats, panPixelsX: panPixels.x}} />
