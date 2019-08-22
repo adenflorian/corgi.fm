@@ -4,8 +4,9 @@ import {Map} from 'immutable'
 import {MidiClip, MidiClipEvents} from '@corgifm/common/midi-types'
 import {betterSequencerActions, sequencerActions} from '@corgifm/common/redux'
 import {smallestNoteLength} from '@corgifm/common/BetterConstants'
+import {sumPoints} from '@corgifm/common/common-utils'
 import {BetterNote} from './BetterNote'
-import {movementXToBeats} from './BetterSequencerHelpers'
+import {movementXToBeats, movementToBeats} from './BetterSequencerHelpers'
 
 interface Props {
 	id: Id
@@ -17,29 +18,30 @@ interface Props {
 	onNoteSelect: (eventId: Id, select: boolean, clear: boolean) => void
 	clearSelected: () => void
 	lengthBeats: number
-	zoomX: number
+	zoom: Point
 	width: number
+	height: number
 }
 
 export const BetterNotes = (props: Props) => {
 	const {
 		id, panPixels, noteHeight, columnWidth, selected, onNoteSelect,
-		clearSelected, midiClip, lengthBeats, zoomX, width,
+		clearSelected, midiClip, lengthBeats, zoom, width, height,
 	} = props
 
 	const [noteResizeActive, setNoteResizeActive] = useState<false | 'left' | 'right'>(false)
 	const [noteMoveActive, setNoteMoveActive] = useState(false)
-	const [persistentDelta, setPersistentDelta] = useState(0)
+	const [persistentDelta, setPersistentDelta] = useState({x: 0, y: 0})
 	const [startEvents, setStartEvents] = useState(MidiClipEvents())
 
 	const dispatch = useDispatch()
 
-	const onMouseMove = useCallback((tempDelta: number) => {
+	const resizeNotes = useCallback((movementX: number) => {
 		if (!noteResizeActive) return
 
-		const newPersistentDelta = persistentDelta + tempDelta
+		const newPersistentDelta = {x: persistentDelta.x + movementX, y: 0}
 		const direction = noteResizeActive === 'left' ? -1 : 1
-		const doo = movementXToBeats(newPersistentDelta, lengthBeats, zoomX, width) * direction
+		const doo = movementXToBeats(newPersistentDelta.x, lengthBeats, zoom.x, width) * direction
 
 		const updatedEvents = startEvents.map(event => {
 			return {
@@ -53,18 +55,28 @@ export const BetterNotes = (props: Props) => {
 
 		dispatch(betterSequencerActions.updateEvents(id, updatedEvents, false))
 		setPersistentDelta(newPersistentDelta)
-	}, [noteResizeActive, persistentDelta, lengthBeats, zoomX, width, startEvents, dispatch, id])
+	}, [noteResizeActive, persistentDelta, lengthBeats, zoom.x, width, startEvents, dispatch, id])
 
-	const startNoteResizing = useCallback((direction: 'left' | 'right', eventId: Id) => {
-		if (selected.get(eventId) !== true) {
-			onNoteSelect(eventId, true, true)
-			setStartEvents(midiClip.events.filter(x => x.id === eventId))
-		} else {
-			setStartEvents(midiClip.events.filter(x => selected.get(x.id) === true || x.id === eventId))
-		}
+	const moveNotes = useCallback((movement: Point) => {
+		if (!noteMoveActive) return
+
+		const newPersistentDelta = sumPoints(persistentDelta, movement)
+		const doo = movementToBeats(newPersistentDelta, lengthBeats, zoom, width, height)
+
+		const updatedEvents = startEvents.map(event => {
+			return {
+				...event,
+				startBeat: Math.max(0, Math.min(lengthBeats - smallestNoteLength, event.startBeat + doo.x)),
+			}
+		})
+
+		dispatch(betterSequencerActions.updateEvents(id, updatedEvents, false))
+		setPersistentDelta(newPersistentDelta)
+	}, [noteMoveActive, persistentDelta, lengthBeats, zoom, width, height, startEvents, dispatch, id])
+
+	const startNoteResizing = useCallback((direction: 'left' | 'right') => {
 		setNoteResizeActive(direction)
-		dispatch(sequencerActions.saveUndo(id))
-	}, [dispatch, id, midiClip.events, onNoteSelect, selected])
+	}, [])
 
 	const stopNoteResizing = useCallback(() => {
 		setNoteResizeActive(false)
@@ -74,38 +86,49 @@ export const BetterNotes = (props: Props) => {
 		setNoteMoveActive(true)
 	}, [])
 
+	const stopNoteMoving = useCallback(() => {
+		setNoteMoveActive(false)
+	}, [])
+
 	const handleMouseDown = useCallback((direction: 'left' | 'right' | 'center', eventId: Id) => {
-		setPersistentDelta(0)
+		dispatch(sequencerActions.saveUndo(id))
+		setPersistentDelta({x: 0, y: 0})
+		if (selected.get(eventId) !== true) {
+			onNoteSelect(eventId, true, true)
+			setStartEvents(midiClip.events.filter(x => x.id === eventId))
+		} else {
+			setStartEvents(midiClip.events.filter(x => selected.get(x.id) === true || x.id === eventId))
+		}
 		if (direction !== 'center') {
-			startNoteResizing(direction, eventId)
+			startNoteResizing(direction)
 		} else {
 			startNoteMoving()
 		}
-	}, [startNoteMoving, startNoteResizing])
+	}, [dispatch, id, midiClip.events, onNoteSelect, selected, startNoteMoving, startNoteResizing])
 
 	// Note mouse resize
 	useLayoutEffect(() => {
-		const foo = (e: MouseEvent) => {
-			if (e.buttons !== 1) return stopNoteResizing()
-			onMouseMove(e.movementX)
+		const stopActive = () => {
+			if (noteResizeActive) return stopNoteResizing()
+			if (noteMoveActive) return stopNoteMoving()
 		}
 
-		const onMouseUp = () => {
-			if (noteResizeActive) {
-				stopNoteResizing()
-			}
+		const onMouseMove = (e: MouseEvent) => {
+			if (e.buttons !== 1) return stopActive()
+			if (noteResizeActive) return resizeNotes(e.movementX)
+			if (noteMoveActive) return moveNotes(getMovement(e))
 		}
 
-		if (noteResizeActive) {
-			window.addEventListener('mousemove', foo)
-			window.addEventListener('mouseup', onMouseUp)
+		if (noteResizeActive || noteMoveActive) {
+			window.addEventListener('mousemove', onMouseMove)
+			window.addEventListener('mouseup', stopActive)
 		}
 
 		return () => {
-			window.removeEventListener('mousemove', foo)
-			window.removeEventListener('mouseup', onMouseUp)
+			window.removeEventListener('mousemove', onMouseMove)
+			window.removeEventListener('mouseup', stopActive)
 		}
-	}, [onMouseMove, noteResizeActive, stopNoteResizing])
+	}, [resizeNotes, noteMoveActive, noteResizeActive, stopNoteMoving, stopNoteResizing, moveNotes])
 
 	return (
 		<div
@@ -142,4 +165,11 @@ export const BetterNotes = (props: Props) => {
 			</div>
 		</div>
 	)
+}
+
+function getMovement(e: MouseEvent) {
+	return {
+		x: e.movementX,
+		y: e.movementY,
+	} as const
 }

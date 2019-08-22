@@ -533,8 +533,9 @@ export const BetterSequencer = ({id}: Props) => {
 						panPixels,
 						selected,
 						width,
+						height,
 						lengthBeats,
-						zoomX: zoom.x,
+						zoom,
 					}}
 				/>
 				{boxActive && <BoxSelect

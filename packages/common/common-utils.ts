@@ -2,9 +2,9 @@ import * as path from 'path'
 import {debounce} from 'lodash'
 import {Map} from 'immutable'
 import {allowedSampleUploadFileExtensions} from './common-constants'
+import {MidiClipEvents} from './midi-types'
 
 import uuid = require('uuid')
-import {MidiClipEvents} from './midi-types';
 
 export function pickRandomArrayElement<T>(array: readonly T[]): T {
 	return array[Math.floor(Math.random() * array.length)]
@@ -197,4 +197,15 @@ export function findHighestNote(events: MidiClipEvents): number {
 	}
 
 	return highest
+}
+
+export function sumPoints(...points: Point[]) {
+	return points.reduce(_sumPoints)
+}
+
+function _sumPoints(a: Point, b: Point) {
+	return {
+		x: a.x + b.x,
+		y: a.y + b.y,
+	}
 }

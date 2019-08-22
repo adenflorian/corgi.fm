@@ -72,6 +72,7 @@ export const BetterNoteResizer = React.memo(({
 					ref={leftRef}
 				/>
 				<div
+					style={{pointerEvents: 'all'}}
 					className="resizeHandle mid"
 					ref={centerRef}
 				/>
