@@ -239,15 +239,19 @@
 - [ ] box select while holding shift should flip selected notes like ableton
 - [ ] change global pan to require middle clicking on background
 - [ ] click and drag notes around
-- [ ] ctrl + d to duplicate notes
+- [√] ctrl + d to duplicate notes
+	- [ ] use range selection to determine new note start point, like ableton
 - [ ] make double click better
 - [ ] show notes on left side
 - [ ] fix shift box select
 - [ ] follow mode where it auto scrolls as song plays
 	- [ ] use request animation frame in an effect
 - [ ] don't save every undo when click drag resizing
-- [ ] remove note border when small
+- [√] remove note border when small
 - [ ] when selected changes in any way, remove overlapped notes and stuff, like ableton
+- [ ] mouse note resize snapping
+- [ ] add more/less vertical bars depending on zoomX
+- [ ] note shadows?
 
 - [ ] when you control click on a node header, the selected node(s) becomes connected
 - [ ] filter resonance

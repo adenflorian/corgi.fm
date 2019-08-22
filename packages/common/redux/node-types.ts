@@ -175,7 +175,7 @@ const nodeInfo: NodeInfoMap = {
 		isNodeCloneable: true,
 		canHaveKeyboardConnectedToIt: true,
 		defaultWidth: 688,
-		defaultHeight: 88 * 4,
+		defaultHeight: 128 * 3,
 		notesDisplayStartX: 64,
 		notesDisplayWidth: 688 - 64,
 		isResizable: true,

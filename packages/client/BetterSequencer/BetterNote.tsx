@@ -14,7 +14,6 @@ interface Props {
 	onNoteSelect: (eventId: Id, select: boolean, clear: boolean) => void
 	handleMouseDown: (direction: 'left' | 'right', eventId: Id) => void
 }
-const x = []
 
 export const BetterNote = React.memo(({
 	id, event, noteHeight, columnWidth, isSelected, onNoteSelect, handleMouseDown,
@@ -58,26 +57,30 @@ export const BetterNote = React.memo(({
 			noteElement.removeEventListener('dblclick', onDoubleClick)
 			noteElement.removeEventListener('mousedown', onMouseDown)
 		}
-	}, [onNoteSelect, event.id, isSelected, id])
+	}, [onNoteSelect, event.id, isSelected, id, dispatch])
+
+	const tiny = noteHeight <= 10
+	const small = noteHeight <= 27
 
 	return (
 		<div
 			key={event.id.toString()}
-			// Class must start with `note `
 			className={`note selected-${isSelected}`}
 			title={noteLabel}
 			style={{
 				width: event.durationBeats * columnWidth,
-				height: noteHeight - 1,
+				height: noteHeight - (tiny ? 0 : 2),
 				left: event.startBeat * columnWidth,
 				top: ((128 - event.note) * noteHeight) - noteHeight,
+				border: tiny && !isSelected ? 'none' : undefined,
+				borderRadius: tiny ? 0 : undefined,
 			}}
 			ref={mainRef}
 		>
 			<div
 				className="noteLabel"
 				style={{
-					display: noteHeight <= 27 ? 'none' : undefined,
+					display: small ? 'none' : undefined,
 				}}
 			>
 				{noteLabel}
