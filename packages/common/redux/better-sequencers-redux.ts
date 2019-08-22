@@ -131,8 +131,8 @@ export class BetterSequencerState extends SequencerStateBase {
 			true,
 			1,
 			1,
-			{x: 1, y: 10},
-			{x: 0, y: 0.5},
+			{x: 1, y: 6},
+			{x: 0, y: 0.42},
 		)
 	}
 }

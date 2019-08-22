@@ -3,8 +3,8 @@ import {useDispatch} from 'react-redux'
 import {Map} from 'immutable'
 import {MidiClip, MidiClipEvents} from '@corgifm/common/midi-types'
 import {betterSequencerActions} from '@corgifm/common/redux'
+import {smallestNoteLength} from '@corgifm/common/BetterConstants'
 import {BetterNote} from './BetterNote'
-import {smallestNoteLength} from './BetterConstants'
 import {movementXToBeats} from './BetterSequencerHelpers'
 
 interface ActiveInfo {
@@ -30,7 +30,7 @@ export const BetterNotes = (props: Props) => {
 		id, panPixels, noteHeight, columnWidth, selected, onNoteSelect,
 		clearSelected, midiClip, lengthBeats, zoomX, width,
 	} = props
-	
+
 	const [active, setActive] = useState<false | 'left' | 'right'>(false)
 	const [persistentDelta, setPersistentDelta] = useState(0)
 	const [startEvents, setStartEvents] = useState(MidiClipEvents())
@@ -54,14 +54,14 @@ export const BetterNotes = (props: Props) => {
 				durationBeats: Math.max(smallestNoteLength, Math.min(lengthBeats, event.durationBeats + doo)),
 				startBeat: active === 'left'
 					? Math.min(event.startBeat + event.durationBeats, event.startBeat - doo)
-					: event.startBeat
+					: event.startBeat,
 			}
 		})
 
 		dispatch(betterSequencerActions.updateEvents(id, updatedEvents))
 
 		setPersistentDelta(newPersistentDelta)
-	}, [active, persistentDelta, dispatch, id, startEvents])
+	}, [active, persistentDelta, lengthBeats, zoomX, width, startEvents, dispatch, id])
 
 	const setInactive = useCallback(() => {
 		setActive(false)

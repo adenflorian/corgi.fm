@@ -18,6 +18,10 @@ import {
 } from '@corgifm/common/common-constants'
 import {clamp} from '@corgifm/common/common-utils'
 import {MidiClipEvent, makeMidiClipEvent, MidiClipEvents} from '@corgifm/common/midi-types'
+import {midiNoteToNoteNameFull} from '@corgifm/common/common-samples-stuff'
+import {
+	minPan, maxPan, minZoomX, maxZoomX, minZoomY, maxZoomY, smallestNoteLength, betterNotesStartX,
+} from '@corgifm/common/BetterConstants'
 import {Panel} from '../Panel/Panel'
 import {
 	seqLengthValueToString,
@@ -32,20 +36,16 @@ import {BoxSelect} from './BoxSelect'
 import {BetterRows} from './BetterRows'
 import {BetterColumns} from './BetterColumns'
 import {BetterNotes} from './BetterNotes'
-import {
-	minPan, maxPan, minZoomX, maxZoomX, minZoomY, maxZoomY, smallestNoteLength,
-} from './BetterConstants'
 import {BetterSequencerControls} from './BetterSequencerControls'
 import {
 	clientSpaceToPercentages, getMaxPan, eventToNote, editorSpaceToPercentages,
 	clientSpaceToEditorSpace,
 } from './BetterSequencerHelpers'
+import {BetterSideNotes} from './BetterSideNotes'
 
 interface Props {
 	id: Id
 }
-
-const controlsWidth = 64
 
 const mouseWheelYSensitivity = 0.001
 const mouseWheelPanXSensitivity = 0.001
@@ -53,6 +53,8 @@ const mouseWheelZoomXSensitivity = 0.01
 const mouseWheelZoomYSensitivity = 0.01
 const middleMousePanXSensitivity = 0.001
 const middleMousePanYSensitivity = 0.001
+
+const rows = new Array(128).fill(0).map((_, i) => midiNoteToNoteNameFull(i))
 
 export const BetterSequencer = ({id}: Props) => {
 	const color = useSelector(createPositionColorSelector(id))
@@ -66,7 +68,7 @@ export const BetterSequencer = ({id}: Props) => {
 	const x = useSelector(createPositionXSelector(id))
 	const y = useSelector(createPositionYSelector(id))
 	const height = useSelector(createPositionHeightSelector(id))
-	const width = useSelector(createPositionWidthSelector(id)) - controlsWidth
+	const width = useSelector(createPositionWidthSelector(id)) - betterNotesStartX
 	const isNodeSelected = useSelector(createPositionHeightSelector(id))
 
 	const [selected, setSelected] = useState(Map<Id, boolean>())
@@ -512,6 +514,7 @@ export const BetterSequencer = ({id}: Props) => {
 			`}
 		>
 			<BetterSequencerControls {...{id}} />
+			<BetterSideNotes {...{id, rows, panPixelsY: panPixels.y, noteHeight}} />
 			<div
 				className="editor"
 				ref={editorElement}

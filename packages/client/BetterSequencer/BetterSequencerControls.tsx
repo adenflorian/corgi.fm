@@ -3,11 +3,11 @@ import {useSelector, useDispatch} from 'react-redux'
 import {
 	createBetterSeqZoomSelector, createBetterSeqPanSelector, sequencerActions,
 } from '@corgifm/common/redux'
-import {Knob} from '../Knob/Knob'
-import {percentageValueString} from '../client-constants'
 import {
 	minZoomX, maxZoomX, minZoomY, maxZoomY, minPan, maxPan,
-} from './BetterConstants'
+} from '@corgifm/common/BetterConstants'
+import {Knob} from '../Knob/Knob'
+import {percentageValueString} from '../client-constants'
 
 interface Props {
 	id: Id

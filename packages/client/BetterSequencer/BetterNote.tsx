@@ -3,6 +3,7 @@ import {useDispatch} from 'react-redux'
 import {midiNoteToNoteNameFull} from '@corgifm/common/common-samples-stuff'
 import {MidiClipEvent} from '@corgifm/common/midi-types'
 import {betterSequencerActions} from '@corgifm/common/redux'
+import {smallNoteHeight, tinyNoteHeight} from '@corgifm/common/BetterConstants'
 import {BetterNoteResizer} from './BetterNoteResizer'
 
 interface Props {
@@ -59,8 +60,8 @@ export const BetterNote = React.memo(({
 		}
 	}, [onNoteSelect, event.id, isSelected, id, dispatch])
 
-	const tiny = noteHeight <= 10
-	const small = noteHeight <= 27
+	const tiny = noteHeight <= tinyNoteHeight
+	const small = noteHeight <= smallNoteHeight
 
 	return (
 		<div
@@ -71,7 +72,7 @@ export const BetterNote = React.memo(({
 				width: event.durationBeats * columnWidth,
 				height: noteHeight - (tiny ? 0 : 2),
 				left: event.startBeat * columnWidth,
-				top: ((128 - event.note) * noteHeight) - noteHeight,
+				top: ((128 - event.note) * noteHeight) - noteHeight + (tiny ? 0 : 1),
 				border: tiny && !isSelected ? 'none' : undefined,
 				borderRadius: tiny ? 0 : undefined,
 			}}

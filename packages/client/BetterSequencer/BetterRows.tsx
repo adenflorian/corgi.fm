@@ -1,4 +1,5 @@
 import React from 'react'
+import {tinyNoteHeight} from '@corgifm/common/BetterConstants'
 import {isWhiteKey} from '../Keyboard/Keyboard'
 
 const rows = new Array(128).fill(0)
@@ -9,6 +10,8 @@ interface Props {
 }
 
 export const BetterRows = React.memo(({panPixelsY, noteHeight}: Props) => {
+	const tiny = noteHeight <= tinyNoteHeight
+
 	return (
 		<div className="rows">
 			<div
@@ -25,6 +28,7 @@ export const BetterRows = React.memo(({panPixelsY, noteHeight}: Props) => {
 							style={{
 								backgroundColor: isWhiteKey(note) ? '#4444' : '#0000',
 								height: noteHeight,
+								border: tiny ? 'none' : undefined,
 							}}
 						/>
 					)

@@ -3,6 +3,7 @@ import {AnyAction} from 'redux'
 import {serverClientId} from '../common-constants'
 import {ConnectionNodeType, IConnectable, IMultiStateThing} from '../common-types'
 import {CssColor} from '../shamu-color'
+import {betterWidth, betterHeight, betterNotesStartX, betterSideNotesWidth} from '../BetterConstants'
 import {
 	basicSamplerActions, addBasicSynthesizer, addSimpleDelay, BasicSamplerState,
 	BasicSynthesizerState, deserializeBasicSamplerState,
@@ -20,8 +21,8 @@ import {
 	selectBetterSequencerIsActive, selectBetterSequencerIsSending,
 	deserializeBetterSequencerState,
 	addSimpleReverb, deserializeSimpleReverbState, SimpleReverbState,
-	addSimpleCompressor, deserializeSimpleCompressorState, selectSimpleCompressor, SimpleCompressorState,
-	selectSequencerIsPlaying, sequencerActions,
+	addSimpleCompressor, deserializeSimpleCompressorState, selectSimpleCompressor,
+	SimpleCompressorState, selectSequencerIsPlaying, sequencerActions,
 	addInfiniteSequencer, deserializeInfiniteSequencerState, InfiniteSequencerState,
 	addGroupSequencer, deserializeGroupSequencerState, GroupSequencer, selectGroupSequencer,
 	addGridSequencer, deserializeGridSequencerState, GridSequencerState,
@@ -174,10 +175,10 @@ const nodeInfo: NodeInfoMap = {
 		disabledText: sequencerDisabledText,
 		isNodeCloneable: true,
 		canHaveKeyboardConnectedToIt: true,
-		defaultWidth: 688,
-		defaultHeight: 128 * 3,
-		notesDisplayStartX: 64,
-		notesDisplayWidth: 688 - 64,
+		defaultWidth: betterWidth,
+		defaultHeight: betterHeight,
+		notesDisplayStartX: betterNotesStartX,
+		notesDisplayWidth: betterSideNotesWidth,
 		isResizable: true,
 	}),
 	infiniteSequencer: makeNodeInfo({
