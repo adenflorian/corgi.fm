@@ -34,10 +34,11 @@ export const betterSequencerActions = {
 		data,
 		...getNetworkActionThings(fieldName),
 	} as const),
-	updateEvents: (id: Id, events: MidiClipEvents) => ({
+	updateEvents: (id: Id, events: MidiClipEvents, saveUndo = true) => ({
 		type: 'UPDATE_BETTER_SEQUENCER_EVENTS',
 		id,
 		events,
+		saveUndo,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	} as const),
@@ -171,6 +172,7 @@ const betterSequencerActionTypes2: BetterSequencerActionTypes = {
 	DELETE_BETTER_SEQUENCER_EVENTS: 0,
 	ADD_BETTER_SEQUENCER_EVENT: 0,
 	ADD_BETTER_SEQUENCER_EVENTS: 0,
+	SEQUENCER_SAVE_UNDO: 0,
 }
 
 const betterSequencerActionTypes = Object.keys(betterSequencerActionTypes2)
@@ -206,7 +208,12 @@ const betterSequencerReducer =
 				midiClip: betterSequencer.midiClip.update('events', events => {
 					return events.merge(action.events)
 				}),
-				// TODO Not working
+				previousEvents: action.saveUndo
+					? betterSequencer.previousEvents.unshift(betterSequencer.midiClip.events)
+					: betterSequencer.previousEvents,
+			}
+			case 'SEQUENCER_SAVE_UNDO': return {
+				...betterSequencer,
 				previousEvents: betterSequencer.previousEvents.unshift(betterSequencer.midiClip.events),
 			}
 			case 'DELETE_BETTER_SEQUENCER_EVENTS': return {

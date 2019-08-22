@@ -31,6 +31,12 @@ export const sequencerActions = {
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	} as const),
+	saveUndo: (id: Id) => ({
+		type: 'SEQUENCER_SAVE_UNDO',
+		id,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	} as const),
 	skipNote: () => ({
 		type: 'SKIP_NOTE',
 	} as const),
