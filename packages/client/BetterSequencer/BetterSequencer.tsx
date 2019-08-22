@@ -32,7 +32,7 @@ import {BetterRows} from './BetterRows'
 import {BetterColumns} from './BetterColumns'
 import {BetterNotes} from './BetterNotes'
 import {
-	minPan, maxPan, minZoomX, maxZoomX, minZoomY, maxZoomY,
+	minPan, maxPan, minZoomX, maxZoomX, minZoomY, maxZoomY, smallestNoteLength,
 } from './BetterConstants'
 import {BetterSequencerControls} from './BetterSequencerControls'
 import {
@@ -44,8 +44,6 @@ import {logger} from '@sentry/utils';
 interface Props {
 	id: Id
 }
-
-const smallestNoteLength = 1 / 64
 
 const controlsWidth = 64
 
@@ -152,9 +150,6 @@ export const BetterSequencer = ({id}: Props) => {
 	// Double click events
 	useEffect(() => {
 		const onDoubleClick = (e: MouseEvent) => {
-			if (e.target && typeof (e.target as HTMLElement).className === 'string' && (e.target as HTMLElement).className.startsWith('note ')) {
-				return
-			}
 			e.preventDefault()
 			e.stopPropagation()
 
@@ -202,8 +197,10 @@ export const BetterSequencer = ({id}: Props) => {
 
 		const onMouseUp = (e: MouseEvent) => {
 			if (e.button !== 0) return
-			deactivateBox()
-			selectNotes(undefined, e.shiftKey)
+			if (boxActive) {
+				deactivateBox()
+				selectNotes(undefined, e.shiftKey)
+			}
 		}
 
 		const onMouseMove = (e: MouseEvent) => {
@@ -487,7 +484,21 @@ export const BetterSequencer = ({id}: Props) => {
 			>
 				<BetterRows {...{noteHeight, panPixelsY: panPixels.y}} />
 				<BetterColumns {...{columnWidth, lengthBeats, panPixelsX: panPixels.x}} />
-				<BetterNotes {...{id, noteHeight, columnWidth, midiClip, onNoteSelect, clearSelected, panPixels, selected}} />
+				<BetterNotes
+					{...{
+						id,
+						noteHeight,
+						columnWidth,
+						midiClip,
+						onNoteSelect,
+						clearSelected,
+						panPixels,
+						selected,
+						width,
+						lengthBeats,
+						zoomX: zoom.x,
+					}}
+				/>
 				{boxActive && <BoxSelect
 					origin={boxOrigin}
 					otherCorner={otherCorner}

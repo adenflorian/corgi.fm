@@ -1,5 +1,5 @@
 import {getNodeInfo} from '@corgifm/common/redux'
-import {mouseFromScreenToBoard} from '../SimpleGlobalClientState'
+import {mouseFromScreenToBoard, makeMouseMovementAccountForGlobalZoom} from '../SimpleGlobalClientState'
 import {MidiClipEvent} from '@corgifm/common/midi-types';
 
 export function getMaxPan(length: number, zoom: number) {
@@ -51,3 +51,13 @@ export function clientSpaceToEditorSpace(
 }
 
 export const eventToNote = (event: MidiClipEvent) => event.note
+
+export function movementXToBeats(movementX: number, lengthBeats: number, zoomX: number, width: number) {
+	const a = makeMouseMovementAccountForGlobalZoom({x: movementX, y: 0}).x
+
+	const scaledWidth = zoomX * width
+
+	const percentageMovement = a / scaledWidth
+
+	return percentageMovement * lengthBeats
+}

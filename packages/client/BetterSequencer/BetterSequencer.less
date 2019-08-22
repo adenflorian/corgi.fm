@@ -77,27 +77,29 @@
 				.note {
 					position: absolute;
 					background-color: currentColor;
-					overflow: hidden;
-					border-radius: 2px;
+					border-radius: 1px;
 					border: 1px solid @panelGrayDark;
 					box-sizing: border-box;
 					margin-bottom: 1px;
+					min-width: 4px;
 
 					&.selected-true {
 						border-color: @defaultGray;
 					}
 
 					.noteLabel {
-						.smallFont();
-						font-size: 10px;
+						.largeFont();
+						font-size: 18px;
 						color: @panelGrayDark;
 						text-align: left;
 						line-height: normal;
-						margin-left: 4px;
-						height: 100%;
+						padding-left: 8px;
+						height: 104%;
 						display: flex;
 						align-items: center;
 						pointer-events: none;
+						overflow: hidden;
+						font-weight: 600;
 					}
 				}
 			}
