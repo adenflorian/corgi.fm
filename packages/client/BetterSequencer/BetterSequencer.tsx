@@ -518,8 +518,8 @@ export const BetterSequencer = ({id}: Props) => {
 			label={getNodeInfo().betterSequencer.typeName}
 			className={oneLine`
 				betterSequencer
-				playing-${isPlaying}
-				recording-${isRecording}
+				${isPlaying ? 'isPlaying saturate ' : 'isNotPlaying '}
+				${isRecording ? `isRecording` : ''}
 			`}
 			saturate={isPlaying}
 			extra={seqLengthValueToString(rate / 4 * lengthBeats)}

@@ -62,8 +62,8 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 		return createSequencerEvents(32)
 			.map(() => (makeMidiClipEvent({
 				note: i + 60,
-				startBeat: i,
-				durationBeats: i++ % 4 === 0 ? 2 : 1,
+				startBeat: i++,
+				durationBeats: 1,
 			})))
 	}
 

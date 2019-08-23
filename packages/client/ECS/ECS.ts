@@ -65,8 +65,8 @@ function ecsLoop() {
 		.map(position => ({
 			position,
 			sequencer: isSequencerNodeType(position.targetType)
-			? selectSequencer(roomState, position.id)
-			: selectGroupSequencer(roomState, position.id),
+				? selectSequencer(roomState, position.id)
+				: selectGroupSequencer(roomState, position.id),
 			nodeInfo: findNodeInfo(position.targetType),
 		}))
 		.map(({position, sequencer, nodeInfo}) => new ECSSequencerEntity(

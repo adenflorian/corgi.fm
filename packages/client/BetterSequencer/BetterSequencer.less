@@ -9,7 +9,21 @@
 
 .betterSequencer {
 	.controls {
+		display: flex;
 
+		.buttons {
+			width: 32px;
+			display: flex;
+			flex-direction: column;
+			justify-content: space-evenly;
+			color: @defaultGray;
+		}
+
+		.knobs, .zoomPanKnobs {
+			display: flex;
+			flex-direction: column;
+			justify-content: space-evenly;
+		}
 	}
 
 	.sideNotes {

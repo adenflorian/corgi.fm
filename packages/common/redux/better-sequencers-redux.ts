@@ -305,6 +305,12 @@ export const createBetterSeqIsPlayingSelector = (id: Id) => (state: IClientAppSt
 export const createBetterSeqRateSelector = (id: Id) => (state: IClientAppState) =>
 	selectBetterSequencer(state.room, id).rate
 
+export const createBetterSeqGateSelector = (id: Id) => (state: IClientAppState) =>
+	selectBetterSequencer(state.room, id).gate
+
+export const createBetterSeqPitchSelector = (id: Id) => (state: IClientAppState) =>
+	selectBetterSequencer(state.room, id).pitch
+
 export const createBetterSeqLengthSelector = (id: Id) => (state: IClientAppState) =>
 	selectBetterSequencer(state.room, id).midiClip.length
 

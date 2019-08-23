@@ -7,7 +7,7 @@ export const maxPan = 1
 
 export const smallestNoteLength = 1 / 64
 
-export const betterControlsWidth = 64
+export const betterControlsWidth = 64 + 64 + 32
 export const betterSideNotesWidth = 32
 export const betterEditorWidth = 512
 export const betterNotesStartX = betterControlsWidth + betterSideNotesWidth

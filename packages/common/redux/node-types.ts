@@ -3,7 +3,7 @@ import {AnyAction} from 'redux'
 import {serverClientId} from '../common-constants'
 import {ConnectionNodeType, IConnectable, IMultiStateThing} from '../common-types'
 import {CssColor} from '../shamu-color'
-import {betterWidth, betterHeight, betterNotesStartX, betterSideNotesWidth} from '../BetterConstants'
+import {betterWidth, betterHeight, betterNotesStartX, betterSideNotesWidth, betterNotesWidth} from '../BetterConstants'
 import {
 	basicSamplerActions, addBasicSynthesizer, addSimpleDelay, BasicSamplerState,
 	BasicSynthesizerState, deserializeBasicSamplerState,
@@ -178,7 +178,7 @@ const nodeInfo: NodeInfoMap = {
 		defaultWidth: betterWidth,
 		defaultHeight: betterHeight,
 		notesDisplayStartX: betterNotesStartX,
-		notesDisplayWidth: betterSideNotesWidth,
+		notesDisplayWidth: betterNotesWidth,
 		isResizable: true,
 	}),
 	infiniteSequencer: makeNodeInfo({

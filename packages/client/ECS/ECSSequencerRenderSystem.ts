@@ -2,7 +2,6 @@ import {List, Map, Set} from 'immutable'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {ECSCanvasRenderSystem} from './ECSCanvasRenderSystem'
 import {ECSComponentType, ECSEntity, ECSSystem} from './ECSTypes'
-import {clamp} from '@corgifm/common/common-utils';
 
 export class ECSSequencerRenderSystem extends ECSSystem {
 	public static readonly canvasIdPrefix = 'ECSCanvasRenderSystemCanvas-node-'
