@@ -50,7 +50,7 @@ export const BetterNoteResizer = React.memo(({
 
 	return (
 		<div
-			className="resizer"
+			className="noteResizer"
 			style={{
 				// width: width + overlap,
 				// height: height + overlap,
