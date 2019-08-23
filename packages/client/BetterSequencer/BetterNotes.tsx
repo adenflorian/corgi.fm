@@ -38,22 +38,26 @@ export const BetterNotes = (props: Props) => {
 	const [persistentDelta, setPersistentDelta] = useState({x: 0, y: 0})
 	const [startEvents, setStartEvents] = useState(MidiClipEvents())
 	const [startMouseNote, setStartMouseNote] = useState(0)
+	const [clickedEvent, setClickedEvent] = useState<Id>('')
 
 	const dispatch = useDispatch()
 
-	const resizeNotes = useCallback((movementX: number) => {
+	const resizeNotes = useCallback(({movementX, altKey}: MouseEvent) => {
 		if (!noteResizeActive) return
 
 		const newPersistentDelta = {x: persistentDelta.x + movementX, y: 0}
 		const direction = noteResizeActive === 'left' ? -1 : 1
-		const doo = movementXToBeats(newPersistentDelta.x, lengthBeats, zoom.x, width) * direction
+		const beatDelta = movementXToBeats(newPersistentDelta.x, lengthBeats, zoom.x, width) * direction
+		const roundedBeatDelta = altKey
+			? beatDelta
+			: Math.round(beatDelta)
 
 		const updatedEvents = startEvents.map(event => {
 			return {
 				...event,
-				durationBeats: Math.max(smallestNoteLength, Math.min(lengthBeats, event.durationBeats + doo)),
+				durationBeats: Math.max(smallestNoteLength, Math.min(lengthBeats, event.durationBeats + roundedBeatDelta)),
 				startBeat: noteResizeActive === 'left'
-					? Math.min(event.startBeat + event.durationBeats, event.startBeat - doo)
+					? Math.min(event.startBeat + event.durationBeats, event.startBeat - roundedBeatDelta)
 					: event.startBeat,
 			}
 		})
@@ -66,17 +70,20 @@ export const BetterNotes = (props: Props) => {
 		return (rows.length) - (clientMousePositionToPercentages({x: 0, y: clientY}).y * rows.length)
 	}, [clientMousePositionToPercentages, rows.length])
 
-	const moveNotes = useCallback((movementX: number, clientY: number) => {
+	const moveNotes = useCallback(({movementX, clientY, altKey}: MouseEvent) => {
 		if (!noteMoveActive) return
 
 		const newPersistentDelta = sumPoints(persistentDelta, {x: movementX, y: 0})
 		const beatDelta = movementXToBeats(newPersistentDelta.x, lengthBeats, zoom.x, width)
+		const roundedBeatDelta = altKey
+			? beatDelta
+			: Math.round(beatDelta)
 		const mouseNoteDelta = clientYToMouseNote(clientY) - startMouseNote
 
 		const updatedEvents = startEvents.map(event => {
 			return {
 				...event,
-				startBeat: Math.max(0, Math.min(lengthBeats - smallestNoteLength, event.startBeat + beatDelta)),
+				startBeat: Math.max(0, Math.min(lengthBeats - smallestNoteLength, event.startBeat + roundedBeatDelta)),
 				note: Math.max(MIN_MIDI_NOTE_NUMBER_0, Math.min(MAX_MIDI_NOTE_NUMBER_127, Math.floor(event.note + mouseNoteDelta))),
 			}
 		})
@@ -103,6 +110,7 @@ export const BetterNotes = (props: Props) => {
 	}, [])
 
 	const handleMouseDown = useCallback((e: MouseEvent, direction: 'left' | 'right' | 'center', eventId: Id) => {
+		setClickedEvent(eventId)
 		dispatch(sequencerActions.saveUndo(id))
 		setPersistentDelta({x: 0, y: 0})
 		if (!selected.has(eventId)) {
@@ -132,20 +140,27 @@ export const BetterNotes = (props: Props) => {
 
 		const onMouseMove = (e: MouseEvent) => {
 			if (e.buttons !== 1) return stopActive()
-			if (noteResizeActive) return resizeNotes(e.movementX)
-			if (noteMoveActive) return moveNotes(e.movementX, e.clientY)
+			if (noteResizeActive) return resizeNotes(e)
+			if (noteMoveActive) return moveNotes(e)
+		}
+
+		const onMouseUp = (e: MouseEvent) => {
+			if ((noteResizeActive || noteMoveActive) && !e.shiftKey && persistentDelta.x === 0 && persistentDelta.y === 0) {
+				onNoteSelect(clickedEvent, true, true)
+			}
+			stopActive()
 		}
 
 		if (noteResizeActive || noteMoveActive) {
 			window.addEventListener('mousemove', onMouseMove)
-			window.addEventListener('mouseup', stopActive)
+			window.addEventListener('mouseup', onMouseUp)
 		}
 
 		return () => {
 			window.removeEventListener('mousemove', onMouseMove)
-			window.removeEventListener('mouseup', stopActive)
+			window.removeEventListener('mouseup', onMouseUp)
 		}
-	}, [resizeNotes, noteMoveActive, noteResizeActive, stopNoteMoving, stopNoteResizing, moveNotes])
+	}, [resizeNotes, noteMoveActive, noteResizeActive, stopNoteMoving, stopNoteResizing, moveNotes, persistentDelta, onNoteSelect, clickedEvent])
 
 	return (
 		<div

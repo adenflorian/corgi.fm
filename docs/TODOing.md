@@ -259,6 +259,7 @@
 	- [ ] note move
 	- [ ] note resize
 - [ ] note resize and move need to snap to smallestNoteLength increments
+- [ ] when clicking single note with multiple selected, deselect others if mouse hasn't moved enough
 
 - [ ] when you control click on a node header, the selected node(s) becomes connected
 - [ ] filter resonance
