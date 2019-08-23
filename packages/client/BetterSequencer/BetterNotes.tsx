@@ -5,8 +5,9 @@ import {MidiClip, MidiClipEvents} from '@corgifm/common/midi-types'
 import {betterSequencerActions, sequencerActions} from '@corgifm/common/redux'
 import {smallestNoteLength} from '@corgifm/common/BetterConstants'
 import {sumPoints} from '@corgifm/common/common-utils'
+import {MIN_MIDI_NOTE_NUMBER_0, MAX_MIDI_NOTE_NUMBER_127} from '@corgifm/common/common-constants'
 import {BetterNote} from './BetterNote'
-import {movementXToBeats, movementToBeats} from './BetterSequencerHelpers'
+import {movementXToBeats, movementToBeats, movementYToNote} from './BetterSequencerHelpers'
 
 interface Props {
 	id: Id
@@ -21,12 +22,13 @@ interface Props {
 	zoom: Point
 	width: number
 	height: number
+	rows: string[]
 }
 
 export const BetterNotes = (props: Props) => {
 	const {
 		id, panPixels, noteHeight, columnWidth, selected, onNoteSelect,
-		clearSelected, midiClip, lengthBeats, zoom, width, height,
+		clearSelected, midiClip, lengthBeats, zoom, width, height, rows,
 	} = props
 
 	const [noteResizeActive, setNoteResizeActive] = useState<false | 'left' | 'right'>(false)
@@ -61,18 +63,20 @@ export const BetterNotes = (props: Props) => {
 		if (!noteMoveActive) return
 
 		const newPersistentDelta = sumPoints(persistentDelta, movement)
-		const doo = movementToBeats(newPersistentDelta, lengthBeats, zoom, width, height)
+		const beatDelta = movementXToBeats(newPersistentDelta.x, lengthBeats, zoom.x, width)
+		const noteDelta = movementYToNote(newPersistentDelta.y, rows, zoom.y, height)
 
 		const updatedEvents = startEvents.map(event => {
 			return {
 				...event,
-				startBeat: Math.max(0, Math.min(lengthBeats - smallestNoteLength, event.startBeat + doo.x)),
+				startBeat: Math.max(0, Math.min(lengthBeats - smallestNoteLength, event.startBeat + beatDelta)),
+				note: Math.max(MIN_MIDI_NOTE_NUMBER_0, Math.min(MAX_MIDI_NOTE_NUMBER_127, Math.round(event.note - noteDelta))),
 			}
 		})
 
 		dispatch(betterSequencerActions.updateEvents(id, updatedEvents, false))
 		setPersistentDelta(newPersistentDelta)
-	}, [noteMoveActive, persistentDelta, lengthBeats, zoom, width, height, startEvents, dispatch, id])
+	}, [noteMoveActive, persistentDelta, lengthBeats, zoom.x, zoom.y, width, rows, height, startEvents, dispatch, id])
 
 	const startNoteResizing = useCallback((direction: 'left' | 'right') => {
 		setNoteResizeActive(direction)

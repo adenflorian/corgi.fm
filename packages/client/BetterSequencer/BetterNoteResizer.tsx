@@ -67,17 +67,16 @@ export const BetterNoteResizer = React.memo(({
 		>
 			<div className="midRow resizerRow">
 				<div
-					style={{pointerEvents: 'all', backgroundColor: debug ? 'red' : undefined, cursor: 'w-resize'}}
+					style={{backgroundColor: debug ? 'red' : undefined}}
 					className="resizeHandle left"
 					ref={leftRef}
 				/>
 				<div
-					style={{pointerEvents: 'all'}}
 					className="resizeHandle mid"
 					ref={centerRef}
 				/>
 				<div
-					style={{pointerEvents: 'all', backgroundColor: debug ? 'green' : undefined, cursor: 'e-resize'}}
+					style={{backgroundColor: debug ? 'green' : undefined}}
 					className="resizeHandle right"
 					ref={rightRef}
 				/>

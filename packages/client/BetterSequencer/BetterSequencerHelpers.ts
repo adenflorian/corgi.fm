@@ -75,3 +75,13 @@ export function movementXToBeats(movementX: number, lengthBeats: number, zoomX: 
 
 	return percentageMovement * lengthBeats
 }
+
+export function movementYToNote(movementY: number, rows: string[], zoomY: number, height: number) {
+	const a = makeMouseMovementAccountForGlobalZoom({x: 0, y: movementY}).y
+
+	const scaledHeight = zoomY * height
+
+	const percentageMovement = a / scaledHeight
+
+	return percentageMovement * rows.length
+}

@@ -15,6 +15,7 @@
 
 	.resizeHandle {
 		opacity: 0.5;
+		pointer-events: all;
 
 		&.top, &.bottom {
 			height: 8px;
@@ -28,14 +29,18 @@
 
 		&.left {
 			margin-left: -1px;
+			cursor: w-resize;
 		}
 
 		&.right {
 			margin-right: -1px;
+			cursor: e-resize;
 		}
 
 		&.mid {
 			flex-grow: 1;
+			margin-top: -1px;
+			margin-bottom: -1px;
 		}
 	}
 }

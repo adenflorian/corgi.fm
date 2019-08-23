@@ -236,26 +236,29 @@
 - [√] pan with middle mouse
 	- [ ] change cursor to grabby hand
 - [ ] disable notes with 0 key
-- [ ] box select while holding shift should flip selected notes like ableton
+- [√] box select while holding shift should flip selected notes like ableton
 - [ ] change global pan to require middle clicking on background
 - [ ] click and drag notes around
 - [√] ctrl + d to duplicate notes
 	- [ ] use range selection to determine new note start point, like ableton
 - [ ] make double click better
-- [ ] show notes on left side
-- [ ] fix shift box select
+- [√] show notes on left side
+	- [ ] play note when clicked
+		- [ ] only release onMouseUp?
+- [√] fix shift box select
 - [ ] follow mode where it auto scrolls as song plays
 	- [ ] use request animation frame in an effect
-- [ ] don't save every undo when click drag resizing
+- [√] don't save every undo when click drag resizing
 - [√] remove note border when small
 - [ ] when selected changes in any way, remove overlapped notes and stuff, like ableton
-- [ ] mouse note resize snapping
+- [ ] mouse note resize/move snapping
 - [ ] add more/less vertical bars depending on zoomX
 - [ ] note shadows?
 - [ ] right click to cancel/end operation
 	- [ ] box select
 	- [ ] note move
 	- [ ] note resize
+- [ ] note resize and move need to snap to smallestNoteLength increments
 
 - [ ] when you control click on a node header, the selected node(s) becomes connected
 - [ ] filter resonance

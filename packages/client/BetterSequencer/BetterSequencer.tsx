@@ -550,6 +550,7 @@ export const BetterSequencer = ({id}: Props) => {
 						height,
 						lengthBeats,
 						zoom,
+						rows,
 					}}
 				/>
 				{boxActive && <BoxSelect
