@@ -251,15 +251,17 @@
 - [√] don't save every undo when click drag resizing
 - [√] remove note border when small
 - [ ] when selected changes in any way, remove overlapped notes and stuff, like ableton
-- [ ] mouse note resize/move snapping
+- [√] mouse note resize/move snapping
+	- [ ] dynamic column sizes
+	- [ ] snap to bars and to increments
 - [ ] add more/less vertical bars depending on zoomX
 - [ ] note shadows?
 - [ ] right click to cancel/end operation
 	- [ ] box select
 	- [ ] note move
 	- [ ] note resize
-- [ ] note resize and move need to snap to smallestNoteLength increments
-- [ ] when clicking single note with multiple selected, deselect others if mouse hasn't moved enough
+- [ ] note resize and move need to snap to smallestNoteLength increments when alt
+- [√] when clicking single note with multiple selected, deselect others if mouse hasn't moved enough
 
 - [ ] when you control click on a node header, the selected node(s) becomes connected
 - [ ] filter resonance
