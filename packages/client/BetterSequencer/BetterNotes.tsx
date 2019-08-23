@@ -7,7 +7,7 @@ import {smallestNoteLength} from '@corgifm/common/BetterConstants'
 import {sumPoints} from '@corgifm/common/common-utils'
 import {MIN_MIDI_NOTE_NUMBER_0, MAX_MIDI_NOTE_NUMBER_127} from '@corgifm/common/common-constants'
 import {BetterNote} from './BetterNote'
-import {movementXToBeats, movementToBeats, movementYToNote} from './BetterSequencerHelpers'
+import {movementXToBeats} from './BetterSequencerHelpers'
 
 interface Props {
 	id: Id
@@ -23,18 +23,21 @@ interface Props {
 	width: number
 	height: number
 	rows: string[]
+	clientMousePositionToPercentages: (clientMousePosition: Point) => Point
 }
 
 export const BetterNotes = (props: Props) => {
 	const {
 		id, panPixels, noteHeight, columnWidth, selected, onNoteSelect,
 		clearSelected, midiClip, lengthBeats, zoom, width, height, rows,
+		clientMousePositionToPercentages,
 	} = props
 
 	const [noteResizeActive, setNoteResizeActive] = useState<false | 'left' | 'right'>(false)
 	const [noteMoveActive, setNoteMoveActive] = useState(false)
 	const [persistentDelta, setPersistentDelta] = useState({x: 0, y: 0})
 	const [startEvents, setStartEvents] = useState(MidiClipEvents())
+	const [startMouseNote, setStartMouseNote] = useState(0)
 
 	const dispatch = useDispatch()
 
@@ -59,24 +62,28 @@ export const BetterNotes = (props: Props) => {
 		setPersistentDelta(newPersistentDelta)
 	}, [noteResizeActive, persistentDelta, lengthBeats, zoom.x, width, startEvents, dispatch, id])
 
-	const moveNotes = useCallback((movement: Point) => {
+	const clientYToMouseNote = useCallback((clientY: number) => {
+		return (rows.length) - (clientMousePositionToPercentages({x: 0, y: clientY}).y * rows.length)
+	}, [clientMousePositionToPercentages, rows.length])
+
+	const moveNotes = useCallback((movementX: number, clientY: number) => {
 		if (!noteMoveActive) return
 
-		const newPersistentDelta = sumPoints(persistentDelta, movement)
+		const newPersistentDelta = sumPoints(persistentDelta, {x: movementX, y: 0})
 		const beatDelta = movementXToBeats(newPersistentDelta.x, lengthBeats, zoom.x, width)
-		const noteDelta = movementYToNote(newPersistentDelta.y, rows, zoom.y, height)
+		const mouseNoteDelta = clientYToMouseNote(clientY) - startMouseNote
 
 		const updatedEvents = startEvents.map(event => {
 			return {
 				...event,
 				startBeat: Math.max(0, Math.min(lengthBeats - smallestNoteLength, event.startBeat + beatDelta)),
-				note: Math.max(MIN_MIDI_NOTE_NUMBER_0, Math.min(MAX_MIDI_NOTE_NUMBER_127, Math.round(event.note - noteDelta))),
+				note: Math.max(MIN_MIDI_NOTE_NUMBER_0, Math.min(MAX_MIDI_NOTE_NUMBER_127, Math.floor(event.note + mouseNoteDelta))),
 			}
 		})
 
 		dispatch(betterSequencerActions.updateEvents(id, updatedEvents, false))
 		setPersistentDelta(newPersistentDelta)
-	}, [noteMoveActive, persistentDelta, lengthBeats, zoom.x, zoom.y, width, rows, height, startEvents, dispatch, id])
+	}, [noteMoveActive, persistentDelta, lengthBeats, zoom.x, width, clientYToMouseNote, startEvents, dispatch, id, startMouseNote])
 
 	const startNoteResizing = useCallback((direction: 'left' | 'right') => {
 		setNoteResizeActive(direction)
@@ -86,9 +93,10 @@ export const BetterNotes = (props: Props) => {
 		setNoteResizeActive(false)
 	}, [])
 
-	const startNoteMoving = useCallback(() => {
+	const startNoteMoving = useCallback((clientY: number) => {
+		setStartMouseNote(Math.floor(clientYToMouseNote(clientY)))
 		setNoteMoveActive(true)
-	}, [])
+	}, [clientYToMouseNote])
 
 	const stopNoteMoving = useCallback(() => {
 		setNoteMoveActive(false)
@@ -111,7 +119,7 @@ export const BetterNotes = (props: Props) => {
 		if (direction !== 'center') {
 			startNoteResizing(direction)
 		} else {
-			startNoteMoving()
+			startNoteMoving(e.clientY)
 		}
 	}, [dispatch, id, midiClip.events, onNoteSelect, selected, startNoteMoving, startNoteResizing])
 
@@ -125,7 +133,7 @@ export const BetterNotes = (props: Props) => {
 		const onMouseMove = (e: MouseEvent) => {
 			if (e.buttons !== 1) return stopActive()
 			if (noteResizeActive) return resizeNotes(e.movementX)
-			if (noteMoveActive) return moveNotes(getMovement(e))
+			if (noteMoveActive) return moveNotes(e.movementX, e.clientY)
 		}
 
 		if (noteResizeActive || noteMoveActive) {
@@ -166,6 +174,7 @@ export const BetterNotes = (props: Props) => {
 								panPixels,
 								onNoteSelect,
 								handleMouseDown,
+								rows,
 							}}
 						/>
 					)
@@ -179,5 +188,12 @@ function getMovement(e: MouseEvent) {
 	return {
 		x: e.movementX,
 		y: e.movementY,
+	} as const
+}
+
+function getClientMousePosition(e: MouseEvent) {
+	return {
+		x: e.clientX,
+		y: e.clientY,
 	} as const
 }

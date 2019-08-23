@@ -2,14 +2,15 @@ import React from 'react'
 import {tinyNoteHeight} from '@corgifm/common/BetterConstants'
 import {isWhiteKey} from '../Keyboard/Keyboard'
 
-const rows = new Array(128).fill(0)
-
 interface Props {
 	panPixelsY: number
 	noteHeight: number
+	rows: string[]
 }
 
-export const BetterRows = React.memo(({panPixelsY, noteHeight}: Props) => {
+export const BetterRows = React.memo(({
+	panPixelsY, noteHeight, rows,
+}: Props) => {
 	const tiny = noteHeight <= tinyNoteHeight
 
 	return (

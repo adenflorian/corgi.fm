@@ -96,7 +96,11 @@ export const BetterSequencer = ({id}: Props) => {
 		y: pan.y * maxPanY,
 	}
 
-	const noteHeight = scaledHeight / 128
+	const noteHeight = scaledHeight / rows.length
+
+	const clientMousePositionToPercentages = useCallback((clientMousePosition: Point) => {
+		return clientSpaceToPercentages(clientMousePosition, {x, y}, panPixels, maxPanX, maxPanY, width, height)
+	}, [height, maxPanX, maxPanY, panPixels, width, x, y])
 
 	// Wheel events
 	useEffect(() => {
@@ -156,9 +160,9 @@ export const BetterSequencer = ({id}: Props) => {
 			e.preventDefault()
 			e.stopPropagation()
 
-			const bar = clientSpaceToPercentages({x: e.clientX, y: e.clientY}, {x, y}, panPixels, maxPanX, maxPanY, width, height)
+			const bar = clientMousePositionToPercentages({x: e.clientX, y: e.clientY})
 
-			const note = 127 - Math.floor(bar.y * 128)
+			const note = (rows.length - 1) - Math.floor(bar.y * rows.length)
 			const startBeat = Math.floor(bar.x * lengthBeats)
 
 			const newEvent = makeMidiClipEvent({
@@ -185,7 +189,7 @@ export const BetterSequencer = ({id}: Props) => {
 				editorElementNotNull.removeEventListener('dblclick', onDoubleClick)
 			}
 		}
-	}, [dispatch, height, id, lengthBeats, maxPanX, maxPanY, panPixels, selected, width, x, y])
+	}, [clientMousePositionToPercentages, dispatch, id, lengthBeats])
 
 	// Box Select
 	useLayoutEffect(() => {
@@ -228,8 +232,8 @@ export const BetterSequencer = ({id}: Props) => {
 			const originPercentages = editorSpaceToPercentages(boxOrigin, panPixels, maxPanX, maxPanY, width, height)
 			const otherCornerPercentages = editorSpaceToPercentages(otherCorner2, panPixels, maxPanX, maxPanY, width, height)
 			const box = {
-				top: 127 - Math.floor(Math.min(originPercentages.y, otherCornerPercentages.y) * 128),
-				bottom: 127 - Math.floor(Math.max(originPercentages.y, otherCornerPercentages.y) * 128),
+				top: (rows.length - 1) - Math.floor(Math.min(originPercentages.y, otherCornerPercentages.y) * rows.length),
+				bottom: (rows.length - 1) - Math.floor(Math.max(originPercentages.y, otherCornerPercentages.y) * rows.length),
 				left: Math.min(originPercentages.x, otherCornerPercentages.x) * lengthBeats,
 				right: Math.max(originPercentages.x, otherCornerPercentages.x) * lengthBeats,
 			}
@@ -534,7 +538,7 @@ export const BetterSequencer = ({id}: Props) => {
 				ref={editorElement}
 				tabIndex={-1}
 			>
-				<BetterRows {...{noteHeight, panPixelsY: panPixels.y}} />
+				<BetterRows {...{noteHeight, panPixelsY: panPixels.y, rows}} />
 				<BetterColumns {...{columnWidth, lengthBeats, panPixelsX: panPixels.x}} />
 				<BetterNotes
 					{...{
@@ -551,6 +555,7 @@ export const BetterSequencer = ({id}: Props) => {
 						lengthBeats,
 						zoom,
 						rows,
+						clientMousePositionToPercentages,
 					}}
 				/>
 				{boxActive && <BoxSelect

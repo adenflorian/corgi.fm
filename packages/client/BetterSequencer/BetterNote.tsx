@@ -14,10 +14,12 @@ interface Props {
 	isSelected: boolean
 	onNoteSelect: (eventId: Id, select: boolean, clear: boolean) => void
 	handleMouseDown: (e: MouseEvent, direction: 'left' | 'right' | 'center', eventId: Id) => void
+	rows: string[]
 }
 
 export const BetterNote = React.memo(({
-	id, event, noteHeight, columnWidth, isSelected, onNoteSelect, handleMouseDown,
+	id, event, noteHeight, columnWidth, isSelected,
+	onNoteSelect, handleMouseDown, rows,
 }: Props) => {
 
 	const dispatch = useDispatch()
@@ -70,7 +72,7 @@ export const BetterNote = React.memo(({
 				width: event.durationBeats * columnWidth,
 				height: noteHeight - (tiny ? 0 : 2),
 				left: event.startBeat * columnWidth,
-				top: ((128 - event.note) * noteHeight) - noteHeight + (tiny ? 0 : 1),
+				top: ((rows.length - event.note) * noteHeight) - noteHeight + (tiny ? 0 : 1),
 				border: tiny && !isSelected ? 'none' : undefined,
 				borderRadius: tiny ? 0 : undefined,
 			}}
