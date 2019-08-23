@@ -252,6 +252,10 @@
 - [ ] mouse note resize snapping
 - [ ] add more/less vertical bars depending on zoomX
 - [ ] note shadows?
+- [ ] right click to cancel/end operation
+	- [ ] box select
+	- [ ] note move
+	- [ ] note resize
 
 - [ ] when you control click on a node header, the selected node(s) becomes connected
 - [ ] filter resonance

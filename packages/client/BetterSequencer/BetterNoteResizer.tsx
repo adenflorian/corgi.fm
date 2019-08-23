@@ -4,7 +4,7 @@ import './BetterNoteResizer.less'
 interface Props {
 	id: Id
 	eventId: Id
-	handleMouseDown: (direction: 'left' | 'right' | 'center', eventId: Id) => void
+	handleMouseDown: (e: MouseEvent, direction: 'left' | 'right' | 'center', eventId: Id) => void
 }
 
 const debug = false
@@ -20,15 +20,15 @@ export const BetterNoteResizer = React.memo(({
 	useLayoutEffect(() => {
 		const onMouseDownLeft = (e: MouseEvent) => {
 			e.stopPropagation()
-			handleMouseDown('left', eventId)
+			handleMouseDown(e, 'left', eventId)
 		}
 		const onMouseDownRight = (e: MouseEvent) => {
 			e.stopPropagation()
-			handleMouseDown('right', eventId)
+			handleMouseDown(e, 'right', eventId)
 		}
 		const onMouseDownCenter = (e: MouseEvent) => {
 			e.stopPropagation()
-			handleMouseDown('center', eventId)
+			handleMouseDown(e, 'center', eventId)
 		}
 
 		const leftElement = leftRef.current

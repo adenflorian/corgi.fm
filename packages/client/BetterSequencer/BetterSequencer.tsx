@@ -2,7 +2,7 @@ import React, {
 	useCallback, useState, useEffect, useRef, useLayoutEffect,
 } from 'react'
 import {useSelector, useDispatch} from 'react-redux'
-import {Map, OrderedMap, Set} from 'immutable'
+import {OrderedMap, Set} from 'immutable'
 import {stripIndents, oneLine} from 'common-tags'
 import {
 	createPositionColorSelector, createBetterSeqIsRecordingSelector,
@@ -71,8 +71,9 @@ export const BetterSequencer = ({id}: Props) => {
 	const width = useSelector(createPositionWidthSelector(id)) - betterNotesStartX
 	const isNodeSelected = useSelector(createPositionHeightSelector(id))
 
-	const [selected, setSelected] = useState(Map<Id, boolean>())
-	const clearSelected = () => setSelected(Map())
+	const [selected, setSelected] = useState(Set<Id>())
+	const [originalSelected, setOriginalSelected] = useState(Set<Id>())
+	const clearSelected = () => setSelected(Set())
 
 	// Box Select
 	const [boxActive, activateBox, deactivateBox] = useBoolean(false)
@@ -168,7 +169,7 @@ export const BetterSequencer = ({id}: Props) => {
 
 			dispatch(betterSequencerActions.addEvent(id, newEvent))
 			dispatch(localActions.playShortNote(id, Set([note])))
-			setSelected(selected.clear().set(newEvent.id, true))
+			setSelected(Set(newEvent.id))
 		}
 
 		const editorElementNotNull = editorElement.current
@@ -194,6 +195,12 @@ export const BetterSequencer = ({id}: Props) => {
 				{x: e.clientX, y: e.clientY}, {x, y})
 			setBoxOrigin(editorSpace)
 			setOtherCorner(editorSpace)
+			if (e.shiftKey) {
+				setOriginalSelected(selected)
+			} else {
+				setOriginalSelected(Set())
+				clearSelected()
+			}
 			activateBox()
 		}
 
@@ -227,15 +234,21 @@ export const BetterSequencer = ({id}: Props) => {
 				right: Math.max(originPercentages.x, otherCornerPercentages.x) * lengthBeats,
 			}
 
+			const insideBox = midiClip.events.filter(
+				z => z.note <= box.top &&
+					z.note >= box.bottom &&
+					(z.startBeat + z.durationBeats) >= box.left &&
+					z.startBeat <= box.right
+			).keySeq().toSet()
+
+			const toFlip = preserve
+				? insideBox.filter(i => originalSelected.has(i))
+				: Set()
+
 			setSelected(
-				midiClip.events.filter(
-					z => z.note <= box.top &&
-						z.note >= box.bottom &&
-						(z.startBeat + z.durationBeats) >= box.left &&
-						z.startBeat <= box.right
-				)
-					.map(_ => true)
-					.concat(preserve ? selected : [])
+				insideBox
+					.concat(preserve ? originalSelected : [])
+					.filter(i => !toFlip.has(i))
 			)
 		}
 
@@ -258,7 +271,7 @@ export const BetterSequencer = ({id}: Props) => {
 			}
 			window.removeEventListener('mouseup', onMouseUp)
 		}
-	}, [activateBox, boxActive, boxOrigin, deactivateBox, height, lengthBeats, maxPanX, maxPanY, midiClip.events, otherCorner, panPixels, width, x, y, selected])
+	}, [activateBox, boxActive, boxOrigin, deactivateBox, height, lengthBeats, maxPanX, maxPanY, midiClip.events, otherCorner, panPixels, width, x, y, selected, originalSelected])
 
 	// Middle mouse pan
 	useLayoutEffect(() => {
@@ -317,12 +330,12 @@ export const BetterSequencer = ({id}: Props) => {
 	const columnWidth = (width * zoom.x) / lengthBeats
 
 	const selectAll = useCallback(() => {
-		setSelected(midiClip.events.map(_ => true))
+		setSelected(midiClip.events.keySeq().toSet())
 	}, [setSelected, midiClip.events])
 
 	const duplicateNotes = useCallback(() => {
 		const eventsToCopy = midiClip.events
-			.filter(event => selected.get(event.id) === true)
+			.filter(event => selected.has(event.id))
 
 		const smallX = eventsToCopy.map(e => e.startBeat).min() || 0
 		const bigX = eventsToCopy.map(e => e.startBeat + e.durationBeats).max() || 0
@@ -339,16 +352,16 @@ export const BetterSequencer = ({id}: Props) => {
 				return result.set(newEvent.id, newEvent)
 			}, MidiClipEvents())
 		dispatch(betterSequencerActions.addEvents(id, newEvents))
-		setSelected(newEvents.map(_ => true))
+		setSelected(newEvents.keySeq().toSet())
 	}, [midiClip.events, dispatch, id, selected])
 
 	const deleteSelected = useCallback(() => {
-		dispatch(betterSequencerActions.deleteEvents(id, selected.keySeq()))
-		setSelected(Map())
+		dispatch(betterSequencerActions.deleteEvents(id, selected))
+		setSelected(Set())
 	}, [dispatch, id, selected, setSelected])
 
 	const moveNotesVertically = useCallback((direction: 1 | -1, shift: boolean) => {
-		const updatedEvents = selected.reduce((events, _, eventId) => {
+		const updatedEvents = selected.reduce((events, eventId) => {
 			const originalEvent = midiClip.events.get(eventId, null)
 
 			if (originalEvent === null) {
@@ -369,7 +382,7 @@ export const BetterSequencer = ({id}: Props) => {
 	}, [dispatch, id, selected, midiClip.events])
 
 	const moveNotesHorizontally = useCallback((direction: 1 | -1, alt: boolean) => {
-		dispatch(betterSequencerActions.updateEvents(id, selected.reduce((events, _, eventId) => {
+		dispatch(betterSequencerActions.updateEvents(id, selected.reduce((events, eventId) => {
 			const originalEvent = midiClip.events.get(eventId, null)
 
 			if (originalEvent === null) {
@@ -387,7 +400,7 @@ export const BetterSequencer = ({id}: Props) => {
 	}, [dispatch, id, selected, midiClip.events, lengthBeats])
 
 	const resizeNotes = useCallback((direction: 1 | -1, alt: boolean) => {
-		dispatch(betterSequencerActions.updateEvents(id, selected.reduce((events, _, eventId) => {
+		dispatch(betterSequencerActions.updateEvents(id, selected.reduce((events, eventId) => {
 			const originalEvent = midiClip.events.get(eventId, null)
 
 			if (originalEvent === null) {
@@ -484,10 +497,11 @@ export const BetterSequencer = ({id}: Props) => {
 
 	const onNoteSelect = useCallback(
 		(eventId: Id, select: boolean, clear: boolean) => {
-			if (clear) {
-				setSelected(selected.clear().set(eventId, select))
+			const foo = clear ? Set() : selected
+			if (select) {
+				setSelected(foo.add(eventId))
 			} else {
-				setSelected(selected.set(eventId, select))
+				setSelected(foo.remove(eventId))
 			}
 		},
 		[selected],

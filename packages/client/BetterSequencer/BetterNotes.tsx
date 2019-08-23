@@ -1,6 +1,6 @@
 import React, {useState, useCallback, useLayoutEffect} from 'react'
 import {useDispatch} from 'react-redux'
-import {Map} from 'immutable'
+import {Set} from 'immutable'
 import {MidiClip, MidiClipEvents} from '@corgifm/common/midi-types'
 import {betterSequencerActions, sequencerActions} from '@corgifm/common/redux'
 import {smallestNoteLength} from '@corgifm/common/BetterConstants'
@@ -14,7 +14,7 @@ interface Props {
 	columnWidth: number
 	panPixels: Point
 	midiClip: MidiClip
-	selected: Map<Id, boolean>
+	selected: Set<Id>
 	onNoteSelect: (eventId: Id, select: boolean, clear: boolean) => void
 	clearSelected: () => void
 	lengthBeats: number
@@ -90,14 +90,19 @@ export const BetterNotes = (props: Props) => {
 		setNoteMoveActive(false)
 	}, [])
 
-	const handleMouseDown = useCallback((direction: 'left' | 'right' | 'center', eventId: Id) => {
+	const handleMouseDown = useCallback((e: MouseEvent, direction: 'left' | 'right' | 'center', eventId: Id) => {
 		dispatch(sequencerActions.saveUndo(id))
 		setPersistentDelta({x: 0, y: 0})
-		if (selected.get(eventId) !== true) {
-			onNoteSelect(eventId, true, true)
-			setStartEvents(midiClip.events.filter(x => x.id === eventId))
+		if (!selected.has(eventId)) {
+			if (e.shiftKey) {
+				onNoteSelect(eventId, true, false)
+				setStartEvents(midiClip.events.filter(x => selected.has(x.id) || x.id === eventId))
+			} else {
+				onNoteSelect(eventId, true, true)
+				setStartEvents(midiClip.events.filter(x => x.id === eventId))
+			}
 		} else {
-			setStartEvents(midiClip.events.filter(x => selected.get(x.id) === true || x.id === eventId))
+			setStartEvents(midiClip.events.filter(x => selected.has(x.id)))
 		}
 		if (direction !== 'center') {
 			startNoteResizing(direction)
@@ -145,7 +150,6 @@ export const BetterNotes = (props: Props) => {
 				}}
 			>
 				{midiClip.events.map(event => {
-					const isSelected = selected.get(event.id) || false
 					return (
 						<BetterNote
 							key={event.id.toString()}
@@ -154,7 +158,7 @@ export const BetterNotes = (props: Props) => {
 								event,
 								noteHeight,
 								columnWidth,
-								isSelected,
+								isSelected: selected.has(event.id),
 								panPixels,
 								onNoteSelect,
 								handleMouseDown,

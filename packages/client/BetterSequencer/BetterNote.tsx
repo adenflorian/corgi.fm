@@ -1,4 +1,4 @@
-import React, {useRef, useLayoutEffect, useCallback} from 'react'
+import React, {useRef, useLayoutEffect} from 'react'
 import {useDispatch} from 'react-redux'
 import {midiNoteToNoteNameFull} from '@corgifm/common/common-samples-stuff'
 import {MidiClipEvent} from '@corgifm/common/midi-types'
@@ -13,7 +13,7 @@ interface Props {
 	columnWidth: number
 	isSelected: boolean
 	onNoteSelect: (eventId: Id, select: boolean, clear: boolean) => void
-	handleMouseDown: (direction: 'left' | 'right' | 'center', eventId: Id) => void
+	handleMouseDown: (e: MouseEvent, direction: 'left' | 'right' | 'center', eventId: Id) => void
 }
 
 export const BetterNote = React.memo(({
@@ -27,6 +27,8 @@ export const BetterNote = React.memo(({
 
 	useLayoutEffect(() => {
 
+		// TODO I don't think this ever gets called
+		// It gets intercepted by the resizer
 		const onMouseDown = (e: MouseEvent) => {
 			if (e.button !== 0) return
 			e.stopPropagation()
