@@ -188,6 +188,7 @@ const gridSequencerActionTypes2: GridSequencerActionTypes = {
 	STOP_ALL: 0,
 	SET_SEQUENCER_PAN: 0,
 	SET_SEQUENCER_ZOOM: 0,
+	SEQUENCER_SAVE_UNDO: 0,
 }
 
 const gridSequencerActionTypes = Object.keys(gridSequencerActionTypes2)

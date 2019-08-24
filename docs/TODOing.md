@@ -262,6 +262,10 @@
 	- [ ] note resize
 - [ ] note resize and move need to snap to smallestNoteLength increments when alt
 - [√] when clicking single note with multiple selected, deselect others if mouse hasn't moved enough
+- [ ] require modifier key to scroll in better sequencer
+- [ ] allow copy pasting notes
+	- [ ] between better sequencers
+- [ ] ctrl + click and drag to duplicate
 
 - [ ] when you control click on a node header, the selected node(s) becomes connected
 - [ ] filter resonance

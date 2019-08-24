@@ -178,6 +178,7 @@ const infiniteSequencerActionTypes2: InfiniteSequencerActionTypes = {
 	VIRTUAL_KEY_PRESSED: 0,
 	SET_SEQUENCER_PAN: 0,
 	SET_SEQUENCER_ZOOM: 0,
+	SEQUENCER_SAVE_UNDO: 0,
 }
 
 const infiniteSequencerActionTypes = Object.keys(infiniteSequencerActionTypes2)
