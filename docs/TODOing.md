@@ -267,6 +267,8 @@
 	- [ ] between better sequencers
 - [ ] ctrl + click and drag to duplicate
 
+- [ ] !!! switching osc on synth while playing notes makes it louder
+
 - [ ] when you control click on a node header, the selected node(s) becomes connected
 - [ ] filter resonance
 - [ ] make piano roll notes light up on grid seq when connected keyboard is playing those notes

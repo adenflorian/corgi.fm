@@ -177,7 +177,7 @@ export const basicSamplersReducer = makeMultiReducer<BasicSamplerState, IBasicSa
 	Object.keys(basicSamplerActionTypes),
 )
 
-function basicSamplerReducer(basicSampler: BasicSamplerState, action: BasicSamplerAction): BasicSamplerState {
+export function basicSamplerReducer(basicSampler: BasicSamplerState, action: BasicSamplerAction): BasicSamplerState {
 	switch (action.type) {
 		case 'SET_BASIC_SAMPLER_PARAM':
 			return {

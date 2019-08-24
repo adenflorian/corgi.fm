@@ -11,6 +11,7 @@ import {emptyMidiNotes, IMidiNote, MidiNotes} from '../MidiNote'
 import {
 	deserializeSequencerState, selectAllGridSequencers, SequencerAction,
 	SequencerStateBase,
+	sequencerActionTypes2,
 } from './sequencer-redux'
 import {
 	addMultiThing, BROADCASTER_ACTION, createSequencerEvents, IClientRoomState,
@@ -172,23 +173,10 @@ type GridSequencerActionTypes = {
 }
 
 const gridSequencerActionTypes2: GridSequencerActionTypes = {
+	...sequencerActionTypes2,
 	SET_GRID_SEQUENCER_NOTE: 0,
 	SET_GRID_SEQUENCER_FIELD: 0,
-	CLEAR_SEQUENCER: 0,
-	UNDO_SEQUENCER: 0,
-	PLAY_SEQUENCER: 0,
-	STOP_SEQUENCER: 0,
-	TOGGLE_SEQUENCER_RECORDING: 0,
-	RECORD_SEQUENCER_NOTE: 0,
-	EXPORT_SEQUENCER_MIDI: 0,
-	PLAY_ALL: 0,
-	RECORD_SEQUENCER_REST: 0,
 	RESTART_GRID_SEQUENCER: 0,
-	SKIP_NOTE: 0,
-	STOP_ALL: 0,
-	SET_SEQUENCER_PAN: 0,
-	SET_SEQUENCER_ZOOM: 0,
-	SEQUENCER_SAVE_UNDO: 0,
 }
 
 const gridSequencerActionTypes = Object.keys(gridSequencerActionTypes2)
@@ -213,7 +201,7 @@ const gridSequencerReducer =
 				}
 				return {
 					...gridSequencer,
-					midiClip: gridSequencer.midiClip.set('events', gridSequencer.midiClip.events.map((event) => {
+					midiClip: gridSequencer.midiClip.set('events', gridSequencer.midiClip.events.map(event => {
 						if (event.startBeat === action.index) {
 							if (action.enabled) {
 								return {

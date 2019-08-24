@@ -42,6 +42,7 @@ export function shamuGraphReducer(state: ShamuGraphState | undefined, action: Sh
 				simpleDelays: deserialize(ConnectionNodeType.simpleDelay, action.shamuGraphState.nodes.simpleDelays),
 				virtualKeyboards: deserialize(ConnectionNodeType.virtualKeyboard, action.shamuGraphState.nodes.virtualKeyboards),
 			},
+			// TODO Get rid of edges, they aren't used
 			edges: makeShamuEdgesState().merge(action.shamuGraphState.edges),
 		}
 		// case 'MERGE_SHAMU_GRAPH_STATE': {

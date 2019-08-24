@@ -1,15 +1,19 @@
 import * as uuid from 'uuid'
-import {List, Record, Map, OrderedMap} from 'immutable'
+import {List, Record, OrderedMap} from 'immutable'
 import {IMidiNote} from './MidiNote'
 
-// Start Clip Midi Types
-
-/** In clip time (beats); Means BPM has not been applied */
+/** V2, In clip time (beats); Means BPM has not been applied */
 export interface MidiClipEvent {
 	readonly note: IMidiNote
 	readonly startBeat: number
 	readonly durationBeats: number
 	readonly id: Id
+}
+
+export interface MidiClipEventV1 {
+	readonly notes: Set<IMidiNote>
+	readonly startBeat: number
+	readonly durationBeats: number
 }
 
 /** In clip time (beats); Means BPM has not been applied */
@@ -27,6 +31,7 @@ export function makeMidiClipEvent(event: Pick<MidiClipEvent, 'durationBeats' | '
 }
 
 export const makeMidiClip = Record({
+	version: '2' as const,
 	length: 0,
 	loop: false,
 	events: OrderedMap<Id, MidiClipEvent>(),
@@ -40,6 +45,13 @@ export function makeEvents(events = List<MidiClipEvent>()) {
 
 /** In clip time (beats); Means BPM has not been applied */
 export class MidiClip extends makeMidiClip {}
+
+export interface MidiClipV1 {
+	readonly length: number
+	readonly loop: boolean
+	readonly events: List<MidiClipEventV1>
+	readonly version: undefined,
+}
 
 /** In clip time (beats); Means BPM has not been applied */
 export type MidiClipEvents = MidiClip['events']
@@ -71,6 +83,7 @@ export function makeMidiGlobalClipEvent(event: MidiGlobalClipEvent): MidiGlobalC
 
 /** In audio context time (seconds); Means BPM is already applied */
 export const makeMidiGlobalClip = Record({
+	version: '2',
 	length: 4,
 	loop: true,
 	events: OrderedMap<Id, MidiGlobalClipEvent>(),

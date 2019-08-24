@@ -68,6 +68,11 @@ export class SamplesManager {
 				`loadSampleAsync should not be called with dummy sample, dummy`)
 		}
 
+		if (path === undefined) {
+			return logger.warn(
+				`loadSampleAsync should not be called with undefined, dummy`)
+		}
+
 		this._samplesStatus.set(path, SampleStatus.Requested)
 
 		const url = `${getCdnUrl()}${path}`

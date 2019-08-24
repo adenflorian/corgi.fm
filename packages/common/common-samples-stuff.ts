@@ -122,6 +122,11 @@ export const dummySample: Sample = {
 	label: '?',
 }
 
+export const samplePathBegin = {
+	static: 'static',
+	user: 'user',
+} as const
+
 export const samplerBasicPianoNotes: Samples = samplesToGet.reduce(
 	(samples, note): Samples => {
 
@@ -130,7 +135,7 @@ export const samplerBasicPianoNotes: Samples = samplesToGet.reduce(
 				const midiNote = midiNoteFromNoteName(note, octave)
 				mutable.set(midiNote, {
 					label: `piano ${note}${octave}`,
-					path: `static/samplers/basic-piano/${sharpToFlatNotes[note]}${octave}-49-96.mp3`,
+					path: `${samplePathBegin.static}/samplers/basic-piano/${sharpToFlatNotes[note]}${octave}-49-96.mp3`,
 					color: note.includes('#') ? 'green' : 'blue',
 				})
 			})
@@ -155,7 +160,7 @@ const basicDrumSamples: Samples = makeSamples([
 	[72, {color: 'orange', label: 'bark rose', path: 'bark-rose.wav'}],
 ]).map(x => ({
 	...x,
-	path: 'static/samplers/basic-drums/' + x.path,
+	path: `${samplePathBegin.static}/samplers/basic-drums/` + x.path,
 }))
 
 export const defaultSamples = Map({

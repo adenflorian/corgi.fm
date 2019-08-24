@@ -1,5 +1,6 @@
 import {makeUser} from '@corgifm/common/models/User'
 import {connectDB, DBStore} from './database'
+import {samplePathBegin} from '@corgifm/common/common-samples-stuff';
 
 const uidA = 'uidA111Lp7TlwLzH4r2ivWTcu1C2'
 const uidB = 'uidB222Lp7TlwLzH4r2ivWTcu1C2'
@@ -56,21 +57,21 @@ describe('Database Tests', () => {
 		test('save upload', async () => {
 			await db.uploads.put({
 				ownerUid: uidA,
-				path: 'user/uidA1.wav',
+				path: `${samplePathBegin.user}/uidA1.wav`,
 				sizeBytes: 350,
 				color: 'red',
 				label: 'my sample1',
 			})
 			await db.uploads.put({
 				ownerUid: uidB,
-				path: 'user/uidB1.wav',
+				path: `${samplePathBegin.user}/uidB1.wav`,
 				sizeBytes: 400,
 				color: 'purple',
 				label: 'my sample2',
 			})
 			await db.uploads.put({
 				ownerUid: uidA,
-				path: 'user/uidA2.wav',
+				path: `${samplePathBegin.user}/uidA2.wav`,
 				sizeBytes: 700,
 				color: 'yellow',
 				label: 'my sample3',

@@ -9,6 +9,7 @@ import {
 	VerifyAuthHeaderMock, missingAuthHeaderResponse, apiRouteNotFoundResponse,
 	uidA, uidB,
 } from './api-test-common'
+import {samplePathBegin} from '@corgifm/common/common-samples-stuff';
 
 export function getSampleApiTests(
 	getDb: () => DBStore,
@@ -116,7 +117,7 @@ export function getSampleApiTests(
 				contentType: ContentTypes.ApplicationJson,
 				resBody: {
 					ownerUid: uidA,
-					path: `user/${mockUuid}.wav`,
+					path: `${samplePathBegin.user}/${mockUuid}.wav`,
 					sizeBytes: 10 * 1000 * 1000,
 					color: 'blue',
 					label: 'smallFile',
@@ -146,21 +147,21 @@ export function getSampleApiTests(
 				before: () => {
 					getDb().uploads.put({
 						ownerUid: uidA,
-						path: `user/${mockUuid}.wav`,
+						path: `${samplePathBegin.user}/${mockUuid}.wav`,
 						sizeBytes: 1000,
 						color: 'blue',
 						label: 'my sample1',
 					})
 					getDb().uploads.put({
 						ownerUid: uidB,
-						path: `user/${mockUuid}.wav`,
+						path: `${samplePathBegin.user}/${mockUuid}.wav`,
 						sizeBytes: 2000,
 						color: 'red',
 						label: 'my sample2',
 					})
 					getDb().uploads.put({
 						ownerUid: uidA,
-						path: `user/${mockUuid}.wav`,
+						path: `${samplePathBegin.user}/${mockUuid}.wav`,
 						sizeBytes: 3000,
 						color: 'green',
 						label: 'my sample3',
@@ -170,13 +171,13 @@ export function getSampleApiTests(
 				contentType: ContentTypes.ApplicationJson,
 				resBody: [{
 					ownerUid: uidA,
-					path: `user/${mockUuid}.wav`,
+					path: `${samplePathBegin.user}/${mockUuid}.wav`,
 					sizeBytes: 1000,
 					color: 'blue',
 					label: 'my sample1',
 				}, {
 					ownerUid: uidA,
-					path: `user/${mockUuid}.wav`,
+					path: `${samplePathBegin.user}/${mockUuid}.wav`,
 						sizeBytes: 3000,
 						color: 'green',
 						label: 'my sample3',

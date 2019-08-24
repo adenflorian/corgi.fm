@@ -20,6 +20,7 @@ import {
 	defaultResponse, RoutedRequest, ApiRequest,
 } from './api-types'
 import {s3Upload} from './s3'
+import {samplePathBegin} from '@corgifm/common/common-samples-stuff';
 
 // If a setting is 0 it might mean infinite, so do minimum of 1
 const multerOptions: multer.Options = {
@@ -164,7 +165,7 @@ async function uploadToS3(
 
 	const serverEnv = getServerEnv()
 
-	const key = serverEnv + '/user/' + createNodeId()
+	const key = serverEnv + `/${samplePathBegin.user}/` + createNodeId()
 		+ uploadResult.validatedExtension
 
 	const result = await s3Upload({

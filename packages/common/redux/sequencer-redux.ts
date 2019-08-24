@@ -103,6 +103,27 @@ export const sequencerActions = {
 	} as const),
 } as const
 
+type SequencerActionTypes = {
+	[key in SequencerAction['type']]: 0
+}
+
+export const sequencerActionTypes2: SequencerActionTypes = {
+	CLEAR_SEQUENCER: 0,
+	UNDO_SEQUENCER: 0,
+	PLAY_SEQUENCER: 0,
+	STOP_SEQUENCER: 0,
+	TOGGLE_SEQUENCER_RECORDING: 0,
+	RECORD_SEQUENCER_NOTE: 0,
+	EXPORT_SEQUENCER_MIDI: 0,
+	PLAY_ALL: 0,
+	RECORD_SEQUENCER_REST: 0,
+	SKIP_NOTE: 0,
+	STOP_ALL: 0,
+	SET_SEQUENCER_ZOOM: 0,
+	SET_SEQUENCER_PAN: 0,
+	SEQUENCER_SAVE_UNDO: 0,
+}
+
 export type SequencerAction = ActionType<typeof sequencerActions>
 
 export const createSequencerEvents = (length: number, ratio = 1): MidiClipEvents => {
