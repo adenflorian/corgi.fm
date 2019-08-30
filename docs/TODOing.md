@@ -223,6 +223,12 @@
 		- [√] samples manager middleware?
 		- [√] if `getSample` gets called and sample isn't loaded, then that's an error?
 
+- [ ] save room as file broken
+- [√] need to strip undo history of better sequencer when saving
+- [ ] audio dying after listening to song for long enough
+- [ ] add checkbox to toggle chat being in front or back
+
+
 **Better Sequencer**
 - [√] scroll up and down with mouse wheel
 - [√] hoz zoom with ctrl + scroll

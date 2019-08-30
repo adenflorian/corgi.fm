@@ -48,7 +48,8 @@ import {
 	VirtualKeyUpAction,
 	virtualOctaveChange,
 	VirtualOctaveChangeAction,
-	LocalAction, chatSystemMessage, animationActions, selectOption, AppOptions, getNodeInfo, InfiniteSequencerState,
+	LocalAction, chatSystemMessage, animationActions, selectOption, AppOptions,
+	getNodeInfo, SequencerStateBase,
 } from '@corgifm/common/redux'
 import {pointersActions} from '@corgifm/common/redux/pointers-redux'
 import {CssColor} from '@corgifm/common/shamu-color'
@@ -533,21 +534,27 @@ function stripShamuGraphForSaving(shamuGraphState: ShamuGraphState): ShamuGraphS
 			...shamuGraphState.nodes,
 			gridSequencers: {
 				things: Map(shamuGraphState.nodes.gridSequencers.things)
-					.map(x => ({
-						...x,
-						previousEvents: List<OrderedMap<Id, MidiClipEvent>>(),
-					} as GridSequencerState))
+					.map(stripSequencerSaves)
 					.toObject(),
 			},
 			infiniteSequencers: {
 				things: Map(shamuGraphState.nodes.infiniteSequencers.things)
-					.map(x => ({
-						...x,
-						previousEvents: List<OrderedMap<Id, MidiClipEvent>>(),
-					} as InfiniteSequencerState))
+					.map(stripSequencerSaves)
+					.toObject(),
+			},
+			betterSequencers: {
+				things: Map(shamuGraphState.nodes.betterSequencers.things)
+					.map(stripSequencerSaves)
 					.toObject(),
 			},
 		},
+	}
+}
+
+function stripSequencerSaves<T extends SequencerStateBase>(sequencer: T): T {
+	return {
+		...sequencer,
+		previousEvents: List(),
 	}
 }
 
