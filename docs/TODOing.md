@@ -225,7 +225,7 @@
 
 - [√] need to strip undo history of better sequencer when saving
 - [√] save room as file broken when room save is too big
-- [ ] timeline not respecting node width on BS
+- [√] timeline not respecting node width on BS
 - [ ] add checkbox to toggle chat being in front or back
 - [ ] audio dying after listening to song for long enough
 	- [ ] refactor audio stuff to reuse oscillators and gain nodes, etc.
