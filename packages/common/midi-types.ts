@@ -50,7 +50,7 @@ export interface MidiClipV1 {
 	readonly length: number
 	readonly loop: boolean
 	readonly events: List<MidiClipEventV1>
-	readonly version: undefined,
+	readonly version: undefined
 }
 
 /** In clip time (beats); Means BPM has not been applied */
@@ -67,18 +67,27 @@ export interface MidiGlobalClipEvent {
 	readonly note: IMidiNote
 	readonly startTime: number
 	readonly endTime: number
+	readonly id: Id
 }
 
 export function makeMidiGlobalClipEvent(event: MidiGlobalClipEvent): MidiGlobalClipEvent {
-	if (event.note === undefined) throw new Error('why')
-	if (event.startTime === undefined) throw new Error('why')
-	if (event.endTime === undefined) throw new Error('why')
+	if (event.note === undefined) throw new Error('why1')
+	if (event.startTime === undefined) throw new Error('why2')
+	if (event.endTime === undefined) throw new Error('why3')
+	if (event.id === undefined) throw new Error('why4')
 
 	return {
 		note: event.note,
 		startTime: event.startTime,
 		endTime: event.endTime,
+		id: event.id,
 	}
+}
+
+export function makeMidiGlobalClipEvents(events: List<MidiGlobalClipEvent>): MidiGlobalClipEvents {
+	return events.reduce((result, event) => {
+		return result.set(event.id, event)
+	}, OrderedMap<Id, MidiGlobalClipEvent>())
 }
 
 /** In audio context time (seconds); Means BPM is already applied */

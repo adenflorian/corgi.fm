@@ -226,7 +226,8 @@
 - [√] need to strip undo history of better sequencer when saving
 - [√] save room as file broken when room save is too big
 - [√] timeline not respecting node width on BS
-- [ ] add checkbox to toggle chat being in front or back
+- [ ] !!! switching osc on synth while playing notes makes it louder
+- [ ] add checkbox to toggle chat being in front or back (brinch)
 - [ ] audio dying after listening to song for long enough
 	- [ ] refactor audio stuff to reuse oscillators and gain nodes, etc.
 
@@ -275,8 +276,6 @@
 	- [ ] between better sequencers
 - [ ] ctrl + click and drag to duplicate
 
-- [ ] !!! switching osc on synth while playing notes makes it louder
-
 - [ ] when you control click on a node header, the selected node(s) becomes connected
 - [ ] filter resonance
 - [ ] make piano roll notes light up on grid seq when connected keyboard is playing those notes
@@ -293,8 +292,8 @@
 - [ ] show download progress on pad
 - [ ] have separate radio selector on pads to select
 - [ ] dont select pad just by clicking on it
-- [√] make button on node's to quickly connect your keyboard to it
-	- shift + click header or right click and select "connect keyboard"
+- [√] make button on nodes to quickly connect your keyboard to it
+	- [√] shift + click header or right click and select "connect keyboard"
 - [ ] view hotkeys, home goes to start of chain and end goes to end
 - [ ] selection group hotkeys
 - [ ] RTS DAW
@@ -302,9 +301,9 @@
 	- [ ] have to build new nodes at factories
 	- [ ] harvest resources
 
-snap nodes to grid
-	snap nodes together
-	when moving a node that is snapped to other nodes, move all of them together
+- [ ] snap nodes to grid
+	- [ ] snap nodes together
+	- [ ] when moving a node that is snapped to other nodes, move all of them together
 
 - [ ] ask the user's experience level
 - [ ] ask what the user wants to use corgi for
@@ -509,6 +508,8 @@ Yes, https://mmckegg.github.io/web-audio-school/, exercise 13 is exactly what yo
 - [ ] save picture of room in save file
 - [ ] make little illustrations for empty stuff, like for when you have no friends or no saves
 - [ ] control stuff with external midi knobs
+- [ ] different node UI at different zoom levels
+- [ ] ability to make nodes smaller/larger zoom levels
 
 # Goals
 - [ ] be able to recreate certain songs

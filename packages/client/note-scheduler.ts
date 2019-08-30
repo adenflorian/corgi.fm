@@ -77,6 +77,7 @@ export function getEvents(clip: MidiClip, initialRange: MidiRange, rate: number)
 					note: x.note,
 					startTime: ((adjustedStartBeat * midiPrecision) - (start * midiPrecision) + (_offset * midiPrecision)) / midiPrecision,
 					endTime: ((adjustedStartBeat * midiPrecision) - (start * midiPrecision) + (_offset * midiPrecision) + (adjustedDurationBeats * midiPrecision)) / midiPrecision, // TODO
+					id: x.id,
 				}))
 			})
 	}
