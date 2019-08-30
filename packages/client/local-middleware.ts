@@ -564,15 +564,31 @@ function setLocalSavesToLocalStorage(localSaves: LocalSaves) {
 
 // https://stackoverflow.com/questions/19721439/download-json-object-as-a-file-from-browser
 function downloadObjectAsJson(exportObj: any, exportName: string) {
-	const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(exportObj))
+	const dataStr = JSON.stringify(exportObj)
+	const blob = dataURIToBlob(dataStr)
+	const objectUrl = URL.createObjectURL(blob)
 	const downloadAnchorNode = document.createElement('a')
-	downloadAnchorNode.setAttribute('href', dataStr)
+	downloadAnchorNode.setAttribute('href', objectUrl)
 	downloadAnchorNode.setAttribute('download', exportName + '.json')
 	// TODO
 	// eslint-disable-next-line unicorn/prefer-node-append
 	document.body.appendChild(downloadAnchorNode) // required for firefox
 	downloadAnchorNode.click()
 	downloadAnchorNode.remove()
+	URL.revokeObjectURL(objectUrl)
+}
+
+// edited from https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob#Polyfill
+function dataURIToBlob(dataURI: string): Blob {
+	const binStr = dataURI
+	const len = binStr.length
+	const arr = new Uint8Array(len)
+
+	for (let i = 0; i < len; i++) {
+		arr[i] = binStr.charCodeAt(i)
+	}
+
+	return new Blob([arr])
 }
 
 export function getOrCreateLocalSavesStorage(): LocalSaves {
