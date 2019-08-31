@@ -31,6 +31,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 	dispatchToRoom(addPosition(
 		makePosition({
 			...masterClock,
+			ownerId: serverClient.id,
 			targetType: masterClock.type,
 			color: findNodeInfo(masterClock.type).color,
 		})))
@@ -38,6 +39,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 	dispatchToRoom(addPosition(
 		makePosition({
 			...masterAudioOutput,
+			ownerId: serverClient.id,
 			targetType: masterAudioOutput.type,
 			color: findNodeInfo(masterAudioOutput.type).color,
 		})))
@@ -50,6 +52,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 	dispatchToRoom(addPosition(
 		makePosition({
 			...simpleReverb,
+			ownerId: serverClient.id,
 			targetType: simpleReverb.type,
 			color: findNodeInfo(simpleReverb.type).color,
 		})))
@@ -126,6 +129,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 		dispatchToRoom(addPosition(
 			makePosition({
 				...target,
+				ownerId: serverClient.id,
 				targetType: target.type,
 				color: findNodeInfo(target.type).color,
 			})))
@@ -134,6 +138,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 		dispatchToRoom(addPosition(
 			makePosition({
 				...source,
+				ownerId: serverClient.id,
 				targetType: source.type,
 				color: findNodeInfo(source.type).color,
 			})))
@@ -161,7 +166,6 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 		switch (args.type) {
 			case ConnectionNodeType.gridSequencer:
 				const x = new GridSequencerState(
-					serverClient.id,
 					args.events,
 					args.isPlaying,
 				)
@@ -170,7 +174,6 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 				return x
 			case ConnectionNodeType.betterSequencer:
 				const w = new BetterSequencerState(
-					serverClient.id,
 					args.events,
 					args.isPlaying,
 				)
@@ -179,7 +182,6 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 				return w
 			case ConnectionNodeType.infiniteSequencer:
 				const y = new InfiniteSequencerState(
-					serverClient.id,
 					args.infinityStyle || InfiniteSequencerStyle.colorGrid,
 					args.events,
 					args.isPlaying,
@@ -188,7 +190,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 				// makeServerOwnedNode(args.type, y)
 				return y
 			case ConnectionNodeType.simpleReverb:
-				const z = new SimpleReverbState(serverClient.id)
+				const z = new SimpleReverbState()
 				dispatchToRoom(addSimpleReverb(z))
 				// makeServerOwnedNode(args.type, z)
 				return z
@@ -200,12 +202,12 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 	function createTarget(type: ConnectionNodeType) {
 		switch (type) {
 			case ConnectionNodeType.basicSynthesizer:
-				const x = new BasicSynthesizerState(serverClient.id)
+				const x = new BasicSynthesizerState()
 				dispatchToRoom(addBasicSynthesizer(x))
 				// makeServerOwnedNode(type, x)
 				return x
 			case ConnectionNodeType.basicSampler:
-				const y = new BasicSamplerState(serverClient.id)
+				const y = new BasicSamplerState()
 				dispatchToRoom(basicSamplerActions.add(y))
 				// makeServerOwnedNode(type, y)
 				return y

@@ -44,7 +44,6 @@ export interface ISimpleCompressors {
 export class SimpleCompressorState implements IConnectable, NodeSpecialState {
 	public static dummy: SimpleCompressorState = {
 		id: 'dummy',
-		ownerId: 'dummyOwner',
 		threshold: 0,
 		knee: 0,
 		ratio: 0,
@@ -54,23 +53,18 @@ export class SimpleCompressorState implements IConnectable, NodeSpecialState {
 	}
 
 	public readonly id = uuid.v4()
-	public readonly ownerId: Id
 	public readonly threshold: number = -24
 	public readonly ratio: number = 12
 	public readonly attack: number = 0.003
 	public readonly release: number = 0.25
 	public readonly knee: number = 30
 	public readonly type = ConnectionNodeType.simpleCompressor
-
-	public constructor(ownerId: ClientId) {
-		this.ownerId = ownerId
-	}
 }
 
 export function deserializeSimpleCompressorState(state: IMultiStateThing): IMultiStateThing {
 	const x = state as SimpleCompressorState
 	const y: SimpleCompressorState = {
-		...(new SimpleCompressorState(x.ownerId)),
+		...(new SimpleCompressorState()),
 		...x,
 	}
 	return y
@@ -110,9 +104,6 @@ export const selectAllSimpleCompressorIds = (state: IClientRoomState) => Object.
 
 export const selectAllSimpleCompressorsAsArray =
 	createSelectAllOfThingAsArray<ISimpleCompressors, SimpleCompressorState>(selectAllSimpleCompressors)
-
-export const selectSimpleCompressorsByOwner = (state: IClientRoomState, ownerId: ClientId) =>
-	selectAllSimpleCompressorsAsArray(state).filter(x => x.ownerId === ownerId)
 
 export const selectSimpleCompressor = (state: IClientRoomState, id: Id) =>
 	selectAllSimpleCompressors(state)[id as string] || SimpleCompressorState.dummy

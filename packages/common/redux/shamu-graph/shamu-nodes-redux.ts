@@ -136,19 +136,3 @@ export const nodesReducer = combineReducers({
 // }
 
 // const dummyNodeSpecialState: NodeSpecialState = GridSequencerState.dummy
-
-export const selectNodeIdsOwnedByClient = (state: IClientRoomState, clientId: ClientId) => {
-	const nodes = state.shamuGraph.nodes as unknown as {[key: string]: IMultiState}
-
-	const ids: {id: Id, type: ConnectionNodeType}[] = []
-
-	Object.keys(nodes).forEach(nodeKey => {
-		const things = nodes[nodeKey].things
-		Object.keys(things).forEach(thingKey => {
-			const thing = things[thingKey]
-			if (thing.ownerId === clientId) ids.push({id: thing.id, type: thing.type})
-		})
-	})
-
-	return ids
-}

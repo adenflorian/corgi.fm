@@ -78,7 +78,6 @@ export class VirtualKeyboardState implements IMultiStateThing, NodeSpecialState 
 		pressedKeys: emptyMidiNotes,
 		octave: 0,
 		id: 'dummy',
-		ownerId: 'dummyOwner',
 		type: ConnectionNodeType.virtualKeyboard,
 		width: VirtualKeyboardState.defaultWidth,
 		height: VirtualKeyboardState.defaultHeight,
@@ -87,7 +86,7 @@ export class VirtualKeyboardState implements IMultiStateThing, NodeSpecialState 
 	public static fromJS: IMultiStateThingDeserializer = state => {
 		const x = state as VirtualKeyboardState
 		const y: VirtualKeyboardState = {
-			...(new VirtualKeyboardState(x.ownerId)),
+			...(new VirtualKeyboardState()),
 			...(state as VirtualKeyboardState),
 			pressedKeys: MidiNotes(x.pressedKeys),
 			width: Math.max(x.width, VirtualKeyboardState.defaultWidth),
@@ -102,10 +101,6 @@ export class VirtualKeyboardState implements IMultiStateThing, NodeSpecialState 
 	public readonly type = ConnectionNodeType.virtualKeyboard
 	public readonly width: number = VirtualKeyboardState.defaultWidth
 	public readonly height: number = VirtualKeyboardState.defaultHeight
-
-	public constructor(
-		public readonly ownerId: ClientId,
-	) {}
 }
 
 export type VirtualKeyboardAction = VirtualOctaveChangeAction | VirtualKeyUpAction | VirtualKeyPressedAction
@@ -190,19 +185,4 @@ export const makeGetKeyboardMidiOutput = () => {
 		selectVirtualKeyboardById,
 		keyboard => keyboard === undefined ? MidiNotes() : keyboard.pressedKeys.map(x => applyOctave(x, keyboard.octave)),
 	)
-}
-
-export function selectVirtualKeyboardsByOwner(state: IClientRoomState, ownerId: ClientId) {
-	return selectAllVirtualKeyboardsArray(state)
-		.filter(x => x.ownerId === ownerId)
-}
-
-export function selectVirtualKeyboardIdByOwner(state: IClientRoomState, ownerId: ClientId) {
-	return selectVirtualKeyboardByOwner(state, ownerId).id
-}
-
-export function selectVirtualKeyboardByOwner(state: IClientRoomState, ownerId: ClientId) {
-	const keyboard = selectAllVirtualKeyboardsArray(state)
-		.find(x => x.ownerId === ownerId)
-	return keyboard || VirtualKeyboardState.dummy
 }

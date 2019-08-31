@@ -240,6 +240,7 @@
 - [√] enabled (removed from node state, was already on position state, and it wasn't used from node state)
 
 **BUGS**
+- [ ] grid sequencer timeline going too far right
 - [ ] connector placeholders aren't using z-index of parent node
 
 **Better Sequencer**
@@ -286,6 +287,7 @@
 	- [ ] between better sequencers
 - [ ] ctrl + click and drag to duplicate
 
+- [ ] don't show connect keyboard menu item if keyboard is already connected
 - [ ] when you control click on a node header, the selected node(s) becomes connected
 - [ ] filter resonance
 - [ ] make piano roll notes light up on grid seq when connected keyboard is playing those notes

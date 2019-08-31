@@ -163,7 +163,6 @@ export const dummySequencerState: SequencerStateBase = {
 	rate: 1,
 	pitch: 0,
 	midiClip: makeMidiClip(),
-	ownerId: 'dummy owner id',
 	type: ConnectionNodeType.gridSequencer,
 	isPlaying: false,
 	gate: 1,
@@ -180,7 +179,6 @@ export abstract class SequencerStateBase implements ISequencerState {
 
 	public constructor(
 		public readonly midiClip: MidiClip,
-		public readonly ownerId: Id,
 		public readonly type: ConnectionNodeType,
 		public readonly isPlaying: boolean = false,
 		public readonly gate: number = 1,

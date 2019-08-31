@@ -23,12 +23,12 @@ import {
 	selectAllRooms, selectAllRoomStates, selectClientById,
 	selectClientBySocketId,
 	selectConnectionsWithSourceOrTargetIds, selectConnectionsWithTargetIds,
-	selectGlobalClockState, selectNodeIdsOwnedByClient,
+	selectGlobalClockState,
 	selectPositionsWithIds, selectRoomExists,
 	selectRoomSettings, selectRoomStateByName, selectShamuGraphState,
 	SERVER_ACTION, setActiveRoom,
 	setChat, setClients, setRoomMembers, setRooms, shamuGraphActions,
-	userLeftRoom, whitelistedRoomActionTypes, isRoomOwnerRoomAction,
+	userLeftRoom, whitelistedRoomActionTypes, isRoomOwnerRoomAction, selectPositionsByOwner,
 } from '@corgifm/common/redux'
 import {WebSocketEvent} from '@corgifm/common/server-constants'
 import {createServerStuff, loadServerStuff} from './create-server-stuff'
@@ -285,16 +285,16 @@ function onLeaveRoom(io: Server, socket: Socket, roomToLeave: string, serverStor
 	serverStore.dispatch(userLeftRoom(roomToLeave, Date.now()))
 
 	{
-		const nodesOwnedByClient = selectNodeIdsOwnedByClient(roomState, clientId)
+		const nodesOwnedByClient = selectPositionsByOwner(roomState, clientId)
 
 		// filter out nodes that we don't want to delete
 
 		const keyboardIds = nodesOwnedByClient
-			.filter(x => x.type === ConnectionNodeType.virtualKeyboard)
-			.map(x => x.id)
+			.filter(x => x.targetType === ConnectionNodeType.virtualKeyboard)
+			.keySeq()
 
 		const otherNodes = nodesOwnedByClient
-			.filter(x => x.type !== ConnectionNodeType.virtualKeyboard)
+			.filter(x => x.targetType !== ConnectionNodeType.virtualKeyboard)
 			.filter(x => {
 				const incomingConnections = selectConnectionsWithTargetIds(roomState, [x.id])
 
@@ -307,7 +307,7 @@ function onLeaveRoom(io: Server, socket: Socket, roomToLeave: string, serverStor
 				return false
 			})
 
-		const nodeIdsToDelete = otherNodes.map(x => x.id).concat(keyboardIds)
+		const nodeIdsToDelete = otherNodes.keySeq().concat(keyboardIds).toArray()
 
 		const connectionIdsToDelete = selectConnectionsWithSourceOrTargetIds(roomState, nodeIdsToDelete)
 			.map(x => x.id)

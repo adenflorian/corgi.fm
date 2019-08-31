@@ -6,7 +6,7 @@ import {
 } from '@corgifm/common/common-utils'
 import {
 	virtualKeyPressed, virtualKeyUp, selectVirtualKeyboardOctave, IClientAppState,
-	selectVirtualKeyboardById, selectClientById, selectLocalClientId,
+	selectVirtualKeyboardById, selectClientById, selectLocalClientId, selectPosition,
 } from '@corgifm/common/redux'
 import {
 	keyColors,
@@ -53,7 +53,7 @@ export const Keyboard = ({id}: IKeyboardAllProps) => {
 	const [wasMouseClickedOnKeyboard, setWasMouseClickedOnKeyboard] =
 		useState(false)
 
-	const ownerId = useSelector((state: IClientAppState) => selectVirtualKeyboardById(state.room, id).ownerId)
+	const ownerId = useSelector((state: IClientAppState) => selectPosition(state.room, id).ownerId)
 	const pressedMidiKeys = useSelector((state: IClientAppState) => selectVirtualKeyboardById(state.room, id).pressedKeys)
 	const octave = useSelector((state: IClientAppState) => selectVirtualKeyboardById(state.room, id).octave)
 

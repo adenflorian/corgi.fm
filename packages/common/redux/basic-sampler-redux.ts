@@ -113,7 +113,6 @@ export class BasicSamplerState implements IConnectable, NodeSpecialState {
 
 	public static dummy: BasicSamplerState = {
 		id: 'dummy',
-		ownerId: 'dummyOwner',
 		type: ConnectionNodeType.basicSampler,
 		filterType: BasicSamplerState.defaultFilterType,
 		samples: makeSamples(),
@@ -123,17 +122,12 @@ export class BasicSamplerState implements IConnectable, NodeSpecialState {
 	}
 
 	public readonly id = uuid.v4()
-	public readonly ownerId: Id
 	public readonly type = ConnectionNodeType.basicSampler
 	public readonly filterType: BuiltInBQFilterType = BasicSamplerState.defaultFilterType
 	public readonly samples: Samples = samplerBasicPianoNotes
 	public readonly samplesViewOctave: number = 4
 	public readonly selectedSamplePad?: IMidiNote = undefined
 	public readonly params: SampleParams = makeSampleParams()
-
-	public constructor(ownerId: ClientId) {
-		this.ownerId = ownerId
-	}
 }
 
 export function deserializeBasicSamplerState(
@@ -141,7 +135,7 @@ export function deserializeBasicSamplerState(
 ): BasicSamplerState {
 	const x = state as BasicSamplerState
 	return {
-		...(new BasicSamplerState(x.ownerId)),
+		...(new BasicSamplerState()),
 		...x,
 		samples: x.samples === undefined
 			? samplerBasicPianoNotes
@@ -230,9 +224,6 @@ export const selectAllSamplerIds = (state: IClientRoomState) => Object.keys(sele
 
 export const selectAllSamplersAsArray =
 	createSelectAllOfThingAsArray<IBasicSamplers, BasicSamplerState>(selectAllSamplers)
-
-export const selectSamplersByOwner = (state: IClientRoomState, ownerId: ClientId) =>
-	selectAllSamplersAsArray(state).filter(x => x.ownerId === ownerId)
 
 export const selectSampler = (state: IClientRoomState, id: Id) =>
 	selectAllSamplers(state)[id as string] || BasicSamplerState.dummy

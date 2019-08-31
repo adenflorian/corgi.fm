@@ -107,11 +107,10 @@ function foo() {
 
 export class BetterSequencerState extends SequencerStateBase {
 	public static dummy = new BetterSequencerState(
-		'dummy', makeEvents(), false,
+		makeEvents(), false,
 	)
 
 	public constructor(
-		ownerId: Id,
 		events = foo(),
 		isPlaying = true,
 	) {
@@ -126,7 +125,6 @@ export class BetterSequencerState extends SequencerStateBase {
 				length: 4 * 8,
 				loop: true,
 			}),
-			ownerId,
 			ConnectionNodeType.betterSequencer,
 			true,
 			1,
@@ -141,7 +139,7 @@ export function deserializeBetterSequencerState(state: IMultiStateThing): IMulti
 	const x = state as BetterSequencerState
 	const z = deserializeSequencerState(x)
 	const y: BetterSequencerState = {
-		...(new BetterSequencerState(x.ownerId)),
+		...(new BetterSequencerState()),
 		...z,
 	}
 	return y

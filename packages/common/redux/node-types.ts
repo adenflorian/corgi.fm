@@ -38,7 +38,6 @@ export type IConnectionNodeInfo = ReturnType<typeof makeNodeInfo>
 export const dummyIConnectable: IMultiStateThing = {
 	id: 'oh no',
 	type: ConnectionNodeType.dummy,
-	ownerId: 'dummyOwnerId',
 }
 
 class DummyConnectable implements IConnectable {
@@ -56,7 +55,7 @@ const _makeNodeInfo = Record({
 	stateDeserializer: ((state: IMultiStateThing) => state) as (state: IMultiStateThing) => IMultiStateThing,
 	color: false as string | false,
 	typeName: 'Default Type Name',
-	StateConstructor: (DummyConnectable) as new (ownerId: Id) => IConnectable,
+	StateConstructor: (DummyConnectable) as new () => IConnectable,
 	addNodeActionCreator: ((state: IClientAppState) => ({type: 'dummy add node action type'})) as (state: any) => AnyAction,
 	showOnAddNodeMenu: false,
 	isDeletable: false,
@@ -83,7 +82,6 @@ function makeNodeInfo(x: Pick<NodeInfo, 'stateSelector' | 'typeName' | 'StateCon
 class AudioOutputState implements IMultiStateThing {
 	public readonly id = MASTER_AUDIO_OUTPUT_TARGET_ID
 	public readonly type = ConnectionNodeType.audioOutput
-	public readonly ownerId = serverClientId
 }
 
 const audioOutputState = new AudioOutputState()
@@ -91,7 +89,6 @@ const audioOutputState = new AudioOutputState()
 class MasterClockState implements IMultiStateThing {
 	public readonly id = MASTER_CLOCK_SOURCE_ID
 	public readonly type = ConnectionNodeType.masterClock
-	public readonly ownerId = serverClientId
 }
 
 const masterClockState = new MasterClockState()

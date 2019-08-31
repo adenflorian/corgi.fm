@@ -36,7 +36,6 @@ export interface GroupSequencers {
 export class GroupSequencer implements IConnectable, NodeSpecialState, IMultiStateThing {
 	public static dummy: GroupSequencer = {
 		id: 'dummy',
-		ownerId: 'dummyOwner',
 		type: ConnectionNodeType.groupSequencer,
 		groups: makeGroups([CssColor.red, CssColor.green], 2, 4),
 		length: 2,
@@ -55,9 +54,7 @@ export class GroupSequencer implements IConnectable, NodeSpecialState, IMultiSta
 	public readonly zoom: Point = {x: 1, y: 1}
 	public readonly pan: Point = {x: 0, y: 0}
 
-	public constructor(
-		public readonly ownerId: Id,
-	) {
+	public constructor() {
 		this.groups = makeGroups([CssColor.red, CssColor.green, CssColor.blue], this.length, this.groupEventBeatLength)
 		this.outputPortCount = this.groups.count()
 		// TODO
@@ -68,7 +65,7 @@ export class GroupSequencer implements IConnectable, NodeSpecialState, IMultiSta
 export function deserializeGroupSequencerState(state: IMultiStateThing): IMultiStateThing {
 	const x = state as GroupSequencer
 	const y: GroupSequencer = {
-		...(new GroupSequencer(x.ownerId)),
+		...(new GroupSequencer()),
 		...x,
 		groups: List<Group>(x.groups)
 			.map(group => ({

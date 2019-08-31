@@ -55,7 +55,6 @@ export class SimpleReverbState implements IConnectable, NodeSpecialState {
 
 	public static dummy: SimpleReverbState = {
 		id: 'dummy',
-		ownerId: 'dummyOwner',
 		lowPassFilterCutoffFrequency: 0,
 		time: 0,
 		dry: 0,
@@ -67,7 +66,6 @@ export class SimpleReverbState implements IConnectable, NodeSpecialState {
 	}
 
 	public readonly id = uuid.v4()
-	public readonly ownerId: Id
 	public readonly lowPassFilterCutoffFrequency: number = SimpleReverbState.defaultLpfFreq
 	public readonly time: number = SimpleReverbState.defaultTime
 	public readonly dry: number = SimpleReverbState.defaultDry
@@ -76,16 +74,12 @@ export class SimpleReverbState implements IConnectable, NodeSpecialState {
 	public readonly decay: number = SimpleReverbState.defaultDecay
 	public readonly filterType: BuiltInBQFilterType = SimpleReverbState.defaultFilterType
 	public readonly type = ConnectionNodeType.simpleReverb
-
-	public constructor(ownerId: ClientId) {
-		this.ownerId = ownerId
-	}
 }
 
 export function deserializeSimpleReverbState(state: IMultiStateThing): IMultiStateThing {
 	const x = state as SimpleReverbState
 	const y: SimpleReverbState = {
-		...(new SimpleReverbState(x.ownerId)),
+		...(new SimpleReverbState()),
 		...x,
 	}
 	return y
@@ -122,12 +116,6 @@ function simpleReverbReducer(simpleReverb: SimpleReverbState, action: AnyAction)
 export const selectAllSimpleReverbs = (state: IClientRoomState) => state.shamuGraph.nodes.simpleReverbs.things
 
 export const selectAllSimpleReverbIds = (state: IClientRoomState) => Object.keys(selectAllSimpleReverbs(state))
-
-export const selectAllSimpleReverbsAsArray =
-	createSelectAllOfThingAsArray<ISimpleReverbs, SimpleReverbState>(selectAllSimpleReverbs)
-
-export const selectSimpleReverbsByOwner = (state: IClientRoomState, ownerId: ClientId) =>
-	selectAllSimpleReverbsAsArray(state).filter(x => x.ownerId === ownerId)
 
 export const selectSimpleReverb = (state: IClientRoomState, id: Id) =>
 	selectAllSimpleReverbs(state)[id as string] || SimpleReverbState.dummy

@@ -62,16 +62,16 @@ export const BackgroundMenuItems = React.memo(
 						if (nodeInfo.type === ConnectionNodeType.virtualKeyboard) {
 							if (localClientKeyboardCount !== 0) return
 
-							const newState = new VirtualKeyboardState(localClientId)
+							const newState = new VirtualKeyboardState()
 							dispatch(nodeInfo.addNodeActionCreator(newState))
-							createPosition(dispatch, newState, e, localClientColor)
+							createPosition(dispatch, newState, e, localClientId, localClientColor)
 						} else {
 							// Be careful when changing the id to be local client
 							// The server currently deletes most things that a user owns
 							// when they disconnect
-							const newState = new nodeInfo.StateConstructor(serverClientId)
+							const newState = new nodeInfo.StateConstructor()
 							dispatch(nodeInfo.addNodeActionCreator(newState))
-							createPosition(dispatch, newState, e)
+							createPosition(dispatch, newState, e, serverClientId)
 							if (nodeInfo.autoConnectToClock) {
 								dispatch(connectionsActions.add(new Connection(
 									MASTER_CLOCK_SOURCE_ID,
@@ -104,13 +104,14 @@ export const BackgroundMenuItems = React.memo(
 function createPosition(
 	dispatch: Dispatch, state: IConnectable,
 	e: React.TouchEvent<HTMLDivElement> | React.MouseEvent<HTMLDivElement>,
-	color?: string,
+	ownerId: Id, color?: string,
 ) {
 	dispatch(addPosition(
 		makePosition({
 			...state,
 			id: state.id,
 			targetType: state.type,
+			ownerId,
 			color: color || findNodeInfo(state.type).color,
 			...getPositionFromMouseOrTouchEvent(e),
 		}),

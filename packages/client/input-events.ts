@@ -80,8 +80,9 @@ const keyboardShortcuts: IKeyBoardShortcuts = Map<KeyBoardShortcut>({
 		actionOnKeyDown: (_, state) => {
 			const selectedNode = selectShamuMetaState(state.room).selectedNode
 			if (selectedNode === undefined) return
+			const ownerId = selectPosition(state.room, selectedNode.id).ownerId
+			if (ownerId.startsWith('dummy')) return
 			const sequencer = selectSequencer(state.room, selectedNode.id)
-			if (sequencer.ownerId.startsWith('dummy')) return
 			return sequencerActions.toggleRecording(selectedNode.id, !sequencer.isRecording)
 		},
 		allowRepeat: false,

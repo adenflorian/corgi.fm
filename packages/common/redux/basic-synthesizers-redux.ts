@@ -81,7 +81,6 @@ export class BasicSynthesizerState implements IConnectable, NodeSpecialState {
 	public static dummy: BasicSynthesizerState = {
 		oscillatorType: BuiltInOscillatorType.sine,
 		id: 'dummy',
-		ownerId: 'dummyOwner',
 		pan: 0,
 		lowPassFilterCutoffFrequency: 0,
 		attack: 0,
@@ -106,7 +105,6 @@ export class BasicSynthesizerState implements IConnectable, NodeSpecialState {
 	= pickRandomArrayElement(['sine', 'sawtooth', 'square', 'triangle']) as ShamuOscillatorType
 
 	public readonly id = uuid.v4()
-	public readonly ownerId: Id
 	public readonly pan: number = Math.random() - 0.5
 	public readonly lowPassFilterCutoffFrequency: number = Math.min(10000, Math.random() * 10000 + 1000)
 	public readonly attack: number = 0.01
@@ -125,16 +123,12 @@ export class BasicSynthesizerState implements IConnectable, NodeSpecialState {
 	public readonly lfoTarget: SynthLfoTarget = SynthLfoTarget.Gain
 	public readonly lfoWave: LfoOscillatorType = LfoOscillatorType.sine
 	public readonly filterType: BuiltInBQFilterType = BasicSynthesizerState.defaultFilterType
-
-	public constructor(ownerId: ClientId) {
-		this.ownerId = ownerId	// TODO Is this still needed?
-	}
 }
 
 export function deserializeBasicSynthesizerState(state: IMultiStateThing): IMultiStateThing {
 	const x = state as BasicSynthesizerState
 	const y: BasicSynthesizerState = {
-		...(new BasicSynthesizerState(x.ownerId)),
+		...(new BasicSynthesizerState()),
 		...x,
 	}
 	return y
@@ -181,9 +175,6 @@ export const selectAllBasicSynthesizerIds = createSelector(
 	selectAllBasicSynthesizers,
 	basicSynthesizers => Object.keys(basicSynthesizers),
 )
-
-export const selectBasicSynthesizersByOwner = (state: IClientRoomState, ownerId: ClientId) =>
-	selectAllBasicSynthesizersAsArray(state).filter(x => x.ownerId === ownerId)
 
 export const selectBasicSynthesizer = (state: IClientRoomState, id: Id) =>
 	selectAllBasicSynthesizers(state)[id as string] || BasicSynthesizerState.dummy

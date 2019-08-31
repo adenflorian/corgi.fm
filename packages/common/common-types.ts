@@ -6,7 +6,6 @@ export interface IConnectable {
 }
 
 export interface IMultiStateThing extends IConnectable {
-	readonly ownerId: Id
 }
 
 export type IMultiStateThingDeserializer = (state: IMultiStateThing) => IMultiStateThing

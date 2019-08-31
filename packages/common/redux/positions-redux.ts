@@ -106,6 +106,7 @@ export type IPosition = typeof defaultPosition
 
 const defaultPosition = {
 	id: '-1' as Id,
+	ownerId: '-1' as Id,
 	targetType: ConnectionNodeType.dummy,
 	width: -1,
 	height: -1,
@@ -121,7 +122,7 @@ const defaultPosition = {
 const makePositionRecord = Record(defaultPosition)
 
 export const makePosition = (
-	position: Pick<IPosition, 'id' | 'targetType'> & Partial<IPosition>,
+	position: Pick<IPosition, 'id' | 'targetType' | 'ownerId'> & Partial<IPosition>,
 ): Readonly<IPosition> => {
 	return makePositionRecord({
 		...position,
@@ -207,6 +208,12 @@ export const selectAllPositions = (state: IClientRoomState) =>
 
 export const selectPosition = (state: IClientRoomState, id: Id) =>
 	selectAllPositions(state).get(id) || defaultPosition
+
+export const selectPositionsByOwnerAndType = (state: IClientRoomState, ownerId: Id, type: ConnectionNodeType) =>
+	selectAllPositions(state).filter(x => x.ownerId === ownerId && x.targetType === type)
+
+export const selectPositionsByOwner = (state: IClientRoomState, ownerId: Id) =>
+	selectAllPositions(state).filter(x => x.ownerId === ownerId)
 
 export const selectAllPositionsAsArray = createSelector(
 	selectAllPositions,

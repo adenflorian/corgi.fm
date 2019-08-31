@@ -1,7 +1,7 @@
 import React, {Fragment} from 'react'
 import {ContextMenu} from 'react-contextmenu'
 import {
-	selectLocalClient, selectVirtualKeyboardsByOwner, shamuConnect,
+	selectLocalClient, shamuConnect, selectVirtualKeyboardCountByOwner,
 } from '@corgifm/common/redux'
 import {backgroundMenuId} from '../client-constants'
 import './ContextMenu.less'
@@ -40,8 +40,8 @@ export const ConnectedContextMenuContainer = shamuConnect(
 		const localClient = selectLocalClient(state)
 		return {
 			localClientId: localClient.id,
-			localClientKeyboardCount: selectVirtualKeyboardsByOwner(
-				state.room, localClient.id).length,
+			localClientKeyboardCount: selectVirtualKeyboardCountByOwner(
+				state.room, localClient.id),
 			localClientColor: localClient.color,
 		}
 	},

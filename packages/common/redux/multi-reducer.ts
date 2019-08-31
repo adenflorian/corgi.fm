@@ -13,7 +13,6 @@ export interface IMultiStateThings {
 
 export const dummyMultiStateThing: IMultiStateThing = {
 	id: '-1',
-	ownerId: '-2',
 	type: ConnectionNodeType.dummy,
 }
 

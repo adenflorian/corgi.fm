@@ -109,14 +109,13 @@ export class InfiniteSequencerState extends SequencerStateBase {
 	public static notesWidth = InfiniteSequencerState.defaultWidth - InfiniteSequencerState.controlsWidth - 8
 
 	public static dummy = new InfiniteSequencerState(
-		'dummy', InfiniteSequencerStyle.colorGrid, makeEvents(), false,
+		InfiniteSequencerStyle.colorGrid, makeEvents(), false,
 	)
 
 	public readonly style: InfiniteSequencerStyle
 	public readonly showRows: boolean
 
 	public constructor(
-		ownerId: Id,
 		style = InfiniteSequencerStyle.colorGrid,
 		events = foo(),
 		isPlaying = false,
@@ -129,7 +128,6 @@ export class InfiniteSequencerState extends SequencerStateBase {
 
 		super(
 			midiClip,
-			ownerId,
 			ConnectionNodeType.infiniteSequencer,
 			isPlaying,
 			0.5,
@@ -143,7 +141,7 @@ export class InfiniteSequencerState extends SequencerStateBase {
 export function deserializeInfiniteSequencerState(state: IMultiStateThing): IMultiStateThing {
 	const x = state as InfiniteSequencerState
 	const y: InfiniteSequencerState = {
-		...(new InfiniteSequencerState(x.ownerId)),
+		...(new InfiniteSequencerState()),
 		...(deserializeSequencerState(x)),
 		// width: Math.max(x.width, InfiniteSequencerState.defaultWidth),
 		// height: Math.max(x.height, InfiniteSequencerState.defaultHeight),

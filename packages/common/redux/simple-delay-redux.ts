@@ -57,7 +57,6 @@ export class SimpleDelayState implements IConnectable, NodeSpecialState {
 
 	public static dummy: SimpleDelayState = {
 		id: 'dummy',
-		ownerId: 'dummyOwner',
 		timeLeft: SimpleDelayState.defaultTimeLeft,
 		timeRight: SimpleDelayState.defaultTimeRight,
 		feedback: SimpleDelayState.defaultFeedback,
@@ -72,7 +71,6 @@ export class SimpleDelayState implements IConnectable, NodeSpecialState {
 	}
 
 	public readonly id = uuid.v4()
-	public readonly ownerId: Id
 	public readonly timeLeft: number = SimpleDelayState.defaultTimeLeft
 	public readonly timeRight: number = SimpleDelayState.defaultTimeRight
 	public readonly feedback: number = SimpleDelayState.defaultFeedback
@@ -84,16 +82,12 @@ export class SimpleDelayState implements IConnectable, NodeSpecialState {
 	public readonly filterType: BuiltInBQFilterType = SimpleDelayState.defaultFilterType
 	public readonly pingPong: boolean = SimpleDelayState.defaultPingPong
 	public readonly type = ConnectionNodeType.simpleDelay
-
-	public constructor(ownerId: ClientId) {
-		this.ownerId = ownerId
-	}
 }
 
 export function deserializeSimpleDelayState(state: IMultiStateThing): IMultiStateThing {
 	const x = state as SimpleDelayState
 	const y: SimpleDelayState = {
-		...(new SimpleDelayState(x.ownerId)),
+		...(new SimpleDelayState()),
 		...x,
 	}
 	return y
@@ -130,12 +124,6 @@ function simpleDelayReducer(simpleDelay: SimpleDelayState, action: SimpleDelayAc
 export const selectAllSimpleDelays = (state: IClientRoomState) => state.shamuGraph.nodes.simpleDelays.things
 
 export const selectAllSimpleDelayIds = (state: IClientRoomState) => Object.keys(selectAllSimpleDelays(state))
-
-export const selectAllSimpleDelaysAsArray =
-	createSelectAllOfThingAsArray<ISimpleDelays, SimpleDelayState>(selectAllSimpleDelays)
-
-export const selectSimpleDelaysByOwner = (state: IClientRoomState, ownerId: ClientId) =>
-	selectAllSimpleDelaysAsArray(state).filter(x => x.ownerId === ownerId)
 
 export const selectSimpleDelay = (state: IClientRoomState, id: Id) =>
 	selectAllSimpleDelays(state)[id as string] || SimpleDelayState.dummy

@@ -62,7 +62,7 @@ function convertBasicSamplers(samplers: IBasicSamplersState): IBasicSamplersStat
 
 function convertBasicSampler(sampler: Partial<BasicSamplerState>): BasicSamplerState {
 	return {
-		...new BasicSamplerState(sampler.ownerId!),
+		...new BasicSamplerState(),
 		...sampler,
 		samples: convertSamples(sampler.samples || makeSamples()),
 	}
