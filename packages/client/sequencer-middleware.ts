@@ -4,7 +4,7 @@ import {Dispatch, Middleware, MiddlewareAPI} from 'redux'
 import {
 	IClientAppState, isEmptyEvents,
 	selectConnectionsWithSourceIds,
-	selectSequencer, SequencerAction, sequencerActions,
+	selectSequencer, SequencerAction, sequencerActions, findNodeInfo,
 } from '@corgifm/common/redux'
 import {GetAllInstruments} from './instrument-manager'
 
@@ -66,7 +66,7 @@ function exportSequencerMidi(
 
 	const write = new MidiWriter.Writer([midiSequencer])
 
-	saveAs(write.dataUri(), sequencer.name + '.mid')
+	saveAs(write.dataUri(), findNodeInfo(sequencer.type).typeName + '.mid')
 }
 
 function handleStopSequencer(

@@ -4,7 +4,7 @@ import {connect, useDispatch} from 'react-redux'
 import {
 	IClientAppState,
 	infiniteSequencerActions, InfiniteSequencerFields, InfiniteSequencerState,
-	selectConnectionSourceColorByTargetId, selectInfiniteSequencer,
+	selectConnectionSourceColorByTargetId, selectInfiniteSequencer, getNodeInfo,
 } from '@corgifm/common/redux'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {rateValues} from '@corgifm/common/common-samples-stuff'
@@ -33,7 +33,6 @@ interface IInfiniteSequencerReduxProps {
 	gate: number
 	isPlaying: boolean
 	isRecording: boolean
-	name: string
 	pitch: number
 	rate: number
 	length: number
@@ -43,7 +42,7 @@ type IInfiniteSequencerAllProps =
 	IInfiniteSequencerProps & IInfiniteSequencerReduxProps
 
 export const InfiniteSequencer = (props: IInfiniteSequencerAllProps) => {
-	const {color, isPlaying, id, isRecording, name, length, rate} = props
+	const {color, isPlaying, id, isRecording, length, rate} = props
 
 	const dispatch = useDispatch()
 
@@ -63,7 +62,7 @@ export const InfiniteSequencer = (props: IInfiniteSequencerAllProps) => {
 		>
 			<Panel
 				id={props.id}
-				label={name}
+				label={getNodeInfo().infiniteSequencer.typeName}
 				color={isRecording ? CssColor.red : color}
 				saturate={isPlaying}
 				helpText={stripIndents`Plug your keyboard into the infinite sequencer, hit record, and play notes
@@ -135,7 +134,6 @@ export const ConnectedInfiniteSequencer = connect(
 			isRecording: infiniteSequencerState.isRecording,
 			color: selectConnectionSourceColorByTargetId(state, props.id),
 			gate: infiniteSequencerState.gate,
-			name: infiniteSequencerState.name,
 			pitch: infiniteSequencerState.pitch,
 			rate: infiniteSequencerState.rate,
 			length: infiniteSequencerState.midiClip.length,

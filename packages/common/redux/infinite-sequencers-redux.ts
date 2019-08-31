@@ -109,7 +109,7 @@ export class InfiniteSequencerState extends SequencerStateBase {
 	public static notesWidth = InfiniteSequencerState.defaultWidth - InfiniteSequencerState.controlsWidth - 8
 
 	public static dummy = new InfiniteSequencerState(
-		'dummy', 'dummy', InfiniteSequencerStyle.colorGrid, makeEvents(), false,
+		'dummy', InfiniteSequencerStyle.colorGrid, makeEvents(), false,
 	)
 
 	public readonly style: InfiniteSequencerStyle
@@ -117,7 +117,6 @@ export class InfiniteSequencerState extends SequencerStateBase {
 
 	public constructor(
 		ownerId: Id,
-		name = 'Infinite Sequencer',
 		style = InfiniteSequencerStyle.colorGrid,
 		events = foo(),
 		isPlaying = false,
@@ -129,7 +128,6 @@ export class InfiniteSequencerState extends SequencerStateBase {
 		})
 
 		super(
-			name,
 			midiClip,
 			ownerId,
 			ConnectionNodeType.infiniteSequencer,

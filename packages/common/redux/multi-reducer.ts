@@ -16,7 +16,6 @@ export const dummyMultiStateThing: IMultiStateThing = {
 	ownerId: '-2',
 	color: 'black',
 	type: ConnectionNodeType.dummy,
-	name: 'dummy multi state thing',
 }
 
 export const ADD_MULTI_THING = 'ADD_MULTI_THING'

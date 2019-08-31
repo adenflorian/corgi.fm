@@ -1,7 +1,7 @@
 import React from 'react'
 import {useDispatch, useSelector} from 'react-redux'
 import {
-	groupSequencerActions, IClientAppState, selectGroupSequencer,
+	groupSequencerActions, IClientAppState, selectGroupSequencer, getNodeInfo,
 } from '@corgifm/common/redux'
 import {Panel} from '../Panel/Panel'
 import './GroupSequencer.less'
@@ -19,7 +19,7 @@ export function GroupSequencerView({id, color}: Props) {
 	return (
 		<Panel
 			id={id}
-			label={groupSequencer.name}
+			label={getNodeInfo().groupSequencer.typeName}
 			className="groupSequencer"
 			color={color}
 		>

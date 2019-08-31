@@ -65,7 +65,6 @@ export class SimpleReverbState implements IConnectable, NodeSpecialState {
 		filterType: BuiltInBQFilterType.lowpass,
 		color: false,
 		type: ConnectionNodeType.simpleReverb,
-		name: 'Dummy Simple Reverb',
 	}
 
 	public readonly id = uuid.v4()
@@ -79,7 +78,6 @@ export class SimpleReverbState implements IConnectable, NodeSpecialState {
 	public readonly filterType: BuiltInBQFilterType = SimpleReverbState.defaultFilterType
 	public readonly color: false = false
 	public readonly type = ConnectionNodeType.simpleReverb
-	public readonly name: string = 'Simple Reverb'
 
 	public constructor(ownerId: ClientId) {
 		this.ownerId = ownerId

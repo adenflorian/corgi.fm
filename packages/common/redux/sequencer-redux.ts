@@ -149,7 +149,6 @@ export interface ISequencerState extends IMultiStateThing, NodeSpecialState {
 	readonly isPlaying: boolean
 	readonly id: Id
 	readonly color: string | false
-	readonly name: string
 	readonly isRecording: boolean
 	readonly previousEvents: List<MidiClipEvents>
 	readonly rate: number
@@ -165,7 +164,6 @@ export const dummySequencerState: SequencerStateBase = {
 	previousEvents: List<MidiClipEvents>(),
 	rate: 1,
 	pitch: 0,
-	name: 'dummy sequencer name',
 	midiClip: makeMidiClip(),
 	ownerId: 'dummy owner id',
 	type: ConnectionNodeType.gridSequencer,
@@ -184,7 +182,6 @@ export abstract class SequencerStateBase implements ISequencerState {
 	public readonly pitch: number = 0
 
 	public constructor(
-		public readonly name: string,
 		public readonly midiClip: MidiClip,
 		public readonly ownerId: Id,
 		public readonly type: ConnectionNodeType,

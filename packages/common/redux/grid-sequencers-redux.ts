@@ -111,14 +111,13 @@ export class GridSequencerState extends SequencerStateBase {
 		GridSequencerState.noteNamesSideBarWidth
 
 	public static dummy = new GridSequencerState(
-		'dummy', 'dummy', makeEvents(), false,
+		'dummy', makeEvents(), false,
 	)
 
 	public readonly scrollY: number
 
 	public constructor(
 		ownerId: Id,
-		name = 'Grid Sequencer',
 		events = foo(),
 		isPlaying = false,
 	) {
@@ -133,7 +132,6 @@ export class GridSequencerState extends SequencerStateBase {
 		})
 
 		super(
-			name,
 			midiClip,
 			ownerId,
 			ConnectionNodeType.gridSequencer,

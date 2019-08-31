@@ -231,6 +231,13 @@
 - [ ] audio dying after listening to song for long enough
 	- [ ] refactor audio stuff to reuse oscillators and gain nodes, etc.
 
+**Refactor Node State**
+- [ ] id (already in position state, but might need to stay on node state as well)
+- [ ] ownerId (move to position state or remove if not used)
+- [ ] color (already in position state but not used)
+- [ ] type (already in position state, but node type is used in some places)
+- [ ] name (move to position state or remove if not used)
+- [x] enabled (removed from node state, was already on position state, and it wasn't used from node state)
 
 **Better Sequencer**
 - [√] scroll up and down with mouse wheel

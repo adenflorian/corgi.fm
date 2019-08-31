@@ -44,7 +44,6 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 
 	// Reverb
 	const simpleReverb = createSource({
-		name: 'Reverb A',
 		type: ConnectionNodeType.simpleReverb,
 	}) as SimpleReverbState
 
@@ -72,7 +71,6 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 			source: {
 				type: ConnectionNodeType.betterSequencer,
 				events: foo(),
-				name: findNodeInfo(ConnectionNodeType.betterSequencer).typeName,
 			},
 			target: {
 				type: ConnectionNodeType.basicSynthesizer,
@@ -82,7 +80,6 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 			source: {
 				type: ConnectionNodeType.infiniteSequencer,
 				events: getInitialInfiniteSequencerEvents(),
-				name: findNodeInfo(ConnectionNodeType.infiniteSequencer).typeName,
 				infinityStyle: InfiniteSequencerStyle.colorGrid,
 				isPlaying: true,
 			},
@@ -155,7 +152,6 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 
 	interface CreateSourceArgs {
 		type: ConnectionNodeType
-		name: string
 		infinityStyle?: InfiniteSequencerStyle
 		events?: MidiClipEvents
 		isPlaying?: boolean
@@ -166,7 +162,6 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 			case ConnectionNodeType.gridSequencer:
 				const x = new GridSequencerState(
 					serverClient.id,
-					args.name,
 					args.events,
 					args.isPlaying,
 				)
@@ -176,7 +171,6 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 			case ConnectionNodeType.betterSequencer:
 				const w = new BetterSequencerState(
 					serverClient.id,
-					args.name,
 					args.events,
 					args.isPlaying,
 				)
@@ -186,7 +180,6 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 			case ConnectionNodeType.infiniteSequencer:
 				const y = new InfiniteSequencerState(
 					serverClient.id,
-					args.name,
 					args.infinityStyle || InfiniteSequencerStyle.colorGrid,
 					args.events,
 					args.isPlaying,

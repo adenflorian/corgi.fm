@@ -107,18 +107,16 @@ function foo() {
 
 export class BetterSequencerState extends SequencerStateBase {
 	public static dummy = new BetterSequencerState(
-		'dummy', 'dummy', makeEvents(), false,
+		'dummy', makeEvents(), false,
 	)
 
 	public constructor(
 		ownerId: Id,
-		name = 'Better Sequencer',
 		events = foo(),
 		isPlaying = true,
 	) {
 
 		super(
-			name,
 			new MidiClip({
 				events: events.map(x => ({
 					...x,

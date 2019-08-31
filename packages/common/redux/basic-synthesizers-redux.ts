@@ -96,7 +96,6 @@ export class BasicSynthesizerState implements IConnectable, NodeSpecialState {
 		type: ConnectionNodeType.basicSynthesizer,
 		fineTuning: 0,
 		gain: 0.5,
-		name: 'Dummy Basic Synth',
 		lfoRate: 0,
 		lfoAmount: 0,
 		lfoTarget: SynthLfoTarget.Gain,
@@ -123,7 +122,6 @@ export class BasicSynthesizerState implements IConnectable, NodeSpecialState {
 	public readonly gain: number = 0.5
 	public readonly color: false = false
 	public readonly type = ConnectionNodeType.basicSynthesizer
-	public readonly name: string = 'Basic Synth'
 	public readonly lfoRate: number = 0
 	public readonly lfoAmount: number = 0.1
 	public readonly lfoTarget: SynthLfoTarget = SynthLfoTarget.Gain

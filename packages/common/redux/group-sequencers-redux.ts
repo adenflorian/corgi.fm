@@ -39,7 +39,6 @@ export class GroupSequencer implements IConnectable, NodeSpecialState, IMultiSta
 		ownerId: 'dummyOwner',
 		color: List([CssColor.defaultGray]),
 		type: ConnectionNodeType.groupSequencer,
-		name: 'Dummy Group Sequencer',
 		groups: makeGroups([CssColor.red, CssColor.green], 2, 4),
 		length: 2,
 		groupEventBeatLength: 1,
@@ -51,7 +50,6 @@ export class GroupSequencer implements IConnectable, NodeSpecialState, IMultiSta
 	public readonly id = uuid.v4()
 	public readonly color: List<string>
 	public readonly type = ConnectionNodeType.groupSequencer
-	public readonly name: string = findNodeInfo(ConnectionNodeType.groupSequencer).typeName
 	public readonly groups: Groups
 	public readonly length: number = 16
 	public readonly groupEventBeatLength: number = 16
