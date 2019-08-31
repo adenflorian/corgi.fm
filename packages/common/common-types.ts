@@ -5,10 +5,7 @@ export interface IConnectable {
 	readonly outputPortCount?: number
 }
 
-export interface IMultiStateThing extends IConnectable {
-}
-
-export type IMultiStateThingDeserializer = (state: IMultiStateThing) => IMultiStateThing
+export type IMultiStateThingDeserializer = (state: IConnectable) => IConnectable
 
 export enum ConnectionNodeType {
 	betterSequencer = 'betterSequencer',

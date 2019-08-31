@@ -2,7 +2,7 @@ import * as uuid from 'uuid'
 import {ActionType} from 'typesafe-actions'
 import {Map} from 'immutable'
 import {createSelector} from 'reselect'
-import {ConnectionNodeType, IConnectable, IMultiStateThing, Octave} from '../common-types'
+import {ConnectionNodeType, IConnectable, Octave} from '../common-types'
 import {BuiltInBQFilterType} from '../OscillatorTypes'
 import {samplerBasicPianoNotes, Samples, makeSamples, Sample, SampleParams, makeSampleParams} from '../common-samples-stuff'
 import {convertToNumberKeyMap, clamp} from '../common-utils'
@@ -131,7 +131,7 @@ export class BasicSamplerState implements IConnectable, NodeSpecialState {
 }
 
 export function deserializeBasicSamplerState(
-	state: IMultiStateThing
+	state: IConnectable
 ): BasicSamplerState {
 	const x = state as BasicSamplerState
 	return {

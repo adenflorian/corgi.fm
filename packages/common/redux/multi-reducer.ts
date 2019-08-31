@@ -1,5 +1,5 @@
 import {Map} from 'immutable'
-import {ConnectionNodeType, IMultiStateThing} from '../common-types'
+import {ConnectionNodeType, IConnectable} from '../common-types'
 import {assertArrayHasNoUndefinedElements} from '../common-utils'
 import {BROADCASTER_ACTION, findNodeInfo, IClientRoomState, NetworkActionType, SERVER_ACTION} from '.'
 
@@ -8,10 +8,10 @@ export interface IMultiState {
 }
 
 export interface IMultiStateThings {
-	readonly [key: string]: IMultiStateThing
+	readonly [key: string]: IConnectable
 }
 
-export const dummyMultiStateThing: IMultiStateThing = {
+export const dummyMultiStateThing: IConnectable = {
 	id: '-1',
 	type: ConnectionNodeType.dummy,
 }
@@ -19,7 +19,7 @@ export const dummyMultiStateThing: IMultiStateThing = {
 export const ADD_MULTI_THING = 'ADD_MULTI_THING'
 type AddMultiThingAction = ReturnType<typeof addMultiThing>
 export const addMultiThing = (
-	thing: IMultiStateThing,
+	thing: IConnectable,
 	thingType: ConnectionNodeType,
 	netActionType: NetworkActionType = NetworkActionType.NO,
 ) => ({
@@ -89,7 +89,7 @@ export type MultiThingAction =
 	| {type: '', id: Id}
 
 // TODO Use immutable js like connections redux
-export function makeMultiReducer<T extends IMultiStateThing, U extends IMultiState>(
+export function makeMultiReducer<T extends IConnectable, U extends IMultiState>(
 	innerReducer: (state: T, action: any) => T,
 	thingType: ConnectionNodeType,
 	actionTypes: string[],

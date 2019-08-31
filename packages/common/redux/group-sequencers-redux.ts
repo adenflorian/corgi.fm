@@ -1,6 +1,6 @@
 import {List} from 'immutable'
 import {ActionType} from 'typesafe-actions'
-import {ConnectionNodeType, IConnectable, IMultiStateThing} from '../common-types'
+import {ConnectionNodeType, IConnectable} from '../common-types'
 import {CssColor} from '../shamu-color'
 import {
 	addMultiThing, BROADCASTER_ACTION, findNodeInfo,
@@ -33,7 +33,7 @@ export interface GroupSequencers {
 	[key: string]: GroupSequencer
 }
 
-export class GroupSequencer implements IConnectable, NodeSpecialState, IMultiStateThing {
+export class GroupSequencer implements IConnectable, NodeSpecialState {
 	public static dummy: GroupSequencer = {
 		id: 'dummy',
 		type: ConnectionNodeType.groupSequencer,
@@ -62,7 +62,7 @@ export class GroupSequencer implements IConnectable, NodeSpecialState, IMultiSta
 	}
 }
 
-export function deserializeGroupSequencerState(state: IMultiStateThing): IMultiStateThing {
+export function deserializeGroupSequencerState(state: IConnectable): IConnectable {
 	const x = state as GroupSequencer
 	const y: GroupSequencer = {
 		...(new GroupSequencer()),

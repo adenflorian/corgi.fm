@@ -2,7 +2,7 @@ import {List, Stack} from 'immutable'
 import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
 import {MAX_MIDI_NOTE_NUMBER_127} from '../common-constants'
-import {ConnectionNodeType, IMultiStateThing} from '../common-types'
+import {ConnectionNodeType, IConnectable} from '../common-types'
 import {
 	assertArrayHasNoUndefinedElements, findLowestNote, findHighestNote,
 } from '../common-utils'
@@ -149,7 +149,7 @@ export class GridSequencerState extends SequencerStateBase {
 	}
 }
 
-export function deserializeGridSequencerState(state: IMultiStateThing): IMultiStateThing {
+export function deserializeGridSequencerState(state: IConnectable): IConnectable {
 	const x = state as GridSequencerState
 	const z = deserializeSequencerState(x)
 	// const notesDisplayWidth = GridSequencerState.noteWidth * z.midiClip.events.count()

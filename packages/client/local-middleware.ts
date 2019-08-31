@@ -2,7 +2,7 @@ import {List, Map, Set, OrderedMap} from 'immutable'
 import {Dispatch, Middleware} from 'redux'
 import uuid from 'uuid'
 import {MAX_MIDI_NOTE_NUMBER_127} from '@corgifm/common/common-constants'
-import {ConnectionNodeType, IMultiStateThing} from '@corgifm/common/common-types'
+import {ConnectionNodeType, IConnectable} from '@corgifm/common/common-types'
 import {applyOctave, createNodeId} from '@corgifm/common/common-utils'
 import {logger} from '@corgifm/common/logger'
 import {MidiClipEvent} from '@corgifm/common/midi-types'
@@ -330,7 +330,7 @@ export function createLocalMiddleware(
 
 				const stateToClone = nodeInfo.stateSelector(newState.room, nodeId)
 
-				const clone: IMultiStateThing = {
+				const clone: IConnectable = {
 					...stateToClone,
 					id: createNodeId(),
 				}

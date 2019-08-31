@@ -1,9 +1,9 @@
 import {AnyAction} from 'redux'
 import * as uuid from 'uuid'
-import {ConnectionNodeType, IConnectable, IMultiStateThing} from '../common-types'
+import {ConnectionNodeType, IConnectable} from '../common-types'
 import {BuiltInBQFilterType} from '../OscillatorTypes'
 import {NodeSpecialState} from './shamu-graph'
-import {addMultiThing, BROADCASTER_ACTION, createSelectAllOfThingAsArray, IClientRoomState, IMultiState, makeMultiReducer, NetworkActionType, SERVER_ACTION} from '.'
+import {addMultiThing, BROADCASTER_ACTION, IClientRoomState, IMultiState, makeMultiReducer, NetworkActionType, SERVER_ACTION} from '.'
 
 export const addSimpleDelay = (sampler: SimpleDelayState) =>
 	addMultiThing(sampler, ConnectionNodeType.simpleDelay, NetworkActionType.SERVER_AND_BROADCASTER)
@@ -84,7 +84,7 @@ export class SimpleDelayState implements IConnectable, NodeSpecialState {
 	public readonly type = ConnectionNodeType.simpleDelay
 }
 
-export function deserializeSimpleDelayState(state: IMultiStateThing): IMultiStateThing {
+export function deserializeSimpleDelayState(state: IConnectable): IConnectable {
 	const x = state as SimpleDelayState
 	const y: SimpleDelayState = {
 		...(new SimpleDelayState()),

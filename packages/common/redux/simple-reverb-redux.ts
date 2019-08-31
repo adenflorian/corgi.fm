@@ -1,10 +1,10 @@
 import {AnyAction} from 'redux'
 import * as uuid from 'uuid'
-import {ConnectionNodeType, IConnectable, IMultiStateThing} from '../common-types'
+import {ConnectionNodeType, IConnectable} from '../common-types'
 import {BuiltInBQFilterType} from '../OscillatorTypes'
 import {NodeSpecialState} from './shamu-graph'
 import {
-	addMultiThing, BROADCASTER_ACTION, createSelectAllOfThingAsArray,
+	addMultiThing, BROADCASTER_ACTION,
 	IClientRoomState, IMultiState, makeMultiReducer,
 	NetworkActionType, SERVER_ACTION,
 } from '.'
@@ -76,7 +76,7 @@ export class SimpleReverbState implements IConnectable, NodeSpecialState {
 	public readonly type = ConnectionNodeType.simpleReverb
 }
 
-export function deserializeSimpleReverbState(state: IMultiStateThing): IMultiStateThing {
+export function deserializeSimpleReverbState(state: IConnectable): IConnectable {
 	const x = state as SimpleReverbState
 	const y: SimpleReverbState = {
 		...(new SimpleReverbState()),

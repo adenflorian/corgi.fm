@@ -1,6 +1,6 @@
 import {AnyAction} from 'redux'
 import * as uuid from 'uuid'
-import {ConnectionNodeType, IConnectable, IMultiStateThing} from '../common-types'
+import {ConnectionNodeType, IConnectable} from '../common-types'
 import {NodeSpecialState} from './shamu-graph'
 import {
 	addMultiThing, BROADCASTER_ACTION, createSelectAllOfThingAsArray,
@@ -61,7 +61,7 @@ export class SimpleCompressorState implements IConnectable, NodeSpecialState {
 	public readonly type = ConnectionNodeType.simpleCompressor
 }
 
-export function deserializeSimpleCompressorState(state: IMultiStateThing): IMultiStateThing {
+export function deserializeSimpleCompressorState(state: IConnectable): IConnectable {
 	const x = state as SimpleCompressorState
 	const y: SimpleCompressorState = {
 		...(new SimpleCompressorState()),

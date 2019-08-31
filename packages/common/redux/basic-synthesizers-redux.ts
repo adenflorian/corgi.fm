@@ -1,7 +1,7 @@
 import {AnyAction} from 'redux'
 import {createSelector} from 'reselect'
 import * as uuid from 'uuid'
-import {ConnectionNodeType, IConnectable, IMultiStateThing} from '../common-types'
+import {ConnectionNodeType, IConnectable} from '../common-types'
 import {pickRandomArrayElement} from '../common-utils'
 import {BuiltInBQFilterType, BuiltInOscillatorType, LfoOscillatorType, ShamuOscillatorType} from '../OscillatorTypes'
 import {NodeSpecialState} from './shamu-graph'
@@ -125,7 +125,7 @@ export class BasicSynthesizerState implements IConnectable, NodeSpecialState {
 	public readonly filterType: BuiltInBQFilterType = BasicSynthesizerState.defaultFilterType
 }
 
-export function deserializeBasicSynthesizerState(state: IMultiStateThing): IMultiStateThing {
+export function deserializeBasicSynthesizerState(state: IConnectable): IConnectable {
 	const x = state as BasicSynthesizerState
 	const y: BasicSynthesizerState = {
 		...(new BasicSynthesizerState()),

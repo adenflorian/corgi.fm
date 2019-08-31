@@ -2,7 +2,7 @@ import {List, Map, Set, OrderedMap} from 'immutable'
 import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
 import {
-	ConnectionNodeType, IMultiStateThing, isSequencerNodeType,
+	ConnectionNodeType, IConnectable, isSequencerNodeType,
 } from '../common-types'
 import {
 	makeMidiClip, makeMidiClipEvent, MidiClip, MidiClipEvent, MidiClipEvents, makeEvents,
@@ -143,7 +143,7 @@ export function deserializeEvents(events: MidiClipEvents): MidiClipEvents {
 	return makeSequencerEvents(OrderedMap(events).map(x => ({...x, note: x.note})).toList())
 }
 
-export interface ISequencerState extends IMultiStateThing, NodeSpecialState {
+export interface ISequencerState extends IConnectable, NodeSpecialState {
 	readonly midiClip: MidiClip
 	readonly index: number
 	readonly isPlaying: boolean
@@ -194,7 +194,7 @@ export function isEmptyEvents(events: MidiClipEvents) {
 	return events.some(x => x.note > -1) === false
 }
 
-export function deserializeSequencerState<T extends ISequencerState>(state: IMultiStateThing): T {
+export function deserializeSequencerState<T extends ISequencerState>(state: IConnectable): T {
 	const x = state as T
 	const y: T = {
 		...x,

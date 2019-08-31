@@ -1,7 +1,7 @@
 import {Map, Record, Set} from 'immutable'
 import {AnyAction} from 'redux'
 import {serverClientId} from '../common-constants'
-import {ConnectionNodeType, IConnectable, IMultiStateThing} from '../common-types'
+import {ConnectionNodeType, IConnectable} from '../common-types'
 import {CssColor} from '../shamu-color'
 import {betterWidth, betterHeight, betterNotesStartX, betterSideNotesWidth, betterNotesWidth} from '../BetterConstants'
 import {
@@ -35,7 +35,7 @@ export const MASTER_CLOCK_SOURCE_ID = 'MASTER_CLOCK_SOURCE_ID'
 
 export type IConnectionNodeInfo = ReturnType<typeof makeNodeInfo>
 
-export const dummyIConnectable: IMultiStateThing = {
+export const dummyIConnectable: IConnectable = {
 	id: 'oh no',
 	type: ConnectionNodeType.dummy,
 }
@@ -52,7 +52,7 @@ const _makeNodeInfo = Record({
 	selectIsActive: (() => null) as (roomState: IClientRoomState, id: Id) => boolean | null,
 	selectIsSending: (() => null) as (roomState: IClientRoomState, id: Id) => boolean | null,
 	selectIsPlaying: (() => false) as (roomState: IClientRoomState, id: Id, processedIds?: Set<Id>) => boolean,
-	stateDeserializer: ((state: IMultiStateThing) => state) as (state: IMultiStateThing) => IMultiStateThing,
+	stateDeserializer: ((state: IConnectable) => state) as (state: IConnectable) => IConnectable,
 	color: false as string | false,
 	typeName: 'Default Type Name',
 	StateConstructor: (DummyConnectable) as new () => IConnectable,
@@ -79,14 +79,14 @@ function makeNodeInfo(x: Pick<NodeInfo, 'stateSelector' | 'typeName' | 'StateCon
 	return _makeNodeInfo(x)
 }
 
-class AudioOutputState implements IMultiStateThing {
+class AudioOutputState implements IConnectable {
 	public readonly id = MASTER_AUDIO_OUTPUT_TARGET_ID
 	public readonly type = ConnectionNodeType.audioOutput
 }
 
 const audioOutputState = new AudioOutputState()
 
-class MasterClockState implements IMultiStateThing {
+class MasterClockState implements IConnectable {
 	public readonly id = MASTER_CLOCK_SOURCE_ID
 	public readonly type = ConnectionNodeType.masterClock
 }

@@ -1,7 +1,7 @@
 import {List, Stack, OrderedMap} from 'immutable'
 import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
-import {ConnectionNodeType, IMultiStateThing} from '../common-types'
+import {ConnectionNodeType, IConnectable} from '../common-types'
 import {
 	assertArrayHasNoUndefinedElements,
 } from '../common-utils'
@@ -135,7 +135,7 @@ export class BetterSequencerState extends SequencerStateBase {
 	}
 }
 
-export function deserializeBetterSequencerState(state: IMultiStateThing): IMultiStateThing {
+export function deserializeBetterSequencerState(state: IConnectable): IConnectable {
 	const x = state as BetterSequencerState
 	const z = deserializeSequencerState(x)
 	const y: BetterSequencerState = {

@@ -2,7 +2,7 @@ import {Set} from 'immutable'
 import {createSelector} from 'reselect'
 import * as uuid from 'uuid'
 import {
-	ConnectionNodeType, IMultiStateThing, IMultiStateThingDeserializer, Octave,
+	ConnectionNodeType, IConnectable, IMultiStateThingDeserializer, Octave,
 } from '../common-types'
 import {applyOctave} from '../common-utils'
 import {emptyMidiNotes, IMidiNote, IMidiNotes, MidiNotes} from '../MidiNote'
@@ -70,7 +70,7 @@ export interface IVirtualKeyboards extends IMultiStateThings {
 	[clientId: string]: VirtualKeyboardState
 }
 
-export class VirtualKeyboardState implements IMultiStateThing, NodeSpecialState {
+export class VirtualKeyboardState implements IConnectable, NodeSpecialState {
 	public static defaultWidth = 456
 	public static defaultHeight = 56
 

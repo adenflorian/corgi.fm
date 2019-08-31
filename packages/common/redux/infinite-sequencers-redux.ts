@@ -1,7 +1,7 @@
 import {List, Set, Stack} from 'immutable'
 import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
-import {ConnectionNodeType, IMultiStateThing} from '../common-types'
+import {ConnectionNodeType, IConnectable} from '../common-types'
 import {assertArrayHasNoUndefinedElements} from '../common-utils'
 import {logger} from '../logger'
 import {makeMidiClipEvent, MidiClip, makeEvents} from '../midi-types'
@@ -138,7 +138,7 @@ export class InfiniteSequencerState extends SequencerStateBase {
 	}
 }
 
-export function deserializeInfiniteSequencerState(state: IMultiStateThing): IMultiStateThing {
+export function deserializeInfiniteSequencerState(state: IConnectable): IConnectable {
 	const x = state as InfiniteSequencerState
 	const y: InfiniteSequencerState = {
 		...(new InfiniteSequencerState()),
