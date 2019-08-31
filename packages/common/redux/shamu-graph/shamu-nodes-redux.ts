@@ -60,10 +60,6 @@ import {
 // export type NodeSpecialState2 = BasicSynthesizerState | BasicSamplerState |
 // 	VirtualKeyboardState | GridSequencerState | InfiniteSequencerState
 
-export interface NodeSpecialState {
-	readonly id: Id
-}
-
 // export type ShamuNodesAction = ActionType<typeof shamuNodesActions> | UpdatePositionsAction
 
 export const nodesReducer = combineReducers({

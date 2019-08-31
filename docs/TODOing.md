@@ -233,8 +233,8 @@
 
 **Refactor Node State**
 - [ ] id (already in position state, but might need to stay on node state as well)
-- [ ] ownerId (move to position state or remove if not used)
-- [√] color (already in position state but not used)
+- [√] ownerId (move to position state or remove if not used) (moved)
+- [√] color (already in position state but not used) (moved)
 - [ ] type (already in position state, but node type is used in some places)
 - [√] name (move to position state or remove if not used) (removed)
 - [√] enabled (removed from node state, was already on position state, and it wasn't used from node state)

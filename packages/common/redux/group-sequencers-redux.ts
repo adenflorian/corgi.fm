@@ -3,9 +3,9 @@ import {ActionType} from 'typesafe-actions'
 import {ConnectionNodeType, IConnectable} from '../common-types'
 import {CssColor} from '../shamu-color'
 import {
-	addMultiThing, BROADCASTER_ACTION, findNodeInfo,
+	addMultiThing, BROADCASTER_ACTION,
 	IClientRoomState, IMultiState, makeMultiReducer, NetworkActionType,
-	NodeSpecialState, SERVER_ACTION,
+	SERVER_ACTION,
 } from '.'
 
 import uuid = require('uuid')
@@ -33,7 +33,7 @@ export interface GroupSequencers {
 	[key: string]: GroupSequencer
 }
 
-export class GroupSequencer implements IConnectable, NodeSpecialState {
+export class GroupSequencer implements IConnectable {
 	public static dummy: GroupSequencer = {
 		id: 'dummy',
 		type: ConnectionNodeType.groupSequencer,

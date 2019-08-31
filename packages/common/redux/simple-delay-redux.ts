@@ -1,8 +1,6 @@
-import {AnyAction} from 'redux'
 import * as uuid from 'uuid'
 import {ConnectionNodeType, IConnectable} from '../common-types'
 import {BuiltInBQFilterType} from '../OscillatorTypes'
-import {NodeSpecialState} from './shamu-graph'
 import {addMultiThing, BROADCASTER_ACTION, IClientRoomState, IMultiState, makeMultiReducer, NetworkActionType, SERVER_ACTION} from '.'
 
 export const addSimpleDelay = (sampler: SimpleDelayState) =>
@@ -43,7 +41,7 @@ export interface ISimpleDelays {
 	[key: string]: SimpleDelayState
 }
 
-export class SimpleDelayState implements IConnectable, NodeSpecialState {
+export class SimpleDelayState implements IConnectable {
 	public static defaultTimeLeft = 0.25
 	public static defaultTimeRight = 0.25
 	public static defaultFeedback = 0.42

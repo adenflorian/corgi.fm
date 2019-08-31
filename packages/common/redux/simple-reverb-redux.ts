@@ -2,7 +2,6 @@ import {AnyAction} from 'redux'
 import * as uuid from 'uuid'
 import {ConnectionNodeType, IConnectable} from '../common-types'
 import {BuiltInBQFilterType} from '../OscillatorTypes'
-import {NodeSpecialState} from './shamu-graph'
 import {
 	addMultiThing, BROADCASTER_ACTION,
 	IClientRoomState, IMultiState, makeMultiReducer,
@@ -44,7 +43,7 @@ export interface ISimpleReverbs {
 	[key: string]: SimpleReverbState
 }
 
-export class SimpleReverbState implements IConnectable, NodeSpecialState {
+export class SimpleReverbState implements IConnectable {
 	public static defaultLpfFreq = 2000
 	public static defaultTime = 4
 	public static defaultDry = 0.6

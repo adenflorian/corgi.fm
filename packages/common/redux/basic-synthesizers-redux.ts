@@ -4,7 +4,6 @@ import * as uuid from 'uuid'
 import {ConnectionNodeType, IConnectable} from '../common-types'
 import {pickRandomArrayElement} from '../common-utils'
 import {BuiltInBQFilterType, BuiltInOscillatorType, LfoOscillatorType, ShamuOscillatorType} from '../OscillatorTypes'
-import {NodeSpecialState} from './shamu-graph'
 import {addMultiThing, BROADCASTER_ACTION, createSelectAllOfThingAsArray, IClientRoomState, IMultiState, makeMultiReducer, NetworkActionType, SERVER_ACTION} from '.'
 
 export const addBasicSynthesizer = (instrument: BasicSynthesizerState) =>
@@ -75,7 +74,7 @@ export interface IBasicSynthesizers {
 	[key: string]: BasicSynthesizerState
 }
 
-export class BasicSynthesizerState implements IConnectable, NodeSpecialState {
+export class BasicSynthesizerState implements IConnectable {
 	public static defaultFilterType = BuiltInBQFilterType.lowpass
 
 	public static dummy: BasicSynthesizerState = {

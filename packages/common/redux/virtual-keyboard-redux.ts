@@ -6,7 +6,6 @@ import {
 } from '../common-types'
 import {applyOctave} from '../common-utils'
 import {emptyMidiNotes, IMidiNote, IMidiNotes, MidiNotes} from '../MidiNote'
-import {NodeSpecialState} from './shamu-graph'
 import {IClientAppState} from './common-redux-types'
 import {
 	addMultiThing, BROADCASTER_ACTION, IClientRoomState, IMultiState,
@@ -70,7 +69,7 @@ export interface IVirtualKeyboards extends IMultiStateThings {
 	[clientId: string]: VirtualKeyboardState
 }
 
-export class VirtualKeyboardState implements IConnectable, NodeSpecialState {
+export class VirtualKeyboardState implements IConnectable {
 	public static defaultWidth = 456
 	public static defaultHeight = 56
 

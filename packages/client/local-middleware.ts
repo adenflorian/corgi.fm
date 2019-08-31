@@ -1,11 +1,10 @@
-import {List, Map, Set, OrderedMap} from 'immutable'
+import {List, Map, Set} from 'immutable'
 import {Dispatch, Middleware} from 'redux'
 import uuid from 'uuid'
 import {MAX_MIDI_NOTE_NUMBER_127} from '@corgifm/common/common-constants'
 import {ConnectionNodeType, IConnectable} from '@corgifm/common/common-types'
 import {applyOctave, createNodeId} from '@corgifm/common/common-utils'
 import {logger} from '@corgifm/common/logger'
-import {MidiClipEvent} from '@corgifm/common/midi-types'
 import {emptyMidiNotes, IMidiNote, IMidiNotes} from '@corgifm/common/MidiNote'
 import {BroadcastAction, IClientRoomState} from '@corgifm/common/redux/common-redux-types'
 import {
@@ -24,35 +23,24 @@ import {
 	MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID,
 	NetworkActionType, ReadyAction, SavedRoom, selectActiveRoom,
 	selectAllPositions,
-	selectClientInfo,
-	selectDirectDownstreamSequencerIds,
-	selectGlobalClockState,
-	selectLocalClient,
-	selectLocalClientId,
-	selectLocalSocketId,
-	selectPosition,
-	selectPositionExtremes,
+	selectClientInfo, selectDirectDownstreamSequencerIds,
+	selectGlobalClockState, selectLocalClient,
+	selectLocalClientId, selectLocalSocketId,
+	selectPosition, selectPositionExtremes,
 	selectRoomSettings, selectSequencer, selectShamuGraphState, selectVirtualKeyboardById,
 	selectVirtualKeyboardByOwner, sequencerActions,
 	SetActiveRoomAction, setClientName, setLocalClientId,
 	SetLocalClientNameAction,
-	ShamuGraphState,
-	shamuMetaActions,
-	UpdatePositionsAction,
-	UserInputAction,
-	UserKeys,
-	VirtualKeyboardState,
-	virtualKeyPressed,
-	VirtualKeyPressedAction,
-	virtualKeyUp,
-	VirtualKeyUpAction,
-	virtualOctaveChange,
-	VirtualOctaveChangeAction,
+	ShamuGraphState, shamuMetaActions,
+	UpdatePositionsAction, UserInputAction,
+	UserKeys, VirtualKeyboardState,
+	virtualKeyPressed, VirtualKeyPressedAction,
+	virtualKeyUp, VirtualKeyUpAction,
+	virtualOctaveChange, VirtualOctaveChangeAction,
 	LocalAction, chatSystemMessage, animationActions, selectOption, AppOptions,
 	getNodeInfo, SequencerStateBase,
 } from '@corgifm/common/redux'
 import {pointersActions} from '@corgifm/common/redux/pointers-redux'
-import {CssColor} from '@corgifm/common/shamu-color'
 import {graphStateSavesLocalStorageKey} from './client-constants'
 import {GetAllInstruments} from './instrument-manager'
 import {MidiNotes} from './Instruments/BasicSynthesizerView'

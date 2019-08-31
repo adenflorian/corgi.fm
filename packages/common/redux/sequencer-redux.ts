@@ -7,13 +7,12 @@ import {
 import {
 	makeMidiClip, makeMidiClipEvent, MidiClip, MidiClipEvent, MidiClipEvents, makeEvents,
 } from '../midi-types'
-import {emptyMidiNotes, IMidiNote, MidiNotes} from '../MidiNote'
+import {IMidiNote} from '../MidiNote'
 import {
 	selectAllConnections, selectConnectionsWithSourceIds,
 	selectConnectionsWithTargetIds,
 } from './connections-redux'
 import {selectGlobalClockIsPlaying} from './global-clock-redux'
-import {NodeSpecialState} from './shamu-graph'
 import {BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION} from '.'
 
 import uuid = require('uuid')
@@ -143,7 +142,7 @@ export function deserializeEvents(events: MidiClipEvents): MidiClipEvents {
 	return makeSequencerEvents(OrderedMap(events).map(x => ({...x, note: x.note})).toList())
 }
 
-export interface ISequencerState extends IConnectable, NodeSpecialState {
+export interface ISequencerState extends IConnectable {
 	readonly midiClip: MidiClip
 	readonly index: number
 	readonly isPlaying: boolean

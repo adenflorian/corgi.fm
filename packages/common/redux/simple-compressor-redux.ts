@@ -1,7 +1,5 @@
-import {AnyAction} from 'redux'
 import * as uuid from 'uuid'
 import {ConnectionNodeType, IConnectable} from '../common-types'
-import {NodeSpecialState} from './shamu-graph'
 import {
 	addMultiThing, BROADCASTER_ACTION, createSelectAllOfThingAsArray,
 	IClientRoomState, IMultiState, makeMultiReducer, NetworkActionType,
@@ -41,7 +39,7 @@ export interface ISimpleCompressors {
 	[key: string]: SimpleCompressorState
 }
 
-export class SimpleCompressorState implements IConnectable, NodeSpecialState {
+export class SimpleCompressorState implements IConnectable {
 	public static dummy: SimpleCompressorState = {
 		id: 'dummy',
 		threshold: 0,

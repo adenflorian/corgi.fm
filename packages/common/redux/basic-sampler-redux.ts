@@ -7,7 +7,6 @@ import {BuiltInBQFilterType} from '../OscillatorTypes'
 import {samplerBasicPianoNotes, Samples, makeSamples, Sample, SampleParams, makeSampleParams} from '../common-samples-stuff'
 import {convertToNumberKeyMap, clamp} from '../common-utils'
 import {IMidiNote} from '../MidiNote'
-import {NodeSpecialState} from './shamu-graph'
 import {IClientAppState} from './common-redux-types'
 import {
 	addMultiThing, BROADCASTER_ACTION, createSelectAllOfThingAsArray,
@@ -105,7 +104,7 @@ export interface IBasicSamplers {
 	[key: string]: BasicSamplerState
 }
 
-export class BasicSamplerState implements IConnectable, NodeSpecialState {
+export class BasicSamplerState implements IConnectable {
 	public static defaultFilterType = BuiltInBQFilterType.lowpass
 	public static minViewOctave = -1
 	public static maxViewOctave = 9
