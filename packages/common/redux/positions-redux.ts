@@ -1,4 +1,4 @@
-import {Map, Record} from 'immutable'
+import {Map, Record, List} from 'immutable'
 import {combineReducers, Reducer} from 'redux'
 import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
@@ -115,7 +115,7 @@ const defaultPosition = {
 	inputPortCount: 1,
 	outputPortCount: 1,
 	enabled: true,
-	color: CssColor.blue as string,
+	color: CssColor.blue as string | false | List<string>,
 }
 
 const makePositionRecord = Record(defaultPosition)

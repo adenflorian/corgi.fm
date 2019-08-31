@@ -17,6 +17,7 @@ import {
 	Key, MAX_MIDI_NOTE_NUMBER_127, MIN_MIDI_NOTE_NUMBER_0,
 } from '@corgifm/common/common-constants'
 import {clamp} from '@corgifm/common/common-utils'
+import {CssColor} from '@corgifm/common/shamu-color'
 import {MidiClipEvent, makeMidiClipEvent, MidiClipEvents} from '@corgifm/common/midi-types'
 import {midiNoteToNoteNameFull} from '@corgifm/common/common-samples-stuff'
 import {
@@ -514,7 +515,7 @@ export const BetterSequencer = ({id}: Props) => {
 	return (
 		<Panel
 			id={id}
-			color={isRecording ? 'red' : color}
+			color={isRecording ? 'red' : (typeof color === 'string' ? color : CssColor.green)}
 			label={getNodeInfo().betterSequencer.typeName}
 			className={oneLine`
 				betterSequencer

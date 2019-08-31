@@ -187,7 +187,7 @@ function scheduleNotes(
 
 		eventsToSchedule.forEach(event => {
 			if (event.note === -1) return
-			
+
 			const delaySecondsUntilStart = (fromBeats(offsetBeats + event.startTime))
 
 			const delaySecondsUntilRelease = (fromBeats(offsetBeats + event.endTime))
