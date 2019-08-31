@@ -71,7 +71,6 @@ export class SimpleDelayState implements IConnectable, NodeSpecialState {
 		color: false,
 		type: ConnectionNodeType.simpleDelay,
 		name: 'Dummy Simple Delay',
-		enabled: false,
 	}
 
 	public readonly id = uuid.v4()
@@ -89,7 +88,6 @@ export class SimpleDelayState implements IConnectable, NodeSpecialState {
 	public readonly color: false = false
 	public readonly type = ConnectionNodeType.simpleDelay
 	public readonly name: string = 'Simple Delay'
-	public readonly enabled: boolean = true
 
 	public constructor(ownerId: ClientId) {
 		this.ownerId = ownerId

@@ -171,7 +171,6 @@ export const dummySequencerState: SequencerStateBase = {
 	type: ConnectionNodeType.gridSequencer,
 	isPlaying: false,
 	gate: 1,
-	enabled: false,
 	zoom: {x: 1, y: 1} as Point,
 	pan: {x: 0, y: 0} as Point,
 }
@@ -183,7 +182,6 @@ export abstract class SequencerStateBase implements ISequencerState {
 	public readonly isRecording: boolean = false
 	public readonly previousEvents: List<MidiClipEvents> = List<MidiClipEvents>()
 	public readonly pitch: number = 0
-	public readonly enabled: boolean = true
 
 	public constructor(
 		public readonly name: string,

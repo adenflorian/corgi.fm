@@ -44,7 +44,6 @@ export class GroupSequencer implements IConnectable, NodeSpecialState, IMultiSta
 		length: 2,
 		groupEventBeatLength: 1,
 		outputPortCount: 2,
-		enabled: false,
 		zoom: {x: 1, y: 1},
 		pan: {x: 0, y: 0},
 	}
@@ -59,7 +58,6 @@ export class GroupSequencer implements IConnectable, NodeSpecialState, IMultiSta
 	public readonly outputPortCount: number
 	// public readonly notesDisplayStartX = 0
 	// public readonly notesDisplayWidth: number
-	public readonly enabled: boolean = true
 	public readonly zoom: Point = {x: 1, y: 1}
 	public readonly pan: Point = {x: 0, y: 0}
 

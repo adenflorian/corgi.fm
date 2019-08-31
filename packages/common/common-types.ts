@@ -7,7 +7,6 @@ export interface IConnectable {
 	readonly name: string
 	readonly inputPortCount?: number
 	readonly outputPortCount?: number
-	readonly enabled: boolean
 }
 
 export interface IMultiStateThing extends IConnectable {

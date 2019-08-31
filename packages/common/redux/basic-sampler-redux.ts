@@ -117,7 +117,6 @@ export class BasicSamplerState implements IConnectable, NodeSpecialState {
 		color: false,
 		type: ConnectionNodeType.basicSampler,
 		name: 'Dummy Basic Piano Sampler',
-		enabled: false,
 		filterType: BasicSamplerState.defaultFilterType,
 		samples: makeSamples(),
 		samplesViewOctave: 4,
@@ -130,7 +129,6 @@ export class BasicSamplerState implements IConnectable, NodeSpecialState {
 	public readonly color: false = false
 	public readonly type = ConnectionNodeType.basicSampler
 	public readonly name: string = 'Basic Piano Sampler'
-	public readonly enabled: boolean = true
 	public readonly filterType: BuiltInBQFilterType = BasicSamplerState.defaultFilterType
 	public readonly samples: Samples = samplerBasicPianoNotes
 	public readonly samplesViewOctave: number = 4

@@ -17,7 +17,6 @@ export const dummyMultiStateThing: IMultiStateThing = {
 	color: 'black',
 	type: ConnectionNodeType.dummy,
 	name: 'dummy multi state thing',
-	enabled: false,
 }
 
 export const ADD_MULTI_THING = 'ADD_MULTI_THING'

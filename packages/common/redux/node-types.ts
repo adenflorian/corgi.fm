@@ -40,7 +40,6 @@ export const dummyIConnectable: IMultiStateThing = {
 	id: 'oh no',
 	type: ConnectionNodeType.dummy,
 	name: 'default node name',
-	enabled: false,
 	ownerId: 'dummyOwnerId',
 }
 
@@ -50,7 +49,6 @@ class DummyConnectable implements IConnectable {
 		public readonly id: Id = 'oh no',
 		public readonly type = ConnectionNodeType.dummy,
 		public readonly name = 'default node name',
-		public readonly enabled = false,
 	) {}
 }
 
@@ -91,7 +89,6 @@ class AudioOutputState implements IMultiStateThing {
 	public readonly color = CssColor.green
 	public readonly type = ConnectionNodeType.audioOutput
 	public readonly name = 'audio output'
-	public readonly enabled = true
 	public readonly ownerId = serverClientId
 }
 
@@ -102,7 +99,6 @@ class MasterClockState implements IMultiStateThing {
 	public readonly color = CssColor.brightBlue
 	public readonly type = ConnectionNodeType.masterClock
 	public readonly name = 'master clock'
-	public readonly enabled = true
 	public readonly ownerId = serverClientId
 }
 
