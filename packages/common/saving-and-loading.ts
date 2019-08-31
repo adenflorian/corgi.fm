@@ -1,7 +1,16 @@
 import {Map, OrderedMap, List, Set} from 'immutable'
-import {SavedRoom, SequencerStateBase, ShamuGraphState, betterSequencersReducer, gridSequencersReducer, infiniteSequencersReducer, shamuGraphReducer, globalClockReducer, roomSettingsReducer, connectionsReducer, IPositions, IConnection, BasicSamplerState, basicSamplersReducer, IBasicSamplersState, basicSamplerReducer} from './redux'
-import {MidiClip, MidiClipEvent, MidiClipEvents, makeMidiClipEvent, MidiClipEventV1, MidiClipV1, makeMidiClip} from './midi-types'
-import {Samples, makeSamples, Sample, dummySample} from './common-samples-stuff';
+import {
+	SavedRoom, SequencerStateBase, ShamuGraphState, betterSequencersReducer,
+	gridSequencersReducer, infiniteSequencersReducer, shamuGraphReducer,
+	globalClockReducer, roomSettingsReducer, connectionsReducer, IPositions,
+	IConnection, BasicSamplerState, basicSamplersReducer,
+	IBasicSamplersState, makePosition,
+} from './redux'
+import {
+	MidiClip, MidiClipEvent, makeMidiClipEvent, MidiClipEventV1,
+	MidiClipV1, makeMidiClip,
+} from './midi-types'
+import {Samples, Sample, dummySample, samplerBasicPianoNotes} from './common-samples-stuff'
 
 export function transformLoadedSave(save: Partial<SavedRoom>): SavedRoom {
 	return [save]
@@ -13,7 +22,7 @@ function bar(save: Partial<SavedRoom>): SavedRoom {
 
 	return {
 		...save,
-		positions: enableNodesMaybe(Map(save.positions || [])),
+		positions: convertPositions(Map(save.positions || [])),
 		connections: save.connections || connectionsReducer(undefined, {} as any).connections,
 		globalClock: save.globalClock || globalClockReducer(undefined, {} as any),
 		room: save.room || '?',
@@ -25,13 +34,20 @@ function bar(save: Partial<SavedRoom>): SavedRoom {
 	}
 }
 
-function enableNodesMaybe(positions: IPositions): IPositions {
-	const _positions = Map(positions || [])
+function convertPositions(positions: IPositions): IPositions {
+	return [Map(positions || [])]
+		.map(enablePositionsMaybe)
+		.map(x =>
+			x.map(makePosition)
+		)
+		.pop()!
+}
 
-	if (_positions.some(position => position.enabled === undefined)) {
-		return _positions.map(x => ({...x, enabled: true}))
+function enablePositionsMaybe(positions: IPositions): IPositions {
+	if (positions.some(position => position.enabled === undefined)) {
+		return positions.map(x => ({...x, enabled: true}))
 	} else {
-		return _positions
+		return positions
 	}
 }
 
@@ -64,7 +80,7 @@ function convertBasicSampler(sampler: Partial<BasicSamplerState>): BasicSamplerS
 	return {
 		...new BasicSamplerState(),
 		...sampler,
-		samples: convertSamples(sampler.samples || makeSamples()),
+		samples: convertSamples(sampler.samples || samplerBasicPianoNotes),
 	}
 }
 

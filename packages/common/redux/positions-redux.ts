@@ -4,9 +4,10 @@ import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
 import {ConnectionNodeType} from '../common-types'
 import {CssColor} from '../shamu-color'
+import {serverClientId} from '../common-constants'
 import {shamuMetaReducer} from './shamu-graph'
 import {IClientAppState} from './common-redux-types'
-import {findNodeInfo} from './node-types'
+import {findNodeInfo, getNodeInfo} from './node-types'
 import {
 	BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION,
 } from '.'
@@ -125,6 +126,8 @@ export const makePosition = (
 	position: Pick<IPosition, 'id' | 'targetType' | 'ownerId'> & Partial<IPosition>,
 ): Readonly<IPosition> => {
 	return makePositionRecord({
+		// For older saves pre 0.7.0
+		ownerId: serverClientId,
 		...position,
 		width: findNodeInfo(position.targetType).defaultWidth,
 		height: findNodeInfo(position.targetType).defaultHeight,
@@ -132,12 +135,14 @@ export const makePosition = (
 	}).toJS()
 }
 
-function getNewPositionColor(type: ConnectionNodeType, color?: IPosition['color']): IPosition['color'] | undefined {
-	if (type === ConnectionNodeType.groupSequencer) {
+export function getNewPositionColor(
+	type: ConnectionNodeType, color?: IPosition['color']
+): IPosition['color'] | undefined {
+	switch (type) {
 		// TODO This is temporary
-		return List([CssColor.red, CssColor.green, CssColor.blue])
-	} else {
-		return color
+		case ConnectionNodeType.groupSequencer: return List([CssColor.red, CssColor.green, CssColor.blue])
+		case ConnectionNodeType.masterClock: return getNodeInfo().masterClock.color
+		default: return color
 	}
 }
 

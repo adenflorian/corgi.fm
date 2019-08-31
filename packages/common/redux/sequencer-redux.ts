@@ -139,7 +139,12 @@ export const makeSequencerEvents =
 	(x: List<MidiClipEvent> = List<MidiClipEvent>()): MidiClipEvents => makeEvents(x)
 
 export function deserializeEvents(events: MidiClipEvents): MidiClipEvents {
-	return makeSequencerEvents(OrderedMap(events).map(x => ({...x, note: x.note})).toList())
+	return makeSequencerEvents(
+		OrderedMap(events)
+			// Some could be undefined in old saves
+			.filter(x => x !== undefined)
+			.map(x => ({...x, note: x.note})
+		).toList())
 }
 
 export interface ISequencerState extends IConnectable {
