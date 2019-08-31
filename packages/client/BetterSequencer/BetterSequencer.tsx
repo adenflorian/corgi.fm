@@ -12,6 +12,7 @@ import {
 	createPositionHeightSelector, createPositionWidthSelector, sequencerActions,
 	betterSequencerActions, createPositionXSelector, createPositionYSelector,
 	localActions,
+	createSmartNodeColorSelector,
 } from '@corgifm/common/redux'
 import {
 	Key, MAX_MIDI_NOTE_NUMBER_127, MIN_MIDI_NOTE_NUMBER_0,
@@ -58,7 +59,7 @@ const middleMousePanYSensitivity = 0.001
 const rows = new Array(128).fill(0).map((_, i) => midiNoteToNoteNameFull(i))
 
 export const BetterSequencer = ({id}: Props) => {
-	const color = useSelector(createPositionColorSelector(id))
+	const color = useSelector(createSmartNodeColorSelector(id))
 	const isRecording = useSelector(createBetterSeqIsRecordingSelector(id))
 	const isPlaying = useSelector(createBetterSeqIsPlayingSelector(id))
 	const rate = useSelector(createBetterSeqRateSelector(id))

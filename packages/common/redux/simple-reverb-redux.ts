@@ -63,7 +63,6 @@ export class SimpleReverbState implements IConnectable, NodeSpecialState {
 		reverse: false,
 		decay: 2,
 		filterType: BuiltInBQFilterType.lowpass,
-		color: false,
 		type: ConnectionNodeType.simpleReverb,
 	}
 
@@ -76,7 +75,6 @@ export class SimpleReverbState implements IConnectable, NodeSpecialState {
 	public readonly reverse: boolean = SimpleReverbState.defaultReverse
 	public readonly decay: number = SimpleReverbState.defaultDecay
 	public readonly filterType: BuiltInBQFilterType = SimpleReverbState.defaultFilterType
-	public readonly color: false = false
 	public readonly type = ConnectionNodeType.simpleReverb
 
 	public constructor(ownerId: ClientId) {

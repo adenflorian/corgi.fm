@@ -11,6 +11,7 @@ import {IClientAppState} from './common-redux-types'
 import {
 	BROADCASTER_ACTION, findNodeInfo, IClientRoomState,
 	selectVirtualKeyboardById, SERVER_ACTION, VirtualKeyboardState,
+	selectPosition,
 } from '.'
 
 export const connectionsActions = {
@@ -186,6 +187,10 @@ export const createSelectPlaceholdersInfo = () => createSelector(
 
 const colorIfLowGraphics = CssColor.blue
 
+export function createSmartNodeColorSelector(id: Id) {
+	return (state: IClientAppState) => selectConnectionSourceColorByTargetId(state, id)
+}
+
 /** For use by a node */
 export const selectConnectionSourceColorByTargetId =
 	(state: IClientAppState, targetId: Id, processedIds = List<Id>()): string => {
@@ -193,7 +198,11 @@ export const selectConnectionSourceColorByTargetId =
 
 		const connections = selectAllConnections(state.room).filter(x => x.targetId === targetId)
 
-		if (connections.count() === 0) return makeConnectionSourceColorSelector(state, processedIds)(Connection.dummy)
+		const positionColor = selectPosition(state.room, targetId).color
+
+		if (typeof positionColor === 'string') return positionColor
+
+		if (connections.count() === 0) return CssColor.disabledGray
 
 		const colors = connections.map(makeConnectionSourceColorSelector(state, processedIds))
 
@@ -214,7 +223,7 @@ const makeConnectionSourceColorSelector =
 		if (processedIds.contains(connection.id)) return CssColor.disabledGray
 
 		return (
-			tryGetColorFromState(findNodeInfo(connection.sourceType).stateSelector(state.room, connection.sourceId).color, connection.sourcePort)
+			tryGetColorFromState(selectPosition(state.room, connection.sourceId).color, connection.sourcePort)
 			||
 			selectConnectionSourceColorByTargetId(state, connection.sourceId, processedIds.push(connection.id))
 		)

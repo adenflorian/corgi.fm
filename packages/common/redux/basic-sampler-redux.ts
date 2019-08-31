@@ -114,7 +114,6 @@ export class BasicSamplerState implements IConnectable, NodeSpecialState {
 	public static dummy: BasicSamplerState = {
 		id: 'dummy',
 		ownerId: 'dummyOwner',
-		color: false,
 		type: ConnectionNodeType.basicSampler,
 		filterType: BasicSamplerState.defaultFilterType,
 		samples: makeSamples(),
@@ -125,7 +124,6 @@ export class BasicSamplerState implements IConnectable, NodeSpecialState {
 
 	public readonly id = uuid.v4()
 	public readonly ownerId: Id
-	public readonly color: false = false
 	public readonly type = ConnectionNodeType.basicSampler
 	public readonly filterType: BuiltInBQFilterType = BasicSamplerState.defaultFilterType
 	public readonly samples: Samples = samplerBasicPianoNotes

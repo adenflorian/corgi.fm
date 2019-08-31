@@ -37,7 +37,6 @@ export class GroupSequencer implements IConnectable, NodeSpecialState, IMultiSta
 	public static dummy: GroupSequencer = {
 		id: 'dummy',
 		ownerId: 'dummyOwner',
-		color: List([CssColor.defaultGray]),
 		type: ConnectionNodeType.groupSequencer,
 		groups: makeGroups([CssColor.red, CssColor.green], 2, 4),
 		length: 2,
@@ -48,14 +47,11 @@ export class GroupSequencer implements IConnectable, NodeSpecialState, IMultiSta
 	}
 
 	public readonly id = uuid.v4()
-	public readonly color: List<string>
 	public readonly type = ConnectionNodeType.groupSequencer
 	public readonly groups: Groups
 	public readonly length: number = 16
 	public readonly groupEventBeatLength: number = 16
 	public readonly outputPortCount: number
-	// public readonly notesDisplayStartX = 0
-	// public readonly notesDisplayWidth: number
 	public readonly zoom: Point = {x: 1, y: 1}
 	public readonly pan: Point = {x: 0, y: 0}
 
@@ -64,8 +60,8 @@ export class GroupSequencer implements IConnectable, NodeSpecialState, IMultiSta
 	) {
 		this.groups = makeGroups([CssColor.red, CssColor.green, CssColor.blue], this.length, this.groupEventBeatLength)
 		this.outputPortCount = this.groups.count()
-		this.color = this.groups.map(x => x.color).toList()
-		// this.notesDisplayWidth = GroupSequencer.defaultWidth
+		// TODO
+		// this.color = this.groups.map(x => x.color).toList()
 	}
 }
 
@@ -79,7 +75,7 @@ export function deserializeGroupSequencerState(state: IMultiStateThing): IMultiS
 				...group,
 				events: List(group.events),
 			})),
-		color: List(x.color),
+		// color: List(x.color),
 		// notesDisplayStartX: 0,
 		// notesDisplayWidth: GroupSequencer.defaultWidth,
 	}

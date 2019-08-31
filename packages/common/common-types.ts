@@ -1,8 +1,5 @@
-import {List} from 'immutable'
-
 export interface IConnectable {
 	readonly id: Id
-	readonly color: string | false | List<string>
 	readonly type: ConnectionNodeType
 	readonly inputPortCount?: number
 	readonly outputPortCount?: number

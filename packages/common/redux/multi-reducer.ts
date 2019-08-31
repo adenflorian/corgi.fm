@@ -14,7 +14,6 @@ export interface IMultiStateThings {
 export const dummyMultiStateThing: IMultiStateThing = {
 	id: '-1',
 	ownerId: '-2',
-	color: 'black',
 	type: ConnectionNodeType.dummy,
 }
 

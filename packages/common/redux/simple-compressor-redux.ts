@@ -50,7 +50,6 @@ export class SimpleCompressorState implements IConnectable, NodeSpecialState {
 		ratio: 0,
 		attack: 0,
 		release: 0,
-		color: false,
 		type: ConnectionNodeType.simpleCompressor,
 	}
 
@@ -61,7 +60,6 @@ export class SimpleCompressorState implements IConnectable, NodeSpecialState {
 	public readonly attack: number = 0.003
 	public readonly release: number = 0.25
 	public readonly knee: number = 30
-	public readonly color: false = false
 	public readonly type = ConnectionNodeType.simpleCompressor
 
 	public constructor(ownerId: ClientId) {

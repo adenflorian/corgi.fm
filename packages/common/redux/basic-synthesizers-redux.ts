@@ -92,7 +92,6 @@ export class BasicSynthesizerState implements IConnectable, NodeSpecialState {
 		filterDecay: 0,
 		filterSustain: 0,
 		filterRelease: 0,
-		color: false,
 		type: ConnectionNodeType.basicSynthesizer,
 		fineTuning: 0,
 		gain: 0.5,
@@ -120,7 +119,6 @@ export class BasicSynthesizerState implements IConnectable, NodeSpecialState {
 	public readonly filterRelease: number = 1
 	public readonly fineTuning: number = 0
 	public readonly gain: number = 0.5
-	public readonly color: false = false
 	public readonly type = ConnectionNodeType.basicSynthesizer
 	public readonly lfoRate: number = 0
 	public readonly lfoAmount: number = 0.1

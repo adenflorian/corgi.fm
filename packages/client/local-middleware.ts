@@ -748,7 +748,7 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 
 	const y = 128 + 32 + 44
 
-	const newVirtualKeyboard = new VirtualKeyboardState(localClient.id, localClient.color)
+	const newVirtualKeyboard = new VirtualKeyboardState(localClient.id)
 	dispatch(addVirtualKeyboard(newVirtualKeyboard))
 	const keyboardPosition = makePosition({
 		...newVirtualKeyboard,
@@ -758,6 +758,7 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 		y: extremes.bottomMost + y,
 		width: getNodeInfo().virtualKeyboard.defaultWidth,
 		height: getNodeInfo().virtualKeyboard.defaultHeight,
+		color: localClient.color,
 	})
 	dispatch(addPosition({
 		...keyboardPosition,
@@ -775,7 +776,7 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 		...newInstrument,
 		id: newInstrument.id,
 		targetType: ConnectionNodeType.basicSynthesizer,
-		color: CssColor.blue,
+		color: findNodeInfo(ConnectionNodeType.basicSynthesizer).color,
 		...nextPosition,
 	})
 	dispatch(addPosition({

@@ -32,14 +32,14 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 		makePosition({
 			...masterClock,
 			targetType: masterClock.type,
-			color: undefined,
+			color: findNodeInfo(masterClock.type).color,
 		})))
 
 	dispatchToRoom(addPosition(
 		makePosition({
 			...masterAudioOutput,
 			targetType: masterAudioOutput.type,
-			color: undefined,
+			color: findNodeInfo(masterAudioOutput.type).color,
 		})))
 
 	// Reverb
@@ -51,7 +51,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 		makePosition({
 			...simpleReverb,
 			targetType: simpleReverb.type,
-			color: undefined,
+			color: findNodeInfo(simpleReverb.type).color,
 		})))
 
 	connectNodes(simpleReverb, masterAudioOutput)
@@ -127,7 +127,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 			makePosition({
 				...target,
 				targetType: target.type,
-				color: undefined,
+				color: findNodeInfo(target.type).color,
 			})))
 
 		const source = createSource(options.source)
@@ -135,7 +135,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 			makePosition({
 				...source,
 				targetType: source.type,
-				color: undefined,
+				color: findNodeInfo(source.type).color,
 			})))
 
 		connectNodes(source, target)

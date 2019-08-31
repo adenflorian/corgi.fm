@@ -36,7 +36,6 @@ export const MASTER_CLOCK_SOURCE_ID = 'MASTER_CLOCK_SOURCE_ID'
 export type IConnectionNodeInfo = ReturnType<typeof makeNodeInfo>
 
 export const dummyIConnectable: IMultiStateThing = {
-	color: CssColor.disabledGray,
 	id: 'oh no',
 	type: ConnectionNodeType.dummy,
 	ownerId: 'dummyOwnerId',
@@ -44,7 +43,6 @@ export const dummyIConnectable: IMultiStateThing = {
 
 class DummyConnectable implements IConnectable {
 	public constructor(
-		public readonly color = CssColor.disabledGray,
 		public readonly id: Id = 'oh no',
 		public readonly type = ConnectionNodeType.dummy,
 	) {}
@@ -84,7 +82,6 @@ function makeNodeInfo(x: Pick<NodeInfo, 'stateSelector' | 'typeName' | 'StateCon
 
 class AudioOutputState implements IMultiStateThing {
 	public readonly id = MASTER_AUDIO_OUTPUT_TARGET_ID
-	public readonly color = CssColor.green
 	public readonly type = ConnectionNodeType.audioOutput
 	public readonly ownerId = serverClientId
 }
@@ -93,7 +90,6 @@ const audioOutputState = new AudioOutputState()
 
 class MasterClockState implements IMultiStateThing {
 	public readonly id = MASTER_CLOCK_SOURCE_ID
-	public readonly color = CssColor.brightBlue
 	public readonly type = ConnectionNodeType.masterClock
 	public readonly ownerId = serverClientId
 }
@@ -149,6 +145,7 @@ const nodeInfo: NodeInfoMap = {
 		defaultHeight: GridSequencerState.getHeight,
 		notesDisplayStartX: GridSequencerState.notesStartX,
 		notesDisplayWidth: GridSequencerState.notesDisplayWidth,
+		color: CssColor.brightOrange,
 	}),
 	betterSequencer: makeNodeInfo({
 		type: ConnectionNodeType.betterSequencer,
@@ -172,6 +169,7 @@ const nodeInfo: NodeInfoMap = {
 		notesDisplayStartX: betterNotesStartX,
 		notesDisplayWidth: betterNotesWidth,
 		isResizable: true,
+		color: CssColor.brightPurple,
 	}),
 	infiniteSequencer: makeNodeInfo({
 		type: ConnectionNodeType.infiniteSequencer,
@@ -194,6 +192,7 @@ const nodeInfo: NodeInfoMap = {
 		defaultHeight: InfiniteSequencerState.defaultHeight,
 		notesDisplayStartX: InfiniteSequencerState.notesStartX,
 		notesDisplayWidth: InfiniteSequencerState.notesWidth,
+		color: CssColor.brightGreen,
 	}),
 	groupSequencer: makeNodeInfo({
 		type: ConnectionNodeType.groupSequencer,

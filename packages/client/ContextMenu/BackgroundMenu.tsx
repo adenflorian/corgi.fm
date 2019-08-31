@@ -5,13 +5,14 @@ import {
 	getAddableNodeInfos, IConnectionNodeInfo, VirtualKeyboardState, addPosition,
 	makePosition, MASTER_AUDIO_OUTPUT_TARGET_ID, connectionsActions, Connection,
 	MASTER_CLOCK_SOURCE_ID,
+	findNodeInfo,
 } from '@corgifm/common/redux'
 import {ConnectionNodeType, IConnectable} from '@corgifm/common/common-types'
 import {Dispatch} from 'redux'
 import {serverClientId} from '@corgifm/common/common-constants'
+import {CssColor} from '@corgifm/common/shamu-color'
 import {toGraphSpace} from '../SimpleGraph/Zoom'
 import {TopMenuBar} from './TopMenuBar'
-import {CssColor} from '@corgifm/common/shamu-color';
 
 interface BackgroundMenuItemsProps {
 	localClientId: Id
@@ -61,10 +62,9 @@ export const BackgroundMenuItems = React.memo(
 						if (nodeInfo.type === ConnectionNodeType.virtualKeyboard) {
 							if (localClientKeyboardCount !== 0) return
 
-							const newState = new VirtualKeyboardState(
-								localClientId, localClientColor)
+							const newState = new VirtualKeyboardState(localClientId)
 							dispatch(nodeInfo.addNodeActionCreator(newState))
-							createPosition(dispatch, newState, e)
+							createPosition(dispatch, newState, e, localClientColor)
 						} else {
 							// Be careful when changing the id to be local client
 							// The server currently deletes most things that a user owns
@@ -103,14 +103,15 @@ export const BackgroundMenuItems = React.memo(
 
 function createPosition(
 	dispatch: Dispatch, state: IConnectable,
-	e: React.TouchEvent<HTMLDivElement> | React.MouseEvent<HTMLDivElement>
+	e: React.TouchEvent<HTMLDivElement> | React.MouseEvent<HTMLDivElement>,
+	color?: string,
 ) {
 	dispatch(addPosition(
 		makePosition({
 			...state,
 			id: state.id,
 			targetType: state.type,
-			color: CssColor.blue,
+			color: color || findNodeInfo(state.type).color,
 			...getPositionFromMouseOrTouchEvent(e),
 		}),
 	))

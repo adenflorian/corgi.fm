@@ -79,7 +79,6 @@ export class VirtualKeyboardState implements IMultiStateThing, NodeSpecialState 
 		octave: 0,
 		id: 'dummy',
 		ownerId: 'dummyOwner',
-		color: 'gray',
 		type: ConnectionNodeType.virtualKeyboard,
 		width: VirtualKeyboardState.defaultWidth,
 		height: VirtualKeyboardState.defaultHeight,
@@ -88,7 +87,7 @@ export class VirtualKeyboardState implements IMultiStateThing, NodeSpecialState 
 	public static fromJS: IMultiStateThingDeserializer = state => {
 		const x = state as VirtualKeyboardState
 		const y: VirtualKeyboardState = {
-			...(new VirtualKeyboardState(x.ownerId, x.color)),
+			...(new VirtualKeyboardState(x.ownerId)),
 			...(state as VirtualKeyboardState),
 			pressedKeys: MidiNotes(x.pressedKeys),
 			width: Math.max(x.width, VirtualKeyboardState.defaultWidth),
@@ -106,7 +105,6 @@ export class VirtualKeyboardState implements IMultiStateThing, NodeSpecialState 
 
 	public constructor(
 		public readonly ownerId: ClientId,
-		public readonly color: string = 'black',
 	) {}
 }
 

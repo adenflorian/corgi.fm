@@ -68,7 +68,6 @@ export class SimpleDelayState implements IConnectable, NodeSpecialState {
 		filterQ: SimpleDelayState.defaultFilterQ,
 		filterType: SimpleDelayState.defaultFilterType,
 		pingPong: SimpleDelayState.defaultPingPong,
-		color: false,
 		type: ConnectionNodeType.simpleDelay,
 	}
 
@@ -84,7 +83,6 @@ export class SimpleDelayState implements IConnectable, NodeSpecialState {
 	public readonly filterQ: number = SimpleDelayState.defaultFilterQ
 	public readonly filterType: BuiltInBQFilterType = SimpleDelayState.defaultFilterType
 	public readonly pingPong: boolean = SimpleDelayState.defaultPingPong
-	public readonly color: false = false
 	public readonly type = ConnectionNodeType.simpleDelay
 
 	public constructor(ownerId: ClientId) {

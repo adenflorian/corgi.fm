@@ -115,7 +115,7 @@ const defaultPosition = {
 	inputPortCount: 1,
 	outputPortCount: 1,
 	enabled: true,
-	color: CssColor.blue as string | false | List<string>,
+	color: false as string | false | List<string>,
 }
 
 const makePositionRecord = Record(defaultPosition)
@@ -127,7 +127,17 @@ export const makePosition = (
 		...position,
 		width: findNodeInfo(position.targetType).defaultWidth,
 		height: findNodeInfo(position.targetType).defaultHeight,
+		color: getNewPositionColor(position.targetType, position.color),
 	}).toJS()
+}
+
+function getNewPositionColor(type: ConnectionNodeType, color?: IPosition['color']): IPosition['color'] | undefined {
+	if (type === ConnectionNodeType.groupSequencer) {
+		// TODO This is temporary
+		return List([CssColor.red, CssColor.green, CssColor.blue])
+	} else {
+		return color
+	}
 }
 
 export type PositionAction = AddPositionAction | DeletePositionsAction | NodeClickedAction
@@ -140,16 +150,16 @@ const positionsSpecificReducer: Reducer<IPositions, PositionAction> =
 		switch (action.type) {
 			case 'ADD_POSITION': return sortPositions(positions.set(
 				action.position.id,
-				{
+				deserializePosition({
 					...action.position,
 					zIndex: getNewZIndex(positions, 0),
-				},
+				}),
 			))
 			case 'DELETE_POSITIONS': return sortPositions(positions.deleteAll(action.positionIds))
 			case 'DELETE_ALL_POSITIONS': return positions.clear()
-			case 'REPLACE_POSITIONS': return sortPositions(Map<string, IPosition>().merge(action.positions))
-			case 'UPDATE_POSITIONS': return sortPositions(positions.merge(action.positions))
-			case 'UPDATE_POSITION': return positions.update(action.id, x => ({...x, ...action.position}))
+			case 'REPLACE_POSITIONS': return sortPositions(Map<string, IPosition>().merge(action.positions).map(deserializePosition))
+			case 'UPDATE_POSITIONS': return sortPositions(positions.merge(action.positions).map(deserializePosition))
+			case 'UPDATE_POSITION': return positions.update(action.id, x => (deserializePosition({...x, ...action.position})))
 			case 'MOVE_POSITION': return positions.update(action.id, x => ({...x, ...action.position}))
 			case 'RESIZE_POSITION': return positions.update(action.id, x => ({...x, ...action.position}))
 			case 'NODE_CLICKED': return positions.update(action.id, x => ({
@@ -165,6 +175,21 @@ function getNewZIndex(positions: IPositions, currentZIndex: number) {
 	const highest = selectHighestZIndexOfAllPositionsLocal(positions)
 	if (currentZIndex === 0) return highest + 1
 	return currentZIndex < highest ? highest + 1 : currentZIndex
+}
+
+const deserializePosition = (position: IPosition): IPosition => {
+	return {
+		...position,
+		color: deserializePositionColor(position.color),
+	}
+}
+
+const deserializePositionColor = (color: IPosition['color']): IPosition['color'] => {
+	if (Array.isArray(color)) {
+		return List(color)
+	} else {
+		return color
+	}
 }
 
 function sortPositions(positions: IPositions) {
