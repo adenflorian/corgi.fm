@@ -287,6 +287,7 @@
 	- [ ] between better sequencers
 - [ ] ctrl + click and drag to duplicate
 
+- [ ] make velocity affect keyboard note visual
 - [ ] put node version in package json so nvm can use it
 - [ ] don't show connect keyboard menu item if keyboard is already connected
 - [ ] when you control click on a node header, the selected node(s) becomes connected
