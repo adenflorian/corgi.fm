@@ -91,13 +91,14 @@ export function createLocalMiddleware(
 						action.midiNote,
 						localVirtualKeyboard.octave,
 						noteToPlay,
+						action.velocity,
 					),
 				)
 			}
 			case 'VIRTUAL_KEY_PRESSED': {
 				scheduleNote(
 					action.midiNote, action.id, getState(), 'on',
-					getAllInstruments, dispatch)
+					getAllInstruments, dispatch, action.velocity)
 
 				next(action)
 
@@ -202,7 +203,7 @@ export function createLocalMiddleware(
 				const noteToRelease = applyOctave(action.midiNote, localVirtualKeyboard.octave)
 
 				scheduleNote(noteToRelease, localVirtualKeyboard.id, state, 'off',
-					getAllInstruments, dispatch)
+					getAllInstruments, dispatch, 1)
 
 				return dispatch(
 					virtualKeyUp(
@@ -220,7 +221,7 @@ export function createLocalMiddleware(
 				)
 
 				scheduleNote(noteToRelease, action.id, state, 'off',
-					getAllInstruments, dispatch)
+					getAllInstruments, dispatch, 1)
 
 				return next(action)
 			}
@@ -248,13 +249,14 @@ export function createLocalMiddleware(
 
 				const keyboard = selectVirtualKeyboardById(state.room, action.id)
 
+				// TODO Store velocity in pressedKeys
 				keyboard.pressedKeys.forEach(key => {
 					const noteToRelease = applyOctave(key, keyboard.octave)
 					const noteToSchedule = applyOctave(key, keyboard.octave + action.delta)
 					scheduleNote(noteToRelease, keyboard.id, state, 'off',
-						getAllInstruments, dispatch)
+						getAllInstruments, dispatch, 1)
 					scheduleNote(noteToSchedule, keyboard.id, state, 'on',
-						getAllInstruments, dispatch)
+						getAllInstruments, dispatch, 1)
 				})
 
 				return next(action)
@@ -631,6 +633,7 @@ function scheduleNote(
 	onOrOff: 'on' | 'off',
 	getAllInstruments: GetAllInstruments,
 	dispatch: Dispatch,
+	velocity: number,
 ) {
 	if (_previousNotesForSourceId.has(sourceId) === false) {
 		_previousNotesForSourceId = _previousNotesForSourceId.set(sourceId, emptyMidiNotes)
@@ -663,7 +666,7 @@ function scheduleNote(
 		if (targetIds.includes(instrument.id) === false) return
 
 		if (onOrOff === 'on') {
-			instrument.scheduleNote(note, 0, true, Set([sourceId]))
+			instrument.scheduleNote(note, 0, true, Set([sourceId]), velocity)
 			if (fancy) dispatch(animationActions.trigger(instrument.id, note))
 		} else {
 			instrument.scheduleRelease(note, 0)
@@ -688,7 +691,7 @@ function playShortNote(
 		if (targetIds.includes(instrument.id) === false) return
 
 		actualNotes.forEach(actualNote => {
-			instrument.scheduleNote(actualNote, 0, true, Set([sourceId]))
+			instrument.scheduleNote(actualNote, 0, true, Set([sourceId]), 1)
 			instrument.scheduleRelease(actualNote, delayUntilRelease)
 		})
 	})
@@ -704,7 +707,7 @@ function playShortNoteOnTarget(
 
 	if (!instrument) return
 
-	instrument.scheduleNote(note, 0, true, Set([]))
+	instrument.scheduleNote(note, 0, true, Set([]), 1)
 
 	instrument.scheduleRelease(note, delayUntilRelease)
 }

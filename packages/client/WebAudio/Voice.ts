@@ -2,6 +2,7 @@ import {Set} from 'immutable'
 import {BuiltInBQFilterType} from '@corgifm/common/OscillatorTypes'
 import {applyEnvelope, calculateScheduledEnvelope, IScheduledEnvelope} from './envelope'
 import {OnEndedCallback} from '.'
+import {clamp} from '@corgifm/common/common-utils';
 
 export type TunableAudioScheduledSourceNode = AudioScheduledSourceNode & Pick<OscillatorNode, 'detune'>
 
@@ -117,6 +118,7 @@ export abstract class Voice {
 		note: number,
 		attackStart: number,
 		sourceIds: Set<Id>,
+		velocity: number,
 	): void {
 		this.sourceIds = this.sourceIds.concat(sourceIds)
 
@@ -138,7 +140,7 @@ export abstract class Voice {
 			attackStart,
 			attackLength: this._attackTimeInSeconds,
 			decayLength: this._decayTimeInSeconds,
-			sustain: this._sustain,
+			sustain: this._getSustain(this._sustain, velocity),
 			hardCutoffTime: Number.MAX_VALUE,
 		})
 
@@ -340,6 +342,10 @@ export abstract class Voice {
 	}
 
 	public abstract dispose(): void
+
+	protected _getSustain(sustain: number, velocity: number): number {
+		return sustain
+	}
 
 	protected _dispose() {
 		if (this._filter) this._filter.disconnect()

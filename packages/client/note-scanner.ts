@@ -198,7 +198,7 @@ function scheduleNotes(
 
 			scheduledNotesWithTimes = scheduledNotesWithTimes.push(slug)
 
-			instrument.scheduleNote(event.note, delaySecondsUntilStart, false, event.sourceIds)
+			instrument.scheduleNote(event.note, delaySecondsUntilStart, false, event.sourceIds, 1)
 			instrument.scheduleRelease(event.note, delaySecondsUntilRelease)
 		})
 

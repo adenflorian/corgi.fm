@@ -30,7 +30,7 @@ const midiKeyShortcuts: {[key: string]: KeyBoardShortcut} = {}
 
 keyToMidiMap.forEach((val, key) => {
 	midiKeyShortcuts[key] = {
-		actionOnKeyDown: localMidiKeyPress(val),
+		actionOnKeyDown: localMidiKeyPress(val, 1),
 		actionOnKeyUp: localMidiKeyUp(val),
 		allowRepeat: false,
 		preventDefault: true,

@@ -4,9 +4,10 @@ import {ConnectionNodeType} from '../common-types'
 import {SERVER_ACTION, BROADCASTER_ACTION} from '.'
 
 export type LocalMidiKeyPressAction = ReturnType<typeof localMidiKeyPress>
-export const localMidiKeyPress = (midiNote: IMidiNote) => ({
+export const localMidiKeyPress = (midiNote: IMidiNote, velocity: number) => ({
 	type: 'LOCAL_MIDI_KEY_PRESS',
 	midiNote,
+	velocity,
 } as const)
 
 export type LocalMidiKeyUpAction = ReturnType<typeof localMidiKeyUp>

@@ -8,6 +8,7 @@ import {
 	OnEndedCallback, SamplesManager,
 	Voice, Voices,
 } from '.'
+import {clamp} from '@corgifm/common/common-utils';
 
 export interface IBasicSamplerOptions extends IInstrumentOptions {
 	samples: Samples
@@ -127,6 +128,10 @@ class SamplerVoice extends Voice {
 		if (rate === this._audioBufferSource.playbackRate.value) return
 
 		this._audioBufferSource.playbackRate.value = rate
+	}
+
+	public _getSustain(sustain: number, velocity: number): number {
+		return sustain * velocity
 	}
 
 	public dispose() {

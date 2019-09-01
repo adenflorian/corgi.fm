@@ -2,6 +2,7 @@
 import {Store} from 'redux'
 import {logger} from '@corgifm/common/logger'
 import {localMidiKeyUp, localMidiKeyPress} from '@corgifm/common/redux'
+import {clamp} from '@corgifm/common/common-utils'
 
 declare global {
 	interface Navigator {
@@ -121,7 +122,7 @@ function onMidiMessage(event: MidiMessageEvent) {
 	} else {
 		switch (type) {
 			case 144:
-				_store.dispatch(localMidiKeyPress(note))
+				_store.dispatch(localMidiKeyPress(note, clamp(velocity / 127, 0, 1)))
 				break
 			case 128:
 				_store.dispatch(localMidiKeyUp(note))

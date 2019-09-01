@@ -46,6 +46,7 @@ export abstract class Voices<V extends Voice> {
 		filterSustain: number,
 		invincible: boolean,
 		sourceIds: Set<Id>,
+		velocity: number,
 	) {
 		// if delay is 0 then the scheduler isn't working properly
 		if (delaySeconds < 0) logger.error('delay <= 0: ', delaySeconds)
@@ -81,7 +82,7 @@ export abstract class Voices<V extends Voice> {
 
 		const newVoice = this._createVoice(invincible, note, attackTimeInSeconds, decayTimeInSeconds, sustain)
 
-		newVoice.scheduleNote(note, newNoteStartTime, sourceIds)
+		newVoice.scheduleNote(note, newNoteStartTime, sourceIds, velocity)
 
 		this._scheduledVoices = this._scheduledVoices.set(newVoice.id, newVoice)
 

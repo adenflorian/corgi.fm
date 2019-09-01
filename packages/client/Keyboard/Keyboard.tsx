@@ -75,7 +75,7 @@ export const Keyboard = ({id}: IKeyboardAllProps) => {
 		if (isLocal === false) return
 		if (isLeftMouseButtonDown(e.buttons) && wasMouseClickedOnKeyboard) {
 			dispatch(
-				virtualKeyPressed(id, index, octave, applyOctave(index, octave)),
+				virtualKeyPressed(id, index, octave, applyOctave(index, octave), 1),
 			)
 		}
 	}, [dispatch, id, isLocal, octave, wasMouseClickedOnKeyboard])
@@ -97,12 +97,12 @@ export const Keyboard = ({id}: IKeyboardAllProps) => {
 						dispatch(virtualKeyUp(id, index))
 					} else {
 						dispatch(
-							virtualKeyPressed(id, index, octave, applyOctave(index, octave)),
+							virtualKeyPressed(id, index, octave, applyOctave(index, octave), 1),
 						)
 					}
 				} else {
 					dispatch(
-						virtualKeyPressed(id, index, octave, applyOctave(index, octave)),
+						virtualKeyPressed(id, index, octave, applyOctave(index, octave), 1),
 					)
 				}
 			}

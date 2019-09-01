@@ -46,13 +46,13 @@ export abstract class Instrument<T extends Voices<V>, V extends Voice> extends A
 		registerInstrumentWithSchedulerVisual(this.id, () => this._getVoices().getScheduledVoices(), this._audioContext)
 	}
 
-	public scheduleNote(note: IMidiNote, delaySeconds: number, invincible: boolean, sourceIds: Set<Id>) {
+	public scheduleNote(note: IMidiNote, delaySeconds: number, invincible: boolean, sourceIds: Set<Id>, velocity: number) {
 		this._getVoices()
 			.scheduleNote(
 				note, delaySeconds,
 				this._attackTimeInSeconds, this._decayTimeInSeconds, this._sustain,
 				this._filterAttackTimeInSeconds, this._filterDecayTimeInSeconds, this._filterSustain,
-				invincible, sourceIds,
+				invincible, sourceIds, velocity,
 			)
 	}
 
