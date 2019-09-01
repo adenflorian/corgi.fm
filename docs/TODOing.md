@@ -232,10 +232,10 @@
 	- [ ] refactor audio stuff to reuse oscillators and gain nodes, etc.
 
 **Refactor Node State**
-- [ ] id (already in position state, but might need to stay on node state as well)
+- [ ] id (already in position state, but might need to stay on node state as well) (staying for now)
 - [√] ownerId (move to position state or remove if not used) (moved)
 - [√] color (already in position state but not used) (moved)
-- [ ] type (already in position state, but node type is used in some places)
+- [ ] type (already in position state, but node type is used in some places) (staying for now)
 - [√] name (move to position state or remove if not used) (removed)
 - [√] enabled (removed from node state, was already on position state, and it wasn't used from node state)
 
@@ -287,6 +287,7 @@
 	- [ ] between better sequencers
 - [ ] ctrl + click and drag to duplicate
 
+- [ ] put node version in package json so nvm can use it
 - [ ] don't show connect keyboard menu item if keyboard is already connected
 - [ ] when you control click on a node header, the selected node(s) becomes connected
 - [ ] filter resonance

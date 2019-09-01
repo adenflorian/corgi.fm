@@ -4,9 +4,8 @@ import {ActionType, StateType} from 'typesafe-actions'
 import {ConnectionNodeType} from '../../common-types'
 import {IMultiState} from '../multi-reducer'
 import {findNodeInfo} from '../node-types'
-import {makeShamuEdgesState} from './shamu-edges-redux'
 import {
-	edgesReducer, nodesReducer,
+	nodesReducer,
 } from '.'
 import {BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION} from '..'
 
@@ -42,8 +41,6 @@ export function shamuGraphReducer(state: ShamuGraphState | undefined, action: Sh
 				simpleDelays: deserialize(ConnectionNodeType.simpleDelay, action.shamuGraphState.nodes.simpleDelays),
 				virtualKeyboards: deserialize(ConnectionNodeType.virtualKeyboard, action.shamuGraphState.nodes.virtualKeyboards),
 			},
-			// TODO Get rid of edges, they aren't used
-			edges: makeShamuEdgesState().merge(action.shamuGraphState.edges),
 		}
 		// case 'MERGE_SHAMU_GRAPH_STATE': {
 		// 	if (!state) {
@@ -88,10 +85,6 @@ export function shamuGraphReducer(state: ShamuGraphState | undefined, action: Sh
 		// 			// Don't merge keyboards
 		// 			virtualKeyboards: state.nodes.virtualKeyboards,
 		// 		},
-		// 		edges: {
-		// 			...state.edges,
-		// 			...makeShamuEdgesState().merge(action.shamuGraphState.edges),
-		// 		},
 		// 	}
 		// }
 		default: return shamuGraphCombinedReducers(state, action)
@@ -100,7 +93,6 @@ export function shamuGraphReducer(state: ShamuGraphState | undefined, action: Sh
 
 const shamuGraphCombinedReducers = combineReducers({
 	nodes: nodesReducer,
-	edges: edgesReducer,
 } as const)
 
 function deserialize<T extends IMultiState>(type: ConnectionNodeType, multiState: T): T {

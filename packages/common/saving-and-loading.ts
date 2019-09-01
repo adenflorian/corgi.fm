@@ -54,7 +54,6 @@ function enablePositionsMaybe(positions: IPositions): IPositions {
 function convertShamuGraph(shamuGraph: Partial<ShamuGraphState>): ShamuGraphState {
 	return {
 		nodes: convertShamuGraphNodes(shamuGraph.nodes || {}),
-		edges: shamuGraph.edges || Map<string, IConnection>(),
 	}
 }
 
