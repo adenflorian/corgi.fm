@@ -38,7 +38,7 @@ import {
 	virtualKeyUp, VirtualKeyUpAction,
 	virtualOctaveChange, VirtualOctaveChangeAction,
 	LocalAction, chatSystemMessage, animationActions, selectOption, AppOptions,
-	getNodeInfo, SequencerStateBase, localMidiKeyUp,
+	getNodeInfo, SequencerStateBase, localMidiKeyUp, selectUserInputKeys, userInputActions,
 } from '@corgifm/common/redux'
 import {pointersActions} from '@corgifm/common/redux/pointers-redux'
 import {graphStateSavesLocalStorageKey} from './client-constants'
@@ -55,6 +55,7 @@ type LocalMiddlewareActions = LocalAction | AddClientAction | VirtualKeyPressedA
 
 /** Key is the key number that was pressed, value is the note that was played (key number with octave applied) */
 let _localMidiKeys = Map<number, IMidiNote>()
+let _localSustainedNotes = Map<number, IMidiNotes>()
 
 export function createLocalMiddleware(
 	getAllInstruments: GetAllInstruments, firebase: FirebaseContextStuff
@@ -65,6 +66,8 @@ export function createLocalMiddleware(
 		switch (action.type) {
 			case 'WINDOW_BLUR': {
 				next(action)
+
+				dispatch(userInputActions.localMidiSustainPedal(false))
 
 				const state = getState()
 
@@ -166,6 +169,13 @@ export function createLocalMiddleware(
 				_localMidiKeys = _localMidiKeys.delete(action.midiNote)
 
 				const state = getState()
+				const sustain = selectUserInputKeys(state).sustainPedalPressed
+
+				if (sustain) {
+					_localSustainedNotes = _localSustainedNotes.update(action.midiNote, Set(), notes => notes.add(noteToRelease))
+					return
+				}
+
 				const localVirtualKeyboard = selectLocalVirtualKeyboard(state)
 				const sourceId = localVirtualKeyboard.id
 				const directlyConnectedSequencerIds = selectDirectDownstreamSequencerIds(state.room, sourceId).toArray()
@@ -193,6 +203,36 @@ export function createLocalMiddleware(
 						instrument.scheduleRelease(action.midiNote, 0)
 					})
 
+				return next(action)
+			}
+			case 'LOCAL_MIDI_SUSTAIN_PEDAL': {
+				if (!action.pressed) {
+					const state = getState()
+					const localVirtualKeyboard = selectLocalVirtualKeyboard(state)
+					const sourceId = localVirtualKeyboard.id
+					const directlyConnectedSequencerIds = selectDirectDownstreamSequencerIds(state.room, sourceId).toArray()
+
+					const targetIds = selectConnectionsWithSourceIds(state.room, [sourceId].concat(directlyConnectedSequencerIds))
+						.map(x => x.targetId)
+						.valueSeq()
+						.toSet()
+
+					_localSustainedNotes.forEach((notes, number) => {
+						notes.forEach(note => {
+							dispatch(
+								virtualKeyUp(
+									sourceId,
+									number,
+									note,
+									targetIds,
+								),
+							)
+						})
+					})
+
+					_localSustainedNotes = _localSustainedNotes.clear()
+				}
+				
 				return next(action)
 			}
 			case 'LOCAL_MIDI_OCTAVE_CHANGE': {
