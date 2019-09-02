@@ -2,11 +2,11 @@ import React, {useState, useCallback, useEffect} from 'react'
 import {useSelector, useDispatch} from 'react-redux'
 import {stripIndents} from 'common-tags'
 import {
-	applyOctave, getKeyByValue, keyToMidiMap,
+	getKeyByValue, keyToMidiMap,
 } from '@corgifm/common/common-utils'
 import {
-	virtualKeyPressed, virtualKeyUp, selectVirtualKeyboardOctave, IClientAppState,
-	selectVirtualKeyboardById, selectClientById, selectLocalClientId, selectPosition,
+	selectVirtualKeyboardOctave, IClientAppState,
+	selectVirtualKeyboardById, selectClientById, selectLocalClientId, selectPosition, localActions, localMidiKeyPress, localMidiKeyUp,
 } from '@corgifm/common/redux'
 import {
 	keyColors,
@@ -74,16 +74,14 @@ export const Keyboard = ({id}: IKeyboardAllProps) => {
 	const handleMouseOver = useCallback((e: React.MouseEvent, index: number) => {
 		if (isLocal === false) return
 		if (isLeftMouseButtonDown(e.buttons) && wasMouseClickedOnKeyboard) {
-			dispatch(
-				virtualKeyPressed(id, index, octave, applyOctave(index, octave), 1),
-			)
+			dispatch(localMidiKeyPress(index, 1))
 		}
 	}, [dispatch, id, isLocal, octave, wasMouseClickedOnKeyboard])
 
 	const handleMouseOut = useCallback((e: React.MouseEvent, index: number) => {
 		if (isLocal === false) return
 		if (isLeftMouseButtonDown(e.buttons) && wasMouseClickedOnKeyboard) {
-			dispatch(virtualKeyUp(id, index))
+			dispatch(localMidiKeyUp(index))
 		}
 	}, [dispatch, id, isLocal, wasMouseClickedOnKeyboard])
 
@@ -94,16 +92,12 @@ export const Keyboard = ({id}: IKeyboardAllProps) => {
 				setWasMouseClickedOnKeyboard(true)
 				if (e.shiftKey) {
 					if (isKeyPressed) {
-						dispatch(virtualKeyUp(id, index))
+						dispatch(localMidiKeyUp(index))
 					} else {
-						dispatch(
-							virtualKeyPressed(id, index, octave, applyOctave(index, octave), 1),
-						)
+						dispatch(localMidiKeyPress(index, 1))
 					}
 				} else {
-					dispatch(
-						virtualKeyPressed(id, index, octave, applyOctave(index, octave), 1),
-					)
+					dispatch(localMidiKeyPress(index, 1))
 				}
 			}
 		},
@@ -112,7 +106,7 @@ export const Keyboard = ({id}: IKeyboardAllProps) => {
 	const handleMouseUp = useCallback((e: React.MouseEvent, index: number) => {
 		if (isLocal === false) return
 		if (e.button === 0 && e.shiftKey === false) {
-			dispatch(virtualKeyUp(id, index))
+			dispatch(localMidiKeyUp(index))
 		}
 	}, [dispatch, id, isLocal])
 

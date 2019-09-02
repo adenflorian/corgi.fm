@@ -5,7 +5,7 @@ import {MAX_MIDI_NOTE_NUMBER_127} from '@corgifm/common/common-constants'
 import {ConnectionNodeType, IConnectable} from '@corgifm/common/common-types'
 import {applyOctave, createNodeId} from '@corgifm/common/common-utils'
 import {logger} from '@corgifm/common/logger'
-import {emptyMidiNotes, IMidiNote, IMidiNotes} from '@corgifm/common/MidiNote'
+import {IMidiNote, IMidiNotes} from '@corgifm/common/MidiNote'
 import {IClientRoomState} from '@corgifm/common/redux/common-redux-types'
 import {
 	selectAllConnections, selectConnectionsWithSourceIds,
@@ -27,7 +27,7 @@ import {
 	selectGlobalClockState, selectLocalClient,
 	selectLocalClientId, selectLocalSocketId,
 	selectPosition, selectPositionExtremes,
-	selectRoomSettings, selectSequencer, selectShamuGraphState, selectVirtualKeyboardById,
+	selectRoomSettings, selectSequencer, selectShamuGraphState,
 	selectVirtualKeyboardByOwner, sequencerActions,
 	SetActiveRoomAction, setClientName, setLocalClientId,
 	SetLocalClientNameAction,
@@ -38,12 +38,11 @@ import {
 	virtualKeyUp, VirtualKeyUpAction,
 	virtualOctaveChange, VirtualOctaveChangeAction,
 	LocalAction, chatSystemMessage, animationActions, selectOption, AppOptions,
-	getNodeInfo, SequencerStateBase,
+	getNodeInfo, SequencerStateBase, localMidiKeyUp,
 } from '@corgifm/common/redux'
 import {pointersActions} from '@corgifm/common/redux/pointers-redux'
 import {graphStateSavesLocalStorageKey} from './client-constants'
 import {GetAllInstruments} from './instrument-manager'
-import {MidiNotes} from './Instruments/BasicSynthesizerView'
 import {getSequencersSchedulerInfo} from './note-scanner'
 import {saveUsernameToLocalStorage} from './username'
 import {corgiApiActions} from './RestClient/corgi-api-middleware'
@@ -53,6 +52,9 @@ import {onChangeRoom} from './WebAudio'
 type LocalMiddlewareActions = LocalAction | AddClientAction | VirtualKeyPressedAction | GridSequencerAction
 | UserInputAction | VirtualKeyUpAction | VirtualOctaveChangeAction | SetActiveRoomAction | ReadyAction
 | UpdatePositionsAction | SetLocalClientNameAction
+
+/** Key is the key number that was pressed, value is the note that was played (key number with octave applied) */
+let _localMidiKeys = Map<number, IMidiNote>()
 
 export function createLocalMiddleware(
 	getAllInstruments: GetAllInstruments, firebase: FirebaseContextStuff
@@ -69,30 +71,35 @@ export function createLocalMiddleware(
 				const localVirtualKeyboard = selectLocalVirtualKeyboard(state)
 
 				return localVirtualKeyboard.pressedKeys.forEach(key => {
-					dispatch(
-						virtualKeyUp(
-							localVirtualKeyboard.id,
-							key,
-						),
-					)
+					dispatch(localMidiKeyUp(key))
 				})
 			}
 			case 'LOCAL_MIDI_KEY_PRESS': {
-				next(action)
 				const state = getState()
-
 				const localVirtualKeyboard = selectLocalVirtualKeyboard(state)
-
+				const sourceId = localVirtualKeyboard.id
 				const noteToPlay = applyOctave(action.midiNote, localVirtualKeyboard.octave)
+				const directlyConnectedSequencerIds = selectDirectDownstreamSequencerIds(state.room, sourceId).toArray()
+
+				if (_localMidiKeys.has(action.midiNote)) {
+					dispatch(localMidiKeyUp(action.midiNote))
+				}
+
+				_localMidiKeys = _localMidiKeys.set(action.midiNote, noteToPlay)
+
+				const targetIds = selectConnectionsWithSourceIds(state.room, [sourceId].concat(directlyConnectedSequencerIds))
+					.map(x => x.targetId)
+					.valueSeq()
+					.toSet()
 
 				dispatch(
 					virtualKeyPressed(
-						localVirtualKeyboard.id,
+						sourceId,
 						action.midiNote,
-						localVirtualKeyboard.octave,
 						noteToPlay,
 						action.velocity,
-					),
+						targetIds,
+					)
 				)
 
 				// add note to sequencer if downstream recording sequencer
@@ -134,43 +141,57 @@ export function createLocalMiddleware(
 						}
 					})
 
+				next(action)
+
 				return
 			}
 			case 'VIRTUAL_KEY_PRESSED': {
-				scheduleNote(
-					action.midiNote, action.id, getState(), 'on',
-					getAllInstruments, dispatch, action.velocity)
+				const state = getState()
+				const fancy = selectOption(state, AppOptions.graphicsExtraAnimations)
+
+				getAllInstruments()
+					.filter(x => action.targetIds.includes(x.id))
+					.forEach(instrument => {
+						instrument.scheduleNote(action.midiNote, 0, true, Set([action.id]), action.velocity)
+						if (fancy) dispatch(animationActions.trigger(instrument.id, action.midiNote))
+					})
 
 				return next(action)
 			}
 			case 'LOCAL_MIDI_KEY_UP': {
-				next(action)
+				const noteToRelease = _localMidiKeys.get(action.midiNote, null)
+
+				if (noteToRelease === null) return
+
+				_localMidiKeys = _localMidiKeys.delete(action.midiNote)
+
 				const state = getState()
-
 				const localVirtualKeyboard = selectLocalVirtualKeyboard(state)
+				const sourceId = localVirtualKeyboard.id
+				const directlyConnectedSequencerIds = selectDirectDownstreamSequencerIds(state.room, sourceId).toArray()
 
-				const noteToRelease = applyOctave(action.midiNote, localVirtualKeyboard.octave)
+				const targetIds = selectConnectionsWithSourceIds(state.room, [sourceId].concat(directlyConnectedSequencerIds))
+					.map(x => x.targetId)
+					.valueSeq()
+					.toSet()
 
-				scheduleNote(noteToRelease, localVirtualKeyboard.id, state, 'off',
-					getAllInstruments, dispatch, 1)
-
-				return dispatch(
+				dispatch(
 					virtualKeyUp(
-						localVirtualKeyboard.id,
+						sourceId,
 						action.midiNote,
+						noteToRelease,
+						targetIds,
 					),
 				)
+
+				return next(action)
 			}
 			case 'VIRTUAL_KEY_UP': {
-				const state = getState()
-
-				const noteToRelease = applyOctave(
-					action.number,
-					selectVirtualKeyboardById(state.room, action.id).octave,
-				)
-
-				scheduleNote(noteToRelease, action.id, state, 'off',
-					getAllInstruments, dispatch, 1)
+				getAllInstruments()
+					.filter(x => action.targetIds.includes(x.id))
+					.forEach(instrument => {
+						instrument.scheduleRelease(action.midiNote, 0)
+					})
 
 				return next(action)
 			}
@@ -193,23 +214,23 @@ export function createLocalMiddleware(
 
 				return dispatch(virtualOctaveChange(selectLocalVirtualKeyboardId(state), action.delta))
 			}
-			case 'VIRTUAL_OCTAVE_CHANGE': {
-				const state = getState()
+			// case 'VIRTUAL_OCTAVE_CHANGE': {
+			// 	const state = getState()
 
-				const keyboard = selectVirtualKeyboardById(state.room, action.id)
+			// 	const keyboard = selectVirtualKeyboardById(state.room, action.id)
 
-				// TODO Store velocity in pressedKeys
-				keyboard.pressedKeys.forEach(key => {
-					const noteToRelease = applyOctave(key, keyboard.octave)
-					const noteToSchedule = applyOctave(key, keyboard.octave + action.delta)
-					scheduleNote(noteToRelease, keyboard.id, state, 'off',
-						getAllInstruments, dispatch, 1)
-					scheduleNote(noteToSchedule, keyboard.id, state, 'on',
-						getAllInstruments, dispatch, 1)
-				})
+			// 	// TODO Store velocity in pressedKeys
+			// 	keyboard.pressedKeys.forEach(key => {
+			// 		const noteToRelease = applyOctave(key, keyboard.octave)
+			// 		const noteToSchedule = applyOctave(key, keyboard.octave + action.delta)
+			// 		scheduleNote(noteToRelease, keyboard.id, state, 'off',
+			// 			getAllInstruments, dispatch, 1)
+			// 		scheduleNote(noteToSchedule, keyboard.id, state, 'on',
+			// 			getAllInstruments, dispatch, 1)
+			// 	})
 
-				return next(action)
-			}
+			// 	return next(action)
+			// }
 			case 'SET_GRID_SEQUENCER_NOTE': {
 				if (action.enabled) {
 					playShortNote(Set([action.note]), action.id, getState().room, getAllInstruments)
@@ -619,56 +640,6 @@ function parseLocalSavesJSON(localSavesJSON: string): LocalSaves {
 const makeInitialLocalSavesStorage = (): LocalSaves => ({
 	all: Map(),
 })
-
-let _previousNotesForSourceId = Map<Id, MidiNotes>()
-
-function scheduleNote(
-	note: IMidiNote,
-	sourceId: Id,
-	state: IClientAppState,
-	onOrOff: 'on' | 'off',
-	getAllInstruments: GetAllInstruments,
-	dispatch: Dispatch,
-	velocity: number,
-) {
-	if (_previousNotesForSourceId.has(sourceId) === false) {
-		_previousNotesForSourceId = _previousNotesForSourceId.set(sourceId, emptyMidiNotes)
-	}
-
-	const previousNotes = _previousNotesForSourceId.get(sourceId, emptyMidiNotes)
-
-	if (onOrOff === 'on') {
-		if (previousNotes.includes(note)) {
-			return
-		} else {
-			_previousNotesForSourceId = _previousNotesForSourceId.update(sourceId, x => x.add(note))
-		}
-	} else if (previousNotes.includes(note)) {
-		_previousNotesForSourceId = _previousNotesForSourceId.update(sourceId, x => x.remove(note))
-	} else {
-		return
-	}
-
-	// logger.log('[local-middleware.scheduleNote] note: ' + note + ' | onOrOff: ' + onOrOff)
-
-	const directlyConnectedSequencerIds = selectDirectDownstreamSequencerIds(state.room, sourceId).toArray()
-
-	const targetIds = selectConnectionsWithSourceIds(state.room, [sourceId].concat(directlyConnectedSequencerIds))
-		.map(x => x.targetId)
-
-	const fancy = selectOption(state, AppOptions.graphicsExtraAnimations)
-
-	getAllInstruments().forEach(instrument => {
-		if (targetIds.includes(instrument.id) === false) return
-
-		if (onOrOff === 'on') {
-			instrument.scheduleNote(note, 0, true, Set([sourceId]), velocity)
-			if (fancy) dispatch(animationActions.trigger(instrument.id, note))
-		} else {
-			instrument.scheduleRelease(note, 0)
-		}
-	})
-}
 
 function playShortNote(
 	notes: IMidiNotes, sourceId: Id, roomState: IClientRoomState,

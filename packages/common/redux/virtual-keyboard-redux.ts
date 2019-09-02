@@ -25,28 +25,30 @@ export const addVirtualKeyboard = (virtualKeyboard: VirtualKeyboardState) =>
 
 export const VIRTUAL_KEY_PRESSED = 'VIRTUAL_KEY_PRESSED'
 export type VirtualKeyPressedAction = ReturnType<typeof virtualKeyPressed>
-export const virtualKeyPressed = (id: Id, number: number, octave: Octave, midiNote: IMidiNote, velocity: number) => {
+export const virtualKeyPressed = (id: Id, number: number, midiNote: IMidiNote, velocity: number, targetIds: Set<Id>) => {
 	return {
 		type: VIRTUAL_KEY_PRESSED,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 		id,
 		number,
-		octave,
 		midiNote,
 		velocity,
+		targetIds,
 	} as const
 }
 
 export const VIRTUAL_KEY_UP = 'VIRTUAL_KEY_UP'
 export type VirtualKeyUpAction = ReturnType<typeof virtualKeyUp>
-export const virtualKeyUp = (id: Id, number: number) => {
+export const virtualKeyUp = (id: Id, number: number, midiNote: IMidiNote, targetIds: Set<Id>) => {
 	return {
 		type: VIRTUAL_KEY_UP,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 		id,
 		number,
+		midiNote,
+		targetIds,
 	} as const
 }
 
