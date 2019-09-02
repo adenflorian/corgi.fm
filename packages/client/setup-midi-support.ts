@@ -1,7 +1,7 @@
 /* eslint-disable no-bitwise */
 import {Store} from 'redux'
 import {logger} from '@corgifm/common/logger'
-import {localMidiKeyUp, localMidiKeyPress} from '@corgifm/common/redux'
+import {localMidiKeyUp, localMidiKeyPress, userInputActions} from '@corgifm/common/redux'
 import {clamp} from '@corgifm/common/common-utils'
 
 declare global {
@@ -126,6 +126,9 @@ function onMidiMessage(event: MidiMessageEvent) {
 				break
 			case 128:
 				_store.dispatch(localMidiKeyUp(note))
+				break
+			case 176:
+				_store.dispatch(userInputActions.localMidiSustainPedal(velocity >= 64))
 				break
 		}
 	}

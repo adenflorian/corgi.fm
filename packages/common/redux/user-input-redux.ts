@@ -16,12 +16,17 @@ export const userInputActions = {
 		type: 'USER_KEY_PRESS',
 		key,
 	} as const),
+	localMidiSustainPedal: (pressed: boolean) => ({
+		type: 'LOCAL_MIDI_SUSTAIN_PEDAL',
+		pressed,
+	} as const),
 } as const
 
 export const makeUserInputKeysState = Record({
 	ctrl: false,
 	alt: false,
 	shift: false,
+	sustainPedalPressed: false,
 })
 
 export type UserInputKeysState = ReturnType<typeof makeUserInputKeysState>
@@ -36,6 +41,7 @@ const userInputKeysReducer: Reducer<UserInputKeysState, UserInputAction> =
 	(state = makeUserInputKeysState(), action) => {
 		switch (action.type) {
 			case 'SET_USER_INPUT': return state.merge(action.keys)
+			case 'LOCAL_MIDI_SUSTAIN_PEDAL': return state.set('sustainPedalPressed', action.pressed)
 			default: return state
 		}
 	}

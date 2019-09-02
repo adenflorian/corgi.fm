@@ -88,6 +88,12 @@ const keyboardShortcuts: IKeyBoardShortcuts = Map<KeyBoardShortcut>({
 		allowRepeat: false,
 		preventDefault: true,
 	},
+	'b': {
+		actionOnKeyDown: userInputActions.localMidiSustainPedal(true),
+		actionOnKeyUp: userInputActions.localMidiSustainPedal(false),
+		allowRepeat: false,
+		preventDefault: true,
+	},
 	'ArrowRight': {
 		actionOnKeyDown: sequencerActions.skipNote(),
 		allowRepeat: true,
