@@ -85,7 +85,7 @@ export function createLocalMiddleware(
 
 				const noteToPlay = applyOctave(action.midiNote, localVirtualKeyboard.octave)
 
-				return dispatch(
+				dispatch(
 					virtualKeyPressed(
 						localVirtualKeyboard.id,
 						action.midiNote,
@@ -94,24 +94,13 @@ export function createLocalMiddleware(
 						action.velocity,
 					),
 				)
-			}
-			case 'VIRTUAL_KEY_PRESSED': {
-				scheduleNote(
-					action.midiNote, action.id, getState(), 'on',
-					getAllInstruments, dispatch, action.velocity)
-
-				next(action)
-
-				if ((action as unknown as BroadcastAction).alreadyBroadcasted) return
-
-				const state = getState()
 
 				// add note to sequencer if downstream recording sequencer
-				_getDownstreamRecordingSequencers(state, action.id)
+				_getDownstreamRecordingSequencers(state, localVirtualKeyboard.id)
 					.forEach(sequencer => {
 						const info = getSequencersSchedulerInfo().get(sequencer.id, null)
 
-						if (!info) return dispatch(sequencerActions.recordNote(sequencer.id, action.midiNote))
+						if (!info) return dispatch(sequencerActions.recordNote(sequencer.id, noteToPlay))
 
 						const clipLength = sequencer.midiClip.length
 
@@ -119,11 +108,11 @@ export function createLocalMiddleware(
 
 						const actualIndex = index >= clipLength ? 0 : index
 
+						const actualMidiNote = Math.min(MAX_MIDI_NOTE_NUMBER_127 - 1, Math.max(0, noteToPlay))
+
 						if (sequencer.type === ConnectionNodeType.gridSequencer) {
 							const gridSequencer = sequencer as GridSequencerState
-
-							const actualMidiNote = Math.min(MAX_MIDI_NOTE_NUMBER_127 - 1, Math.max(0, action.midiNote))
-
+							
 							const topNote = gridSequencer.scrollY + GridSequencerState.notesToShow - 1
 
 							let needToScroll = 0
@@ -141,11 +130,18 @@ export function createLocalMiddleware(
 
 							return dispatch(sequencerActions.recordNote(sequencer.id, actualMidiNote, actualIndex))
 						} else {
-							return dispatch(sequencerActions.recordNote(sequencer.id, action.midiNote, actualIndex))
+							return dispatch(sequencerActions.recordNote(sequencer.id, actualMidiNote, actualIndex))
 						}
 					})
 
 				return
+			}
+			case 'VIRTUAL_KEY_PRESSED': {
+				scheduleNote(
+					action.midiNote, action.id, getState(), 'on',
+					getAllInstruments, dispatch, action.velocity)
+
+				return next(action)
 			}
 			case 'SET_GRID_SEQUENCER_NOTE': {
 				if (action.enabled) {
