@@ -1,11 +1,10 @@
-import {List, Set, Stack} from 'immutable'
-import {createSelector} from 'reselect'
+import {Stack, OrderedMap} from 'immutable'
 import {ActionType} from 'typesafe-actions'
 import {ConnectionNodeType, IConnectable} from '../common-types'
 import {assertArrayHasNoUndefinedElements} from '../common-utils'
 import {logger} from '../logger'
 import {makeMidiClipEvent, MidiClip, makeEvents} from '../midi-types'
-import {IMidiNote, MidiNotes} from '../MidiNote'
+import {IMidiNote} from '../MidiNote'
 import {
 	deserializeSequencerState,
 	selectAllInfiniteSequencers, SequencerAction, SequencerStateBase, sequencerActionTypes2,
@@ -271,32 +270,41 @@ function infiniteSequencerReducer(
 		case 'STOP_SEQUENCER': return {...infiniteSequencer, isPlaying: false, isRecording: false}
 		case 'PLAY_ALL': return {...infiniteSequencer, isPlaying: true}
 		case 'STOP_ALL': return {...infiniteSequencer, isPlaying: false, isRecording: false}
-		// case 'RECORD_SEQUENCER_REST':
-		// case 'RECORD_SEQUENCER_NOTE':
-		// 	if (infiniteSequencer.isRecording) {
-		// 		return {
-		// 			...infiniteSequencer,
-		// 			midiClip: infiniteSequencer.midiClip.withMutations(mutable => {
-		// 				mutable.set('events', mutable.events
-		// 					.concat(makeMidiClipEvent({
-		// 						note: action.type === 'RECORD_SEQUENCER_NOTE'
-		// 							? action.note
-		// 							: action.type === 'RECORD_SEQUENCER_REST'
-		// 								? -1
-		// 								: (() => {logger.error('nope'); return -1})(),
-		// 						startBeat: mutable.events.count(),
-		// 						durationBeats: 1,
-		// 					})),
-		// 				)
-		// 				mutable.set('length', mutable.events.count())
-		// 			}),
-		// 			previousEvents: infiniteSequencer.previousEvents.unshift(infiniteSequencer.midiClip.events),
-		// 		}
-		// 	} else {
-		// 		return infiniteSequencer
-		// 	}
+		case 'RECORD_SEQUENCER_REST':
+		case 'RECORD_SEQUENCER_NOTE':
+			if (infiniteSequencer.isRecording) {
+				return {
+					...infiniteSequencer,
+					midiClip: infiniteSequencer.midiClip
+						.update('events', events => events.concat(createEventToRecord(action, infiniteSequencer)))
+						.update('length', length => length + 1),
+					previousEvents: infiniteSequencer.previousEvents.unshift(infiniteSequencer.midiClip.events),
+				}
+			} else {
+				return infiniteSequencer
+			}
 		default:
 			return infiniteSequencer
+	}
+}
+
+function createEventToRecord(action: SequencerAction, infiniteSequencer: InfiniteSequencerState) {
+	const newEvent = makeMidiClipEvent({
+		note: getNoteToRecord(action),
+		startBeat: infiniteSequencer.midiClip.events.count(),
+		durationBeats: 1,
+	})
+	return OrderedMap([[newEvent.id, newEvent]])
+}
+
+function getNoteToRecord(action: SequencerAction): number {
+	switch (action.type) {
+		case 'RECORD_SEQUENCER_NOTE': return action.note
+		case 'RECORD_SEQUENCER_REST': return -1
+		default: {
+			logger.error('[getRecordNote] bad action: ', {action})
+			return -1
+		}
 	}
 }
 
