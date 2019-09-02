@@ -135,15 +135,22 @@ function convertMidiClip(midiClip: MidiClip | MidiClipV1): MidiClip {
 		...midiClip,
 		events: convertListEventsToV2(List(midiClip.events)),
 		version: '2',
+		length: List(midiClip.events).count(),
 	}
 }
 
 function convertListEventsToV2(events: List<MidiClipEventV1>): OrderedMap<Id, MidiClipEvent> {
 	return events.reduce((result, event) => {
+		return result.concat(convertEventV1ToEvents(event))
+	}, OrderedMap<Id, MidiClipEvent>())
+}
+
+function convertEventV1ToEvents(event: MidiClipEventV1): OrderedMap<Id, MidiClipEvent> {
+	return List(event.notes).reduce((result, note) => {
 		const newEvent = makeMidiClipEvent({
-			durationBeats: event.durationBeats,
-			note: Set(event.notes).first(-1),
-			startBeat: event.startBeat,
+			durationBeats: 1,
+			note,
+			startBeat: event.startBeat * (1 / event.durationBeats),
 		})
 		return result.set(newEvent.id, newEvent)
 	}, OrderedMap<Id, MidiClipEvent>())

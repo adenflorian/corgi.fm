@@ -84,6 +84,7 @@ function foo() {
 			startBeat: i++,
 			durationBeats: 1,
 		})))
+		.filter(x => x.note > -1)
 }
 
 export class GridSequencerState extends SequencerStateBase {
@@ -121,12 +122,8 @@ export class GridSequencerState extends SequencerStateBase {
 		isPlaying = false,
 	) {
 		const midiClip = new MidiClip({
-			events: events.map(x => ({
-				...x,
-				startBeat: x.startBeat,
-				durationBeats: x.durationBeats,
-			})),
-			length: events.count(),
+			events,
+			length: GridSequencerState.eventCount,
 			loop: true,
 		})
 
@@ -192,28 +189,31 @@ const gridSequencerReducer =
 	(gridSequencer: GridSequencerState, action: GridSequencerAction): GridSequencerState => {
 		switch (action.type) {
 			case 'SET_GRID_SEQUENCER_NOTE':
-				if (action.note === undefined) {
-					throw new Error('action.notes === undefined')
-				}
 				return {
 					...gridSequencer,
-					midiClip: gridSequencer.midiClip.set('events', gridSequencer.midiClip.events.map(event => {
-						if (event.startBeat === action.index) {
-							if (action.enabled) {
-								return {
-									...event,
-									note: action.note,
-								}
+					midiClip: gridSequencer.midiClip.update('events', events => {
+
+						const matchedEvent = events.find(x => x.startBeat === action.index && x.note === action.note)
+
+						if (action.enabled) {
+							if (matchedEvent) {
+								return events
 							} else {
-								return {
-									...event,
-									notes: -1,
-								}
+								const newEvent = makeMidiClipEvent({
+									durationBeats: 1,
+									note: action.note,
+									startBeat: action.index,
+								})
+								return events.set(newEvent.id, newEvent)
 							}
 						} else {
-							return event
+							if (matchedEvent) {
+								return events.delete(matchedEvent.id)
+							} else {
+								return events
+							}
 						}
-					})),
+					}),
 					previousEvents: gridSequencer.previousEvents.unshift(gridSequencer.midiClip.events),
 				}
 			case 'SET_GRID_SEQUENCER_FIELD':
@@ -252,23 +252,22 @@ const gridSequencerReducer =
 					previousEvents: gridSequencer.previousEvents.unshift(gridSequencer.midiClip.events),
 				}
 			}
-			// case 'RECORD_SEQUENCER_NOTE':
-			// 	const index = action.index
-			// 	if (index === undefined) return gridSequencer
-			// 	if (gridSequencer.isRecording) {
-			// 		return {
-			// 			...gridSequencer,
-			// 			midiClip: gridSequencer.midiClip.withMutations(mutable => {
-			// 				mutable.set('events',
-			// 					mutable.events.update(
-			// 						index,
-			// 						x => ({...x, note: action.note})))
-			// 			}),
-			// 			previousEvents: gridSequencer.previousEvents.unshift(gridSequencer.midiClip.events),
-			// 		}
-			// 	} else {
-			// 		return gridSequencer
-			// 	}
+			case 'RECORD_SEQUENCER_NOTE':
+				const index = action.index
+				if (index === undefined) return gridSequencer
+				if (!gridSequencer.isRecording) return gridSequencer
+				return {
+					...gridSequencer,
+					midiClip: gridSequencer.midiClip.update('events', events => {
+						const newEvent = makeMidiClipEvent({
+							note: action.note,
+							startBeat: index,
+							durationBeats: 1,
+						})
+						return events.set(newEvent.id, newEvent)
+					}),
+					previousEvents: gridSequencer.previousEvents.unshift(gridSequencer.midiClip.events),
+				}
 			case 'PLAY_SEQUENCER': return {...gridSequencer, isPlaying: true}
 			case 'STOP_SEQUENCER': return {...gridSequencer, isPlaying: false, isRecording: false}
 			case 'PLAY_ALL': return {...gridSequencer, isPlaying: true}

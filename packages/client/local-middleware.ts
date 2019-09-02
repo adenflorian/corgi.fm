@@ -113,11 +113,11 @@ export function createLocalMiddleware(
 
 						if (!info) return dispatch(sequencerActions.recordNote(sequencer.id, action.midiNote))
 
-						const eventCount = sequencer.midiClip.events.count()
+						const clipLength = sequencer.midiClip.length
 
-						const index = Math.ceil((eventCount * info.loopRatio) + 0.5) - 1
+						const index = Math.ceil((clipLength * info.loopRatio) + 0.5) - 1
 
-						const actualIndex = index >= eventCount ? 0 : index
+						const actualIndex = index >= clipLength ? 0 : index
 
 						if (sequencer.type === ConnectionNodeType.gridSequencer) {
 							const gridSequencer = sequencer as GridSequencerState

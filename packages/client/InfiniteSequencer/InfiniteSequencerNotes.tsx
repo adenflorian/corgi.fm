@@ -43,7 +43,7 @@ export function InfiniteSequencerNotes(
 
 	const [mouseDelta, setMouseDelta] = useState({x: 0, y: 0})
 
-	const {lowestNote, highestNote} = findLowestAndHighestNotes(events)
+	const {lowestNote, highestNote} = findLowestAndHighestNotes(events.filter(x => x.note >= 0))
 	const numberOfPossibleNotes = highestNote - lowestNote + 1
 	const noteHeightPercentage = 100 / numberOfPossibleNotes
 	const rows = [] as any[]
