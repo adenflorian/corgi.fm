@@ -6,7 +6,7 @@ import {ConnectionNodeType, IConnectable} from '@corgifm/common/common-types'
 import {applyOctave, createNodeId} from '@corgifm/common/common-utils'
 import {logger} from '@corgifm/common/logger'
 import {emptyMidiNotes, IMidiNote, IMidiNotes} from '@corgifm/common/MidiNote'
-import {BroadcastAction, IClientRoomState} from '@corgifm/common/redux/common-redux-types'
+import {IClientRoomState} from '@corgifm/common/redux/common-redux-types'
 import {
 	selectAllConnections, selectConnectionsWithSourceIds,
 	selectConnectionsWithSourceOrTargetIds, selectConnectionsWithTargetIds,
@@ -112,7 +112,7 @@ export function createLocalMiddleware(
 
 						if (sequencer.type === ConnectionNodeType.gridSequencer) {
 							const gridSequencer = sequencer as GridSequencerState
-							
+
 							const topNote = gridSequencer.scrollY + GridSequencerState.notesToShow - 1
 
 							let needToScroll = 0
@@ -140,53 +140,6 @@ export function createLocalMiddleware(
 				scheduleNote(
 					action.midiNote, action.id, getState(), 'on',
 					getAllInstruments, dispatch, action.velocity)
-
-				return next(action)
-			}
-			case 'SET_GRID_SEQUENCER_NOTE': {
-				if (action.enabled) {
-					playShortNote(Set([action.note]), action.id, getState().room, getAllInstruments)
-				}
-
-				next(action)
-
-				return
-			}
-			case 'PLAY_SHORT_NOTE': {
-				playShortNote(action.notes, action.sourceId, getState().room, getAllInstruments)
-
-				next(action)
-
-				return
-			}
-			case 'PLAY_SHORT_NOTE_ON_TARGET': {
-				playShortNoteOnTarget(action.note, action.targetId, getAllInstruments)
-
-				next(action)
-
-				return
-			}
-			case 'SKIP_NOTE': {
-				const state = getState()
-
-				// add rest to sequencer if downstream recording sequencer
-				_getDownstreamRecordingSequencers(state, selectLocalVirtualKeyboardId(state))
-					.forEach(x => {
-						dispatch(sequencerActions.recordRest(x.id))
-					})
-
-				return next(action)
-			}
-			case 'USER_KEY_PRESS': {
-				if (action.key === UserKeys.Backspace) {
-					const state = getState()
-
-					// add rest to sequencer if downstream recording sequencer
-					_getDownstreamRecordingSequencers(state, selectLocalVirtualKeyboardId(state))
-						.forEach(x => {
-							dispatch(sequencerActions.undo(x.id))
-						})
-				}
 
 				return next(action)
 			}
@@ -254,6 +207,53 @@ export function createLocalMiddleware(
 					scheduleNote(noteToSchedule, keyboard.id, state, 'on',
 						getAllInstruments, dispatch, 1)
 				})
+
+				return next(action)
+			}
+			case 'SET_GRID_SEQUENCER_NOTE': {
+				if (action.enabled) {
+					playShortNote(Set([action.note]), action.id, getState().room, getAllInstruments)
+				}
+
+				next(action)
+
+				return
+			}
+			case 'PLAY_SHORT_NOTE': {
+				playShortNote(action.notes, action.sourceId, getState().room, getAllInstruments)
+
+				next(action)
+
+				return
+			}
+			case 'PLAY_SHORT_NOTE_ON_TARGET': {
+				playShortNoteOnTarget(action.note, action.targetId, getAllInstruments)
+
+				next(action)
+
+				return
+			}
+			case 'SKIP_NOTE': {
+				const state = getState()
+
+				// add rest to sequencer if downstream recording sequencer
+				_getDownstreamRecordingSequencers(state, selectLocalVirtualKeyboardId(state))
+					.forEach(x => {
+						dispatch(sequencerActions.recordRest(x.id))
+					})
+
+				return next(action)
+			}
+			case 'USER_KEY_PRESS': {
+				if (action.key === UserKeys.Backspace) {
+					const state = getState()
+
+					// add rest to sequencer if downstream recording sequencer
+					_getDownstreamRecordingSequencers(state, selectLocalVirtualKeyboardId(state))
+						.forEach(x => {
+							dispatch(sequencerActions.undo(x.id))
+						})
+				}
 
 				return next(action)
 			}
