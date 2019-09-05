@@ -109,20 +109,26 @@ export const BetterNotes = (props: Props) => {
 		setNoteMoveActive(false)
 	}, [])
 
-	const handleMouseDown = useCallback((e: MouseEvent, direction: 'left' | 'right' | 'center', eventId: Id) => {
-		setClickedEvent(eventId)
+	const handleMouseDown = useCallback((e: MouseEvent, direction: 'left' | 'right' | 'center', clickedEventId: Id) => {
+		setClickedEvent(clickedEventId)
 		dispatch(sequencerActions.saveUndo(id))
 		setPersistentDelta({x: 0, y: 0})
-		if (!selected.has(eventId)) {
+
+		if (!selected.has(clickedEventId)) {
 			if (e.shiftKey) {
-				onNoteSelect(eventId, true, false)
-				setStartEvents(midiClip.events.filter(x => selected.has(x.id) || x.id === eventId))
+				onNoteSelect(clickedEventId, true, false)
+				setStartEvents(midiClip.events.filter(x => selected.has(x.id) || x.id === clickedEventId))
 			} else {
-				onNoteSelect(eventId, true, true)
-				setStartEvents(midiClip.events.filter(x => x.id === eventId))
+				onNoteSelect(clickedEventId, true, true)
+				setStartEvents(midiClip.events.filter(x => x.id === clickedEventId))
 			}
 		} else {
-			setStartEvents(midiClip.events.filter(x => selected.has(x.id)))
+			if (e.shiftKey) {
+				onNoteSelect(clickedEventId, false, false)
+				return
+			} else {
+				setStartEvents(midiClip.events.filter(x => selected.has(x.id)))
+			}
 		}
 		if (direction !== 'center') {
 			startNoteResizing(direction)
