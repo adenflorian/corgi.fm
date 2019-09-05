@@ -105,12 +105,12 @@ const keyboardShortcuts: IKeyBoardShortcuts = Map<KeyBoardShortcut>({
 		preventDefault: true,
 	},
 	// Disabling these until needed again
-	// 'Control': {
-	// 	actionOnKeyDown: userInputActions.setKeys({ctrl: true}),
-	// 	actionOnKeyUp: userInputActions.setKeys({ctrl: false}),
-	// 	allowRepeat: false,
-	// 	preventDefault: false,
-	// },
+	'Control': {
+		actionOnKeyDown: userInputActions.setKeys({ctrl: true}),
+		actionOnKeyUp: userInputActions.setKeys({ctrl: false}),
+		allowRepeat: false,
+		preventDefault: false,
+	},
 	// 'Alt': {
 	// 	actionOnKeyDown: userInputActions.setKeys({alt: true}),
 	// 	actionOnKeyUp: userInputActions.setKeys({alt: false}),
@@ -171,13 +171,15 @@ export function setupInputEventListeners(
 	})
 
 	function onKeyEvent(event: KeyboardEvent) {
-		const prefix = event.shiftKey
-			? Shift + Plus
-			: event.ctrlKey || event.metaKey
-				? Control + Plus
-				: event.altKey
-					? Alt + Plus
-					: ''
+		const prefix = ['Control'].includes(event.key)
+			? ''
+			:	event.shiftKey
+				? Shift + Plus
+				: event.ctrlKey || event.metaKey
+					? Control + Plus
+					: event.altKey
+						? Alt + Plus
+						: ''
 
 		const keyboardShortcut = keyboardShortcuts.get(prefix + event.key.toLowerCase())
 

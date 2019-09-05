@@ -552,6 +552,7 @@ export const BetterSequencer = ({id}: Props) => {
 						clearSelected,
 						panPixels,
 						selected,
+						setSelected,
 						width,
 						height,
 						lengthBeats,
