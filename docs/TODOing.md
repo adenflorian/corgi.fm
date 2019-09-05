@@ -257,8 +257,8 @@
 	- [ ] change cursor to grabby hand
 - [ ] disable notes with 0 key
 - [√] box select while holding shift should flip selected notes like ableton
-- [ ] change global pan to require middle clicking on background
-- [ ] click and drag notes around
+- [ ] change global pan to require middle clicking on background?
+- [√] click and drag notes around
 - [√] ctrl + d to duplicate notes
 	- [ ] use range selection to determine new note start point, like ableton
 - [ ] make double click better
@@ -275,7 +275,6 @@
 	- [ ] dynamic column sizes
 	- [ ] snap to bars and to increments
 - [ ] add more/less vertical bars depending on zoomX
-- [ ] note shadows?
 - [ ] right click to cancel/end operation
 	- [ ] box select
 	- [ ] note move
@@ -285,7 +284,7 @@
 - [ ] require modifier key to scroll in better sequencer
 - [ ] allow copy pasting notes
 	- [ ] between better sequencers
-- [ ] ctrl + click and drag to duplicate
+- [√] ctrl + click and drag to duplicate
 
 - [ ] make velocity affect keyboard note visual
 - [ ] put node version in package json so nvm can use it

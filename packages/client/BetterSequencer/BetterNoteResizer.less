@@ -1,3 +1,6 @@
+@import "../colors.less";
+@import "../AppCommon.less";
+
 .noteResizer {
 	position: absolute;
 	top: 50%;
@@ -33,12 +36,12 @@
 
 		&.left {
 			margin-left: -1px;
-			cursor: w-resize;
+			@leftBracketCursor();
 		}
 
 		&.right {
 			margin-right: -1px;
-			cursor: e-resize;
+			@rightBracketCursor();
 		}
 
 		&.mid {

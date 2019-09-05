@@ -127,6 +127,14 @@
 			overflow: hidden;
 			z-index: 10;
 
+			&.resize-left {
+				@leftBracketCursor();
+			}
+
+			&.resize-right {
+				@rightBracketCursor();
+			}
+
 			.scalable {
 				position: relative;
 				width: 100%;

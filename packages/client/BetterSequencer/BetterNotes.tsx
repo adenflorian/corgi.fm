@@ -241,7 +241,7 @@ export const BetterNotes = (props: Props) => {
 
 	return (
 		<div
-			className={`notes active-${noteResizeActive}`}
+			className={`notes active-${noteResizeActive} resize-${noteResizeActive}`}
 		>
 			<div
 				className="scalable"
