@@ -285,6 +285,7 @@
 - [ ] allow copy pasting notes
 	- [ ] between better sequencers
 - [√] ctrl + click and drag to duplicate
+- [ ] dont delete note on dbl click if shift held down
 
 - [ ] make velocity affect keyboard note visual
 - [ ] put node version in package json so nvm can use it

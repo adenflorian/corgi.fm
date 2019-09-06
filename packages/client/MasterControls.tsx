@@ -70,7 +70,7 @@ export const MasterControls = (
 				<div className="controls">
 					<span
 						className={`play ${masterClockState.index % 2 === 0 ? 'highlight' : ''}`}
-						onClick={masterClockState.isPlaying ? restart : onPlay}
+						onClick={() => masterClockState.isPlaying ? restart() : onPlay()}
 						title="Start (Space) or Restart (Ctrl + Space)"
 					>
 						<Play />

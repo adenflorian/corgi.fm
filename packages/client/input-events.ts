@@ -130,11 +130,12 @@ const keyboardShortcuts: IKeyBoardShortcuts = Map<KeyBoardShortcut>({
 		allowRepeat: false,
 		preventDefault: false,
 	},
-	[Control + Plus + ' ']: {
-		actionOnKeyDown: globalClockActions.restart(),
-		allowRepeat: false,
-		preventDefault: false,
-	},
+	// TODO Get it to play nice with better sequencer
+	// [Control + Plus + ' ']: {
+	// 	actionOnKeyDown: globalClockActions.restart(),
+	// 	allowRepeat: false,
+	// 	preventDefault: false,
+	// },
 })
 	.merge(midiKeyShortcuts)
 	.mapKeys(x => x.toLowerCase())

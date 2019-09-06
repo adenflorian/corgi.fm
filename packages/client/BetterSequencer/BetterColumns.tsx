@@ -1,13 +1,15 @@
 import React from 'react'
+import {TimeSelect} from './BetterSequencerHelpers'
 
 interface Props {
 	panPixelsX: number
 	columnWidth: number
 	lengthBeats: number
+	timeSelect: TimeSelect
 }
 
 export const BetterColumns = React.memo((
-	{panPixelsX, columnWidth, lengthBeats}: Props,
+	{panPixelsX, columnWidth, lengthBeats, timeSelect}: Props,
 ) => {
 
 	const columns = new Array(lengthBeats).fill(0)
@@ -33,6 +35,12 @@ export const BetterColumns = React.memo((
 						</div>
 					)
 				})}
+				<div
+					className="timeBar"
+					style={{
+						left: timeSelect.start * columnWidth,
+					}}
+				/>
 			</div>
 		</div>
 	)

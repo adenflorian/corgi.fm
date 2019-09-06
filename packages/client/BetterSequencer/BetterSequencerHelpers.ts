@@ -85,3 +85,8 @@ export function movementYToNote(movementY: number, rows: string[], zoomY: number
 
 	return percentageMovement * rows.length
 }
+
+export interface TimeSelect {
+	start: number
+	duration: number
+}

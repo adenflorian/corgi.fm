@@ -13,6 +13,7 @@ import {
 	betterSequencerActions, createPositionXSelector, createPositionYSelector,
 	localActions,
 	createSmartNodeColorSelector,
+	globalClockActions,
 } from '@corgifm/common/redux'
 import {
 	Key, MAX_MIDI_NOTE_NUMBER_127, MIN_MIDI_NOTE_NUMBER_0,
@@ -42,6 +43,7 @@ import {BetterSequencerControls} from './BetterSequencerControls'
 import {
 	clientSpaceToPercentages, getMaxPan, eventToNote, editorSpaceToPercentages,
 	clientSpaceToEditorSpace,
+	TimeSelect,
 } from './BetterSequencerHelpers'
 import {BetterSideNotes} from './BetterSideNotes'
 
@@ -81,6 +83,9 @@ export const BetterSequencer = ({id}: Props) => {
 	const [boxActive, activateBox, deactivateBox] = useBoolean(false)
 	const [boxOrigin, setBoxOrigin] = useState({x: 0, y: 0})
 	const [otherCorner, setOtherCorner] = useState({x: 0, y: 0})
+
+	// Timeline
+	const [timeSelect, setTimeSelect] = useState<TimeSelect>({start: 0, duration: 0})
 
 	// Middle mouse pan
 	const [middleMouseActive, activateMiddleMouse, deactivateMiddleMouse] = useBoolean(false)
@@ -214,7 +219,7 @@ export const BetterSequencer = ({id}: Props) => {
 			if (e.button !== 0) return
 			if (boxActive) {
 				deactivateBox()
-				selectNotes(undefined, e.shiftKey)
+				selectNotes(undefined, e.shiftKey, e)
 			}
 		}
 
@@ -227,10 +232,10 @@ export const BetterSequencer = ({id}: Props) => {
 				y: clamp(editorSpace.y, 0, height),
 			}
 			setOtherCorner(clamped)
-			selectNotes(clamped, e.shiftKey)
+			selectNotes(clamped, e.shiftKey, e)
 		}
 
-		function selectNotes(otherCorner2 = otherCorner, preserve = false) {
+		function selectNotes(otherCorner2 = otherCorner, preserve = false, e: MouseEvent) {
 			const originPercentages = editorSpaceToPercentages(boxOrigin, panPixels, maxPanX, maxPanY, width, height)
 			const otherCornerPercentages = editorSpaceToPercentages(otherCorner2, panPixels, maxPanX, maxPanY, width, height)
 			const box = {
@@ -256,6 +261,11 @@ export const BetterSequencer = ({id}: Props) => {
 					.concat(preserve ? originalSelected : [])
 					.filter(i => !toFlip.has(i))
 			)
+
+			setTimeSelect({
+				start: clamp(e.altKey ? box.left : Math.round(box.left), 0, midiClip.length),
+				duration: box.right - box.left,
+			})
 		}
 
 		const editorElementNotNull = editorElement.current
@@ -277,7 +287,7 @@ export const BetterSequencer = ({id}: Props) => {
 			}
 			window.removeEventListener('mouseup', onMouseUp)
 		}
-	}, [activateBox, boxActive, boxOrigin, deactivateBox, height, lengthBeats, maxPanX, maxPanY, midiClip.events, otherCorner, panPixels, width, x, y, selected, originalSelected])
+	}, [activateBox, boxActive, boxOrigin, deactivateBox, height, lengthBeats, maxPanX, maxPanY, midiClip.events, otherCorner, panPixels, width, x, y, selected, originalSelected, midiClip.length])
 
 	// Middle mouse pan
 	useLayoutEffect(() => {
@@ -432,6 +442,10 @@ export const BetterSequencer = ({id}: Props) => {
 
 	const onKeyDown = useCallback((e: KeyboardEvent) => {
 
+		if (e.ctrlKey && e.key === ' ') {
+			dispatch(globalClockActions.restart(timeSelect.start))
+		}
+
 		if (e.ctrlKey && e.key === Key.a) {
 			return selectAll()
 		}
@@ -484,7 +498,7 @@ export const BetterSequencer = ({id}: Props) => {
 			}
 			return
 		}
-	}, [selected, selectAll, deleteSelected, moveNotesVertically, moveNotesHorizontally, resizeNotes, duplicateNotes])
+	}, [dispatch, timeSelect.start, selectAll, duplicateNotes, selected, deleteSelected, moveNotesVertically, resizeNotes, moveNotesHorizontally])
 
 	// Key events
 	useEffect(() => {
@@ -541,7 +555,7 @@ export const BetterSequencer = ({id}: Props) => {
 				tabIndex={-1}
 			>
 				<BetterRows {...{noteHeight, panPixelsY: panPixels.y, rows}} />
-				<BetterColumns {...{columnWidth, lengthBeats, panPixelsX: panPixels.x}} />
+				<BetterColumns {...{columnWidth, lengthBeats, panPixelsX: panPixels.x, timeSelect}} />
 				<BetterNotes
 					{...{
 						id,

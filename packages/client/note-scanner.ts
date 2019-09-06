@@ -68,7 +68,7 @@ function scheduleNotes(
 	const roomState = _store.getState().room
 
 	const {
-		isPlaying, bpm, maxReadAheadSeconds, playCount,
+		isPlaying, bpm, maxReadAheadSeconds, playCount, startBeat,
 	} = selectGlobalClockState(roomState)
 
 	const actualBPM = Math.max(0.000001, bpm)
@@ -113,8 +113,8 @@ function scheduleNotes(
 	currentSongTimeBeats += deltaBeats
 
 	if (_justStarted || _playCount !== playCount) {
-		currentSongTimeBeats = 0
-		_cursorBeats = 0
+		currentSongTimeBeats = startBeat
+		_cursorBeats = startBeat
 		_playCount = playCount
 	}
 

@@ -77,7 +77,7 @@ export interface Samples extends Map<number, Sample> {}
 export const makeSamples =
 	(collection: Iterable<[number, Sample]> = []): Samples =>
 		Map<number, Sample>(collection)
-		
+
 export const allSampleColors =
 	['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'panelGrayLight'] as const
 
