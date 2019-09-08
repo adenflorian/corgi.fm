@@ -48,6 +48,7 @@ import {saveUsernameToLocalStorage} from './username'
 import {corgiApiActions} from './RestClient/corgi-api-middleware'
 import {FirebaseContextStuff} from './Firebase/FirebaseContext'
 import {onChangeRoom} from './WebAudio'
+import {createResetZoomAction, createResetPanAction} from './SimpleGraph/Zoom'
 
 type LocalMiddlewareActions = LocalAction | AddClientAction | VirtualKeyPressedAction | GridSequencerAction
 | UserInputAction | VirtualKeyUpAction | VirtualOctaveChangeAction | SetActiveRoomAction | ReadyAction
@@ -232,7 +233,7 @@ export function createLocalMiddleware(
 
 					_localSustainedNotes = _localSustainedNotes.clear()
 				}
-				
+
 				return next(action)
 			}
 			case 'LOCAL_MIDI_OCTAVE_CHANGE': {
@@ -343,6 +344,8 @@ export function createLocalMiddleware(
 			}
 			case 'READY': {
 				next(action)
+				dispatch(createResetZoomAction())
+				dispatch(createResetPanAction())
 				return createLocalStuff(dispatch, getState())
 			}
 			case 'DELETE_NODE': {

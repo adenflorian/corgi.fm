@@ -1,33 +1,18 @@
-import React from 'react'
+import React, {useState, useCallback, useLayoutEffect, useEffect} from 'react'
 import {ContextMenuTrigger} from 'react-contextmenu'
 import {
-	selectLocalClientId, selectOptions, selectRoomSettings, shamuConnect,
+	selectLocalClientId, selectOptions, selectRoomSettings, IClientAppState,
+	createAnimationFrameSelector, animationActions,
 } from '@corgifm/common/redux'
+import {oneLine} from 'common-tags'
+import {useSelector} from 'react-redux'
 import {backgroundMenuId, graphSizeX, zoomBackgroundClass} from '../client-constants'
 // eslint-disable-next-line import/no-internal-modules
 import PlusSVG from '../OtherSVG/plus.svg'
 import {simpleGlobalClientState} from '../SimpleGlobalClientState'
 
-interface IZoomProps {
+interface Props {
 	children: React.ReactNode
-}
-
-interface IZoomReduxProps {
-	requireCtrlToZoom: boolean
-	fancyZoomPan: boolean
-	disableMenu: boolean
-}
-
-type IZoomAllProps = IZoomProps & IZoomReduxProps
-
-interface IZoomState {
-	zoom: number
-	zoomReal: number
-	pan: {
-		x: number
-		y: number
-	}
-	backgroundClicked: boolean
 }
 
 const maxZoom = 3
@@ -36,104 +21,74 @@ const scrollZoomMod = 0.002
 const mouseZoomMod = 0.001
 const mousePanMod = 1
 const maxPan = graphSizeX
+const defaultZoom = 0
+const defaultZoomReal = 1
+const makeDefaultPan = () => ({x: 0, y: 0})
 // const zoomTextLength = Math.max(scrollZoomMod.toString().length, mouseZoomMod.toString().length)
 
 const bgSize = 10000
 
-export class Zoom extends React.PureComponent<IZoomAllProps, IZoomState> {
-	public state = {
-		zoom: 0,
-		zoomReal: 1,
-		pan: {
-			x: 0,
-			y: 0,
-		},
-		backgroundClicked: false,
-	}
+const zoomLevels = {
+	close: 1,
+	default: defaultZoom,
+	far: -1,
+} as const
 
-	public componentDidMount() {
-		window.addEventListener('wheel', this._onMouseWheel, {passive: false})
-		window.addEventListener('mousemove', this._onMouseMove)
-	}
+function getZoomClasses(zoom: number): string {
+	return zoom >= zoomLevels.close
+		? 'zoomCloser'
+		: zoom <= zoomLevels.far
+			? 'zoomFarther'
+			: zoom < zoomLevels.default - 0.0001
+				? 'zoomFar'
+				: zoom > zoomLevels.default + 0.0001
+					? 'zoomClose'
+					: 'zoomDefault'
+}
 
-	public componentWillUnmount() {
-		window.removeEventListener('wheel', this._onMouseWheel)
-		window.removeEventListener('mousemove', this._onMouseMove)
-		simpleGlobalClientState.zoom = 1
-		simpleGlobalClientState.zoomDisplay = 0
-		simpleGlobalClientState.pan = {x: 0, y: 0}
-	}
+export const globalZoomAnimParentKey = 'globalZoom'
+export const globalZoomResetZoomAnimChildKey = 'resetZoom'
+export const globalZoomResetPanAnimChildKey = 'resetPan'
 
-	public render() {
-		const {children, fancyZoomPan, disableMenu} = this.props
-		const {zoomReal, pan} = this.state
+export const createResetZoomAction = () => animationActions.trigger(globalZoomAnimParentKey, globalZoomResetZoomAnimChildKey)
+export const createResetPanAction = () => animationActions.trigger(globalZoomAnimParentKey, globalZoomResetPanAnimChildKey)
 
-		return (
-			<div
-				className="zoomZoom"
-				style={{
-					transform: `scale(${zoomReal}) translate(${pan.x}px, ${pan.y}px)`,
-					willChange: fancyZoomPan ? '' : 'transform',
-					// transition: backgroundClicked ? '' : 'transform 0.05s ease 0s',
-				}}
-			>
-				<ZoomBackground
-					onMouseEvent={this._onBgMouseEvent}
-					disableMenu={disableMenu}
-				/>
-				{children}
-			</div>
-		)
-	}
+export const ConnectedZoom = React.memo(function _Zoom({
+	children,
+}: Props) {
 
-	private readonly _onBgMouseEvent = (e: React.MouseEvent) => {
-		if (e.type === 'mousedown') {
-			this.setState({
-				backgroundClicked: true,
-			})
-		}
-	}
+	const triggerZoomReset = useSelector(createAnimationFrameSelector(globalZoomAnimParentKey, globalZoomResetZoomAnimChildKey))
+	const triggerPanReset = useSelector(createAnimationFrameSelector(globalZoomAnimParentKey, globalZoomResetPanAnimChildKey))
+	const requireCtrlToZoom = useSelector((state: IClientAppState) => selectOptions(state).requireCtrlToScroll)
+	const fancyZoomPan = useSelector((state: IClientAppState) => selectOptions(state).graphicsExpensiveZoomPan)
+	const disableMenu = useSelector((state: IClientAppState) => {
+		const roomSettings = selectRoomSettings(state.room)
+		return selectLocalClientId(state) !== roomSettings.ownerId && roomSettings.onlyOwnerCanDoStuff
+	})
 
-	private readonly _onMouseWheel = (e: WheelEvent) => {
-		// Turning off rounding so that two finger track pad scrolling will be smooth
-		// TODO Detect if scroll amount is small or large, if large, round it
-		if (this.props.requireCtrlToZoom === false || e.ctrlKey) {
-			this._zoom(e.deltaY * scrollZoomMod, e.clientX, e.clientY, e.ctrlKey)
-		} else {
-			this._pan(-e.deltaX, -e.deltaY)
-		}
-		e.preventDefault()
-	}
+	const [backgroundClicked, setBackgroundClicked] = useState(false)
+	const [zoomReal, setZoomReal] = useState(defaultZoomReal)
+	const [zoom, setZoom] = useState(defaultZoom)
+	const [pan, setPan] = useState(makeDefaultPan())
 
-	private readonly _onMouseMove = (e: MouseEvent) => {
-		if (e.buttons !== 1 && this.state.backgroundClicked) {
-			this.setState({
-				backgroundClicked: false,
-			})
-		}
-		if (e.buttons === 4 && !e.shiftKey) {
-			// console.log({x: e.defaultPrevented, y: e.bubbles, d: e.detail})
-			this._pan(e.movementX, e.movementY)
-		}
-		if (this.state.backgroundClicked && e.buttons === 1) {
-			if (e.ctrlKey) {
-				this._zoom(e.movementY * mouseZoomMod)
-			} else {
-				this._pan(e.movementX, e.movementY)
-			}
-		}
-	}
+	const clampPan = useCallback((pan2: number, zoom2: number = zoomReal) => {
+		return Math.min(maxPan * zoom2, Math.max(-maxPan * zoom2, pan2))
+	}, [zoomReal])
 
-	private readonly _zoom = (zoom: number, clientX?: number, clientY?: number, controlKey = false) => {
-		const newZoom = this._clampZoom(this.state.zoom - zoom)
+	const clampZoom = useCallback((val: number) => {
+		return Math.min(maxZoom, Math.max(minZoom, val))
+	}, [])
+
+	const doZoom = useCallback((zoom2: number, clientX?: number, clientY?: number, controlKey = false) => {
+		const newZoom = clampZoom(zoom - zoom2)
 
 		const newZoomReal = 2 ** newZoom
 
-		const zoomDelta = newZoomReal - this.state.zoomReal
+		const zoomDelta = newZoomReal - zoomReal
 
 		if (zoomDelta === 0) return
 
-		const zoomPercentChange = (newZoomReal - this.state.zoomReal) / this.state.zoomReal
+		const zoomPercentChange = (newZoomReal - zoomReal) / zoomReal
 
 		const distanceFromCenterX = clientX && !controlKey ? clientX - (window.innerWidth / 2) : 0
 		const distanceFromCenterY = clientY && !controlKey ? clientY - (window.innerHeight / 2) : 0
@@ -142,38 +97,112 @@ export class Zoom extends React.PureComponent<IZoomAllProps, IZoomState> {
 		const panY = ((distanceFromCenterY * zoomPercentChange) / newZoomReal)
 
 		const newPan = {
-			x: this._clampPan(this.state.pan.x - panX, newZoomReal),
-			y: this._clampPan(this.state.pan.y - panY, newZoomReal),
+			x: clampPan(pan.x - panX, newZoomReal),
+			y: clampPan(pan.y - panY, newZoomReal),
 		}
 
 		simpleGlobalClientState.zoom = newZoomReal
 		simpleGlobalClientState.zoomDisplay = newZoom
 		simpleGlobalClientState.pan = newPan
 
-		this.setState({
-			zoom: newZoom,
-			zoomReal: newZoomReal,
-			pan: newPan,
-		})
-	}
+		setZoom(newZoom)
+		setZoomReal(newZoomReal)
+		setPan(newPan)
+	}, [clampPan, clampZoom, pan.x, pan.y, zoom, zoomReal])
 
-	private readonly _clampZoom = (val: number) =>
-		Math.min(maxZoom, Math.max(minZoom, val))
-
-	private readonly _pan = (x = 0, y = 0) => {
+	const doPan = useCallback((x = 0, y = 0) => {
 		const newPan = {
-			x: this._clampPan(this.state.pan.x + (x * mousePanMod / this.state.zoomReal)),
-			y: this._clampPan(this.state.pan.y + (y * mousePanMod / this.state.zoomReal)),
+			x: clampPan(pan.x + (x * mousePanMod / zoomReal)),
+			y: clampPan(pan.y + (y * mousePanMod / zoomReal)),
 		}
 		simpleGlobalClientState.pan = newPan
-		this.setState({
-			pan: newPan,
-		})
-	}
+		setPan(newPan)
+	}, [clampPan, pan.x, pan.y, zoomReal])
 
-	private readonly _clampPan = (pan: number, zoom: number = this.state.zoomReal) =>
-		Math.min(maxPan * zoom, Math.max(-maxPan * zoom, pan))
-}
+	const onBgMouseEvent = useCallback((e: React.MouseEvent) => {
+		if (e.type === 'mousedown') {
+			setBackgroundClicked(true)
+		}
+	}, [])
+
+	const onMouseWheel = useCallback((e: WheelEvent) => {
+		// Turning off rounding so that two finger track pad scrolling will be smooth
+		// TODO Detect if scroll amount is small or large, if large, round it
+		if (requireCtrlToZoom === false || e.ctrlKey) {
+			doZoom(e.deltaY * scrollZoomMod, e.clientX, e.clientY, e.ctrlKey)
+		} else {
+			doPan(-e.deltaX, -e.deltaY)
+		}
+		e.preventDefault()
+	}, [doPan, doZoom, requireCtrlToZoom])
+
+	const onMouseMove = useCallback((e: MouseEvent) => {
+		if (e.buttons !== 1 && backgroundClicked) {
+			setBackgroundClicked(false)
+		}
+		if (e.buttons === 4 && !e.shiftKey) {
+			// console.log({x: e.defaultPrevented, y: e.bubbles, d: e.detail})
+			doPan(e.movementX, e.movementY)
+		}
+		if (backgroundClicked && e.buttons === 1) {
+			if (e.ctrlKey) {
+				doZoom(e.movementY * mouseZoomMod)
+			} else {
+				doPan(e.movementX, e.movementY)
+			}
+		}
+	}, [backgroundClicked, doPan, doZoom])
+
+	useLayoutEffect(() => {
+		window.addEventListener('wheel', onMouseWheel, {passive: false})
+		window.addEventListener('mousemove', onMouseMove)
+
+		return () => {
+			window.removeEventListener('wheel', onMouseWheel)
+			window.removeEventListener('mousemove', onMouseMove)
+		}
+	}, [onMouseMove, onMouseWheel])
+
+	const resetZoom = useCallback(() => {
+		setZoom(defaultZoom)
+		setZoomReal(defaultZoomReal)
+		simpleGlobalClientState.zoom = defaultZoomReal
+		simpleGlobalClientState.zoomDisplay = defaultZoom
+	}, [])
+
+	const resetPan = useCallback(() => {
+		setPan(makeDefaultPan())
+		simpleGlobalClientState.pan = makeDefaultPan()
+	}, [])
+
+	useEffect(() => {
+		resetZoom()
+	}, [resetZoom, triggerZoomReset])
+
+	useEffect(() => {
+		resetPan()
+	}, [resetPan, triggerPanReset])
+
+	return (
+		<div
+			className={oneLine`
+				zoomZoom
+				${getZoomClasses(Math.round(zoom * 10) / 10)}
+			`}
+			style={{
+				transform: `scale(${zoomReal}) translate(${pan.x}px, ${pan.y}px)`,
+				willChange: fancyZoomPan ? '' : 'transform',
+				// transition: backgroundClicked ? '' : 'transform 0.05s ease 0s',
+			}}
+		>
+			<ZoomBackground
+				onMouseEvent={onBgMouseEvent}
+				disableMenu={disableMenu}
+			/>
+			{children}
+		</div>
+	)
+})
 
 interface ZoomBgProps {
 	onMouseEvent: (e: React.MouseEvent) => void
@@ -206,18 +235,6 @@ const ZoomBackground = React.memo(
 		)
 	},
 )
-
-export const ConnectedZoom = shamuConnect(
-	(state): IZoomReduxProps => {
-		const roomSettings = selectRoomSettings(state.room)
-
-		return {
-			requireCtrlToZoom: selectOptions(state).requireCtrlToScroll,
-			fancyZoomPan: selectOptions(state).graphicsExpensiveZoomPan,
-			disableMenu: selectLocalClientId(state) !== roomSettings.ownerId && roomSettings.onlyOwnerCanDoStuff,
-		}
-	},
-)(Zoom)
 
 export function toGraphSpace(x = 0, y = 0) {
 	const zoom = simpleGlobalClientState.zoom

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useCallback} from 'react'
 import {useDispatch} from 'react-redux'
 import {rateLimitedDebounceNoTrail} from '@corgifm/common/common-utils'
 import {
@@ -24,6 +24,7 @@ import {ConnectedRoomSelector} from './RoomSelector'
 import {LoadRoomModalButton} from './SavingAndLoading/SavingAndLoading'
 import './TopDiv.less'
 import {WelcomeModalButton} from './Welcome/Welcome'
+import {createResetZoomAction} from './SimpleGraph/Zoom'
 
 interface ReduxProps {
 	memberCount: number
@@ -43,6 +44,10 @@ export const TopDiv = ({
 }: AllProps) => {
 	const dispatch = useDispatch()
 
+	const resetZoom = useCallback(() => {
+		dispatch(createResetZoomAction())
+	}, [dispatch])
+
 	return (
 		<div className="topDiv" style={{marginBottom: 'auto'}}>
 			<div className="left">
@@ -56,7 +61,7 @@ export const TopDiv = ({
 					</div>
 					<div id="fps" style={{width: 32, overflow: 'hidden'}} />
 				</div>
-				<div className="blob" style={{overflow: 'hidden'}}>
+				<div className="blob" style={{overflow: 'hidden', cursor: 'pointer'}} title="Click to reset zoom" onClick={resetZoom}>
 					<span className="blobDark">Zoom</span>
 					<span id="zoomText">0.0</span>
 				</div>
