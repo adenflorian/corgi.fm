@@ -111,18 +111,18 @@ const keyboardShortcuts: IKeyBoardShortcuts = Map<KeyBoardShortcut>({
 		allowRepeat: false,
 		preventDefault: false,
 	},
-	// 'Alt': {
-	// 	actionOnKeyDown: userInputActions.setKeys({alt: true}),
-	// 	actionOnKeyUp: userInputActions.setKeys({alt: false}),
-	// 	allowRepeat: false,
-	// 	preventDefault: false,
-	// },
-	// 'Shift': {
-	// 	actionOnKeyDown: userInputActions.setKeys({shift: true}),
-	// 	actionOnKeyUp: userInputActions.setKeys({shift: false}),
-	// 	allowRepeat: false,
-	// 	preventDefault: false,
-	// },
+	'Alt': {
+		actionOnKeyDown: userInputActions.setKeys({alt: true}),
+		actionOnKeyUp: userInputActions.setKeys({alt: false}),
+		allowRepeat: false,
+		preventDefault: false,
+	},
+	'Shift': {
+		actionOnKeyDown: userInputActions.setKeys({shift: true}),
+		actionOnKeyUp: userInputActions.setKeys({shift: false}),
+		allowRepeat: false,
+		preventDefault: false,
+	},
 	' ': {
 		actionOnKeyDown: (_, state) => selectGlobalClockIsPlaying(state.room)
 			? globalClockActions.stop()
@@ -172,7 +172,7 @@ export function setupInputEventListeners(
 	})
 
 	function onKeyEvent(event: KeyboardEvent) {
-		const prefix = ['Control'].includes(event.key)
+		const prefix = ['Control', 'Alt', 'Shift'].includes(event.key)
 			? ''
 			:	event.shiftKey
 				? Shift + Plus

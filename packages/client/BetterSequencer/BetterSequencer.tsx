@@ -60,15 +60,15 @@ const middleMousePanYSensitivity = 0.001
 
 const rows = new Array(128).fill(0).map((_, i) => midiNoteToNoteNameFull(i))
 
-export const BetterSequencer = ({id}: Props) => {
+export const BetterSequencer = React.memo(function _BetterSequencer({id}: Props) {
 	const color = useSelector(createSmartNodeColorSelector(id))
 	const isRecording = useSelector(createBetterSeqIsRecordingSelector(id))
 	const isPlaying = useSelector(createBetterSeqIsPlayingSelector(id))
 	const rate = useSelector(createBetterSeqRateSelector(id))
-	const lengthBeats = useSelector(createBetterSeqLengthSelector(id))
 	const zoom = useSelector(createBetterSeqZoomSelector(id))
 	const pan = useSelector(createBetterSeqPanSelector(id))
 	const midiClip = useSelector(createBetterSeqMidiClipSelector(id))
+	const lengthBeats = midiClip.length
 	const x = useSelector(createPositionXSelector(id))
 	const y = useSelector(createPositionYSelector(id))
 	const height = useSelector(createPositionHeightSelector(id))
@@ -77,7 +77,7 @@ export const BetterSequencer = ({id}: Props) => {
 
 	const [selected, setSelected] = useState(Set<Id>())
 	const [originalSelected, setOriginalSelected] = useState(Set<Id>())
-	const clearSelected = () => setSelected(Set())
+	const clearSelected = useCallback(() => setSelected(Set()), [])
 
 	// Box Select
 	const [boxActive, activateBox, deactivateBox] = useBoolean(false)
@@ -94,10 +94,16 @@ export const BetterSequencer = ({id}: Props) => {
 
 	const dispatch = useDispatch()
 
-	const scaledHeight = height * zoom.y
+	const fixedHeight = 384
+	const fixedWidth = 512
 
-	const maxPanY = getMaxPan(height, zoom.y)
-	const maxPanX = getMaxPan(width, zoom.x)
+	const scaledHeightUnclamped = fixedHeight * zoom.y
+	const scaledHeight = Math.max(scaledHeightUnclamped, height)
+	const scaledWidthUnclamped = fixedWidth * zoom.x
+	const scaledWidth = Math.max(scaledWidthUnclamped, width)
+
+	const maxPanY = Math.max(scaledHeightUnclamped - height, 0)
+	const maxPanX = getMaxPan(fixedWidth, zoom.x)
 	const panPixels = {
 		x: pan.x * maxPanX,
 		y: pan.y * maxPanY,
@@ -106,30 +112,46 @@ export const BetterSequencer = ({id}: Props) => {
 	const noteHeight = scaledHeight / rows.length
 
 	const clientMousePositionToPercentages = useCallback((clientMousePosition: Point) => {
-		return clientSpaceToPercentages(clientMousePosition, {x, y}, panPixels, maxPanX, maxPanY, width, height)
-	}, [height, maxPanX, maxPanY, panPixels, width, x, y])
+		return clientSpaceToPercentages(clientMousePosition, {x, y}, panPixels, maxPanX, maxPanY, fixedWidth, scaledHeight)
+	}, [scaledHeight, maxPanX, maxPanY, panPixels, fixedWidth, x, y])
+
+	const removeDuplicateEvents = useCallback(() => {
+		const {toDelete} = midiClip.events.reduce((result, event) => {
+			if (result.clean.some(c => c.note === event.note && c.startBeat === event.startBeat && c.durationBeats === event.durationBeats)) {
+				return {
+					...result,
+					toDelete: result.toDelete.add(event.id),
+				}
+			} else {
+				return {
+					...result,
+					clean: result.clean.set(event.id, event),
+				}
+			}
+		}, {clean: MidiClipEvents(), toDelete: Set<Id>()})
+
+		dispatch(betterSequencerActions.deleteEvents(id, toDelete))
+	}, [dispatch, id, midiClip.events])
 
 	// Wheel events
-	useEffect(() => {
+	useLayoutEffect(() => {
 		const onWheel = (e: WheelEvent) => {
-			if (e.altKey) return
 
-			e.preventDefault()
-			e.stopPropagation()
+			// const bar = clientSpaceToPercentages({x: e.clientX, y: e.clientY}, {x, y}, panPixels, maxPanX, maxPanY, width, height)
 
-			const bar = clientSpaceToPercentages({x: e.clientX, y: e.clientY}, {x, y}, panPixels, maxPanX, maxPanY, width, height)
+			let preventDefault = true
 
-			if (e.ctrlKey && e.shiftKey) {
+			if (e.shiftKey && !e.ctrlKey) {
 				dispatch(sequencerActions.setPan(id, {
 					...pan,
 					x: clamp(pan.x + (e.deltaY * (mouseWheelPanXSensitivity / zoom.x)), minPan, maxPan),
 				}))
-			} else if (e.ctrlKey) {
+			} else if (e.ctrlKey && e.altKey) {
 				dispatch(sequencerActions.setZoom(id, {
 					...zoom,
 					x: clamp(zoom.x + (-e.deltaY * mouseWheelZoomXSensitivity), minZoomX, maxZoomX),
 				}))
-			} else if (e.shiftKey) {
+			} else if (e.altKey) {
 				dispatch(sequencerActions.setZoom(id, {
 					...zoom,
 					y: clamp(zoom.y + (-e.deltaY * mouseWheelZoomYSensitivity), minZoomY, maxZoomY),
@@ -138,11 +160,18 @@ export const BetterSequencer = ({id}: Props) => {
 				// 	...pan,
 				// 	y: clamp(bar.centerY, minPan, maxPan),
 				// }))
-			} else {
+			} else if (e.ctrlKey && e.shiftKey) {
 				dispatch(sequencerActions.setPan(id, {
 					...pan,
 					y: clamp(pan.y + (e.deltaY * (mouseWheelYSensitivity / zoom.y)), minPan, maxPan),
 				}))
+			} else {
+				preventDefault = false
+			}
+
+			if (preventDefault) {
+				e.preventDefault()
+				e.stopPropagation()
 			}
 		}
 
@@ -169,11 +198,12 @@ export const BetterSequencer = ({id}: Props) => {
 
 			const bar = clientMousePositionToPercentages({x: e.clientX, y: e.clientY})
 
-			const note = (rows.length - 1) - Math.floor(bar.y * rows.length)
-			const startBeat = Math.floor(bar.x * lengthBeats)
+			const newDuration = 1
+			const note = clamp((rows.length - 1) - Math.floor(bar.y * rows.length), MIN_MIDI_NOTE_NUMBER_0, MAX_MIDI_NOTE_NUMBER_127)
+			const startBeat = clamp(Math.floor(bar.x * lengthBeats), 0, lengthBeats - newDuration)
 
 			const newEvent = makeMidiClipEvent({
-				durationBeats: 1,
+				durationBeats: newDuration,
 				startBeat,
 				note,
 			})
@@ -181,6 +211,7 @@ export const BetterSequencer = ({id}: Props) => {
 			dispatch(betterSequencerActions.addEvent(id, newEvent))
 			dispatch(localActions.playShortNote(id, Set([note])))
 			setSelected(Set(newEvent.id))
+			removeDuplicateEvents()
 		}
 
 		const editorElementNotNull = editorElement.current
@@ -196,12 +227,12 @@ export const BetterSequencer = ({id}: Props) => {
 				editorElementNotNull.removeEventListener('dblclick', onDoubleClick)
 			}
 		}
-	}, [clientMousePositionToPercentages, dispatch, id, lengthBeats])
+	}, [clientMousePositionToPercentages, dispatch, id, lengthBeats, removeDuplicateEvents])
 
 	// Box Select
 	useLayoutEffect(() => {
 		const onMouseDown = (e: MouseEvent) => {
-			if (e.button !== 0) return
+			if (e.button !== 0 || (e.ctrlKey && e.altKey)) return
 			const editorSpace = clientSpaceToEditorSpace(
 				{x: e.clientX, y: e.clientY}, {x, y})
 			setBoxOrigin(editorSpace)
@@ -236,8 +267,8 @@ export const BetterSequencer = ({id}: Props) => {
 		}
 
 		function selectNotes(otherCorner2 = otherCorner, preserve = false, e: MouseEvent) {
-			const originPercentages = editorSpaceToPercentages(boxOrigin, panPixels, maxPanX, maxPanY, width, height)
-			const otherCornerPercentages = editorSpaceToPercentages(otherCorner2, panPixels, maxPanX, maxPanY, width, height)
+			const originPercentages = editorSpaceToPercentages(boxOrigin, panPixels, maxPanX, maxPanY, fixedWidth, scaledHeight)
+			const otherCornerPercentages = editorSpaceToPercentages(otherCorner2, panPixels, maxPanX, maxPanY, fixedWidth, scaledHeight)
 			const box = {
 				top: (rows.length - 1) - Math.floor(Math.min(originPercentages.y, otherCornerPercentages.y) * rows.length),
 				bottom: (rows.length - 1) - Math.floor(Math.max(originPercentages.y, otherCornerPercentages.y) * rows.length),
@@ -287,23 +318,24 @@ export const BetterSequencer = ({id}: Props) => {
 			}
 			window.removeEventListener('mouseup', onMouseUp)
 		}
-	}, [activateBox, boxActive, boxOrigin, deactivateBox, height, lengthBeats, maxPanX, maxPanY, midiClip.events, otherCorner, panPixels, width, x, y, selected, originalSelected, midiClip.length])
+	}, [activateBox, boxActive, boxOrigin, deactivateBox, height, lengthBeats, maxPanX, maxPanY, midiClip.events, otherCorner, panPixels, width, x, y, selected, originalSelected, midiClip.length, scaledHeight, clearSelected])
 
 	// Middle mouse pan
 	useLayoutEffect(() => {
 		const onMouseDown = (e: MouseEvent) => {
-			if (e.button !== 1) return
-
-			activateMiddleMouse()
+			if (e.button === 0 && e.ctrlKey && e.altKey) {
+				activateMiddleMouse()
+			}
 		}
 
 		const onMouseUp = (e: MouseEvent) => {
-			if (e.button !== 1) return
-			deactivateMiddleMouse()
+			if (e.button === 0 && e.ctrlKey && e.altKey) {
+				deactivateMiddleMouse()
+			}
 		}
 
 		const onMouseMove = (e: MouseEvent) => {
-			if (e.buttons !== 4 || !e.shiftKey) return deactivateMiddleMouse()
+			if (e.buttons !== 1 || !e.ctrlKey || !e.altKey) return deactivateMiddleMouse()
 
 			const zoomedMovement = makeMouseMovementAccountForGlobalZoom(
 				{x: e.movementX, y: e.movementY})
@@ -312,12 +344,12 @@ export const BetterSequencer = ({id}: Props) => {
 				x: zoom.x === 1
 					? pan.x
 					: clamp(
-						pan.x + ((-zoomedMovement.x) * (1 / (width * (zoom.x - 1)))),
+						pan.x + ((-zoomedMovement.x) * (1 / (fixedWidth * (zoom.x - 1)))),
 						minPan, maxPan),
 				y: zoom.y === 1
 					? pan.y
 					: clamp(
-						pan.y + ((-zoomedMovement.y) * (1 / (height * (zoom.y - 1)))),
+						pan.y + -zoomedMovement.y / maxPanY,
 						minPan, maxPan),
 			}))
 		}
@@ -341,9 +373,9 @@ export const BetterSequencer = ({id}: Props) => {
 			}
 			window.removeEventListener('mouseup', onMouseUp)
 		}
-	}, [activateMiddleMouse, deactivateMiddleMouse, dispatch, height, id, middleMouseActive, pan, width, zoom])
+	}, [activateMiddleMouse, deactivateMiddleMouse, dispatch, id, maxPanY, middleMouseActive, pan, zoom])
 
-	const columnWidth = (width * zoom.x) / lengthBeats
+	const columnWidth = (fixedWidth * zoom.x) / lengthBeats
 
 	const selectAll = useCallback(() => {
 		setSelected(midiClip.events.keySeq().toSet())
@@ -554,27 +586,37 @@ export const BetterSequencer = ({id}: Props) => {
 				ref={editorElement}
 				tabIndex={-1}
 			>
-				<BetterRows {...{noteHeight, panPixelsY: panPixels.y, rows}} />
-				<BetterColumns {...{columnWidth, lengthBeats, panPixelsX: panPixels.x, timeSelect}} />
-				<BetterNotes
-					{...{
-						id,
-						noteHeight,
-						columnWidth,
-						midiClip,
-						onNoteSelect,
-						clearSelected,
-						panPixels,
-						selected,
-						setSelected,
-						width,
-						height,
-						lengthBeats,
-						zoom,
-						rows,
-						clientMousePositionToPercentages,
+				<div
+					className="translatable"
+					style={{
+						transform: `translate(${-panPixels.x}px, ${-panPixels.y}px)`,
+						width: scaledWidth + panPixels.x,
+						height: scaledHeight,
 					}}
-				/>
+				>
+					<BetterRows {...{noteHeight, rows}} />
+					<BetterColumns {...{columnWidth, lengthBeats, timeSelect}} />
+					<BetterNotes
+						{...{
+							id,
+							noteHeight,
+							columnWidth,
+							midiClip,
+							onNoteSelect,
+							clearSelected,
+							panPixels,
+							selected,
+							setSelected,
+							width,
+							height,
+							lengthBeats,
+							zoom,
+							rows,
+							clientMousePositionToPercentages,
+							removeDuplicateEvents,
+						}}
+					/>
+				</div>
 				{boxActive && <BoxSelect
 					origin={boxOrigin}
 					otherCorner={otherCorner}
@@ -582,4 +624,4 @@ export const BetterSequencer = ({id}: Props) => {
 			</div>
 		</Panel>
 	)
-}
+})

@@ -25,7 +25,7 @@ interface Props {
 	id: Id
 }
 
-export const BetterSequencerControls = ({id}: Props) => {
+export const BetterSequencerControls = React.memo(function _BetterSequencerControls({id}: Props) {
 	const zoom = useSelector(createBetterSeqZoomSelector(id))
 	const pan = useSelector(createBetterSeqPanSelector(id))
 	const rate = useSelector(createBetterSeqRateSelector(id))
@@ -146,4 +146,4 @@ export const BetterSequencerControls = ({id}: Props) => {
 			</div>
 		</div>
 	)
-}
+})

@@ -6,7 +6,7 @@ interface Props {
 	otherCorner: Point
 }
 
-export const BoxSelect = React.memo(({origin, otherCorner}: Props) => {
+export const BoxSelect = React.memo(function _BoxSelect({origin, otherCorner}: Props) {
 	let box = {width: 0, height: 0, left: 0, top: 0}
 
 	if (origin.x <= otherCorner.x) {

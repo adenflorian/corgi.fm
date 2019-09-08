@@ -11,6 +11,8 @@ import {ConnectedOnlineApp} from './OnlineApp'
 
 const App = () => {
 	const ctrl = useSelector((state: IClientAppState) => selectUserInputKeys(state).ctrl)
+	const shift = useSelector((state: IClientAppState) => selectUserInputKeys(state).shift)
+	const alt = useSelector((state: IClientAppState) => selectUserInputKeys(state).alt)
 	const isConnectingForFirstTime = useSelector((state: IClientAppState) => selectClientInfo(state).isConnectingForFirstTime)
 	const isClientReady = useSelector((state: IClientAppState) => selectClientInfo(state).isClientReady)
 
@@ -22,7 +24,7 @@ const App = () => {
 
 	const isLoading = !isClientReady && isConnectingForFirstTime
 	return (
-		<div className={`ctrl-${ctrl}`}>
+		<div className={`ctrl-${ctrl} alt-${alt} shift-${shift}`}>
 			<LoadingScreen loading={isLoading} />
 			{!isLoading && <ConnectedOnlineApp />}
 		</div>

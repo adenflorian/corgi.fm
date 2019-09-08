@@ -1,4 +1,4 @@
-import React, {useState, useCallback, useLayoutEffect} from 'react'
+import React, {useState, useCallback, useLayoutEffect, Fragment} from 'react'
 import {useDispatch} from 'react-redux'
 import {Set} from 'immutable'
 import {MidiClip, MidiClipEvents, makeMidiClipEvent} from '@corgifm/common/midi-types'
@@ -6,6 +6,7 @@ import {betterSequencerActions, sequencerActions} from '@corgifm/common/redux'
 import {smallestNoteLength} from '@corgifm/common/BetterConstants'
 import {sumPoints} from '@corgifm/common/common-utils'
 import {MIN_MIDI_NOTE_NUMBER_0, MAX_MIDI_NOTE_NUMBER_127} from '@corgifm/common/common-constants'
+import {oneLine} from 'common-tags'
 import {BetterNote} from './BetterNote'
 import {movementXToBeats} from './BetterSequencerHelpers'
 
@@ -25,13 +26,14 @@ interface Props {
 	height: number
 	rows: string[]
 	clientMousePositionToPercentages: (clientMousePosition: Point) => Point
+	removeDuplicateEvents: () => void
 }
 
-export const BetterNotes = (props: Props) => {
+export const BetterNotes = React.memo(function _BetterNotes(props: Props) {
 	const {
 		id, panPixels, noteHeight, columnWidth, selected, onNoteSelect,
 		clearSelected, midiClip, lengthBeats, zoom, width, height, rows,
-		clientMousePositionToPercentages, setSelected,
+		clientMousePositionToPercentages, setSelected, removeDuplicateEvents,
 	} = props
 
 	const [noteResizeActive, setNoteResizeActive] = useState<false | 'left' | 'right'>(false)
@@ -50,7 +52,7 @@ export const BetterNotes = (props: Props) => {
 
 		const newPersistentDelta = {x: persistentDelta.x + movementX, y: 0}
 		const direction = noteResizeActive === 'left' ? -1 : 1
-		const beatDelta = movementXToBeats(newPersistentDelta.x, lengthBeats, zoom.x, width) * direction
+		const beatDelta = movementXToBeats(newPersistentDelta.x, columnWidth) * direction
 		const roundedBeatDelta = altKey
 			? beatDelta
 			: Math.round(beatDelta)
@@ -67,7 +69,7 @@ export const BetterNotes = (props: Props) => {
 
 		dispatch(betterSequencerActions.updateEvents(id, updatedEvents, false))
 		setPersistentDelta(newPersistentDelta)
-	}, [noteResizeActive, persistentDelta, lengthBeats, zoom.x, width, startEvents, dispatch, id])
+	}, [noteResizeActive, persistentDelta.x, columnWidth, startEvents, dispatch, id, lengthBeats])
 
 	const clientYToMouseNote = useCallback((clientY: number) => {
 		return (rows.length) - (clientMousePositionToPercentages({x: 0, y: clientY}).y * rows.length)
@@ -76,8 +78,14 @@ export const BetterNotes = (props: Props) => {
 	const moveNotes = useCallback(({movementX, clientY, altKey}: MouseEvent) => {
 		if (!noteMoveActive) return
 
+		if (!firstMouseMove) {
+			setFirstMouseMove(true)
+			setStartMouseNote(Math.floor(clientYToMouseNote(clientY)))
+			return
+		}
+
 		const newPersistentDelta = sumPoints(persistentDelta, {x: movementX, y: 0})
-		const beatDelta = movementXToBeats(newPersistentDelta.x, lengthBeats, zoom.x, width)
+		const beatDelta = movementXToBeats(newPersistentDelta.x, columnWidth)
 		const roundedBeatDelta = altKey
 			? beatDelta
 			: Math.round(beatDelta)
@@ -86,14 +94,14 @@ export const BetterNotes = (props: Props) => {
 		const updatedEvents = startEvents.map(event => {
 			return {
 				...event,
-				startBeat: Math.max(0, Math.min(lengthBeats - smallestNoteLength, event.startBeat + roundedBeatDelta)),
+				startBeat: Math.max(0, Math.min(lengthBeats - event.durationBeats, event.startBeat + roundedBeatDelta)),
 				note: Math.max(MIN_MIDI_NOTE_NUMBER_0, Math.min(MAX_MIDI_NOTE_NUMBER_127, Math.floor(event.note + mouseNoteDelta))),
 			}
 		})
 
 		dispatch(betterSequencerActions.updateEvents(id, updatedEvents, false))
 		setPersistentDelta(newPersistentDelta)
-	}, [noteMoveActive, persistentDelta, lengthBeats, zoom.x, width, clientYToMouseNote, startEvents, dispatch, id, startMouseNote])
+	}, [noteMoveActive, firstMouseMove, persistentDelta, columnWidth, clientYToMouseNote, startMouseNote, startEvents, dispatch, id, lengthBeats])
 
 	const cloneNotes = useCallback(({movementX, clientY, altKey}: MouseEvent) => {
 		if (!noteCloneActive) return
@@ -109,11 +117,12 @@ export const BetterNotes = (props: Props) => {
 			setSelected(newEvents.keySeq().toSet())
 			setStartEvents(newEvents)
 			setFirstMouseMove(true)
+			setStartMouseNote(Math.floor(clientYToMouseNote(clientY)))
 			return
 		}
 
 		const newPersistentDelta = sumPoints(persistentDelta, {x: movementX, y: 0})
-		const beatDelta = movementXToBeats(newPersistentDelta.x, lengthBeats, zoom.x, width)
+		const beatDelta = movementXToBeats(newPersistentDelta.x, columnWidth)
 		const roundedBeatDelta = altKey
 			? beatDelta
 			: Math.round(beatDelta)
@@ -122,32 +131,14 @@ export const BetterNotes = (props: Props) => {
 		const updatedEvents = startEvents.map(event => {
 			return {
 				...event,
-				startBeat: Math.max(0, Math.min(lengthBeats - smallestNoteLength, event.startBeat + roundedBeatDelta)),
+				startBeat: Math.max(0, Math.min(lengthBeats - event.durationBeats, event.startBeat + roundedBeatDelta)),
 				note: Math.max(MIN_MIDI_NOTE_NUMBER_0, Math.min(MAX_MIDI_NOTE_NUMBER_127, Math.floor(event.note + mouseNoteDelta))),
 			}
 		})
 
 		dispatch(betterSequencerActions.updateEvents(id, updatedEvents, false))
 		setPersistentDelta(newPersistentDelta)
-	}, [clientYToMouseNote, dispatch, firstMouseMove, id, lengthBeats, noteCloneActive, persistentDelta, setSelected, startEvents, startMouseNote, width, zoom.x])
-
-	const removeDuplicateEvents = useCallback(() => {
-		const {toDelete} = midiClip.events.reduce((result, event) => {
-			if (result.clean.some(x => x.note === event.note && x.startBeat === event.startBeat && x.durationBeats === event.durationBeats)) {
-				return {
-					...result,
-					toDelete: result.toDelete.add(event.id),
-				}
-			} else {
-				return {
-					...result,
-					clean: result.clean.set(event.id, event),
-				}
-			}
-		}, {clean: MidiClipEvents(), toDelete: Set<Id>()})
-
-		dispatch(betterSequencerActions.deleteEvents(id, toDelete))
-	}, [dispatch, id, midiClip.events])
+	}, [clientYToMouseNote, columnWidth, dispatch, firstMouseMove, id, lengthBeats, noteCloneActive, persistentDelta, setSelected, startEvents, startMouseNote])
 
 	const startNoteResizing = useCallback((direction: 'left' | 'right') => {
 		setNoteResizeActive(direction)
@@ -158,9 +149,9 @@ export const BetterNotes = (props: Props) => {
 	}, [])
 
 	const startNoteMoving = useCallback((clientY: number) => {
-		setStartMouseNote(Math.floor(clientYToMouseNote(clientY)))
+		setFirstMouseMove(false)
 		setNoteMoveActive(true)
-	}, [clientYToMouseNote])
+	}, [])
 
 	const stopNoteMoving = useCallback(() => {
 		setNoteMoveActive(false)
@@ -170,8 +161,7 @@ export const BetterNotes = (props: Props) => {
 	const startNoteCloning = useCallback((clientY: number) => {
 		setFirstMouseMove(false)
 		setNoteCloneActive(true)
-		setStartMouseNote(Math.floor(clientYToMouseNote(clientY)))
-	}, [clientYToMouseNote])
+	}, [])
 
 	const stopNoteCloning = useCallback(() => {
 		setNoteCloneActive(false)
@@ -179,6 +169,8 @@ export const BetterNotes = (props: Props) => {
 	}, [removeDuplicateEvents])
 
 	const handleMouseDown = useCallback((e: MouseEvent, direction: 'left' | 'right' | 'center', clickedEventId: Id) => {
+		if (e.ctrlKey && e.altKey) return
+
 		setClickedEvent(clickedEventId)
 		dispatch(sequencerActions.saveUndo(id))
 		setPersistentDelta({x: 0, y: 0})
@@ -241,40 +233,70 @@ export const BetterNotes = (props: Props) => {
 
 	return (
 		<div
-			className={`notes active-${noteResizeActive} resize-${noteResizeActive}`}
+			className={oneLine`
+				notes
+				active-${noteResizeActive}
+				resizing-${noteResizeActive}
+				moving-${noteMoveActive}
+				cloning-${noteCloneActive}
+			`}
 		>
 			<div
 				className="scalable"
-				style={{
-					transform: `translate(${-panPixels.x}px, ${-panPixels.y}px)`,
-				}}
 				onMouseDown={e => {
 					if (e.button !== 0 || e.shiftKey) return
 					clearSelected()
 				}}
 			>
-				{midiClip.events.map(event => {
-					return (
-						<BetterNote
-							key={event.id.toString()}
-							{...{
-								id,
-								event,
-								noteHeight,
-								columnWidth,
-								isSelected: selected.has(event.id),
-								panPixels,
-								onNoteSelect,
-								handleMouseDown,
-								rows,
-							}}
-						/>
-					)
-				}).toList()}
+				<ActualNotes
+					id={id}
+					noteHeight={noteHeight}
+					columnWidth={columnWidth}
+					midiClip={midiClip}
+					selected={selected}
+					onNoteSelect={onNoteSelect}
+					rows={rows}
+					handleMouseDown={handleMouseDown}
+				/>
 			</div>
 		</div>
 	)
+})
+
+interface ActualNotesProps {
+	id: Id
+	noteHeight: number
+	columnWidth: number
+	midiClip: MidiClip
+	selected: Set<Id>
+	onNoteSelect: (eventId: Id, select: boolean, clear: boolean) => void
+	rows: string[]
+	handleMouseDown: (e: MouseEvent, direction: 'left' | 'right' | 'center', clickedEventId: Id) => void
 }
+
+const ActualNotes = React.memo(function _ActualNotes({midiClip, id, noteHeight, columnWidth, selected, onNoteSelect, handleMouseDown, rows}: ActualNotesProps) {
+	return (
+		<Fragment>
+			{midiClip.events.map(event => {
+				return (
+					<BetterNote
+						key={event.id.toString()}
+						{...{
+							id,
+							event,
+							noteHeight,
+							columnWidth,
+							isSelected: selected.has(event.id),
+							onNoteSelect,
+							handleMouseDown,
+							rows,
+						}}
+					/>
+				)
+			}).toList()}
+		</Fragment>
+	)
+})
 
 function getMovement(e: MouseEvent) {
 	return {

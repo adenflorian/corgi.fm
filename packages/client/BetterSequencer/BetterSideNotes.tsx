@@ -1,4 +1,4 @@
-import React, {useCallback} from 'react'
+import React, {useCallback, Fragment} from 'react'
 import {Set} from 'immutable'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {betterSideNotesWidth, smallNoteHeight} from '@corgifm/common/BetterConstants'
@@ -13,9 +13,9 @@ interface Props {
 	noteHeight: number
 }
 
-export const BetterSideNotes = React.memo(({
+export const BetterSideNotes = React.memo(function _BetterSideNotes({
 	id, rows, panPixelsY, noteHeight,
-}: Props) => {
+}: Props) {
 	return (
 		<div
 			className="sideNotes"
@@ -29,17 +29,37 @@ export const BetterSideNotes = React.memo(({
 					transform: `translateY(${-panPixelsY}px)`,
 				}}
 			>
-				{rows.map((row, i) =>
-					<BetterSideNote
-						id={id}
-						i={i}
-						key={row}
-						row={row}
-						noteHeight={noteHeight}
-					/>
-				)}
+				<BetterSideNotesArray
+					id={id}
+					rows={rows}
+					noteHeight={noteHeight}
+				/>
 			</div>
 		</div>
+	)
+})
+
+interface BetterSideNotesArrayProps {
+	id: Id
+	rows: string[]
+	noteHeight: number
+}
+
+export const BetterSideNotesArray = React.memo(function _BetterSideNotesArray({
+	id, rows, noteHeight,
+}: BetterSideNotesArrayProps) {
+	return (
+		<Fragment>
+			{rows.map((row, i) =>
+				<BetterSideNote
+					id={id}
+					i={i}
+					key={row}
+					row={row}
+					noteHeight={noteHeight}
+				/>
+			)}
+		</Fragment>
 	)
 })
 

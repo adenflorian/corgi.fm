@@ -28,7 +28,7 @@
 
 	.sideNotes {
 		position: relative;
-		overflow: hidden;
+
 		.transformable {
 			width: 100%;
 			display: flex;
@@ -60,6 +60,12 @@
 	.editor {
 		flex-grow: 1;
 		position: relative;
+		overflow: hidden;
+
+		.translatable {
+			width: 100%;
+			height: 100%;
+		}
 
 		.rows {
 			position: absolute;
@@ -100,6 +106,7 @@
 			}
 
 			.scalable {
+				display: flex;
 				width: 100%;
 				height: 100%;
 				white-space: nowrap;
@@ -124,6 +131,14 @@
 						height: 100%;
 					}
 				}
+
+				.farRightColumn {
+					width: auto;
+					height: 100%;
+					background-color: hsla(0, 0%, 0%, 0.24);
+					display: inline-block;
+					flex-grow: 1;
+				}
 			}
 		}
 
@@ -135,12 +150,24 @@
 			overflow: hidden;
 			z-index: 10;
 
-			&.resize-left {
+			&.resizing-left {
 				@leftBracketCursor();
 			}
 
-			&.resize-right {
+			&.resizing-right {
 				@rightBracketCursor();
+			}
+
+			&.moving-true {
+				@grabbingCursor();
+			}
+
+			&.cloning-true {
+				@grabbingCursor();
+			}
+
+			.ctrl-true.alt-true & {
+				@grabCursor();
 			}
 
 			.scalable {
@@ -154,7 +181,7 @@
 					position: absolute;
 					background-color: currentColor;
 					border-radius: 1px;
-					border: 1px solid @panelGrayDark;
+					border: 2px solid @panelGrayDark;
 					box-sizing: border-box;
 					margin-bottom: 1px;
 					min-width: 4px;

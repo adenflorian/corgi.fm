@@ -17,10 +17,10 @@ interface Props {
 	rows: string[]
 }
 
-export const BetterNote = React.memo(({
+export const BetterNote = React.memo(function _BetterNote({
 	id, event, noteHeight, columnWidth, isSelected,
 	onNoteSelect, handleMouseDown, rows,
-}: Props) => {
+}: Props) {
 
 	const dispatch = useDispatch()
 	const noteLabel = midiNoteToNoteNameFull(event.note)

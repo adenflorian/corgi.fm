@@ -78,7 +78,7 @@ function ecsLoop() {
 			}),
 			new ECSSequencerComponent({
 				notesDisplayStartX: nodeInfo.notesDisplayStartX,
-				notesDisplayWidth: position.width - nodeInfo.notesDisplayStartX,
+				notesDisplayWidth: nodeInfo.defaultWidth - nodeInfo.notesDisplayStartX,
 				ratio: (getSequencersSchedulerInfo()
 					.get(sequencer.id, {loopRatio: 0})
 					.loopRatio * sequencer.zoom.x) - (sequencer.pan.x * (sequencer.zoom.x - 1)),

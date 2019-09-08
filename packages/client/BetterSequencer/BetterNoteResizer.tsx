@@ -9,9 +9,9 @@ interface Props {
 
 const debug = false
 
-export const BetterNoteResizer = React.memo(({
+export const BetterNoteResizer = React.memo(function _BetterNoteResizer({
 	id, handleMouseDown, eventId,
-}: Props) => {
+}: Props) {
 
 	const leftRef = useRef<HTMLDivElement>(null)
 	const rightRef = useRef<HTMLDivElement>(null)

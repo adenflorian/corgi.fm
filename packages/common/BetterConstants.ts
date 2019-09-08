@@ -16,4 +16,4 @@ export const betterWidth = betterControlsWidth + betterSideNotesWidth + betterEd
 export const betterHeight = 128 * 3
 
 export const smallNoteHeight = 27
-export const tinyNoteHeight = 10
+export const tinyNoteHeight = 12
