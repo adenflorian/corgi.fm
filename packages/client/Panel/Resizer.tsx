@@ -5,21 +5,18 @@ import {
 	positionActions, createPositionSelector, createPositionTypeSelector,
 	findNodeInfo,
 } from '@corgifm/common/redux'
-import {panelHeaderHeight} from '@corgifm/common/common-constants'
 import {simpleGlobalClientState} from '../SimpleGlobalClientState'
 
 interface Props {
 	id: Id
 }
 
-const overlap = 8
-
 interface ActiveInfo {
 	vert: 'up' | 'down' | 'none'
 	hoz: 'left' | 'right' | 'none'
 }
 
-const debug = false
+const debug = true
 
 export const Resizer = React.memo(({id}: Props) => {
 	const {x, y, width, height} = useSelector(createPositionSelector(id))
@@ -91,8 +88,6 @@ export const Resizer = React.memo(({id}: Props) => {
 		<div
 			className="resizer"
 			style={{
-				width: width + overlap,
-				height: height + panelHeaderHeight + overlap,
 				position: 'absolute',
 				top: '50%',
 				left: '50%',
@@ -103,55 +98,46 @@ export const Resizer = React.memo(({id}: Props) => {
 			}}
 			onMouseUp={setInactive}
 		>
-			<div className="topRow resizerRow">
-				<div
-					style={{pointerEvents: 'all', backgroundColor: debug ? 'red' : undefined, cursor: 'nw-resize'}}
-					className="resizeHandle top left topLeft corner"
-					onMouseDown={() => handleMouseDown({hoz: 'left', vert: 'up'})}
-				/>
-				<div
-					style={{pointerEvents: 'all', backgroundColor: debug ? 'blue' : undefined, cursor: 'n-resize'}}
-					className="resizeHandle top mid topMid edge"
-					onMouseDown={() => handleMouseDown({hoz: 'none', vert: 'up'})}
-				/>
-				<div
-					style={{pointerEvents: 'all', backgroundColor: debug ? 'red' : undefined, cursor: 'ne-resize'}}
-					className="resizeHandle top right topRight corner"
-					onMouseDown={() => handleMouseDown({hoz: 'right', vert: 'up'})}
-				/>
-			</div>
-			<div className="midRow resizerRow">
-				<div
-					style={{pointerEvents: 'all', backgroundColor: debug ? 'blue' : undefined, cursor: 'w-resize'}}
-					className="resizeHandle left midLeft edge"
-					onMouseDown={() => handleMouseDown({hoz: 'left', vert: 'none'})}
-				/>
-				<div
-					className="resizeHandle mid midMid"
-				/>
-				<div
-					style={{pointerEvents: 'all', backgroundColor: debug ? 'blue' : undefined, cursor: 'e-resize'}}
-					className="resizeHandle right midRight edge"
-					onMouseDown={() => handleMouseDown({hoz: 'right', vert: 'none'})}
-				/>
-			</div>
-			<div className="bottomRow resizerRow">
-				<div
-					style={{pointerEvents: 'all', backgroundColor: debug ? 'red' : undefined, cursor: 'sw-resize'}}
-					className="resizeHandle bottom left bottomLeft corner"
-					onMouseDown={() => handleMouseDown({hoz: 'left', vert: 'down'})}
-				/>
-				<div
-					style={{pointerEvents: 'all', backgroundColor: debug ? 'blue' : undefined, cursor: 's-resize'}}
-					className="resizeHandle bottom mid bottomMid edge"
-					onMouseDown={() => handleMouseDown({hoz: 'none', vert: 'down'})}
-				/>
-				<div
-					style={{pointerEvents: 'all', backgroundColor: debug ? 'red' : undefined, cursor: 'se-resize'}}
-					className="resizeHandle bottom right bottomRight corner"
-					onMouseDown={() => handleMouseDown({hoz: 'right', vert: 'down'})}
-				/>
-			</div>
+			<div
+				style={{pointerEvents: 'all', backgroundColor: debug ? 'red' : undefined, cursor: 'nw-resize'}}
+				className="resizeHandle top left topLeft corner"
+				onMouseDown={() => handleMouseDown({hoz: 'left', vert: 'up'})}
+			/>
+			<div
+				style={{pointerEvents: 'all', backgroundColor: debug ? 'blue' : undefined, cursor: 'n-resize'}}
+				className="resizeHandle top mid topMid edge hoz"
+				onMouseDown={() => handleMouseDown({hoz: 'none', vert: 'up'})}
+			/>
+			<div
+				style={{pointerEvents: 'all', backgroundColor: debug ? 'red' : undefined, cursor: 'ne-resize'}}
+				className="resizeHandle top right topRight corner"
+				onMouseDown={() => handleMouseDown({hoz: 'right', vert: 'up'})}
+			/>
+			<div
+				style={{pointerEvents: 'all', backgroundColor: debug ? 'blue' : undefined, cursor: 'w-resize'}}
+				className="resizeHandle left midLeft edge vert"
+				onMouseDown={() => handleMouseDown({hoz: 'left', vert: 'none'})}
+			/>
+			<div
+				style={{pointerEvents: 'all', backgroundColor: debug ? 'blue' : undefined, cursor: 'e-resize'}}
+				className="resizeHandle right midRight edge vert"
+				onMouseDown={() => handleMouseDown({hoz: 'right', vert: 'none'})}
+			/>
+			<div
+				style={{pointerEvents: 'all', backgroundColor: debug ? 'red' : undefined, cursor: 'sw-resize'}}
+				className="resizeHandle bottom left bottomLeft corner"
+				onMouseDown={() => handleMouseDown({hoz: 'left', vert: 'down'})}
+			/>
+			<div
+				style={{pointerEvents: 'all', backgroundColor: debug ? 'blue' : undefined, cursor: 's-resize'}}
+				className="resizeHandle bottom mid bottomMid edge hoz"
+				onMouseDown={() => handleMouseDown({hoz: 'none', vert: 'down'})}
+			/>
+			<div
+				style={{pointerEvents: 'all', backgroundColor: debug ? 'red' : undefined, cursor: 'se-resize'}}
+				className="resizeHandle bottom right bottomRight corner"
+				onMouseDown={() => handleMouseDown({hoz: 'right', vert: 'down'})}
+			/>
 		</div>
 	)
 })
