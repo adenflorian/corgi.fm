@@ -11,6 +11,7 @@ import {IMidiNote} from '../MidiNote'
 import {
 	selectAllConnections, selectConnectionsWithSourceIds,
 	selectConnectionsWithTargetIds,
+	IConnectionsState,
 } from './connections-redux'
 import {selectGlobalClockIsPlaying} from './global-clock-redux'
 import {BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION} from '.'
@@ -144,7 +145,7 @@ export function deserializeEvents(events: MidiClipEvents): MidiClipEvents {
 			// Some could be undefined in old saves
 			.filter(x => x !== undefined)
 			.map(x => ({...x, note: x.note})
-		).toList())
+			).toList())
 }
 
 export interface ISequencerState extends IConnectable {
@@ -275,16 +276,29 @@ function isUpstreamClockFromNode(
 		})
 }
 
-export const selectDirectDownstreamSequencerIds = (state: IClientRoomState, id: Id): List<SequencerId> => {
-	return _getDirectDownstreamSequencerIds(state, id)
+let lastConnectionsState: IConnectionsState
+let cache = Map<Id, List<Id>>()
+
+export const selectDirectDownstreamSequencerIds = (state: IClientRoomState, id: Id): List<Id> => {
+	if (state.connections === lastConnectionsState) {
+		const foo = cache.get(id, null)
+		if (foo) {
+			return foo
+		} else {
+			const foo2 = _bar(state, id)
+			cache = cache.set(id, foo2)
+			return foo2
+		}
+	} else {
+		lastConnectionsState = state.connections
+		const foo = _bar(state, id)
+		cache = cache.clear().set(id, foo)
+		return foo
+	}
 }
 
-interface SequencerId extends Id {}
-
-function _getDirectDownstreamSequencerIds(
-	state: IClientRoomState, nodeId: Id,
-): List<SequencerId> {
-	return selectConnectionsWithSourceIds(state, [nodeId])
+function _bar(state: IClientRoomState, id: Id): List<Id> {
+	return selectConnectionsWithSourceIds(state, [id])
 		.filter(connection => isSequencerNodeType(connection.targetType))
 		.map(x => x.targetId).toList()
 }

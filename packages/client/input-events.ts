@@ -115,7 +115,7 @@ const keyboardShortcuts: IKeyBoardShortcuts = Map<KeyBoardShortcut>({
 		actionOnKeyDown: userInputActions.setKeys({alt: true}),
 		actionOnKeyUp: userInputActions.setKeys({alt: false}),
 		allowRepeat: false,
-		preventDefault: false,
+		preventDefault: true,
 	},
 	'Shift': {
 		actionOnKeyDown: userInputActions.setKeys({shift: true}),

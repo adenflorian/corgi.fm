@@ -16,7 +16,7 @@ interface ActiveInfo {
 	hoz: 'left' | 'right' | 'none'
 }
 
-const debug = true
+const debug = false
 
 export const Resizer = React.memo(({id}: Props) => {
 	const {x, y, width, height} = useSelector(createPositionSelector(id))

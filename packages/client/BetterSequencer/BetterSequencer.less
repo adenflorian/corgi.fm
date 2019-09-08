@@ -39,6 +39,26 @@
 				// box-sizing: border-box;
 				// margin: 2px 0;
 				margin-bottom: 1px;
+				
+				&.white {
+					background-color: @defaultGray;
+
+					&.animate-off {
+						.colorFadeAnimation(BSKeyFadeWhite, currentColor, @defaultGray);
+					}
+				}
+
+				&.black {
+					background-color: @panelGrayDark;
+
+					&.animate-off {
+						.colorFadeAnimation(BSKeyFadeBlack, currentColor,  @panelGrayDark);
+					}
+				}
+
+				&.animate-on {
+					background-color: currentColor;
+				}
 
 				.rowLabel {
 					.largeFont();

@@ -1,9 +1,9 @@
-import React, {useCallback, Fragment} from 'react'
+import React, {useCallback, Fragment, useState} from 'react'
 import {Set} from 'immutable'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {betterSideNotesWidth, smallNoteHeight} from '@corgifm/common/BetterConstants'
-import {useDispatch} from 'react-redux'
-import {localActions} from '@corgifm/common/redux'
+import {useDispatch, useSelector} from 'react-redux'
+import {localActions, createAnimationFrameSelector, createAnimationFlagSelector, IClientAppState, selectOptions, animationActions} from '@corgifm/common/redux'
 import {isWhiteKey} from '../Keyboard/Keyboard'
 
 interface Props {
@@ -77,18 +77,27 @@ export const BetterSideNote = React.memo(({
 	const isC = i % 12 === 0
 	const isSmall = noteHeight <= smallNoteHeight
 	const dispatch = useDispatch()
+	const fancy = useSelector((state: IClientAppState) => selectOptions(state).graphicsExtraAnimations)
 	const onClick = useCallback(() => {
 		dispatch(localActions.playShortNote(id, Set([i])))
-	}, [dispatch, i, id])
+		if (fancy) dispatch(animationActions.on(Set([id]), i))
+		setTimeout(() => {
+			if (fancy) dispatch(animationActions.off(Set([id]), i))
+		}, 250)
+	}, [dispatch, fancy, i, id])
+
+	const flag = useSelector(createAnimationFlagSelector(id, i))
+
+	const animClass = flag
+		? 'animate-on'
+		: 'animate-off'
+
 	return (
 		<div
 			key={row}
-			className="row"
+			className={`row ${animClass} ${isWhite ? 'white' : 'black'}`}
 			style={{
 				height: noteHeight - 1,
-				backgroundColor: isWhite
-					? CssColor.defaultGray
-					: CssColor.panelGrayDark,
 				fontWeight: isWhite ? 600 : 400,
 			}}
 			onMouseDown={onClick}

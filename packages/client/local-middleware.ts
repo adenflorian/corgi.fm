@@ -150,15 +150,16 @@ export function createLocalMiddleware(
 				return
 			}
 			case 'VIRTUAL_KEY_PRESSED': {
-				const state = getState()
-				const fancy = selectOption(state, AppOptions.graphicsExtraAnimations)
-
 				getAllInstruments()
 					.filter(x => action.targetIds.includes(x.id))
 					.forEach(instrument => {
 						instrument.scheduleNote(action.midiNote, 0, true, Set([action.id]), action.velocity)
-						if (fancy) dispatch(animationActions.trigger(instrument.id, action.midiNote))
 					})
+
+				const state = getState()
+				const fancy = selectOption(state, AppOptions.graphicsExtraAnimations)
+
+				if (fancy) dispatch(animationActions.on(action.targetIds, action.midiNote))
 
 				return next(action)
 			}
@@ -203,6 +204,11 @@ export function createLocalMiddleware(
 					.forEach(instrument => {
 						instrument.scheduleRelease(action.midiNote, 0)
 					})
+
+				const state = getState()
+				const fancy = selectOption(state, AppOptions.graphicsExtraAnimations)
+
+				if (fancy) dispatch(animationActions.off(action.targetIds, action.midiNote))
 
 				return next(action)
 			}

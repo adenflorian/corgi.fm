@@ -6,12 +6,13 @@ import {
 } from '@corgifm/common/common-utils'
 import {
 	selectVirtualKeyboardOctave, IClientAppState,
-	selectVirtualKeyboardById, selectClientById, selectLocalClientId, selectPosition, localActions, localMidiKeyPress, localMidiKeyUp,
+	selectVirtualKeyboardById, selectClientById,
+	selectLocalClientId, selectPosition, localMidiKeyPress, localMidiKeyUp,
 } from '@corgifm/common/redux'
 import {
 	keyColors,
 } from '@corgifm/common/common-samples-stuff'
-import {IVirtualMidiKeyboard} from '@corgifm/common/common-types'
+import {IVirtualMidiKeyboard, IVirtualMidiKey} from '@corgifm/common/common-types'
 import {isLeftMouseButtonDown} from '../client-utils'
 import {Panel} from '../Panel/Panel'
 import './Keyboard.less'
@@ -48,84 +49,35 @@ interface IKeyboardProps {
 
 const maxUsernameDisplayLength = 24
 
-export const Keyboard = ({id}: IKeyboardAllProps) => {
+export const Keyboard = React.memo(function _Keyboard({id}: IKeyboardAllProps) {
 
 	const [wasMouseClickedOnKeyboard, setWasMouseClickedOnKeyboard] =
 		useState(false)
 
 	const ownerId = useSelector((state: IClientAppState) => selectPosition(state.room, id).ownerId)
-	const pressedMidiKeys = useSelector((state: IClientAppState) => selectVirtualKeyboardById(state.room, id).pressedKeys)
-	const octave = useSelector((state: IClientAppState) => selectVirtualKeyboardById(state.room, id).octave)
 
 	const ownerName = useSelector((state: IClientAppState) => selectClientById(state, ownerId).name)
 	const color = useSelector((state: IClientAppState) => selectClientById(state, ownerId).color)
 
 	const localClientId = useSelector((state: IClientAppState) => selectLocalClientId(state))
 
-	const showNoteNames = useSelector((state: IClientAppState) => state.options.showNoteNamesOnKeyboard)
-
 	const isLocal = localClientId === ownerId
 
-	const isPlaying = pressedMidiKeys.count() > 0
-	const virtualMidiKeyboard = globalVirtualMidiKeyboard
-
-	const dispatch = useDispatch()
-
-	const handleMouseOver = useCallback((e: React.MouseEvent, index: number) => {
-		if (isLocal === false) return
-		if (isLeftMouseButtonDown(e.buttons) && wasMouseClickedOnKeyboard) {
-			dispatch(localMidiKeyPress(index, 1))
-		}
-	}, [dispatch, id, isLocal, octave, wasMouseClickedOnKeyboard])
-
-	const handleMouseOut = useCallback((e: React.MouseEvent, index: number) => {
-		if (isLocal === false) return
-		if (isLeftMouseButtonDown(e.buttons) && wasMouseClickedOnKeyboard) {
-			dispatch(localMidiKeyUp(index))
-		}
-	}, [dispatch, id, isLocal, wasMouseClickedOnKeyboard])
-
-	const handleMouseDown = useCallback(
-		(e: React.MouseEvent, index: number, isKeyPressed: boolean) => {
-			if (isLocal === false) return
-			if (e.button === 0) {
-				setWasMouseClickedOnKeyboard(true)
-				if (e.shiftKey) {
-					if (isKeyPressed) {
-						dispatch(localMidiKeyUp(index))
-					} else {
-						dispatch(localMidiKeyPress(index, 1))
-					}
-				} else {
-					dispatch(localMidiKeyPress(index, 1))
-				}
-			}
-		},
-		[dispatch, id, isLocal, octave])
-
-	const handleMouseUp = useCallback((e: React.MouseEvent, index: number) => {
-		if (isLocal === false) return
-		if (e.button === 0 && e.shiftKey === false) {
-			dispatch(localMidiKeyUp(index))
-		}
-	}, [dispatch, id, isLocal])
-
-	const handleWindowMouseUp = useCallback((e: MouseEvent) => {
-		if (e.button === 0) {
-			setWasMouseClickedOnKeyboard(false)
-		}
-	}, [])
-
 	useEffect(() => {
+		const handleWindowMouseUp = (e: MouseEvent) => {
+			if (e.button === 0) {
+				setWasMouseClickedOnKeyboard(false)
+			}
+		}
+
 		if (isLocal) {
-			window.removeEventListener('mouseup', handleWindowMouseUp)
 			window.addEventListener('mouseup', handleWindowMouseUp)
 		}
 
 		return () => {
 			window.removeEventListener('mouseup', handleWindowMouseUp)
 		}
-	}, [isLocal, handleWindowMouseUp])
+	}, [isLocal])
 
 	const isOwnerNameTooLong = ownerName.length > maxUsernameDisplayLength
 
@@ -136,48 +88,114 @@ export const Keyboard = ({id}: IKeyboardAllProps) => {
 	return (
 		<Panel
 			color={color}
-			className={`keyboard ${isLocal ? 'isLocal' : 'notLocal'} ${isPlaying ? 'isPlaying' : 'isNotPlaying'}`}
+			className={`keyboard ${isLocal ? 'isLocal' : 'notLocal'}`}
 			label="Virtual Keyboard"
 			labelTitle={isOwnerNameTooLong ? ownerName.toUpperCase() : ''}
 			id={id}
-			saturate={isPlaying}
 			ownerName={ownerNameDisplay}
 		>
 			<OctaveSection id={id} />
-			{virtualMidiKeyboard.map((value, index) => {
-				const isKeyPressed = pressedMidiKeys
-					.map(x => x >= virtualMidiKeyboard.length || x < 0 ? (x + 1200) % 12 : x)
-					.some(x => x === index)
-
-				return (
-					// eslint-disable-next-line jsx-a11y/mouse-events-have-key-events
-					<div
-						// eslint-disable-next-line react/no-array-index-key
-						key={index}
-						className={`key ${value.color} ${isKeyPressed ? 'pressed' : 'notPressed'}`}
-						onMouseOver={e => handleMouseOver(e, index)}
-						onMouseOut={e => handleMouseOut(e, index)}
-						onMouseDown={e => handleMouseDown(e, index, isKeyPressed)}
-						onMouseUp={e => handleMouseUp(e, index)}
-					>
-						<div className="noteName unselectable">
-							{showNoteNames &&
-								value.name
-							}
-						</div>
-						{isLocal &&
-							<div className="unselectable smallText">
-								{value.keyName}
-							</div>
-						}
-					</div>
-				)
+			{globalVirtualMidiKeyboard.map((value, index) => {
+				return <Key
+					key={index}
+					id={id}
+					index={index}
+					virtualMidiKey={value}
+					isLocal={isLocal}
+					wasMouseClickedOnKeyboard={wasMouseClickedOnKeyboard}
+					setWasMouseClickedOnKeyboard={setWasMouseClickedOnKeyboard}
+				/>
 			})}
 		</Panel>
 	)
+})
+
+interface KeyProps {
+	id: Id
+	index: number
+	virtualMidiKey: IVirtualMidiKey
+	isLocal: boolean
+	wasMouseClickedOnKeyboard: boolean
+	setWasMouseClickedOnKeyboard: (value: boolean) => void
 }
 
-const OctaveSection = React.memo(({id}: {id: Id}) => {
+const Key = React.memo(function _Key({
+	id, index, virtualMidiKey, isLocal, wasMouseClickedOnKeyboard,
+	setWasMouseClickedOnKeyboard,
+}: KeyProps) {
+
+	const isKeyPressed = useSelector((state: IClientAppState) => {
+		return selectVirtualKeyboardById(state.room, id)
+			.pressedKeys
+			.map(x => x >= globalVirtualMidiKeyboard.length || x < 0 ? (x + 1200) % 12 : x)
+			.some(x => x === index)
+	})
+
+	const showNoteNames = useSelector((state: IClientAppState) => state.options.showNoteNamesOnKeyboard)
+
+	const dispatch = useDispatch()
+
+	const handleMouseOver = useCallback((e: React.MouseEvent) => {
+		if (isLeftMouseButtonDown(e.buttons) && wasMouseClickedOnKeyboard) {
+			dispatch(localMidiKeyPress(index, 1))
+		}
+	}, [dispatch, index, wasMouseClickedOnKeyboard])
+
+	const handleMouseOut = useCallback((e: React.MouseEvent) => {
+		if (isLeftMouseButtonDown(e.buttons) && wasMouseClickedOnKeyboard) {
+			dispatch(localMidiKeyUp(index))
+		}
+	}, [dispatch, index, wasMouseClickedOnKeyboard])
+
+	const handleMouseDown = useCallback((
+		e: React.MouseEvent,
+	) => {
+		if (e.button === 0) {
+			setWasMouseClickedOnKeyboard(true)
+			if (e.shiftKey) {
+				if (isKeyPressed) {
+					dispatch(localMidiKeyUp(index))
+				} else {
+					dispatch(localMidiKeyPress(index, 1))
+				}
+			} else {
+				dispatch(localMidiKeyPress(index, 1))
+			}
+		}
+	}, [dispatch, index, isKeyPressed, setWasMouseClickedOnKeyboard])
+
+	const handleMouseUp = useCallback((e: React.MouseEvent) => {
+		if (e.button === 0 && e.shiftKey === false) {
+			dispatch(localMidiKeyUp(index))
+		}
+	}, [dispatch, index])
+
+	return (
+		// eslint-disable-next-line jsx-a11y/mouse-events-have-key-events
+		<div
+			// eslint-disable-next-line react/no-array-index-key
+			key={index}
+			className={`key ${virtualMidiKey.color} ${isKeyPressed ? 'pressed' : 'notPressed'}`}
+			onMouseOver={isLocal ? handleMouseOver : undefined}
+			onMouseOut={isLocal ? handleMouseOut : undefined}
+			onMouseDown={isLocal ? handleMouseDown : undefined}
+			onMouseUp={isLocal ? handleMouseUp : undefined}
+		>
+			<div className="noteName unselectable">
+				{showNoteNames &&
+					virtualMidiKey.name
+				}
+			</div>
+			{isLocal &&
+				<div className="unselectable smallText">
+					{virtualMidiKey.keyName}
+				</div>
+			}
+		</div>
+	)
+})
+
+const OctaveSection = React.memo(function _OctaveSection({id}: {id: Id}) {
 	const octave = useSelector(selectVirtualKeyboardOctave(id))
 
 	return (

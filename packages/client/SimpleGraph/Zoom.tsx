@@ -1,5 +1,6 @@
 import React, {useState, useCallback, useLayoutEffect, useEffect} from 'react'
 import {ContextMenuTrigger} from 'react-contextmenu'
+import {Set} from 'immutable'
 import {
 	selectLocalClientId, selectOptions, selectRoomSettings, IClientAppState,
 	createAnimationFrameSelector, animationActions,
@@ -50,8 +51,8 @@ export const globalZoomAnimParentKey = 'globalZoom'
 export const globalZoomResetZoomAnimChildKey = 'resetZoom'
 export const globalZoomResetPanAnimChildKey = 'resetPan'
 
-export const createResetZoomAction = () => animationActions.trigger(globalZoomAnimParentKey, globalZoomResetZoomAnimChildKey)
-export const createResetPanAction = () => animationActions.trigger(globalZoomAnimParentKey, globalZoomResetPanAnimChildKey)
+export const createResetZoomAction = () => animationActions.trigger(Set([globalZoomAnimParentKey]), globalZoomResetZoomAnimChildKey)
+export const createResetPanAction = () => animationActions.trigger(Set([globalZoomAnimParentKey]), globalZoomResetPanAnimChildKey)
 
 export const ConnectedZoom = React.memo(function _Zoom({
 	children,
