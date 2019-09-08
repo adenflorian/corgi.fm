@@ -286,6 +286,7 @@
 	- [ ] between better sequencers
 - [√] ctrl + click and drag to duplicate
 - [ ] dont delete note on dbl click if shift held down
+- [ ] move time bar with arrow keys if no note selected
 
 - [ ] make velocity affect keyboard note visual
 - [ ] put node version in package json so nvm can use it

@@ -475,7 +475,7 @@ export const BetterSequencer = React.memo(function _BetterSequencer({id}: Props)
 	const onKeyDown = useCallback((e: KeyboardEvent) => {
 
 		if (e.ctrlKey && e.key === ' ') {
-			dispatch(globalClockActions.restart(timeSelect.start))
+			dispatch(globalClockActions.restart(timeSelect.start * rate))
 		}
 
 		if (e.ctrlKey && e.key === Key.a) {
@@ -530,7 +530,7 @@ export const BetterSequencer = React.memo(function _BetterSequencer({id}: Props)
 			}
 			return
 		}
-	}, [dispatch, timeSelect.start, selectAll, duplicateNotes, selected, deleteSelected, moveNotesVertically, resizeNotes, moveNotesHorizontally])
+	}, [dispatch, timeSelect.start, rate, selectAll, duplicateNotes, selected, deleteSelected, moveNotesVertically, resizeNotes, moveNotesHorizontally])
 
 	// Key events
 	useEffect(() => {
