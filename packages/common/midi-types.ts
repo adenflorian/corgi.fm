@@ -17,7 +17,7 @@ export interface MidiClipEventV1 {
 }
 
 /** In clip time (beats); Means BPM has not been applied */
-export function makeMidiClipEvent(event: Pick<MidiClipEvent, 'durationBeats' | 'note' | 'startBeat'>): MidiClipEvent {
+export function makeMidiClipEvent(event: Omit<MidiClipEvent, 'id'>): MidiClipEvent {
 	if (event.note === undefined) throw new Error('why1')
 	if (event.startBeat === undefined) throw new Error('why2')
 	if (event.durationBeats === undefined) throw new Error('why3')
@@ -108,6 +108,18 @@ export type MidiGlobalClipEvents = MidiGlobalClip['events']
 
 /** Multiply things by  this number before doing math with it */
 export const midiPrecision = 1000000
+
+export function preciseModulus(a: number, b: number) {
+	return ((a * midiPrecision) % (b * midiPrecision)) / midiPrecision
+}
+
+export function preciseSubtract(a: number, b: number): number {
+	return ((a * midiPrecision) - (b * midiPrecision)) / midiPrecision
+}
+
+export function preciseAdd(a: number, b: number): number {
+	return ((a * midiPrecision) + (b * midiPrecision)) / midiPrecision
+}
 
 export class MidiRange {
 	/** exclusive */

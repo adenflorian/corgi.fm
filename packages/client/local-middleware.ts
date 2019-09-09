@@ -3,7 +3,7 @@ import {Dispatch, Middleware} from 'redux'
 import uuid from 'uuid'
 import {MAX_MIDI_NOTE_NUMBER_127} from '@corgifm/common/common-constants'
 import {ConnectionNodeType, IConnectable} from '@corgifm/common/common-types'
-import {applyOctave, createNodeId} from '@corgifm/common/common-utils'
+import {applyOctave, createNodeId, clamp} from '@corgifm/common/common-utils'
 import {logger} from '@corgifm/common/logger'
 import {IMidiNote, IMidiNotes} from '@corgifm/common/MidiNote'
 import {IClientRoomState} from '@corgifm/common/redux/common-redux-types'
@@ -38,12 +38,14 @@ import {
 	virtualKeyUp, VirtualKeyUpAction,
 	virtualOctaveChange, VirtualOctaveChangeAction,
 	LocalAction, chatSystemMessage, animationActions, selectOption, AppOptions,
-	getNodeInfo, SequencerStateBase, localMidiKeyUp, selectUserInputKeys, userInputActions,
+	getNodeInfo, SequencerStateBase, localMidiKeyUp, selectUserInputKeys,
+	userInputActions, recordingActions, betterSequencerActions,
 } from '@corgifm/common/redux'
 import {pointersActions} from '@corgifm/common/redux/pointers-redux'
+import {makeMidiClipEvent, preciseModulus, preciseSubtract} from '@corgifm/common/midi-types'
 import {graphStateSavesLocalStorageKey} from './client-constants'
 import {GetAllInstruments} from './instrument-manager'
-import {getSequencersSchedulerInfo} from './note-scanner'
+import {getSequencersSchedulerInfo, getCurrentSongTimeBeats} from './note-scanner'
 import {saveUsernameToLocalStorage} from './username'
 import {corgiApiActions} from './RestClient/corgi-api-middleware'
 import {FirebaseContextStuff} from './Firebase/FirebaseContext'
@@ -62,7 +64,9 @@ export function createLocalMiddleware(
 	getAllInstruments: GetAllInstruments, firebase: FirebaseContextStuff
 ): Middleware<{}, IClientAppState> {
 	return ({dispatch, getState}) => next => async (action: LocalMiddlewareActions) => {
-		// TODO Do next later so keyboard is more responsive
+
+		const beforeState = getState()
+		const localClientId = selectLocalClientId(beforeState)
 
 		switch (action.type) {
 			case 'WINDOW_BLUR': {
@@ -79,11 +83,10 @@ export function createLocalMiddleware(
 				})
 			}
 			case 'LOCAL_MIDI_KEY_PRESS': {
-				const state = getState()
-				const localVirtualKeyboard = selectLocalVirtualKeyboard(state)
+				const localVirtualKeyboard = selectVirtualKeyboardByOwner(beforeState.room, localClientId)
 				const sourceId = localVirtualKeyboard.id
 				const noteToPlay = applyOctave(action.midiNote, localVirtualKeyboard.octave)
-				const directlyConnectedSequencerIds = selectDirectDownstreamSequencerIds(state.room, sourceId).toArray()
+				const directlyConnectedSequencerIds = selectDirectDownstreamSequencerIds(beforeState.room, sourceId).toArray()
 
 				if (_localMidiKeys.has(action.midiNote)) {
 					dispatch(localMidiKeyUp(action.midiNote))
@@ -91,7 +94,7 @@ export function createLocalMiddleware(
 
 				_localMidiKeys = _localMidiKeys.set(action.midiNote, noteToPlay)
 
-				const targetIds = selectConnectionsWithSourceIds(state.room, [sourceId].concat(directlyConnectedSequencerIds))
+				const targetIds = selectConnectionsWithSourceIds(beforeState.room, [sourceId].concat(directlyConnectedSequencerIds))
 					.map(x => x.targetId)
 					.valueSeq()
 					.toSet()
@@ -106,11 +109,16 @@ export function createLocalMiddleware(
 					)
 				)
 
+				const currentSongTimeBeats = getCurrentSongTimeBeats()
+
 				// add note to sequencer if downstream recording sequencer
-				_getDownstreamRecordingSequencers(state, localVirtualKeyboard.id)
+				_getDownstreamRecordingSequencers(beforeState, localVirtualKeyboard.id)
 					.forEach(sequencer => {
 						const info = getSequencersSchedulerInfo().get(sequencer.id, null)
 
+						// Why this?
+						// Maybe if song hasn't been started yet?
+						// TODO
 						if (!info) return dispatch(sequencerActions.recordNote(sequencer.id, noteToPlay))
 
 						const clipLength = sequencer.midiClip.length
@@ -119,7 +127,7 @@ export function createLocalMiddleware(
 
 						const actualIndex = index >= clipLength ? 0 : index
 
-						const actualMidiNote = Math.min(MAX_MIDI_NOTE_NUMBER_127 - 1, Math.max(0, noteToPlay))
+						const actualMidiNote = clamp(noteToPlay, 0, MAX_MIDI_NOTE_NUMBER_127 - 1)
 
 						if (sequencer.type === ConnectionNodeType.gridSequencer) {
 							const gridSequencer = sequencer as GridSequencerState
@@ -138,11 +146,15 @@ export function createLocalMiddleware(
 							if (needToScroll !== 0) {
 								dispatch(gridSequencerActions.setField(gridSequencer.id, GridSequencerFields.scrollY, gridSequencer.scrollY + needToScroll))
 							}
-
-							return dispatch(sequencerActions.recordNote(sequencer.id, actualMidiNote, actualIndex))
-						} else {
-							return dispatch(sequencerActions.recordNote(sequencer.id, actualMidiNote, actualIndex))
 						}
+
+						dispatch(recordingActions.startEvent({
+							ownerId: localClientId,
+							note: actualMidiNote,
+							startBeat: currentSongTimeBeats,
+							sequencerId: sequencer.id,
+						}))
+						return dispatch(sequencerActions.recordNote(sequencer.id, actualMidiNote, actualIndex))
 					})
 
 				next(action)
@@ -195,6 +207,38 @@ export function createLocalMiddleware(
 						targetIds,
 					),
 				)
+
+				const recordingEventsForOwnerAndNote = beforeState.room.recording.recordingEvents
+					.filter(x => x.ownerId === localClientId && x.note === noteToRelease)
+
+				if (recordingEventsForOwnerAndNote.count() > 0) {
+
+					const currentSongTimeBeats = getCurrentSongTimeBeats()
+
+					_getDownstreamRecordingSequencers(beforeState, localVirtualKeyboard.id)
+						.forEach(sequencer => {
+
+							const recordingEventsForSequencer = recordingEventsForOwnerAndNote
+								.filter(x => x.sequencerId === sequencer.id)
+
+							const event = recordingEventsForSequencer.first(null)
+
+							if (!event) return
+
+							if (recordingEventsForSequencer.count() > 1) {
+								logger.warn(`I don't think this should happen`)
+							}
+
+							if (sequencer.type === ConnectionNodeType.betterSequencer) {
+								dispatch(betterSequencerActions.addEvent(sequencer.id, makeMidiClipEvent({
+									note: event.note,
+									startBeat: preciseModulus(event.startBeat / sequencer.rate, sequencer.midiClip.length),
+									durationBeats: preciseSubtract(currentSongTimeBeats, event.startBeat) / sequencer.rate,
+								})))
+							}
+							return dispatch(recordingActions.endEvent(event.id))
+						})
+				}
 
 				return next(action)
 			}
@@ -733,7 +777,7 @@ function selectLocalVirtualKeyboardId(state: IClientAppState) {
 }
 
 function selectLocalVirtualKeyboard(state: IClientAppState) {
-	return selectVirtualKeyboardByOwner(state.room, selectLocalClient(state).id)
+	return selectVirtualKeyboardByOwner(state.room, selectLocalClientId(state))
 }
 
 // TODO Refactor to use functions in create-server-stuff.ts

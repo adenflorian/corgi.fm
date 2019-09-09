@@ -1,13 +1,11 @@
 import {Map} from 'immutable'
 import {Action, combineReducers, Reducer} from 'redux'
-import {ghostConnectionsReducer} from './ghost-connections-redux'
-import {roomSettingsReducer} from './room-settings-redux'
-import {uploadReducer} from './upload-redux'
 import {
 	chatReducer, connectionsReducer, CREATE_ROOM, DELETE_ROOM,
 	globalClockReducer, IClientRoomState, IServerState,
 	pointersStateReducer, positionsReducer, roomMembersReducer,
-	RoomsReduxAction, shamuGraphReducer,
+	RoomsReduxAction, shamuGraphReducer, recordingReducer, uploadReducer,
+	roomSettingsReducer, ghostConnectionsReducer,
 } from '.'
 
 export type RoomAction = ReturnType<typeof createRoomAction>
@@ -25,6 +23,7 @@ export const roomReducers = combineReducers({
 	ghostConnections: ghostConnectionsReducer,
 	members: roomMembersReducer,
 	positions: positionsReducer,
+	recording: recordingReducer,
 	roomSettings: roomSettingsReducer,
 	shamuGraph: shamuGraphReducer,
 	upload: uploadReducer,

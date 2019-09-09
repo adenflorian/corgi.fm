@@ -57,6 +57,10 @@ export function getCurrentSongTime() {
 	return _audioContext.currentTime - songStartTimeSeconds
 }
 
+export function getCurrentSongTimeBeats() {
+	return currentSongTimeBeats
+}
+
 export function getCurrentSongIsPlaying() {
 	return _isPlaying
 }

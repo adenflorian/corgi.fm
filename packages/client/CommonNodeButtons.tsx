@@ -7,10 +7,11 @@ import {
 	IoMdStar as Star, IoMdTrash as Clear, IoMdUndo as Undo,
 } from 'react-icons/io'
 import {
-	sequencerActions, globalClockActions, selectInfiniteSequencerIsRecording,
+	sequencerActions, globalClockActions,
 	selectInfiniteSequencerStyle, infiniteSequencerActions,
 	InfiniteSequencerFields, InfiniteSequencerStyle,
-	selectInfiniteSequencerShowRows,
+	selectInfiniteSequencerShowRows, selectSequencer,
+	IClientAppState,
 } from '@corgifm/common/redux'
 import {
 	sequencerPlayToolTip, sequencerStopToolTip, sequencerRecordToolTip,
@@ -55,7 +56,7 @@ export const StopButton = React.memo(({parentId}: {parentId: Id}) => {
 
 export const RecordButton = React.memo(({parentId}: {parentId: Id}) => {
 	const dispatch = useDispatch()
-	const isRecording = useSelector(selectInfiniteSequencerIsRecording(parentId))
+	const isRecording = useSelector((state: IClientAppState) => selectSequencer(state.room, parentId).isRecording)
 	const toggleRecording = useCallback(
 		() => dispatch(sequencerActions.toggleRecording(parentId, !isRecording)),
 		[dispatch, parentId, isRecording])

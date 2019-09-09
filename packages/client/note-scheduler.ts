@@ -1,7 +1,9 @@
 import {OrderedMap} from 'immutable'
 import {logger} from '@corgifm/common/logger'
 import {
-	makeMidiGlobalClipEvent, MidiClip, MidiGlobalClipEvent, MidiGlobalClipEvents, midiPrecision, MidiRange, MidiClipEvent, MidiClipEvents,
+	makeMidiGlobalClipEvent, MidiClip, MidiGlobalClipEvent,
+	MidiGlobalClipEvents, midiPrecision, MidiRange, MidiClipEvent,
+	preciseAdd, preciseSubtract, preciseModulus,
 } from '@corgifm/common/midi-types'
 
 export const applyBPM = (beat: number, bpm: number) => {
@@ -160,18 +162,6 @@ function songBeatToClipSpace(clipLength: number, songBeat: number, clipLoops: bo
 	} else {
 		return songBeat
 	}
-}
-
-function preciseModulus(a: number, b: number) {
-	return ((a * midiPrecision) % (b * midiPrecision)) / midiPrecision
-}
-
-function preciseSubtract(a: number, b: number): number {
-	return ((a * midiPrecision) - (b * midiPrecision)) / midiPrecision
-}
-
-function preciseAdd(a: number, b: number): number {
-	return ((a * midiPrecision) + (b * midiPrecision)) / midiPrecision
 }
 
 function applyRateToEvent(rate: number) {

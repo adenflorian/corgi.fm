@@ -6,6 +6,7 @@ import {
 	assertArrayHasNoUndefinedElements,
 } from '../common-utils'
 import {makeMidiClipEvent, MidiClip, makeEvents, MidiClipEvents, MidiClipEvent} from '../midi-types'
+import {logger} from '../logger'
 import {
 	deserializeSequencerState, SequencerAction,
 	SequencerStateBase,
@@ -228,6 +229,13 @@ const betterSequencerReducer =
 				}
 			}
 			case 'SET_SEQUENCER_PAN': {
+				if (Number.isNaN(action.pan.x) || Number.isNaN(action.pan.y)) {
+					logger.error(`[SET_SEQUENCER_PAN] isNaN(action.pan.?): `, {action})
+					return {
+						...betterSequencer,
+						pan: {x: 0, y: 0},
+					}
+				}
 				return {
 					...betterSequencer,
 					pan: action.pan,
@@ -250,10 +258,7 @@ const betterSequencerReducer =
 
 				return {
 					...betterSequencer,
-					midiClip: betterSequencer.midiClip.set(
-						'events',
-						createSequencerEvents(betterSequencer.midiClip.events.count(), 1),
-					),
+					midiClip: betterSequencer.midiClip.update('events', events => events.clear()),
 					previousEvents: betterSequencer.previousEvents.unshift(betterSequencer.midiClip.events),
 				}
 			}
