@@ -19,6 +19,10 @@
 	.resizeHandle {
 		opacity: 0.5;
 		pointer-events: all;
+					
+		.ctrl-true.alt-true & {
+			pointer-events: none;
+		}
 
 		&.top, &.bottom {
 			height: 8px;

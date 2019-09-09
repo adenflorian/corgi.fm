@@ -206,7 +206,11 @@
 					margin-bottom: 1px;
 					min-width: 4px;
 					// border-top: none;
-  				// border-bottom: none;
+					// border-bottom: none;
+					
+					.ctrl-true.alt-true & {
+						pointer-events: none;
+					}
 
 					&.selected-true {
 						border-color: @defaultGray;
