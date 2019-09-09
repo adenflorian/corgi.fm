@@ -288,6 +288,9 @@
 - [ ] dont delete note on dbl click if shift held down
 - [ ] move time bar with arrow keys if no note selected
 - [ ] ctrl + space, hold ctrl and click somewhere else, then press space, it takes to presses of space to place from new spot
+	- can't repro anymore
+- [ ] start playing when space bar is lifted, if user hold space, then play note, start playing with that note
+	- similar to starting recordings on OP-1
 
 - [ ] make velocity affect keyboard note visual
 - [ ] put node version in package json so nvm can use it

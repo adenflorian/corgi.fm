@@ -32,45 +32,57 @@
 		.transformable {
 			width: 100%;
 			display: flex;
-			flex-direction: column-reverse;
-			
-			.row {
-				// border-bottom: 1px solid @panelGray;
-				// box-sizing: border-box;
-				// margin: 2px 0;
-				margin-bottom: 1px;
-				
-				&.white {
-					background-color: @defaultGray;
 
-					&.animate-off {
-						.colorFadeAnimation(BSKeyFadeWhite, currentColor, @defaultGray);
+			.leftPanZoom {
+				cursor: zoom-in;
+				height: 100%;
+				width: 50%;
+				background-color: @panelGrayDark;
+			}
+
+			.rows {
+				width: 50%;
+				display: flex;
+				flex-direction: column-reverse;
+
+				.row {
+					// border-bottom: 1px solid @panelGray;
+					// box-sizing: border-box;
+					// margin: 2px 0;
+					margin-bottom: 1px;
+					
+					&.white {
+						background-color: @defaultGray;
+	
+						&.animate-off {
+							.colorFadeAnimation(BSKeyFadeWhite, currentColor, @defaultGray);
+						}
 					}
-				}
-
-				&.black {
-					background-color: @panelGrayDark;
-
-					&.animate-off {
-						.colorFadeAnimation(BSKeyFadeBlack, currentColor,  @panelGrayDark);
+	
+					&.black {
+						background-color: @panelGrayDark;
+	
+						&.animate-off {
+							.colorFadeAnimation(BSKeyFadeBlack, currentColor,  @panelGrayDark);
+						}
 					}
-				}
-
-				&.animate-on {
-					background-color: currentColor;
-				}
-
-				.rowLabel {
-					.largeFont();
-					font-size: @noteNameFontSize;
-					display: flex;
-					align-items: center;
-					height: 100%;
-					opacity: 0;
-					padding-left: 4px;
-
-					&:hover {
-						opacity: 1;
+	
+					&.animate-on {
+						background-color: currentColor;
+					}
+	
+					.rowLabel {
+						.largeFont();
+						font-size: @noteNameFontSize;
+						display: flex;
+						align-items: center;
+						height: 100%;
+						opacity: 0;
+						padding-left: 4px;
+	
+						&:hover {
+							opacity: 1;
+						}
 					}
 				}
 			}

@@ -57,6 +57,7 @@ const mouseWheelZoomXSensitivity = 0.01
 const mouseWheelZoomYSensitivity = 0.01
 const middleMousePanXSensitivity = 0.001
 const middleMousePanYSensitivity = 0.001
+const leftZoomSensitivity = 0.01
 
 const rows = new Array(128).fill(0).map((_, i) => midiNoteToNoteNameFull(i))
 
@@ -89,6 +90,9 @@ export const BetterSequencer = React.memo(function _BetterSequencer({id}: Props)
 
 	// Middle mouse pan
 	const [middleMouseActive, activateMiddleMouse, deactivateMiddleMouse] = useBoolean(false)
+
+	// Left Zoom Pan Bar
+	const [leftZoomPanActive, activateLeftZoomPan, deactivateLeftZoomPan] = useBoolean(false)
 
 	const editorElement = useRef<HTMLDivElement>(null)
 
@@ -375,6 +379,54 @@ export const BetterSequencer = React.memo(function _BetterSequencer({id}: Props)
 		}
 	}, [activateMiddleMouse, deactivateMiddleMouse, dispatch, id, maxPanY, middleMouseActive, pan, zoom])
 
+	// Left Zoom Pan Bar
+	const onLeftZoomPanBarMouseDown = useCallback((e: React.MouseEvent) => {
+		if (e.button === 0) {
+			activateLeftZoomPan()
+		}
+	}, [activateLeftZoomPan])
+
+	useLayoutEffect(() => {
+		if (!leftZoomPanActive) return
+
+		const onMouseUp = (e: MouseEvent) => {
+			if (e.button === 0) {
+				deactivateLeftZoomPan()
+			}
+		}
+
+		const onMouseMove = (e: MouseEvent) => {
+			if (e.buttons !== 1) return deactivateLeftZoomPan()
+
+			const zoomedMovement = makeMouseMovementAccountForGlobalZoom(
+				{x: e.movementX, y: e.movementY})
+
+			dispatch(sequencerActions.setPan(id, {
+				x: pan.x,
+				y: zoom.y === 1
+					? pan.y
+					: clamp(
+						pan.y + -zoomedMovement.y / maxPanY,
+						minPan, maxPan),
+			}))
+
+			dispatch(sequencerActions.setZoom(id, {
+				x: zoom.x,
+				y: clamp(
+					zoom.y - (zoomedMovement.x * leftZoomSensitivity),
+					minZoomY, maxZoomY),
+			}))
+		}
+
+		window.addEventListener('mousemove', onMouseMove)
+		window.addEventListener('mouseup', onMouseUp)
+
+		return () => {
+			window.removeEventListener('mousemove', onMouseMove)
+			window.removeEventListener('mouseup', onMouseUp)
+		}
+	}, [activateLeftZoomPan, deactivateLeftZoomPan, dispatch, id, maxPanY, leftZoomPanActive, pan, zoom])
+
 	const columnWidth = (fixedWidth * zoom.x) / lengthBeats
 
 	const selectAll = useCallback(() => {
@@ -580,7 +632,7 @@ export const BetterSequencer = React.memo(function _BetterSequencer({id}: Props)
 			`}
 		>
 			<BetterSequencerControls {...{id}} />
-			<BetterSideNotes {...{id, rows, panPixelsY: panPixels.y, noteHeight}} />
+			<BetterSideNotes {...{id, rows, panPixelsY: panPixels.y, noteHeight, onLeftZoomPanBarMouseDown}} />
 			<div
 				className="editor"
 				ref={editorElement}

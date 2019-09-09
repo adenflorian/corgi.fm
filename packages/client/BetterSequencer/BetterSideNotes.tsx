@@ -1,9 +1,12 @@
-import React, {useCallback, Fragment, useState} from 'react'
+import React, {useCallback, Fragment} from 'react'
 import {Set} from 'immutable'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {betterSideNotesWidth, smallNoteHeight} from '@corgifm/common/BetterConstants'
 import {useDispatch, useSelector} from 'react-redux'
-import {localActions, createAnimationFrameSelector, createAnimationFlagSelector, IClientAppState, selectOptions, animationActions} from '@corgifm/common/redux'
+import {
+	localActions, createAnimationFlagSelector,
+	IClientAppState, selectOptions, animationActions,
+} from '@corgifm/common/redux'
 import {isWhiteKey} from '../Keyboard/Keyboard'
 
 interface Props {
@@ -11,10 +14,11 @@ interface Props {
 	rows: string[]
 	panPixelsY: number
 	noteHeight: number
+	onLeftZoomPanBarMouseDown: (e: React.MouseEvent) => void
 }
 
 export const BetterSideNotes = React.memo(function _BetterSideNotes({
-	id, rows, panPixelsY, noteHeight,
+	id, rows, panPixelsY, noteHeight, onLeftZoomPanBarMouseDown,
 }: Props) {
 	return (
 		<div
@@ -27,13 +31,20 @@ export const BetterSideNotes = React.memo(function _BetterSideNotes({
 				className="transformable"
 				style={{
 					transform: `translateY(${-panPixelsY}px)`,
+					height: noteHeight * rows.length,
 				}}
 			>
-				<BetterSideNotesArray
-					id={id}
-					rows={rows}
-					noteHeight={noteHeight}
+				<div
+					className="leftPanZoom"
+					onMouseDown={onLeftZoomPanBarMouseDown}
 				/>
+				<div className="rows">
+					<BetterSideNotesArray
+						id={id}
+						rows={rows}
+						noteHeight={noteHeight}
+					/>
+				</div>
 			</div>
 		</div>
 	)
