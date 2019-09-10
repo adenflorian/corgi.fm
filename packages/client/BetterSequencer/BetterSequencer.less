@@ -5,7 +5,7 @@
 	border-bottom-right-radius: 8px;
 }
 
-@zoomBarWidth: 40px;
+@zoomBarWidth: 36px;
 @notesWidth: 16px;
 @noteNameFont: {
 	font-size: 14px;
@@ -34,6 +34,8 @@
 
 	.sideNotes {
 		position: relative;
+		overflow: hidden;
+		min-width: @zoomBarWidth + @notesWidth;
 
 		.transformable {
 			width: 100%;
@@ -244,7 +246,7 @@
 					border: 2px solid @panelGrayDark;
 					box-sizing: border-box;
 					margin-bottom: 1px;
-					min-width: 4px;
+					min-width: 1px;
 					// border-top: none;
 					// border-bottom: none;
 
