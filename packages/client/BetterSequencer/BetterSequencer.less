@@ -53,6 +53,16 @@
 					// margin: 2px 0;
 					margin-bottom: 1px;
 					position: relative;
+
+					&::after {
+						background-color: @panelGrayDark;
+						width: 100%;
+						height: 1px;
+						content: '';
+						position: absolute;
+						left: 0;
+  					bottom: -1px;
+					}
 					
 					&.white {
 						background-color: @defaultGray;
@@ -79,7 +89,6 @@
 						font-size: @noteNameFontSize;
 						display: flex;
 						align-items: flex-end;
-						height: 100%;
 						opacity: 0;
 						@leftPadding: 4px;
 						padding-left: @leftPadding;
@@ -89,6 +98,8 @@
 						color: @knobValueGray;
 						width: @zoomBarWidth - @leftPadding;
 						border-bottom: 1px solid @panelGrayDark;
+						height: 16px;
+						bottom: -1px;
 					}
 	
 					&:hover {
@@ -231,6 +242,10 @@
 					min-width: 4px;
 					// border-top: none;
 					// border-bottom: none;
+
+					.zoomCloser & {
+						border-width: 1px;
+					}
 					
 					.ctrl-true.alt-true & {
 						pointer-events: none;

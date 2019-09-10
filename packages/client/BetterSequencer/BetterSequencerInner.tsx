@@ -407,7 +407,7 @@ export const BetterSequencerInner = React.memo(function _BetterSequencerInner({i
 			dispatch(sequencerActions.setZoomAndPan(id, {
 				x: zoom.x,
 				y: clamp(
-					startPoint.y + (zoomedMovement.x * leftZoomSensitivity),
+					startPoint.y + (newPersistentDelta.x * leftZoomSensitivity),
 					minZoomY, maxZoomY),
 			}, {
 				x: pan.x,

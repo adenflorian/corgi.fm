@@ -113,6 +113,8 @@ export const BetterSideNote = React.memo(({
 				className="rowLabel"
 				style={{
 					opacity: isC ? 1 : undefined,
+					zIndex: isC ? 0 : 1,
+					backgroundColor: isC ? undefined : CssColor.panelGray,
 					// color: isWhite ? CssColor.panelGrayDark : CssColor.defaultGray,
 				}}
 			>
