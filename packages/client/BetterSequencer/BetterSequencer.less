@@ -5,9 +5,13 @@
 	border-bottom-right-radius: 8px;
 }
 
-@noteNameFontSize: 16px;
 @zoomBarWidth: 40px;
 @notesWidth: 16px;
+@noteNameFont: {
+	font-size: 14px;
+	font-weight: 600;
+	letter-spacing: 1px;
+}
 
 .betterSequencer {
 	.controls {
@@ -86,9 +90,9 @@
 	
 					.rowLabel {
 						.largeFont();
-						font-size: @noteNameFontSize;
+						@noteNameFont();
 						display: flex;
-						align-items: flex-end;
+						align-items: center;
 						opacity: 0;
 						@leftPadding: 4px;
 						padding-left: @leftPadding;
@@ -98,8 +102,9 @@
 						color: @knobValueGray;
 						width: @zoomBarWidth - @leftPadding;
 						border-bottom: 1px solid @panelGrayDark;
-						height: 16px;
+						min-height: 16px;
 						bottom: -1px;
+						box-shadow: -4px -4px 4px 0px @panelGray;
 					}
 	
 					&:hover {
@@ -257,7 +262,7 @@
 
 					.noteLabel {
 						.largeFont();
-						font-size: @noteNameFontSize;
+						@noteNameFont();
 						color: @panelGrayDark;
 						text-align: left;
 						line-height: normal;
@@ -267,7 +272,6 @@
 						align-items: center;
 						pointer-events: none;
 						overflow: hidden;
-						font-weight: 600;
 					}
 				}
 			}

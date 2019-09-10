@@ -115,6 +115,7 @@ export const BetterSideNote = React.memo(({
 					opacity: isC ? 1 : undefined,
 					zIndex: isC ? 0 : 1,
 					backgroundColor: isC ? undefined : CssColor.panelGray,
+					height: noteHeight - 1,
 					// color: isWhite ? CssColor.panelGrayDark : CssColor.defaultGray,
 				}}
 			>
