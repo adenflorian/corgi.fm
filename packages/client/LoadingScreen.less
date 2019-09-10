@@ -13,6 +13,7 @@
 	line-height: normal;
 	position: fixed;
 	background-color: @appBackground;
+	background-image: radial-gradient(circle at left, hsla(0, 0%, 7%, 1), hsl(0, 0%, 5%) 70%);
 	z-index: 99999999;
 	opacity: 0;
 	transition: opacity 0.5s;
@@ -30,6 +31,10 @@
 
 	.corgi {
 		color: @brightBlue;
+		background: linear-gradient(@brightBlue, hsla(196, 100%, 50%));
+		background-clip: text;
+		-webkit-text-fill-color: transparent;
+		font-size: 2em;
 	}
 
 	.message {
