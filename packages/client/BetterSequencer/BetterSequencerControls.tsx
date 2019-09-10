@@ -114,7 +114,7 @@ export const BetterSequencerControls = React.memo(function _BetterSequencerContr
 					tooltip={`zoom x`}
 					value={zoom.x}
 				/>
-				<Knob
+				{/* <Knob
 					defaultValue={1}
 					label={`Zoom Y`}
 					min={minZoomY}
@@ -122,7 +122,7 @@ export const BetterSequencerControls = React.memo(function _BetterSequencerContr
 					onChange={setZoomY}
 					tooltip={`zoom Y`}
 					value={zoom.y}
-				/>
+				/> */}
 				<Knob
 					defaultValue={1}
 					label={`Pan X`}
@@ -133,7 +133,7 @@ export const BetterSequencerControls = React.memo(function _BetterSequencerContr
 					value={pan.x}
 					valueString={percentageValueString}
 				/>
-				<Knob
+				{/* <Knob
 					defaultValue={1}
 					label={`Pan Y`}
 					min={minPan}
@@ -142,7 +142,7 @@ export const BetterSequencerControls = React.memo(function _BetterSequencerContr
 					tooltip={`pan Y`}
 					value={pan.y}
 					valueString={percentageValueString}
-				/>
+				/> */}
 			</div>
 		</div>
 	)

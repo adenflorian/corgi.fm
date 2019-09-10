@@ -6,6 +6,8 @@
 }
 
 @noteNameFontSize: 16px;
+@zoomBarWidth: 40px;
+@notesWidth: 16px;
 
 .betterSequencer {
 	.controls {
@@ -36,12 +38,12 @@
 			.leftPanZoom {
 				cursor: zoom-in;
 				height: 100%;
-				width: 50%;
-				background-color: @panelGrayDark;
+				width: @zoomBarWidth;
+				background-color: @panelGray;
 			}
 
 			.rows {
-				width: 50%;
+				width: @notesWidth;
 				display: flex;
 				flex-direction: column-reverse;
 
@@ -50,6 +52,7 @@
 					// box-sizing: border-box;
 					// margin: 2px 0;
 					margin-bottom: 1px;
+					position: relative;
 					
 					&.white {
 						background-color: @defaultGray;
@@ -75,12 +78,21 @@
 						.largeFont();
 						font-size: @noteNameFontSize;
 						display: flex;
-						align-items: center;
+						align-items: flex-end;
 						height: 100%;
 						opacity: 0;
-						padding-left: 4px;
+						@leftPadding: 4px;
+						padding-left: @leftPadding;
+						position: absolute;
+						left: -@zoomBarWidth;
+						pointer-events: none;
+						color: @knobValueGray;
+						width: @zoomBarWidth - @leftPadding;
+						border-bottom: 1px solid @panelGrayDark;
+					}
 	
-						&:hover {
+					&:hover {
+						.rowLabel {
 							opacity: 1;
 						}
 					}

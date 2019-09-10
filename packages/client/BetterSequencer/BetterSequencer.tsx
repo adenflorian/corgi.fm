@@ -5,9 +5,9 @@ import {useSelector, useDispatch} from 'react-redux'
 import {OrderedMap, Set} from 'immutable'
 import {stripIndents, oneLine} from 'common-tags'
 import {
-	createPositionColorSelector, createBetterSeqIsRecordingSelector,
+	createBetterSeqIsRecordingSelector,
 	createBetterSeqIsPlayingSelector, createBetterSeqRateSelector, getNodeInfo,
-	createBetterSeqLengthSelector, createBetterSeqZoomSelector,
+	createBetterSeqZoomSelector,
 	createBetterSeqMidiClipSelector, createBetterSeqPanSelector,
 	createPositionHeightSelector, createPositionWidthSelector, sequencerActions,
 	betterSequencerActions, createPositionXSelector, createPositionYSelector,
@@ -93,6 +93,11 @@ export const BetterSequencer = React.memo(function _BetterSequencer({id}: Props)
 
 	// Left Zoom Pan Bar
 	const [leftZoomPanActive, activateLeftZoomPan, deactivateLeftZoomPan] = useBoolean(false)
+
+	// Common state
+	const [persistentDelta, setPersistentDelta] = useState({x: 0, y: 0})
+	const [startPoint, setStartPoint] = useState({x: 0, y: 0})
+	const [firstMouseMove, setFirstMouseMove] = useState(false)
 
 	const editorElement = useRef<HTMLDivElement>(null)
 
@@ -383,6 +388,8 @@ export const BetterSequencer = React.memo(function _BetterSequencer({id}: Props)
 	const onLeftZoomPanBarMouseDown = useCallback((e: React.MouseEvent) => {
 		if (e.button === 0) {
 			activateLeftZoomPan()
+			setPersistentDelta({x: 0, y: 0})
+			setFirstMouseMove(false)
 		}
 	}, [activateLeftZoomPan])
 
@@ -398,24 +405,32 @@ export const BetterSequencer = React.memo(function _BetterSequencer({id}: Props)
 		const onMouseMove = (e: MouseEvent) => {
 			if (e.buttons !== 1) return deactivateLeftZoomPan()
 
-			const zoomedMovement = makeMouseMovementAccountForGlobalZoom(
-				{x: e.movementX, y: e.movementY})
+			if (!firstMouseMove) {
+				setFirstMouseMove(true)
+				return setStartPoint({x: pan.y, y: zoom.y})
+			}
+
+			const newPersistentDelta = {x: persistentDelta.x + e.movementX, y: persistentDelta.y + e.movementY}
+
+			const zoomedMovement = makeMouseMovementAccountForGlobalZoom(newPersistentDelta)
 
 			dispatch(sequencerActions.setPan(id, {
 				x: pan.x,
 				y: zoom.y === 1
 					? pan.y
 					: clamp(
-						pan.y + -zoomedMovement.y / maxPanY,
+						startPoint.x + -zoomedMovement.y / maxPanY,
 						minPan, maxPan),
 			}))
 
 			dispatch(sequencerActions.setZoom(id, {
 				x: zoom.x,
 				y: clamp(
-					zoom.y - (zoomedMovement.x * leftZoomSensitivity),
+					startPoint.y + (zoomedMovement.x * leftZoomSensitivity),
 					minZoomY, maxZoomY),
 			}))
+
+			setPersistentDelta(newPersistentDelta)
 		}
 
 		window.addEventListener('mousemove', onMouseMove)
@@ -425,7 +440,7 @@ export const BetterSequencer = React.memo(function _BetterSequencer({id}: Props)
 			window.removeEventListener('mousemove', onMouseMove)
 			window.removeEventListener('mouseup', onMouseUp)
 		}
-	}, [activateLeftZoomPan, deactivateLeftZoomPan, dispatch, id, maxPanY, leftZoomPanActive, pan, zoom])
+	}, [activateLeftZoomPan, deactivateLeftZoomPan, dispatch, id, maxPanY, leftZoomPanActive, pan, zoom, persistentDelta, firstMouseMove, startPoint])
 
 	const columnWidth = (fixedWidth * zoom.x) / lengthBeats
 

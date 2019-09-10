@@ -21,17 +21,13 @@ export const BetterSideNotes = React.memo(function _BetterSideNotes({
 	id, rows, panPixelsY, noteHeight, onLeftZoomPanBarMouseDown,
 }: Props) {
 	return (
-		<div
-			className="sideNotes"
-			style={{
-				width: betterSideNotesWidth,
-			}}
-		>
+		<div className="sideNotes">
 			<div
 				className="transformable"
 				style={{
 					transform: `translateY(${-panPixelsY}px)`,
 					height: noteHeight * rows.length,
+					width: betterSideNotesWidth,
 				}}
 			>
 				<div
@@ -109,15 +105,15 @@ export const BetterSideNote = React.memo(({
 			className={`row ${animClass} ${isWhite ? 'white' : 'black'}`}
 			style={{
 				height: noteHeight - 1,
-				fontWeight: isWhite ? 600 : 400,
+				// fontWeight: isWhite ? 600 : 400,
 			}}
 			onMouseDown={onClick}
 		>
 			<div
 				className="rowLabel"
 				style={{
-					opacity: isSmall ? 0 : isC ? 1 : undefined,
-					color: isWhite ? CssColor.panelGrayDark : CssColor.defaultGray,
+					opacity: isC ? 1 : undefined,
+					// color: isWhite ? CssColor.panelGrayDark : CssColor.defaultGray,
 				}}
 			>
 				{row}
