@@ -35,20 +35,20 @@ export const BetterSequencerControls = React.memo(function _BetterSequencerContr
 	const dispatch = useDispatch()
 
 	const setZoomX = useCallback((_, newZoomX: number) => {
-		dispatch(sequencerActions.setZoom(id, {...zoom, x: newZoomX}))
-	}, [dispatch, id, zoom])
+		dispatch(sequencerActions.setZoom(id, {x: newZoomX}))
+	}, [dispatch, id])
 
 	const setZoomY = useCallback((_, newZoomY: number) => {
-		dispatch(sequencerActions.setZoom(id, {...zoom, y: newZoomY}))
-	}, [dispatch, id, zoom])
+		dispatch(sequencerActions.setZoom(id, {y: newZoomY}))
+	}, [dispatch, id])
 
 	const setPanX = useCallback((_, newPanX: number) => {
-		dispatch(sequencerActions.setPan(id, {...pan, x: newPanX}))
-	}, [dispatch, id, pan])
+		dispatch(sequencerActions.setPan(id, {x: newPanX}))
+	}, [dispatch, id])
 
 	const setPanY = useCallback((_, newPanY: number) => {
-		dispatch(sequencerActions.setPan(id, {...pan, y: newPanY}))
-	}, [dispatch, id, pan])
+		dispatch(sequencerActions.setPan(id, {y: newPanY}))
+	}, [dispatch, id])
 
 	const dispatchBetterSeqParam = useCallback(
 		(paramType: BetterSequencerFields, value: number | boolean | string) =>

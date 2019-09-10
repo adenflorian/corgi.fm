@@ -225,20 +225,32 @@ const betterSequencerReducer =
 			case 'SET_SEQUENCER_ZOOM': {
 				return {
 					...betterSequencer,
-					zoom: action.zoom,
+					zoom: {
+						...betterSequencer.zoom,
+						...action.zoom,
+					},
 				}
 			}
 			case 'SET_SEQUENCER_PAN': {
-				if (Number.isNaN(action.pan.x) || Number.isNaN(action.pan.y)) {
-					logger.error(`[SET_SEQUENCER_PAN] isNaN(action.pan.?): `, {action})
-					return {
-						...betterSequencer,
-						pan: {x: 0, y: 0},
-					}
-				}
 				return {
 					...betterSequencer,
-					pan: action.pan,
+					pan: {
+						...betterSequencer.pan,
+						...action.pan,
+					},
+				}
+			}
+			case 'SET_SEQUENCER_ZOOM_AND_PAN': {
+				return {
+					...betterSequencer,
+					zoom: {
+						...betterSequencer.zoom,
+						...action.zoom,
+					},
+					pan: {
+						...betterSequencer.pan,
+						...action.pan,
+					},
 				}
 			}
 			case 'TOGGLE_SEQUENCER_RECORDING': return {...betterSequencer, isRecording: action.isRecording}

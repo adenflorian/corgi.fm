@@ -63,7 +63,7 @@ export function createNodeId() {
 	return uuid.v4()
 }
 
-export const clamp = (val: number, min: number, max: number) => Math.min(max, Math.max(min, val))
+export const clamp = (val: number, min: number, max: number) => Math.min(max || 0, Math.max(min || 0, val || 0))
 
 export const incrementalRound = (v: number, increment: number) => Math.round(v / increment) * increment
 

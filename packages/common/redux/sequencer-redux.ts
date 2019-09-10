@@ -87,16 +87,24 @@ export const sequencerActions = {
 		BROADCASTER_ACTION,
 		SERVER_ACTION,
 	} as const),
-	setZoom: (id: Id, zoom: Point) => ({
+	setZoom: (id: Id, zoom: Partial<Point>) => ({
 		type: 'SET_SEQUENCER_ZOOM',
 		id,
 		zoom,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	} as const),
-	setPan: (id: Id, pan: Point) => ({
+	setPan: (id: Id, pan: Partial<Point>) => ({
 		type: 'SET_SEQUENCER_PAN',
 		id,
+		pan,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	} as const),
+	setZoomAndPan: (id: Id, zoom: Partial<Point>, pan: Partial<Point>) => ({
+		type: 'SET_SEQUENCER_ZOOM_AND_PAN',
+		id,
+		zoom,
 		pan,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
@@ -122,6 +130,7 @@ export const sequencerActionTypes2: SequencerActionTypes = {
 	SET_SEQUENCER_ZOOM: 0,
 	SET_SEQUENCER_PAN: 0,
 	SEQUENCER_SAVE_UNDO: 0,
+	SET_SEQUENCER_ZOOM_AND_PAN: 0,
 }
 
 export type SequencerAction = ActionType<typeof sequencerActions>
