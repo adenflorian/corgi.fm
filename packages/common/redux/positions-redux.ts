@@ -225,11 +225,6 @@ export const selectAllPositionsAsArray = createSelector(
 	positions => positions.toIndexedSeq().toArray(),
 )
 
-export const selectAllPositionIds = createSelector(
-	selectAllPositions,
-	positions => positions.keySeq(),
-)
-
 export const selectPositionsWithIds = (state: IClientRoomState, ids: Id[]) => {
 	return selectAllPositionsAsArray(state)
 		.filter(x => ids.includes(x.id))
