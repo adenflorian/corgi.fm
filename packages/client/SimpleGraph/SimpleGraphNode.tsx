@@ -106,6 +106,7 @@ export function SimpleGraphNode(props: ISimpleGraphNodeAllProps) {
 				height: height + panelHeaderHeight,
 				zIndex,
 				top: -panelHeaderHeight,
+				transition: dragging ? undefined : 'transform 0.1s',
 			}}
 			onMouseDown={handleMouseDown}
 		>
