@@ -292,6 +292,12 @@
 - [ ] start playing when space bar is lifted, if user hold space, then play note, start playing with that note
 	- similar to starting recordings on OP-1
 
+**Chrome 77 - Envelope Rewrite**
+- [ ] address TODOs
+- [ ] able to change envelope while note is playing
+- [ ] fixed number of voices
+- [ ] reuse all nodes (oscillator/gain/pan/filter)
+
 - [ ] make velocity affect keyboard note visual
 - [ ] put node version in package json so nvm can use it
 - [ ] don't show connect keyboard menu item if keyboard is already connected

@@ -159,7 +159,6 @@
 
 ### GridSequencer
 - [ ] make size adjustable
-	- use react-draggable
 	- drop down with size options?
 - [√] global play button
 - [ ] input notes from keyboard

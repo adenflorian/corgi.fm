@@ -22,7 +22,6 @@
 		"react": "^16.8.6",
 		"react-contextmenu": "^2.11.0",
 		"react-dom": "npm:@hot-loader/react-dom",
-		"react-draggable": "^3.2.1",
 		"react-ga": "^2.5.6",
 		"react-hot-loader": "^4.8.3",
 		"react-icons": "^3.3.0",

@@ -1,8 +1,6 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
-import React from 'react'
+import React, {useCallback, useMemo, useState, useLayoutEffect} from 'react'
 import {ContextMenuTrigger} from 'react-contextmenu'
-import Draggable, {DraggableEventHandler} from 'react-draggable'
-import {Dispatch} from 'redux'
 import {ConnectionNodeType} from '@corgifm/common/common-types'
 import {
 	findNodeInfo, IPosition, movePosition,
@@ -11,6 +9,7 @@ import {
 	shamuConnect, shamuMetaActions,
 } from '@corgifm/common/redux'
 import {panelHeaderHeight} from '@corgifm/common/common-constants'
+import {useDispatch} from 'react-redux'
 import {BasicSampler} from '../BasicSampler/BasicSampler'
 import {graphSizeX, graphSizeY, handleClassName, nodeMenuId} from '../client-constants'
 import {ECSSequencerRenderSystem} from '../ECS/ECSSequencerRenderSystem'
@@ -39,97 +38,119 @@ interface ISimpleGraphNodeReduxProps {
 	isSelected: boolean
 }
 
-type ISimpleGraphNodeAllProps = ISimpleGraphNodeProps & ISimpleGraphNodeReduxProps & {dispatch: Dispatch}
+type ISimpleGraphNodeAllProps = ISimpleGraphNodeProps & ISimpleGraphNodeReduxProps
 
-export class SimpleGraphNode extends React.PureComponent<ISimpleGraphNodeAllProps> {
-	public render() {
-		const {
-			positionId, color, highQuality,
-			position, fancyZoomPan, isSelected,
-		} = this.props
+export function SimpleGraphNode(props: ISimpleGraphNodeAllProps) {
+	const {
+		positionId, color, highQuality,
+		position, fancyZoomPan, isSelected,
+	} = props
 
-		const {x, y, width, height, targetType, zIndex} = position
+	const {x, y, width, height, targetType, zIndex} = position
 
-		return (
-			<Draggable
-				enableUserSelectHack={false}
-				onDrag={this._handleDrag}
-				position={{
-					x,
-					y,
-				}}
-				scale={simpleGlobalClientState.zoom}
-				bounds={{
-					top: -(graphSizeY / 2),
-					right: (graphSizeX / 2),
-					bottom: (graphSizeY / 2),
-					left: -(graphSizeX / 2),
-				}}
-				handle={`.${handleClassName}`}
-				cancel={`.noDrag, .panel`}
-			>
-				<div
-					className={`simpleGraphNode ${isSelected ? 'selectedNode' : ''}`}
-					onBlur={() => this.props.dispatch(shamuMetaActions.clearSelectedNode())}
-					// TODO
-					tabIndex={0}
-					onFocus={this._handleMouseDown}
-					style={{
-						position: 'absolute',
-						willChange: fancyZoomPan ? '' : 'transform',
-						width,
-						height: height + panelHeaderHeight,
-						zIndex,
-						top: -panelHeaderHeight,
-					}}
-				>
-					{
-						// @ts-ignore disableIfShiftIsPressed
+	const dispatch = useDispatch()
+
+	const handleFocus = useCallback(() => {
+		dispatch(nodeClicked(positionId))
+		dispatch(shamuMetaActions.setSelectedNode({id: positionId, type: position.targetType}))
+	}, [dispatch, position.targetType, positionId])
+
+	const onBlur = useCallback(() => {
+		dispatch(shamuMetaActions.clearSelectedNode())
+	}, [dispatch])
+
+	const [dragging, setDragging] = useState(false)
+
+	const handleMouseDown = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+		const target = e.target as HTMLElement
+		if (target.className && target.className.includes(handleClassName)) {
+			setDragging(true)
+		}
+	}, [])
+
+	useLayoutEffect(() => {
+		if (!dragging) return
+
+		const onMouseMove = (e: MouseEvent) => {
+			dispatch(movePosition(positionId, {
+				x: x + (e.movementX / simpleGlobalClientState.zoom),
+				y: y + (e.movementY / simpleGlobalClientState.zoom),
+			}))
+		}
+
+		const onMouseUp = () => {
+			setDragging(false)
+		}
+
+		window.addEventListener('mousemove', onMouseMove)
+		window.addEventListener('mouseup', onMouseUp)
+
+		return () => {
+			window.removeEventListener('mousemove', onMouseMove)
+			window.removeEventListener('mouseup', onMouseUp)
+		}
+	}, [dispatch, dragging, positionId, x, y])
+
+	return (
+		<div
+			className={`simpleGraphNode ${isSelected ? 'selectedNode' : ''}`}
+			onBlur={onBlur}
+				// TODO
+			tabIndex={0}
+			onFocus={handleFocus}
+			style={{
+				transform: `translate(${x}px, ${y}px)`,
+				position: 'absolute',
+				willChange: fancyZoomPan ? '' : 'transform',
+				width,
+				height: height + panelHeaderHeight,
+				zIndex,
+				top: -panelHeaderHeight,
+			}}
+			onMouseDown={handleMouseDown}
+		>
+			{
+				useMemo(() => {
+					return (
+					// @ts-ignore disableIfShiftIsPressed
 						<ContextMenuTrigger
 							id={nodeMenuId}
 							disableIfShiftIsPressed={true}
 							holdToDisplay={-1}
 							nodeId={positionId}
 							nodeType={targetType}
-							collect={({nodeId, nodeType}) => ({
-								nodeId,
-								nodeType,
-							})}
+							collect={collect}
 						>
 							{getComponentByNodeType(targetType, positionId, color)}
 						</ContextMenuTrigger>
-					}
-					<canvas
-						id={ECSSequencerRenderSystem.canvasIdPrefix + positionId}
-						style={{
-							position: 'absolute',
-							width,
-							height,
-							bottom: 0,
-							left: 0,
-							pointerEvents: 'none',
-							zIndex: 999999,
-							display: highQuality ? undefined : 'none',
-						}}
-						width={width}
-						height={height}
-					/>
-				</div>
-			</Draggable>
-		)
-	}
-
-	private readonly _handleDrag: DraggableEventHandler = (_, data) => {
-		this.props.dispatch(movePosition(this.props.positionId, {x: data.x, y: data.y}))
-	}
-
-	private readonly _handleMouseDown = () => {
-		this.props.dispatch(nodeClicked(this.props.positionId))
-		this.props.dispatch(shamuMetaActions.setSelectedNode({id: this.props.positionId, type: this.props.position.targetType}))
-	}
+					)
+				}, [color, positionId, targetType])
+			}
+			<canvas
+				id={ECSSequencerRenderSystem.canvasIdPrefix + positionId}
+				style={{
+					position: 'absolute',
+					width,
+					height,
+					bottom: 0,
+					left: 0,
+					pointerEvents: 'none',
+					zIndex: 999999,
+					display: highQuality ? undefined : 'none',
+				}}
+				width={width}
+				height={height}
+			/>
+		</div>
+	)
 }
 
-export function getComponentByNodeType(type: ConnectionNodeType, id: Id, color: string) {
+const collect = ({nodeId, nodeType}: any) => ({
+	nodeId,
+	nodeType,
+})
+
+function getComponentByNodeType(type: ConnectionNodeType, id: Id, color: string) {
 	switch (type) {
 		case ConnectionNodeType.masterClock: return <ConnectedMasterControls color={color} />
 		case ConnectionNodeType.audioOutput: return <ConnectedVolumeControl color={color} />
