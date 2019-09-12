@@ -29,6 +29,17 @@ export function editorSpaceToPercentages(
 	return panSpace
 }
 
+export function editorOffsetSpaceToPercentages(
+	editorOffsetSpace: Point, scaledWidth: number, scaledHeight: number,
+): Point {
+	const panSpace = {
+		x: editorOffsetSpace.x / scaledWidth,
+		y: editorOffsetSpace.y / scaledHeight,
+	}
+
+	return panSpace
+}
+
 export function clientSpaceToEditorSpace(
 	clientSpace: Point, nodePosition: Point,
 ) {

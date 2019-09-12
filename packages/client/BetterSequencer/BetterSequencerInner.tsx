@@ -37,6 +37,7 @@ import {
 	clientSpaceToPercentages, getMaxPan, eventToNote, editorSpaceToPercentages,
 	clientSpaceToEditorSpace,
 	TimeSelect,
+	editorOffsetSpaceToPercentages,
 } from './BetterSequencerHelpers'
 import {BetterSideNotes} from './BetterSideNotes'
 
@@ -187,15 +188,19 @@ export const BetterSequencerInner = React.memo(function _BetterSequencerInner({i
 				editorElementNotNull.removeEventListener('wheel', onWheel)
 			}
 		}
-	}, [dispatch, height, id, maxPanX, maxPanY, pan, panPixels, width, x, y, zoom])
+	}, [dispatch, id, pan, zoom])
 
 	// Double click events
 	useEffect(() => {
+		const editorElementNotNull = editorElement.current
+
+		if (editorElementNotNull === null) return
+
 		const onDoubleClick = (e: MouseEvent) => {
 			e.preventDefault()
 			e.stopPropagation()
 
-			const bar = clientMousePositionToPercentages({x: e.clientX, y: e.clientY})
+			const bar = editorOffsetSpaceToPercentages({x: e.offsetX, y: e.offsetY}, scaledWidth, scaledHeight)
 
 			const newDuration = 1
 			const note = clamp((rows.length - 1) - Math.floor(bar.y * rows.length), MIN_MIDI_NOTE_NUMBER_0, MAX_MIDI_NOTE_NUMBER_127)
@@ -213,10 +218,6 @@ export const BetterSequencerInner = React.memo(function _BetterSequencerInner({i
 			removeDuplicateEvents()
 		}
 
-		const editorElementNotNull = editorElement.current
-
-		if (editorElementNotNull === null) return
-
 		if (editorElementNotNull) {
 			editorElementNotNull.addEventListener('dblclick', onDoubleClick)
 		}
@@ -226,7 +227,7 @@ export const BetterSequencerInner = React.memo(function _BetterSequencerInner({i
 				editorElementNotNull.removeEventListener('dblclick', onDoubleClick)
 			}
 		}
-	}, [clientMousePositionToPercentages, dispatch, id, lengthBeats, removeDuplicateEvents])
+	}, [dispatch, id, lengthBeats, removeDuplicateEvents, scaledHeight, scaledWidth])
 
 	// Box Select
 	useLayoutEffect(() => {
