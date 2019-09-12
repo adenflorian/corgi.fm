@@ -330,6 +330,7 @@
 	- [ ] snap nodes together
 	- [ ] when moving a node that is snapped to other nodes, move all of them together
 
+- [ ] make connector placeholders a child of the node so they dont have to update whenever parent position changes
 - [ ] ask the user's experience level
 - [ ] ask what the user wants to use corgi for
 - [ ] feedback thru sentry

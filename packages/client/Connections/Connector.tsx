@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useMemo, Fragment} from 'react'
 import {CssColor} from '@corgifm/common/shamu-color'
 
 interface ConnectorProps {
@@ -18,7 +18,7 @@ export const Connector: React.FC<ConnectorProps> =
 		isPlaceHolderForNewConnection, title,
 	}) {
 		return (
-			<React.Fragment>
+			<Fragment>
 				<svg
 					{...svgProps}
 					className={`colorize connector ${saturate ? 'saturate' : ''} ${svgProps.className}`}
@@ -26,45 +26,48 @@ export const Connector: React.FC<ConnectorProps> =
 					style={{
 						width,
 						height,
-						top: y - (height / 2),
-						left: x,
+						transform: `translate(${x}px, ${y - (height / 2)}px)`,
 						opacity: isPlaceHolderForNewConnection
 							? 0.5
 							: 1,
 						...svgProps.style,
 					}}
 				>
-					{title && <title>{title}</title>}
-					<line
-						x1={0}
-						y1={height / 2}
-						x2={width}
-						y2={height / 2}
-						strokeWidth={height}
-						strokeLinecap="round"
-					/>
-					{isPlaceHolderForNewConnection &&
-						<g
-							stroke={CssColor.disabledGray}
-							strokeWidth={2}
-							className="addConnectionPlusSymbol"
-							strokeLinecap="round"
-						>
+					{useMemo(() =>
+						<Fragment>
+							{title && <title>{title}</title>}
 							<line
-								x1={5}
+								x1={0}
 								y1={height / 2}
-								x2={11}
+								x2={width}
 								y2={height / 2}
+								strokeWidth={height}
+								strokeLinecap="round"
 							/>
-							<line
-								x1={width / 2}
-								y1={1}
-								x2={width / 2}
-								y2={7}
-							/>
-						</g>
-					}
+							{isPlaceHolderForNewConnection &&
+							<g
+								stroke={CssColor.disabledGray}
+								strokeWidth={2}
+								className="addConnectionPlusSymbol"
+								strokeLinecap="round"
+							>
+								<line
+									x1={5}
+									y1={height / 2}
+									x2={11}
+									y2={height / 2}
+								/>
+								<line
+									x1={width / 2}
+									y1={1}
+									x2={width / 2}
+									y2={7}
+								/>
+							</g>
+							}
+						</Fragment>,
+					[height, isPlaceHolderForNewConnection, title, width])}
 				</svg>
-			</React.Fragment>
+			</Fragment>
 		)
 	})
