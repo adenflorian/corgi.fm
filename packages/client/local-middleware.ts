@@ -63,7 +63,7 @@ let _localSustainedNotes = Map<number, IMidiNotes>()
 export function createLocalMiddleware(
 	getAllInstruments: GetAllInstruments, firebase: FirebaseContextStuff
 ): Middleware<{}, IClientAppState> {
-	return ({dispatch, getState}) => next => async (action: LocalMiddlewareActions) => {
+	return ({dispatch, getState}) => next => async function localMiddleware(action: LocalMiddlewareActions) {
 
 		const beforeState = getState()
 		const localClientId = selectLocalClientId(beforeState)

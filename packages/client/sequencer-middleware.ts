@@ -11,7 +11,7 @@ import {GetAllInstruments} from './instrument-manager'
 export const createSequencerMiddleware = (getAllInstruments: GetAllInstruments) => {
 
 	const sequencerMiddleware: Middleware<{}, IClientAppState> =
-		store => next => (action: SequencerAction) => {
+		store => next => function _sequencerMiddleware(action: SequencerAction) {
 			next(action)
 
 			switch (action.type) {

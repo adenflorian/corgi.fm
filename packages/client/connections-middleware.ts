@@ -16,8 +16,8 @@ type ConnectionClientMiddleWareAction = IConnectionAction | OrganizeGraphAction 
 GhostConnectorAction | PositionAction
 
 // TODO Merge with local middleware?
-export const connectionsClientMiddleware: (getAllInstruments: GetAllInstruments) => Middleware<{}, IClientAppState> =
-	(getAllInstruments: GetAllInstruments) => ({dispatch, getState}) => next => (action: ConnectionClientMiddleWareAction) => {
+export const makeConnectionsClientMiddleware: (getAllInstruments: GetAllInstruments) => Middleware<{}, IClientAppState> =
+	(getAllInstruments: GetAllInstruments) => ({dispatch, getState}) => next => function _connectionsClientMiddleware(action: ConnectionClientMiddleWareAction) {
 
 		const beforeState = getState()
 

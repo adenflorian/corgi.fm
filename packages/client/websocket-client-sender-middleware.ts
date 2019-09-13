@@ -11,7 +11,7 @@ import {WebSocketEvent} from '@corgifm/common/server-constants'
 import {socket} from './websocket-listeners'
 
 export const websocketSenderMiddleware: Middleware<{}, IClientAppState, Dispatch> =
-	({getState}) => next => (action: AnyAction | BroadcastAction) => {
+	({getState}) => next => function _websocketSenderMiddleware(action: AnyAction | BroadcastAction) {
 		next(action)
 
 		// Don't try to send stuff over network if we're not ready (disconnected/offline)
@@ -31,7 +31,7 @@ function isNetworkAction(action: AnyAction | BroadcastAction): boolean {
 	return action[BROADCASTER_ACTION] || action[SERVER_ACTION]
 }
 
-const processNetworkAction = (action: BroadcastAction, getState: () => IClientAppState) => {
+function processNetworkAction(action: BroadcastAction, getState: () => IClientAppState) {
 	const actionToSend = {
 		...action,
 		source: selectLocalSocketId(getState()),

@@ -88,7 +88,7 @@ async function setupAsync() {
 
 	const firebaseContextStuff = initializeFirebase()
 
-	const onReduxMiddleware: Middleware = () => next => action => {
+	const onReduxMiddleware: Middleware = () => next => function onReduxMiddlewareInner(action) {
 		next(action)
 		switch (action.type) {
 			case SET_ACTIVE_ROOM: return onSetActiveRoom()

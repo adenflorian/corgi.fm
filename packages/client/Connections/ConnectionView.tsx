@@ -186,7 +186,7 @@ export function makeStraightPath(line: LineState) {
 }
 
 export const ConnectedConnectionView = shamuConnect(
-	(state: IClientAppState, props: IConnectionViewProps): IConnectionViewReduxProps => {
+	function connectionViewMapStateToProps(state: IClientAppState, props: IConnectionViewProps): IConnectionViewReduxProps {
 		// const globalClockState = selectGlobalClockState(state.room)
 		const connection = selectConnection(state.room, props.id)
 		const isSourceSending = selectConnectionSourceIsSending(state.room, connection.id)

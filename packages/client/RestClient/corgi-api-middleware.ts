@@ -52,7 +52,7 @@ export function createCorgiApiMiddleware(
 
 	const putUserDebounced = debounce(_putUser, 2000)
 
-	return ({dispatch, getState}) => next => async (action: CorgiApiAction) => {
+	return ({dispatch, getState}) => next => async function _corgiApiMiddleware(action: CorgiApiAction) {
 		next(action)
 
 		if (!action.type.startsWith(prefix)) return

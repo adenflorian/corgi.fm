@@ -12,7 +12,7 @@ type AuthMiddleware =
 
 export const createAuthMiddleware: AuthMiddleware =
 	(firebase: FirebaseContextStuff) => ({dispatch, getState}) =>
-		next => async (action: AuthMiddlewareActions) => {
+		next => async function _authMiddleware(action: AuthMiddlewareActions) {
 			next(action)
 
 			switch (action.type) {

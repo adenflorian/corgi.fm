@@ -12,7 +12,7 @@ export function createSamplesManagerMiddleware(
 	samplesManager: SamplesManager,
 ): Middleware<{}, IClientAppState> {
 
-	return ({dispatch, getState}) => next => (action: Actions) => {
+	return ({dispatch, getState}) => next => function _samplesManagerMiddleware(action: Actions) {
 		switch (action.type) {
 			case 'ADD_MULTI_THING':
 			case 'REPLACE_SHAMU_GRAPH_STATE':

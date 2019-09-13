@@ -4,7 +4,7 @@ import {composeWithDevTools} from 'redux-devtools-extension/developmentOnly'
 import {
 	getActionsBlacklist, getClientReducers, IClientAppState,
 } from '@corgifm/common/redux'
-import {connectionsClientMiddleware} from './connections-middleware'
+import {makeConnectionsClientMiddleware} from './connections-middleware'
 import {createAuthMiddleware} from './Firebase/auth-middleware'
 import {FirebaseContextStuff} from './Firebase/FirebaseContext'
 import {GetAllInstruments} from './instrument-manager'
@@ -37,7 +37,7 @@ export function configureStore(
 				createAuthMiddleware(firebase),
 				createCorgiApiMiddleware(firebase, samplesManager),
 				createSequencerMiddleware(getAllInstruments),
-				connectionsClientMiddleware(getAllInstruments),
+				makeConnectionsClientMiddleware(getAllInstruments),
 				websocketSenderMiddleware,
 			),
 		),
