@@ -4,6 +4,7 @@ import {ActionType} from 'typesafe-actions'
 import * as uuid from 'uuid'
 import {ConnectionNodeType} from '../common-types'
 import {CssColor, mixColors} from '../shamu-color'
+import {emptyList} from '../common-utils'
 import {selectOption, AppOptions} from './options-redux'
 import {IClientAppState} from './common-redux-types'
 import {
@@ -101,7 +102,7 @@ const defaultNodeConnectionsInfo = Object.freeze({
 	rightConnections: Map<number, List<Id>>(),
 })
 
-type NodeConnectionsInfo = typeof defaultNodeConnectionsInfo
+export type NodeConnectionsInfo = typeof defaultNodeConnectionsInfo
 
 const makeInitialState = () => ({
 	connections: Map<Id, IConnection>(),
@@ -252,7 +253,19 @@ export function selectAllConnections(state: IClientRoomState) {
 }
 
 export function selectAllNodeConnectionInfos(state: IClientRoomState) {
-	return state.connections.connections
+	return state.connections.nodeInfos
+}
+
+export function selectNodeConnectionInfosForNode(state: IClientRoomState, nodeId: Id): NodeConnectionsInfo {
+	return selectAllNodeConnectionInfos(state).get(nodeId, defaultNodeConnectionsInfo)
+}
+
+export function selectConnectionIdsForNodeLeftPort(state: IClientRoomState, nodeId: Id, port: number): List<Id> {
+	return selectNodeConnectionInfosForNode(state, nodeId).leftConnections.get(port, emptyList)
+}
+
+export function selectConnectionIdsForNodeRightPort(state: IClientRoomState, nodeId: Id, port: number): List<Id> {
+	return selectNodeConnectionInfosForNode(state, nodeId).rightConnections.get(port, emptyList)
 }
 
 export function selectConnection(state: IClientRoomState, id: Id) {
@@ -277,19 +290,31 @@ export const selectSortedConnections = createSelector(
 	}
 )
 
+export function selectConnectionIdsOnPortOnNodeLeft(state: IClientRoomState, nodeId: Id, port: number) {
+	return selectNodeConnectionInfosForNode(state, nodeId).leftConnections.get(port, emptyList)
+}
+
+export function selectConnectionIdsOnPortOnNodeRight(state: IClientRoomState, nodeId: Id, port: number) {
+	return selectNodeConnectionInfosForNode(state, nodeId).leftConnections.get(port, emptyList)
+}
+
+// TODO Use node infos
 export function selectConnectionsWithSourceOrTargetIds(state: IClientRoomState, sourceOrTargetIds: Id[]) {
 	return selectAllConnections(state)
 		.filter(x => sourceOrTargetIds.includes(x.sourceId) || sourceOrTargetIds.includes(x.targetId))
 }
 
+// TODO Use node infos
 export function selectConnectionsWithTargetIds2(connections: IConnections, targetId: Id) {
 	return connections.filter(x => x.targetId === targetId)
 }
 
 export function selectConnectionsWithTargetIds(state: IClientRoomState, targetId: Id) {
+	// return selectNodeConnectionInfosForNode(state, targetId).leftConnections.reduce((result, id) => result.set(id, selectConnection(state, id)), emptyMap as IConnections)
 	return selectConnectionsWithTargetIds2(selectAllConnections(state), targetId)
 }
 
+// TODO Use node infos
 export function selectConnectionsWithSourceId2(connections: IConnections, sourceId: Id) {
 	return connections.filter(x => x.sourceId === sourceId)
 }
@@ -298,6 +323,7 @@ export function selectConnectionsWithSourceId(state: IClientRoomState, sourceId:
 	return selectConnectionsWithSourceId2(selectAllConnections(state), sourceId)
 }
 
+// TODO Use node infos
 export function selectConnectionsWithSourceIds2(connections: IConnections, sourceIds: Id[]) {
 	return connections.filter(x => sourceIds.includes(x.sourceId))
 }
@@ -306,17 +332,12 @@ export function selectConnectionsWithSourceIds(state: IClientRoomState, sourceId
 	return selectConnectionsWithSourceIds2(selectAllConnections(state), sourceIds)
 }
 
-export function selectConnectionsWithSourceAndTargetId(
-	state: IClientRoomState, sourceId: Id, sourcePort: number, targetId: Id, targetPort: number
-) {
-	return selectAllConnections(state)
-		.filter(x => x.sourceId === sourceId && x.sourcePort === sourcePort && x.targetId === targetId && x.targetPort === targetPort)
-}
-
 export function doesConnectionBetweenNodesExist(
 	state: IClientRoomState, sourceId: Id, sourcePort: number, targetId: Id, targetPort: number
 ): boolean {
-	return selectConnectionsWithSourceAndTargetId(state, sourceId, sourcePort, targetId, targetPort).count() > 0
+	const a = selectConnectionIdsForNodeRightPort(state, sourceId, sourcePort)
+	const b = selectConnectionIdsForNodeLeftPort(state, targetId, targetPort)
+	return a.some(x => b.includes(x))
 }
 
 export function selectFirstConnectionByTargetId(state: IClientRoomState, targetId: Id) {
@@ -328,17 +349,6 @@ export function selectFirstConnectionIdByTargetId(state: IClientRoomState, targe
 	const conn = selectFirstConnectionByTargetId(state, targetId)
 	return conn ? conn.id : 'fakeConnectionId'
 }
-
-export const createSelectPlaceholdersInfo = () => createSelector(
-	(state: IClientRoomState, _: any) => selectAllConnections(state),
-	(_, parentId: Id) => parentId,
-	(allConnections, parentId: Id) => {
-		return {
-			leftConnections: selectConnectionsWithTargetIds2(allConnections, parentId),
-			rightConnections: selectConnectionsWithSourceId2(allConnections, parentId),
-		}
-	},
-)
 
 const colorIfLowGraphics = CssColor.blue
 
@@ -352,7 +362,7 @@ export function selectConnectionSourceColorByTargetId(
 ): string {
 	if (!selectOption(state, AppOptions.graphicsMultiColoredConnections)) return colorIfLowGraphics
 
-	const connections = selectAllConnections(state.room).filter(x => x.targetId === targetId)
+	const connections = selectConnectionsWithTargetIds(state.room, targetId)
 
 	const positionColor = selectPosition(state.room, targetId).color
 
@@ -446,16 +456,12 @@ export function sortConnection(connA: IConnection, connB: IConnection) {
 
 export function selectConnectionStackOrderForTarget(roomState: IClientRoomState, id: Id) {
 	const connection = selectConnection(roomState, id)
-	const connections = selectConnectionsWithTargetIds(roomState, connection.targetId)
-		.filter(x => x.targetPort === connection.targetPort)
-	return connections.toIndexedSeq().indexOf(connection)
+	return selectConnectionIdsForNodeLeftPort(roomState, connection.targetId, connection.targetPort).indexOf(connection.id)
 }
 
 export function selectConnectionStackOrderForSource(roomState: IClientRoomState, id: Id) {
 	const connection = selectConnection(roomState, id)
-	const connections = selectConnectionsWithSourceId(roomState, connection.sourceId)
-		.filter(x => x.sourcePort === connection.sourcePort)
-	return connections.toIndexedSeq().indexOf(connection)
+	return selectConnectionIdsForNodeRightPort(roomState, connection.sourceId, connection.sourcePort).indexOf(connection.id)
 }
 
 export function calculateConnectorPositionY(parentY: number, parentHeight: number, portCount: number, port: number) {

@@ -156,6 +156,8 @@ export const clientsReducer = createReducer(initialState, {
 	}),
 })
 
+const fakeLocalClientId = 'fakeLocalClientId'
+
 export function selectClientById(state: IClientAppState, id: ClientId): IClientState {
 	if (id === serverClientId) return ClientState.serverClient
 
@@ -169,9 +171,9 @@ export function selectClientById(state: IClientAppState, id: ClientId): IClientS
 		// 	+ `, but no client with that id was found, returning fake`)
 		return {
 			color: CssColor.disabledGray,
-			id: 'fakeClientId',
-			name: 'fakeClient',
-			socketId: 'fakeClientSocketId',
+			id: fakeLocalClientId,
+			name: fakeLocalClientId,
+			socketId: fakeLocalClientId,
 		}
 	}
 }
@@ -185,9 +187,9 @@ export function selectClientBySocketId(state: IClientAppState | IServerState, so
 			+ `, but no client with that socket id was found, returning fake`)
 		return {
 			color: CssColor.disabledGray,
-			id: 'fakeClientId',
-			name: 'fakeClient',
-			socketId: 'fakeClientSocketId',
+			id: fakeLocalClientId,
+			name: fakeLocalClientId,
+			socketId: fakeLocalClientId,
 		}
 	}
 }
@@ -201,15 +203,15 @@ export function selectLocalClient(state: IClientAppState): IClientState {
 		logger.warn('selectLocalClient was called but localClient is not set, returning fake')
 		return {
 			color: CssColor.disabledGray,
-			id: 'fakeLocalClientId',
-			name: 'fakeLocalClient',
-			socketId: 'fakeLocalClientSocketId',
+			id: fakeLocalClientId,
+			name: fakeLocalClientId,
+			socketId: fakeLocalClientId,
 		}
 	}
 }
 
 export function selectLocalClientId(state: IClientAppState): Id {
-	return state.clients.localClientId || 'fakeLocalClientId'
+	return state.clients.localClientId || fakeLocalClientId
 }
 
 export const selectAllClients = (state: IClientAppState | IServerState) => state.clients.clients

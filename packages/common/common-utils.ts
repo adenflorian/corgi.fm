@@ -1,6 +1,6 @@
 import * as path from 'path'
 import {debounce} from 'lodash'
-import {Map} from 'immutable'
+import {Map, List} from 'immutable'
 import {allowedSampleUploadFileExtensions} from './common-constants'
 import {MidiClipEvents} from './midi-types'
 
@@ -79,6 +79,10 @@ export function removeOctave(midiNumber: number) {
 
 // eslint-disable-next-line no-empty-function
 export const noop = () => {}
+
+export const emptyList = List()
+
+export const emptyMap = Map()
 
 // https://stackoverflow.com/a/30835667
 export function multilineRegExp(regExps: RegExp[], flags?: string) {

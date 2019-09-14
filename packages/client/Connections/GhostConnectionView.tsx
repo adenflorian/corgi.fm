@@ -4,12 +4,12 @@ import {
 	ActiveGhostConnectorSourceOrTarget, calculateConnectorPositionY,
 	GhostConnection, ghostConnectorActions,
 	IPosition,
-	selectConnectionsWithSourceId,
-	selectConnectionsWithTargetIds,
 	selectGhostConnection,
 	selectLocalClientId,
 	selectPosition,
 	shamuConnect,
+	selectConnectionIdsForNodeLeftPort,
+	selectConnectionIdsForNodeRightPort,
 } from '@corgifm/common/redux'
 import {toGraphSpace} from '../SimpleGraph/Zoom'
 import {connectorHeight, connectorWidth, makeCurvedPath} from './ConnectionView'
@@ -166,8 +166,8 @@ export const ConnectedGhostConnectionView = shamuConnect(
 			parentPosition: selectPosition(state.room, parentNodeId),
 			parentConnectionCount:
 				ghostConnection.activeSourceOrTarget === ActiveGhostConnectorSourceOrTarget.Source
-					? selectConnectionsWithTargetIds(state.room, parentNodeId).filter(x => x.targetPort === ghostConnection.port).count()
-					: selectConnectionsWithSourceId(state.room, parentNodeId).filter(x => x.sourcePort === ghostConnection.port).count(),
+					? selectConnectionIdsForNodeLeftPort(state.room, parentNodeId, ghostConnection.port).count()
+					: selectConnectionIdsForNodeRightPort(state.room, parentNodeId, ghostConnection.port).count(),
 			localClientId: selectLocalClientId(state),
 		}
 	},
