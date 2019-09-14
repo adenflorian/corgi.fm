@@ -166,7 +166,7 @@ export const ConnectedGhostConnectionView = shamuConnect(
 			parentPosition: selectPosition(state.room, parentNodeId),
 			parentConnectionCount:
 				ghostConnection.activeSourceOrTarget === ActiveGhostConnectorSourceOrTarget.Source
-					? selectConnectionsWithTargetIds(state.room, [parentNodeId]).filter(x => x.targetPort === ghostConnection.port).count()
+					? selectConnectionsWithTargetIds(state.room, parentNodeId).filter(x => x.targetPort === ghostConnection.port).count()
 					: selectConnectionsWithSourceIds(state.room, [parentNodeId]).filter(x => x.sourcePort === ghostConnection.port).count(),
 			localClientId: selectLocalClientId(state),
 		}

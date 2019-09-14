@@ -67,7 +67,7 @@ export function handleStopDraggingGhostConnector(
 			doesConnectionBetweenNodesExist(
 				roomState, sourceId, sourcePort, targetId, targetPort)
 		) return
-		dispatch(connectionsActions.update(movingConnectionId, {
+		dispatch(connectionsActions.updateSource(movingConnectionId, {
 			sourceId,
 			sourceType,
 			sourcePort,
@@ -89,7 +89,7 @@ export function handleStopDraggingGhostConnector(
 			doesConnectionBetweenNodesExist(
 				roomState, sourceId, sourcePort, targetId, targetPort)
 		) return
-		dispatch(connectionsActions.update(movingConnectionId, {
+		dispatch(connectionsActions.updateTarget(movingConnectionId, {
 			targetId,
 			targetType,
 			targetPort,
@@ -198,7 +198,7 @@ const moveToOutputPosition = (roomState: IClientRoomState) => (position: Connect
 }
 
 const moveToInputPosition = (roomState: IClientRoomState) => (position: ConnectionCandidate): ConnectionCandidate => {
-	const connections = selectConnectionsWithTargetIds(roomState, [position.id])
+	const connections = selectConnectionsWithTargetIds(roomState, position.id)
 	const stackCountOnPort = connections.filter(x => x.targetPort === position.portNumber).count()
 	return {
 		...position,

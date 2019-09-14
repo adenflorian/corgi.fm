@@ -2,7 +2,6 @@ import {Set} from 'immutable'
 import {BuiltInBQFilterType} from '@corgifm/common/OscillatorTypes'
 import {applyEnvelope, calculateScheduledEnvelope, IScheduledEnvelope} from './envelope'
 import {OnEndedCallback} from '.'
-import {clamp} from '@corgifm/common/common-utils';
 
 export type TunableAudioScheduledSourceNode = AudioScheduledSourceNode & Pick<OscillatorNode, 'detune'>
 

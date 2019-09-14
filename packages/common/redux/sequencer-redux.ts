@@ -275,7 +275,7 @@ function isUpstreamClockFromNode(
 ): boolean {
 	if (processedNodeIds.includes(nodeId)) return false
 
-	return selectConnectionsWithTargetIds(state, [nodeId])
+	return selectConnectionsWithTargetIds(state, nodeId)
 		.some(connection => {
 			if (connection.sourceType === ConnectionNodeType.masterClock) {
 				return true

@@ -459,7 +459,7 @@ export function createLocalMiddleware(
 							sourceId: clone.id,
 						}))
 						.concat(
-							selectConnectionsWithTargetIds(newState.room, [nodeId])
+							selectConnectionsWithTargetIds(newState.room, nodeId)
 								.map(x => ({
 									...x,
 									id: createNodeId(),

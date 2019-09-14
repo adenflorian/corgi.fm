@@ -296,7 +296,7 @@ function onLeaveRoom(io: Server, socket: Socket, roomToLeave: string, serverStor
 		const otherNodes = nodesOwnedByClient
 			.filter(x => x.targetType !== ConnectionNodeType.virtualKeyboard)
 			.filter(x => {
-				const incomingConnections = selectConnectionsWithTargetIds(roomState, [x.id])
+				const incomingConnections = selectConnectionsWithTargetIds(roomState, x.id)
 
 				// return true if it has no incoming connections
 				if (incomingConnections.count() === 0) return true

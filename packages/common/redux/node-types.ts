@@ -352,7 +352,7 @@ function isUpstreamNodePlaying(
 ): boolean {
 	if (processedNodeIds.includes(nodeId)) return false
 
-	return selectConnectionsWithTargetIds(state, [nodeId])
+	return selectConnectionsWithTargetIds(state, nodeId)
 		.some(connection => {
 			return findNodeInfo(connection.sourceType)
 				.selectIsPlaying(state, connection.sourceId, processedNodeIds.add(nodeId))

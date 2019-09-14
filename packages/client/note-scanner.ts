@@ -235,7 +235,7 @@ function scheduleNotes(
 
 /** Filter events based on upstream group sequencers */
 const getGroupEventsFilter = (groupSequencers: GroupSequencers, roomState: IClientRoomState, seqId: Id, currentBeats: number) => (event: MidiGlobalClipEvent): boolean => {
-	const connectionsToSequencer = selectConnectionsWithTargetIds(roomState, [seqId])
+	const connectionsToSequencer = selectConnectionsWithTargetIds(roomState, seqId)
 	const connectionSourceIds = connectionsToSequencer.map(x => x.sourceId)
 
 	const sourceGroupSequencers = Map(groupSequencers).filter(x => connectionSourceIds.includes(x.id))
