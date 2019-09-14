@@ -1,10 +1,9 @@
-import {List, Map, Set} from 'immutable'
+import {List, Map} from 'immutable'
 import {combineReducers, Reducer} from 'redux'
 import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
 import * as uuid from 'uuid'
 import {ConnectionNodeType} from '../common-types'
-import {IMidiNotes, IMidiNote} from '../MidiNote'
 import {CssColor, mixColors} from '../shamu-color'
 import {selectOption, AppOptions} from './options-redux'
 import {IClientAppState} from './common-redux-types'
@@ -95,8 +94,10 @@ export type ConnectionPortId = number
 
 export type IConnectionAction = ActionType<typeof connectionsActions>
 
-const connectionsSpecificReducer: Reducer<IConnections, IConnectionAction> =
-	(connections = Connections(), action) => {
+function connectionsSpecificReducer(
+	connections: IConnections = Connections(),
+	action: IConnectionAction,
+) {
 		switch (action.type) {
 			case 'ADD_CONNECTION': return connections.set(action.connection.id, action.connection)
 			case 'ADD_CONNECTIONS': return connections.concat(action.connections.reduce((map, val) => map.set(val.id, val), Map<Id, IConnection>()))
@@ -112,64 +113,72 @@ export const connectionsReducer: Reducer<IConnectionsState, any> = combineReduce
 	connections: connectionsSpecificReducer,
 })
 
-export const selectAllConnections = (state: IClientRoomState) =>
-	state.connections.connections
+export function selectAllConnections(state: IClientRoomState) {
+	return state.connections.connections
+}
 
-export const selectConnection = (state: IClientRoomState, id: Id) =>
-	selectAllConnections(state).get(id) || Connection.dummy
+export function selectConnection(state: IClientRoomState, id: Id) {
+	return selectAllConnections(state).get(id) || Connection.dummy
+}
 
-export const selectSourceByConnectionId = (state: IClientRoomState, id: Id): VirtualKeyboardState =>
-	selectVirtualKeyboardById(state, selectConnection(state, id)!.sourceId)
+export function selectSourceByConnectionId(state: IClientRoomState, id: Id): VirtualKeyboardState {
+	return selectVirtualKeyboardById(state, selectConnection(state, id)!.sourceId)
+}
 
 export const selectAllConnectionIds = createSelector(
 	selectAllConnections,
-	connections => connections.keySeq().toArray(),
+	function _selectAllConnectionIds(connections) {
+		return connections.keySeq().toArray()
+	}
 )
 
 export const selectSortedConnections = createSelector(
 	selectAllConnections,
-	connections => connections.sort(sortConnection).toList(),
+	function _selectSortedConnections(connections) {
+		return connections.sort(sortConnection).toList()
+	}
 )
 
-export const selectConnectionsWithSourceOrTargetIds = (state: IClientRoomState, sourceOrTargetIds: Id[]) => {
+export function selectConnectionsWithSourceOrTargetIds(state: IClientRoomState, sourceOrTargetIds: Id[]) {
 	return selectAllConnections(state)
 		.filter(x => sourceOrTargetIds.includes(x.sourceId) || sourceOrTargetIds.includes(x.targetId))
 }
 
-export const selectConnectionsWithTargetIds2 = (connections: IConnections, targetIds: Id[]) => {
+export function selectConnectionsWithTargetIds2(connections: IConnections, targetIds: Id[]) {
 	return connections.filter(x => targetIds.includes(x.targetId))
 }
 
-export const selectConnectionsWithTargetIds = (state: IClientRoomState, targetIds: Id[]) => {
+export function selectConnectionsWithTargetIds(state: IClientRoomState, targetIds: Id[]) {
 	return selectConnectionsWithTargetIds2(selectAllConnections(state), targetIds)
 }
 
-export const selectConnectionsWithSourceIds2 = (connections: IConnections, sourceIds: Id[]) => {
+export function selectConnectionsWithSourceIds2(connections: IConnections, sourceIds: Id[]) {
 	return connections.filter(x => sourceIds.includes(x.sourceId))
 }
 
-export const selectConnectionsWithSourceIds = (state: IClientRoomState, sourceIds: Id[]) => {
+export function selectConnectionsWithSourceIds(state: IClientRoomState, sourceIds: Id[]) {
 	return selectConnectionsWithSourceIds2(selectAllConnections(state), sourceIds)
 }
 
-export const selectConnectionsWithSourceAndTargetId = (
+export function selectConnectionsWithSourceAndTargetId(
 	state: IClientRoomState, sourceId: Id, sourcePort: number, targetId: Id, targetPort: number
-) => {
+) {
 	return selectAllConnections(state)
 		.filter(x => x.sourceId === sourceId && x.sourcePort === sourcePort && x.targetId === targetId && x.targetPort === targetPort)
 }
 
-export const doesConnectionBetweenNodesExist = (
+export function doesConnectionBetweenNodesExist(
 	state: IClientRoomState, sourceId: Id, sourcePort: number, targetId: Id, targetPort: number
-): boolean => {
+): boolean {
 	return selectConnectionsWithSourceAndTargetId(state, sourceId, sourcePort, targetId, targetPort).count() > 0
 }
 
-export const selectFirstConnectionByTargetId = (state: IClientRoomState, targetId: Id) =>
-	selectAllConnections(state)
+export function selectFirstConnectionByTargetId(state: IClientRoomState, targetId: Id) {
+	return selectAllConnections(state)
 		.find(x => x.targetId === targetId) || Connection.dummy
+}
 
-export const selectFirstConnectionIdByTargetId = (state: IClientRoomState, targetId: Id): Id => {
+export function selectFirstConnectionIdByTargetId(state: IClientRoomState, targetId: Id): Id {
 	const conn = selectFirstConnectionByTargetId(state, targetId)
 	return conn ? conn.id : 'fakeConnectionId'
 }
@@ -192,8 +201,9 @@ export function createSmartNodeColorSelector(id: Id) {
 }
 
 /** For use by a node */
-export const selectConnectionSourceColorByTargetId =
-	(state: IClientAppState, targetId: Id, processedIds = List<Id>()): string => {
+export function selectConnectionSourceColorByTargetId(
+	state: IClientAppState, targetId: Id, processedIds = List<Id>(),
+): string {
 		if (!selectOption(state, AppOptions.graphicsMultiColoredConnections)) return colorIfLowGraphics
 
 		const connections = selectAllConnections(state.room).filter(x => x.targetId === targetId)
@@ -210,7 +220,7 @@ export const selectConnectionSourceColorByTargetId =
 	}
 
 /** For use by a connection */
-export const selectConnectionSourceColor = (state: IClientAppState, id: Id): string => {
+export function selectConnectionSourceColor(state: IClientAppState, id: Id): string {
 	if (!selectOption(state, AppOptions.graphicsMultiColoredConnections)) return colorIfLowGraphics
 	const connection = selectConnection(state.room, id)
 
@@ -218,7 +228,7 @@ export const selectConnectionSourceColor = (state: IClientAppState, id: Id): str
 }
 
 const makeConnectionSourceColorSelector =
-	(state: IClientAppState, processedIds = List<Id>()) => (connection: IConnection): string => {
+	(state: IClientAppState, processedIds = List<Id>()) => function _makeConnectionSourceColorSelector(connection: IConnection): string {
 		// If in a loop
 		if (processedIds.contains(connection.id)) return CssColor.disabledGray
 
@@ -235,14 +245,14 @@ function tryGetColorFromState(colorFromState: string | false | List<string>, por
 	return colorFromState.get(portNumber, CssColor.defaultGray)
 }
 
-export const selectConnectionSourceIdsByTarget = (state: IClientRoomState, targetId: Id): List<Id> => {
+export function selectConnectionSourceIdsByTarget(state: IClientRoomState, targetId: Id): List<Id> {
 	return selectConnectionsWithTargetIds(state, [targetId])
 		.toList()
 		.map(x => x.sourceId)
 }
 
 // TODO Handle multiple ancestor connections
-export const selectConnectionSourceIsActive = (roomState: IClientRoomState, id: Id, processedIds = List<Id>()): boolean => {
+export function selectConnectionSourceIsActive(roomState: IClientRoomState, id: Id, processedIds = List<Id>()): boolean {
 	if (processedIds.contains(id)) return false
 
 	const connection = selectConnection(roomState, id)
@@ -260,7 +270,7 @@ export const selectConnectionSourceIsActive = (roomState: IClientRoomState, id: 
 }
 
 // TODO Handle multiple ancestor connections
-export const selectConnectionSourceIsSending = (roomState: IClientRoomState, id: Id, processedIds = List<Id>()): boolean => {
+export function selectConnectionSourceIsSending(roomState: IClientRoomState, id: Id, processedIds = List<Id>()): boolean {
 	if (processedIds.contains(id)) return false
 
 	const connection = selectConnection(roomState, id)
@@ -288,20 +298,20 @@ export function sortConnection(connA: IConnection, connB: IConnection) {
 	}
 }
 
-export const selectConnectionStackOrderForTarget = (roomState: IClientRoomState, id: Id) => {
+export function selectConnectionStackOrderForTarget(roomState: IClientRoomState, id: Id) {
 	const connection = selectConnection(roomState, id)
 	const connections = selectConnectionsWithTargetIds(roomState, [connection.targetId])
 		.filter(x => x.targetPort === connection.targetPort)
 	return connections.toIndexedSeq().indexOf(connection)
 }
 
-export const selectConnectionStackOrderForSource = (roomState: IClientRoomState, id: Id) => {
+export function selectConnectionStackOrderForSource(roomState: IClientRoomState, id: Id) {
 	const connection = selectConnection(roomState, id)
 	const connections = selectConnectionsWithSourceIds(roomState, [connection.sourceId])
 		.filter(x => x.sourcePort === connection.sourcePort)
 	return connections.toIndexedSeq().indexOf(connection)
 }
 
-export const calculateConnectorPositionY = (parentY: number, parentHeight: number, portCount: number, port: number) => {
+export function calculateConnectorPositionY(parentY: number, parentHeight: number, portCount: number, port: number) {
 	return parentY + ((parentHeight / (1 + portCount)) * (port + 1))
 }
