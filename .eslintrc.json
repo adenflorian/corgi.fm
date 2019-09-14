@@ -60,8 +60,7 @@
                 "allow": [
                     "**/*.html",
                     "**/*.css",
-                    "**/*.less",
-                    "babel-polyfill"
+                    "**/*.less"
                 ]
             }
         ],

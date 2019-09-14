@@ -1,5 +1,3 @@
-// TODO Is this still needed?
-import 'babel-polyfill'
 import React from 'react'
 import * as ReactGA from 'react-ga'
 import {Middleware} from 'redux'
