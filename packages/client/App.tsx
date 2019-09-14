@@ -8,6 +8,7 @@ import './App.less'
 import {isLocalDevClient} from './is-prod-client'
 import {LoadingScreen} from './LoadingScreen'
 import {ConnectedOnlineApp} from './OnlineApp'
+import {Benchmarks} from './Benchmarks'
 
 const App = () => {
 	const ctrl = useSelector((state: IClientAppState) => selectUserInputKeys(state).ctrl)
@@ -18,6 +19,7 @@ const App = () => {
 
 	if (isLocalDevClient()) {
 		switch (window.location.pathname.replace('/', '')) {
+			case 'benchmarks': return <Benchmarks />
 			default: break
 		}
 	}
