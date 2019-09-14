@@ -9,7 +9,7 @@ import {
 } from '../midi-types'
 import {IMidiNote} from '../MidiNote'
 import {
-	selectAllConnections, selectConnectionsWithSourceIds,
+	selectAllConnections, selectConnectionsWithSourceId,
 	selectConnectionsWithTargetIds,
 	IConnectionsState,
 } from './connections-redux'
@@ -307,7 +307,7 @@ export const selectDirectDownstreamSequencerIds = (state: IClientRoomState, id: 
 }
 
 function _bar(state: IClientRoomState, id: Id): List<Id> {
-	return selectConnectionsWithSourceIds(state, [id])
+	return selectConnectionsWithSourceId(state, id)
 		.filter(connection => isSequencerNodeType(connection.targetType))
 		.map(x => x.targetId).toList()
 }

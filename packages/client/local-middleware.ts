@@ -11,6 +11,7 @@ import {
 	selectAllConnections, selectConnectionsWithSourceIds,
 	selectConnectionsWithSourceOrTargetIds, selectConnectionsWithTargetIds,
 	doesConnectionBetweenNodesExist,
+	selectConnectionsWithSourceId,
 } from '@corgifm/common/redux/connections-redux'
 import {
 	addBasicSynthesizer, AddClientAction,
@@ -452,7 +453,7 @@ export function createLocalMiddleware(
 				dispatch(addPosition(clonePosition))
 
 				if (action.withConnections === 'all') {
-					const newConnections = selectConnectionsWithSourceIds(newState.room, [nodeId])
+					const newConnections = selectConnectionsWithSourceId(newState.room, nodeId)
 						.map(x => ({
 							...x,
 							id: createNodeId(),
@@ -738,7 +739,7 @@ function playShortNote(
 	notes: IMidiNotes, sourceId: Id, roomState: IClientRoomState,
 	getAllInstruments: GetAllInstruments,
 ) {
-	const targetIds = selectConnectionsWithSourceIds(roomState, [sourceId]).map(x => x.targetId)
+	const targetIds = selectConnectionsWithSourceId(roomState, sourceId).map(x => x.targetId)
 	const {gate, rate, pitch} = selectSequencer(roomState, sourceId)
 	const bpm = selectGlobalClockState(roomState).bpm
 

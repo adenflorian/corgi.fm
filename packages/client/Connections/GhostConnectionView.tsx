@@ -4,7 +4,7 @@ import {
 	ActiveGhostConnectorSourceOrTarget, calculateConnectorPositionY,
 	GhostConnection, ghostConnectorActions,
 	IPosition,
-	selectConnectionsWithSourceIds,
+	selectConnectionsWithSourceId,
 	selectConnectionsWithTargetIds,
 	selectGhostConnection,
 	selectLocalClientId,
@@ -167,7 +167,7 @@ export const ConnectedGhostConnectionView = shamuConnect(
 			parentConnectionCount:
 				ghostConnection.activeSourceOrTarget === ActiveGhostConnectorSourceOrTarget.Source
 					? selectConnectionsWithTargetIds(state.room, parentNodeId).filter(x => x.targetPort === ghostConnection.port).count()
-					: selectConnectionsWithSourceIds(state.room, [parentNodeId]).filter(x => x.sourcePort === ghostConnection.port).count(),
+					: selectConnectionsWithSourceId(state.room, parentNodeId).filter(x => x.sourcePort === ghostConnection.port).count(),
 			localClientId: selectLocalClientId(state),
 		}
 	},

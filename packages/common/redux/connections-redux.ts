@@ -290,6 +290,14 @@ export function selectConnectionsWithTargetIds(state: IClientRoomState, targetId
 	return selectConnectionsWithTargetIds2(selectAllConnections(state), targetId)
 }
 
+export function selectConnectionsWithSourceId2(connections: IConnections, sourceId: Id) {
+	return connections.filter(x => x.sourceId === sourceId)
+}
+
+export function selectConnectionsWithSourceId(state: IClientRoomState, sourceId: Id) {
+	return selectConnectionsWithSourceId2(selectAllConnections(state), sourceId)
+}
+
 export function selectConnectionsWithSourceIds2(connections: IConnections, sourceIds: Id[]) {
 	return connections.filter(x => sourceIds.includes(x.sourceId))
 }
@@ -327,7 +335,7 @@ export const createSelectPlaceholdersInfo = () => createSelector(
 	(allConnections, parentId: Id) => {
 		return {
 			leftConnections: selectConnectionsWithTargetIds2(allConnections, parentId),
-			rightConnections: selectConnectionsWithSourceIds2(allConnections, [parentId]),
+			rightConnections: selectConnectionsWithSourceId2(allConnections, parentId),
 		}
 	},
 )
@@ -445,7 +453,7 @@ export function selectConnectionStackOrderForTarget(roomState: IClientRoomState,
 
 export function selectConnectionStackOrderForSource(roomState: IClientRoomState, id: Id) {
 	const connection = selectConnection(roomState, id)
-	const connections = selectConnectionsWithSourceIds(roomState, [connection.sourceId])
+	const connections = selectConnectionsWithSourceId(roomState, connection.sourceId)
 		.filter(x => x.sourcePort === connection.sourcePort)
 	return connections.toIndexedSeq().indexOf(connection)
 }

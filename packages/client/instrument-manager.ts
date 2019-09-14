@@ -7,7 +7,7 @@ import {
 	MASTER_AUDIO_OUTPUT_TARGET_ID, selectAllBasicSynthesizerIds,
 	selectAllSamplerIds, selectAllSimpleCompressorIds, selectAllSimpleDelayIds,
 	selectAllSimpleReverbIds, selectBasicSynthesizer,
-	selectConnectionsWithSourceIds, selectPosition,
+	selectConnectionsWithSourceId, selectPosition,
 	selectSampler, selectSimpleCompressor, selectSimpleDelay,
 	selectSimpleReverb, SimpleCompressorState, SimpleDelayState,
 	SimpleReverbState,
@@ -302,7 +302,7 @@ export const setupInstrumentManager = (
 	}
 
 	function updateAudioConnectionsFromSource(roomState: IClientRoomState, sourceId: Id, audioNodeWrapper: AudioNodeWrapper) {
-		const outgoingConnections = selectConnectionsWithSourceIds(roomState, [sourceId])
+		const outgoingConnections = selectConnectionsWithSourceId(roomState, sourceId)
 
 		if (outgoingConnections.count() === 0) {
 			return audioNodeWrapper.disconnectAll()

@@ -3,7 +3,7 @@ import * as MidiWriter from 'midi-writer-js'
 import {Dispatch, Middleware, MiddlewareAPI} from 'redux'
 import {
 	IClientAppState, isEmptyEvents,
-	selectConnectionsWithSourceIds,
+	selectConnectionsWithSourceId,
 	selectSequencer, SequencerAction, sequencerActions, findNodeInfo,
 } from '@corgifm/common/redux'
 import {GetAllInstruments} from './instrument-manager'
@@ -76,8 +76,7 @@ function handleStopSequencer(
 ) {
 	const instruments = getAllInstruments()
 
-	selectConnectionsWithSourceIds(store.getState().room, [action.id])
+	selectConnectionsWithSourceId(store.getState().room, action.id)
 		.map(x => instruments.get(x.targetId))
-		.filter(x => x !== undefined)
-		.forEach(x => x!.releaseAllScheduledFromSourceId(action.id))
+		.forEach(x => x && x.releaseAllScheduledFromSourceId(action.id))
 }

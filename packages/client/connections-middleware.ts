@@ -7,7 +7,7 @@ import {
 	GhostConnectorAction, IClientAppState,
 	IConnectionAction, PositionAction,
 	selectAllConnections, selectAllPositions, selectConnection,
-	selectConnectionsWithSourceIds, updatePositions,
+	selectConnectionsWithSourceId, updatePositions,
 } from '@corgifm/common/redux'
 import {handleStopDraggingGhostConnector} from './dragging-connections'
 import {GetAllInstruments} from './instrument-manager'
@@ -66,7 +66,7 @@ export const makeConnectionsClientMiddleware: (getAllInstruments: GetAllInstrume
 
 				const instruments = getAllInstruments()
 
-				return selectConnectionsWithSourceIds(getState().room, [action.id])
+				return selectConnectionsWithSourceId(getState().room, action.id)
 					.forEach(connection => {
 						const instrument = instruments.get(connection.targetId)
 						if (instrument) {

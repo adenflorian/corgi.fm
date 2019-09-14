@@ -5,7 +5,7 @@ import {IClientRoomState} from '@corgifm/common/redux/common-redux-types'
 import {
 	ActiveGhostConnectorSourceOrTarget, Connection,
 	connectionsActions, GhostConnectorAddingOrMoving, IPosition, selectAllPositions,
-	selectConnectionsWithSourceIds, selectConnectionsWithTargetIds, selectGhostConnection, selectPosition, doesConnectionBetweenNodesExist, selectConnection,
+	selectConnectionsWithSourceId, selectConnectionsWithTargetIds, selectGhostConnection, selectPosition, doesConnectionBetweenNodesExist, selectConnection,
 } from '@corgifm/common/redux'
 import {connectorWidth} from './Connections/ConnectionView'
 
@@ -188,7 +188,7 @@ function getDistanceBetweenPoints(a: Point, b: Point): number {
 }
 
 const moveToOutputPosition = (roomState: IClientRoomState) => (position: ConnectionCandidate): ConnectionCandidate => {
-	const connections = selectConnectionsWithSourceIds(roomState, [position.id])
+	const connections = selectConnectionsWithSourceId(roomState, position.id)
 	const stackCountOnPort = connections.filter(x => x.sourcePort === position.portNumber).count()
 	return {
 		...position,
