@@ -57,7 +57,8 @@ function determineEvent(action: BroadcastAction) {
 }
 
 const actionTypeRateLimitIntervals = Map<string, number>([
-	['UPDATE_POINTER', 50],
+	// This is already debounced in input-event.ts
+	// ['UPDATE_POINTER', 50],
 	['MOVE_POSITION', 100],
 ])
 

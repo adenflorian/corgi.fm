@@ -330,6 +330,11 @@
 	- [ ] snap nodes together
 	- [ ] when moving a node that is snapped to other nodes, move all of them together
 
+https://hal.archives-ouvertes.fr/hal-01304889v1
+https://npm.taobao.org/package/@ircam/sync
+https://github.com/collective-soundworks
+
+- [ ] turn off overflow for svg (mainly connection svg's)
 - [ ] make connector placeholders a child of the node so they dont have to update whenever parent position changes
 - [ ] ask the user's experience level
 - [ ] ask what the user wants to use corgi for
