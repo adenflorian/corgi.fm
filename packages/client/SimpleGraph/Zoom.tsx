@@ -264,6 +264,7 @@ export const ConnectedZoom = React.memo(function _Zoom({
 			>
 				{children}
 			</div>
+			{backgroundClicked && <div className="zoomBlock" />}
 		</Fragment>
 	)
 })
