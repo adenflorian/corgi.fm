@@ -68,10 +68,9 @@
                     .smallFont();
                     color: @defaultGray;
                     font-size: 12px;
-                    white-space: nowrap;
-                    // TODO Handle overflow in js (hurts ULT on pan)
-                    // overflow: hidden;
-                    // text-overflow: ellipsis;
+                    word-break: break-word;
+                    // Don't use overflow: hidden until bug is fixed
+                    // https://bugs.chromium.org/p/chromium/issues/detail?id=814439
                     margin: 1px 2px 1px 2px;
                     text-align: left;
                     line-height: initial;

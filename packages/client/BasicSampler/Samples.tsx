@@ -168,7 +168,10 @@ const SamplePad = React.memo((props: SamplePadProps) => {
 				? isLoggedIn
 					? 'Upload...'
 					: 'Login first'
-				: sample.label
+				// Limiting in js because `overflow: hidden` has too big a perf hit
+				: sample.label.length > 18
+					? sample.label.substr(0, 15) + '...'
+					: sample.label
 	}
 
 	function getAnimationClass() {
