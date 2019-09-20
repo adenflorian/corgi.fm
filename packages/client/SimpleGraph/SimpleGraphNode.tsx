@@ -63,7 +63,7 @@ export function SimpleGraphNode(props: ISimpleGraphNodeAllProps) {
 
 	const handleMouseDown = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
 		const target = e.target as HTMLElement
-		if (target.className && target.className.includes(handleClassName)) {
+		if (target.classList && target.classList.contains(handleClassName)) {
 			setDragging(true)
 		}
 	}, [])

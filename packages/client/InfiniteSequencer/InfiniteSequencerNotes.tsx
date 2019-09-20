@@ -127,7 +127,7 @@ export function InfiniteSequencerNotes(
 		return (
 			<div className={`display ${events.count() > 8 ? 'small' : ''}`}>
 				<div className="notes">
-					{events.map(event => {
+					{events.toList().map(event => {
 						const note = event.note
 
 						return (
