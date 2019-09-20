@@ -42,7 +42,7 @@ export const KnobIncremental = React.memo(function _KnobIncremental(props: Props
 			allowAltKey={allowAltKey}
 			sensitivity={sensitivity}
 		>
-			{(handleMouseDown, percentage, adjustedPercentage) =>
+			{(handleMouseDown, percentage, adjustedPercentage, isMouseDown) =>
 				<KnobView
 					percentage={percentage}
 					adjustedPercentage={adjustedPercentage}
@@ -51,6 +51,7 @@ export const KnobIncremental = React.memo(function _KnobIncremental(props: Props
 					handleMouseDown={handleMouseDown}
 					tooltip={tooltip}
 					canEdit={true}
+					isMouseDown={isMouseDown}
 				>
 					<KnobValueNumber
 						value={value}

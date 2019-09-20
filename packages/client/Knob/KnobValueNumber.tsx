@@ -1,4 +1,4 @@
-import React, {FormEvent, useEffect, useRef, useState} from 'react'
+import React, {FormEvent, useEffect, useRef, useState, useCallback, ChangeEvent} from 'react'
 import {clamp} from '@corgifm/common/common-utils'
 
 interface Props {
@@ -29,6 +29,19 @@ export const KnobValueNumber = React.memo(
 			}
 		}, [active])
 
+		const handleClick = useCallback(() => {
+			setTempValue(value.toFixed(2))
+			setActive(true)
+		}, [value])
+
+		const handleBlur = useCallback(() => {
+			setActive(false)
+		}, [])
+
+		const handleChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+			setTempValue(e.target.value.replace(/[^0-9-.]/g, ''))
+		}, [])
+
 		const displayValue = valueString(value)
 
 		if (active) {
@@ -36,11 +49,11 @@ export const KnobValueNumber = React.memo(
 				<form
 					className="knobValue unselectable"
 					onSubmit={handleSubmit}
-					onBlur={() => setActive(false)}
+					onBlur={handleBlur}
 				>
 					<input
 						value={tempValue}
-						onChange={e => setTempValue(e.target.value.replace(/[^0-9-.]/g, ''))}
+						onChange={handleChange}
 						ref={inputRef}
 					/>
 				</form>
@@ -49,10 +62,7 @@ export const KnobValueNumber = React.memo(
 			return (
 				<div
 					className="knobValue unselectable"
-					onClick={() => {
-						setTempValue(value.toFixed(2))
-						setActive(true)
-					}}
+					onClick={handleClick}
 				>
 					{displayValue}
 				</div>

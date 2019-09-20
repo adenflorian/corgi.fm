@@ -6,7 +6,7 @@ interface Props {
 	onChange: (newValue: number | string | boolean) => any
 	value: number | string | boolean
 	defaultIndex: number
-	children: (handleMouseDown: any, percentage: number, adjustedPercentage: number) => ReactElement<any>
+	children: (handleMouseDown: any, percentage: number, adjustedPercentage: number, isMouseDown: boolean) => ReactElement<any>
 	possibleValues: List<any>
 }
 
@@ -78,6 +78,7 @@ export function SliderControllerSnapping(props: Props) {
 		_handleMouseDown,
 		_normalize(value),
 		_normalize(value),
+		isMouseDown,
 	)
 }
 

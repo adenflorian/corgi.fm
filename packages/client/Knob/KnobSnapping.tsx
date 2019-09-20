@@ -33,7 +33,7 @@ export const KnobSnapping = React.memo(function _KnobSnapping(props: Props) {
 			defaultIndex={defaultIndex}
 			possibleValues={possibleValues}
 		>
-			{(handleMouseDown, percentage, adjustedPercentage) =>
+			{(handleMouseDown, percentage, adjustedPercentage, isMouseDown) =>
 				<KnobView
 					percentage={percentage}
 					adjustedPercentage={adjustedPercentage}
@@ -42,6 +42,7 @@ export const KnobSnapping = React.memo(function _KnobSnapping(props: Props) {
 					handleMouseDown={handleMouseDown}
 					tooltip={tooltip}
 					canEdit={false}
+					isMouseDown={isMouseDown}
 				>
 					<KnobValueOther value={value} valueString={valueString} />
 				</KnobView>

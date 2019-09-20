@@ -23,12 +23,6 @@ export const ActualKnob = React.memo(function _ActualKnob(props: Props) {
 				width="100%"
 				height="100%"
 				xmlns="http://www.w3.org/2000/svg"
-				style={{
-					position: 'absolute',
-					overflow: 'visible',
-					transform: `rotate(90deg)`,
-					strokeLinecap: 'round',
-				}}
 			>
 				<circle
 					cx="50%"
@@ -54,6 +48,7 @@ export const ActualKnob = React.memo(function _ActualKnob(props: Props) {
 			<div
 				className="actualKnob"
 				style={{
+					// TODO Can't use a transform, causes long ULT
 					transform: `rotate(${_getRotation(percentage)}deg)`,
 				}}
 			>

@@ -13,17 +13,18 @@ interface IKnobViewProps {
 	tooltip: string
 	children: React.ReactNode
 	canEdit: boolean
+	isMouseDown: boolean
 }
 
 export const KnobView = React.memo(function _KnobView(props: IKnobViewProps) {
 	const {
-		handleMouseDown, percentage, canEdit,
+		handleMouseDown, percentage, canEdit, isMouseDown,
 		label, readOnly = false, tooltip, children,
 	} = props
 
 	return (
 		<div
-			className={`knob ${readOnly ? 'readOnly' : ''}`}
+			className={`knob ${readOnly ? 'readOnly' : ''} isMouseDown-${isMouseDown}`}
 			style={{
 				width: 64,
 				height: 88,

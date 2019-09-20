@@ -34,7 +34,7 @@ export const Knob = React.memo(function _Knob(props: IKnobProps) {
 			value={value}
 			defaultValue={defaultValue}
 		>
-			{(handleMouseDown, percentage, adjustedPercentage) =>
+			{(handleMouseDown, percentage, adjustedPercentage, isMouseDown) =>
 				<KnobView
 					percentage={percentage}
 					adjustedPercentage={adjustedPercentage}
@@ -43,6 +43,7 @@ export const Knob = React.memo(function _Knob(props: IKnobProps) {
 					handleMouseDown={handleMouseDown}
 					tooltip={tooltip}
 					canEdit={true}
+					isMouseDown={isMouseDown}
 				>
 					<KnobValueNumber
 						value={value}

@@ -9,7 +9,7 @@ interface Props {
 	value: number
 	defaultValue: number
 	children: (
-		handleMouseDown: any, percentage: number, adjustedPercentage: number
+		handleMouseDown: any, percentage: number, adjustedPercentage: number, isMouseDown: boolean,
 	) => ReactElement<any>
 	increment: number
 	fineIncrement?: number
@@ -89,6 +89,7 @@ export function SliderControllerIncremental(props: Props) {
 		_handleMouseDown,
 		_normalize(value),
 		_normalize(value),
+		isMouseDown,
 	)
 }
 

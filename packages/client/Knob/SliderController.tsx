@@ -8,7 +8,7 @@ interface ISliderControllerProps {
 	value: number
 	defaultValue?: number
 	curve: number
-	children: (handleMouseDown: any, percentage: number, adjustedPercentage: number) => ReactElement<any>
+	children: (handleMouseDown: any, percentage: number, adjustedPercentage: number, isMouseDown: boolean) => ReactElement<any>
 }
 
 export function SliderController(props: ISliderControllerProps) {
@@ -76,6 +76,7 @@ export function SliderController(props: ISliderControllerProps) {
 		_handleMouseDown,
 		_normalize(value, min, max, curve, true),
 		_normalize(value, min, max, curve, false),
+		isMouseDown,
 	)
 }
 
