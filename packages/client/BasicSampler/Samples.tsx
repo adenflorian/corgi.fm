@@ -152,10 +152,11 @@ const SamplePad = React.memo((props: SamplePadProps) => {
 					'"\n\nDrag files from your computer onto a pad to upload them' +
 					'\nTry right clicking'}
 			>
-				<div className="label">
-					{label}
-				</div>
-				<SampleDropZone {...{setDragState, samplerId, midiNote}} />
+				<SampleDropZone {...{setDragState, samplerId, midiNote}}>
+					<div className="label">
+						{label}
+					</div>
+				</SampleDropZone>
 			</div>
 		</ContextMenuTrigger>
 	)
@@ -183,10 +184,11 @@ interface SampleDropZoneProps {
 	setDragState: React.Dispatch<React.SetStateAction<'none' | 'over'>>
 	samplerId: Id
 	midiNote: number
+	children: React.ReactNode
 }
 
 function SampleDropZone(props: SampleDropZoneProps) {
-	const {setDragState, samplerId, midiNote} = props
+	const {setDragState, samplerId, midiNote, children} = props
 
 	const dispatch = useDispatch()
 	const isLoggedIn = useLoggedIn()
@@ -219,7 +221,9 @@ function SampleDropZone(props: SampleDropZoneProps) {
 					return dispatch(
 						corgiApiActions.uploadSample(samplerId, midiNote, fileOrError))
 				}}
-			/>
+			>
+				{children}
+			</div>
 		</div>
 	)
 }
