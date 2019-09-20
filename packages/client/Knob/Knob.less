@@ -14,7 +14,7 @@
     }
 
     &:hover, &:active {
-        // TODO Don't use filter
+        // TODO Use something other than filter
         // filter: brightness(125%);
 
         .valueBox {
@@ -58,10 +58,6 @@
         width: max-content;
         .smallFont();
         margin-top: 4px;
-
-        .saturate & {
-            filter: saturate(300%);
-        }
     }
 
     .knobValue {
@@ -102,10 +98,6 @@
             letter-spacing: inherit;
             writing-mode: inherit;
             text-rendering: inherit;
-        }
-
-        .saturate & {
-            filter: saturate(300%);
         }
     }
 
