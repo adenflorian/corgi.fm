@@ -231,6 +231,35 @@
 - [ ] audio dying after listening to song for long enough
 	- [ ] refactor audio stuff to reuse oscillators and gain nodes, etc.
 
+**PERFORMANCE**
+- [ ] make things better when lots of nodes on screen
+	- [ ] panning
+	- [ ] zooming
+	- [ ] moving a node
+	- [ ] changing a knob
+	- [ ] playing keyboard
+- [ ] metrics
+	- [ ] rendering
+		- [ ] hit test
+		- [ ] update layer tree
+	- [ ] javascript
+		- [ ] react
+		- [ ] redux
+		- [ ] garbage creation/collection
+- [ ] general action items
+	- [ ] avoid use `filter` css property
+	- [ ] avoid use of `position: relative/absolute/fixed`
+	- [ ] use `contain: strict` in more places
+	- [ ] avoid use of `overflow: hidden`
+	- [ ] avoid use of `transform/translate/rotate/scale`
+- tips
+	- use negative margins
+	- use svg transform over css transform
+- node specific
+	- [ ] knob
+		- [ ] fix clicking on knob value
+		- [ ] fix slob knob changing
+
 **Refactor Node State**
 - [ ] id (already in position state, but might need to stay on node state as well) (staying for now)
 - [√] ownerId (move to position state or remove if not used) (moved)
