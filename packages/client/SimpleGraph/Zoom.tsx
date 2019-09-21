@@ -257,7 +257,8 @@ export const ConnectedZoom = React.memo(function _Zoom({
 				ref={zoomRef}
 				className={getZoomClasses()}
 				style={{
-					willChange: backgroundClicked || !fancyZoomPan ? 'transform' : '',
+					// Might not need this with the hack in SimpleGraphNode
+					// willChange: backgroundClicked || !fancyZoomPan ? 'transform' : '',
 					// transition: backgroundClicked ? '' : 'transform 0.05s ease 0s',
 					// overflow: 'hidden',
 				}}

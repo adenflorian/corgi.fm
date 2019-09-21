@@ -72,10 +72,10 @@ export const OptionsModalContent: ModalContent = () => {
 						option={AppOptions.graphicsECS}
 						label="graphics: enable ECS animations (sequencer time marker thing)"
 					/>
-					<ConnectedOption
+					{/* <ConnectedOption
 						option={AppOptions.graphicsExpensiveZoomPan}
 						label="graphics: enable expensive/fancy zoom and pan (sharper render, but slower)"
-					/>
+					/> */}
 					<ConnectedOption
 						option={AppOptions.graphicsExtraAnimations}
 						label="graphics: enable extra animations (disable for better performance in big rooms)"
