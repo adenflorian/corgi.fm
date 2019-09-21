@@ -1,10 +1,11 @@
-import React, {useState, useCallback, useLayoutEffect} from 'react'
+import React, {useState, useCallback, useLayoutEffect, Fragment, useMemo} from 'react'
 import './Resizer.less'
 import {useSelector, useDispatch} from 'react-redux'
 import {
 	positionActions, createPositionSelector, createPositionTypeSelector,
 	findNodeInfo,
 } from '@corgifm/common/redux'
+import {panelHeaderHeight} from '@corgifm/common/common-constants';
 import {simpleGlobalClientState} from '../SimpleGlobalClientState'
 
 interface Props {
@@ -18,7 +19,7 @@ interface ActiveInfo {
 
 const debug = false
 
-export const Resizer = React.memo(({id}: Props) => {
+export const Resizer = React.memo(function _Resizer({id}: Props) {
 	const {x, y, width, height} = useSelector(createPositionSelector(id))
 	const nodeType = useSelector(createPositionTypeSelector(id))
 
@@ -88,56 +89,65 @@ export const Resizer = React.memo(({id}: Props) => {
 		<div
 			className="resizer"
 			style={{
-				position: 'absolute',
-				top: '50%',
-				left: '50%',
-				transform: 'translate(-50%, -50%)',
-				display: 'flex',
-				flexDirection: 'column',
-				pointerEvents: 'none',
+				opacity: debug ? 0.2 : undefined,
+				marginTop: -(height + panelHeaderHeight),
 			}}
 			onMouseUp={setInactive}
 		>
-			<div
-				style={{pointerEvents: 'all', backgroundColor: debug ? 'red' : undefined, cursor: 'nw-resize'}}
-				className="resizeHandle top left topLeft corner"
-				onMouseDown={() => handleMouseDown({hoz: 'left', vert: 'up'})}
-			/>
-			<div
-				style={{pointerEvents: 'all', backgroundColor: debug ? 'blue' : undefined, cursor: 'n-resize'}}
-				className="resizeHandle top mid topMid edge hoz"
-				onMouseDown={() => handleMouseDown({hoz: 'none', vert: 'up'})}
-			/>
-			<div
-				style={{pointerEvents: 'all', backgroundColor: debug ? 'red' : undefined, cursor: 'ne-resize'}}
-				className="resizeHandle top right topRight corner"
-				onMouseDown={() => handleMouseDown({hoz: 'right', vert: 'up'})}
-			/>
-			<div
-				style={{pointerEvents: 'all', backgroundColor: debug ? 'blue' : undefined, cursor: 'w-resize'}}
-				className="resizeHandle left midLeft edge vert"
-				onMouseDown={() => handleMouseDown({hoz: 'left', vert: 'none'})}
-			/>
-			<div
-				style={{pointerEvents: 'all', backgroundColor: debug ? 'blue' : undefined, cursor: 'e-resize'}}
-				className="resizeHandle right midRight edge vert"
-				onMouseDown={() => handleMouseDown({hoz: 'right', vert: 'none'})}
-			/>
-			<div
-				style={{pointerEvents: 'all', backgroundColor: debug ? 'red' : undefined, cursor: 'sw-resize'}}
-				className="resizeHandle bottom left bottomLeft corner"
-				onMouseDown={() => handleMouseDown({hoz: 'left', vert: 'down'})}
-			/>
-			<div
-				style={{pointerEvents: 'all', backgroundColor: debug ? 'blue' : undefined, cursor: 's-resize'}}
-				className="resizeHandle bottom mid bottomMid edge hoz"
-				onMouseDown={() => handleMouseDown({hoz: 'none', vert: 'down'})}
-			/>
-			<div
-				style={{pointerEvents: 'all', backgroundColor: debug ? 'red' : undefined, cursor: 'se-resize'}}
-				className="resizeHandle bottom right bottomRight corner"
-				onMouseDown={() => handleMouseDown({hoz: 'right', vert: 'down'})}
-			/>
+			{useMemo(() => (
+				<Fragment>
+					<div className="row top">
+						<div
+							style={{backgroundColor: debug ? 'red' : undefined, cursor: 'nw-resize'}}
+							className="resizeHandle left topLeft corner"
+							onMouseDown={() => handleMouseDown({hoz: 'left', vert: 'up'})}
+						/>
+						<div
+							style={{backgroundColor: debug ? 'blue' : undefined, cursor: 'n-resize'}}
+							className="resizeHandle mid topMid edge hoz"
+							onMouseDown={() => handleMouseDown({hoz: 'none', vert: 'up'})}
+						/>
+						<div
+							style={{backgroundColor: debug ? 'red' : undefined, cursor: 'ne-resize'}}
+							className="resizeHandle right topRight corner"
+							onMouseDown={() => handleMouseDown({hoz: 'right', vert: 'up'})}
+						/>
+					</div>
+					<div className="row vert">
+						<div
+							style={{backgroundColor: debug ? 'blue' : undefined, cursor: 'w-resize'}}
+							className="resizeHandle left midLeft edge vert"
+							onMouseDown={() => handleMouseDown({hoz: 'left', vert: 'none'})}
+						/>
+						<div
+							style={{backgroundColor: debug ? 'green' : undefined}}
+							className="vert hoz"
+						/>
+						<div
+							style={{backgroundColor: debug ? 'blue' : undefined, cursor: 'e-resize'}}
+							className="resizeHandle right midRight edge vert"
+							onMouseDown={() => handleMouseDown({hoz: 'right', vert: 'none'})}
+						/>
+					</div>
+					<div className="row bottom">
+						<div
+							style={{backgroundColor: debug ? 'red' : undefined, cursor: 'sw-resize'}}
+							className="resizeHandle left bottomLeft corner"
+							onMouseDown={() => handleMouseDown({hoz: 'left', vert: 'down'})}
+						/>
+						<div
+							style={{backgroundColor: debug ? 'blue' : undefined, cursor: 's-resize'}}
+							className="resizeHandle mid bottomMid edge hoz"
+							onMouseDown={() => handleMouseDown({hoz: 'none', vert: 'down'})}
+						/>
+						<div
+							style={{backgroundColor: debug ? 'red' : undefined, cursor: 'se-resize'}}
+							className="resizeHandle right bottomRight corner"
+							onMouseDown={() => handleMouseDown({hoz: 'right', vert: 'down'})}
+						/>
+					</div>
+				</Fragment>
+			), [handleMouseDown])}
 		</div>
 	)
 })

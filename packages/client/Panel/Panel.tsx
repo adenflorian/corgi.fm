@@ -58,7 +58,6 @@ export const Panel =
 				}}
 				className={`panelContainer ${saturate ? 'saturate' : ''}`}
 			>
-				{isResizable && <Resizer id={id} />}
 				<div
 					className={`header ${handleClassName}`}
 					title={labelTitle}
@@ -107,6 +106,7 @@ export const Panel =
 				>
 					{children}
 				</div>
+				{isResizable && <Resizer id={id} />}
 			</div>
 		)
 
