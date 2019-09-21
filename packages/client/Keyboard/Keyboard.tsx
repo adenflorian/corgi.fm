@@ -202,15 +202,13 @@ const OctaveSection = React.memo(function _OctaveSection({id}: {id: Id}) {
 		<div
 			className="octave black unselectable"
 			title={stripIndents`Octave
-				Press Z or - to decrease octave and X or + to increase octave`}
+
+				Press Z or - to decrease octave
+				Press X or + to increase octave`}
 		>
-			<div className="octaveNumber">
-				<div>{octave}</div>
-			</div>
-			<div className="octaveKeys smallText">
-				<span>z</span>
-				<span>x</span>
-			</div>
+			<div className="octaveKey smallText">z</div>
+			<div className="octaveNumber">{octave}</div>
+			<div className="octaveKey smallText">x</div>
 		</div>
 	)
 })

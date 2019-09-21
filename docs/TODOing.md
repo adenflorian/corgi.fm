@@ -256,19 +256,19 @@
 	- use negative margins
 	- use svg transform over css transform
 - node specific
-	- [ ] knob
-		- [ ] fix clicking on knob value
-		- [ ] fix slob knob changing
 	- [√] sampler
 	- [√] synth
-	- [ ] graph node/panel/header
-	- [ ] keyboard
+	- [√] keyboard
 	- [ ] BS
 	- [√] infinite seq
 	- [ ] grid seq
 	- [ ] group seq
+	- [ ] graph node/panel/header
 	- [ ] ECS
 	- [ ] master limiter canvas
+	- [ ] knob
+		- [ ] fix clicking on knob value
+		- [ ] fix slob knob changing
 
 **Refactor Node State**
 - [ ] id (already in position state, but might need to stay on node state as well) (staying for now)

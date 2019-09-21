@@ -86,7 +86,7 @@ export enum CssColor {
 	gray2 = '#31313d',
 	gray3 = 'hsl(240, 0%, 30%)',
 	keyWhite = '#EBEBF6',
-	defaultGray = 'rgb(226, 226, 226)',
+	defaultGray = 'hsl(0, 0%, 89%)',
 	subtleGrayWhiteBg = 'hsl(240, 0%, 65%)',
 	subtleGrayBlackBg = 'hsl(240, 0%, 57%)',
 	orange = 'hsl(19, 90%, 50%)',
