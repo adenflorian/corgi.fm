@@ -65,13 +65,22 @@ export const Panel =
 					onMouseDown={handleMouseDownOnHeader}
 				>
 					<div
-						className={`colorDotContainer ${enabled ? 'enabled' : ''}`}
+						className={`colorDotContainer enabled-${enabled}`}
 						onClick={onColorDotClick}
 						title={(enabled ? 'Enabled' : 'Disabled') +
 							`\nDisable or enable this node\n` +
 							disabledText + ' when disabled'}
 					>
-						<div className="colorDot" />
+						<svg width={24} height={16}>
+							<circle
+								r={3}
+								cx="50%"
+								cy="50%"
+								stroke="currentColor"
+								strokeWidth="2px"
+								fill={enabled ? 'currentColor' : 'none'}
+							/>
+						</svg>
 					</div>
 					<div className="label">{label}</div>
 					{ownerName &&

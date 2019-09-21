@@ -276,6 +276,7 @@
 	- [ ] make custom debouncing solution that runs on RAF
 	- [ ] moving vertical scroll bar on grid sequencer
 	- [ ] canvases
+	- [ ] resizing node on left and top sides
 
 **Refactor Node State**
 - [ ] id (already in position state, but might need to stay on node state as well) (staying for now)
