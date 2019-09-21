@@ -5,10 +5,6 @@
 .gridSequencer {
     max-width: 580px;
 
-    .isNotPlaying& {
-        transition: box-shadow 0.3s ease-out;
-    }
-
     .controls {
         display: flex;
         flex-direction: column;
@@ -120,24 +116,24 @@
                 margin-left: 0;
             }
             &.active {
-                filter: brightness(120%)
+                // : brightness(120%)
             }
             &.active:nth-child(odd) {
-                filter: brightness(120%)
+                // : brightness(120%)
             }
             &:nth-child(odd) {
-                // filter: brightness(110%)
+                // : brightness(110%)
             }
             &:nth-child(4n) {
-                // filter: brightness(110%)
+                // : brightness(110%)
                 border-right: 1px dashed @panelGrayLight;
             }
             &:nth-child(8n) {
-                // filter: brightness(110%)
+                // : brightness(110%)
                 border-right: 1px solid @panelGrayLight;
             }
             // &:last-child {
-            //     // filter: brightness(110%)
+            //     // : brightness(110%)
             //     border-right: none;
             // }
             .note {
@@ -148,7 +144,7 @@
                 // border: 1px solid @panelGrayLight;
                 &.white {
                     // background-color: @gray2;
-                    // filter: brightness(110%);
+                    // : brightness(110%);
                     // background-color: @panelGrayLight;
                 }
                 &.black {
@@ -157,21 +153,21 @@
                 &:hover {
                     // box-shadow: none;
                     background-color: currentColor;
-                    filter: brightness(60%)
+                    // : brightness(60%)
                 }
                 &.on {
                     // box-shadow: none;
                     background-color: currentColor;
                     &:hover {
-                        filter: saturate(300%)
+                        // : saturate(300%)
                     }
                 }
                 &:active,
                 &.active {
-                    filter: saturate(300%)
+                    // : saturate(300%)
                 }
                 &.on:active {
-                    filter: saturate(50%)
+                    // : saturate(50%)
                 }
             }
         }

@@ -127,7 +127,7 @@ class Event extends React.PureComponent<IEventProps> {
 		return (
 			<div
 				key={eventIndex}
-				className={`event transitionAllColor`}
+				className={`event`}
 			>
 				{placeholderNotesArray.map(this._renderNote)}
 			</div>
@@ -168,7 +168,6 @@ class Note extends React.PureComponent<INoteProps> {
 			onMouseEnter={this._onMouseEnter}
 			onMouseDown={this._onMouseDown}
 			style={{
-				backgroundColor: isEnabled ? getColorStringForMidiNote(note) : undefined,
 				color: getColorStringForMidiNote(note),
 				borderRadius: 4,
 			}}
