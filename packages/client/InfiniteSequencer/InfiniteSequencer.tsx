@@ -78,7 +78,7 @@ export const InfiniteSequencer = (props: IInfiniteSequencerAllProps) => {
 						<EraseButton parentId={id} />
 						<UndoButton parentId={id} />
 						<StyleButton parentId={id} />
-						<ShowRowsButton parentId={id} />
+						{/* <ShowRowsButton parentId={id} /> */}
 					</div>
 					<div className="knobs">
 						<Knob

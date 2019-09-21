@@ -65,7 +65,7 @@ export const Panel =
 					onMouseDown={handleMouseDownOnHeader}
 				>
 					<div
-						className={`colorDotContainer noDrag ${enabled ? 'enabled' : ''}`}
+						className={`colorDotContainer ${enabled ? 'enabled' : ''}`}
 						onClick={onColorDotClick}
 						title={(enabled ? 'Enabled' : 'Disabled') +
 							`\nDisable or enable this node\n` +

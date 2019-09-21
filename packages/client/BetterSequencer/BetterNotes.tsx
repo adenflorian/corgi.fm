@@ -95,6 +95,7 @@ export const BetterNotes = React.memo(function _BetterNotes(props: Props) {
 			return {
 				...event,
 				startBeat: Math.max(0, Math.min(lengthBeats - event.durationBeats, event.startBeat + roundedBeatDelta)),
+				// TODO clampMidiNote
 				note: Math.max(MIN_MIDI_NOTE_NUMBER_0, Math.min(MAX_MIDI_NOTE_NUMBER_127, Math.floor(event.note + mouseNoteDelta))),
 			}
 		})

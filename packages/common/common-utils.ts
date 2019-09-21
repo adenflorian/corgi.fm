@@ -1,7 +1,10 @@
 import * as path from 'path'
 import {debounce} from 'lodash'
 import {Map, List} from 'immutable'
-import {allowedSampleUploadFileExtensions} from './common-constants'
+import {
+	allowedSampleUploadFileExtensions, MAX_MIDI_NOTE_NUMBER_127,
+	MIN_MIDI_NOTE_NUMBER_0,
+} from './common-constants'
 import {MidiClipEvents} from './midi-types'
 
 import uuid = require('uuid')
@@ -63,9 +66,14 @@ export function createNodeId() {
 	return uuid.v4()
 }
 
-export const clamp = (val: number, min: number, max: number) => Math.min(max || 0, Math.max(min || 0, val || 0))
+export const clamp = (val: number, min: number, max: number) =>
+	Math.min(max || 0, Math.max(min || 0, val || 0))
 
-export const incrementalRound = (v: number, increment: number) => Math.round(v / increment) * increment
+export const clampMidiNote = (note: number) =>
+	clamp(note, MIN_MIDI_NOTE_NUMBER_0, MAX_MIDI_NOTE_NUMBER_127)
+
+export const incrementalRound = (v: number, increment: number) =>
+	Math.round(v / increment) * increment
 
 export function applyOctave(midiNumber: number, octave: number) {
 	if (octave === -1) return midiNumber

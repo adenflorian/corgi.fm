@@ -259,6 +259,16 @@
 	- [ ] knob
 		- [ ] fix clicking on knob value
 		- [ ] fix slob knob changing
+	- [√] sampler
+	- [√] synth
+	- [ ] graph node/panel/header
+	- [ ] keyboard
+	- [ ] BS
+	- [√] infinite seq
+	- [ ] grid seq
+	- [ ] group seq
+	- [ ] ECS
+	- [ ] master limiter canvas
 
 **Refactor Node State**
 - [ ] id (already in position state, but might need to stay on node state as well) (staying for now)
@@ -629,3 +639,12 @@ do i need to be able to support older version?
 	- FOSS VSTs
 - is there a limit on an individual chat message
 - add option to disable cable highlighting
+
+# Events
+- like discord challenges
+	- musical telephone
+	- exquisite corpse
+
+# Built in games
+- musical tetris
+	- the blocks are midi clips or samples
