@@ -178,10 +178,28 @@
     }
 
     .verticalScrollBar {
+        width: 16px;
+        height: 100%;
+        overflow: visible;
+
         .slider {
+            width: 100%;
+            fill: @panelGrayLight;
+            rx: 4px;
+            ry: 4px;
+
             &:hover {
-                filter: brightness(125%)
+                // fill: @pan;
             }
+        }
+
+        .mark {
+            fill: currentColor;
+            height: 2%;
+            pointer-events: none;
+            width: 100%;
+            rx: 2px;
+            ry: 2px;
         }
     }
 }

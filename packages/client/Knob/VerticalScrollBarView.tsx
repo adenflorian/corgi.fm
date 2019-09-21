@@ -1,6 +1,5 @@
-import {List} from 'immutable'
-import React from 'react'
-import {CssColor} from '@corgifm/common/shamu-color'
+import {List, Map} from 'immutable'
+import React, {useMemo} from 'react'
 
 interface IVerticalScrollBarViewProps {
 	percentage: number
@@ -14,46 +13,32 @@ export const VerticalScrollBarView = (props: IVerticalScrollBarViewProps) => {
 
 	const inversePercentage = 100 - sliderGrabberHeightPercentage
 
+	const finalMarks = useMemo(() =>
+		marks.reduce((result, mark) => {
+			return result.update(mark, 0, x => x + 1)
+		}, Map<number, number>()),
+	[marks])
+
+	const mostMarks = useMemo(() => finalMarks.max() || 1, [finalMarks])
+
 	return (
-		<div
-			className="verticalScrollBar"
-			style={{
-				width: 16,
-				position: 'relative',
-			}}
-		>
-			<div
+		<svg className="verticalScrollBar">
+			<rect
 				className="slider"
-				style={{
-					top: `${inversePercentage - (percentage * inversePercentage)}%`,
-					position: 'absolute',
-					zIndex: 2,
-					width: '100%',
-					height: `${sliderGrabberHeightPercentage}%`,
-					backgroundColor: CssColor.panelGrayLight,
-					borderRadius: 4,
-				}}
+				y={`${inversePercentage - (percentage * inversePercentage)}%`}
+				height={`${sliderGrabberHeightPercentage}%`}
 				onMouseDown={handleMouseDown}
 			/>
-			{marks.map((mark, index) => {
-				return (
-					<div
-						key={index}
+			{useMemo(() => (
+				finalMarks.map((count, mark) => (
+					<rect
+						key={mark}
 						className="mark"
-						style={{
-							position: 'absolute',
-							top: `${99 - Math.floor(mark * 100)}%`,
-							backgroundColor: 'currentColor',
-							width: '100%',
-							height: '2%',
-							filter: 'opacity(0.4)',
-							zIndex: 2,
-							pointerEvents: 'none',
-							borderRadius: 2,
-						}}
+						y={`${99 - Math.floor(mark * 100)}%`}
+						opacity={(count / mostMarks) + ((1 - (count / mostMarks)) * 0.2)}
 					/>
-				)
-			})}
-		</div>
+				)).toList()
+			), [finalMarks, mostMarks])}
+		</svg>
 	)
 }

@@ -241,6 +241,7 @@
 - [ ] metrics
 	- [ ] rendering
 		- [ ] hit test
+			- filter, position(abs/fix/rel)
 		- [ ] update layer tree
 	- [ ] javascript
 		- [ ] react
@@ -259,10 +260,10 @@
 	- [√] sampler
 	- [√] synth
 	- [√] keyboard
-	- [ ] BS
 	- [√] infinite seq
 	- [ ] grid seq
 	- [ ] group seq
+	- [ ] BS
 	- [ ] graph node/panel/header
 	- [ ] ECS
 	- [ ] master limiter canvas
