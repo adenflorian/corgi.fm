@@ -261,15 +261,20 @@
 	- [√] synth
 	- [√] keyboard
 	- [√] infinite seq
-	- [ ] grid seq
+	- [√] grid seq
 	- [ ] group seq
 	- [ ] BS
+	- [ ] FPS in top div
+	- [ ] Zoom text in top div
+	- [ ] chat
 	- [ ] graph node/panel/header
 	- [ ] ECS
 	- [ ] master limiter canvas
 	- [ ] knob
 		- [ ] fix clicking on knob value
 		- [ ] fix slob knob changing
+	- [ ] make custom debouncing solution that runs on RAF
+	- [ ] moving vertical scroll bar on grid sequencer
 
 **Refactor Node State**
 - [ ] id (already in position state, but might need to stay on node state as well) (staying for now)

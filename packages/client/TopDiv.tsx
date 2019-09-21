@@ -59,9 +59,9 @@ export const TopDiv = ({
 					<div className="blobDark" title="Frames per second">
 						FPS
 					</div>
-					<div id="fps" style={{width: 32, overflow: 'hidden'}} />
+					<div id="fps" />
 				</div>
-				<div className="blob" style={{overflow: 'hidden', cursor: 'pointer'}} title="Click to reset zoom" onClick={resetZoom}>
+				<div className="blob" style={{cursor: 'pointer'}} title="Click to reset zoom" onClick={resetZoom}>
 					<span className="blobDark">Zoom</span>
 					<span id="zoomText">0.0</span>
 				</div>
