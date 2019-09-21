@@ -262,7 +262,7 @@
 	- [√] keyboard
 	- [√] infinite seq
 	- [√] grid seq
-	- [ ] group seq
+	- [√] group seq
 	- [ ] BS
 	- [ ] FPS in top div
 	- [ ] Zoom text in top div
@@ -275,6 +275,7 @@
 		- [ ] fix slob knob changing
 	- [ ] make custom debouncing solution that runs on RAF
 	- [ ] moving vertical scroll bar on grid sequencer
+	- [ ] canvases
 
 **Refactor Node State**
 - [ ] id (already in position state, but might need to stay on node state as well) (staying for now)
