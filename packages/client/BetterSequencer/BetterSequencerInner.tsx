@@ -658,6 +658,7 @@ export const BetterSequencerInner = React.memo(function _BetterSequencerInner({i
 				{boxActive && <BoxSelect
 					origin={boxOrigin}
 					otherCorner={otherCorner}
+					top={scaledHeight}
 				/>}
 			</div>
 		</Fragment>
