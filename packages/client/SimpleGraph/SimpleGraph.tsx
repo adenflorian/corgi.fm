@@ -29,7 +29,7 @@ export function ConnectedSimpleGraph() {
 					<ConnectedConnections />
 					<ConnectedGhostConnectionsView />
 					<PositionsStuff />
-					<canvas
+					{/* <canvas
 						id="ECSCanvasRenderSystemCanvas"
 						style={{
 							position: 'absolute',
@@ -41,7 +41,7 @@ export function ConnectedSimpleGraph() {
 						}}
 						width={canvasSize}
 						height={canvasSize}
-					/>
+					/> */}
 				</div>
 			</ConnectedZoom>
 		</div>

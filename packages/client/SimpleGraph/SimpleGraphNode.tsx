@@ -187,6 +187,7 @@ export const ConnectedSimpleGraphNode = shamuConnect(
 
 		return {
 			position,
+			// TODO Don't get color here
 			color: findNodeInfo(position.targetType).color
 				|| selectConnectionSourceColorByTargetId(state, positionId),
 			highQuality: selectOptions(state).graphicsECS,

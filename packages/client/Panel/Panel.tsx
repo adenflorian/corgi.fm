@@ -54,7 +54,6 @@ export const Panel =
 			<div
 				style={{
 					color: enabled ? color : CssColor.disabledGray,
-					position: 'relative',
 				}}
 				className={`panelContainer ${saturate ? 'saturate' : ''}`}
 			>
@@ -131,7 +130,6 @@ export const PanelLite = React.memo(
 			<div
 				style={{
 					color,
-					position: 'relative',
 				}}
 				className={`panelContainer`}
 			>
