@@ -33,7 +33,6 @@
 	}
 
 	.sideNotes {
-		position: relative;
 		overflow: hidden;
 		min-width: @zoomBarWidth + @notesWidth;
 
@@ -54,20 +53,31 @@
 				flex-direction: column-reverse;
 
 				.row {
-					// border-bottom: 1px solid @panelGray;
-					// box-sizing: border-box;
-					// margin: 2px 0;
 					margin-bottom: 1px;
-					position: relative;
+					box-shadow: 0 1px 0 0 @panelGrayDark;
 
-					&::after {
-						background-color: @panelGrayDark;
-						width: 100%;
-						height: 1px;
-						content: '';
-						position: absolute;
-						left: 0;
-  					bottom: -1px;
+					&:hover + .row.isC-true {
+						.rowLabel {
+							display: none !important;
+						}
+					}
+
+					&:hover + .row + .row.isC-true {
+						.rowLabel {
+							display: none !important;
+						}
+					}
+
+					&:hover + .row + .row + .row.isC-true {
+						.rowLabel {
+							display: none !important;
+						}
+					}
+
+					&:hover + .row + .row + .row + .row.isC-true {
+						.rowLabel {
+							display: none !important;
+						}
 					}
 					
 					&.white {
@@ -93,13 +103,11 @@
 					.rowLabel {
 						.largeFont();
 						@noteNameFont();
-						display: flex;
+						display: none;
 						align-items: center;
-						opacity: 0;
 						@leftPadding: 4px;
 						padding-left: @leftPadding;
-						position: absolute;
-						left: -@zoomBarWidth;
+						margin-left: -@zoomBarWidth;
 						pointer-events: none;
 						color: @knobValueGray;
 						width: @zoomBarWidth - @leftPadding;
@@ -111,7 +119,7 @@
 	
 					&:hover {
 						.rowLabel {
-							opacity: 1;
+							display: flex;
 						}
 					}
 				}

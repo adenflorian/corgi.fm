@@ -25,7 +25,7 @@ export const BetterSideNotes = React.memo(function _BetterSideNotes({
 			<div
 				className="transformable"
 				style={{
-					transform: `translateY(${-panPixelsY}px)`,
+					marginTop: -panPixelsY,
 					height: noteHeight * rows.length,
 					width: betterSideNotesWidth,
 				}}
@@ -102,7 +102,7 @@ export const BetterSideNote = React.memo(({
 	return (
 		<div
 			key={row}
-			className={`row ${animClass} ${isWhite ? 'white' : 'black'}`}
+			className={`row ${animClass} ${isWhite ? 'white' : 'black'} isC-${isC}`}
 			style={{
 				height: noteHeight - 1,
 				// fontWeight: isWhite ? 600 : 400,
@@ -112,11 +112,10 @@ export const BetterSideNote = React.memo(({
 			<div
 				className="rowLabel"
 				style={{
-					opacity: isC ? 1 : undefined,
-					zIndex: isC ? 0 : 1,
+					display: isC ? 'flex' : undefined,
 					backgroundColor: isC ? undefined : CssColor.panelGray,
 					height: noteHeight - 1,
-					// color: isWhite ? CssColor.panelGrayDark : CssColor.defaultGray,
+					marginTop: Math.min(0, -(17 - noteHeight)),
 				}}
 			>
 				{row}
