@@ -18,7 +18,6 @@ export function SliderController(props: ISliderControllerProps) {
 	} = props
 
 	const [isMouseDown, setIsMouseDown] = useState(false)
-	const [tempValue, setTempValue] = useState(0)
 
 	useLayoutEffect(() => {
 
@@ -49,7 +48,6 @@ export function SliderController(props: ISliderControllerProps) {
 
 				if (newValue !== value) {
 					onChange(newValue)
-					setTempValue(newValue)
 				}
 			}
 		}
@@ -61,13 +59,12 @@ export function SliderController(props: ISliderControllerProps) {
 		return () => {
 			window.removeEventListener('mousemove', _handleMouseMove)
 		}
-	}, [curve, isMouseDown, max, min, onChange, tempValue, value])
+	}, [curve, isMouseDown, max, min, onChange, value])
 
 	const _handleMouseDown = (e: React.MouseEvent) => {
 		if ((e.ctrlKey || e.metaKey) && defaultValue !== undefined) {
 			onChange(defaultValue)
 		} else {
-			setTempValue(value)
 			setIsMouseDown(true)
 		}
 	}
