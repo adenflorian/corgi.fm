@@ -242,7 +242,7 @@ export const BetterNotes = React.memo(function _BetterNotes(props: Props) {
 				cloning-${noteCloneActive}
 			`}
 		>
-			<div
+			<svg
 				className="scalable"
 				onMouseDown={e => {
 					if (e.button !== 0 || e.shiftKey) return
@@ -259,7 +259,7 @@ export const BetterNotes = React.memo(function _BetterNotes(props: Props) {
 					rows={rows}
 					handleMouseDown={handleMouseDown}
 				/>
-			</div>
+			</svg>
 		</div>
 	)
 })

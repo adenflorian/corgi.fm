@@ -128,7 +128,6 @@
 	}
 
 	.editor {
-		flex-grow: 1;
 		overflow: hidden;
 
 		.translatable {
@@ -212,6 +211,7 @@
 		}
 
 		.notes {
+			// TODO
 			position: absolute;
 			width: 100%;
 			height: 100%;
@@ -240,47 +240,29 @@
 			}
 
 			.scalable {
-				position: relative;
 				width: 100%;
 				height: 100%;
-				white-space: nowrap;
-				// will-change: transform;
+				shape-rendering: crispedges;
 
 				.note {
-					position: absolute;
-					background-color: currentColor;
-					// border-radius: 1px;
-					border: 2px solid #0000;
-					box-sizing: border-box;
-					margin-bottom: 1px;
-					min-width: 1px;
-					// border-top: none;
-					// border-bottom: none;
+					pointer-events: none;
 
-					// .zoomCloser & {
-					// 	border-width: 1px;
-					// }
-					
-					.ctrl-true.alt-true & {
-						pointer-events: none;
+					.noteBackground {
+						stroke: none;
 					}
 
-					&.selected-true {
-						border-color: @defaultGray;
+					.noteBorder {
+						width: 100%;
+						height: 100%;
+						fill: none;
 					}
 
 					.noteLabel {
 						.largeFont();
 						@noteNameFont();
-						color: @panelGrayDark;
-						text-align: left;
+						fill: @panelGrayDark;
+						stroke: none;
 						line-height: normal;
-						padding-left: 8px;
-						height: 104%;
-						display: flex;
-						align-items: center;
-						pointer-events: none;
-						overflow: hidden;
 					}
 				}
 			}

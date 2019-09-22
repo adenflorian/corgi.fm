@@ -2,34 +2,19 @@
 @import "../AppCommon.less";
 
 .noteResizer {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	display: flex;
-	flex-direction: column;
-
-	.resizerRow {
-		display: flex;
-
-		&.midRow {
-			flex-grow: 1;
-		}
-	}
+	pointer-events: none;
 
 	.resizeHandle {
-		opacity: 0.5;
 		pointer-events: all;
+		height: 100%;
+		fill: none;
+		stroke: none;
 					
 		.ctrl-true.alt-true & {
 			pointer-events: none;
 		}
 
-		&.top, &.bottom {
-			height: 8px;
-		}
-
 		&.left, &.right {
-			width: 8px;
 			margin-top: -1px;
 			margin-bottom: -1px;
 
@@ -49,7 +34,6 @@
 		}
 
 		&.mid {
-			flex-grow: 1;
 			margin-top: -1px;
 			margin-bottom: -1px;
 		}

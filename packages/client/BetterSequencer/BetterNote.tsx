@@ -4,6 +4,7 @@ import {midiNoteToNoteNameFull} from '@corgifm/common/common-samples-stuff'
 import {MidiClipEvent} from '@corgifm/common/midi-types'
 import {betterSequencerActions} from '@corgifm/common/redux'
 import {smallNoteHeight, tinyNoteHeight} from '@corgifm/common/BetterConstants'
+import {CssColor} from '@corgifm/common/shamu-color'
 import {BetterNoteResizer} from './BetterNoteResizer'
 
 interface Props {
@@ -25,7 +26,7 @@ export const BetterNote = React.memo(function _BetterNote({
 	const dispatch = useDispatch()
 	const noteLabel = midiNoteToNoteNameFull(event.note)
 
-	const mainRef = useRef<HTMLDivElement>(null)
+	const mainRef = useRef<SVGSVGElement>(null)
 
 	useLayoutEffect(() => {
 
@@ -62,31 +63,50 @@ export const BetterNote = React.memo(function _BetterNote({
 
 	const tiny = noteHeight <= tinyNoteHeight
 	const small = noteHeight <= smallNoteHeight
+	const actualHeight = noteHeight - (tiny ? 0 : 2)
+	const useBorder = !tiny
+	const borderThickness = 2
+	const width = Math.max(1, event.durationBeats * columnWidth)
 
 	return (
-		<div
-			key={event.id.toString()}
-			className={`note selected-${isSelected}`}
-			title={noteLabel}
-			style={{
-				width: event.durationBeats * columnWidth,
-				height: noteHeight - (tiny ? 0 : 2),
-				left: event.startBeat * columnWidth,
-				top: ((rows.length - event.note) * noteHeight) - noteHeight + (tiny ? 0 : 1),
-				border: tiny && !isSelected ? 'none' : undefined,
-				borderRadius: tiny ? 0 : undefined,
-			}}
+		<svg
+			className={`note selected-${isSelected} ${tiny ? 'tiny' : ''}`}
+			x={event.startBeat * columnWidth}
+			y={((rows.length - event.note) * noteHeight) - noteHeight + (tiny ? 0 : 1)}
+			width={width}
+			height={actualHeight}
 			ref={mainRef}
 		>
-			<div
+			<rect
+				className={`noteBackground`}
+				width={width - (useBorder ? 2 : 0)}
+				height={actualHeight - (useBorder ? 2 : 0)}
+				x={useBorder ? 1 : 0}
+				y={useBorder ? 1 : 0}
+				fill={tiny && isSelected ? CssColor.defaultGray : 'currentColor'}
+			>
+				<title>{noteLabel}</title>
+			</rect>
+			<text
 				className="noteLabel"
 				style={{
 					display: small ? 'none' : undefined,
 				}}
+				x={8}
+				y={actualHeight / 1.5}
 			>
 				{noteLabel}
-			</div>
-			<BetterNoteResizer {...{id, handleMouseDown, eventId: event.id}} />
-		</div>
+			</text>
+			<rect
+				className={`noteBorder`}
+				width="100%"
+				height="100%"
+				strokeWidth={borderThickness * 2}
+				stroke={!useBorder ? 'none' : isSelected ? CssColor.defaultGray : CssColor.panelGrayDark}
+			>
+				<title>{noteLabel}</title>
+			</rect>
+			<BetterNoteResizer {...{id, handleMouseDown, eventId: event.id, noteHeight, width}} />
+		</svg>
 	)
 })
