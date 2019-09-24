@@ -12,7 +12,7 @@ import {ConnectedZoom} from './Zoom'
 
 const canvasSize = ECSCanvasRenderSystem.canvasSize
 
-export function ConnectedSimpleGraph() {
+export const ConnectedSimpleGraph = function _ConnectedSimpleGraph() {
 	return (
 		<div
 			className="simpleGraph"
