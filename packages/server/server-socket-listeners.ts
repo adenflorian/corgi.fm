@@ -15,7 +15,7 @@ import {
 	getActionsBlacklist, GLOBAL_SERVER_ACTION, globalClockActions,
 	IClientRoomState,
 	IServerState, LOAD_ROOM, maxUsernameLength, pointersActions, ready,
-	replacePositions, REQUEST_CREATE_ROOM, roomOwnerRoomActions,
+	replacePositions, roomOwnerRoomActions,
 	RoomSettingsAction, roomSettingsActions, RoomsReduxAction, SavedRoom,
 	selectAllClients, selectAllConnections,
 	selectAllMessages, selectAllPointers, selectAllPositions,
@@ -28,7 +28,8 @@ import {
 	selectRoomSettings, selectRoomStateByName, selectShamuGraphState,
 	SERVER_ACTION, setActiveRoom,
 	setChat, setClients, setRoomMembers, setRooms, shamuGraphActions,
-	userLeftRoom, whitelistedRoomActionTypes, isRoomOwnerRoomAction, selectPositionsByOwner,
+	userLeftRoom, whitelistedRoomActionTypes, isRoomOwnerRoomAction,
+	selectPositionsByOwner, roomInfoAction, RoomType, selectRoomInfoState,
 } from '@corgifm/common/redux'
 import {WebSocketEvent} from '@corgifm/common/server-constants'
 import {createServerStuff, loadServerStuff} from './create-server-stuff'
@@ -165,10 +166,10 @@ export function setupServerWebSocketListeners(
 
 			if (action.type === CHANGE_ROOM) {
 				changeRooms(action.room)
-			} else if (action.type === REQUEST_CREATE_ROOM) {
-				makeAndJoinNewRoom(animal.getId())
+			} else if (action.type === 'REQUEST_CREATE_ROOM') {
+				makeAndJoinNewRoom(action.name || animal.getId(), action.roomType)
 			} else if (action.type === LOAD_ROOM) {
-				makeAndJoinNewRoom(animal.getId(), action.savedRoom)
+				makeAndJoinNewRoom(animal.getId(), RoomType.Normal, action.savedRoom)
 			} else if ((action as any)[GLOBAL_SERVER_ACTION]) {
 				serverStore.dispatch(action)
 			} else if ((action as any)[SERVER_ACTION]) {
@@ -205,7 +206,7 @@ export function setupServerWebSocketListeners(
 
 				// Do this check after joining the socket to the room, that way the room can't get deleted anymore
 				if (roomExists === false) {
-					makeNewRoom(newRoom)
+					makeNewRoom(newRoom, RoomType.Normal)
 				}
 
 				onJoinRoom(io, socket, newRoom, serverStore, clientId)
@@ -228,27 +229,28 @@ export function setupServerWebSocketListeners(
 
 				// Do this check after joining the socket to the room, that way the room can't get deleted anymore
 				if (roomExists === false) {
-					makeNewRoom(newRoom)
+					makeNewRoom(newRoom, RoomType.Normal)
 				}
 
 				onJoinRoom(io, socket, newRoom, serverStore, selectClientBySocketId(serverStore.getState(), socket.id).id)
 			})
 		}
 
-		function makeAndJoinNewRoom(newRoomName: string, roomDataToLoad?: SavedRoom) {
+		function makeAndJoinNewRoom(newRoomName: string, type: RoomType, roomDataToLoad?: SavedRoom) {
 			if (selectRoomExists(serverStore.getState(), newRoomName) === false) {
-				makeNewRoom(newRoomName, roomDataToLoad)
+				makeNewRoom(newRoomName, type, roomDataToLoad)
 			}
 
 			changeRooms(newRoomName)
 		}
 
-		function makeNewRoom(newRoomName: string, roomDataToLoad?: SavedRoom) {
+		function makeNewRoom(newRoomName: string, type: RoomType, roomDataToLoad?: SavedRoom) {
 			if (selectRoomExists(serverStore.getState(), newRoomName)) {
 				throw new Error(`room exists, this shouldn't happen`)
 			} else {
 				serverStore.dispatch(createRoom(newRoomName, Date.now()))
 				serverStore.dispatch(createRoomAction(roomSettingsActions.setOwner(clientId), newRoomName))
+				serverStore.dispatch(createRoomAction(roomInfoAction.setType(type), newRoomName))
 
 				if (roomDataToLoad) {
 					loadServerStuff(newRoomName, serverStore, roomDataToLoad, clientId)
@@ -367,6 +369,7 @@ function syncState(newSocket: Socket, roomState: IClientRoomState, serverState: 
 	})
 
 	const updaters = [
+		[roomInfoAction.replace, selectRoomInfoState],
 		[pointersActions.replaceAll, selectAllPointers],
 		[setRoomMembers, selectAllRoomMemberIds],
 		[setChat, selectAllMessages],

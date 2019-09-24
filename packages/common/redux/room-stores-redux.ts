@@ -5,7 +5,7 @@ import {
 	globalClockReducer, IClientRoomState, IServerState,
 	pointersStateReducer, positionsReducer, roomMembersReducer,
 	RoomsReduxAction, shamuGraphReducer, recordingReducer, uploadReducer,
-	roomSettingsReducer, ghostConnectionsReducer,
+	roomSettingsReducer, ghostConnectionsReducer, roomInfoReducer,
 } from '.'
 
 export type RoomAction = ReturnType<typeof createRoomAction>
@@ -24,6 +24,7 @@ export const roomReducers = combineReducers({
 	members: roomMembersReducer,
 	positions: positionsReducer,
 	recording: recordingReducer,
+	roomInfo: roomInfoReducer,
 	roomSettings: roomSettingsReducer,
 	shamuGraph: shamuGraphReducer,
 	upload: uploadReducer,

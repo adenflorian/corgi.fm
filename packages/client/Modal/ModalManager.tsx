@@ -8,6 +8,7 @@ import {AuthModalContent} from '../Auth/Auth'
 import {OptionsModalContent} from '../Options/Options'
 import {LoadRoomModalContent} from '../SavingAndLoading/SavingAndLoading'
 import {WelcomeModalContent} from '../Welcome/Welcome'
+import {NewRoomModalContent} from '../Button/NewRoomButton'
 import {Modal} from './Modal'
 
 export interface ModalContent extends React.FunctionComponent<{
@@ -37,6 +38,8 @@ export function ModalManager() {
 				return <WelcomeModalContent {...{hideModal}} />
 			case ModalId.Options:
 				return <OptionsModalContent {...{hideModal}} />
+			case ModalId.NewRoom:
+				return <NewRoomModalContent {...{hideModal}} />
 			default: return null
 		}
 	}

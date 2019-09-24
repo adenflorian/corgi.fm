@@ -1,4 +1,5 @@
 import {useState} from 'react'
+import {logger} from './client-logger'
 
 export function useBoolean(init: boolean): [boolean, Enabler, Disabler] {
 	const [toggle, setToggle] = useState(init)
@@ -24,3 +25,31 @@ export function useResettableState<T>(init: T): [T, React.Dispatch<React.SetStat
 }
 
 type Resetter = () => void
+
+export function useInputState(init: string): [string, OnChange] {
+	const [value, onChange] = useState(init)
+
+	return [
+		value,
+		e => onChange(e.target.value),
+	]
+}
+
+type OnChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void
+
+export function useEnumInputState<T extends string>(init: T, typeGuard: StringTypeGuard<T>): [T, OnChange] {
+	const [value, onChange] = useState(init)
+
+	return [
+		value,
+		e => {
+			if (typeGuard(e.target.value)) {
+				onChange(e.target.value)
+			} else {
+				logger.warn('[useEnumInputState] onChange value failed typeGuard: ', e.target.value)
+			}
+		},
+	]
+}
+
+type StringTypeGuard<T extends string> = (val: string) => val is T

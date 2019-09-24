@@ -50,6 +50,9 @@ export * from './positions-redux'
 export * from './room-members-redux'
 export * from './shamu-graph'
 
+export * from './room-info-redux'
+
+// Any room reducers need to be before room-stores-redux
 export * from './room-stores-redux'
 export * from './rooms-redux'
 

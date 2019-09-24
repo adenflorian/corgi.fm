@@ -21,7 +21,7 @@ export function LoadRoomModalButton() {
 	)
 }
 
-export const LoadRoomModalContent: ModalContent = () => {
+export const LoadRoomModalContent: ModalContent = ({hideModal}) => {
 	const [saveStorage, setSaveStorage] = React.useState(getOrCreateLocalSavesStorage())
 	const dispatch = useDispatch()
 
@@ -44,7 +44,10 @@ export const LoadRoomModalContent: ModalContent = () => {
 						const saveName = `${saveData.saveDateTime} - ${saveData.room} - v${saveData.saveClientVersion || '?'}`
 						const version = saveData.saveClientVersion || '?'
 						const date = moment(saveData.saveDateTime).calendar()
-						const onClick = () => dispatch(loadRoom(saveData))
+						const onClick = () => {
+							dispatch(loadRoom(saveData))
+							hideModal()
+						}
 						return (
 							<div key={saveId as string} className="localSave">
 								<div className="load">

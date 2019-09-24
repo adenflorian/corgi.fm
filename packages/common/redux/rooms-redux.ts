@@ -1,13 +1,21 @@
 import {Map} from 'immutable'
 import {combineReducers, Reducer} from 'redux'
 import {createSelector} from 'reselect'
-import {IClientAppState} from './common-redux-types'
-import {selectAllConnections} from './connections-redux'
-import {selectGlobalClockState} from './global-clock-redux'
-import {selectAllPositions} from './positions-redux'
-import {selectRoomSettings} from './room-settings-redux'
-import {selectShamuGraphState} from './shamu-graph'
-import {SERVER_ACTION} from '.'
+import {ActionType} from 'typesafe-actions'
+import {
+	SERVER_ACTION, selectShamuGraphState, selectRoomSettings,
+	selectAllPositions, selectGlobalClockState, selectAllConnections,
+	IClientAppState, RoomType,
+} from '.'
+
+export const roomsActions = {
+	requestCreate: (name: string, roomType: RoomType) => ({
+		type: 'REQUEST_CREATE_ROOM' as const,
+		name,
+		roomType,
+		SERVER_ACTION,
+	} as const),
+} as const
 
 export const SET_ROOMS = 'SET_ROOMS'
 export type SetRoomsAction = ReturnType<typeof setRooms>
@@ -49,13 +57,6 @@ export const userLeftRoom = (name: string, timestamp: number) => ({
 	timestamp,
 })
 
-export const REQUEST_CREATE_ROOM = 'REQUEST_CREATE_ROOM'
-export type RequestCreateRoomAction = ReturnType<typeof requestCreateRoom>
-export const requestCreateRoom = () => ({
-	type: REQUEST_CREATE_ROOM as typeof REQUEST_CREATE_ROOM,
-	SERVER_ACTION,
-})
-
 export const DELETE_ROOM = 'DELETE_ROOM'
 export type DeleteRoomAction = ReturnType<typeof deleteRoom>
 export const deleteRoom = (name: string) => ({
@@ -72,8 +73,9 @@ export const loadRoom = (savedRoom: SavedRoom) => ({
 	SERVER_ACTION,
 })
 
-export type RoomsReduxAction = SetRoomsAction | SetActiveRoomAction | RequestCreateRoomAction |
-ChangeRoomAction | CreateRoomAction | DeleteRoomAction | UserLeftRoomAction | LoadRoomAction
+export type RoomsReduxAction = SetRoomsAction | SetActiveRoomAction |
+ChangeRoomAction | CreateRoomAction | DeleteRoomAction | UserLeftRoomAction | LoadRoomAction |
+ActionType<typeof roomsActions>
 
 export interface LocalSaves {
 	readonly all: Map<Id, SavedRoom>

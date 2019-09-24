@@ -1,13 +1,12 @@
 import {Store} from 'redux'
-// eslint-disable-next-line import/no-extraneous-dependencies
 import * as io from 'socket.io-client'
-import {maxRoomNameLength} from '@corgifm/common/common-constants'
 import {logger} from '@corgifm/common/logger'
 import {
 	BroadcastAction, clientInfoActions, getActionsBlacklist, maxUsernameLength,
 	selectActiveRoom, selfDisconnected, setInfo, setSocketId,
 } from '@corgifm/common/redux'
 import {WebSocketEvent} from '@corgifm/common/server-constants'
+import {roomNameCleaner} from '@corgifm/common/common-utils'
 import {eventClientServerVersionMismatch} from './analytics/analytics'
 import {getCurrentClientVersion} from './client-utils'
 import {isLocalDevClient} from './is-prod-client'
@@ -23,12 +22,7 @@ const refreshedToGetNewVersionKey = 'refreshedToGetNewVersion'
 
 export function setupWebsocketAndListeners(store: Store) {
 
-	const room = window.location.pathname
-		.replace(/^\//, '')
-		.replace(/%3F.*/, '')
-		.replace(/\/.*/, '')
-		.trim()
-		.substring(0, maxRoomNameLength)
+	const room = roomNameCleaner(window.location.pathname)
 
 	socket = io.connect(window.location.hostname + `:${port}/`, {
 		// Make sure to add any new query params to the reconnect_attempt handler

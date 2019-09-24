@@ -1,5 +1,6 @@
 import React, {Fragment, useCallback} from 'react'
 import {useDispatch, useSelector} from 'react-redux'
+import {IoMdSettings} from 'react-icons/io'
 import {
 	AppOptions, IClientAppState, LineType, ModalId,
 	modalsAction, roomSettingsActions, selectLocalClientId, selectRoomSettings,
@@ -19,6 +20,7 @@ export function OptionsModalButton() {
 
 	return (
 		<Button onClick={showModal}>
+			<IoMdSettings />
 			Options
 		</Button>
 	)

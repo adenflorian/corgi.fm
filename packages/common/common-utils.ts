@@ -4,6 +4,7 @@ import {Map, List} from 'immutable'
 import {
 	allowedSampleUploadFileExtensions, MAX_MIDI_NOTE_NUMBER_127,
 	MIN_MIDI_NOTE_NUMBER_0,
+	maxRoomNameLength,
 } from './common-constants'
 import {MidiClipEvents} from './midi-types'
 
@@ -220,4 +221,15 @@ function _sumPoints(a: Point, b: Point) {
 		x: a.x + b.x,
 		y: a.y + b.y,
 	}
+}
+
+export function roomNameCleaner(name: string): string {
+	return name
+		.replace(/^\//, '')
+		.replace(/%3F.*/, '')
+		.replace(/\/.*/, '')
+		.trim()
+		.replace(/(%20)+/g, ' ')
+		.replace(/ +/g, '-')
+		.substring(0, maxRoomNameLength)
 }

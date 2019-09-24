@@ -19,6 +19,7 @@ export enum ModalId {
 	Welcome = 'Welcome',
 	Options = 'Options',
 	LoadRoom = 'LoadRoom',
+	NewRoom = 'NewRoom',
 	None = 'None',
 }
 

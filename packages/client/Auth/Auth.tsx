@@ -3,8 +3,9 @@ import React, {Fragment, useCallback, useState} from 'react'
 import {
 	// IoLogoFacebook as Facebook,
 	IoLogoGoogle as Google,
+	IoMdLogOut, IoMdLogIn,
 } from 'react-icons/io'
-import {useDispatch, useSelector} from 'react-redux'
+import {useDispatch} from 'react-redux'
 import {AuthConstants} from '@corgifm/common/auth-constants'
 import {
 	authActions, chatSystemMessage, ModalId, modalsAction, useLoggedIn,
@@ -31,7 +32,9 @@ export function AuthModalButton() {
 		<Button
 			onClick={onClick}
 		>
-			{loggedIn ? `Log Out` : `Register / Login`}
+			{loggedIn
+				? <Fragment><IoMdLogOut />Log Out</Fragment>
+				: <Fragment><IoMdLogIn />Register / Login</Fragment>}
 		</Button>
 	)
 

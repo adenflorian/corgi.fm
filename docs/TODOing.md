@@ -289,6 +289,16 @@
 	- [ ] rows
 	- [ ] columns
 
+# Room Types
+- [ ] better room button with modal
+	- [ ] room name
+	- [ ] room type
+- [ ] room types
+	- [ ] main
+	- [ ] experimental modular rewrite
+	- [ ] game
+	- [ ] drawing
+
 **Refactor Node State**
 - [ ] id (already in position state, but might need to stay on node state as well) (staying for now)
 - [√] ownerId (move to position state or remove if not used) (moved)

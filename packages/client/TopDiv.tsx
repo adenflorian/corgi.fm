@@ -16,7 +16,7 @@ import {
 } from './analytics/analytics'
 import {AuthModalButton} from './Auth/Auth'
 import {Button} from './Button/Button'
-import {NewRoomButton} from './Button/CommonButtons'
+import {NewRoomButton} from './Button/NewRoomButton'
 import {DiscordLink, NewsletterLink, PatreonLink} from './Links'
 import {ConnectedNameChanger} from './NameChanger'
 import {OptionsModalButton} from './Options/Options'

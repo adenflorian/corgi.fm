@@ -6,7 +6,7 @@ import {
 	changeRoom, ModalId, modalsAction, selectActiveRoom,
 } from '@corgifm/common/redux'
 import {Button} from '../Button/Button'
-import {NewRoomButton} from '../Button/CommonButtons'
+import {NewRoomButton} from '../Button/NewRoomButton'
 import {DiscordLink, NewsletterLink, PatreonLink} from '../Links'
 import {ModalContent} from '../Modal/ModalManager'
 import {ConnectedNameChanger} from '../NameChanger'
