@@ -24,6 +24,7 @@ import {getUsernameFromLocalStorage, saveUsernameToLocalStorage} from './usernam
 import {SamplesManager} from './WebAudio/SamplesManager'
 import {setStoreForSchedulerVisual, startSchedulerVisualLoop} from './WebAudio/SchedulerVisual'
 import {setupWebsocketAndListeners, socket} from './websocket-listeners'
+import {NodeManager} from './Experimental/NodeManager'
 
 if (!isLocalDevClient()) initSentry()
 
@@ -98,9 +99,11 @@ async function setupAsync() {
 		options: loadedOptionsState,
 	}
 
+	const nodeManager = new NodeManager(audioContext)
+
 	const store = configureStore(
 		initialState, getGetAllInstruments, onReduxMiddleware,
-		firebaseContextStuff, samplesManager)
+		firebaseContextStuff, samplesManager, nodeManager)
 
 	wireUpFirebaseToRedux(firebaseContextStuff, store)
 

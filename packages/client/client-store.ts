@@ -14,6 +14,8 @@ import {websocketSenderMiddleware} from './websocket-client-sender-middleware'
 import {createCorgiApiMiddleware} from './RestClient/corgi-api-middleware'
 import {createSamplesManagerMiddleware} from './WebAudio/samples-manager-middleware'
 import {SamplesManager} from './WebAudio'
+import {createExpMiddleware} from './Experimental/experimental-middleware'
+import {NodeManager} from './Experimental/NodeManager'
 
 const composeEnhancers = composeWithDevTools({
 	actionsBlacklist: getActionsBlacklist(),
@@ -25,6 +27,7 @@ export function configureStore(
 	onReduxMiddleware: Middleware,
 	firebase: FirebaseContextStuff,
 	samplesManager: SamplesManager,
+	nodeManager: NodeManager,
 ): Store<IClientAppState> {
 	return createStore(
 		getClientReducers(),
@@ -38,6 +41,7 @@ export function configureStore(
 				createCorgiApiMiddleware(firebase, samplesManager),
 				createSequencerMiddleware(getAllInstruments),
 				makeConnectionsClientMiddleware(getAllInstruments),
+				createExpMiddleware(nodeManager),
 				websocketSenderMiddleware,
 			),
 		),

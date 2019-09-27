@@ -1,5 +1,5 @@
 import React from 'react'
-import {useSelector} from 'react-redux';
+import {useSelector} from 'react-redux'
 import {
 	selectLocalClientId, selectRoomSettings, IClientAppState,
 } from '@corgifm/common/redux'
@@ -7,7 +7,7 @@ import {ConnectedChat} from '../Chat'
 import {ConnectedContextMenuContainer} from '../ContextMenu/ContextMenuContainer'
 import {ModalManager} from '../Modal/ModalManager'
 import {ConnectedTopDiv} from '../TopDiv'
-import {ExperimentalGraph} from './ExperimentalGraph';
+import {ExperimentalGraph} from './ExperimentalGraph'
 
 export const ExperimentalApp = function _ExperimentalApp() {
 	const roomSettings = useSelector((state: IClientAppState) => selectRoomSettings(state.room))

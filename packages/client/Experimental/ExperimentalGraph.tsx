@@ -2,6 +2,7 @@ import React from 'react'
 import {mainBoardsId} from '../client-constants'
 import {ConnectedMousePointers} from '../MousePointers/MousePointers'
 import {ConnectedZoom} from '../SimpleGraph/Zoom'
+import {ExperimentalMain} from './ExperimentalMain'
 
 export const ExperimentalGraph = function _ExperimentalGraph() {
 	return (
@@ -17,6 +18,7 @@ export const ExperimentalGraph = function _ExperimentalGraph() {
 			<ConnectedZoom>
 				<div id={mainBoardsId} className="boards">
 					<ConnectedMousePointers />
+					<ExperimentalMain />
 				</div>
 			</ConnectedZoom>
 		</div>

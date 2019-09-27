@@ -6,10 +6,10 @@ import {
 	findNodeInfo, IPosition, movePosition,
 	nodeClicked, selectConnectionSourceColorByTargetId,
 	selectOptions, selectPosition, selectShamuMetaState,
-	shamuConnect, shamuMetaActions,
+	shamuConnect, shamuMetaActions, IClientAppState, RoomType,
 } from '@corgifm/common/redux'
 import {panelHeaderHeight} from '@corgifm/common/common-constants'
-import {useDispatch} from 'react-redux'
+import {useDispatch, useSelector} from 'react-redux'
 import {BasicSampler} from '../BasicSampler/BasicSampler'
 import {graphSizeX, graphSizeY, handleClassName, nodeMenuId} from '../client-constants'
 import {ECSSequencerRenderSystem} from '../ECS/ECSSequencerRenderSystem'
@@ -25,6 +25,7 @@ import {ConnectedSimpleReverb} from '../ShamuNodes/SimpleReverb/SimpleReverbView
 import {simpleGlobalClientState} from '../SimpleGlobalClientState'
 import {ConnectedVolumeControl} from '../Volume/VolumeControl'
 import {BetterSequencer} from '../BetterSequencer/BetterSequencer'
+import {Panel} from '../Panel/Panel'
 
 interface ISimpleGraphNodeProps {
 	positionId: Id
@@ -60,6 +61,8 @@ export function SimpleGraphNode(props: ISimpleGraphNodeAllProps) {
 	}, [dispatch])
 
 	const [dragging, setDragging] = useState(false)
+
+	const roomType = useSelector((state: IClientAppState) => state.room.roomInfo.roomType)
 
 	const handleMouseDown = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
 		const target = e.target as HTMLElement
@@ -127,10 +130,12 @@ export function SimpleGraphNode(props: ISimpleGraphNodeAllProps) {
 							nodeType={targetType}
 							collect={collect}
 						>
-							{getComponentByNodeType(targetType, positionId, color)}
+							{roomType === RoomType.Experimental
+								? getExperimentalPanel(position, color)
+								: getComponentByNodeType(targetType, positionId, color)}
 						</ContextMenuTrigger>
 					)
-				}, [color, positionId, targetType])
+				}, [color, position, positionId, roomType, targetType])
 			}
 			<canvas
 				id={ECSSequencerRenderSystem.canvasIdPrefix + positionId}
@@ -177,6 +182,22 @@ function getComponentByNodeType(type: ConnectionNodeType, id: Id, color: string)
 
 		default: throw new Error('invalid type: ' + type.toString() + ' ' + id)
 	}
+}
+
+export function getExpAnchorId(nodeId: Id): string {
+	return `expAnchor-${nodeId}`
+}
+
+function getExperimentalPanel(position: IPosition, color: string) {
+	return (
+		<Panel
+			color={color}
+			id={position.id}
+			label="test"
+		>
+			<div id={getExpAnchorId(position.id)} className={`experimentalAnchor`} />
+		</Panel>
+	)
 }
 
 export const ConnectedSimpleGraphNode = shamuConnect(

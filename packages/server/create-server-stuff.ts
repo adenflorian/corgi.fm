@@ -16,13 +16,134 @@ import {
 	makeSequencerEvents, replacePositions, roomSettingsActions, SavedRoom,
 	selectAllConnections, selectAllPositions, selectAllVirtualKeyboardIds,
 	selectConnectionsWithSourceOrTargetIds, shamuGraphActions,
-	SimpleReverbState, updatePositions, BetterSequencerState, addBetterSequencer, createSequencerEvents,
+	SimpleReverbState, updatePositions, BetterSequencerState,
+	addBetterSequencer, createSequencerEvents, RoomType, expNodesActions,
+	expPositionActions, makeExpPosition, makeExpNodeState, expConnectionsActions, ExpConnection,
 } from '@corgifm/common/redux'
+import {logger} from '@corgifm/common/logger'
+import {serverClientId} from '@corgifm/common/common-constants';
 
 const masterAudioOutput: IConnectable = findNodeInfo(ConnectionNodeType.audioOutput).stateSelector({} as any, '')
 const masterClock: IConnectable = findNodeInfo(ConnectionNodeType.masterClock).stateSelector({} as any, '')
 
-export function createServerStuff(room: string, serverStore: Store<IServerState>) {
+export function createServerStuff(room: string, serverStore: Store<IServerState>, type: RoomType) {
+	switch (type) {
+		case RoomType.Experimental: return createServerStuffExperimental(room, serverStore)
+		case RoomType.Normal:
+		default: return createServerStuffNormal(room, serverStore)
+	}
+}
+
+export function createServerStuffExperimental(room: string, serverStore: Store<IServerState>) {
+	logger.log('todo')
+
+	const audioOutput = makeExpNodeState({
+		type: 'audioOutput',
+		params: Map([['gain', 0.5]]),
+	})
+
+	dispatchToRoom(expNodesActions.add(audioOutput))
+
+	dispatchToRoom(expPositionActions.add(
+		makeExpPosition({
+			id: audioOutput.id,
+			ownerId: serverClientId,
+		})))
+
+	const gain = makeExpNodeState({
+		type: 'gain',
+		params: Map(),
+	})
+
+	dispatchToRoom(expNodesActions.add(gain))
+
+	dispatchToRoom(expPositionActions.add(
+		makeExpPosition({
+			id: gain.id,
+			ownerId: serverClientId,
+		})))
+
+	const filter = makeExpNodeState({
+		type: 'filter',
+		params: Map(),
+	})
+
+	dispatchToRoom(expNodesActions.add(filter))
+
+	dispatchToRoom(expPositionActions.add(
+		makeExpPosition({
+			id: filter.id,
+			ownerId: serverClientId,
+		})))
+
+	const osc1 = makeExpNodeState({
+		type: 'oscillator',
+		params: Map([['test', 123]]),
+	})
+
+	dispatchToRoom(expNodesActions.add(osc1))
+
+	dispatchToRoom(expPositionActions.add(
+		makeExpPosition({
+			id: osc1.id,
+			ownerId: serverClientId,
+		})))
+
+	const osc2 = makeExpNodeState({
+		type: 'oscillator',
+		params: Map(),
+	})
+
+	dispatchToRoom(expNodesActions.add(osc2))
+
+	dispatchToRoom(expPositionActions.add(
+		makeExpPosition({
+			id: osc2.id,
+			ownerId: serverClientId,
+		})))
+
+	dispatchToRoom(expConnectionsActions.add(new ExpConnection(
+		osc1.id,
+		osc1.type,
+		filter.id,
+		filter.type,
+		0,
+		0,
+	)))
+
+	dispatchToRoom(expConnectionsActions.add(new ExpConnection(
+		filter.id,
+		filter.type,
+		audioOutput.id,
+		audioOutput.type,
+		0,
+		0,
+	)))
+
+	dispatchToRoom(expConnectionsActions.add(new ExpConnection(
+		osc2.id,
+		osc2.type,
+		gain.id,
+		gain.type,
+		0,
+		0,
+	)))
+
+	dispatchToRoom(expConnectionsActions.add(new ExpConnection(
+		gain.id,
+		gain.type,
+		filter.id,
+		filter.type,
+		0,
+		1,
+	)))
+
+	function dispatchToRoom(action: Action) {
+		return serverStore.dispatch(createRoomAction(action, room))
+	}
+}
+
+export function createServerStuffNormal(room: string, serverStore: Store<IServerState>) {
 	const serverClient = ClientState.createServerClient()
 	const addClientAction = addClient(serverClient)
 

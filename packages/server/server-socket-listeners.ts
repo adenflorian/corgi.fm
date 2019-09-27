@@ -30,6 +30,8 @@ import {
 	setChat, setClients, setRoomMembers, setRooms, shamuGraphActions,
 	userLeftRoom, whitelistedRoomActionTypes, isRoomOwnerRoomAction,
 	selectPositionsByOwner, roomInfoAction, RoomType, selectRoomInfoState,
+	expNodesActions, selectExpNodesState, expPositionActions,
+	selectExpAllPositions, expConnectionsActions, selectExpAllConnections,
 } from '@corgifm/common/redux'
 import {WebSocketEvent} from '@corgifm/common/server-constants'
 import {createServerStuff, loadServerStuff} from './create-server-stuff'
@@ -255,7 +257,7 @@ export function setupServerWebSocketListeners(
 				if (roomDataToLoad) {
 					loadServerStuff(newRoomName, serverStore, roomDataToLoad, clientId)
 				} else {
-					createServerStuff(newRoomName, serverStore)
+					createServerStuff(newRoomName, serverStore, type)
 				}
 
 				io.local.emit(WebSocketEvent.broadcast, {
@@ -379,6 +381,10 @@ function syncState(newSocket: Socket, roomState: IClientRoomState, serverState: 
 		[globalClockActions.replace, selectGlobalClockState],
 		// Sync positions after shamuGraph
 		[replacePositions, selectAllPositions],
+		// exp
+		[expNodesActions.replaceAll, selectExpNodesState],
+		[expPositionActions.replaceAll, selectExpAllPositions],
+		[expConnectionsActions.replaceAll, selectExpAllConnections],
 	]
 
 	updaters.forEach(([actionCreator, selector]: any[]) => {

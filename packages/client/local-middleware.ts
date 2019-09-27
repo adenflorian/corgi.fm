@@ -40,7 +40,7 @@ import {
 	virtualOctaveChange, VirtualOctaveChangeAction,
 	LocalAction, chatSystemMessage, animationActions, selectOption, AppOptions,
 	getNodeInfo, SequencerStateBase, localMidiKeyUp, selectUserInputKeys,
-	userInputActions, recordingActions, betterSequencerActions,
+	userInputActions, recordingActions, betterSequencerActions, RoomType,
 } from '@corgifm/common/redux'
 import {pointersActions} from '@corgifm/common/redux/pointers-redux'
 import {makeMidiClipEvent, preciseModulus, preciseSubtract} from '@corgifm/common/midi-types'
@@ -783,6 +783,21 @@ function selectLocalVirtualKeyboard(state: IClientAppState) {
 
 // TODO Refactor to use functions in create-server-stuff.ts
 function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
+	const roomType = state.room.roomInfo.roomType
+
+	switch (roomType) {
+		case RoomType.Experimental: return createLocalStuffExperimental(dispatch, state)
+		case RoomType.Normal:
+		default: return createLocalStuffNormal(dispatch, state)
+	}
+}
+
+function createLocalStuffExperimental(dispatch: Dispatch, state: IClientAppState) {
+	// TODO
+	logger.log('foo')
+}
+
+function createLocalStuffNormal(dispatch: Dispatch, state: IClientAppState) {
 	const localClient = selectLocalClient(state)
 
 	if (localClient.id.startsWith('fake')) {

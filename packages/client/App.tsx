@@ -9,7 +9,6 @@ import {isLocalDevClient} from './is-prod-client'
 import {LoadingScreen} from './LoadingScreen'
 import {ConnectedOnlineApp} from './OnlineApp'
 import {Benchmarks} from './Benchmarks'
-import {ExperimentalApp} from './Experimental/ExperimentalApp';
 
 const App = () => {
 	const ctrl = useSelector((state: IClientAppState) => selectUserInputKeys(state).ctrl)
@@ -32,7 +31,7 @@ const App = () => {
 			<LoadingScreen loading={isLoading} />
 			{!isLoading && {
 				[RoomType.Normal]: <ConnectedOnlineApp />,
-				[RoomType.Experimental]: <ExperimentalApp />
+				[RoomType.Experimental]: <ConnectedOnlineApp />,
 			}[roomType]
 			}
 		</div>

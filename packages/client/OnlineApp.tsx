@@ -1,4 +1,5 @@
 import React from 'react'
+import {useSelector} from 'react-redux'
 import {
 	selectLocalClientId, selectRoomSettings, IClientAppState,
 } from '@corgifm/common/redux'
@@ -7,7 +8,6 @@ import {ConnectedContextMenuContainer} from './ContextMenu/ContextMenuContainer'
 import {ModalManager} from './Modal/ModalManager'
 import {ConnectedSimpleGraph} from './SimpleGraph/SimpleGraph'
 import {ConnectedTopDiv} from './TopDiv'
-import {useSelector} from 'react-redux';
 
 export const ConnectedOnlineApp = function _OnlineApp() {
 	const roomSettings = useSelector((state: IClientAppState) => selectRoomSettings(state.room))
