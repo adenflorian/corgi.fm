@@ -52,7 +52,10 @@ export class ExpNodeAudioConnection {
 		public readonly id: Id,
 		private _source: ExpNodeAudioOutputPort,
 		private _target: ExpNodeAudioInputPort,
-	) {}
+	) {
+		this._source.connect(this)
+		this._target.connect(this)
+	}
 
 	public getSource() {
 		return this._source
@@ -62,12 +65,22 @@ export class ExpNodeAudioConnection {
 		return this._target
 	}
 
-	public connectSource(source: ExpNodeAudioOutputPort) {
-		this._source = source
+	public changeSource(newSource: ExpNodeAudioOutputPort) {
+		this._source.disconnect(this)
+		this._source = newSource
+		this._source.connect(this)
 	}
 
-	public connectTarget(target: ExpNodeAudioInputPort) {
-		this._target = target
+	public changeTarget(newTarget: ExpNodeAudioInputPort) {
+		this._source.changeTarget(this._target, newTarget)
+		this._target.disconnect(this)
+		this._target = newTarget
+		this._target.connect(this)
+	}
+
+	public dispose() {
+		this._source.disconnect(this)
+		this._target.disconnect(this)
 	}
 }
 
@@ -82,12 +95,17 @@ export abstract class ExpNodeAudioPort {
 	) {}
 
 	public connect(connection: ExpNodeAudioConnection) {
+		this._connect(connection)
 		this._connections.set(connection.id, connection)
 	}
 
-	public disconnect(connectionId: Id) {
-		this._connections.delete(connectionId)
+	public disconnect(connection: ExpNodeAudioConnection) {
+		this._disconnect(connection)
+		this._connections.delete(connection.id)
 	}
+
+	protected abstract _connect(connection: ExpNodeAudioConnection): void
+	protected abstract _disconnect(connection: ExpNodeAudioConnection): void
 }
 
 export class ExpNodeAudioInputPort extends ExpNodeAudioPort {
@@ -98,6 +116,12 @@ export class ExpNodeAudioInputPort extends ExpNodeAudioPort {
 	) {
 		super(id, name)
 	}
+
+	protected _connect(connection: ExpNodeAudioConnection) {
+	}
+
+	protected _disconnect(connection: ExpNodeAudioConnection) {
+	}
 }
 
 export class ExpNodeAudioOutputPort extends ExpNodeAudioPort {
@@ -107,6 +131,19 @@ export class ExpNodeAudioOutputPort extends ExpNodeAudioPort {
 		public readonly source: AudioNode
 	) {
 		super(id, name)
+	}
+
+	protected _connect(connection: ExpNodeAudioConnection) {
+		this.source.connect(connection.getTarget().destination as AudioNode)
+	}
+
+	public changeTarget(oldTarget: ExpNodeAudioInputPort, newTarget: ExpNodeAudioInputPort) {
+		this.source.disconnect(oldTarget.destination as AudioNode)
+		this.source.connect(newTarget.destination as AudioNode)
+	}
+
+	protected _disconnect(connection: ExpNodeAudioConnection) {
+		this.source.disconnect(connection.getTarget().destination as AudioNode)
 	}
 }
 

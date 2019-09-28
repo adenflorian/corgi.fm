@@ -1,6 +1,6 @@
 import ReactDOM from 'react-dom'
 import * as immutable from 'immutable'
-import {ExpNodeState, ExpConnection} from '@corgifm/common/redux'
+import {ExpNodeState, IExpConnection} from '@corgifm/common/redux'
 import {logger} from '../client-logger'
 import {getExpAnchorId} from '../SimpleGraph/SimpleGraphNodeExp'
 import {CorgiNode, typeClassMap} from './ExpNodes'
@@ -55,12 +55,12 @@ export class NodeManager {
 		// TODO More stuff
 	}
 
-	public addAudioConnections = (connections: immutable.Map<Id, ExpConnection>) => {
-		connections.valueSeq().toList().forEach(this.createAudioConnection)
+	public addAudioConnections = (connections: immutable.Map<Id, IExpConnection>) => {
+		connections.valueSeq().toList().forEach(this.addAudioConnection)
 		// TODO More stuff
 	}
 
-	public createAudioConnection = (expConnection: ExpConnection) => {
+	public addAudioConnection = (expConnection: IExpConnection) => {
 		// Get nodes
 		const source = this._nodes.get(expConnection.sourceId)
 		const target = this._nodes.get(expConnection.targetId)
@@ -77,40 +77,54 @@ export class NodeManager {
 		// Create connection
 		const connection = new ExpNodeAudioConnection(expConnection.id, sourcePort, targetPort)
 		this._audioConnections.set(connection.id, connection)
-
-		// Connect ports to connection
-		sourcePort.connect(connection)
-		targetPort.connect(connection)
-
-		// Connect connection to ports
-		connection.connectSource(sourcePort)
-		connection.connectTarget(targetPort)
-
-		// Connect audio stuff
-		if (targetPort.destination instanceof AudioParam) {
-			sourcePort.source.connect(targetPort.destination)
-		} else {
-			sourcePort.source.connect(targetPort.destination)
-		}
 	}
 
-	public deleteConnection = (id: Id) => {
-		const connection = this._audioConnections.get(id)
+	public deleteAudioConnection = (connectionId: Id) => {
+		const connection = this._audioConnections.get(connectionId)
 
-		if (!connection) return logger.warn('tried to delete non existent connection: ', id)
+		if (!connection) return logger.warn('tried to delete non existent connection: ', connectionId)
 
-		this._audioConnections.delete(id)
+		this._audioConnections.delete(connectionId)
+
+		connection.dispose()
+	}
+
+	public deleteAllAudioConnections = () => {
+		this._audioConnections.forEach(x => this.deleteAudioConnection(x.id))
+	}
+
+	public changeAudioConnectionSource = (connectionId: Id, newSourceId: Id, newSourcePort: number) => {
+		const connection = this._audioConnections.get(connectionId)
+
+		if (!connection) return logger.warn('404 connection not found: ', connectionId)
+
+		// Get node
+		const source = this._nodes.get(newSourceId)
+		if (!source) return logger.warn('uh oh: ', {source})
 
 		// Get and connect ports
-		const sourcePort = connection.getSource()
-		const targetPort = connection.getTarget()
-		if (!sourcePort || !targetPort) return logger.warn('[deleteConnection] 404 port not found: ', {sourcePort, targetPort})
+		const sourcePort = source.getAudioOutputPort(newSourcePort)
+		if (!sourcePort) return logger.warn('404 port not found: ', {sourcePort})
 
-		if (targetPort.destination instanceof AudioParam) {
-			sourcePort.source.disconnect(targetPort.destination)
-		} else {
-			sourcePort.source.disconnect(targetPort.destination)
-		}
+		// Disconnect old source
+		connection.changeSource(sourcePort)
+	}
+
+	public changeAudioConnectionTarget = (connectionId: Id, newTargetId: Id, newTargetPort: number) => {
+		const connection = this._audioConnections.get(connectionId)
+
+		if (!connection) return logger.warn('404 connection not found: ', connectionId)
+
+		// Get node
+		const target = this._nodes.get(newTargetId)
+		if (!target) return logger.warn('uh oh: ', {target})
+
+		// Get and connect ports
+		const targetPort = target.getAudioInputPort(newTargetPort)
+		if (!targetPort) return logger.warn('404 port not found: ', {targetPort})
+
+		// Disconnect old target
+		connection.changeTarget(targetPort)
 	}
 
 	public cleanup = () => {
