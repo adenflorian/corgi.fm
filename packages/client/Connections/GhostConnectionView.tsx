@@ -10,12 +10,16 @@ import {
 	shamuConnect,
 	selectConnectionIdsForNodeLeftPort,
 	selectConnectionIdsForNodeRightPort,
+	selectExpPosition,
+	selectExpConnectionIdsForNodeLeftPort,
+	selectExpConnectionIdsForNodeRightPort,
 } from '@corgifm/common/redux'
 import {toGraphSpace} from '../SimpleGraph/Zoom'
 import {connectorHeight, connectorWidth, makeCurvedPath} from './ConnectionView'
 import {Connector} from './Connector'
 import {GhostConnectionLine} from './GhostConnectionLine'
 import {LineState} from './LineState'
+import {ConnectionNodeType} from '@corgifm/common/common-types';
 
 interface Props {
 	id: Id
@@ -168,6 +172,28 @@ export const ConnectedGhostConnectionView = shamuConnect(
 				ghostConnection.activeSourceOrTarget === ActiveGhostConnectorSourceOrTarget.Source
 					? selectConnectionIdsForNodeLeftPort(state.room, parentNodeId, ghostConnection.port).count()
 					: selectConnectionIdsForNodeRightPort(state.room, parentNodeId, ghostConnection.port).count(),
+			localClientId: selectLocalClientId(state),
+		}
+	},
+)(GhostConnectionView)
+
+export const ConnectedExpGhostConnectionView = shamuConnect(
+	(state, {id}: Props): ReduxProps => {
+		const ghostConnection = selectGhostConnection(state.room, id)
+		const parentNodeId = ghostConnection.inactiveConnector.parentNodeId
+
+		return {
+			ghostConnection,
+			parentPosition: {
+				...selectExpPosition(state.room, parentNodeId).toJS(),
+				targetType: ConnectionNodeType.dummy,
+				inputPortCount: 1,
+				outputPortCount: 1,
+			},
+			parentConnectionCount:
+				ghostConnection.activeSourceOrTarget === ActiveGhostConnectorSourceOrTarget.Source
+					? selectExpConnectionIdsForNodeLeftPort(state.room, parentNodeId, ghostConnection.port).count()
+					: selectExpConnectionIdsForNodeRightPort(state.room, parentNodeId, ghostConnection.port).count(),
 			localClientId: selectLocalClientId(state),
 		}
 	},

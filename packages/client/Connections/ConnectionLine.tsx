@@ -1,7 +1,4 @@
-import {List} from 'immutable'
 import React from 'react'
-import {useDispatch} from 'react-redux'
-import {connectionsActions} from '@corgifm/common/redux'
 import {saturateColor} from '@corgifm/common/shamu-color'
 import {longLineTooltip} from '../client-constants'
 import {longLineStrokeWidth} from './ConnectionView'
@@ -18,6 +15,7 @@ interface ConnectionLineProps {
 	speed?: number
 	isSourcePlaying: boolean
 	highQuality: boolean
+	onDelete: () => void
 }
 
 export const ConnectionLine = React.memo(
@@ -25,11 +23,10 @@ export const ConnectionLine = React.memo(
 		{
 			id, color, saturateSource, saturateTarget, pathDPart1,
 			pathDFull, connectedLine, speed = 1,
-			isSourcePlaying, highQuality,
+			isSourcePlaying, highQuality, onDelete,
 		}: ConnectionLineProps,
 	) {
 		const saturatedColor = saturateColor(color)
-		const dispatch = useDispatch()
 
 		return (
 			<svg
@@ -68,7 +65,7 @@ export const ConnectionLine = React.memo(
 				<g
 					onContextMenu={(e: React.MouseEvent) => {
 						if (e.shiftKey) return
-						dispatch(connectionsActions.delete(List([id])))
+						onDelete()
 						e.preventDefault()
 					}}
 				>

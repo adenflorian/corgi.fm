@@ -1,6 +1,6 @@
 import {stripIndent} from 'common-tags'
 import {List} from 'immutable'
-import React from 'react'
+import React, {useCallback} from 'react'
 import {useDispatch} from 'react-redux'
 import {
 	ActiveGhostConnectorSourceOrTarget,
@@ -103,6 +103,10 @@ export const ConnectionView =
 			)))
 		}
 
+		const onDelete = useCallback(() => {
+			dispatch(connectionsActions.delete(List([id])))
+		}, [dispatch, id])
+
 		return (
 			<div className={`connection ${saturateSource ? 'playing' : ''}`} style={{color}}>
 				<ConnectionLine
@@ -116,6 +120,7 @@ export const ConnectionView =
 					speed={speed}
 					isSourcePlaying={isSourcePlaying}
 					highQuality={highQuality}
+					onDelete={onDelete}
 				/>
 				<Connector
 					width={connectorWidth}

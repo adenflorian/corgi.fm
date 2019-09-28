@@ -9,7 +9,7 @@ import {
 import {CssColor} from '@corgifm/common/shamu-color'
 import {handleClassName} from '../client-constants'
 import './Panel.less'
-import {Resizer} from './Resizer'
+import {ExpResizer} from './ExpResizer'
 
 export interface Props {
 	children: any
@@ -104,7 +104,7 @@ export const ExpPanel =
 				>
 					{children}
 				</div>
-				{isResizable && <Resizer id={id} />}
+				{isResizable && <ExpResizer id={id} />}
 			</div>
 		)
 

@@ -6,7 +6,7 @@ import {CssColor} from '../../shamu-color'
 import {shamuMetaReducer} from '../shamu-graph'
 import {IClientAppState} from '../common-redux-types'
 import {
-	BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION,
+	BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION, ExpNodeType,
 } from '..'
 
 export const expPositionActions = {
@@ -82,7 +82,7 @@ export interface ExpPositionsState {
 
 export type ExpPositions = Map<Id, ExpPosition>
 
-const defaultPosition = {
+export const defaultExpPosition = Object.freeze({
 	id: '-1' as Id,
 	ownerId: '-1' as Id,
 	width: 200,
@@ -92,13 +92,14 @@ const defaultPosition = {
 	zIndex: 0,
 	enabled: true,
 	color: CssColor.blue,
-}
+	targetType: 'dummy' as ExpNodeType,
+})
 
-const makeExpPositionRecord = Record(defaultPosition)
+const makeExpPositionRecord = Record(defaultExpPosition)
 
 const defaultExpPositionRecord = makeExpPositionRecord()
 
-export function makeExpPosition(position: Pick<typeof defaultPosition, 'id' | 'ownerId'> & Partial<typeof defaultPosition>): ExpPosition {
+export function makeExpPosition(position: Pick<typeof defaultExpPosition, 'id' | 'ownerId'> & Partial<typeof defaultExpPosition>): ExpPosition {
 	return makeExpPositionRecord(position)
 }
 

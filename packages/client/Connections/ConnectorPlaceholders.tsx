@@ -5,7 +5,7 @@ import {
 	GhostConnection, ghostConnectorActions,
 	GhostConnectorAddingOrMoving, IClientAppState,
 	selectLocalClientId, selectPosition, shamuConnect,
-	selectNodeConnectionInfosForNode, NodeConnectionsInfo,
+	selectNodeConnectionInfosForNode, NodeConnectionsInfo, selectExpPosition, selectExpNodeConnectionInfosForNode,
 } from '@corgifm/common/redux'
 import {emptyList} from '@corgifm/common/common-utils'
 import {connectorWidth} from './ConnectionView'
@@ -103,4 +103,22 @@ const mapStateToProps = (state: IClientAppState, props: Props): ReduxProps => {
 
 export const ConnectedConnectorPlaceholders = shamuConnect(
 	mapStateToProps,
+)(ConnectorPlaceholders)
+
+const mapStateToPropsExp = (state: IClientAppState, props: Props): ReduxProps => {
+	const parentPosition = selectExpPosition(state.room, props.parentId)
+	return {
+		placeholdersInfo: selectExpNodeConnectionInfosForNode(state.room, props.parentId),
+		localClientId: selectLocalClientId(state),
+		parentX: parentPosition.x,
+		parentY: parentPosition.y,
+		parentWidth: parentPosition.width,
+		parentHeight: parentPosition.height,
+		leftPortCount: 1,
+		rightPortCount: 1,
+	}
+}
+
+export const ConnectedExpConnectorPlaceholders = shamuConnect(
+	mapStateToPropsExp,
 )(ConnectorPlaceholders)

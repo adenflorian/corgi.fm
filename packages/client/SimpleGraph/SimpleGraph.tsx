@@ -5,7 +5,7 @@ import {
 import {useSelector} from 'react-redux'
 import {mainBoardsId} from '../client-constants'
 import {ConnectedConnections} from '../Connections/Connections'
-import {ConnectedConnectorPlaceholders} from '../Connections/ConnectorPlaceholders'
+import {ConnectedConnectorPlaceholders, ConnectedExpConnectorPlaceholders} from '../Connections/ConnectorPlaceholders'
 import {ConnectedGhostConnectionsView} from '../Connections/GhostConnections'
 import {ECSCanvasRenderSystem} from '../ECS/ECSCanvasRenderSystem'
 import {ConnectedMousePointers} from '../MousePointers/MousePointers'
@@ -35,7 +35,7 @@ export const ConnectedSimpleGraph = function _ConnectedSimpleGraph() {
 					{roomType === RoomType.Experimental
 						? <ConnectedExpConnections />
 						: <ConnectedConnections />}
-					<ConnectedGhostConnectionsView />
+					<ConnectedGhostConnectionsView roomType={roomType} />
 					{roomType === RoomType.Experimental
 						? <PositionsStuffExp />
 						: <PositionsStuff />}
@@ -84,7 +84,7 @@ function PositionsStuffExp() {
 		<Fragment>
 			{positionIds.map((_, positionId) =>
 				<Fragment key={positionId as string}>
-					<ConnectedConnectorPlaceholders
+					<ConnectedExpConnectorPlaceholders
 						parentId={positionId}
 					/>
 					<ConnectedSimpleGraphNodeExp

@@ -1,44 +1,39 @@
-import {List} from 'immutable'
+import {List, Record} from 'immutable'
 import {Dispatch} from 'redux'
 import {logger} from '@corgifm/common/logger'
 import {IClientRoomState} from '@corgifm/common/redux/common-redux-types'
 import {
-	ActiveGhostConnectorSourceOrTarget, Connection,
-	connectionsActions, GhostConnectorAddingOrMoving, IPosition, selectAllPositions,
-	selectGhostConnection, selectPosition, doesConnectionBetweenNodesExist,
-	selectConnection, selectConnectionIdsForNodeLeftPort,
-	selectConnectionIdsForNodeRightPort,
-	selectRoomInfoState,
-	RoomType,
+	ActiveGhostConnectorSourceOrTarget, ExpConnection,
+	expConnectionsActions, GhostConnectorAddingOrMoving, ExpPosition, selectExpAllPositions,
+	selectGhostConnection, selectExpPosition, doesExpConnectionBetweenNodesExist,
+	selectExpConnection, selectExpConnectionIdsForNodeLeftPort,
+	selectExpConnectionIdsForNodeRightPort,
+	defaultExpPosition,
 } from '@corgifm/common/redux'
 import {connectorWidth} from './Connections/ConnectionView'
-import {handleStopDraggingGhostConnectorExp} from './exp-dragging-connections'
 
 import Victor = require('victor')
 
-interface ConnectionCandidate extends IPosition {
-	portNumber: number
-}
+interface ConnectionCandidate extends ReturnType<typeof makeConnectionCandidate> {}
 
-export function handleStopDraggingGhostConnector(
+const makeConnectionCandidate = Record({
+	...defaultExpPosition,
+	portNumber: 0,
+})
+
+export function handleStopDraggingGhostConnectorExp(
 	roomState: IClientRoomState, dispatch: Dispatch, ghostConnectionId: Id,
 ) {
-	const roomType = selectRoomInfoState(roomState).roomType
-
-	if (roomType === RoomType.Experimental) {
-		return handleStopDraggingGhostConnectorExp(roomState, dispatch, ghostConnectionId)
-	}
-
 	const ghostConnection = selectGhostConnection(roomState, ghostConnectionId)
 
 	const movingConnectionId = ghostConnection.movingConnectionId
 
-	const parentNodePosition = selectPosition(roomState, ghostConnection.inactiveConnector.parentNodeId)
+	const parentNodePosition = selectExpPosition(roomState, ghostConnection.inactiveConnector.parentNodeId)
 
 	const positionFunction = getPositionFunc()
 
 	// Find nodes within threshold
-	const newConnectionCandidates = selectAllPositions(roomState)
+	const newConnectionCandidates = selectExpAllPositions(roomState)
 		.reduce(expandToPorts, List<ConnectionCandidate>())
 		.map(positionFunction)
 		.map(getDistanceFromGhostConnector)
@@ -57,7 +52,7 @@ export function handleStopDraggingGhostConnector(
 		return getChangeConnectionFunc()(closest, ghostConnection.port)
 	}
 
-	function validatePosition(position: IPosition) {
+	function validatePosition(position: ConnectionCandidate) {
 		if (position.id === parentNodePosition.id) {
 			return false
 		} else {
@@ -70,15 +65,15 @@ export function handleStopDraggingGhostConnector(
 		if (movingConnectionId === undefined) {
 			return logger.error('[changeConnectionSource] movingConnectionId is undefined but should never be right here')
 		}
-		const {targetId, targetPort} = selectConnection(roomState, movingConnectionId)
+		const {targetId, targetPort} = selectExpConnection(roomState, movingConnectionId)
 		const sourceId = position.id
 		const sourceType = position.targetType
 		const sourcePort = position.portNumber
 		if (
-			doesConnectionBetweenNodesExist(
+			doesExpConnectionBetweenNodesExist(
 				roomState, sourceId, sourcePort, targetId, targetPort)
 		) return
-		dispatch(connectionsActions.updateSource(movingConnectionId, {
+		dispatch(expConnectionsActions.updateSource(movingConnectionId, {
 			sourceId,
 			sourceType,
 			sourcePort,
@@ -92,15 +87,15 @@ export function handleStopDraggingGhostConnector(
 		if (movingConnectionId === undefined) {
 			return logger.error('[changeConnectionTarget] movingConnectionId is undefined but should never be right here')
 		}
-		const {sourceId, sourcePort} = selectConnection(roomState, movingConnectionId)
+		const {sourceId, sourcePort} = selectExpConnection(roomState, movingConnectionId)
 		const targetId = position.id
 		const targetType = position.targetType
 		const targetPort = position.portNumber
 		if (
-			doesConnectionBetweenNodesExist(
+			doesExpConnectionBetweenNodesExist(
 				roomState, sourceId, sourcePort, targetId, targetPort)
 		) return
-		dispatch(connectionsActions.updateTarget(movingConnectionId, {
+		dispatch(expConnectionsActions.updateTarget(movingConnectionId, {
 			targetId,
 			targetType,
 			targetPort,
@@ -113,11 +108,11 @@ export function handleStopDraggingGhostConnector(
 		if (validatePosition(position) === false) return
 
 		if (
-			doesConnectionBetweenNodesExist(
+			doesExpConnectionBetweenNodesExist(
 				roomState, position.id, position.portNumber, parentNodePosition.id, port)
 		) return
 
-		dispatch(connectionsActions.add(new Connection(
+		dispatch(expConnectionsActions.add(new ExpConnection(
 			position.id,
 			position.targetType,
 			parentNodePosition.id,
@@ -131,11 +126,11 @@ export function handleStopDraggingGhostConnector(
 		if (validatePosition(position) === false) return
 
 		if (
-			doesConnectionBetweenNodesExist(
+			doesExpConnectionBetweenNodesExist(
 				roomState, parentNodePosition.id, port, position.id, position.portNumber)
 		) return
 
-		dispatch(connectionsActions.add(new Connection(
+		dispatch(expConnectionsActions.add(new ExpConnection(
 			parentNodePosition.id,
 			parentNodePosition.targetType,
 			position.id,
@@ -163,17 +158,14 @@ export function handleStopDraggingGhostConnector(
 		}
 	}
 
-	function expandToPorts(all: List<ConnectionCandidate>, current: IPosition): List<ConnectionCandidate> {
+	function expandToPorts(all: List<ConnectionCandidate>, current: ExpPosition): List<ConnectionCandidate> {
 		const portCount = ghostConnection.activeSourceOrTarget === ActiveGhostConnectorSourceOrTarget.Source
-			? current.outputPortCount
-			: current.inputPortCount
+			? 1 // current.outputPortCount
+			: 1 // current.inputPortCount
 
 		return all.withMutations(mutableAll => {
 			for (let i = 0; i < portCount; i++) {
-				mutableAll.push({
-					...current,
-					portNumber: i,
-				})
+				mutableAll.push(makeConnectionCandidate(current.toJS()).set('portNumber', i))
 			}
 		})
 	}
@@ -199,20 +191,20 @@ function getDistanceBetweenPoints(a: Point, b: Point): number {
 }
 
 const moveToOutputPosition = (roomState: IClientRoomState) => (position: ConnectionCandidate): ConnectionCandidate => {
-	const stackCountOnPort = selectConnectionIdsForNodeRightPort(roomState, position.id, position.portNumber).count()
+	const stackCountOnPort = selectExpConnectionIdsForNodeRightPort(roomState, position.id, position.portNumber).count()
 	return {
 		...position,
 		x: position.x + position.width + (connectorWidth * (stackCountOnPort + 1)),
-		y: position.y + ((position.height / (1 + position.outputPortCount)) * (position.portNumber + 1)),
+		y: position.y + ((position.height / (1 /*+ position.outputPortCount*/)) * (position.portNumber + 1)),
 	}
 }
 
 const moveToInputPosition = (roomState: IClientRoomState) => (position: ConnectionCandidate): ConnectionCandidate => {
-	const stackCountOnPort = selectConnectionIdsForNodeLeftPort(roomState, position.id, position.portNumber).count()
+	const stackCountOnPort = selectExpConnectionIdsForNodeLeftPort(roomState, position.id, position.portNumber).count()
 	return {
 		...position,
 		x: position.x - (connectorWidth * (stackCountOnPort + 1)),
-		y: position.y + ((position.height / (1 + position.outputPortCount)) * (position.portNumber + 1)),
+		y: position.y + ((position.height / (1 /*+ position.outputPortCount*/)) * (position.portNumber + 1)),
 	}
 }
 
