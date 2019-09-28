@@ -1,4 +1,4 @@
-import {List, Record} from 'immutable'
+import {List} from 'immutable'
 import {Dispatch} from 'redux'
 import {logger} from '@corgifm/common/logger'
 import {IClientRoomState} from '@corgifm/common/redux/common-redux-types'
@@ -7,19 +7,15 @@ import {
 	expConnectionsActions, GhostConnectorAddingOrMoving, ExpPosition, selectExpAllPositions,
 	selectGhostConnection, selectExpPosition, doesExpConnectionBetweenNodesExist,
 	selectExpConnection, selectExpConnectionIdsForNodeLeftPort,
-	selectExpConnectionIdsForNodeRightPort,
-	defaultExpPosition,
+	selectExpConnectionIdsForNodeRightPort, ExpPositionRaw,
 } from '@corgifm/common/redux'
 import {connectorWidth} from './Connections/ConnectionView'
 
 import Victor = require('victor')
 
-interface ConnectionCandidate extends ReturnType<typeof makeConnectionCandidate> {}
-
-const makeConnectionCandidate = Record({
-	...defaultExpPosition,
-	portNumber: 0,
-})
+interface ConnectionCandidate extends ExpPositionRaw {
+	readonly portNumber: number
+}
 
 export function handleStopDraggingGhostConnectorExp(
 	roomState: IClientRoomState, dispatch: Dispatch, ghostConnectionId: Id,
@@ -165,7 +161,10 @@ export function handleStopDraggingGhostConnectorExp(
 
 		return all.withMutations(mutableAll => {
 			for (let i = 0; i < portCount; i++) {
-				mutableAll.push(makeConnectionCandidate(current.toJS()).set('portNumber', i))
+				mutableAll.push({
+					...current.toJS(),
+					portNumber: i,
+				})
 			}
 		})
 	}

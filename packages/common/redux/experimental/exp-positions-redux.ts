@@ -112,6 +112,8 @@ console.log('$$$$$$$$ foo: ', foo)
 
 export interface ExpPosition extends ReturnType<typeof makeExpPositionRecord> {}
 
+export type ExpPositionRaw = typeof defaultExpPosition
+
 export type ExpPositionAction = ActionType<typeof expPositionActions>
 
 // Reducers
