@@ -1,20 +1,31 @@
 import {Middleware} from 'redux'
 import {
 	IClientAppState, ExpNodesAction, ExpConnectionAction,
-	RoomsReduxAction, selectExpConnection, 
+	RoomsReduxAction, selectExpConnection,
 	selectExpAllConnections, selectExpNodesState,
+	selectRoomInfoState, RoomType,
 } from '@corgifm/common/redux'
+import {SingletonContextImpl} from '../SingletonContext'
+import {logger} from '../client-logger'
 import {NodeManager} from './NodeManager'
 
 type ExpMiddlewareActions = ExpNodesAction | ExpConnectionAction | RoomsReduxAction
 
 type ExpMiddleware =
-	(nodeManager: NodeManager) => Middleware<{}, IClientAppState>
+	(singletonContext: SingletonContextImpl) => Middleware<{}, IClientAppState>
 
 export const createExpMiddleware: ExpMiddleware =
-	(nodeManager: NodeManager) => ({dispatch, getState}) =>
+	singletonContext => ({dispatch, getState}) =>
 		next => async function _expMiddleware(action: ExpMiddlewareActions) {
 			next(action)
+			const roomType = selectRoomInfoState(getState().room).roomType
+
+			if (roomType !== RoomType.Experimental) return
+
+			const nodeManager = singletonContext.getNodeManager()
+
+			if (!nodeManager) return logger.error('missing node manager!')
+
 			foo(
 				action,
 				nodeManager,
@@ -39,6 +50,9 @@ function foo(
 		// Nodes
 		case 'EXP_NODE_REPLACE_ALL':
 			return nodeManager.addNodes(getNodes())
+
+		case 'EXP_NODE_PARAM_CHANGE':
+			return nodeManager.onAudioParamChange(action)
 
 		// Connections
 		case 'EXP_REPLACE_CONNECTIONS':

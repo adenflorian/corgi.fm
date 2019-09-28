@@ -1,24 +1,26 @@
-export type ExpAudioParams = Map<string, ExpAudioParam>
+/* eslint-disable no-empty-function */
+export type ExpAudioParams = Map<Id, ExpAudioParam>
 
 export interface ExpAudioParam {
-	audioParam: AudioParam
-	min: number
-	max: number
-	default: number
+	readonly id: Id
+	readonly audioParam: AudioParam
+	readonly min: number
+	readonly max: number
+	readonly default: number
+	readonly reactSubscribers: Map<AudioParamCallback, AudioParamCallback>
 }
 
-export interface ParamChange {
-	nodeId: Id
-	paramId: Id
-	newValue: number | string | boolean
-	timestamp: number
-	type: ExpParamType
+export type AudioParamCallback = (newValue: number) => void
+
+export interface AudioParamChange {
+	readonly nodeId: Id
+	readonly paramId: Id
+	readonly newValue: number
 }
 
 export interface ParamDescriptor {
-	paramId: Id
-	type: ExpParamType
-
+	readonly paramId: Id
+	readonly type: ExpParamType
 }
 
 // Different connection types could have different functions for sending data across

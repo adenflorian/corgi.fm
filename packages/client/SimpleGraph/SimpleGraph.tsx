@@ -1,18 +1,18 @@
 import React, {Fragment} from 'react'
 import {
-	selectAllPositions, IClientAppState, selectExpAllPositions, RoomType,
+	selectAllPositions, IClientAppState, RoomType,
 } from '@corgifm/common/redux'
 import {useSelector} from 'react-redux'
 import {mainBoardsId} from '../client-constants'
 import {ConnectedConnections} from '../Connections/Connections'
-import {ConnectedConnectorPlaceholders, ConnectedExpConnectorPlaceholders} from '../Connections/ConnectorPlaceholders'
+import {ConnectedConnectorPlaceholders} from '../Connections/ConnectorPlaceholders'
 import {ConnectedGhostConnectionsView} from '../Connections/GhostConnections'
 import {ECSCanvasRenderSystem} from '../ECS/ECSCanvasRenderSystem'
 import {ConnectedMousePointers} from '../MousePointers/MousePointers'
 import {ConnectedExpConnections} from '../Connections/ExpConnections'
+import {NodeManagerRoot} from '../Experimental/NodeManagerRoot'
 import {ConnectedSimpleGraphNode} from './SimpleGraphNode'
 import {ConnectedZoom} from './Zoom'
-import {ConnectedSimpleGraphNodeExp} from './SimpleGraphNodeExp'
 
 const canvasSize = ECSCanvasRenderSystem.canvasSize
 
@@ -37,7 +37,7 @@ export const ConnectedSimpleGraph = function _ConnectedSimpleGraph() {
 						: <ConnectedConnections />}
 					<ConnectedGhostConnectionsView roomType={roomType} />
 					{roomType === RoomType.Experimental
-						? <PositionsStuffExp />
+						? <NodeManagerRoot />
 						: <PositionsStuff />}
 					{/* <canvas
 						id="ECSCanvasRenderSystemCanvas"
@@ -69,25 +69,6 @@ function PositionsStuff() {
 						parentId={positionId}
 					/>
 					<ConnectedSimpleGraphNode
-						positionId={positionId}
-					/>
-				</Fragment>
-			).toList()}
-		</Fragment>
-	)
-}
-
-function PositionsStuffExp() {
-	const positionIds = useSelector((state: IClientAppState) => selectExpAllPositions(state.room))
-
-	return (
-		<Fragment>
-			{positionIds.map((_, positionId) =>
-				<Fragment key={positionId as string}>
-					<ConnectedExpConnectorPlaceholders
-						parentId={positionId}
-					/>
-					<ConnectedSimpleGraphNodeExp
 						positionId={positionId}
 					/>
 				</Fragment>

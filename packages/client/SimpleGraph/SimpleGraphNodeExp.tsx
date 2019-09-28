@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
-import React, {useCallback, useMemo, useState, useLayoutEffect} from 'react'
+import React, {useCallback, useMemo, useState, useLayoutEffect, Fragment} from 'react'
 import {useDispatch} from 'react-redux'
 import {ContextMenuTrigger} from 'react-contextmenu'
 import {
@@ -11,9 +11,11 @@ import {ConnectionNodeType} from '@corgifm/common/common-types'
 import {handleClassName, nodeMenuId} from '../client-constants'
 import {simpleGlobalClientState} from '../SimpleGlobalClientState'
 import {ExpPanel} from '../Panel/ExpPanel'
+import {ConnectedExpConnectorPlaceholders} from '../Connections/ConnectorPlaceholders';
 
 interface ISimpleGraphNodeProps {
 	positionId: Id
+	children: React.ReactNode
 }
 
 interface ISimpleGraphNodeReduxProps {
@@ -27,7 +29,7 @@ type ISimpleGraphNodeAllProps = ISimpleGraphNodeProps & ISimpleGraphNodeReduxPro
 
 export function SimpleGraphNode(props: ISimpleGraphNodeAllProps) {
 	const {
-		positionId, color,
+		positionId, color, children,
 		position, isSelected,
 	} = props
 
@@ -77,62 +79,56 @@ export function SimpleGraphNode(props: ISimpleGraphNodeAllProps) {
 	}, [dispatch, dragging, positionId, x, y])
 
 	return (
-		<div
-			className={`simpleGraphNode ${isSelected ? 'selectedNode' : ''}`}
-			onBlur={onBlur}
-			// TODO
-			tabIndex={0}
-			onFocus={handleFocus}
-			style={{
-				transform: `translate(${x}px, ${y}px)`,
-				position: 'absolute',
-				// Might not need this with the hack below
-				// willChange: fancyZoomPan ? '' : 'transform',
-				width,
-				height: height + panelHeaderHeight,
-				zIndex,
-				top: -panelHeaderHeight,
-				transition: dragging ? undefined : 'transform 0.1s',
-			}}
-			onMouseDown={handleMouseDown}
-		>
-			{/* This forces the node onto its own composite layer, without making it blurry when zooming in
-			having our own layer will restrict paints and stuff into this layer only
-			and makes transforms and opacity super fast */}
-			<div className="hack" />
-			{
-				useMemo(() => {
-					return (
-					// @ts-ignore disableIfShiftIsPressed
-						<ContextMenuTrigger
-							id={nodeMenuId}
-							disableIfShiftIsPressed={true}
-							holdToDisplay={-1}
-							nodeId={positionId}
-							nodeType={ConnectionNodeType.dummy}
-							collect={collect}
-						>
-							{getExperimentalPanel(position, color)}
-						</ContextMenuTrigger>
-					)
-				}, [color, position, positionId])
-			}
-			{/* <canvas
-				id={ECSSequencerRenderSystem.canvasIdPrefix + positionId}
+		<Fragment>
+			<ConnectedExpConnectorPlaceholders
+				parentId={positionId}
+			/>
+			<div
+				className={`simpleGraphNode ${isSelected ? 'selectedNode' : ''}`}
+				onBlur={onBlur}
+				// TODO
+				tabIndex={0}
+				onFocus={handleFocus}
 				style={{
+					transform: `translate(${x}px, ${y}px)`,
 					position: 'absolute',
 					width,
-					height,
-					bottom: 0,
-					left: 0,
-					pointerEvents: 'none',
-					zIndex: 999999,
-					display: highQuality ? undefined : 'none',
+					height: height + panelHeaderHeight,
+					zIndex,
+					top: -panelHeaderHeight,
+					transition: dragging ? undefined : 'transform 0.1s',
 				}}
-				width={width}
-				height={height}
-			/> */}
-		</div>
+				onMouseDown={handleMouseDown}
+			>
+				{/* This forces the node onto its own composite layer, without making it blurry when zooming in
+				having our own layer will restrict paints and stuff into this layer only
+				and makes transforms and opacity super fast */}
+				<div className="hack" />
+				{
+					useMemo(() => {
+						return (
+						// @ts-ignore disableIfShiftIsPressed
+							<ContextMenuTrigger
+								id={nodeMenuId}
+								disableIfShiftIsPressed={true}
+								holdToDisplay={-1}
+								nodeId={positionId}
+								nodeType={ConnectionNodeType.dummy}
+								collect={collect}
+							>
+								<ExpPanel
+									color={color}
+									id={position.id}
+									label="test"
+								>
+									{children}
+								</ExpPanel>
+							</ContextMenuTrigger>
+						)
+					}, [color, position, positionId])
+				}
+			</div>
+		</Fragment>
 	)
 }
 
@@ -140,22 +136,6 @@ const collect = ({nodeId, nodeType}: any) => ({
 	nodeId,
 	nodeType,
 })
-
-export function getExpAnchorId(nodeId: Id): string {
-	return `expAnchor-${nodeId}`
-}
-
-function getExperimentalPanel(position: ExpPosition, color: string) {
-	return (
-		<ExpPanel
-			color={color}
-			id={position.id}
-			label="test"
-		>
-			<div id={getExpAnchorId(position.id)} className={`experimentalAnchor`} />
-		</ExpPanel>
-	)
-}
 
 export const ConnectedSimpleGraphNodeExp = shamuConnect(
 	(state, {positionId}: ISimpleGraphNodeProps): ISimpleGraphNodeReduxProps => {

@@ -184,7 +184,7 @@
         {"language": "typescript", "autoFix": true},
         {"language": "typescriptreact", "autoFix": true},
     ],
-    "eslint.enable": false,
+    "eslint.enable": true,
     "eslint.options": {
         "ignorePath": ".gitignore",
         "extensions": [".js",".jsx",".ts",".tsx",]

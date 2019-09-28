@@ -24,7 +24,7 @@ import {getUsernameFromLocalStorage, saveUsernameToLocalStorage} from './usernam
 import {SamplesManager} from './WebAudio/SamplesManager'
 import {setStoreForSchedulerVisual, startSchedulerVisualLoop} from './WebAudio/SchedulerVisual'
 import {setupWebsocketAndListeners, socket} from './websocket-listeners'
-import {NodeManager} from './Experimental/NodeManager'
+import {SingletonContextImpl} from './SingletonContext'
 
 if (!isLocalDevClient()) initSentry()
 
@@ -99,11 +99,13 @@ async function setupAsync() {
 		options: loadedOptionsState,
 	}
 
-	const nodeManager = new NodeManager(audioContext)
+	const singletonContext = new SingletonContextImpl(
+		audioContext,
+	)
 
 	const store = configureStore(
 		initialState, getGetAllInstruments, onReduxMiddleware,
-		firebaseContextStuff, samplesManager, nodeManager)
+		firebaseContextStuff, samplesManager, singletonContext)
 
 	wireUpFirebaseToRedux(firebaseContextStuff, store)
 
@@ -119,12 +121,16 @@ async function setupAsync() {
 
 	setupInputEventListeners(window, store, audioContext)
 
-	setupWebsocketAndListeners(store)
-
 	const {getAllInstruments, getAllAudioNodes} =
 		setupInstrumentManager(store, audioContext, preFx, samplesManager)
 
-	renderApp(store, firebaseContextStuff)
+	// Rendering before websocket stuff so anything that needs
+	// to be setup from inside a react component can be done
+	// before we start receiving events over the network
+	// (like NodeManagerRoot component)
+	renderApp(store, firebaseContextStuff, singletonContext)
+
+	setupWebsocketAndListeners(store)
 
 	const {ecsLoop, onSetActiveRoom} = getECSLoop(store, masterLimiter)
 

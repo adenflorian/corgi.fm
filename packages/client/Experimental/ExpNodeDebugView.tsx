@@ -1,7 +1,9 @@
 import React from 'react'
+import {logger} from '../client-logger'
 import {
 	ExpAudioParams, ExpNodeAudioInputPorts, ExpNodeAudioOutputPorts,
-} from './ExpTypes';
+} from './ExpTypes'
+import {ExpNodeDebugKnob} from './ExpNodeDebugKnob'
 
 interface Props {
 	nodeId: Id
@@ -14,6 +16,7 @@ interface Props {
 export const ExpNodeDebugView = React.memo(function _ExpNodeDebugView({
 	nodeId, nodeName, audioParams, audioInputPorts, audioOutputPorts,
 }: Props) {
+	logger.log('ExpNodeDebugView render')
 	return (
 		<div className="expNodeDebugView">
 			<div className="nodeName">{nodeName}</div>
@@ -21,9 +24,13 @@ export const ExpNodeDebugView = React.memo(function _ExpNodeDebugView({
 			<div className="params">
 				<div className="sectionLabel">Audio Params</div>
 				{[...audioParams].map(([id, audioParam]) => (
-					<div className="param" key={id}>
-						<div className="paramId">{id}</div>
-						<div className="paramValue">{audioParam.audioParam.value}</div>
+					<div className="param" key={id as string}>
+						{/* <div className="paramId">{id}</div>
+						<div className="paramValue">{audioParam.audioParam.value}</div> */}
+						<ExpNodeDebugKnob
+							nodeId={nodeId}
+							audioParam={audioParam}
+						/>
 					</div>
 				))}
 			</div>

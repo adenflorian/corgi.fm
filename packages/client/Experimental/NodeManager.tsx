@@ -1,63 +1,69 @@
-import ReactDOM from 'react-dom'
+import React from 'react'
 import * as immutable from 'immutable'
 import {ExpNodeState, IExpConnection} from '@corgifm/common/redux'
 import {logger} from '../client-logger'
-import {getExpAnchorId} from '../SimpleGraph/SimpleGraphNodeExp'
-import {CorgiNode, typeClassMap} from './ExpNodes'
-import {ParamChange, ExpNodeAudioConnection} from './ExpTypes'
+import {typeClassMap} from './ExpNodes'
+import {CorgiNode, ExpNodeContext} from './CorgiNode'
+import {AudioParamChange, ExpNodeAudioConnection} from './ExpTypes'
 
 export class NodeManager {
 	private readonly _nodes = new Map<Id, CorgiNode>()
-	// private readonly _connections = new Map<Id, ExpNodeConnection>()
 	private readonly _audioConnections = new Map<Id, ExpNodeAudioConnection>()
 
 	public constructor(
-		private readonly _audioContext: AudioContext
+		private readonly _audioContext: AudioContext,
 	) {}
 
-	public renderAll = () => {
-		[...this._nodes.values()].forEach(node => {
-			node.render()
+	public renderNodeId = (nodeId: Id) => {
+		const node = this._nodes.get(nodeId)
 
-			// Using a timeout so that react-redux can render the containers
-			setTimeout(() => {
-				const targetId = getExpAnchorId(node.id)
-				const targetContainerElement = document.getElementById(targetId)
+		if (!node) {
+			logger.warn('[renderNodeId] 404 node not found: ', nodeId)
+			return null
+		}
 
-				ReactDOM.render(
-					node.render(),
-					targetContainerElement
-				)
-			}, 1)
-		})
+		return (
+			<ExpNodeContext.Provider value={node.reactContext}>
+				{node.render()}
+			</ExpNodeContext.Provider>
+		)
 	}
 
-	public onNodeParamChange = (paramChange: ParamChange) => {
+	// public onNodeParamChange = (paramChange: AudioParamChange) => {
+	// 	const node = this._nodes.get(paramChange.nodeId)
+
+	// 	if (!node) return logger.warn('404 node not found: ', {paramChange})
+
+	// 	node.onParamChange(paramChange)
+
+	// 	// TODO
+	// }
+
+	public onAudioParamChange = (paramChange: AudioParamChange) => {
 		const node = this._nodes.get(paramChange.nodeId)
 
-		if (node) {
-			node.onParamChange(paramChange)
-		} else {
-			// warning/error
-		}
+		if (!node) return logger.warn('404 node not found: ', {paramChange})
+
+		node.onAudioParamChange(paramChange.paramId, paramChange.newValue)
 	}
 
 	public addNode = (newNode: CorgiNode) => {
 		this._nodes.set(newNode.id, newNode)
-		// TODO More stuff
+		// TODO More stuff?
 	}
 
 	public addNodes = (newNodes: immutable.Map<Id, ExpNodeState>) => {
 		newNodes.forEach(node => {
-			this._nodes.set(node.id, new typeClassMap[node.type](node.id, this._audioContext))
+			const newNode = new typeClassMap[node.type](node.id, this._audioContext)
+			this._nodes.set(node.id, newNode)
+			node.audioParams.forEach((newValue, paramId) => newNode.onAudioParamChange(paramId, newValue))
 		})
-		this.renderAll()
-		// TODO More stuff
+		// TODO More stuff?
 	}
 
 	public addAudioConnections = (connections: immutable.Map<Id, IExpConnection>) => {
 		connections.valueSeq().toList().forEach(this.addAudioConnection)
-		// TODO More stuff
+		// TODO More stuff?
 	}
 
 	public addAudioConnection = (expConnection: IExpConnection) => {

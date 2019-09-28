@@ -6,28 +6,36 @@ import {Store} from 'redux'
 import {ConnectedApp} from './App'
 import {FirebaseContext, FirebaseContextStuff} from './Firebase/FirebaseContext'
 import {SvgGradients} from './SvgGradients'
+import {SingletonContext, SingletonContextImpl} from './SingletonContext'
 
 export function renderApp(
 	store: Store,
 	firebaseContextStuff: FirebaseContextStuff,
+	singletonContext: SingletonContextImpl,
 ) {
 	const HotProvider = hot(module)(Provider)
 	ReactDOM.render(
 		<HotProvider store={store}>
 			<FirebaseContext.Provider value={firebaseContextStuff}>
-				<React.Fragment>
-					<ConnectedApp />
-					<SvgGradients />
-				</React.Fragment>
+				<SingletonContext.Provider value={singletonContext}>
+					<React.Fragment>
+						<ConnectedApp />
+						<SvgGradients />
+					</React.Fragment>
+				</SingletonContext.Provider>
 			</FirebaseContext.Provider>
 		</HotProvider>,
-		document.querySelector('#react-app'),
+		getReactAppElement(),
 	)
 }
 
 export function renderOther(other: any) {
 	ReactDOM.render(
 		other,
-		document.querySelector('#react-app'),
+		getReactAppElement(),
 	)
+}
+
+function getReactAppElement() {
+	return document.querySelector('#react-app')
 }

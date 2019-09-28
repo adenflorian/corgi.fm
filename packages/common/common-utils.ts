@@ -233,3 +233,7 @@ export function roomNameCleaner(name: string): string {
 		.replace(/ +/g, '-')
 		.substring(0, maxRoomNameLength)
 }
+
+export function isId(val: unknown): val is Id {
+	return typeof val === 'string' && val.length > 0
+}

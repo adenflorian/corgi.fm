@@ -21,7 +21,7 @@ import {
 	expPositionActions, makeExpPosition, makeExpNodeState, expConnectionsActions, ExpConnection,
 } from '@corgifm/common/redux'
 import {logger} from '@corgifm/common/logger'
-import {serverClientId} from '@corgifm/common/common-constants';
+import {serverClientId} from '@corgifm/common/common-constants'
 
 const masterAudioOutput: IConnectable = findNodeInfo(ConnectionNodeType.audioOutput).stateSelector({} as any, '')
 const masterClock: IConnectable = findNodeInfo(ConnectionNodeType.masterClock).stateSelector({} as any, '')
@@ -39,7 +39,6 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 
 	const audioOutput = makeExpNodeState({
 		type: 'audioOutput',
-		params: Map([['gain', 0.5]]),
 	})
 
 	dispatchToRoom(expNodesActions.add(audioOutput))
@@ -54,7 +53,6 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 
 	const gain = makeExpNodeState({
 		type: 'gain',
-		params: Map(),
 	})
 
 	dispatchToRoom(expNodesActions.add(gain))
@@ -69,7 +67,6 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 
 	const filter = makeExpNodeState({
 		type: 'filter',
-		params: Map(),
 	})
 
 	dispatchToRoom(expNodesActions.add(filter))
@@ -84,7 +81,6 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 
 	const osc1 = makeExpNodeState({
 		type: 'oscillator',
-		params: Map([['test', 123]]),
 	})
 
 	dispatchToRoom(expNodesActions.add(osc1))
@@ -99,7 +95,6 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 
 	const osc2 = makeExpNodeState({
 		type: 'oscillator',
-		params: Map(),
 	})
 
 	dispatchToRoom(expNodesActions.add(osc2))

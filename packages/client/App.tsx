@@ -29,7 +29,7 @@ const App = () => {
 	return (
 		<div className={`ctrl-${ctrl} alt-${alt} shift-${shift}`}>
 			<LoadingScreen loading={isLoading} />
-			{!isLoading && {
+			{{
 				[RoomType.Normal]: <ConnectedOnlineApp />,
 				[RoomType.Experimental]: <ConnectedOnlineApp />,
 			}[roomType]

@@ -200,7 +200,9 @@ export function selectLocalClient(state: IClientAppState): IClientState {
 	if (!localClient.id.startsWith('fake')) {
 		return localClient
 	} else {
-		logger.warn('selectLocalClient was called but localClient is not set, returning fake')
+		if (state.clientInfo.isClientReady) {
+			logger.warn('selectLocalClient was called but localClient is not set, returning fake')
+		}
 		return {
 			color: CssColor.disabledGray,
 			id: fakeLocalClientId,
