@@ -1,0 +1,58 @@
+@import '../colors.less';
+@import '../AppCommon.less';
+
+.expNodeDebugView {
+	height: 100%;
+	padding: 8px;
+
+	.nodeName {
+		font-size: 1.2em;
+		margin-bottom: 4px;
+	}
+
+	.nodeId {
+		font-size: 0.75em;
+		line-height: 1em;
+		margin-bottom: 4px;
+	}
+
+	.params {
+		margin-bottom: 4px;
+
+		.param {
+			display: flex;
+			justify-content: space-between;
+
+			&:nth-child(odd) {
+				// background-color: @panelGrayDark;
+			}
+
+			.paramId {
+
+			}
+			.paramValue {
+
+			}
+		}
+	}
+
+	.audioInputPorts, .audioOutputPorts {
+		margin-bottom: 4px;
+
+		.port {
+			display: flex;
+			justify-content: space-between;
+
+			&:nth-child(odd) {
+				// background-color: @panelGrayDark;
+			}
+
+			.portId {
+
+			}
+			.paramValue {
+
+			}
+		}
+	}
+}

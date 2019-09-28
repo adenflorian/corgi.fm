@@ -85,8 +85,8 @@ export type ExpPositions = Map<Id, ExpPosition>
 const defaultPosition = {
 	id: '-1' as Id,
 	ownerId: '-1' as Id,
-	width: 100,
-	height: 100,
+	width: 200,
+	height: 200,
 	x: Math.random() * 1600 - 800,
 	y: Math.random() * 1000 - 500,
 	zIndex: 0,

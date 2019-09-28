@@ -7,10 +7,10 @@ import {
 	shamuConnect, shamuMetaActions, selectExpPosition, expPositionActions,
 } from '@corgifm/common/redux'
 import {panelHeaderHeight} from '@corgifm/common/common-constants'
-import {ConnectionNodeType} from '@corgifm/common/common-types';
+import {ConnectionNodeType} from '@corgifm/common/common-types'
 import {handleClassName, nodeMenuId} from '../client-constants'
 import {simpleGlobalClientState} from '../SimpleGlobalClientState'
-import {Panel} from '../Panel/Panel'
+import {ExpPanel} from '../Panel/ExpPanel'
 
 interface ISimpleGraphNodeProps {
 	positionId: Id
@@ -147,13 +147,13 @@ export function getExpAnchorId(nodeId: Id): string {
 
 function getExperimentalPanel(position: ExpPosition, color: string) {
 	return (
-		<Panel
+		<ExpPanel
 			color={color}
 			id={position.id}
 			label="test"
 		>
 			<div id={getExpAnchorId(position.id)} className={`experimentalAnchor`} />
-		</Panel>
+		</ExpPanel>
 	)
 }
 

@@ -1,6 +1,9 @@
 import React, {ReactElement} from 'react'
 import {ExpNodeType} from '@corgifm/common/redux'
 import {logger} from '../client-logger'
+import './ExpNodes.less'
+import {ExpNodeDebugView} from './ExpNodeDebugView'
+import {ExpAudioParam, ExpNodePort, ParamChange, ExpNodeAudioInputPorts, ExpNodeAudioInputPort, ExpNodeAudioOutputPorts, ExpNodeAudioOutputPort, ExpNodeConnection} from './ExpTypes'
 
 export abstract class CorgiNode {
 	public constructor(
@@ -8,11 +11,13 @@ export abstract class CorgiNode {
 		public readonly audioContext: AudioContext,
 		protected readonly _audioInputPorts: ExpNodeAudioInputPorts = makePorts<ExpNodeAudioInputPort>([]),
 		protected readonly _audioOutPorts: ExpNodeAudioOutputPorts = makePorts<ExpNodeAudioOutputPort>([]),
-	) { }
+		private readonly _params: Map<string, ExpAudioParam> = new Map(),
+	) {}
 
 	public abstract onParamChange(paramChange: ParamChange): void
 	public abstract render(): ReactElement<any>
 	public abstract dispose(): void
+	public abstract getName(): string
 
 	public onNewAudioOutConnection(port: ExpNodePort, connection: ExpNodeConnection) {
 		logger.log('onNewAudioOutConnection default')
@@ -29,6 +34,18 @@ export abstract class CorgiNode {
 	public getAudioOutputPort(id: number): ExpNodeAudioOutputPort | undefined {
 		return this._audioOutPorts.get(id)
 	}
+
+	protected getDebugView() {
+		return (
+			<ExpNodeDebugView
+				nodeId={this.id}
+				nodeName={this.getName()}
+				audioParams={this._params}
+				audioInputPorts={this._audioInputPorts}
+				audioOutputPorts={this._audioOutPorts}
+			/>
+		)
+	}
 }
 
 export class OscillatorExpNode extends CorgiNode {
@@ -44,39 +61,48 @@ export class OscillatorExpNode extends CorgiNode {
 
 		const inPorts = makePorts([
 			new ExpNodeAudioInputPort(0, 'frequency', oscillator.frequency),
+			new ExpNodeAudioInputPort(1, 'detune', oscillator.detune),
 		])
 
 		const outPorts = makePorts([
 			new ExpNodeAudioOutputPort(0, 'output', oscillator),
 		])
 
-		super(id, audioContext, inPorts, outPorts)
+		const audioParams = new Map<string, ExpAudioParam>([
+			['frequency', buildAudioParamDesc(oscillator.frequency)],
+			['detune', buildAudioParamDesc(oscillator.detune)],
+		])
+
+		super(id, audioContext, inPorts, outPorts, audioParams)
 
 		this._oscillator = oscillator
 	}
 
+	public getName() {return 'Oscillator'}
+
 	public onParamChange(paramChange: ParamChange) {
+		switch (paramChange.paramId) {
+			case 'frequency': return isNumber(paramChange.newValue) && this._changeFrequency(paramChange.newValue)
+			case 'wave': return isOscillatorType(paramChange.newValue) && this._changeOscillatorType(paramChange.newValue)
+			default: return logger.warn('unexpected param id: ', {paramChange})
+		}
 		// Render view
 		// Change value on web audio oscillator
 	}
 
+	private _changeFrequency(newValue: number) {
+		this._oscillator.frequency.value = newValue
+	}
+
+	private _changeOscillatorType(newValue: OscillatorType) {
+		this._oscillator.type = newValue
+	}
+
 	public onNewAudioOutConnection(port: ExpNodePort, connection: ExpNodeConnection) {
-		// if (port.inputOrOutput === 'out') {
-		// 	// connection.getTarget().
-		// 	this._oscillator.connect()
-		// }
-		// switch (port.name) {
-		// 	case 'output':
-		// }
 	}
 
 	public render() {
-		return (
-			<div className="oscillator">
-				<h2>osc</h2>
-				<p>{this.id}</p>
-			</div>
-		)
+		return this.getDebugView()
 	}
 
 	public dispose() {
@@ -96,6 +122,8 @@ export class AudioOutputExpNode extends CorgiNode {
 		super(id, audioContext, inPorts)
 	}
 
+	public getName() {return 'Audio Output'}
+
 	public onParamChange(paramChange: ParamChange) {
 
 		// Render view
@@ -104,11 +132,7 @@ export class AudioOutputExpNode extends CorgiNode {
 	}
 
 	public render() {
-		return (
-			<div className="audioOut">
-				<h2>audio out</h2>
-			</div>
-		)
+		return this.getDebugView()
 	}
 
 	public dispose() {
@@ -123,6 +147,8 @@ export class DummyNode extends CorgiNode {
 		super(id, audioContext, makePorts([]))
 	}
 
+	public getName() {return 'Dummy'}
+
 	public onParamChange(paramChange: ParamChange) {
 
 		// Render view
@@ -131,12 +157,7 @@ export class DummyNode extends CorgiNode {
 	}
 
 	public render() {
-		return (
-			<div className="dummy">
-				<h2>dummy dumdum</h2>
-				<p>{this.id}</p>
-			</div>
-		)
+		return this.getDebugView()
 	}
 
 	public dispose() {
@@ -159,10 +180,20 @@ export class FilterNode extends CorgiNode {
 		const outPorts = makePorts([
 			new ExpNodeAudioOutputPort(0, 'output', filter),
 		])
-		super(id, audioContext, inPorts, outPorts)
+
+		const audioParams = new Map<string, ExpAudioParam>([
+			['frequency', buildAudioParamDesc(filter.frequency)],
+			['detune', buildAudioParamDesc(filter.detune)],
+			['q', buildAudioParamDesc(filter.Q)],
+			['gain', buildAudioParamDesc(filter.gain)],
+		])
+
+		super(id, audioContext, inPorts, outPorts, audioParams)
 
 		this._filter = filter
 	}
+
+	public getName() {return 'Filter'}
 
 	public onParamChange(paramChange: ParamChange) {
 
@@ -172,16 +203,20 @@ export class FilterNode extends CorgiNode {
 	}
 
 	public render() {
-		return (
-			<div className="filter">
-				<h2>filter</h2>
-				<p>{this.id}</p>
-			</div>
-		)
+		return this.getDebugView()
 	}
 
 	public dispose() {
 		this._filter.disconnect()
+	}
+}
+
+function buildAudioParamDesc(audioParam: AudioParam) {
+	return {
+		audioParam,
+		min: audioParam.minValue,
+		max: audioParam.maxValue,
+		default: audioParam.defaultValue,
 	}
 }
 
@@ -192,7 +227,7 @@ export class ExpGainNode extends CorgiNode {
 		id: Id, audioContext: AudioContext,
 	) {
 		const gain = audioContext.createGain()
-		gain.gain.value = 500
+		// gain.gain.value = 500
 		const inPorts = makePorts([
 			new ExpNodeAudioInputPort(0, 'input', gain),
 			new ExpNodeAudioInputPort(1, 'gain', gain.gain),
@@ -200,10 +235,17 @@ export class ExpGainNode extends CorgiNode {
 		const outPorts = makePorts([
 			new ExpNodeAudioOutputPort(0, 'output', gain),
 		])
-		super(id, audioContext, inPorts, outPorts)
+
+		const audioParams = new Map<string, ExpAudioParam>([
+			['gain', buildAudioParamDesc(gain.gain)],
+		])
+
+		super(id, audioContext, inPorts, outPorts, audioParams)
 
 		this._gain = gain
 	}
+
+	public getName() {return 'Gain'}
 
 	public onParamChange(paramChange: ParamChange) {
 
@@ -213,12 +255,7 @@ export class ExpGainNode extends CorgiNode {
 	}
 
 	public render() {
-		return (
-			<div className="filter">
-				<h2>filter</h2>
-				<p>{this.id}</p>
-			</div>
-		)
+		return this.getDebugView()
 	}
 
 	public dispose() {
@@ -227,7 +264,7 @@ export class ExpGainNode extends CorgiNode {
 }
 
 // Is there a way to use class decorators to create this map at runtime?
-export const typeClassMap: {[key in ExpNodeType]: new (id: Id, context: AudioContext) => CorgiNode} = {
+export const typeClassMap: {readonly [key in ExpNodeType]: new (id: Id, context: AudioContext) => CorgiNode} = {
 	oscillator: OscillatorExpNode,
 	dummy: DummyNode,
 	filter: FilterNode,
@@ -235,83 +272,52 @@ export const typeClassMap: {[key in ExpNodeType]: new (id: Id, context: AudioCon
 	gain: ExpGainNode,
 }
 
-export interface ParamChange {
-	paramName: string
-	newValue: number | string | boolean
-	timestamp: number
-	targetNodeId: Id
-}
-
-// Different connection types could have different functions for sending data across
-export class ExpNodeConnection {
-	public constructor(
-		public readonly id: Id,
-		private _source: ExpNodePort,
-		private _target: ExpNodePort,
-	) {}
-
-	public getSource() {
-		return this._source
-	}
-
-	public getTarget() {
-		return this._target
-	}
-
-	public connectSource(source: ExpNodePort) {
-		this._source = source
-	}
-
-	public connectTarget(target: ExpNodePort) {
-		this._target = target
-	}
-}
-
-export type ExpNodeConnections = Map<Id, ExpNodeConnection>
-
-export abstract class ExpNodePort {
-	protected readonly _connections: ExpNodeConnections = new Map<Id, ExpNodeConnection>()
-
-	public constructor(
-		public readonly id: number,
-		public readonly name: string,
-	) {}
-
-	public connect(connection: ExpNodeConnection) {
-		this._connections.set(connection.id, connection)
-	}
-}
-
-export class ExpNodeAudioInputPort extends ExpNodePort {
-	public constructor(
-		public readonly id: number,
-		public readonly name: string,
-		public readonly destination: AudioNode | AudioParam
-	) {
-		super(id, name)
-	}
-}
-
-export class ExpNodeAudioOutputPort extends ExpNodePort {
-	public constructor(
-		public readonly id: number,
-		public readonly name: string,
-		public readonly source: AudioNode
-	) {
-		super(id, name)
-	}
-}
-
-export type ExpNodePortType = 'audio' | 'midi'
-
-export type ExpNodePortIO = 'in' | 'out'
-
-export type ExpNodePorts = Map<number, ExpNodePort>
-export type ExpNodeAudioInputPorts = Map<number, ExpNodeAudioInputPort>
-export type ExpNodeAudioOutputPorts = Map<number, ExpNodeAudioOutputPort>
-
 export function makePorts<T extends ExpNodePort>(ports: readonly T[]): Map<number, T> {
 	const map = new Map<number, T>()
 	ports.forEach(x => map.set(x.id, x))
 	return map
+}
+
+type ParamTypeStrings = 'number' | 'string' | 'boolean'
+
+function ifTypeThenDo(type: 'number' ) {
+
+}
+
+function isNumber(val: unknown): val is number {
+	return typeof val === 'number'
+}
+
+function isFrequency(val: unknown): val is EPTFrequency {
+	return typeof val === 'number'
+}
+
+function isString(val: unknown): val is string {
+	return typeof val === 'string'
+}
+
+function isBoolean(val: unknown): val is boolean {
+	return typeof val === 'boolean'
+}
+
+const oscillatorTypes = Object.freeze([
+	'sine', 'square', 'sawtooth', 'triangle', 'custom',
+])
+
+type EPTFrequency = number
+
+type ExpParamTypeGuard<T> = (val: unknown) => val is T
+
+export const expParamTypeGuards = {
+	Frequency: isFrequency,
+	Boolean: isBoolean,
+	OscillatorType: isOscillatorType,
+} as const
+
+function isOscillatorType(val: unknown): val is OscillatorType {
+	if (isString(val)) {
+		return oscillatorTypes.includes(val)
+	} else {
+		return false
+	}
 }

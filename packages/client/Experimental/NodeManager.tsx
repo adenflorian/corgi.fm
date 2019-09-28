@@ -1,9 +1,10 @@
 import ReactDOM from 'react-dom'
 import * as immutable from 'immutable'
 import {ExpNodeState, ExpConnection} from '@corgifm/common/redux'
-import {getExpAnchorId} from '../SimpleGraph/SimpleGraphNode'
 import {logger} from '../client-logger'
-import {ParamChange, CorgiNode, typeClassMap, ExpNodeConnection} from './ExpNodes'
+import {getExpAnchorId} from '../SimpleGraph/SimpleGraphNodeExp'
+import {CorgiNode, typeClassMap} from './ExpNodes'
+import {ExpNodeConnection, ParamChange} from './ExpTypes'
 
 export class NodeManager {
 	private readonly _nodes = new Map<Id, CorgiNode>()
@@ -22,8 +23,6 @@ export class NodeManager {
 				const targetId = getExpAnchorId(node.id)
 				const targetContainerElement = document.getElementById(targetId)
 
-				logger.log('goo goo:', {targetId, targetContainerElement})
-
 				ReactDOM.render(
 					node.render(),
 					targetContainerElement
@@ -33,7 +32,7 @@ export class NodeManager {
 	}
 
 	public onNodeParamChange = (paramChange: ParamChange) => {
-		const node = this._nodes.get(paramChange.targetNodeId)
+		const node = this._nodes.get(paramChange.nodeId)
 
 		if (node) {
 			node.onParamChange(paramChange)

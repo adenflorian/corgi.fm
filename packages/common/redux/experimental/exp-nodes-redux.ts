@@ -35,7 +35,7 @@ export type ExpNodesAction = ActionType<typeof expNodesActions>
 const defaultExpNodeState = {
 	id: 'dummyId' as Id,
 	type: 'dummy' as ExpNodeType,
-	params: Map<string, ExpParamValue>(),
+	params: Map<Id, ExpParamValue>(),
 }
 
 const _makeExpNodeState = Record(defaultExpNodeState)
