@@ -3,7 +3,7 @@ import {ExpNodeType} from '@corgifm/common/redux'
 import {logger} from '../client-logger'
 import './ExpNodes.less'
 import {ExpNodeDebugView} from './ExpNodeDebugView'
-import {ExpAudioParam, ExpNodePort, ParamChange, ExpNodeAudioInputPorts, ExpNodeAudioInputPort, ExpNodeAudioOutputPorts, ExpNodeAudioOutputPort, ExpNodeConnection} from './ExpTypes'
+import {ExpAudioParam, ExpNodeAudioPort, ParamChange, ExpNodeAudioInputPorts, ExpNodeAudioInputPort, ExpNodeAudioOutputPorts, ExpNodeAudioOutputPort, ExpNodeConnection} from './ExpTypes'
 
 export abstract class CorgiNode {
 	public constructor(
@@ -19,11 +19,11 @@ export abstract class CorgiNode {
 	public abstract dispose(): void
 	public abstract getName(): string
 
-	public onNewAudioOutConnection(port: ExpNodePort, connection: ExpNodeConnection) {
+	public onNewAudioOutConnection(port: ExpNodeAudioPort, connection: ExpNodeConnection) {
 		logger.log('onNewAudioOutConnection default')
 	}
 
-	public onNewAudioInConnection(port: ExpNodePort, connection: ExpNodeConnection) {
+	public onNewAudioInConnection(port: ExpNodeAudioPort, connection: ExpNodeConnection) {
 		logger.log('onNewAudioInConnection default')
 	}
 
@@ -98,7 +98,7 @@ export class OscillatorExpNode extends CorgiNode {
 		this._oscillator.type = newValue
 	}
 
-	public onNewAudioOutConnection(port: ExpNodePort, connection: ExpNodeConnection) {
+	public onNewAudioOutConnection(port: ExpNodeAudioPort, connection: ExpNodeConnection) {
 	}
 
 	public render() {
@@ -272,7 +272,7 @@ export const typeClassMap: {readonly [key in ExpNodeType]: new (id: Id, context:
 	gain: ExpGainNode,
 }
 
-export function makePorts<T extends ExpNodePort>(ports: readonly T[]): Map<number, T> {
+export function makePorts<T extends ExpNodeAudioPort>(ports: readonly T[]): Map<number, T> {
 	const map = new Map<number, T>()
 	ports.forEach(x => map.set(x.id, x))
 	return map

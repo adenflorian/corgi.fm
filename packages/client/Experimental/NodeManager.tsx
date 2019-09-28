@@ -4,11 +4,12 @@ import {ExpNodeState, ExpConnection} from '@corgifm/common/redux'
 import {logger} from '../client-logger'
 import {getExpAnchorId} from '../SimpleGraph/SimpleGraphNodeExp'
 import {CorgiNode, typeClassMap} from './ExpNodes'
-import {ExpNodeConnection, ParamChange} from './ExpTypes'
+import {ParamChange, ExpNodeAudioConnection} from './ExpTypes'
 
 export class NodeManager {
 	private readonly _nodes = new Map<Id, CorgiNode>()
-	private readonly _connections = new Map<Id, ExpNodeConnection>()
+	// private readonly _connections = new Map<Id, ExpNodeConnection>()
+	private readonly _audioConnections = new Map<Id, ExpNodeAudioConnection>()
 
 	public constructor(
 		private readonly _audioContext: AudioContext
@@ -54,12 +55,12 @@ export class NodeManager {
 		// TODO More stuff
 	}
 
-	public addConnections = (connections: immutable.Map<Id, ExpConnection>) => {
-		connections.valueSeq().toList().forEach(this.connectAudioNodes)
+	public addAudioConnections = (connections: immutable.Map<Id, ExpConnection>) => {
+		connections.valueSeq().toList().forEach(this.createAudioConnection)
 		// TODO More stuff
 	}
 
-	public connectAudioNodes = (expConnection: ExpConnection) => {
+	public createAudioConnection = (expConnection: ExpConnection) => {
 		// Get nodes
 		const source = this._nodes.get(expConnection.sourceId)
 		const target = this._nodes.get(expConnection.targetId)
@@ -74,8 +75,8 @@ export class NodeManager {
 		if (!sourcePort || !targetPort) return logger.warn('404 port not found: ', {sourcePort, targetPort})
 
 		// Create connection
-		const connection = new ExpNodeConnection(expConnection.id, sourcePort, targetPort)
-		this._connections.set(connection.id, connection)
+		const connection = new ExpNodeAudioConnection(expConnection.id, sourcePort, targetPort)
+		this._audioConnections.set(connection.id, connection)
 
 		// Connect ports to connection
 		sourcePort.connect(connection)
@@ -85,7 +86,7 @@ export class NodeManager {
 		connection.connectSource(sourcePort)
 		connection.connectTarget(targetPort)
 
-		// Notify nodes of new connection
+		// Connect audio stuff
 		if (targetPort.destination instanceof AudioParam) {
 			sourcePort.source.connect(targetPort.destination)
 		} else {
@@ -93,12 +94,31 @@ export class NodeManager {
 		}
 	}
 
-	public cleanup() {
+	public deleteConnection = (id: Id) => {
+		const connection = this._audioConnections.get(id)
+
+		if (!connection) return logger.warn('tried to delete non existent connection: ', id)
+
+		this._audioConnections.delete(id)
+
+		// Get and connect ports
+		const sourcePort = connection.getSource()
+		const targetPort = connection.getTarget()
+		if (!sourcePort || !targetPort) return logger.warn('[deleteConnection] 404 port not found: ', {sourcePort, targetPort})
+
+		if (targetPort.destination instanceof AudioParam) {
+			sourcePort.source.disconnect(targetPort.destination)
+		} else {
+			sourcePort.source.disconnect(targetPort.destination)
+		}
+	}
+
+	public cleanup = () => {
 		this._nodes.forEach(node => {
 			node.dispose()
 		})
 		this._nodes.clear()
-		this._connections.clear()
+		this._audioConnections.clear()
 	}
 }
 

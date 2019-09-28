@@ -16,8 +16,9 @@ export const createExpMiddleware: ExpMiddleware =
 
 			switch (action.type) {
 				case 'EXP_NODE_REPLACE_ALL': return nodeManager.addNodes(getState().room.expNodes)
-				case 'EXP_REPLACE_CONNECTIONS': return nodeManager.addConnections(getState().room.expConnections.connections)
+				case 'EXP_REPLACE_CONNECTIONS': return nodeManager.addAudioConnections(getState().room.expConnections.connections)
 				case 'SET_ACTIVE_ROOM': return nodeManager.cleanup()
+				case 'EXP_DELETE_CONNECTIONS': return action.connectionIds.forEach(nodeManager.deleteConnection)
 				default: return
 			}
 		}
