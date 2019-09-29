@@ -11,7 +11,6 @@ import {ConnectionNodeType} from '@corgifm/common/common-types'
 import {handleClassName, nodeMenuId} from '../client-constants'
 import {simpleGlobalClientState} from '../SimpleGlobalClientState'
 import {ExpPanel} from '../Panel/ExpPanel'
-import {ConnectedExpConnectorPlaceholders} from '../Connections/ConnectorPlaceholders';
 
 interface ISimpleGraphNodeProps {
 	positionId: Id
@@ -80,9 +79,6 @@ export function SimpleGraphNode(props: ISimpleGraphNodeAllProps) {
 
 	return (
 		<Fragment>
-			<ConnectedExpConnectorPlaceholders
-				parentId={positionId}
-			/>
 			<div
 				className={`simpleGraphNode ${isSelected ? 'selectedNode' : ''}`}
 				onBlur={onBlur}

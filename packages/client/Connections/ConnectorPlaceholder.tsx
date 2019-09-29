@@ -14,8 +14,6 @@ interface Props {
 
 type AllProps = Props
 
-const hitBoxSize = 80
-
 export const ConnectorPlaceholder = React.memo(
 	function _ConnectorPlaceholder({
 		sourceOrTarget, x, y, onMouseDown,
@@ -43,13 +41,7 @@ export const ConnectorPlaceholder = React.memo(
 				<div
 					className="newConnectionPlaceholder-hitbox"
 					style={{
-						width: 80,
-						height: 80,
-						backgroundColor: 'magenta',
-						position: 'absolute',
-						transform: `translate(${x - (hitBoxSize / 2)}px, ${y - (hitBoxSize / 2)}px)`,
-						opacity: 0,
-						zIndex: -10,
+						transform: `translate(${x}px, ${y}px)`,
 					}}
 					onMouseEnter={() => setIsMouseOver(true)}
 					onMouseLeave={() => setIsMouseOver(false)}

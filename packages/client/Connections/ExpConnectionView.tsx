@@ -226,9 +226,17 @@ export const ConnectedExpConnectionView = shamuConnect(
 	},
 )(ExpConnectionView)
 
-const portHeight = 16
-const debugNodeHeaderHeight = 8 + 16 + 4 + 12 + 4 + 16
-const xAdjust = 8;
+export const expConnectionConstants = {
+	portHeight: 16,
+	debugNodeHeaderHeight: 8 + 16 + 4 + 12 + 4 + 16,
+	xAdjust: 8,
+} as const
+
+const {portHeight, debugNodeHeaderHeight, xAdjust} = expConnectionConstants
+
+export function calculateExpDebugConnectorY(parentY: number, portIndex: number) {
+	return parentY + debugNodeHeaderHeight + (portHeight * portIndex) + (portHeight / 2)
+}
 
 export const ConnectedExpConnectionDebugView = shamuConnect(
 	function connectionViewMapStateToProps(state: IClientAppState, props: IExpConnectionViewProps): IExpConnectionViewReduxProps {
@@ -251,9 +259,9 @@ export const ConnectedExpConnectionDebugView = shamuConnect(
 			targetStackOrder: selectExpConnectionStackOrderForTarget(state.room, props.id),
 			color: sourceColor,
 			sourceX: sourcePosition.x + sourcePosition.width - xAdjust,
-			sourceY: sourcePosition.y + debugNodeHeaderHeight + (portHeight * connection.sourcePort) + (portHeight / 2),
+			sourceY: calculateExpDebugConnectorY(sourcePosition.y, connection.sourcePort),
 			targetX: targetPosition.x + xAdjust,
-			targetY: targetPosition.y + debugNodeHeaderHeight + (portHeight * connection.targetPort) + (portHeight / 2),
+			targetY: calculateExpDebugConnectorY(targetPosition.y, connection.targetPort),
 			saturateSource: isSourceActive || isSourceSending,
 			saturateTarget: isSourceSending,
 			connection,

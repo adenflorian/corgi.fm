@@ -169,9 +169,9 @@ export type ExpNodePortType = 'audio' | 'midi'
 
 export type ExpNodePortIO = 'in' | 'out'
 
-export type ExpNodePorts = Map<number, ExpNodeAudioPort>
-export type ExpNodeAudioInputPorts = Map<number, ExpNodeAudioInputPort>
-export type ExpNodeAudioOutputPorts = Map<number, ExpNodeAudioOutputPort>
+export type ExpNodePorts = readonly ExpNodeAudioPort[]
+export type ExpNodeAudioInputPorts = readonly ExpNodeAudioInputPort[]
+export type ExpNodeAudioOutputPorts = readonly ExpNodeAudioOutputPort[]
 
 export enum ExpParamType {
 	Frequency = 'Frequency',

@@ -67,10 +67,43 @@ path.animatedLongLine {
     }
 }
 
-.debugViewConnections {
+@lineZ: 1000000;
+@placeholderHitboxZ: @lineZ + 1;
+@connectorZ: @placeholderHitboxZ + 1;
+@placeholderZ: @connectorZ + 1;
+
+@hitboxSize: 80px;
+
+.newConnectionPlaceholder-hitbox {
+    width: @hitboxSize;
+    height: @hitboxSize;
+    background-color: magenta;
+    position: absolute;
+    opacity: 0;
+    z-index: -10;
+    margin-top: @hitboxSize / -2px;
+    margin-left: @hitboxSize / -2px;
+
+    .viewMode-debug & {
+        z-index: @placeholderHitboxZ;
+        width: 32px;
+        height: 16px;
+        margin-top: 16px / -2px;
+        margin-left: 32px / -4px;
+    }
+}
+
+.debugViewConnections, .viewMode-debug {
     .connection {
-        .longLine, .connector {
-            z-index: 99999999;
+        .longLine {
+            z-index: @lineZ;
+        }
+        .connector {
+            z-index: @connectorZ;
+
+            &.newConnectionPlaceholder {
+                z-index: @placeholderZ;
+            }
         }
     }
 }

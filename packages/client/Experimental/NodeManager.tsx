@@ -1,10 +1,12 @@
-import React from 'react'
+import React, {Fragment} from 'react'
 import * as immutable from 'immutable'
 import {ExpNodeState, IExpConnection} from '@corgifm/common/redux'
 import {logger} from '../client-logger'
 import {typeClassMap} from './ExpNodes'
 import {CorgiNode, ExpNodeContext} from './CorgiNode'
 import {AudioParamChange, ExpNodeAudioConnection} from './ExpTypes'
+import {ConnectedExpConnectorPlaceholders} from '../Connections/ConnectorPlaceholders';
+import {ConnectedSimpleGraphNodeExp} from '../SimpleGraph/SimpleGraphNodeExp';
 
 export class NodeManager {
 	private readonly _nodes = new Map<Id, CorgiNode>()
@@ -23,9 +25,21 @@ export class NodeManager {
 		}
 
 		return (
-			<ExpNodeContext.Provider value={node.reactContext}>
-				{node.render()}
-			</ExpNodeContext.Provider>
+			<Fragment>
+				<ConnectedExpConnectorPlaceholders
+					parentId={nodeId}
+					inputAudioPortCount={node.getAudioInputPortCount()}
+					outputAudioPortCount={node.getAudioOutputPortCount()}
+				/>
+				<ConnectedSimpleGraphNodeExp
+					key={nodeId as string}
+					positionId={nodeId}
+				>
+					<ExpNodeContext.Provider value={node.reactContext}>
+						{node.render()}
+					</ExpNodeContext.Provider>
+				</ConnectedSimpleGraphNodeExp>
+			</Fragment>
 		)
 	}
 

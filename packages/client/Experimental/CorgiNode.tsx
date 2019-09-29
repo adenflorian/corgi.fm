@@ -103,12 +103,20 @@ export abstract class CorgiNode {
 		logger.log('onNewAudioInConnection default')
 	}
 
-	public getAudioInputPort(id: number): ExpNodeAudioInputPort | undefined {
-		return this._audioInputPorts.get(id)
+	public getAudioInputPort(index: number): ExpNodeAudioInputPort | undefined {
+		return this._audioInputPorts[index]
 	}
 
-	public getAudioOutputPort(id: number): ExpNodeAudioOutputPort | undefined {
-		return this._audioOutPorts.get(id)
+	public getAudioOutputPort(index: number): ExpNodeAudioOutputPort | undefined {
+		return this._audioOutPorts[index]
+	}
+
+	public getAudioInputPortCount(): number {
+		return this._audioInputPorts.length
+	}
+
+	public getAudioOutputPortCount(): number {
+		return this._audioOutPorts.length
 	}
 
 	protected abstract _enable(): void
@@ -127,8 +135,6 @@ export abstract class CorgiNode {
 	}
 }
 
-export function makePorts<T extends ExpNodeAudioPort>(ports: readonly T[]): Map<number, T> {
-	const map = new Map<number, T>()
-	ports.forEach(x => map.set(x.id, x))
-	return map
+export function makePorts<T extends ExpNodeAudioPort>(ports: readonly T[]): readonly T[] {
+	return ports
 }

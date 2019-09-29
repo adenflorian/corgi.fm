@@ -16,6 +16,8 @@ export const NodeManagerRoot = () => {
 
 	const nodeManager = useMemo(() => new NodeManager(singletonContext.getAudioContext()), [singletonContext])
 
+	const viewMode = useSelector((state: IClientAppState) => state.room.roomSettings.viewMode)
+
 	useLayoutEffect(() => {
 		singletonContext.setNodeManager(nodeManager)
 
@@ -40,15 +42,10 @@ export const NodeManagerRoot = () => {
 		// 	subscriberThingy: {
 		// 	}
 		// }}>
-		<div className="nodeManagerRoot">
-			{positionIds.map((_, positionId) =>
-				<ConnectedSimpleGraphNodeExp
-					key={positionId as string}
-					positionId={positionId}
-				>
-					{nodeManager.renderNodeId(positionId)}
-				</ConnectedSimpleGraphNodeExp>
-			).toList()}
+		<div className={`nodeManagerRoot viewMode-${viewMode}`}>
+			{positionIds.map((_, positionId) => {
+				return nodeManager.renderNodeId(positionId)
+			}).toList()}
 		</div>
 		// </NodeManagerContext.Provider>
 	)

@@ -1,15 +1,18 @@
 import React from 'react'
-import {useDispatch} from 'react-redux'
+import {useDispatch, useSelector} from 'react-redux'
 import {
 	ActiveGhostConnectorSourceOrTarget, calculateConnectorPositionY,
 	GhostConnection, ghostConnectorActions,
 	GhostConnectorAddingOrMoving, IClientAppState,
 	selectLocalClientId, selectPosition, shamuConnect,
-	selectNodeConnectionInfosForNode, NodeConnectionsInfo, selectExpPosition, selectExpNodeConnectionInfosForNode,
+	selectNodeConnectionInfosForNode, NodeConnectionsInfo,
+	selectExpPosition, selectExpNodeConnectionInfosForNode,
+	RoomSettings,
 } from '@corgifm/common/redux'
 import {emptyList} from '@corgifm/common/common-utils'
 import {connectorWidth} from './ConnectionView'
 import {ConnectorPlaceholder} from './ConnectorPlaceholder'
+import {expConnectionConstants, calculateExpDebugConnectorY} from './ExpConnectionView'
 
 interface Props {
 	parentId: Id
@@ -24,6 +27,7 @@ interface ReduxProps {
 	placeholdersInfo: NodeConnectionsInfo
 	leftPortCount: number
 	rightPortCount: number
+	viewMode: RoomSettings['viewMode']
 }
 
 type AllProps = Props & ReduxProps
@@ -33,6 +37,7 @@ export const ConnectorPlaceholders =
 		{
 			parentId, placeholdersInfo, leftPortCount, rightPortCount,
 			localClientId, parentX, parentY, parentWidth, parentHeight,
+			viewMode,
 		}: AllProps
 	) {
 		const {leftConnections, rightConnections} = placeholdersInfo
@@ -52,18 +57,22 @@ export const ConnectorPlaceholders =
 			)))
 		}
 
+		const xMod = viewMode === 'debug' ? xAdjust : 0
+
 		return (
 			<div
 				className="connection"
 				style={{color: 'white'}}
 			>
 				{new Array(leftPortCount).fill(0).map((_, port) => {
-					const y = calculateConnectorPositionY(parentY, parentHeight, leftPortCount, port)
+					const y = viewMode === 'debug'
+						? calculateExpDebugConnectorY(parentY, port)
+						: calculateConnectorPositionY(parentY, parentHeight, leftPortCount, port)
 					return (
 						<div key={`left-${port}`}>
 							<ConnectorPlaceholder
 								onMouseDown={onMouseDown(y, port)}
-								x={parentX + (leftConnections.get(port, emptyList).count() * -connectorWidth) - connectorWidth}
+								x={parentX + (leftConnections.get(port, emptyList).count() * -connectorWidth) - connectorWidth + xMod}
 								y={y}
 								sourceOrTarget={ActiveGhostConnectorSourceOrTarget.Source}
 							/>
@@ -71,12 +80,14 @@ export const ConnectorPlaceholders =
 					)
 				})}
 				{new Array(rightPortCount).fill(0).map((_, port) => {
-					const y = calculateConnectorPositionY(parentY, parentHeight, rightPortCount, port)
+					const y = viewMode === 'debug'
+						? calculateExpDebugConnectorY(parentY, port)
+						: calculateConnectorPositionY(parentY, parentHeight, rightPortCount, port)
 					return (
 						<div key={`right-${port}`}>
 							<ConnectorPlaceholder
 								onMouseDown={onMouseDown(y, port)}
-								x={parentX + parentWidth + (rightConnections.get(port, emptyList).count() * connectorWidth)}
+								x={parentX + parentWidth + (rightConnections.get(port, emptyList).count() * connectorWidth) - xMod}
 								y={y}
 								sourceOrTarget={ActiveGhostConnectorSourceOrTarget.Target}
 							/>
@@ -98,6 +109,7 @@ const mapStateToProps = (state: IClientAppState, props: Props): ReduxProps => {
 		parentHeight: parentPosition.height,
 		leftPortCount: parentPosition.inputPortCount,
 		rightPortCount: parentPosition.outputPortCount,
+		viewMode: 'normal'
 	}
 }
 
@@ -105,20 +117,31 @@ export const ConnectedConnectorPlaceholders = shamuConnect(
 	mapStateToProps,
 )(ConnectorPlaceholders)
 
-const mapStateToPropsExp = (state: IClientAppState, props: Props): ReduxProps => {
-	const parentPosition = selectExpPosition(state.room, props.parentId)
-	return {
-		placeholdersInfo: selectExpNodeConnectionInfosForNode(state.room, props.parentId),
-		localClientId: selectLocalClientId(state),
-		parentX: parentPosition.x,
-		parentY: parentPosition.y,
-		parentWidth: parentPosition.width,
-		parentHeight: parentPosition.height,
-		leftPortCount: 1,
-		rightPortCount: 1,
-	}
+type PPProps = Props & {
+	readonly inputAudioPortCount: number
+	readonly outputAudioPortCount: number
 }
 
-export const ConnectedExpConnectorPlaceholders = shamuConnect(
-	mapStateToPropsExp,
-)(ConnectorPlaceholders)
+const {xAdjust} = expConnectionConstants
+
+export const ConnectedExpConnectorPlaceholders = (React.memo(function _ConnectedExpConnectorPlaceholders(props: PPProps) {
+	const parentPosition = useSelector((state: IClientAppState) => selectExpPosition(state.room, props.parentId))
+	const placeholdersInfo = useSelector((state: IClientAppState) => selectExpNodeConnectionInfosForNode(state.room, props.parentId))
+	const localClientId = useSelector((state: IClientAppState) => selectLocalClientId(state))
+	const viewMode = useSelector((state: IClientAppState) => state.room.roomSettings.viewMode)
+
+	return (
+		<ConnectorPlaceholders
+			parentId={props.parentId}
+			placeholdersInfo={placeholdersInfo}
+			localClientId={localClientId}
+			parentX={parentPosition.x}
+			parentY={parentPosition.y}
+			parentWidth={parentPosition.width}
+			parentHeight={parentPosition.height}
+			leftPortCount={props.inputAudioPortCount}
+			rightPortCount={props.outputAudioPortCount}
+			viewMode={viewMode}
+		/>
+	)
+}))
