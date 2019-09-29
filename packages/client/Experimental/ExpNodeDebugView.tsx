@@ -23,16 +23,23 @@ export const ExpNodeDebugView = React.memo(function _ExpNodeDebugView({
 			<div className="nodeId">{nodeId}</div>
 			<div className="params">
 				<div className="sectionLabel">Audio Params</div>
-				{[...audioParams].map(([id, audioParam]) => (
-					<div className="param" key={id as string}>
-						{/* <div className="paramId">{id}</div>
-						<div className="paramValue">{audioParam.audioParam.value}</div> */}
+				{/* <div className="paramTexts">
+					{[...audioParams].map(([id, audioParam]) => (
+						<div className="param" key={id as string}>
+							<div className="paramId">{id}</div>
+							<div className="paramValue">{audioParam.audioParam.value}</div>
+						</div>
+					))}
+				</div> */}
+				<div className="paramKnobs">
+					{[...audioParams].map(([id, audioParam]) => (
 						<ExpNodeDebugKnob
+							key={id as string}
 							nodeId={nodeId}
 							audioParam={audioParam}
 						/>
-					</div>
-				))}
+					))}
+				</div>
 			</div>
 			<div className="audioInputPorts">
 				<div className="sectionLabel">Audio Input Ports</div>

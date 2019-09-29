@@ -10,13 +10,6 @@ import {
 } from '..'
 
 export const expPositionActions = {
-	setEnabled: (id: Id, enabled: boolean) => ({
-		type: 'EXP_SET_ENABLED_NODE',
-		id,
-		enabled,
-		SERVER_ACTION,
-		BROADCASTER_ACTION,
-	} as const),
 	resizePosition: (
 		id: Id, position: Pick<ExpPosition, 'x' | 'y' | 'width' | 'height'>,
 	) => ({
@@ -103,13 +96,6 @@ export function makeExpPosition(position: Pick<typeof defaultExpPosition, 'id' |
 	return makeExpPositionRecord(position)
 }
 
-const foo = makeExpPosition({
-	id: 'myId',
-	ownerId: 'myself',
-})
-
-console.log('$$$$$$$$ foo: ', foo)
-
 export interface ExpPosition extends ReturnType<typeof makeExpPositionRecord> {}
 
 export type ExpPositionRaw = typeof defaultExpPosition
@@ -132,7 +118,6 @@ const positionsSpecificReducer: Reducer<ExpPositions, ExpPositionAction> =
 			case 'EXP_MOVE_POSITION': return positions.update(action.id, x => x.merge(action.position))
 			case 'EXP_RESIZE_POSITION': return positions.update(action.id, x => x.merge(action.position))
 			case 'EXP_NODE_CLICKED': return positions.update(action.id, x => x.set('zIndex', getNewZIndex(positions, x.zIndex)))
-			case 'EXP_SET_ENABLED_NODE': return positions.update(action.id, x => x.set('enabled', action.enabled))
 			default: return positions
 		}
 	}

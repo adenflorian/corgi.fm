@@ -26,6 +26,7 @@ export function useNodeContext() {
 
 export abstract class CorgiNode {
 	public readonly reactContext: ExpNodeContextValue
+	private _enabled = true
 
 	public constructor(
 		public readonly id: Id,
@@ -41,6 +42,16 @@ export abstract class CorgiNode {
 	public abstract render(): ReactElement<any>
 	public abstract dispose(): void
 	public abstract getName(): string
+
+	public setEnabled(enabled: boolean) {
+		if (enabled === this._enabled) return
+		this._enabled = enabled
+		if (enabled) {
+			this._enable()
+		} else {
+			this._disable()
+		}
+	}
 
 	public makeExpNodeContextValue() {
 		return {
@@ -63,7 +74,7 @@ export abstract class CorgiNode {
 			getAudioParamValue: (paramId: Id) => {
 				const param = this._audioParams.get(paramId)
 
-				if (!param) return logger.warn('[unregisterAudioParam] 404 audio param not found: ', paramId)
+				if (!param) return logger.warn('[getAudioParamValue] 404 audio param not found: ', paramId)
 
 				return param.audioParam.value
 			},
@@ -99,6 +110,9 @@ export abstract class CorgiNode {
 	public getAudioOutputPort(id: number): ExpNodeAudioOutputPort | undefined {
 		return this._audioOutPorts.get(id)
 	}
+
+	protected abstract _enable(): void
+	protected abstract _disable(): void
 
 	protected getDebugView() {
 		return (

@@ -39,31 +39,35 @@ export class NodeManager {
 	// 	// TODO
 	// }
 
+	public enableNode(id: Id, enabled: boolean) {
+		const node = this._nodes.get(id)
+
+		if (!node) return logger.warn('[enableNode] 404 node not found: ', {id})
+
+		node.setEnabled(enabled)
+	}
+
 	public onAudioParamChange = (paramChange: AudioParamChange) => {
 		const node = this._nodes.get(paramChange.nodeId)
 
-		if (!node) return logger.warn('404 node not found: ', {paramChange})
+		if (!node) return logger.warn('[onAudioParamChange] 404 node not found: ', {paramChange})
 
 		node.onAudioParamChange(paramChange.paramId, paramChange.newValue)
 	}
 
-	public addNode = (newNode: CorgiNode) => {
-		this._nodes.set(newNode.id, newNode)
-		// TODO More stuff?
+	public addNodes = (newNodes: immutable.Map<Id, ExpNodeState>) => {
+		newNodes.forEach(this.addNode)
 	}
 
-	public addNodes = (newNodes: immutable.Map<Id, ExpNodeState>) => {
-		newNodes.forEach(node => {
-			const newNode = new typeClassMap[node.type](node.id, this._audioContext)
-			this._nodes.set(node.id, newNode)
-			node.audioParams.forEach((newValue, paramId) => newNode.onAudioParamChange(paramId, newValue))
-		})
-		// TODO More stuff?
+	public addNode = (nodeState: ExpNodeState) => {
+		const newNode = new typeClassMap[nodeState.type](nodeState.id, this._audioContext)
+		this._nodes.set(newNode.id, newNode)
+		nodeState.audioParams.forEach((newValue, paramId) => newNode.onAudioParamChange(paramId, newValue))
+		newNode.setEnabled(nodeState.enabled)
 	}
 
 	public addAudioConnections = (connections: immutable.Map<Id, IExpConnection>) => {
-		connections.valueSeq().toList().forEach(this.addAudioConnection)
-		// TODO More stuff?
+		connections.forEach(this.addAudioConnection)
 	}
 
 	public addAudioConnection = (expConnection: IExpConnection) => {

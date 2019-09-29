@@ -12,6 +12,7 @@ import {CorgiNode, makePorts} from './CorgiNode'
 
 export class OscillatorExpNode extends CorgiNode {
 	private readonly _oscillator: OscillatorNode
+	private readonly _outputGain: GainNode
 
 	public constructor(
 		id: Id, audioContext: AudioContext,
@@ -20,6 +21,8 @@ export class OscillatorExpNode extends CorgiNode {
 		oscillator.frequency.value = 110
 		oscillator.type = 'triangle'
 		oscillator.start()
+		const outputGain = audioContext.createGain()
+		oscillator.connect(outputGain)
 
 		const inPorts = makePorts([
 			new ExpNodeAudioInputPort(0, 'frequency', oscillator.frequency),
@@ -27,7 +30,7 @@ export class OscillatorExpNode extends CorgiNode {
 		])
 
 		const outPorts = makePorts([
-			new ExpNodeAudioOutputPort(0, 'output', oscillator),
+			new ExpNodeAudioOutputPort(0, 'output', outputGain),
 		])
 
 		const audioParams = new Map<Id, ExpAudioParam>([
@@ -38,22 +41,18 @@ export class OscillatorExpNode extends CorgiNode {
 		super(id, audioContext, inPorts, outPorts, audioParams)
 
 		this._oscillator = oscillator
+		this._outputGain = outputGain
 	}
 
 	public getName() {return 'Oscillator'}
 
 	public onParamChange(paramChange: AudioParamChange) {
 		switch (paramChange.paramId) {
-			case 'frequency': return isNumber(paramChange.newValue) && this._changeFrequency(paramChange.newValue)
 			case 'wave': return isOscillatorType(paramChange.newValue) && this._changeOscillatorType(paramChange.newValue)
 			default: return logger.warn('unexpected param id: ', {paramChange})
 		}
 		// Render view
 		// Change value on web audio oscillator
-	}
-
-	private _changeFrequency(newValue: number) {
-		this._oscillator.frequency.value = newValue
 	}
 
 	private _changeOscillatorType(newValue: OscillatorType) {
@@ -69,6 +68,14 @@ export class OscillatorExpNode extends CorgiNode {
 		return this.getDebugView()
 	}
 
+	protected _enable() {
+		this._outputGain.gain.value = 1
+	}
+
+	protected _disable() {
+		this._outputGain.gain.value = 0
+	}
+
 	public dispose() {
 		this._oscillator.stop()
 		this._oscillator.disconnect()
@@ -76,14 +83,21 @@ export class OscillatorExpNode extends CorgiNode {
 }
 
 export class AudioOutputExpNode extends CorgiNode {
+	private readonly _inputGain: GainNode
+
 	public constructor(
 		id: Id, audioContext: AudioContext,
 	) {
+		const inputGain = audioContext.createGain()
+		inputGain.connect(audioContext.destination)
+	
 		const inPorts = makePorts([
-			new ExpNodeAudioInputPort(0, 'input', audioContext.destination),
+			new ExpNodeAudioInputPort(0, 'input', inputGain),
 		])
 
 		super(id, audioContext, inPorts)
+
+		this._inputGain = inputGain
 	}
 
 	public getName() {return 'Audio Output'}
@@ -97,6 +111,14 @@ export class AudioOutputExpNode extends CorgiNode {
 
 	public render() {
 		return this.getDebugView()
+	}
+
+	protected _enable() {
+		this._inputGain.gain.value = 1
+	}
+
+	protected _disable() {
+		this._inputGain.gain.value = 0
 	}
 
 	public dispose() {
@@ -124,6 +146,12 @@ export class DummyNode extends CorgiNode {
 		return this.getDebugView()
 	}
 
+	protected _enable() {
+	}
+
+	protected _disable() {
+	}
+
 	public dispose() {
 		logger.log('dispose DummyNode')
 	}
@@ -131,18 +159,25 @@ export class DummyNode extends CorgiNode {
 
 export class FilterNode extends CorgiNode {
 	private readonly _filter: BiquadFilterNode
+	private readonly _dryWetChain: DryWetChain
 
 	public constructor(
 		id: Id, audioContext: AudioContext,
 	) {
 		const filter = audioContext.createBiquadFilter()
 		filter.frequency.value = 150
+
+		const dryWetChain = new DryWetChain(audioContext, filter)
+
 		const inPorts = makePorts([
-			new ExpNodeAudioInputPort(0, 'input', filter),
+			new ExpNodeAudioInputPort(0, 'input', dryWetChain.inputGain),
 			new ExpNodeAudioInputPort(1, 'frequency', filter.frequency),
+			new ExpNodeAudioInputPort(2, 'detune', filter.detune),
+			new ExpNodeAudioInputPort(3, 'q', filter.Q),
+			new ExpNodeAudioInputPort(4, 'gain', filter.gain),
 		])
 		const outPorts = makePorts([
-			new ExpNodeAudioOutputPort(0, 'output', filter),
+			new ExpNodeAudioOutputPort(0, 'output', dryWetChain.outputGain),
 		])
 
 		const audioParams = new Map<Id, ExpAudioParam>([
@@ -155,6 +190,7 @@ export class FilterNode extends CorgiNode {
 		super(id, audioContext, inPorts, outPorts, audioParams)
 
 		this._filter = filter
+		this._dryWetChain = dryWetChain
 	}
 
 	public getName() {return 'Filter'}
@@ -170,25 +206,74 @@ export class FilterNode extends CorgiNode {
 		return this.getDebugView()
 	}
 
+	protected _enable() {
+		this._dryWetChain.wetOnly()
+	}
+
+	protected _disable() {
+		this._dryWetChain.dryOnly()
+	}
+
 	public dispose() {
 		this._filter.disconnect()
 	}
 }
 
+class DryWetChain {
+	public readonly inputGain: GainNode
+	public readonly dryGain: GainNode
+	public readonly wetGain: GainNode
+	public readonly outputGain: GainNode
+
+	public constructor(
+		audioContext: AudioContext,
+		wetInternalNode: AudioNode,
+	) {
+		this.inputGain = audioContext.createGain()
+		this.dryGain = audioContext.createGain()
+		this.wetGain = audioContext.createGain()
+		this.outputGain = audioContext.createGain()
+
+		this.inputGain
+			.connect(this.dryGain)
+			.connect(this.outputGain)
+		this.inputGain
+			.connect(this.wetGain)
+			.connect(wetInternalNode)
+			.connect(this.outputGain)
+
+		this.dryGain.gain.value = 0
+		this.wetGain.gain.value = 1
+	}
+
+	public wetOnly() {
+		this.dryGain.gain.value = 0
+		this.wetGain.gain.value = 1
+	}
+
+	public dryOnly() {
+		this.dryGain.gain.value = 1
+		this.wetGain.gain.value = 0
+	}
+}
+
 export class ExpGainNode extends CorgiNode {
 	private readonly _gain: GainNode
+	private readonly _dryWetChain: DryWetChain
 
 	public constructor(
 		id: Id, audioContext: AudioContext,
 	) {
 		const gain = audioContext.createGain()
-		// gain.gain.value = 500
+
+		const dryWetChain = new DryWetChain(audioContext, gain)
+
 		const inPorts = makePorts([
-			new ExpNodeAudioInputPort(0, 'input', gain),
+			new ExpNodeAudioInputPort(0, 'input', dryWetChain.inputGain),
 			new ExpNodeAudioInputPort(1, 'gain', gain.gain),
 		])
 		const outPorts = makePorts([
-			new ExpNodeAudioOutputPort(0, 'output', gain),
+			new ExpNodeAudioOutputPort(0, 'output', dryWetChain.outputGain),
 		])
 
 		const audioParams = new Map<Id, ExpAudioParam>([
@@ -198,6 +283,7 @@ export class ExpGainNode extends CorgiNode {
 		super(id, audioContext, inPorts, outPorts, audioParams)
 
 		this._gain = gain
+		this._dryWetChain = dryWetChain
 	}
 
 	public getName() {return 'Gain'}
@@ -211,6 +297,14 @@ export class ExpGainNode extends CorgiNode {
 
 	public render() {
 		return this.getDebugView()
+	}
+
+	protected _enable() {
+		this._dryWetChain.wetOnly()
+	}
+
+	protected _disable() {
+		this._dryWetChain.dryOnly()
 	}
 
 	public dispose() {

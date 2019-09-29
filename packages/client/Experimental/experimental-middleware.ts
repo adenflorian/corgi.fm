@@ -3,13 +3,14 @@ import {
 	IClientAppState, ExpNodesAction, ExpConnectionAction,
 	RoomsReduxAction, selectExpConnection,
 	selectExpAllConnections, selectExpNodesState,
-	selectRoomInfoState, RoomType,
+	selectRoomInfoState, RoomType, ExpPositionAction,
 } from '@corgifm/common/redux'
 import {SingletonContextImpl} from '../SingletonContext'
 import {logger} from '../client-logger'
 import {NodeManager} from './NodeManager'
 
-type ExpMiddlewareActions = ExpNodesAction | ExpConnectionAction | RoomsReduxAction
+type ExpMiddlewareActions = ExpNodesAction | ExpConnectionAction |
+RoomsReduxAction | ExpPositionAction
 
 type ExpMiddleware =
 	(singletonContext: SingletonContextImpl) => Middleware<{}, IClientAppState>
@@ -53,6 +54,9 @@ function foo(
 
 		case 'EXP_NODE_PARAM_CHANGE':
 			return nodeManager.onAudioParamChange(action)
+
+		case 'EXP_NODE_SET_ENABLED':
+			return nodeManager.enableNode(action.nodeId, action.enabled)
 
 		// Connections
 		case 'EXP_REPLACE_CONNECTIONS':

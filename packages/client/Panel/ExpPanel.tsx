@@ -3,8 +3,8 @@ import {useDispatch, useSelector} from 'react-redux'
 import {ConnectionNodeType} from '@corgifm/common/common-types'
 import {
 	createExpPositionHeightSelector,
-	createExpPositionEnabledSelector,
-	expPositionActions,
+	expNodesActions,
+	createExpNodeEnabledSelector,
 } from '@corgifm/common/redux'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {handleClassName} from '../client-constants'
@@ -32,12 +32,10 @@ export const ExpPanel =
 	}: Props) {
 		const dispatch = useDispatch()
 
-		const isPositionEnabled = useSelector(createExpPositionEnabledSelector(id))
+		const enabled = useSelector(createExpNodeEnabledSelector(id))
 		// const nodeType = useSelector(createExpPositionTypeSelector(id))
 		const nodeType = ConnectionNodeType.dummy
 		const height = useSelector(createExpPositionHeightSelector(id))
-
-		const enabled = isPositionEnabled
 
 		// const {disabledText, isResizable} = findNodeInfo(nodeType)
 		const disabledText = 'disabled'
@@ -109,6 +107,6 @@ export const ExpPanel =
 		)
 
 		function onColorDotClick() {
-			dispatch(expPositionActions.setEnabled(id, !enabled))
+			dispatch(expNodesActions.setEnabled(id, !enabled))
 		}
 	})

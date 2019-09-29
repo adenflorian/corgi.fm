@@ -4,6 +4,7 @@ import * as uuid from 'uuid'
 import {
 	BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION, ExpNodeType,
 } from '..'
+import {IClientAppState} from '../common-redux-types';
 
 export type ExpParamValue = string | boolean | number
 
@@ -36,6 +37,13 @@ export const expNodesActions = {
 		BROADCASTER_ACTION,
 		SERVER_ACTION,
 	} as const),
+	setEnabled: (nodeId: Id, enabled: boolean) => ({
+		type: 'EXP_NODE_SET_ENABLED',
+		nodeId,
+		enabled,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	} as const),
 } as const
 
 export type ExpNodesAction = ActionType<typeof expNodesActions>
@@ -44,9 +52,12 @@ const defaultExpNodeState = {
 	id: 'dummyId' as Id,
 	type: 'dummy' as ExpNodeType,
 	audioParams: Map<Id, number>(),
+	enabled: true,
 }
 
 const _makeExpNodeState = Record(defaultExpNodeState)
+
+const defaultExpNodeRecord = _makeExpNodeState()
 
 export function makeExpNodeState(node: Exclude<Partial<typeof defaultExpNodeState>, 'id'>): ExpNodeState {
 	return _makeExpNodeState(node)
@@ -69,8 +80,16 @@ export const expNodesReducer = (state = initialState, action: ExpNodesAction): E
 		case 'EXP_NODE_REPLACE_ALL': return state.clear().merge(action.state).map(x => makeExpNodeState(x))
 		case 'EXP_NODE_PARAM_CHANGE': return state.update(
 			action.nodeId, x => x.update('audioParams', audioParams => audioParams.set(action.paramId, action.newValue)))
+		case 'EXP_NODE_SET_ENABLED': return state.update(
+			action.nodeId, x => x.set('enabled', action.enabled))
 		default: return state
 	}
 }
 
 export const selectExpNodesState = (state: IClientRoomState) => state.expNodes
+
+export const selectExpNode = (state: IClientRoomState, id: Id) =>
+	selectExpNodesState(state).get(id) || defaultExpNodeRecord
+
+export const createExpNodeEnabledSelector = (id: Id) => (state: IClientAppState) =>
+	selectExpNode(state.room, id).enabled
