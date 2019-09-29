@@ -1,7 +1,7 @@
 import {ActionType} from 'typesafe-actions'
 import {IMidiNote, IMidiNotes} from '../MidiNote'
 import {ConnectionNodeType} from '../common-types'
-import {SERVER_ACTION, BROADCASTER_ACTION} from '.'
+import {SERVER_ACTION, BROADCASTER_ACTION, ActiveGhostConnectorSourceOrTarget} from '.'
 
 export type LocalMidiKeyPressAction = ReturnType<typeof localMidiKeyPress>
 export const localMidiKeyPress = (midiNote: IMidiNote, velocity: number) => ({
@@ -75,6 +75,10 @@ export const localActions = {
 		nodeId,
 		targetType,
 	} as const),
+	mouseUpOnPlaceholder: (nodeId: Id, side: ActiveGhostConnectorSourceOrTarget, portId: number) => ({
+		type: 'MOUSE_UP_ON_PLACEHOLDER' as const,
+		nodeId, side, portId,
+	})
 } as const
 
 export type LocalAction = ActionType<typeof localActions>

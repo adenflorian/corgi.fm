@@ -1,28 +1,40 @@
-import React, {Fragment, useState} from 'react'
+import React, {useState, useCallback} from 'react'
 import {
-	ActiveGhostConnectorSourceOrTarget,
+	ActiveGhostConnectorSourceOrTarget, localActions,
 } from '@corgifm/common/redux'
 import {connectorHeight, connectorWidth} from './ConnectionView'
 import {Connector} from './Connector'
+import {useDispatch} from 'react-redux';
 
 interface Props {
 	onMouseDown: any
 	sourceOrTarget: ActiveGhostConnectorSourceOrTarget
 	x: number
 	y: number
+	nodeId: Id
+	portId: number
 }
 
 type AllProps = Props
 
 export const ConnectorPlaceholder = React.memo(
 	function _ConnectorPlaceholder({
-		sourceOrTarget, x, y, onMouseDown,
+		sourceOrTarget, x, y, onMouseDown, nodeId, portId,
 	}: AllProps) {
 
 		const [isMouseOver, setIsMouseOver] = useState(false)
 
+		const dispatch = useDispatch()
+
+		const onMouseUp = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+			dispatch(localActions.mouseUpOnPlaceholder(nodeId, sourceOrTarget, portId))
+		}, [dispatch])
+
 		return (
-			<Fragment>
+			<div
+				className="connectorDropZone"
+				onMouseUp={onMouseUp}
+			>
 				<Connector
 					width={connectorWidth}
 					height={connectorHeight}
@@ -46,7 +58,7 @@ export const ConnectorPlaceholder = React.memo(
 					onMouseEnter={() => setIsMouseOver(true)}
 					onMouseLeave={() => setIsMouseOver(false)}
 				/>
-			</Fragment>
+			</div>
 		)
 	},
 )

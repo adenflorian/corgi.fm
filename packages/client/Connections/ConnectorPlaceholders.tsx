@@ -75,6 +75,8 @@ export const ConnectorPlaceholders =
 								x={parentX + (leftConnections.get(port, emptyList).count() * -connectorWidth) - connectorWidth + xMod}
 								y={y}
 								sourceOrTarget={ActiveGhostConnectorSourceOrTarget.Source}
+								nodeId={parentId}
+								portId={port}
 							/>
 						</div>
 					)
@@ -90,6 +92,8 @@ export const ConnectorPlaceholders =
 								x={parentX + parentWidth + (rightConnections.get(port, emptyList).count() * connectorWidth) - xMod}
 								y={y}
 								sourceOrTarget={ActiveGhostConnectorSourceOrTarget.Target}
+								nodeId={parentId}
+								portId={port}
 							/>
 						</div>
 					)

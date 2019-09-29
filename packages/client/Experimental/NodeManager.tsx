@@ -55,14 +55,13 @@ export class NodeManager {
 		}
 
 		return (
-			<Fragment>
+			<Fragment key={nodeId as string}>
 				<ConnectedExpConnectorPlaceholders
 					parentId={nodeId}
 					inputAudioPortCount={node.getAudioInputPortCount()}
 					outputAudioPortCount={node.getAudioOutputPortCount()}
 				/>
 				<ConnectedSimpleGraphNodeExp
-					key={nodeId as string}
 					positionId={nodeId}
 				>
 					<ExpNodeContext.Provider value={node.reactContext}>
