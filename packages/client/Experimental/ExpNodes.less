@@ -12,7 +12,8 @@
 	width: 100%;
 	height: 100%;
 	padding: 8px;
-	overflow: auto;
+	overflow: hidden;
+	white-space: nowrap;
 
 	.nodeName {
 		font-size: 1.2em;
@@ -51,41 +52,45 @@
 		}
 	}
 
-	.audioInputPorts, .audioOutputPorts {
-		margin-bottom: 4px;
-
-		.port {
-			display: flex;
-			align-items: center;
-
-			&:nth-child(odd) {
-				// background-color: @panelGrayDark;
-			}
-
-			.portId {
-				margin: 0 4px;
-			}
-			.paramValue {
-
-			}
-			.portDropZone {
-				background-color: currentColor;
-				height: @portDiameter;
-				width: @portDiameter;
-				border-radius: @portDiameter / 2;
+	.ports {
+		display: flex;
+		.audioInputPorts, .audioOutputPorts {
+			margin-bottom: 4px;
+			flex-grow: 1;
+	
+			.port {
+				display: flex;
+				align-items: center;
+	
+				&:nth-child(odd) {
+					// background-color: @panelGrayDark;
+				}
+	
+				.portId {
+					margin: 0 4px;
+				}
+				.paramValue {
+	
+				}
+				.portDropZone {
+					background-color: currentColor;
+					height: @portDiameter;
+					width: @portDiameter;
+					border-radius: @portDiameter / 2;
+				}
 			}
 		}
-	}
-
-	.audioInputPorts {
-		.port {
-			justify-content: flex-start;
+	
+		.audioInputPorts {
+			.port {
+				justify-content: flex-start;
+			}
 		}
-	}
-
-	.audioOutputPorts {
-		.port {
-			justify-content: flex-end;
+	
+		.audioOutputPorts {
+			.port {
+				justify-content: flex-end;
+			}
 		}
 	}
 }

@@ -2,11 +2,6 @@ import React from 'react'
 import {selectAllConnectionIds, shamuConnect} from '@corgifm/common/redux'
 import {ConnectedConnectionView} from './ConnectionView'
 
-export enum ConnectionsUsage {
-	normal = 'normal',
-	simpleGraph = 'simpleGraph',
-}
-
 interface IConnectionsProps {}
 
 interface IConnectionsReduxProps {

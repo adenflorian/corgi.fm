@@ -1,32 +1,27 @@
 import React from 'react'
-import {shamuConnect, selectExpAllConnectionIds} from '@corgifm/common/redux'
-import {ConnectedExpConnectionView} from './ExpConnectionView'
+import {useSelector} from 'react-redux'
+import {selectExpAllConnectionIds, IClientAppState} from '@corgifm/common/redux'
+import {ConnectedExpConnectionView, ConnectedExpConnectionDebugView} from './ExpConnectionView'
 
-export enum ConnectionsUsage {
-	normal = 'normal',
-	simpleGraph = 'simpleGraph',
+export const ConnectedExpConnections = function _Connections() {
+	const viewMode = useSelector((state: IClientAppState) => state.room.roomSettings.viewMode)
+	const connectionIds = useSelector((state: IClientAppState) => selectExpAllConnectionIds(state.room))
+
+	if (viewMode === 'debug') {
+		return (
+			<div className="debugViewConnections">
+				{connectionIds.map(connectionId =>
+					<ConnectedExpConnectionDebugView key={connectionId as string} id={connectionId} />,
+				)}
+			</div>
+		)
+	} else {
+		return (
+			<div className="connections">
+				{connectionIds.map(connectionId =>
+					<ConnectedExpConnectionView key={connectionId as string} id={connectionId} />,
+				)}
+			</div>
+		)
+	}
 }
-
-interface IConnectionsProps {}
-
-interface IConnectionsReduxProps {
-	connectionIds: Id[]
-}
-
-type IConnectionsAllProps = IConnectionsProps & IConnectionsReduxProps
-
-export const Connections = function _Connections({connectionIds}: IConnectionsAllProps) {
-	return (
-		<div className="connections">
-			{connectionIds.map(connectionId =>
-				<ConnectedExpConnectionView key={connectionId.toString()} id={connectionId} />,
-			)}
-		</div>
-	)
-}
-
-export const ConnectedExpConnections = shamuConnect(
-	(state): IConnectionsReduxProps => ({
-		connectionIds: selectExpAllConnectionIds(state.room),
-	}),
-)(Connections)

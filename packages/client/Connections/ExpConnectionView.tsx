@@ -225,3 +225,39 @@ export const ConnectedExpConnectionView = shamuConnect(
 		}
 	},
 )(ExpConnectionView)
+
+const portHeight = 16
+const debugNodeHeaderHeight = 8 + 16 + 4 + 12 + 4 + 16
+const xAdjust = 8;
+
+export const ConnectedExpConnectionDebugView = shamuConnect(
+	function connectionViewMapStateToProps(state: IClientAppState, props: IExpConnectionViewProps): IExpConnectionViewReduxProps {
+		// const globalClockState = selectGlobalClockState(state.room)
+		const connection = selectExpConnection(state.room, props.id)
+		const isSourceSending = selectExpConnectionSourceIsSending(state.room, connection.id)
+		const isSourceActive = isSourceSending || selectExpConnectionSourceIsActive(state.room, connection.id)
+		const sourcePosition = selectExpPosition(state.room, connection.sourceId)
+		const targetPosition = selectExpPosition(state.room, connection.targetId)
+		const sourceColor = selectExpConnectionSourceColor(state, props.id)
+
+		return {
+			speed: 120,
+			// Disabled for now because of performance issues
+			// speed: globalClockState.bpm,
+			highQuality: selectOption(state, AppOptions.graphicsFancyConnections) as boolean,
+			isSourcePlaying: false,
+			localClientId: selectLocalClientId(state),
+			sourceStackOrder: selectExpConnectionStackOrderForSource(state.room, props.id),
+			targetStackOrder: selectExpConnectionStackOrderForTarget(state.room, props.id),
+			color: sourceColor,
+			sourceX: sourcePosition.x + sourcePosition.width - xAdjust,
+			sourceY: sourcePosition.y + debugNodeHeaderHeight + (portHeight * connection.sourcePort) + (portHeight / 2),
+			targetX: targetPosition.x + xAdjust,
+			targetY: targetPosition.y + debugNodeHeaderHeight + (portHeight * connection.targetPort) + (portHeight / 2),
+			saturateSource: isSourceActive || isSourceSending,
+			saturateTarget: isSourceSending,
+			connection,
+			lineType: selectRoomSettings(state.room).lineType,
+		}
+	},
+)(ExpConnectionView)
