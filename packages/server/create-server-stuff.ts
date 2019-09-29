@@ -47,7 +47,7 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 		makeExpPosition({
 			id: audioOutput.id,
 			ownerId: serverClientId,
-			x: 600,
+			x: 700,
 			y: 0,
 		})))
 
@@ -61,8 +61,8 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 		makeExpPosition({
 			id: gain.id,
 			ownerId: serverClientId,
-			x: 200,
-			y: 200,
+			x: 0,
+			y: 250,
 		})))
 
 	const filter = makeExpNodeState({
@@ -75,7 +75,7 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 		makeExpPosition({
 			id: filter.id,
 			ownerId: serverClientId,
-			x: 0,
+			x: 350,
 			y: 0,
 		})))
 
@@ -90,7 +90,7 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 			id: osc1.id,
 			ownerId: serverClientId,
 			x: 0,
-			y: 200,
+			y: 0,
 		})))
 
 	const osc2 = makeExpNodeState({
@@ -103,8 +103,8 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 		makeExpPosition({
 			id: osc2.id,
 			ownerId: serverClientId,
-			x: 0,
-			y: 400,
+			x: -350,
+			y: 250,
 		})))
 
 	dispatchToRoom(expConnectionsActions.add(new ExpConnection(

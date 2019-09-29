@@ -78,7 +78,7 @@ export type ExpPositions = Map<Id, ExpPosition>
 export const defaultExpPosition = Object.freeze({
 	id: '-1' as Id,
 	ownerId: '-1' as Id,
-	width: 200,
+	width: 300,
 	height: 200,
 	x: Math.random() * 1600 - 800,
 	y: Math.random() * 1000 - 500,

@@ -1,4 +1,4 @@
-import React, {Fragment} from 'react'
+import React, {Fragment, useContext} from 'react'
 import * as immutable from 'immutable'
 import {ExpNodeState, IExpConnection} from '@corgifm/common/redux'
 import {logger} from '../client-logger'
@@ -8,13 +8,43 @@ import {AudioParamChange, ExpNodeAudioConnection} from './ExpTypes'
 import {ConnectedExpConnectorPlaceholders} from '../Connections/ConnectorPlaceholders';
 import {ConnectedSimpleGraphNodeExp} from '../SimpleGraph/SimpleGraphNodeExp';
 
+export const NodeManagerContext = React.createContext<null | NodeManagerContextValue>(null)
+
+export interface NodeManagerContextValue extends ReturnType<NodeManager['_makeContextValue']> {}
+
+export function useNodeManagerContext() {
+	const context = useContext(NodeManagerContext)
+
+	if (!context) throw new Error(`missing node manager context, maybe there's no provider`)
+
+	return context
+}
+
 export class NodeManager {
 	private readonly _nodes = new Map<Id, CorgiNode>()
 	private readonly _audioConnections = new Map<Id, ExpNodeAudioConnection>()
+	public readonly reactContext: NodeManagerContextValue
 
 	public constructor(
 		private readonly _audioContext: AudioContext,
-	) {}
+	) {
+		this.reactContext = this._makeContextValue()
+	}
+
+	private _makeContextValue = () => {
+		return {
+			getNodeInfo: (nodeId: Id) => {
+				const node = this._nodes.get(nodeId)
+
+				if (!node) return logger.warn('[getNodeInfo] 404 node not found: ', {nodeId})
+
+				return {
+					audioInputPortCount: node.getAudioInputPortCount(),
+					audioOutputPortCount: node.getAudioOutputPortCount(),
+				} as const
+			}
+		}
+	}
 
 	public renderNodeId = (nodeId: Id) => {
 		const node = this._nodes.get(nodeId)

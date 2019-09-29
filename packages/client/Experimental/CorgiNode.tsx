@@ -14,7 +14,7 @@ import {
 
 export const ExpNodeContext = React.createContext<null | ExpNodeContextValue>(null)
 
-export interface ExpNodeContextValue extends ReturnType<CorgiNode['makeExpNodeContextValue']> {}
+export interface ExpNodeContextValue extends ReturnType<CorgiNode['_makeExpNodeContextValue']> {}
 
 export function useNodeContext() {
 	const context = useContext(ExpNodeContext)
@@ -35,7 +35,7 @@ export abstract class CorgiNode {
 		protected readonly _audioOutPorts: ExpNodeAudioOutputPorts = makePorts<ExpNodeAudioOutputPort>([]),
 		private readonly _audioParams: ExpAudioParams = new Map(),
 	) {
-		this.reactContext = this.makeExpNodeContextValue()
+		this.reactContext = this._makeExpNodeContextValue()
 	}
 
 	public abstract onParamChange(paramChange: AudioParamChange): void
@@ -53,7 +53,7 @@ export abstract class CorgiNode {
 		}
 	}
 
-	public makeExpNodeContextValue() {
+	private _makeExpNodeContextValue() {
 		return {
 			registerAudioParam: (paramId: Id, callback: AudioParamCallback) => {
 				const param = this._audioParams.get(paramId)
