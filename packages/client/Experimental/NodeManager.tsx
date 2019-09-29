@@ -27,6 +27,7 @@ export class NodeManager {
 
 	public constructor(
 		private readonly _audioContext: AudioContext,
+		private readonly _preMasterLimiter: GainNode,
 	) {
 		this.reactContext = this._makeContextValue()
 	}
@@ -103,7 +104,7 @@ export class NodeManager {
 	}
 
 	public addNode = (nodeState: ExpNodeState) => {
-		const newNode = new typeClassMap[nodeState.type](nodeState.id, this._audioContext)
+		const newNode = new typeClassMap[nodeState.type](nodeState.id, this._audioContext, this._preMasterLimiter)
 		this._nodes.set(newNode.id, newNode)
 		nodeState.audioParams.forEach((newValue, paramId) => newNode.onAudioParamChange(paramId, newValue))
 		newNode.setEnabled(nodeState.enabled)

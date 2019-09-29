@@ -77,7 +77,7 @@ async function setupAsync() {
 	// Might be needed for safari
 	const AudioContext = window.AudioContext || window.webkitAudioContext
 	const audioContext = new AudioContext()
-	const preFx = audioContext.createGain()
+	const preMasterLimiter = audioContext.createGain()
 
 	const samplesManager = new SamplesManager(audioContext)
 
@@ -101,6 +101,7 @@ async function setupAsync() {
 
 	const singletonContext = new SingletonContextImpl(
 		audioContext,
+		preMasterLimiter,
 	)
 
 	const store = configureStore(
@@ -115,14 +116,14 @@ async function setupAsync() {
 
 	setStoreForSchedulerVisual(store)
 
-	const {masterLimiter} = setupAudioContext(audioContext, preFx, store)
+	const {masterLimiter} = setupAudioContext(audioContext, preMasterLimiter, store)
 
 	setupMidiSupport(store)
 
 	setupInputEventListeners(window, store, audioContext)
 
 	const {getAllInstruments, getAllAudioNodes} =
-		setupInstrumentManager(store, audioContext, preFx, samplesManager)
+		setupInstrumentManager(store, audioContext, preMasterLimiter, samplesManager)
 
 	// Rendering before websocket stuff so anything that needs
 	// to be setup from inside a react component can be done

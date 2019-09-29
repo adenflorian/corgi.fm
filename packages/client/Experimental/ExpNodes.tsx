@@ -17,7 +17,7 @@ export class OscillatorExpNode extends CorgiNode {
 	private readonly _outputGain: GainNode
 
 	public constructor(
-		id: Id, audioContext: AudioContext,
+		id: Id, audioContext: AudioContext, preMasterLimiter: GainNode,
 	) {
 		const oscillator = audioContext.createOscillator()
 		oscillator.frequency.value = 110
@@ -40,7 +40,7 @@ export class OscillatorExpNode extends CorgiNode {
 			buildAudioParamDesc('detune', oscillator.detune, 0, -100, 100, 1, filterValueToString),
 		])
 
-		super(id, audioContext, inPorts, outPorts, audioParams)
+		super(id, audioContext, preMasterLimiter, inPorts, outPorts, audioParams)
 
 		this._oscillator = oscillator
 		this._outputGain = outputGain
@@ -88,17 +88,18 @@ export class AudioOutputExpNode extends CorgiNode {
 	private readonly _inputGain: GainNode
 
 	public constructor(
-		id: Id, audioContext: AudioContext,
+		id: Id, audioContext: AudioContext, preMasterLimiter: GainNode,
 	) {
 		const inputGain = audioContext.createGain()
-		inputGain.connect(audioContext.destination)
 	
 		const inPorts = makePorts([
 			new ExpNodeAudioInputPort(0, 'input', inputGain),
 		])
 
-		super(id, audioContext, inPorts)
+		super(id, audioContext, preMasterLimiter,inPorts)
 
+		inputGain.connect(audioContext.destination)
+		// inputGain.connect(this.preMasterLimiter)
 		this._inputGain = inputGain
 	}
 
@@ -130,9 +131,9 @@ export class AudioOutputExpNode extends CorgiNode {
 
 export class DummyNode extends CorgiNode {
 	public constructor(
-		id: Id, audioContext: AudioContext,
+		id: Id, audioContext: AudioContext, preMasterLimiter: GainNode,
 	) {
-		super(id, audioContext, makePorts([]))
+		super(id, audioContext, preMasterLimiter, makePorts([]))
 	}
 
 	public getName() {return 'Dummy'}
@@ -164,7 +165,7 @@ export class FilterNode extends CorgiNode {
 	private readonly _dryWetChain: DryWetChain
 
 	public constructor(
-		id: Id, audioContext: AudioContext,
+		id: Id, audioContext: AudioContext, preMasterLimiter: GainNode,
 	) {
 		const filter = audioContext.createBiquadFilter()
 		filter.frequency.value = 150
@@ -189,7 +190,7 @@ export class FilterNode extends CorgiNode {
 			buildAudioParamDesc('gain', filter.gain, 0, -1, 1, 1, percentageValueString),
 		])
 
-		super(id, audioContext, inPorts, outPorts, audioParams)
+		super(id, audioContext, preMasterLimiter, inPorts, outPorts, audioParams)
 
 		this._filter = filter
 		this._dryWetChain = dryWetChain
@@ -264,7 +265,7 @@ export class ExpGainNode extends CorgiNode {
 	private readonly _dryWetChain: DryWetChain
 
 	public constructor(
-		id: Id, audioContext: AudioContext,
+		id: Id, audioContext: AudioContext, preMasterLimiter: GainNode,
 	) {
 		const gain = audioContext.createGain()
 
@@ -282,7 +283,7 @@ export class ExpGainNode extends CorgiNode {
 			buildAudioParamDesc('gain', gain.gain, 1, 0, 2, 1, percentageValueString),
 		])
 
-		super(id, audioContext, inPorts, outPorts, audioParams)
+		super(id, audioContext, preMasterLimiter, inPorts, outPorts, audioParams)
 
 		this._gain = gain
 		this._dryWetChain = dryWetChain
@@ -315,7 +316,7 @@ export class ExpGainNode extends CorgiNode {
 }
 
 // Is there a way to use class decorators to create this map at runtime?
-export const typeClassMap: {readonly [key in ExpNodeType]: new (id: Id, context: AudioContext) => CorgiNode} = {
+export const typeClassMap: {readonly [key in ExpNodeType]: new (id: Id, context: AudioContext, preMasterLimiter: GainNode) => CorgiNode} = {
 	oscillator: OscillatorExpNode,
 	dummy: DummyNode,
 	filter: FilterNode,

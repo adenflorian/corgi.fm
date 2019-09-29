@@ -12,7 +12,10 @@ export const NodeManagerRoot = () => {
 
 	const singletonContext = useSingletonContext()
 
-	const nodeManager = useMemo(() => new NodeManager(singletonContext.getAudioContext()), [singletonContext])
+	const nodeManager = useMemo(() => new NodeManager(
+		singletonContext.getAudioContext(),
+		singletonContext.getPreMasterLimiter()
+	), [singletonContext])
 
 	const viewMode = useSelector((state: IClientAppState) => state.room.roomSettings.viewMode)
 

@@ -4,15 +4,17 @@ import {NodeManager} from './Experimental/NodeManager'
 export const SingletonContext = React.createContext<SingletonContextImpl | null>(null)
 
 export class SingletonContextImpl {
+	private nodeManager?: NodeManager
+
 	public constructor(
 		private audioContext: AudioContext,
-		private nodeManager?: NodeManager,
+		private preMasterLimiter: GainNode,
 	) {}
 
 	public readonly getNodeManager = () => this.nodeManager
 	public readonly setNodeManager = (x?: NodeManager) => this.nodeManager = x
 	public readonly getAudioContext = () => this.audioContext
-	public readonly setAudioContext = (x: AudioContext) => this.audioContext = x
+	public readonly getPreMasterLimiter = () => this.preMasterLimiter
 }
 
 export function useSingletonContext() {

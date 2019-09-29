@@ -30,7 +30,8 @@ export abstract class CorgiNode {
 
 	public constructor(
 		public readonly id: Id,
-		public readonly audioContext: AudioContext,
+		protected readonly audioContext: AudioContext,
+		protected readonly preMasterLimiter: GainNode,
 		protected readonly _audioInputPorts: ExpNodeAudioInputPorts = makePorts<ExpNodeAudioInputPort>([]),
 		protected readonly _audioOutPorts: ExpNodeAudioOutputPorts = makePorts<ExpNodeAudioOutputPort>([]),
 		private readonly _audioParams: ExpAudioParams = new Map(),
