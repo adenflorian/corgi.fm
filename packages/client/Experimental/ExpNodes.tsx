@@ -7,8 +7,10 @@ import {
 	ExpNodeAudioInputPort,
 	ExpNodeAudioOutputPort,
 	ExpNodeConnection,
+	buildAudioParamDesc,
 } from './ExpTypes'
 import {CorgiNode, makePorts} from './CorgiNode'
+import {percentageValueString, filterValueToString} from '../client-constants';
 
 export class OscillatorExpNode extends CorgiNode {
 	private readonly _oscillator: OscillatorNode
@@ -34,8 +36,8 @@ export class OscillatorExpNode extends CorgiNode {
 		])
 
 		const audioParams = new Map<Id, ExpAudioParam>([
-			buildAudioParamDesc('frequency', oscillator.frequency),
-			buildAudioParamDesc('detune', oscillator.detune),
+			buildAudioParamDesc('frequency', oscillator.frequency, 440, 0, 20000, 3, filterValueToString),
+			buildAudioParamDesc('detune', oscillator.detune, 0, -100, 100, 1, filterValueToString),
 		])
 
 		super(id, audioContext, inPorts, outPorts, audioParams)
@@ -181,10 +183,10 @@ export class FilterNode extends CorgiNode {
 		])
 
 		const audioParams = new Map<Id, ExpAudioParam>([
-			buildAudioParamDesc('frequency', filter.frequency),
-			buildAudioParamDesc('detune', filter.detune),
-			buildAudioParamDesc('q', filter.Q),
-			buildAudioParamDesc('gain', filter.gain),
+			buildAudioParamDesc('frequency', filter.frequency, 20000, 0, 20000, 3, filterValueToString),
+			buildAudioParamDesc('detune', filter.detune, 0, -100, 100, 1, filterValueToString),
+			buildAudioParamDesc('q', filter.Q, 1, 0.1, 18),
+			buildAudioParamDesc('gain', filter.gain, 0, -1, 1, 1, percentageValueString),
 		])
 
 		super(id, audioContext, inPorts, outPorts, audioParams)
@@ -277,7 +279,7 @@ export class ExpGainNode extends CorgiNode {
 		])
 
 		const audioParams = new Map<Id, ExpAudioParam>([
-			buildAudioParamDesc('gain', gain.gain),
+			buildAudioParamDesc('gain', gain.gain, 1, 0, 2, 1, percentageValueString),
 		])
 
 		super(id, audioContext, inPorts, outPorts, audioParams)
@@ -310,17 +312,6 @@ export class ExpGainNode extends CorgiNode {
 	public dispose() {
 		this._gain.disconnect()
 	}
-}
-
-function buildAudioParamDesc(id: Id, audioParam: AudioParam): [Id, ExpAudioParam] {
-	return [id, {
-		id,
-		audioParam,
-		min: audioParam.minValue,
-		max: audioParam.maxValue,
-		default: audioParam.defaultValue,
-		reactSubscribers: new Map(),
-	}]
 }
 
 // Is there a way to use class decorators to create this map at runtime?

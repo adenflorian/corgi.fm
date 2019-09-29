@@ -34,6 +34,8 @@ export const ExpNodeDebugKnob = React.memo(function _ExpNodeDebugKnob({
 			onChange={onAudioParamChange}
 			tooltip={audioParam.id as string}
 			value={value}
+			curve={audioParam.curve}
+			valueString={audioParam.valueString}
 		/>
 	)
 })

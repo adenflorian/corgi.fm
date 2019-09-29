@@ -1,14 +1,30 @@
 /* eslint-disable no-empty-function */
 export type ExpAudioParams = Map<Id, ExpAudioParam>
 
-export interface ExpAudioParam {
-	readonly id: Id
-	readonly audioParam: AudioParam
-	readonly min: number
-	readonly max: number
-	readonly default: number
-	readonly reactSubscribers: Map<AudioParamCallback, AudioParamCallback>
+export function buildAudioParamDesc(
+	...args: Parameters<typeof foo>
+): [Id, ExpAudioParam] {
+	return [args[0], foo(...args)]
 }
+
+function foo(
+	id: Id, audioParam: AudioParam,
+	defaultValue: number, min: number, max: number,
+	curve = 1, valueString?: (v: number) => string,
+) {
+	return {
+		id,
+		audioParam,
+		min,
+		max,
+		default: defaultValue,
+		reactSubscribers: new Map<AudioParamCallback, AudioParamCallback>(),
+		curve,
+		valueString,
+	}
+}
+
+export interface ExpAudioParam extends ReturnType<typeof foo> {}
 
 export type AudioParamCallback = (newValue: number) => void
 
