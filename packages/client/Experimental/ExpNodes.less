@@ -5,6 +5,8 @@
 	width: 100%;
 }
 
+@portDiameter: 16px;
+
 .expNodeDebugView {
 	box-sizing: border-box;
 	width: 100%;
@@ -54,18 +56,36 @@
 
 		.port {
 			display: flex;
-			justify-content: space-between;
+			align-items: center;
 
 			&:nth-child(odd) {
 				// background-color: @panelGrayDark;
 			}
 
 			.portId {
-
+				margin: 0 4px;
 			}
 			.paramValue {
 
 			}
+			.portDropZone {
+				background-color: currentColor;
+				height: @portDiameter;
+				width: @portDiameter;
+				border-radius: @portDiameter / 2;
+			}
+		}
+	}
+
+	.audioInputPorts {
+		.port {
+			justify-content: flex-start;
+		}
+	}
+
+	.audioOutputPorts {
+		.port {
+			justify-content: flex-end;
 		}
 	}
 }
