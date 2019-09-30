@@ -41,6 +41,10 @@ import {
 	LocalAction, chatSystemMessage, animationActions, selectOption, AppOptions,
 	getNodeInfo, SequencerStateBase, localMidiKeyUp, selectUserInputKeys,
 	userInputActions, recordingActions, betterSequencerActions, RoomType,
+	expNodesActions, expPositionActions, expConnectionsActions,
+	selectExpConnectionsWithSourceOrTargetIds, selectExpNode,
+	selectExpPosition, selectExpConnectionsWithSourceId,
+	selectExpConnectionsWithTargetIds,
 } from '@corgifm/common/redux'
 import {pointersActions} from '@corgifm/common/redux/pointers-redux'
 import {makeMidiClipEvent, preciseModulus, preciseSubtract} from '@corgifm/common/midi-types'
@@ -418,6 +422,25 @@ export function createLocalMiddleware(
 
 				return
 			}
+			case 'DELETE_EXP_NODE': {
+				next(action)
+
+				const newState = getState()
+
+				const nodeId = action.nodeId
+
+				dispatch(expNodesActions.delete(nodeId))
+				dispatch(expPositionActions.delete([nodeId]))
+				dispatch(
+					expConnectionsActions.delete(
+						selectExpConnectionsWithSourceOrTargetIds(newState.room, [nodeId])
+							.map(x => x.id)
+							.toList(),
+					),
+				)
+
+				return
+			}
 			case 'CLONE_NODE': {
 				next(action)
 
@@ -491,6 +514,76 @@ export function createLocalMiddleware(
 							0,
 						)))
 					}
+				}
+
+				return
+			}
+			case 'CLONE_EXP_NODE': {
+				next(action)
+
+				const newState = getState()
+
+				const nodeId = action.nodeId
+
+				// Select multiThing
+				const stateToClone = selectExpNode(newState.room, nodeId)
+
+				const clone = stateToClone.set('id', createNodeId())
+
+				// dispatch add multi thing
+				dispatch(expNodesActions.add(clone))
+				dispatch(shamuMetaActions.setSelectedNode({id: clone.id, type: ConnectionNodeType.dummy}))
+
+				// clone position
+				const positionToClone = selectExpPosition(newState.room, nodeId)
+
+				const clonePosition = positionToClone
+					.set('id', clone.id)
+					.set('x', positionToClone.x + 32)
+					.set('y', positionToClone.y)
+
+				dispatch(expPositionActions.add(clonePosition))
+
+				if (action.withConnections === 'all') {
+					const newConnections = selectExpConnectionsWithSourceId(newState.room, nodeId)
+						.map(x => ({
+							...x,
+							id: createNodeId(),
+							sourceId: clone.id,
+						}))
+						.concat(
+							selectExpConnectionsWithTargetIds(newState.room, nodeId)
+								.map(x => ({
+									...x,
+									id: createNodeId(),
+									targetId: clone.id,
+								})),
+						)
+						.toList()
+
+					if (newConnections.count() > 0) dispatch(expConnectionsActions.addMultiple(newConnections))
+				} else if (action.withConnections === 'default') {
+					//TODO
+					// if (nodeInfo.autoConnectToClock) {
+					// 	dispatch(expConnectionsActions.add(new Connection(
+					// 		MASTER_CLOCK_SOURCE_ID,
+					// 		ConnectionNodeType.masterClock,
+					// 		clone.id,
+					// 		clone.type,
+					// 		0,
+					// 		0,
+					// 	)))
+					// }
+					// if (nodeInfo.autoConnectToAudioOutput) {
+					// 	dispatch(expConnectionsActions.add(new Connection(
+					// 		clone.id,
+					// 		clone.type,
+					// 		MASTER_AUDIO_OUTPUT_TARGET_ID,
+					// 		ConnectionNodeType.audioOutput,
+					// 		0,
+					// 		0,
+					// 	)))
+					// }
 				}
 
 				return

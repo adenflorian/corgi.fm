@@ -3,10 +3,10 @@ import {ContextMenuTrigger} from 'react-contextmenu'
 import {Set} from 'immutable'
 import {
 	selectLocalClientId, selectOptions, selectRoomSettings, IClientAppState,
-	createAnimationFrameSelector, animationActions,
+	createAnimationFrameSelector, animationActions, RoomType,
 } from '@corgifm/common/redux'
 import {useSelector} from 'react-redux'
-import {backgroundMenuId, graphSizeX, zoomBackgroundClass} from '../client-constants'
+import {backgroundMenuId, graphSizeX, zoomBackgroundClass, expBackgroundMenuId} from '../client-constants'
 import PlusSVG from '../OtherSVG/plus.svg'
 import {simpleGlobalClientState} from '../SimpleGlobalClientState'
 
@@ -227,12 +227,14 @@ export const ConnectedZoom = React.memo(function _Zoom({
 		resetPan()
 	}, [resetPan, triggerPanReset])
 
+	const roomType = useSelector((state: IClientAppState) => state.room.roomInfo.roomType)
+
 	return (
 		<Fragment>
 			{
 				// @ts-ignore disableIfShiftIsPressed
 				<ContextMenuTrigger
-					id={backgroundMenuId}
+					id={roomType === RoomType.Experimental ? expBackgroundMenuId : backgroundMenuId}
 					disableIfShiftIsPressed={true}
 					holdToDisplay={-1}
 					disable={disableMenu}

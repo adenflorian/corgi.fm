@@ -1,3 +1,4 @@
+import {List} from 'immutable'
 import {CorgiNode} from './CorgiNode';
 import {logger} from '../client-logger';
 
@@ -93,10 +94,11 @@ export class ExpNodeAudioConnection {
 	}
 
 	public changeTarget(newTarget: ExpNodeAudioInputPort) {
-		this._target.disconnect(this)
+		const oldTarget = this._target
 		this._target = newTarget
-		this._target.connect(this)
-		this._source.changeTarget(this._target, newTarget)
+		oldTarget.disconnect(this)
+		newTarget.connect(this)
+		this._source.changeTarget(oldTarget, newTarget)
 	}
 
 	public dispose() {
@@ -104,7 +106,7 @@ export class ExpNodeAudioConnection {
 		this._target.disconnect(this)
 	}
 
-	public detectFeedbackLoop(i: number, nodeIds: Id[]): boolean {
+	public detectFeedbackLoop(i: number, nodeIds: List<Id>): boolean {
 		return this._target.detectFeedbackLoop(i, nodeIds)
 	}
 }
@@ -156,7 +158,7 @@ export class ExpNodeAudioInputPort extends ExpNodeAudioPort {
 	protected _disconnect = (connection: ExpNodeAudioConnection) => {
 	}
 
-	public detectFeedbackLoop(i: number, nodeIds: Id[]): boolean {
+	public detectFeedbackLoop(i: number, nodeIds: List<Id>): boolean {
 		return this._node.detectFeedbackLoop(i, nodeIds)
 	}
 }
@@ -202,7 +204,7 @@ export class ExpNodeAudioOutputPort extends ExpNodeAudioPort {
 		}
 	}
 
-	public detectFeedbackLoop(i = 0, nodeIds: Id[] = []): boolean {
+	public detectFeedbackLoop(i = 0, nodeIds: List<Id> = List()): boolean {
 		if (nodeIds.includes(this._node.id)) {
 			logger.warn('detected feedback loop because matching nodeId: ', {nodeId: this._node.id, nodeIds, i})
 			return true
@@ -212,12 +214,10 @@ export class ExpNodeAudioOutputPort extends ExpNodeAudioPort {
 			return true
 		}
 
-		nodeIds.push(this._node.id)
-
 		if (this._connections.size === 0) return false
 
 		return [...this._connections].some(([_, connection]) => {
-			return connection.detectFeedbackLoop(i + 1, nodeIds)
+			return connection.detectFeedbackLoop(i + 1, nodeIds.push(this._node.id))
 		})
 	}
 }

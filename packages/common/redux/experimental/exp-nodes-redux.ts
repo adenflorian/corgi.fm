@@ -67,7 +67,9 @@ export function makeExpNodeState(node: Exclude<Partial<typeof defaultExpNodeStat
 
 export interface ExpNodeState extends ReturnType<typeof _makeExpNodeState> {}
 
-export type ExpNodeType = 'oscillator' | 'filter' | 'dummy' | 'audioOutput' | 'gain'
+export type ExpNodeType = typeof expNodeTypes[number]
+
+export const expNodeTypes = ['oscillator', 'filter', 'dummy', 'audioOutput', 'gain'] as const
 
 const initialState = Map<Id, ExpNodeState>()
 

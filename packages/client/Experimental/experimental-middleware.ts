@@ -58,6 +58,12 @@ function foo(
 		case 'EXP_NODE_SET_ENABLED':
 			return nodeManager.enableNode(action.nodeId, action.enabled)
 
+		case 'EXP_NODE_ADD':
+			return nodeManager.addNode(action.newNode)
+
+		case 'EXP_NODE_DELETE':
+			return nodeManager.deleteNode(action.nodeId)
+
 		// Connections
 		case 'EXP_REPLACE_CONNECTIONS':
 			return nodeManager.addAudioConnections(getConnections())

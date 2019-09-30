@@ -41,6 +41,7 @@ export class OscillatorExpNode extends CorgiNode {
 
 		super(id, audioContext, preMasterLimiter, inPorts, outPorts, audioParams)
 
+		// Make sure to add these to the dispose method!
 		this._oscillator = oscillator
 		this._outputGain = outputGain
 	}
@@ -81,9 +82,10 @@ export class OscillatorExpNode extends CorgiNode {
 		this._outputGain.gain.value = 0
 	}
 
-	public dispose() {
+	protected _dispose() {
 		this._oscillator.stop()
 		this._oscillator.disconnect()
+		this._outputGain.disconnect()
 	}
 }
 
@@ -103,6 +105,8 @@ export class AudioOutputExpNode extends CorgiNode {
 
 		inputGain.connect(audioContext.destination)
 		// inputGain.connect(this.preMasterLimiter)
+
+		// Make sure to add these to the dispose method!
 		this._inputGain = inputGain
 	}
 
@@ -127,8 +131,8 @@ export class AudioOutputExpNode extends CorgiNode {
 		this._inputGain.gain.value = 0
 	}
 
-	public dispose() {
-		logger.log('dispose AudioOutputExpNode')
+	protected _dispose() {
+		this._inputGain.disconnect()
 	}
 }
 
@@ -162,7 +166,7 @@ export class DummyNode extends CorgiNode {
 	protected _disable() {
 	}
 
-	public dispose() {
+	protected _dispose() {
 		logger.log('dispose DummyNode')
 	}
 }
@@ -199,6 +203,7 @@ export class FilterNode extends CorgiNode {
 
 		super(id, audioContext, preMasterLimiter, inPorts, outPorts, audioParams)
 
+		// Make sure to add these to the dispose method!
 		this._filter = filter
 		this._dryWetChain = dryWetChain
 	}
@@ -228,8 +233,9 @@ export class FilterNode extends CorgiNode {
 		this._dryWetChain.dryOnly()
 	}
 
-	public dispose() {
+	protected _dispose() {
 		this._filter.disconnect()
+		this._dryWetChain.dispose()
 	}
 }
 
@@ -269,6 +275,13 @@ class DryWetChain {
 		this.dryGain.gain.value = 1
 		this.wetGain.gain.value = 0
 	}
+
+	public dispose() {
+		this.inputGain.disconnect()
+		this.dryGain.disconnect()
+		this.wetGain.disconnect()
+		this.outputGain.disconnect()
+	}
 }
 
 export class ExpGainNode extends CorgiNode {
@@ -296,6 +309,7 @@ export class ExpGainNode extends CorgiNode {
 
 		super(id, audioContext, preMasterLimiter, inPorts, outPorts, audioParams)
 
+		// Make sure to add these to the dispose method!
 		this._gain = gain
 		this._dryWetChain = dryWetChain
 	}
@@ -325,8 +339,9 @@ export class ExpGainNode extends CorgiNode {
 		this._dryWetChain.dryOnly()
 	}
 
-	public dispose() {
+	protected _dispose() {
 		this._gain.disconnect()
+		this._dryWetChain.dispose()
 	}
 }
 

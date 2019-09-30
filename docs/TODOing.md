@@ -568,6 +568,7 @@ Yes, https://mmckegg.github.io/web-audio-school/, exercise 13 is exactly what yo
 - [ ] flanger
 - [ ] distortion
 - [ ] desktop notifications for chat
+- [ ] allow setting bookmarks on knobs (like setting what the preferred value or range is)
 
 # 0.7.0
 - [ ] quick connection mode

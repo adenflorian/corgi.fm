@@ -112,6 +112,15 @@ export class NodeManager {
 		newNode.setEnabled(nodeState.enabled)
 	}
 
+	public deleteNode = (nodeId: Id) => {
+		const node = this._nodes.get(nodeId)
+
+		if (!node) return logger.warn('[deleteNode] 404 node not found: ', {nodeId})
+
+		node.dispose()
+		this._nodes.delete(nodeId)
+	}
+
 	public addAudioConnections = (connections: immutable.Map<Id, IExpConnection>) => {
 		connections.forEach(this.addAudioConnection)
 	}
@@ -184,9 +193,7 @@ export class NodeManager {
 	}
 
 	public cleanup = () => {
-		this._nodes.forEach(node => {
-			node.dispose()
-		})
+		this._nodes.forEach(node => node.dispose())
 		this._nodes.clear()
 		this._audioConnections.clear()
 	}

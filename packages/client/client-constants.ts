@@ -3,7 +3,9 @@ import {stripIndents} from 'common-tags'
 export const mainBoardsId = 'mainBoards'
 export const zoomBackgroundClass = 'zoomBackground'
 export const backgroundMenuId = 'backgroundMenuId'
+export const expBackgroundMenuId = 'expBackgroundMenuId'
 export const nodeMenuId = 'nodeMenuId'
+export const expNodeMenuId = 'expNodeMenuId'
 export const panToolTip = stripIndents`
 	Panning
 	Controls how far left and right the sound is

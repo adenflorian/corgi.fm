@@ -1,4 +1,5 @@
 import React, {ReactElement, useContext} from 'react'
+import {List} from 'immutable'
 import {clamp} from '@corgifm/common/common-utils'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {logger} from '../client-logger'
@@ -48,7 +49,6 @@ export abstract class CorgiNode {
 
 	public abstract onParamChange(paramChange: AudioParamChange): void
 	public abstract render(): ReactElement<any>
-	public abstract dispose(): void
 	public abstract getName(): string
 
 	public getColor(): string {
@@ -146,9 +146,15 @@ export abstract class CorgiNode {
 		)
 	}
 
-	public detectFeedbackLoop(i: number, nodeIds: Id[]): boolean {
+	public detectFeedbackLoop(i: number, nodeIds: List<Id>): boolean {
 		return this._audioOutPorts.some(x => x.detectFeedbackLoop(i, nodeIds))
 	}
+
+	public dispose() {
+		this._dispose()
+	}
+
+	protected abstract _dispose(): void
 }
 
 export function makeAudioInputPorts(args: readonly ExpNodeAudioInputPortArgs[], node: CorgiNode): ExpNodeAudioInputPorts {

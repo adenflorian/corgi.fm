@@ -8,7 +8,7 @@ import {
 } from '@corgifm/common/redux'
 import {panelHeaderHeight} from '@corgifm/common/common-constants'
 import {ConnectionNodeType} from '@corgifm/common/common-types'
-import {handleClassName, nodeMenuId} from '../client-constants'
+import {handleClassName, expNodeMenuId} from '../client-constants'
 import {simpleGlobalClientState} from '../SimpleGlobalClientState'
 import {ExpPanel} from '../Panel/ExpPanel'
 
@@ -106,7 +106,7 @@ export function SimpleGraphNode(props: ISimpleGraphNodeAllProps) {
 						return (
 						// @ts-ignore disableIfShiftIsPressed
 							<ContextMenuTrigger
-								id={nodeMenuId}
+								id={expNodeMenuId}
 								disableIfShiftIsPressed={true}
 								holdToDisplay={-1}
 								nodeId={positionId}

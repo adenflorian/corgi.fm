@@ -9,7 +9,7 @@ import {
 	selectPosition, selectSequencer, selectShamuMetaState, sequencerActions,
 	userInputActions,
 	localActions, localMidiKeyPress, localMidiKeyUp, localMidiOctaveChange,
-	windowBlur,
+	windowBlur, selectRoomInfoState, RoomType,
 } from '@corgifm/common/redux'
 import {mouseFromScreenToBoard} from './SimpleGlobalClientState'
 
@@ -70,8 +70,12 @@ const keyboardShortcuts: IKeyBoardShortcuts = Map<KeyBoardShortcut>({
 		actionOnKeyDown: (_, state) => {
 			const selectedNode = selectShamuMetaState(state.room).selectedNode
 			if (selectedNode === undefined) return
-			if (findNodeInfo(selectedNode.type).isNodeCloneable !== true) return
-			return localActions.cloneNode(selectedNode.id, selectedNode.type, 'all')
+			if (selectRoomInfoState(state.room).roomType === RoomType.Experimental) {
+				return localActions.cloneExpNode(selectedNode.id, 'all')
+			} else {
+				if (findNodeInfo(selectedNode.type).isNodeCloneable !== true) return
+				return localActions.cloneNode(selectedNode.id, selectedNode.type, 'all')
+			}
 		},
 		allowRepeat: false,
 		preventDefault: true,
