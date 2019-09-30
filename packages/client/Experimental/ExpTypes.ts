@@ -1,3 +1,6 @@
+import {CorgiNode} from './CorgiNode';
+import {logger} from '../client-logger';
+
 /* eslint-disable no-empty-function */
 export type ExpAudioParams = Map<Id, ExpAudioParam>
 
@@ -100,6 +103,10 @@ export class ExpNodeAudioConnection {
 		this._source.disconnect(this)
 		this._target.disconnect(this)
 	}
+
+	public detectFeedbackLoop(i: number, nodeIds: Id[]): boolean {
+		return this._target.detectFeedbackLoop(i, nodeIds)
+	}
 }
 
 export type ExpNodeAudioConnections = Map<Id, ExpNodeAudioConnection>
@@ -110,11 +117,12 @@ export abstract class ExpNodeAudioPort {
 	public constructor(
 		public readonly id: number,
 		public readonly name: string,
+		protected readonly _node: CorgiNode,
 	) {}
 
 	public connect = (connection: ExpNodeAudioConnection) => {
-		this._connect(connection)
 		this._connections.set(connection.id, connection)
+		this._connect(connection)
 	}
 
 	public disconnect = (connection: ExpNodeAudioConnection) => {
@@ -126,13 +134,20 @@ export abstract class ExpNodeAudioPort {
 	protected abstract _disconnect(connection: ExpNodeAudioConnection): void
 }
 
+export interface ExpNodeAudioInputPortArgs {
+	readonly id: number
+	readonly name: string
+	readonly destination: AudioNode | AudioParam
+}
+
 export class ExpNodeAudioInputPort extends ExpNodeAudioPort {
 	public constructor(
 		public readonly id: number,
 		public readonly name: string,
+		protected readonly _node: CorgiNode,
 		public readonly destination: AudioNode | AudioParam
 	) {
-		super(id, name)
+		super(id, name, _node)
 	}
 
 	protected _connect = (connection: ExpNodeAudioConnection) => {
@@ -140,28 +155,62 @@ export class ExpNodeAudioInputPort extends ExpNodeAudioPort {
 
 	protected _disconnect = (connection: ExpNodeAudioConnection) => {
 	}
+
+	public detectFeedbackLoop(i: number, nodeIds: Id[]): boolean {
+		return this._node.detectFeedbackLoop(i, nodeIds)
+	}
+}
+
+export interface ExpNodeAudioOutputPortArgs {
+	readonly id: number
+	readonly name: string
+	readonly source: AudioNode
 }
 
 export class ExpNodeAudioOutputPort extends ExpNodeAudioPort {
 	public constructor(
 		public readonly id: number,
 		public readonly name: string,
+		protected readonly _node: CorgiNode,
 		public readonly source: AudioNode
 	) {
-		super(id, name)
+		super(id, name, _node)
 	}
 
 	protected _connect = (connection: ExpNodeAudioConnection) => {
-		this.source.connect(connection.getTarget().destination as AudioNode)
+		if (!this.detectFeedbackLoop()) {
+			this.source.connect(connection.getTarget().destination as AudioNode)
+		}
 	}
 
 	public changeTarget = (oldTarget: ExpNodeAudioInputPort, newTarget: ExpNodeAudioInputPort) => {
 		this.source.disconnect(oldTarget.destination as AudioNode)
-		this.source.connect(newTarget.destination as AudioNode)
+		if (!this.detectFeedbackLoop()) {
+			this.source.connect(newTarget.destination as AudioNode)
+		}
 	}
 
 	protected _disconnect = (connection: ExpNodeAudioConnection) => {
 		this.source.disconnect(connection.getTarget().destination as AudioNode)
+	}
+
+	public detectFeedbackLoop(i = 0, nodeIds: Id[] = []): boolean {
+		if (nodeIds.includes(this._node.id)) {
+			logger.warn('detected feedback loop because matching nodeId: ', {nodeId: this._node.id, nodeIds, i})
+			return true
+		}
+		if (i > 500) {
+			logger.warn('detected feedback loop because i too high: ', {nodeId: this._node.id, nodeIds, i})
+			return true
+		}
+
+		nodeIds.push(this._node.id)
+
+		if (this._connections.size === 0) return false
+
+		return [...this._connections].some(([_, connection]) => {
+			return connection.detectFeedbackLoop(i + 1, nodeIds)
+		})
 	}
 }
 

@@ -7,9 +7,9 @@ import {
 	ExpNodeAudioPort, AudioParamChange,
 	ExpNodeAudioInputPorts, ExpNodeAudioInputPort,
 	ExpNodeAudioOutputPorts, ExpNodeAudioOutputPort,
-	ExpNodeConnection,
-	ExpAudioParams,
-	AudioParamCallback,
+	ExpNodeConnection, ExpAudioParams,
+	AudioParamCallback, ExpNodeAudioOutputPortArgs,
+	ExpNodeAudioInputPortArgs,
 } from './ExpTypes'
 
 export const ExpNodeContext = React.createContext<null | ExpNodeContextValue>(null)
@@ -26,17 +26,23 @@ export function useNodeContext() {
 
 export abstract class CorgiNode {
 	public readonly reactContext: ExpNodeContextValue
+	protected readonly _audioInputPorts: ExpNodeAudioInputPorts
+	protected readonly _audioOutPorts: ExpNodeAudioOutputPorts
+	private readonly _audioParams: ExpAudioParams
 	private _enabled = true
 
 	public constructor(
 		public readonly id: Id,
 		protected readonly audioContext: AudioContext,
 		protected readonly preMasterLimiter: GainNode,
-		protected readonly _audioInputPorts: ExpNodeAudioInputPorts = makePorts<ExpNodeAudioInputPort>([]),
-		protected readonly _audioOutPorts: ExpNodeAudioOutputPorts = makePorts<ExpNodeAudioOutputPort>([]),
-		private readonly _audioParams: ExpAudioParams = new Map(),
+		audioInputPorts: readonly ExpNodeAudioInputPortArgs[] = [],
+		audioOutPorts: readonly ExpNodeAudioOutputPortArgs[] = [],
+		audioParams: ExpAudioParams = new Map(),
 	) {
 		this.reactContext = this._makeExpNodeContextValue()
+		this._audioInputPorts = makeAudioInputPorts(audioInputPorts, this)
+		this._audioOutPorts = makeAudioOutputPorts(audioOutPorts, this)
+		this._audioParams = audioParams
 	}
 
 	public abstract onParamChange(paramChange: AudioParamChange): void
@@ -134,8 +140,16 @@ export abstract class CorgiNode {
 			/>
 		)
 	}
+
+	public detectFeedbackLoop(i: number, nodeIds: Id[]): boolean {
+		return this._audioOutPorts.some(x => x.detectFeedbackLoop(i, nodeIds))
+	}
 }
 
-export function makePorts<T extends ExpNodeAudioPort>(ports: readonly T[]): readonly T[] {
-	return ports
+export function makeAudioInputPorts(args: readonly ExpNodeAudioInputPortArgs[], node: CorgiNode): ExpNodeAudioInputPorts {
+	return args.map(x => new ExpNodeAudioInputPort(x.id, x.name, node, x.destination))
+}
+
+export function makeAudioOutputPorts(args: readonly ExpNodeAudioOutputPortArgs[], node: CorgiNode): ExpNodeAudioOutputPorts {
+	return args.map(x => new ExpNodeAudioOutputPort(x.id, x.name, node, x.source))
 }

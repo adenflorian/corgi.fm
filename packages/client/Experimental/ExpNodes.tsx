@@ -1,15 +1,14 @@
-import React, {ReactElement} from 'react'
 import {ExpNodeType} from '@corgifm/common/redux'
 import {logger} from '../client-logger'
 import './ExpNodes.less'
 import {
 	ExpAudioParam, ExpNodeAudioPort, AudioParamChange,
-	ExpNodeAudioInputPort,
-	ExpNodeAudioOutputPort,
 	ExpNodeConnection,
 	buildAudioParamDesc,
+	ExpNodeAudioInputPortArgs,
+	ExpNodeAudioOutputPortArgs,
 } from './ExpTypes'
-import {CorgiNode, makePorts} from './CorgiNode'
+import {CorgiNode} from './CorgiNode'
 import {percentageValueString, filterValueToString} from '../client-constants';
 
 export class OscillatorExpNode extends CorgiNode {
@@ -26,14 +25,13 @@ export class OscillatorExpNode extends CorgiNode {
 		const outputGain = audioContext.createGain()
 		oscillator.connect(outputGain)
 
-		const inPorts = makePorts([
-			new ExpNodeAudioInputPort(0, 'frequency', oscillator.frequency),
-			new ExpNodeAudioInputPort(1, 'detune', oscillator.detune),
-		])
-
-		const outPorts = makePorts([
-			new ExpNodeAudioOutputPort(0, 'output', outputGain),
-		])
+		const inPorts: readonly ExpNodeAudioInputPortArgs[] = [
+			{id: 0, name: 'frequency', destination: oscillator.frequency},
+			{id: 1, name: 'detune', destination: oscillator.detune},
+		]
+		const outPorts: readonly ExpNodeAudioOutputPortArgs[] = [
+			{id: 0, name: 'output', source: outputGain},
+		]
 
 		const audioParams = new Map<Id, ExpAudioParam>([
 			buildAudioParamDesc('frequency', oscillator.frequency, 440, 0, 20000, 3, filterValueToString),
@@ -91,10 +89,10 @@ export class AudioOutputExpNode extends CorgiNode {
 		id: Id, audioContext: AudioContext, preMasterLimiter: GainNode,
 	) {
 		const inputGain = audioContext.createGain()
-	
-		const inPorts = makePorts([
-			new ExpNodeAudioInputPort(0, 'input', inputGain),
-		])
+
+		const inPorts: readonly ExpNodeAudioInputPortArgs[] = [
+			{id: 0, name: 'input', destination: inputGain},
+		]
 
 		super(id, audioContext, preMasterLimiter,inPorts)
 
@@ -133,7 +131,7 @@ export class DummyNode extends CorgiNode {
 	public constructor(
 		id: Id, audioContext: AudioContext, preMasterLimiter: GainNode,
 	) {
-		super(id, audioContext, preMasterLimiter, makePorts([]))
+		super(id, audioContext, preMasterLimiter)
 	}
 
 	public getName() {return 'Dummy'}
@@ -172,16 +170,16 @@ export class FilterNode extends CorgiNode {
 
 		const dryWetChain = new DryWetChain(audioContext, filter)
 
-		const inPorts = makePorts([
-			new ExpNodeAudioInputPort(0, 'input', dryWetChain.inputGain),
-			new ExpNodeAudioInputPort(1, 'frequency', filter.frequency),
-			new ExpNodeAudioInputPort(2, 'detune', filter.detune),
-			new ExpNodeAudioInputPort(3, 'q', filter.Q),
-			new ExpNodeAudioInputPort(4, 'gain', filter.gain),
-		])
-		const outPorts = makePorts([
-			new ExpNodeAudioOutputPort(0, 'output', dryWetChain.outputGain),
-		])
+		const inPorts: readonly ExpNodeAudioInputPortArgs[] = [
+			{id: 0, name: 'input', destination: dryWetChain.inputGain},
+			{id: 1, name: 'frequency', destination: filter.frequency},
+			{id: 2, name: 'detune', destination: filter.detune},
+			{id: 3, name: 'q', destination: filter.Q},
+			{id: 4, name: 'gain', destination: filter.gain},
+		]
+		const outPorts: readonly ExpNodeAudioOutputPortArgs[] = [
+			{id: 0, name: 'output', source: dryWetChain.outputGain},
+		]
 
 		const audioParams = new Map<Id, ExpAudioParam>([
 			buildAudioParamDesc('frequency', filter.frequency, 20000, 0, 20000, 3, filterValueToString),
@@ -271,13 +269,13 @@ export class ExpGainNode extends CorgiNode {
 
 		const dryWetChain = new DryWetChain(audioContext, gain)
 
-		const inPorts = makePorts([
-			new ExpNodeAudioInputPort(0, 'input', dryWetChain.inputGain),
-			new ExpNodeAudioInputPort(1, 'gain', gain.gain),
-		])
-		const outPorts = makePorts([
-			new ExpNodeAudioOutputPort(0, 'output', dryWetChain.outputGain),
-		])
+		const inPorts: readonly ExpNodeAudioInputPortArgs[] = [
+			{id: 0, name: 'input', destination: dryWetChain.inputGain},
+			{id: 1, name: 'gain', destination: gain.gain},
+		]
+		const outPorts: readonly ExpNodeAudioOutputPortArgs[] = [
+			{id: 0, name: 'output', source: dryWetChain.outputGain},
+		]
 
 		const audioParams = new Map<Id, ExpAudioParam>([
 			buildAudioParamDesc('gain', gain.gain, 1, 0, 2, 1, percentageValueString),
