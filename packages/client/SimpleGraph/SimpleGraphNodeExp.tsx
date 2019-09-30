@@ -15,6 +15,7 @@ import {ExpPanel} from '../Panel/ExpPanel'
 interface ISimpleGraphNodeProps {
 	positionId: Id
 	children: React.ReactNode
+	overrideColor?: string
 }
 
 interface ISimpleGraphNodeReduxProps {
@@ -29,7 +30,7 @@ type ISimpleGraphNodeAllProps = ISimpleGraphNodeProps & ISimpleGraphNodeReduxPro
 export function SimpleGraphNode(props: ISimpleGraphNodeAllProps) {
 	const {
 		positionId, color, children,
-		position, isSelected,
+		position, isSelected, overrideColor,
 	} = props
 
 	const {x, y, width, height, zIndex} = position
@@ -113,7 +114,7 @@ export function SimpleGraphNode(props: ISimpleGraphNodeAllProps) {
 								collect={collect}
 							>
 								<ExpPanel
-									color={color}
+									color={overrideColor || color}
 									id={position.id}
 									label="test"
 								>
@@ -121,7 +122,7 @@ export function SimpleGraphNode(props: ISimpleGraphNodeAllProps) {
 								</ExpPanel>
 							</ContextMenuTrigger>
 						)
-					}, [color, position, positionId])
+					}, [overrideColor, color, position, positionId])
 				}
 			</div>
 		</Fragment>

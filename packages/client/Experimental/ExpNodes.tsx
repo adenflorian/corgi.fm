@@ -1,6 +1,7 @@
 import {ExpNodeType} from '@corgifm/common/redux'
+import {CssColor} from '@corgifm/common/shamu-color'
 import {logger} from '../client-logger'
-import './ExpNodes.less'
+import {percentageValueString, filterValueToString} from '../client-constants'
 import {
 	ExpAudioParam, ExpNodeAudioPort, AudioParamChange,
 	ExpNodeConnection,
@@ -9,7 +10,7 @@ import {
 	ExpNodeAudioOutputPortArgs,
 } from './ExpTypes'
 import {CorgiNode} from './CorgiNode'
-import {percentageValueString, filterValueToString} from '../client-constants';
+import './ExpNodes.less'
 
 export class OscillatorExpNode extends CorgiNode {
 	private readonly _oscillator: OscillatorNode
@@ -42,6 +43,10 @@ export class OscillatorExpNode extends CorgiNode {
 
 		this._oscillator = oscillator
 		this._outputGain = outputGain
+	}
+
+	public getColor(): string {
+		return CssColor.green
 	}
 
 	public getName() {return 'Oscillator'}
@@ -134,6 +139,10 @@ export class DummyNode extends CorgiNode {
 		super(id, audioContext, preMasterLimiter)
 	}
 
+	public getColor(): string {
+		return CssColor.disabledGray
+	}
+
 	public getName() {return 'Dummy'}
 
 	public onParamChange(paramChange: AudioParamChange) {
@@ -192,6 +201,10 @@ export class FilterNode extends CorgiNode {
 
 		this._filter = filter
 		this._dryWetChain = dryWetChain
+	}
+
+	public getColor(): string {
+		return CssColor.orange
 	}
 
 	public getName() {return 'Filter'}
@@ -285,6 +298,10 @@ export class ExpGainNode extends CorgiNode {
 
 		this._gain = gain
 		this._dryWetChain = dryWetChain
+	}
+
+	public getColor(): string {
+		return CssColor.yellow
 	}
 
 	public getName() {return 'Gain'}

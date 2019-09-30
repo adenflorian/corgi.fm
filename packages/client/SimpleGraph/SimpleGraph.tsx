@@ -9,7 +9,6 @@ import {ConnectedConnectorPlaceholders} from '../Connections/ConnectorPlaceholde
 import {ConnectedGhostConnectionsView} from '../Connections/GhostConnections'
 import {ECSCanvasRenderSystem} from '../ECS/ECSCanvasRenderSystem'
 import {ConnectedMousePointers} from '../MousePointers/MousePointers'
-import {ConnectedExpConnections} from '../Connections/ExpConnections'
 import {NodeManagerRoot} from '../Experimental/NodeManagerRoot'
 import {ConnectedSimpleGraphNode} from './SimpleGraphNode'
 import {ConnectedZoom} from './Zoom'
@@ -32,9 +31,8 @@ export const ConnectedSimpleGraph = function _ConnectedSimpleGraph() {
 			<ConnectedZoom>
 				<div id={mainBoardsId} className="boards">
 					<ConnectedMousePointers />
-					{roomType === RoomType.Experimental
-						? <ConnectedExpConnections />
-						: <ConnectedConnections />}
+					{roomType !== RoomType.Experimental &&
+						<ConnectedConnections />}
 					{roomType !== RoomType.Experimental &&
 						<ConnectedGhostConnectionsView roomType={RoomType.Normal} />}
 					{roomType === RoomType.Experimental

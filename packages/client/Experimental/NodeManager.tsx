@@ -42,6 +42,7 @@ export class NodeManager {
 				return {
 					audioInputPortCount: node.getAudioInputPortCount(),
 					audioOutputPortCount: node.getAudioOutputPortCount(),
+					color: node.getColor(),
 				} as const
 			}
 		}
@@ -64,6 +65,7 @@ export class NodeManager {
 				/>
 				<ConnectedSimpleGraphNodeExp
 					positionId={nodeId}
+					overrideColor={node.getColor()}
 				>
 					<ExpNodeContext.Provider value={node.reactContext}>
 						{node.render()}

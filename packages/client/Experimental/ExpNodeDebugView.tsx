@@ -23,7 +23,7 @@ export const ExpNodeDebugView = React.memo(function _ExpNodeDebugView({
 			<div className="nodeId">{nodeId}</div>
 			<div className="ports">
 				<div className="audioInputPorts">
-					<div className="sectionLabel">Audio Input Ports</div>
+					<div className="sectionLabel">Audio Ins</div>
 					{audioInputPorts.map((port, id) => (
 						<div className="port" key={id}>
 							<div className="portDropZone"></div>
@@ -33,7 +33,7 @@ export const ExpNodeDebugView = React.memo(function _ExpNodeDebugView({
 					))}
 				</div>
 				<div className="audioOutputPorts">
-					<div className="sectionLabel">Audio Output Ports</div>
+					<div className="sectionLabel">Audio Outs</div>
 					{audioOutputPorts.map((port, id) => (
 						<div className="port" key={id}>
 							<div className="portName">{port.name}</div>

@@ -14,10 +14,11 @@ import {
 	selectRoomSettings, shamuConnect, selectExpConnection,
 	selectExpConnectionSourceIsSending,
 	selectExpConnectionSourceIsActive,
-	selectExpConnectionSourceColor,
 	selectExpConnectionStackOrderForSource,
 	selectExpConnectionStackOrderForTarget,
 } from '@corgifm/common/redux'
+import {CssColor} from '@corgifm/common/shamu-color'
+import {useNodeManagerContext} from '../Experimental/NodeManager'
 import {longLineTooltip} from '../client-constants'
 import {ConnectionLine} from './ConnectionLine'
 import './ConnectionView.less'
@@ -31,7 +32,6 @@ export interface IExpConnectionViewProps {
 interface IExpConnectionViewReduxProps {
 	speed?: number
 	highQuality: boolean
-	color: string
 	isSourcePlaying: boolean
 	localClientId: ClientId
 	sourceX: number
@@ -58,7 +58,7 @@ const joint = 8
 export const ExpConnectionView =
 	React.memo(function _ExpConnectionView(props: IExpConnectionViewAllProps) {
 		const {
-			color, saturateSource, saturateTarget, id, sourceX, sourceY, targetX, targetY,
+			saturateSource, saturateTarget, id, sourceX, sourceY, targetX, targetY,
 			targetStackOrder = 0, sourceStackOrder = 0, speed = 1, lineType,
 			isSourcePlaying, highQuality, localClientId, connection,
 		} = props
@@ -110,6 +110,14 @@ export const ExpConnectionView =
 		const onDelete = useCallback(() => {
 			dispatch(expConnectionsActions.delete(List([id])))
 		}, [dispatch, id])
+
+		const nodeManagerContext = useNodeManagerContext()
+
+		const nodeInfo = nodeManagerContext.getNodeInfo(connection.sourceId)
+
+		const color = nodeInfo
+			? nodeInfo.color
+			: CssColor.blue
 
 		return (
 			<div className={`connection ${saturateSource ? 'playing' : ''}`} style={{color}}>
@@ -202,7 +210,6 @@ export const ConnectedExpConnectionView = shamuConnect(
 		const isSourceActive = isSourceSending || selectExpConnectionSourceIsActive(state.room, connection.id)
 		const sourcePosition = selectExpPosition(state.room, connection.sourceId)
 		const targetPosition = selectExpPosition(state.room, connection.targetId)
-		const sourceColor = selectExpConnectionSourceColor(state, props.id)
 
 		return {
 			speed: 120,
@@ -213,7 +220,6 @@ export const ConnectedExpConnectionView = shamuConnect(
 			localClientId: selectLocalClientId(state),
 			sourceStackOrder: selectExpConnectionStackOrderForSource(state.room, props.id),
 			targetStackOrder: selectExpConnectionStackOrderForTarget(state.room, props.id),
-			color: sourceColor,
 			sourceX: sourcePosition.x + sourcePosition.width,
 			sourceY: calculateExpConnectorPositionY(sourcePosition.y, sourcePosition.height, 1, connection.sourcePort),
 			targetX: targetPosition.x,
@@ -227,7 +233,7 @@ export const ConnectedExpConnectionView = shamuConnect(
 )(ExpConnectionView)
 
 export const expConnectionConstants = {
-	portHeight: 16,
+	portHeight: 16 + 8,
 	debugNodeHeaderHeight: 8 + 16 + 4 + 12 + 4 + 16,
 	xAdjust: 8,
 } as const
@@ -246,7 +252,6 @@ export const ConnectedExpConnectionDebugView = shamuConnect(
 		const isSourceActive = isSourceSending || selectExpConnectionSourceIsActive(state.room, connection.id)
 		const sourcePosition = selectExpPosition(state.room, connection.sourceId)
 		const targetPosition = selectExpPosition(state.room, connection.targetId)
-		const sourceColor = selectExpConnectionSourceColor(state, props.id)
 
 		return {
 			speed: 120,
@@ -257,7 +262,6 @@ export const ConnectedExpConnectionDebugView = shamuConnect(
 			localClientId: selectLocalClientId(state),
 			sourceStackOrder: selectExpConnectionStackOrderForSource(state.room, props.id),
 			targetStackOrder: selectExpConnectionStackOrderForTarget(state.room, props.id),
-			color: sourceColor,
 			sourceX: sourcePosition.x + sourcePosition.width - xAdjust,
 			sourceY: calculateExpDebugConnectorY(sourcePosition.y, connection.sourcePort),
 			targetX: targetPosition.x + xAdjust,

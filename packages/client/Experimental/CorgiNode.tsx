@@ -1,5 +1,6 @@
 import React, {ReactElement, useContext} from 'react'
 import {clamp} from '@corgifm/common/common-utils'
+import {CssColor} from '@corgifm/common/shamu-color'
 import {logger} from '../client-logger'
 import './ExpNodes.less'
 import {ExpNodeDebugView} from './ExpNodeDebugView'
@@ -49,6 +50,10 @@ export abstract class CorgiNode {
 	public abstract render(): ReactElement<any>
 	public abstract dispose(): void
 	public abstract getName(): string
+
+	public getColor(): string {
+		return CssColor.blue
+	}
 
 	public setEnabled(enabled: boolean) {
 		if (enabled === this._enabled) return

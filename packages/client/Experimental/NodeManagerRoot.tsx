@@ -4,8 +4,9 @@ import {
 	IClientAppState, selectExpAllPositions, RoomType,
 } from '@corgifm/common/redux'
 import {useSingletonContext} from '../SingletonContext'
+import {ConnectedGhostConnectionsView} from '../Connections/GhostConnections'
+import {ConnectedExpConnections} from '../Connections/ExpConnections'
 import {NodeManager, NodeManagerContext} from './NodeManager'
-import {ConnectedGhostConnectionsView} from '../Connections/GhostConnections';
 
 export const NodeManagerRoot = () => {
 	const positionIds = useSelector((state: IClientAppState) => selectExpAllPositions(state.room))
@@ -30,6 +31,7 @@ export const NodeManagerRoot = () => {
 	return (
 		<NodeManagerContext.Provider value={nodeManager.reactContext}>
 			<div className={`nodeManagerRoot viewMode-${viewMode}`}>
+				<ConnectedExpConnections />
 				<ConnectedGhostConnectionsView roomType={RoomType.Experimental} />
 				{positionIds.map((_, positionId) => {
 					return nodeManager.renderNodeId(positionId)

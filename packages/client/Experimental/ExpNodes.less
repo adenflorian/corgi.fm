@@ -18,12 +18,18 @@
 	.nodeName {
 		font-size: 1.2em;
 		margin-bottom: 4px;
+		color: @defaultGray;
 	}
 
 	.nodeId {
 		font-size: 0.75em;
 		line-height: 1em;
 		margin-bottom: 4px;
+		color: @knobValueGray;
+	}
+
+	.sectionLabel {
+		color: @defaultGray;
 	}
 
 	.params {
@@ -61,6 +67,7 @@
 			.port {
 				display: flex;
 				align-items: center;
+				padding: 4px 0;
 	
 				&:nth-child(odd) {
 					// background-color: @panelGrayDark;
@@ -68,6 +75,12 @@
 	
 				.portId {
 					margin: 0 4px;
+					color: @defaultGray;
+					@knobLabelFont();
+				}
+				.portName {
+					color: @defaultGray;
+					@knobLabelFont();
 				}
 				.paramValue {
 	
