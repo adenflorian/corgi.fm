@@ -93,10 +93,10 @@ export class ExpNodeAudioConnection {
 	}
 
 	public changeTarget(newTarget: ExpNodeAudioInputPort) {
-		this._source.changeTarget(this._target, newTarget)
 		this._target.disconnect(this)
 		this._target = newTarget
 		this._target.connect(this)
+		this._source.changeTarget(this._target, newTarget)
 	}
 
 	public dispose() {
@@ -184,14 +184,22 @@ export class ExpNodeAudioOutputPort extends ExpNodeAudioPort {
 	}
 
 	public changeTarget = (oldTarget: ExpNodeAudioInputPort, newTarget: ExpNodeAudioInputPort) => {
-		this.source.disconnect(oldTarget.destination as AudioNode)
+		try {
+			this.source.disconnect(oldTarget.destination as AudioNode)
+		} catch (error) {
+			logger.warn('[changeTarget] error while disconnecting ExpNodeAudioOutputPort: ', {error})
+		}
 		if (!this.detectFeedbackLoop()) {
 			this.source.connect(newTarget.destination as AudioNode)
 		}
 	}
 
 	protected _disconnect = (connection: ExpNodeAudioConnection) => {
-		this.source.disconnect(connection.getTarget().destination as AudioNode)
+		try {
+			this.source.disconnect(connection.getTarget().destination as AudioNode)
+		} catch (error) {
+			logger.warn('[_disconnect] error while disconnecting ExpNodeAudioOutputPort: ', {error})
+		}
 	}
 
 	public detectFeedbackLoop(i = 0, nodeIds: Id[] = []): boolean {

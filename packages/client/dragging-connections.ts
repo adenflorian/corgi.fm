@@ -35,11 +35,11 @@ export function handleStopDraggingGhostConnector(
 		? selectExpPosition(roomState, info.nodeId)
 		: selectPosition(roomState, info.nodeId)
 
-	const targetPort = info.portId
+	const mouseUpPort = info.portId
 
 	return getChangeConnectionFunc()(winningPosition, ghostConnection.port)
 
-	function doesConnectionBetweenNodesExistLocal(sourceId: Id, sourcePort: number, targetId: Id) {
+	function doesConnectionBetweenNodesExistLocal(sourceId: Id, sourcePort: number, targetId: Id, targetPort: number) {
 		return roomType === RoomType.Experimental
 			? doesExpConnectionBetweenNodesExist(
 				roomState, sourceId, sourcePort, targetId, targetPort)
@@ -63,10 +63,10 @@ export function handleStopDraggingGhostConnector(
 		const {targetId, targetPort} = getConnection(roomState, movingConnectionId)
 		const sourceId = position.id
 		const sourceType = position.targetType
-		const sourcePort = targetPort
+		const sourcePort = mouseUpPort
 		if (
 			doesConnectionBetweenNodesExistLocal(
-				sourceId, sourcePort, targetId)
+				sourceId, sourcePort, targetId, targetPort)
 		) return
 
 		roomType === RoomType.Experimental
@@ -80,8 +80,6 @@ export function handleStopDraggingGhostConnector(
 				sourceType: sourceType as IPosition['targetType'],
 				sourcePort,
 			}))
-		// getAllInstruments().get(connection.targetId)!
-		// 	.releaseAllScheduledFromSourceId(connection.sourceId)
 	}
 
 	function changeConnectionTarget(position: ConnectionCandidate) {
@@ -92,9 +90,10 @@ export function handleStopDraggingGhostConnector(
 		const {sourceId, sourcePort} = getConnection(roomState, movingConnectionId)
 		const targetId = position.id
 		const targetType = position.targetType
+		const targetPort = mouseUpPort
 		if (
 			doesConnectionBetweenNodesExistLocal(
-				sourceId, sourcePort, targetId)
+				sourceId, sourcePort, targetId, targetPort)
 		) return
 
 		roomType === RoomType.Experimental
@@ -108,8 +107,6 @@ export function handleStopDraggingGhostConnector(
 				targetType: targetType as IPosition['targetType'],
 				targetPort,
 			}))
-		// getAllInstruments().get(connection.targetId)!
-		// 	.releaseAllScheduledFromSourceId(connection.sourceId)
 	}
 
 	function newConnectionToSource(position: ConnectionCandidate, port: number) {
@@ -117,7 +114,7 @@ export function handleStopDraggingGhostConnector(
 
 		if (
 			doesConnectionBetweenNodesExistLocal(
-				position.id, targetPort, parentNodePosition.id)
+				position.id, mouseUpPort, parentNodePosition.id, port)
 		) return
 
 		roomType === RoomType.Experimental
@@ -126,7 +123,7 @@ export function handleStopDraggingGhostConnector(
 				position.targetType as ExpConnection['targetType'],
 				parentNodePosition.id,
 				parentNodePosition.targetType as ExpConnection['targetType'],
-				targetPort,
+				mouseUpPort,
 				port,
 			)))
 			: dispatch(connectionsActions.add(new Connection(
@@ -134,7 +131,7 @@ export function handleStopDraggingGhostConnector(
 				position.targetType as IPosition['targetType'],
 				parentNodePosition.id,
 				parentNodePosition.targetType as IPosition['targetType'],
-				targetPort,
+				mouseUpPort,
 				port,
 			)))
 	}
@@ -144,7 +141,7 @@ export function handleStopDraggingGhostConnector(
 
 		if (
 			doesConnectionBetweenNodesExistLocal(
-				parentNodePosition.id, port, position.id)
+				parentNodePosition.id, port, position.id, mouseUpPort)
 		) return
 
 		roomType === RoomType.Experimental
@@ -154,7 +151,7 @@ export function handleStopDraggingGhostConnector(
 				position.id,
 				position.targetType as ExpConnection['targetType'],
 				port,
-				targetPort,
+				mouseUpPort,
 			)))
 			: dispatch(connectionsActions.add(new Connection(
 				parentNodePosition.id,
@@ -162,7 +159,7 @@ export function handleStopDraggingGhostConnector(
 				position.id,
 				position.targetType as IPosition['targetType'],
 				port,
-				targetPort,
+				mouseUpPort,
 			)))
 	}
 

@@ -126,7 +126,7 @@ export class NodeManager {
 		// Get and connect ports
 		const sourcePort = source.getAudioOutputPort(expConnection.sourcePort)
 		const targetPort = target.getAudioInputPort(expConnection.targetPort)
-		if (!sourcePort || !targetPort) return logger.warn('404 port not found: ', {sourcePort, targetPort})
+		if (!sourcePort || !targetPort) return logger.warn('[addAudioConnection] 404 port not found: ', {node: this, sourcePort, targetPort})
 
 		// Create connection
 		const connection = new ExpNodeAudioConnection(expConnection.id, sourcePort, targetPort)
@@ -158,7 +158,7 @@ export class NodeManager {
 
 		// Get and connect ports
 		const sourcePort = source.getAudioOutputPort(newSourcePort)
-		if (!sourcePort) return logger.warn('404 port not found: ', {sourcePort})
+		if (!sourcePort) return logger.warn('[changeAudioConnectionSource] 404 port not found: ', {node: this, sourcePort})
 
 		// Disconnect old source
 		connection.changeSource(sourcePort)
@@ -175,7 +175,7 @@ export class NodeManager {
 
 		// Get and connect ports
 		const targetPort = target.getAudioInputPort(newTargetPort)
-		if (!targetPort) return logger.warn('404 port not found: ', {targetPort})
+		if (!targetPort) return logger.warn('[changeAudioConnectionTarget] 404 port not found: ', {node: this, targetPort})
 
 		// Disconnect old target
 		connection.changeTarget(targetPort)
