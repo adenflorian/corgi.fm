@@ -36,8 +36,10 @@ interface IExpConnectionViewReduxProps {
 	localClientId: ClientId
 	sourceX: number
 	sourceY: number
+	sourceZ: number
 	targetX: number
 	targetY: number
+	targetZ: number
 	saturateSource: boolean
 	saturateTarget: boolean
 	sourceStackOrder?: number
@@ -58,7 +60,9 @@ const joint = 8
 export const ExpConnectionView =
 	React.memo(function _ExpConnectionView(props: IExpConnectionViewAllProps) {
 		const {
-			saturateSource, saturateTarget, id, sourceX, sourceY, targetX, targetY,
+			saturateSource, saturateTarget, id,
+			sourceX, sourceY, sourceZ,
+			targetX, targetY, targetZ,
 			targetStackOrder = 0, sourceStackOrder = 0, speed = 1, lineType,
 			isSourcePlaying, highQuality, localClientId, connection,
 		} = props
@@ -113,10 +117,10 @@ export const ExpConnectionView =
 
 		const nodeManagerContext = useNodeManagerContext()
 
-		const nodeInfo = nodeManagerContext.getNodeInfo(connection.sourceId)
+		const sourceNodeInfo = nodeManagerContext.getNodeInfo(connection.sourceId)
 
-		const color = nodeInfo
-			? nodeInfo.color
+		const color = sourceNodeInfo
+			? sourceNodeInfo.color
 			: CssColor.blue
 
 		return (
@@ -133,12 +137,14 @@ export const ExpConnectionView =
 					isSourcePlaying={isSourcePlaying}
 					highQuality={highQuality}
 					onDelete={onDelete}
+					z={Math.max(sourceZ, targetZ) - 1}
 				/>
 				<Connector
 					width={connectorWidth}
 					height={connectorHeight}
 					x={sourceConnectorLeft}
 					y={sourceY}
+					z={sourceZ}
 					saturate={highQuality ? (saturateSource || isSourcePlaying) : isSourcePlaying}
 					title={longLineTooltip}
 					svgProps={{
@@ -160,6 +166,7 @@ export const ExpConnectionView =
 					height={connectorHeight}
 					x={targetConnectorLeft}
 					y={targetY}
+					z={targetZ}
 					saturate={highQuality ? (saturateTarget || isSourcePlaying) : isSourcePlaying}
 					title={longLineTooltip}
 					svgProps={{
@@ -222,8 +229,10 @@ export const ConnectedExpConnectionView = shamuConnect(
 			targetStackOrder: selectExpConnectionStackOrderForTarget(state.room, props.id),
 			sourceX: sourcePosition.x + sourcePosition.width,
 			sourceY: calculateExpConnectorPositionY(sourcePosition.y, sourcePosition.height, 1, connection.sourcePort),
+			sourceZ: sourcePosition.zIndex,
 			targetX: targetPosition.x,
 			targetY: calculateExpConnectorPositionY(targetPosition.y, targetPosition.height, 1, connection.targetPort),
+			targetZ: targetPosition.zIndex,
 			saturateSource: isSourceActive || isSourceSending,
 			saturateTarget: isSourceSending,
 			connection,
@@ -264,8 +273,10 @@ export const ConnectedExpConnectionDebugView = shamuConnect(
 			targetStackOrder: selectExpConnectionStackOrderForTarget(state.room, props.id),
 			sourceX: sourcePosition.x + sourcePosition.width - xAdjust,
 			sourceY: calculateExpDebugConnectorY(sourcePosition.y, connection.sourcePort),
+			sourceZ: sourcePosition.zIndex,
 			targetX: targetPosition.x + xAdjust,
 			targetY: calculateExpDebugConnectorY(targetPosition.y, connection.targetPort),
+			targetZ: targetPosition.zIndex,
 			saturateSource: isSourceActive || isSourceSending,
 			saturateTarget: isSourceSending,
 			connection,

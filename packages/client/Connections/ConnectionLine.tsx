@@ -16,13 +16,14 @@ interface ConnectionLineProps {
 	isSourcePlaying: boolean
 	highQuality: boolean
 	onDelete: () => void
+	z?: number
 }
 
 export const ConnectionLine = React.memo(
 	function _ConnectionLine(
 		{
 			id, color, saturateSource, saturateTarget, pathDPart1,
-			pathDFull, connectedLine, speed = 1,
+			pathDFull, connectedLine, speed = 1, z = undefined,
 			isSourcePlaying, highQuality, onDelete,
 		}: ConnectionLineProps,
 	) {
@@ -37,6 +38,7 @@ export const ConnectionLine = React.memo(
 					pointerEvents: 'none',
 					color,
 					fill: 'none',
+					zIndex: z,
 				}}
 			>
 				<defs>

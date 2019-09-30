@@ -39,6 +39,7 @@ export class NodeManager {
 
 				if (!node) return logger.warn('[getNodeInfo] 404 node not found: ', {nodeId})
 
+				// Only static info should go in here
 				return {
 					audioInputPortCount: node.getAudioInputPortCount(),
 					audioOutputPortCount: node.getAudioOutputPortCount(),

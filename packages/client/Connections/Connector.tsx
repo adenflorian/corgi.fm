@@ -7,6 +7,7 @@ interface ConnectorProps {
 	saturate: boolean
 	x?: number
 	y?: number
+	z?: number
 	svgProps?: React.SVGProps<SVGSVGElement>
 	isPlaceHolderForNewConnection?: boolean
 	title?: string
@@ -14,7 +15,7 @@ interface ConnectorProps {
 
 export const Connector: React.FC<ConnectorProps> =
 	React.memo(function _Connector({
-		width, height, saturate = false, x = 0, y = 0, svgProps = {},
+		width, height, saturate = false, x = 0, y = 0, z = undefined, svgProps = {},
 		isPlaceHolderForNewConnection, title,
 	}) {
 		return (
@@ -26,6 +27,7 @@ export const Connector: React.FC<ConnectorProps> =
 					style={{
 						width,
 						height,
+						zIndex: z,
 						transform: `translate(${x}px, ${y - (height / 2)}px)`,
 						opacity: isPlaceHolderForNewConnection
 							? 0.5

@@ -31,11 +31,12 @@ export const NodeManagerRoot = () => {
 	return (
 		<NodeManagerContext.Provider value={nodeManager.reactContext}>
 			<div className={`nodeManagerRoot viewMode-${viewMode}`}>
-				<ConnectedExpConnections />
 				<ConnectedGhostConnectionsView roomType={RoomType.Experimental} />
 				{positionIds.map((_, positionId) => {
 					return nodeManager.renderNodeId(positionId)
 				}).toList()}
+				{/* Render connections after some the connectors render on top of nodes */}
+				<ConnectedExpConnections />
 			</div>
 		</NodeManagerContext.Provider>
 	)

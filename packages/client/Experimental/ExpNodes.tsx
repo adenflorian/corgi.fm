@@ -1,7 +1,7 @@
 import {ExpNodeType} from '@corgifm/common/redux'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {logger} from '../client-logger'
-import {percentageValueString, filterValueToString} from '../client-constants'
+import {percentageValueString, filterValueToString, panValueToString} from '../client-constants'
 import {
 	ExpAudioParam, ExpNodeAudioPort, AudioParamChange,
 	ExpNodeConnection,
@@ -345,6 +345,67 @@ export class ExpGainNode extends CorgiNode {
 	}
 }
 
+export class ExpPanNode extends CorgiNode {
+	private readonly _pan: StereoPannerNode
+	private readonly _dryWetChain: DryWetChain
+
+	public constructor(
+		id: Id, audioContext: AudioContext, preMasterLimiter: GainNode,
+	) {
+		const pan = audioContext.createStereoPanner()
+
+		const dryWetChain = new DryWetChain(audioContext, pan)
+
+		const inPorts: readonly ExpNodeAudioInputPortArgs[] = [
+			{id: 0, name: 'input', destination: dryWetChain.inputGain},
+			{id: 1, name: 'pan', destination: pan.pan},
+		]
+		const outPorts: readonly ExpNodeAudioOutputPortArgs[] = [
+			{id: 0, name: 'output', source: dryWetChain.outputGain},
+		]
+
+		const audioParams = new Map<Id, ExpAudioParam>([
+			buildAudioParamDesc('pan', pan.pan, 0, -1, 1, 1, panValueToString),
+		])
+
+		super(id, audioContext, preMasterLimiter, inPorts, outPorts, audioParams)
+
+		// Make sure to add these to the dispose method!
+		this._pan = pan
+		this._dryWetChain = dryWetChain
+	}
+
+	public getColor(): string {
+		return CssColor.purple
+	}
+
+	public getName() {return 'Pan'}
+
+	public onParamChange(paramChange: AudioParamChange) {
+
+		// Render view
+
+		// Change value on web audio oscillator
+	}
+
+	public render() {
+		return this.getDebugView()
+	}
+
+	protected _enable() {
+		this._dryWetChain.wetOnly()
+	}
+
+	protected _disable() {
+		this._dryWetChain.dryOnly()
+	}
+
+	protected _dispose() {
+		this._pan.disconnect()
+		this._dryWetChain.dispose()
+	}
+}
+
 // Is there a way to use class decorators to create this map at runtime?
 export const typeClassMap: {readonly [key in ExpNodeType]: new (id: Id, context: AudioContext, preMasterLimiter: GainNode) => CorgiNode} = {
 	oscillator: OscillatorExpNode,
@@ -352,6 +413,7 @@ export const typeClassMap: {readonly [key in ExpNodeType]: new (id: Id, context:
 	filter: FilterNode,
 	audioOutput: AudioOutputExpNode,
 	gain: ExpGainNode,
+	pan: ExpPanNode,
 }
 
 type ParamTypeStrings = 'number' | 'string' | 'boolean'
