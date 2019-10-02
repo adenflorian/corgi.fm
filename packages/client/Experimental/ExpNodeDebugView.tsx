@@ -1,20 +1,24 @@
 import React from 'react'
 import {logger} from '../client-logger'
 import {
-	ExpAudioParams, ExpNodeAudioInputPorts, ExpNodeAudioOutputPorts,
-} from './ExpTypes'
-import {ExpNodeDebugKnob} from './ExpNodeDebugKnob'
+	ExpNodeAudioInputPorts, ExpNodeAudioOutputPorts,
+} from './ExpPorts'
+import {ExpNodeDebugAudioParamKnob} from './ExpNodeDebugAudioParamKnob'
+import {ExpAudioParams, ExpCustomNumberParams} from './ExpParams'
+import {ExpNodeDebugCustomNumberParamKnob} from './ExpNodeDebugCustomNumberParamKnob'
 
 interface Props {
 	nodeId: Id
 	nodeName: string
 	audioParams: ExpAudioParams
+	customNumberParams: ExpCustomNumberParams
 	audioInputPorts: ExpNodeAudioInputPorts
 	audioOutputPorts: ExpNodeAudioOutputPorts
 }
 
 export const ExpNodeDebugView = React.memo(function _ExpNodeDebugView({
-	nodeId, nodeName, audioParams, audioInputPorts, audioOutputPorts,
+	nodeId, nodeName, audioParams, customNumberParams,
+	audioInputPorts, audioOutputPorts,
 }: Props) {
 	logger.log('ExpNodeDebugView render')
 	return (
@@ -44,7 +48,8 @@ export const ExpNodeDebugView = React.memo(function _ExpNodeDebugView({
 				</div>
 			</div>
 			<div className="params">
-				<div className="sectionLabel">Audio Params</div>
+				{audioParams.size > 0 &&
+					<div className="sectionLabel">Audio Params</div>}
 				{/* <div className="paramTexts">
 					{[...audioParams].map(([id, audioParam]) => (
 						<div className="param" key={id as string}>
@@ -55,10 +60,21 @@ export const ExpNodeDebugView = React.memo(function _ExpNodeDebugView({
 				</div> */}
 				<div className="paramKnobs">
 					{[...audioParams].map(([id, audioParam]) => (
-						<ExpNodeDebugKnob
+						<ExpNodeDebugAudioParamKnob
 							key={id as string}
 							nodeId={nodeId}
 							audioParam={audioParam}
+						/>
+					))}
+				</div>
+				{customNumberParams.size > 0 &&
+					<div className="sectionLabel">Custom Number Params</div>}
+				<div className="paramKnobs">
+					{[...customNumberParams].map(([id, customNumberParam]) => (
+						<ExpNodeDebugCustomNumberParamKnob
+							key={id as string}
+							nodeId={nodeId}
+							customNumberParam={customNumberParam}
 						/>
 					))}
 				</div>

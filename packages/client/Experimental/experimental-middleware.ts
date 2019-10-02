@@ -52,8 +52,11 @@ function foo(
 		case 'EXP_NODE_REPLACE_ALL':
 			return nodeManager.addNodes(getNodes())
 
-		case 'EXP_NODE_PARAM_CHANGE':
+		case 'EXP_NODE_AUDIO_PARAM_CHANGE':
 			return nodeManager.onAudioParamChange(action)
+
+		case 'EXP_NODE_CUSTOM_NUMBER_PARAM_CHANGE':
+			return nodeManager.onCustomNumberParamChange(action)
 
 		case 'EXP_NODE_SET_ENABLED':
 			return nodeManager.enableNode(action.nodeId, action.enabled)

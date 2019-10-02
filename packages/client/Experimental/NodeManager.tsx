@@ -2,11 +2,12 @@ import React, {Fragment, useContext} from 'react'
 import * as immutable from 'immutable'
 import {ExpNodeState, IExpConnection} from '@corgifm/common/redux'
 import {logger} from '../client-logger'
+import {ConnectedExpConnectorPlaceholders} from '../Connections/ConnectorPlaceholders'
+import {ConnectedSimpleGraphNodeExp} from '../SimpleGraph/SimpleGraphNodeExp'
 import {typeClassMap} from './ExpNodes'
 import {CorgiNode, ExpNodeContext} from './CorgiNode'
-import {AudioParamChange, ExpNodeAudioConnection} from './ExpTypes'
-import {ConnectedExpConnectorPlaceholders} from '../Connections/ConnectorPlaceholders';
-import {ConnectedSimpleGraphNodeExp} from '../SimpleGraph/SimpleGraphNodeExp';
+import {ExpNodeAudioConnection} from './ExpConnections'
+import {NumberParamChange} from './ExpParams'
 
 export const NodeManagerContext = React.createContext<null | NodeManagerContextValue>(null)
 
@@ -94,12 +95,20 @@ export class NodeManager {
 		node.setEnabled(enabled)
 	}
 
-	public onAudioParamChange = (paramChange: AudioParamChange) => {
+	public onAudioParamChange = (paramChange: NumberParamChange) => {
 		const node = this._nodes.get(paramChange.nodeId)
 
 		if (!node) return logger.warn('[onAudioParamChange] 404 node not found: ', {paramChange})
 
 		node.onAudioParamChange(paramChange.paramId, paramChange.newValue)
+	}
+
+	public onCustomNumberParamChange = (paramChange: NumberParamChange) => {
+		const node = this._nodes.get(paramChange.nodeId)
+
+		if (!node) return logger.warn('[onCustomNumberParamChange] 404 node not found: ', {paramChange})
+
+		node.onCustomNumberParamChange(paramChange.paramId, paramChange.newValue)
 	}
 
 	public addNodes = (newNodes: immutable.Map<Id, ExpNodeState>) => {

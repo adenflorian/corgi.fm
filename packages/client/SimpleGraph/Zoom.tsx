@@ -156,7 +156,7 @@ export const ConnectedZoom = React.memo(function _Zoom({
 	}, [clampPan, updateRefs])
 
 	const onBgMouseEvent = useCallback((e: React.MouseEvent) => {
-		if (e.type === 'mousedown') {
+		if (e.type === 'mousedown' && (e.buttons === 1 || (e.buttons === 4 && !e.shiftKey))) {
 			setBackgroundClicked(true)
 			setStartZoom(simpleGlobalClientState.zoom)
 		}
@@ -174,7 +174,7 @@ export const ConnectedZoom = React.memo(function _Zoom({
 	}, [doPan, doZoom, requireCtrlToZoom])
 
 	const onMouseMove = useCallback((e: MouseEvent) => {
-		if (e.buttons !== 1 && backgroundClicked) {
+		if (backgroundClicked && (e.buttons !== 1 && e.buttons !== 4)) {
 			setBackgroundClicked(false)
 		}
 		if (e.buttons === 4 && !e.shiftKey) {

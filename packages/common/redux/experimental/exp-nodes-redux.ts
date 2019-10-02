@@ -3,8 +3,8 @@ import {ActionType} from 'typesafe-actions'
 import * as uuid from 'uuid'
 import {
 	BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION, ExpNodeType,
+	IClientAppState,
 } from '..'
-import {IClientAppState} from '../common-redux-types';
 
 export type ExpParamValue = string | boolean | number
 
@@ -28,8 +28,17 @@ export const expNodesActions = {
 		isExpNodeAction: true,
 		state,
 	} as const),
-	paramChange: (nodeId: Id, paramId: Id, newValue: number) => ({
-		type: 'EXP_NODE_PARAM_CHANGE' as const,
+	audioParamChange: (nodeId: Id, paramId: Id, newValue: number) => ({
+		type: 'EXP_NODE_AUDIO_PARAM_CHANGE' as const,
+		isExpNodeAction: true,
+		nodeId,
+		paramId,
+		newValue,
+		BROADCASTER_ACTION,
+		SERVER_ACTION,
+	} as const),
+	customNumberParamChange: (nodeId: Id, paramId: Id, newValue: number) => ({
+		type: 'EXP_NODE_CUSTOM_NUMBER_PARAM_CHANGE' as const,
 		isExpNodeAction: true,
 		nodeId,
 		paramId,
@@ -52,6 +61,7 @@ const defaultExpNodeState = {
 	id: 'dummyId' as Id,
 	type: 'dummy' as ExpNodeType,
 	audioParams: Map<Id, number>(),
+	customNumberParams: Map<Id, number>(),
 	enabled: true,
 }
 
@@ -63,13 +73,16 @@ export function makeExpNodeState(node: Exclude<Partial<typeof defaultExpNodeStat
 	return _makeExpNodeState(node)
 		.set('id', node.id || uuid.v4())
 		.set('audioParams', Map(node.audioParams || Map()))
+		.set('customNumberParams', Map(node.customNumberParams || Map()))
 }
 
 export interface ExpNodeState extends ReturnType<typeof _makeExpNodeState> {}
 
 export type ExpNodeType = typeof expNodeTypes[number]
 
-export const expNodeTypes = ['oscillator', 'filter', 'dummy', 'audioOutput', 'gain', 'pan'] as const
+export const expNodeTypes = [
+	'oscillator', 'filter', 'dummy', 'audioOutput', 'gain', 'pan', 'envelope',
+] as const
 
 const initialState = Map<Id, ExpNodeState>()
 
@@ -80,8 +93,10 @@ export const expNodesReducer = (state = initialState, action: ExpNodesAction): E
 		case 'EXP_NODE_ADD': return state.set(action.newNode.id, makeExpNodeState(action.newNode))
 		case 'EXP_NODE_DELETE': return state.delete(action.nodeId)
 		case 'EXP_NODE_REPLACE_ALL': return state.clear().merge(action.state).map(x => makeExpNodeState(x))
-		case 'EXP_NODE_PARAM_CHANGE': return state.update(
+		case 'EXP_NODE_AUDIO_PARAM_CHANGE': return state.update(
 			action.nodeId, x => x.update('audioParams', audioParams => audioParams.set(action.paramId, action.newValue)))
+		case 'EXP_NODE_CUSTOM_NUMBER_PARAM_CHANGE': return state.update(
+			action.nodeId, x => x.update('customNumberParams', customNumberParams => customNumberParams.set(action.paramId, action.newValue)))
 		case 'EXP_NODE_SET_ENABLED': return state.update(
 			action.nodeId, x => x.set('enabled', action.enabled))
 		default: return state

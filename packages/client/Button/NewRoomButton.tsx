@@ -77,7 +77,7 @@ export const NewRoomModalContent: ModalContent = ({hideModal}) => {
 							disabled={inputsDisabled}
 							required
 						/>
-						<Select
+						{/* {isLocalDevClient() && <Select
 							label="Room Name"
 							name="roomName"
 							onChange={setType}
@@ -85,7 +85,7 @@ export const NewRoomModalContent: ModalContent = ({hideModal}) => {
 							value={type}
 							disabled={inputsDisabled}
 							required
-						/>
+						/>} */}
 						<div className="submitRow">
 							<input
 								type="submit"

@@ -1,15 +1,19 @@
 import {ExpNodeType} from '@corgifm/common/redux'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {logger} from '../client-logger'
-import {percentageValueString, filterValueToString, panValueToString} from '../client-constants'
 import {
-	ExpAudioParam, ExpNodeAudioPort, AudioParamChange,
-	ExpNodeConnection,
-	buildAudioParamDesc,
-	ExpNodeAudioInputPortArgs,
-	ExpNodeAudioOutputPortArgs,
-} from './ExpTypes'
+	percentageValueString, filterValueToString,
+	panValueToString, adsrValueToString, gainDecibelValueToString,
+} from '../client-constants'
+import {
+	ExpNodeAudioPort, ExpNodeAudioInputPortArgs, ExpNodeAudioOutputPortArgs,
+} from './ExpPorts'
 import {CorgiNode} from './CorgiNode'
+import {
+	ExpAudioParam, buildAudioParamDesc, NumberParamChange,
+	ExpCustomNumberParam, buildCustomNumberParamDesc,
+} from './ExpParams'
+import {ExpNodeConnection} from './ExpConnections'
 import './ExpNodes.less'
 
 export class OscillatorExpNode extends CorgiNode {
@@ -52,18 +56,18 @@ export class OscillatorExpNode extends CorgiNode {
 
 	public getName() {return 'Oscillator'}
 
-	public onParamChange(paramChange: AudioParamChange) {
-		switch (paramChange.paramId) {
-			case 'wave': return isOscillatorType(paramChange.newValue) && this._changeOscillatorType(paramChange.newValue)
-			default: return logger.warn('unexpected param id: ', {paramChange})
-		}
+	public onNumberParamChange(paramChange: NumberParamChange) {
+		// switch (paramChange.paramId) {
+		// 	case 'wave': return isOscillatorType(paramChange.newValue) && this._changeOscillatorType(paramChange.newValue)
+		// 	default: return logger.warn('unexpected param id: ', {paramChange})
+		// }
 		// Render view
 		// Change value on web audio oscillator
 	}
 
-	private _changeOscillatorType(newValue: OscillatorType) {
-		this._oscillator.type = newValue
-	}
+	// private _changeOscillatorType(newValue: OscillatorType) {
+	// 	this._oscillator.type = newValue
+	// }
 
 	// eslint-disable-next-line no-empty-function
 	public onNewAudioOutConnection(port: ExpNodeAudioPort, connection: ExpNodeConnection) {
@@ -112,10 +116,8 @@ export class AudioOutputExpNode extends CorgiNode {
 
 	public getName() {return 'Audio Output'}
 
-	public onParamChange(paramChange: AudioParamChange) {
-
+	public onNumberParamChange(paramChange: NumberParamChange) {
 		// Render view
-
 		// Change value on web audio oscillator
 	}
 
@@ -149,10 +151,8 @@ export class DummyNode extends CorgiNode {
 
 	public getName() {return 'Dummy'}
 
-	public onParamChange(paramChange: AudioParamChange) {
-
+	public onNumberParamChange(paramChange: NumberParamChange) {
 		// Render view
-
 		// Change value on web audio oscillator
 	}
 
@@ -214,10 +214,8 @@ export class FilterNode extends CorgiNode {
 
 	public getName() {return 'Filter'}
 
-	public onParamChange(paramChange: AudioParamChange) {
-
+	public onNumberParamChange(paramChange: NumberParamChange) {
 		// Render view
-
 		// Change value on web audio oscillator
 	}
 
@@ -287,24 +285,35 @@ class DryWetChain {
 export class ExpGainNode extends CorgiNode {
 	private readonly _gain: GainNode
 	private readonly _dryWetChain: DryWetChain
+	private readonly _gainParamWaveShaper: WaveShaperNode
+	private readonly _gainConstantSource: ConstantSourceNode
 
 	public constructor(
 		id: Id, audioContext: AudioContext, preMasterLimiter: GainNode,
 	) {
 		const gain = audioContext.createGain()
+		gain.gain.value = 0
+		const gainParamWaveShaper = audioContext.createWaveShaper()
+		const gainConstantSource = audioContext.createConstantSource()
+
+		gainParamWaveShaper.curve = new Float32Array([0, 0, 1])
+
+		gainConstantSource.connect(gainParamWaveShaper).connect(gain.gain)
+		gainConstantSource.start()
 
 		const dryWetChain = new DryWetChain(audioContext, gain)
 
 		const inPorts: readonly ExpNodeAudioInputPortArgs[] = [
 			{id: 0, name: 'input', destination: dryWetChain.inputGain},
-			{id: 1, name: 'gain', destination: gain.gain},
+			{id: 1, name: 'gain', destination: gainParamWaveShaper},
 		]
 		const outPorts: readonly ExpNodeAudioOutputPortArgs[] = [
 			{id: 0, name: 'output', source: dryWetChain.outputGain},
 		]
 
 		const audioParams = new Map<Id, ExpAudioParam>([
-			buildAudioParamDesc('gain', gain.gain, 1, 0, 2, 1, percentageValueString),
+			buildAudioParamDesc('gain', gainConstantSource.offset, 1, 0, 1, 1, gainDecibelValueToString),
+			// buildAudioParamDesc('gain', gain.gain, 1, 0, 10, 3.33, gainDecibelValueToString),
 		])
 
 		super(id, audioContext, preMasterLimiter, inPorts, outPorts, audioParams)
@@ -312,6 +321,8 @@ export class ExpGainNode extends CorgiNode {
 		// Make sure to add these to the dispose method!
 		this._gain = gain
 		this._dryWetChain = dryWetChain
+		this._gainParamWaveShaper = gainParamWaveShaper
+		this._gainConstantSource = gainConstantSource
 	}
 
 	public getColor(): string {
@@ -320,7 +331,7 @@ export class ExpGainNode extends CorgiNode {
 
 	public getName() {return 'Gain'}
 
-	public onParamChange(paramChange: AudioParamChange) {
+	public onNumberParamChange(paramChange: NumberParamChange) {
 
 		// Render view
 
@@ -342,6 +353,9 @@ export class ExpGainNode extends CorgiNode {
 	protected _dispose() {
 		this._gain.disconnect()
 		this._dryWetChain.dispose()
+		this._gainParamWaveShaper.disconnect()
+		this._gainConstantSource.stop()
+		this._gainConstantSource.disconnect()
 	}
 }
 
@@ -381,7 +395,7 @@ export class ExpPanNode extends CorgiNode {
 
 	public getName() {return 'Pan'}
 
-	public onParamChange(paramChange: AudioParamChange) {
+	public onNumberParamChange(paramChange: NumberParamChange) {
 
 		// Render view
 
@@ -406,6 +420,123 @@ export class ExpPanNode extends CorgiNode {
 	}
 }
 
+const longTime = 999999999
+
+export class EnvelopeNode extends CorgiNode {
+	private readonly _constantSource: ConstantSourceNode
+	private readonly _outputGain: GainNode
+	private _intervalId: NodeJS.Timeout
+
+	public constructor(
+		id: Id, audioContext: AudioContext, preMasterLimiter: GainNode,
+	) {
+		const constantSource = audioContext.createConstantSource()
+		const outputGain = audioContext.createGain()
+
+		constantSource.offset.value = 0
+		constantSource.connect(outputGain)
+		constantSource.start()
+		constantSource.offset.linearRampToValueAtTime(0, longTime)
+
+		const inPorts: readonly ExpNodeAudioInputPortArgs[] = [
+		]
+		const outPorts: readonly ExpNodeAudioOutputPortArgs[] = [
+			{id: 0, name: 'output', source: outputGain},
+		]
+
+		const audioParams = new Map<Id, ExpAudioParam>([
+		])
+
+		const customNumberParams = new Map<Id, ExpCustomNumberParam>([
+			// buildCustomNumberParamDesc('attack', 0.0005, 0.0005, 0, 32, 3, adsrValueToString),
+			// buildCustomNumberParamDesc('hold', 0, 0, 0, 32, 3, adsrValueToString),
+			// buildCustomNumberParamDesc('decay', 1, 1, 0, 32, 3, adsrValueToString),
+			// buildCustomNumberParamDesc('sustain', 1, 1, 0, 1, 1, gainDecibelValueToString),
+			// buildCustomNumberParamDesc('release', 0.015, 0.015, 0, 32, 3, adsrValueToString),
+			buildCustomNumberParamDesc('attack', 0.5, 0.5, 0, 32, 3, adsrValueToString),
+			buildCustomNumberParamDesc('hold', 0, 0, 0, 32, 3, adsrValueToString),
+			buildCustomNumberParamDesc('decay', 0, 0, 0, 32, 3, adsrValueToString),
+			buildCustomNumberParamDesc('sustain', 0, 0, 0, 1, 1, gainDecibelValueToString),
+			buildCustomNumberParamDesc('release', 0, 0, 0, 32, 3, adsrValueToString),
+		])
+
+		super(id, audioContext, preMasterLimiter, inPorts, outPorts, audioParams, customNumberParams)
+
+		// Make sure to add these to the dispose method!
+		this._constantSource = constantSource
+		this._outputGain = outputGain
+		// TODO Temporary
+		this._intervalId = setInterval(() => {
+			this.receiveGateSignal(true, this.audioContext.currentTime + 0.5)
+			this.receiveGateSignal(false, this.audioContext.currentTime + 1.5)
+		}, 1000)
+	}
+
+	public getColor(): string {
+		return CssColor.blue
+	}
+
+	public getName() {return 'Envelope'}
+
+	public onNumberParamChange(paramChange: NumberParamChange) {
+		switch (paramChange.paramId) {
+			case 'attack': return
+			case 'decay': return
+			case 'sustain': return
+			case 'release': return
+			default: return logger.warn('unhandled number param change: ', {paramChange})
+		}
+	}
+
+	public receiveGateSignal(signal: boolean, start: number) {
+		const offset = this._constantSource.offset
+		if (signal) {
+			const attackEnd = start + this._attackSeconds
+			const holdEnd = attackEnd + this._holdSeconds
+			const decayEnd = holdEnd + this._decaySeconds
+			const farOut = decayEnd + longTime
+			offset.cancelAndHoldAtTime(start)
+			offset.linearRampToValueAtTime(1, attackEnd)
+			offset.linearRampToValueAtTime(1, holdEnd)
+			offset.linearRampToValueAtTime(Math.max(0.0001, this._sustain), decayEnd)
+			offset.linearRampToValueAtTime(this._sustain, farOut)
+		} else {
+			const releaseEnd = start + this._releaseSeconds
+			const farOut = releaseEnd + longTime
+			offset.cancelAndHoldAtTime(start)
+			offset.linearRampToValueAtTime(0.0001, releaseEnd)
+			offset.linearRampToValueAtTime(0, farOut)
+		}
+		// farOut is to provide an event to be canceled so an anchor point can
+		// be created whenever cancelAndHoldAtTime is called.
+	}
+
+	private get _attackSeconds() {return this._customNumberParams.get('attack')!.value}
+	private get _holdSeconds() {return this._customNumberParams.get('hold')!.value}
+	private get _decaySeconds() {return this._customNumberParams.get('decay')!.value}
+	private get _sustain() {return this._customNumberParams.get('sustain')!.value}
+	private get _releaseSeconds() {return this._customNumberParams.get('release')!.value}
+
+	public render() {
+		return this.getDebugView()
+	}
+
+	protected _enable() {
+		this._outputGain.gain.value = 1
+	}
+
+	protected _disable() {
+		this._outputGain.gain.value = 0
+	}
+
+	protected _dispose() {
+		this._constantSource.stop()
+		this._constantSource.disconnect()
+		this._outputGain.disconnect()
+		clearInterval(this._intervalId)
+	}
+}
+
 // Is there a way to use class decorators to create this map at runtime?
 export const typeClassMap: {readonly [key in ExpNodeType]: new (id: Id, context: AudioContext, preMasterLimiter: GainNode) => CorgiNode} = {
 	oscillator: OscillatorExpNode,
@@ -414,48 +545,5 @@ export const typeClassMap: {readonly [key in ExpNodeType]: new (id: Id, context:
 	audioOutput: AudioOutputExpNode,
 	gain: ExpGainNode,
 	pan: ExpPanNode,
-}
-
-type ParamTypeStrings = 'number' | 'string' | 'boolean'
-
-// function ifTypeThenDo(type: 'number' ) {
-
-// }
-
-function isNumber(val: unknown): val is number {
-	return typeof val === 'number'
-}
-
-function isFrequency(val: unknown): val is EPTFrequency {
-	return typeof val === 'number'
-}
-
-function isString(val: unknown): val is string {
-	return typeof val === 'string'
-}
-
-function isBoolean(val: unknown): val is boolean {
-	return typeof val === 'boolean'
-}
-
-const oscillatorTypes = Object.freeze([
-	'sine', 'square', 'sawtooth', 'triangle', 'custom',
-])
-
-type EPTFrequency = number
-
-type ExpParamTypeGuard<T> = (val: unknown) => val is T
-
-export const expParamTypeGuards = {
-	Frequency: isFrequency,
-	Boolean: isBoolean,
-	OscillatorType: isOscillatorType,
-} as const
-
-function isOscillatorType(val: unknown): val is OscillatorType {
-	if (isString(val)) {
-		return oscillatorTypes.includes(val)
-	} else {
-		return false
-	}
+	envelope: EnvelopeNode,
 }

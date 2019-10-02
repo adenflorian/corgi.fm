@@ -159,6 +159,10 @@ export function adsrValueToString(ms: number) {
 	return (ms).toFixed(1) + ' s'
 }
 
+export function gainDecibelValueToString(gain: number) {
+	return (20 * Math.log10(gain)).toFixed(2) + ' dB'
+}
+
 export const graphStateSaveLocalStorageKeyPrefix = 'localSave_'
 export const graphStateSavesLocalStorageKey = 'localSaves'
 

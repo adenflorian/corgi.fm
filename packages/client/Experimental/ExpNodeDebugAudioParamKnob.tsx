@@ -3,22 +3,20 @@ import {useDispatch} from 'react-redux'
 import {expNodesActions} from '@corgifm/common/redux'
 import {Knob} from '../Knob/Knob'
 import {logger} from '../client-logger'
-import {
-	ExpAudioParam,
-} from './ExpTypes'
 import {useAudioParam} from './hooks/useAudioParam'
+import {ExpAudioParam} from './ExpParams'
 
 interface Props {
 	nodeId: Id
 	audioParam: ExpAudioParam
 }
 
-export const ExpNodeDebugKnob = React.memo(function _ExpNodeDebugKnob({
+export const ExpNodeDebugAudioParamKnob = React.memo(function _ExpNodeDebugAudioParamKnob({
 	nodeId, audioParam,
 }: Props) {
 	const dispatch = useDispatch()
 	const onAudioParamChange = useCallback((_, newValue: number) => {
-		dispatch(expNodesActions.paramChange(nodeId, audioParam.id, newValue))
+		dispatch(expNodesActions.audioParamChange(nodeId, audioParam.id, newValue))
 	}, [audioParam.id, dispatch, nodeId])
 	useEffect(() => {
 		logger.log('mount')

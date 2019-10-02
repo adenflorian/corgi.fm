@@ -6,13 +6,17 @@ import {logger} from '../client-logger'
 import './ExpNodes.less'
 import {ExpNodeDebugView} from './ExpNodeDebugView'
 import {
-	ExpNodeAudioPort, AudioParamChange,
+	ExpNodeAudioPort,
 	ExpNodeAudioInputPorts, ExpNodeAudioInputPort,
 	ExpNodeAudioOutputPorts, ExpNodeAudioOutputPort,
-	ExpNodeConnection, ExpAudioParams,
-	AudioParamCallback, ExpNodeAudioOutputPortArgs,
+	ExpNodeAudioOutputPortArgs,
 	ExpNodeAudioInputPortArgs,
-} from './ExpTypes'
+} from './ExpPorts'
+import {
+	ExpAudioParams, ExpCustomNumberParams, NumberParamChange,
+	ExpNumberParamCallback,
+} from './ExpParams'
+import {ExpNodeConnection} from './ExpConnections'
 
 export const ExpNodeContext = React.createContext<null | ExpNodeContextValue>(null)
 
@@ -31,6 +35,7 @@ export abstract class CorgiNode {
 	protected readonly _audioInputPorts: ExpNodeAudioInputPorts
 	protected readonly _audioOutPorts: ExpNodeAudioOutputPorts
 	private readonly _audioParams: ExpAudioParams
+	protected readonly _customNumberParams: ExpCustomNumberParams
 	private _enabled = true
 
 	public constructor(
@@ -40,14 +45,16 @@ export abstract class CorgiNode {
 		audioInputPorts: readonly ExpNodeAudioInputPortArgs[] = [],
 		audioOutPorts: readonly ExpNodeAudioOutputPortArgs[] = [],
 		audioParams: ExpAudioParams = new Map(),
+		customNumberParams: ExpCustomNumberParams = new Map(),
 	) {
 		this.reactContext = this._makeExpNodeContextValue()
 		this._audioInputPorts = makeAudioInputPorts(audioInputPorts, this)
 		this._audioOutPorts = makeAudioOutputPorts(audioOutPorts, this)
 		this._audioParams = audioParams
+		this._customNumberParams = customNumberParams
 	}
 
-	public abstract onParamChange(paramChange: AudioParamChange): void
+	public abstract onNumberParamChange(paramChange: NumberParamChange): void
 	public abstract render(): ReactElement<any>
 	public abstract getName(): string
 
@@ -67,28 +74,37 @@ export abstract class CorgiNode {
 
 	private _makeExpNodeContextValue() {
 		return {
-			registerAudioParam: (paramId: Id, callback: AudioParamCallback) => {
+			registerAudioParam: (paramId: Id, callback: ExpNumberParamCallback) => {
 				const param = this._audioParams.get(paramId)
-
 				if (!param) return logger.warn('[registerAudioParam] 404 audio param not found: ', paramId)
-
 				param.reactSubscribers.set(callback, callback)
-
 				callback(param.audioParam.value)
 			},
-			unregisterAudioParam: (paramId: Id, callback: AudioParamCallback) => {
+			unregisterAudioParam: (paramId: Id, callback: ExpNumberParamCallback) => {
 				const param = this._audioParams.get(paramId)
-
 				if (!param) return logger.warn('[unregisterAudioParam] 404 audio param not found: ', paramId)
-
 				param.reactSubscribers.delete(callback)
 			},
 			getAudioParamValue: (paramId: Id) => {
 				const param = this._audioParams.get(paramId)
-
 				if (!param) return logger.warn('[getAudioParamValue] 404 audio param not found: ', paramId)
-
 				return param.audioParam.value
+			},
+			registerCustomNumberParam: (paramId: Id, callback: ExpNumberParamCallback) => {
+				const param = this._customNumberParams.get(paramId)
+				if (!param) return logger.warn('[registerCustomNumberParam] 404 custom number param not found: ', paramId)
+				param.reactSubscribers.set(callback, callback)
+				callback(param.value)
+			},
+			unregisterCustomNumberParam: (paramId: Id, callback: ExpNumberParamCallback) => {
+				const param = this._customNumberParams.get(paramId)
+				if (!param) return logger.warn('[unregisterCustomNumberParam] 404 custom number param not found: ', paramId)
+				param.reactSubscribers.delete(callback)
+			},
+			getCustomNumberParamValue: (paramId: Id) => {
+				const param = this._customNumberParams.get(paramId)
+				if (!param) return logger.warn('[getCustomNumberParamValue] 404 custom number param not found: ', paramId)
+				return param.value
 			},
 		}
 	}
@@ -96,15 +112,25 @@ export abstract class CorgiNode {
 	public onAudioParamChange(paramId: Id, newValue: number) {
 		const audioParam = this._audioParams.get(paramId)
 
-		if (!audioParam) return logger.warn('404 audio param not found: ', {paramId, newValue})
+		if (!audioParam) return logger.warn('[onAudioParamChange] 404 audio param not found: ', {paramId, newValue})
 
 		const newClampedValue = clamp(newValue, audioParam.min, audioParam.max)
 
 		audioParam.audioParam.value = newClampedValue
 
-		audioParam.reactSubscribers.forEach(sub => {
-			sub(newClampedValue)
-		})
+		audioParam.reactSubscribers.forEach(sub => sub(newClampedValue))
+	}
+
+	public onCustomNumberParamChange(paramId: Id, newValue: number) {
+		const customNumberParam = this._customNumberParams.get(paramId)
+
+		if (!customNumberParam) return logger.warn('[onCustomNumberParamChange] 404 customNumberParam not found: ', {paramId, newValue})
+
+		const newClampedValue = clamp(newValue, customNumberParam.min, customNumberParam.max)
+
+		customNumberParam.value = newClampedValue
+
+		customNumberParam.reactSubscribers.forEach(sub => sub(newClampedValue))
 	}
 
 	public onNewAudioOutConnection(port: ExpNodeAudioPort, connection: ExpNodeConnection) {
@@ -140,6 +166,7 @@ export abstract class CorgiNode {
 				nodeId={this.id}
 				nodeName={this.getName()}
 				audioParams={this._audioParams}
+				customNumberParams={this._customNumberParams}
 				audioInputPorts={this._audioInputPorts}
 				audioOutputPorts={this._audioOutPorts}
 			/>
