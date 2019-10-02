@@ -40,8 +40,8 @@ export abstract class CorgiNode {
 
 	public constructor(
 		public readonly id: Id,
-		protected readonly audioContext: AudioContext,
-		protected readonly preMasterLimiter: GainNode,
+		protected readonly _audioContext: AudioContext,
+		protected readonly _preMasterLimiter: GainNode,
 		audioInputPorts: readonly ExpNodeAudioInputPortArgs[] = [],
 		audioOutPorts: readonly ExpNodeAudioOutputPortArgs[] = [],
 		audioParams: ExpAudioParams = new Map(),
@@ -54,13 +54,14 @@ export abstract class CorgiNode {
 		this._customNumberParams = customNumberParams
 	}
 
-	public abstract onNumberParamChange(paramChange: NumberParamChange): void
+	// public abstract onNumberParamChange(paramChange: NumberParamChange): void
 	public abstract render(): ReactElement<any>
 	public abstract getName(): string
 
-	public getColor(): string {
-		return CssColor.blue
-	}
+	// eslint-disable-next-line no-empty-function
+	public onTick(maxReadAhead: number): void {}
+
+	public getColor(): string {return CssColor.blue}
 
 	public setEnabled(enabled: boolean) {
 		if (enabled === this._enabled) return

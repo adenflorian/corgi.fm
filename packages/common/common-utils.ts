@@ -237,3 +237,11 @@ export function roomNameCleaner(name: string): string {
 export function isId(val: unknown): val is Id {
 	return typeof val === 'string' && val.length > 0
 }
+
+export function toBeats(seconds: number, bpm: number) {
+	return seconds * (bpm / 60)
+}
+
+export function fromBeats(beats: number, bpm: number) {
+	return beats * (60 / bpm)
+}

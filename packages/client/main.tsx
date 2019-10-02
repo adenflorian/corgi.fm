@@ -143,6 +143,10 @@ async function setupAsync() {
 		startNoteScanner(store, audioContext, getAllInstruments, getAllAudioNodes)
 
 	startMainRealTimeLoop([
+		() => {
+			const nodeManager = singletonContext.getNodeManager()
+			if (nodeManager) nodeManager.onTick()
+		},
 		noteScannerLoop,
 		ecsLoop,
 		schedulerVisualLoop,

@@ -33,7 +33,7 @@ export class NodeManager {
 		this.reactContext = this._makeContextValue()
 	}
 
-	private _makeContextValue = () => {
+	private readonly _makeContextValue = () => {
 		return {
 			getNodeInfo: (nodeId: Id) => {
 				const node = this._nodes.get(nodeId)
@@ -46,7 +46,7 @@ export class NodeManager {
 					audioOutputPortCount: node.getAudioOutputPortCount(),
 					color: node.getColor(),
 				} as const
-			}
+			},
 		}
 	}
 
@@ -86,6 +86,11 @@ export class NodeManager {
 
 	// 	// TODO
 	// }
+
+	public onTick() {
+		const maxReadAhead = 0.1
+		this._nodes.forEach(node => node.onTick(maxReadAhead))
+	}
 
 	public enableNode(id: Id, enabled: boolean) {
 		const node = this._nodes.get(id)

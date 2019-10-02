@@ -1,5 +1,7 @@
+/* eslint-disable no-empty-function */
 import {ExpNodeType} from '@corgifm/common/redux'
 import {CssColor} from '@corgifm/common/shamu-color'
+import {toBeats} from '@corgifm/common/common-utils'
 import {logger} from '../client-logger'
 import {
 	percentageValueString, filterValueToString,
@@ -56,14 +58,14 @@ export class OscillatorExpNode extends CorgiNode {
 
 	public getName() {return 'Oscillator'}
 
-	public onNumberParamChange(paramChange: NumberParamChange) {
-		// switch (paramChange.paramId) {
-		// 	case 'wave': return isOscillatorType(paramChange.newValue) && this._changeOscillatorType(paramChange.newValue)
-		// 	default: return logger.warn('unexpected param id: ', {paramChange})
-		// }
-		// Render view
-		// Change value on web audio oscillator
-	}
+	// public onParamChange(paramChange: NumberParamChange) {
+	// 	// switch (paramChange.paramId) {
+	// 	// 	case 'wave': return isOscillatorType(paramChange.newValue) && this._changeOscillatorType(paramChange.newValue)
+	// 	// 	default: return logger.warn('unexpected param id: ', {paramChange})
+	// 	// }
+	// 	// Render view
+	// 	// Change value on web audio oscillator
+	// }
 
 	// private _changeOscillatorType(newValue: OscillatorType) {
 	// 	this._oscillator.type = newValue
@@ -105,7 +107,7 @@ export class AudioOutputExpNode extends CorgiNode {
 			{id: 0, name: 'input', destination: inputGain},
 		]
 
-		super(id, audioContext, preMasterLimiter,inPorts)
+		super(id, audioContext, preMasterLimiter, inPorts)
 
 		inputGain.connect(audioContext.destination)
 		// inputGain.connect(this.preMasterLimiter)
@@ -115,11 +117,6 @@ export class AudioOutputExpNode extends CorgiNode {
 	}
 
 	public getName() {return 'Audio Output'}
-
-	public onNumberParamChange(paramChange: NumberParamChange) {
-		// Render view
-		// Change value on web audio oscillator
-	}
 
 	public render() {
 		return this.getDebugView()
@@ -150,11 +147,6 @@ export class DummyNode extends CorgiNode {
 	}
 
 	public getName() {return 'Dummy'}
-
-	public onNumberParamChange(paramChange: NumberParamChange) {
-		// Render view
-		// Change value on web audio oscillator
-	}
 
 	public render() {
 		return this.getDebugView()
@@ -213,11 +205,6 @@ export class FilterNode extends CorgiNode {
 	}
 
 	public getName() {return 'Filter'}
-
-	public onNumberParamChange(paramChange: NumberParamChange) {
-		// Render view
-		// Change value on web audio oscillator
-	}
 
 	public render() {
 		return this.getDebugView()
@@ -331,13 +318,6 @@ export class ExpGainNode extends CorgiNode {
 
 	public getName() {return 'Gain'}
 
-	public onNumberParamChange(paramChange: NumberParamChange) {
-
-		// Render view
-
-		// Change value on web audio oscillator
-	}
-
 	public render() {
 		return this.getDebugView()
 	}
@@ -395,13 +375,6 @@ export class ExpPanNode extends CorgiNode {
 
 	public getName() {return 'Pan'}
 
-	public onNumberParamChange(paramChange: NumberParamChange) {
-
-		// Render view
-
-		// Change value on web audio oscillator
-	}
-
 	public render() {
 		return this.getDebugView()
 	}
@@ -425,7 +398,7 @@ const longTime = 999999999
 export class EnvelopeNode extends CorgiNode {
 	private readonly _constantSource: ConstantSourceNode
 	private readonly _outputGain: GainNode
-	private _intervalId: NodeJS.Timeout
+	// private _intervalId: NodeJS.Timeout
 
 	public constructor(
 		id: Id, audioContext: AudioContext, preMasterLimiter: GainNode,
@@ -448,16 +421,11 @@ export class EnvelopeNode extends CorgiNode {
 		])
 
 		const customNumberParams = new Map<Id, ExpCustomNumberParam>([
-			// buildCustomNumberParamDesc('attack', 0.0005, 0.0005, 0, 32, 3, adsrValueToString),
-			// buildCustomNumberParamDesc('hold', 0, 0, 0, 32, 3, adsrValueToString),
-			// buildCustomNumberParamDesc('decay', 1, 1, 0, 32, 3, adsrValueToString),
-			// buildCustomNumberParamDesc('sustain', 1, 1, 0, 1, 1, gainDecibelValueToString),
-			// buildCustomNumberParamDesc('release', 0.015, 0.015, 0, 32, 3, adsrValueToString),
-			buildCustomNumberParamDesc('attack', 0.5, 0.5, 0, 32, 3, adsrValueToString),
-			buildCustomNumberParamDesc('hold', 0, 0, 0, 32, 3, adsrValueToString),
-			buildCustomNumberParamDesc('decay', 0, 0, 0, 32, 3, adsrValueToString),
-			buildCustomNumberParamDesc('sustain', 0, 0, 0, 1, 1, gainDecibelValueToString),
-			buildCustomNumberParamDesc('release', 0, 0, 0, 32, 3, adsrValueToString),
+			buildCustomNumberParamDesc('attack', 0.0005, 0, 32, 3, adsrValueToString),
+			buildCustomNumberParamDesc('hold', 0, 0, 32, 3, adsrValueToString),
+			buildCustomNumberParamDesc('decay', 1, 0, 32, 3, adsrValueToString),
+			buildCustomNumberParamDesc('sustain', 1, 0, 1, 1, gainDecibelValueToString),
+			buildCustomNumberParamDesc('release', 0.015, 0, 32, 3, adsrValueToString),
 		])
 
 		super(id, audioContext, preMasterLimiter, inPorts, outPorts, audioParams, customNumberParams)
@@ -466,10 +434,10 @@ export class EnvelopeNode extends CorgiNode {
 		this._constantSource = constantSource
 		this._outputGain = outputGain
 		// TODO Temporary
-		this._intervalId = setInterval(() => {
-			this.receiveGateSignal(true, this.audioContext.currentTime + 0.5)
-			this.receiveGateSignal(false, this.audioContext.currentTime + 1.5)
-		}, 1000)
+		// this._intervalId = setInterval(() => {
+		// 	this.receiveGateSignal(true, this.audioContext.currentTime + 0.5)
+		// 	this.receiveGateSignal(false, this.audioContext.currentTime + 1.5)
+		// }, 1000)
 	}
 
 	public getColor(): string {
@@ -477,16 +445,6 @@ export class EnvelopeNode extends CorgiNode {
 	}
 
 	public getName() {return 'Envelope'}
-
-	public onNumberParamChange(paramChange: NumberParamChange) {
-		switch (paramChange.paramId) {
-			case 'attack': return
-			case 'decay': return
-			case 'sustain': return
-			case 'release': return
-			default: return logger.warn('unhandled number param change: ', {paramChange})
-		}
-	}
 
 	public receiveGateSignal(signal: boolean, start: number) {
 		const offset = this._constantSource.offset
@@ -533,7 +491,126 @@ export class EnvelopeNode extends CorgiNode {
 		this._constantSource.stop()
 		this._constantSource.disconnect()
 		this._outputGain.disconnect()
-		clearInterval(this._intervalId)
+		// clearInterval(this._intervalId)
+	}
+}
+
+interface GateEvent {
+	readonly gate: boolean
+	readonly beat: number
+}
+
+interface NextEvent {
+	readonly index: number
+	readonly event: GateEvent
+	readonly distanceFromCursor: number
+}
+
+class EventStream {
+	private _beatCursor = 0
+	private _lastEventIndex = -1
+	private readonly _beatLength = 2
+	private readonly _events: readonly GateEvent[] = [
+		{gate: true, beat: 0},
+		{gate: false, beat: 1},
+	]
+
+	public read(beatsToRead: number): readonly NextEvent[] {
+		if (beatsToRead === 0) return []
+
+		let tempBeatCursor = this._beatCursor
+		let nextEvent = this._getNextEvent(tempBeatCursor)
+		const readEvents: NextEvent[] = []
+		let readDistance = nextEvent.distanceFromCursor
+
+		while (readDistance < beatsToRead) {
+			this._lastEventIndex = nextEvent.index
+			tempBeatCursor = (tempBeatCursor + nextEvent.distanceFromCursor) % this._beatLength
+			readEvents.push(nextEvent)
+			nextEvent = this._getNextEvent(tempBeatCursor)
+			readDistance += nextEvent.distanceFromCursor
+		}
+
+		this._beatCursor = (this._beatCursor + beatsToRead) % this._beatLength
+
+		return readEvents
+	}
+
+	private _getNextEvent(tempBeatCursor: number): NextEvent {
+		const nextEventIndex = (this._lastEventIndex + 1) % this._events.length
+
+		const nextEvent = this._events[nextEventIndex]
+
+		let distanceFromCursor: number
+
+		if (nextEventIndex <= this._lastEventIndex) {
+			// We looped
+			distanceFromCursor = (this._beatLength - tempBeatCursor) + nextEvent.beat
+		} else {
+			distanceFromCursor = nextEvent.beat - tempBeatCursor
+		}
+
+		return {
+			index: nextEventIndex,
+			event: nextEvent,
+			distanceFromCursor,
+			// TODO
+			// distanceFromMainCursor,
+		}
+	}
+}
+
+export class SequencerNode extends CorgiNode {
+	private _cursor: number
+	private readonly _eventStream: EventStream
+
+	public constructor(
+		id: Id, audioContext: AudioContext, preMasterLimiter: GainNode,
+	) {
+		const customNumberParams = new Map<Id, ExpCustomNumberParam>([
+			buildCustomNumberParamDesc('tempo', 120, 0.001, 999.99, 3),
+			buildCustomNumberParamDesc('noteLength', 1, 0.001, 2, 3),
+		])
+
+		super(id, audioContext, preMasterLimiter, [], [], new Map(), customNumberParams)
+
+		this._cursor = audioContext.currentTime
+		this._eventStream = new EventStream()
+
+		// Make sure to add these to the dispose method!
+	}
+
+	public getColor(): string {return CssColor.green}
+	public getName() {return 'Sequencer'}
+
+	private get _tempo() {return this._customNumberParams.get('tempo')!.value}
+	private get _noteLength() {return this._customNumberParams.get('noteLength')!.value}
+
+	public render() {return this.getDebugView()}
+
+	public onTick(maxReadAhead: number) {
+		const targetTimeToReadTo = this._audioContext.currentTime + maxReadAhead
+		const distanceSeconds = targetTimeToReadTo - this._cursor
+		if (distanceSeconds <= 0) return
+		const distanceBeats = toBeats(distanceSeconds, this._tempo)
+		const events = this._eventStream.read(distanceBeats)
+		this._cursor = targetTimeToReadTo
+		events.forEach(event => {
+			// TODO Convert event time to seconds
+			logger.log(`time: ${this._audioContext.currentTime.toFixed(2)}, gate: ${event.event.gate}`)
+		})
+	}
+
+	protected _enable() {
+		// TODO
+	}
+
+	protected _disable() {
+		// TODO
+	}
+
+	protected _dispose() {
+		// TODO?
 	}
 }
 
@@ -546,4 +623,5 @@ export const typeClassMap: {readonly [key in ExpNodeType]: new (id: Id, context:
 	gain: ExpGainNode,
 	pan: ExpPanNode,
 	envelope: EnvelopeNode,
+	sequencer: SequencerNode,
 }

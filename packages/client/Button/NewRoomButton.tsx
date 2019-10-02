@@ -8,8 +8,9 @@ import {roomNameCleaner} from '@corgifm/common/common-utils'
 import {eventNewRoomButtonClick} from '../analytics/analytics'
 import {ModalContent} from '../Modal/ModalManager'
 import {useBoolean, useInputState, useEnumInputState} from '../react-hooks'
+import {Select} from '../Select/Select'
+import {isLocalDevClient} from '../is-prod-client'
 import {Button} from './Button'
-import {Select} from '../Select/Select';
 
 export function NewRoomButton({onClick}: {onClick?: () => any}) {
 	const dispatch = useDispatch()
@@ -77,7 +78,7 @@ export const NewRoomModalContent: ModalContent = ({hideModal}) => {
 							disabled={inputsDisabled}
 							required
 						/>
-						{/* {isLocalDevClient() && <Select
+						{isLocalDevClient() && <Select
 							label="Room Name"
 							name="roomName"
 							onChange={setType}
@@ -85,7 +86,7 @@ export const NewRoomModalContent: ModalContent = ({hideModal}) => {
 							value={type}
 							disabled={inputsDisabled}
 							required
-						/>} */}
+						/>}
 						<div className="submitRow">
 							<input
 								type="submit"

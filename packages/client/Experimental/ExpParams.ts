@@ -64,13 +64,13 @@ export function buildCustomNumberParamDesc(
 }
 
 function _buildCustomNumberParamDesc(
-	id: Id, value: number,
+	id: Id,
 	defaultValue: number, min: number, max: number,
 	curve = 1, valueString?: (v: number) => string,
 ): ExpCustomNumberParam {
 	return {
 		id,
-		value,
+		value: defaultValue,
 		min,
 		max,
 		default: defaultValue,
