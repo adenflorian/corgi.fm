@@ -22,7 +22,7 @@ import {
 	gridSequencerActions, GridSequencerFields, GridSequencerState, IClientAppState,
 	IPosition, ISequencerState, LocalSaves, makePosition,
 	MASTER_AUDIO_OUTPUT_TARGET_ID, MASTER_CLOCK_SOURCE_ID,
-	NetworkActionType, ReadyAction, SavedRoom, selectActiveRoom,
+	NetworkActionType, CommonAction, SavedRoom, selectActiveRoom,
 	selectAllPositions,
 	selectClientInfo, selectDirectDownstreamSequencerIds,
 	selectGlobalClockState, selectLocalClient,
@@ -57,8 +57,10 @@ import {FirebaseContextStuff} from './Firebase/FirebaseContext'
 import {onChangeRoom} from './WebAudio'
 import {createResetZoomAction, createResetPanAction} from './SimpleGraph/Zoom'
 
-type LocalMiddlewareActions = LocalAction | AddClientAction | VirtualKeyPressedAction | GridSequencerAction
-| UserInputAction | VirtualKeyUpAction | VirtualOctaveChangeAction | SetActiveRoomAction | ReadyAction
+type LocalMiddlewareActions = LocalAction | AddClientAction
+| VirtualKeyPressedAction | GridSequencerAction
+| UserInputAction | VirtualKeyUpAction | VirtualOctaveChangeAction
+| SetActiveRoomAction | CommonAction
 | UpdatePositionsAction | SetLocalClientNameAction
 
 /** Key is the key number that was pressed, value is the note that was played (key number with octave applied) */
@@ -563,7 +565,7 @@ export function createLocalMiddleware(
 
 					if (newConnections.count() > 0) dispatch(expConnectionsActions.addMultiple(newConnections))
 				} else if (action.withConnections === 'default') {
-					//TODO
+					// TODO
 					// if (nodeInfo.autoConnectToClock) {
 					// 	dispatch(expConnectionsActions.add(new Connection(
 					// 		MASTER_CLOCK_SOURCE_ID,

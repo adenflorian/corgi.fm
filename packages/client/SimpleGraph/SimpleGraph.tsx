@@ -1,6 +1,6 @@
 import React, {Fragment} from 'react'
 import {
-	selectAllPositions, IClientAppState, RoomType,
+	selectAllPositions, IClientAppState, RoomType, selectClientInfo,
 } from '@corgifm/common/redux'
 import {useSelector} from 'react-redux'
 import {mainBoardsId} from '../client-constants'
@@ -17,6 +17,7 @@ const canvasSize = ECSCanvasRenderSystem.canvasSize
 
 export const ConnectedSimpleGraph = function _ConnectedSimpleGraph() {
 	const roomType = useSelector((state: IClientAppState) => state.room.roomInfo.roomType)
+	const isClientReady = useSelector((state: IClientAppState) => selectClientInfo(state).isClientReady)
 
 	return (
 		<div
@@ -36,7 +37,7 @@ export const ConnectedSimpleGraph = function _ConnectedSimpleGraph() {
 					{roomType !== RoomType.Experimental &&
 						<ConnectedGhostConnectionsView />}
 					{roomType === RoomType.Experimental
-						? <NodeManagerRoot />
+						? (isClientReady ? <NodeManagerRoot /> : null)
 						: <PositionsStuff />}
 					{/* <canvas
 						id="ECSCanvasRenderSystemCanvas"

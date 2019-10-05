@@ -2,7 +2,7 @@ import React, {useCallback} from 'react'
 import {useDispatch} from 'react-redux'
 import {rateLimitedDebounceNoTrail} from '@corgifm/common/common-utils'
 import {
-	IClientState, organizeGraph,
+	IClientState, commonActions,
 	selectClientById, selectLocalClientId, selectMemberCount,
 	selectRoomSettings, localActions,
 	selectClientInfo, shamuConnect, selectClientCount,
@@ -30,7 +30,7 @@ interface ReduxProps {
 	memberCount: number
 	clientCount: number
 	info: string
-	isClientReady: boolean
+	isConnected: boolean
 	roomOwner: IClientState
 	onlyOwnerCanDoStuff: boolean
 	isLocalClientRoomOwner: boolean
@@ -39,7 +39,7 @@ interface ReduxProps {
 type AllProps = ReduxProps
 
 export const TopDiv = ({
-	memberCount, clientCount, info, isClientReady,
+	memberCount, clientCount, info, isConnected,
 	roomOwner, onlyOwnerCanDoStuff, isLocalClientRoomOwner,
 }: AllProps) => {
 	const dispatch = useDispatch()
@@ -112,7 +112,7 @@ export const TopDiv = ({
 						{onlyOwnerCanDoStuff ? 'Limited' : 'Public'}
 					</div>
 				</div>
-				{!isClientReady &&
+				{!isConnected &&
 					<div
 						className="blob"
 						style={{
@@ -190,7 +190,7 @@ export const TopDiv = ({
 										+ 'nodes in this room?'
 										+ '\nThis cannot be undone!')
 								) {
-									dispatch(organizeGraph())
+									dispatch(commonActions.organizeGraph())
 									eventOrganizeRoomConfirmed()
 								}
 								eventOrganizeRoomButtonClick()
@@ -224,7 +224,7 @@ export const ConnectedTopDiv = shamuConnect(
 			clientCount: selectClientCount(state),
 			info: state.websocket.info,
 			memberCount: selectMemberCount(state.room),
-			isClientReady: selectClientInfo(state).isClientReady,
+			isConnected: selectClientInfo(state).isConnected,
 			roomOwner: selectClientById(state, roomSettings.ownerId),
 			onlyOwnerCanDoStuff: roomSettings.onlyOwnerCanDoStuff,
 			isLocalClientRoomOwner:

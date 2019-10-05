@@ -14,7 +14,7 @@ import {
 	deletePositions, deleteRoomMember, deleteThingsAny,
 	getActionsBlacklist, GLOBAL_SERVER_ACTION, globalClockActions,
 	IClientRoomState,
-	IServerState, LOAD_ROOM, maxUsernameLength, pointersActions, ready,
+	IServerState, LOAD_ROOM, maxUsernameLength, pointersActions, commonActions,
 	replacePositions, roomOwnerRoomActions,
 	RoomSettingsAction, roomSettingsActions, RoomsReduxAction, SavedRoom,
 	selectAllClients, selectAllConnections,
@@ -353,6 +353,11 @@ function onLeaveRoom(io: Server, socket: Socket, roomToLeave: string, serverStor
 
 function syncState(newSocket: Socket, roomState: IClientRoomState, serverState: IServerState, activeRoom: string) {
 	newSocket.emit(WebSocketEvent.broadcast, {
+		...commonActions.notReady(),
+		alreadyBroadcasted: true,
+		source: server,
+	})
+	newSocket.emit(WebSocketEvent.broadcast, {
 		...setRooms(selectAllRooms(serverState)),
 		alreadyBroadcasted: true,
 		source: server,
@@ -398,7 +403,7 @@ function syncState(newSocket: Socket, roomState: IClientRoomState, serverState: 
 	})
 
 	newSocket.emit(WebSocketEvent.broadcast, {
-		...ready(),
+		...commonActions.ready(),
 		alreadyBroadcasted: true,
 		source: server,
 	})

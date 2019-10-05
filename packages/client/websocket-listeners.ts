@@ -3,7 +3,7 @@ import * as io from 'socket.io-client'
 import {logger} from '@corgifm/common/logger'
 import {
 	BroadcastAction, clientInfoActions, getActionsBlacklist, maxUsernameLength,
-	selectActiveRoom, selfDisconnected, setInfo, setSocketId,
+	selectActiveRoom, commonActions, setInfo, setSocketId,
 } from '@corgifm/common/redux'
 import {WebSocketEvent} from '@corgifm/common/server-constants'
 import {roomNameCleaner} from '@corgifm/common/common-utils'
@@ -46,7 +46,7 @@ export function setupWebsocketAndListeners(store: Store) {
 
 	socket.on('disconnect', () => {
 		logger.log('socket: disconnect')
-		store.dispatch(selfDisconnected())
+		store.dispatch(commonActions.selfDisconnected())
 	})
 
 	socket.on('version', (serverVersion: string) => {

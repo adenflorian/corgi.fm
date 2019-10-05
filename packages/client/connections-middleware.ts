@@ -1,7 +1,7 @@
 import {Middleware} from 'redux'
 import {calculatePositionsGivenConnections} from '@corgifm/common/compute-positions'
 import {logger} from '@corgifm/common/logger'
-import {OrganizeGraphAction} from '@corgifm/common/redux/common-actions'
+import {CommonAction} from '@corgifm/common/redux/common-actions'
 import {BroadcastAction} from '@corgifm/common/redux/common-redux-types'
 import {
 	GhostConnectorAction, IClientAppState,
@@ -13,7 +13,7 @@ import {
 import {handleStopDraggingGhostConnector} from './dragging-connections'
 import {GetAllInstruments} from './instrument-manager'
 
-type ConnectionClientMiddleWareAction = IConnectionAction | OrganizeGraphAction |
+type ConnectionClientMiddleWareAction = IConnectionAction | CommonAction |
 GhostConnectorAction | PositionAction | LocalAction
 
 // TODO Merge with local middleware?
