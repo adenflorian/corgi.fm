@@ -1,10 +1,10 @@
 import React, {useState, useCallback} from 'react'
+import {useDispatch} from 'react-redux'
 import {
 	ActiveGhostConnectorSourceOrTarget, localActions,
 } from '@corgifm/common/redux'
 import {connectorHeight, connectorWidth} from './ConnectionView'
 import {Connector} from './Connector'
-import {useDispatch} from 'react-redux';
 
 interface Props {
 	onMouseDown: any
@@ -28,7 +28,7 @@ export const ConnectorPlaceholder = React.memo(
 
 		const onMouseUp = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
 			dispatch(localActions.mouseUpOnPlaceholder(nodeId, sourceOrTarget, portId))
-		}, [dispatch])
+		}, [dispatch, nodeId, portId, sourceOrTarget])
 
 		return (
 			<div

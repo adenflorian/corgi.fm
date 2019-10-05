@@ -1,16 +1,19 @@
-import {Middleware} from 'redux'
+import {Middleware, Dispatch} from 'redux'
 import {
 	IClientAppState, ExpNodesAction, ExpConnectionAction,
 	RoomsReduxAction, selectExpConnection,
 	selectExpAllConnections, selectExpNodesState,
 	selectRoomInfoState, RoomType, ExpPositionAction,
+	ExpGhostConnectorAction, BroadcastAction, LocalAction,
+	expGhostConnectorActions, createLocalActiveExpGhostConnectionSelector,
 } from '@corgifm/common/redux'
 import {SingletonContextImpl} from '../SingletonContext'
 import {logger} from '../client-logger'
+import {handleStopDraggingExpGhostConnector} from '../exp-dragging-connections'
 import {NodeManager} from './NodeManager'
 
 type ExpMiddlewareActions = ExpNodesAction | ExpConnectionAction |
-RoomsReduxAction | ExpPositionAction
+RoomsReduxAction | ExpPositionAction | ExpGhostConnectorAction | LocalAction
 
 type ExpMiddleware =
 	(singletonContext: SingletonContextImpl) => Middleware<{}, IClientAppState>
@@ -18,30 +21,51 @@ type ExpMiddleware =
 export const createExpMiddleware: ExpMiddleware =
 	singletonContext => ({dispatch, getState}) =>
 		next => async function _expMiddleware(action: ExpMiddlewareActions) {
+			const beforeState = getState()
 			next(action)
+			const afterState = getState()
 			const roomType = selectRoomInfoState(getState().room).roomType
 
 			if (roomType !== RoomType.Experimental) return
 
-			const nodeManager = singletonContext.getNodeManager()
+			let nodeManager = singletonContext.getNodeManager()
 
-			if (!nodeManager) return logger.error('missing node manager!')
+			if (!nodeManager) {
+				logger.log('creating node manager')
+				singletonContext.setNodeManager(
+					new NodeManager(
+						singletonContext.getAudioContext(),
+						singletonContext.getPreMasterLimiter()
+					)
+				)
+				nodeManager = singletonContext.getNodeManager()
+
+				if (!nodeManager) {
+					return logger.error('missing node manager!')
+				}
+			}
 
 			foo(
+				beforeState,
+				afterState,
 				action,
 				nodeManager,
 				() => selectExpNodesState(getState().room),
 				(id: Id) => selectExpConnection(getState().room, id),
 				() => selectExpAllConnections(getState().room),
+				dispatch,
 			)
 		}
 
 function foo(
+	beforeState: IClientAppState,
+	afterState: IClientAppState,
 	action: ExpMiddlewareActions,
 	nodeManager: NodeManager,
 	getNodes: () => ReturnType<typeof selectExpNodesState>,
 	getConnection: (id: Id) => ReturnType<typeof selectExpConnection>,
 	getConnections: () => ReturnType<typeof selectExpAllConnections>,
+	dispatch: Dispatch,
 ) {
 	switch (action.type) {
 		// Room
@@ -73,30 +97,52 @@ function foo(
 
 		case 'EXP_DELETE_CONNECTIONS':
 			return action.connectionIds.forEach(
-				nodeManager.deleteAudioConnection)
+				nodeManager.deleteConnection)
 
 		case 'EXP_ADD_CONNECTION':
-			return nodeManager.addAudioConnection(
+			return nodeManager.addConnection(
 				getConnection(action.connection.id))
 
 		case 'EXP_ADD_CONNECTIONS':
 			return action.connections.forEach(
-				x => nodeManager.addAudioConnection(getConnection(x.id)))
+				x => nodeManager.addConnection(getConnection(x.id)))
 
 		case 'EXP_DELETE_ALL_CONNECTIONS':
-			return nodeManager.deleteAllAudioConnections()
+			return nodeManager.deleteAllConnections()
 
 		case 'EXP_UPDATE_CONNECTION_SOURCE':
-			return nodeManager.changeAudioConnectionSource(
+			return nodeManager.changeConnectionSource(
 				action.id,
 				action.connectionSourceInfo.sourceId,
 				action.connectionSourceInfo.sourcePort)
 
 		case 'EXP_UPDATE_CONNECTION_TARGET':
-			return nodeManager.changeAudioConnectionTarget(
+			return nodeManager.changeConnectionTarget(
 				action.id,
 				action.connectionTargetInfo.targetId,
 				action.connectionTargetInfo.targetPort)
+
+		case 'EXP_GHOST_CONNECTION_DELETE': {
+			if ((action as unknown as BroadcastAction).alreadyBroadcasted) return
+
+			if (!action.info) return
+
+			try {
+				handleStopDraggingExpGhostConnector(beforeState.room, dispatch, action.id, action.info, nodeManager)
+			} catch (error) {
+				logger.warn('Caught error (will ignore) when handling EXP_GHOST_CONNECTION_DELETE: ', error)
+				return
+			}
+
+			return
+		}
+		case 'MOUSE_UP_ON_EXP_PLACEHOLDER': {
+			const localActiveGhostConnection = createLocalActiveExpGhostConnectionSelector()(afterState)
+			if (localActiveGhostConnection) {
+				dispatch(expGhostConnectorActions.delete(localActiveGhostConnection.id, action))
+			}
+			return
+		}
 
 		default: return
 	}

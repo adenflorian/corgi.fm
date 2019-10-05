@@ -2,34 +2,46 @@ import {Dispatch} from 'redux'
 import {logger} from '@corgifm/common/logger'
 import {IClientRoomState} from '@corgifm/common/redux/common-redux-types'
 import {
-	ActiveGhostConnectorSourceOrTarget, Connection,
-	connectionsActions, GhostConnectorAddingOrMoving, IPosition,
-	selectGhostConnection, selectPosition, doesConnectionBetweenNodesExist,
-	selectConnection, DeleteGhostInfo,
+	ActiveGhostConnectorSourceOrTarget,
+	GhostConnectorAddingOrMoving,
+	selectExpGhostConnection,
+	ExpDeleteGhostInfo, selectExpPosition,
+	expConnectionsActions, ExpConnection, ExpPosition,
+	doesExpConnectionBetweenNodesExist,
+	selectExpConnection,
+	chatSystemMessage,
 } from '@corgifm/common/redux'
+import {NodeManager} from './Experimental/NodeManager'
 
-type ConnectionCandidate = IPosition
+type ConnectionCandidate = ExpPosition
 
-export function handleStopDraggingGhostConnector(
+export function handleStopDraggingExpGhostConnector(
 	roomState: IClientRoomState, dispatch: Dispatch, ghostConnectionId: Id,
-	info: DeleteGhostInfo,
+	info: ExpDeleteGhostInfo, nodeManager: NodeManager,
 ) {
-	const ghostConnection = selectGhostConnection(roomState, ghostConnectionId)
+	const ghostConnection = selectExpGhostConnection(roomState, ghostConnectionId)
 
-	const getConnection = selectConnection
+	const getConnection = selectExpConnection
 
 	const movingConnectionId = ghostConnection.movingConnectionId
 
-	const parentNodePosition = selectPosition(roomState, ghostConnection.inactiveConnector.parentNodeId)
+	const parentNodePosition = selectExpPosition(roomState, ghostConnection.inactiveConnector.parentNodeId)
 
-	const winningPosition = selectPosition(roomState, info.nodeId)
+	const winningPosition = selectExpPosition(roomState, info.nodeId)
 
 	const mouseUpPort = info.portId
 
+	const portToConnectToType = nodeManager.getPortType(info.nodeId, mouseUpPort)
+
+	if (ghostConnection.type !== portToConnectToType) {
+		dispatch(chatSystemMessage(`Connections between ${ghostConnection.type} ports and ${portToConnectToType} ports are not allowed.`))
+		return
+	}
+
 	return getChangeConnectionFunc()(winningPosition, ghostConnection.port)
 
-	function doesConnectionBetweenNodesExistLocal(sourceId: Id, sourcePort: number, targetId: Id, targetPort: number) {
-		return doesConnectionBetweenNodesExist(
+	function doesConnectionBetweenNodesExistLocal(sourceId: Id, sourcePort: Id, targetId: Id, targetPort: Id) {
+		return doesExpConnectionBetweenNodesExist(
 			roomState, sourceId, sourcePort, targetId, targetPort)
 	}
 
@@ -55,7 +67,7 @@ export function handleStopDraggingGhostConnector(
 				sourceId, sourcePort, targetId, targetPort)
 		) return
 
-		dispatch(connectionsActions.updateSource(movingConnectionId, {
+		dispatch(expConnectionsActions.updateSource(movingConnectionId, {
 			sourceId,
 			sourceType,
 			sourcePort,
@@ -76,14 +88,14 @@ export function handleStopDraggingGhostConnector(
 				sourceId, sourcePort, targetId, targetPort)
 		) return
 
-		dispatch(connectionsActions.updateTarget(movingConnectionId, {
+		dispatch(expConnectionsActions.updateTarget(movingConnectionId, {
 			targetId,
 			targetType,
 			targetPort,
 		}))
 	}
 
-	function newConnectionToSource(position: ConnectionCandidate, port: number) {
+	function newConnectionToSource(position: ConnectionCandidate, port: Id) {
 		if (validatePosition(position) === false) return
 
 		if (
@@ -91,17 +103,18 @@ export function handleStopDraggingGhostConnector(
 				position.id, mouseUpPort, parentNodePosition.id, port)
 		) return
 
-		dispatch(connectionsActions.add(new Connection(
+		dispatch(expConnectionsActions.add(new ExpConnection(
 			position.id,
 			position.targetType,
 			parentNodePosition.id,
 			parentNodePosition.targetType,
 			mouseUpPort,
 			port,
+			ghostConnection.type,
 		)))
 	}
 
-	function newConnectionToTarget(position: ConnectionCandidate, port: number) {
+	function newConnectionToTarget(position: ConnectionCandidate, port: Id) {
 		if (validatePosition(position) === false) return
 
 		if (
@@ -109,13 +122,14 @@ export function handleStopDraggingGhostConnector(
 				parentNodePosition.id, port, position.id, mouseUpPort)
 		) return
 
-		dispatch(connectionsActions.add(new Connection(
+		dispatch(expConnectionsActions.add(new ExpConnection(
 			parentNodePosition.id,
 			parentNodePosition.targetType,
 			position.id,
 			position.targetType,
 			port,
 			mouseUpPort,
+			ghostConnection.type,
 		)))
 	}
 

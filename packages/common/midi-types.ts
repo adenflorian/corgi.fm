@@ -121,6 +121,14 @@ export function preciseAdd(a: number, b: number): number {
 	return ((a * midiPrecision) + (b * midiPrecision)) / midiPrecision
 }
 
+export function preciseMultiply(a: number, b: number): number {
+	return ((a * midiPrecision) * (b * midiPrecision)) / midiPrecision
+}
+
+export function preciseDivide(a: number, b: number): number {
+	return ((a * midiPrecision) / (b * midiPrecision)) / midiPrecision
+}
+
 export class MidiRange {
 	/** exclusive */
 	public static readonly maxSafeNumber = 100000000

@@ -1,5 +1,11 @@
 # EXPERIMENTAL
 
+## Goals
+- model after real world modular synth setup
+- OOP
+- performance by bypassing react-redux
+- build everything with building blocks
+
 ## low level nodes
 - audio sources (uses clock, no inputs, outputs audio)
 	- [√] oscillator

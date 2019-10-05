@@ -1,7 +1,6 @@
 import React from 'react'
 import {saturateColor} from '@corgifm/common/shamu-color'
 import {longLineTooltip} from '../client-constants'
-import {longLineStrokeWidth} from './ConnectionView'
 import {LineState} from './LineState'
 
 interface ConnectionLineProps {
@@ -75,7 +74,6 @@ export const ConnectionLine = React.memo(
 						className="mainLongLine"
 						d={pathDPart1}
 						stroke={highQuality ? `url(#${id})` : isSourcePlaying ? saturatedColor : color}
-						strokeWidth={`${longLineStrokeWidth}px`}
 					/>
 					<path
 						className="invisibleLongLine"
@@ -101,7 +99,6 @@ export const ConnectionLine = React.memo(
 							className="animatedLongLine"
 							d={pathDPart1}
 							stroke={saturatedColor}
-							strokeWidth={`${longLineStrokeWidth * 2}px`}
 							strokeDasharray="4 8"
 						/>
 					}

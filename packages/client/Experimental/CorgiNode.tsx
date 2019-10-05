@@ -4,19 +4,16 @@ import {clamp} from '@corgifm/common/common-utils'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {logger} from '../client-logger'
 import './ExpNodes.less'
+import {ExpConnectorPlaceholders} from '../Connections/ExpConnectorPlaceholders'
+import {SimpleGraphNodeExp} from '../SimpleGraph/SimpleGraphNodeExp'
 import {ExpNodeDebugView} from './ExpNodeDebugView'
 import {
-	ExpNodeAudioPort,
-	ExpNodeAudioInputPorts, ExpNodeAudioInputPort,
-	ExpNodeAudioOutputPorts, ExpNodeAudioOutputPort,
-	ExpNodeAudioOutputPortArgs,
-	ExpNodeAudioInputPortArgs,
+	ExpPorts, ExpPort, isAudioOutputPort,
 } from './ExpPorts'
 import {
-	ExpAudioParams, ExpCustomNumberParams, NumberParamChange,
+	ExpAudioParams, ExpCustomNumberParams,
 	ExpNumberParamCallback,
 } from './ExpParams'
-import {ExpNodeConnection} from './ExpConnections'
 
 export const ExpNodeContext = React.createContext<null | ExpNodeContextValue>(null)
 
@@ -30,10 +27,15 @@ export function useNodeContext() {
 	return context
 }
 
+export interface CorgiNodeOptions {
+	readonly ports?: readonly ExpPort[]
+	readonly audioParams?: ExpAudioParams
+	readonly customNumberParams?: ExpCustomNumberParams
+}
+
 export abstract class CorgiNode {
 	public readonly reactContext: ExpNodeContextValue
-	protected readonly _audioInputPorts: ExpNodeAudioInputPorts
-	protected readonly _audioOutPorts: ExpNodeAudioOutputPorts
+	protected readonly _ports: ExpPorts
 	private readonly _audioParams: ExpAudioParams
 	protected readonly _customNumberParams: ExpCustomNumberParams
 	private _enabled = true
@@ -42,16 +44,12 @@ export abstract class CorgiNode {
 		public readonly id: Id,
 		protected readonly _audioContext: AudioContext,
 		protected readonly _preMasterLimiter: GainNode,
-		audioInputPorts: readonly ExpNodeAudioInputPortArgs[] = [],
-		audioOutPorts: readonly ExpNodeAudioOutputPortArgs[] = [],
-		audioParams: ExpAudioParams = new Map(),
-		customNumberParams: ExpCustomNumberParams = new Map(),
+		options: CorgiNodeOptions = {},
 	) {
 		this.reactContext = this._makeExpNodeContextValue()
-		this._audioInputPorts = makeAudioInputPorts(audioInputPorts, this)
-		this._audioOutPorts = makeAudioOutputPorts(audioOutPorts, this)
-		this._audioParams = audioParams
-		this._customNumberParams = customNumberParams
+		this._ports = (options.ports || []).reduce((result, port) => {return result.set(port.id, port)}, new Map() as ExpPorts)
+		this._audioParams = options.audioParams || new Map()
+		this._customNumberParams = options.customNumberParams || new Map()
 	}
 
 	// public abstract onNumberParamChange(paramChange: NumberParamChange): void
@@ -59,7 +57,7 @@ export abstract class CorgiNode {
 	public abstract getName(): string
 
 	// eslint-disable-next-line no-empty-function
-	public onTick(maxReadAhead: number): void {}
+	public onTick(currentTime: number, maxReadAhead: number): void {}
 
 	public getColor(): string {return CssColor.blue}
 
@@ -75,6 +73,9 @@ export abstract class CorgiNode {
 
 	private _makeExpNodeContextValue() {
 		return {
+			id: this.id,
+			getColor: () => this.getColor(),
+			getName: () => this.getName(),
 			registerAudioParam: (paramId: Id, callback: ExpNumberParamCallback) => {
 				const param = this._audioParams.get(paramId)
 				if (!param) return logger.warn('[registerAudioParam] 404 audio param not found: ', paramId)
@@ -107,6 +108,12 @@ export abstract class CorgiNode {
 				if (!param) return logger.warn('[getCustomNumberParamValue] 404 custom number param not found: ', paramId)
 				return param.value
 			},
+			setPortPosition: (id: Id, position: Point) => {
+				const port = this.getPort(id)
+				if (!port) return logger.warn('[setPortPosition] 404 port not found: ', {id, position, nodeId: this.id})
+				port.setPosition(position)
+			},
+			getPorts: () => this._ports,
 		}
 	}
 
@@ -134,28 +141,8 @@ export abstract class CorgiNode {
 		customNumberParam.reactSubscribers.forEach(sub => sub(newClampedValue))
 	}
 
-	public onNewAudioOutConnection(port: ExpNodeAudioPort, connection: ExpNodeConnection) {
-		logger.log('onNewAudioOutConnection default')
-	}
-
-	public onNewAudioInConnection(port: ExpNodeAudioPort, connection: ExpNodeConnection) {
-		logger.log('onNewAudioInConnection default')
-	}
-
-	public getAudioInputPort(index: number): ExpNodeAudioInputPort | undefined {
-		return this._audioInputPorts[index]
-	}
-
-	public getAudioOutputPort(index: number): ExpNodeAudioOutputPort | undefined {
-		return this._audioOutPorts[index]
-	}
-
-	public getAudioInputPortCount(): number {
-		return this._audioInputPorts.length
-	}
-
-	public getAudioOutputPortCount(): number {
-		return this._audioOutPorts.length
+	public getPort(id: Id): ExpPort | undefined {
+		return this._ports.get(id)
 	}
 
 	protected abstract _enable(): void
@@ -163,19 +150,21 @@ export abstract class CorgiNode {
 
 	protected getDebugView() {
 		return (
-			<ExpNodeDebugView
-				nodeId={this.id}
-				nodeName={this.getName()}
-				audioParams={this._audioParams}
-				customNumberParams={this._customNumberParams}
-				audioInputPorts={this._audioInputPorts}
-				audioOutputPorts={this._audioOutPorts}
-			/>
+			<ExpNodeContext.Provider value={this.reactContext}>
+				<ExpConnectorPlaceholders />
+				<SimpleGraphNodeExp>
+					<ExpNodeDebugView
+						audioParams={this._audioParams}
+						customNumberParams={this._customNumberParams}
+						ports={this._ports}
+					/>
+				</SimpleGraphNodeExp>
+			</ExpNodeContext.Provider>
 		)
 	}
 
-	public detectFeedbackLoop(i: number, nodeIds: List<Id>): boolean {
-		return this._audioOutPorts.some(x => x.detectFeedbackLoop(i, nodeIds))
+	public detectAudioFeedbackLoop(i: number, nodeIds: List<Id>): boolean {
+		return [...this._ports].some(([_, x]) => isAudioOutputPort(x) && x.detectFeedbackLoop(i, nodeIds))
 	}
 
 	public dispose() {
@@ -183,12 +172,4 @@ export abstract class CorgiNode {
 	}
 
 	protected abstract _dispose(): void
-}
-
-export function makeAudioInputPorts(args: readonly ExpNodeAudioInputPortArgs[], node: CorgiNode): ExpNodeAudioInputPorts {
-	return args.map(x => new ExpNodeAudioInputPort(x.id, x.name, node, x.destination))
-}
-
-export function makeAudioOutputPorts(args: readonly ExpNodeAudioOutputPortArgs[], node: CorgiNode): ExpNodeAudioOutputPorts {
-	return args.map(x => new ExpNodeAudioOutputPort(x.id, x.name, node, x.source))
 }

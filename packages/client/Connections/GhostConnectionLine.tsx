@@ -1,5 +1,4 @@
 import React from 'react'
-import {longLineStrokeWidth} from './ConnectionView'
 
 interface GhostConnectionLineProps {
 	color: string
@@ -23,12 +22,9 @@ export const GhostConnectionLine = React.memo(
 			>
 				<g>
 					<path
-						className="mainLongLine"
+						className="mainLongLine mainLongLine-ghost"
 						d={pathDPart1}
 						stroke={color}
-						strokeWidth={`${longLineStrokeWidth}px`}
-						strokeDasharray="8 4"
-						strokeLinecap="round"
 					/>
 				</g>
 			</svg>

@@ -66,7 +66,7 @@ export const localActions = {
 		nodeId,
 		nodeType,
 		withConnections,
-		} as const),
+	} as const),
 	cloneExpNode: (
 		nodeId: Id,
 		withConnections: 'none' | 'all' | 'default'
@@ -85,12 +85,20 @@ export const localActions = {
 	} as const),
 	mouseUpOnPlaceholder: (nodeId: Id, side: ActiveGhostConnectorSourceOrTarget, portId: number) => ({
 		type: 'MOUSE_UP_ON_PLACEHOLDER' as const,
-		nodeId, side, portId,
+		nodeId,
+		side,
+		portId,
+	} as const),
+	mouseUpOnExpPlaceholder: (nodeId: Id, side: ActiveGhostConnectorSourceOrTarget, portId: Id) => ({
+		type: 'MOUSE_UP_ON_EXP_PLACEHOLDER' as const,
+		nodeId,
+		side,
+		portId,
 	} as const),
 	deleteExpNode: (nodeId: Id) => ({
 		type: 'DELETE_EXP_NODE' as const,
 		nodeId,
-	} as const)
+	} as const),
 } as const
 
 export type LocalAction = ActionType<typeof localActions>

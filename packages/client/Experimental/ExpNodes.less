@@ -60,7 +60,7 @@
 
 	.ports {
 		display: flex;
-		.audioInputPorts, .audioOutputPorts {
+		.inputPorts, .outputPorts {
 			margin-bottom: 4px;
 			flex-grow: 1;
 	
@@ -79,6 +79,7 @@
 					@knobLabelFont();
 				}
 				.portName {
+					margin: 0 4px;
 					color: @defaultGray;
 					@knobLabelFont();
 				}
@@ -90,19 +91,26 @@
 					height: @portDiameter;
 					width: @portDiameter;
 					border-radius: @portDiameter / 2;
+
+					&.type-audio {
+					}
+
+					&.type-gate {
+						border-radius: 2px;
+					}
 				}
 			}
 		}
 	
-		.audioInputPorts {
+		.inputPorts {
 			.port {
 				justify-content: flex-start;
 			}
 		}
 	
-		.audioOutputPorts {
+		.outputPorts {
 			.port {
-				justify-content: flex-end;
+				flex-direction: row-reverse;
 			}
 		}
 	}

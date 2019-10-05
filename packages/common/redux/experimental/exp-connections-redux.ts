@@ -6,12 +6,12 @@ import {CssColor, mixColors} from '../../shamu-color'
 import {emptyList} from '../../common-utils'
 import {selectOption, AppOptions} from '../options-redux'
 import {IClientAppState} from '../common-redux-types'
+import {ExpNodeType} from '.'
 import {
 	BROADCASTER_ACTION, IClientRoomState,
 	selectVirtualKeyboardById, SERVER_ACTION, VirtualKeyboardState,
 	selectExpPosition,
 } from '..'
-import {ExpNodeType} from '.';
 
 export const expConnectionsActions = {
 	add: (connection: ExpConnection) => ({
@@ -56,6 +56,8 @@ export const expConnectionsActions = {
 	} as const),
 } as const
 
+export type ExpConnectionType = 'audio' | 'gate' | 'dummy'
+
 export interface IExpConnection {
 	sourceId: Id
 	sourceType: ExpNodeType
@@ -64,6 +66,7 @@ export interface IExpConnection {
 	id: Id
 	sourcePort: ExpConnectionPortId
 	targetPort: ExpConnectionPortId
+	type: ExpConnectionType
 }
 
 export class ExpConnection implements IExpConnection {
@@ -73,8 +76,9 @@ export class ExpConnection implements IExpConnection {
 		targetId: '-1',
 		targetType: 'dummy',
 		id: '-1',
-		sourcePort: 0,
-		targetPort: 0,
+		sourcePort: 'dummySourcePortId',
+		targetPort: 'dummyTargetPortId',
+		type: 'dummy',
 	}
 
 	public readonly id = uuid.v4()
@@ -86,10 +90,11 @@ export class ExpConnection implements IExpConnection {
 		public readonly targetType: ExpNodeType,
 		public readonly sourcePort: ExpConnectionPortId,
 		public readonly targetPort: ExpConnectionPortId,
+		public readonly type: ExpConnectionType,
 	) {}
 }
 
-export type ExpConnectionPortId = number
+export type ExpConnectionPortId = Id
 
 export type ExpConnectionAction = ActionType<typeof expConnectionsActions>
 
@@ -98,8 +103,8 @@ type ExpNodeConnectionsInfos = ExpConnectionsState['nodeInfos']
 export type ExpConnections = Map<Id, ExpConnection>
 
 const defaultExpNodeConnectionsInfo = Object.freeze({
-	leftConnections: Map<number, List<Id>>(),
-	rightConnections: Map<number, List<Id>>(),
+	leftConnections: Map<Id, List<Id>>(),
+	rightConnections: Map<Id, List<Id>>(),
 })
 
 export type ExpNodeConnectionsInfo = typeof defaultExpNodeConnectionsInfo
@@ -260,16 +265,22 @@ export function selectExpNodeConnectionInfosForNode(state: IClientRoomState, nod
 	return selectExpAllNodeConnectionInfos(state).get(nodeId, defaultExpNodeConnectionsInfo)
 }
 
-export function selectExpConnectionIdsForNodeLeftPort(state: IClientRoomState, nodeId: Id, port: number): List<Id> {
+export function selectExpConnectionIdsForNodeLeftPort(state: IClientRoomState, nodeId: Id, port: Id): List<Id> {
 	return selectExpNodeConnectionInfosForNode(state, nodeId).leftConnections.get(port, emptyList)
 }
 
-export function selectExpConnectionIdsForNodeRightPort(state: IClientRoomState, nodeId: Id, port: number): List<Id> {
+export function selectExpConnectionIdsForNodeRightPort(state: IClientRoomState, nodeId: Id, port: Id): List<Id> {
 	return selectExpNodeConnectionInfosForNode(state, nodeId).rightConnections.get(port, emptyList)
 }
 
 export function selectExpConnection(state: IClientRoomState, id: Id) {
 	return selectExpAllConnections(state).get(id) || ExpConnection.dummy
+}
+
+export function createExpConnectionSelector(id: Id) {
+	return (state: IClientAppState) => {
+		return selectExpConnection(state.room, id)
+	}
 }
 
 export function selectExpSourceByConnectionId(state: IClientRoomState, id: Id): VirtualKeyboardState {
@@ -290,11 +301,11 @@ export const selectExpSortedConnections = createSelector(
 	}
 )
 
-export function selectExpConnectionIdsOnPortOnNodeLeft(state: IClientRoomState, nodeId: Id, port: number) {
+export function selectExpConnectionIdsOnPortOnNodeLeft(state: IClientRoomState, nodeId: Id, port: Id) {
 	return selectExpNodeConnectionInfosForNode(state, nodeId).leftConnections.get(port, emptyList)
 }
 
-export function selectExpConnectionIdsOnPortOnNodeRight(state: IClientRoomState, nodeId: Id, port: number) {
+export function selectExpConnectionIdsOnPortOnNodeRight(state: IClientRoomState, nodeId: Id, port: Id) {
 	return selectExpNodeConnectionInfosForNode(state, nodeId).leftConnections.get(port, emptyList)
 }
 
@@ -333,7 +344,7 @@ export function selectExpConnectionsWithSourceIds(state: IClientRoomState, sourc
 }
 
 export function doesExpConnectionBetweenNodesExist(
-	state: IClientRoomState, sourceId: Id, sourcePort: number, targetId: Id, targetPort: number
+	state: IClientRoomState, sourceId: Id, sourcePort: Id, targetId: Id, targetPort: Id
 ): boolean {
 	const a = selectExpConnectionIdsForNodeRightPort(state, sourceId, sourcePort)
 	const b = selectExpConnectionIdsForNodeLeftPort(state, targetId, targetPort)
@@ -395,10 +406,9 @@ const makeConnectionSourceColorSelector =
 		)
 	}
 
-function tryGetColorFromState(colorFromState: string | false | List<string>, portNumber: number): string | false {
+function tryGetColorFromState(colorFromState: string | false, portNumber: Id): string | false {
 	if (!colorFromState) return false
-	if (typeof colorFromState === 'string') return colorFromState
-	return colorFromState.get(portNumber, CssColor.defaultGray)
+	return colorFromState
 }
 
 export function selectExpConnectionSourceIdsByTarget(state: IClientRoomState, targetId: Id): List<Id> {

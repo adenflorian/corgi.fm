@@ -112,8 +112,9 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 		osc1.type,
 		filter.id,
 		filter.type,
-		0,
-		0,
+		'output',
+		'input',
+		'audio',
 	)))
 
 	dispatchToRoom(expConnectionsActions.add(new ExpConnection(
@@ -121,8 +122,9 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 		filter.type,
 		audioOutput.id,
 		audioOutput.type,
-		0,
-		0,
+		'output',
+		'input',
+		'audio',
 	)))
 
 	dispatchToRoom(expConnectionsActions.add(new ExpConnection(
@@ -130,8 +132,9 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 		osc2.type,
 		gain.id,
 		gain.type,
-		0,
-		0,
+		'output',
+		'input',
+		'audio',
 	)))
 
 	dispatchToRoom(expConnectionsActions.add(new ExpConnection(
@@ -139,8 +142,9 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 		gain.type,
 		filter.id,
 		filter.type,
-		0,
-		1,
+		'output',
+		'frequency',
+		'audio',
 	)))
 
 	function dispatchToRoom(action: Action) {

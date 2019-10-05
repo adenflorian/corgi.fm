@@ -6,7 +6,7 @@ import {
 	MIN_MIDI_NOTE_NUMBER_0,
 	maxRoomNameLength,
 } from './common-constants'
-import {MidiClipEvents} from './midi-types'
+import {MidiClipEvents, preciseDivide, preciseMultiply} from './midi-types'
 
 import uuid = require('uuid')
 
@@ -239,9 +239,9 @@ export function isId(val: unknown): val is Id {
 }
 
 export function toBeats(seconds: number, bpm: number) {
-	return seconds * (bpm / 60)
+	return preciseMultiply(seconds, preciseDivide(bpm, 60))
 }
 
 export function fromBeats(beats: number, bpm: number) {
-	return beats * (60 / bpm)
+	return preciseMultiply(beats, preciseDivide(60, bpm))
 }

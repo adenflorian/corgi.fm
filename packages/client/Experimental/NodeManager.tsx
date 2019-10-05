@@ -2,12 +2,17 @@ import React, {Fragment, useContext} from 'react'
 import * as immutable from 'immutable'
 import {ExpNodeState, IExpConnection} from '@corgifm/common/redux'
 import {logger} from '../client-logger'
-import {ConnectedExpConnectorPlaceholders} from '../Connections/ConnectorPlaceholders'
-import {ConnectedSimpleGraphNodeExp} from '../SimpleGraph/SimpleGraphNodeExp'
 import {typeClassMap} from './ExpNodes'
-import {CorgiNode, ExpNodeContext} from './CorgiNode'
-import {ExpNodeAudioConnection} from './ExpConnections'
+import {CorgiNode} from './CorgiNode'
+import {
+	ExpNodeAudioConnection, ExpNodeConnection, isAudioConnection,
+	ExpConnectionCallback, ExpGateConnection, isGateConnection,
+} from './ExpConnections'
 import {NumberParamChange} from './ExpParams'
+import {
+	isAudioOutputPort, isAudioInputPort, ExpPortCallback, ExpPortType,
+} from './ExpPorts'
+import {isGateOutputPort, isGateInputPort} from './ExpGatePorts'
 
 export const NodeManagerContext = React.createContext<null | NodeManagerContextValue>(null)
 
@@ -23,7 +28,7 @@ export function useNodeManagerContext() {
 
 export class NodeManager {
 	private readonly _nodes = new Map<Id, CorgiNode>()
-	private readonly _audioConnections = new Map<Id, ExpNodeAudioConnection>()
+	private readonly _connections = new Map<Id, ExpNodeConnection>()
 	public readonly reactContext: NodeManagerContextValue
 
 	public constructor(
@@ -40,14 +45,54 @@ export class NodeManager {
 
 				if (!node) return logger.warn('[getNodeInfo] 404 node not found: ', {nodeId})
 
-				// Only static info should go in here
 				return {
-					audioInputPortCount: node.getAudioInputPortCount(),
-					audioOutputPortCount: node.getAudioOutputPortCount(),
+					// Only static info should go in here
 					color: node.getColor(),
 				} as const
 			},
-		}
+			connections: {
+				register: (id: Id, callback: ExpConnectionCallback) => {
+					const connection = this._connections.get(id)
+					if (!connection) return logger.warn('[connections.register] 404 connection not found: ', {id, connections: this._connections})
+					connection.subscribers.set(callback, callback)
+					callback(connection)
+				},
+				unregister: (id: Id, callback: ExpConnectionCallback) => {
+					const connection = this._connections.get(id)
+					if (!connection) return // logger.warn('[connections.unregister] 404 connection not found: ', {id, connections: this._connections})
+					connection.subscribers.delete(callback)
+				},
+				get: (id: Id) => {
+					const connection = this._connections.get(id)
+					if (!connection) return logger.warn('[connections.get] 404 connection not found: ', {id, connections: this._connections})
+					return connection
+				},
+			} as const,
+			ports: {
+				register: (nodeId: Id, portId: Id, callback: ExpPortCallback) => {
+					const node = this._nodes.get(nodeId)
+					if (!node) return logger.warn('[ports.register] 404 node not found: ', {nodeId, portId})
+					const port = node.getPort(portId)
+					if (!port) return logger.warn('[ports.register] 404 port not found: ', {nodeId, portId})
+					port.subscribers.set(callback, callback)
+					callback(port)
+				},
+				unregister: (nodeId: Id, portId: Id, callback: ExpPortCallback) => {
+					const node = this._nodes.get(nodeId)
+					if (!node) return logger.warn('[ports.unregister] 404 node not found: ', {nodeId, portId})
+					const port = node.getPort(portId)
+					if (!port) return logger.warn('[ports.unregister] 404 port not found: ', {nodeId, portId})
+					port.subscribers.delete(callback)
+				},
+				get: (nodeId: Id, portId: Id) => {
+					const node = this._nodes.get(nodeId)
+					if (!node) return logger.warn('[ports.get] 404 node not found: ', {nodeId, portId})
+					const port = node.getPort(portId)
+					if (!port) return logger.warn('[ports.get] 404 port not found: ', {nodeId, portId})
+					return port
+				},
+			} as const,
+		} as const
 	}
 
 	public renderNodeId = (nodeId: Id) => {
@@ -60,36 +105,22 @@ export class NodeManager {
 
 		return (
 			<Fragment key={nodeId as string}>
-				<ConnectedExpConnectorPlaceholders
-					parentId={nodeId}
-					inputAudioPortCount={node.getAudioInputPortCount()}
-					outputAudioPortCount={node.getAudioOutputPortCount()}
-				/>
-				<ConnectedSimpleGraphNodeExp
-					positionId={nodeId}
-					overrideColor={node.getColor()}
-				>
-					<ExpNodeContext.Provider value={node.reactContext}>
-						{node.render()}
-					</ExpNodeContext.Provider>
-				</ConnectedSimpleGraphNodeExp>
+				{node.render()}
 			</Fragment>
 		)
 	}
 
-	// public onNodeParamChange = (paramChange: AudioParamChange) => {
-	// 	const node = this._nodes.get(paramChange.nodeId)
-
-	// 	if (!node) return logger.warn('404 node not found: ', {paramChange})
-
-	// 	node.onParamChange(paramChange)
-
-	// 	// TODO
-	// }
+	public getPortType(nodeId: Id, portId: Id): ExpPortType | void {
+		const node = this._nodes.get(nodeId)
+		if (!node) return logger.warn('[getPortType] 404 node not found: ', {nodeId, portId})
+		const port = node.getPort(portId)
+		if (!port) return logger.warn('[getPortType] 404 port not found: ', {nodeId, portId})
+		return port.type
+	}
 
 	public onTick() {
-		const maxReadAhead = 0.1
-		this._nodes.forEach(node => node.onTick(maxReadAhead))
+		const maxReadAhead = 0.2
+		this._nodes.forEach(node => node.onTick(this._audioContext.currentTime, maxReadAhead))
 	}
 
 	public enableNode(id: Id, enabled: boolean) {
@@ -137,10 +168,18 @@ export class NodeManager {
 	}
 
 	public addAudioConnections = (connections: immutable.Map<Id, IExpConnection>) => {
-		connections.forEach(this.addAudioConnection)
+		connections.forEach(this.addConnection)
 	}
 
-	public addAudioConnection = (expConnection: IExpConnection) => {
+	public addConnection = (expConnection: IExpConnection) => {
+		switch (expConnection.type) {
+			case 'audio': return this._addAudioConnection(expConnection)
+			case 'gate': return this._addGateConnection(expConnection)
+			default: return
+		}
+	}
+
+	private readonly _addAudioConnection = (expConnection: IExpConnection) => {
 		// Get nodes
 		const source = this._nodes.get(expConnection.sourceId)
 		const target = this._nodes.get(expConnection.targetId)
@@ -150,58 +189,151 @@ export class NodeManager {
 		}
 
 		// Get and connect ports
-		const sourcePort = source.getAudioOutputPort(expConnection.sourcePort)
-		const targetPort = target.getAudioInputPort(expConnection.targetPort)
+		const sourcePort = source.getPort(expConnection.sourcePort)
+		const targetPort = target.getPort(expConnection.targetPort)
 		if (!sourcePort || !targetPort) return logger.warn('[addAudioConnection] 404 port not found: ', {node: this, sourcePort, targetPort})
+		if (!isAudioOutputPort(sourcePort)) return logger.error('[addAudioConnection] expected audio output port: ', {node: this, sourcePort, targetPort})
+		if (!isAudioInputPort(targetPort)) return logger.error('[addAudioConnection] expected audio input port: ', {node: this, sourcePort, targetPort})
 
 		// Create connection
 		const connection = new ExpNodeAudioConnection(expConnection.id, sourcePort, targetPort)
-		this._audioConnections.set(connection.id, connection)
+		this._connections.set(connection.id, connection)
 	}
 
-	public deleteAudioConnection = (connectionId: Id) => {
-		const connection = this._audioConnections.get(connectionId)
+	private readonly _addGateConnection = (expConnection: IExpConnection) => {
+		// Get nodes
+		const source = this._nodes.get(expConnection.sourceId)
+		const target = this._nodes.get(expConnection.targetId)
+		if (!source || !target) {
+			logger.warn('uh oh: ', {source, target})
+			return
+		}
+
+		// Get and connect ports
+		const sourcePort = source.getPort(expConnection.sourcePort)
+		const targetPort = target.getPort(expConnection.targetPort)
+		if (!sourcePort || !targetPort) return logger.warn('[addGateConnection] 404 port not found: ', {node: this, sourcePort, targetPort})
+		if (!isGateOutputPort(sourcePort)) return logger.error('[addGateConnection] expected gate output port: ', {node: this, sourcePort, targetPort})
+		if (!isGateInputPort(targetPort)) return logger.error('[addGateConnection] expected gate input port: ', {node: this, sourcePort, targetPort})
+
+		// Create connection
+		const connection = new ExpGateConnection(expConnection.id, sourcePort, targetPort)
+		this._connections.set(connection.id, connection)
+	}
+
+	public deleteConnection = (connectionId: Id) => {
+		const connection = this._connections.get(connectionId)
 
 		if (!connection) return logger.warn('tried to delete non existent connection: ', connectionId)
 
-		this._audioConnections.delete(connectionId)
+		this._connections.delete(connectionId)
 
 		connection.dispose()
 	}
 
-	public deleteAllAudioConnections = () => {
-		this._audioConnections.forEach(x => this.deleteAudioConnection(x.id))
+	public deleteAllConnections = () => {
+		this._connections.forEach(x => this.deleteConnection(x.id))
 	}
 
-	public changeAudioConnectionSource = (connectionId: Id, newSourceId: Id, newSourcePort: number) => {
-		const connection = this._audioConnections.get(connectionId)
+	public changeConnectionSource = (connectionId: Id, newSourceId: Id, newSourcePort: Id) => {
+		const connection = this._connections.get(connectionId)
 
 		if (!connection) return logger.warn('404 connection not found: ', connectionId)
+
+		switch (connection.type) {
+			case 'audio': return this._changeAudioConnectionSource(connection, newSourceId, newSourcePort)
+			case 'gate': return this._changeGateConnectionSource(connection, newSourceId, newSourcePort)
+			default: return
+		}
+	}
+
+	private readonly _changeAudioConnectionSource = (connection: ExpNodeConnection, newSourceId: Id, newSourcePort: Id) => {
+		if (!isAudioConnection(connection)) {
+			return logger.error(
+				'[_changeAudioConnectionSource] connection not instanceof ExpNodeAudioConnection: ',
+				{connection, newSourceId, newSourcePort})
+		}
 
 		// Get node
 		const source = this._nodes.get(newSourceId)
 		if (!source) return logger.warn('uh oh: ', {source})
 
 		// Get and connect ports
-		const sourcePort = source.getAudioOutputPort(newSourcePort)
+		const sourcePort = source.getPort(newSourcePort)
 		if (!sourcePort) return logger.warn('[changeAudioConnectionSource] 404 port not found: ', {node: this, sourcePort})
+		if (!isAudioOutputPort(sourcePort)) return logger.error('[changeAudioConnectionSource] expected audio output port: ', {node: this, sourcePort})
 
 		// Disconnect old source
 		connection.changeSource(sourcePort)
 	}
 
-	public changeAudioConnectionTarget = (connectionId: Id, newTargetId: Id, newTargetPort: number) => {
-		const connection = this._audioConnections.get(connectionId)
+	private readonly _changeGateConnectionSource = (connection: ExpNodeConnection, newSourceId: Id, newSourcePort: Id) => {
+		if (!isGateConnection(connection)) {
+			return logger.error(
+				'[_changeGateConnectionSource] connection not instanceof ExpNodeGateConnection: ',
+				{connection, newSourceId, newSourcePort})
+		}
+
+		// Get node
+		const source = this._nodes.get(newSourceId)
+		if (!source) return logger.warn('uh oh: ', {source})
+
+		// Get and connect ports
+		const sourcePort = source.getPort(newSourcePort)
+		if (!sourcePort) return logger.warn('[changeGateConnectionSource] 404 port not found: ', {node: this, sourcePort})
+		if (!isGateOutputPort(sourcePort)) return logger.error('[changeGateConnectionSource] expected audio output port: ', {node: this, sourcePort})
+
+		// Disconnect old source
+		connection.changeSource(sourcePort)
+	}
+
+	public changeConnectionTarget = (connectionId: Id, newTargetId: Id, newTargetPort: Id) => {
+		const connection = this._connections.get(connectionId)
 
 		if (!connection) return logger.warn('404 connection not found: ', connectionId)
+
+		switch (connection.type) {
+			case 'audio': return this._changeAudioConnectionTarget(connection, newTargetId, newTargetPort)
+			case 'gate': return this._changeGateConnectionTarget(connection, newTargetId, newTargetPort)
+			default: return
+		}
+	}
+
+	private readonly _changeAudioConnectionTarget = (connection: ExpNodeConnection, newTargetId: Id, newTargetPort: Id) => {
+		if (!isAudioConnection(connection)) {
+			return logger.error(
+				'[changeAudioConnectionTarget] connection not instanceof ExpNodeAudioConnection: ',
+				{newTargetId, newTargetPort, connection})
+		}
 
 		// Get node
 		const target = this._nodes.get(newTargetId)
 		if (!target) return logger.warn('uh oh: ', {target})
 
 		// Get and connect ports
-		const targetPort = target.getAudioInputPort(newTargetPort)
+		const targetPort = target.getPort(newTargetPort)
 		if (!targetPort) return logger.warn('[changeAudioConnectionTarget] 404 port not found: ', {node: this, targetPort})
+		if (!isAudioInputPort(targetPort)) return logger.error('[changeAudioConnectionTarget] expected audio input port: ', {node: this, targetPort})
+
+		// Disconnect old target
+		connection.changeTarget(targetPort)
+	}
+
+	private readonly _changeGateConnectionTarget = (connection: ExpNodeConnection, newTargetId: Id, newTargetPort: Id) => {
+		if (!isGateConnection(connection)) {
+			return logger.error(
+				'[changeGateConnectionTarget] connection not instanceof ExpNodeGateConnection: ',
+				{newTargetId, newTargetPort, connection})
+		}
+
+		// Get node
+		const target = this._nodes.get(newTargetId)
+		if (!target) return logger.warn('uh oh: ', {target})
+
+		// Get and connect ports
+		const targetPort = target.getPort(newTargetPort)
+		if (!targetPort) return logger.warn('[changeGateConnectionTarget] 404 port not found: ', {node: this, targetPort})
+		if (!isGateInputPort(targetPort)) return logger.error('[changeGateConnectionTarget] expected audio input port: ', {node: this, targetPort})
 
 		// Disconnect old target
 		connection.changeTarget(targetPort)
@@ -210,7 +342,7 @@ export class NodeManager {
 	public cleanup = () => {
 		this._nodes.forEach(node => node.dispose())
 		this._nodes.clear()
-		this._audioConnections.clear()
+		this._connections.clear()
 	}
 }
 

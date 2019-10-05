@@ -1,39 +1,44 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import React, {useCallback, useMemo, useState, useLayoutEffect, Fragment} from 'react'
-import {useDispatch} from 'react-redux'
+import {useDispatch, useSelector, shallowEqual} from 'react-redux'
 import {ContextMenuTrigger} from 'react-contextmenu'
 import {
-	ExpPosition, selectOptions,
-	shamuConnect, shamuMetaActions, selectExpPosition, expPositionActions,
+	shamuMetaActions, selectExpPosition, expPositionActions, IClientAppState,
 } from '@corgifm/common/redux'
 import {panelHeaderHeight} from '@corgifm/common/common-constants'
 import {ConnectionNodeType} from '@corgifm/common/common-types'
 import {handleClassName, expNodeMenuId} from '../client-constants'
 import {simpleGlobalClientState} from '../SimpleGlobalClientState'
 import {ExpPanel} from '../Panel/ExpPanel'
+import {useNodeContext} from '../Experimental/CorgiNode'
 
-interface ISimpleGraphNodeProps {
-	positionId: Id
+interface Props {
 	children: React.ReactNode
-	overrideColor?: string
 }
 
-interface ISimpleGraphNodeReduxProps {
-	position: ExpPosition
-	color: string
-	highQuality: boolean
-	isSelected: boolean
-}
+export function SimpleGraphNodeExp({children}: Props) {
+	const nodeContext = useNodeContext()
 
-type ISimpleGraphNodeAllProps = ISimpleGraphNodeProps & ISimpleGraphNodeReduxProps
+	const positionId = nodeContext.id
 
-export function SimpleGraphNode(props: ISimpleGraphNodeAllProps) {
-	const {
-		positionId, color, children,
-		position, isSelected, overrideColor,
-	} = props
+	const color = nodeContext.getColor()
 
-	const {x, y, width, height, zIndex} = position
+	const selectedNode = useSelector((state: IClientAppState) => state.room.expPositions.meta.selectedNode)
+
+	const selectedNodeId = selectedNode ? selectedNode.id : undefined
+
+	const isSelected = positionId === selectedNodeId
+
+	const {x, y, width, height, zIndex} = useSelector((state: IClientAppState) => {
+		const position = selectExpPosition(state.room, positionId)
+		return {
+			x: position.x,
+			y: position.y,
+			width: position.width,
+			height: position.height,
+			zIndex: position.zIndex,
+		}
+	}, shallowEqual)
 
 	const dispatch = useDispatch()
 
@@ -114,15 +119,15 @@ export function SimpleGraphNode(props: ISimpleGraphNodeAllProps) {
 								collect={collect}
 							>
 								<ExpPanel
-									color={overrideColor || color}
-									id={position.id}
+									color={color}
+									id={positionId}
 									label="test"
 								>
 									{children}
 								</ExpPanel>
 							</ContextMenuTrigger>
 						)
-					}, [overrideColor, color, position, positionId])
+					}, [children, color, positionId])
 				}
 			</div>
 		</Fragment>
@@ -133,18 +138,3 @@ const collect = ({nodeId, nodeType}: any) => ({
 	nodeId,
 	nodeType,
 })
-
-export const ConnectedSimpleGraphNodeExp = shamuConnect(
-	(state, {positionId}: ISimpleGraphNodeProps): ISimpleGraphNodeReduxProps => {
-		const position = selectExpPosition(state.room, positionId)
-		const selectedNode = state.room.expPositions.meta.selectedNode
-		const selectedId = selectedNode ? selectedNode.id : undefined
-
-		return {
-			position,
-			color: position.color,
-			highQuality: selectOptions(state).graphicsECS,
-			isSelected: positionId === selectedId,
-		}
-	},
-)(SimpleGraphNode)

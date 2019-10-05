@@ -1,42 +1,37 @@
-import React, {useLayoutEffect, useMemo} from 'react'
+import React from 'react'
 import {useSelector} from 'react-redux'
 import {
-	IClientAppState, selectExpAllPositions, RoomType,
+	IClientAppState, selectExpAllPositions,
 } from '@corgifm/common/redux'
 import {useSingletonContext} from '../SingletonContext'
-import {ConnectedGhostConnectionsView} from '../Connections/GhostConnections'
 import {ConnectedExpConnections} from '../Connections/ExpConnections'
-import {NodeManager, NodeManagerContext} from './NodeManager'
+import {logger} from '../client-logger'
+import {ConnectedExpGhostConnectionsView} from '../Connections/ExpGhostConnections'
+import {NodeManagerContext} from './NodeManager'
 
 export const NodeManagerRoot = () => {
 	const positionIds = useSelector((state: IClientAppState) => selectExpAllPositions(state.room))
 
 	const singletonContext = useSingletonContext()
 
-	const nodeManager = useMemo(() => new NodeManager(
-		singletonContext.getAudioContext(),
-		singletonContext.getPreMasterLimiter()
-	), [singletonContext])
+	const nodeManager = singletonContext.getNodeManager()
 
 	const viewMode = useSelector((state: IClientAppState) => state.room.roomSettings.viewMode)
 
-	useLayoutEffect(() => {
-		singletonContext.setNodeManager(nodeManager)
-
-		return () => {
-			singletonContext.setNodeManager(undefined)
-		}
-	}, [nodeManager, singletonContext])
+	if (!nodeManager) {
+		logger.error('missing nodeManager in root!')
+		return null
+	}
 
 	return (
 		<NodeManagerContext.Provider value={nodeManager.reactContext}>
 			<div className={`nodeManagerRoot viewMode-${viewMode}`}>
-				<ConnectedGhostConnectionsView roomType={RoomType.Experimental} />
 				{positionIds.map((_, positionId) => {
 					return nodeManager.renderNodeId(positionId)
 				}).toList()}
 				{/* Render connections after some the connectors render on top of nodes */}
 				<ConnectedExpConnections />
+				<ConnectedExpGhostConnectionsView />
 			</div>
 		</NodeManagerContext.Provider>
 	)

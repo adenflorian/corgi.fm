@@ -1,18 +1,16 @@
 import React from 'react'
-import {useDispatch, useSelector} from 'react-redux'
+import {useDispatch} from 'react-redux'
 import {
 	ActiveGhostConnectorSourceOrTarget, calculateConnectorPositionY,
 	GhostConnection, ghostConnectorActions,
 	GhostConnectorAddingOrMoving, IClientAppState,
 	selectLocalClientId, selectPosition, shamuConnect,
 	selectNodeConnectionInfosForNode, NodeConnectionsInfo,
-	selectExpPosition, selectExpNodeConnectionInfosForNode,
 	RoomSettings,
 } from '@corgifm/common/redux'
 import {emptyList} from '@corgifm/common/common-utils'
 import {connectorWidth} from './ConnectionView'
 import {ConnectorPlaceholder} from './ConnectorPlaceholder'
-import {expConnectionConstants, calculateExpDebugConnectorY} from './ExpConnectionView'
 
 interface Props {
 	parentId: Id
@@ -57,22 +55,18 @@ export const ConnectorPlaceholders =
 			)))
 		}
 
-		const xMod = viewMode === 'debug' ? xAdjust : 0
-
 		return (
 			<div
 				className="connection"
 				style={{color: 'white'}}
 			>
 				{new Array(leftPortCount).fill(0).map((_, port) => {
-					const y = viewMode === 'debug'
-						? calculateExpDebugConnectorY(parentY, port)
-						: calculateConnectorPositionY(parentY, parentHeight, leftPortCount, port)
+					const y = calculateConnectorPositionY(parentY, parentHeight, leftPortCount, port)
 					return (
 						<div key={`left-${port}`}>
 							<ConnectorPlaceholder
 								onMouseDown={onMouseDown(y, port)}
-								x={parentX + (leftConnections.get(port, emptyList).count() * -connectorWidth) - connectorWidth + xMod}
+								x={parentX + (leftConnections.get(port, emptyList).count() * -connectorWidth) - connectorWidth}
 								y={y}
 								sourceOrTarget={ActiveGhostConnectorSourceOrTarget.Source}
 								nodeId={parentId}
@@ -82,14 +76,12 @@ export const ConnectorPlaceholders =
 					)
 				})}
 				{new Array(rightPortCount).fill(0).map((_, port) => {
-					const y = viewMode === 'debug'
-						? calculateExpDebugConnectorY(parentY, port)
-						: calculateConnectorPositionY(parentY, parentHeight, rightPortCount, port)
+					const y = calculateConnectorPositionY(parentY, parentHeight, rightPortCount, port)
 					return (
 						<div key={`right-${port}`}>
 							<ConnectorPlaceholder
 								onMouseDown={onMouseDown(y, port)}
-								x={parentX + parentWidth + (rightConnections.get(port, emptyList).count() * connectorWidth) - xMod}
+								x={parentX + parentWidth + (rightConnections.get(port, emptyList).count() * connectorWidth)}
 								y={y}
 								sourceOrTarget={ActiveGhostConnectorSourceOrTarget.Target}
 								nodeId={parentId}
@@ -113,39 +105,10 @@ const mapStateToProps = (state: IClientAppState, props: Props): ReduxProps => {
 		parentHeight: parentPosition.height,
 		leftPortCount: parentPosition.inputPortCount,
 		rightPortCount: parentPosition.outputPortCount,
-		viewMode: 'normal'
+		viewMode: 'normal',
 	}
 }
 
 export const ConnectedConnectorPlaceholders = shamuConnect(
 	mapStateToProps,
 )(ConnectorPlaceholders)
-
-type PPProps = Props & {
-	readonly inputAudioPortCount: number
-	readonly outputAudioPortCount: number
-}
-
-const {xAdjust} = expConnectionConstants
-
-export const ConnectedExpConnectorPlaceholders = (React.memo(function _ConnectedExpConnectorPlaceholders(props: PPProps) {
-	const parentPosition = useSelector((state: IClientAppState) => selectExpPosition(state.room, props.parentId))
-	const placeholdersInfo = useSelector((state: IClientAppState) => selectExpNodeConnectionInfosForNode(state.room, props.parentId))
-	const localClientId = useSelector((state: IClientAppState) => selectLocalClientId(state))
-	const viewMode = useSelector((state: IClientAppState) => state.room.roomSettings.viewMode)
-
-	return (
-		<ConnectorPlaceholders
-			parentId={props.parentId}
-			placeholdersInfo={placeholdersInfo}
-			localClientId={localClientId}
-			parentX={parentPosition.x}
-			parentY={parentPosition.y}
-			parentWidth={parentPosition.width}
-			parentHeight={parentPosition.height}
-			leftPortCount={props.inputAudioPortCount}
-			rightPortCount={props.outputAudioPortCount}
-			viewMode={viewMode}
-		/>
-	)
-}))

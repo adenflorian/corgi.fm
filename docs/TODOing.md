@@ -569,6 +569,7 @@ Yes, https://mmckegg.github.io/web-audio-school/, exercise 13 is exactly what yo
 - [ ] distortion
 - [ ] desktop notifications for chat
 - [ ] allow setting bookmarks on knobs (like setting what the preferred value or range is)
+- [ ] right click add node menu, new node should go at right click position, not the left click position
 
 # 0.7.0
 - [ ] quick connection mode

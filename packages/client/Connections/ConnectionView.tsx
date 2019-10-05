@@ -44,7 +44,6 @@ interface IConnectionViewReduxProps {
 
 type IConnectionViewAllProps = IConnectionViewProps & IConnectionViewReduxProps
 
-export const longLineStrokeWidth = 2
 export const connectorWidth = 16
 export const connectorHeight = 8
 

@@ -34,7 +34,7 @@ export const ConnectedSimpleGraph = function _ConnectedSimpleGraph() {
 					{roomType !== RoomType.Experimental &&
 						<ConnectedConnections />}
 					{roomType !== RoomType.Experimental &&
-						<ConnectedGhostConnectionsView roomType={RoomType.Normal} />}
+						<ConnectedGhostConnectionsView />}
 					{roomType === RoomType.Experimental
 						? <NodeManagerRoot />
 						: <PositionsStuff />}

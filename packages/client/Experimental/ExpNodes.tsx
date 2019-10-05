@@ -1,26 +1,30 @@
 /* eslint-disable no-empty-function */
 import {ExpNodeType} from '@corgifm/common/redux'
 import {CssColor} from '@corgifm/common/shamu-color'
-import {toBeats} from '@corgifm/common/common-utils'
+import {toBeats, fromBeats} from '@corgifm/common/common-utils'
+import {preciseSubtract, preciseAdd, midiPrecision} from '@corgifm/common/midi-types'
 import {logger} from '../client-logger'
 import {
 	percentageValueString, filterValueToString,
 	panValueToString, adsrValueToString, gainDecibelValueToString,
 } from '../client-constants'
 import {
-	ExpNodeAudioPort, ExpNodeAudioInputPortArgs, ExpNodeAudioOutputPortArgs,
+	ExpNodeAudioInputPort, ExpNodeAudioOutputPort,
 } from './ExpPorts'
 import {CorgiNode} from './CorgiNode'
 import {
-	ExpAudioParam, buildAudioParamDesc, NumberParamChange,
+	ExpAudioParam, buildAudioParamDesc,
 	ExpCustomNumberParam, buildCustomNumberParamDesc,
 } from './ExpParams'
-import {ExpNodeConnection} from './ExpConnections'
 import './ExpNodes.less'
+import {ExpGateInputPort, ExpGateOutputPort} from './ExpGatePorts'
 
 export class OscillatorExpNode extends CorgiNode {
 	private readonly _oscillator: OscillatorNode
 	private readonly _outputGain: GainNode
+	private readonly _frequencyPort: ExpNodeAudioInputPort
+	private readonly _detunePort: ExpNodeAudioInputPort
+	private readonly _outputPort: ExpNodeAudioOutputPort
 
 	public constructor(
 		id: Id, audioContext: AudioContext, preMasterLimiter: GainNode,
@@ -32,20 +36,21 @@ export class OscillatorExpNode extends CorgiNode {
 		const outputGain = audioContext.createGain()
 		oscillator.connect(outputGain)
 
-		const inPorts: readonly ExpNodeAudioInputPortArgs[] = [
-			{id: 0, name: 'frequency', destination: oscillator.frequency},
-			{id: 1, name: 'detune', destination: oscillator.detune},
-		]
-		const outPorts: readonly ExpNodeAudioOutputPortArgs[] = [
-			{id: 0, name: 'output', source: outputGain},
-		]
+		const frequencyPort = new ExpNodeAudioInputPort('frequency', 'frequency', () => this, oscillator.frequency)
+		const detunePort = new ExpNodeAudioInputPort('detune', 'detune', () => this, oscillator.detune)
+		const outputPort = new ExpNodeAudioOutputPort('output', 'output', () => this, outputGain)
 
-		const audioParams = new Map<Id, ExpAudioParam>([
-			buildAudioParamDesc('frequency', oscillator.frequency, 440, 0, 20000, 3, filterValueToString),
-			buildAudioParamDesc('detune', oscillator.detune, 0, -100, 100, 1, filterValueToString),
-		])
+		super(id, audioContext, preMasterLimiter, {
+			ports: [frequencyPort, detunePort, outputPort],
+			audioParams: new Map<Id, ExpAudioParam>([
+				buildAudioParamDesc('frequency', oscillator.frequency, 440, 0, 20000, 3, filterValueToString),
+				buildAudioParamDesc('detune', oscillator.detune, 0, -100, 100, 1, filterValueToString),
+			]),
+		})
 
-		super(id, audioContext, preMasterLimiter, inPorts, outPorts, audioParams)
+		this._frequencyPort = frequencyPort
+		this._detunePort = detunePort
+		this._outputPort = outputPort
 
 		// Make sure to add these to the dispose method!
 		this._oscillator = oscillator
@@ -57,24 +62,6 @@ export class OscillatorExpNode extends CorgiNode {
 	}
 
 	public getName() {return 'Oscillator'}
-
-	// public onParamChange(paramChange: NumberParamChange) {
-	// 	// switch (paramChange.paramId) {
-	// 	// 	case 'wave': return isOscillatorType(paramChange.newValue) && this._changeOscillatorType(paramChange.newValue)
-	// 	// 	default: return logger.warn('unexpected param id: ', {paramChange})
-	// 	// }
-	// 	// Render view
-	// 	// Change value on web audio oscillator
-	// }
-
-	// private _changeOscillatorType(newValue: OscillatorType) {
-	// 	this._oscillator.type = newValue
-	// }
-
-	// eslint-disable-next-line no-empty-function
-	public onNewAudioOutConnection(port: ExpNodeAudioPort, connection: ExpNodeConnection) {
-
-	}
 
 	public render() {
 		return this.getDebugView()
@@ -97,17 +84,18 @@ export class OscillatorExpNode extends CorgiNode {
 
 export class AudioOutputExpNode extends CorgiNode {
 	private readonly _inputGain: GainNode
+	private readonly _inputPort: ExpNodeAudioInputPort
 
 	public constructor(
 		id: Id, audioContext: AudioContext, preMasterLimiter: GainNode,
 	) {
 		const inputGain = audioContext.createGain()
 
-		const inPorts: readonly ExpNodeAudioInputPortArgs[] = [
-			{id: 0, name: 'input', destination: inputGain},
-		]
+		const inputPort = new ExpNodeAudioInputPort('input', 'input', () => this, inputGain)
 
-		super(id, audioContext, preMasterLimiter, inPorts)
+		super(id, audioContext, preMasterLimiter, {ports: [inputPort]})
+
+		this._inputPort = inputPort
 
 		inputGain.connect(audioContext.destination)
 		// inputGain.connect(this.preMasterLimiter)
@@ -175,25 +163,30 @@ export class FilterNode extends CorgiNode {
 
 		const dryWetChain = new DryWetChain(audioContext, filter)
 
-		const inPorts: readonly ExpNodeAudioInputPortArgs[] = [
-			{id: 0, name: 'input', destination: dryWetChain.inputGain},
-			{id: 1, name: 'frequency', destination: filter.frequency},
-			{id: 2, name: 'detune', destination: filter.detune},
-			{id: 3, name: 'q', destination: filter.Q},
-			{id: 4, name: 'gain', destination: filter.gain},
-		]
-		const outPorts: readonly ExpNodeAudioOutputPortArgs[] = [
-			{id: 0, name: 'output', source: dryWetChain.outputGain},
-		]
+		const inputPort = new ExpNodeAudioInputPort('input', 'input', () => this, dryWetChain.inputGain)
+		const frequencyPort = new ExpNodeAudioInputPort('frequency', 'frequency', () => this, filter.frequency)
+		const detunePort = new ExpNodeAudioInputPort('detune', 'detune', () => this, filter.detune)
+		const qPort = new ExpNodeAudioInputPort('q', 'q', () => this, filter.Q)
+		const gainPort = new ExpNodeAudioInputPort('gain', 'gain', () => this, filter.gain)
 
-		const audioParams = new Map<Id, ExpAudioParam>([
-			buildAudioParamDesc('frequency', filter.frequency, 20000, 0, 20000, 3, filterValueToString),
-			buildAudioParamDesc('detune', filter.detune, 0, -100, 100, 1, filterValueToString),
-			buildAudioParamDesc('q', filter.Q, 1, 0.1, 18),
-			buildAudioParamDesc('gain', filter.gain, 0, -1, 1, 1, percentageValueString),
-		])
+		const outputPort = new ExpNodeAudioOutputPort('output', 'output', () => this, dryWetChain.outputGain)
 
-		super(id, audioContext, preMasterLimiter, inPorts, outPorts, audioParams)
+		super(id, audioContext, preMasterLimiter, {
+			ports: [
+				inputPort,
+				frequencyPort,
+				detunePort,
+				qPort,
+				gainPort,
+				outputPort,
+			],
+			audioParams: new Map<Id, ExpAudioParam>([
+				buildAudioParamDesc('frequency', filter.frequency, 20000, 0, 20000, 3, filterValueToString),
+				buildAudioParamDesc('detune', filter.detune, 0, -100, 100, 1, filterValueToString),
+				buildAudioParamDesc('q', filter.Q, 1, 0.1, 18),
+				buildAudioParamDesc('gain', filter.gain, 0, -1, 1, 1, percentageValueString),
+			]),
+		})
 
 		// Make sure to add these to the dispose method!
 		this._filter = filter
@@ -290,20 +283,18 @@ export class ExpGainNode extends CorgiNode {
 
 		const dryWetChain = new DryWetChain(audioContext, gain)
 
-		const inPorts: readonly ExpNodeAudioInputPortArgs[] = [
-			{id: 0, name: 'input', destination: dryWetChain.inputGain},
-			{id: 1, name: 'gain', destination: gainParamWaveShaper},
-		]
-		const outPorts: readonly ExpNodeAudioOutputPortArgs[] = [
-			{id: 0, name: 'output', source: dryWetChain.outputGain},
-		]
+		const inputPort = new ExpNodeAudioInputPort('input', 'input', () => this, dryWetChain.inputGain)
+		const gainPort = new ExpNodeAudioInputPort('gain', 'gain', () => this, gainParamWaveShaper)
 
-		const audioParams = new Map<Id, ExpAudioParam>([
-			buildAudioParamDesc('gain', gainConstantSource.offset, 1, 0, 1, 1, gainDecibelValueToString),
-			// buildAudioParamDesc('gain', gain.gain, 1, 0, 10, 3.33, gainDecibelValueToString),
-		])
+		const outputPort = new ExpNodeAudioOutputPort('output', 'output', () => this, dryWetChain.outputGain)
 
-		super(id, audioContext, preMasterLimiter, inPorts, outPorts, audioParams)
+		super(id, audioContext, preMasterLimiter, {
+			ports: [inputPort, gainPort, outputPort],
+			audioParams: new Map<Id, ExpAudioParam>([
+				buildAudioParamDesc('gain', gainConstantSource.offset, 1, 0, 1, 1, gainDecibelValueToString),
+				// buildAudioParamDesc('gain', gain.gain, 1, 0, 10, 3.33, gainDecibelValueToString),
+			]),
+		})
 
 		// Make sure to add these to the dispose method!
 		this._gain = gain
@@ -313,7 +304,7 @@ export class ExpGainNode extends CorgiNode {
 	}
 
 	public getColor(): string {
-		return CssColor.yellow
+		return CssColor.orange
 	}
 
 	public getName() {return 'Gain'}
@@ -350,19 +341,19 @@ export class ExpPanNode extends CorgiNode {
 
 		const dryWetChain = new DryWetChain(audioContext, pan)
 
-		const inPorts: readonly ExpNodeAudioInputPortArgs[] = [
-			{id: 0, name: 'input', destination: dryWetChain.inputGain},
-			{id: 1, name: 'pan', destination: pan.pan},
-		]
-		const outPorts: readonly ExpNodeAudioOutputPortArgs[] = [
-			{id: 0, name: 'output', source: dryWetChain.outputGain},
-		]
+		const inputPort = new ExpNodeAudioInputPort('input', 'input', () => this, dryWetChain.inputGain)
+		const panPort = new ExpNodeAudioInputPort('pan', 'pan', () => this, pan.pan)
+
+		const outputPort = new ExpNodeAudioOutputPort('output', 'output', () => this, dryWetChain.outputGain)
 
 		const audioParams = new Map<Id, ExpAudioParam>([
 			buildAudioParamDesc('pan', pan.pan, 0, -1, 1, 1, panValueToString),
 		])
 
-		super(id, audioContext, preMasterLimiter, inPorts, outPorts, audioParams)
+		super(id, audioContext, preMasterLimiter, {
+			ports: [inputPort, panPort, outputPort],
+			audioParams,
+		})
 
 		// Make sure to add these to the dispose method!
 		this._pan = pan
@@ -394,11 +385,16 @@ export class ExpPanNode extends CorgiNode {
 }
 
 const longTime = 999999999
+const minDistance = 0.00001
 
 export class EnvelopeNode extends CorgiNode {
 	private readonly _constantSource: ConstantSourceNode
 	private readonly _outputGain: GainNode
+	private readonly _outputPort: ExpNodeAudioOutputPort
+	private readonly _gateInputPort: ExpGateInputPort
 	// private _intervalId: NodeJS.Timeout
+	private _lastGateTime: number
+	private _lastGate?: boolean
 
 	public constructor(
 		id: Id, audioContext: AudioContext, preMasterLimiter: GainNode,
@@ -411,29 +407,36 @@ export class EnvelopeNode extends CorgiNode {
 		constantSource.start()
 		constantSource.offset.linearRampToValueAtTime(0, longTime)
 
-		const inPorts: readonly ExpNodeAudioInputPortArgs[] = [
-		]
-		const outPorts: readonly ExpNodeAudioOutputPortArgs[] = [
-			{id: 0, name: 'output', source: outputGain},
-		]
+		const outputPort = new ExpNodeAudioOutputPort('output', 'output', () => this, outputGain)
 
-		const audioParams = new Map<Id, ExpAudioParam>([
-		])
+		const gateInputPort = new ExpGateInputPort('input', 'input', () => this, (gate, time) => this.receiveGateSignal.bind(this)(gate, time))
 
-		const customNumberParams = new Map<Id, ExpCustomNumberParam>([
-			buildCustomNumberParamDesc('attack', 0.0005, 0, 32, 3, adsrValueToString),
-			buildCustomNumberParamDesc('hold', 0, 0, 32, 3, adsrValueToString),
-			buildCustomNumberParamDesc('decay', 1, 0, 32, 3, adsrValueToString),
-			buildCustomNumberParamDesc('sustain', 1, 0, 1, 1, gainDecibelValueToString),
-			buildCustomNumberParamDesc('release', 0.015, 0, 32, 3, adsrValueToString),
-		])
+		super(id, audioContext, preMasterLimiter, {
+			ports: [outputPort, gateInputPort],
+			customNumberParams: new Map<Id, ExpCustomNumberParam>([
+				// TODO Store reference in private class field
+				// buildCustomNumberParamDesc('attack', 0.0005, 0, 32, 3, adsrValueToString),
+				// buildCustomNumberParamDesc('hold', 0, 0, 32, 3, adsrValueToString),
+				// buildCustomNumberParamDesc('decay', 1, 0, 32, 3, adsrValueToString),
+				// buildCustomNumberParamDesc('sustain', 1, 0, 1, 1, gainDecibelValueToString),
+				// buildCustomNumberParamDesc('release', 0.015, 0, 32, 3, adsrValueToString),
+				buildCustomNumberParamDesc('attack', 0.25, 0, 32, 3, adsrValueToString),
+				buildCustomNumberParamDesc('hold', 0, 0, 32, 3, adsrValueToString),
+				buildCustomNumberParamDesc('decay', 0, 0, 32, 3, adsrValueToString),
+				buildCustomNumberParamDesc('sustain', 1, 0, 1, 1, gainDecibelValueToString),
+				buildCustomNumberParamDesc('release', 32, 0, 32, 3, adsrValueToString),
+			]),
+		})
 
-		super(id, audioContext, preMasterLimiter, inPorts, outPorts, audioParams, customNumberParams)
+		this._lastGateTime = -1
+
+		this._outputPort = outputPort
+		this._gateInputPort = gateInputPort
 
 		// Make sure to add these to the dispose method!
 		this._constantSource = constantSource
 		this._outputGain = outputGain
-		// TODO Temporary
+
 		// this._intervalId = setInterval(() => {
 		// 	this.receiveGateSignal(true, this.audioContext.currentTime + 0.5)
 		// 	this.receiveGateSignal(false, this.audioContext.currentTime + 1.5)
@@ -446,24 +449,37 @@ export class EnvelopeNode extends CorgiNode {
 
 	public getName() {return 'Envelope'}
 
-	public receiveGateSignal(signal: boolean, start: number) {
+	public receiveGateSignal(gate: boolean, startTime: number) {
+		if (startTime < this._lastGateTime) {
+			logger.error('receiveGateSignal startTime < this._lastGateTime:', {gate, startTime, last: this._lastGateTime, lastGate: this._lastGate})
+		}
+		if (gate === this._lastGate) {
+			logger.error('receiveGateSignal gate === this._lastGate:', {gate, startTime, last: this._lastGateTime, lastGate: this._lastGate})
+		}
+		this._lastGateTime = startTime
+		this._lastGate = gate
+		// logger.log({startTime, currentTime: this._audioContext.currentTime/*, diff: startTime - this._audioContext.currentTime */})
+		if (startTime < this._audioContext.currentTime) {
+			logger.warn('[receiveGateSignal] startTime < this._audioContext.currentTime:', {startTime, currentTime: this._audioContext.currentTime})
+		}
 		const offset = this._constantSource.offset
-		if (signal) {
-			const attackEnd = start + this._attackSeconds
-			const holdEnd = attackEnd + this._holdSeconds
-			const decayEnd = holdEnd + this._decaySeconds
-			const farOut = decayEnd + longTime
-			offset.cancelAndHoldAtTime(start)
+		if (gate) {
+			const attackEnd = startTime + this._attackSeconds + minDistance
+			const holdEnd = attackEnd + this._holdSeconds + minDistance
+			const decayEnd = holdEnd + this._decaySeconds + minDistance
+			const farOut = decayEnd + longTime + minDistance
+			const actualSustain = Math.max(0.0001, this._sustain)
+			offset.cancelAndHoldAtTime(startTime)
 			offset.linearRampToValueAtTime(1, attackEnd)
 			offset.linearRampToValueAtTime(1, holdEnd)
-			offset.linearRampToValueAtTime(Math.max(0.0001, this._sustain), decayEnd)
-			offset.linearRampToValueAtTime(this._sustain, farOut)
+			offset.exponentialRampToValueAtTime(actualSustain, decayEnd)
+			offset.linearRampToValueAtTime(actualSustain, farOut)
 		} else {
-			const releaseEnd = start + this._releaseSeconds
-			const farOut = releaseEnd + longTime
-			offset.cancelAndHoldAtTime(start)
-			offset.linearRampToValueAtTime(0.0001, releaseEnd)
-			offset.linearRampToValueAtTime(0, farOut)
+			const releaseEnd = startTime + this._releaseSeconds + minDistance
+			const farOut = releaseEnd + longTime + minDistance
+			offset.cancelAndHoldAtTime(startTime)
+			offset.exponentialRampToValueAtTime(0.0001, releaseEnd)
+			offset.linearRampToValueAtTime(0.0001, farOut)
 		}
 		// farOut is to provide an event to be canceled so an anchor point can
 		// be created whenever cancelAndHoldAtTime is called.
@@ -500,82 +516,103 @@ interface GateEvent {
 	readonly beat: number
 }
 
-interface NextEvent {
-	readonly index: number
-	readonly event: GateEvent
-	readonly distanceFromCursor: number
+interface NextEvent extends GateEvent {
+	readonly distanceFromMainCursor: number
 }
 
-class EventStream {
+const myPrecision = 1000
+
+// TODO Good candidate for writing in Rust?
+class EventStreamReader {
 	private _beatCursor = 0
-	private _lastEventIndex = -1
-	private readonly _beatLength = 2
-	private readonly _events: readonly GateEvent[] = [
-		{gate: true, beat: 0},
-		{gate: false, beat: 1},
-	]
+	private readonly _eventStream = new EventStream()
+	private _currentEvent: GateEvent
+
+	public constructor() {
+		this._currentEvent = this._eventStream.getNextEvent()
+	}
 
 	public read(beatsToRead: number): readonly NextEvent[] {
-		if (beatsToRead === 0) return []
-
-		let tempBeatCursor = this._beatCursor
-		let nextEvent = this._getNextEvent(tempBeatCursor)
-		const readEvents: NextEvent[] = []
-		let readDistance = nextEvent.distanceFromCursor
-
-		while (readDistance < beatsToRead) {
-			this._lastEventIndex = nextEvent.index
-			tempBeatCursor = (tempBeatCursor + nextEvent.distanceFromCursor) % this._beatLength
-			readEvents.push(nextEvent)
-			nextEvent = this._getNextEvent(tempBeatCursor)
-			readDistance += nextEvent.distanceFromCursor
+		if (beatsToRead <= 0) {
+			return []
 		}
 
-		this._beatCursor = (this._beatCursor + beatsToRead) % this._beatLength
+		const readEvents: NextEvent[] = []
+
+		let distanceFromMainCursor = Math.round((this._currentEvent.beat - this._beatCursor) * midiPrecision) / midiPrecision
+
+		if (distanceFromMainCursor.toString().length > 8) logger.warn('precision error oh no A: ', {distanceFromMainCursor, ceb: this._currentEvent.beat, bc: this._beatCursor})
+
+		while (distanceFromMainCursor < beatsToRead) {
+			readEvents.push({
+				...this._currentEvent,
+				distanceFromMainCursor,
+			})
+			this._currentEvent = this._eventStream.getNextEvent()
+			distanceFromMainCursor = Math.round((this._currentEvent.beat - this._beatCursor) * midiPrecision) / midiPrecision
+			if (distanceFromMainCursor.toString().length > 8) logger.warn('precision error oh no B: ', {distanceFromMainCursor, ceb: this._currentEvent.beat, bc: this._beatCursor})
+		}
+
+		this._beatCursor = Math.round((this._beatCursor + beatsToRead) * myPrecision) / myPrecision
 
 		return readEvents
 	}
+}
 
-	private _getNextEvent(tempBeatCursor: number): NextEvent {
-		const nextEventIndex = (this._lastEventIndex + 1) % this._events.length
+class EventStream {
+	public readonly beatLength = 4
+	private _currentIndex = -1
+	private _loops = 0
+	private readonly _events: readonly GateEvent[] = [
+		{gate: true, beat: 0},
+		{gate: false, beat: 1},
+		{gate: true, beat: 2},
+		{gate: false, beat: 3},
+	]
 
-		const nextEvent = this._events[nextEventIndex]
+	public getNextEvent(): GateEvent {
+		this._currentIndex++
 
-		let distanceFromCursor: number
-
-		if (nextEventIndex <= this._lastEventIndex) {
-			// We looped
-			distanceFromCursor = (this._beatLength - tempBeatCursor) + nextEvent.beat
-		} else {
-			distanceFromCursor = nextEvent.beat - tempBeatCursor
+		if (this._currentIndex >= this._events.length) {
+			this._loops++
+			this._currentIndex = 0
 		}
 
+		const nextEvent = this._events[this._currentIndex]
+
 		return {
-			index: nextEventIndex,
-			event: nextEvent,
-			distanceFromCursor,
-			// TODO
-			// distanceFromMainCursor,
+			...nextEvent,
+			beat: nextEvent.beat + (this._loops * this.beatLength),
 		}
 	}
 }
 
 export class SequencerNode extends CorgiNode {
 	private _cursor: number
-	private readonly _eventStream: EventStream
+	private readonly _eventStream: EventStreamReader
+	private readonly _gateOutputPort: ExpGateOutputPort
+	private _startSongTime: number
 
 	public constructor(
 		id: Id, audioContext: AudioContext, preMasterLimiter: GainNode,
 	) {
-		const customNumberParams = new Map<Id, ExpCustomNumberParam>([
-			buildCustomNumberParamDesc('tempo', 120, 0.001, 999.99, 3),
-			buildCustomNumberParamDesc('noteLength', 1, 0.001, 2, 3),
-		])
+		const gateOutputPort = new ExpGateOutputPort('output', 'output', () => this)
 
-		super(id, audioContext, preMasterLimiter, [], [], new Map(), customNumberParams)
+		super(id, audioContext, preMasterLimiter, {
+			ports: [gateOutputPort],
+			customNumberParams: new Map<Id, ExpCustomNumberParam>([
+				// TODO Store in private class field
+				buildCustomNumberParamDesc('tempo', 240, 0.001, 999.99, 3),
+				buildCustomNumberParamDesc('noteLength', 1, 0.001, 2, 3),
+			]),
+		})
 
-		this._cursor = audioContext.currentTime
-		this._eventStream = new EventStream()
+		this._startSongTime = -1
+
+		this._gateOutputPort = gateOutputPort
+
+		this._cursor = 0
+		this._eventStream = new EventStreamReader()
 
 		// Make sure to add these to the dispose method!
 	}
@@ -588,17 +625,32 @@ export class SequencerNode extends CorgiNode {
 
 	public render() {return this.getDebugView()}
 
-	public onTick(maxReadAhead: number) {
-		const targetTimeToReadTo = this._audioContext.currentTime + maxReadAhead
-		const distanceSeconds = targetTimeToReadTo - this._cursor
+	public onTick(currentGlobalTime: number, maxReadAhead: number) {
+		if (this._startSongTime < 0) {
+			this._startSongTime = Math.ceil((currentGlobalTime + 0.1) * 10) / 10
+		}
+		const cursor = this._cursor
+		const songStartTime = this._startSongTime
+		const tempo = this._tempo
+		const currentSongTime = preciseSubtract(currentGlobalTime, songStartTime)
+		const targetSongTimeToReadTo = Math.ceil(preciseAdd(currentSongTime, maxReadAhead) * myPrecision) / myPrecision
+		const distanceSeconds = Math.round(preciseSubtract(targetSongTimeToReadTo, cursor) * myPrecision) / myPrecision
 		if (distanceSeconds <= 0) return
-		const distanceBeats = toBeats(distanceSeconds, this._tempo)
+		const distanceBeats = toBeats(distanceSeconds, tempo)
 		const events = this._eventStream.read(distanceBeats)
-		this._cursor = targetTimeToReadTo
 		events.forEach(event => {
-			// TODO Convert event time to seconds
-			logger.log(`time: ${this._audioContext.currentTime.toFixed(2)}, gate: ${event.event.gate}`)
+			const eventDistanceFromCursor = event.distanceFromMainCursor
+			const fromBeats_ = fromBeats(eventDistanceFromCursor, tempo)
+			const songStartPlusCursor = Math.round((songStartTime + cursor) * myPrecision) / myPrecision
+			const eventStart = Math.round((songStartPlusCursor + fromBeats_) * myPrecision) / myPrecision
+			const diff = preciseSubtract(eventStart, songStartTime)
+			const leadTime = eventStart - currentGlobalTime
+			const data = {gate: event.gate, eventStart, songStartTime, cursor, eventDistanceFromCursor, tempo, fromBeats_, songStartPlusCursor, diff, event, leadTime}
+			if (eventStart.toString().length > 8) logger.warn('precision error oh no: ', data)
+			// logger.log(`gate:`, data)
+			this._gateOutputPort.sendGateSignal(event.gate, eventStart)
 		})
+		this._cursor = targetSongTimeToReadTo
 	}
 
 	protected _enable() {

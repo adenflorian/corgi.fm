@@ -1,3 +1,5 @@
+@longLineStrokeWidth: 2px;
+
 .connection {
     svg {
         position: absolute;
@@ -34,11 +36,37 @@
         }
     }
 
+    &.type-gate {
+        .longLine {
+            stroke-dasharray: 1 8;
+
+            .mainLongLine {
+                stroke-width: 4px;
+            }
+        }
+    }
+
     .longLine {
         z-index: -15;
+        stroke-linecap: round;
+
+
 
         g {
             pointer-events: all;
+
+            .mainLongLine {
+                stroke-width: @longLineStrokeWidth;
+
+                &.mainLongLine-ghost {
+                    stroke-dasharray: 8 4;
+                    stroke-linecap: round;
+                }
+            }
+
+            .animatedLongLine {
+                stroke-width: @longLineStrokeWidth * 2;
+            }
 
             &:not(:hover) {
                 .blurLine {

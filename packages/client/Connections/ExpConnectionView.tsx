@@ -1,71 +1,68 @@
-import {stripIndent} from 'common-tags'
 import {List} from 'immutable'
 import React, {useCallback} from 'react'
-import {useDispatch} from 'react-redux'
+import {useDispatch, useSelector} from 'react-redux'
 import {
-	ActiveGhostConnectorSourceOrTarget,
-	AppOptions,
-	calculateExpConnectorPositionY, expConnectionsActions,
-	GhostConnection,
-	ghostConnectorActions, GhostConnectorAddingOrMoving,
-	IClientAppState, IExpConnection,
+	ActiveGhostConnectorSourceOrTarget, expConnectionsActions,
+	ExpGhostConnection,
+	expGhostConnectorActions, GhostConnectorAddingOrMoving,
 	LineType,
-	selectLocalClientId, selectOption, selectExpPosition,
-	selectRoomSettings, shamuConnect, selectExpConnection,
-	selectExpConnectionSourceIsSending,
-	selectExpConnectionSourceIsActive,
+	createExpPositionSelector,
+	createExpConnectionSelector,
+	IClientAppState,
+	selectLocalClientId,
 	selectExpConnectionStackOrderForSource,
 	selectExpConnectionStackOrderForTarget,
+	selectRoomSettings,
 } from '@corgifm/common/redux'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {useNodeManagerContext} from '../Experimental/NodeManager'
 import {longLineTooltip} from '../client-constants'
+import {useConnection} from '../Experimental/hooks/useConnection'
 import {ConnectionLine} from './ConnectionLine'
 import './ConnectionView.less'
 import {Connector} from './Connector'
 import {LineState} from './LineState'
+import {connectorWidth, connectorHeight, makeStraightPath, makeCurvedPath} from './ConnectionView'
 
-export interface IExpConnectionViewProps {
+interface Props {
 	id: Id
 }
-
-interface IExpConnectionViewReduxProps {
-	speed?: number
-	highQuality: boolean
-	isSourcePlaying: boolean
-	localClientId: ClientId
-	sourceX: number
-	sourceY: number
-	sourceZ: number
-	targetX: number
-	targetY: number
-	targetZ: number
-	saturateSource: boolean
-	saturateTarget: boolean
-	sourceStackOrder?: number
-	targetStackOrder?: number
-	connection: IExpConnection
-	lineType: LineType
-}
-
-type IExpConnectionViewAllProps = IExpConnectionViewProps & IExpConnectionViewReduxProps
-
-export const longLineStrokeWidth = 2
-export const connectorWidth = 16
-export const connectorHeight = 8
 
 const buffer = 50
 const joint = 8
 
+const defaultPosition = {x: 0, y: 0} as const
+
 export const ExpConnectionView =
-	React.memo(function _ExpConnectionView(props: IExpConnectionViewAllProps) {
-		const {
-			saturateSource, saturateTarget, id,
-			sourceX, sourceY, sourceZ,
-			targetX, targetY, targetZ,
-			targetStackOrder = 0, sourceStackOrder = 0, speed = 1, lineType,
-			isSourcePlaying, highQuality, localClientId, connection,
-		} = props
+	React.memo(function _ExpConnectionView({id}: Props) {
+		const {sourceId, sourcePort, targetId, targetPort, type} = useSelector(createExpConnectionSelector(id))
+		const sourceNodePosition = useSelector(createExpPositionSelector(sourceId))
+		const targetNodePosition = useSelector(createExpPositionSelector(targetId))
+
+		const {zIndex: sourceZ} = sourceNodePosition
+		const {zIndex: targetZ} = targetNodePosition
+
+		const connectionInfo = useConnection(id)
+
+		const sourcePortPosition = connectionInfo
+			? connectionInfo.outputPort.position
+			: defaultPosition
+
+		const sourceX = sourceNodePosition.x + sourceNodePosition.width - sourcePortPosition.x
+		const sourceY = sourceNodePosition.y + sourcePortPosition.y
+
+		const targetPortPosition = connectionInfo
+			? connectionInfo.inputPort.position
+			: defaultPosition
+
+		const targetX = targetNodePosition.x + targetPortPosition.x
+		const targetY = targetNodePosition.y + targetPortPosition.y
+
+		const localClientId = useSelector((state: IClientAppState) => selectLocalClientId(state))
+
+		const sourceStackOrder = useSelector((state: IClientAppState) => selectExpConnectionStackOrderForSource(state.room, id))
+		const targetStackOrder = useSelector((state: IClientAppState) => selectExpConnectionStackOrderForTarget(state.room, id))
+		const lineType = useSelector((state: IClientAppState) => selectRoomSettings(state.room).lineType)
 
 		const dispatch = useDispatch()
 
@@ -75,9 +72,9 @@ export const ExpConnectionView =
 		// const targetConnectorRight = targetX - (connectorWidth * targetStackOrder)
 
 		const connectedLine = new LineState(
-			sourceConnectorRight,
+			sourceConnectorRight + 4,
 			sourceY,
-			targetConnectorLeft,
+			targetConnectorLeft - 4,
 			targetY,
 		)
 
@@ -98,16 +95,17 @@ export const ExpConnectionView =
 			sourceOrTarget: ActiveGhostConnectorSourceOrTarget,
 			parentNodeId: Id,
 		) {
-			dispatch(ghostConnectorActions.create(new GhostConnection(
+			dispatch(expGhostConnectorActions.create(new ExpGhostConnection(
 				{x: connectorPositionX, y: connectorPositionY},
 				{parentNodeId},
 				sourceOrTarget,
 				localClientId,
 				GhostConnectorAddingOrMoving.Moving,
 				sourceOrTarget === ActiveGhostConnectorSourceOrTarget.Source
-					? connection.sourcePort
-					: connection.targetPort,
-				connection.id,
+					? sourcePort
+					: targetPort,
+				type,
+				id,
 			)))
 		}
 
@@ -117,25 +115,27 @@ export const ExpConnectionView =
 
 		const nodeManagerContext = useNodeManagerContext()
 
-		const sourceNodeInfo = nodeManagerContext.getNodeInfo(connection.sourceId)
+		const sourceNodeInfo = nodeManagerContext.getNodeInfo(sourceId)
 
 		const color = sourceNodeInfo
 			? sourceNodeInfo.color
 			: CssColor.blue
 
 		return (
-			<div className={`connection ${saturateSource ? 'playing' : ''}`} style={{color}}>
+			<div
+				className={`connection type-${type}`}
+				style={{color}}
+			>
 				<ConnectionLine
 					id={id}
 					color={color}
-					saturateSource={saturateSource}
-					saturateTarget={saturateTarget}
+					saturateSource={false}
+					saturateTarget={false}
 					pathDPart1={pathDPart1}
 					pathDFull={pathDFull}
 					connectedLine={connectedLine}
-					speed={speed}
-					isSourcePlaying={isSourcePlaying}
-					highQuality={highQuality}
+					isSourcePlaying={false}
+					highQuality={false}
 					onDelete={onDelete}
 					z={Math.max(sourceZ, targetZ) - 1}
 				/>
@@ -145,14 +145,14 @@ export const ExpConnectionView =
 					x={sourceConnectorLeft}
 					y={sourceY}
 					z={sourceZ}
-					saturate={highQuality ? (saturateSource || isSourcePlaying) : isSourcePlaying}
+					saturate={false}
 					title={longLineTooltip}
 					svgProps={{
 						onMouseDown: e => e.button === 0 && onMouseDown(
 							sourceConnectorLeft,
 							sourceY,
 							ActiveGhostConnectorSourceOrTarget.Source,
-							connection.targetId,
+							targetId,
 						),
 						onContextMenu: (e: React.MouseEvent) => {
 							if (e.shiftKey) return
@@ -167,14 +167,14 @@ export const ExpConnectionView =
 					x={targetConnectorLeft}
 					y={targetY}
 					z={targetZ}
-					saturate={highQuality ? (saturateTarget || isSourcePlaying) : isSourcePlaying}
+					saturate={false}
 					title={longLineTooltip}
 					svgProps={{
 						onMouseDown: e => e.button === 0 && onMouseDown(
 							targetConnectorLeft,
 							targetY,
 							ActiveGhostConnectorSourceOrTarget.Target,
-							connection.sourceId,
+							sourceId,
 						),
 						onContextMenu: (e: React.MouseEvent) => {
 							if (e.shiftKey) return
@@ -186,101 +186,3 @@ export const ExpConnectionView =
 			</div>
 		)
 	})
-
-export function makeCurvedPath(line: LineState) {
-	const distance = Math.sqrt(((line.x1 - line.x2) ** 2) + ((line.y1 - line.y2) ** 2))
-	// const diff2 = Math.abs((line.x2 - line.x1) / 10)
-
-	const curveStrength2 = distance / 4
-	// const curveStrength2 = 64
-
-	return stripIndent`
-		M ${line.x1} ${line.y1}
-		C ${line.x1 + joint + curveStrength2} ${line.y1} ${line.x2 - joint - curveStrength2} ${line.y2} ${line.x2} ${line.y2}
-	`
-}
-
-export function makeStraightPath(line: LineState) {
-	return stripIndent`
-		M ${line.x1} ${line.y1}
-		L ${line.x1 + joint} ${line.y1}
-		L ${line.x2 - joint} ${line.y2}
-		L ${line.x2} ${line.y2}
-	`
-}
-
-export const ConnectedExpConnectionView = shamuConnect(
-	function connectionViewMapStateToProps(state: IClientAppState, props: IExpConnectionViewProps): IExpConnectionViewReduxProps {
-		// const globalClockState = selectGlobalClockState(state.room)
-		const connection = selectExpConnection(state.room, props.id)
-		const isSourceSending = selectExpConnectionSourceIsSending(state.room, connection.id)
-		const isSourceActive = isSourceSending || selectExpConnectionSourceIsActive(state.room, connection.id)
-		const sourcePosition = selectExpPosition(state.room, connection.sourceId)
-		const targetPosition = selectExpPosition(state.room, connection.targetId)
-
-		return {
-			speed: 120,
-			// Disabled for now because of performance issues
-			// speed: globalClockState.bpm,
-			highQuality: selectOption(state, AppOptions.graphicsFancyConnections) as boolean,
-			isSourcePlaying: false,
-			localClientId: selectLocalClientId(state),
-			sourceStackOrder: selectExpConnectionStackOrderForSource(state.room, props.id),
-			targetStackOrder: selectExpConnectionStackOrderForTarget(state.room, props.id),
-			sourceX: sourcePosition.x + sourcePosition.width,
-			sourceY: calculateExpConnectorPositionY(sourcePosition.y, sourcePosition.height, 1, connection.sourcePort),
-			sourceZ: sourcePosition.zIndex,
-			targetX: targetPosition.x,
-			targetY: calculateExpConnectorPositionY(targetPosition.y, targetPosition.height, 1, connection.targetPort),
-			targetZ: targetPosition.zIndex,
-			saturateSource: isSourceActive || isSourceSending,
-			saturateTarget: isSourceSending,
-			connection,
-			lineType: selectRoomSettings(state.room).lineType,
-		}
-	},
-)(ExpConnectionView)
-
-export const expConnectionConstants = {
-	portHeight: 16 + 8,
-	debugNodeHeaderHeight: 8 + 16 + 4 + 12 + 4 + 16,
-	xAdjust: 8,
-} as const
-
-const {portHeight, debugNodeHeaderHeight, xAdjust} = expConnectionConstants
-
-export function calculateExpDebugConnectorY(parentY: number, portIndex: number) {
-	return parentY + debugNodeHeaderHeight + (portHeight * portIndex) + (portHeight / 2)
-}
-
-export const ConnectedExpConnectionDebugView = shamuConnect(
-	function connectionViewMapStateToProps(state: IClientAppState, props: IExpConnectionViewProps): IExpConnectionViewReduxProps {
-		// const globalClockState = selectGlobalClockState(state.room)
-		const connection = selectExpConnection(state.room, props.id)
-		const isSourceSending = selectExpConnectionSourceIsSending(state.room, connection.id)
-		const isSourceActive = isSourceSending || selectExpConnectionSourceIsActive(state.room, connection.id)
-		const sourcePosition = selectExpPosition(state.room, connection.sourceId)
-		const targetPosition = selectExpPosition(state.room, connection.targetId)
-
-		return {
-			speed: 120,
-			// Disabled for now because of performance issues
-			// speed: globalClockState.bpm,
-			highQuality: selectOption(state, AppOptions.graphicsFancyConnections) as boolean,
-			isSourcePlaying: false,
-			localClientId: selectLocalClientId(state),
-			sourceStackOrder: selectExpConnectionStackOrderForSource(state.room, props.id),
-			targetStackOrder: selectExpConnectionStackOrderForTarget(state.room, props.id),
-			sourceX: sourcePosition.x + sourcePosition.width - xAdjust,
-			sourceY: calculateExpDebugConnectorY(sourcePosition.y, connection.sourcePort),
-			sourceZ: sourcePosition.zIndex,
-			targetX: targetPosition.x + xAdjust,
-			targetY: calculateExpDebugConnectorY(targetPosition.y, connection.targetPort),
-			targetZ: targetPosition.zIndex,
-			saturateSource: isSourceActive || isSourceSending,
-			saturateTarget: isSourceSending,
-			connection,
-			lineType: selectRoomSettings(state.room).lineType,
-		}
-	},
-)(ExpConnectionView)
