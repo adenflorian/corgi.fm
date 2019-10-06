@@ -34,3 +34,15 @@ SSH_USER_TEST=notroot
 
 ## Server Setup
 Run `yarn setup-test-server` or `yarn setup-prod-server`.
+
+## Audio Worklets
+`packages/client/WebAudio/AudioWorklets/Processors` is the folder where audio worklet processor files go.
+
+All files in that folder ending in `.ts` will be treated as a parcel entry point.
+
+See these places for more info:
+- `package.json`
+- `run-parcel.js`
+- `build-parcel.js`
+- `.assetWrapper.js`
+- `packages/client/WebAudio/AudioWorklets`

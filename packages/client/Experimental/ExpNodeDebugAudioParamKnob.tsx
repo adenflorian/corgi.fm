@@ -18,9 +18,6 @@ export const ExpNodeDebugAudioParamKnob = React.memo(function _ExpNodeDebugAudio
 	const onAudioParamChange = useCallback((_, newValue: number) => {
 		dispatch(expNodesActions.audioParamChange(nodeId, audioParam.id, newValue))
 	}, [audioParam.id, dispatch, nodeId])
-	useEffect(() => {
-		logger.log('mount')
-	}, [])
 	const value = useAudioParam(audioParam.id)
 
 	return (

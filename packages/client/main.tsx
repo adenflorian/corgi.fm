@@ -25,6 +25,7 @@ import {SamplesManager} from './WebAudio/SamplesManager'
 import {setStoreForSchedulerVisual, startSchedulerVisualLoop} from './WebAudio/SchedulerVisual'
 import {setupWebsocketAndListeners, socket} from './websocket-listeners'
 import {SingletonContextImpl} from './SingletonContext'
+import {loadAudioWorkletsAsync} from './WebAudio/AudioWorklets/audio-worklets'
 
 if (!isLocalDevClient()) initSentry()
 
@@ -76,8 +77,10 @@ async function setupAsync() {
 
 	// Might be needed for safari
 	const AudioContext = window.AudioContext || window.webkitAudioContext
-	const audioContext = new AudioContext()
+	const audioContext = new AudioContext() as AudioContext
 	const preMasterLimiter = audioContext.createGain()
+
+	await loadAudioWorkletsAsync(audioContext)
 
 	const samplesManager = new SamplesManager(audioContext)
 
@@ -154,9 +157,9 @@ async function setupAsync() {
 	])
 
 	if (module.hot) {
-		module.hot.dispose(() => {
+		module.hot.dispose(async () => {
 			socket.disconnect()
-			audioContext.close()
+			await audioContext.close()
 		})
 	}
 }

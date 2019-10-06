@@ -61,7 +61,7 @@ export const ExpConnectorPlaceholder = React.memo(
 			)))
 		}, [dispatch, localClientId, nodeId, port.type, portId, sourceOrTarget, x, y])
 
-		logger.log('ExpConnectorPlaceholder render:', {connectionCount: port.connectionCount, x})
+		// logger.log('ExpConnectorPlaceholder render:', {connectionCount: port.connectionCount, x})
 
 		return (
 			<div

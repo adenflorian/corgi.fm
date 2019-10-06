@@ -889,7 +889,6 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 
 function createLocalStuffExperimental(dispatch: Dispatch, state: IClientAppState) {
 	// TODO
-	logger.log('foo')
 }
 
 function createLocalStuffNormal(dispatch: Dispatch, state: IClientAppState) {

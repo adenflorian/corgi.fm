@@ -18,7 +18,7 @@ export const ExpNodeDebugView = React.memo(function _ExpNodeDebugView({
 	audioParams, customNumberParams,
 	ports,
 }: Props) {
-	logger.log('ExpNodeDebugView render')
+	// logger.log('ExpNodeDebugView render')
 	const nodeContext = useNodeContext()
 	const nodeName = nodeContext.getName()
 	const nodeId = nodeContext.id

@@ -6,7 +6,6 @@ import {
 	ExpNodeAudioConnection,
 	ExpNodeConnections, ExpNodeConnection,
 } from './ExpConnections'
-// import {createCustomAnalyserWorkletNode} from './ExpNodes'
 
 export type ExpPortCallback = (port: ExpPort) => void
 
@@ -35,7 +34,7 @@ export abstract class ExpPort {
 	}
 
 	public onUpdated() {
-		logger.log('ExpPort onUpdated:', this)
+		// logger.log('ExpPort onUpdated:', this)
 		this.subscribers.forEach(x => x(this))
 		this._connections.forEach(x => x.onPortUpdated(this))
 	}
@@ -197,19 +196,19 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 		this._gainDenormalizer = audioContext.createGain()
 		this._knobConstantSource = audioContext.createConstantSource()
 		this._gainNormalizer = audioContext.createGain()
-		// this._analyser = createCustomAnalyserWorkletNode(audioContext)
+		// this._analyser = createCorgiAnalyserWorkletNode(audioContext)
 
 
 
 		// this._analyser.port.onmessage = (event) => {
 		// 	// Handling data from the processor.
 		// 	// console.log('[OscillatorExpNode] ', event.data);
-		// 	this.getNode().setAudioParamAutoValue(this.id, event.data)
+		// 	// this.getNode().setAudioParamAutoValue(this.id, event.data)
 
-		// 	this._analyser.port.postMessage('Hello from osc!');
+		// 	this._analyser.port.postMessage('Hello from osc onmessage!');
 		// };
 
-		// this._analyser.port.postMessage('Hello from osc!');
+		// this._analyser.port.postMessage('Hello from osc start!');
 
 		this._knobConstantSource.offset.value = defaultParamValue
 		this._knobConstantSource.start()

@@ -19,7 +19,7 @@ export const ExpNodeDebugCustomNumberParamKnob = React.memo(function _ExpNodeDeb
 		dispatch(expNodesActions.customNumberParamChange(nodeId, customNumberParam.id, newValue))
 	}, [customNumberParam.id, dispatch, nodeId])
 	useEffect(() => {
-		logger.log('mount')
+		// logger.log('mount')
 	}, [])
 	const value = useCustomNumberParam(customNumberParam.id)
 
