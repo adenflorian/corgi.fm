@@ -95,3 +95,18 @@ web audio api does have other non audio params like booleans and enums
 - [ ] Other Web Audio Params (Stored in Web Audio objects/nodes)
 - [ ] Custom Single Value Params (Stored in the CorgiNode/redux)
 - [ ] Midi Events (Stored in the CorgiNode/redux)
+
+
+
+
+- inputs
+	- audio (raw | param)
+	- gate
+- params
+	- audio
+	- custom number
+	- enum
+	- boolean
+- outputs
+	- audio
+	- gate

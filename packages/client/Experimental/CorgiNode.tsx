@@ -8,7 +8,7 @@ import {ExpConnectorPlaceholders} from '../Connections/ExpConnectorPlaceholders'
 import {SimpleGraphNodeExp} from '../SimpleGraph/SimpleGraphNodeExp'
 import {ExpNodeDebugView} from './ExpNodeDebugView'
 import {
-	ExpPorts, ExpPort, isAudioOutputPort,
+	ExpPorts, ExpPort, isAudioOutputPort, isAudioParamInputPort,
 } from './ExpPorts'
 import {
 	ExpAudioParams, ExpCustomNumberParams,
@@ -36,7 +36,7 @@ export interface CorgiNodeOptions {
 export abstract class CorgiNode {
 	public readonly reactContext: ExpNodeContextValue
 	protected readonly _ports: ExpPorts
-	private readonly _audioParams: ExpAudioParams
+	protected readonly _audioParams: ExpAudioParams
 	protected readonly _customNumberParams: ExpCustomNumberParams
 	private _enabled = true
 
@@ -122,9 +122,15 @@ export abstract class CorgiNode {
 
 		if (!audioParam) return logger.warn('[onAudioParamChange] 404 audio param not found: ', {paramId, newValue})
 
+		const port = this.getPort(paramId)
+
+		if (!port) return logger.warn('[onAudioParamChange] 404 audio param port not found: ', {paramId, newValue})
+
+		if (!isAudioParamInputPort(port)) return logger.warn('[onAudioParamChange] !isAudioParamInputPort(port): ', {paramId, newValue, port})
+
 		const newClampedValue = clamp(newValue, audioParam.min, audioParam.max)
 
-		audioParam.audioParam.value = newClampedValue
+		port.setKnobValue(newClampedValue)
 
 		audioParam.reactSubscribers.forEach(sub => sub(newClampedValue))
 	}

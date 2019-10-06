@@ -28,6 +28,8 @@ export abstract class ExpNodeConnection {
 
 // Different connection types could have different functions for sending data across
 export class ExpNodeAudioConnection extends ExpNodeConnection {
+	private _actualTargetNode: AudioNode | AudioParam
+
 	public constructor(
 		public readonly id: Id,
 		private _source: ExpNodeAudioOutputPort,
@@ -36,6 +38,12 @@ export class ExpNodeAudioConnection extends ExpNodeConnection {
 		super(id, 'audio')
 		this._source.connect(this)
 		this._target.connect(this)
+
+		this._actualTargetNode = this._target.prepareDestinationForConnection(this.id, this._source.signalRange)
+
+		if (this._source.detectFeedbackLoop()) return
+
+		this._source.getSource(this.id).connect(this._actualTargetNode as AudioNode)
 	}
 
 	public get outputPort() {return this._source}
@@ -50,22 +58,25 @@ export class ExpNodeAudioConnection extends ExpNodeConnection {
 	}
 
 	public changeSource(newSource: ExpNodeAudioOutputPort) {
-		this._source.disconnect(this)
+		this._source.disconnect(this, this._actualTargetNode as AudioNode)
 		this._source = newSource
 		this._source.connect(this)
+		this._source.getSource(this.id).connect(this._actualTargetNode as AudioNode)
 	}
 
 	public changeTarget(newTarget: ExpNodeAudioInputPort) {
+		const oldActualTarget = this._actualTargetNode
 		const oldTarget = this._target
 		this._target = newTarget
-		oldTarget.disconnect(this)
+		oldTarget.disconnect(this, this._actualTargetNode as AudioNode)
 		newTarget.connect(this)
-		this._source.changeTarget(oldTarget, newTarget)
+		this._actualTargetNode = this._target.prepareDestinationForConnection(this.id, this._source.signalRange)
+		this._source.changeTarget(oldActualTarget as AudioNode, this._actualTargetNode as AudioNode)
 	}
 
 	public dispose() {
-		this._source.disconnect(this)
-		this._target.disconnect(this)
+		this._source.disconnect(this, this._actualTargetNode as AudioNode)
+		this._target.disconnect(this, this._actualTargetNode as AudioNode)
 	}
 
 	public detectFeedbackLoop(i: number, nodeIds: List<Id>): boolean {

@@ -22,6 +22,7 @@
         "Comparator",
         "DEVTOOLS",
         "Deletable",
+        "Denormalizer",
         "Deserializer",
         "Dont",
         "FOSS",
@@ -184,7 +185,7 @@
         {"language": "typescript", "autoFix": true},
         {"language": "typescriptreact", "autoFix": true},
     ],
-    "eslint.enable": true,
+    "eslint.enable": false,
     "eslint.options": {
         "ignorePath": ".gitignore",
         "extensions": [".js",".jsx",".ts",".tsx",]
