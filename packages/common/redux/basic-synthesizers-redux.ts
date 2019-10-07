@@ -85,7 +85,7 @@ export class BasicSynthesizerState implements IConnectable {
 		attack: 0,
 		decay: 0,
 		sustain: 0,
-		release: 0,
+		release: 1,
 		filterAttack: 0,
 		filterDecay: 0,
 		filterSustain: 0,

@@ -1,4 +1,5 @@
 import React, {useLayoutEffect, useState, ReactElement} from 'react'
+import {clamp} from '@corgifm/common/common-utils'
 import './Knob.less'
 
 interface ISliderControllerProps {
@@ -78,18 +79,15 @@ export function SliderController(props: ISliderControllerProps) {
 }
 
 function _normalize(n: number, min: number, max: number, curve: number, useCurve = true) {
-	// if (n === 0) return 0
 	if (min === max) return min
 
-	const x = (n - min) / (max - min)
+	const clamped = clamp(n, min, max)
+	
+	const x = (clamped - min) / (max - min)
 
 	if (useCurve) {
-		return clamp(x ** (1 / curve))
+		return clamp(x ** (1 / curve), 0, 1)
 	} else {
-		return clamp(x)
+		return clamp(x, 0, 1)
 	}
-}
-
-function clamp(value: number): number {
-	return Math.min(1, Math.max(0, value))
 }
