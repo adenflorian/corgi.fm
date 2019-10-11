@@ -1,3 +1,8 @@
+import React, {useContext} from 'react'
+import {CurveFunctions, defaultBipolarCurveFunctions, defaultUnipolarCurveFunctions} from '../client-utils'
+import {CorgiNumberChangedEvent} from './ExpPorts';
+import {SignalRange} from '@corgifm/common/common-types';
+
 export interface ExpParam {
 	readonly id: Id
 }
@@ -5,7 +10,7 @@ export interface ExpParam {
 export interface ExpNumberParam extends ExpParam {
 	readonly min: number
 	readonly max: number
-	readonly default: number
+	readonly defaultValue: number
 	readonly reactSubscribers: Map<ExpNumberParamCallback, ExpNumberParamCallback>
 	readonly curve: number
 	readonly valueString?: (v: number) => string
@@ -13,8 +18,44 @@ export interface ExpNumberParam extends ExpParam {
 
 export type ExpNumberParamCallback = (newValue: number) => void
 
-export interface ExpAudioParam extends ExpNumberParam {
-	readonly audioParam: AudioParam
+export const AudioParamContext = React.createContext<null | ExpAudioParam>(null)
+
+export function useAudioParamContext() {
+	const context = useContext(AudioParamContext)
+
+	if (!context) throw new Error(`missing audio param context, maybe there's no provider`)
+
+	return context
+}
+
+export interface ExpAudioParamOptions {
+	readonly valueString?: (v: number) => string
+	readonly curveFunctions?: CurveFunctions
+}
+
+export class ExpAudioParam implements ExpParam {
+	public readonly onChange: CorgiNumberChangedEvent
+	public readonly onModdedLiveValueChange: CorgiNumberChangedEvent
+	public readonly valueString?: (v: number) => string
+	public readonly curveFunctions: CurveFunctions
+
+	public constructor(
+		public readonly id: Id,
+		public readonly audioParam: AudioParam,
+		public readonly defaultValue: number,
+		public readonly maxValue: number,
+		public readonly paramSignalRange: SignalRange,
+		options: ExpAudioParamOptions = {},
+	) {
+		this.valueString = options.valueString
+		this.curveFunctions = options.curveFunctions || (
+			paramSignalRange === 'bipolar'
+				? defaultBipolarCurveFunctions
+				: defaultUnipolarCurveFunctions)
+
+		this.onChange = new CorgiNumberChangedEvent(defaultValue)
+		this.onModdedLiveValueChange = new CorgiNumberChangedEvent(defaultValue)
+	}
 }
 
 export interface ExpCustomNumberParam extends ExpNumberParam {
@@ -34,29 +75,6 @@ export type ExpCustomNumberParams = Map<Id, ExpCustomNumberParam>
 export type ExpBooleanParams = Map<Id, ExpBooleanParam>
 export type ExpEnumParams<TEnum extends string> = Map<Id, ExpEnumParam<TEnum>>
 
-export function buildAudioParamDesc(
-	...args: Parameters<typeof _buildAudioParamDesc>
-): [Id, ExpAudioParam] {
-	return [args[0], _buildAudioParamDesc(...args)]
-}
-
-function _buildAudioParamDesc(
-	id: Id, audioParam: AudioParam,
-	defaultValue: number, min: number, max: number,
-	curve = 1, valueString?: (v: number) => string,
-): ExpAudioParam {
-	return {
-		id,
-		audioParam,
-		min,
-		max,
-		default: defaultValue,
-		reactSubscribers: new Map<ExpNumberParamCallback, ExpNumberParamCallback>(),
-		curve,
-		valueString,
-	}
-}
-
 export function buildCustomNumberParamDesc(
 	...args: Parameters<typeof _buildCustomNumberParamDesc>
 ): [Id, ExpCustomNumberParam] {
@@ -73,7 +91,7 @@ function _buildCustomNumberParamDesc(
 		value: defaultValue,
 		min,
 		max,
-		default: defaultValue,
+		defaultValue: defaultValue,
 		reactSubscribers: new Map<ExpNumberParamCallback, ExpNumberParamCallback>(),
 		curve,
 		valueString,

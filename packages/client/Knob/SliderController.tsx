@@ -1,33 +1,51 @@
-import React, {useLayoutEffect, useState, ReactElement} from 'react'
+import React, {useLayoutEffect, useState, ReactElement, useCallback} from 'react'
 import {clamp} from '@corgifm/common/common-utils'
 import './Knob.less'
+import {CurveFunctions} from '../client-utils'
 
 interface ISliderControllerProps {
-	min: number
-	max: number
-	onChange: (newValue: number) => any
-	value: number
-	defaultValue?: number
-	curve: number
-	children: (handleMouseDown: any, percentage: number, adjustedPercentage: number, isMouseDown: boolean) => ReactElement<any>
+	readonly min: number
+	readonly max: number
+	readonly onChange: (newValue: number) => any
+	readonly value: number
+	readonly defaultValue?: number
+	readonly curve: number
+	readonly children: (handleMouseDown: any, percentage: number, isMouseDown: boolean) => ReactElement<any>
+	readonly curveFunctionOverride?: CurveFunctions
+	readonly experimental?: boolean
 }
 
 export function SliderController(props: ISliderControllerProps) {
 	const {
-		value, defaultValue, onChange = () => undefined,
-		min = 0, max = 1, curve = 1,
+		value, defaultValue, onChange = () => undefined, experimental = false,
+		min = 0, max = 1, curve = 1, curveFunctionOverride,
 	} = props
 
 	const [isMouseDown, setIsMouseDown] = useState(false)
 
-	useLayoutEffect(() => {
+	const normalize = useCallback((n: number) => {
+		if (min === max) return min
 
-		const _deNormalize = (n: number) => {
-			const deCurvedValue = n ** curve
-			const deNormalizedValue = (deCurvedValue * (max - min)) + min
-			return deNormalizedValue
+		const clamped = clamp(n, min, max)
+
+		const x = (clamped - min) / (max - min)
+
+		if (curveFunctionOverride) {
+			return curveFunctionOverride.unCurve(x)
+		} else {
+			return clamp(x ** (1 / curve), 0, 1)
 		}
+	}, [min, max, curve, curveFunctionOverride])
 
+	const deNormalize = useCallback((n: number) => {
+		const deCurvedValue = curveFunctionOverride
+			? curveFunctionOverride.curve(n)
+			: n ** curve
+		const deNormalizedValue = (deCurvedValue * (max - min)) + min
+		return deNormalizedValue
+	}, [min, max, curve, curveFunctionOverride])
+
+	useLayoutEffect(() => {
 		const _handleMouseMove = (e: MouseEvent) => {
 			if (isMouseDown) {
 				if (e.buttons !== 1) return setIsMouseDown(false)
@@ -41,14 +59,22 @@ export function SliderController(props: ISliderControllerProps) {
 
 				const mouseYDelta = e.movementY * sensitivity
 
-				const newNormalizedValue = Math.max(0, Math.min(1, _normalize(value, min, max, curve) - mouseYDelta))
+				if (experimental) {
+					const newNormalizedValue = Math.max(0, Math.min(1, value - mouseYDelta))
 
-				const newValue = _deNormalize(newNormalizedValue)
+					if (newNormalizedValue !== value) {
+						onChange(newNormalizedValue)
+					}
+				} else {
+					const newNormalizedValue = Math.max(0, Math.min(1, normalize(value) - mouseYDelta))
 
-				// if (isNaN(newValue)) throw new Error('nan')
+					const newValue = deNormalize(newNormalizedValue)
 
-				if (newValue !== value) {
-					onChange(newValue)
+					if (isNaN(newValue)) throw new Error('nan')
+
+					if (newValue !== value) {
+						onChange(newValue)
+					}
 				}
 			}
 		}
@@ -70,24 +96,19 @@ export function SliderController(props: ISliderControllerProps) {
 		}
 	}
 
-	return props.children(
-		_handleMouseDown,
-		_normalize(value, min, max, curve, true),
-		_normalize(value, min, max, curve, false),
-		isMouseDown,
-	)
-}
+	if (experimental) {
 
-function _normalize(n: number, min: number, max: number, curve: number, useCurve = true) {
-	if (min === max) return min
-
-	const clamped = clamp(n, min, max)
-	
-	const x = (clamped - min) / (max - min)
-
-	if (useCurve) {
-		return clamp(x ** (1 / curve), 0, 1)
+		return props.children(
+			_handleMouseDown,
+			value,
+			isMouseDown,
+		)
 	} else {
-		return clamp(x, 0, 1)
+
+		return props.children(
+			_handleMouseDown,
+			normalize(value),
+			isMouseDown,
+		)
 	}
 }

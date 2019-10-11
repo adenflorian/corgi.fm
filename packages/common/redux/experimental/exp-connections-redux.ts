@@ -1,4 +1,4 @@
-import {List, Map} from 'immutable'
+import {List, Map, Record} from 'immutable'
 import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
 import * as uuid from 'uuid'
@@ -12,6 +12,7 @@ import {
 	selectVirtualKeyboardById, SERVER_ACTION, VirtualKeyboardState,
 	selectExpPosition,
 } from '..'
+import {ParamInputCentering} from '../../common-types';
 
 export const expConnectionsActions = {
 	add: (connection: ExpConnection) => ({
@@ -54,19 +55,34 @@ export const expConnectionsActions = {
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	} as const),
+	setAudioParamInputCentering: (id: Id, centering: ParamInputCentering) => ({
+		type: 'EXP_UPDATE_CONNECTION_AUDIO_PARAM_INPUT_CENTERING',
+		id,
+		centering,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	} as const),
+	setAudioParamInputGain: (id: Id, gain: number) => ({
+		type: 'EXP_UPDATE_CONNECTION_AUDIO_PARAM_INPUT_GAIN',
+		id,
+		gain,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	} as const),
 } as const
 
 export type ExpConnectionType = 'audio' | 'gate' | 'dummy'
 
 export interface IExpConnection {
-	sourceId: Id
-	sourceType: ExpNodeType
-	targetId: Id
-	targetType: ExpNodeType
-	id: Id
-	sourcePort: ExpConnectionPortId
-	targetPort: ExpConnectionPortId
-	type: ExpConnectionType
+	readonly sourceId: Id
+	readonly sourceType: ExpNodeType
+	readonly targetId: Id
+	readonly targetType: ExpNodeType
+	readonly id: Id
+	readonly sourcePort: ExpConnectionPortId
+	readonly targetPort: ExpConnectionPortId
+	readonly type: ExpConnectionType
+	readonly audioParamInput: ExpAudioParamInputState
 }
 
 export class ExpConnection implements IExpConnection {
@@ -79,6 +95,7 @@ export class ExpConnection implements IExpConnection {
 		sourcePort: 'dummySourcePortId',
 		targetPort: 'dummyTargetPortId',
 		type: 'dummy',
+		audioParamInput: {},
 	}
 
 	public readonly id = uuid.v4()
@@ -91,7 +108,13 @@ export class ExpConnection implements IExpConnection {
 		public readonly sourcePort: ExpConnectionPortId,
 		public readonly targetPort: ExpConnectionPortId,
 		public readonly type: ExpConnectionType,
+		public readonly audioParamInput = {} as ExpAudioParamInputState,
 	) {}
+}
+
+export interface ExpAudioParamInputState {
+	readonly centering?: ParamInputCentering
+	readonly gain?: number
 }
 
 export type ExpConnectionPortId = Id
@@ -170,6 +193,27 @@ export function expConnectionsReducer(state = makeInitialState(), action: ExpCon
 				nodeInfos: updateNodeInfosWithUpdatedConnectionTarget(state.nodeInfos, connection, updatedConnection),
 			}
 		}
+		case 'EXP_UPDATE_CONNECTION_AUDIO_PARAM_INPUT_GAIN':
+		case 'EXP_UPDATE_CONNECTION_AUDIO_PARAM_INPUT_CENTERING': {
+			const connection = state.connections.get(action.id, null)
+			if (!connection) return state
+			const updatedConnection: ExpConnection = {
+				...connection,
+				audioParamInput: audioParamInputReducer(connection.audioParamInput, action),
+			}
+			return {
+				...state,
+				connections: state.connections.set(action.id, updatedConnection),
+			}
+		}
+		default: return state
+	}
+}
+
+function audioParamInputReducer(state = {} as ExpAudioParamInputState, action: ExpConnectionAction): ExpAudioParamInputState {
+	switch (action.type) {
+		case 'EXP_UPDATE_CONNECTION_AUDIO_PARAM_INPUT_CENTERING': return {...state, centering: action.centering}
+		case 'EXP_UPDATE_CONNECTION_AUDIO_PARAM_INPUT_GAIN': return {...state, gain: action.gain}
 		default: return state
 	}
 }

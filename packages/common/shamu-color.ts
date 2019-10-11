@@ -25,6 +25,10 @@ export function getColorStringForMidiNote(note: IMidiNote): string {
 	return `hsl(${removeOctave(note) * 23}, 90%, 60%)`
 }
 
+export function setLightness(color: string, lightness: number): string {
+	return colorFunc(color).lightness(lightness).hsl().string()
+}
+
 let finalMixedColors = Map<string, string>()
 
 export function mixColors(colors: List<string>): string {

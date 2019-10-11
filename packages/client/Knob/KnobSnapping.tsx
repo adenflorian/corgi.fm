@@ -36,7 +36,6 @@ export const KnobSnapping = React.memo(function _KnobSnapping(props: Props) {
 			{(handleMouseDown, percentage, adjustedPercentage, isMouseDown) =>
 				<KnobView
 					percentage={percentage}
-					adjustedPercentage={adjustedPercentage}
 					label={label}
 					readOnly={readOnly}
 					handleMouseDown={handleMouseDown}

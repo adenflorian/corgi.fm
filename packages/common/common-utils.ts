@@ -1,6 +1,6 @@
 import * as path from 'path'
 import {debounce} from 'lodash'
-import {Map, List} from 'immutable'
+import * as immutable from 'immutable'
 import {
 	allowedSampleUploadFileExtensions, MAX_MIDI_NOTE_NUMBER_127,
 	MIN_MIDI_NOTE_NUMBER_0,
@@ -9,6 +9,7 @@ import {
 import {MidiClipEvents, preciseDivide, preciseMultiply} from './midi-types'
 
 import uuid = require('uuid')
+import {SignalRange} from './common-types';
 
 export function pickRandomArrayElement<T>(array: readonly T[]): T {
 	return array[Math.floor(Math.random() * array.length)]
@@ -73,6 +74,15 @@ export const clamp = (val: number, min: number, max: number) =>
 export const clampMidiNote = (note: number) =>
 	clamp(note, MIN_MIDI_NOTE_NUMBER_0, MAX_MIDI_NOTE_NUMBER_127)
 
+const polarizedClamps = {
+	bipolar: (x: number) => clamp(x, -1, 1),
+	unipolar: (x: number) => clamp(x, 0, 1),
+}
+
+export function clampPolarized(val: number, polarity: SignalRange): number {
+	return polarizedClamps[polarity](val)
+}
+
 export const incrementalRound = (v: number, increment: number) =>
 	Math.round(v / increment) * increment
 
@@ -89,9 +99,9 @@ export function removeOctave(midiNumber: number) {
 // eslint-disable-next-line no-empty-function
 export const noop = () => {}
 
-export const emptyList = List()
+export const emptyList = immutable.List()
 
-export const emptyMap = Map()
+export const emptyMap = immutable.Map()
 
 // https://stackoverflow.com/a/30835667
 export function multilineRegExp(regExps: RegExp[], flags?: string) {
@@ -101,10 +111,10 @@ export function multilineRegExp(regExps: RegExp[], flags?: string) {
 	)
 }
 
-export function convertToNumberKeyMap<T>(obj: Map<string, T>): Map<number, T> {
+export function convertToNumberKeyMap<T>(obj: immutable.Map<string, T>): immutable.Map<number, T> {
 	return obj.reduce((result, value, key) => {
 		return result.set(Number.parseInt(key), value)
-	}, Map<number, T>())
+	}, immutable.Map<number, T>())
 }
 
 export function capitalizeFirstLetter(string: string) {
@@ -145,9 +155,9 @@ export function removeExtension(fileName: string) {
 	return fileName.replace(/\.[^/.]+$/, '')
 }
 
-export type IKeyToMidiMap = Map<string, number>
+export type IKeyToMidiMap = immutable.Map<string, number>
 
-export const keyToMidiMap: IKeyToMidiMap = Map<number>({
+export const keyToMidiMap: IKeyToMidiMap = immutable.Map<number>({
 	'a': 0,
 	'w': 1,
 	's': 2,
@@ -244,4 +254,10 @@ export function toBeats(seconds: number, bpm: number) {
 
 export function fromBeats(beats: number, bpm: number) {
 	return preciseMultiply(beats, preciseDivide(60, bpm))
+}
+
+export function arrayToESMap<T, U extends keyof T>(array: readonly T[] = [], idKey: U): Map<T[typeof idKey], T> {
+	return array.reduce((map, item) => {
+		return map.set(item[idKey], item)
+	}, new Map<T[typeof idKey], T>())
 }

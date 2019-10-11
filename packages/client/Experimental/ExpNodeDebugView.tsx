@@ -1,10 +1,11 @@
 import React from 'react'
 import {logger} from '../client-logger'
+import {hot} from 'react-hot-loader'
 import {
 	ExpPort, ExpPorts,
 } from './ExpPorts'
 import {ExpNodeDebugAudioParamKnob} from './ExpNodeDebugAudioParamKnob'
-import {ExpAudioParams, ExpCustomNumberParams} from './ExpParams'
+import {ExpAudioParams, ExpCustomNumberParams, AudioParamContext} from './ExpParams'
 import {ExpNodeDebugCustomNumberParamKnob} from './ExpNodeDebugCustomNumberParamKnob'
 import {useNodeContext} from './CorgiNode'
 
@@ -14,7 +15,7 @@ interface Props {
 	ports: ExpPorts
 }
 
-export const ExpNodeDebugView = React.memo(function _ExpNodeDebugView({
+export const ExpNodeDebugView = hot(module)(React.memo(function _ExpNodeDebugView({
 	audioParams, customNumberParams,
 	ports,
 }: Props) {
@@ -40,11 +41,11 @@ export const ExpNodeDebugView = React.memo(function _ExpNodeDebugView({
 				</div> */}
 				<div className="paramKnobs">
 					{[...audioParams].map(([id, audioParam]) => (
-						<ExpNodeDebugAudioParamKnob
-							key={id as string}
-							nodeId={nodeId}
-							audioParam={audioParam}
-						/>
+						<AudioParamContext.Provider value={audioParam} key={id as string}>
+							<ExpNodeDebugAudioParamKnob
+								nodeId={nodeId}
+							/>
+						</AudioParamContext.Provider>
 					))}
 				</div>
 				{customNumberParams.size > 0 &&
@@ -61,7 +62,7 @@ export const ExpNodeDebugView = React.memo(function _ExpNodeDebugView({
 			</div>
 		</div>
 	)
-})
+}))
 
 interface PortsProps {
 	readonly ports: ExpPorts

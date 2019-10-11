@@ -57,6 +57,7 @@ export const ExpConnectorPlaceholder = React.memo(
 				localClientId,
 				GhostConnectorAddingOrMoving.Adding,
 				portId,
+				portId,
 				port.type,
 			)))
 		}, [dispatch, localClientId, nodeId, port.type, portId, sourceOrTarget, x, y])

@@ -25,7 +25,7 @@ export const ExpNodeDebugCustomNumberParamKnob = React.memo(function _ExpNodeDeb
 
 	return (
 		<Knob
-			defaultValue={customNumberParam.default}
+			defaultValue={customNumberParam.defaultValue}
 			label={customNumberParam.id as string}
 			min={customNumberParam.min}
 			max={customNumberParam.max}

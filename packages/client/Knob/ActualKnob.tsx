@@ -8,6 +8,8 @@ interface Props {
 export const ActualKnob = React.memo(function _ActualKnob(props: Props) {
 	const {percentage} = props
 
+	if (isNaN(percentage)) console.error('percentage isNaN: ', {percentage})
+
 	const size = 32
 
 	return (

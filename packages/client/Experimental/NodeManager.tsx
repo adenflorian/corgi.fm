@@ -10,9 +10,10 @@ import {
 } from './ExpConnections'
 import {NumberParamChange} from './ExpParams'
 import {
-	isAudioOutputPort, isAudioInputPort, ExpPortCallback, ExpPortType,
+	isAudioOutputPort, isAudioInputPort, ExpPortCallback, ExpPortType, isAudioParamInputPort,
 } from './ExpPorts'
 import {isGateOutputPort, isGateInputPort} from './ExpGatePorts'
+import {ParamInputCentering} from '@corgifm/common/common-types';
 
 export const NodeManagerContext = React.createContext<null | NodeManagerContextValue>(null)
 
@@ -137,6 +138,34 @@ export class NodeManager {
 		if (!node) return logger.warn('[onAudioParamChange] 404 node not found: ', {paramChange})
 
 		node.onAudioParamChange(paramChange.paramId, paramChange.newValue)
+	}
+
+	public onAudioParamInputGainChange = (connectionId: Id, newGain: number) => {
+		const connection = this._connections.get(connectionId)
+
+		if (!connection) return logger.warn('[onAudioParamInputGainChange] 404 connection not found: ', connectionId)
+
+		const inputPort = connection.inputPort
+
+		if (!isAudioParamInputPort(inputPort)) {
+			return logger.error('[onAudioParamInputGainChange] !isAudioParamInputPort(inputPort): ', {connectionId, connection, inputPort})
+		}
+
+		inputPort.setChainGain(connectionId, newGain)
+	}
+
+	public onAudioParamInputCenteringChange = (connectionId: Id, newCentering: ParamInputCentering) => {
+		const connection = this._connections.get(connectionId)
+
+		if (!connection) return logger.warn('[onAudioParamInputCenteringChange] 404 connection not found: ', connectionId)
+
+		const inputPort = connection.inputPort
+
+		if (!isAudioParamInputPort(inputPort)) {
+			return logger.error('[onAudioParamInputCenteringChange] !isAudioParamInputPort(inputPort): ', {connectionId, connection, inputPort})
+		}
+
+		inputPort.setChainCentering(connectionId, newCentering)
 	}
 
 	public onCustomNumberParamChange = (paramChange: NumberParamChange) => {

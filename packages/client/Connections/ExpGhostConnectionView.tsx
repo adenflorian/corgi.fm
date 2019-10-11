@@ -23,7 +23,7 @@ const defaultPosition = {x: 0, y: 0} as const
 
 export const ConnectedExpGhostConnectionView = ({id}: Props) => {
 
-	const {activeConnector, inactiveConnector, activeSourceOrTarget, port, ownerId} = useSelector(
+	const {activeConnector, inactiveConnector, activeSourceOrTarget, inactivePort, ownerId} = useSelector(
 		(state: IClientAppState) => selectExpGhostConnection(state.room, id))
 
 	const [mousePosition, setMousePosition] = useState(activeConnector)
@@ -32,7 +32,7 @@ export const ConnectedExpGhostConnectionView = ({id}: Props) => {
 
 	const parentPosition = useSelector(createExpPositionSelector(parentId))
 
-	const expPort = usePort(parentId, port)
+	const expPort = usePort(parentId, inactivePort)
 
 	const portPosition = expPort
 		? expPort.position

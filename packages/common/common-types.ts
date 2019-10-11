@@ -79,3 +79,7 @@ export interface IKeyColors {
 		readonly name: NoteNameSharps
 	}
 }
+
+export type SignalRange = 'unipolar' | 'bipolar'
+
+export type ParamInputCentering = 'center' | 'offset'

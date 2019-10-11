@@ -136,6 +136,7 @@ function foo(
 
 			return
 		}
+
 		case 'MOUSE_UP_ON_EXP_PLACEHOLDER': {
 			const localActiveGhostConnection = createLocalActiveExpGhostConnectionSelector()(afterState)
 			if (localActiveGhostConnection) {
@@ -143,6 +144,12 @@ function foo(
 			}
 			return
 		}
+
+		case 'EXP_UPDATE_CONNECTION_AUDIO_PARAM_INPUT_GAIN':
+			return nodeManager.onAudioParamInputGainChange(action.id, action.gain)
+
+		case 'EXP_UPDATE_CONNECTION_AUDIO_PARAM_INPUT_CENTERING':
+			return nodeManager.onAudioParamInputCenteringChange(action.id, action.centering)
 
 		default: return
 	}

@@ -47,6 +47,7 @@ export class ExpGhostConnection {
 		ownerId: 'dummy owner id',
 		id: 'dummy id',
 		port: 'dummyPortId',
+		inactivePort: 'dummyInactivePort',
 		addingOrMoving: GhostConnectorAddingOrMoving.Adding,
 		type: 'dummy',
 	}
@@ -60,6 +61,7 @@ export class ExpGhostConnection {
 		public readonly ownerId: ClientId,
 		public readonly addingOrMoving: GhostConnectorAddingOrMoving,
 		public readonly port: Id,
+		public readonly inactivePort: Id,
 		public readonly type: ExpConnectionType,
 		public readonly movingConnectionId?: Id,
 	) {}

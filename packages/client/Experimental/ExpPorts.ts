@@ -6,6 +6,52 @@ import {
 	ExpNodeAudioConnection,
 	ExpNodeConnections, ExpNodeConnection,
 } from './ExpConnections'
+import {ParamInputCentering, SignalRange} from '@corgifm/common/common-types'
+import {clamp} from '@corgifm/common/common-utils'
+import {createCorgiAnalyserWorkletNode} from '../WebAudio/AudioWorklets/audio-worklets'
+import {ExpAudioParam} from './ExpParams';
+
+/**
+ * CorgiEvent
+stores subscribers internally
+has sub and un-sub functions
+and an invoke function
+ */
+export type NumberChangedDelegate = (newNumber: number) => void
+
+export class CorgiNumberChangedEvent {
+	private readonly _subscribers = new Set<NumberChangedDelegate>()
+	private _frameRequested = false
+
+	constructor(
+		private _currentValue: number,
+	) {}
+
+	public subscribe(delegate: NumberChangedDelegate): number {
+		this._subscribers.add(delegate)
+		return this._currentValue
+	}
+	public unsubscribe(delegate: NumberChangedDelegate) {
+		this._subscribers.delete(delegate)
+	}
+	public invokeImmediately(newNumber: number) {
+		this._currentValue = newNumber
+		this._invoke()
+	}
+	public invokeNextFrame(newNumber: number, onInvoked?: () => void) {
+		this._currentValue = newNumber
+		if (this._frameRequested) return
+		this._frameRequested = true
+		requestAnimationFrame(() => {
+			this._frameRequested = false
+			this._invoke()
+			if (onInvoked) onInvoked()
+		})
+	}
+	private _invoke() {
+		this._subscribers.forEach(delegate => delegate(this._currentValue))
+	}
+}
 
 export type ExpPortCallback = (port: ExpPort) => void
 
@@ -74,10 +120,6 @@ export interface ExpNodeAudioInputPortArgs {
 	readonly destination: AudioNode | AudioParam
 }
 
-type SignalRange = 'unipolar' | 'bipolar'
-
-type ParamInputCentering = 'center' | 'offset'
-
 const curves = {
 	bipolar: {
 		center: null,
@@ -89,25 +131,30 @@ const curves = {
 	},
 } as const
 
+export interface ParamInputChainReact extends Pick<ParamInputChain, 'id' | 'centering' | 'gain'> {}
+
 // TODO Maybe, use current knob value to determine starting gain value, like serum
 class ParamInputChain {
+	public get centering() {return this._centering}
+	public get gain() {return this._gain.gain.value}
 	private readonly _waveShaper: WaveShaperNode
 	private readonly _gain: GainNode
 	private _centering: ParamInputCentering
 
 	public constructor(
+		public readonly id: Id,
 		audioContext: AudioContext,
 		private readonly _destination: AudioParam | AudioNode,
 		private readonly _inputRange: SignalRange,
-		private readonly _defaultCentering: ParamInputCentering,
+		defaultCentering: ParamInputCentering,
 	) {
-		this._centering = this._defaultCentering
-
 		this._waveShaper = audioContext.createWaveShaper()
 		this._gain = audioContext.createGain()
 
-		this._gain.gain.value = 1
-		this.updateWaveShaperCurve()
+		this._gain.gain.value = 0.5
+
+		this._centering = defaultCentering
+		this.setCentering(defaultCentering)
 
 		this._waveShaper.connect(this._gain).connect(this._destination as AudioNode)
 	}
@@ -115,18 +162,14 @@ class ParamInputChain {
 	public setCentering(newCentering: ParamInputCentering) {
 		if (newCentering === this._centering) return
 		this._centering = newCentering
-		this.updateWaveShaperCurve()
+		this._waveShaper.curve = curves[this._inputRange][this._centering]
 	}
 
 	public setGain(gain: number) {
 		// Rounding to nearest to 32 bit number because AudioParam values are 32 bit floats
-		const newGain = Math.fround(gain)
+		const newGain = Math.fround(clamp(gain, -1, 1))
 		if (newGain === this._gain.gain.value) return
-		this._gain.gain.value = gain
-	}
-
-	private updateWaveShaperCurve() {
-		this._waveShaper.curve = curves[this._inputRange][this._centering]
+		this._gain.gain.value = newGain
 	}
 
 	public getInput(): AudioNode {
@@ -172,21 +215,24 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 	private readonly _waveShaperClamp: WaveShaperNode
 	private readonly _gainDenormalizer: GainNode
 	private readonly _knobConstantSource: ConstantSourceNode
-	private readonly _gainNormalizer: GainNode
-	// private readonly _analyser: AudioWorkletNode
+	// private readonly _gainNormalizer: GainNode
+	private _liveModdedValue = 0
+	public get liveModdedValue() {return this._liveModdedValue}
+	private readonly _analyser: AudioWorkletNode
+	public readonly destination: AudioParam
+	public readonly defaultParamValue: number
 
 	public constructor(
-		public readonly id: Id,
-		public readonly name: string,
+		public readonly expAudioParam: ExpAudioParam,
 		public readonly getNode: () => CorgiNode,
-		public readonly destination: AudioParam,
 		public readonly audioContext: AudioContext,
 		public readonly defaultCentering: ParamInputCentering,
-		public readonly maxValue: number,
-		public readonly paramSignalRange: SignalRange,
-		public readonly defaultParamValue: number,
+		public readonly clampCurveOverride?: Float32Array,
 	) {
-		super(id, name, getNode, destination)
+		super(expAudioParam.id, expAudioParam.id as string, getNode, expAudioParam.audioParam)
+
+		this.destination = expAudioParam.audioParam
+		this.defaultParamValue = expAudioParam.defaultValue
 
 		// All AudioParam values should be 0, because it will only be
 		// controlled from modulation sources, including the knob.
@@ -195,35 +241,48 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 		this._waveShaperClamp = audioContext.createWaveShaper()
 		this._gainDenormalizer = audioContext.createGain()
 		this._knobConstantSource = audioContext.createConstantSource()
-		this._gainNormalizer = audioContext.createGain()
-		// this._analyser = createCorgiAnalyserWorkletNode(audioContext)
+		// this._gainNormalizer = audioContext.createGain()
+		this._analyser = createCorgiAnalyserWorkletNode(audioContext)
 
+		this._analyser.port.onmessage = (event) => {
+			if (!isNaN(event.data) && event.data !== this._liveModdedValue) {
+				this._liveModdedValue = event.data
+				this.expAudioParam.onModdedLiveValueChange.invokeNextFrame(event.data, this._requestWorkletUpdate)
+			} else {
+				this._requestWorkletUpdate()
+			}
+		}
 
+		this._requestWorkletUpdate()
 
-		// this._analyser.port.onmessage = (event) => {
-		// 	// Handling data from the processor.
-		// 	// console.log('[OscillatorExpNode] ', event.data);
-		// 	// this.getNode().setAudioParamAutoValue(this.id, event.data)
-
-		// 	this._analyser.port.postMessage('Hello from osc onmessage!');
-		// };
-
-		// this._analyser.port.postMessage('Hello from osc start!');
-
-		this._knobConstantSource.offset.value = defaultParamValue
+		this._knobConstantSource.offset.value = this.defaultParamValue
 		this._knobConstantSource.start()
 
-		this._gainDenormalizer.gain.value = maxValue
-		this._gainNormalizer.gain.value = 1 / maxValue
+		this._gainDenormalizer.gain.value = this.expAudioParam.maxValue
+		// this._gainNormalizer.gain.value = 1 / this.maxValue
 
-		this._waveShaperClamp.curve = waveShaperClampCurves[paramSignalRange]
+		this._waveShaperClamp.curve = this.expAudioParam.curveFunctions.waveShaperCurve
 
 		this._knobConstantSource
-			.connect(this._gainNormalizer)
+			// .connect(this._gainNormalizer)
 			.connect(this._waveShaperClamp)
 			.connect(this._gainDenormalizer)
-			// .connect(this._analyser)
-			.connect(destination)
+			.connect(this._analyser)
+			.connect(this.destination)
+	}
+
+	// public onUpdated() {
+	// 	super.onUpdated()
+	// 	this._requestWorkletUpdate()
+	// }
+
+	private _requestWorkletUpdate = () => {
+		// console.log('_requestWorkletUpdate')
+		this._analyser.port.postMessage('Update please!')
+	}
+
+	public getChains(): readonly ParamInputChainReact[] {
+		return [...this._inputChains].map(x => x[1])
 	}
 
 	public setKnobValue(value: number) {
@@ -233,12 +292,28 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 		this._knobConstantSource.offset.value = newValue
 	}
 
+	public setChainGain(connectionId: Id, value: number) {
+		const chain = this._inputChains.get(connectionId)
+
+		if (!chain) return logger.error('[setChainGain] 404 chain not found!:', {connectionId, value})
+
+		chain.setGain(value)
+	}
+
+	public setChainCentering(connectionId: Id, centering: ParamInputCentering) {
+		const chain = this._inputChains.get(connectionId)
+
+		if (!chain) return logger.error('[setChainCentering] 404 chain not found!:', {connectionId, centering})
+
+		chain.setCentering(centering)
+	}
+
 	public prepareDestinationForConnection(connectionId: Id, signalRange: SignalRange): AudioNode {
 		const existingChain = this._inputChains.get(connectionId)
 
 		if (existingChain) return existingChain.getInput()
 
-		const newChain = new ParamInputChain(this.audioContext, this._waveShaperClamp, signalRange, this.defaultCentering)
+		const newChain = new ParamInputChain(connectionId, this.audioContext, this._waveShaperClamp, signalRange, this.defaultCentering)
 
 		this._inputChains.set(connectionId, newChain)
 
@@ -263,7 +338,7 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 		this._gainDenormalizer.disconnect()
 		this._knobConstantSource.stop()
 		this._knobConstantSource.disconnect()
-		this._gainNormalizer.disconnect()
+		// this._gainNormalizer.disconnect()
 	}
 }
 

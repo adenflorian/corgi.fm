@@ -1,28 +1,25 @@
 import React, {FormEvent, useEffect, useRef, useState, useCallback, ChangeEvent} from 'react'
-import {clamp} from '@corgifm/common/common-utils'
+import {clamp, clampPolarized} from '@corgifm/common/common-utils'
+import {SignalRange} from '@corgifm/common/common-types'
 import {CurveFunctions} from '../client-utils'
 
 interface Props {
 	readonly value: number
 	readonly valueString?: (value: number) => string
 	readonly onValueChange: (value: number) => void
-	readonly min: number
-	readonly max: number
-	readonly round?: (value: number) => number
-	readonly curveFunctionOverride?: CurveFunctions
+	readonly curveFunctions: CurveFunctions
+	readonly maxValue: number
+	readonly range: SignalRange
 }
 
-export const KnobValueNumber = React.memo(
-	function _KnobValueNumber(props: Props) {
+export const ExpKnobValueNumber = React.memo(
+	function _ExpKnobValueNumber(props: Props) {
 		const {
 			valueString = (v: number) => v.toFixed(2),
-			round = (v: number) => v, curveFunctionOverride,
-			onValueChange, min, max,
+			onValueChange, maxValue, curveFunctions, range,
 		} = props
 
-		const curvedValue = curveFunctionOverride
-			? curveFunctionOverride.curve(props.value) * max
-			: props.value
+		const curvedValue = curveFunctions.curve(props.value) * maxValue
 
 		const [active, setActive] = useState(false)
 		const [tempValue, setTempValue] = useState(curvedValue.toString())
@@ -83,7 +80,9 @@ export const KnobValueNumber = React.memo(
 
 			if (Number.isNaN(parsedFloat)) return
 
-			onValueChange(clamp(round(parsedFloat), min, max))
+			const normalized = curveFunctions.unCurve(parsedFloat / maxValue)
+
+			onValueChange(clampPolarized(normalized, range))
 		}
 	},
 )

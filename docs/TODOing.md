@@ -520,6 +520,11 @@ Yes, https://mmckegg.github.io/web-audio-school/, exercise 13 is exactly what yo
 
 
 # 0.6.0
+- [ ] change cursor to vertical arrows when dragging knob
+- [ ] animate things when being changed from over the network
+	- [ ] knobs
+	- [ ] node positions
+	- [ ] connections
 - [ ] https://github.com/pelotom/runtypes
 - [ ] https://github.com/hmil/rest.ts
 - [ ] built in synth for keyboard

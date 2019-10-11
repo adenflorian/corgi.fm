@@ -14,7 +14,7 @@ interface Props {
 	children: React.ReactNode
 }
 
-const maxZoom = 3
+const maxZoom = 4
 const minZoom = -3
 const scrollZoomMod = 0.002
 const mouseZoomMod = 0.001
@@ -88,6 +88,7 @@ export const ConnectedZoom = React.memo(function _Zoom({
 		return Math.min(maxZoom, Math.max(minZoom, val))
 	}, [])
 
+	// TODO Wait for animation frame?
 	const updateRefs = useCallback((zoom = false) => {
 		const zoomElement = zoomRef.current
 		if (zoomElement) {

@@ -62,3 +62,49 @@ export function getCdnUrl() {
 		return `https://cdn.test.corgi.fm/prod/`
 	}
 }
+
+const a = 1000
+const a0 = 1000 ** -1 // 0.001
+const length = 65535
+const halfLength = Math.floor(length / 2) // 32767
+
+const filterWaveShaperCurve = new Float32Array(length).map((_, i) => {
+	if (i < halfLength) {
+		return a0
+	} else {
+		const x = (i - halfLength) / halfLength
+		return a ** (x - 1)
+	}
+})
+
+export interface CurveFunctions {
+	readonly curve: (x: number) => number
+	readonly unCurve: (x: number) => number
+	readonly waveShaperCurve: Float32Array | null
+}
+
+export const filterFreqCurveFunctions: CurveFunctions = {
+	curve: (x: number) => a ** (x - 1),
+	unCurve: (x: number) => Math.log(a * x) / Math.log(a),
+	waveShaperCurve: filterWaveShaperCurve,
+}
+
+export const defaultBipolarCurveFunctions: CurveFunctions = {
+	curve: (x: number) => x,
+	unCurve: (x: number) => x,
+	waveShaperCurve: null,
+}
+
+export const defaultUnipolarCurveFunctions: CurveFunctions = {
+	curve: (x: number) => x,
+	unCurve: (x: number) => x,
+	waveShaperCurve: null,
+}
+
+// export function filterFreqCurveFunction(x: number): number {
+// 	return a ** (x - 1)
+// }
+
+// export function filterFreqCurveReverseFunction(x: number): number {
+// 	return Math.log(a * x) / Math.log(a)
+// }

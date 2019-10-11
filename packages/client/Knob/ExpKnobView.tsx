@@ -4,8 +4,9 @@ import {ActualKnob} from './ActualKnob'
 import './Knob.less'
 import {ActualUberKnob} from './ActualUberKnob';
 import {ParamInputChainReact} from '../Experimental/ExpPorts';
+import {SignalRange} from '@corgifm/common/common-types';
 
-interface IKnobViewProps {
+interface Props {
 	label: string
 	percentage: number
 	readOnly?: boolean
@@ -15,13 +16,15 @@ interface IKnobViewProps {
 	children: React.ReactNode
 	canEdit: boolean
 	isMouseDown: boolean
+	chains?: readonly ParamInputChainReact[]
 	color?: string
+	range: SignalRange
 }
 
-export const KnobView = React.memo(function _KnobView(props: IKnobViewProps) {
+export const ExpKnobView = React.memo(function _KnobView(props: Props) {
 	const {
 		handleMouseDown, percentage, canEdit, isMouseDown, color,
-		label, readOnly = false, tooltip, children,
+		label, readOnly = false, tooltip, children, chains = [], range,
 	} = props
 
 	return (
@@ -39,7 +42,10 @@ export const KnobView = React.memo(function _KnobView(props: IKnobViewProps) {
 			onMouseDown={handleMouseDown}
 		>
 			<div className="knobLabel unselectable">{label}</div>
-			<ActualKnob percentage={percentage} />
+			<ActualUberKnob percentage={percentage} chains={chains} color={color} range={range} />
+			{/* {chains.length > 0
+				? <ActualUberKnob percentage={percentage} chains={chains} color={color} />
+				: <ActualKnob percentage={percentage} />} */}
 			{children}
 		</div>
 	)

@@ -1,36 +1,47 @@
-import React, {useCallback, useEffect} from 'react'
+import React, {useCallback} from 'react'
 import {useDispatch} from 'react-redux'
 import {expNodesActions} from '@corgifm/common/redux'
-import {Knob} from '../Knob/Knob'
-import {logger} from '../client-logger'
-import {useAudioParam} from './hooks/useAudioParam'
-import {ExpAudioParam} from './ExpParams'
+import {ExpKnob} from '../Knob/ExpKnob'
+import {useNumberChangedEvent} from './hooks/useAudioParam'
+import {usePort} from './hooks/usePort'
+import {useNodeContext} from './CorgiNode'
+import {useAudioParamContext} from './ExpParams'
+import {isAudioParamInputPort} from './ExpPorts'
 
 interface Props {
 	nodeId: Id
-	audioParam: ExpAudioParam
 }
 
 export const ExpNodeDebugAudioParamKnob = React.memo(function _ExpNodeDebugAudioParamKnob({
-	nodeId, audioParam,
+	nodeId,
 }: Props) {
+	const audioParam = useAudioParamContext()
 	const dispatch = useDispatch()
 	const onAudioParamChange = useCallback((_, newValue: number) => {
 		dispatch(expNodesActions.audioParamChange(nodeId, audioParam.id, newValue))
 	}, [audioParam.id, dispatch, nodeId])
-	const value = useAudioParam(audioParam.id)
+	const node = useNodeContext()
+	const value = useNumberChangedEvent(audioParam.onChange)
+	const port = usePort(nodeId, audioParam.id)
+
+	let chains
+	if (port && isAudioParamInputPort(port)) {
+		chains = port.getChains()
+	}
 
 	return (
-		<Knob
-			defaultValue={audioParam.default}
+		<ExpKnob
+			defaultValue={audioParam.defaultValue}
 			label={audioParam.id as string}
-			min={audioParam.min}
-			max={audioParam.max}
 			onChange={onAudioParamChange}
 			tooltip={audioParam.id as string}
 			value={value}
-			curve={audioParam.curve}
 			valueString={audioParam.valueString}
+			chains={chains}
+			color={node.getColor()}
+			curveFunctions={audioParam.curveFunctions}
+			range={audioParam.paramSignalRange}
+			maxValue={audioParam.maxValue}
 		/>
 	)
 })

@@ -1,6 +1,6 @@
 import React, {ReactElement, useContext} from 'react'
 import {List} from 'immutable'
-import {clamp} from '@corgifm/common/common-utils'
+import {clamp, arrayToESMap, clampPolarized} from '@corgifm/common/common-utils'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {logger} from '../client-logger'
 import './ExpNodes.less'
@@ -13,6 +13,7 @@ import {
 import {
 	ExpAudioParams, ExpCustomNumberParams,
 	ExpNumberParamCallback,
+	ExpAudioParam,
 } from './ExpParams'
 
 export const ExpNodeContext = React.createContext<null | ExpNodeContextValue>(null)
@@ -29,7 +30,7 @@ export function useNodeContext() {
 
 export interface CorgiNodeOptions {
 	readonly ports?: readonly ExpPort[]
-	readonly audioParams?: ExpAudioParams
+	readonly audioParams?: readonly ExpAudioParam[]
 	readonly customNumberParams?: ExpCustomNumberParams
 }
 
@@ -39,6 +40,7 @@ export abstract class CorgiNode {
 	protected readonly _audioParams: ExpAudioParams
 	protected readonly _customNumberParams: ExpCustomNumberParams
 	private _enabled = true
+	private _portsWithUpdates = [] as ExpPort[]
 
 	public constructor(
 		public readonly id: Id,
@@ -47,8 +49,8 @@ export abstract class CorgiNode {
 		options: CorgiNodeOptions = {},
 	) {
 		this.reactContext = this._makeExpNodeContextValue()
-		this._ports = (options.ports || []).reduce((result, port) => {return result.set(port.id, port)}, new Map() as ExpPorts)
-		this._audioParams = options.audioParams || new Map()
+		this._ports = arrayToESMap(options.ports, 'id')
+		this._audioParams = arrayToESMap(options.audioParams, 'id')
 		this._customNumberParams = options.customNumberParams || new Map()
 	}
 
@@ -57,7 +59,18 @@ export abstract class CorgiNode {
 	public abstract getName(): string
 
 	// eslint-disable-next-line no-empty-function
-	public onTick(currentTime: number, maxReadAhead: number): void {}
+	public onTick(currentTime: number, maxReadAhead: number): void {
+		if (this._portsWithUpdates.length > 0) {
+			this._portsWithUpdates.forEach(port => {
+				port.onUpdated()
+			})
+			this._portsWithUpdates = []
+		}
+	}
+
+	public portHasUpdate(port: ExpPort) {
+		this._portsWithUpdates.push(port)
+	}
 
 	public getColor(): string {return CssColor.blue}
 
@@ -76,22 +89,6 @@ export abstract class CorgiNode {
 			id: this.id,
 			getColor: () => this.getColor(),
 			getName: () => this.getName(),
-			registerAudioParam: (paramId: Id, callback: ExpNumberParamCallback) => {
-				const param = this._audioParams.get(paramId)
-				if (!param) return logger.warn('[registerAudioParam] 404 audio param not found: ', paramId)
-				param.reactSubscribers.set(callback, callback)
-				callback(param.audioParam.value)
-			},
-			unregisterAudioParam: (paramId: Id, callback: ExpNumberParamCallback) => {
-				const param = this._audioParams.get(paramId)
-				if (!param) return logger.warn('[unregisterAudioParam] 404 audio param not found: ', paramId)
-				param.reactSubscribers.delete(callback)
-			},
-			getAudioParamValue: (paramId: Id) => {
-				const param = this._audioParams.get(paramId)
-				if (!param) return logger.warn('[getAudioParamValue] 404 audio param not found: ', paramId)
-				return param.audioParam.value
-			},
 			registerCustomNumberParam: (paramId: Id, callback: ExpNumberParamCallback) => {
 				const param = this._customNumberParams.get(paramId)
 				if (!param) return logger.warn('[registerCustomNumberParam] 404 custom number param not found: ', paramId)
@@ -102,11 +99,6 @@ export abstract class CorgiNode {
 				const param = this._customNumberParams.get(paramId)
 				if (!param) return logger.warn('[unregisterCustomNumberParam] 404 custom number param not found: ', paramId)
 				param.reactSubscribers.delete(callback)
-			},
-			getCustomNumberParamValue: (paramId: Id) => {
-				const param = this._customNumberParams.get(paramId)
-				if (!param) return logger.warn('[getCustomNumberParamValue] 404 custom number param not found: ', paramId)
-				return param.value
 			},
 			setPortPosition: (id: Id, position: Point) => {
 				const port = this.getPort(id)
@@ -128,11 +120,11 @@ export abstract class CorgiNode {
 
 		if (!isAudioParamInputPort(port)) return logger.warn('[onAudioParamChange] !isAudioParamInputPort(port): ', {paramId, newValue, port})
 
-		const newClampedValue = clamp(newValue, audioParam.min, audioParam.max)
+		const newClampedValue = clampPolarized(newValue, audioParam.paramSignalRange)
 
 		port.setKnobValue(newClampedValue)
 
-		audioParam.reactSubscribers.forEach(sub => sub(newClampedValue))
+		audioParam.onChange.invokeImmediately(newClampedValue)
 	}
 
 	public onCustomNumberParamChange(paramId: Id, newValue: number) {

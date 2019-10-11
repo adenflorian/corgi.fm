@@ -1,23 +1,24 @@
 import React from 'react'
-import './Knob.less'
 import {KnobBaseProps} from './KnobTypes'
 import {KnobValueNumber} from './KnobValueNumber'
 import {KnobView} from './KnobView'
 import {SliderController} from './SliderController'
+import './Knob.less'
 
 interface IKnobProps extends KnobBaseProps {
-	curve?: number
-	max: number
-	min: number
-	onChange: (onChangeId: any, newValue: number) => any
-	defaultValue: number
-	valueString?: (value: number) => string
-	value: number
+	readonly curve?: number
+	readonly max: number
+	readonly min: number
+	readonly onChange: (onChangeId: any, newValue: number) => any
+	readonly defaultValue: number
+	readonly valueString?: (value: number) => string
+	readonly value: number
+	readonly color?: string
 }
 
 export const Knob = React.memo(function _Knob(props: IKnobProps) {
 	const {
-		value, label = '', readOnly = false, defaultValue, onChangeId,
+		value, label = '', readOnly = false, defaultValue, onChangeId, color,
 		min = 0, max = 1, curve = 1, tooltip, valueString, onChange = () => undefined,
 	} = props
 
@@ -34,16 +35,16 @@ export const Knob = React.memo(function _Knob(props: IKnobProps) {
 			value={value}
 			defaultValue={defaultValue}
 		>
-			{(handleMouseDown, percentage, adjustedPercentage, isMouseDown) =>
+			{(handleMouseDown, percentage, isMouseDown) =>
 				<KnobView
 					percentage={percentage}
-					adjustedPercentage={adjustedPercentage}
 					label={label}
 					readOnly={readOnly}
 					handleMouseDown={handleMouseDown}
 					tooltip={tooltip}
 					canEdit={true}
 					isMouseDown={isMouseDown}
+					color={color}
 				>
 					<KnobValueNumber
 						value={value}

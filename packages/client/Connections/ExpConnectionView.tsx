@@ -104,6 +104,9 @@ export const ExpConnectionView =
 				sourceOrTarget === ActiveGhostConnectorSourceOrTarget.Source
 					? sourcePort
 					: targetPort,
+				sourceOrTarget === ActiveGhostConnectorSourceOrTarget.Source
+					? targetPort
+					: sourcePort,
 				type,
 				id,
 			)))
