@@ -1,3 +1,23 @@
+# Experimental
+- [√] create color changed event on corgi node
+- [√] uber arc should subscribe to that event to get its color
+- [√] extract dumb uber arc component
+- [ ] make sure mod rail is accurately reflecting gain value
+- [ ] click and drag on mod rail to change gain
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # 0.5.0
 - [√] fix dropping on connections on something with a lot of connections already
 - [√] duplicate nodes

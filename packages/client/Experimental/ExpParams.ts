@@ -1,8 +1,8 @@
 import React, {useContext} from 'react'
+import {SignalRange} from '@corgifm/common/common-types'
+import {clampPolarized} from '@corgifm/common/common-utils'
 import {CurveFunctions, defaultBipolarCurveFunctions, defaultUnipolarCurveFunctions} from '../client-utils'
-import {CorgiNumberChangedEvent} from './ExpPorts';
-import {SignalRange} from '@corgifm/common/common-types';
-import {clampPolarized} from '@corgifm/common/common-utils';
+import {CorgiNumberChangedEvent} from './CorgiEvents'
 
 export interface ExpParam {
 	readonly id: Id
@@ -95,7 +95,7 @@ function _buildCustomNumberParamDesc(
 		value: defaultValue,
 		min,
 		max,
-		defaultValue: defaultValue,
+		defaultValue,
 		reactSubscribers: new Map<ExpNumberParamCallback, ExpNumberParamCallback>(),
 		curve,
 		valueString,

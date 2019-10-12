@@ -4,6 +4,7 @@ import {CssColor} from '@corgifm/common/shamu-color'
 import {toBeats, fromBeats, clamp, pickRandomArrayElement} from '@corgifm/common/common-utils'
 import {preciseSubtract, preciseAdd, midiPrecision} from '@corgifm/common/midi-types'
 import {logger} from '../client-logger'
+import {filterFreqCurveFunctions} from '../client-utils'
 import {
 	percentageValueString, filterValueToString,
 	panValueToString, adsrValueToString, gainDecibelValueToString,
@@ -18,7 +19,6 @@ import {
 } from './ExpParams'
 import './ExpNodes.less'
 import {ExpGateInputPort, ExpGateOutputPort} from './ExpGatePorts'
-import {filterFreqCurveFunctions} from '../client-utils';
 
 export class OscillatorExpNode extends CorgiNode {
 	private readonly _oscillator: OscillatorNode

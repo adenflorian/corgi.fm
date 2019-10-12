@@ -8,7 +8,7 @@ import {
 import {useSelector} from 'react-redux'
 import {backgroundMenuId, graphSizeX, zoomBackgroundClass, expBackgroundMenuId} from '../client-constants'
 import PlusSVG from '../OtherSVG/plus.svg'
-import {simpleGlobalClientState} from '../SimpleGlobalClientState'
+import {simpleGlobalClientState, blockMouse, unblockMouse} from '../SimpleGlobalClientState'
 
 interface Props {
 	children: React.ReactNode
@@ -228,6 +228,14 @@ export const ConnectedZoom = React.memo(function _Zoom({
 		resetPan()
 	}, [resetPan, triggerPanReset])
 
+	useLayoutEffect(() => {
+		if (backgroundClicked) {
+			blockMouse()
+		} else {
+			unblockMouse()
+		}
+	}, [backgroundClicked])
+
 	const roomType = useSelector((state: IClientAppState) => state.room.roomInfo.roomType)
 
 	return (
@@ -268,7 +276,7 @@ export const ConnectedZoom = React.memo(function _Zoom({
 			>
 				{children}
 			</div>
-			{backgroundClicked && <div className="zoomBlock" />}
+			<div id="zoomBlock" />
 		</Fragment>
 	)
 })

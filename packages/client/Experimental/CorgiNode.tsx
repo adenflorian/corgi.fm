@@ -15,6 +15,7 @@ import {
 	ExpNumberParamCallback,
 	ExpAudioParam,
 } from './ExpParams'
+import {CorgiStringChangedEvent} from './CorgiEvents'
 
 export const ExpNodeContext = React.createContext<null | ExpNodeContextValue>(null)
 
@@ -36,6 +37,7 @@ export interface CorgiNodeOptions {
 
 export abstract class CorgiNode {
 	public readonly reactContext: ExpNodeContextValue
+	public readonly onColorChange: CorgiStringChangedEvent
 	protected readonly _ports: ExpPorts
 	protected readonly _audioParams: ExpAudioParams
 	protected readonly _customNumberParams: ExpCustomNumberParams
@@ -52,6 +54,7 @@ export abstract class CorgiNode {
 		this._ports = arrayToESMap(options.ports, 'id')
 		this._audioParams = arrayToESMap(options.audioParams, 'id')
 		this._customNumberParams = options.customNumberParams || new Map()
+		this.onColorChange = new CorgiStringChangedEvent(this.getColor())
 	}
 
 	// public abstract onNumberParamChange(paramChange: NumberParamChange): void
@@ -106,6 +109,7 @@ export abstract class CorgiNode {
 				port.setPosition(position)
 			},
 			getPorts: () => this._ports,
+			node: this,
 		}
 	}
 

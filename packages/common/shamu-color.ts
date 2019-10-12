@@ -26,6 +26,7 @@ export function getColorStringForMidiNote(note: IMidiNote): string {
 }
 
 export function setLightness(color: string, lightness: number): string {
+	if (!color) return color
 	return colorFunc(color).lightness(lightness).hsl().string()
 }
 

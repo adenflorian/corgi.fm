@@ -53,3 +53,23 @@ export function makeMouseMovementAccountForGlobalZoom({x, y}: Point) {
 		y: y / zoom,
 	}
 }
+
+export function blockMouse() {
+	const element = getZoomBlockElement()
+	if (element) {
+		element.style.visibility = 'visible'
+	}
+}
+
+export function unblockMouse() {
+	const element = getZoomBlockElement()
+	if (element) {
+		element.style.visibility = 'hidden'
+	}
+}
+
+const zoomBlockId = 'zoomBlock'
+
+function getZoomBlockElement() {
+	return document.getElementById(zoomBlockId)
+}

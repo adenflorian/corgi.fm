@@ -4,6 +4,7 @@ import {ActionType} from 'typesafe-actions'
 import * as uuid from 'uuid'
 import {CssColor, mixColors} from '../../shamu-color'
 import {emptyList} from '../../common-utils'
+import {ParamInputCentering} from '../../common-types'
 import {selectOption, AppOptions} from '../options-redux'
 import {IClientAppState} from '../common-redux-types'
 import {ExpNodeType} from '.'
@@ -12,7 +13,6 @@ import {
 	selectVirtualKeyboardById, SERVER_ACTION, VirtualKeyboardState,
 	selectExpPosition,
 } from '..'
-import {ParamInputCentering} from '../../common-types';
 
 export const expConnectionsActions = {
 	add: (connection: ExpConnection) => ({

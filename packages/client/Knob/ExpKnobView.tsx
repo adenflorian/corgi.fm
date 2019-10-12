@@ -42,7 +42,7 @@ export const ExpKnobView = React.memo(function _KnobView(props: Props) {
 			onMouseDown={handleMouseDown}
 		>
 			<div className="knobLabel unselectable">{label}</div>
-			<ActualUberKnob percentage={percentage} chains={chains} color={color} range={range} />
+			<ActualUberKnob percentage={percentage} chains={chains} range={range} />
 			{/* {chains.length > 0
 				? <ActualUberKnob percentage={percentage} chains={chains} color={color} />
 				: <ActualKnob percentage={percentage} />} */}

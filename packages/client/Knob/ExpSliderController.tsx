@@ -2,6 +2,7 @@ import React, {useLayoutEffect, useState, ReactElement} from 'react'
 import {SignalRange} from '@corgifm/common/common-types'
 import {clampPolarized} from '@corgifm/common/common-utils'
 import './Knob.less'
+import {blockMouse, unblockMouse} from '../SimpleGlobalClientState'
 
 interface ISliderControllerProps {
 	readonly onChange: (newValue: number) => void
@@ -16,6 +17,14 @@ export function ExpSliderController({
 }: ISliderControllerProps) {
 
 	const [isMouseDown, setIsMouseDown] = useState(false)
+
+	useLayoutEffect(() => {
+		if (isMouseDown) {
+			blockMouse()
+		} else {
+			unblockMouse()
+		}
+	}, [isMouseDown])
 
 	useLayoutEffect(() => {
 		if (!isMouseDown) return
@@ -45,7 +54,7 @@ export function ExpSliderController({
 		return () => {
 			window.removeEventListener('mousemove', _handleMouseMove)
 		}
-	}, [isMouseDown, onChange, value])
+	}, [isMouseDown, onChange, range, value])
 
 	const _handleMouseDown = (e: React.MouseEvent) => {
 		if ((e.ctrlKey || e.metaKey)) {
