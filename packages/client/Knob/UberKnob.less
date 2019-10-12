@@ -7,8 +7,13 @@
         .clickArc {
             pointer-events: all;
         }
-        .clickArc:hover + .railArc, .clickArc:active + .railArc {
-            stroke: currentColor;
+        &:hover, &:active {
+            .railArc {
+                stroke: currentColor;
+            }
+            .otherDot {
+                fill: currentColor;
+            }
         }
     }
     &.liveValueArc {

@@ -377,74 +377,84 @@ function UberArcDumb({
 	const dotY = -4 - (strokeWidth * layer)
 
 	return (
-		<g style={{color: activeColor}} className={`uberArc ${className}`}>
-			<g transform={`rotate(${offset * (360 * limit)}, 16, 16)`}>
-				{/* Click arc */}
-				{<circle
-					className="clickArc"
+		<g
+			className={`uberArc ${className}`}
+			style={{color: activeColor}}
+			transform={`rotate(${offset * (360 * limit)}, 16, 16)`}
+		>
+			{/* Click arc */}
+			{<circle
+				className="clickArc"
+				cx="50%"
+				cy="50%"
+				r={radius}
+				fill="none"
+				stroke="#0000"
+				strokeWidth={strokeWidth}
+				strokeDasharray={circumference}
+				strokeDashoffset={0}
+				onMouseDown={onRailMouseDown}
+			/>}
+			{/* Rail arc */}
+			{!hideRail && <circle
+				className="railArc"
+				cx="50%"
+				cy="50%"
+				r={radius}
+				fill="none"
+				stroke={railColor}
+				strokeWidth={strokeWidth}
+				strokeDasharray={circumference}
+				strokeDashoffset={(1 - (railRatio * limit)) * circumference}
+			/>}
+			{/* Active arc */}
+			{!hideTail && <circle
+				className="activeArc"
+				cx="50%"
+				cy="50%"
+				r={radius}
+				fill="none"
+				stroke={activeColor}
+				strokeWidth={strokeWidth}
+				strokeDasharray={circumference}
+				strokeDashoffset={(1 - (actualActiveRatio * limit)) * circumference}
+				transform={`rotate(${actualActiveOffset * (360 * limit)}, 16, 16)`}
+			/>}
+			<g
+				className="gDot"
+				transform={getDotTransform(actualActiveRatio, actualActiveOffset)}
+				ref={gDotRef}
+			>
+				{hideDot && <circle
+					className="otherDot"
 					cx="50%"
-					cy="50%"
-					r={radius}
-					fill="none"
-					stroke="#0000"
-					strokeWidth={strokeWidth}
-					strokeDasharray={circumference}
-					strokeDashoffset={0}
-					onMouseDown={onRailMouseDown}
+					cy={dotY}
+					r={strokeWidth / 2}
+					fill={railColor}
+					strokeWidth={0.25}
 				/>}
-				{/* Rail arc */}
-				{!hideRail && <circle
-					className="railArc"
+				{!hideDot && <circle
+					className="dot"
 					cx="50%"
-					cy="50%"
-					r={radius}
-					fill="none"
-					stroke={railColor}
-					strokeWidth={strokeWidth}
-					strokeDasharray={circumference}
-					strokeDashoffset={(1 - (railRatio * limit)) * circumference}
+					cy={dotY}
+					r={strokeWidth / (bigDot ? 1.5 : 2)}
+					fill={activeColor}
+					strokeWidth={0.25}
 				/>}
-				{/* Active arc */}
-				{!hideTail && <circle
-					className="activeArc"
+				{/* Dark dot */}
+				{/* <circle
 					cx="50%"
-					cy="50%"
-					r={radius}
-					fill="none"
-					stroke={activeColor}
-					strokeWidth={strokeWidth}
-					strokeDasharray={circumference}
-					strokeDashoffset={(1 - (actualActiveRatio * limit)) * circumference}
-					transform={`rotate(${actualActiveOffset * (360 * limit)}, 16, 16)`}
-				/>}
-				<g
-					className="gDot"
-					transform={getDotTransform(actualActiveRatio, actualActiveOffset)}
-					ref={gDotRef}
-				>
-					{!hideDot && <circle
-						className="dot"
-						cx="50%"
-						cy={dotY}
-						r={strokeWidth / (bigDot ? 1.5 : 2)}
-						fill={activeColor}
-						strokeWidth={0.25}
-					/>}
-					{/* Dark dot */}
-					{/* <circle
-						cx="50%"
-						cy={dotY}
-						r={strokeWidth / 3}
-						fill={railColor}
-						stroke={'none'}
-					/> */}
-				</g>
-				<g
-					className="gDot"
-					transform={getChildrenTransform(actualActiveRatio, actualActiveOffset)}
-				>
-					{children}
-				</g>
+					cy={dotY}
+					r={strokeWidth / 3}
+					fill={railColor}
+					stroke={'none'}
+				/> */}
+			</g>
+			<g
+				className="gDot"
+				transform={getChildrenTransform(actualActiveRatio, actualActiveOffset)}
+			>
+				{children}
 			</g>
 		</g>
 	)
