@@ -10,7 +10,7 @@ import {
 	ExpNodeConnections, ExpNodeConnection,
 } from './ExpConnections'
 import {ExpAudioParam} from './ExpParams'
-import {CorgiNumberChangedEvent} from './CorgiEvents'
+import {CorgiNumberChangedEvent, CorgiEnumChangedEvent} from './CorgiEvents'
 
 export type ExpPortCallback = (port: ExpPort) => void
 
@@ -90,13 +90,14 @@ const curves = {
 	},
 } as const
 
-export interface ParamInputChainReact extends Pick<ParamInputChain, 'id' | 'centering' | 'onGainChange'> {}
+export interface ParamInputChainReact extends Pick<ParamInputChain, 'id' | 'centering' | 'onGainChange' | 'onCenteringChange'> {}
 
 // TODO Maybe, use current knob value to determine starting gain value, like serum
 class ParamInputChain {
 	public get centering() {return this._centering}
 	public get gain() {return this._gain.gain.value}
 	public onGainChange: CorgiNumberChangedEvent
+	public onCenteringChange: CorgiEnumChangedEvent<ParamInputCentering>
 	private readonly _waveShaper: WaveShaperNode
 	private readonly _gain: GainNode
 	private _centering: ParamInputCentering
@@ -113,13 +114,14 @@ class ParamInputChain {
 		this._waveShaper = audioContext.createWaveShaper()
 		this._gain = audioContext.createGain()
 
-		this._centering = defaultCentering
-		this.setCentering(defaultCentering)
-
 		this._waveShaper.connect(this._gain).connect(this._destination as AudioNode)
 
-		this.onGainChange = new CorgiNumberChangedEvent(1)
+		this._centering = defaultCentering
 
+		this.onGainChange = new CorgiNumberChangedEvent(1)
+		this.onCenteringChange = new CorgiEnumChangedEvent(this._centering)
+
+		this.setCentering(this._centering)
 		this.setGain(1)
 	}
 
@@ -127,17 +129,22 @@ class ParamInputChain {
 		if (newCentering === this._centering) return
 		this._centering = newCentering
 		this._waveShaper.curve = curves[this._inputRange][this._centering]
+		this.onCenteringChange.invokeImmediately(this._centering)
+		this._updateModdedGain()
 	}
 
 	public setGain(gain: number) {
 		this._clampedGainValue = clamp(gain, -1, 1)
-		const modded = this._clampedGainValue * extraGain[this.centering][this._destinationRange]
-		const frounded = Math.fround(modded)
-		// Rounding to nearest to 32 bit number because AudioParam values are 32 bit floats
-		const newGain = frounded
-		if (newGain === this._gain.gain.value) return
-		this._gain.gain.value = newGain
+		this._updateModdedGain()
 		this.onGainChange.invokeImmediately(this._clampedGainValue)
+	}
+
+	private _updateModdedGain() {
+		const modded = this._clampedGainValue * extraGain[this.centering][this._destinationRange]
+		// Rounding to nearest to 32 bit number because AudioParam values are 32 bit floats
+		const frounded = Math.fround(modded)
+		if (frounded === this._gain.gain.value) return
+		this._gain.gain.value = frounded
 	}
 
 	public getInput(): AudioNode {

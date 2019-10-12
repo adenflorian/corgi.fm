@@ -5,8 +5,11 @@
 - [√] make sure mod rail is accurately reflecting gain value
 - [√] click and drag on mod rail to change gain
 - [√] modRail should be visible when gain is 0
+- [√] allow switching between center and offset
+	- [√] with alt + shift + click
 - [ ] clamp mod rails
 - [ ] get liveValueRail to be accurate
+- [ ] show source node name, gain, and centering value on hover of mod arc
 
 
 

@@ -84,3 +84,43 @@ export class CorgiStringChangedEvent {
 		this._subscribers.forEach(delegate => delegate(this._currentValue))
 	}
 }
+
+export type EnumChangedDelegate<TEnum extends string> = (newEnum: TEnum) => void
+
+export class CorgiEnumChangedEvent<TEnum extends string> {
+	private readonly _subscribers = new Set<EnumChangedDelegate<TEnum>>()
+	private _frameRequested = false
+
+	public constructor(
+		private _currentValue: TEnum,
+	) {}
+
+	public subscribe(delegate: EnumChangedDelegate<TEnum>): TEnum {
+		this._subscribers.add(delegate)
+		return this._currentValue
+	}
+
+	public unsubscribe(delegate: EnumChangedDelegate<TEnum>) {
+		this._subscribers.delete(delegate)
+	}
+
+	public invokeImmediately(newEnum: TEnum) {
+		this._currentValue = newEnum
+		this._invoke()
+	}
+
+	public invokeNextFrame(newEnum: TEnum, onInvoked?: () => void) {
+		this._currentValue = newEnum
+		if (this._frameRequested) return
+		this._frameRequested = true
+		requestAnimationFrame(() => {
+			this._frameRequested = false
+			this._invoke()
+			if (onInvoked) onInvoked()
+		})
+	}
+
+	private _invoke() {
+		this._subscribers.forEach(delegate => delegate(this._currentValue))
+	}
+}

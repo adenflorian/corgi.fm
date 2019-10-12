@@ -3,7 +3,7 @@ import {
 } from 'react'
 import {useNodeContext} from '../CorgiNode'
 import {ExpAudioParam} from '../ExpParams'
-import {CorgiNumberChangedEvent, CorgiStringChangedEvent} from '../CorgiEvents'
+import {CorgiNumberChangedEvent, CorgiStringChangedEvent, CorgiEnumChangedEvent} from '../CorgiEvents'
 
 // export function useAudioParam(paramId: Id) {
 // 	const nodeContext = useNodeContext()
@@ -61,6 +61,30 @@ export function useStringChangedEvent(event?: CorgiStringChangedEvent) {
 		if (!event) return
 
 		function onNewValue(newValue: string) {
+			if (newValue === previousValue.current) return
+
+			previousValue.current = newValue
+			setState(newValue)
+		}
+
+		const initialValue = event.subscribe(onNewValue)
+		onNewValue(initialValue)
+
+		return () => event.unsubscribe(onNewValue)
+	}, [event])
+
+	return value
+}
+
+export function useEnumChangedEvent<TEnum extends string>(initValue: TEnum, event?: CorgiEnumChangedEvent<TEnum>) {
+	const [value, setState] = useState<TEnum>(initValue)
+
+	const previousValue = useRef<TEnum>(initValue)
+
+	useLayoutEffect(() => {
+		if (!event) return
+
+		function onNewValue(newValue: TEnum) {
 			if (newValue === previousValue.current) return
 
 			previousValue.current = newValue

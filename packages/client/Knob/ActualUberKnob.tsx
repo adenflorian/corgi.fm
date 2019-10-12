@@ -7,7 +7,7 @@ import {setLightness} from '@corgifm/common/shamu-color'
 import {ParamInputChainReact} from '../Experimental/ExpPorts'
 import {useAudioParamContext} from '../Experimental/ExpParams'
 import {CorgiNumberChangedEvent, CorgiStringChangedEvent} from '../Experimental/CorgiEvents'
-import {useStringChangedEvent, useNumberChangedEvent} from '../Experimental/hooks/useAudioParam'
+import {useStringChangedEvent, useNumberChangedEvent, useEnumChangedEvent} from '../Experimental/hooks/useCorgiEvent'
 import {useNodeContext} from '../Experimental/CorgiNode'
 import {useNodeManagerContext} from '../Experimental/NodeManager'
 import {useBoolean} from '../react-hooks'
@@ -210,16 +210,20 @@ function UberArcMod({
 	const railColor = useMemo(() => setLightness(activeColor, 12), [activeColor])
 	const gain = useNumberChangedEvent(chain.onGainChange)
 	// const gain = 0.5
-	const centering = 'center'
+	const centering = useEnumChangedEvent(chain.centering, chain.onCenteringChange)
 
 	const [active, setActive, setInactive] = useBoolean(false)
 
+	const dispatch = useDispatch()
+
 	const onRailMouseDown = useCallback((e: React.MouseEvent) => {
 		e.stopPropagation()
-		setActive()
-	}, [setActive])
-
-	const dispatch = useDispatch()
+		if (e.shiftKey && e.altKey) {
+			dispatch(expConnectionsActions.setAudioParamInputCentering(chain.id, chain.centering === 'center' ? 'offset' : 'center'))
+		} else {
+			setActive()
+		}
+	}, [chain.centering, chain.id, dispatch, setActive])
 
 	useLayoutEffect(() => {
 		if (!active) return
@@ -237,9 +241,6 @@ function UberArcMod({
 			window.removeEventListener('mouseup', setInactive)
 		}
 	}, [active, chain.id, dispatch, gain, setInactive])
-	const mainActiveRatio = gain * (centering === 'center' ? 0.5 : 1)
-	const mainActiveOffset = centering === 'center' ? 0.5 : 0
-	const activeRatio = 0
 
 	useLayoutEffect(() => {
 		if (active) {
@@ -248,6 +249,8 @@ function UberArcMod({
 			unblockMouse()
 		}
 	}, [active])
+
+	const activeRatio = 0
 
 	return (
 		<Fragment>
@@ -268,7 +271,7 @@ function UberArcMod({
 				// y = -0.5x
 				offset={(centering === 'center'
 					? Math.abs(gain) * -0.5 // Math.abs(gain) * 0.5
-					: (gain >= 0 ? 0 : Math.abs(gain)))}
+					: clamp(gain, -1, 0))}
 				// offset={0}
 				hideDot={true}
 				hideTail={true}
