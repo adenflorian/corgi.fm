@@ -31,7 +31,7 @@ export const ExpNodeDebugAudioParamKnob = React.memo(function _ExpNodeDebugAudio
 
 	return (
 		<ExpKnob
-			defaultValue={audioParam.defaultValue}
+			defaultValue={audioParam.defaultNormalizedValue}
 			label={audioParam.id as string}
 			onChange={onAudioParamChange}
 			tooltip={audioParam.id as string}

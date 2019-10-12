@@ -220,7 +220,6 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 	public get liveModdedValue() {return this._liveModdedValue}
 	private readonly _analyser: AudioWorkletNode
 	public readonly destination: AudioParam
-	public readonly defaultParamValue: number
 
 	public constructor(
 		public readonly expAudioParam: ExpAudioParam,
@@ -232,7 +231,6 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 		super(expAudioParam.id, expAudioParam.id as string, getNode, expAudioParam.audioParam)
 
 		this.destination = expAudioParam.audioParam
-		this.defaultParamValue = expAudioParam.defaultValue
 
 		// All AudioParam values should be 0, because it will only be
 		// controlled from modulation sources, including the knob.
@@ -255,7 +253,7 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 
 		this._requestWorkletUpdate()
 
-		this._knobConstantSource.offset.value = this.defaultParamValue
+		this._knobConstantSource.offset.value = expAudioParam.defaultNormalizedValue
 		this._knobConstantSource.start()
 
 		this._gainDenormalizer.gain.value = this.expAudioParam.maxValue

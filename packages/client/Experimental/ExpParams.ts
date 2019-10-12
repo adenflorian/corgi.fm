@@ -2,6 +2,7 @@ import React, {useContext} from 'react'
 import {CurveFunctions, defaultBipolarCurveFunctions, defaultUnipolarCurveFunctions} from '../client-utils'
 import {CorgiNumberChangedEvent} from './ExpPorts';
 import {SignalRange} from '@corgifm/common/common-types';
+import {clampPolarized} from '@corgifm/common/common-utils';
 
 export interface ExpParam {
 	readonly id: Id
@@ -38,6 +39,7 @@ export class ExpAudioParam implements ExpParam {
 	public readonly onModdedLiveValueChange: CorgiNumberChangedEvent
 	public readonly valueString?: (v: number) => string
 	public readonly curveFunctions: CurveFunctions
+	public readonly defaultNormalizedValue: number
 
 	public constructor(
 		public readonly id: Id,
@@ -53,8 +55,10 @@ export class ExpAudioParam implements ExpParam {
 				? defaultBipolarCurveFunctions
 				: defaultUnipolarCurveFunctions)
 
-		this.onChange = new CorgiNumberChangedEvent(defaultValue)
-		this.onModdedLiveValueChange = new CorgiNumberChangedEvent(defaultValue)
+		this.defaultNormalizedValue = clampPolarized(this.curveFunctions.unCurve(defaultValue / maxValue), paramSignalRange)
+
+		this.onChange = new CorgiNumberChangedEvent(this.defaultNormalizedValue)
+		this.onModdedLiveValueChange = new CorgiNumberChangedEvent(this.defaultNormalizedValue)
 	}
 }
 

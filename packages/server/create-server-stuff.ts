@@ -57,6 +57,8 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 
 	dispatchToRoom(expNodesActions.add(gain))
 
+	dispatchToRoom(expNodesActions.audioParamChange(gain.id, 'gain', 0.25))
+
 	dispatchToRoom(expPositionActions.add(
 		makeExpPosition({
 			id: gain.id,
@@ -85,6 +87,8 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 
 	dispatchToRoom(expNodesActions.add(osc1))
 
+	dispatchToRoom(expNodesActions.audioParamChange(osc1.id, 'frequency', 0.01))
+
 	dispatchToRoom(expPositionActions.add(
 		makeExpPosition({
 			id: osc1.id,
@@ -98,6 +102,8 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 	})
 
 	dispatchToRoom(expNodesActions.add(osc2))
+
+	dispatchToRoom(expNodesActions.audioParamChange(osc2.id, 'frequency', 0.00005))
 
 	dispatchToRoom(expPositionActions.add(
 		makeExpPosition({
@@ -120,6 +126,16 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 	dispatchToRoom(expConnectionsActions.add(new ExpConnection(
 		filter.id,
 		filter.type,
+		gain.id,
+		gain.type,
+		'output',
+		'input',
+		'audio',
+	)))
+
+	dispatchToRoom(expConnectionsActions.add(new ExpConnection(
+		gain.id,
+		gain.type,
 		audioOutput.id,
 		audioOutput.type,
 		'output',
@@ -130,22 +146,14 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 	dispatchToRoom(expConnectionsActions.add(new ExpConnection(
 		osc2.id,
 		osc2.type,
-		gain.id,
-		gain.type,
-		'output',
-		'input',
-		'audio',
-	)))
-
-	dispatchToRoom(expConnectionsActions.add(new ExpConnection(
-		gain.id,
-		gain.type,
 		filter.id,
 		filter.type,
 		'output',
 		'frequency',
 		'audio',
 	)))
+
+
 
 	function dispatchToRoom(action: Action) {
 		return serverStore.dispatch(createRoomAction(action, room))

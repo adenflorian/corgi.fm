@@ -35,7 +35,7 @@ export const ExpKnob = React.memo(function _Knob(props: Props) {
 		<ExpSliderController
 			onChange={_handleOnChange}
 			value={value}
-			defaultValue={curveFunctions.unCurve(defaultValue / maxValue)}
+			defaultValue={defaultValue}
 			range={range}
 		>
 			{(handleMouseDown, percentage, isMouseDown) =>
