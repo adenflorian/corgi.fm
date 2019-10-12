@@ -126,16 +126,16 @@ function makeUberKnob(
 			{/* {makeArc(-1, '#FF5C00', '#3D1600', 1 / 3, 100, 0.5, main.knobValueRatio - 1 / 6)}
 			{makeArc(-2, '#7FFF00', '#1F3D00', 1 / 6, -0.25, 0.5, main.knobValueRatio - 1 / 12)}
 			{makeArc(-3, '#FF0099', '#3D0025', 1 / 6, -0.5, 1, main.knobValueRatio - 1 / 6)} */}
-			{mods.length > 0
+			{mods.length >= 0
 				? <UberArc
 					layer={-mods.length - 1}
 					activeColor={'#E3E3E3'}
 					railColor={'#1C1C1C'}
-					railRatio={0.5}
-					activeRatio={1}
+					railRatio={1}
+					activeRatio={0}
 					// activeOffset={main.moddedRatio + 0.5}
-					activeOffset={0.5}
-					offset={main.knobValueRatio - 0.25}
+					activeOffset={mainActiveOffset}
+					// offset={main.knobValueRatio - 0.25}
 					hideTail={true}
 					liveEvent={audioParam.onModdedLiveValueChange}
 					liveValueMax={audioParam.maxValue}
@@ -211,10 +211,9 @@ function UberArc({
 
 			if (!moddedValueGroupElement) return
 
-			const foo = (value / liveValueMax) - railRatio
-			// console.log('foo:', {foo, foo2: foo * 360 * limit, value, liveValueMax, vdlm: value / liveValueMax})
+			// console.log('foo:', {value, foo2: value * 360 * limit, liveValueMax, vdlm: value / liveValueMax})
 
-			moddedValueGroupElement.transform.baseVal.getItem(0).setRotate(foo * 360 * limit, 16, 16)
+			moddedValueGroupElement.transform.baseVal.getItem(0).setRotate(value * 360 * limit, 16, 16)
 		}
 
 		liveEvent.subscribe(onNewValue)
@@ -222,7 +221,7 @@ function UberArc({
 		return () => {
 			liveEvent.unsubscribe(onNewValue)
 		}
-	}, [liveEvent, 121111])
+	}, [liveEvent, 12111311])
 
 	return (
 		<g>

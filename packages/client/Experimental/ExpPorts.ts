@@ -245,7 +245,8 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 		this._analyser.port.onmessage = (event) => {
 			if (!isNaN(event.data) && event.data !== this._liveModdedValue) {
 				this._liveModdedValue = event.data
-				this.expAudioParam.onModdedLiveValueChange.invokeNextFrame(event.data, this._requestWorkletUpdate)
+				const unCurved = this.expAudioParam.curveFunctions.unCurve(event.data / this.expAudioParam.maxValue)
+				this.expAudioParam.onModdedLiveValueChange.invokeNextFrame(unCurved, this._requestWorkletUpdate)
 			} else {
 				this._requestWorkletUpdate()
 			}
