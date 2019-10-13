@@ -1,8 +1,7 @@
 import React from 'react'
-import {logger} from '../client-logger'
 import {hot} from 'react-hot-loader'
 import {
-	ExpPort, ExpPorts,
+	ExpPort, ExpPorts, AudioParamInputPortContext, ExpNodeAudioParamInputPort,
 } from './ExpPorts'
 import {ExpNodeDebugAudioParamKnob} from './ExpNodeDebugAudioParamKnob'
 import {ExpAudioParams, ExpCustomNumberParams, AudioParamContext} from './ExpParams'
@@ -40,13 +39,18 @@ export const ExpNodeDebugView = hot(module)(React.memo(function _ExpNodeDebugVie
 					))}
 				</div> */}
 				<div className="paramKnobs">
-					{[...audioParams].map(([id, audioParam]) => (
-						<AudioParamContext.Provider value={audioParam} key={id as string}>
-							<ExpNodeDebugAudioParamKnob
-								nodeId={nodeId}
-							/>
-						</AudioParamContext.Provider>
-					))}
+					{[...audioParams].map(([id, audioParam]) => {
+						const port = ports.get(id) as ExpNodeAudioParamInputPort
+						return (
+							<AudioParamContext.Provider value={audioParam} key={id as string}>
+								<AudioParamInputPortContext.Provider value={port}>
+									<ExpNodeDebugAudioParamKnob
+										nodeId={nodeId}
+									/>
+								</AudioParamInputPortContext.Provider>
+							</AudioParamContext.Provider>
+						)
+					})}
 				</div>
 				{customNumberParams.size > 0 &&
 					<div className="sectionLabel">Custom Number Params</div>}

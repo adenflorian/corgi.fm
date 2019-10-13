@@ -4,10 +4,10 @@ import {expConnectionsActions} from '@corgifm/common/redux'
 import {clamp} from '@corgifm/common/common-utils'
 import {SignalRange} from '@corgifm/common/common-types'
 import {setLightness} from '@corgifm/common/shamu-color'
-import {ParamInputChainReact} from '../Experimental/ExpPorts'
+import {ParamInputChainReact, useAudioParamInputPortContext} from '../Experimental/ExpPorts'
 import {useAudioParamContext} from '../Experimental/ExpParams'
 import {CorgiNumberChangedEvent, CorgiStringChangedEvent} from '../Experimental/CorgiEvents'
-import {useStringChangedEvent, useNumberChangedEvent, useEnumChangedEvent} from '../Experimental/hooks/useCorgiEvent'
+import {useStringChangedEvent, useNumberChangedEvent, useEnumChangedEvent, useObjectChangedEvent} from '../Experimental/hooks/useCorgiEvent'
 import {useNodeContext} from '../Experimental/CorgiNode'
 import {useNodeManagerContext} from '../Experimental/NodeManager'
 import {useBoolean} from '../react-hooks'
@@ -92,7 +92,7 @@ function UberArcMain({
 					key={chain.id as string}
 					layer={-1 - i}
 					chain={chain}
-					parentRatio={knobValueRatio}
+					parentRatio={activeRatio}
 					parentRange={range}
 				/>
 			})}
@@ -100,6 +100,7 @@ function UberArcMain({
 				layer={-chains.length - 1}
 				liveEvent={audioParam.onModdedLiveValueChange}
 				parentRatio={activeRatio}
+				parentRange={range}
 			/>
 		</UberArcDumb>
 	)
@@ -172,8 +173,8 @@ function UberArcMod({
 			? clamp((-Math.abs(parentRatio - 0.5) + 1) - ((-0.5 * absGain) + 0.5), absGain / 2, absGain)
 			: Math.max(Math.min(-parentRatio + 1, gain), -parentRatio)
 		: centering === 'center'
-			? Math.min((-Math.abs(parentRatio / 2) + 1) - ((-0.5 * absGain) + 0.5), absGain)
-			: Math.max(Math.min((-parentRatio / 2) + 0.5, gain), (-parentRatio / 2) - 0.5)
+			? Math.min((-Math.abs(parentRatio) + 1) - ((-0.5 * absGain) + 0.5), absGain)
+			: Math.max(Math.min((-parentRatio) + 0.5, gain), (-parentRatio) - 0.5)
 	const railRatio2 = -0.25
 
 	const offset = parentRange === 'unipolar'
@@ -181,7 +182,7 @@ function UberArcMod({
 			? -Math.min(parentRatio, absGain / 2)
 			: 0
 		: centering === 'center'
-			? -Math.min((parentRatio / 2) + 0.5, absGain / 2)
+			? -Math.min((parentRatio) + 0.5, absGain / 2)
 			: 0
 	const offset2 = 0
 
@@ -206,23 +207,30 @@ interface UberArcLiveValueProps {
 	readonly layer: number
 	readonly liveEvent: CorgiNumberChangedEvent
 	readonly parentRatio: number
+	readonly parentRange: SignalRange
 }
 
 function UberArcLiveValue({
-	layer, liveEvent, parentRatio,
+	layer, liveEvent, parentRatio, parentRange,
 }: UberArcLiveValueProps) {
 	const moddedValueCircleRef = useRef<SVGGElement>(null)
 	const liveValueRef = useRef(0)
+
+	const portContext = useAudioParamInputPortContext()
+
+	const liveRange = useObjectChangedEvent(portContext.onLiveRangeChanged)
 
 	const updateLiveValueDot = useCallback(() => {
 		const moddedValueGroupElement = moddedValueCircleRef.current
 
 		if (!moddedValueGroupElement) return
 
-		const value2 = liveValueRef.current - parentRatio
+		const liveValue = parentRange === 'bipolar' ? liveValueRef.current / 2 : liveValueRef.current
+
+		const value2 = liveValue - parentRatio - (parentRange === 'bipolar' ? liveRange.min : liveRange.min)
 
 		moddedValueGroupElement.transform.baseVal.getItem(0).setRotate((value2 * 360 * limit) + (360 * 0.25), 16, 16)
-	}, [moddedValueCircleRef, parentRatio])
+	}, [moddedValueCircleRef, parentRatio, liveRange.min, parentRange])
 
 	useEffect(() => {
 		function onNewValue(newValue: number) {
@@ -237,18 +245,22 @@ function UberArcLiveValue({
 		}
 	}, [liveEvent, updateLiveValueDot])
 
-	useLayoutEffect(updateLiveValueDot, [parentRatio])
+	useLayoutEffect(updateLiveValueDot, [moddedValueCircleRef, parentRatio, liveRange.min, parentRange])
+
+	const railRatio = parentRange === 'bipolar'
+		? Math.abs(liveRange.min) + (liveRange.max)
+		: Math.abs(liveRange.min) + liveRange.max
 
 	return (
 		<UberArcDumb
 			layer={layer}
 			activeColor={'#E3E3E3'}
 			railColor={'#1C1C1C'}
-			railRatio={1}
+			railRatio={railRatio}
 			activeRatio={0}
 			// // activeOffset={main.moddedRatio + 0.5}
 			// activeOffset={mainActiveOffset}
-			// offset={-0.5}
+			offset={liveRange.min}
 			hideTail={true}
 			// hideRail={true}
 			gDotRef={moddedValueCircleRef}

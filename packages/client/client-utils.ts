@@ -92,13 +92,13 @@ export const filterFreqCurveFunctions: CurveFunctions = {
 export const defaultBipolarCurveFunctions: CurveFunctions = {
 	curve: (x: number) => x,
 	unCurve: (x: number) => x,
-	waveShaperCurve: null,
+	waveShaperCurve: new Float32Array([-1, 1]),
 }
 
 export const defaultUnipolarCurveFunctions: CurveFunctions = {
 	curve: (x: number) => x,
 	unCurve: (x: number) => x,
-	waveShaperCurve: null,
+	waveShaperCurve: new Float32Array([0, 0, 1]),
 }
 
 // export function filterFreqCurveFunction(x: number): number {

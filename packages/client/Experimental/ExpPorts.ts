@@ -1,4 +1,5 @@
 /* eslint-disable no-empty-function */
+import React, {useContext} from 'react'
 import {List} from 'immutable'
 import {ParamInputCentering, SignalRange} from '@corgifm/common/common-types'
 import {clamp} from '@corgifm/common/common-utils'
@@ -10,7 +11,7 @@ import {
 	ExpNodeConnections, ExpNodeConnection,
 } from './ExpConnections'
 import {ExpAudioParam} from './ExpParams'
-import {CorgiNumberChangedEvent, CorgiEnumChangedEvent} from './CorgiEvents'
+import {CorgiNumberChangedEvent, CorgiEnumChangedEvent, CorgiObjectChangedEvent} from './CorgiEvents'
 
 export type ExpPortCallback = (port: ExpPort) => void
 
@@ -96,6 +97,7 @@ export interface ParamInputChainReact extends Pick<ParamInputChain, 'id' | 'cent
 class ParamInputChain {
 	public get centering() {return this._centering}
 	public get gain() {return this._gain.gain.value}
+	public get clampedGain() {return this._clampedGainValue}
 	public onGainChange: CorgiNumberChangedEvent
 	public onCenteringChange: CorgiEnumChangedEvent<ParamInputCentering>
 	private readonly _waveShaper: WaveShaperNode
@@ -110,6 +112,7 @@ class ParamInputChain {
 		private readonly _inputRange: SignalRange,
 		defaultCentering: ParamInputCentering,
 		private readonly _destinationRange: SignalRange,
+		private readonly _updateLiveRange: () => void,
 	) {
 		this._waveShaper = audioContext.createWaveShaper()
 		this._gain = audioContext.createGain()
@@ -131,12 +134,14 @@ class ParamInputChain {
 		this._waveShaper.curve = curves[this._inputRange][this._centering]
 		this.onCenteringChange.invokeImmediately(this._centering)
 		this._updateModdedGain()
+		this._updateLiveRange()
 	}
 
 	public setGain(gain: number) {
 		this._clampedGainValue = clamp(gain, -1, 1)
 		this._updateModdedGain()
 		this.onGainChange.invokeImmediately(this._clampedGainValue)
+		this._updateLiveRange()
 	}
 
 	private _updateModdedGain() {
@@ -191,6 +196,23 @@ export class ExpNodeAudioInputPort extends ExpNodeAudioPort {
 	}
 }
 
+interface LiveRange {
+	readonly min: number
+	readonly max: number
+}
+
+export const AudioParamInputPortContext = React.createContext<null | ExpNodeAudioParamInputPortReact>(null)
+
+export function useAudioParamInputPortContext() {
+	const context = useContext(AudioParamInputPortContext)
+
+	if (!context) throw new Error(`missing audio param context, maybe there's no provider`)
+
+	return context
+}
+
+export interface ExpNodeAudioParamInputPortReact extends Pick<ExpNodeAudioParamInputPort, 'onLiveRangeChanged'> {}
+
 export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 	private readonly _inputChains = new Map<Id, ParamInputChain>()
 	private readonly _waveShaperClamp: WaveShaperNode
@@ -201,6 +223,8 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 	public get liveModdedValue() {return this._liveModdedValue}
 	private readonly _analyser: AudioWorkletNode
 	public readonly destination: AudioParam
+	public readonly onLiveRangeChanged: CorgiObjectChangedEvent<LiveRange>
+	private _knobValue: number
 
 	public constructor(
 		public readonly expAudioParam: ExpAudioParam,
@@ -235,6 +259,7 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 		this._requestWorkletUpdate()
 
 		this._knobConstantSource.offset.value = expAudioParam.defaultNormalizedValue
+		this._knobValue = expAudioParam.defaultNormalizedValue
 		this._knobConstantSource.start()
 
 		this._gainDenormalizer.gain.value = this.expAudioParam.maxValue
@@ -248,6 +273,48 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 			.connect(this._gainDenormalizer)
 			.connect(this._analyser)
 			.connect(this.destination)
+
+		this.onLiveRangeChanged = new CorgiObjectChangedEvent(this._createLiveRange())
+	}
+
+	private _createLiveRange(): LiveRange {
+		let min = 0
+		let max = 0
+
+		this._inputChains.forEach(chain => {
+			switch (chain.centering) {
+				case 'center':
+					const g2 = (Math.abs(chain.clampedGain) / 2)
+					min -= g2
+					max += g2
+					break
+				case 'offset':
+					min += clamp(chain.clampedGain, -1, 0)
+					max += clamp(chain.clampedGain, 0, 1)
+					break
+			}
+		})
+
+		const knobValue = this.expAudioParam.paramSignalRange === 'bipolar'
+			? this._knobValue / 2
+			: this._knobValue
+
+		const allowedMin = this.expAudioParam.paramSignalRange === 'bipolar'
+			? clamp(-knobValue - 0.5, -1, 0)
+			: clamp(-knobValue, -1, 0)
+
+		const allowedMax = this.expAudioParam.paramSignalRange === 'bipolar'
+			? clamp(-knobValue + 0.5, 0, 1)
+			: clamp(-knobValue + 1, 0, 1)
+
+		min = Math.max(min, allowedMin)
+		max = Math.min(max, allowedMax)
+
+		return {min, max}
+	}
+
+	private readonly _updateLiveRange = () => {
+		this.onLiveRangeChanged.invokeImmediately(this._createLiveRange())
 	}
 
 	// public onUpdated() {
@@ -269,6 +336,8 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 		const newValue = Math.fround(value)
 		if (newValue === this._knobConstantSource.offset.value) return
 		this._knobConstantSource.offset.value = newValue
+		this._knobValue = value
+		this._updateLiveRange()
 	}
 
 	public setChainGain(connectionId: Id, value: number) {
@@ -293,9 +362,18 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 		if (existingChain) return existingChain.getInput()
 
 		const newChain = new ParamInputChain(
-			connectionId, this.audioContext, this._waveShaperClamp, signalRange, this.defaultCentering, this.expAudioParam.paramSignalRange)
+			connectionId,
+			this.audioContext,
+			this._waveShaperClamp,
+			signalRange,
+			this.defaultCentering,
+			this.expAudioParam.paramSignalRange,
+			this._updateLiveRange,
+		)
 
 		this._inputChains.set(connectionId, newChain)
+
+		this._updateLiveRange()
 
 		return newChain.getInput()
 	}
