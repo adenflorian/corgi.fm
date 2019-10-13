@@ -22,10 +22,7 @@ import {ExpGateInputPort, ExpGateOutputPort} from './ExpGatePorts'
 
 export class OscillatorExpNode extends CorgiNode {
 	private readonly _oscillator: OscillatorNode
-	private readonly _outputGain: GainNode
-	private readonly _frequencyPort: ExpNodeAudioParamInputPort
-	private readonly _detunePort: ExpNodeAudioParamInputPort
-	private readonly _outputPort: ExpNodeAudioOutputPort
+	private readonly _outputChain: ToggleGainChain
 
 	public constructor(
 		id: Id, audioContext: AudioContext, preMasterLimiter: GainNode,
@@ -34,28 +31,24 @@ export class OscillatorExpNode extends CorgiNode {
 		oscillator.type = 'sine'
 		// oscillator.type = pickRandomArrayElement(['sawtooth', 'sine', 'triangle', 'square'])
 		oscillator.start()
-		const outputGain = audioContext.createGain()
-		oscillator.connect(outputGain)
+		const outputChain = new ToggleGainChain(audioContext)
+		oscillator.connect(outputChain.input)
 
 		const frequencyParam = new ExpAudioParam('frequency', oscillator.frequency, 440, 20000, 'unipolar', {valueString: filterValueToString})
 		const detuneParam = new ExpAudioParam('detune', oscillator.detune, 0, 100, 'bipolar', {valueString: filterValueToString})
 
 		const frequencyPort = new ExpNodeAudioParamInputPort(frequencyParam, () => this, audioContext, 'offset')
 		const detunePort = new ExpNodeAudioParamInputPort(detuneParam, () => this, audioContext, 'center')
-		const outputPort = new ExpNodeAudioOutputPort('output', 'output', () => this, outputGain, 'bipolar')
+		const outputPort = new ExpNodeAudioOutputPort('output', 'output', () => this, outputChain.output, 'bipolar')
 
 		super(id, audioContext, preMasterLimiter, {
 			ports: [frequencyPort, detunePort, outputPort],
 			audioParams: [frequencyParam, detuneParam],
 		})
 
-		this._frequencyPort = frequencyPort
-		this._detunePort = detunePort
-		this._outputPort = outputPort
-
 		// Make sure to add these to the dispose method!
 		this._oscillator = oscillator
-		this._outputGain = outputGain
+		this._outputChain = outputChain
 	}
 
 	public getColor(): string {
@@ -69,17 +62,18 @@ export class OscillatorExpNode extends CorgiNode {
 	}
 
 	protected _enable() {
-		this._outputGain.gain.value = 1
+		this._outputChain.enable()
 	}
 
 	protected _disable() {
-		this._outputGain.gain.value = 0
+		this._outputChain.disable()
 	}
 
 	protected _dispose() {
-		this._oscillator.stop()
-		this._oscillator.disconnect()
-		this._outputGain.disconnect()
+		this._outputChain.dispose(() => {
+			this._oscillator.stop()
+			this._oscillator.disconnect()
+		})
 	}
 }
 
@@ -136,37 +130,30 @@ export class ConstantExpNode extends CorgiNode {
 }
 
 export class AudioOutputExpNode extends CorgiNode {
-	private readonly _inputGain: GainNode
-	private readonly _extraGain: GainNode
+	private readonly _inputChain: ToggleGainChain
 	private readonly _onWindowUnloadBound: () => void
 
 	public constructor(
 		id: Id, audioContext: AudioContext, preMasterLimiter: GainNode,
 	) {
-		const inputGain = audioContext.createGain()
-		inputGain.gain.setValueAtTime(1, 0)
+		const inputChain = new ToggleGainChain(audioContext, 0.5)
 
-		const extraGain = audioContext.createGain()
-		extraGain.gain.setValueAtTime(0, 0)
-		extraGain.gain.setTargetAtTime(1, 0.5, 0.5)
-
-		const inputPort = new ExpNodeAudioInputPort('input', 'input', () => this, inputGain)
+		const inputPort = new ExpNodeAudioInputPort('input', 'input', () => this, inputChain.input)
 
 		super(id, audioContext, preMasterLimiter, {ports: [inputPort]})
 
-		inputGain.connect(extraGain).connect(audioContext.destination)
+		inputChain.output.connect(audioContext.destination)
 		// inputGain.connect(this.preMasterLimiter)
 
 		// Make sure to add these to the dispose method!
-		this._inputGain = inputGain
-		this._extraGain = extraGain
+		this._inputChain = inputChain
 
 		this._onWindowUnloadBound = this._onWindowUnload.bind(this)
 		window.addEventListener('unload', this._onWindowUnloadBound)
 	}
 
 	private _onWindowUnload() {
-		this._extraGain.gain.setTargetAtTime(0, 0, 0.005)
+		this._inputChain.dispose()
 
 		const start = this._audioContext.currentTime
 
@@ -187,17 +174,55 @@ export class AudioOutputExpNode extends CorgiNode {
 	}
 
 	protected _enable() {
-		this._inputGain.gain.setTargetAtTime(1, 0, 0.005)
+		this._inputChain.enable()
 	}
 
 	protected _disable() {
-		this._inputGain.gain.setTargetAtTime(0, 0, 0.005)
+		this._inputChain.disable()
 	}
 
 	protected _dispose() {
-		this._inputGain.disconnect()
-		this._extraGain.disconnect()
+		this._inputChain.dispose()
 		window.removeEventListener('unload', this._onWindowUnloadBound)
+	}
+}
+
+class ToggleGainChain {
+	public get input(): AudioNode {return this._inputGain}
+	public get output(): AudioNode {return this._outputGain}
+	private readonly _inputGain: GainNode
+	private readonly _outputGain: GainNode
+
+	public constructor(
+		_audioContext: AudioContext,
+		startRampSpeed = 0.005,
+	) {
+		this._inputGain = _audioContext.createGain()
+		this._inputGain.gain.setValueAtTime(1, 0)
+
+		this._outputGain = _audioContext.createGain()
+		this._outputGain.gain.setValueAtTime(0, 0)
+		this._outputGain.gain.setTargetAtTime(1, 0.5, startRampSpeed)
+
+		this._inputGain.connect(this._outputGain)
+	}
+
+	public enable() {
+		this._inputGain.gain.setTargetAtTime(1, 0, 0.005)
+	}
+
+	public disable() {
+		this._inputGain.gain.setTargetAtTime(0, 0, 0.005)
+	}
+
+	public dispose(callback?: () => void) {
+		this._outputGain.gain.setTargetAtTime(0, 0, 0.005)
+
+		setTimeout(() => {
+			this._inputGain.disconnect()
+			this._outputGain.disconnect()
+			if (callback) callback()
+		}, 50)
 	}
 }
 

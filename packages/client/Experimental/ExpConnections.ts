@@ -75,8 +75,11 @@ export class ExpNodeAudioConnection extends ExpNodeConnection {
 	}
 
 	public dispose() {
-		this._source.disconnect(this, this._actualTargetNode as AudioNode)
-		this._target.disconnect(this, this._actualTargetNode as AudioNode)
+		// Give some time for the nodes to fade out audio
+		setTimeout(() => {
+			this._source.disconnect(this, this._actualTargetNode as AudioNode)
+			this._target.disconnect(this, this._actualTargetNode as AudioNode)
+		}, 100)
 	}
 
 	public detectFeedbackLoop(i: number, nodeIds: List<Id>): boolean {
