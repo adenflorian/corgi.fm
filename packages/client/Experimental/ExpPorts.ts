@@ -238,7 +238,7 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 
 		// All AudioParam values should be 0, because it will only be
 		// controlled from modulation sources, including the knob.
-		this.destination.value = 0
+		this.destination.setValueAtTime(0, 0)
 
 		this._waveShaperClamp = audioContext.createWaveShaper()
 		this._gainDenormalizer = audioContext.createGain()
@@ -258,7 +258,7 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 
 		this._requestWorkletUpdate()
 
-		this._knobConstantSource.offset.value = expAudioParam.defaultNormalizedValue
+		this._knobConstantSource.offset.setValueAtTime(expAudioParam.defaultNormalizedValue, 0)
 		this._knobValue = expAudioParam.defaultNormalizedValue
 		this._knobConstantSource.start()
 
@@ -334,8 +334,8 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 	public setKnobValue(value: number) {
 		// Rounding to nearest to 32 bit number because AudioParam values are 32 bit floats
 		const newValue = Math.fround(value)
-		if (newValue === this._knobConstantSource.offset.value) return
-		this._knobConstantSource.offset.value = newValue
+		// if (newValue === this._knobConstantSource.offset.value) return
+		this._knobConstantSource.offset.setTargetAtTime(newValue, 0, 0.005)
 		this._knobValue = value
 		this._updateLiveRange()
 	}
