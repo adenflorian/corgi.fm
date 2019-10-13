@@ -7,7 +7,7 @@
 - [√] modRail should be visible when gain is 0
 - [√] allow switching between center and offset
 	- [√] with alt + shift + click
-- [ ] clamp mod rails
+- [√] clamp mod rails
 - [ ] get liveValueRail to be accurate
 - [ ] show source node name, gain, and centering value on hover of mod arc
 
