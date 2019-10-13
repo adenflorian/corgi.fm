@@ -22,6 +22,7 @@ import {ExpGateInputPort, ExpGateOutputPort} from './ExpGatePorts'
 
 export class OscillatorExpNode extends CorgiNode {
 	private readonly _oscillator: OscillatorNode
+	// private readonly _merger: ChannelMergerNode
 	private readonly _outputChain: ToggleGainChain
 
 	public constructor(
@@ -31,7 +32,11 @@ export class OscillatorExpNode extends CorgiNode {
 		oscillator.type = 'sine'
 		// oscillator.type = pickRandomArrayElement(['sawtooth', 'sine', 'triangle', 'square'])
 		oscillator.start()
+		// const merger = audioContext.createChannelMerger(2)
 		const outputChain = new ToggleGainChain(audioContext)
+		// oscillator.connect(merger, 0, 0)
+		// oscillator.connect(merger, 0, 1)
+		// merger.connect(outputGain)
 		oscillator.connect(outputChain.input)
 
 		const frequencyParam = new ExpAudioParam('frequency', oscillator.frequency, 440, 20000, 'unipolar', {valueString: filterValueToString})
@@ -48,6 +53,7 @@ export class OscillatorExpNode extends CorgiNode {
 
 		// Make sure to add these to the dispose method!
 		this._oscillator = oscillator
+		// this._merger = merger
 		this._outputChain = outputChain
 	}
 
@@ -73,6 +79,7 @@ export class OscillatorExpNode extends CorgiNode {
 		this._outputChain.dispose(() => {
 			this._oscillator.stop()
 			this._oscillator.disconnect()
+		// this._merger.disconnect()
 		})
 	}
 }
