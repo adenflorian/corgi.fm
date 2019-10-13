@@ -1,6 +1,7 @@
 import React, {Fragment, useContext} from 'react'
 import * as immutable from 'immutable'
 import {ExpNodeState, IExpConnection} from '@corgifm/common/redux'
+import {ParamInputCentering} from '@corgifm/common/common-types'
 import {logger} from '../client-logger'
 import {typeClassMap} from './ExpNodes'
 import {CorgiNode} from './CorgiNode'
@@ -13,7 +14,6 @@ import {
 	isAudioOutputPort, isAudioInputPort, ExpPortCallback, ExpPortType, isAudioParamInputPort,
 } from './ExpPorts'
 import {isGateOutputPort, isGateInputPort} from './ExpGatePorts'
-import {ParamInputCentering} from '@corgifm/common/common-types';
 
 export const NodeManagerContext = React.createContext<null | NodeManagerContextValue>(null)
 

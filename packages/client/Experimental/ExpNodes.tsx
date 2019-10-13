@@ -137,24 +137,47 @@ export class ConstantExpNode extends CorgiNode {
 
 export class AudioOutputExpNode extends CorgiNode {
 	private readonly _inputGain: GainNode
-	private readonly _inputPort: ExpNodeAudioInputPort
+	private readonly _extraGain: GainNode
+	private readonly _onWindowUnloadBound: () => void
 
 	public constructor(
 		id: Id, audioContext: AudioContext, preMasterLimiter: GainNode,
 	) {
 		const inputGain = audioContext.createGain()
+		inputGain.gain.setValueAtTime(1, 0)
+
+		const extraGain = audioContext.createGain()
+		extraGain.gain.setValueAtTime(0, 0)
+		extraGain.gain.setTargetAtTime(1, 0.5, 0.5)
 
 		const inputPort = new ExpNodeAudioInputPort('input', 'input', () => this, inputGain)
 
 		super(id, audioContext, preMasterLimiter, {ports: [inputPort]})
 
-		this._inputPort = inputPort
-
-		inputGain.connect(audioContext.destination)
+		inputGain.connect(extraGain).connect(audioContext.destination)
 		// inputGain.connect(this.preMasterLimiter)
 
 		// Make sure to add these to the dispose method!
 		this._inputGain = inputGain
+		this._extraGain = extraGain
+
+		this._onWindowUnloadBound = this._onWindowUnload.bind(this)
+		window.addEventListener('unload', this._onWindowUnloadBound)
+	}
+
+	private _onWindowUnload() {
+		this._extraGain.gain.setTargetAtTime(0, 0, 0.005)
+
+		const start = this._audioContext.currentTime
+
+		let stop = false
+
+		// Backup in case something goes wrong with audio context time
+		setTimeout(() => (stop = true), 500)
+
+		while (this._audioContext.currentTime - start < 0.05) {
+			if (stop) break
+		}
 	}
 
 	public getName() {return 'Audio Output'}
@@ -164,15 +187,17 @@ export class AudioOutputExpNode extends CorgiNode {
 	}
 
 	protected _enable() {
-		this._inputGain.gain.value = 1
+		this._inputGain.gain.setTargetAtTime(1, 0, 0.005)
 	}
 
 	protected _disable() {
-		this._inputGain.gain.value = 0
+		this._inputGain.gain.setTargetAtTime(0, 0, 0.005)
 	}
 
 	protected _dispose() {
 		this._inputGain.disconnect()
+		this._extraGain.disconnect()
+		window.removeEventListener('unload', this._onWindowUnloadBound)
 	}
 }
 
