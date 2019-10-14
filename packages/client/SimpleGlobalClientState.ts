@@ -41,6 +41,10 @@ class SimpleGlobalClientState {
 		this._analyserDumpNode = audioContext.createAnalyser()
 		return this._analyserDumpNode
 	}
+
+	public resetAnalyserDumpNode(audioContext: AudioContext) {
+		this._analyserDumpNode = audioContext.createAnalyser()
+	}
 }
 
 export const simpleGlobalClientState = new SimpleGlobalClientState()

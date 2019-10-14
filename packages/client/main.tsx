@@ -25,6 +25,7 @@ import {SamplesManager} from './WebAudio/SamplesManager'
 import {setStoreForSchedulerVisual, startSchedulerVisualLoop} from './WebAudio/SchedulerVisual'
 import {setupWebsocketAndListeners, socket} from './websocket-listeners'
 import {SingletonContextImpl} from './SingletonContext'
+import {simpleGlobalClientState} from './SimpleGlobalClientState'
 import {createExpTupperware} from './Experimental/experimental-middleware'
 
 if (!isLocalDevClient()) initSentry()
@@ -78,6 +79,7 @@ async function setupAsync() {
 	// Might be needed for safari
 	const AudioContext = window.AudioContext || window.webkitAudioContext
 	const audioContext = new AudioContext() as AudioContext
+	simpleGlobalClientState.resetAnalyserDumpNode(audioContext)
 	const preMasterLimiter = audioContext.createGain()
 
 	// Disabled until audio worklet glitch issues are fixed

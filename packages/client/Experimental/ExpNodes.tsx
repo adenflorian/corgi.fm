@@ -162,14 +162,14 @@ export class AudioOutputExpNode extends CorgiNode {
 	private _onWindowUnload() {
 		this._inputChain.dispose()
 
-		const start = this._audioContext.currentTime
+		const startMs = Date.now()
 
 		let stop = false
 
 		// Backup in case something goes wrong with audio context time
-		setTimeout(() => (stop = true), 500)
+		setTimeout(() => (stop = true), 100)
 
-		while (this._audioContext.currentTime - start < 0.05) {
+		while (Date.now() - startMs < 50) {
 			if (stop) break
 		}
 	}

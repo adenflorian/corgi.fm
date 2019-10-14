@@ -1,4 +1,5 @@
 import {simpleGlobalClientState} from '../SimpleGlobalClientState'
+import {logger} from '../client-logger'
 
 export class CorgiAnalyserSPNode {
 	public get input() {return this._scriptProcessorNode as AudioNode}
@@ -12,7 +13,17 @@ export class CorgiAnalyserSPNode {
 	) {
 		this._scriptProcessorNode = _audioContext.createScriptProcessor(256, 1, 1)
 		this._scriptProcessorNode.addEventListener('audioprocess', this._onAudioProcess)
-		this._scriptProcessorNode.connect(simpleGlobalClientState.getAnalyserDumpNode(_audioContext))
+		try {
+			this._scriptProcessorNode.connect(simpleGlobalClientState.getAnalyserDumpNode(_audioContext))
+		} catch (error1) {
+			try {
+				logger.warn('ha ha ha uh oh:', {error1})
+				simpleGlobalClientState.resetAnalyserDumpNode(_audioContext)
+				this._scriptProcessorNode.connect(simpleGlobalClientState.getAnalyserDumpNode(_audioContext))
+			} catch (error2) {
+				logger.error('failed to connect to analyser node:', {error2})
+			}
+		}
 	}
 
 	public requestUpdate() {
