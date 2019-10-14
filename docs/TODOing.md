@@ -11,11 +11,20 @@
 - [√] get liveValueRail to be accurate
 - [√] fix zoomBlock on knob from preventing clicking on knob value
 - [√] fix cloning
-- [ ] setup curve for osc freq
+- [√] setup curve for osc freq
+- [ ] LFO
+- [ ] uber knob updates
+	- [ ] tweak style of rail when negative gain
+	- [ ] add something to show that rail extends past limit
+		- [ ] mod rail
+		- [ ] live value rail
+	- [ ] highlight main knob on hover, including the center
+	- [ ] fix knob UI when no mod inputs
+	- [ ] show source node name, gain, and centering value on hover of mod arc
 - [ ] BiquadFilterNode: state is bad, probably due to unstable filter caused by fast parameter automation.
 - [ ] fix connector placeholders z index
-- [ ] show source node name, gain, and centering value on hover of mod arc
 - [ ] add extra gains and wave shapers to param input chain to allow fading between them when switching between center and offset
+- [ ] change room type drop down to a button select thing
 
 
 

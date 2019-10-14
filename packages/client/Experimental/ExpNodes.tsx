@@ -14,8 +14,7 @@ import {
 } from './ExpPorts'
 import {CorgiNode} from './CorgiNode'
 import {
-	ExpAudioParam,
-	ExpCustomNumberParam, buildCustomNumberParamDesc,
+	ExpAudioParam, ExpCustomNumberParam, buildCustomNumberParamDesc,
 } from './ExpParams'
 import './ExpNodes.less'
 import {ExpGateInputPort, ExpGateOutputPort} from './ExpGatePorts'
@@ -36,10 +35,10 @@ export class OscillatorExpNode extends CorgiNode {
 		const outputChain = new ToggleGainChain(audioContext)
 		// oscillator.connect(merger, 0, 0)
 		// oscillator.connect(merger, 0, 1)
-		// merger.connect(outputGain)
+		// merger.connect(outputChain.input)
 		oscillator.connect(outputChain.input)
 
-		const frequencyParam = new ExpAudioParam('frequency', oscillator.frequency, 440, 20000, 'unipolar', {valueString: filterValueToString})
+		const frequencyParam = new ExpAudioParam('frequency', oscillator.frequency, 440, 20000, 'unipolar', {valueString: filterValueToString, curveFunctions: filterFreqCurveFunctions})
 		const detuneParam = new ExpAudioParam('detune', oscillator.detune, 0, 100, 'bipolar', {valueString: filterValueToString})
 
 		const frequencyPort = new ExpNodeAudioParamInputPort(frequencyParam, () => this, audioContext, 'offset')
@@ -79,7 +78,7 @@ export class OscillatorExpNode extends CorgiNode {
 		this._outputChain.dispose(() => {
 			this._oscillator.stop()
 			this._oscillator.disconnect()
-		// this._merger.disconnect()
+			// this._merger.disconnect()
 		})
 	}
 }
