@@ -32,7 +32,8 @@ export const ExpKnobValueNumber = React.memo(
 			}
 		}, [active])
 
-		const handleClick = useCallback(() => {
+		const handleClick = useCallback((e: React.MouseEvent) => {
+			e.stopPropagation()
 			setTempValue(curvedValue.toFixed(2))
 			setActive(true)
 		}, [curvedValue])
@@ -65,7 +66,7 @@ export const ExpKnobValueNumber = React.memo(
 			return (
 				<div
 					className="knobValue unselectable"
-					onClick={handleClick}
+					onMouseDown={handleClick}
 				>
 					{displayValue}
 				</div>

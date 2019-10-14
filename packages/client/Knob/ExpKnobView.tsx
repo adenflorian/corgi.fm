@@ -1,10 +1,10 @@
 import {stripIndents} from 'common-tags'
 import React from 'react'
+import {SignalRange} from '@corgifm/common/common-types'
+import {ParamInputChainReact} from '../Experimental/ExpPorts'
 import {ActualKnob} from './ActualKnob'
 import './Knob.less'
-import {ActualUberKnob} from './ActualUberKnob';
-import {ParamInputChainReact} from '../Experimental/ExpPorts';
-import {SignalRange} from '@corgifm/common/common-types';
+import {ActualUberKnob} from './ActualUberKnob'
 
 interface Props {
 	label: string

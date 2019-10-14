@@ -3,6 +3,7 @@ import {SignalRange} from '@corgifm/common/common-types'
 import {clampPolarized} from '@corgifm/common/common-utils'
 import './Knob.less'
 import {blockMouse, unblockMouse} from '../SimpleGlobalClientState'
+import {useBoolean} from '../react-hooks'
 
 interface ISliderControllerProps {
 	readonly onChange: (newValue: number) => void
@@ -16,22 +17,27 @@ export function ExpSliderController({
 	value, defaultValue, onChange, range, children,
 }: ISliderControllerProps) {
 
-	const [isMouseDown, setIsMouseDown] = useState(false)
+	const [isMouseDown, mouseDown, mouseUp] = useBoolean(false)
+	const [hasMouseMoved, mouseMoved, resetMouseMoved] = useBoolean(false)
 
 	useLayoutEffect(() => {
-		if (isMouseDown) {
+		if (isMouseDown && hasMouseMoved) {
 			blockMouse()
 		} else {
 			unblockMouse()
 		}
-	}, [isMouseDown])
+	}, [hasMouseMoved, isMouseDown])
 
 	useLayoutEffect(() => {
 		if (!isMouseDown) return
 
-		const _handleMouseMove = (e: MouseEvent) => {
+		const handleMouseMove = (e: MouseEvent) => {
 			if (!isMouseDown) return
-			if (e.buttons !== 1) return setIsMouseDown(false)
+			if (e.buttons !== 1) return mouseUp()
+
+			if (!hasMouseMoved) {
+				mouseMoved()
+			}
 
 			let sensitivity = 0.005 * (range === 'bipolar' ? 2 : 1)
 			if (e.shiftKey) {
@@ -49,18 +55,22 @@ export function ExpSliderController({
 			}
 		}
 
-		window.addEventListener('mousemove', _handleMouseMove)
+		window.addEventListener('mousemove', handleMouseMove)
+		window.addEventListener('mouseup', mouseUp)
 
 		return () => {
-			window.removeEventListener('mousemove', _handleMouseMove)
+			window.removeEventListener('mousemove', handleMouseMove)
+			window.removeEventListener('mouseup', mouseUp)
 		}
-	}, [isMouseDown, onChange, range, value])
+	}, [hasMouseMoved, isMouseDown, mouseMoved, mouseUp, onChange, range, value])
 
 	const _handleMouseDown = (e: React.MouseEvent) => {
+		if (e.button !== 0) return
 		if ((e.ctrlKey || e.metaKey)) {
 			onChange(defaultValue)
 		} else {
-			setIsMouseDown(true)
+			resetMouseMoved()
+			mouseDown()
 		}
 	}
 
