@@ -34,6 +34,13 @@ class SimpleGlobalClientState {
 	public set pan(val) {
 		this._pan = val
 	}
+
+	private _analyserDumpNode?: AnalyserNode
+	public getAnalyserDumpNode(audioContext: AudioContext): AnalyserNode {
+		if (this._analyserDumpNode) return this._analyserDumpNode
+		this._analyserDumpNode = audioContext.createAnalyser()
+		return this._analyserDumpNode
+	}
 }
 
 export const simpleGlobalClientState = new SimpleGlobalClientState()

@@ -80,7 +80,9 @@ async function setupAsync() {
 	const audioContext = new AudioContext() as AudioContext
 	const preMasterLimiter = audioContext.createGain()
 
-	await loadAudioWorkletsAsync(audioContext)
+	// Disabled until audio worklet glitch issues are fixed
+	// https://bugs.chromium.org/p/chromium/issues/detail?id=1006844
+	// await loadAudioWorkletsAsync(audioContext)
 
 	const samplesManager = new SamplesManager(audioContext)
 

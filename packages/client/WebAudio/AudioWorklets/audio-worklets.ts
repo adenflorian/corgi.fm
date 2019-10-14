@@ -10,9 +10,9 @@ let x = 0
 
 export async function loadAudioWorkletsAsync(audioContext: AudioContext) {
 	try {
-		for (const name of audioWorkletNames) {
+		await Promise.all(audioWorkletNames.map(async name => {
 			await _loadAudioWorkletAsync(audioContext)(name)
-		}
+		}))
 		logger.log('all audio worklets loaded!')
 	} catch (error) {
 		logger.error('error loading audio worklet ☹️:', {error})

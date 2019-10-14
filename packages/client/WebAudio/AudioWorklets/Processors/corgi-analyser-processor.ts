@@ -1,13 +1,14 @@
+/* eslint-disable no-restricted-syntax */
 import {corgiAnalyserName} from '../audio-worklets'
 
 class CorgiAnalyserProcessor extends AudioWorkletProcessor {
 	private _readyForNextMessage = true
 	// private nan = false
 
-	constructor() {
+	public constructor() {
 		super()
-		
-		this.port.onmessage = (event) => {
+
+		this.port.onmessage = event => {
 			this._readyForNextMessage = true
 		}
 

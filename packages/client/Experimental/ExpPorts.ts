@@ -4,7 +4,6 @@ import {List} from 'immutable'
 import {ParamInputCentering, SignalRange} from '@corgifm/common/common-types'
 import {clamp} from '@corgifm/common/common-utils'
 import {logger} from '../client-logger'
-import {createCorgiAnalyserWorkletNode} from '../WebAudio/AudioWorklets/audio-worklets'
 import {CorgiNode} from './CorgiNode'
 import {
 	ExpNodeAudioConnection,
@@ -12,6 +11,7 @@ import {
 } from './ExpConnections'
 import {ExpAudioParam} from './ExpParams'
 import {CorgiNumberChangedEvent, CorgiEnumChangedEvent, CorgiObjectChangedEvent} from './CorgiEvents'
+import {CorgiAnalyserSPNode} from './CorgiAnalyserSPN'
 
 export type ExpPortCallback = (port: ExpPort) => void
 
@@ -218,10 +218,7 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 	private readonly _waveShaperClamp: WaveShaperNode
 	private readonly _gainDenormalizer: GainNode
 	private readonly _knobConstantSource: ConstantSourceNode
-	// private readonly _gainNormalizer: GainNode
-	private _liveModdedValue = 0
-	public get liveModdedValue() {return this._liveModdedValue}
-	private readonly _analyser: AudioWorkletNode
+	private readonly _analyser: CorgiAnalyserSPNode
 	public readonly destination: AudioParam
 	public readonly onLiveRangeChanged: CorgiObjectChangedEvent<LiveRange>
 	private _knobValue: number
@@ -243,18 +240,7 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 		this._waveShaperClamp = audioContext.createWaveShaper()
 		this._gainDenormalizer = audioContext.createGain()
 		this._knobConstantSource = audioContext.createConstantSource()
-		// this._gainNormalizer = audioContext.createGain()
-		this._analyser = createCorgiAnalyserWorkletNode(audioContext)
-
-		this._analyser.port.onmessage = event => {
-			if (!Number.isNaN(event.data) && event.data !== this._liveModdedValue) {
-				this._liveModdedValue = event.data
-				const unCurved = this.expAudioParam.curveFunctions.unCurve(event.data / this.expAudioParam.maxValue)
-				this.expAudioParam.onModdedLiveValueChange.invokeNextFrame(unCurved, this._requestWorkletUpdate)
-			} else {
-				this._requestWorkletUpdate()
-			}
-		}
+		this._analyser = new CorgiAnalyserSPNode(audioContext, this._onAnalyserUpdate)
 
 		this._requestWorkletUpdate()
 
@@ -263,18 +249,22 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 		this._knobConstantSource.start()
 
 		this._gainDenormalizer.gain.value = this.expAudioParam.maxValue
-		// this._gainNormalizer.gain.value = 1 / this.maxValue
 
 		this._waveShaperClamp.curve = this.expAudioParam.curveFunctions.waveShaperCurve
 
+		this._gainDenormalizer.connect(this._analyser.input)
+
 		this._knobConstantSource
-			// .connect(this._gainNormalizer)
 			.connect(this._waveShaperClamp)
 			.connect(this._gainDenormalizer)
-			.connect(this._analyser)
 			.connect(this.destination)
 
 		this.onLiveRangeChanged = new CorgiObjectChangedEvent(this._createLiveRange())
+	}
+
+	private readonly _onAnalyserUpdate = (newValue: number) => {
+		const unCurved = this.expAudioParam.curveFunctions.unCurve(newValue / this.expAudioParam.maxValue)
+		this.expAudioParam.onModdedLiveValueChange.invokeNextFrame(unCurved, this._requestWorkletUpdate)
 	}
 
 	private _createLiveRange(): LiveRange {
@@ -317,14 +307,13 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 		this.onLiveRangeChanged.invokeImmediately(this._createLiveRange())
 	}
 
-	// public onUpdated() {
-	// 	super.onUpdated()
-	// 	this._requestWorkletUpdate()
-	// }
+	public onUpdated() {
+		super.onUpdated()
+		this._requestWorkletUpdate()
+	}
 
 	private readonly _requestWorkletUpdate = () => {
-		// console.log('_requestWorkletUpdate')
-		this._analyser.port.postMessage('Update please!')
+		this._analyser.requestUpdate()
 	}
 
 	public getChains(): readonly ParamInputChainReact[] {
@@ -332,10 +321,7 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 	}
 
 	public setKnobValue(value: number) {
-		// Rounding to nearest to 32 bit number because AudioParam values are 32 bit floats
-		const newValue = Math.fround(value)
-		// if (newValue === this._knobConstantSource.offset.value) return
-		this._knobConstantSource.offset.setTargetAtTime(newValue, 0, 0.005)
+		this._knobConstantSource.offset.setTargetAtTime(value, 0, 0.005)
 		this._knobValue = value
 		this._updateLiveRange()
 	}
@@ -396,7 +382,7 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 		this._gainDenormalizer.disconnect()
 		this._knobConstantSource.stop()
 		this._knobConstantSource.disconnect()
-		// this._gainNormalizer.disconnect()
+		this._analyser.dispose()
 	}
 }
 
