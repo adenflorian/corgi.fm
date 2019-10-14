@@ -18,6 +18,7 @@ export * from './modals-redux'
 export * from './animation-redux'
 export * from './upload-redux'
 export * from './local-user-redux'
+export * from './other-redux'
 
 export * from './redux-utils'
 export * from './websocket-redux'

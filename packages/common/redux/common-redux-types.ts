@@ -9,6 +9,7 @@ import {
 	RoomsReduxAction, ModalsAction, InProgressAction, OptionsAction,
 	ClientInfoAction, AudioReduxAction, authReducer, AuthAction,
 	animationReducer, clientsActionTypesWhitelist, localUserReducer,
+	otherReducer,
 } from '.'
 
 export interface IClientAppState extends StateType<ReturnType<typeof getClientReducers>> {}
@@ -28,6 +29,7 @@ export function getClientReducers() {
 		localUser: localUserReducer,
 		modals: modalsReducer,
 		options: optionsReducer,
+		other: otherReducer,
 		rooms: roomsReducer,
 		websocket: websocketReducer,
 		room: roomReducers,

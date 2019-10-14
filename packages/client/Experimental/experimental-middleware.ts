@@ -1,4 +1,4 @@
-import {Middleware, Dispatch} from 'redux'
+import {Middleware, Dispatch, Store} from 'redux'
 import {
 	IClientAppState, ExpNodesAction, ExpConnectionAction,
 	RoomsReduxAction, selectExpConnection,
@@ -92,21 +92,6 @@ function foo(
 			return nodeManager.deleteNode(action.nodeId)
 
 		// Connections
-		case 'EXP_REPLACE_CONNECTIONS':
-			return nodeManager.addAudioConnections(getConnections())
-
-		case 'EXP_DELETE_CONNECTIONS':
-			return action.connectionIds.forEach(
-				nodeManager.deleteConnection)
-
-		case 'EXP_ADD_CONNECTION':
-			return nodeManager.addConnection(
-				getConnection(action.connection.id))
-
-		case 'EXP_ADD_CONNECTIONS':
-			return action.connections.forEach(
-				x => nodeManager.addConnection(getConnection(x.id)))
-
 		case 'EXP_DELETE_ALL_CONNECTIONS':
 			return nodeManager.deleteAllConnections()
 
@@ -150,6 +135,76 @@ function foo(
 
 		case 'EXP_UPDATE_CONNECTION_AUDIO_PARAM_INPUT_CENTERING':
 			return nodeManager.onAudioParamInputCenteringChange(action.id, action.centering)
+
+		default: return
+	}
+}
+
+export function createExpTupperware(
+	store: Store<IClientAppState>, singletonContext: SingletonContextImpl,
+) {
+	return () => {
+		const state = store.getState()
+		const action = state.other.lastAction as ExpMiddlewareActions
+
+		const roomType = selectRoomInfoState(state.room).roomType
+
+		if (roomType !== RoomType.Experimental) return
+
+		let nodeManager = singletonContext.getNodeManager()
+
+		if (!nodeManager) {
+			logger.log('creating node manager')
+			singletonContext.setNodeManager(
+				new NodeManager(
+					singletonContext.getAudioContext(),
+					singletonContext.getPreMasterLimiter()
+				)
+			)
+			nodeManager = singletonContext.getNodeManager()
+
+			if (!nodeManager) {
+				return logger.error('missing node manager!')
+			}
+		}
+
+		bar(
+			state,
+			action,
+			nodeManager,
+			() => selectExpNodesState(state.room),
+			(id: Id) => selectExpConnection(state.room, id),
+			() => selectExpAllConnections(state.room),
+			store.dispatch,
+		)
+	}
+}
+
+function bar(
+	state: IClientAppState,
+	action: ExpMiddlewareActions,
+	nodeManager: NodeManager,
+	getNodes: () => ReturnType<typeof selectExpNodesState>,
+	getConnection: (id: Id) => ReturnType<typeof selectExpConnection>,
+	getConnections: () => ReturnType<typeof selectExpAllConnections>,
+	dispatch: Dispatch,
+) {
+	switch (action.type) {
+		// Connections
+		case 'EXP_REPLACE_CONNECTIONS':
+			return nodeManager.addAudioConnections(getConnections())
+
+		case 'EXP_DELETE_CONNECTIONS':
+			return action.connectionIds.forEach(
+				nodeManager.deleteConnection)
+
+		case 'EXP_ADD_CONNECTION':
+			return nodeManager.addConnection(
+				getConnection(action.connection.id))
+
+		case 'EXP_ADD_CONNECTIONS':
+			return action.connections.forEach(
+				x => nodeManager.addConnection(getConnection(x.id)))
 
 		default: return
 	}

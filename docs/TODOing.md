@@ -10,8 +10,9 @@
 - [√] clamp mod rails
 - [√] get liveValueRail to be accurate
 - [√] fix zoomBlock on knob from preventing clicking on knob value
+- [√] fix cloning
 - [ ] setup curve for osc freq
-- [ ] fix cloning
+- [ ] BiquadFilterNode: state is bad, probably due to unstable filter caused by fast parameter automation.
 - [ ] fix connector placeholders z index
 - [ ] show source node name, gain, and centering value on hover of mod arc
 - [ ] add extra gains and wave shapers to param input chain to allow fading between them when switching between center and offset

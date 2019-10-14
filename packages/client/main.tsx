@@ -25,7 +25,7 @@ import {SamplesManager} from './WebAudio/SamplesManager'
 import {setStoreForSchedulerVisual, startSchedulerVisualLoop} from './WebAudio/SchedulerVisual'
 import {setupWebsocketAndListeners, socket} from './websocket-listeners'
 import {SingletonContextImpl} from './SingletonContext'
-import {loadAudioWorkletsAsync} from './WebAudio/AudioWorklets/audio-worklets'
+import {createExpTupperware} from './Experimental/experimental-middleware'
 
 if (!isLocalDevClient()) initSentry()
 
@@ -112,6 +112,8 @@ async function setupAsync() {
 	const store = configureStore(
 		initialState, getGetAllInstruments, onReduxMiddleware,
 		firebaseContextStuff, samplesManager, singletonContext)
+
+	store.subscribe(createExpTupperware(store, singletonContext))
 
 	wireUpFirebaseToRedux(firebaseContextStuff, store)
 
