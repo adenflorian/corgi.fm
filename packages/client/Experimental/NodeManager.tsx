@@ -3,7 +3,7 @@ import * as immutable from 'immutable'
 import {ExpNodeState, IExpConnection} from '@corgifm/common/redux'
 import {ParamInputCentering} from '@corgifm/common/common-types'
 import {logger} from '../client-logger'
-import {typeClassMap} from './ExpNodes'
+import {typeClassMap} from './Nodes/ExpNodes'
 import {CorgiNode} from './CorgiNode'
 import {
 	ExpNodeAudioConnection, ExpNodeConnection, isAudioConnection,

@@ -19,8 +19,13 @@
 		- [ ] mod rail
 		- [ ] live value rail
 	- [ ] highlight main knob on hover, including the center
-	- [ ] fix knob UI when no mod inputs
+	- [√] fix knob UI when no mod inputs
 	- [ ] show source node name, gain, and centering value on hover of mod arc
+- [ ] Sequencer upgrades
+	- [ ] pitch
+	- [ ] note length
+- [ ] Delay node
+- [ ] Reverb node
 - [ ] BiquadFilterNode: state is bad, probably due to unstable filter caused by fast parameter automation.
 - [ ] fix connector placeholders z index
 - [ ] add extra gains and wave shapers to param input chain to allow fading between them when switching between center and offset

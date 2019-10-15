@@ -3,7 +3,6 @@ import {List} from 'immutable'
 import {clamp, arrayToESMap, clampPolarized} from '@corgifm/common/common-utils'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {logger} from '../client-logger'
-import './ExpNodes.less'
 import {ExpConnectorPlaceholders} from '../Connections/ExpConnectorPlaceholders'
 import {SimpleGraphNodeExp} from '../SimpleGraph/SimpleGraphNodeExp'
 import {ExpNodeDebugView} from './ExpNodeDebugView'
@@ -12,10 +11,10 @@ import {
 } from './ExpPorts'
 import {
 	ExpAudioParams, ExpCustomNumberParams,
-	ExpNumberParamCallback,
-	ExpAudioParam,
+	ExpNumberParamCallback, ExpAudioParam,
 } from './ExpParams'
 import {CorgiStringChangedEvent} from './CorgiEvents'
+import './ExpNodes.less'
 
 export const ExpNodeContext = React.createContext<null | ExpNodeContextValue>(null)
 
