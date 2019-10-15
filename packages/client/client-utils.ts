@@ -63,19 +63,28 @@ export function getCdnUrl() {
 	}
 }
 
-const a = 1000
-const a0 = 1000 ** -1 // 0.001
 const length = 65535
 const halfLength = Math.floor(length / 2) // 32767
 
-const filterWaveShaperCurve = new Float32Array(length).map((_, i) => {
-	if (i < halfLength) {
-		return a0
-	} else {
-		const x = (i - halfLength) / halfLength
-		return a ** (x - 1)
+/** b is value when input is 0 */
+function createExpWaveShaperCurve(b: number) {
+	return new Float32Array(length).map((_, i) => {
+		if (i < halfLength) {
+			return b
+		} else {
+			const x = (i - halfLength) / halfLength
+			return b ** (-x + 1)
+		}
+	})
+}
+
+function createExpCurveFunctions(b: number): CurveFunctions {
+	return {
+		curve: (x: number) => b ** (-x + 1),
+		unCurve: (x: number) => (-Math.log(x) / Math.log(b)) + 1,
+		waveShaperCurve: createExpWaveShaperCurve(b),
 	}
-})
+}
 
 export interface CurveFunctions {
 	readonly curve: (x: number) => number
@@ -83,11 +92,9 @@ export interface CurveFunctions {
 	readonly waveShaperCurve: Float32Array | null
 }
 
-export const filterFreqCurveFunctions: CurveFunctions = {
-	curve: (x: number) => a ** (x - 1),
-	unCurve: (x: number) => Math.log(a * x) / Math.log(a),
-	waveShaperCurve: filterWaveShaperCurve,
-}
+export const filterFreqCurveFunctions = createExpCurveFunctions(0.001)
+
+export const lfoFreqCurveFunctions = createExpCurveFunctions(0.0001)
 
 export const defaultBipolarCurveFunctions: CurveFunctions = {
 	curve: (x: number) => x,
