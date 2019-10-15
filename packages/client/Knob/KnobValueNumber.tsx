@@ -1,6 +1,5 @@
 import React, {FormEvent, useEffect, useRef, useState, useCallback, ChangeEvent} from 'react'
-import {clamp} from '@corgifm/common/common-utils'
-import {CurveFunctions} from '../client-utils'
+import {clamp, CurveFunctions} from '@corgifm/common/common-utils'
 
 interface Props {
 	readonly value: number

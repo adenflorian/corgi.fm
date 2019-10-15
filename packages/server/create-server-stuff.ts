@@ -22,6 +22,7 @@ import {
 } from '@corgifm/common/redux'
 import {logger} from '@corgifm/common/logger'
 import {serverClientId} from '@corgifm/common/common-constants'
+import {oscillatorFreqCurveFunctions, lfoFreqCurveFunctions} from '@corgifm/common/common-utils'
 
 const masterAudioOutput: IConnectable = findNodeInfo(ConnectionNodeType.audioOutput).stateSelector({} as any, '')
 const masterClock: IConnectable = findNodeInfo(ConnectionNodeType.masterClock).stateSelector({} as any, '')
@@ -87,7 +88,7 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 
 	dispatchToRoom(expNodesActions.add(osc1))
 
-	dispatchToRoom(expNodesActions.audioParamChange(osc1.id, 'frequency', 0.01))
+	dispatchToRoom(expNodesActions.audioParamChange(osc1.id, 'frequency', oscillatorFreqCurveFunctions.unCurve(440 / 10000)))
 
 	dispatchToRoom(expPositionActions.add(
 		makeExpPosition({
@@ -97,17 +98,17 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 			y: 0,
 		})))
 
-	const osc2 = makeExpNodeState({
-		type: 'oscillator',
+	const lfo = makeExpNodeState({
+		type: 'lowFrequencyOscillator',
 	})
 
-	dispatchToRoom(expNodesActions.add(osc2))
+	dispatchToRoom(expNodesActions.add(lfo))
 
-	dispatchToRoom(expNodesActions.audioParamChange(osc2.id, 'frequency', 0.00005))
+	dispatchToRoom(expNodesActions.audioParamChange(lfo.id, 'frequency', lfoFreqCurveFunctions.unCurve(1 / 32)))
 
 	dispatchToRoom(expPositionActions.add(
 		makeExpPosition({
-			id: osc2.id,
+			id: lfo.id,
 			ownerId: serverClientId,
 			x: -400,
 			y: 300,
@@ -144,16 +145,14 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 	)))
 
 	dispatchToRoom(expConnectionsActions.add(new ExpConnection(
-		osc2.id,
-		osc2.type,
+		lfo.id,
+		lfo.type,
 		filter.id,
 		filter.type,
 		'output',
 		'frequency',
 		'audio',
 	)))
-
-
 
 	function dispatchToRoom(action: Action) {
 		return serverStore.dispatch(createRoomAction(action, room))

@@ -96,12 +96,12 @@ function UberArcMain({
 					parentRange={range}
 				/>
 			})}
-			<UberArcLiveValue
+			{chains.length > 0 && <UberArcLiveValue
 				layer={-chains.length - 1}
 				liveEvent={audioParam.onModdedLiveValueChange}
 				parentRatio={activeRatio}
 				parentRange={range}
-			/>
+			/>}
 		</UberArcDumb>
 	)
 }

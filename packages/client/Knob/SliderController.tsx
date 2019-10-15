@@ -1,7 +1,6 @@
 import React, {useLayoutEffect, useState, ReactElement, useCallback} from 'react'
-import {clamp} from '@corgifm/common/common-utils'
+import {clamp, CurveFunctions} from '@corgifm/common/common-utils'
 import './Knob.less'
-import {CurveFunctions} from '../client-utils'
 
 interface ISliderControllerProps {
 	readonly min: number
@@ -70,7 +69,7 @@ export function SliderController(props: ISliderControllerProps) {
 
 					const newValue = deNormalize(newNormalizedValue)
 
-					if (isNaN(newValue)) throw new Error('nan')
+					if (Number.isNaN(newValue)) throw new Error('nan')
 
 					if (newValue !== value) {
 						onChange(newValue)
@@ -86,7 +85,7 @@ export function SliderController(props: ISliderControllerProps) {
 		return () => {
 			window.removeEventListener('mousemove', _handleMouseMove)
 		}
-	}, [curve, isMouseDown, max, min, onChange, value])
+	}, [curve, deNormalize, experimental, isMouseDown, max, min, normalize, onChange, value])
 
 	const _handleMouseDown = (e: React.MouseEvent) => {
 		if ((e.ctrlKey || e.metaKey) && defaultValue !== undefined) {

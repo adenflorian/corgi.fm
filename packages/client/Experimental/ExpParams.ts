@@ -1,7 +1,9 @@
 import React, {useContext} from 'react'
 import {SignalRange} from '@corgifm/common/common-types'
-import {clampPolarized} from '@corgifm/common/common-utils'
-import {CurveFunctions, defaultBipolarCurveFunctions, defaultUnipolarCurveFunctions} from '../client-utils'
+import {
+	clampPolarized, CurveFunctions, defaultBipolarCurveFunctions,
+	defaultUnipolarCurveFunctions,
+} from '@corgifm/common/common-utils'
 import {CorgiNumberChangedEvent} from './CorgiEvents'
 
 export interface ExpParam {

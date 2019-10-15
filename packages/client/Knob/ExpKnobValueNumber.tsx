@@ -1,7 +1,6 @@
 import React, {FormEvent, useEffect, useRef, useState, useCallback, ChangeEvent} from 'react'
-import {clamp, clampPolarized} from '@corgifm/common/common-utils'
+import {CurveFunctions, clampPolarized} from '@corgifm/common/common-utils'
 import {SignalRange} from '@corgifm/common/common-types'
-import {CurveFunctions} from '../client-utils'
 
 interface Props {
 	readonly value: number

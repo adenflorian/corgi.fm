@@ -261,3 +261,51 @@ export function arrayToESMap<T, U extends keyof T>(array: readonly T[] = [], idK
 		return map.set(item[idKey], item)
 	}, new Map<T[typeof idKey], T>())
 }
+
+// Curve functions
+const length = 65535
+const halfLength = Math.floor(length / 2) // 32767
+
+/** b is value when input is 0 */
+function createExpWaveShaperCurve(b: number) {
+	return new Float32Array(length).map((_, i) => {
+		if (i < halfLength) {
+			return b
+		} else {
+			const x = (i - halfLength) / halfLength
+			return b ** (-x + 1)
+		}
+	})
+}
+
+function createExpCurveFunctions(b: number): CurveFunctions {
+	return {
+		curve: (x: number) => b ** (-x + 1),
+		unCurve: (x: number) => (-Math.log(x) / Math.log(b)) + 1,
+		waveShaperCurve: createExpWaveShaperCurve(b),
+	}
+}
+
+export interface CurveFunctions {
+	readonly curve: (x: number) => number
+	readonly unCurve: (x: number) => number
+	readonly waveShaperCurve: Float32Array | null
+}
+
+export const filterFreqCurveFunctions = createExpCurveFunctions(0.001)
+
+export const oscillatorFreqCurveFunctions = createExpCurveFunctions(0.001)
+
+export const lfoFreqCurveFunctions = createExpCurveFunctions(0.0001)
+
+export const defaultBipolarCurveFunctions: CurveFunctions = {
+	curve: (x: number) => x,
+	unCurve: (x: number) => x,
+	waveShaperCurve: new Float32Array([-1, 1]),
+}
+
+export const defaultUnipolarCurveFunctions: CurveFunctions = {
+	curve: (x: number) => x,
+	unCurve: (x: number) => x,
+	waveShaperCurve: new Float32Array([0, 0, 1]),
+}

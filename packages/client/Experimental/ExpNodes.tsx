@@ -1,10 +1,12 @@
 /* eslint-disable no-empty-function */
 import {ExpNodeType} from '@corgifm/common/redux'
 import {CssColor} from '@corgifm/common/shamu-color'
-import {toBeats, fromBeats, clamp, pickRandomArrayElement} from '@corgifm/common/common-utils'
+import {
+	toBeats, fromBeats, clamp, pickRandomArrayElement,
+	filterFreqCurveFunctions, lfoFreqCurveFunctions, oscillatorFreqCurveFunctions,
+} from '@corgifm/common/common-utils'
 import {preciseSubtract, preciseAdd, midiPrecision} from '@corgifm/common/midi-types'
 import {logger} from '../client-logger'
-import {filterFreqCurveFunctions, lfoFreqCurveFunctions} from '../client-utils'
 import {
 	percentageValueString, filterValueToString,
 	panValueToString, adsrValueToString, gainDecibelValueToString,
@@ -29,7 +31,7 @@ export class OscillatorExpNode extends CorgiNode {
 		id: Id, audioContext: AudioContext, preMasterLimiter: GainNode,
 	) {
 		const oscillator = audioContext.createOscillator()
-		oscillator.type = 'sine'
+		oscillator.type = 'sawtooth'
 		// oscillator.type = pickRandomArrayElement(['sawtooth', 'sine', 'triangle', 'square'])
 		oscillator.start()
 		// const merger = audioContext.createChannelMerger(2)
@@ -39,7 +41,7 @@ export class OscillatorExpNode extends CorgiNode {
 		// merger.connect(outputChain.input)
 		oscillator.connect(outputChain.input)
 
-		const frequencyParam = new ExpAudioParam('frequency', oscillator.frequency, 440, 10000, 'unipolar', {valueString: filterValueToString, curveFunctions: filterFreqCurveFunctions})
+		const frequencyParam = new ExpAudioParam('frequency', oscillator.frequency, 440, 10000, 'unipolar', {valueString: filterValueToString, curveFunctions: oscillatorFreqCurveFunctions})
 		const detuneParam = new ExpAudioParam('detune', oscillator.detune, 0, 100, 'bipolar', {valueString: detuneValueToString})
 
 		const frequencyPort = new ExpNodeAudioParamInputPort(frequencyParam, () => this, audioContext, 'offset')

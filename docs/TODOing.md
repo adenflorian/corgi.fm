@@ -12,7 +12,7 @@
 - [√] fix zoomBlock on knob from preventing clicking on knob value
 - [√] fix cloning
 - [√] setup curve for osc freq
-- [ ] LFO
+- [√] LFO
 - [ ] uber knob updates
 	- [ ] tweak style of rail when negative gain
 	- [ ] add something to show that rail extends past limit
