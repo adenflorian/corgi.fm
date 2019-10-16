@@ -43,3 +43,5 @@ export const Key = {
 	d: 'd',
 	Control: 'Control',
 } as const
+
+export const maxPitchFrequency = 20000

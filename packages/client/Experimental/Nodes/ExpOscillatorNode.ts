@@ -1,6 +1,7 @@
 /* eslint-disable no-empty-function */
 import {CssColor} from '@corgifm/common/shamu-color'
 import {oscillatorFreqCurveFunctions} from '@corgifm/common/common-utils'
+import {maxPitchFrequency} from '@corgifm/common/common-constants'
 import {
 	filterValueToString, detuneValueToString,
 } from '../../client-constants'
@@ -30,7 +31,7 @@ export class OscillatorExpNode extends CorgiNode {
 		// merger.connect(outputChain.input)
 		oscillator.connect(outputChain.input)
 
-		const frequencyParam = new ExpAudioParam('frequency', oscillator.frequency, 440, 10000, 'unipolar', {valueString: filterValueToString, curveFunctions: oscillatorFreqCurveFunctions})
+		const frequencyParam = new ExpAudioParam('frequency', oscillator.frequency, 440, maxPitchFrequency, 'unipolar', {valueString: filterValueToString, curveFunctions: oscillatorFreqCurveFunctions})
 		const detuneParam = new ExpAudioParam('detune', oscillator.detune, 0, 100, 'bipolar', {valueString: detuneValueToString})
 
 		const frequencyPort = new ExpNodeAudioParamInputPort(frequencyParam, () => this, audioContext, 'offset')

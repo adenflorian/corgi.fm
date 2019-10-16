@@ -76,9 +76,10 @@ export class EnvelopeNode extends CorgiNode {
 		if (startTime < this._lastGateTime) {
 			logger.error('receiveGateSignal startTime < this._lastGateTime:', {gate, startTime, last: this._lastGateTime, lastGate: this._lastGate})
 		}
-		if (gate === this._lastGate) {
-			logger.error('receiveGateSignal gate === this._lastGate:', {gate, startTime, last: this._lastGateTime, lastGate: this._lastGate})
-		}
+		// This should be ok, it's like a retrigger
+		// if (gate === this._lastGate) {
+		// 	logger.error('receiveGateSignal gate === this._lastGate:', {gate, startTime, last: this._lastGateTime, lastGate: this._lastGate})
+		// }
 		this._lastGateTime = startTime
 		this._lastGate = gate
 		// logger.log({startTime, currentTime: this._audioContext.currentTime/*, diff: startTime - this._audioContext.currentTime */})

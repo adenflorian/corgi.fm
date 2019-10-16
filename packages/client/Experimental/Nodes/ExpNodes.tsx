@@ -11,8 +11,10 @@ import {EnvelopeNode} from './EnvelopeNode'
 import {SequencerNode} from './SequencerNode'
 import {ConstantExpNode} from './ExpConstantNode'
 
+type CorgiNodeConstructor = new (id: Id, context: AudioContext, preMasterLimiter: GainNode) => CorgiNode
+
 // Is there a way to use class decorators to create this map at runtime?
-export const typeClassMap: {readonly [key in ExpNodeType]: new (id: Id, context: AudioContext, preMasterLimiter: GainNode) => CorgiNode} = {
+export const typeClassMap: {readonly [key in ExpNodeType]: CorgiNodeConstructor} = {
 	oscillator: OscillatorExpNode,
 	dummy: DummyNode,
 	filter: FilterNode,

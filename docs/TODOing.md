@@ -13,6 +13,8 @@
 - [√] fix cloning
 - [√] setup curve for osc freq
 - [√] LFO
+- [√] sequencer pitch stuff
+	- [√] put note into events
 - [ ] uber knob updates
 	- [ ] tweak style of rail when negative gain
 	- [ ] add something to show that rail extends past limit
@@ -30,6 +32,12 @@
 - [ ] fix connector placeholders z index
 - [ ] add extra gains and wave shapers to param input chain to allow fading between them when switching between center and offset
 - [ ] change room type drop down to a button select thing
+- [ ] sequencer upgrades
+	- [ ] portamento
+		- [ ] rise/fall separate knobs
+		- [ ] "always" toggle (see serum)
+		- [ ] custom portamento curve (use setValueCurveAtTime?)
+		- [ ] "scaled" toggle (see serum)
 
 
 

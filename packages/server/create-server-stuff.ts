@@ -21,7 +21,7 @@ import {
 	expPositionActions, makeExpPosition, makeExpNodeState, expConnectionsActions, ExpConnection,
 } from '@corgifm/common/redux'
 import {logger} from '@corgifm/common/logger'
-import {serverClientId} from '@corgifm/common/common-constants'
+import {serverClientId, maxPitchFrequency} from '@corgifm/common/common-constants'
 import {oscillatorFreqCurveFunctions, lfoFreqCurveFunctions} from '@corgifm/common/common-utils'
 
 const masterAudioOutput: IConnectable = findNodeInfo(ConnectionNodeType.audioOutput).stateSelector({} as any, '')
@@ -88,7 +88,7 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 
 	dispatchToRoom(expNodesActions.add(osc1))
 
-	dispatchToRoom(expNodesActions.audioParamChange(osc1.id, 'frequency', oscillatorFreqCurveFunctions.unCurve(440 / 10000)))
+	dispatchToRoom(expNodesActions.audioParamChange(osc1.id, 'frequency', oscillatorFreqCurveFunctions.unCurve(440 / maxPitchFrequency)))
 
 	dispatchToRoom(expPositionActions.add(
 		makeExpPosition({
