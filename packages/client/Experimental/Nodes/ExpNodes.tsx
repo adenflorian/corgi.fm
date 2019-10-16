@@ -10,6 +10,7 @@ import {ExpPanNode} from './ExpPanNode'
 import {EnvelopeNode} from './EnvelopeNode'
 import {SequencerNode} from './SequencerNode'
 import {ConstantExpNode} from './ExpConstantNode'
+import {MidiConverterNode} from './MidiConverterNode'
 
 type CorgiNodeConstructor = new (id: Id, context: AudioContext, preMasterLimiter: GainNode) => CorgiNode
 
@@ -25,4 +26,5 @@ export const typeClassMap: {readonly [key in ExpNodeType]: CorgiNodeConstructor}
 	sequencer: SequencerNode,
 	constant: ConstantExpNode,
 	lowFrequencyOscillator: LowFrequencyOscillatorExpNode,
+	midiConverter: MidiConverterNode,
 }

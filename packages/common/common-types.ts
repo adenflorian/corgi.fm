@@ -44,7 +44,7 @@ export type AnyFunction = (...args: any[]) => any
 export type Octave = number
 
 export type RequiredField<T, K extends keyof T> = {
-	[P in K]-?: T[P];
+	[P in K]-?: T[P]
 } & T
 
 export enum Header {
@@ -83,3 +83,23 @@ export interface IKeyColors {
 export type SignalRange = 'unipolar' | 'bipolar'
 
 export type ParamInputCentering = 'center' | 'offset'
+
+export interface SequencerEvent {
+	readonly gate: boolean
+	readonly beat: number
+	/** MIDI note number */
+	readonly note?: number
+}
+
+export const midiActions = {
+	gate: (time: number, gate: boolean) => ({
+		type: 'MIDI_GATE' as const,
+		time, gate,
+	} as const),
+	note: (time: number, gate: boolean, note: number, velocity: number) => ({
+		type: 'MIDI_NOTE' as const,
+		time, gate, note, velocity,
+	} as const),
+} as const
+
+export type MidiAction = ReturnType<typeof midiActions[keyof typeof midiActions]>

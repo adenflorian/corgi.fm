@@ -1,24 +1,14 @@
 /* eslint-disable no-empty-function */
 import {CssColor} from '@corgifm/common/shamu-color'
-import {toBeats, fromBeats, oscillatorFreqCurveFunctions} from '@corgifm/common/common-utils'
+import {toBeats, fromBeats} from '@corgifm/common/common-utils'
 import {preciseSubtract, preciseAdd, midiPrecision} from '@corgifm/common/midi-types'
-import {maxPitchFrequency} from '@corgifm/common/common-constants'
+import {SequencerEvent, midiActions} from '@corgifm/common/common-types'
 import {logger} from '../../client-logger'
-import {midiNoteToFrequency} from '../../WebAudio'
-import {adsrValueToString} from '../../client-constants'
 import {ExpCustomNumberParam, buildCustomNumberParamDesc} from '../ExpParams'
-import {ExpGateOutputPort} from '../ExpGatePorts'
+import {ExpMidiOutputPort} from '../ExpMidiPorts'
 import {CorgiNode} from '../CorgiNode'
-import {ExpNodeAudioOutputPort} from '../ExpPorts'
 
-interface GateEvent {
-	readonly gate: boolean
-	readonly beat: number
-	/** MIDI note number */
-	readonly note?: number
-}
-
-interface NextEvent extends GateEvent {
+interface NextEvent extends SequencerEvent {
 	readonly distanceFromMainCursor: number
 }
 
@@ -28,7 +18,7 @@ const myPrecision = 1000
 class EventStreamReader {
 	private _beatCursor = 0
 	private readonly _eventStream = new EventStream()
-	private _currentEvent: GateEvent
+	private _currentEvent: SequencerEvent
 
 	public constructor() {
 		this._currentEvent = this._eventStream.getNextEvent()
@@ -65,7 +55,7 @@ class EventStream {
 	public readonly beatLength = 16
 	private _currentIndex = -1
 	private _loops = 0
-	private readonly _events: readonly GateEvent[] = [
+	private readonly _events: readonly SequencerEvent[] = [
 		{gate: true, beat: 0, note: 60},
 		{gate: true, beat: 2, note: 63},
 		{gate: true, beat: 3, note: 67},
@@ -85,7 +75,7 @@ class EventStream {
 		{gate: false, beat: 15.5},
 	]
 
-	public getNextEvent(): GateEvent {
+	public getNextEvent(): SequencerEvent {
 		this._currentIndex++
 
 		if (this._currentIndex >= this._events.length) {
@@ -105,8 +95,7 @@ class EventStream {
 export class SequencerNode extends CorgiNode {
 	private _cursor: number
 	private readonly _eventStream: EventStreamReader
-	private readonly _gateOutputPort: ExpGateOutputPort
-	private readonly _constantSourceNode: ConstantSourceNode
+	private readonly _midiOutputPort: ExpMidiOutputPort
 	private _startSongTime: number
 
 	public constructor(
@@ -116,34 +105,30 @@ export class SequencerNode extends CorgiNode {
 		constantSourceNode.offset.setValueAtTime(0, 0)
 		constantSourceNode.start()
 
-		const gateOutputPort = new ExpGateOutputPort('output', 'output', () => this)
-		const pitchOutputPort = new ExpNodeAudioOutputPort('pitch', 'pitch', () => this, constantSourceNode, 'unipolar')
+		const midiOutputPort = new ExpMidiOutputPort('output', 'output', () => this)
 
 		super(id, audioContext, preMasterLimiter, {
-			ports: [gateOutputPort, pitchOutputPort],
+			ports: [midiOutputPort],
 			customNumberParams: new Map<Id, ExpCustomNumberParam>([
 				// TODO Store in private class field
 				buildCustomNumberParamDesc('tempo', 240, 0.001, 999.99, 3),
-				buildCustomNumberParamDesc('portamento', 0, 0, 8, 3, adsrValueToString),
 			]),
 		})
 
 		this._startSongTime = -1
 
-		this._gateOutputPort = gateOutputPort
+		this._midiOutputPort = midiOutputPort
 
 		this._cursor = 0
 		this._eventStream = new EventStreamReader()
 
 		// Make sure to add these to the dispose method!
-		this._constantSourceNode = constantSourceNode
 	}
 
 	public getColor(): string {return CssColor.green}
 	public getName() {return 'Sequencer'}
 
 	private get _tempo() {return this._customNumberParams.get('tempo')!.value}
-	private get _portamento() {return this._customNumberParams.get('portamento')!.value}
 
 	public render() {return this.getDebugView()}
 
@@ -175,12 +160,10 @@ export class SequencerNode extends CorgiNode {
 
 			if (eventStart.toString().length > 8) logger.warn('precision error oh no: ', {eventDistanceFromCursor, fromBeats_, songStartPlusCursor, eventStart})
 
-			this._gateOutputPort.sendGateSignal(event.gate, eventStart)
-
-			if (event.note !== undefined) {
-				const frequency = midiNoteToFrequency(event.note)
-				const normalized = oscillatorFreqCurveFunctions.unCurve(frequency / maxPitchFrequency)
-				this._constantSourceNode.offset.setTargetAtTime(normalized, eventStart, this._portamento)
+			if (event.note) {
+				this._midiOutputPort.sendMidiAction(midiActions.note(eventStart, event.gate, event.note, 1))
+			} else {
+				this._midiOutputPort.sendMidiAction(midiActions.gate(eventStart, event.gate))
 			}
 		})
 
@@ -191,13 +174,11 @@ export class SequencerNode extends CorgiNode {
 	}
 
 	protected _disable() {
-		this._gateOutputPort.sendGateSignal(false, this._startSongTime + this._cursor)
+		this._midiOutputPort.sendMidiAction(midiActions.gate(this._startSongTime + this._cursor, false))
 		this._startSongTime = -1
 		this._cursor = 0
 	}
 
 	protected _dispose() {
-		this._constantSourceNode.stop()
-		this._constantSourceNode.disconnect()
 	}
 }

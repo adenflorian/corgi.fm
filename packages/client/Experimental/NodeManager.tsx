@@ -7,13 +7,13 @@ import {typeClassMap} from './Nodes/ExpNodes'
 import {CorgiNode} from './CorgiNode'
 import {
 	ExpNodeAudioConnection, ExpNodeConnection, isAudioConnection,
-	ExpConnectionCallback, ExpGateConnection, isGateConnection,
+	ExpConnectionCallback, ExpMidiConnection, isMidiConnection,
 } from './ExpConnections'
 import {NumberParamChange} from './ExpParams'
 import {
 	isAudioOutputPort, isAudioInputPort, ExpPortCallback, ExpPortType, isAudioParamInputPort,
 } from './ExpPorts'
-import {isGateOutputPort, isGateInputPort} from './ExpGatePorts'
+import {isMidiOutputPort, isMidiInputPort} from './ExpMidiPorts'
 
 export const NodeManagerContext = React.createContext<null | NodeManagerContextValue>(null)
 
@@ -204,7 +204,7 @@ export class NodeManager {
 	public addConnection = (expConnection: IExpConnection) => {
 		switch (expConnection.type) {
 			case 'audio': return this._addAudioConnection(expConnection)
-			case 'gate': return this._addGateConnection(expConnection)
+			case 'midi': return this._addMidiConnection(expConnection)
 			default: return
 		}
 	}
@@ -230,7 +230,7 @@ export class NodeManager {
 		this._connections.set(connection.id, connection)
 	}
 
-	private readonly _addGateConnection = (expConnection: IExpConnection) => {
+	private readonly _addMidiConnection = (expConnection: IExpConnection) => {
 		// Get nodes
 		const source = this._nodes.get(expConnection.sourceId)
 		const target = this._nodes.get(expConnection.targetId)
@@ -242,12 +242,12 @@ export class NodeManager {
 		// Get and connect ports
 		const sourcePort = source.getPort(expConnection.sourcePort)
 		const targetPort = target.getPort(expConnection.targetPort)
-		if (!sourcePort || !targetPort) return logger.warn('[addGateConnection] 404 port not found: ', {node: this, sourcePort, targetPort})
-		if (!isGateOutputPort(sourcePort)) return logger.error('[addGateConnection] expected gate output port: ', {node: this, sourcePort, targetPort})
-		if (!isGateInputPort(targetPort)) return logger.error('[addGateConnection] expected gate input port: ', {node: this, sourcePort, targetPort})
+		if (!sourcePort || !targetPort) return logger.warn('[addMidiConnection] 404 port not found: ', {node: this, sourcePort, targetPort})
+		if (!isMidiOutputPort(sourcePort)) return logger.error('[addMidiConnection] expected midi output port: ', {node: this, sourcePort, targetPort})
+		if (!isMidiInputPort(targetPort)) return logger.error('[addMidiConnection] expected midi input port: ', {node: this, sourcePort, targetPort})
 
 		// Create connection
-		const connection = new ExpGateConnection(expConnection.id, sourcePort, targetPort)
+		const connection = new ExpMidiConnection(expConnection.id, sourcePort, targetPort)
 		this._connections.set(connection.id, connection)
 	}
 
@@ -272,7 +272,7 @@ export class NodeManager {
 
 		switch (connection.type) {
 			case 'audio': return this._changeAudioConnectionSource(connection, newSourceId, newSourcePort)
-			case 'gate': return this._changeGateConnectionSource(connection, newSourceId, newSourcePort)
+			case 'midi': return this._changeMidiConnectionSource(connection, newSourceId, newSourcePort)
 			default: return
 		}
 	}
@@ -297,10 +297,10 @@ export class NodeManager {
 		connection.changeSource(sourcePort)
 	}
 
-	private readonly _changeGateConnectionSource = (connection: ExpNodeConnection, newSourceId: Id, newSourcePort: Id) => {
-		if (!isGateConnection(connection)) {
+	private readonly _changeMidiConnectionSource = (connection: ExpNodeConnection, newSourceId: Id, newSourcePort: Id) => {
+		if (!isMidiConnection(connection)) {
 			return logger.error(
-				'[_changeGateConnectionSource] connection not instanceof ExpNodeGateConnection: ',
+				'[_changeMidiConnectionSource] connection not instanceof ExpNodeMidiConnection: ',
 				{connection, newSourceId, newSourcePort})
 		}
 
@@ -310,8 +310,8 @@ export class NodeManager {
 
 		// Get and connect ports
 		const sourcePort = source.getPort(newSourcePort)
-		if (!sourcePort) return logger.warn('[changeGateConnectionSource] 404 port not found: ', {node: this, sourcePort})
-		if (!isGateOutputPort(sourcePort)) return logger.error('[changeGateConnectionSource] expected audio output port: ', {node: this, sourcePort})
+		if (!sourcePort) return logger.warn('[changeMidiConnectionSource] 404 port not found: ', {node: this, sourcePort})
+		if (!isMidiOutputPort(sourcePort)) return logger.error('[changeMidiConnectionSource] expected audio output port: ', {node: this, sourcePort})
 
 		// Disconnect old source
 		connection.changeSource(sourcePort)
@@ -324,7 +324,7 @@ export class NodeManager {
 
 		switch (connection.type) {
 			case 'audio': return this._changeAudioConnectionTarget(connection, newTargetId, newTargetPort)
-			case 'gate': return this._changeGateConnectionTarget(connection, newTargetId, newTargetPort)
+			case 'midi': return this._changeMidiConnectionTarget(connection, newTargetId, newTargetPort)
 			default: return
 		}
 	}
@@ -349,10 +349,10 @@ export class NodeManager {
 		connection.changeTarget(targetPort)
 	}
 
-	private readonly _changeGateConnectionTarget = (connection: ExpNodeConnection, newTargetId: Id, newTargetPort: Id) => {
-		if (!isGateConnection(connection)) {
+	private readonly _changeMidiConnectionTarget = (connection: ExpNodeConnection, newTargetId: Id, newTargetPort: Id) => {
+		if (!isMidiConnection(connection)) {
 			return logger.error(
-				'[changeGateConnectionTarget] connection not instanceof ExpNodeGateConnection: ',
+				'[_changeMidiConnectionTarget] connection not instanceof ExpNodeMidiConnection: ',
 				{newTargetId, newTargetPort, connection})
 		}
 
@@ -362,8 +362,8 @@ export class NodeManager {
 
 		// Get and connect ports
 		const targetPort = target.getPort(newTargetPort)
-		if (!targetPort) return logger.warn('[changeGateConnectionTarget] 404 port not found: ', {node: this, targetPort})
-		if (!isGateInputPort(targetPort)) return logger.error('[changeGateConnectionTarget] expected audio input port: ', {node: this, targetPort})
+		if (!targetPort) return logger.warn('[_changeMidiConnectionTarget] 404 port not found: ', {node: this, targetPort})
+		if (!isMidiInputPort(targetPort)) return logger.error('[_changeMidiConnectionTarget] expected audio input port: ', {node: this, targetPort})
 
 		// Disconnect old target
 		connection.changeTarget(targetPort)

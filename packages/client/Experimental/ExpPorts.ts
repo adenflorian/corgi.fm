@@ -449,7 +449,7 @@ export class ExpNodeAudioOutputPort extends ExpNodeAudioPort {
 
 export type ExpPortSide = 'in' | 'out'
 
-export type ExpPortType = 'audio' | 'gate' | 'dummy'
+export type ExpPortType = 'audio' | 'midi' | 'dummy'
 
 export type ExpNodeAudioInputPorts = readonly ExpNodeAudioInputPort[]
 export type ExpNodeAudioOutputPorts = readonly ExpNodeAudioOutputPort[]

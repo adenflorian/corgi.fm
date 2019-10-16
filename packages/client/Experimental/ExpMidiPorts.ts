@@ -1,12 +1,13 @@
 /* eslint-disable no-empty-function */
 import {List} from 'immutable'
+import {MidiAction} from '@corgifm/common/common-types'
 import {logger} from '../client-logger'
 import {CorgiNode} from './CorgiNode'
-import {ExpGateConnections, ExpGateConnection} from './ExpConnections'
+import {ExpMidiConnections, ExpMidiConnection} from './ExpConnections'
 import {ExpPort, ExpPortSide} from './ExpPorts'
 
-export abstract class ExpGatePort extends ExpPort {
-	protected readonly _connections: ExpGateConnections = new Map<Id, ExpGateConnection>()
+export abstract class ExpMidiPort extends ExpPort {
+	protected readonly _connections: ExpMidiConnections = new Map<Id, ExpMidiConnection>()
 
 	public constructor(
 		public readonly id: Id,
@@ -14,58 +15,58 @@ export abstract class ExpGatePort extends ExpPort {
 		public readonly getNode: () => CorgiNode,
 		side: ExpPortSide,
 	) {
-		super(id, name, getNode, side, 'gate')
+		super(id, name, getNode, side, 'midi')
 	}
 
-	public connect = (connection: ExpGateConnection) => {
+	public connect = (connection: ExpMidiConnection) => {
 		this._connections.set(connection.id, connection)
 		this._connect(connection)
 		this.onUpdated()
 	}
 
-	public disconnect = (connection: ExpGateConnection) => {
+	public disconnect = (connection: ExpMidiConnection) => {
 		this._disconnect(connection)
 		this._connections.delete(connection.id)
 		this.onUpdated()
 	}
 
-	protected abstract _connect(connection: ExpGateConnection): void
-	protected abstract _disconnect(connection: ExpGateConnection): void
+	protected abstract _connect(connection: ExpMidiConnection): void
+	protected abstract _disconnect(connection: ExpMidiConnection): void
 }
 
-export type GateReceiver = (gate: boolean, time: number) => void
+export type MidiReceiver = (midiAction: MidiAction) => void
 
-export interface ExpGateInputPortArgs {
+export interface ExpMidiInputPortArgs {
 	readonly id: Id
 	readonly name: string
-	readonly destination: GateReceiver
+	readonly destination: MidiReceiver
 }
 
-export class ExpGateInputPort extends ExpGatePort {
+export class ExpMidiInputPort extends ExpMidiPort {
 	public constructor(
 		public readonly id: Id,
 		public readonly name: string,
 		public readonly getNode: () => CorgiNode,
-		public readonly destination: GateReceiver
+		public readonly destination: MidiReceiver
 	) {
 		super(id, name, getNode, 'in')
 	}
 
-	protected _connect = (connection: ExpGateConnection) => {}
+	protected _connect = (connection: ExpMidiConnection) => {}
 
-	protected _disconnect = (connection: ExpGateConnection) => {}
+	protected _disconnect = (connection: ExpMidiConnection) => {}
 
 	public detectFeedbackLoop(i: number, nodeIds: List<Id>): boolean {
 		return this.getNode().detectAudioFeedbackLoop(i, nodeIds)
 	}
 }
 
-export interface ExpGateOutputPortArgs {
+export interface ExpMidiOutputPortArgs {
 	readonly id: Id
 	readonly name: string
 }
 
-export class ExpGateOutputPort extends ExpGatePort {
+export class ExpMidiOutputPort extends ExpMidiPort {
 	public constructor(
 		public readonly id: Id,
 		public readonly name: string,
@@ -74,23 +75,23 @@ export class ExpGateOutputPort extends ExpGatePort {
 		super(id, name, getNode, 'out')
 	}
 
-	public sendGateSignal: GateReceiver = (...args) => {
+	public sendMidiAction: MidiReceiver = (...args) => {
 		this._connections.forEach(connection => {
 			connection.getTarget().destination(...args)
 		})
 	}
 
-	protected _connect = (connection: ExpGateConnection) => {
+	protected _connect = (connection: ExpMidiConnection) => {
 		// TODO ?
 		this.detectFeedbackLoop()
 	}
 
-	public changeTarget = (oldTarget: ExpGateInputPort, newTarget: ExpGateInputPort) => {
+	public changeTarget = (oldTarget: ExpMidiInputPort, newTarget: ExpMidiInputPort) => {
 		// TODO ?
 		this.detectFeedbackLoop()
 	}
 
-	protected _disconnect = (connection: ExpGateConnection) => {
+	protected _disconnect = (connection: ExpMidiConnection) => {
 	}
 
 	public detectFeedbackLoop(i = 0, nodeIds: List<Id> = List()): boolean {
@@ -110,13 +111,13 @@ export class ExpGateOutputPort extends ExpGatePort {
 		})
 	}
 }
-export type ExpGateInputPorts = readonly ExpGateInputPort[]
-export type ExpGateOutputPorts = readonly ExpGateOutputPort[]
+export type ExpMidiInputPorts = readonly ExpMidiInputPort[]
+export type ExpMidiOutputPorts = readonly ExpMidiOutputPort[]
 
-export function isGateOutputPort(val: unknown): val is ExpGateOutputPort {
-	return val instanceof ExpGateOutputPort
+export function isMidiOutputPort(val: unknown): val is ExpMidiOutputPort {
+	return val instanceof ExpMidiOutputPort
 }
 
-export function isGateInputPort(val: unknown): val is ExpGateInputPort {
-	return val instanceof ExpGateInputPort
+export function isMidiInputPort(val: unknown): val is ExpMidiInputPort {
+	return val instanceof ExpMidiInputPort
 }

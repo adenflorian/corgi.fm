@@ -1,7 +1,7 @@
 import {List} from 'immutable'
 import {ExpConnectionType} from '@corgifm/common/redux'
 import {ExpNodeAudioOutputPort, ExpNodeAudioInputPort, ExpPort} from './ExpPorts'
-import {ExpGateOutputPort, ExpGateInputPort} from './ExpGatePorts'
+import {ExpMidiOutputPort, ExpMidiInputPort} from './ExpMidiPorts'
 
 export type ExpConnectionCallback = (connection: ExpNodeConnectionReact) => void
 
@@ -88,13 +88,13 @@ export class ExpNodeAudioConnection extends ExpNodeConnection {
 }
 
 // Different connection types could have different functions for sending data across
-export class ExpGateConnection extends ExpNodeConnection {
+export class ExpMidiConnection extends ExpNodeConnection {
 	public constructor(
 		public readonly id: Id,
-		private _source: ExpGateOutputPort,
-		private _target: ExpGateInputPort,
+		private _source: ExpMidiOutputPort,
+		private _target: ExpMidiInputPort,
 	) {
-		super(id, 'gate')
+		super(id, 'midi')
 		this._source.connect(this)
 		this._target.connect(this)
 	}
@@ -110,13 +110,13 @@ export class ExpGateConnection extends ExpNodeConnection {
 		return this._target
 	}
 
-	public changeSource(newSource: ExpGateOutputPort) {
+	public changeSource(newSource: ExpMidiOutputPort) {
 		this._source.disconnect(this)
 		this._source = newSource
 		this._source.connect(this)
 	}
 
-	public changeTarget(newTarget: ExpGateInputPort) {
+	public changeTarget(newTarget: ExpMidiInputPort) {
 		const oldTarget = this._target
 		this._target = newTarget
 		oldTarget.disconnect(this)
@@ -136,12 +136,12 @@ export class ExpGateConnection extends ExpNodeConnection {
 
 export type ExpNodeConnections = Map<Id, ExpNodeConnection>
 export type ExpNodeAudioConnections = Map<Id, ExpNodeAudioConnection>
-export type ExpGateConnections = Map<Id, ExpGateConnection>
+export type ExpMidiConnections = Map<Id, ExpMidiConnection>
 
 export function isAudioConnection(val: unknown): val is ExpNodeAudioConnection {
 	return val instanceof ExpNodeAudioConnection
 }
 
-export function isGateConnection(val: unknown): val is ExpGateConnection {
-	return val instanceof ExpGateConnection
+export function isMidiConnection(val: unknown): val is ExpMidiConnection {
+	return val instanceof ExpMidiConnection
 }

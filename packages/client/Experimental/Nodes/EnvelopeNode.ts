@@ -1,6 +1,7 @@
 /* eslint-disable no-empty-function */
 import {CssColor} from '@corgifm/common/shamu-color'
 import {clamp} from '@corgifm/common/common-utils'
+import {MidiAction} from '@corgifm/common/common-types'
 import {logger} from '../../client-logger'
 import {
 	adsrValueToString, gainDecibelValueToString,
@@ -9,7 +10,7 @@ import {ExpNodeAudioOutputPort} from '../ExpPorts'
 import {
 	ExpCustomNumberParam, buildCustomNumberParamDesc,
 } from '../ExpParams'
-import {ExpGateInputPort} from '../ExpGatePorts'
+import {ExpMidiInputPort} from '../ExpMidiPorts'
 import {CorgiNode} from '../CorgiNode'
 
 const longTime = 999999999
@@ -35,10 +36,10 @@ export class EnvelopeNode extends CorgiNode {
 
 		const outputPort = new ExpNodeAudioOutputPort('output', 'output', () => this, outputGain, 'unipolar')
 
-		const gateInputPort = new ExpGateInputPort('input', 'input', () => this, (gate, time) => this.receiveGateSignal.bind(this)(gate, time))
+		const midiInputPort = new ExpMidiInputPort('input', 'input', () => this, midiAction => this.receiveMidiAction.bind(this)(midiAction))
 
 		super(id, audioContext, preMasterLimiter, {
-			ports: [outputPort, gateInputPort],
+			ports: [outputPort, midiInputPort],
 			customNumberParams: new Map<Id, ExpCustomNumberParam>([
 				// TODO Store reference in private class field
 				// buildCustomNumberParamDesc('attack', 0.0005, 0, 32, 3, adsrValueToString),
@@ -61,8 +62,8 @@ export class EnvelopeNode extends CorgiNode {
 		this._outputGain = outputGain
 
 		// this._intervalId = setInterval(() => {
-		// 	this.receiveGateSignal(true, this.audioContext.currentTime + 0.5)
-		// 	this.receiveGateSignal(false, this.audioContext.currentTime + 1.5)
+		// 	this.receiveMidiAction(true, this.audioContext.currentTime + 0.5)
+		// 	this.receiveMidiAction(false, this.audioContext.currentTime + 1.5)
 		// }, 1000)
 	}
 
@@ -72,19 +73,25 @@ export class EnvelopeNode extends CorgiNode {
 
 	public getName() {return 'Envelope'}
 
-	public receiveGateSignal(gate: boolean, startTime: number) {
+	public receiveMidiAction(midiAction: MidiAction) {
+		if (midiAction.gate !== undefined) {
+			this.handleGateEvent(midiAction.gate, midiAction.time)
+		}
+	}
+
+	public handleGateEvent(gate: boolean, startTime: number) {
 		if (startTime < this._lastGateTime) {
-			logger.error('receiveGateSignal startTime < this._lastGateTime:', {gate, startTime, last: this._lastGateTime, lastGate: this._lastGate})
+			logger.error('receiveMidiAction startTime < this._lastGateTime:', {gate, startTime, last: this._lastGateTime, lastGate: this._lastGate})
 		}
 		// This should be ok, it's like a retrigger
 		// if (gate === this._lastGate) {
-		// 	logger.error('receiveGateSignal gate === this._lastGate:', {gate, startTime, last: this._lastGateTime, lastGate: this._lastGate})
+		// 	logger.error('receiveMidiAction gate === this._lastGate:', {gate, startTime, last: this._lastGateTime, lastGate: this._lastGate})
 		// }
 		this._lastGateTime = startTime
 		this._lastGate = gate
 		// logger.log({startTime, currentTime: this._audioContext.currentTime/*, diff: startTime - this._audioContext.currentTime */})
 		if (startTime < this._audioContext.currentTime) {
-			logger.warn('[receiveGateSignal] startTime < this._audioContext.currentTime:', {startTime, currentTime: this._audioContext.currentTime})
+			logger.warn('[receiveMidiAction] startTime < this._audioContext.currentTime:', {startTime, currentTime: this._audioContext.currentTime})
 		}
 		const offset = this._constantSource.offset
 		if (gate) {
