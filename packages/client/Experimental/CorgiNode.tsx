@@ -40,7 +40,7 @@ export abstract class CorgiNode {
 	protected readonly _ports: ExpPorts
 	protected readonly _audioParams: ExpAudioParams
 	protected readonly _customNumberParams: ExpCustomNumberParams
-	private _enabled = true
+	protected _enabled = true
 	private _portsWithUpdates = [] as ExpPort[]
 
 	public constructor(

@@ -184,6 +184,7 @@ export class NodeManager {
 		const newNode = new typeClassMap[nodeState.type](nodeState.id, this._audioContext, this._preMasterLimiter)
 		this._nodes.set(newNode.id, newNode)
 		nodeState.audioParams.forEach((newValue, paramId) => newNode.onAudioParamChange(paramId, newValue))
+		nodeState.customNumberParams.forEach((newValue, paramId) => newNode.onCustomNumberParamChange(paramId, newValue))
 		newNode.setEnabled(nodeState.enabled)
 	}
 
