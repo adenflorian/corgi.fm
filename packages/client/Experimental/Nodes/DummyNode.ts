@@ -1,13 +1,13 @@
 /* eslint-disable no-empty-function */
 import {CssColor} from '@corgifm/common/shamu-color'
 import {logger} from '../../client-logger'
-import {CorgiNode} from '../CorgiNode'
+import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 
 export class DummyNode extends CorgiNode {
 	public constructor(
-		id: Id, audioContext: AudioContext, preMasterLimiter: GainNode,
+		corgiNodeArgs: CorgiNodeArgs,
 	) {
-		super(id, audioContext, preMasterLimiter)
+		super(corgiNodeArgs)
 	}
 
 	public getColor(): string {

@@ -32,12 +32,7 @@ export const createExpMiddleware: ExpMiddleware =
 
 			if (!nodeManager) {
 				logger.log('creating node manager')
-				singletonContext.setNodeManager(
-					new NodeManager(
-						singletonContext.getAudioContext(),
-						singletonContext.getPreMasterLimiter()
-					)
-				)
+				singletonContext.setNodeManager(new NodeManager(singletonContext))
 				nodeManager = singletonContext.getNodeManager()
 
 				if (!nodeManager) {
@@ -45,7 +40,7 @@ export const createExpMiddleware: ExpMiddleware =
 				}
 			}
 
-			foo(
+			after(
 				beforeState,
 				afterState,
 				action,
@@ -57,7 +52,24 @@ export const createExpMiddleware: ExpMiddleware =
 			)
 		}
 
-function foo(
+function before(
+	beforeState: IClientAppState,
+	action: ExpMiddlewareActions,
+	nodeManager: NodeManager,
+) {
+	switch (action.type) {
+		// case 'LOCAL_MIDI_KEY_PRESS':
+		// return nodeManager.onLocalMidiKeypress(action.midiNote, action.velocity)
+		// case 'LOCAL_MIDI_KEY_UP':
+		// 	return nodeManager.onLocalMidiKeyUp(action.midiNote)
+		// case 'LOCAL_MIDI_OCTAVE_CHANGE':
+		// 	return nodeManager.onLocalMidiOctaveChange(action., action.velocity)
+
+		default: return
+	}
+}
+
+function after(
 	beforeState: IClientAppState,
 	afterState: IClientAppState,
 	action: ExpMiddlewareActions,
@@ -155,12 +167,7 @@ export function createExpTupperware(
 
 		if (!nodeManager) {
 			logger.log('creating node manager')
-			singletonContext.setNodeManager(
-				new NodeManager(
-					singletonContext.getAudioContext(),
-					singletonContext.getPreMasterLimiter()
-				)
-			)
+			singletonContext.setNodeManager(new NodeManager(singletonContext))
 			nodeManager = singletonContext.getNodeManager()
 
 			if (!nodeManager) {

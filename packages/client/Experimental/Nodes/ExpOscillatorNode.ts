@@ -9,7 +9,7 @@ import {
 	ExpNodeAudioOutputPort, ExpNodeAudioParamInputPort,
 } from '../ExpPorts'
 import {ExpAudioParam} from '../ExpParams'
-import {CorgiNode} from '../CorgiNode'
+import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 import {ToggleGainChain} from './NodeHelpers/ToggleGainChain'
 
 export class OscillatorExpNode extends CorgiNode {
@@ -18,14 +18,14 @@ export class OscillatorExpNode extends CorgiNode {
 	private readonly _outputChain: ToggleGainChain
 
 	public constructor(
-		id: Id, audioContext: AudioContext, preMasterLimiter: GainNode,
+		corgiNodeArgs: CorgiNodeArgs,
 	) {
-		const oscillator = audioContext.createOscillator()
+		const oscillator = corgiNodeArgs.audioContext.createOscillator()
 		oscillator.type = 'sawtooth'
 		// oscillator.type = pickRandomArrayElement(['sawtooth', 'sine', 'triangle', 'square'])
 		oscillator.start()
-		// const merger = audioContext.createChannelMerger(2)
-		const outputChain = new ToggleGainChain(audioContext)
+		// const merger = corgiNodeArgs.audioContext.createChannelMerger(2)
+		const outputChain = new ToggleGainChain(corgiNodeArgs.audioContext)
 		// oscillator.connect(merger, 0, 0)
 		// oscillator.connect(merger, 0, 1)
 		// merger.connect(outputChain.input)
@@ -34,11 +34,11 @@ export class OscillatorExpNode extends CorgiNode {
 		const frequencyParam = new ExpAudioParam('frequency', oscillator.frequency, 440, maxPitchFrequency, 'unipolar', {valueString: filterValueToString, curveFunctions: oscillatorFreqCurveFunctions})
 		const detuneParam = new ExpAudioParam('detune', oscillator.detune, 0, 100, 'bipolar', {valueString: detuneValueToString})
 
-		const frequencyPort = new ExpNodeAudioParamInputPort(frequencyParam, () => this, audioContext, 'offset')
-		const detunePort = new ExpNodeAudioParamInputPort(detuneParam, () => this, audioContext, 'center')
+		const frequencyPort = new ExpNodeAudioParamInputPort(frequencyParam, () => this, corgiNodeArgs.audioContext, 'offset')
+		const detunePort = new ExpNodeAudioParamInputPort(detuneParam, () => this, corgiNodeArgs.audioContext, 'center')
 		const outputPort = new ExpNodeAudioOutputPort('output', 'output', () => this, outputChain.output, 'bipolar')
 
-		super(id, audioContext, preMasterLimiter, {
+		super(corgiNodeArgs, {
 			ports: [frequencyPort, detunePort, outputPort],
 			audioParams: [frequencyParam, detuneParam],
 		})

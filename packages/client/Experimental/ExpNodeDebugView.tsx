@@ -12,10 +12,11 @@ interface Props {
 	audioParams: ExpAudioParams
 	customNumberParams: ExpCustomNumberParams
 	ports: ExpPorts
+	children?: React.ReactNode
 }
 
 export const ExpNodeDebugView = hot(module)(React.memo(function _ExpNodeDebugView({
-	audioParams, customNumberParams,
+	audioParams, customNumberParams, children,
 	ports,
 }: Props) {
 	// logger.log('ExpNodeDebugView render')
@@ -64,6 +65,7 @@ export const ExpNodeDebugView = hot(module)(React.memo(function _ExpNodeDebugVie
 					))}
 				</div>
 			</div>
+			{children}
 		</div>
 	)
 }))

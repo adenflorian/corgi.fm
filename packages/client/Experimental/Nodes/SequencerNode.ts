@@ -6,7 +6,7 @@ import {SequencerEvent, midiActions} from '@corgifm/common/common-types'
 import {logger} from '../../client-logger'
 import {ExpCustomNumberParam, buildCustomNumberParamDesc} from '../ExpParams'
 import {ExpMidiOutputPort} from '../ExpMidiPorts'
-import {CorgiNode} from '../CorgiNode'
+import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 
 interface NextEvent extends SequencerEvent {
 	readonly distanceFromMainCursor: number
@@ -99,15 +99,11 @@ export class SequencerNode extends CorgiNode {
 	private _startSongTime: number
 
 	public constructor(
-		id: Id, audioContext: AudioContext, preMasterLimiter: GainNode,
+		corgiNodeArgs: CorgiNodeArgs,
 	) {
-		const constantSourceNode = audioContext.createConstantSource()
-		constantSourceNode.offset.setValueAtTime(0, 0)
-		constantSourceNode.start()
-
 		const midiOutputPort = new ExpMidiOutputPort('output', 'output', () => this)
 
-		super(id, audioContext, preMasterLimiter, {
+		super(corgiNodeArgs, {
 			ports: [midiOutputPort],
 			customNumberParams: new Map<Id, ExpCustomNumberParam>([
 				// TODO Store in private class field

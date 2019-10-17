@@ -27,6 +27,7 @@ import {setupWebsocketAndListeners, socket} from './websocket-listeners'
 import {SingletonContextImpl} from './SingletonContext'
 import {simpleGlobalClientState} from './SimpleGlobalClientState'
 import {createExpTupperware} from './Experimental/experimental-middleware'
+import {MidiService} from './ClientServices/MidiService'
 
 if (!isLocalDevClient()) initSentry()
 
@@ -109,6 +110,7 @@ async function setupAsync() {
 	const singletonContext = new SingletonContextImpl(
 		audioContext,
 		preMasterLimiter,
+		new MidiService(),
 	)
 
 	const store = configureStore(

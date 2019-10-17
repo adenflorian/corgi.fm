@@ -36,7 +36,8 @@
 		"soundbank-reverb": "^1.1.2",
 		"typesafe-actions": "^3.0.0",
 		"uuid": "^3.3.2",
-		"victor": "^1.1.0"
+		"victor": "^1.1.0",
+		"webmidi": "^2.5.1"
 	},
 	"devDependencies": {
 		"@types/file-saver": "^2.0.0",
@@ -50,6 +51,7 @@
 		"@types/socket.io-client": "^1.4.32",
 		"@types/uuid": "^3.4.4",
 		"@types/victor": "^1.1.0",
+		"@types/webmidi": "^2.0.3",
 		"less": "^3.0.4",
 		"parcel-bundler": "^1.12.3"
 	}

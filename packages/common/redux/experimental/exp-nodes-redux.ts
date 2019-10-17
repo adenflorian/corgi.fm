@@ -59,6 +59,7 @@ export type ExpNodesAction = ActionType<typeof expNodesActions>
 
 const defaultExpNodeState = {
 	id: 'dummyId' as Id,
+	ownerId: 'dummyOwnerId',
 	type: 'dummy' as ExpNodeType,
 	audioParams: Map<Id, number>(),
 	customNumberParams: Map<Id, number>(),
@@ -82,7 +83,7 @@ export type ExpNodeType = typeof expNodeTypes[number]
 
 export const expNodeTypes = [
 	'oscillator', 'filter', 'dummy', 'audioOutput', 'gain', 'pan', 'envelope',
-	'sequencer', 'constant', 'lowFrequencyOscillator', 'midiConverter',
+	'sequencer', 'constant', 'lowFrequencyOscillator', 'midiConverter', 'keyboard',
 ] as const
 
 const initialState = Map<Id, ExpNodeState>()

@@ -5,7 +5,7 @@ import {
 	ExpNodeAudioInputPort, ExpNodeAudioOutputPort, ExpNodeAudioParamInputPort,
 } from '../ExpPorts'
 import {ExpAudioParam} from '../ExpParams'
-import {CorgiNode} from '../CorgiNode'
+import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 import {DryWetChain} from './NodeHelpers/DryWetChain'
 
 export class ExpGainNode extends CorgiNode {
@@ -13,21 +13,21 @@ export class ExpGainNode extends CorgiNode {
 	private readonly _dryWetChain: DryWetChain
 
 	public constructor(
-		id: Id, audioContext: AudioContext, preMasterLimiter: GainNode,
+		corgiNodeArgs: CorgiNodeArgs,
 	) {
-		const gain = audioContext.createGain()
+		const gain = corgiNodeArgs.audioContext.createGain()
 		gain.gain.value = 0
 
-		const dryWetChain = new DryWetChain(audioContext, gain)
+		const dryWetChain = new DryWetChain(corgiNodeArgs.audioContext, gain)
 
 		const gainParam = new ExpAudioParam('gain', gain.gain, 1, 1, 'unipolar', {valueString: gainDecibelValueToString})
 
 		const inputPort = new ExpNodeAudioInputPort('input', 'input', () => this, dryWetChain.inputGain)
-		const gainPort = new ExpNodeAudioParamInputPort(gainParam, () => this, audioContext, 'offset')
+		const gainPort = new ExpNodeAudioParamInputPort(gainParam, () => this, corgiNodeArgs.audioContext, 'offset')
 
 		const outputPort = new ExpNodeAudioOutputPort('output', 'output', () => this, dryWetChain.outputGain, 'bipolar')
 
-		super(id, audioContext, preMasterLimiter, {
+		super(corgiNodeArgs, {
 			ports: [inputPort, gainPort, outputPort],
 			audioParams: [gainParam],
 			// new ExpAudioParam('gain', gain.gain, 1, 0, 10, 3.33, gainDecibelValueToString),

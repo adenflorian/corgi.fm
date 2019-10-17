@@ -1,0 +1,31 @@
+@import '../colors.less';
+@import '../AppCommon.less';
+
+@radius: 8px;
+
+.buttonSelect {
+	.option {
+		border: 2px solid #0000;
+		padding: 4px;
+		white-space: normal;
+		font-family: Questrial;
+
+		&.selected {
+			border: 2px solid currentColor;
+		}
+	}
+	&.vertical {
+		.option {
+			background-color: @panelGrayDark;
+
+			&:first-child {
+				border-top-left-radius: @radius;
+				border-top-right-radius: @radius;
+			}
+			&:last-child {
+				border-bottom-left-radius: @radius;
+				border-bottom-right-radius: @radius;
+			}
+		}
+	}
+}

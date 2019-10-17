@@ -1,6 +1,6 @@
 /* eslint-disable no-empty-function */
 import {ExpNodeAudioInputPort} from '../ExpPorts'
-import {CorgiNode} from '../CorgiNode'
+import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 import {ToggleGainChain} from './NodeHelpers/ToggleGainChain'
 
 export class AudioOutputExpNode extends CorgiNode {
@@ -8,15 +8,15 @@ export class AudioOutputExpNode extends CorgiNode {
 	private readonly _onWindowUnloadBound: () => void
 
 	public constructor(
-		id: Id, audioContext: AudioContext, preMasterLimiter: GainNode,
+		corgiNodeArgs: CorgiNodeArgs,
 	) {
-		const inputChain = new ToggleGainChain(audioContext, 0.5)
+		const inputChain = new ToggleGainChain(corgiNodeArgs.audioContext, 0.5)
 
 		const inputPort = new ExpNodeAudioInputPort('input', 'input', () => this, inputChain.input)
 
-		super(id, audioContext, preMasterLimiter, {ports: [inputPort]})
+		super(corgiNodeArgs, {ports: [inputPort]})
 
-		inputChain.output.connect(audioContext.destination)
+		inputChain.output.connect(this._audioContext.destination)
 		// inputGain.connect(this.preMasterLimiter)
 
 		// Make sure to add these to the dispose method!

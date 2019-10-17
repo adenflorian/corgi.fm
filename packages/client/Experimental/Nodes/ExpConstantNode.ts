@@ -4,26 +4,26 @@ import {
 	ExpNodeAudioOutputPort, ExpNodeAudioParamInputPort,
 } from '../ExpPorts'
 import {ExpAudioParam} from '../ExpParams'
-import {CorgiNode} from '../CorgiNode'
+import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 
 export class ConstantExpNode extends CorgiNode {
 	private readonly _constantSourceNode: ConstantSourceNode
 	private readonly _outputGain: GainNode
 
 	public constructor(
-		id: Id, audioContext: AudioContext, preMasterLimiter: GainNode,
+		corgiNodeArgs: CorgiNodeArgs,
 	) {
-		const constantSourceNode = audioContext.createConstantSource()
+		const constantSourceNode = corgiNodeArgs.audioContext.createConstantSource()
 		constantSourceNode.start()
-		const outputGain = audioContext.createGain()
+		const outputGain = corgiNodeArgs.audioContext.createGain()
 		constantSourceNode.connect(outputGain)
 
 		const offsetParam = new ExpAudioParam('offset', constantSourceNode.offset, 0, 1, 'bipolar')
 
-		const offsetPort = new ExpNodeAudioParamInputPort(offsetParam, () => this, audioContext, 'offset')
+		const offsetPort = new ExpNodeAudioParamInputPort(offsetParam, () => this, corgiNodeArgs.audioContext, 'offset')
 		const outputPort = new ExpNodeAudioOutputPort('output', 'output', () => this, outputGain, 'bipolar')
 
-		super(id, audioContext, preMasterLimiter, {
+		super(corgiNodeArgs, {
 			ports: [offsetPort, outputPort],
 			audioParams: [offsetParam],
 		})

@@ -1,5 +1,5 @@
 import {ExpNodeType} from '@corgifm/common/redux'
-import {CorgiNode} from '../CorgiNode'
+import {CorgiNodeConstructor} from '../CorgiNode'
 import {OscillatorExpNode} from './ExpOscillatorNode'
 import {LowFrequencyOscillatorExpNode} from './ExpLowFrequencyOscillatorNode'
 import {DummyNode} from './DummyNode'
@@ -11,8 +11,7 @@ import {EnvelopeNode} from './EnvelopeNode'
 import {SequencerNode} from './SequencerNode'
 import {ConstantExpNode} from './ExpConstantNode'
 import {MidiConverterNode} from './MidiConverterNode'
-
-type CorgiNodeConstructor = new (id: Id, context: AudioContext, preMasterLimiter: GainNode) => CorgiNode
+import {KeyboardNode} from './KeyboardNode'
 
 // Is there a way to use class decorators to create this map at runtime?
 export const typeClassMap: {readonly [key in ExpNodeType]: CorgiNodeConstructor} = {
@@ -27,4 +26,5 @@ export const typeClassMap: {readonly [key in ExpNodeType]: CorgiNodeConstructor}
 	constant: ConstantExpNode,
 	lowFrequencyOscillator: LowFrequencyOscillatorExpNode,
 	midiConverter: MidiConverterNode,
+	keyboard: KeyboardNode,
 }

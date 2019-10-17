@@ -5,6 +5,7 @@ import {CssColor} from '@corgifm/common/shamu-color'
 import {logger} from '../client-logger'
 import {ExpConnectorPlaceholders} from '../Connections/ExpConnectorPlaceholders'
 import {SimpleGraphNodeExp} from '../SimpleGraph/SimpleGraphNodeExp'
+import {SingletonContextImpl} from '../SingletonContext'
 import {ExpNodeDebugView} from './ExpNodeDebugView'
 import {
 	ExpPorts, ExpPort, isAudioOutputPort, isAudioParamInputPort,
@@ -34,6 +35,16 @@ export interface CorgiNodeOptions {
 	readonly customNumberParams?: ExpCustomNumberParams
 }
 
+export interface CorgiNodeArgs {
+	readonly id: Id
+	readonly ownerId: Id
+	readonly audioContext: AudioContext
+	readonly preMasterLimiter: GainNode
+	readonly singletonContext: SingletonContextImpl
+}
+
+export type CorgiNodeConstructor = new (args: CorgiNodeArgs) => CorgiNode
+
 export abstract class CorgiNode {
 	public readonly reactContext: ExpNodeContextValue
 	public readonly onColorChange: CorgiStringChangedEvent
@@ -42,18 +53,28 @@ export abstract class CorgiNode {
 	protected readonly _customNumberParams: ExpCustomNumberParams
 	protected _enabled = true
 	private _portsWithUpdates = [] as ExpPort[]
+	public readonly id: Id
+	public readonly ownerId: Id
+	protected readonly _audioContext: AudioContext
+	protected readonly _preMasterLimiter: GainNode
+	protected readonly _singletonContext: SingletonContextImpl
 
 	public constructor(
-		public readonly id: Id,
-		protected readonly _audioContext: AudioContext,
-		protected readonly _preMasterLimiter: GainNode,
+		args: CorgiNodeArgs,
 		options: CorgiNodeOptions = {},
 	) {
+		this.id = args.id
+		this.ownerId = args.ownerId
+		this._audioContext = args.audioContext
+		this._preMasterLimiter = args.preMasterLimiter
+		this._singletonContext = args.singletonContext
+
 		this.reactContext = this._makeExpNodeContextValue()
+		this.onColorChange = new CorgiStringChangedEvent(this.getColor())
+
 		this._ports = arrayToESMap(options.ports, 'id')
 		this._audioParams = arrayToESMap(options.audioParams, 'id')
 		this._customNumberParams = options.customNumberParams || new Map()
-		this.onColorChange = new CorgiStringChangedEvent(this.getColor())
 	}
 
 	// public abstract onNumberParamChange(paramChange: NumberParamChange): void
@@ -149,7 +170,7 @@ export abstract class CorgiNode {
 	protected abstract _enable(): void
 	protected abstract _disable(): void
 
-	protected getDebugView() {
+	protected getDebugView(children?: React.ReactNode) {
 		return (
 			<ExpNodeContext.Provider value={this.reactContext}>
 				<ExpConnectorPlaceholders />
@@ -158,7 +179,9 @@ export abstract class CorgiNode {
 						audioParams={this._audioParams}
 						customNumberParams={this._customNumberParams}
 						ports={this._ports}
-					/>
+					>
+						{children}
+					</ExpNodeDebugView>
 				</SimpleGraphNodeExp>
 			</ExpNodeContext.Provider>
 		)

@@ -6,7 +6,7 @@ import {
 	ExpNodeAudioInputPort, ExpNodeAudioOutputPort, ExpNodeAudioParamInputPort,
 } from '../ExpPorts'
 import {ExpAudioParam} from '../ExpParams'
-import {CorgiNode} from '../CorgiNode'
+import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 import {DryWetChain} from './NodeHelpers/DryWetChain'
 
 export class FilterNode extends CorgiNode {
@@ -14,12 +14,12 @@ export class FilterNode extends CorgiNode {
 	private readonly _dryWetChain: DryWetChain
 
 	public constructor(
-		id: Id, audioContext: AudioContext, preMasterLimiter: GainNode,
+		corgiNodeArgs: CorgiNodeArgs,
 	) {
-		const filter = audioContext.createBiquadFilter()
+		const filter = corgiNodeArgs.audioContext.createBiquadFilter()
 		filter.type = 'lowpass'
 
-		const dryWetChain = new DryWetChain(audioContext, filter)
+		const dryWetChain = new DryWetChain(corgiNodeArgs.audioContext, filter)
 
 		const frequencyParam = new ExpAudioParam('frequency', filter.frequency, 425, 20000, 'unipolar', {valueString: filterValueToString, curveFunctions: filterFreqCurveFunctions})
 		const detuneParam = new ExpAudioParam('detune', filter.detune, 0, 100, 'bipolar', {valueString: filterValueToString})
@@ -27,13 +27,13 @@ export class FilterNode extends CorgiNode {
 		const gainParam = new ExpAudioParam('gain', filter.gain, 0, 1, 'bipolar', {valueString: percentageValueString})
 
 		const inputPort = new ExpNodeAudioInputPort('input', 'input', () => this, dryWetChain.inputGain)
-		const frequencyPort = new ExpNodeAudioParamInputPort(frequencyParam, () => this, audioContext, 'center')
-		const detunePort = new ExpNodeAudioParamInputPort(detuneParam, () => this, audioContext, 'center')
-		const qPort = new ExpNodeAudioParamInputPort(qParam, () => this, audioContext, 'offset')
-		const gainPort = new ExpNodeAudioParamInputPort(gainParam, () => this, audioContext, 'offset')
+		const frequencyPort = new ExpNodeAudioParamInputPort(frequencyParam, () => this, corgiNodeArgs.audioContext, 'center')
+		const detunePort = new ExpNodeAudioParamInputPort(detuneParam, () => this, corgiNodeArgs.audioContext, 'center')
+		const qPort = new ExpNodeAudioParamInputPort(qParam, () => this, corgiNodeArgs.audioContext, 'offset')
+		const gainPort = new ExpNodeAudioParamInputPort(gainParam, () => this, corgiNodeArgs.audioContext, 'offset')
 		const outputPort = new ExpNodeAudioOutputPort('output', 'output', () => this, dryWetChain.outputGain, 'bipolar')
 
-		super(id, audioContext, preMasterLimiter, {
+		super(corgiNodeArgs, {
 			ports: [inputPort, frequencyPort, detunePort, qPort, gainPort, outputPort],
 			audioParams: [frequencyParam, detuneParam, qParam, gainParam],
 		})

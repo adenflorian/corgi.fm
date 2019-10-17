@@ -1,34 +1,10 @@
 import {
-	useLayoutEffect, useState, useRef,
+	useLayoutEffect, useState, useRef, useReducer,
 } from 'react'
-import {useNodeContext} from '../CorgiNode'
-import {ExpAudioParam} from '../ExpParams'
-import {CorgiNumberChangedEvent, CorgiStringChangedEvent, CorgiEnumChangedEvent, CorgiObjectChangedEvent} from '../CorgiEvents'
-
-// export function useAudioParam(paramId: Id) {
-// 	const nodeContext = useNodeContext()
-
-// 	const [value, setState] = useState(0)
-
-// 	const previousValue = useRef(0)
-
-// 	useLayoutEffect(() => {
-// 		function onNewValue(newValue: number) {
-// 			if (newValue === previousValue.current) {
-// 				return
-// 			}
-
-// 			previousValue.current = newValue
-// 			setState(newValue)
-// 		}
-
-// 		nodeContext.registerAudioParam(paramId, onNewValue)
-
-// 		return () => nodeContext.unregisterAudioParam(paramId, onNewValue)
-// 	}, [nodeContext, paramId])
-
-// 	return value
-// }
+import {
+	CorgiNumberChangedEvent, CorgiStringChangedEvent,
+	CorgiEnumChangedEvent, CorgiObjectChangedEvent,
+} from '../CorgiEvents'
 
 export function useNumberChangedEvent(event: CorgiNumberChangedEvent) {
 	const [value, setState] = useState(0)
@@ -100,19 +76,17 @@ export function useEnumChangedEvent<TEnum extends string>(initValue: TEnum, even
 	return value
 }
 
-export function useObjectChangedEvent<TObject extends object>(event: CorgiObjectChangedEvent<TObject>) {
-	const [value, setState] = useState<TObject>(event.currentValue)
+export function useObjectChangedEvent<TObject extends object | undefined>(event: CorgiObjectChangedEvent<TObject>) {
+	const [, forceRender] = useReducer(x => x + 1, 0)
 
-	const previousValue = useRef<TObject>(event.currentValue)
+	const value = useRef(event.currentValue)
 
 	useLayoutEffect(() => {
 		if (!event) return
 
 		function onNewValue(newValue: TObject) {
-			if (newValue === previousValue.current) return
-
-			previousValue.current = newValue
-			setState(newValue)
+			value.current = newValue
+			forceRender(0)
 		}
 
 		const initialValue = event.subscribe(onNewValue)
@@ -121,5 +95,5 @@ export function useObjectChangedEvent<TObject extends object>(event: CorgiObject
 		return () => event.unsubscribe(onNewValue)
 	}, [event])
 
-	return value
+	return value.current
 }

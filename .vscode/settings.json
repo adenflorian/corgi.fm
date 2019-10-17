@@ -34,6 +34,7 @@
         "ICVC",
         "Mailchimp",
         "Middlewares",
+        "Noteoff",
         "Passthrough",
         "Patreon",
         "Resizer",
@@ -115,6 +116,7 @@
         "monetization",
         "nginx",
         "noninteractive",
+        "noteon",
         "notroot",
         "nyan",
         "onmidimessage",
@@ -164,6 +166,7 @@
         "wasm",
         "wavetable",
         "webgl",
+        "webmidi",
         "worklet",
         "wucky"
     ],

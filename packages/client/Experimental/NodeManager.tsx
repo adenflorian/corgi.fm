@@ -3,6 +3,7 @@ import * as immutable from 'immutable'
 import {ExpNodeState, IExpConnection} from '@corgifm/common/redux'
 import {ParamInputCentering} from '@corgifm/common/common-types'
 import {logger} from '../client-logger'
+import {SingletonContextImpl} from '../SingletonContext'
 import {typeClassMap} from './Nodes/ExpNodes'
 import {CorgiNode} from './CorgiNode'
 import {
@@ -31,10 +32,11 @@ export class NodeManager {
 	private readonly _nodes = new Map<Id, CorgiNode>()
 	private readonly _connections = new Map<Id, ExpNodeConnection>()
 	public readonly reactContext: NodeManagerContextValue
+	private get _audioContext() {return this._singletonContext.getAudioContext()}
+	private get _preMasterLimiter() {return this._singletonContext.getPreMasterLimiter()}
 
 	public constructor(
-		private readonly _audioContext: AudioContext,
-		private readonly _preMasterLimiter: GainNode,
+		private readonly _singletonContext: SingletonContextImpl,
 	) {
 		this.reactContext = this._makeContextValue()
 	}
@@ -181,7 +183,13 @@ export class NodeManager {
 	}
 
 	public addNode = (nodeState: ExpNodeState) => {
-		const newNode = new typeClassMap[nodeState.type](nodeState.id, this._audioContext, this._preMasterLimiter)
+		const newNode = new typeClassMap[nodeState.type]({
+			id: nodeState.id,
+			ownerId: nodeState.ownerId,
+			audioContext: this._audioContext,
+			preMasterLimiter: this._preMasterLimiter,
+			singletonContext: this._singletonContext,
+		})
 		this._nodes.set(newNode.id, newNode)
 		nodeState.audioParams.forEach((newValue, paramId) => newNode.onAudioParamChange(paramId, newValue))
 		nodeState.customNumberParams.forEach((newValue, paramId) => newNode.onCustomNumberParamChange(paramId, newValue))
@@ -228,6 +236,14 @@ export class NodeManager {
 		// Create connection
 		const connection = new ExpNodeAudioConnection(expConnection.id, sourcePort, targetPort)
 		this._connections.set(connection.id, connection)
+		if (isAudioParamInputPort(targetPort)) {
+			if (expConnection.audioParamInput.centering) {
+				targetPort.setChainCentering(connection.id, expConnection.audioParamInput.centering)
+			}
+			if (expConnection.audioParamInput.gain) {
+				targetPort.setChainGain(connection.id, expConnection.audioParamInput.gain)
+			}
+		}
 	}
 
 	private readonly _addMidiConnection = (expConnection: IExpConnection) => {

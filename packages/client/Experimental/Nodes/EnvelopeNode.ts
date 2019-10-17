@@ -11,7 +11,7 @@ import {
 	ExpCustomNumberParam, buildCustomNumberParamDesc,
 } from '../ExpParams'
 import {ExpMidiInputPort} from '../ExpMidiPorts'
-import {CorgiNode} from '../CorgiNode'
+import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 
 const longTime = 999999999
 const minDistance = 0.00001
@@ -24,10 +24,10 @@ export class EnvelopeNode extends CorgiNode {
 	private _lastGate?: boolean
 
 	public constructor(
-		id: Id, audioContext: AudioContext, preMasterLimiter: GainNode,
+		corgiNodeArgs: CorgiNodeArgs,
 	) {
-		const constantSource = audioContext.createConstantSource()
-		const outputGain = audioContext.createGain()
+		const constantSource = corgiNodeArgs.audioContext.createConstantSource()
+		const outputGain = corgiNodeArgs.audioContext.createGain()
 
 		constantSource.offset.value = 0
 		constantSource.connect(outputGain)
@@ -38,7 +38,7 @@ export class EnvelopeNode extends CorgiNode {
 
 		const midiInputPort = new ExpMidiInputPort('input', 'input', () => this, midiAction => this.receiveMidiAction.bind(this)(midiAction))
 
-		super(id, audioContext, preMasterLimiter, {
+		super(corgiNodeArgs, {
 			ports: [outputPort, midiInputPort],
 			customNumberParams: new Map<Id, ExpCustomNumberParam>([
 				// TODO Store reference in private class field
