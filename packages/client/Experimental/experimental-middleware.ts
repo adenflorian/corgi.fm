@@ -5,7 +5,7 @@ import {
 	selectExpAllConnections, selectExpNodesState,
 	selectRoomInfoState, RoomType, ExpPositionAction,
 	ExpGhostConnectorAction, BroadcastAction, LocalAction,
-	expGhostConnectorActions, createLocalActiveExpGhostConnectionSelector,
+	expGhostConnectorActions, createLocalActiveExpGhostConnectionSelector, selectExpNode,
 } from '@corgifm/common/redux'
 import {SingletonContextImpl} from '../SingletonContext'
 import {logger} from '../client-logger'
@@ -98,7 +98,7 @@ function after(
 			return nodeManager.enableNode(action.nodeId, action.enabled)
 
 		case 'EXP_NODE_ADD':
-			return nodeManager.addNode(action.newNode)
+			return nodeManager.addNode(selectExpNode(afterState.room, action.newNode.id))
 
 		case 'EXP_NODE_DELETE':
 			return nodeManager.deleteNode(action.nodeId)

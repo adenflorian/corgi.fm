@@ -42,7 +42,7 @@ export function configureStore(
 				createSequencerMiddleware(getAllInstruments),
 				makeConnectionsClientMiddleware(getAllInstruments),
 				createExpMiddleware(singletonContext),
-				websocketSenderMiddleware,
+				websocketSenderMiddleware(singletonContext),
 			),
 		),
 	)

@@ -23,11 +23,11 @@ import {setupMidiSupport} from './setup-midi-support'
 import {getUsernameFromLocalStorage, saveUsernameToLocalStorage} from './username'
 import {SamplesManager} from './WebAudio/SamplesManager'
 import {setStoreForSchedulerVisual, startSchedulerVisualLoop} from './WebAudio/SchedulerVisual'
-import {setupWebsocketAndListeners, socket} from './websocket-listeners'
 import {SingletonContextImpl} from './SingletonContext'
 import {simpleGlobalClientState} from './SimpleGlobalClientState'
 import {createExpTupperware} from './Experimental/experimental-middleware'
 import {MidiService} from './ClientServices/MidiService'
+import {WebSocketService} from './ClientServices/WebSocketService'
 
 if (!isLocalDevClient()) initSentry()
 
@@ -111,6 +111,7 @@ async function setupAsync() {
 		audioContext,
 		preMasterLimiter,
 		new MidiService(),
+		new WebSocketService(),
 	)
 
 	const store = configureStore(
@@ -142,31 +143,24 @@ async function setupAsync() {
 	// (like NodeManagerRoot component)
 	renderApp(store, firebaseContextStuff, singletonContext)
 
-	setupWebsocketAndListeners(store)
+	singletonContext.webSocketService.connect(store)
 
 	const {ecsLoop, onSetActiveRoom} = getECSLoop(store, masterLimiter)
-
-	const fpsLoop = getFpsLoop()
-
-	const schedulerVisualLoop = startSchedulerVisualLoop()
-
-	const noteScannerLoop =
-		startNoteScanner(store, audioContext, getAllInstruments, getAllAudioNodes)
 
 	startMainRealTimeLoop([
 		() => {
 			const nodeManager = singletonContext.getNodeManager()
 			if (nodeManager) nodeManager.onTick()
 		},
-		noteScannerLoop,
+		startNoteScanner(store, audioContext, getAllInstruments, getAllAudioNodes),
 		ecsLoop,
-		schedulerVisualLoop,
-		fpsLoop,
+		startSchedulerVisualLoop(),
+		getFpsLoop(),
 	])
 
 	if (module.hot) {
 		module.hot.dispose(async () => {
-			socket.disconnect()
+			singletonContext.webSocketService.dispose()
 			await audioContext.close()
 		})
 	}
