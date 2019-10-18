@@ -1,7 +1,7 @@
 import {List, Map, Set} from 'immutable'
 import {Dispatch, Middleware} from 'redux'
 import uuid from 'uuid'
-import {MAX_MIDI_NOTE_NUMBER_127} from '@corgifm/common/common-constants'
+import {MAX_MIDI_NOTE_NUMBER_127, panelHeaderHeight} from '@corgifm/common/common-constants'
 import {ConnectionNodeType, IConnectable} from '@corgifm/common/common-types'
 import {applyOctave, createNodeId, clamp} from '@corgifm/common/common-utils'
 import {logger} from '@corgifm/common/logger'
@@ -45,6 +45,7 @@ import {
 	selectExpConnectionsWithSourceOrTargetIds, selectExpNode,
 	selectExpPosition, selectExpConnectionsWithSourceId,
 	selectExpConnectionsWithTargetIds,
+	makeExpNodeState, makeExpPosition, ExpConnection, selectExpPositionExtremes,
 } from '@corgifm/common/redux'
 import {pointersActions} from '@corgifm/common/redux/pointers-redux'
 import {makeMidiClipEvent, preciseModulus, preciseSubtract} from '@corgifm/common/midi-types'
@@ -888,7 +889,52 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 }
 
 function createLocalStuffExperimental(dispatch: Dispatch, state: IClientAppState) {
-	// TODO
+
+	const localClientId = selectLocalClientId(state)
+
+	const extremes = selectExpPositionExtremes(state.room)
+
+	const newY = extremes.bottomMost + panelHeaderHeight + 32
+
+	const keyboard = makeExpNodeState({
+		type: 'keyboard',
+		ownerId: localClientId,
+	})
+
+	dispatch(expNodesActions.add(keyboard))
+
+	dispatch(expPositionActions.add(
+		makeExpPosition({
+			id: keyboard.id,
+			ownerId: localClientId,
+			x: -800,
+			y: newY,
+		})))
+
+	const midiConverter = makeExpNodeState({
+		type: 'midiConverter',
+		ownerId: localClientId,
+	})
+
+	dispatch(expNodesActions.add(midiConverter))
+
+	dispatch(expPositionActions.add(
+		makeExpPosition({
+			id: midiConverter.id,
+			ownerId: localClientId,
+			x: -400,
+			y: newY,
+		})))
+
+	dispatch(expConnectionsActions.add(new ExpConnection(
+		keyboard.id,
+		keyboard.type,
+		midiConverter.id,
+		midiConverter.type,
+		'output',
+		'input',
+		'midi',
+	)))
 }
 
 function createLocalStuffNormal(dispatch: Dispatch, state: IClientAppState) {

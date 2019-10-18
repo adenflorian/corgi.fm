@@ -1,4 +1,6 @@
 # Experimental
+
+## Test Weekend 1
 - [√] create color changed event on corgi node
 - [√] uber arc should subscribe to that event to get its color
 - [√] extract dumb uber arc component
@@ -15,6 +17,29 @@
 - [√] LFO
 - [√] sequencer pitch stuff
 	- [√] put note into events
+- [ ] different background for experimental
+- [ ] KeyboardNode
+	- [ ] network it
+	- [ ] take computer keyboard input
+- [ ] BiquadFilterNode: state is bad, probably due to unstable filter caused by fast parameter automation.
+- [ ] fix connector placeholders z index
+- [ ] ArpNode
+- [ ] implement enable/disable for all nodes
+- [ ] prevent clicks when adding/removing connections
+- [ ] prevent clicks for enable/disable on all nodes
+- [ ] Delay node
+- [ ] Reverb node
+- [ ] WaveShaper distortion node
+- [ ] change room type drop down to a button select thing
+- [ ] enable room type selector for test
+
+## Test Weekend 2
+- [ ] midi converter upgrades
+	- [ ] portamento
+		- [ ] rise/fall separate knobs
+		- [ ] "always" toggle (see serum)
+		- [ ] custom portamento curve (use setValueCurveAtTime?)
+		- [ ] "scaled" toggle (see serum)
 - [ ] uber knob updates
 	- [ ] tweak style of rail when negative gain
 	- [ ] add something to show that rail extends past limit
@@ -25,25 +50,8 @@
 	- [ ] show source node name, gain, and centering value on hover of mod arc
 - [ ] Sequencer upgrades
 	- [ ] pitch
-	- [ ] note length
-- [ ] Delay node
-- [ ] Reverb node
-- [ ] BiquadFilterNode: state is bad, probably due to unstable filter caused by fast parameter automation.
-- [ ] fix connector placeholders z index
-- [ ] add extra gains and wave shapers to param input chain to allow fading between them when switching between center and offset
-- [ ] change room type drop down to a button select thing
-- [ ] sequencer upgrades
-	- [ ] portamento
-		- [ ] rise/fall separate knobs
-		- [ ] "always" toggle (see serum)
-		- [ ] custom portamento curve (use setValueCurveAtTime?)
-		- [ ] "scaled" toggle (see serum)
-
-
-
-
-
-
+	- [ ] velocity
+- [ ] add extra gains and wave shapers to param input chain to allow fading between them when switching between center and offset to prevent clicks
 
 
 

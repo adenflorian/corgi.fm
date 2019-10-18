@@ -309,3 +309,8 @@ export const defaultUnipolarCurveFunctions: CurveFunctions = {
 	unCurve: (x: number) => x,
 	waveShaperCurve: new Float32Array([0, 0, 1]),
 }
+
+// Other
+export function assertUnreachable(x: never): never {
+	throw new Error(`Didn't expect to get here`)
+}

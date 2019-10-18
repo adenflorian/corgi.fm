@@ -32,8 +32,11 @@ import {
 	selectPositionsByOwner, roomInfoAction, RoomType, selectRoomInfoState,
 	expNodesActions, selectExpNodesState, expPositionActions,
 	selectExpAllPositions, expConnectionsActions, selectExpAllConnections,
+	selectExpConnectionsWithTargetIds, selectExpConnectionsWithSourceOrTargetIds,
+	selectExpPositionsWithIds,
 } from '@corgifm/common/redux'
 import {WebSocketEvent} from '@corgifm/common/server-constants'
+import {assertUnreachable} from '@corgifm/common/common-utils'
 import {createServerStuff, loadServerStuff} from './create-server-stuff'
 import {DBStore} from './database/database'
 import {getServerVersion} from './server-version'
@@ -281,58 +284,118 @@ function onJoinRoom(io: Server, socket: Socket, room: string, serverStore: Store
 }
 
 /** When a user leaves a room, tell all the other room members to delete that user's things */
-function onLeaveRoom(io: Server, socket: Socket, roomToLeave: string, serverStore: Store<IServerState>) {
+function onLeaveRoom(io: Server, socket: Socket, roomToLeave: string, serverStore: Store<IServerState>): void {
 	const roomState = selectRoomStateByName(serverStore.getState(), roomToLeave)
+
 	if (!roomState) return logger.warn(`onLeaveRoom-couldn't find room state: roomToLeave: ${roomToLeave}`)
-	const clientId = selectClientBySocketId(serverStore.getState(), socket.id).id
 
 	serverStore.dispatch(userLeftRoom(roomToLeave, Date.now()))
 
-	{
-		const nodesOwnedByClient = selectPositionsByOwner(roomState, clientId)
+	const clientId = selectClientBySocketId(serverStore.getState(), socket.id).id
+	const roomType = selectRoomInfoState(roomState).roomType
 
-		// filter out nodes that we don't want to delete
-
-		const keyboardIds = nodesOwnedByClient
-			.filter(x => x.targetType === ConnectionNodeType.virtualKeyboard)
-			.keySeq()
-
-		const otherNodes = nodesOwnedByClient
-			.filter(x => x.targetType !== ConnectionNodeType.virtualKeyboard)
-			.filter(x => {
-				const incomingConnections = selectConnectionsWithTargetIds(roomState, x.id)
-
-				// return true if it has no incoming connections
-				if (incomingConnections.count() === 0) return true
-
-				// return true if all incoming connections are from owner's keyboards
-				if (incomingConnections.every(y => keyboardIds.includes(y.sourceId))) return true
-
-				return false
-			})
-
-		const nodeIdsToDelete = otherNodes.keySeq().concat(keyboardIds).toArray()
-
-		const connectionIdsToDelete = selectConnectionsWithSourceOrTargetIds(roomState, nodeIdsToDelete)
-			.map(x => x.id)
-			.toList()
-		const deleteConnectionsAction = connectionsActions.delete(connectionIdsToDelete)
-		serverStore.dispatch(createRoomAction(deleteConnectionsAction, roomToLeave))
-		io.to(roomToLeave).emit(WebSocketEvent.broadcast, deleteConnectionsAction)
-
-		const positionIdsToDelete = selectPositionsWithIds(roomState, nodeIdsToDelete).map(x => x.id)
-		const deletePositionsAction = deletePositions(positionIdsToDelete)
-		serverStore.dispatch(createRoomAction(deletePositionsAction, roomToLeave))
-		io.to(roomToLeave).emit(WebSocketEvent.broadcast, deletePositionsAction)
-
-		const deleteNodes = deleteThingsAny(nodeIdsToDelete)
-		serverStore.dispatch(createRoomAction(deleteNodes, roomToLeave))
-		io.to(roomToLeave).emit(WebSocketEvent.broadcast, deleteNodes)
-
-		const deletePointer = pointersActions.delete(clientId)
-		serverStore.dispatch(createRoomAction(deletePointer, roomToLeave))
-		io.to(roomToLeave).emit(WebSocketEvent.broadcast, deletePointer)
+	switch (roomType) {
+		case RoomType.Normal: onLeaveRoomNormal(io, clientId, roomToLeave, serverStore, roomState)
+			break
+		case RoomType.Experimental: onLeaveRoomExperimental(io, clientId, roomToLeave, serverStore, roomState)
+			break
+		default: assertUnreachable(roomType)
 	}
+
+	onLeaveRoomGeneric(io, clientId, roomToLeave, serverStore, roomState)
+}
+
+/** When a user leaves a room, tell all the other room members to delete that user's things */
+function onLeaveRoomNormal(io: Server, clientId: Id, roomToLeave: string, serverStore: Store<IServerState>, roomState: IClientRoomState) {
+	const nodesOwnedByClient = selectPositionsByOwner(roomState, clientId)
+
+	// filter out nodes that we don't want to delete
+
+	const keyboardIds = nodesOwnedByClient
+		.filter(x => x.targetType === ConnectionNodeType.virtualKeyboard)
+		.keySeq()
+
+	const otherNodes = nodesOwnedByClient
+		.filter(x => x.targetType !== ConnectionNodeType.virtualKeyboard)
+		.filter(x => {
+			const incomingConnections = selectConnectionsWithTargetIds(roomState, x.id)
+
+			// return true if it has no incoming connections
+			if (incomingConnections.count() === 0) return true
+
+			// return true if all incoming connections are from owner's keyboards
+			if (incomingConnections.every(y => keyboardIds.includes(y.sourceId))) return true
+
+			return false
+		})
+
+	const nodeIdsToDelete = otherNodes.keySeq().concat(keyboardIds).toArray()
+
+	const connectionIdsToDelete = selectConnectionsWithSourceOrTargetIds(roomState, nodeIdsToDelete)
+		.map(x => x.id)
+		.toList()
+	const deleteConnectionsAction = connectionsActions.delete(connectionIdsToDelete)
+	serverStore.dispatch(createRoomAction(deleteConnectionsAction, roomToLeave))
+	io.to(roomToLeave).emit(WebSocketEvent.broadcast, deleteConnectionsAction)
+
+	const positionIdsToDelete = selectPositionsWithIds(roomState, nodeIdsToDelete).map(x => x.id)
+	const deletePositionsAction = deletePositions(positionIdsToDelete)
+	serverStore.dispatch(createRoomAction(deletePositionsAction, roomToLeave))
+	io.to(roomToLeave).emit(WebSocketEvent.broadcast, deletePositionsAction)
+
+	const deleteNodes = deleteThingsAny(nodeIdsToDelete)
+	serverStore.dispatch(createRoomAction(deleteNodes, roomToLeave))
+	io.to(roomToLeave).emit(WebSocketEvent.broadcast, deleteNodes)
+}
+
+/** When a user leaves a room, tell all the other room members to delete that user's things */
+function onLeaveRoomExperimental(io: Server, clientId: Id, roomToLeave: string, serverStore: Store<IServerState>, roomState: IClientRoomState) {
+	const nodesOwnedByClient = selectExpNodesState(roomState).filter(x => x.ownerId === clientId)
+
+	// filter out nodes that we don't want to delete
+
+	const keyboardIds = nodesOwnedByClient
+		.filter(x => x.type === 'keyboard')
+		.keySeq()
+
+	const otherNodes = nodesOwnedByClient
+		.filter(x => x.type !== 'keyboard')
+		.filter(x => {
+			const incomingConnections = selectExpConnectionsWithTargetIds(roomState, x.id)
+
+			// return true if it has no incoming connections
+			if (incomingConnections.count() === 0) return true
+
+			// return true if all incoming connections are from owner's keyboards
+			if (incomingConnections.every(y => keyboardIds.includes(y.sourceId))) return true
+
+			return false
+		})
+
+	const nodeIdsToDelete = otherNodes.keySeq().concat(keyboardIds).toArray()
+
+	const connectionIdsToDelete = selectExpConnectionsWithSourceOrTargetIds(roomState, nodeIdsToDelete)
+		.map(x => x.id)
+		.toList()
+	const deleteConnectionsAction = expConnectionsActions.delete(connectionIdsToDelete)
+	serverStore.dispatch(createRoomAction(deleteConnectionsAction, roomToLeave))
+	io.to(roomToLeave).emit(WebSocketEvent.broadcast, deleteConnectionsAction)
+
+	const positionIdsToDelete = selectExpPositionsWithIds(roomState, nodeIdsToDelete).map(x => x.id)
+	const deletePositionsAction = expPositionActions.delete(positionIdsToDelete)
+	serverStore.dispatch(createRoomAction(deletePositionsAction, roomToLeave))
+	io.to(roomToLeave).emit(WebSocketEvent.broadcast, deletePositionsAction)
+
+	const deleteNodes = expNodesActions.deleteMany(nodeIdsToDelete)
+	serverStore.dispatch(createRoomAction(deleteNodes, roomToLeave))
+	io.to(roomToLeave).emit(WebSocketEvent.broadcast, deleteNodes)
+}
+
+/** When a user leaves a room, tell all the other room members to delete that user's things */
+function onLeaveRoomGeneric(io: Server, clientId: Id, roomToLeave: string, serverStore: Store<IServerState>, roomState: IClientRoomState) {
+	const deletePointer = pointersActions.delete(clientId)
+	serverStore.dispatch(createRoomAction(deletePointer, roomToLeave))
+	io.to(roomToLeave).emit(WebSocketEvent.broadcast, deletePointer)
 
 	const deleteRoomMemberAction = deleteRoomMember(clientId)
 	serverStore.dispatch(createRoomAction(deleteRoomMemberAction, roomToLeave))
