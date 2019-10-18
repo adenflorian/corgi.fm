@@ -353,7 +353,8 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 
 		this._inputChains.set(connectionId, newChain)
 
-		this.onChainsChanged.invokeImmediately(this._inputChains)
+		// Next frame because connection hasn't been added to connections collection yet
+		this.onChainsChanged.invokeNextFrame(this._inputChains)
 
 		this._updateLiveRange()
 
