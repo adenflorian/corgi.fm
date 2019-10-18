@@ -3,10 +3,7 @@ import {List} from 'immutable'
 import {clamp, arrayToESMap, clampPolarized} from '@corgifm/common/common-utils'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {logger} from '../client-logger'
-import {ExpConnectorPlaceholders} from '../Connections/ExpConnectorPlaceholders'
-import {SimpleGraphNodeExp} from '../SimpleGraph/SimpleGraphNodeExp'
 import {SingletonContextImpl} from '../SingletonContext'
-import {ExpNodeDebugView} from './ExpNodeDebugView'
 import {
 	ExpPorts, ExpPort, isAudioOutputPort, isAudioParamInputPort,
 } from './ExpPorts'
@@ -15,7 +12,7 @@ import {
 	ExpNumberParamCallback, ExpAudioParam,
 } from './ExpParams'
 import {CorgiStringChangedEvent} from './CorgiEvents'
-import './ExpNodes.less'
+import {CorgiNodeView} from './CorgiNodeView'
 
 export const ExpNodeContext = React.createContext<null | ExpNodeContextValue>(null)
 
@@ -172,18 +169,14 @@ export abstract class CorgiNode {
 
 	protected getDebugView(children?: React.ReactNode) {
 		return (
-			<ExpNodeContext.Provider value={this.reactContext}>
-				<ExpConnectorPlaceholders />
-				<SimpleGraphNodeExp>
-					<ExpNodeDebugView
-						audioParams={this._audioParams}
-						customNumberParams={this._customNumberParams}
-						ports={this._ports}
-					>
-						{children}
-					</ExpNodeDebugView>
-				</SimpleGraphNodeExp>
-			</ExpNodeContext.Provider>
+			<CorgiNodeView
+				audioParams={this._audioParams}
+				context={this.reactContext}
+				customNumberParams={this._customNumberParams}
+				ports={this._ports}
+			>
+				{children}
+			</CorgiNodeView>
 		)
 	}
 

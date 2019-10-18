@@ -1,5 +1,6 @@
 import React from 'react'
 import {useSelector} from 'react-redux'
+import {hot} from 'react-hot-loader'
 import {
 	IClientAppState, selectExpAllPositions,
 } from '@corgifm/common/redux'
@@ -9,7 +10,7 @@ import {logger} from '../client-logger'
 import {ConnectedExpGhostConnectionsView} from '../Connections/ExpGhostConnections'
 import {NodeManagerContext} from './NodeManager'
 
-export const NodeManagerRoot = () => {
+export const NodeManagerRoot = hot(module)(React.memo(() => {
 	const positionIds = useSelector((state: IClientAppState) => selectExpAllPositions(state.room))
 
 	const singletonContext = useSingletonContext()
@@ -35,4 +36,4 @@ export const NodeManagerRoot = () => {
 			</div>
 		</NodeManagerContext.Provider>
 	)
-}
+}))

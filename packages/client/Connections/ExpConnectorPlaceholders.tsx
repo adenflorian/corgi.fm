@@ -1,5 +1,6 @@
 import React, {Fragment} from 'react'
 import {useSelector} from 'react-redux'
+import {hot} from 'react-hot-loader'
 import {
 	ActiveGhostConnectorSourceOrTarget,
 	createExpPositionSelector,
@@ -7,7 +8,7 @@ import {
 import {useNodeContext} from '../Experimental/CorgiNode'
 import {ExpConnectorPlaceholder} from './ExpConnectorPlaceholder'
 
-export const ExpConnectorPlaceholders = () => {
+export const ExpConnectorPlaceholders = hot(module)(React.memo(function _ExpConnectorPlaceholders() {
 	const nodeContext = useNodeContext()
 	const parentId = nodeContext.id
 	const ports = [...nodeContext.getPorts()].map(x => x[1])
@@ -45,4 +46,4 @@ export const ExpConnectorPlaceholders = () => {
 			})}
 		</Fragment>
 	)
-}
+}))

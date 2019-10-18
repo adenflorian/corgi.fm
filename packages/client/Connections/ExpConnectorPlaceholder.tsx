@@ -1,5 +1,6 @@
 import React, {useState, useCallback} from 'react'
 import {useDispatch, useSelector} from 'react-redux'
+import {hot} from 'react-hot-loader'
 import {
 	ActiveGhostConnectorSourceOrTarget, localActions,
 	expGhostConnectorActions, ExpGhostConnection,
@@ -22,7 +23,7 @@ interface Props {
 
 type AllProps = Props
 
-export const ExpConnectorPlaceholder = React.memo(
+export const ExpConnectorPlaceholder = hot(module)(React.memo(
 	function _ExpConnectorPlaceholder({
 		sourceOrTarget, parentX, parentY, nodeId, portId, parentWidth,
 	}: AllProps) {
@@ -100,4 +101,4 @@ export const ExpConnectorPlaceholder = React.memo(
 			</div>
 		)
 	},
-)
+))

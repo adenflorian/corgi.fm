@@ -1,16 +1,14 @@
 /* eslint-disable no-empty-function */
-import React, {useCallback, useMemo} from 'react'
+import React from 'react'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {LocalAction} from '@corgifm/common/redux'
 import {Input, InputEventNoteon, InputEventNoteoff} from 'webmidi'
 import {midiActions} from '@corgifm/common/common-types'
-import {ButtonSelect, ButtonSelectOption} from '../../ButtonSelect/ButtonSelect'
 import {ExpCustomNumberParam} from '../ExpParams'
 import {ExpMidiOutputPort} from '../ExpMidiPorts'
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
-import {useObjectChangedEvent} from '../hooks/useCorgiEvent'
-import {useSingletonContext} from '../../SingletonContext'
 import {CorgiObjectChangedEvent} from '../CorgiEvents'
+import {KeyboardNodeExtra} from './KeyboardNodeView'
 
 export class KeyboardNode extends CorgiNode {
 	private readonly _midiOutputPort: ExpMidiOutputPort
@@ -43,7 +41,11 @@ export class KeyboardNode extends CorgiNode {
 	public render() {
 		return this.getDebugView(
 			<div>
-				<KeyboardNodeExtra onInputSelected={this._subscribeToInputBound} inputChangedEvent={this._onInputChanged} />
+				<KeyboardNodeExtra
+					onInputSelected={this._subscribeToInputBound}
+					inputChangedEvent={this._onInputChanged}
+					ownerId={this.ownerId}
+				/>
 			</div>
 		)
 	}
@@ -95,36 +97,3 @@ export class KeyboardNode extends CorgiNode {
 		this._unsubscribeFromCurrentInput()
 	}
 }
-
-interface KeyboardNodeExtraProps {
-	readonly onInputSelected: (input: Input) => void
-	readonly inputChangedEvent: CorgiObjectChangedEvent<Input | undefined>
-}
-
-const KeyboardNodeExtra = React.memo(function _KeyboardNodeExtra({
-	onInputSelected, inputChangedEvent,
-}: KeyboardNodeExtraProps) {
-	const midiService = useSingletonContext().midiService
-	const midiInputs = useObjectChangedEvent(midiService.onInputsChanged)
-	const midiInputOptions = useMemo(() => midiInputs.map((input): ButtonSelectOption<Input> => ({
-		label: input.name,
-		value: input.id,
-		object: input,
-	})), [midiInputs])
-
-	const onNewSelection = useCallback((newSelection: ButtonSelectOption<Input>) => {
-		onInputSelected(newSelection.object)
-	}, [onInputSelected])
-
-	const selectedInput = useObjectChangedEvent(inputChangedEvent)
-
-	return (
-		<div>
-			<ButtonSelect
-				options={midiInputOptions}
-				onNewSelection={onNewSelection}
-				selectedOption={midiInputOptions.find(x => x.object === selectedInput)}
-			/>
-		</div>
-	)
-})
