@@ -1,9 +1,9 @@
 /* eslint-disable no-empty-function */
 import React from 'react'
 import {CssColor} from '@corgifm/common/shamu-color'
-import {LocalAction} from '@corgifm/common/redux'
 import {Input, InputEventNoteon, InputEventNoteoff} from 'webmidi'
 import {midiActions} from '@corgifm/common/common-types'
+import {nodeToNodeActions, NodeToNodeAction} from '@corgifm/common/server-constants'
 import {ExpCustomNumberParam} from '../ExpParams'
 import {ExpMidiOutputPort} from '../ExpMidiPorts'
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
@@ -74,17 +74,26 @@ export class KeyboardNode extends CorgiNode {
 	private readonly _onNoteOnBound: (input: InputEventNoteon) => void
 	private _onNoteOn(event: InputEventNoteon) {
 		if (!this._enabled) return
-		this._midiOutputPort.sendMidiAction(midiActions.note(this._audioContext.currentTime, true, event.note.number, event.velocity))
+		const midiAction = midiActions.note(this._audioContext.currentTime, true, event.note.number, event.velocity)
+		this._midiOutputPort.sendMidiAction(midiAction)
+		this._singletonContext.webSocketService.nodeToNode(nodeToNodeActions.midi(this.id, midiAction))
 	}
 
 	private readonly _onNoteOffBound: (input: InputEventNoteoff) => void
 	private _onNoteOff(event: InputEventNoteoff) {
 		if (!this._enabled) return
-		this._midiOutputPort.sendMidiAction(midiActions.note(this._audioContext.currentTime, false, event.note.number, event.velocity))
+		const midiAction = midiActions.note(this._audioContext.currentTime, false, event.note.number, event.velocity)
+		this._midiOutputPort.sendMidiAction(midiAction)
+		this._singletonContext.webSocketService.nodeToNode(nodeToNodeActions.midi(this.id, midiAction))
 	}
 
-	public onReduxMidiAction(action: LocalAction) {
-
+	public onNodeToNode(action: NodeToNodeAction) {
+		if (action.type === 'NODE_TO_NODE_MIDI') {
+			this._midiOutputPort.sendMidiAction({
+				...action.midiAction,
+				time: this._audioContext.currentTime,
+			})
+		}
 	}
 
 	protected _enable() {

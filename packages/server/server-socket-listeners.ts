@@ -35,7 +35,7 @@ import {
 	selectExpConnectionsWithTargetIds, selectExpConnectionsWithSourceOrTargetIds,
 	selectExpPositionsWithIds,
 } from '@corgifm/common/redux'
-import {WebSocketEvent} from '@corgifm/common/server-constants'
+import {WebSocketEvent, NodeToNodeAction} from '@corgifm/common/server-constants'
 import {assertUnreachable} from '@corgifm/common/common-utils'
 import {createServerStuff, loadServerStuff} from './create-server-stuff'
 import {DBStore} from './database/database'
@@ -95,6 +95,11 @@ export function setupServerWebSocketListeners(
 
 			// TODO Merge with broadcast event above
 			socket.on(WebSocketEvent.serverAction, handleSocketHandlerError(handleServerAction))
+
+			socket.on(WebSocketEvent.nodeToNode, handleSocketHandlerError((action: NodeToNodeAction) => {
+				const currentRoom = getRoom(socket)
+				socket.broadcast.to(currentRoom).emit(WebSocketEvent.nodeToNode, action)
+			}))
 
 			socket.on('disconnect', handleSocketHandlerError(handleDisconnect))
 		}

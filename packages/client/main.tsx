@@ -143,7 +143,7 @@ async function setupAsync() {
 	// (like NodeManagerRoot component)
 	renderApp(store, firebaseContextStuff, singletonContext)
 
-	singletonContext.webSocketService.connect(store)
+	singletonContext.webSocketService.connect(store, singletonContext)
 
 	const {ecsLoop, onSetActiveRoom} = getECSLoop(store, masterLimiter)
 

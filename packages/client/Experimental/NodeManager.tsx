@@ -2,6 +2,7 @@ import React, {Fragment, useContext} from 'react'
 import * as immutable from 'immutable'
 import {ExpNodeState, IExpConnection} from '@corgifm/common/redux'
 import {ParamInputCentering} from '@corgifm/common/common-types'
+import {NodeToNodeAction} from '@corgifm/common/server-constants'
 import {logger} from '../client-logger'
 import {SingletonContextImpl} from '../SingletonContext'
 import {typeClassMap} from './Nodes/ExpNodes'
@@ -111,6 +112,14 @@ export class NodeManager {
 				{node.render()}
 			</Fragment>
 		)
+	}
+
+	public onNodeToNode(action: NodeToNodeAction) {
+		const node = this._nodes.get(action.nodeId)
+
+		if (!node) return logger.warn('[onNodeToNode] 404 node not found: ', {action, node})
+
+		node.onNodeToNode(action)
 	}
 
 	public getPortType(nodeId: Id, portId: Id): ExpPortType | void {

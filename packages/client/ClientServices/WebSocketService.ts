@@ -5,12 +5,13 @@ import {
 	BroadcastAction, clientInfoActions, getActionsBlacklist, maxUsernameLength,
 	selectActiveRoom, commonActions, setInfo, setSocketId, BROADCASTER_ACTION,
 } from '@corgifm/common/redux'
-import {WebSocketEvent} from '@corgifm/common/server-constants'
+import {WebSocketEvent, NodeToNodeAction} from '@corgifm/common/server-constants'
 import {roomNameCleaner} from '@corgifm/common/common-utils'
 import {eventClientServerVersionMismatch} from '../analytics/analytics'
 import {getCurrentClientVersion} from '../client-utils'
 import {isLocalDevClient} from '../is-prod-client'
 import {getUsernameFromLocalStorage} from '../username'
+import {SingletonContextImpl} from '../SingletonContext'
 
 const port = isLocalDevClient() ? 3000 : 443
 
@@ -19,9 +20,11 @@ const refreshedToGetNewVersionKey = 'refreshedToGetNewVersion'
 export class WebSocketService {
 	private _socket!: SocketIOClient.Socket
 	private _store!: Store
+	private _singletonContext!: SingletonContextImpl
 
-	public connect(store: Store) {
+	public connect(store: Store, singletonContext: SingletonContextImpl) {
 		this._store = store
+		this._singletonContext = singletonContext
 		const room = roomNameCleaner(window.location.pathname)
 
 		this._socket = io.connect(window.location.hostname + `:${port}/`, {
@@ -83,6 +86,8 @@ export class WebSocketService {
 			this._store.dispatch({...action, alreadyBroadcasted: true})
 		})
 
+		this._socket.on(WebSocketEvent.nodeToNode, this.onNodeToNode)
+
 		this._setupDefaultListeners([
 			['connect'],
 			['disconnect'],
@@ -118,6 +123,18 @@ export class WebSocketService {
 	private readonly _socketInfo = (info: string) => {
 		this._store.dispatch(setInfo(info))
 		logger.trace(info)
+	}
+
+	public nodeToNode(action: NodeToNodeAction) {
+		this._socket.emit(WebSocketEvent.nodeToNode, action)
+	}
+
+	public onNodeToNode = (action: NodeToNodeAction) => {
+		const nodeManager = this._singletonContext.getNodeManager()
+
+		if (!nodeManager) return logger.warn('[WebSocketService][onNodeToNode] missing nodeManager:', {nodeManager})
+
+		nodeManager.onNodeToNode(action)
 	}
 
 	public dispose() {

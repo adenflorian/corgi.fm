@@ -2,6 +2,7 @@ import React, {ReactElement, useContext} from 'react'
 import {List} from 'immutable'
 import {clamp, arrayToESMap, clampPolarized} from '@corgifm/common/common-utils'
 import {CssColor} from '@corgifm/common/shamu-color'
+import {NodeToNodeAction} from '@corgifm/common/server-constants'
 import {logger} from '../client-logger'
 import {SingletonContextImpl} from '../SingletonContext'
 import {
@@ -87,6 +88,9 @@ export abstract class CorgiNode {
 			this._portsWithUpdates = []
 		}
 	}
+
+	// eslint-disable-next-line no-empty-function
+	public onNodeToNode(action: NodeToNodeAction) {}
 
 	public portHasUpdate(port: ExpPort) {
 		this._portsWithUpdates.push(port)
