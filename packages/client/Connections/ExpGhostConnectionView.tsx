@@ -1,15 +1,14 @@
 import React, {useState, useLayoutEffect, useCallback} from 'react'
 import {useSelector, useDispatch} from 'react-redux'
 import {
-	ActiveGhostConnectorSourceOrTarget,
-	expGhostConnectorActions,
-	selectExpGhostConnection,
-	selectLocalClientId,
-	IClientAppState,
-	createExpPositionSelector,
+	ActiveGhostConnectorSourceOrTarget, expGhostConnectorActions,
+	selectExpGhostConnection, selectLocalClientId,
+	IClientAppState, createExpPositionSelector, ActiveConnector,
 } from '@corgifm/common/redux'
 import {toGraphSpace} from '../SimpleGraph/Zoom'
 import {usePort} from '../Experimental/hooks/usePort'
+import {useObjectChangedEvent, useNumberChangedEvent} from '../Experimental/hooks/useCorgiEvent'
+import {ExpPortReact} from '../Experimental/ExpPorts'
 import {connectorHeight, connectorWidth, makeCurvedPath} from './ConnectionView'
 import {Connector} from './Connector'
 import {GhostConnectionLine} from './GhostConnectionLine'
@@ -19,28 +18,54 @@ interface Props {
 	id: Id
 }
 
-const defaultPosition = {x: 0, y: 0} as const
+export const ConnectedExpGhostConnectionView = React.memo(
+	function _ConnectedExpGhostConnectionView({
+		id,
+	}: Props) {
 
-export const ConnectedExpGhostConnectionView = ({id}: Props) => {
+		const {activeConnector, inactiveConnector, activeSourceOrTarget, inactivePort, ownerId} = useSelector(
+			(state: IClientAppState) => selectExpGhostConnection(state.room, id))
 
-	const {activeConnector, inactiveConnector, activeSourceOrTarget, inactivePort, ownerId} = useSelector(
-		(state: IClientAppState) => selectExpGhostConnection(state.room, id))
+		const parentId = inactiveConnector.parentNodeId
+
+		const expPort = usePort(parentId, inactivePort)
+
+		if (!expPort) {
+			return null
+		} else {
+			return (
+				<ExpGhostConnectionView
+					id={id}
+					activeConnector={activeConnector}
+					parentId={parentId}
+					ownerId={ownerId}
+					activeSourceOrTarget={activeSourceOrTarget}
+					expPort={expPort}
+				/>
+			)
+		}
+	}
+)
+
+interface ExpGhostConnectionViewProps {
+	readonly id: Id
+	readonly activeConnector: ActiveConnector
+	readonly parentId: Id
+	readonly ownerId: Id
+	readonly activeSourceOrTarget: ActiveGhostConnectorSourceOrTarget
+	readonly expPort: ExpPortReact
+}
+
+const ExpGhostConnectionView = ({
+	id, activeConnector, parentId, ownerId,
+	activeSourceOrTarget, expPort,
+}: ExpGhostConnectionViewProps) => {
+	const portPosition = useObjectChangedEvent(expPort.onPositionChanged)
+	const portConnectionsCount = useNumberChangedEvent(expPort.onConnectionCountChanged)
 
 	const [mousePosition, setMousePosition] = useState(activeConnector)
 
-	const parentId = inactiveConnector.parentNodeId
-
 	const parentPosition = useSelector(createExpPositionSelector(parentId))
-
-	const expPort = usePort(parentId, inactivePort)
-
-	const portPosition = expPort
-		? expPort.position
-		: defaultPosition
-
-	const portConnectionsCount = expPort
-		? expPort.connectionCount
-		: 0
 
 	const localClientId = useSelector((state: IClientAppState) => selectLocalClientId(state))
 
@@ -51,41 +76,41 @@ export const ConnectedExpGhostConnectionView = ({id}: Props) => {
 		: activeConnector
 
 	const activeConnectorPosition: Point =
-			activeSourceOrTarget === ActiveGhostConnectorSourceOrTarget.Source
-				? {
-					x: position.x + (connectorWidth / 2),
-					y: position.y,
-				}
-				: {
-					x: position.x - (connectorWidth / 2),
-					y: position.y,
-				}
+		activeSourceOrTarget === ActiveGhostConnectorSourceOrTarget.Source
+			? {
+				x: position.x + (connectorWidth / 2),
+				y: position.y,
+			}
+			: {
+				x: position.x - (connectorWidth / 2),
+				y: position.y,
+			}
 
 	const anchorConnectorPosition: Point =
-			activeSourceOrTarget === ActiveGhostConnectorSourceOrTarget.Source
-				? {
-					x: parentPosition.x + portPosition.x - (portConnectionsCount * connectorWidth) - connectorWidth,
-					y: parentPosition.y + portPosition.y,
-				}
-				: {
-					x: parentPosition.x + parentPosition.width - portPosition.x + (portConnectionsCount * connectorWidth) + connectorWidth,
-					y: parentPosition.y + portPosition.y,
-				}
+		activeSourceOrTarget === ActiveGhostConnectorSourceOrTarget.Source
+			? {
+				x: parentPosition.x + portPosition.x - (portConnectionsCount * connectorWidth) - connectorWidth,
+				y: parentPosition.y + portPosition.y,
+			}
+			: {
+				x: parentPosition.x + parentPosition.width - portPosition.x + (portConnectionsCount * connectorWidth) + connectorWidth,
+				y: parentPosition.y + portPosition.y,
+			}
 
 	const connectedLine =
-			activeSourceOrTarget === ActiveGhostConnectorSourceOrTarget.Source
-				? new LineState(
-					activeConnectorPosition.x,
-					activeConnectorPosition.y,
-					anchorConnectorPosition.x,
-					anchorConnectorPosition.y,
-				)
-				: new LineState(
-					anchorConnectorPosition.x,
-					anchorConnectorPosition.y,
-					activeConnectorPosition.x,
-					activeConnectorPosition.y,
-				)
+		activeSourceOrTarget === ActiveGhostConnectorSourceOrTarget.Source
+			? new LineState(
+				activeConnectorPosition.x,
+				activeConnectorPosition.y,
+				anchorConnectorPosition.x,
+				anchorConnectorPosition.y,
+			)
+			: new LineState(
+				anchorConnectorPosition.x,
+				anchorConnectorPosition.y,
+				activeConnectorPosition.x,
+				activeConnectorPosition.y,
+			)
 
 	const pathDPart1 = makeCurvedPath(connectedLine)
 

@@ -16,14 +16,13 @@ import {blockMouse, unblockMouse} from '../SimpleGlobalClientState'
 
 interface Props {
 	percentage: number
-	chains: readonly ParamInputChainReact[]
 	range: SignalRange
 }
 
 const size = 32
 
 export const ActualUberKnob = React.memo(function _ActualUberKnob({
-	percentage, chains, range,
+	percentage, range,
 }: Props) {
 	const nodeContext = useNodeContext()
 
@@ -44,7 +43,6 @@ export const ActualUberKnob = React.memo(function _ActualUberKnob({
 				<g transform={`rotate(135, ${size / 2}, ${size / 2})`}>
 					<UberArcMain
 						colorEvent={nodeContext.node.onColorChange}
-						chains={chains}
 						knobValueRatio={percentage}
 						range={range}
 					/>
@@ -60,13 +58,12 @@ const mainDiameter = 40
 
 interface UberArcMainProps {
 	readonly colorEvent: CorgiStringChangedEvent
-	readonly chains: readonly ParamInputChainReact[]
 	readonly knobValueRatio: number
 	readonly range: SignalRange
 }
 
 function UberArcMain({
-	colorEvent, chains, knobValueRatio, range,
+	colorEvent, knobValueRatio, range,
 }: UberArcMainProps) {
 
 	const activeColor = useStringChangedEvent(colorEvent)
@@ -75,6 +72,10 @@ function UberArcMain({
 
 	const activeRatio = knobValueRatio * (range === 'bipolar' ? 0.5 : 1)
 	const activeOffset = range === 'bipolar' ? 0.5 : 0
+
+	const portContext = useAudioParamInputPortContext()
+
+	const chains = [...useObjectChangedEvent(portContext.onChainsChanged)].map(x => x[1])
 
 	return (
 		<UberArcDumb

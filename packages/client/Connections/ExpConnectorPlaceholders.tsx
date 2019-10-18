@@ -27,7 +27,7 @@ export const ExpConnectorPlaceholders = hot(module)(React.memo(function _ExpConn
 						parentWidth={parentPosition.width}
 						sourceOrTarget={ActiveGhostConnectorSourceOrTarget.Source}
 						nodeId={parentId}
-						portId={port.id}
+						port={port}
 					/>
 				)
 			})}
@@ -40,7 +40,7 @@ export const ExpConnectorPlaceholders = hot(module)(React.memo(function _ExpConn
 						parentWidth={parentPosition.width}
 						sourceOrTarget={ActiveGhostConnectorSourceOrTarget.Target}
 						nodeId={parentId}
-						portId={port.id}
+						port={port}
 					/>
 				)
 			})}

@@ -9,8 +9,6 @@ export interface ExpNodeConnectionReact extends Pick<ExpNodeConnection, 'id' | '
 
 // Different connection types could have different functions for sending data across
 export abstract class ExpNodeConnection {
-	public readonly subscribers = new Map<ExpConnectionCallback, ExpConnectionCallback>()
-
 	public constructor(
 		public readonly id: Id,
 		public readonly type: ExpConnectionType,
@@ -20,10 +18,6 @@ export abstract class ExpNodeConnection {
 	public abstract detectFeedbackLoop(i: number, nodeIds: List<Id>): boolean
 	public abstract get outputPort(): ExpPort
 	public abstract get inputPort(): ExpPort
-
-	public onPortUpdated(port: ExpPort) {
-		this.subscribers.forEach(x => x(this))
-	}
 }
 
 // Different connection types could have different functions for sending data across

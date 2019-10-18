@@ -12,17 +12,19 @@ import {
 	selectLocalClientId,
 	selectExpConnectionStackOrderForSource,
 	selectExpConnectionStackOrderForTarget,
-	selectRoomSettings,
+	selectRoomSettings, ExpConnectionType,
 } from '@corgifm/common/redux'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {useNodeManagerContext} from '../Experimental/NodeManager'
 import {longLineTooltip} from '../client-constants'
-import {useConnection} from '../Experimental/hooks/useConnection'
+import {useObjectChangedEvent} from '../Experimental/hooks/useCorgiEvent'
+import {usePort} from '../Experimental/hooks/usePort'
+import {ExpPortReact} from '../Experimental/ExpPorts'
 import {ConnectionLine} from './ConnectionLine'
-import './ConnectionView.less'
 import {Connector} from './Connector'
 import {LineState} from './LineState'
 import {connectorWidth, connectorHeight, makeStraightPath, makeCurvedPath} from './ConnectionView'
+import './ConnectionView.less'
 
 interface Props {
 	id: Id
@@ -31,29 +33,51 @@ interface Props {
 const buffer = 50
 const joint = 8
 
-const defaultPosition = {x: 0, y: 0} as const
+export const ConnectedExpConnectionView = ({id}: Props) => {
+	const {sourceId, sourcePort, targetId, targetPort, type} = useSelector(createExpConnectionSelector(id))
+	const sourceExpPort = usePort(sourceId, sourcePort)
+	const targetExpPort = usePort(targetId, targetPort)
 
-export const ExpConnectionView =
-	React.memo(function _ExpConnectionView({id}: Props) {
-		const {sourceId, sourcePort, targetId, targetPort, type} = useSelector(createExpConnectionSelector(id))
+	if (sourceExpPort && targetExpPort) {
+		return (
+			<ExpConnectionView
+				id={id}
+				sourcePort={sourceExpPort}
+				targetPort={targetExpPort}
+				sourceId={sourceId}
+				targetId={targetId}
+				type={type}
+			/>
+		)
+	} else {
+		return null
+	}
+}
+
+interface ExpConnectionViewPorts extends Props {
+	readonly sourcePort: ExpPortReact
+	readonly targetPort: ExpPortReact
+	readonly sourceId: Id
+	readonly targetId: Id
+	readonly type: ExpConnectionType
+}
+
+const ExpConnectionView =
+	React.memo(function _ExpConnectionView({
+		id, sourcePort, targetPort, sourceId, targetId, type,
+	}: ExpConnectionViewPorts) {
 		const sourceNodePosition = useSelector(createExpPositionSelector(sourceId))
 		const targetNodePosition = useSelector(createExpPositionSelector(targetId))
 
 		const {zIndex: sourceZ} = sourceNodePosition
 		const {zIndex: targetZ} = targetNodePosition
 
-		const connectionInfo = useConnection(id)
-
-		const sourcePortPosition = connectionInfo
-			? connectionInfo.outputPort.position
-			: defaultPosition
+		const sourcePortPosition = useObjectChangedEvent(sourcePort.onPositionChanged)
 
 		const sourceX = sourceNodePosition.x + sourceNodePosition.width - sourcePortPosition.x
 		const sourceY = sourceNodePosition.y + sourcePortPosition.y
 
-		const targetPortPosition = connectionInfo
-			? connectionInfo.inputPort.position
-			: defaultPosition
+		const targetPortPosition = useObjectChangedEvent(targetPort.onPositionChanged)
 
 		const targetX = targetNodePosition.x + targetPortPosition.x
 		const targetY = targetNodePosition.y + targetPortPosition.y
@@ -102,11 +126,11 @@ export const ExpConnectionView =
 				localClientId,
 				GhostConnectorAddingOrMoving.Moving,
 				sourceOrTarget === ActiveGhostConnectorSourceOrTarget.Source
-					? sourcePort
-					: targetPort,
+					? sourcePort.id
+					: targetPort.id,
 				sourceOrTarget === ActiveGhostConnectorSourceOrTarget.Source
-					? targetPort
-					: sourcePort,
+					? targetPort.id
+					: sourcePort.id,
 				type,
 				id,
 			)))

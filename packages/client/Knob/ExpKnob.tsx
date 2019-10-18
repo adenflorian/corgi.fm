@@ -1,7 +1,6 @@
 import React from 'react'
 import {SignalRange} from '@corgifm/common/common-types'
 import {CurveFunctions} from '@corgifm/common/common-utils'
-import {ParamInputChainReact} from '../Experimental/ExpPorts'
 import {KnobBaseProps} from './KnobTypes'
 import {ExpKnobView} from './ExpKnobView'
 import {ExpSliderController} from './ExpSliderController'
@@ -13,7 +12,6 @@ interface Props extends KnobBaseProps {
 	readonly defaultValue: number
 	readonly valueString?: (value: number) => string
 	readonly value: number
-	readonly chains?: readonly ParamInputChainReact[]
 	readonly color?: string
 	readonly curveFunctions: CurveFunctions
 	readonly range: SignalRange
@@ -22,7 +20,7 @@ interface Props extends KnobBaseProps {
 
 export const ExpKnob = React.memo(function _Knob(props: Props) {
 	const {
-		value, label = '', readOnly = false, defaultValue, onChangeId, chains, color,
+		value, label = '', readOnly = false, defaultValue, onChangeId, color,
 		tooltip, valueString, onChange, maxValue,
 		curveFunctions, range,
 	} = props
@@ -47,7 +45,6 @@ export const ExpKnob = React.memo(function _Knob(props: Props) {
 					tooltip={tooltip}
 					canEdit={true}
 					isMouseDown={isMouseDown}
-					chains={chains}
 					color={color}
 					range={range}
 				>

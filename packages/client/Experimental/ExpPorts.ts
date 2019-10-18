@@ -15,12 +15,14 @@ import {CorgiAnalyserSPNode} from './CorgiAnalyserSPN'
 
 export type ExpPortCallback = (port: ExpPort) => void
 
-export interface ExpPortReact extends ExpPort {}
+export interface ExpPortReact extends Pick<ExpPort, 'id' | 'type' | 'onPositionChanged' | 'onConnectionCountChanged'> {}
 
 export abstract class ExpPort {
-	public readonly subscribers = new Map<ExpPortCallback, ExpPortCallback>()
 	protected readonly _connections: ExpNodeConnections = new Map<Id, ExpNodeConnection>()
 	private _position: Point = {x: 0, y: 0}
+	public get position() {return this._position}
+	public readonly onPositionChanged: CorgiObjectChangedEvent<Point>
+	public readonly onConnectionCountChanged: CorgiNumberChangedEvent
 
 	public constructor(
 		public readonly id: Id,
@@ -28,21 +30,16 @@ export abstract class ExpPort {
 		public readonly getNode: () => CorgiNode,
 		public readonly side: ExpPortSide,
 		public readonly type: ExpPortType,
-	) {}
-
-	public get position() {return this._position}
+	) {
+		this.onPositionChanged = new CorgiObjectChangedEvent(this.position)
+		this.onConnectionCountChanged = new CorgiNumberChangedEvent(this.connectionCount)
+	}
 
 	public get connectionCount() {return this._connections.size}
 
 	public setPosition(newPosition: Point) {
 		this._position = newPosition
-		this.onUpdated()
-	}
-
-	public onUpdated() {
-		// logger.log('ExpPort onUpdated:', this)
-		this.subscribers.forEach(x => x(this))
-		this._connections.forEach(x => x.onPortUpdated(this))
+		this.onPositionChanged.invokeNextFrame(this.position)
 	}
 }
 
@@ -61,13 +58,13 @@ export abstract class ExpNodeAudioPort extends ExpPort {
 	public connect = (connection: ExpNodeAudioConnection) => {
 		this._connections.set(connection.id, connection)
 		this._connect(connection)
-		this.onUpdated()
+		this.onConnectionCountChanged.invokeNextFrame(this.connectionCount)
 	}
 
 	public disconnect = (connection: ExpNodeAudioConnection, target: AudioNode) => {
 		this._disconnect(connection, target)
 		this._connections.delete(connection.id)
-		this.onUpdated()
+		this.onConnectionCountChanged.invokeNextFrame(this.connectionCount)
 	}
 
 	protected abstract _connect(connection: ExpNodeAudioConnection): void
@@ -211,7 +208,7 @@ export function useAudioParamInputPortContext() {
 	return context
 }
 
-export interface ExpNodeAudioParamInputPortReact extends Pick<ExpNodeAudioParamInputPort, 'onLiveRangeChanged'> {}
+export interface ExpNodeAudioParamInputPortReact extends Pick<ExpNodeAudioParamInputPort, 'onLiveRangeChanged' | 'onChainsChanged'> {}
 
 export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 	private readonly _inputChains = new Map<Id, ParamInputChain>()
@@ -221,6 +218,7 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 	private readonly _analyser: CorgiAnalyserSPNode
 	public readonly destination: AudioParam
 	public readonly onLiveRangeChanged: CorgiObjectChangedEvent<LiveRange>
+	public readonly onChainsChanged: CorgiObjectChangedEvent<Map<Id, ParamInputChain>>
 	private _knobValue: number
 
 	public constructor(
@@ -260,6 +258,7 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 			.connect(this.destination)
 
 		this.onLiveRangeChanged = new CorgiObjectChangedEvent(this._createLiveRange())
+		this.onChainsChanged = new CorgiObjectChangedEvent(this._inputChains)
 	}
 
 	private readonly _onAnalyserUpdate = (newValue: number) => {
@@ -305,11 +304,6 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 
 	private readonly _updateLiveRange = () => {
 		this.onLiveRangeChanged.invokeImmediately(this._createLiveRange())
-	}
-
-	public onUpdated() {
-		super.onUpdated()
-		this._requestWorkletUpdate()
 	}
 
 	private readonly _requestWorkletUpdate = () => {
@@ -359,6 +353,8 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 
 		this._inputChains.set(connectionId, newChain)
 
+		this.onChainsChanged.invokeImmediately(this._inputChains)
+
 		this._updateLiveRange()
 
 		return newChain.getInput()
@@ -374,6 +370,8 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 		existingChain.dispose()
 
 		this._inputChains.delete(connection.id)
+
+		this.onChainsChanged.invokeImmediately(this._inputChains)
 	}
 
 	public dispose() {
@@ -418,14 +416,13 @@ export class ExpNodeAudioOutputPort extends ExpNodeAudioPort {
 		if (!this.detectFeedbackLoop()) {
 			this.source.connect(newTarget)
 		}
-		this.onUpdated()
 	}
 
 	protected _disconnect = (connection: ExpNodeAudioConnection, target: AudioNode) => {
 		try {
 			this.source.disconnect(target)
 		} catch (error) {
-			logger.warn('[_disconnect] error while disconnecting ExpNodeAudioOutputPort: ', {error})
+			// logger.warn('[_disconnect] error while disconnecting ExpNodeAudioOutputPort: ', {error})
 		}
 	}
 

@@ -50,7 +50,6 @@ export abstract class CorgiNode {
 	protected readonly _audioParams: ExpAudioParams
 	protected readonly _customNumberParams: ExpCustomNumberParams
 	protected _enabled = true
-	private _portsWithUpdates = [] as ExpPort[]
 	public readonly id: Id
 	public readonly ownerId: Id
 	protected readonly _audioContext: AudioContext
@@ -80,21 +79,10 @@ export abstract class CorgiNode {
 	public abstract getName(): string
 
 	// eslint-disable-next-line no-empty-function
-	public onTick(currentTime: number, maxReadAhead: number): void {
-		if (this._portsWithUpdates.length > 0) {
-			this._portsWithUpdates.forEach(port => {
-				port.onUpdated()
-			})
-			this._portsWithUpdates = []
-		}
-	}
+	public onTick(currentTime: number, maxReadAhead: number): void {}
 
 	// eslint-disable-next-line no-empty-function
 	public onNodeToNode(action: NodeToNodeAction) {}
-
-	public portHasUpdate(port: ExpPort) {
-		this._portsWithUpdates.push(port)
-	}
 
 	public getColor(): string {return CssColor.blue}
 

@@ -55,17 +55,6 @@ export class NodeManager {
 				} as const
 			},
 			connections: {
-				register: (id: Id, callback: ExpConnectionCallback) => {
-					const connection = this._connections.get(id)
-					if (!connection) return logger.warn('[connections.register] 404 connection not found: ', {id, connections: this._connections})
-					connection.subscribers.set(callback, callback)
-					callback(connection)
-				},
-				unregister: (id: Id, callback: ExpConnectionCallback) => {
-					const connection = this._connections.get(id)
-					if (!connection) return // logger.warn('[connections.unregister] 404 connection not found: ', {id, connections: this._connections})
-					connection.subscribers.delete(callback)
-				},
 				get: (id: Id) => {
 					const connection = this._connections.get(id)
 					if (!connection) return logger.warn('[connections.get] 404 connection not found: ', {id, connections: this._connections})
@@ -73,24 +62,9 @@ export class NodeManager {
 				},
 			} as const,
 			ports: {
-				register: (nodeId: Id, portId: Id, callback: ExpPortCallback) => {
-					const node = this._nodes.get(nodeId)
-					if (!node) return logger.warn('[ports.register] 404 node not found: ', {nodeId, portId})
-					const port = node.getPort(portId)
-					if (!port) return logger.warn('[ports.register] 404 port not found: ', {nodeId, portId})
-					port.subscribers.set(callback, callback)
-					callback(port)
-				},
-				unregister: (nodeId: Id, portId: Id, callback: ExpPortCallback) => {
-					const node = this._nodes.get(nodeId)
-					if (!node) return logger.warn('[ports.unregister] 404 node not found: ', {nodeId, portId})
-					const port = node.getPort(portId)
-					if (!port) return logger.warn('[ports.unregister] 404 port not found: ', {nodeId, portId})
-					port.subscribers.delete(callback)
-				},
 				get: (nodeId: Id, portId: Id) => {
 					const node = this._nodes.get(nodeId)
-					if (!node) return logger.warn('[ports.get] 404 node not found: ', {nodeId, portId})
+					if (!node) return // logger.warn('[ports.get] 404 node not found: ', {nodeId, portId})
 					const port = node.getPort(portId)
 					if (!port) return logger.warn('[ports.get] 404 port not found: ', {nodeId, portId})
 					return port

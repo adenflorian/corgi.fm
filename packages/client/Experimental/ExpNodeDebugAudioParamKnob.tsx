@@ -3,10 +3,8 @@ import {useDispatch} from 'react-redux'
 import {expNodesActions} from '@corgifm/common/redux'
 import {ExpKnob} from '../Knob/ExpKnob'
 import {useNumberChangedEvent} from './hooks/useCorgiEvent'
-import {usePort} from './hooks/usePort'
 import {useNodeContext} from './CorgiNode'
 import {useAudioParamContext} from './ExpParams'
-import {isAudioParamInputPort} from './ExpPorts'
 
 interface Props {
 	nodeId: Id
@@ -22,12 +20,6 @@ export const ExpNodeDebugAudioParamKnob = React.memo(function _ExpNodeDebugAudio
 	}, [audioParam.id, dispatch, nodeId])
 	const node = useNodeContext()
 	const value = useNumberChangedEvent(audioParam.onChange)
-	const port = usePort(nodeId, audioParam.id)
-
-	let chains
-	if (port && isAudioParamInputPort(port)) {
-		chains = port.getChains()
-	}
 
 	return (
 		<ExpKnob
@@ -37,7 +29,6 @@ export const ExpNodeDebugAudioParamKnob = React.memo(function _ExpNodeDebugAudio
 			tooltip={audioParam.id as string}
 			value={value}
 			valueString={audioParam.valueString}
-			chains={chains}
 			color={node.getColor()}
 			curveFunctions={audioParam.curveFunctions}
 			range={audioParam.paramSignalRange}

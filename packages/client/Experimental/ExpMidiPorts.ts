@@ -21,13 +21,13 @@ export abstract class ExpMidiPort extends ExpPort {
 	public connect = (connection: ExpMidiConnection) => {
 		this._connections.set(connection.id, connection)
 		this._connect(connection)
-		this.onUpdated()
+		this.onConnectionCountChanged.invokeNextFrame(this.connectionCount)
 	}
 
 	public disconnect = (connection: ExpMidiConnection) => {
 		this._disconnect(connection)
 		this._connections.delete(connection.id)
-		this.onUpdated()
+		this.onConnectionCountChanged.invokeNextFrame(this.connectionCount)
 	}
 
 	protected abstract _connect(connection: ExpMidiConnection): void
