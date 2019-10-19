@@ -5,14 +5,14 @@ export const logger = {
 	error: (...args: any[]) => {
 		commonLogger.error(...args)
 		eventError({
-			description: args[0],
+			description: args[0].toString(),
 			fatal: true,
 		})
 	},
 	warn: (...args: any[]) => {
 		commonLogger.warn(...args)
 		eventError({
-			description: args[0],
+			description: args[0].toString(),
 			fatal: false,
 		})
 	},

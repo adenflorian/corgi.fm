@@ -19,7 +19,7 @@
 	- [√] put note into events
 - [ ] different background for experimental
 - [ ] KeyboardNode
-	- [ ] network it
+	- [√] network it
 	- [ ] take computer keyboard input
 - [ ] BiquadFilterNode: state is bad, probably due to unstable filter caused by fast parameter automation.
 - [ ] fix connector placeholders z index
