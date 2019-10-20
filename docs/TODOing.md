@@ -213,6 +213,7 @@
 - [ ] look into if we can not call `next(action)` for middleware actions
 - [ ] cant exit modal by clicking in between modals
 - [ ] put redux clients in a Map
+- [ ] use canvas for FPS to reduce garbage created
 
 - [√] add options to disable new animation things
 - [ ] menus shouldnt disappear when mouse moves off of it

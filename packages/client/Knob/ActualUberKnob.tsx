@@ -1,6 +1,6 @@
 import React, {Fragment, useMemo, useRef, useEffect, useCallback, useLayoutEffect} from 'react'
-import {useDispatch} from 'react-redux'
-import {expConnectionsActions} from '@corgifm/common/redux'
+import {useDispatch, useSelector} from 'react-redux'
+import {expConnectionsActions, createOptionSelector, AppOptions} from '@corgifm/common/redux'
 import {clamp} from '@corgifm/common/common-utils'
 import {SignalRange} from '@corgifm/common/common-types'
 import {setLightness} from '@corgifm/common/shamu-color'
@@ -221,6 +221,8 @@ function UberArcLiveValue({
 
 	const liveRange = useObjectChangedEvent(portContext.onLiveRangeChanged)
 
+	const extraAnimationsEnabled = useSelector(createOptionSelector(AppOptions.graphicsExtraAnimations)) as boolean
+
 	const updateLiveValueDot = useCallback(() => {
 		const moddedValueGroupElement = moddedValueCircleRef.current
 
@@ -234,6 +236,8 @@ function UberArcLiveValue({
 	}, [moddedValueCircleRef, parentRatio, liveRange.min, parentRange])
 
 	useEffect(() => {
+		if (!extraAnimationsEnabled) return
+
 		function onNewValue(newValue: number) {
 			liveValueRef.current = newValue
 			updateLiveValueDot()
@@ -244,7 +248,7 @@ function UberArcLiveValue({
 		return () => {
 			liveEvent.unsubscribe(onNewValue)
 		}
-	}, [liveEvent, updateLiveValueDot])
+	}, [liveEvent, updateLiveValueDot, extraAnimationsEnabled])
 
 	useLayoutEffect(updateLiveValueDot, [moddedValueCircleRef, parentRatio, liveRange.min, parentRange])
 
@@ -264,6 +268,7 @@ function UberArcLiveValue({
 			offset={liveRange.min}
 			hideTail={true}
 			// hideRail={true}
+			hideDot={!extraAnimationsEnabled}
 			gDotRef={moddedValueCircleRef}
 			className="liveValueArc"
 		/>
