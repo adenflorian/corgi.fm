@@ -7,12 +7,12 @@ import {ExpPorts} from './ExpPorts'
 import {
 	ExpAudioParams, ExpCustomNumberParams,
 } from './ExpParams'
-import {ExpNodeContext, ExpNodeContextValue} from './CorgiNode'
+import {ExpNodeContext, CorgiNodeReact} from './CorgiNode'
 import './ExpNodes.less'
 
 interface Props {
 	readonly children: React.ReactNode
-	readonly context: ExpNodeContextValue
+	readonly context: CorgiNodeReact
 	readonly audioParams: ExpAudioParams
 	readonly customNumberParams: ExpCustomNumberParams
 	readonly ports: ExpPorts

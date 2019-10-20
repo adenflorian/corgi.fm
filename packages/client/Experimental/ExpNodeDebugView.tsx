@@ -32,7 +32,7 @@ export const ExpNodeDebugView = hot(module)(React.memo(function _ExpNodeDebugVie
 			<div className="nodeName">{nodeName}</div>
 			<div className="nodeId">{nodeId}</div>
 			<Ports ports={ports} />
-			{nodeContext.node.requiresAudioWorklet && !isAudioWorkletLoaded &&
+			{nodeContext.requiresAudioWorklet && !isAudioWorkletLoaded &&
 				<div
 					className="audioWorkletWarning"
 					title={audioWorkletToolTip}

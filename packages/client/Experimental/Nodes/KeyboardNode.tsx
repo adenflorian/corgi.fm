@@ -81,6 +81,7 @@ export class KeyboardNode extends CorgiNode {
 	}
 
 	public onNodeToNode(action: NodeToNodeAction) {
+		super.onNodeToNode(action)
 		if (action.type === 'NODE_TO_NODE_MIDI') {
 			this._midiOutputPort.sendMidiAction({
 				...action.midiAction,

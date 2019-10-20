@@ -42,7 +42,7 @@ export const ActualUberKnob = React.memo(function _ActualUberKnob({
 			>
 				<g transform={`rotate(135, ${size / 2}, ${size / 2})`}>
 					<UberArcMain
-						colorEvent={nodeContext.node.onColorChange}
+						color={nodeContext.getColor()}
 						knobValueRatio={percentage}
 						range={range}
 					/>
@@ -57,16 +57,16 @@ const strokeWidth = 3
 const mainDiameter = 40
 
 interface UberArcMainProps {
-	readonly colorEvent: CorgiStringChangedEvent
+	readonly color: string
 	readonly knobValueRatio: number
 	readonly range: SignalRange
 }
 
 function UberArcMain({
-	colorEvent, knobValueRatio, range,
+	color, knobValueRatio, range,
 }: UberArcMainProps) {
 
-	const activeColor = useStringChangedEvent(colorEvent)
+	const activeColor = color
 	const railColor = useMemo(() => setLightness(activeColor, 12), [activeColor])
 	const audioParam = useAudioParamContext()
 
@@ -119,10 +119,10 @@ function UberArcMod({
 }: UberArcModProps) {
 	const nodeManagerContext = useNodeManagerContext()
 	const connection = nodeManagerContext.connections.get(chain.id)
-	const colorEvent = connection
-		? connection.outputPort.node.onColorChange
+	const color = connection
+		? connection.outputPort.node.getColor()
 		: undefined
-	const activeColor = useStringChangedEvent(colorEvent)
+	const activeColor = color || ''
 	const railColor = useMemo(() => setLightness(activeColor, 12), [activeColor])
 	const gain = useNumberChangedEvent(chain.onGainChange)
 	const centering = useEnumChangedEvent(chain.centering, chain.onCenteringChange)
