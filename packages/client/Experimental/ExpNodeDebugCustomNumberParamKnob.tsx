@@ -1,10 +1,9 @@
-import React, {useCallback, useEffect} from 'react'
+import React, {useCallback} from 'react'
 import {useDispatch} from 'react-redux'
 import {expNodesActions} from '@corgifm/common/redux'
 import {Knob} from '../Knob/Knob'
-import {logger} from '../client-logger'
-import {useCustomNumberParam} from './hooks/useCustomNumberParam'
 import {ExpCustomNumberParam} from './ExpParams'
+import {useNumberChangedEvent} from './hooks/useCorgiEvent'
 
 interface Props {
 	nodeId: Id
@@ -18,10 +17,7 @@ export const ExpNodeDebugCustomNumberParamKnob = React.memo(function _ExpNodeDeb
 	const onCustomNumberParamChange = useCallback((_, newValue: number) => {
 		dispatch(expNodesActions.customNumberParamChange(nodeId, customNumberParam.id, newValue))
 	}, [customNumberParam.id, dispatch, nodeId])
-	useEffect(() => {
-		// logger.log('mount')
-	}, [])
-	const value = useCustomNumberParam(customNumberParam.id)
+	const value = useNumberChangedEvent(customNumberParam.onChange)
 
 	return (
 		<Knob

@@ -9,7 +9,7 @@ import {
 	ExpPorts, ExpPort, isAudioOutputPort, isAudioParamInputPort,
 } from './ExpPorts'
 import {
-	ExpAudioParams, ExpCustomNumberParams, ExpNumberParamCallback,
+	ExpAudioParams, ExpCustomNumberParams,
 } from './ExpParams'
 import {CorgiStringChangedEvent} from './CorgiEvents'
 import {CorgiNodeView} from './CorgiNodeView'
@@ -71,7 +71,6 @@ export abstract class CorgiNode {
 			? options.requiresAudioWorklet : false
 	}
 
-	// public abstract onNumberParamChange(paramChange: NumberParamChange): void
 	public abstract render(): ReactElement<any>
 	public abstract getName(): string
 
@@ -98,18 +97,6 @@ export abstract class CorgiNode {
 			id: this.id,
 			getColor: () => this.getColor(),
 			getName: () => this.getName(),
-			// TODO Use Corgi Events
-			registerCustomNumberParam: (paramId: Id, callback: ExpNumberParamCallback) => {
-				const param = this._customNumberParams.get(paramId)
-				if (!param) return logger.warn('[registerCustomNumberParam] 404 custom number param not found: ', paramId)
-				param.reactSubscribers.set(callback, callback)
-				callback(param.value)
-			},
-			unregisterCustomNumberParam: (paramId: Id, callback: ExpNumberParamCallback) => {
-				const param = this._customNumberParams.get(paramId)
-				if (!param) return logger.warn('[unregisterCustomNumberParam] 404 custom number param not found: ', paramId)
-				param.reactSubscribers.delete(callback)
-			},
 			setPortPosition: (id: Id, position: Point) => {
 				const port = this.getPort(id)
 				if (!port) return logger.warn('[setPortPosition] 404 port not found: ', {id, position, nodeId: this.id})
@@ -147,7 +134,7 @@ export abstract class CorgiNode {
 
 		customNumberParam.value = newClampedValue
 
-		customNumberParam.reactSubscribers.forEach(sub => sub(newClampedValue))
+		customNumberParam.onChange.invokeImmediately(newClampedValue)
 	}
 
 	public getPort(id: Id): ExpPort | undefined {

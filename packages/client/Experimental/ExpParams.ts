@@ -10,17 +10,6 @@ export interface ExpParam {
 	readonly id: Id
 }
 
-export interface ExpNumberParam extends ExpParam {
-	readonly min: number
-	readonly max: number
-	readonly defaultValue: number
-	readonly reactSubscribers: Map<ExpNumberParamCallback, ExpNumberParamCallback>
-	readonly curve: number
-	readonly valueString?: (v: number) => string
-}
-
-export type ExpNumberParamCallback = (newValue: number) => void
-
 export const AudioParamContext = React.createContext<null | ExpAudioParam>(null)
 
 export function useAudioParamContext() {
@@ -64,9 +53,9 @@ export class ExpAudioParam implements ExpParam {
 	}
 }
 
-export class ExpCustomNumberParam implements ExpNumberParam {
+export class ExpCustomNumberParam {
 	public value: number
-	public readonly reactSubscribers = new Map<ExpNumberParamCallback, ExpNumberParamCallback>()
+	public readonly onChange: CorgiNumberChangedEvent
 
 	public constructor(
 		public readonly id: Id,
@@ -76,7 +65,8 @@ export class ExpCustomNumberParam implements ExpNumberParam {
 		public readonly curve = 1,
 		public readonly valueString?: (v: number) => string,
 	) {
-		this.value = defaultValue
+		this.value = this.defaultValue
+		this.onChange = new CorgiNumberChangedEvent(this.defaultValue)
 	}
 }
 
