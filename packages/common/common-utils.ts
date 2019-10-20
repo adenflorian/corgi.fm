@@ -7,9 +7,9 @@ import {
 	maxRoomNameLength,
 } from './common-constants'
 import {MidiClipEvents, preciseDivide, preciseMultiply} from './midi-types'
+import {SignalRange} from './common-types'
 
 import uuid = require('uuid')
-import {SignalRange} from './common-types';
 
 export function pickRandomArrayElement<T>(array: readonly T[]): T {
 	return array[Math.floor(Math.random() * array.length)]

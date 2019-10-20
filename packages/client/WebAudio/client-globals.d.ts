@@ -9,3 +9,8 @@ declare let AudioWorkletProcessor: {
 }
 
 declare function registerProcessor(name: string, processor: typeof AudioWorkletProcessor): void
+
+interface AudioParamMap {
+	forEach(callbackfn: (value: AudioParam, key: string, parent: AudioParamMap) => void, thisArg?: any): void
+	get(name: string): AudioParam | undefined
+}

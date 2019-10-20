@@ -7,6 +7,7 @@ export class DryWetChain {
 	public constructor(
 		audioContext: AudioContext,
 		wetInternalNode: AudioNode,
+		wetInternalOutputNode?: AudioNode,
 	) {
 		this.inputGain = audioContext.createGain()
 		this.dryGain = audioContext.createGain()
@@ -18,7 +19,8 @@ export class DryWetChain {
 			.connect(this.outputGain)
 		this.inputGain
 			.connect(this.wetGain)
-			.connect(wetInternalNode)
+			.connect(wetInternalNode);
+		(wetInternalOutputNode || wetInternalNode)
 			.connect(this.outputGain)
 
 		this.dryGain.gain.value = 0

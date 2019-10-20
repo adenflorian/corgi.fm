@@ -28,6 +28,7 @@ import {simpleGlobalClientState} from './SimpleGlobalClientState'
 import {createExpTupperware} from './Experimental/experimental-middleware'
 import {MidiService} from './ClientServices/MidiService'
 import {WebSocketService} from './ClientServices/WebSocketService'
+import {loadAudioWorkletsAsync} from './WebAudio/AudioWorklets/audio-worklets'
 
 if (!isLocalDevClient()) initSentry()
 
@@ -85,7 +86,7 @@ async function setupAsync() {
 
 	// Disabled until audio worklet glitch issues are fixed
 	// https://bugs.chromium.org/p/chromium/issues/detail?id=1006844
-	// await loadAudioWorkletsAsync(audioContext)
+	await loadAudioWorkletsAsync(audioContext)
 
 	const samplesManager = new SamplesManager(audioContext)
 

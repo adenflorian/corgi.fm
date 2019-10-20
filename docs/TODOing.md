@@ -33,7 +33,11 @@
 - [ ] change room type drop down to a button select thing
 - [ ] enable room type selector for test
 
+## Test Weekend 1.5?
+- [ ] create enum param type (knob/dropdown/buttonSelect)
+
 ## Test Weekend 2
+- [ ] disconnect analyser node if no sources connected
 - [ ] midi converter upgrades
 	- [ ] portamento
 		- [ ] rise/fall separate knobs
