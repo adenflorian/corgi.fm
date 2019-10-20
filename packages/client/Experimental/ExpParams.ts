@@ -64,8 +64,20 @@ export class ExpAudioParam implements ExpParam {
 	}
 }
 
-export interface ExpCustomNumberParam extends ExpNumberParam {
-	value: number
+export class ExpCustomNumberParam implements ExpNumberParam {
+	public value: number
+	public readonly reactSubscribers = new Map<ExpNumberParamCallback, ExpNumberParamCallback>()
+
+	public constructor(
+		public readonly id: Id,
+		public readonly defaultValue: number,
+		public readonly min: number,
+		public readonly max: number,
+		public readonly curve = 1,
+		public readonly valueString?: (v: number) => string,
+	) {
+		this.value = defaultValue
+	}
 }
 
 export interface ExpBooleanParam extends ExpParam {
@@ -76,33 +88,10 @@ export interface ExpEnumParam<TEnum extends string> extends ExpParam {
 	value: TEnum
 }
 
-export type ExpAudioParams = Map<Id, ExpAudioParam>
-export type ExpCustomNumberParams = Map<Id, ExpCustomNumberParam>
-export type ExpBooleanParams = Map<Id, ExpBooleanParam>
-export type ExpEnumParams<TEnum extends string> = Map<Id, ExpEnumParam<TEnum>>
-
-export function buildCustomNumberParamDesc(
-	...args: Parameters<typeof _buildCustomNumberParamDesc>
-): [Id, ExpCustomNumberParam] {
-	return [args[0], _buildCustomNumberParamDesc(...args)]
-}
-
-function _buildCustomNumberParamDesc(
-	id: Id,
-	defaultValue: number, min: number, max: number,
-	curve = 1, valueString?: (v: number) => string,
-): ExpCustomNumberParam {
-	return {
-		id,
-		value: defaultValue,
-		min,
-		max,
-		defaultValue,
-		reactSubscribers: new Map<ExpNumberParamCallback, ExpNumberParamCallback>(),
-		curve,
-		valueString,
-	}
-}
+export type ExpAudioParams = ReadonlyMap<Id, ExpAudioParam>
+export type ExpCustomNumberParams = ReadonlyMap<Id, ExpCustomNumberParam>
+export type ExpBooleanParams = ReadonlyMap<Id, ExpBooleanParam>
+export type ExpEnumParams<TEnum extends string> = ReadonlyMap<Id, ExpEnumParam<TEnum>>
 
 export interface NumberParamChange {
 	readonly nodeId: Id

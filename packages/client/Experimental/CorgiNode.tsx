@@ -1,6 +1,6 @@
 import React, {ReactElement, useContext} from 'react'
 import {List} from 'immutable'
-import {clamp, arrayToESMap, clampPolarized} from '@corgifm/common/common-utils'
+import {clamp, clampPolarized} from '@corgifm/common/common-utils'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {NodeToNodeAction} from '@corgifm/common/server-constants'
 import {logger} from '../client-logger'
@@ -9,8 +9,7 @@ import {
 	ExpPorts, ExpPort, isAudioOutputPort, isAudioParamInputPort,
 } from './ExpPorts'
 import {
-	ExpAudioParams, ExpCustomNumberParams,
-	ExpNumberParamCallback, ExpAudioParam,
+	ExpAudioParams, ExpCustomNumberParams, ExpNumberParamCallback,
 } from './ExpParams'
 import {CorgiStringChangedEvent} from './CorgiEvents'
 import {CorgiNodeView} from './CorgiNodeView'
@@ -21,16 +20,11 @@ export interface ExpNodeContextValue extends ReturnType<CorgiNode['_makeExpNodeC
 
 export function useNodeContext() {
 	const context = useContext(ExpNodeContext)
-
 	if (!context) throw new Error(`missing node context, maybe there's no provider`)
-
 	return context
 }
 
 export interface CorgiNodeOptions {
-	readonly ports?: readonly ExpPort[]
-	readonly audioParams?: readonly ExpAudioParam[]
-	readonly customNumberParams?: ExpCustomNumberParams
 	readonly requiresAudioWorklet?: boolean
 }
 
@@ -49,9 +43,9 @@ export interface CorgiNodeReact extends Pick<CorgiNode, 'id' | 'onColorChange' |
 export abstract class CorgiNode {
 	public readonly reactContext: ExpNodeContextValue
 	public readonly onColorChange: CorgiStringChangedEvent
-	protected readonly _ports: ExpPorts
-	protected readonly _audioParams: ExpAudioParams
-	protected readonly _customNumberParams: ExpCustomNumberParams
+	protected readonly _ports: ExpPorts = new Map()
+	protected readonly _audioParams: ExpAudioParams = new Map()
+	protected readonly _customNumberParams: ExpCustomNumberParams = new Map()
 	protected _enabled = true
 	public readonly id: Id
 	public readonly ownerId: Id
@@ -73,9 +67,6 @@ export abstract class CorgiNode {
 		this.reactContext = this._makeExpNodeContextValue()
 		this.onColorChange = new CorgiStringChangedEvent(this.getColor())
 
-		this._ports = arrayToESMap(options.ports, 'id')
-		this._audioParams = arrayToESMap(options.audioParams, 'id')
-		this._customNumberParams = options.customNumberParams || new Map()
 		this.requiresAudioWorklet = options.requiresAudioWorklet !== undefined
 			? options.requiresAudioWorklet : false
 	}
@@ -107,6 +98,7 @@ export abstract class CorgiNode {
 			id: this.id,
 			getColor: () => this.getColor(),
 			getName: () => this.getName(),
+			// TODO Use Corgi Events
 			registerCustomNumberParam: (paramId: Id, callback: ExpNumberParamCallback) => {
 				const param = this._customNumberParams.get(paramId)
 				if (!param) return logger.warn('[registerCustomNumberParam] 404 custom number param not found: ', paramId)

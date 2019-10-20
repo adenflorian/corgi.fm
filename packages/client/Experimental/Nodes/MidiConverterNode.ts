@@ -2,56 +2,56 @@
 import {OrderedSet} from 'immutable'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {MidiAction, midiActions} from '@corgifm/common/common-types'
-import {oscillatorFreqCurveFunctions} from '@corgifm/common/common-utils'
+import {oscillatorFreqCurveFunctions, arrayToESIdKeyMap} from '@corgifm/common/common-utils'
 import {maxPitchFrequency} from '@corgifm/common/common-constants'
 import {adsrValueToString} from '../../client-constants'
-import {ExpCustomNumberParam, buildCustomNumberParamDesc} from '../ExpParams'
+import {ExpCustomNumberParam, ExpCustomNumberParams} from '../ExpParams'
 import {ExpMidiOutputPort, ExpMidiInputPort} from '../ExpMidiPorts'
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
-import {ExpNodeAudioOutputPort} from '../ExpPorts'
+import {ExpNodeAudioOutputPort, ExpPorts} from '../ExpPorts'
 import {midiNoteToFrequency} from '../../WebAudio'
 
 export class MidiConverterNode extends CorgiNode {
-	private readonly _midiInputPort: ExpMidiInputPort
+	protected readonly _ports: ExpPorts
+	protected readonly _customNumberParams: ExpCustomNumberParams
 	private readonly _midiOutputPort: ExpMidiOutputPort
 	private readonly _constantSourceNode: ConstantSourceNode
+	private readonly _portamento: ExpCustomNumberParam
 	private _lastMidiActionTime: number
 	private _currentNotes: OrderedSet<number>
 
-	public constructor(
-		corgiNodeArgs: CorgiNodeArgs,
-	) {
-		const constantSourceNode = corgiNodeArgs.audioContext.createConstantSource()
-		constantSourceNode.offset.setValueAtTime(0, 0)
-		constantSourceNode.start()
+	public constructor(corgiNodeArgs: CorgiNodeArgs) {
+		super(corgiNodeArgs)
 
-		const midiInputPort = new ExpMidiInputPort('input', 'input', () => this, midiAction => this._onMidiMessage.bind(this)(midiAction))
-		const midiOutputPort = new ExpMidiOutputPort('gate', 'gate', () => this)
-		const pitchOutputPort = new ExpNodeAudioOutputPort('pitch', 'pitch', () => this, constantSourceNode, 'unipolar')
+		this._constantSourceNode = corgiNodeArgs.audioContext.createConstantSource()
+		this._constantSourceNode.offset.setValueAtTime(0, 0)
+		this._constantSourceNode.start()
 
-		super(corgiNodeArgs, {
-			ports: [midiInputPort, midiOutputPort, pitchOutputPort],
-			customNumberParams: new Map<Id, ExpCustomNumberParam>([
-				// TODO Store in private class field
-				buildCustomNumberParamDesc('portamento', 0, 0, 8, 3, adsrValueToString),
-			]),
-		})
+		const midiInputPort = new ExpMidiInputPort('input', 'input', this, midiAction => this._onMidiMessage.bind(this)(midiAction))
+		this._midiOutputPort = new ExpMidiOutputPort('gate', 'gate', this)
+		const pitchOutputPort = new ExpNodeAudioOutputPort('pitch', 'pitch', this, this._constantSourceNode, 'unipolar')
+		this._ports = arrayToESIdKeyMap([midiInputPort, this._midiOutputPort, pitchOutputPort])
 
-		this._midiInputPort = midiInputPort
-		this._midiOutputPort = midiOutputPort
+		this._portamento = new ExpCustomNumberParam('portamento', 0, 0, 8, 3, adsrValueToString)
+		this._customNumberParams = arrayToESIdKeyMap([this._portamento])
+
 		this._lastMidiActionTime = 0
 		this._currentNotes = OrderedSet()
-
-		// Make sure to add these to the dispose method!
-		this._constantSourceNode = constantSourceNode
 	}
 
-	public getColor(): string {return CssColor.green}
-	public getName() {return 'Midi Converter'}
+	public getColor = () => CssColor.green
+	public getName = () => 'Midi Converter'
+	public render = () => this.getDebugView()
 
-	private get _portamento() {return this._customNumberParams.get('portamento')!.value}
+	protected _enable() {}
+	protected _disable() {
+		this._midiOutputPort.sendMidiAction(midiActions.gate(this._lastMidiActionTime, false))
+	}
 
-	public render() {return this.getDebugView()}
+	protected _dispose() {
+		this._constantSourceNode.stop()
+		this._constantSourceNode.disconnect()
+	}
 
 	private _onMidiMessage(midiAction: MidiAction) {
 		if (!this._enabled) return
@@ -63,7 +63,7 @@ export class MidiConverterNode extends CorgiNode {
 				this._currentNotes = this._currentNotes.add(midiAction.note)
 				const frequency = midiNoteToFrequency(midiAction.note)
 				const normalized = oscillatorFreqCurveFunctions.unCurve(frequency / maxPitchFrequency)
-				this._constantSourceNode.offset.setTargetAtTime(normalized, midiAction.time, this._portamento)
+				this._constantSourceNode.offset.setTargetAtTime(normalized, midiAction.time, this._portamento.value)
 				this._midiOutputPort.sendMidiAction(midiAction)
 			} else {
 				this._currentNotes = this._currentNotes.delete(midiAction.note)
@@ -74,22 +74,10 @@ export class MidiConverterNode extends CorgiNode {
 					if (noteToPlay !== null) {
 						const frequency = midiNoteToFrequency(noteToPlay)
 						const normalized = oscillatorFreqCurveFunctions.unCurve(frequency / maxPitchFrequency)
-						this._constantSourceNode.offset.setTargetAtTime(normalized, midiAction.time, this._portamento)
+						this._constantSourceNode.offset.setTargetAtTime(normalized, midiAction.time, this._portamento.value)
 					}
 				}
 			}
 		}
-	}
-
-	protected _enable() {
-	}
-
-	protected _disable() {
-		this._midiOutputPort.sendMidiAction(midiActions.gate(this._lastMidiActionTime, false))
-	}
-
-	protected _dispose() {
-		this._constantSourceNode.stop()
-		this._constantSourceNode.disconnect()
 	}
 }

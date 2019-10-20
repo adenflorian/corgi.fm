@@ -1,20 +1,94 @@
 /* eslint-disable no-empty-function */
 import {CssColor} from '@corgifm/common/shamu-color'
-import {toBeats, fromBeats} from '@corgifm/common/common-utils'
+import {toBeats, fromBeats, arrayToESIdKeyMap} from '@corgifm/common/common-utils'
 import {preciseSubtract, preciseAdd, midiPrecision} from '@corgifm/common/midi-types'
 import {SequencerEvent, midiActions} from '@corgifm/common/common-types'
 import {logger} from '../../client-logger'
-import {ExpCustomNumberParam, buildCustomNumberParamDesc} from '../ExpParams'
+import {ExpCustomNumberParam, ExpCustomNumberParams} from '../ExpParams'
 import {ExpMidiOutputPort} from '../ExpMidiPorts'
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
+import {ExpPorts} from '../ExpPorts'
+
+const myPrecision = 1000
+
+export class SequencerNode extends CorgiNode {
+	protected readonly _ports: ExpPorts
+	protected readonly _customNumberParams: ExpCustomNumberParams
+	private readonly _tempo: ExpCustomNumberParam
+	private _cursor = 0
+	private readonly _eventStream = new EventStreamReader()
+	private readonly _midiOutputPort: ExpMidiOutputPort
+	private _startSongTime = -1
+
+	public constructor(corgiNodeArgs: CorgiNodeArgs) {
+		super(corgiNodeArgs)
+
+		this._midiOutputPort = new ExpMidiOutputPort('output', 'output', this)
+		this._ports = arrayToESIdKeyMap([this._midiOutputPort])
+
+		this._tempo = new ExpCustomNumberParam('tempo', 240, 0.001, 999.99, 3)
+		this._customNumberParams = arrayToESIdKeyMap([this._tempo])
+	}
+
+	public getName = () => 'Sequencer'
+	public getColor = () => CssColor.green
+	public render = () => this.getDebugView()
+
+	public onTick(currentGlobalTime: number, maxReadAhead: number) {
+		super.onTick(currentGlobalTime, maxReadAhead)
+		if (!this._enabled) return
+
+		if (this._startSongTime < 0) {
+			this._startSongTime = Math.ceil((currentGlobalTime + 0.1) * 10) / 10
+		}
+
+		const cursor = this._cursor
+		const songStartTime = this._startSongTime
+		const tempo = this._tempo.value
+		const currentSongTime = preciseSubtract(currentGlobalTime, songStartTime)
+		const targetSongTimeToReadTo = Math.ceil(preciseAdd(currentSongTime, maxReadAhead) * myPrecision) / myPrecision
+		const distanceSeconds = Math.round(preciseSubtract(targetSongTimeToReadTo, cursor) * myPrecision) / myPrecision
+
+		if (distanceSeconds <= 0) return
+
+		const distanceBeats = toBeats(distanceSeconds, tempo)
+		const events = this._eventStream.read(distanceBeats)
+
+		events.forEach(event => {
+			const eventDistanceFromCursor = event.distanceFromMainCursor
+			const fromBeats_ = fromBeats(eventDistanceFromCursor, tempo)
+			const songStartPlusCursor = Math.round((songStartTime + cursor) * myPrecision) / myPrecision
+			const eventStart = Math.round((songStartPlusCursor + fromBeats_) * myPrecision) / myPrecision
+
+			if (eventStart.toString().length > 8) logger.warn('precision error oh no: ', {eventDistanceFromCursor, fromBeats_, songStartPlusCursor, eventStart})
+
+			if (event.note) {
+				this._midiOutputPort.sendMidiAction(midiActions.note(eventStart, event.gate, event.note, 1))
+			} else {
+				this._midiOutputPort.sendMidiAction(midiActions.gate(eventStart, event.gate))
+			}
+		})
+
+		this._cursor = targetSongTimeToReadTo
+	}
+
+	protected _enable() {
+	}
+
+	protected _disable() {
+		this._midiOutputPort.sendMidiAction(midiActions.gate(this._startSongTime + this._cursor, false))
+		this._startSongTime = -1
+		this._cursor = 0
+	}
+
+	protected _dispose() {
+	}
+}
 
 interface NextEvent extends SequencerEvent {
 	readonly distanceFromMainCursor: number
 }
 
-const myPrecision = 1000
-
-// TODO Good candidate for writing in Rust?
 class EventStreamReader {
 	private _beatCursor = 0
 	private readonly _eventStream = new EventStream()
@@ -89,92 +163,5 @@ class EventStream {
 			...nextEvent,
 			beat: nextEvent.beat + (this._loops * this.beatLength),
 		}
-	}
-}
-
-export class SequencerNode extends CorgiNode {
-	private _cursor: number
-	private readonly _eventStream: EventStreamReader
-	private readonly _midiOutputPort: ExpMidiOutputPort
-	private _startSongTime: number
-
-	public constructor(
-		corgiNodeArgs: CorgiNodeArgs,
-	) {
-		const midiOutputPort = new ExpMidiOutputPort('output', 'output', () => this)
-
-		super(corgiNodeArgs, {
-			ports: [midiOutputPort],
-			customNumberParams: new Map<Id, ExpCustomNumberParam>([
-				// TODO Store in private class field
-				buildCustomNumberParamDesc('tempo', 240, 0.001, 999.99, 3),
-			]),
-		})
-
-		this._startSongTime = -1
-
-		this._midiOutputPort = midiOutputPort
-
-		this._cursor = 0
-		this._eventStream = new EventStreamReader()
-
-		// Make sure to add these to the dispose method!
-	}
-
-	public getColor(): string {return CssColor.green}
-	public getName() {return 'Sequencer'}
-
-	private get _tempo() {return this._customNumberParams.get('tempo')!.value}
-
-	public render() {return this.getDebugView()}
-
-	public onTick(currentGlobalTime: number, maxReadAhead: number) {
-		super.onTick(currentGlobalTime, maxReadAhead)
-		if (!this._enabled) return
-
-		if (this._startSongTime < 0) {
-			this._startSongTime = Math.ceil((currentGlobalTime + 0.1) * 10) / 10
-		}
-
-		const cursor = this._cursor
-		const songStartTime = this._startSongTime
-		const tempo = this._tempo
-		const currentSongTime = preciseSubtract(currentGlobalTime, songStartTime)
-		const targetSongTimeToReadTo = Math.ceil(preciseAdd(currentSongTime, maxReadAhead) * myPrecision) / myPrecision
-		const distanceSeconds = Math.round(preciseSubtract(targetSongTimeToReadTo, cursor) * myPrecision) / myPrecision
-
-		if (distanceSeconds <= 0) return
-
-		const distanceBeats = toBeats(distanceSeconds, tempo)
-		const events = this._eventStream.read(distanceBeats)
-
-		events.forEach(event => {
-			const eventDistanceFromCursor = event.distanceFromMainCursor
-			const fromBeats_ = fromBeats(eventDistanceFromCursor, tempo)
-			const songStartPlusCursor = Math.round((songStartTime + cursor) * myPrecision) / myPrecision
-			const eventStart = Math.round((songStartPlusCursor + fromBeats_) * myPrecision) / myPrecision
-
-			if (eventStart.toString().length > 8) logger.warn('precision error oh no: ', {eventDistanceFromCursor, fromBeats_, songStartPlusCursor, eventStart})
-
-			if (event.note) {
-				this._midiOutputPort.sendMidiAction(midiActions.note(eventStart, event.gate, event.note, 1))
-			} else {
-				this._midiOutputPort.sendMidiAction(midiActions.gate(eventStart, event.gate))
-			}
-		})
-
-		this._cursor = targetSongTimeToReadTo
-	}
-
-	protected _enable() {
-	}
-
-	protected _disable() {
-		this._midiOutputPort.sendMidiAction(midiActions.gate(this._startSongTime + this._cursor, false))
-		this._startSongTime = -1
-		this._cursor = 0
-	}
-
-	protected _dispose() {
 	}
 }

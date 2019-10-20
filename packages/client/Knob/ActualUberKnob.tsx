@@ -120,7 +120,7 @@ function UberArcMod({
 	const nodeManagerContext = useNodeManagerContext()
 	const connection = nodeManagerContext.connections.get(chain.id)
 	const colorEvent = connection
-		? connection.outputPort.getNode().onColorChange
+		? connection.outputPort.node.onColorChange
 		: undefined
 	const activeColor = useStringChangedEvent(colorEvent)
 	const railColor = useMemo(() => setLightness(activeColor, 12), [activeColor])

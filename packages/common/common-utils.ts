@@ -262,6 +262,10 @@ export function arrayToESMap<T, U extends keyof T>(array: readonly T[] = [], idK
 	}, new Map<T[typeof idKey], T>())
 }
 
+export function arrayToESIdKeyMap<T extends {id: Id}>(array: readonly T[] = []): Map<Id, T> {
+	return arrayToESMap(array, 'id')
+}
+
 // Curve functions
 const length = 65535
 const halfLength = Math.floor(length / 2) // 32767

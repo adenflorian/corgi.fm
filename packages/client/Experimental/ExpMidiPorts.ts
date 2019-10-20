@@ -12,10 +12,10 @@ export abstract class ExpMidiPort extends ExpPort {
 	public constructor(
 		public readonly id: Id,
 		public readonly name: string,
-		public readonly getNode: () => CorgiNode,
+		public readonly node: CorgiNode,
 		side: ExpPortSide,
 	) {
-		super(id, name, getNode, side, 'midi')
+		super(id, name, node, side, 'midi')
 	}
 
 	public connect = (connection: ExpMidiConnection) => {
@@ -46,10 +46,10 @@ export class ExpMidiInputPort extends ExpMidiPort {
 	public constructor(
 		public readonly id: Id,
 		public readonly name: string,
-		public readonly getNode: () => CorgiNode,
+		public readonly node: CorgiNode,
 		public readonly destination: MidiReceiver
 	) {
-		super(id, name, getNode, 'in')
+		super(id, name, node, 'in')
 	}
 
 	protected _connect = (connection: ExpMidiConnection) => {}
@@ -57,7 +57,7 @@ export class ExpMidiInputPort extends ExpMidiPort {
 	protected _disconnect = (connection: ExpMidiConnection) => {}
 
 	public detectFeedbackLoop(i: number, nodeIds: List<Id>): boolean {
-		return this.getNode().detectAudioFeedbackLoop(i, nodeIds)
+		return this.node.detectAudioFeedbackLoop(i, nodeIds)
 	}
 }
 
@@ -70,9 +70,9 @@ export class ExpMidiOutputPort extends ExpMidiPort {
 	public constructor(
 		public readonly id: Id,
 		public readonly name: string,
-		public readonly getNode: () => CorgiNode,
+		public readonly node: CorgiNode,
 	) {
-		super(id, name, getNode, 'out')
+		super(id, name, node, 'out')
 	}
 
 	public sendMidiAction: MidiReceiver = (...args) => {
@@ -95,19 +95,19 @@ export class ExpMidiOutputPort extends ExpMidiPort {
 	}
 
 	public detectFeedbackLoop(i = 0, nodeIds: List<Id> = List()): boolean {
-		if (nodeIds.includes(this.getNode().id)) {
-			logger.warn('detected feedback loop because matching nodeId: ', {nodeId: this.getNode().id, nodeIds, i})
+		if (nodeIds.includes(this.node.id)) {
+			logger.warn('detected feedback loop because matching nodeId: ', {nodeId: this.node.id, nodeIds, i})
 			return true
 		}
 		if (i > 500) {
-			logger.warn('detected feedback loop because i too high: ', {nodeId: this.getNode().id, nodeIds, i})
+			logger.warn('detected feedback loop because i too high: ', {nodeId: this.node.id, nodeIds, i})
 			return true
 		}
 
 		if (this._connections.size === 0) return false
 
 		return [...this._connections].some(([_, connection]) => {
-			return connection.detectFeedbackLoop(i + 1, nodeIds.push(this.getNode().id))
+			return connection.detectFeedbackLoop(i + 1, nodeIds.push(this.node.id))
 		})
 	}
 }

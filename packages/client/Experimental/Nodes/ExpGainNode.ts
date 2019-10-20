@@ -1,60 +1,44 @@
 /* eslint-disable no-empty-function */
 import {CssColor} from '@corgifm/common/shamu-color'
+import {arrayToESIdKeyMap} from '@corgifm/common/common-utils'
 import {gainDecibelValueToString} from '../../client-constants'
 import {
-	ExpNodeAudioInputPort, ExpNodeAudioOutputPort, ExpNodeAudioParamInputPort,
+	ExpNodeAudioInputPort, ExpNodeAudioOutputPort, ExpNodeAudioParamInputPort, ExpPorts,
 } from '../ExpPorts'
-import {ExpAudioParam} from '../ExpParams'
+import {ExpAudioParam, ExpAudioParams} from '../ExpParams'
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 import {DryWetChain} from './NodeHelpers/DryWetChain'
 
 export class ExpGainNode extends CorgiNode {
+	protected readonly _ports: ExpPorts
 	private readonly _gain: GainNode
 	private readonly _dryWetChain: DryWetChain
+	protected readonly _audioParams: ExpAudioParams
 
-	public constructor(
-		corgiNodeArgs: CorgiNodeArgs,
-	) {
-		const gain = corgiNodeArgs.audioContext.createGain()
-		gain.gain.value = 0
+	public constructor(corgiNodeArgs: CorgiNodeArgs) {
+		super(corgiNodeArgs)
 
-		const dryWetChain = new DryWetChain(corgiNodeArgs.audioContext, gain)
+		this._gain = corgiNodeArgs.audioContext.createGain()
+		this._gain.gain.value = 0
 
-		const gainParam = new ExpAudioParam('gain', gain.gain, 1, 1, 'unipolar', {valueString: gainDecibelValueToString})
+		this._dryWetChain = new DryWetChain(corgiNodeArgs.audioContext, this._gain)
 
-		const inputPort = new ExpNodeAudioInputPort('input', 'input', () => this, dryWetChain.inputGain)
-		const gainPort = new ExpNodeAudioParamInputPort(gainParam, () => this, corgiNodeArgs.audioContext, 'offset')
+		const gainParam = new ExpAudioParam('gain', this._gain.gain, 1, 1, 'unipolar', {valueString: gainDecibelValueToString})
+		this._audioParams = arrayToESIdKeyMap([gainParam])
 
-		const outputPort = new ExpNodeAudioOutputPort('output', 'output', () => this, dryWetChain.outputGain, 'bipolar')
+		const inputPort = new ExpNodeAudioInputPort('input', 'input', this, this._dryWetChain.inputGain)
+		const gainPort = new ExpNodeAudioParamInputPort(gainParam, this, corgiNodeArgs.audioContext, 'offset')
+		const outputPort = new ExpNodeAudioOutputPort('output', 'output', this, this._dryWetChain.outputGain, 'bipolar')
+		this._ports = arrayToESIdKeyMap([inputPort, gainPort, outputPort])
 
-		super(corgiNodeArgs, {
-			ports: [inputPort, gainPort, outputPort],
-			audioParams: [gainParam],
-			// new ExpAudioParam('gain', gain.gain, 1, 0, 10, 3.33, gainDecibelValueToString),
-		})
-
-		// Make sure to add these to the dispose method!
-		this._gain = gain
-		this._dryWetChain = dryWetChain
 	}
 
-	public getColor(): string {
-		return CssColor.orange
-	}
+	public getColor = () => CssColor.orange
+	public getName = () => 'Gain'
+	public render = () => this.getDebugView()
 
-	public getName() {return 'Gain'}
-
-	public render() {
-		return this.getDebugView()
-	}
-
-	protected _enable() {
-		this._dryWetChain.wetOnly()
-	}
-
-	protected _disable() {
-		this._dryWetChain.dryOnly()
-	}
+	protected _enable = () =>	this._dryWetChain.wetOnly()
+	protected _disable = () => this._dryWetChain.dryOnly()
 
 	protected _dispose() {
 		this._gain.disconnect()

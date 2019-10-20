@@ -3,9 +3,9 @@ import {hot} from 'react-hot-loader'
 import {ExpConnectorPlaceholders} from '../Connections/ExpConnectorPlaceholders'
 import {SimpleGraphNodeExp} from '../SimpleGraph/SimpleGraphNodeExp'
 import {ExpNodeDebugView} from './ExpNodeDebugView'
-import {ExpPort} from './ExpPorts'
+import {ExpPorts} from './ExpPorts'
 import {
-	ExpAudioParam, ExpCustomNumberParam,
+	ExpAudioParams, ExpCustomNumberParams,
 } from './ExpParams'
 import {ExpNodeContext, ExpNodeContextValue} from './CorgiNode'
 import './ExpNodes.less'
@@ -13,9 +13,9 @@ import './ExpNodes.less'
 interface Props {
 	readonly children: React.ReactNode
 	readonly context: ExpNodeContextValue
-	readonly audioParams: Map<Id, ExpAudioParam>
-	readonly customNumberParams: Map<Id, ExpCustomNumberParam>
-	readonly ports: Map<Id, ExpPort>
+	readonly audioParams: ExpAudioParams
+	readonly customNumberParams: ExpCustomNumberParams
+	readonly ports: ExpPorts
 }
 
 export const CorgiNodeView = hot(module)(React.memo(function _CorgiNodeView({

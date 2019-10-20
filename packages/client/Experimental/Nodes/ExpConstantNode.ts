@@ -1,43 +1,36 @@
 /* eslint-disable no-empty-function */
 import {CssColor} from '@corgifm/common/shamu-color'
+import {arrayToESIdKeyMap} from '@corgifm/common/common-utils'
 import {
-	ExpNodeAudioOutputPort, ExpNodeAudioParamInputPort,
+	ExpNodeAudioOutputPort, ExpNodeAudioParamInputPort, ExpPorts,
 } from '../ExpPorts'
-import {ExpAudioParam} from '../ExpParams'
+import {ExpAudioParam, ExpAudioParams} from '../ExpParams'
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 
 export class ConstantExpNode extends CorgiNode {
+	protected readonly _audioParams: ExpAudioParams
+	protected readonly _ports: ExpPorts
 	private readonly _constantSourceNode: ConstantSourceNode
 	private readonly _outputGain: GainNode
 
-	public constructor(
-		corgiNodeArgs: CorgiNodeArgs,
-	) {
-		const constantSourceNode = corgiNodeArgs.audioContext.createConstantSource()
-		constantSourceNode.start()
-		const outputGain = corgiNodeArgs.audioContext.createGain()
-		constantSourceNode.connect(outputGain)
+	public constructor(corgiNodeArgs: CorgiNodeArgs) {
+		super(corgiNodeArgs)
 
-		const offsetParam = new ExpAudioParam('offset', constantSourceNode.offset, 0, 1, 'bipolar')
+		this._constantSourceNode = corgiNodeArgs.audioContext.createConstantSource()
+		this._constantSourceNode.start()
+		this._outputGain = corgiNodeArgs.audioContext.createGain()
+		this._constantSourceNode.connect(this._outputGain)
 
-		const offsetPort = new ExpNodeAudioParamInputPort(offsetParam, () => this, corgiNodeArgs.audioContext, 'offset')
-		const outputPort = new ExpNodeAudioOutputPort('output', 'output', () => this, outputGain, 'bipolar')
+		const offsetParam = new ExpAudioParam('offset', this._constantSourceNode.offset, 0, 1, 'bipolar')
+		this._audioParams = arrayToESIdKeyMap([offsetParam])
 
-		super(corgiNodeArgs, {
-			ports: [offsetPort, outputPort],
-			audioParams: [offsetParam],
-		})
-
-		// Make sure to add these to the dispose method!
-		this._constantSourceNode = constantSourceNode
-		this._outputGain = outputGain
-	}
-
-	public getColor(): string {
-		return CssColor.green
+		const offsetPort = new ExpNodeAudioParamInputPort(offsetParam, this, corgiNodeArgs.audioContext, 'offset')
+		const outputPort = new ExpNodeAudioOutputPort('output', 'output', this, this._outputGain, 'bipolar')
+		this._ports = arrayToESIdKeyMap([offsetPort, outputPort])
 	}
 
 	public getName() {return 'Constant'}
+	public getColor() {return CssColor.green}
 
 	public render() {
 		return this.getDebugView()

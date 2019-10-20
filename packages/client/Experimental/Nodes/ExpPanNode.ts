@@ -1,57 +1,42 @@
 /* eslint-disable no-empty-function */
 import {CssColor} from '@corgifm/common/shamu-color'
+import {arrayToESIdKeyMap} from '@corgifm/common/common-utils'
 import {panValueToString} from '../../client-constants'
 import {
-	ExpNodeAudioInputPort, ExpNodeAudioOutputPort, ExpNodeAudioParamInputPort,
+	ExpNodeAudioInputPort, ExpNodeAudioOutputPort, ExpNodeAudioParamInputPort, ExpPorts,
 } from '../ExpPorts'
-import {ExpAudioParam} from '../ExpParams'
+import {ExpAudioParam, ExpAudioParams} from '../ExpParams'
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 import {DryWetChain} from './NodeHelpers/DryWetChain'
 
 export class ExpPanNode extends CorgiNode {
+	protected readonly _ports: ExpPorts
 	private readonly _pan: StereoPannerNode
 	private readonly _dryWetChain: DryWetChain
+	protected readonly _audioParams: ExpAudioParams
 
-	public constructor(
-		corgiNodeArgs: CorgiNodeArgs,
-	) {
-		const pan = corgiNodeArgs.audioContext.createStereoPanner()
+	public constructor(corgiNodeArgs: CorgiNodeArgs) {
+		super(corgiNodeArgs)
 
-		const dryWetChain = new DryWetChain(corgiNodeArgs.audioContext, pan)
+		this._pan = corgiNodeArgs.audioContext.createStereoPanner()
 
-		const panParam = new ExpAudioParam('pan', pan.pan, 0, 1, 'bipolar', {valueString: panValueToString})
+		this._dryWetChain = new DryWetChain(corgiNodeArgs.audioContext, this._pan)
 
-		const inputPort = new ExpNodeAudioInputPort('input', 'input', () => this, dryWetChain.inputGain)
-		const panPort = new ExpNodeAudioParamInputPort(panParam, () => this, corgiNodeArgs.audioContext, 'center')
-		const outputPort = new ExpNodeAudioOutputPort('output', 'output', () => this, dryWetChain.outputGain, 'bipolar')
+		const panParam = new ExpAudioParam('pan', this._pan.pan, 0, 1, 'bipolar', {valueString: panValueToString})
+		this._audioParams = arrayToESIdKeyMap([panParam])
 
-		super(corgiNodeArgs, {
-			ports: [inputPort, panPort, outputPort],
-			audioParams: [panParam],
-		})
-
-		// Make sure to add these to the dispose method!
-		this._pan = pan
-		this._dryWetChain = dryWetChain
+		const inputPort = new ExpNodeAudioInputPort('input', 'input', this, this._dryWetChain.inputGain)
+		const panPort = new ExpNodeAudioParamInputPort(panParam, this, corgiNodeArgs.audioContext, 'center')
+		const outputPort = new ExpNodeAudioOutputPort('output', 'output', this, this._dryWetChain.outputGain, 'bipolar')
+		this._ports = arrayToESIdKeyMap([inputPort, panPort, outputPort])
 	}
 
-	public getColor(): string {
-		return CssColor.purple
-	}
+	public getColor = () => CssColor.purple
+	public getName = () => 'Pan'
+	public render = () => this.getDebugView()
 
-	public getName() {return 'Pan'}
-
-	public render() {
-		return this.getDebugView()
-	}
-
-	protected _enable() {
-		this._dryWetChain.wetOnly()
-	}
-
-	protected _disable() {
-		this._dryWetChain.dryOnly()
-	}
+	protected _enable = () => this._dryWetChain.wetOnly()
+	protected _disable = () => this._dryWetChain.dryOnly()
 
 	protected _dispose() {
 		this._pan.disconnect()

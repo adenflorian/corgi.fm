@@ -1,14 +1,14 @@
 /* eslint-disable no-empty-function */
 import {CssColor} from '@corgifm/common/shamu-color'
-import {clamp} from '@corgifm/common/common-utils'
+import {clamp, arrayToESIdKeyMap} from '@corgifm/common/common-utils'
 import {MidiAction} from '@corgifm/common/common-types'
 import {logger} from '../../client-logger'
 import {
 	adsrValueToString, gainDecibelValueToString,
 } from '../../client-constants'
-import {ExpNodeAudioOutputPort} from '../ExpPorts'
+import {ExpNodeAudioOutputPort, ExpPorts} from '../ExpPorts'
 import {
-	ExpCustomNumberParam, buildCustomNumberParamDesc,
+	ExpCustomNumberParam, ExpCustomNumberParams,
 } from '../ExpParams'
 import {ExpMidiInputPort} from '../ExpMidiPorts'
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
@@ -17,61 +17,57 @@ const longTime = 999999999
 const minDistance = 0.00001
 
 export class EnvelopeNode extends CorgiNode {
+	protected readonly _ports: ExpPorts
+	protected readonly _customNumberParams: ExpCustomNumberParams
 	private readonly _constantSource: ConstantSourceNode
 	private readonly _outputGain: GainNode
-	// private _intervalId: NodeJS.Timeout
-	private _lastGateTime: number
+	private _lastGateTime = -1
 	private _lastGate?: boolean
+	private readonly _attack: ExpCustomNumberParam
+	private readonly _hold: ExpCustomNumberParam
+	private readonly _decay: ExpCustomNumberParam
+	private readonly _sustain: ExpCustomNumberParam
+	private readonly _release: ExpCustomNumberParam
 
 	public constructor(
 		corgiNodeArgs: CorgiNodeArgs,
 	) {
-		const constantSource = corgiNodeArgs.audioContext.createConstantSource()
-		const outputGain = corgiNodeArgs.audioContext.createGain()
+		super(corgiNodeArgs)
 
-		constantSource.offset.value = 0
-		constantSource.connect(outputGain)
-		constantSource.start()
-		constantSource.offset.linearRampToValueAtTime(0, longTime)
+		this._constantSource = corgiNodeArgs.audioContext.createConstantSource()
+		this._outputGain = corgiNodeArgs.audioContext.createGain()
 
-		const outputPort = new ExpNodeAudioOutputPort('output', 'output', () => this, outputGain, 'unipolar')
+		this._constantSource.offset.value = 0
+		this._constantSource.connect(this._outputGain)
+		this._constantSource.start()
+		this._constantSource.offset.linearRampToValueAtTime(0, longTime)
 
-		const midiInputPort = new ExpMidiInputPort('input', 'input', () => this, midiAction => this.receiveMidiAction.bind(this)(midiAction))
+		const outputPort = new ExpNodeAudioOutputPort('output', 'output', this, this._outputGain, 'unipolar')
+		const midiInputPort = new ExpMidiInputPort('input', 'input', this, midiAction => this.receiveMidiAction.bind(this)(midiAction))
+		this._ports = arrayToESIdKeyMap([outputPort, midiInputPort])
 
-		super(corgiNodeArgs, {
-			ports: [outputPort, midiInputPort],
-			customNumberParams: new Map<Id, ExpCustomNumberParam>([
-				// TODO Store reference in private class field
-				// buildCustomNumberParamDesc('attack', 0.0005, 0, 32, 3, adsrValueToString),
-				// buildCustomNumberParamDesc('hold', 0, 0, 32, 3, adsrValueToString),
-				// buildCustomNumberParamDesc('decay', 1, 0, 32, 3, adsrValueToString),
-				// buildCustomNumberParamDesc('sustain', 1, 0, 1, 1, gainDecibelValueToString),
-				// buildCustomNumberParamDesc('release', 0.015, 0, 32, 3, adsrValueToString),
-				buildCustomNumberParamDesc('attack', 0.25, 0, 32, 3, adsrValueToString),
-				buildCustomNumberParamDesc('hold', 0, 0, 32, 3, adsrValueToString),
-				buildCustomNumberParamDesc('decay', 0, 0, 32, 3, adsrValueToString),
-				buildCustomNumberParamDesc('sustain', 1, 0, 1, 1, gainDecibelValueToString),
-				buildCustomNumberParamDesc('release', 32, 0, 32, 3, adsrValueToString),
-			]),
-		})
-
-		this._lastGateTime = -1
-
-		// Make sure to add these to the dispose method!
-		this._constantSource = constantSource
-		this._outputGain = outputGain
-
-		// this._intervalId = setInterval(() => {
-		// 	this.receiveMidiAction(true, this.audioContext.currentTime + 0.5)
-		// 	this.receiveMidiAction(false, this.audioContext.currentTime + 1.5)
-		// }, 1000)
+		this._attack = new ExpCustomNumberParam('attack', 0.25, 0, 32, 3, adsrValueToString) // 0.0005
+		this._hold = new ExpCustomNumberParam('hold', 0, 0, 32, 3, adsrValueToString) // 0
+		this._decay = new ExpCustomNumberParam('decay', 0, 0, 32, 3, adsrValueToString) // 1
+		this._sustain = new ExpCustomNumberParam('sustain', 1, 0, 1, 1, gainDecibelValueToString) // 1
+		this._release = new ExpCustomNumberParam('release', 32, 0, 32, 3, adsrValueToString) // 0.015
+		this._customNumberParams = arrayToESIdKeyMap([
+			this._attack, this._hold, this._decay, this._sustain, this._release,
+		])
 	}
 
-	public getColor(): string {
-		return CssColor.blue
-	}
+	public getColor = () => CssColor.blue
+	public getName = () => 'Envelope'
+	public render = () => this.getDebugView()
 
-	public getName() {return 'Envelope'}
+	protected _enable = () => this._outputGain.gain.value = 1
+	protected _disable = () => this._outputGain.gain.value = 0
+
+	protected _dispose() {
+		this._constantSource.stop()
+		this._constantSource.disconnect()
+		this._outputGain.disconnect()
+	}
 
 	public receiveMidiAction(midiAction: MidiAction) {
 		if (midiAction.gate !== undefined) {
@@ -95,18 +91,18 @@ export class EnvelopeNode extends CorgiNode {
 		}
 		const offset = this._constantSource.offset
 		if (gate) {
-			const attackEnd = startTime + this._attackSeconds + minDistance
-			const holdEnd = attackEnd + this._holdSeconds + minDistance
-			const decayEnd = holdEnd + this._decaySeconds + minDistance
+			const attackEnd = startTime + this._attack.value + minDistance
+			const holdEnd = attackEnd + this._hold.value + minDistance
+			const decayEnd = holdEnd + this._decay.value + minDistance
 			const farOut = decayEnd + longTime + minDistance
-			const actualSustain = clamp(this._sustain, 0.0001, 1)
+			const actualSustain = clamp(this._sustain.value, 0.0001, 1)
 			offset.cancelAndHoldAtTime(startTime)
 			offset.linearRampToValueAtTime(1, attackEnd)
 			offset.linearRampToValueAtTime(1, holdEnd)
 			offset.exponentialRampToValueAtTime(actualSustain, decayEnd)
 			offset.linearRampToValueAtTime(actualSustain, farOut)
 		} else {
-			const releaseEnd = startTime + this._releaseSeconds + minDistance
+			const releaseEnd = startTime + this._release.value + minDistance
 			const farOut = releaseEnd + longTime + minDistance
 			offset.cancelAndHoldAtTime(startTime)
 			offset.exponentialRampToValueAtTime(0.0001, releaseEnd)
@@ -114,30 +110,5 @@ export class EnvelopeNode extends CorgiNode {
 		}
 		// farOut is to provide an event to be canceled so an anchor point can
 		// be created whenever cancelAndHoldAtTime is called.
-	}
-
-	private get _attackSeconds() {return this._customNumberParams.get('attack')!.value}
-	private get _holdSeconds() {return this._customNumberParams.get('hold')!.value}
-	private get _decaySeconds() {return this._customNumberParams.get('decay')!.value}
-	private get _sustain() {return this._customNumberParams.get('sustain')!.value}
-	private get _releaseSeconds() {return this._customNumberParams.get('release')!.value}
-
-	public render() {
-		return this.getDebugView()
-	}
-
-	protected _enable() {
-		this._outputGain.gain.value = 1
-	}
-
-	protected _disable() {
-		this._outputGain.gain.value = 0
-	}
-
-	protected _dispose() {
-		this._constantSource.stop()
-		this._constantSource.disconnect()
-		this._outputGain.disconnect()
-		// clearInterval(this._intervalId)
 	}
 }

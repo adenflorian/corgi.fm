@@ -1,32 +1,28 @@
 /* eslint-disable no-empty-function */
-import {ExpNodeAudioInputPort} from '../ExpPorts'
+import {arrayToESIdKeyMap} from '@corgifm/common/common-utils'
+import {CssColor} from '@corgifm/common/shamu-color'
+import {ExpNodeAudioInputPort, ExpPorts} from '../ExpPorts'
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 import {ToggleGainChain} from './NodeHelpers/ToggleGainChain'
 
 export class AudioOutputExpNode extends CorgiNode {
+	protected readonly _ports: ExpPorts
 	private readonly _inputChain: ToggleGainChain
-	private readonly _onWindowUnloadBound: () => void
 
-	public constructor(
-		corgiNodeArgs: CorgiNodeArgs,
-	) {
-		const inputChain = new ToggleGainChain(corgiNodeArgs.audioContext, 0.5)
+	public constructor(corgiNodeArgs: CorgiNodeArgs) {
+		super(corgiNodeArgs)
 
-		const inputPort = new ExpNodeAudioInputPort('input', 'input', () => this, inputChain.input)
-
-		super(corgiNodeArgs, {ports: [inputPort]})
-
-		inputChain.output.connect(this._audioContext.destination)
+		this._inputChain = new ToggleGainChain(corgiNodeArgs.audioContext, 0.5)
+		this._inputChain.output.connect(this._audioContext.destination)
 		// inputGain.connect(this.preMasterLimiter)
 
-		// Make sure to add these to the dispose method!
-		this._inputChain = inputChain
+		const inputPort = new ExpNodeAudioInputPort('input', 'input', this, this._inputChain.input)
+		this._ports = arrayToESIdKeyMap([inputPort])
 
-		this._onWindowUnloadBound = this._onWindowUnload.bind(this)
-		window.addEventListener('unload', this._onWindowUnloadBound)
+		window.addEventListener('unload', this._onWindowUnload)
 	}
 
-	private _onWindowUnload() {
+	private readonly _onWindowUnload = () => {
 		this._inputChain.dispose()
 
 		const startMs = Date.now()
@@ -41,22 +37,15 @@ export class AudioOutputExpNode extends CorgiNode {
 		}
 	}
 
-	public getName() {return 'Audio Output'}
+	public getName = () => 'Audio Output'
+	public getColor = () => CssColor.green
+	public render = () => this.getDebugView()
 
-	public render() {
-		return this.getDebugView()
-	}
-
-	protected _enable() {
-		this._inputChain.enable()
-	}
-
-	protected _disable() {
-		this._inputChain.disable()
-	}
+	protected _enable = () => this._inputChain.enable()
+	protected _disable = () => this._inputChain.disable()
 
 	protected _dispose() {
 		this._inputChain.dispose()
-		window.removeEventListener('unload', this._onWindowUnloadBound)
+		window.removeEventListener('unload', this._onWindowUnload)
 	}
 }
