@@ -1,3 +1,5 @@
+import {CorgiObjectChangedEvent} from './Experimental/CorgiEvents'
+
 class SimpleGlobalClientState {
 	private _zoom = 1
 	private _zoomDisplay = 0
@@ -45,6 +47,8 @@ class SimpleGlobalClientState {
 	public resetAnalyserDumpNode(audioContext: AudioContext) {
 		this._analyserDumpNode = audioContext.createAnalyser()
 	}
+
+	public onAudioWorkletLoaded = new CorgiObjectChangedEvent(false as boolean)
 }
 
 export const simpleGlobalClientState = new SimpleGlobalClientState()

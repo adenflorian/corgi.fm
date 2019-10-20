@@ -7,25 +7,28 @@ import {
 import {ExpAudioParam} from '../ExpParams'
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 import {createCorgiDownSamplerWorkletNode} from '../../WebAudio/AudioWorklets/audio-worklets'
-import {logger} from '../../client-logger'
 import {DryWetChain} from './NodeHelpers/DryWetChain'
 
 export class DistortionExpNode extends CorgiNode {
-	private readonly _downSamplerWorkletNode: AudioWorkletNode
+	private readonly _downSamplerWorkletNode: AudioNode
 	private readonly _dryWetChain: DryWetChain
 
 	public constructor(
 		corgiNodeArgs: CorgiNodeArgs,
 	) {
 		const downSamplerWorkletNode = createCorgiDownSamplerWorkletNode(corgiNodeArgs.audioContext)
+		const dummyGainNode = corgiNodeArgs.audioContext.createGain()
 
-		const dryWetChain = new DryWetChain(corgiNodeArgs.audioContext, downSamplerWorkletNode)
+		const dryWetChain = new DryWetChain(corgiNodeArgs.audioContext, downSamplerWorkletNode || dummyGainNode)
 
-		let driveAudioParam = downSamplerWorkletNode.parameters.get('drive')
+		let driveAudioParam: AudioParam | undefined
+
+		if (downSamplerWorkletNode) {
+			driveAudioParam = downSamplerWorkletNode.parameters.get('drive')
+		}
 
 		if (!driveAudioParam) {
-			logger.error('driveAudioParam not defined! Something wrong with AudioWorklet stuff:', {driveAudioParam})
-			driveAudioParam = corgiNodeArgs.audioContext.createGain().gain
+			driveAudioParam = dummyGainNode.gain
 		}
 
 		const driveParam = new ExpAudioParam('drive', driveAudioParam, 0.25, 1, 'unipolar', {valueString: percentageValueString})
@@ -36,17 +39,15 @@ export class DistortionExpNode extends CorgiNode {
 		super(corgiNodeArgs, {
 			ports: [inputPort, drivePort, outputPort],
 			audioParams: [driveParam],
+			requiresAudioWorklet: true,
 		})
 
 		// Make sure to add these to the dispose method!
-		this._downSamplerWorkletNode = downSamplerWorkletNode
+		this._downSamplerWorkletNode = downSamplerWorkletNode || dummyGainNode
 		this._dryWetChain = dryWetChain
 	}
 
-	public getColor(): string {
-		return CssColor.orange
-	}
-
+	public getColor(): string {return CssColor.orange}
 	public getName() {return 'Downsample'}
 
 	public render() {

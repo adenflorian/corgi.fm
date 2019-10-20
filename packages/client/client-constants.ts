@@ -90,6 +90,19 @@ export const sequencerUndoToolTip = stripIndents`
 	Ctrl + Z
 	Cmd + Z
 `
+
+export const audioWorkletToolTip = stripIndents`
+	AudioWorklet is a new browser technology
+	It is known to cause audio glitch sounds (Chromium team is aware and is working to solve this issue)
+	You can disable AudioWorklet in the options on the right side of the screen
+	If disabled, certain audio effects will no longer work
+
+	Things you can try to reduce glitch sounds:
+	- restart audio interface
+	- lower computer CPU usage by closing other applications and browser tabs
+	- use options to lower graphics settings
+`
+
 export const graphSizeX = 12800
 export const graphSizeY = 7200
 

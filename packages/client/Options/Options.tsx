@@ -10,6 +10,7 @@ import {ModalContent} from '../Modal/ModalManager'
 import {ConnectedOption} from '../Option'
 import {ConnectedOptionCheckbox} from '../RoomSetting'
 import './Options.less'
+import {audioWorkletToolTip} from '../client-constants'
 
 export function OptionsModalButton() {
 	const dispatch = useDispatch()
@@ -81,6 +82,11 @@ export const OptionsModalContent: ModalContent = () => {
 					<ConnectedOption
 						option={AppOptions.graphicsExtraAnimations}
 						label="graphics: enable extra animations (disable for better performance in big rooms)"
+					/>
+					<ConnectedOption
+						option={AppOptions.disableAudioWorklet}
+						toolTip={audioWorkletToolTip}
+						label="audio: disable AudioWorklet (requires refresh) (try this if you are hearing audio glitch noises)"
 					/>
 				</div>
 			</div>

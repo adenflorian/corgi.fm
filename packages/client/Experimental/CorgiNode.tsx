@@ -31,6 +31,7 @@ export interface CorgiNodeOptions {
 	readonly ports?: readonly ExpPort[]
 	readonly audioParams?: readonly ExpAudioParam[]
 	readonly customNumberParams?: ExpCustomNumberParams
+	readonly requiresAudioWorklet?: boolean
 }
 
 export interface CorgiNodeArgs {
@@ -42,6 +43,8 @@ export interface CorgiNodeArgs {
 }
 
 export type CorgiNodeConstructor = new (args: CorgiNodeArgs) => CorgiNode
+
+export interface CorgiNodeReact extends Pick<CorgiNode, 'id' | 'onColorChange' | 'requiresAudioWorklet'> {}
 
 export abstract class CorgiNode {
 	public readonly reactContext: ExpNodeContextValue
@@ -55,6 +58,7 @@ export abstract class CorgiNode {
 	protected readonly _audioContext: AudioContext
 	protected readonly _preMasterLimiter: GainNode
 	protected readonly _singletonContext: SingletonContextImpl
+	public readonly requiresAudioWorklet: boolean
 
 	public constructor(
 		args: CorgiNodeArgs,
@@ -72,6 +76,8 @@ export abstract class CorgiNode {
 		this._ports = arrayToESMap(options.ports, 'id')
 		this._audioParams = arrayToESMap(options.audioParams, 'id')
 		this._customNumberParams = options.customNumberParams || new Map()
+		this.requiresAudioWorklet = options.requiresAudioWorklet !== undefined
+			? options.requiresAudioWorklet : false
 	}
 
 	// public abstract onNumberParamChange(paramChange: NumberParamChange): void
@@ -118,7 +124,7 @@ export abstract class CorgiNode {
 				port.setPosition(position)
 			},
 			getPorts: () => this._ports,
-			node: this,
+			node: this as CorgiNodeReact,
 		}
 	}
 

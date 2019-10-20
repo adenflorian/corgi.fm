@@ -1,5 +1,6 @@
 import React, {useCallback} from 'react'
 import {useDispatch} from 'react-redux'
+import {stripIndents} from 'common-tags'
 import {rateLimitedDebounceNoTrail} from '@corgifm/common/common-utils'
 import {
 	IClientState, commonActions,
@@ -22,9 +23,12 @@ import {ConnectedNameChanger} from './NameChanger'
 import {OptionsModalButton} from './Options/Options'
 import {ConnectedRoomSelector} from './RoomSelector'
 import {LoadRoomModalButton} from './SavingAndLoading/SavingAndLoading'
-import './TopDiv.less'
 import {WelcomeModalButton} from './Welcome/Welcome'
 import {createResetZoomAction} from './SimpleGraph/Zoom'
+import {useObjectChangedEvent} from './Experimental/hooks/useCorgiEvent'
+import {simpleGlobalClientState} from './SimpleGlobalClientState'
+import {audioWorkletToolTip} from './client-constants'
+import './TopDiv.less'
 
 interface ReduxProps {
 	memberCount: number
@@ -47,6 +51,8 @@ export const TopDiv = ({
 	const resetZoom = useCallback(() => {
 		dispatch(createResetZoomAction())
 	}, [dispatch])
+
+	const isAudioWorkletLoaded = useObjectChangedEvent(simpleGlobalClientState.onAudioWorkletLoaded)
 
 	return (
 		<div className="topDiv" style={{marginBottom: 'auto'}}>
@@ -110,6 +116,19 @@ export const TopDiv = ({
 							: 'Public: anyone can join and do stuff'}
 					>
 						{onlyOwnerCanDoStuff ? 'Limited' : 'Public'}
+					</div>
+				</div>
+				<div className="blob">
+					<div className="blobDark">AudioWorklet</div>
+					<div
+						style={{
+							color: isAudioWorkletLoaded
+								? CssColor.orange
+								: CssColor.defaultGray,
+						}}
+						title={audioWorkletToolTip}
+					>
+						{isAudioWorkletLoaded ? 'Loaded' : 'Not Loaded'}
 					</div>
 				</div>
 				{!isConnected &&

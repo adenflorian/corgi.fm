@@ -1,5 +1,7 @@
 import React from 'react'
 import {hot} from 'react-hot-loader'
+import {simpleGlobalClientState} from '../SimpleGlobalClientState'
+import {audioWorkletToolTip} from '../client-constants'
 import {
 	ExpPort, ExpPorts, AudioParamInputPortContext, ExpNodeAudioParamInputPort,
 } from './ExpPorts'
@@ -7,6 +9,7 @@ import {ExpNodeDebugAudioParamKnob} from './ExpNodeDebugAudioParamKnob'
 import {ExpAudioParams, ExpCustomNumberParams, AudioParamContext} from './ExpParams'
 import {ExpNodeDebugCustomNumberParamKnob} from './ExpNodeDebugCustomNumberParamKnob'
 import {useNodeContext} from './CorgiNode'
+import {useObjectChangedEvent} from './hooks/useCorgiEvent'
 
 interface Props {
 	audioParams: ExpAudioParams
@@ -22,11 +25,21 @@ export const ExpNodeDebugView = hot(module)(React.memo(function _ExpNodeDebugVie
 	const nodeContext = useNodeContext()
 	const nodeName = nodeContext.getName()
 	const nodeId = nodeContext.id
+	const isAudioWorkletLoaded = useObjectChangedEvent(simpleGlobalClientState.onAudioWorkletLoaded)
+
 	return (
 		<div className="expNodeDebugView">
 			<div className="nodeName">{nodeName}</div>
 			<div className="nodeId">{nodeId}</div>
 			<Ports ports={ports} />
+			{nodeContext.node.requiresAudioWorklet && !isAudioWorkletLoaded &&
+				<div
+					className="audioWorkletWarning"
+					title={audioWorkletToolTip}
+				>
+					This node needs AudioWorklet to work properly, but AudioWorklet is not loaded.
+				</div>
+			}
 			<div className="params">
 				{audioParams.size > 0 &&
 					<div className="sectionLabel">Audio Params</div>}

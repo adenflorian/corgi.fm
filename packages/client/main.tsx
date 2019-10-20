@@ -84,13 +84,14 @@ async function setupAsync() {
 	simpleGlobalClientState.resetAnalyserDumpNode(audioContext)
 	const preMasterLimiter = audioContext.createGain()
 
-	// Disabled until audio worklet glitch issues are fixed
-	// https://bugs.chromium.org/p/chromium/issues/detail?id=1006844
-	await loadAudioWorkletsAsync(audioContext)
-
 	const samplesManager = new SamplesManager(audioContext)
 
 	const loadedOptionsState = loadOptionsState()
+
+	if (!loadedOptionsState.disableAudioWorklet) {
+		// https://bugs.chromium.org/p/chromium/issues/detail?id=1006844
+		await loadAudioWorkletsAsync(audioContext)
+	}
 
 	const getGetAllInstruments: GetAllInstruments = () => getAllInstruments()
 
