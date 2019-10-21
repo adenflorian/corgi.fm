@@ -83,6 +83,8 @@ export function SimpleGraphNodeExp({children}: Props) {
 		}
 	}, [dispatch, dragging, positionId, x, y])
 
+	const nodeName = nodeContext.getName()
+
 	return (
 		<Fragment>
 			<div
@@ -121,13 +123,13 @@ export function SimpleGraphNodeExp({children}: Props) {
 								<ExpPanel
 									color={color}
 									id={positionId}
-									label="test"
+									label={nodeName}
 								>
 									{children}
 								</ExpPanel>
 							</ContextMenuTrigger>
 						)
-					}, [children, color, positionId])
+					}, [children, color, nodeName, positionId])
 				}
 			</div>
 		</Fragment>
