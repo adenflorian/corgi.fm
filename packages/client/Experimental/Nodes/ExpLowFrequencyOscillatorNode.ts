@@ -46,7 +46,7 @@ export class LowFrequencyOscillatorExpNode extends CorgiNode {
 		this._ports = arrayToESIdKeyMap([frequencyPort, detunePort, outputPort])
 	}
 
-	public getColor = () => CssColor.green
+	public getColor = () => CssColor.purple
 	public getName = () => 'Low Frequency Oscillator'
 	public render = () => this.getDebugView()
 

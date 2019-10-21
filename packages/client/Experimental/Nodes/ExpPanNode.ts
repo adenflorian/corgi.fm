@@ -31,7 +31,7 @@ export class ExpPanNode extends CorgiNode {
 		this._ports = arrayToESIdKeyMap([inputPort, panPort, outputPort])
 	}
 
-	public getColor = () => CssColor.purple
+	public getColor = () => CssColor.orange
 	public getName = () => 'Pan'
 	public render = () => this.getDebugView()
 

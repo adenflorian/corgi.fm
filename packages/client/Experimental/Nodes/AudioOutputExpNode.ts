@@ -38,7 +38,7 @@ export class AudioOutputExpNode extends CorgiNode {
 	}
 
 	public getName = () => 'Audio Output'
-	public getColor = () => CssColor.green
+	public getColor = () => CssColor.blue
 	public render = () => this.getDebugView()
 
 	protected _enable = () => this._inputChain.enable()

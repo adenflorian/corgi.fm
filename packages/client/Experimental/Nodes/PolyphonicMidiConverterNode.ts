@@ -44,7 +44,7 @@ export class PolyphonicMidiConverterNode extends CorgiNode {
 		this._customNumberParams = arrayToESIdKeyMap([this._portamento])
 	}
 
-	public getColor = () => CssColor.green
+	public getColor = () => CssColor.yellow
 	public getName = () => 'Polyphonic Midi Converter'
 	public render = () => this.getDebugView()
 

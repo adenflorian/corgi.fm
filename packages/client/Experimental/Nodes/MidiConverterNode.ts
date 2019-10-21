@@ -47,7 +47,7 @@ export class MidiConverterNode extends CorgiNode {
 		this._currentNotes = OrderedSet()
 	}
 
-	public getColor = () => CssColor.green
+	public getColor = () => CssColor.yellow
 	public getName = () => 'Midi Converter'
 	public render = () => this.getDebugView()
 

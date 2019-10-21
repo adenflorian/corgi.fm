@@ -24,7 +24,7 @@ export class KeyboardNode extends CorgiNode {
 		this._ports = arrayToESIdKeyMap([this._midiOutputPort])
 	}
 
-	public getColor = () => CssColor.green
+	public getColor = () => CssColor.yellow
 	public getName = () => 'Keyboard'
 
 	public render() {

@@ -56,7 +56,7 @@ export class EnvelopeNode extends CorgiNode {
 		])
 	}
 
-	public getColor = () => CssColor.blue
+	public getColor = () => CssColor.purple
 	public getName = () => 'Envelope'
 	public render = () => this.getDebugView()
 

@@ -30,7 +30,7 @@ export class ConstantExpNode extends CorgiNode {
 	}
 
 	public getName() {return 'Constant'}
-	public getColor() {return CssColor.green}
+	public getColor() {return CssColor.purple}
 
 	public render() {
 		return this.getDebugView()
