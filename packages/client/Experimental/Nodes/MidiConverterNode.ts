@@ -5,18 +5,23 @@ import {MidiAction, midiActions} from '@corgifm/common/common-types'
 import {oscillatorFreqCurveFunctions, arrayToESIdKeyMap} from '@corgifm/common/common-utils'
 import {maxPitchFrequency} from '@corgifm/common/common-constants'
 import {adsrValueToString} from '../../client-constants'
-import {ExpCustomNumberParam, ExpCustomNumberParams} from '../ExpParams'
+import {ExpCustomNumberParam, ExpCustomNumberParams, ExpCustomEnumParam, ExpCustomEnumParams} from '../ExpParams'
 import {ExpMidiOutputPort, ExpMidiInputPort} from '../ExpMidiPorts'
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 import {ExpNodeAudioOutputPort, ExpPorts} from '../ExpPorts'
 import {midiNoteToFrequency} from '../../WebAudio'
 
+const legatoOptions = ['legato', `legaton't`] as const
+type Legato = typeof legatoOptions[number]
+
 export class MidiConverterNode extends CorgiNode {
 	protected readonly _ports: ExpPorts
 	protected readonly _customNumberParams: ExpCustomNumberParams
+	protected readonly _customEnumParams: ExpCustomEnumParams
 	private readonly _midiOutputPort: ExpMidiOutputPort
 	private readonly _constantSourceNode: ConstantSourceNode
 	private readonly _portamento: ExpCustomNumberParam
+	private readonly _legato: ExpCustomEnumParam<Legato>
 	private _lastMidiActionTime: number
 	private _currentNotes: OrderedSet<number>
 
@@ -34,6 +39,9 @@ export class MidiConverterNode extends CorgiNode {
 
 		this._portamento = new ExpCustomNumberParam('portamento', 0, 0, 8, 3, adsrValueToString)
 		this._customNumberParams = arrayToESIdKeyMap([this._portamento])
+
+		this._legato = new ExpCustomEnumParam<Legato>('legato', `legaton't`, legatoOptions)
+		this._customEnumParams = arrayToESIdKeyMap([this._legato] as ExpCustomEnumParam<string>[])
 
 		this._lastMidiActionTime = 0
 		this._currentNotes = OrderedSet()
@@ -72,9 +80,12 @@ export class MidiConverterNode extends CorgiNode {
 	}
 
 	private _onMidiNoteOn(midiAction: Extract<MidiAction, {type: 'MIDI_NOTE'}>) {
+		const fresh = this._currentNotes.size === 0
 		this._currentNotes = this._currentNotes.add(midiAction.note)
 		this._updatePitch(midiAction.note, midiAction.time)
-		this._midiOutputPort.sendMidiAction(midiAction)
+		if (fresh || this._legato.value === `legaton't`) {
+			this._midiOutputPort.sendMidiAction(midiAction)
+		}
 	}
 
 	private _onMidiNoteOff(midiAction: Extract<MidiAction, {type: 'MIDI_NOTE'}>) {

@@ -1,4 +1,6 @@
-import React, {Fragment, useMemo, useRef, useEffect, useCallback, useLayoutEffect} from 'react'
+import React, {
+	useMemo, useRef, useEffect, useCallback, useLayoutEffect,
+} from 'react'
 import {useDispatch, useSelector} from 'react-redux'
 import {expConnectionsActions, createOptionSelector, AppOptions} from '@corgifm/common/redux'
 import {clamp} from '@corgifm/common/common-utils'
@@ -6,8 +8,10 @@ import {SignalRange} from '@corgifm/common/common-types'
 import {setLightness} from '@corgifm/common/shamu-color'
 import {ParamInputChainReact, useAudioParamInputPortContext} from '../Experimental/ExpPorts'
 import {useAudioParamContext} from '../Experimental/ExpParams'
-import {CorgiNumberChangedEvent, CorgiStringChangedEvent} from '../Experimental/CorgiEvents'
-import {useStringChangedEvent, useNumberChangedEvent, useEnumChangedEvent, useObjectChangedEvent} from '../Experimental/hooks/useCorgiEvent'
+import {CorgiNumberChangedEvent} from '../Experimental/CorgiEvents'
+import {
+	useNumberChangedEvent, useEnumChangedEvent, useObjectChangedEvent,
+} from '../Experimental/hooks/useCorgiEvent'
 import {useNodeContext} from '../Experimental/CorgiNode'
 import {useNodeManagerContext} from '../Experimental/NodeManager'
 import {useBoolean} from '../react-hooks'

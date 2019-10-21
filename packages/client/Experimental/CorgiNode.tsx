@@ -8,7 +8,7 @@ import {SingletonContextImpl} from '../SingletonContext'
 import {
 	ExpPorts, ExpPort, isAudioOutputPort, isAudioParamInputPort,
 } from './ExpPorts'
-import {ExpAudioParams, ExpCustomNumberParams} from './ExpParams'
+import {ExpAudioParams, ExpCustomNumberParams, ExpCustomEnumParams} from './ExpParams'
 import {CorgiNodeView} from './CorgiNodeView'
 
 export const ExpNodeContext = React.createContext<null | CorgiNodeReact>(null)
@@ -46,6 +46,7 @@ export abstract class CorgiNode {
 	protected readonly _audioParams: ExpAudioParams = new Map()
 	protected readonly _ports: ExpPorts = new Map()
 	protected readonly _customNumberParams: ExpCustomNumberParams = new Map()
+	protected readonly _customEnumParams: ExpCustomEnumParams = new Map()
 	protected _enabled = true
 
 	public constructor(
@@ -114,6 +115,15 @@ export abstract class CorgiNode {
 		customNumberParam.onChange.invokeImmediately(newClampedValue)
 	}
 
+	public onCustomEnumParamChange(paramId: Id, newValue: string) {
+		const customEnumParam = this._customEnumParams.get(paramId)
+
+		if (!customEnumParam) return logger.warn('[onCustomEnumParamChange] 404 customEnumParam not found: ', {paramId, newValue})
+
+		customEnumParam.value = newValue
+		customEnumParam.onChange.invokeImmediately(newValue)
+	}
+
 	public getPort(id: Id): ExpPort | undefined {
 		return this._ports.get(id)
 	}
@@ -127,6 +137,7 @@ export abstract class CorgiNode {
 				audioParams={this._audioParams}
 				context={this as CorgiNodeReact}
 				customNumberParams={this._customNumberParams}
+				customEnumParams={this._customEnumParams}
 				ports={this._ports}
 			>
 				{children}

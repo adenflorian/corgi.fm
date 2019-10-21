@@ -9,11 +9,11 @@ import {typeClassMap} from './Nodes/ExpNodes'
 import {CorgiNode} from './CorgiNode'
 import {
 	ExpNodeAudioConnection, ExpNodeConnection, isAudioConnection,
-	ExpConnectionCallback, ExpMidiConnection, isMidiConnection,
+	ExpMidiConnection, isMidiConnection,
 } from './ExpConnections'
-import {NumberParamChange} from './ExpParams'
+import {NumberParamChange, EnumParamChange} from './ExpParams'
 import {
-	isAudioOutputPort, isAudioInputPort, ExpPortCallback, ExpPortType, isAudioParamInputPort,
+	isAudioOutputPort, isAudioInputPort, ExpPortType, isAudioParamInputPort,
 } from './ExpPorts'
 import {isMidiOutputPort, isMidiInputPort} from './ExpMidiPorts'
 
@@ -161,6 +161,14 @@ export class NodeManager {
 		node.onCustomNumberParamChange(paramChange.paramId, paramChange.newValue)
 	}
 
+	public onCustomEnumParamChange = (paramChange: EnumParamChange) => {
+		const node = this._nodes.get(paramChange.nodeId)
+
+		if (!node) return logger.warn('[onCustomEnumParamChange] 404 node not found: ', {paramChange})
+
+		node.onCustomEnumParamChange(paramChange.paramId, paramChange.newValue)
+	}
+
 	public addNodes = (newNodes: immutable.Map<Id, ExpNodeState>) => {
 		newNodes.forEach(this.addNode)
 	}
@@ -176,6 +184,7 @@ export class NodeManager {
 		this._nodes.set(newNode.id, newNode)
 		nodeState.audioParams.forEach((newValue, paramId) => newNode.onAudioParamChange(paramId, newValue))
 		nodeState.customNumberParams.forEach((newValue, paramId) => newNode.onCustomNumberParamChange(paramId, newValue))
+		nodeState.customEnumParams.forEach((newValue, paramId) => newNode.onCustomEnumParamChange(paramId, newValue))
 		newNode.setEnabled(nodeState.enabled)
 	}
 

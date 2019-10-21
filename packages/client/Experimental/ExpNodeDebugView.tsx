@@ -6,21 +6,23 @@ import {
 	ExpPort, ExpPorts, AudioParamInputPortContext, ExpNodeAudioParamInputPort,
 } from './ExpPorts'
 import {ExpNodeDebugAudioParamKnob} from './ExpNodeDebugAudioParamKnob'
-import {ExpAudioParams, ExpCustomNumberParams, AudioParamContext} from './ExpParams'
+import {ExpAudioParams, ExpCustomNumberParams, AudioParamContext, ExpCustomEnumParams} from './ExpParams'
 import {ExpNodeDebugCustomNumberParamKnob} from './ExpNodeDebugCustomNumberParamKnob'
 import {useNodeContext} from './CorgiNode'
 import {useObjectChangedEvent} from './hooks/useCorgiEvent'
+import {ExpNodeDebugCustomEnumParamSelect} from './ExpNodeDebugCustomEnumParamSelect'
 
 interface Props {
 	audioParams: ExpAudioParams
 	customNumberParams: ExpCustomNumberParams
+	customEnumParams: ExpCustomEnumParams
 	ports: ExpPorts
 	children?: React.ReactNode
 }
 
 export const ExpNodeDebugView = hot(module)(React.memo(function _ExpNodeDebugView({
 	audioParams, customNumberParams, children,
-	ports,
+	ports, customEnumParams,
 }: Props) {
 	const nodeContext = useNodeContext()
 	const nodeName = nodeContext.getName()
@@ -73,6 +75,17 @@ export const ExpNodeDebugView = hot(module)(React.memo(function _ExpNodeDebugVie
 							key={id as string}
 							nodeId={nodeId}
 							customNumberParam={customNumberParam}
+						/>
+					))}
+				</div>
+				{customEnumParams.size > 0 &&
+					<div className="sectionLabel">Custom Enum Params</div>}
+				<div className="enumParams">
+					{[...customEnumParams].map(([id, customEnumParam]) => (
+						<ExpNodeDebugCustomEnumParamSelect
+							key={id as string}
+							nodeId={nodeId}
+							customEnumParam={customEnumParam}
 						/>
 					))}
 				</div>

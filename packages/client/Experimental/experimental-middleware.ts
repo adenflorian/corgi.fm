@@ -94,6 +94,9 @@ function after(
 		case 'EXP_NODE_CUSTOM_NUMBER_PARAM_CHANGE':
 			return nodeManager.onCustomNumberParamChange(action)
 
+		case 'EXP_NODE_CUSTOM_ENUM_PARAM_CHANGE':
+			return nodeManager.onCustomEnumParamChange(action)
+
 		case 'EXP_NODE_SET_ENABLED':
 			return nodeManager.enableNode(action.nodeId, action.enabled)
 

@@ -7,6 +7,7 @@ import {ButtonSelect, ButtonSelectOption} from '../../ButtonSelect/ButtonSelect'
 import {useObjectChangedEvent} from '../hooks/useCorgiEvent'
 import {useSingletonContext} from '../../SingletonContext'
 import {CorgiObjectChangedEvent} from '../CorgiEvents'
+import {logger} from '../../client-logger'
 
 interface KeyboardNodeExtraProps {
 	readonly onInputSelected: (input: Input) => void
@@ -38,13 +39,14 @@ const KeyboardNodeExtra2 = React.memo(function _KeyboardNodeExtra({
 	})), [midiInputs])
 
 	const onNewSelection = useCallback((newSelection: ButtonSelectOption<Input>) => {
+		if (newSelection.object === undefined) return logger.error('missing object from newSelection:', {newSelection})
 		onInputSelected(newSelection.object)
 	}, [onInputSelected])
 
 	const selectedInput = useObjectChangedEvent(inputChangedEvent)
 
 	return (
-		<div>
+		<div style={{display: 'flex', justifyContent: 'center'}}>
 			<ButtonSelect
 				options={midiInputOptions}
 				onNewSelection={onNewSelection}

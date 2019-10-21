@@ -12,7 +12,7 @@ export type ButtonSelectOptions<T> = readonly ButtonSelectOption<T>[]
 export interface ButtonSelectOption<T> {
 	readonly label: string
 	readonly value: string
-	readonly object: T
+	readonly object?: T
 }
 
 export const ButtonSelect = function _ButtonSelect<T>({options, onNewSelection, selectedOption}: Props<T>) {

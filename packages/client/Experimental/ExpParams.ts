@@ -4,7 +4,8 @@ import {
 	clampPolarized, CurveFunctions, defaultBipolarCurveFunctions,
 	defaultUnipolarCurveFunctions,
 } from '@corgifm/common/common-utils'
-import {CorgiNumberChangedEvent} from './CorgiEvents'
+import {ButtonSelectOption} from '../ButtonSelect/ButtonSelect'
+import {CorgiNumberChangedEvent, CorgiEnumChangedEvent} from './CorgiEvents'
 
 export interface ExpParam {
 	readonly id: Id
@@ -25,6 +26,7 @@ export interface ExpAudioParamOptions {
 	readonly curveFunctions?: CurveFunctions
 }
 
+export type ExpAudioParams = ReadonlyMap<Id, ExpAudioParam>
 export class ExpAudioParam implements ExpParam {
 	public readonly onChange: CorgiNumberChangedEvent
 	public readonly onModdedLiveValueChange: CorgiNumberChangedEvent
@@ -53,6 +55,7 @@ export class ExpAudioParam implements ExpParam {
 	}
 }
 
+export type ExpCustomNumberParams = ReadonlyMap<Id, ExpCustomNumberParam>
 export class ExpCustomNumberParam {
 	public value: number
 	public readonly onChange: CorgiNumberChangedEvent
@@ -70,76 +73,39 @@ export class ExpCustomNumberParam {
 	}
 }
 
-export interface ExpBooleanParam extends ExpParam {
-	value: boolean
-}
-
-export interface ExpEnumParam<TEnum extends string> extends ExpParam {
-	value: TEnum
-}
-
-export type ExpAudioParams = ReadonlyMap<Id, ExpAudioParam>
-export type ExpCustomNumberParams = ReadonlyMap<Id, ExpCustomNumberParam>
-export type ExpBooleanParams = ReadonlyMap<Id, ExpBooleanParam>
-export type ExpEnumParams<TEnum extends string> = ReadonlyMap<Id, ExpEnumParam<TEnum>>
-
 export interface NumberParamChange {
 	readonly nodeId: Id
 	readonly paramId: Id
 	readonly newValue: number
 }
 
-// export interface ParamDescriptor {
-// 	readonly paramId: Id
-// 	readonly type: ExpParamType
-// }
+export type ExpCustomEnumParams = ReadonlyMap<Id, ExpCustomEnumParam>
+export class ExpCustomEnumParam<TEnum extends string = string> {
+	public value: TEnum
+	public readonly onChange: CorgiEnumChangedEvent<TEnum>
 
-// export enum ExpParamType {
-// 	Frequency = 'Frequency',
-// 	Boolean = 'Boolean',
-// 	OscillatorType = 'OscillatorType',
-// }
+	public constructor(
+		public readonly id: Id,
+		public readonly defaultValue: TEnum,
+		public readonly options: readonly TEnum[],
+		public readonly valueString?: (v: TEnum) => string,
+	) {
+		this.value = this.defaultValue
+		this.onChange = new CorgiEnumChangedEvent(this.defaultValue)
+	}
 
-// type ParamTypeStrings = 'number' | 'string' | 'boolean'
+	public buildSelectOptions(): readonly ButtonSelectOption<TEnum>[] {
+		return this.options.map((option): ButtonSelectOption<TEnum> => {
+			return {
+				label: option,
+				value: option,
+			}
+		})
+	}
+}
 
-// // function ifTypeThenDo(type: 'number' ) {
-
-// // }
-
-// function isNumber(val: unknown): val is number {
-// 	return typeof val === 'number'
-// }
-
-// function isFrequency(val: unknown): val is EPTFrequency {
-// 	return typeof val === 'number'
-// }
-
-// function isString(val: unknown): val is string {
-// 	return typeof val === 'string'
-// }
-
-// function isBoolean(val: unknown): val is boolean {
-// 	return typeof val === 'boolean'
-// }
-
-// const oscillatorTypes = Object.freeze([
-// 	'sine', 'square', 'sawtooth', 'triangle', 'custom',
-// ])
-
-// type EPTFrequency = number
-
-// type ExpParamTypeGuard<T> = (val: unknown) => val is T
-
-// export const expParamTypeGuards = {
-// 	Frequency: isFrequency,
-// 	Boolean: isBoolean,
-// 	OscillatorType: isOscillatorType,
-// } as const
-
-// function isOscillatorType(val: unknown): val is OscillatorType {
-// 	if (isString(val)) {
-// 		return oscillatorTypes.includes(val)
-// 	} else {
-// 		return false
-// 	}
-// }
+export interface EnumParamChange {
+	readonly nodeId: Id
+	readonly paramId: Id
+	readonly newValue: string
+}

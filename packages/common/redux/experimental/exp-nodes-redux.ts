@@ -53,6 +53,15 @@ export const expNodesActions = {
 		BROADCASTER_ACTION,
 		SERVER_ACTION,
 	} as const),
+	customEnumParamChange: (nodeId: Id, paramId: Id, newValue: string) => ({
+		type: 'EXP_NODE_CUSTOM_ENUM_PARAM_CHANGE' as const,
+		isExpNodeAction: true,
+		nodeId,
+		paramId,
+		newValue,
+		BROADCASTER_ACTION,
+		SERVER_ACTION,
+	} as const),
 	setEnabled: (nodeId: Id, enabled: boolean) => ({
 		type: 'EXP_NODE_SET_ENABLED',
 		nodeId,
@@ -70,6 +79,7 @@ const defaultExpNodeState = {
 	type: 'dummy' as ExpNodeType,
 	audioParams: Map<Id, number>(),
 	customNumberParams: Map<Id, number>(),
+	customEnumParams: Map<Id, string>(),
 	enabled: true,
 }
 
@@ -82,6 +92,7 @@ export function makeExpNodeState(node: Exclude<Partial<typeof defaultExpNodeStat
 		.set('id', node.id || uuid.v4())
 		.set('audioParams', Map(node.audioParams || Map()))
 		.set('customNumberParams', Map(node.customNumberParams || Map()))
+		.set('customEnumParams', Map(node.customEnumParams || Map()))
 }
 
 export interface ExpNodeState extends ReturnType<typeof _makeExpNodeState> {}
@@ -108,6 +119,8 @@ export const expNodesReducer = (state = initialState, action: ExpNodesAction): E
 			action.nodeId, x => x.update('audioParams', audioParams => audioParams.set(action.paramId, action.newValue)))
 		case 'EXP_NODE_CUSTOM_NUMBER_PARAM_CHANGE': return state.update(
 			action.nodeId, x => x.update('customNumberParams', customNumberParams => customNumberParams.set(action.paramId, action.newValue)))
+		case 'EXP_NODE_CUSTOM_ENUM_PARAM_CHANGE': return state.update(
+			action.nodeId, x => x.update('customEnumParams', customEnumParams => customEnumParams.set(action.paramId, action.newValue)))
 		case 'EXP_NODE_SET_ENABLED': return state.update(
 			action.nodeId, x => x.set('enabled', action.enabled))
 		default: return state
