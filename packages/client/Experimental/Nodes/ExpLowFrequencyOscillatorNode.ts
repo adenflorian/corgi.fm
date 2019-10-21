@@ -7,22 +7,30 @@ import {
 import {
 	ExpNodeAudioOutputPort, ExpNodeAudioParamInputPort, ExpPorts,
 } from '../ExpPorts'
-import {ExpAudioParam, ExpAudioParams} from '../ExpParams'
+import {ExpAudioParam, ExpAudioParams, ExpCustomEnumParams, ExpCustomEnumParam} from '../ExpParams'
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 import {ToggleGainChain} from './NodeHelpers/ToggleGainChain'
 
+const oscillatorTypes = ['sawtooth', 'sine', 'triangle', 'square'] as const
+type OscillatorType = typeof oscillatorTypes[number]
+
 export class LowFrequencyOscillatorExpNode extends CorgiNode {
 	protected readonly _ports: ExpPorts
+	protected readonly _audioParams: ExpAudioParams
+	protected readonly _customEnumParams: ExpCustomEnumParams
 	private readonly _oscillator: OscillatorNode
 	private readonly _outputChain: ToggleGainChain
-	protected readonly _audioParams: ExpAudioParams
+	private readonly _type: ExpCustomEnumParam<OscillatorType>
 
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
 		super(corgiNodeArgs)
 
+		this._type = new ExpCustomEnumParam<OscillatorType>('type', 'sine', oscillatorTypes)
+		this._type.onChange.subscribe(this.onTypeChange)
+		this._customEnumParams = arrayToESIdKeyMap([this._type] as ExpCustomEnumParam<string>[])
+
 		this._oscillator = corgiNodeArgs.audioContext.createOscillator()
-		this._oscillator.type = 'sine'
-		// this._oscillator.type = pickRandomArrayElement(['sawtooth', 'sine', 'triangle', 'square'])
+		this._oscillator.type = this._type.value
 		this._oscillator.start()
 
 		this._outputChain = new ToggleGainChain(corgiNodeArgs.audioContext)
@@ -50,5 +58,9 @@ export class LowFrequencyOscillatorExpNode extends CorgiNode {
 			this._oscillator.stop()
 			this._oscillator.disconnect()
 		})
+	}
+
+	private readonly onTypeChange = (type: OscillatorType) => {
+		this._oscillator.type = type
 	}
 }

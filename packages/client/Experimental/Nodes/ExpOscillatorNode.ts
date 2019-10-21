@@ -8,29 +8,32 @@ import {
 import {
 	ExpNodeAudioOutputPort, ExpNodeAudioParamInputPort, ExpPorts,
 } from '../ExpPorts'
-import {ExpAudioParam, ExpAudioParams} from '../ExpParams'
+import {ExpAudioParam, ExpAudioParams, ExpCustomEnumParams, ExpCustomEnumParam} from '../ExpParams'
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 import {ToggleGainChain} from './NodeHelpers/ToggleGainChain'
 
+const oscillatorTypes = ['sawtooth', 'sine', 'triangle', 'square'] as const
+type OscillatorType = typeof oscillatorTypes[number]
+
 export class OscillatorExpNode extends CorgiNode {
 	protected readonly _ports: ExpPorts
-	private readonly _oscillator: OscillatorNode
-	// private readonly _merger: ChannelMergerNode
-	private readonly _outputChain: ToggleGainChain
 	protected readonly _audioParams: ExpAudioParams
+	protected readonly _customEnumParams: ExpCustomEnumParams
+	private readonly _oscillator: OscillatorNode
+	private readonly _outputChain: ToggleGainChain
+	private readonly _type: ExpCustomEnumParam<OscillatorType>
 
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
 		super(corgiNodeArgs)
 
+		this._type = new ExpCustomEnumParam<OscillatorType>('type', 'sawtooth', oscillatorTypes)
+		this._type.onChange.subscribe(this.onTypeChange)
+		this._customEnumParams = arrayToESIdKeyMap([this._type] as ExpCustomEnumParam<string>[])
+
 		this._oscillator = corgiNodeArgs.audioContext.createOscillator()
-		this._oscillator.type = 'sawtooth'
-		// this._oscillator.type = pickRandomArrayElement(['sawtooth', 'sine', 'triangle', 'square'])
+		this._oscillator.type = this._type.value
 		this._oscillator.start()
-		// this._merger = corgiNodeArgs.audioContext.createChannelMerger(2)
 		this._outputChain = new ToggleGainChain(corgiNodeArgs.audioContext)
-		// this._oscillator.connect(this._merger, 0, 0)
-		// this._oscillator.connect(this._merger, 0, 1)
-		// this._merger.connect(this._outputChain.input)
 		this._oscillator.connect(this._outputChain.input)
 
 		const frequencyParam = new ExpAudioParam('frequency', this._oscillator.frequency, 440, maxPitchFrequency, 'unipolar', {valueString: filterValueToString, curveFunctions: oscillatorFreqCurveFunctions})
@@ -55,7 +58,10 @@ export class OscillatorExpNode extends CorgiNode {
 		this._outputChain.dispose(() => {
 			this._oscillator.stop()
 			this._oscillator.disconnect()
-			// this._merger.disconnect()
 		})
+	}
+
+	private readonly onTypeChange = (type: OscillatorType) => {
+		this._oscillator.type = type
 	}
 }

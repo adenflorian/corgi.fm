@@ -5,18 +5,27 @@ import {percentageValueString, filterValueToString} from '../../client-constants
 import {
 	ExpNodeAudioInputPort, ExpNodeAudioOutputPort, ExpNodeAudioParamInputPort, ExpPorts,
 } from '../ExpPorts'
-import {ExpAudioParam, ExpAudioParams} from '../ExpParams'
+import {ExpAudioParam, ExpAudioParams, ExpCustomEnumParams, ExpCustomEnumParam} from '../ExpParams'
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 import {DryWetChain} from './NodeHelpers/DryWetChain'
 
+const filterTypes = ['lowpass', 'highpass', 'bandpass', 'lowshelf', 'highshelf', 'peaking', 'notch', 'allpass'] as const
+type FilterType = typeof filterTypes[number]
+
 export class FilterNode extends CorgiNode {
 	protected readonly _ports: ExpPorts
+	protected readonly _audioParams: ExpAudioParams
+	protected readonly _customEnumParams: ExpCustomEnumParams
 	private readonly _filter: BiquadFilterNode
 	private readonly _dryWetChain: DryWetChain
-	protected readonly _audioParams: ExpAudioParams
+	private readonly _type: ExpCustomEnumParam<FilterType>
 
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
 		super(corgiNodeArgs)
+
+		this._type = new ExpCustomEnumParam<FilterType>('type', 'lowpass', filterTypes)
+		this._type.onChange.subscribe(this.onTypeChange)
+		this._customEnumParams = arrayToESIdKeyMap([this._type] as ExpCustomEnumParam<string>[])
 
 		this._filter = corgiNodeArgs.audioContext.createBiquadFilter()
 		this._filter.type = 'lowpass'
@@ -39,26 +48,19 @@ export class FilterNode extends CorgiNode {
 		this._audioParams = arrayToESIdKeyMap([frequencyParam, detuneParam, qParam, gainParam])
 	}
 
-	public getColor(): string {
-		return CssColor.orange
-	}
+	public getColor = () => CssColor.orange
+	public getName = () => 'Filter'
+	public render = () => this.getDebugView()
 
-	public getName() {return 'Filter'}
-
-	public render() {
-		return this.getDebugView()
-	}
-
-	protected _enable() {
-		this._dryWetChain.wetOnly()
-	}
-
-	protected _disable() {
-		this._dryWetChain.dryOnly()
-	}
+	protected _enable = () => this._dryWetChain.wetOnly()
+	protected _disable = () => this._dryWetChain.dryOnly()
 
 	protected _dispose() {
 		this._filter.disconnect()
 		this._dryWetChain.dispose()
+	}
+
+	private readonly onTypeChange = (type: FilterType) => {
+		this._filter.type = type
 	}
 }
