@@ -59,25 +59,47 @@ export class MidiConverterNode extends CorgiNode {
 		this._lastMidiActionTime = midiAction.time
 
 		if (midiAction.type === 'MIDI_NOTE') {
-			if (midiAction.gate === true) {
-				this._currentNotes = this._currentNotes.add(midiAction.note)
-				const frequency = midiNoteToFrequency(midiAction.note)
-				const normalized = oscillatorFreqCurveFunctions.unCurve(frequency / maxPitchFrequency)
-				this._constantSourceNode.offset.setTargetAtTime(normalized, midiAction.time, this._portamento.value)
-				this._midiOutputPort.sendMidiAction(midiAction)
-			} else {
-				this._currentNotes = this._currentNotes.delete(midiAction.note)
-				if (this._currentNotes.size === 0) {
-					this._midiOutputPort.sendMidiAction(midiAction)
-				} else {
-					const noteToPlay = this._currentNotes.last(null)
-					if (noteToPlay !== null) {
-						const frequency = midiNoteToFrequency(noteToPlay)
-						const normalized = oscillatorFreqCurveFunctions.unCurve(frequency / maxPitchFrequency)
-						this._constantSourceNode.offset.setTargetAtTime(normalized, midiAction.time, this._portamento.value)
-					}
-				}
-			}
+			this._onMidiNoteAction(midiAction)
 		}
+	}
+
+	private _onMidiNoteAction(midiAction: Extract<MidiAction, {type: 'MIDI_NOTE'}>) {
+		if (midiAction.gate === true) {
+			this._onMidiNoteOn(midiAction)
+		} else {
+			this._onMidiNoteOff(midiAction)
+		}
+	}
+
+	private _onMidiNoteOn(midiAction: Extract<MidiAction, {type: 'MIDI_NOTE'}>) {
+		this._currentNotes = this._currentNotes.add(midiAction.note)
+		this._updatePitch(midiAction.note, midiAction.time)
+		this._midiOutputPort.sendMidiAction(midiAction)
+	}
+
+	private _onMidiNoteOff(midiAction: Extract<MidiAction, {type: 'MIDI_NOTE'}>) {
+		// Remove note from currently playing notes
+		this._currentNotes = this._currentNotes.delete(midiAction.note)
+
+		// Get last currently playing note
+		const noteToPlay = this._currentNotes.last(null)
+
+		if (noteToPlay === null) {
+			this._sendGateOff(midiAction)
+		} else {
+			this._updatePitch(noteToPlay, midiAction.time)
+			// Retrigger/!Legato?
+			// this._midiOutputPort.sendMidiAction({...midiAction, gate: true})
+		}
+	}
+
+	private _updatePitch(note: number, time: number) {
+		const frequency = midiNoteToFrequency(note)
+		const normalized = oscillatorFreqCurveFunctions.unCurve(frequency / maxPitchFrequency)
+		this._constantSourceNode.offset.setTargetAtTime(normalized, time, this._portamento.value)
+	}
+
+	private _sendGateOff(midiAction: Extract<MidiAction, {type: 'MIDI_NOTE'}>) {
+		this._midiOutputPort.sendMidiAction(midiAction)
 	}
 }

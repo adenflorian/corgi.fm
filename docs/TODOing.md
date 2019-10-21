@@ -37,6 +37,7 @@
 - [ ] create enum param type (knob/dropdown/buttonSelect)
 
 ## Test Weekend 2
+- [ ] allow drawing a selection box around nodes to select
 - [ ] disconnect analyser node if no sources connected
 - [ ] midi converter upgrades
 	- [ ] portamento

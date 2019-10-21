@@ -888,6 +888,8 @@ function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
 	}
 }
 
+const expWidth = 400
+
 function createLocalStuffExperimental(dispatch: Dispatch, state: IClientAppState) {
 
 	const localClientId = selectLocalClientId(state)
@@ -907,7 +909,7 @@ function createLocalStuffExperimental(dispatch: Dispatch, state: IClientAppState
 		makeExpPosition({
 			id: keyboard.id,
 			ownerId: localClientId,
-			x: -800,
+			x: -expWidth * 3,
 			y: newY,
 		})))
 
@@ -922,7 +924,7 @@ function createLocalStuffExperimental(dispatch: Dispatch, state: IClientAppState
 		makeExpPosition({
 			id: midiConverter.id,
 			ownerId: localClientId,
-			x: -400,
+			x: -expWidth * 2,
 			y: newY,
 		})))
 
