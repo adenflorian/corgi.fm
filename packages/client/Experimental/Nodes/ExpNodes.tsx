@@ -13,6 +13,7 @@ import {ConstantExpNode} from './ExpConstantNode'
 import {MidiConverterNode} from './MidiConverterNode'
 import {KeyboardNode} from './KeyboardNode'
 import {DistortionExpNode} from './DistortionExpNode'
+import {PolyphonicMidiConverterNode} from './PolyphonicMidiConverterNode'
 
 // Is there a way to use class decorators to create this map at runtime?
 export const typeClassMap: {readonly [key in ExpNodeType]: CorgiNodeConstructor} = {
@@ -27,6 +28,7 @@ export const typeClassMap: {readonly [key in ExpNodeType]: CorgiNodeConstructor}
 	constant: ConstantExpNode,
 	lowFrequencyOscillator: LowFrequencyOscillatorExpNode,
 	midiConverter: MidiConverterNode,
+	polyphonicMidiConverter: PolyphonicMidiConverterNode,
 	keyboard: KeyboardNode,
 	distortion: DistortionExpNode,
 }

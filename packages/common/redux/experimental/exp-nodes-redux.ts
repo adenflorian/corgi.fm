@@ -91,7 +91,7 @@ export type ExpNodeType = typeof expNodeTypes[number]
 export const expNodeTypes = [
 	'oscillator', 'filter', 'dummy', 'audioOutput', 'gain', 'pan', 'envelope',
 	'sequencer', 'constant', 'lowFrequencyOscillator', 'midiConverter', 'keyboard',
-	'distortion',
+	'distortion', 'polyphonicMidiConverter',
 ] as const
 
 const initialState = Map<Id, ExpNodeState>()
