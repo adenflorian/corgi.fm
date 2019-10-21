@@ -4,10 +4,13 @@ import './ButtonSelect.less'
 interface Props<T> {
 	readonly options: ButtonSelectOptions<T>
 	readonly selectedOption?: ButtonSelectOption<T>
+	readonly orientation?: Orientation
 	readonly onNewSelection: (newSelection: ButtonSelectOption<T>) => void
 }
 
 export type ButtonSelectOptions<T> = readonly ButtonSelectOption<T>[]
+
+type Orientation = 'vertical' | 'horizontal' | 'autoGrid'
 
 export interface ButtonSelectOption<T> {
 	readonly label: string
@@ -15,13 +18,15 @@ export interface ButtonSelectOption<T> {
 	readonly object?: T
 }
 
-export const ButtonSelect = function _ButtonSelect<T>({options, onNewSelection, selectedOption}: Props<T>) {
+export const ButtonSelect = function _ButtonSelect<T>({
+	options, onNewSelection, selectedOption, orientation = 'vertical',
+}: Props<T>) {
 	const handleOptionClick = useCallback((e: React.MouseEvent, option: ButtonSelectOption<T>) => {
 		onNewSelection(option)
 	}, [onNewSelection])
 
 	return (
-		<div className="buttonSelect vertical">
+		<div className={`buttonSelect ${orientation}`}>
 			{options.map(option => {
 				return (
 					<Option

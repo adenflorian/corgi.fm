@@ -4,7 +4,10 @@
 @radius: 8px;
 
 .buttonSelect {
+	display: flex;
+
 	.option {
+		background-color: @panelGrayDark;
 		border: 2px solid #0000;
 		padding: 4px;
 		white-space: normal;
@@ -15,9 +18,9 @@
 		}
 	}
 	&.vertical {
-		.option {
-			background-color: @panelGrayDark;
+		flex-direction: column;
 
+		.option {
 			&:first-child {
 				border-top-left-radius: @radius;
 				border-top-right-radius: @radius;
@@ -26,6 +29,30 @@
 				border-bottom-left-radius: @radius;
 				border-bottom-right-radius: @radius;
 			}
+		}
+	}
+	&.horizontal {
+		flex-direction: row;
+
+		.option {
+			&:first-child {
+				border-top-left-radius: @radius;
+				border-bottom-left-radius: @radius;
+			}
+			&:last-child {
+				border-top-right-radius: @radius;
+				border-bottom-right-radius: @radius;
+			}
+		}
+	}
+	&.autoGrid {
+		flex-direction: row;
+		flex-wrap: wrap;
+		width: 100%;
+		border-radius: @radius;
+
+		.option {
+			flex-grow: 1;
 		}
 	}
 }

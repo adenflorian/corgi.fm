@@ -29,6 +29,7 @@ export const ExpNodeDebugCustomEnumParamSelect = React.memo(function _ExpNodeDeb
 			options={midiInputOptions}
 			onNewSelection={onCustomEnumParamChange}
 			selectedOption={midiInputOptions.find(x => x.value === value)}
+			orientation={'autoGrid'}
 		/>
 	)
 })
