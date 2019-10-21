@@ -31,8 +31,8 @@ export const ExpNodeDebugView = hot(module)(React.memo(function _ExpNodeDebugVie
 
 	return (
 		<div className="expNodeDebugView">
-			<div className="nodeName">{nodeName}</div>
-			<div className="nodeId">{nodeId}</div>
+			{/* <div className="nodeName">{nodeName}</div> */}
+			{/* <div className="nodeId">{nodeId}</div> */}
 			<Ports ports={ports} />
 			{nodeContext.requiresAudioWorklet && !isAudioWorkletLoaded &&
 				<div
@@ -43,8 +43,8 @@ export const ExpNodeDebugView = hot(module)(React.memo(function _ExpNodeDebugVie
 				</div>
 			}
 			<div className="params">
-				{audioParams.size > 0 &&
-					<div className="sectionLabel">Audio Params</div>}
+				{/* {audioParams.size > 0 &&
+					<div className="sectionLabel">Audio Params</div>} */}
 				{/* <div className="paramTexts">
 					{[...audioParams].map(([id, audioParam]) => (
 						<div className="param" key={id as string}>
@@ -67,8 +67,8 @@ export const ExpNodeDebugView = hot(module)(React.memo(function _ExpNodeDebugVie
 						)
 					})}
 				</div>
-				{customNumberParams.size > 0 &&
-					<div className="sectionLabel">Custom Number Params</div>}
+				{/* {customNumberParams.size > 0 &&
+					<div className="sectionLabel">Custom Number Params</div>} */}
 				<div className="paramKnobs">
 					{[...customNumberParams].map(([id, customNumberParam]) => (
 						<ExpNodeDebugCustomNumberParamKnob
@@ -78,8 +78,8 @@ export const ExpNodeDebugView = hot(module)(React.memo(function _ExpNodeDebugVie
 						/>
 					))}
 				</div>
-				{customEnumParams.size > 0 &&
-					<div className="sectionLabel">Custom Enum Params</div>}
+				{/* {customEnumParams.size > 0 &&
+					<div className="sectionLabel">Custom Enum Params</div>} */}
 				<div className="enumParams">
 					{[...customEnumParams].map(([id, customEnumParam]) => (
 						<ExpNodeDebugCustomEnumParamSelect
@@ -101,7 +101,7 @@ interface PortsProps {
 
 const xOffset = 16
 const portHeight = 24
-const heightOffset = 8 + 16 + 4 + 12 + 4 + 16 + 8 + 4
+const heightOffset = 8 + 8 + 4
 
 const Ports = React.memo(function _Ports({ports}: PortsProps) {
 	const nodeContext = useNodeContext()
@@ -120,7 +120,7 @@ const Ports = React.memo(function _Ports({ports}: PortsProps) {
 	) {
 		return (
 			<div className={className}>
-				<div className="sectionLabel">{label}</div>
+				{/* <div className="sectionLabel">{label}</div> */}
 				{ports2.map((port, i) => {
 					const x = xOffset
 					const y = heightOffset + (portHeight * i)

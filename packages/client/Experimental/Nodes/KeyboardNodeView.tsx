@@ -51,6 +51,7 @@ const KeyboardNodeExtra2 = React.memo(function _KeyboardNodeExtra({
 				options={midiInputOptions}
 				onNewSelection={onNewSelection}
 				selectedOption={midiInputOptions.find(x => x.object === selectedInput)}
+				orientation="autoGrid"
 			/>
 		</div>
 	)
