@@ -66,6 +66,8 @@
 
 	.ports {
 		display: flex;
+		margin: 0 -16px;
+
 		.inputPorts, .outputPorts {
 			margin-bottom: 4px;
 			flex-grow: 1;
@@ -93,10 +95,11 @@
 	
 				}
 				.portDropZone {
-					background-color: currentColor;
+					background-color: @panelGray;
 					height: @portDiameter;
 					width: @portDiameter;
 					border-radius: @portDiameter / 2;
+					box-shadow: inset 0 0 0px 4px currentColor;
 
 					&.type-audio {
 					}

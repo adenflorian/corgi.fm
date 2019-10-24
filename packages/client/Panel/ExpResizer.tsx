@@ -1,12 +1,12 @@
 import React, {useState, useCallback, useLayoutEffect, Fragment, useMemo} from 'react'
-import './Resizer.less'
 import {useSelector, useDispatch} from 'react-redux'
 import {
 	findNodeInfo, createExpPositionSelector, expPositionActions,
 } from '@corgifm/common/redux'
-import {panelHeaderHeight} from '@corgifm/common/common-constants';
+import {panelHeaderHeight} from '@corgifm/common/common-constants'
+import {ConnectionNodeType} from '@corgifm/common/common-types'
 import {simpleGlobalClientState} from '../SimpleGlobalClientState'
-import {ConnectionNodeType} from '@corgifm/common/common-types';
+import './Resizer.less'
 
 interface Props {
 	id: Id

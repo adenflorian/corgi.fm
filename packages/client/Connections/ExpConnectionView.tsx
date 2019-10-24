@@ -96,9 +96,9 @@ const ExpConnectionView =
 		// const targetConnectorRight = targetX - (connectorWidth * targetStackOrder)
 
 		const connectedLine = new LineState(
-			sourceConnectorRight + 4,
+			sourceConnectorRight,
 			sourceY,
-			targetConnectorLeft - 4,
+			targetConnectorLeft,
 			targetY,
 		)
 
@@ -164,14 +164,14 @@ const ExpConnectionView =
 					isSourcePlaying={false}
 					highQuality={false}
 					onDelete={onDelete}
-					z={Math.max(sourceZ, targetZ) - 1}
+					// z={Math.max(sourceZ, targetZ) - 1}
 				/>
 				<Connector
 					width={connectorWidth}
 					height={connectorHeight}
 					x={sourceConnectorLeft}
 					y={sourceY}
-					z={sourceZ}
+					// z={sourceZ}
 					saturate={false}
 					title={longLineTooltip}
 					svgProps={{
@@ -193,7 +193,7 @@ const ExpConnectionView =
 					height={connectorHeight}
 					x={targetConnectorLeft}
 					y={targetY}
-					z={targetZ}
+					// z={targetZ}
 					saturate={false}
 					title={longLineTooltip}
 					svgProps={{

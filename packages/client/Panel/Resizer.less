@@ -1,3 +1,5 @@
+@overlap: 2;
+
 .resizer {
 	width: 100%;
 	height: 100%;
@@ -31,23 +33,19 @@
 
 .foo(@size) {
 	.left {
-		left: -@size;
-		margin-left: -@size;
+		margin-left: -@size / @overlap;
 	}
 
 	.right {
-		right: -@size;
-		margin-right: -@size;
+		margin-right: -@size / @overlap;
 	}
 
 	.top {
-		top: -@size;
-		margin-top: -@size;
+		margin-top: -@size / @overlap;
 	}
 
 	.bottom {
-		bottom: -@size;
-		margin-bottom: -@size;
+		margin-bottom: -@size / @overlap;
 	}
 
 	.top, .bottom {

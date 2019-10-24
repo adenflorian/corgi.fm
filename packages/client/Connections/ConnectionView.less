@@ -101,6 +101,7 @@ path.animatedLongLine {
 @placeholderZ: @connectorZ + 1;
 
 @hitboxSize: 80px;
+@connectorWidth: 16px;
 
 .newConnectionPlaceholder-hitbox {
     width: @hitboxSize;
@@ -113,24 +114,27 @@ path.animatedLongLine {
     margin-left: @hitboxSize / -2px;
 
     .viewMode-debug & {
-        z-index: @placeholderHitboxZ;
-        width: 32px;
-        height: 16px;
-        margin-top: 16px / -2px;
-        margin-left: 32px / -4px;
+        // z-index: @placeholderHitboxZ;
+        @width: 64px;
+        @height: 24px;
+        width: @width;
+        height: @height;
+        margin-top: @height / -2px;
+        margin-left: (@width / -2px) + (@connectorWidth / 2);
     }
 }
 
+// These causes big bad hidden perf issues
 .debugViewConnections, .viewMode-debug {
     .connection {
         .longLine {
-            z-index: @lineZ;
+            // z-index: @lineZ;
         }
         .connector {
-            z-index: @connectorZ;
+            // z-index: @connectorZ;
 
             &.newConnectionPlaceholder {
-                z-index: @placeholderZ;
+                // z-index: @placeholderZ;
             }
         }
     }

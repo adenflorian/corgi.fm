@@ -99,7 +99,7 @@ interface PortsProps {
 	readonly ports: ExpPorts
 }
 
-const xOffset = 16
+const xOffset = 0
 const portHeight = 24
 const heightOffset = 8 + 8 + 4
 

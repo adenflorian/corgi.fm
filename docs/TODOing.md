@@ -17,6 +17,7 @@
 - [√] LFO
 - [√] sequencer pitch stuff
 	- [√] put note into events
+- [ ] fix issue with live value after new connection to filter q
 - [ ] different background for experimental
 - [ ] KeyboardNode
 	- [√] network it
@@ -29,6 +30,7 @@
 - [ ] prevent clicks for enable/disable on all nodes
 - [ ] Delay node
 - [ ] Reverb node
+- [ ] Phaser node
 - [ ] WaveShaper distortion node
 - [ ] change room type drop down to a button select thing
 - [ ] enable room type selector for test
@@ -37,6 +39,7 @@
 - [ ] create enum param type (knob/dropdown/buttonSelect)
 
 ## Test Weekend 2
+- [ ] voice and unison params for oscillator?
 - [ ] allow drawing a selection box around nodes to select
 - [ ] disconnect analyser node if no sources connected
 - [ ] midi converter upgrades
