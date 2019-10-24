@@ -17,7 +17,7 @@
 - [√] LFO
 - [√] sequencer pitch stuff
 	- [√] put note into events
-- [ ] fix issue with live value after new connection to filter q
+- [√] fix issue with live value after new connection to filter q
 - [ ] different background for experimental
 - [ ] KeyboardNode
 	- [√] network it

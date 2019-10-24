@@ -202,7 +202,7 @@ function bar(
 	switch (action.type) {
 		// Connections
 		case 'EXP_REPLACE_CONNECTIONS':
-			return nodeManager.addAudioConnections(getConnections())
+			return nodeManager.addConnections(getConnections())
 
 		case 'EXP_DELETE_CONNECTIONS':
 			return action.connectionIds.forEach(

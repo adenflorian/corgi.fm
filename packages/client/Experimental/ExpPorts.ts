@@ -95,8 +95,8 @@ class ParamInputChain {
 	public get centering() {return this._centering}
 	public get gain() {return this._gain.gain.value}
 	public get clampedGain() {return this._clampedGainValue}
-	public onGainChange: CorgiNumberChangedEvent
-	public onCenteringChange: CorgiEnumChangedEvent<ParamInputCentering>
+	public readonly onGainChange: CorgiNumberChangedEvent
+	public readonly onCenteringChange: CorgiEnumChangedEvent<ParamInputCentering>
 	private readonly _waveShaper: WaveShaperNode
 	private readonly _gain: GainNode
 	private _centering: ParamInputCentering
@@ -117,16 +117,19 @@ class ParamInputChain {
 		this._waveShaper.connect(this._gain).connect(this._destination as AudioNode)
 
 		this._centering = defaultCentering
+		this.onCenteringChange = new CorgiEnumChangedEvent(this._centering)
+		this._setCentering(this._centering)
 
 		this.onGainChange = new CorgiNumberChangedEvent(1)
-		this.onCenteringChange = new CorgiEnumChangedEvent(this._centering)
-
-		this.setCentering(this._centering)
 		this.setGain(1)
 	}
 
 	public setCentering(newCentering: ParamInputCentering) {
 		if (newCentering === this._centering) return
+		this._setCentering(newCentering)
+	}
+
+	private _setCentering(newCentering: ParamInputCentering) {
 		this._centering = newCentering
 		this._waveShaper.curve = curves[this._inputRange][this._centering]
 		this.onCenteringChange.invokeImmediately(this._centering)

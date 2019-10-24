@@ -197,7 +197,7 @@ export class NodeManager {
 		this._nodes.delete(nodeId)
 	}
 
-	public addAudioConnections = (connections: immutable.Map<Id, IExpConnection>) => {
+	public addConnections = (connections: immutable.Map<Id, IExpConnection>) => {
 		connections.forEach(this.addConnection)
 	}
 
