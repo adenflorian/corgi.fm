@@ -4,11 +4,12 @@ import './BoxSelect.less'
 interface Props {
 	origin: Point
 	otherCorner: Point
-	top: number
+	top?: number
+	style?: React.CSSProperties
 }
 
 export const BoxSelect = React.memo(function _BoxSelect({
-	origin, otherCorner, top,
+	origin, otherCorner, top = 0, style,
 }: Props) {
 	let box = {width: 0, height: 0, marginLeft: 0, marginTop: 0}
 
@@ -48,6 +49,7 @@ export const BoxSelect = React.memo(function _BoxSelect({
 				className="box"
 				style={{
 					...box,
+					...style,
 				}}
 			/>
 		</div>

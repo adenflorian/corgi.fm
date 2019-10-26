@@ -2,6 +2,7 @@
 import React, {useCallback, useMemo, useState, useLayoutEffect, Fragment} from 'react'
 import {useDispatch, useSelector, shallowEqual} from 'react-redux'
 import {ContextMenuTrigger} from 'react-contextmenu'
+import {Set} from 'immutable'
 import {
 	shamuMetaActions, selectExpPosition, expPositionActions, IClientAppState,
 } from '@corgifm/common/redux'
@@ -23,11 +24,9 @@ export function SimpleGraphNodeExp({children}: Props) {
 
 	const color = nodeContext.getColor()
 
-	const selectedNode = useSelector((state: IClientAppState) => state.room.expPositions.meta.selectedNode)
+	const selectedNodes = useSelector((state: IClientAppState) => state.room.expPositions.meta.selectedNodes)
 
-	const selectedNodeId = selectedNode ? selectedNode.id : undefined
-
-	const isSelected = positionId === selectedNodeId
+	const isSelected = selectedNodes.includes(positionId)
 
 	const {x, y, width, height, zIndex} = useSelector((state: IClientAppState) => {
 		const position = selectExpPosition(state.room, positionId)
@@ -43,22 +42,31 @@ export function SimpleGraphNodeExp({children}: Props) {
 	const dispatch = useDispatch()
 
 	const handleFocus = useCallback(() => {
-		dispatch(expPositionActions.clicked(positionId))
-		dispatch(shamuMetaActions.setSelectedNode({id: positionId, type: ConnectionNodeType.dummy}))
-	}, [dispatch, positionId])
+		// dispatch(expPositionActions.clicked(positionId))
+		// if (!isSelected) dispatch(shamuMetaActions.setSelectedNodes(Set([positionId])))
+	}, [])
 
 	const onBlur = useCallback(() => {
-		dispatch(shamuMetaActions.clearSelectedNode())
-	}, [dispatch])
+		// dispatch(shamuMetaActions.setSelectedNodes(selectedNodes.delete(positionId)))
+	}, [])
 
 	const [dragging, setDragging] = useState(false)
 
 	const handleMouseDown = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+		if (e.button !== 0) return
+		if (e.shiftKey) {
+			dispatch(shamuMetaActions.setSelectedNodes(isSelected
+				? selectedNodes.delete(positionId)
+				: selectedNodes.add(positionId)))
+		} else {
+			dispatch(shamuMetaActions.setSelectedNodes(Set([positionId])))
+		}
 		const target = e.target as HTMLElement
 		if (target.classList && target.classList.contains(handleClassName)) {
 			setDragging(true)
 		}
-	}, [])
+		dispatch(expPositionActions.clicked(positionId))
+	}, [dispatch, isSelected, positionId, selectedNodes])
 
 	useLayoutEffect(() => {
 		if (!dragging) return

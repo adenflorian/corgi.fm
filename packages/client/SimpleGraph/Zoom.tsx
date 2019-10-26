@@ -6,9 +6,13 @@ import {
 	createAnimationFrameSelector, animationActions, RoomType,
 } from '@corgifm/common/redux'
 import {useSelector} from 'react-redux'
+import {hot} from 'react-hot-loader'
+import {CssColor, colorFunc} from '@corgifm/common/shamu-color'
 import {backgroundMenuId, graphSizeX, zoomBackgroundClass, expBackgroundMenuId} from '../client-constants'
 import PlusSVG from '../OtherSVG/plus.svg'
 import {simpleGlobalClientState, blockMouse, unblockMouse} from '../SimpleGlobalClientState'
+import {BoxSelect} from '../BetterSequencer/BoxSelect'
+import {useNodeSelector, NodeSelectorContext} from './useNodeSelector'
 
 interface Props {
 	children: React.ReactNode
@@ -40,6 +44,8 @@ const zoomClose = 'zoomClose'
 const zoomDefault = 'zoomDefault'
 const zoomZoom = 'zoomZoom'
 
+const boxBgColor = colorFunc(CssColor.green).alpha(0.1).toString()
+
 function getZoomClasses(): string {
 	const zoom = Math.round(simpleGlobalClientState.zoomDisplay * 10) / 10
 
@@ -61,7 +67,7 @@ export const globalZoomResetPanAnimChildKey = 'resetPan'
 export const createResetZoomAction = () => animationActions.trigger(Set([globalZoomAnimParentKey]), globalZoomResetZoomAnimChildKey)
 export const createResetPanAction = () => animationActions.trigger(Set([globalZoomAnimParentKey]), globalZoomResetPanAnimChildKey)
 
-export const ConnectedZoom = React.memo(function _Zoom({
+export const ConnectedZoom = hot(module)(React.memo(function _Zoom({
 	children,
 }: Props) {
 
@@ -156,12 +162,17 @@ export const ConnectedZoom = React.memo(function _Zoom({
 		updateRefs()
 	}, [clampPan, updateRefs])
 
+	const [onMouseDownForNodeSelector, boxOrigin, otherCorner, boxActive, nodeSelectorContextValue] = useNodeSelector()
+
 	const onBgMouseEvent = useCallback((e: React.MouseEvent) => {
-		if (e.type === 'mousedown' && (e.buttons === 1 || (e.buttons === 4 && !e.shiftKey))) {
+		if (e.type !== 'mousedown') return
+		if (e.buttons === 4 && !e.shiftKey) {
 			setBackgroundClicked(true)
 			setStartZoom(simpleGlobalClientState.zoom)
+		} else if (e.buttons === 1) {
+			onMouseDownForNodeSelector(e.nativeEvent)
 		}
-	}, [])
+	}, [onMouseDownForNodeSelector])
 
 	const onMouseWheel = useCallback((e: WheelEvent) => {
 		// Turning off rounding so that two finger track pad scrolling will be smooth
@@ -174,29 +185,29 @@ export const ConnectedZoom = React.memo(function _Zoom({
 		e.preventDefault()
 	}, [doPan, doZoom, requireCtrlToZoom])
 
-	const onMouseMove = useCallback((e: MouseEvent) => {
-		if (backgroundClicked && (e.buttons !== 1 && e.buttons !== 4)) {
-			setBackgroundClicked(false)
-		}
-		if (e.buttons === 4 && !e.shiftKey) {
-			doPan(e.movementX, e.movementY)
-		}
-		if (backgroundClicked && e.buttons === 1) {
-			if (e.ctrlKey) {
-				doZoom(e.movementY * mouseZoomMod)
-			} else {
-				doPan(e.movementX, e.movementY)
+	useLayoutEffect(() => {
+		const onMouseUp = () => {
+			if (backgroundClicked) {
+				setBackgroundClicked(false)
 			}
 		}
-	}, [backgroundClicked, doPan, doZoom])
 
-	const onMouseUp = useCallback(() => {
-		if (backgroundClicked) {
-			setBackgroundClicked(false)
+		const onMouseMove = (e: MouseEvent) => {
+			if (backgroundClicked && (e.buttons !== 1 && e.buttons !== 4)) {
+				setBackgroundClicked(false)
+			}
+			if (e.buttons === 4 && !e.shiftKey) {
+				doPan(e.movementX, e.movementY)
+			}
+			if (backgroundClicked && e.buttons === 1) {
+				if (e.ctrlKey) {
+					doZoom(e.movementY * mouseZoomMod)
+				} else {
+					doPan(e.movementX, e.movementY)
+				}
+			}
 		}
-	}, [backgroundClicked])
 
-	useLayoutEffect(() => {
 		window.addEventListener('wheel', onMouseWheel, {passive: false})
 		window.addEventListener('mousemove', onMouseMove)
 		window.addEventListener('mouseup', onMouseUp)
@@ -206,7 +217,7 @@ export const ConnectedZoom = React.memo(function _Zoom({
 			window.removeEventListener('mousemove', onMouseMove)
 			window.removeEventListener('mouseup', onMouseUp)
 		}
-	}, [onMouseMove, onMouseWheel, onMouseUp])
+	}, [onMouseWheel, backgroundClicked, doPan, doZoom])
 
 	const resetZoom = useCallback(() => {
 		simpleGlobalClientState.zoom = defaultZoomReal
@@ -274,12 +285,38 @@ export const ConnectedZoom = React.memo(function _Zoom({
 					// overflow: 'hidden',
 				}}
 			>
-				{children}
+				<NodeSelectorContext.Provider value={nodeSelectorContextValue}>
+					{children}
+				</NodeSelectorContext.Provider>
 			</div>
+			{boxActive &&
+				<div
+					className="nodeSelectorContainer"
+					style={{
+						width: '100vw',
+						height: '100vh',
+						position: 'fixed',
+						top: 0,
+						left: 0,
+						pointerEvents: 'none',
+					}}
+				>
+					<BoxSelect
+						origin={boxOrigin}
+						otherCorner={otherCorner}
+						style={{
+							position: 'absolute',
+							zIndex: 100,
+							borderColor: CssColor.green,
+							backgroundColor: boxBgColor,
+						}}
+					/>
+				</div>
+			}
 			<div id="zoomBlock" />
 		</Fragment>
 	)
-})
+}))
 
 function getBackgroundPosition(pan: Point): string {
 	return `calc(50% + ${pan.x * simpleGlobalClientState.zoom}px) calc(50% + ${pan.y * simpleGlobalClientState.zoom}px)`

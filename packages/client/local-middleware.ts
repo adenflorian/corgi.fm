@@ -464,7 +464,7 @@ export function createLocalMiddleware(
 
 				// dispatch add multi thing
 				dispatch(addMultiThing(clone, nodeType, NetworkActionType.SERVER_AND_BROADCASTER))
-				dispatch(shamuMetaActions.setSelectedNode({id: clone.id, type: clone.type}))
+				dispatch(shamuMetaActions.setSelectedNodes(Set(clone.id)))
 
 				// clone position
 				const positionToClone = selectPosition(newState.room, nodeId)
@@ -535,7 +535,7 @@ export function createLocalMiddleware(
 
 				// dispatch add multi thing
 				dispatch(expNodesActions.add(clone))
-				dispatch(shamuMetaActions.setSelectedNode({id: clone.id, type: ConnectionNodeType.dummy}))
+				dispatch(shamuMetaActions.setSelectedNodes(Set(clone.id)))
 
 				// clone position
 				const positionToClone = selectExpPosition(newState.room, nodeId)

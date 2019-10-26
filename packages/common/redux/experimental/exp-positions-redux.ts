@@ -216,9 +216,7 @@ export const createExpPositionHeightSelector = (id: Id) => (state: IClientAppSta
 	selectExpPosition(state.room, id).height
 
 export const createExpPositionSelectedSelector = (id: Id) => (state: IClientAppState) =>
-	state.room.positions.meta.selectedNode
-		? state.room.positions.meta.selectedNode.id === id
-		: false
+	state.room.positions.meta.selectedNodes.includes(id)
 
 export const createExpPositionEnabledSelector = (id: Id) => (state: IClientAppState) =>
 	selectExpPosition(state.room, id).enabled

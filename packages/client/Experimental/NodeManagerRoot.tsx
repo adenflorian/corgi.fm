@@ -8,7 +8,6 @@ import {useSingletonContext} from '../SingletonContext'
 import {ConnectedExpConnections} from '../Connections/ExpConnections'
 import {logger} from '../client-logger'
 import {ConnectedExpGhostConnectionsView} from '../Connections/ExpGhostConnections'
-import {NodeManagerContext} from './NodeManager'
 
 export const NodeManagerRoot = hot(module)(React.memo(() => {
 	const positionIds = useSelector((state: IClientAppState) => selectExpAllPositions(state.room))
@@ -20,20 +19,18 @@ export const NodeManagerRoot = hot(module)(React.memo(() => {
 	const viewMode = useSelector((state: IClientAppState) => state.room.roomSettings.viewMode)
 
 	if (!nodeManager) {
-		logger.error('missing nodeManager in root!')
+		logger.error('missing nodeManager in NodeManagerRoot!')
 		return null
 	}
 
 	return (
-		<NodeManagerContext.Provider value={nodeManager.reactContext}>
-			<div className={`nodeManagerRoot viewMode-${viewMode}`}>
-				{positionIds.map((_, positionId) => {
-					return nodeManager.renderNodeId(positionId)
-				}).toList()}
-				{/* Render connections after some the connectors render on top of nodes */}
-				<ConnectedExpConnections />
-				<ConnectedExpGhostConnectionsView />
-			</div>
-		</NodeManagerContext.Provider>
+		<div className={`nodeManagerRoot viewMode-${viewMode}`}>
+			{positionIds.map((_, positionId) => {
+				return nodeManager.renderNodeId(positionId)
+			}).toList()}
+			{/* Render connections after some the connectors render on top of nodes */}
+			<ConnectedExpConnections />
+			<ConnectedExpGhostConnectionsView />
+		</div>
 	)
 }))

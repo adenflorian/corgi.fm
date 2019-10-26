@@ -59,22 +59,23 @@ const keyboardShortcuts: IKeyBoardShortcuts = Map<KeyBoardShortcut>({
 	[Shift + Plus + '+']: changeOctaveShortcut(2),
 	[Control + Plus + 'z']: {
 		actionOnKeyDown: (_, state) => {
-			const selectedNode = selectShamuMetaState(state.room).selectedNode
-			if (selectedNode === undefined) return
-			return findNodeInfo(selectPosition(state.room, selectedNode.id).targetType).undoAction(selectedNode.id)
+			const selectedNodes = selectShamuMetaState(state.room).selectedNodes
+			if (selectedNodes.count() !== 1) return
+			return findNodeInfo(selectPosition(state.room, selectedNodes.first()).targetType).undoAction(selectedNodes.first())
 		},
 		allowRepeat: true,
 		preventDefault: true,
 	},
 	[Control + Plus + 'd']: {
 		actionOnKeyDown: (_, state) => {
-			const selectedNode = selectShamuMetaState(state.room).selectedNode
-			if (selectedNode === undefined) return
+			const selectedNodes = selectShamuMetaState(state.room).selectedNodes
+			if (selectedNodes.count() !== 1) return
 			if (selectRoomInfoState(state.room).roomType === RoomType.Experimental) {
-				return localActions.cloneExpNode(selectedNode.id, 'all')
+				return localActions.cloneExpNode(selectedNodes.first(), 'all')
 			} else {
-				if (findNodeInfo(selectedNode.type).isNodeCloneable !== true) return
-				return localActions.cloneNode(selectedNode.id, selectedNode.type, 'all')
+				const type = selectPosition(state.room, selectedNodes.first()).targetType
+				if (findNodeInfo(type).isNodeCloneable !== true) return
+				return localActions.cloneNode(selectedNodes.first(), type, 'all')
 			}
 		},
 		allowRepeat: false,
@@ -82,12 +83,12 @@ const keyboardShortcuts: IKeyBoardShortcuts = Map<KeyBoardShortcut>({
 	},
 	'r': {
 		actionOnKeyDown: (_, state) => {
-			const selectedNode = selectShamuMetaState(state.room).selectedNode
-			if (selectedNode === undefined) return
-			const ownerId = selectPosition(state.room, selectedNode.id).ownerId
+			const selectedNodes = selectShamuMetaState(state.room).selectedNodes
+			if (selectedNodes.count() !== 1) return
+			const ownerId = selectPosition(state.room, selectedNodes.first()).ownerId
 			if (ownerId.startsWith('dummy')) return
-			const sequencer = selectSequencer(state.room, selectedNode.id)
-			return sequencerActions.toggleRecording(selectedNode.id, !sequencer.isRecording)
+			const sequencer = selectSequencer(state.room, selectedNodes.first())
+			return sequencerActions.toggleRecording(selectedNodes.first(), !sequencer.isRecording)
 		},
 		allowRepeat: false,
 		preventDefault: true,

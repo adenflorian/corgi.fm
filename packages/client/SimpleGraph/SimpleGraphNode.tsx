@@ -1,6 +1,7 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import React, {useCallback, useMemo, useState, useLayoutEffect} from 'react'
 import {ContextMenuTrigger} from 'react-contextmenu'
+import {Set} from 'immutable'
 import {ConnectionNodeType} from '@corgifm/common/common-types'
 import {
 	findNodeInfo, IPosition, movePosition,
@@ -52,11 +53,11 @@ export function SimpleGraphNode(props: ISimpleGraphNodeAllProps) {
 
 	const handleFocus = useCallback(() => {
 		dispatch(nodeClicked(positionId))
-		dispatch(shamuMetaActions.setSelectedNode({id: positionId, type: position.targetType}))
-	}, [dispatch, position.targetType, positionId])
+		dispatch(shamuMetaActions.setSelectedNodes(Set([positionId])))
+	}, [dispatch, positionId])
 
 	const onBlur = useCallback(() => {
-		dispatch(shamuMetaActions.clearSelectedNode())
+		dispatch(shamuMetaActions.clearSelectedNodes())
 	}, [dispatch])
 
 	const [dragging, setDragging] = useState(false)
@@ -132,7 +133,7 @@ export function SimpleGraphNode(props: ISimpleGraphNodeAllProps) {
 							{getComponentByNodeType(targetType, positionId, color)}
 						</ContextMenuTrigger>
 					)
-				}, [color, position, positionId, roomType, targetType])
+				}, [color, positionId, targetType])
 			}
 			<canvas
 				id={ECSSequencerRenderSystem.canvasIdPrefix + positionId}
@@ -184,8 +185,7 @@ function getComponentByNodeType(type: ConnectionNodeType, id: Id, color: string)
 export const ConnectedSimpleGraphNode = shamuConnect(
 	(state, {positionId}: ISimpleGraphNodeProps): ISimpleGraphNodeReduxProps => {
 		const position = selectPosition(state.room, positionId)
-		const selectedNode = selectShamuMetaState(state.room).selectedNode
-		const selectedId = selectedNode ? selectedNode.id : undefined
+		const selectedNodes = selectShamuMetaState(state.room).selectedNodes
 
 		return {
 			position,
@@ -194,7 +194,7 @@ export const ConnectedSimpleGraphNode = shamuConnect(
 				|| selectConnectionSourceColorByTargetId(state, positionId),
 			highQuality: selectOptions(state).graphicsECS,
 			fancyZoomPan: selectOptions(state).graphicsExpensiveZoomPan,
-			isSelected: positionId === selectedId,
+			isSelected: selectedNodes.includes(positionId),
 		}
 	},
 )(SimpleGraphNode)

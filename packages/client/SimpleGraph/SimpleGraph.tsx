@@ -7,18 +7,11 @@ import {mainBoardsId} from '../client-constants'
 import {ConnectedConnections} from '../Connections/Connections'
 import {ConnectedConnectorPlaceholders} from '../Connections/ConnectorPlaceholders'
 import {ConnectedGhostConnectionsView} from '../Connections/GhostConnections'
-import {ECSCanvasRenderSystem} from '../ECS/ECSCanvasRenderSystem'
 import {ConnectedMousePointers} from '../MousePointers/MousePointers'
-import {NodeManagerRoot} from '../Experimental/NodeManagerRoot'
 import {ConnectedSimpleGraphNode} from './SimpleGraphNode'
 import {ConnectedZoom} from './Zoom'
 
-const canvasSize = ECSCanvasRenderSystem.canvasSize
-
 export const ConnectedSimpleGraph = function _ConnectedSimpleGraph() {
-	const roomType = useSelector((state: IClientAppState) => state.room.roomInfo.roomType)
-	const isClientReady = useSelector((state: IClientAppState) => selectClientInfo(state).isClientReady)
-
 	return (
 		<div
 			className="simpleGraph"
@@ -32,26 +25,9 @@ export const ConnectedSimpleGraph = function _ConnectedSimpleGraph() {
 			<ConnectedZoom>
 				<div id={mainBoardsId} className="boards">
 					<ConnectedMousePointers />
-					{roomType !== RoomType.Experimental &&
-						<ConnectedConnections />}
-					{roomType !== RoomType.Experimental &&
-						<ConnectedGhostConnectionsView />}
-					{roomType === RoomType.Experimental
-						? (isClientReady ? <NodeManagerRoot /> : null)
-						: <PositionsStuff />}
-					{/* <canvas
-						id="ECSCanvasRenderSystemCanvas"
-						style={{
-							position: 'absolute',
-							width: canvasSize,
-							height: canvasSize,
-							top: -canvasSize / 2,
-							left: -canvasSize / 2,
-							pointerEvents: 'none',
-						}}
-						width={canvasSize}
-						height={canvasSize}
-					/> */}
+					<ConnectedConnections />
+					<ConnectedGhostConnectionsView />
+					<PositionsStuff />
 				</div>
 			</ConnectedZoom>
 		</div>
