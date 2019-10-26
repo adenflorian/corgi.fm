@@ -8,10 +8,10 @@ import {
 import {ConnectionNodeType} from '@corgifm/common/common-types'
 import {logger} from '@corgifm/common/logger'
 import {
-	addClient, addRoomMember, BroadcastAction,
+	addClient, roomMemberActions, BroadcastAction,
 	CHANGE_ROOM, clientDisconnected, ClientState,
 	connectionsActions, createRoom, createRoomAction,
-	deletePositions, deleteRoomMember, deleteThingsAny,
+	deletePositions, deleteThingsAny,
 	getActionsBlacklist, GLOBAL_SERVER_ACTION, globalClockActions,
 	IClientRoomState,
 	IServerState, LOAD_ROOM, maxUsernameLength, pointersActions, commonActions,
@@ -27,13 +27,13 @@ import {
 	selectPositionsWithIds, selectRoomExists,
 	selectRoomSettings, selectRoomStateByName, selectShamuGraphState,
 	SERVER_ACTION, setActiveRoom,
-	setChat, setClients, setRoomMembers, setRooms, shamuGraphActions,
+	setChat, setClients, setRooms, shamuGraphActions,
 	userLeftRoom, whitelistedRoomActionTypes, isRoomOwnerRoomAction,
 	selectPositionsByOwner, roomInfoAction, RoomType, selectRoomInfoState,
 	expNodesActions, selectExpNodesState, expPositionActions,
 	selectExpAllPositions, expConnectionsActions, selectExpAllConnections,
 	selectExpConnectionsWithTargetIds, selectExpConnectionsWithSourceOrTargetIds,
-	selectExpPositionsWithIds,
+	selectExpPositionsWithIds, makeRoomMember, selectRoomMemberState,
 } from '@corgifm/common/redux'
 import {WebSocketEvent, NodeToNodeAction} from '@corgifm/common/server-constants'
 import {assertUnreachable} from '@corgifm/common/common-utils'
@@ -283,7 +283,7 @@ function onJoinRoom(io: Server, socket: Socket, room: string, serverStore: Store
 	if (!roomState) return logger.warn(`onJoinRoom-couldn't find room state`)
 	syncState(socket, roomState, serverStore.getState(), getRoom(socket))
 
-	const addRoomMemberAction = addRoomMember(clientId)
+	const addRoomMemberAction = roomMemberActions.add(makeRoomMember({id: clientId}))
 	serverStore.dispatch(createRoomAction(addRoomMemberAction, room))
 	io.to(getRoom(socket)).emit(WebSocketEvent.broadcast, addRoomMemberAction)
 }
@@ -402,7 +402,7 @@ function onLeaveRoomGeneric(io: Server, clientId: Id, roomToLeave: string, serve
 	serverStore.dispatch(createRoomAction(deletePointer, roomToLeave))
 	io.to(roomToLeave).emit(WebSocketEvent.broadcast, deletePointer)
 
-	const deleteRoomMemberAction = deleteRoomMember(clientId)
+	const deleteRoomMemberAction = roomMemberActions.delete(clientId)
 	serverStore.dispatch(createRoomAction(deleteRoomMemberAction, roomToLeave))
 	io.to(roomToLeave).emit(WebSocketEvent.broadcast, deleteRoomMemberAction)
 
@@ -446,7 +446,7 @@ function syncState(newSocket: Socket, roomState: IClientRoomState, serverState: 
 	const updaters = [
 		[roomInfoAction.replace, selectRoomInfoState],
 		[pointersActions.replaceAll, selectAllPointers],
-		[setRoomMembers, selectAllRoomMemberIds],
+		[roomMemberActions.replaceAll, selectRoomMemberState],
 		[setChat, selectAllMessages],
 		[connectionsActions.replaceAll, selectAllConnections],
 		[roomSettingsActions.replaceAll, selectRoomSettings],

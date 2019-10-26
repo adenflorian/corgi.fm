@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import {hot} from 'react-hot-loader'
 import {useSelector} from 'react-redux'
 import {selectClientInfo, IClientAppState, selectUserInputKeys, RoomType} from '@corgifm/common/redux'
@@ -9,6 +9,7 @@ import {isLocalDevClient} from './is-prod-client'
 import {LoadingScreen} from './LoadingScreen'
 import {ConnectedOnlineApp} from './OnlineApp'
 import {Benchmarks} from './Benchmarks'
+import {simpleGlobalClientState} from './SimpleGlobalClientState'
 
 const App = () => {
 	const ctrl = useSelector((state: IClientAppState) => selectUserInputKeys(state).ctrl)
@@ -17,6 +18,19 @@ const App = () => {
 	const isConnectingForFirstTime = useSelector((state: IClientAppState) => selectClientInfo(state).isConnectingForFirstTime)
 	const isClientReady = useSelector((state: IClientAppState) => selectClientInfo(state).isClientReady)
 	const roomType = useSelector((state: IClientAppState) => state.room.roomInfo.roomType)
+
+	useEffect(() => {
+		const onMouseMove = (e: MouseEvent) => {
+			simpleGlobalClientState.lastMousePosition.x = e.clientX
+			simpleGlobalClientState.lastMousePosition.y = e.clientY
+		}
+
+		window.addEventListener('mousemove', onMouseMove)
+
+		return () => {
+			window.removeEventListener('mousemove', onMouseMove)
+		}
+	}, [])
 
 	if (isLocalDevClient()) {
 		switch (window.location.pathname.replace('/', '')) {

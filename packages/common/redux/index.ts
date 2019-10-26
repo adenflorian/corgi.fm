@@ -4,6 +4,7 @@
 
 export * from './multi-reducer'
 export * from './local-actions'
+export * from './exp-local-actions'
 export * from './client-info-redux'
 export * from './pointers-redux'
 export * from './sequencer-redux'

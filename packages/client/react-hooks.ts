@@ -1,4 +1,8 @@
 import {useState} from 'react'
+import {useSelector} from 'react-redux'
+import {
+	selectLocalClientId, createRoomMemberSelector,
+} from '@corgifm/common/redux'
 import {logger} from './client-logger'
 
 export function useBoolean(init: boolean): [boolean, Enabler, Disabler] {
@@ -53,3 +57,12 @@ export function useEnumInputState<T extends string>(init: T, typeGuard: StringTy
 }
 
 type StringTypeGuard<T extends string> = (val: string) => val is T
+
+export function useLocalClientId() {
+	return useSelector(selectLocalClientId)
+}
+
+export function useLocalRoomMember() {
+	const localClientId = useSelector(selectLocalClientId)
+	return useSelector(createRoomMemberSelector(localClientId))
+}

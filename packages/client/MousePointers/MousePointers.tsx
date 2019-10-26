@@ -1,34 +1,37 @@
-import {List} from 'immutable'
 import React from 'react'
 import {connect} from 'react-redux'
 import {
-	IClientAppState, selectAllOtherRoomMemberIds,
+	IClientAppState,
+	selectLocalClientId, selectRoomMemberState, RoomMembers,
 } from '@corgifm/common/redux'
 import {ConnectedMousePointer} from './MousePointer'
 
-interface IMousePointersViewProps {
-	clientIds: List<Id>
+interface Props {
+	readonly roomMembers: RoomMembers
+	readonly localClientId: ClientId
 }
 
-export const MousePointers: React.FC<IMousePointersViewProps> =
-	React.memo(function _MousePointers({clientIds}) {
+export const MousePointers: React.FC<Props> =
+	React.memo(function _MousePointers({roomMembers, localClientId}) {
 		return (
 			<div className="pointers">
-				{clientIds
-					.map(clientId =>
+				{roomMembers
+					.filter(x => x.id !== localClientId)
+					.map(member =>
 						<ConnectedMousePointer
-							key={clientId.toString()}
-							clientId={clientId}
+							key={member.id as string}
+							clientId={member.id}
 						/>,
-					)
+					).toList()
 				}
 			</div>
 		)
 	})
 
-const mapStateToProps = (state: IClientAppState): IMousePointersViewProps => {
+const mapStateToProps = (state: IClientAppState): Props => {
 	return {
-		clientIds: selectAllOtherRoomMemberIds(state),
+		roomMembers: selectRoomMemberState(state.room),
+		localClientId: selectLocalClientId(state),
 	}
 }
 

@@ -3,6 +3,7 @@ import React, {ReactElement, useContext} from 'react'
 import {List} from 'immutable'
 import {clamp, clampPolarized, noop} from '@corgifm/common/common-utils'
 import {NodeToNodeAction} from '@corgifm/common/server-constants'
+import {ExpNodeType} from '@corgifm/common/redux'
 import {logger} from '../client-logger'
 import {SingletonContextImpl} from '../SingletonContext'
 import {
@@ -26,6 +27,7 @@ export interface CorgiNodeOptions {
 export interface CorgiNodeArgs {
 	readonly id: Id
 	readonly ownerId: Id
+	readonly type: ExpNodeType
 	readonly audioContext: AudioContext
 	readonly preMasterLimiter: GainNode
 	readonly singletonContext: SingletonContextImpl
@@ -34,11 +36,13 @@ export interface CorgiNodeArgs {
 export type CorgiNodeConstructor = new (args: CorgiNodeArgs) => CorgiNode
 
 export interface CorgiNodeReact extends Pick<CorgiNode,
-'id' | 'requiresAudioWorklet' | 'getPorts' | 'getColor' | 'getName' | 'setPortPosition'> {}
+'id' | 'requiresAudioWorklet' | 'getPorts' | 'getColor' |
+'getName' | 'setPortPosition' | 'type'> {}
 
 export abstract class CorgiNode {
 	public readonly id: Id
 	public readonly ownerId: Id
+	public readonly type: ExpNodeType
 	public readonly requiresAudioWorklet: boolean
 	protected readonly _audioContext: AudioContext
 	protected readonly _preMasterLimiter: GainNode
@@ -55,6 +59,7 @@ export abstract class CorgiNode {
 	) {
 		this.id = args.id
 		this.ownerId = args.ownerId
+		this.type = args.type
 		this._audioContext = args.audioContext
 		this._preMasterLimiter = args.preMasterLimiter
 		this._singletonContext = args.singletonContext

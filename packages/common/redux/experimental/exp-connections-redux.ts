@@ -1,10 +1,11 @@
-import {List, Map, Record} from 'immutable'
+import {List, Map, Record, Set} from 'immutable'
 import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
 import * as uuid from 'uuid'
 import {CssColor, mixColors} from '../../shamu-color'
 import {emptyList} from '../../common-utils'
 import {ParamInputCentering} from '../../common-types'
+import {topGroupId} from '../../common-constants'
 import {selectOption, AppOptions} from '../options-redux'
 import {IClientAppState} from '../common-redux-types'
 import {ExpNodeType} from '.'
@@ -69,6 +70,13 @@ export const expConnectionsActions = {
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	} as const),
+	setGroup: (ids: Set<Id>, groupId: Id) => ({
+		type: 'EXP_CONNECTION_SET_GROUP',
+		ids,
+		groupId,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	} as const),
 } as const
 
 export type ExpConnectionType = 'audio' | 'midi' | 'dummy'
@@ -109,6 +117,7 @@ export class ExpConnection implements IExpConnection {
 		public readonly targetPort: ExpConnectionPortId,
 		public readonly type: ExpConnectionType,
 		public readonly audioParamInput = {} as ExpAudioParamInputState,
+		public readonly groupId = topGroupId as Id | typeof topGroupId,
 	) {}
 }
 
@@ -191,6 +200,16 @@ export function expConnectionsReducer(state = makeInitialState(), action: ExpCon
 				...state,
 				connections: state.connections.set(action.id, updatedConnection),
 				nodeInfos: updateNodeInfosWithUpdatedConnectionTarget(state.nodeInfos, connection, updatedConnection),
+			}
+		}
+		case 'EXP_CONNECTION_SET_GROUP': {
+			return {
+				...state,
+				connections: state.connections.withMutations(mutable => {
+					action.ids.forEach(id => {
+						mutable.update(id, connection => ({...connection, groupId: action.groupId}))
+					})
+				}),
 			}
 		}
 		case 'EXP_UPDATE_CONNECTION_AUDIO_PARAM_INPUT_GAIN':

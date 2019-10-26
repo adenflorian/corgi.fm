@@ -1,19 +1,27 @@
 import {Middleware, Dispatch, Store} from 'redux'
+import {Set} from 'immutable'
 import {
 	IClientAppState, ExpNodesAction, ExpConnectionAction,
 	RoomsReduxAction, selectExpConnection,
 	selectExpAllConnections, selectExpNodesState,
 	selectRoomInfoState, RoomType, ExpPositionAction,
 	ExpGhostConnectorAction, BroadcastAction, LocalAction,
-	expGhostConnectorActions, createLocalActiveExpGhostConnectionSelector, selectExpNode,
+	expGhostConnectorActions,
+	createLocalActiveExpGhostConnectionSelector, selectExpNode,
+	ExpLocalAction, expNodesActions, makeExpNodeState,
+	expPositionActions, makeExpPosition, selectExpPosition,
+	expConnectionsActions, selectLocalClientId, selectRoomMember,
 } from '@corgifm/common/redux'
+import {serverClientId} from '@corgifm/common/common-constants'
 import {SingletonContextImpl} from '../SingletonContext'
 import {logger} from '../client-logger'
 import {handleStopDraggingExpGhostConnector} from '../exp-dragging-connections'
+import {mouseFromScreenToBoard, simpleGlobalClientState} from '../SimpleGlobalClientState'
 import {NodeManager} from './NodeManager'
 
-type ExpMiddlewareActions = ExpNodesAction | ExpConnectionAction |
-RoomsReduxAction | ExpPositionAction | ExpGhostConnectorAction | LocalAction
+type ExpMiddlewareActions = ExpNodesAction | ExpConnectionAction
+| ExpLocalAction | RoomsReduxAction | ExpPositionAction
+| ExpGhostConnectorAction | LocalAction
 
 type ExpMiddleware =
 	(singletonContext: SingletonContextImpl) => Middleware<{}, IClientAppState>
@@ -151,7 +159,65 @@ function after(
 		case 'EXP_UPDATE_CONNECTION_AUDIO_PARAM_INPUT_CENTERING':
 			return nodeManager.onAudioParamInputCenteringChange(action.id, action.centering)
 
+			// Exp Local Actions
+		case 'EXP_CREATE_GROUP': {
+			const {nodeIds} = action
+			const localClientId = selectLocalClientId(afterState)
+			const currentNodeGroupId = selectRoomMember(afterState.room, localClientId).groupNodeId
+
+			// create new group node and position
+			const groupNode = makeExpNodeState({
+				type: 'group',
+				groupId: currentNodeGroupId,
+			})
+			dispatch(expNodesActions.add(groupNode))
+			const average = averagePositionByIds(nodeIds, afterState)
+			dispatch(expPositionActions.add(
+				makeExpPosition({
+					id: groupNode.id,
+					ownerId: serverClientId,
+					x: average.x,
+					y: average.y,
+				})))
+
+			// set group Ids of selected nodes
+			dispatch(expNodesActions.setGroup(nodeIds, groupNode.id))
+
+			// set group Ids for connections
+			const allConnections = selectExpAllConnections(afterState.room)
+			const internalConnections = allConnections.filter(x =>
+				nodeIds.includes(x.sourceId) && nodeIds.includes(x.targetId))
+			const boundaryConnections = allConnections.filter(x =>
+				(nodeIds.includes(x.sourceId) && !nodeIds.includes(x.targetId)) ||
+				(!nodeIds.includes(x.sourceId) && nodeIds.includes(x.targetId)))
+
+			dispatch(expConnectionsActions.setGroup(internalConnections.keySeq().toSet(), groupNode.id))
+
+			// do something with boundary connections
+			// Temporary
+			dispatch(expConnectionsActions.delete(boundaryConnections.keySeq().toList()))
+
+			return
+		}
+
 		default: return
+	}
+}
+
+function averagePositionByIds(positionIds: Set<Id>, state: IClientAppState) {
+	if (positionIds.count() === 0) return mouseFromScreenToBoard(simpleGlobalClientState.lastMousePosition)
+
+	const sumOfPositions = positionIds.reduce((sum, current) => {
+		const {x, y} = selectExpPosition(state.room, current)
+		return {
+			x: sum.x + x,
+			y: sum.y + y,
+		}
+	}, {x: 0, y: 0})
+
+	return {
+		x: sumOfPositions.x / positionIds.count(),
+		y: sumOfPositions.y / positionIds.count(),
 	}
 }
 

@@ -45,3 +45,5 @@ export const Key = {
 } as const
 
 export const maxPitchFrequency = 20000
+
+export const topGroupId = 'top'

@@ -22,6 +22,7 @@ export interface Props {
 	helpText?: string
 	ownerName?: string
 	extra?: string
+	onHeaderDoubleClick?: (e: React.MouseEvent) => void
 }
 
 /** For nodes only */
@@ -29,6 +30,7 @@ export const ExpPanel =
 	React.memo(function _ExpPanel({
 		children, className = '', color = CssColor.disabledGray,
 		id, label, labelTitle, saturate = false, helpText, ownerName, extra,
+		onHeaderDoubleClick,
 	}: Props) {
 		const dispatch = useDispatch()
 
@@ -45,7 +47,7 @@ export const ExpPanel =
 			// if (e.buttons === 1 && e.shiftKey) {
 			// 	dispatch(localActions.connectKeyboardToNode(id, nodeType))
 			// }
-		}, [dispatch, id, nodeType])
+		}, [])
 
 		return (
 			<div
@@ -58,6 +60,7 @@ export const ExpPanel =
 					className={`header ${handleClassName}`}
 					title={labelTitle}
 					onMouseDown={handleMouseDownOnHeader}
+					onDoubleClick={onHeaderDoubleClick}
 				>
 					<div
 						className={`colorDotContainer enabled-${enabled}`}

@@ -4,7 +4,8 @@ import {useDispatch, useSelector, shallowEqual} from 'react-redux'
 import {ContextMenuTrigger} from 'react-contextmenu'
 import {Set} from 'immutable'
 import {
-	shamuMetaActions, selectExpPosition, expPositionActions, IClientAppState,
+	shamuMetaActions, selectExpPosition, expPositionActions,
+	IClientAppState, roomMemberActions,
 } from '@corgifm/common/redux'
 import {panelHeaderHeight} from '@corgifm/common/common-constants'
 import {ConnectionNodeType} from '@corgifm/common/common-types'
@@ -12,6 +13,7 @@ import {handleClassName, expNodeMenuId} from '../client-constants'
 import {simpleGlobalClientState} from '../SimpleGlobalClientState'
 import {ExpPanel} from '../Panel/ExpPanel'
 import {useNodeContext} from '../Experimental/CorgiNode'
+import {useLocalClientId} from '../react-hooks'
 
 interface Props {
 	children: React.ReactNode
@@ -93,6 +95,14 @@ export function SimpleGraphNodeExp({children}: Props) {
 
 	const nodeName = nodeContext.getName()
 
+	const localClientId = useLocalClientId()
+
+	const onHeaderDoubleClick = useCallback(() => {
+		if (nodeContext.type === 'group') {
+			dispatch(roomMemberActions.setNodeGroup(localClientId, nodeContext.id))
+		}
+	}, [dispatch, localClientId, nodeContext.id, nodeContext.type])
+
 	return (
 		<Fragment>
 			<div
@@ -132,12 +142,13 @@ export function SimpleGraphNodeExp({children}: Props) {
 									color={color}
 									id={positionId}
 									label={nodeName}
+									onHeaderDoubleClick={onHeaderDoubleClick}
 								>
 									{children}
 								</ExpPanel>
 							</ContextMenuTrigger>
 						)
-					}, [children, color, nodeName, positionId])
+					}, [children, color, nodeName, onHeaderDoubleClick, positionId])
 				}
 			</div>
 		</Fragment>

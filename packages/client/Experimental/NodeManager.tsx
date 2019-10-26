@@ -177,6 +177,7 @@ export class NodeManager {
 		const newNode = new typeClassMap[nodeState.type]({
 			id: nodeState.id,
 			ownerId: nodeState.ownerId,
+			type: nodeState.type,
 			audioContext: this._audioContext,
 			preMasterLimiter: this._preMasterLimiter,
 			singletonContext: this._singletonContext,

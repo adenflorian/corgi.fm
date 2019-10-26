@@ -49,6 +49,8 @@ class SimpleGlobalClientState {
 	}
 
 	public onAudioWorkletLoaded = new CorgiObjectChangedEvent(false as boolean)
+
+	public lastMousePosition = {x: 0, y: 0}
 }
 
 export const simpleGlobalClientState = new SimpleGlobalClientState()

@@ -1,6 +1,7 @@
-import {Map, Record} from 'immutable'
+import {Set, Map, Record} from 'immutable'
 import {ActionType} from 'typesafe-actions'
 import * as uuid from 'uuid'
+import {topGroupId} from '../../common-constants'
 import {
 	BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION, ExpNodeType,
 	IClientAppState,
@@ -69,6 +70,13 @@ export const expNodesActions = {
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	} as const),
+	setGroup: (nodeIds: Set<Id>, groupId: Id) => ({
+		type: 'EXP_NODE_SET_GROUP',
+		nodeIds,
+		groupId,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	} as const),
 } as const
 
 export type ExpNodesAction = ActionType<typeof expNodesActions>
@@ -81,6 +89,7 @@ const defaultExpNodeState = {
 	customNumberParams: Map<Id, number>(),
 	customEnumParams: Map<Id, string>(),
 	enabled: true,
+	groupId: topGroupId as Id | typeof topGroupId,
 }
 
 const _makeExpNodeState = Record(defaultExpNodeState)
@@ -102,7 +111,7 @@ export type ExpNodeType = typeof expNodeTypes[number]
 export const expNodeTypes = [
 	'oscillator', 'filter', 'dummy', 'audioOutput', 'gain', 'pan', 'envelope',
 	'sequencer', 'constant', 'lowFrequencyOscillator', 'midiConverter', 'keyboard',
-	'distortion', 'polyphonicMidiConverter',
+	'distortion', 'polyphonicMidiConverter', 'group',
 ] as const
 
 const initialState = Map<Id, ExpNodeState>()
@@ -123,6 +132,11 @@ export const expNodesReducer = (state = initialState, action: ExpNodesAction): E
 			action.nodeId, x => x.update('customEnumParams', customEnumParams => customEnumParams.set(action.paramId, action.newValue)))
 		case 'EXP_NODE_SET_ENABLED': return state.update(
 			action.nodeId, x => x.set('enabled', action.enabled))
+		case 'EXP_NODE_SET_GROUP': return state.withMutations(mutable => {
+			action.nodeIds.forEach(nodeId => {
+				mutable.update(nodeId, node => node.set('groupId', action.groupId))
+			})
+		})
 		default: return state
 	}
 }

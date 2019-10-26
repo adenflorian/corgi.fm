@@ -33,7 +33,7 @@ export class CompoundNode extends CorgiNode {
 	}
 
 	public getColor = () => CssColor.orange
-	public getName = () => 'Gain'
+	public getName = () => 'Group'
 	public render = () => this.getDebugView()
 
 	protected _enable = () => this._dryWetChain.wetOnly()

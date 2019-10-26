@@ -9,7 +9,8 @@ import {
 	selectPosition, selectSequencer, selectShamuMetaState, sequencerActions,
 	userInputActions,
 	localActions, localMidiKeyPress, localMidiKeyUp, localMidiOctaveChange,
-	windowBlur, selectRoomInfoState, RoomType,
+	windowBlur, selectRoomInfoState, RoomType, expLocalActions,
+	selectLocalClientId, selectRoomMember, selectExpNode, roomMemberActions,
 } from '@corgifm/common/redux'
 import {mouseFromScreenToBoard} from './SimpleGlobalClientState'
 
@@ -77,6 +78,27 @@ const keyboardShortcuts: IKeyBoardShortcuts = Map<KeyBoardShortcut>({
 				if (findNodeInfo(type).isNodeCloneable !== true) return
 				return localActions.cloneNode(selectedNodes.first(), type, 'all')
 			}
+		},
+		allowRepeat: false,
+		preventDefault: true,
+	},
+	[Control + Plus + 'g']: {
+		actionOnKeyDown: (_, state) => {
+			if (selectRoomInfoState(state.room).roomType !== RoomType.Experimental) return
+			const selectedNodes = selectShamuMetaState(state.room).selectedNodes
+			return expLocalActions.createGroup(selectedNodes)
+		},
+		allowRepeat: false,
+		preventDefault: true,
+	},
+	'PageUp': {
+		actionOnKeyDown: (_, state) => {
+			if (selectRoomInfoState(state.room).roomType !== RoomType.Experimental) return
+			const localClientId = selectLocalClientId(state)
+			const currentNodeGroupId = selectRoomMember(state.room, localClientId).groupNodeId
+			if (currentNodeGroupId === 'top') return
+			const node = selectExpNode(state.room, currentNodeGroupId)
+			return roomMemberActions.setNodeGroup(localClientId, node.groupId)
 		},
 		allowRepeat: false,
 		preventDefault: true,
