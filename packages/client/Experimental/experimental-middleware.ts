@@ -88,32 +88,6 @@ function after(
 	dispatch: Dispatch,
 ) {
 	switch (action.type) {
-		// Room
-		case 'SET_ACTIVE_ROOM':
-			return nodeManager.cleanup()
-
-		// Nodes
-		case 'EXP_NODE_REPLACE_ALL':
-			return nodeManager.addNodes(getNodes())
-
-		case 'EXP_NODE_AUDIO_PARAM_CHANGE':
-			return nodeManager.onAudioParamChange(action)
-
-		case 'EXP_NODE_CUSTOM_NUMBER_PARAM_CHANGE':
-			return nodeManager.onCustomNumberParamChange(action)
-
-		case 'EXP_NODE_CUSTOM_ENUM_PARAM_CHANGE':
-			return nodeManager.onCustomEnumParamChange(action)
-
-		case 'EXP_NODE_SET_ENABLED':
-			return nodeManager.enableNode(action.nodeId, action.enabled)
-
-		case 'EXP_NODE_ADD':
-			return nodeManager.addNode(selectExpNode(afterState.room, action.newNode.id))
-
-		case 'EXP_NODE_DELETE':
-			return nodeManager.deleteNode(action.nodeId)
-
 		// Connections
 		case 'EXP_DELETE_ALL_CONNECTIONS':
 			return nodeManager.deleteAllConnections()
@@ -313,6 +287,32 @@ function bar(
 	dispatch: Dispatch,
 ) {
 	switch (action.type) {
+		// Room
+		case 'SET_ACTIVE_ROOM':
+			return nodeManager.cleanup()
+
+		// Nodes
+		case 'EXP_NODE_REPLACE_ALL':
+			return nodeManager.addNodes(getNodes())
+
+		case 'EXP_NODE_AUDIO_PARAM_CHANGE':
+			return nodeManager.onAudioParamChange(action)
+
+		case 'EXP_NODE_CUSTOM_NUMBER_PARAM_CHANGE':
+			return nodeManager.onCustomNumberParamChange(action)
+
+		case 'EXP_NODE_CUSTOM_ENUM_PARAM_CHANGE':
+			return nodeManager.onCustomEnumParamChange(action)
+
+		case 'EXP_NODE_SET_ENABLED':
+			return nodeManager.enableNode(action.nodeId, action.enabled)
+
+		case 'EXP_NODE_ADD':
+			return nodeManager.addNode(selectExpNode(state.room, action.newNode.id))
+
+		case 'EXP_NODE_DELETE':
+			return nodeManager.deleteNode(action.nodeId)
+
 		// Connections
 		case 'EXP_REPLACE_CONNECTIONS':
 			return nodeManager.addConnections(getConnections())

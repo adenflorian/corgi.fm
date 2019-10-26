@@ -16,6 +16,7 @@ import {
 	isAudioOutputPort, isAudioInputPort, ExpPortType, isAudioParamInputPort,
 } from './ExpPorts'
 import {isMidiOutputPort, isMidiInputPort} from './ExpMidiPorts'
+import {GroupNode} from './Nodes/GroupNode'
 
 export const NodeManagerContext = React.createContext<null | NodeManagerContextValue>(null)
 
@@ -170,7 +171,9 @@ export class NodeManager {
 	}
 
 	public addNodes = (newNodes: immutable.Map<Id, ExpNodeState>) => {
-		newNodes.forEach(this.addNode)
+		// Add group nodes first, because child nodes need the group node to exist before creating
+		newNodes.filter(x => x.type === 'group').forEach(this.addNode)
+		newNodes.filter(x => x.type !== 'group').forEach(this.addNode)
 	}
 
 	public addNode = (nodeState: ExpNodeState) => {
@@ -181,12 +184,31 @@ export class NodeManager {
 			audioContext: this._audioContext,
 			preMasterLimiter: this._preMasterLimiter,
 			singletonContext: this._singletonContext,
+			parentGroupNode: this._getGroupNode(nodeState),
 		})
 		this._nodes.set(newNode.id, newNode)
 		nodeState.audioParams.forEach((newValue, paramId) => newNode.onAudioParamChange(paramId, newValue))
 		nodeState.customNumberParams.forEach((newValue, paramId) => newNode.onCustomNumberParamChange(paramId, newValue))
 		nodeState.customEnumParams.forEach((newValue, paramId) => newNode.onCustomEnumParamChange(paramId, newValue))
 		newNode.setEnabled(nodeState.enabled)
+	}
+
+	private readonly _getGroupNode = (nodeState: ExpNodeState): GroupNode | undefined => {
+		const groupNodeId = nodeState.groupId
+		if (groupNodeId === 'top') return undefined
+
+		const groupNode = this._nodes.get(groupNodeId)
+
+		if (!groupNode) {
+			logger.error('404 group node not found!', {groupNodeId, nodeState})
+			return undefined
+		}
+		if (!(groupNode instanceof GroupNode)) {
+			logger.error('wtf! groupNode not groupNode?!', {groupNodeId, groupNode, nodeState})
+			return undefined
+		}
+
+		return groupNode
 	}
 
 	public deleteNode = (nodeId: Id) => {

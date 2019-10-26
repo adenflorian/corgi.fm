@@ -8,8 +8,7 @@ import {
 	ExpDeleteGhostInfo, selectExpPosition,
 	expConnectionsActions, ExpConnection, ExpPosition,
 	doesExpConnectionBetweenNodesExist,
-	selectExpConnection,
-	chatSystemMessage,
+	selectExpConnection, chatSystemMessage, selectExpNode,
 } from '@corgifm/common/redux'
 import {NodeManager} from './Experimental/NodeManager'
 
@@ -26,6 +25,7 @@ export function handleStopDraggingExpGhostConnector(
 	const movingConnectionId = ghostConnection.movingConnectionId
 
 	const parentNodePosition = selectExpPosition(roomState, ghostConnection.inactiveConnector.parentNodeId)
+	const parentNode = selectExpNode(roomState, parentNodePosition.id)
 
 	const winningPosition = selectExpPosition(roomState, info.nodeId)
 
@@ -111,6 +111,7 @@ export function handleStopDraggingExpGhostConnector(
 			mouseUpPort,
 			port,
 			ghostConnection.type,
+			parentNode.groupId,
 		)))
 	}
 
@@ -130,6 +131,7 @@ export function handleStopDraggingExpGhostConnector(
 			port,
 			mouseUpPort,
 			ghostConnection.type,
+			parentNode.groupId,
 		)))
 	}
 

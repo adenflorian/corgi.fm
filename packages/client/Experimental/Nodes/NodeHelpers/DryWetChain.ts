@@ -2,6 +2,7 @@ export class DryWetChain {
 	public readonly inputGain: GainNode
 	public readonly dryGain: GainNode
 	public readonly wetGain: GainNode
+	public readonly wetPostGain: GainNode
 	public readonly outputGain: GainNode
 
 	public constructor(
@@ -12,6 +13,7 @@ export class DryWetChain {
 		this.inputGain = audioContext.createGain()
 		this.dryGain = audioContext.createGain()
 		this.wetGain = audioContext.createGain()
+		this.wetPostGain = audioContext.createGain()
 		this.outputGain = audioContext.createGain()
 
 		this.inputGain
@@ -21,6 +23,7 @@ export class DryWetChain {
 			.connect(this.wetGain)
 			.connect(wetInternalNode);
 		(wetInternalOutputNode || wetInternalNode)
+			.connect(this.wetPostGain)
 			.connect(this.outputGain)
 
 		this.dryGain.gain.value = 0
@@ -30,17 +33,20 @@ export class DryWetChain {
 	public wetOnly() {
 		this.dryGain.gain.value = 0
 		this.wetGain.gain.value = 1
+		this.wetPostGain.gain.value = 1
 	}
 
 	public dryOnly() {
 		this.dryGain.gain.value = 1
 		this.wetGain.gain.value = 0
+		this.wetPostGain.gain.value = 0
 	}
 
 	public dispose() {
 		this.inputGain.disconnect()
 		this.dryGain.disconnect()
 		this.wetGain.disconnect()
+		this.wetPostGain.disconnect()
 		this.outputGain.disconnect()
 	}
 }

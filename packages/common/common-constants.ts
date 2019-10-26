@@ -47,3 +47,4 @@ export const Key = {
 export const maxPitchFrequency = 20000
 
 export const topGroupId = 'top'
+export type GroupId = Id | typeof topGroupId

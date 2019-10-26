@@ -25,6 +25,8 @@ export interface Props {
 	onHeaderDoubleClick?: (e: React.MouseEvent) => void
 }
 
+const stopPropagation = (e: React.SyntheticEvent) => e.stopPropagation()
+
 /** For nodes only */
 export const ExpPanel =
 	React.memo(function _ExpPanel({
@@ -65,6 +67,7 @@ export const ExpPanel =
 					<div
 						className={`colorDotContainer enabled-${enabled}`}
 						onClick={onColorDotClick}
+						onDoubleClick={stopPropagation}
 						title={(enabled ? 'Enabled' : 'Disabled') +
 							`\nDisable or enable this node\n` +
 							disabledText + ' when disabled'}

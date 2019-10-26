@@ -122,6 +122,7 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 		'output',
 		'input',
 		'audio',
+		'top',
 	)))
 
 	dispatchToRoom(expConnectionsActions.add(new ExpConnection(
@@ -132,6 +133,7 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 		'output',
 		'input',
 		'audio',
+		'top',
 	)))
 
 	dispatchToRoom(expConnectionsActions.add(new ExpConnection(
@@ -142,6 +144,7 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 		'output',
 		'input',
 		'audio',
+		'top',
 	)))
 
 	dispatchToRoom(expConnectionsActions.add(new ExpConnection(
@@ -152,6 +155,7 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 		'output',
 		'frequency',
 		'audio',
+		'top',
 	)))
 
 	function dispatchToRoom(action: Action) {

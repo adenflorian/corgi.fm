@@ -1,11 +1,11 @@
-import {List, Map, Record, Set} from 'immutable'
+import {List, Map, Set} from 'immutable'
 import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
 import * as uuid from 'uuid'
 import {CssColor, mixColors} from '../../shamu-color'
 import {emptyList} from '../../common-utils'
 import {ParamInputCentering} from '../../common-types'
-import {topGroupId} from '../../common-constants'
+import {GroupId} from '../../common-constants'
 import {selectOption, AppOptions} from '../options-redux'
 import {IClientAppState} from '../common-redux-types'
 import {ExpNodeType} from '.'
@@ -116,8 +116,8 @@ export class ExpConnection implements IExpConnection {
 		public readonly sourcePort: ExpConnectionPortId,
 		public readonly targetPort: ExpConnectionPortId,
 		public readonly type: ExpConnectionType,
+		public readonly groupId: GroupId,
 		public readonly audioParamInput = {} as ExpAudioParamInputState,
-		public readonly groupId = topGroupId as Id | typeof topGroupId,
 	) {}
 }
 

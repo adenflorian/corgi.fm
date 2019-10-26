@@ -1,7 +1,7 @@
 import {Set, Map, Record} from 'immutable'
 import {ActionType} from 'typesafe-actions'
 import * as uuid from 'uuid'
-import {topGroupId} from '../../common-constants'
+import {topGroupId, GroupId} from '../../common-constants'
 import {
 	BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION, ExpNodeType,
 	IClientAppState,
@@ -89,7 +89,7 @@ const defaultExpNodeState = {
 	customNumberParams: Map<Id, number>(),
 	customEnumParams: Map<Id, string>(),
 	enabled: true,
-	groupId: topGroupId as Id | typeof topGroupId,
+	groupId: topGroupId as GroupId,
 }
 
 const _makeExpNodeState = Record(defaultExpNodeState)

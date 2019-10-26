@@ -14,7 +14,7 @@ import {MidiConverterNode} from './MidiConverterNode'
 import {KeyboardNode} from './KeyboardNode'
 import {DistortionExpNode} from './DistortionExpNode'
 import {PolyphonicMidiConverterNode} from './PolyphonicMidiConverterNode'
-import {CompoundNode} from './CompoundNode'
+import {GroupNode} from './GroupNode'
 import {GroupInputNode} from './GroupInputNode'
 import {GroupOutputNode} from './GroupOutputNode'
 
@@ -34,7 +34,7 @@ export const typeClassMap: {readonly [key in ExpNodeType]: CorgiNodeConstructor}
 	polyphonicMidiConverter: PolyphonicMidiConverterNode,
 	keyboard: KeyboardNode,
 	distortion: DistortionExpNode,
-	group: CompoundNode,
+	group: GroupNode,
 	groupInput: GroupInputNode,
 	groupOutput: GroupOutputNode,
 }

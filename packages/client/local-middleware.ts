@@ -936,6 +936,7 @@ function createLocalStuffExperimental(dispatch: Dispatch, state: IClientAppState
 		'output',
 		'input',
 		'midi',
+		'top',
 	)))
 }
 
