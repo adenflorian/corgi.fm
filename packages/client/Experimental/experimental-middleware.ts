@@ -166,17 +166,45 @@ function after(
 			const currentNodeGroupId = selectRoomMember(afterState.room, localClientId).groupNodeId
 
 			// create new group node and position
+			const average = averagePositionByIds(nodeIds, afterState)
+			const extremes = extremesPositionByIds(nodeIds, afterState)
+
 			const groupNode = makeExpNodeState({
 				type: 'group',
 				groupId: currentNodeGroupId,
 			})
 			dispatch(expNodesActions.add(groupNode))
-			const average = averagePositionByIds(nodeIds, afterState)
 			dispatch(expPositionActions.add(
 				makeExpPosition({
 					id: groupNode.id,
 					ownerId: serverClientId,
 					x: average.x,
+					y: average.y,
+				})))
+
+			const groupInputNode = makeExpNodeState({
+				type: 'groupInput',
+				groupId: groupNode.id,
+			})
+			dispatch(expNodesActions.add(groupInputNode))
+			dispatch(expPositionActions.add(
+				makeExpPosition({
+					id: groupInputNode.id,
+					ownerId: serverClientId,
+					x: extremes.left - 400,
+					y: average.y,
+				})))
+
+			const groupOutputNode = makeExpNodeState({
+				type: 'groupOutput',
+				groupId: groupNode.id,
+			})
+			dispatch(expNodesActions.add(groupOutputNode))
+			dispatch(expPositionActions.add(
+				makeExpPosition({
+					id: groupOutputNode.id,
+					ownerId: serverClientId,
+					x: extremes.right + 100,
 					y: average.y,
 				})))
 
@@ -219,6 +247,25 @@ function averagePositionByIds(positionIds: Set<Id>, state: IClientAppState) {
 		x: sumOfPositions.x / positionIds.count(),
 		y: sumOfPositions.y / positionIds.count(),
 	}
+}
+
+function extremesPositionByIds(positionIds: Set<Id>, state: IClientAppState): Extremes {
+	return positionIds.reduce((extremes, current) => {
+		const {x, y, width, height} = selectExpPosition(state.room, current)
+		return {
+			top: Math.min(extremes.top, y),
+			right: Math.max(extremes.right, x + width),
+			bottom: Math.max(extremes.bottom, y + height),
+			left: Math.min(extremes.left, x),
+		}
+	}, {top: 0, right: 0, bottom: 0, left: 0} as Extremes)
+}
+
+interface Extremes {
+	readonly top: number
+	readonly right: number
+	readonly bottom: number
+	readonly left: number
 }
 
 export function createExpTupperware(

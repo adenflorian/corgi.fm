@@ -430,6 +430,9 @@
 	- can't repro anymore
 - [ ] start playing when space bar is lifted, if user hold space, then play note, start playing with that note
 	- similar to starting recordings on OP-1
+- [ ] select scale to highlight notes in the scale (bean)
+- [ ] allow manually highlighting certain note rows to build own custom scale (bean)
+- [ ] fold button
 
 **Chrome 77 - Envelope Rewrite**
 - [ ] address TODOs

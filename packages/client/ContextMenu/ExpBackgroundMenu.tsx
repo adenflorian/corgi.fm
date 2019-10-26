@@ -1,9 +1,10 @@
 import React, {Fragment, MouseEvent} from 'react'
 import {useDispatch} from 'react-redux'
 import {MenuItem} from 'react-contextmenu'
+import {Set} from 'immutable'
 import {
 	expPositionActions, makeExpPosition, expNodesActions,
-	makeExpNodeState, ExpNodeState, ExpPosition, expNodeTypes,
+	makeExpNodeState, ExpNodeState, ExpPosition, expNodeTypes, expLocalActions,
 } from '@corgifm/common/redux'
 import {Dispatch} from 'redux'
 import {serverClientId} from '@corgifm/common/common-constants'
@@ -19,7 +20,7 @@ interface ExpBackgroundMenuItemsProps {
 export const ExpBackgroundMenuItems = React.memo(
 	function _MenuItems(
 		{localClientId, localClientKeyboardCount, localClientColor}:
-			ExpBackgroundMenuItemsProps,
+		ExpBackgroundMenuItemsProps,
 	) {
 		const dispatch = useDispatch()
 
@@ -34,6 +35,7 @@ export const ExpBackgroundMenuItems = React.memo(
 			return (
 				<Fragment>
 					{expNodeTypes
+						.filter(x => x !== 'groupInput' && x !== 'groupOutput')
 						// .filter(
 						// 	x => localClientKeyboardCount === 0
 						// 		? true
@@ -64,9 +66,15 @@ export const ExpBackgroundMenuItems = React.memo(
 						// Be careful when changing the id to be local client
 						// The server currently deletes most things that a user owns
 						// when they disconnect
-						const newExpNode = makeExpNodeState({type})
-						dispatch(expNodesActions.add(newExpNode))
-						createPosition(dispatch, newExpNode, e, serverClientId)
+
+						if (type === 'group') {
+							dispatch(expLocalActions.createGroup(Set()))
+						} else {
+							const newExpNode = makeExpNodeState({type})
+							dispatch(expNodesActions.add(newExpNode))
+							createPosition(dispatch, newExpNode, e, serverClientId)
+						}
+
 						// if (nodeInfo.autoConnectToClock) {
 						// 	dispatch(connectionsActions.add(new Connection(
 						// 		MASTER_CLOCK_SOURCE_ID,
