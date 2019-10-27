@@ -4,7 +4,7 @@ import {ContextMenu, SubMenu, MenuItem, connectMenu} from 'react-contextmenu'
 import {List} from 'immutable'
 import {oneLine} from 'common-tags'
 import {
-	localActions, ExpPosition,
+	localActions, ExpPosition, WithConnections,
 } from '@corgifm/common/redux'
 import {expNodeMenuId} from '../client-constants'
 import {TopMenuBar} from './TopMenuBar'
@@ -72,9 +72,9 @@ const ExpNodeMenuItems = React.memo(function _MenuItems({nodeType}: ExpNodeMenuI
 
 	function CloneExpNodeMenuItem() {
 
-		const onClick = (withConnections: Parameters<typeof localActions.cloneExpNode>[1]) =>
+		const onClick = (withConnections: WithConnections) =>
 			(_: any, {nodeId}: DeleteMenuData) => {
-				dispatch(localActions.cloneExpNode(nodeId, withConnections))
+				dispatch(localActions.cloneSelectedExpNodes(withConnections))
 			}
 
 		return (

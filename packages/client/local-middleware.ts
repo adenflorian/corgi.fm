@@ -1,4 +1,4 @@
-import {List, Map, Set} from 'immutable'
+import Immutable from 'immutable'
 import {Dispatch, Middleware} from 'redux'
 import uuid from 'uuid'
 import {MAX_MIDI_NOTE_NUMBER_127, panelHeaderHeight} from '@corgifm/common/common-constants'
@@ -43,10 +43,10 @@ import {
 	userInputActions, recordingActions, betterSequencerActions, RoomType,
 	expNodesActions, expPositionActions, expConnectionsActions,
 	selectExpConnectionsWithSourceOrTargetIds, selectExpNode,
-	selectExpPosition, selectExpConnectionsWithSourceId,
-	selectExpConnectionsWithTargetIds,
+	selectExpPosition,
 	makeExpNodeState, makeExpPosition, ExpConnection,
-	selectExpPositionExtremes, selectExpNodesState,
+	selectExpPositionExtremes, selectExpNodesState, WithConnections,
+	selectShamuMetaState, selectExpAllConnections,
 } from '@corgifm/common/redux'
 import {pointersActions} from '@corgifm/common/redux/pointers-redux'
 import {makeMidiClipEvent, preciseModulus, preciseSubtract} from '@corgifm/common/midi-types'
@@ -66,8 +66,8 @@ type LocalMiddlewareActions = LocalAction | AddClientAction
 | UpdatePositionsAction | SetLocalClientNameAction
 
 /** Key is the key number that was pressed, value is the note that was played (key number with octave applied) */
-let _localMidiKeys = Map<number, IMidiNote>()
-let _localSustainedNotes = Map<number, IMidiNotes>()
+let _localMidiKeys = Immutable.Map<number, IMidiNote>()
+let _localSustainedNotes = Immutable.Map<number, IMidiNotes>()
 
 export function createLocalMiddleware(
 	getAllInstruments: GetAllInstruments, firebase: FirebaseContextStuff
@@ -174,7 +174,7 @@ export function createLocalMiddleware(
 				getAllInstruments()
 					.filter(x => action.targetIds.includes(x.id))
 					.forEach(instrument => {
-						instrument.scheduleNote(action.midiNote, 0, true, Set([action.id]), action.velocity)
+						instrument.scheduleNote(action.midiNote, 0, true, Immutable.Set([action.id]), action.velocity)
 					})
 
 				const state = getState()
@@ -195,7 +195,7 @@ export function createLocalMiddleware(
 				const sustain = selectUserInputKeys(state).sustainPedalPressed
 
 				if (sustain) {
-					_localSustainedNotes = _localSustainedNotes.update(action.midiNote, Set(), notes => notes.add(noteToRelease))
+					_localSustainedNotes = _localSustainedNotes.update(action.midiNote, Immutable.Set(), notes => notes.add(noteToRelease))
 					return
 				}
 
@@ -333,7 +333,7 @@ export function createLocalMiddleware(
 			// }
 			case 'SET_GRID_SEQUENCER_NOTE': {
 				if (action.enabled) {
-					playShortNote(Set([action.note]), action.id, getState().room, getAllInstruments)
+					playShortNote(Immutable.Set([action.note]), action.id, getState().room, getAllInstruments)
 				}
 
 				next(action)
@@ -467,7 +467,7 @@ export function createLocalMiddleware(
 
 				// dispatch add multi thing
 				dispatch(addMultiThing(clone, nodeType, NetworkActionType.SERVER_AND_BROADCASTER))
-				dispatch(shamuMetaActions.setSelectedNodes(Set(clone.id)))
+				dispatch(shamuMetaActions.setSelectedNodes(Immutable.Set(clone.id)))
 
 				// clone position
 				const positionToClone = selectPosition(newState.room, nodeId)
@@ -524,75 +524,16 @@ export function createLocalMiddleware(
 
 				return
 			}
-			case 'CLONE_EXP_NODE': {
+			case 'CLONE_EXP_NODES': {
 				next(action)
 
 				const newState = getState()
 
-				const nodeId = action.nodeId
+				action.withConnections
 
-				// Select multiThing
-				const stateToClone = selectExpNode(newState.room, nodeId)
+				const selectedExpNodes = selectShamuMetaState(newState.room).selectedNodes
 
-				if (stateToClone.type === 'groupInput' || stateToClone.type === 'groupOutput') return
-
-				const clone = stateToClone.set('id', createNodeId())
-
-				// dispatch add multi thing
-				dispatch(expNodesActions.add(clone))
-				dispatch(shamuMetaActions.setSelectedNodes(Set(clone.id)))
-
-				// clone position
-				const positionToClone = selectExpPosition(newState.room, nodeId)
-
-				const clonePosition = positionToClone
-					.set('id', clone.id)
-					.set('x', positionToClone.x + 32)
-					.set('y', positionToClone.y)
-
-				dispatch(expPositionActions.add(clonePosition))
-
-				if (action.withConnections === 'all') {
-					const newConnections = selectExpConnectionsWithSourceId(newState.room, nodeId)
-						.map(x => ({
-							...x,
-							id: createNodeId(),
-							sourceId: clone.id,
-						}))
-						.concat(
-							selectExpConnectionsWithTargetIds(newState.room, nodeId)
-								.map(x => ({
-									...x,
-									id: createNodeId(),
-									targetId: clone.id,
-								})),
-						)
-						.toList()
-
-					if (newConnections.count() > 0) dispatch(expConnectionsActions.addMultiple(newConnections))
-				} else if (action.withConnections === 'default') {
-					// TODO
-					// if (nodeInfo.autoConnectToClock) {
-					// 	dispatch(expConnectionsActions.add(new Connection(
-					// 		MASTER_CLOCK_SOURCE_ID,
-					// 		ConnectionNodeType.masterClock,
-					// 		clone.id,
-					// 		clone.type,
-					// 		0,
-					// 		0,
-					// 	)))
-					// }
-					// if (nodeInfo.autoConnectToAudioOutput) {
-					// 	dispatch(expConnectionsActions.add(new Connection(
-					// 		clone.id,
-					// 		clone.type,
-					// 		MASTER_AUDIO_OUTPUT_TARGET_ID,
-					// 		ConnectionNodeType.audioOutput,
-					// 		0,
-					// 		0,
-					// 	)))
-					// }
-				}
+				cloneExpNodes(dispatch, newState, selectedExpNodes, action.withConnections)
 
 				return
 			}
@@ -675,7 +616,7 @@ export function createLocalMiddleware(
 			// 	// TODO I think we're doing this in 2 places...
 			// 	const foo: ReturnType<typeof updatePositions> = {
 			// 		...action,
-			// 		positions: Map(action.positions).map((position): IPosition => {
+			// 		positions: Immutable.Map(action.positions).map((position): IPosition => {
 			// 			return {
 			// 				...position,
 			// 				width: Math.max(position.width, position.width),
@@ -715,16 +656,90 @@ export function createLocalMiddleware(
 	}
 }
 
-function getChildExpNodeIds(nodeId: Id, state: IClientAppState): Set<Id> {
+function cloneExpNodes(dispatch: Dispatch, newState: IClientAppState, nodeIds: Immutable.Set<Id>, withConnections: WithConnections) {
+	const nodes = selectExpNodesState(newState.room).filter(x => nodeIds.includes(x.id) && x.type !== 'groupInput' && x.type !== 'groupOutput')
+	const firstNode = nodes.first(null)
+	if (!firstNode) return
+	if (nodes.every(x => x.groupId === firstNode.groupId) === false) {
+		logger.warn('attempted to clone node selection across multiple groups', {nodes: nodes.toJS()})
+		return
+	}
+	const filteredNodeIds = nodes.map(x => x.id)
+
+	let nodeCloneMap = Immutable.Map<Id, Id>()
+
+	nodes.forEach((_, nodeId) => {
+		const clone = _cloneExpNode2(dispatch, newState, nodeId, withConnections)
+		nodeCloneMap = nodeCloneMap.set(nodeId, clone.id)
+	})
+
+	if (withConnections === 'all') {
+		const allConnections = selectExpAllConnections(newState.room)
+		const newConnections = allConnections
+			.filter(x => filteredNodeIds.includes(x.sourceId) || filteredNodeIds.includes(x.targetId))
+			.map((x): ExpConnection => ({
+				...x,
+				id: createNodeId(),
+				sourceId: nodeCloneMap.get(x.sourceId, x.sourceId),
+				targetId: nodeCloneMap.get(x.targetId, x.targetId),
+			}))
+			.toList()
+
+		if (newConnections.count() > 0) dispatch(expConnectionsActions.addMultiple(newConnections))
+	}
+
+	dispatch(shamuMetaActions.setSelectedNodes(nodeCloneMap.valueSeq().toSet()))
+}
+
+function _cloneExpNode2(dispatch: Dispatch, newState: IClientAppState, nodeId: Id, withConnections: WithConnections) {
+	const stateToClone = selectExpNode(newState.room, nodeId)
+
+	return _cloneExpNode(dispatch, newState, nodeId, withConnections, stateToClone.groupId)
+
+	// _cloneExpChildren(dispatch, newState, nodeId, topClone.id)
+}
+
+// function _cloneExpChildren(dispatch: Dispatch, newState: IClientAppState, nodeId: Id, cloneId: Id) {
+// 	const allExpNodes = selectExpNodesState(newState.room)
+
+// 	const childrenToClone = allExpNodes.filter(x => x.groupId === nodeId)
+
+// 	childrenToClone.forEach(x => {
+// 		const clone = _cloneExpNode(dispatch, newState, x.id, 'all', cloneId)
+// 		_cloneExpChildren(dispatch, newState, x.id, clone.id)
+// 	})
+// }
+
+function _cloneExpNode(dispatch: Dispatch, newState: IClientAppState, nodeId: Id, withConnections: WithConnections, groupId: Id) {
+	const stateToClone = selectExpNode(newState.room, nodeId)
+
+	const clone = stateToClone.set('id', createNodeId()).set('groupId', groupId)
+
+	dispatch(expNodesActions.add(clone))
+
+	// clone position
+	const positionToClone = selectExpPosition(newState.room, nodeId)
+
+	const clonePosition = positionToClone
+		.set('id', clone.id)
+		.set('x', positionToClone.x + 32)
+		.set('y', positionToClone.y)
+
+	dispatch(expPositionActions.add(clonePosition))
+
+	return clone
+}
+
+function getChildExpNodeIds(nodeId: Id, state: IClientAppState): Immutable.Set<Id> {
 	const allNodes = selectExpNodesState(state.room)
 	let loopCount = 0
-	const getChildIds = (_nodeId: Id): Set<Id> => {
+	const getChildIds = (_nodeId: Id): Immutable.Set<Id> => {
 		if (loopCount++ > 500) {
 			logger.error('loop count exceeded!', {_nodeId, loopCount})
-			return Set()
+			return Immutable.Set()
 		}
 		const childNodes = allNodes.filter(x => x.groupId === _nodeId).keySeq().toSet()
-		return childNodes.concat(childNodes.map(getChildIds).reduce((result, x) => result.concat(x), Set<Id>()))
+		return childNodes.concat(childNodes.map(getChildIds).reduce((result, x) => result.concat(x), Immutable.Set<Id>()))
 	}
 	return getChildIds(nodeId).add(nodeId)
 }
@@ -749,17 +764,17 @@ function stripShamuGraphForSaving(shamuGraphState: ShamuGraphState): ShamuGraphS
 		nodes: {
 			...shamuGraphState.nodes,
 			gridSequencers: {
-				things: Map(shamuGraphState.nodes.gridSequencers.things)
+				things: Immutable.Map(shamuGraphState.nodes.gridSequencers.things)
 					.map(stripSequencerSaves)
 					.toObject(),
 			},
 			infiniteSequencers: {
-				things: Map(shamuGraphState.nodes.infiniteSequencers.things)
+				things: Immutable.Map(shamuGraphState.nodes.infiniteSequencers.things)
 					.map(stripSequencerSaves)
 					.toObject(),
 			},
 			betterSequencers: {
-				things: Map(shamuGraphState.nodes.betterSequencers.things)
+				things: Immutable.Map(shamuGraphState.nodes.betterSequencers.things)
 					.map(stripSequencerSaves)
 					.toObject(),
 			},
@@ -770,7 +785,7 @@ function stripShamuGraphForSaving(shamuGraphState: ShamuGraphState): ShamuGraphS
 function stripSequencerSaves<T extends SequencerStateBase>(sequencer: T): T {
 	return {
 		...sequencer,
-		previousEvents: List(),
+		previousEvents: Immutable.List(),
 	}
 }
 
@@ -828,7 +843,7 @@ function parseLocalSavesJSON(localSavesJSON: string): LocalSaves {
 			return makeInitialLocalSavesStorage()
 		} else {
 			return {
-				all: Map<Id, SavedRoom>(localSaves.all).map((save): SavedRoom => {
+				all: Immutable.Map<Id, SavedRoom>(localSaves.all).map((save): SavedRoom => {
 					return {
 						...save,
 						saveDateTime: save.saveDateTime || '?',
@@ -847,7 +862,7 @@ function parseLocalSavesJSON(localSavesJSON: string): LocalSaves {
 }
 
 const makeInitialLocalSavesStorage = (): LocalSaves => ({
-	all: Map(),
+	all: Immutable.Map(),
 })
 
 function playShortNote(
@@ -867,7 +882,7 @@ function playShortNote(
 		if (targetIds.includes(instrument.id) === false) return
 
 		actualNotes.forEach(actualNote => {
-			instrument.scheduleNote(actualNote, 0, true, Set([sourceId]), 1)
+			instrument.scheduleNote(actualNote, 0, true, Immutable.Set([sourceId]), 1)
 			instrument.scheduleRelease(actualNote, delayUntilRelease)
 		})
 	})
@@ -883,7 +898,7 @@ function playShortNoteOnTarget(
 
 	if (!instrument) return
 
-	instrument.scheduleNote(note, 0, true, Set([]), 1)
+	instrument.scheduleNote(note, 0, true, Immutable.Set([]), 1)
 
 	instrument.scheduleRelease(note, delayUntilRelease)
 }
@@ -1040,7 +1055,7 @@ function createLocalStuffNormal(dispatch: Dispatch, state: IClientAppState) {
 
 function _getDownstreamRecordingSequencers(
 	state: IClientAppState, nodeId: Id
-): List<ISequencerState> {
+): Immutable.List<ISequencerState> {
 	return selectDirectDownstreamSequencerIds(state.room, nodeId)
 		.map(x => selectSequencer(state.room, x))
 		.filter(x => x.isRecording)

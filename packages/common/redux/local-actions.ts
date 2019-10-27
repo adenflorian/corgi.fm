@@ -34,6 +34,8 @@ export const deleteNode = (nodeId: Id) => ({
 	nodeId,
 } as const)
 
+export type WithConnections = 'none' | 'all' | 'default'
+
 export const localActions = {
 	saveRoomToBrowser: () => ({
 		type: 'SAVE_ROOM_TO_BROWSER',
@@ -60,19 +62,17 @@ export const localActions = {
 	cloneNode: (
 		nodeId: Id,
 		nodeType: ConnectionNodeType,
-		withConnections: 'none' | 'all' | 'default'
+		withConnections: WithConnections
 	) => ({
 		type: 'CLONE_NODE',
 		nodeId,
 		nodeType,
 		withConnections,
 	} as const),
-	cloneExpNode: (
-		nodeId: Id,
-		withConnections: 'none' | 'all' | 'default'
+	cloneSelectedExpNodes: (
+		withConnections: WithConnections
 	) => ({
-		type: 'CLONE_EXP_NODE',
-		nodeId,
+		type: 'CLONE_EXP_NODES',
 		withConnections,
 	} as const),
 	pruneRoom: () => ({

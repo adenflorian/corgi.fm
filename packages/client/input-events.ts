@@ -70,10 +70,10 @@ const keyboardShortcuts: IKeyBoardShortcuts = Map<KeyBoardShortcut>({
 	[Control + Plus + 'd']: {
 		actionOnKeyDown: (_, state) => {
 			const selectedNodes = selectShamuMetaState(state.room).selectedNodes
-			if (selectedNodes.count() !== 1) return
 			if (selectRoomInfoState(state.room).roomType === RoomType.Experimental) {
-				return localActions.cloneExpNode(selectedNodes.first(), 'all')
+				return localActions.cloneSelectedExpNodes('all')
 			} else {
+				if (selectedNodes.count() !== 1) return
 				const type = selectPosition(state.room, selectedNodes.first()).targetType
 				if (findNodeInfo(type).isNodeCloneable !== true) return
 				return localActions.cloneNode(selectedNodes.first(), type, 'all')
