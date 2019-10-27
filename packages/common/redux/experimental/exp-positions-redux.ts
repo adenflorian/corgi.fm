@@ -60,6 +60,12 @@ export const expPositionActions = {
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	} as const),
+	moveMany: (updates: Map<Id, Pick<ExpPosition, 'x' | 'y'>>) => ({
+		type: 'EXP_MOVE_MANY_POSITIONS' as const,
+		updates,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	} as const),
 	clicked: (id: Id) => ({
 		type: 'EXP_NODE_CLICKED' as const,
 		id,
@@ -116,6 +122,11 @@ const positionsSpecificReducer: Reducer<ExpPositions, ExpPositionAction> =
 			case 'EXP_UPDATE_POSITIONS': return sortPositions(positions.merge(action.positions).map(x => makeExpPosition(x)))
 			case 'EXP_UPDATE_POSITION': return positions.update(action.id, x => x.merge(action.position))
 			case 'EXP_MOVE_POSITION': return positions.update(action.id, x => x.merge(action.position))
+			case 'EXP_MOVE_MANY_POSITIONS': return positions.withMutations(mutable => {
+				Map(action.updates).forEach((update, id) => {
+					mutable.update(id, x => x.merge(update))
+				})
+			})
 			case 'EXP_RESIZE_POSITION': return positions.update(action.id, x => x.merge(action.position))
 			case 'EXP_NODE_CLICKED': return positions.update(action.id, x => x.set('zIndex', getNewZIndex(positions, x.zIndex)))
 			default: return positions

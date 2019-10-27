@@ -1,11 +1,11 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import React, {useCallback, useMemo, useState, useLayoutEffect, Fragment} from 'react'
-import {useDispatch, useSelector, shallowEqual} from 'react-redux'
+import {useDispatch, useSelector, shallowEqual, useStore} from 'react-redux'
 import {ContextMenuTrigger} from 'react-contextmenu'
 import {Set} from 'immutable'
 import {
 	shamuMetaActions, selectExpPosition, expPositionActions,
-	IClientAppState, roomMemberActions,
+	IClientAppState, roomMemberActions, selectShamuMetaState, selectExpAllPositions,
 } from '@corgifm/common/redux'
 import {panelHeaderHeight} from '@corgifm/common/common-constants'
 import {handleClassName, expNodeMenuId} from '../client-constants'
@@ -52,6 +52,7 @@ export function SimpleGraphNodeExp({children}: Props) {
 	}, [])
 
 	const [dragging, setDragging] = useState(false)
+	const [didDrag, setDidDrag] = useState(false)
 
 	const handleMouseDown = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
 		if (e.button !== 0) return
@@ -59,24 +60,41 @@ export function SimpleGraphNodeExp({children}: Props) {
 			dispatch(shamuMetaActions.setSelectedNodes(isSelected
 				? selectedNodes.delete(positionId)
 				: selectedNodes.add(positionId)))
-		} else {
+		} else if (!isSelected) {
 			dispatch(shamuMetaActions.setSelectedNodes(Set([positionId])))
 		}
 		const target = e.target as HTMLElement
 		if (target.classList && target.classList.contains(handleClassName)) {
 			setDragging(true)
+			setDidDrag(false)
 		}
 		dispatch(expPositionActions.clicked(positionId))
 	}, [dispatch, isSelected, positionId, selectedNodes])
+
+	const handleMouseUp = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+		if (e.button !== 0) return
+		if (!e.shiftKey && !didDrag) {
+			dispatch(shamuMetaActions.setSelectedNodes(Set([positionId])))
+		}
+	}, [didDrag, dispatch, positionId])
+
+	const store = useStore()
 
 	useLayoutEffect(() => {
 		if (!dragging) return
 
 		const onMouseMove = (e: MouseEvent) => {
-			dispatch(expPositionActions.move(positionId, {
-				x: x + (e.movementX / simpleGlobalClientState.zoom),
-				y: y + (e.movementY / simpleGlobalClientState.zoom),
-			}))
+			const state = store.getState()
+			const allPositions = selectExpAllPositions(state.room)
+			const selected = selectShamuMetaState(state.room).selectedNodes
+			const positionsToMove = allPositions.filter(pos => selected.includes(pos.id))
+				.map(pos => ({
+					x: pos.x + (e.movementX / simpleGlobalClientState.zoom),
+					y: pos.y + (e.movementY / simpleGlobalClientState.zoom),
+				}))
+
+			dispatch(expPositionActions.moveMany(positionsToMove))
+			setDidDrag(true)
 		}
 
 		const onMouseUp = () => {
@@ -90,7 +108,7 @@ export function SimpleGraphNodeExp({children}: Props) {
 			window.removeEventListener('mousemove', onMouseMove)
 			window.removeEventListener('mouseup', onMouseUp)
 		}
-	}, [dispatch, dragging, positionId, x, y])
+	}, [dispatch, dragging, positionId, store])
 
 	const nodeName = nodeContext.getName()
 
@@ -117,9 +135,10 @@ export function SimpleGraphNodeExp({children}: Props) {
 					height: height + panelHeaderHeight,
 					zIndex,
 					top: -panelHeaderHeight,
-					transition: dragging ? undefined : 'transform 0.1s',
+					transition: isSelected || dragging ? undefined : 'transform 0.1s',
 				}}
 				onMouseDown={handleMouseDown}
+				onMouseUp={handleMouseUp}
 			>
 				{/* This forces the node onto its own composite layer, without making it blurry when zooming in
 				having our own layer will restrict paints and stuff into this layer only
@@ -128,7 +147,7 @@ export function SimpleGraphNodeExp({children}: Props) {
 				{
 					useMemo(() => {
 						return (
-						// @ts-ignore disableIfShiftIsPressed
+							// @ts-ignore disableIfShiftIsPressed
 							<ContextMenuTrigger
 								id={expNodeMenuId}
 								disableIfShiftIsPressed={true}
