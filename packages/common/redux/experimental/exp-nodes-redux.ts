@@ -6,6 +6,7 @@ import {
 	BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION, ExpNodeType,
 	IClientAppState,
 } from '..'
+import {ExpConnectionType} from './exp-connections-redux'
 
 export type ExpParamValue = string | boolean | number
 
@@ -85,6 +86,7 @@ const defaultExpNodeState = {
 	id: 'dummyId' as Id,
 	ownerId: 'dummyOwnerId' as Id,
 	type: 'dummy' as ExpNodeType,
+	ports: Map<Id, ExpPortState>(),
 	audioParams: Map<Id, number>(),
 	customNumberParams: Map<Id, number>(),
 	customEnumParams: Map<Id, string>(),
@@ -102,9 +104,21 @@ export function makeExpNodeState(node: Exclude<Partial<typeof defaultExpNodeStat
 		.set('audioParams', Map(node.audioParams || Map()))
 		.set('customNumberParams', Map(node.customNumberParams || Map()))
 		.set('customEnumParams', Map(node.customEnumParams || Map()))
+		.set('ports', Map<Id, ExpPortState>(node.ports || Map()).map(makeExpPortState))
 }
 
 export interface ExpNodeState extends ReturnType<typeof _makeExpNodeState> {}
+
+export const makeExpPortState = Record({
+	id: 'dummyPortId' as Id,
+	type: 'dummy' as ExpConnectionType,
+	inputOrOutput: 'input' as ExpPortSide,
+})
+
+export interface ExpPortState extends ReturnType<typeof makeExpPortState> {}
+export type ExpPortStates = Map<Id, ExpPortState>
+
+export type ExpPortSide = 'input' | 'output'
 
 export type ExpNodeType = typeof expNodeTypes[number]
 

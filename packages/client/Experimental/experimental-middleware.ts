@@ -11,6 +11,7 @@ import {
 	ExpLocalAction, expNodesActions, makeExpNodeState,
 	expPositionActions, makeExpPosition, selectExpPosition,
 	expConnectionsActions, selectLocalClientId, selectRoomMember,
+	makeExpPortState, ExpConnection,
 } from '@corgifm/common/redux'
 import {serverClientId} from '@corgifm/common/common-constants'
 import {SingletonContextImpl} from '../SingletonContext'
@@ -133,77 +134,141 @@ function after(
 		case 'EXP_UPDATE_CONNECTION_AUDIO_PARAM_INPUT_CENTERING':
 			return nodeManager.onAudioParamInputCenteringChange(action.id, action.centering)
 
-			// Exp Local Actions
+		// Exp Local Actions
 		case 'EXP_CREATE_GROUP': {
-			const {nodeIds} = action
-			const localClientId = selectLocalClientId(afterState)
-			const currentNodeGroupId = selectRoomMember(afterState.room, localClientId).groupNodeId
-
-			// create new group node and position
-			const average = averagePositionByIds(nodeIds, afterState)
-			const extremes = extremesPositionByIds(nodeIds, afterState)
-
-			const groupNode = makeExpNodeState({
-				type: 'group',
-				groupId: currentNodeGroupId,
-			})
-			dispatch(expNodesActions.add(groupNode))
-			dispatch(expPositionActions.add(
-				makeExpPosition({
-					id: groupNode.id,
-					ownerId: serverClientId,
-					x: average.x,
-					y: average.y,
-				})))
-
-			const groupInputNode = makeExpNodeState({
-				type: 'groupInput',
-				groupId: groupNode.id,
-			})
-			dispatch(expNodesActions.add(groupInputNode))
-			dispatch(expPositionActions.add(
-				makeExpPosition({
-					id: groupInputNode.id,
-					ownerId: serverClientId,
-					x: extremes.left - 400,
-					y: average.y,
-				})))
-
-			const groupOutputNode = makeExpNodeState({
-				type: 'groupOutput',
-				groupId: groupNode.id,
-			})
-			dispatch(expNodesActions.add(groupOutputNode))
-			dispatch(expPositionActions.add(
-				makeExpPosition({
-					id: groupOutputNode.id,
-					ownerId: serverClientId,
-					x: extremes.right + 100,
-					y: average.y,
-				})))
-
-			// set group Ids of selected nodes
-			dispatch(expNodesActions.setGroup(nodeIds, groupNode.id))
-
-			// set group Ids for connections
-			const allConnections = selectExpAllConnections(afterState.room)
-			const internalConnections = allConnections.filter(x =>
-				nodeIds.includes(x.sourceId) && nodeIds.includes(x.targetId))
-			const boundaryConnections = allConnections.filter(x =>
-				(nodeIds.includes(x.sourceId) && !nodeIds.includes(x.targetId)) ||
-				(!nodeIds.includes(x.sourceId) && nodeIds.includes(x.targetId)))
-
-			dispatch(expConnectionsActions.setGroup(internalConnections.keySeq().toSet(), groupNode.id))
-
-			// do something with boundary connections
-			// Temporary
-			dispatch(expConnectionsActions.delete(boundaryConnections.keySeq().toList()))
-
-			return
+			return createGroup(dispatch, action.nodeIds, afterState)
 		}
 
 		default: return
 	}
+}
+
+function createGroup(dispatch: Dispatch, nodeIds: Set<Id>, state: IClientAppState) {
+	const localClientId = selectLocalClientId(state)
+	const currentNodeGroupId = selectRoomMember(state.room, localClientId).groupNodeId
+
+	// create new group node and position
+	const average = averagePositionByIds(nodeIds, state)
+	const extremes = extremesPositionByIds(nodeIds, state)
+
+	const allConnections = selectExpAllConnections(state.room)
+	const internalConnections = allConnections.filter(x =>
+		nodeIds.includes(x.sourceId) && nodeIds.includes(x.targetId))
+	// Boundary connections
+	const inputConnections = allConnections.filter(x =>
+		(!nodeIds.includes(x.sourceId) && nodeIds.includes(x.targetId)))
+	const outputConnections = allConnections.filter(x =>
+		(nodeIds.includes(x.sourceId) && !nodeIds.includes(x.targetId)))
+
+	// Maps connections to their new port Ids
+	const updatedConnectionsMap = new Map<Id, Id>()
+
+	let inputCount = 0
+	const inputPorts = inputConnections.map((connection) => {
+		const newPortId = (connection.targetPort as string) + '-' + inputCount++
+		updatedConnectionsMap.set(connection.id, newPortId)
+		return makeExpPortState({
+			id: newPortId,
+			inputOrOutput: 'input',
+			type: connection.type,
+		})
+	})
+	let outputCount = 0
+	const outputPorts = outputConnections.map((connection) => {
+		const newPortId = (connection.sourcePort as string) + '-' + outputCount++
+		updatedConnectionsMap.set(connection.id, newPortId)
+		return makeExpPortState({
+			id: newPortId,
+			inputOrOutput: 'output',
+			type: connection.type,
+		})
+	})
+	
+	const groupNode = makeExpNodeState({
+		type: 'group',
+		groupId: currentNodeGroupId,
+		ports: inputPorts.concat(outputPorts),
+	})
+	dispatch(expNodesActions.add(groupNode))
+	dispatch(expPositionActions.add(
+		makeExpPosition({
+			id: groupNode.id,
+			ownerId: serverClientId,
+			x: average.x,
+			y: average.y,
+		})))
+
+	const groupInputNode = makeExpNodeState({
+		type: 'groupInput',
+		groupId: groupNode.id,
+	})
+	dispatch(expNodesActions.add(groupInputNode))
+	dispatch(expPositionActions.add(
+		makeExpPosition({
+			id: groupInputNode.id,
+			ownerId: serverClientId,
+			x: extremes.left - 400,
+			y: average.y,
+		})))
+
+	const groupOutputNode = makeExpNodeState({
+		type: 'groupOutput',
+		groupId: groupNode.id,
+	})
+	dispatch(expNodesActions.add(groupOutputNode))
+	dispatch(expPositionActions.add(
+		makeExpPosition({
+			id: groupOutputNode.id,
+			ownerId: serverClientId,
+			x: extremes.right + 100,
+			y: average.y,
+		})))
+
+	// set group Ids of selected nodes
+	dispatch(expNodesActions.setGroup(nodeIds, groupNode.id))
+
+	// set group Ids for connections
+	dispatch(expConnectionsActions.setGroup(internalConnections.keySeq().toSet(), groupNode.id))
+
+	// do something with boundary connections
+	inputConnections.forEach(connection => {
+		const targetPort = updatedConnectionsMap.get(connection.id)
+		if (targetPort === undefined) return logger.error('no target port found for connection', {connection, targetPort, updatedConnectionsMap})
+		dispatch(expConnectionsActions.updateTarget(connection.id, {
+			targetId: groupNode.id,
+			targetType: groupNode.type,
+			targetPort: targetPort,
+		}))
+		dispatch(expConnectionsActions.add(new ExpConnection(
+			groupInputNode.id,
+			groupInputNode.type,
+			connection.targetId,
+			connection.targetType,
+			targetPort,
+			connection.targetPort,
+			connection.type,
+			groupNode.id,
+		)))
+	})
+	outputConnections.forEach(connection => {
+		const sourcePort = updatedConnectionsMap.get(connection.id)
+		if (sourcePort === undefined) return logger.error('no source port found for connection', {connection, sourcePort, updatedConnectionsMap})
+		dispatch(expConnectionsActions.updateSource(connection.id, {
+			sourceId: groupNode.id,
+			sourceType: groupNode.type,
+			sourcePort: sourcePort,
+		}))
+		dispatch(expConnectionsActions.add(new ExpConnection(
+			connection.sourceId,
+			connection.sourceType,
+			groupOutputNode.id,
+			groupOutputNode.type,
+			connection.sourcePort,
+			sourcePort,
+			connection.type,
+			groupNode.id,
+		)))
+	})
 }
 
 function averagePositionByIds(positionIds: Set<Id>, state: IClientAppState) {

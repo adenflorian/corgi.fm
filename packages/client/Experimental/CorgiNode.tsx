@@ -1,9 +1,9 @@
 /* eslint-disable no-empty-function */
 import React, {ReactElement, useContext} from 'react'
 import {List} from 'immutable'
-import {clamp, clampPolarized, noop} from '@corgifm/common/common-utils'
+import {clamp, clampPolarized} from '@corgifm/common/common-utils'
 import {NodeToNodeAction} from '@corgifm/common/server-constants'
-import {ExpNodeType} from '@corgifm/common/redux'
+import {ExpNodeType, ExpPortStates} from '@corgifm/common/redux'
 import {logger} from '../client-logger'
 import {SingletonContextImpl} from '../SingletonContext'
 import {
@@ -33,6 +33,7 @@ export interface CorgiNodeArgs {
 	readonly preMasterLimiter: GainNode
 	readonly singletonContext: SingletonContextImpl
 	readonly parentGroupNode?: GroupNode
+	readonly ports?: ExpPortStates
 }
 
 export type CorgiNodeConstructor = new (args: CorgiNodeArgs) => CorgiNode

@@ -185,6 +185,7 @@ export class NodeManager {
 			preMasterLimiter: this._preMasterLimiter,
 			singletonContext: this._singletonContext,
 			parentGroupNode: this._getGroupNode(nodeState),
+			ports: nodeState.ports,
 		})
 		this._nodes.set(newNode.id, newNode)
 		nodeState.audioParams.forEach((newValue, paramId) => newNode.onAudioParamChange(paramId, newValue))
