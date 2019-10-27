@@ -49,8 +49,8 @@ const ExpNodeMenuItems = React.memo(function _MenuItems({nodeType}: ExpNodeMenuI
 	return (
 		<Fragment>
 			<TopMenuBar label="node menu" />
-			<DeleteExpNodeMenuItem />
-			<CloneExpNodeMenuItem />
+			{nodeType !== 'groupInput' && nodeType !== 'groupOutput' && <DeleteExpNodeMenuItem />}
+			{nodeType !== 'groupInput' && nodeType !== 'groupOutput' && <CloneExpNodeMenuItem />}
 		</Fragment>
 	)
 

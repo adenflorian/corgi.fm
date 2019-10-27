@@ -50,6 +50,7 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 			ownerId: serverClientId,
 			x: 400,
 			y: 0,
+			targetType: audioOutput.type,
 		})))
 
 	const gain = makeExpNodeState({
@@ -66,6 +67,7 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 			ownerId: serverClientId,
 			x: 0,
 			y: 300,
+			targetType: gain.type,
 		})))
 
 	const filter = makeExpNodeState({
@@ -80,6 +82,7 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 			ownerId: serverClientId,
 			x: 0,
 			y: 0,
+			targetType: filter.type,
 		})))
 
 	const osc1 = makeExpNodeState({
@@ -96,6 +99,7 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 			ownerId: serverClientId,
 			x: -400,
 			y: 0,
+			targetType: osc1.type,
 		})))
 
 	const lfo = makeExpNodeState({
@@ -112,6 +116,7 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 			ownerId: serverClientId,
 			x: -400,
 			y: 300,
+			targetType: lfo.type,
 		})))
 
 	dispatchToRoom(expConnectionsActions.add(new ExpConnection(

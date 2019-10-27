@@ -534,6 +534,8 @@ export function createLocalMiddleware(
 				// Select multiThing
 				const stateToClone = selectExpNode(newState.room, nodeId)
 
+				if (stateToClone.type === 'groupInput' || stateToClone.type === 'groupOutput') return
+
 				const clone = stateToClone.set('id', createNodeId())
 
 				// dispatch add multi thing
@@ -928,6 +930,7 @@ function createLocalStuffExperimental(dispatch: Dispatch, state: IClientAppState
 			ownerId: localClientId,
 			x: -expWidth * 3,
 			y: newY,
+			targetType: keyboard.type,
 		})))
 
 	const midiConverter = makeExpNodeState({
@@ -943,6 +946,7 @@ function createLocalStuffExperimental(dispatch: Dispatch, state: IClientAppState
 			ownerId: localClientId,
 			x: -expWidth * 2,
 			y: newY,
+			targetType: midiConverter.type,
 		})))
 
 	dispatch(expConnectionsActions.add(new ExpConnection(

@@ -92,7 +92,7 @@ const makeExpPositionRecord = Record(defaultExpPosition)
 
 const defaultExpPositionRecord = makeExpPositionRecord()
 
-export function makeExpPosition(position: Pick<typeof defaultExpPosition, 'id' | 'ownerId'> & Partial<typeof defaultExpPosition>): ExpPosition {
+export function makeExpPosition(position: Pick<typeof defaultExpPosition, 'id' | 'ownerId' | 'targetType'> & Partial<typeof defaultExpPosition>): ExpPosition {
 	return makeExpPositionRecord(position)
 }
 

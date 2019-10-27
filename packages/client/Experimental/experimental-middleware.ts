@@ -168,10 +168,10 @@ function createGroup(dispatch: Dispatch, nodeIds: Set<Id>, state: IClientAppStat
 	const updatedConnectionsMap = new Map<Id, Id>()
 
 	let inputCount = 0
-	const inputPorts = inputConnections.map((connection) => {
+	const inputPorts = inputConnections.map(connection => {
 		const newPortId = (connection.targetPort as string) + '-' + inputCount++
 		updatedConnectionsMap.set(connection.id, newPortId)
-		const [,isAudioParam] = nodeManager.getPortType(connection.targetId, connection.targetPort)
+		const [, isAudioParam] = nodeManager.getPortType(connection.targetId, connection.targetPort)
 		return makeExpPortState({
 			id: newPortId,
 			inputOrOutput: 'input',
@@ -180,7 +180,7 @@ function createGroup(dispatch: Dispatch, nodeIds: Set<Id>, state: IClientAppStat
 		})
 	})
 	let outputCount = 0
-	const outputPorts = outputConnections.map((connection) => {
+	const outputPorts = outputConnections.map(connection => {
 		const newPortId = (connection.sourcePort as string) + '-' + outputCount++
 		updatedConnectionsMap.set(connection.id, newPortId)
 		const [, isAudioParam] = nodeManager.getPortType(connection.sourceId, connection.sourcePort)
@@ -191,7 +191,7 @@ function createGroup(dispatch: Dispatch, nodeIds: Set<Id>, state: IClientAppStat
 			isAudioParamInput: isAudioParam,
 		})
 	})
-	
+
 	const groupNode = makeExpNodeState({
 		type: 'group',
 		groupId: currentNodeGroupId,
@@ -204,6 +204,7 @@ function createGroup(dispatch: Dispatch, nodeIds: Set<Id>, state: IClientAppStat
 			ownerId: serverClientId,
 			x: average.x,
 			y: average.y,
+			targetType: groupNode.type,
 		})))
 
 	const groupInputNode = makeExpNodeState({
@@ -217,6 +218,7 @@ function createGroup(dispatch: Dispatch, nodeIds: Set<Id>, state: IClientAppStat
 			ownerId: serverClientId,
 			x: extremes.left - 500,
 			y: average.y,
+			targetType: groupInputNode.type,
 		})))
 
 	const groupOutputNode = makeExpNodeState({
@@ -230,6 +232,7 @@ function createGroup(dispatch: Dispatch, nodeIds: Set<Id>, state: IClientAppStat
 			ownerId: serverClientId,
 			x: extremes.right + 200,
 			y: average.y,
+			targetType: groupOutputNode.type,
 		})))
 
 	// set group Ids of selected nodes
@@ -245,7 +248,7 @@ function createGroup(dispatch: Dispatch, nodeIds: Set<Id>, state: IClientAppStat
 		dispatch(expConnectionsActions.updateTarget(connection.id, {
 			targetId: groupNode.id,
 			targetType: groupNode.type,
-			targetPort: targetPort,
+			targetPort,
 		}))
 		dispatch(expConnectionsActions.add(new ExpConnection(
 			groupInputNode.id,
@@ -265,7 +268,7 @@ function createGroup(dispatch: Dispatch, nodeIds: Set<Id>, state: IClientAppStat
 		dispatch(expConnectionsActions.updateSource(connection.id, {
 			sourceId: groupNode.id,
 			sourceType: groupNode.type,
-			sourcePort: sourcePort,
+			sourcePort,
 		}))
 		dispatch(expConnectionsActions.add(new ExpConnection(
 			connection.sourceId,

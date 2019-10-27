@@ -8,7 +8,6 @@ import {
 	IClientAppState, roomMemberActions,
 } from '@corgifm/common/redux'
 import {panelHeaderHeight} from '@corgifm/common/common-constants'
-import {ConnectionNodeType} from '@corgifm/common/common-types'
 import {handleClassName, expNodeMenuId} from '../client-constants'
 import {simpleGlobalClientState} from '../SimpleGlobalClientState'
 import {ExpPanel} from '../Panel/ExpPanel'
@@ -135,7 +134,7 @@ export function SimpleGraphNodeExp({children}: Props) {
 								disableIfShiftIsPressed={true}
 								holdToDisplay={-1}
 								nodeId={positionId}
-								nodeType={ConnectionNodeType.dummy}
+								nodeType={nodeContext.type}
 								collect={collect}
 							>
 								<ExpPanel
@@ -148,7 +147,7 @@ export function SimpleGraphNodeExp({children}: Props) {
 								</ExpPanel>
 							</ContextMenuTrigger>
 						)
-					}, [children, color, nodeName, onHeaderDoubleClick, positionId])
+					}, [children, color, nodeContext.type, nodeName, onHeaderDoubleClick, positionId])
 				}
 			</div>
 		</Fragment>
