@@ -31,7 +31,7 @@ export function handleStopDraggingExpGhostConnector(
 
 	const mouseUpPort = info.portId
 
-	const portToConnectToType = nodeManager.getPortType(info.nodeId, mouseUpPort)
+	const [portToConnectToType] = nodeManager.getPortType(info.nodeId, mouseUpPort)
 
 	if (ghostConnection.type !== portToConnectToType) {
 		dispatch(chatSystemMessage(`Connections between ${ghostConnection.type} ports and ${portToConnectToType} ports are not allowed.`))

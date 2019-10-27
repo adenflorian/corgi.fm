@@ -113,6 +113,7 @@ export const makeExpPortState = Record({
 	id: 'dummyPortId' as Id,
 	type: 'dummy' as ExpConnectionType,
 	inputOrOutput: 'input' as ExpPortSide,
+	isAudioParamInput: false,
 })
 
 export interface ExpPortState extends ReturnType<typeof makeExpPortState> {}

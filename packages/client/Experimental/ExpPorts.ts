@@ -3,6 +3,7 @@ import React, {useContext} from 'react'
 import {List} from 'immutable'
 import {ParamInputCentering, SignalRange} from '@corgifm/common/common-types'
 import {clamp} from '@corgifm/common/common-utils'
+import {ExpConnectionType} from '@corgifm/common/redux'
 import {logger} from '../client-logger'
 import {CorgiNode} from './CorgiNode'
 import {
@@ -30,6 +31,7 @@ export abstract class ExpPort {
 		public readonly node: CorgiNode,
 		public readonly side: ExpPortSide,
 		public readonly type: ExpPortType,
+		public readonly isAudioParamInput = false,
 	) {
 		this.onPositionChanged = new CorgiObjectChangedEvent(this.position)
 		this.onConnectionCountChanged = new CorgiNumberChangedEvent(this.connectionCount)
@@ -51,8 +53,9 @@ export abstract class ExpNodeAudioPort extends ExpPort {
 		public readonly name: string,
 		public readonly node: CorgiNode,
 		side: ExpPortSide,
+		public readonly isAudioParamInput =false,
 	) {
-		super(id, name, node, side, 'audio')
+		super(id, name, node, side, 'audio', isAudioParamInput)
 	}
 
 	public connect = (connection: ExpNodeAudioConnection) => {
@@ -178,8 +181,9 @@ export class ExpNodeAudioInputPort extends ExpNodeAudioPort {
 		public readonly name: string,
 		public readonly node: CorgiNode,
 		public readonly destination: AudioNode | AudioParam,
+		public readonly isAudioParamInput = false,
 	) {
-		super(id, name, node, 'in')
+		super(id, name, node, 'in', isAudioParamInput)
 	}
 
 	public prepareDestinationForConnection(connectionId: Id): AudioNode | AudioParam {
@@ -229,7 +233,7 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 		public readonly audioContext: AudioContext,
 		public readonly defaultCentering: ParamInputCentering,
 	) {
-		super(expAudioParam.id, expAudioParam.id as string, node, expAudioParam.audioParam)
+		super(expAudioParam.id, expAudioParam.id as string, node, expAudioParam.audioParam, true)
 
 		this.destination = expAudioParam.audioParam
 
@@ -399,7 +403,7 @@ export class ExpNodeAudioOutputPort extends ExpNodeAudioPort {
 		public readonly node: CorgiNode,
 		public readonly source: AudioNode,
 	) {
-		super(id, name, node, 'out')
+		super(id, name, node, 'out', false)
 	}
 
 	public getSource(connectionId: Id) {
@@ -447,7 +451,7 @@ export class ExpNodeAudioOutputPort extends ExpNodeAudioPort {
 
 export type ExpPortSide = 'in' | 'out'
 
-export type ExpPortType = 'audio' | 'midi' | 'dummy'
+export type ExpPortType = ExpConnectionType
 
 export type ExpNodeAudioInputPorts = readonly ExpNodeAudioInputPort[]
 export type ExpNodeAudioOutputPorts = readonly ExpNodeAudioOutputPort[]

@@ -97,12 +97,18 @@ export class NodeManager {
 		node.onNodeToNode(action)
 	}
 
-	public getPortType(nodeId: Id, portId: Id): ExpPortType | void {
+	public getPortType(nodeId: Id, portId: Id): readonly [ExpPortType, boolean] {
 		const node = this._nodes.get(nodeId)
-		if (!node) return logger.warn('[getPortType] 404 node not found: ', {nodeId, portId})
+		if (!node) {
+			logger.warn('[getPortType] 404 node not found: ', {nodeId, portId})
+			return ['dummy', false]
+		}
 		const port = node.getPort(portId)
-		if (!port) return logger.warn('[getPortType] 404 port not found: ', {nodeId, portId})
-		return port.type
+		if (!port) {
+			logger.warn('[getPortType] 404 port not found: ', {nodeId, portId})
+			return ['dummy', false]
+		}
+		return [port.type, port.isAudioParamInput]
 	}
 
 	public onTick() {

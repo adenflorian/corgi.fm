@@ -1,12 +1,11 @@
 import React, {useCallback} from 'react'
 import {useDispatch} from 'react-redux'
-import {stripIndents} from 'common-tags'
 import {rateLimitedDebounceNoTrail} from '@corgifm/common/common-utils'
 import {
 	IClientState, commonActions,
 	selectClientById, selectLocalClientId, selectMemberCount,
 	selectRoomSettings, localActions,
-	selectClientInfo, shamuConnect, selectClientCount,
+	selectClientInfo, shamuConnect, selectClientCount, RoomType,
 } from '@corgifm/common/redux'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {
@@ -28,6 +27,7 @@ import {createResetZoomAction} from './SimpleGraph/Zoom'
 import {useObjectChangedEvent} from './Experimental/hooks/useCorgiEvent'
 import {simpleGlobalClientState} from './SimpleGlobalClientState'
 import {audioWorkletToolTip} from './client-constants'
+import {useRoomType, useLocalRoomMember} from './react-hooks'
 import './TopDiv.less'
 
 interface ReduxProps {
@@ -53,6 +53,8 @@ export const TopDiv = ({
 	}, [dispatch])
 
 	const isAudioWorkletLoaded = useObjectChangedEvent(simpleGlobalClientState.onAudioWorkletLoaded)
+	const roomType = useRoomType()
+	const localRoomMember = useLocalRoomMember()
 
 	return (
 		<div className="topDiv" style={{marginBottom: 'auto'}}>
@@ -118,6 +120,14 @@ export const TopDiv = ({
 						{onlyOwnerCanDoStuff ? 'Limited' : 'Public'}
 					</div>
 				</div>
+				{roomType === RoomType.Experimental &&
+					<div className="blob">
+						<div className="blobDark">Node Group</div>
+						<div>
+							{localRoomMember.groupNodeId}
+						</div>
+					</div>
+				}
 				<div className="blob">
 					<div className="blobDark">AudioWorklet</div>
 					<div

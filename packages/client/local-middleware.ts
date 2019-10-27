@@ -45,7 +45,8 @@ import {
 	selectExpConnectionsWithSourceOrTargetIds, selectExpNode,
 	selectExpPosition, selectExpConnectionsWithSourceId,
 	selectExpConnectionsWithTargetIds,
-	makeExpNodeState, makeExpPosition, ExpConnection, selectExpPositionExtremes,
+	makeExpNodeState, makeExpPosition, ExpConnection,
+	selectExpPositionExtremes, selectExpNodesState,
 } from '@corgifm/common/redux'
 import {pointersActions} from '@corgifm/common/redux/pointers-redux'
 import {makeMidiClipEvent, preciseModulus, preciseSubtract} from '@corgifm/common/midi-types'
@@ -432,11 +433,13 @@ export function createLocalMiddleware(
 
 				const nodeId = action.nodeId
 
-				dispatch(expNodesActions.delete(nodeId))
-				dispatch(expPositionActions.delete([nodeId]))
+				const nodeIdsPlusChildren = getChildExpNodeIds(nodeId, newState).toArray()
+
+				dispatch(expNodesActions.deleteMany(nodeIdsPlusChildren))
+				dispatch(expPositionActions.delete(nodeIdsPlusChildren))
 				dispatch(
 					expConnectionsActions.delete(
-						selectExpConnectionsWithSourceOrTargetIds(newState.room, [nodeId])
+						selectExpConnectionsWithSourceOrTargetIds(newState.room, nodeIdsPlusChildren)
 							.map(x => x.id)
 							.toList(),
 					),
@@ -708,6 +711,20 @@ export function createLocalMiddleware(
 			default: return next(action)
 		}
 	}
+}
+
+function getChildExpNodeIds(nodeId: Id, state: IClientAppState): Set<Id> {
+	const allNodes = selectExpNodesState(state.room)
+	let loopCount = 0
+	const getChildIds = (_nodeId: Id): Set<Id> => {
+		if (loopCount++ > 500) {
+			logger.error('loop count exceeded!', {_nodeId, loopCount})
+			return Set()
+		}
+		const childNodes = allNodes.filter(x => x.groupId === _nodeId).keySeq().toSet()
+		return childNodes.concat(childNodes.map(getChildIds).reduce((result, x) => result.concat(x), Set<Id>()))
+	}
+	return getChildIds(nodeId).add(nodeId)
 }
 
 function createRoomSave(state: IClientAppState, roomName: string): SavedRoom {

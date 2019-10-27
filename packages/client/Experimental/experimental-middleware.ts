@@ -136,29 +136,33 @@ function after(
 
 		// Exp Local Actions
 		case 'EXP_CREATE_GROUP': {
-			return createGroup(dispatch, action.nodeIds, afterState)
+			return createGroup(dispatch, action.nodeIds, afterState, nodeManager)
 		}
 
 		default: return
 	}
 }
 
-function createGroup(dispatch: Dispatch, nodeIds: Set<Id>, state: IClientAppState) {
+function createGroup(dispatch: Dispatch, nodeIds: Set<Id>, state: IClientAppState, nodeManager: NodeManager) {
 	const localClientId = selectLocalClientId(state)
 	const currentNodeGroupId = selectRoomMember(state.room, localClientId).groupNodeId
 
+	const nodes = selectExpNodesState(state.room)
+		.filter(x => nodeIds.includes(x.id) && x.type !== 'groupInput' && x.type !== 'groupOutput' && x.groupId === currentNodeGroupId)
+	const actualNodeIds = nodes.map(x => x.id).toSet()
+
 	// create new group node and position
-	const average = averagePositionByIds(nodeIds, state)
-	const extremes = extremesPositionByIds(nodeIds, state)
+	const average = averagePositionByIds(actualNodeIds, state)
+	const extremes = extremesPositionByIds(actualNodeIds, state)
 
 	const allConnections = selectExpAllConnections(state.room)
 	const internalConnections = allConnections.filter(x =>
-		nodeIds.includes(x.sourceId) && nodeIds.includes(x.targetId))
+		actualNodeIds.includes(x.sourceId) && actualNodeIds.includes(x.targetId))
 	// Boundary connections
 	const inputConnections = allConnections.filter(x =>
-		(!nodeIds.includes(x.sourceId) && nodeIds.includes(x.targetId)))
+		(!actualNodeIds.includes(x.sourceId) && actualNodeIds.includes(x.targetId)))
 	const outputConnections = allConnections.filter(x =>
-		(nodeIds.includes(x.sourceId) && !nodeIds.includes(x.targetId)))
+		(actualNodeIds.includes(x.sourceId) && !actualNodeIds.includes(x.targetId)))
 
 	// Maps connections to their new port Ids
 	const updatedConnectionsMap = new Map<Id, Id>()
@@ -167,20 +171,24 @@ function createGroup(dispatch: Dispatch, nodeIds: Set<Id>, state: IClientAppStat
 	const inputPorts = inputConnections.map((connection) => {
 		const newPortId = (connection.targetPort as string) + '-' + inputCount++
 		updatedConnectionsMap.set(connection.id, newPortId)
+		const [,isAudioParam] = nodeManager.getPortType(connection.targetId, connection.targetPort)
 		return makeExpPortState({
 			id: newPortId,
 			inputOrOutput: 'input',
 			type: connection.type,
+			isAudioParamInput: isAudioParam,
 		})
 	})
 	let outputCount = 0
 	const outputPorts = outputConnections.map((connection) => {
 		const newPortId = (connection.sourcePort as string) + '-' + outputCount++
 		updatedConnectionsMap.set(connection.id, newPortId)
+		const [, isAudioParam] = nodeManager.getPortType(connection.sourceId, connection.sourcePort)
 		return makeExpPortState({
 			id: newPortId,
 			inputOrOutput: 'output',
 			type: connection.type,
+			isAudioParamInput: isAudioParam,
 		})
 	})
 	
@@ -207,7 +215,7 @@ function createGroup(dispatch: Dispatch, nodeIds: Set<Id>, state: IClientAppStat
 		makeExpPosition({
 			id: groupInputNode.id,
 			ownerId: serverClientId,
-			x: extremes.left - 400,
+			x: extremes.left - 500,
 			y: average.y,
 		})))
 
@@ -220,12 +228,12 @@ function createGroup(dispatch: Dispatch, nodeIds: Set<Id>, state: IClientAppStat
 		makeExpPosition({
 			id: groupOutputNode.id,
 			ownerId: serverClientId,
-			x: extremes.right + 100,
+			x: extremes.right + 200,
 			y: average.y,
 		})))
 
 	// set group Ids of selected nodes
-	dispatch(expNodesActions.setGroup(nodeIds, groupNode.id))
+	dispatch(expNodesActions.setGroup(actualNodeIds, groupNode.id))
 
 	// set group Ids for connections
 	dispatch(expConnectionsActions.setGroup(internalConnections.keySeq().toSet(), groupNode.id))
@@ -248,6 +256,7 @@ function createGroup(dispatch: Dispatch, nodeIds: Set<Id>, state: IClientAppStat
 			connection.targetPort,
 			connection.type,
 			groupNode.id,
+			connection.audioParamInput,
 		)))
 	})
 	outputConnections.forEach(connection => {

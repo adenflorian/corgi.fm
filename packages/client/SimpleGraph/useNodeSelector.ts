@@ -1,7 +1,11 @@
 import React, {useState, useCallback, useLayoutEffect} from 'react'
 import Immutable, {Set} from 'immutable'
-import {useSelector, useDispatch} from 'react-redux'
-import {IClientAppState, RoomType, selectExpAllPositions, shamuMetaActions} from '@corgifm/common/redux'
+import {useSelector, useDispatch, useStore} from 'react-redux'
+import {
+	IClientAppState, RoomType, selectExpAllPositions,
+	shamuMetaActions, selectExpNodesState,
+	selectRoomMember, selectLocalClientId,
+} from '@corgifm/common/redux'
 import {useBoolean} from '../react-hooks'
 import {mouseFromScreenToBoard} from '../SimpleGlobalClientState'
 import {CorgiObjectChangedEvent} from '../Experimental/CorgiEvents'
@@ -29,8 +33,7 @@ export function useNodeSelector() {
 	const roomType = useSelector((state: IClientAppState) => state.room.roomInfo.roomType)
 
 	const dispatch = useDispatch()
-
-	const expPositions = useSelector((state: IClientAppState) => selectExpAllPositions(state.room))
+	const store = useStore()
 
 	const onMouseDown = useCallback((e: MouseEvent) => {
 		if (e.button !== 0) return
@@ -72,13 +75,23 @@ export function useNodeSelector() {
 				right: Math.max(originPercentages.x, otherCornerPercentages.x),
 			}
 
-			const insideBox = expPositions.filter(
-				z =>
-					z.y >= box.top &&
-					z.y + z.height <= box.bottom &&
-					z.x >= box.left &&
-					z.x + z.width <= box.right
-			).keySeq().toSet()
+			const state = store.getState()
+			const expPositions = selectExpAllPositions(state.room)
+			const expNodes = selectExpNodesState(state.room)
+			const currentGroupId = selectRoomMember(state.room, selectLocalClientId(state)).groupNodeId
+
+			const insideBox = expNodes
+				.filter(x => x.groupId === currentGroupId)
+				.map(x => expPositions.get(x.id)!)
+				.filter(
+					z =>
+						z.y >= box.top &&
+						z.y + z.height <= box.bottom &&
+						z.x >= box.left &&
+						z.x + z.width <= box.right
+				)
+				.keySeq()
+				.toSet()
 
 			const toFlip = preserve
 				? insideBox.filter(i => originalSelected.has(i))
@@ -116,7 +129,7 @@ export function useNodeSelector() {
 			document.removeEventListener('keydown', onKeyDown)
 			document.removeEventListener('keyup', onKeyUp)
 		}
-	}, [activateBox, boxActive, boxOrigin, deactivateBox, dispatch, expPositions, originalSelected, otherCorner, roomType, selected])
+	}, [activateBox, boxActive, boxOrigin, deactivateBox, dispatch, originalSelected, otherCorner, roomType, selected])
 
 	return [onMouseDown, boxOrigin, otherCorner, boxActive, nodeSelectorContextValue] as const
 }
