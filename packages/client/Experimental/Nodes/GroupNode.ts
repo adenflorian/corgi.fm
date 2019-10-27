@@ -60,7 +60,7 @@ export class GroupNode extends CorgiNode {
 			} else if (inputOrOutput === 'output') {
 				const newGain = this._audioContext.createGain()
 				this._outputGains.set(id, newGain)
-				return new ExpNodeAudioOutputPort(id, id as string, this, newGain, 'bipolar')
+				return new ExpNodeAudioOutputPort(id, id as string, this, newGain)
 			}
 		}
 

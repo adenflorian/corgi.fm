@@ -19,6 +19,7 @@ export class PolyphonicMidiConverterNode extends CorgiNode {
 	protected readonly _customNumberParams: ExpCustomNumberParams
 	private readonly _midiOutputPorts: readonly ExpMidiOutputPort[]
 	private readonly _pitchSources: readonly ConstantSourceNode[]
+	private readonly _waveShapers: readonly WaveShaperNode[]
 	private readonly _portamento: ExpCustomNumberParam
 	private readonly _algorithm: PolyAlgorithm = new RoundRobin()
 
@@ -30,13 +31,17 @@ export class PolyphonicMidiConverterNode extends CorgiNode {
 			voice.offset.setValueAtTime(0, 0)
 			voice.start()
 		})
+		this._waveShapers = new Array(voiceCount).fill(0).map(() => corgiNodeArgs.audioContext.createWaveShaper())
+		this._waveShapers.forEach(waveShaper => {
+			waveShaper.curve = new Float32Array([-3, 1])
+		})
 
 		const midiInputPort = new ExpMidiInputPort('input', 'input', this, midiAction => this._onMidiMessage.bind(this)(midiAction))
 		this._midiOutputPorts = this._pitchSources.map((_, index) => {
 			return new ExpMidiOutputPort('gate' + index, 'gate' + index, this)
 		})
 		const pitchOutputPorts = this._pitchSources.map((_, index) => {
-			return new ExpNodeAudioOutputPort('pitch' + index, 'pitch' + index, this, this._pitchSources[index], 'unipolar')
+			return new ExpNodeAudioOutputPort('pitch' + index, 'pitch' + index, this, this._pitchSources[index].connect(this._waveShapers[index]))
 		})
 		this._ports = arrayToESIdKeyMap([midiInputPort, ...this._midiOutputPorts, ...pitchOutputPorts])
 
@@ -55,6 +60,9 @@ export class PolyphonicMidiConverterNode extends CorgiNode {
 		this._pitchSources.forEach(voice => {
 			voice.stop()
 			voice.disconnect()
+		})
+		this._waveShapers.forEach(waveShaper => {
+			waveShaper.disconnect()
 		})
 	}
 

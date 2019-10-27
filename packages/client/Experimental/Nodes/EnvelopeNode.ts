@@ -21,6 +21,7 @@ export class EnvelopeNode extends CorgiNode {
 	protected readonly _customNumberParams: ExpCustomNumberParams
 	private readonly _constantSource: ConstantSourceNode
 	private readonly _outputGain: GainNode
+	private readonly _waveShaper: WaveShaperNode
 	private _lastGateTime = -1
 	private _lastGate?: boolean
 	private readonly _attack: ExpCustomNumberParam
@@ -36,13 +37,15 @@ export class EnvelopeNode extends CorgiNode {
 
 		this._constantSource = corgiNodeArgs.audioContext.createConstantSource()
 		this._outputGain = corgiNodeArgs.audioContext.createGain()
+		this._waveShaper = corgiNodeArgs.audioContext.createWaveShaper()
+		this._waveShaper.curve = new Float32Array([-3, 1])
 
 		this._constantSource.offset.value = 0
-		this._constantSource.connect(this._outputGain)
+		this._constantSource.connect(this._waveShaper).connect(this._outputGain)
 		this._constantSource.start()
 		this._constantSource.offset.linearRampToValueAtTime(0, longTime)
 
-		const outputPort = new ExpNodeAudioOutputPort('output', 'output', this, this._outputGain, 'unipolar')
+		const outputPort = new ExpNodeAudioOutputPort('output', 'output', this, this._outputGain)
 		const midiInputPort = new ExpMidiInputPort('input', 'input', this, midiAction => this.receiveMidiAction.bind(this)(midiAction))
 		this._ports = arrayToESIdKeyMap([outputPort, midiInputPort])
 

@@ -83,7 +83,7 @@ const curves = {
 		offset: new Float32Array([0, 1]),
 	},
 	unipolar: {
-		center: new Float32Array([-2, 1]),
+		center: new Float32Array([-3, 1]),
 		offset: null,
 	},
 } as const
@@ -106,7 +106,6 @@ class ParamInputChain {
 		public readonly id: Id,
 		audioContext: AudioContext,
 		private readonly _destination: AudioParam | AudioNode,
-		private readonly _inputRange: SignalRange,
 		defaultCentering: ParamInputCentering,
 		private readonly _destinationRange: SignalRange,
 		private readonly _updateLiveRange: () => void,
@@ -131,7 +130,7 @@ class ParamInputChain {
 
 	private _setCentering(newCentering: ParamInputCentering) {
 		this._centering = newCentering
-		this._waveShaper.curve = curves[this._inputRange][this._centering]
+		this._waveShaper.curve = curves['bipolar'][this._centering]
 		this.onCenteringChange.invokeImmediately(this._centering)
 		this._updateModdedGain()
 		this._updateLiveRange()
@@ -183,7 +182,7 @@ export class ExpNodeAudioInputPort extends ExpNodeAudioPort {
 		super(id, name, node, 'in')
 	}
 
-	public prepareDestinationForConnection(connectionId: Id, signalRange: SignalRange): AudioNode | AudioParam {
+	public prepareDestinationForConnection(connectionId: Id): AudioNode | AudioParam {
 		return this.destination
 	}
 
@@ -339,7 +338,7 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 		chain.setCentering(centering)
 	}
 
-	public prepareDestinationForConnection(connectionId: Id, signalRange: SignalRange): AudioNode {
+	public prepareDestinationForConnection(connectionId: Id): AudioNode {
 		const existingChain = this._inputChains.get(connectionId)
 
 		if (existingChain) return existingChain.getInput()
@@ -348,7 +347,6 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 			connectionId,
 			this.audioContext,
 			this._waveShaperClamp,
-			signalRange,
 			this.defaultCentering,
 			this.expAudioParam.paramSignalRange,
 			this._updateLiveRange,
@@ -400,7 +398,6 @@ export class ExpNodeAudioOutputPort extends ExpNodeAudioPort {
 		public readonly name: string,
 		public readonly node: CorgiNode,
 		public readonly source: AudioNode,
-		public readonly signalRange: SignalRange,
 	) {
 		super(id, name, node, 'out')
 	}

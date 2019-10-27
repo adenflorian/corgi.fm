@@ -20,6 +20,7 @@ export class MidiConverterNode extends CorgiNode {
 	protected readonly _customEnumParams: ExpCustomEnumParams
 	private readonly _midiOutputPort: ExpMidiOutputPort
 	private readonly _constantSourceNode: ConstantSourceNode
+	private readonly _waveShaper: WaveShaperNode
 	private readonly _portamento: ExpCustomNumberParam
 	private readonly _legato: ExpCustomEnumParam<Legato>
 	private _lastMidiActionTime: number
@@ -32,9 +33,14 @@ export class MidiConverterNode extends CorgiNode {
 		this._constantSourceNode.offset.setValueAtTime(0, 0)
 		this._constantSourceNode.start()
 
+		this._waveShaper = corgiNodeArgs.audioContext.createWaveShaper()
+		this._waveShaper.curve = new Float32Array([-3, 1])
+
+		this._constantSourceNode.connect(this._waveShaper)
+
 		const midiInputPort = new ExpMidiInputPort('input', 'input', this, midiAction => this._onMidiMessage.bind(this)(midiAction))
 		this._midiOutputPort = new ExpMidiOutputPort('gate', 'gate', this)
-		const pitchOutputPort = new ExpNodeAudioOutputPort('pitch', 'pitch', this, this._constantSourceNode, 'unipolar')
+		const pitchOutputPort = new ExpNodeAudioOutputPort('pitch', 'pitch', this, this._waveShaper)
 		this._ports = arrayToESIdKeyMap([midiInputPort, this._midiOutputPort, pitchOutputPort])
 
 		this._portamento = new ExpCustomNumberParam('portamento', 0, 0, 8, 3, adsrValueToString)

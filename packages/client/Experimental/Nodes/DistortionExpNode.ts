@@ -35,7 +35,7 @@ export class DistortionExpNode extends CorgiNode {
 
 		const inputPort = new ExpNodeAudioInputPort('input', 'input', this, this._dryWetChain.inputGain)
 		const drivePort = new ExpNodeAudioParamInputPort(driveParam, this, corgiNodeArgs.audioContext, 'offset')
-		const outputPort = new ExpNodeAudioOutputPort('output', 'output', this, this._dryWetChain.outputGain, 'bipolar')
+		const outputPort = new ExpNodeAudioOutputPort('output', 'output', this, this._dryWetChain.outputGain)
 		this._ports = arrayToESIdKeyMap([inputPort, drivePort, outputPort])
 	}
 

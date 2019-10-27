@@ -41,7 +41,7 @@ export class OscillatorExpNode extends CorgiNode {
 
 		const frequencyPort = new ExpNodeAudioParamInputPort(frequencyParam, this, corgiNodeArgs.audioContext, 'offset')
 		const detunePort = new ExpNodeAudioParamInputPort(detuneParam, this, corgiNodeArgs.audioContext, 'center')
-		const outputPort = new ExpNodeAudioOutputPort('output', 'output', this, this._outputChain.output, 'bipolar')
+		const outputPort = new ExpNodeAudioOutputPort('output', 'output', this, this._outputChain.output)
 
 		this._ports = arrayToESIdKeyMap([frequencyPort, detunePort, outputPort])
 		this._audioParams = arrayToESIdKeyMap([frequencyParam, detuneParam])

@@ -42,7 +42,7 @@ export class FilterNode extends CorgiNode {
 		const detunePort = new ExpNodeAudioParamInputPort(detuneParam, this, corgiNodeArgs.audioContext, 'center')
 		const qPort = new ExpNodeAudioParamInputPort(qParam, this, corgiNodeArgs.audioContext, 'offset')
 		const gainPort = new ExpNodeAudioParamInputPort(gainParam, this, corgiNodeArgs.audioContext, 'offset')
-		const outputPort = new ExpNodeAudioOutputPort('output', 'output', this, this._dryWetChain.outputGain, 'bipolar')
+		const outputPort = new ExpNodeAudioOutputPort('output', 'output', this, this._dryWetChain.outputGain)
 
 		this._ports = arrayToESIdKeyMap([inputPort, frequencyPort, detunePort, qPort, gainPort, outputPort])
 		this._audioParams = arrayToESIdKeyMap([frequencyParam, detuneParam, qParam, gainParam])

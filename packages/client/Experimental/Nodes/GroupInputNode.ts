@@ -18,7 +18,7 @@ export class GroupInputNode extends CorgiNode {
 		}
 
 		this._parentGroupNode.registerChildInputNode().forEach(input => {
-			this._ports.set(input.id, new ExpNodeAudioOutputPort(input.id, input.name, this, input.destination as AudioNode, 'bipolar'))
+			this._ports.set(input.id, new ExpNodeAudioOutputPort(input.id, input.name, this, input.destination as AudioNode))
 		})
 	}
 

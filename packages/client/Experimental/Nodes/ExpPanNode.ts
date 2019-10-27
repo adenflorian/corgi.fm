@@ -27,7 +27,7 @@ export class ExpPanNode extends CorgiNode {
 
 		const inputPort = new ExpNodeAudioInputPort('input', 'input', this, this._dryWetChain.inputGain)
 		const panPort = new ExpNodeAudioParamInputPort(panParam, this, corgiNodeArgs.audioContext, 'center')
-		const outputPort = new ExpNodeAudioOutputPort('output', 'output', this, this._dryWetChain.outputGain, 'bipolar')
+		const outputPort = new ExpNodeAudioOutputPort('output', 'output', this, this._dryWetChain.outputGain)
 		this._ports = arrayToESIdKeyMap([inputPort, panPort, outputPort])
 	}
 
