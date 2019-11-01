@@ -2,7 +2,7 @@ import {Set} from 'immutable'
 import {createSelector} from 'reselect'
 import * as uuid from 'uuid'
 import {
-	ConnectionNodeType, IConnectable, IMultiStateThingDeserializer, Octave,
+	ConnectionNodeType, IConnectable, IMultiStateThingDeserializer,
 } from '../common-types'
 import {applyOctave} from '../common-utils'
 import {emptyMidiNotes, IMidiNote, IMidiNotes, MidiNotes} from '../MidiNote'

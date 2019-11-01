@@ -25,7 +25,7 @@ export function SimpleGraphNodeExp({children}: Props) {
 
 	const color = nodeContext.getColor()
 
-	const selectedNodes = useSelector((state: IClientAppState) => state.room.expPositions.meta.selectedNodes)
+	const selectedNodes = useSelector((state: IClientAppState) => state.room.expGraphs.mainGraph.positions.meta.selectedNodes)
 
 	const isSelected = selectedNodes.includes(positionId)
 

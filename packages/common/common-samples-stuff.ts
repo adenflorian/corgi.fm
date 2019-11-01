@@ -1,6 +1,6 @@
 import {List, Map} from 'immutable'
 import {IMidiNote} from './MidiNote'
-import {Octave, IKeyColors, NoteNameSharps} from './common-types'
+import {IKeyColors, NoteNameSharps} from './common-types'
 import {BuiltInBQFilterType} from './OscillatorTypes'
 import {defaultSamplePlaybackRate} from './common-constants'
 

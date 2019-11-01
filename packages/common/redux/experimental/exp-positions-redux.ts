@@ -3,7 +3,7 @@ import {combineReducers, Reducer} from 'redux'
 import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
 import {CssColor} from '../../shamu-color'
-import {shamuMetaReducer} from '../shamu-graph'
+import {shamuMetaReducer, ShamuMetaState} from '../shamu-graph'
 import {IClientAppState} from '../common-redux-types'
 import {
 	BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION, ExpNodeType,
@@ -74,12 +74,16 @@ export const expPositionActions = {
 	} as const),
 } as const
 
-export interface ExpPositionsState {
-	all: ExpPositions
-	meta: ReturnType<typeof shamuMetaReducer>
+export interface ExpPositionsState extends ReturnType<typeof makeExpPositionsState> {}
+
+export function makeExpPositionsState() {
+	return {
+		all: Map<Id, ExpPosition>() as ExpPositions,
+		meta: new ShamuMetaState(),
+	}
 }
 
-export type ExpPositions = Map<Id, ExpPosition>
+export interface ExpPositions extends Map<Id, ExpPosition> {}
 
 export const defaultExpPosition = Object.freeze({
 	id: '-1' as Id,
@@ -150,7 +154,7 @@ export const expPositionsReducer: Reducer<ExpPositionsState, ExpPositionAction> 
 
 // Selectors
 export const selectExpAllPositions = (state: IClientRoomState) =>
-	state.expPositions.all
+	state.expGraphs.mainGraph.positions.all
 
 export const selectExpPosition = (state: IClientRoomState, id: Id) =>
 	selectExpAllPositions(state).get(id) || defaultExpPositionRecord

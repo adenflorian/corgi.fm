@@ -7,7 +7,7 @@ import {
 	RoomsReduxAction, shamuGraphReducer, recordingReducer, uploadReducer,
 	roomSettingsReducer, ghostConnectionsReducer, roomInfoReducer,
 	expNodesReducer, expPositionsReducer, expConnectionsReducer,
-	expGhostConnectionsReducer,
+	expGhostConnectionsReducer, expGraphsReducer,
 } from '.'
 
 export type RoomAction = ReturnType<typeof createRoomAction>
@@ -21,10 +21,8 @@ export const createRoomAction = (action: Action, room: string) => ({
 export const roomReducers = combineReducers({
 	chat: chatReducer,
 	connections: connectionsReducer,
-	expConnections: expConnectionsReducer,
+	expGraphs: expGraphsReducer,
 	expGhostConnections: expGhostConnectionsReducer,
-	expNodes: expNodesReducer,
-	expPositions: expPositionsReducer,
 	globalClock: globalClockReducer,
 	ghostConnections: ghostConnectionsReducer,
 	members: roomMembersReducer,

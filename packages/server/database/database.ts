@@ -1,5 +1,4 @@
 import {MongoClient} from 'mongodb'
-import {ThenArg} from '@corgifm/common/common-types'
 import {logger} from '@corgifm/common/logger'
 import {getDbConnector} from '../server-config'
 import {eventsQueries} from './events'

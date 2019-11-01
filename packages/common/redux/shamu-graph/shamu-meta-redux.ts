@@ -12,7 +12,7 @@ export const shamuMetaActions = {
 	} as const),
 } as const
 
-class ShamuMetaState {
+export class ShamuMetaState {
 	public constructor(
 		public readonly selectedNodes = Set<Id>(),
 	) {}

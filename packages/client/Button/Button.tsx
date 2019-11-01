@@ -1,5 +1,4 @@
 import React, {HTMLAttributes, MouseEvent} from 'react'
-import {OmitStrict} from '@corgifm/common/common-types'
 import {noop} from '@corgifm/common/common-utils'
 import './Button.less'
 

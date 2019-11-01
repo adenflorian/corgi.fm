@@ -31,22 +31,6 @@ export function isSequencerNodeType(type: ConnectionNodeType) {
 	].includes(type)
 }
 
-export type ThenArg<T> = T extends Promise<infer U>
-	? U
-	: T extends (...args: any[]) => Promise<infer V>
-		? V
-		: T
-
-export type OmitStrict<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
-
-export type AnyFunction = (...args: any[]) => any
-
-export type Octave = number
-
-export type RequiredField<T, K extends keyof T> = {
-	[P in K]-?: T[P]
-} & T
-
 export enum Header {
 	AccessControlAllowOrigin = 'access-control-allow-origin',
 	ContentType = 'content-type',

@@ -11,7 +11,6 @@ import {
 	Sample, dummySample, dummySamplePath, midiNoteToNoteNameFull,
 } from '@corgifm/common/common-samples-stuff'
 import {ContextMenuTrigger} from 'react-contextmenu'
-import {Octave} from '@corgifm/common/common-types'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {
 	MBtoBytes, validateSampleFilenameExtension,

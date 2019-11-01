@@ -1,6 +1,5 @@
 import React from 'react'
 import {useDispatch, useSelector} from 'react-redux'
-import {AnyFunction} from '@corgifm/common/common-types'
 import {
 	ModalId, modalsAction, selectActiveModalId,
 } from '@corgifm/common/redux'

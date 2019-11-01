@@ -23,7 +23,7 @@ export function useNodeSelector() {
 	const [boxOrigin, setBoxOrigin] = useState({x: 0, y: 0})
 	const [otherCorner, setOtherCorner] = useState({x: 0, y: 0})
 
-	const selected = useSelector((state: IClientAppState) => state.room.expPositions.meta.selectedNodes)
+	const selected = useSelector((state: IClientAppState) => state.room.expGraphs.mainGraph.positions.meta.selectedNodes)
 	const [originalSelected, setOriginalSelected] = useState(Set<Id>())
 
 	const [nodeSelectorContextValue] = useState<NodeSelectorContextValue>({

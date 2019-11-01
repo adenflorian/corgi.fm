@@ -2,11 +2,11 @@ import {Set, Map, Record} from 'immutable'
 import {ActionType} from 'typesafe-actions'
 import * as uuid from 'uuid'
 import {topGroupId, GroupId} from '../../common-constants'
+import {ExpConnectionType} from './exp-connections-redux'
 import {
 	BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION, ExpNodeType,
 	IClientAppState,
 } from '..'
-import {ExpConnectionType} from './exp-connections-redux'
 
 export type ExpParamValue = string | boolean | number
 
@@ -98,7 +98,7 @@ const _makeExpNodeState = Record(defaultExpNodeState)
 
 const defaultExpNodeRecord = _makeExpNodeState()
 
-export function makeExpNodeState(node: Exclude<Partial<typeof defaultExpNodeState>, 'id'>): ExpNodeState {
+export function makeExpNodeState(node: Partial<typeof defaultExpNodeState>): ExpNodeState {
 	return _makeExpNodeState(node)
 		.set('id', node.id || uuid.v4())
 		.set('audioParams', Map(node.audioParams || Map()))
@@ -156,7 +156,7 @@ export const expNodesReducer = (state = initialState, action: ExpNodesAction): E
 	}
 }
 
-export const selectExpNodesState = (state: IClientRoomState) => state.expNodes
+export const selectExpNodesState = (state: IClientRoomState) => state.expGraphs.mainGraph.nodes
 
 export const selectExpNode = (state: IClientRoomState, id: Id) =>
 	selectExpNodesState(state).get(id) || defaultExpNodeRecord

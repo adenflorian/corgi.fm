@@ -141,16 +141,16 @@ const defaultExpNodeConnectionsInfo = Object.freeze({
 
 export type ExpNodeConnectionsInfo = typeof defaultExpNodeConnectionsInfo
 
-const makeInitialState = () => ({
+export const makeInitialExpConnectionsState = () => ({
 	connections: Map<Id, ExpConnection>(),
 	nodeInfos: Map<Id, ExpNodeConnectionsInfo>(),
 })
 
 const makeNodeInfos = () => Map<Id, ExpNodeConnectionsInfo>()
 
-export interface ExpConnectionsState extends ReturnType<typeof makeInitialState> {}
+export interface ExpConnectionsState extends ReturnType<typeof makeInitialExpConnectionsState> {}
 
-export function expConnectionsReducer(state = makeInitialState(), action: ExpConnectionAction): ExpConnectionsState {
+export function expConnectionsReducer(state = makeInitialExpConnectionsState(), action: ExpConnectionAction): ExpConnectionsState {
 	switch (action.type) {
 		case 'EXP_ADD_CONNECTION': return {
 			...state,
@@ -317,11 +317,11 @@ const removeConnectionToConnections = (connection: ExpConnection) => (connection
 }
 
 export function selectExpAllConnections(state: IClientRoomState) {
-	return state.expConnections.connections
+	return state.expGraphs.mainGraph.connections.connections
 }
 
 export function selectExpAllNodeConnectionInfos(state: IClientRoomState) {
-	return state.expConnections.nodeInfos
+	return state.expGraphs.mainGraph.connections.nodeInfos
 }
 
 export function selectExpNodeConnectionInfosForNode(state: IClientRoomState, nodeId: Id): ExpNodeConnectionsInfo {
