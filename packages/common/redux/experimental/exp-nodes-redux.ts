@@ -127,7 +127,7 @@ export const expNodeTypes = [
 	'oscillator', 'filter', 'dummy', 'audioOutput', 'gain', 'pan', 'envelope',
 	'sequencer', 'constant', 'lowFrequencyOscillator', 'midiConverter', 'keyboard',
 	'distortion', 'polyphonicMidiConverter', 'group', 'groupInput', 'groupOutput',
-	'midiRandom',
+	'midiRandom', 'midiPitch',
 ] as const
 
 const initialState = Map<Id, ExpNodeState>()

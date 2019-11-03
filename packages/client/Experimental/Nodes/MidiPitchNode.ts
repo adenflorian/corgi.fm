@@ -1,18 +1,18 @@
 /* eslint-disable no-empty-function */
 import {CssColor} from '@corgifm/common/shamu-color'
 import {MidiAction} from '@corgifm/common/common-types'
-import {arrayToESIdKeyMap, randomBoolean} from '@corgifm/common/common-utils'
-import {percentageValueString} from '../../client-constants'
+import {arrayToESIdKeyMap} from '@corgifm/common/common-utils'
+import {floorValueString} from '../../client-constants'
 import {ExpCustomNumberParam, ExpCustomNumberParams} from '../ExpParams'
 import {ExpMidiOutputPort, ExpMidiInputPort} from '../ExpMidiPorts'
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 import {ExpPorts} from '../ExpPorts'
 
-export class MidiRandomNode extends CorgiNode {
+export class MidiPitchNode extends CorgiNode {
 	protected readonly _ports: ExpPorts
 	protected readonly _customNumberParams: ExpCustomNumberParams
 	private readonly _midiOutputPort: ExpMidiOutputPort
-	private readonly _chance: ExpCustomNumberParam
+	private readonly _pitch: ExpCustomNumberParam
 
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
 		super(corgiNodeArgs)
@@ -21,12 +21,12 @@ export class MidiRandomNode extends CorgiNode {
 		this._midiOutputPort = new ExpMidiOutputPort('output', 'output', this)
 		this._ports = arrayToESIdKeyMap([midiInputPort, this._midiOutputPort])
 
-		this._chance = new ExpCustomNumberParam('chance', 0.5, 0, 1, 1, percentageValueString)
-		this._customNumberParams = arrayToESIdKeyMap([this._chance])
+		this._pitch = new ExpCustomNumberParam('pitch', 0, -128, 128, 1, floorValueString)
+		this._customNumberParams = arrayToESIdKeyMap([this._pitch])
 	}
 
 	public getColor = () => CssColor.yellow
-	public getName = () => 'Midi Random'
+	public getName = () => 'Midi Pitch'
 	public render = () => this.getDebugView()
 
 	protected _enable() {}
@@ -50,8 +50,11 @@ export class MidiRandomNode extends CorgiNode {
 	}
 
 	private _onMidiNoteOn(midiAction: Extract<MidiAction, {type: 'MIDI_NOTE'}>) {
-		if (!this._enabled || randomBoolean(this._chance.value)) {
-			this._midiOutputPort.sendMidiAction(midiAction)
-		}
+		this._midiOutputPort.sendMidiAction({
+			...midiAction,
+			note: this._enabled
+				? midiAction.note + Math.floor(this._pitch.value)
+				: midiAction.note,
+		})
 	}
 }

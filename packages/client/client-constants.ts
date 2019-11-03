@@ -133,6 +133,10 @@ export function percentageValueString(num: number) {
 	return (num * 100).toFixed(0) + '%'
 }
 
+export function floorValueString(num: number) {
+	return Math.floor(num).toFixed(0)
+}
+
 export function percentageValueStringCurved(num: number) {
 	const percent = num * 100
 	if (percent < 10) return percent.toFixed(2) + '%'

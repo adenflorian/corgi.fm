@@ -52,7 +52,7 @@ export class EnvelopeNode extends CorgiNode {
 		this._attack = new ExpCustomNumberParam('attack', 0.0004, 0, 32, 3, adsrValueToString) // 0.0005
 		this._hold = new ExpCustomNumberParam('hold', 0, 0, 32, 3, adsrValueToString) // 0
 		this._decay = new ExpCustomNumberParam('decay', 1, 0, 32, 3, adsrValueToString) // 1
-		this._sustain = new ExpCustomNumberParam('sustain', 1, 0, 1, 1, gainDecibelValueToString) // 1
+		this._sustain = new ExpCustomNumberParam('sustain', 0, 0, 1, 1, gainDecibelValueToString) // 1
 		this._release = new ExpCustomNumberParam('release', 0.015, 0, 32, 3, adsrValueToString) // 0.015
 		this._customNumberParams = arrayToESIdKeyMap([
 			this._attack, this._hold, this._decay, this._sustain, this._release,
