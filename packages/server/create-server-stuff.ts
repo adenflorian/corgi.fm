@@ -35,89 +35,343 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 	}
 }
 
+const xSpacing = 400
+const ySpacing = 300
+
 export function createServerStuffExperimental(room: string, serverStore: Store<IServerState>) {
 	logger.log('todo')
 
-	const audioOutput = makeExpNodeState({
-		type: 'audioOutput',
+	const sequencer = makeExpNodeState({
+		type: 'sequencer',
 	})
-
-	dispatchToRoom(expNodesActions.add(audioOutput))
-
+	dispatchToRoom(expNodesActions.add(sequencer))
 	dispatchToRoom(expPositionActions.add(
 		makeExpPosition({
-			id: audioOutput.id,
+			id: sequencer.id,
 			ownerId: serverClientId,
-			x: 400,
-			y: 0,
-			targetType: audioOutput.type,
+			x: xSpacing * -4,
+			y: ySpacing * 0,
+			targetType: sequencer.type,
 		})))
 
-	const gain = makeExpNodeState({
-		type: 'gain',
+	const midiConverter = makeExpNodeState({
+		type: 'midiConverter',
 	})
-
-	dispatchToRoom(expNodesActions.add(gain))
-
-	dispatchToRoom(expNodesActions.audioParamChange(gain.id, 'gain', 0.25))
-
+	dispatchToRoom(expNodesActions.add(midiConverter))
 	dispatchToRoom(expPositionActions.add(
 		makeExpPosition({
-			id: gain.id,
+			id: midiConverter.id,
 			ownerId: serverClientId,
-			x: 0,
-			y: 300,
-			targetType: gain.type,
+			x: xSpacing * -2,
+			y: ySpacing * 0,
+			targetType: midiConverter.type,
 		})))
 
-	const filter = makeExpNodeState({
-		type: 'filter',
+	const midiConverter2 = makeExpNodeState({
+		type: 'midiConverter',
 	})
-
-	dispatchToRoom(expNodesActions.add(filter))
-
+	dispatchToRoom(expNodesActions.add(midiConverter2))
 	dispatchToRoom(expPositionActions.add(
 		makeExpPosition({
-			id: filter.id,
+			id: midiConverter2.id,
 			ownerId: serverClientId,
-			x: 0,
-			y: 0,
-			targetType: filter.type,
+			x: xSpacing * -2,
+			y: ySpacing * -1,
+			targetType: midiConverter2.type,
+		})))
+
+	const midiRandom = makeExpNodeState({
+		type: 'midiRandom',
+	})
+	dispatchToRoom(expNodesActions.add(midiRandom))
+	dispatchToRoom(expPositionActions.add(
+		makeExpPosition({
+			id: midiRandom.id,
+			ownerId: serverClientId,
+			x: xSpacing * -3,
+			y: ySpacing * 0,
+			targetType: midiRandom.type,
+		})))
+
+	const midiPitch = makeExpNodeState({
+		type: 'midiPitch',
+	})
+	dispatchToRoom(expNodesActions.add(midiPitch))
+	dispatchToRoom(expPositionActions.add(
+		makeExpPosition({
+			id: midiPitch.id,
+			ownerId: serverClientId,
+			x: xSpacing * -3,
+			y: ySpacing * -1,
+			targetType: midiPitch.type,
+		})))
+
+	// const midiDelay = makeExpNodeState({
+	// 	type: 'midiDelay',
+	// })
+	// dispatchToRoom(expNodesActions.add(midiDelay))
+	// dispatchToRoom(expPositionActions.add(
+	// 	makeExpPosition({
+	// 		id: midiDelay.id,
+	// 		ownerId: serverClientId,
+	// 		x: xSpacing * -3,
+	// 		y: ySpacing * 1,
+	// 		targetType: midiDelay.type,
+	// 	})))
+
+	const env1 = makeExpNodeState({
+		type: 'envelope',
+	})
+	dispatchToRoom(expNodesActions.add(env1))
+	dispatchToRoom(expPositionActions.add(
+		makeExpPosition({
+			id: env1.id,
+			ownerId: serverClientId,
+			x: xSpacing * -1,
+			y: ySpacing * -2,
+			targetType: env1.type,
+		})))
+
+	const env2 = makeExpNodeState({
+		type: 'envelope',
+	})
+	dispatchToRoom(expNodesActions.add(env2))
+	dispatchToRoom(expPositionActions.add(
+		makeExpPosition({
+			id: env2.id,
+			ownerId: serverClientId,
+			x: xSpacing * -1,
+			y: ySpacing * 1,
+			targetType: env2.type,
 		})))
 
 	const osc1 = makeExpNodeState({
 		type: 'oscillator',
 	})
-
 	dispatchToRoom(expNodesActions.add(osc1))
-
-	dispatchToRoom(expNodesActions.audioParamChange(osc1.id, 'frequency', oscillatorFreqCurveFunctions.unCurve(440 / maxPitchFrequency)))
-
+	dispatchToRoom(expNodesActions.audioParamChange(osc1.id, 'frequency', 0))
 	dispatchToRoom(expPositionActions.add(
 		makeExpPosition({
 			id: osc1.id,
 			ownerId: serverClientId,
-			x: -400,
-			y: 0,
+			x: xSpacing * -1,
+			y: ySpacing * 0,
 			targetType: osc1.type,
 		})))
 
-	const lfo = makeExpNodeState({
-		type: 'lowFrequencyOscillator',
+	const osc2 = makeExpNodeState({
+		type: 'oscillator',
 	})
-
-	dispatchToRoom(expNodesActions.add(lfo))
-
-	dispatchToRoom(expNodesActions.audioParamChange(lfo.id, 'frequency', lfoFreqCurveFunctions.unCurve(1 / 32)))
-
+	dispatchToRoom(expNodesActions.add(osc2))
+	dispatchToRoom(expNodesActions.audioParamChange(osc2.id, 'frequency', 0))
 	dispatchToRoom(expPositionActions.add(
 		makeExpPosition({
-			id: lfo.id,
+			id: osc2.id,
 			ownerId: serverClientId,
-			x: -400,
-			y: 300,
-			targetType: lfo.type,
+			x: xSpacing * -1,
+			y: ySpacing * -1,
+			targetType: osc2.type,
 		})))
+
+	const filter = makeExpNodeState({
+		type: 'filter',
+	})
+	dispatchToRoom(expNodesActions.add(filter))
+	dispatchToRoom(expPositionActions.add(
+		makeExpPosition({
+			id: filter.id,
+			ownerId: serverClientId,
+			x: xSpacing * 0,
+			y: ySpacing * 0,
+			targetType: filter.type,
+		})))
+
+	const gain = makeExpNodeState({
+		type: 'gain',
+	})
+	dispatchToRoom(expNodesActions.add(gain))
+	dispatchToRoom(expNodesActions.audioParamChange(gain.id, 'gain', 0))
+	dispatchToRoom(expPositionActions.add(
+		makeExpPosition({
+			id: gain.id,
+			ownerId: serverClientId,
+			x: xSpacing * 0,
+			y: ySpacing * 1,
+			targetType: gain.type,
+		})))
+
+	const gain2 = makeExpNodeState({
+		type: 'gain',
+	})
+	dispatchToRoom(expNodesActions.add(gain2))
+	dispatchToRoom(expNodesActions.audioParamChange(gain2.id, 'gain', 0))
+	dispatchToRoom(expPositionActions.add(
+		makeExpPosition({
+			id: gain2.id,
+			ownerId: serverClientId,
+			x: xSpacing * 0,
+			y: ySpacing * -1,
+			targetType: gain2.type,
+		})))
+
+	const gainMaster = makeExpNodeState({
+		type: 'gain',
+	})
+	dispatchToRoom(expNodesActions.add(gainMaster))
+	dispatchToRoom(expNodesActions.audioParamChange(gainMaster.id, 'gain', 0.25))
+	dispatchToRoom(expPositionActions.add(
+		makeExpPosition({
+			id: gainMaster.id,
+			ownerId: serverClientId,
+			x: xSpacing * 1,
+			y: ySpacing * 0,
+			targetType: gainMaster.type,
+		})))
+
+	const audioOutput = makeExpNodeState({
+		type: 'audioOutput',
+	})
+	dispatchToRoom(expNodesActions.add(audioOutput))
+	dispatchToRoom(expPositionActions.add(
+		makeExpPosition({
+			id: audioOutput.id,
+			ownerId: serverClientId,
+			x: xSpacing * 2,
+			y: ySpacing * 0,
+			targetType: audioOutput.type,
+		})))
+
+	dispatchToRoom(expConnectionsActions.add(new ExpConnection(
+		sequencer.id,
+		sequencer.type,
+		midiRandom.id,
+		midiRandom.type,
+		'output',
+		'input',
+		'midi',
+		'top',
+	)))
+
+	dispatchToRoom(expConnectionsActions.add(new ExpConnection(
+		sequencer.id,
+		sequencer.type,
+		midiPitch.id,
+		midiPitch.type,
+		'output',
+		'input',
+		'midi',
+		'top',
+	)))
+
+	// dispatchToRoom(expConnectionsActions.add(new ExpConnection(
+	// 	sequencer.id,
+	// 	sequencer.type,
+	// 	midiDelay.id,
+	// 	midiDelay.type,
+	// 	'output',
+	// 	'input',
+	// 	'midi',
+	// 	'top',
+	// )))
+
+	dispatchToRoom(expConnectionsActions.add(new ExpConnection(
+		midiRandom.id,
+		midiRandom.type,
+		midiConverter.id,
+		midiConverter.type,
+		'output',
+		'input',
+		'midi',
+		'top',
+	)))
+
+	dispatchToRoom(expConnectionsActions.add(new ExpConnection(
+		midiPitch.id,
+		midiPitch.type,
+		midiConverter2.id,
+		midiConverter2.type,
+		'output',
+		'input',
+		'midi',
+		'top',
+	)))
+
+	dispatchToRoom(expConnectionsActions.add(new ExpConnection(
+		midiConverter2.id,
+		midiConverter2.type,
+		osc2.id,
+		osc2.type,
+		'pitch',
+		'frequency',
+		'audio',
+		'top',
+	)))
+
+	// dispatchToRoom(expConnectionsActions.add(new ExpConnection(
+	// 	midiDelay.id,
+	// 	midiDelay.type,
+	// 	midiConverter.id,
+	// 	midiConverter.type,
+	// 	'output',
+	// 	'input',
+	// 	'midi',
+	// 	'top',
+	// )))
+
+	dispatchToRoom(expConnectionsActions.add(new ExpConnection(
+		midiConverter.id,
+		midiConverter.type,
+		osc1.id,
+		osc1.type,
+		'pitch',
+		'frequency',
+		'audio',
+		'top',
+	)))
+
+	dispatchToRoom(expConnectionsActions.add(new ExpConnection(
+		midiConverter.id,
+		midiConverter.type,
+		env2.id,
+		env2.type,
+		'gate',
+		'input',
+		'midi',
+		'top',
+	)))
+
+	dispatchToRoom(expConnectionsActions.add(new ExpConnection(
+		midiConverter2.id,
+		midiConverter2.type,
+		env1.id,
+		env1.type,
+		'gate',
+		'input',
+		'midi',
+		'top',
+	)))
+
+	dispatchToRoom(expConnectionsActions.add(new ExpConnection(
+		env1.id,
+		env1.type,
+		gain2.id,
+		gain2.type,
+		'output',
+		'gain',
+		'audio',
+		'top',
+	)))
+
+	dispatchToRoom(expConnectionsActions.add(new ExpConnection(
+		env2.id,
+		env2.type,
+		gain.id,
+		gain.type,
+		'output',
+		'gain',
+		'audio',
+		'top',
+	)))
 
 	dispatchToRoom(expConnectionsActions.add(new ExpConnection(
 		osc1.id,
@@ -131,6 +385,17 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 	)))
 
 	dispatchToRoom(expConnectionsActions.add(new ExpConnection(
+		osc2.id,
+		osc2.type,
+		gain2.id,
+		gain2.type,
+		'output',
+		'input',
+		'audio',
+		'top',
+	)))
+
+	dispatchToRoom(expConnectionsActions.add(new ExpConnection(
 		filter.id,
 		filter.type,
 		gain.id,
@@ -144,21 +409,32 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 	dispatchToRoom(expConnectionsActions.add(new ExpConnection(
 		gain.id,
 		gain.type,
+		gainMaster.id,
+		gainMaster.type,
+		'output',
+		'input',
+		'audio',
+		'top',
+	)))
+
+	dispatchToRoom(expConnectionsActions.add(new ExpConnection(
+		gain2.id,
+		gain2.type,
+		gainMaster.id,
+		gainMaster.type,
+		'output',
+		'input',
+		'audio',
+		'top',
+	)))
+
+	dispatchToRoom(expConnectionsActions.add(new ExpConnection(
+		gainMaster.id,
+		gainMaster.type,
 		audioOutput.id,
 		audioOutput.type,
 		'output',
 		'input',
-		'audio',
-		'top',
-	)))
-
-	dispatchToRoom(expConnectionsActions.add(new ExpConnection(
-		lfo.id,
-		lfo.type,
-		filter.id,
-		filter.type,
-		'output',
-		'frequency',
 		'audio',
 		'top',
 	)))
