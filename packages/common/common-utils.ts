@@ -15,6 +15,10 @@ export function pickRandomArrayElement<T>(array: readonly T[]): T {
 	return array[Math.floor(Math.random() * array.length)]
 }
 
+export function randomBoolean(chance = 0.5): boolean {
+	return Math.random() < chance
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function getKeyByValue(object: any, value: unknown) {
 	return Object.keys(object).find(key => object[key] === value)
