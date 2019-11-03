@@ -1,9 +1,9 @@
 import * as http from 'http'
 import * as socketIO from 'socket.io'
-import {lobby, serverClientId} from '@corgifm/common/common-constants'
+import {lobby, serverClientId, expLobby} from '@corgifm/common/common-constants'
 import {logger} from '@corgifm/common/logger'
 import {
-	configureServerStore, createRoomAction, roomSettingsActions, createRoom, RoomType,
+	configureServerStore, createRoomAction, roomSettingsActions, createRoom, RoomType, roomInfoAction,
 } from '@corgifm/common/redux'
 import {initSentryServer} from './analytics/sentry-server'
 import {createServerStuff} from './create-server-stuff'
@@ -38,8 +38,12 @@ async function start() {
 
 	serverStore.dispatch(createRoom(lobby, Date.now()))
 	serverStore.dispatch(createRoomAction(roomSettingsActions.setOwner(serverClientId), lobby))
-
 	createServerStuff(lobby, serverStore, RoomType.Normal)
+
+	serverStore.dispatch(createRoom(expLobby, Date.now()))
+	serverStore.dispatch(createRoomAction(roomInfoAction.setType(RoomType.Experimental), expLobby))
+	serverStore.dispatch(createRoomAction(roomSettingsActions.setOwner(serverClientId), expLobby))
+	createServerStuff(expLobby, serverStore, RoomType.Experimental)
 
 	const app = await setupExpressApp(serverStore, dbStore)
 

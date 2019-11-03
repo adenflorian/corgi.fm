@@ -6,6 +6,7 @@ export const MIN_MIDI_NOTE_NUMBER_0 = 0
 export const MAX_MIDI_NOTE_NUMBER_127 = 127
 
 export const lobby = 'lobby'
+export const expLobby = 'expLobby'
 // REST API
 export const apiResourcePathName = 'api'
 export const usersResourcePathName = 'users'
