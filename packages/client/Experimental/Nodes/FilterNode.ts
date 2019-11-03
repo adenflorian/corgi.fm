@@ -32,7 +32,7 @@ export class FilterNode extends CorgiNode {
 
 		this._dryWetChain = new DryWetChain(corgiNodeArgs.audioContext, this._filter)
 
-		const frequencyParam = new ExpAudioParam('frequency', this._filter.frequency, 425, 20000, 'unipolar', {valueString: filterValueToString, curveFunctions: filterFreqCurveFunctions})
+		const frequencyParam = new ExpAudioParam('frequency', this._filter.frequency, 632, 20000, 'unipolar', {valueString: filterValueToString, curveFunctions: filterFreqCurveFunctions})
 		const detuneParam = new ExpAudioParam('detune', this._filter.detune, 0, 100, 'bipolar', {valueString: filterValueToString})
 		const qParam = new ExpAudioParam('q', this._filter.Q, 1, 18, 'unipolar')
 		const gainParam = new ExpAudioParam('gain', this._filter.gain, 0, 1, 'bipolar', {valueString: percentageValueString})
