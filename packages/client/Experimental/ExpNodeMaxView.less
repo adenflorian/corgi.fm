@@ -1,0 +1,22 @@
+@import '../colors.less';
+@import '../AppCommon.less';
+
+@pad: 4px;
+
+.expNodeMaxView {
+	display: flex;
+	color: @defaultGray;
+	margin: 4px;
+
+	.name {
+		text-transform: lowercase;
+		margin-right: @pad;
+	}
+	.params {
+		display: flex;
+
+		& > * {
+			margin-right: @pad;
+		}
+	}
+}

@@ -77,6 +77,7 @@
 - [ ] highlight keys in the current key
 - [ ] show message to user if an error is detected (like if console.error was called)
 - [ ] GIFs synced with song
+- [ ] show dots on side of screen to show objects (nodes and cursors) that are off screen
 
 # MIDI
 - [ ] handle sustain pedal

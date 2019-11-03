@@ -3,11 +3,12 @@ import {hot} from 'react-hot-loader'
 import {ExpConnectorPlaceholders} from '../Connections/ExpConnectorPlaceholders'
 import {SimpleGraphNodeExp} from '../SimpleGraph/SimpleGraphNodeExp'
 import {ExpNodeDebugView} from './ExpNodeDebugView'
+import {ExpNodeMaxView} from './ExpNodeMaxView'
 import {ExpPorts} from './ExpPorts'
+import {ExpNodeContext, CorgiNodeReact} from './CorgiNode'
 import {
 	ExpAudioParams, ExpCustomNumberParams, ExpCustomEnumParams,
 } from './ExpParams'
-import {ExpNodeContext, CorgiNodeReact} from './CorgiNode'
 import './ExpNodes.less'
 
 interface Props {
@@ -19,6 +20,8 @@ interface Props {
 	readonly ports: ExpPorts
 }
 
+const viewMode = 'debug' as 'max' | 'debug'
+
 export const CorgiNodeView = hot(module)(React.memo(function _CorgiNodeView({
 	children, context, audioParams, customNumberParams, ports, customEnumParams,
 }: Props) {
@@ -26,14 +29,26 @@ export const CorgiNodeView = hot(module)(React.memo(function _CorgiNodeView({
 		<ExpNodeContext.Provider value={context}>
 			<ExpConnectorPlaceholders />
 			<SimpleGraphNodeExp>
-				<ExpNodeDebugView
-					audioParams={audioParams}
-					customNumberParams={customNumberParams}
-					customEnumParams={customEnumParams}
-					ports={ports}
-				>
-					{children}
-				</ExpNodeDebugView>
+				{viewMode === 'debug' &&
+					<ExpNodeDebugView
+						audioParams={audioParams}
+						customNumberParams={customNumberParams}
+						customEnumParams={customEnumParams}
+						ports={ports}
+					>
+						{children}
+					</ExpNodeDebugView>
+				}
+				{viewMode === 'max' &&
+					<ExpNodeMaxView
+						audioParams={audioParams}
+						customNumberParams={customNumberParams}
+						customEnumParams={customEnumParams}
+						ports={ports}
+					>
+						{children}
+					</ExpNodeMaxView>
+				}
 			</SimpleGraphNodeExp>
 		</ExpNodeContext.Provider>
 	)
