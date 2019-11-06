@@ -19,7 +19,7 @@ export class ExpOscilloscopeNode extends CorgiNode {
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
 		super(corgiNodeArgs)
 
-		this._analyser = new CorgiAnalyserSPNode(corgiNodeArgs.audioContext, this._onAnalyserUpdate)
+		this._analyser = new CorgiAnalyserSPNode(corgiNodeArgs.audioContext, this._onAnalyserUpdate, true)
 
 		this._gain = corgiNodeArgs.audioContext.createGain()
 		this._gain.gain.value = 1
@@ -38,11 +38,9 @@ export class ExpOscilloscopeNode extends CorgiNode {
 
 	public render() {
 		return this.getDebugView(
-			<div>
-				<ExpOscilloscopeNodeExtra
-					newSampleEvent={this._newSampleEvent}
-				/>
-			</div>
+			<ExpOscilloscopeNodeExtra
+				newSampleEvent={this._newSampleEvent}
+			/>
 		)
 	}
 

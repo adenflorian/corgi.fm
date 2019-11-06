@@ -10,6 +10,7 @@ export class CorgiAnalyserSPNode {
 	public constructor(
 		private readonly _audioContext: AudioContext,
 		private readonly _onUpdatedValue: (newValue: number) => void,
+		public readonly _ignoreRepeats = true,
 	) {
 		this._scriptProcessorNode = _audioContext.createScriptProcessor(256, 1, 1)
 		this._scriptProcessorNode.addEventListener('audioprocess', this._onAudioProcess)
@@ -35,7 +36,7 @@ export class CorgiAnalyserSPNode {
 
 		const value = audioProcessingEvent.inputBuffer.getChannelData(0)[0]
 
-		if (!Number.isNaN(value) && value !== this._lastUpdatedValue) {
+		if (!Number.isNaN(value) && (this._ignoreRepeats || value !== this._lastUpdatedValue)) {
 			this._updateRequested = false
 			this._lastUpdatedValue = value
 			this._onUpdatedValue(value)

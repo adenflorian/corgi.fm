@@ -6,26 +6,26 @@ import {
 	CorgiEnumChangedEvent, CorgiObjectChangedEvent,
 } from '../CorgiEvents'
 
-export function useNumberChangedEvent(event: CorgiNumberChangedEvent) {
-	const [value, setState] = useState(0)
+export function useNumberChangedEvent(event: CorgiNumberChangedEvent, doEqualityCheck = true) {
+	const [, forceRender] = useReducer(x => x + 1, 0)
 
 	const previousValue = useRef(0)
 
 	useLayoutEffect(() => {
 		function onNewValue(newValue: number) {
-			if (newValue === previousValue.current) return
+			if (doEqualityCheck && newValue === previousValue.current) return
 
 			previousValue.current = newValue
-			setState(newValue)
+			forceRender(0)
 		}
 
 		const initialValue = event.subscribe(onNewValue)
 		onNewValue(initialValue)
 
 		return () => event.unsubscribe(onNewValue)
-	}, [event])
+	}, [doEqualityCheck, event])
 
-	return value
+	return previousValue.current
 }
 
 export function useStringChangedEvent(event?: CorgiStringChangedEvent) {
