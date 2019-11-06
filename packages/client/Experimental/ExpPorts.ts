@@ -53,7 +53,7 @@ export abstract class ExpNodeAudioPort extends ExpPort {
 		public readonly name: string,
 		public readonly node: CorgiNode,
 		side: ExpPortSide,
-		public readonly isAudioParamInput =false,
+		public readonly isAudioParamInput = false,
 	) {
 		super(id, name, node, side, 'audio', isAudioParamInput)
 	}
@@ -133,7 +133,7 @@ class ParamInputChain {
 
 	private _setCentering(newCentering: ParamInputCentering) {
 		this._centering = newCentering
-		this._waveShaper.curve = curves['bipolar'][this._centering]
+		this._waveShaper.curve = curves.bipolar[this._centering]
 		this.onCenteringChange.invokeImmediately(this._centering)
 		this._updateModdedGain()
 		this._updateLiveRange()

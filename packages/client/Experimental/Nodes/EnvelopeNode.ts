@@ -89,9 +89,9 @@ export class EnvelopeNode extends CorgiNode {
 		this._lastGateTime = startTime
 		this._lastGate = gate
 		// logger.log({startTime, currentTime: this._audioContext.currentTime/*, diff: startTime - this._audioContext.currentTime */})
-		if (startTime < this._audioContext.currentTime) {
-			logger.warn('[receiveMidiAction] startTime < this._audioContext.currentTime:', {startTime, currentTime: this._audioContext.currentTime})
-		}
+		// if (startTime < this._audioContext.currentTime) {
+		// 	logger.warn('[receiveMidiAction] startTime < this._audioContext.currentTime:', {startTime, currentTime: this._audioContext.currentTime})
+		// }
 		const offset = this._constantSource.offset
 		if (gate) {
 			const attackEnd = startTime + this._attack.value + minDistance
