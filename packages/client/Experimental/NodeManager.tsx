@@ -407,6 +407,16 @@ export class NodeManager {
 		connection.changeTarget(targetPort)
 	}
 
+	public readonly onExtraAnimationsChange = (value: boolean) => {
+		this._nodes.forEach(node => {
+			node.getPorts().forEach(port => {
+				if (isAudioParamInputPort(port)) {
+					port.onExtraAnimationsChange(value)
+				}
+			})
+		})
+	}
+
 	public cleanup = () => {
 		this._nodes.forEach(node => node.dispose())
 		this._nodes.clear()

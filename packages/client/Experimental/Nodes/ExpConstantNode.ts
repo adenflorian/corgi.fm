@@ -24,7 +24,7 @@ export class ConstantExpNode extends CorgiNode {
 		const offsetParam = new ExpAudioParam('offset', this._constantSourceNode.offset, 0, 1, 'bipolar')
 		this._audioParams = arrayToESIdKeyMap([offsetParam])
 
-		const offsetPort = new ExpNodeAudioParamInputPort(offsetParam, this, corgiNodeArgs.audioContext, 'offset')
+		const offsetPort = new ExpNodeAudioParamInputPort(offsetParam, this, corgiNodeArgs, 'offset')
 		const outputPort = new ExpNodeAudioOutputPort('output', 'output', this, this._outputGain)
 		this._ports = arrayToESIdKeyMap([offsetPort, outputPort])
 	}

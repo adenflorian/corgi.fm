@@ -180,7 +180,6 @@ function UberArcMod({
 		: centering === 'center'
 			? Math.min((-Math.abs(parentRatio) + 1) - ((-0.5 * absGain) + 0.5), absGain)
 			: Math.max(Math.min((-parentRatio) + 0.5, gain), (-parentRatio) - 0.5)
-	const railRatio2 = -0.25
 
 	const offset = parentRange === 'unipolar'
 		? centering === 'center'
@@ -189,7 +188,6 @@ function UberArcMod({
 		: centering === 'center'
 			? -Math.min((parentRatio) + 0.5, absGain / 2)
 			: 0
-	const offset2 = 0
 
 	return (
 		<UberArcDumb
@@ -232,12 +230,14 @@ function UberArcLiveValue({
 
 		if (!moddedValueGroupElement) return
 
-		const liveValue = parentRange === 'bipolar' ? liveValueRef.current / 2 : liveValueRef.current
+		const liveValue = extraAnimationsEnabled
+			? parentRange === 'bipolar' ? liveValueRef.current / 2 : liveValueRef.current
+			: parentRatio
 
 		const value2 = liveValue - parentRatio - (parentRange === 'bipolar' ? liveRange.min : liveRange.min)
 
 		moddedValueGroupElement.transform.baseVal.getItem(0).setRotate((value2 * 360 * limit) + (360 * 0.25), 16, 16)
-	}, [moddedValueCircleRef, parentRatio, liveRange.min, parentRange])
+	}, [extraAnimationsEnabled, parentRange, parentRatio, liveRange.min])
 
 	useEffect(() => {
 		if (!extraAnimationsEnabled) return

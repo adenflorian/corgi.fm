@@ -11,7 +11,7 @@ import {
 	ExpLocalAction, expNodesActions, makeExpNodeState,
 	expPositionActions, makeExpPosition, selectExpPosition,
 	expConnectionsActions, selectLocalClientId, selectRoomMember,
-	makeExpPortState, ExpConnection,
+	makeExpPortState, ExpConnection, OptionsAction, AppOptions,
 } from '@corgifm/common/redux'
 import {serverClientId} from '@corgifm/common/common-constants'
 import {SingletonContextImpl} from '../SingletonContext'
@@ -22,7 +22,7 @@ import {NodeManager} from './NodeManager'
 
 type ExpMiddlewareActions = ExpNodesAction | ExpConnectionAction
 | ExpLocalAction | RoomsReduxAction | ExpPositionAction
-| ExpGhostConnectorAction | LocalAction
+| ExpGhostConnectorAction | LocalAction | OptionsAction
 
 type ExpMiddleware =
 	(singletonContext: SingletonContextImpl) => Middleware<{}, IClientAppState>
@@ -405,6 +405,14 @@ function bar(
 		case 'EXP_ADD_CONNECTIONS':
 			return action.connections.forEach(
 				x => nodeManager.addConnection(getConnection(x.id)))
+
+		// Other
+		case 'SET_OPTION': {
+			if (action.option === AppOptions.graphicsExtraAnimations) {
+				nodeManager.onExtraAnimationsChange(action.value as boolean)
+			}
+			return
+		}
 
 		default: return
 	}

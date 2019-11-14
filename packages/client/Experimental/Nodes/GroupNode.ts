@@ -18,12 +18,12 @@ export class GroupNode extends CorgiNode {
 	private readonly _inputConstantSources = new Map<Id, ConstantSourceNode>()
 	private readonly _outputGains = new Map<Id, GainNode>()
 
-	public constructor(corgiNodeArgs: CorgiNodeArgs) {
-		super(corgiNodeArgs)
+	public constructor(private readonly _corgiNodeArgs: CorgiNodeArgs) {
+		super(_corgiNodeArgs)
 
-		this._audioContext = corgiNodeArgs.audioContext
+		this._audioContext = _corgiNodeArgs.audioContext
 
-		const portStates = corgiNodeArgs.ports || new Map<Id, ExpPortState>()
+		const portStates = _corgiNodeArgs.ports || new Map<Id, ExpPortState>()
 
 		const ports = [...portStates].map(x => x[1]).map(this._createPort)
 
@@ -33,7 +33,7 @@ export class GroupNode extends CorgiNode {
 
 	public registerChildInputNode(): [ExpNodeAudioInputPort, AudioNode][] {
 		return ([...this._ports].map(x => x[1]).filter(x => x.type === 'audio' && x.side === 'in') as ExpNodeAudioInputPort[])
-			.map(x => [x, x.destination instanceof AudioParam ? this._inputConstantSources.get(x.id)! : x.destination as AudioNode])
+			.map(x => [x, x.destination instanceof AudioParam ? this._inputConstantSources.get(x.id)! : x.destination])
 	}
 
 	public registerChildOutputNode(): ExpNodeAudioOutputPort[] {
@@ -45,12 +45,13 @@ export class GroupNode extends CorgiNode {
 	public render = () => this.getDebugView()
 
 	protected _enable = () => {
-		this._inputGains.forEach(x => x.gain.value = 1)
-		this._outputGains.forEach(x => x.gain.value = 1)
+		this._inputGains.forEach(x => x.gain.setValueAtTime(1, 0))
+		this._outputGains.forEach(x => x.gain.setValueAtTime(1, 0))
 	}
+
 	protected _disable = () => {
-		this._inputGains.forEach(x => x.gain.value = 0)
-		this._outputGains.forEach(x => x.gain.value = 0)
+		this._inputGains.forEach(x => x.gain.setValueAtTime(0, 0))
+		this._outputGains.forEach(x => x.gain.setValueAtTime(0, 0))
 	}
 
 	protected _dispose() {
@@ -62,7 +63,7 @@ export class GroupNode extends CorgiNode {
 		this._outputGains.forEach(x => x.disconnect())
 	}
 
-	private _createPort = ({type, inputOrOutput, id, isAudioParamInput}: ExpPortState): [ExpPort, ExpAudioParam | undefined] => {
+	private readonly _createPort = ({type, inputOrOutput, id, isAudioParamInput}: ExpPortState): [ExpPort, ExpAudioParam | undefined] => {
 		if (type === 'audio') {
 			if (inputOrOutput === 'input') {
 				if (isAudioParamInput) {
@@ -70,7 +71,7 @@ export class GroupNode extends CorgiNode {
 					newConstantSource.start()
 					this._inputConstantSources.set(id, newConstantSource)
 					const audioParam = new ExpAudioParam(id, newConstantSource.offset, 0, 1, 'bipolar', {valueString: percentageValueString})
-					return [new ExpNodeAudioParamInputPort(audioParam, this, this._audioContext, 'center'), audioParam]
+					return [new ExpNodeAudioParamInputPort(audioParam, this, this._corgiNodeArgs, 'center'), audioParam]
 				} else {
 					const newGain = this._audioContext.createGain()
 					this._inputGains.set(id, newGain)

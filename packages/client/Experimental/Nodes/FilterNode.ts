@@ -38,10 +38,10 @@ export class FilterNode extends CorgiNode {
 		const gainParam = new ExpAudioParam('gain', this._filter.gain, 0, 1, 'bipolar', {valueString: percentageValueString})
 
 		const inputPort = new ExpNodeAudioInputPort('input', 'input', this, this._dryWetChain.inputGain)
-		const frequencyPort = new ExpNodeAudioParamInputPort(frequencyParam, this, corgiNodeArgs.audioContext, 'center')
-		const detunePort = new ExpNodeAudioParamInputPort(detuneParam, this, corgiNodeArgs.audioContext, 'center')
-		const qPort = new ExpNodeAudioParamInputPort(qParam, this, corgiNodeArgs.audioContext, 'offset')
-		const gainPort = new ExpNodeAudioParamInputPort(gainParam, this, corgiNodeArgs.audioContext, 'offset')
+		const frequencyPort = new ExpNodeAudioParamInputPort(frequencyParam, this, corgiNodeArgs, 'center')
+		const detunePort = new ExpNodeAudioParamInputPort(detuneParam, this, corgiNodeArgs, 'center')
+		const qPort = new ExpNodeAudioParamInputPort(qParam, this, corgiNodeArgs, 'offset')
+		const gainPort = new ExpNodeAudioParamInputPort(gainParam, this, corgiNodeArgs, 'offset')
 		const outputPort = new ExpNodeAudioOutputPort('output', 'output', this, this._dryWetChain.outputGain)
 
 		this._ports = arrayToESIdKeyMap([inputPort, frequencyPort, detunePort, qPort, gainPort, outputPort])

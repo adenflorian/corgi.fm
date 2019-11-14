@@ -120,6 +120,8 @@ async function setupAsync() {
 		initialState, getGetAllInstruments, onReduxMiddleware,
 		firebaseContextStuff, samplesManager, singletonContext)
 
+	singletonContext.setStore(store)
+
 	store.subscribe(createExpTupperware(store, singletonContext))
 
 	wireUpFirebaseToRedux(firebaseContextStuff, store)

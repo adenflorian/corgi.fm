@@ -3,9 +3,9 @@ import React, {useContext} from 'react'
 import {List} from 'immutable'
 import {ParamInputCentering, SignalRange} from '@corgifm/common/common-types'
 import {clamp} from '@corgifm/common/common-utils'
-import {ExpConnectionType} from '@corgifm/common/redux'
+import {ExpConnectionType, selectOption, AppOptions} from '@corgifm/common/redux'
 import {logger} from '../client-logger'
-import {CorgiNode} from './CorgiNode'
+import {CorgiNode, CorgiNodeArgs} from './CorgiNode'
 import {
 	ExpNodeAudioConnection,
 	ExpNodeConnections, ExpNodeConnection,
@@ -221,19 +221,22 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 	private readonly _waveShaperClamp: WaveShaperNode
 	private readonly _gainDenormalizer: GainNode
 	private readonly _knobConstantSource: ConstantSourceNode
-	private readonly _analyser: CorgiAnalyserSPNode
+	private _analyser?: CorgiAnalyserSPNode
 	public readonly destination: AudioParam
 	public readonly onLiveRangeChanged: CorgiObjectChangedEvent<LiveRange>
 	public readonly onChainsChanged: CorgiObjectChangedEvent<Map<Id, ParamInputChain>>
 	private _knobValue: number
+	private readonly _audioContext: AudioContext
 
 	public constructor(
 		public readonly expAudioParam: ExpAudioParam,
 		public readonly node: CorgiNode,
-		public readonly audioContext: AudioContext,
+		public readonly corgiNodeArgs: CorgiNodeArgs,
 		public readonly defaultCentering: ParamInputCentering,
 	) {
 		super(expAudioParam.id, expAudioParam.id as string, node, expAudioParam.audioParam, true)
+
+		this._audioContext = corgiNodeArgs.audioContext
 
 		this.destination = expAudioParam.audioParam
 
@@ -241,12 +244,9 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 		// controlled from modulation sources, including the knob.
 		this.destination.setValueAtTime(0, 0)
 
-		this._waveShaperClamp = audioContext.createWaveShaper()
-		this._gainDenormalizer = audioContext.createGain()
-		this._knobConstantSource = audioContext.createConstantSource()
-		this._analyser = new CorgiAnalyserSPNode(audioContext, this._onAnalyserUpdate)
-
-		this._requestWorkletUpdate()
+		this._waveShaperClamp = this._audioContext.createWaveShaper()
+		this._gainDenormalizer = this._audioContext.createGain()
+		this._knobConstantSource = this._audioContext.createConstantSource()
 
 		this._knobConstantSource.offset.setValueAtTime(expAudioParam.defaultNormalizedValue, 0)
 		this._knobValue = expAudioParam.defaultNormalizedValue
@@ -256,7 +256,14 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 
 		this._waveShaperClamp.curve = this.expAudioParam.curveFunctions.waveShaperCurve
 
-		this._gainDenormalizer.connect(this._analyser.input)
+		const store = corgiNodeArgs.singletonContext.getStore()
+
+		if (store) {
+			this.onExtraAnimationsChange(selectOption(store.getState(), AppOptions.graphicsExtraAnimations) as boolean)
+		} else {
+			logger.error('[ExpNodeAudioParamInputPort] missing store: ', {corgiNodeArgs, this: this})
+			this.onExtraAnimationsChange(false)
+		}
 
 		this._knobConstantSource
 			.connect(this._waveShaperClamp)
@@ -265,6 +272,20 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 
 		this.onLiveRangeChanged = new CorgiObjectChangedEvent(this._createLiveRange())
 		this.onChainsChanged = new CorgiObjectChangedEvent(this._inputChains)
+	}
+
+	public readonly onExtraAnimationsChange = (value: boolean) => {
+		try {
+			if (value) {
+				this._analyser = new CorgiAnalyserSPNode(this._audioContext, this._onAnalyserUpdate)
+				this._gainDenormalizer.connect(this._analyser.input)
+				this._requestWorkletUpdate()
+			} else if (this._analyser) {
+				this._gainDenormalizer.disconnect(this._analyser.input)
+				this._analyser.dispose()
+			}
+		// eslint-disable-next-line no-empty
+		} catch (error) { }
 	}
 
 	private readonly _onAnalyserUpdate = (newValue: number) => {
@@ -313,7 +334,7 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 	}
 
 	private readonly _requestWorkletUpdate = () => {
-		this._analyser.requestUpdate()
+		if (this._analyser) this._analyser.requestUpdate()
 	}
 
 	public getChains(): readonly ParamInputChainReact[] {
@@ -349,7 +370,7 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 
 		const newChain = new ParamInputChain(
 			connectionId,
-			this.audioContext,
+			this._audioContext,
 			this._waveShaperClamp,
 			this.defaultCentering,
 			this.expAudioParam.paramSignalRange,
@@ -386,7 +407,7 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 		this._gainDenormalizer.disconnect()
 		this._knobConstantSource.stop()
 		this._knobConstantSource.disconnect()
-		this._analyser.dispose()
+		if (this._analyser) this._analyser.dispose()
 	}
 }
 
