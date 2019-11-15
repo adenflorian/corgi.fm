@@ -14,7 +14,7 @@ import {midiNoteToFrequency} from '../../WebAudio'
 
 const voiceCount = 4
 
-export class PolyphonicMidiConverterNode extends CorgiNode {
+export class ManualPolyphonicMidiConverterNode extends CorgiNode {
 	protected readonly _ports: ExpPorts
 	protected readonly _customNumberParams: ExpCustomNumberParams
 	private readonly _midiOutputPorts: readonly ExpMidiOutputPort[]
@@ -33,6 +33,7 @@ export class PolyphonicMidiConverterNode extends CorgiNode {
 		})
 		this._waveShapers = new Array(voiceCount).fill(0).map(() => corgiNodeArgs.audioContext.createWaveShaper())
 		this._waveShapers.forEach(waveShaper => {
+			// eslint-disable-next-line no-param-reassign
 			waveShaper.curve = new Float32Array([-3, 1])
 		})
 

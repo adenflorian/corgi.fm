@@ -13,7 +13,7 @@ import {ConstantExpNode} from './ExpConstantNode'
 import {MidiConverterNode} from './MidiConverterNode'
 import {KeyboardNode} from './KeyboardNode'
 import {DistortionExpNode} from './DistortionExpNode'
-import {PolyphonicMidiConverterNode} from './PolyphonicMidiConverterNode'
+import {ManualPolyphonicMidiConverterNode} from './ManualPolyphonicMidiConverterNode'
 import {GroupNode} from './GroupNode'
 import {GroupInputNode} from './GroupInputNode'
 import {GroupOutputNode} from './GroupOutputNode'
@@ -34,7 +34,7 @@ export const typeClassMap: {readonly [key in ExpNodeType]: CorgiNodeConstructor}
 	constant: ConstantExpNode,
 	lowFrequencyOscillator: LowFrequencyOscillatorExpNode,
 	midiConverter: MidiConverterNode,
-	polyphonicMidiConverter: PolyphonicMidiConverterNode,
+	manualPolyphonicMidiConverter: ManualPolyphonicMidiConverterNode,
 	keyboard: KeyboardNode,
 	distortion: DistortionExpNode,
 	group: GroupNode,

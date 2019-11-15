@@ -126,7 +126,7 @@ export type ExpNodeType = typeof expNodeTypes[number]
 export const expNodeTypes = [
 	'oscillator', 'filter', 'dummy', 'audioOutput', 'gain', 'pan', 'envelope',
 	'sequencer', 'constant', 'lowFrequencyOscillator', 'midiConverter', 'keyboard',
-	'distortion', 'polyphonicMidiConverter', 'group', 'groupInput', 'groupOutput',
+	'distortion', 'manualPolyphonicMidiConverter', 'group', 'groupInput', 'groupOutput',
 	'midiRandom', 'midiPitch', 'oscilloscope',
 ] as const
 

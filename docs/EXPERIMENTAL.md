@@ -28,15 +28,53 @@
 	- [ ] polyphonic MIDI to CV converter? (MIDI in, trigger & CV out)
 
 
+# The Node System
+you got nodes
+nodes are connected with connections
+1 or more nodes and connections make up a graph
+
+graphs are made up of nodes and connections between those nodes
+nodes can be windows into other graphs
+a graph can be a single node with some specific settings
+a graph can be a handful of nodes that have no connections between them
+
+## Graph
+### Properties
+- id
+- name
+- type? (nodePreset | )
+
+## Node
+### Properties
+- id
+- name
+- graphId (groupId)
+- type (oscillator | gain | filter | ...)
+
+## Connection
+### Properties
+- id
+- graphId (groupId)
+- type (audio | midi)
+- sourceId
+- sourceType
+- sourcePortId
+- target...
+
 # TODO
 - [√] NodeManager
 - [√] CorgiNode
-- [ ] redux
-	- [...] nodes reducer
+- [√] redux
+	- [√] nodes reducer
 		- [√] add/delete/replaceAll
 		- [√] changeAudioParam
-- [ ] display knobs for params
+- [√] display knobs for params
 	- [√] audio params
+- [√] groups
+- [ ] linked groups
+- [ ] polyphony
+	- [√] ManualPolyphonicMidiConverter
+	- [ ] AutomaticPolyphonicMidiConverter
 
 
 # Envelope
