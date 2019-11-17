@@ -24,7 +24,7 @@ const makeExpGraphMetaRecord = Record(defaultExpGraphMeta)
 
 const defaultExpGraphMetaRecord = makeExpGraphMetaRecord()
 
-export function makeExpGraphMeta(meta: Partial<typeof defaultExpGraphMeta>): ExpGraphMeta {
+export function makeExpGraphMeta(meta: Partial<typeof defaultExpGraphMeta> = {}): ExpGraphMeta {
 	return makeExpGraphMetaRecord(meta)
 		.set('id', meta.id || uuid.v4())
 }

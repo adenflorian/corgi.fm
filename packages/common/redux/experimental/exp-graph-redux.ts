@@ -1,30 +1,27 @@
-
 import {combineReducers} from 'redux'
 import {ActionType} from 'typesafe-actions'
+import {Map} from 'immutable'
+import {expGraphMetaReducer, makeExpGraphMeta} from './exp-graph-meta-redux'
+import {expNodesReducer, ExpNodeState, makeExpNodeState} from './exp-nodes-redux'
+import {expConnectionsReducer, makeExpConnectionsState} from './exp-connections-redux'
+import {expPositionsReducer, makeExpPositionsState} from './exp-positions-redux'
 import {
 	BROADCASTER_ACTION, SERVER_ACTION,
 } from '..'
-import {expGraphMetaReducer} from './exp-graph-meta-redux'
-import {expNodesReducer} from './exp-nodes-redux'
-import {expConnectionsReducer} from './exp-connections-redux'
-import {expPositionsReducer} from './exp-positions-redux'
 
 export const expGraphActions = {
-	add: (graph: ExpGraph) => ({
-		type: 'EXP_GRAPH_ADD',
-		graph,
-	})
 } as const
 
-// export function makeExpGraph(graph: Partial<typeof defaultExpGraph>): ExpGraph {
-// 	return makeExpGraphRecord(graph)
-// 		.set('meta', makeExpGraphMeta(graph.meta))
-// 		.set('nodes', Map<Id, ExpNodeState>())
-// 		.set('connections', makeInitialExpConnectionsState())
-// 		.set('positions', makeExpPositionsState())
-// }
+export function makeExpGraph(graph: Partial<ExpGraph> = {}): ExpGraph {
+	return {
+		meta: makeExpGraphMeta(graph.meta),
+		nodes: Map<Id, ExpNodeState>(graph.nodes || []).map(makeExpNodeState),
+		connections: makeExpConnectionsState(graph.connections),
+		positions: makeExpPositionsState(graph.positions),
+	}
+}
 
-export type ExpGraph = ReturnType<typeof expGraphReducer>
+export interface ExpGraph extends ReturnType<typeof expGraphReducer> {}
 
 export type ExpGraphAction = ActionType<typeof expGraphActions>
 

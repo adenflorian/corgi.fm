@@ -3,7 +3,7 @@ import {combineReducers, Reducer} from 'redux'
 import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
 import {CssColor} from '../../shamu-color'
-import {shamuMetaReducer, ShamuMetaState} from '../shamu-graph'
+import {shamuMetaReducer, ShamuMetaState, makeShamuMetaState} from '../shamu-graph'
 import {IClientAppState} from '../common-redux-types'
 import {
 	BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION, ExpNodeType,
@@ -74,12 +74,17 @@ export const expPositionActions = {
 	} as const),
 } as const
 
+const _defaultExpPositionsState = Object.freeze({
+	all: Map<Id, ExpPosition>() as ExpPositions,
+	meta: new ShamuMetaState(),
+})
+
 export interface ExpPositionsState extends ReturnType<typeof makeExpPositionsState> {}
 
-export function makeExpPositionsState() {
+export function makeExpPositionsState(state: Partial<typeof _defaultExpPositionsState> = {}) {
 	return {
-		all: Map<Id, ExpPosition>() as ExpPositions,
-		meta: new ShamuMetaState(),
+		all: Map<Id, ExpPosition>(state.all || []).map(makeExpPosition) as ExpPositions,
+		meta: makeShamuMetaState(state.meta),
 	}
 }
 

@@ -71,10 +71,15 @@ a graph can be a handful of nodes that have no connections between them
 - [√] display knobs for params
 	- [√] audio params
 - [√] groups
+- [ ] presets
+	- [ ] single node presets
+	- [ ] graph presets
+		- [ ] group presets
+		- [ ] room saves
 - [ ] linked groups
 - [ ] polyphony
 	- [ ] ManualPolyphonicMidiConverter
-		- [ ] dynamic voice count
+		- [√] dynamic voice count
 	- [ ] AutomaticPolyphonicMidiConverter
 		- [ ] figure out how to link to a voice graph
 

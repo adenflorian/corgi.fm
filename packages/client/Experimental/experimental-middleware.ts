@@ -1,5 +1,5 @@
 import {Middleware, Dispatch, Store} from 'redux'
-import {Set} from 'immutable'
+import * as immutable from 'immutable'
 import {
 	IClientAppState, ExpNodesAction, ExpConnectionAction,
 	RoomsReduxAction, selectExpConnection,
@@ -12,6 +12,9 @@ import {
 	expPositionActions, makeExpPosition, selectExpPosition,
 	expConnectionsActions, selectLocalClientId, selectRoomMember,
 	makeExpPortState, ExpConnection, OptionsAction, AppOptions,
+	expGraphsActions, makeExpGraphMeta, ExpNodeState,
+	makeInitialExpConnectionsState, makeExpPositionsState,
+	selectLocalClient, selectMainExpGraph, ExpGraphsAction,
 } from '@corgifm/common/redux'
 import {serverClientId} from '@corgifm/common/common-constants'
 import {SingletonContextImpl} from '../SingletonContext'
@@ -23,6 +26,7 @@ import {NodeManager} from './NodeManager'
 type ExpMiddlewareActions = ExpNodesAction | ExpConnectionAction
 | ExpLocalAction | RoomsReduxAction | ExpPositionAction
 | ExpGhostConnectorAction | LocalAction | OptionsAction
+| ExpGraphsAction
 
 type ExpMiddleware =
 	(singletonContext: SingletonContextImpl) => Middleware<{}, IClientAppState>
@@ -31,6 +35,7 @@ export const createExpMiddleware: ExpMiddleware =
 	singletonContext => ({dispatch, getState}) =>
 		next => async function _expMiddleware(action: ExpMiddlewareActions) {
 			const beforeState = getState()
+			before(beforeState, action, dispatch)
 			next(action)
 			const afterState = getState()
 			const roomType = selectRoomInfoState(getState().room).roomType
@@ -64,16 +69,9 @@ export const createExpMiddleware: ExpMiddleware =
 function before(
 	beforeState: IClientAppState,
 	action: ExpMiddlewareActions,
-	nodeManager: NodeManager,
+	dispatch: Dispatch,
 ) {
 	switch (action.type) {
-		// case 'LOCAL_MIDI_KEY_PRESS':
-		// return nodeManager.onLocalMidiKeypress(action.midiNote, action.velocity)
-		// case 'LOCAL_MIDI_KEY_UP':
-		// 	return nodeManager.onLocalMidiKeyUp(action.midiNote)
-		// case 'LOCAL_MIDI_OCTAVE_CHANGE':
-		// 	return nodeManager.onLocalMidiOctaveChange(action., action.velocity)
-
 		default: return
 	}
 }
@@ -139,11 +137,31 @@ function after(
 			return createGroup(dispatch, action.nodeIds, afterState, nodeManager)
 		}
 
+		case 'EXP_CREATE_PRESET': {
+			const node = selectExpNode(afterState.room, action.nodeId)
+			const localClient = selectLocalClient(afterState)
+			dispatch(expGraphsActions.add({
+				meta: makeExpGraphMeta({
+					name: node.type + '-' + node.id.substr(0, 4) + '-' + localClient.name,
+					ownerId: localClient.id,
+				}),
+				nodes: immutable.Map<Id, ExpNodeState>([[node.id, node]]),
+				connections: makeInitialExpConnectionsState(),
+				positions: makeExpPositionsState(),
+			}))
+			return
+		}
+
 		default: return
 	}
 }
 
-function createGroup(dispatch: Dispatch, nodeIds: Set<Id>, state: IClientAppState, nodeManager: NodeManager) {
+function createGroup(
+	dispatch: Dispatch,
+	nodeIds: immutable.Set<Id>,
+	state: IClientAppState,
+	nodeManager: NodeManager,
+) {
 	const localClientId = selectLocalClientId(state)
 	const currentNodeGroupId = selectRoomMember(state.room, localClientId).groupNodeId
 
@@ -283,7 +301,7 @@ function createGroup(dispatch: Dispatch, nodeIds: Set<Id>, state: IClientAppStat
 	})
 }
 
-function averagePositionByIds(positionIds: Set<Id>, state: IClientAppState) {
+function averagePositionByIds(positionIds: immutable.Set<Id>, state: IClientAppState) {
 	if (positionIds.count() === 0) return mouseFromScreenToBoard(simpleGlobalClientState.lastMousePosition)
 
 	const sumOfPositions = positionIds.reduce((sum, current) => {
@@ -300,7 +318,7 @@ function averagePositionByIds(positionIds: Set<Id>, state: IClientAppState) {
 	}
 }
 
-function extremesPositionByIds(positionIds: Set<Id>, state: IClientAppState): Extremes {
+function extremesPositionByIds(positionIds: immutable.Set<Id>, state: IClientAppState): Extremes {
 	return positionIds.reduce((extremes, current) => {
 		const {x, y, width, height} = selectExpPosition(state.room, current)
 		return {
@@ -368,6 +386,10 @@ function bar(
 		case 'SET_ACTIVE_ROOM':
 			return nodeManager.cleanup()
 
+		// Graphs
+		case 'EXP_GRAPHS_REPLACE_ALL':
+			return nodeManager.loadMainGraph(selectMainExpGraph(state.room))
+
 		// Nodes
 		case 'EXP_NODE_REPLACE_ALL':
 			return nodeManager.addNodes(getNodes())
@@ -389,6 +411,9 @@ function bar(
 
 		case 'EXP_NODE_DELETE':
 			return nodeManager.deleteNode(action.nodeId)
+
+		case 'EXP_NODE_LOAD_PRESET':
+			return nodeManager.loadNodePreset(selectExpNode(state.room, action.nodeId))
 
 		// Connections
 		case 'EXP_REPLACE_CONNECTIONS':

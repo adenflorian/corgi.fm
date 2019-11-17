@@ -6,6 +6,10 @@ export const expLocalActions = {
 		type: 'EXP_CREATE_GROUP',
 		nodeIds,
 	} as const),
+	createPreset: (nodeId: Id) => ({
+		type: 'EXP_CREATE_PRESET',
+		nodeId,
+	} as const),
 } as const
 
 export type ExpLocalAction = ActionType<typeof expLocalActions>

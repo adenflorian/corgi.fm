@@ -1,12 +1,14 @@
-import React, {Fragment} from 'react'
-import {useDispatch} from 'react-redux'
+import React, {Fragment, useMemo} from 'react'
+import {useDispatch, useStore} from 'react-redux'
 import {ContextMenu, SubMenu, MenuItem, connectMenu} from 'react-contextmenu'
 import {List} from 'immutable'
 import {oneLine} from 'common-tags'
 import {
-	localActions, ExpPosition, WithConnections,
+	localActions, ExpPosition, WithConnections, expLocalActions, ExpNodeType,
+	selectPresetsForExpNodeTypeSlow, ExpGraph, expNodesActions, chatSystemMessage, IClientAppState,
 } from '@corgifm/common/redux'
 import {expNodeMenuId} from '../client-constants'
+import {logger} from '../client-logger'
 import {TopMenuBar} from './TopMenuBar'
 
 interface ExpNodeMenuProps {
@@ -51,6 +53,8 @@ const ExpNodeMenuItems = React.memo(function _MenuItems({nodeType}: ExpNodeMenuI
 			<TopMenuBar label="node menu" />
 			{nodeType !== 'groupInput' && nodeType !== 'groupOutput' && <DeleteExpNodeMenuItem />}
 			{nodeType !== 'groupInput' && nodeType !== 'groupOutput' && <CloneExpNodeMenuItem />}
+			{nodeType !== 'groupInput' && nodeType !== 'groupOutput' && <CreatePresetExpNodeMenuItem />}
+			{nodeType !== 'groupInput' && nodeType !== 'groupOutput' && <LoadPresetExpNodeMenuItem nodeType={nodeType} />}
 		</Fragment>
 	)
 
@@ -71,7 +75,6 @@ const ExpNodeMenuItems = React.memo(function _MenuItems({nodeType}: ExpNodeMenuI
 	}
 
 	function CloneExpNodeMenuItem() {
-
 		const onClick = (withConnections: WithConnections) =>
 			(_: any, {nodeId}: DeleteMenuData) => {
 				dispatch(localActions.cloneSelectedExpNodes(withConnections))
@@ -96,6 +99,19 @@ const ExpNodeMenuItems = React.memo(function _MenuItems({nodeType}: ExpNodeMenuI
 		)
 	}
 
+	function CreatePresetExpNodeMenuItem() {
+		const onClick = () =>
+			(_: any, {nodeId}: DeleteMenuData) => {
+				dispatch(expLocalActions.createPreset(nodeId))
+			}
+
+		return (
+			<MenuItem onClick={onClick()}>
+				Create Preset
+			</MenuItem>
+		)
+	}
+
 	function generateDeleteSubMenus(tree: React.ReactElement<any>, labels: List<string>): React.ReactElement<any> {
 		if (labels.count() === 0) return tree
 
@@ -116,3 +132,43 @@ const ExpNodeMenuItems = React.memo(function _MenuItems({nodeType}: ExpNodeMenuI
 		)
 	}
 })
+
+interface LoadPresetExpNodeMenuItemProps {
+	readonly nodeType: ExpNodeType
+}
+
+function LoadPresetExpNodeMenuItem({nodeType}: LoadPresetExpNodeMenuItemProps) {
+	const store = useStore<IClientAppState>()
+	const dispatch = useDispatch()
+	const presets = useMemo(() => {
+		return selectPresetsForExpNodeTypeSlow(store.getState().room, nodeType)
+	}, [nodeType, store])
+	const onClick = (preset: ExpGraph) =>
+		(_: any, {nodeId}: DeleteMenuData) => {
+			const presetNode = preset.nodes.first(null)
+			if (!presetNode) {
+				logger.error('missing preset node', {presetNode, preset, nodes: preset.nodes.toJS()})
+				dispatch(chatSystemMessage('Something went wrong while trying to load a preset', 'error'))
+			} else {
+				dispatch(expNodesActions.loadPreset(nodeId, presetNode))
+			}
+		}
+
+	return (
+		<SubMenu
+			title={<div>Load Preset...</div>}
+			hoverDelay={hoverDelayMs}
+		>
+			{presets.count() === 0
+				? <MenuItem>{`No presets for "${nodeType}"`}</MenuItem>
+				: presets.map(preset => {
+					return (
+						<MenuItem key={preset.meta.id as string} onClick={onClick(preset)}>
+							{preset.meta.name}
+						</MenuItem>
+					)
+				}).toList()
+			}
+		</SubMenu>
+	)
+}

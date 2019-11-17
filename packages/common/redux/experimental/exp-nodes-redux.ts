@@ -78,6 +78,13 @@ export const expNodesActions = {
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	} as const),
+	loadPreset: (nodeId: Id, nodePreset: ExpNodeState) => ({
+		type: 'EXP_NODE_LOAD_PRESET',
+		nodeId,
+		nodePreset,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	} as const),
 } as const
 
 export type ExpNodesAction = ActionType<typeof expNodesActions>
@@ -153,8 +160,26 @@ export const expNodesReducer = (state = initialState, action: ExpNodesAction): E
 				mutable.update(nodeId, node => node.set('groupId', action.groupId))
 			})
 		})
+		case 'EXP_NODE_LOAD_PRESET': return state.update(action.nodeId, x => _loadPresetIntoNodeState(action.nodePreset, x))
 		default: return state
 	}
+}
+
+function _loadPresetIntoNodeState(preset: ExpNodeState, node: ExpNodeState): ExpNodeState {
+	const foo: typeof defaultExpNodeState = {
+		// These stay the same
+		id: node.id,
+		ownerId: node.ownerId,
+		type: node.type,
+		ports: node.ports,
+		enabled: node.enabled,
+		groupId: node.groupId,
+		// These get loaded from the preset
+		audioParams: preset.audioParams,
+		customNumberParams: preset.customNumberParams,
+		customEnumParams: preset.customEnumParams,
+	}
+	return makeExpNodeState(foo)
 }
 
 export const selectExpNodesState = (state: IClientRoomState) => state.expGraphs.mainGraph.nodes

@@ -18,6 +18,10 @@ export class ShamuMetaState {
 	) {}
 }
 
+export function makeShamuMetaState(state: Partial<ShamuMetaState> = {}): ShamuMetaState {
+	return new ShamuMetaState(Set(state.selectedNodes || []))
+}
+
 export type ShamuMetaAction = ActionType<typeof shamuMetaActions>
 
 export function shamuMetaReducer(state = new ShamuMetaState(), action: ShamuMetaAction): ShamuMetaState {

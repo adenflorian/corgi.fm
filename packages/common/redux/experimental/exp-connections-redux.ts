@@ -141,9 +141,21 @@ const defaultExpNodeConnectionsInfo = Object.freeze({
 
 export type ExpNodeConnectionsInfo = typeof defaultExpNodeConnectionsInfo
 
+function makeExpNodeConnectionsInfo(info: ExpNodeConnectionsInfo): ExpNodeConnectionsInfo {
+	return {
+		leftConnections: Map<Id, List<Id>>(info.leftConnections).map(x => List(x)),
+		rightConnections: Map<Id, List<Id>>(info.rightConnections).map(x => List(x)),
+	}
+}
+
 export const makeInitialExpConnectionsState = () => ({
 	connections: Map<Id, ExpConnection>(),
 	nodeInfos: Map<Id, ExpNodeConnectionsInfo>(),
+})
+
+export const makeExpConnectionsState = (expConnectionsState: Partial<ExpConnectionsState> = {}) => ({
+	connections: Map<Id, ExpConnection>(expConnectionsState.connections || []),
+	nodeInfos: Map<Id, ExpNodeConnectionsInfo>(expConnectionsState.nodeInfos || []).map(makeExpNodeConnectionsInfo),
 })
 
 const makeNodeInfos = () => Map<Id, ExpNodeConnectionsInfo>()

@@ -1,6 +1,6 @@
 import React, {Fragment, useContext} from 'react'
 import * as immutable from 'immutable'
-import {ExpNodeState, IExpConnection} from '@corgifm/common/redux'
+import {ExpNodeState, IExpConnection, ExpGraph} from '@corgifm/common/redux'
 import {ParamInputCentering} from '@corgifm/common/common-types'
 import {NodeToNodeAction} from '@corgifm/common/server-constants'
 import {logger} from '../client-logger'
@@ -114,7 +114,7 @@ export class NodeManager {
 		node.setEnabled(enabled)
 	}
 
-	public onAudioParamChange = (paramChange: NumberParamChange) => {
+	public readonly onAudioParamChange = (paramChange: NumberParamChange) => {
 		const node = this._nodes.get(paramChange.nodeId)
 
 		if (!node) return logger.warn('[onAudioParamChange] 404 node not found: ', {paramChange})
@@ -122,7 +122,7 @@ export class NodeManager {
 		node.onAudioParamChange(paramChange.paramId, paramChange.newValue)
 	}
 
-	public onAudioParamInputGainChange = (connectionId: Id, newGain: number) => {
+	public readonly onAudioParamInputGainChange = (connectionId: Id, newGain: number) => {
 		const connection = this._connections.get(connectionId)
 
 		if (!connection) return logger.warn('[onAudioParamInputGainChange] 404 connection not found: ', connectionId)
@@ -136,7 +136,7 @@ export class NodeManager {
 		inputPort.setChainGain(connectionId, newGain)
 	}
 
-	public onAudioParamInputCenteringChange = (connectionId: Id, newCentering: ParamInputCentering) => {
+	public readonly onAudioParamInputCenteringChange = (connectionId: Id, newCentering: ParamInputCentering) => {
 		const connection = this._connections.get(connectionId)
 
 		if (!connection) return logger.warn('[onAudioParamInputCenteringChange] 404 connection not found: ', connectionId)
@@ -150,7 +150,7 @@ export class NodeManager {
 		inputPort.setChainCentering(connectionId, newCentering)
 	}
 
-	public onCustomNumberParamChange = (paramChange: NumberParamChange) => {
+	public readonly onCustomNumberParamChange = (paramChange: NumberParamChange) => {
 		const node = this._nodes.get(paramChange.nodeId)
 
 		if (!node) return logger.warn('[onCustomNumberParamChange] 404 node not found: ', {paramChange})
@@ -158,7 +158,7 @@ export class NodeManager {
 		node.onCustomNumberParamChange(paramChange.paramId, paramChange.newValue)
 	}
 
-	public onCustomEnumParamChange = (paramChange: EnumParamChange) => {
+	public readonly onCustomEnumParamChange = (paramChange: EnumParamChange) => {
 		const node = this._nodes.get(paramChange.nodeId)
 
 		if (!node) return logger.warn('[onCustomEnumParamChange] 404 node not found: ', {paramChange})
@@ -166,13 +166,18 @@ export class NodeManager {
 		node.onCustomEnumParamChange(paramChange.paramId, paramChange.newValue)
 	}
 
-	public addNodes = (newNodes: immutable.Map<Id, ExpNodeState>) => {
+	public readonly loadMainGraph = (mainGraph: ExpGraph) => {
+		this.addNodes(mainGraph.nodes)
+		this.addConnections(mainGraph.connections.connections)
+	}
+
+	public readonly addNodes = (newNodes: immutable.Map<Id, ExpNodeState>) => {
 		// Add group nodes first, because child nodes need the group node to exist before creating
 		newNodes.filter(x => x.type === 'group').forEach(this.addNode)
 		newNodes.filter(x => x.type !== 'group').forEach(this.addNode)
 	}
 
-	public addNode = (nodeState: ExpNodeState) => {
+	public readonly addNode = (nodeState: ExpNodeState) => {
 		const newNode = new typeClassMap[nodeState.type]({
 			id: nodeState.id,
 			ownerId: nodeState.ownerId,
@@ -184,10 +189,20 @@ export class NodeManager {
 			ports: nodeState.ports,
 		})
 		this._nodes.set(newNode.id, newNode)
-		nodeState.audioParams.forEach((newValue, paramId) => newNode.onAudioParamChange(paramId, newValue))
-		nodeState.customNumberParams.forEach((newValue, paramId) => newNode.onCustomNumberParamChange(paramId, newValue))
-		nodeState.customEnumParams.forEach((newValue, paramId) => newNode.onCustomEnumParamChange(paramId, newValue))
-		newNode.setEnabled(nodeState.enabled)
+		this._loadNodePreset(newNode, nodeState)
+	}
+
+	public readonly loadNodePreset = (nodeState: ExpNodeState) => {
+		const node = this._nodes.get(nodeState.id)
+		if (!node) return logger.warn('[loadNodePreset] 404 node not found: ', {nodeState: nodeState.toJS()})
+		this._loadNodePreset(node, nodeState)
+	}
+
+	private readonly _loadNodePreset = (node: CorgiNode, nodeState: ExpNodeState) => {
+		nodeState.audioParams.forEach((newValue, paramId) => node.onAudioParamChange(paramId, newValue))
+		nodeState.customNumberParams.forEach((newValue, paramId) => node.onCustomNumberParamChange(paramId, newValue))
+		nodeState.customEnumParams.forEach((newValue, paramId) => node.onCustomEnumParamChange(paramId, newValue))
+		node.setEnabled(nodeState.enabled)
 	}
 
 	private readonly _getGroupNode = (nodeState: ExpNodeState): GroupNode | undefined => {
@@ -208,7 +223,7 @@ export class NodeManager {
 		return groupNode
 	}
 
-	public deleteNode = (nodeId: Id) => {
+	public readonly deleteNode = (nodeId: Id) => {
 		const node = this._nodes.get(nodeId)
 
 		if (!node) return logger.warn('[deleteNode] 404 node not found: ', {nodeId})
@@ -217,11 +232,11 @@ export class NodeManager {
 		this._nodes.delete(nodeId)
 	}
 
-	public addConnections = (connections: immutable.Map<Id, IExpConnection>) => {
+	public readonly addConnections = (connections: immutable.Map<Id, IExpConnection>) => {
 		connections.forEach(this.addConnection)
 	}
 
-	public addConnection = (expConnection: IExpConnection) => {
+	public readonly addConnection = (expConnection: IExpConnection) => {
 		switch (expConnection.type) {
 			case 'audio': return this._addAudioConnection(expConnection)
 			case 'midi': return this._addMidiConnection(expConnection)
@@ -279,7 +294,7 @@ export class NodeManager {
 		this._connections.set(connection.id, connection)
 	}
 
-	public deleteConnection = (connectionId: Id) => {
+	public readonly deleteConnection = (connectionId: Id) => {
 		const connection = this._connections.get(connectionId)
 
 		if (!connection) return logger.warn('tried to delete non existent connection: ', connectionId)
@@ -289,11 +304,11 @@ export class NodeManager {
 		connection.dispose()
 	}
 
-	public deleteAllConnections = () => {
+	public readonly deleteAllConnections = () => {
 		this._connections.forEach(x => this.deleteConnection(x.id))
 	}
 
-	public changeConnectionSource = (connectionId: Id, newSourceId: Id, newSourcePort: Id) => {
+	public readonly changeConnectionSource = (connectionId: Id, newSourceId: Id, newSourcePort: Id) => {
 		const connection = this._connections.get(connectionId)
 
 		if (!connection) return logger.warn('404 connection not found: ', connectionId)
@@ -345,7 +360,7 @@ export class NodeManager {
 		connection.changeSource(sourcePort)
 	}
 
-	public changeConnectionTarget = (connectionId: Id, newTargetId: Id, newTargetPort: Id) => {
+	public readonly changeConnectionTarget = (connectionId: Id, newTargetId: Id, newTargetPort: Id) => {
 		const connection = this._connections.get(connectionId)
 
 		if (!connection) return logger.warn('404 connection not found: ', connectionId)
@@ -407,7 +422,7 @@ export class NodeManager {
 		})
 	}
 
-	public cleanup = () => {
+	public readonly cleanup = () => {
 		this._nodes.forEach(node => node.dispose())
 		this._nodes.clear()
 		this._connections.clear()
