@@ -73,9 +73,10 @@ a graph can be a handful of nodes that have no connections between them
 - [√] groups
 - [ ] linked groups
 - [ ] polyphony
-	- [√] ManualPolyphonicMidiConverter
+	- [ ] ManualPolyphonicMidiConverter
+		- [ ] dynamic voice count
 	- [ ] AutomaticPolyphonicMidiConverter
-
+		- [ ] figure out how to link to a voice graph
 
 # Envelope
 - inputs

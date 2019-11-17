@@ -1,16 +1,15 @@
 /* eslint-disable no-empty-function */
-import * as immutable from 'immutable'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {MidiAction} from '@corgifm/common/common-types'
 import {oscillatorFreqCurveFunctions, arrayToESIdKeyMap} from '@corgifm/common/common-utils'
 import {maxPitchFrequency} from '@corgifm/common/common-constants'
-import {IMidiNote} from '@corgifm/common/MidiNote'
 import {adsrValueToString} from '../../client-constants'
 import {ExpCustomNumberParam, ExpCustomNumberParams} from '../ExpParams'
 import {ExpMidiOutputPort, ExpMidiInputPort} from '../ExpMidiPorts'
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 import {ExpNodeAudioOutputPort, ExpPorts} from '../ExpPorts'
 import {midiNoteToFrequency} from '../../WebAudio'
+import {PolyAlgorithm, RoundRobin, VoiceIndex} from './NodeHelpers/PolyAlgorithms'
 
 const voiceCount = 4
 
@@ -21,7 +20,7 @@ export class ManualPolyphonicMidiConverterNode extends CorgiNode {
 	private readonly _pitchSources: readonly ConstantSourceNode[]
 	private readonly _waveShapers: readonly WaveShaperNode[]
 	private readonly _portamento: ExpCustomNumberParam
-	private readonly _algorithm: PolyAlgorithm = new RoundRobin()
+	private readonly _algorithm: PolyAlgorithm = new RoundRobin(voiceCount)
 
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
 		super(corgiNodeArgs)
@@ -51,7 +50,7 @@ export class ManualPolyphonicMidiConverterNode extends CorgiNode {
 	}
 
 	public getColor = () => CssColor.yellow
-	public getName = () => 'Polyphonic Midi Converter'
+	public getName = () => 'Manual Polyphonic Midi Converter'
 	public render = () => this.getDebugView()
 
 	protected _enable() {}
@@ -102,49 +101,5 @@ export class ManualPolyphonicMidiConverterNode extends CorgiNode {
 		const frequency = midiNoteToFrequency(note)
 		const normalized = oscillatorFreqCurveFunctions.unCurve(frequency / maxPitchFrequency)
 		this._pitchSources[voiceIndex as number].offset.setTargetAtTime(normalized, time, this._portamento.value)
-	}
-}
-
-interface VoiceIndex extends Number {}
-
-interface PolyAlgorithm {
-	getVoiceForNoteOn: (note: IMidiNote) => VoiceIndex
-	getVoiceForNoteOff: (note: IMidiNote) => VoiceIndex | undefined
-}
-
-class RoundRobin implements PolyAlgorithm {
-	private _voiceMap = immutable.Map<VoiceIndex, IMidiNote>()
-	private _lastVoiceUsed: VoiceIndex = -1
-
-	public getVoiceForNoteOn(note: IMidiNote) {
-		(this._lastVoiceUsed as number)++
-
-		if (this._lastVoiceUsed >= voiceCount) this._lastVoiceUsed = 0
-
-		this._voiceMap = this._voiceMap.set(this._lastVoiceUsed, note)
-
-		return this._lastVoiceUsed
-	}
-
-	public getVoiceForNoteOff(note: IMidiNote) {
-		const voice = this._voiceMap.keyOf(note)
-
-		if (voice === undefined) {
-			return undefined
-		} else {
-			this._voiceMap = this._voiceMap.delete(voice)
-			return voice
-		}
-	}
-}
-
-class Optimal implements PolyAlgorithm {
-
-	public getVoiceForNoteOn(note: IMidiNote) {
-		return 0
-	}
-
-	public getVoiceForNoteOff(note: IMidiNote) {
-		return 0
 	}
 }
