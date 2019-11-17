@@ -1,19 +1,14 @@
 export type NumberChangedDelegate = (newNumber: number) => void
 
-export interface ICorgiNumberChangedEvent {
-	subscribe(delegate: NumberChangedDelegate): number
-	unsubscribe(delegate: NumberChangedDelegate): void
-	invokeImmediately(newNumber: number): void
-	invokeNextFrame(newNumber: number, onInvoked?: () => void): void
-}
-
-export class CorgiNumberChangedEvent implements ICorgiNumberChangedEvent {
+export class CorgiNumberChangedEvent {
 	private readonly _subscribers = new Set<NumberChangedDelegate>()
 	private _frameRequested = false
 
 	public constructor(
 		private _currentValue: number,
 	) {}
+
+	public get current() {return this._currentValue}
 
 	public subscribe(delegate: NumberChangedDelegate): number {
 		this._subscribers.add(delegate)
@@ -55,6 +50,8 @@ export class CorgiStringChangedEvent {
 		private _currentValue: string,
 	) {}
 
+	public get current() {return this._currentValue}
+
 	public subscribe(delegate: StringChangedDelegate): string {
 		this._subscribers.add(delegate)
 		return this._currentValue
@@ -95,6 +92,8 @@ export class CorgiEnumChangedEvent<TEnum extends string> {
 		private _currentValue: TEnum,
 	) {}
 
+	public get current() {return this._currentValue}
+
 	public subscribe(delegate: EnumChangedDelegate<TEnum>): TEnum {
 		this._subscribers.add(delegate)
 		return this._currentValue
@@ -134,6 +133,8 @@ export class CorgiObjectChangedEvent<TObject extends object | boolean | undefine
 	public constructor(
 		public currentValue: TObject,
 	) {}
+
+	public get current() {return this.currentValue}
 
 	public subscribe(delegate: ObjectChangedDelegate<TObject>): TObject {
 		this._subscribers.add(delegate)

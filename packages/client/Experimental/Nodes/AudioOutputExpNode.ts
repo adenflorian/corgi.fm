@@ -10,7 +10,7 @@ export class AudioOutputExpNode extends CorgiNode {
 	private readonly _inputChain: ToggleGainChain
 
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
-		super(corgiNodeArgs)
+		super(corgiNodeArgs, {name: 'Audio Output', color: CssColor.blue})
 
 		this._inputChain = new ToggleGainChain(corgiNodeArgs.audioContext, 0.5)
 		this._inputChain.output.connect(this._audioContext.destination)
@@ -37,8 +37,6 @@ export class AudioOutputExpNode extends CorgiNode {
 		}
 	}
 
-	public getName = () => 'Audio Output'
-	public getColor = () => CssColor.blue
 	public render = () => this.getDebugView()
 
 	protected _enable = () => this._inputChain.enable()

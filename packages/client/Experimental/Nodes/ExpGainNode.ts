@@ -16,7 +16,7 @@ export class ExpGainNode extends CorgiNode {
 	protected readonly _audioParams: ExpAudioParams
 
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
-		super(corgiNodeArgs)
+		super(corgiNodeArgs, {name: 'Gain', color: CssColor.orange})
 
 		this._gain = corgiNodeArgs.audioContext.createGain()
 		this._gain.gain.value = 0
@@ -33,8 +33,6 @@ export class ExpGainNode extends CorgiNode {
 
 	}
 
-	public getColor = () => CssColor.orange
-	public getName = () => 'Gain'
 	public render = () => this.getDebugView()
 
 	protected _enable = () =>	this._dryWetChain.wetOnly()

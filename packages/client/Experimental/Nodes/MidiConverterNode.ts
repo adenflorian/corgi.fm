@@ -27,7 +27,7 @@ export class MidiConverterNode extends CorgiNode {
 	private _currentNotes: OrderedSet<number>
 
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
-		super(corgiNodeArgs)
+		super(corgiNodeArgs, {name: 'Midi Converter', color: CssColor.yellow})
 
 		this._constantSourceNode = corgiNodeArgs.audioContext.createConstantSource()
 		this._constantSourceNode.offset.setValueAtTime(0, 0)
@@ -53,8 +53,6 @@ export class MidiConverterNode extends CorgiNode {
 		this._currentNotes = OrderedSet()
 	}
 
-	public getColor = () => CssColor.yellow
-	public getName = () => 'Midi Converter'
 	public render = () => this.getDebugView()
 
 	protected _enable() {}

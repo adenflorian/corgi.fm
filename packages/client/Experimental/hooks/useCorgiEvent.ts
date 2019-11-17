@@ -29,7 +29,7 @@ export function useNumberChangedEvent(event: CorgiNumberChangedEvent, doEquality
 }
 
 export function useStringChangedEvent(event?: CorgiStringChangedEvent) {
-	const [value, setState] = useState('')
+	const [value, setState] = useState(event ? event.current : '')
 
 	const previousValue = useRef('')
 

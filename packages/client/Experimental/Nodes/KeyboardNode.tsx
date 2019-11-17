@@ -18,14 +18,11 @@ export class KeyboardNode extends CorgiNode {
 	private currentInput?: Input
 
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
-		super(corgiNodeArgs)
+		super(corgiNodeArgs, {name: 'Keyboard', color: CssColor.yellow})
 
 		this._midiOutputPort = new ExpMidiOutputPort('output', 'output', this)
 		this._ports = arrayToESIdKeyMap([this._midiOutputPort])
 	}
-
-	public getColor = () => CssColor.yellow
-	public getName = () => 'Keyboard'
 
 	public render() {
 		return this.getDebugView(

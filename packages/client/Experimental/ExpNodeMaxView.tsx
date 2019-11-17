@@ -6,6 +6,7 @@ import {
 import {ExpAudioParams, ExpCustomNumberParams, AudioParamContext, ExpCustomEnumParams} from './ExpParams'
 import {useNodeContext} from './CorgiNode'
 import {ExpMaxValue} from './ExpMaxValue'
+import {useStringChangedEvent} from './hooks/useCorgiEvent'
 import './ExpNodeMaxView.less'
 
 interface Props {
@@ -21,7 +22,7 @@ export const ExpNodeMaxView = hot(module)(React.memo(function _ExpNodeMaxView({
 	ports, customEnumParams,
 }: Props) {
 	const nodeContext = useNodeContext()
-	const nodeName = nodeContext.getName()
+	const nodeName = useStringChangedEvent(nodeContext.onNameChange)
 
 	return (
 		<div className="expNodeMaxView">

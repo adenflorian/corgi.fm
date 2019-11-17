@@ -21,7 +21,7 @@ export class SequencerNode extends CorgiNode {
 	private _startSongTime = -1
 
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
-		super(corgiNodeArgs)
+		super(corgiNodeArgs, {name: 'Sequencer', color: CssColor.yellow})
 
 		this._midiOutputPort = new ExpMidiOutputPort('output', 'output', this)
 		this._ports = arrayToESIdKeyMap([this._midiOutputPort])
@@ -30,8 +30,6 @@ export class SequencerNode extends CorgiNode {
 		this._customNumberParams = arrayToESIdKeyMap([this._tempo])
 	}
 
-	public getName = () => 'Sequencer'
-	public getColor = () => CssColor.yellow
 	public render = () => this.getDebugView()
 
 	public onTick(currentGlobalTime: number, maxReadAhead: number) {

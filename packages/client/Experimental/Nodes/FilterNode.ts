@@ -21,7 +21,7 @@ export class FilterNode extends CorgiNode {
 	private readonly _type: ExpCustomEnumParam<FilterType>
 
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
-		super(corgiNodeArgs)
+		super(corgiNodeArgs, {name: 'Filter', color: CssColor.orange})
 
 		this._type = new ExpCustomEnumParam<FilterType>('type', 'lowpass', filterTypes)
 		this._type.onChange.subscribe(this.onTypeChange)
@@ -48,8 +48,6 @@ export class FilterNode extends CorgiNode {
 		this._audioParams = arrayToESIdKeyMap([frequencyParam, detuneParam, qParam, gainParam])
 	}
 
-	public getColor = () => CssColor.orange
-	public getName = () => 'Filter'
 	public render = () => this.getDebugView()
 
 	protected _enable = () => this._dryWetChain.wetOnly()

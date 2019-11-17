@@ -7,14 +7,8 @@ export class DummyNode extends CorgiNode {
 	public constructor(
 		corgiNodeArgs: CorgiNodeArgs,
 	) {
-		super(corgiNodeArgs)
+		super(corgiNodeArgs, {name: 'Dummy', color: CssColor.disabledGray})
 	}
-
-	public getColor(): string {
-		return CssColor.disabledGray
-	}
-
-	public getName() {return 'Dummy'}
 
 	public render() {
 		return this.getDebugView()

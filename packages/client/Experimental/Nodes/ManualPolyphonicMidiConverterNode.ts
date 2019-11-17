@@ -11,26 +11,28 @@ import {ExpNodeAudioOutputPort, ExpPorts} from '../ExpPorts'
 import {midiNoteToFrequency} from '../../WebAudio'
 import {PolyAlgorithm, RoundRobin, VoiceIndex} from './NodeHelpers/PolyAlgorithms'
 
-const voiceCount = 4
+const maxVoiceCount = 4
 
 export class ManualPolyphonicMidiConverterNode extends CorgiNode {
 	protected readonly _ports: ExpPorts
 	protected readonly _customNumberParams: ExpCustomNumberParams
 	private readonly _midiOutputPorts: readonly ExpMidiOutputPort[]
+	private readonly _pitchOutputPorts: readonly ExpNodeAudioOutputPort[]
 	private readonly _pitchSources: readonly ConstantSourceNode[]
 	private readonly _waveShapers: readonly WaveShaperNode[]
 	private readonly _portamento: ExpCustomNumberParam
-	private readonly _algorithm: PolyAlgorithm = new RoundRobin(voiceCount)
+	private readonly _voiceCount: ExpCustomNumberParam
+	private readonly _algorithm: PolyAlgorithm
 
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
-		super(corgiNodeArgs)
+		super(corgiNodeArgs, {name: 'Manual Polyphonic Midi Converter', color: CssColor.yellow})
 
-		this._pitchSources = new Array(voiceCount).fill(0).map(() => corgiNodeArgs.audioContext.createConstantSource())
+		this._pitchSources = new Array(maxVoiceCount).fill(0).map(() => corgiNodeArgs.audioContext.createConstantSource())
 		this._pitchSources.forEach(voice => {
 			voice.offset.setValueAtTime(0, 0)
 			voice.start()
 		})
-		this._waveShapers = new Array(voiceCount).fill(0).map(() => corgiNodeArgs.audioContext.createWaveShaper())
+		this._waveShapers = new Array(maxVoiceCount).fill(0).map(() => corgiNodeArgs.audioContext.createWaveShaper())
 		this._waveShapers.forEach(waveShaper => {
 			// eslint-disable-next-line no-param-reassign
 			waveShaper.curve = new Float32Array([-3, 1])
@@ -40,17 +42,20 @@ export class ManualPolyphonicMidiConverterNode extends CorgiNode {
 		this._midiOutputPorts = this._pitchSources.map((_, index) => {
 			return new ExpMidiOutputPort('gate' + index, 'gate' + index, this)
 		})
-		const pitchOutputPorts = this._pitchSources.map((_, index) => {
+		this._pitchOutputPorts = this._pitchSources.map((_, index) => {
 			return new ExpNodeAudioOutputPort('pitch' + index, 'pitch' + index, this, this._pitchSources[index].connect(this._waveShapers[index]))
 		})
-		this._ports = arrayToESIdKeyMap([midiInputPort, ...this._midiOutputPorts, ...pitchOutputPorts])
+		this._ports = arrayToESIdKeyMap([midiInputPort, ...this._midiOutputPorts, ...this._pitchOutputPorts])
 
 		this._portamento = new ExpCustomNumberParam('portamento', 0, 0, 8, 3, adsrValueToString)
-		this._customNumberParams = arrayToESIdKeyMap([this._portamento])
+		this._voiceCount = new ExpCustomNumberParam('voiceCount', 4, 1, maxVoiceCount, 1, val => Math.round(val).toString())
+		this._voiceCount.onChange.subscribe(this._onVoiceCountChange)
+		this._customNumberParams = arrayToESIdKeyMap([this._portamento, this._voiceCount])
+
+		this._algorithm = new RoundRobin(this._voiceCount.onChange)
+		this._onVoiceCountChange(this._voiceCount.value)
 	}
 
-	public getColor = () => CssColor.yellow
-	public getName = () => 'Manual Polyphonic Midi Converter'
 	public render = () => this.getDebugView()
 
 	protected _enable() {}
@@ -64,6 +69,20 @@ export class ManualPolyphonicMidiConverterNode extends CorgiNode {
 		this._waveShapers.forEach(waveShaper => {
 			waveShaper.disconnect()
 		})
+		this._voiceCount.onChange.unsubscribe(this._onVoiceCountChange)
+	}
+
+	private readonly _onVoiceCountChange = (newVoiceCount: number) => {
+		const realVoiceCount = Math.round(newVoiceCount)
+		for (let i = 0; i < maxVoiceCount; i++) {
+			if (i < realVoiceCount) {
+				this._midiOutputPorts[i].enable()
+				this._pitchOutputPorts[i].enable()
+			} else {
+				this._midiOutputPorts[i].disable()
+				this._pitchOutputPorts[i].disable()
+			}
+		}
 	}
 
 	private _onMidiMessage(midiAction: MidiAction) {

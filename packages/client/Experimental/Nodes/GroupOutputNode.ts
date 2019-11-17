@@ -10,7 +10,7 @@ export class GroupOutputNode extends CorgiNode {
 	protected readonly _ports = new Map<Id, ExpPort>()
 
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
-		super(corgiNodeArgs)
+		super(corgiNodeArgs, {name: 'Group Output', color: CssColor.blue})
 
 		if (this._parentGroupNode === undefined) {
 			logger.error('[GroupOutputNode] expected a parent node!', {this: this, parent: this._parentGroupNode})
@@ -22,8 +22,6 @@ export class GroupOutputNode extends CorgiNode {
 		})
 	}
 
-	public getColor = () => CssColor.blue
-	public getName = () => 'Group Output'
 	public render = () => this.getDebugView()
 
 	protected _enable = () => {}

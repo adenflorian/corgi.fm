@@ -14,7 +14,7 @@ export class ConstantExpNode extends CorgiNode {
 	private readonly _outputGain: GainNode
 
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
-		super(corgiNodeArgs)
+		super(corgiNodeArgs, {name: 'Constant', color: CssColor.purple})
 
 		this._constantSourceNode = corgiNodeArgs.audioContext.createConstantSource()
 		this._constantSourceNode.start()
@@ -28,9 +28,6 @@ export class ConstantExpNode extends CorgiNode {
 		const outputPort = new ExpNodeAudioOutputPort('output', 'output', this, this._outputGain)
 		this._ports = arrayToESIdKeyMap([offsetPort, outputPort])
 	}
-
-	public getName() {return 'Constant'}
-	public getColor() {return CssColor.purple}
 
 	public render() {
 		return this.getDebugView()

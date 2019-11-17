@@ -17,7 +17,7 @@ import {
 import {CssColor} from '@corgifm/common/shamu-color'
 import {useNodeManagerContext} from '../Experimental/NodeManager'
 import {longLineTooltip} from '../client-constants'
-import {useObjectChangedEvent} from '../Experimental/hooks/useCorgiEvent'
+import {useObjectChangedEvent, useStringChangedEvent} from '../Experimental/hooks/useCorgiEvent'
 import {usePort} from '../Experimental/hooks/usePort'
 import {ExpPortReact} from '../Experimental/ExpPorts'
 import {ConnectionLine} from './ConnectionLine'
@@ -140,13 +140,7 @@ const ExpConnectionView =
 			dispatch(expConnectionsActions.delete(List([id])))
 		}, [dispatch, id])
 
-		const nodeManagerContext = useNodeManagerContext()
-
-		const sourceNodeInfo = nodeManagerContext.getNodeInfo(sourceId)
-
-		const color = sourceNodeInfo
-			? sourceNodeInfo.color
-			: CssColor.blue
+		const color = useStringChangedEvent(sourcePort.onColorChange)
 
 		return (
 			<div

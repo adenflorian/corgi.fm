@@ -13,6 +13,7 @@ import {simpleGlobalClientState} from '../SimpleGlobalClientState'
 import {ExpPanel} from '../Panel/ExpPanel'
 import {useNodeContext} from '../Experimental/CorgiNode'
 import {useLocalClientId} from '../react-hooks'
+import {useStringChangedEvent} from '../Experimental/hooks/useCorgiEvent';
 
 interface Props {
 	children: React.ReactNode
@@ -23,7 +24,7 @@ export function SimpleGraphNodeExp({children}: Props) {
 
 	const positionId = nodeContext.id
 
-	const color = nodeContext.getColor()
+	const color = useStringChangedEvent(nodeContext.onColorChange)
 
 	const selectedNodes = useSelector((state: IClientAppState) => state.room.expGraphs.mainGraph.positions.meta.selectedNodes)
 
@@ -110,7 +111,7 @@ export function SimpleGraphNodeExp({children}: Props) {
 		}
 	}, [dispatch, dragging, positionId, store])
 
-	const nodeName = nodeContext.getName()
+	const nodeName = useStringChangedEvent(nodeContext.onNameChange)
 
 	const localClientId = useLocalClientId()
 

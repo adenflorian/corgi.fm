@@ -10,7 +10,7 @@ import {ParamInputChainReact, useAudioParamInputPortContext} from '../Experiment
 import {useAudioParamContext} from '../Experimental/ExpParams'
 import {CorgiNumberChangedEvent} from '../Experimental/CorgiEvents'
 import {
-	useNumberChangedEvent, useEnumChangedEvent, useObjectChangedEvent,
+	useNumberChangedEvent, useEnumChangedEvent, useObjectChangedEvent, useStringChangedEvent,
 } from '../Experimental/hooks/useCorgiEvent'
 import {useNodeContext} from '../Experimental/CorgiNode'
 import {useNodeManagerContext} from '../Experimental/NodeManager'
@@ -28,8 +28,6 @@ const size = 32
 export const ActualUberKnob = React.memo(function _ActualUberKnob({
 	percentage, range,
 }: Props) {
-	const nodeContext = useNodeContext()
-
 	return (
 		<div
 			className="actualKnobContainer"
@@ -46,7 +44,6 @@ export const ActualUberKnob = React.memo(function _ActualUberKnob({
 			>
 				<g transform={`rotate(135, ${size / 2}, ${size / 2})`}>
 					<UberArcMain
-						color={nodeContext.getColor()}
 						knobValueRatio={percentage}
 						range={range}
 					/>
@@ -61,16 +58,16 @@ const strokeWidth = 3
 const mainDiameter = 40
 
 interface UberArcMainProps {
-	readonly color: string
 	readonly knobValueRatio: number
 	readonly range: SignalRange
 }
 
 function UberArcMain({
-	color, knobValueRatio, range,
+	knobValueRatio, range,
 }: UberArcMainProps) {
 
-	const activeColor = color
+	const nodeContext = useNodeContext()
+	const activeColor = useStringChangedEvent(nodeContext.onColorChange)
 	const railColor = useMemo(() => setLightness(activeColor, 12), [activeColor])
 	const audioParam = useAudioParamContext()
 
@@ -123,9 +120,11 @@ function UberArcMod({
 }: UberArcModProps) {
 	const nodeManagerContext = useNodeManagerContext()
 	const connection = nodeManagerContext.connections.get(chain.id)
-	const color = connection
-		? connection.outputPort.node.getColor()
-		: undefined
+	const color = useStringChangedEvent(
+		connection
+			? connection.outputPort.onColorChange
+			: undefined
+	)
 	const activeColor = color || ''
 	const railColor = useMemo(() => setLightness(activeColor, 12), [activeColor])
 	const gain = useNumberChangedEvent(chain.onGainChange)

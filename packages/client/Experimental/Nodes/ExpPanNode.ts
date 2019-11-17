@@ -16,7 +16,7 @@ export class ExpPanNode extends CorgiNode {
 	protected readonly _audioParams: ExpAudioParams
 
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
-		super(corgiNodeArgs)
+		super(corgiNodeArgs, {name: 'Pan', color: CssColor.orange})
 
 		this._pan = corgiNodeArgs.audioContext.createStereoPanner()
 
@@ -31,8 +31,6 @@ export class ExpPanNode extends CorgiNode {
 		this._ports = arrayToESIdKeyMap([inputPort, panPort, outputPort])
 	}
 
-	public getColor = () => CssColor.orange
-	public getName = () => 'Pan'
 	public render = () => this.getDebugView()
 
 	protected _enable = () => this._dryWetChain.wetOnly()

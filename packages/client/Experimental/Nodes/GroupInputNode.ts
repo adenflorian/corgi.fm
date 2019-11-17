@@ -10,7 +10,7 @@ export class GroupInputNode extends CorgiNode {
 	protected readonly _ports = new Map<Id, ExpPort>()
 
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
-		super(corgiNodeArgs)
+		super(corgiNodeArgs, {name: 'Group Input', color: CssColor.blue})
 
 		if (this._parentGroupNode === undefined) {
 			logger.error('[GroupInputNode] expected a parent node!', {this: this, parent: this._parentGroupNode})
@@ -22,8 +22,6 @@ export class GroupInputNode extends CorgiNode {
 		})
 	}
 
-	public getColor = () => CssColor.blue
-	public getName = () => 'Group Input'
 	public render = () => this.getDebugView()
 
 	protected _enable = () => {}

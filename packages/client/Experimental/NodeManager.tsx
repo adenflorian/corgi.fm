@@ -45,16 +45,6 @@ export class NodeManager {
 
 	private readonly _makeContextValue = () => {
 		return {
-			getNodeInfo: (nodeId: Id) => {
-				const node = this._nodes.get(nodeId)
-
-				if (!node) return logger.warn('[getNodeInfo] 404 node not found: ', {nodeId})
-
-				return {
-					// Only static info should go in here
-					color: node.getColor(),
-				} as const
-			},
 			connections: {
 				get: (id: Id) => {
 					const connection = this._connections.get(id)

@@ -4,6 +4,7 @@ import {List} from 'immutable'
 import {clamp, clampPolarized} from '@corgifm/common/common-utils'
 import {NodeToNodeAction} from '@corgifm/common/server-constants'
 import {ExpNodeType, ExpPortStates} from '@corgifm/common/redux'
+import {CssColor} from '@corgifm/common/shamu-color'
 import {logger} from '../client-logger'
 import {SingletonContextImpl} from '../SingletonContext'
 import {
@@ -12,6 +13,7 @@ import {
 import {ExpAudioParams, ExpCustomNumberParams, ExpCustomEnumParams} from './ExpParams'
 import {CorgiNodeView} from './CorgiNodeView'
 import {GroupNode} from './Nodes/GroupNode'
+import {CorgiStringChangedEvent} from './CorgiEvents'
 
 export const ExpNodeContext = React.createContext<null | CorgiNodeReact>(null)
 
@@ -22,6 +24,8 @@ export function useNodeContext() {
 }
 
 export interface CorgiNodeOptions {
+	readonly name: string
+	readonly color: string
 	readonly requiresAudioWorklet?: boolean
 }
 
@@ -39,8 +43,8 @@ export interface CorgiNodeArgs {
 export type CorgiNodeConstructor = new (args: CorgiNodeArgs) => CorgiNode
 
 export interface CorgiNodeReact extends Pick<CorgiNode,
-'id' | 'requiresAudioWorklet' | 'getPorts' | 'getColor' |
-'getName' | 'setPortPosition' | 'type'> {}
+'id' | 'requiresAudioWorklet' | 'getPorts' | 'onColorChange' |
+'onNameChange' | 'setPortPosition' | 'type'> {}
 
 export abstract class CorgiNode {
 	public readonly id: Id
@@ -56,10 +60,13 @@ export abstract class CorgiNode {
 	protected readonly _customNumberParams: ExpCustomNumberParams = new Map()
 	protected readonly _customEnumParams: ExpCustomEnumParams = new Map()
 	protected _enabled = true
+	public readonly onNameChange: CorgiStringChangedEvent
+	public readonly onColorChange: CorgiStringChangedEvent
+	public readonly defaultColor: string
 
 	public constructor(
 		args: CorgiNodeArgs,
-		options: CorgiNodeOptions = {},
+		options: CorgiNodeOptions,
 	) {
 		this.id = args.id
 		this.ownerId = args.ownerId
@@ -69,14 +76,15 @@ export abstract class CorgiNode {
 		this._singletonContext = args.singletonContext
 		this._parentGroupNode = args.parentGroupNode
 
+		this.onNameChange = new CorgiStringChangedEvent(options.name)
+		this.defaultColor = options.color
+		this.onColorChange = new CorgiStringChangedEvent(this.defaultColor)
 		this.requiresAudioWorklet = options.requiresAudioWorklet !== undefined
 			? options.requiresAudioWorklet : false
 	}
 
 	public getPorts = () => this._ports
 
-	public abstract getName(): string
-	public abstract getColor(): string
 	public abstract render(): ReactElement<any>
 
 	public onTick(currentTime: number, maxReadAhead: number) {}
@@ -88,8 +96,10 @@ export abstract class CorgiNode {
 		this._enabled = enabled
 		if (enabled) {
 			this._enable()
+			this.onColorChange.invokeNextFrame(this.defaultColor)
 		} else {
 			this._disable()
+			this.onColorChange.invokeNextFrame(CssColor.disabledGray)
 		}
 	}
 

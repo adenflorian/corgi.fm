@@ -24,7 +24,7 @@ export class OscillatorExpNode extends CorgiNode {
 	private readonly _type: ExpCustomEnumParam<OscillatorType>
 
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
-		super(corgiNodeArgs)
+		super(corgiNodeArgs, {name: 'Oscillator', color: CssColor.green})
 
 		this._type = new ExpCustomEnumParam<OscillatorType>('type', 'sawtooth', oscillatorTypes)
 		this._type.onChange.subscribe(this.onTypeChange)
@@ -47,8 +47,6 @@ export class OscillatorExpNode extends CorgiNode {
 		this._audioParams = arrayToESIdKeyMap([frequencyParam, detuneParam])
 	}
 
-	public getColor = () => CssColor.green
-	public getName = () => 'Oscillator'
 	public render = () => this.getDebugView()
 
 	protected _enable = () => this._outputChain.enable()

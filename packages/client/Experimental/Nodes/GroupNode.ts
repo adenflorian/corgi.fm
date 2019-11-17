@@ -19,7 +19,7 @@ export class GroupNode extends CorgiNode {
 	private readonly _outputGains = new Map<Id, GainNode>()
 
 	public constructor(private readonly _corgiNodeArgs: CorgiNodeArgs) {
-		super(_corgiNodeArgs)
+		super(_corgiNodeArgs, {name: 'Group', color: CssColor.blue})
 
 		this._audioContext = _corgiNodeArgs.audioContext
 
@@ -40,8 +40,6 @@ export class GroupNode extends CorgiNode {
 		return [...this._ports].map(x => x[1]).filter(x => x.type === 'audio' && x.side === 'out') as ExpNodeAudioOutputPort[]
 	}
 
-	public getColor = () => CssColor.blue
-	public getName = () => 'Group'
 	public render = () => this.getDebugView()
 
 	protected _enable = () => {

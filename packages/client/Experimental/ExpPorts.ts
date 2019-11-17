@@ -4,6 +4,7 @@ import {List} from 'immutable'
 import {ParamInputCentering, SignalRange} from '@corgifm/common/common-types'
 import {clamp} from '@corgifm/common/common-utils'
 import {ExpConnectionType, selectOption, AppOptions} from '@corgifm/common/redux'
+import {CssColor} from '@corgifm/common/shamu-color'
 import {logger} from '../client-logger'
 import {CorgiNode, CorgiNodeArgs} from './CorgiNode'
 import {
@@ -11,12 +12,12 @@ import {
 	ExpNodeConnections, ExpNodeConnection,
 } from './ExpConnections'
 import {ExpAudioParam} from './ExpParams'
-import {CorgiNumberChangedEvent, CorgiEnumChangedEvent, CorgiObjectChangedEvent} from './CorgiEvents'
+import {CorgiNumberChangedEvent, CorgiEnumChangedEvent, CorgiObjectChangedEvent, CorgiStringChangedEvent} from './CorgiEvents'
 import {CorgiAnalyserSPNode} from './CorgiAnalyserSPN'
 
 export type ExpPortCallback = (port: ExpPort) => void
 
-export interface ExpPortReact extends Pick<ExpPort, 'id' | 'type' | 'onPositionChanged' | 'onConnectionCountChanged'> {}
+export interface ExpPortReact extends Pick<ExpPort, 'id' | 'type' | 'onPositionChanged' | 'onConnectionCountChanged' | 'onColorChange' | 'enabled'> {}
 
 export abstract class ExpPort {
 	protected readonly _connections: ExpNodeConnections = new Map<Id, ExpNodeConnection>()
@@ -24,6 +25,8 @@ export abstract class ExpPort {
 	public get position() {return this._position}
 	public readonly onPositionChanged: CorgiObjectChangedEvent<Point>
 	public readonly onConnectionCountChanged: CorgiNumberChangedEvent
+	public readonly onColorChange: CorgiStringChangedEvent
+	public enabled = new CorgiObjectChangedEvent<boolean>(true)
 
 	public constructor(
 		public readonly id: Id,
@@ -35,6 +38,14 @@ export abstract class ExpPort {
 	) {
 		this.onPositionChanged = new CorgiObjectChangedEvent(this.position)
 		this.onConnectionCountChanged = new CorgiNumberChangedEvent(this.connectionCount)
+		this.onColorChange = new CorgiStringChangedEvent(node.onColorChange.current)
+		node.onColorChange.subscribe(this.onNodeColorChange)
+	}
+
+	private readonly onNodeColorChange = (newColor: string) => {
+		if (this.enabled.current) {
+			this.onColorChange.invokeImmediately(newColor)
+		}
 	}
 
 	public get connectionCount() {return this._connections.size}
@@ -42,6 +53,22 @@ export abstract class ExpPort {
 	public setPosition(newPosition: Point) {
 		this._position = newPosition
 		this.onPositionChanged.invokeNextFrame(this.position)
+	}
+
+	public enable() {
+		if (this.enabled.current === true) return
+		this.enabled.invokeImmediately(true)
+		this.onColorChange.invokeImmediately(this.node.onColorChange.current)
+	}
+
+	public disable() {
+		if (this.enabled.current === false) return
+		this.enabled.invokeImmediately(false)
+		this.onColorChange.invokeImmediately(CssColor.disabledGray)
+	}
+
+	public dispose() {
+		this.node.onColorChange.unsubscribe(this.onNodeColorChange)
 	}
 }
 

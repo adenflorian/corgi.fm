@@ -2,7 +2,7 @@ import React, {useCallback} from 'react'
 import {useDispatch} from 'react-redux'
 import {expNodesActions} from '@corgifm/common/redux'
 import {ExpKnob} from '../Knob/ExpKnob'
-import {useNumberChangedEvent} from './hooks/useCorgiEvent'
+import {useNumberChangedEvent, useStringChangedEvent} from './hooks/useCorgiEvent'
 import {useNodeContext} from './CorgiNode'
 import {useAudioParamContext} from './ExpParams'
 
@@ -20,6 +20,7 @@ export const ExpNodeDebugAudioParamKnob = React.memo(function _ExpNodeDebugAudio
 	}, [audioParam.id, dispatch, nodeId])
 	const node = useNodeContext()
 	const value = useNumberChangedEvent(audioParam.onChange)
+	const color = useStringChangedEvent(node.onColorChange)
 
 	return (
 		<ExpKnob
@@ -29,7 +30,7 @@ export const ExpNodeDebugAudioParamKnob = React.memo(function _ExpNodeDebugAudio
 			tooltip={audioParam.id as string}
 			value={value}
 			valueString={audioParam.valueString}
-			color={node.getColor()}
+			color={color}
 			curveFunctions={audioParam.curveFunctions}
 			range={audioParam.paramSignalRange}
 			maxValue={audioParam.maxValue}

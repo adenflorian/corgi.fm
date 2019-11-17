@@ -33,7 +33,7 @@ export class EnvelopeNode extends CorgiNode {
 	public constructor(
 		corgiNodeArgs: CorgiNodeArgs,
 	) {
-		super(corgiNodeArgs)
+		super(corgiNodeArgs, {name: 'Envelope', color: CssColor.purple})
 
 		this._constantSource = corgiNodeArgs.audioContext.createConstantSource()
 		this._outputGain = corgiNodeArgs.audioContext.createGain()
@@ -59,8 +59,6 @@ export class EnvelopeNode extends CorgiNode {
 		])
 	}
 
-	public getColor = () => CssColor.purple
-	public getName = () => 'Envelope'
 	public render = () => this.getDebugView()
 
 	protected _enable = () => this._outputGain.gain.value = 1

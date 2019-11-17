@@ -9,7 +9,7 @@ import {ExpNodeDebugAudioParamKnob} from './ExpNodeDebugAudioParamKnob'
 import {ExpAudioParams, ExpCustomNumberParams, AudioParamContext, ExpCustomEnumParams} from './ExpParams'
 import {ExpNodeDebugCustomNumberParamKnob} from './ExpNodeDebugCustomNumberParamKnob'
 import {useNodeContext} from './CorgiNode'
-import {useObjectChangedEvent} from './hooks/useCorgiEvent'
+import {useObjectChangedEvent, useStringChangedEvent} from './hooks/useCorgiEvent'
 import {ExpNodeDebugCustomEnumParamSelect} from './ExpNodeDebugCustomEnumParamSelect'
 
 interface Props {
@@ -25,7 +25,7 @@ export const ExpNodeDebugView = hot(module)(React.memo(function _ExpNodeDebugVie
 	ports, customEnumParams,
 }: Props) {
 	const nodeContext = useNodeContext()
-	const nodeName = nodeContext.getName()
+	// const nodeName = useStringChangedEvent(nodeContext.onNameChange)
 	const nodeId = nodeContext.id
 	const isAudioWorkletLoaded = useObjectChangedEvent(simpleGlobalClientState.onAudioWorkletLoaded)
 
@@ -122,24 +122,40 @@ const Ports = React.memo(function _Ports({ports}: PortsProps) {
 			<div className={className}>
 				{/* <div className="sectionLabel">{label}</div> */}
 				{ports2.map((port, i) => {
-					const x = xOffset
-					const y = heightOffset + (portHeight * i)
-					nodeContext.setPortPosition(port.id, {
-						x,
-						y,
-					})
 					return (
-						<div
-							className="port"
+						<Port
 							key={port.id as string}
-						>
-							<div className={`portDropZone type-${port.type}`} />
-							{/* <div className="portId">{port.id}</div> */}
-							<div className="portName">{port.name}</div>
-						</div>
+							port={port}
+							index={i}
+						/>
 					)
 				})}
 			</div>
 		)
 	}
+})
+
+interface PortProps {
+	readonly port: ExpPort
+	readonly index: number
+}
+
+const Port = React.memo(function _Port({port, index}: PortProps) {
+	const x = xOffset
+	const y = heightOffset + (portHeight * index)
+	port.node.setPortPosition(port.id, {
+		x,
+		y,
+	})
+	const enabled = useObjectChangedEvent(port.enabled)
+	return (
+		<div
+			className={`port enabled-${enabled}`}
+			key={port.id as string}
+		>
+			<div className={`portDropZone type-${port.type}`} />
+			{/* <div className="portId">{port.id}</div> */}
+			<div className="portName">{port.name}</div>
+		</div>
+	)
 })

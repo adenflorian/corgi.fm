@@ -19,6 +19,8 @@ export class DistortionExpNode extends CorgiNode {
 
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
 		super(corgiNodeArgs, {
+			name: 'Downsample',
+			color: CssColor.orange,
 			requiresAudioWorklet: true,
 		})
 
@@ -39,8 +41,6 @@ export class DistortionExpNode extends CorgiNode {
 		this._ports = arrayToESIdKeyMap([inputPort, drivePort, outputPort])
 	}
 
-	public getColor = () => CssColor.orange
-	public getName = () => 'Downsample'
 	public render = () => this.getDebugView()
 
 	protected _enable = () => this._dryWetChain.wetOnly()

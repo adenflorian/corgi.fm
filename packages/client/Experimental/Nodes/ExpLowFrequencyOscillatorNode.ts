@@ -23,7 +23,7 @@ export class LowFrequencyOscillatorExpNode extends CorgiNode {
 	private readonly _type: ExpCustomEnumParam<OscillatorType>
 
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
-		super(corgiNodeArgs)
+		super(corgiNodeArgs, {name: 'Low Frequency Oscillator', color: CssColor.purple})
 
 		this._type = new ExpCustomEnumParam<OscillatorType>('type', 'sine', oscillatorTypes)
 		this._type.onChange.subscribe(this.onTypeChange)
@@ -46,8 +46,6 @@ export class LowFrequencyOscillatorExpNode extends CorgiNode {
 		this._ports = arrayToESIdKeyMap([frequencyPort, detunePort, outputPort])
 	}
 
-	public getColor = () => CssColor.purple
-	public getName = () => 'Low Frequency Oscillator'
 	public render = () => this.getDebugView()
 
 	protected _enable = () => this._outputChain.enable()

@@ -15,7 +15,7 @@ export class MidiPitchNode extends CorgiNode {
 	private readonly _pitch: ExpCustomNumberParam
 
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
-		super(corgiNodeArgs)
+		super(corgiNodeArgs, {name: 'Midi Pitch', color: CssColor.yellow})
 
 		const midiInputPort = new ExpMidiInputPort('input', 'input', this, this._onMidiMessage)
 		this._midiOutputPort = new ExpMidiOutputPort('output', 'output', this)
@@ -25,8 +25,6 @@ export class MidiPitchNode extends CorgiNode {
 		this._customNumberParams = arrayToESIdKeyMap([this._pitch])
 	}
 
-	public getColor = () => CssColor.yellow
-	public getName = () => 'Midi Pitch'
 	public render = () => this.getDebugView()
 
 	protected _enable() {}

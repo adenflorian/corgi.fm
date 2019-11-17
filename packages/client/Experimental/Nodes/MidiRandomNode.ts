@@ -15,7 +15,7 @@ export class MidiRandomNode extends CorgiNode {
 	private readonly _chance: ExpCustomNumberParam
 
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
-		super(corgiNodeArgs)
+		super(corgiNodeArgs, {name: 'Midi Random', color: CssColor.yellow})
 
 		const midiInputPort = new ExpMidiInputPort('input', 'input', this, this._onMidiMessage)
 		this._midiOutputPort = new ExpMidiOutputPort('output', 'output', this)
@@ -25,8 +25,6 @@ export class MidiRandomNode extends CorgiNode {
 		this._customNumberParams = arrayToESIdKeyMap([this._chance])
 	}
 
-	public getColor = () => CssColor.yellow
-	public getName = () => 'Midi Random'
 	public render = () => this.getDebugView()
 
 	protected _enable() {}

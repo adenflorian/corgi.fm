@@ -17,7 +17,7 @@ export class ExpOscilloscopeNode extends CorgiNode {
 	private readonly _newSampleEvent = new CorgiNumberChangedEvent(0)
 
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
-		super(corgiNodeArgs)
+		super(corgiNodeArgs, {name: 'Oscilloscope', color: CssColor.blue})
 
 		this._analyser = new CorgiAnalyserSPNode(corgiNodeArgs.audioContext, this._onAnalyserUpdate, true)
 
@@ -32,9 +32,6 @@ export class ExpOscilloscopeNode extends CorgiNode {
 
 		this._analyser.requestUpdate()
 	}
-
-	public getColor = () => CssColor.blue
-	public getName = () => 'Oscilloscope'
 
 	public render() {
 		return this.getDebugView(
