@@ -97,13 +97,13 @@ export function createCorgiApiMiddleware(
 			.then(async response => {
 				if (response.status === 200) {
 					return response.json()
-				} else if (response.status === 404) {
+				} else if (response.status === 204) {
 					if (localClient) {
 						// Try to update user if they don't already exist
 						return _putUser(uid, makeUserFromClient(localClient))
 							.then(async () => getUserByUid(uid))
 					} else {
-						throw new Error(`[getUserByUid] still a 404 after putting user`)
+						throw new Error(`[getUserByUid] still a 204 after putting user`)
 					}
 				} else {
 					throw new Error(`[getUserByUid] unexpected status ${response.status}`)

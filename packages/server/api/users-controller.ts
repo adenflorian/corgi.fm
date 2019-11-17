@@ -58,10 +58,7 @@ export function getUsersController(serverStore: ServerStore, dbStore: DBStore) {
 
 		if (user === null) {
 			return {
-				status: 404,
-				body: {
-					message: `userNotFound`,
-				},
+				status: 204,
 			}
 		} else {
 			return {

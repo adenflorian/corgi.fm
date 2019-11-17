@@ -62,9 +62,7 @@ export function getUserApiTests(
 			path(uidA, [
 				get({
 					name: 'user not in DB',
-					status: 404,
-					contentType: ContentTypes.ApplicationJson,
-					resBody: userNotFound,
+					status: 204,
 				}),
 			]),
 			path(uidA, [
