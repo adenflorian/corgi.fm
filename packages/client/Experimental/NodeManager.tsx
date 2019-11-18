@@ -442,8 +442,7 @@ function sortNodesWithParentsFirst(nodes: immutable.Map<Id, ExpNodeState>): read
 			return
 		} else {
 			const parent = nodes.find(x => x.id === node.groupId)
-			if (!parent) throw new Error('expected a parent:' + JSON.stringify({parent, nodes, node}))
-			sortNode(parent)
+			if (parent) sortNode(parent)
 			return sortedNodeIds.push(node)
 		}
 	}
