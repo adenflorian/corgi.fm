@@ -73,6 +73,7 @@ a graph can be a handful of nodes that have no connections between them
 - [√] groups
 - [ ] presets
 	- [ ] single node presets
+		- [√] add new node from preset
 	- [ ] graph presets
 		- [ ] group presets
 		- [ ] room saves

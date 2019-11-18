@@ -1,128 +1,135 @@
-import React, {Fragment, MouseEvent} from 'react'
-import {useDispatch} from 'react-redux'
-import {MenuItem} from 'react-contextmenu'
+import React, {Fragment, MouseEvent, useMemo, useState} from 'react'
+import {useDispatch, useStore} from 'react-redux'
+import {MenuItem, SubMenu, connectMenu, ContextMenu} from 'react-contextmenu'
 import {Set} from 'immutable'
 import {
 	expPositionActions, makeExpPosition, expNodesActions,
-	makeExpNodeState, ExpNodeState, ExpPosition, expNodeTypes, expLocalActions,
+	makeExpNodeState, ExpNodeState, ExpPosition, expNodeTypes,
+	expLocalActions, ExpNodeType, IClientAppState,
+	selectPresetsForExpNodeTypeSlow, ExpGraph, selectLocalClientId, selectRoomMember,
 } from '@corgifm/common/redux'
 import {Dispatch} from 'redux'
 import {serverClientId} from '@corgifm/common/common-constants'
 import {toGraphSpace} from '../SimpleGraph/Zoom'
+import {logger} from '../client-logger'
+import {expBackgroundMenuId} from '../client-constants'
+import {useBoolean} from '../react-hooks'
 import {TopMenuBar} from './TopMenuBar'
 
-interface ExpBackgroundMenuItemsProps {
-	localClientId: Id
-	localClientKeyboardCount: number
-	localClientColor: string
+interface ExpBackgroundMenuProps {
+	trigger: {}
 }
 
-export const ExpBackgroundMenuItems = React.memo(
-	function _MenuItems(
-		{localClientId, localClientKeyboardCount, localClientColor}:
-		ExpBackgroundMenuItemsProps,
-	) {
-		const dispatch = useDispatch()
+function ExpBackgroundMenu({trigger}: ExpBackgroundMenuProps) {
+	const [position, setPosition] = useState({x: 0, y: 0})
+	const [visible, show, hide] = useBoolean(false)
+	return (
+		<ContextMenu
+			id={expBackgroundMenuId}
+			onShow={e => {
+				setPosition(toGraphSpace(e.detail.position.x || 0, e.detail.position.y || 0))
+				show()
+			}}
+			onHide={hide}
+		>
+			{visible && <ExpBackgroundMenuItems position={position} />}
+		</ContextMenu>
+	)
+}
 
+export const ConnectedExpBackgroundMenu = connectMenu(expBackgroundMenuId)(ExpBackgroundMenu)
+
+interface ExpBackgroundMenuItemsProps {
+	readonly position: Point
+}
+
+const hoverDelayMs = 1
+
+export const ExpBackgroundMenuItems = React.memo(
+	function _MenuItems({position}: ExpBackgroundMenuItemsProps) {
 		return (
 			<Fragment>
 				<TopMenuBar label="background menu" />
-				<AddExpNodeMenuItems />
+				{expNodeTypes
+					.filter(x => x !== 'groupInput' && x !== 'groupOutput')
+					.map(nodeType => {
+						return (
+							<AddNodeMenuItem
+								key={nodeType}
+								nodeType={nodeType}
+								position={position}
+							/>
+						)
+					})}
 			</Fragment>
 		)
-
-		function AddExpNodeMenuItems() {
-			return (
-				<Fragment>
-					{expNodeTypes
-						.filter(x => x !== 'groupInput' && x !== 'groupOutput')
-						// .filter(
-						// 	x => localClientKeyboardCount === 0
-						// 		? true
-						// 		: x.type !== ConnectionNodeType.virtualKeyboard)
-						.map(type => {
-							return (
-								<AddNodeMenuItem
-									key={type}
-									type={type}
-								/>
-							)
-						})}
-				</Fragment>
-			)
-		}
-
-		function AddNodeMenuItem({type}: {type: ExpPosition['targetType']}) {
-			return (
-				<MenuItem
-					onClick={e => {
-						// if (nodeInfo.type === ConnectionNodeType.virtualKeyboard) {
-						// 	if (localClientKeyboardCount !== 0) return
-
-						// 	const newState = new VirtualKeyboardState()
-						// 	dispatch(nodeInfo.addNodeActionCreator(newState))
-						// 	createPosition(dispatch, newState, e, localClientId, localClientColor)
-						// } else {
-						// Be careful when changing the id to be local client
-						// The server currently deletes most things that a user owns
-						// when they disconnect
-
-						if (type === 'group') {
-							dispatch(expLocalActions.createGroup(Set()))
-						} else {
-							const newExpNode = makeExpNodeState({type})
-							dispatch(expNodesActions.add(newExpNode))
-							createPosition(dispatch, newExpNode, e, serverClientId)
-						}
-
-						// if (nodeInfo.autoConnectToClock) {
-						// 	dispatch(connectionsActions.add(new Connection(
-						// 		MASTER_CLOCK_SOURCE_ID,
-						// 		ConnectionNodeType.masterClock,
-						// 		newState.id,
-						// 		newState.type,
-						// 		0,
-						// 		0,
-						// 	)))
-						// }
-						// if (nodeInfo.autoConnectToAudioOutput) {
-						// 	dispatch(connectionsActions.add(new Connection(
-						// 		newState.id,
-						// 		newState.type,
-						// 		MASTER_AUDIO_OUTPUT_TARGET_ID,
-						// 		ConnectionNodeType.audioOutput,
-						// 		0,
-						// 		0,
-						// 	)))
-						// }
-						// }
-					}}
-				>
-					{type}
-				</MenuItem>
-			)
-		}
 	})
+
+interface AddNodeMenuItemProps {
+	readonly position: Point
+	readonly nodeType: ExpNodeType
+}
+
+function AddNodeMenuItem({nodeType, position}: AddNodeMenuItemProps) {
+	const dispatch = useDispatch()
+	const store = useStore<IClientAppState>()
+	return (
+		<SubMenu
+			title={<div>{nodeType}</div>}
+			hoverDelay={hoverDelayMs}
+		>
+			<MenuItem
+				onClick={e => {
+					if (nodeType === 'group') {
+						dispatch(expLocalActions.createGroup(Set()))
+					} else {
+						const state = store.getState()
+						const localClientId = selectLocalClientId(state)
+						const currentNodeGroupId = selectRoomMember(state.room, localClientId).groupNodeId
+						const newExpNode = makeExpNodeState({type: nodeType, groupId: currentNodeGroupId})
+						dispatch(expNodesActions.add(newExpNode))
+						createPosition(dispatch, newExpNode, position, serverClientId)
+					}
+				}}
+			>
+				Default Preset
+			</MenuItem>
+			<AddNodeSubMenuItems nodeType={nodeType} position={position} />
+		</SubMenu>
+	)
+}
+
+const AddNodeSubMenuItems = React.memo(function _AddNodeSubMenuItems({nodeType, position}: {nodeType: ExpNodeType, position: Point}) {
+	const store = useStore<IClientAppState>()
+	const dispatch = useDispatch()
+	const presets = useMemo(() => {
+		return selectPresetsForExpNodeTypeSlow(store.getState().room, nodeType)
+	}, [nodeType, store])
+	const onClick = (preset: ExpGraph) =>
+		(e: React.TouchEvent<HTMLDivElement> | React.MouseEvent<HTMLDivElement>) => {
+			dispatch(expLocalActions.createNodeFromPreset(preset.meta.id, position))
+		}
+	return (
+		<Fragment>
+			{presets.map(preset =>
+				<MenuItem key={preset.meta.id as string} onClick={onClick(preset)}>
+					{preset.meta.name}
+				</MenuItem>
+			).toList()}
+		</Fragment>
+	)
+})
 
 function createPosition(
 	dispatch: Dispatch, state: ExpNodeState,
-	e: React.TouchEvent<HTMLDivElement> | React.MouseEvent<HTMLDivElement>,
-	ownerId: Id,
+	position: Point, ownerId: Id,
 ) {
 	dispatch(expPositionActions.add(
 		makeExpPosition({
 			id: state.id,
 			targetType: state.type,
 			ownerId,
-			...getPositionFromMouseOrTouchEvent(e),
+			...position,
 		}),
 	))
-}
-
-function getPositionFromMouseOrTouchEvent(
-	e: React.TouchEvent<HTMLDivElement> | React.MouseEvent<HTMLDivElement>
-): Point {
-	const x = (e as MouseEvent).clientX || 0
-	const y = (e as MouseEvent).clientY || 0
-	return toGraphSpace(x, y)
 }

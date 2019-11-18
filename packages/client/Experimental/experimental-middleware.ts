@@ -15,6 +15,7 @@ import {
 	expGraphsActions, makeExpGraphMeta, ExpNodeState,
 	makeInitialExpConnectionsState, makeExpPositionsState,
 	selectLocalClient, selectMainExpGraph, ExpGraphsAction,
+	chatSystemMessage, selectPreset, loadPresetIntoNodeState,
 } from '@corgifm/common/redux'
 import {serverClientId} from '@corgifm/common/common-constants'
 import {SingletonContextImpl} from '../SingletonContext'
@@ -140,15 +141,46 @@ function after(
 		case 'EXP_CREATE_PRESET': {
 			const node = selectExpNode(afterState.room, action.nodeId)
 			const localClient = selectLocalClient(afterState)
+			const presetName = node.type + '-' + node.id.substr(0, 4) + '-' + localClient.name
+
 			dispatch(expGraphsActions.add({
 				meta: makeExpGraphMeta({
-					name: node.type + '-' + node.id.substr(0, 4) + '-' + localClient.name,
+					name: presetName,
 					ownerId: localClient.id,
 				}),
 				nodes: immutable.Map<Id, ExpNodeState>([[node.id, node]]),
 				connections: makeInitialExpConnectionsState(),
 				positions: makeExpPositionsState(),
 			}))
+			dispatch(chatSystemMessage(`Created preset: ${presetName}`, 'success'))
+			return
+		}
+
+		case 'EXP_CREATE_NODE_FROM_PRESET': {
+			const preset = selectPreset(afterState.room, action.presetId)
+			if (!preset) return logger.error('[EXP_CREATE_NODE_FROM_PRESET] no preset found', {action})
+			if (preset.nodes.count() !== 1) return logger.error('[EXP_CREATE_NODE_FROM_PRESET] invalid node preset, not exactly 1 node', {action, preset, count: preset.nodes.count()})
+
+			const presetNode = preset.nodes.first(null)
+			if (!presetNode) {
+				logger.error('[EXP_CREATE_NODE_FROM_PRESET] missing preset node', {presetNode, preset, nodes: preset.nodes.toJS()})
+				return dispatch(chatSystemMessage('Something went wrong while trying to create a node from a preset', 'error'))
+			}
+
+			const localClientId = selectLocalClientId(afterState)
+			const currentNodeGroupId = selectRoomMember(afterState.room, localClientId).groupNodeId
+			const newNode = loadPresetIntoNodeState(presetNode, makeExpNodeState({
+				type: presetNode.type,
+				groupId: currentNodeGroupId,
+			}))
+			dispatch(expNodesActions.add(newNode))
+			dispatch(expPositionActions.add(
+				makeExpPosition({
+					id: newNode.id,
+					ownerId: serverClientId,
+					targetType: newNode.type,
+					...action.position,
+				})))
 			return
 		}
 

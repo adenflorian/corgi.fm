@@ -160,12 +160,12 @@ export const expNodesReducer = (state = initialState, action: ExpNodesAction): E
 				mutable.update(nodeId, node => node.set('groupId', action.groupId))
 			})
 		})
-		case 'EXP_NODE_LOAD_PRESET': return state.update(action.nodeId, x => _loadPresetIntoNodeState(action.nodePreset, x))
+		case 'EXP_NODE_LOAD_PRESET': return state.update(action.nodeId, x => loadPresetIntoNodeState(action.nodePreset, x))
 		default: return state
 	}
 }
 
-function _loadPresetIntoNodeState(preset: ExpNodeState, node: ExpNodeState): ExpNodeState {
+export function loadPresetIntoNodeState(preset: ExpNodeState, node: ExpNodeState): ExpNodeState {
 	const foo: typeof defaultExpNodeState = {
 		// These stay the same
 		id: node.id,

@@ -3,13 +3,13 @@ import {ContextMenu} from 'react-contextmenu'
 import {
 	selectLocalClient, shamuConnect, selectVirtualKeyboardCountByOwner,
 } from '@corgifm/common/redux'
-import {backgroundMenuId, expBackgroundMenuId} from '../client-constants'
+import {backgroundMenuId} from '../client-constants'
 import './ContextMenu.less'
 import {ConnectedNodeMenu} from './NodeMenu'
 import {BackgroundMenuItems} from './BackgroundMenu'
 import {SamplePadMenu} from './SamplePadMenu'
 import {ConnectedExpNodeMenu} from './ExpNodeMenu'
-import {ExpBackgroundMenuItems} from './ExpBackgroundMenu'
+import {ConnectedExpBackgroundMenu} from './ExpBackgroundMenu'
 
 interface ReduxProps {
 	localClientId: Id
@@ -31,13 +31,7 @@ export function ContextMenuContainer(
 					localClientColor={localClientColor}
 				/>
 			</ContextMenu>
-			<ContextMenu id={expBackgroundMenuId}>
-				<ExpBackgroundMenuItems
-					localClientId={localClientId}
-					localClientKeyboardCount={localClientKeyboardCount}
-					localClientColor={localClientColor}
-				/>
-			</ContextMenu>
+			<ConnectedExpBackgroundMenu />
 			<ConnectedNodeMenu />
 			<ConnectedExpNodeMenu />
 			<SamplePadMenu />
