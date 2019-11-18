@@ -25,6 +25,12 @@ export const expPositionActions = {
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	} as const),
+	addMany: (positions: ExpPositions) => ({
+		type: 'EXP_ADD_MANY_POSITIONS' as const,
+		positions,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	} as const),
 	delete: (positionIds: Id[]) => ({
 		type: 'EXP_DELETE_POSITIONS' as const,
 		positionIds,
@@ -125,6 +131,13 @@ const positionsSpecificReducer: Reducer<ExpPositions, ExpPositionAction> =
 				action.position.id,
 				makeExpPosition(action.position).set('zIndex', getNewZIndex(positions, 0)),
 			))
+			case 'EXP_ADD_MANY_POSITIONS': {
+				const highest = selectExpHighestZIndexOfAllPositionsLocal(positions)
+				let i = 1
+				return sortPositions(positions.merge(
+					Map(action.positions).map(makeExpPosition).map(x => x.set('zIndex', highest + i++))
+				))
+			}
 			case 'EXP_DELETE_POSITIONS': return sortPositions(positions.deleteAll(action.positionIds))
 			case 'EXP_DELETE_ALL_POSITIONS': return positions.clear()
 			case 'EXP_REPLACE_POSITIONS': return sortPositions(Map<string, ExpPosition>().merge(action.positions).map(x => makeExpPosition(x)))

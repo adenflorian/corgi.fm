@@ -46,7 +46,8 @@ import {
 	selectExpPosition,
 	makeExpNodeState, makeExpPosition, ExpConnection,
 	selectExpPositionExtremes, selectExpNodesState, WithConnections,
-	selectShamuMetaState, selectExpAllConnections,
+	selectShamuMetaState, selectExpAllConnections, ExpPosition, ExpNodeState,
+	ExpConnections, ExpNodesState, ExpPositions,
 } from '@corgifm/common/redux'
 import {pointersActions} from '@corgifm/common/redux/pointers-redux'
 import {makeMidiClipEvent, preciseModulus, preciseSubtract} from '@corgifm/common/midi-types'
@@ -656,28 +657,59 @@ export function createLocalMiddleware(
 	}
 }
 
+interface CloneNodeResult {
+	readonly clone: ExpNodeState
+	readonly clonePosition: ExpPosition
+}
+
+interface CloneChildrenResult {
+	readonly clones: ExpNodesState
+	readonly clonesTop: ExpNodesState
+	readonly clonePositions: ExpPositions
+	readonly cloneConnections: ExpConnections
+}
+
 function cloneExpNodes(dispatch: Dispatch, state: IClientAppState, nodeIds: Immutable.Set<Id>, withConnections: WithConnections) {
+	const foo = _cloneExpNodes(state, nodeIds, withConnections)
+	if (!foo) return
+	dispatch(expNodesActions.addMany(foo.clones))
+	dispatch(expPositionActions.addMany(foo.clonePositions))
+	if (foo.cloneConnections.count() > 0) dispatch(expConnectionsActions.addMultiple(foo.cloneConnections.toList()))
+	dispatch(shamuMetaActions.setSelectedNodes(foo.clonesTop.keySeq().toSet()))
+}
+
+function _cloneExpNodes(state: IClientAppState, nodeIds: Immutable.Set<Id>, withConnections: WithConnections): CloneChildrenResult | null {
 	const nodes = selectExpNodesState(state.room).filter(x => nodeIds.includes(x.id) && x.type !== 'groupInput' && x.type !== 'groupOutput')
 	const firstNode = nodes.first(null)
-	if (!firstNode) return
+	if (!firstNode) return null
 	const topGroupId = firstNode.groupId
 	if (nodes.every(x => x.groupId === topGroupId) === false) {
 		logger.warn('attempted to clone node selection across multiple groups', {nodes: nodes.toJS()})
-		return
+		return null
 	}
 	const filteredNodeIds = nodes.map(x => x.id)
 
 	let nodeCloneMap = Immutable.Map<Id, Id>()
+	let clones: ExpNodesState = Immutable.Map()
+	let clonesTop: ExpNodesState = Immutable.Map()
+	let clonePositions: ExpPositions = Immutable.Map()
+	let cloneConnections: ExpConnections = Immutable.Map()
 
 	nodes.forEach(node => {
-		const clone = _cloneExpNode(dispatch, state, node.id, withConnections, topGroupId)
+		const {clone, clonePosition} = _cloneExpNode(state, node.id, withConnections, topGroupId)
 		nodeCloneMap = nodeCloneMap.set(node.id, clone.id)
-		_cloneExpChildren(dispatch, state, node.id, clone.id)
+		clones = clones.set(clone.id, clone)
+		clonesTop = clonesTop.set(clone.id, clone)
+		clonePositions = clonePositions.set(clonePosition.id, clonePosition)
+		const childrenResult = _cloneExpChildren(state, node.id, clone.id)
+		clones = clones.merge(childrenResult.clones)
+		clonePositions = clonePositions.merge(childrenResult.clonePositions)
+		cloneConnections = cloneConnections.merge(childrenResult.cloneConnections)
 	})
 
 	if (withConnections === 'all') {
 		const allConnections = selectExpAllConnections(state.room)
-		const newConnections = allConnections
+		cloneConnections = cloneConnections.merge(allConnections
 			.filter(x => filteredNodeIds.includes(x.sourceId) || filteredNodeIds.includes(x.targetId))
 			.map((x): ExpConnection => ({
 				...x,
@@ -685,31 +717,36 @@ function cloneExpNodes(dispatch: Dispatch, state: IClientAppState, nodeIds: Immu
 				sourceId: nodeCloneMap.get(x.sourceId, x.sourceId),
 				targetId: nodeCloneMap.get(x.targetId, x.targetId),
 				groupId: topGroupId,
-			}))
-			.toList()
-
-		if (newConnections.count() > 0) dispatch(expConnectionsActions.addMultiple(newConnections))
+			})))
 	}
 
-	dispatch(shamuMetaActions.setSelectedNodes(nodeCloneMap.valueSeq().toSet()))
+	return {clones, clonesTop, clonePositions, cloneConnections}
 }
 
-function _cloneExpChildren(dispatch: Dispatch, state: IClientAppState, oldParentNodeId: Id, newCloneParentId: GroupId) {
+function _cloneExpChildren(state: IClientAppState, oldParentNodeId: Id, newCloneParentId: GroupId): CloneChildrenResult {
 	const allExpNodes = selectExpNodesState(state.room)
 
 	const childrenToClone = allExpNodes.filter(x => x.groupId === oldParentNodeId)
 	const childrenIds = childrenToClone.map(x => x.id)
 
 	let nodeCloneMap = Immutable.Map<Id, Id>()
+	let clones: ExpNodesState = Immutable.Map()
+	let clonePositions: ExpPositions = Immutable.Map()
+	let cloneConnections: ExpConnections = Immutable.Map()
 
 	childrenToClone.forEach(node => {
-		const clone = _cloneExpNode(dispatch, state, node.id, 'all', newCloneParentId)
+		const {clone, clonePosition} = _cloneExpNode(state, node.id, 'all', newCloneParentId)
 		nodeCloneMap = nodeCloneMap.set(node.id, clone.id)
-		_cloneExpChildren(dispatch, state, node.id, clone.id)
+		clones = clones.set(clone.id, clone)
+		clonePositions = clonePositions.set(clonePosition.id, clonePosition)
+		const childrenResult = _cloneExpChildren(state, node.id, clone.id)
+		clones = clones.merge(childrenResult.clones)
+		clonePositions = clonePositions.merge(childrenResult.clonePositions)
+		cloneConnections = cloneConnections.merge(childrenResult.cloneConnections)
 	})
 
 	const allConnections = selectExpAllConnections(state.room)
-	const newConnections = allConnections
+	cloneConnections = cloneConnections.merge(allConnections
 		.filter(x => childrenIds.includes(x.sourceId) || childrenIds.includes(x.targetId))
 		.map((x): ExpConnection => ({
 			...x,
@@ -717,20 +754,17 @@ function _cloneExpChildren(dispatch: Dispatch, state: IClientAppState, oldParent
 			sourceId: nodeCloneMap.get(x.sourceId, x.sourceId),
 			targetId: nodeCloneMap.get(x.targetId, x.targetId),
 			groupId: newCloneParentId,
-		}))
-		.toList()
+		})))
 
-	if (newConnections.count() > 0) dispatch(expConnectionsActions.addMultiple(newConnections))
+	return {clones, clonePositions, cloneConnections, clonesTop: Immutable.Map()}
 }
 
-function _cloneExpNode(dispatch: Dispatch, state: IClientAppState, nodeId: Id, withConnections: WithConnections, groupId: GroupId) {
+function _cloneExpNode(state: IClientAppState, nodeId: Id, withConnections: WithConnections, groupId: GroupId): CloneNodeResult {
 	const stateToClone = selectExpNode(state.room, nodeId)
 
 	const clone = stateToClone
 		.set('id', createNodeId())
 		.set('groupId', groupId)
-
-	dispatch(expNodesActions.add(clone))
 
 	const positionToClone = selectExpPosition(state.room, nodeId)
 
@@ -739,9 +773,7 @@ function _cloneExpNode(dispatch: Dispatch, state: IClientAppState, nodeId: Id, w
 		.set('x', positionToClone.x + 32)
 		.set('y', positionToClone.y)
 
-	dispatch(expPositionActions.add(clonePosition))
-
-	return clone
+	return {clone, clonePosition}
 }
 
 function getChildExpNodeIds(nodeId: Id, state: IClientAppState): Immutable.Set<Id> {

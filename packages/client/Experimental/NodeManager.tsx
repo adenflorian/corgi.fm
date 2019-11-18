@@ -172,9 +172,7 @@ export class NodeManager {
 	}
 
 	public readonly addNodes = (newNodes: immutable.Map<Id, ExpNodeState>) => {
-		// Add group nodes first, because child nodes need the group node to exist before creating
-		newNodes.filter(x => x.type === 'group').forEach(this.addNode)
-		newNodes.filter(x => x.type !== 'group').forEach(this.addNode)
+		sortNodesWithParentsFirst(newNodes).forEach(this.addNode)
 	}
 
 	public readonly addNode = (nodeState: ExpNodeState) => {
@@ -426,6 +424,28 @@ export class NodeManager {
 		this._nodes.forEach(node => node.dispose())
 		this._nodes.clear()
 		this._connections.clear()
+	}
+}
+
+function sortNodesWithParentsFirst(nodes: immutable.Map<Id, ExpNodeState>): readonly ExpNodeState[] {
+	const sortedNodeIds: ExpNodeState[] = []
+	const firstNode = nodes.first(null)
+	if (!firstNode) return sortedNodeIds
+	nodes.forEach(sortNode)
+
+	return sortedNodeIds
+
+	function sortNode(node: ExpNodeState) {
+		if (node.groupId === 'top') {
+			return sortedNodeIds.push(node)
+		} else if (sortedNodeIds.some(x => x.id === node.id)) {
+			return
+		} else {
+			const parent = nodes.find(x => x.id === node.groupId)
+			if (!parent) throw new Error('expected a parent:' + JSON.stringify({parent, nodes, node}))
+			sortNode(parent)
+			return sortedNodeIds.push(node)
+		}
 	}
 }
 

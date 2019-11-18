@@ -15,7 +15,7 @@ import {
 	expGraphsActions, makeExpGraphMeta, ExpNodeState,
 	makeInitialExpConnectionsState, makeExpPositionsState,
 	selectLocalClient, selectMainExpGraph, ExpGraphsAction,
-	chatSystemMessage, selectPreset, loadPresetIntoNodeState,
+	chatSystemMessage, selectPreset, loadPresetIntoNodeState, ExpGraph,
 } from '@corgifm/common/redux'
 import {serverClientId} from '@corgifm/common/common-constants'
 import {SingletonContextImpl} from '../SingletonContext'
@@ -143,7 +143,7 @@ function after(
 			const localClient = selectLocalClient(afterState)
 			const presetName = node.type + '-' + node.id.substr(0, 4) + '-' + localClient.name
 
-			dispatch(expGraphsActions.add({
+			const graph: ExpGraph = {
 				meta: makeExpGraphMeta({
 					name: presetName,
 					ownerId: localClient.id,
@@ -151,7 +151,9 @@ function after(
 				nodes: immutable.Map<Id, ExpNodeState>([[node.id, node]]),
 				connections: makeInitialExpConnectionsState(),
 				positions: makeExpPositionsState(),
-			}))
+			}
+
+			dispatch(expGraphsActions.add(graph))
 			dispatch(chatSystemMessage(`Created preset: ${presetName}`, 'success'))
 			return
 		}
@@ -440,6 +442,10 @@ function bar(
 
 		case 'EXP_NODE_ADD':
 			return nodeManager.addNode(selectExpNode(state.room, action.newNode.id))
+
+		case 'EXP_NODE_ADD_MANY':
+			return nodeManager.addNodes(selectExpNodesState(state.room)
+				.filter(x => action.newNodes.keySeq().includes(x.id)))
 
 		case 'EXP_NODE_DELETE':
 			return nodeManager.deleteNode(action.nodeId)

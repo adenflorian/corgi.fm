@@ -18,6 +18,13 @@ export const expNodesActions = {
 		BROADCASTER_ACTION,
 		SERVER_ACTION,
 	} as const),
+	addMany: (newNodes: Map<Id, ExpNodeState>) => ({
+		type: 'EXP_NODE_ADD_MANY' as const,
+		isExpNodeAction: true,
+		newNodes,
+		BROADCASTER_ACTION,
+		SERVER_ACTION,
+	} as const),
 	delete: (nodeId: Id) => ({
 		type: 'EXP_NODE_DELETE' as const,
 		isExpNodeAction: true,
@@ -144,6 +151,7 @@ export type ExpNodesState = typeof initialState
 export const expNodesReducer = (state = initialState, action: ExpNodesAction): ExpNodesState => {
 	switch (action.type) {
 		case 'EXP_NODE_ADD': return state.set(action.newNode.id, makeExpNodeState(action.newNode))
+		case 'EXP_NODE_ADD_MANY': return state.merge(Map(action.newNodes).map(makeExpNodeState))
 		case 'EXP_NODE_DELETE': return state.delete(action.nodeId)
 		case 'EXP_NODE_DELETE_MANY': return state.deleteAll(action.nodeIds)
 		case 'EXP_NODE_REPLACE_ALL': return state.clear().merge(action.state).map(x => makeExpNodeState(x))
