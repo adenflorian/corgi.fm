@@ -1,4 +1,5 @@
 import React, {Fragment} from 'react'
+import {hot} from 'react-hot-loader'
 import {ContextMenu} from 'react-contextmenu'
 import {
 	selectLocalClient, shamuConnect, selectVirtualKeyboardCountByOwner,
@@ -19,7 +20,7 @@ interface ReduxProps {
 
 type AllProps = ReduxProps
 
-export function ContextMenuContainer(
+export const ContextMenuContainer = hot(module)(function _ContextMenuContainer(
 	{localClientId, localClientKeyboardCount, localClientColor}: AllProps
 ) {
 	return (
@@ -37,7 +38,7 @@ export function ContextMenuContainer(
 			<SamplePadMenu />
 		</Fragment>
 	)
-}
+})
 
 export const ConnectedContextMenuContainer = shamuConnect(
 	(state): ReduxProps => {

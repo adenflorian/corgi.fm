@@ -160,7 +160,7 @@ function LoadPresetExpNodeMenuItem({nodeType}: LoadPresetExpNodeMenuItemProps) {
 			hoverDelay={hoverDelayMs}
 		>
 			{presets.count() === 0
-				? <MenuItem>{`No presets for "${nodeType}"`}</MenuItem>
+				? <MenuItem preventClose={true}>{`No presets for "${nodeType}"`}</MenuItem>
 				: presets.map(preset => {
 					return (
 						<MenuItem key={preset.meta.id as string} onClick={onClick(preset)}>

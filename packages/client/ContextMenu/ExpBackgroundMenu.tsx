@@ -1,4 +1,4 @@
-import React, {Fragment, MouseEvent, useMemo, useState} from 'react'
+import React, {Fragment, MouseEvent, useMemo, useState, useCallback} from 'react'
 import {useDispatch, useStore} from 'react-redux'
 import {MenuItem, SubMenu, connectMenu, ContextMenu} from 'react-contextmenu'
 import {Set} from 'immutable'
@@ -73,25 +73,25 @@ interface AddNodeMenuItemProps {
 function AddNodeMenuItem({nodeType, position}: AddNodeMenuItemProps) {
 	const dispatch = useDispatch()
 	const store = useStore<IClientAppState>()
+	const onClick = useCallback(() => {
+		if (nodeType === 'group') {
+			dispatch(expLocalActions.createGroup(Set()))
+		} else {
+			const state = store.getState()
+			const localClientId = selectLocalClientId(state)
+			const currentNodeGroupId = selectRoomMember(state.room, localClientId).groupNodeId
+			const newExpNode = makeExpNodeState({type: nodeType, groupId: currentNodeGroupId})
+			dispatch(expNodesActions.add(newExpNode))
+			createPosition(dispatch, newExpNode, position, serverClientId)
+		}
+	}, [dispatch, nodeType, position, store])
 	return (
 		<SubMenu
 			title={<div>{nodeType}</div>}
 			hoverDelay={hoverDelayMs}
+			onClick={onClick}
 		>
-			<MenuItem
-				onClick={e => {
-					if (nodeType === 'group') {
-						dispatch(expLocalActions.createGroup(Set()))
-					} else {
-						const state = store.getState()
-						const localClientId = selectLocalClientId(state)
-						const currentNodeGroupId = selectRoomMember(state.room, localClientId).groupNodeId
-						const newExpNode = makeExpNodeState({type: nodeType, groupId: currentNodeGroupId})
-						dispatch(expNodesActions.add(newExpNode))
-						createPosition(dispatch, newExpNode, position, serverClientId)
-					}
-				}}
-			>
+			<MenuItem onClick={onClick}>
 				Default Preset
 			</MenuItem>
 			<AddNodeSubMenuItems nodeType={nodeType} position={position} />

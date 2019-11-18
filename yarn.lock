@@ -10742,10 +10742,10 @@ rc@^1.2.7:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
-react-contextmenu@^2.11.0:
-  version "2.11.0"
-  resolved "https://registry.yarnpkg.com/react-contextmenu/-/react-contextmenu-2.11.0.tgz#ec57614e6d687ceaec5c0ba97d56a302c9551d17"
-  integrity sha512-vT9QV9p/9h1BSIvmajRVG3KsgjuBnISpEQp0F1QYsUPFMe3VOKV2l7IiD8yrNUyXYZKrWMqI0YKsaBwGSRVgJg==
+react-contextmenu@^2.13.0:
+  version "2.13.0"
+  resolved "https://registry.yarnpkg.com/react-contextmenu/-/react-contextmenu-2.13.0.tgz#dabaea63124e30c85f1b4245c095b7045d013459"
+  integrity sha512-hhFuJX4di0zGV7H7pXPn42U70OZbGpQD+PxcdmKStNT5mebSjI+inhOuFESDmDbqVsN/f99hI5/nw95oXTVRXQ==
   dependencies:
     classnames "^2.2.5"
     object-assign "^4.1.0"
