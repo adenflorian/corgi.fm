@@ -436,10 +436,10 @@ function sortNodesWithParentsFirst(nodes: immutable.Map<Id, ExpNodeState>): read
 	return sortedNodeIds
 
 	function sortNode(node: ExpNodeState) {
-		if (node.groupId === 'top') {
-			return sortedNodeIds.push(node)
-		} else if (sortedNodeIds.some(x => x.id === node.id)) {
+		if (sortedNodeIds.some(x => x.id === node.id)) {
 			return
+		} else if (node.groupId === 'top') {
+			return sortedNodeIds.push(node)
 		} else {
 			const parent = nodes.find(x => x.id === node.groupId)
 			if (parent) sortNode(parent)
