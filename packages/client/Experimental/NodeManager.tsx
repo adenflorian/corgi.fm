@@ -183,7 +183,7 @@ export class NodeManager {
 			audioContext: this._audioContext,
 			preMasterLimiter: this._preMasterLimiter,
 			singletonContext: this._singletonContext,
-			parentGroupNode: this._getGroupNode(nodeState),
+			parentNode: this._getParentNode(nodeState),
 			ports: nodeState.ports,
 		})
 		this._nodes.set(newNode.id, newNode)
@@ -203,22 +203,18 @@ export class NodeManager {
 		node.setEnabled(nodeState.enabled)
 	}
 
-	private readonly _getGroupNode = (nodeState: ExpNodeState): GroupNode | undefined => {
-		const groupNodeId = nodeState.groupId
-		if (groupNodeId === 'top') return undefined
+	private readonly _getParentNode = (nodeState: ExpNodeState): CorgiNode | undefined => {
+		const parentNodeId = nodeState.groupId
+		if (parentNodeId === 'top') return undefined
 
-		const groupNode = this._nodes.get(groupNodeId)
+		const parentNode = this._nodes.get(parentNodeId)
 
-		if (!groupNode) {
-			logger.error('404 group node not found!', {groupNodeId, nodeState})
-			return undefined
-		}
-		if (!(groupNode instanceof GroupNode)) {
-			logger.error('wtf! groupNode not groupNode?!', {groupNodeId, groupNode, nodeState})
+		if (!parentNode) {
+			logger.error('404 parentNode not found!', {parentNodeId, nodeState})
 			return undefined
 		}
 
-		return groupNode
+		return parentNode
 	}
 
 	public readonly deleteNode = (nodeId: Id) => {

@@ -71,6 +71,7 @@ a graph can be a handful of nodes that have no connections between them
 - [√] display knobs for params
 	- [√] audio params
 - [√] groups
+- [ ] PolyGroupNode
 - [ ] presets
 	- [ ] single node presets
 		- [√] add new node from preset
@@ -83,6 +84,7 @@ a graph can be a handful of nodes that have no connections between them
 		- [√] dynamic voice count
 	- [ ] AutomaticPolyphonicMidiConverter
 		- [ ] figure out how to link to a voice graph
+- [ ] disable saving exp rooms
 
 # Envelope
 - inputs

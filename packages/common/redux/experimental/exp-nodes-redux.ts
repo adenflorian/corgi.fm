@@ -137,13 +137,29 @@ export type ExpPortSide = 'input' | 'output'
 
 export type ExpNodeType = typeof expNodeTypes[number]
 
+export const GroupExpNodeType = 'group'
+
+export const PolyphonicGroupExpNodeType = 'polyphonicGroup'
+
+export type GroupType = typeof GroupExpNodeType | typeof PolyphonicGroupExpNodeType
+
 export const expNodeTypes = [
 	'oscillator', 'filter', 'dummy', 'audioOutput', 'gain', 'pan', 'envelope',
 	'sequencer', 'constant', 'lowFrequencyOscillator', 'midiConverter', 'keyboard',
 	'distortion', 'manualPolyphonicMidiConverter', 'automaticPolyphonicMidiConverter',
-	'group', 'groupInput', 'groupOutput',
+	GroupExpNodeType, 'groupInput', 'groupOutput',
+	PolyphonicGroupExpNodeType, 'polyphonicGroupInput', 'polyphonicGroupOutput',
 	'midiRandom', 'midiPitch', 'oscilloscope',
 ] as const
+
+export const groupInOutNodeTypes: ExpNodeType[] = [
+	'groupInput', 'groupOutput',
+	'polyphonicGroupInput', 'polyphonicGroupOutput',
+]
+
+export const isGroupInOutNode = (node: ExpNodeState) => groupInOutNodeTypes.includes(node.type)
+
+export const isGroupInOutNodeType = (type: ExpNodeType) => groupInOutNodeTypes.includes(type)
 
 const initialState = Map<Id, ExpNodeState>()
 

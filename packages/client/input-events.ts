@@ -86,7 +86,7 @@ const keyboardShortcuts: IKeyBoardShortcuts = Map<KeyBoardShortcut>({
 		actionOnKeyDown: (_, state) => {
 			if (selectRoomInfoState(state.room).roomType !== RoomType.Experimental) return
 			const selectedNodes = selectShamuMetaState(state.room).selectedNodes
-			return expLocalActions.createGroup(selectedNodes)
+			return expLocalActions.createGroup(selectedNodes, 'group')
 		},
 		allowRepeat: false,
 		preventDefault: true,

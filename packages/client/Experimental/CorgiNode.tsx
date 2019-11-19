@@ -36,7 +36,7 @@ export interface CorgiNodeArgs {
 	readonly audioContext: AudioContext
 	readonly preMasterLimiter: GainNode
 	readonly singletonContext: SingletonContextImpl
-	readonly parentGroupNode?: GroupNode
+	readonly parentNode?: CorgiNode
 	readonly ports?: ExpPortStates
 }
 
@@ -54,7 +54,7 @@ export abstract class CorgiNode {
 	protected readonly _audioContext: AudioContext
 	protected readonly _preMasterLimiter: GainNode
 	protected readonly _singletonContext: SingletonContextImpl
-	protected readonly _parentGroupNode?: GroupNode
+	protected readonly _parentNode?: CorgiNode
 	protected readonly _audioParams: ExpAudioParams = new Map()
 	protected readonly _ports: ExpPorts = new Map()
 	protected readonly _customNumberParams: ExpCustomNumberParams = new Map()
@@ -74,7 +74,7 @@ export abstract class CorgiNode {
 		this._audioContext = args.audioContext
 		this._preMasterLimiter = args.preMasterLimiter
 		this._singletonContext = args.singletonContext
-		this._parentGroupNode = args.parentGroupNode
+		this._parentNode = args.parentNode
 
 		this.onNameChange = new CorgiStringChangedEvent(options.name)
 		this.defaultColor = options.color

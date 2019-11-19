@@ -1,10 +1,12 @@
 import {ActionType} from 'typesafe-actions'
 import {Set} from 'immutable'
+import {GroupType} from './experimental'
 
 export const expLocalActions = {
-	createGroup: (nodeIds: Set<Id>) => ({
+	createGroup: (nodeIds: Set<Id>, groupType: GroupType) => ({
 		type: 'EXP_CREATE_GROUP',
 		nodeIds,
+		groupType,
 	} as const),
 	createPreset: (nodeId: Id) => ({
 		type: 'EXP_CREATE_PRESET',

@@ -116,7 +116,7 @@ export function SimpleGraphNodeExp({children}: Props) {
 	const localClientId = useLocalClientId()
 
 	const onHeaderDoubleClick = useCallback(() => {
-		if (nodeContext.type === 'group') {
+		if (nodeContext.type === 'group' || nodeContext.type === 'polyphonicGroup') {
 			dispatch(roomMemberActions.setNodeGroup(localClientId, nodeContext.id))
 		}
 	}, [dispatch, localClientId, nodeContext.id, nodeContext.type])

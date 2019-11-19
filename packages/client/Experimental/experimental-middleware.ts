@@ -15,11 +15,11 @@ import {
 	expGraphsActions, makeExpGraphMeta, ExpNodeState,
 	makeExpPositionsState,
 	selectLocalClient, selectMainExpGraph, ExpGraphsAction,
-	chatSystemMessage, selectPreset, loadPresetIntoNodeState, ExpGraph,
+	chatSystemMessage, selectPreset, ExpGraph,
 	ExpNodesState, ExpPositions, ExpConnections,
 	selectShamuMetaState, ExpPosition, WithConnections,
 	shamuMetaActions, makeExpConnectionsState, defaultExpPositionRecord,
-	defaultExpNodeRecord,
+	defaultExpNodeRecord, isGroupInOutNode, GroupType,
 } from '@corgifm/common/redux'
 import {serverClientId, GroupId} from '@corgifm/common/common-constants'
 import {createNodeId} from '@corgifm/common/common-utils'
@@ -140,7 +140,7 @@ function after(
 
 		// Exp Local Actions
 		case 'EXP_CREATE_GROUP': {
-			return createGroup(dispatch, action.nodeIds, afterState, nodeManager)
+			return createGroup(dispatch, action.nodeIds, afterState, nodeManager, action.groupType)
 		}
 
 		case 'EXP_CREATE_PRESET': {
@@ -230,12 +230,13 @@ function createGroup(
 	nodeIds: Immutable.Set<Id>,
 	state: IClientAppState,
 	nodeManager: NodeManager,
+	groupType: GroupType,
 ) {
 	const localClientId = selectLocalClientId(state)
 	const currentNodeGroupId = selectRoomMember(state.room, localClientId).groupNodeId
 
 	const nodes = selectExpNodesState(state.room)
-		.filter(x => nodeIds.includes(x.id) && x.type !== 'groupInput' && x.type !== 'groupOutput' && x.groupId === currentNodeGroupId)
+		.filter(x => nodeIds.includes(x.id) && !isGroupInOutNode(x) && x.groupId === currentNodeGroupId)
 	const actualNodeIds = nodes.map(x => x.id).toSet()
 
 	// create new group node and position
@@ -280,7 +281,7 @@ function createGroup(
 	})
 
 	const groupNode = makeExpNodeState({
-		type: 'group',
+		type: groupType,
 		groupId: currentNodeGroupId,
 		ports: inputPorts.concat(outputPorts),
 	})
@@ -295,7 +296,7 @@ function createGroup(
 		})))
 
 	const groupInputNode = makeExpNodeState({
-		type: 'groupInput',
+		type: groupType === 'group' ? 'groupInput' : 'polyphonicGroupInput',
 		groupId: groupNode.id,
 	})
 	dispatch(expNodesActions.add(groupInputNode))
@@ -309,7 +310,7 @@ function createGroup(
 		})))
 
 	const groupOutputNode = makeExpNodeState({
-		type: 'groupOutput',
+		type: groupType === 'group' ? 'groupOutput' : 'polyphonicGroupOutput',
 		groupId: groupNode.id,
 	})
 	dispatch(expNodesActions.add(groupOutputNode))
@@ -545,7 +546,7 @@ function dispatchCreationOfCloneInfos(dispatch: Dispatch, cloneInfos: CloneChild
 }
 
 function _cloneExpNodes(graph: ExpGraph, nodeIds: Immutable.Set<Id>, withConnections: WithConnections, newTopGroupId: GroupId): CloneChildrenResult | null {
-	const nodes = graph.nodes.filter(x => nodeIds.includes(x.id) && x.type !== 'groupInput' && x.type !== 'groupOutput')
+	const nodes = graph.nodes.filter(x => nodeIds.includes(x.id) && !isGroupInOutNode(x))
 	const firstNode = nodes.first(null)
 	if (!firstNode) return null
 	const filteredNodeIds = nodes.map(x => x.id)

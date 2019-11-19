@@ -7,7 +7,7 @@ import {
 	makeExpNodeState, ExpNodeState, expNodeTypes,
 	expLocalActions, ExpNodeType, IClientAppState,
 	selectPresetsForExpNodeTypeSlow, ExpGraph, selectLocalClientId,
-	selectRoomMember, selectGraphPresetsSlow,
+	selectRoomMember, selectGraphPresetsSlow, isGroupInOutNodeType,
 } from '@corgifm/common/redux'
 import {Dispatch} from 'redux'
 import {serverClientId} from '@corgifm/common/common-constants'
@@ -52,7 +52,7 @@ export const ExpBackgroundMenuItems = React.memo(
 			<Fragment>
 				<TopMenuBar label="background menu" />
 				{expNodeTypes
-					.filter(x => x !== 'groupInput' && x !== 'groupOutput')
+					.filter(x => !isGroupInOutNodeType(x))
 					.map(nodeType => {
 						return (
 							<AddNodeMenuItem
@@ -81,8 +81,8 @@ function AddNodeMenuItem({nodeType, position}: AddNodeMenuItemProps) {
 	const onClick = useCallback(() => {
 		if (nodeType === 'graph') {
 			return logger.error('you should not have come here')
-		} else	if (nodeType === 'group') {
-			dispatch(expLocalActions.createGroup(Set()))
+		} else if (nodeType === 'group' || nodeType === 'polyphonicGroup') {
+			dispatch(expLocalActions.createGroup(Set(), nodeType))
 		} else {
 			const state = store.getState()
 			const localClientId = selectLocalClientId(state)

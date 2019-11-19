@@ -5,7 +5,8 @@ import {List} from 'immutable'
 import {oneLine} from 'common-tags'
 import {
 	localActions, ExpPosition, WithConnections, expLocalActions, ExpNodeType,
-	selectPresetsForExpNodeTypeSlow, ExpGraph, expNodesActions, chatSystemMessage, IClientAppState,
+	selectPresetsForExpNodeTypeSlow, ExpGraph, expNodesActions,
+	chatSystemMessage, IClientAppState, isGroupInOutNodeType,
 } from '@corgifm/common/redux'
 import {expNodeMenuId} from '../client-constants'
 import {logger} from '../client-logger'
@@ -51,10 +52,14 @@ const ExpNodeMenuItems = React.memo(function _MenuItems({nodeType}: ExpNodeMenuI
 	return (
 		<Fragment>
 			<TopMenuBar label="node menu" />
-			{nodeType !== 'groupInput' && nodeType !== 'groupOutput' && <DeleteExpNodeMenuItem />}
-			{nodeType !== 'groupInput' && nodeType !== 'groupOutput' && <CloneExpNodeMenuItem />}
-			{nodeType !== 'groupInput' && nodeType !== 'groupOutput' && <CreatePresetExpNodeMenuItem />}
-			{nodeType !== 'groupInput' && nodeType !== 'groupOutput' && <LoadPresetExpNodeMenuItem nodeType={nodeType} />}
+			{!isGroupInOutNodeType(nodeType) &&
+				<Fragment>
+					<DeleteExpNodeMenuItem />
+					<CloneExpNodeMenuItem />
+					<CreatePresetExpNodeMenuItem />
+					<LoadPresetExpNodeMenuItem nodeType={nodeType} />
+				</Fragment>
+			}
 		</Fragment>
 	)
 
