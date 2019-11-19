@@ -503,16 +503,16 @@ interface CloneChildrenResult {
 }
 
 function cloneExpNodes(dispatch: Dispatch, state: IClientAppState, nodeIds: Immutable.Set<Id>, withConnections: WithConnections) {
-	const foo = _cloneExpNodes(state, nodeIds, withConnections)
-	if (!foo) return
-	dispatch(expNodesActions.addMany(foo.clones))
-	dispatch(expPositionActions.addMany(foo.clonePositions))
-	if (foo.cloneConnections.count() > 0) dispatch(expConnectionsActions.addMultiple(foo.cloneConnections.toList()))
-	dispatch(shamuMetaActions.setSelectedNodes(foo.clonesTop.keySeq().toSet()))
+	const cloneInfos = _cloneExpNodes(selectMainExpGraph(state.room), nodeIds, withConnections)
+	if (!cloneInfos) return
+	dispatch(expNodesActions.addMany(cloneInfos.clones))
+	dispatch(expPositionActions.addMany(cloneInfos.clonePositions))
+	if (cloneInfos.cloneConnections.count() > 0) dispatch(expConnectionsActions.addMultiple(cloneInfos.cloneConnections.toList()))
+	dispatch(shamuMetaActions.setSelectedNodes(cloneInfos.clonesTop.keySeq().toSet()))
 }
 
-function _cloneExpNodes(state: IClientAppState, nodeIds: Immutable.Set<Id>, withConnections: WithConnections): CloneChildrenResult | null {
-	const nodes = selectExpNodesState(state.room).filter(x => nodeIds.includes(x.id) && x.type !== 'groupInput' && x.type !== 'groupOutput')
+function _cloneExpNodes(graph: ExpGraph, nodeIds: Immutable.Set<Id>, withConnections: WithConnections): CloneChildrenResult | null {
+	const nodes = graph.nodes.filter(x => nodeIds.includes(x.id) && x.type !== 'groupInput' && x.type !== 'groupOutput')
 	const firstNode = nodes.first(null)
 	if (!firstNode) return null
 	const topGroupId = firstNode.groupId
@@ -529,20 +529,19 @@ function _cloneExpNodes(state: IClientAppState, nodeIds: Immutable.Set<Id>, with
 	let cloneConnections: ExpConnections = Immutable.Map()
 
 	nodes.forEach(node => {
-		const {clone, clonePosition} = _cloneExpNode(state, node.id, withConnections, topGroupId)
+		const {clone, clonePosition} = _cloneExpNode(graph, node.id, topGroupId)
 		nodeCloneMap = nodeCloneMap.set(node.id, clone.id)
 		clones = clones.set(clone.id, clone)
 		clonesTop = clonesTop.set(clone.id, clone)
 		clonePositions = clonePositions.set(clonePosition.id, clonePosition)
-		const childrenResult = _cloneExpChildren(state, node.id, clone.id)
+		const childrenResult = _cloneExpChildren(graph, node.id, clone.id)
 		clones = clones.merge(childrenResult.clones)
 		clonePositions = clonePositions.merge(childrenResult.clonePositions)
 		cloneConnections = cloneConnections.merge(childrenResult.cloneConnections)
 	})
 
 	if (withConnections === 'all') {
-		const allConnections = selectExpAllConnections(state.room)
-		cloneConnections = cloneConnections.merge(allConnections
+		cloneConnections = cloneConnections.merge(graph.connections.connections
 			.filter(x => filteredNodeIds.includes(x.sourceId) || filteredNodeIds.includes(x.targetId))
 			.map((x): ExpConnection => ({
 				...x,
@@ -556,10 +555,8 @@ function _cloneExpNodes(state: IClientAppState, nodeIds: Immutable.Set<Id>, with
 	return {clones, clonesTop, clonePositions, cloneConnections}
 }
 
-function _cloneExpChildren(state: IClientAppState, oldParentNodeId: Id, newCloneParentId: GroupId): CloneChildrenResult {
-	const allExpNodes = selectExpNodesState(state.room)
-
-	const childrenToClone = allExpNodes.filter(x => x.groupId === oldParentNodeId)
+function _cloneExpChildren(graph: ExpGraph, oldParentNodeId: Id, newCloneParentId: GroupId): CloneChildrenResult {
+	const childrenToClone = graph.nodes.filter(x => x.groupId === oldParentNodeId)
 	const childrenIds = childrenToClone.map(x => x.id)
 
 	let nodeCloneMap = Immutable.Map<Id, Id>()
@@ -568,18 +565,17 @@ function _cloneExpChildren(state: IClientAppState, oldParentNodeId: Id, newClone
 	let cloneConnections: ExpConnections = Immutable.Map()
 
 	childrenToClone.forEach(node => {
-		const {clone, clonePosition} = _cloneExpNode(state, node.id, 'all', newCloneParentId)
+		const {clone, clonePosition} = _cloneExpNode(graph, node.id, newCloneParentId)
 		nodeCloneMap = nodeCloneMap.set(node.id, clone.id)
 		clones = clones.set(clone.id, clone)
 		clonePositions = clonePositions.set(clonePosition.id, clonePosition)
-		const childrenResult = _cloneExpChildren(state, node.id, clone.id)
+		const childrenResult = _cloneExpChildren(graph, node.id, clone.id)
 		clones = clones.merge(childrenResult.clones)
 		clonePositions = clonePositions.merge(childrenResult.clonePositions)
 		cloneConnections = cloneConnections.merge(childrenResult.cloneConnections)
 	})
 
-	const allConnections = selectExpAllConnections(state.room)
-	cloneConnections = cloneConnections.merge(allConnections
+	cloneConnections = cloneConnections.merge(graph.connections.connections
 		.filter(x => childrenIds.includes(x.sourceId) || childrenIds.includes(x.targetId))
 		.map((x): ExpConnection => ({
 			...x,
@@ -592,14 +588,14 @@ function _cloneExpChildren(state: IClientAppState, oldParentNodeId: Id, newClone
 	return {clones, clonePositions, cloneConnections, clonesTop: Immutable.Map()}
 }
 
-function _cloneExpNode(state: IClientAppState, nodeId: Id, withConnections: WithConnections, groupId: GroupId): CloneNodeResult {
-	const stateToClone = selectExpNode(state.room, nodeId)
+function _cloneExpNode(graph: ExpGraph, nodeId: Id, groupId: GroupId): CloneNodeResult {
+	const stateToClone = graph.nodes.get(nodeId, defaultExpNodeRecord)
 
 	const clone = stateToClone
 		.set('id', createNodeId())
 		.set('groupId', groupId)
 
-	const positionToClone = selectExpPosition(state.room, nodeId)
+	const positionToClone = graph.positions.all.get(nodeId, defaultExpPositionRecord)
 
 	const clonePosition = positionToClone
 		.set('id', clone.id)
