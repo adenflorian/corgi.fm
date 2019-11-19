@@ -252,9 +252,9 @@ export const ConnectedZoom = hot(module)(React.memo(function _Zoom({
 	return (
 		<Fragment>
 			{
-				// @ts-ignore disableIfShiftIsPressed
 				<ContextMenuTrigger
 					id={roomType === RoomType.Experimental ? expBackgroundMenuId : backgroundMenuId}
+					// @ts-ignore
 					disableIfShiftIsPressed={true}
 					holdToDisplay={-1}
 					disable={disableMenu}

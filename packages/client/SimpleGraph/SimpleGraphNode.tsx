@@ -121,9 +121,9 @@ export function SimpleGraphNode(props: ISimpleGraphNodeAllProps) {
 			{
 				useMemo(() => {
 					return (
-					// @ts-ignore disableIfShiftIsPressed
 						<ContextMenuTrigger
 							id={nodeMenuId}
+							// @ts-ignore
 							disableIfShiftIsPressed={true}
 							holdToDisplay={-1}
 							nodeId={positionId}

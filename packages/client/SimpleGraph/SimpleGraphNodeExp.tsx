@@ -13,7 +13,7 @@ import {simpleGlobalClientState} from '../SimpleGlobalClientState'
 import {ExpPanel} from '../Panel/ExpPanel'
 import {useNodeContext} from '../Experimental/CorgiNode'
 import {useLocalClientId} from '../react-hooks'
-import {useStringChangedEvent} from '../Experimental/hooks/useCorgiEvent';
+import {useStringChangedEvent} from '../Experimental/hooks/useCorgiEvent'
 
 interface Props {
 	children: React.ReactNode
@@ -148,9 +148,9 @@ export function SimpleGraphNodeExp({children}: Props) {
 				{
 					useMemo(() => {
 						return (
-							// @ts-ignore disableIfShiftIsPressed
 							<ContextMenuTrigger
 								id={expNodeMenuId}
+								// @ts-ignore
 								disableIfShiftIsPressed={true}
 								holdToDisplay={-1}
 								nodeId={positionId}

@@ -4,7 +4,7 @@ import * as uuid from 'uuid'
 import {topGroupId, GroupId} from '../../common-constants'
 import {ExpConnectionType} from './exp-connections-redux'
 import {
-	BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION, ExpNodeType,
+	BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION,
 	IClientAppState,
 } from '..'
 

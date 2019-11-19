@@ -129,10 +129,10 @@ const SamplePad = React.memo((props: SamplePadProps) => {
 	const label = getLabel()
 
 	return (
-	/* eslint-disable no-shadow */
-	// @ts-ignore disableIfShiftIsPressed
+		/* eslint-disable no-shadow */
 		<ContextMenuTrigger
 			id={samplePadMenuId}
+			// @ts-ignore
 			disableIfShiftIsPressed={true}
 			holdToDisplay={-1}
 			samplerId={samplerId}

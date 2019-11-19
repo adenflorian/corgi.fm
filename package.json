@@ -39,6 +39,9 @@
   },
   "dependencies": {},
   "devDependencies": {
+    "@babel/core": "^7.7.2",
+    "@babel/plugin-proposal-optional-chaining": "^7.6.0",
+    "@types/node": "^12.12.9",
     "@typescript-eslint/eslint-plugin": "^1.13.0",
     "@typescript-eslint/parser": "^1.13.0",
     "chai": "^4.1.2",
@@ -62,7 +65,7 @@
     "ts-jest": "^24.0.2",
     "ts-node": "^6.1.0",
     "ts-node-dev": "^1.0.0-pre.26",
-    "typescript": "^3.5.3",
+    "typescript": "^3.7.2",
     "watch": "^1.0.2"
   }
 }
