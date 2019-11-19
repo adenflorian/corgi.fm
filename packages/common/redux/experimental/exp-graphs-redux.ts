@@ -71,6 +71,10 @@ export function selectPresetsForExpNodeTypeSlow(state: IClientRoomState, nodeTyp
 	return selectExpGraphsState(state).all.filter(x => x.nodes.count() === 1 && x.nodes.some(y => y.type === nodeType))
 }
 
+export function selectGraphPresetsSlow(state: IClientRoomState) {
+	return selectExpGraphsState(state).all.filter(x => x.nodes.count() > 1)
+}
+
 export function selectPreset(state: IClientRoomState, presetId: Id) {
 	return selectExpGraphsState(state).all.get(presetId)
 }

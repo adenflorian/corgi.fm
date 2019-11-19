@@ -13,11 +13,13 @@ import {
 	expConnectionsActions, selectLocalClientId, selectRoomMember,
 	makeExpPortState, ExpConnection, OptionsAction, AppOptions,
 	expGraphsActions, makeExpGraphMeta, ExpNodeState,
-	makeInitialExpConnectionsState, makeExpPositionsState,
+	makeExpPositionsState,
 	selectLocalClient, selectMainExpGraph, ExpGraphsAction,
 	chatSystemMessage, selectPreset, loadPresetIntoNodeState, ExpGraph,
 	ExpNodesState, ExpPositions, ExpConnections,
-	selectShamuMetaState, ExpPosition, WithConnections, shamuMetaActions,
+	selectShamuMetaState, ExpPosition, WithConnections,
+	shamuMetaActions, makeExpConnectionsState, defaultExpPositionRecord,
+	defaultExpNodeRecord,
 } from '@corgifm/common/redux'
 import {serverClientId, GroupId} from '@corgifm/common/common-constants'
 import {createNodeId} from '@corgifm/common/common-utils'
@@ -146,14 +148,20 @@ function after(
 			const localClient = selectLocalClient(afterState)
 			const presetName = node.type + '-' + node.id.substr(0, 4) + '-' + localClient.name
 
+			const clones = _cloneExpNodes(selectMainExpGraph(afterState.room), Immutable.Set([node.id]), 'none', node.groupId)
+
 			const graph: ExpGraph = {
 				meta: makeExpGraphMeta({
 					name: presetName,
 					ownerId: localClient.id,
 				}),
-				nodes: Immutable.Map<Id, ExpNodeState>([[node.id, node]]),
-				connections: makeInitialExpConnectionsState(),
-				positions: makeExpPositionsState(),
+				nodes: clones ? clones.clones : Immutable.Map(),
+				connections: makeExpConnectionsState({
+					connections: clones ? clones.cloneConnections : Immutable.Map(),
+				}),
+				positions: makeExpPositionsState({
+					all: clones ? clones.clonePositions : Immutable.Map(),
+				}),
 			}
 
 			dispatch(expGraphsActions.add(graph))
@@ -164,28 +172,41 @@ function after(
 		case 'EXP_CREATE_NODE_FROM_PRESET': {
 			const preset = selectPreset(afterState.room, action.presetId)
 			if (!preset) return logger.error('[EXP_CREATE_NODE_FROM_PRESET] no preset found', {action})
-			if (preset.nodes.count() !== 1) return logger.error('[EXP_CREATE_NODE_FROM_PRESET] invalid node preset, not exactly 1 node', {action, preset, count: preset.nodes.count()})
+			// if (preset.nodes.count() !== 1) return logger.error('[EXP_CREATE_NODE_FROM_PRESET] invalid node preset, not exactly 1 node', {action, preset, count: preset.nodes.count()})
 
+			if (preset.nodes.count() === 0) {
+				logger.error('[EXP_CREATE_NODE_FROM_PRESET] preset has no nodes', {preset, nodes: preset.nodes.toJS()})
+				return dispatch(chatSystemMessage('Something went wrong while trying to create node(s) from a preset', 'error'))
+			}
 			const presetNode = preset.nodes.first(null)
 			if (!presetNode) {
 				logger.error('[EXP_CREATE_NODE_FROM_PRESET] missing preset node', {presetNode, preset, nodes: preset.nodes.toJS()})
 				return dispatch(chatSystemMessage('Something went wrong while trying to create a node from a preset', 'error'))
 			}
 
+			const topGroup = determineTopGroupInGraph(preset.nodes)
+
+			if (!topGroup) {
+				logger.error('[EXP_CREATE_NODE_FROM_PRESET] no top group', {topGroup, presetNode, preset, nodes: preset.nodes.toJS()})
+				return dispatch(chatSystemMessage('Something went wrong while trying to create a node from a preset', 'error'))
+			}
+
+			const topNodes = preset.nodes.filter(x => x.groupId === topGroup).keySeq().toSet()
+
 			const localClientId = selectLocalClientId(afterState)
 			const currentNodeGroupId = selectRoomMember(afterState.room, localClientId).groupNodeId
-			const newNode = loadPresetIntoNodeState(presetNode, makeExpNodeState({
-				type: presetNode.type,
-				groupId: currentNodeGroupId,
-			}))
-			dispatch(expNodesActions.add(newNode))
-			dispatch(expPositionActions.add(
-				makeExpPosition({
-					id: newNode.id,
-					ownerId: serverClientId,
-					targetType: newNode.type,
-					...action.position,
-				})))
+
+			const clones = _cloneExpNodes(preset, topNodes, 'none', currentNodeGroupId)
+
+			if (!clones) {
+				logger.error('[EXP_CREATE_NODE_FROM_PRESET] no clones', {clones, topGroup, presetNode, preset, nodes: preset.nodes.toJS()})
+				return dispatch(chatSystemMessage('Something went wrong while trying to create a node from a preset', 'error'))
+			}
+
+			// TODO Adjust position of top level nodes
+
+			dispatchCreationOfCloneInfos(dispatch, clones)
+
 			return
 		}
 
@@ -197,6 +218,11 @@ function after(
 
 		default: return
 	}
+}
+
+function determineTopGroupInGraph(nodes: ExpGraph['nodes']) {
+	// The top group is the groupId that is not an ID of any of the nodes in the graph
+	return nodes.find(node => !nodes.some(x => x.id === node.groupId))?.groupId
 }
 
 function createGroup(
@@ -503,23 +529,25 @@ interface CloneChildrenResult {
 }
 
 function cloneExpNodes(dispatch: Dispatch, state: IClientAppState, nodeIds: Immutable.Set<Id>, withConnections: WithConnections) {
-	const cloneInfos = _cloneExpNodes(selectMainExpGraph(state.room), nodeIds, withConnections)
+	const firstNodeId = nodeIds.first(null)
+	if (!firstNodeId) return
+	const firstNode = selectExpNode(state.room, firstNodeId)
+	const cloneInfos = _cloneExpNodes(selectMainExpGraph(state.room), nodeIds, withConnections, firstNode.groupId)
 	if (!cloneInfos) return
+	dispatchCreationOfCloneInfos(dispatch, cloneInfos)
+}
+
+function dispatchCreationOfCloneInfos(dispatch: Dispatch, cloneInfos: CloneChildrenResult) {
 	dispatch(expNodesActions.addMany(cloneInfos.clones))
 	dispatch(expPositionActions.addMany(cloneInfos.clonePositions))
 	if (cloneInfos.cloneConnections.count() > 0) dispatch(expConnectionsActions.addMultiple(cloneInfos.cloneConnections.toList()))
 	dispatch(shamuMetaActions.setSelectedNodes(cloneInfos.clonesTop.keySeq().toSet()))
 }
 
-function _cloneExpNodes(graph: ExpGraph, nodeIds: Immutable.Set<Id>, withConnections: WithConnections): CloneChildrenResult | null {
+function _cloneExpNodes(graph: ExpGraph, nodeIds: Immutable.Set<Id>, withConnections: WithConnections, newTopGroupId: GroupId): CloneChildrenResult | null {
 	const nodes = graph.nodes.filter(x => nodeIds.includes(x.id) && x.type !== 'groupInput' && x.type !== 'groupOutput')
 	const firstNode = nodes.first(null)
 	if (!firstNode) return null
-	const topGroupId = firstNode.groupId
-	if (nodes.every(x => x.groupId === topGroupId) === false) {
-		logger.warn('attempted to clone node selection across multiple groups', {nodes: nodes.toJS()})
-		return null
-	}
 	const filteredNodeIds = nodes.map(x => x.id)
 
 	let nodeCloneMap = Immutable.Map<Id, Id>()
@@ -529,7 +557,7 @@ function _cloneExpNodes(graph: ExpGraph, nodeIds: Immutable.Set<Id>, withConnect
 	let cloneConnections: ExpConnections = Immutable.Map()
 
 	nodes.forEach(node => {
-		const {clone, clonePosition} = _cloneExpNode(graph, node.id, topGroupId)
+		const {clone, clonePosition} = _cloneExpNode(graph, node.id, newTopGroupId)
 		nodeCloneMap = nodeCloneMap.set(node.id, clone.id)
 		clones = clones.set(clone.id, clone)
 		clonesTop = clonesTop.set(clone.id, clone)
@@ -548,7 +576,7 @@ function _cloneExpNodes(graph: ExpGraph, nodeIds: Immutable.Set<Id>, withConnect
 				id: createNodeId(),
 				sourceId: nodeCloneMap.get(x.sourceId, x.sourceId),
 				targetId: nodeCloneMap.get(x.targetId, x.targetId),
-				groupId: topGroupId,
+				groupId: newTopGroupId,
 			})))
 	}
 

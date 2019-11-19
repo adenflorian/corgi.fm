@@ -111,7 +111,7 @@ export const defaultExpPosition = Object.freeze({
 
 const makeExpPositionRecord = Record(defaultExpPosition)
 
-const defaultExpPositionRecord = makeExpPositionRecord()
+export const defaultExpPositionRecord: ExpPosition = makeExpPositionRecord()
 
 export function makeExpPosition(position: Pick<typeof defaultExpPosition, 'id' | 'ownerId' | 'targetType'> & Partial<typeof defaultExpPosition>): ExpPosition {
 	return makeExpPositionRecord(position)

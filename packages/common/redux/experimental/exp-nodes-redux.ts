@@ -110,7 +110,7 @@ const defaultExpNodeState = {
 
 const _makeExpNodeState = Record(defaultExpNodeState)
 
-const defaultExpNodeRecord = _makeExpNodeState()
+export const defaultExpNodeRecord: ExpNodeState = _makeExpNodeState()
 
 export function makeExpNodeState(node: Partial<typeof defaultExpNodeState>): ExpNodeState {
 	return _makeExpNodeState(node)
@@ -190,9 +190,9 @@ export function loadPresetIntoNodeState(preset: ExpNodeState, node: ExpNodeState
 	return makeExpNodeState(foo)
 }
 
-export const selectExpNodesState = (state: IClientRoomState) => state.expGraphs.mainGraph.nodes
+export const selectExpNodesState = (state: IClientRoomState): ExpNodesState => state.expGraphs.mainGraph.nodes
 
-export const selectExpNode = (state: IClientRoomState, id: Id) =>
+export const selectExpNode = (state: IClientRoomState, id: Id): ExpNodeState =>
 	selectExpNodesState(state).get(id) || defaultExpNodeRecord
 
 export const createExpNodeEnabledSelector = (id: Id) => (state: IClientAppState) =>

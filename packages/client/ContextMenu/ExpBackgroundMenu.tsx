@@ -1,12 +1,13 @@
-import React, {Fragment, MouseEvent, useMemo, useState, useCallback} from 'react'
+import React, {Fragment, useMemo, useState, useCallback} from 'react'
 import {useDispatch, useStore} from 'react-redux'
 import {MenuItem, SubMenu, connectMenu, ContextMenu} from 'react-contextmenu'
 import {Set} from 'immutable'
 import {
 	expPositionActions, makeExpPosition, expNodesActions,
-	makeExpNodeState, ExpNodeState, ExpPosition, expNodeTypes,
+	makeExpNodeState, ExpNodeState, expNodeTypes,
 	expLocalActions, ExpNodeType, IClientAppState,
-	selectPresetsForExpNodeTypeSlow, ExpGraph, selectLocalClientId, selectRoomMember,
+	selectPresetsForExpNodeTypeSlow, ExpGraph, selectLocalClientId,
+	selectRoomMember, selectGraphPresetsSlow,
 } from '@corgifm/common/redux'
 import {Dispatch} from 'redux'
 import {serverClientId} from '@corgifm/common/common-constants'
@@ -61,20 +62,26 @@ export const ExpBackgroundMenuItems = React.memo(
 							/>
 						)
 					})}
+				<AddNodeMenuItem
+					nodeType={'graph'}
+					position={position}
+				/>
 			</Fragment>
 		)
 	})
 
 interface AddNodeMenuItemProps {
 	readonly position: Point
-	readonly nodeType: ExpNodeType
+	readonly nodeType: ExpNodeType | 'graph'
 }
 
 function AddNodeMenuItem({nodeType, position}: AddNodeMenuItemProps) {
 	const dispatch = useDispatch()
 	const store = useStore<IClientAppState>()
 	const onClick = useCallback(() => {
-		if (nodeType === 'group') {
+		if (nodeType === 'graph') {
+			return logger.error('you should not have come here')
+		} else	if (nodeType === 'group') {
 			dispatch(expLocalActions.createGroup(Set()))
 		} else {
 			const state = store.getState()
@@ -89,26 +96,29 @@ function AddNodeMenuItem({nodeType, position}: AddNodeMenuItemProps) {
 		<SubMenu
 			title={<div>{nodeType}</div>}
 			hoverDelay={hoverDelayMs}
-			onClick={onClick}
+			onClick={nodeType !== 'graph' ? onClick : undefined}
+			preventCloseOnClick={nodeType === 'graph'}
 		>
-			<MenuItem onClick={onClick}>
-				Default Preset
-			</MenuItem>
+			{nodeType !== 'graph' &&
+				<MenuItem onClick={onClick}>
+					Default Preset
+				</MenuItem>
+			}
 			<AddNodeSubMenuItems nodeType={nodeType} position={position} />
 		</SubMenu>
 	)
 }
 
-const AddNodeSubMenuItems = React.memo(function _AddNodeSubMenuItems({nodeType, position}: {nodeType: ExpNodeType, position: Point}) {
+const AddNodeSubMenuItems = React.memo(function _AddNodeSubMenuItems({nodeType, position}: {nodeType: ExpNodeType | 'graph', position: Point}) {
 	const store = useStore<IClientAppState>()
 	const dispatch = useDispatch()
 	const presets = useMemo(() => {
-		return selectPresetsForExpNodeTypeSlow(store.getState().room, nodeType)
+		return nodeType === 'graph'
+			? selectGraphPresetsSlow(store.getState().room)
+			: selectPresetsForExpNodeTypeSlow(store.getState().room, nodeType)
 	}, [nodeType, store])
 	const onClick = (preset: ExpGraph) =>
-		(e: React.TouchEvent<HTMLDivElement> | React.MouseEvent<HTMLDivElement>) => {
-			dispatch(expLocalActions.createNodeFromPreset(preset.meta.id, position))
-		}
+		() => dispatch(expLocalActions.createNodeFromPreset(preset.meta.id, position))
 	return (
 		<Fragment>
 			{presets.map(preset =>
@@ -116,6 +126,11 @@ const AddNodeSubMenuItems = React.memo(function _AddNodeSubMenuItems({nodeType, 
 					{preset.meta.name}
 				</MenuItem>
 			).toList()}
+			{nodeType === 'graph' && presets.count() === 0 &&
+				<MenuItem preventClose={true}>
+					No graph presets yet
+				</MenuItem>
+			}
 		</Fragment>
 	)
 })
