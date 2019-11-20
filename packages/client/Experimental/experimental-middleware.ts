@@ -20,9 +20,11 @@ import {
 	selectShamuMetaState, ExpPosition, WithConnections,
 	shamuMetaActions, makeExpConnectionsState, defaultExpPositionRecord,
 	defaultExpNodeRecord, isGroupInOutNode, GroupType,
+	selectExpConnectionsWithTargetIds,
+	selectExpConnectionsWithSourceIds, selectExpAllPositions,
 } from '@corgifm/common/redux'
 import {serverClientId, GroupId} from '@corgifm/common/common-constants'
-import {createNodeId} from '@corgifm/common/common-utils'
+import {createNodeId, arrayToESIdKeyMap} from '@corgifm/common/common-utils'
 import {SingletonContextImpl} from '../SingletonContext'
 import {logger} from '../client-logger'
 import {handleStopDraggingExpGhostConnector} from '../exp-dragging-connections'
@@ -206,6 +208,80 @@ function after(
 			// TODO Adjust position of top level nodes
 
 			dispatchCreationOfCloneInfos(dispatch, clones)
+
+			return
+		}
+
+		case 'EXP_CONVERT_GROUP_TO_POLY_GROUP': {
+			// clone group node and child group in/out nodes
+			const nodes = selectExpNodesState(afterState.room)
+			const positions = selectExpAllPositions(afterState.room)
+			const groupNode = nodes.get(action.groupNodeId, null)
+			const groupInputNode = nodes.find(x => x.type === 'groupInput' && x.groupId === action.groupNodeId)
+			const groupOutputNode = nodes.find(x => x.type === 'groupOutput' && x.groupId === action.groupNodeId)
+			if (!groupNode || !groupInputNode || !groupOutputNode) {
+				logger.error('not all needed nodes are present, sad day:', {action, groupNode, groupInputNode, groupOutputNode})
+				return
+			}
+			if (groupNode.type !== 'group') {
+				logger.error('expected a group node, BUT IT WAS NOT A GROUP NODE WAS IT?', {action, groupNode, groupInputNode, groupOutputNode})
+				return
+			}
+
+			const groupPosition = positions.get(groupNode.id, null)
+			const groupInputPosition = positions.get(groupInputNode.id, null)
+			const groupOutputPosition = positions.get(groupOutputNode.id, null)
+			if (!groupPosition || !groupInputPosition || !groupOutputPosition) {
+				logger.error('not all needed positions are present, very sad day:', {action, groupPosition, groupInputPosition, groupOutputPosition})
+				return
+			}
+
+			const groupNodeClone = groupNode.set('id', createNodeId())
+				.set('type', 'polyphonicGroup')
+			const groupInputNodeClone = groupInputNode.set('id', createNodeId())
+				.set('type', 'polyphonicGroupInput')
+				.set('groupId', groupNodeClone.id)
+			const groupOutputNodeClone = groupOutputNode.set('id', createNodeId())
+				.set('type', 'polyphonicGroupOutput')
+				.set('groupId', groupNodeClone.id)
+
+			dispatch(expNodesActions.addMany(Immutable.Map(arrayToESIdKeyMap([groupNodeClone, groupInputNodeClone, groupOutputNodeClone]))))
+
+			const groupPositionClone = groupPosition.set('id', groupNodeClone.id)
+				.set('targetType', groupNode.type)
+			const groupInputPositionClone = groupInputPosition.set('id', groupInputNodeClone.id)
+				.set('targetType', groupInputNode.type)
+			const groupOutputPositionClone = groupOutputPosition.set('id', groupOutputNodeClone.id)
+				.set('targetType', groupOutputNode.type)
+
+			dispatch(expPositionActions.addMany(Immutable.Map(arrayToESIdKeyMap([groupPositionClone, groupInputPositionClone, groupOutputPositionClone]))))
+
+			// reroute connections
+			const connectionsToOldGroupNode = selectExpConnectionsWithTargetIds(afterState.room, groupNode.id)
+			connectionsToOldGroupNode.forEach(x => dispatch(expConnectionsActions
+				.updateTarget(x.id, {targetId: groupNodeClone.id, targetType: groupNodeClone.type, targetPort: x.targetPort})))
+
+			const connectionsFromOldGroupNode = selectExpConnectionsWithSourceIds(afterState.room, [groupNode.id])
+			connectionsFromOldGroupNode.forEach(x => dispatch(expConnectionsActions
+				.updateSource(x.id, {sourceId: groupNodeClone.id, sourceType: groupNodeClone.type, sourcePort: x.sourcePort})))
+
+			const connectionsFromOldGroupInputNode = selectExpConnectionsWithSourceIds(afterState.room, [groupInputNode.id])
+			connectionsFromOldGroupInputNode.forEach(x => dispatch(expConnectionsActions
+				.updateSource(x.id, {sourceId: groupInputNodeClone.id, sourceType: groupInputNodeClone.type, sourcePort: x.sourcePort})))
+
+			const connectionsFromToGroupOutputNode = selectExpConnectionsWithTargetIds(afterState.room, groupOutputNode.id)
+			connectionsFromToGroupOutputNode.forEach(x => dispatch(expConnectionsActions
+				.updateTarget(x.id, {targetId: groupOutputNodeClone.id, targetType: groupOutputNodeClone.type, targetPort: x.targetPort})))
+
+			const connectionsFromOldGroup = selectExpAllConnections(afterState.room).filter(x => x.groupId === groupNode.id)
+			dispatch(expConnectionsActions.setGroup(connectionsFromOldGroup.keySeq().toSet(), groupNodeClone.id))
+
+			// change groupId for direct children
+			const directChildren = nodes.filter(x => !isGroupInOutNode(x) && x.groupId === groupNode.id)
+			dispatch(expNodesActions.setGroup(directChildren.keySeq().toSet(), groupNodeClone.id))
+
+			// delete old group nodes
+			dispatch(expNodesActions.deleteMany([groupNode.id, groupInputNode.id, groupOutputNode.id]))
 
 			return
 		}

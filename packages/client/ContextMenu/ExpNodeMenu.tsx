@@ -60,6 +60,7 @@ const ExpNodeMenuItems = React.memo(function _MenuItems({nodeType}: ExpNodeMenuI
 					<LoadPresetExpNodeMenuItem nodeType={nodeType} />
 				</Fragment>
 			}
+			{nodeType === 'group' && <ConvertToPolyGroupNodeMenuItem />}
 		</Fragment>
 	)
 
@@ -76,6 +77,18 @@ const ExpNodeMenuItems = React.memo(function _MenuItems({nodeType}: ExpNodeMenuI
 				<span role="img" aria-label="delete">🔪</span>
 			</MenuItem>,
 			deleteMenuLabels,
+		)
+	}
+
+	function ConvertToPolyGroupNodeMenuItem() {
+		return (
+			<MenuItem
+				onClick={(_, {nodeId}: DeleteMenuData) => {
+					dispatch(expLocalActions.convertGroupToPolyGroup(nodeId))
+				}}
+			>
+				Convert to Polyphonic Group Node
+			</MenuItem>
 		)
 	}
 

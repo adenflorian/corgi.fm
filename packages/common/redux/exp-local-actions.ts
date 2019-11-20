@@ -17,6 +17,10 @@ export const expLocalActions = {
 		presetId,
 		position,
 	} as const),
+	convertGroupToPolyGroup: (groupNodeId: Id) => ({
+		type: 'EXP_CONVERT_GROUP_TO_POLY_GROUP',
+		groupNodeId,
+	} as const),
 } as const
 
 export type ExpLocalAction = ActionType<typeof expLocalActions>

@@ -5,6 +5,7 @@ import {
 } from '../ExpPorts'
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 import {logger} from '../../client-logger'
+import {ExpMidiOutputPort} from '../ExpMidiPorts'
 import {PolyphonicGroupNode} from './PolyphonicGroupNode'
 
 export class PolyphonicGroupInputNode extends CorgiNode {
@@ -29,6 +30,13 @@ export class PolyphonicGroupInputNode extends CorgiNode {
 		this._parentPolyGroupNode.registerChildInputNode().forEach(([input, source]) => {
 			this._ports.set(input.id, new ExpNodeAudioOutputPort(input.id, input.name, this, source))
 		})
+
+		const pitchGain = corgiNodeArgs.audioContext.createGain()
+		const internalPitchPort = new ExpNodeAudioOutputPort('pitch', 'pitch', this, pitchGain)
+		this._ports.set(internalPitchPort.id, internalPitchPort)
+
+		const internalMidiPort = new ExpMidiOutputPort('gate', 'gate', this)
+		this._ports.set(internalMidiPort.id, internalMidiPort)
 	}
 
 	public render = () => this.getDebugView()
