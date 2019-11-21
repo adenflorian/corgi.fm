@@ -9,6 +9,7 @@ import {
 } from '../ExpPorts'
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 import {ExpAudioParam, ExpAudioParams} from '../ExpParams'
+import {ExpPolyphonicInputPort} from '../ExpPolyphonicPorts'
 
 export class PolyphonicGroupNode extends CorgiNode {
 	protected readonly _ports: ExpPorts
@@ -25,9 +26,12 @@ export class PolyphonicGroupNode extends CorgiNode {
 
 		const portStates = _corgiNodeArgs.ports || new Map<Id, ExpPortState>()
 
+		const polyInputPort = new ExpPolyphonicInputPort('poly', 'poly', this)
+
 		const ports = [...portStates].map(x => x[1]).map(this._createPort)
 
-		this._ports = arrayToESIdKeyMap(ports.map(x => x[0]))
+		this._ports = arrayToESIdKeyMap([...ports.map(x => x[0]), polyInputPort])
+
 		this._audioParams = arrayToESIdKeyMap(ports.map(x => x[1]).filter(x => x !== undefined) as ExpAudioParam[])
 	}
 

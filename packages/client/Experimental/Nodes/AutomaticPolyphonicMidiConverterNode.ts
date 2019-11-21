@@ -9,6 +9,7 @@ import {ExpMidiOutputPort, ExpMidiInputPort} from '../ExpMidiPorts'
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 import {ExpNodeAudioOutputPort, ExpPorts} from '../ExpPorts'
 import {midiNoteToFrequency} from '../../WebAudio'
+import {ExpPolyphonicOutputPort} from '../ExpPolyphonicPorts'
 import {PolyAlgorithm, RoundRobin, VoiceIndex} from './NodeHelpers/PolyAlgorithms'
 
 const maxVoiceCount = 4
@@ -45,7 +46,8 @@ export class AutomaticPolyphonicMidiConverterNode extends CorgiNode {
 		this._pitchOutputPorts = this._pitchSources.map((_, index) => {
 			return new ExpNodeAudioOutputPort('pitch' + index, 'pitch' + index, this, this._pitchSources[index].connect(this._waveShapers[index]))
 		})
-		this._ports = arrayToESIdKeyMap([midiInputPort, ...this._midiOutputPorts, ...this._pitchOutputPorts])
+		const polyOutPort = new ExpPolyphonicOutputPort('poly', 'poly', this)
+		this._ports = arrayToESIdKeyMap([midiInputPort, polyOutPort])
 
 		this._portamento = new ExpCustomNumberParam('portamento', 0, 0, 8, 3, adsrValueToString)
 		this._voiceCount = new ExpCustomNumberParam('voiceCount', 4, 1, maxVoiceCount, 1, val => Math.round(val).toString())

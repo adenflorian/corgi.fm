@@ -2,6 +2,7 @@ import {List} from 'immutable'
 import {ExpConnectionType} from '@corgifm/common/redux'
 import {ExpNodeAudioOutputPort, ExpNodeAudioInputPort, ExpPort} from './ExpPorts'
 import {ExpMidiOutputPort, ExpMidiInputPort} from './ExpMidiPorts'
+import {ExpPolyphonicOutputPort, ExpPolyphonicInputPort} from './ExpPolyphonicPorts'
 
 export type ExpConnectionCallback = (connection: ExpNodeConnectionReact) => void
 
@@ -128,9 +129,57 @@ export class ExpMidiConnection extends ExpNodeConnection {
 	}
 }
 
+// Different connection types could have different functions for sending data across
+export class ExpPolyphonicConnection extends ExpNodeConnection {
+	public constructor(
+		public readonly id: Id,
+		private _source: ExpPolyphonicOutputPort,
+		private _target: ExpPolyphonicInputPort,
+	) {
+		super(id, 'polyphonic')
+		this._source.connect(this)
+		this._target.connect(this)
+	}
+
+	public get outputPort() {return this._source}
+	public get inputPort() {return this._target}
+
+	public getSource() {
+		return this._source
+	}
+
+	public getTarget() {
+		return this._target
+	}
+
+	public changeSource(newSource: ExpPolyphonicOutputPort) {
+		this._source.disconnect(this)
+		this._source = newSource
+		this._source.connect(this)
+	}
+
+	public changeTarget(newTarget: ExpPolyphonicInputPort) {
+		const oldTarget = this._target
+		this._target = newTarget
+		oldTarget.disconnect(this)
+		newTarget.connect(this)
+		this._source.changeTarget(oldTarget, newTarget)
+	}
+
+	public dispose() {
+		this._source.disconnect(this)
+		this._target.disconnect(this)
+	}
+
+	public detectFeedbackLoop(i: number, nodeIds: List<Id>): boolean {
+		return this._target.detectFeedbackLoop(i, nodeIds)
+	}
+}
+
 export type ExpNodeConnections = Map<Id, ExpNodeConnection>
 export type ExpNodeAudioConnections = Map<Id, ExpNodeAudioConnection>
 export type ExpMidiConnections = Map<Id, ExpMidiConnection>
+export type ExpPolyphonicConnections = Map<Id, ExpPolyphonicConnection>
 
 export function isAudioConnection(val: unknown): val is ExpNodeAudioConnection {
 	return val instanceof ExpNodeAudioConnection
@@ -138,4 +187,8 @@ export function isAudioConnection(val: unknown): val is ExpNodeAudioConnection {
 
 export function isMidiConnection(val: unknown): val is ExpMidiConnection {
 	return val instanceof ExpMidiConnection
+}
+
+export function isPolyphonicConnection(val: unknown): val is ExpPolyphonicConnection {
+	return val instanceof ExpPolyphonicConnection
 }

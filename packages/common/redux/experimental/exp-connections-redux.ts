@@ -79,7 +79,7 @@ export const expConnectionsActions = {
 	} as const),
 } as const
 
-export type ExpConnectionType = 'audio' | 'midi' | 'dummy'
+export type ExpConnectionType = 'audio' | 'midi' | 'dummy' | 'polyphonic'
 
 export interface IExpConnection {
 	readonly sourceId: Id
