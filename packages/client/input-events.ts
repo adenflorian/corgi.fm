@@ -91,6 +91,15 @@ const keyboardShortcuts: IKeyBoardShortcuts = Map<KeyBoardShortcut>({
 		allowRepeat: false,
 		preventDefault: true,
 	},
+	[Control + Plus + Shift + Plus + 'g']: {
+		actionOnKeyDown: (_, state) => {
+			if (selectRoomInfoState(state.room).roomType !== RoomType.Experimental) return
+			const selectedNodes = selectShamuMetaState(state.room).selectedNodes
+			return expLocalActions.createGroup(selectedNodes, 'polyphonicGroup')
+		},
+		allowRepeat: false,
+		preventDefault: true,
+	},
 	'PageUp': {
 		actionOnKeyDown: (_, state) => {
 			if (selectRoomInfoState(state.room).roomType !== RoomType.Experimental) return
@@ -132,19 +141,19 @@ const keyboardShortcuts: IKeyBoardShortcuts = Map<KeyBoardShortcut>({
 		preventDefault: true,
 	},
 	// Disabling these until needed again
-	'Control': {
+	[Control]: {
 		actionOnKeyDown: userInputActions.setKeys({ctrl: true}),
 		actionOnKeyUp: userInputActions.setKeys({ctrl: false}),
 		allowRepeat: false,
 		preventDefault: false,
 	},
-	'Alt': {
+	[Alt]: {
 		actionOnKeyDown: userInputActions.setKeys({alt: true}),
 		actionOnKeyUp: userInputActions.setKeys({alt: false}),
 		allowRepeat: false,
 		preventDefault: true,
 	},
-	'Shift': {
+	[Shift]: {
 		actionOnKeyDown: userInputActions.setKeys({shift: true}),
 		actionOnKeyUp: userInputActions.setKeys({shift: false}),
 		allowRepeat: false,
@@ -165,7 +174,11 @@ const keyboardShortcuts: IKeyBoardShortcuts = Map<KeyBoardShortcut>({
 	// },
 })
 	.merge(midiKeyShortcuts)
-	.mapKeys(x => x.toLowerCase())
+	.mapKeys(x => arrayToPlusString(x.toLowerCase().split(Plus).sort()))
+
+function arrayToPlusString(array: readonly string[]): string {
+	return array.reduce((result, current) => result + current + Plus, '').replace(/\+$/, '')
+}
 
 export function setupInputEventListeners(
 	window: Window, store: Store<IClientAppState>, audioContext: AudioContext,
@@ -199,17 +212,14 @@ export function setupInputEventListeners(
 	})
 
 	function onKeyEvent(event: KeyboardEvent) {
-		const prefix = ['Control', 'Alt', 'Shift'].includes(event.key)
-			? ''
-			:	event.shiftKey
-				? Shift + Plus
-				: event.ctrlKey || event.metaKey
-					? Control + Plus
-					: event.altKey
-						? Alt + Plus
-						: ''
+		let keyCombo = [] as string[]
+		if (event.shiftKey) keyCombo.push(Shift)
+		if (event.ctrlKey || event.metaKey) keyCombo.push(Control)
+		if (event.altKey) keyCombo.push(Alt)
+		if (!['Control', 'Alt', 'Shift'].includes(event.key)) keyCombo.push(event.key.toLowerCase())
+		let keyComboString = keyCombo.sort().reduce((result, current) => result + current + Plus, '').replace(/\+$/, '')
 
-		const keyboardShortcut = keyboardShortcuts.get(prefix + event.key.toLowerCase())
+		const keyboardShortcut = keyboardShortcuts.get(keyComboString)
 
 		if (!keyboardShortcut) return
 
