@@ -1,10 +1,10 @@
 import {List} from 'immutable'
 import {ExpConnectionType} from '@corgifm/common/redux'
+import {logger} from '../client-logger'
 import {ExpNodeAudioOutputPort, ExpNodeAudioInputPort, ExpPort} from './ExpPorts'
 import {ExpMidiOutputPort, ExpMidiInputPort, MidiReceiver} from './ExpMidiPorts'
 import {ExpPolyphonicOutputPort, ExpPolyphonicInputPort} from './ExpPolyphonicPorts'
-import {logger} from '../client-logger'
-import {CorgiObjectChangedEvent, BooleanChangedEvent} from './CorgiEvents'
+import {BooleanChangedEvent} from './CorgiEvents'
 
 export type ExpConnectionCallback = (connection: ExpNodeConnectionReact) => void
 
@@ -30,9 +30,8 @@ export abstract class ExpNodeConnection {
 	}
 }
 
-// Different connection types could have different functions for sending data across
 export class ExpNodeAudioConnection extends ExpNodeConnection {
-	private _actualTargetNode: AudioNode | AudioParam
+	private _audioVoiceConnection: AudioVoiceConnection
 
 	public constructor(
 		public readonly id: Id,
@@ -42,13 +41,12 @@ export class ExpNodeAudioConnection extends ExpNodeConnection {
 		super(id, 'audio')
 		this._source.connect(this)
 		this._target.connect(this)
-
-		this._actualTargetNode = this._target.getTarget(this.id)
+		this._audioVoiceConnection = new AudioVoiceConnection(id, this._source.getSource(this.id), this._target.getTarget(this.id))
 
 		this.feedbackLoopDetected.invokeImmediately(this._source.detectFeedbackLoop())
 
 		if (!this.feedbackLoopDetected.current) {
-			this._source.getSource(this.id).connect(this._actualTargetNode as AudioNode)
+			this._audioVoiceConnection.connect()
 		}
 	}
 
@@ -56,51 +54,84 @@ export class ExpNodeAudioConnection extends ExpNodeConnection {
 	public get inputPort() {return this._target}
 
 	public changeSource(newSource: ExpNodeAudioOutputPort) {
-		this._source.disconnect(this, this._actualTargetNode as AudioNode)
+		this._audioVoiceConnection.disconnect()
+		this._source.disconnect(this)
 		this._source = newSource
 		this._source.connect(this)
 
 		this.feedbackLoopDetected.invokeImmediately(this._source.detectFeedbackLoop())
 
 		if (!this.feedbackLoopDetected.current) {
-			this._source.getSource(this.id).connect(this._actualTargetNode as AudioNode)
+			this._audioVoiceConnection.changeSource(this._source.getSource(this.id))
 		}
 	}
 
 	public changeTarget(newTarget: ExpNodeAudioInputPort) {
-		const oldActualTarget = this._actualTargetNode
-		const oldTarget = this._target
+		this._audioVoiceConnection.disconnect()
+		this._target.disconnect(this)
 		this._target = newTarget
-		oldTarget.disconnect(this, this._actualTargetNode as AudioNode)
-		newTarget.connect(this)
-		this._actualTargetNode = this._target.getTarget(this.id)
-		const source = this._source.getSource(this.id)
-
-		try {
-			source.disconnect(oldActualTarget as AudioNode)
-		} catch (error) {
-			logger.warn('[changeTarget] error while disconnecting ExpNodeAudioOutputPort: ', {error})
-		}
+		this._target.connect(this)
 
 		this.feedbackLoopDetected.invokeImmediately(this._source.detectFeedbackLoop())
 
 		if (!this.feedbackLoopDetected.current) {
-			source.connect(this._actualTargetNode as AudioNode)
+			this._audioVoiceConnection.changeTarget(this._target.getTarget(this.id))
 		}
 	}
 
 	public dispose() {
 		// Give some time for the nodes to fade out audio
 		setTimeout(() => {
-			try {
-				this._source.getSource(this.id).disconnect(this._actualTargetNode as AudioNode)
-			} catch (error) {
-				// Probably doesn't matter if there is an error thrown here, we can just carry on
-				// logger.warn('[_disconnect] error while disconnecting ExpNodeAudioOutputPort: ', {error})
-			}
-			this._source.disconnect(this, this._actualTargetNode as AudioNode)
-			this._target.disconnect(this, this._actualTargetNode as AudioNode)
+			this._audioVoiceConnection.dispose()
+			this._source.disconnect(this)
+			this._target.disconnect(this)
 		}, 100)
+	}
+}
+
+class AudioVoiceConnection {
+	public get isConnected() {return this._isConnected}
+	private _isConnected = false
+
+	public constructor(
+		public readonly id: Id,
+		protected _source: AudioNode,
+		protected _target: AudioNode | AudioParam,
+	) {}
+
+	public get outputPort() {return this._source}
+	public get inputPort() {return this._target}
+
+	public connect() {
+		if (this._isConnected) return
+		this._source.connect(this._target as AudioNode)
+		this._isConnected = true
+	}
+
+	public disconnect() {
+		if (!this._isConnected) return
+		try {
+			this._source.disconnect(this._target as AudioNode)
+		} catch (error) {
+			logger.warn('[AudioVoiceConnection.disconnect] error while disconnecting: ', {error, source: this._source, target: this._target})
+		}
+		this._isConnected = false
+	}
+
+	public changeSource(newSource: AudioNode) {
+		this.disconnect()
+		this._source = newSource
+		this.connect()
+	}
+
+	public changeTarget(newTarget: AudioNode | AudioParam) {
+		this.disconnect()
+		this._target = newTarget
+		this.connect()
+	}
+
+	public dispose() {
+		this.disconnect()
 	}
 }
 

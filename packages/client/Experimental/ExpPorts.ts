@@ -93,14 +93,14 @@ export abstract class ExpNodeAudioPort extends ExpPort {
 		this.onConnectionCountChanged.invokeNextFrame(this.connectionCount)
 	}
 
-	public disconnect = (connection: ExpNodeAudioConnection, target: AudioNode) => {
-		this._disconnect(connection, target)
+	public disconnect = (connection: ExpNodeAudioConnection) => {
+		this._disconnect(connection)
 		this._connections.delete(connection.id)
 		this.onConnectionCountChanged.invokeNextFrame(this.connectionCount)
 	}
 
 	protected abstract _connect(connection: ExpNodeAudioConnection): void
-	protected abstract _disconnect(connection: ExpNodeAudioConnection, target: AudioNode): void
+	protected abstract _disconnect(connection: ExpNodeAudioConnection): void
 }
 
 export interface ExpNodeAudioInputPortArgs {
@@ -462,7 +462,7 @@ export class ExpNodeAudioOutputPort extends ExpNodeAudioPort {
 
 	protected _connect = (connection: ExpNodeAudioConnection) => {}
 
-	protected _disconnect = (connection: ExpNodeAudioConnection, target: AudioNode) => {}
+	protected _disconnect = (connection: ExpNodeAudioConnection) => {}
 
 	public detectFeedbackLoop(i = 0, nodeIds: List<Id> = List()): boolean {
 		return detectFeedbackLoop(this.node.id, this._connections, i, nodeIds)
