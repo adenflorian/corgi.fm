@@ -53,14 +53,6 @@ export class ExpNodeAudioConnection extends ExpNodeConnection {
 	public get outputPort() {return this._source}
 	public get inputPort() {return this._target}
 
-	public getSource() {
-		return this._source
-	}
-
-	public getTarget() {
-		return this._target
-	}
-
 	public changeSource(newSource: ExpNodeAudioOutputPort) {
 		this._source.disconnect(this, this._actualTargetNode as AudioNode)
 		this._source = newSource
@@ -104,12 +96,9 @@ export class ExpMidiConnection extends ExpNodeConnection {
 	public get outputPort() {return this._source}
 	public get inputPort() {return this._target}
 
-	public getSource() {
-		return this._source
-	}
-
-	public getTarget() {
-		return this._target
+	public sendMidiAction: MidiReceiver = (...args) => {
+		if (this.feedbackLoopDetected.current) return
+		this._target.destination(...args)
 	}
 
 	public changeSource(newSource: ExpMidiOutputPort) {
@@ -150,14 +139,6 @@ export class ExpPolyphonicConnection extends ExpNodeConnection {
 
 	public get outputPort() {return this._source}
 	public get inputPort() {return this._target}
-
-	public getSource() {
-		return this._source
-	}
-
-	public getTarget() {
-		return this._target
-	}
 
 	public changeSource(newSource: ExpPolyphonicOutputPort) {
 		this._source.disconnect(this)

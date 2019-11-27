@@ -75,10 +75,12 @@ export class ExpMidiOutputPort extends ExpMidiPort {
 		super(id, name, node, 'out')
 	}
 
-	public sendMidiAction: MidiReceiver = (...args) => {
-		this._connections.forEach(connection => {
-			connection.getTarget().destination(...args)
-		})
+	public sendMidiAction: MidiReceiver = (midiAction: MidiAction) => {
+		this._connections.forEach(this._sendMidiActionToConnection(midiAction))
+	}
+
+	private _sendMidiActionToConnection = (midiAction: MidiAction) => (connection: ExpMidiConnection) => {
+		connection.sendMidiAction(midiAction)
 	}
 
 	protected _connect = (connection: ExpMidiConnection) => {
