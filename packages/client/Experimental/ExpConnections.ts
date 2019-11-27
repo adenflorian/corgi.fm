@@ -92,6 +92,12 @@ export class ExpNodeAudioConnection extends ExpNodeConnection {
 	public dispose() {
 		// Give some time for the nodes to fade out audio
 		setTimeout(() => {
+			try {
+				this._source.getSource(this.id).disconnect(this._actualTargetNode as AudioNode)
+			} catch (error) {
+				// Probably doesn't matter if there is an error thrown here, we can just carry on
+				// logger.warn('[_disconnect] error while disconnecting ExpNodeAudioOutputPort: ', {error})
+			}
 			this._source.disconnect(this, this._actualTargetNode as AudioNode)
 			this._target.disconnect(this, this._actualTargetNode as AudioNode)
 		}, 100)

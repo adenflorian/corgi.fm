@@ -462,13 +462,7 @@ export class ExpNodeAudioOutputPort extends ExpNodeAudioPort {
 
 	protected _connect = (connection: ExpNodeAudioConnection) => {}
 
-	protected _disconnect = (connection: ExpNodeAudioConnection, target: AudioNode) => {
-		try {
-			this.source.disconnect(target)
-		} catch (error) {
-			// logger.warn('[_disconnect] error while disconnecting ExpNodeAudioOutputPort: ', {error})
-		}
-	}
+	protected _disconnect = (connection: ExpNodeAudioConnection, target: AudioNode) => {}
 
 	public detectFeedbackLoop(i = 0, nodeIds: List<Id> = List()): boolean {
 		return detectFeedbackLoop(this.node.id, this._connections, i, nodeIds)
