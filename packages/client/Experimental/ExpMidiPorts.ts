@@ -4,7 +4,7 @@ import {MidiAction} from '@corgifm/common/common-types'
 import {logger} from '../client-logger'
 import {CorgiNode} from './CorgiNode'
 import {ExpMidiConnections, ExpMidiConnection} from './ExpConnections'
-import {ExpPort, ExpPortSide} from './ExpPorts'
+import {ExpPort, ExpPortSide, detectFeedbackLoop} from './ExpPorts'
 
 export abstract class ExpMidiPort extends ExpPort {
 	protected readonly _connections: ExpMidiConnections = new Map<Id, ExpMidiConnection>()
@@ -57,7 +57,7 @@ export class ExpMidiInputPort extends ExpMidiPort {
 	protected _disconnect = (connection: ExpMidiConnection) => {}
 
 	public detectFeedbackLoop(i: number, nodeIds: List<Id>): boolean {
-		return this.node.detectAudioFeedbackLoop(i, nodeIds)
+		return this.node.detectMidiFeedbackLoop(i, nodeIds)
 	}
 }
 
@@ -94,21 +94,8 @@ export class ExpMidiOutputPort extends ExpMidiPort {
 	protected _disconnect = (connection: ExpMidiConnection) => {
 	}
 
-	public detectFeedbackLoop(i = 0, nodeIds: List<Id> = List()): boolean {
-		if (nodeIds.includes(this.node.id)) {
-			logger.warn('detected feedback loop because matching nodeId: ', {nodeId: this.node.id, nodeIds, i})
-			return true
-		}
-		if (i > 500) {
-			logger.warn('detected feedback loop because i too high: ', {nodeId: this.node.id, nodeIds, i})
-			return true
-		}
-
-		if (this._connections.size === 0) return false
-
-		return [...this._connections].some(([_, connection]) => {
-			return connection.detectFeedbackLoop(i + 1, nodeIds.push(this.node.id))
-		})
+	public detectFeedbackLoop(i = 0, nodeIds = List<Id>()): boolean {
+		return detectFeedbackLoop(this.node.id, this._connections, i, nodeIds)
 	}
 }
 export type ExpMidiInputPorts = readonly ExpMidiInputPort[]

@@ -1,8 +1,10 @@
 import {List} from 'immutable'
 import {ExpConnectionType} from '@corgifm/common/redux'
 import {ExpNodeAudioOutputPort, ExpNodeAudioInputPort, ExpPort} from './ExpPorts'
-import {ExpMidiOutputPort, ExpMidiInputPort} from './ExpMidiPorts'
+import {ExpMidiOutputPort, ExpMidiInputPort, MidiReceiver} from './ExpMidiPorts'
 import {ExpPolyphonicOutputPort, ExpPolyphonicInputPort} from './ExpPolyphonicPorts'
+import {logger} from '../client-logger'
+import {CorgiObjectChangedEvent, BooleanChangedEvent} from './CorgiEvents'
 
 export type ExpConnectionCallback = (connection: ExpNodeConnectionReact) => void
 
@@ -10,15 +12,22 @@ export interface ExpNodeConnectionReact extends Pick<ExpNodeConnection, 'id' | '
 
 // Different connection types could have different functions for sending data across
 export abstract class ExpNodeConnection {
+	public readonly feedbackLoopDetected = new BooleanChangedEvent(false)
+	protected abstract _source: ExpPort
+	protected abstract _target: ExpPort
+
 	public constructor(
 		public readonly id: Id,
 		public readonly type: ExpConnectionType,
 	) {}
 
 	public abstract dispose(): void
-	public abstract detectFeedbackLoop(i: number, nodeIds: List<Id>): boolean
 	public abstract get outputPort(): ExpPort
 	public abstract get inputPort(): ExpPort
+
+	public detectFeedbackLoop(i: number, nodeIds: List<Id>): boolean {
+		return this._target.detectFeedbackLoop(i, nodeIds)
+	}
 }
 
 // Different connection types could have different functions for sending data across
@@ -27,8 +36,8 @@ export class ExpNodeAudioConnection extends ExpNodeConnection {
 
 	public constructor(
 		public readonly id: Id,
-		private _source: ExpNodeAudioOutputPort,
-		private _target: ExpNodeAudioInputPort,
+		protected _source: ExpNodeAudioOutputPort,
+		protected _target: ExpNodeAudioInputPort,
 	) {
 		super(id, 'audio')
 		this._source.connect(this)
@@ -76,22 +85,20 @@ export class ExpNodeAudioConnection extends ExpNodeConnection {
 			this._target.disconnect(this, this._actualTargetNode as AudioNode)
 		}, 100)
 	}
-
-	public detectFeedbackLoop(i: number, nodeIds: List<Id>): boolean {
-		return this._target.detectFeedbackLoop(i, nodeIds)
-	}
 }
 
 // Different connection types could have different functions for sending data across
 export class ExpMidiConnection extends ExpNodeConnection {
 	public constructor(
 		public readonly id: Id,
-		private _source: ExpMidiOutputPort,
-		private _target: ExpMidiInputPort,
+		protected _source: ExpMidiOutputPort,
+		protected _target: ExpMidiInputPort,
 	) {
 		super(id, 'midi')
 		this._source.connect(this)
 		this._target.connect(this)
+
+		this.feedbackLoopDetected.invokeImmediately(this._source.detectFeedbackLoop())
 	}
 
 	public get outputPort() {return this._source}
@@ -109,6 +116,8 @@ export class ExpMidiConnection extends ExpNodeConnection {
 		this._source.disconnect(this)
 		this._source = newSource
 		this._source.connect(this)
+
+		this.feedbackLoopDetected.invokeImmediately(this._source.detectFeedbackLoop())
 	}
 
 	public changeTarget(newTarget: ExpMidiInputPort) {
@@ -117,15 +126,13 @@ export class ExpMidiConnection extends ExpNodeConnection {
 		oldTarget.disconnect(this)
 		newTarget.connect(this)
 		this._source.changeTarget(oldTarget, newTarget)
+
+		this.feedbackLoopDetected.invokeImmediately(this._source.detectFeedbackLoop())
 	}
 
 	public dispose() {
 		this._source.disconnect(this)
 		this._target.disconnect(this)
-	}
-
-	public detectFeedbackLoop(i: number, nodeIds: List<Id>): boolean {
-		return this._target.detectFeedbackLoop(i, nodeIds)
 	}
 }
 
@@ -133,8 +140,8 @@ export class ExpMidiConnection extends ExpNodeConnection {
 export class ExpPolyphonicConnection extends ExpNodeConnection {
 	public constructor(
 		public readonly id: Id,
-		private _source: ExpPolyphonicOutputPort,
-		private _target: ExpPolyphonicInputPort,
+		protected _source: ExpPolyphonicOutputPort,
+		protected _target: ExpPolyphonicInputPort,
 	) {
 		super(id, 'polyphonic')
 		this._target.connect(this)
@@ -169,10 +176,6 @@ export class ExpPolyphonicConnection extends ExpNodeConnection {
 	public dispose() {
 		this._source.disconnect(this)
 		this._target.disconnect(this)
-	}
-
-	public detectFeedbackLoop(i: number, nodeIds: List<Id>): boolean {
-		return this._target.detectFeedbackLoop(i, nodeIds)
 	}
 }
 

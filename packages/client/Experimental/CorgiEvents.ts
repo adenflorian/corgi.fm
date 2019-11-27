@@ -167,3 +167,47 @@ export class CorgiObjectChangedEvent<TObject extends CorgiObjectType> {
 		this._subscribers.forEach(delegate => delegate(this.currentValue))
 	}
 }
+
+export type BooleanChangedDelegate = (newBoolean: boolean) => void
+
+export class BooleanChangedEvent {
+	private readonly _subscribers = new Set<ObjectChangedDelegate<boolean>>()
+	private _frameRequested = false
+
+	public constructor(
+		private _current: boolean,
+	) {}
+
+	public get current() {return this._current}
+
+	public subscribe(delegate: ObjectChangedDelegate<boolean>): boolean {
+		this._subscribers.add(delegate)
+		return this._current
+	}
+
+	public unsubscribe(delegate: ObjectChangedDelegate<boolean>) {
+		this._subscribers.delete(delegate)
+	}
+
+	public invokeImmediately(newBoolean: boolean) {
+		if (newBoolean === this._current) return
+		this._current = newBoolean
+		this._invoke()
+	}
+
+	public invokeNextFrame(newBoolean: boolean, onInvoked?: () => void) {
+		if (newBoolean === this._current) return
+		this._current = newBoolean
+		if (this._frameRequested) return
+		this._frameRequested = true
+		requestAnimationFrame(() => {
+			this._frameRequested = false
+			this._invoke()
+			if (onInvoked) onInvoked()
+		})
+	}
+
+	private _invoke() {
+		this._subscribers.forEach(delegate => delegate(this._current))
+	}
+}

@@ -120,6 +120,7 @@ export const ConnectionView =
 					isSourcePlaying={isSourcePlaying}
 					highQuality={highQuality}
 					onDelete={onDelete}
+					toolTip={longLineTooltip}
 				/>
 				<Connector
 					width={connectorWidth}

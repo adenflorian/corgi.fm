@@ -42,6 +42,8 @@ export abstract class ExpPort {
 		node.onColorChange.subscribe(this.onNodeColorChange)
 	}
 
+	public abstract detectFeedbackLoop(i: number, nodeIds: List<Id>): boolean
+
 	private readonly onNodeColorChange = (newColor: string) => {
 		if (this.enabled.current) {
 			this.onColorChange.invokeImmediately(newColor)
@@ -480,20 +482,7 @@ export class ExpNodeAudioOutputPort extends ExpNodeAudioPort {
 	}
 
 	public detectFeedbackLoop(i = 0, nodeIds: List<Id> = List()): boolean {
-		if (nodeIds.includes(this.node.id)) {
-			logger.warn('detected feedback loop because matching nodeId: ', {nodeId: this.node.id, nodeIds, i})
-			return true
-		}
-		if (i > 500) {
-			logger.warn('detected feedback loop because i too high: ', {nodeId: this.node.id, nodeIds, i})
-			return true
-		}
-
-		if (this._connections.size === 0) return false
-
-		return [...this._connections].some(([_, connection]) => {
-			return connection.detectFeedbackLoop(i + 1, nodeIds.push(this.node.id))
-		})
+		return detectFeedbackLoop(this.node.id, this._connections, i, nodeIds)
 	}
 }
 
@@ -514,4 +503,21 @@ export function isAudioInputPort(val: unknown): val is ExpNodeAudioInputPort {
 
 export function isAudioParamInputPort(val: unknown): val is ExpNodeAudioParamInputPort {
 	return val instanceof ExpNodeAudioParamInputPort
+}
+
+export function detectFeedbackLoop(nodeId: Id, connections: ReadonlyMap<Id, ExpNodeConnection>, i: number, nodeIds: List<Id>): boolean {
+	if (nodeIds.includes(nodeId)) {
+		logger.warn('detected feedback loop because matching nodeId: ', {nodeId: nodeId, nodeIds, i})
+		return true
+	}
+	if (i > 500) {
+		logger.warn('detected feedback loop because i too high: ', {nodeId: nodeId, nodeIds, i})
+		return true
+	}
+
+	if (connections.size === 0) return false
+
+	return [...connections].some(([_, connection]) => {
+		return connection.detectFeedbackLoop(i + 1, nodeIds.push(nodeId))
+	})
 }

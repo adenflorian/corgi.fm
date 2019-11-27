@@ -14,6 +14,8 @@ import {ExpAudioParams, ExpCustomNumberParams, ExpCustomEnumParams} from './ExpP
 import {CorgiNodeView} from './CorgiNodeView'
 import {GroupNode} from './Nodes/GroupNode'
 import {CorgiStringChangedEvent} from './CorgiEvents'
+import {isMidiOutputPort} from './ExpMidiPorts'
+import {isPolyphonicOutputPort} from './ExpPolyphonicPorts'
 
 export const ExpNodeContext = React.createContext<null | CorgiNodeReact>(null)
 
@@ -167,6 +169,14 @@ export abstract class CorgiNode {
 
 	public detectAudioFeedbackLoop(i: number, nodeIds: List<Id>): boolean {
 		return [...this._ports].some(([_, x]) => isAudioOutputPort(x) && x.detectFeedbackLoop(i, nodeIds))
+	}
+
+	public detectMidiFeedbackLoop(i: number, nodeIds: List<Id>): boolean {
+		return [...this._ports].some(([_, x]) => isMidiOutputPort(x) && x.detectFeedbackLoop(i, nodeIds))
+	}
+
+	public detectPolyphonicFeedbackLoop(i: number, nodeIds: List<Id>): boolean {
+		return [...this._ports].some(([_, x]) => isPolyphonicOutputPort(x) && x.detectFeedbackLoop(i, nodeIds))
 	}
 
 	public dispose() {

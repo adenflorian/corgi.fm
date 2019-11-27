@@ -1,6 +1,5 @@
 import React from 'react'
 import {saturateColor} from '@corgifm/common/shamu-color'
-import {longLineTooltip} from '../client-constants'
 import {LineState} from './LineState'
 
 interface ConnectionLineProps {
@@ -16,6 +15,7 @@ interface ConnectionLineProps {
 	highQuality: boolean
 	onDelete: () => void
 	z?: number
+	toolTip: string
 }
 
 export const ConnectionLine = React.memo(
@@ -23,7 +23,7 @@ export const ConnectionLine = React.memo(
 		{
 			id, color, saturateSource, saturateTarget, pathDPart1,
 			pathDFull, connectedLine, speed = 1, z = undefined,
-			isSourcePlaying, highQuality, onDelete,
+			isSourcePlaying, highQuality, onDelete, toolTip,
 		}: ConnectionLineProps,
 	) {
 		const saturatedColor = saturateColor(color)
@@ -81,7 +81,7 @@ export const ConnectionLine = React.memo(
 						stroke="#0000"
 						strokeWidth="24px"
 					>
-						<title>{longLineTooltip}</title>
+						<title>{toolTip}</title>
 					</path>
 					<path
 						className="blurLine"
@@ -89,7 +89,7 @@ export const ConnectionLine = React.memo(
 						stroke={highQuality ? `url(#${id})` : isSourcePlaying ? saturatedColor : color}
 						strokeWidth="4px"
 					>
-						<title>{longLineTooltip}</title>
+						<title>{toolTip}</title>
 					</path>
 					{highQuality && isSourcePlaying &&
 						<path

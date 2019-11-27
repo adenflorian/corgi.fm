@@ -15,14 +15,16 @@ import {
 	selectRoomSettings, ExpConnectionType,
 } from '@corgifm/common/redux'
 import {longLineTooltip} from '../client-constants'
-import {useObjectChangedEvent, useStringChangedEvent} from '../Experimental/hooks/useCorgiEvent'
-import {usePort} from '../Experimental/hooks/usePort'
+import {useObjectChangedEvent, useStringChangedEvent, useBooleanChangedEvent} from '../Experimental/hooks/useCorgiEvent'
+import {usePort, useConnection} from '../Experimental/hooks/usePort'
 import {ExpPortReact} from '../Experimental/ExpPorts'
 import {ConnectionLine} from './ConnectionLine'
 import {Connector} from './Connector'
 import {LineState} from './LineState'
 import {connectorWidth, connectorHeight, makeStraightPath, makeCurvedPath} from './ConnectionView'
 import './ConnectionView.less'
+import {ExpNodeConnection} from '../Experimental/ExpConnections'
+import {CssColor} from '@corgifm/common/shamu-color'
 
 interface Props {
 	id: Id
@@ -35,13 +37,15 @@ export const ConnectedExpConnectionView = ({id}: Props) => {
 	const {sourceId, sourcePort, targetId, targetPort, type} = useSelector(createExpConnectionSelector(id))
 	const sourceExpPort = usePort(sourceId, sourcePort)
 	const targetExpPort = usePort(targetId, targetPort)
+	const connection = useConnection(id)
 
-	if (sourceExpPort && targetExpPort) {
+	if (sourceExpPort && targetExpPort && connection) {
 		return (
 			<ExpConnectionView
 				id={id}
 				sourcePort={sourceExpPort}
 				targetPort={targetExpPort}
+				connection={connection}
 				sourceId={sourceId}
 				targetId={targetId}
 				type={type}
@@ -55,6 +59,7 @@ export const ConnectedExpConnectionView = ({id}: Props) => {
 interface ExpConnectionViewPorts extends Props {
 	readonly sourcePort: ExpPortReact
 	readonly targetPort: ExpPortReact
+	readonly connection: ExpNodeConnection
 	readonly sourceId: Id
 	readonly targetId: Id
 	readonly type: ExpConnectionType
@@ -62,7 +67,7 @@ interface ExpConnectionViewPorts extends Props {
 
 const ExpConnectionView =
 	React.memo(function _ExpConnectionView({
-		id, sourcePort, targetPort, sourceId, targetId, type,
+		id, sourcePort, targetPort, sourceId, targetId, type, connection,
 	}: ExpConnectionViewPorts) {
 		const sourceNodePosition = useSelector(createExpPositionSelector(sourceId))
 		const targetNodePosition = useSelector(createExpPositionSelector(targetId))
@@ -79,6 +84,8 @@ const ExpConnectionView =
 
 		const targetX = targetNodePosition.x + targetPortPosition.x
 		const targetY = targetNodePosition.y + targetPortPosition.y
+
+		const isFeedbackLoopDetected = useBooleanChangedEvent(connection.feedbackLoopDetected)
 
 		const localClientId = useSelector((state: IClientAppState) => selectLocalClientId(state))
 
@@ -138,11 +145,21 @@ const ExpConnectionView =
 			dispatch(expConnectionsActions.delete(List([id])))
 		}, [dispatch, id])
 
-		const color = useStringChangedEvent(sourcePort.onColorChange)
+		const sourcePortColor = useStringChangedEvent(sourcePort.onColorChange)
+
+		const color = isFeedbackLoopDetected
+			? CssColor.disabledGray
+			: sourcePortColor
+
+		const feedbackLoopToolTip = isFeedbackLoopDetected
+			? `\nThis connection is disabled because it would have created a feedback loop`
+			: ``
+
+		const toolTip = longLineTooltip + feedbackLoopToolTip
 
 		return (
 			<div
-				className={`connection type-${type}`}
+				className={`connection type-${type} isFeedbackLoopDetected-${isFeedbackLoopDetected}`}
 				style={{color}}
 			>
 				<ConnectionLine
@@ -157,6 +174,7 @@ const ExpConnectionView =
 					highQuality={false}
 					onDelete={onDelete}
 					// z={Math.max(sourceZ, targetZ) - 1}
+					toolTip={toolTip}
 				/>
 				<Connector
 					width={connectorWidth}
@@ -165,7 +183,7 @@ const ExpConnectionView =
 					y={sourceY}
 					// z={sourceZ}
 					saturate={false}
-					title={longLineTooltip}
+					title={toolTip}
 					svgProps={{
 						onMouseDown: e => e.button === 0 && onMouseDown(
 							sourceConnectorLeft,
@@ -187,7 +205,7 @@ const ExpConnectionView =
 					y={targetY}
 					// z={targetZ}
 					saturate={false}
-					title={longLineTooltip}
+					title={toolTip}
 					svgProps={{
 						onMouseDown: e => e.button === 0 && onMouseDown(
 							targetConnectorLeft,

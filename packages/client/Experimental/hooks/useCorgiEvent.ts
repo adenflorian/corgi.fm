@@ -3,7 +3,7 @@ import {
 } from 'react'
 import {
 	CorgiNumberChangedEvent, CorgiStringChangedEvent,
-	CorgiEnumChangedEvent, CorgiObjectChangedEvent,
+	CorgiEnumChangedEvent, CorgiObjectChangedEvent, BooleanChangedEvent,
 } from '../CorgiEvents'
 
 export function useNumberChangedEvent(event: CorgiNumberChangedEvent, doEqualityCheck = true) {
@@ -79,11 +79,9 @@ export function useEnumChangedEvent<TEnum extends string>(initValue: TEnum, even
 export function useObjectChangedEvent<TObject extends object | boolean | undefined>(event: CorgiObjectChangedEvent<TObject>) {
 	const [, forceRender] = useReducer(x => x + 1, 0)
 
-	const value = useRef(event.currentValue)
+	const value = useRef(event.current)
 
 	useLayoutEffect(() => {
-		if (!event) return
-
 		function onNewValue(newValue: TObject) {
 			value.current = newValue
 			forceRender(0)
@@ -96,4 +94,26 @@ export function useObjectChangedEvent<TObject extends object | boolean | undefin
 	}, [event])
 
 	return value.current
+}
+
+export function useBooleanChangedEvent(event: BooleanChangedEvent) {
+	const [, forceRender] = useReducer(x => x + 1, 0)
+
+	const previousValue = useRef(event.current)
+
+	useLayoutEffect(() => {
+		function onNewValue(newValue: boolean) {
+			if (newValue === previousValue.current) return
+
+			previousValue.current = newValue
+			forceRender(0)
+		}
+
+		const initialValue = event.subscribe(onNewValue)
+		onNewValue(initialValue)
+
+		return () => event.unsubscribe(onNewValue)
+	}, [event])
+
+	return previousValue.current
 }
