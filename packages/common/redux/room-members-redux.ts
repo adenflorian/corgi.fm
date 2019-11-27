@@ -1,8 +1,8 @@
 import {Map, Record} from 'immutable'
 import {ActionType} from 'typesafe-actions'
-import {topGroupId} from '../common-constants'
+import {topGroupId, GroupId} from '../common-constants'
 import {IClientAppState} from './common-redux-types'
-import {IClientRoomState} from '.'
+import {IClientRoomState, BROADCASTER_ACTION, SERVER_ACTION} from '.'
 
 export const roomMemberActions = {
 	// Actions only to be sent from server
@@ -19,10 +19,12 @@ export const roomMemberActions = {
 		memberId,
 	} as const),
 	// Actions that can be sent by client
-	setNodeGroup: (memberId: ClientId, nodeGroupId: Id) => ({
+	setNodeGroup: (memberId: ClientId, nodeGroupId: GroupId) => ({
 		type: 'ROOM_MEMBERS_SET_NODE_GROUP' as const,
 		memberId,
 		nodeGroupId,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
 	} as const),
 } as const
 
@@ -32,7 +34,7 @@ export type RoomMembers = Map<ClientId, RoomMember>
 
 const defaultRoomMember = {
 	id: 'dummyRoomMemberId' as Id,
-	groupNodeId: topGroupId as Id | typeof topGroupId,
+	groupNodeId: topGroupId as GroupId,
 }
 
 const _makeRoomMember = Record(defaultRoomMember)
