@@ -298,7 +298,10 @@ function after(
 
 function determineTopGroupInGraph(nodes: ExpGraph['nodes']) {
 	// The top group is the groupId that is not an ID of any of the nodes in the graph
-	return nodes.find(node => !nodes.some(x => x.id === node.groupId))?.groupId
+	const node = nodes.find(x => !nodes.some(y => y.id === x.groupId))
+	return node
+		? node.groupId
+		: undefined
 }
 
 function createGroup(
