@@ -258,7 +258,7 @@ export class NodeManager {
 			case 'dummy': return logger.warn('was asked to add a dummy connection, how dum')
 		}
 
-		return assertUnreachable(expConnection && expConnection.type)
+		// return assertUnreachable(expConnection && expConnection.type)
 	}
 
 	private readonly _addAudioConnection = (expConnection: IExpConnection, sourcePort: ExpPort, targetPort: ExpPort) => {
@@ -330,7 +330,7 @@ export class NodeManager {
 			case 'dummy': return logger.warn('was asked to changeConnectionSource for a dummy connection, how dum')
 		}
 
-		return assertUnreachable(connection && connection.type)
+		// return assertUnreachable(connection && connection.type)
 	}
 
 	private readonly _changeAudioConnectionSource = (connection: ExpNodeConnection, newSourceId: Id, newSourcePort: ExpPort) => {
@@ -392,7 +392,7 @@ export class NodeManager {
 			case 'dummy': return logger.warn('was asked to changeConnectionTarget for a dummy connection, how dum')
 		}
 
-		return assertUnreachable(connection && connection.type)
+		// return assertUnreachable(connection && connection.type)
 	}
 
 	private readonly _changeAudioConnectionTarget = (connection: ExpNodeConnection, newTargetId: Id, newTargetPort: ExpPort) => {

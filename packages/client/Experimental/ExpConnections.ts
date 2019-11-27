@@ -31,7 +31,7 @@ export abstract class ExpNodeConnection {
 }
 
 export class ExpNodeAudioConnection extends ExpNodeConnection {
-	private _audioVoiceConnection: AudioVoiceConnection
+	private _audioVoiceConnections: AudioVoiceConnections
 
 	public constructor(
 		public readonly id: Id,
@@ -41,12 +41,15 @@ export class ExpNodeAudioConnection extends ExpNodeConnection {
 		super(id, 'audio')
 		this._source.connect(this)
 		this._target.connect(this)
-		this._audioVoiceConnection = new AudioVoiceConnection(id, this._source.getSource(this.id), this._target.getTarget(this.id))
+		const pairs = new Map<Id, SourceTargetPair>([
+			[id, {source: this._source.getSource(this.id), target: this._target.getTarget(this.id)} as SourceTargetPair]
+		])
+		this._audioVoiceConnections = new AudioVoiceConnections(id, pairs)
 
 		this.feedbackLoopDetected.invokeImmediately(this._source.detectFeedbackLoop())
 
 		if (!this.feedbackLoopDetected.current) {
-			this._audioVoiceConnection.connect()
+			this._audioVoiceConnections.connect()
 		}
 	}
 
@@ -54,7 +57,7 @@ export class ExpNodeAudioConnection extends ExpNodeConnection {
 	public get inputPort() {return this._target}
 
 	public changeSource(newSource: ExpNodeAudioOutputPort) {
-		this._audioVoiceConnection.disconnect()
+		this._audioVoiceConnections.disconnect()
 		this._source.disconnect(this)
 		this._source = newSource
 		this._source.connect(this)
@@ -62,12 +65,12 @@ export class ExpNodeAudioConnection extends ExpNodeConnection {
 		this.feedbackLoopDetected.invokeImmediately(this._source.detectFeedbackLoop())
 
 		if (!this.feedbackLoopDetected.current) {
-			this._audioVoiceConnection.changeSource(this._source.getSource(this.id))
+			this._audioVoiceConnections.changeSource(this._source.getSource(this.id))
 		}
 	}
 
 	public changeTarget(newTarget: ExpNodeAudioInputPort) {
-		this._audioVoiceConnection.disconnect()
+		this._audioVoiceConnections.disconnect()
 		this._target.disconnect(this)
 		this._target = newTarget
 		this._target.connect(this)
@@ -75,17 +78,62 @@ export class ExpNodeAudioConnection extends ExpNodeConnection {
 		this.feedbackLoopDetected.invokeImmediately(this._source.detectFeedbackLoop())
 
 		if (!this.feedbackLoopDetected.current) {
-			this._audioVoiceConnection.changeTarget(this._target.getTarget(this.id))
+			this._audioVoiceConnections.changeTarget(this._target.getTarget(this.id))
 		}
 	}
 
 	public dispose() {
 		// Give some time for the nodes to fade out audio
 		setTimeout(() => {
-			this._audioVoiceConnection.dispose()
+			this._audioVoiceConnections.dispose()
 			this._source.disconnect(this)
 			this._target.disconnect(this)
 		}, 100)
+	}
+}
+
+interface SourceTargetPair {
+	readonly id: Id
+	readonly source: AudioNode
+	readonly target: AudioNode | AudioParam
+}
+
+class AudioVoiceConnections {
+	public get isConnected() {return this._isConnected}
+	private readonly _voiceConnections = new Map<Id, AudioVoiceConnection>()
+	private _isConnected = false
+
+	public constructor(
+		public readonly id: Id,
+		sourceTargetPairs: Map<Id, SourceTargetPair>,
+	) {
+		sourceTargetPairs.forEach(pair => {
+			this._voiceConnections.set(pair.id, new AudioVoiceConnection(pair.id, pair.source, pair.target))
+		})
+	}
+
+	public connect() {
+		if (this._isConnected) return
+		this._voiceConnections.forEach(x => x.connect())
+		this._isConnected = true
+	}
+
+	public disconnect() {
+		if (!this._isConnected) return
+		this._voiceConnections.forEach(x => x.disconnect())
+		this._isConnected = false
+	}
+
+	public changeSource(newSource: AudioNode) {
+		this._voiceConnections.forEach(x => x.changeSource(newSource))
+	}
+
+	public changeTarget(newTarget: AudioNode | AudioParam) {
+		this._voiceConnections.forEach(x => x.changeTarget(newTarget))
+	}
+
+	public dispose() {
+		this._voiceConnections.forEach(x => x.dispose())
 	}
 }
 
@@ -98,9 +146,6 @@ class AudioVoiceConnection {
 		protected _source: AudioNode,
 		protected _target: AudioNode | AudioParam,
 	) {}
-
-	public get outputPort() {return this._source}
-	public get inputPort() {return this._target}
 
 	public connect() {
 		if (this._isConnected) return
