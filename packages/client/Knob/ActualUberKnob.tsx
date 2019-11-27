@@ -235,7 +235,9 @@ function UberArcLiveValue({
 
 		const value2 = liveValue - parentRatio - (parentRange === 'bipolar' ? liveRange.min : liveRange.min)
 
-		moddedValueGroupElement.transform.baseVal.getItem(0).setRotate((value2 * 360 * limit) + (360 * 0.25), 16, 16)
+		const value3 = Number.isNaN(value2) ? 0 : value2
+
+		moddedValueGroupElement.transform.baseVal.getItem(0).setRotate((value3 * 360 * limit) + (360 * 0.25), 16, 16)
 	}, [extraAnimationsEnabled, parentRange, parentRatio, liveRange.min])
 
 	useEffect(() => {

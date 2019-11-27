@@ -1,4 +1,4 @@
-import {List} from 'immutable'
+import * as Immutable from 'immutable'
 import {ExpConnectionType} from '@corgifm/common/redux'
 import {logger} from '../client-logger'
 import {ExpNodeAudioOutputPort, ExpNodeAudioInputPort, ExpPort} from './ExpPorts'
@@ -25,13 +25,15 @@ export abstract class ExpNodeConnection {
 	public abstract get outputPort(): ExpPort
 	public abstract get inputPort(): ExpPort
 
-	public detectFeedbackLoop(i: number, nodeIds: List<Id>): boolean {
+	public detectFeedbackLoop(i: number, nodeIds: Immutable.List<Id>): boolean {
 		return this._target.detectFeedbackLoop(i, nodeIds)
 	}
 }
 
+const emptyMap = Immutable.Map<any, any>()
+
 export class ExpNodeAudioConnection extends ExpNodeConnection {
-	private _audioVoiceConnections: AudioVoiceConnections
+	private _audioVoiceConnections = new AudioVoiceConnections(this.id, emptyMap)
 
 	public constructor(
 		public readonly id: Id,
@@ -41,44 +43,37 @@ export class ExpNodeAudioConnection extends ExpNodeConnection {
 		super(id, 'audio')
 		this._source.connect(this)
 		this._target.connect(this)
-		const pairs = new Map<Id, SourceTargetPair>([
-			[id, {source: this._source.getSource(this.id), target: this._target.getTarget(this.id)} as SourceTargetPair]
-		])
-		this._audioVoiceConnections = new AudioVoiceConnections(id, pairs)
-
-		this.feedbackLoopDetected.invokeImmediately(this._source.detectFeedbackLoop())
-
-		if (!this.feedbackLoopDetected.current) {
-			this._audioVoiceConnections.connect()
-		}
+		this._updateAudioStuff()
 	}
 
 	public get outputPort() {return this._source}
 	public get inputPort() {return this._target}
 
 	public changeSource(newSource: ExpNodeAudioOutputPort) {
-		this._audioVoiceConnections.disconnect()
+		this._audioVoiceConnections.dispose()
 		this._source.disconnect(this)
 		this._source = newSource
 		this._source.connect(this)
-
-		this.feedbackLoopDetected.invokeImmediately(this._source.detectFeedbackLoop())
-
-		if (!this.feedbackLoopDetected.current) {
-			this._audioVoiceConnections.changeSource(this._source.getSource(this.id))
-		}
+		this._updateAudioStuff()
 	}
 
 	public changeTarget(newTarget: ExpNodeAudioInputPort) {
-		this._audioVoiceConnections.disconnect()
+		this._audioVoiceConnections.dispose()
 		this._target.disconnect(this)
 		this._target = newTarget
 		this._target.connect(this)
+		this._updateAudioStuff()
+	}
+
+	private _updateAudioStuff() {
+		const sources = this._source.getSources(this.id)
+		const pairs = this._target.pairSourcesWithTargets(this.id, sources)
+		this._audioVoiceConnections = new AudioVoiceConnections(this.id, pairs)
 
 		this.feedbackLoopDetected.invokeImmediately(this._source.detectFeedbackLoop())
 
 		if (!this.feedbackLoopDetected.current) {
-			this._audioVoiceConnections.changeTarget(this._target.getTarget(this.id))
+			this._audioVoiceConnections.connect()
 		}
 	}
 
@@ -92,11 +87,13 @@ export class ExpNodeAudioConnection extends ExpNodeConnection {
 	}
 }
 
-interface SourceTargetPair {
+export interface SourceTargetPair {
 	readonly id: Id
 	readonly source: AudioNode
 	readonly target: AudioNode | AudioParam
 }
+
+export type SourceTargetPairs = Immutable.Map<Id, SourceTargetPair>
 
 class AudioVoiceConnections {
 	public get isConnected() {return this._isConnected}
@@ -105,7 +102,7 @@ class AudioVoiceConnections {
 
 	public constructor(
 		public readonly id: Id,
-		sourceTargetPairs: Map<Id, SourceTargetPair>,
+		sourceTargetPairs: SourceTargetPairs,
 	) {
 		sourceTargetPairs.forEach(pair => {
 			this._voiceConnections.set(pair.id, new AudioVoiceConnection(pair.id, pair.source, pair.target))
@@ -118,19 +115,19 @@ class AudioVoiceConnections {
 		this._isConnected = true
 	}
 
-	public disconnect() {
-		if (!this._isConnected) return
-		this._voiceConnections.forEach(x => x.disconnect())
-		this._isConnected = false
-	}
+	// public disconnect() {
+	// 	if (!this._isConnected) return
+	// 	this._voiceConnections.forEach(x => x.disconnect())
+	// 	this._isConnected = false
+	// }
 
-	public changeSource(newSource: AudioNode) {
-		this._voiceConnections.forEach(x => x.changeSource(newSource))
-	}
+	// public changeSource(newSources: Immutable.Map<Id, AudioNode>) {
+	// 	this._voiceConnections.forEach(x => x.changeSource(newSource))
+	// }
 
-	public changeTarget(newTarget: AudioNode | AudioParam) {
-		this._voiceConnections.forEach(x => x.changeTarget(newTarget))
-	}
+	// public changeTarget(newTarget: AudioNode | AudioParam) {
+	// 	this._voiceConnections.forEach(x => x.changeTarget(newTarget))
+	// }
 
 	public dispose() {
 		this._voiceConnections.forEach(x => x.dispose())
@@ -153,7 +150,7 @@ class AudioVoiceConnection {
 		this._isConnected = true
 	}
 
-	public disconnect() {
+	private disconnect() {
 		if (!this._isConnected) return
 		try {
 			this._source.disconnect(this._target as AudioNode)
@@ -163,17 +160,17 @@ class AudioVoiceConnection {
 		this._isConnected = false
 	}
 
-	public changeSource(newSource: AudioNode) {
-		this.disconnect()
-		this._source = newSource
-		this.connect()
-	}
+	// public changeSource(newSource: AudioNode) {
+	// 	this.disconnect()
+	// 	this._source = newSource
+	// 	this.connect()
+	// }
 
-	public changeTarget(newTarget: AudioNode | AudioParam) {
-		this.disconnect()
-		this._target = newTarget
-		this.connect()
-	}
+	// public changeTarget(newTarget: AudioNode | AudioParam) {
+	// 	this.disconnect()
+	// 	this._target = newTarget
+	// 	this.connect()
+	// }
 
 	public dispose() {
 		this.disconnect()

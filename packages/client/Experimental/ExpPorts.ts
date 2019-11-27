@@ -1,6 +1,6 @@
 /* eslint-disable no-empty-function */
 import React, {useContext} from 'react'
-import {List} from 'immutable'
+import * as Immutable from 'immutable'
 import {ParamInputCentering, SignalRange} from '@corgifm/common/common-types'
 import {clamp} from '@corgifm/common/common-utils'
 import {ExpConnectionType, selectOption, AppOptions} from '@corgifm/common/redux'
@@ -9,7 +9,7 @@ import {logger} from '../client-logger'
 import {CorgiNode, CorgiNodeArgs} from './CorgiNode'
 import {
 	ExpNodeAudioConnection,
-	ExpNodeConnections, ExpNodeConnection,
+	ExpNodeConnections, ExpNodeConnection, SourceTargetPairs, SourceTargetPair,
 } from './ExpConnections'
 import {ExpAudioParam} from './ExpParams'
 import {CorgiNumberChangedEvent, CorgiEnumChangedEvent, CorgiObjectChangedEvent, CorgiStringChangedEvent} from './CorgiEvents'
@@ -42,7 +42,7 @@ export abstract class ExpPort {
 		node.onColorChange.subscribe(this.onNodeColorChange)
 	}
 
-	public abstract detectFeedbackLoop(i: number, nodeIds: List<Id>): boolean
+	public abstract detectFeedbackLoop(i: number, nodeIds: Immutable.List<Id>): boolean
 
 	private readonly onNodeColorChange = (newColor: string) => {
 		if (this.enabled.current) {
@@ -183,9 +183,7 @@ class ParamInputChain {
 		this._gain.gain.value = frounded
 	}
 
-	public getInput(): AudioNode {
-		return this._waveShaper
-	}
+	public get input(): AudioNode {return this._waveShaper}
 
 	public dispose() {
 		this._waveShaper.disconnect()
@@ -215,15 +213,19 @@ export class ExpNodeAudioInputPort extends ExpNodeAudioPort {
 		super(id, name, node, 'in', isAudioParamInput)
 	}
 
-	public getTarget(connectionId: Id): AudioNode | AudioParam {
-		return this.destination
+	public pairSourcesWithTargets(connectionId: Id, sources: Immutable.Map<Id, AudioNode>): SourceTargetPairs {
+		return sources.map((source, id): SourceTargetPair => ({
+			id,
+			source,
+			target: this.destination,
+		}))
 	}
 
 	protected _connect = (connection: ExpNodeAudioConnection) => {}
 
 	protected _disconnect = (connection: ExpNodeAudioConnection) => {}
 
-	public detectFeedbackLoop(i: number, nodeIds: List<Id>): boolean {
+	public detectFeedbackLoop(i: number, nodeIds: Immutable.List<Id>): boolean {
 		return this.node.detectAudioFeedbackLoop(i, nodeIds)
 	}
 }
@@ -313,8 +315,8 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 				this._gainDenormalizer.disconnect(this._analyser.input)
 				this._analyser.dispose()
 			}
-		// eslint-disable-next-line no-empty
-		} catch (error) { }
+			// eslint-disable-next-line no-empty
+		} catch (error) {}
 	}
 
 	private readonly _onAnalyserUpdate = (newValue: number) => {
@@ -392,10 +394,20 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 		chain.setCentering(centering)
 	}
 
-	public getTarget(connectionId: Id): AudioNode {
+	public pairSourcesWithTargets(connectionId: Id, sources: Immutable.Map<Id, AudioNode>): SourceTargetPairs {
+		const chain = this._getOrMakeChainForConnection(connectionId)
+
+		return sources.map((source, id): SourceTargetPair => ({
+			id,
+			source,
+			target: chain.input,
+		}))
+	}
+
+	private _getOrMakeChainForConnection(connectionId: Id): ParamInputChain {
 		const existingChain = this._inputChains.get(connectionId)
 
-		if (existingChain) return existingChain.getInput()
+		if (existingChain) return existingChain
 
 		const newChain = new ParamInputChain(
 			connectionId,
@@ -413,7 +425,7 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 
 		this._updateLiveRange()
 
-		return newChain.getInput()
+		return newChain
 	}
 
 	protected _connect = (connection: ExpNodeAudioConnection) => {}
@@ -456,15 +468,15 @@ export class ExpNodeAudioOutputPort extends ExpNodeAudioPort {
 		super(id, name, node, 'out', false)
 	}
 
-	public getSource(connectionId: Id) {
-		return this.source
+	public getSources(connectionId: Id) {
+		return Immutable.Map<Id, AudioNode>([[this.id, this.source]])
 	}
 
 	protected _connect = (connection: ExpNodeAudioConnection) => {}
 
 	protected _disconnect = (connection: ExpNodeAudioConnection) => {}
 
-	public detectFeedbackLoop(i = 0, nodeIds: List<Id> = List()): boolean {
+	public detectFeedbackLoop(i = 0, nodeIds = Immutable.List<Id>()): boolean {
 		return detectFeedbackLoop(this.node.id, this._connections, i, nodeIds)
 	}
 }
@@ -488,7 +500,7 @@ export function isAudioParamInputPort(val: unknown): val is ExpNodeAudioParamInp
 	return val instanceof ExpNodeAudioParamInputPort
 }
 
-export function detectFeedbackLoop(nodeId: Id, connections: ReadonlyMap<Id, ExpNodeConnection>, i: number, nodeIds: List<Id>): boolean {
+export function detectFeedbackLoop(nodeId: Id, connections: ReadonlyMap<Id, ExpNodeConnection>, i: number, nodeIds: Immutable.List<Id>): boolean {
 	if (nodeIds.includes(nodeId)) {
 		logger.warn('detected feedback loop because matching nodeId: ', {nodeId: nodeId, nodeIds, i})
 		return true
