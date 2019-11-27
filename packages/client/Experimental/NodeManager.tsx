@@ -3,20 +3,23 @@ import * as immutable from 'immutable'
 import {ExpNodeState, IExpConnection, ExpGraph} from '@corgifm/common/redux'
 import {ParamInputCentering} from '@corgifm/common/common-types'
 import {NodeToNodeAction} from '@corgifm/common/server-constants'
+import {assertUnreachable} from '@corgifm/common/common-utils'
 import {logger} from '../client-logger'
 import {SingletonContextImpl} from '../SingletonContext'
 import {typeClassMap} from './Nodes/ExpNodes'
 import {CorgiNode} from './CorgiNode'
 import {
 	ExpNodeAudioConnection, ExpNodeConnection, isAudioConnection,
-	ExpMidiConnection, isMidiConnection,
+	ExpMidiConnection, isMidiConnection, ExpPolyphonicConnection,
+	isPolyphonicConnection,
 } from './ExpConnections'
 import {NumberParamChange, EnumParamChange} from './ExpParams'
 import {
-	isAudioOutputPort, isAudioInputPort, ExpPortType, isAudioParamInputPort,
+	isAudioOutputPort, isAudioInputPort, ExpPortType,
+	isAudioParamInputPort, ExpPort,
 } from './ExpPorts'
 import {isMidiOutputPort, isMidiInputPort} from './ExpMidiPorts'
-import {GroupNode} from './Nodes/GroupNode'
+import {isPolyphonicOutputPort, isPolyphonicInputPort} from './ExpPolyphonicPorts'
 
 export const NodeManagerContext = React.createContext<null | NodeManagerContextValue>(null)
 
@@ -234,18 +237,10 @@ export class NodeManager {
 		connections.forEach(this.addConnection)
 	}
 
-	public readonly addConnection = (expConnection: IExpConnection) => {
-		switch (expConnection.type) {
-			case 'audio': return this._addAudioConnection(expConnection)
-			case 'midi': return this._addMidiConnection(expConnection)
-			default: return
-		}
-	}
-
-	private readonly _addAudioConnection = (expConnection: IExpConnection) => {
+	public readonly addConnection = (expConnection: IExpConnection): void => {
 		// Get nodes
-		const source = this._nodes.get(expConnection.sourceId)
-		const target = this._nodes.get(expConnection.targetId)
+		const source = this._mainGraph.nodes.get(expConnection.sourceId)
+		const target = this._mainGraph.nodes.get(expConnection.targetId)
 		if (!source || !target) {
 			logger.warn('uh oh: ', {source, target})
 			return
@@ -254,13 +249,25 @@ export class NodeManager {
 		// Get and connect ports
 		const sourcePort = source.getPort(expConnection.sourcePort)
 		const targetPort = target.getPort(expConnection.targetPort)
-		if (!sourcePort || !targetPort) return logger.warn('[addAudioConnection] 404 port not found: ', {node: this, sourcePort, targetPort})
+		if (!sourcePort || !targetPort) return logger.warn('[addPolyConnection] 404 port not found: ', {node: this, sourcePort, targetPort})
+
+		switch (expConnection.type) {
+			case 'audio': return this._addAudioConnection(expConnection, sourcePort, targetPort)
+			case 'midi': return this._addMidiConnection(expConnection, sourcePort, targetPort)
+			case 'polyphonic': return this._addPolyConnection(expConnection, sourcePort, targetPort)
+			case 'dummy': return logger.warn('was asked to add a dummy connection, how dum')
+		}
+
+		return assertUnreachable(expConnection.type)
+	}
+
+	private readonly _addAudioConnection = (expConnection: IExpConnection, sourcePort: ExpPort, targetPort: ExpPort) => {
 		if (!isAudioOutputPort(sourcePort)) return logger.error('[addAudioConnection] expected audio output port: ', {node: this, sourcePort, targetPort})
 		if (!isAudioInputPort(targetPort)) return logger.error('[addAudioConnection] expected audio input port: ', {node: this, sourcePort, targetPort})
 
 		// Create connection
 		const connection = new ExpNodeAudioConnection(expConnection.id, sourcePort, targetPort)
-		this._connections.set(connection.id, connection)
+		this._mainGraph.connections.set(connection.id, connection)
 		if (isAudioParamInputPort(targetPort)) {
 			if (expConnection.audioParamInput.centering) {
 				targetPort.setChainCentering(connection.id, expConnection.audioParamInput.centering)
@@ -271,143 +278,157 @@ export class NodeManager {
 		}
 	}
 
-	private readonly _addMidiConnection = (expConnection: IExpConnection) => {
-		// Get nodes
-		const source = this._nodes.get(expConnection.sourceId)
-		const target = this._nodes.get(expConnection.targetId)
-		if (!source || !target) {
-			logger.warn('uh oh: ', {source, target})
-			return
-		}
-
-		// Get and connect ports
-		const sourcePort = source.getPort(expConnection.sourcePort)
-		const targetPort = target.getPort(expConnection.targetPort)
-		if (!sourcePort || !targetPort) return logger.warn('[addMidiConnection] 404 port not found: ', {node: this, sourcePort, targetPort})
+	private readonly _addMidiConnection = (expConnection: IExpConnection, sourcePort: ExpPort, targetPort: ExpPort) => {
 		if (!isMidiOutputPort(sourcePort)) return logger.error('[addMidiConnection] expected midi output port: ', {node: this, sourcePort, targetPort})
 		if (!isMidiInputPort(targetPort)) return logger.error('[addMidiConnection] expected midi input port: ', {node: this, sourcePort, targetPort})
 
 		// Create connection
 		const connection = new ExpMidiConnection(expConnection.id, sourcePort, targetPort)
-		this._connections.set(connection.id, connection)
+		this._mainGraph.connections.set(connection.id, connection)
+	}
+
+	private readonly _addPolyConnection = (expConnection: IExpConnection, sourcePort: ExpPort, targetPort: ExpPort) => {
+		if (!isPolyphonicOutputPort(sourcePort)) return logger.error('[addPolyConnection] expected poly output port: ', {node: this, sourcePort, targetPort})
+		if (!isPolyphonicInputPort(targetPort)) return logger.error('[addPolyConnection] expected poly input port: ', {node: this, sourcePort, targetPort})
+
+		// Create connection
+		const connection = new ExpPolyphonicConnection(expConnection.id, sourcePort, targetPort)
+		this._mainGraph.connections.set(connection.id, connection)
 	}
 
 	public readonly deleteConnection = (connectionId: Id) => {
-		const connection = this._connections.get(connectionId)
+		const connection = this._mainGraph.connections.get(connectionId)
 
 		if (!connection) return logger.warn('tried to delete non existent connection: ', connectionId)
 
-		this._connections.delete(connectionId)
+		this._mainGraph.connections.delete(connectionId)
 
 		connection.dispose()
 	}
 
 	public readonly deleteAllConnections = () => {
-		this._connections.forEach(x => this.deleteConnection(x.id))
+		this._mainGraph.connections.forEach(x => this.deleteConnection(x.id))
 	}
 
-	public readonly changeConnectionSource = (connectionId: Id, newSourceId: Id, newSourcePort: Id) => {
-		const connection = this._connections.get(connectionId)
+	public readonly changeConnectionSource = (connectionId: Id, newSourceId: Id, newSourcePortId: Id) => {
+		const connection = this._mainGraph.connections.get(connectionId)
 
 		if (!connection) return logger.warn('404 connection not found: ', connectionId)
+
+		// Get node
+		const source = this._mainGraph.nodes.get(newSourceId)
+		if (!source) return logger.warn('[changeConnectionSource] uh oh missing source: ', {source, connection})
+
+		// Get and connect ports
+		const newSourcePort = source.getPort(newSourcePortId)
+		if (!newSourcePort) return logger.warn('[changeConnectionSource] 404 port not found: ', {source, sourcePort: newSourcePort, connection})
 
 		switch (connection.type) {
 			case 'audio': return this._changeAudioConnectionSource(connection, newSourceId, newSourcePort)
 			case 'midi': return this._changeMidiConnectionSource(connection, newSourceId, newSourcePort)
-			default: return
+			case 'polyphonic': return this._changePolyConnectionSource(connection, newSourceId, newSourcePort)
+			case 'dummy': return logger.warn('was asked to changeConnectionSource for a dummy connection, how dum')
 		}
+
+		return assertUnreachable(connection.type)
 	}
 
-	private readonly _changeAudioConnectionSource = (connection: ExpNodeConnection, newSourceId: Id, newSourcePort: Id) => {
+	private readonly _changeAudioConnectionSource = (connection: ExpNodeConnection, newSourceId: Id, newSourcePort: ExpPort) => {
 		if (!isAudioConnection(connection)) {
 			return logger.error(
 				'[_changeAudioConnectionSource] connection not instanceof ExpNodeAudioConnection: ',
 				{connection, newSourceId, newSourcePort})
 		}
 
-		// Get node
-		const source = this._nodes.get(newSourceId)
-		if (!source) return logger.warn('uh oh: ', {source})
-
-		// Get and connect ports
-		const sourcePort = source.getPort(newSourcePort)
-		if (!sourcePort) return logger.warn('[changeAudioConnectionSource] 404 port not found: ', {node: this, sourcePort})
-		if (!isAudioOutputPort(sourcePort)) return logger.error('[changeAudioConnectionSource] expected audio output port: ', {node: this, sourcePort})
+		if (!isAudioOutputPort(newSourcePort)) return logger.error('[changeAudioConnectionSource] expected audio output port: ', {node: this, newSourcePort})
 
 		// Disconnect old source
-		connection.changeSource(sourcePort)
+		connection.changeSource(newSourcePort)
 	}
 
-	private readonly _changeMidiConnectionSource = (connection: ExpNodeConnection, newSourceId: Id, newSourcePort: Id) => {
+	private readonly _changeMidiConnectionSource = (connection: ExpNodeConnection, newSourceId: Id, newSourcePort: ExpPort) => {
 		if (!isMidiConnection(connection)) {
 			return logger.error(
 				'[_changeMidiConnectionSource] connection not instanceof ExpNodeMidiConnection: ',
 				{connection, newSourceId, newSourcePort})
 		}
 
-		// Get node
-		const source = this._nodes.get(newSourceId)
-		if (!source) return logger.warn('uh oh: ', {source})
-
-		// Get and connect ports
-		const sourcePort = source.getPort(newSourcePort)
-		if (!sourcePort) return logger.warn('[changeMidiConnectionSource] 404 port not found: ', {node: this, sourcePort})
-		if (!isMidiOutputPort(sourcePort)) return logger.error('[changeMidiConnectionSource] expected audio output port: ', {node: this, sourcePort})
+		if (!isMidiOutputPort(newSourcePort)) return logger.error('[changeMidiConnectionSource] expected midi output port: ', {node: this, newSourcePort})
 
 		// Disconnect old source
-		connection.changeSource(sourcePort)
+		connection.changeSource(newSourcePort)
 	}
 
-	public readonly changeConnectionTarget = (connectionId: Id, newTargetId: Id, newTargetPort: Id) => {
-		const connection = this._connections.get(connectionId)
+	private readonly _changePolyConnectionSource = (connection: ExpNodeConnection, newSourceId: Id, newSourcePort: ExpPort) => {
+		if (!isPolyphonicConnection(connection)) {
+			return logger.error(
+				'[_changePolyConnectionSource] connection not instanceof ExpNodePolyConnection: ',
+				{connection, newSourceId, newSourcePort})
+		}
+
+		if (!isPolyphonicOutputPort(newSourcePort)) return logger.error('[changePolyConnectionSource] expected poly output port: ', {node: this, newSourcePort})
+
+		// Disconnect old source
+		connection.changeSource(newSourcePort)
+	}
+
+	public readonly changeConnectionTarget = (connectionId: Id, newTargetId: Id, newTargetPortId: Id) => {
+		const connection = this._mainGraph.connections.get(connectionId)
 
 		if (!connection) return logger.warn('404 connection not found: ', connectionId)
+
+		// Get node
+		const target = this._mainGraph.nodes.get(newTargetId)
+		if (!target) return logger.warn('[changeConnectionTarget] uh oh target node not found: ', {target, connection})
+
+		// Get and connect ports
+		const newTargetPort = target.getPort(newTargetPortId)
+		if (!newTargetPort) return logger.warn('[changeConnectionTarget] 404 port not found: ', {target, targetPort: newTargetPort, connection})
 
 		switch (connection.type) {
 			case 'audio': return this._changeAudioConnectionTarget(connection, newTargetId, newTargetPort)
 			case 'midi': return this._changeMidiConnectionTarget(connection, newTargetId, newTargetPort)
-			default: return
+			case 'polyphonic': return this._changePolyConnectionTarget(connection, newTargetId, newTargetPort)
+			case 'dummy': return logger.warn('was asked to changeConnectionTarget for a dummy connection, how dum')
 		}
+
+		return assertUnreachable(connection.type)
 	}
 
-	private readonly _changeAudioConnectionTarget = (connection: ExpNodeConnection, newTargetId: Id, newTargetPort: Id) => {
+	private readonly _changeAudioConnectionTarget = (connection: ExpNodeConnection, newTargetId: Id, newTargetPort: ExpPort) => {
 		if (!isAudioConnection(connection)) {
 			return logger.error(
 				'[changeAudioConnectionTarget] connection not instanceof ExpNodeAudioConnection: ',
 				{newTargetId, newTargetPort, connection})
 		}
 
-		// Get node
-		const target = this._nodes.get(newTargetId)
-		if (!target) return logger.warn('uh oh: ', {target})
+		if (!isAudioInputPort(newTargetPort)) return logger.error('[changeAudioConnectionTarget] expected audio input port: ', {connection, newTargetPort})
 
-		// Get and connect ports
-		const targetPort = target.getPort(newTargetPort)
-		if (!targetPort) return logger.warn('[changeAudioConnectionTarget] 404 port not found: ', {node: this, targetPort})
-		if (!isAudioInputPort(targetPort)) return logger.error('[changeAudioConnectionTarget] expected audio input port: ', {node: this, targetPort})
-
-		// Disconnect old target
-		connection.changeTarget(targetPort)
+		connection.changeTarget(newTargetPort)
 	}
 
-	private readonly _changeMidiConnectionTarget = (connection: ExpNodeConnection, newTargetId: Id, newTargetPort: Id) => {
+	private readonly _changeMidiConnectionTarget = (connection: ExpNodeConnection, newTargetId: Id, newTargetPort: ExpPort) => {
 		if (!isMidiConnection(connection)) {
 			return logger.error(
 				'[_changeMidiConnectionTarget] connection not instanceof ExpNodeMidiConnection: ',
 				{newTargetId, newTargetPort, connection})
 		}
 
-		// Get node
-		const target = this._nodes.get(newTargetId)
-		if (!target) return logger.warn('uh oh: ', {target})
+		if (!isMidiInputPort(newTargetPort)) return logger.error('[_changeMidiConnectionTarget] expected midi input port: ', {connection, newTargetPort})
 
-		// Get and connect ports
-		const targetPort = target.getPort(newTargetPort)
-		if (!targetPort) return logger.warn('[_changeMidiConnectionTarget] 404 port not found: ', {node: this, targetPort})
-		if (!isMidiInputPort(targetPort)) return logger.error('[_changeMidiConnectionTarget] expected audio input port: ', {node: this, targetPort})
+		connection.changeTarget(newTargetPort)
+	}
 
-		// Disconnect old target
-		connection.changeTarget(targetPort)
+	private readonly _changePolyConnectionTarget = (connection: ExpNodeConnection, newTargetId: Id, newTargetPort: ExpPort) => {
+		if (!isPolyphonicConnection(connection)) {
+			return logger.error(
+				'[_changePolyConnectionTarget] connection not instanceof ExpNodePolyConnection: ',
+				{newTargetId, newTargetPort, connection})
+		}
+
+		if (!isPolyphonicInputPort(newTargetPort)) return logger.error('[_changePolyConnectionTarget] expected poly input port: ', {connection, newTargetPort})
+
+		connection.changeTarget(newTargetPort)
 	}
 
 	public readonly onExtraAnimationsChange = (value: boolean) => {

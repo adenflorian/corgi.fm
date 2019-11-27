@@ -15,7 +15,9 @@ export abstract class PolyAlgorithm {
 		voiceCount.subscribe(this._onVoiceCountChange)
 	}
 
-	protected readonly _onVoiceCountChange = (newVoiceCount: number) => {}
+	protected readonly _onVoiceCountChange = (newVoiceCount: number) => {
+		// const realNewVoiceCount = Math.round(newVoiceCount)
+	}
 }
 
 export class RoundRobin extends PolyAlgorithm {

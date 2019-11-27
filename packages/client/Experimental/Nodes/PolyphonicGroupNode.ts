@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 /* eslint-disable no-empty-function */
 import {CssColor} from '@corgifm/common/shamu-color'
 import {arrayToESIdKeyMap} from '@corgifm/common/common-utils'
@@ -9,9 +10,12 @@ import {
 } from '../ExpPorts'
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 import {ExpAudioParam, ExpAudioParams} from '../ExpParams'
-import {ExpPolyphonicInputPort} from '../ExpPolyphonicPorts'
+import {
+	ExpPolyphonicInputPort, PolyInNode, PolyOutNode,
+	PolyVoices, PolyVoice,
+} from '../ExpPolyphonicPorts'
 
-export class PolyphonicGroupNode extends CorgiNode {
+export class PolyphonicGroupNode extends CorgiNode implements PolyInNode {
 	protected readonly _ports: ExpPorts
 	protected readonly _audioParams: ExpAudioParams
 	protected readonly _audioContext: AudioContext
@@ -63,6 +67,46 @@ export class PolyphonicGroupNode extends CorgiNode {
 			x.disconnect()
 		})
 		this._outputGains.forEach(x => x.disconnect())
+	}
+
+	public onVoiceCountChanged(newVoiceCount: number, sourceNode: PolyOutNode) {
+		const sourceVoices = sourceNode.getVoices()
+		let currentVoiceCount = 0
+		sourceVoices.forEach(sourceVoice => {
+			if (sourceVoice) {
+				currentVoiceCount++
+			}
+		})
+		// console.log({currentVoiceCount, newVoiceCount})
+
+		if (newVoiceCount === currentVoiceCount) return
+
+		if (newVoiceCount < currentVoiceCount) {
+			this.destroyVoices(newVoiceCount, sourceVoices, sourceNode)
+		} else {
+			this.createVoices(newVoiceCount - currentVoiceCount, sourceVoices, sourceNode, currentVoiceCount)
+		}
+	}
+
+	private destroyVoices(newVoiceCount: number, sourceVoices: PolyVoices, sourceNode: PolyOutNode) {
+		const destroyedVoiceIndexes = [] as number[]
+		sourceVoices.forEach((sourceVoice, i) => {
+			if (i < newVoiceCount) return
+			sourceVoice.dispose()
+			delete sourceVoices[i]
+			destroyedVoiceIndexes.push(i)
+		})
+		sourceNode.onVoicesDestroyed(destroyedVoiceIndexes)
+	}
+
+	private createVoices(numberToAdd: number, sourceVoices: PolyVoices, sourceNode: PolyOutNode, currentVoiceCount: number) {
+		const createdVoiceIndexes = [] as number[]
+		for (let i = 0; i < numberToAdd; i++) {
+			const newVoiceIndex = currentVoiceCount + i
+			sourceVoices[newVoiceIndex] = new PolyVoice(newVoiceIndex, this._audioContext)
+			createdVoiceIndexes.push(newVoiceIndex)
+		}
+		sourceNode.onVoicesCreated(createdVoiceIndexes)
 	}
 
 	private readonly _createPort = ({type, inputOrOutput, id, isAudioParamInput}: ExpPortState): [ExpPort, ExpAudioParam | undefined] => {

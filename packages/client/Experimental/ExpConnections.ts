@@ -137,8 +137,8 @@ export class ExpPolyphonicConnection extends ExpNodeConnection {
 		private _target: ExpPolyphonicInputPort,
 	) {
 		super(id, 'polyphonic')
-		this._source.connect(this)
 		this._target.connect(this)
+		this._source.connect(this)
 	}
 
 	public get outputPort() {return this._source}
