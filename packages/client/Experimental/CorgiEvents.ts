@@ -124,9 +124,11 @@ export class CorgiEnumChangedEvent<TEnum extends string> {
 	}
 }
 
-export type ObjectChangedDelegate<TObject extends object | boolean | undefined | null> = (newObject: TObject) => void
+export type CorgiObjectType = object | boolean | undefined | null | string
 
-export class CorgiObjectChangedEvent<TObject extends object | boolean | undefined | null> {
+export type ObjectChangedDelegate<TObject extends CorgiObjectType> = (newObject: TObject) => void
+
+export class CorgiObjectChangedEvent<TObject extends CorgiObjectType> {
 	private readonly _subscribers = new Set<ObjectChangedDelegate<TObject>>()
 	private _frameRequested = false
 
