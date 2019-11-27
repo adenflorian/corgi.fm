@@ -45,9 +45,11 @@ export class ExpNodeAudioConnection extends ExpNodeConnection {
 
 		this._actualTargetNode = this._target.getTarget(this.id)
 
-		if (this._source.detectFeedbackLoop()) return
+		this.feedbackLoopDetected.invokeImmediately(this._source.detectFeedbackLoop())
 
-		this._source.getSource(this.id).connect(this._actualTargetNode as AudioNode)
+		if (!this.feedbackLoopDetected.current) {
+			this._source.getSource(this.id).connect(this._actualTargetNode as AudioNode)
+		}
 	}
 
 	public get outputPort() {return this._source}
@@ -57,7 +59,12 @@ export class ExpNodeAudioConnection extends ExpNodeConnection {
 		this._source.disconnect(this, this._actualTargetNode as AudioNode)
 		this._source = newSource
 		this._source.connect(this)
-		this._source.getSource(this.id).connect(this._actualTargetNode as AudioNode)
+
+		this.feedbackLoopDetected.invokeImmediately(this._source.detectFeedbackLoop())
+
+		if (!this.feedbackLoopDetected.current) {
+			this._source.getSource(this.id).connect(this._actualTargetNode as AudioNode)
+		}
 	}
 
 	public changeTarget(newTarget: ExpNodeAudioInputPort) {
@@ -67,7 +74,19 @@ export class ExpNodeAudioConnection extends ExpNodeConnection {
 		oldTarget.disconnect(this, this._actualTargetNode as AudioNode)
 		newTarget.connect(this)
 		this._actualTargetNode = this._target.getTarget(this.id)
-		this._source.changeTarget(oldActualTarget as AudioNode, this._actualTargetNode as AudioNode)
+		const source = this._source.getSource(this.id)
+
+		try {
+			source.disconnect(oldActualTarget as AudioNode)
+		} catch (error) {
+			logger.warn('[changeTarget] error while disconnecting ExpNodeAudioOutputPort: ', {error})
+		}
+
+		this.feedbackLoopDetected.invokeImmediately(this._source.detectFeedbackLoop())
+
+		if (!this.feedbackLoopDetected.current) {
+			source.connect(this._actualTargetNode as AudioNode)
+		}
 	}
 
 	public dispose() {
@@ -135,6 +154,8 @@ export class ExpPolyphonicConnection extends ExpNodeConnection {
 		super(id, 'polyphonic')
 		this._target.connect(this)
 		this._source.connect(this)
+
+		this.feedbackLoopDetected.invokeImmediately(this._source.detectFeedbackLoop())
 	}
 
 	public get outputPort() {return this._source}
@@ -144,6 +165,8 @@ export class ExpPolyphonicConnection extends ExpNodeConnection {
 		this._source.disconnect(this)
 		this._source = newSource
 		this._source.connect(this)
+
+		this.feedbackLoopDetected.invokeImmediately(this._source.detectFeedbackLoop())
 	}
 
 	public changeTarget(newTarget: ExpPolyphonicInputPort) {
@@ -152,6 +175,8 @@ export class ExpPolyphonicConnection extends ExpNodeConnection {
 		oldTarget.disconnect(this)
 		newTarget.connect(this)
 		this._source.changeTarget(oldTarget, newTarget)
+
+		this.feedbackLoopDetected.invokeImmediately(this._source.detectFeedbackLoop())
 	}
 
 	public dispose() {

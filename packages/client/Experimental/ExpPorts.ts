@@ -462,17 +462,6 @@ export class ExpNodeAudioOutputPort extends ExpNodeAudioPort {
 
 	protected _connect = (connection: ExpNodeAudioConnection) => {}
 
-	public changeTarget = (oldTarget: AudioNode, newTarget: AudioNode) => {
-		try {
-			this.source.disconnect(oldTarget)
-		} catch (error) {
-			logger.warn('[changeTarget] error while disconnecting ExpNodeAudioOutputPort: ', {error})
-		}
-		if (!this.detectFeedbackLoop()) {
-			this.source.connect(newTarget)
-		}
-	}
-
 	protected _disconnect = (connection: ExpNodeAudioConnection, target: AudioNode) => {
 		try {
 			this.source.disconnect(target)
@@ -511,7 +500,7 @@ export function detectFeedbackLoop(nodeId: Id, connections: ReadonlyMap<Id, ExpN
 		return true
 	}
 	if (i > 500) {
-		logger.warn('detected feedback loop because i too high: ', {nodeId: nodeId, nodeIds, i})
+		logger.error('detected feedback loop because i too high: ', {nodeId: nodeId, nodeIds, i})
 		return true
 	}
 
