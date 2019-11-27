@@ -9,7 +9,7 @@ import {ExpMidiInputPort} from '../ExpMidiPorts'
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 import {ExpPorts} from '../ExpPorts'
 import {midiNoteToFrequency} from '../../WebAudio'
-import {ExpPolyphonicOutputPort, PolyOutNode, PolyVoices} from '../ExpPolyphonicPorts'
+import {ExpPolyphonicOutputPort, PolyOutNode, PolyVoices, PolyVoice} from '../ExpPolyphonicPorts'
 import {PolyAlgorithm, RoundRobin, VoiceIndex} from './NodeHelpers/PolyAlgorithms'
 
 const maxVoiceCount = 32
@@ -32,7 +32,7 @@ export class AutomaticPolyphonicMidiConverterNode extends CorgiNode implements P
 		this._customNumberParams = arrayToESIdKeyMap([this._portamento, this._voiceCount])
 
 		const midiInputPort = new ExpMidiInputPort('input', 'input', this, midiAction => this._onMidiMessage.bind(this)(midiAction))
-		this._polyOutPort = new ExpPolyphonicOutputPort('poly', 'poly', this, this._voiceCount.onChange)
+		this._polyOutPort = new ExpPolyphonicOutputPort('poly', 'poly', this)
 		this._ports = arrayToESIdKeyMap([midiInputPort, this._polyOutPort])
 
 		this._algorithm = new RoundRobin(this._voiceCount.onChange)
@@ -48,50 +48,43 @@ export class AutomaticPolyphonicMidiConverterNode extends CorgiNode implements P
 		this._voiceCount.onChange.unsubscribe(this._onVoiceCountChange)
 	}
 
-	public onVoicesCreated = (createdVoiceIndexes: readonly number[]) => {
-		// for (let i = 0; i < createdVoiceIndexes.length; i++) {
-		// 	const newIndex = createdVoiceIndexes[i]
-		// 	const newVoice = this._voices[newIndex]
-		// 	const newPitchSource = this._createPitchSource()
-		// 	this._pitchSources[newIndex] = newPitchSource
-		// 	const newPitchWaveShaper = this._createPitchWaveShaper()
-		// 	this._waveShapers[newIndex] = newPitchWaveShaper
-		// 	newPitchSource.connect(newPitchWaveShaper).connect(newVoice.pitchInput)
+	private readonly _onVoiceCountChange = (newVoiceCount: number) => {
+		let currentVoiceCount = 0
+		this._voices.forEach(sourceVoice => {
+			if (sourceVoice) {
+				currentVoiceCount++
+			}
+		})
+		// console.log({currentVoiceCount, newVoiceCount})
 
-		// 	this._midiReceivers[newIndex] = newVoice.gateInput
-		// }
-		console.log('onVoicesCreated:', createdVoiceIndexes)
+		if (newVoiceCount === currentVoiceCount) return
+
+		if (newVoiceCount < currentVoiceCount) {
+			this.destroyVoices(newVoiceCount)
+		} else {
+			this.createVoices(newVoiceCount - currentVoiceCount, currentVoiceCount)
+		}
 	}
 
-	public onVoicesDestroyed(destroyedVoiceIndexes: readonly number[]) {
-		// for (let i = 0; i < destroyedVoiceIndexes.length; i++) {
-		// 	const indexOfDeath = destroyedVoiceIndexes[i]
-		// 	this._pitchSources[indexOfDeath].stop()
-		// 	this._pitchSources[indexOfDeath].disconnect()
-		// 	delete this._pitchSources[indexOfDeath]
-		// 	this._waveShapers[indexOfDeath].disconnect()
-		// 	delete this._waveShapers[indexOfDeath]
-		// 	// this._midiReceivers[indexOfDeath]
-		// }
+	private destroyVoices(newVoiceCount: number) {
+		const destroyedVoiceIndexes = [] as number[]
+		this._voices.forEach((sourceVoice, i) => {
+			if (i < newVoiceCount) return
+			sourceVoice.dispose()
+			delete this._voices[i]
+			destroyedVoiceIndexes.push(i)
+		})
 		console.log('onVoicesDestroyed:', destroyedVoiceIndexes)
 	}
 
-	public getVoices(): PolyVoices {
-		return this._voices
-	}
-
-	private readonly _onVoiceCountChange = (newVoiceCount: number) => {
-		// const realVoiceCount = Math.round(newVoiceCount)
-
-		// for (let i = 0; i < maxVoiceCount; i++) {
-		// 	if (i < realVoiceCount) {
-		// 		this._midiOutputPorts[i].enable()
-		// 		this._pitchOutputPorts[i].enable()
-		// 	} else {
-		// 		this._midiOutputPorts[i].disable()
-		// 		this._pitchOutputPorts[i].disable()
-		// 	}
-		// }
+	private createVoices(numberToAdd: number, currentVoiceCount: number) {
+		const createdVoiceIndexes = [] as number[]
+		for (let i = 0; i < numberToAdd; i++) {
+			const newVoiceIndex = currentVoiceCount + i
+			this._voices[newVoiceIndex] = new PolyVoice(newVoiceIndex, this._audioContext)
+			createdVoiceIndexes.push(newVoiceIndex)
+		}
+		console.log('onVoicesCreated:', createdVoiceIndexes)
 	}
 
 	private _onMidiMessage(midiAction: MidiAction) {

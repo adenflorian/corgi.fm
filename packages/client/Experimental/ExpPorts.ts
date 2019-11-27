@@ -215,7 +215,7 @@ export class ExpNodeAudioInputPort extends ExpNodeAudioPort {
 		super(id, name, node, 'in', isAudioParamInput)
 	}
 
-	public prepareDestinationForConnection(connectionId: Id): AudioNode | AudioParam {
+	public getTarget(connectionId: Id): AudioNode | AudioParam {
 		return this.destination
 	}
 
@@ -392,7 +392,7 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 		chain.setCentering(centering)
 	}
 
-	public prepareDestinationForConnection(connectionId: Id): AudioNode {
+	public getTarget(connectionId: Id): AudioNode {
 		const existingChain = this._inputChains.get(connectionId)
 
 		if (existingChain) return existingChain.getInput()

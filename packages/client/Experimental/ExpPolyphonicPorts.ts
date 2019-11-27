@@ -57,10 +57,6 @@ export class ExpPolyphonicInputPort extends ExpPolyphonicPort {
 	public detectFeedbackLoop(i: number, nodeIds: List<Id>): boolean {
 		return this.node.detectPolyphonicFeedbackLoop(i, nodeIds)
 	}
-
-	public onVoiceCountChanged = (newVoiceCount: number, sourceNode: PolyOutNode) => {
-		this.node.onVoiceCountChanged(newVoiceCount, sourceNode)
-	}
 }
 
 export interface ExpPolyphonicOutputPortArgs {
@@ -106,13 +102,9 @@ export type PolyVoices = PolyVoice[]
 export type ReadonlyPolyVoices = readonly PolyVoice[]
 
 export interface PolyOutNode extends CorgiNode {
-	onVoicesCreated(createdVoiceIndexes: readonly number[]): void
-	onVoicesDestroyed(destroyedVoiceIndexes: readonly number[]): void
-	getVoices(): PolyVoices
 }
 
 export interface PolyInNode extends CorgiNode {
-	onVoiceCountChanged(newVoiceCount: number, sourceNode: PolyOutNode): void
 }
 
 export class ExpPolyphonicOutputPort extends ExpPolyphonicPort {
@@ -120,29 +112,19 @@ export class ExpPolyphonicOutputPort extends ExpPolyphonicPort {
 		public readonly id: Id,
 		public readonly name: string,
 		public readonly node: PolyOutNode,
-		private readonly onSourceVoiceCountChanged: CorgiNumberChangedEvent
 	) {
 		super(id, name, node, 'out')
-		this.onSourceVoiceCountChanged.subscribe(this._onSourceVoiceCountChanged)
-	}
-
-	private _onSourceVoiceCountChanged = (newVoiceCount: number) => {
-		this._connections.forEach(connection => connection.getTarget().onVoiceCountChanged(Math.round(newVoiceCount), this.node))
 	}
 
 	protected _connect = (connection: ExpPolyphonicConnection) => {
 		if (this.detectFeedbackLoop()) return
-		connection.getTarget().onVoiceCountChanged(this.onSourceVoiceCountChanged.current, this.node)
 	}
 
 	public changeTarget = (oldTarget: ExpPolyphonicInputPort, newTarget: ExpPolyphonicInputPort) => {
-		oldTarget.onVoiceCountChanged(0, this.node)
 		if (this.detectFeedbackLoop()) return
-		newTarget.onVoiceCountChanged(this.onSourceVoiceCountChanged.current, this.node)
 	}
 
 	protected _disconnect = (connection: ExpPolyphonicConnection) => {
-		connection.getTarget().onVoiceCountChanged(0, this.node)
 	}
 
 	public dispose() {

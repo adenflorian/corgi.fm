@@ -69,46 +69,6 @@ export class PolyphonicGroupNode extends CorgiNode implements PolyInNode {
 		this._outputGains.forEach(x => x.disconnect())
 	}
 
-	public onVoiceCountChanged(newVoiceCount: number, sourceNode: PolyOutNode) {
-		const sourceVoices = sourceNode.getVoices()
-		let currentVoiceCount = 0
-		sourceVoices.forEach(sourceVoice => {
-			if (sourceVoice) {
-				currentVoiceCount++
-			}
-		})
-		// console.log({currentVoiceCount, newVoiceCount})
-
-		if (newVoiceCount === currentVoiceCount) return
-
-		if (newVoiceCount < currentVoiceCount) {
-			this.destroyVoices(newVoiceCount, sourceVoices, sourceNode)
-		} else {
-			this.createVoices(newVoiceCount - currentVoiceCount, sourceVoices, sourceNode, currentVoiceCount)
-		}
-	}
-
-	private destroyVoices(newVoiceCount: number, sourceVoices: PolyVoices, sourceNode: PolyOutNode) {
-		const destroyedVoiceIndexes = [] as number[]
-		sourceVoices.forEach((sourceVoice, i) => {
-			if (i < newVoiceCount) return
-			sourceVoice.dispose()
-			delete sourceVoices[i]
-			destroyedVoiceIndexes.push(i)
-		})
-		sourceNode.onVoicesDestroyed(destroyedVoiceIndexes)
-	}
-
-	private createVoices(numberToAdd: number, sourceVoices: PolyVoices, sourceNode: PolyOutNode, currentVoiceCount: number) {
-		const createdVoiceIndexes = [] as number[]
-		for (let i = 0; i < numberToAdd; i++) {
-			const newVoiceIndex = currentVoiceCount + i
-			sourceVoices[newVoiceIndex] = new PolyVoice(newVoiceIndex, this._audioContext)
-			createdVoiceIndexes.push(newVoiceIndex)
-		}
-		sourceNode.onVoicesCreated(createdVoiceIndexes)
-	}
-
 	private readonly _createPort = ({type, inputOrOutput, id, isAudioParamInput}: ExpPortState): [ExpPort, ExpAudioParam | undefined] => {
 		if (type === 'audio') {
 			if (inputOrOutput === 'input') {

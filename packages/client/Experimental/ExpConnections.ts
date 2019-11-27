@@ -43,7 +43,7 @@ export class ExpNodeAudioConnection extends ExpNodeConnection {
 		this._source.connect(this)
 		this._target.connect(this)
 
-		this._actualTargetNode = this._target.prepareDestinationForConnection(this.id)
+		this._actualTargetNode = this._target.getTarget(this.id)
 
 		if (this._source.detectFeedbackLoop()) return
 
@@ -66,7 +66,7 @@ export class ExpNodeAudioConnection extends ExpNodeConnection {
 		this._target = newTarget
 		oldTarget.disconnect(this, this._actualTargetNode as AudioNode)
 		newTarget.connect(this)
-		this._actualTargetNode = this._target.prepareDestinationForConnection(this.id)
+		this._actualTargetNode = this._target.getTarget(this.id)
 		this._source.changeTarget(oldActualTarget as AudioNode, this._actualTargetNode as AudioNode)
 	}
 
