@@ -30,9 +30,13 @@ export function useNodeManagerContext() {
 	return context
 }
 
+class CorgiGraph {
+	public readonly nodes = new Map<Id, CorgiNode>()
+	public readonly connections = new Map<Id, ExpNodeConnection>()
+}
+
 export class NodeManager {
-	private readonly _nodes = new Map<Id, CorgiNode>()
-	private readonly _connections = new Map<Id, ExpNodeConnection>()
+	private readonly _mainGraph = new CorgiGraph()
 	public readonly reactContext: NodeManagerContextValue
 	private get _audioContext() {return this._singletonContext.getAudioContext()}
 	private get _preMasterLimiter() {return this._singletonContext.getPreMasterLimiter()}
@@ -47,14 +51,14 @@ export class NodeManager {
 		return {
 			connections: {
 				get: (id: Id) => {
-					const connection = this._connections.get(id)
-					if (!connection) return logger.warn('[connections.get] 404 connection not found: ', {id, connections: this._connections})
+					const connection = this._mainGraph.connections.get(id)
+					if (!connection) return logger.warn('[connections.get] 404 connection not found: ', {id, connections: this._mainGraph.connections})
 					return connection
 				},
 			} as const,
 			ports: {
 				get: (nodeId: Id, portId: Id) => {
-					const node = this._nodes.get(nodeId)
+					const node = this._mainGraph.nodes.get(nodeId)
 					if (!node) return // logger.warn('[ports.get] 404 node not found: ', {nodeId, portId})
 					const port = node.getPort(portId)
 					if (!port) return logger.warn('[ports.get] 404 port not found: ', {nodeId, portId})
@@ -65,7 +69,7 @@ export class NodeManager {
 	}
 
 	public renderNodeId = (nodeId: Id) => {
-		const node = this._nodes.get(nodeId)
+		const node = this._mainGraph.nodes.get(nodeId)
 
 		if (!node) {
 			logger.warn('[renderNodeId] 404 node not found: ', nodeId)
@@ -80,7 +84,7 @@ export class NodeManager {
 	}
 
 	public onNodeToNode(action: NodeToNodeAction) {
-		const node = this._nodes.get(action.nodeId)
+		const node = this._mainGraph.nodes.get(action.nodeId)
 
 		if (!node) return logger.warn('[onNodeToNode] 404 node not found: ', {action, node})
 
@@ -88,7 +92,7 @@ export class NodeManager {
 	}
 
 	public getPortType(nodeId: Id, portId: Id): readonly [ExpPortType, boolean] {
-		const node = this._nodes.get(nodeId)
+		const node = this._mainGraph.nodes.get(nodeId)
 		if (!node) {
 			logger.warn('[getPortType] 404 node not found: ', {nodeId, portId})
 			return ['dummy', false]
@@ -103,11 +107,11 @@ export class NodeManager {
 
 	public onTick() {
 		const maxReadAhead = 0.2
-		this._nodes.forEach(node => node.onTick(this._audioContext.currentTime, maxReadAhead))
+		this._mainGraph.nodes.forEach(node => node.onTick(this._audioContext.currentTime, maxReadAhead))
 	}
 
 	public enableNode(id: Id, enabled: boolean) {
-		const node = this._nodes.get(id)
+		const node = this._mainGraph.nodes.get(id)
 
 		if (!node) return logger.warn('[enableNode] 404 node not found: ', {id})
 
@@ -115,7 +119,7 @@ export class NodeManager {
 	}
 
 	public readonly onAudioParamChange = (paramChange: NumberParamChange) => {
-		const node = this._nodes.get(paramChange.nodeId)
+		const node = this._mainGraph.nodes.get(paramChange.nodeId)
 
 		if (!node) return logger.warn('[onAudioParamChange] 404 node not found: ', {paramChange})
 
@@ -123,7 +127,7 @@ export class NodeManager {
 	}
 
 	public readonly onAudioParamInputGainChange = (connectionId: Id, newGain: number) => {
-		const connection = this._connections.get(connectionId)
+		const connection = this._mainGraph.connections.get(connectionId)
 
 		if (!connection) return logger.warn('[onAudioParamInputGainChange] 404 connection not found: ', connectionId)
 
@@ -137,7 +141,7 @@ export class NodeManager {
 	}
 
 	public readonly onAudioParamInputCenteringChange = (connectionId: Id, newCentering: ParamInputCentering) => {
-		const connection = this._connections.get(connectionId)
+		const connection = this._mainGraph.connections.get(connectionId)
 
 		if (!connection) return logger.warn('[onAudioParamInputCenteringChange] 404 connection not found: ', connectionId)
 
@@ -151,7 +155,7 @@ export class NodeManager {
 	}
 
 	public readonly onCustomNumberParamChange = (paramChange: NumberParamChange) => {
-		const node = this._nodes.get(paramChange.nodeId)
+		const node = this._mainGraph.nodes.get(paramChange.nodeId)
 
 		if (!node) return logger.warn('[onCustomNumberParamChange] 404 node not found: ', {paramChange})
 
@@ -159,7 +163,7 @@ export class NodeManager {
 	}
 
 	public readonly onCustomEnumParamChange = (paramChange: EnumParamChange) => {
-		const node = this._nodes.get(paramChange.nodeId)
+		const node = this._mainGraph.nodes.get(paramChange.nodeId)
 
 		if (!node) return logger.warn('[onCustomEnumParamChange] 404 node not found: ', {paramChange})
 
@@ -186,12 +190,12 @@ export class NodeManager {
 			parentNode: this._getParentNode(nodeState),
 			ports: nodeState.ports,
 		})
-		this._nodes.set(newNode.id, newNode)
+		this._mainGraph.nodes.set(newNode.id, newNode)
 		this._loadNodePreset(newNode, nodeState)
 	}
 
 	public readonly loadNodePreset = (nodeState: ExpNodeState) => {
-		const node = this._nodes.get(nodeState.id)
+		const node = this._mainGraph.nodes.get(nodeState.id)
 		if (!node) return logger.warn('[loadNodePreset] 404 node not found: ', {nodeState: nodeState.toJS()})
 		this._loadNodePreset(node, nodeState)
 	}
@@ -207,7 +211,7 @@ export class NodeManager {
 		const parentNodeId = nodeState.groupId
 		if (parentNodeId === 'top') return undefined
 
-		const parentNode = this._nodes.get(parentNodeId)
+		const parentNode = this._mainGraph.nodes.get(parentNodeId)
 
 		if (!parentNode) {
 			logger.error('404 parentNode not found!', {parentNodeId, nodeState})
@@ -218,12 +222,12 @@ export class NodeManager {
 	}
 
 	public readonly deleteNode = (nodeId: Id) => {
-		const node = this._nodes.get(nodeId)
+		const node = this._mainGraph.nodes.get(nodeId)
 
 		if (!node) return logger.warn('[deleteNode] 404 node not found: ', {nodeId})
 
 		node.dispose()
-		this._nodes.delete(nodeId)
+		this._mainGraph.nodes.delete(nodeId)
 	}
 
 	public readonly addConnections = (connections: immutable.Map<Id, IExpConnection>) => {
@@ -407,7 +411,7 @@ export class NodeManager {
 	}
 
 	public readonly onExtraAnimationsChange = (value: boolean) => {
-		this._nodes.forEach(node => {
+		this._mainGraph.nodes.forEach(node => {
 			node.getPorts().forEach(port => {
 				if (isAudioParamInputPort(port)) {
 					port.onExtraAnimationsChange(value)
@@ -417,9 +421,10 @@ export class NodeManager {
 	}
 
 	public readonly cleanup = () => {
-		this._nodes.forEach(node => node.dispose())
-		this._nodes.clear()
-		this._connections.clear()
+		this._mainGraph.nodes.forEach(node => node.dispose())
+		this._mainGraph.nodes.clear()
+		this._mainGraph.nodes.forEach(connection => connection.dispose())
+		this._mainGraph.connections.clear()
 	}
 }
 
