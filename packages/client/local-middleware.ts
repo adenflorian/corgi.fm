@@ -849,6 +849,7 @@ function createLocalStuffExperimental(dispatch: Dispatch, state: IClientAppState
 	const keyboard = makeExpNodeState({
 		type: 'keyboard',
 		ownerId: localClientId,
+		groupId: 'top',
 	})
 
 	dispatch(expNodesActions.add(keyboard))
@@ -865,6 +866,7 @@ function createLocalStuffExperimental(dispatch: Dispatch, state: IClientAppState
 	const midiConverter = makeExpNodeState({
 		type: 'midiConverter',
 		ownerId: localClientId,
+		groupId: 'top',
 	})
 
 	dispatch(expNodesActions.add(midiConverter))

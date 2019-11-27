@@ -43,6 +43,7 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 
 	const sequencer = makeExpNodeState({
 		type: 'sequencer',
+		groupId: 'top',
 	})
 	dispatchToRoom(expNodesActions.add(sequencer))
 	dispatchToRoom(expPositionActions.add(
@@ -56,6 +57,7 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 
 	const midiConverter = makeExpNodeState({
 		type: 'midiConverter',
+		groupId: 'top',
 	})
 	dispatchToRoom(expNodesActions.add(midiConverter))
 	dispatchToRoom(expPositionActions.add(
@@ -69,6 +71,7 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 
 	const midiConverter2 = makeExpNodeState({
 		type: 'midiConverter',
+		groupId: 'top',
 	})
 	dispatchToRoom(expNodesActions.add(midiConverter2))
 	dispatchToRoom(expPositionActions.add(
@@ -82,6 +85,7 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 
 	const midiRandom = makeExpNodeState({
 		type: 'midiRandom',
+		groupId: 'top',
 	})
 	dispatchToRoom(expNodesActions.add(midiRandom))
 	dispatchToRoom(expPositionActions.add(
@@ -95,6 +99,7 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 
 	const midiPitch = makeExpNodeState({
 		type: 'midiPitch',
+		groupId: 'top',
 	})
 	dispatchToRoom(expNodesActions.add(midiPitch))
 	dispatchToRoom(expNodesActions.customNumberParamChange(midiPitch.id, 'pitch', -12))
@@ -122,6 +127,7 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 
 	const env1 = makeExpNodeState({
 		type: 'envelope',
+		groupId: 'top',
 	})
 	dispatchToRoom(expNodesActions.add(env1))
 	dispatchToRoom(expPositionActions.add(
@@ -135,6 +141,7 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 
 	const env2 = makeExpNodeState({
 		type: 'envelope',
+		groupId: 'top',
 	})
 	dispatchToRoom(expNodesActions.add(env2))
 	dispatchToRoom(expPositionActions.add(
@@ -148,6 +155,7 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 
 	const osc1 = makeExpNodeState({
 		type: 'oscillator',
+		groupId: 'top',
 	})
 	dispatchToRoom(expNodesActions.add(osc1))
 	dispatchToRoom(expNodesActions.audioParamChange(osc1.id, 'frequency', 0))
@@ -162,6 +170,7 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 
 	const osc2 = makeExpNodeState({
 		type: 'oscillator',
+		groupId: 'top',
 	})
 	dispatchToRoom(expNodesActions.add(osc2))
 	dispatchToRoom(expNodesActions.audioParamChange(osc2.id, 'frequency', 0))
@@ -177,6 +186,7 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 
 	const filter = makeExpNodeState({
 		type: 'filter',
+		groupId: 'top',
 	})
 	dispatchToRoom(expNodesActions.add(filter))
 	dispatchToRoom(expPositionActions.add(
@@ -190,6 +200,7 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 
 	const gain = makeExpNodeState({
 		type: 'gain',
+		groupId: 'top',
 	})
 	dispatchToRoom(expNodesActions.add(gain))
 	dispatchToRoom(expNodesActions.audioParamChange(gain.id, 'gain', 0))
@@ -204,6 +215,7 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 
 	const gain2 = makeExpNodeState({
 		type: 'gain',
+		groupId: 'top',
 	})
 	dispatchToRoom(expNodesActions.add(gain2))
 	dispatchToRoom(expNodesActions.audioParamChange(gain2.id, 'gain', 0))
@@ -218,6 +230,7 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 
 	const gainMaster = makeExpNodeState({
 		type: 'gain',
+		groupId: 'top',
 	})
 	dispatchToRoom(expNodesActions.add(gainMaster))
 	dispatchToRoom(expNodesActions.audioParamChange(gainMaster.id, 'gain', 0))
@@ -232,6 +245,7 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 
 	const audioOutput = makeExpNodeState({
 		type: 'audioOutput',
+		groupId: 'top',
 	})
 	dispatchToRoom(expNodesActions.add(audioOutput))
 	dispatchToRoom(expPositionActions.add(

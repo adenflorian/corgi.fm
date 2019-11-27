@@ -112,7 +112,7 @@ const _makeExpNodeState = Record(defaultExpNodeState)
 
 export const defaultExpNodeRecord: ExpNodeState = _makeExpNodeState()
 
-export function makeExpNodeState(node: Partial<typeof defaultExpNodeState>): ExpNodeState {
+export function makeExpNodeState(node: Pick<typeof defaultExpNodeState, 'groupId' | 'type'> & Partial<typeof defaultExpNodeState>): ExpNodeState {
 	return _makeExpNodeState(node)
 		.set('id', node.id || uuid.v4())
 		.set('audioParams', Map(node.audioParams || Map()))
@@ -156,6 +156,14 @@ export const groupInOutNodeTypes: ExpNodeType[] = [
 	'groupInput', 'groupOutput',
 	'polyphonicGroupInput', 'polyphonicGroupOutput',
 ]
+
+export const groupNodeTypes: ExpNodeType[] = [
+	GroupExpNodeType, PolyphonicGroupExpNodeType,
+]
+
+export const isGroupNode = (node: ExpNodeState) => groupNodeTypes.includes(node.type)
+
+export const isGroupNodeType = (type: ExpNodeType) => groupNodeTypes.includes(type)
 
 export const isGroupInOutNode = (node: ExpNodeState) => groupInOutNodeTypes.includes(node.type)
 
