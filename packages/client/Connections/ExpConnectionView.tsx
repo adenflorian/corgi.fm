@@ -14,8 +14,6 @@ import {
 	selectExpConnectionStackOrderForTarget,
 	selectRoomSettings, ExpConnectionType,
 } from '@corgifm/common/redux'
-import {CssColor} from '@corgifm/common/shamu-color'
-import {useNodeManagerContext} from '../Experimental/NodeManager'
 import {longLineTooltip} from '../client-constants'
 import {useObjectChangedEvent, useStringChangedEvent} from '../Experimental/hooks/useCorgiEvent'
 import {usePort} from '../Experimental/hooks/usePort'

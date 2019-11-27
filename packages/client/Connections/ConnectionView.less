@@ -43,6 +43,9 @@
             .mainLongLine {
                 stroke-width: 4px;
             }
+            .blurLine {
+                stroke-width: 6px;
+            }
         }
     }
 
@@ -51,14 +54,15 @@
             .mainLongLine {
                 stroke-width: 6px;
             }
+            .blurLine {
+                stroke-width: 8px;
+            }
         }
     }
 
     .longLine {
         z-index: -15;
         stroke-linecap: round;
-
-
 
         g {
             pointer-events: all;
@@ -78,12 +82,13 @@
 
             &:not(:hover) {
                 .blurLine {
-                    stroke: #0000;
+                    stroke: transparent;
                 }
             }
 
             .blurLine {
                 filter: url(#saturate);
+                stroke-width: 4px;
             }
         }
     }
