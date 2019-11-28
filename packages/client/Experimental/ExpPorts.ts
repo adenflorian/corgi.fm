@@ -12,7 +12,11 @@ import {
 	ExpNodeConnections, ExpNodeConnection, SourceTargetPairs, SourceTargetPair,
 } from './ExpConnections'
 import {ExpAudioParam} from './ExpParams'
-import {CorgiNumberChangedEvent, CorgiEnumChangedEvent, CorgiObjectChangedEvent, CorgiStringChangedEvent} from './CorgiEvents'
+import {
+	CorgiNumberChangedEvent, CorgiEnumChangedEvent,
+	CorgiObjectChangedEvent, CorgiStringChangedEvent,
+	isCorgiObjectChangedEvent,
+} from './CorgiEvents'
 import {CorgiAnalyserSPNode} from './CorgiAnalyserSPN'
 
 export type ExpPortCallback = (port: ExpPort) => void
@@ -459,21 +463,21 @@ export interface ExpNodeAudioOutputPortArgs {
 }
 
 export class ExpNodeAudioOutputPort extends ExpNodeAudioPort {
-	private _sources = Immutable.Map<Id, AudioNode>()
-	public get source(): AudioNode {return this._sources.first(null)!}
+	private _sources = new CorgiObjectChangedEvent<Immutable.Map<Id, AudioNode>>(Immutable.Map())
+	public get source(): AudioNode {return this._sources.current.first(null)!}
 
 	public constructor(
 		public readonly id: Id,
 		public readonly name: string,
 		public readonly node: CorgiNode,
-		source: AudioNode | Immutable.Map<Id, AudioNode>,
+		source: AudioNode | CorgiObjectChangedEvent<Immutable.Map<Id, AudioNode>>,
 	) {
 		super(id, name, node, 'out', false)
 
-		if (Immutable.isImmutable(source)) {
+		if (isCorgiObjectChangedEvent<Immutable.Map<Id, AudioNode>>(source)) {
 			this._sources = source
 		} else {
-			this._sources = this._sources.set(this.id, source)
+			this._sources = new CorgiObjectChangedEvent<Immutable.Map<Id, AudioNode>>(Immutable.Map<Id, AudioNode>().set(this.id, source))
 		}
 	}
 

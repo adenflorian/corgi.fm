@@ -128,19 +128,24 @@ export type CorgiObjectType = object | boolean | undefined | null | string
 
 export type ObjectChangedDelegate<TObject extends CorgiObjectType> = (newObject: TObject) => void
 
+/** Be careful with this */
+export function isCorgiObjectChangedEvent<TObject extends CorgiObjectType>(val: unknown): val is CorgiObjectChangedEvent<TObject> {
+	return val instanceof CorgiObjectChangedEvent
+}
+
 export class CorgiObjectChangedEvent<TObject extends CorgiObjectType> {
 	private readonly _subscribers = new Set<ObjectChangedDelegate<TObject>>()
 	private _frameRequested = false
 
 	public constructor(
-		public currentValue: TObject,
+		private currentValue: TObject,
 	) {}
 
 	public get current() {return this.currentValue}
 
-	public subscribe(delegate: ObjectChangedDelegate<TObject>): TObject {
+	public subscribe(delegate: ObjectChangedDelegate<TObject>) {
 		this._subscribers.add(delegate)
-		return this.currentValue
+		delegate(this.current)
 	}
 
 	public unsubscribe(delegate: ObjectChangedDelegate<TObject>) {

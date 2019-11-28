@@ -14,7 +14,7 @@ type AudioWorkletNames = typeof audioWorkletNames[number]
 let x = 0
 
 export async function loadAudioWorkletsAsync(audioContext: AudioContext) {
-	if (simpleGlobalClientState.onAudioWorkletLoaded.currentValue) {
+	if (simpleGlobalClientState.onAudioWorkletLoaded.current) {
 		logger.warn('AudioWorklet already loaded!')
 	}
 	try {
@@ -46,7 +46,7 @@ export function createCorgiDownSamplerWorkletNode(audioContext: AudioContext) {
 }
 
 function _createAudioWorkletNode(moduleName: AudioWorkletNames, audioContext: AudioContext): AudioWorkletNode | null {
-	if (simpleGlobalClientState.onAudioWorkletLoaded.currentValue) {
+	if (simpleGlobalClientState.onAudioWorkletLoaded.current) {
 		return new AudioWorkletNode(audioContext, moduleName)
 	} else {
 		return null

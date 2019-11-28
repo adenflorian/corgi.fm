@@ -249,7 +249,7 @@ export class NodeManager {
 		// Get and connect ports
 		const sourcePort = source.getPort(expConnection.sourcePort)
 		const targetPort = target.getPort(expConnection.targetPort)
-		if (!sourcePort || !targetPort) return logger.warn('[addPolyConnection] 404 port not found: ', {node: this, sourcePort, targetPort})
+		if (!sourcePort || !targetPort) return logger.warn('[addConnection] 404 port not found: ', {node: this, sourcePort, targetPort})
 
 		switch (expConnection.type) {
 			case 'audio': return this._addAudioConnection(expConnection, sourcePort, targetPort)

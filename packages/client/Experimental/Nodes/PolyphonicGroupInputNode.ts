@@ -31,12 +31,12 @@ export class PolyphonicGroupInputNode extends CorgiNode {
 			this._ports.set(input.id, new ExpNodeAudioOutputPort(input.id, input.name, this, source))
 		})
 
-		const pitchGain = corgiNodeArgs.audioContext.createGain()
-		const internalPitchPort = new ExpNodeAudioOutputPort('pitch', 'pitch', this, pitchGain)
-		this._ports.set(internalPitchPort.id, internalPitchPort)
+		// const pitchGain = corgiNodeArgs.audioContext.createGain()
+		// const internalPitchPort = new ExpNodeAudioOutputPort('pitch', 'pitch', this, pitchGain)
+		// this._ports.set(internalPitchPort.id, internalPitchPort)
 
-		const internalMidiPort = new ExpMidiOutputPort('gate', 'gate', this)
-		this._ports.set(internalMidiPort.id, internalMidiPort)
+		// const internalMidiPort = new ExpMidiOutputPort('gate', 'gate', this)
+		// this._ports.set(internalMidiPort.id, internalMidiPort)
 	}
 
 	public render = () => this.getDebugView()

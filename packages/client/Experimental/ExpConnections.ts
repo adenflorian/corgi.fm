@@ -43,7 +43,7 @@ export class ExpNodeAudioConnection extends ExpNodeConnection {
 		super(id, 'audio')
 		this._source.connect(this)
 		this._target.connect(this)
-		this._updateAudioStuff()
+		this._subscribeToSources()
 	}
 
 	public get outputPort() {return this._source}
@@ -54,7 +54,7 @@ export class ExpNodeAudioConnection extends ExpNodeConnection {
 		this._source.disconnect(this)
 		this._source = newSource
 		this._source.connect(this)
-		this._updateAudioStuff()
+		this._subscribeToSources()
 	}
 
 	public changeTarget(newTarget: ExpNodeAudioInputPort) {
@@ -62,22 +62,29 @@ export class ExpNodeAudioConnection extends ExpNodeConnection {
 		this._target.disconnect(this)
 		this._target = newTarget
 		this._target.connect(this)
-		this._updateAudioStuff()
+		this._subscribeToSources()
 	}
 
-	private _updateAudioStuff() {
-		const sources = this._source.getSources(this.id)
+	private _subscribeToSources() {
+		this._source.getSources(this.id).subscribe(this._foo)
+	}
+
+	private readonly _foo = (sources: Immutable.Map<Id, AudioNode>) => {
+		console.log('foo 1', {sources: sources.toJS()})
 		const pairs = this._target.pairSourcesWithTargets(this.id, sources)
+		this._audioVoiceConnections.dispose()
 		this._audioVoiceConnections = new AudioVoiceConnections(this.id, pairs)
 
 		this.feedbackLoopDetected.invokeImmediately(this._source.detectFeedbackLoop())
 
 		if (!this.feedbackLoopDetected.current) {
+			console.log('foo 2', {_audioVoiceConnections: this._audioVoiceConnections})
 			this._audioVoiceConnections.connect()
 		}
 	}
 
 	public dispose() {
+		this._source.getSources(this.id).unsubscribe(this._foo)
 		// Give some time for the nodes to fade out audio
 		setTimeout(() => {
 			this._audioVoiceConnections.dispose()

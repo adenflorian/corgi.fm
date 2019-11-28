@@ -5,7 +5,6 @@ import {CorgiNode} from './CorgiNode'
 import {ExpPolyphonicConnections, ExpPolyphonicConnection} from './ExpConnections'
 import {ExpPort, ExpPortSide, detectFeedbackLoop} from './ExpPorts'
 import {MidiReceiver} from './ExpMidiPorts'
-import {CorgiNumberChangedEvent} from './CorgiEvents'
 import {MidiAction} from '@corgifm/common/common-types'
 
 export abstract class ExpPolyphonicPort extends ExpPort {
@@ -91,6 +90,8 @@ export class PolyVoice {
 
 	public get pitchSource() {return this._pitchInput.offset}
 
+	public get pitchOut(): AudioNode {return this._pitchWaveShaper}
+
 	public dispose() {
 		this._pitchInput.stop()
 		this._pitchInput.disconnect()
@@ -117,11 +118,9 @@ export class ExpPolyphonicOutputPort extends ExpPolyphonicPort {
 	}
 
 	protected _connect = (connection: ExpPolyphonicConnection) => {
-		if (this.detectFeedbackLoop()) return
 	}
 
 	public changeTarget = (oldTarget: ExpPolyphonicInputPort, newTarget: ExpPolyphonicInputPort) => {
-		if (this.detectFeedbackLoop()) return
 	}
 
 	protected _disconnect = (connection: ExpPolyphonicConnection) => {

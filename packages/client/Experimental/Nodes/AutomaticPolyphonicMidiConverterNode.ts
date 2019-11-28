@@ -1,16 +1,18 @@
 /* eslint-disable no-empty-function */
+import * as Immutable from 'immutable'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {MidiAction} from '@corgifm/common/common-types'
 import {oscillatorFreqCurveFunctions, arrayToESIdKeyMap} from '@corgifm/common/common-utils'
 import {maxPitchFrequency} from '@corgifm/common/common-constants'
 import {adsrValueToString} from '../../client-constants'
 import {ExpCustomNumberParam, ExpCustomNumberParams} from '../ExpParams'
-import {ExpMidiInputPort} from '../ExpMidiPorts'
+import {ExpMidiInputPort, ExpMidiOutputPort} from '../ExpMidiPorts'
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
-import {ExpPorts} from '../ExpPorts'
+import {ExpPorts, ExpNodeAudioOutputPort} from '../ExpPorts'
 import {midiNoteToFrequency} from '../../WebAudio'
 import {ExpPolyphonicOutputPort, PolyOutNode, PolyVoices, PolyVoice} from '../ExpPolyphonicPorts'
 import {PolyAlgorithm, RoundRobin, VoiceIndex} from './NodeHelpers/PolyAlgorithms'
+import {CorgiObjectChangedEvent} from '../CorgiEvents'
 
 const maxVoiceCount = 32
 
@@ -21,7 +23,10 @@ export class AutomaticPolyphonicMidiConverterNode extends CorgiNode implements P
 	private readonly _voiceCount: ExpCustomNumberParam
 	private readonly _algorithm: PolyAlgorithm
 	private readonly _voices: PolyVoices = []
-	private readonly _polyOutPort: ExpPolyphonicOutputPort
+	// private readonly _polyOutPort: ExpPolyphonicOutputPort
+	private readonly _pitchOutputPort: ExpNodeAudioOutputPort
+	private readonly _midiOutputPort: ExpMidiOutputPort
+	private readonly _pitchSources: CorgiObjectChangedEvent<Immutable.Map<Id, AudioNode>>
 
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
 		super(corgiNodeArgs, {name: 'Automatic Polyphonic Midi Converter', color: CssColor.yellow})
@@ -32,8 +37,11 @@ export class AutomaticPolyphonicMidiConverterNode extends CorgiNode implements P
 		this._customNumberParams = arrayToESIdKeyMap([this._portamento, this._voiceCount])
 
 		const midiInputPort = new ExpMidiInputPort('input', 'input', this, midiAction => this._onMidiMessage.bind(this)(midiAction))
-		this._polyOutPort = new ExpPolyphonicOutputPort('poly', 'poly', this)
-		this._ports = arrayToESIdKeyMap([midiInputPort, this._polyOutPort])
+		// this._polyOutPort = new ExpPolyphonicOutputPort('poly', 'poly', this)
+		this._pitchSources = new CorgiObjectChangedEvent<Immutable.Map<Id, AudioNode>>(this._getPitchSources())
+		this._pitchOutputPort = new ExpNodeAudioOutputPort('pitch', 'pitch', this, this._pitchSources)
+		this._midiOutputPort = new ExpMidiOutputPort('gate', 'gate', this)
+		this._ports = arrayToESIdKeyMap([midiInputPort/*, this._polyOutPort*/, this._pitchOutputPort, this._midiOutputPort])
 
 		this._algorithm = new RoundRobin(this._voiceCount.onChange)
 		this._onVoiceCountChange(this._voiceCount.value)
@@ -48,22 +56,31 @@ export class AutomaticPolyphonicMidiConverterNode extends CorgiNode implements P
 		this._voiceCount.onChange.unsubscribe(this._onVoiceCountChange)
 	}
 
+	private readonly _getPitchSources = () => {
+		return this._voices.reduce((map, voice) => {
+			return map.set(voice.index.toString(), voice.pitchOut)
+		}, Immutable.Map<Id, AudioNode>())
+	}
+
 	private readonly _onVoiceCountChange = (newVoiceCount: number) => {
+		const roundedNewVoiceCount = Math.round(newVoiceCount)
 		let currentVoiceCount = 0
 		this._voices.forEach(sourceVoice => {
 			if (sourceVoice) {
 				currentVoiceCount++
 			}
 		})
-		// console.log({currentVoiceCount, newVoiceCount})
+		// console.log({currentVoiceCount, roundedNewVoiceCount})
 
-		if (newVoiceCount === currentVoiceCount) return
+		if (roundedNewVoiceCount === currentVoiceCount) return
 
-		if (newVoiceCount < currentVoiceCount) {
-			this.destroyVoices(newVoiceCount)
+		if (roundedNewVoiceCount < currentVoiceCount) {
+			this.destroyVoices(roundedNewVoiceCount)
 		} else {
-			this.createVoices(newVoiceCount - currentVoiceCount, currentVoiceCount)
+			this.createVoices(roundedNewVoiceCount - currentVoiceCount, currentVoiceCount)
 		}
+
+		this._pitchSources.invokeImmediately(this._getPitchSources())
 	}
 
 	private destroyVoices(newVoiceCount: number) {
@@ -122,5 +139,6 @@ export class AutomaticPolyphonicMidiConverterNode extends CorgiNode implements P
 		const frequency = midiNoteToFrequency(note)
 		const normalized = oscillatorFreqCurveFunctions.unCurve(frequency / maxPitchFrequency)
 		this._voices[voiceIndex as number].pitchSource.setTargetAtTime(normalized, time, this._portamento.value)
+		// console.log('update pitch:', {note, voiceIndex, frequency, normalized})
 	}
 }

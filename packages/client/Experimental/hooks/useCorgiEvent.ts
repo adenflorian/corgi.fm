@@ -87,8 +87,7 @@ export function useObjectChangedEvent<TObject extends object | boolean | undefin
 			forceRender(0)
 		}
 
-		const initialValue = event.subscribe(onNewValue)
-		onNewValue(initialValue)
+		event.subscribe(onNewValue)
 
 		return () => event.unsubscribe(onNewValue)
 	}, [event])

@@ -17,6 +17,7 @@ import {useNodeManagerContext} from '../Experimental/NodeManager'
 import {useBoolean} from '../react-hooks'
 import './UberKnob.less'
 import {blockMouse, unblockMouse} from '../SimpleGlobalClientState'
+import {logger} from '@sentry/utils'
 
 interface Props {
 	percentage: number
@@ -237,7 +238,13 @@ function UberArcLiveValue({
 
 		const value3 = Number.isNaN(value2) ? 0 : value2
 
-		moddedValueGroupElement.transform.baseVal.getItem(0).setRotate((value3 * 360 * limit) + (360 * 0.25), 16, 16)
+		const final = (value3 * 360 * limit) + (360 * 0.25)
+
+		try {
+			moddedValueGroupElement.transform.baseVal.getItem(0).setRotate(final, 16, 16)
+		} catch (error) {
+			logger.error('UberArcLiveValue setRotate error', {error, value3, final, value2, liveValue})
+		}
 	}, [extraAnimationsEnabled, parentRange, parentRatio, liveRange.min])
 
 	useEffect(() => {

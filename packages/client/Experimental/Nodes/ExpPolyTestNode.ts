@@ -6,20 +6,22 @@ import {
 	ExpNodeAudioOutputPort, ExpPorts,
 } from '../ExpPorts'
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
+import {CorgiObjectChangedEvent} from '../CorgiEvents'
 
 export class ExpPolyTestNode extends CorgiNode {
 	protected readonly _ports: ExpPorts
-	private readonly _oscillators: Immutable.Map<Id, OscillatorNode>
+	private _oscillators: Immutable.Map<Id, OscillatorNode>
+	private readonly _oscillatorsEvent: CorgiObjectChangedEvent<Immutable.Map<Id, AudioNode>>
 
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
-		super(corgiNodeArgs, {name: 'Oscillator', color: CssColor.green})
+		super(corgiNodeArgs, {name: 'ExpPolyTestNode', color: CssColor.red})
 
 		this._oscillators = Immutable.Map<Id, OscillatorNode>()
-			.set('0', corgiNodeArgs.audioContext.createOscillator())
-			.set('1', corgiNodeArgs.audioContext.createOscillator())
-			.set('2', corgiNodeArgs.audioContext.createOscillator())
+			.set('0', this._audioContext.createOscillator())
+			.set('1', this._audioContext.createOscillator())
+			.set('2', this._audioContext.createOscillator())
 
-		let nextFrequency = 440
+		let nextFrequency = 880
 
 		this._oscillators.forEach(osc => {
 			osc.type = 'sawtooth'
@@ -28,9 +30,21 @@ export class ExpPolyTestNode extends CorgiNode {
 			nextFrequency *= 0.5
 		})
 
-		const outputPort = new ExpNodeAudioOutputPort('output', 'output', this, this._oscillators)
+		this._oscillatorsEvent = new CorgiObjectChangedEvent<Immutable.Map<Id, AudioNode>>(this._oscillators)
+
+		const outputPort = new ExpNodeAudioOutputPort('output', 'output', this, this._oscillatorsEvent)
 
 		this._ports = arrayToESIdKeyMap([outputPort])
+
+		setTimeout(() => {
+			const newOsc = this._audioContext.createOscillator()
+			newOsc.type = 'sawtooth'
+			newOsc.frequency.setValueAtTime(nextFrequency, 0)
+			newOsc.start()
+			nextFrequency *= 0.5
+			this._oscillators = this._oscillators.set('3', newOsc)
+			this._oscillatorsEvent.invokeImmediately(this._oscillators)
+		}, 5000)
 	}
 
 	public render = () => this.getDebugView()

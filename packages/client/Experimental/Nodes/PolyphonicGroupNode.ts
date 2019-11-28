@@ -14,6 +14,8 @@ import {
 	ExpPolyphonicInputPort, PolyInNode, PolyOutNode,
 	PolyVoices, PolyVoice,
 } from '../ExpPolyphonicPorts'
+import {ExpMidiInputPort} from '../ExpMidiPorts'
+import {MidiAction} from '@corgifm/common/common-types'
 
 export class PolyphonicGroupNode extends CorgiNode implements PolyInNode {
 	protected readonly _ports: ExpPorts
@@ -22,6 +24,10 @@ export class PolyphonicGroupNode extends CorgiNode implements PolyInNode {
 	private readonly _inputGains = new Map<Id, GainNode>()
 	private readonly _inputConstantSources = new Map<Id, ConstantSourceNode>()
 	private readonly _outputGains = new Map<Id, GainNode>()
+	private readonly _outGain: GainNode
+	private readonly _pitchInputPort: ExpNodeAudioInputPort
+	private readonly _pitchInputGain: GainNode
+	private readonly _midiInputPort: ExpMidiInputPort
 
 	public constructor(private readonly _corgiNodeArgs: CorgiNodeArgs) {
 		super(_corgiNodeArgs, {name: 'Polyphonic Group', color: CssColor.blue})
@@ -30,13 +36,23 @@ export class PolyphonicGroupNode extends CorgiNode implements PolyInNode {
 
 		const portStates = _corgiNodeArgs.ports || new Map<Id, ExpPortState>()
 
-		const polyInputPort = new ExpPolyphonicInputPort('poly', 'poly', this)
+		// const polyInputPort = new ExpPolyphonicInputPort('poly', 'poly', this)
+		this._outGain = _corgiNodeArgs.audioContext.createGain()
+		const audioOut = new ExpNodeAudioOutputPort('out', 'out', this, this._outGain)
+
+		this._pitchInputGain = this._audioContext.createGain()
+		this._pitchInputPort = new ExpNodeAudioInputPort('pitch', 'pitch', this, this._pitchInputGain)
+		this._midiInputPort = new ExpMidiInputPort('gate', 'gate', this, this._onMidiAction)
 
 		const ports = [...portStates].map(x => x[1]).map(this._createPort)
 
-		this._ports = arrayToESIdKeyMap([...ports.map(x => x[0]), polyInputPort])
+		this._ports = arrayToESIdKeyMap([...ports.map(x => x[0])/*, polyInputPort*/, audioOut, this._pitchInputPort, this._midiInputPort])
 
 		this._audioParams = arrayToESIdKeyMap(ports.map(x => x[1]).filter(x => x !== undefined) as ExpAudioParam[])
+	}
+
+	private readonly _onMidiAction = (midiAction: MidiAction) => {
+
 	}
 
 	public registerChildInputNode(): [ExpNodeAudioInputPort, AudioNode][] {
