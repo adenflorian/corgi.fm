@@ -459,17 +459,26 @@ export interface ExpNodeAudioOutputPortArgs {
 }
 
 export class ExpNodeAudioOutputPort extends ExpNodeAudioPort {
+	private _sources = Immutable.Map<Id, AudioNode>()
+	public get source(): AudioNode {return this._sources.first(null)!}
+
 	public constructor(
 		public readonly id: Id,
 		public readonly name: string,
 		public readonly node: CorgiNode,
-		public readonly source: AudioNode,
+		source: AudioNode | Immutable.Map<Id, AudioNode>,
 	) {
 		super(id, name, node, 'out', false)
+
+		if (Immutable.isImmutable(source)) {
+			this._sources = source
+		} else {
+			this._sources = this._sources.set(this.id, source)
+		}
 	}
 
 	public getSources(connectionId: Id) {
-		return Immutable.Map<Id, AudioNode>([[this.id, this.source]])
+		return this._sources
 	}
 
 	protected _connect = (connection: ExpNodeAudioConnection) => {}
