@@ -10,9 +10,9 @@ export class CorgiNumberChangedEvent {
 
 	public get current() {return this._currentValue}
 
-	public subscribe(delegate: NumberChangedDelegate): number {
+	public subscribe(delegate: NumberChangedDelegate) {
 		this._subscribers.add(delegate)
-		return this._currentValue
+		delegate(this.current)
 	}
 
 	public unsubscribe(delegate: NumberChangedDelegate) {

@@ -132,21 +132,19 @@ class ParamInputChain {
 	public get clampedGain() {return this._clampedGainValue}
 	public readonly onGainChange: CorgiNumberChangedEvent
 	public readonly onCenteringChange: CorgiEnumChangedEvent<ParamInputCentering>
-	private readonly _paramInputWebAudioChain: ParamInputWebAudioChain
+	private readonly _paramInputWebAudioChain: ParamInputWebAudioChains
 	private _centering: ParamInputCentering
 	private _clampedGainValue = 1
 
 	public constructor(
 		public readonly id: Id,
 		audioContext: AudioContext,
-		private readonly _destination: AudioParam | AudioNode,
+		private readonly _destination: () => AudioParam | AudioNode,
 		defaultCentering: ParamInputCentering,
 		private readonly _destinationRange: SignalRange,
 		private readonly _updateLiveRange: () => void,
 	) {
-		this._paramInputWebAudioChain = new ParamInputWebAudioChain(audioContext)
-
-		this._paramInputWebAudioChain.output.connect(this._destination as AudioNode)
+		this._paramInputWebAudioChain = new ParamInputWebAudioChains(audioContext, this._destination)
 
 		this._centering = defaultCentering
 		this.onCenteringChange = new CorgiEnumChangedEvent(this._centering)
@@ -154,6 +152,10 @@ class ParamInputChain {
 
 		this.onGainChange = new CorgiNumberChangedEvent(1)
 		this.setGain(1)
+	}
+
+	public pairSourcesWithTargets(sources: Immutable.Map<Id, AudioNode>): SourceTargetPairs {
+		return this._paramInputWebAudioChain.pairSourcesWithTargets(sources)
 	}
 
 	public setCentering(newCentering: ParamInputCentering) {
@@ -181,8 +183,6 @@ class ParamInputChain {
 		this._paramInputWebAudioChain.setGain(modded)
 	}
 
-	public get input(): AudioNode {return this._paramInputWebAudioChain.input}
-
 	public dispose() {
 		this._paramInputWebAudioChain.dispose()
 	}
@@ -199,19 +199,73 @@ const extraGain = {
 	},
 }
 
+class ParamInputWebAudioChains {
+	private _chains = Immutable.Map<Id, ParamInputWebAudioChain>()
+
+	public constructor(
+		private readonly _audioContext: AudioContext,
+		private readonly getTarget: () => AudioNode | AudioParam,
+	) {
+		this._chains = this._chains.set('0', new ParamInputWebAudioChain(_audioContext, getTarget))
+	}
+
+	public pairSourcesWithTargets(sources: Immutable.Map<Id, AudioNode>): SourceTargetPairs {
+		return sources.map((source, id): SourceTargetPair => ({
+			id,
+			source,
+			target: this._getOrCreateChain('0').input,
+		}))
+	}
+
+	private _getOrCreateChain(voiceId: Id): ParamInputWebAudioChain {
+		const existingChain = this._chains.get(voiceId)
+
+		if (existingChain) return existingChain
+
+		const newChain = new ParamInputWebAudioChain(
+			this._audioContext,
+			this.getTarget,
+		)
+
+		this._chains = this._chains.set(voiceId, newChain)
+
+		return newChain
+	}
+
+	public setCentering(newCentering: ParamInputCentering) {
+		this._chains.forEach(x => x.setCentering(newCentering))
+	}
+
+	public setGain(newGain: number) {
+		this._chains.forEach(x => x.setGain(newGain))
+	}
+
+	public dispose() {
+		this._chains.forEach(x => x.dispose())
+	}
+}
+
 class ParamInputWebAudioChain {
-	public get input(): AudioNode {return this._waveShaper}
-	public get output(): AudioNode {return this._gain}
+	public get input() {return this._waveShaper}
 	private readonly _waveShaper: WaveShaperNode
 	private readonly _gain: GainNode
 
 	public constructor(
 		audioContext: AudioContext,
+		private readonly getTarget: () => AudioNode | AudioParam,
 	) {
 		this._waveShaper = audioContext.createWaveShaper()
 		this._gain = audioContext.createGain()
 
-		this._waveShaper.connect(this._gain)
+		this._waveShaper.connect(this._gain).connect(this.getTarget() as AudioNode)
+	}
+
+	public pairSourcesWithTargets(sources: Immutable.Map<Id, AudioNode>): SourceTargetPairs {
+		return sources.map((source, id): SourceTargetPair => ({
+			id,
+			source,
+			target: this._waveShaper,
+		}))
 	}
 
 	public setCentering(newCentering: ParamInputCentering) {
@@ -429,11 +483,13 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 	public pairSourcesWithTargets(connectionId: Id, sources: Immutable.Map<Id, AudioNode>): SourceTargetPairs {
 		const chain = this._getOrMakeChainForConnection(connectionId)
 
-		return sources.map((source, id): SourceTargetPair => ({
-			id,
-			source,
-			target: chain.input,
-		}))
+		return chain.pairSourcesWithTargets(sources)
+
+		// return sources.map((source, id): SourceTargetPair => ({
+		// 	id,
+		// 	source,
+		// 	target: chain.input,
+		// }))
 	}
 
 	private _getOrMakeChainForConnection(connectionId: Id): ParamInputChain {
@@ -444,7 +500,7 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 		const newChain = new ParamInputChain(
 			connectionId,
 			this._audioContext,
-			this._waveShaperClamp,
+			() => this._waveShaperClamp,
 			this.defaultCentering,
 			this.expAudioParam.paramSignalRange,
 			this._updateLiveRange,

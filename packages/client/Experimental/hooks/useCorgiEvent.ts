@@ -19,8 +19,7 @@ export function useNumberChangedEvent(event: CorgiNumberChangedEvent, doEquality
 			forceRender(0)
 		}
 
-		const initialValue = event.subscribe(onNewValue)
-		onNewValue(initialValue)
+		event.subscribe(onNewValue)
 
 		return () => event.unsubscribe(onNewValue)
 	}, [doEqualityCheck, event])

@@ -49,11 +49,10 @@ export class ManualPolyphonicMidiConverterNode extends CorgiNode {
 
 		this._portamento = new ExpCustomNumberParam('portamento', 0, 0, 8, 3, adsrValueToString)
 		this._voiceCount = new ExpCustomNumberParam('voiceCount', 4, 1, maxVoiceCount, 1, val => Math.round(val).toString())
-		this._voiceCount.onChange.subscribe(this._onVoiceCountChange)
 		this._customNumberParams = arrayToESIdKeyMap([this._portamento, this._voiceCount])
-
+		
 		this._algorithm = new RoundRobin(this._voiceCount.onChange)
-		this._onVoiceCountChange(this._voiceCount.value)
+		this._voiceCount.onChange.subscribe(this._onVoiceCountChange)
 	}
 
 	public render = () => this.getDebugView()
