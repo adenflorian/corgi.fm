@@ -129,12 +129,10 @@ export interface ParamInputChainReact extends Pick<ParamInputChain, 'id' | 'cent
 // TODO Maybe, use current knob value to determine starting gain value, like serum
 class ParamInputChain {
 	public get centering() {return this._centering}
-	public get gain() {return this._gain.gain.value}
 	public get clampedGain() {return this._clampedGainValue}
 	public readonly onGainChange: CorgiNumberChangedEvent
 	public readonly onCenteringChange: CorgiEnumChangedEvent<ParamInputCentering>
-	private readonly _waveShaper: WaveShaperNode
-	private readonly _gain: GainNode
+	private readonly _paramInputWebAudioChain: ParamInputWebAudioChain
 	private _centering: ParamInputCentering
 	private _clampedGainValue = 1
 
@@ -146,10 +144,9 @@ class ParamInputChain {
 		private readonly _destinationRange: SignalRange,
 		private readonly _updateLiveRange: () => void,
 	) {
-		this._waveShaper = audioContext.createWaveShaper()
-		this._gain = audioContext.createGain()
+		this._paramInputWebAudioChain = new ParamInputWebAudioChain(audioContext)
 
-		this._waveShaper.connect(this._gain).connect(this._destination as AudioNode)
+		this._paramInputWebAudioChain.output.connect(this._destination as AudioNode)
 
 		this._centering = defaultCentering
 		this.onCenteringChange = new CorgiEnumChangedEvent(this._centering)
@@ -166,7 +163,7 @@ class ParamInputChain {
 
 	private _setCentering(newCentering: ParamInputCentering) {
 		this._centering = newCentering
-		this._waveShaper.curve = curves.bipolar[this._centering]
+		this._paramInputWebAudioChain.setCentering(newCentering)
 		this.onCenteringChange.invokeImmediately(this._centering)
 		this._updateModdedGain()
 		this._updateLiveRange()
@@ -181,17 +178,13 @@ class ParamInputChain {
 
 	private _updateModdedGain() {
 		const modded = this._clampedGainValue * extraGain[this.centering][this._destinationRange]
-		// Rounding to nearest to 32 bit number because AudioParam values are 32 bit floats
-		const frounded = Math.fround(modded)
-		if (frounded === this._gain.gain.value) return
-		this._gain.gain.value = frounded
+		this._paramInputWebAudioChain.setGain(modded)
 	}
 
-	public get input(): AudioNode {return this._waveShaper}
+	public get input(): AudioNode {return this._paramInputWebAudioChain.input}
 
 	public dispose() {
-		this._waveShaper.disconnect()
-		this._gain.disconnect()
+		this._paramInputWebAudioChain.dispose()
 	}
 }
 
@@ -205,6 +198,40 @@ const extraGain = {
 		bipolar: 2,
 	},
 }
+
+class ParamInputWebAudioChain {
+	public get input(): AudioNode {return this._waveShaper}
+	public get output(): AudioNode {return this._gain}
+	private readonly _waveShaper: WaveShaperNode
+	private readonly _gain: GainNode
+
+	public constructor(
+		audioContext: AudioContext,
+	) {
+		this._waveShaper = audioContext.createWaveShaper()
+		this._gain = audioContext.createGain()
+
+		this._waveShaper.connect(this._gain)
+	}
+
+	public setCentering(newCentering: ParamInputCentering) {
+		this._waveShaper.curve = curves.bipolar[newCentering]
+	}
+
+	public setGain(newGain: number) {
+		// Rounding to nearest to 32 bit number because AudioParam values are 32 bit floats
+		const frounded = Math.fround(newGain)
+		if (frounded === this._gain.gain.value) return
+		this._gain.gain.value = frounded
+	}
+
+	public dispose() {
+		this._waveShaper.disconnect()
+		this._gain.disconnect()
+	}
+}
+
+type AudioInputPortVoicesThingy = (connectionId: Id, voiceId: Id) => AudioNode | AudioParam
 
 export class ExpNodeAudioInputPort extends ExpNodeAudioPort {
 	public constructor(
@@ -222,6 +249,7 @@ export class ExpNodeAudioInputPort extends ExpNodeAudioPort {
 			id,
 			source,
 			target: this.destination,
+			// target: typeof this.destination === 'function' ? this.destination(connectionId, id) : this.destination,
 		}))
 	}
 
