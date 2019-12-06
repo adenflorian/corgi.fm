@@ -306,19 +306,23 @@ export class ExpNodeAudioInputPort extends ExpNodeAudioPort {
 		public readonly id: Id,
 		public readonly name: string,
 		public readonly node: CorgiNode,
-		public readonly destination: AudioNode | AudioParam,
+		public readonly destination: AudioNodeOrParam | PairSourcesWithTargets,
 		public readonly isAudioParamInput = false,
 	) {
 		super(id, name, node, 'in', isAudioParamInput)
 	}
 
 	public pairSourcesWithTargets(connectionId: Id, sources: Immutable.Map<Id, AudioNode>): SourceTargetPairs {
-		return sources.map((source, id): SourceTargetPair => ({
-			id,
-			source,
-			target: this.destination,
-			// target: typeof this.destination === 'function' ? this.destination(connectionId, id) : this.destination,
-		}))
+		if (isAudioNodeOrParam(this.destination)) {
+			const target = this.destination
+			return sources.map((source, id): SourceTargetPair => ({
+				id,
+				source,
+				target,
+			}))
+		} else {
+			return this.destination(sources)
+		}
 	}
 
 	protected _connect = (connection: ExpNodeAudioConnection) => {}
