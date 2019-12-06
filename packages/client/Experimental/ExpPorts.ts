@@ -260,13 +260,13 @@ class ParamInputWebAudioChain {
 		this._waveShaper.connect(this._gain).connect(this.getTarget() as AudioNode)
 	}
 
-	public pairSourcesWithTargets(sources: Immutable.Map<Id, AudioNode>): SourceTargetPairs {
-		return sources.map((source, id): SourceTargetPair => ({
-			id,
-			source,
-			target: this._waveShaper,
-		}))
-	}
+	// public pairSourcesWithTargets(sources: Immutable.Map<Id, AudioNode>): SourceTargetPairs {
+	// 	return sources.map((source, id): SourceTargetPair => ({
+	// 		id,
+	// 		source,
+	// 		target: this._waveShaper,
+	// 	}))
+	// }
 
 	public setCentering(newCentering: ParamInputCentering) {
 		this._waveShaper.curve = curves.bipolar[newCentering]

@@ -162,7 +162,8 @@ class AudioVoiceConnection {
 		try {
 			this._source.disconnect(this._target as AudioNode)
 		} catch (error) {
-			logger.warn('[AudioVoiceConnection.disconnect] error while disconnecting: ', {error, source: this._source, target: this._target})
+			// Safe to ignore I think, the source node will probably have already disconnected the actual source already
+			// logger.warn('[AudioVoiceConnection.disconnect] error while disconnecting: ', {error, id: this.id, source: this._source, target: this._target})
 		}
 		this._isConnected = false
 	}
