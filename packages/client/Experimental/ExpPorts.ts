@@ -135,16 +135,17 @@ class ParamInputChain {
 	private readonly _paramInputWebAudioChain: ParamInputWebAudioChains
 	private _centering: ParamInputCentering
 	private _clampedGainValue = 1
+	private _moddedGainValue = 1
 
 	public constructor(
 		public readonly id: Id,
 		audioContext: AudioContext,
-		private readonly _destination: () => AudioParam | AudioNode,
+		private readonly _pairSourcesWithTargets: (sources: Immutable.Map<Id, AudioNode>) => SourceTargetPairs,
 		defaultCentering: ParamInputCentering,
 		private readonly _destinationRange: SignalRange,
 		private readonly _updateLiveRange: () => void,
 	) {
-		this._paramInputWebAudioChain = new ParamInputWebAudioChains(audioContext, this._destination)
+		this._paramInputWebAudioChain = new ParamInputWebAudioChains(audioContext, this._pairSourcesWithTargets)
 
 		this._centering = defaultCentering
 		this.onCenteringChange = new CorgiEnumChangedEvent(this._centering)
@@ -155,7 +156,12 @@ class ParamInputChain {
 	}
 
 	public pairSourcesWithTargets(sources: Immutable.Map<Id, AudioNode>): SourceTargetPairs {
-		return this._paramInputWebAudioChain.pairSourcesWithTargets(sources)
+		const result = this._paramInputWebAudioChain.pairSourcesWithTargets(sources)
+
+		this._paramInputWebAudioChain.setCentering(this._centering)
+		this._paramInputWebAudioChain.setGain(this._moddedGainValue)
+
+		return result
 	}
 
 	public setCentering(newCentering: ParamInputCentering) {
@@ -179,8 +185,8 @@ class ParamInputChain {
 	}
 
 	private _updateModdedGain() {
-		const modded = this._clampedGainValue * extraGain[this.centering][this._destinationRange]
-		this._paramInputWebAudioChain.setGain(modded)
+		this._moddedGainValue = this._clampedGainValue * extraGain[this.centering][this._destinationRange]
+		this._paramInputWebAudioChain.setGain(this._moddedGainValue)
 	}
 
 	public dispose() {
@@ -204,30 +210,31 @@ class ParamInputWebAudioChains {
 
 	public constructor(
 		private readonly _audioContext: AudioContext,
-		private readonly getTarget: () => AudioNode | AudioParam,
-	) {
-		this._chains = this._chains.set('0', new ParamInputWebAudioChain(_audioContext, getTarget))
-	}
+		private readonly _pairSourcesWithTargets: (sources: Immutable.Map<Id, AudioNode>) => SourceTargetPairs,
+	) {}
 
 	public pairSourcesWithTargets(sources: Immutable.Map<Id, AudioNode>): SourceTargetPairs {
-		return sources.map((source, id): SourceTargetPair => ({
+		const pairs = this._pairSourcesWithTargets(sources)
+		return pairs.map((pair, id): SourceTargetPair => ({
 			id,
-			source,
-			target: this._getOrCreateChain('0').input,
+			source: pair.source,
+			target: this._getOrCreateChain('0', pair.target).input,
 		}))
 	}
 
-	private _getOrCreateChain(voiceId: Id): ParamInputWebAudioChain {
+	private _getOrCreateChain(voiceId: Id, target: AudioNode | AudioParam): ParamInputWebAudioChain {
 		const existingChain = this._chains.get(voiceId)
 
+		console.log('_getOrCreateChain existingChain:', {existingChain})
 		if (existingChain) return existingChain
 
 		const newChain = new ParamInputWebAudioChain(
 			this._audioContext,
-			this.getTarget,
+			target,
 		)
 
 		this._chains = this._chains.set(voiceId, newChain)
+		console.log('_getOrCreateChain newChain')
 
 		return newChain
 	}
@@ -252,12 +259,12 @@ class ParamInputWebAudioChain {
 
 	public constructor(
 		audioContext: AudioContext,
-		private readonly getTarget: () => AudioNode | AudioParam,
+		target: AudioNode | AudioParam,
 	) {
 		this._waveShaper = audioContext.createWaveShaper()
 		this._gain = audioContext.createGain()
 
-		this._waveShaper.connect(this._gain).connect(this.getTarget() as AudioNode)
+		this._waveShaper.connect(this._gain).connect(target as AudioNode)
 	}
 
 	// public pairSourcesWithTargets(sources: Immutable.Map<Id, AudioNode>): SourceTargetPairs {
@@ -500,7 +507,7 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 		const newChain = new ParamInputChain(
 			connectionId,
 			this._audioContext,
-			() => this._waveShaperClamp,
+			(sources: Immutable.Map<Id, AudioNode>): SourceTargetPairs => sources.map((source, id): SourceTargetPair => ({id, source, target: this._waveShaperClamp})),
 			this.defaultCentering,
 			this.expAudioParam.paramSignalRange,
 			this._updateLiveRange,
