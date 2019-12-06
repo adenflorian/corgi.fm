@@ -9,7 +9,8 @@ import {logger} from '../client-logger'
 import {CorgiNode, CorgiNodeArgs} from './CorgiNode'
 import {
 	ExpNodeAudioConnection,
-	ExpNodeConnections, ExpNodeConnection, SourceTargetPairs, SourceTargetPair,
+	ExpNodeConnections, ExpNodeConnection, SourceTargetPairs,
+	SourceTargetPair, PairSourcesWithTargets,
 } from './ExpConnections'
 import {ExpAudioParam} from './ExpParams'
 import {
@@ -292,7 +293,13 @@ class ParamInputWebAudioChain {
 	}
 }
 
+type AudioNodeOrParam = AudioNode | AudioParam
+
 type AudioInputPortVoicesThingy = (connectionId: Id, voiceId: Id) => AudioNode | AudioParam
+
+export function isAudioNodeOrParam(val: AudioNodeOrParam | PairSourcesWithTargets): val is AudioNodeOrParam {
+	return typeof val !== 'function'
+}
 
 export class ExpNodeAudioInputPort extends ExpNodeAudioPort {
 	public constructor(
@@ -491,12 +498,6 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 		const chain = this._getOrMakeChainForConnection(connectionId)
 
 		return chain.pairSourcesWithTargets(sources)
-
-		// return sources.map((source, id): SourceTargetPair => ({
-		// 	id,
-		// 	source,
-		// 	target: chain.input,
-		// }))
 	}
 
 	private _getOrMakeChainForConnection(connectionId: Id): ParamInputChain {

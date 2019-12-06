@@ -102,6 +102,8 @@ export interface SourceTargetPair {
 
 export type SourceTargetPairs = Immutable.Map<Id, SourceTargetPair>
 
+export type PairSourcesWithTargets = (sources: Immutable.Map<Id, AudioNode>) => SourceTargetPairs
+
 class AudioVoiceConnections {
 	public get isConnected() {return this._isConnected}
 	private readonly _voiceConnections = new Map<Id, AudioVoiceConnection>()
