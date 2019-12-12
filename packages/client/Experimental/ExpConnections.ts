@@ -70,7 +70,6 @@ export class ExpNodeAudioConnection extends ExpNodeConnection {
 	}
 
 	private readonly _foo = (sources: Immutable.Map<Id, AudioNode>) => {
-		console.log('foo 1', {sources: sources.toJS()})
 		const pairs = this._target.pairSourcesWithTargets(this.id, sources)
 		this._audioVoiceConnections.dispose()
 		this._audioVoiceConnections = new AudioVoiceConnections(this.id, pairs)
@@ -78,7 +77,6 @@ export class ExpNodeAudioConnection extends ExpNodeConnection {
 		this.feedbackLoopDetected.invokeImmediately(this._source.detectFeedbackLoop())
 
 		if (!this.feedbackLoopDetected.current) {
-			console.log('foo 2', {_audioVoiceConnections: this._audioVoiceConnections})
 			this._audioVoiceConnections.connect()
 		}
 	}
