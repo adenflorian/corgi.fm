@@ -1,5 +1,7 @@
 export type NumberChangedDelegate = (newNumber: number) => void
 
+export interface CorgiNumberChangedObservable extends Pick<CorgiNumberChangedEvent, 'subscribe' | 'unsubscribe' | 'current'> {}
+
 export class CorgiNumberChangedEvent {
 	private readonly _subscribers = new Set<NumberChangedDelegate>()
 	private _frameRequested = false
@@ -10,6 +12,8 @@ export class CorgiNumberChangedEvent {
 
 	public get current() {return this._currentValue}
 
+	public get observable() {return this as CorgiNumberChangedObservable}
+
 	public subscribe(delegate: NumberChangedDelegate) {
 		this._subscribers.add(delegate)
 		delegate(this.current)
@@ -19,7 +23,8 @@ export class CorgiNumberChangedEvent {
 		this._subscribers.delete(delegate)
 	}
 
-	public invokeImmediately(newNumber: number) {
+	public invokeImmediately(newNumber: number, onlyIfChanged = false) {
+		if (onlyIfChanged === true && newNumber === this._currentValue) return
 		this._currentValue = newNumber
 		this._invoke()
 	}
