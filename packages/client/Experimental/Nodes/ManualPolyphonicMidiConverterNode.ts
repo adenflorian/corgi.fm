@@ -1,4 +1,3 @@
-/* eslint-disable no-empty-function */
 import {CssColor} from '@corgifm/common/shamu-color'
 import {MidiAction} from '@corgifm/common/common-types'
 import {oscillatorFreqCurveFunctions, arrayToESIdKeyMap} from '@corgifm/common/common-utils'

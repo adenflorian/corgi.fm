@@ -1,4 +1,3 @@
-/* eslint-disable no-empty-function */
 import {List} from 'immutable'
 import {logger} from '../client-logger'
 import {CorgiNode} from './CorgiNode'

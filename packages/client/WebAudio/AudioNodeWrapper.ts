@@ -214,7 +214,6 @@ export abstract class AudioNodeWrapper implements IDisposable {
 		input.connect(output)
 	}
 
-	// eslint-disable-next-line no-empty-function
 	public readonly syncOscillatorStartTimes = (startTime: number, bpm: number) => {}
 }
 

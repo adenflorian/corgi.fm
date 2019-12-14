@@ -1,4 +1,3 @@
-/* eslint-disable no-empty-function */
 import React, {useContext} from 'react'
 import * as Immutable from 'immutable'
 import {ParamInputCentering, SignalRange} from '@corgifm/common/common-types'

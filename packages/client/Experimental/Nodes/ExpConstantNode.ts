@@ -1,4 +1,3 @@
-/* eslint-disable no-empty-function */
 import {CssColor} from '@corgifm/common/shamu-color'
 import {arrayToESIdKeyMap} from '@corgifm/common/common-utils'
 import {

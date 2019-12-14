@@ -1,4 +1,3 @@
-/* eslint-disable no-empty-function */
 import {arrayToESIdKeyMap} from '@corgifm/common/common-utils'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {ExpNodeAudioInputPort, ExpPorts} from '../ExpPorts'

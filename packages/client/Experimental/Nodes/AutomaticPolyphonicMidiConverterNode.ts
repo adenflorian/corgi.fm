@@ -1,4 +1,3 @@
-/* eslint-disable no-empty-function */
 import * as Immutable from 'immutable'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {MidiAction} from '@corgifm/common/common-types'

@@ -1,4 +1,3 @@
-/* eslint-disable no-empty-function */
 import {OrderedSet} from 'immutable'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {MidiAction, midiActions} from '@corgifm/common/common-types'

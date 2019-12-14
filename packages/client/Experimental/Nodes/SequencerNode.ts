@@ -1,4 +1,3 @@
-/* eslint-disable no-empty-function */
 import {CssColor} from '@corgifm/common/shamu-color'
 import {toBeats, fromBeats, arrayToESIdKeyMap} from '@corgifm/common/common-utils'
 import {preciseSubtract, preciseAdd, midiPrecision} from '@corgifm/common/midi-types'

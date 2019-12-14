@@ -1,4 +1,3 @@
-/* eslint-disable no-empty-function */
 import {CssColor} from '@corgifm/common/shamu-color'
 import {
 	ExpNodeAudioInputPort, ExpPort,

@@ -1,5 +1,4 @@
 /* eslint-disable no-param-reassign */
-/* eslint-disable no-empty-function */
 import * as Immutable from 'immutable'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {arrayToESIdKeyMap} from '@corgifm/common/common-utils'

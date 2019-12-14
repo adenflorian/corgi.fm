@@ -1,4 +1,3 @@
-/* eslint-disable no-empty-function */
 import React from 'react'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {Input, InputEventNoteon, InputEventNoteoff} from 'webmidi'

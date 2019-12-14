@@ -1,4 +1,3 @@
-/* eslint-disable no-empty-function */
 import React, {ReactElement, useContext} from 'react'
 import {List} from 'immutable'
 import {clamp, clampPolarized} from '@corgifm/common/common-utils'

@@ -254,7 +254,8 @@
             "error",
             {
                 "allow": [
-                    "constructors"
+                    "constructors",
+                    "methods"
                 ]
             }
         ],

@@ -1,4 +1,3 @@
-/* eslint-disable no-empty-function */
 import * as immutable from 'immutable'
 import {IMidiNote} from '@corgifm/common/MidiNote'
 import {CorgiNumberChangedEvent} from '../../CorgiEvents'

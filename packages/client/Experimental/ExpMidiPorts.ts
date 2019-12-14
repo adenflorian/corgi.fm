@@ -1,4 +1,3 @@
-/* eslint-disable no-empty-function */
 import {List} from 'immutable'
 import {MidiAction} from '@corgifm/common/common-types'
 import {logger} from '../client-logger'
