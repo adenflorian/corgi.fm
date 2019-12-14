@@ -121,6 +121,7 @@ export function SimpleGraphNode(props: ISimpleGraphNodeAllProps) {
 			{
 				useMemo(() => {
 					return (
+						// @ts-ignore
 						<ContextMenuTrigger
 							id={nodeMenuId}
 							// @ts-ignore

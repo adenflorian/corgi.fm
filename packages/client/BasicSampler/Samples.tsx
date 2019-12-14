@@ -130,6 +130,7 @@ const SamplePad = React.memo((props: SamplePadProps) => {
 
 	return (
 		/* eslint-disable no-shadow */
+		// @ts-ignore
 		<ContextMenuTrigger
 			id={samplePadMenuId}
 			// @ts-ignore

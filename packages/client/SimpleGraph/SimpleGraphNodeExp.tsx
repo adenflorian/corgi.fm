@@ -148,6 +148,7 @@ export function SimpleGraphNodeExp({children}: Props) {
 				{
 					useMemo(() => {
 						return (
+							// @ts-ignore
 							<ContextMenuTrigger
 								id={expNodeMenuId}
 								// @ts-ignore

@@ -252,6 +252,7 @@ export const ConnectedZoom = hot(module)(React.memo(function _Zoom({
 	return (
 		<Fragment>
 			{
+				// @ts-ignore
 				<ContextMenuTrigger
 					id={roomType === RoomType.Experimental ? expBackgroundMenuId : backgroundMenuId}
 					// @ts-ignore
