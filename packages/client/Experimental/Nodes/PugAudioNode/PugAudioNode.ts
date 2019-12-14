@@ -15,14 +15,16 @@ export type AudioNodes = Map<Id, AudioNode>
 
 export type WebAudioNodes<T extends AudioNode> = T[]
 
+export type WebAudioPairs<T extends AudioNode, U extends AudioNode | AudioParam> = Map<T, U>
+
 export interface PugAudioTarget {
 	onNewSourceConnection(source: PugAudioNode): WebAudioTarget
 	onDisconnectSource(source: PugAudioNode): void
 }
 
 export interface PugPolyAudioTarget {
-	onNewSourceConnection<U extends AudioNode>(source: PugPolyAudioNode<U>, sources: WebAudioNodes<U>): Map<U, AudioNode>
-	onNewSourceVoiceCount<U extends AudioNode>(source: PugPolyAudioNode<U>, sources: WebAudioNodes<U>): Map<U, AudioNode>
+	onNewSourceConnection<U extends AudioNode>(source: PugPolyAudioNode<U>, sources: WebAudioNodes<U>): WebAudioPairs<U, WebAudioTarget>
+	onNewSourceVoiceCount<U extends AudioNode>(source: PugPolyAudioNode<U>, sources: WebAudioNodes<U>): WebAudioPairs<U, WebAudioTarget>
 	onDisconnectSource(source: PugPolyAudioNode): void
 }
 
@@ -174,14 +176,16 @@ export interface IncomingPolyConnection {
 	sourceVoiceCount: CorgiNumberChangedEvent
 }
 
-export abstract class PugPolyAudioNode<T extends AudioNode = AudioNode> implements PugPolyAudioTarget {
+export abstract class PugPolyAudioNode<TSelf extends AudioNode = AudioNode> implements PugPolyAudioTarget {
 	public readonly pugType = 'nodePoly'
 	public readonly abstract pugAudioNodeType: string
+	public readonly abstract params: readonly PugPolyAudioParamSources[]
 	public get voiceCount() {return this._webAudioNodes.length}
 	protected readonly _audioContext: AudioContext
 	protected readonly _sources = new Set<PugPolyAudioNode>()
-	protected readonly _targets = new Map<PugPolyAudioTarget, Map<T, AudioNode>>()
-	protected readonly _webAudioNodes: WebAudioNodes<T> = []
+	protected readonly _targets = new Map<PugPolyAudioTarget, WebAudioPairs<TSelf, WebAudioTarget>>()
+	protected readonly _webAudioNodes: WebAudioNodes<TSelf> = []
+	public get webAudioNodes() {return this._webAudioNodes as readonly TSelf[]}
 
 	public constructor(
 		args: PugPolyAudioNodeArgs,
@@ -220,7 +224,7 @@ export abstract class PugPolyAudioNode<T extends AudioNode = AudioNode> implemen
 			const newPairs = target.onNewSourceVoiceCount(this, this._webAudioNodes)
 			for (const [sourceWebAudioNode, targetWebAudioNode] of newPairs) {
 				try {
-					sourceWebAudioNode.connect(targetWebAudioNode)
+					sourceWebAudioNode.connect(targetWebAudioNode as AudioNode)
 				} catch (error) {
 					logger.warn('[PugPolyAudioNode.setVoiceCount] error while connecting:', {error, this: this, sourceWebAudioNode, targetWebAudioNode})
 				}
@@ -253,10 +257,17 @@ export abstract class PugPolyAudioNode<T extends AudioNode = AudioNode> implemen
 		logger.log('[PugPolyAudioNode._deleteVoices] onVoicesDestroyed:', {destroyedVoiceIndexes, type: this.pugAudioNodeType})
 	}
 
-	public connect(target: PugPolyAudioNode) {
+	public connect<TTarget extends AudioNode>(target: PugPolyAudioNode<TTarget> | PugPolyAudioParam<TTarget>): PugPolyAudioNode<TTarget> {
+		switch (target.pugType) {
+			case 'nodePoly': return this._connectToNode(target)
+			case 'paramPoly': return this._connectToParam(target)
+		}
+	}
+
+	private _connectToNode<TTarget extends AudioNode>(target: PugPolyAudioNode<TTarget>): PugPolyAudioNode<TTarget> {
 		const alreadyConnected = this._targets.has(target)
 		if (alreadyConnected) {
-			this._logWarning('connect', 'alreadyConnected!', {target})
+			this._logWarning('_connectToNode', 'alreadyConnected!', {target})
 			return target
 		}
 		const pairs = target.onNewSourceConnection(this, this._webAudioNodes)
@@ -267,33 +278,43 @@ export abstract class PugPolyAudioNode<T extends AudioNode = AudioNode> implemen
 		return target
 	}
 
-	public onNewSourceConnection<U extends AudioNode>(
-		source: PugPolyAudioNode<U>, sources: WebAudioNodes<U>,
-	): Map<U, T> {
+	private _connectToParam<TTarget extends AudioNode>(target: PugPolyAudioParam<TTarget>): PugPolyAudioNode<TTarget> {
+		const alreadyConnected = this._targets.has(target)
+		if (alreadyConnected) {
+			this._logWarning('_connectToParam', 'alreadyConnected!', {target})
+			return target.pugNode
+		}
+		const pairs = target.onNewSourceConnection(this, this._webAudioNodes)
+		return target.pugNode
+	}
+
+	public onNewSourceConnection<TSource extends AudioNode>(
+		source: PugPolyAudioNode<TSource>, sources: WebAudioNodes<TSource>,
+	): Map<TSource, TSelf> {
 		const alreadyConnected = this._sources.has(source)
 		if (alreadyConnected) {
 			throw new Error('[PugPolyAudioNode.onNewConnection] alreadyConnected! ' + JSON.stringify({source, target: this}))
 		}
 		this._sources.add(source)
-		return this._getTargetsForSources(source, sources)
+		return this._getTargetsForSources(sources)
 	}
 
-	public onNewSourceVoiceCount<U extends AudioNode>(
-		source: PugPolyAudioNode<U>, sources: WebAudioNodes<U>,
-	): Map<U, T> {
+	public onNewSourceVoiceCount<TSource extends AudioNode>(
+		source: PugPolyAudioNode<TSource>, sources: WebAudioNodes<TSource>,
+	): Map<TSource, TSelf> {
 		const alreadyConnected = this._sources.has(source)
 		if (alreadyConnected === false) {
 			throw new Error('[PugPolyAudioNode.onNewConnection] not connected! ' + JSON.stringify({source, target: this}))
 		}
-		return this._getTargetsForSources(source, sources)
+		return this._getTargetsForSources(sources)
 	}
 
-	private _getTargetsForSources<U extends AudioNode>(
-		source: PugPolyAudioNode<U>, sources: WebAudioNodes<U>,
-	) {
+	public _getTargetsForSources<TSource extends AudioNode>(
+		sources: WebAudioNodes<TSource>,
+	): WebAudioPairs<TSource, TSelf> {
 		const sourceVoiceCount = sources.length
 		this._ensureMinimumVoiceCount(sourceVoiceCount)
-		const pairs = new Map<U, T>()
+		const pairs = new Map<TSource, TSelf>()
 
 		for (let i = 0; i < sourceVoiceCount; i++) {
 			pairs.set(sources[i], this._webAudioNodes[i])
@@ -301,10 +322,10 @@ export abstract class PugPolyAudioNode<T extends AudioNode = AudioNode> implemen
 
 		for (const [sourceNode, targetNode] of pairs) {
 			if (sourceNode === undefined) {
-				logger.error('[PugPolyAudioNode.onNewConnection] sourceNode === undefined', {source, target: this})
+				logger.error('[PugPolyAudioNode.onNewConnection] sourceNode === undefined', {target: this})
 			}
 			if (targetNode === undefined) {
-				logger.error('[PugPolyAudioNode.onNewConnection] targetNode === undefined', {source, target: this})
+				logger.error('[PugPolyAudioNode.onNewConnection] targetNode === undefined', {target: this})
 			}
 		}
 
@@ -321,7 +342,7 @@ export abstract class PugPolyAudioNode<T extends AudioNode = AudioNode> implemen
 		this.setVoiceCount(maxSourceVoiceCount)
 	}
 
-	public onDisconnectSource(source: PugPolyAudioNode<T>) {
+	public onDisconnectSource(source: PugPolyAudioNode<TSelf>) {
 		if (this._sources.has(source)) {
 			this._sources.delete(source)
 			this.setVoiceCount(this._getMaxRequiredVoiceCount())
@@ -334,6 +355,11 @@ export abstract class PugPolyAudioNode<T extends AudioNode = AudioNode> implemen
 		let maxSourceVoiceCount = 0
 		this._sources.forEach(source => {
 			maxSourceVoiceCount = Math.max(maxSourceVoiceCount, source.voiceCount)
+		})
+		this.params.forEach(param => {
+			param.sources.forEach(paramSource => {
+				maxSourceVoiceCount = Math.max(maxSourceVoiceCount, paramSource.voiceCount)
+			})
 		})
 		return maxSourceVoiceCount
 	}
@@ -349,14 +375,14 @@ export abstract class PugPolyAudioNode<T extends AudioNode = AudioNode> implemen
 	private _disconnectTarget(target: PugPolyAudioTarget) {
 		this._withWebAudioTarget(target, webAudioTargets => {
 			for (const [sourceNode, targetNode] of webAudioTargets) {
-				sourceNode.disconnect(targetNode)
+				sourceNode.disconnect(targetNode as AudioNode)
 			}
 			target.onDisconnectSource(this)
 			this._targets.delete(target)
 		})
 	}
 
-	private _withWebAudioTarget(target: PugPolyAudioTarget, func: (webAudioTargets: Map<T, AudioNode>) => void) {
+	private _withWebAudioTarget(target: PugPolyAudioTarget, func: (webAudioTargets: WebAudioPairs<TSelf, WebAudioTarget>) => void) {
 		const webAudioTarget = this._targets.get(target)
 		if (webAudioTarget === undefined) {
 			return this._logWarning('_disconnectTarget', 'target not found!', {target})
@@ -375,8 +401,8 @@ export abstract class PugPolyAudioNode<T extends AudioNode = AudioNode> implemen
 
 	private _logWarning(functionName: string, message: string, data: object) {
 		logger.warn(`[PugPolyAudioNode.${functionName}] ${message}`, {
-			pugAudioNodeType: this.pugAudioNodeType,
-			source: this,
+			thisType: this.pugAudioNodeType,
+			this: this,
 			...data,
 		})
 	}
@@ -387,65 +413,129 @@ export abstract class PugPolyAudioNode<T extends AudioNode = AudioNode> implemen
 		}
 	}
 
-	protected abstract _makeWebAudioNode(): T
-	protected abstract _disposeWebAudioNode(webAudioNode: T): void
+	protected abstract _makeWebAudioNode(): TSelf
+	protected abstract _disposeWebAudioNode(webAudioNode: TSelf): void
 }
 
-// export class PugPolyAudioParam implements PugPolyAudioTarget {
-// 	public readonly pugType = 'paramPoly'
-// 	protected readonly _sources = new Map<PugAudioNode, PugAudioNode>()
+export interface PugPolyAudioParamSources {
+	sources: ReadonlySet<PugPolyAudioNode>
+}
 
-// 	public constructor(
-// 		private readonly _getAudioParams: () => AudioParam,
-// 		private readonly _pugNode: PugAudioNode,
-// 	) {}
+// TODO Param input chain
+// TODO Knob value stuff
+export class PugPolyAudioParam<TParent extends AudioNode = AudioNode> implements PugPolyAudioTarget, PugPolyAudioParamSources {
+	public readonly pugType = 'paramPoly'
+	protected readonly _sources = new Set<PugPolyAudioNode>()
+	public get sources() {return this._sources as ReadonlySet<PugPolyAudioNode>}
 
-// 	public onNewSourceConnection(source: PugAudioNode, targets: Map<Id, AudioParam>): AudioParam {
-// 		const alreadyConnected = this._sources.has(source)
-// 		if (alreadyConnected) {
-// 			throw new Error('[PugAudioParam.onNewConnection] alreadyConnected! ' + JSON.stringify({source, target: this}))
-// 		}
-// 		for (const [id] of targets) {
-// 			targets.set(id, value)
-// 		}
-// 		this._sources.set(source, source)
-// 		return this._getAudioParams()
-// 	}
+	public constructor(
+		public readonly pugNode: PugPolyAudioNode<TParent>,
+		private readonly _getAudioParamFromNode: (webAudioNode: TParent) => AudioParam
+	) {}
 
-// 	public onDisconnectSource(source: PugAudioNode) {
-// 		this._sources.delete(source)
-// 	}
+	public onNewSourceConnection<TSource extends AudioNode>(
+		source: PugPolyAudioNode<TSource>, sources: WebAudioNodes<TSource>,
+	): WebAudioPairs<TSource, AudioParam> {
+		const alreadyConnected = this._sources.has(source)
+		if (alreadyConnected) {
+			throw new Error('[PugPolyAudioParam.onNewSourceConnection] alreadyConnected! ' + JSON.stringify({source, target: this}))
+		}
+		this._sources.add(source)
+		return this._getTargetsForSources(sources)
+	}
 
-// 	public linearRampToValueAtTime(value: number, endTime: number) {
-// 		this._getAudioParams().linearRampToValueAtTime(value, endTime)
-// 	}
+	public onNewSourceVoiceCount<TSource extends AudioNode>(
+		source: PugPolyAudioNode<TSource>, sources: WebAudioNodes<TSource>,
+	): WebAudioPairs<TSource, AudioParam> {
+		const alreadyConnected = this._sources.has(source as PugPolyAudioNode)
+		if (alreadyConnected === false) {
+			throw new Error('[PugPolyAudioParam.onNewSourceVoiceCount] not connected! ' + JSON.stringify({source, target: this}))
+		}
+		return this._getTargetsForSources(sources)
+	}
 
-// 	public setTargetAtTime(target: number, startTime: number, timeConstant: number) {
-// 		this._getAudioParams().setTargetAtTime(target, startTime, timeConstant)
-// 	}
+	private _getTargetsForSources<TSource extends AudioNode>(
+		sources: WebAudioNodes<TSource>,
+	): WebAudioPairs<TSource, AudioParam> {
+		const pairs = this.pugNode._getTargetsForSources(sources)
+		const paramPairs = new Map() as WebAudioPairs<TSource, AudioParam>
+		for (const [sourceWebAudioNode, targetWebAudioNode] of pairs) {
+			paramPairs.set(sourceWebAudioNode, this._getAudioParamFromNode(targetWebAudioNode))
+		}
+		return paramPairs
+	}
 
-// 	public setValueAtTime(value: number, startTime = 0) {
-// 		this._getAudioParams().setValueAtTime(value, startTime)
-// 	}
+	public getMaxRequiredVoiceCount() {
+		let maxSourceVoiceCount = 0
+		this._sources.forEach(source => {
+			maxSourceVoiceCount = Math.max(maxSourceVoiceCount, source.voiceCount)
+		})
+		return maxSourceVoiceCount
+	}
 
-// 	public setValueCurveAtTime(values: number[] | Float32Array, startTime: number, duration: number) {
-// 		this._getAudioParams().setValueCurveAtTime(values, startTime, duration)
-// 	}
+	public onDisconnectSource(source: PugPolyAudioNode) {
+		this._sources.delete(source)
+	}
 
-// 	public cancelScheduledValues(cancelTime: number) {
-// 		this._getAudioParams().cancelScheduledValues(cancelTime)
-// 	}
+	public linearRampToValueAtTime(voice: number | 'all', value: number, endTime: number) {
+		this._getVoices(voice).forEach(webAudioNode => {
+			this._getAudioParamFromNode(webAudioNode).linearRampToValueAtTime(value, endTime)
+		})
+	}
 
-// 	public cancelAndHoldAtTime(cancelTime: number) {
-// 		this._getAudioParams().cancelAndHoldAtTime(cancelTime)
-// 	}
-// }
+	public setTargetAtTime(voice: number | 'all', target: number, startTime: number, timeConstant: number) {
+		this._getVoices(voice).forEach(webAudioNode => {
+			this._getAudioParamFromNode(webAudioNode).setTargetAtTime(target, startTime, timeConstant)
+		})
+	}
+
+	public setValueAtTime(voice: number | 'all', value: number, startTime = 0) {
+		this._getVoices(voice).forEach(webAudioNode => {
+			this._getAudioParamFromNode(webAudioNode).setValueAtTime(value, startTime)
+		})
+	}
+
+	public setValueCurveAtTime(voice: number | 'all', values: number[] | Float32Array, startTime: number, duration: number) {
+		this._getVoices(voice).forEach(webAudioNode => {
+			this._getAudioParamFromNode(webAudioNode).setValueCurveAtTime(values, startTime, duration)
+		})
+	}
+
+	public cancelScheduledValues(voice: number | 'all', cancelTime: number) {
+		this._getVoices(voice).forEach(webAudioNode => {
+			this._getAudioParamFromNode(webAudioNode).cancelScheduledValues(cancelTime)
+		})
+	}
+
+	public cancelAndHoldAtTime(voice: number | 'all', cancelTime: number) {
+		this._getVoices(voice).forEach(webAudioNode => {
+			this._getAudioParamFromNode(webAudioNode).cancelAndHoldAtTime(cancelTime)
+		})
+	}
+
+	private _getVoices(voice: number | 'all') {
+		if (voice === 'all') {
+			return this.pugNode.webAudioNodes
+		} else {
+			const webAudioNode = this.pugNode.webAudioNodes[voice]
+			if (!webAudioNode) {
+				logger.error('[PugPolyAudioParam._getVoices] missing voice!', {voice, this: this, nodes: this.pugNode.webAudioNodes})
+				return [] as const
+			}
+			return [webAudioNode] as const
+		}
+	}
+}
 
 export class PugPolyGainNode extends PugPolyAudioNode<GainNode> {
 	public readonly pugAudioNodeType = 'gain'
+	public readonly params: readonly PugPolyAudioParamSources[]
+	public readonly gain: PugPolyAudioParam<GainNode>
 
 	public constructor(args: PugPolyAudioNodeArgs) {
 		super(args)
+		this.gain = new PugPolyAudioParam(this, gain => gain.gain)
+		this.params = [this.gain]
 	}
 
 	protected _makeWebAudioNode() {
@@ -461,15 +551,30 @@ export class PugPolyGainNode extends PugPolyAudioNode<GainNode> {
 
 export class PugPolyOscillatorNode extends PugPolyAudioNode<OscillatorNode> {
 	public readonly pugAudioNodeType = 'oscillator'
+	public readonly params: readonly PugPolyAudioParamSources[]
+	public readonly frequency: PugPolyAudioParam<OscillatorNode>
+	public readonly detune: PugPolyAudioParam<OscillatorNode>
+	private _type: OscillatorNode['type'] = 'sawtooth'
 
 	public constructor(args: PugPolyAudioNodeArgs) {
 		super(args)
+		this.frequency = new PugPolyAudioParam(this, osc => osc.frequency)
+		this.detune = new PugPolyAudioParam(this, osc => osc.detune)
+		this.params = [this.frequency, this.detune]
+	}
+
+	public set type(type: OscillatorNode['type']) {
+		this._type = type
+		for (const osc of this.webAudioNodes) {
+			osc.type = this._type
+		}
 	}
 
 	protected _makeWebAudioNode() {
 		const osc = this._audioContext.createOscillator()
+		osc.type = this._type
 		osc.frequency.value = (Math.random() * 440) + 440
-		osc.type = 'sawtooth'
+		osc.detune.value = 0
 		osc.start()
 		return osc
 	}
@@ -482,6 +587,7 @@ export class PugPolyOscillatorNode extends PugPolyAudioNode<OscillatorNode> {
 
 export class PugPolyAudioDestinationNode extends PugPolyAudioNode<AudioDestinationNode> {
 	public readonly pugAudioNodeType = 'destination'
+	public readonly params: readonly PugPolyAudioParamSources[] = []
 
 	public constructor(args: PugPolyAudioNodeArgs) {
 		super(args)
