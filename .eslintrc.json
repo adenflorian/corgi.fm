@@ -51,6 +51,7 @@
             "never"
         ],
         "no-case-declarations": "off",
+        "no-restricted-syntax": "off",
         // jest
         "jest/valid-describe": "off",
         // import
