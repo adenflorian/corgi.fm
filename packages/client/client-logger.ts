@@ -25,4 +25,7 @@ export const logger = {
 	trace: (...args: any[]) => {
 		commonLogger.log(...args)
 	},
+	assert: (value: any, message?: string, ...optionalParams: any[]) => {
+		commonLogger.assert(value, message, optionalParams)
+	},
 }

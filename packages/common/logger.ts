@@ -5,6 +5,7 @@ const logLevel = {
 	log: true,
 	debug: false,
 	trace: false,
+	assert: true,
 }
 
 let enabled = true
@@ -42,4 +43,9 @@ export const logger = {
 		enabled = false
 	},
 	isEnabled: () => enabled,
+	assert: (value: any, message?: string, ...optionalParams: any[]) => {
+		if (logLevel.assert && enabled) {
+			console.assert(value, message, optionalParams)
+		}
+	},
 }
