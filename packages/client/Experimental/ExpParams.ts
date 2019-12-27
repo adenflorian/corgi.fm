@@ -6,6 +6,7 @@ import {
 } from '@corgifm/common/common-utils'
 import {ButtonSelectOption} from '../ButtonSelect/ButtonSelect'
 import {CorgiNumberChangedEvent, CorgiEnumChangedEvent} from './CorgiEvents'
+import {PugPolyAudioParam} from './Nodes/PugAudioNode/PugAudioNode'
 
 export interface ExpParam {
 	readonly id: Id
@@ -27,7 +28,7 @@ export interface ExpAudioParamOptions {
 }
 
 export type ExpAudioParams = ReadonlyMap<Id, ExpAudioParam>
-export class ExpAudioParam implements ExpParam {
+export class ExpAudioParam<T extends AudioNode = AudioNode> implements ExpParam {
 	public readonly onChange: CorgiNumberChangedEvent
 	public readonly onModdedLiveValueChange: CorgiNumberChangedEvent
 	public readonly valueString?: (v: number) => string
@@ -36,7 +37,7 @@ export class ExpAudioParam implements ExpParam {
 
 	public constructor(
 		public readonly id: Id,
-		public readonly audioParam: AudioParam,
+		public readonly audioParam: PugPolyAudioParam<T>,
 		public readonly defaultValue: number,
 		public readonly maxValue: number,
 		public readonly paramSignalRange: SignalRange,

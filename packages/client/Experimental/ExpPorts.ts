@@ -1,3 +1,4 @@
+/* eslint-disable no-empty-function */
 import React, {useContext} from 'react'
 import * as Immutable from 'immutable'
 import {ParamInputCentering, SignalRange} from '@corgifm/common/common-types'
@@ -8,16 +9,15 @@ import {logger} from '../client-logger'
 import {CorgiNode, CorgiNodeArgs} from './CorgiNode'
 import {
 	ExpNodeAudioConnection,
-	ExpNodeConnections, ExpNodeConnection, SourceTargetPairs,
-	SourceTargetPair, PairSourcesWithTargets,
+	ExpNodeConnections, ExpNodeConnection,
 } from './ExpConnections'
 import {ExpAudioParam} from './ExpParams'
 import {
 	CorgiNumberChangedEvent, CorgiEnumChangedEvent,
 	CorgiObjectChangedEvent, CorgiStringChangedEvent,
-	isCorgiObjectChangedEvent,
 } from './CorgiEvents'
 import {CorgiAnalyserSPNode} from './CorgiAnalyserSPN'
+import {PugPolyAudioParam, PugPolyAudioNode, PugPolyGainNode, PugPolyWaveShaperNode} from './Nodes/PugAudioNode/PugAudioNode'
 
 export type ExpPortCallback = (port: ExpPort) => void
 
@@ -132,20 +132,21 @@ class ParamInputChain {
 	public get clampedGain() {return this._clampedGainValue}
 	public readonly onGainChange: CorgiNumberChangedEvent
 	public readonly onCenteringChange: CorgiEnumChangedEvent<ParamInputCentering>
-	private readonly _paramInputWebAudioChain: ParamInputWebAudioChains
+	private readonly _paramInputWebAudioChain: ParamInputWebAudioChain
 	private _centering: ParamInputCentering
 	private _clampedGainValue = 1
-	private _moddedGainValue = 1
 
 	public constructor(
 		public readonly id: Id,
 		audioContext: AudioContext,
-		private readonly _pairSourcesWithTargets: (sources: Immutable.Map<Id, AudioNode>) => SourceTargetPairs,
+		private readonly _destination: PugPolyAudioParam | PugPolyAudioNode,
 		defaultCentering: ParamInputCentering,
 		private readonly _destinationRange: SignalRange,
 		private readonly _updateLiveRange: () => void,
 	) {
-		this._paramInputWebAudioChain = new ParamInputWebAudioChains(audioContext, this._pairSourcesWithTargets)
+		this._paramInputWebAudioChain = new ParamInputWebAudioChain(audioContext)
+
+		this._paramInputWebAudioChain.output.connect(this._destination)
 
 		this._centering = defaultCentering
 		this.onCenteringChange = new CorgiEnumChangedEvent(this._centering)
@@ -153,15 +154,6 @@ class ParamInputChain {
 
 		this.onGainChange = new CorgiNumberChangedEvent(1)
 		this.setGain(1)
-	}
-
-	public pairSourcesWithTargets(sources: Immutable.Map<Id, AudioNode>): SourceTargetPairs {
-		const result = this._paramInputWebAudioChain.pairSourcesWithTargets(sources)
-
-		this._paramInputWebAudioChain.setCentering(this._centering)
-		this._paramInputWebAudioChain.setGain(this._moddedGainValue)
-
-		return result
 	}
 
 	public setCentering(newCentering: ParamInputCentering) {
@@ -185,9 +177,11 @@ class ParamInputChain {
 	}
 
 	private _updateModdedGain() {
-		this._moddedGainValue = this._clampedGainValue * extraGain[this.centering][this._destinationRange]
-		this._paramInputWebAudioChain.setGain(this._moddedGainValue)
+		const modded = this._clampedGainValue * extraGain[this.centering][this._destinationRange]
+		this._paramInputWebAudioChain.setGain(modded)
 	}
+
+	public get input(): PugPolyAudioNode {return this._paramInputWebAudioChain.input}
 
 	public dispose() {
 		this._paramInputWebAudioChain.dispose()
@@ -205,85 +199,27 @@ const extraGain = {
 	},
 }
 
-class ParamInputWebAudioChains {
-	private _chains = Immutable.Map<Id, ParamInputWebAudioChain>()
-
-	public constructor(
-		private readonly _audioContext: AudioContext,
-		private readonly _pairSourcesWithTargets: (sources: Immutable.Map<Id, AudioNode>) => SourceTargetPairs,
-	) {}
-
-	public pairSourcesWithTargets(sources: Immutable.Map<Id, AudioNode>): SourceTargetPairs {
-		const pairs = this._pairSourcesWithTargets(sources)
-		return pairs.map((pair, id): SourceTargetPair => ({
-			id,
-			source: pair.source,
-			target: this._getOrCreateChain('0', pair.target).input,
-		}))
-	}
-
-	private _getOrCreateChain(voiceId: Id, target: AudioNode | AudioParam): ParamInputWebAudioChain {
-		const existingChain = this._chains.get(voiceId)
-
-		console.log('_getOrCreateChain existingChain:', {existingChain})
-		if (existingChain) return existingChain
-
-		const newChain = new ParamInputWebAudioChain(
-			this._audioContext,
-			target,
-		)
-
-		this._chains = this._chains.set(voiceId, newChain)
-		console.log('_getOrCreateChain newChain')
-
-		return newChain
-	}
-
-	public setCentering(newCentering: ParamInputCentering) {
-		this._chains.forEach(x => x.setCentering(newCentering))
-	}
-
-	public setGain(newGain: number) {
-		this._chains.forEach(x => x.setGain(newGain))
-	}
-
-	public dispose() {
-		this._chains.forEach(x => x.dispose())
-	}
-}
-
 class ParamInputWebAudioChain {
-	public get input() {return this._waveShaper}
-	private readonly _waveShaper: WaveShaperNode
-	private readonly _gain: GainNode
+	public get input(): PugPolyAudioNode {return this._waveShaper}
+	public get output(): PugPolyAudioNode {return this._gain}
+	private readonly _waveShaper: PugPolyWaveShaperNode
+	private readonly _gain: PugPolyGainNode
 
 	public constructor(
 		audioContext: AudioContext,
-		target: AudioNode | AudioParam,
 	) {
-		this._waveShaper = audioContext.createWaveShaper()
-		this._gain = audioContext.createGain()
+		this._waveShaper = new PugPolyWaveShaperNode({audioContext})
+		this._gain = new PugPolyGainNode({audioContext})
 
-		this._waveShaper.connect(this._gain).connect(target as AudioNode)
+		this._waveShaper.connect(this._gain)
 	}
-
-	// public pairSourcesWithTargets(sources: Immutable.Map<Id, AudioNode>): SourceTargetPairs {
-	// 	return sources.map((source, id): SourceTargetPair => ({
-	// 		id,
-	// 		source,
-	// 		target: this._waveShaper,
-	// 	}))
-	// }
 
 	public setCentering(newCentering: ParamInputCentering) {
 		this._waveShaper.curve = curves.bipolar[newCentering]
 	}
 
 	public setGain(newGain: number) {
-		// Rounding to nearest to 32 bit number because AudioParam values are 32 bit floats
-		const frounded = Math.fround(newGain)
-		if (frounded === this._gain.gain.value) return
-		this._gain.gain.value = frounded
+		this._gain.gain.value = newGain
 	}
 
 	public dispose() {
@@ -292,37 +228,20 @@ class ParamInputWebAudioChain {
 	}
 }
 
-type AudioNodeOrParam = AudioNode | AudioParam
-
-type AudioInputPortVoicesThingy = (connectionId: Id, voiceId: Id) => AudioNode | AudioParam
-
-export function isAudioNodeOrParam(val: AudioNodeOrParam | PairSourcesWithTargets): val is AudioNodeOrParam {
-	return typeof val !== 'function'
-}
+type AudioNodeOrParam = PugPolyAudioNode | PugPolyAudioParam
 
 export class ExpNodeAudioInputPort extends ExpNodeAudioPort {
 	public constructor(
 		public readonly id: Id,
 		public readonly name: string,
 		public readonly node: CorgiNode,
-		public readonly destination: AudioNodeOrParam | PairSourcesWithTargets,
+		public readonly destination: AudioNodeOrParam,
 		public readonly isAudioParamInput = false,
 	) {
 		super(id, name, node, 'in', isAudioParamInput)
 	}
 
-	public pairSourcesWithTargets(connectionId: Id, sources: Immutable.Map<Id, AudioNode>): SourceTargetPairs {
-		if (isAudioNodeOrParam(this.destination)) {
-			const target = this.destination
-			return sources.map((source, id): SourceTargetPair => ({
-				id,
-				source,
-				target,
-			}))
-		} else {
-			return this.destination(sources)
-		}
-	}
+	public getTarget = (connectionId: Id) => this.destination
 
 	protected _connect = (connection: ExpNodeAudioConnection) => {}
 
@@ -352,11 +271,11 @@ export interface ExpNodeAudioParamInputPortReact extends Pick<ExpNodeAudioParamI
 
 export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 	private readonly _inputChains = new Map<Id, ParamInputChain>()
-	private readonly _waveShaperClamp: WaveShaperNode
-	private readonly _gainDenormalizer: GainNode
+	private readonly _waveShaperClamp: PugPolyWaveShaperNode
+	private readonly _gainDenormalizer: PugPolyGainNode
 	private readonly _knobConstantSource: ConstantSourceNode
 	private _analyser?: CorgiAnalyserSPNode
-	public readonly destination: AudioParam
+	public readonly destination: PugPolyAudioParam
 	public readonly onLiveRangeChanged: CorgiObjectChangedEvent<LiveRange>
 	public readonly onChainsChanged: CorgiObjectChangedEvent<Map<Id, ParamInputChain>>
 	private _knobValue: number
@@ -378,8 +297,8 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 		// controlled from modulation sources, including the knob.
 		this.destination.setValueAtTime(0, 0)
 
-		this._waveShaperClamp = this._audioContext.createWaveShaper()
-		this._gainDenormalizer = this._audioContext.createGain()
+		this._waveShaperClamp = new PugPolyWaveShaperNode({audioContext: this._audioContext})
+		this._gainDenormalizer = new PugPolyGainNode({audioContext: this._audioContext})
 		this._knobConstantSource = this._audioContext.createConstantSource()
 
 		this._knobConstantSource.offset.setValueAtTime(expAudioParam.defaultNormalizedValue, 0)
@@ -497,21 +416,15 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 		chain.setCentering(centering)
 	}
 
-	public pairSourcesWithTargets(connectionId: Id, sources: Immutable.Map<Id, AudioNode>): SourceTargetPairs {
-		const chain = this._getOrMakeChainForConnection(connectionId)
-
-		return chain.pairSourcesWithTargets(sources)
-	}
-
-	private _getOrMakeChainForConnection(connectionId: Id): ParamInputChain {
+	public getTarget(connectionId: Id): PugPolyAudioNode {
 		const existingChain = this._inputChains.get(connectionId)
 
-		if (existingChain) return existingChain
+		if (existingChain) return existingChain.input
 
 		const newChain = new ParamInputChain(
 			connectionId,
 			this._audioContext,
-			(sources: Immutable.Map<Id, AudioNode>): SourceTargetPairs => sources.map((source, id): SourceTargetPair => ({id, source, target: this._waveShaperClamp})),
+			this._waveShaperClamp,
 			this.defaultCentering,
 			this.expAudioParam.paramSignalRange,
 			this._updateLiveRange,
@@ -524,7 +437,7 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 
 		this._updateLiveRange()
 
-		return newChain
+		return newChain.input
 	}
 
 	protected _connect = (connection: ExpNodeAudioConnection) => {}
@@ -558,26 +471,17 @@ export interface ExpNodeAudioOutputPortArgs {
 }
 
 export class ExpNodeAudioOutputPort extends ExpNodeAudioPort {
-	private _sources = new CorgiObjectChangedEvent<Immutable.Map<Id, AudioNode>>(Immutable.Map())
-	public get source(): AudioNode {return this._sources.current.first(null)!}
-
 	public constructor(
 		public readonly id: Id,
 		public readonly name: string,
 		public readonly node: CorgiNode,
-		source: AudioNode | CorgiObjectChangedEvent<Immutable.Map<Id, AudioNode>>,
+		public readonly source: PugPolyAudioNode,
 	) {
 		super(id, name, node, 'out', false)
-
-		if (isCorgiObjectChangedEvent<Immutable.Map<Id, AudioNode>>(source)) {
-			this._sources = source
-		} else {
-			this._sources = new CorgiObjectChangedEvent<Immutable.Map<Id, AudioNode>>(Immutable.Map<Id, AudioNode>().set(this.id, source))
-		}
 	}
 
-	public getSources(connectionId: Id) {
-		return this._sources
+	public getSource(connectionId: Id) {
+		return this.source
 	}
 
 	protected _connect = (connection: ExpNodeAudioConnection) => {}
@@ -610,11 +514,11 @@ export function isAudioParamInputPort(val: unknown): val is ExpNodeAudioParamInp
 
 export function detectFeedbackLoop(nodeId: Id, connections: ReadonlyMap<Id, ExpNodeConnection>, i: number, nodeIds: Immutable.List<Id>): boolean {
 	if (nodeIds.includes(nodeId)) {
-		logger.warn('detected feedback loop because matching nodeId: ', {nodeId: nodeId, nodeIds, i})
+		logger.warn('detected feedback loop because matching nodeId: ', {nodeId, nodeIds, i})
 		return true
 	}
 	if (i > 500) {
-		logger.error('detected feedback loop because i too high: ', {nodeId: nodeId, nodeIds, i})
+		logger.error('detected feedback loop because i too high: ', {nodeId, nodeIds, i})
 		return true
 	}
 

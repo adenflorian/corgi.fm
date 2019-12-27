@@ -1,20 +1,22 @@
+import {PugPolyAudioNode, PugPolyGainNode} from '../PugAudioNode/PugAudioNode'
+
 export class DryWetChain {
-	public readonly inputGain: GainNode
-	public readonly dryGain: GainNode
-	public readonly wetGain: GainNode
-	public readonly wetPostGain: GainNode
-	public readonly outputGain: GainNode
+	public readonly inputGain: PugPolyGainNode
+	public readonly dryGain: PugPolyGainNode
+	public readonly wetGain: PugPolyGainNode
+	public readonly wetPostGain: PugPolyGainNode
+	public readonly outputGain: PugPolyGainNode
 
 	public constructor(
 		audioContext: AudioContext,
-		wetInternalNode: AudioNode,
-		wetInternalOutputNode?: AudioNode,
+		wetInternalNode: PugPolyAudioNode,
+		wetInternalOutputNode?: PugPolyAudioNode,
 	) {
-		this.inputGain = audioContext.createGain()
-		this.dryGain = audioContext.createGain()
-		this.wetGain = audioContext.createGain()
-		this.wetPostGain = audioContext.createGain()
-		this.outputGain = audioContext.createGain()
+		this.inputGain = new PugPolyGainNode({audioContext})
+		this.dryGain = new PugPolyGainNode({audioContext})
+		this.wetGain = new PugPolyGainNode({audioContext})
+		this.wetPostGain = new PugPolyGainNode({audioContext})
+		this.outputGain = new PugPolyGainNode({audioContext})
 
 		this.inputGain
 			.connect(this.dryGain)
@@ -43,10 +45,10 @@ export class DryWetChain {
 	}
 
 	public dispose() {
-		this.inputGain.disconnect()
-		this.dryGain.disconnect()
-		this.wetGain.disconnect()
-		this.wetPostGain.disconnect()
-		this.outputGain.disconnect()
+		this.inputGain.dispose()
+		this.dryGain.dispose()
+		this.wetGain.dispose()
+		this.wetPostGain.dispose()
+		this.outputGain.dispose()
 	}
 }
