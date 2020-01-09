@@ -26,6 +26,7 @@
         "Deletable",
         "Denormalizer",
         "Deserializer",
+        "Detunes",
         "Dont",
         "Downsample",
         "FOSS",
@@ -198,7 +199,7 @@
         {"language": "typescript", "autoFix": true},
         {"language": "typescriptreact", "autoFix": true},
     ],
-    "eslint.enable": true,
+    "eslint.enable": false,
     "eslint.options": {
         "ignorePath": ".gitignore",
         "extensions": [".js",".jsx",".ts",".tsx",]

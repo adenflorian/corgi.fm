@@ -7,6 +7,39 @@ problems:
 - cleaning up unneeded voices
 
 
+
+
+
+
+requirements:
+- [ ] connections
+	- [ ] poly node to poly node
+	- [ ] poly node to poly param
+	- [ ] poly node to mono node
+	- [ ] poly node to mono param
+	- [ ] mono node to mono node
+	- [ ] mono node to mono param
+	- [ ] mono node to poly node
+	- [ ] mono node to poly param
+- [ ] be able to switch node between mono and poly
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 classes:
 - A
 	- MonoNode
