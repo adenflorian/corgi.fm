@@ -3,24 +3,32 @@ import {logger} from '../../../client-logger'
 // Lab
 type LabTarget<TTarget extends KelpieAudioNode = KelpieAudioNode> = LabAudioNode<TTarget> | LabAudioParam<TTarget>
 
-type VoiceCount = number | 'mono' | 'autoPoly'
+type VoiceCount = number | LabTargetMode
 
 interface LabAudioNodeArgs {
 	readonly audioContext: AudioContext
 	readonly voiceMode: VoiceCount 
 }
 
+type LabTargetMode = 'mono' | 'autoPoly'
+
+interface LabTargetConnection {
+	readonly target: LabTarget
+	readonly targetMode: LabTargetMode
+	readonly targetVoices: readonly KelpieTarget[]
+}
+
 abstract class LabAudioNode<TNode extends KelpieAudioNode = KelpieAudioNode> {
 	public readonly voices = [] as TNode[]
 	public get voiceCount() {return this.voices.length}
 	// Keep track of targets in case we change voice count/mode
-	public readonly targets = new Set<LabTarget>()
+	public readonly targets = new Map<LabTarget, LabTargetConnection>()
 	// Keep track of sources in case we change voice mode
 	public readonly sources = new Set<LabAudioNode>()
-	private _voiceMode: VoiceCount = 'mono'
-	public get voiceMode() {return this._voiceMode}
+	private _mode: VoiceCount = 'mono'
+	public get mode() {return this._mode}
 	protected _audioContext: AudioContext
-	private _currentModeImpl: LabModeImpl = new LabMono(this)
+	private _currentModeImpl: LabModeImpl<TNode> = new LabMono(this)
 	private readonly _params = new Set<LabAudioParam>()
 	public get params() {return this._params as ReadonlySet<LabAudioParam>}
 
@@ -31,85 +39,89 @@ abstract class LabAudioNode<TNode extends KelpieAudioNode = KelpieAudioNode> {
 
 	// Called on the source
 	public connect<TTarget extends KelpieAudioNode>(target: LabTarget<TTarget>): this {
-		this._currentModeImpl.connect(target)
-		this.targets.add(target)
+		const [targetMode, targetVoices] = target.onConnect(this)
+		this._currentModeImpl.connect(target, targetMode, targetVoices)
+		this.targets.set(target, {target, targetMode, targetVoices})
 		return this
 	}
 
 	// Called on the target
-	public onConnect(source: LabAudioNode): readonly ['mono' | 'autoPoly', KelpieAudioNode[]] {
+	public onConnect(source: LabAudioNode): readonly [LabTargetMode, KelpieAudioNode[]] {
 		const voices = this._currentModeImpl.onConnect(source)
 		this.sources.add(source)
 		return voices
 	}
 
-	public onSourceVoiceCountChange(source: LabAudioNode): readonly KelpieAudioNode[] {
-		// TODO
+	public onConnectThroughParam(param: LabAudioParam, source: LabAudioNode): readonly [LabTargetMode, TNode[]] {
+		logger.assert(this.params.has(param), 'missing param!')
+		return this._currentModeImpl.onConnect(source)
+	}
+
+	public onSourceVoiceCountChange(source: LabAudioNode): readonly [LabTargetMode, readonly TNode[]] {
 		return this._currentModeImpl.onSourceVoiceCountChange(source)
-	}
-
-	public ensureMinimumVoiceCount(count: number) {
-		// TODO Handle mono and static poly
-		const delta = count - this.voices.length
-
-		if (delta > 0) {
-			this._addVoices(delta)
-		}
-
-		return this.voices
-	}
-
-	private _addVoices(numberToAdd: number) {
-		for (let i = 0; i < numberToAdd; i++) {
-			this.voices.push(this._makeVoice())
-		}
-	}
-
-	private _deleteVoices(numberToDelete: number) {
-		for (let i = 0; i < numberToDelete; i++) {
-			const deletedVoice = this.voices.pop()
-			if (deletedVoice === undefined) {
-				logger.error('[LabNode._deleteVoices] deletedVoice is undefined:', {source: this, voices: this.voices, numberToDelete})
-			} else {
-				deletedVoice.disconnect()
-			}
-		}
 	}
 
 	public abstract _makeVoice(): TNode
 
-	public setVoiceCount(newVoiceCount: number | 'mono' | 'autoPoly') {
-		if (newVoiceCount === this.voiceMode) return
-		this._voiceMode = newVoiceCount
-
-		// TODO Handle incoming and outgoing connections
+	public setVoiceCount(newVoiceCount: VoiceCount) {
+		if (newVoiceCount === this.mode) return
+		this._mode = newVoiceCount
 	
 		if (newVoiceCount === 'mono') {
 			this._currentModeImpl = new LabMono(this)
 			this._currentModeImpl.setVoiceCount(1)
+			this.sources.forEach(source => {
+				source.onTargetVoiceModeChange(this, newVoiceCount, this.voices)
+			})
+			this.params.forEach(param => {
+				param.sources.forEach(source => {
+					source.onTargetVoiceModeChange(this, newVoiceCount, this.voices)
+				})
+			})
 		} else if (newVoiceCount === 'autoPoly') {
 			this._currentModeImpl = new LabAutoPoly(this)
 			this._currentModeImpl.setVoiceCount(0)
+			this.sources.forEach(source => {
+				source.onTargetVoiceModeChange(this, newVoiceCount, this.voices)
+			})
+			this.params.forEach(param => {
+				param.sources.forEach(source => {
+					source.onTargetVoiceModeChange(this, newVoiceCount, this.voices)
+				})
+			})
 		} else {
 			this._currentModeImpl = new LabStaticPoly(this)
 			this._currentModeImpl.setVoiceCount(newVoiceCount)
 		}
 	}
 
+	public onTargetVoiceModeChange(target: LabTarget, targetMode: LabTargetMode, targetVoices: readonly KelpieTarget[]) {
+		this._currentModeImpl.onTargetVoiceModeChange(target, targetMode, targetVoices)
+	}
+
 	public disconnect(target?: LabTarget) {
-		// TODO
 		if (target) {
+			const targetConnection = this.targets.get(target)
+			if (!targetConnection) throw new Error('!targetConnection')
+			this._currentModeImpl.disconnect(target, targetConnection.targetVoices)
 			target.onDisconnect(this)
 			this.targets.delete(target)
 		} else {
-			this.targets.forEach(target2 => target2.onDisconnect(this))
-			this.targets.clear()
+			this.targets.forEach(target2 => {
+				this.disconnect(target2.target)
+			})
+			logger.assert(this.targets.size === 0, 'this.targets.size === 0')
 		}
 	}
 
 	public onDisconnect(source: LabAudioNode) {
-		// TODO
 		this.sources.delete(source)
+		this._currentModeImpl.onDisconnect(source)
+	}
+
+	public onDisconnectThroughParam(param: LabAudioParam, source: LabAudioNode) {
+		logger.assert(this.params.has(param), 'missing param2!')
+		this._currentModeImpl.onDisconnect(source)
 	}
 
 	public onParamAdd(param: LabAudioParam) {
@@ -121,22 +133,24 @@ abstract class LabAudioNode<TNode extends KelpieAudioNode = KelpieAudioNode> {
 	}
 
 	public dispose() {
-		// TODO
 		this.voices.forEach(voice => voice.dispose())
+		this.params.forEach(param => param.dispose())
 	}
 }
 
-interface LabModeImpl {
-	connect<TTarget extends KelpieAudioNode>(target: LabTarget<TTarget>): void
-	onConnect(source: LabAudioNode): readonly ['mono' | 'autoPoly', KelpieAudioNode[]]
-	onSourceVoiceCountChange(source: LabAudioNode): readonly KelpieAudioNode[]
+interface LabModeImpl<TNode extends KelpieAudioNode> {
+	connect<TTarget extends KelpieAudioNode>(target: LabTarget<TTarget>, targetMode: LabTargetMode, targetVoices: readonly KelpieTarget[]): void
+	onConnect(source: LabAudioNode): readonly [LabTargetMode, TNode[]]
+	onSourceVoiceCountChange(source: LabAudioNode): readonly [LabTargetMode, readonly TNode[]]
 	setVoiceCount(voiceCount: number): void
-	disconnect(target?: LabTarget): void
+	onTargetVoiceModeChange(target: LabTarget, targetMode: LabTargetMode, targetVoices: readonly KelpieTarget[]): void
+	disconnect(target: LabTarget, targetVoices: readonly KelpieTarget[]): void
+	onDisconnect(source: LabAudioNode): void
 	dispose(): void
 }
 
-class LabAutoPoly implements LabModeImpl {
-	public constructor(private readonly _parent: LabAudioNode) {}
+class LabAutoPoly<TNode extends KelpieAudioNode = KelpieAudioNode> implements LabModeImpl<TNode> {
+	public constructor(private readonly _parent: LabAudioNode<TNode>) {}
 
 	// Called on the source
 	public connect<TTarget extends KelpieAudioNode>(target: LabTarget<TTarget>) {
@@ -153,19 +167,40 @@ class LabAutoPoly implements LabModeImpl {
 	}
 
 	// Called on the target
-	public onConnect(source: LabAudioNode): readonly ['mono' | 'autoPoly', KelpieAudioNode[]] {
+	public onConnect(source: LabAudioNode): readonly [LabTargetMode, TNode[]] {
 		const sourceVoiceCount = source.voices.length
-		this.ensureMinimumVoiceCount(sourceVoiceCount)
+		this._ensureMinimumVoiceCount(sourceVoiceCount)
 		return ['autoPoly', this._parent.voices]
 	}
 
-	public onSourceVoiceCountChange(source: LabAudioNode): readonly KelpieAudioNode[] {
+	public onSourceVoiceCountChange(source: LabAudioNode): [LabTargetMode, TNode[]] {
 		this._setVoiceCount(this._getMaxSourceVoiceCount())
-		return this._parent.voices
+		return ['autoPoly', this._parent.voices]
 	}
 
 	public setVoiceCount(newVoiceCount: number) {
 		this._setVoiceCount(this._getMaxSourceVoiceCount())
+	}
+
+	public onTargetVoiceModeChange(target: LabTarget, targetMode: LabTargetMode, targetVoices: readonly KelpieTarget[]) {
+		const oldTargetConnection = this._parent.targets.get(target)
+		if (!oldTargetConnection) throw new Error('!oldTargetConnection')
+		if (targetMode === 'mono') {
+			this._parent.voices.forEach((voice, i) => {
+				voice.disconnect(oldTargetConnection.targetVoices[i] as KelpieAudioNode)
+			})
+			this._parent.voices.forEach((voice) => {
+				voice.connect(targetVoices[0] as KelpieAudioNode)
+			})
+		} else {
+			this._parent.voices.forEach((voice, i) => {
+				voice.disconnect(oldTargetConnection.targetVoices[0] as KelpieAudioNode)
+			})
+			this._parent.voices.forEach((voice, i) => {
+				voice.connect(targetVoices[i] as KelpieAudioNode)
+			})
+		}
+		this._parent.targets.set(target, {target, targetVoices, targetMode})
 	}
 
 	private _getMaxSourceVoiceCount(): number {
@@ -193,14 +228,21 @@ class LabAutoPoly implements LabModeImpl {
 		}
 
 		this._parent.targets.forEach(target => {
-			const kelpieTargets = target.onSourceVoiceCountChange(this._parent)
-			this._parent.voices.forEach((voice, i) => {
-				voice.connect(kelpieTargets[i])
-			})
+			const [targetMode, targetVoices] = target.target.onSourceVoiceCountChange(this._parent)
+			if (targetMode === 'mono') {
+				this._parent.voices.forEach((voice) => {
+					voice.connect(targetVoices[0] as KelpieAudioNode)
+				})
+			} else {
+				this._parent.voices.forEach((voice, i) => {
+					voice.connect(targetVoices[i] as KelpieAudioNode)
+				})
+			}
+			this._parent.targets.set(target.target, {target: target.target, targetVoices, targetMode})
 		})
 	}
 
-	public ensureMinimumVoiceCount(count: number) {
+	private _ensureMinimumVoiceCount(count: number) {
 		const delta = count - this._parent.voices.length
 
 		if (delta > 0) {
@@ -227,17 +269,21 @@ class LabAutoPoly implements LabModeImpl {
 		}
 	}
 
-	public disconnect(target?: LabTarget) {
-		// TODO
+	public disconnect(target: LabTarget, targetVoices: readonly KelpieTarget[]) {
+		this._parent.voices.forEach((voice, i) => {
+			voice.disconnect(targetVoices[i])
+		})
 	}
 
-	public dispose() {
-		// TODO
+	public onDisconnect(source: LabAudioNode) {
+		this._setVoiceCount(this._getMaxSourceVoiceCount())
 	}
+
+	public dispose() {}
 }
 
-class LabStaticPoly implements LabModeImpl {
-	public constructor(private readonly _parent: LabAudioNode) {}
+class LabStaticPoly<TNode extends KelpieAudioNode = KelpieAudioNode> implements LabModeImpl<TNode> {
+	public constructor(private readonly _parent: LabAudioNode<TNode>) {}
 
 	// Called on the source
 	public connect<TTarget extends KelpieAudioNode>(target: LabTarget<TTarget>) {
@@ -254,13 +300,12 @@ class LabStaticPoly implements LabModeImpl {
 	}
 
 	// Called on the target
-	public onConnect(source: LabAudioNode): readonly ['mono' | 'autoPoly', KelpieAudioNode[]] {
+	public onConnect(source: LabAudioNode): readonly [LabTargetMode, TNode[]] {
 		throw new Error('nothing is allowed to connect to static poly')
 	}
 
-	public onSourceVoiceCountChange(source: LabAudioNode): readonly KelpieAudioNode[] {
-		// TODO
-		return this._parent.voices
+	public onSourceVoiceCountChange(source: LabAudioNode): readonly [LabTargetMode, readonly TNode[]] {
+		throw new Error('wrong!')
 	}
 
 	private _addVoices(numberToAdd: number) {
@@ -280,8 +325,10 @@ class LabStaticPoly implements LabModeImpl {
 		}
 	}
 
-	public disconnect(target?: LabTarget) {
-		// TODO
+	public disconnect(target: LabTarget, targetVoices: readonly KelpieTarget[]) {
+		this._parent.voices.forEach((voice, i) => {
+			voice.disconnect(targetVoices[i])
+		})
 	}
 
 	public setVoiceCount(newVoiceCount: number) {
@@ -297,20 +344,48 @@ class LabStaticPoly implements LabModeImpl {
 		}
 
 		this._parent.targets.forEach(target => {
-			const kelpieTargets = target.onSourceVoiceCountChange(this._parent)
-			this._parent.voices.forEach((voice, i) => {
-				voice.connect(kelpieTargets[i])
-			})
+			const [targetMode, targetVoices] = target.target.onSourceVoiceCountChange(this._parent)
+			if (targetMode === 'mono') {
+				this._parent.voices.forEach((voice) => {
+					voice.connect(targetVoices[0] as KelpieAudioNode)
+				})
+			} else {
+				this._parent.voices.forEach((voice, i) => {
+					voice.connect(targetVoices[i] as KelpieAudioNode)
+				})
+			}
+			this._parent.targets.set(target.target, {target: target.target, targetVoices, targetMode})
 		})
 	}
 
-	public dispose() {
-		// TODO
+	public onTargetVoiceModeChange(target: LabTarget, targetMode: LabTargetMode, targetVoices: readonly KelpieTarget[]) {
+		const oldTargetConnection = this._parent.targets.get(target)
+		if (!oldTargetConnection) throw new Error('!oldTargetConnection')
+		if (targetMode === 'mono') {
+			this._parent.voices.forEach((voice, i) => {
+				voice.disconnect(oldTargetConnection.targetVoices[i] as KelpieAudioNode)
+			})
+			this._parent.voices.forEach((voice) => {
+				voice.connect(targetVoices[0] as KelpieAudioNode)
+			})
+		} else {
+			this._parent.voices.forEach((voice, i) => {
+				voice.disconnect(oldTargetConnection.targetVoices[0] as KelpieAudioNode)
+			})
+			this._parent.voices.forEach((voice, i) => {
+				voice.connect(targetVoices[i] as KelpieAudioNode)
+			})
+		}
+		this._parent.targets.set(target, {target, targetVoices, targetMode})
 	}
+
+	public onDisconnect(source: LabAudioNode) {}
+
+	public dispose() {}
 }
 
-class LabMono implements LabModeImpl {
-	public constructor(private readonly _parent: LabAudioNode) {}
+class LabMono<TNode extends KelpieAudioNode = KelpieAudioNode> implements LabModeImpl<TNode> {
+	public constructor(private readonly _parent: LabAudioNode<TNode>) {}
 
 	public connect<TTarget extends KelpieAudioNode>(target: LabTarget<TTarget>) {
 		const [_, targetVoices] = target.onConnect(this._parent)
@@ -318,7 +393,7 @@ class LabMono implements LabModeImpl {
 	}
 
 	// Called on the target
-	public onConnect(source: LabAudioNode): readonly ['mono' , KelpieAudioNode[]] {
+	public onConnect(source: LabAudioNode): readonly ['mono', TNode[]] {
 		logger.assert(this._parent.voices.length === 1, 'this._parent.voices.length === 1')
 		return ['mono', this._parent.voices]
 	}
@@ -327,17 +402,31 @@ class LabMono implements LabModeImpl {
 		const delta = 1 - this._parent.voiceCount
 		if (delta < 0) {
 			this._deleteVoices(Math.abs(delta))
+			logger.assert(this._parent.voices.length === 1, 'this._parent.voices.length === 1')
 
 			this._parent.targets.forEach(target => {
-				const targetVoices = target.onSourceVoiceCountChange(this._parent)
+				const [targetMode, targetVoices] = target.target.onSourceVoiceCountChange(this._parent)
 				this._connectToTargetVoices(targetVoices)
+				this._parent.targets.set(target.target, {target: target.target, targetVoices, targetMode})
 			})
 		}
 	}
 
+	public onTargetVoiceModeChange(target: LabTarget, targetMode: LabTargetMode, targetVoices: readonly KelpieTarget[]) {
+		const oldTargetConnection = this._parent.targets.get(target)
+		if (!oldTargetConnection) throw new Error('!oldTargetConnection')
+		oldTargetConnection.targetVoices.forEach(oldTargetVoice => {
+			this._monoVoice.disconnect(oldTargetVoice)
+		})
+		this._connectToTargetVoices(targetVoices)
+		this._parent.targets.set(target, {target, targetVoices, targetMode})
+	}
+
+	private get _monoVoice() {return this._parent.voices[0]}
+
 	private _connectToTargetVoices(targetVoices: readonly KelpieTarget[]) {
 		targetVoices.forEach((targetVoice: KelpieAudioNode | KelpieAudioParam) => {
-			this._parent.voices[0].connect(targetVoice)
+			this._monoVoice.connect(targetVoice)
 		})
 	}
 
@@ -352,21 +441,23 @@ class LabMono implements LabModeImpl {
 		}
 	}
 
-	public onSourceVoiceCountChange(source: LabAudioNode): readonly KelpieAudioNode[] {
-		// TODO
-		return this._parent.voices
+	public onSourceVoiceCountChange(source: LabAudioNode): readonly [LabTargetMode, readonly TNode[]] {
+		return ['mono', this._parent.voices]
 	}
 
-	public disconnect(target?: LabTarget) {
-		// TODO
+	public disconnect(target: LabTarget, targetVoices: readonly KelpieTarget[]) {
+		targetVoices.forEach(targetVoice => {
+			this._monoVoice.disconnect(targetVoice)
+		})
 	}
 
-	public dispose() {
-		// TODO
-	}
+	public onDisconnect(source: LabAudioNode) {}
+
+	public dispose() {}
 }
 
 class LabAudioParam<TNode extends KelpieAudioNode = KelpieAudioNode> {
+	public get mode() {return this._labAudioNode.mode}
 	// Keep track of sources in case we change voice mode
 	public readonly sources = new Set<LabAudioNode>()
 
@@ -395,25 +486,20 @@ class LabAudioParam<TNode extends KelpieAudioNode = KelpieAudioNode> {
 		}
 	}
 
-	public onConnect(source: LabAudioNode): readonly ['mono' | 'autoPoly', KelpieAudioParam[]] {
-		if (this._labAudioNode.voiceMode === 'mono') {
-			logger.assert(this._labAudioNode.voices.length === 1, 'this._labAudioNode.voices.length === 1')
-			return ['mono', this._labAudioNode.voices.map(this._getAudioParam)]
-		} else if (this._labAudioNode.voiceMode === 'autoPoly') {
-			const voices = this._labAudioNode.ensureMinimumVoiceCount(source.voiceCount)
-			return ['autoPoly', voices.map(this._getAudioParam)]
-		} else {
-			throw new Error('nothing is allowed to connect to static poly')
-		}
+	public onConnect(source: LabAudioNode): readonly [LabTargetMode, KelpieAudioParam[]] {
+		this.sources.add(source)
+		const [mode, voices] = this._labAudioNode.onConnectThroughParam(this, source)
+		return [mode, voices.map(this._getAudioParam)]
 	}
 
 	public onDisconnect(source: LabAudioNode) {
-		// TODO?
+		this.sources.delete(source)
+		this._labAudioNode.onDisconnectThroughParam(this, source)
 	}
 
-	public onSourceVoiceCountChange(source: LabAudioNode): readonly KelpieAudioNode[] {
-		// TODO
-		return []
+	public onSourceVoiceCountChange(source: LabAudioNode): readonly [LabTargetMode, readonly KelpieAudioParam[]] {
+		const [mode, voices] = this._labAudioNode.onSourceVoiceCountChange(source)
+		return [mode, voices.map(this._getAudioParam)]
 	}
 
 	public dispose() {
