@@ -433,7 +433,7 @@ export class PugPolyAudioNode<TSelf extends PugAudioNode = PugAudioNode> impleme
 			maxSourceVoiceCount = Math.max(maxSourceVoiceCount, source.voiceCount)
 		})
 		this._pugAudioNode.params.forEach(param => {
-			param.sources.forEach(paramSource => {ddddd
+			param.sources.forEach(paramSource => {
 				maxSourceVoiceCount = Math.max(maxSourceVoiceCount, paramSource.voiceCount)
 			})
 		})
