@@ -16,8 +16,8 @@ import {
 	CorgiNumberChangedEvent, CorgiEnumChangedEvent,
 	CorgiObjectChangedEvent, CorgiStringChangedEvent,
 } from './CorgiEvents'
-import {CorgiAnalyserSPNode} from './CorgiAnalyserSPN'
-import {PugPolyAudioParam, PugPolyAudioNode, PugPolyGainNode, PugPolyWaveShaperNode} from './Nodes/PugAudioNode/PugAudioNode'
+import {LabCorgiAnalyserSPNode} from './CorgiAnalyserSPN'
+import {LabAudioParam, LabAudioNode, LabGain, LabWaveShaperNode, LabConstantSourceNode} from './Nodes/PugAudioNode/Lab'
 
 export type ExpPortCallback = (port: ExpPort) => void
 
@@ -139,7 +139,7 @@ class ParamInputChain {
 	public constructor(
 		public readonly id: Id,
 		audioContext: AudioContext,
-		private readonly _destination: PugPolyAudioParam | PugPolyAudioNode,
+		private readonly _destination: LabAudioParam | LabAudioNode,
 		defaultCentering: ParamInputCentering,
 		private readonly _destinationRange: SignalRange,
 		private readonly _updateLiveRange: () => void,
@@ -181,7 +181,7 @@ class ParamInputChain {
 		this._paramInputWebAudioChain.setGain(modded)
 	}
 
-	public get input(): PugPolyAudioNode {return this._paramInputWebAudioChain.input}
+	public get input(): LabAudioNode {return this._paramInputWebAudioChain.input}
 
 	public dispose() {
 		this._paramInputWebAudioChain.dispose()
@@ -200,16 +200,16 @@ const extraGain = {
 }
 
 class ParamInputWebAudioChain {
-	public get input(): PugPolyAudioNode {return this._waveShaper}
-	public get output(): PugPolyAudioNode {return this._gain}
-	private readonly _waveShaper: PugPolyWaveShaperNode
-	private readonly _gain: PugPolyGainNode
+	public get input(): LabAudioNode {return this._waveShaper}
+	public get output(): LabAudioNode {return this._gain}
+	private readonly _waveShaper: LabWaveShaperNode
+	private readonly _gain: LabGain
 
 	public constructor(
 		audioContext: AudioContext,
 	) {
-		this._waveShaper = new PugPolyWaveShaperNode({audioContext})
-		this._gain = new PugPolyGainNode({audioContext})
+		this._waveShaper = new LabWaveShaperNode({audioContext, voiceMode: 'autoPoly'})
+		this._gain = new LabGain({audioContext, voiceMode: 'autoPoly'})
 
 		this._waveShaper.connect(this._gain)
 	}
@@ -228,7 +228,7 @@ class ParamInputWebAudioChain {
 	}
 }
 
-type AudioNodeOrParam = PugPolyAudioNode | PugPolyAudioParam
+type AudioNodeOrParam = LabAudioNode | LabAudioParam
 
 export class ExpNodeAudioInputPort extends ExpNodeAudioPort {
 	public constructor(
@@ -271,11 +271,11 @@ export interface ExpNodeAudioParamInputPortReact extends Pick<ExpNodeAudioParamI
 
 export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 	private readonly _inputChains = new Map<Id, ParamInputChain>()
-	private readonly _waveShaperClamp: PugPolyWaveShaperNode
-	private readonly _gainDenormalizer: PugPolyGainNode
-	private readonly _knobConstantSource: ConstantSourceNode
-	private _analyser?: CorgiAnalyserSPNode
-	public readonly destination: PugPolyAudioParam
+	private readonly _waveShaperClamp: LabWaveShaperNode
+	private readonly _gainDenormalizer: LabGain
+	private readonly _knobConstantSource: LabConstantSourceNode
+	private _analyser?: LabCorgiAnalyserSPNode
+	public readonly destination: LabAudioParam
 	public readonly onLiveRangeChanged: CorgiObjectChangedEvent<LiveRange>
 	public readonly onChainsChanged: CorgiObjectChangedEvent<Map<Id, ParamInputChain>>
 	private _knobValue: number
@@ -297,9 +297,9 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 		// controlled from modulation sources, including the knob.
 		this.destination.setValueAtTime(0, 0)
 
-		this._waveShaperClamp = new PugPolyWaveShaperNode({audioContext: this._audioContext})
-		this._gainDenormalizer = new PugPolyGainNode({audioContext: this._audioContext})
-		this._knobConstantSource = this._audioContext.createConstantSource()
+		this._waveShaperClamp = new LabWaveShaperNode({audioContext: this._audioContext, voiceMode: 'autoPoly'})
+		this._gainDenormalizer = new LabGain({audioContext: this._audioContext, voiceMode: 'autoPoly'})
+		this._knobConstantSource = new LabConstantSourceNode({audioContext: this._audioContext, voiceMode: 'autoPoly'})
 
 		this._knobConstantSource.offset.setValueAtTime(expAudioParam.defaultNormalizedValue, 0)
 		this._knobValue = expAudioParam.defaultNormalizedValue
@@ -330,11 +330,11 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 	public readonly onExtraAnimationsChange = (value: boolean) => {
 		try {
 			if (value) {
-				this._analyser = new CorgiAnalyserSPNode(this._audioContext, this._onAnalyserUpdate)
-				this._gainDenormalizer.connect(this._analyser.input)
+				this._analyser = new LabCorgiAnalyserSPNode(this._audioContext, this._onAnalyserUpdate)
+				this._gainDenormalizer.connect(this._analyser)
 				this._requestWorkletUpdate()
 			} else if (this._analyser) {
-				this._gainDenormalizer.disconnect(this._analyser.input)
+				this._gainDenormalizer.disconnect(this._analyser)
 				this._analyser.dispose()
 			}
 			// eslint-disable-next-line no-empty
@@ -416,7 +416,7 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 		chain.setCentering(centering)
 	}
 
-	public getTarget(connectionId: Id): PugPolyAudioNode {
+	public getTarget = (connectionId: Id): LabAudioNode => {
 		const existingChain = this._inputChains.get(connectionId)
 
 		if (existingChain) return existingChain.input
@@ -456,18 +456,11 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 
 	public dispose() {
 		this._inputChains.forEach(x => x.dispose())
-		this._waveShaperClamp.disconnect()
-		this._gainDenormalizer.disconnect()
-		this._knobConstantSource.stop()
-		this._knobConstantSource.disconnect()
+		this._waveShaperClamp.dispose()
+		this._gainDenormalizer.dispose()
+		this._knobConstantSource.dispose()
 		if (this._analyser) this._analyser.dispose()
 	}
-}
-
-export interface ExpNodeAudioOutputPortArgs {
-	readonly id: Id
-	readonly name: string
-	readonly source: AudioNode
 }
 
 export class ExpNodeAudioOutputPort extends ExpNodeAudioPort {
@@ -475,7 +468,7 @@ export class ExpNodeAudioOutputPort extends ExpNodeAudioPort {
 		public readonly id: Id,
 		public readonly name: string,
 		public readonly node: CorgiNode,
-		public readonly source: PugPolyAudioNode,
+		public readonly source: LabAudioNode,
 	) {
 		super(id, name, node, 'out', false)
 	}

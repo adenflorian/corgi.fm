@@ -5,19 +5,20 @@ import {
 } from '../ExpPorts'
 import {ExpAudioParam, ExpAudioParams} from '../ExpParams'
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
+import {LabConstantSourceNode, LabGain} from './PugAudioNode/Lab'
 
 export class ConstantExpNode extends CorgiNode {
 	protected readonly _audioParams: ExpAudioParams
 	protected readonly _ports: ExpPorts
-	private readonly _constantSourceNode: ConstantSourceNode
-	private readonly _outputGain: GainNode
+	private readonly _constantSourceNode: LabConstantSourceNode
+	private readonly _outputGain: LabGain
 
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
 		super(corgiNodeArgs, {name: 'Constant', color: CssColor.purple})
 
-		this._constantSourceNode = corgiNodeArgs.audioContext.createConstantSource()
+		this._constantSourceNode = new LabConstantSourceNode({audioContext: this._audioContext, voiceMode: 'mono'})
 		this._constantSourceNode.start()
-		this._outputGain = corgiNodeArgs.audioContext.createGain()
+		this._outputGain = new LabGain({audioContext: this._audioContext, voiceMode: 'mono'})
 		this._constantSourceNode.connect(this._outputGain)
 
 		const offsetParam = new ExpAudioParam('offset', this._constantSourceNode.offset, 0, 1, 'bipolar')
@@ -41,8 +42,7 @@ export class ConstantExpNode extends CorgiNode {
 	}
 
 	protected _dispose() {
-		this._constantSourceNode.stop()
-		this._constantSourceNode.disconnect()
-		this._outputGain.disconnect()
+		this._constantSourceNode.dispose()
+		this._outputGain.dispose()
 	}
 }

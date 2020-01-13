@@ -5,7 +5,7 @@ import {ExpNodeAudioOutputPort, ExpNodeAudioInputPort, ExpPort} from './ExpPorts
 import {ExpMidiOutputPort, ExpMidiInputPort, MidiReceiver} from './ExpMidiPorts'
 import {ExpPolyphonicOutputPort, ExpPolyphonicInputPort} from './ExpPolyphonicPorts'
 import {BooleanChangedEvent} from './CorgiEvents'
-import {PugPolyAudioNode, PugPolyAudioParam} from './Nodes/PugAudioNode/PugAudioNode'
+import {LabAudioNode, LabAudioParam} from './Nodes/PugAudioNode/Lab'
 
 export type ExpConnectionCallback = (connection: ExpNodeConnectionReact) => void
 
@@ -98,8 +98,8 @@ class AudioVoiceConnection {
 
 	public constructor(
 		public readonly id: Id,
-		protected _source: PugPolyAudioNode,
-		protected _target: PugPolyAudioNode | PugPolyAudioParam,
+		protected _source: LabAudioNode,
+		protected _target: LabAudioNode | LabAudioParam,
 	) {}
 
 	public get outputPort() {return this._source}
@@ -121,13 +121,13 @@ class AudioVoiceConnection {
 		this._isConnected = false
 	}
 
-	public changeSource(newSource: PugPolyAudioNode) {
+	public changeSource(newSource: LabAudioNode) {
 		this.disconnect()
 		this._source = newSource
 		this.connect()
 	}
 
-	public changeTarget(newTarget: PugPolyAudioNode | PugPolyAudioParam) {
+	public changeTarget(newTarget: LabAudioNode | LabAudioParam) {
 		this.disconnect()
 		this._target = newTarget
 		this.connect()

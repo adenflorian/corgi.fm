@@ -1,22 +1,22 @@
-import {PugPolyAudioNode, PugPolyGainNode} from '../PugAudioNode/PugAudioNode'
+import {LabAudioNode, LabGain} from '../PugAudioNode/Lab'
 
 export class DryWetChain {
-	public readonly inputGain: PugPolyGainNode
-	public readonly dryGain: PugPolyGainNode
-	public readonly wetGain: PugPolyGainNode
-	public readonly wetPostGain: PugPolyGainNode
-	public readonly outputGain: PugPolyGainNode
+	public readonly inputGain: LabGain
+	public readonly dryGain: LabGain
+	public readonly wetGain: LabGain
+	public readonly wetPostGain: LabGain
+	public readonly outputGain: LabGain
 
 	public constructor(
 		audioContext: AudioContext,
-		wetInternalNode: PugPolyAudioNode,
-		wetInternalOutputNode?: PugPolyAudioNode,
+		wetInternalNode: LabAudioNode,
+		wetInternalOutputNode?: LabAudioNode,
 	) {
-		this.inputGain = new PugPolyGainNode({audioContext})
-		this.dryGain = new PugPolyGainNode({audioContext})
-		this.wetGain = new PugPolyGainNode({audioContext})
-		this.wetPostGain = new PugPolyGainNode({audioContext})
-		this.outputGain = new PugPolyGainNode({audioContext})
+		this.inputGain = new LabGain({audioContext, voiceMode: 'autoPoly'})
+		this.dryGain = new LabGain({audioContext, voiceMode: 'autoPoly'})
+		this.wetGain = new LabGain({audioContext, voiceMode: 'autoPoly'})
+		this.wetPostGain = new LabGain({audioContext, voiceMode: 'autoPoly'})
+		this.outputGain = new LabGain({audioContext, voiceMode: 'autoPoly'})
 
 		this.inputGain
 			.connect(this.dryGain)

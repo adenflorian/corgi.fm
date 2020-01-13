@@ -1,17 +1,19 @@
+import {LabAudioNode, LabGain} from '../PugAudioNode/Lab'
+
 export class ToggleGainChain {
-	public get input(): AudioNode {return this._inputGain}
-	public get output(): AudioNode {return this._outputGain}
-	private readonly _inputGain: GainNode
-	private readonly _outputGain: GainNode
+	public get input(): LabAudioNode {return this._inputGain}
+	public get output(): LabAudioNode {return this._outputGain}
+	private readonly _inputGain: LabGain
+	private readonly _outputGain: LabGain
 
 	public constructor(
 		_audioContext: AudioContext,
 		startRampSpeed = 0.005,
 	) {
-		this._inputGain = _audioContext.createGain()
+		this._inputGain = new LabGain({audioContext: _audioContext, voiceMode: 'autoPoly'})
 		this._inputGain.gain.setValueAtTime(1, 0)
 
-		this._outputGain = _audioContext.createGain()
+		this._outputGain = new LabGain({audioContext: _audioContext, voiceMode: 'autoPoly'})
 		this._outputGain.gain.setValueAtTime(0, 0)
 		this._outputGain.gain.setTargetAtTime(1, 0.5, startRampSpeed)
 

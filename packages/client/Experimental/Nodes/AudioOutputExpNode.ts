@@ -3,16 +3,20 @@ import {CssColor} from '@corgifm/common/shamu-color'
 import {ExpNodeAudioInputPort, ExpPorts} from '../ExpPorts'
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 import {ToggleGainChain} from './NodeHelpers/ToggleGainChain'
+import {LabAudioDestinationNode} from './PugAudioNode/Lab'
 
 export class AudioOutputExpNode extends CorgiNode {
 	protected readonly _ports: ExpPorts
 	private readonly _inputChain: ToggleGainChain
+	private readonly _destination: LabAudioDestinationNode
 
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
 		super(corgiNodeArgs, {name: 'Audio Output', color: CssColor.blue})
 
+		this._destination = new LabAudioDestinationNode({audioContext: this._audioContext, voiceMode: 'mono'})
+
 		this._inputChain = new ToggleGainChain(corgiNodeArgs.audioContext, 0.5)
-		this._inputChain.output.connect(this._audioContext.destination)
+		this._inputChain.output.connect(this._destination)
 		// inputGain.connect(this.preMasterLimiter)
 
 		const inputPort = new ExpNodeAudioInputPort('input', 'input', this, this._inputChain.input)

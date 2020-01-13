@@ -18,7 +18,7 @@ interface LabTargetConnection {
 	readonly targetVoices: readonly KelpieTarget[]
 }
 
-abstract class LabAudioNode<TNode extends KelpieAudioNode = KelpieAudioNode> {
+export abstract class LabAudioNode<TNode extends KelpieAudioNode = KelpieAudioNode> {
 	public readonly voices = [] as TNode[]
 	public get voiceCount() {return this.voices.length}
 	// Keep track of targets in case we change voice count/mode
@@ -456,7 +456,7 @@ class LabMono<TNode extends KelpieAudioNode = KelpieAudioNode> implements LabMod
 	public dispose() {}
 }
 
-class LabAudioParam<TNode extends KelpieAudioNode = KelpieAudioNode> {
+export class LabAudioParam<TNode extends KelpieAudioNode = KelpieAudioNode> {
 	public get mode() {return this._labAudioNode.mode}
 	// Keep track of sources in case we change voice mode
 	public readonly sources = new Set<LabAudioNode>()
@@ -475,14 +475,80 @@ class LabAudioParam<TNode extends KelpieAudioNode = KelpieAudioNode> {
 		})
 	}
 
-	public linearRampToValueAtTime(value: number, time: number, voiceIndex: number | 'all' = 'all') {
+	public cancelAndHoldAtTime(cancelTime: number, voiceIndex: number | 'all' = 'all') {
 		if (voiceIndex === 'all') {
 			this._labAudioNode.voices.forEach(voice => {
-				this._getAudioParam(voice).linearRampToValueAtTime(value, time)
+				this._getAudioParam(voice).cancelAndHoldAtTime(cancelTime)
 			})
 		} else {
 			const voice = this._labAudioNode.voices[voiceIndex]
-			this._getAudioParam(voice).linearRampToValueAtTime(value, time)
+			this._getAudioParam(voice).cancelAndHoldAtTime(cancelTime)
+		}
+	}
+
+	public cancelScheduledValues(cancelTime: number, voiceIndex: number | 'all' = 'all') {
+		if (voiceIndex === 'all') {
+			this._labAudioNode.voices.forEach(voice => {
+				this._getAudioParam(voice).cancelScheduledValues(cancelTime)
+			})
+		} else {
+			const voice = this._labAudioNode.voices[voiceIndex]
+			this._getAudioParam(voice).cancelScheduledValues(cancelTime)
+		}
+	}
+
+	public exponentialRampToValueAtTime(value: number, endTime: number, voiceIndex: number | 'all' = 'all') {
+		if (voiceIndex === 'all') {
+			this._labAudioNode.voices.forEach(voice => {
+				this._getAudioParam(voice).exponentialRampToValueAtTime(value, endTime)
+			})
+		} else {
+			const voice = this._labAudioNode.voices[voiceIndex]
+			this._getAudioParam(voice).exponentialRampToValueAtTime(value, endTime)
+		}
+	}
+
+	public linearRampToValueAtTime(value: number, endTime: number, voiceIndex: number | 'all' = 'all') {
+		if (voiceIndex === 'all') {
+			this._labAudioNode.voices.forEach(voice => {
+				this._getAudioParam(voice).linearRampToValueAtTime(value, endTime)
+			})
+		} else {
+			const voice = this._labAudioNode.voices[voiceIndex]
+			this._getAudioParam(voice).linearRampToValueAtTime(value, endTime)
+		}
+	}
+
+	public setTargetAtTime(target: number, startTime: number, timeConstant: number, voiceIndex: number | 'all' = 'all') {
+		if (voiceIndex === 'all') {
+			this._labAudioNode.voices.forEach(voice => {
+				this._getAudioParam(voice).setTargetAtTime(target, startTime, timeConstant)
+			})
+		} else {
+			const voice = this._labAudioNode.voices[voiceIndex]
+			this._getAudioParam(voice).setTargetAtTime(target, startTime, timeConstant)
+		}
+	}
+
+	public setValueAtTime(value: number, startTime: number, voiceIndex: number | 'all' = 'all') {
+		if (voiceIndex === 'all') {
+			this._labAudioNode.voices.forEach(voice => {
+				this._getAudioParam(voice).setValueAtTime(value, startTime)
+			})
+		} else {
+			const voice = this._labAudioNode.voices[voiceIndex]
+			this._getAudioParam(voice).setValueAtTime(value, startTime)
+		}
+	}
+
+	public setValueCurveAtTime(values: number[] | Float32Array, startTime: number, duration: number, voiceIndex: number | 'all' = 'all') {
+		if (voiceIndex === 'all') {
+			this._labAudioNode.voices.forEach(voice => {
+				this._getAudioParam(voice).setValueCurveAtTime(values, startTime, duration)
+			})
+		} else {
+			const voice = this._labAudioNode.voices[voiceIndex]
+			this._getAudioParam(voice).setValueCurveAtTime(values, startTime, duration)
 		}
 	}
 
@@ -507,7 +573,7 @@ class LabAudioParam<TNode extends KelpieAudioNode = KelpieAudioNode> {
 	}
 }
 
-class LabOscillator extends LabAudioNode<KelpieOscillator> {
+export class LabOscillator extends LabAudioNode<KelpieOscillator> {
 	public readonly frequency: LabAudioParam<KelpieOscillator>
 	private _type: OscillatorType = 'sawtooth'
 	public set type(value: OscillatorType) {
@@ -521,6 +587,10 @@ class LabOscillator extends LabAudioNode<KelpieOscillator> {
 		this.voices.push(new KelpieOscillator({audioContext: this._audioContext}))
 	}
 
+	public start(time?: number) {
+		this.voices.forEach(voice => voice.start(time))
+	}
+
 	public _makeVoice() {
 		const newOsc = new KelpieOscillator({audioContext: this._audioContext})
 		newOsc.type = this._type
@@ -528,7 +598,7 @@ class LabOscillator extends LabAudioNode<KelpieOscillator> {
 	}
 }
 
-class LabGain extends LabAudioNode<KelpieGain> {
+export class LabGain extends LabAudioNode<KelpieGain> {
 	public readonly gain: LabAudioParam<KelpieGain>
 
 	public constructor(args: LabAudioNodeArgs) {
@@ -542,6 +612,69 @@ class LabGain extends LabAudioNode<KelpieGain> {
 	}
 }
 
+export class LabStereoPannerNode extends LabAudioNode<KelpieStereoPannerNode> {
+	public readonly pan: LabAudioParam<KelpieStereoPannerNode>
+
+	public constructor(args: LabAudioNodeArgs) {
+		super(args)
+		this.pan = new LabAudioParam(this, (kelpieStereoPannerNode) => kelpieStereoPannerNode.pan)
+		this.voices.push(new KelpieStereoPannerNode({audioContext: this._audioContext}))
+	}
+
+	public _makeVoice() {
+		return new KelpieStereoPannerNode({audioContext: this._audioContext})
+	}
+}
+
+export class LabAudioDestinationNode extends LabAudioNode<KelpieAudioDestinationNode> {
+	public constructor(args: LabAudioNodeArgs) {
+		super(args)
+		this.voices.push(new KelpieAudioDestinationNode({audioContext: this._audioContext}))
+	}
+
+	public _makeVoice() {
+		return new KelpieAudioDestinationNode({audioContext: this._audioContext})
+	}
+}
+
+export class LabWaveShaperNode extends LabAudioNode<KelpieWaveShaperNode> {
+	private _curve: Float32Array | null = null
+	public set curve(curve: Float32Array | null) {
+		this.voices.forEach(voice => voice.curve = curve)
+		this._curve = curve
+	}
+
+	public constructor(args: LabAudioNodeArgs) {
+		super(args)
+		this.voices.push(new KelpieWaveShaperNode({audioContext: this._audioContext}))
+	}
+
+	public _makeVoice() {
+		const newWS = new KelpieWaveShaperNode({audioContext: this._audioContext})
+		newWS.curve = this._curve
+		return newWS
+	}
+}
+
+export class LabConstantSourceNode extends LabAudioNode<KelpieConstantSourceNode> {
+	public readonly offset: LabAudioParam<KelpieConstantSourceNode>
+
+	public constructor(args: LabAudioNodeArgs) {
+		super(args)
+		this.offset = new LabAudioParam(this, (kelpieConstantSource) => kelpieConstantSource.offset)
+		this.voices.push(new KelpieConstantSourceNode({audioContext: this._audioContext}))
+	}
+
+	public start(time?: number) {
+		this.voices.forEach(voice => voice.start(time))
+	}
+
+	public _makeVoice() {
+		const newThing = new KelpieConstantSourceNode({audioContext: this._audioContext})
+		return newThing
+	}
+}
+
 // Kelpie
 interface KelpieAudioNodeArgs {
 	readonly audioContext: AudioContext
@@ -549,7 +682,7 @@ interface KelpieAudioNodeArgs {
 
 type KelpieTarget = KelpieAudioNode | KelpieAudioParam
 
-abstract class KelpieAudioNode {
+export abstract class KelpieAudioNode {
 	protected _audioContext: AudioContext
 
 	public constructor(args: KelpieAudioNodeArgs) {
@@ -591,8 +724,32 @@ class KelpieAudioParam {
 
 	public get input(): AudioParam {return this._audioParam}
 
-	public linearRampToValueAtTime(value: number, time: number) {
-		this._audioParam.linearRampToValueAtTime(value, time)
+	public cancelAndHoldAtTime(cancelTime: number) {
+		this._audioParam.cancelAndHoldAtTime(cancelTime)
+	}
+
+	public cancelScheduledValues(cancelTime: number) {
+		this._audioParam.cancelScheduledValues(cancelTime)
+	}
+
+	public exponentialRampToValueAtTime(value: number, endTime: number) {
+		this._audioParam.exponentialRampToValueAtTime(value, endTime)
+	}
+
+	public linearRampToValueAtTime(value: number, endTime: number) {
+		this._audioParam.linearRampToValueAtTime(value, endTime)
+	}
+
+	public setTargetAtTime(target: number, startTime: number, timeConstant: number) {
+		this._audioParam.setTargetAtTime(target, startTime, timeConstant)
+	}
+
+	public setValueAtTime(value: number, startTime: number) {
+		this._audioParam.setValueAtTime(value, startTime)
+	}
+
+	public setValueCurveAtTime(values: number[] | Float32Array, startTime: number, duration: number) {
+		this._audioParam.setValueCurveAtTime(values, startTime, duration)
 	}
 }
 
@@ -607,6 +764,10 @@ class KelpieOscillator extends KelpieAudioNode {
 		super(args)
 		this._osc = this._audioContext.createOscillator()
 		this.frequency = new KelpieAudioParam(this._audioContext, this._osc.frequency)
+	}
+
+	public start(time?: number) {
+		this._osc.start(time)
 	}
 
 	public get input(): AudioNode {return this._osc}
@@ -628,6 +789,69 @@ class KelpieGain extends KelpieAudioNode {
 
 	public get input(): AudioNode {return this._gain}
 	public get output(): AudioNode {return this._gain}
+	protected _dispose() {}
+}
+
+class KelpieStereoPannerNode extends KelpieAudioNode {
+	private readonly _stereoPanner: StereoPannerNode
+	public readonly pan: KelpieAudioParam
+
+	public constructor(args: KelpieAudioNodeArgs) {
+		super(args)
+		this._stereoPanner = this._audioContext.createStereoPanner()
+		this.pan = new KelpieAudioParam(this._audioContext, this._stereoPanner.pan)
+	}
+
+	public get input(): AudioNode {return this._stereoPanner}
+	public get output(): AudioNode {return this._stereoPanner}
+	protected _dispose() {}
+}
+
+class KelpieAudioDestinationNode extends KelpieAudioNode {
+	private readonly _destination: AudioDestinationNode
+
+	public constructor(args: KelpieAudioNodeArgs) {
+		super(args)
+		this._destination = this._audioContext.destination
+	}
+
+	public get input(): AudioNode {return this._destination}
+	public get output(): AudioNode {throw new Error(`I don't think you meant to do that`)}
+	protected _dispose() {}
+}
+
+class KelpieWaveShaperNode extends KelpieAudioNode {
+	private readonly _waveShaper: WaveShaperNode
+	public set curve(curve: Float32Array | null) {
+		this._waveShaper.curve = curve
+	}
+
+	public constructor(args: KelpieAudioNodeArgs) {
+		super(args)
+		this._waveShaper = this._audioContext.createWaveShaper()
+	}
+
+	public get input(): AudioNode {return this._waveShaper}
+	public get output(): AudioNode {return this._waveShaper}
+	protected _dispose() {}
+}
+
+class KelpieConstantSourceNode extends KelpieAudioNode {
+	private readonly _constantSource: ConstantSourceNode
+	public readonly offset: KelpieAudioParam
+
+	public constructor(args: KelpieAudioNodeArgs) {
+		super(args)
+		this._constantSource = this._audioContext.createConstantSource()
+		this.offset = new KelpieAudioParam(this._audioContext, this._constantSource.offset)
+	}
+
+	public start(time?: number) {
+		this._constantSource.start(time)
+	}
+
+	public get input(): AudioNode {return this._constantSource}
+	public get output(): AudioNode {return this._constantSource}
 	protected _dispose() {}
 }
 

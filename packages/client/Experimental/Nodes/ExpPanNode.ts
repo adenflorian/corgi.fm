@@ -7,17 +7,18 @@ import {
 import {ExpAudioParam, ExpAudioParams} from '../ExpParams'
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 import {DryWetChain} from './NodeHelpers/DryWetChain'
+import {LabStereoPannerNode} from './PugAudioNode/Lab'
 
 export class ExpPanNode extends CorgiNode {
 	protected readonly _ports: ExpPorts
-	private readonly _pan: StereoPannerNode
+	private readonly _pan: LabStereoPannerNode
 	private readonly _dryWetChain: DryWetChain
 	protected readonly _audioParams: ExpAudioParams
 
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
 		super(corgiNodeArgs, {name: 'Pan', color: CssColor.orange})
 
-		this._pan = corgiNodeArgs.audioContext.createStereoPanner()
+		this._pan = new LabStereoPannerNode({...corgiNodeArgs, voiceMode: 'mono'})
 
 		this._dryWetChain = new DryWetChain(corgiNodeArgs.audioContext, this._pan)
 

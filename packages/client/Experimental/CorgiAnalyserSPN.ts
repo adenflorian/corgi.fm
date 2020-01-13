@@ -1,26 +1,54 @@
 import {simpleGlobalClientState} from '../SimpleGlobalClientState'
 import {logger} from '../client-logger'
+import {LabAudioNode, KelpieAudioNode} from './Nodes/PugAudioNode/Lab'
 
-export class CorgiAnalyserSPNode {
+export class LabCorgiAnalyserSPNode extends LabAudioNode<KelpieCorgiAnalyserSPNode> {
+	public _makeVoice() {
+		const newThing = new KelpieCorgiAnalyserSPNode(this._audioContext, this._onUpdatedValue, this._ignoreRepeats)
+		return newThing
+	}
+
+	public constructor(
+		__audioContext: AudioContext,
+		private readonly _onUpdatedValue: (newValue: number) => void,
+		public readonly _ignoreRepeats = true,
+	) {
+		super({audioContext: __audioContext, voiceMode: 'autoPoly'})
+		this.voices.push(new KelpieCorgiAnalyserSPNode(this._audioContext, _onUpdatedValue, this._ignoreRepeats))
+	}
+
+	public requestUpdate() {
+		this.voices[0].requestUpdate()
+	}
+
+	public dispose() {}
+}
+
+
+export class KelpieCorgiAnalyserSPNode extends KelpieAudioNode {
 	public get input() {return this._scriptProcessorNode as AudioNode}
+	public get output(): AudioNode {
+		throw new Error('Method not implemented.');
+	}
 	private readonly _scriptProcessorNode: ScriptProcessorNode
 	private _updateRequested = false
 	private _lastUpdatedValue = 0
 
 	public constructor(
-		private readonly _audioContext: AudioContext,
+		__audioContext: AudioContext,
 		private readonly _onUpdatedValue: (newValue: number) => void,
 		public readonly _ignoreRepeats = true,
 	) {
-		this._scriptProcessorNode = _audioContext.createScriptProcessor(256, 1, 1)
+		super({audioContext: __audioContext})
+		this._scriptProcessorNode = this._audioContext.createScriptProcessor(256, 1, 1)
 		this._scriptProcessorNode.addEventListener('audioprocess', this._onAudioProcess)
 		try {
-			this._scriptProcessorNode.connect(simpleGlobalClientState.getAnalyserDumpNode(_audioContext))
+			this._scriptProcessorNode.connect(simpleGlobalClientState.getAnalyserDumpNode(this._audioContext))
 		} catch (error1) {
 			try {
 				logger.warn('ha ha ha uh oh:', {error1})
-				simpleGlobalClientState.resetAnalyserDumpNode(_audioContext)
-				this._scriptProcessorNode.connect(simpleGlobalClientState.getAnalyserDumpNode(_audioContext))
+				simpleGlobalClientState.resetAnalyserDumpNode(this._audioContext)
+				this._scriptProcessorNode.connect(simpleGlobalClientState.getAnalyserDumpNode(this._audioContext))
 			} catch (error2) {
 				logger.error('failed to connect to analyser node:', {error2})
 			}
@@ -43,7 +71,7 @@ export class CorgiAnalyserSPNode {
 		}
 	}
 
-	public dispose() {
+	protected _dispose(): void {
 		this._scriptProcessorNode.removeEventListener('audioprocess', this._onAudioProcess)
 		this._scriptProcessorNode.disconnect()
 	}
