@@ -18,7 +18,7 @@ export class ExpGainNode extends CorgiNode {
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
 		super(corgiNodeArgs, {name: 'Gain', color: CssColor.orange})
 
-		this._gain = new LabGain({...corgiNodeArgs, voiceMode: 'mono'})
+		this._gain = new LabGain({...corgiNodeArgs, voiceMode: 'mono', creatorName: 'ExpGainNode'})
 		this._gain.gain.value = 0
 
 		this._dryWetChain = new DryWetChain(corgiNodeArgs.audioContext, this._gain)

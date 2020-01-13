@@ -22,7 +22,7 @@ export class DistortionExpNode extends CorgiNode {
 			requiresAudioWorklet: true,
 		})
 
-		this._distortion = new LabDistortionNode({audioContext: this._audioContext, voiceMode: 'mono'})
+		this._distortion = new LabDistortionNode({audioContext: this._audioContext, voiceMode: 'mono', creatorName: 'DistortionExpNode'})
 
 		this._dryWetChain = new DryWetChain(corgiNodeArgs.audioContext, this._distortion)
 

@@ -7,7 +7,8 @@ type VoiceCount = number | LabTargetMode
 
 export interface LabAudioNodeArgs {
 	readonly audioContext: AudioContext
-	readonly voiceMode: VoiceCount 
+	readonly voiceMode: VoiceCount
+	readonly creatorName: string
 }
 
 type LabTargetMode = 'mono' | 'autoPoly'
@@ -31,18 +32,20 @@ export abstract class LabAudioNode<TNode extends KelpieAudioNode = KelpieAudioNo
 	private _currentModeImpl: LabModeImpl<TNode> = new LabMono(this)
 	private readonly _params = new Set<LabAudioParam>()
 	public get params() {return this._params as ReadonlySet<LabAudioParam>}
+	public readonly creatorName: string
 
 	public constructor(args: LabAudioNodeArgs) {
 		this._audioContext = args.audioContext
+		this.creatorName = args.creatorName
 		this.setVoiceCount(args.voiceMode)
 	}
 
 	// Called on the source
-	public connect<TTarget extends KelpieAudioNode>(target: LabTarget<TTarget>): this {
+	public connect<TTarget extends LabTarget>(target: TTarget): TTarget {
 		const [targetMode, targetVoices] = target.onConnect(this)
 		this._currentModeImpl.connect(target, targetMode, targetVoices)
 		this.targets.set(target, {target, targetMode, targetVoices})
-		return this
+		return target
 	}
 
 	// Called on the target
@@ -586,15 +589,15 @@ export class LabOscillator extends LabAudioNode<KelpieOscillator> {
 		super(args)
 		this.frequency = new LabAudioParam(this, (kelpieOsc) => kelpieOsc.frequency)
 		this.detune = new LabAudioParam(this, (kelpieOsc) => kelpieOsc.detune)
-		this.voices.push(new KelpieOscillator({audioContext: this._audioContext}))
+		this.voices.push(new KelpieOscillator({audioContext: this._audioContext, labNode: this}))
 	}
 
 	public start(time?: number) {
 		this.voices.forEach(voice => voice.start(time))
 	}
 
-	public _makeVoice() {
-		const newOsc = new KelpieOscillator({audioContext: this._audioContext})
+	public _makeVoice(): KelpieOscillator {
+		const newOsc = new KelpieOscillator({audioContext: this._audioContext, labNode: this})
 		newOsc.type = this._type
 		return newOsc
 	}
@@ -606,11 +609,11 @@ export class LabGain extends LabAudioNode<KelpieGain> {
 	public constructor(args: LabAudioNodeArgs) {
 		super(args)
 		this.gain = new LabAudioParam(this, (kelpieGain) => kelpieGain.gain)
-		this.voices.push(new KelpieGain({audioContext: this._audioContext}))
+		this.voices.push(new KelpieGain({audioContext: this._audioContext, labNode: this}))
 	}
 
-	public _makeVoice() {
-		return new KelpieGain({audioContext: this._audioContext})
+	public _makeVoice(): KelpieGain {
+		return new KelpieGain({audioContext: this._audioContext, labNode: this})
 	}
 }
 
@@ -631,11 +634,11 @@ export class LabBiquadFilterNode extends LabAudioNode<KelpieBiquadFilterNode> {
 		this.detune = new LabAudioParam(this, (kelpieBiquadFilterNode) => kelpieBiquadFilterNode.detune)
 		this.frequency = new LabAudioParam(this, (kelpieBiquadFilterNode) => kelpieBiquadFilterNode.frequency)
 		this.gain = new LabAudioParam(this, (kelpieBiquadFilterNode) => kelpieBiquadFilterNode.gain)
-		this.voices.push(new KelpieBiquadFilterNode({audioContext: this._audioContext}))
+		this.voices.push(new KelpieBiquadFilterNode({audioContext: this._audioContext, labNode: this}))
 	}
 
-	public _makeVoice() {
-		return new KelpieBiquadFilterNode({audioContext: this._audioContext})
+	public _makeVoice(): KelpieBiquadFilterNode {
+		return new KelpieBiquadFilterNode({audioContext: this._audioContext, labNode: this})
 	}
 }
 
@@ -645,22 +648,22 @@ export class LabStereoPannerNode extends LabAudioNode<KelpieStereoPannerNode> {
 	public constructor(args: LabAudioNodeArgs) {
 		super(args)
 		this.pan = new LabAudioParam(this, (kelpieStereoPannerNode) => kelpieStereoPannerNode.pan)
-		this.voices.push(new KelpieStereoPannerNode({audioContext: this._audioContext}))
+		this.voices.push(new KelpieStereoPannerNode({audioContext: this._audioContext, labNode: this}))
 	}
 
-	public _makeVoice() {
-		return new KelpieStereoPannerNode({audioContext: this._audioContext})
+	public _makeVoice(): KelpieStereoPannerNode {
+		return new KelpieStereoPannerNode({audioContext: this._audioContext, labNode: this})
 	}
 }
 
 export class LabAudioDestinationNode extends LabAudioNode<KelpieAudioDestinationNode> {
 	public constructor(args: LabAudioNodeArgs) {
 		super(args)
-		this.voices.push(new KelpieAudioDestinationNode({audioContext: this._audioContext}))
+		this.voices.push(new KelpieAudioDestinationNode({audioContext: this._audioContext, labNode: this}))
 	}
 
-	public _makeVoice() {
-		return new KelpieAudioDestinationNode({audioContext: this._audioContext})
+	public _makeVoice(): KelpieAudioDestinationNode {
+		return new KelpieAudioDestinationNode({audioContext: this._audioContext, labNode: this})
 	}
 }
 
@@ -673,11 +676,11 @@ export class LabWaveShaperNode extends LabAudioNode<KelpieWaveShaperNode> {
 
 	public constructor(args: LabAudioNodeArgs) {
 		super(args)
-		this.voices.push(new KelpieWaveShaperNode({audioContext: this._audioContext}))
+		this.voices.push(new KelpieWaveShaperNode({audioContext: this._audioContext, labNode: this}))
 	}
 
-	public _makeVoice() {
-		const newWS = new KelpieWaveShaperNode({audioContext: this._audioContext})
+	public _makeVoice(): KelpieWaveShaperNode {
+		const newWS = new KelpieWaveShaperNode({audioContext: this._audioContext, labNode: this})
 		newWS.curve = this._curve
 		return newWS
 	}
@@ -689,15 +692,15 @@ export class LabConstantSourceNode extends LabAudioNode<KelpieConstantSourceNode
 	public constructor(args: LabAudioNodeArgs) {
 		super(args)
 		this.offset = new LabAudioParam(this, (kelpieConstantSource) => kelpieConstantSource.offset)
-		this.voices.push(new KelpieConstantSourceNode({audioContext: this._audioContext}))
+		this.voices.push(new KelpieConstantSourceNode({audioContext: this._audioContext, labNode: this}))
 	}
 
 	public start(time?: number) {
 		this.voices.forEach(voice => voice.start(time))
 	}
 
-	public _makeVoice() {
-		const newThing = new KelpieConstantSourceNode({audioContext: this._audioContext})
+	public _makeVoice(): KelpieConstantSourceNode {
+		const newThing = new KelpieConstantSourceNode({audioContext: this._audioContext, labNode: this})
 		return newThing
 	}
 }
@@ -705,20 +708,24 @@ export class LabConstantSourceNode extends LabAudioNode<KelpieConstantSourceNode
 // Kelpie
 export interface KelpieAudioNodeArgs {
 	readonly audioContext: AudioContext
+	readonly labNode: LabAudioNode
 }
 
 type KelpieTarget = KelpieAudioNode | KelpieAudioParam
 
 export abstract class KelpieAudioNode {
 	protected _audioContext: AudioContext
+	public abstract readonly name: string
+	public readonly labNode: LabAudioNode
 
 	public constructor(args: KelpieAudioNodeArgs) {
 		this._audioContext = args.audioContext
+		this.labNode = args.labNode
 	}
 
-	public connect(target: KelpieTarget): this {
+	public connect<TTarget extends KelpieTarget>(target: TTarget): TTarget {
 		this.output.connect(target.input as AudioNode)
-		return this
+		return target
 	}
 
 	public disconnect(target?: KelpieTarget) {
@@ -740,6 +747,7 @@ export abstract class KelpieAudioNode {
 }
 
 export class KelpieAudioParam {
+	// public abstract readonly name: string
 	public set value(value: number) {
 		this._audioParam.value = value
 	}
@@ -747,6 +755,8 @@ export class KelpieAudioParam {
 	public constructor(
 		protected _audioContext: AudioContext,
 		private readonly _audioParam: AudioParam,
+		public readonly name: string,
+		private readonly _kelpieNode: KelpieAudioNode,
 	) {}
 
 	public get input(): AudioParam {return this._audioParam}
@@ -768,6 +778,7 @@ export class KelpieAudioParam {
 	}
 
 	public setTargetAtTime(target: number, startTime: number, timeConstant: number) {
+		// console.log(`${this._kelpieNode.labNode.creatorName} ${this._kelpieNode.name}.${this.name} KelpieAudioParam.setTargetAtTime(${target})`)
 		this._audioParam.setTargetAtTime(target, startTime, timeConstant)
 	}
 
@@ -781,6 +792,7 @@ export class KelpieAudioParam {
 }
 
 class KelpieOscillator extends KelpieAudioNode {
+	public readonly name = 'Oscillator'
 	private readonly _osc: OscillatorNode
 	public readonly frequency: KelpieAudioParam
 	public readonly detune: KelpieAudioParam
@@ -791,8 +803,8 @@ class KelpieOscillator extends KelpieAudioNode {
 	public constructor(args: KelpieAudioNodeArgs) {
 		super(args)
 		this._osc = this._audioContext.createOscillator()
-		this.frequency = new KelpieAudioParam(this._audioContext, this._osc.frequency)
-		this.detune = new KelpieAudioParam(this._audioContext, this._osc.detune)
+		this.frequency = new KelpieAudioParam(this._audioContext, this._osc.frequency, 'frequency', this)
+		this.detune = new KelpieAudioParam(this._audioContext, this._osc.detune, 'detune', this)
 	}
 
 	public start(time?: number) {
@@ -807,13 +819,14 @@ class KelpieOscillator extends KelpieAudioNode {
 }
 
 class KelpieGain extends KelpieAudioNode {
+	public readonly name = 'GainNode'
 	private readonly _gain: GainNode
 	public readonly gain: KelpieAudioParam
 
 	public constructor(args: KelpieAudioNodeArgs) {
 		super(args)
 		this._gain = this._audioContext.createGain()
-		this.gain = new KelpieAudioParam(this._audioContext, this._gain.gain)
+		this.gain = new KelpieAudioParam(this._audioContext, this._gain.gain, 'gain', this)
 	}
 
 	public get input(): AudioNode {return this._gain}
@@ -822,6 +835,7 @@ class KelpieGain extends KelpieAudioNode {
 }
 
 class KelpieBiquadFilterNode extends KelpieAudioNode {
+	public readonly name = 'BiquadFilterNode'
 	private readonly _biquadFilter: BiquadFilterNode
 	public readonly Q: KelpieAudioParam;
 	public readonly detune: KelpieAudioParam;
@@ -834,10 +848,10 @@ class KelpieBiquadFilterNode extends KelpieAudioNode {
 	public constructor(args: KelpieAudioNodeArgs) {
 		super(args)
 		this._biquadFilter = this._audioContext.createBiquadFilter()
-		this.Q = new KelpieAudioParam(this._audioContext, this._biquadFilter.Q)
-		this.detune = new KelpieAudioParam(this._audioContext, this._biquadFilter.detune)
-		this.frequency = new KelpieAudioParam(this._audioContext, this._biquadFilter.frequency)
-		this.gain = new KelpieAudioParam(this._audioContext, this._biquadFilter.gain)
+		this.Q = new KelpieAudioParam(this._audioContext, this._biquadFilter.Q, 'Q', this)
+		this.detune = new KelpieAudioParam(this._audioContext, this._biquadFilter.detune, 'detune', this)
+		this.frequency = new KelpieAudioParam(this._audioContext, this._biquadFilter.frequency, 'frequency', this)
+		this.gain = new KelpieAudioParam(this._audioContext, this._biquadFilter.gain, 'gain', this)
 	}
 
 	public get input(): AudioNode {return this._biquadFilter}
@@ -846,13 +860,14 @@ class KelpieBiquadFilterNode extends KelpieAudioNode {
 }
 
 class KelpieStereoPannerNode extends KelpieAudioNode {
+	public readonly name = 'StereoPannerNode'
 	private readonly _stereoPanner: StereoPannerNode
 	public readonly pan: KelpieAudioParam
 
 	public constructor(args: KelpieAudioNodeArgs) {
 		super(args)
 		this._stereoPanner = this._audioContext.createStereoPanner()
-		this.pan = new KelpieAudioParam(this._audioContext, this._stereoPanner.pan)
+		this.pan = new KelpieAudioParam(this._audioContext, this._stereoPanner.pan, 'pan', this)
 	}
 
 	public get input(): AudioNode {return this._stereoPanner}
@@ -861,6 +876,7 @@ class KelpieStereoPannerNode extends KelpieAudioNode {
 }
 
 class KelpieAudioDestinationNode extends KelpieAudioNode {
+	public readonly name = 'AudioDestinationNode'
 	private readonly _destination: AudioDestinationNode
 
 	public constructor(args: KelpieAudioNodeArgs) {
@@ -874,6 +890,7 @@ class KelpieAudioDestinationNode extends KelpieAudioNode {
 }
 
 class KelpieWaveShaperNode extends KelpieAudioNode {
+	public readonly name = 'WaveShaperNode'
 	private readonly _waveShaper: WaveShaperNode
 	public set curve(curve: Float32Array | null) {
 		this._waveShaper.curve = curve
@@ -890,13 +907,14 @@ class KelpieWaveShaperNode extends KelpieAudioNode {
 }
 
 class KelpieConstantSourceNode extends KelpieAudioNode {
+	public readonly name = 'ConstantSourceNode'
 	private readonly _constantSource: ConstantSourceNode
 	public readonly offset: KelpieAudioParam
 
 	public constructor(args: KelpieAudioNodeArgs) {
 		super(args)
 		this._constantSource = this._audioContext.createConstantSource()
-		this.offset = new KelpieAudioParam(this._audioContext, this._constantSource.offset)
+		this.offset = new KelpieAudioParam(this._audioContext, this._constantSource.offset, 'offset', this)
 	}
 
 	public start(time?: number) {
@@ -908,46 +926,46 @@ class KelpieConstantSourceNode extends KelpieAudioNode {
 	protected _dispose() {}
 }
 
-const audioContext = new AudioContext()
+// const audioContext = new AudioContext()
 
-// 1 voice (autoPoly, inherits voice count from source nodes)
-const myOsc1 = new LabOscillator({audioContext, voiceMode: 'autoPoly'})
+// // 1 voice (autoPoly, inherits voice count from source nodes)
+// const myOsc1 = new LabOscillator({audioContext, voiceMode: 'autoPoly', creatorName: 'myOsc1'})
 
-// 1 voice (staticPoly, downstream autoPoly nodes will match this voice count)
-const myOsc2 = new LabOscillator({audioContext, voiceMode: 1})
+// // 1 voice (staticPoly, downstream autoPoly nodes will match this voice count)
+// const myOsc2 = new LabOscillator({audioContext, voiceMode: 1, creatorName: 'myOsc2'})
 
-// 1 voice (mono)
-const myGain = new LabGain({audioContext, voiceMode: 'mono'})
+// // 1 voice (mono)
+// const myGain = new LabGain({audioContext, voiceMode: 'mono', creatorName: 'myGain'})
 
-// 1 autoPoly voice connecting to 1 mono voice
-myOsc1.connect(myGain)
+// // 1 autoPoly voice connecting to 1 mono voice
+// myOsc1.connect(myGain)
 
-// Creates more voices, but they aren't connected to anything yet
-myOsc2.setVoiceCount(7)
+// // Creates more voices, but they aren't connected to anything yet
+// myOsc2.setVoiceCount(7)
 
-// 6 voices will be created in myOsc1, and each of the 7 voices between the 2 nodes will be connected
-myOsc2.connect(myOsc1.frequency)
+// // 6 voices will be created in myOsc1, and each of the 7 voices between the 2 nodes will be connected
+// myOsc2.connect(myOsc1.frequency)
 
-// will set the type on all 7 oscillators, and value will be stored and used when new voices are created in the future
-myOsc1.type = 'sawtooth'
+// // will set the type on all 7 oscillators, and value will be stored and used when new voices are created in the future
+// myOsc1.type = 'sawtooth'
 
-myGain.gain.value = 0
+// myGain.gain.value = 0
 
-myGain.gain.linearRampToValueAtTime(0.5, 4)
+// myGain.gain.linearRampToValueAtTime(0.5, 4)
 
-// linearRampToValueAtTime will be called on voice 2
-myOsc2.frequency.linearRampToValueAtTime(220, 6, 2)
+// // linearRampToValueAtTime will be called on voice 2
+// myOsc2.frequency.linearRampToValueAtTime(220, 6, 2)
 
-// all 7 oscillators are disconnect from myGain
-myOsc1.disconnect(myGain)
+// // all 7 oscillators are disconnect from myGain
+// myOsc1.disconnect(myGain)
 
-// 4 voices in myOsc1 and myOsc2 are disconnected and deleted
-myOsc2.setVoiceCount(3)
+// // 4 voices in myOsc1 and myOsc2 are disconnected and deleted
+// myOsc2.setVoiceCount(3)
 
-// all 4 oscillators are disconnected from myOsc1.frequency
-// myOsc1 goes back to 1 oscillator, because there are no sources connected
-myOsc2.disconnect(myOsc1.frequency)
+// // all 4 oscillators are disconnected from myOsc1.frequency
+// // myOsc1 goes back to 1 oscillator, because there are no sources connected
+// myOsc2.disconnect(myOsc1.frequency)
 
-myGain.disconnect()
+// myGain.disconnect()
 
-myOsc1.dispose()
+// myOsc1.dispose()

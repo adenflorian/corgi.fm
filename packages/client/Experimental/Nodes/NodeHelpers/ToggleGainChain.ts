@@ -10,10 +10,10 @@ export class ToggleGainChain {
 		_audioContext: AudioContext,
 		startRampSpeed = 0.005,
 	) {
-		this._inputGain = new LabGain({audioContext: _audioContext, voiceMode: 'autoPoly'})
+		this._inputGain = new LabGain({audioContext: _audioContext, voiceMode: 'autoPoly', creatorName: 'ToggleGainChain'})
 		this._inputGain.gain.setValueAtTime(1, 0)
 
-		this._outputGain = new LabGain({audioContext: _audioContext, voiceMode: 'autoPoly'})
+		this._outputGain = new LabGain({audioContext: _audioContext, voiceMode: 'autoPoly', creatorName: 'ToggleGainChain'})
 		this._outputGain.gain.setValueAtTime(0, 0)
 		this._outputGain.gain.setTargetAtTime(1, 0.5, startRampSpeed)
 

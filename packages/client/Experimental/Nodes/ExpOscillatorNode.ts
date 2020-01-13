@@ -30,7 +30,7 @@ export class OscillatorExpNode extends CorgiNode {
 		this._type.onChange.subscribe(this.onTypeChange)
 		this._customEnumParams = arrayToESIdKeyMap([this._type] as ExpCustomEnumParam<string>[])
 
-		this._oscillator = new LabOscillator({...corgiNodeArgs, voiceMode: 'mono'})
+		this._oscillator = new LabOscillator({...corgiNodeArgs, voiceMode: 'mono', creatorName: 'OscillatorExpNode'})
 		this._oscillator.type = this._type.value
 		this._oscillator.start()
 		this._outputChain = new ToggleGainChain(corgiNodeArgs.audioContext)

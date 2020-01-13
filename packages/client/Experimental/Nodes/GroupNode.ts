@@ -71,18 +71,18 @@ export class GroupNode extends CorgiNode {
 		if (type === 'audio') {
 			if (inputOrOutput === 'input') {
 				if (isAudioParamInput) {
-					const newConstantSource = new LabConstantSourceNode({audioContext: this._audioContext, voiceMode: 'autoPoly'})
+					const newConstantSource = new LabConstantSourceNode({audioContext: this._audioContext, voiceMode: 'autoPoly', creatorName: 'GroupNode'})
 					newConstantSource.start()
 					this._inputConstantSources.set(id, newConstantSource)
 					const audioParam = new ExpAudioParam(id, newConstantSource.offset, 0, 1, 'bipolar', {valueString: percentageValueString})
 					return [new ExpNodeAudioParamInputPort(audioParam, this, this._corgiNodeArgs, 'center'), audioParam]
 				} else {
-					const newGain = new LabGain({audioContext: this._audioContext, voiceMode: 'autoPoly'})
+					const newGain = new LabGain({audioContext: this._audioContext, voiceMode: 'autoPoly', creatorName: 'GroupNode'})
 					this._inputGains.set(id, newGain)
 					return [new ExpNodeAudioInputPort(id, id as string, this, newGain), undefined]
 				}
 			} else if (inputOrOutput === 'output') {
-				const newGain = new LabGain({audioContext: this._audioContext, voiceMode: 'autoPoly'})
+				const newGain = new LabGain({audioContext: this._audioContext, voiceMode: 'autoPoly', creatorName: 'GroupNode'})
 				this._outputGains.set(id, newGain)
 				return [new ExpNodeAudioOutputPort(id, id as string, this, newGain), undefined]
 			}

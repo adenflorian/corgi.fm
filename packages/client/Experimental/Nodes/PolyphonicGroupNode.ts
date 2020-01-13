@@ -40,10 +40,10 @@ export class PolyphonicGroupNode extends CorgiNode implements PolyInNode {
 		const portStates = _corgiNodeArgs.ports || new Map<Id, ExpPortState>()
 
 		// const polyInputPort = new ExpPolyphonicInputPort('poly', 'poly', this)
-		this._outGain = new LabGain({audioContext: this._audioContext, voiceMode: 'autoPoly'})
+		this._outGain = new LabGain({audioContext: this._audioContext, voiceMode: 'autoPoly', creatorName: 'PolyphonicGroupNode'})
 		const audioOut = new ExpNodeAudioOutputPort('out', 'out', this, this._outGain)
 
-		this._pitchInputGain = new LabGain({audioContext: this._audioContext, voiceMode: 'mono'})
+		this._pitchInputGain = new LabGain({audioContext: this._audioContext, voiceMode: 'mono', creatorName: 'PolyphonicGroupNode'})
 		this._pitchInputPort = new ExpNodeAudioInputPort('pitch', 'pitch', this, this._pitchInputGain)
 		this._midiInputPort = new ExpMidiInputPort('gate', 'gate', this, this._onMidiAction)
 
@@ -95,18 +95,18 @@ export class PolyphonicGroupNode extends CorgiNode implements PolyInNode {
 		if (type === 'audio') {
 			if (inputOrOutput === 'input') {
 				if (isAudioParamInput) {
-					const newConstantSource = new LabConstantSourceNode({audioContext: this._audioContext, voiceMode: 'autoPoly'})
+					const newConstantSource = new LabConstantSourceNode({audioContext: this._audioContext, voiceMode: 'autoPoly', creatorName: 'PolyphonicGroupNode'})
 					newConstantSource.start()
 					this._inputConstantSources.set(id, newConstantSource)
 					const audioParam = new ExpAudioParam(id, newConstantSource.offset, 0, 1, 'bipolar', {valueString: percentageValueString})
 					return [new ExpNodeAudioParamInputPort(audioParam, this, this._corgiNodeArgs, 'center'), audioParam]
 				} else {
-					const newGain = new LabGain({audioContext: this._audioContext, voiceMode: 'autoPoly'})
+					const newGain = new LabGain({audioContext: this._audioContext, voiceMode: 'autoPoly', creatorName: 'PolyphonicGroupNode'})
 					this._inputGains.set(id, newGain)
 					return [new ExpNodeAudioInputPort(id, id as string, this, newGain), undefined]
 				}
 			} else if (inputOrOutput === 'output') {
-				const newGain = new LabGain({audioContext: this._audioContext, voiceMode: 'autoPoly'})
+				const newGain = new LabGain({audioContext: this._audioContext, voiceMode: 'autoPoly', creatorName: 'PolyphonicGroupNode'})
 				this._outputGains.set(id, newGain)
 				return [new ExpNodeAudioOutputPort(id, id as string, this, newGain), undefined]
 			}

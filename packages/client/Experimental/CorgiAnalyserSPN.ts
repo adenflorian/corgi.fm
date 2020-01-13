@@ -1,10 +1,10 @@
 import {simpleGlobalClientState} from '../SimpleGlobalClientState'
 import {logger} from '../client-logger'
-import {LabAudioNode, KelpieAudioNode} from './Nodes/PugAudioNode/Lab'
+import {LabAudioNode, KelpieAudioNode, KelpieAudioNodeArgs} from './Nodes/PugAudioNode/Lab'
 
 export class LabCorgiAnalyserSPNode extends LabAudioNode<KelpieCorgiAnalyserSPNode> {
-	public _makeVoice() {
-		const newThing = new KelpieCorgiAnalyserSPNode(this._audioContext, this._onUpdatedValue, this._ignoreRepeats)
+	public _makeVoice(): KelpieCorgiAnalyserSPNode {
+		const newThing = new KelpieCorgiAnalyserSPNode({audioContext: this._audioContext, labNode: this}, this._onUpdatedValue, this._ignoreRepeats)
 		return newThing
 	}
 
@@ -13,8 +13,8 @@ export class LabCorgiAnalyserSPNode extends LabAudioNode<KelpieCorgiAnalyserSPNo
 		private readonly _onUpdatedValue: (newValue: number) => void,
 		public readonly _ignoreRepeats = true,
 	) {
-		super({audioContext: __audioContext, voiceMode: 'autoPoly'})
-		this.voices.push(new KelpieCorgiAnalyserSPNode(this._audioContext, _onUpdatedValue, this._ignoreRepeats))
+		super({audioContext: __audioContext, voiceMode: 'autoPoly', creatorName: 'LabCorgiAnalyserSPNode'})
+		this.voices.push(new KelpieCorgiAnalyserSPNode({audioContext: this._audioContext, labNode: this}, _onUpdatedValue, this._ignoreRepeats))
 	}
 
 	public requestUpdate() {
@@ -26,6 +26,7 @@ export class LabCorgiAnalyserSPNode extends LabAudioNode<KelpieCorgiAnalyserSPNo
 
 
 export class KelpieCorgiAnalyserSPNode extends KelpieAudioNode {
+	public readonly name = 'CorgiAnalyserSPNode'
 	public get input() {return this._scriptProcessorNode as AudioNode}
 	public get output(): AudioNode {
 		throw new Error('Method not implemented.');
@@ -35,11 +36,11 @@ export class KelpieCorgiAnalyserSPNode extends KelpieAudioNode {
 	private _lastUpdatedValue = 0
 
 	public constructor(
-		__audioContext: AudioContext,
+		args: KelpieAudioNodeArgs,
 		private readonly _onUpdatedValue: (newValue: number) => void,
 		public readonly _ignoreRepeats = true,
 	) {
-		super({audioContext: __audioContext})
+		super(args)
 		this._scriptProcessorNode = this._audioContext.createScriptProcessor(256, 1, 1)
 		this._scriptProcessorNode.addEventListener('audioprocess', this._onAudioProcess)
 		try {

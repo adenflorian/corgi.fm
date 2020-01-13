@@ -60,16 +60,17 @@ export class LabDistortionNode extends LabAudioNode<KelpieDistortionNode> {
 	public constructor(args: LabAudioNodeArgs) {
 		super(args)
 		this.drive = new LabAudioParam(this, (kelpieDistortion) => kelpieDistortion.drive)
-		this.voices.push(new KelpieDistortionNode({audioContext: this._audioContext}))
+		this.voices.push(new KelpieDistortionNode({audioContext: this._audioContext, labNode: this}))
 	}
 
 	public _makeVoice(): KelpieDistortionNode {
-		const newThing = new KelpieDistortionNode({audioContext: this._audioContext})
+		const newThing = new KelpieDistortionNode({audioContext: this._audioContext, labNode: this})
 		return newThing
 	}
 }
 
 export class KelpieDistortionNode extends KelpieAudioNode {
+	public readonly name = 'DistortionNode'
 	private readonly _distortion: AudioNode
 	private readonly _distortionWorklet: AudioWorkletNode | null
 	private readonly _gain: GainNode
@@ -96,7 +97,7 @@ export class KelpieDistortionNode extends KelpieAudioNode {
 			driveAudioParam = this._gain.gain
 		}
 
-		this.drive = new KelpieAudioParam(this._audioContext, driveAudioParam)
+		this.drive = new KelpieAudioParam(this._audioContext, driveAudioParam, 'drive', this)
 	}
 
 	public get input(): AudioNode {return this._distortion}

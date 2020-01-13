@@ -208,8 +208,8 @@ class ParamInputWebAudioChain {
 	public constructor(
 		audioContext: AudioContext,
 	) {
-		this._waveShaper = new LabWaveShaperNode({audioContext, voiceMode: 'autoPoly'})
-		this._gain = new LabGain({audioContext, voiceMode: 'autoPoly'})
+		this._waveShaper = new LabWaveShaperNode({audioContext, voiceMode: 'autoPoly', creatorName: 'ParamInputWebAudioChain'})
+		this._gain = new LabGain({audioContext, voiceMode: 'autoPoly', creatorName: 'ParamInputWebAudioChain'})
 
 		this._waveShaper.connect(this._gain)
 	}
@@ -295,9 +295,9 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 		// controlled from modulation sources, including the knob.
 		this.destination.setValueAtTime(0, 0)
 
-		this._waveShaperClamp = new LabWaveShaperNode({audioContext: this._audioContext, voiceMode: 'autoPoly'})
-		this._gainDenormalizer = new LabGain({audioContext: this._audioContext, voiceMode: 'autoPoly'})
-		this._knobConstantSource = new LabConstantSourceNode({audioContext: this._audioContext, voiceMode: 'autoPoly'})
+		this._waveShaperClamp = new LabWaveShaperNode({audioContext: this._audioContext, voiceMode: 'autoPoly', creatorName: 'ExpNodeAudioParamInputPort.' + expAudioParam.id})
+		this._gainDenormalizer = new LabGain({audioContext: this._audioContext, voiceMode: 'autoPoly', creatorName: 'ExpNodeAudioParamInputPort.' + expAudioParam.id})
+		this._knobConstantSource = new LabConstantSourceNode({audioContext: this._audioContext, voiceMode: 'mono', creatorName: 'ExpNodeAudioParamInputPort.' + expAudioParam.id})
 
 		this._knobConstantSource.offset.setValueAtTime(expAudioParam.defaultNormalizedValue, 0)
 		this._knobValue = expAudioParam.defaultNormalizedValue

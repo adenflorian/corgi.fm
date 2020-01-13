@@ -36,7 +36,7 @@ export class AutomaticPolyphonicMidiConverterNode extends CorgiNode implements P
 		
 		const midiInputPort = new ExpMidiInputPort('input', 'input', this, midiAction => this._onMidiMessage.bind(this)(midiAction))
 		// this._polyOutPort = new ExpPolyphonicOutputPort('poly', 'poly', this)
-		this._pitchSource = new LabConstantSourceNode({audioContext: this._audioContext, voiceMode: 'mono'})
+		this._pitchSource = new LabConstantSourceNode({audioContext: this._audioContext, voiceMode: 'mono', creatorName: 'AutomaticPolyphonicMidiConverterNode'})
 		this._pitchOutputPort = new ExpNodeAudioOutputPort('pitch', 'pitch', this, this._pitchSource)
 		this._midiOutputPort = new ExpMidiOutputPort('gate', 'gate', this)
 		this._ports = arrayToESIdKeyMap([midiInputPort/*, this._polyOutPort*/, this._pitchOutputPort, this._midiOutputPort])

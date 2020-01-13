@@ -12,11 +12,11 @@ export class DryWetChain {
 		wetInternalNode: LabAudioNode,
 		wetInternalOutputNode?: LabAudioNode,
 	) {
-		this.inputGain = new LabGain({audioContext, voiceMode: 'autoPoly'})
-		this.dryGain = new LabGain({audioContext, voiceMode: 'autoPoly'})
-		this.wetGain = new LabGain({audioContext, voiceMode: 'autoPoly'})
-		this.wetPostGain = new LabGain({audioContext, voiceMode: 'autoPoly'})
-		this.outputGain = new LabGain({audioContext, voiceMode: 'autoPoly'})
+		this.inputGain = new LabGain({audioContext, voiceMode: 'autoPoly', creatorName: 'DryWetChain'})
+		this.dryGain = new LabGain({audioContext, voiceMode: 'autoPoly', creatorName: 'DryWetChain'})
+		this.wetGain = new LabGain({audioContext, voiceMode: 'autoPoly', creatorName: 'DryWetChain'})
+		this.wetPostGain = new LabGain({audioContext, voiceMode: 'autoPoly', creatorName: 'DryWetChain'})
+		this.outputGain = new LabGain({audioContext, voiceMode: 'autoPoly', creatorName: 'DryWetChain'})
 
 		this.inputGain
 			.connect(this.dryGain)

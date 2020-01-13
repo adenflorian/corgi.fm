@@ -21,7 +21,7 @@ export class ExpOscilloscopeNode extends CorgiNode {
 
 		this._analyser = new LabCorgiAnalyserSPNode(corgiNodeArgs.audioContext, this._onAnalyserUpdate, true)
 
-		this._gain = new LabGain({audioContext: this._audioContext, voiceMode: 'mono'})
+		this._gain = new LabGain({audioContext: this._audioContext, voiceMode: 'mono', creatorName: 'ExpOscilloscopeNode'})
 		this._gain.gain.value = 1
 
 		this._gain.connect(this._analyser)

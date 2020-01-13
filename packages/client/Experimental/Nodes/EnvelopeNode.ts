@@ -35,9 +35,9 @@ export class EnvelopeNode extends CorgiNode {
 	) {
 		super(corgiNodeArgs, {name: 'Envelope', color: CssColor.purple})
 
-		this._constantSource = new LabConstantSourceNode({audioContext: this._audioContext, voiceMode: 'mono'})
-		this._outputGain = new LabGain({audioContext: this._audioContext, voiceMode: 'autoPoly'})
-		this._waveShaper = new LabWaveShaperNode({audioContext: this._audioContext, voiceMode: 'autoPoly'})
+		this._constantSource = new LabConstantSourceNode({audioContext: this._audioContext, voiceMode: 'mono', creatorName: 'EnvelopeNode'})
+		this._outputGain = new LabGain({audioContext: this._audioContext, voiceMode: 'autoPoly', creatorName: 'EnvelopeNode'})
+		this._waveShaper = new LabWaveShaperNode({audioContext: this._audioContext, voiceMode: 'autoPoly', creatorName: 'EnvelopeNode'})
 		this._waveShaper.curve = new Float32Array([-3, 1])
 
 		this._constantSource.offset.value = 0

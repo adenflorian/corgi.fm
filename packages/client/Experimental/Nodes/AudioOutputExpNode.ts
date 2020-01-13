@@ -13,7 +13,7 @@ export class AudioOutputExpNode extends CorgiNode {
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
 		super(corgiNodeArgs, {name: 'Audio Output', color: CssColor.blue})
 
-		this._destination = new LabAudioDestinationNode({audioContext: this._audioContext, voiceMode: 'mono'})
+		this._destination = new LabAudioDestinationNode({audioContext: this._audioContext, voiceMode: 'mono', creatorName: 'AudioOutputExpNode'})
 
 		this._inputChain = new ToggleGainChain(corgiNodeArgs.audioContext, 0.5)
 		this._inputChain.output.connect(this._destination)
