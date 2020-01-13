@@ -17,7 +17,7 @@ import {
 	CorgiObjectChangedEvent, CorgiStringChangedEvent,
 } from './CorgiEvents'
 import {LabCorgiAnalyserSPNode} from './CorgiAnalyserSPN'
-import {LabAudioParam, LabAudioNode, LabGain, LabWaveShaperNode, LabConstantSourceNode} from './Nodes/PugAudioNode/Lab'
+import {LabAudioParam, LabAudioNode, LabGain, LabWaveShaperNode, LabConstantSourceNode, LabTarget} from './Nodes/PugAudioNode/Lab'
 
 export type ExpPortCallback = (port: ExpPort) => void
 
@@ -228,14 +228,12 @@ class ParamInputWebAudioChain {
 	}
 }
 
-type AudioNodeOrParam = LabAudioNode | LabAudioParam
-
 export class ExpNodeAudioInputPort extends ExpNodeAudioPort {
 	public constructor(
 		public readonly id: Id,
 		public readonly name: string,
 		public readonly node: CorgiNode,
-		public readonly destination: AudioNodeOrParam,
+		public readonly destination: LabTarget,
 		public readonly isAudioParamInput = false,
 	) {
 		super(id, name, node, 'in', isAudioParamInput)

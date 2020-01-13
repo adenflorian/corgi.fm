@@ -76,17 +76,19 @@ export interface SequencerEvent {
 }
 
 export const midiActions = {
-	gate: (time: number, gate: boolean) => ({
+	gate: (time: number, gate: boolean, voice: number | 'all' = 'all') => ({
 		type: 'MIDI_GATE' as const,
 		time,
 		gate,
+		voice,
 	} as const),
-	note: (time: number, gate: boolean, note: number, velocity: number) => ({
+	note: (time: number, gate: boolean, note: number, velocity: number, voice: number | 'all' = 'all') => ({
 		type: 'MIDI_NOTE' as const,
 		time,
 		gate,
 		note,
 		velocity,
+		voice,
 	} as const),
 } as const
 

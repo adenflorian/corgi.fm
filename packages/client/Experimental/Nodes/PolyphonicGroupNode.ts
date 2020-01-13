@@ -18,7 +18,7 @@ import {ExpMidiInputPort} from '../ExpMidiPorts'
 import {MidiAction} from '@corgifm/common/common-types'
 import {CorgiObjectChangedEvent} from '../CorgiEvents'
 import {logger} from '../../client-logger'
-import {LabGain, LabAudioNode, LabTarget, LabConstantSourceNode} from './PugAudioNode/Lab'
+import {LabGain, LabAudioNode, LabTarget, LabConstantSourceNode, LabAudioParam} from './PugAudioNode/Lab'
 
 export class PolyphonicGroupNode extends CorgiNode implements PolyInNode {
 	protected readonly _ports: ExpPorts
@@ -31,7 +31,6 @@ export class PolyphonicGroupNode extends CorgiNode implements PolyInNode {
 	private readonly _pitchInputPort: ExpNodeAudioInputPort
 	private readonly _pitchInputGain: LabGain
 	private readonly _midiInputPort: ExpMidiInputPort
-	private readonly _inputSourceEvents = new Map<Id, CorgiObjectChangedEvent<Immutable.Map<Id, LabAudioNode>>>()
 
 	public constructor(private readonly _corgiNodeArgs: CorgiNodeArgs) {
 		super(_corgiNodeArgs, {name: 'Polyphonic Group', color: CssColor.blue})
@@ -46,9 +45,6 @@ export class PolyphonicGroupNode extends CorgiNode implements PolyInNode {
 
 		this._pitchInputGain = new LabGain({audioContext: this._audioContext, voiceMode: 'mono'})
 		this._pitchInputPort = new ExpNodeAudioInputPort('pitch', 'pitch', this, this._pitchInputGain)
-		this._inputSourceEvents.set(
-			this._pitchInputPort.id,
-			new CorgiObjectChangedEvent<Immutable.Map<Id, LabAudioNode>>(Immutable.Map({[this._pitchInputPort.id as string]: this._pitchInputGain})))
 		this._midiInputPort = new ExpMidiInputPort('gate', 'gate', this, this._onMidiAction)
 
 		const ports = [...portStates].map(x => x[1]).map(this._createPort)
@@ -62,18 +58,13 @@ export class PolyphonicGroupNode extends CorgiNode implements PolyInNode {
 
 	}
 
-	public registerChildInputNode(): [ExpNodeAudioInputPort, CorgiObjectChangedEvent<Immutable.Map<Id, LabAudioNode>>][] {
-		return ([...this._ports]
-			.map(x => x[1])
-			.filter(x => x.type === 'audio' && x.side === 'in') as ExpNodeAudioInputPort[])
-			.map(x => {
-				const event = this._inputSourceEvents.get(x.id)
-				if (!event) {
-					logger.error('[PolyphonicGroupNode] missing input source event', {event, x, events: this._inputSourceEvents})
-					throw new Error('bad')
-				}
-				return [x, event]
-			})
+	public registerChildInputNode(): [ExpNodeAudioInputPort, LabAudioNode][] {
+		return (
+			[...this._ports]
+				.map(x => x[1])
+				.filter(x => x.type === 'audio' && x.side === 'in') as ExpNodeAudioInputPort[]
+		)
+			.map(x => [x, x.destination instanceof LabAudioParam ? this._inputConstantSources.get(x.id)! : x.destination])
 	}
 
 	public registerChildOutputNode(): ExpNodeAudioOutputPort[] {
@@ -95,8 +86,7 @@ export class PolyphonicGroupNode extends CorgiNode implements PolyInNode {
 	protected _dispose() {
 		this._inputGains.forEach(x => x.disconnect())
 		this._inputConstantSources.forEach(x => {
-			x.stop()
-			x.disconnect()
+			x.dispose()
 		})
 		this._outputGains.forEach(x => x.disconnect())
 	}
@@ -108,14 +98,12 @@ export class PolyphonicGroupNode extends CorgiNode implements PolyInNode {
 					const newConstantSource = new LabConstantSourceNode({audioContext: this._audioContext, voiceMode: 'autoPoly'})
 					newConstantSource.start()
 					this._inputConstantSources.set(id, newConstantSource)
-					this._inputSourceEvents.set(id, new CorgiObjectChangedEvent<Immutable.Map<Id, LabAudioNode>>(Immutable.Map({[id as string]: newConstantSource})))
 					const audioParam = new ExpAudioParam(id, newConstantSource.offset, 0, 1, 'bipolar', {valueString: percentageValueString})
 					return [new ExpNodeAudioParamInputPort(audioParam, this, this._corgiNodeArgs, 'center'), audioParam]
 				} else {
 					const newGain = new LabGain({audioContext: this._audioContext, voiceMode: 'autoPoly'})
 					this._inputGains.set(id, newGain)
-					this._inputSourceEvents.set(id, new CorgiObjectChangedEvent<Immutable.Map<Id, LabAudioNode>>(Immutable.Map({[id as string]: newGain})))
-					return [new ExpNodeAudioInputPort(id, id as string, this, this._pairSourcesWithTargets(newGain)), undefined]
+					return [new ExpNodeAudioInputPort(id, id as string, this, newGain), undefined]
 				}
 			} else if (inputOrOutput === 'output') {
 				const newGain = new LabGain({audioContext: this._audioContext, voiceMode: 'autoPoly'})
@@ -125,11 +113,5 @@ export class PolyphonicGroupNode extends CorgiNode implements PolyInNode {
 		}
 
 		throw new Error('port type not yet supported')
-	}
-
-	private readonly _pairSourcesWithTargets = (target: LabTarget) => (sources: Immutable.Map<Id, LabAudioNode>): SourceTargetPairs => {
-		return sources.map((source, id) => ({
-			id, source, target,
-		}))
 	}
 }
