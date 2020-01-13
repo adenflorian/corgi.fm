@@ -1,5 +1,6 @@
 import {logger} from '@corgifm/common/logger'
 import {simpleGlobalClientState} from '../../SimpleGlobalClientState'
+import {LabAudioNode, KelpieAudioNode, KelpieAudioNodeArgs, LabGain, KelpieAudioParam, LabAudioParam, LabAudioNodeArgs} from '../../Experimental/Nodes/PugAudioNode/Lab'
 
 export const corgiAnalyserName = 'corgi-analyser-processor'
 export const corgiDownSamplerName = 'corgi-down-sampler-processor'
@@ -51,4 +52,54 @@ function _createAudioWorkletNode(moduleName: AudioWorkletNames, audioContext: Au
 	} else {
 		return null
 	}
+}
+
+export class LabDistortionNode extends LabAudioNode<KelpieDistortionNode> {
+	public readonly drive: LabAudioParam<KelpieDistortionNode>
+
+	public constructor(args: LabAudioNodeArgs) {
+		super(args)
+		this.drive = new LabAudioParam(this, (kelpieDistortion) => kelpieDistortion.drive)
+		this.voices.push(new KelpieDistortionNode({audioContext: this._audioContext}))
+	}
+
+	public _makeVoice(): KelpieDistortionNode {
+		const newThing = new KelpieDistortionNode({audioContext: this._audioContext})
+		return newThing
+	}
+}
+
+export class KelpieDistortionNode extends KelpieAudioNode {
+	private readonly _distortion: AudioNode
+	private readonly _distortionWorklet: AudioWorkletNode | null
+	private readonly _gain: GainNode
+	public readonly drive: KelpieAudioParam
+
+	public constructor(args: KelpieAudioNodeArgs) {
+		super(args)
+		this._distortionWorklet = createCorgiDownSamplerWorkletNode(this._audioContext)
+		this._gain = this._audioContext.createGain()
+		this._distortion = this._distortionWorklet || this._gain
+
+
+		let driveAudioParam: AudioParam | undefined
+
+		if (this._distortionWorklet) {
+			driveAudioParam = this._distortionWorklet.parameters.get('drive')
+
+			if (!driveAudioParam) {
+				logger.error('drive audio worklet node param not found', {_distortionWorklet: this._distortionWorklet})
+			}
+		}
+
+		if (!driveAudioParam) {
+			driveAudioParam = this._gain.gain
+		}
+
+		this.drive = new KelpieAudioParam(this._audioContext, driveAudioParam)
+	}
+
+	public get input(): AudioNode {return this._distortion}
+	public get output(): AudioNode {return this._distortion}
+	protected _dispose(): void {}
 }

@@ -11,6 +11,7 @@ import {
 } from '../ExpParams'
 import {ExpMidiInputPort} from '../ExpMidiPorts'
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
+import {LabWaveShaperNode, LabConstantSourceNode, LabGain} from './PugAudioNode/Lab'
 
 const longTime = 999999999
 const minDistance = 0.00001
@@ -18,9 +19,9 @@ const minDistance = 0.00001
 export class EnvelopeNode extends CorgiNode {
 	protected readonly _ports: ExpPorts
 	protected readonly _customNumberParams: ExpCustomNumberParams
-	private readonly _constantSource: ConstantSourceNode
-	private readonly _outputGain: GainNode
-	private readonly _waveShaper: WaveShaperNode
+	private readonly _constantSource: LabConstantSourceNode
+	private readonly _outputGain: LabGain
+	private readonly _waveShaper: LabWaveShaperNode
 	private _lastGateTime = -1
 	private _lastGate?: boolean
 	private readonly _attack: ExpCustomNumberParam
@@ -34,9 +35,9 @@ export class EnvelopeNode extends CorgiNode {
 	) {
 		super(corgiNodeArgs, {name: 'Envelope', color: CssColor.purple})
 
-		this._constantSource = corgiNodeArgs.audioContext.createConstantSource()
-		this._outputGain = corgiNodeArgs.audioContext.createGain()
-		this._waveShaper = corgiNodeArgs.audioContext.createWaveShaper()
+		this._constantSource = new LabConstantSourceNode({audioContext: this._audioContext, voiceMode: 'mono'})
+		this._outputGain = new LabGain({audioContext: this._audioContext, voiceMode: 'autoPoly'})
+		this._waveShaper = new LabWaveShaperNode({audioContext: this._audioContext, voiceMode: 'autoPoly'})
 		this._waveShaper.curve = new Float32Array([-3, 1])
 
 		this._constantSource.offset.value = 0
@@ -64,9 +65,8 @@ export class EnvelopeNode extends CorgiNode {
 	protected _disable = () => this._outputGain.gain.value = 0
 
 	protected _dispose() {
-		this._constantSource.stop()
-		this._constantSource.disconnect()
-		this._outputGain.disconnect()
+		this._constantSource.dispose()
+		this._outputGain.dispose()
 	}
 
 	public receiveMidiAction(midiAction: MidiAction) {

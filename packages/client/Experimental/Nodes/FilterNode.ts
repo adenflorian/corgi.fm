@@ -7,6 +7,7 @@ import {
 import {ExpAudioParam, ExpAudioParams, ExpCustomEnumParams, ExpCustomEnumParam} from '../ExpParams'
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 import {DryWetChain} from './NodeHelpers/DryWetChain'
+import {LabBiquadFilterNode} from './PugAudioNode/Lab'
 
 const filterTypes = ['lowpass', 'highpass', 'bandpass', 'lowshelf', 'highshelf', 'peaking', 'notch', 'allpass'] as const
 type FilterType = typeof filterTypes[number]
@@ -15,7 +16,7 @@ export class FilterNode extends CorgiNode {
 	protected readonly _ports: ExpPorts
 	protected readonly _audioParams: ExpAudioParams
 	protected readonly _customEnumParams: ExpCustomEnumParams
-	private readonly _filter: BiquadFilterNode
+	private readonly _filter: LabBiquadFilterNode
 	private readonly _dryWetChain: DryWetChain
 	private readonly _type: ExpCustomEnumParam<FilterType>
 
@@ -26,7 +27,7 @@ export class FilterNode extends CorgiNode {
 		this._type.onChange.subscribe(this.onTypeChange)
 		this._customEnumParams = arrayToESIdKeyMap([this._type] as ExpCustomEnumParam<string>[])
 
-		this._filter = corgiNodeArgs.audioContext.createBiquadFilter()
+		this._filter = new LabBiquadFilterNode({...corgiNodeArgs, voiceMode: 'mono'})
 		this._filter.type = 'lowpass'
 
 		this._dryWetChain = new DryWetChain(corgiNodeArgs.audioContext, this._filter)

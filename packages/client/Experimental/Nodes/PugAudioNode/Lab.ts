@@ -1,11 +1,11 @@
 import {logger} from '../../../client-logger'
 
 // Lab
-type LabTarget<TTarget extends KelpieAudioNode = KelpieAudioNode> = LabAudioNode<TTarget> | LabAudioParam<TTarget>
+export type LabTarget<TTarget extends KelpieAudioNode = KelpieAudioNode> = LabAudioNode<TTarget> | LabAudioParam<TTarget>
 
 type VoiceCount = number | LabTargetMode
 
-interface LabAudioNodeArgs {
+export interface LabAudioNodeArgs {
 	readonly audioContext: AudioContext
 	readonly voiceMode: VoiceCount 
 }
@@ -575,6 +575,7 @@ export class LabAudioParam<TNode extends KelpieAudioNode = KelpieAudioNode> {
 
 export class LabOscillator extends LabAudioNode<KelpieOscillator> {
 	public readonly frequency: LabAudioParam<KelpieOscillator>
+	public readonly detune: LabAudioParam<KelpieOscillator>
 	private _type: OscillatorType = 'sawtooth'
 	public set type(value: OscillatorType) {
 		this.voices.forEach(voice => voice.type = value)
@@ -584,6 +585,7 @@ export class LabOscillator extends LabAudioNode<KelpieOscillator> {
 	public constructor(args: LabAudioNodeArgs) {
 		super(args)
 		this.frequency = new LabAudioParam(this, (kelpieOsc) => kelpieOsc.frequency)
+		this.detune = new LabAudioParam(this, (kelpieOsc) => kelpieOsc.detune)
 		this.voices.push(new KelpieOscillator({audioContext: this._audioContext}))
 	}
 
@@ -609,6 +611,31 @@ export class LabGain extends LabAudioNode<KelpieGain> {
 
 	public _makeVoice() {
 		return new KelpieGain({audioContext: this._audioContext})
+	}
+}
+
+export class LabBiquadFilterNode extends LabAudioNode<KelpieBiquadFilterNode> {
+	public readonly Q: LabAudioParam<KelpieBiquadFilterNode>
+	public readonly detune: LabAudioParam<KelpieBiquadFilterNode>
+	public readonly frequency: LabAudioParam<KelpieBiquadFilterNode>
+	public readonly gain: LabAudioParam<KelpieBiquadFilterNode>
+	private _type: BiquadFilterType = 'lowpass'
+	public set type(value: BiquadFilterType) {
+		this.voices.forEach(voice => voice.type = value)
+		this._type = value
+	}
+
+	public constructor(args: LabAudioNodeArgs) {
+		super(args)
+		this.Q = new LabAudioParam(this, (kelpieBiquadFilterNode) => kelpieBiquadFilterNode.Q)
+		this.detune = new LabAudioParam(this, (kelpieBiquadFilterNode) => kelpieBiquadFilterNode.detune)
+		this.frequency = new LabAudioParam(this, (kelpieBiquadFilterNode) => kelpieBiquadFilterNode.frequency)
+		this.gain = new LabAudioParam(this, (kelpieBiquadFilterNode) => kelpieBiquadFilterNode.gain)
+		this.voices.push(new KelpieBiquadFilterNode({audioContext: this._audioContext}))
+	}
+
+	public _makeVoice() {
+		return new KelpieBiquadFilterNode({audioContext: this._audioContext})
 	}
 }
 
@@ -676,7 +703,7 @@ export class LabConstantSourceNode extends LabAudioNode<KelpieConstantSourceNode
 }
 
 // Kelpie
-interface KelpieAudioNodeArgs {
+export interface KelpieAudioNodeArgs {
 	readonly audioContext: AudioContext
 }
 
@@ -712,7 +739,7 @@ export abstract class KelpieAudioNode {
 	protected abstract _dispose(): void
 }
 
-class KelpieAudioParam {
+export class KelpieAudioParam {
 	public set value(value: number) {
 		this._audioParam.value = value
 	}
@@ -756,6 +783,7 @@ class KelpieAudioParam {
 class KelpieOscillator extends KelpieAudioNode {
 	private readonly _osc: OscillatorNode
 	public readonly frequency: KelpieAudioParam
+	public readonly detune: KelpieAudioParam
 	public set type(value: OscillatorType) {
 		this._osc.type = value
 	}
@@ -764,6 +792,7 @@ class KelpieOscillator extends KelpieAudioNode {
 		super(args)
 		this._osc = this._audioContext.createOscillator()
 		this.frequency = new KelpieAudioParam(this._audioContext, this._osc.frequency)
+		this.detune = new KelpieAudioParam(this._audioContext, this._osc.detune)
 	}
 
 	public start(time?: number) {
@@ -789,6 +818,30 @@ class KelpieGain extends KelpieAudioNode {
 
 	public get input(): AudioNode {return this._gain}
 	public get output(): AudioNode {return this._gain}
+	protected _dispose() {}
+}
+
+class KelpieBiquadFilterNode extends KelpieAudioNode {
+	private readonly _biquadFilter: BiquadFilterNode
+	public readonly Q: KelpieAudioParam;
+	public readonly detune: KelpieAudioParam;
+	public readonly frequency: KelpieAudioParam;
+	public readonly gain: KelpieAudioParam;
+	public set type(value: BiquadFilterType) {
+		this._biquadFilter.type = value
+	}
+
+	public constructor(args: KelpieAudioNodeArgs) {
+		super(args)
+		this._biquadFilter = this._audioContext.createBiquadFilter()
+		this.Q = new KelpieAudioParam(this._audioContext, this._biquadFilter.Q)
+		this.detune = new KelpieAudioParam(this._audioContext, this._biquadFilter.detune)
+		this.frequency = new KelpieAudioParam(this._audioContext, this._biquadFilter.frequency)
+		this.gain = new KelpieAudioParam(this._audioContext, this._biquadFilter.gain)
+	}
+
+	public get input(): AudioNode {return this._biquadFilter}
+	public get output(): AudioNode {return this._biquadFilter}
 	protected _dispose() {}
 }
 

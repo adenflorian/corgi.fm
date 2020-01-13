@@ -9,6 +9,7 @@ import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 import {ExpNodeAudioOutputPort, ExpPorts} from '../ExpPorts'
 import {midiNoteToFrequency} from '../../WebAudio'
 import {PolyAlgorithm, RoundRobin, VoiceIndex} from './NodeHelpers/PolyAlgorithms'
+import {LabWaveShaperNode, LabConstantSourceNode} from './PugAudioNode/Lab'
 
 const maxVoiceCount = 4
 
@@ -17,8 +18,8 @@ export class ManualPolyphonicMidiConverterNode extends CorgiNode {
 	protected readonly _customNumberParams: ExpCustomNumberParams
 	private readonly _midiOutputPorts: readonly ExpMidiOutputPort[]
 	private readonly _pitchOutputPorts: readonly ExpNodeAudioOutputPort[]
-	private readonly _pitchSources: readonly ConstantSourceNode[]
-	private readonly _waveShapers: readonly WaveShaperNode[]
+	private readonly _pitchSources: readonly LabConstantSourceNode[]
+	private readonly _waveShapers: readonly LabWaveShaperNode[]
 	private readonly _portamento: ExpCustomNumberParam
 	private readonly _voiceCount: ExpCustomNumberParam
 	private readonly _algorithm: PolyAlgorithm
@@ -26,12 +27,12 @@ export class ManualPolyphonicMidiConverterNode extends CorgiNode {
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
 		super(corgiNodeArgs, {name: 'Manual Polyphonic Midi Converter', color: CssColor.yellow})
 
-		this._pitchSources = new Array(maxVoiceCount).fill(0).map(() => corgiNodeArgs.audioContext.createConstantSource())
+		this._pitchSources = new Array(maxVoiceCount).fill(0).map(() => new LabConstantSourceNode({audioContext: this._audioContext, voiceMode: 1}))
 		this._pitchSources.forEach(voice => {
 			voice.offset.setValueAtTime(0, 0)
 			voice.start()
 		})
-		this._waveShapers = new Array(maxVoiceCount).fill(0).map(() => corgiNodeArgs.audioContext.createWaveShaper())
+		this._waveShapers = new Array(maxVoiceCount).fill(0).map(() => new LabWaveShaperNode({audioContext: this._audioContext, voiceMode: 'autoPoly'}))
 		this._waveShapers.forEach(waveShaper => {
 			// eslint-disable-next-line no-param-reassign
 			waveShaper.curve = new Float32Array([-3, 1])
@@ -61,11 +62,10 @@ export class ManualPolyphonicMidiConverterNode extends CorgiNode {
 
 	protected _dispose() {
 		this._pitchSources.forEach(voice => {
-			voice.stop()
-			voice.disconnect()
+			voice.dispose()
 		})
 		this._waveShapers.forEach(waveShaper => {
-			waveShaper.disconnect()
+			waveShaper.dispose()
 		})
 		this._voiceCount.onChange.unsubscribe(this._onVoiceCountChange)
 	}

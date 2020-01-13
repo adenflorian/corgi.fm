@@ -9,6 +9,7 @@ import {ExpMidiOutputPort, ExpMidiInputPort} from '../ExpMidiPorts'
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 import {ExpNodeAudioOutputPort, ExpPorts} from '../ExpPorts'
 import {midiNoteToFrequency} from '../../WebAudio'
+import {LabWaveShaperNode, LabConstantSourceNode} from './PugAudioNode/Lab'
 
 const legatoOptions = ['legato', `legaton't`] as const
 type Legato = typeof legatoOptions[number]
@@ -18,8 +19,8 @@ export class MidiConverterNode extends CorgiNode {
 	protected readonly _customNumberParams: ExpCustomNumberParams
 	protected readonly _customEnumParams: ExpCustomEnumParams
 	private readonly _midiOutputPort: ExpMidiOutputPort
-	private readonly _constantSourceNode: ConstantSourceNode
-	private readonly _waveShaper: WaveShaperNode
+	private readonly _constantSourceNode: LabConstantSourceNode
+	private readonly _waveShaper: LabWaveShaperNode
 	private readonly _portamento: ExpCustomNumberParam
 	private readonly _legato: ExpCustomEnumParam<Legato>
 	private _lastMidiActionTime: number
@@ -28,11 +29,11 @@ export class MidiConverterNode extends CorgiNode {
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
 		super(corgiNodeArgs, {name: 'Midi Converter', color: CssColor.yellow})
 
-		this._constantSourceNode = corgiNodeArgs.audioContext.createConstantSource()
+		this._constantSourceNode = new LabConstantSourceNode({audioContext: this._audioContext, voiceMode: 'mono'})
 		this._constantSourceNode.offset.setValueAtTime(0, 0)
 		this._constantSourceNode.start()
 
-		this._waveShaper = corgiNodeArgs.audioContext.createWaveShaper()
+		this._waveShaper = new LabWaveShaperNode({audioContext: this._audioContext, voiceMode: 'autoPoly'})
 		this._waveShaper.curve = new Float32Array([-3, 1])
 
 		this._constantSourceNode.connect(this._waveShaper)
@@ -60,8 +61,7 @@ export class MidiConverterNode extends CorgiNode {
 	}
 
 	protected _dispose() {
-		this._constantSourceNode.stop()
-		this._constantSourceNode.disconnect()
+		this._constantSourceNode.dispose()
 	}
 
 	private _onMidiMessage(midiAction: MidiAction) {

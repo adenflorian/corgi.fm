@@ -9,6 +9,7 @@ import {
 import {ExpAudioParam, ExpAudioParams, ExpCustomEnumParams, ExpCustomEnumParam} from '../ExpParams'
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 import {ToggleGainChain} from './NodeHelpers/ToggleGainChain'
+import {LabOscillator} from './PugAudioNode/Lab'
 
 const oscillatorTypes = ['sawtooth', 'sine', 'triangle', 'square'] as const
 type OscillatorType = typeof oscillatorTypes[number]
@@ -17,7 +18,7 @@ export class LowFrequencyOscillatorExpNode extends CorgiNode {
 	protected readonly _ports: ExpPorts
 	protected readonly _audioParams: ExpAudioParams
 	protected readonly _customEnumParams: ExpCustomEnumParams
-	private readonly _oscillator: OscillatorNode
+	private readonly _oscillator: LabOscillator
 	private readonly _outputChain: ToggleGainChain
 	private readonly _type: ExpCustomEnumParam<OscillatorType>
 
@@ -28,7 +29,7 @@ export class LowFrequencyOscillatorExpNode extends CorgiNode {
 		this._type.onChange.subscribe(this.onTypeChange)
 		this._customEnumParams = arrayToESIdKeyMap([this._type] as ExpCustomEnumParam<string>[])
 
-		this._oscillator = corgiNodeArgs.audioContext.createOscillator()
+		this._oscillator = new LabOscillator({...corgiNodeArgs, voiceMode: 'mono'})
 		this._oscillator.type = this._type.value
 		this._oscillator.start()
 
@@ -52,8 +53,7 @@ export class LowFrequencyOscillatorExpNode extends CorgiNode {
 
 	protected _dispose() {
 		this._outputChain.dispose(() => {
-			this._oscillator.stop()
-			this._oscillator.disconnect()
+			this._oscillator.dispose()
 		})
 	}
 
