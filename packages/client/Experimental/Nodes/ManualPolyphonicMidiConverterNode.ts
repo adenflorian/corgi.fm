@@ -30,7 +30,6 @@ export class ManualPolyphonicMidiConverterNode extends CorgiNode {
 		this._pitchSources = new Array(maxVoiceCount).fill(0).map(() => new LabConstantSourceNode({audioContext: this._audioContext, voiceMode: 1, creatorName: 'ManualPolyphonicMidiConverterNode'}))
 		this._pitchSources.forEach(voice => {
 			voice.offset.setValueAtTime(0, 0)
-			voice.start()
 		})
 		this._waveShapers = new Array(maxVoiceCount).fill(0).map(() => new LabWaveShaperNode({audioContext: this._audioContext, voiceMode: 'autoPoly', creatorName: 'ManualPolyphonicMidiConverterNode'}))
 		this._waveShapers.forEach(waveShaper => {

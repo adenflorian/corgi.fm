@@ -301,7 +301,6 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 
 		this._knobConstantSource.offset.setValueAtTime(expAudioParam.defaultNormalizedValue, 0)
 		this._knobValue = expAudioParam.defaultNormalizedValue
-		this._knobConstantSource.start()
 
 		this._gainDenormalizer.gain.value = this.expAudioParam.maxValue
 

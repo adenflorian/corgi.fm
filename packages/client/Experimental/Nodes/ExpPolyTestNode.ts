@@ -19,7 +19,6 @@ export class ExpPolyTestNode extends CorgiNode {
 
 		let nextFrequency = 880
 
-		this._oscillator.start()
 		this._oscillator.type = 'sawtooth'
 		this._oscillator.frequency.setValueAtTime(220, 0, 0)
 		this._oscillator.frequency.setValueAtTime(230, 0, 1)

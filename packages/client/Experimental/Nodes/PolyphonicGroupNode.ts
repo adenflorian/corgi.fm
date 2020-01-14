@@ -96,7 +96,6 @@ export class PolyphonicGroupNode extends CorgiNode implements PolyInNode {
 			if (inputOrOutput === 'input') {
 				if (isAudioParamInput) {
 					const newConstantSource = new LabConstantSourceNode({audioContext: this._audioContext, voiceMode: 'autoPoly', creatorName: 'PolyphonicGroupNode'})
-					newConstantSource.start()
 					this._inputConstantSources.set(id, newConstantSource)
 					const audioParam = new ExpAudioParam(id, newConstantSource.offset, 0, 1, 'bipolar', {valueString: percentageValueString})
 					return [new ExpNodeAudioParamInputPort(audioParam, this, this._corgiNodeArgs, 'center'), audioParam]

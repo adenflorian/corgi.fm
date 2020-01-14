@@ -32,7 +32,6 @@ export class OscillatorExpNode extends CorgiNode {
 
 		this._oscillator = new LabOscillator({...corgiNodeArgs, voiceMode: 'autoPoly', creatorName: 'OscillatorExpNode'})
 		this._oscillator.type = this._type.value
-		this._oscillator.start()
 		this._outputChain = new ToggleGainChain(corgiNodeArgs.audioContext)
 		this._oscillator.connect(this._outputChain.input)
 

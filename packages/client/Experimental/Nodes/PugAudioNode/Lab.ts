@@ -551,6 +551,7 @@ export class LabAudioParam<TNode extends KelpieAudioNode = KelpieAudioNode> {
 		} else {
 			const voice = this._labAudioNode.voices[voiceIndex]
 			this._getAudioParam(voice).setTargetAtTime(target, startTime, timeConstant)
+			console.log(`setTargetAtTime voiceIndex: ${voiceIndex}   target: ${target}   voice: `, voice)
 		}
 	}
 
@@ -614,13 +615,10 @@ export class LabOscillator extends LabAudioNode<KelpieOscillator> {
 		this.detune = new LabAudioParam(this, (kelpieOsc) => kelpieOsc.detune, 'detune')
 	}
 
-	public start(time?: number) {
-		this.voices.forEach(voice => voice.start(time))
-	}
-
 	public readonly _makeVoice = (voiceIndex: number): KelpieOscillator => {
 		const newOsc = new KelpieOscillator({audioContext: this._audioContext, labNode: this, voiceIndex})
 		newOsc.type = this._type
+		newOsc.start()
 		return newOsc
 	}
 }
@@ -725,12 +723,9 @@ export class LabConstantSourceNode extends LabAudioNode<KelpieConstantSourceNode
 		this.offset = new LabAudioParam(this, (kelpieConstantSource) => kelpieConstantSource.offset, 'offset')
 	}
 
-	public start(time?: number) {
-		this.voices.forEach(voice => voice.start(time))
-	}
-
 	public readonly _makeVoice = (voiceIndex: number): KelpieConstantSourceNode => {
 		const newThing = new KelpieConstantSourceNode({audioContext: this._audioContext, labNode: this, voiceIndex})
+		newThing.start()
 		return newThing
 	}
 }

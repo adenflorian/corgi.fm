@@ -42,7 +42,7 @@ export class EnvelopeNode extends CorgiNode {
 
 		this._constantSource.offset.value = 0
 		this._constantSource.connect(this._waveShaper).connect(this._outputGain)
-		this._constantSource.start()
+
 		this._constantSource.offset.linearRampToValueAtTime(0, longTime)
 
 		const outputPort = new ExpNodeAudioOutputPort('output', 'output', this, this._outputGain)
