@@ -55,6 +55,7 @@ export class AutomaticPolyphonicMidiConverterNode extends CorgiNode implements P
 	}
 
 	private readonly _onVoiceCountChange = (newVoiceCount: number) => {
+		console.log(`AutomaticPolyphonicMidiConverterNode._onVoiceCountChange ${newVoiceCount}`)
 		const roundedNewVoiceCount = Math.round(newVoiceCount)
 		this._pitchSource.setVoiceCount(roundedNewVoiceCount)
 	}

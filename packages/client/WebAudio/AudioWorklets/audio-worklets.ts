@@ -55,11 +55,13 @@ function _createAudioWorkletNode(moduleName: AudioWorkletNames, audioContext: Au
 }
 
 export class LabDistortionNode extends LabAudioNode<KelpieDistortionNode> {
+	public readonly name = 'LabDistortionNode'
 	public readonly drive: LabAudioParam<KelpieDistortionNode>
 
 	public constructor(args: LabAudioNodeArgs) {
 		super(args)
-		this.drive = new LabAudioParam(this, (kelpieDistortion) => kelpieDistortion.drive)
+		super.init()
+		this.drive = new LabAudioParam(this, (kelpieDistortion) => kelpieDistortion.drive, 'drive')
 		this.voices.push(new KelpieDistortionNode({audioContext: this._audioContext, labNode: this}))
 	}
 

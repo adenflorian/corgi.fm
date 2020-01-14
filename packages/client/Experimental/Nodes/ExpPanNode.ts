@@ -20,7 +20,7 @@ export class ExpPanNode extends CorgiNode {
 
 		this._pan = new LabStereoPannerNode({...corgiNodeArgs, voiceMode: 'mono', creatorName: 'ExpPanNode'})
 
-		this._dryWetChain = new DryWetChain(corgiNodeArgs.audioContext, this._pan)
+		this._dryWetChain = new DryWetChain(corgiNodeArgs.audioContext, this._pan, 'mono')
 
 		const panParam = new ExpAudioParam('pan', this._pan.pan, 0, 1, 'bipolar', {valueString: panValueToString})
 		this._audioParams = arrayToESIdKeyMap([panParam])

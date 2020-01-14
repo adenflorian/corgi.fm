@@ -3,7 +3,8 @@ import {logger} from '../client-logger'
 import {LabAudioNode, KelpieAudioNode, KelpieAudioNodeArgs} from './Nodes/PugAudioNode/Lab'
 
 export class LabCorgiAnalyserSPNode extends LabAudioNode<KelpieCorgiAnalyserSPNode> {
-	public _makeVoice(): KelpieCorgiAnalyserSPNode {
+	public readonly name = 'LabCorgiAnalyserSPNode'
+	public readonly _makeVoice = (): KelpieCorgiAnalyserSPNode => {
 		const newThing = new KelpieCorgiAnalyserSPNode({audioContext: this._audioContext, labNode: this}, this._onUpdatedValue, this._ignoreRepeats)
 		return newThing
 	}
@@ -14,23 +15,21 @@ export class LabCorgiAnalyserSPNode extends LabAudioNode<KelpieCorgiAnalyserSPNo
 		public readonly _ignoreRepeats = true,
 	) {
 		super({audioContext: __audioContext, voiceMode: 'autoPoly', creatorName: 'LabCorgiAnalyserSPNode'})
-		this.voices.push(new KelpieCorgiAnalyserSPNode({audioContext: this._audioContext, labNode: this}, _onUpdatedValue, this._ignoreRepeats))
+		super.init()
+		this.voices.push(new KelpieCorgiAnalyserSPNode({audioContext: this._audioContext, labNode: this}, this._onUpdatedValue, this._ignoreRepeats))
 	}
 
-	public requestUpdate() {
+	public readonly requestUpdate = () => {
 		this.voices[0].requestUpdate()
 	}
 
-	public dispose() {}
+	public readonly dispose = () => {}
 }
 
-
-export class KelpieCorgiAnalyserSPNode extends KelpieAudioNode {
+class KelpieCorgiAnalyserSPNode extends KelpieAudioNode {
 	public readonly name = 'CorgiAnalyserSPNode'
 	public get input() {return this._scriptProcessorNode as AudioNode}
-	public get output(): AudioNode {
-		throw new Error('Method not implemented.');
-	}
+	public get output(): AudioNode {return this._scriptProcessorNode as AudioNode}
 	private readonly _scriptProcessorNode: ScriptProcessorNode
 	private _updateRequested = false
 	private _lastUpdatedValue = 0

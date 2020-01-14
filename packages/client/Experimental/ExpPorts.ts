@@ -208,8 +208,8 @@ class ParamInputWebAudioChain {
 	public constructor(
 		audioContext: AudioContext,
 	) {
-		this._waveShaper = new LabWaveShaperNode({audioContext, voiceMode: 'autoPoly', creatorName: 'ParamInputWebAudioChain'})
-		this._gain = new LabGain({audioContext, voiceMode: 'autoPoly', creatorName: 'ParamInputWebAudioChain'})
+		this._waveShaper = new LabWaveShaperNode({audioContext, voiceMode: 'autoPoly', creatorName: 'ParamInputWebAudioChain._waveShaper'})
+		this._gain = new LabGain({audioContext, voiceMode: 'autoPoly', creatorName: 'ParamInputWebAudioChain._gain'})
 
 		this._waveShaper.connect(this._gain)
 	}
@@ -223,8 +223,8 @@ class ParamInputWebAudioChain {
 	}
 
 	public dispose() {
-		this._waveShaper.disconnect()
-		this._gain.disconnect()
+		this._waveShaper.dispose()
+		this._gain.dispose()
 	}
 }
 
@@ -295,9 +295,9 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 		// controlled from modulation sources, including the knob.
 		this.destination.setValueAtTime(0, 0)
 
-		this._waveShaperClamp = new LabWaveShaperNode({audioContext: this._audioContext, voiceMode: 'autoPoly', creatorName: 'ExpNodeAudioParamInputPort.' + expAudioParam.id})
-		this._gainDenormalizer = new LabGain({audioContext: this._audioContext, voiceMode: 'autoPoly', creatorName: 'ExpNodeAudioParamInputPort.' + expAudioParam.id})
-		this._knobConstantSource = new LabConstantSourceNode({audioContext: this._audioContext, voiceMode: 'mono', creatorName: 'ExpNodeAudioParamInputPort.' + expAudioParam.id})
+		this._waveShaperClamp = new LabWaveShaperNode({audioContext: this._audioContext, voiceMode: 'autoPoly', creatorName: 'ExpNodeAudioParamInputPort.' + expAudioParam.id + '._waveShaperClamp'})
+		this._gainDenormalizer = new LabGain({audioContext: this._audioContext, voiceMode: 'autoPoly', creatorName: 'ExpNodeAudioParamInputPort.' + expAudioParam.id + '._gainDenormalizer'})
+		this._knobConstantSource = new LabConstantSourceNode({audioContext: this._audioContext, voiceMode: 'mono', creatorName: 'ExpNodeAudioParamInputPort.' + expAudioParam.id + '._knobConstantSource'})
 
 		this._knobConstantSource.offset.setValueAtTime(expAudioParam.defaultNormalizedValue, 0)
 		this._knobValue = expAudioParam.defaultNormalizedValue

@@ -21,7 +21,7 @@ export class ExpGainNode extends CorgiNode {
 		this._gain = new LabGain({...corgiNodeArgs, voiceMode: 'mono', creatorName: 'ExpGainNode'})
 		this._gain.gain.value = 0
 
-		this._dryWetChain = new DryWetChain(corgiNodeArgs.audioContext, this._gain)
+		this._dryWetChain = new DryWetChain(corgiNodeArgs.audioContext, this._gain, 'mono')
 
 		const gainParam = new ExpAudioParam('gain', this._gain.gain, 1, 1, 'unipolar', {valueString: gainDecibelValueToString})
 		this._audioParams = arrayToESIdKeyMap([gainParam]) as ReadonlyMap<Id, ExpAudioParam>
