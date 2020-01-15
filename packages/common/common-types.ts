@@ -90,6 +90,11 @@ export const midiActions = {
 		velocity,
 		voice,
 	} as const),
+	voiceCountChange: (time: number, newCount: number) => ({
+		type: 'VOICE_COUNT_CHANGE' as const,
+		time,
+		newCount,
+	} as const),
 } as const
 
 export type MidiAction = ReturnType<typeof midiActions[keyof typeof midiActions]>

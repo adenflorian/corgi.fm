@@ -31,6 +31,7 @@ export abstract class LabAudioNode<TNode extends KelpieAudioNode = KelpieAudioNo
 	public get mode() {return this._mode}
 	protected _audioContext: AudioContext
 	private _currentModeImpl: LabModeImpl<TNode> = new LabMono(this)
+	public get currentModeImpl() {return this._currentModeImpl}
 	private readonly _params = new Set<LabAudioParam>()
 	public get params() {return this._params as ReadonlySet<LabAudioParam>}
 	public readonly creatorName: string
@@ -148,19 +149,24 @@ export abstract class LabAudioNode<TNode extends KelpieAudioNode = KelpieAudioNo
 	}
 }
 
-interface LabModeImpl<TNode extends KelpieAudioNode> {
-	connect<TTarget extends KelpieAudioNode>(target: LabTarget<TTarget>, targetMode: LabTargetMode, targetVoices: readonly KelpieTarget[]): void
-	onConnect(source: LabAudioNode): readonly [LabTargetMode, TNode[]]
-	onSourceVoiceCountChange(source: LabAudioNode): readonly [LabTargetMode, readonly TNode[]]
-	setVoiceCount(voiceCount: number): void
-	onTargetVoiceModeChange(target: LabTarget, targetMode: LabTargetMode, targetVoices: readonly KelpieTarget[]): void
-	disconnect(target: LabTarget, targetVoices: readonly KelpieTarget[]): void
-	onDisconnect(source: LabAudioNode): void
-	dispose(): void
+abstract class LabModeImpl<TNode extends KelpieAudioNode> {
+	public abstract connect<TTarget extends KelpieAudioNode>(target: LabTarget<TTarget>, targetMode: LabTargetMode, targetVoices: readonly KelpieTarget[]): void
+	public abstract onConnect(source: LabAudioNode): readonly [LabTargetMode, TNode[]]
+	public abstract onSourceVoiceCountChange(source: LabAudioNode): readonly [LabTargetMode, readonly TNode[]]
+	public abstract setVoiceCount(voiceCount: number): void
+	public abstract onTargetVoiceModeChange(target: LabTarget, targetMode: LabTargetMode, targetVoices: readonly KelpieTarget[]): void
+	public onTargetVoiceCountChange(target: LabTarget, targetMode: LabTargetMode, targetVoices: readonly KelpieTarget[]): void {
+		// Only meant to be overridden by mono
+	}
+	public abstract disconnect(target: LabTarget, targetVoices: readonly KelpieTarget[]): void
+	public abstract onDisconnect(source: LabAudioNode): void
+	public abstract dispose(): void
 }
 
-class LabAutoPoly<TNode extends KelpieAudioNode = KelpieAudioNode> implements LabModeImpl<TNode> {
-	public constructor(private readonly _parent: LabAudioNode<TNode>) {}
+class LabAutoPoly<TNode extends KelpieAudioNode = KelpieAudioNode> extends LabModeImpl<TNode> {
+	public constructor(private readonly _parent: LabAudioNode<TNode>) {
+		super()
+	}
 
 	// Called on the source
 	public readonly connect = <TTarget extends KelpieAudioNode>(target: LabTarget<TTarget>) => {
@@ -254,13 +260,13 @@ class LabAutoPoly<TNode extends KelpieAudioNode = KelpieAudioNode> implements La
 				})
 			}
 			this._parent.targets.set(target.target, {target: target.target, targetVoices, targetMode})
+			this._parent.sources.forEach(source => source.currentModeImpl.onTargetVoiceCountChange(this._parent, 'autoPoly', this._parent.voices))
 		})
 	}
 
 	private readonly _addVoices = (numberToAdd: number) => {
 		for (let i = 0; i < numberToAdd; i++) {
 			console.log(this._parent.voices)
-			console.log(this._parent._makeVoice)
 			this._parent.voices.push(this._parent._makeVoice(this._parent.voices.length))
 		}
 	}
@@ -290,8 +296,10 @@ class LabAutoPoly<TNode extends KelpieAudioNode = KelpieAudioNode> implements La
 	public readonly dispose = () => {}
 }
 
-class LabStaticPoly<TNode extends KelpieAudioNode = KelpieAudioNode> implements LabModeImpl<TNode> {
-	public constructor(private readonly _parent: LabAudioNode<TNode>) {}
+class LabStaticPoly<TNode extends KelpieAudioNode = KelpieAudioNode> extends LabModeImpl<TNode> {
+	public constructor(private readonly _parent: LabAudioNode<TNode>) {
+		super()
+	}
 
 	// Called on the source
 	public readonly connect = <TTarget extends KelpieAudioNode>(target: LabTarget<TTarget>) => {
@@ -394,8 +402,10 @@ class LabStaticPoly<TNode extends KelpieAudioNode = KelpieAudioNode> implements 
 	public readonly dispose = () => {}
 }
 
-class LabMono<TNode extends KelpieAudioNode = KelpieAudioNode> implements LabModeImpl<TNode> {
-	public constructor(private readonly _parent: LabAudioNode<TNode>) {}
+class LabMono<TNode extends KelpieAudioNode = KelpieAudioNode> extends LabModeImpl<TNode> {
+	public constructor(private readonly _parent: LabAudioNode<TNode>) {
+		super()
+	}
 
 	public readonly connect = <TTarget extends KelpieAudioNode>(target: LabTarget<TTarget>) => {
 		const [_, targetVoices] = target.onConnect(this._parent)
@@ -434,6 +444,19 @@ class LabMono<TNode extends KelpieAudioNode = KelpieAudioNode> implements LabMod
 			this._monoVoice.disconnect(oldTargetVoice)
 		})
 		this._connectToTargetVoices(targetVoices)
+		this._parent.targets.set(target, {target, targetVoices, targetMode})
+	}
+
+	public readonly onTargetVoiceCountChange = (target: LabTarget, targetMode: LabTargetMode, targetVoices: readonly KelpieTarget[]) => {
+		const oldTargetConnection = this._parent.targets.get(target)
+		if (!oldTargetConnection) throw new Error('!oldTargetConnection')
+		if (targetMode !== 'autoPoly') throw new Error('expected autoPoly!')
+
+		oldTargetConnection.targetVoices.forEach(oldTargetVoice => {
+			this._monoVoice.disconnect(oldTargetVoice)
+		})
+		this._connectToTargetVoices(targetVoices)
+
 		this._parent.targets.set(target, {target, targetVoices, targetMode})
 	}
 
@@ -509,6 +532,7 @@ export class LabAudioParam<TNode extends KelpieAudioNode = KelpieAudioNode> {
 			})
 		} else {
 			const voice = this._labAudioNode.voices[voiceIndex]
+			if (!voice) return logger.warn('LabAudioParam !voice :( . ' + `voiceIndex: ${voiceIndex}  voiceCount: ${this._labAudioNode.voiceCount}  ${this.name}`)
 			this._getAudioParam(voice).cancelAndHoldAtTime(cancelTime)
 		}
 	}
@@ -520,6 +544,7 @@ export class LabAudioParam<TNode extends KelpieAudioNode = KelpieAudioNode> {
 			})
 		} else {
 			const voice = this._labAudioNode.voices[voiceIndex]
+			if (!voice) return logger.warn('LabAudioParam !voice :( . ' + `voiceIndex: ${voiceIndex}  voiceCount: ${this._labAudioNode.voiceCount}  ${this.name}`)
 			this._getAudioParam(voice).cancelScheduledValues(cancelTime)
 		}
 	}
@@ -531,6 +556,7 @@ export class LabAudioParam<TNode extends KelpieAudioNode = KelpieAudioNode> {
 			})
 		} else {
 			const voice = this._labAudioNode.voices[voiceIndex]
+			if (!voice) return logger.warn('LabAudioParam !voice :( . ' + `voiceIndex: ${voiceIndex}  voiceCount: ${this._labAudioNode.voiceCount}  ${this.name}`)
 			this._getAudioParam(voice).exponentialRampToValueAtTime(value, endTime)
 		}
 	}
@@ -542,6 +568,7 @@ export class LabAudioParam<TNode extends KelpieAudioNode = KelpieAudioNode> {
 			})
 		} else {
 			const voice = this._labAudioNode.voices[voiceIndex]
+			if (!voice) return logger.warn('LabAudioParam !voice :( . ' + `voiceIndex: ${voiceIndex}  voiceCount: ${this._labAudioNode.voiceCount}  ${this.name}`)
 			this._getAudioParam(voice).linearRampToValueAtTime(value, endTime)
 		}
 	}
@@ -553,6 +580,7 @@ export class LabAudioParam<TNode extends KelpieAudioNode = KelpieAudioNode> {
 			})
 		} else {
 			const voice = this._labAudioNode.voices[voiceIndex]
+			if (!voice) return logger.warn('LabAudioParam !voice :( . ' + `voiceIndex: ${voiceIndex}  voiceCount: ${this._labAudioNode.voiceCount}  ${this.name}`)
 			this._getAudioParam(voice).setTargetAtTime(target, startTime, timeConstant)
 			// console.log(`setTargetAtTime voiceIndex: ${voiceIndex}   target: ${target}   voice: `, voice)
 		}
@@ -565,6 +593,7 @@ export class LabAudioParam<TNode extends KelpieAudioNode = KelpieAudioNode> {
 			})
 		} else {
 			const voice = this._labAudioNode.voices[voiceIndex]
+			if (!voice) return logger.warn('LabAudioParam !voice :( . ' + `voiceIndex: ${voiceIndex}  voiceCount: ${this._labAudioNode.voiceCount}  ${this.name}`)
 			this._getAudioParam(voice).setValueAtTime(value, startTime)
 		}
 	}
@@ -576,6 +605,7 @@ export class LabAudioParam<TNode extends KelpieAudioNode = KelpieAudioNode> {
 			})
 		} else {
 			const voice = this._labAudioNode.voices[voiceIndex]
+			if (!voice) return logger.warn('LabAudioParam !voice :( . ' + `voiceIndex: ${voiceIndex}  voiceCount: ${this._labAudioNode.voiceCount}  ${this.name}`)
 			this._getAudioParam(voice).setValueCurveAtTime(values, startTime, duration)
 		}
 	}
@@ -775,9 +805,17 @@ export abstract class KelpieAudioNode {
 
 	public disconnect(target?: KelpieTarget) {
 		if (target) {
-			this.output.disconnect(target.input as AudioNode)
+			try {
+				this.output.disconnect(target.input as AudioNode)
+			} catch (error) {
+				logger.warn(`[KelpieAudioNode.disconnect] error thrown while disconnecting ${this.labNode.creatorName}.${this.name}(${this.voiceIndex}) to ${target.labNode.creatorName}.${target.name}(${target.voiceIndex})`)
+			}
 		} else {
-			this.output.disconnect()
+			try {
+				this.output.disconnect()
+			} catch (error) {
+				logger.warn(`[KelpieAudioNode.disconnect] error thrown while disconnecting ${this.labNode.creatorName}.${this.name}(${this.voiceIndex}) all`)
+			}
 		}
 	}
 

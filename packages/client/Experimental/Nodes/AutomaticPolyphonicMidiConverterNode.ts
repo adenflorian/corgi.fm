@@ -1,6 +1,6 @@
 import * as Immutable from 'immutable'
 import {CssColor} from '@corgifm/common/shamu-color'
-import {MidiAction} from '@corgifm/common/common-types'
+import {MidiAction, midiActions} from '@corgifm/common/common-types'
 import {oscillatorFreqCurveFunctions, arrayToESIdKeyMap} from '@corgifm/common/common-utils'
 import {maxPitchFrequency} from '@corgifm/common/common-constants'
 import {adsrValueToString} from '../../client-constants'
@@ -61,11 +61,13 @@ export class AutomaticPolyphonicMidiConverterNode extends CorgiNode implements P
 	}
 
 	private readonly _onVoiceCountChange = (newVoiceCount: number) => {
-		console.log(`AutomaticPolyphonicMidiConverterNode._onVoiceCountChange ${newVoiceCount}`)
 		const roundedNewVoiceCount = Math.round(newVoiceCount)
+		if (this._pitchSource.voiceCount === roundedNewVoiceCount) return
+		console.log(`AutomaticPolyphonicMidiConverterNode._onVoiceCountChange ${roundedNewVoiceCount}`)
 		this._pitchSource.setVoiceCount(roundedNewVoiceCount)
 		this._waveShaper.curve = new Float32Array([-3, 1])
 		this._pitchSource.offset.setValueAtTime(0, 0)
+		this._midiOutputPort.sendMidiAction(midiActions.voiceCountChange(this._audioContext.currentTime, roundedNewVoiceCount))
 	}
 
 	private _onMidiMessage(midiAction: MidiAction) {

@@ -12,6 +12,7 @@ import {
 import {ExpMidiInputPort} from '../ExpMidiPorts'
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 import {LabWaveShaperNode, LabConstantSourceNode, LabGain} from './PugAudioNode/Lab'
+import {VoiceIndex} from './NodeHelpers/PolyAlgorithms'
 
 const longTime = 999999999
 const minDistance = 0.00001
@@ -35,7 +36,7 @@ export class EnvelopeNode extends CorgiNode {
 	) {
 		super(corgiNodeArgs, {name: 'Envelope', color: CssColor.purple})
 
-		this._constantSource = new LabConstantSourceNode({audioContext: this._audioContext, voiceMode: 'mono', creatorName: 'EnvelopeNode'})
+		this._constantSource = new LabConstantSourceNode({audioContext: this._audioContext, voiceMode: 1, creatorName: 'EnvelopeNode'})
 		this._outputGain = new LabGain({audioContext: this._audioContext, voiceMode: 'autoPoly', creatorName: 'EnvelopeNode'})
 		this._waveShaper = new LabWaveShaperNode({audioContext: this._audioContext, voiceMode: 'autoPoly', creatorName: 'EnvelopeNode'})
 		this._waveShaper.curve = new Float32Array([-3, 1])
@@ -70,12 +71,14 @@ export class EnvelopeNode extends CorgiNode {
 	}
 
 	public receiveMidiAction(midiAction: MidiAction) {
-		if (midiAction.gate !== undefined) {
-			this.handleGateEvent(midiAction.gate, midiAction.time)
+		if (midiAction.type === 'VOICE_COUNT_CHANGE') {
+			this._constantSource.setVoiceCount(midiAction.newCount)
+		} else if (midiAction.gate !== undefined) {
+			this.handleGateEvent(midiAction.gate, midiAction.time, midiAction.voice)
 		}
 	}
 
-	public handleGateEvent(gate: boolean, startTime: number) {
+	public handleGateEvent(gate: boolean, startTime: number, voiceIndex: number | 'all') {
 		if (startTime < this._lastGateTime) {
 			logger.error('receiveMidiAction startTime < this._lastGateTime:', {gate, startTime, last: this._lastGateTime, lastGate: this._lastGate})
 		}
@@ -96,17 +99,18 @@ export class EnvelopeNode extends CorgiNode {
 			const decayEnd = holdEnd + this._decay.value + minDistance
 			const farOut = decayEnd + longTime + minDistance
 			const actualSustain = clamp(this._sustain.value, 0.0001, 1)
-			offset.cancelAndHoldAtTime(startTime)
-			offset.linearRampToValueAtTime(1, attackEnd)
-			offset.linearRampToValueAtTime(1, holdEnd)
-			offset.exponentialRampToValueAtTime(actualSustain, decayEnd)
-			offset.linearRampToValueAtTime(actualSustain, farOut)
+			console.log(`${voiceIndex}`)
+			offset.cancelAndHoldAtTime(startTime, voiceIndex)
+			offset.linearRampToValueAtTime(1, attackEnd, voiceIndex)
+			offset.linearRampToValueAtTime(1, holdEnd, voiceIndex)
+			offset.exponentialRampToValueAtTime(actualSustain, decayEnd, voiceIndex)
+			offset.linearRampToValueAtTime(actualSustain, farOut, voiceIndex)
 		} else {
 			const releaseEnd = startTime + this._release.value + minDistance
 			const farOut = releaseEnd + longTime + minDistance
-			offset.cancelAndHoldAtTime(startTime)
-			offset.exponentialRampToValueAtTime(0.0001, releaseEnd)
-			offset.linearRampToValueAtTime(0.0001, farOut)
+			offset.cancelAndHoldAtTime(startTime, voiceIndex)
+			offset.exponentialRampToValueAtTime(0.0001, releaseEnd, voiceIndex)
+			offset.linearRampToValueAtTime(0.0001, farOut, voiceIndex)
 		}
 		// farOut is to provide an event to be canceled so an anchor point can
 		// be created whenever cancelAndHoldAtTime is called.

@@ -17,7 +17,7 @@ export class DryWetChain {
 		this.dryGain = new LabGain({audioContext, voiceMode, creatorName: 'DryWetChain'})
 		this.wetGain = new LabGain({audioContext, voiceMode, creatorName: 'DryWetChain'})
 		this.wetPostGain = new LabGain({audioContext, voiceMode, creatorName: 'DryWetChain'})
-		this.outputGain = new LabGain({audioContext, voiceMode, creatorName: 'DryWetChain'})
+		this.outputGain = new LabGain({audioContext, voiceMode: 'mono', creatorName: 'DryWetChain'})
 
 		this.inputGain
 			.connect(this.dryGain)
