@@ -20,8 +20,7 @@ export class ExpPolyTestNode extends CorgiNode {
 		let nextFrequency = 880
 
 		this._oscillator.type = 'sawtooth'
-		this._oscillator.frequency.setValueAtTime(220, 0, 0)
-		this._oscillator.frequency.setValueAtTime(230, 0, 1)
+		this._oscillator.frequency.setValueAtTime(110, 0, 0)
 
 		const outputPort = new ExpNodeAudioOutputPort('output', 'output', this, this._oscillator)
 
@@ -35,8 +34,11 @@ export class ExpPolyTestNode extends CorgiNode {
 			// nextFrequency *= 0.5
 			// this._oscillators = this._oscillators.set('3', newOsc)
 			// this._oscillatorsEvent.invokeImmediately(this._oscillators)
-			this._oscillator.frequency.setValueAtTime(400, 0, 2)
-		}, 5000)
+			this._oscillator.frequency.setValueAtTime(220, 0, 1)
+			setTimeout(() => {
+				this._oscillator.frequency.setValueAtTime(440, 0, 2)
+			}, 3000)
+		}, 3000)
 	}
 
 	public render = () => this.getDebugView()

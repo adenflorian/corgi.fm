@@ -15,8 +15,8 @@ export class LabCorgiAnalyserSPNode extends LabAudioNode<KelpieCorgiAnalyserSPNo
 		public readonly _ignoreRepeats = true,
 	) {
 		super({audioContext: __audioContext, voiceMode: 'autoPoly', creatorName: 'LabCorgiAnalyserSPNode'})
-		super.init()
 		this.voices.push(new KelpieCorgiAnalyserSPNode({audioContext: this._audioContext, labNode: this}, this._onUpdatedValue, this._ignoreRepeats))
+		super.init()
 	}
 
 	public readonly requestUpdate = () => {
