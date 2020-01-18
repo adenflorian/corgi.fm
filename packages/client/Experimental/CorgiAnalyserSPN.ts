@@ -20,7 +20,7 @@ export class LabCorgiAnalyserSPNode extends LabAudioNode<KelpieCorgiAnalyserSPNo
 	}
 
 	public readonly requestUpdate = () => {
-		this.voices[0].requestUpdate()
+		this.voices.get(0)!.requestUpdate()
 	}
 
 	public readonly dispose = () => {}
