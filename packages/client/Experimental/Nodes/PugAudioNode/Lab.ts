@@ -263,17 +263,20 @@ class LabAutoPoly<TNode extends KelpieAudioNode = KelpieAudioNode> extends LabMo
 
 		this._parent.targets.forEach(target => {
 			const [targetMode, targetVoices] = target.target.onSourceVoiceCountChange(this._parent)
-			if (targetMode === 'mono') {
-				this._parent.voices.forEach((voice) => {
-					voice.connect(targetVoices[0] as KelpieAudioNode)
-				})
-			} else {
-				this._parent.voices.forEach((voice, i) => {
-					voice.connect(targetVoices[i] as KelpieAudioNode)
-				})
+			if (delta > 0) {
+				if (targetMode === 'mono') {
+					this._parent.voices.forEach((voice) => {
+						voice.connect(targetVoices[0] as KelpieAudioNode)
+					})
+				} else {
+					this._parent.voices.forEach((voice, i) => {
+						voice.connect(targetVoices[i] as KelpieAudioNode)
+					})
+				}
 			}
 			this._parent.targets.set(target.target, {target: target.target, targetVoices, targetMode})
 			this._parent.sources.forEach(source => source.currentModeImpl.onTargetVoiceCountChange(this._parent, 'autoPoly', this._parent.voices))
+			// TODO Maybe call onTargetVoiceCountChange on param sources as well?
 		})
 	}
 
@@ -376,14 +379,16 @@ class LabStaticPoly<TNode extends KelpieAudioNode = KelpieAudioNode> extends Lab
 
 		this._parent.targets.forEach(target => {
 			const [targetMode, targetVoices] = target.target.onSourceVoiceCountChange(this._parent)
-			if (targetMode === 'mono') {
-				this._parent.voices.forEach((voice) => {
-					voice.connect(targetVoices[0] as KelpieAudioNode)
-				})
-			} else {
-				this._parent.voices.forEach((voice, i) => {
-					voice.connect(targetVoices[i] as KelpieAudioNode)
-				})
+			if (delta > 0) {
+				if (targetMode === 'mono') {
+					this._parent.voices.forEach((voice) => {
+						voice.connect(targetVoices[0] as KelpieAudioNode)
+					})
+				} else {
+					this._parent.voices.forEach((voice, i) => {
+						voice.connect(targetVoices[i] as KelpieAudioNode)
+					})
+				}
 			}
 			this._parent.targets.set(target.target, {target: target.target, targetVoices, targetMode})
 		})
@@ -465,10 +470,19 @@ class LabMono<TNode extends KelpieAudioNode = KelpieAudioNode> extends LabModeIm
 		if (!oldTargetConnection) throw new Error('!oldTargetConnection')
 		if (targetMode !== 'autoPoly') throw new Error('expected autoPoly!')
 
-		oldTargetConnection.targetVoices.forEach(oldTargetVoice => {
+		// Only disconnect old voices that aren't in the new target voices
+		const oldTargetVoicesToDisconnect = oldTargetConnection.targetVoices
+			.filter(voice => targetVoices.includes(voice) === false)
+
+		oldTargetVoicesToDisconnect.forEach(oldTargetVoice => {
 			this._monoVoice.disconnect(oldTargetVoice)
 		})
-		this._connectToTargetVoices(targetVoices)
+
+		// Only connect new voices that aren't in the old target voices
+		const newTargetVoicesToConnectTo = targetVoices
+			.filter(voice => oldTargetConnection.targetVoices.includes(voice) === false)
+
+		this._connectToTargetVoices(newTargetVoicesToConnectTo)
 
 		this._parent.targets.set(target, {target, targetVoices, targetMode})
 	}
@@ -499,6 +513,7 @@ class LabMono<TNode extends KelpieAudioNode = KelpieAudioNode> extends LabModeIm
 	}
 
 	public readonly onSourceVoiceCountChange = (source: LabAudioNode): readonly [LabTargetMode, readonly TNode[]] => {
+		logger.assert(this._parent.voices.length === 1, ` expected 1, actual: ${this._parent.voices.length}`)
 		return ['mono', this._parent.voices]
 	}
 
