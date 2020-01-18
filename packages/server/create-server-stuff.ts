@@ -70,7 +70,7 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 		})))
 
 	const midiConverter2 = makeExpNodeState({
-		type: 'midiConverter',
+		type: 'automaticPolyphonicMidiConverter',
 		groupId: 'top',
 	})
 	dispatchToRoom(expNodesActions.add(midiConverter2))

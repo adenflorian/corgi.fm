@@ -96,6 +96,8 @@ export const expNodesActions = {
 
 export type ExpNodesAction = ActionType<typeof expNodesActions>
 
+export type ExpNodePolyMode = 'mono' | 'autoPoly'
+
 const defaultExpNodeState = {
 	id: 'dummyId' as Id,
 	ownerId: 'dummyOwnerId' as Id,

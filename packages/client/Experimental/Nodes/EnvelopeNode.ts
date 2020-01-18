@@ -99,7 +99,7 @@ export class EnvelopeNode extends CorgiNode {
 			const decayEnd = holdEnd + this._decay.value + minDistance
 			const farOut = decayEnd + longTime + minDistance
 			const actualSustain = clamp(this._sustain.value, 0.0001, 1)
-			console.log(`${voiceIndex}`)
+			// console.log(`${voiceIndex}`)
 			offset.cancelAndHoldAtTime(startTime, voiceIndex)
 			offset.linearRampToValueAtTime(1, attackEnd, voiceIndex)
 			offset.linearRampToValueAtTime(1, holdEnd, voiceIndex)

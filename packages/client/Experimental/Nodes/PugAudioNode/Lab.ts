@@ -19,8 +19,12 @@ interface LabTargetConnection {
 	readonly targetVoices: readonly KelpieTarget[]
 }
 
+let id = 0
+
 export abstract class LabAudioNode<TNode extends KelpieAudioNode = KelpieAudioNode> {
 	public readonly abstract name: string
+	public get fullName() {return `${this.creatorName}-${this.name}-${this.id}`}
+	public readonly id = id++
 	public readonly voices = [] as TNode[]
 	public get voiceCount() {return this.voices.length}
 	// Keep track of targets in case we change voice count/mode
@@ -86,7 +90,7 @@ export abstract class LabAudioNode<TNode extends KelpieAudioNode = KelpieAudioNo
 			})
 			this.params.forEach(param => {
 				param.sources.forEach(source => {
-					source.onTargetVoiceModeChange(this, newVoiceCount, this.voices)
+					source.onTargetVoiceModeChange(param, newVoiceCount, this.voices)
 				})
 			})
 		} else if (newVoiceCount === 'autoPoly') {
@@ -97,7 +101,7 @@ export abstract class LabAudioNode<TNode extends KelpieAudioNode = KelpieAudioNo
 			})
 			this.params.forEach(param => {
 				param.sources.forEach(source => {
-					source.onTargetVoiceModeChange(this, newVoiceCount, this.voices)
+					source.onTargetVoiceModeChange(param, newVoiceCount, this.voices)
 				})
 			})
 		} else {
@@ -203,7 +207,16 @@ class LabAutoPoly<TNode extends KelpieAudioNode = KelpieAudioNode> extends LabMo
 
 	public readonly onTargetVoiceModeChange = (target: LabTarget, targetMode: LabTargetMode, targetVoices: readonly KelpieTarget[]) => {
 		const oldTargetConnection = this._parent.targets.get(target)
-		if (!oldTargetConnection) throw new Error('!oldTargetConnection')
+		if (!oldTargetConnection) {
+			logger.warn(`this:`, this._parent)
+			logger.warn(`target:`, target)
+			logger.warn(`parentTargets:`, this._parent.targets)
+			logger.warn(`thisParams:`, this._parent.params)
+			throw new Error('!oldTargetConnection' + JSON.stringify({
+				thisName: this._parent.fullName,
+				targetName: target.fullName,
+			}))
+		}
 		if (targetMode === 'mono') {
 			this._parent.voices.forEach((voice, i) => {
 				voice.disconnect(oldTargetConnection.targetVoices[i] as KelpieAudioNode)
@@ -501,6 +514,7 @@ class LabMono<TNode extends KelpieAudioNode = KelpieAudioNode> extends LabModeIm
 }
 
 export class LabAudioParam<TNode extends KelpieAudioNode = KelpieAudioNode> {
+	public get fullName() {return `${this._labAudioNode.fullName}.${this._name}`}
 	public get creatorName() {return this._labAudioNode.creatorName}
 	public get mode() {return this._labAudioNode.mode}
 	// Keep track of sources in case we change voice mode

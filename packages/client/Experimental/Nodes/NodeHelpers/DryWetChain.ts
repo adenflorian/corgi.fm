@@ -1,3 +1,4 @@
+import {ExpNodePolyMode} from '@corgifm/common/redux'
 import {LabAudioNode, LabGain} from '../PugAudioNode/Lab'
 
 export class DryWetChain {
@@ -10,14 +11,15 @@ export class DryWetChain {
 	public constructor(
 		audioContext: AudioContext,
 		wetInternalNode: LabAudioNode,
-		voiceMode: 'mono' | 'autoPoly',
+		voiceMode: ExpNodePolyMode,
 		wetInternalOutputNode?: LabAudioNode,
 	) {
+		// Only input gain should have a variable voiceMode
 		this.inputGain = new LabGain({audioContext, voiceMode, creatorName: 'DryWetChain'})
-		this.dryGain = new LabGain({audioContext, voiceMode, creatorName: 'DryWetChain'})
-		this.wetGain = new LabGain({audioContext, voiceMode, creatorName: 'DryWetChain'})
-		this.wetPostGain = new LabGain({audioContext, voiceMode, creatorName: 'DryWetChain'})
-		this.outputGain = new LabGain({audioContext, voiceMode: 'mono', creatorName: 'DryWetChain'})
+		this.dryGain = new LabGain({audioContext, voiceMode: 'autoPoly', creatorName: 'DryWetChain'})
+		this.wetGain = new LabGain({audioContext, voiceMode: 'autoPoly', creatorName: 'DryWetChain'})
+		this.wetPostGain = new LabGain({audioContext, voiceMode: 'autoPoly', creatorName: 'DryWetChain'})
+		this.outputGain = new LabGain({audioContext, voiceMode: 'autoPoly', creatorName: 'DryWetChain'})
 
 		this.inputGain
 			.connect(this.dryGain)
@@ -31,6 +33,10 @@ export class DryWetChain {
 
 		this.dryGain.gain.value = 0
 		this.wetGain.gain.value = 1
+	}
+
+	public setAutoPoly(autoPoly: ExpNodePolyMode) {
+		this.inputGain.setVoiceCount(autoPoly)
 	}
 
 	public wetOnly() {
