@@ -65,8 +65,9 @@ export class AutomaticPolyphonicMidiConverterNode extends CorgiNode implements P
 		if (this._pitchSource.voiceCount === roundedNewVoiceCount) return
 		console.log(`AutomaticPolyphonicMidiConverterNode._onVoiceCountChange ${roundedNewVoiceCount}`)
 		this._pitchSource.setVoiceCount(roundedNewVoiceCount)
-		this._waveShaper.curve = new Float32Array([-3, 1])
-		this._pitchSource.offset.setValueAtTime(0, 0)
+		// shouldn't need this
+		// this._waveShaper.curve = new Float32Array([-3, 1])
+		// this._pitchSource.offset.setValueAtTime(0, 0)
 		this._midiOutputPort.sendMidiAction(midiActions.voiceCountChange(this._audioContext.currentTime, roundedNewVoiceCount))
 	}
 

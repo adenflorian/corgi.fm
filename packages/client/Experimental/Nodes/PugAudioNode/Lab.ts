@@ -822,13 +822,13 @@ export abstract class KelpieAudioNode {
 			try {
 				this.output.disconnect(target.input as AudioNode)
 			} catch (error) {
-				logger.warn(`[KelpieAudioNode.disconnect] error thrown while disconnecting ${this.labNode.creatorName}.${this.name}(${this.voiceIndex}) to ${target.labNode.creatorName}.${target.name}(${target.voiceIndex})`)
+				logger.warn(`[KelpieAudioNode.disconnect] error thrown while disconnecting ${this.labNode.creatorName}.${this.name}(${this.voiceIndex}) to ${target.labNode.creatorName}.${target.name}(${target.voiceIndex}):`, error)
 			}
 		} else {
 			try {
 				this.output.disconnect()
 			} catch (error) {
-				logger.warn(`[KelpieAudioNode.disconnect] error thrown while disconnecting ${this.labNode.creatorName}.${this.name}(${this.voiceIndex}) all`)
+				logger.warn(`[KelpieAudioNode.disconnect] error thrown while disconnecting ${this.labNode.creatorName}.${this.name}(${this.voiceIndex}) all:`, error)
 			}
 		}
 	}
