@@ -1,5 +1,5 @@
 import {List} from 'immutable'
-import {MidiAction} from '@corgifm/common/common-types'
+import {MidiAction, midiActions} from '@corgifm/common/common-types'
 import {logger} from '../client-logger'
 import {CorgiNode} from './CorgiNode'
 import {ExpMidiConnections, ExpMidiConnection} from './ExpConnections'
@@ -66,6 +66,8 @@ export interface ExpMidiOutputPortArgs {
 }
 
 export class ExpMidiOutputPort extends ExpMidiPort {
+	private lastVoiceCount = 1
+
 	public constructor(
 		public readonly id: Id,
 		public readonly name: string,
@@ -76,6 +78,9 @@ export class ExpMidiOutputPort extends ExpMidiPort {
 
 	public sendMidiAction: MidiReceiver = (midiAction: MidiAction) => {
 		this._connections.forEach(this._sendMidiActionToConnection(midiAction))
+		if (midiAction.type === 'VOICE_COUNT_CHANGE') {
+			this.lastVoiceCount = midiAction.newCount
+		}
 	}
 
 	private _sendMidiActionToConnection = (midiAction: MidiAction) => (connection: ExpMidiConnection) => {
@@ -85,11 +90,13 @@ export class ExpMidiOutputPort extends ExpMidiPort {
 	protected _connect = (connection: ExpMidiConnection) => {
 		// TODO ?
 		this.detectFeedbackLoop()
+		connection.sendMidiAction(midiActions.voiceCountChange(0, this.lastVoiceCount))
 	}
 
-	public changeTarget = (oldTarget: ExpMidiInputPort, newTarget: ExpMidiInputPort) => {
+	public changeTarget = (oldTarget: ExpMidiInputPort, newTarget: ExpMidiInputPort, connection: ExpMidiConnection) => {
 		// TODO ?
 		this.detectFeedbackLoop()
+		connection.sendMidiAction(midiActions.voiceCountChange(0, this.lastVoiceCount))
 	}
 
 	protected _disconnect = (connection: ExpMidiConnection) => {

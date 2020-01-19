@@ -335,7 +335,9 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 				this._analyser.dispose()
 			}
 			// eslint-disable-next-line no-empty
-		} catch (error) {}
+		} catch (error) {
+			logger.warn('onExtraAnimationsChange error', this, {value})
+		}
 	}
 
 	private readonly _onAnalyserUpdate = (newValue: number) => {

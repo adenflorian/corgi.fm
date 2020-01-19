@@ -83,7 +83,7 @@ export class ManualPolyphonicMidiConverterNode extends CorgiNode {
 	}
 
 	private _onMidiMessage(midiAction: MidiAction) {
-		if (!this._enabled) return
+		if (!this._enabled && midiAction.type !== 'VOICE_COUNT_CHANGE') return
 
 		if (midiAction.type === 'MIDI_NOTE') {
 			this._onMidiNoteAction(midiAction)

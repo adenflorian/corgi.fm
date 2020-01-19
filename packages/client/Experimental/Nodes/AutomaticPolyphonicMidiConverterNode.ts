@@ -49,6 +49,8 @@ export class AutomaticPolyphonicMidiConverterNode extends CorgiNode implements P
 		
 		this._algorithm = new RoundRobin(this._voiceCount.onChange)
 		this._voiceCount.onChange.subscribe(this._onVoiceCountChange)
+
+		this._midiOutputPort.sendMidiAction(midiActions.voiceCountChange(this._audioContext.currentTime, this._pitchSource.voiceCount))
 	}
 
 	public render = () => this.getDebugView()
@@ -72,7 +74,7 @@ export class AutomaticPolyphonicMidiConverterNode extends CorgiNode implements P
 	}
 
 	private _onMidiMessage(midiAction: MidiAction) {
-		if (!this._enabled) return
+		if (!this._enabled && midiAction.type !== 'VOICE_COUNT_CHANGE') return
 
 		if (midiAction.type === 'MIDI_NOTE') {
 			this._onMidiNoteAction(midiAction)

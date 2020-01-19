@@ -43,6 +43,8 @@ export abstract class LabAudioNode<TNode extends KelpieAudioNode = KelpieAudioNo
 	private _activeVoice = 0
 	public get activeVoice() {return this._activeVoice}
 	public set activeVoice(val: number) {
+		if (val === this._activeVoice) return
+		// console.log(`set activeVoice`, this.fullName, {val})
 		this._activeVoice = val
 		this.targets.forEach(target => {
 			target.target.onSourceActiveVoiceChanged(val)

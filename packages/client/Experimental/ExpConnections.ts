@@ -174,7 +174,7 @@ export class ExpMidiConnection extends ExpNodeConnection {
 		this._target = newTarget
 		oldTarget.disconnect(this)
 		newTarget.connect(this)
-		this._source.changeTarget(oldTarget, newTarget)
+		this._source.changeTarget(oldTarget, newTarget, this)
 
 		this.feedbackLoopDetected.invokeImmediately(this._source.detectFeedbackLoop())
 	}

@@ -72,6 +72,7 @@ export class EnvelopeNode extends CorgiNode {
 
 	public receiveMidiAction(midiAction: MidiAction) {
 		if (midiAction.type === 'VOICE_COUNT_CHANGE') {
+			// console.log('receiveMidiAction VOICE_COUNT_CHANGE', this, midiAction.newCount)
 			this._constantSource.setVoiceCount(midiAction.newCount)
 		} else if (midiAction.gate !== undefined) {
 			this.handleGateEvent(midiAction.gate, midiAction.time, midiAction.voice)
@@ -105,6 +106,7 @@ export class EnvelopeNode extends CorgiNode {
 			offset.linearRampToValueAtTime(1, holdEnd, voiceIndex)
 			offset.exponentialRampToValueAtTime(actualSustain, decayEnd, voiceIndex)
 			offset.linearRampToValueAtTime(actualSustain, farOut, voiceIndex)
+			this._constantSource.activeVoice = voiceIndex as number
 		} else {
 			const releaseEnd = startTime + this._release.value + minDistance
 			const farOut = releaseEnd + longTime + minDistance
