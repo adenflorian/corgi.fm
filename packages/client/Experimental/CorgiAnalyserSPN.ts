@@ -20,7 +20,12 @@ export class LabCorgiAnalyserSPNode extends LabAudioNode<KelpieCorgiAnalyserSPNo
 	}
 
 	public readonly requestUpdate = () => {
-		this.voices.get(0)!.requestUpdate()
+		const activeVoice = this.voices.get(this.activeVoice)
+		if (activeVoice) {
+			activeVoice.requestUpdate()
+		} else {
+			logger.warn('!activeVoice', {activeVoice, voices: this.voices})
+		}
 	}
 
 	public readonly dispose = () => {}

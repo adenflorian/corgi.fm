@@ -40,6 +40,14 @@ export abstract class LabAudioNode<TNode extends KelpieAudioNode = KelpieAudioNo
 	private readonly _params = new Set<LabAudioParam>()
 	public get params() {return this._params as ReadonlySet<LabAudioParam>}
 	public readonly creatorName: string
+	private _activeVoice = 0
+	public get activeVoice() {return this._activeVoice}
+	public set activeVoice(val: number) {
+		this._activeVoice = val
+		this.targets.forEach(target => {
+			target.target.onSourceActiveVoiceChanged(val)
+		})
+	}
 
 	public constructor(args: LabAudioNodeArgs) {
 		this._audioContext = args.audioContext
@@ -50,6 +58,12 @@ export abstract class LabAudioNode<TNode extends KelpieAudioNode = KelpieAudioNo
 	// Do not make into a property
 	public init() {
 		this.setVoiceCount(this._mode, true)
+	}
+
+	public onSourceActiveVoiceChanged(newActiveVoice: number) {
+		if (this.mode === 'autoPoly') {
+			this.activeVoice = newActiveVoice
+		}
 	}
 
 	// Called on the source
@@ -258,6 +272,7 @@ class LabAutoPoly<TNode extends KelpieAudioNode = KelpieAudioNode> extends LabMo
 			this._addVoices(delta)
 		} else if (delta < 0) {
 			this._deleteVoices(Math.abs(delta))
+			this._parent.activeVoice = Math.min(this._parent.activeVoice, this._parent.voiceCount)
 		} else {
 			return
 		}
@@ -382,6 +397,7 @@ class LabStaticPoly<TNode extends KelpieAudioNode = KelpieAudioNode> extends Lab
 			this._addVoices(delta)
 		} else if (delta < 0) {
 			this._deleteVoices(Math.abs(delta))
+			this._parent.activeVoice = Math.min(this._parent.activeVoice, this._parent.voiceCount)
 		} else {
 			return
 		}
@@ -450,10 +466,13 @@ class LabMono<TNode extends KelpieAudioNode = KelpieAudioNode> extends LabModeIm
 		console.log(`LabMono.setVoiceCount delta: ${delta}`)
 		if (delta < 0) {
 			this._deleteVoices(Math.abs(delta))
+			this._parent.activeVoice = Math.min(this._parent.activeVoice, this._parent.voiceCount)
 		} else if (delta > 0) {
 			logger.assert(delta === 1, 'delta === 1')
 			this._addVoices(delta)
 		}
+
+		this._parent.activeVoice = 0
 
 		logger.assert(this._parent.voiceCount === 1, 'this._parent.voiceCount === 1')
 
@@ -563,6 +582,10 @@ export class LabAudioParam<TNode extends KelpieAudioNode = KelpieAudioNode> {
 		private readonly _name: string,
 	) {
 		this._labAudioNode.onParamAdd(this)
+	}
+
+	public onSourceActiveVoiceChanged(newActiveVoice: number) {
+		this._labAudioNode.onSourceActiveVoiceChanged(newActiveVoice)
 	}
 
 	public set value(value: number) {
