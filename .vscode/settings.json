@@ -181,6 +181,7 @@
         "**/node_modules/**",
         "**/vscode-extension/**",
         "**/.git/**",
+        "**/.eslintrc.json",
         ".vscode",
         "typings",
         "built/**/*",
@@ -194,30 +195,21 @@
     },
     "jest.autoEnable": false,
     "eslint.validate": [
-        {"language": "javascript", "autoFix": true},
-        {"language": "javascriptreact", "autoFix": true},
-        {"language": "typescript", "autoFix": true},
-        {"language": "typescriptreact", "autoFix": true},
+        "javascript",
+        "javascriptreact",
+        "typescript",
+        "typescriptreact"
     ],
     "eslint.enable": false,
     "eslint.options": {
         "ignorePath": ".gitignore",
-        "extensions": [".js",".jsx",".ts",".tsx",]
+        "extensions": [
+            ".js",
+            ".jsx",
+            ".ts",
+            ".tsx",
+        ]
     },
     "editor.formatOnSave": false,
     "eslint.packageManager": "yarn",
-    "eslint.autoFixOnSave": true,
-    // "eslint.autoFixOnSave": true,
-    // "eslint.validate": [
-    //     "javascript",
-    //     "javascriptreact",
-    //     {
-    //         "language": "typescript",
-    //         "autoFix": true
-    //     },
-    //     {
-    //         "language": "typescriptreact",
-    //         "autoFix": true
-    //     }
-    // ]
 }

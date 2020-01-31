@@ -5,8 +5,9 @@ A "multiplayer DAW"
 
 ## Required Software
 - node 10.14.1
-- yarn
+- yarn 1.x.x
 - graphviz (for viewing diagrams in docs folder)
+- rust (https://rustup.rs/)
 
 ## Local Development
 Add `127.0.0.1 local.corgi.fm` to your `hosts` file for local development.
