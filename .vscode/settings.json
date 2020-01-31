@@ -187,7 +187,8 @@
         "built/**/*",
         ".cache",
         "TODO.md",
-        "nginx-site-config"
+        "nginx-site-config",
+        "**/package.json"
     ],
     "less.lint.emptyRules": "ignore",
     "files.associations": {
