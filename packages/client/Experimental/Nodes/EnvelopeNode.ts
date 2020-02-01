@@ -106,7 +106,7 @@ export class EnvelopeNode extends CorgiNode {
 			offset.linearRampToValueAtTime(1, holdEnd, voiceIndex)
 			offset.exponentialRampToValueAtTime(actualSustain, decayEnd, voiceIndex)
 			offset.linearRampToValueAtTime(actualSustain, farOut, voiceIndex)
-			this._constantSource.activeVoice = voiceIndex as number
+			this._constantSource.setActiveVoice(voiceIndex as number, startTime)
 		} else {
 			const releaseEnd = startTime + this._release.value + minDistance
 			const farOut = releaseEnd + longTime + minDistance

@@ -19,7 +19,7 @@ export class ExpOscilloscopeNode extends CorgiNode {
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
 		super(corgiNodeArgs, {name: 'Oscilloscope', color: CssColor.blue})
 
-		this._analyser = new LabCorgiAnalyserSPNode(corgiNodeArgs.audioContext, this._onAnalyserUpdate, true)
+		this._analyser = new LabCorgiAnalyserSPNode(corgiNodeArgs.audioContext, this._onAnalyserUpdate, true, 'ExpOscilloscopeNode')
 
 		this._gain = new LabGain({audioContext: this._audioContext, voiceMode: 'mono', creatorName: 'ExpOscilloscopeNode'})
 		this._gain.gain.value = 1

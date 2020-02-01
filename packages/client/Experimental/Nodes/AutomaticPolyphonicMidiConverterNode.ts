@@ -108,7 +108,7 @@ export class AutomaticPolyphonicMidiConverterNode extends CorgiNode implements P
 		const frequency = midiNoteToFrequency(note)
 		const normalized = oscillatorFreqCurveFunctions.unCurve(frequency / maxPitchFrequency)
 		this._pitchSource.offset.setTargetAtTime(normalized, time, this._portamento.value, voiceIndex as number)
-		this._pitchSource.activeVoice = voiceIndex as number
+		this._pitchSource.setActiveVoice(voiceIndex as number, time)
 		// console.log('update pitch:', {note, voiceIndex, frequency, normalized})
 	}
 }

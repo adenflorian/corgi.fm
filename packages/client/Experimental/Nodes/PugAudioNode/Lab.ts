@@ -34,7 +34,7 @@ export abstract class LabAudioNode<TNode extends KelpieAudioNode = KelpieAudioNo
 	public readonly sources = new Set<LabAudioNode>()
 	private _mode: VoiceCount = 'mono'
 	public get mode() {return this._mode}
-	protected _audioContext: AudioContext
+	public audioContext: AudioContext
 	private _currentModeImpl: LabModeImpl<TNode> = new LabMono(this)
 	public get currentModeImpl() {return this._currentModeImpl}
 	private readonly _params = new Set<LabAudioParam>()
@@ -42,17 +42,20 @@ export abstract class LabAudioNode<TNode extends KelpieAudioNode = KelpieAudioNo
 	public readonly creatorName: string
 	private _activeVoice = 0
 	public get activeVoice() {return this._activeVoice}
-	public set activeVoice(val: number) {
+	public readonly setActiveVoice = (val: number, time: number) => {
 		if (val === this._activeVoice) return
 		// console.log(`set activeVoice`, this.fullName, {val})
 		this._activeVoice = val
+		this._activeVoiceTime = time
 		this.targets.forEach(target => {
-			target.target.onSourceActiveVoiceChanged(val)
+			target.target.onSourceActiveVoiceChanged(val, time)
 		})
 	}
+	private _activeVoiceTime = 0
+	public get activeVoiceTime() {return this._activeVoiceTime}
 
 	public constructor(args: LabAudioNodeArgs) {
-		this._audioContext = args.audioContext
+		this.audioContext = args.audioContext
 		this.creatorName = args.creatorName
 		this._mode = args.voiceMode
 	}
@@ -62,9 +65,9 @@ export abstract class LabAudioNode<TNode extends KelpieAudioNode = KelpieAudioNo
 		this.setVoiceCount(this._mode, true)
 	}
 
-	public onSourceActiveVoiceChanged(newActiveVoice: number) {
+	public onSourceActiveVoiceChanged(newActiveVoice: number, time: number) {
 		if (this.mode === 'autoPoly') {
-			this.activeVoice = newActiveVoice
+			this.setActiveVoice(newActiveVoice, time)
 		}
 	}
 
@@ -274,7 +277,7 @@ class LabAutoPoly<TNode extends KelpieAudioNode = KelpieAudioNode> extends LabMo
 			this._addVoices(delta)
 		} else if (delta < 0) {
 			this._deleteVoices(Math.abs(delta))
-			this._parent.activeVoice = Math.min(this._parent.activeVoice, this._parent.voiceCount)
+			this._parent.setActiveVoice(Math.min(this._parent.activeVoice, this._parent.voiceCount), this._parent.audioContext.currentTime)
 		} else {
 			return
 		}
@@ -399,7 +402,7 @@ class LabStaticPoly<TNode extends KelpieAudioNode = KelpieAudioNode> extends Lab
 			this._addVoices(delta)
 		} else if (delta < 0) {
 			this._deleteVoices(Math.abs(delta))
-			this._parent.activeVoice = Math.min(this._parent.activeVoice, this._parent.voiceCount)
+			this._parent.setActiveVoice(Math.min(this._parent.activeVoice, this._parent.voiceCount), this._parent.audioContext.currentTime)
 		} else {
 			return
 		}
@@ -468,13 +471,13 @@ class LabMono<TNode extends KelpieAudioNode = KelpieAudioNode> extends LabModeIm
 		console.log(`LabMono.setVoiceCount delta: ${delta}`)
 		if (delta < 0) {
 			this._deleteVoices(Math.abs(delta))
-			this._parent.activeVoice = Math.min(this._parent.activeVoice, this._parent.voiceCount)
+			this._parent.setActiveVoice(Math.min(this._parent.activeVoice, this._parent.voiceCount), this._parent.audioContext.currentTime)
 		} else if (delta > 0) {
 			logger.assert(delta === 1, 'delta === 1')
 			this._addVoices(delta)
 		}
 
-		this._parent.activeVoice = 0
+		this._parent.setActiveVoice(0, this._parent.audioContext.currentTime)
 
 		logger.assert(this._parent.voiceCount === 1, 'this._parent.voiceCount === 1')
 
@@ -586,8 +589,8 @@ export class LabAudioParam<TNode extends KelpieAudioNode = KelpieAudioNode> {
 		this._labAudioNode.onParamAdd(this)
 	}
 
-	public onSourceActiveVoiceChanged(newActiveVoice: number) {
-		this._labAudioNode.onSourceActiveVoiceChanged(newActiveVoice)
+	public onSourceActiveVoiceChanged(newActiveVoice: number, time: number) {
+		this._labAudioNode.onSourceActiveVoiceChanged(newActiveVoice, time)
 	}
 
 	public set value(value: number) {
@@ -721,7 +724,7 @@ export class LabOscillator extends LabAudioNode<KelpieOscillator> {
 	}
 
 	public readonly _makeVoice = (voiceIndex: number): KelpieOscillator => {
-		const newOsc = new KelpieOscillator({audioContext: this._audioContext, labNode: this, voiceIndex})
+		const newOsc = new KelpieOscillator({audioContext: this.audioContext, labNode: this, voiceIndex})
 		newOsc.type = this._type
 		newOsc.frequency.setValueAtTime(0, 0)
 		newOsc.start()
@@ -742,7 +745,7 @@ export class LabGain extends LabAudioNode<KelpieGain> {
 	}
 
 	public readonly _makeVoice = (voiceIndex: number): KelpieGain => {
-		const newGain = new KelpieGain({audioContext: this._audioContext, labNode: this, voiceIndex})
+		const newGain = new KelpieGain({audioContext: this.audioContext, labNode: this, voiceIndex})
 		if (this.gain.lastSetValue !== undefined) newGain.gain.value = this.gain.lastSetValue
 		return newGain
 	}
@@ -770,7 +773,7 @@ export class LabBiquadFilterNode extends LabAudioNode<KelpieBiquadFilterNode> {
 	}
 
 	public readonly _makeVoice = (voiceIndex: number): KelpieBiquadFilterNode => {
-		const newFilter = new KelpieBiquadFilterNode({audioContext: this._audioContext, labNode: this, voiceIndex})
+		const newFilter = new KelpieBiquadFilterNode({audioContext: this.audioContext, labNode: this, voiceIndex})
 		newFilter.type = this._type
 		if (this.Q.lastSetValue !== undefined) newFilter.Q.value = this.Q.lastSetValue
 		if (this.detune.lastSetValue !== undefined) newFilter.detune.value = this.detune.lastSetValue
@@ -791,7 +794,7 @@ export class LabStereoPannerNode extends LabAudioNode<KelpieStereoPannerNode> {
 	}
 
 	public readonly _makeVoice = (voiceIndex: number): KelpieStereoPannerNode => {
-		const newPan = new KelpieStereoPannerNode({audioContext: this._audioContext, labNode: this, voiceIndex})
+		const newPan = new KelpieStereoPannerNode({audioContext: this.audioContext, labNode: this, voiceIndex})
 		if (this.pan.lastSetValue !== undefined) newPan.pan.value = this.pan.lastSetValue
 		return newPan
 	}
@@ -805,7 +808,7 @@ export class LabAudioDestinationNode extends LabAudioNode<KelpieAudioDestination
 	}
 
 	public readonly _makeVoice = (voiceIndex: number): KelpieAudioDestinationNode => {
-		const newDestination = new KelpieAudioDestinationNode({audioContext: this._audioContext, labNode: this, voiceIndex})
+		const newDestination = new KelpieAudioDestinationNode({audioContext: this.audioContext, labNode: this, voiceIndex})
 		return newDestination
 	}
 }
@@ -824,7 +827,7 @@ export class LabWaveShaperNode extends LabAudioNode<KelpieWaveShaperNode> {
 	}
 
 	public readonly _makeVoice = (voiceIndex: number): KelpieWaveShaperNode => {
-		const newWS = new KelpieWaveShaperNode({audioContext: this._audioContext, labNode: this, voiceIndex})
+		const newWS = new KelpieWaveShaperNode({audioContext: this.audioContext, labNode: this, voiceIndex})
 		newWS.curve = this._curve
 		return newWS
 	}
@@ -841,7 +844,7 @@ export class LabConstantSourceNode extends LabAudioNode<KelpieConstantSourceNode
 	}
 
 	public readonly _makeVoice = (voiceIndex: number): KelpieConstantSourceNode => {
-		const newThing = new KelpieConstantSourceNode({audioContext: this._audioContext, labNode: this, voiceIndex})
+		const newThing = new KelpieConstantSourceNode({audioContext: this.audioContext, labNode: this, voiceIndex})
 		if (this.offset.lastSetValue !== undefined) newThing.offset.value = this.offset.lastSetValue
 		newThing.start()
 		return newThing

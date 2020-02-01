@@ -4,28 +4,44 @@ import {LabAudioNode, KelpieAudioNode, KelpieAudioNodeArgs} from './Nodes/PugAud
 
 export class LabCorgiAnalyserSPNode extends LabAudioNode<KelpieCorgiAnalyserSPNode> {
 	public readonly name = 'LabCorgiAnalyserSPNode'
+	private _lastActiveVoice = 0
 	public readonly _makeVoice = (): KelpieCorgiAnalyserSPNode => {
-		const newThing = new KelpieCorgiAnalyserSPNode({audioContext: this._audioContext, labNode: this}, this._onUpdatedValue, this._ignoreRepeats)
+		const newThing = new KelpieCorgiAnalyserSPNode({audioContext: this.audioContext, labNode: this}, this._onUpdatedValue, this._ignoreRepeats)
 		return newThing
 	}
 
 	public constructor(
 		__audioContext: AudioContext,
 		private readonly _onUpdatedValue: (newValue: number) => void,
-		public readonly _ignoreRepeats = true,
+		public readonly _ignoreRepeats: boolean,
+		creatorName: string,
 	) {
-		super({audioContext: __audioContext, voiceMode: 'autoPoly', creatorName: 'LabCorgiAnalyserSPNode'})
-		this.voices.push(new KelpieCorgiAnalyserSPNode({audioContext: this._audioContext, labNode: this}, this._onUpdatedValue, this._ignoreRepeats))
+		super({audioContext: __audioContext, voiceMode: 'autoPoly', creatorName})
+		this.voices.push(new KelpieCorgiAnalyserSPNode({audioContext: this.audioContext, labNode: this}, this._onUpdatedValue, this._ignoreRepeats))
 		super.init()
 	}
 
 	public readonly requestUpdate = () => {
-		const activeVoice = this.voices.get(this.activeVoice)
+		const voiceIndexToUse = this._getActiveVoiceIndex()
+		const activeVoice = this.voices.get(voiceIndexToUse)
 		if (activeVoice) {
-			// console.log(`requestUpdate`, this.fullName, this.activeVoice)
+			if (this.fullName.includes('frequency')) {
+				console.log(`requestUpdate`, this.fullName, this.activeVoice, this.activeVoiceTime)
+			}
 			activeVoice.requestUpdate()
 		} else {
 			logger.warn('!activeVoice', {activeVoiceIndex: this.activeVoice, activeVoice, voices: this.voices})
+		}
+	}
+
+	private readonly _getActiveVoiceIndex = () => {
+		if (this._lastActiveVoice === this.activeVoice) return this.activeVoice
+
+		if (this.activeVoiceTime < this.audioContext.currentTime) {
+			this._lastActiveVoice = this.activeVoice
+			return this.activeVoice
+		} else {
+			return this._lastActiveVoice
 		}
 	}
 

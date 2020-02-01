@@ -327,7 +327,7 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 	public readonly onExtraAnimationsChange = (value: boolean) => {
 		try {
 			if (value) {
-				this._analyser = new LabCorgiAnalyserSPNode(this._audioContext, this._onAnalyserUpdate)
+				this._analyser = new LabCorgiAnalyserSPNode(this._audioContext, this._onAnalyserUpdate, true, 'ExpNodeAudioParamInputPort-' + this.node.onNameChange.current + '-' + this.expAudioParam.id)
 				this._gainDenormalizer.connect(this._analyser)
 				this._requestWorkletUpdate()
 			} else if (this._analyser) {
