@@ -295,9 +295,9 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 		// controlled from modulation sources, including the knob.
 		this.destination.setValueAtTime(0, 0)
 
-		this._waveShaperClamp = new LabWaveShaperNode({audioContext: this._audioContext, voiceMode: 'autoPoly', creatorName: 'ExpNodeAudioParamInputPort.' + expAudioParam.id + '._waveShaperClamp'})
-		this._gainDenormalizer = new LabGain({audioContext: this._audioContext, voiceMode: 'autoPoly', creatorName: 'ExpNodeAudioParamInputPort.' + expAudioParam.id + '._gainDenormalizer'})
-		this._knobConstantSource = new LabConstantSourceNode({audioContext: this._audioContext, voiceMode: 'mono', creatorName: 'ExpNodeAudioParamInputPort.' + expAudioParam.id + '._knobConstantSource'})
+		this._waveShaperClamp = new LabWaveShaperNode({audioContext: this._audioContext, voiceMode: 'autoPoly', creatorName: node.onNameChange.current + '-' + node.id.substring(0, 8) + '-ExpNodeAudioParamInputPort.' + expAudioParam.id + '._waveShaperClamp'})
+		this._gainDenormalizer = new LabGain({audioContext: this._audioContext, voiceMode: 'autoPoly', creatorName: node.onNameChange.current + '-' + node.id.substring(0, 8) + '-ExpNodeAudioParamInputPort.' + expAudioParam.id + '._gainDenormalizer'})
+		this._knobConstantSource = new LabConstantSourceNode({audioContext: this._audioContext, voiceMode: 'mono', creatorName: node.onNameChange.current + '-' + node.id.substring(0, 8) + '-ExpNodeAudioParamInputPort.' + expAudioParam.id + '._knobConstantSource'})
 
 		this._knobConstantSource.offset.setValueAtTime(expAudioParam.defaultNormalizedValue, 0)
 		this._knobValue = expAudioParam.defaultNormalizedValue

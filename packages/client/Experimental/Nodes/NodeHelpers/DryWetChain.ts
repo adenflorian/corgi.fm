@@ -15,11 +15,11 @@ export class DryWetChain {
 		wetInternalOutputNode?: LabAudioNode,
 	) {
 		// Only input gain should have a variable voiceMode
-		this.inputGain = new LabGain({audioContext, voiceMode, creatorName: 'DryWetChain'})
-		this.dryGain = new LabGain({audioContext, voiceMode: 'autoPoly', creatorName: 'DryWetChain'})
-		this.wetGain = new LabGain({audioContext, voiceMode: 'autoPoly', creatorName: 'DryWetChain'})
-		this.wetPostGain = new LabGain({audioContext, voiceMode: 'autoPoly', creatorName: 'DryWetChain'})
-		this.outputGain = new LabGain({audioContext, voiceMode: 'autoPoly', creatorName: 'DryWetChain'})
+		this.inputGain = new LabGain({audioContext, voiceMode, creatorName: 'DryWetChain-inputGain'})
+		this.dryGain = new LabGain({audioContext, voiceMode: 'autoPoly', creatorName: 'DryWetChain-dryGain'})
+		this.wetGain = new LabGain({audioContext, voiceMode: 'autoPoly', creatorName: 'DryWetChain-wetGain'})
+		this.wetPostGain = new LabGain({audioContext, voiceMode: 'autoPoly', creatorName: 'DryWetChain-wetPostGain'})
+		this.outputGain = new LabGain({audioContext, voiceMode: 'autoPoly', creatorName: 'DryWetChain-outputGain'})
 
 		this.inputGain
 			.connect(this.dryGain)
