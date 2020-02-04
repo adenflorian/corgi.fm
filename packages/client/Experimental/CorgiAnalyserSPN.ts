@@ -4,7 +4,7 @@ import {LabAudioNode, KelpieAudioNode, KelpieAudioNodeArgs} from './Nodes/PugAud
 
 export class LabCorgiAnalyserSPNode extends LabAudioNode<KelpieCorgiAnalyserSPNode> {
 	public readonly name = 'LabCorgiAnalyserSPNode'
-	private _lastActiveVoice = 0
+	private _lastActiveVoice = 0 as number | 'all'
 	public readonly _makeVoice = (): KelpieCorgiAnalyserSPNode => {
 		const newThing = new KelpieCorgiAnalyserSPNode({audioContext: this.audioContext, labNode: this}, this._onUpdatedValue, this._ignoreRepeats)
 		return newThing
@@ -23,14 +23,17 @@ export class LabCorgiAnalyserSPNode extends LabAudioNode<KelpieCorgiAnalyserSPNo
 
 	public readonly requestUpdate = () => {
 		const voiceIndexToUse = this._getActiveVoiceIndex()
-		const activeVoice = this.voices.get(voiceIndexToUse)
+		const activeVoice = this.voices.get(voiceIndexToUse === 'all' ? 0 : voiceIndexToUse)
 		if (activeVoice) {
 			if (this.fullName.includes('frequency')) {
-				console.log(`requestUpdate`, this.fullName, this.activeVoice, this.activeVoiceTime)
+				// console.log(`requestUpdate`, this.fullName, this.activeVoice, this.activeVoiceTime)
 			}
 			activeVoice.requestUpdate()
 		} else {
-			logger.warn('!activeVoice', {activeVoiceIndex: this.activeVoice, activeVoice, voices: this.voices})
+			// logger.warn('!activeVoice', {voiceIndexToUse, thisActiveVoice: this.activeVoice, this_lastActiveVoice: this._lastActiveVoice, activeVoice, voices: this.voices})
+			const firstVoice = this.voices.get(0)
+			if (!firstVoice) throw new Error('missing first voice!')
+			firstVoice.requestUpdate()
 		}
 	}
 

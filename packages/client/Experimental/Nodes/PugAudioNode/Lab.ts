@@ -40,9 +40,9 @@ export abstract class LabAudioNode<TNode extends KelpieAudioNode = KelpieAudioNo
 	private readonly _params = new Set<LabAudioParam>()
 	public get params() {return this._params as ReadonlySet<LabAudioParam>}
 	public readonly creatorName: string
-	private _activeVoice = 0
+	private _activeVoice = 0 as number | 'all'
 	public get activeVoice() {return this._activeVoice}
-	public readonly setActiveVoice = (val: number, time: number) => {
+	public readonly setActiveVoice = (val: number | 'all', time: number) => {
 		if (val === this._activeVoice) return
 		// console.log(`set activeVoice`, this.fullName, {val})
 		this._activeVoice = val
@@ -65,7 +65,7 @@ export abstract class LabAudioNode<TNode extends KelpieAudioNode = KelpieAudioNo
 		this.setVoiceCount(this._mode, true)
 	}
 
-	public onSourceActiveVoiceChanged(newActiveVoice: number, time: number) {
+	public onSourceActiveVoiceChanged(newActiveVoice: number | 'all', time: number) {
 		if (this.mode === 'autoPoly') {
 			this.setActiveVoice(newActiveVoice, time)
 		}
@@ -277,7 +277,9 @@ class LabAutoPoly<TNode extends KelpieAudioNode = KelpieAudioNode> extends LabMo
 			this._addVoices(delta)
 		} else if (delta < 0) {
 			this._deleteVoices(Math.abs(delta))
-			this._parent.setActiveVoice(Math.min(this._parent.activeVoice, this._parent.voiceCount), this._parent.audioContext.currentTime)
+			if (this._parent.activeVoice !== 'all') {
+				this._parent.setActiveVoice(Math.min(this._parent.activeVoice, this._parent.voiceCount - 1), 0)
+			}
 		} else {
 			return
 		}
@@ -402,7 +404,9 @@ class LabStaticPoly<TNode extends KelpieAudioNode = KelpieAudioNode> extends Lab
 			this._addVoices(delta)
 		} else if (delta < 0) {
 			this._deleteVoices(Math.abs(delta))
-			this._parent.setActiveVoice(Math.min(this._parent.activeVoice, this._parent.voiceCount), this._parent.audioContext.currentTime)
+			if (this._parent.activeVoice !== 'all') {
+				this._parent.setActiveVoice(Math.min(this._parent.activeVoice, this._parent.voiceCount - 1), 0)
+			}
 		} else {
 			return
 		}
@@ -471,7 +475,9 @@ class LabMono<TNode extends KelpieAudioNode = KelpieAudioNode> extends LabModeIm
 		console.log(`LabMono.setVoiceCount delta: ${delta}`)
 		if (delta < 0) {
 			this._deleteVoices(Math.abs(delta))
-			this._parent.setActiveVoice(Math.min(this._parent.activeVoice, this._parent.voiceCount), this._parent.audioContext.currentTime)
+			if (this._parent.activeVoice !== 'all') {
+				this._parent.setActiveVoice(Math.min(this._parent.activeVoice, this._parent.voiceCount - 1), 0)
+			}
 		} else if (delta > 0) {
 			logger.assert(delta === 1, 'delta === 1')
 			this._addVoices(delta)
@@ -589,7 +595,7 @@ export class LabAudioParam<TNode extends KelpieAudioNode = KelpieAudioNode> {
 		this._labAudioNode.onParamAdd(this)
 	}
 
-	public onSourceActiveVoiceChanged(newActiveVoice: number, time: number) {
+	public onSourceActiveVoiceChanged(newActiveVoice: number | 'all', time: number) {
 		this._labAudioNode.onSourceActiveVoiceChanged(newActiveVoice, time)
 	}
 
