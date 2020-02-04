@@ -208,7 +208,6 @@ class LabAutoPoly<TNode extends KelpieAudioNode = KelpieAudioNode> extends LabMo
 
 	// Called on the target
 	public readonly onConnect = (source: LabAudioNode): readonly [LabTargetMode, Immutable.List<TNode>] => {
-		const sourceVoiceCount = source.voices.size
 		this._setVoiceCount(this._getMaxSourceVoiceCount())
 		return ['autoPoly', this._parent.voices]
 	}
@@ -271,7 +270,7 @@ class LabAutoPoly<TNode extends KelpieAudioNode = KelpieAudioNode> extends LabMo
 
 	private readonly _setVoiceCount = (newVoiceCount: number) => {
 		const delta = Math.max(newVoiceCount, 1) - this._parent.voices.size
-		console.log(`${this._parent.creatorName} LabAutoPoly._setVoiceCount delta: ${delta}`)
+		console.log(`${this._parent.fullName} LabAutoPoly._setVoiceCount delta: ${delta}`, {this: this, newVoiceCount})
 
 		if (delta > 0) {
 			this._addVoices(delta)
@@ -303,7 +302,7 @@ class LabAutoPoly<TNode extends KelpieAudioNode = KelpieAudioNode> extends LabMo
 			console.log('################# ', this._parent, this._parent.params)
 			this._parent.params.forEach(param => {
 				param.sources.forEach(paramSource => {
-					paramSource.currentModeImpl.onTargetVoiceCountChange(this._parent, 'autoPoly', this._parent.voices)
+					paramSource.currentModeImpl.onTargetVoiceCountChange(param, 'autoPoly', this._parent.voices.map(param.getAudioParam))
 				})
 			})
 		})
@@ -329,9 +328,15 @@ class LabAutoPoly<TNode extends KelpieAudioNode = KelpieAudioNode> extends LabMo
 	}
 
 	public readonly disconnect = (target: LabTarget, targetVoices: Immutable.List<KelpieTarget>) => {
-		this._parent.voices.forEach((voice, i) => {
-			voice.disconnect(targetVoices.get(i)!)
-		})
+		if (target.mode === 'mono') {
+			this._parent.voices.forEach(voice => {
+				voice.disconnect(targetVoices.get(0)!)
+			})
+		} else {
+			this._parent.voices.forEach((voice, i) => {
+				voice.disconnect(targetVoices.get(i)!)
+			})
+		}
 	}
 
 	public readonly onDisconnect = (source: LabAudioNode) => {
@@ -589,7 +594,7 @@ export class LabAudioParam<TNode extends KelpieAudioNode = KelpieAudioNode> {
 	public constructor(
 		private readonly _labAudioNode: LabAudioNode<TNode>,
 		// TParent2 is a workaround for some typing issue
-		private readonly _getAudioParam: <TNode2 extends TNode>(kelpieNode: TNode2) => KelpieAudioParam,
+		public readonly getAudioParam: <TNode2 extends TNode>(kelpieNode: TNode2) => KelpieAudioParam,
 		private readonly _name: string,
 	) {
 		this._labAudioNode.onParamAdd(this)
@@ -602,67 +607,67 @@ export class LabAudioParam<TNode extends KelpieAudioNode = KelpieAudioNode> {
 	public set value(value: number) {
 		this._lastSetValue = value
 		this._labAudioNode.voices.forEach(voice => {
-			this._getAudioParam(voice).value = value
+			this.getAudioParam(voice).value = value
 		})
 	}
 
 	public readonly cancelAndHoldAtTime = (cancelTime: number, voiceIndex: number | 'all' = 'all') => {
 		if (voiceIndex === 'all') {
 			this._labAudioNode.voices.forEach(voice => {
-				this._getAudioParam(voice).cancelAndHoldAtTime(cancelTime)
+				this.getAudioParam(voice).cancelAndHoldAtTime(cancelTime)
 			})
 		} else {
 			const voice = this._labAudioNode.voices.get(voiceIndex)
 			if (!voice) return logger.warn('LabAudioParam !voice :( . ' + `voiceIndex: ${voiceIndex}  voiceCount: ${this._labAudioNode.voiceCount}  ${this.name}`)
-			this._getAudioParam(voice).cancelAndHoldAtTime(cancelTime)
+			this.getAudioParam(voice).cancelAndHoldAtTime(cancelTime)
 		}
 	}
 
 	public readonly cancelScheduledValues = (cancelTime: number, voiceIndex: number | 'all' = 'all') => {
 		if (voiceIndex === 'all') {
 			this._labAudioNode.voices.forEach(voice => {
-				this._getAudioParam(voice).cancelScheduledValues(cancelTime)
+				this.getAudioParam(voice).cancelScheduledValues(cancelTime)
 			})
 		} else {
 			const voice = this._labAudioNode.voices.get(voiceIndex)
 			if (!voice) return logger.warn('LabAudioParam !voice :( . ' + `voiceIndex: ${voiceIndex}  voiceCount: ${this._labAudioNode.voiceCount}  ${this.name}`)
-			this._getAudioParam(voice).cancelScheduledValues(cancelTime)
+			this.getAudioParam(voice).cancelScheduledValues(cancelTime)
 		}
 	}
 
 	public readonly exponentialRampToValueAtTime = (value: number, endTime: number, voiceIndex: number | 'all' = 'all') => {
 		if (voiceIndex === 'all') {
 			this._labAudioNode.voices.forEach(voice => {
-				this._getAudioParam(voice).exponentialRampToValueAtTime(value, endTime)
+				this.getAudioParam(voice).exponentialRampToValueAtTime(value, endTime)
 			})
 		} else {
 			const voice = this._labAudioNode.voices.get(voiceIndex)
 			if (!voice) return logger.warn('LabAudioParam !voice :( . ' + `voiceIndex: ${voiceIndex}  voiceCount: ${this._labAudioNode.voiceCount}  ${this.name}`)
-			this._getAudioParam(voice).exponentialRampToValueAtTime(value, endTime)
+			this.getAudioParam(voice).exponentialRampToValueAtTime(value, endTime)
 		}
 	}
 
 	public readonly linearRampToValueAtTime = (value: number, endTime: number, voiceIndex: number | 'all' = 'all') => {
 		if (voiceIndex === 'all') {
 			this._labAudioNode.voices.forEach(voice => {
-				this._getAudioParam(voice).linearRampToValueAtTime(value, endTime)
+				this.getAudioParam(voice).linearRampToValueAtTime(value, endTime)
 			})
 		} else {
 			const voice = this._labAudioNode.voices.get(voiceIndex)
 			if (!voice) return logger.warn('LabAudioParam !voice :( . ' + `voiceIndex: ${voiceIndex}  voiceCount: ${this._labAudioNode.voiceCount}  ${this.name}`)
-			this._getAudioParam(voice).linearRampToValueAtTime(value, endTime)
+			this.getAudioParam(voice).linearRampToValueAtTime(value, endTime)
 		}
 	}
 
 	public readonly setTargetAtTime = (target: number, startTime: number, timeConstant: number, voiceIndex: number | 'all' = 'all') => {
 		if (voiceIndex === 'all') {
 			this._labAudioNode.voices.forEach(voice => {
-				this._getAudioParam(voice).setTargetAtTime(target, startTime, timeConstant)
+				this.getAudioParam(voice).setTargetAtTime(target, startTime, timeConstant)
 			})
 		} else {
 			const voice = this._labAudioNode.voices.get(voiceIndex)
 			if (!voice) return logger.warn('LabAudioParam !voice :( . ' + `voiceIndex: ${voiceIndex}  voiceCount: ${this._labAudioNode.voiceCount}  ${this.name}`)
-			this._getAudioParam(voice).setTargetAtTime(target, startTime, timeConstant)
+			this.getAudioParam(voice).setTargetAtTime(target, startTime, timeConstant)
 			// console.log(`setTargetAtTime voiceIndex: ${voiceIndex}   target: ${target}   voice: `, voice)
 		}
 	}
@@ -670,31 +675,31 @@ export class LabAudioParam<TNode extends KelpieAudioNode = KelpieAudioNode> {
 	public readonly setValueAtTime = (value: number, startTime: number, voiceIndex: number | 'all' = 'all') => {
 		if (voiceIndex === 'all') {
 			this._labAudioNode.voices.forEach(voice => {
-				this._getAudioParam(voice).setValueAtTime(value, startTime)
+				this.getAudioParam(voice).setValueAtTime(value, startTime)
 			})
 		} else {
 			const voice = this._labAudioNode.voices.get(voiceIndex)
 			if (!voice) return logger.warn('LabAudioParam !voice :( . ' + `voiceIndex: ${voiceIndex}  voiceCount: ${this._labAudioNode.voiceCount}  ${this.name}`)
-			this._getAudioParam(voice).setValueAtTime(value, startTime)
+			this.getAudioParam(voice).setValueAtTime(value, startTime)
 		}
 	}
 
 	public readonly setValueCurveAtTime = (values: number[] | Float32Array, startTime: number, duration: number, voiceIndex: number | 'all' = 'all') => {
 		if (voiceIndex === 'all') {
 			this._labAudioNode.voices.forEach(voice => {
-				this._getAudioParam(voice).setValueCurveAtTime(values, startTime, duration)
+				this.getAudioParam(voice).setValueCurveAtTime(values, startTime, duration)
 			})
 		} else {
 			const voice = this._labAudioNode.voices.get(voiceIndex)
 			if (!voice) return logger.warn('LabAudioParam !voice :( . ' + `voiceIndex: ${voiceIndex}  voiceCount: ${this._labAudioNode.voiceCount}  ${this.name}`)
-			this._getAudioParam(voice).setValueCurveAtTime(values, startTime, duration)
+			this.getAudioParam(voice).setValueCurveAtTime(values, startTime, duration)
 		}
 	}
 
 	public readonly onConnect = (source: LabAudioNode): readonly [LabTargetMode, Immutable.List<KelpieAudioParam>] => {
 		this.sources.add(source)
 		const [mode, voices] = this._labAudioNode.onConnectThroughParam(this, source)
-		return [mode, voices.map(this._getAudioParam)]
+		return [mode, voices.map(this.getAudioParam)]
 	}
 
 	public readonly onDisconnect = (source: LabAudioNode) => {
@@ -704,7 +709,7 @@ export class LabAudioParam<TNode extends KelpieAudioNode = KelpieAudioNode> {
 
 	public readonly onSourceVoiceCountChange = (source: LabAudioNode): readonly [LabTargetMode, Immutable.List<KelpieAudioParam>] => {
 		const [mode, voices] = this._labAudioNode.onSourceVoiceCountChange(source)
-		return [mode, voices.map(this._getAudioParam)]
+		return [mode, voices.map(this.getAudioParam)]
 	}
 
 	public readonly dispose = () => {
