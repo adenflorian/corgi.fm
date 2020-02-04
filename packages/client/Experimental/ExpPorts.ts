@@ -295,8 +295,8 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 		// controlled from modulation sources, including the knob.
 		this.destination.setValueAtTime(0, 0)
 
-		this._waveShaperClamp = new LabWaveShaperNode({audioContext: this._audioContext, voiceMode: 'autoPoly', creatorName: node.onNameChange.current + '-' + node.id.substring(0, 8) + '-ExpNodeAudioParamInputPort.' + expAudioParam.id + '._waveShaperClamp'})
-		this._gainDenormalizer = new LabGain({audioContext: this._audioContext, voiceMode: 'autoPoly', creatorName: node.onNameChange.current + '-' + node.id.substring(0, 8) + '-ExpNodeAudioParamInputPort.' + expAudioParam.id + '._gainDenormalizer'})
+		this._waveShaperClamp = new LabWaveShaperNode({audioContext: this._audioContext, voiceMode: 'autoPoly', autoMono: true, creatorName: node.onNameChange.current + '-' + node.id.substring(0, 8) + '-ExpNodeAudioParamInputPort.' + expAudioParam.id + '._waveShaperClamp'})
+		this._gainDenormalizer = new LabGain({audioContext: this._audioContext, voiceMode: 'autoPoly', autoMono: true, creatorName: node.onNameChange.current + '-' + node.id.substring(0, 8) + '-ExpNodeAudioParamInputPort.' + expAudioParam.id + '._gainDenormalizer'})
 		this._knobConstantSource = new LabConstantSourceNode({audioContext: this._audioContext, voiceMode: 'mono', creatorName: node.onNameChange.current + '-' + node.id.substring(0, 8) + '-ExpNodeAudioParamInputPort.' + expAudioParam.id + '._knobConstantSource'})
 
 		this._knobConstantSource.offset.setValueAtTime(expAudioParam.defaultNormalizedValue, 0)
@@ -420,6 +420,10 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 
 		if (existingChain) return existingChain.input
 
+		// console.log('%%^^ this._waveShaperClamp.setVoiceCount(autoPoly)')
+		// this._waveShaperClamp.setVoiceCount('autoPoly')
+		// this._gainDenormalizer.setVoiceCount('autoPoly')
+
 		const newChain = new ParamInputChain(
 			connectionId,
 			this._audioContext,
@@ -449,6 +453,12 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 		existingChain.dispose()
 
 		this._inputChains.delete(connection.id)
+
+		// if (this._inputChains.size === 0) {
+		// 	console.log('%%^^ this._inputChains.size === 0')
+		// 	this._waveShaperClamp.setVoiceCount('mono')
+		// 	this._gainDenormalizer.setVoiceCount('mono')
+		// }
 
 		this.onChainsChanged.invokeImmediately(this._inputChains)
 	}

@@ -10,6 +10,7 @@ export interface LabAudioNodeArgs {
 	readonly audioContext: AudioContext
 	readonly voiceMode: VoiceCount
 	readonly creatorName: string
+	readonly autoMono?: boolean
 }
 
 type LabTargetMode = 'mono' | 'autoPoly'
@@ -53,11 +54,13 @@ export abstract class LabAudioNode<TNode extends KelpieAudioNode = KelpieAudioNo
 	}
 	private _activeVoiceTime = 0
 	public get activeVoiceTime() {return this._activeVoiceTime}
+	public readonly autoMono?: boolean
 
 	public constructor(args: LabAudioNodeArgs) {
 		this.audioContext = args.audioContext
 		this.creatorName = args.creatorName
 		this._mode = args.voiceMode
+		this.autoMono = args.autoMono
 	}
 
 	// Do not make into a property
@@ -199,6 +202,10 @@ class LabAutoPoly<TNode extends KelpieAudioNode = KelpieAudioNode> extends LabMo
 			this._parent.voices.forEach((voice) => {
 				voice.connect(targetVoices.get(0)! as KelpieAudioNode)
 			})
+		} else if (this._parent.voiceCount === 1 && this._parent.autoMono) {
+			targetVoices.forEach((targetVoice: KelpieAudioNode | KelpieAudioParam) => {
+				this._monoVoice.connect(targetVoice)
+			})
 		} else {
 			this._parent.voices.forEach((voice, i) => {
 				voice.connect(targetVoices.get(i)! as KelpieAudioNode)
@@ -236,20 +243,34 @@ class LabAutoPoly<TNode extends KelpieAudioNode = KelpieAudioNode> extends LabMo
 				targetName: target.fullName,
 			}))
 		}
-		if (targetMode === 'mono') {
-			this._parent.voices.forEach((voice, i) => {
-				voice.disconnect(oldTargetConnection.targetVoices.get(i)! as KelpieAudioNode)
-			})
-			this._parent.voices.forEach((voice) => {
-				voice.connect(targetVoices.get(0)! as KelpieAudioNode)
-			})
+		if (this._parent.voiceCount === 1 && this._parent.autoMono) {
+			if (targetMode === 'mono') {
+				oldTargetConnection.targetVoices.forEach(x => {
+					this._monoVoice.disconnect(x)
+				})
+				this._monoVoice.connect(targetVoices.get(0)! as KelpieAudioNode)
+			} else {
+				this._monoVoice.disconnect(oldTargetConnection.targetVoices.get(0)! as KelpieAudioNode)
+				targetVoices.forEach((targetVoice: KelpieAudioNode | KelpieAudioParam) => {
+					this._monoVoice.connect(targetVoice)
+				})
+			}
 		} else {
-			this._parent.voices.forEach((voice, i) => {
-				voice.disconnect(oldTargetConnection.targetVoices.get(0)! as KelpieAudioNode)
-			})
-			this._parent.voices.forEach((voice, i) => {
-				voice.connect(targetVoices.get(i)! as KelpieAudioNode)
-			})
+			if (targetMode === 'mono') {
+				this._parent.voices.forEach((voice, i) => {
+					voice.disconnect(oldTargetConnection.targetVoices.get(i)! as KelpieAudioNode)
+				})
+				this._parent.voices.forEach((voice) => {
+					voice.connect(targetVoices.get(0)! as KelpieAudioNode)
+				})
+			} else {
+				this._parent.voices.forEach((voice, i) => {
+					voice.disconnect(oldTargetConnection.targetVoices.get(0)! as KelpieAudioNode)
+				})
+				this._parent.voices.forEach((voice, i) => {
+					voice.connect(targetVoices.get(i)! as KelpieAudioNode)
+				})
+			}
 		}
 		this._parent.targets.set(target, {target, targetVoices, targetMode})
 	}
@@ -273,6 +294,9 @@ class LabAutoPoly<TNode extends KelpieAudioNode = KelpieAudioNode> extends LabMo
 		console.log(`${this._parent.fullName} LabAutoPoly._setVoiceCount delta: ${delta}`, {this: this, newVoiceCount})
 
 		if (delta > 0) {
+			if (this._parent.voiceCount === 1 && this._parent.autoMono) {
+				this._monoVoice.disconnect()
+			}
 			this._addVoices(delta)
 		} else if (delta < 0) {
 			this._deleteVoices(Math.abs(delta))
@@ -295,6 +319,10 @@ class LabAutoPoly<TNode extends KelpieAudioNode = KelpieAudioNode> extends LabMo
 						voice.connect(targetVoices.get(i)! as KelpieAudioNode)
 					})
 				}
+			} else if (this._parent.voiceCount === 1 && this._parent.autoMono) {
+				targetVoices.forEach((targetVoice: KelpieAudioNode | KelpieAudioParam) => {
+					this._monoVoice.connect(targetVoice)
+				})
 			}
 			this._parent.targets.set(target.target, {target: target.target, targetVoices, targetMode})
 			console.log('$$$$$$$$$$$$$$$$$ ', this._parent, this._parent.sources)
@@ -306,6 +334,42 @@ class LabAutoPoly<TNode extends KelpieAudioNode = KelpieAudioNode> extends LabMo
 				})
 			})
 		})
+	}
+
+	private get _monoVoice() {return this._parent.voices.get(0)!}
+
+	public readonly onTargetVoiceCountChange = (target: LabTarget, targetMode: LabTargetMode, targetVoices: Immutable.List<KelpieTarget>) => {
+		if (this._parent.voiceCount > 1 || !this._parent.autoMono) return
+
+		const oldTargetConnection = this._parent.targets.get(target)
+		if (!oldTargetConnection) throw new Error('!oldTargetConnection')
+		if (targetMode !== 'autoPoly') throw new Error('expected autoPoly!')
+
+		// Only disconnect old voices that aren't in the new target voices
+		const oldTargetVoicesToDisconnect = oldTargetConnection.targetVoices
+			.filter(voice => targetVoices.includes(voice) === false)
+
+		oldTargetVoicesToDisconnect.forEach(oldTargetVoice => {
+			this._monoVoice.disconnect(oldTargetVoice)
+		})
+
+		// Only connect new voices that aren't in the old target voices
+		const newTargetVoicesToConnectTo = targetVoices
+			.filter(voice => oldTargetConnection.targetVoices.includes(voice) === false)
+		
+		newTargetVoicesToConnectTo.forEach((targetVoice: KelpieAudioNode | KelpieAudioParam) => {
+			this._monoVoice.connect(targetVoice)
+		})
+		console.log('%^%^%^%^%^%^%^%^ LabAutoPoly.onTargetVoiceCountChange ', this._parent, {oldTargetVoicesToDisconnect, newTargetVoicesToConnectTo})
+
+		// logger.assert(oldTargetVoicesToDisconnect.size > 0 || newTargetVoicesToConnectTo.size > 0, ':(', {
+		// 	oldTargetVoicesToDisconnect,
+		// 	newTargetVoicesToConnectTo,
+		// 	oldTargetVoices: oldTargetConnection.targetVoices,
+		// 	targetVoices,
+		// })
+
+		this._parent.targets.set(target, {target, targetVoices, targetMode})
 	}
 
 	private readonly _addVoices = (numberToAdd: number) => {
@@ -328,7 +392,11 @@ class LabAutoPoly<TNode extends KelpieAudioNode = KelpieAudioNode> extends LabMo
 	}
 
 	public readonly disconnect = (target: LabTarget, targetVoices: Immutable.List<KelpieTarget>) => {
-		if (target.mode === 'mono') {
+		if (this._parent.voiceCount === 1 && this._parent.autoMono) {
+			targetVoices.forEach(x => {
+				this._monoVoice.disconnect(x)
+			})
+		} else if (target.mode === 'mono') {
 			this._parent.voices.forEach(voice => {
 				voice.disconnect(targetVoices.get(0)!)
 			})
