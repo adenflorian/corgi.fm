@@ -1,26 +1,30 @@
 import {CssColor} from '@corgifm/common/shamu-color'
 import {MidiAction, midiActions} from '@corgifm/common/common-types'
 import {arrayToESIdKeyMap} from '@corgifm/common/common-utils'
-import {ExpCustomEnumParam, ExpCustomEnumParams} from '../ExpParams'
+import {ExpCustomStringParam, ExpCustomStringParams, ExpCustomEnumParams, ExpCustomEnumParam} from '../ExpParams'
 import {ExpMidiInputPort, ExpMidiOutputPort} from '../ExpMidiPorts'
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
-import {ExpNodeAudioOutputPort, ExpPorts, ExpNodeAudioInputPort} from '../ExpPorts'
-import {LabGain} from './PugAudioNode/Lab'
+import {ExpPorts} from '../ExpPorts'
 
-const pulseOptions = ['on', 'off', 'idle'] as const
+const pulseOptions = ['send', 'idle'] as const
 type PulseMode = typeof pulseOptions[number]
 
-export class MidiPulseNode extends CorgiNode {
+export class MidiMessageNode extends CorgiNode {
 	protected readonly _ports: ExpPorts
 	protected readonly _customEnumParams: ExpCustomEnumParams
+	protected readonly _customStringParams: ExpCustomStringParams
 	private readonly _pulseMode: ExpCustomEnumParam<PulseMode>
+	private readonly _message: ExpCustomStringParam
 	private readonly _midiOutputPort: ExpMidiOutputPort
 
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
-		super(corgiNodeArgs, {name: 'Midi Pulse', color: CssColor.yellow})
-		
-		this._midiOutputPort = new ExpMidiOutputPort('output', 'output', this)
+		super(corgiNodeArgs, {name: 'Midi Message', color: CssColor.yellow})
+
+		this._midiOutputPort = new ExpMidiOutputPort('gate', 'gate', this)
 		this._ports = arrayToESIdKeyMap([this._midiOutputPort])
+
+		this._message = new ExpCustomStringParam('pattern', '')
+		this._customStringParams = arrayToESIdKeyMap([this._message] as ExpCustomStringParam[])
 
 		this._pulseMode = new ExpCustomEnumParam<PulseMode>('mode', 'idle', pulseOptions)
 		this._customEnumParams = arrayToESIdKeyMap([this._pulseMode] as ExpCustomEnumParam<string>[])
@@ -39,12 +43,8 @@ export class MidiPulseNode extends CorgiNode {
 	private readonly _onChange = (mode: PulseMode) => {
 		if (mode !== 'idle') this._pulseMode.onChange.invokeNextFrame('idle')
 
-		if (!this._enabled) return
-
-		if (mode === 'on') {
-			this._midiOutputPort.sendMidiAction(midiActions.gate(this._audioContext.currentTime, true))
-		} else if (mode === 'off') {
-			this._midiOutputPort.sendMidiAction(midiActions.gate(this._audioContext.currentTime, false))
+		if (this._enabled && mode === 'send') {
+			this._midiOutputPort.sendMidiAction(midiActions.message(this._audioContext.currentTime, this._message.value.current))
 		}
 	}
 }

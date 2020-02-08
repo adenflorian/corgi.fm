@@ -29,6 +29,7 @@ import {ExpWaveShaperNode} from './ExpWaveShaperNode'
 import {MidiGateNode} from './MidiGate'
 import {MidiPulseNode} from './MidiPulse'
 import {MidiMatchNode} from './MidiMatchNode'
+import {MidiMessageNode} from './MidiMessageNode'
 
 // Is there a way to use class decorators to create this map at runtime?
 export const typeClassMap: {readonly [key in ExpNodeType]: CorgiNodeConstructor} = {
@@ -61,4 +62,5 @@ export const typeClassMap: {readonly [key in ExpNodeType]: CorgiNodeConstructor}
 	midiGate: MidiGateNode,
 	midiPulse: MidiPulseNode,
 	midiMatch: MidiMatchNode,
+	midiMessage: MidiMessageNode,
 }

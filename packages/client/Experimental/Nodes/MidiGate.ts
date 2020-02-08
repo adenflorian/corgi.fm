@@ -57,6 +57,7 @@ export class MidiGateNode extends CorgiNode {
 		if (midiAction.type === 'MIDI_GATE') {
 			if (midiAction.gate) {
 				console.log(('on'))
+				// TODO This value won't get saved in redux
 				this._gateMode.onChange.invokeImmediately('allow')
 			} else {
 				console.log(('off'))
