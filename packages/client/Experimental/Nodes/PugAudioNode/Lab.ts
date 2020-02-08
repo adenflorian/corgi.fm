@@ -215,14 +215,14 @@ class LabAutoPoly<TNode extends KelpieAudioNode = KelpieAudioNode> extends LabMo
 
 	// Called on the target
 	public readonly onConnect = (source: LabAudioNode): readonly [LabTargetMode, Immutable.List<TNode>] => {
-		this._setVoiceCount(this._getMaxSourceVoiceCount())
+		this._setVoiceCount(this._getMaxSourceVoiceCount(), source)
 		return ['autoPoly', this._parent.voices]
 	}
 
 	public readonly onSourceVoiceCountChange = (source: LabAudioNode): readonly [LabTargetMode, Immutable.List<TNode>] => {
 		console.log(`${this._parent.creatorName} LabAutoPoly.onSourceVoiceCountChange source: ${source.name}`)
 
-		this._setVoiceCount(this._getMaxSourceVoiceCount())
+		this._setVoiceCount(this._getMaxSourceVoiceCount(), source)
 		return ['autoPoly', this._parent.voices]
 	}
 
@@ -289,7 +289,7 @@ class LabAutoPoly<TNode extends KelpieAudioNode = KelpieAudioNode> extends LabMo
 		return maxSourceVoiceCount
 	}
 
-	private readonly _setVoiceCount = (newVoiceCount: number) => {
+	private readonly _setVoiceCount = (newVoiceCount: number, sourceCatalyst?: LabAudioNode) => {
 		const delta = Math.max(newVoiceCount, 1) - this._parent.voices.size
 		console.log(`${this._parent.fullName} LabAutoPoly._setVoiceCount delta: ${delta}`, {this: this, newVoiceCount})
 
@@ -325,11 +325,15 @@ class LabAutoPoly<TNode extends KelpieAudioNode = KelpieAudioNode> extends LabMo
 				})
 			}
 			this._parent.targets.set(target.target, {target: target.target, targetVoices, targetMode})
-			console.log('$$$$$$$$$$$$$$$$$ ', this._parent, this._parent.sources)
-			this._parent.sources.forEach(source => source.currentModeImpl.onTargetVoiceCountChange(this._parent, 'autoPoly', this._parent.voices))
-			console.log('################# ', this._parent, this._parent.params)
+			this._parent.sources.forEach(source => {
+				// If this source is the one that caused our voice count to change,
+				// then we don't want to call them back saying our voice count changed
+				if (source === sourceCatalyst) return
+				source.currentModeImpl.onTargetVoiceCountChange(this._parent, 'autoPoly', this._parent.voices)
+			})
 			this._parent.params.forEach(param => {
 				param.sources.forEach(paramSource => {
+					if (paramSource === sourceCatalyst) return
 					paramSource.currentModeImpl.onTargetVoiceCountChange(param, 'autoPoly', this._parent.voices.map(param.getAudioParam))
 				})
 			})
@@ -362,12 +366,12 @@ class LabAutoPoly<TNode extends KelpieAudioNode = KelpieAudioNode> extends LabMo
 		})
 		console.log('%^%^%^%^%^%^%^%^ LabAutoPoly.onTargetVoiceCountChange ', this._parent, {oldTargetVoicesToDisconnect, newTargetVoicesToConnectTo})
 
-		// logger.assert(oldTargetVoicesToDisconnect.size > 0 || newTargetVoicesToConnectTo.size > 0, ':(', {
-		// 	oldTargetVoicesToDisconnect,
-		// 	newTargetVoicesToConnectTo,
-		// 	oldTargetVoices: oldTargetConnection.targetVoices,
-		// 	targetVoices,
-		// })
+		logger.assert(oldTargetVoicesToDisconnect.size > 0 || newTargetVoicesToConnectTo.size > 0, ':(', {
+			oldTargetVoicesToDisconnect,
+			newTargetVoicesToConnectTo,
+			oldTargetVoices: oldTargetConnection.targetVoices,
+			targetVoices,
+		})
 
 		this._parent.targets.set(target, {target, targetVoices, targetMode})
 	}
@@ -962,13 +966,13 @@ export abstract class KelpieAudioNode {
 			try {
 				this.output.disconnect(target.input as AudioNode)
 			} catch (error) {
-				logger.warn(`[KelpieAudioNode.disconnect] error thrown while disconnecting ${this.labNode.creatorName}.${this.name}(${this.voiceIndex}) to ${target.labNode.creatorName}.${target.name}(${target.voiceIndex}):`, error)
+				logger.warn(`[KelpieAudioNode.disconnect] error thrown while disconnecting ${this.labNode.creatorName}.${this.name}(${this.voiceIndex}) from ${target.labNode.creatorName}.${target.name}(${target.voiceIndex}):`, error)
 			}
 		} else {
 			try {
 				this.output.disconnect()
 			} catch (error) {
-				logger.warn(`[KelpieAudioNode.disconnect] error thrown while disconnecting ${this.labNode.creatorName}.${this.name}(${this.voiceIndex}) all:`, error)
+				logger.warn(`[KelpieAudioNode.disconnect] error thrown while disconnecting ${this.labNode.creatorName}.${this.name}(${this.voiceIndex}) from all:`, error)
 			}
 		}
 	}
