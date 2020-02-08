@@ -27,7 +27,7 @@ export class ExpGainNode extends CorgiNode {
 		this._customEnumParams = arrayToESIdKeyMap([this._autoPoly] as ExpCustomEnumParam<string>[])
 
 		this._gain = new LabGain({...corgiNodeArgs, voiceMode: 'autoPoly', creatorName: 'ExpGainNode'})
-		this._gain.gain.value = 0
+		this._gain.gain.onMakeVoice = gain => gain.setValueAtTime(0, 0)
 
 		this._dryWetChain = new DryWetChain(corgiNodeArgs.audioContext, this._gain, 'autoPoly')
 

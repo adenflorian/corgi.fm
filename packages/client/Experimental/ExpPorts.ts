@@ -206,7 +206,7 @@ class ParamInputWebAudioChain {
 	private readonly _gain: LabGain
 
 	public constructor(
-		audioContext: AudioContext,
+		private readonly audioContext: AudioContext,
 	) {
 		this._waveShaper = new LabWaveShaperNode({audioContext, voiceMode: 'autoPoly', creatorName: 'ParamInputWebAudioChain._waveShaper'})
 		this._gain = new LabGain({audioContext, voiceMode: 'autoPoly', creatorName: 'ParamInputWebAudioChain._gain'})
@@ -219,7 +219,7 @@ class ParamInputWebAudioChain {
 	}
 
 	public setGain(newGain: number) {
-		this._gain.gain.value = newGain
+		this._gain.gain.onMakeVoice = gain => gain.setValueAtTime(newGain, this.audioContext.currentTime)
 	}
 
 	public dispose() {
@@ -293,7 +293,8 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 
 		// All AudioParam values should be 0, because it will only be
 		// controlled from modulation sources, including the knob.
-		this.destination.setValueAtTime(0, 0)
+		// Currently doing this explicitly in the lab nodes
+		// this.destination.setValueAtTime(0, 0)
 
 		this._waveShaperClamp = new LabWaveShaperNode({audioContext: this._audioContext, voiceMode: 'autoPoly', autoMono: true, creatorName: node.onNameChange.current + '-' + node.id.substring(0, 8) + '-ExpNodeAudioParamInputPort.' + expAudioParam.id + '._waveShaperClamp'})
 		this._gainDenormalizer = new LabGain({audioContext: this._audioContext, voiceMode: 'autoPoly', autoMono: true, creatorName: node.onNameChange.current + '-' + node.id.substring(0, 8) + '-ExpNodeAudioParamInputPort.' + expAudioParam.id + '._gainDenormalizer'})
@@ -302,7 +303,7 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 		this._knobConstantSource.offset.setValueAtTime(expAudioParam.defaultNormalizedValue, 0)
 		this._knobValue = expAudioParam.defaultNormalizedValue
 
-		this._gainDenormalizer.gain.value = this.expAudioParam.maxValue
+		this._gainDenormalizer.gain.onMakeVoice = gain => gain.setValueAtTime(this.expAudioParam.maxValue, 0)
 
 		this._waveShaperClamp.curve = this.expAudioParam.curveFunctions.waveShaperCurve
 
@@ -420,10 +421,6 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 
 		if (existingChain) return existingChain.input
 
-		// console.log('%%^^ this._waveShaperClamp.setVoiceCount(autoPoly)')
-		// this._waveShaperClamp.setVoiceCount('autoPoly')
-		// this._gainDenormalizer.setVoiceCount('autoPoly')
-
 		const newChain = new ParamInputChain(
 			connectionId,
 			this._audioContext,
@@ -453,12 +450,6 @@ export class ExpNodeAudioParamInputPort extends ExpNodeAudioInputPort {
 		existingChain.dispose()
 
 		this._inputChains.delete(connection.id)
-
-		// if (this._inputChains.size === 0) {
-		// 	console.log('%%^^ this._inputChains.size === 0')
-		// 	this._waveShaperClamp.setVoiceCount('mono')
-		// 	this._gainDenormalizer.setVoiceCount('mono')
-		// }
 
 		this.onChainsChanged.invokeImmediately(this._inputChains)
 	}

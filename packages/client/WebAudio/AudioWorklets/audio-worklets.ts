@@ -60,14 +60,12 @@ export class LabDistortionNode extends LabAudioNode<KelpieDistortionNode> {
 
 	public constructor(args: LabAudioNodeArgs) {
 		super(args)
-		this.drive = new LabAudioParam(this, (kelpieDistortion) => kelpieDistortion.drive, 'drive')
-		this.voices.push(new KelpieDistortionNode({audioContext: this.audioContext, labNode: this}))
+		this.drive = new LabAudioParam(this, (kelpieDistortion) => kelpieDistortion.drive, 'drive', d => d.setValueAtTime(0, 0))
 		super.init()
 	}
 
 	public _makeVoice(): KelpieDistortionNode {
 		const newThing = new KelpieDistortionNode({audioContext: this.audioContext, labNode: this})
-		if (this.drive.lastSetValue !== undefined) newThing.drive.value = this.drive.lastSetValue
 		return newThing
 	}
 }

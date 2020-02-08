@@ -33,11 +33,11 @@ export class ConstantExpNode extends CorgiNode {
 	}
 
 	protected _enable() {
-		this._outputGain.gain.value = 1
+		this._outputGain.gain.onMakeVoice = gain => gain.setValueAtTime(1, this._audioContext.currentTime)
 	}
 
 	protected _disable() {
-		this._outputGain.gain.value = 0
+		this._outputGain.gain.onMakeVoice = gain => gain.setValueAtTime(0, this._audioContext.currentTime)
 	}
 
 	protected _dispose() {

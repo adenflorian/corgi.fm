@@ -17,7 +17,6 @@ export class LabCorgiAnalyserSPNode extends LabAudioNode<KelpieCorgiAnalyserSPNo
 		creatorName: string,
 	) {
 		super({audioContext: __audioContext, voiceMode: 'autoPoly', creatorName})
-		this.voices.push(new KelpieCorgiAnalyserSPNode({audioContext: this.audioContext, labNode: this}, this._onUpdatedValue, this._ignoreRepeats))
 		super.init()
 	}
 

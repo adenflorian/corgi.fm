@@ -73,13 +73,21 @@ export class PolyphonicGroupNode extends CorgiNode implements PolyInNode {
 	public render = () => this.getDebugView()
 
 	protected _enable = () => {
-		this._inputGains.forEach(x => x.gain.setValueAtTime(1, 0))
-		this._outputGains.forEach(x => x.gain.setValueAtTime(1, 0))
+		this._inputGains.forEach(x => {
+			x.gain.onMakeVoice = gain => gain.setValueAtTime(1, 0)
+		})
+		this._outputGains.forEach(x => {
+			x.gain.onMakeVoice = gain => gain.setValueAtTime(1, 0)
+		})
 	}
 
 	protected _disable = () => {
-		this._inputGains.forEach(x => x.gain.setValueAtTime(0, 0))
-		this._outputGains.forEach(x => x.gain.setValueAtTime(0, 0))
+		this._inputGains.forEach(x => {
+			x.gain.onMakeVoice = gain => gain.setValueAtTime(0, 0)
+		})
+		this._outputGains.forEach(x => {
+			x.gain.onMakeVoice = gain => gain.setValueAtTime(0, 0)
+		})
 	}
 
 	protected _dispose() {

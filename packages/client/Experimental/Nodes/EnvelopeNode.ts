@@ -41,10 +41,9 @@ export class EnvelopeNode extends CorgiNode {
 		this._waveShaper = new LabWaveShaperNode({audioContext: this._audioContext, voiceMode: 'autoPoly', creatorName: 'EnvelopeNode'})
 		this._waveShaper.curve = new Float32Array([-3, 1])
 
-		this._constantSource.offset.value = 0
 		this._constantSource.connect(this._waveShaper).connect(this._outputGain)
 
-		this._constantSource.offset.linearRampToValueAtTime(0, longTime)
+		this._constantSource.offset.onMakeVoice = offset => offset.linearRampToValueAtTime(0, longTime)
 
 		const outputPort = new ExpNodeAudioOutputPort('output', 'output', this, this._outputGain)
 		const midiInputPort = new ExpMidiInputPort('input', 'input', this, midiAction => this.receiveMidiAction.bind(this)(midiAction))
@@ -62,8 +61,12 @@ export class EnvelopeNode extends CorgiNode {
 
 	public render = () => this.getDebugView()
 
-	protected _enable = () => this._outputGain.gain.value = 1
-	protected _disable = () => this._outputGain.gain.value = 0
+	protected _enable = () => {
+		this._outputGain.gain.onMakeVoice = gain => gain.setValueAtTime(1, this._audioContext.currentTime)
+	}
+	protected _disable = () => {
+		this._outputGain.gain.onMakeVoice = gain => gain.setValueAtTime(0, this._audioContext.currentTime)
+	}
 
 	protected _dispose() {
 		this._constantSource.dispose()

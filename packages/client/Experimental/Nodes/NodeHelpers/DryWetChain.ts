@@ -9,7 +9,7 @@ export class DryWetChain {
 	public readonly outputGain: LabGain
 
 	public constructor(
-		audioContext: AudioContext,
+		private readonly audioContext: AudioContext,
 		wetInternalNode: LabAudioNode,
 		voiceMode: ExpNodePolyMode,
 		wetInternalOutputNode?: LabAudioNode,
@@ -31,8 +31,12 @@ export class DryWetChain {
 			.connect(this.wetPostGain)
 			.connect(this.outputGain)
 
-		this.dryGain.gain.value = 0
-		this.wetGain.gain.value = 1
+		
+		this.inputGain.gain.onMakeVoice = gain => gain.setValueAtTime(1, this.audioContext.currentTime)
+		this.dryGain.gain.onMakeVoice = gain => gain.setValueAtTime(0, this.audioContext.currentTime)
+		this.wetGain.gain.onMakeVoice = gain => gain.setValueAtTime(1, this.audioContext.currentTime)
+		this.wetPostGain.gain.onMakeVoice = gain => gain.setValueAtTime(1, this.audioContext.currentTime)
+		this.outputGain.gain.onMakeVoice = gain => gain.setValueAtTime(1, this.audioContext.currentTime)
 	}
 
 	public setAutoPoly(autoPoly: ExpNodePolyMode) {
@@ -40,15 +44,15 @@ export class DryWetChain {
 	}
 
 	public wetOnly() {
-		this.dryGain.gain.value = 0
-		this.wetGain.gain.value = 1
-		this.wetPostGain.gain.value = 1
+		this.dryGain.gain.onMakeVoice = gain => gain.setValueAtTime(0, this.audioContext.currentTime)
+		this.wetGain.gain.onMakeVoice = gain => gain.setValueAtTime(1, this.audioContext.currentTime)
+		this.wetPostGain.gain.onMakeVoice = gain => gain.setValueAtTime(1, this.audioContext.currentTime)
 	}
 
 	public dryOnly() {
-		this.dryGain.gain.value = 1
-		this.wetGain.gain.value = 0
-		this.wetPostGain.gain.value = 0
+		this.dryGain.gain.onMakeVoice = gain => gain.setValueAtTime(1, this.audioContext.currentTime)
+		this.wetGain.gain.onMakeVoice = gain => gain.setValueAtTime(0, this.audioContext.currentTime)
+		this.wetPostGain.gain.onMakeVoice = gain => gain.setValueAtTime(0, this.audioContext.currentTime)
 	}
 
 	public dispose() {

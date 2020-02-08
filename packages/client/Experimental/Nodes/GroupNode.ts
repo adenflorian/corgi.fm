@@ -50,13 +50,13 @@ export class GroupNode extends CorgiNode {
 	public render = () => this.getDebugView()
 
 	protected _enable = () => {
-		this._inputGains.forEach(x => x.gain.setValueAtTime(1, 0))
-		this._outputGains.forEach(x => x.gain.setValueAtTime(1, 0))
+		this._inputGains.forEach(x => x.gain.onMakeVoice = gain => gain.setValueAtTime(1, 0))
+		this._outputGains.forEach(x => x.gain.onMakeVoice = gain => gain.setValueAtTime(1, 0))
 	}
 
 	protected _disable = () => {
-		this._inputGains.forEach(x => x.gain.setValueAtTime(0, 0))
-		this._outputGains.forEach(x => x.gain.setValueAtTime(0, 0))
+		this._inputGains.forEach(x => x.gain.onMakeVoice = gain => gain.setValueAtTime(0, 0))
+		this._outputGains.forEach(x => x.gain.onMakeVoice = gain => gain.setValueAtTime(0, 0))
 	}
 
 	protected _dispose() {
@@ -77,11 +77,15 @@ export class GroupNode extends CorgiNode {
 					return [new ExpNodeAudioParamInputPort(audioParam, this, this._corgiNodeArgs, 'center'), audioParam]
 				} else {
 					const newGain = new LabGain({audioContext: this._audioContext, voiceMode: 'autoPoly', creatorName: 'GroupNode'})
+					const newGainValue = this._enabled ? 1 : 0
+					newGain.gain.onMakeVoice = gain => gain.setValueAtTime(newGainValue, 0)
 					this._inputGains.set(id, newGain)
 					return [new ExpNodeAudioInputPort(id, id as string, this, newGain), undefined]
 				}
 			} else if (inputOrOutput === 'output') {
 				const newGain = new LabGain({audioContext: this._audioContext, voiceMode: 'autoPoly', creatorName: 'GroupNode'})
+				const newGainValue = this._enabled ? 1 : 0
+				newGain.gain.onMakeVoice = gain => gain.setValueAtTime(newGainValue, 0)
 				this._outputGains.set(id, newGain)
 				return [new ExpNodeAudioOutputPort(id, id as string, this, newGain), undefined]
 			}
