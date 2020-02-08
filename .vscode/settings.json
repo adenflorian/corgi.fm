@@ -188,7 +188,8 @@
         ".cache",
         "TODO.md",
         "nginx-site-config",
-        "**/package.json"
+        "**/package.json",
+        "**/tsconfig.json"
     ],
     "less.lint.emptyRules": "ignore",
     "files.associations": {

@@ -25,6 +25,7 @@ import {PolyphonicGroupNode} from './PolyphonicGroupNode'
 import {PolyphonicGroupInputNode} from './PolyphonicGroupInputNode'
 import {PolyphonicGroupOutputNode} from './PolyphonicGroupOutputNode'
 import {ExpPolyTestNode} from './ExpPolyTestNode'
+import {ExpWaveShaperNode} from './ExpWaveShaperNode'
 
 // Is there a way to use class decorators to create this map at runtime?
 export const typeClassMap: {readonly [key in ExpNodeType]: CorgiNodeConstructor} = {
@@ -53,4 +54,5 @@ export const typeClassMap: {readonly [key in ExpNodeType]: CorgiNodeConstructor}
 	polyphonicGroupInput: PolyphonicGroupInputNode,
 	polyphonicGroupOutput: PolyphonicGroupOutputNode,
 	polyTest: ExpPolyTestNode,
+	waveShaper: ExpWaveShaperNode,
 }
