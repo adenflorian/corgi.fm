@@ -43,7 +43,10 @@ export class EnvelopeNode extends CorgiNode {
 
 		this._constantSource.connect(this._waveShaper).connect(this._outputGain)
 
-		this._constantSource.offset.onMakeVoice = offset => offset.linearRampToValueAtTime(0, longTime)
+		this._constantSource.offset.onMakeVoice = offset => {
+			offset.setValueAtTime(0, 0)
+			offset.linearRampToValueAtTime(0, longTime)
+		}
 
 		const outputPort = new ExpNodeAudioOutputPort('output', 'output', this, this._outputGain)
 		const midiInputPort = new ExpMidiInputPort('input', 'input', this, midiAction => this.receiveMidiAction.bind(this)(midiAction))
