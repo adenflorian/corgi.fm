@@ -1,5 +1,6 @@
 import {logger} from '../../../client-logger'
 import * as Immutable from 'immutable'
+import {clamp} from '@corgifm/common/common-utils'
 
 // Lab
 export type LabTarget<TTarget extends KelpieAudioNode = KelpieAudioNode> = LabAudioNode<TTarget> | LabAudioParam<TTarget>
@@ -813,6 +814,12 @@ export class LabOscillator extends LabAudioNode<KelpieOscillator> {
 		this._type = value
 	}
 
+	private _unisonCount: number = 1
+	public set unisonCount(value: number) {
+		this.voices.forEach(voice => voice.unisonCount = value)
+		this._unisonCount = value
+	}
+
 	public constructor(args: LabAudioNodeArgs) {
 		super(args)
 		this.frequency = new LabAudioParam(this, (kelpieOsc) => kelpieOsc.frequency, 'frequency', f => f.setValueAtTime(0, 0))
@@ -821,9 +828,9 @@ export class LabOscillator extends LabAudioNode<KelpieOscillator> {
 	}
 
 	protected readonly _makeVoice = (voiceIndex: number): KelpieOscillator => {
-		const newOsc = new KelpieOscillator({audioContext: this.audioContext, labNode: this, voiceIndex})
+		const newOsc = new KelpieOscillator({audioContext: this.audioContext, labNode: this, voiceIndex}, 0)
 		newOsc.type = this._type
-		newOsc.start()
+		newOsc.unisonCount = this._unisonCount
 		return newOsc
 	}
 }
@@ -1038,7 +1045,7 @@ export class KelpieAudioParam {
 	}
 }
 
-class KelpieOscillator extends KelpieAudioNode {
+class KelpieOscillatorOLD extends KelpieAudioNode {
 	public readonly name = 'Oscillator'
 	private readonly _osc: OscillatorNode
 	public readonly frequency: KelpieAudioParam
@@ -1062,6 +1069,108 @@ class KelpieOscillator extends KelpieAudioNode {
 	public get output(): AudioNode {return this._osc}
 	protected _dispose() {
 		this._osc.stop()
+	}
+}
+
+const minUnisonCount = 1
+const maxUnisonCount = 16
+
+class KelpieOscillator extends KelpieAudioNode {
+	public readonly name = 'UberOscillator'
+	private readonly _oscillators: OscillatorNode[] = []
+	public readonly frequency: KelpieAudioParam
+	public readonly detune: KelpieAudioParam
+	private readonly _frequencyConstantNode: ConstantSourceNode
+	private readonly _detuneConstantNode: ConstantSourceNode
+	private readonly _outputGain: GainNode
+	public get voiceCount() {return this._oscillators.length}
+
+	private _type: OscillatorType = 'sawtooth'
+	public set type(value: OscillatorType) {
+		this._type = value
+		this._oscillators.forEach(osc => osc.type = this._type)
+	}
+
+	public set unisonCount(newVoiceCount: number) {
+		const delta = Math.max(newVoiceCount, 1) - this.voiceCount
+
+		if (delta > 0) {
+			this._addVoices(delta)
+		} else if (delta < 0) {
+			this._deleteVoices(Math.abs(delta))
+		} else {
+			return
+		}
+	}
+
+	public set unisonDetune(value: number) {
+		const clampedDetune = clamp(value, 0, 1)
+	}
+
+	public constructor(
+		args: KelpieAudioNodeArgs,
+		public readonly startTime: number,
+	) {
+		super(args)
+		this._outputGain = this._audioContext.createGain()
+		this._frequencyConstantNode = this._audioContext.createConstantSource()
+		this._frequencyConstantNode.offset.setValueAtTime(0, 0)
+		this._frequencyConstantNode.start(0)
+		this._detuneConstantNode = this._audioContext.createConstantSource()
+		this._detuneConstantNode.offset.setValueAtTime(0, 0)
+		this._detuneConstantNode.start(0)
+		this.frequency = new KelpieAudioParam(this._audioContext, this._frequencyConstantNode.offset, 'frequency', this)
+		this.detune = new KelpieAudioParam(this._audioContext, this._detuneConstantNode.offset, 'detune', this)
+		this._addVoices(1)
+	}
+
+	private _addVoices(numberToAdd: number) {
+		for (let i = 0; i < numberToAdd; i++) {
+			this._oscillators.push(this._makeOsc())
+		}
+		this._updateUnisonDetune()
+	}
+
+	private _deleteVoices(numberToDelete: number) {
+		for (let i = 0; i < numberToDelete; i++) {
+			const deletedOsc = this._oscillators.pop()
+			if (deletedOsc === undefined) {
+				logger.error('[MyMegaOscillator._deleteVoices] deletedOsc is undefined:', {source: this, voices: this._oscillators, numberToDelete})
+			} else {
+				this._frequencyConstantNode.connect(deletedOsc.frequency)
+				this._detuneConstantNode.connect(deletedOsc.detune)
+				deletedOsc.disconnect()
+			}
+		}
+		this._updateUnisonDetune()
+	}
+
+	private _updateUnisonDetune() {
+		// TODO
+	}
+
+	private _makeOsc() {
+		const newOsc = this._audioContext.createOscillator()
+		newOsc.frequency.setValueAtTime(0, 0)
+		newOsc.detune.setValueAtTime((Math.random() * 100) - 50, 0)
+		newOsc.type = this._type
+		newOsc.connect(this._outputGain)
+		this._frequencyConstantNode.connect(newOsc.frequency)
+		this._detuneConstantNode.connect(newOsc.detune)
+		newOsc.start(this.startTime)
+		return newOsc
+	}
+
+	public get input(): AudioNode {return this._outputGain}
+	public get output(): AudioNode {return this._outputGain}
+	protected _dispose() {
+		this._oscillators.forEach(osc => {
+			osc.stop()
+		})
+		this._frequencyConstantNode.disconnect()
+		this._detuneConstantNode.disconnect()
+		this._frequencyConstantNode.stop()
+		this._detuneConstantNode.stop()
 	}
 }
 

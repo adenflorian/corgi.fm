@@ -28,7 +28,7 @@
 - [ ] implement enable/disable for all nodes
 - [ ] prevent clicks when adding/removing connections
 - [ ] prevent clicks for enable/disable on all nodes
-- [ ] Delay node
+- [√] Delay node
 - [ ] Reverb node
 - [ ] Phaser node
 - [ ] WaveShaper distortion node
@@ -36,7 +36,7 @@
 - [ ] enable room type selector for test
 
 ## Test Weekend 1.5?
-- [ ] create enum param type (knob/dropdown/buttonSelect)
+- [√] create enum param type (knob/dropdown/buttonSelect)
 
 ## Test Weekend 2
 - [ ] voice and unison params for oscillator?
