@@ -27,10 +27,10 @@ export class FilterNode extends CorgiNode {
 		this._type.onChange.subscribe(this.onTypeChange)
 		this._customEnumParams = arrayToESIdKeyMap([this._type] as ExpCustomEnumParam<string>[])
 
-		this._filter = new LabBiquadFilterNode({...corgiNodeArgs, voiceMode: 'mono', creatorName: 'FilterNode'})
+		this._filter = new LabBiquadFilterNode({...corgiNodeArgs, voiceMode: 'autoPoly', creatorName: 'FilterNode'})
 		this._filter.type = 'lowpass'
 
-		this._dryWetChain = new DryWetChain(corgiNodeArgs.audioContext, this._filter, 'mono')
+		this._dryWetChain = new DryWetChain(corgiNodeArgs.audioContext, this._filter, 'autoPoly')
 
 		const frequencyParam = new ExpAudioParam('frequency', this._filter.frequency, 632, 20000, 'unipolar', {valueString: filterValueToString, curveFunctions: filterFreqCurveFunctions})
 		const detuneParam = new ExpAudioParam('detune', this._filter.detune, 0, 100, 'bipolar', {valueString: filterValueToString})

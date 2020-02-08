@@ -39,7 +39,6 @@ export class PolyphonicGroupNode extends CorgiNode implements PolyInNode {
 
 		const portStates = _corgiNodeArgs.ports || new Map<Id, ExpPortState>()
 
-		// const polyInputPort = new ExpPolyphonicInputPort('poly', 'poly', this)
 		this._outGain = new LabGain({audioContext: this._audioContext, voiceMode: 'autoPoly', creatorName: 'PolyphonicGroupNode'})
 		const audioOut = new ExpNodeAudioOutputPort('out', 'out', this, this._outGain)
 
@@ -49,7 +48,7 @@ export class PolyphonicGroupNode extends CorgiNode implements PolyInNode {
 
 		const ports = [...portStates].map(x => x[1]).map(this._createPort)
 
-		this._ports = arrayToESIdKeyMap([...ports.map(x => x[0])/*, polyInputPort*/, audioOut, this._pitchInputPort, this._midiInputPort])
+		this._ports = arrayToESIdKeyMap([...ports.map(x => x[0]), audioOut, this._pitchInputPort, this._midiInputPort])
 
 		this._audioParams = arrayToESIdKeyMap(ports.map(x => x[1]).filter(x => x !== undefined) as ExpAudioParam[])
 	}

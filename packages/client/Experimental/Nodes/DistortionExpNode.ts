@@ -22,9 +22,9 @@ export class DistortionExpNode extends CorgiNode {
 			requiresAudioWorklet: true,
 		})
 
-		this._distortion = new LabDistortionNode({audioContext: this._audioContext, voiceMode: 'mono', creatorName: 'DistortionExpNode'})
+		this._distortion = new LabDistortionNode({audioContext: this._audioContext, voiceMode: 'autoPoly', creatorName: 'DistortionExpNode'})
 
-		this._dryWetChain = new DryWetChain(corgiNodeArgs.audioContext, this._distortion, 'mono')
+		this._dryWetChain = new DryWetChain(corgiNodeArgs.audioContext, this._distortion, 'autoPoly')
 
 		const driveParam = new ExpAudioParam('drive', this._distortion.drive, 0.25, 1, 'unipolar', {valueString: percentageValueString})
 		this._audioParams = arrayToESIdKeyMap([driveParam])
