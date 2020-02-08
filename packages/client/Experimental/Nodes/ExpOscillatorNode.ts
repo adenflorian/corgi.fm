@@ -2,7 +2,7 @@ import {CssColor} from '@corgifm/common/shamu-color'
 import {oscillatorFreqCurveFunctions, arrayToESIdKeyMap} from '@corgifm/common/common-utils'
 import {maxPitchFrequency} from '@corgifm/common/common-constants'
 import {
-	filterValueToString, detuneValueToString,
+	filterValueToString, detuneValueToString, percentageValueString,
 } from '../../client-constants'
 import {
 	ExpNodeAudioOutputPort, ExpNodeAudioParamInputPort, ExpPorts,
@@ -39,13 +39,15 @@ export class OscillatorExpNode extends CorgiNode {
 
 		const frequencyParam = new ExpAudioParam('frequency', this._oscillator.frequency, 440, maxPitchFrequency, 'unipolar', {valueString: filterValueToString, curveFunctions: oscillatorFreqCurveFunctions})
 		const detuneParam = new ExpAudioParam('detune', this._oscillator.detune, 0, 100, 'bipolar', {valueString: detuneValueToString})
+		const unisonDetuneParam = new ExpAudioParam('unisonDetune', this._oscillator.unisonDetune, 0, 1, 'unipolar', {valueString: percentageValueString})
 
 		const frequencyPort = new ExpNodeAudioParamInputPort(frequencyParam, this, corgiNodeArgs, 'offset')
 		const detunePort = new ExpNodeAudioParamInputPort(detuneParam, this, corgiNodeArgs, 'center')
+		const unisonDetunePort = new ExpNodeAudioParamInputPort(unisonDetuneParam, this, corgiNodeArgs, 'offset')
 		const outputPort = new ExpNodeAudioOutputPort('output', 'output', this, this._outputChain.output)
 
-		this._ports = arrayToESIdKeyMap([frequencyPort, detunePort, outputPort])
-		this._audioParams = arrayToESIdKeyMap([frequencyParam, detuneParam])
+		this._ports = arrayToESIdKeyMap([frequencyPort, detunePort, unisonDetunePort, outputPort])
+		this._audioParams = arrayToESIdKeyMap([frequencyParam, detuneParam, unisonDetuneParam])
 
 		this._unisonCount = new ExpCustomNumberParam('unisonCount', 1, 1, 16, 1, val => Math.round(val).toString()) // 0.0005
 		this._customNumberParams = arrayToESIdKeyMap([this._unisonCount])
