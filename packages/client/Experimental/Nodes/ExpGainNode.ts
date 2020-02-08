@@ -23,13 +23,13 @@ export class ExpGainNode extends CorgiNode {
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
 		super(corgiNodeArgs, {name: 'Gain', color: CssColor.orange})
 
-		this._autoPoly = new ExpCustomEnumParam<AutoPoly>('autoPoly', 'mono', autoPolyOptions)
+		this._autoPoly = new ExpCustomEnumParam<AutoPoly>('autoPoly', 'autoPoly', autoPolyOptions)
 		this._customEnumParams = arrayToESIdKeyMap([this._autoPoly] as ExpCustomEnumParam<string>[])
 
-		this._gain = new LabGain({...corgiNodeArgs, voiceMode: 'mono', creatorName: 'ExpGainNode'})
+		this._gain = new LabGain({...corgiNodeArgs, voiceMode: 'autoPoly', creatorName: 'ExpGainNode'})
 		this._gain.gain.value = 0
 
-		this._dryWetChain = new DryWetChain(corgiNodeArgs.audioContext, this._gain, 'mono')
+		this._dryWetChain = new DryWetChain(corgiNodeArgs.audioContext, this._gain, 'autoPoly')
 
 		const gainParam = new ExpAudioParam('gain', this._gain.gain, 1, 1, 'unipolar', {valueString: gainDecibelValueToString})
 		this._audioParams = arrayToESIdKeyMap([gainParam]) as ReadonlyMap<Id, ExpAudioParam>

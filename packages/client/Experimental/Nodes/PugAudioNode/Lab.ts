@@ -113,7 +113,7 @@ export abstract class LabAudioNode<TNode extends KelpieAudioNode = KelpieAudioNo
 			})
 			this.params.forEach(param => {
 				param.sources.forEach(source => {
-					source.onTargetVoiceModeChange(param, newVoiceCount, this.voices)
+					source.onTargetVoiceModeChange(param, newVoiceCount, this.voices.map(param.getAudioParam))
 				})
 			})
 		} else if (newVoiceCount === 'autoPoly') {
@@ -124,7 +124,7 @@ export abstract class LabAudioNode<TNode extends KelpieAudioNode = KelpieAudioNo
 			})
 			this.params.forEach(param => {
 				param.sources.forEach(source => {
-					source.onTargetVoiceModeChange(param, newVoiceCount, this.voices)
+					source.onTargetVoiceModeChange(param, newVoiceCount, this.voices.map(param.getAudioParam))
 				})
 			})
 		} else {
