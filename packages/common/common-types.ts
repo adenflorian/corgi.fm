@@ -64,9 +64,11 @@ export interface IKeyColors {
 	}
 }
 
-export type SignalRange = 'unipolar' | 'bipolar'
+export const signalRangeOptions = ['unipolar', 'bipolar'] as const
+export type SignalRange = typeof signalRangeOptions[number]
 
-export type ParamInputCentering = 'center' | 'offset'
+export const paramInputCenteringOptions = ['center', 'offset'] as const
+export type ParamInputCentering = typeof paramInputCenteringOptions[number]
 
 export interface SequencerEvent {
 	readonly gate: boolean
