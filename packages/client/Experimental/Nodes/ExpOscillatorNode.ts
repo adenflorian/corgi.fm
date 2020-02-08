@@ -38,8 +38,8 @@ export class OscillatorExpNode extends CorgiNode {
 		this._oscillator.connect(this._outputChain.input)
 
 		const frequencyParam = new ExpAudioParam('frequency', this._oscillator.frequency, 440, maxPitchFrequency, 'unipolar', {valueString: filterValueToString, curveFunctions: oscillatorFreqCurveFunctions})
-		const detuneParam = new ExpAudioParam('detune', this._oscillator.detune, 0, 100, 'bipolar', {valueString: detuneValueToString})
-		const unisonDetuneParam = new ExpAudioParam('unisonDetune', this._oscillator.unisonDetune, 0, 1, 'unipolar', {valueString: percentageValueString})
+		const detuneParam = new ExpAudioParam('fine', this._oscillator.detune, 0, 100, 'bipolar', {valueString: detuneValueToString})
+		const unisonDetuneParam = new ExpAudioParam('detune', this._oscillator.unisonDetune, 0, 1, 'unipolar', {valueString: percentageValueString})
 
 		const frequencyPort = new ExpNodeAudioParamInputPort(frequencyParam, this, corgiNodeArgs, 'offset')
 		const detunePort = new ExpNodeAudioParamInputPort(detuneParam, this, corgiNodeArgs, 'center')
@@ -49,7 +49,7 @@ export class OscillatorExpNode extends CorgiNode {
 		this._ports = arrayToESIdKeyMap([frequencyPort, detunePort, unisonDetunePort, outputPort])
 		this._audioParams = arrayToESIdKeyMap([frequencyParam, detuneParam, unisonDetuneParam])
 
-		this._unisonCount = new ExpCustomNumberParam('unisonCount', 1, 1, 16, 1, val => Math.round(val).toString()) // 0.0005
+		this._unisonCount = new ExpCustomNumberParam('unison', 1, 1, 16, 1, val => Math.round(val).toString()) // 0.0005
 		this._customNumberParams = arrayToESIdKeyMap([this._unisonCount])
 		
 		this._unisonCount.onChange.subscribe(this._onUnisonCountChange)
