@@ -97,6 +97,11 @@ export const midiActions = {
 		time,
 		newCount,
 	} as const),
+	message: (time: number, message: string) => ({
+		type: 'MESSAGE' as const,
+		time,
+		message,
+	} as const),
 } as const
 
 export type MidiAction = ReturnType<typeof midiActions[keyof typeof midiActions]>
