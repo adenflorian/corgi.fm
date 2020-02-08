@@ -3,7 +3,7 @@ import {hot} from 'react-hot-loader'
 import {
 	ExpPorts, AudioParamInputPortContext, ExpNodeAudioParamInputPort,
 } from './ExpPorts'
-import {ExpAudioParams, ExpCustomNumberParams, AudioParamContext, ExpCustomEnumParams} from './ExpParams'
+import {ExpAudioParams, ExpCustomNumberParams, AudioParamContext, ExpCustomEnumParams, ExpCustomStringParams} from './ExpParams'
 import {useNodeContext} from './CorgiNode'
 import {ExpMaxValue} from './ExpMaxValue'
 import {useStringChangedEvent} from './hooks/useCorgiEvent'
@@ -13,13 +13,14 @@ interface Props {
 	audioParams: ExpAudioParams
 	customNumberParams: ExpCustomNumberParams
 	customEnumParams: ExpCustomEnumParams
+	customStringParams: ExpCustomStringParams
 	ports: ExpPorts
 	children?: React.ReactNode
 }
 
 export const ExpNodeMaxView = hot(module)(React.memo(function _ExpNodeMaxView({
 	audioParams, customNumberParams, children,
-	ports, customEnumParams,
+	ports, customEnumParams, customStringParams,
 }: Props) {
 	const nodeContext = useNodeContext()
 	const nodeName = useStringChangedEvent(nodeContext.onNameChange)

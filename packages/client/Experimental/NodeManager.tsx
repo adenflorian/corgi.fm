@@ -13,7 +13,7 @@ import {
 	ExpMidiConnection, isMidiConnection, ExpPolyphonicConnection,
 	isPolyphonicConnection,
 } from './ExpConnections'
-import {NumberParamChange, EnumParamChange} from './ExpParams'
+import {NumberParamChange, EnumParamChange, StringParamChange} from './ExpParams'
 import {
 	isAudioOutputPort, isAudioInputPort, ExpPortType,
 	isAudioParamInputPort, ExpPort,
@@ -173,6 +173,14 @@ export class NodeManager {
 		node.onCustomEnumParamChange(paramChange.paramId, paramChange.newValue)
 	}
 
+	public readonly onCustomStringParamChange = (paramChange: StringParamChange) => {
+		const node = this._mainGraph.nodes.get(paramChange.nodeId)
+
+		if (!node) return logger.warn('[onCustomStringParamChange] 404 node not found: ', {paramChange})
+
+		node.onCustomStringParamChange(paramChange.paramId, paramChange.newValue)
+	}
+
 	public readonly loadMainGraph = (mainGraph: ExpGraph) => {
 		this.addNodes(mainGraph.nodes)
 		this.addConnections(mainGraph.connections.connections)
@@ -207,6 +215,7 @@ export class NodeManager {
 		nodeState.audioParams.forEach((newValue, paramId) => node.onAudioParamChange(paramId, newValue))
 		nodeState.customNumberParams.forEach((newValue, paramId) => node.onCustomNumberParamChange(paramId, newValue))
 		nodeState.customEnumParams.forEach((newValue, paramId) => node.onCustomEnumParamChange(paramId, newValue))
+		nodeState.customStringParams.forEach((newValue, paramId) => node.onCustomStringParamChange(paramId, newValue))
 		node.setEnabled(nodeState.enabled)
 	}
 

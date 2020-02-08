@@ -71,6 +71,15 @@ export const expNodesActions = {
 		BROADCASTER_ACTION,
 		SERVER_ACTION,
 	} as const),
+	customStringParamChange: (nodeId: Id, paramId: Id, newValue: string) => ({
+		type: 'EXP_NODE_CUSTOM_STRING_PARAM_CHANGE' as const,
+		isExpNodeAction: true,
+		nodeId,
+		paramId,
+		newValue,
+		BROADCASTER_ACTION,
+		SERVER_ACTION,
+	} as const),
 	setEnabled: (nodeId: Id, enabled: boolean) => ({
 		type: 'EXP_NODE_SET_ENABLED',
 		nodeId,
@@ -106,6 +115,7 @@ const defaultExpNodeState = {
 	audioParams: Map<Id, number>(),
 	customNumberParams: Map<Id, number>(),
 	customEnumParams: Map<Id, string>(),
+	customStringParams: Map<Id, string>(),
 	enabled: true,
 	groupId: topGroupId as GroupId,
 }
@@ -120,6 +130,7 @@ export function makeExpNodeState(node: Pick<typeof defaultExpNodeState, 'groupId
 		.set('audioParams', Map(node.audioParams || Map()))
 		.set('customNumberParams', Map(node.customNumberParams || Map()))
 		.set('customEnumParams', Map(node.customEnumParams || Map()))
+		.set('customStringParams', Map(node.customStringParams || Map()))
 		.set('ports', Map<Id, ExpPortState>(node.ports || Map()).map(makeExpPortState))
 }
 
@@ -152,7 +163,7 @@ export const expNodeTypes = [
 	GroupExpNodeType, 'groupInput', 'groupOutput',
 	PolyphonicGroupExpNodeType, 'polyphonicGroupInput', 'polyphonicGroupOutput',
 	'midiRandom', 'midiPitch', 'oscilloscope', 'polyTest', 'waveShaper', 'midiGate',
-	'midiPulse',
+	'midiPulse', 'midiMatch',
 ] as const
 
 export const groupInOutNodeTypes: ExpNodeType[] = [
@@ -189,6 +200,8 @@ export const expNodesReducer = (state = initialState, action: ExpNodesAction): E
 			action.nodeId, x => x.update('customNumberParams', customNumberParams => customNumberParams.set(action.paramId, action.newValue)))
 		case 'EXP_NODE_CUSTOM_ENUM_PARAM_CHANGE': return state.update(
 			action.nodeId, x => x.update('customEnumParams', customEnumParams => customEnumParams.set(action.paramId, action.newValue)))
+		case 'EXP_NODE_CUSTOM_STRING_PARAM_CHANGE': return state.update(
+			action.nodeId, x => x.update('customStringParams', customStringParams => customStringParams.set(action.paramId, action.newValue)))
 		case 'EXP_NODE_SET_ENABLED': return state.update(
 			action.nodeId, x => x.set('enabled', action.enabled))
 		case 'EXP_NODE_SET_GROUP': return state.withMutations(mutable => {
@@ -214,6 +227,7 @@ export function loadPresetIntoNodeState(preset: ExpNodeState, node: ExpNodeState
 		audioParams: preset.audioParams,
 		customNumberParams: preset.customNumberParams,
 		customEnumParams: preset.customEnumParams,
+		customStringParams: preset.customStringParams,
 	}
 	return makeExpNodeState(foo)
 }

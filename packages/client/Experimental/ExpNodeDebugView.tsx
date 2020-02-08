@@ -6,23 +6,25 @@ import {
 	ExpPort, ExpPorts, AudioParamInputPortContext, ExpNodeAudioParamInputPort,
 } from './ExpPorts'
 import {ExpNodeDebugAudioParamKnob} from './ExpNodeDebugAudioParamKnob'
-import {ExpAudioParams, ExpCustomNumberParams, AudioParamContext, ExpCustomEnumParams} from './ExpParams'
+import {ExpAudioParams, ExpCustomNumberParams, AudioParamContext, ExpCustomEnumParams, ExpCustomStringParams} from './ExpParams'
 import {ExpNodeDebugCustomNumberParamKnob} from './ExpNodeDebugCustomNumberParamKnob'
 import {useNodeContext} from './CorgiNode'
 import {useObjectChangedEvent, useStringChangedEvent} from './hooks/useCorgiEvent'
 import {ExpNodeDebugCustomEnumParamSelect} from './ExpNodeDebugCustomEnumParamSelect'
+import {ExpNodeDebugCustomStringParamField} from './ExpNodeDebugCustomStringParamField'
 
 interface Props {
 	audioParams: ExpAudioParams
 	customNumberParams: ExpCustomNumberParams
 	customEnumParams: ExpCustomEnumParams
+	customStringParams: ExpCustomStringParams
 	ports: ExpPorts
 	children?: React.ReactNode
 }
 
 export const ExpNodeDebugView = hot(module)(React.memo(function _ExpNodeDebugView({
 	audioParams, customNumberParams, children,
-	ports, customEnumParams,
+	ports, customEnumParams, customStringParams,
 }: Props) {
 	const nodeContext = useNodeContext()
 	// const nodeName = useStringChangedEvent(nodeContext.onNameChange)
@@ -86,6 +88,15 @@ export const ExpNodeDebugView = hot(module)(React.memo(function _ExpNodeDebugVie
 							key={id as string}
 							nodeId={nodeId}
 							customEnumParam={customEnumParam}
+						/>
+					))}
+				</div>
+				<div className="stringParams">
+					{[...customStringParams].map(([id, customStringParam]) => (
+						<ExpNodeDebugCustomStringParamField
+							key={id as string}
+							nodeId={nodeId}
+							customStringParam={customStringParam}
 						/>
 					))}
 				</div>

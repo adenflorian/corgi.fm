@@ -9,7 +9,7 @@ import {SingletonContextImpl} from '../SingletonContext'
 import {
 	ExpPorts, ExpPort, isAudioOutputPort, isAudioParamInputPort,
 } from './ExpPorts'
-import {ExpAudioParams, ExpCustomNumberParams, ExpCustomEnumParams} from './ExpParams'
+import {ExpAudioParams, ExpCustomNumberParams, ExpCustomEnumParams, ExpCustomStringParams} from './ExpParams'
 import {CorgiNodeView} from './CorgiNodeView'
 import {GroupNode} from './Nodes/GroupNode'
 import {CorgiStringChangedEvent} from './CorgiEvents'
@@ -60,6 +60,7 @@ export abstract class CorgiNode {
 	protected readonly _ports: ExpPorts = new Map()
 	protected readonly _customNumberParams: ExpCustomNumberParams = new Map()
 	protected readonly _customEnumParams: ExpCustomEnumParams = new Map()
+	protected readonly _customStringParams: ExpCustomStringParams = new Map()
 	protected _enabled = true
 	public readonly onNameChange: CorgiStringChangedEvent
 	public readonly onColorChange: CorgiStringChangedEvent
@@ -145,6 +146,14 @@ export abstract class CorgiNode {
 		customEnumParam.onChange.invokeImmediately(newValue)
 	}
 
+	public onCustomStringParamChange(paramId: Id, newValue: string) {
+		const customStringParam = this._customStringParams.get(paramId)
+
+		if (!customStringParam) return logger.warn('[onCustomStringParamChange] 404 customStringParam not found: ', {paramId, newValue})
+
+		customStringParam.value.invokeImmediately(newValue)
+	}
+
 	public getPort(id: Id): ExpPort | undefined {
 		return this._ports.get(id)
 	}
@@ -159,6 +168,7 @@ export abstract class CorgiNode {
 				context={this as CorgiNodeReact}
 				customNumberParams={this._customNumberParams}
 				customEnumParams={this._customEnumParams}
+				customStringParams={this._customStringParams}
 				ports={this._ports}
 			>
 				{children}

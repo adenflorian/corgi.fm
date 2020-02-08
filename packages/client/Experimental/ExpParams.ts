@@ -5,7 +5,7 @@ import {
 	defaultUnipolarCurveFunctions,
 } from '@corgifm/common/common-utils'
 import {ButtonSelectOption} from '../ButtonSelect/ButtonSelect'
-import {CorgiNumberChangedEvent, CorgiEnumChangedEvent} from './CorgiEvents'
+import {CorgiNumberChangedEvent, CorgiEnumChangedEvent, CorgiStringChangedEvent} from './CorgiEvents'
 import {LabAudioParam, KelpieAudioNode} from './Nodes/PugAudioNode/Lab'
 
 export interface ExpParam {
@@ -89,7 +89,6 @@ export class ExpCustomEnumParam<TEnum extends string = string> {
 		public readonly id: Id,
 		public readonly defaultValue: TEnum,
 		public readonly options: readonly TEnum[],
-		public readonly valueString?: (v: TEnum) => string,
 	) {
 		this.value = this.defaultValue
 		this.onChange = new CorgiEnumChangedEvent(this.defaultValue)
@@ -106,6 +105,25 @@ export class ExpCustomEnumParam<TEnum extends string = string> {
 }
 
 export interface EnumParamChange {
+	readonly nodeId: Id
+	readonly paramId: Id
+	readonly newValue: string
+}
+
+
+export type ExpCustomStringParams = ReadonlyMap<Id, ExpCustomStringParam>
+export class ExpCustomStringParam {
+	public readonly value: CorgiStringChangedEvent
+
+	public constructor(
+		public readonly id: Id,
+		public readonly defaultValue: string,
+	) {
+		this.value = new CorgiStringChangedEvent(this.defaultValue)
+	}
+}
+
+export interface StringParamChange {
 	readonly nodeId: Id
 	readonly paramId: Id
 	readonly newValue: string

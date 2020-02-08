@@ -7,7 +7,7 @@ import {ExpNodeMaxView} from './ExpNodeMaxView'
 import {ExpPorts} from './ExpPorts'
 import {ExpNodeContext, CorgiNodeReact} from './CorgiNode'
 import {
-	ExpAudioParams, ExpCustomNumberParams, ExpCustomEnumParams,
+	ExpAudioParams, ExpCustomNumberParams, ExpCustomEnumParams, ExpCustomStringParams,
 } from './ExpParams'
 import './ExpNodes.less'
 
@@ -17,6 +17,7 @@ interface Props {
 	readonly audioParams: ExpAudioParams
 	readonly customNumberParams: ExpCustomNumberParams
 	readonly customEnumParams: ExpCustomEnumParams
+	readonly customStringParams: ExpCustomStringParams
 	readonly ports: ExpPorts
 }
 
@@ -24,6 +25,7 @@ const viewMode = 'debug' as 'max' | 'debug'
 
 export const CorgiNodeView = hot(module)(React.memo(function _CorgiNodeView({
 	children, context, audioParams, customNumberParams, ports, customEnumParams,
+	customStringParams,
 }: Props) {
 	return (
 		<ExpNodeContext.Provider value={context}>
@@ -34,6 +36,7 @@ export const CorgiNodeView = hot(module)(React.memo(function _CorgiNodeView({
 						audioParams={audioParams}
 						customNumberParams={customNumberParams}
 						customEnumParams={customEnumParams}
+						customStringParams={customStringParams}
 						ports={ports}
 					>
 						{children}
@@ -44,6 +47,7 @@ export const CorgiNodeView = hot(module)(React.memo(function _CorgiNodeView({
 						audioParams={audioParams}
 						customNumberParams={customNumberParams}
 						customEnumParams={customEnumParams}
+						customStringParams={customStringParams}
 						ports={ports}
 					>
 						{children}

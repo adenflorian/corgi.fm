@@ -32,9 +32,9 @@ import {mouseFromScreenToBoard, simpleGlobalClientState} from '../SimpleGlobalCl
 import {NodeManager} from './NodeManager'
 
 type ExpMiddlewareActions = ExpNodesAction | ExpConnectionAction
-| ExpLocalAction | RoomsReduxAction | ExpPositionAction
-| ExpGhostConnectorAction | LocalAction | OptionsAction
-| ExpGraphsAction
+	| ExpLocalAction | RoomsReduxAction | ExpPositionAction
+	| ExpGhostConnectorAction | LocalAction | OptionsAction
+	| ExpGraphsAction
 
 type ExpMiddleware =
 	(singletonContext: SingletonContextImpl) => Middleware<{}, IClientAppState>
@@ -551,6 +551,9 @@ function bar(
 
 		case 'EXP_NODE_CUSTOM_ENUM_PARAM_CHANGE':
 			return nodeManager.onCustomEnumParamChange(action)
+
+		case 'EXP_NODE_CUSTOM_STRING_PARAM_CHANGE':
+			return nodeManager.onCustomStringParamChange(action)
 
 		case 'EXP_NODE_SET_ENABLED':
 			return nodeManager.enableNode(action.nodeId, action.enabled)
