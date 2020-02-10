@@ -11,12 +11,12 @@ import {
 } from '../ExpPorts'
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 import {ExpAudioParam, ExpAudioParams} from '../ExpParams'
-import {LabConstantSourceNode, LabGain} from './PugAudioNode/Lab'
+import {LabConstantSourceNode, LabGain, LabWaveShaperNode} from './PugAudioNode/Lab'
 import {ExpMidiInputPort, ExpMidiOutputPort, isMidiInputPort, MidiReceiver, isMidiOutputPort} from '../ExpMidiPorts'
 import {MidiAction} from '@corgifm/common/common-types'
 
 export interface RegisterChildInputNodeResult {
-	readonly audioParamInputs: readonly [ExpNodeAudioInputPort, LabConstantSourceNode][]
+	readonly audioParamInputs: readonly [ExpNodeAudioInputPort, LabWaveShaperNode][]
 	readonly audioInputs: readonly ExpNodeAudioInputPort[]
 	readonly midiInputs: readonly ExpMidiInputPort[]
 }
@@ -32,6 +32,7 @@ export class GroupNode extends CorgiNode {
 	protected readonly _audioContext: AudioContext
 	private readonly _inputGains = new Map<Id, LabGain>()
 	private readonly _inputConstantSources = new Map<Id, LabConstantSourceNode>()
+	private readonly _inputWaveShapers = new Map<Id, LabWaveShaperNode>()
 	private readonly _outputGains = new Map<Id, LabGain>()
 	private readonly _midiReceivers = new Map<Id, MidiReceiver>()
 	private readonly _midiOutputs = new Map<Id, ExpMidiOutputPort>()
@@ -54,7 +55,7 @@ export class GroupNode extends CorgiNode {
 		return {
 			audioParamInputs: ports
 				.filter(isAudioParamInputPort)
-				.map(x => [x, this._inputConstantSources.get(x.id)!]),
+				.map(x => [x, this._inputWaveShapers.get(x.id)!]),
 			audioInputs: ports
 				.filter(isAudioInputPort)
 				.filter(x => !isAudioParamInputPort(x)),
@@ -92,11 +93,10 @@ export class GroupNode extends CorgiNode {
 	}
 
 	protected _dispose() {
-		this._inputGains.forEach(x => x.disconnect())
-		this._inputConstantSources.forEach(x => {
-			x.dispose()
-		})
-		this._outputGains.forEach(x => x.disconnect())
+		this._inputGains.forEach(x => x.dispose())
+		this._inputConstantSources.forEach(x =>	x.dispose())
+		this._inputWaveShapers.forEach(x =>	x.dispose())
+		this._outputGains.forEach(x => x.dispose())
 	}
 
 	private readonly _createPort = ({type, inputOrOutput, id, isAudioParamInput}: ExpPortState): [ExpPort, ExpAudioParam | undefined] => {
@@ -106,8 +106,12 @@ export class GroupNode extends CorgiNode {
 					const newConstantSource = new LabConstantSourceNode({audioContext: this._audioContext, voiceMode: 'autoPoly', creatorName: 'GroupNode'})
 					newConstantSource.offset.onMakeVoice = offset => offset.setValueAtTime(0, 0)
 					this._inputConstantSources.set(id, newConstantSource)
-					const audioParam = new ExpAudioParam(id, newConstantSource.offset, 0, 1, 'bipolar', {valueString: percentageValueString})
-					return [new ExpNodeAudioParamInputPort(audioParam, this, this._corgiNodeArgs, 'center'), audioParam]
+					const newWaveShaper = new LabWaveShaperNode({audioContext: this._audioContext, voiceMode: 'autoPoly', creatorName: 'GroupNode'})
+					newWaveShaper.curve = new Float32Array([-3, 1])
+					this._inputWaveShapers.set(id, newWaveShaper)
+					newConstantSource.connect(newWaveShaper)
+					const audioParam = new ExpAudioParam(id, newConstantSource.offset, 0, 1, 'unipolar', {valueString: percentageValueString})
+					return [new ExpNodeAudioParamInputPort(audioParam, this, this._corgiNodeArgs, 'offset'), audioParam]
 				} else {
 					const newGain = new LabGain({audioContext: this._audioContext, voiceMode: 'autoPoly', creatorName: 'GroupNode'})
 					const newGainValue = this._enabled ? 1 : 0
