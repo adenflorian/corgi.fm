@@ -86,7 +86,7 @@ export abstract class LabAudioNode<TNode extends KelpieAudioNode = KelpieAudioNo
 
 	// Called on the source
 	public readonly connect = <TTarget extends LabTarget>(target: TTarget): TTarget => {
-		console.log(`connecting ${this.creatorName}.${this.name}(${this.mode}) to ${target.creatorName}.${target.name}(${target.mode})`)
+		// console.log(`connecting ${this.creatorName}.${this.name}(${this.mode}) to ${target.creatorName}.${target.name}(${target.mode})`)
 		const [targetMode, targetVoices] = target.onConnect(this)
 		this._currentModeImpl.connect(target, targetMode, targetVoices)
 		this.targets.set(target, {target, targetMode, targetVoices})
@@ -241,14 +241,14 @@ class LabAutoPoly<TNode extends KelpieAudioNode = KelpieAudioNode> extends LabMo
 	}
 
 	public readonly onSourceVoiceCountChange = (source: LabAudioNode): readonly [LabTargetMode, Immutable.List<TNode>] => {
-		console.log(`${this._parent.creatorName} LabAutoPoly.onSourceVoiceCountChange source: ${source.name}`)
+		// console.log(`${this._parent.creatorName} LabAutoPoly.onSourceVoiceCountChange source: ${source.name}`)
 
 		this._setVoiceCount(this._getMaxSourceVoiceCount(), source)
 		return ['autoPoly', this._parent.voices]
 	}
 
 	public readonly setVoiceCount = (newVoiceCount: number) => {
-		console.log(`${this._parent.creatorName} LabAutoPoly.setVoiceCount`)
+		// console.log(`${this._parent.creatorName} LabAutoPoly.setVoiceCount`)
 		this._setVoiceCount(this._getMaxSourceVoiceCount())
 	}
 
@@ -306,13 +306,13 @@ class LabAutoPoly<TNode extends KelpieAudioNode = KelpieAudioNode> extends LabMo
 				maxSourceVoiceCount = Math.max(maxSourceVoiceCount, paramSource.voiceCount.current)
 			})
 		})
-		console.log(`${this._parent.creatorName} LabAutoPoly._getMaxSourceVoiceCount: ${maxSourceVoiceCount}`)
+		// console.log(`${this._parent.creatorName} LabAutoPoly._getMaxSourceVoiceCount: ${maxSourceVoiceCount}`)
 		return maxSourceVoiceCount
 	}
 
 	private readonly _setVoiceCount = (newVoiceCount: number, sourceCatalyst?: LabAudioNode) => {
 		const delta = Math.max(newVoiceCount, 1) - this._parent.voices.size
-		console.log(`${this._parent.fullName} LabAutoPoly._setVoiceCount delta: ${delta}`, {this: this, newVoiceCount})
+		// console.log(`${this._parent.fullName} LabAutoPoly._setVoiceCount delta: ${delta}`, {this: this, newVoiceCount})
 
 		if (delta > 0) {
 			if (this._parent.voiceCount.current === 1 && this._parent.autoMono) {
@@ -385,7 +385,7 @@ class LabAutoPoly<TNode extends KelpieAudioNode = KelpieAudioNode> extends LabMo
 		newTargetVoicesToConnectTo.forEach((targetVoice: KelpieAudioNode | KelpieAudioParam) => {
 			this._monoVoice.connect(targetVoice)
 		})
-		console.log('%^%^%^%^%^%^%^%^ LabAutoPoly.onTargetVoiceCountChange ', this._parent, {oldTargetVoicesToDisconnect, newTargetVoicesToConnectTo})
+		// console.log('%^%^%^%^%^%^%^%^ LabAutoPoly.onTargetVoiceCountChange ', this._parent, {oldTargetVoicesToDisconnect, newTargetVoicesToConnectTo})
 
 		logger.assert(oldTargetVoicesToDisconnect.size > 0 || newTargetVoicesToConnectTo.size > 0, ':(', {
 			oldTargetVoicesToDisconnect,
@@ -399,7 +399,7 @@ class LabAutoPoly<TNode extends KelpieAudioNode = KelpieAudioNode> extends LabMo
 
 	private readonly _addVoices = (numberToAdd: number) => {
 		for (let i = 0; i < numberToAdd; i++) {
-			console.log(this._parent.voices)
+			// console.log(this._parent.voices)
 			this._parent.voices = this._parent.voices.push(this._parent.makeVoice(this._parent.voices.size))
 		}
 	}
@@ -433,7 +433,7 @@ class LabAutoPoly<TNode extends KelpieAudioNode = KelpieAudioNode> extends LabMo
 	}
 
 	public readonly onDisconnect = (source: LabAudioNode) => {
-		console.log(`${this._parent.creatorName} LabAutoPoly.onDisconnect source: ${source.name}`)
+		// console.log(`${this._parent.creatorName} LabAutoPoly.onDisconnect source: ${source.name}`)
 		this._setVoiceCount(this._getMaxSourceVoiceCount())
 	}
 
@@ -447,7 +447,7 @@ class LabStaticPoly<TNode extends KelpieAudioNode = KelpieAudioNode> extends Lab
 
 	// Called on the source
 	public readonly connect = <TTarget extends KelpieAudioNode>(target: LabTarget<TTarget>) => {
-		console.log(`LabStaticPoly.connect start. this._parent.voices.size: ${this._parent.voices.size}. this._parent.voices`, this._parent.voices)
+		// console.log(`LabStaticPoly.connect start. this._parent.voices.size: ${this._parent.voices.size}. this._parent.voices`, this._parent.voices)
 		const [targetMode, targetVoices] = target.onConnect(this._parent)
 		if (targetMode === 'mono') {
 			this._parent.voices.forEach((voice) => {
@@ -458,7 +458,7 @@ class LabStaticPoly<TNode extends KelpieAudioNode = KelpieAudioNode> extends Lab
 				voice.connect(targetVoices.get(i) as KelpieAudioNode)
 			})
 		}
-		console.log(`LabStaticPoly.connect end`)
+		// console.log(`LabStaticPoly.connect end`)
 	}
 
 	// Called on the target
@@ -496,7 +496,7 @@ class LabStaticPoly<TNode extends KelpieAudioNode = KelpieAudioNode> extends Lab
 
 	public readonly setVoiceCount = (newVoiceCount: number) => {
 		const delta = Math.max(newVoiceCount, 1) - this._parent.voices.size
-		console.log(`${this._parent.creatorName} LabStaticPoly newVoiceCount: ${newVoiceCount}, delta: ${delta}`)
+		// console.log(`${this._parent.creatorName} LabStaticPoly newVoiceCount: ${newVoiceCount}, delta: ${delta}`)
 
 		if (delta > 0) {
 			this._addVoices(delta)
@@ -570,7 +570,7 @@ class LabMono<TNode extends KelpieAudioNode = KelpieAudioNode> extends LabModeIm
 
 	public readonly setVoiceCount = (newVoiceCount: number) => {
 		const delta = 1 - this._parent.voiceCount.current
-		console.log(`LabMono.setVoiceCount delta: ${delta}`)
+		// console.log(`LabMono.setVoiceCount delta: ${delta}`)
 		if (delta < 0) {
 			this._deleteVoices(Math.abs(delta))
 			if (this._parent.activeVoice !== 'all') {
@@ -620,7 +620,7 @@ class LabMono<TNode extends KelpieAudioNode = KelpieAudioNode> extends LabModeIm
 			.filter(voice => oldTargetConnection.targetVoices.includes(voice) === false)
 
 		this._connectToTargetVoices(newTargetVoicesToConnectTo)
-		console.log('%^%^%^%^%^%^%^%^ LabMono.onTargetVoiceCountChange ', this._parent, {oldTargetVoicesToDisconnect, newTargetVoicesToConnectTo})
+		// console.log('%^%^%^%^%^%^%^%^ LabMono.onTargetVoiceCountChange ', this._parent, {oldTargetVoicesToDisconnect, newTargetVoicesToConnectTo})
 
 		logger.assert(oldTargetVoicesToDisconnect.size > 0 || newTargetVoicesToConnectTo.size > 0, ':(', {
 			oldTargetVoicesToDisconnect,
@@ -1021,7 +1021,7 @@ export abstract class KelpieAudioNode {
 	}
 
 	public connect<TTarget extends KelpieTarget>(target: TTarget): TTarget {
-		console.log(`KelpieAudioNode connecting ${this.labNode.creatorName}.${this.name}(${this.voiceIndex}) to ${target.labNode.creatorName}.${target.name}(${target.voiceIndex})`)
+		// console.log(`KelpieAudioNode connecting ${this.labNode.creatorName}.${this.name}(${this.voiceIndex}) to ${target.labNode.creatorName}.${target.name}(${target.voiceIndex})`)
 		this.output.connect(target.input as AudioNode)
 		return target
 	}

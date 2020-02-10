@@ -22,18 +22,34 @@ export class SamplerExpNode extends CorgiNode {
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
 		super(corgiNodeArgs, {name: 'Sampler', color: CssColor.green})
 
+		const sampleRate = 44100
+		const lengthSeconds = 1
+		const sampleCount = sampleRate * lengthSeconds
+
+		const buffer = this._audioContext.createBuffer(1, sampleCount, sampleRate)
+
+		const sineArray = new Float32Array(sampleCount)
+
+		for (let i = 0; i < sampleCount; i++) {
+			const time = i / sampleRate
+			sineArray[i] = Math.sin(2 * Math.PI * time)
+		}
+
+		buffer.copyToChannel(sineArray, 0)
+
 		this._bufferSource = new LabAudioBufferSourceNode({...corgiNodeArgs, voiceMode: 'autoPoly', creatorName: 'SamplerExpNode'})
-		this._singletonContext.samplesManager.loadSample(`${samplePathBegin.static}/samplers/basic-piano/${sharpToFlatNotes['C']}${4}-49-96.mp3`)
-			.then(() => {
-				this._bufferSource.buffer = this._singletonContext.samplesManager.getSample(`${samplePathBegin.static}/samplers/basic-piano/${sharpToFlatNotes['C']}${4}-49-96.mp3`)
-			})
+		// this._singletonContext.samplesManager.loadSample(`${samplePathBegin.static}/samplers/basic-piano/${sharpToFlatNotes['C']}${4}-49-96.mp3`)
+		// 	.then(() => {
+		// 		this._bufferSource.buffer = this._singletonContext.samplesManager.getSample(`${samplePathBegin.static}/samplers/basic-piano/${sharpToFlatNotes['C']}${4}-49-96.mp3`)
+		// 	})
+		this._bufferSource.buffer = buffer
 		this._bufferSource.loop = true
-		this._bufferSource.loopEnd = 3
+		this._bufferSource.loopEnd = lengthSeconds
 		this._bufferSource.playbackRate.onMakeVoice = rate => rate.setValueAtTime(0, 0)
 		this._outputChain = new ToggleGainChain(corgiNodeArgs.audioContext)
 		this._bufferSource.connect(this._outputChain.input)
 
-		const playbackRateParam = new ExpAudioParam('playbackRate', this._bufferSource.playbackRate, 1, 16, 'unipolar', {valueString: percentageValueString})
+		const playbackRateParam = new ExpAudioParam('playbackRate', this._bufferSource.playbackRate, 440, 880, 'unipolar', {valueString: percentageValueString})
 		const detuneParam = new ExpAudioParam('detune', this._bufferSource.detune, 0, 100, 'bipolar', {valueString: detuneValueToString})
 
 		const playbackRatePort = new ExpNodeAudioParamInputPort(playbackRateParam, this, corgiNodeArgs, 'center')
