@@ -1,17 +1,30 @@
-import * as Immutable from 'immutable'
 import {CssColor} from '@corgifm/common/shamu-color'
-import {arrayToESIdKeyMap} from '@corgifm/common/common-utils'
+import {arrayToESIdKeyMap, noop} from '@corgifm/common/common-utils'
 import {ExpPortState} from '@corgifm/common/redux'
 import {percentageValueString} from '../../client-constants'
-import {logger} from '../../client-logger'
 import {
 	ExpNodeAudioInputPort, ExpNodeAudioOutputPort, ExpPorts, ExpPort,
 	ExpNodeAudioParamInputPort,
+	isAudioInputPort,
+	isAudioParamInputPort,
+	isAudioOutputPort,
 } from '../ExpPorts'
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 import {ExpAudioParam, ExpAudioParams} from '../ExpParams'
-import {CorgiObjectChangedEvent} from '../CorgiEvents'
-import {LabConstantSourceNode, LabGain, LabTarget, LabAudioNode, LabAudioParam} from './PugAudioNode/Lab'
+import {LabConstantSourceNode, LabGain} from './PugAudioNode/Lab'
+import {ExpMidiInputPort, ExpMidiOutputPort, isMidiInputPort, MidiReceiver, isMidiOutputPort} from '../ExpMidiPorts'
+import {MidiAction} from '@corgifm/common/common-types'
+
+export interface RegisterChildInputNodeResult {
+	readonly audioParamInputs: readonly [ExpNodeAudioInputPort, LabConstantSourceNode][]
+	readonly audioInputs: readonly ExpNodeAudioInputPort[]
+	readonly midiInputs: readonly ExpMidiInputPort[]
+}
+
+export interface RegisterChildOutputNodeResult {
+	readonly audioOutputs: readonly ExpNodeAudioOutputPort[]
+	readonly midiOutputs: readonly ExpMidiOutputPort[]
+}
 
 export class GroupNode extends CorgiNode {
 	protected readonly _ports: ExpPorts
@@ -20,6 +33,8 @@ export class GroupNode extends CorgiNode {
 	private readonly _inputGains = new Map<Id, LabGain>()
 	private readonly _inputConstantSources = new Map<Id, LabConstantSourceNode>()
 	private readonly _outputGains = new Map<Id, LabGain>()
+	private readonly _midiReceivers = new Map<Id, MidiReceiver>()
+	private readonly _midiOutputs = new Map<Id, ExpMidiOutputPort>()
 
 	public constructor(private readonly _corgiNodeArgs: CorgiNodeArgs) {
 		super(_corgiNodeArgs, {name: 'Group', color: CssColor.blue})
@@ -34,17 +49,34 @@ export class GroupNode extends CorgiNode {
 		this._audioParams = arrayToESIdKeyMap(ports.map(x => x[1]).filter(x => x !== undefined) as ExpAudioParam[])
 	}
 
-	public registerChildInputNode(): [ExpNodeAudioInputPort, LabAudioNode][] {
-		return (
-			[...this._ports]
-				.map(x => x[1])
-				.filter(x => x.type === 'audio' && x.side === 'in') as ExpNodeAudioInputPort[]
-		)
-			.map(x => [x, x.destination instanceof LabAudioParam ? this._inputConstantSources.get(x.id)! : x.destination])
+	public registerChildInputNode(): RegisterChildInputNodeResult {
+		const ports = [...this._ports].map(x => x[1])
+		return {
+			audioParamInputs: ports
+				.filter(isAudioParamInputPort)
+				.map(x => [x, this._inputConstantSources.get(x.id)!]),
+			audioInputs: ports
+				.filter(isAudioInputPort)
+				.filter(x => !isAudioParamInputPort(x)),
+			midiInputs: ports
+				.filter(isMidiInputPort),
+		}
 	}
 
-	public registerChildOutputNode(): ExpNodeAudioOutputPort[] {
-		return [...this._ports].map(x => x[1]).filter(x => x.type === 'audio' && x.side === 'out') as ExpNodeAudioOutputPort[]
+	public registerMidiOutput(id: Id, outputPort: ExpMidiOutputPort) {
+		this._midiReceivers.set(id, outputPort.sendMidiAction)
+	}
+
+	public registerChildOutputNode(): RegisterChildOutputNodeResult {
+		const ports = [...this._ports].map(x => x[1])
+		return {
+			audioOutputs: ports.filter(isAudioOutputPort),
+			midiOutputs: ports.filter(isMidiOutputPort),
+		}
+	}
+
+	public onMidiMessageFromChildInputNode(id: Id, action: MidiAction) {
+		this._midiOutputs.get(id)!.sendMidiAction(action)
 	}
 
 	public render = () => this.getDebugView()
@@ -89,8 +121,21 @@ export class GroupNode extends CorgiNode {
 				this._outputGains.set(id, newGain)
 				return [new ExpNodeAudioOutputPort(id, id as string, this, newGain), undefined]
 			}
+		} else if (type === 'midi') {
+			if (inputOrOutput === 'input') {
+				this._midiReceivers.set(id, noop)
+				return [new ExpMidiInputPort(id, id as string, this, this._onMidiMessage(id)), undefined]
+			} else if (inputOrOutput === 'output') {
+				const newOutput = new ExpMidiOutputPort(id, id as string, this)
+				this._midiOutputs.set(id, newOutput)
+				return [newOutput, undefined]
+			}
 		}
 
 		throw new Error('port type not yet supported')
+	}
+
+	private readonly _onMidiMessage = (id: Id) => (midiAction: MidiAction) => {
+		this._midiReceivers.get(id)!(midiAction)
 	}
 }

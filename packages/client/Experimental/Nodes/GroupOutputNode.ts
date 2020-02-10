@@ -5,6 +5,8 @@ import {
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 import {logger} from '../../client-logger'
 import {GroupNode} from './GroupNode'
+import {ExpMidiInputPort} from '../ExpMidiPorts'
+import {MidiAction} from '@corgifm/common/common-types'
 
 export class GroupOutputNode extends CorgiNode {
 	protected readonly _ports = new Map<Id, ExpPort>()
@@ -25,8 +27,14 @@ export class GroupOutputNode extends CorgiNode {
 
 		this._parentGroupNode = this._parentNode
 
-		this._parentGroupNode.registerChildOutputNode().forEach(output => {
+		const {audioOutputs, midiOutputs} = this._parentGroupNode.registerChildOutputNode()
+
+		audioOutputs.forEach(output => {
 			this._ports.set(output.id, new ExpNodeAudioInputPort(output.id, output.name, this, output.source))
+		})
+
+		midiOutputs.forEach(output => {
+			this._ports.set(output.id, new ExpMidiInputPort(output.id, output.name, this, this._onMidiMessage(output.id)))
 		})
 	}
 
@@ -36,5 +44,9 @@ export class GroupOutputNode extends CorgiNode {
 	protected _disable = () => {}
 
 	protected _dispose() {
+	}
+
+	private readonly _onMidiMessage = (id: Id) => (midiAction: MidiAction) => {
+		this._parentGroupNode!.onMidiMessageFromChildInputNode(id, midiAction)
 	}
 }

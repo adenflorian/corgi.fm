@@ -5,6 +5,8 @@ import {
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 import {logger} from '../../client-logger'
 import {GroupNode} from './GroupNode'
+import {LabAudioNode} from './PugAudioNode/Lab'
+import {ExpMidiOutputPort} from '../ExpMidiPorts'
 
 export class GroupInputNode extends CorgiNode {
 	protected readonly _ports = new Map<Id, ExpPort>()
@@ -25,8 +27,20 @@ export class GroupInputNode extends CorgiNode {
 
 		this._parentGroupNode = this._parentNode
 
-		this._parentNode.registerChildInputNode().forEach(([input, source]) => {
+		const {audioInputs, audioParamInputs, midiInputs} = this._parentNode.registerChildInputNode()
+
+		audioParamInputs.forEach(([input, source]) => {
 			this._ports.set(input.id, new ExpNodeAudioOutputPort(input.id, input.name, this, source))
+		})
+
+		audioInputs.forEach(input => {
+			this._ports.set(input.id, new ExpNodeAudioOutputPort(input.id, input.name, this, input.destination as LabAudioNode))
+		})
+
+		midiInputs.forEach(input => {
+			const newOut = new ExpMidiOutputPort(input.id, input.name, this)
+			this._parentGroupNode!.registerMidiOutput(input.id, newOut)
+			this._ports.set(input.id, newOut)
 		})
 	}
 

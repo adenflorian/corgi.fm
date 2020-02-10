@@ -80,7 +80,7 @@ export class EnvelopeNode extends CorgiNode {
 		if (midiAction.type === 'VOICE_COUNT_CHANGE') {
 			// console.log('receiveMidiAction VOICE_COUNT_CHANGE', this, midiAction.newCount)
 			this._constantSource.setVoiceCount(midiAction.newCount)
-		} else if (midiAction.gate !== undefined) {
+		} else if (midiAction.type === 'MIDI_GATE' || midiAction.type === 'MIDI_NOTE') {
 			this.handleGateEvent(midiAction.gate, midiAction.time, midiAction.voice)
 		}
 	}
