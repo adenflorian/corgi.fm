@@ -15,9 +15,9 @@ import {
 	selectRoomSettings, ExpConnectionType,
 } from '@corgifm/common/redux'
 import {longLineTooltip} from '../client-constants'
-import {useObjectChangedEvent, useStringChangedEvent, useBooleanChangedEvent} from '../Experimental/hooks/useCorgiEvent'
+import {useObjectChangedEvent, useStringChangedEvent, useBooleanChangedEvent, useNumberChangedEvent} from '../Experimental/hooks/useCorgiEvent'
 import {usePort, useConnection} from '../Experimental/hooks/usePort'
-import {ExpPortReact} from '../Experimental/ExpPorts'
+import {ExpPortReact, isAudioOutputPort, ExpPort} from '../Experimental/ExpPorts'
 import {ConnectionLine} from './ConnectionLine'
 import {Connector} from './Connector'
 import {LineState} from './LineState'
@@ -25,6 +25,7 @@ import {connectorWidth, connectorHeight, makeStraightPath, makeCurvedPath} from 
 import './ConnectionView.less'
 import {ExpNodeConnection} from '../Experimental/ExpConnections'
 import {CssColor} from '@corgifm/common/shamu-color'
+import {CorgiNumberChangedEvent} from '../Experimental/CorgiEvents'
 
 interface Props {
 	id: Id
@@ -65,12 +66,20 @@ interface ExpConnectionViewPorts extends Props {
 	readonly type: ExpConnectionType
 }
 
+const constant1 = new CorgiNumberChangedEvent(1)
+
 const ExpConnectionView =
 	React.memo(function _ExpConnectionView({
 		id, sourcePort, targetPort, sourceId, targetId, type, connection,
 	}: ExpConnectionViewPorts) {
 		const sourceNodePosition = useSelector(createExpPositionSelector(sourceId))
 		const targetNodePosition = useSelector(createExpPositionSelector(targetId))
+		
+		const voiceCountEvent = isAudioOutputPort(sourcePort)
+			? sourcePort.source.voiceCount
+			: constant1
+
+		const voiceCount = useNumberChangedEvent(voiceCountEvent)
 
 		const {zIndex: sourceZ} = sourceNodePosition
 		const {zIndex: targetZ} = targetNodePosition
@@ -159,7 +168,7 @@ const ExpConnectionView =
 
 		return (
 			<div
-				className={`connection type-${type} isFeedbackLoopDetected-${isFeedbackLoopDetected}`}
+				className={`connection type-${type} isFeedbackLoopDetected-${isFeedbackLoopDetected} voiceCount-${voiceCount > 1 ? 'poly' : 'mono'}`}
 				style={{color}}
 			>
 				<ConnectionLine
