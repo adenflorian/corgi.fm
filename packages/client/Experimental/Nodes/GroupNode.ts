@@ -104,6 +104,7 @@ export class GroupNode extends CorgiNode {
 			if (inputOrOutput === 'input') {
 				if (isAudioParamInput) {
 					const newConstantSource = new LabConstantSourceNode({audioContext: this._audioContext, voiceMode: 'autoPoly', creatorName: 'GroupNode'})
+					newConstantSource.offset.onMakeVoice = offset => offset.setValueAtTime(0, 0)
 					this._inputConstantSources.set(id, newConstantSource)
 					const audioParam = new ExpAudioParam(id, newConstantSource.offset, 0, 1, 'bipolar', {valueString: percentageValueString})
 					return [new ExpNodeAudioParamInputPort(audioParam, this, this._corgiNodeArgs, 'center'), audioParam]

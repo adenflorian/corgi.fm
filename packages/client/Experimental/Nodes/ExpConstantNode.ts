@@ -17,6 +17,7 @@ export class ConstantExpNode extends CorgiNode {
 		super(corgiNodeArgs, {name: 'Constant', color: CssColor.purple})
 
 		this._constantSourceNode = new LabConstantSourceNode({audioContext: this._audioContext, voiceMode: 'autoPoly', creatorName: 'ConstantExpNode'})
+		this._constantSourceNode.offset.onMakeVoice = offset => offset.setValueAtTime(0, 0)
 		this._outputGain = new LabGain({audioContext: this._audioContext, voiceMode: 'autoPoly', creatorName: 'ConstantExpNode'})
 		this._constantSourceNode.connect(this._outputGain)
 

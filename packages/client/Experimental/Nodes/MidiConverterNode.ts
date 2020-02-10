@@ -30,7 +30,7 @@ export class MidiConverterNode extends CorgiNode {
 		super(corgiNodeArgs, {name: 'Midi Converter', color: CssColor.yellow})
 
 		this._constantSourceNode = new LabConstantSourceNode({audioContext: this._audioContext, voiceMode: 1, creatorName: 'MidiConverterNode'})
-		this._constantSourceNode.offset.setValueAtTime(0, 0)
+		this._constantSourceNode.offset.onMakeVoice = offset => offset.setValueAtTime(0, 0)
 
 		this._waveShaper = new LabWaveShaperNode({audioContext: this._audioContext, voiceMode: 'autoPoly', creatorName: 'MidiConverterNode'})
 		this._waveShaper.curve = new Float32Array([-3, 1])
