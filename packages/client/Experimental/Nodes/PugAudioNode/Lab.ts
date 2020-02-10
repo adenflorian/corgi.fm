@@ -956,6 +956,49 @@ export class LabConstantSourceNode extends LabAudioNode<KelpieConstantSourceNode
 	}
 }
 
+export class LabAudioBufferSourceNode extends LabAudioNode<KelpieAudioBufferSourceNode> {
+	public readonly name = 'LabAudioBufferSourceNode'
+	public readonly detune: LabAudioParam<KelpieAudioBufferSourceNode>
+	public readonly playbackRate: LabAudioParam<KelpieAudioBufferSourceNode>
+	private _buffer: AudioBuffer | null = null
+	public set buffer(buffer: AudioBuffer | null) {
+		this.voices.forEach(voice => voice.buffer = buffer)
+		this._buffer = buffer
+	}
+	private _loop: boolean = false
+	public set loop(loop: boolean) {
+		this.voices.forEach(voice => voice.loop = loop)
+		this._loop = loop
+	}
+	private _loopStart: number = 0
+	public set loopStart(loopStart: number) {
+		this.voices.forEach(voice => voice.loopStart = loopStart)
+		this._loopStart = loopStart
+	}
+	private _loopEnd: number = 0
+	public set loopEnd(loopEnd: number) {
+		this.voices.forEach(voice => voice.loopEnd = loopEnd)
+		this._loopEnd = loopEnd
+	}
+
+	public constructor(args: LabAudioNodeArgs) {
+		super(args)
+		this.detune = new LabAudioParam(this, (kelpieAudioBufferSource) => kelpieAudioBufferSource.detune, 'detune')
+		this.playbackRate = new LabAudioParam(this, (kelpieAudioBufferSource) => kelpieAudioBufferSource.playbackRate, 'playbackRate')
+		super.init()
+	}
+
+	protected readonly _makeVoice = (voiceIndex: number): KelpieAudioBufferSourceNode => {
+		const newThing = new KelpieAudioBufferSourceNode({audioContext: this.audioContext, labNode: this, voiceIndex})
+		newThing.buffer = this._buffer
+		newThing.loop = this._loop
+		newThing.loopStart = this._loopStart
+		newThing.loopEnd = this._loopEnd
+		newThing.start()
+		return newThing
+	}
+}
+
 // Kelpie
 export interface KelpieAudioNodeArgs {
 	readonly audioContext: AudioContext
@@ -1347,7 +1390,45 @@ class KelpieConstantSourceNode extends KelpieAudioNode {
 
 	public get input(): AudioNode {return this._constantSource}
 	public get output(): AudioNode {return this._constantSource}
-	protected _dispose() {}
+	protected _dispose() {
+		this._constantSource.stop()
+	}
+}
+
+class KelpieAudioBufferSourceNode extends KelpieAudioNode {
+	public readonly name = 'AudioBufferSourceNode'
+	private readonly _bufferSource: AudioBufferSourceNode
+	public readonly detune: KelpieAudioParam
+	public readonly playbackRate: KelpieAudioParam
+	public set buffer(buffer: AudioBuffer | null) {
+		this._bufferSource.buffer = buffer
+	}
+	public set loop(loop: boolean) {
+		this._bufferSource.loop = loop
+	}
+	public set loopStart(loopStart: number) {
+		this._bufferSource.loopStart = loopStart
+	}
+	public set loopEnd(loopEnd: number) {
+		this._bufferSource.loopEnd = loopEnd
+	}
+
+	public constructor(args: KelpieAudioNodeArgs) {
+		super(args)
+		this._bufferSource = this._audioContext.createBufferSource()
+		this.detune = new KelpieAudioParam(this._audioContext, this._bufferSource.detune, 'detune', this)
+		this.playbackRate = new KelpieAudioParam(this._audioContext, this._bufferSource.playbackRate, 'playbackRate', this)
+	}
+
+	public start(time?: number) {
+		this._bufferSource.start(time)
+	}
+
+	public get input(): AudioNode {return this._bufferSource}
+	public get output(): AudioNode {return this._bufferSource}
+	protected _dispose() {
+		this._bufferSource.stop()
+	}
 }
 
 // const audioContext = new AudioContext()

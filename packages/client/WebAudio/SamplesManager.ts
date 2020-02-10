@@ -50,9 +50,9 @@ export class SamplesManager {
 	}
 
 	/** Fire and forget */
-	public loadSample(path: string): void {
+	public async loadSample(path: string): Promise<void> {
 		// eslint-disable-next-line @typescript-eslint/no-floating-promises
-		this._loadSample(path)
+		return this._loadSample(path)
 			.catch(error => {
 				logger.error('error in _loadSample:', {error})
 			})

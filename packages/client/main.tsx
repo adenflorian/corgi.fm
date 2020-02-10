@@ -114,6 +114,7 @@ async function setupAsync() {
 		preMasterLimiter,
 		new MidiService(),
 		new WebSocketService(),
+		samplesManager,
 	)
 
 	const store = configureStore(
