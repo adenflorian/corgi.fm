@@ -40,10 +40,12 @@ async function start() {
 	serverStore.dispatch(createRoomAction(roomSettingsActions.setOwner(serverClientId), lobby))
 	createServerStuff(lobby, serverStore, RoomType.Normal)
 
-	serverStore.dispatch(createRoom(expLobby, Date.now()))
-	serverStore.dispatch(createRoomAction(roomInfoAction.setType(RoomType.Experimental), expLobby))
-	serverStore.dispatch(createRoomAction(roomSettingsActions.setOwner(serverClientId), expLobby))
-	createServerStuff(expLobby, serverStore, RoomType.Experimental)
+	if (isLocalDevServer()) {
+		serverStore.dispatch(createRoom(expLobby, Date.now()))
+		serverStore.dispatch(createRoomAction(roomInfoAction.setType(RoomType.Experimental), expLobby))
+		serverStore.dispatch(createRoomAction(roomSettingsActions.setOwner(serverClientId), expLobby))
+		createServerStuff(expLobby, serverStore, RoomType.Experimental)
+	}
 
 	const app = await setupExpressApp(serverStore, dbStore)
 

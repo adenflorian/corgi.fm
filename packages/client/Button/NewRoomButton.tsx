@@ -79,8 +79,8 @@ export const NewRoomModalContent: ModalContent = ({hideModal}) => {
 							required
 						/>
 						{isLocalDevClient() && <Select
-							label="Room Name"
-							name="roomName"
+							label="Room Type"
+							name="roomType"
 							onChange={setType}
 							options={List(Object.keys(RoomType))}
 							value={type}
