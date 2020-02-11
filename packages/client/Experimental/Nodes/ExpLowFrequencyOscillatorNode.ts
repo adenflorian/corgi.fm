@@ -10,6 +10,8 @@ import {ExpAudioParam, ExpAudioParams, ExpCustomEnumParams, ExpCustomEnumParam} 
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 import {ToggleGainChain} from './NodeHelpers/ToggleGainChain'
 import {LabGain, LabAudioBufferSourceNode} from './PugAudioNode/Lab'
+import {ExpMidiInputPort} from '../ExpMidiPorts'
+import {MidiAction} from '@corgifm/common/common-types'
 
 const oscillatorTypes = ['sawtooth', 'sine', 'triangle', 'square'] as const
 type OscillatorType = typeof oscillatorTypes[number]
@@ -53,11 +55,12 @@ export class LowFrequencyOscillatorExpNode extends CorgiNode {
 		const gainParam = new ExpAudioParam('gain', this._gain.gain, 1, 1, 'unipolar', {valueString: percentageValueString})
 		this._audioParams = arrayToESIdKeyMap([frequencyParam, detuneParam, gainParam])
 
+		const midiInputPort = new ExpMidiInputPort('retrigger', 'retrigger', this, this._onMidiMessage)
 		const frequencyPort = new ExpNodeAudioParamInputPort(frequencyParam, this, corgiNodeArgs, 'offset')
 		const detunePort = new ExpNodeAudioParamInputPort(detuneParam, this, corgiNodeArgs, 'center')
 		const gainPort = new ExpNodeAudioParamInputPort(gainParam, this, corgiNodeArgs, 'offset')
 		const outputPort = new ExpNodeAudioOutputPort('output', 'output', this, this._outputChain.output)
-		this._ports = arrayToESIdKeyMap([frequencyPort, detunePort, gainPort, outputPort])
+		this._ports = arrayToESIdKeyMap([midiInputPort, frequencyPort, detunePort, gainPort, outputPort])
 
 		this._type.onChange.subscribe(this.onTypeChange)
 		this._pulseMode.onChange.subscribe(this._onPulse)
@@ -84,6 +87,14 @@ export class LowFrequencyOscillatorExpNode extends CorgiNode {
 
 		if (this._enabled && mode === 'retrigger') {
 			this._bufferSource.retrigger(this._audioContext.currentTime)
+		}
+	}
+
+	private readonly _onMidiMessage = (midiAction: MidiAction) => {
+		if (!this._enabled) return
+
+		if ((midiAction.type === 'MIDI_NOTE' || midiAction.type === 'MIDI_GATE') && midiAction.gate === true) {
+			this._bufferSource.retrigger(midiAction.time, midiAction.voice)
 		}
 	}
 }
