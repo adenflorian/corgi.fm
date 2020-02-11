@@ -21,7 +21,7 @@ export function WelcomeModalButton() {
 	)
 
 	return (
-		<Button onClick={showModal}>
+		<Button onClick={showModal} background="medium" shadow={true}>
 			Show Welcome
 		</Button>
 	)

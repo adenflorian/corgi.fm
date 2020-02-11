@@ -31,6 +31,8 @@ export function AuthModalButton() {
 	return (
 		<Button
 			onClick={onClick}
+			background="medium"
+			shadow={true}
 		>
 			{loggedIn
 				? <Fragment><IoMdLogOut />Log Out</Fragment>

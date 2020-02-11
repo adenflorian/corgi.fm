@@ -29,6 +29,8 @@ export function NewRoomButton({onClick}: {onClick?: () => any}) {
 					onClick && onClick()
 					showModal()
 				}}
+				background="medium"
+				shadow={true}
 			>
 				<IoMdAddCircle />
 				New Room

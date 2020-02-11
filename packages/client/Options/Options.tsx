@@ -20,7 +20,7 @@ export function OptionsModalButton() {
 	)
 
 	return (
-		<Button onClick={showModal}>
+		<Button onClick={showModal} background="medium" shadow={true}>
 			<IoMdSettings />
 			Options
 		</Button>

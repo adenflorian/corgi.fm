@@ -1,13 +1,24 @@
 @import "../AppCommon.less";
 @import "../colors.less";
 
+button {
+    color: inherit;
+    font-family: inherit;
+    font-weight: inherit;
+    font-size: inherit;
+    border: none;
+
+    &:not(:disabled) {
+        cursor: pointer;
+    }
+}
+
 @disabled: {
     filter: brightness(0.4) saturate(0.5);
 }
 
 @button: {
     position: relative;
-    background-color: @panelGrayLight;
     border: none;
     padding: 0 8px;
     font-size: 16px;
@@ -48,6 +59,22 @@
         &, span {
             @disabled();
         }
+    }
+
+    &.bg-light, & .bg-light {
+        background-color: @panelGrayLight;
+    }
+
+    &.bg-dark, & .bg-dark {
+        background-color: @panelGrayDark;
+    }
+
+    &.bg-medium, & .bg-medium {
+        background-color: @panelGray;
+    }
+
+    &.shadow-true, & .shadow-true {
+        @panelShadow();
     }
 }
 

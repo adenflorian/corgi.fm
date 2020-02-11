@@ -27,8 +27,9 @@ import {createResetZoomAction} from './SimpleGraph/Zoom'
 import {useObjectChangedEvent} from './Experimental/hooks/useCorgiEvent'
 import {simpleGlobalClientState} from './SimpleGlobalClientState'
 import {audioWorkletToolTip} from './client-constants'
-import {useRoomType, useLocalRoomMember} from './react-hooks'
+import {useRoomType} from './react-hooks'
 import './TopDiv.less'
+import {NodeGroupInfo} from './SmallComponents/NodeGroupInfo'
 
 interface ReduxProps {
 	memberCount: number
@@ -54,7 +55,6 @@ export const TopDiv = ({
 
 	const isAudioWorkletLoaded = useObjectChangedEvent(simpleGlobalClientState.onAudioWorkletLoaded)
 	const roomType = useRoomType()
-	const localRoomMember = useLocalRoomMember()
 
 	return (
 		<div className="topDiv" style={{marginBottom: 'auto'}}>
@@ -120,14 +120,19 @@ export const TopDiv = ({
 						{onlyOwnerCanDoStuff ? 'Limited' : 'Public'}
 					</div>
 				</div>
-				{roomType === RoomType.Experimental &&
-					<div className="blob">
-						<div className="blobDark">Node Group</div>
-						<div>
-							{localRoomMember.groupNodeId}
-						</div>
+				<div className="blob">
+					<div className="blobDark">Room Type</div>
+					<div
+						style={{
+							color: roomType === RoomType.Experimental
+								? CssColor.orange
+								: undefined,
+						}}
+						title={''}
+					>
+						{roomType}
 					</div>
-				}
+				</div>
 				<div className="blob">
 					<div className="blobDark">AudioWorklet</div>
 					<div
@@ -141,6 +146,9 @@ export const TopDiv = ({
 						{isAudioWorkletLoaded ? 'Loaded' : 'Not Loaded'}
 					</div>
 				</div>
+				{roomType === RoomType.Experimental &&
+					<NodeGroupInfo />
+				}
 				{!isConnected &&
 					<div
 						className="blob"
@@ -170,6 +178,8 @@ export const TopDiv = ({
 							eventSaveRoomToBrowserButtonClick()
 						}, 1000)
 					}
+					background="medium"
+					shadow={true}
 				>
 					Save Room To Browser
 				</Button>
@@ -183,6 +193,8 @@ export const TopDiv = ({
 							eventSaveRoomToFileButtonClick()
 						}, 2000)
 					}
+					background="medium"
+					shadow={true}
 				>
 					Save Room To File
 				</Button>
@@ -207,6 +219,8 @@ export const TopDiv = ({
 								: ''),
 					}}
 					disabled={onlyOwnerCanDoStuff && !isLocalClientRoomOwner}
+					background="medium"
+					shadow={true}
 				>
 					Prune Room
 				</Button>
@@ -232,6 +246,8 @@ export const TopDiv = ({
 									: ''),
 						}}
 						disabled={onlyOwnerCanDoStuff && !isLocalClientRoomOwner}
+						background="medium"
+						shadow={true}
 					>
 						Organize Room
 					</Button>
