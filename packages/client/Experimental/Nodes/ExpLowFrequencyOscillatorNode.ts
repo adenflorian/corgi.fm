@@ -24,6 +24,7 @@ export class LowFrequencyOscillatorExpNode extends CorgiNode {
 	protected readonly _audioParams: ExpAudioParams
 	protected readonly _customEnumParams: ExpCustomEnumParams
 	private readonly _bufferSource: LabAudioBufferSourceNode
+	private readonly _dummyGain: LabGain
 	private readonly _gain: LabGain
 	private readonly _outputChain: ToggleGainChain
 	private readonly _type: ExpCustomEnumParam<OscillatorType>
@@ -41,10 +42,15 @@ export class LowFrequencyOscillatorExpNode extends CorgiNode {
 		this._bufferSource.loopEnd = 1
 		this._bufferSource.playbackRate.onMakeVoice = rate => rate.setValueAtTime(0, 0)
 
-		this._gain = new LabGain({...corgiNodeArgs, voiceMode: 'autoPoly', creatorName: 'LowFrequencyOscillatorExpNode'})
+		this._gain = new LabGain({...corgiNodeArgs, voiceMode: 'autoPoly', creatorName: 'LowFrequencyOscillatorExpNode-_gain'})
 		this._gain.gain.onMakeVoice = gain => gain.setValueAtTime(0, 0)
 
+		this._dummyGain = new LabGain({...corgiNodeArgs, voiceMode: 'autoPoly', creatorName: 'LowFrequencyOscillatorExpNode-_dummyGain'})
+		this._dummyGain.gain.onMakeVoice = gain => gain.setValueAtTime(0, 0)
+
 		this._outputChain = new ToggleGainChain(corgiNodeArgs.audioContext)
+
+		this._dummyGain.connect(this._bufferSource.playbackRate)
 
 		this._bufferSource
 			.connect(this._gain)
@@ -87,14 +93,20 @@ export class LowFrequencyOscillatorExpNode extends CorgiNode {
 
 		if (this._enabled && mode === 'retrigger') {
 			this._bufferSource.retrigger(this._audioContext.currentTime)
+			this._bufferSource.setActiveVoice('all', this._audioContext.currentTime)
 		}
 	}
 
 	private readonly _onMidiMessage = (midiAction: MidiAction) => {
+		if (midiAction.type === 'VOICE_COUNT_CHANGE') {
+			// console.log('receiveMidiAction VOICE_COUNT_CHANGE', this, midiAction.newCount)
+			this._dummyGain.setVoiceCount(midiAction.newCount)
+		}
 		if (!this._enabled) return
 
 		if ((midiAction.type === 'MIDI_NOTE' || midiAction.type === 'MIDI_GATE') && midiAction.gate === true) {
 			this._bufferSource.retrigger(midiAction.time, midiAction.voice)
+			this._bufferSource.setActiveVoice(midiAction.voice, midiAction.time)
 		}
 	}
 }
