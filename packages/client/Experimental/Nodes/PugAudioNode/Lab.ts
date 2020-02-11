@@ -988,6 +988,18 @@ export class LabAudioBufferSourceNode extends LabAudioNode<KelpieAudioBufferSour
 		super.init()
 	}
 
+	public retrigger(time: number, voiceIndex: number | 'all' = 'all') {
+		if (voiceIndex === 'all') {
+			this.voices.forEach(voice => {
+				voice.retrigger(time)
+			})
+		} else {
+			const voice = this.voices.get(voiceIndex)
+			if (!voice) return logger.error('LabAudioBufferSourceNode.retrigger !voice :( . ' + `voiceIndex: ${voiceIndex} ${this.name}`)
+			voice.retrigger(time)
+		}
+	}
+
 	protected readonly _makeVoice = (voiceIndex: number): KelpieAudioBufferSourceNode => {
 		const newThing = new KelpieAudioBufferSourceNode({audioContext: this.audioContext, labNode: this, voiceIndex})
 		newThing.buffer = this._buffer
@@ -1406,7 +1418,9 @@ class KelpieAudioBufferSourceNode extends KelpieAudioNode {
 	private _startTime?: number = 0
 	private _started = false
 	private _bufferSet = false
+	private _buffer: AudioBuffer | null = null
 	public set buffer(buffer: AudioBuffer | null) {
+		this._buffer = buffer
 		if (this._bufferSet === false) {
 			this._bufferSet = true
 			this._bufferSource.buffer = buffer
@@ -1468,6 +1482,28 @@ class KelpieAudioBufferSourceNode extends KelpieAudioNode {
 		this._bufferSource.start(time)
 		this._startTime = time
 		this._started = true
+	}
+
+	public retrigger(time: number) {
+		const oldBufferSource = this._bufferSource
+		oldBufferSource.stop(time)
+		oldBufferSource.onended = () => {
+			oldBufferSource.disconnect()
+			this._detuneConstantSource.disconnect(oldBufferSource.detune)
+			this._playbackRateConstantSource.disconnect(oldBufferSource.playbackRate)
+		}
+
+		this._bufferSource = this._audioContext.createBufferSource()
+		this._bufferSource.playbackRate.setValueAtTime(0, 0)
+		this._bufferSource.loop = oldBufferSource.loop
+		this._bufferSource.loopStart = oldBufferSource.loopStart
+		this._bufferSource.loopEnd = oldBufferSource.loopEnd
+		this._bufferSource.buffer = this._buffer
+		this._bufferSource.start(time)
+
+		this._bufferSource.connect(this._outputGain)
+		this._detuneConstantSource.connect(this._bufferSource.detune)
+		this._playbackRateConstantSource.connect(this._bufferSource.playbackRate)
 	}
 
 	public get input(): AudioNode {return this._outputGain}

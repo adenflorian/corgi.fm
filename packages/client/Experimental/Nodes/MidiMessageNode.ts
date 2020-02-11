@@ -26,7 +26,7 @@ export class MidiMessageNode extends CorgiNode {
 		this._message = new ExpCustomStringParam('pattern', '')
 		this._customStringParams = arrayToESIdKeyMap([this._message] as ExpCustomStringParam[])
 
-		this._pulseMode = new ExpCustomEnumParam<PulseMode>('mode', 'idle', pulseOptions)
+		this._pulseMode = new ExpCustomEnumParam<PulseMode>('mode', 'idle', ['send'])
 		this._customEnumParams = arrayToESIdKeyMap([this._pulseMode] as ExpCustomEnumParam<string>[])
 
 		this._pulseMode.onChange.subscribe(this._onChange)

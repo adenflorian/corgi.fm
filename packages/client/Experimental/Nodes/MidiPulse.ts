@@ -22,7 +22,7 @@ export class MidiPulseNode extends CorgiNode {
 		this._midiOutputPort = new ExpMidiOutputPort('output', 'output', this)
 		this._ports = arrayToESIdKeyMap([this._midiOutputPort])
 
-		this._pulseMode = new ExpCustomEnumParam<PulseMode>('mode', 'idle', pulseOptions)
+		this._pulseMode = new ExpCustomEnumParam<PulseMode>('mode', 'idle', ['on', 'off'])
 		this._customEnumParams = arrayToESIdKeyMap([this._pulseMode] as ExpCustomEnumParam<string>[])
 
 		this._pulseMode.onChange.subscribe(this._onChange)

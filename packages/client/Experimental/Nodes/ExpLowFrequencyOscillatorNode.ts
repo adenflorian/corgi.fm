@@ -14,6 +14,9 @@ import {LabGain, LabAudioBufferSourceNode} from './PugAudioNode/Lab'
 const oscillatorTypes = ['sawtooth', 'sine', 'triangle', 'square'] as const
 type OscillatorType = typeof oscillatorTypes[number]
 
+const pulseOptions = ['retrigger', 'idle'] as const
+type PulseMode = typeof pulseOptions[number]
+
 export class LowFrequencyOscillatorExpNode extends CorgiNode {
 	protected readonly _ports: ExpPorts
 	protected readonly _audioParams: ExpAudioParams
@@ -22,12 +25,14 @@ export class LowFrequencyOscillatorExpNode extends CorgiNode {
 	private readonly _gain: LabGain
 	private readonly _outputChain: ToggleGainChain
 	private readonly _type: ExpCustomEnumParam<OscillatorType>
+	private readonly _pulseMode: ExpCustomEnumParam<PulseMode>
 
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
 		super(corgiNodeArgs, {name: 'Low Frequency Oscillator', color: CssColor.purple})
 
 		this._type = new ExpCustomEnumParam<OscillatorType>('type', 'sine', oscillatorTypes)
-		this._customEnumParams = arrayToESIdKeyMap([this._type] as ExpCustomEnumParam<string>[])
+		this._pulseMode = new ExpCustomEnumParam<PulseMode>('mode', 'idle', ['retrigger'])
+		this._customEnumParams = arrayToESIdKeyMap([this._type, this._pulseMode] as ExpCustomEnumParam<string>[])
 
 		this._bufferSource = new LabAudioBufferSourceNode({...corgiNodeArgs, voiceMode: 'autoPoly', creatorName: 'LowFrequencyOscillatorExpNode'})
 		this._bufferSource.loop = true
@@ -55,6 +60,7 @@ export class LowFrequencyOscillatorExpNode extends CorgiNode {
 		this._ports = arrayToESIdKeyMap([frequencyPort, detunePort, gainPort, outputPort])
 
 		this._type.onChange.subscribe(this.onTypeChange)
+		this._pulseMode.onChange.subscribe(this._onPulse)
 	}
 
 	public render = () => this.getDebugView()
@@ -71,6 +77,14 @@ export class LowFrequencyOscillatorExpNode extends CorgiNode {
 
 	private readonly onTypeChange = (type: OscillatorType) => {
 		this._bufferSource.buffer = generateWave(type, this._audioContext)
+	}
+
+	private readonly _onPulse = (mode: PulseMode) => {
+		if (mode !== 'idle') this._pulseMode.onChange.invokeNextFrame('idle')
+
+		if (this._enabled && mode === 'retrigger') {
+			this._bufferSource.retrigger(this._audioContext.currentTime)
+		}
 	}
 }
 
