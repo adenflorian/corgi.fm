@@ -15,7 +15,7 @@ export enum AppOptions {
 	graphicsECS = 'graphicsECS',
 	graphicsExpensiveZoomPan = 'graphicsExpensiveZoomPan',
 	graphicsExtraAnimations = 'graphicsExtraAnimations',
-	disableAudioWorklet = 'disableAudioWorklet',
+	enableAudioWorklet = 'enableAudioWorklet',
 }
 
 export const initialOptionsState = Object.freeze({
@@ -30,7 +30,7 @@ export const initialOptionsState = Object.freeze({
 	graphicsECS: true,
 	graphicsExpensiveZoomPan: true,
 	graphicsExtraAnimations: false,
-	disableAudioWorklet: false,
+	enableAudioWorklet: false,
 })
 
 type SetOptionAction = ReturnType<typeof setOption>

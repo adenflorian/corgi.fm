@@ -88,7 +88,7 @@ async function setupAsync() {
 
 	const loadedOptionsState = loadOptionsState()
 
-	if (!loadedOptionsState.disableAudioWorklet) {
+	if (loadedOptionsState.enableAudioWorklet) {
 		// https://bugs.chromium.org/p/chromium/issues/detail?id=1006844
 		await loadAudioWorkletsAsync(audioContext)
 	}

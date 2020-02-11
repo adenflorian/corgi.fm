@@ -84,9 +84,9 @@ export const OptionsModalContent: ModalContent = () => {
 						label="graphics: enable extra animations (disable for better performance in big rooms)"
 					/>
 					<ConnectedOption
-						option={AppOptions.disableAudioWorklet}
+						option={AppOptions.enableAudioWorklet}
 						toolTip={audioWorkletToolTip}
-						label="audio: disable AudioWorklet (requires refresh) (try this if you are hearing audio glitch noises)"
+						label="audio: enable AudioWorklet (requires refresh) (disable if you are hearing audio glitch noises)"
 					/>
 				</div>
 			</div>
