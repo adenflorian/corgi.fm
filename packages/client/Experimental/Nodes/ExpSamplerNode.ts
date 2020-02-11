@@ -29,22 +29,6 @@ export class SamplerExpNode extends CorgiNode {
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
 		super(corgiNodeArgs, {name: 'Sampler', color: CssColor.green})
 
-		// TODO Use for LFO
-		// const sampleRate = 44100
-		// const lengthSeconds = 1
-		// const sampleCount = sampleRate * lengthSeconds
-
-		// const buffer = this._audioContext.createBuffer(1, sampleCount, sampleRate)
-
-		// const sineArray = new Float32Array(sampleCount)
-
-		// for (let i = 0; i < sampleCount; i++) {
-		// 	const time = i / sampleRate
-		// 	sineArray[i] = Math.sin(2 * Math.PI * time)
-		// }
-
-		// buffer.copyToChannel(sineArray, 0)
-
 		this._bufferSource = new LabAudioBufferSourceNode({...corgiNodeArgs, voiceMode: 'autoPoly', creatorName: 'SamplerExpNode'})
 		this._singletonContext.samplesManager.loadSample(`${samplePathBegin.static}/samplers/basic-piano/${sharpToFlatNotes['C']}${4}-49-96.mp3`)
 			.then(() => {

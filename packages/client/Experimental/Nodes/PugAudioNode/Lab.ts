@@ -1397,11 +1397,42 @@ class KelpieConstantSourceNode extends KelpieAudioNode {
 
 class KelpieAudioBufferSourceNode extends KelpieAudioNode {
 	public readonly name = 'AudioBufferSourceNode'
-	private readonly _bufferSource: AudioBufferSourceNode
+	private _bufferSource: AudioBufferSourceNode
+	private readonly _detuneConstantSource: ConstantSourceNode
+	private readonly _playbackRateConstantSource: ConstantSourceNode
+	private readonly _outputGain: GainNode
 	public readonly detune: KelpieAudioParam
 	public readonly playbackRate: KelpieAudioParam
+	private _startTime?: number = 0
+	private _started = false
+	private _bufferSet = false
 	public set buffer(buffer: AudioBuffer | null) {
+		if (this._bufferSet === false) {
+			this._bufferSet = true
+			this._bufferSource.buffer = buffer
+			return
+		}
+		const oldBufferSource = this._bufferSource
+		this._bufferSource = this._audioContext.createBufferSource()
+		this._bufferSource.playbackRate.setValueAtTime(0, 0)
+		this._bufferSource.loop = oldBufferSource.loop
+		this._bufferSource.loopStart = oldBufferSource.loopStart
+		this._bufferSource.loopEnd = oldBufferSource.loopEnd
+
 		this._bufferSource.buffer = buffer
+
+		this._detuneConstantSource.disconnect()
+		this._playbackRateConstantSource.disconnect()
+
+		this._bufferSource.connect(this._outputGain)
+		this._detuneConstantSource.connect(this._bufferSource.detune)
+		this._playbackRateConstantSource.connect(this._bufferSource.playbackRate)
+
+		oldBufferSource.disconnect()
+		if (this._started) {
+			oldBufferSource.stop()
+			this._bufferSource.start(this._startTime)
+		}
 	}
 	public set loop(loop: boolean) {
 		this._bufferSource.loop = loop
@@ -1415,19 +1446,38 @@ class KelpieAudioBufferSourceNode extends KelpieAudioNode {
 
 	public constructor(args: KelpieAudioNodeArgs) {
 		super(args)
+		this._outputGain = this._audioContext.createGain()
 		this._bufferSource = this._audioContext.createBufferSource()
-		this.detune = new KelpieAudioParam(this._audioContext, this._bufferSource.detune, 'detune', this)
-		this.playbackRate = new KelpieAudioParam(this._audioContext, this._bufferSource.playbackRate, 'playbackRate', this)
+		this._bufferSource.playbackRate.setValueAtTime(0, 0)
+		this._detuneConstantSource = this._audioContext.createConstantSource()
+		this._detuneConstantSource.offset.setValueAtTime(0, 0)
+		this._detuneConstantSource.start(0)
+		this._playbackRateConstantSource = this._audioContext.createConstantSource()
+		this._playbackRateConstantSource.offset.setValueAtTime(0, 0)
+		this._playbackRateConstantSource.start(0)
+
+		this.detune = new KelpieAudioParam(this._audioContext, this._detuneConstantSource.offset, 'detune', this)
+		this.playbackRate = new KelpieAudioParam(this._audioContext, this._playbackRateConstantSource.offset, 'playbackRate', this)
+
+		this._bufferSource.connect(this._outputGain)
+		this._detuneConstantSource.connect(this._bufferSource.detune)
+		this._playbackRateConstantSource.connect(this._bufferSource.playbackRate)
 	}
 
 	public start(time?: number) {
 		this._bufferSource.start(time)
+		this._startTime = time
+		this._started = true
 	}
 
-	public get input(): AudioNode {return this._bufferSource}
-	public get output(): AudioNode {return this._bufferSource}
+	public get input(): AudioNode {return this._outputGain}
+	public get output(): AudioNode {return this._outputGain}
 	protected _dispose() {
-		this._bufferSource.stop()
+		if (this._started) this._bufferSource.stop()
+		this._detuneConstantSource.stop()
+		this._detuneConstantSource.disconnect()
+		this._playbackRateConstantSource.stop()
+		this._playbackRateConstantSource.disconnect()
 	}
 }
 
