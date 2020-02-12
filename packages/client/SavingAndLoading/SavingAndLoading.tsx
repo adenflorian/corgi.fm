@@ -1,15 +1,18 @@
 /* eslint-disable react/no-array-index-key */
 import {stripIndents} from 'common-tags'
-import {Map} from 'immutable'
 import moment from 'moment'
 import React from 'react'
 import {IoMdFolder} from 'react-icons/io'
 import {useDispatch} from 'react-redux'
-import {loadRoom, ModalId, SavedRoom, localActions} from '@corgifm/common/redux'
+import {
+	loadRoom, ModalId, SavedRoom, localActions,
+	RoomType, getRoomTypeFriendlyString,
+} from '@corgifm/common/redux'
 import {getOrCreateLocalSavesStorage} from '../local-middleware'
 import {ModalButton} from '../Modal/ModalButton'
 import {ModalContent} from '../Modal/ModalManager'
 import './SavingAndLoading.less'
+import {CssColor} from '@corgifm/common/shamu-color'
 
 export function LoadRoomModalButton() {
 	return (
@@ -48,11 +51,15 @@ export const LoadRoomModalContent: ModalContent = ({hideModal}) => {
 							dispatch(loadRoom(saveData))
 							hideModal()
 						}
+						const type = saveData.roomType
+						const isExp = type === RoomType.Experimental
+						const typeString = getRoomTypeFriendlyString(type)
 						return (
 							<div key={saveId as string} className="localSave">
 								<div className="load">
 									<div className="room" title={`Load ${saveData.room}`} onClick={onClick}>{saveData.room}</div>
 									<div className="date" title={date} onClick={onClick}>{date}</div>
+									<div className="type" title={typeString} onClick={onClick} style={{color: isExp ? CssColor.orange : undefined}}>{typeString}</div>
 									<div className="version" title={`Version ${version}`} onClick={onClick}>{version}</div>
 								</div>
 								<div

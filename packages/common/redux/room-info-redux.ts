@@ -21,6 +21,13 @@ export enum RoomType {
 	Experimental = 'Experimental',
 }
 
+export const getRoomTypeFriendlyString = (type: RoomType) => {
+	switch (type) {
+		case RoomType.Normal: return 'Classic'
+		case RoomType.Experimental: return 'Experimental'
+	}
+}
+
 const makeRoomInfoState = Record({
 	roomType: RoomType.Normal,
 })

@@ -6,6 +6,7 @@ import {
 	selectClientById, selectLocalClientId, selectMemberCount,
 	selectRoomSettings, localActions,
 	selectClientInfo, shamuConnect, selectClientCount, RoomType,
+	getRoomTypeFriendlyString,
 } from '@corgifm/common/redux'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {
@@ -130,7 +131,7 @@ export const TopDiv = ({
 						}}
 						title={''}
 					>
-						{roomType}
+						{getRoomTypeFriendlyString(roomType)}
 					</div>
 				</div>
 				<div className="blob">
