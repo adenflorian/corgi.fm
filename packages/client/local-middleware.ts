@@ -47,7 +47,7 @@ import {
 	makeExpNodeState, makeExpPosition, ExpConnection,
 	selectExpPositionExtremes, selectExpNodesState, WithConnections,
 	selectShamuMetaState, selectExpAllConnections, ExpPosition, ExpNodeState,
-	ExpConnections, ExpNodesState, ExpPositions,
+	ExpConnections, ExpNodesState, ExpPositions, selectRoomInfoState, SavedClassicRoom, SavedExpRoom, selectExpGraphsState,
 } from '@corgifm/common/redux'
 import {pointersActions} from '@corgifm/common/redux/pointers-redux'
 import {makeMidiClipEvent, preciseModulus, preciseSubtract} from '@corgifm/common/midi-types'
@@ -61,10 +61,10 @@ import {onChangeRoom} from './WebAudio'
 import {createResetZoomAction, createResetPanAction} from './SimpleGraph/Zoom'
 
 type LocalMiddlewareActions = LocalAction | AddClientAction
-| VirtualKeyPressedAction | GridSequencerAction
-| UserInputAction | VirtualKeyUpAction | VirtualOctaveChangeAction
-| SetActiveRoomAction | CommonAction
-| UpdatePositionsAction | SetLocalClientNameAction
+	| VirtualKeyPressedAction | GridSequencerAction
+	| UserInputAction | VirtualKeyUpAction | VirtualOctaveChangeAction
+	| SetActiveRoomAction | CommonAction
+	| UpdatePositionsAction | SetLocalClientNameAction
 
 /** Key is the key number that was pressed, value is the note that was played (key number with octave applied) */
 let _localMidiKeys = Immutable.Map<number, IMidiNote>()
@@ -659,6 +659,14 @@ function getChildExpNodeIds(nodeId: Id, state: IClientAppState): Immutable.Set<I
 }
 
 function createRoomSave(state: IClientAppState, roomName: string): SavedRoom {
+	const {roomType} = selectRoomInfoState(state.room)
+	switch (roomType) {
+		case RoomType.Normal: return createClassicRoomSave(state, roomName)
+		case RoomType.Experimental: return createExpRoomSave(state, roomName)
+	}
+}
+
+function createClassicRoomSave(state: IClientAppState, roomName: string): SavedClassicRoom {
 	return {
 		connections: selectAllConnections(state.room),
 		globalClock: selectGlobalClockState(state.room),
@@ -669,6 +677,21 @@ function createRoomSave(state: IClientAppState, roomName: string): SavedRoom {
 		saveClientVersion: selectClientInfo(state).clientVersion,
 		saveServerVersion: selectClientInfo(state).serverVersion,
 		room: roomName,
+		roomType: RoomType.Normal,
+		roomInfo: selectRoomInfoState(state.room),
+	} as const
+}
+
+function createExpRoomSave(state: IClientAppState, roomName: string): SavedExpRoom {
+	return {
+		expGraphs: selectExpGraphsState(state.room),
+		roomSettings: selectRoomSettings(state.room),
+		saveDateTime: new Date().toISOString(),
+		saveClientVersion: selectClientInfo(state).clientVersion,
+		saveServerVersion: selectClientInfo(state).serverVersion,
+		room: roomName,
+		roomType: RoomType.Experimental,
+		roomInfo: selectRoomInfoState(state.room),
 	} as const
 }
 
@@ -758,13 +781,15 @@ function parseLocalSavesJSON(localSavesJSON: string): LocalSaves {
 		} else {
 			return {
 				all: Immutable.Map<Id, SavedRoom>(localSaves.all).map((save): SavedRoom => {
-					return {
+					const foo = {
 						...save,
 						saveDateTime: save.saveDateTime || '?',
 						saveClientVersion: save.saveClientVersion || '?',
 						saveServerVersion: save.saveServerVersion || '?',
 						room: save.room || '?',
 					}
+					foo.roomType = save.roomType || RoomType.Normal
+					return foo
 				}),
 			}
 		}

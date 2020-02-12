@@ -18,7 +18,7 @@ import {
 	selectConnectionsWithSourceOrTargetIds, shamuGraphActions,
 	SimpleReverbState, updatePositions, BetterSequencerState,
 	addBetterSequencer, createSequencerEvents, RoomType, expNodesActions,
-	expPositionActions, makeExpPosition, makeExpNodeState, expConnectionsActions, ExpConnection,
+	expPositionActions, makeExpPosition, makeExpNodeState, expConnectionsActions, ExpConnection, SavedClassicRoom, SavedExpRoom, expGraphsActions, roomInfoAction,
 } from '@corgifm/common/redux'
 import {logger} from '@corgifm/common/logger'
 import {serverClientId, maxPitchFrequency} from '@corgifm/common/common-constants'
@@ -759,9 +759,26 @@ export function loadServerStuff(room: string, serverStore: Store<IServerState>, 
 	const serverClient = ClientState.createServerClient()
 	const addClientAction = addClient(serverClient)
 
-	const getRoomState = () => serverStore.getState().roomStores.get(room)!
-
 	dispatchToRoom(addClientAction)
+
+	dispatchToRoom(roomSettingsActions.replaceAll(transformedRoomSave.roomSettings))
+	dispatchToRoom(roomSettingsActions.setOwner(ownerId))
+	dispatchToRoom(roomInfoAction.replace(transformedRoomSave.roomInfo))
+
+	switch (transformedRoomSave.roomType) {
+		case RoomType.Normal: loadClassicServerStuff(room, serverStore, transformedRoomSave, ownerId)
+			break;
+		case RoomType.Experimental: loadExpServerStuff(room, serverStore, transformedRoomSave, ownerId)
+			break;
+	}
+
+	function dispatchToRoom(action: Action) {
+		return serverStore.dispatch(createRoomAction(action, room))
+	}
+}
+
+export function loadClassicServerStuff(room: string, serverStore: Store<IServerState>, transformedRoomSave: SavedClassicRoom, ownerId: Id) {
+	const getRoomState = () => serverStore.getState().roomStores.get(room)!
 
 	dispatchToRoom(connectionsActions.replaceAll(transformedRoomSave.connections))
 	dispatchToRoom(shamuGraphActions.replace(transformedRoomSave.shamuGraph))
@@ -773,7 +790,6 @@ export function loadServerStuff(room: string, serverStore: Store<IServerState>, 
 		}
 	})
 	dispatchToRoom(replacePositions(newPositions))
-	dispatchToRoom(roomSettingsActions.replaceAll(transformedRoomSave.roomSettings))
 	dispatchToRoom(globalClockActions.replace(transformedRoomSave.globalClock))
 
 	const keyboardIds = selectAllVirtualKeyboardIds(getRoomState())
@@ -785,7 +801,13 @@ export function loadServerStuff(room: string, serverStore: Store<IServerState>, 
 	dispatchToRoom(deleteThingsAny(keyboardIds))
 	dispatchToRoom(deletePositions(keyboardIds))
 
-	dispatchToRoom(roomSettingsActions.setOwner(ownerId))
+	function dispatchToRoom(action: Action) {
+		return serverStore.dispatch(createRoomAction(action, room))
+	}
+}
+
+export function loadExpServerStuff(room: string, serverStore: Store<IServerState>, transformedRoomSave: SavedExpRoom, ownerId: Id) {
+	dispatchToRoom(expGraphsActions.replaceAll(transformedRoomSave.expGraphs))
 
 	function dispatchToRoom(action: Action) {
 		return serverStore.dispatch(createRoomAction(action, room))

@@ -7,6 +7,8 @@ import {
 	selectAllPositions, selectGlobalClockState, selectAllConnections,
 	IClientAppState, RoomType,
 } from '.'
+import {selectExpGraphsState} from './experimental'
+import {selectRoomInfoState} from './room-info-redux'
 
 export const roomsActions = {
 	requestCreate: (name: string, roomType: RoomType) => ({
@@ -81,16 +83,29 @@ export interface LocalSaves {
 	readonly all: Map<Id, SavedRoom>
 }
 
-export interface SavedRoom {
-	readonly connections: ReturnType<typeof selectAllConnections>
-	readonly globalClock: ReturnType<typeof selectGlobalClockState>
-	readonly positions: ReturnType<typeof selectAllPositions>
+export type SavedRoom = SavedClassicRoom | SavedExpRoom
+
+export interface SavedRoomBase {
 	readonly roomSettings: ReturnType<typeof selectRoomSettings>
-	readonly shamuGraph: ReturnType<typeof selectShamuGraphState>
 	readonly saveDateTime: string
 	readonly saveClientVersion: string
 	readonly saveServerVersion: string
 	readonly room: string
+	readonly roomType: RoomType
+	readonly roomInfo: ReturnType<typeof selectRoomInfoState>
+}
+
+export interface SavedClassicRoom extends SavedRoomBase {
+	readonly roomType: RoomType.Normal
+	readonly connections: ReturnType<typeof selectAllConnections>
+	readonly globalClock: ReturnType<typeof selectGlobalClockState>
+	readonly positions: ReturnType<typeof selectAllPositions>
+	readonly shamuGraph: ReturnType<typeof selectShamuGraphState>
+}
+
+export interface SavedExpRoom extends SavedRoomBase {
+	readonly roomType: RoomType.Experimental
+	readonly expGraphs: ReturnType<typeof selectExpGraphsState>
 }
 
 const initialState = {

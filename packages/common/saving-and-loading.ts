@@ -4,7 +4,7 @@ import {
 	gridSequencersReducer, infiniteSequencersReducer, shamuGraphReducer,
 	globalClockReducer, roomSettingsReducer, connectionsReducer, IPositions,
 	IConnection, BasicSamplerState, basicSamplersReducer,
-	IBasicSamplersState, makePosition,
+	IBasicSamplersState, makePosition, RoomType, SavedClassicRoom, SavedExpRoom, expGraphsReducer, roomInfoReducer,
 } from './redux'
 import {
 	MidiClip, MidiClipEvent, makeMidiClipEvent, MidiClipEventV1,
@@ -19,7 +19,14 @@ export function transformLoadedSave(save: Partial<SavedRoom>): SavedRoom {
 }
 
 function bar(save: Partial<SavedRoom>): SavedRoom {
+	switch (save.roomType) {
+		case RoomType.Experimental: return barExp(save)
+		case RoomType.Normal:
+		default: return barClassic(save as Partial<SavedClassicRoom>)
+	}
+}
 
+function barClassic(save: Partial<SavedClassicRoom>): SavedClassicRoom {
 	return {
 		...save,
 		positions: convertPositions(Map(save.positions || [])),
@@ -31,6 +38,22 @@ function bar(save: Partial<SavedRoom>): SavedRoom {
 		saveDateTime: save.saveDateTime || '?',
 		saveServerVersion: save.saveServerVersion || '?',
 		shamuGraph: convertShamuGraph(save.shamuGraph || {}),
+		roomType: RoomType.Normal,
+		roomInfo: save.roomInfo || {...roomInfoReducer(undefined, {} as any), roomType: RoomType.Normal},
+	}
+}
+
+function barExp(save: Partial<SavedExpRoom>): SavedExpRoom {
+	return {
+		...save,
+		room: save.room || '?',
+		roomSettings: save.roomSettings || roomSettingsReducer(undefined, {} as any),
+		saveClientVersion: save.saveClientVersion || '?',
+		saveDateTime: save.saveDateTime || '?',
+		saveServerVersion: save.saveServerVersion || '?',
+		roomType: RoomType.Experimental,
+		expGraphs: save.expGraphs || expGraphsReducer(undefined, {} as any),
+		roomInfo: save.roomInfo || {...roomInfoReducer(undefined, {} as any), roomType: RoomType.Experimental},
 	}
 }
 
