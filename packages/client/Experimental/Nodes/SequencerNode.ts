@@ -64,6 +64,7 @@ export class SequencerNode extends CorgiNode {
 			} else {
 				this._midiOutputPort.sendMidiAction(midiActions.gate(eventStart, event.gate))
 			}
+			this.debugInfo.invokeNextFrame(JSON.stringify(event))
 		})
 
 		this._cursor = targetSongTimeToReadTo
@@ -127,22 +128,51 @@ class EventStream {
 	private _currentIndex = -1
 	private _loops = 0
 	private readonly _events: readonly SequencerEvent[] = [
+		// {gate: true, beat: 0, note: 60},
+		// {gate: false, beat: 1, note: 60},
+		// {gate: true, beat: 2, note: 65},
+		// {gate: false, beat: 3, note: 65},
+
 		{gate: true, beat: 0, note: 60},
+		{gate: true, beat: 0, note: 48},
+		{gate: false, beat: 1, note: 60},
 		{gate: true, beat: 2, note: 63},
+		{gate: false, beat: 3, note: 63},
 		{gate: true, beat: 3, note: 67},
+		{gate: false, beat: 3.5, note: 48},
+		{gate: false, beat: 4, note: 67},
 		{gate: true, beat: 4, note: 60},
+		{gate: true, beat: 4, note: 51},
+		{gate: false, beat: 5, note: 60},
 		{gate: true, beat: 6, note: 63},
+		{gate: false, beat: 7, note: 63},
 		{gate: true, beat: 7, note: 67},
+		{gate: false, beat: 7.5, note: 51},
 		{gate: true, beat: 7.5, note: 70},
+		{gate: false, beat: 8, note: 67},
 		{gate: true, beat: 8, note: 69},
+		{gate: true, beat: 8, note: 53},
+		{gate: false, beat: 8.5, note: 70},
+		{gate: false, beat: 9, note: 69},
 		{gate: true, beat: 9, note: 65},
+		{gate: false, beat: 10, note: 65},
 		{gate: true, beat: 10, note: 63},
 		{gate: true, beat: 10.5, note: 65},
+		{gate: false, beat: 11, note: 63},
 		{gate: true, beat: 11, note: 67},
+		{gate: false, beat: 11.5, note: 53},
+		{gate: false, beat: 11.5, note: 65},
+		{gate: false, beat: 12, note: 67},
 		{gate: true, beat: 12, note: 60},
+		{gate: true, beat: 12, note: 55},
+		{gate: false, beat: 13, note: 60},
 		{gate: true, beat: 13, note: 58},
 		{gate: true, beat: 13.5, note: 62},
+		{gate: false, beat: 14, note: 58},
 		{gate: true, beat: 14, note: 60},
+		{gate: false, beat: 14.5, note: 62},
+		{gate: false, beat: 15, note: 60},
+		{gate: false, beat: 15.5, note: 55},
 		{gate: false, beat: 15.5},
 	]
 

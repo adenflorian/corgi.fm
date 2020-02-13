@@ -12,6 +12,7 @@ import {
 import './ExpNodes.less'
 
 interface Props {
+	readonly beforeChildren: React.ReactNode
 	readonly children: React.ReactNode
 	readonly context: CorgiNodeReact
 	readonly audioParams: ExpAudioParams
@@ -24,7 +25,7 @@ interface Props {
 const viewMode = 'debug' as 'max' | 'debug'
 
 export const CorgiNodeView = hot(module)(React.memo(function _CorgiNodeView({
-	children, context, audioParams, customNumberParams, ports, customEnumParams,
+	beforeChildren, children, context, audioParams, customNumberParams, ports, customEnumParams,
 	customStringParams,
 }: Props) {
 	return (
@@ -38,6 +39,7 @@ export const CorgiNodeView = hot(module)(React.memo(function _CorgiNodeView({
 						customEnumParams={customEnumParams}
 						customStringParams={customStringParams}
 						ports={ports}
+						beforeChildren={beforeChildren}
 					>
 						{children}
 					</ExpNodeDebugView>

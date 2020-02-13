@@ -86,6 +86,7 @@ export class EnvelopeNode extends CorgiNode {
 	}
 
 	public handleGateEvent(gate: boolean, startTime: number, voiceIndex: number | 'all') {
+		this.debugInfo.invokeNextFrame(JSON.stringify({gate, startTime, voiceIndex}))
 		if (startTime < this._lastGateTime) {
 			logger.error('receiveMidiAction startTime < this._lastGateTime:', {gate, startTime, last: this._lastGateTime, lastGate: this._lastGate})
 		}

@@ -31,7 +31,7 @@ export class LowFrequencyOscillatorExpNode extends CorgiNode {
 	private readonly _pulseMode: ExpCustomEnumParam<PulseMode>
 
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
-		super(corgiNodeArgs, {name: 'Low Frequency Oscillator', color: CssColor.purple})
+		super(corgiNodeArgs, {name: 'Low Frequency Oscillator', color: CssColor.purple, useBackgroundOscilloscope: true})
 
 		this._type = new ExpCustomEnumParam<OscillatorType>('type', 'sine', oscillatorTypes)
 		this._pulseMode = new ExpCustomEnumParam<PulseMode>('mode', 'idle', ['retrigger'])
@@ -55,6 +55,8 @@ export class LowFrequencyOscillatorExpNode extends CorgiNode {
 		this._bufferSource
 			.connect(this._gain)
 			.connect(this._outputChain.input)
+		
+		this._gain.connect(this._analyser!)
 
 		const frequencyParam = new ExpAudioParam('frequency', this._bufferSource.playbackRate, 1, 32, 'unipolar', {valueString: lfoRateValueToString, curveFunctions: lfoFreqCurveFunctions})
 		const detuneParam = new ExpAudioParam('detune', this._bufferSource.detune, 0, 100, 'bipolar', {valueString: detuneValueToString})
@@ -69,6 +71,7 @@ export class LowFrequencyOscillatorExpNode extends CorgiNode {
 		this._ports = arrayToESIdKeyMap([midiInputPort, frequencyPort, detunePort, gainPort, outputPort])
 
 		this._type.onChange.subscribe(this.onTypeChange)
+		this.onTypeChange(this._type.onChange.current, true)
 		this._pulseMode.onChange.subscribe(this._onPulse)
 	}
 
@@ -84,8 +87,10 @@ export class LowFrequencyOscillatorExpNode extends CorgiNode {
 		})
 	}
 
-	private readonly onTypeChange = (type: OscillatorType) => {
-		this._bufferSource.buffer = generateWave(type, this._audioContext)
+	private readonly onTypeChange = (type: OscillatorType, didChange: boolean) => {
+		if (didChange) {
+			this._bufferSource.buffer = generateWave(type, this._audioContext)
+		}
 	}
 
 	private readonly _onPulse = (mode: PulseMode) => {

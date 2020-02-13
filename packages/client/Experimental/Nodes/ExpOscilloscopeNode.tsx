@@ -13,28 +13,29 @@ import {LabGain} from './PugAudioNode/Lab'
 export class ExpOscilloscopeNode extends CorgiNode {
 	protected readonly _ports: ExpPorts
 	private readonly _gain: LabGain
-	private readonly _analyser: LabCorgiAnalyserSPNode
+	private readonly _analyser2: LabCorgiAnalyserSPNode
 	private readonly _newSampleEvent = new CorgiNumberChangedEvent(0)
 
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
 		super(corgiNodeArgs, {name: 'Oscilloscope', color: CssColor.blue})
 
-		this._analyser = new LabCorgiAnalyserSPNode(corgiNodeArgs.audioContext, this._onAnalyserUpdate, true, 'ExpOscilloscopeNode')
+		this._analyser2 = new LabCorgiAnalyserSPNode(corgiNodeArgs.audioContext, this._onAnalyserUpdate, true, 'ExpOscilloscopeNode')
 
 		this._gain = new LabGain({audioContext: this._audioContext, voiceMode: 'autoPoly', creatorName: 'ExpOscilloscopeNode'})
 		this._gain.gain.onMakeVoice = gain => gain.setValueAtTime(1, 0)
 
-		this._gain.connect(this._analyser)
+		this._gain.connect(this._analyser2)
 
 		const inputPort = new ExpNodeAudioInputPort('input', 'input', this, this._gain)
 		const outputPort = new ExpNodeAudioOutputPort('output', 'output', this, this._gain)
 		this._ports = arrayToESIdKeyMap([inputPort, outputPort])
 
-		this._analyser.requestUpdate()
+		this._analyser2.requestUpdate()
 	}
 
 	public render() {
 		return this.getDebugView(
+			undefined,
 			<ExpOscilloscopeNodeExtra
 				newSampleEvent={this._newSampleEvent}
 			/>
@@ -50,6 +51,6 @@ export class ExpOscilloscopeNode extends CorgiNode {
 
 	private readonly _onAnalyserUpdate = (newValue: number) => {
 		if (this._enabled) this._newSampleEvent.invokeNextFrame(newValue)
-		this._analyser.requestUpdate()
+		this._analyser2.requestUpdate()
 	}
 }

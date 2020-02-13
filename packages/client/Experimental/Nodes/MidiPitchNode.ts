@@ -32,21 +32,13 @@ export class MidiPitchNode extends CorgiNode {
 
 	private readonly _onMidiMessage = (midiAction: MidiAction) => {
 		if (midiAction.type === 'MIDI_NOTE') {
-			this._onMidiNoteAction(midiAction)
+			this._onMidiNote(midiAction)
 		} else {
 			this._midiOutputPort.sendMidiAction(midiAction)
 		}
 	}
 
-	private _onMidiNoteAction(midiAction: Extract<MidiAction, {type: 'MIDI_NOTE'}>) {
-		if (midiAction.gate === true) {
-			this._onMidiNoteOn(midiAction)
-		} else {
-			this._midiOutputPort.sendMidiAction(midiAction)
-		}
-	}
-
-	private _onMidiNoteOn(midiAction: Extract<MidiAction, {type: 'MIDI_NOTE'}>) {
+	private _onMidiNote(midiAction: Extract<MidiAction, {type: 'MIDI_NOTE'}>) {
 		this._midiOutputPort.sendMidiAction({
 			...midiAction,
 			note: this._enabled

@@ -73,6 +73,7 @@ export class AutomaticPolyphonicMidiConverterNode extends CorgiNode implements P
 
 	private _onMidiMessage(midiAction: MidiAction) {
 		if (!this._enabled && midiAction.type !== 'VOICE_COUNT_CHANGE') return
+		this.debugInfo.invokeNextFrame(JSON.stringify(midiAction))
 
 		if (midiAction.type === 'MIDI_NOTE') {
 			this._onMidiNoteAction(midiAction)
@@ -96,6 +97,7 @@ export class AutomaticPolyphonicMidiConverterNode extends CorgiNode implements P
 
 	private _onMidiNoteOff(midiAction: Extract<MidiAction, {type: 'MIDI_NOTE'}>) {
 		const voiceIndex = this._algorithm.getVoiceForNoteOff(midiAction.note)
+		this.debugInfo.invokeNextFrame(this.debugInfo.current + '\n' + JSON.stringify({voiceIndex}))
 
 		if (voiceIndex === undefined) return
 

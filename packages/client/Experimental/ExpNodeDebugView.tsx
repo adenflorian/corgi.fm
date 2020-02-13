@@ -12,6 +12,8 @@ import {useNodeContext} from './CorgiNode'
 import {useObjectChangedEvent, useStringChangedEvent} from './hooks/useCorgiEvent'
 import {ExpNodeDebugCustomEnumParamSelect} from './ExpNodeDebugCustomEnumParamSelect'
 import {ExpNodeDebugCustomStringParamField} from './ExpNodeDebugCustomStringParamField'
+import {CssColor} from '@corgifm/common/shamu-color'
+import {ExpOscilloscopeNodeExtra} from './Nodes/ExpOscilloscopeNodeView'
 
 interface Props {
 	audioParams: ExpAudioParams
@@ -19,11 +21,12 @@ interface Props {
 	customEnumParams: ExpCustomEnumParams
 	customStringParams: ExpCustomStringParams
 	ports: ExpPorts
-	children?: React.ReactNode
+	children: React.ReactNode
+	beforeChildren: React.ReactNode
 }
 
 export const ExpNodeDebugView = hot(module)(React.memo(function _ExpNodeDebugView({
-	audioParams, customNumberParams, children,
+	audioParams, customNumberParams, children, beforeChildren,
 	ports, customEnumParams, customStringParams,
 }: Props) {
 	const nodeContext = useNodeContext()
@@ -32,22 +35,25 @@ export const ExpNodeDebugView = hot(module)(React.memo(function _ExpNodeDebugVie
 	const isAudioWorkletLoaded = useObjectChangedEvent(simpleGlobalClientState.onAudioWorkletLoaded)
 
 	return (
-		<div className="expNodeDebugView">
-			{/* <div className="nodeName">{nodeName}</div> */}
-			{/* <div className="nodeId">{nodeId}</div> */}
-			<Ports ports={ports} />
-			{nodeContext.requiresAudioWorklet && !isAudioWorkletLoaded &&
-				<div
-					className="audioWorkletWarning"
-					title={audioWorkletToolTip}
-				>
-					This node needs AudioWorklet to work properly, but AudioWorklet is not loaded.
-				</div>
-			}
-			<div className="params">
-				{/* {audioParams.size > 0 &&
+		<div style={{position: 'relative', width: '100%'}}>
+			{nodeContext.newSampleEvent && <ExpOscilloscopeNodeExtra newSampleEvent={nodeContext.newSampleEvent} />}
+			{beforeChildren}
+			<div className="expNodeDebugView">
+				{/* <div className="nodeName">{nodeName}</div> */}
+				{/* <div className="nodeId">{nodeId}</div> */}
+				<Ports ports={ports} />
+				{nodeContext.requiresAudioWorklet && !isAudioWorkletLoaded &&
+					<div
+						className="audioWorkletWarning"
+						title={audioWorkletToolTip}
+					>
+						This node needs AudioWorklet to work properly, but AudioWorklet is not loaded.
+					</div>
+				}
+				<div className="params">
+					{/* {audioParams.size > 0 &&
 					<div className="sectionLabel">Audio Params</div>} */}
-				{/* <div className="paramTexts">
+					{/* <div className="paramTexts">
 					{[...audioParams].map(([id, audioParam]) => (
 						<div className="param" key={id as string}>
 							<div className="paramId">{id}</div>
@@ -55,53 +61,55 @@ export const ExpNodeDebugView = hot(module)(React.memo(function _ExpNodeDebugVie
 						</div>
 					))}
 				</div> */}
-				<div className="paramKnobs">
-					{[...audioParams].map(([id, audioParam]) => {
-						const port = ports.get(id) as ExpNodeAudioParamInputPort
-						return (
-							<AudioParamContext.Provider value={audioParam} key={id as string}>
-								<AudioParamInputPortContext.Provider value={port}>
-									<ExpNodeDebugAudioParamKnob
-										nodeId={nodeId}
-									/>
-								</AudioParamInputPortContext.Provider>
-							</AudioParamContext.Provider>
-						)
-					})}
-				</div>
-				{/* {customNumberParams.size > 0 &&
+					<div className="paramKnobs">
+						{[...audioParams].map(([id, audioParam]) => {
+							const port = ports.get(id) as ExpNodeAudioParamInputPort
+							return (
+								<AudioParamContext.Provider value={audioParam} key={id as string}>
+									<AudioParamInputPortContext.Provider value={port}>
+										<ExpNodeDebugAudioParamKnob
+											nodeId={nodeId}
+										/>
+									</AudioParamInputPortContext.Provider>
+								</AudioParamContext.Provider>
+							)
+						})}
+					</div>
+					{/* {customNumberParams.size > 0 &&
 					<div className="sectionLabel">Custom Number Params</div>} */}
-				<div className="paramKnobs">
-					{[...customNumberParams].map(([id, customNumberParam]) => (
-						<ExpNodeDebugCustomNumberParamKnob
-							key={id as string}
-							nodeId={nodeId}
-							customNumberParam={customNumberParam}
-						/>
-					))}
-				</div>
-				{/* {customEnumParams.size > 0 &&
+					<div className="paramKnobs">
+						{[...customNumberParams].map(([id, customNumberParam]) => (
+							<ExpNodeDebugCustomNumberParamKnob
+								key={id as string}
+								nodeId={nodeId}
+								customNumberParam={customNumberParam}
+							/>
+						))}
+					</div>
+					{/* {customEnumParams.size > 0 &&
 					<div className="sectionLabel">Custom Enum Params</div>} */}
-				<div className="enumParams">
-					{[...customEnumParams].map(([id, customEnumParam]) => (
-						<ExpNodeDebugCustomEnumParamSelect
-							key={id as string}
-							nodeId={nodeId}
-							customEnumParam={customEnumParam}
-						/>
-					))}
+					<div className="enumParams">
+						{[...customEnumParams].map(([id, customEnumParam]) => (
+							<ExpNodeDebugCustomEnumParamSelect
+								key={id as string}
+								nodeId={nodeId}
+								customEnumParam={customEnumParam}
+							/>
+						))}
+					</div>
+					<div className="stringParams">
+						{[...customStringParams].map(([id, customStringParam]) => (
+							<ExpNodeDebugCustomStringParamField
+								key={id as string}
+								nodeId={nodeId}
+								customStringParam={customStringParam}
+							/>
+						))}
+					</div>
+					<DebugInfo />
 				</div>
-				<div className="stringParams">
-					{[...customStringParams].map(([id, customStringParam]) => (
-						<ExpNodeDebugCustomStringParamField
-							key={id as string}
-							nodeId={nodeId}
-							customStringParam={customStringParam}
-						/>
-					))}
-				</div>
+				{children}
 			</div>
-			{children}
 		</div>
 	)
 }))
@@ -167,6 +175,23 @@ const Port = React.memo(function _Port({port, index}: PortProps) {
 			<div className={`portDropZone type-${port.type}`} />
 			{/* <div className="portId">{port.id}</div> */}
 			<div className="portName">{port.name}</div>
+		</div>
+	)
+})
+
+const DebugInfo = React.memo(function _DebugInfo() {
+	const nodeContext = useNodeContext()
+	const debugString = useStringChangedEvent(nodeContext.debugInfo)
+	return (
+		<div
+			className={`debugString smallFont`}
+			style={{
+				color: CssColor.defaultGray,
+				fontSize: 12,
+				width: '100%',
+			}}
+		>
+			{debugString}
 		</div>
 	)
 })

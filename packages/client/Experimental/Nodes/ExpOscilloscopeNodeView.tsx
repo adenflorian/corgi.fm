@@ -4,12 +4,13 @@ import {CorgiNumberChangedEvent} from '../CorgiEvents'
 import {useNumberChangedEvent} from '../hooks/useCorgiEvent'
 import {useExpPosition} from '../../react-hooks'
 import {useNodeContext} from '../CorgiNode'
+import {CssColor} from '@corgifm/common/shamu-color'
 
 interface Props {
 	newSampleEvent: CorgiNumberChangedEvent
 }
 
-const limit = 256
+const limit = 512
 const dotSize = 1
 
 export const ExpOscilloscopeNodeExtra = hot(module)(React.memo(function _ExpOscilloscopeNodeExtra({
@@ -17,6 +18,9 @@ export const ExpOscilloscopeNodeExtra = hot(module)(React.memo(function _ExpOsci
 }: Props) {
 	const lastSample = useNumberChangedEvent(newSampleEvent, false)
 	const history = useRef<number[]>([])
+	while (history.current.length < limit) {
+		history.current.push(0)
+	}
 	history.current.push(lastSample)
 	while (history.current.length > limit) {
 		history.current.shift()
@@ -49,6 +53,9 @@ export const ExpOscilloscopeNodeExtra2 = (function _ExpOscilloscopeNodeExtra({
 				position: 'absolute',
 				top: 0,
 				left: 0,
+				overflow: 'hidden',
+				borderBottomLeftRadius: 8,
+				borderBottomRightRadius: 8,
 			}}
 		>
 			{/* {history.current.map((sample, i) => {
@@ -73,14 +80,24 @@ export const ExpOscilloscopeNodeExtra2 = (function _ExpOscilloscopeNodeExtra({
 					overflow: 'visible',
 				}}
 			>
+				{/* <defs>
+					<linearGradient id="grad1" x1="0%" y1="0%" x2="0%" y2="100%">
+						<stop offset="0%" style={{stopColor: 'hsl(0,0,100)', stopOpacity: 1}} />
+						<stop offset="100%" style={{stopColor: 'hsl(0,0,0)', stopOpacity: 1}} />
+					</linearGradient>
+				</defs> */}
 				<polyline
+					// fill="url(#grad1)"
 					points={
+						`0 ${position.height}, ` + 
 						samples
 							.reduce((result, sample, i) => result + `${(i / (limit - 1)) * (position.width)} ${(sample * -position.height * 0.45) + position.height / 2}, `, '')
-							.replace(/, $/, '')
+							.replace(/, $/, '') +
+						`, ${position.width} ${position.height}`
 					}
-					stroke="currentColor"
-					fill="none"
+					stroke={"none"}
+					opacity={1}
+					fill={CssColor.panelGrayDark}
 					strokeLinecap="round"
 					strokeLinejoin="round"
 					strokeWidth={position.width / 400}

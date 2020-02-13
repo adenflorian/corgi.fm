@@ -1,4 +1,4 @@
-import React, {ReactElement, useContext} from 'react'
+import React, {ReactElement, useContext, ReactNode} from 'react'
 import {List} from 'immutable'
 import {clamp, clampPolarized} from '@corgifm/common/common-utils'
 import {NodeToNodeAction} from '@corgifm/common/server-constants'
@@ -11,10 +11,10 @@ import {
 } from './ExpPorts'
 import {ExpAudioParams, ExpCustomNumberParams, ExpCustomEnumParams, ExpCustomStringParams} from './ExpParams'
 import {CorgiNodeView} from './CorgiNodeView'
-import {GroupNode} from './Nodes/GroupNode'
-import {CorgiStringChangedEvent} from './CorgiEvents'
+import {CorgiStringChangedEvent, CorgiNumberChangedEvent} from './CorgiEvents'
 import {isMidiOutputPort} from './ExpMidiPorts'
 import {isPolyphonicOutputPort} from './ExpPolyphonicPorts'
+import {LabCorgiAnalyserSPNode} from './CorgiAnalyserSPN'
 
 export const ExpNodeContext = React.createContext<null | CorgiNodeReact>(null)
 
@@ -28,6 +28,7 @@ export interface CorgiNodeOptions {
 	readonly name: string
 	readonly color: string
 	readonly requiresAudioWorklet?: boolean
+	readonly useBackgroundOscilloscope?: boolean
 }
 
 export interface CorgiNodeArgs {
@@ -45,7 +46,7 @@ export type CorgiNodeConstructor = new (args: CorgiNodeArgs) => CorgiNode
 
 export interface CorgiNodeReact extends Pick<CorgiNode,
 'id' | 'requiresAudioWorklet' | 'getPorts' | 'onColorChange' |
-'onNameChange' | 'setPortPosition' | 'type'> {}
+'onNameChange' | 'setPortPosition' | 'type' | 'debugInfo' | 'newSampleEvent'> {}
 
 export abstract class CorgiNode {
 	public readonly id: Id
@@ -65,6 +66,9 @@ export abstract class CorgiNode {
 	public readonly onNameChange: CorgiStringChangedEvent
 	public readonly onColorChange: CorgiStringChangedEvent
 	public readonly defaultColor: string
+	public readonly debugInfo = new CorgiStringChangedEvent('')
+	public readonly newSampleEvent?: CorgiNumberChangedEvent
+	protected readonly _analyser?: LabCorgiAnalyserSPNode
 
 	public constructor(
 		args: CorgiNodeArgs,
@@ -83,6 +87,14 @@ export abstract class CorgiNode {
 		this.onColorChange = new CorgiStringChangedEvent(this.defaultColor)
 		this.requiresAudioWorklet = options.requiresAudioWorklet !== undefined
 			? options.requiresAudioWorklet : false
+		if (options.useBackgroundOscilloscope) {
+			this.newSampleEvent = new CorgiNumberChangedEvent(0)
+			this._analyser = new LabCorgiAnalyserSPNode(this._audioContext, (value) => {
+				this.newSampleEvent!.invokeImmediately(value)
+				this._analyser!.requestUpdate()
+			}, true, 'CorgiNode')
+			this._analyser.requestUpdate()
+		}
 	}
 
 	public getPorts = () => this._ports
@@ -161,7 +173,7 @@ export abstract class CorgiNode {
 	protected abstract _enable(): void
 	protected abstract _disable(): void
 
-	protected getDebugView(children?: React.ReactNode) {
+	protected getDebugView(children?: ReactNode, beforeChildren?: ReactNode) {
 		return (
 			<CorgiNodeView
 				audioParams={this._audioParams}
@@ -170,6 +182,7 @@ export abstract class CorgiNode {
 				customEnumParams={this._customEnumParams}
 				customStringParams={this._customStringParams}
 				ports={this._ports}
+				beforeChildren={beforeChildren}
 			>
 				{children}
 			</CorgiNodeView>
