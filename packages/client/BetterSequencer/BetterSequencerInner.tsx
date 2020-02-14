@@ -200,7 +200,7 @@ export const BetterSequencerInner = React.memo(function _BetterSequencerInner({i
 			e.preventDefault()
 			e.stopPropagation()
 
-			const bar = editorOffsetSpaceToPercentages({x: e.offsetX, y: e.offsetY}, scaledWidth, scaledHeight)
+			const bar = editorOffsetSpaceToPercentages({x: e.offsetX, y: e.offsetY}, scaledWidthUnclamped, scaledHeight)
 
 			const newDuration = 1
 			const note = clamp((rows.length - 1) - Math.floor(bar.y * rows.length), MIN_MIDI_NOTE_NUMBER_0, MAX_MIDI_NOTE_NUMBER_127)
@@ -227,7 +227,7 @@ export const BetterSequencerInner = React.memo(function _BetterSequencerInner({i
 				editorElementNotNull.removeEventListener('dblclick', onDoubleClick)
 			}
 		}
-	}, [dispatch, id, lengthBeats, removeDuplicateEvents, scaledHeight, scaledWidth])
+	}, [dispatch, id, lengthBeats, removeDuplicateEvents, scaledHeight, scaledWidthUnclamped])
 
 	// Box Select
 	useLayoutEffect(() => {
