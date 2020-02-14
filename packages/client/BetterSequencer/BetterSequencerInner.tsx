@@ -546,7 +546,7 @@ export const BetterSequencerInner = React.memo(function _BetterSequencerInner({i
 			return duplicateNotes()
 		}
 
-		if (e.key === Key.Delete) {
+		if (e.key === Key.Delete || e.key === Key.Backspace) {
 			if (selected.count() === 0) return
 			return deleteSelected()
 		}

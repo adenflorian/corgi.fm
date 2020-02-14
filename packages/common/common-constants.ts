@@ -40,6 +40,7 @@ export const Key = {
 	ArrowDown: 'ArrowDown',
 	ArrowLeft: 'ArrowLeft',
 	Delete: 'Delete',
+	Backspace: 'Backspace',
 	a: 'a',
 	d: 'd',
 	Control: 'Control',
