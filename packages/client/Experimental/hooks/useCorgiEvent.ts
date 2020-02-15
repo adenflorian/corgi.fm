@@ -76,7 +76,7 @@ export function useEnumChangedEvent<TEnum extends string>(initValue: TEnum, even
 	return value
 }
 
-export function useObjectChangedEvent<TObject extends object | boolean | undefined>(event: ReadonlyCorgiObjectChangedEvent<TObject>) {
+export function useObjectChangedEvent<TObject extends object | boolean | undefined | null>(event: ReadonlyCorgiObjectChangedEvent<TObject>) {
 	const [, forceRender] = useReducer(x => x + 1, 0)
 
 	const value = useRef(event.current)

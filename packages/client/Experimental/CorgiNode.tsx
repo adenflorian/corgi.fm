@@ -158,7 +158,6 @@ export abstract class CorgiNode {
 		if (!customNumberParam) return logger.warn('[onCustomNumberParamChange] 404 customNumberParam not found: ', {paramId, newValue})
 
 		const newClampedValue = clamp(newValue, customNumberParam.min, customNumberParam.max)
-		customNumberParam.value = newClampedValue
 		customNumberParam.onChange.invokeImmediately(newClampedValue)
 	}
 

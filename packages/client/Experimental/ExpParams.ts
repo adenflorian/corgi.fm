@@ -61,7 +61,7 @@ export class ExpAudioParam<T extends KelpieAudioNode = KelpieAudioNode> implemen
 
 export type ExpCustomNumberParams = ReadonlyMap<Id, ExpCustomNumberParam>
 export class ExpCustomNumberParam {
-	public value: number
+	public get value() {return this.onChange.current}
 	public readonly onChange: CorgiNumberChangedEvent
 
 	public constructor(
@@ -72,7 +72,6 @@ export class ExpCustomNumberParam {
 		public readonly curve = 1,
 		public readonly valueString?: (v: number) => string,
 	) {
-		this.value = this.defaultValue
 		this.onChange = new CorgiNumberChangedEvent(this.defaultValue)
 	}
 }
