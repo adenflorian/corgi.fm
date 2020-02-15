@@ -1,7 +1,11 @@
 import React from 'react'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {toBeats, fromBeats, arrayToESIdKeyMap} from '@corgifm/common/common-utils'
-import {preciseSubtract, preciseAdd, makeExpMidiClip, makeExpMidiEventsFromArray, ExpMidiClip, makeExpMidiNoteEvent} from '@corgifm/common/midi-types'
+import {
+	preciseSubtract, preciseAdd, makeExpMidiClip,
+	makeExpMidiEventsFromArray, ExpMidiClip, makeExpMidiNoteEvent,
+	preciseRound, preciseCeil,
+} from '@corgifm/common/midi-types'
 import {midiActions} from '@corgifm/common/common-types'
 import {logger} from '../../client-logger'
 import {
@@ -95,8 +99,8 @@ export class SequencerNode extends CorgiNode {
 		const songStartTime = this._startSongTime
 		const tempo = this._tempo.value
 		const currentSongTime = preciseSubtract(currentGlobalTime, songStartTime)
-		const targetSongTimeToReadTo = Math.ceil(preciseAdd(currentSongTime, maxReadAhead) * myPrecision) / myPrecision
-		const distanceSeconds = Math.round(preciseSubtract(targetSongTimeToReadTo, cursor) * myPrecision) / myPrecision
+		const targetSongTimeToReadTo = preciseCeil(preciseAdd(currentSongTime, maxReadAhead), myPrecision)
+		const distanceSeconds = preciseRound(preciseSubtract(targetSongTimeToReadTo, cursor), myPrecision)
 
 		if (distanceSeconds <= 0) return
 
@@ -106,8 +110,8 @@ export class SequencerNode extends CorgiNode {
 		events.forEach(event => {
 			const eventDistanceFromCursor = event.distanceFromMainCursor
 			const fromBeats_ = fromBeats(eventDistanceFromCursor, tempo)
-			const songStartPlusCursor = Math.round((songStartTime + cursor) * myPrecision) / myPrecision
-			const eventStart = Math.round((songStartPlusCursor + fromBeats_) * myPrecision) / myPrecision
+			const songStartPlusCursor = preciseRound(songStartTime + cursor, myPrecision)
+			const eventStart = preciseRound(songStartPlusCursor + fromBeats_, myPrecision)
 
 			if (eventStart.toString().length > 8) logger.warn('precision error oh no: ', {eventDistanceFromCursor, fromBeats_, songStartPlusCursor, eventStart})
 

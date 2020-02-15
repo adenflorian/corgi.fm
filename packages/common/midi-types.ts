@@ -130,6 +130,14 @@ export function preciseDivide(a: number, b: number): number {
 	return ((a * midiPrecision) / (b * midiPrecision)) / midiPrecision
 }
 
+export function preciseRound(a: number, precision: number = midiPrecision): number {
+	return Math.round(a * precision) / precision
+}
+
+export function preciseCeil(a: number, precision: number = midiPrecision): number {
+	return Math.ceil(a * precision) / precision
+}
+
 export class MidiRange {
 	/** exclusive */
 	public static readonly maxSafeNumber = 100000000
