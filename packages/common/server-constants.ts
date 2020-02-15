@@ -1,4 +1,5 @@
 import {MidiAction} from './common-types'
+import uuid = require('uuid')
 
 export enum WebSocketEvent {
 	broadcast = 'broadcast',
@@ -11,6 +12,12 @@ export const nodeToNodeActions = {
 		type: 'NODE_TO_NODE_MIDI' as const,
 		nodeId,
 		midiAction,
+	} as const),
+	buttonPress: (nodeId: Id, buttonId: Id) => ({
+		type: 'NODE_TO_NODE_BUTTON_PRESS' as const,
+		nodeId,
+		buttonId,
+		pressId: uuid.v4(),
 	} as const),
 } as const
 

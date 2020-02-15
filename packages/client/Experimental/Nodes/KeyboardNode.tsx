@@ -66,18 +66,17 @@ export class KeyboardNode extends CorgiNode {
 		if (!this._enabled) return
 		const midiAction = midiActions.note(this._audioContext.currentTime, true, event.note.number, event.velocity)
 		this._midiOutputPort.sendMidiAction(midiAction)
-		this._singletonContext.webSocketService.nodeToNode(nodeToNodeActions.midi(this.id, midiAction))
+		this.singletonContext.webSocketService.nodeToNode(nodeToNodeActions.midi(this.id, midiAction))
 	}
 
 	private readonly _onNoteOff = (event: InputEventNoteoff) => {
 		if (!this._enabled) return
 		const midiAction = midiActions.note(this._audioContext.currentTime, false, event.note.number, event.velocity)
 		this._midiOutputPort.sendMidiAction(midiAction)
-		this._singletonContext.webSocketService.nodeToNode(nodeToNodeActions.midi(this.id, midiAction))
+		this.singletonContext.webSocketService.nodeToNode(nodeToNodeActions.midi(this.id, midiAction))
 	}
 
-	public onNodeToNode(action: NodeToNodeAction) {
-		super.onNodeToNode(action)
+	protected readonly _onNodeToNode = (action: NodeToNodeAction) => {
 		if (action.type === 'NODE_TO_NODE_MIDI') {
 			this._midiOutputPort.sendMidiAction({
 				...action.midiAction,

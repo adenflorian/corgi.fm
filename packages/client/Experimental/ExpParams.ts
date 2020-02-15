@@ -8,6 +8,8 @@ import {ButtonSelectOption} from '../ButtonSelect/ButtonSelect'
 import {CorgiNumberChangedEvent, CorgiEnumChangedEvent, CorgiStringChangedEvent, CorgiObjectChangedEvent} from './CorgiEvents'
 import {LabAudioParam, KelpieAudioNode} from './Nodes/PugAudioNode/Lab'
 import {ExpMidiClip, makeExpMidiClip} from '@corgifm/common/midi-types'
+import {CorgiNode} from './CorgiNode'
+import {nodeToNodeActions} from '@corgifm/common/server-constants'
 
 export interface ExpParam {
 	readonly id: Id
@@ -147,4 +149,21 @@ export interface MidiClipParamChange {
 	readonly nodeId: Id
 	readonly paramId: Id
 	readonly newValue: ExpMidiClip
+}
+
+
+export type ExpButtons = ReadonlyMap<Id, ExpButton>
+export class ExpButton {
+	public readonly onPress = new CorgiStringChangedEvent('not pressed')
+
+	public constructor(
+		public readonly id: Id,
+		public readonly node: CorgiNode,
+	) {}
+
+	public readonly press = () => {
+		const action = nodeToNodeActions.buttonPress(this.node.id, this.id)
+		this.node.singletonContext.webSocketService.nodeToNode(action)
+		this.onPress.invokeImmediately(action.pressId)
+	}
 }

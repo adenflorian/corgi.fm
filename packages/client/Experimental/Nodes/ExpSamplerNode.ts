@@ -30,9 +30,9 @@ export class SamplerExpNode extends CorgiNode {
 		super(corgiNodeArgs, {name: 'Sampler', color: CssColor.green})
 
 		this._bufferSource = new LabAudioBufferSourceNode({...corgiNodeArgs, voiceMode: 'autoPoly', creatorName: 'SamplerExpNode'})
-		this._singletonContext.samplesManager.loadSample(`${samplePathBegin.static}/samplers/basic-piano/${sharpToFlatNotes['C']}${4}-49-96.mp3`)
+		this.singletonContext.samplesManager.loadSample(`${samplePathBegin.static}/samplers/basic-piano/${sharpToFlatNotes['C']}${4}-49-96.mp3`)
 			.then(() => {
-				this._bufferSource.buffer = this._singletonContext.samplesManager.getSample(`${samplePathBegin.static}/samplers/basic-piano/${sharpToFlatNotes['C']}${4}-49-96.mp3`)
+				this._bufferSource.buffer = this.singletonContext.samplesManager.getSample(`${samplePathBegin.static}/samplers/basic-piano/${sharpToFlatNotes['C']}${4}-49-96.mp3`)
 			})
 		this._bufferSource.loop = true
 		this._bufferSource.loopEnd = 4

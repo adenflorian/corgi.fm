@@ -9,7 +9,10 @@ import {SingletonContextImpl} from '../SingletonContext'
 import {
 	ExpPorts, ExpPort, isAudioOutputPort, isAudioParamInputPort,
 } from './ExpPorts'
-import {ExpAudioParams, ExpCustomNumberParams, ExpCustomEnumParams, ExpCustomStringParams} from './ExpParams'
+import {
+	ExpAudioParams, ExpCustomNumberParams, ExpCustomEnumParams,
+	ExpCustomStringParams, ExpButtons,
+} from './ExpParams'
 import {CorgiNodeView} from './CorgiNodeView'
 import {CorgiStringChangedEvent, CorgiNumberChangedEvent} from './CorgiEvents'
 import {isMidiOutputPort} from './ExpMidiPorts'
@@ -53,15 +56,16 @@ export abstract class CorgiNode {
 	public readonly ownerId: Id
 	public readonly type: ExpNodeType
 	public readonly requiresAudioWorklet: boolean
+	public readonly singletonContext: SingletonContextImpl
 	protected readonly _audioContext: AudioContext
 	protected readonly _preMasterLimiter: GainNode
-	protected readonly _singletonContext: SingletonContextImpl
 	protected readonly _parentNode?: CorgiNode
 	protected readonly _audioParams: ExpAudioParams = new Map()
 	protected readonly _ports: ExpPorts = new Map()
 	protected readonly _customNumberParams: ExpCustomNumberParams = new Map()
 	protected readonly _customEnumParams: ExpCustomEnumParams = new Map()
 	protected readonly _customStringParams: ExpCustomStringParams = new Map()
+	protected readonly _buttons: ExpButtons = new Map()
 	protected _enabled = true
 	public readonly onNameChange: CorgiStringChangedEvent
 	public readonly onColorChange: CorgiStringChangedEvent
@@ -79,7 +83,7 @@ export abstract class CorgiNode {
 		this.type = args.type
 		this._audioContext = args.audioContext
 		this._preMasterLimiter = args.preMasterLimiter
-		this._singletonContext = args.singletonContext
+		this.singletonContext = args.singletonContext
 		this._parentNode = args.parentNode
 
 		this.onNameChange = new CorgiStringChangedEvent(options.name)
@@ -103,7 +107,16 @@ export abstract class CorgiNode {
 
 	public onTick(currentTime: number, maxReadAhead: number) {}
 
-	public onNodeToNode(action: NodeToNodeAction) {}
+	public onNodeToNode(action: NodeToNodeAction) {
+		if (action.type === 'NODE_TO_NODE_BUTTON_PRESS') {
+			const button = this._buttons.get(action.buttonId)
+			if (!button) return logger.error('404 button not found!', {button, this: this, action, buttons: this._buttons})
+			button.onPress.invokeImmediately(action.pressId)
+		}
+		this._onNodeToNode(action)
+	}
+
+	protected readonly _onNodeToNode = (action: NodeToNodeAction) => {}
 
 	public setEnabled(enabled: boolean) {
 		if (enabled === this._enabled) return
@@ -181,6 +194,7 @@ export abstract class CorgiNode {
 				customNumberParams={this._customNumberParams}
 				customEnumParams={this._customEnumParams}
 				customStringParams={this._customStringParams}
+				buttons={this._buttons}
 				ports={this._ports}
 				beforeChildren={beforeChildren}
 			>

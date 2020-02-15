@@ -20,10 +20,11 @@ export const ExpSequencerNodeExtra = hot(module)(React.memo(function _ExpSequenc
 	const eventStreamIndex = useNumberChangedEvent(eventStreamReader.eventStream.currentIndex)
 	const loops = useNumberChangedEvent(eventStreamReader.eventStream.loops)
 	const events = useObjectChangedEvent(eventStreamReader.eventStream.events)
+	const eventsBeatLength = useNumberChangedEvent(eventStreamReader.eventStream.beatLength)
+	const innerBeatCursor = useNumberChangedEvent(eventStreamReader.eventStream.beatCursor)
 	const maxBeat = events.map(x => x.beat).reduce((max, current) => Math.max(current, max))
 	const eventsHeight = position.height / 3
 	const eventsWidth = position.width - 16
-	const eventsBeatLength = useNumberChangedEvent(eventStreamReader.eventStream.beatLength)
 	const notes = events.map(x => x.note).filter(x => x !== undefined) as readonly number[]
 	const minNote = notes.reduce((min, current) => Math.min(current, min))
 	const maxNote = notes.reduce((max, current) => Math.max(current, max))
@@ -46,6 +47,7 @@ export const ExpSequencerNodeExtra = hot(module)(React.memo(function _ExpSequenc
 			<div>note: <span style={{color: getColorStringForMidiNote(currentEvent.note || 0)}}>{currentEvent.note}</span></div>
 			<div>eventStreamIndex: {eventStreamIndex}</div>
 			<div>loops: {loops}</div>
+			<div>innerBeatCursor: {innerBeatCursor}</div>
 			<div
 				className="events"
 				style={{
@@ -80,7 +82,14 @@ export const ExpSequencerNodeExtra = hot(module)(React.memo(function _ExpSequenc
 					height: eventsHeight,
 					width: 1,
 					backgroundColor: CssColor.defaultGray,
-					left: ((beatCursor % eventsBeatLength) / eventsBeatLength) * eventsWidth,
+					left: (((beatCursor % eventsBeatLength) / eventsBeatLength) * eventsWidth || 0),
+				}}></div>
+				<div className="currentTime" style={{
+					position: 'absolute',
+					height: eventsHeight,
+					width: 1,
+					backgroundColor: CssColor.orange,
+					left: (((innerBeatCursor % eventsBeatLength) / eventsBeatLength) * eventsWidth || 0),
 				}}></div>
 			</div>
 		</div>

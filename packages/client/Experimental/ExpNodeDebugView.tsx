@@ -6,7 +6,10 @@ import {
 	ExpPort, ExpPorts, AudioParamInputPortContext, ExpNodeAudioParamInputPort,
 } from './ExpPorts'
 import {ExpNodeDebugAudioParamKnob} from './ExpNodeDebugAudioParamKnob'
-import {ExpAudioParams, ExpCustomNumberParams, AudioParamContext, ExpCustomEnumParams, ExpCustomStringParams} from './ExpParams'
+import {
+	ExpAudioParams, ExpCustomNumberParams, AudioParamContext,
+	ExpCustomEnumParams, ExpCustomStringParams, ExpButtons,
+} from './ExpParams'
 import {ExpNodeDebugCustomNumberParamKnob} from './ExpNodeDebugCustomNumberParamKnob'
 import {useNodeContext} from './CorgiNode'
 import {useObjectChangedEvent, useStringChangedEvent} from './hooks/useCorgiEvent'
@@ -14,12 +17,14 @@ import {ExpNodeDebugCustomEnumParamSelect} from './ExpNodeDebugCustomEnumParamSe
 import {ExpNodeDebugCustomStringParamField} from './ExpNodeDebugCustomStringParamField'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {ExpOscilloscopeNodeExtra} from './Nodes/ExpOscilloscopeNodeView'
+import {ExpNodeDebugButton} from './ExpNodeDebugButton'
 
 interface Props {
 	audioParams: ExpAudioParams
 	customNumberParams: ExpCustomNumberParams
 	customEnumParams: ExpCustomEnumParams
 	customStringParams: ExpCustomStringParams
+	buttons: ExpButtons
 	ports: ExpPorts
 	children: React.ReactNode
 	beforeChildren: React.ReactNode
@@ -27,7 +32,7 @@ interface Props {
 
 export const ExpNodeDebugView = hot(module)(React.memo(function _ExpNodeDebugView({
 	audioParams, customNumberParams, children, beforeChildren,
-	ports, customEnumParams, customStringParams,
+	ports, customEnumParams, customStringParams, buttons,
 }: Props) {
 	const nodeContext = useNodeContext()
 	// const nodeName = useStringChangedEvent(nodeContext.onNameChange)
@@ -103,6 +108,15 @@ export const ExpNodeDebugView = hot(module)(React.memo(function _ExpNodeDebugVie
 								key={id as string}
 								nodeId={nodeId}
 								customStringParam={customStringParam}
+							/>
+						))}
+					</div>
+					<div className="buttons">
+						{[...buttons].map(([id, button]) => (
+							<ExpNodeDebugButton
+								key={id as string}
+								nodeId={nodeId}
+								button={button}
 							/>
 						))}
 					</div>

@@ -4,7 +4,10 @@ import {toBeats, fromBeats, arrayToESIdKeyMap} from '@corgifm/common/common-util
 import {preciseSubtract, preciseAdd, makeExpMidiClip, makeExpMidiEventsFromArray, ExpMidiClip, makeExpMidiNoteEvent} from '@corgifm/common/midi-types'
 import {midiActions} from '@corgifm/common/common-types'
 import {logger} from '../../client-logger'
-import {ExpCustomNumberParam, ExpCustomNumberParams, ExpMidiClipParams, ExpMidiClipParam} from '../ExpParams'
+import {
+	ExpCustomNumberParam, ExpCustomNumberParams, ExpMidiClipParams,
+	ExpMidiClipParam, ExpButtons, ExpButton,
+} from '../ExpParams'
 import {ExpMidiOutputPort} from '../ExpMidiPorts'
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 import {ExpPorts} from '../ExpPorts'
@@ -15,6 +18,8 @@ export class SequencerNode extends CorgiNode {
 	protected readonly _ports: ExpPorts
 	protected readonly _customNumberParams: ExpCustomNumberParams
 	protected readonly _midiClipParams: ExpMidiClipParams
+	protected readonly _buttons: ExpButtons
+	private readonly _restartButton: ExpButton
 	private readonly _tempo: ExpCustomNumberParam
 	private _cursor = 0
 	private readonly _eventStream = new EventStreamReader()
@@ -38,7 +43,11 @@ export class SequencerNode extends CorgiNode {
 		])))
 		this._midiClipParams = arrayToESIdKeyMap([this._midiClip])
 
+		this._restartButton = new ExpButton('restart', this)
+		this._buttons = arrayToESIdKeyMap([this._restartButton])
+
 		this._midiClip.value.subscribe(this._onMidiClipChange)
+		this._restartButton.onPress.subscribe(this._onRestartPress)
 	}
 
 	public render = () => {
@@ -56,10 +65,18 @@ export class SequencerNode extends CorgiNode {
 		this._midiOutputPort.sendMidiAction(midiActions.gate(this._startSongTime + this._cursor, false))
 		this._startSongTime = -1
 		this._cursor = 0
+		this._eventStream.restart()
 	}
 
 	protected _dispose() {
 		this._midiClip.value.unsubscribe(this._onMidiClipChange)
+	}
+
+	private readonly _onRestartPress = () => {
+		this._midiOutputPort.sendMidiAction(midiActions.gate(this._startSongTime + this._cursor, false))
+		this._startSongTime = -1
+		this._cursor = 0
+		this._eventStream.restart()
 	}
 
 	private readonly _onMidiClipChange = (clip: ExpMidiClip) => {

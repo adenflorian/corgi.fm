@@ -27,6 +27,12 @@ export class EventStreamReader {
 		this._currentEvent = new CorgiObjectChangedEvent<SequencerEvent>(this._eventStream.getNextEvent())
 	}
 
+	public restart() {
+		this._beatCursor.invokeNextFrame(0)
+		this._eventStream.restart()
+		this._currentEvent.invokeNextFrame(this._eventStream.getNextEvent())
+	}
+
 	public read(beatsToRead: number): readonly NextEvent[] {
 		if (beatsToRead <= 0) {
 			return []
@@ -56,17 +62,30 @@ export class EventStreamReader {
 
 export type ReadonlyEventStream = Pick<EventStream, 'beatLength' | 'beatCursor' | 'currentIndex' | 'loops' | 'events'>
 
+const beatLength = 16
+
 export class EventStream {
 	public get beatLength() {return this._beatLength as ReadonlyCorgiNumberChangedEvent}
 	public get currentIndex() {return this._currentIndex as ReadonlyCorgiNumberChangedEvent}
 	public get loops() {return this._loops as ReadonlyCorgiNumberChangedEvent}
 	public get beatCursor() {return this._beatCursor as ReadonlyCorgiNumberChangedEvent}
 	public get events() {return this._events as ReadonlyCorgiObjectChangedEvent<SequencerEvents>}
-	private readonly _beatLength = new CorgiNumberChangedEvent(16)
+	public get lastEvent() {return this._lastEvent as ReadonlyCorgiObjectChangedEvent<SequencerEvent>}
+	private readonly _beatLength = new CorgiNumberChangedEvent(beatLength)
 	private readonly _currentIndex = new CorgiNumberChangedEvent(-1)
 	private readonly _loops = new CorgiNumberChangedEvent(0)
 	private readonly _beatCursor = new CorgiNumberChangedEvent(0)
 	private readonly _events = new CorgiObjectChangedEvent<SequencerEvents>(songOfTime)
+	private readonly _lastEvent = new CorgiObjectChangedEvent<SequencerEvent>({beat: 0, gate: false})
+
+	public restart() {
+		this._beatLength.invokeNextFrame(beatLength)
+		this._currentIndex.invokeNextFrame(-1)
+		this._loops.invokeNextFrame(0)
+		this._beatCursor.invokeNextFrame(0)
+		// this._events.invokeNextFrame(0)
+		this._lastEvent.invokeNextFrame({beat: 0, gate: false})
+	}
 
 	public getNextEvent(): SequencerEvent {
 		this._currentIndex.invokeNextFrame(this.currentIndex.current + 1)
@@ -77,6 +96,10 @@ export class EventStream {
 		}
 
 		const nextEvent = this._events.current[this._currentIndex.current]
+
+		this._beatCursor.invokeNextFrame(this._beatCursor.current + (nextEvent.beat - this.lastEvent.current.beat))
+
+		this._lastEvent.invokeNextFrame(nextEvent)
 
 		return {
 			...nextEvent,
