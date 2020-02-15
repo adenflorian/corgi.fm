@@ -1,4 +1,4 @@
-import React, {Fragment, useContext} from 'react'
+import React, {Fragment, useContext, useLayoutEffect} from 'react'
 import * as immutable from 'immutable'
 import {ExpNodeState, IExpConnection, ExpGraph} from '@corgifm/common/redux'
 import {ParamInputCentering} from '@corgifm/common/common-types'
@@ -38,11 +38,23 @@ class CorgiGraph {
 	public readonly connections = new Map<Id, ExpNodeConnection>()
 }
 
+export type NodeTickDelegate = (audioTime: number) => void
+
+export function useExpNodeManagerTick(handler: NodeTickDelegate) {
+	const nodeManagerContext = useNodeManagerContext()
+
+	useLayoutEffect(() => {
+		nodeManagerContext.subscribeToTick(handler)
+		return () => nodeManagerContext.unsubscribeFromTick(handler)
+	})
+}
+
 export class NodeManager {
 	private readonly _mainGraph = new CorgiGraph()
 	public readonly reactContext: NodeManagerContextValue
 	private get _audioContext() {return this._singletonContext.getAudioContext()}
 	private get _preMasterLimiter() {return this._singletonContext.getPreMasterLimiter()}
+	private _tickSubscribers = new Set<NodeTickDelegate>()
 
 	public constructor(
 		private readonly _singletonContext: SingletonContextImpl,
@@ -68,6 +80,12 @@ export class NodeManager {
 					return port
 				},
 			} as const,
+			subscribeToTick: (delegate: NodeTickDelegate) => {
+				this._tickSubscribers.add(delegate)
+			},
+			unsubscribeFromTick: (delegate: NodeTickDelegate) => {
+				this._tickSubscribers.delete(delegate)
+			},
 		} as const
 	}
 
@@ -110,7 +128,9 @@ export class NodeManager {
 
 	public onTick() {
 		const maxReadAhead = 0.2
-		this._mainGraph.nodes.forEach(node => node.onTick(this._audioContext.currentTime, maxReadAhead))
+		const time = this._audioContext.currentTime
+		this._mainGraph.nodes.forEach(node => node.onTick(time, maxReadAhead))
+		this._tickSubscribers.forEach(sub => sub(time))
 	}
 
 	public enableNode(id: Id, enabled: boolean) {

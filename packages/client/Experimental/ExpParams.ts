@@ -5,8 +5,9 @@ import {
 	defaultUnipolarCurveFunctions,
 } from '@corgifm/common/common-utils'
 import {ButtonSelectOption} from '../ButtonSelect/ButtonSelect'
-import {CorgiNumberChangedEvent, CorgiEnumChangedEvent, CorgiStringChangedEvent} from './CorgiEvents'
+import {CorgiNumberChangedEvent, CorgiEnumChangedEvent, CorgiStringChangedEvent, CorgiObjectChangedEvent} from './CorgiEvents'
 import {LabAudioParam, KelpieAudioNode} from './Nodes/PugAudioNode/Lab'
+import {ExpMidiClip, makeExpMidiClip} from '@corgifm/common/midi-types'
 
 export interface ExpParam {
 	readonly id: Id
@@ -127,4 +128,23 @@ export interface StringParamChange {
 	readonly nodeId: Id
 	readonly paramId: Id
 	readonly newValue: string
+}
+
+
+export type ExpMidiClipParams = ReadonlyMap<Id, ExpMidiClipParam>
+export class ExpMidiClipParam {
+	public readonly value: CorgiObjectChangedEvent<ExpMidiClip>
+
+	public constructor(
+		public readonly id: Id,
+		public readonly defaultValue: ExpMidiClip = makeExpMidiClip(),
+	) {
+		this.value = new CorgiObjectChangedEvent<ExpMidiClip>(this.defaultValue)
+	}
+}
+
+export interface MidiClipParamChange {
+	readonly nodeId: Id
+	readonly paramId: Id
+	readonly newValue: ExpMidiClip
 }

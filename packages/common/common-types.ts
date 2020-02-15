@@ -70,13 +70,6 @@ export type SignalRange = typeof signalRangeOptions[number]
 export const paramInputCenteringOptions = ['center', 'offset'] as const
 export type ParamInputCentering = typeof paramInputCenteringOptions[number]
 
-export interface SequencerEvent {
-	readonly gate: boolean
-	readonly beat: number
-	/** MIDI note number */
-	readonly note?: number
-}
-
 export const midiActions = {
 	gate: (time: number, gate: boolean, voice: number | 'all' = 'all') => ({
 		type: 'MIDI_GATE' as const,

@@ -1,4 +1,5 @@
 import * as uuid from 'uuid'
+import * as Immutable from 'immutable'
 import {List, Record, OrderedMap} from 'immutable'
 import {IMidiNote} from './MidiNote'
 
@@ -159,4 +160,71 @@ export class MidiRange {
 			this.length,
 		)
 	}
+}
+
+// Exp
+export interface ExpMidiClip {
+	readonly events: ExpMidiEvents
+}
+
+export type ExpMidiEvents = Immutable.Map<Id, ExpMidiEvent>
+
+interface ExpMidiEventBase {
+	readonly type: ExpMidiEventType
+	readonly id: Id
+	readonly startBeat: number
+	readonly durationBeats: number
+}
+
+export interface ExpMidiNoteEvent extends ExpMidiEventBase {
+	readonly type: ExpMidiEventType.Note
+	readonly noteNumber: number
+	readonly velocity: number
+}
+
+export type ExpMidiEvent = ExpMidiNoteEvent	// | ExpOtherMidiEvent
+
+export enum ExpMidiEventType {
+	Note = 0,
+}
+
+export function makeExpMidiClip(events?: ExpMidiEvents): ExpMidiClip {
+	return {
+		events: makeExpMidiEvents(events),
+	}
+}
+
+export function makeExpMidiEvents(events?: ExpMidiEvents): ExpMidiEvents {
+	return events ? Immutable.Map(events) : Immutable.Map()
+}
+
+export function makeExpMidiEventsFromArray(events: readonly Omit<ExpMidiEvent, 'id'>[]): ExpMidiEvents {
+	return Immutable.Map(events.map(x => {
+		const newId = uuid.v4()
+		return [newId, {...x, id: newId}]
+	}))
+}
+
+export function makeExpMidiNoteEvent(startBeat: number, durationBeats: number, noteNumber: number, velocity: number): ExpMidiNoteEvent {
+	return {
+		id: uuid.v4(),
+		type: ExpMidiEventType.Note,
+		startBeat,
+		durationBeats,
+		noteNumber,
+		velocity,
+	}
+}
+
+export interface SequencerEvent {
+	readonly gate: boolean
+	readonly beat: number
+	/** MIDI note number */
+	readonly note?: number
+}
+
+export type SequencerEvents = readonly SequencerEvent[]
+
+export function convertExpMidiEventsToSequencerEvents(events: ExpMidiEvents): SequencerEvents {
+	return []
 }

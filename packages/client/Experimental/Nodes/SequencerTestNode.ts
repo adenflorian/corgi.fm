@@ -1,7 +1,7 @@
 import {CssColor} from '@corgifm/common/shamu-color'
 import {toBeats, fromBeats, arrayToESIdKeyMap} from '@corgifm/common/common-utils'
-import {preciseSubtract, preciseAdd, midiPrecision} from '@corgifm/common/midi-types'
-import {SequencerEvent, midiActions} from '@corgifm/common/common-types'
+import {preciseSubtract, preciseAdd, midiPrecision, SequencerEvent} from '@corgifm/common/midi-types'
+import {midiActions} from '@corgifm/common/common-types'
 import {logger} from '../../client-logger'
 import {ExpCustomNumberParam, ExpCustomNumberParams} from '../ExpParams'
 import {ExpMidiOutputPort} from '../ExpMidiPorts'
@@ -10,7 +10,7 @@ import {ExpPorts} from '../ExpPorts'
 
 const myPrecision = 1000
 
-export class SequencerNode extends CorgiNode {
+export class SequencerTestNode extends CorgiNode {
 	protected readonly _ports: ExpPorts
 	protected readonly _customNumberParams: ExpCustomNumberParams
 	private readonly _tempo: ExpCustomNumberParam

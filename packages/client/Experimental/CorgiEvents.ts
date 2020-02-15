@@ -2,6 +2,8 @@ export type NumberChangedDelegate = (newNumber: number) => void
 
 export interface CorgiNumberChangedObservable extends Pick<CorgiNumberChangedEvent, 'subscribe' | 'unsubscribe' | 'current'> {}
 
+export type ReadonlyCorgiNumberChangedEvent = Pick<CorgiNumberChangedEvent, 'current' | 'subscribe' | 'unsubscribe'>
+
 export class CorgiNumberChangedEvent {
 	private readonly _subscribers = new Set<NumberChangedDelegate>()
 	private _frameRequested = false
@@ -47,6 +49,8 @@ export class CorgiNumberChangedEvent {
 
 export type StringChangedDelegate = (newString: string) => void
 
+export type ReadonlyCorgiStringChangedEvent = Pick<CorgiStringChangedEvent, 'current' | 'subscribe' | 'unsubscribe'>
+
 export class CorgiStringChangedEvent {
 	private readonly _subscribers = new Set<StringChangedDelegate>()
 	private _frameRequested = false
@@ -88,6 +92,8 @@ export class CorgiStringChangedEvent {
 }
 
 export type EnumChangedDelegate<TEnum extends string> = (newEnum: TEnum, didChange: boolean) => void
+
+export type ReadonlyCorgiEnumChangedEvent<TEnum extends string> = Pick<CorgiEnumChangedEvent<TEnum>, 'current' | 'subscribe' | 'unsubscribe'>
 
 export class CorgiEnumChangedEvent<TEnum extends string> {
 	private readonly _subscribers = new Set<EnumChangedDelegate<TEnum>>()
@@ -140,6 +146,8 @@ export function isCorgiObjectChangedEvent<TObject extends CorgiObjectType>(val: 
 	return val instanceof CorgiObjectChangedEvent
 }
 
+export type ReadonlyCorgiObjectChangedEvent<TObject extends CorgiObjectType> = Pick<CorgiObjectChangedEvent<TObject>, 'current' | 'subscribe' | 'unsubscribe'>
+
 export class CorgiObjectChangedEvent<TObject extends CorgiObjectType> {
 	private readonly _subscribers = new Set<ObjectChangedDelegate<TObject>>()
 	private _frameRequested = false
@@ -181,6 +189,8 @@ export class CorgiObjectChangedEvent<TObject extends CorgiObjectType> {
 }
 
 export type BooleanChangedDelegate = (newBoolean: boolean) => void
+
+export type ReadonlyBooleanChangedEvent = Pick<BooleanChangedEvent, 'current' | 'subscribe' | 'unsubscribe'>
 
 export class BooleanChangedEvent {
 	private readonly _subscribers = new Set<ObjectChangedDelegate<boolean>>()

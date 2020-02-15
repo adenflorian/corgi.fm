@@ -2,11 +2,12 @@ import {
 	useLayoutEffect, useState, useRef, useReducer,
 } from 'react'
 import {
-	CorgiNumberChangedEvent, CorgiStringChangedEvent,
-	CorgiEnumChangedEvent, CorgiObjectChangedEvent, BooleanChangedEvent,
+	ReadonlyCorgiNumberChangedEvent, ReadonlyCorgiStringChangedEvent,
+	ReadonlyCorgiEnumChangedEvent, ReadonlyCorgiObjectChangedEvent,
+	ReadonlyBooleanChangedEvent,
 } from '../CorgiEvents'
 
-export function useNumberChangedEvent(event: CorgiNumberChangedEvent, doEqualityCheck = true) {
+export function useNumberChangedEvent(event: ReadonlyCorgiNumberChangedEvent, doEqualityCheck = true) {
 	const [, forceRender] = useReducer(x => x + 1, 0)
 
 	const previousValue = useRef(0)
@@ -27,7 +28,7 @@ export function useNumberChangedEvent(event: CorgiNumberChangedEvent, doEquality
 	return previousValue.current
 }
 
-export function useStringChangedEvent(event?: CorgiStringChangedEvent) {
+export function useStringChangedEvent(event?: ReadonlyCorgiStringChangedEvent) {
 	const [value, setState] = useState(event ? event.current : '')
 
 	const previousValue = useRef('')
@@ -51,7 +52,7 @@ export function useStringChangedEvent(event?: CorgiStringChangedEvent) {
 	return value
 }
 
-export function useEnumChangedEvent<TEnum extends string>(initValue: TEnum, event?: CorgiEnumChangedEvent<TEnum>) {
+export function useEnumChangedEvent<TEnum extends string>(initValue: TEnum, event?: ReadonlyCorgiEnumChangedEvent<TEnum>) {
 	const [value, setState] = useState<TEnum>(initValue)
 
 	const previousValue = useRef<TEnum>(initValue)
@@ -75,7 +76,7 @@ export function useEnumChangedEvent<TEnum extends string>(initValue: TEnum, even
 	return value
 }
 
-export function useObjectChangedEvent<TObject extends object | boolean | undefined>(event: CorgiObjectChangedEvent<TObject>) {
+export function useObjectChangedEvent<TObject extends object | boolean | undefined>(event: ReadonlyCorgiObjectChangedEvent<TObject>) {
 	const [, forceRender] = useReducer(x => x + 1, 0)
 
 	const value = useRef(event.current)
@@ -94,7 +95,7 @@ export function useObjectChangedEvent<TObject extends object | boolean | undefin
 	return value.current
 }
 
-export function useBooleanChangedEvent(event: BooleanChangedEvent) {
+export function useBooleanChangedEvent(event: ReadonlyBooleanChangedEvent) {
 	const [, forceRender] = useReducer(x => x + 1, 0)
 
 	const previousValue = useRef(event.current)
