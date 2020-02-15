@@ -16,7 +16,9 @@ export const ExpNodeDebugButton = React.memo(function _ExpNodeDebugButton({
 
 	return (
 		<div>
-			<button onClick={onClick}>{button.id}</button>
+			<button className="bg-dark" onClick={onClick}>
+				{button.id}
+			</button>
 		</div>
 	)
 })

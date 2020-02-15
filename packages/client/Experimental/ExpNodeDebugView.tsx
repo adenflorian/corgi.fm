@@ -93,7 +93,7 @@ export const ExpNodeDebugView = hot(module)(React.memo(function _ExpNodeDebugVie
 					</div>
 					{/* {customEnumParams.size > 0 &&
 					<div className="sectionLabel">Custom Enum Params</div>} */}
-					<div className="enumParams">
+					{customEnumParams.size > 0 && <div className="enumParams">
 						{[...customEnumParams].map(([id, customEnumParam]) => (
 							<ExpNodeDebugCustomEnumParamSelect
 								key={id as string}
@@ -101,8 +101,8 @@ export const ExpNodeDebugView = hot(module)(React.memo(function _ExpNodeDebugVie
 								customEnumParam={customEnumParam}
 							/>
 						))}
-					</div>
-					<div className="stringParams">
+					</div>}
+					{customStringParams.size > 0 && <div className="stringParams">
 						{[...customStringParams].map(([id, customStringParam]) => (
 							<ExpNodeDebugCustomStringParamField
 								key={id as string}
@@ -110,8 +110,8 @@ export const ExpNodeDebugView = hot(module)(React.memo(function _ExpNodeDebugVie
 								customStringParam={customStringParam}
 							/>
 						))}
-					</div>
-					<div className="buttons">
+					</div>}
+					{buttons.size > 0 && <div className="buttons">
 						{[...buttons].map(([id, button]) => (
 							<ExpNodeDebugButton
 								key={id as string}
@@ -119,7 +119,7 @@ export const ExpNodeDebugView = hot(module)(React.memo(function _ExpNodeDebugVie
 								button={button}
 							/>
 						))}
-					</div>
+					</div>}
 					<DebugInfo />
 				</div>
 				{children}

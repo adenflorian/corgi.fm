@@ -131,7 +131,7 @@ button.iconButton {
 }
 
 .button-dark {
-    background-color: @panelGray !important;
+    background-color: @panelGray;
     @panelShadow();
 }
 
@@ -157,7 +157,11 @@ input, select {
         @button();
         text-decoration: none;
         box-shadow: none !important;
-        background-color: @panelGrayLight !important;
+        background-color: @panelGrayLight;
+
+        &.bg-medium, & .bg-medium {
+            background-color: @panelGrayLight;
+        }
     }
     input {
         box-shadow: none !important;
