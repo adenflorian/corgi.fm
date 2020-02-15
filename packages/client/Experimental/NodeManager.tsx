@@ -127,7 +127,7 @@ export class NodeManager {
 	}
 
 	public onTick() {
-		const maxReadAhead = 0.2
+		const maxReadAhead = 0.1
 		const time = this._audioContext.currentTime
 		this._mainGraph.nodes.forEach(node => node.onTick(time, maxReadAhead))
 		this._tickSubscribers.forEach(sub => sub(time))
