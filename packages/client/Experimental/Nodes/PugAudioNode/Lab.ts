@@ -1082,32 +1082,39 @@ export class KelpieAudioParam {
 	public get input(): AudioParam {return this._audioParam}
 
 	public cancelAndHoldAtTime(cancelTime: number) {
-		this._audioParam.cancelAndHoldAtTime(cancelTime)
+		this._doSafely(() => this._audioParam.cancelAndHoldAtTime(cancelTime))
 	}
 
 	public cancelScheduledValues(cancelTime: number) {
-		this._audioParam.cancelScheduledValues(cancelTime)
+		this._doSafely(() => this._audioParam.cancelScheduledValues(cancelTime))
 	}
 
 	public exponentialRampToValueAtTime(value: number, endTime: number) {
-		this._audioParam.exponentialRampToValueAtTime(value, endTime)
+		this._doSafely(() => this._audioParam.exponentialRampToValueAtTime(value, endTime))
 	}
 
 	public linearRampToValueAtTime(value: number, endTime: number) {
-		this._audioParam.linearRampToValueAtTime(value, endTime)
+		this._doSafely(() => this._audioParam.linearRampToValueAtTime(value, endTime))
 	}
 
 	public setTargetAtTime(target: number, startTime: number, timeConstant: number) {
-		// console.log(`${this._kelpieNode.labNode.creatorName} ${this._kelpieNode.name}.${this.name} KelpieAudioParam.setTargetAtTime(${target})`)
-		this._audioParam.setTargetAtTime(target, startTime, timeConstant)
+		this._doSafely(() => this._audioParam.setTargetAtTime(target, startTime, timeConstant))
 	}
 
 	public setValueAtTime(value: number, startTime: number) {
-		this._audioParam.setValueAtTime(value, startTime)
+		this._doSafely(() => this._audioParam.setValueAtTime(value, startTime))
 	}
 
 	public setValueCurveAtTime(values: number[] | Float32Array, startTime: number, duration: number) {
-		this._audioParam.setValueCurveAtTime(values, startTime, duration)
+		this._doSafely(() => this._audioParam.setValueCurveAtTime(values, startTime, duration))
+	}
+
+	private _doSafely(foo: () => void) {
+		try {
+			foo()
+		} catch (error) {
+			logger.error('KelpieAudioParam error:', {error, this: this})
+		}
 	}
 }
 
