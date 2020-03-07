@@ -36,6 +36,9 @@ SSH_USER_TEST=notroot
 ## Server Setup
 Run `yarn setup-test-server` or `yarn setup-prod-server`.
 
+### Manual Server Setup Steps
+Add AWS secrets: https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/loading-node-credentials-shared.html
+
 ## Audio Worklets
 `packages/client/WebAudio/AudioWorklets/Processors` is the folder where audio worklet processor files go.
 
