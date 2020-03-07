@@ -4,7 +4,7 @@ Collaborative Online Real-time Graphical Interface For Music
 A "multiplayer DAW"
 
 ## Required Software
-- node 10.14.1
+- node 12.16.1
 - yarn 1.x.x
 - graphviz (for viewing diagrams in docs folder)
 - rust (https://rustup.rs/)

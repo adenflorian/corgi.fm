@@ -14,8 +14,8 @@ rm built/corgi.fm.tar.gz
 
 echo 'nvm' | ssh ${SSH_USER_TEST}@${SSH_HOST_TEST} '
     . ~/.nvm/nvm.sh;
-    nvm install 10.14.1;
-    nvm use 10.14.1;
+    nvm install 12.16.1;
+    nvm use 12.16.1;
     npm i -g yarn pm2;
     pm2 delete all;
     rm -r corgi.fm;
