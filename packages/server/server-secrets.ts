@@ -1,4 +1,5 @@
 import * as fs from 'fs'
+import * as os from 'os'
 import {plainToClass} from 'class-transformer'
 import {Length, validate} from 'class-validator'
 import {isLocalDevServer} from './is-prod-server'
@@ -10,7 +11,7 @@ export async function loadServerSecrets() {
 
 	const corgiSecretsPath = isLocalDevServer()
 		? __dirname + '/../../corgiSecrets.json'
-		: '~/corgiSecrets.json'
+		: os.homedir() + '/corgiSecrets.json'
 
 	const buffer = await fs.promises.readFile(corgiSecretsPath, {encoding: 'utf8'})
 
