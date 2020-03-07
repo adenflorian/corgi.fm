@@ -4,7 +4,7 @@ import {toBeats, fromBeats, arrayToESIdKeyMap} from '@corgifm/common/common-util
 import {
 	preciseSubtract, preciseAdd, makeExpMidiClip,
 	makeExpMidiEventsFromArray, ExpMidiClip, makeExpMidiNoteEvent,
-	preciseRound, preciseCeil,
+	preciseRound, preciseCeil, convertExpMidiEventsToSequencerEvents,
 } from '@corgifm/common/midi-types'
 import {midiActions} from '@corgifm/common/common-types'
 import {logger} from '../../client-logger'
@@ -16,7 +16,9 @@ import {ExpMidiOutputPort} from '../ExpMidiPorts'
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 import {ExpPorts} from '../ExpPorts'
 import {ExpSequencerNodeExtra} from './ExpSequencerNodeView'
-import {EventStreamReader, myPrecision} from './EventStreamStuff'
+import {EventStreamReader, myPrecision, songOfTime} from './EventStreamStuff'
+
+let flag = false
 
 export class SequencerNode extends CorgiNode {
 	protected readonly _ports: ExpPorts
@@ -24,6 +26,7 @@ export class SequencerNode extends CorgiNode {
 	protected readonly _midiClipParams: ExpMidiClipParams
 	protected readonly _buttons: ExpButtons
 	private readonly _restartButton: ExpButton
+	private readonly _swapButton: ExpButton
 	private readonly _tempo: ExpCustomNumberParam
 	private _cursor = 0
 	private readonly _eventStream = new EventStreamReader()
@@ -48,10 +51,12 @@ export class SequencerNode extends CorgiNode {
 		this._midiClipParams = arrayToESIdKeyMap([this._midiClip])
 
 		this._restartButton = new ExpButton('restart', this)
-		this._buttons = arrayToESIdKeyMap([this._restartButton])
+		this._swapButton = new ExpButton('swap', this)
+		this._buttons = arrayToESIdKeyMap([this._restartButton, this._swapButton])
 
 		this._midiClip.value.subscribe(this._onMidiClipChange)
 		this._restartButton.onPress.subscribe(this._onRestartPress)
+		this._swapButton.onPress.subscribe(this._onSwapPress)
 	}
 
 	public render = () => {
@@ -83,6 +88,15 @@ export class SequencerNode extends CorgiNode {
 		this._eventStream.restart()
 	}
 
+	private readonly _onSwapPress = () => {
+		if (flag) {
+			this._eventStream.changeEvents(convertExpMidiEventsToSequencerEvents(this._midiClip.value.current.events))
+		} else {
+			this._eventStream.changeEvents(songOfTime)
+		}
+		flag = !flag
+	}
+
 	private readonly _onMidiClipChange = (clip: ExpMidiClip) => {
 
 	}
@@ -95,31 +109,33 @@ export class SequencerNode extends CorgiNode {
 			this._startSongTime = Math.ceil((currentGlobalTime + 0.1) * 10) / 10
 		}
 
-		const cursor = this._cursor
-		const songStartTime = this._startSongTime
-		const tempo = this._tempo.value
-		const currentSongTime = preciseSubtract(currentGlobalTime, songStartTime)
+		const currentSongTime = preciseSubtract(currentGlobalTime, this._startSongTime)
 		const targetSongTimeToReadTo = preciseCeil(preciseAdd(currentSongTime, maxReadAhead), myPrecision)
-		const distanceSeconds = preciseRound(preciseSubtract(targetSongTimeToReadTo, cursor), myPrecision)
+		const distanceSeconds = preciseRound(preciseSubtract(targetSongTimeToReadTo, this._cursor), myPrecision)
 
 		if (distanceSeconds <= 0) return
 
-		const distanceBeats = toBeats(distanceSeconds, tempo)
+		const distanceBeats = toBeats(distanceSeconds, this._tempo.value)
 		const events = this._eventStream.read(distanceBeats)
 
+		const songStartPlusCursor = preciseRound(this._startSongTime + this._cursor, myPrecision)
+
 		events.forEach(event => {
-			const eventDistanceFromCursor = event.distanceFromMainCursor
-			const fromBeats_ = fromBeats(eventDistanceFromCursor, tempo)
-			const songStartPlusCursor = preciseRound(songStartTime + cursor, myPrecision)
-			const eventStart = preciseRound(songStartPlusCursor + fromBeats_, myPrecision)
+			const eventDistanceSeconds = fromBeats(event.distanceFromMainCursor, this._tempo.value)
+			const eventStart = preciseRound(songStartPlusCursor + eventDistanceSeconds, myPrecision)
 
-			if (eventStart.toString().length > 8) logger.warn('precision error oh no: ', {eventDistanceFromCursor, fromBeats_, songStartPlusCursor, eventStart})
+			if (eventStart.toString().length > 8) logger.warn('precision error oh no: ', {eventDistanceFromCursor: event.distanceFromMainCursor, eventDistanceSeconds, songStartPlusCursor, eventStart})
 
-			if (event.note) {
-				this._midiOutputPort.sendMidiAction(midiActions.note(eventStart, event.gate, event.note, 1))
+			if (eventStart < 0) {
+				logger.error('SequencerNode.onTick eventStart < 0:', {eventStart, eventDistanceSeconds, songStartPlusCursor, eventDistanceFromCursor: event.distanceFromMainCursor})
 			} else {
-				this._midiOutputPort.sendMidiAction(midiActions.gate(eventStart, event.gate))
+				if (event.note) {
+					this._midiOutputPort.sendMidiAction(midiActions.note(eventStart, event.gate, event.note, 1))
+				} else {
+					this._midiOutputPort.sendMidiAction(midiActions.gate(eventStart, event.gate))
+				}
 			}
+
 			this.debugInfo.invokeNextFrame(JSON.stringify(event))
 		})
 

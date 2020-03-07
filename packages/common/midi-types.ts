@@ -231,8 +231,32 @@ export interface SequencerEvent {
 	readonly note?: number
 }
 
+export interface SequencerEventExtra extends SequencerEvent {
+	readonly loop: number
+}
+
 export type SequencerEvents = readonly SequencerEvent[]
 
 export function convertExpMidiEventsToSequencerEvents(events: ExpMidiEvents): SequencerEvents {
-	return []
+	return events.reduce((result, event) => {
+		result.push({
+			beat: event.startBeat,
+			gate: true,
+			note: event.noteNumber,
+		})
+		result.push({
+			beat: event.startBeat + event.durationBeats,
+			gate: false,
+			note: event.noteNumber,
+		})
+		return result
+	}, [] as SequencerEvent[]).sort((a, b) => {
+		const foo = a.beat - b.beat
+
+		if (foo !== 0) return foo
+
+		if (a.gate === b.gate) return 0
+
+		return a.gate ? 1 : -1
+	})
 }

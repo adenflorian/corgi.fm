@@ -1,4 +1,4 @@
-import {SequencerEvents, SequencerEvent} from '@corgifm/common/midi-types'
+import {SequencerEvents, SequencerEvent, SequencerEventExtra} from '@corgifm/common/midi-types'
 import {midiPrecision} from '@corgifm/common/midi-types'
 import {logger} from '../../client-logger'
 import {
@@ -33,6 +33,10 @@ export class EventStreamReader {
 		this._currentEvent.invokeNextFrame(this._eventStream.getNextEvent())
 	}
 
+	public changeEvents(events: SequencerEvents) {
+		this._eventStream.changeEvents(events)
+	}
+
 	public read(beatsToRead: number): readonly NextEvent[] {
 		if (beatsToRead <= 0) {
 			return []
@@ -41,6 +45,10 @@ export class EventStreamReader {
 		const readEvents: NextEvent[] = []
 
 		let distanceFromMainCursor = Math.round((this._currentEvent.current.beat - this._beatCursor.current) * midiPrecision) / midiPrecision
+
+		if (distanceFromMainCursor < 0) {
+			logger.error('EventStreamReader.read distanceFromMainCursor < 0 AAA:', {distanceFromMainCursor, currentEvent: this._currentEvent.current, beatCursor: this._beatCursor.current})
+		}
 
 		if (distanceFromMainCursor.toString().length > 8) logger.warn('precision error oh no A: ', {distanceFromMainCursor, ceb: this._currentEvent.current.beat, bc: this._beatCursor.current})
 
@@ -51,6 +59,9 @@ export class EventStreamReader {
 			})
 			this._currentEvent.invokeNextFrame(this._eventStream.getNextEvent())
 			distanceFromMainCursor = Math.round((this._currentEvent.current.beat - this._beatCursor.current) * midiPrecision) / midiPrecision
+			if (distanceFromMainCursor < 0) {
+				logger.error('EventStreamReader.read distanceFromMainCursor < 0 BBB:', {distanceFromMainCursor, currentEvent: this._currentEvent.current, beatCursor: this._beatCursor.current})
+			}
 			if (distanceFromMainCursor.toString().length > 8) logger.warn('precision error oh no B: ', {distanceFromMainCursor, ceb: this._currentEvent.current.beat, bc: this._beatCursor.current})
 		}
 
@@ -60,7 +71,7 @@ export class EventStreamReader {
 	}
 }
 
-export type ReadonlyEventStream = Pick<EventStream, 'beatLength' | 'beatCursor' | 'currentIndex' | 'loops' | 'events'>
+export type ReadonlyEventStream = Pick<EventStream, 'beatLength' | 'beatCursor' | 'beatCursor2' | 'currentIndex' | 'loops' | 'events'>
 
 const beatLength = 16
 
@@ -69,35 +80,58 @@ export class EventStream {
 	public get currentIndex() {return this._currentIndex as ReadonlyCorgiNumberChangedEvent}
 	public get loops() {return this._loops as ReadonlyCorgiNumberChangedEvent}
 	public get beatCursor() {return this._beatCursor as ReadonlyCorgiNumberChangedEvent}
+	public get beatCursor2() {return this._beatCursor2 as ReadonlyCorgiNumberChangedEvent}
 	public get events() {return this._events as ReadonlyCorgiObjectChangedEvent<SequencerEvents>}
-	public get lastEvent() {return this._lastEvent as ReadonlyCorgiObjectChangedEvent<SequencerEvent>}
+	public get lastEvent() {return this._lastEvent as ReadonlyCorgiObjectChangedEvent<SequencerEventExtra>}
 	private readonly _beatLength = new CorgiNumberChangedEvent(beatLength)
 	private readonly _currentIndex = new CorgiNumberChangedEvent(-1)
 	private readonly _loops = new CorgiNumberChangedEvent(0)
 	private readonly _beatCursor = new CorgiNumberChangedEvent(0)
+	private readonly _beatCursor2 = new CorgiNumberChangedEvent(0)
 	private readonly _events = new CorgiObjectChangedEvent<SequencerEvents>(songOfTime)
-	private readonly _lastEvent = new CorgiObjectChangedEvent<SequencerEvent>({beat: 0, gate: false})
+	private readonly _lastEvent = new CorgiObjectChangedEvent<SequencerEventExtra>({beat: 0, gate: false, loop: 0})
+
+	public changeEvents(events: SequencerEvents) {
+		this._events.invokeImmediately(events)
+		this.restart()
+	}
 
 	public restart() {
 		this._beatLength.invokeNextFrame(beatLength)
 		this._currentIndex.invokeNextFrame(-1)
 		this._loops.invokeNextFrame(0)
 		this._beatCursor.invokeNextFrame(0)
+		this._beatCursor2.invokeNextFrame(0)
 		// this._events.invokeNextFrame(0)
-		this._lastEvent.invokeNextFrame({beat: 0, gate: false})
+		this._lastEvent.invokeNextFrame({beat: 0, gate: false, loop: 0})
 	}
 
 	public getNextEvent(): SequencerEvent {
 		this._currentIndex.invokeNextFrame(this.currentIndex.current + 1)
 
 		if (this._currentIndex.current >= this._events.current.length) {
+			console.log('A:', {loops: this._loops.current})
 			this._loops.invokeNextFrame(this._loops.current + 1)
+			console.log('B:', {loops: this._loops.current})
 			this._currentIndex.invokeNextFrame(0)
 		}
 
-		const nextEvent = this._events.current[this._currentIndex.current]
+		const bar = this._events.current[this._currentIndex.current]
 
-		this._beatCursor.invokeNextFrame(this._beatCursor.current + (nextEvent.beat - this.lastEvent.current.beat))
+		const nextEvent: SequencerEventExtra = {
+			...bar,
+			loop: this.loops.current,
+		}
+
+		logger.assert(nextEvent.loop >= this.lastEvent.current.loop, 'oof', {nextEvent, lastEvent: this.lastEvent})
+
+		const foo = nextEvent.loop > this.lastEvent.current.loop
+			? this._beatLength.current - this.lastEvent.current.beat + nextEvent.beat
+			: nextEvent.beat - this.lastEvent.current.beat
+
+		this._beatCursor.invokeNextFrame(this._beatCursor.current + foo)
+
+		this._beatCursor2.invokeNextFrame(nextEvent.beat + (this._loops.current * this.beatLength.current))
 
 		this._lastEvent.invokeNextFrame(nextEvent)
 
@@ -108,7 +142,7 @@ export class EventStream {
 	}
 }
 
-const songOfTime: SequencerEvents = [
+export const songOfTime: SequencerEvents = [
 	// {gate: true, beat: 0, note: 60},
 	// {gate: false, beat: 1, note: 60},
 	// {gate: true, beat: 2, note: 65},

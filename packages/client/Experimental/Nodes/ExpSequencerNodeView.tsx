@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {Fragment} from 'react'
 import {hot} from 'react-hot-loader'
 import {useNumberChangedEvent, useObjectChangedEvent} from '../hooks/useCorgiEvent'
 import {useExpPosition} from '../../react-hooks'
@@ -22,15 +22,18 @@ export const ExpSequencerNodeExtra = hot(module)(React.memo(function _ExpSequenc
 	const events = useObjectChangedEvent(eventStreamReader.eventStream.events)
 	const eventsBeatLength = useNumberChangedEvent(eventStreamReader.eventStream.beatLength)
 	const innerBeatCursor = useNumberChangedEvent(eventStreamReader.eventStream.beatCursor)
-	const maxBeat = events.map(x => x.beat).reduce((max, current) => Math.max(current, max))
+	const innerBeatCursor2 = useNumberChangedEvent(eventStreamReader.eventStream.beatCursor2)
+	const maxBeat = events.map(x => x.beat).reduce((max, current) => Math.max(current, max), 0)
 	const eventsHeight = position.height / 3
 	const eventsWidth = position.width - 16
 	const notes = events.map(x => x.note).filter(x => x !== undefined) as readonly number[]
-	const minNote = notes.reduce((min, current) => Math.min(current, min))
-	const maxNote = notes.reduce((max, current) => Math.max(current, max))
+	const minNote = notes.reduce((min, current) => Math.min(current, min), 127)
+	const maxNote = notes.reduce((max, current) => Math.max(current, max), 0)
 	const noteRange = maxNote - minNote
 	const noteHeight = eventsHeight / noteRange
 	const noteWidth = Math.max(position.width / 200, 1)
+
+	// console.log({beatCursor, eventsBeatLength, eventsWidth, innerBeatCursor, innerBeatCursor2})
 
 	return (
 		<div
@@ -42,12 +45,13 @@ export const ExpSequencerNodeExtra = hot(module)(React.memo(function _ExpSequenc
 		>
 			<div>beatCursor: {beatCursor.toFixed(1)}</div>
 			<div>current event:</div>
-			<div>beat: {currentEvent.beat}</div>
-			<div>gate: {currentEvent.gate ? 'on' : 'off'}</div>
-			<div>note: <span style={{color: getColorStringForMidiNote(currentEvent.note || 0)}}>{currentEvent.note}</span></div>
+			<div>beat: {currentEvent && currentEvent.beat}</div>
+			<div>gate: {currentEvent && (currentEvent.gate ? 'on' : 'off')}</div>
+			<div>note: <span style={{color: getColorStringForMidiNote((currentEvent && currentEvent.note) || 0)}}>{currentEvent && currentEvent.note}</span></div>
 			<div>eventStreamIndex: {eventStreamIndex}</div>
 			<div>loops: {loops}</div>
 			<div>innerBeatCursor: {innerBeatCursor}</div>
+			<div>innerBeatCursor2: {innerBeatCursor2}</div>
 			<div
 				className="events"
 				style={{
@@ -65,32 +69,44 @@ export const ExpSequencerNodeExtra = hot(module)(React.memo(function _ExpSequenc
 					backgroundColor: CssColor.panelGrayLight,
 					height: eventsHeight,
 				}} />
-				{events.map((event, i) => {
-					return (
-						<div key={i} className="event" style={{
+				{eventsBeatLength <= 0
+					? 'uh oh'
+					: <Fragment>
+						{events.map((event, i) => {
+							return (
+								<div key={i} className="event" style={{
+									position: 'absolute',
+									left: (event.beat / eventsBeatLength) * eventsWidth,
+									width: noteWidth,
+									height: noteHeight,
+									backgroundColor: event.note === undefined ? CssColor.blue : event.gate ? CssColor.green : CssColor.red,
+									top: ((maxNote - (event.note || minNote)) / (noteRange + 1)) * eventsHeight,
+								}}></div>
+							)
+						})}
+						<div className="currentTime" style={{
 							position: 'absolute',
-							left: (event.beat / maxBeat) * eventsWidth,
-							width: noteWidth,
-							height: noteHeight,
-							backgroundColor: event.note === undefined ? CssColor.blue : event.gate ? CssColor.green : CssColor.red,
-							top: ((maxNote - (event.note || minNote)) / (noteRange + 1)) * eventsHeight,
+							height: eventsHeight,
+							width: 1,
+							backgroundColor: CssColor.defaultGray,
+							left: (((beatCursor % eventsBeatLength) / eventsBeatLength) * eventsWidth || 0),
 						}}></div>
-					)
-				})}
-				<div className="currentTime" style={{
-					position: 'absolute',
-					height: eventsHeight,
-					width: 1,
-					backgroundColor: CssColor.defaultGray,
-					left: (((beatCursor % eventsBeatLength) / eventsBeatLength) * eventsWidth || 0),
-				}}></div>
-				<div className="currentTime" style={{
-					position: 'absolute',
-					height: eventsHeight,
-					width: 1,
-					backgroundColor: CssColor.orange,
-					left: (((innerBeatCursor % eventsBeatLength) / eventsBeatLength) * eventsWidth || 0),
-				}}></div>
+						<div className="currentTime" style={{
+							position: 'absolute',
+							height: eventsHeight / 2,
+							width: 1,
+							backgroundColor: CssColor.orange,
+							left: (((innerBeatCursor % eventsBeatLength) / eventsBeatLength) * eventsWidth || 0),
+						}}></div>
+						<div className="currentTime" style={{
+							position: 'absolute',
+							height: eventsHeight / 2,
+							top: eventsHeight / 2,
+							width: 1,
+							backgroundColor: CssColor.purple,
+							left: (((innerBeatCursor2 % eventsBeatLength) / eventsBeatLength) * eventsWidth || 0),
+						}}></div>
+					</Fragment>}
 			</div>
 		</div>
 	)
