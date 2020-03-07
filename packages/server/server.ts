@@ -12,6 +12,8 @@ import {getServerEnv, isLocalDevServer, logServerEnv} from './is-prod-server'
 import {startRoomWatcher} from './room-watcher'
 import {setupServerWebSocketListeners} from './server-socket-listeners'
 import {setupExpressApp} from './setup-express-app'
+import {DiscordBot} from './discord'
+import {loadServerSecrets} from './server-secrets'
 
 if (!isLocalDevServer()) initSentryServer()
 
@@ -61,4 +63,12 @@ async function start() {
 	server.listen(port)
 
 	logger.log(`corgi.fm server listening on port ${port}`)
+
+	try {
+		await loadServerSecrets()
+		const discordBot = new DiscordBot(serverStore)
+		await discordBot.start()
+	} catch(error) {
+		logger.error(error)
+	}
 }

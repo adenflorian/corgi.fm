@@ -33,11 +33,19 @@ SSH_HOST_TEST=test.example.com
 SSH_USER_TEST=notroot
 ```
 
+Create `corgiSecrets.json` in project root.
+Used by corgi server at runtime.
+See `server-secrets.ts`.
+
 ## Server Setup
 Run `yarn setup-test-server` or `yarn setup-prod-server`.
 
 ### Manual Server Setup Steps
 Add AWS secrets: https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/loading-node-credentials-shared.html
+See `s3.ts`.
+
+Create and populate `~/corgiSecrets.json`.
+See `server-secrets.ts`.
 
 ## Audio Worklets
 `packages/client/WebAudio/AudioWorklets/Processors` is the folder where audio worklet processor files go.

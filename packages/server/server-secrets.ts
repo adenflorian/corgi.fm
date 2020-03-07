@@ -1,33 +1,44 @@
 import * as fs from 'fs'
+import {plainToClass} from 'class-transformer'
+import {Length, validate} from 'class-validator'
 import {isLocalDevServer} from './is-prod-server'
 
 let cachedSecrets: ServerSecrets | undefined
 
-export async function getServerSecrets(): Promise<ServerSecrets> {
-	return new Promise(resolve => {
-		if (cachedSecrets) return resolve(cachedSecrets)
+export async function loadServerSecrets() {
+	if (cachedSecrets) return
 
-		const corgiSecretsPath = isLocalDevServer()
-			? __dirname + '/corgiSecrets.json'
-			: '~/corgiSecrets.json'
+	const corgiSecretsPath = isLocalDevServer()
+		? __dirname + '/../../corgiSecrets.json'
+		: '~/corgiSecrets.json'
 
-		fs.readFile(corgiSecretsPath, 'utf-8', (err, data) => {
-			if (err) throw err
-			const secrets = JSON.parse(data)
-			if (!isServerSecrets(secrets)) {
-				throw new Error('parsed server secrets is not a proper ServerSecrets: keys: '
-					+ JSON.stringify(Object.keys(secrets)))
-			} else {
-				cachedSecrets = secrets
-				return resolve(cachedSecrets)
-			}
-		})
+	const buffer = await fs.promises.readFile(corgiSecretsPath, {encoding: 'utf8'})
+
+	const secrets = plainToClass(ServerSecrets, JSON.parse(buffer))
+
+	const errors = await validate(secrets, {
+		validationError: {
+			target: false,
+			value: true,
+		},
+		forbidUnknownValues: true,
+		whitelist: true,
 	})
+
+	if (errors.length === 0) {
+		cachedSecrets = secrets
+	} else {
+		throw new Error('parsed server secrets is not a proper ServerSecrets: keys: ' + JSON.stringify({corgiSecretsPath, buffer, errors, secrets: Object.keys(secrets)}))
+	}
 }
 
-export interface ServerSecrets {
+export function getServerSecrets(): ServerSecrets {
+	if (!cachedSecrets) throw new Error('must load secrets first!')
+
+	return cachedSecrets
 }
 
-function isServerSecrets(arg: any): arg is ServerSecrets {
-	return arg
+export class ServerSecrets {
+	@Length(1)
+	public readonly discordClientSecret: string = ''
 }
