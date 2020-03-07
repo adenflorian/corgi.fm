@@ -57,7 +57,7 @@
     "eslint-watch": "^6.0.0",
     "eslint_d": "^8.0.0",
     "jest": "^24.8.0",
-    "lerna": "^3.15.0",
+    "lerna": "^3.20.2",
     "parcel-plugin-wrapper": "^0.2.2",
     "pm2": "^2.10.4",
     "sinon": "^7.2.2",

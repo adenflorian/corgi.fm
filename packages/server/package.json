@@ -57,7 +57,6 @@
 		"chai": "^4.1.2",
 		"concurrently": "^3.5.1",
 		"jest": "^24.8.0",
-		"lerna": "^3.15.0",
 		"mongodb-memory-server-global": "^5.1.5",
 		"pm2": "^2.10.4",
 		"sinon": "^7.2.2",
