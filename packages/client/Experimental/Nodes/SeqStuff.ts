@@ -152,6 +152,14 @@ export interface SeqSession {
 	readonly name: string
 }
 
+export function seqSessionClipReader(range: MidiRange, clip: SeqSessionClip): readonly SeqReadEvent[] {
+	return seqPatternViewReader(range, clip.patternView)
+}
+
+export function seqSessionReader(range: MidiRange, session: SeqSession): readonly SeqReadEvent[] {
+	return session.sessionClips.map(x => seqSessionClipReader(range, x)).toArray().flat(1)
+}
+
 export interface Sequencer {
 	readonly id: Id
 	readonly name: string

@@ -1,6 +1,6 @@
 import {List, Map} from 'immutable'
 import {IMidiNote} from './MidiNote'
-import {IKeyColors, NoteNameSharps} from './common-types'
+import {IKeyColors, NoteNameSharps, NoteNameFlats} from './common-types'
 import {BuiltInBQFilterType} from './OscillatorTypes'
 import {defaultSamplePlaybackRate} from './common-constants'
 
@@ -168,7 +168,7 @@ export const defaultSamples = Map({
 	basicDrums: basicDrumSamples,
 })
 
-export function midiNoteFromNoteName(noteName: NoteNameSharps, octave: Octave): IMidiNote {
+export function midiNoteFromNoteName(noteName: NoteNameSharps | NoteNameFlats, octave: Octave): IMidiNote {
 	const midiNoteBase = noteNameToMidi[noteName]
 	return midiNoteBase + (octave * 12) + 12
 }
