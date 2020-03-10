@@ -19,7 +19,7 @@ import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 import {ExpPorts} from '../ExpPorts'
 import {ExpSequencerNodeExtra} from './ExpSequencerNodeView'
 import {EventStreamReader, myPrecision, songOfTime} from './EventStreamStuff'
-import {SeqPatternView, SeqPattern, SeqEvent, SeqNoteEvent, seqPatternViewReader} from './SeqStuff'
+import {SeqPatternView, SeqPattern, SeqEvent, SeqNoteEvent, seqPatternViewReader, SeqReadEvent} from './SeqStuff'
 
 // not sure if needed?
 // causes problems with range 0 and repeating notes on start
@@ -44,31 +44,62 @@ export class SequencerNode extends CorgiNode {
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
 		super(corgiNodeArgs, {name: 'Sequencer', color: CssColor.yellow})
 
-		const events: readonly SeqNoteEvent[] = [{
-			id: uuid.v4(),
-			active: true,
-			startBeat: 0,
-			type: 'note',
-			duration: 0.5,
-			velocity: 1,
-			note: 60,
-		}, {
-			id: uuid.v4(),
-			active: true,
-			startBeat: 0.5,
-			type: 'note',
-			duration: 1,
-			velocity: 1,
-			note: 72,
-		}, {
-			id: uuid.v4(),
-			active: true,
-			startBeat: 1.5,
-			type: 'note',
-			duration: 1,
-			velocity: 1,
-			note: 67,
-		}]
+		const events: readonly SeqNoteEvent[] = [
+			{
+				id: uuid.v4(),
+				active: true,
+				startBeat: 0.5,
+				type: 'note',
+				duration: 1,
+				velocity: 1,
+				note: 72,
+			},
+			{
+				id: uuid.v4(),
+				active: true,
+				startBeat: 0.5,
+				type: 'note',
+				duration: 1,
+				velocity: 1,
+				note: 55,
+			},
+			{
+				id: uuid.v4(),
+				active: true,
+				startBeat: 0,
+				type: 'note',
+				duration: 0.5,
+				velocity: 1,
+				note: 55,
+			},
+			{
+				id: uuid.v4(),
+				active: true,
+				startBeat: 1.5,
+				type: 'note',
+				duration: 1,
+				velocity: 1,
+				note: 67,
+			},
+			{
+				id: uuid.v4(),
+				active: true,
+				startBeat: 0,
+				type: 'note',
+				duration: 0.5,
+				velocity: 1,
+				note: 60,
+			},
+			{
+				id: uuid.v4(),
+				active: true,
+				startBeat: 1.5,
+				type: 'note',
+				duration: 1,
+				velocity: 1,
+				note: 57,
+			}
+		]
 
 		this._pattern = {
 			id: uuid.v4(),
@@ -191,19 +222,35 @@ export class SequencerNode extends CorgiNode {
 
 		const events = seqPatternViewReader(readRangeBeats, this._patternView)
 
-		events.forEach(event => {
-			const eventStartSeconds = currentAudioContextTime + offsetSeconds + fromBeats(event.offsetBeats)
-			// console.log(event)
-			// console.log({eventStartSeconds})
-			if (event.type === 'noteOn') {
-				this._midiOutputPort.sendMidiAction(midiActions.note(eventStartSeconds, true, event.note, event.velocity))
-			} else if (event.type === 'noteOff') {
-				this._midiOutputPort.sendMidiAction(midiActions.note(eventStartSeconds, false, event.note, 0))
-			}
-		})
+		if (events.length > 0) {
+			const sortedEvents = events.slice().sort(sortEventByType).sort(sortEventByOffset)
+
+			// if (sortedEvents.length > 4) console.log({events, sortedEvents})
+
+			sortedEvents.forEach(event => {
+				const eventStartSeconds = currentAudioContextTime + offsetSeconds + fromBeats(event.offsetBeats)
+				// console.log(event)
+				// console.log({eventStartSeconds})
+				if (event.type === 'noteOn') {
+					this._midiOutputPort.sendMidiAction(midiActions.note(eventStartSeconds, true, event.note, event.velocity))
+				} else if (event.type === 'noteOff') {
+					this._midiOutputPort.sendMidiAction(midiActions.note(eventStartSeconds, false, event.note, 0))
+				}
+			})
+		}
 
 		this._cursorSeconds = readToSongTimeSeconds
 		this._cursorBeats += beatsToRead
 		this._justStarted = false
 	}
+}
+
+function sortEventByType(a: SeqReadEvent, b: SeqReadEvent): number {
+	if (a.type === b.type) return 0
+
+	return a.type === 'noteOff' ? -1 : 1
+}
+
+function sortEventByOffset(a: SeqReadEvent, b: SeqReadEvent): number {
+	return a.offsetBeats - b.offsetBeats
 }
