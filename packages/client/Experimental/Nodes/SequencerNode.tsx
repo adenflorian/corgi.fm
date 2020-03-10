@@ -1,10 +1,12 @@
 import React from 'react'
+import * as uuid from 'uuid'
+import * as Immutable from 'immutable'
 import {CssColor} from '@corgifm/common/shamu-color'
-import {toBeats, fromBeats, arrayToESIdKeyMap} from '@corgifm/common/common-utils'
+import {arrayToESIdKeyMap} from '@corgifm/common/common-utils'
 import {
 	preciseSubtract, preciseAdd, makeExpMidiClip,
 	makeExpMidiEventsFromArray, ExpMidiClip, makeExpMidiNoteEvent,
-	preciseRound, preciseCeil, convertExpMidiEventsToSequencerEvents,
+	preciseRound, preciseCeil, convertExpMidiEventsToSequencerEvents, MidiRange,
 } from '@corgifm/common/midi-types'
 import {midiActions} from '@corgifm/common/common-types'
 import {logger} from '../../client-logger'
@@ -17,25 +19,70 @@ import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 import {ExpPorts} from '../ExpPorts'
 import {ExpSequencerNodeExtra} from './ExpSequencerNodeView'
 import {EventStreamReader, myPrecision, songOfTime} from './EventStreamStuff'
+import {SeqPatternView, SeqPattern, SeqEvent, SeqNoteEvent, seqPatternViewReader} from './SeqStuff'
 
-let flag = false
+// not sure if needed?
+// causes problems with range 0 and repeating notes on start
+const _jumpStartSeconds = 0.0
 
 export class SequencerNode extends CorgiNode {
 	protected readonly _ports: ExpPorts
 	protected readonly _customNumberParams: ExpCustomNumberParams
-	protected readonly _midiClipParams: ExpMidiClipParams
 	protected readonly _buttons: ExpButtons
 	private readonly _restartButton: ExpButton
-	private readonly _swapButton: ExpButton
 	private readonly _tempo: ExpCustomNumberParam
-	private _cursor = 0
-	private readonly _eventStream = new EventStreamReader()
 	private readonly _midiOutputPort: ExpMidiOutputPort
-	private _startSongTime = -1
-	private readonly _midiClip: ExpMidiClipParam
+	private _songStartTimeSeconds = -1
+	private _cursorBeats = 0
+	private readonly _patternView: SeqPatternView
+	private readonly _pattern: SeqPattern
+	private _justStarted = false
+	private lastAudioContextTime = -1
+	private currentSongTimeBeats = 0
+	private _cursorSeconds = 0
 
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
 		super(corgiNodeArgs, {name: 'Sequencer', color: CssColor.yellow})
+
+		const events: readonly SeqNoteEvent[] = [{
+			id: uuid.v4(),
+			active: true,
+			startBeat: 0,
+			type: 'note',
+			duration: 0.5,
+			velocity: 1,
+			note: 60,
+		}, {
+			id: uuid.v4(),
+			active: true,
+			startBeat: 0.5,
+			type: 'note',
+			duration: 1,
+			velocity: 1,
+			note: 72,
+		}, {
+			id: uuid.v4(),
+			active: true,
+			startBeat: 1.5,
+			type: 'note',
+			duration: 1,
+			velocity: 1,
+			note: 67,
+		}]
+
+		this._pattern = {
+			id: uuid.v4(),
+			events: Immutable.Map<Id, SeqEvent>(arrayToESIdKeyMap(events))
+		}
+
+		this._patternView = {
+			id: uuid.v4(),
+			startBeat: 0,
+			endBeat: 4,
+			loopStartBeat: 0,
+			loopEndBeat: 4,
+			pattern: this._pattern,
+		}
 
 		this._midiOutputPort = new ExpMidiOutputPort('output', 'output', this)
 		this._ports = arrayToESIdKeyMap([this._midiOutputPort])
@@ -43,102 +90,120 @@ export class SequencerNode extends CorgiNode {
 		this._tempo = new ExpCustomNumberParam('tempo', 240, 0.001, 999.99, 3)
 		this._customNumberParams = arrayToESIdKeyMap([this._tempo])
 
-		this._midiClip = new ExpMidiClipParam('midiClip', makeExpMidiClip(makeExpMidiEventsFromArray([
-			makeExpMidiNoteEvent(0, 1, 60, 0.8),
-			makeExpMidiNoteEvent(4, 2, 72, 1),
-			makeExpMidiNoteEvent(2, 1, 65, 0.5),
-		])))
-		this._midiClipParams = arrayToESIdKeyMap([this._midiClip])
-
 		this._restartButton = new ExpButton('restart', this)
-		this._swapButton = new ExpButton('swap', this)
-		this._buttons = arrayToESIdKeyMap([this._restartButton, this._swapButton])
+		this._buttons = arrayToESIdKeyMap([this._restartButton])
 
-		this._midiClip.value.subscribe(this._onMidiClipChange)
 		this._restartButton.onPress.subscribe(this._onRestartPress)
-		this._swapButton.onPress.subscribe(this._onSwapPress)
 	}
 
 	public render = () => {
-		return this.getDebugView(
-			<ExpSequencerNodeExtra
-				eventStreamReader={this._eventStream}
-			/>
-		)
+		return this.getDebugView()
 	}
 
 	protected _enable() {
 	}
 
 	protected _disable() {
-		this._midiOutputPort.sendMidiAction(midiActions.gate(this._startSongTime + this._cursor, false))
-		this._startSongTime = -1
-		this._cursor = 0
-		this._eventStream.restart()
+		this._songStartTimeSeconds = -1
 	}
 
 	protected _dispose() {
-		this._midiClip.value.unsubscribe(this._onMidiClipChange)
 	}
 
 	private readonly _onRestartPress = () => {
-		this._midiOutputPort.sendMidiAction(midiActions.gate(this._startSongTime + this._cursor, false))
-		this._startSongTime = -1
-		this._cursor = 0
-		this._eventStream.restart()
+		this._songStartTimeSeconds = -1
 	}
 
-	private readonly _onSwapPress = () => {
-		if (flag) {
-			this._eventStream.changeEvents(convertExpMidiEventsToSequencerEvents(this._midiClip.value.current.events))
-		} else {
-			this._eventStream.changeEvents(songOfTime)
-		}
-		flag = !flag
-	}
+	public onTick(currentGlobalTime: number, maxReadAheadSeconds: number) {
+		super.onTick(currentGlobalTime, maxReadAheadSeconds)
 
-	private readonly _onMidiClipChange = (clip: ExpMidiClip) => {
-
-	}
-
-	public onTick(currentGlobalTime: number, maxReadAhead: number) {
-		super.onTick(currentGlobalTime, maxReadAhead)
 		if (!this._enabled) return
 
-		if (this._startSongTime < 0) {
-			this._startSongTime = Math.ceil((currentGlobalTime + 0.1) * 10) / 10
+		const currentAudioContextTime = currentGlobalTime
+
+		if (this._songStartTimeSeconds < 0) {
+			// this._songStartTimeSeconds = Math.ceil((currentGlobalTime + 0.1) * 10) / 10
+			this._justStarted = true
+			this._songStartTimeSeconds = currentAudioContextTime
+			// getAllAudioNodes().forEach(x => x.syncOscillatorStartTimes(songStartTimeSeconds, bpm))
+			this.lastAudioContextTime = currentAudioContextTime
+			this._cursorSeconds = 0
+			this._cursorBeats = 0
 		}
 
-		const currentSongTime = preciseSubtract(currentGlobalTime, this._startSongTime)
-		const targetSongTimeToReadTo = preciseCeil(preciseAdd(currentSongTime, maxReadAhead), myPrecision)
-		const distanceSeconds = preciseRound(preciseSubtract(targetSongTimeToReadTo, this._cursor), myPrecision)
+		// const {
+		// 	isPlaying, bpm, maxReadAheadSeconds, playCount, startBeat,
+		// } = selectGlobalClockState(roomState)
 
-		if (distanceSeconds <= 0) return
+		const startBeat = 0
 
-		const distanceBeats = toBeats(distanceSeconds, this._tempo.value)
-		const events = this._eventStream.read(distanceBeats)
+		const actualBPM = Math.max(0.000001, this._tempo.value)
+		const toBeats = (x: number) => x * (actualBPM / 60)
+		const fromBeats = (x: number) => x * (60 / actualBPM)
 
-		const songStartPlusCursor = preciseRound(this._startSongTime + this._cursor, myPrecision)
+		// if (isPlaying !== _isPlaying) {
+		// 	_isPlaying = isPlaying
+		// 	logger.log('[note-scanner] isPlaying: ', isPlaying)
+		// 	if (isPlaying) {
+		// 		this._justStarted = true
+		// 		this._songStartTimeSeconds = currentAudioContextTime
+		// 		// getAllAudioNodes().forEach(x => x.syncOscillatorStartTimes(songStartTimeSeconds, bpm))
+		// 	} else {
+		// 		// song stopped
+		// 		// release all notes on all instruments
+		// 		// TODO
+		// 		// releaseAllNotesOnAllInstruments(getAllInstruments)
+		// 	}
+		// }
+
+		// if (isPlaying === false) return
+
+		const currentSongTimeSeconds = currentAudioContextTime - this._songStartTimeSeconds
+		const readToSongTimeSeconds = currentSongTimeSeconds + maxReadAheadSeconds
+		// TODO Could be 0 or negative?
+		const secondsToRead = readToSongTimeSeconds - this._cursorSeconds
+		if (secondsToRead === 0) return
+		logger.assert(secondsToRead > 0, 'no no no',
+			{secondsToRead, readToSongTimeSeconds, cursorSeconds: this._cursorSeconds, currentSongTimeSeconds, maxReadAheadSeconds})
+		const readFromBeat = this._cursorBeats
+		const beatsToRead = toBeats(secondsToRead)
+
+
+		// if (this._justStarted) {
+		// 	this.currentSongTimeBeats = startBeat
+		// 	this._cursorSeconds = startBeat
+		// 	// _playCount = playCount
+		// }
+
+		// if playing
+		// read from cursor to next cursor position
+		// this._cursorSeconds = Math.max(this._cursorSeconds, this.currentSongTimeBeats)
+		// const cursorDestinationBeats = this.currentSongTimeBeats + maxReadAheadSeconds
+		// const minBeatsToRead = this._justStarted
+		// 	? (toBeats(_jumpStartSeconds))
+		// 	: 0
+		// const beatsToRead = Math.max(minBeatsToRead, cursorDestinationBeats - this._cursorSeconds)
+
+		// distance from currentSongTime to where the cursor just started reading events from
+		const offsetSeconds = this._cursorSeconds - currentSongTimeSeconds
+
+		const readRangeBeats = new MidiRange(readFromBeat, beatsToRead)
+
+		const events = seqPatternViewReader(readRangeBeats, this._patternView)
 
 		events.forEach(event => {
-			const eventDistanceSeconds = fromBeats(event.distanceFromMainCursor, this._tempo.value)
-			const eventStart = preciseRound(songStartPlusCursor + eventDistanceSeconds, myPrecision)
-
-			if (eventStart.toString().length > 8) logger.warn('precision error oh no: ', {eventDistanceFromCursor: event.distanceFromMainCursor, eventDistanceSeconds, songStartPlusCursor, eventStart})
-
-			if (eventStart < 0) {
-				logger.error('SequencerNode.onTick eventStart < 0:', {eventStart, eventDistanceSeconds, songStartPlusCursor, eventDistanceFromCursor: event.distanceFromMainCursor})
-			} else {
-				if (event.note) {
-					this._midiOutputPort.sendMidiAction(midiActions.note(eventStart, event.gate, event.note, 1))
-				} else {
-					this._midiOutputPort.sendMidiAction(midiActions.gate(eventStart, event.gate))
-				}
+			const eventStartSeconds = currentAudioContextTime + offsetSeconds + fromBeats(event.offsetBeats)
+			// console.log(event)
+			// console.log({eventStartSeconds})
+			if (event.type === 'noteOn') {
+				this._midiOutputPort.sendMidiAction(midiActions.note(eventStartSeconds, true, event.note, event.velocity))
+			} else if (event.type === 'noteOff') {
+				this._midiOutputPort.sendMidiAction(midiActions.note(eventStartSeconds, false, event.note, 0))
 			}
-
-			this.debugInfo.invokeNextFrame(JSON.stringify(event))
 		})
 
-		this._cursor = targetSongTimeToReadTo
+		this._cursorSeconds = readToSongTimeSeconds
+		this._cursorBeats += beatsToRead
+		this._justStarted = false
 	}
 }
