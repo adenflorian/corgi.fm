@@ -3,11 +3,7 @@ import * as uuid from 'uuid'
 import * as Immutable from 'immutable'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {arrayToESIdKeyMap} from '@corgifm/common/common-utils'
-import {
-	preciseSubtract, preciseAdd, makeExpMidiClip,
-	makeExpMidiEventsFromArray, ExpMidiClip, makeExpMidiNoteEvent,
-	preciseRound, preciseCeil, convertExpMidiEventsToSequencerEvents, MidiRange,
-} from '@corgifm/common/midi-types'
+import {MidiRange} from '@corgifm/common/midi-types'
 import {midiActions} from '@corgifm/common/common-types'
 import {logger} from '../../client-logger'
 import {
@@ -18,12 +14,7 @@ import {ExpMidiOutputPort} from '../ExpMidiPorts'
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 import {ExpPorts} from '../ExpPorts'
 import {ExpSequencerNodeExtra} from './ExpSequencerNodeView'
-import {EventStreamReader, myPrecision, songOfTime} from './EventStreamStuff'
 import {SeqPatternView, SeqPattern, SeqEvent, SeqNoteEvent, seqPatternViewReader, SeqReadEvent} from './SeqStuff'
-
-// not sure if needed?
-// causes problems with range 0 and repeating notes on start
-const _jumpStartSeconds = 0.0
 
 export class SequencerNode extends CorgiNode {
 	protected readonly _ports: ExpPorts
@@ -36,9 +27,6 @@ export class SequencerNode extends CorgiNode {
 	private _cursorBeats = 0
 	private readonly _patternView: SeqPatternView
 	private readonly _pattern: SeqPattern
-	private _justStarted = false
-	private lastAudioContextTime = -1
-	private currentSongTimeBeats = 0
 	private _cursorSeconds = 0
 
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
@@ -155,16 +143,11 @@ export class SequencerNode extends CorgiNode {
 		if (this._songStartTimeSeconds < 0) {
 			// this._songStartTimeSeconds = Math.ceil((currentGlobalTime + 0.1) * 10) / 10
 			this._justStarted = true
-			this._songStartTimeSeconds = currentAudioContextTime
+			this._songStartTimeSeconds = currentAudioContextTime + 0.1
 			// getAllAudioNodes().forEach(x => x.syncOscillatorStartTimes(songStartTimeSeconds, bpm))
-			this.lastAudioContextTime = currentAudioContextTime
 			this._cursorSeconds = 0
 			this._cursorBeats = 0
 		}
-
-		// const {
-		// 	isPlaying, bpm, maxReadAheadSeconds, playCount, startBeat,
-		// } = selectGlobalClockState(roomState)
 
 		const startBeat = 0
 
@@ -172,48 +155,12 @@ export class SequencerNode extends CorgiNode {
 		const toBeats = (x: number) => x * (actualBPM / 60)
 		const fromBeats = (x: number) => x * (60 / actualBPM)
 
-		// if (isPlaying !== _isPlaying) {
-		// 	_isPlaying = isPlaying
-		// 	logger.log('[note-scanner] isPlaying: ', isPlaying)
-		// 	if (isPlaying) {
-		// 		this._justStarted = true
-		// 		this._songStartTimeSeconds = currentAudioContextTime
-		// 		// getAllAudioNodes().forEach(x => x.syncOscillatorStartTimes(songStartTimeSeconds, bpm))
-		// 	} else {
-		// 		// song stopped
-		// 		// release all notes on all instruments
-		// 		// TODO
-		// 		// releaseAllNotesOnAllInstruments(getAllInstruments)
-		// 	}
-		// }
-
-		// if (isPlaying === false) return
-
 		const currentSongTimeSeconds = currentAudioContextTime - this._songStartTimeSeconds
 		const readToSongTimeSeconds = currentSongTimeSeconds + maxReadAheadSeconds
-		// TODO Could be 0 or negative?
 		const secondsToRead = readToSongTimeSeconds - this._cursorSeconds
-		if (secondsToRead === 0) return
-		logger.assert(secondsToRead > 0, 'no no no',
-			{secondsToRead, readToSongTimeSeconds, cursorSeconds: this._cursorSeconds, currentSongTimeSeconds, maxReadAheadSeconds})
+		if (secondsToRead <= 0) return
 		const readFromBeat = this._cursorBeats
 		const beatsToRead = toBeats(secondsToRead)
-
-
-		// if (this._justStarted) {
-		// 	this.currentSongTimeBeats = startBeat
-		// 	this._cursorSeconds = startBeat
-		// 	// _playCount = playCount
-		// }
-
-		// if playing
-		// read from cursor to next cursor position
-		// this._cursorSeconds = Math.max(this._cursorSeconds, this.currentSongTimeBeats)
-		// const cursorDestinationBeats = this.currentSongTimeBeats + maxReadAheadSeconds
-		// const minBeatsToRead = this._justStarted
-		// 	? (toBeats(_jumpStartSeconds))
-		// 	: 0
-		// const beatsToRead = Math.max(minBeatsToRead, cursorDestinationBeats - this._cursorSeconds)
 
 		// distance from currentSongTime to where the cursor just started reading events from
 		const offsetSeconds = this._cursorSeconds - currentSongTimeSeconds
