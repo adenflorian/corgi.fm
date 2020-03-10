@@ -4,7 +4,7 @@ import * as Immutable from 'immutable'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {arrayToESIdKeyMap} from '@corgifm/common/common-utils'
 import {MidiRange} from '@corgifm/common/midi-types'
-import {midiActions} from '@corgifm/common/common-types'
+import {midiActions, NoteNameSharps} from '@corgifm/common/common-types'
 import {logger} from '../../client-logger'
 import {
 	ExpCustomNumberParam, ExpCustomNumberParams, ExpMidiClipParams,
@@ -14,7 +14,8 @@ import {ExpMidiOutputPort} from '../ExpMidiPorts'
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 import {ExpPorts} from '../ExpPorts'
 import {ExpSequencerNodeExtra} from './ExpSequencerNodeView'
-import {SeqPatternView, SeqPattern, SeqEvent, SeqNoteEvent, seqPatternViewReader, SeqReadEvent} from './SeqStuff'
+import {SeqPatternView, SeqPattern, SeqEvent, SeqNoteEvent, seqPatternViewReader, SeqReadEvent, SeqSession, SeqSessionClip} from './SeqStuff'
+import {noteNameToMidi, midiNoteFromNoteName} from '@corgifm/common/common-samples-stuff'
 
 export class SequencerNode extends CorgiNode {
 	protected readonly _ports: ExpPorts
@@ -25,82 +26,82 @@ export class SequencerNode extends CorgiNode {
 	private readonly _midiOutputPort: ExpMidiOutputPort
 	private _songStartTimeSeconds = -1
 	private _cursorBeats = 0
-	private readonly _patternView: SeqPatternView
-	private readonly _pattern: SeqPattern
 	private _cursorSeconds = 0
+	private readonly _session: SeqSession
 
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
 		super(corgiNodeArgs, {name: 'Sequencer', color: CssColor.yellow})
 
-		const events: readonly SeqNoteEvent[] = [
-			{
-				id: uuid.v4(),
-				active: true,
-				startBeat: 0.5,
-				type: 'note',
-				duration: 1,
-				velocity: 1,
-				note: 72,
-			},
-			{
-				id: uuid.v4(),
-				active: true,
-				startBeat: 0.5,
-				type: 'note',
-				duration: 1,
-				velocity: 1,
-				note: 55,
-			},
-			{
-				id: uuid.v4(),
-				active: true,
-				startBeat: 0,
-				type: 'note',
-				duration: 0.5,
-				velocity: 1,
-				note: 55,
-			},
-			{
-				id: uuid.v4(),
-				active: true,
-				startBeat: 1.5,
-				type: 'note',
-				duration: 1,
-				velocity: 1,
-				note: 67,
-			},
-			{
-				id: uuid.v4(),
-				active: true,
-				startBeat: 0,
-				type: 'note',
-				duration: 0.5,
-				velocity: 1,
-				note: 60,
-			},
-			{
-				id: uuid.v4(),
-				active: true,
-				startBeat: 1.5,
-				type: 'note',
-				duration: 1,
-				velocity: 1,
-				note: 57,
-			}
+		const eventsA: readonly SeqNoteEvent[] = [
+			makeNoteEvent('A', 3, 0, 3),
+			makeNoteEvent('B', 3, 3, 3),
+			makeNoteEvent('C', 4, 6, 3),
+			makeNoteEvent('B', 3, 9, 3),
 		]
 
-		this._pattern = {
+		const eventsB: readonly SeqNoteEvent[] = [
+			makeNoteEvent('A', 3, 0, 3),
+			makeNoteEvent('B', 3, 3, 3),
+			makeNoteEvent('C', 4, 6, 3),
+			makeNoteEvent('B', 3, 9, 3),
+		]
+
+		const patternA = {
 			id: uuid.v4(),
-			events: Immutable.Map<Id, SeqEvent>(arrayToESIdKeyMap(events))
+			events: Immutable.Map<Id, SeqEvent>(arrayToESIdKeyMap(eventsA)),
+			name: 'Pattern A',
 		}
 
-		this._patternView = {
+		const patternB = {
+			id: uuid.v4(),
+			events: Immutable.Map<Id, SeqEvent>(arrayToESIdKeyMap(eventsB)),
+			name: 'Pattern B',
+		}
+
+		const patternViewA = {
 			id: uuid.v4(),
 			startBeat: 0,
-			endBeat: 4,
+			endBeat: 12,
 			loopStartBeat: 0,
-			loopEndBeat: 4,
-			pattern: this._pattern,
+			loopEndBeat: 12,
+			pattern: patternA,
+			name: 'Pattern View A',
+		}
+
+		const patternViewB = {
+			id: uuid.v4(),
+			startBeat: 0,
+			endBeat: 12,
+			loopStartBeat: 0,
+			loopEndBeat: 12,
+			pattern: patternB,
+			name: 'Pattern View B',
+		}
+
+		const sessionClipA: SeqSessionClip = {
+			id: uuid.v4(),
+			active: true,
+			channelId: uuid.v4(),
+			sceneId: uuid.v4(),
+			launchMode: 'trigger',
+			patternView: patternViewA,
+			name: 'Session Clip A',
+		}
+
+		const sessionClipB: SeqSessionClip = {
+			id: uuid.v4(),
+			active: true,
+			channelId: uuid.v4(),
+			sceneId: uuid.v4(),
+			launchMode: 'trigger',
+			patternView: patternViewB,
+			name: 'Session Clip B',
+		}
+
+		this._session = {
+			id: uuid.v4(),
+			sessionClips: Immutable.Set([sessionClipA, sessionClipB]),
+			name: 'The Session',
 		}
 
 		this._midiOutputPort = new ExpMidiOutputPort('output', 'output', this)
@@ -142,7 +143,6 @@ export class SequencerNode extends CorgiNode {
 
 		if (this._songStartTimeSeconds < 0) {
 			// this._songStartTimeSeconds = Math.ceil((currentGlobalTime + 0.1) * 10) / 10
-			this._justStarted = true
 			this._songStartTimeSeconds = currentAudioContextTime + 0.1
 			// getAllAudioNodes().forEach(x => x.syncOscillatorStartTimes(songStartTimeSeconds, bpm))
 			this._cursorSeconds = 0
@@ -167,7 +167,7 @@ export class SequencerNode extends CorgiNode {
 
 		const readRangeBeats = new MidiRange(readFromBeat, beatsToRead)
 
-		const events = seqPatternViewReader(readRangeBeats, this._patternView)
+		const events = seqPatternViewReader(readRangeBeats, this._session.sessionClips.first(undefined)!.patternView)
 
 		if (events.length > 0) {
 			const sortedEvents = events.slice().sort(sortEventByType).sort(sortEventByOffset)
@@ -188,7 +188,6 @@ export class SequencerNode extends CorgiNode {
 
 		this._cursorSeconds = readToSongTimeSeconds
 		this._cursorBeats += beatsToRead
-		this._justStarted = false
 	}
 }
 
@@ -200,4 +199,16 @@ function sortEventByType(a: SeqReadEvent, b: SeqReadEvent): number {
 
 function sortEventByOffset(a: SeqReadEvent, b: SeqReadEvent): number {
 	return a.offsetBeats - b.offsetBeats
+}
+
+function makeNoteEvent(noteName: NoteNameSharps, octave: Octave, startBeat: number, duration: number): SeqNoteEvent {
+	return {
+		id: uuid.v4(),
+		active: true,
+		startBeat,
+		type: 'note',
+		duration,
+		velocity: 1,
+		note: midiNoteFromNoteName(noteName, octave),
+	}
 }

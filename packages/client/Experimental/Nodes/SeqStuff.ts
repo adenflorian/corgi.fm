@@ -44,6 +44,7 @@ export interface SeqReadNoteOffEvent extends SeqReadEventBase {
 export interface SeqPattern {
 	readonly id: Id
 	readonly events: SeqEvents
+	readonly name: string
 }
 
 export interface SeqPatternView {
@@ -53,6 +54,7 @@ export interface SeqPatternView {
 	readonly loopStartBeat: number
 	readonly loopEndBeat: number
 	readonly pattern: SeqPattern
+	readonly name: string
 }
 
 export function seqPatternReader(range: MidiRange, pattern: SeqPattern): readonly SeqReadEvent[] {
@@ -113,6 +115,7 @@ export interface SeqTimelineClip {
 	readonly beatLength: number
 	readonly active: boolean
 	readonly patternView: SeqPatternView
+	readonly name: string
 }
 
 export interface SeqTimelineTrack {
@@ -121,6 +124,7 @@ export interface SeqTimelineTrack {
 	readonly active: boolean
 	readonly solo: boolean
 	readonly armed: boolean
+	readonly name: string
 }
 
 export interface SeqTimelineArrangement {
@@ -129,24 +133,28 @@ export interface SeqTimelineArrangement {
 	readonly loopEndBeat: number
 	readonly timelineTrackIds: Immutable.Set<Id>
 	readonly playFromMarkerInBeats: number
+	readonly name: string
 }
 
 export interface SeqSessionClip {
 	readonly id: Id
-	readonly patternViewId: Id
+	readonly patternView: SeqPatternView
 	readonly launchMode: SeqSessionClipLaunchMode
 	readonly channelId: Id
 	readonly sceneId: Id
 	readonly active: boolean
+	readonly name: string
 }
 
 export interface SeqSession {
 	readonly id: Id
-	readonly sessionClipIds: Immutable.Set<Id>
+	readonly sessionClips: Immutable.Set<SeqSessionClip>
+	readonly name: string
 }
 
 export interface Sequencer {
 	readonly id: Id
+	readonly name: string
 }
 
 export interface SeqGlobal {
