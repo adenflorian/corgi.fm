@@ -13,6 +13,11 @@ export const commonActions = {
 	organizeGraph: () => ({
 		type: 'ORGANIZE_GRAPH' as const,
 	} as const),
+	init: () => ({
+		type: '$$$$INIT' as const,
+	} as const),
 } as const
 
 export type CommonAction = ActionType<typeof commonActions>
+
+export type InitAction = ReturnType<typeof commonActions.init>

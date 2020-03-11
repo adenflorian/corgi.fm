@@ -1,12 +1,11 @@
 import {Map, Record} from 'immutable'
 import {Reducer} from 'redux'
 import {ActionType} from 'typesafe-actions'
-import {IClientRoomState} from '../common-redux-types'
-import {ExpGraph, expGraphReducer, makeExpGraph} from './exp-graph-redux'
-import {ExpNodeType} from './exp-nodes-redux'
 import {
-	BROADCASTER_ACTION, SERVER_ACTION,
+	BROADCASTER_ACTION, SERVER_ACTION, IClientRoomState, InitAction,
 } from '..'
+import {ExpNodeType, ExpGraph, expGraphReducer, makeExpGraph} from '.'
+import {selectExpGraphsState} from './exp-common-redux'
 
 export const expGraphsActions = {
 	add: (graph: ExpGraph) => ({
@@ -14,10 +13,6 @@ export const expGraphsActions = {
 		graph,
 		BROADCASTER_ACTION,
 		SERVER_ACTION,
-	} as const),
-	replaceAll: (expGraphsState: ExpGraphsState) => ({
-		type: 'EXP_GRAPHS_REPLACE_ALL',
-		expGraphsState,
 	} as const),
 } as const
 
@@ -30,7 +25,7 @@ const defaultExpGraphsState = Object.freeze({
 
 const _makeExpGraphsState = Record(defaultExpGraphsState)
 
-function makeExpGraphsState(expGraphsState: ExpGraphsState) {
+export function makeExpGraphsState(expGraphsState: ExpGraphsState) {
 	return _makeExpGraphsState(expGraphsState)
 		.set('all', Map(expGraphsState.all).map(makeExpGraph))
 		.set('mainGraph', makeExpGraph(expGraphsState.mainGraph))
@@ -42,7 +37,7 @@ export type ExpGraphs = Map<Id, ExpGraph>
 
 export type ExpGraphsAction = ActionType<typeof expGraphsActions>
 
-export const expGraphsReducer: Reducer<ExpGraphsState, ExpGraphsAction> = (
+export const expGraphsReducer: Reducer<ExpGraphsState, ExpGraphsAction | InitAction> = (
 	state = defaultExpGraphsStateRecord, action,
 ) => {
 	const {mainGraph} = state
@@ -51,16 +46,11 @@ export const expGraphsReducer: Reducer<ExpGraphsState, ExpGraphsAction> = (
 		return state.set('mainGraph', newMainGraphState)
 	}
 	switch (action.type) {
-		case 'EXP_GRAPHS_REPLACE_ALL': return makeExpGraphsState(action.expGraphsState)
 		case 'EXP_GRAPHS_ADD': {
 			return state.update('all', all => all.set(action.graph.meta.id, makeExpGraph(action.graph)))
 		}
 		default: return state
 	}
-}
-
-export function selectExpGraphsState(state: IClientRoomState) {
-	return state.expGraphs
 }
 
 export function selectMainExpGraph(state: IClientRoomState) {

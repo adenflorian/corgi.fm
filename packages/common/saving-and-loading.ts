@@ -4,13 +4,14 @@ import {
 	gridSequencersReducer, infiniteSequencersReducer, shamuGraphReducer,
 	globalClockReducer, roomSettingsReducer, connectionsReducer, IPositions,
 	IConnection, BasicSamplerState, basicSamplersReducer,
-	IBasicSamplersState, makePosition, RoomType, SavedClassicRoom, SavedExpRoom, expGraphsReducer, roomInfoReducer,
+	IBasicSamplersState, makePosition, RoomType, SavedClassicRoom, SavedExpRoom, expGraphsReducer, roomInfoReducer, activityReducer, activityActions, ExpProjectState,
 } from './redux'
 import {
 	MidiClip, MidiClipEvent, makeMidiClipEvent, MidiClipEventV1,
 	MidiClipV1, makeMidiClip,
 } from './midi-types'
 import {Samples, Sample, dummySample, samplerBasicPianoNotes} from './common-samples-stuff'
+import {logger} from './logger'
 
 export function transformLoadedSave(save: Partial<SavedRoom>): SavedRoom {
 	return [save]
@@ -52,7 +53,7 @@ function barExp(save: Partial<SavedExpRoom>): SavedExpRoom {
 		saveDateTime: save.saveDateTime || '?',
 		saveServerVersion: save.saveServerVersion || '?',
 		roomType: RoomType.Experimental,
-		expGraphs: save.expGraphs || expGraphsReducer(undefined, {} as any),
+		activity: save.activity as ExpProjectState || activityReducer(undefined, activityActions.set('expCorgi')),
 		roomInfo: save.roomInfo || {...roomInfoReducer(undefined, {} as any), roomType: RoomType.Experimental},
 	}
 }

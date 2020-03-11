@@ -34,7 +34,7 @@ import {
 	expConnectionsActions,
 	selectExpConnectionsWithTargetIds, selectExpConnectionsWithSourceOrTargetIds,
 	selectExpPositionsWithIds, makeRoomMember, selectRoomMemberState,
-	selectExpGraphsState, expGraphsActions,
+	selectExpGraphsState, expGraphsActions, activityActions, selectActivityState,
 } from '@corgifm/common/redux'
 import {WebSocketEvent, NodeToNodeAction} from '@corgifm/common/server-constants'
 import {assertUnreachable} from '@corgifm/common/common-utils'
@@ -456,7 +456,7 @@ function syncState(newSocket: Socket, roomState: IClientRoomState, serverState: 
 		// Sync positions after shamuGraph
 		[replacePositions, selectAllPositions],
 		// exp
-		[expGraphsActions.replaceAll, selectExpGraphsState],
+		[activityActions.replace, selectActivityState],
 	]
 
 	updaters.forEach(([actionCreator, selector]: any[]) => {

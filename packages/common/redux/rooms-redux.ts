@@ -7,7 +7,7 @@ import {
 	selectAllPositions, selectGlobalClockState, selectAllConnections,
 	IClientAppState, RoomType,
 } from '.'
-import {selectExpGraphsState} from './experimental'
+import {selectExpGraphsState, ExpProjectState} from './experimental'
 import {selectRoomInfoState} from './room-info-redux'
 
 export const roomsActions = {
@@ -105,7 +105,7 @@ export interface SavedClassicRoom extends SavedRoomBase {
 
 export interface SavedExpRoom extends SavedRoomBase {
 	readonly roomType: RoomType.Experimental
-	readonly expGraphs: ReturnType<typeof selectExpGraphsState>
+	readonly activity: ExpProjectState
 }
 
 const initialState = {

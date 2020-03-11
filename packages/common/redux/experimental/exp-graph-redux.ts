@@ -1,13 +1,11 @@
 import {combineReducers} from 'redux'
 import {ActionType} from 'typesafe-actions'
 import {Map} from 'immutable'
-import {expGraphMetaReducer, makeExpGraphMeta} from './exp-graph-meta-redux'
-import {expNodesReducer, ExpNodeState, makeExpNodeState} from './exp-nodes-redux'
-import {expConnectionsReducer, makeExpConnectionsState} from './exp-connections-redux'
-import {expPositionsReducer, makeExpPositionsState} from './exp-positions-redux'
 import {
 	BROADCASTER_ACTION, SERVER_ACTION,
 } from '..'
+import {expPositionsReducer, makeExpPositionsState, expConnectionsReducer, makeExpConnectionsState,
+	expNodesReducer, ExpNodeState, makeExpNodeState, expGraphMetaReducer, makeExpGraphMeta} from '.'
 
 export const expGraphActions = {
 } as const

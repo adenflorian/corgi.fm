@@ -14,6 +14,7 @@ import {
 	selectVirtualKeyboardById, SERVER_ACTION, VirtualKeyboardState,
 	selectExpPosition,
 } from '..'
+import {selectExpGraphsState} from './exp-common-redux'
 
 export const expConnectionsActions = {
 	add: (connection: ExpConnection) => ({
@@ -329,11 +330,11 @@ const removeConnectionToConnections = (connection: ExpConnection) => (connection
 }
 
 export function selectExpAllConnections(state: IClientRoomState) {
-	return state.expGraphs.mainGraph.connections.connections
+	return selectExpGraphsState(state).mainGraph.connections.connections
 }
 
 export function selectExpAllNodeConnectionInfos(state: IClientRoomState) {
-	return state.expGraphs.mainGraph.connections.nodeInfos
+	return selectExpGraphsState(state).mainGraph.connections.nodeInfos
 }
 
 export function selectExpNodeConnectionInfosForNode(state: IClientRoomState, nodeId: Id): ExpNodeConnectionsInfo {

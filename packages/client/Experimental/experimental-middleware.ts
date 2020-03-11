@@ -21,7 +21,7 @@ import {
 	shamuMetaActions, makeExpConnectionsState, defaultExpPositionRecord,
 	defaultExpNodeRecord, isGroupInOutNode, GroupType,
 	selectExpConnectionsWithTargetIds,
-	selectExpConnectionsWithSourceIds, selectExpAllPositions,
+	selectExpConnectionsWithSourceIds, selectExpAllPositions, ActivityAction,
 } from '@corgifm/common/redux'
 import {serverClientId, GroupId} from '@corgifm/common/common-constants'
 import {createNodeId, arrayToESIdKeyMap} from '@corgifm/common/common-utils'
@@ -34,7 +34,7 @@ import {NodeManager} from './NodeManager'
 type ExpMiddlewareActions = ExpNodesAction | ExpConnectionAction
 	| ExpLocalAction | RoomsReduxAction | ExpPositionAction
 	| ExpGhostConnectorAction | LocalAction | OptionsAction
-	| ExpGraphsAction
+	| ExpGraphsAction | ActivityAction
 
 type ExpMiddleware =
 	(singletonContext: SingletonContextImpl) => Middleware<{}, IClientAppState>
@@ -536,8 +536,12 @@ function bar(
 			return nodeManager.cleanup()
 
 		// Graphs
-		case 'EXP_GRAPHS_REPLACE_ALL':
-			return nodeManager.loadMainGraph(selectMainExpGraph(state.room))
+		case 'ACTIVITY_REPLACE':
+			if (action.activityState.activityType === 'expCorgi') {
+				return nodeManager.loadMainGraph(selectMainExpGraph(state.room))
+			} else {
+				return
+			}
 
 		// Nodes
 		case 'EXP_NODE_REPLACE_ALL':

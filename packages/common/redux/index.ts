@@ -54,6 +54,10 @@ export * from './shamu-graph'
 
 export * from './experimental'
 
+export * from './dummy-activity-redux'
+
+export * from './activity-redux'
+
 export * from './room-info-redux'
 
 // Any room reducers need to be before room-stores-redux

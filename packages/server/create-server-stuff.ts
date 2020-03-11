@@ -18,7 +18,7 @@ import {
 	selectConnectionsWithSourceOrTargetIds, shamuGraphActions,
 	SimpleReverbState, updatePositions, BetterSequencerState,
 	addBetterSequencer, createSequencerEvents, RoomType, expNodesActions,
-	expPositionActions, makeExpPosition, makeExpNodeState, expConnectionsActions, ExpConnection, SavedClassicRoom, SavedExpRoom, expGraphsActions, roomInfoAction,
+	expPositionActions, makeExpPosition, makeExpNodeState, expConnectionsActions, ExpConnection, SavedClassicRoom, SavedExpRoom, expGraphsActions, roomInfoAction, activityActions,
 } from '@corgifm/common/redux'
 import {logger} from '@corgifm/common/logger'
 import {serverClientId, maxPitchFrequency} from '@corgifm/common/common-constants'
@@ -40,6 +40,8 @@ const ySpacing = 300
 
 export function createServerStuffExperimental(room: string, serverStore: Store<IServerState>) {
 	logger.log('todo')
+
+	dispatchToRoom(activityActions.set('expCorgi'))
 
 	const sequencer = makeExpNodeState({
 		type: 'sequencer',
@@ -807,7 +809,7 @@ export function loadClassicServerStuff(room: string, serverStore: Store<IServerS
 }
 
 export function loadExpServerStuff(room: string, serverStore: Store<IServerState>, transformedRoomSave: SavedExpRoom, ownerId: Id) {
-	dispatchToRoom(expGraphsActions.replaceAll(transformedRoomSave.expGraphs))
+	dispatchToRoom(activityActions.replace(transformedRoomSave.activity))
 
 	function dispatchToRoom(action: Action) {
 		return serverStore.dispatch(createRoomAction(action, room))

@@ -8,6 +8,7 @@ import {IClientAppState} from '../common-redux-types'
 import {
 	BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION, ExpNodeType,
 } from '..'
+import {selectExpGraphsState} from './exp-common-redux'
 
 export const expPositionActions = {
 	resizePosition: (
@@ -172,7 +173,7 @@ export const expPositionsReducer: Reducer<ExpPositionsState, ExpPositionAction> 
 
 // Selectors
 export const selectExpAllPositions = (state: IClientRoomState) =>
-	state.expGraphs.mainGraph.positions.all
+	selectExpGraphsState(state).mainGraph.positions.all
 
 export const selectExpPosition = (state: IClientRoomState, id: Id) =>
 	selectExpAllPositions(state).get(id) || defaultExpPositionRecord

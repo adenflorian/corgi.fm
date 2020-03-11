@@ -7,6 +7,7 @@ import {
 	BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION,
 	IClientAppState,
 } from '..'
+import {selectExpGraphsState} from './exp-common-redux'
 
 export type ExpParamValue = string | boolean | number
 
@@ -232,7 +233,7 @@ export function loadPresetIntoNodeState(preset: ExpNodeState, node: ExpNodeState
 	return makeExpNodeState(foo)
 }
 
-export const selectExpNodesState = (state: IClientRoomState): ExpNodesState => state.expGraphs.mainGraph.nodes
+export const selectExpNodesState = (state: IClientRoomState): ExpNodesState => selectExpGraphsState(state).mainGraph.nodes
 
 export const selectExpNode = (state: IClientRoomState, id: Id): ExpNodeState =>
 	selectExpNodesState(state).get(id) || defaultExpNodeRecord

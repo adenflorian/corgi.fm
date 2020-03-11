@@ -4,7 +4,7 @@ import {useSelector, useDispatch, useStore} from 'react-redux'
 import {
 	IClientAppState, RoomType, selectExpAllPositions,
 	shamuMetaActions, selectExpNodesState,
-	selectRoomMember, selectLocalClientId,
+	selectRoomMember, selectLocalClientId, selectExpGraphsState,
 } from '@corgifm/common/redux'
 import {useBoolean} from '../react-hooks'
 import {mouseFromScreenToBoard} from '../SimpleGlobalClientState'
@@ -18,19 +18,23 @@ interface NodeSelectorContextValue {
 	readonly onSelectedNodeIdsChange: CorgiObjectChangedEvent<Set<Id>>
 }
 
+const emptySet = Immutable.Set()
+
 export function useNodeSelector() {
 	const [boxActive, activateBox, deactivateBox] = useBoolean(false)
 	const [boxOrigin, setBoxOrigin] = useState({x: 0, y: 0})
 	const [otherCorner, setOtherCorner] = useState({x: 0, y: 0})
 
-	const selected = useSelector((state: IClientAppState) => state.room.expGraphs.mainGraph.positions.meta.selectedNodes)
+	const roomType = useSelector((state: IClientAppState) => state.room.roomInfo.roomType)
+	const selected = useSelector((state: IClientAppState) => roomType === RoomType.Experimental
+		? selectExpGraphsState(state.room).mainGraph.positions.meta.selectedNodes
+		: emptySet)
 	const [originalSelected, setOriginalSelected] = useState(Set<Id>())
 
 	const [nodeSelectorContextValue] = useState<NodeSelectorContextValue>({
 		onSelectedNodeIdsChange: new CorgiObjectChangedEvent(selected),
 	})
 
-	const roomType = useSelector((state: IClientAppState) => state.room.roomInfo.roomType)
 
 	const dispatch = useDispatch()
 	const store = useStore()

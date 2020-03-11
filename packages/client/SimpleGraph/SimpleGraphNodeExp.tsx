@@ -5,7 +5,7 @@ import {ContextMenuTrigger} from 'react-contextmenu'
 import {Set} from 'immutable'
 import {
 	shamuMetaActions, selectExpPosition, expPositionActions,
-	IClientAppState, roomMemberActions, selectShamuMetaState, selectExpAllPositions,
+	IClientAppState, roomMemberActions, selectShamuMetaState, selectExpAllPositions, selectExpGraphsState,
 } from '@corgifm/common/redux'
 import {panelHeaderHeight} from '@corgifm/common/common-constants'
 import {handleClassName, expNodeMenuId} from '../client-constants'
@@ -26,7 +26,7 @@ export function SimpleGraphNodeExp({children}: Props) {
 
 	const color = useStringChangedEvent(nodeContext.onColorChange)
 
-	const selectedNodes = useSelector((state: IClientAppState) => state.room.expGraphs.mainGraph.positions.meta.selectedNodes)
+	const selectedNodes = useSelector((state: IClientAppState) => selectExpGraphsState(state.room).mainGraph.positions.meta.selectedNodes)
 
 	const isSelected = selectedNodes.includes(positionId)
 
