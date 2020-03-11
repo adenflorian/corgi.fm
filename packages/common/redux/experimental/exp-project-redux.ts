@@ -1,13 +1,11 @@
-import {Map, Record} from 'immutable'
+import {Record} from 'immutable'
 import {Reducer, combineReducers} from 'redux'
 import {ActionType} from 'typesafe-actions'
-import {
-	BROADCASTER_ACTION, SERVER_ACTION, IClientRoomState,
-} from '..'
 import {
 	expGraphsReducer, makeExpGraphsState,
 } from '.'
 import {InitAction} from '../common-actions'
+import {expMidiReducer, makeExpMidiState} from './exp-midi-redux'
 
 export const expProjectActions = {
 } as const
@@ -22,6 +20,7 @@ export interface ExpProjectState extends ReturnType<typeof _makeExpProjectState>
 // Reducers
 const innerReducers = combineReducers({
 	graphs: expGraphsReducer,
+	midi: expMidiReducer,
 })
 
 const defaultExpProjectState = Object.freeze({
@@ -35,6 +34,7 @@ export function makeExpProjectState(expProjectsState: ExpProjectState) {
 	return _makeExpProjectState(expProjectsState)
 		.set('state', {
 			graphs: makeExpGraphsState(expProjectsState.state.graphs),
+			midi: makeExpMidiState(expProjectsState.state.midi),
 		})
 }
 

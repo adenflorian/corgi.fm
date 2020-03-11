@@ -40,11 +40,6 @@ export const expNodesActions = {
 		BROADCASTER_ACTION,
 		SERVER_ACTION,
 	} as const),
-	replaceAll: (state: ExpNodesState) => ({
-		type: 'EXP_NODE_REPLACE_ALL' as const,
-		isExpNodeAction: true,
-		state,
-	} as const),
 	audioParamChange: (nodeId: Id, paramId: Id, newValue: number) => ({
 		type: 'EXP_NODE_AUDIO_PARAM_CHANGE' as const,
 		isExpNodeAction: true,
@@ -194,7 +189,6 @@ export const expNodesReducer = (state = initialState, action: ExpNodesAction): E
 		case 'EXP_NODE_ADD_MANY': return state.merge(Map(action.newNodes).map(makeExpNodeState))
 		case 'EXP_NODE_DELETE': return state.delete(action.nodeId)
 		case 'EXP_NODE_DELETE_MANY': return state.deleteAll(action.nodeIds)
-		case 'EXP_NODE_REPLACE_ALL': return state.clear().merge(action.state).map(x => makeExpNodeState(x))
 		case 'EXP_NODE_AUDIO_PARAM_CHANGE': return state.update(
 			action.nodeId, x => x.update('audioParams', audioParams => audioParams.set(action.paramId, action.newValue)))
 		case 'EXP_NODE_CUSTOM_NUMBER_PARAM_CHANGE': return state.update(

@@ -544,9 +544,6 @@ function bar(
 			}
 
 		// Nodes
-		case 'EXP_NODE_REPLACE_ALL':
-			return nodeManager.addNodes(getNodes())
-
 		case 'EXP_NODE_AUDIO_PARAM_CHANGE':
 			return nodeManager.onAudioParamChange(action)
 

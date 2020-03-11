@@ -47,7 +47,7 @@ import {
 	makeExpNodeState, makeExpPosition, ExpConnection,
 	selectExpPositionExtremes, selectExpNodesState, WithConnections,
 	selectShamuMetaState, selectExpAllConnections, ExpPosition, ExpNodeState,
-	ExpConnections, ExpNodesState, ExpPositions, selectRoomInfoState, SavedClassicRoom, SavedExpRoom, selectExpGraphsState,
+	ExpConnections, ExpNodesState, ExpPositions, selectRoomInfoState, SavedClassicRoom, SavedExpRoom, selectExpGraphsState, selectActivityState,
 } from '@corgifm/common/redux'
 import {pointersActions} from '@corgifm/common/redux/pointers-redux'
 import {makeMidiClipEvent, preciseModulus, preciseSubtract} from '@corgifm/common/midi-types'
@@ -684,7 +684,7 @@ function createClassicRoomSave(state: IClientAppState, roomName: string): SavedC
 
 function createExpRoomSave(state: IClientAppState, roomName: string): SavedExpRoom {
 	return {
-		expGraphs: selectExpGraphsState(state.room),
+		activity: selectActivityState(state.room),
 		roomSettings: selectRoomSettings(state.room),
 		saveDateTime: new Date().toISOString(),
 		saveClientVersion: selectClientInfo(state).clientVersion,
@@ -692,7 +692,7 @@ function createExpRoomSave(state: IClientAppState, roomName: string): SavedExpRo
 		room: roomName,
 		roomType: RoomType.Experimental,
 		roomInfo: selectRoomInfoState(state.room),
-	} as const
+	} as SavedExpRoom
 }
 
 function stripShamuGraphForSaving(shamuGraphState: ShamuGraphState): ShamuGraphState {

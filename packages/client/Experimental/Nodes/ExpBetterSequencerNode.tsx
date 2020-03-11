@@ -14,7 +14,7 @@ import {ExpMidiOutputPort} from '../ExpMidiPorts'
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 import {ExpPorts} from '../ExpPorts'
 import {ExpBetterSequencerNodeView} from './ExpBetterSequencerNodeView'
-import {SeqPatternView, SeqPattern, SeqEvent, SeqNoteEvent, seqPatternViewReader, SeqReadEvent, SeqSession, SeqSessionClip, seqSessionReader} from './SeqStuff'
+import {SeqPatternView, SeqPattern, SeqEvent, SeqNoteEvent, seqPatternViewReader, SeqReadEvent, SeqSession, SeqSessionClip, seqSessionReader} from '@corgifm/common/SeqStuff'
 import {noteNameToMidi, midiNoteFromNoteName} from '@corgifm/common/common-samples-stuff'
 
 export class ExpBetterSequencerNode extends CorgiNode {

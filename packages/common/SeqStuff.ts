@@ -1,6 +1,6 @@
 import * as Immutable from 'immutable'
 import {MidiRange} from '@corgifm/common/midi-types'
-import {logger} from '../../client-logger'
+import {logger} from './logger'
 
 export type SeqEvent = SeqNoteEvent
 
