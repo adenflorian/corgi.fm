@@ -10,7 +10,6 @@ import {
 import {isWhiteKey} from '../../../Keyboard/Keyboard'
 
 interface Props {
-	id: Id
 	rows: string[]
 	panPixelsY: number
 	noteHeight: number
@@ -18,7 +17,7 @@ interface Props {
 }
 
 export const BetterSideNotes = React.memo(function _BetterSideNotes({
-	id, rows, panPixelsY, noteHeight, onLeftZoomPanBarMouseDown,
+	rows, panPixelsY, noteHeight, onLeftZoomPanBarMouseDown,
 }: Props) {
 	return (
 		<div className="sideNotes">
@@ -36,7 +35,6 @@ export const BetterSideNotes = React.memo(function _BetterSideNotes({
 				/>
 				<div className="rows">
 					<BetterSideNotesArray
-						id={id}
 						rows={rows}
 						noteHeight={noteHeight}
 					/>
@@ -47,19 +45,17 @@ export const BetterSideNotes = React.memo(function _BetterSideNotes({
 })
 
 interface BetterSideNotesArrayProps {
-	id: Id
 	rows: string[]
 	noteHeight: number
 }
 
 export const BetterSideNotesArray = React.memo(function _BetterSideNotesArray({
-	id, rows, noteHeight,
+	rows, noteHeight,
 }: BetterSideNotesArrayProps) {
 	return (
 		<Fragment>
 			{rows.map((row, i) =>
 				<BetterSideNote
-					id={id}
 					i={i}
 					key={row}
 					row={row}
@@ -71,43 +67,42 @@ export const BetterSideNotesArray = React.memo(function _BetterSideNotesArray({
 })
 
 interface BetterSideNoteProps {
-	id: Id
 	i: number
 	row: string
 	noteHeight: number
 }
 
 export const BetterSideNote = React.memo(({
-	id, i, row, noteHeight,
+	i, row, noteHeight,
 }: BetterSideNoteProps) => {
 	const isWhite = isWhiteKey(i)
 	const isC = i % 12 === 0
 	const isSmall = noteHeight <= smallNoteHeight
 	const dispatch = useDispatch()
 	const fancy = useSelector((state: IClientAppState) => selectOptions(state).graphicsExtraAnimations)
-	const onClick = useCallback(() => {
-		dispatch(localActions.playShortNote(id, Set([i])))
-		if (fancy) dispatch(animationActions.on(Set([id]), i))
-		setTimeout(() => {
-			if (fancy) dispatch(animationActions.off(Set([id]), i))
-		}, 250)
-	}, [dispatch, fancy, i, id])
+	// const onClick = useCallback(() => {
+	// 	dispatch(localActions.playShortNote(id, Set([i])))
+	// 	if (fancy) dispatch(animationActions.on(Set([id]), i))
+	// 	setTimeout(() => {
+	// 		if (fancy) dispatch(animationActions.off(Set([id]), i))
+	// 	}, 250)
+	// }, [dispatch, fancy, i, id])
 
-	const flag = useSelector(createAnimationFlagSelector(id, i))
+	// const flag = useSelector(createAnimationFlagSelector(id, i))
 
-	const animClass = flag
-		? 'animate-on'
-		: 'animate-off'
+	// const animClass = flag
+	// 	? 'animate-on'
+	// 	: 'animate-off'
 
 	return (
 		<div
 			key={row}
-			className={`row ${animClass} ${isWhite ? 'white' : 'black'} isC-${isC}`}
+			className={`row ${/*animClass*/''} ${isWhite ? 'white' : 'black'} isC-${isC}`}
 			style={{
 				height: noteHeight - 1,
 				// fontWeight: isWhite ? 600 : 400,
 			}}
-			onMouseDown={onClick}
+			// onMouseDown={onClick}
 		>
 			<div
 				className="rowLabel"

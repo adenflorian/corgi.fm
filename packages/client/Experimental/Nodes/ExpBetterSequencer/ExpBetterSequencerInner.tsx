@@ -60,6 +60,7 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 	// const pan = useSelector(createBetterSeqPanSelector(id))
 	// const midiClip = useSelector(createBetterSeqMidiClipSelector(id))
 	// const lengthBeats = midiClip.length
+	const lengthBeats = 4
 	// const x = useSelector(createPositionXSelector(id))
 	// const y = useSelector(createPositionYSelector(id))
 	// const height = useSelector(createPositionHeightSelector(id))
@@ -76,6 +77,7 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 	const zoomY = useNumberChangedEvent(nodeContext.zoomY.onChange)
 	const panX = useNumberChangedEvent(nodeContext.panX.onChange)
 	const panY = useNumberChangedEvent(nodeContext.panY.onChange)
+
 
 	const zoom = {x: zoomX, y: zoomY}
 	const pan = {x: panX, y: panY}
@@ -445,7 +447,7 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 	// 	}
 	// }, [activateLeftZoomPan, deactivateLeftZoomPan, dispatch, id, maxPanY, leftZoomPanActive, pan, zoom, persistentDelta, firstMouseMove, startPoint])
 
-	// const columnWidth = (fixedWidth * zoom.x) / lengthBeats
+	const columnWidth = (fixedWidth * zoom.x) / lengthBeats
 
 	// const selectAll = useCallback(() => {
 	// 	setSelected(midiClip.events.keySeq().toSet())
@@ -630,9 +632,9 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 	)
 
 	return (
-		<Fragment>
+		<div className="expBetterSequencer" style={{}}>
 			{/* <BetterSequencerControls {...{id}} /> */}
-			{/* <BetterSideNotes {...{id, rows, panPixelsY: panPixels.y, noteHeight, onLeftZoomPanBarMouseDown}} /> */}
+			<BetterSideNotes {...{rows, panPixelsY: panPixels.y, noteHeight, onLeftZoomPanBarMouseDown}} />
 			<div
 				className="editor"
 				ref={editorElement}
@@ -647,10 +649,9 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 					}}
 				>
 					<BetterRows {...{noteHeight, rows}} />
-					{/* <BetterColumns {...{columnWidth, lengthBeats, timeSelect}} /> */}
+					<BetterColumns {...{columnWidth, lengthBeats, timeSelect}} />
 					{/* <BetterNotes
 						{...{
-							id,
 							noteHeight,
 							columnWidth,
 							midiClip,
@@ -675,6 +676,6 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 					top={scaledHeight}
 				/>}
 			</div>
-		</Fragment>
+		</div>
 	)
 })

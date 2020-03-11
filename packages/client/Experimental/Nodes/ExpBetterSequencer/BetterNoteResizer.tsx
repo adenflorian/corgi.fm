@@ -2,7 +2,6 @@ import React, {useLayoutEffect, useRef, Fragment} from 'react'
 import './BetterNoteResizer.less'
 
 interface Props {
-	id: Id
 	eventId: Id
 	handleMouseDown: (e: MouseEvent, direction: 'left' | 'right' | 'center', eventId: Id) => void
 	width: number
@@ -13,7 +12,7 @@ const debug = false
 const hitWidth = 6
 
 export const BetterNoteResizer = React.memo(function _BetterNoteResizer({
-	id, handleMouseDown, eventId, width,
+	handleMouseDown, eventId, width,
 }: Props) {
 
 	const leftRef = useRef<SVGRectElement>(null)

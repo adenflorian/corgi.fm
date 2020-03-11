@@ -8,7 +8,6 @@ import {CssColor} from '@corgifm/common/shamu-color'
 import {BetterNoteResizer} from './BetterNoteResizer'
 
 interface Props {
-	id: Id
 	event: MidiClipEvent
 	noteHeight: number
 	columnWidth: number
@@ -19,7 +18,7 @@ interface Props {
 }
 
 export const BetterNote = React.memo(function _BetterNote({
-	id, event, noteHeight, columnWidth, isSelected,
+	event, noteHeight, columnWidth, isSelected,
 	onNoteSelect, handleMouseDown, rows,
 }: Props) {
 
@@ -28,38 +27,38 @@ export const BetterNote = React.memo(function _BetterNote({
 
 	const mainRef = useRef<SVGSVGElement>(null)
 
-	useLayoutEffect(() => {
+	// useLayoutEffect(() => {
 
-		// TODO I don't think this ever gets called
-		// It gets intercepted by the resizer
-		const onMouseDown = (e: MouseEvent) => {
-			if (e.button !== 0) return
-			e.stopPropagation()
-			if (e.shiftKey) {
-				onNoteSelect(event.id, !isSelected, false)
-			} else {
-				onNoteSelect(event.id, true, true)
-			}
-		}
+	// 	// TODO I don't think this ever gets called
+	// 	// It gets intercepted by the resizer
+	// 	const onMouseDown = (e: MouseEvent) => {
+	// 		if (e.button !== 0) return
+	// 		e.stopPropagation()
+	// 		if (e.shiftKey) {
+	// 			onNoteSelect(event.id, !isSelected, false)
+	// 		} else {
+	// 			onNoteSelect(event.id, true, true)
+	// 		}
+	// 	}
 
-		const onDoubleClick = (e: MouseEvent) => {
-			e.preventDefault()
-			e.stopPropagation()
-			dispatch(betterSequencerActions.deleteEvents(id, [event.id]))
-		}
+	// 	const onDoubleClick = (e: MouseEvent) => {
+	// 		e.preventDefault()
+	// 		e.stopPropagation()
+	// 		dispatch(betterSequencerActions.deleteEvents(id, [event.id]))
+	// 	}
 
-		const noteElement = mainRef.current
+	// 	const noteElement = mainRef.current
 
-		if (noteElement === null) return
+	// 	if (noteElement === null) return
 
-		noteElement.addEventListener('dblclick', onDoubleClick)
-		noteElement.addEventListener('mousedown', onMouseDown)
+	// 	noteElement.addEventListener('dblclick', onDoubleClick)
+	// 	noteElement.addEventListener('mousedown', onMouseDown)
 
-		return () => {
-			noteElement.removeEventListener('dblclick', onDoubleClick)
-			noteElement.removeEventListener('mousedown', onMouseDown)
-		}
-	}, [onNoteSelect, event.id, isSelected, id, dispatch])
+	// 	return () => {
+	// 		noteElement.removeEventListener('dblclick', onDoubleClick)
+	// 		noteElement.removeEventListener('mousedown', onMouseDown)
+	// 	}
+	// }, [onNoteSelect, event.id, isSelected, id, dispatch])
 
 	const tiny = noteHeight <= tinyNoteHeight
 	const small = noteHeight <= smallNoteHeight
@@ -106,7 +105,7 @@ export const BetterNote = React.memo(function _BetterNote({
 			>
 				<title>{noteLabel}</title>
 			</rect>
-			<BetterNoteResizer {...{id, handleMouseDown, eventId: event.id, noteHeight, width}} />
+			<BetterNoteResizer {...{handleMouseDown, eventId: event.id, noteHeight, width}} />
 		</svg>
 	)
 })
