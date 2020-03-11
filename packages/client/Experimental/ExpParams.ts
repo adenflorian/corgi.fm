@@ -5,7 +5,7 @@ import {
 	defaultUnipolarCurveFunctions,
 } from '@corgifm/common/common-utils'
 import {ButtonSelectOption} from '../ButtonSelect/ButtonSelect'
-import {CorgiNumberChangedEvent, CorgiEnumChangedEvent, CorgiStringChangedEvent, CorgiObjectChangedEvent} from './CorgiEvents'
+import {CorgiNumberChangedEvent, CorgiEnumChangedEvent, CorgiStringChangedEvent, CorgiObjectChangedEvent, ReadonlyCorgiNumberChangedEvent} from './CorgiEvents'
 import {LabAudioParam, KelpieAudioNode} from './Nodes/PugAudioNode/Lab'
 import {ExpMidiClip, makeExpMidiClip} from '@corgifm/common/midi-types'
 import {CorgiNode} from './CorgiNode'
@@ -60,6 +60,9 @@ export class ExpAudioParam<T extends KelpieAudioNode = KelpieAudioNode> implemen
 }
 
 export type ExpCustomNumberParams = ReadonlyMap<Id, ExpCustomNumberParam>
+export type ExpCustomNumberParamReadonly = ExpCustomNumberParam & {
+	onChange: ReadonlyCorgiNumberChangedEvent
+}
 export class ExpCustomNumberParam {
 	public get value() {return this.onChange.current}
 	public readonly onChange: CorgiNumberChangedEvent
