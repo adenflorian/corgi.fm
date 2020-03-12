@@ -20,7 +20,7 @@ import {
 	addBetterSequencer, createSequencerEvents, expNodesActions,
 	expPositionActions, makeExpPosition, makeExpNodeState,
 	expConnectionsActions, ExpConnection, SavedClassicRoom,
-	SavedExpRoom, expGraphsActions, roomInfoAction, activityActions,
+	SavedExpRoom, expGraphsActions, roomInfoAction, activityActions, expMidiPatternsActions, makeExpMidiPatternState, makeExpMidiPatternEvents,
 } from '@corgifm/common/redux'
 import {logger} from '@corgifm/common/logger'
 import {serverClientId, maxPitchFrequency} from '@corgifm/common/common-constants'
@@ -44,6 +44,12 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 	logger.log('todo')
 
 	dispatchToRoom(activityActions.set(RoomType.Experimental))
+
+	dispatchToRoom(expMidiPatternsActions.add(makeExpMidiPatternState({
+		events: makeExpMidiPatternEvents([
+			{note: 60, startBeat: 0, duration: 2},
+		]),
+	})))
 
 	const sequencer = makeExpNodeState({
 		type: 'sequencer',

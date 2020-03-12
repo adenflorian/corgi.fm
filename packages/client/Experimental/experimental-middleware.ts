@@ -592,8 +592,12 @@ function bar(
 				x => nodeManager.addConnection(getConnection(x.id)))
 
 		// Midi
+		case 'EXP_MIDI_PATTERN_ADD':
+			return nodeManager.patternUpdated(selectExpMidiPattern(state.room, action.newPattern.id))
 		case 'EXP_MIDI_PATTERN_ADD_EVENT':
 			return nodeManager.patternUpdated(selectExpMidiPattern(state.room, action.id))
+		case 'EXP_MIDI_PATTERN_DELETE':
+			return nodeManager.patternDeleted(action.id)
 
 		// Other
 		case 'SET_OPTION': {

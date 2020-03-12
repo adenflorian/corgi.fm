@@ -49,7 +49,7 @@ import {
 	selectShamuMetaState, selectExpAllConnections, ExpPosition, ExpNodeState,
 	ExpConnections, ExpNodesState, ExpPositions, selectRoomInfoState,
 	SavedClassicRoom, SavedExpRoom, selectExpGraphsState,
-	selectActivityState, SavedDummyRoom, selectActivityType,
+	selectActivityState, SavedDummyRoom, selectActivityType, expMidiPatternsActions, makeExpMidiPatternState, makeExpMidiPatternEvents,
 } from '@corgifm/common/redux'
 import {pointersActions} from '@corgifm/common/redux/pointers-redux'
 import {makeMidiClipEvent, preciseModulus, preciseSubtract} from '@corgifm/common/midi-types'
@@ -881,6 +881,12 @@ const expWidth = 400
 function createLocalStuffExperimental(dispatch: Dispatch, state: IClientAppState) {
 
 	const localClientId = selectLocalClientId(state)
+
+	// dispatch(expMidiPatternsActions.add(makeExpMidiPatternState({
+	// 	events: makeExpMidiPatternEvents([
+	// 		{note: 72, startBeat: 0, duration: 3},
+	// 	]),
+	// })))
 
 	const extremes = selectExpPositionExtremes(state.room)
 

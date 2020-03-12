@@ -8,35 +8,35 @@ import {selectExpProjectState} from '.'
 
 export const expMidiPatternViewsActions = {
 	add: (newPattern: ExpMidiPatternViewState) => ({
-		type: 'EXP_MIDI_PATTERN_ADD' as const,
+		type: 'EXP_MIDI_PATTERN_VIEW_ADD' as const,
 		isExpMidiPatternViewAction: true,
 		newPattern,
 		BROADCASTER_ACTION,
 		SERVER_ACTION,
 	} as const),
 	addMany: (newPatterns: Map<Id, ExpMidiPatternViewState>) => ({
-		type: 'EXP_MIDI_PATTERN_ADD_MANY' as const,
+		type: 'EXP_MIDI_PATTERN_VIEW_ADD_MANY' as const,
 		isExpMidiPatternViewAction: true,
 		newPatterns,
 		BROADCASTER_ACTION,
 		SERVER_ACTION,
 	} as const),
 	delete: (nodeId: Id) => ({
-		type: 'EXP_MIDI_PATTERN_DELETE' as const,
+		type: 'EXP_MIDI_PATTERN_VIEW_DELETE' as const,
 		isExpMidiPatternViewAction: true,
 		nodeId,
 		BROADCASTER_ACTION,
 		SERVER_ACTION,
 	} as const),
 	deleteMany: (nodeIds: readonly Id[]) => ({
-		type: 'EXP_MIDI_PATTERN_DELETE_MANY' as const,
+		type: 'EXP_MIDI_PATTERN_VIEW_DELETE_MANY' as const,
 		isExpMidiPatternViewAction: true,
 		nodeIds,
 		BROADCASTER_ACTION,
 		SERVER_ACTION,
 	} as const),
 	replaceAll: (state: ExpMidiPatternViewsState) => ({
-		type: 'EXP_MIDI_PATTERN_REPLACE_ALL' as const,
+		type: 'EXP_MIDI_PATTERN_VIEW_REPLACE_ALL' as const,
 		isExpMidiPatternViewAction: true,
 		state,
 	} as const),
@@ -74,15 +74,15 @@ export type ExpMidiPatternViewsState = typeof initialState
 export const expMidiPatternViewsReducer =
 	(state = initialState, action: ExpMidiPatternViewsAction): ExpMidiPatternViewsState => {
 		switch (action.type) {
-			case 'EXP_MIDI_PATTERN_ADD':
+			case 'EXP_MIDI_PATTERN_VIEW_ADD':
 				return state.set(action.newPattern.id, makeExpMidiPatternViewState(action.newPattern))
-			case 'EXP_MIDI_PATTERN_ADD_MANY':
+			case 'EXP_MIDI_PATTERN_VIEW_ADD_MANY':
 				return state.merge(Map(action.newPatterns).map(makeExpMidiPatternViewState))
-			case 'EXP_MIDI_PATTERN_DELETE':
+			case 'EXP_MIDI_PATTERN_VIEW_DELETE':
 				return state.delete(action.nodeId)
-			case 'EXP_MIDI_PATTERN_DELETE_MANY':
+			case 'EXP_MIDI_PATTERN_VIEW_DELETE_MANY':
 				return state.deleteAll(action.nodeIds)
-			case 'EXP_MIDI_PATTERN_REPLACE_ALL':
+			case 'EXP_MIDI_PATTERN_VIEW_REPLACE_ALL':
 				return state.clear().merge(action.state).map(x => makeExpMidiPatternViewState(x))
 			default: return state
 		}

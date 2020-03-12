@@ -20,6 +20,7 @@ import {
 } from './ExpPorts'
 import {isMidiOutputPort, isMidiInputPort} from './ExpMidiPorts'
 import {isPolyphonicOutputPort, isPolyphonicInputPort} from './ExpPolyphonicPorts'
+import {CorgiObjectChangedEvent} from './CorgiEvents'
 
 export const NodeManagerContext = React.createContext<null | NodeManagerContextValue>(null)
 
@@ -55,6 +56,7 @@ export class NodeManager {
 	private get _audioContext() {return this._singletonContext.getAudioContext()}
 	private get _preMasterLimiter() {return this._singletonContext.getPreMasterLimiter()}
 	private _tickSubscribers = new Set<NodeTickDelegate>()
+	private readonly _midiPatterns = new Map<Id, CorgiObjectChangedEvent<ExpMidiPatternState>>()
 
 	public constructor(
 		private readonly _singletonContext: SingletonContextImpl,
@@ -470,8 +472,18 @@ export class NodeManager {
 		})
 	}
 
-	public readonly patternUpdated = (pattern: ExpMidiPatternState) => {
-		// TODO
+	public readonly patternUpdated = (patternState: ExpMidiPatternState) => {
+		const pattern = this._midiPatterns.get(patternState.id)
+		if (!pattern) {
+			this._midiPatterns.set(patternState.id, new CorgiObjectChangedEvent(patternState))
+		} else {
+			pattern.invokeImmediately(patternState)
+		}
+	}
+
+	public readonly patternDeleted = (id: Id) => {
+		this._midiPatterns.delete(id)
+		// TODO Somehow notify subscribers
 	}
 
 	public readonly cleanup = () => {
