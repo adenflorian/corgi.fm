@@ -263,7 +263,7 @@ export class ExpBetterSequencerNode extends CorgiNode {
 		this._zoomY = new ExpCustomNumberParam('zoomY', 1, 0.5, 2)
 		this._panX = new ExpCustomNumberParam('panX', 1, 0.5, 2)
 		this._panY = new ExpCustomNumberParam('panY', 1, 0.5, 2)
-		this._customNumberParams = arrayToESIdKeyMap([this._tempo])
+		this._customNumberParams = arrayToESIdKeyMap([this._tempo, this._rate, this._zoomX, this._zoomY, this._panX, this._panY])
 
 		this._restartButton = new ExpButton('restart', this)
 		this._buttons = arrayToESIdKeyMap([this._restartButton])

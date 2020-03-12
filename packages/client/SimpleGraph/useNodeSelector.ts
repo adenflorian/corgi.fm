@@ -2,13 +2,14 @@ import React, {useState, useCallback, useLayoutEffect} from 'react'
 import Immutable, {Set} from 'immutable'
 import {useSelector, useDispatch, useStore} from 'react-redux'
 import {
-	IClientAppState, RoomType, selectExpAllPositions,
+	IClientAppState, selectExpAllPositions,
 	shamuMetaActions, selectExpNodesState,
 	selectRoomMember, selectLocalClientId, selectExpGraphsState,
 } from '@corgifm/common/redux'
-import {useBoolean} from '../react-hooks'
+import {useBoolean, useRoomType} from '../react-hooks'
 import {mouseFromScreenToBoard} from '../SimpleGlobalClientState'
 import {CorgiObjectChangedEvent} from '../Experimental/CorgiEvents'
+import {RoomType} from '@corgifm/common/common-types'
 
 export const NodeSelectorContext = React.createContext<NodeSelectorContextValue>({
 	onSelectedNodeIdsChange: new CorgiObjectChangedEvent(Set<Id>()),
@@ -25,7 +26,7 @@ export function useNodeSelector() {
 	const [boxOrigin, setBoxOrigin] = useState({x: 0, y: 0})
 	const [otherCorner, setOtherCorner] = useState({x: 0, y: 0})
 
-	const roomType = useSelector((state: IClientAppState) => state.room.roomInfo.roomType)
+	const roomType = useRoomType()
 	const selected = useSelector((state: IClientAppState) => roomType === RoomType.Experimental
 		? selectExpGraphsState(state.room).mainGraph.positions.meta.selectedNodes
 		: emptySet)

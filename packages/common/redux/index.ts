@@ -55,6 +55,7 @@ export * from './shamu-graph'
 export * from './experimental'
 
 export * from './dummy-activity-redux'
+export * from './normal-activity-redux'
 
 export * from './activity-redux'
 

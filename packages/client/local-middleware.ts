@@ -2,7 +2,7 @@ import Immutable from 'immutable'
 import {Dispatch, Middleware} from 'redux'
 import uuid from 'uuid'
 import {MAX_MIDI_NOTE_NUMBER_127, panelHeaderHeight, GroupId} from '@corgifm/common/common-constants'
-import {ConnectionNodeType, IConnectable} from '@corgifm/common/common-types'
+import {ConnectionNodeType, IConnectable, RoomType} from '@corgifm/common/common-types'
 import {applyOctave, createNodeId, clamp} from '@corgifm/common/common-utils'
 import {logger} from '@corgifm/common/logger'
 import {IMidiNote, IMidiNotes} from '@corgifm/common/MidiNote'
@@ -40,14 +40,16 @@ import {
 	virtualOctaveChange, VirtualOctaveChangeAction,
 	LocalAction, chatSystemMessage, animationActions, selectOption, AppOptions,
 	getNodeInfo, SequencerStateBase, localMidiKeyUp, selectUserInputKeys,
-	userInputActions, recordingActions, betterSequencerActions, RoomType,
+	userInputActions, recordingActions, betterSequencerActions,
 	expNodesActions, expPositionActions, expConnectionsActions,
 	selectExpConnectionsWithSourceOrTargetIds, selectExpNode,
 	selectExpPosition,
 	makeExpNodeState, makeExpPosition, ExpConnection,
 	selectExpPositionExtremes, selectExpNodesState, WithConnections,
 	selectShamuMetaState, selectExpAllConnections, ExpPosition, ExpNodeState,
-	ExpConnections, ExpNodesState, ExpPositions, selectRoomInfoState, SavedClassicRoom, SavedExpRoom, selectExpGraphsState, selectActivityState,
+	ExpConnections, ExpNodesState, ExpPositions, selectRoomInfoState,
+	SavedClassicRoom, SavedExpRoom, selectExpGraphsState,
+	selectActivityState, SavedDummyRoom, selectActivityType,
 } from '@corgifm/common/redux'
 import {pointersActions} from '@corgifm/common/redux/pointers-redux'
 import {makeMidiClipEvent, preciseModulus, preciseSubtract} from '@corgifm/common/midi-types'
@@ -659,10 +661,11 @@ function getChildExpNodeIds(nodeId: Id, state: IClientAppState): Immutable.Set<I
 }
 
 function createRoomSave(state: IClientAppState, roomName: string): SavedRoom {
-	const {roomType} = selectRoomInfoState(state.room)
+	const roomType = selectActivityType(state.room)
 	switch (roomType) {
 		case RoomType.Normal: return createClassicRoomSave(state, roomName)
 		case RoomType.Experimental: return createExpRoomSave(state, roomName)
+		case RoomType.Dummy: return createDummyRoomSave(state)
 	}
 }
 
@@ -693,6 +696,18 @@ function createExpRoomSave(state: IClientAppState, roomName: string): SavedExpRo
 		roomType: RoomType.Experimental,
 		roomInfo: selectRoomInfoState(state.room),
 	} as SavedExpRoom
+}
+
+function createDummyRoomSave(state: IClientAppState): SavedDummyRoom {
+	return {
+		roomSettings: selectRoomSettings(state.room),
+		saveDateTime: new Date().toISOString(),
+		saveClientVersion: selectClientInfo(state).clientVersion,
+		saveServerVersion: selectClientInfo(state).serverVersion,
+		room: 'dummyRoomName',
+		roomType: RoomType.Dummy,
+		roomInfo: selectRoomInfoState(state.room),
+	} as SavedDummyRoom
 }
 
 function stripShamuGraphForSaving(shamuGraphState: ShamuGraphState): ShamuGraphState {
@@ -852,7 +867,7 @@ function selectLocalVirtualKeyboard(state: IClientAppState) {
 
 // TODO Refactor to use functions in create-server-stuff.ts
 function createLocalStuff(dispatch: Dispatch, state: IClientAppState) {
-	const roomType = state.room.roomInfo.roomType
+	const roomType = selectActivityType(state.room)
 
 	switch (roomType) {
 		case RoomType.Experimental: return createLocalStuffExperimental(dispatch, state)

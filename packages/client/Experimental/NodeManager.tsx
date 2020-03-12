@@ -1,6 +1,6 @@
 import React, {Fragment, useContext, useLayoutEffect} from 'react'
 import * as immutable from 'immutable'
-import {ExpNodeState, IExpConnection, ExpGraph} from '@corgifm/common/redux'
+import {ExpNodeState, IExpConnection, ExpGraph, ExpMidiPatternState} from '@corgifm/common/redux'
 import {ParamInputCentering} from '@corgifm/common/common-types'
 import {NodeToNodeAction} from '@corgifm/common/server-constants'
 import {assertUnreachable} from '@corgifm/common/common-utils'
@@ -468,6 +468,10 @@ export class NodeManager {
 				}
 			})
 		})
+	}
+
+	public readonly patternUpdated = (pattern: ExpMidiPatternState) => {
+		// TODO
 	}
 
 	public readonly cleanup = () => {

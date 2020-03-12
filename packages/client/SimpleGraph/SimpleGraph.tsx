@@ -1,6 +1,6 @@
 import React, {Fragment} from 'react'
 import {
-	selectAllPositions, IClientAppState, RoomType, selectClientInfo,
+	selectAllPositions, IClientAppState, selectClientInfo,
 } from '@corgifm/common/redux'
 import {useSelector} from 'react-redux'
 import {mainBoardsId} from '../client-constants'

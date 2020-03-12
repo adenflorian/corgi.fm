@@ -1,7 +1,8 @@
+import {RoomType} from '../../common-types'
 import {IClientRoomState} from '../common-redux-types'
 
 export function selectExpProjectState(state: IClientRoomState) {
-	if (state.activity.activityType !== 'expCorgi') throw new Error('state.activity.activityType !== expCorgi')
+	if (state.activity.activityType !== RoomType.Experimental) throw new Error('state.activity.activityType !== RoomType.Experimental')
 	return state.activity
 }
 

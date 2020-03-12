@@ -9,10 +9,11 @@ import {
 	selectPosition, selectSequencer, selectShamuMetaState, sequencerActions,
 	userInputActions,
 	localActions, localMidiKeyPress, localMidiKeyUp, localMidiOctaveChange,
-	windowBlur, selectRoomInfoState, RoomType, expLocalActions,
-	selectLocalClientId, selectRoomMember, selectExpNode, roomMemberActions,
+	windowBlur, selectRoomInfoState, expLocalActions,
+	selectLocalClientId, selectRoomMember, selectExpNode, roomMemberActions, selectActivityType,
 } from '@corgifm/common/redux'
 import {mouseFromScreenToBoard} from './SimpleGlobalClientState'
+import {RoomType} from '@corgifm/common/common-types'
 
 type IKeyBoardShortcuts = Map<string, KeyBoardShortcut>
 
@@ -70,7 +71,7 @@ const keyboardShortcuts: IKeyBoardShortcuts = Map<KeyBoardShortcut>({
 	[Control + Plus + 'd']: {
 		actionOnKeyDown: (_, state) => {
 			const selectedNodes = selectShamuMetaState(state.room).selectedNodes
-			if (selectRoomInfoState(state.room).roomType === RoomType.Experimental) {
+			if (selectActivityType(state.room) === RoomType.Experimental) {
 				return localActions.cloneSelectedExpNodes('all')
 			} else {
 				if (selectedNodes.count() !== 1) return
@@ -84,7 +85,7 @@ const keyboardShortcuts: IKeyBoardShortcuts = Map<KeyBoardShortcut>({
 	},
 	[Control + Plus + 'g']: {
 		actionOnKeyDown: (_, state) => {
-			if (selectRoomInfoState(state.room).roomType !== RoomType.Experimental) return
+			if (selectActivityType(state.room) !== RoomType.Experimental) return
 			const selectedNodes = selectShamuMetaState(state.room).selectedNodes
 			return expLocalActions.createGroup(selectedNodes, 'group')
 		},
@@ -93,7 +94,7 @@ const keyboardShortcuts: IKeyBoardShortcuts = Map<KeyBoardShortcut>({
 	},
 	[Control + Plus + Shift + Plus + 'g']: {
 		actionOnKeyDown: (_, state) => {
-			if (selectRoomInfoState(state.room).roomType !== RoomType.Experimental) return
+			if (selectActivityType(state.room) !== RoomType.Experimental) return
 			const selectedNodes = selectShamuMetaState(state.room).selectedNodes
 			return expLocalActions.createGroup(selectedNodes, 'polyphonicGroup')
 		},
@@ -102,7 +103,7 @@ const keyboardShortcuts: IKeyBoardShortcuts = Map<KeyBoardShortcut>({
 	},
 	'PageUp': {
 		actionOnKeyDown: (_, state) => {
-			if (selectRoomInfoState(state.room).roomType !== RoomType.Experimental) return
+			if (selectActivityType(state.room) !== RoomType.Experimental) return
 			const localClientId = selectLocalClientId(state)
 			const currentNodeGroupId = selectRoomMember(state.room, localClientId).groupNodeId
 			if (currentNodeGroupId === 'top') return

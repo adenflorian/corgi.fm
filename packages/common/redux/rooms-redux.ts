@@ -5,10 +5,11 @@ import {ActionType} from 'typesafe-actions'
 import {
 	SERVER_ACTION, selectShamuGraphState, selectRoomSettings,
 	selectAllPositions, selectGlobalClockState, selectAllConnections,
-	IClientAppState, RoomType,
+	IClientAppState,
 } from '.'
 import {selectExpGraphsState, ExpProjectState} from './experimental'
 import {selectRoomInfoState} from './room-info-redux'
+import {RoomType} from '../common-types'
 
 export const roomsActions = {
 	requestCreate: (name: string, roomType: RoomType) => ({
@@ -83,7 +84,7 @@ export interface LocalSaves {
 	readonly all: Map<Id, SavedRoom>
 }
 
-export type SavedRoom = SavedClassicRoom | SavedExpRoom
+export type SavedRoom = SavedClassicRoom | SavedExpRoom | SavedDummyRoom
 
 export interface SavedRoomBase {
 	readonly roomSettings: ReturnType<typeof selectRoomSettings>
@@ -101,6 +102,10 @@ export interface SavedClassicRoom extends SavedRoomBase {
 	readonly globalClock: ReturnType<typeof selectGlobalClockState>
 	readonly positions: ReturnType<typeof selectAllPositions>
 	readonly shamuGraph: ReturnType<typeof selectShamuGraphState>
+}
+
+export interface SavedDummyRoom extends SavedRoomBase {
+	readonly roomType: RoomType.Dummy
 }
 
 export interface SavedExpRoom extends SavedRoomBase {

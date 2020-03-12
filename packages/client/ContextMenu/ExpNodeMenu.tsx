@@ -11,6 +11,8 @@ import {
 import {expNodeMenuId} from '../client-constants'
 import {logger} from '../client-logger'
 import {TopMenuBar} from './TopMenuBar'
+import {useRoomType} from '../react-hooks'
+import {RoomType} from '@corgifm/common/common-types'
 
 interface ExpNodeMenuProps {
 	trigger: {
@@ -19,6 +21,8 @@ interface ExpNodeMenuProps {
 }
 
 function ExpNodeMenu({trigger}: ExpNodeMenuProps) {
+	const roomType = useRoomType()
+	if (roomType !== RoomType.Experimental) return null
 	return (
 		<ContextMenu id={expNodeMenuId}>
 			<ExpNodeMenuItems

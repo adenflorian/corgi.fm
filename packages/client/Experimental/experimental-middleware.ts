@@ -4,7 +4,7 @@ import {
 	IClientAppState, ExpNodesAction, ExpConnectionAction,
 	RoomsReduxAction, selectExpConnection,
 	selectExpAllConnections, selectExpNodesState,
-	selectRoomInfoState, RoomType, ExpPositionAction,
+	selectRoomInfoState, ExpPositionAction,
 	ExpGhostConnectorAction, BroadcastAction, LocalAction,
 	expGhostConnectorActions,
 	createLocalActiveExpGhostConnectionSelector, selectExpNode,
@@ -21,7 +21,8 @@ import {
 	shamuMetaActions, makeExpConnectionsState, defaultExpPositionRecord,
 	defaultExpNodeRecord, isGroupInOutNode, GroupType,
 	selectExpConnectionsWithTargetIds,
-	selectExpConnectionsWithSourceIds, selectExpAllPositions, ActivityAction,
+	selectExpConnectionsWithSourceIds, selectExpAllPositions,
+	ActivityAction, ExpMidiPatternsAction, ExpMidiPatternViewsAction, selectExpMidiPattern, selectActivityType,
 } from '@corgifm/common/redux'
 import {serverClientId, GroupId} from '@corgifm/common/common-constants'
 import {createNodeId, arrayToESIdKeyMap} from '@corgifm/common/common-utils'
@@ -30,11 +31,13 @@ import {logger} from '../client-logger'
 import {handleStopDraggingExpGhostConnector} from '../exp-dragging-connections'
 import {mouseFromScreenToBoard, simpleGlobalClientState} from '../SimpleGlobalClientState'
 import {NodeManager} from './NodeManager'
+import {RoomType} from '@corgifm/common/common-types'
 
 type ExpMiddlewareActions = ExpNodesAction | ExpConnectionAction
 	| ExpLocalAction | RoomsReduxAction | ExpPositionAction
 	| ExpGhostConnectorAction | LocalAction | OptionsAction
-	| ExpGraphsAction | ActivityAction
+	| ExpGraphsAction | ActivityAction | ExpMidiPatternsAction
+	| ExpMidiPatternViewsAction
 
 type ExpMiddleware =
 	(singletonContext: SingletonContextImpl) => Middleware<{}, IClientAppState>
@@ -46,7 +49,7 @@ export const createExpMiddleware: ExpMiddleware =
 			before(beforeState, action, dispatch)
 			next(action)
 			const afterState = getState()
-			const roomType = selectRoomInfoState(getState().room).roomType
+			const roomType = selectActivityType(afterState.room)
 
 			if (roomType !== RoomType.Experimental) return
 
@@ -493,7 +496,7 @@ export function createExpTupperware(
 		const state = store.getState()
 		const action = state.other.lastAction as ExpMiddlewareActions
 
-		const roomType = selectRoomInfoState(state.room).roomType
+		const roomType = selectActivityType(state.room)
 
 		if (roomType !== RoomType.Experimental) return
 
@@ -537,7 +540,7 @@ function bar(
 
 		// Graphs
 		case 'ACTIVITY_REPLACE':
-			if (action.activityState.activityType === 'expCorgi') {
+			if (action.activityState.activityType === RoomType.Experimental) {
 				return nodeManager.loadMainGraph(selectMainExpGraph(state.room))
 			} else {
 				return
@@ -587,6 +590,10 @@ function bar(
 		case 'EXP_ADD_CONNECTIONS':
 			return action.connections.forEach(
 				x => nodeManager.addConnection(getConnection(x.id)))
+
+		// Midi
+		case 'EXP_MIDI_PATTERN_ADD_EVENT':
+			return nodeManager.patternUpdated(selectExpMidiPattern(state.room, action.id))
 
 		// Other
 		case 'SET_OPTION': {

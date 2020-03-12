@@ -41,6 +41,13 @@ export const expMidiPatternsActions = {
 		isExpMidiPatternAction: true,
 		state,
 	} as const),
+	addEvent: (id: Id, event: SeqEvent) => ({
+		type: 'EXP_MIDI_PATTERN_ADD_EVENT',
+		id,
+		event,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	} as const),
 } as const
 
 export type ExpMidiPatternsAction = ActionType<typeof expMidiPatternsActions>
@@ -69,11 +76,19 @@ export type ExpMidiPatternsState = typeof initialState
 
 export const expMidiPatternsReducer = (state = initialState, action: ExpMidiPatternsAction): ExpMidiPatternsState => {
 	switch (action.type) {
-		case 'EXP_MIDI_PATTERN_ADD': return state.set(action.newPattern.id, makeExpMidiPatternState(action.newPattern))
-		case 'EXP_MIDI_PATTERN_ADD_MANY': return state.merge(Map(action.newPatterns).map(makeExpMidiPatternState))
-		case 'EXP_MIDI_PATTERN_DELETE': return state.delete(action.nodeId)
-		case 'EXP_MIDI_PATTERN_DELETE_MANY': return state.deleteAll(action.nodeIds)
-		case 'EXP_MIDI_PATTERN_REPLACE_ALL': return state.clear().merge(action.state).map(x => makeExpMidiPatternState(x))
+		case 'EXP_MIDI_PATTERN_ADD':
+			return state.set(action.newPattern.id, makeExpMidiPatternState(action.newPattern))
+		case 'EXP_MIDI_PATTERN_ADD_MANY':
+			return state.merge(Map(action.newPatterns).map(makeExpMidiPatternState))
+		case 'EXP_MIDI_PATTERN_DELETE':
+			return state.delete(action.nodeId)
+		case 'EXP_MIDI_PATTERN_DELETE_MANY':
+			return state.deleteAll(action.nodeIds)
+		case 'EXP_MIDI_PATTERN_REPLACE_ALL':
+			return state.clear().merge(action.state).map(x => makeExpMidiPatternState(x))
+		case 'EXP_MIDI_PATTERN_ADD_EVENT':
+			return state.update(action.id, defaultExpMidiPatternRecord,
+				x => x.update('events', x => x.set(action.event.id, action.event)))
 		default: return state
 	}
 }

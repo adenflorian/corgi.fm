@@ -98,3 +98,9 @@ export const midiActions = {
 } as const
 
 export type MidiAction = ReturnType<typeof midiActions[keyof typeof midiActions]>
+
+export enum RoomType {
+	Normal = 'Normal',
+	Experimental = 'Experimental',
+	Dummy = 'Dummy'
+}

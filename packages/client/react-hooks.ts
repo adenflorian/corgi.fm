@@ -2,7 +2,7 @@ import {useState} from 'react'
 import {useSelector} from 'react-redux'
 import {
 	selectLocalClientId, createRoomMemberSelector,
-	IClientAppState, selectRoomInfoState, selectExpPosition,
+	IClientAppState, selectRoomInfoState, selectExpPosition, selectActivityType,
 } from '@corgifm/common/redux'
 import {logger} from './client-logger'
 
@@ -69,7 +69,7 @@ export function useLocalRoomMember() {
 }
 
 export function useRoomType() {
-	return useSelector((state: IClientAppState) => selectRoomInfoState(state.room).roomType)
+	return useSelector((state: IClientAppState) => selectActivityType(state.room))
 }
 
 export function useExpPosition(nodeId: Id) {

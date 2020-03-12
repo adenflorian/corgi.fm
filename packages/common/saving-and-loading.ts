@@ -4,7 +4,9 @@ import {
 	gridSequencersReducer, infiniteSequencersReducer, shamuGraphReducer,
 	globalClockReducer, roomSettingsReducer, connectionsReducer, IPositions,
 	IConnection, BasicSamplerState, basicSamplersReducer,
-	IBasicSamplersState, makePosition, RoomType, SavedClassicRoom, SavedExpRoom, expGraphsReducer, roomInfoReducer, activityReducer, activityActions, ExpProjectState,
+	IBasicSamplersState, makePosition, SavedClassicRoom, SavedExpRoom,
+	expGraphsReducer, roomInfoReducer, activityReducer, activityActions,
+	ExpProjectState,
 } from './redux'
 import {
 	MidiClip, MidiClipEvent, makeMidiClipEvent, MidiClipEventV1,
@@ -12,6 +14,7 @@ import {
 } from './midi-types'
 import {Samples, Sample, dummySample, samplerBasicPianoNotes} from './common-samples-stuff'
 import {logger} from './logger'
+import {RoomType} from './common-types'
 
 export function transformLoadedSave(save: Partial<SavedRoom>): SavedRoom {
 	return [save]
@@ -40,7 +43,7 @@ function barClassic(save: Partial<SavedClassicRoom>): SavedClassicRoom {
 		saveServerVersion: save.saveServerVersion || '?',
 		shamuGraph: convertShamuGraph(save.shamuGraph || {}),
 		roomType: RoomType.Normal,
-		roomInfo: save.roomInfo || {...roomInfoReducer(undefined, {} as any), roomType: RoomType.Normal},
+		roomInfo: save.roomInfo || {...roomInfoReducer(undefined, {} as any)},
 	}
 }
 
@@ -53,8 +56,8 @@ function barExp(save: Partial<SavedExpRoom>): SavedExpRoom {
 		saveDateTime: save.saveDateTime || '?',
 		saveServerVersion: save.saveServerVersion || '?',
 		roomType: RoomType.Experimental,
-		activity: save.activity as ExpProjectState || activityReducer(undefined, activityActions.set('expCorgi')),
-		roomInfo: save.roomInfo || {...roomInfoReducer(undefined, {} as any), roomType: RoomType.Experimental},
+		activity: save.activity as ExpProjectState || activityReducer(undefined, activityActions.set(RoomType.Experimental)),
+		roomInfo: save.roomInfo || {...roomInfoReducer(undefined, {} as any)},
 	}
 }
 

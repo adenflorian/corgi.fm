@@ -5,7 +5,7 @@ import {
 	IClientState, commonActions,
 	selectClientById, selectLocalClientId, selectMemberCount,
 	selectRoomSettings, localActions,
-	selectClientInfo, shamuConnect, selectClientCount, RoomType,
+	selectClientInfo, shamuConnect, selectClientCount,
 	getRoomTypeFriendlyString,
 } from '@corgifm/common/redux'
 import {CssColor} from '@corgifm/common/shamu-color'
@@ -31,6 +31,7 @@ import {audioWorkletToolTip} from './client-constants'
 import {useRoomType} from './react-hooks'
 import './TopDiv.less'
 import {NodeGroupInfo} from './SmallComponents/NodeGroupInfo'
+import {RoomType} from '@corgifm/common/common-types'
 
 interface ReduxProps {
 	memberCount: number

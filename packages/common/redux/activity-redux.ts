@@ -3,9 +3,9 @@ import {ActionType} from 'typesafe-actions'
 import {IClientRoomState} from './common-redux-types'
 import {
 	BROADCASTER_ACTION, SERVER_ACTION, expProjectReducer,
+	normalActivityReducer, commonActions, dummyActivityReducer,
 } from '.'
-import {dummyActivityReducer} from './dummy-activity-redux'
-import {commonActions} from './common-actions'
+import {RoomType} from '../common-types'
 
 export const activityActions = {
 	replace: (activityState: ActivityState) => ({
@@ -19,8 +19,9 @@ export const activityActions = {
 } as const
 
 const activityReducers = {
-	expCorgi: expProjectReducer,
-	dummy: dummyActivityReducer,
+	[RoomType.Experimental]: expProjectReducer,
+	[RoomType.Dummy]: dummyActivityReducer,
+	[RoomType.Normal]: normalActivityReducer,
 }
 
 export interface ActivityStateBase {
@@ -36,7 +37,7 @@ export type Activity = ActivityState['activityType']
 export type ActivityAction = ActionType<typeof activityActions>
 
 export const activityReducer: Reducer<ActivityState, ActivityAction> = (
-	state = {activityType: 'dummy'}, action,
+	state = {activityType: RoomType.Dummy}, action,
 ) => {
 	switch (action.type) {
 		case 'ACTIVITY_REPLACE': return getReducer(action.activityState)(undefined, action)

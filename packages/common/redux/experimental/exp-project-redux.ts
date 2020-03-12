@@ -6,6 +6,8 @@ import {
 } from '.'
 import {InitAction} from '../common-actions'
 import {expMidiReducer, makeExpMidiState} from './exp-midi-redux'
+import {IClientAppState, IClientRoomState} from '../common-redux-types'
+import {RoomType} from '../../common-types'
 
 export const expProjectActions = {
 } as const
@@ -25,7 +27,7 @@ const innerReducers = combineReducers({
 
 const defaultExpProjectState = Object.freeze({
 	state: innerReducers(undefined, {type: '$$$$INIT'}),
-	activityType: 'expCorgi' as const,
+	activityType: RoomType.Experimental,
 })
 
 const _makeExpProjectState = Record(defaultExpProjectState)
@@ -54,3 +56,5 @@ export const expProjectReducer: Reducer<ExpProjectState, ExpProjectAction | Repl
 		}
 	}
 }
+
+export const selectActivityType = (state: IClientRoomState) => state.activity.activityType

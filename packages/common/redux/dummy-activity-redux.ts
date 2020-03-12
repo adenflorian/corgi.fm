@@ -1,16 +1,13 @@
-import {Map, Record} from 'immutable'
-import {Reducer, AnyAction} from 'redux'
-import {ActionType} from 'typesafe-actions'
-import {IClientRoomState} from './common-redux-types'
-import {ExpNodeType} from './experimental/exp-nodes-redux'
-import {
-	BROADCASTER_ACTION, SERVER_ACTION, expGraphsReducer, makeExpGraphsState, expProjectReducer,
-} from '.'
+import {AnyAction} from 'redux'
+import {RoomType} from '../common-types'
 
 interface DummyActivityState {
-	readonly activityType: 'dummy'
+	readonly activityType: RoomType.Dummy
 }
 
-export function dummyActivityReducer(state: DummyActivityState = {activityType: 'dummy'}, action: AnyAction): DummyActivityState {
+export function dummyActivityReducer(
+	state: DummyActivityState = {activityType: RoomType.Dummy},
+	action: AnyAction,
+): DummyActivityState {
 	return state
 }

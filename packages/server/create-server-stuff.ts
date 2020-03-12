@@ -1,6 +1,6 @@
 import {List, Map} from 'immutable'
 import {Action, Store} from 'redux'
-import {ConnectionNodeType, IConnectable} from '@corgifm/common/common-types'
+import {ConnectionNodeType, IConnectable, RoomType} from '@corgifm/common/common-types'
 import {calculatePositionsGivenConnections} from '@corgifm/common/compute-positions'
 import {MidiClipEvents, makeMidiClipEvent} from '@corgifm/common/midi-types'
 import {transformLoadedSave} from '@corgifm/common/saving-and-loading'
@@ -17,8 +17,10 @@ import {
 	selectAllConnections, selectAllPositions, selectAllVirtualKeyboardIds,
 	selectConnectionsWithSourceOrTargetIds, shamuGraphActions,
 	SimpleReverbState, updatePositions, BetterSequencerState,
-	addBetterSequencer, createSequencerEvents, RoomType, expNodesActions,
-	expPositionActions, makeExpPosition, makeExpNodeState, expConnectionsActions, ExpConnection, SavedClassicRoom, SavedExpRoom, expGraphsActions, roomInfoAction, activityActions,
+	addBetterSequencer, createSequencerEvents, expNodesActions,
+	expPositionActions, makeExpPosition, makeExpNodeState,
+	expConnectionsActions, ExpConnection, SavedClassicRoom,
+	SavedExpRoom, expGraphsActions, roomInfoAction, activityActions,
 } from '@corgifm/common/redux'
 import {logger} from '@corgifm/common/logger'
 import {serverClientId, maxPitchFrequency} from '@corgifm/common/common-constants'
@@ -41,7 +43,7 @@ const ySpacing = 300
 export function createServerStuffExperimental(room: string, serverStore: Store<IServerState>) {
 	logger.log('todo')
 
-	dispatchToRoom(activityActions.set('expCorgi'))
+	dispatchToRoom(activityActions.set(RoomType.Experimental))
 
 	const sequencer = makeExpNodeState({
 		type: 'sequencer',
@@ -465,6 +467,8 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 export function createServerStuffNormal(room: string, serverStore: Store<IServerState>) {
 	const serverClient = ClientState.createServerClient()
 	const addClientAction = addClient(serverClient)
+
+	dispatchToRoom(activityActions.set(RoomType.Normal))
 
 	dispatchToRoom(addClientAction)
 

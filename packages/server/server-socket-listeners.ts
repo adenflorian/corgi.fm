@@ -5,7 +5,7 @@ import {Server, Socket} from 'socket.io'
 import {
 	lobby, maxRoomNameLength, serverClientId,
 } from '@corgifm/common/common-constants'
-import {ConnectionNodeType} from '@corgifm/common/common-types'
+import {ConnectionNodeType, RoomType} from '@corgifm/common/common-types'
 import {logger} from '@corgifm/common/logger'
 import {
 	addClient, roomMemberActions, BroadcastAction,
@@ -29,12 +29,13 @@ import {
 	SERVER_ACTION, setActiveRoom,
 	setChat, setClients, setRooms, shamuGraphActions,
 	userLeftRoom, whitelistedRoomActionTypes, isRoomOwnerRoomAction,
-	selectPositionsByOwner, roomInfoAction, RoomType, selectRoomInfoState,
+	selectPositionsByOwner, roomInfoAction, selectRoomInfoState,
 	expNodesActions, selectExpNodesState, expPositionActions,
 	expConnectionsActions,
 	selectExpConnectionsWithTargetIds, selectExpConnectionsWithSourceOrTargetIds,
 	selectExpPositionsWithIds, makeRoomMember, selectRoomMemberState,
-	selectExpGraphsState, expGraphsActions, activityActions, selectActivityState,
+	selectExpGraphsState, expGraphsActions, activityActions,
+	selectActivityState, selectActivityType,
 } from '@corgifm/common/redux'
 import {WebSocketEvent, NodeToNodeAction} from '@corgifm/common/server-constants'
 import {assertUnreachable} from '@corgifm/common/common-utils'
@@ -261,7 +262,7 @@ export function setupServerWebSocketListeners(
 			} else {
 				serverStore.dispatch(createRoom(newRoomName, Date.now()))
 				serverStore.dispatch(createRoomAction(roomSettingsActions.setOwner(clientId), newRoomName))
-				serverStore.dispatch(createRoomAction(roomInfoAction.setType(type), newRoomName))
+				serverStore.dispatch(createRoomAction(activityActions.set(type), newRoomName))
 
 				if (roomDataToLoad) {
 					loadServerStuff(newRoomName, serverStore, roomDataToLoad, clientId)
@@ -298,12 +299,14 @@ function onLeaveRoom(io: Server, socket: Socket, roomToLeave: string, serverStor
 	serverStore.dispatch(userLeftRoom(roomToLeave, Date.now()))
 
 	const clientId = selectClientBySocketId(serverStore.getState(), socket.id).id
-	const roomType = selectRoomInfoState(roomState).roomType
+	const roomType = selectActivityType(roomState)
 
 	switch (roomType) {
 		case RoomType.Normal: onLeaveRoomNormal(io, clientId, roomToLeave, serverStore, roomState)
 			break
 		case RoomType.Experimental: onLeaveRoomExperimental(io, clientId, roomToLeave, serverStore, roomState)
+			break
+		case RoomType.Dummy:
 			break
 		default: assertUnreachable(roomType)
 	}

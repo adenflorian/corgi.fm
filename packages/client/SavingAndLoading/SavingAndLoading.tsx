@@ -6,13 +6,14 @@ import {IoMdFolder} from 'react-icons/io'
 import {useDispatch} from 'react-redux'
 import {
 	loadRoom, ModalId, SavedRoom, localActions,
-	RoomType, getRoomTypeFriendlyString,
+	getRoomTypeFriendlyString,
 } from '@corgifm/common/redux'
 import {getOrCreateLocalSavesStorage} from '../local-middleware'
 import {ModalButton} from '../Modal/ModalButton'
 import {ModalContent} from '../Modal/ModalManager'
 import './SavingAndLoading.less'
 import {CssColor} from '@corgifm/common/shamu-color'
+import {RoomType} from '@corgifm/common/common-types'
 
 export function LoadRoomModalButton() {
 	return (

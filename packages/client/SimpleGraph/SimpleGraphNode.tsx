@@ -26,6 +26,7 @@ import {ConnectedSimpleReverb} from '../ShamuNodes/SimpleReverb/SimpleReverbView
 import {simpleGlobalClientState} from '../SimpleGlobalClientState'
 import {ConnectedVolumeControl} from '../Volume/VolumeControl'
 import {BetterSequencer} from '../BetterSequencer/BetterSequencer'
+import {useRoomType} from '../react-hooks'
 
 interface ISimpleGraphNodeProps {
 	positionId: Id
@@ -62,7 +63,7 @@ export function SimpleGraphNode(props: ISimpleGraphNodeAllProps) {
 
 	const [dragging, setDragging] = useState(false)
 
-	const roomType = useSelector((state: IClientAppState) => state.room.roomInfo.roomType)
+	const roomType = useRoomType()
 
 	const handleMouseDown = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
 		const target = e.target as HTMLElement

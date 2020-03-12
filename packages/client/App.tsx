@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react'
 import {hot} from 'react-hot-loader'
 import {useSelector} from 'react-redux'
-import {selectClientInfo, IClientAppState, selectUserInputKeys, RoomType} from '@corgifm/common/redux'
+import {selectClientInfo, IClientAppState, selectUserInputKeys} from '@corgifm/common/redux'
 // css-reset must be first
 import './css-reset.css'
 import './App.less'
@@ -10,6 +10,8 @@ import {LoadingScreen} from './LoadingScreen'
 import {ConnectedOnlineApp} from './OnlineApp'
 import {Benchmarks} from './Benchmarks'
 import {simpleGlobalClientState} from './SimpleGlobalClientState'
+import {useRoomType} from './react-hooks'
+import {RoomType} from '@corgifm/common/common-types'
 
 const App = () => {
 	const ctrl = useSelector((state: IClientAppState) => selectUserInputKeys(state).ctrl)
@@ -17,7 +19,7 @@ const App = () => {
 	const alt = useSelector((state: IClientAppState) => selectUserInputKeys(state).alt)
 	const isConnectingForFirstTime = useSelector((state: IClientAppState) => selectClientInfo(state).isConnectingForFirstTime)
 	const isClientReady = useSelector((state: IClientAppState) => selectClientInfo(state).isClientReady)
-	const roomType = useSelector((state: IClientAppState) => state.room.roomInfo.roomType)
+	const roomType = useRoomType()
 
 	useEffect(() => {
 		const onMouseMove = (e: MouseEvent) => {
@@ -46,6 +48,7 @@ const App = () => {
 			{!isLoading && {
 				[RoomType.Normal]: <ConnectedOnlineApp />,
 				[RoomType.Experimental]: <ConnectedOnlineApp />,
+				[RoomType.Dummy]: <div>DuMmY</div>,
 			}[roomType]}
 		</div>
 	)

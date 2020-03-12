@@ -3,7 +3,7 @@ import animal from 'animal-id'
 import {List} from 'immutable'
 import {IoMdAddCircle} from 'react-icons/io'
 import {useDispatch} from 'react-redux'
-import {roomsActions, modalsAction, ModalId, RoomType, isRoomType} from '@corgifm/common/redux'
+import {roomsActions, modalsAction, ModalId, isRoomType} from '@corgifm/common/redux'
 import {roomNameCleaner} from '@corgifm/common/common-utils'
 import {eventNewRoomButtonClick} from '../analytics/analytics'
 import {ModalContent} from '../Modal/ModalManager'
@@ -11,6 +11,7 @@ import {useBoolean, useInputState, useEnumInputState} from '../react-hooks'
 import {Select} from '../Select/Select'
 import {isLocalDevClient} from '../is-prod-client'
 import {Button} from './Button'
+import {RoomType} from '@corgifm/common/common-types'
 
 export function NewRoomButton({onClick}: {onClick?: () => any}) {
 	const dispatch = useDispatch()

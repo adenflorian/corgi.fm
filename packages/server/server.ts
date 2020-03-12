@@ -3,7 +3,8 @@ import * as socketIO from 'socket.io'
 import {lobby, serverClientId, expLobby} from '@corgifm/common/common-constants'
 import {logger} from '@corgifm/common/logger'
 import {
-	configureServerStore, createRoomAction, roomSettingsActions, createRoom, RoomType, roomInfoAction,
+	configureServerStore, createRoomAction, roomSettingsActions,
+	createRoom, roomInfoAction, activityActions,
 } from '@corgifm/common/redux'
 import {initSentryServer} from './analytics/sentry-server'
 import {createServerStuff} from './create-server-stuff'
@@ -14,6 +15,7 @@ import {setupServerWebSocketListeners} from './server-socket-listeners'
 import {setupExpressApp} from './setup-express-app'
 import {DiscordBot} from './discord'
 import {loadServerSecrets} from './server-secrets'
+import {RoomType} from '@corgifm/common/common-types'
 
 if (!isLocalDevServer()) initSentryServer()
 
@@ -44,7 +46,7 @@ async function start() {
 
 	if (isLocalDevServer()) {
 		serverStore.dispatch(createRoom(expLobby, Date.now()))
-		serverStore.dispatch(createRoomAction(roomInfoAction.setType(RoomType.Experimental), expLobby))
+		serverStore.dispatch(createRoomAction(activityActions.set(RoomType.Experimental), expLobby))
 		serverStore.dispatch(createRoomAction(roomSettingsActions.setOwner(serverClientId), expLobby))
 		createServerStuff(expLobby, serverStore, RoomType.Experimental)
 	}

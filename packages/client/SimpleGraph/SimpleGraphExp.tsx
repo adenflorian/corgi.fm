@@ -1,6 +1,6 @@
 import React from 'react'
 import {
-	IClientAppState, RoomType, selectClientInfo,
+	IClientAppState, selectClientInfo,
 } from '@corgifm/common/redux'
 import {useSelector} from 'react-redux'
 import {mainBoardsId} from '../client-constants'
@@ -10,9 +10,11 @@ import {NodeManagerContext} from '../Experimental/NodeManager'
 import {useSingletonContext} from '../SingletonContext'
 import {logger} from '../client-logger'
 import {ConnectedZoom} from './Zoom'
+import {useRoomType} from '../react-hooks'
+import {RoomType} from '@corgifm/common/common-types'
 
 export const ConnectedSimpleGraphExp = function _ConnectedSimpleGraphExp() {
-	const roomType = useSelector((state: IClientAppState) => state.room.roomInfo.roomType)
+	const roomType = useRoomType()
 	const isClientReady = useSelector((state: IClientAppState) => selectClientInfo(state).isClientReady)
 
 	const singletonContext = useSingletonContext()

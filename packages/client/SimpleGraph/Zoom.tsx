@@ -3,7 +3,7 @@ import {ContextMenuTrigger} from 'react-contextmenu'
 import {Set} from 'immutable'
 import {
 	selectLocalClientId, selectOptions, selectRoomSettings, IClientAppState,
-	createAnimationFrameSelector, animationActions, RoomType,
+	createAnimationFrameSelector, animationActions,
 } from '@corgifm/common/redux'
 import {useSelector} from 'react-redux'
 import {hot} from 'react-hot-loader'
@@ -13,6 +13,8 @@ import PlusSVG from '../OtherSVG/plus.svg'
 import {simpleGlobalClientState, blockMouse, unblockMouse} from '../SimpleGlobalClientState'
 import {BoxSelect} from '../BetterSequencer/BoxSelect'
 import {useNodeSelector, NodeSelectorContext} from './useNodeSelector'
+import {useRoomType} from '../react-hooks'
+import {RoomType} from '@corgifm/common/common-types'
 
 interface Props {
 	children: React.ReactNode
@@ -247,7 +249,7 @@ export const ConnectedZoom = hot(module)(React.memo(function _Zoom({
 		}
 	}, [backgroundClicked])
 
-	const roomType = useSelector((state: IClientAppState) => state.room.roomInfo.roomType)
+	const roomType = useRoomType()
 
 	return (
 		<Fragment>

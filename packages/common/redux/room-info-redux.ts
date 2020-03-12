@@ -1,13 +1,10 @@
 import {Record} from 'immutable'
 import {ActionType} from 'typesafe-actions'
-import {logger} from '../logger';
-import {IClientRoomState} from '.';
+import {logger} from '../logger'
+import {IClientRoomState} from '.'
+import {RoomType} from '../common-types'
 
 export const roomInfoAction = {
-	setType: (roomType: RoomType) => ({
-		type: 'SET_ROOM_TYPE',
-		roomType,
-	} as const),
 	replace: (state: RoomInfoState) => ({
 		type: 'REPLACE_ROOM_INFO_STATE',
 		state,
@@ -16,20 +13,15 @@ export const roomInfoAction = {
 
 export type RoomInfosAction = ActionType<typeof roomInfoAction>
 
-export enum RoomType {
-	Normal = 'Normal',
-	Experimental = 'Experimental',
-}
-
 export const getRoomTypeFriendlyString = (type: RoomType) => {
 	switch (type) {
 		case RoomType.Normal: return 'Classic'
 		case RoomType.Experimental: return 'Experimental'
+		case RoomType.Dummy: return 'Dummy'
 	}
 }
 
 const makeRoomInfoState = Record({
-	roomType: RoomType.Normal,
 })
 
 export function isRoomType(val: string): val is RoomType {
@@ -51,18 +43,8 @@ export const roomInfoReducer = (
 	state = makeRoomInfoState(), action: RoomInfosAction,
 ): RoomInfoState => {
 	switch (action.type) {
-		case 'SET_ROOM_TYPE': return setRoomType(state, action.roomType)
 		case 'REPLACE_ROOM_INFO_STATE': return makeRoomInfoState(action.state)
 		default: return state
-	}
-}
-
-function setRoomType(state: RoomInfoState, roomType: RoomType): RoomInfoState {
-	if (isRoomType(roomType)) {
-		return state.set('roomType', roomType)
-	} else {
-		logger.error('invalid room type: ', {state, roomType})
-		return state
 	}
 }
 
