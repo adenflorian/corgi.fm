@@ -1,12 +1,11 @@
-import {Set, Map, Record} from 'immutable'
+import {Map, Record} from 'immutable'
 import {ActionType} from 'typesafe-actions'
 import * as uuid from 'uuid'
+import {SeqEvents, SeqEvent} from '../../SeqStuff'
 import {
 	BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION,
-	IClientAppState,
 } from '..'
-import {selectExpProjectState} from './exp-common-redux'
-import {SeqEvents, SeqEvent} from '../../SeqStuff'
+import {selectExpProjectState} from '.'
 
 export const expMidiPatternsActions = {
 	add: (newPattern: ExpMidiPatternState) => ({
