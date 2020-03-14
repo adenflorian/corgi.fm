@@ -42,7 +42,8 @@ import {
 import {BetterSideNotes} from './BetterSideNotes'
 import {useNodeContext} from '../../CorgiNode'
 import {ExpBetterSequencerNode} from '../ExpBetterSequencerNode'
-import {useNumberChangedEvent} from '../../hooks/useCorgiEvent'
+import {useNumberChangedEvent, useObjectChangedEvent} from '../../hooks/useCorgiEvent'
+import {SeqEvents} from '@corgifm/common/SeqStuff'
 
 const mouseWheelYSensitivity = 0.001
 const mouseWheelPanXSensitivity = 0.001
@@ -77,6 +78,9 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 	const zoomY = useNumberChangedEvent(nodeContext.zoomY.onChange)
 	const panX = useNumberChangedEvent(nodeContext.panX.onChange)
 	const panY = useNumberChangedEvent(nodeContext.panY.onChange)
+
+
+	const midiClip = useObjectChangedEvent(nodeContext.midiPatternParam.value)
 
 
 	const zoom = {x: zoomX, y: zoomY}
@@ -131,23 +135,24 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 		return clientSpaceToPercentages(clientMousePosition, {x, y}, panPixels, maxPanX, maxPanY, fixedWidth, scaledHeight)
 	}, [scaledHeight, maxPanX, maxPanY, panPixels, fixedWidth, x, y])
 
-	// const removeDuplicateEvents = useCallback(() => {
-	// 	const {toDelete} = midiClip.events.reduce((result, event) => {
-	// 		if (result.clean.some(c => c.note === event.note && c.startBeat === event.startBeat && c.durationBeats === event.durationBeats)) {
-	// 			return {
-	// 				...result,
-	// 				toDelete: result.toDelete.add(event.id),
-	// 			}
-	// 		} else {
-	// 			return {
-	// 				...result,
-	// 				clean: result.clean.set(event.id, event),
-	// 			}
-	// 		}
-	// 	}, {clean: MidiClipEvents(), toDelete: Set<Id>()})
+	const removeDuplicateEvents = useCallback(() => {
+		const {toDelete} = midiClip.events.reduce((result, event) => {
+			if (result.clean.some(c => c.note === event.note && c.startBeat === event.startBeat && c.duration === event.duration)) {
+				return {
+					...result,
+					toDelete: result.toDelete.add(event.id),
+				}
+			} else {
+				return {
+					...result,
+					clean: result.clean.set(event.id, event),
+				}
+			}
+		}, {clean: SeqEvents(), toDelete: Set<Id>()})
 
-	// 	dispatch(betterSequencerActions.deleteEvents(id, toDelete))
-	// }, [dispatch, id, midiClip.events])
+		// TODO
+		// dispatch(betterSequencerActions.deleteEvents(id, toDelete))
+	}, [dispatch, midiClip.events])
 
 	// Wheel events
 	// useLayoutEffect(() => {
@@ -650,7 +655,7 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 				>
 					<BetterRows {...{noteHeight, rows}} />
 					<BetterColumns {...{columnWidth, lengthBeats, timeSelect}} />
-					{/* <BetterNotes
+					<BetterNotes
 						{...{
 							noteHeight,
 							columnWidth,
@@ -668,7 +673,7 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 							clientMousePositionToPercentages,
 							removeDuplicateEvents,
 						}}
-					/> */}
+					/>
 				</div>
 				{boxActive && <BoxSelect
 					origin={boxOrigin}

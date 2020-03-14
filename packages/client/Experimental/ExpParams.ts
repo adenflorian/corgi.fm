@@ -5,11 +5,12 @@ import {
 	defaultUnipolarCurveFunctions,
 } from '@corgifm/common/common-utils'
 import {ButtonSelectOption} from '../ButtonSelect/ButtonSelect'
-import {CorgiNumberChangedEvent, CorgiEnumChangedEvent, CorgiStringChangedEvent, CorgiObjectChangedEvent, ReadonlyCorgiNumberChangedEvent} from './CorgiEvents'
+import {CorgiNumberChangedEvent, CorgiEnumChangedEvent, CorgiStringChangedEvent, CorgiObjectChangedEvent, ReadonlyCorgiNumberChangedEvent, ReadonlyCorgiObjectChangedEvent} from './CorgiEvents'
 import {LabAudioParam, KelpieAudioNode} from './Nodes/PugAudioNode/Lab'
 import {ExpMidiClip, makeExpMidiClip} from '@corgifm/common/midi-types'
 import {CorgiNode} from './CorgiNode'
 import {nodeToNodeActions} from '@corgifm/common/server-constants'
+import {ExpMidiPatternState, makeExpMidiPatternState} from '@corgifm/common/redux'
 
 export interface ExpParam {
 	readonly id: Id
@@ -151,23 +152,26 @@ export interface MidiClipParamChange {
 	readonly newValue: ExpMidiClip
 }
 
-// export type ExpMidiPatternParams = ReadonlyMap<Id, ExpMidiPatternParam>
-// export class ExpMidiPatternParam {
-// 	public readonly value: CorgiObjectChangedEvent<ExpMidiPattern>
+export type ExpMidiPatternParams = ReadonlyMap<Id, ExpMidiPatternParam>
+export type ExpMidiPatternParamReadonly = ExpMidiPatternParam & {
+	value: ReadonlyCorgiObjectChangedEvent<ExpMidiPatternState>
+}
+export class ExpMidiPatternParam {
+	public readonly value: CorgiObjectChangedEvent<ExpMidiPatternState>
 
-// 	public constructor(
-// 		public readonly id: Id,
-// 		public readonly defaultValue: ExpMidiPattern = makeExpMidiPattern(),
-// 	) {
-// 		this.value = new CorgiObjectChangedEvent<ExpMidiPattern>(this.defaultValue)
-// 	}
-// }
+	public constructor(
+		public readonly id: Id,
+		public readonly defaultValue: ExpMidiPatternState = makeExpMidiPatternState({}),
+	) {
+		this.value = new CorgiObjectChangedEvent<ExpMidiPatternState>(this.defaultValue)
+	}
+}
 
-// export interface MidiClipParamChange {
-// 	readonly nodeId: Id
-// 	readonly paramId: Id
-// 	readonly newValue: ExpMidiPattern
-// }
+export interface ExpMidiPatternParamChange {
+	readonly nodeId: Id
+	readonly paramId: Id
+	readonly newValue: ExpMidiPatternState
+}
 
 export type ExpButtons = ReadonlyMap<Id, ExpButton>
 export class ExpButton {

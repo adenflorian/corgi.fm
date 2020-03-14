@@ -20,6 +20,12 @@ export interface SeqNoteEvent extends SeqEventBase {
 
 export type SeqEvents = Immutable.Map<Id, SeqEvent>
 
+
+
+export function SeqEvents(): SeqEvents {
+	return Immutable.Map<Id, SeqEvent>()
+}
+
 export type SeqReadEvent = SeqReadNoteOffEvent | SeqReadNoteOnEvent
 
 export interface SeqReadEventBase {

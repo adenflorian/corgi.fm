@@ -6,9 +6,10 @@ import {betterSequencerActions} from '@corgifm/common/redux'
 import {smallNoteHeight, tinyNoteHeight} from '@corgifm/common/BetterConstants'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {BetterNoteResizer} from './BetterNoteResizer'
+import {SeqEvent} from '@corgifm/common/SeqStuff'
 
 interface Props {
-	event: MidiClipEvent
+	event: SeqEvent
 	noteHeight: number
 	columnWidth: number
 	isSelected: boolean
@@ -65,7 +66,7 @@ export const BetterNote = React.memo(function _BetterNote({
 	const actualHeight = noteHeight - (tiny ? 0 : 2)
 	const useBorder = !tiny
 	const borderThickness = 2
-	const width = Math.max(1, event.durationBeats * columnWidth)
+	const width = Math.max(1, event.duration * columnWidth)
 
 	return (
 		<svg

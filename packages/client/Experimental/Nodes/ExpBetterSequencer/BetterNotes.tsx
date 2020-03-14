@@ -2,7 +2,7 @@ import React, {useState, useCallback, useLayoutEffect, Fragment} from 'react'
 import {useDispatch} from 'react-redux'
 import {Set} from 'immutable'
 import {MidiClip, MidiClipEvents, makeMidiClipEvent} from '@corgifm/common/midi-types'
-import {betterSequencerActions, sequencerActions} from '@corgifm/common/redux'
+import {betterSequencerActions, sequencerActions, ExpMidiPatternState} from '@corgifm/common/redux'
 import {smallestNoteLength} from '@corgifm/common/BetterConstants'
 import {sumPoints} from '@corgifm/common/common-utils'
 import {MIN_MIDI_NOTE_NUMBER_0, MAX_MIDI_NOTE_NUMBER_127} from '@corgifm/common/common-constants'
@@ -14,7 +14,7 @@ interface Props {
 	noteHeight: number
 	columnWidth: number
 	panPixels: Point
-	midiClip: MidiClip
+	midiClip: ExpMidiPatternState
 	selected: Set<Id>
 	setSelected: (newSelected: Set<Id>) => void
 	onNoteSelect: (eventId: Id, select: boolean, clear: boolean) => void
@@ -267,7 +267,7 @@ export const BetterNotes = React.memo(function _BetterNotes(props: Props) {
 interface ActualNotesProps {
 	noteHeight: number
 	columnWidth: number
-	midiClip: MidiClip
+	midiClip: ExpMidiPatternState
 	selected: Set<Id>
 	onNoteSelect: (eventId: Id, select: boolean, clear: boolean) => void
 	rows: string[]

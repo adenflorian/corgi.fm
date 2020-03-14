@@ -7,8 +7,8 @@ import {MidiRange} from '@corgifm/common/midi-types'
 import {midiActions, NoteNameSharps, NoteNameFlats} from '@corgifm/common/common-types'
 import {logger} from '../../client-logger'
 import {
-	ExpCustomNumberParam, ExpCustomNumberParams, ExpMidiClipParams,
-	ExpMidiClipParam, ExpButtons, ExpButton, ExpCustomNumberParamReadonly,
+	ExpCustomNumberParam, ExpCustomNumberParams,
+	ExpButtons, ExpButton, ExpCustomNumberParamReadonly, ExpMidiPatternParam, ExpMidiPatternParamReadonly,
 } from '../ExpParams'
 import {ExpMidiOutputPort} from '../ExpMidiPorts'
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
@@ -16,6 +16,7 @@ import {ExpPorts} from '../ExpPorts'
 import {ExpBetterSequencerNodeView} from './ExpBetterSequencerNodeView'
 import {SeqPatternView, SeqPattern, SeqEvent, SeqNoteEvent, seqPatternViewReader, SeqReadEvent, SeqSession, SeqSessionClip, seqSessionReader} from '@corgifm/common/SeqStuff'
 import {noteNameToMidi, midiNoteFromNoteName} from '@corgifm/common/common-samples-stuff'
+import {expMidiPatternsActions, makeExpMidiPatternState} from '@corgifm/common/redux'
 
 export class ExpBetterSequencerNode extends CorgiNode {
 	protected readonly _ports: ExpPorts
@@ -39,9 +40,13 @@ export class ExpBetterSequencerNode extends CorgiNode {
 	private _cursorBeats = 0
 	private _cursorSeconds = 0
 	private readonly _session: SeqSession
+	private readonly _midiPatternParam: ExpMidiPatternParam
+	public get midiPatternParam() {return this._midiPatternParam as ExpMidiPatternParamReadonly}
 
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
 		super(corgiNodeArgs, {name: 'Sequencer', color: CssColor.yellow})
+
+		const {dispatch} = this.singletonContext.getStore()!
 
 		const eventsA: readonly SeqNoteEvent[] = [
 			makeNoteEvent('D', 3, 0, 3),
@@ -253,6 +258,12 @@ export class ExpBetterSequencerNode extends CorgiNode {
 			sessionClips: Immutable.Set([sessionClipA, sessionClipB, sessionClipC]),
 			name: 'The Session',
 		}
+
+		const newPattern = makeExpMidiPatternState(patternA)
+
+		dispatch(expMidiPatternsActions.add(newPattern))
+
+		this._midiPatternParam = new ExpMidiPatternParam('main', newPattern)
 
 		this._midiOutputPort = new ExpMidiOutputPort('output', 'output', this)
 		this._ports = arrayToESIdKeyMap([this._midiOutputPort])
