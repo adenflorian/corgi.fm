@@ -1,12 +1,14 @@
 import React, {useRef, useLayoutEffect} from 'react'
 import {useDispatch} from 'react-redux'
 import {midiNoteToNoteNameFull} from '@corgifm/common/common-samples-stuff'
-import {MidiClipEvent} from '@corgifm/common/midi-types'
-import {betterSequencerActions} from '@corgifm/common/redux'
+import {expMidiPatternsActions} from '@corgifm/common/redux'
 import {smallNoteHeight, tinyNoteHeight} from '@corgifm/common/BetterConstants'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {BetterNoteResizer} from './BetterNoteResizer'
 import {SeqEvent} from '@corgifm/common/SeqStuff'
+import {useNodeContext} from '../../CorgiNode'
+import {ExpBetterSequencerNode} from '../ExpBetterSequencerNode'
+import {useObjectChangedEvent} from '../../hooks/useCorgiEvent'
 
 interface Props {
 	event: SeqEvent
@@ -28,38 +30,41 @@ export const BetterNote = React.memo(function _BetterNote({
 
 	const mainRef = useRef<SVGSVGElement>(null)
 
-	// useLayoutEffect(() => {
+	const nodeContext = useNodeContext() as ExpBetterSequencerNode
+	const expMidiPattern = useObjectChangedEvent(nodeContext.midiPatternParam.value)
 
-	// 	// TODO I don't think this ever gets called
-	// 	// It gets intercepted by the resizer
-	// 	const onMouseDown = (e: MouseEvent) => {
-	// 		if (e.button !== 0) return
-	// 		e.stopPropagation()
-	// 		if (e.shiftKey) {
-	// 			onNoteSelect(event.id, !isSelected, false)
-	// 		} else {
-	// 			onNoteSelect(event.id, true, true)
-	// 		}
-	// 	}
+	useLayoutEffect(() => {
 
-	// 	const onDoubleClick = (e: MouseEvent) => {
-	// 		e.preventDefault()
-	// 		e.stopPropagation()
-	// 		dispatch(betterSequencerActions.deleteEvents(id, [event.id]))
-	// 	}
+		// TODO I don't think this ever gets called
+		// It gets intercepted by the resizer
+		const onMouseDown = (e: MouseEvent) => {
+			if (e.button !== 0) return
+			e.stopPropagation()
+			if (e.shiftKey) {
+				onNoteSelect(event.id, !isSelected, false)
+			} else {
+				onNoteSelect(event.id, true, true)
+			}
+		}
 
-	// 	const noteElement = mainRef.current
+		const onDoubleClick = (e: MouseEvent) => {
+			e.preventDefault()
+			e.stopPropagation()
+			dispatch(expMidiPatternsActions.deleteEvents(expMidiPattern.id, [event.id]))
+		}
 
-	// 	if (noteElement === null) return
+		const noteElement = mainRef.current
 
-	// 	noteElement.addEventListener('dblclick', onDoubleClick)
-	// 	noteElement.addEventListener('mousedown', onMouseDown)
+		if (noteElement === null) return
 
-	// 	return () => {
-	// 		noteElement.removeEventListener('dblclick', onDoubleClick)
-	// 		noteElement.removeEventListener('mousedown', onMouseDown)
-	// 	}
-	// }, [onNoteSelect, event.id, isSelected, id, dispatch])
+		noteElement.addEventListener('dblclick', onDoubleClick)
+		noteElement.addEventListener('mousedown', onMouseDown)
+
+		return () => {
+			noteElement.removeEventListener('dblclick', onDoubleClick)
+			noteElement.removeEventListener('mousedown', onMouseDown)
+		}
+	}, [onNoteSelect, event.id, isSelected, expMidiPattern.id, dispatch])
 
 	const tiny = noteHeight <= tinyNoteHeight
 	const small = noteHeight <= smallNoteHeight
