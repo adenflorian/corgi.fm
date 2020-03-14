@@ -1,6 +1,8 @@
 import React, {Fragment, useContext, useLayoutEffect} from 'react'
 import * as immutable from 'immutable'
-import {ExpNodeState, IExpConnection, ExpGraph, ExpMidiPatternState} from '@corgifm/common/redux'
+import {ExpNodeState, IExpConnection, ExpGraph, ExpMidiPatternState,
+	ExpReferenceTargetType, ExpReferenceParamState,
+	ExpMidiPatternsState} from '@corgifm/common/redux'
 import {ParamInputCentering} from '@corgifm/common/common-types'
 import {NodeToNodeAction} from '@corgifm/common/server-constants'
 import {assertUnreachable} from '@corgifm/common/common-utils'
@@ -13,7 +15,8 @@ import {
 	ExpMidiConnection, isMidiConnection, ExpPolyphonicConnection,
 	isPolyphonicConnection,
 } from './ExpConnections'
-import {NumberParamChange, EnumParamChange, StringParamChange} from './ExpParams'
+import {NumberParamChange, EnumParamChange, StringParamChange,
+	ExpReferenceParamChange} from './ExpParams'
 import {
 	isAudioOutputPort, isAudioInputPort, ExpPortType,
 	isAudioParamInputPort, ExpPort,
@@ -203,7 +206,37 @@ export class NodeManager {
 		node.onCustomStringParamChange(paramChange.paramId, paramChange.newValue)
 	}
 
-	public readonly loadMainGraph = (mainGraph: ExpGraph) => {
+	public readonly onReferenceParamChange = (paramChange: ExpReferenceParamChange) => {
+		const {nodeId, paramId, newValue: {targetId, targetType}} = paramChange
+		const node = this._mainGraph.nodes.get(nodeId)
+
+		if (!node) return logger.warn('[onReferenceParamChange] 404 node not found: ', {nodeId, paramChange})
+
+		const target = this._getReferenceTarget(targetType, targetId) as undefined | CorgiObjectChangedEvent<IdObject>
+
+		if (!target) return logger.warn('[onReferenceParamChange] 404 target not found: ', {targetId, targetType, paramChange})
+
+		node.onReferenceParamChange(paramId, target)
+	}
+
+	private readonly _loadReferenceParam = (node: CorgiNode, paramId: Id, paramChange: ExpReferenceParamState) => {
+		const {targetType, targetId} = paramChange
+		const target = this._getReferenceTarget(targetType, targetId) as undefined | CorgiObjectChangedEvent<IdObject>
+
+		if (!target) return logger.warn('[loadReferenceParam] 404 target not found: ', {targetId, targetType, paramChange})
+
+		node.onReferenceParamChange(paramId, target)
+	}
+
+	private readonly _getReferenceTarget = (type: ExpReferenceTargetType, id: Id) => {
+		switch (type) {
+			case 'midiPattern': return this._midiPatterns.get(id)
+			default: throw new Error('hello there')
+		}
+	}
+
+	public readonly loadMainGraph = (mainGraph: ExpGraph, patterns: ExpMidiPatternsState) => {
+		patterns.forEach(this.patternUpdated)
 		this.addNodes(mainGraph.nodes)
 		this.addConnections(mainGraph.connections.connections)
 	}
@@ -238,6 +271,7 @@ export class NodeManager {
 		nodeState.customNumberParams.forEach((newValue, paramId) => node.onCustomNumberParamChange(paramId, newValue))
 		nodeState.customEnumParams.forEach((newValue, paramId) => node.onCustomEnumParamChange(paramId, newValue))
 		nodeState.customStringParams.forEach((newValue, paramId) => node.onCustomStringParamChange(paramId, newValue))
+		nodeState.referenceParams.forEach((newValue, paramId) => this._loadReferenceParam(node, paramId, newValue))
 		node.setEnabled(nodeState.enabled)
 	}
 

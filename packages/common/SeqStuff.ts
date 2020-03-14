@@ -1,6 +1,9 @@
 import * as Immutable from 'immutable'
 import {MidiRange} from '@corgifm/common/midi-types'
 import {logger} from './logger'
+import {NoteNameSharps, NoteNameFlats} from './common-types'
+import {midiNoteFromNoteName} from './common-samples-stuff'
+import uuid = require('uuid')
 
 export type SeqEvent = SeqNoteEvent
 
@@ -16,6 +19,30 @@ export interface SeqNoteEvent extends SeqEventBase {
 	readonly duration: number
 	readonly velocity: number
 	readonly note: number
+}
+
+export function makeNoteEvent(noteName: NoteNameSharps | NoteNameFlats, octave: Octave, startBeat: number, duration: number): SeqNoteEvent {
+	return {
+		id: uuid.v4(),
+		active: true,
+		startBeat,
+		type: 'note',
+		duration,
+		velocity: 1,
+		note: midiNoteFromNoteName(noteName, octave),
+	}
+}
+
+export function makeNoteEvent2(note: number, startBeat: number, duration: number): SeqNoteEvent {
+	return {
+		id: uuid.v4(),
+		active: true,
+		startBeat,
+		type: 'note',
+		duration,
+		velocity: 1,
+		note,
+	}
 }
 
 export type SeqEvents = Immutable.Map<Id, SeqEvent>

@@ -1,27 +1,26 @@
 import React from 'react'
-import * as uuid from 'uuid'
-import * as Immutable from 'immutable'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {arrayToESIdKeyMap} from '@corgifm/common/common-utils'
 import {MidiRange} from '@corgifm/common/midi-types'
-import {midiActions, NoteNameSharps, NoteNameFlats} from '@corgifm/common/common-types'
-import {logger} from '../../client-logger'
+import {midiActions} from '@corgifm/common/common-types'
 import {
 	ExpCustomNumberParam, ExpCustomNumberParams,
-	ExpButtons, ExpButton, ExpCustomNumberParamReadonly, ExpMidiPatternParam, ExpMidiPatternParamReadonly,
+	ExpButtons, ExpButton, ExpCustomNumberParamReadonly,
+	ExpReferenceParam, ExpReferenceParamReadonly, ExpReferenceParams,
 } from '../ExpParams'
 import {ExpMidiOutputPort} from '../ExpMidiPorts'
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 import {ExpPorts} from '../ExpPorts'
 import {ExpBetterSequencerNodeView} from './ExpBetterSequencerNodeView'
-import {SeqPatternView, SeqPattern, SeqEvent, SeqNoteEvent, seqPatternViewReader, SeqReadEvent, SeqSession, SeqSessionClip, seqSessionReader} from '@corgifm/common/SeqStuff'
-import {noteNameToMidi, midiNoteFromNoteName} from '@corgifm/common/common-samples-stuff'
-import {expMidiPatternsActions, makeExpMidiPatternState} from '@corgifm/common/redux'
+import {SeqReadEvent, seqPatternReader} from '@corgifm/common/SeqStuff'
+import {makeExpMidiPatternState, ExpMidiPatternStateRaw} from '@corgifm/common/redux'
 import {minZoomX, maxZoomX, maxZoomY, minZoomY, maxPan, minPan} from '@corgifm/common/BetterConstants'
+import {expBetterSequencerMainPatternParamId} from '@corgifm/common/common-constants'
 
 export class ExpBetterSequencerNode extends CorgiNode {
 	protected readonly _ports: ExpPorts
 	protected readonly _customNumberParams: ExpCustomNumberParams
+	protected readonly _referenceParams: ExpReferenceParams
 	protected readonly _buttons: ExpButtons
 	private readonly _restartButton: ExpButton
 	private readonly _tempo: ExpCustomNumberParam
@@ -40,231 +39,15 @@ export class ExpBetterSequencerNode extends CorgiNode {
 	private _songStartTimeSeconds = -1
 	private _cursorBeats = 0
 	private _cursorSeconds = 0
-	private readonly _session: SeqSession
-	private readonly _midiPatternParam: ExpMidiPatternParam
-	public get midiPatternParam() {return this._midiPatternParam as ExpMidiPatternParamReadonly}
+	private readonly _midiPatternParam: ExpReferenceParam<ExpMidiPatternStateRaw>
+	public get midiPatternParam() {return this._midiPatternParam as ExpReferenceParamReadonly<ExpMidiPatternStateRaw>}
 
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
 		super(corgiNodeArgs, {name: 'Sequencer', color: CssColor.yellow})
 
-		const {dispatch} = this.singletonContext.getStore()!
-
-		const eventsA: readonly SeqNoteEvent[] = [
-			makeNoteEvent('D', 3, 0, 3),
-			makeNoteEvent('E', 3, 3, 3),
-			makeNoteEvent('F', 3, 6, 3),
-			makeNoteEvent('E', 3, 9, 3),
-
-			makeNoteEvent('Bb', 3, 12, 3),
-			makeNoteEvent('F', 3, 15, 3),
-			makeNoteEvent('Bb', 3, 18, 3),
-			makeNoteEvent('A', 3, 21, 3),
-
-			makeNoteEvent('D', 3, 24, 3),
-			makeNoteEvent('E', 3, 27, 3),
-			makeNoteEvent('F', 3, 30, 3),
-			makeNoteEvent('E', 3, 33, 3),
-
-			makeNoteEvent('Bb', 3, 36, 3),
-			makeNoteEvent('A', 3, 39, 3),
-
-			makeNoteEvent('D', 3, 42, 3),
-			makeNoteEvent('E', 3, 45, 3),
-			makeNoteEvent('F', 3, 48, 3),
-			makeNoteEvent('E', 3, 51, 3),
-
-			makeNoteEvent('D', 3, 54, 3),
-			makeNoteEvent('E', 3, 57, 3),
-			makeNoteEvent('F', 3, 60, 3),
-			makeNoteEvent('E', 3, 63, 3),
-		]
-
-		const eventsB: readonly SeqNoteEvent[] = [
-			makeNoteEvent('A', 4, 1, 1),
-			makeNoteEvent('A', 4, 2, 1),
-			makeNoteEvent('B', 4, 4, 2),
-			makeNoteEvent('C', 5, 7, 1),
-			makeNoteEvent('C', 5, 8, 1),
-			makeNoteEvent('B', 4, 10, 2),
-
-			makeNoteEvent('A', 4, 13, 1),
-			makeNoteEvent('A', 4, 14, 1),
-			makeNoteEvent('A', 4, 16, 2),
-			makeNoteEvent('A', 4, 19, 1),
-			makeNoteEvent('A', 4, 20, 1),
-			makeNoteEvent('A', 4, 22, 2),
-
-			makeNoteEvent('A', 4, 25, 1),
-			makeNoteEvent('A', 4, 26, 1),
-			makeNoteEvent('B', 4, 28, 2),
-			makeNoteEvent('C', 5, 31, 1),
-			makeNoteEvent('C', 5, 32, 1),
-			makeNoteEvent('B', 4, 34, 2),
-
-			makeNoteEvent('A', 4, 37, 1),
-			makeNoteEvent('A', 4, 38, 1),
-			makeNoteEvent('A', 4, 40, 2),
-
-			makeNoteEvent('A', 4, 43, 1),
-			makeNoteEvent('A', 4, 44, 1),
-			makeNoteEvent('B', 4, 46, 2),
-			makeNoteEvent('C', 5, 49, 1),
-			makeNoteEvent('C', 5, 50, 1),
-			makeNoteEvent('B', 4, 52, 2),
-
-			makeNoteEvent('A', 4, 55, 1),
-			makeNoteEvent('A', 4, 56, 1),
-			makeNoteEvent('B', 4, 58, 2),
-			makeNoteEvent('C', 5, 61, 1),
-			makeNoteEvent('C', 5, 62, 1),
-			makeNoteEvent('B', 4, 64, 2),
-		]
-
-
-
-		const eventsC: readonly SeqNoteEvent[] = [
-			makeNoteEvent('D', 5, 0, 0.5),
-			makeNoteEvent('F', 5, 0.5, 0.5),
-			makeNoteEvent('D', 6, 1, 2),
-			makeNoteEvent('D', 5, 3, 0.5),
-			makeNoteEvent('F', 5, 3.5, 0.5),
-			makeNoteEvent('D', 6, 4, 2),
-
-			makeNoteEvent('E', 6, 6, 1.5),
-			makeNoteEvent('F', 6, 7.5, 0.5),
-			makeNoteEvent('E', 6, 8, 0.5),
-			makeNoteEvent('F', 6, 8.5, 0.5),
-			makeNoteEvent('E', 6, 9, 0.5),
-			makeNoteEvent('C', 6, 9.5, 0.5),
-			makeNoteEvent('A', 5, 10, 2),
-
-			makeNoteEvent('A', 5, 12, 1),
-			makeNoteEvent('D', 5, 13, 1),
-			makeNoteEvent('F', 5, 14, 0.5),
-			makeNoteEvent('G', 5, 14.5, 0.5),
-			makeNoteEvent('A', 5, 15, 3),
-
-			makeNoteEvent('A', 5, 18, 1),
-			makeNoteEvent('D', 5, 19, 1),
-			makeNoteEvent('F', 5, 20, 0.5),
-			makeNoteEvent('G', 5, 20.5, 0.5),
-			makeNoteEvent('E', 5, 21, 3),
-			
-
-			makeNoteEvent('D', 5, 24, 0.5),
-			makeNoteEvent('F', 5, 24.5, 0.5),
-			makeNoteEvent('D', 6, 25, 2),
-			makeNoteEvent('D', 5, 27, 0.5),
-			makeNoteEvent('F', 5, 27.5, 0.5),
-			makeNoteEvent('D', 6, 28, 2),
-
-			makeNoteEvent('E', 6, 30, 1.5),
-			makeNoteEvent('F', 6, 31.5, 0.5),
-			makeNoteEvent('E', 6, 32, 0.5),
-			makeNoteEvent('F', 6, 32.5, 0.5),
-			makeNoteEvent('E', 6, 33, 0.5),
-			makeNoteEvent('C', 6, 33.5, 0.5),
-			makeNoteEvent('A', 5, 34, 2),
-
-			makeNoteEvent('A', 5, 36, 1),
-			makeNoteEvent('D', 5, 37, 1),
-			makeNoteEvent('F', 5, 38, 0.5),
-			makeNoteEvent('G', 5, 38.5, 0.5),
-			makeNoteEvent('A', 5, 39, 3),
-
-			makeNoteEvent('A', 5, 41, 1),
-			makeNoteEvent('D', 5, 42, 3),
-		]
-
-		const patternA = {
-			id: uuid.v4(),
-			events: Immutable.Map<Id, SeqEvent>(arrayToESIdKeyMap(eventsA)),
-			name: 'Pattern A',
-		}
-
-		const patternB = {
-			id: uuid.v4(),
-			events: Immutable.Map<Id, SeqEvent>(arrayToESIdKeyMap(eventsB)),
-			name: 'Pattern B',
-		}
-
-		const patternC = {
-			id: uuid.v4(),
-			events: Immutable.Map<Id, SeqEvent>(arrayToESIdKeyMap(eventsC)),
-			name: 'Pattern C',
-		}
-
-		const patternViewA = {
-			id: uuid.v4(),
-			startBeat: 0,
-			endBeat: 66,
-			loopStartBeat: 0,
-			loopEndBeat: 66,
-			pattern: patternA,
-			name: 'Pattern View A',
-		}
-
-		const patternViewB = {
-			id: uuid.v4(),
-			startBeat: 0,
-			endBeat: 66,
-			loopStartBeat: 0,
-			loopEndBeat: 66,
-			pattern: patternB,
-			name: 'Pattern View B',
-		}
-
-		const patternViewC = {
-			id: uuid.v4(),
-			startBeat: 0,
-			endBeat: 66,
-			loopStartBeat: 0,
-			loopEndBeat: 66,
-			pattern: patternC,
-			name: 'Pattern View C',
-		}
-
-		const sessionClipA: SeqSessionClip = {
-			id: uuid.v4(),
-			active: true,
-			channelId: uuid.v4(),
-			sceneId: uuid.v4(),
-			launchMode: 'trigger',
-			patternView: patternViewA,
-			name: 'Session Clip A',
-		}
-
-		const sessionClipB: SeqSessionClip = {
-			id: uuid.v4(),
-			active: true,
-			channelId: uuid.v4(),
-			sceneId: uuid.v4(),
-			launchMode: 'trigger',
-			patternView: patternViewB,
-			name: 'Session Clip B',
-		}
-
-		const sessionClipC: SeqSessionClip = {
-			id: uuid.v4(),
-			active: true,
-			channelId: uuid.v4(),
-			sceneId: uuid.v4(),
-			launchMode: 'trigger',
-			patternView: patternViewC,
-			name: 'Session Clip C',
-		}
-
-		this._session = {
-			id: uuid.v4(),
-			sessionClips: Immutable.Set([sessionClipA, sessionClipB, sessionClipC]),
-			name: 'The Session',
-		}
-
-		const newPattern = makeExpMidiPatternState(patternA)
-
-		dispatch(expMidiPatternsActions.add(newPattern))
-
-		this._midiPatternParam = new ExpMidiPatternParam('main', newPattern)
+		this._midiPatternParam = new ExpReferenceParam(
+			expBetterSequencerMainPatternParamId, makeExpMidiPatternState({}) as ExpMidiPatternStateRaw)
+		this._referenceParams = arrayToESIdKeyMap([this._midiPatternParam] as unknown as ExpReferenceParam[])
 
 		this._midiOutputPort = new ExpMidiOutputPort('output', 'output', this)
 		this._ports = arrayToESIdKeyMap([this._midiOutputPort])
@@ -338,7 +121,8 @@ export class ExpBetterSequencerNode extends CorgiNode {
 
 		const readRangeBeats = new MidiRange(readFromBeat, beatsToRead)
 
-		const events = seqSessionReader(readRangeBeats, this._session)
+		const events = seqPatternReader(readRangeBeats, this._midiPatternParam.value.current)
+		// const events = seqSessionReader(readRangeBeats, this._session)
 
 		if (events.length > 0) {
 			const sortedEvents = events.slice().sort(sortEventByType).sort(sortEventByOffset)
@@ -370,16 +154,4 @@ function sortEventByType(a: SeqReadEvent, b: SeqReadEvent): number {
 
 function sortEventByOffset(a: SeqReadEvent, b: SeqReadEvent): number {
 	return a.offsetBeats - b.offsetBeats
-}
-
-function makeNoteEvent(noteName: NoteNameSharps | NoteNameFlats, octave: Octave, startBeat: number, duration: number): SeqNoteEvent {
-	return {
-		id: uuid.v4(),
-		active: true,
-		startBeat,
-		type: 'note',
-		duration,
-		velocity: 1,
-		note: midiNoteFromNoteName(noteName, octave),
-	}
 }

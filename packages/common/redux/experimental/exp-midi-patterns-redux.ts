@@ -54,9 +54,9 @@ export type ExpMidiPatternsAction = ActionType<typeof expMidiPatternsActions>
 
 const defaultExpMidiPatternState = {
 	id: 'dummyId' as Id,
-	name: 'dummyOwnerId',
+	name: 'dummyOwnerId' as string,
 	events: Map<Id, SeqEvent>() as SeqEvents,
-}
+} as const
 
 const _makeExpMidiPatternState = Record(defaultExpMidiPatternState)
 
@@ -84,6 +84,8 @@ export function makeExpMidiPatternEvents(
 }
 
 export interface ExpMidiPatternState extends ReturnType<typeof _makeExpMidiPatternState> {}
+
+export type ExpMidiPatternStateRaw = typeof defaultExpMidiPatternState
 
 const initialState = Map<Id, ExpMidiPatternState>()
 

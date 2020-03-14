@@ -22,9 +22,11 @@ import {
 	defaultExpNodeRecord, isGroupInOutNode, GroupType,
 	selectExpConnectionsWithTargetIds,
 	selectExpConnectionsWithSourceIds, selectExpAllPositions,
-	ActivityAction, ExpMidiPatternsAction, ExpMidiPatternViewsAction, selectExpMidiPattern, selectActivityType,
+	ActivityAction, ExpMidiPatternsAction, ExpMidiPatternViewsAction,
+	selectExpMidiPattern, selectActivityType, makeExpMidiPatternState,
+	expMidiPatternsActions, selectExpMidiPatternsState,
 } from '@corgifm/common/redux'
-import {serverClientId, GroupId} from '@corgifm/common/common-constants'
+import {serverClientId, GroupId, expBetterSequencerMainPatternParamId} from '@corgifm/common/common-constants'
 import {createNodeId, arrayToESIdKeyMap} from '@corgifm/common/common-utils'
 import {SingletonContextImpl} from '../SingletonContext'
 import {logger} from '../client-logger'
@@ -32,6 +34,7 @@ import {handleStopDraggingExpGhostConnector} from '../exp-dragging-connections'
 import {mouseFromScreenToBoard, simpleGlobalClientState} from '../SimpleGlobalClientState'
 import {NodeManager} from './NodeManager'
 import {RoomType} from '@corgifm/common/common-types'
+import {patternA} from '@corgifm/common/default-midi'
 
 type ExpMiddlewareActions = ExpNodesAction | ExpConnectionAction
 	| ExpLocalAction | RoomsReduxAction | ExpPositionAction
@@ -295,6 +298,18 @@ function after(
 			return cloneExpNodes(dispatch, afterState, selectedExpNodes, action.withConnections)
 		}
 
+		case 'EXP_NODE_ADD': {
+			if (!(action as unknown as BroadcastAction).alreadyBroadcasted) {
+				if (action.newNode.type === 'betterSequencer') {
+					const newPattern = makeExpMidiPatternState(patternA())
+
+					dispatch(expMidiPatternsActions.add(newPattern))
+					dispatch(expNodesActions.referenceParamChange(
+						action.newNode.id, expBetterSequencerMainPatternParamId, {targetId: newPattern.id, targetType: 'midiPattern'}))
+				}
+			}
+			return
+		}
 		default: return
 	}
 }
@@ -541,7 +556,8 @@ function bar(
 		// Graphs
 		case 'ACTIVITY_REPLACE':
 			if (action.activityState.activityType === RoomType.Experimental) {
-				return nodeManager.loadMainGraph(selectMainExpGraph(state.room))
+				return nodeManager.loadMainGraph(
+					selectMainExpGraph(state.room), selectExpMidiPatternsState(state.room))
 			} else {
 				return
 			}
@@ -558,6 +574,9 @@ function bar(
 
 		case 'EXP_NODE_CUSTOM_STRING_PARAM_CHANGE':
 			return nodeManager.onCustomStringParamChange(action)
+
+		case 'EXP_NODE_REFERENCE_PARAM_CHANGE':
+			return nodeManager.onReferenceParamChange(action)
 
 		case 'EXP_NODE_SET_ENABLED':
 			return nodeManager.enableNode(action.nodeId, action.enabled)

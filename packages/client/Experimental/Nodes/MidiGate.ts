@@ -35,7 +35,6 @@ export class MidiGateNode extends CorgiNode {
 	public render = () => this.getDebugView()
 
 	protected readonly _enable = () => {
-		console.log('_enable: ', this._gateMode.onChange.current)
 		if (this._gateMode.onChange.current === 'allow') {
 			this._gain.gain.onMakeVoice = gain => gain.setTargetAtTime(1, 0, 0.005)
 		} else {
@@ -56,11 +55,9 @@ export class MidiGateNode extends CorgiNode {
 
 		if (midiAction.type === 'MIDI_GATE') {
 			if (midiAction.gate) {
-				console.log(('on'))
 				// TODO This value won't get saved in redux
 				this._gateMode.onChange.invokeImmediately('allow')
 			} else {
-				console.log(('off'))
 				this._gateMode.onChange.invokeImmediately('block')
 			}
 		}

@@ -1,5 +1,5 @@
 import React, {
-	useCallback, useState, useEffect, useRef, useLayoutEffect, Fragment,
+	useCallback, useState, useEffect, useRef, useLayoutEffect, Fragment, useMemo,
 } from 'react'
 import {useSelector, useDispatch} from 'react-redux'
 import {OrderedMap, Set} from 'immutable'
@@ -12,12 +12,14 @@ import {
 	localActions,
 	globalClockActions,
 	expNodesActions,
+	expMidiPatternsActions,
+	makeSequencerEvents,
 } from '@corgifm/common/redux'
 import {
 	Key, MAX_MIDI_NOTE_NUMBER_127, MIN_MIDI_NOTE_NUMBER_0,
 } from '@corgifm/common/common-constants'
 import {clamp} from '@corgifm/common/common-utils'
-import {MidiClipEvent, makeMidiClipEvent, MidiClipEvents} from '@corgifm/common/midi-types'
+import {MidiClipEvent, makeMidiClipEvent, MidiClipEvents, makeExpMidiEvents, makeExpMidiNoteEvent} from '@corgifm/common/midi-types'
 import {midiNoteToNoteNameFull} from '@corgifm/common/common-samples-stuff'
 import {
 	minPan, maxPan, minZoomX, maxZoomX, minZoomY,
@@ -44,7 +46,7 @@ import {BetterSideNotes} from './BetterSideNotes'
 import {useNodeContext} from '../../CorgiNode'
 import {ExpBetterSequencerNode} from '../ExpBetterSequencerNode'
 import {useNumberChangedEvent, useObjectChangedEvent} from '../../hooks/useCorgiEvent'
-import {SeqEvents} from '@corgifm/common/SeqStuff'
+import {SeqEvents, makeNoteEvent, makeNoteEvent2} from '@corgifm/common/SeqStuff'
 
 const mouseWheelYSensitivity = 0.001
 const mouseWheelPanXSensitivity = 0.001
@@ -60,9 +62,6 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 	// const rate = useSelector(createBetterSeqRateSelector(id))
 	// const zoom = useSelector(createBetterSeqZoomSelector(id))
 	// const pan = useSelector(createBetterSeqPanSelector(id))
-	// const midiClip = useSelector(createBetterSeqMidiClipSelector(id))
-	// const lengthBeats = midiClip.length
-	const lengthBeats = 4
 	// const x = useSelector(createPositionXSelector(id))
 	// const y = useSelector(createPositionYSelector(id))
 	// const height = useSelector(createPositionHeightSelector(id))
@@ -83,6 +82,8 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 
 	const midiClip = useObjectChangedEvent(nodeContext.midiPatternParam.value)
 
+
+	const lengthBeats = useMemo(() => midiClip.events.map(x => x.startBeat + x.duration).max() || 4, [midiClip.events])
 
 	const zoom = {x: zoomX, y: zoomY}
 	const pan = {x: panX, y: panY}
@@ -212,44 +213,41 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 	// 	}
 	// }, [dispatch, id, pan, zoom])
 
-	// // Double click events
-	// useEffect(() => {
-	// 	const editorElementNotNull = editorElement.current
+	// Double click events
+	useEffect(() => {
+		const editorElementNotNull = editorElement.current
 
-	// 	if (editorElementNotNull === null) return
+		if (editorElementNotNull === null) return
 
-	// 	const onDoubleClick = (e: MouseEvent) => {
-	// 		e.preventDefault()
-	// 		e.stopPropagation()
+		const onDoubleClick = (e: MouseEvent) => {
+			e.preventDefault()
+			e.stopPropagation()
 
-	// 		const bar = editorOffsetSpaceToPercentages({x: e.offsetX, y: e.offsetY}, scaledWidthUnclamped, scaledHeight)
+			const bar = editorOffsetSpaceToPercentages({x: e.offsetX, y: e.offsetY}, scaledWidthUnclamped, scaledHeight)
 
-	// 		const newDuration = 1
-	// 		const note = clamp((rows.length - 1) - Math.floor(bar.y * rows.length), MIN_MIDI_NOTE_NUMBER_0, MAX_MIDI_NOTE_NUMBER_127)
-	// 		const startBeat = clamp(Math.floor(bar.x * lengthBeats), 0, lengthBeats - newDuration)
+			const newDuration = 1
+			const note = clamp((rows.length - 1) - Math.floor(bar.y * rows.length), MIN_MIDI_NOTE_NUMBER_0, MAX_MIDI_NOTE_NUMBER_127)
+			const startBeat = clamp(Math.floor(bar.x * lengthBeats), 0, lengthBeats - newDuration)
 
-	// 		const newEvent = makeMidiClipEvent({
-	// 			durationBeats: newDuration,
-	// 			startBeat,
-	// 			note,
-	// 		})
+			const newEvent = makeNoteEvent2(note, startBeat, newDuration)
 
-	// 		dispatch(betterSequencerActions.addEvent(id, newEvent))
-	// 		dispatch(localActions.playShortNote(id, Set([note])))
-	// 		setSelected(Set(newEvent.id))
-	// 		removeDuplicateEvents()
-	// 	}
+			dispatch(expMidiPatternsActions.addEvent(midiClip.id, newEvent))
+			// TODO
+			// dispatch(localActions.playShortNote(id, Set([note])))
+			setSelected(Set(newEvent.id))
+			removeDuplicateEvents()
+		}
 
-	// 	if (editorElementNotNull) {
-	// 		editorElementNotNull.addEventListener('dblclick', onDoubleClick)
-	// 	}
+		if (editorElementNotNull) {
+			editorElementNotNull.addEventListener('dblclick', onDoubleClick)
+		}
 
-	// 	return () => {
-	// 		if (editorElementNotNull) {
-	// 			editorElementNotNull.removeEventListener('dblclick', onDoubleClick)
-	// 		}
-	// 	}
-	// }, [dispatch, id, lengthBeats, removeDuplicateEvents, scaledHeight, scaledWidthUnclamped])
+		return () => {
+			if (editorElementNotNull) {
+				editorElementNotNull.removeEventListener('dblclick', onDoubleClick)
+			}
+		}
+	}, [dispatch, lengthBeats, removeDuplicateEvents, scaledHeight, scaledWidthUnclamped])
 
 	// // Box Select
 	// useLayoutEffect(() => {

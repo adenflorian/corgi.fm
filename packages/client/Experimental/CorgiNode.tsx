@@ -11,10 +11,10 @@ import {
 } from './ExpPorts'
 import {
 	ExpAudioParams, ExpCustomNumberParams, ExpCustomEnumParams,
-	ExpCustomStringParams, ExpButtons,
+	ExpCustomStringParams, ExpButtons, ExpReferenceParams,
 } from './ExpParams'
 import {CorgiNodeView} from './CorgiNodeView'
-import {CorgiStringChangedEvent, CorgiNumberChangedEvent} from './CorgiEvents'
+import {CorgiStringChangedEvent, CorgiNumberChangedEvent, CorgiObjectChangedEvent} from './CorgiEvents'
 import {isMidiOutputPort} from './ExpMidiPorts'
 import {isPolyphonicOutputPort} from './ExpPolyphonicPorts'
 import {LabCorgiAnalyserSPNode} from './CorgiAnalyserSPN'
@@ -65,6 +65,7 @@ export abstract class CorgiNode {
 	protected readonly _customNumberParams: ExpCustomNumberParams = new Map()
 	protected readonly _customEnumParams: ExpCustomEnumParams = new Map()
 	protected readonly _customStringParams: ExpCustomStringParams = new Map()
+	protected readonly _referenceParams: ExpReferenceParams = new Map()
 	protected readonly _buttons: ExpButtons = new Map()
 	protected _enabled = true
 	public readonly onNameChange: CorgiStringChangedEvent
@@ -178,6 +179,14 @@ export abstract class CorgiNode {
 		customStringParam.value.invokeImmediately(newValue)
 	}
 
+	public onReferenceParamChange(paramId: Id, newTarget: CorgiObjectChangedEvent<IdObject>) {
+		const referenceParam = this._referenceParams.get(paramId)
+
+		if (!referenceParam) return logger.warn('[onReferenceParamChange] 404 referenceParam not found: ', {paramId, nodeId: this.id, newTarget})
+
+		referenceParam.newTarget(newTarget)
+	}
+
 	public getPort(id: Id): ExpPort | undefined {
 		return this._ports.get(id)
 	}
@@ -193,6 +202,7 @@ export abstract class CorgiNode {
 				customNumberParams={this._customNumberParams}
 				customEnumParams={this._customEnumParams}
 				customStringParams={this._customStringParams}
+				referenceParams={this._referenceParams}
 				buttons={this._buttons}
 				ports={this._ports}
 				beforeChildren={beforeChildren}
@@ -216,6 +226,7 @@ export abstract class CorgiNode {
 
 	public dispose() {
 		this._dispose()
+		this._referenceParams.forEach(x => x.dispose())
 	}
 
 	protected abstract _dispose(): void

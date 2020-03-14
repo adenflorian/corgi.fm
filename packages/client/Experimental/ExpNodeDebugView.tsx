@@ -8,7 +8,7 @@ import {
 import {ExpNodeDebugAudioParamKnob} from './ExpNodeDebugAudioParamKnob'
 import {
 	ExpAudioParams, ExpCustomNumberParams, AudioParamContext,
-	ExpCustomEnumParams, ExpCustomStringParams, ExpButtons,
+	ExpCustomEnumParams, ExpCustomStringParams, ExpButtons, ExpReferenceParams,
 } from './ExpParams'
 import {ExpNodeDebugCustomNumberParamKnob} from './ExpNodeDebugCustomNumberParamKnob'
 import {useNodeContext} from './CorgiNode'
@@ -18,12 +18,14 @@ import {ExpNodeDebugCustomStringParamField} from './ExpNodeDebugCustomStringPara
 import {CssColor} from '@corgifm/common/shamu-color'
 import {ExpOscilloscopeNodeExtra} from './Nodes/ExpOscilloscopeNodeView'
 import {ExpNodeDebugButton} from './ExpNodeDebugButton'
+import {ExpNodeDebugReferenceParamField} from './ExpNodeDebugReferenceParamField'
 
 interface Props {
 	audioParams: ExpAudioParams
 	customNumberParams: ExpCustomNumberParams
 	customEnumParams: ExpCustomEnumParams
 	customStringParams: ExpCustomStringParams
+	referenceParams: ExpReferenceParams
 	buttons: ExpButtons
 	ports: ExpPorts
 	children: React.ReactNode
@@ -32,7 +34,7 @@ interface Props {
 
 export const ExpNodeDebugView = hot(module)(React.memo(function _ExpNodeDebugView({
 	audioParams, customNumberParams, children, beforeChildren,
-	ports, customEnumParams, customStringParams, buttons,
+	ports, customEnumParams, customStringParams, referenceParams, buttons,
 }: Props) {
 	const nodeContext = useNodeContext()
 	// const nodeName = useStringChangedEvent(nodeContext.onNameChange)
@@ -108,6 +110,15 @@ export const ExpNodeDebugView = hot(module)(React.memo(function _ExpNodeDebugVie
 								key={id as string}
 								nodeId={nodeId}
 								customStringParam={customStringParam}
+							/>
+						))}
+					</div>}
+					{referenceParams.size > 0 && <div className="stringParams">
+						{[...referenceParams].map(([id, referenceParam]) => (
+							<ExpNodeDebugReferenceParamField
+								key={id as string}
+								nodeId={nodeId}
+								referenceParam={referenceParam}
 							/>
 						))}
 					</div>}

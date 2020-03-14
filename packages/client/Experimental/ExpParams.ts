@@ -5,12 +5,14 @@ import {
 	defaultUnipolarCurveFunctions,
 } from '@corgifm/common/common-utils'
 import {ButtonSelectOption} from '../ButtonSelect/ButtonSelect'
-import {CorgiNumberChangedEvent, CorgiEnumChangedEvent, CorgiStringChangedEvent, CorgiObjectChangedEvent, ReadonlyCorgiNumberChangedEvent, ReadonlyCorgiObjectChangedEvent} from './CorgiEvents'
+import {CorgiNumberChangedEvent, CorgiEnumChangedEvent, CorgiStringChangedEvent,
+	CorgiObjectChangedEvent, ReadonlyCorgiNumberChangedEvent,
+	ReadonlyCorgiObjectChangedEvent} from './CorgiEvents'
 import {LabAudioParam, KelpieAudioNode} from './Nodes/PugAudioNode/Lab'
 import {ExpMidiClip, makeExpMidiClip} from '@corgifm/common/midi-types'
 import {CorgiNode} from './CorgiNode'
 import {nodeToNodeActions} from '@corgifm/common/server-constants'
-import {ExpMidiPatternState, makeExpMidiPatternState} from '@corgifm/common/redux'
+import {ExpMidiPatternState, ExpReferenceParamState} from '@corgifm/common/redux'
 
 export interface ExpParam {
 	readonly id: Id
@@ -152,25 +154,40 @@ export interface MidiClipParamChange {
 	readonly newValue: ExpMidiClip
 }
 
-export type ExpMidiPatternParams = ReadonlyMap<Id, ExpMidiPatternParam>
-export type ExpMidiPatternParamReadonly = ExpMidiPatternParam & {
+export type ExpReferenceParams = ReadonlyMap<Id, ExpReferenceParam>
+export type ExpReferenceParamReadonly<T extends IdObject> = ExpReferenceParam<T> & {
 	value: ReadonlyCorgiObjectChangedEvent<ExpMidiPatternState>
 }
-export class ExpMidiPatternParam {
-	public readonly value: CorgiObjectChangedEvent<ExpMidiPatternState>
+export class ExpReferenceParam<T extends IdObject = IdObject> {
+	public readonly value: CorgiObjectChangedEvent<T>
+	private _target?: CorgiObjectChangedEvent<T>
 
 	public constructor(
 		public readonly id: Id,
-		public readonly defaultValue: ExpMidiPatternState = makeExpMidiPatternState({}),
+		public readonly defaultValue: T,
 	) {
-		this.value = new CorgiObjectChangedEvent<ExpMidiPatternState>(this.defaultValue)
+		this.value = new CorgiObjectChangedEvent<T>(this.defaultValue)
+	}
+
+	public readonly newTarget = (newTarget: CorgiObjectChangedEvent<T>) => {
+		if (this._target) this._target.unsubscribe(this._onTargetUpdated)
+		this._target = newTarget
+		this._target.subscribe(this._onTargetUpdated)
+	}
+
+	private readonly _onTargetUpdated = (updatedTarget: T) => {
+		this.value.invokeImmediately(updatedTarget)
+	}
+
+	public readonly dispose = () => {
+		if (this._target) this._target.unsubscribe(this._onTargetUpdated)
 	}
 }
 
-export interface ExpMidiPatternParamChange {
+export interface ExpReferenceParamChange {
 	readonly nodeId: Id
 	readonly paramId: Id
-	readonly newValue: ExpMidiPatternState
+	readonly newValue: ExpReferenceParamState
 }
 
 export type ExpButtons = ReadonlyMap<Id, ExpButton>

@@ -28,3 +28,7 @@ type Octave = number
 type RequiredField<T, K extends keyof T> = {
 	[P in K]-?: T[P]
 } & T
+
+interface IdObject {
+	readonly id: Id
+}
