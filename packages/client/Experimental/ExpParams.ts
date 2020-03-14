@@ -115,7 +115,6 @@ export interface EnumParamChange {
 	readonly newValue: string
 }
 
-
 export type ExpCustomStringParams = ReadonlyMap<Id, ExpCustomStringParam>
 export class ExpCustomStringParam {
 	public readonly value: CorgiStringChangedEvent
@@ -133,7 +132,6 @@ export interface StringParamChange {
 	readonly paramId: Id
 	readonly newValue: string
 }
-
 
 export type ExpMidiClipParams = ReadonlyMap<Id, ExpMidiClipParam>
 export class ExpMidiClipParam {
@@ -153,6 +151,23 @@ export interface MidiClipParamChange {
 	readonly newValue: ExpMidiClip
 }
 
+// export type ExpMidiPatternParams = ReadonlyMap<Id, ExpMidiPatternParam>
+// export class ExpMidiPatternParam {
+// 	public readonly value: CorgiObjectChangedEvent<ExpMidiPattern>
+
+// 	public constructor(
+// 		public readonly id: Id,
+// 		public readonly defaultValue: ExpMidiPattern = makeExpMidiPattern(),
+// 	) {
+// 		this.value = new CorgiObjectChangedEvent<ExpMidiPattern>(this.defaultValue)
+// 	}
+// }
+
+// export interface MidiClipParamChange {
+// 	readonly nodeId: Id
+// 	readonly paramId: Id
+// 	readonly newValue: ExpMidiPattern
+// }
 
 export type ExpButtons = ReadonlyMap<Id, ExpButton>
 export class ExpButton {

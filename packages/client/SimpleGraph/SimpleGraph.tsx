@@ -4,7 +4,7 @@ import {
 } from '@corgifm/common/redux'
 import {useSelector} from 'react-redux'
 import {mainBoardsId} from '../client-constants'
-import {ConnectedConnections} from '../Connections/Connections'
+import {Connections} from '../Connections/Connections'
 import {ConnectedConnectorPlaceholders} from '../Connections/ConnectorPlaceholders'
 import {ConnectedGhostConnectionsView} from '../Connections/GhostConnections'
 import {ConnectedMousePointers} from '../MousePointers/MousePointers'
@@ -25,7 +25,7 @@ export const ConnectedSimpleGraph = function _ConnectedSimpleGraph() {
 			<ConnectedZoom>
 				<div id={mainBoardsId} className="boards">
 					<ConnectedMousePointers />
-					<ConnectedConnections />
+					<Connections />
 					<ConnectedGhostConnectionsView />
 					<PositionsStuff />
 				</div>

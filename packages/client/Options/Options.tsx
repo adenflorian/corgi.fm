@@ -68,6 +68,10 @@ export const OptionsModalContent: ModalContent = () => {
 						label="graphics: enable fancy connections"
 					/>
 					<ConnectedOption
+						option={AppOptions.enableWireShadows}
+						label="graphics: enable wire shadows"
+					/>
+					<ConnectedOption
 						option={AppOptions.graphicsMultiColoredConnections}
 						label="graphics: enable multi colored connections"
 					/>

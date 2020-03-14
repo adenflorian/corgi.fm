@@ -2,7 +2,7 @@ import React from 'react'
 import {useSelector} from 'react-redux'
 import {hot} from 'react-hot-loader'
 import {
-	IClientAppState, selectExpNodesState, selectExpAllConnections,
+	IClientAppState, selectExpNodesState, selectExpAllConnections, selectOption, AppOptions,
 } from '@corgifm/common/redux'
 import {useSingletonContext} from '../SingletonContext'
 import {logger} from '../client-logger'
@@ -23,6 +23,8 @@ export const NodeManagerRoot = hot(module)(React.memo(() => {
 
 	const connections = useSelector((state: IClientAppState) => selectExpAllConnections(state.room))
 
+	const enableWireShadows = useSelector((state: IClientAppState) => selectOption(state, AppOptions.enableWireShadows))
+
 	if (!nodeManager) {
 		logger.error('missing nodeManager in NodeManagerRoot!')
 		return null
@@ -34,7 +36,7 @@ export const NodeManagerRoot = hot(module)(React.memo(() => {
 				return nodeManager.renderNodeId(nodeId)
 			}).toList()}
 			{/* Render connections after some the connectors render on top of nodes */}
-			<div className="debugViewConnections">
+			<div className={`debugViewConnections enableWireShadows-${enableWireShadows}`}>
 				{connections.filter(x => x.groupId === currentGroupId).map(connection =>
 					<ConnectedExpConnectionView key={connection.id} id={connection.id} />
 				).toList()}

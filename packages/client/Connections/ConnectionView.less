@@ -1,5 +1,15 @@
 @longLineStrokeWidth: 2px;
 
+
+
+.enableWireShadows-false {
+    .connection {
+        svg {
+            filter: none;
+        }
+    }
+}
+
 .connection {
     svg {
         position: absolute;
@@ -140,6 +150,7 @@ path.animatedLongLine {
 // These causes big bad hidden perf issues
 .debugViewConnections, .viewMode-debug {
     .connection {
+
         .longLine {
             // z-index: @lineZ;
         }
