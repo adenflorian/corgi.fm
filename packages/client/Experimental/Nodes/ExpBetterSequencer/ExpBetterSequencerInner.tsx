@@ -43,8 +43,9 @@ import {
 import {BetterSideNotes} from './BetterSideNotes'
 import {useNodeContext} from '../../CorgiNode'
 import {ExpBetterSequencerNode} from '../ExpBetterSequencerNode'
-import {useNumberChangedEvent, useObjectChangedEvent} from '../../hooks/useCorgiEvent'
-import {SeqEvents, makeNoteEvent, makeNoteEvent2} from '@corgifm/common/SeqStuff'
+import {useNumberChangedEvent, useObjectChangedEvent, useStringChangedEvent} from '../../hooks/useCorgiEvent'
+import {SeqEvents, makeNoteEvent, makeNoteEvent2, duplicateNoteEvent, SeqEvent} from '@corgifm/common/SeqStuff'
+import {node} from 'prop-types'
 
 const mouseWheelYSensitivity = 0.001
 const mouseWheelPanXSensitivity = 0.001
@@ -70,10 +71,10 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 	const panY = useNumberChangedEvent(nodeContext.panY.onChange)
 
 
-	const midiClip = useObjectChangedEvent(nodeContext.midiPatternParam.value)
+	const expMidiPattern = useObjectChangedEvent(nodeContext.midiPatternParam.value)
 
 
-	const lengthBeats = useMemo(() => midiClip.events.map(x => x.startBeat + x.duration).max() || 4, [midiClip.events])
+	const lengthBeats = useMemo(() => expMidiPattern.events.map(x => x.startBeat + x.duration).max() || 4, [expMidiPattern.events])
 
 	const zoom = {x: zoomX, y: zoomY}
 	const pan = {x: panX, y: panY}
@@ -128,7 +129,7 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 	}, [scaledHeight, maxPanX, maxPanY, panPixels, fixedWidth, x, y])
 
 	const removeDuplicateEvents = useCallback(() => {
-		const {toDelete} = midiClip.events.reduce((result, event) => {
+		const {toDelete} = expMidiPattern.events.reduce((result, event) => {
 			if (result.clean.some(c => c.note === event.note && c.startBeat === event.startBeat && c.duration === event.duration)) {
 				return {
 					...result,
@@ -142,8 +143,8 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 			}
 		}, {clean: SeqEvents(), toDelete: Set<Id>()})
 
-		dispatch(expMidiPatternsActions.deleteEvents(nodeContext.id, toDelete))
-	}, [dispatch, midiClip.events, nodeContext.id])
+		dispatch(expMidiPatternsActions.deleteEvents(expMidiPattern.id, toDelete))
+	}, [dispatch, expMidiPattern.events, expMidiPattern.id])
 
 	// Wheel events
 	useLayoutEffect(() => {
@@ -216,7 +217,7 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 
 			const newEvent = makeNoteEvent2(note, startBeat, newDuration)
 
-			dispatch(expMidiPatternsActions.addEvent(midiClip.id, newEvent))
+			dispatch(expMidiPatternsActions.addEvent(expMidiPattern.id, newEvent))
 			// TODO
 			// dispatch(localActions.playShortNote(id, Set([note])))
 			setSelected(Set(newEvent.id))
@@ -232,153 +233,158 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 				editorElementNotNull.removeEventListener('dblclick', onDoubleClick)
 			}
 		}
-	}, [dispatch, lengthBeats, removeDuplicateEvents, scaledHeight, scaledWidthUnclamped])
+	}, [dispatch, lengthBeats, removeDuplicateEvents, scaledHeight, scaledWidthUnclamped, expMidiPattern.id])
 
 	// // Box Select
-	// useLayoutEffect(() => {
-	// 	const onMouseDown = (e: MouseEvent) => {
-	// 		if (e.button !== 0 || (e.ctrlKey && e.altKey)) return
-	// 		const editorSpace = clientSpaceToEditorSpace(
-	// 			{x: e.clientX, y: e.clientY}, {x, y})
-	// 		setBoxOrigin(editorSpace)
-	// 		setOtherCorner(editorSpace)
-	// 		if (e.shiftKey) {
-	// 			setOriginalSelected(selected)
-	// 		} else {
-	// 			setOriginalSelected(Set())
-	// 			clearSelected()
-	// 		}
-	// 		activateBox()
-	// 	}
+	useLayoutEffect(() => {
+		const onMouseDown = (e: MouseEvent) => {
+			if (e.button !== 0 || (e.ctrlKey && e.altKey)) return
+			const editorSpace = clientSpaceToEditorSpace(
+				{x: e.clientX, y: e.clientY}, {x, y})
+			setBoxOrigin(editorSpace)
+			setOtherCorner(editorSpace)
+			if (e.shiftKey) {
+				setOriginalSelected(selected)
+			} else {
+				setOriginalSelected(Set())
+				clearSelected()
+			}
+			activateBox()
+		}
 
-	// 	const onMouseUp = (e: MouseEvent) => {
-	// 		if (e.button !== 0) return
-	// 		if (boxActive) {
-	// 			deactivateBox()
-	// 			selectNotes(undefined, e.shiftKey, e)
-	// 		}
-	// 	}
+		const onMouseUp = (e: MouseEvent) => {
+			if (e.button !== 0) return
+			if (boxActive) {
+				deactivateBox()
+				selectNotes(undefined, e.shiftKey, e)
+			}
+		}
 
-	// 	const onMouseMove = (e: MouseEvent) => {
-	// 		if (e.buttons !== 1) return deactivateBox()
-	// 		const editorSpace = clientSpaceToEditorSpace(
-	// 			{x: e.clientX, y: e.clientY}, {x, y})
-	// 		const clamped = {
-	// 			x: clamp(editorSpace.x, 0, width),
-	// 			y: clamp(editorSpace.y, 0, height),
-	// 		}
-	// 		setOtherCorner(clamped)
-	// 		selectNotes(clamped, e.shiftKey, e)
-	// 	}
+		const onMouseMove = (e: MouseEvent) => {
+			if (e.buttons !== 1) return deactivateBox()
+			const editorSpace = clientSpaceToEditorSpace(
+				{x: e.clientX, y: e.clientY}, {x, y})
+			const clamped = {
+				x: clamp(editorSpace.x, 0, width),
+				y: clamp(editorSpace.y, 0, height),
+			}
+			setOtherCorner(clamped)
+			selectNotes(clamped, e.shiftKey, e)
+		}
 
-	// 	function selectNotes(otherCorner2 = otherCorner, preserve = false, e: MouseEvent) {
-	// 		const originPercentages = editorSpaceToPercentages(boxOrigin, panPixels, maxPanX, maxPanY, fixedWidth, scaledHeight)
-	// 		const otherCornerPercentages = editorSpaceToPercentages(otherCorner2, panPixels, maxPanX, maxPanY, fixedWidth, scaledHeight)
-	// 		const box = {
-	// 			top: (rows.length - 1) - Math.floor(Math.min(originPercentages.y, otherCornerPercentages.y) * rows.length),
-	// 			bottom: (rows.length - 1) - Math.floor(Math.max(originPercentages.y, otherCornerPercentages.y) * rows.length),
-	// 			left: Math.min(originPercentages.x, otherCornerPercentages.x) * lengthBeats,
-	// 			right: Math.max(originPercentages.x, otherCornerPercentages.x) * lengthBeats,
-	// 		}
+		function selectNotes(otherCorner2 = otherCorner, preserve = false, e: MouseEvent) {
+			const originPercentages = editorSpaceToPercentages(boxOrigin, panPixels, maxPanX, maxPanY, fixedWidth, scaledHeight)
+			const otherCornerPercentages = editorSpaceToPercentages(otherCorner2, panPixels, maxPanX, maxPanY, fixedWidth, scaledHeight)
+			const box = {
+				top: (rows.length - 1) - Math.floor(Math.min(originPercentages.y, otherCornerPercentages.y) * rows.length),
+				bottom: (rows.length - 1) - Math.floor(Math.max(originPercentages.y, otherCornerPercentages.y) * rows.length),
+				left: Math.min(originPercentages.x, otherCornerPercentages.x) * lengthBeats,
+				right: Math.max(originPercentages.x, otherCornerPercentages.x) * lengthBeats,
+			}
 
-	// 		const insideBox = midiClip.events.filter(
-	// 			z => z.note <= box.top &&
-	// 				z.note >= box.bottom &&
-	// 				(z.startBeat + z.durationBeats) >= box.left &&
-	// 				z.startBeat <= box.right
-	// 		).keySeq().toSet()
+			const insideBox = expMidiPattern.events.filter(
+				z => z.note <= box.top &&
+					z.note >= box.bottom &&
+					(z.startBeat + z.duration) >= box.left &&
+					z.startBeat <= box.right
+			).keySeq().toSet()
 
-	// 		const toFlip = preserve
-	// 			? insideBox.filter(i => originalSelected.has(i))
-	// 			: Set()
+			const toFlip = preserve
+				? insideBox.filter(i => originalSelected.has(i))
+				: Set()
 
-	// 		setSelected(
-	// 			insideBox
-	// 				.concat(preserve ? originalSelected : [])
-	// 				.filter(i => !toFlip.has(i))
-	// 		)
+			setSelected(
+				insideBox
+					.concat(preserve ? originalSelected : [])
+					.filter(i => !toFlip.has(i))
+			)
 
-	// 		setTimeSelect({
-	// 			start: clamp(e.altKey ? box.left : Math.round(box.left), 0, midiClip.length),
-	// 			duration: box.right - box.left,
-	// 		})
-	// 	}
+			setTimeSelect({
+				start: clamp(e.altKey ? box.left : Math.round(box.left), 0, 4 /* // TODO midiClip.length*/),
+				duration: box.right - box.left,
+			})
+		}
 
-	// 	const editorElementNotNull = editorElement.current
+		const editorElementNotNull = editorElement.current
 
-	// 	if (editorElementNotNull === null) return
+		if (editorElementNotNull === null) return
 
-	// 	editorElementNotNull.addEventListener('mousedown', onMouseDown)
+		editorElementNotNull.addEventListener('mousedown', onMouseDown)
 
-	// 	if (boxActive) {
-	// 		window.addEventListener('mousemove', onMouseMove)
-	// 	}
+		if (boxActive) {
+			window.addEventListener('mousemove', onMouseMove)
+		}
 
-	// 	window.addEventListener('mouseup', onMouseUp)
+		window.addEventListener('mouseup', onMouseUp)
 
-	// 	return () => {
-	// 		if (editorElementNotNull) {
-	// 			editorElementNotNull.removeEventListener('mousedown', onMouseDown)
-	// 			window.removeEventListener('mousemove', onMouseMove)
-	// 		}
-	// 		window.removeEventListener('mouseup', onMouseUp)
-	// 	}
-	// }, [activateBox, boxActive, boxOrigin, deactivateBox, height, lengthBeats, maxPanX, maxPanY, midiClip.events, otherCorner, panPixels, width, x, y, selected, originalSelected, midiClip.length, scaledHeight, clearSelected])
+		return () => {
+			if (editorElementNotNull) {
+				editorElementNotNull.removeEventListener('mousedown', onMouseDown)
+				window.removeEventListener('mousemove', onMouseMove)
+			}
+			window.removeEventListener('mouseup', onMouseUp)
+		}
+	}, [activateBox, boxActive, boxOrigin, deactivateBox, height, lengthBeats,
+		maxPanX, maxPanY, expMidiPattern.events, otherCorner, panPixels, width,
+		x, y, selected, originalSelected, scaledHeight, clearSelected])
 
-	// // Middle mouse pan
-	// useLayoutEffect(() => {
-	// 	const onMouseDown = (e: MouseEvent) => {
-	// 		if (e.button === 0 && e.ctrlKey && e.altKey) {
-	// 			activateMiddleMouse()
-	// 		}
-	// 	}
+	// Middle mouse pan
+	useLayoutEffect(() => {
+		const onMouseDown = (e: MouseEvent) => {
+			if (e.button === 0 && e.ctrlKey && e.altKey) {
+				activateMiddleMouse()
+			}
+		}
 
-	// 	const onMouseUp = (e: MouseEvent) => {
-	// 		if (e.button === 0 && e.ctrlKey && e.altKey) {
-	// 			deactivateMiddleMouse()
-	// 		}
-	// 	}
+		const onMouseUp = (e: MouseEvent) => {
+			if (e.button === 0 && e.ctrlKey && e.altKey) {
+				deactivateMiddleMouse()
+			}
+		}
 
-	// 	const onMouseMove = (e: MouseEvent) => {
-	// 		if (e.buttons !== 1 || !e.ctrlKey || !e.altKey) return deactivateMiddleMouse()
+		const onMouseMove = (e: MouseEvent) => {
+			if (e.buttons !== 1 || !e.ctrlKey || !e.altKey) return deactivateMiddleMouse()
 
-	// 		const zoomedMovement = makeMouseMovementAccountForGlobalZoom(
-	// 			{x: e.movementX, y: e.movementY})
+			const zoomedMovement = makeMouseMovementAccountForGlobalZoom(
+				{x: e.movementX, y: e.movementY})
 
-	// 		dispatch(sequencerActions.setPan(id, {
-	// 			x: zoom.x === 1
-	// 				? pan.x
-	// 				: clamp(
-	// 					pan.x + ((-zoomedMovement.x) * (1 / (fixedWidth * (zoom.x - 1)))),
-	// 					minPan, maxPan),
-	// 			y: zoom.y === 1
-	// 				? pan.y
-	// 				: clamp(
-	// 					pan.y + -zoomedMovement.y / maxPanY,
-	// 					minPan, maxPan),
-	// 		}))
-	// 	}
+			dispatch(expNodesActions.customNumberParamChange(nodeContext.id, nodeContext.panX.id,
+				zoom.x === 1
+					? pan.x
+					: clamp(
+						pan.x + ((-zoomedMovement.x) * (1 / (fixedWidth * (zoom.x - 1)))),
+						minPan, maxPan)
+			))
 
-	// 	const editorElementNotNull = editorElement.current
+			dispatch(expNodesActions.customNumberParamChange(nodeContext.id, nodeContext.panY.id,
+				zoom.y === 1
+					? pan.y
+					: clamp(
+						pan.y + -zoomedMovement.y / maxPanY,
+						minPan, maxPan)
+			))
+		}
 
-	// 	if (editorElementNotNull === null) return
+		const editorElementNotNull = editorElement.current
 
-	// 	editorElementNotNull.addEventListener('mousedown', onMouseDown)
+		if (editorElementNotNull === null) return
 
-	// 	if (middleMouseActive) {
-	// 		window.addEventListener('mousemove', onMouseMove)
-	// 	}
+		editorElementNotNull.addEventListener('mousedown', onMouseDown)
 
-	// 	window.addEventListener('mouseup', onMouseUp)
+		if (middleMouseActive) {
+			window.addEventListener('mousemove', onMouseMove)
+		}
 
-	// 	return () => {
-	// 		if (editorElementNotNull) {
-	// 			editorElementNotNull.removeEventListener('mousedown', onMouseDown)
-	// 			window.removeEventListener('mousemove', onMouseMove)
-	// 		}
-	// 		window.removeEventListener('mouseup', onMouseUp)
-	// 	}
-	// }, [activateMiddleMouse, deactivateMiddleMouse, dispatch, id, maxPanY, middleMouseActive, pan, zoom])
+		window.addEventListener('mouseup', onMouseUp)
+
+		return () => {
+			if (editorElementNotNull) {
+				editorElementNotNull.removeEventListener('mousedown', onMouseDown)
+				window.removeEventListener('mousemove', onMouseMove)
+			}
+			window.removeEventListener('mouseup', onMouseUp)
+		}
+	}, [activateMiddleMouse, deactivateMiddleMouse, dispatch, nodeContext.id, maxPanY, middleMouseActive, pan, zoom])
 
 	// Left Zoom Pan Bar
 	const onLeftZoomPanBarMouseDown = useCallback((e: React.MouseEvent) => {
@@ -447,174 +453,176 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 	const columnWidth = (fixedWidth * zoom.x) / lengthBeats
 
 	const selectAll = useCallback(() => {
-		setSelected(midiClip.events.keySeq().toSet())
-	}, [setSelected, midiClip.events])
+		setSelected(expMidiPattern.events.keySeq().toSet())
+	}, [setSelected, expMidiPattern.events])
 
-	// const duplicateNotes = useCallback(() => {
-	// 	const eventsToCopy = midiClip.events
-	// 		.filter(event => selected.has(event.id))
+	const duplicateNotes = useCallback(() => {
+		const eventsToCopy = expMidiPattern.events
+			.filter(event => selected.has(event.id))
 
-	// 	const smallX = eventsToCopy.map(e => e.startBeat).min() || 0
-	// 	const bigX = eventsToCopy.map(e => e.startBeat + e.durationBeats).max() || 0
-	// 	const diff = bigX - smallX
+		const smallX = eventsToCopy.map(e => e.startBeat).min() || 0
+		const bigX = eventsToCopy.map(e => e.startBeat + e.duration).max() || 0
+		const diff = bigX - smallX
 
-	// 	if (diff === 0) return
+		if (diff === 0) return
 
-	// 	const newEvents = eventsToCopy
-	// 		.reduce((result, event) => {
-	// 			const newEvent = makeMidiClipEvent({
-	// 				...event,
-	// 				startBeat: event.startBeat + diff,
-	// 			})
-	// 			return result.set(newEvent.id, newEvent)
-	// 		}, MidiClipEvents())
-	// 	dispatch(betterSequencerActions.addEvents(id, newEvents))
-	// 	setSelected(newEvents.keySeq().toSet())
-	// }, [midiClip.events, dispatch, id, selected])
+		const newEvents = eventsToCopy
+			.reduce((result, event) => {
+				const newEvent = duplicateNoteEvent({
+					...event,
+					startBeat: event.startBeat + diff,
+				})
+				return result.set(newEvent.id, newEvent)
+			}, SeqEvents())
+		dispatch(expMidiPatternsActions.addEvents(expMidiPattern.id, newEvents))
+		setSelected(newEvents.keySeq().toSet())
+	}, [expMidiPattern.events, dispatch, nodeContext.id, selected, expMidiPattern.id])
 
-	// const deleteSelected = useCallback(() => {
-	// 	dispatch(betterSequencerActions.deleteEvents(id, selected))
-	// 	setSelected(Set())
-	// }, [dispatch, id, selected, setSelected])
+	const deleteSelected = useCallback(() => {
+		dispatch(expMidiPatternsActions.deleteEvents(expMidiPattern.id, selected))
+		setSelected(Set())
+	}, [dispatch, selected, setSelected, expMidiPattern.id])
 
-	// const moveNotesVertically = useCallback((direction: 1 | -1, shift: boolean) => {
-	// 	const updatedEvents = selected.reduce((events, eventId) => {
-	// 		const originalEvent = midiClip.events.get(eventId, null)
+	const moveNotesVertically = useCallback((direction: 1 | -1, shift: boolean) => {
+		const updatedEvents = selected.reduce((events, eventId) => {
+			const originalEvent = expMidiPattern.events.get(eventId, null)
 
-	// 		if (originalEvent === null) {
-	// 			logger.warn('[moveNotesVertically] originalEvent === null')
-	// 			return events
-	// 		}
+			if (originalEvent === null) {
+				logger.warn('[moveNotesVertically] originalEvent === null')
+				return events
+			}
 
-	// 		const delta = (shift ? 12 : 1) * direction
+			const delta = (shift ? 12 : 1) * direction
 
-	// 		return events.set(eventId, {
-	// 			...originalEvent,
-	// 			note: Math.max(MIN_MIDI_NOTE_NUMBER_0, Math.min(MAX_MIDI_NOTE_NUMBER_127, originalEvent.note + delta)),
-	// 		})
-	// 	}, MidiClipEvents())
+			return events.set(eventId, {
+				...originalEvent,
+				note: Math.max(MIN_MIDI_NOTE_NUMBER_0, Math.min(MAX_MIDI_NOTE_NUMBER_127, originalEvent.note + delta)),
+			})
+		}, SeqEvents())
 
-	// 	dispatch(betterSequencerActions.updateEvents(id, updatedEvents))
-	// 	dispatch(localActions.playShortNote(id, updatedEvents.map(eventToNote).toSet()))
-	// }, [dispatch, id, selected, midiClip.events])
+		dispatch(expMidiPatternsActions.updateEvents(expMidiPattern.id, updatedEvents))
+		// TODO
+		// dispatch(localActions.playShortNote(id, updatedEvents.map(eventToNote).toSet()))
+	}, [dispatch, expMidiPattern.id, selected, expMidiPattern.events])
 
-	// const moveNotesHorizontally = useCallback((direction: 1 | -1, alt: boolean) => {
-	// 	dispatch(betterSequencerActions.updateEvents(id, selected.reduce((events, eventId) => {
-	// 		const originalEvent = midiClip.events.get(eventId, null)
+	const moveNotesHorizontally = useCallback((direction: 1 | -1, alt: boolean) => {
+		dispatch(expMidiPatternsActions.updateEvents(expMidiPattern.id, selected.reduce((events, eventId) => {
+			const originalEvent = expMidiPattern.events.get(eventId, null)
 
-	// 		if (originalEvent === null) {
-	// 			logger.warn('[moveNotesHorizontally] originalEvent === null')
-	// 			return events
-	// 		}
+			if (originalEvent === null) {
+				logger.warn('[moveNotesHorizontally] originalEvent === null')
+				return events
+			}
 
-	// 		const delta = (alt ? smallestNoteLength : 1) * direction
+			const delta = (alt ? smallestNoteLength : 1) * direction
 
-	// 		return events.set(eventId, {
-	// 			...originalEvent,
-	// 			startBeat: Math.max(0, Math.min(lengthBeats - 1, originalEvent.startBeat + delta)),
-	// 		})
-	// 	}, MidiClipEvents())))
-	// }, [dispatch, id, selected, midiClip.events, lengthBeats])
+			return events.set(eventId, {
+				...originalEvent,
+				startBeat: Math.max(0, Math.min(lengthBeats - 1, originalEvent.startBeat + delta)),
+			})
+		}, SeqEvents())))
+	}, [dispatch, expMidiPattern.id, selected, expMidiPattern.events, lengthBeats])
 
-	// const resizeNotes = useCallback((direction: 1 | -1, alt: boolean) => {
-	// 	dispatch(betterSequencerActions.updateEvents(id, selected.reduce((events, eventId) => {
-	// 		const originalEvent = midiClip.events.get(eventId, null)
+	const resizeNotes = useCallback((direction: 1 | -1, alt: boolean) => {
+		dispatch(expMidiPatternsActions.updateEvents(expMidiPattern.id, selected.reduce((events, eventId) => {
+			const originalEvent = expMidiPattern.events.get(eventId, null)
 
-	// 		if (originalEvent === null) {
-	// 			logger.warn('[resizeNotes] originalEvent === null')
-	// 			return events
-	// 		}
+			if (originalEvent === null) {
+				logger.warn('[resizeNotes] originalEvent === null')
+				return events
+			}
 
-	// 		const delta = (alt ? smallestNoteLength : 1) * direction
+			const delta = (alt ? smallestNoteLength : 1) * direction
 
-	// 		if (direction === 1 && originalEvent.durationBeats === smallestNoteLength && !alt) {
-	// 			return events.set(eventId, {
-	// 				...originalEvent,
-	// 				durationBeats: 1,
-	// 			})
-	// 		} else {
-	// 			return events.set(eventId, {
-	// 				...originalEvent,
-	// 				durationBeats: Math.max(smallestNoteLength, Math.min(8, originalEvent.durationBeats + delta)),
-	// 			})
-	// 		}
-	// 	}, OrderedMap<Id, MidiClipEvent>())))
-	// }, [dispatch, id, selected, midiClip.events])
+			if (direction === 1 && originalEvent.duration === smallestNoteLength && !alt) {
+				return events.set(eventId, {
+					...originalEvent,
+					duration: 1,
+				})
+			} else {
+				return events.set(eventId, {
+					...originalEvent,
+					duration: Math.max(smallestNoteLength, Math.min(8, originalEvent.duration + delta)),
+				})
+			}
+		}, SeqEvents())))
+	}, [dispatch, expMidiPattern.id, selected, expMidiPattern.events])
 
-	// const onKeyDown = useCallback((e: KeyboardEvent) => {
+	const onKeyDown = useCallback((e: KeyboardEvent) => {
 
-	// 	if (e.ctrlKey && e.key === ' ') {
-	// 		dispatch(globalClockActions.restart(timeSelect.start * rate))
-	// 	}
+		if (e.ctrlKey && e.key === ' ') {
+			dispatch(globalClockActions.restart(timeSelect.start * rate))
+		}
 
-	// 	if (e.ctrlKey && e.key === Key.a) {
-	// 		return selectAll()
-	// 	}
+		if (e.ctrlKey && e.key === Key.a) {
+			return selectAll()
+		}
 
-	// 	if (e.ctrlKey && e.key === Key.d) {
-	// 		// Prevent the whole node from getting duplicated
-	// 		e.stopPropagation()
-	// 		// Prevent bookmark from being created
-	// 		e.preventDefault()
-	// 		return duplicateNotes()
-	// 	}
+		if (e.ctrlKey && e.key === Key.d) {
+			// Prevent the whole node from getting duplicated
+			e.stopPropagation()
+			// Prevent bookmark from being created
+			e.preventDefault()
+			return duplicateNotes()
+		}
 
-	// 	if (e.key === Key.Delete || e.key === Key.Backspace) {
-	// 		if (selected.count() === 0) return
-	// 		return deleteSelected()
-	// 	}
+		if (e.key === Key.Delete || e.key === Key.Backspace) {
+			if (selected.count() === 0) return
+			return deleteSelected()
+		}
 
-	// 	if (e.key === Key.ArrowUp) {
-	// 		e.preventDefault()
-	// 		if (selected.count() === 0) return
-	// 		return moveNotesVertically(1, e.shiftKey)
-	// 	}
+		if (e.key === Key.ArrowUp) {
+			e.preventDefault()
+			if (selected.count() === 0) return
+			return moveNotesVertically(1, e.shiftKey)
+		}
 
-	// 	if (e.key === Key.ArrowDown) {
-	// 		e.preventDefault()
-	// 		if (selected.count() === 0) return
-	// 		return moveNotesVertically(-1, e.shiftKey)
-	// 	}
+		if (e.key === Key.ArrowDown) {
+			e.preventDefault()
+			if (selected.count() === 0) return
+			return moveNotesVertically(-1, e.shiftKey)
+		}
 
-	// 	if (e.key === Key.ArrowRight) {
-	// 		e.preventDefault()
-	// 		if (selected.count() === 0) return
+		if (e.key === Key.ArrowRight) {
+			e.preventDefault()
+			if (selected.count() === 0) return
 
-	// 		if (e.shiftKey) {
-	// 			resizeNotes(1, e.altKey)
-	// 		} else {
-	// 			moveNotesHorizontally(1, e.altKey)
-	// 		}
-	// 		return
-	// 	}
+			if (e.shiftKey) {
+				resizeNotes(1, e.altKey)
+			} else {
+				moveNotesHorizontally(1, e.altKey)
+			}
+			return
+		}
 
-	// 	if (e.key === Key.ArrowLeft) {
-	// 		e.preventDefault()
-	// 		if (selected.count() === 0) return
+		if (e.key === Key.ArrowLeft) {
+			e.preventDefault()
+			if (selected.count() === 0) return
 
-	// 		if (e.shiftKey) {
-	// 			resizeNotes(-1, e.altKey)
-	// 		} else {
-	// 			moveNotesHorizontally(-1, e.altKey)
-	// 		}
-	// 		return
-	// 	}
-	// }, [dispatch, timeSelect.start, rate, selectAll, duplicateNotes, selected, deleteSelected, moveNotesVertically, resizeNotes, moveNotesHorizontally])
+			if (e.shiftKey) {
+				resizeNotes(-1, e.altKey)
+			} else {
+				moveNotesHorizontally(-1, e.altKey)
+			}
+			return
+		}
+	}, [dispatch, timeSelect.start, rate, selectAll, duplicateNotes,
+		selected, deleteSelected, moveNotesVertically, resizeNotes, moveNotesHorizontally])
 
 	// Key events
-	// useEffect(() => {
-	// 	const editorElement2 = editorElement.current
+	useEffect(() => {
+		const editorElement2 = editorElement.current
 
-	// 	if (editorElement2 === null) return
+		if (editorElement2 === null) return
 
-	// 	if (isNodeSelected) {
-	// 		editorElement2.addEventListener('keydown', onKeyDown)
-	// 	}
+		if (isNodeSelected) {
+			editorElement2.addEventListener('keydown', onKeyDown)
+		}
 
-	// 	return () => {
-	// 		editorElement2.removeEventListener('keydown', onKeyDown)
-	// 	}
-	// }, [isNodeSelected, onKeyDown])
+		return () => {
+			editorElement2.removeEventListener('keydown', onKeyDown)
+		}
+	}, [isNodeSelected, onKeyDown])
 
 	const onNoteSelect = useCallback(
 		(eventId: Id, select: boolean, clear: boolean) => {
@@ -628,8 +636,10 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 		[selected],
 	)
 
+	const color = useStringChangedEvent(nodeContext.onColorChange)
+
 	return (
-		<div className="expBetterSequencer" style={{}}>
+		<div className="expBetterSequencer" style={{color}}>
 			{/* <BetterSequencerControls {...{id}} /> */}
 			<BetterSideNotes {...{rows, panPixelsY: panPixels.y, noteHeight, onLeftZoomPanBarMouseDown}} />
 			<div
@@ -651,7 +661,7 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 						{...{
 							noteHeight,
 							columnWidth,
-							midiClip,
+							expMidiPattern,
 							onNoteSelect,
 							clearSelected,
 							panPixels,

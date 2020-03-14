@@ -14,7 +14,7 @@ interface Props {
 	noteHeight: number
 	columnWidth: number
 	panPixels: Point
-	midiClip: ExpMidiPatternState
+	expMidiPattern: ExpMidiPatternState
 	selected: Set<Id>
 	setSelected: (newSelected: Set<Id>) => void
 	onNoteSelect: (eventId: Id, select: boolean, clear: boolean) => void
@@ -31,7 +31,7 @@ interface Props {
 export const BetterNotes = React.memo(function _BetterNotes(props: Props) {
 	const {
 		panPixels, noteHeight, columnWidth, selected, onNoteSelect,
-		clearSelected, midiClip, lengthBeats, zoom, width, height, rows,
+		clearSelected, expMidiPattern, lengthBeats, zoom, width, height, rows,
 		clientMousePositionToPercentages, setSelected, removeDuplicateEvents,
 	} = props
 
@@ -180,16 +180,16 @@ export const BetterNotes = React.memo(function _BetterNotes(props: Props) {
 	// 	if (!selected.has(clickedEventId)) {
 	// 		if (e.shiftKey) {
 	// 			onNoteSelect(clickedEventId, true, false)
-	// 			setStartEvents(midiClip.events.filter(x => selected.has(x.id) || x.id === clickedEventId))
+	// 			setStartEvents(expMidiPattern.events.filter(x => selected.has(x.id) || x.id === clickedEventId))
 	// 		} else {
 	// 			onNoteSelect(clickedEventId, true, true)
-	// 			setStartEvents(midiClip.events.filter(x => x.id === clickedEventId))
+	// 			setStartEvents(expMidiPattern.events.filter(x => x.id === clickedEventId))
 	// 		}
 	// 	} else if (e.shiftKey) {
 	// 		onNoteSelect(clickedEventId, false, false)
 	// 		return
 	// 	} else {
-	// 		setStartEvents(midiClip.events.filter(x => selected.has(x.id)))
+	// 		setStartEvents(expMidiPattern.events.filter(x => selected.has(x.id)))
 	// 	}
 	// 	if (e.ctrlKey) {
 	// 		startNoteCloning(e.clientY)
@@ -198,7 +198,7 @@ export const BetterNotes = React.memo(function _BetterNotes(props: Props) {
 	// 	} else {
 	// 		startNoteMoving(e.clientY)
 	// 	}
-	// }, [dispatch, id, midiClip.events, onNoteSelect, selected, startNoteCloning, startNoteMoving, startNoteResizing])
+	// }, [dispatch, id, expMidiPattern.events, onNoteSelect, selected, startNoteCloning, startNoteMoving, startNoteResizing])
 
 	// Note mouse resize
 	// useLayoutEffect(() => {
@@ -253,7 +253,7 @@ export const BetterNotes = React.memo(function _BetterNotes(props: Props) {
 				<ActualNotes
 					noteHeight={noteHeight}
 					columnWidth={columnWidth}
-					midiClip={midiClip}
+					expMidiPattern={expMidiPattern}
 					selected={selected}
 					onNoteSelect={onNoteSelect}
 					rows={rows}
@@ -267,17 +267,17 @@ export const BetterNotes = React.memo(function _BetterNotes(props: Props) {
 interface ActualNotesProps {
 	noteHeight: number
 	columnWidth: number
-	midiClip: ExpMidiPatternState
+	expMidiPattern: ExpMidiPatternState
 	selected: Set<Id>
 	onNoteSelect: (eventId: Id, select: boolean, clear: boolean) => void
 	rows: string[]
 	handleMouseDown: (e: MouseEvent, direction: 'left' | 'right' | 'center', clickedEventId: Id) => void
 }
 
-const ActualNotes = React.memo(function _ActualNotes({midiClip, noteHeight, columnWidth, selected, onNoteSelect, handleMouseDown, rows}: ActualNotesProps) {
+const ActualNotes = React.memo(function _ActualNotes({expMidiPattern, noteHeight, columnWidth, selected, onNoteSelect, handleMouseDown, rows}: ActualNotesProps) {
 	return (
 		<Fragment>
-			{midiClip.events.map(event => {
+			{expMidiPattern.events.map(event => {
 				return (
 					<BetterNote
 						key={event.id.toString()}

@@ -45,6 +45,13 @@ export function makeNoteEvent2(note: number, startBeat: number, duration: number
 	}
 }
 
+export function duplicateNoteEvent(event: SeqNoteEvent): SeqNoteEvent {
+	return {
+		...event,
+		id: uuid.v4(),
+	}
+}
+
 export type SeqEvents = Immutable.Map<Id, SeqEvent>
 
 

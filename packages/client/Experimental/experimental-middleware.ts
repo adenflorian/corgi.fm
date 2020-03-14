@@ -610,13 +610,16 @@ function bar(
 			return action.connections.forEach(
 				x => nodeManager.addConnection(getConnection(x.id)))
 
-		// Midi
+		// Midi Patterns
 		case 'EXP_MIDI_PATTERN_ADD':
 			return nodeManager.patternUpdated(selectExpMidiPattern(state.room, action.newPattern.id))
-		case 'EXP_MIDI_PATTERN_ADD_EVENT':
-			return nodeManager.patternUpdated(selectExpMidiPattern(state.room, action.id))
 		case 'EXP_MIDI_PATTERN_DELETE':
 			return nodeManager.patternDeleted(action.id)
+		case 'EXP_MIDI_PATTERN_ADD_EVENT':
+		case 'EXP_MIDI_PATTERN_ADD_EVENTS':
+		case 'EXP_MIDI_PATTERN_DELETE_EVENTS':
+		case 'EXP_MIDI_PATTERN_UPDATE_EVENTS':
+			return nodeManager.patternUpdated(selectExpMidiPattern(state.room, action.id))
 
 		// Other
 		case 'SET_OPTION': {
