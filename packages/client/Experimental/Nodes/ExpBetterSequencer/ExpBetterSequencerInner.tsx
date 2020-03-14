@@ -1,19 +1,17 @@
 import React, {
-	useCallback, useState, useEffect, useRef, useLayoutEffect, Fragment, useMemo,
+	useCallback, useState, useEffect,
+	useRef, useLayoutEffect, Fragment, useMemo,
 } from 'react'
 import {useSelector, useDispatch} from 'react-redux'
 import {OrderedMap, Set} from 'immutable'
 import {
-	createBetterSeqRateSelector,
-	createBetterSeqZoomSelector,
+	createBetterSeqRateSelector, createBetterSeqZoomSelector,
 	createBetterSeqMidiClipSelector, createBetterSeqPanSelector,
 	createPositionHeightSelector, createPositionWidthSelector, sequencerActions,
 	betterSequencerActions, createPositionXSelector, createPositionYSelector,
-	localActions,
-	globalClockActions,
-	expNodesActions,
-	expMidiPatternsActions,
-	makeSequencerEvents,
+	localActions, globalClockActions,
+	expNodesActions, expMidiPatternsActions,
+	makeSequencerEvents, createExpPositionSelectedSelector,
 } from '@corgifm/common/redux'
 import {
 	Key, MAX_MIDI_NOTE_NUMBER_127, MIN_MIDI_NOTE_NUMBER_0,
@@ -59,16 +57,8 @@ const leftZoomSensitivity = 0.01
 const rows = new Array(128).fill(0).map((_, i) => midiNoteToNoteNameFull(i))
 
 export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerInner() {
-	// const rate = useSelector(createBetterSeqRateSelector(id))
-	// const zoom = useSelector(createBetterSeqZoomSelector(id))
-	// const pan = useSelector(createBetterSeqPanSelector(id))
-	// const x = useSelector(createPositionXSelector(id))
-	// const y = useSelector(createPositionYSelector(id))
-	// const height = useSelector(createPositionHeightSelector(id))
-	// const width = useSelector(createPositionWidthSelector(id)) - betterNotesStartX
-	// const isNodeSelected = useSelector(createPositionHeightSelector(id))
-
 	const nodeContext = useNodeContext() as ExpBetterSequencerNode
+	const isNodeSelected = useSelector(createExpPositionSelectedSelector(nodeContext.id))
 	const position = useExpPosition(nodeContext.id)
 
 	const {x, y, width, height} = position
@@ -152,66 +142,61 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 			}
 		}, {clean: SeqEvents(), toDelete: Set<Id>()})
 
-		// TODO
-		// dispatch(betterSequencerActions.deleteEvents(id, toDelete))
-	}, [dispatch, midiClip.events])
+		dispatch(expMidiPatternsActions.deleteEvents(nodeContext.id, toDelete))
+	}, [dispatch, midiClip.events, nodeContext.id])
 
 	// Wheel events
-	// useLayoutEffect(() => {
-	// 	const onWheel = (e: WheelEvent) => {
+	useLayoutEffect(() => {
+		const onWheel = (e: WheelEvent) => {
 
-	// 		// const bar = clientSpaceToPercentages({x: e.clientX, y: e.clientY}, {x, y}, panPixels, maxPanX, maxPanY, width, height)
+			// const bar = clientSpaceToPercentages({x: e.clientX, y: e.clientY}, {x, y}, panPixels, maxPanX, maxPanY, width, height)
 
-	// 		let preventDefault = true
+			let preventDefault = true
 
-	// 		if (e.shiftKey && !e.ctrlKey) {
-	// 			dispatch(sequencerActions.setPan(id, {
-	// 				...pan,
-	// 				x: clamp(pan.x + (e.deltaY * (mouseWheelPanXSensitivity / zoom.x)), minPan, maxPan),
-	// 			}))
-	// 		} else if (e.ctrlKey && e.altKey) {
-	// 			dispatch(sequencerActions.setZoom(id, {
-	// 				...zoom,
-	// 				x: clamp(zoom.x + (-e.deltaY * mouseWheelZoomXSensitivity), minZoomX, maxZoomX),
-	// 			}))
-	// 		} else if (e.altKey) {
-	// 			dispatch(sequencerActions.setZoom(id, {
-	// 				...zoom,
-	// 				y: clamp(zoom.y + (-e.deltaY * mouseWheelZoomYSensitivity), minZoomY, maxZoomY),
-	// 			}))
-	// 			// dispatch(sequencerActions.setPan(id, {
-	// 			// 	...pan,
-	// 			// 	y: clamp(bar.centerY, minPan, maxPan),
-	// 			// }))
-	// 		} else if (e.ctrlKey && e.shiftKey) {
-	// 			dispatch(sequencerActions.setPan(id, {
-	// 				...pan,
-	// 				y: clamp(pan.y + (e.deltaY * (mouseWheelYSensitivity / zoom.y)), minPan, maxPan),
-	// 			}))
-	// 		} else {
-	// 			preventDefault = false
-	// 		}
+			if (e.shiftKey && !e.ctrlKey) {
+				dispatch(expNodesActions.customNumberParamChange(nodeContext.id, nodeContext.panX.id,
+					clamp(pan.x + (e.deltaY * (mouseWheelPanXSensitivity / zoom.x)), minPan, maxPan)
+				))
+			} else if (e.ctrlKey && e.altKey) {
+				dispatch(expNodesActions.customNumberParamChange(nodeContext.id, nodeContext.zoomX.id,
+					clamp(zoom.x + (-e.deltaY * mouseWheelZoomXSensitivity), minZoomX, maxZoomX)
+				))
+			} else if (e.altKey) {
+				dispatch(expNodesActions.customNumberParamChange(nodeContext.id, nodeContext.zoomY.id,
+					clamp(zoom.y + (-e.deltaY * mouseWheelZoomYSensitivity), minZoomY, maxZoomY)
+				))
+				// dispatch(expNodesActions.customNumberParamChange(nodeContext.id, nodeContext.).setPan(id, {
+				// 	...pan,
+				// 	y: clamp(bar.centerY, minPan, maxPan),
+				// }))
+			} else if (e.ctrlKey && e.shiftKey) {
+				dispatch(expNodesActions.customNumberParamChange(nodeContext.id, nodeContext.panY.id,
+					clamp(pan.y + (e.deltaY * (mouseWheelYSensitivity / zoom.y)), minPan, maxPan)
+				))
+			} else {
+				preventDefault = false
+			}
 
-	// 		if (preventDefault) {
-	// 			e.preventDefault()
-	// 			e.stopPropagation()
-	// 		}
-	// 	}
+			if (preventDefault) {
+				e.preventDefault()
+				e.stopPropagation()
+			}
+		}
 
-	// 	const editorElementNotNull = editorElement.current
+		const editorElementNotNull = editorElement.current
 
-	// 	if (editorElementNotNull === null) return
+		if (editorElementNotNull === null) return
 
-	// 	if (editorElementNotNull) {
-	// 		editorElementNotNull.addEventListener('wheel', onWheel)
-	// 	}
+		if (editorElementNotNull) {
+			editorElementNotNull.addEventListener('wheel', onWheel)
+		}
 
-	// 	return () => {
-	// 		if (editorElementNotNull) {
-	// 			editorElementNotNull.removeEventListener('wheel', onWheel)
-	// 		}
-	// 	}
-	// }, [dispatch, id, pan, zoom])
+		return () => {
+			if (editorElementNotNull) {
+				editorElementNotNull.removeEventListener('wheel', onWheel)
+			}
+		}
+	}, [dispatch, nodeContext.id, pan, zoom])
 
 	// Double click events
 	useEffect(() => {

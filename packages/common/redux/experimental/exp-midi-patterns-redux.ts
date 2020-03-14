@@ -48,6 +48,20 @@ export const expMidiPatternsActions = {
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	} as const),
+	addEvents: (id: Id, events: SeqEvents) => ({
+		type: 'EXP_MIDI_PATTERN_ADD_EVENTS',
+		id,
+		events,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	} as const),
+	deleteEvents: (id: Id, idsToDelete: Iterable<Id>) => ({
+		type: 'EXP_MIDI_PATTERN_DELETE_EVENTS',
+		id,
+		idsToDelete,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	} as const),
 } as const
 
 export type ExpMidiPatternsAction = ActionType<typeof expMidiPatternsActions>
@@ -106,6 +120,12 @@ export const expMidiPatternsReducer = (state = initialState, action: ExpMidiPatt
 		case 'EXP_MIDI_PATTERN_ADD_EVENT':
 			return state.update(action.id, defaultExpMidiPatternRecord,
 				x => x.update('events', x => x.set(action.event.id, action.event)))
+		case 'EXP_MIDI_PATTERN_ADD_EVENTS':
+			return state.update(action.id, defaultExpMidiPatternRecord,
+				x => x.update('events', x => x.merge(action.events)))
+		case 'EXP_MIDI_PATTERN_DELETE_EVENTS':
+			return state.update(action.id, defaultExpMidiPatternRecord,
+				x => x.update('events', x => x.deleteAll(action.idsToDelete)))
 		default: return state
 	}
 }

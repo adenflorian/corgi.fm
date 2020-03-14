@@ -4,13 +4,11 @@ import React, {
 import {useSelector, useDispatch} from 'react-redux'
 import {OrderedMap, Set} from 'immutable'
 import {
-	createBetterSeqRateSelector,
-	createBetterSeqZoomSelector,
+	createBetterSeqRateSelector, createBetterSeqZoomSelector,
 	createBetterSeqMidiClipSelector, createBetterSeqPanSelector,
 	createPositionHeightSelector, createPositionWidthSelector, sequencerActions,
 	betterSequencerActions, createPositionXSelector, createPositionYSelector,
-	localActions,
-	globalClockActions,
+	localActions, globalClockActions, createPositionSelectedSelector,
 } from '@corgifm/common/redux'
 import {
 	Key, MAX_MIDI_NOTE_NUMBER_127, MIN_MIDI_NOTE_NUMBER_0,
@@ -65,7 +63,7 @@ export const BetterSequencerInner = React.memo(function _BetterSequencerInner({i
 	const y = useSelector(createPositionYSelector(id))
 	const height = useSelector(createPositionHeightSelector(id))
 	const width = useSelector(createPositionWidthSelector(id)) - betterNotesStartX
-	const isNodeSelected = useSelector(createPositionHeightSelector(id))
+	const isNodeSelected = useSelector(createPositionSelectedSelector(id))
 
 	const [selected, setSelected] = useState(Set<Id>())
 	const [originalSelected, setOriginalSelected] = useState(Set<Id>())
