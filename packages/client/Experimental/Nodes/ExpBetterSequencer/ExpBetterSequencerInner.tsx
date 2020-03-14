@@ -11,6 +11,7 @@ import {
 	betterSequencerActions, createPositionXSelector, createPositionYSelector,
 	localActions,
 	globalClockActions,
+	expNodesActions,
 } from '@corgifm/common/redux'
 import {
 	Key, MAX_MIDI_NOTE_NUMBER_127, MIN_MIDI_NOTE_NUMBER_0,
@@ -405,58 +406,66 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 		}
 	}, [activateLeftZoomPan])
 
-	// useLayoutEffect(() => {
-	// 	if (!leftZoomPanActive) return
+	useLayoutEffect(() => {
+		if (!leftZoomPanActive) return
 
-	// 	const onMouseUp = (e: MouseEvent) => {
-	// 		if (e.button === 0) {
-	// 			deactivateLeftZoomPan()
-	// 		}
-	// 	}
+		const onMouseUp = (e: MouseEvent) => {
+			if (e.button === 0) {
+				deactivateLeftZoomPan()
+			}
+		}
 
-	// 	const onMouseMove = (e: MouseEvent) => {
-	// 		if (e.buttons !== 1) return deactivateLeftZoomPan()
+		const onMouseMove = (e: MouseEvent) => {
+			if (e.buttons !== 1) return deactivateLeftZoomPan()
 
-	// 		if (!firstMouseMove) {
-	// 			setFirstMouseMove(true)
-	// 			return setStartPoint({x: pan.y, y: zoom.y})
-	// 		}
+			if (!firstMouseMove) {
+				setFirstMouseMove(true)
+				return setStartPoint({x: pan.y, y: zoom.y})
+			}
 
-	// 		const newPersistentDelta = {x: persistentDelta.x + e.movementX, y: persistentDelta.y + e.movementY}
+			const newPersistentDelta = {x: persistentDelta.x + e.movementX, y: persistentDelta.y + e.movementY}
 
-	// 		const zoomedMovement = makeMouseMovementAccountForGlobalZoom(newPersistentDelta)
+			const zoomedMovement = makeMouseMovementAccountForGlobalZoom(newPersistentDelta)
 
-	// 		dispatch(sequencerActions.setZoomAndPan(id, {
-	// 			x: zoom.x,
-	// 			y: clamp(
-	// 				startPoint.y + (newPersistentDelta.x * leftZoomSensitivity),
-	// 				minZoomY, maxZoomY),
-	// 		}, {
-	// 			x: pan.x,
-	// 			y: zoom.y === 1
-	// 				? pan.y
-	// 				: clamp(
-	// 					startPoint.x + -zoomedMovement.y / maxPanY,
-	// 					minPan, maxPan),
-	// 		}))
+			const newZoom = {
+				x: zoom.x,
+				y: clamp(
+					startPoint.y + (newPersistentDelta.x * leftZoomSensitivity),
+					minZoomY, maxZoomY),
+			}
 
-	// 		setPersistentDelta(newPersistentDelta)
-	// 	}
+			const newPan = {
+				x: pan.x,
+				y: zoom.y === 1
+					? pan.y
+					: clamp(
+						startPoint.x + -zoomedMovement.y / maxPanY,
+						minPan, maxPan),
+			}
 
-	// 	window.addEventListener('mousemove', onMouseMove)
-	// 	window.addEventListener('mouseup', onMouseUp)
+			dispatch(expNodesActions.customNumberParamChange(nodeContext.id, nodeContext.zoomX.id, newZoom.x))
+			dispatch(expNodesActions.customNumberParamChange(nodeContext.id, nodeContext.zoomY.id, newZoom.y))
+			dispatch(expNodesActions.customNumberParamChange(nodeContext.id, nodeContext.panX.id, newPan.x))
+			dispatch(expNodesActions.customNumberParamChange(nodeContext.id, nodeContext.panY.id, newPan.y))
 
-	// 	return () => {
-	// 		window.removeEventListener('mousemove', onMouseMove)
-	// 		window.removeEventListener('mouseup', onMouseUp)
-	// 	}
-	// }, [activateLeftZoomPan, deactivateLeftZoomPan, dispatch, id, maxPanY, leftZoomPanActive, pan, zoom, persistentDelta, firstMouseMove, startPoint])
+			setPersistentDelta(newPersistentDelta)
+		}
+
+		window.addEventListener('mousemove', onMouseMove)
+		window.addEventListener('mouseup', onMouseUp)
+
+		return () => {
+			window.removeEventListener('mousemove', onMouseMove)
+			window.removeEventListener('mouseup', onMouseUp)
+		}
+	}, [activateLeftZoomPan, deactivateLeftZoomPan, dispatch, maxPanY, nodeContext,
+		leftZoomPanActive, pan, zoom, persistentDelta, firstMouseMove, startPoint])
 
 	const columnWidth = (fixedWidth * zoom.x) / lengthBeats
 
-	// const selectAll = useCallback(() => {
-	// 	setSelected(midiClip.events.keySeq().toSet())
-	// }, [setSelected, midiClip.events])
+	const selectAll = useCallback(() => {
+		setSelected(midiClip.events.keySeq().toSet())
+	}, [setSelected, midiClip.events])
 
 	// const duplicateNotes = useCallback(() => {
 	// 	const eventsToCopy = midiClip.events

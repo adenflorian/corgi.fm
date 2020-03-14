@@ -17,6 +17,7 @@ import {ExpBetterSequencerNodeView} from './ExpBetterSequencerNodeView'
 import {SeqPatternView, SeqPattern, SeqEvent, SeqNoteEvent, seqPatternViewReader, SeqReadEvent, SeqSession, SeqSessionClip, seqSessionReader} from '@corgifm/common/SeqStuff'
 import {noteNameToMidi, midiNoteFromNoteName} from '@corgifm/common/common-samples-stuff'
 import {expMidiPatternsActions, makeExpMidiPatternState} from '@corgifm/common/redux'
+import {minZoomX, maxZoomX, maxZoomY, minZoomY, maxPan, minPan} from '@corgifm/common/BetterConstants'
 
 export class ExpBetterSequencerNode extends CorgiNode {
 	protected readonly _ports: ExpPorts
@@ -270,10 +271,10 @@ export class ExpBetterSequencerNode extends CorgiNode {
 
 		this._tempo = new ExpCustomNumberParam('tempo', 240, 0.001, 999.99, 3)
 		this._rate = new ExpCustomNumberParam('rate', 1, 0.001, 4)
-		this._zoomX = new ExpCustomNumberParam('zoomX', 1, 0.5, 2)
-		this._zoomY = new ExpCustomNumberParam('zoomY', 1, 0.5, 2)
-		this._panX = new ExpCustomNumberParam('panX', 1, 0.5, 2)
-		this._panY = new ExpCustomNumberParam('panY', 1, 0.5, 2)
+		this._zoomX = new ExpCustomNumberParam('zoomX', 1, minZoomX, maxZoomX)
+		this._zoomY = new ExpCustomNumberParam('zoomY', 1, minZoomY, maxZoomY)
+		this._panX = new ExpCustomNumberParam('panX', 1, minPan, maxPan)
+		this._panY = new ExpCustomNumberParam('panY', 1, minPan, maxPan)
 		this._customNumberParams = arrayToESIdKeyMap([this._tempo, this._rate, this._zoomX, this._zoomY, this._panX, this._panY])
 
 		this._restartButton = new ExpButton('restart', this)
