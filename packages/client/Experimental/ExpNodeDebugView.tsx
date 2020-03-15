@@ -46,21 +46,22 @@ export const ExpNodeDebugView = hot(module)(React.memo(function _ExpNodeDebugVie
 			{nodeContext.newSampleEvent && <ExpOscilloscopeNodeExtra newSampleEvent={nodeContext.newSampleEvent} />}
 			{beforeChildren}
 			<div className="expNodeDebugView">
-				{/* <div className="nodeName">{nodeName}</div> */}
-				{/* <div className="nodeId">{nodeId}</div> */}
-				<Ports ports={ports} />
-				{nodeContext.requiresAudioWorklet && !isAudioWorkletLoaded &&
-					<div
-						className="audioWorkletWarning"
-						title={audioWorkletToolTip}
-					>
-						This node needs AudioWorklet to work properly, but AudioWorklet is not loaded.
+				<div style={{padding: 8}}>
+					{/* <div className="nodeName">{nodeName}</div> */}
+					{/* <div className="nodeId">{nodeId}</div> */}
+					<Ports ports={ports} />
+					{nodeContext.requiresAudioWorklet && !isAudioWorkletLoaded &&
+						<div
+							className="audioWorkletWarning"
+							title={audioWorkletToolTip}
+						>
+							This node needs AudioWorklet to work properly, but AudioWorklet is not loaded.
 					</div>
-				}
-				<div className="params">
-					{/* {audioParams.size > 0 &&
+					}
+					<div className="params">
+						{/* {audioParams.size > 0 &&
 					<div className="sectionLabel">Audio Params</div>} */}
-					{/* <div className="paramTexts">
+						{/* <div className="paramTexts">
 					{[...audioParams].map(([id, audioParam]) => (
 						<div className="param" key={id as string}>
 							<div className="paramId">{id}</div>
@@ -68,70 +69,71 @@ export const ExpNodeDebugView = hot(module)(React.memo(function _ExpNodeDebugVie
 						</div>
 					))}
 				</div> */}
-					<div className="paramKnobs">
-						{[...audioParams].map(([id, audioParam]) => {
-							const port = ports.get(id) as ExpNodeAudioParamInputPort
-							return (
-								<AudioParamContext.Provider value={audioParam} key={id as string}>
-									<AudioParamInputPortContext.Provider value={port}>
-										<ExpNodeDebugAudioParamKnob
-											nodeId={nodeId}
-										/>
-									</AudioParamInputPortContext.Provider>
-								</AudioParamContext.Provider>
-							)
-						})}
-					</div>
-					{/* {customNumberParams.size > 0 &&
+						<div className="paramKnobs">
+							{[...audioParams].map(([id, audioParam]) => {
+								const port = ports.get(id) as ExpNodeAudioParamInputPort
+								return (
+									<AudioParamContext.Provider value={audioParam} key={id as string}>
+										<AudioParamInputPortContext.Provider value={port}>
+											<ExpNodeDebugAudioParamKnob
+												nodeId={nodeId}
+											/>
+										</AudioParamInputPortContext.Provider>
+									</AudioParamContext.Provider>
+								)
+							})}
+						</div>
+						{/* {customNumberParams.size > 0 &&
 					<div className="sectionLabel">Custom Number Params</div>} */}
-					<div className="paramKnobs">
-						{[...customNumberParams].map(([id, customNumberParam]) => (
-							<ExpNodeDebugCustomNumberParamKnob
-								key={id as string}
-								nodeId={nodeId}
-								customNumberParam={customNumberParam}
-							/>
-						))}
-					</div>
-					{/* {customEnumParams.size > 0 &&
+						<div className="paramKnobs">
+							{[...customNumberParams].map(([id, customNumberParam]) => (
+								<ExpNodeDebugCustomNumberParamKnob
+									key={id as string}
+									nodeId={nodeId}
+									customNumberParam={customNumberParam}
+								/>
+							))}
+						</div>
+						{/* {customEnumParams.size > 0 &&
 					<div className="sectionLabel">Custom Enum Params</div>} */}
-					{customEnumParams.size > 0 && <div className="enumParams">
-						{[...customEnumParams].map(([id, customEnumParam]) => (
-							<ExpNodeDebugCustomEnumParamSelect
-								key={id as string}
-								nodeId={nodeId}
-								customEnumParam={customEnumParam}
-							/>
-						))}
-					</div>}
-					{customStringParams.size > 0 && <div className="stringParams">
-						{[...customStringParams].map(([id, customStringParam]) => (
-							<ExpNodeDebugCustomStringParamField
-								key={id as string}
-								nodeId={nodeId}
-								customStringParam={customStringParam}
-							/>
-						))}
-					</div>}
-					{referenceParams.size > 0 && <div className="stringParams">
-						{[...referenceParams].map(([id, referenceParam]) => (
-							<ExpNodeDebugReferenceParamField
-								key={id as string}
-								nodeId={nodeId}
-								referenceParam={referenceParam}
-							/>
-						))}
-					</div>}
-					{buttons.size > 0 && <div className="buttons">
-						{[...buttons].map(([id, button]) => (
-							<ExpNodeDebugButton
-								key={id as string}
-								nodeId={nodeId}
-								button={button}
-							/>
-						))}
-					</div>}
-					<DebugInfo />
+						{customEnumParams.size > 0 && <div className="enumParams">
+							{[...customEnumParams].map(([id, customEnumParam]) => (
+								<ExpNodeDebugCustomEnumParamSelect
+									key={id as string}
+									nodeId={nodeId}
+									customEnumParam={customEnumParam}
+								/>
+							))}
+						</div>}
+						{customStringParams.size > 0 && <div className="stringParams">
+							{[...customStringParams].map(([id, customStringParam]) => (
+								<ExpNodeDebugCustomStringParamField
+									key={id as string}
+									nodeId={nodeId}
+									customStringParam={customStringParam}
+								/>
+							))}
+						</div>}
+						{referenceParams.size > 0 && <div className="stringParams">
+							{[...referenceParams].map(([id, referenceParam]) => (
+								<ExpNodeDebugReferenceParamField
+									key={id as string}
+									nodeId={nodeId}
+									referenceParam={referenceParam}
+								/>
+							))}
+						</div>}
+						{buttons.size > 0 && <div className="buttons">
+							{[...buttons].map(([id, button]) => (
+								<ExpNodeDebugButton
+									key={id as string}
+									nodeId={nodeId}
+									button={button}
+								/>
+							))}
+						</div>}
+						<DebugInfo />
+					</div>
 				</div>
 				{children}
 			</div>
@@ -148,8 +150,6 @@ const portHeight = 24
 const heightOffset = 8 + 8 + 4
 
 const Ports = React.memo(function _Ports({ports}: PortsProps) {
-	const nodeContext = useNodeContext()
-
 	const portsMapped = [...ports].map(x => x[1])
 
 	return (

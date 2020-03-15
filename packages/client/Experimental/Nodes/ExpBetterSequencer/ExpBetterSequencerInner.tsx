@@ -35,7 +35,7 @@ import {BetterColumns} from './BetterColumns'
 import {BetterNotes} from './BetterNotes'
 import {BetterSequencerControls} from './BetterSequencerControls'
 import {
-	clientSpaceToPercentages, getMaxPan, eventToNote, editorSpaceToPercentages,
+	clientSpaceToPercentages, getMaxPan, editorSpaceToPercentages,
 	clientSpaceToEditorSpace,
 	TimeSelect,
 	editorOffsetSpaceToPercentages,
@@ -62,7 +62,8 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 	const isNodeSelected = useSelector(createExpPositionSelectedSelector(nodeContext.id))
 	const position = useExpPosition(nodeContext.id)
 
-	const {x, y, width, height} = position
+	const {x, y, width} = position
+	const height = 400
 
 	const rate = useNumberChangedEvent(nodeContext.rate.onChange)
 	const zoomX = useNumberChangedEvent(nodeContext.zoomX.onChange)
@@ -235,7 +236,7 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 		}
 	}, [dispatch, lengthBeats, removeDuplicateEvents, scaledHeight, scaledWidthUnclamped, expMidiPattern.id])
 
-	// // Box Select
+	// Box Select
 	useLayoutEffect(() => {
 		const onMouseDown = (e: MouseEvent) => {
 			if (e.button !== 0 || (e.ctrlKey && e.altKey)) return
@@ -300,7 +301,7 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 			)
 
 			setTimeSelect({
-				start: clamp(e.altKey ? box.left : Math.round(box.left), 0, 4 /* // TODO midiClip.length*/),
+				start: clamp(e.altKey ? box.left : Math.round(box.left), 0, lengthBeats),
 				duration: box.right - box.left,
 			})
 		}
@@ -639,7 +640,7 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 	const color = useStringChangedEvent(nodeContext.onColorChange)
 
 	return (
-		<div className="expBetterSequencer" style={{color}}>
+		<div className="expBetterSequencer" style={{color, height}}>
 			{/* <BetterSequencerControls {...{id}} /> */}
 			<BetterSideNotes {...{rows, panPixelsY: panPixels.y, noteHeight, onLeftZoomPanBarMouseDown}} />
 			<div

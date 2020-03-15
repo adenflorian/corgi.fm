@@ -1,6 +1,7 @@
 import React from 'react'
 import {ExpReferenceParam} from './ExpParams'
 import {useObjectChangedEvent} from './hooks/useCorgiEvent'
+import {CssColor} from '@corgifm/common/shamu-color'
 
 interface Props {
 	nodeId: Id
@@ -13,8 +14,9 @@ export const ExpNodeDebugReferenceParamField = React.memo(function _ExpNodeDebug
 	const value = useObjectChangedEvent(referenceParam.value)
 
 	return (
-		<div>
-			ReferenceParamId: {referenceParam.id} Id: {value.id}
+		<div style={{color: CssColor.defaultGray, fontSize: 12, fontFamily: 'Ubuntu'}}>
+			<div>ReferenceParamId: {referenceParam.id}</div>
+			<div>TargetId: {value.id}</div>
 		</div>
 	)
 })

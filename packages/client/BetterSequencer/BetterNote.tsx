@@ -6,6 +6,7 @@ import {betterSequencerActions} from '@corgifm/common/redux'
 import {smallNoteHeight, tinyNoteHeight} from '@corgifm/common/BetterConstants'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {BetterNoteResizer} from './BetterNoteResizer'
+import {clamp} from '@corgifm/common/common-utils'
 
 interface Props {
 	id: Id
@@ -79,7 +80,7 @@ export const BetterNote = React.memo(function _BetterNote({
 		>
 			<rect
 				className={`noteBackground`}
-				width={width - (useBorder ? 2 : 0)}
+				width={Math.max(width - (useBorder ? 2 : 0), 1)}
 				height={actualHeight - (useBorder ? 2 : 0)}
 				x={useBorder ? 1 : 0}
 				y={useBorder ? 1 : 0}

@@ -1,6 +1,5 @@
-import {getNodeInfo} from '@corgifm/common/redux'
-import {MidiClipEvent} from '@corgifm/common/midi-types'
 import {mouseFromScreenToBoard, makeMouseMovementAccountForGlobalZoom} from '../../../SimpleGlobalClientState'
+import {betterSideNotesWidth} from '@corgifm/common/BetterConstants'
 
 export function getMaxPan(length: number, zoom: number) {
 	return (length * zoom) - length
@@ -51,17 +50,13 @@ export function clientSpaceToEditorSpace(
 		y: boardSpace.y - nodePosition.y,
 	}
 
-	const nodeInfo = getNodeInfo().betterSequencer
-
 	const editorSpace = {
-		x: nodeSpace.x - nodeInfo.notesDisplayStartX,
-		y: nodeSpace.y,
+		x: nodeSpace.x - betterSideNotesWidth,
+		y: nodeSpace.y - (232),
 	}
 
 	return editorSpace
 }
-
-export const eventToNote = (event: MidiClipEvent) => event.note
 
 export function movementToBeats(movement: Point, lengthBeats: number, zoom: Point, width: number, height: number) {
 	const a = makeMouseMovementAccountForGlobalZoom(movement)

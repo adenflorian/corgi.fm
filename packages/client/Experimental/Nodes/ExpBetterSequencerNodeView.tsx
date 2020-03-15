@@ -37,16 +37,7 @@ export const ExpBetterSequencerNodeView = hot(module)(React.memo(function _ExpSe
 	// console.log({beatCursor, eventsBeatLength, eventsWidth, innerBeatCursor, innerBeatCursor2})
 
 	return (
-		<div
-			style={{
-				color: CssColor.defaultGray,
-				fontSize: 14,
-				fontFamily: 'Ubuntu',
-			}}
-		>
-			<div>current event:</div>
-			<ExpBetterSequencerInner />
-		</div>
+		<ExpBetterSequencerInner />
 	)
 }))
 
