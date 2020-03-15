@@ -17,3 +17,6 @@ export const betterHeight = 128 * 3
 
 export const smallNoteHeight = 27
 export const tinyNoteHeight = 12
+
+export const loopBarHeight = 16
+export const topSectionHeight = loopBarHeight

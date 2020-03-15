@@ -1,27 +1,22 @@
 import React, {
 	useCallback, useState, useEffect,
-	useRef, useLayoutEffect, Fragment, useMemo,
+	useRef, useLayoutEffect,
 } from 'react'
 import {useSelector, useDispatch} from 'react-redux'
-import {OrderedMap, Set} from 'immutable'
+import {Set} from 'immutable'
 import {
-	createBetterSeqRateSelector, createBetterSeqZoomSelector,
-	createBetterSeqMidiClipSelector, createBetterSeqPanSelector,
-	createPositionHeightSelector, createPositionWidthSelector, sequencerActions,
-	betterSequencerActions, createPositionXSelector, createPositionYSelector,
-	localActions, globalClockActions,
+	globalClockActions,
 	expNodesActions, expMidiPatternsActions,
-	makeSequencerEvents, createExpPositionSelectedSelector,
+	createExpPositionSelectedSelector,
 } from '@corgifm/common/redux'
 import {
 	Key, MAX_MIDI_NOTE_NUMBER_127, MIN_MIDI_NOTE_NUMBER_0,
 } from '@corgifm/common/common-constants'
 import {clamp} from '@corgifm/common/common-utils'
-import {MidiClipEvent, makeMidiClipEvent, MidiClipEvents, makeExpMidiEvents, makeExpMidiNoteEvent} from '@corgifm/common/midi-types'
 import {midiNoteToNoteNameFull} from '@corgifm/common/common-samples-stuff'
 import {
 	minPan, maxPan, minZoomX, maxZoomX, minZoomY,
-	maxZoomY, smallestNoteLength, betterNotesStartX,
+	maxZoomY, smallestNoteLength, betterSideNotesWidth,
 } from '@corgifm/common/BetterConstants'
 import './BetterSequencer.less'
 import {
@@ -33,19 +28,17 @@ import {BoxSelect} from './BoxSelect'
 import {BetterRows} from './BetterRows'
 import {BetterColumns} from './BetterColumns'
 import {BetterNotes} from './BetterNotes'
-import {BetterSequencerControls} from './BetterSequencerControls'
 import {
 	clientSpaceToPercentages, getMaxPan, editorSpaceToPercentages,
-	clientSpaceToEditorSpace,
-	TimeSelect,
+	clientSpaceToEditorSpace, TimeSelect,
 	editorOffsetSpaceToPercentages,
 } from './BetterSequencerHelpers'
 import {BetterSideNotes} from './BetterSideNotes'
 import {useNodeContext} from '../../CorgiNode'
 import {ExpBetterSequencerNode} from '../ExpBetterSequencerNode'
 import {useNumberChangedEvent, useObjectChangedEvent, useStringChangedEvent} from '../../hooks/useCorgiEvent'
-import {SeqEvents, makeNoteEvent, makeNoteEvent2, duplicateNoteEvent, SeqEvent} from '@corgifm/common/SeqStuff'
-import {node} from 'prop-types'
+import {SeqEvents, makeNoteEvent2, duplicateNoteEvent} from '@corgifm/common/SeqStuff'
+import {BetterLoopBar} from './BetterLoopBar'
 
 const mouseWheelYSensitivity = 0.001
 const mouseWheelPanXSensitivity = 0.001
@@ -71,17 +64,14 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 	const panX = useNumberChangedEvent(nodeContext.panX.onChange)
 	const panY = useNumberChangedEvent(nodeContext.panY.onChange)
 
-
 	const expMidiPatternView = useObjectChangedEvent(nodeContext.midiPatternParam.value)
 	const expMidiPattern = expMidiPatternView.pattern
 
-
-	const lengthBeats = useMemo(() => expMidiPattern.events.map(x => x.startBeat + x.duration).max() || 4, [expMidiPattern.events])
+	const lengthBeats = expMidiPatternView.loopEndBeat
 
 	const zoom = {x: zoomX, y: zoomY}
 	const pan = {x: panX, y: panY}
 	
-
 	const [selected, setSelected] = useState(Set<Id>())
 	const [originalSelected, setOriginalSelected] = useState(Set<Id>())
 	const clearSelected = useCallback(() => setSelected(Set()), [])
@@ -642,48 +632,56 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 
 	return (
 		<div className="expBetterSequencer" style={{color, height}}>
-			{/* <BetterSequencerControls {...{id}} /> */}
-			<BetterSideNotes {...{rows, panPixelsY: panPixels.y, noteHeight, onLeftZoomPanBarMouseDown}} />
-			<div
-				className="editor"
-				ref={editorElement}
-				tabIndex={-1}
-			>
+			<div className="top">
+				<div className="topLeft" style={{width: betterSideNotesWidth}}></div>
+				<BetterLoopBar {...{width, columnWidth}} />
+			</div>
+			<div className="middle">
+				<BetterSideNotes {...{rows, panPixelsY: panPixels.y, noteHeight, onLeftZoomPanBarMouseDown}} />
 				<div
-					className="translatable"
-					style={{
-						transform: `translate(${-panPixels.x}px, ${-panPixels.y}px)`,
-						width: scaledWidth + panPixels.x,
-						height: scaledHeight,
-					}}
+					className="editor"
+					ref={editorElement}
+					tabIndex={-1}
 				>
-					<BetterRows {...{noteHeight, rows}} />
-					<BetterColumns {...{columnWidth, lengthBeats, timeSelect}} />
-					<BetterNotes
-						{...{
-							noteHeight,
-							columnWidth,
-							expMidiPattern,
-							onNoteSelect,
-							clearSelected,
-							panPixels,
-							selected,
-							setSelected,
-							width,
-							height,
-							lengthBeats,
-							zoom,
-							rows,
-							clientMousePositionToPercentages,
-							removeDuplicateEvents,
+					<div
+						className="translatable"
+						style={{
+							transform: `translate(${-panPixels.x}px, ${-panPixels.y}px)`,
+							width: scaledWidth + panPixels.x,
+							height: scaledHeight,
 						}}
-					/>
+					>
+						<BetterRows {...{noteHeight, rows}} />
+						<BetterColumns {...{columnWidth, lengthBeats, timeSelect}} />
+						<BetterNotes
+							{...{
+								noteHeight,
+								columnWidth,
+								expMidiPattern,
+								onNoteSelect,
+								clearSelected,
+								panPixels,
+								selected,
+								setSelected,
+								width,
+								height,
+								lengthBeats,
+								zoom,
+								rows,
+								clientMousePositionToPercentages,
+								removeDuplicateEvents,
+							}}
+						/>
+					</div>
+					{boxActive && <BoxSelect
+						origin={boxOrigin}
+						otherCorner={otherCorner}
+						top={scaledHeight}
+					/>}
 				</div>
-				{boxActive && <BoxSelect
-					origin={boxOrigin}
-					otherCorner={otherCorner}
-					top={scaledHeight}
-				/>}
+			</div>
+			<div className="bottom">
+
 			</div>
 		</div>
 	)

@@ -19,6 +19,8 @@
     "typescript.tsdk": "node_modules\\typescript\\lib",
     "cSpell.words": [
         "Biquad",
+        "Bottomleft",
+        "Bottomright",
         "CDNs",
         "Cloneable",
         "Comparator",
@@ -48,6 +50,8 @@
         "Shamu",
         "Signup",
         "TODOs",
+        "Topleft",
+        "Topright",
         "Unmount",
         "Uploader",
         "VSTs",
