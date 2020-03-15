@@ -408,26 +408,19 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 
 			const zoomedMovement = makeMouseMovementAccountForGlobalZoom(newPersistentDelta)
 
-			const newZoom = {
-				x: zoom.x,
-				y: clamp(
-					startPoint.y + (newPersistentDelta.x * leftZoomSensitivity),
-					minZoomY, maxZoomY),
-			}
+			const newZoomY = clamp(
+				startPoint.y + (newPersistentDelta.x * leftZoomSensitivity),
+				minZoomY,
+				maxZoomY)
 
-			const newPan = {
-				x: pan.x,
-				y: zoom.y === 1
+			const newPanY = zoom.y === 1
 					? pan.y
 					: clamp(
 						startPoint.x + -zoomedMovement.y / maxPanY,
-						minPan, maxPan),
-			}
+						minPan, maxPan)
 
-			dispatch(expNodesActions.customNumberParamChange(nodeContext.id, nodeContext.zoomX.id, newZoom.x))
-			dispatch(expNodesActions.customNumberParamChange(nodeContext.id, nodeContext.zoomY.id, newZoom.y))
-			dispatch(expNodesActions.customNumberParamChange(nodeContext.id, nodeContext.panX.id, newPan.x))
-			dispatch(expNodesActions.customNumberParamChange(nodeContext.id, nodeContext.panY.id, newPan.y))
+			dispatch(expNodesActions.customNumberParamChange(nodeContext.id, nodeContext.zoomY.id, newZoomY))
+			dispatch(expNodesActions.customNumberParamChange(nodeContext.id, nodeContext.panY.id, newPanY))
 
 			setPersistentDelta(newPersistentDelta)
 		}
