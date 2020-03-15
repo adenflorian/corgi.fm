@@ -1,20 +1,20 @@
 import React, {useState, useCallback, useLayoutEffect, Fragment} from 'react'
 import {useDispatch} from 'react-redux'
 import {Set} from 'immutable'
-import {ExpMidiPatternState, expMidiPatternsActions} from '@corgifm/common/redux'
+import {expMidiPatternsActions} from '@corgifm/common/redux'
 import {smallestNoteLength} from '@corgifm/common/BetterConstants'
 import {sumPoints} from '@corgifm/common/common-utils'
 import {MIN_MIDI_NOTE_NUMBER_0, MAX_MIDI_NOTE_NUMBER_127} from '@corgifm/common/common-constants'
 import {oneLine} from 'common-tags'
 import {BetterNote} from './BetterNote'
 import {movementXToBeats} from './BetterSequencerHelpers'
-import {SeqEvents, duplicateNoteEvent} from '@corgifm/common/SeqStuff'
+import {SeqEvents, duplicateNoteEvent, SeqPattern} from '@corgifm/common/SeqStuff'
 
 interface Props {
 	noteHeight: number
 	columnWidth: number
 	panPixels: Point
-	expMidiPattern: ExpMidiPatternState
+	expMidiPattern: SeqPattern
 	selected: Set<Id>
 	setSelected: (newSelected: Set<Id>) => void
 	onNoteSelect: (eventId: Id, select: boolean, clear: boolean) => void
@@ -271,7 +271,7 @@ export const BetterNotes = React.memo(function _BetterNotes(props: Props) {
 interface ActualNotesProps {
 	noteHeight: number
 	columnWidth: number
-	expMidiPattern: ExpMidiPatternState
+	expMidiPattern: SeqPattern
 	selected: Set<Id>
 	onNoteSelect: (eventId: Id, select: boolean, clear: boolean) => void
 	rows: string[]

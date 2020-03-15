@@ -24,7 +24,7 @@ import {
 	selectExpConnectionsWithSourceIds, selectExpAllPositions,
 	ActivityAction, ExpMidiPatternsAction, ExpMidiPatternViewsAction,
 	selectExpMidiPattern, selectActivityType, makeExpMidiPatternState,
-	expMidiPatternsActions, selectExpMidiPatternsState,
+	expMidiPatternsActions, selectExpMidiPatternsState, makeExpMidiPatternViewState, expMidiPatternViewsActions, selectExpMidiPatternView, selectExpMidiPatternViewsState,
 } from '@corgifm/common/redux'
 import {serverClientId, GroupId, expBetterSequencerMainPatternParamId} from '@corgifm/common/common-constants'
 import {createNodeId, arrayToESIdKeyMap} from '@corgifm/common/common-utils'
@@ -302,10 +302,14 @@ function after(
 			if (!(action as unknown as BroadcastAction).alreadyBroadcasted) {
 				if (action.newNode.type === 'betterSequencer') {
 					const newPattern = makeExpMidiPatternState(patternA())
-
 					dispatch(expMidiPatternsActions.add(newPattern))
+
+					const lengthBeats = newPattern.events.map(x => x.startBeat + x.duration).max() || 100
+					const newPatternView = makeExpMidiPatternViewState({pattern: newPattern.id, endBeat: lengthBeats, loopEndBeat: lengthBeats})
+					dispatch(expMidiPatternViewsActions.add(newPatternView))
+
 					dispatch(expNodesActions.referenceParamChange(
-						action.newNode.id, expBetterSequencerMainPatternParamId, {targetId: newPattern.id, targetType: 'midiPattern'}))
+						action.newNode.id, expBetterSequencerMainPatternParamId, {targetId: newPatternView.id, targetType: 'midiPatternView'}))
 				}
 			}
 			return
@@ -557,7 +561,9 @@ function bar(
 		case 'ACTIVITY_REPLACE':
 			if (action.activityState.activityType === RoomType.Experimental) {
 				return nodeManager.loadMainGraph(
-					selectMainExpGraph(state.room), selectExpMidiPatternsState(state.room))
+					selectMainExpGraph(state.room),
+					selectExpMidiPatternsState(state.room),
+					selectExpMidiPatternViewsState(state.room))
 			} else {
 				return
 			}
@@ -620,6 +626,14 @@ function bar(
 		case 'EXP_MIDI_PATTERN_DELETE_EVENTS':
 		case 'EXP_MIDI_PATTERN_UPDATE_EVENTS':
 			return nodeManager.patternUpdated(selectExpMidiPattern(state.room, action.id))
+
+		// Midi Pattern Views
+		case 'EXP_MIDI_PATTERN_VIEW_ADD':
+			return nodeManager.patternViewUpdated(selectExpMidiPatternView(state.room, action.newPattern.id))
+		case 'EXP_MIDI_PATTERN_VIEW_DELETE':
+			return nodeManager.patternViewDeleted(action.id)
+		case 'EXP_MIDI_PATTERN_VIEW_UPDATE':
+			return nodeManager.patternViewUpdated(selectExpMidiPatternView(state.room, action.updatedPattern.id))
 
 		// Other
 		case 'SET_OPTION': {

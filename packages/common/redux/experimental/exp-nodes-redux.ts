@@ -195,7 +195,7 @@ export interface ExpReferenceParamState {
 	readonly targetType: ExpReferenceTargetType
 }
 
-export type ExpReferenceTargetType = 'midiPattern'
+export type ExpReferenceTargetType = 'midiPattern' | 'midiPatternView'
 
 const initialState = Map<Id, ExpNodeState>()
 

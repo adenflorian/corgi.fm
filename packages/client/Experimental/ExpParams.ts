@@ -12,7 +12,8 @@ import {LabAudioParam, KelpieAudioNode} from './Nodes/PugAudioNode/Lab'
 import {ExpMidiClip, makeExpMidiClip} from '@corgifm/common/midi-types'
 import {CorgiNode} from './CorgiNode'
 import {nodeToNodeActions} from '@corgifm/common/server-constants'
-import {ExpMidiPatternState, ExpReferenceParamState} from '@corgifm/common/redux'
+import {ExpReferenceParamState, ExpReferenceTargetType, ExpMidiPatternViewState} from '@corgifm/common/redux'
+import {SeqPatternView, SeqPattern} from '@corgifm/common/SeqStuff'
 
 export interface ExpParam {
 	readonly id: Id
@@ -156,7 +157,7 @@ export interface MidiClipParamChange {
 
 export type ExpReferenceParams = ReadonlyMap<Id, ExpReferenceParam>
 export type ExpReferenceParamReadonly<T extends IdObject> = ExpReferenceParam<T> & {
-	value: ReadonlyCorgiObjectChangedEvent<ExpMidiPatternState>
+	value: ReadonlyCorgiObjectChangedEvent<T>
 }
 export class ExpReferenceParam<T extends IdObject = IdObject> {
 	public readonly value: CorgiObjectChangedEvent<T>
@@ -165,6 +166,7 @@ export class ExpReferenceParam<T extends IdObject = IdObject> {
 	public constructor(
 		public readonly id: Id,
 		public readonly defaultValue: T,
+		public readonly targetType: ExpReferenceTargetType,
 	) {
 		this.value = new CorgiObjectChangedEvent<T>(this.defaultValue)
 	}
@@ -172,6 +174,7 @@ export class ExpReferenceParam<T extends IdObject = IdObject> {
 	public readonly newTarget = (newTarget: CorgiObjectChangedEvent<T>) => {
 		if (this._target) this._target.unsubscribe(this._onTargetUpdated)
 		this._target = newTarget
+		console.log({sub: this._target.subscribe, _target: this._target.subscribe, newTarget})
 		this._target.subscribe(this._onTargetUpdated)
 	}
 
@@ -203,5 +206,44 @@ export class ExpButton {
 		const action = nodeToNodeActions.buttonPress(this.node.id, this.id)
 		this.node.singletonContext.webSocketService.nodeToNode(action)
 		this.onPress.invokeImmediately(action.pressId)
+	}
+}
+
+export class SeqPatternViewContainer {
+	public readonly patternView: CorgiObjectChangedEvent<SeqPatternView>
+
+	constructor(
+		patternViewState: ExpMidiPatternViewState,
+		private _pattern: CorgiObjectChangedEvent<SeqPattern>,
+	) {
+		this.patternView = new CorgiObjectChangedEvent({
+			...patternViewState.toJS(),
+			pattern: this._pattern.current,
+		})
+		this._pattern.subscribe(this._onPatternUpdated)
+	}
+
+	public readonly changePattern = (newPattern: CorgiObjectChangedEvent<SeqPattern>) => {
+		this._pattern.unsubscribe(this._onPatternUpdated)
+		this._pattern = newPattern
+		this._pattern.subscribe(this._onPatternUpdated)
+	}
+
+	public readonly update = (updatedPatternView: ExpMidiPatternViewState) => {
+		this.patternView.invokeImmediately({
+			...updatedPatternView.toJS(),
+			pattern: this.patternView.current.pattern,
+		})
+	}
+
+	private readonly _onPatternUpdated = (updatedPattern: SeqPattern) => {
+		this.patternView.invokeImmediately({
+			...this.patternView.current,
+			pattern: updatedPattern,
+		})
+	}
+
+	public readonly dispose = () => {
+		this._pattern.unsubscribe(this._onPatternUpdated)
 	}
 }

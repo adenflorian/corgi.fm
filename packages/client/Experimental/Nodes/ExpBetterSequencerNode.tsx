@@ -12,10 +12,13 @@ import {ExpMidiOutputPort} from '../ExpMidiPorts'
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 import {ExpPorts} from '../ExpPorts'
 import {ExpBetterSequencerNodeView} from './ExpBetterSequencerNodeView'
-import {SeqReadEvent, seqPatternReader} from '@corgifm/common/SeqStuff'
-import {makeExpMidiPatternState, ExpMidiPatternStateRaw} from '@corgifm/common/redux'
+import {SeqReadEvent, seqPatternReader, seqPatternViewReader, SeqPatternView, makeSeqPatternView} from '@corgifm/common/SeqStuff'
+import {makeExpMidiPatternViewState} from '@corgifm/common/redux'
 import {minZoomX, maxZoomX, maxZoomY, minZoomY, maxPan, minPan} from '@corgifm/common/BetterConstants'
 import {expBetterSequencerMainPatternParamId} from '@corgifm/common/common-constants'
+import {logger} from '@corgifm/common/logger'
+
+let bbb = 0
 
 export class ExpBetterSequencerNode extends CorgiNode {
 	protected readonly _ports: ExpPorts
@@ -39,15 +42,15 @@ export class ExpBetterSequencerNode extends CorgiNode {
 	private _songStartTimeSeconds = -1
 	private _cursorBeats = 0
 	private _cursorSeconds = 0
-	private readonly _midiPatternParam: ExpReferenceParam<ExpMidiPatternStateRaw>
-	public get midiPatternParam() {return this._midiPatternParam as ExpReferenceParamReadonly<ExpMidiPatternStateRaw>}
+	private readonly _midiPatternViewParam: ExpReferenceParam<SeqPatternView>
+	public get midiPatternParam() {return this._midiPatternViewParam as ExpReferenceParamReadonly<SeqPatternView>}
 
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
 		super(corgiNodeArgs, {name: 'Sequencer', color: CssColor.yellow})
 
-		this._midiPatternParam = new ExpReferenceParam(
-			expBetterSequencerMainPatternParamId, makeExpMidiPatternState({}) as ExpMidiPatternStateRaw)
-		this._referenceParams = arrayToESIdKeyMap([this._midiPatternParam] as unknown as ExpReferenceParam[])
+		this._midiPatternViewParam = new ExpReferenceParam(
+			expBetterSequencerMainPatternParamId, makeSeqPatternView() as SeqPatternView, 'midiPatternView')
+		this._referenceParams = arrayToESIdKeyMap([this._midiPatternViewParam] as unknown as ExpReferenceParam[])
 
 		this._midiOutputPort = new ExpMidiOutputPort('output', 'output', this)
 		this._ports = arrayToESIdKeyMap([this._midiOutputPort])
@@ -115,13 +118,14 @@ export class ExpBetterSequencerNode extends CorgiNode {
 		if (secondsToRead <= 0) return
 		const readFromBeat = this._cursorBeats
 		const beatsToRead = toBeats(secondsToRead)
+		if (Number.isNaN(beatsToRead)) return logger.error({beatsToRead, secondsToRead, readToSongTimeSeconds, cursorSeconds: this._cursorSeconds, currentSongTimeSeconds, actualBPM})
 
 		// distance from currentSongTime to where the cursor just started reading events from
 		const offsetSeconds = this._cursorSeconds - currentSongTimeSeconds
 
 		const readRangeBeats = new MidiRange(readFromBeat, beatsToRead)
 
-		const events = seqPatternReader(readRangeBeats, this._midiPatternParam.value.current)
+		const events = seqPatternViewReader(readRangeBeats, this._midiPatternViewParam.value.current)
 		// const events = seqSessionReader(readRangeBeats, this._session)
 
 		if (events.length > 0) {

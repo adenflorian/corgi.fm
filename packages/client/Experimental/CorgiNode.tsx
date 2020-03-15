@@ -2,7 +2,7 @@ import React, {ReactElement, useContext, ReactNode} from 'react'
 import {List} from 'immutable'
 import {clamp, clampPolarized} from '@corgifm/common/common-utils'
 import {NodeToNodeAction} from '@corgifm/common/server-constants'
-import {ExpNodeType, ExpPortStates} from '@corgifm/common/redux'
+import {ExpNodeType, ExpPortStates, ExpReferenceTargetType} from '@corgifm/common/redux'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {logger} from '../client-logger'
 import {SingletonContextImpl} from '../SingletonContext'
@@ -179,10 +179,12 @@ export abstract class CorgiNode {
 		customStringParam.value.invokeImmediately(newValue)
 	}
 
-	public onReferenceParamChange(paramId: Id, newTarget: CorgiObjectChangedEvent<IdObject>) {
+	public onReferenceParamChange(paramId: Id, newTarget: CorgiObjectChangedEvent<IdObject>, targetType: ExpReferenceTargetType) {
 		const referenceParam = this._referenceParams.get(paramId)
 
 		if (!referenceParam) return logger.warn('[onReferenceParamChange] 404 referenceParam not found: ', {paramId, nodeId: this.id, newTarget})
+
+		if (referenceParam.targetType !== targetType) return logger.error('[onReferenceParamChange] reference target type mismatch!: ', {paramId, nodeId: this.id, newTarget, targetType, referenceParam})
 
 		referenceParam.newTarget(newTarget)
 	}

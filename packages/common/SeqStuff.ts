@@ -1,9 +1,9 @@
 import * as Immutable from 'immutable'
+import * as uuid from 'uuid'
 import {MidiRange} from '@corgifm/common/midi-types'
 import {logger} from './logger'
 import {NoteNameSharps, NoteNameFlats} from './common-types'
 import {midiNoteFromNoteName} from './common-samples-stuff'
-import uuid = require('uuid')
 
 export type SeqEvent = SeqNoteEvent
 
@@ -97,6 +97,26 @@ export interface SeqPatternView {
 	readonly name: string
 }
 
+export function makeSeqPattern(): SeqPattern {
+	return {
+		id: uuid.v4(),
+		events: SeqEvents(),
+		name: 'defaultSeqPattern',
+	}
+}
+
+export function makeSeqPatternView(): SeqPatternView {
+	return {
+		id: uuid.v4(),
+		startBeat: 0,
+		endBeat: 4,
+		loopStartBeat: 0.,
+		loopEndBeat: 4,
+		pattern: makeSeqPattern(),
+		name: 'defaultSeqPatternView',
+	}
+}
+
 export function seqPatternReader(range: MidiRange, pattern: SeqPattern): readonly SeqReadEvent[] {
 	const noteOnEvents = pattern.events
 		.filter(x => x.startBeat >= range.start && x.startBeat < range.end)
@@ -126,10 +146,10 @@ export function seqPatternReader(range: MidiRange, pattern: SeqPattern): readonl
 	return events
 }
 
-export function seqPatternViewReader(range: MidiRange, patternView: SeqPatternView): readonly SeqReadEvent[] {
+export function seqPatternViewReader(range: MidiRange, patternView: SeqPatternView, loops = 0): readonly SeqReadEvent[] {
 	const a = range.start % patternView.loopEndBeat
 	const b = range.end - (range.start - a)
-	logger.assert(b > a, 'no sir', {a, b, range, patternView})
+	logger.assert(b > a, 'no sir', {loops, a, b, range, patternView})
 
 	if (b <= patternView.loopEndBeat) {
 		// Range fits within loop, so we're done
@@ -141,10 +161,10 @@ export function seqPatternViewReader(range: MidiRange, patternView: SeqPatternVi
 		const lengthA = patternView.loopEndBeat - a
 		const rangeA = new MidiRange(a, patternView.loopEndBeat - a)
 		const lengthB = range.length - lengthA
-		logger.assert(lengthB > 0, 'uh no plz', {range, patternView, a, b, lengthA, rangeA, lengthB})
+		logger.assert(lengthB > 0, 'uh no plz', {loops, range, patternView, a, b, lengthA, rangeA, lengthB})
 		const rangeB = new MidiRange(patternView.loopStartBeat, lengthB)
 		const eventsA = seqPatternReader(rangeA, patternView.pattern)
-		const eventsB = seqPatternViewReader(rangeB, patternView)
+		const eventsB = seqPatternViewReader(rangeB, patternView, loops + 1)
 		return eventsA.concat(eventsB.map(x => ({...x, offsetBeats: x.offsetBeats + lengthA})))
 	}
 }

@@ -72,7 +72,8 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 	const panY = useNumberChangedEvent(nodeContext.panY.onChange)
 
 
-	const expMidiPattern = useObjectChangedEvent(nodeContext.midiPatternParam.value)
+	const expMidiPatternView = useObjectChangedEvent(nodeContext.midiPatternParam.value)
+	const expMidiPattern = expMidiPatternView.pattern
 
 
 	const lengthBeats = useMemo(() => expMidiPattern.events.map(x => x.startBeat + x.duration).max() || 4, [expMidiPattern.events])

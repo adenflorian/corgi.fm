@@ -14,31 +14,19 @@ export const expMidiPatternViewsActions = {
 		BROADCASTER_ACTION,
 		SERVER_ACTION,
 	} as const),
-	addMany: (newPatterns: Map<Id, ExpMidiPatternViewState>) => ({
-		type: 'EXP_MIDI_PATTERN_VIEW_ADD_MANY' as const,
-		isExpMidiPatternViewAction: true,
-		newPatterns,
-		BROADCASTER_ACTION,
-		SERVER_ACTION,
-	} as const),
-	delete: (nodeId: Id) => ({
+	delete: (id: Id) => ({
 		type: 'EXP_MIDI_PATTERN_VIEW_DELETE' as const,
 		isExpMidiPatternViewAction: true,
-		nodeId,
+		id,
 		BROADCASTER_ACTION,
 		SERVER_ACTION,
 	} as const),
-	deleteMany: (nodeIds: readonly Id[]) => ({
-		type: 'EXP_MIDI_PATTERN_VIEW_DELETE_MANY' as const,
+	update: (updatedPattern: ExpMidiPatternViewState) => ({
+		type: 'EXP_MIDI_PATTERN_VIEW_UPDATE' as const,
 		isExpMidiPatternViewAction: true,
-		nodeIds,
+		updatedPattern,
 		BROADCASTER_ACTION,
 		SERVER_ACTION,
-	} as const),
-	replaceAll: (state: ExpMidiPatternViewsState) => ({
-		type: 'EXP_MIDI_PATTERN_VIEW_REPLACE_ALL' as const,
-		isExpMidiPatternViewAction: true,
-		state,
 	} as const),
 } as const
 
@@ -46,13 +34,13 @@ export type ExpMidiPatternViewsAction = ActionType<typeof expMidiPatternViewsAct
 
 const defaultExpMidiPatternViewState = {
 	id: 'dummyId' as Id,
-	name: 'dummyName',
-	startBeat: 0,
-	endBeat: 4,
-	loopStartBeat: 0,
-	loopEndBeat: 4,
+	name: 'dummyName' as string,
+	startBeat: 0 as number,
+	endBeat: 4 as number,
+	loopStartBeat: 0 as number,
+	loopEndBeat: 4 as number,
 	pattern: 'dummyPatternId' as Id,
-}
+} as const
 
 const _makeExpMidiPatternViewState = Record(defaultExpMidiPatternViewState)
 
@@ -67,6 +55,8 @@ export function makeExpMidiPatternViewState(
 
 export interface ExpMidiPatternViewState extends ReturnType<typeof _makeExpMidiPatternViewState> {}
 
+export type ExpMidiPatternViewStateRaw = typeof defaultExpMidiPatternViewState
+
 const initialState = Map<Id, ExpMidiPatternViewState>()
 
 export type ExpMidiPatternViewsState = typeof initialState
@@ -76,14 +66,10 @@ export const expMidiPatternViewsReducer =
 		switch (action.type) {
 			case 'EXP_MIDI_PATTERN_VIEW_ADD':
 				return state.set(action.newPattern.id, makeExpMidiPatternViewState(action.newPattern))
-			case 'EXP_MIDI_PATTERN_VIEW_ADD_MANY':
-				return state.merge(Map(action.newPatterns).map(makeExpMidiPatternViewState))
+			case 'EXP_MIDI_PATTERN_VIEW_UPDATE':
+				return state.update(action.updatedPattern.id, x => x.merge(action.updatedPattern))
 			case 'EXP_MIDI_PATTERN_VIEW_DELETE':
-				return state.delete(action.nodeId)
-			case 'EXP_MIDI_PATTERN_VIEW_DELETE_MANY':
-				return state.deleteAll(action.nodeIds)
-			case 'EXP_MIDI_PATTERN_VIEW_REPLACE_ALL':
-				return state.clear().merge(action.state).map(x => makeExpMidiPatternViewState(x))
+				return state.delete(action.id)
 			default: return state
 		}
 	}

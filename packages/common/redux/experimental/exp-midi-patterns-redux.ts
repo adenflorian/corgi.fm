@@ -1,7 +1,7 @@
 import {Map, Record} from 'immutable'
 import {ActionType} from 'typesafe-actions'
 import * as uuid from 'uuid'
-import {SeqEvents, SeqEvent} from '../../SeqStuff'
+import {SeqEvents, SeqEvent, SeqPattern} from '../../SeqStuff'
 import {
 	BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION,
 } from '..'
@@ -75,10 +75,10 @@ export const expMidiPatternsActions = {
 export type ExpMidiPatternsAction = ActionType<typeof expMidiPatternsActions>
 
 const defaultExpMidiPatternState = {
-	id: 'dummyId' as Id,
-	name: 'dummyOwnerId' as string,
-	events: Map<Id, SeqEvent>() as SeqEvents,
-} as const
+	id: 'dummyId',
+	name: 'dummyOwnerId',
+	events: Map<Id, SeqEvent>(),
+} as SeqPattern
 
 const _makeExpMidiPatternState = Record(defaultExpMidiPatternState)
 

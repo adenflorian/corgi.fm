@@ -1,8 +1,9 @@
 import React, {Fragment, useContext, useLayoutEffect} from 'react'
 import * as immutable from 'immutable'
-import {ExpNodeState, IExpConnection, ExpGraph, ExpMidiPatternState,
+import {ExpNodeState, IExpConnection, ExpGraph,
 	ExpReferenceTargetType, ExpReferenceParamState,
-	ExpMidiPatternsState} from '@corgifm/common/redux'
+	ExpMidiPatternsState, ExpMidiPatternViewState,
+	ExpMidiPatternViewsState} from '@corgifm/common/redux'
 import {ParamInputCentering} from '@corgifm/common/common-types'
 import {NodeToNodeAction} from '@corgifm/common/server-constants'
 import {assertUnreachable} from '@corgifm/common/common-utils'
@@ -16,7 +17,8 @@ import {
 	isPolyphonicConnection,
 } from './ExpConnections'
 import {NumberParamChange, EnumParamChange, StringParamChange,
-	ExpReferenceParamChange} from './ExpParams'
+	ExpReferenceParamChange,
+	SeqPatternViewContainer} from './ExpParams'
 import {
 	isAudioOutputPort, isAudioInputPort, ExpPortType,
 	isAudioParamInputPort, ExpPort,
@@ -24,6 +26,7 @@ import {
 import {isMidiOutputPort, isMidiInputPort} from './ExpMidiPorts'
 import {isPolyphonicOutputPort, isPolyphonicInputPort} from './ExpPolyphonicPorts'
 import {CorgiObjectChangedEvent} from './CorgiEvents'
+import {SeqPattern} from '@corgifm/common/SeqStuff'
 
 export const NodeManagerContext = React.createContext<null | NodeManagerContextValue>(null)
 
@@ -59,7 +62,8 @@ export class NodeManager {
 	private get _audioContext() {return this._singletonContext.getAudioContext()}
 	private get _preMasterLimiter() {return this._singletonContext.getPreMasterLimiter()}
 	private _tickSubscribers = new Set<NodeTickDelegate>()
-	private readonly _midiPatterns = new Map<Id, CorgiObjectChangedEvent<ExpMidiPatternState>>()
+	private readonly _midiPatterns = new Map<Id, CorgiObjectChangedEvent<SeqPattern>>()
+	private readonly _midiPatternViews = new Map<Id, SeqPatternViewContainer>()
 
 	public constructor(
 		private readonly _singletonContext: SingletonContextImpl,
@@ -216,7 +220,7 @@ export class NodeManager {
 
 		if (!target) return logger.warn('[onReferenceParamChange] 404 target not found: ', {targetId, targetType, paramChange})
 
-		node.onReferenceParamChange(paramId, target)
+		node.onReferenceParamChange(paramId, target, targetType)
 	}
 
 	private readonly _loadReferenceParam = (node: CorgiNode, paramId: Id, paramChange: ExpReferenceParamState) => {
@@ -225,18 +229,23 @@ export class NodeManager {
 
 		if (!target) return logger.warn('[loadReferenceParam] 404 target not found: ', {targetId, targetType, paramChange})
 
-		node.onReferenceParamChange(paramId, target)
+		node.onReferenceParamChange(paramId, target, targetType)
 	}
 
 	private readonly _getReferenceTarget = (type: ExpReferenceTargetType, id: Id) => {
 		switch (type) {
 			case 'midiPattern': return this._midiPatterns.get(id)
+			case 'midiPatternView': {
+				const foo = this._midiPatternViews.get(id)
+				return foo ? foo.patternView : undefined
+			}
 			default: throw new Error('hello there')
 		}
 	}
 
-	public readonly loadMainGraph = (mainGraph: ExpGraph, patterns: ExpMidiPatternsState) => {
+	public readonly loadMainGraph = (mainGraph: ExpGraph, patterns: ExpMidiPatternsState, patternViews: ExpMidiPatternViewsState) => {
 		patterns.forEach(this.patternUpdated)
+		patternViews.forEach(this.patternViewUpdated)
 		this.addNodes(mainGraph.nodes)
 		this.addConnections(mainGraph.connections.connections)
 	}
@@ -506,7 +515,7 @@ export class NodeManager {
 		})
 	}
 
-	public readonly patternUpdated = (patternState: ExpMidiPatternState) => {
+	public readonly patternUpdated = (patternState: SeqPattern) => {
 		const pattern = this._midiPatterns.get(patternState.id)
 		if (!pattern) {
 			this._midiPatterns.set(patternState.id, new CorgiObjectChangedEvent(patternState))
@@ -517,6 +526,27 @@ export class NodeManager {
 
 	public readonly patternDeleted = (id: Id) => {
 		this._midiPatterns.delete(id)
+		// TODO Somehow notify subscribers
+	}
+
+	public readonly patternViewUpdated = (updatedPatternViewState: ExpMidiPatternViewState) => {
+		const patternView = this._midiPatternViews.get(updatedPatternViewState.id)
+		if (!patternView) {
+			const pattern = this._midiPatterns.get(updatedPatternViewState.pattern)
+			if (!pattern) return logger.error('[patternViewUpdated] 404 pattern not found!', {patternViewState: updatedPatternViewState})
+			this._midiPatternViews.set(updatedPatternViewState.id, new SeqPatternViewContainer(updatedPatternViewState, pattern))
+		} else {
+			if (updatedPatternViewState.pattern !== patternView.patternView.current.pattern.id) {
+				const pattern = this._midiPatterns.get(updatedPatternViewState.pattern)
+				if (!pattern) return logger.error('[patternViewUpdated] 404 pattern not found!', {patternViewState: updatedPatternViewState})
+				patternView.changePattern(pattern)
+			}
+			patternView.update(updatedPatternViewState)
+		}
+	}
+
+	public readonly patternViewDeleted = (id: Id) => {
+		this._midiPatternViews.delete(id)
 		// TODO Somehow notify subscribers
 	}
 
