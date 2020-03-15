@@ -10,7 +10,8 @@ import {
 	userInputActions,
 	localActions, localMidiKeyPress, localMidiKeyUp, localMidiOctaveChange,
 	windowBlur, selectRoomInfoState, expLocalActions,
-	selectLocalClientId, selectRoomMember, selectExpNode, roomMemberActions, selectActivityType,
+	selectLocalClientId, selectRoomMember, selectExpNode,
+	roomMemberActions, selectActivityType, selectUserInputKeys,
 } from '@corgifm/common/redux'
 import {mouseFromScreenToBoard} from './SimpleGlobalClientState'
 import {RoomType} from '@corgifm/common/common-types'
@@ -141,25 +142,6 @@ const keyboardShortcuts: IKeyBoardShortcuts = Map<KeyBoardShortcut>({
 		allowRepeat: true,
 		preventDefault: true,
 	},
-	// Disabling these until needed again
-	[Control]: {
-		actionOnKeyDown: userInputActions.setKeys({ctrl: true}),
-		actionOnKeyUp: userInputActions.setKeys({ctrl: false}),
-		allowRepeat: false,
-		preventDefault: false,
-	},
-	[Alt]: {
-		actionOnKeyDown: userInputActions.setKeys({alt: true}),
-		actionOnKeyUp: userInputActions.setKeys({alt: false}),
-		allowRepeat: false,
-		preventDefault: true,
-	},
-	[Shift]: {
-		actionOnKeyDown: userInputActions.setKeys({shift: true}),
-		actionOnKeyUp: userInputActions.setKeys({shift: false}),
-		allowRepeat: false,
-		preventDefault: false,
-	},
 	' ': {
 		actionOnKeyDown: (_, state) => selectGlobalClockIsPlaying(state.room)
 			? globalClockActions.stop()
@@ -213,6 +195,12 @@ export function setupInputEventListeners(
 	})
 
 	function onKeyEvent(event: KeyboardEvent) {
+
+		const state = store.getState()
+		const {dispatch} = store
+
+		syncModifierKeysState(event)
+
 		let keyCombo = [] as string[]
 		if (event.shiftKey) keyCombo.push(Shift)
 		if (event.ctrlKey || event.metaKey) keyCombo.push(Control)
@@ -226,7 +214,7 @@ export function setupInputEventListeners(
 
 		if (event.repeat && keyboardShortcut.allowRepeat === false) return
 
-		if (selectIsLocalClientInLimitedMode(store.getState()) && keyboardShortcut.allowInLimitedMode !== true) return
+		if (selectIsLocalClientInLimitedMode(state) && keyboardShortcut.allowInLimitedMode !== true) return
 
 		const actionPropToUse = getPropNameForEventType(event.type)
 		const action = keyboardShortcut[actionPropToUse]
@@ -234,12 +222,12 @@ export function setupInputEventListeners(
 		if (!action) return
 
 		if (typeof action === 'function') {
-			const actualAction = action(event, store.getState())
+			const actualAction = action(event, state)
 			if (actualAction !== undefined) {
-				store.dispatch(actualAction)
+				dispatch(actualAction)
 			}
 		} else {
-			store.dispatch(action)
+			dispatch(action)
 		}
 
 		if (!isInputFocused() && keyboardShortcut.preventDefault) {
@@ -247,12 +235,36 @@ export function setupInputEventListeners(
 		}
 	}
 
+	function syncModifierKeysState(event: KeyboardEvent | MouseEvent) {
+		const state = store.getState()
+		const {dispatch} = store
+
+		const userInputState = selectUserInputKeys(state)
+
+		if (userInputState.shift !== event.shiftKey ||
+			userInputState.alt !== event.altKey ||
+			userInputState.ctrl !== event.ctrlKey
+		) {
+			dispatch(userInputActions.setKeys({
+				shift: event.shiftKey,
+				alt: event.altKey,
+				ctrl: event.ctrlKey,
+			}))
+		}
+	}
+
 	const mouseMoveUpdateIntervalMs = 50
 
-	const onMouseMove = (e: MouseEvent) => dispatchPointersUpdate(e.clientX, e.clientY)
+	const onMouseMove = (e: MouseEvent) => {
+		dispatchPointersUpdate(e.clientX, e.clientY)
+		syncModifierKeysState(e)
+	}
 	window.addEventListener('mousemove', rateLimitedDebounce(onMouseMove, mouseMoveUpdateIntervalMs))
 
-	const onWheel = () => setTimeout(() => dispatchPointersUpdate(), 0)
+	const onWheel = (e: MouseWheelEvent) => {
+		setTimeout(() => dispatchPointersUpdate(), 0)
+		syncModifierKeysState(e)
+	}
 	window.addEventListener('wheel', rateLimitedDebounce(onWheel, mouseMoveUpdateIntervalMs))
 
 	let lastMousePosition = {
