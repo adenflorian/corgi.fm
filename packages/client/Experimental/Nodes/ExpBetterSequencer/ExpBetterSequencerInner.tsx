@@ -16,7 +16,7 @@ import {clamp} from '@corgifm/common/common-utils'
 import {midiNoteToNoteNameFull} from '@corgifm/common/common-samples-stuff'
 import {
 	minPan, maxPan, minZoomX, maxZoomX, minZoomY,
-	maxZoomY, smallestNoteLength, betterSideNotesWidth,
+	maxZoomY, smallestNoteLength, betterSideNotesWidth, topSectionHeight,
 } from '@corgifm/common/BetterConstants'
 import './BetterSequencer.less'
 import {
@@ -93,13 +93,15 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 	// Common state
 	const [persistentDelta, setPersistentDelta] = useState({x: 0, y: 0})
 	const [startPoint, setStartPoint] = useState({x: 0, y: 0})
+	const [clickPositionPercentage, setClickPositionPercentage] = useState({x: 0, y: 0})
+	const [clickYOffset, setClickYOffset] = useState(0)
 	const [firstMouseMove, setFirstMouseMove] = useState(false)
 
 	const editorElement = useRef<HTMLDivElement>(null)
 
 	const dispatch = useDispatch()
 
-	const fixedHeight = 384
+	const fixedHeight = 400
 	const fixedWidth = 512
 
 	const scaledHeightUnclamped = fixedHeight * zoom.y
@@ -384,6 +386,10 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 			activateLeftZoomPan()
 			setPersistentDelta({x: 0, y: 0})
 			setFirstMouseMove(false)
+			const clickPercentage = clientMousePositionToPercentages({x: e.clientX, y: e.clientY})
+			setClickPositionPercentage(clickPercentage)
+			const clickInEditorSpace = clientSpaceToEditorSpace({x: e.clientX, y: e.clientY}, {x, y})
+			setClickYOffset(clickInEditorSpace.y)
 		}
 	}, [activateLeftZoomPan])
 
@@ -413,11 +419,14 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 				minZoomY,
 				maxZoomY)
 
-			const newPanY = zoom.y === 1
-					? pan.y
-					: clamp(
-						startPoint.x + -zoomedMovement.y / maxPanY,
-						minPan, maxPan)
+			const z = newZoomY
+			const c = clickPositionPercentage.y
+			const b = 1 / c
+			const a = (z * height) - height
+			const g = (1 / ((b * z) - b)) + c
+			const o = clickYOffset + zoomedMovement.y
+			const y = -(o / a) + g
+			const newPanY = y
 
 			dispatch(expNodesActions.customNumberParamChange(nodeContext.id, nodeContext.zoomY.id, newZoomY))
 			dispatch(expNodesActions.customNumberParamChange(nodeContext.id, nodeContext.panY.id, newPanY))
@@ -624,12 +633,12 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 	const color = useStringChangedEvent(nodeContext.onColorChange)
 
 	return (
-		<div className="expBetterSequencer" style={{color, height}}>
+		<div className="expBetterSequencer" style={{color, height: height + topSectionHeight}}>
 			<div className="top">
 				<div className="topLeft" style={{width: betterSideNotesWidth}}></div>
 				<BetterLoopBar {...{width, columnWidth}} />
 			</div>
-			<div className="middle">
+			<div className="middle" style={{height}}>
 				<BetterSideNotes {...{rows, panPixelsY: panPixels.y, noteHeight, onLeftZoomPanBarMouseDown}} />
 				<div
 					className="editor"
