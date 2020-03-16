@@ -37,8 +37,8 @@ export const BetterLoopBar = React.memo(function _BetterLoopBar({width, columnWi
 			`}
 			style={{
 				height: loopBarHeight,
-				width: width - betterSideNotesWidth,
-				backgroundColor: CssColor.panelGrayLight,
+				width: '100%',
+				backgroundColor: CssColor.panelGray,
 				position: 'relative',
 
 			}}

@@ -15,8 +15,11 @@ export const betterNotesWidth = betterEditorWidth
 export const betterWidth = betterControlsWidth + betterSideNotesWidth + betterEditorWidth
 export const betterHeight = 128 * 3
 
+export const expBetterYOffset = 232
+
 export const smallNoteHeight = 27
 export const tinyNoteHeight = 12
 
+export const topTimeBarHeight = 24
 export const loopBarHeight = 16
-export const topSectionHeight = loopBarHeight
+export const topSectionHeight = topTimeBarHeight + loopBarHeight

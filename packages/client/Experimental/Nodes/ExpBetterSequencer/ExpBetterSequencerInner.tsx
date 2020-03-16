@@ -16,7 +16,8 @@ import {clamp} from '@corgifm/common/common-utils'
 import {midiNoteToNoteNameFull} from '@corgifm/common/common-samples-stuff'
 import {
 	minPan, maxPan, minZoomX, maxZoomX, minZoomY,
-	maxZoomY, smallestNoteLength, betterSideNotesWidth, topSectionHeight,
+	maxZoomY, smallestNoteLength, betterSideNotesWidth,
+	topSectionHeight, expBetterYOffset,
 } from '@corgifm/common/BetterConstants'
 import './BetterSequencer.less'
 import {
@@ -39,6 +40,7 @@ import {ExpBetterSequencerNode} from '../ExpBetterSequencerNode'
 import {useNumberChangedEvent, useObjectChangedEvent, useStringChangedEvent} from '../../hooks/useCorgiEvent'
 import {SeqEvents, makeNoteEvent2, duplicateNoteEvent} from '@corgifm/common/SeqStuff'
 import {BetterLoopBar} from './BetterLoopBar'
+import {BetterTopTimeBar} from './BetterTopTimeBar'
 
 const mouseWheelYSensitivity = 0.001
 const mouseWheelPanXSensitivity = 0.001
@@ -56,7 +58,7 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 	const position = useExpPosition(nodeContext.id)
 
 	const {x, y, width} = position
-	const height = 400
+	const visibleHeight = position.height - expBetterYOffset - topSectionHeight
 
 	const rate = useNumberChangedEvent(nodeContext.rate.onChange)
 	const zoomX = useNumberChangedEvent(nodeContext.zoomX.onChange)
@@ -71,7 +73,7 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 
 	const zoom = {x: zoomX, y: zoomY}
 	const pan = {x: panX, y: panY}
-	
+
 	const [selected, setSelected] = useState(Set<Id>())
 	const [originalSelected, setOriginalSelected] = useState(Set<Id>())
 	const clearSelected = useCallback(() => setSelected(Set()), [])
@@ -90,26 +92,28 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 	// Left Zoom Pan Bar
 	const [leftZoomPanActive, activateLeftZoomPan, deactivateLeftZoomPan] = useBoolean(false)
 
+	// Top Zoom Pan Bar
+	const [topZoomPanActive, activateTopZoomPan, deactivateTopZoomPan] = useBoolean(false)
+
 	// Common state
 	const [persistentDelta, setPersistentDelta] = useState({x: 0, y: 0})
 	const [startPoint, setStartPoint] = useState({x: 0, y: 0})
 	const [clickPositionPercentage, setClickPositionPercentage] = useState({x: 0, y: 0})
-	const [clickYOffset, setClickYOffset] = useState(0)
+	const [clickInEditorSpace, setClickInEditorSpace] = useState({x: 0, y: 0})
 	const [firstMouseMove, setFirstMouseMove] = useState(false)
 
 	const editorElement = useRef<HTMLDivElement>(null)
 
 	const dispatch = useDispatch()
 
-	const fixedHeight = 400
+	const minScaledHeight = 400
 	const fixedWidth = 512
 
-	const scaledHeightUnclamped = fixedHeight * zoom.y
-	const scaledHeight = Math.max(scaledHeightUnclamped, height)
+	const scaledHeight = Math.max(visibleHeight * zoom.y, minScaledHeight) //Math.max(scaledHeightUnclamped, height)
 	const scaledWidthUnclamped = fixedWidth * zoom.x
 	const scaledWidth = Math.max(scaledWidthUnclamped, width)
 
-	const maxPanY = Math.max(scaledHeightUnclamped - height, 0)
+	const maxPanY = Math.max(scaledHeight - visibleHeight, 0)
 	const maxPanX = getMaxPan(fixedWidth, zoom.x)
 	const panPixels = {
 		x: pan.x * maxPanX,
@@ -260,7 +264,7 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 				{x: e.clientX, y: e.clientY}, {x, y})
 			const clamped = {
 				x: clamp(editorSpace.x, 0, width),
-				y: clamp(editorSpace.y, 0, height),
+				y: clamp(editorSpace.y, 0, visibleHeight),
 			}
 			setOtherCorner(clamped)
 			selectNotes(clamped, e.shiftKey, e)
@@ -318,7 +322,7 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 			}
 			window.removeEventListener('mouseup', onMouseUp)
 		}
-	}, [activateBox, boxActive, boxOrigin, deactivateBox, height, lengthBeats,
+	}, [activateBox, boxActive, boxOrigin, deactivateBox, visibleHeight, lengthBeats,
 		maxPanX, maxPanY, expMidiPattern.events, otherCorner, panPixels, width,
 		x, y, selected, originalSelected, scaledHeight, clearSelected])
 
@@ -389,7 +393,10 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 			const clickPercentage = clientMousePositionToPercentages({x: e.clientX, y: e.clientY})
 			setClickPositionPercentage(clickPercentage)
 			const clickInEditorSpace = clientSpaceToEditorSpace({x: e.clientX, y: e.clientY}, {x, y})
-			setClickYOffset(clickInEditorSpace.y)
+			setClickInEditorSpace(clickInEditorSpace)
+			// console.log('clickPercentage.y', clickPercentage.y)
+			// console.log('clickInEditorSpace.y', clickInEditorSpace.y)
+			// console.log({height: visibleHeight, scaledHeight, maxPanY})
 		}
 	}, [activateLeftZoomPan])
 
@@ -410,8 +417,12 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 				return setStartPoint({x: pan.y, y: zoom.y})
 			}
 
-			const newPersistentDelta = {x: persistentDelta.x + e.movementX, y: persistentDelta.y + e.movementY}
+			const moreXThanY = Math.abs(e.movementX) > Math.abs(e.movementY)
 
+			const newPersistentDelta = {
+				x: persistentDelta.x + (moreXThanY ? e.movementX : 0),
+				y: persistentDelta.y + e.movementY,
+			}
 			const zoomedMovement = makeMouseMovementAccountForGlobalZoom(newPersistentDelta)
 
 			const newZoomY = clamp(
@@ -419,17 +430,29 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 				minZoomY,
 				maxZoomY)
 
+			const newScaledHeight = Math.max(visibleHeight * newZoomY, minScaledHeight)
+			const belowMinZoom = scaledHeight === minScaledHeight
+
 			const z = newZoomY
 			const c = clickPositionPercentage.y
 			const b = 1 / c
-			const a = (z * height) - height
+			// Max pixel pan
+			// Can't use MaxPanY because it is based on previous zoomY
+			const a = newScaledHeight - visibleHeight
 			const g = (1 / ((b * z) - b)) + c
-			const o = clickYOffset + zoomedMovement.y
+			const o = clickInEditorSpace.y + zoomedMovement.y
 			const y = -(o / a) + g
 			const newPanY = y
+			// console.log(JSON.stringify({z: z.toFixed(2), c: c.toFixed(2), b: b.toFixed(2), a: a.toFixed(2), g: g.toFixed(2), o: o.toFixed(2), y: y.toFixed(2)}))
+
+			const newPanY2 = belowMinZoom
+				? clamp(
+					startPoint.x + -zoomedMovement.y / maxPanY,
+					minPan, maxPan)
+				: newPanY
 
 			dispatch(expNodesActions.customNumberParamChange(nodeContext.id, nodeContext.zoomY.id, newZoomY))
-			dispatch(expNodesActions.customNumberParamChange(nodeContext.id, nodeContext.panY.id, newPanY))
+			dispatch(expNodesActions.customNumberParamChange(nodeContext.id, nodeContext.panY.id, newPanY2))
 
 			setPersistentDelta(newPersistentDelta)
 		}
@@ -443,6 +466,72 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 		}
 	}, [activateLeftZoomPan, deactivateLeftZoomPan, dispatch, maxPanY, nodeContext,
 		leftZoomPanActive, pan, zoom, persistentDelta, firstMouseMove, startPoint])
+
+	// Top Zoom Pan Bar
+	const onTopZoomPanBarMouseDown = useCallback((e: React.MouseEvent) => {
+		if (e.button === 0) {
+			activateTopZoomPan()
+			setPersistentDelta({x: 0, y: 0})
+			setFirstMouseMove(false)
+			const clickPercentage = clientMousePositionToPercentages({x: e.clientX, y: e.clientY})
+			setClickPositionPercentage(clickPercentage)
+			const clickInEditorSpace = clientSpaceToEditorSpace({x: e.clientX, y: e.clientY}, {x, y})
+			setClickInEditorSpace(clickInEditorSpace)
+			console.log('clickPercentage.x', clickPercentage.x)
+			console.log('clickInEditorSpace.x', clickInEditorSpace.x)
+		}
+	}, [activateTopZoomPan])
+
+	useLayoutEffect(() => {
+		if (!topZoomPanActive) return
+
+		const onMouseUp = (e: MouseEvent) => {
+			if (e.button === 0) {
+				deactivateTopZoomPan()
+			}
+		}
+
+		const onMouseMove = (e: MouseEvent) => {
+			if (e.buttons !== 1) return deactivateTopZoomPan()
+
+			if (!firstMouseMove) {
+				setFirstMouseMove(true)
+				return setStartPoint({x: pan.x, y: zoom.x})
+			}
+
+			const newPersistentDelta = {x: persistentDelta.x + e.movementX, y: persistentDelta.y + e.movementY}
+
+			const zoomedMovement = makeMouseMovementAccountForGlobalZoom(newPersistentDelta)
+
+			const newZoomX = clamp(
+				startPoint.y + (newPersistentDelta.y * leftZoomSensitivity),
+				minZoomX,
+				maxZoomX)
+
+			const z = newZoomX
+			const c = clickPositionPercentage.x
+			const b = 1 / c
+			const a = (z * width) - width
+			const g = (1 / ((b * z) - b)) + c
+			const o = clickInEditorSpace.x + zoomedMovement.x
+			const y = -(o / a) + g
+			const newPanX = y
+
+			dispatch(expNodesActions.customNumberParamChange(nodeContext.id, nodeContext.zoomX.id, newZoomX))
+			dispatch(expNodesActions.customNumberParamChange(nodeContext.id, nodeContext.panX.id, newPanX))
+
+			setPersistentDelta(newPersistentDelta)
+		}
+
+		window.addEventListener('mousemove', onMouseMove)
+		window.addEventListener('mouseup', onMouseUp)
+
+		return () => {
+			window.removeEventListener('mousemove', onMouseMove)
+			window.removeEventListener('mouseup', onMouseUp)
+		}
+	}, [activateTopZoomPan, deactivateTopZoomPan, dispatch, maxPanY, nodeContext,
+		topZoomPanActive, pan, zoom, persistentDelta, firstMouseMove, startPoint])
 
 	const columnWidth = (fixedWidth * zoom.x) / lengthBeats
 
@@ -633,12 +722,15 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 	const color = useStringChangedEvent(nodeContext.onColorChange)
 
 	return (
-		<div className="expBetterSequencer" style={{color, height: height + topSectionHeight}}>
-			<div className="top">
+		<div className="expBetterSequencer" style={{color, height: visibleHeight + topSectionHeight}}>
+			<div className="top" style={{height: topSectionHeight}}>
 				<div className="topLeft" style={{width: betterSideNotesWidth}}></div>
-				<BetterLoopBar {...{width, columnWidth}} />
+				<div className="topMid" style={{width: width - betterSideNotesWidth}}>
+					<BetterTopTimeBar {...{width, columnWidth, onTopZoomPanBarMouseDown}} />
+					<BetterLoopBar {...{width, columnWidth}} />
+				</div>
 			</div>
-			<div className="middle" style={{height}}>
+			<div className="middle" style={{height: visibleHeight}}>
 				<BetterSideNotes {...{rows, panPixelsY: panPixels.y, noteHeight, onLeftZoomPanBarMouseDown}} />
 				<div
 					className="editor"
@@ -666,7 +758,7 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 								selected,
 								setSelected,
 								width,
-								height,
+								height: visibleHeight,
 								lengthBeats,
 								zoom,
 								rows,

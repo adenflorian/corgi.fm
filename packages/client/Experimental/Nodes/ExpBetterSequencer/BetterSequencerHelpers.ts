@@ -1,5 +1,5 @@
 import {mouseFromScreenToBoard, makeMouseMovementAccountForGlobalZoom} from '../../../SimpleGlobalClientState'
-import {betterSideNotesWidth, topSectionHeight} from '@corgifm/common/BetterConstants'
+import {betterSideNotesWidth, topSectionHeight, expBetterYOffset} from '@corgifm/common/BetterConstants'
 
 export function getMaxPan(length: number, zoom: number) {
 	return (length * zoom) - length
@@ -52,7 +52,7 @@ export function clientSpaceToEditorSpace(
 
 	const editorSpace = {
 		x: nodeSpace.x - betterSideNotesWidth,
-		y: nodeSpace.y - (232) - topSectionHeight,
+		y: nodeSpace.y - expBetterYOffset - topSectionHeight,
 	}
 
 	return editorSpace

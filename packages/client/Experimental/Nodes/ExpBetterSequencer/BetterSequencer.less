@@ -49,6 +49,10 @@
 		}
 	}
 
+	.topTimeBar {
+		cursor: zoom-in;
+	}
+
 	.loopBar {
 		.loopBracket {
 			cursor: ew-resize;
@@ -64,6 +68,7 @@
 	.sideNotes {
 		overflow: hidden;
 		min-width: @zoomBarWidth + @notesWidth;
+		border-bottom-left-radius: 8px;
 
 		.transformable {
 			width: 100%;
@@ -158,6 +163,7 @@
 
 	.editor {
 		overflow: hidden;
+		border-bottom-right-radius: 8px;
 
 		.translatable {
 			width: 100%;
