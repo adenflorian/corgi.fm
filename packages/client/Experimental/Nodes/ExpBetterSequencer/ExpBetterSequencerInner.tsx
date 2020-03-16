@@ -109,7 +109,7 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 	const minScaledHeight = 400
 	const fixedWidth = 512
 
-	const scaledHeight = Math.max(visibleHeight * zoom.y, minScaledHeight) //Math.max(scaledHeightUnclamped, height)
+	const scaledHeight = Math.max(minScaledHeight * zoom.y, minScaledHeight, visibleHeight) //Math.max(scaledHeightUnclamped, height)
 	const scaledWidthUnclamped = fixedWidth * zoom.x
 	const scaledWidth = Math.max(scaledWidthUnclamped, width)
 
@@ -430,16 +430,16 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 				minZoomY,
 				maxZoomY)
 
-			const newScaledHeight = Math.max(visibleHeight * newZoomY, minScaledHeight)
-			const belowMinZoom = scaledHeight === minScaledHeight
+			const newScaledHeight = Math.max(minScaledHeight * newZoomY, minScaledHeight, visibleHeight)
+			const belowMinZoom = newScaledHeight === minScaledHeight
 
 			const z = newZoomY
 			const c = clickPositionPercentage.y
 			const b = 1 / c
 			// Max pixel pan
 			// Can't use MaxPanY because it is based on previous zoomY
-			const a = newScaledHeight - visibleHeight
-			const g = (1 / ((b * z) - b)) + c
+			const a = -visibleHeight + (minScaledHeight * newZoomY)
+			const g = (1 / (((400 / (c * visibleHeight)) * z) - b)) + c
 			const o = clickInEditorSpace.y + zoomedMovement.y
 			const y = -(o / a) + g
 			const newPanY = y
@@ -464,8 +464,8 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 			window.removeEventListener('mousemove', onMouseMove)
 			window.removeEventListener('mouseup', onMouseUp)
 		}
-	}, [activateLeftZoomPan, deactivateLeftZoomPan, dispatch, maxPanY, nodeContext,
-		leftZoomPanActive, pan, zoom, persistentDelta, firstMouseMove, startPoint])
+	}, [activateLeftZoomPan, deactivateLeftZoomPan, dispatch, maxPanY, nodeContext, clickInEditorSpace, clickPositionPercentage,
+			leftZoomPanActive, pan, zoom, persistentDelta, firstMouseMove, startPoint, visibleHeight])
 
 	// Top Zoom Pan Bar
 	const onTopZoomPanBarMouseDown = useCallback((e: React.MouseEvent) => {
