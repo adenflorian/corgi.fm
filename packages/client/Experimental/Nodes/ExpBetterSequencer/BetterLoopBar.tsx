@@ -15,11 +15,10 @@ import {ExpBetterSequencerNode} from '../ExpBetterSequencerNode'
 import {useObjectChangedEvent} from '../../hooks/useCorgiEvent'
 
 interface Props {
-	readonly width: number
 	readonly columnWidth: number
 }
 
-export const BetterLoopBar = React.memo(function _BetterLoopBar({width, columnWidth}: Props) {
+export const BetterLoopBar = React.memo(function _BetterLoopBar({columnWidth}: Props) {
 
 	const dispatch = useDispatch()
 	const nodeContext = useNodeContext() as ExpBetterSequencerNode

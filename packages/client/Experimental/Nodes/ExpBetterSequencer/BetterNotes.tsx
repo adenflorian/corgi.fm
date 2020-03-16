@@ -21,8 +21,6 @@ interface Props {
 	clearSelected: () => void
 	lengthBeats: number
 	zoom: Point
-	width: number
-	height: number
 	rows: string[]
 	clientMousePositionToPercentages: (clientMousePosition: Point) => Point
 	removeDuplicateEvents: () => void
@@ -31,7 +29,7 @@ interface Props {
 export const BetterNotes = React.memo(function _BetterNotes(props: Props) {
 	const {
 		panPixels, noteHeight, columnWidth, selected, onNoteSelect,
-		clearSelected, expMidiPattern, lengthBeats, zoom, width, height, rows,
+		clearSelected, expMidiPattern, lengthBeats, zoom, rows,
 		clientMousePositionToPercentages, setSelected, removeDuplicateEvents,
 	} = props
 

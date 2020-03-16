@@ -20,7 +20,7 @@ export function editorSpaceToPercentages(
 	width: number, height: number,
 ): Point {
 	const panSpace = {
-		x: (editorSpace.x + panPixels.x) / (maxPanX + width),
+		x: (editorSpace.x + panPixels.x) / (width),
 		y: (editorSpace.y + panPixels.y) / (height),
 		centerY: (height / 2 + panPixels.y) / (height),
 	}
@@ -56,20 +56,6 @@ export function clientSpaceToEditorSpace(
 	}
 
 	return editorSpace
-}
-
-export function movementToBeats(movement: Point, lengthBeats: number, zoom: Point, width: number, height: number) {
-	const a = makeMouseMovementAccountForGlobalZoom(movement)
-
-	const scaledWidth = zoom.x * width
-	const scaledHeight = zoom.y * height
-
-	const percentageMovement = {
-		x: (a.x / scaledWidth) * lengthBeats,
-		y: a.y / scaledHeight, // maybe multiply by note count?
-	}
-
-	return percentageMovement
 }
 
 export function movementXToBeats(movementX: number, pixelsPerBeat: number) {

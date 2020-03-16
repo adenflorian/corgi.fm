@@ -15,13 +15,12 @@ import {ExpBetterSequencerNode} from '../ExpBetterSequencerNode'
 import {useObjectChangedEvent} from '../../hooks/useCorgiEvent'
 
 interface Props {
-	readonly width: number
 	readonly columnWidth: number
 	readonly onTopZoomPanBarMouseDown: (e: React.MouseEvent) => void
 }
 
 export const BetterTopTimeBar = React.memo(function _BetterTopTimeBar({
-	width, columnWidth, onTopZoomPanBarMouseDown,
+	columnWidth, onTopZoomPanBarMouseDown,
 }: Props) {
 
 	const dispatch = useDispatch()
