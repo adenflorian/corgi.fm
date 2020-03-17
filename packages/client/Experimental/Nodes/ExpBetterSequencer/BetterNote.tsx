@@ -6,9 +6,6 @@ import {smallNoteHeight, tinyNoteHeight} from '@corgifm/common/BetterConstants'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {BetterNoteResizer} from './BetterNoteResizer'
 import {SeqEvent} from '@corgifm/common/SeqStuff'
-import {useNodeContext} from '../../CorgiNode'
-import {ExpBetterSequencerNode} from '../ExpBetterSequencerNode'
-import {useObjectChangedEvent} from '../../hooks/useCorgiEvent'
 
 interface Props {
 	event: SeqEvent
@@ -18,20 +15,18 @@ interface Props {
 	onNoteSelect: (eventId: Id, select: boolean, clear: boolean) => void
 	handleMouseDown: (e: MouseEvent, direction: 'left' | 'right' | 'center', eventId: Id) => void
 	rows: string[]
+	patternId: Id,
 }
 
 export const BetterNote = React.memo(function _BetterNote({
 	event, noteHeight, columnWidth, isSelected,
-	onNoteSelect, handleMouseDown, rows,
+	onNoteSelect, handleMouseDown, rows, patternId,
 }: Props) {
 
 	const dispatch = useDispatch()
 	const noteLabel = midiNoteToNoteNameFull(event.note)
 
 	const mainRef = useRef<SVGSVGElement>(null)
-
-	const nodeContext = useNodeContext() as ExpBetterSequencerNode
-	const expMidiPattern = useObjectChangedEvent(nodeContext.midiPatternParam.value)
 
 	useLayoutEffect(() => {
 
@@ -50,7 +45,7 @@ export const BetterNote = React.memo(function _BetterNote({
 		const onDoubleClick = (e: MouseEvent) => {
 			e.preventDefault()
 			e.stopPropagation()
-			dispatch(expMidiPatternsActions.deleteEvents(expMidiPattern.id, [event.id]))
+			dispatch(expMidiPatternsActions.deleteEvents(patternId, [event.id]))
 		}
 
 		const noteElement = mainRef.current
@@ -64,7 +59,7 @@ export const BetterNote = React.memo(function _BetterNote({
 			noteElement.removeEventListener('dblclick', onDoubleClick)
 			noteElement.removeEventListener('mousedown', onMouseDown)
 		}
-	}, [onNoteSelect, event.id, isSelected, expMidiPattern.id, dispatch])
+	}, [onNoteSelect, event.id, isSelected, patternId, dispatch])
 
 	const tiny = noteHeight <= tinyNoteHeight
 	const small = noteHeight <= smallNoteHeight

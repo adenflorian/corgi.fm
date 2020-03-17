@@ -9,6 +9,8 @@ import {oneLine} from 'common-tags'
 import {BetterNote} from './BetterNote'
 import {movementXToBeats} from './BetterSequencerHelpers'
 import {SeqEvents, duplicateNoteEvent, SeqPattern} from '@corgifm/common/SeqStuff'
+import {useNodeContext} from '../../CorgiNode'
+import {ExpBetterSequencerNode} from '../ExpBetterSequencerNode'
 
 interface Props {
 	noteHeight: number
@@ -41,6 +43,8 @@ export const BetterNotes = React.memo(function _BetterNotes(props: Props) {
 	const [startEvents, setStartEvents] = useState(SeqEvents())
 	const [startMouseNote, setStartMouseNote] = useState(0)
 	const [clickedEvent, setClickedEvent] = useState<Id>('')
+
+	const nodeContext = useNodeContext() as ExpBetterSequencerNode
 
 	const dispatch = useDispatch()
 
@@ -177,19 +181,21 @@ export const BetterNotes = React.memo(function _BetterNotes(props: Props) {
 		// dispatch(sequencerActions.saveUndo(id))
 		setPersistentDelta({x: 0, y: 0})
 
+		const events = nodeContext.midiPatternParam.value.current.pattern.events
+
 		if (!selected.has(clickedEventId)) {
 			if (e.shiftKey) {
 				onNoteSelect(clickedEventId, true, false)
-				setStartEvents(expMidiPattern.events.filter(x => selected.has(x.id) || x.id === clickedEventId))
+				setStartEvents(events.filter(x => selected.has(x.id) || x.id === clickedEventId))
 			} else {
 				onNoteSelect(clickedEventId, true, true)
-				setStartEvents(expMidiPattern.events.filter(x => x.id === clickedEventId))
+				setStartEvents(events.filter(x => x.id === clickedEventId))
 			}
 		} else if (e.shiftKey) {
 			onNoteSelect(clickedEventId, false, false)
 			return
 		} else {
-			setStartEvents(expMidiPattern.events.filter(x => selected.has(x.id)))
+			setStartEvents(events.filter(x => selected.has(x.id)))
 		}
 		if (e.ctrlKey) {
 			startNoteCloning(e.clientY)
@@ -198,7 +204,7 @@ export const BetterNotes = React.memo(function _BetterNotes(props: Props) {
 		} else {
 			startNoteMoving(e.clientY)
 		}
-	}, [dispatch, expMidiPattern.events, onNoteSelect, selected, startNoteCloning, startNoteMoving, startNoteResizing])
+	}, [dispatch, onNoteSelect, selected, startNoteCloning, startNoteMoving, startNoteResizing])
 
 	// Note mouse resize
 	useLayoutEffect(() => {
@@ -255,11 +261,12 @@ export const BetterNotes = React.memo(function _BetterNotes(props: Props) {
 				<ActualNotes
 					noteHeight={noteHeight}
 					columnWidth={columnWidth}
-					expMidiPattern={expMidiPattern}
+					events={expMidiPattern.events}
 					selected={selected}
 					onNoteSelect={onNoteSelect}
 					rows={rows}
 					handleMouseDown={handleMouseDown}
+					patternId={expMidiPattern.id}
 				/>
 			</svg>
 		</div>
@@ -267,19 +274,23 @@ export const BetterNotes = React.memo(function _BetterNotes(props: Props) {
 })
 
 interface ActualNotesProps {
-	noteHeight: number
-	columnWidth: number
-	expMidiPattern: SeqPattern
-	selected: Set<Id>
-	onNoteSelect: (eventId: Id, select: boolean, clear: boolean) => void
-	rows: string[]
-	handleMouseDown: (e: MouseEvent, direction: 'left' | 'right' | 'center', clickedEventId: Id) => void
+	readonly noteHeight: number
+	readonly columnWidth: number
+	readonly events: SeqEvents
+	readonly selected: Set<Id>
+	readonly onNoteSelect: (eventId: Id, select: boolean, clear: boolean) => void
+	readonly rows: string[]
+	readonly handleMouseDown: (e: MouseEvent, direction: 'left' | 'right' | 'center', clickedEventId: Id) => void
+	readonly patternId: Id
 }
 
-const ActualNotes = React.memo(function _ActualNotes({expMidiPattern, noteHeight, columnWidth, selected, onNoteSelect, handleMouseDown, rows}: ActualNotesProps) {
+const ActualNotes = React.memo(function _ActualNotes({
+	events, noteHeight, columnWidth, patternId,
+	selected, onNoteSelect, handleMouseDown, rows,
+}: ActualNotesProps) {
 	return (
 		<Fragment>
-			{expMidiPattern.events.map(event => {
+			{events.map(event => {
 				return (
 					<BetterNote
 						key={event.id.toString()}
@@ -291,6 +302,7 @@ const ActualNotes = React.memo(function _ActualNotes({expMidiPattern, noteHeight
 							onNoteSelect,
 							handleMouseDown,
 							rows,
+							patternId,
 						}}
 					/>
 				)
