@@ -32,6 +32,7 @@ export interface CorgiNodeOptions {
 	readonly color: string
 	readonly requiresAudioWorklet?: boolean
 	readonly useBackgroundOscilloscope?: boolean
+	readonly renderDebugStuff?: boolean
 }
 
 export interface CorgiNodeArgs {
@@ -48,7 +49,7 @@ export interface CorgiNodeArgs {
 export type CorgiNodeConstructor = new (args: CorgiNodeArgs) => CorgiNode
 
 export interface CorgiNodeReact extends Pick<CorgiNode,
-'id' | 'requiresAudioWorklet' | 'getPorts' | 'onColorChange' |
+'id' | 'requiresAudioWorklet' | 'getPorts' | 'onColorChange' | 'renderDebugStuff' |
 'onNameChange' | 'setPortPosition' | 'type' | 'debugInfo' | 'newSampleEvent'> {}
 
 export abstract class CorgiNode {
@@ -74,6 +75,7 @@ export abstract class CorgiNode {
 	public readonly debugInfo = new CorgiStringChangedEvent('')
 	public readonly newSampleEvent?: CorgiNumberChangedEvent
 	protected readonly _analyser?: LabCorgiAnalyserSPNode
+	public readonly renderDebugStuff: boolean
 
 	public constructor(
 		args: CorgiNodeArgs,
@@ -100,6 +102,7 @@ export abstract class CorgiNode {
 			}, true, 'CorgiNode')
 			this._analyser.requestUpdate()
 		}
+		this.renderDebugStuff = options.renderDebugStuff !== undefined ? options.renderDebugStuff : true
 	}
 
 	public getPorts = () => this._ports

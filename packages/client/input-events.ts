@@ -15,6 +15,7 @@ import {
 } from '@corgifm/common/redux'
 import {mouseFromScreenToBoard} from './SimpleGlobalClientState'
 import {RoomType} from '@corgifm/common/common-types'
+import {isInputFocused} from './client-utils'
 
 type IKeyBoardShortcuts = Map<string, KeyBoardShortcut>
 
@@ -166,10 +167,6 @@ function arrayToPlusString(array: readonly string[]): string {
 export function setupInputEventListeners(
 	window: Window, store: Store<IClientAppState>, audioContext: AudioContext,
 ) {
-	const isInputFocused = (): boolean => document.activeElement
-		? document.activeElement.tagName === 'INPUT'
-		: false
-
 	window.addEventListener('mousedown', async _ => {
 		if (audioContext.state === 'suspended') await audioContext.resume()
 	})

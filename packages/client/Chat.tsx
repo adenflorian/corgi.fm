@@ -12,6 +12,7 @@ import {
 import {ConnectedChatMessages} from './Chat/ChatMessages'
 import {isTestClient} from './is-prod-client'
 import {Button} from './Button/Button'
+import {isInputFocused} from './client-utils'
 
 interface IChatComponentState {
 	chatMessage: string
@@ -98,7 +99,7 @@ export class Chat extends Component<AllProps, IChatComponentState> {
 	private readonly _onKeydown = (e: KeyboardEvent) => {
 		if (e.repeat) return
 		if (e.key === 'Enter' && this.state.isChatFocused === false && this.chatInputRef) {
-			if (document.activeElement && document.activeElement.tagName.toLowerCase() === 'input') return
+			if (isInputFocused()) return
 			this.chatInputRef.focus()
 			e.preventDefault()
 		}

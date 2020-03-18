@@ -1,18 +1,18 @@
 @import '../../colors.less';
 @import '../../AppCommon.less';
 
-.textField {
-	input {
+.textArea {
+	textarea {
 		background-color: @panelGrayDark;
 		border-radius: @mainBorderRadius;
-		box-shadow: none !important;
+		box-shadow: none;
 		border: none;
 		padding: 4px 8px;
 		color: @defaultGray;
 		font-family: inherit;
 
 		&:focus {
-			@colorBorder();
+			@colorBorder2();
 		}
 	}
 }

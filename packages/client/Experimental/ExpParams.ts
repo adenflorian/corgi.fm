@@ -7,7 +7,8 @@ import {
 import {ButtonSelectOption} from '../ButtonSelect/ButtonSelect'
 import {CorgiNumberChangedEvent, CorgiEnumChangedEvent, CorgiStringChangedEvent,
 	CorgiObjectChangedEvent, ReadonlyCorgiNumberChangedEvent,
-	ReadonlyCorgiObjectChangedEvent} from './CorgiEvents'
+	ReadonlyCorgiObjectChangedEvent,
+	ReadonlyCorgiStringChangedEvent} from './CorgiEvents'
 import {LabAudioParam, KelpieAudioNode} from './Nodes/PugAudioNode/Lab'
 import {ExpMidiClip, makeExpMidiClip} from '@corgifm/common/midi-types'
 import {CorgiNode} from './CorgiNode'
@@ -120,12 +121,16 @@ export interface EnumParamChange {
 }
 
 export type ExpCustomStringParams = ReadonlyMap<Id, ExpCustomStringParam>
+export type ExpCustomStringParamReadonly = ExpCustomStringParam & {
+	value: ReadonlyCorgiStringChangedEvent
+}
 export class ExpCustomStringParam {
 	public readonly value: CorgiStringChangedEvent
 
 	public constructor(
 		public readonly id: Id,
 		public readonly defaultValue: string,
+		public readonly showInDebugView = true,
 	) {
 		this.value = new CorgiStringChangedEvent(this.defaultValue)
 	}

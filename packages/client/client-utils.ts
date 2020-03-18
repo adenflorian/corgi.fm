@@ -62,3 +62,9 @@ export function getCdnUrl() {
 		return `https://cdn.test.corgi.fm/prod/`
 	}
 }
+
+export function isInputFocused() {
+	return document.activeElement
+		? ['input', 'textarea'].includes(document.activeElement.tagName.toLowerCase())
+		: false
+}

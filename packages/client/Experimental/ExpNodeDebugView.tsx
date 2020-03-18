@@ -40,13 +40,14 @@ export const ExpNodeDebugView = hot(module)(React.memo(function _ExpNodeDebugVie
 	// const nodeName = useStringChangedEvent(nodeContext.onNameChange)
 	const nodeId = nodeContext.id
 	const isAudioWorkletLoaded = useObjectChangedEvent(simpleGlobalClientState.onAudioWorkletLoaded)
+	const {renderDebugStuff} = nodeContext
 
 	return (
 		<div style={{position: 'relative', width: '100%'}}>
 			{nodeContext.newSampleEvent && <ExpOscilloscopeNodeExtra newSampleEvent={nodeContext.newSampleEvent} />}
 			{beforeChildren}
 			<div className="expNodeDebugView">
-				<div style={{padding: 8}}>
+				{renderDebugStuff && <div style={{padding: 8}}>
 					{/* <div className="nodeName">{nodeName}</div> */}
 					{/* <div className="nodeId">{nodeId}</div> */}
 					<Ports ports={ports} />
@@ -106,7 +107,7 @@ export const ExpNodeDebugView = hot(module)(React.memo(function _ExpNodeDebugVie
 							))}
 						</div>}
 						{customStringParams.size > 0 && <div className="stringParams">
-							{[...customStringParams].map(([id, customStringParam]) => (
+							{[...customStringParams].filter(x => x[1].showInDebugView).map(([id, customStringParam]) => (
 								<ExpNodeDebugCustomStringParamField
 									key={id as string}
 									nodeId={nodeId}
@@ -134,7 +135,7 @@ export const ExpNodeDebugView = hot(module)(React.memo(function _ExpNodeDebugVie
 						</div>}
 						<DebugInfo />
 					</div>
-				</div>
+				</div>}
 				{children}
 			</div>
 		</div>
