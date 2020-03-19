@@ -20,7 +20,8 @@ import {
 	addBetterSequencer, createSequencerEvents, expNodesActions,
 	expPositionActions, makeExpPosition, makeExpNodeState,
 	expConnectionsActions, ExpConnection, SavedClassicRoom,
-	SavedExpRoom, expGraphsActions, roomInfoAction, activityActions, expMidiPatternsActions, makeExpMidiPatternState, makeExpMidiPatternEvents,
+	SavedExpRoom, expGraphsActions, roomInfoAction, activityActions,
+	expMidiPatternsActions, makeExpMidiPatternState, makeExpMidiPatternEvents,
 } from '@corgifm/common/redux'
 import {logger} from '@corgifm/common/logger'
 import {serverClientId, maxPitchFrequency} from '@corgifm/common/common-constants'

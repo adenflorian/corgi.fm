@@ -3,6 +3,7 @@ import {combineReducers, Reducer} from 'redux'
 import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
 import {CssColor} from '../../shamu-color'
+import {getExpNodeInfo} from '../../exp-node-infos'
 import {shamuMetaReducer, ShamuMetaState, makeShamuMetaState} from '../shamu-graph'
 import {IClientAppState} from '../common-redux-types'
 import {
@@ -115,7 +116,13 @@ const makeExpPositionRecord = Record(defaultExpPosition)
 export const defaultExpPositionRecord: ExpPosition = makeExpPositionRecord()
 
 export function makeExpPosition(position: Pick<typeof defaultExpPosition, 'id' | 'ownerId' | 'targetType'> & Partial<typeof defaultExpPosition>): ExpPosition {
-	return makeExpPositionRecord(position)
+	const info = getExpNodeInfo(position.targetType)
+	return makeExpPositionRecord()
+		.merge({
+			width: info.width,
+			height: info.height,
+		})
+		.merge(position)
 }
 
 export interface ExpPosition extends ReturnType<typeof makeExpPositionRecord> {}
