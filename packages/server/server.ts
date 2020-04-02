@@ -6,6 +6,8 @@ import {
 	configureServerStore, createRoomAction, roomSettingsActions,
 	createRoom, roomInfoAction, activityActions,
 } from '@corgifm/common/redux'
+import {RoomType} from '@corgifm/common/common-types'
+import {enableNewCorgiForProd} from '@corgifm/common/feature-flags'
 import {initSentryServer} from './analytics/sentry-server'
 import {createServerStuff} from './create-server-stuff'
 import {connectDB, DBStore} from './database/database'
@@ -15,7 +17,6 @@ import {setupServerWebSocketListeners} from './server-socket-listeners'
 import {setupExpressApp} from './setup-express-app'
 import {DiscordBot} from './discord'
 import {loadServerSecrets} from './server-secrets'
-import {RoomType} from '@corgifm/common/common-types'
 
 if (!isLocalDevServer()) initSentryServer()
 
@@ -44,7 +45,7 @@ async function start() {
 	serverStore.dispatch(createRoomAction(roomSettingsActions.setOwner(serverClientId), lobby))
 	createServerStuff(lobby, serverStore, RoomType.Normal)
 
-	if (isLocalDevServer()) {
+	if (isLocalDevServer() || enableNewCorgiForProd) {
 		serverStore.dispatch(createRoom(expLobby, Date.now()))
 		serverStore.dispatch(createRoomAction(activityActions.set(RoomType.Experimental), expLobby))
 		serverStore.dispatch(createRoomAction(roomSettingsActions.setOwner(serverClientId), expLobby))

@@ -5,13 +5,14 @@ import {IoMdAddCircle} from 'react-icons/io'
 import {useDispatch} from 'react-redux'
 import {roomsActions, modalsAction, ModalId, isRoomType} from '@corgifm/common/redux'
 import {roomNameCleaner} from '@corgifm/common/common-utils'
+import {RoomType} from '@corgifm/common/common-types'
+import {enableNewCorgiForProd} from '@corgifm/common/feature-flags'
 import {eventNewRoomButtonClick} from '../analytics/analytics'
 import {ModalContent} from '../Modal/ModalManager'
 import {useBoolean, useInputState, useEnumInputState} from '../react-hooks'
 import {Select} from '../Select/Select'
 import {isLocalDevClient} from '../is-prod-client'
 import {Button} from './Button'
-import {RoomType} from '@corgifm/common/common-types'
 
 export function NewRoomButton({onClick}: {onClick?: () => any}) {
 	const dispatch = useDispatch()
@@ -81,7 +82,7 @@ export const NewRoomModalContent: ModalContent = ({hideModal}) => {
 							disabled={inputsDisabled}
 							required
 						/>
-						{isLocalDevClient() && <Select
+						{(isLocalDevClient() || enableNewCorgiForProd) && <Select
 							label="Room Type"
 							name="roomType"
 							onChange={setType}
