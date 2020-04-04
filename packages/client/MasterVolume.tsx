@@ -3,9 +3,9 @@ import {CssColor} from '@corgifm/common/shamu-color'
 import {useLocalVolume, useBoolean, useLocalMute} from './react-hooks'
 import {hot} from 'react-hot-loader'
 import {useStore} from 'react-redux'
-import {setOption, AppOptions, selectOption} from '@corgifm/common/redux'
+import {setOption, AppOptions} from '@corgifm/common/redux'
 import {clamp} from '@corgifm/common/common-utils'
-import {IoMdVolumeMute, IoMdVolumeHigh, IoMdVolumeLow} from 'react-icons/io'
+import {FiVolumeX, FiVolume1, FiVolume2} from 'react-icons/fi'
 
 const width = 160
 const sliderSize = 16
@@ -69,7 +69,7 @@ export const MasterVolume = hot(module)(React.memo(function _MasterVolume() {
 			title="This controls your local master volume, and won't affect anyone else"
 		>
 			<div className='blobDark' onClick={onMuteClick} style={{fontSize: 16 + 8}}>
-				{(mute || volume === 0) ? <IoMdVolumeMute /> : volume > 0.5 ? <IoMdVolumeHigh /> : <IoMdVolumeLow />}
+				{(mute || volume === 0) ? <FiVolumeX /> : volume > 0.5 ? <FiVolume2 /> : <FiVolume1 />}
 			</div>
 			<div
 				className="rail"
