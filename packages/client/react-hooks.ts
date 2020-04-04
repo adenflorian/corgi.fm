@@ -80,3 +80,7 @@ export function useExpPosition(nodeId: Id) {
 export function useLocalVolume() {
 	return useSelector((state: IClientAppState) => selectOption(state, AppOptions.masterVolume) as number)
 }
+
+export function useLocalMute() {
+	return useSelector((state: IClientAppState) => selectOption(state, AppOptions.masterVolumeMute) as boolean)
+}

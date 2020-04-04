@@ -1,6 +1,6 @@
 import React, {useCallback, useLayoutEffect, useState} from 'react'
 import {CssColor} from '@corgifm/common/shamu-color'
-import {useLocalVolume, useBoolean} from './react-hooks'
+import {useLocalVolume, useBoolean, useLocalMute} from './react-hooks'
 import {hot} from 'react-hot-loader'
 import {useStore} from 'react-redux'
 import {setOption, AppOptions, selectOption} from '@corgifm/common/redux'
@@ -12,6 +12,7 @@ const slidableDistance = width - sliderSize
 
 export const MasterVolume = hot(module)(React.memo(function _MasterVolume() {
 	const volume = useLocalVolume()
+	const mute = useLocalMute()
 
 	const [isSliderActive, activateSlider, deactivateSlider] = useBoolean(false)
 	const [startingVolume, setStartingVolume] = useState(0)
@@ -50,12 +51,17 @@ export const MasterVolume = hot(module)(React.memo(function _MasterVolume() {
 		}
 	}, [isSliderActive, dispatch, persistentDelta, setPersistentDelta, startingVolume])
 
+	const onMuteClick = useCallback(() => {
+		dispatch(setOption(AppOptions.masterVolumeMute, !mute))
+	}, [mute])
+
 	return (
 		<div
 			className="masterVolume blob"
 			style={{
 				pointerEvents: 'all',
 				userSelect: 'none',
+				color: mute ? CssColor.brightRed : undefined,
 			}}
 		>
 			<div className='blobDark'>
@@ -75,6 +81,9 @@ export const MasterVolume = hot(module)(React.memo(function _MasterVolume() {
 					}}
 					onMouseDown={onClickSlider}
 				></div>
+			</div>
+			<div className='blobDark' onClick={onMuteClick}>
+				{mute ? 'muted' : 'not muted'}
 			</div>
 		</div>
 	)
