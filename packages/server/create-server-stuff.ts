@@ -95,7 +95,7 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 		})))
 
 	const midiRandom = makeExpNodeState({
-		type: 'midiRandom',
+		type: 'midiPitch',
 		groupId: 'top',
 	})
 	dispatchToRoom(expNodesActions.add(midiRandom))
