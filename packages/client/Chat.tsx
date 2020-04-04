@@ -11,8 +11,8 @@ import {
 } from 'react-icons/io'
 import {ConnectedChatMessages} from './Chat/ChatMessages'
 import {isTestClient} from './is-prod-client'
-import {Button} from './Button/Button'
 import {isInputFocused} from './client-utils'
+import {MasterVolume} from './MasterVolume'
 
 interface IChatComponentState {
 	chatMessage: string
@@ -86,6 +86,8 @@ export class Chat extends Component<AllProps, IChatComponentState> {
 						>
 							<Clear />
 						</button>
+						<div style={{marginLeft: 'auto'}} />
+						<MasterVolume />
 						<BottomInfo
 							clientVersion={this.props.clientVersion}
 							serverVersion={this.props.serverVersion}

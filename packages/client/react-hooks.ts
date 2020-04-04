@@ -2,7 +2,8 @@ import {useState} from 'react'
 import {useSelector} from 'react-redux'
 import {
 	selectLocalClientId, createRoomMemberSelector,
-	IClientAppState, selectRoomInfoState, selectExpPosition, selectActivityType,
+	IClientAppState, selectExpPosition, selectActivityType,
+	selectOption, AppOptions,
 } from '@corgifm/common/redux'
 import {logger} from './client-logger'
 
@@ -74,4 +75,8 @@ export function useRoomType() {
 
 export function useExpPosition(nodeId: Id) {
 	return useSelector((state: IClientAppState) => selectExpPosition(state.room, nodeId))
+}
+
+export function useLocalVolume() {
+	return useSelector((state: IClientAppState) => selectOption(state, AppOptions.masterVolume) as number)
 }

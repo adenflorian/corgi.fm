@@ -908,13 +908,13 @@ export class LabStereoPannerNode extends LabAudioNode<KelpieStereoPannerNode> {
 
 export class LabAudioDestinationNode extends LabAudioNode<KelpieAudioDestinationNode> {
 	public readonly name = 'LabAudioDestinationNode'
-	public constructor(args: LabAudioNodeArgs) {
+	public constructor(args: LabAudioNodeArgs, public readonly destination: AudioNode) {
 		super(args)
 		super.init()
 	}
 
 	protected readonly _makeVoice = (voiceIndex: number): KelpieAudioDestinationNode => {
-		const newDestination = new KelpieAudioDestinationNode({audioContext: this.audioContext, labNode: this, voiceIndex})
+		const newDestination = new KelpieAudioDestinationNode({audioContext: this.audioContext, labNode: this, voiceIndex}, this.destination)
 		return newDestination
 	}
 }
@@ -1363,11 +1363,11 @@ class KelpieStereoPannerNode extends KelpieAudioNode {
 
 class KelpieAudioDestinationNode extends KelpieAudioNode {
 	public readonly name = 'AudioDestinationNode'
-	private readonly _destination: AudioDestinationNode
+	private readonly _destination: AudioNode
 
-	public constructor(args: KelpieAudioNodeArgs) {
+	public constructor(args: KelpieAudioNodeArgs, destination: AudioNode) {
 		super(args)
-		this._destination = this._audioContext.destination
+		this._destination = destination
 	}
 
 	public get input(): AudioNode {return this._destination}
