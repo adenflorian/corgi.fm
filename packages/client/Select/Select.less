@@ -10,57 +10,52 @@
         margin-right: 8px;
     }
 
-    .selectContainer {
+    .arrow {
+        position: absolute;
+        right: 0px;
+        pointer-events: none;
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
+        justify-content: center;
+        height: 100%;
+    }
 
-        .arrow {
-            position: absolute;
-            right: 8px;
-            pointer-events: none;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            height: 100%;
+    &:hover {
+        select, .arrow {
+            filter: brightness(125%)
+        }
+    }        
+
+    select {
+        font-family: inherit;
+        position: relative;
+        background-color: transparent;
+        border: none;
+        padding: 0 32px 0 8px;
+        font-size: 16px;
+        text-transform: inherit;
+        font-weight: inherit;
+        letter-spacing: inherit;
+        color: currentColor;
+        text-shadow: inherit;
+        height: 32px;
+
+        /* reset */
+        margin: 0;      
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+        -webkit-appearance:none;
+        -moz-appearance:none;
+
+        &:not(:disabled) {
+            cursor: pointer;
         }
 
-        &:hover {
-            select, .arrow {
-                filter: brightness(125%)
-            }
-        }        
-
-        select {
-            font-family: inherit;
-            position: relative;
-            background-color: transparent;
-            border: none;
-            padding: 0 32px 0 8px;
-            font-size: 16px;
-            text-transform: inherit;
+        option {
+            background-color: @panelGray;
             font-weight: inherit;
             letter-spacing: inherit;
-            color: currentColor;
-            text-shadow: inherit;
-            height: 32px;
-
-            /* reset */
-            margin: 0;      
-            -webkit-box-sizing: border-box;
-            -moz-box-sizing: border-box;
-            box-sizing: border-box;
-            -webkit-appearance:none;
-            -moz-appearance:none;
-
-            &:not(:disabled) {
-                cursor: pointer;
-            }
-
-            option {
-                background-color: @panelGray;
-                font-weight: inherit;
-                letter-spacing: inherit;
-            }
         }
     }
 }
@@ -74,25 +69,21 @@
         label {
         }
     
-        .selectContainer {
-    
-            .arrow {
+        .arrow {
+        }
+
+        &:hover {
+            select, .arrow {
             }
-    
-            &:hover {
-                select, .arrow {
-                }
-            }        
-    
-            select {
-                background-color: @panelGrayLight;
-                width: 100%;
-    
-                &:not(:disabled) {
-                }
-    
-                option {
-                }
+        }        
+
+        select {
+            width: 100%;
+
+            &:not(:disabled) {
+            }
+
+            option {
             }
         }
     }

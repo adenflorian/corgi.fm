@@ -76,7 +76,7 @@ export const NewRoomModalContent: ModalContent = ({hideModal}) => {
 							ref={nameInputRef}
 							type="text"
 							placeholder="Room Name"
-							className="roomName"
+							className="roomName blob"
 							value={name}
 							onChange={setName}
 							disabled={inputsDisabled}
@@ -94,7 +94,7 @@ export const NewRoomModalContent: ModalContent = ({hideModal}) => {
 						<div className="submitRow">
 							<input
 								type="submit"
-								className="button createRoom"
+								className="button createRoom blob"
 								value="Create Room"
 								disabled={inputsDisabled}
 							/>

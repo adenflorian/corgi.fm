@@ -21,7 +21,9 @@
 		}
 
 		& > .first {
-			width: 100%;
+			display: flex;
+			justify-content: center;
+			flex-basis: 100%;
 		}
 
 		& > .left, & > .right {
@@ -37,16 +39,6 @@
 			display: flex;
 			align-items: center;
 			font-size: 16px;
-
-			label {
-				background-color: @panelGrayLight;
-				height: 32px;
-				display: flex;
-				align-items: center;
-				padding: 0 8px;
-				border-top-left-radius: @mainBorderRadius;
-				border-bottom-left-radius: @mainBorderRadius;
-			}
 
 			input {
 				border-top-left-radius: 0 !important;

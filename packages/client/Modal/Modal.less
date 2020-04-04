@@ -10,6 +10,15 @@
 	background-color: @overlayGray;
 	z-index: 2;
 	margin: 0 !important;
+
+	input, label {
+		font-size: 16px;
+	}
+
+	.blob {
+		box-shadow: none;
+		background-color: @panelGrayLight;
+	}
 }
 
 .modalPanel {
@@ -61,6 +70,7 @@
 			}
 			.modalSectionContent {
 				padding: 16px;
+				font-size: 16px;
 			}
 			.modalSectionFooter {
 				font-size: 0.84em;
@@ -98,8 +108,6 @@
 					writing-mode: inherit;
 					text-rendering: inherit;
 					border: none;
-					background-color: @panelGrayLight;
-					border-radius: @mainBorderRadius;
 					padding: 0 8px;
 					min-height: 32px;
 					width: fill;

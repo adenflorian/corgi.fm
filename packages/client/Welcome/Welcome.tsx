@@ -12,6 +12,7 @@ import {ModalContent} from '../Modal/ModalManager'
 import {ConnectedNameChanger} from '../NameChanger'
 import {LoadRoomModalButton} from '../SavingAndLoading/SavingAndLoading'
 import './Welcome.less'
+import {MasterVolume} from '../MasterVolume'
 
 export function WelcomeModalButton() {
 	const dispatch = useDispatch()
@@ -46,10 +47,10 @@ export const WelcomeModalContent: ModalContent = ({hideModal}) => {
 				</div>
 				<div className="modalSectionContent">
 					<div className="first">
-						<div className="name">
-							<label htmlFor="usernameInput">Username</label>
-							<ConnectedNameChanger />
-						</div>
+						<ConnectedNameChanger showLabel={true} />
+					</div>
+					<div style={{marginTop: 32, display: 'flex', justifyContent: 'center', flexBasis: '100%'}}>
+						<MasterVolume />
 					</div>
 					<div className="left">
 						<div className="roomActions vert-space-16">

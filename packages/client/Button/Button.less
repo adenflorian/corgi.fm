@@ -140,9 +140,7 @@ button.iconButton {
     text-decoration: none;
 }
 
-input, select {
-    border-radius: @mainBorderRadius;
-    
+input.blob, select.blob {    
     &:focus {
         @colorBorder();
     }
@@ -161,13 +159,6 @@ input, select {
 
         &.bg-medium, & .bg-medium {
             background-color: @panelGrayLight;
-        }
-    }
-    input {
-        box-shadow: none !important;
-    
-        &:focus {
-            @colorBorder();
         }
     }
 }

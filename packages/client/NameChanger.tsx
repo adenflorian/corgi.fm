@@ -6,14 +6,18 @@ import {
 } from '@corgifm/common/redux'
 import {useBoolean} from './react-hooks'
 
+interface Props {
+	readonly showLabel?: boolean
+}
+
 interface ReduxProps {
 	author: string
 	authorColor: string
 }
 
-type AllProps = ReduxProps
+type AllProps = ReduxProps & Props
 
-function NameChanger({author, authorColor}: AllProps) {
+function NameChanger({author, authorColor, showLabel = false}: AllProps) {
 	const dispatch = useDispatch()
 	const [username, setUsername] = useState(author)
 	const [isFocused, onFocus, onBlur] = useBoolean(false)
@@ -59,23 +63,28 @@ function NameChanger({author, authorColor}: AllProps) {
 	}
 
 	return (
-		<form
-			className="nameForm"
-			onSubmit={_onSubmitNameChange}
-			title="Change your username here"
-		>
-			<AutosizeInput
-				name="nameAutosizeInput"
-				className="author nameAutosizeInput"
-				value={username}
-				onChange={_onNameInputChange}
-				autoComplete="off"
+		<div className="blob">
+			{showLabel &&
+				<label htmlFor="usernameInput">Username</label>
+			}
+			<form
+				className="nameForm blobDark"
+				onSubmit={_onSubmitNameChange}
+				title="Change your username here"
 				style={{color: authorColor}}
-				onBlur={_onNameInputBlur}
-				onFocus={handleFocus}
-				inputRef={setInputRef}
-			/>
-		</form>
+			>
+				<AutosizeInput
+					name="nameAutosizeInput"
+					className="author nameAutosizeInput"
+					value={username}
+					onChange={_onNameInputChange}
+					autoComplete="off"
+					onBlur={_onNameInputBlur}
+					onFocus={handleFocus}
+					inputRef={setInputRef}
+				/>
+			</form>
+		</div>
 	)
 
 	function handleFocus() {

@@ -72,7 +72,7 @@ export const AuthModalContent: ModalContent = ({hideModal}) => {
 						<input
 							type="email"
 							placeholder="Email"
-							className="email"
+							className="email blob"
 							value={email}
 							onChange={e => setEmail(e.target.value)}
 							disabled={inputsDisabled}
@@ -81,7 +81,7 @@ export const AuthModalContent: ModalContent = ({hideModal}) => {
 						<input
 							type="password"
 							placeholder="Password"
-							className="password"
+							className="password blob"
 							value={password}
 							onChange={e => setPassword(e.target.value)}
 							disabled={inputsDisabled}
@@ -91,13 +91,13 @@ export const AuthModalContent: ModalContent = ({hideModal}) => {
 						<div className="submitRow">
 							<input
 								type="submit"
-								className="button register"
+								className="button register blob"
 								value="Register / Login"
 								disabled={inputsDisabled}
 							/>
 							<input
 								type="button"
-								className="button resetPassword"
+								className="button resetPassword blob"
 								value="Reset Password"
 								disabled={inputsDisabled}
 								onClick={handleResetPassword}

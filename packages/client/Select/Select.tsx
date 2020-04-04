@@ -1,7 +1,6 @@
 import {List} from 'immutable'
 import React from 'react'
-import {CssColor} from '@corgifm/common/shamu-color'
-import {PanelLite} from '../Panel/Panel'
+import {hot} from 'react-hot-loader'
 import './Select.less'
 
 interface ISelectProps extends React.DetailedHTMLProps<React.SelectHTMLAttributes<HTMLSelectElement>, HTMLSelectElement> {
@@ -13,8 +12,8 @@ interface ISelectProps extends React.DetailedHTMLProps<React.SelectHTMLAttribute
 }
 
 // TODO Make it use PanelLite
-export const Select = ({label, name, onChange, options, value, ...selectProps}: ISelectProps) =>
-	<div className="shamuSelect">
+export const Select = hot(module)(({label, name, onChange, options, value, ...selectProps}: ISelectProps) =>
+	<div className="shamuSelect blob focusBorder">
 		{/* <label
 			htmlFor={name}
 			style={{
@@ -23,17 +22,13 @@ export const Select = ({label, name, onChange, options, value, ...selectProps}: 
 			}}>
 			{label}
 		</label> */}
-		<PanelLite
-			className="selectContainer"
-			color={CssColor.defaultGray}
-		>
-			<select name={name} value={value} onChange={onChange} {...selectProps}>
-				{options.map(choice =>
-					<option key={choice} value={choice} label={choice}>{choice}</option>,
-				)}
-			</select>
-			<div className="arrow">
-				<div>▼</div>
-			</div>
-		</PanelLite>
+		<select name={name} value={value} onChange={onChange} {...selectProps}>
+			{options.map(choice =>
+				<option key={choice} value={choice} label={choice}>{choice}</option>,
+			)}
+		</select>
+		<div className="arrow">
+			<div>▼</div>
+		</div>
 	</div>
+)

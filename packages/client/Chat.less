@@ -1,14 +1,6 @@
 @import "./colors.less";
 @import "./AppCommon.less";
 
-@boxyThing: {
-    background-color: @panelGray;
-    border-radius: @mainBorderRadius;
-    @panelShadow();
-    padding: 0 8px;
-    min-height: 32px;
-}
-
 #chat {
     &.focused {
         user-select: text;
@@ -131,7 +123,7 @@
                 #chatInput {
                     color: @defaultGray;
                     letter-spacing: initial;
-                    @boxyThing();
+                    min-height: 32px;
                     min-width: 226px;
                     pointer-events: all;
                     &:focus::placeholder {

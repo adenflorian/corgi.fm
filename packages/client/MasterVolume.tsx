@@ -6,7 +6,7 @@ import {useStore} from 'react-redux'
 import {setOption, AppOptions, selectOption} from '@corgifm/common/redux'
 import {clamp} from '@corgifm/common/common-utils'
 
-const width = 200
+const width = 160
 const sliderSize = 16
 const slidableDistance = width - sliderSize
 
@@ -61,7 +61,7 @@ export const MasterVolume = hot(module)(React.memo(function _MasterVolume() {
 			style={{
 				pointerEvents: 'all',
 				userSelect: 'none',
-				color: mute ? CssColor.brightRed : undefined,
+				color: mute ? CssColor.brightRed : CssColor.defaultGray,
 			}}
 		>
 			<div className='blobDark'>

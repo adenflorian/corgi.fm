@@ -62,8 +62,6 @@ a {
     font-size: inherit;
     text-decoration: inherit;
     border: none;
-    background-color: @panelGrayDark !important;
-    padding: 0 8px;
     height: 32px;
     color: currentColor;
 }
@@ -264,7 +262,7 @@ svg {
 .blob {
     background-color: @panelGray;
     border-radius: @mainBorderRadius;
-    min-height: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     width: fit-content;
@@ -290,6 +288,10 @@ svg {
     .blobDark {
         background-color: @panelGrayDark;
     }
+}
+
+.focusBorder:focus-within {
+    @colorBorder();
 }
 
 .pointerName {

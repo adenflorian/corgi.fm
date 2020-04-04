@@ -54,18 +54,29 @@ export class Chat extends Component<AllProps, IChatComponentState> {
 				id="chat"
 				ref={this.chatRef}
 				className={this.state.isChatFocused ? 'focused' : ''}
-				onFocus={this._onFocus}
-				onBlur={this._onBlur}
 			>
 				<div
 					className="chatOverlay"
+					onFocus={this._onFocus}
+					onBlur={this._onBlur}
 				/>
 
-				<ConnectedChatMessages />
+				<div
+					onFocus={this._onFocus}
+					onBlur={this._onBlur}
+				>
+					<ConnectedChatMessages />
+				</div>
+
 
 				<div className="chatBottom" style={{textAlign: 'initial'}} tabIndex={-1}>
 					<div className="inputWrapper" style={{color: authorColor}} tabIndex={-1}>
-						<form className="chatMessageForm" onSubmit={this._onSubmitChat} title="Chat box input">
+						<form
+							className="chatMessageForm blob focusBorder"
+							onSubmit={this._onSubmitChat} title="Chat box input"
+							onFocus={this._onFocus}
+							onBlur={this._onBlur}
+						>
 							<AutosizeInput
 								id="chatInput"
 								onChange={this._onInputChange}
@@ -83,6 +94,8 @@ export class Chat extends Component<AllProps, IChatComponentState> {
 								e.preventDefault()
 								this.props.dispatch(clearChat())
 							}}
+							onFocus={this._onFocus}
+							onBlur={this._onBlur}
 						>
 							<Clear />
 						</button>
