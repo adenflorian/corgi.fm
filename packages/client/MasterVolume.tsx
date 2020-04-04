@@ -5,25 +5,27 @@ import {hot} from 'react-hot-loader'
 import {useStore} from 'react-redux'
 import {setOption, AppOptions, selectOption} from '@corgifm/common/redux'
 import {clamp} from '@corgifm/common/common-utils'
+import {IoMdVolumeMute, IoMdVolumeHigh, IoMdVolumeLow} from 'react-icons/io'
 
 const width = 160
 const sliderSize = 16
 const slidableDistance = width - sliderSize
+const lineSize = sliderSize / 2
 
 export const MasterVolume = hot(module)(React.memo(function _MasterVolume() {
-	const volume = useLocalVolume()
 	const mute = useLocalMute()
+	let volume = useLocalVolume()
+	volume = mute ? 0 : volume
 
 	const [isSliderActive, activateSlider, deactivateSlider] = useBoolean(false)
 	const [startingVolume, setStartingVolume] = useState(0)
 	const [persistentDelta, setPersistentDelta] = useState(0)
 
 	const onClickSlider = useCallback(() => {
-		const currentVolume = selectOption(getState(), AppOptions.masterVolume) as number
-		setStartingVolume(currentVolume)
+		setStartingVolume(volume)
 		setPersistentDelta(0)
 		activateSlider()
-	}, [activateSlider])
+	}, [activateSlider, volume])
 
 	const {dispatch, getState} = useStore()
 
@@ -39,6 +41,7 @@ export const MasterVolume = hot(module)(React.memo(function _MasterVolume() {
 			const newPersistentDelta = persistentDelta + delta
 			const newVolume = clamp(startingVolume + newPersistentDelta, 0, 1)
 			setPersistentDelta(newPersistentDelta)
+			if (mute) dispatch(setOption(AppOptions.masterVolumeMute, false))
 			dispatch(setOption(AppOptions.masterVolume, newVolume))
 		}
 
@@ -49,7 +52,7 @@ export const MasterVolume = hot(module)(React.memo(function _MasterVolume() {
 			window.removeEventListener('mouseup', onMouseUp)
 			window.removeEventListener('mousemove', onMouseMove)
 		}
-	}, [isSliderActive, dispatch, persistentDelta, setPersistentDelta, startingVolume])
+	}, [isSliderActive, dispatch, persistentDelta, setPersistentDelta, startingVolume, mute])
 
 	const onMuteClick = useCallback(() => {
 		dispatch(setOption(AppOptions.masterVolumeMute, !mute))
@@ -61,29 +64,43 @@ export const MasterVolume = hot(module)(React.memo(function _MasterVolume() {
 			style={{
 				pointerEvents: 'all',
 				userSelect: 'none',
-				color: mute ? CssColor.brightRed : CssColor.defaultGray,
+				color: CssColor.blue,
 			}}
+			title="This controls your local master volume, and won't affect anyone else"
 		>
-			<div className='blobDark'>
-				local volume {(volume * 100).toFixed(0)}%
+			<div className='blobDark' onClick={onMuteClick} style={{fontSize: 16 + 8}}>
+				{(mute || volume === 0) ? <IoMdVolumeMute /> : volume > 0.5 ? <IoMdVolumeHigh /> : <IoMdVolumeLow />}
 			</div>
-			<div className="rail" style={{
-				width,
-			}}>
+			<div
+				className="rail"
+				style={{
+					width,
+					position: 'relative',
+				}}
+			>
+				<div
+					className="colorLine"
+					style={{
+						position: 'absolute',
+						backgroundColor: 'currentColor',
+						borderRadius: lineSize / 2,
+						width: (slidableDistance * volume) + (sliderSize / 2),
+						height: lineSize,
+					}}
+				/>
 				<div
 					className="slider"
 					style={{
+						position: 'absolute',
+						zIndex: 1,
 						backgroundColor: CssColor.defaultGray,
-						borderRadius: 8,
+						borderRadius: sliderSize / 2,
 						marginLeft: slidableDistance * volume,
 						width: sliderSize,
 						height: sliderSize,
 					}}
 					onMouseDown={onClickSlider}
-				></div>
-			</div>
-			<div className='blobDark' onClick={onMuteClick}>
-				{mute ? 'muted' : 'not muted'}
+				/>
 			</div>
 		</div>
 	)
