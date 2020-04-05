@@ -68,9 +68,9 @@ export const MasterVolume = hot(module)(React.memo(function _MasterVolume() {
 			}}
 			title="This controls your local master volume, and won't affect anyone else"
 		>
-			<div className='blobDark' onClick={onMuteClick} style={{fontSize: 16 + 8}}>
+			<button className='blobDark' onClick={onMuteClick} style={{fontSize: 16 + 8}}>
 				{(mute || volume === 0) ? <FiVolumeX /> : volume > 0.5 ? <FiVolume2 /> : <FiVolume1 />}
-			</div>
+			</button>
 			<div
 				className="rail"
 				style={{
@@ -78,6 +78,16 @@ export const MasterVolume = hot(module)(React.memo(function _MasterVolume() {
 					position: 'relative',
 				}}
 			>
+				<div
+					className="colorLine"
+					style={{
+						position: 'absolute',
+						backgroundColor: CssColor.panelGrayDark,
+						borderRadius: lineSize / 2,
+						width: slidableDistance + (sliderSize / 2),
+						height: lineSize,
+					}}
+				/>
 				<div
 					className="colorLine"
 					style={{

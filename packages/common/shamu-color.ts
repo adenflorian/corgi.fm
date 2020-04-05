@@ -84,7 +84,7 @@ export function hashbow(input: IHashable, saturation = 90, lightness = 50) {
 // Keep in sync with colors.less
 export enum CssColor {
 	panelGray = '#252525',
-	panelGrayDark = '#1A1A1A',
+	panelGrayDark = 'hsl(0, 0%, 8.5%)',
 	panelGrayLight = 'hsl(0, 0%, 25%)',
 	panelGrayTransparent = 'rgba(40, 40, 50, 0.5)',
 	disabledGray = 'hsla(0, 0%, 48%, 1)',
@@ -107,7 +107,7 @@ export enum CssColor {
 	yellow = 'hsl(65, 90%, 60%)',
 	brightYellow = 'hsl(65, 100%, 60%)',
 	darkTextShadow = 'rgb(20, 20, 22)',
-	appBackground = 'hsl(0, 0%, 7%)',
+	appBackground = 'hsl(0, 0%, 6%)',
 	overlayGray = 'hsla(0, 0, 4%, 0.8)',
 }
 

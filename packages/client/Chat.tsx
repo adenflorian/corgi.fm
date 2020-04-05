@@ -7,8 +7,8 @@ import {
 } from '@corgifm/common/redux'
 import './Chat.less'
 import {
-	IoMdTrash as Clear,
-} from 'react-icons/io'
+	FiTrash2 as Clear,
+} from 'react-icons/fi'
 import {ConnectedChatMessages} from './Chat/ChatMessages'
 import {isTestClient} from './is-prod-client'
 import {isInputFocused} from './client-utils'

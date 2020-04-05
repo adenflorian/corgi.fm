@@ -5,6 +5,8 @@ import {
 	maxUsernameLength, selectLocalClient, setLocalClientName, shamuConnect,
 } from '@corgifm/common/redux'
 import {useBoolean} from './react-hooks'
+import {FiUser as UserIcon} from 'react-icons/fi'
+import {CssColor} from '@corgifm/common/shamu-color'
 
 interface Props {
 	readonly showLabel?: boolean
@@ -63,15 +65,14 @@ function NameChanger({author, authorColor, showLabel = false}: AllProps) {
 	}
 
 	return (
-		<div className="blob">
+		<div className="blob" style={{color: authorColor}}>
 			{showLabel &&
-				<label htmlFor="usernameInput">Username</label>
+				<label htmlFor="usernameInput" style={{backgroundColor: authorColor, color: CssColor.panelGrayDark}}><UserIcon /></label>
 			}
 			<form
 				className="nameForm blobDark"
 				onSubmit={_onSubmitNameChange}
 				title="Change your username here"
-				style={{color: authorColor}}
 			>
 				<AutosizeInput
 					name="nameAutosizeInput"

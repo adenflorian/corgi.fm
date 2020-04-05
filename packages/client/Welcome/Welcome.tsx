@@ -1,5 +1,5 @@
 import React, {useCallback} from 'react'
-import {IoMdArrowRoundForward, IoMdGlobe} from 'react-icons/io'
+import {FiArrowRight as RightArrow, FiGlobe as Globe} from 'react-icons/fi'
 import {useDispatch, useSelector} from 'react-redux'
 import {lobby} from '@corgifm/common/common-constants'
 import {
@@ -56,20 +56,20 @@ export const WelcomeModalContent: ModalContent = ({hideModal}) => {
 						<div className="roomActions vert-space-16">
 							<button
 								type="button"
-								className="joinActiveRoom"
+								className="joinActiveRoom corgiButton"
 								onClick={hideModal}
 							>
-								<IoMdArrowRoundForward />
+								<RightArrow />
 								<span>Continue to room&nbsp;</span>
 								<span className="room">{activeRoom}</span>
 							</button>
 							{activeRoom !== lobby && (
 								<button
 									type="button"
-									className="joinLobby"
+									className="joinLobby corgiButton"
 									onClick={joinLobby}
 								>
-									<IoMdGlobe />
+									<Globe />
 									<span>Join&nbsp;</span>
 									<span className="room">lobby</span>
 								</button>

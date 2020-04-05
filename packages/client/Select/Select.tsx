@@ -2,6 +2,7 @@ import {List} from 'immutable'
 import React from 'react'
 import {hot} from 'react-hot-loader'
 import './Select.less'
+import {FiArrowDown} from 'react-icons/fi'
 
 interface ISelectProps extends React.DetailedHTMLProps<React.SelectHTMLAttributes<HTMLSelectElement>, HTMLSelectElement> {
 	label: string
@@ -28,7 +29,7 @@ export const Select = hot(module)(({label, name, onChange, options, value, ...se
 			)}
 		</select>
 		<div className="arrow">
-			<div>▼</div>
+			<FiArrowDown />
 		</div>
 	</div>
 )

@@ -1,6 +1,6 @@
 import React, {Fragment, useCallback} from 'react'
 import {useDispatch, useSelector} from 'react-redux'
-import {IoMdSettings} from 'react-icons/io'
+import {FiSettings as GearIcon} from 'react-icons/fi'
 import {
 	AppOptions, IClientAppState, LineType, ModalId,
 	modalsAction, roomSettingsActions, selectLocalClientId, selectRoomSettings,
@@ -21,7 +21,7 @@ export function OptionsModalButton() {
 
 	return (
 		<Button onClick={showModal} background="medium" shadow={true}>
-			<IoMdSettings />
+			<GearIcon />
 			Options
 		</Button>
 	)

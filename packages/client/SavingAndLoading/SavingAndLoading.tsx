@@ -2,7 +2,7 @@
 import {stripIndents} from 'common-tags'
 import moment from 'moment'
 import React from 'react'
-import {IoMdFolder} from 'react-icons/io'
+import {FiFolder} from 'react-icons/fi'
 import {useDispatch} from 'react-redux'
 import {
 	loadRoom, ModalId, SavedRoom, localActions,
@@ -20,7 +20,7 @@ export function LoadRoomModalButton() {
 		<ModalButton
 			label="Load Room"
 			modalId={ModalId.LoadRoom}
-			icon={IoMdFolder}
+			icon={FiFolder}
 		/>
 	)
 }

@@ -3,8 +3,10 @@ import React, {Fragment, useCallback, useState} from 'react'
 import {
 	// IoLogoFacebook as Facebook,
 	IoLogoGoogle as Google,
-	IoMdLogOut, IoMdLogIn,
 } from 'react-icons/io'
+import {
+	FiLogIn, FiLogOut,
+} from 'react-icons/fi'
 import {useDispatch} from 'react-redux'
 import {AuthConstants} from '@corgifm/common/auth-constants'
 import {
@@ -35,8 +37,8 @@ export function AuthModalButton() {
 			shadow={true}
 		>
 			{loggedIn
-				? <Fragment><IoMdLogOut />Log Out</Fragment>
-				: <Fragment><IoMdLogIn />Register / Login</Fragment>}
+				? <Fragment><FiLogOut />Log Out</Fragment>
+				: <Fragment><FiLogIn />Register / Login</Fragment>}
 		</Button>
 	)
 
@@ -124,7 +126,7 @@ export const AuthModalContent: ModalContent = ({hideModal}) => {
 				<div className="modalSectionContent providers">
 					<button
 						type="button"
-						className="button google"
+						className="button google corgiButton"
 						disabled={inputsDisabled}
 						onClick={async () => handleProviderLogin(
 							firebase.auth.GoogleAuthProvider)}
@@ -134,7 +136,7 @@ export const AuthModalContent: ModalContent = ({hideModal}) => {
 					</button>
 					{/* <button
 						type="button"
-						className="button facebook"
+						className="button facebook corgiButton"
 						disabled={inputsDisabled}
 						onClick={async () => handleProviderLogin(
 							firebase.auth.FacebookAuthProvider)}

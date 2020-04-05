@@ -2,10 +2,10 @@ import React, {useCallback} from 'react'
 import {useDispatch, useSelector} from 'react-redux'
 import {stripIndents} from 'common-tags'
 import {
-	IoMdDownload as Download, IoMdGrid as Rows, IoMdPlay as Play,
-	IoMdRecording as Record, IoMdSquare as Stop,
-	IoMdStar as Star, IoMdTrash as Clear, IoMdUndo as Undo,
-} from 'react-icons/io'
+	FiDownload as Download, FiGrid as Rows, FiPlay as Play,
+	FiCircle as Record, FiSquare as Stop,
+	FiStar as Star, FiTrash2 as Clear, FiCornerUpLeft as Undo,
+} from 'react-icons/fi'
 import {
 	sequencerActions, globalClockActions,
 	selectInfiniteSequencerStyle, infiniteSequencerActions,
@@ -17,6 +17,9 @@ import {
 	sequencerPlayToolTip, sequencerStopToolTip, sequencerRecordToolTip,
 	sequencerDownloadToolTip, sequencerEraseToolTip, sequencerUndoToolTip,
 } from './client-constants'
+
+export const PlayIcon = Play
+export const StopIcon = Stop
 
 export const PlayButton = React.memo(({parentId}: {parentId: Id}) => {
 	const dispatch = useDispatch()

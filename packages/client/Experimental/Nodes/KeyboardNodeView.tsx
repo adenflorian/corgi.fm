@@ -46,7 +46,7 @@ const KeyboardNodeExtra2 = React.memo(function _KeyboardNodeExtra({
 	const selectedInput = useObjectChangedEvent(inputChangedEvent)
 
 	return (
-		<div style={{display: 'flex', justifyContent: 'center'}}>
+		<div style={{display: 'flex', justifyContent: 'center', padding: 8}}>
 			<ButtonSelect
 				options={midiInputOptions}
 				onNewSelection={onNewSelection}

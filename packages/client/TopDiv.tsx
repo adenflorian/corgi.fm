@@ -32,6 +32,7 @@ import {useRoomType} from './react-hooks'
 import './TopDiv.less'
 import {NodeGroupInfo} from './SmallComponents/NodeGroupInfo'
 import {RoomType} from '@corgifm/common/common-types'
+import {FiDownload} from 'react-icons/fi'
 
 interface ReduxProps {
 	memberCount: number
@@ -167,7 +168,7 @@ export const TopDiv = ({
 				}
 			</div>
 			<div className="right">
-				<ConnectedNameChanger />
+				<ConnectedNameChanger showLabel={true} />
 				<AuthModalButton />
 				<WelcomeModalButton />
 				<ConnectedRoomSelector />
@@ -198,6 +199,7 @@ export const TopDiv = ({
 					background="medium"
 					shadow={true}
 				>
+					<FiDownload />
 					Save Room To File
 				</Button>
 				<Button

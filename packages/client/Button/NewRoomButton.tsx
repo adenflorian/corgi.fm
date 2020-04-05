@@ -1,7 +1,7 @@
 import React, {useCallback, Fragment, useRef, useEffect} from 'react'
 import animal from 'animal-id'
 import {List} from 'immutable'
-import {IoMdAddCircle} from 'react-icons/io'
+import {FiPlusCircle} from 'react-icons/fi'
 import {useDispatch} from 'react-redux'
 import {roomsActions, modalsAction, ModalId, isRoomType} from '@corgifm/common/redux'
 import {roomNameCleaner} from '@corgifm/common/common-utils'
@@ -34,7 +34,7 @@ export function NewRoomButton({onClick}: {onClick?: () => any}) {
 				background="medium"
 				shadow={true}
 			>
-				<IoMdAddCircle />
+				<FiPlusCircle />
 				New Room
 			</Button>
 		</Fragment>
