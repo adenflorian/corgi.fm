@@ -51,7 +51,7 @@ export const Samples = React.memo(({samplerId}: Props) => {
 				<ViewOctaveKnob setOctave={setOctave} octave={octave} />
 				<button
 					type="button"
-					className="deselect"
+					className="deselect corgiButton"
 					onClick={deselect}
 					title={oneLine`Deselects all samples allowing you to change the
 						main instrument params`}
