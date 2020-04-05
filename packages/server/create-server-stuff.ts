@@ -39,7 +39,7 @@ export function createServerStuff(room: string, serverStore: Store<IServerState>
 }
 
 const xSpacing = 400
-const ySpacing = 300
+const ySpacing = 400
 
 export function createServerStuffExperimental(room: string, serverStore: Store<IServerState>) {
 	logger.log('todo')
@@ -62,7 +62,7 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 			id: sequencer.id,
 			ownerId: serverClientId,
 			x: xSpacing * -4,
-			y: ySpacing * 0,
+			y: ySpacing * -0.5,
 			targetType: sequencer.type,
 		})))
 
