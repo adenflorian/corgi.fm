@@ -7,10 +7,10 @@ import {
 	ExpCustomNumberParam, ExpCustomNumberParams,
 	ExpButtons, ExpButton, ExpCustomNumberParamReadonly,
 	ExpReferenceParam, ExpReferenceParamReadonly, ExpReferenceParams,
-} from '../ExpParams'
-import {ExpMidiOutputPort} from '../ExpMidiPorts'
-import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
-import {ExpPorts} from '../ExpPorts'
+} from '../../ExpParams'
+import {ExpMidiOutputPort} from '../../ExpMidiPorts'
+import {CorgiNode, CorgiNodeArgs} from '../../CorgiNode'
+import {ExpPorts} from '../../ExpPorts'
 import {ExpBetterSequencerNodeView} from './ExpBetterSequencerNodeView'
 import {SeqReadEvent, seqPatternReader, seqPatternViewReader, SeqPatternView, makeSeqPatternView} from '@corgifm/common/SeqStuff'
 import {makeExpMidiPatternViewState} from '@corgifm/common/redux'
@@ -58,9 +58,9 @@ export class ExpBetterSequencerNode extends CorgiNode {
 		this._tempo = new ExpCustomNumberParam('tempo', 240, 0.001, 999.99, 3)
 		this._rate = new ExpCustomNumberParam('rate', 1, 0.001, 4)
 		this._zoomX = new ExpCustomNumberParam('zoomX', 1, minZoomX, maxZoomX)
-		this._zoomY = new ExpCustomNumberParam('zoomY', 1, minZoomY, maxZoomY)
+		this._zoomY = new ExpCustomNumberParam('zoomY', 6, minZoomY, maxZoomY)
 		this._panX = new ExpCustomNumberParam('panX', 1, minPan, maxPan)
-		this._panY = new ExpCustomNumberParam('panY', 1, minPan, maxPan)
+		this._panY = new ExpCustomNumberParam('panY', 0.6, minPan, maxPan)
 		this._customNumberParams = arrayToESIdKeyMap([this._tempo, this._rate, this._zoomX, this._zoomY, this._panX, this._panY])
 
 		this._restartButton = new ExpButton('restart', this)

@@ -31,7 +31,7 @@ import {MidiPulseNode} from './MidiPulse'
 import {MidiMatchNode} from './MidiMatchNode'
 import {MidiMessageNode} from './MidiMessageNode'
 import {SamplerExpNode} from './ExpSamplerNode'
-import {ExpBetterSequencerNode} from './ExpBetterSequencerNode'
+import {ExpBetterSequencerNode} from './ExpBetterSequencer/ExpBetterSequencerNode'
 import {NoteNode} from './NoteNode/NoteNode'
 
 // Is there a way to use class decorators to create this map at runtime?

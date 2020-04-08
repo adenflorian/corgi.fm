@@ -10,7 +10,7 @@ import {BetterNote} from './BetterNote'
 import {movementXToBeats} from './BetterSequencerHelpers'
 import {SeqEvents, duplicateNoteEvent, SeqPattern} from '@corgifm/common/SeqStuff'
 import {useNodeContext} from '../../CorgiNode'
-import {ExpBetterSequencerNode} from '../ExpBetterSequencerNode'
+import {ExpBetterSequencerNode} from './ExpBetterSequencerNode'
 
 interface Props {
 	noteHeight: number

@@ -36,7 +36,7 @@ import {
 } from './BetterSequencerHelpers'
 import {BetterSideNotes} from './BetterSideNotes'
 import {useNodeContext} from '../../CorgiNode'
-import {ExpBetterSequencerNode} from '../ExpBetterSequencerNode'
+import {ExpBetterSequencerNode} from './ExpBetterSequencerNode'
 import {useNumberChangedEvent, useObjectChangedEvent, useStringChangedEvent} from '../../hooks/useCorgiEvent'
 import {SeqEvents, makeNoteEvent2, duplicateNoteEvent} from '@corgifm/common/SeqStuff'
 import {BetterLoopBar} from './BetterLoopBar'

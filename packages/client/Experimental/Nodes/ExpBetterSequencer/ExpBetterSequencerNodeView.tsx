@@ -1,11 +1,11 @@
 import React, {Fragment} from 'react'
 import {hot} from 'react-hot-loader'
-import {useNumberChangedEvent, useObjectChangedEvent} from '../hooks/useCorgiEvent'
-import {useExpPosition} from '../../react-hooks'
-import {useNodeContext} from '../CorgiNode'
+import {useNumberChangedEvent, useObjectChangedEvent} from '../../hooks/useCorgiEvent'
+import {useExpPosition} from '../../../react-hooks'
+import {useNodeContext} from '../../CorgiNode'
 import {CssColor, getColorStringForMidiNote} from '@corgifm/common/shamu-color'
-import {ReadonlyEventStreamReader} from './EventStreamStuff'
-import {ExpBetterSequencerInner} from './ExpBetterSequencer/ExpBetterSequencerInner'
+import {ReadonlyEventStreamReader} from '../EventStreamStuff'
+import {ExpBetterSequencerInner} from './ExpBetterSequencerInner'
 
 interface Props {
 

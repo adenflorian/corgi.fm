@@ -11,7 +11,7 @@ import {movementXToBeats} from './BetterSequencerHelpers'
 import {SeqEvents, duplicateNoteEvent, SeqPattern} from '@corgifm/common/SeqStuff'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {useNodeContext} from '../../CorgiNode'
-import {ExpBetterSequencerNode} from '../ExpBetterSequencerNode'
+import {ExpBetterSequencerNode} from './ExpBetterSequencerNode'
 import {useObjectChangedEvent} from '../../hooks/useCorgiEvent'
 
 interface Props {
