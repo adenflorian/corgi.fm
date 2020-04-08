@@ -3,11 +3,11 @@ import {hot} from 'react-hot-loader'
 import {selectLocalClientId, IClientAppState} from '@corgifm/common/redux'
 import {Input} from 'webmidi'
 import {useSelector} from 'react-redux'
-import {ButtonSelect, ButtonSelectOption} from '../../ButtonSelect/ButtonSelect'
-import {useObjectChangedEvent} from '../hooks/useCorgiEvent'
-import {useSingletonContext} from '../../SingletonContext'
-import {CorgiObjectChangedEvent} from '../CorgiEvents'
-import {logger} from '../../client-logger'
+import {ButtonSelect, ButtonSelectOption} from '../../../ButtonSelect/ButtonSelect'
+import {useObjectChangedEvent} from '../../hooks/useCorgiEvent'
+import {useSingletonContext} from '../../../SingletonContext'
+import {CorgiObjectChangedEvent} from '../../CorgiEvents'
+import {logger} from '../../../client-logger'
 
 interface KeyboardNodeExtraProps {
 	readonly onInputSelected: (input: Input) => void
