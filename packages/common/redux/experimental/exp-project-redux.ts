@@ -1,4 +1,4 @@
-import {Record} from 'immutable'
+import {Record, Map} from 'immutable'
 import {Reducer, combineReducers} from 'redux'
 import {ActionType} from 'typesafe-actions'
 import {
@@ -6,8 +6,9 @@ import {
 } from '.'
 import {InitAction} from '../common-actions'
 import {expMidiReducer, makeExpMidiState} from './exp-midi-redux'
-import {IClientAppState, IClientRoomState} from '../common-redux-types'
+import {IClientRoomState} from '../common-redux-types'
 import {RoomType} from '../../common-types'
+import {expKeyboardsReducer, makeExpKeyboardState, ExpKeyboardState} from './exp-keyboard-keys-redux'
 
 export const expProjectActions = {
 } as const
@@ -23,6 +24,7 @@ export interface ExpProjectState extends ReturnType<typeof _makeExpProjectState>
 const innerReducers = combineReducers({
 	graphs: expGraphsReducer,
 	midi: expMidiReducer,
+	keyboards: expKeyboardsReducer,
 })
 
 const defaultExpProjectState = Object.freeze({
@@ -37,6 +39,7 @@ export function makeExpProjectState(expProjectsState: ExpProjectState) {
 		.set('state', {
 			graphs: makeExpGraphsState(expProjectsState.state.graphs),
 			midi: makeExpMidiState(expProjectsState.state.midi),
+			keyboards: Map<Id, ExpKeyboardState>(expProjectsState.state.keyboards || []).map(makeExpKeyboardState),
 		})
 }
 

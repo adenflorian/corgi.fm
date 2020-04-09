@@ -1,3 +1,5 @@
+import * as Immutable from 'immutable'
+
 export type NumberChangedDelegate = (newNumber: number) => void
 
 export interface CorgiNumberChangedObservable extends Pick<CorgiNumberChangedEvent, 'subscribe' | 'unsubscribe' | 'current'> {}
@@ -174,6 +176,55 @@ export class CorgiObjectChangedEvent<TObject extends CorgiObjectType> {
 
 	public invokeNextFrame(newObject: TObject, onInvoked?: () => void) {
 		this.currentValue = newObject
+		if (this._frameRequested) return
+		this._frameRequested = true
+		requestAnimationFrame(() => {
+			this._frameRequested = false
+			this._invoke()
+			if (onInvoked) onInvoked()
+		})
+	}
+
+	private _invoke() {
+		this._subscribers.forEach(delegate => delegate(this.currentValue))
+	}
+}
+
+export type SetChangedDelegate<TElement> = (newSet: Immutable.Set<TElement>) => void
+
+/** Be careful with this */
+export function isCorgiSetChangedEvent<TElement>(val: unknown): val is CorgiSetChangedEvent<TElement> {
+	return val instanceof CorgiSetChangedEvent
+}
+
+export type ReadonlyCorgiSetChangedEvent<TElement> = Pick<CorgiSetChangedEvent<TElement>, 'current' | 'subscribe' | 'unsubscribe'>
+
+export class CorgiSetChangedEvent<TElement> {
+	private readonly _subscribers = new Set<SetChangedDelegate<TElement>>()
+	private _frameRequested = false
+
+	public constructor(
+		private currentValue: Immutable.Set<TElement>,
+	) {}
+
+	public get current() {return this.currentValue}
+
+	public subscribe(delegate: SetChangedDelegate<TElement>) {
+		this._subscribers.add(delegate)
+		delegate(this.current)
+	}
+
+	public unsubscribe(delegate: SetChangedDelegate<TElement>) {
+		this._subscribers.delete(delegate)
+	}
+
+	public invokeImmediately(newSet: Immutable.Set<TElement>) {
+		this.currentValue = newSet
+		this._invoke()
+	}
+
+	public invokeNextFrame(newSet: Immutable.Set<TElement>, onInvoked?: () => void) {
+		this.currentValue = newSet
 		if (this._frameRequested) return
 		this._frameRequested = true
 		requestAnimationFrame(() => {

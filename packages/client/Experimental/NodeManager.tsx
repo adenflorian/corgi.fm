@@ -3,7 +3,10 @@ import * as immutable from 'immutable'
 import {ExpNodeState, IExpConnection, ExpGraph,
 	ExpReferenceTargetType, ExpReferenceParamState,
 	ExpMidiPatternsState, ExpMidiPatternViewState,
-	ExpMidiPatternViewsState} from '@corgifm/common/redux'
+	ExpMidiPatternViewsState,
+	ExpKeyboardState,
+	ExpKeyboardStateRaw,
+	ExpKeyboardsState} from '@corgifm/common/redux'
 import {ParamInputCentering} from '@corgifm/common/common-types'
 import {NodeToNodeAction} from '@corgifm/common/server-constants'
 import {assertUnreachable} from '@corgifm/common/common-utils'
@@ -18,7 +21,8 @@ import {
 } from './ExpConnections'
 import {NumberParamChange, EnumParamChange, StringParamChange,
 	ExpReferenceParamChange,
-	SeqPatternViewContainer} from './ExpParams'
+	SeqPatternViewContainer,
+	SetParamChange} from './ExpParams'
 import {
 	isAudioOutputPort, isAudioInputPort, ExpPortType,
 	isAudioParamInputPort, ExpPort,
@@ -64,6 +68,7 @@ export class NodeManager {
 	private _tickSubscribers = new Set<NodeTickDelegate>()
 	private readonly _midiPatterns = new Map<Id, CorgiObjectChangedEvent<SeqPattern>>()
 	private readonly _midiPatternViews = new Map<Id, SeqPatternViewContainer>()
+	private readonly _keyboards = new Map<Id, CorgiObjectChangedEvent<ExpKeyboardStateRaw>>()
 
 	public constructor(
 		private readonly _singletonContext: SingletonContextImpl,
@@ -202,6 +207,15 @@ export class NodeManager {
 		node.onCustomEnumParamChange(paramChange.paramId, paramChange.newValue)
 	}
 
+
+	public readonly onCustomSetParamChange = (paramChange: SetParamChange) => {
+		const node = this._mainGraph.nodes.get(paramChange.nodeId)
+
+		if (!node) return logger.warn('[onCustomSetParamChange] 404 node not found: ', {paramChange})
+
+		node.onCustomSetParamChange(paramChange.paramId, paramChange.newValue)
+	}
+
 	public readonly onCustomStringParamChange = (paramChange: StringParamChange) => {
 		const node = this._mainGraph.nodes.get(paramChange.nodeId)
 
@@ -239,13 +253,20 @@ export class NodeManager {
 				const foo = this._midiPatternViews.get(id)
 				return foo ? foo.patternView : undefined
 			}
+			case 'keyboardState': return this._keyboards.get(id)
 			default: throw new Error('hello there')
 		}
 	}
 
-	public readonly loadMainGraph = (mainGraph: ExpGraph, patterns: ExpMidiPatternsState, patternViews: ExpMidiPatternViewsState) => {
+	public readonly loadMainGraph = (
+		mainGraph: ExpGraph,
+		patterns: ExpMidiPatternsState,
+		patternViews: ExpMidiPatternViewsState,
+		keyboards: ExpKeyboardsState,
+	) => {
 		patterns.forEach(this.patternUpdated)
 		patternViews.forEach(this.patternViewUpdated)
+		keyboards.forEach(this.keyboardUpdated)
 		this.addNodes(mainGraph.nodes)
 		this.addConnections(mainGraph.connections.connections)
 	}
@@ -279,6 +300,7 @@ export class NodeManager {
 		nodeState.audioParams.forEach((newValue, paramId) => node.onAudioParamChange(paramId, newValue))
 		nodeState.customNumberParams.forEach((newValue, paramId) => node.onCustomNumberParamChange(paramId, newValue))
 		nodeState.customEnumParams.forEach((newValue, paramId) => node.onCustomEnumParamChange(paramId, newValue))
+		nodeState.customSetParams.forEach((newValue, paramId) => node.onCustomSetParamChange(paramId, newValue))
 		nodeState.customStringParams.forEach((newValue, paramId) => node.onCustomStringParamChange(paramId, newValue))
 		nodeState.referenceParams.forEach((newValue, paramId) => this._loadReferenceParam(node, paramId, newValue))
 		node.setEnabled(nodeState.enabled)
@@ -316,7 +338,7 @@ export class NodeManager {
 		const source = this._mainGraph.nodes.get(expConnection.sourceId)
 		const target = this._mainGraph.nodes.get(expConnection.targetId)
 		if (!source || !target) {
-			logger.warn('uh oh: ', {source, target})
+			logger.warn('uh oh 42: ', {source, target})
 			return
 		}
 
@@ -547,6 +569,20 @@ export class NodeManager {
 
 	public readonly patternViewDeleted = (id: Id) => {
 		this._midiPatternViews.delete(id)
+		// TODO Somehow notify subscribers
+	}
+
+	public readonly keyboardUpdated = (keyboardState: ExpKeyboardStateRaw) => {
+		const keyboard = this._keyboards.get(keyboardState.id)
+		if (!keyboard) {
+			this._keyboards.set(keyboardState.id, new CorgiObjectChangedEvent(keyboardState))
+		} else {
+			keyboard.invokeImmediately(keyboardState)
+		}
+	}
+
+	public readonly keyboardDeleted = (id: Id) => {
+		this._keyboards.delete(id)
 		// TODO Somehow notify subscribers
 	}
 

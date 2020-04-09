@@ -24,9 +24,9 @@ import {
 	selectExpConnectionsWithSourceIds, selectExpAllPositions,
 	ActivityAction, ExpMidiPatternsAction, ExpMidiPatternViewsAction,
 	selectExpMidiPattern, selectActivityType, makeExpMidiPatternState,
-	expMidiPatternsActions, selectExpMidiPatternsState, makeExpMidiPatternViewState, expMidiPatternViewsActions, selectExpMidiPatternView, selectExpMidiPatternViewsState,
+	expMidiPatternsActions, selectExpMidiPatternsState, makeExpMidiPatternViewState, expMidiPatternViewsActions, selectExpMidiPatternView, selectExpMidiPatternViewsState, makeExpKeyboardState, expKeyboardsActions, ExpKeyboardsAction, selectExpKeyboardState, selectExpKeyboardKeys,
 } from '@corgifm/common/redux'
-import {serverClientId, GroupId, expBetterSequencerMainPatternParamId} from '@corgifm/common/common-constants'
+import {serverClientId, GroupId, expBetterSequencerMainPatternParamId, expKeyboardStateParamId} from '@corgifm/common/common-constants'
 import {createNodeId, arrayToESIdKeyMap} from '@corgifm/common/common-utils'
 import {SingletonContextImpl} from '../SingletonContext'
 import {logger} from '../client-logger'
@@ -40,7 +40,7 @@ type ExpMiddlewareActions = ExpNodesAction | ExpConnectionAction
 	| ExpLocalAction | RoomsReduxAction | ExpPositionAction
 	| ExpGhostConnectorAction | LocalAction | OptionsAction
 	| ExpGraphsAction | ActivityAction | ExpMidiPatternsAction
-	| ExpMidiPatternViewsAction
+	| ExpMidiPatternViewsAction | ExpKeyboardsAction
 
 type ExpMiddleware =
 	(singletonContext: SingletonContextImpl) => Middleware<{}, IClientAppState>
@@ -310,6 +310,12 @@ function after(
 
 					dispatch(expNodesActions.referenceParamChange(
 						action.newNode.id, expBetterSequencerMainPatternParamId, {targetId: newPatternView.id, targetType: 'midiPatternView'}))
+				} else if (action.newNode.type === 'keyboard') {
+					const newKeyboard = makeExpKeyboardState({})
+					dispatch(expKeyboardsActions.add(newKeyboard))
+
+					dispatch(expNodesActions.referenceParamChange(
+						action.newNode.id, expKeyboardStateParamId, {targetId: newKeyboard.id, targetType: 'keyboardState'}))
 				}
 			}
 			return
@@ -563,7 +569,9 @@ function bar(
 				return nodeManager.loadMainGraph(
 					selectMainExpGraph(state.room),
 					selectExpMidiPatternsState(state.room),
-					selectExpMidiPatternViewsState(state.room))
+					selectExpMidiPatternViewsState(state.room),
+					selectExpKeyboardState(state.room),
+				)
 			} else {
 				return
 			}
@@ -577,6 +585,9 @@ function bar(
 
 		case 'EXP_NODE_CUSTOM_ENUM_PARAM_CHANGE':
 			return nodeManager.onCustomEnumParamChange(action)
+
+		case 'EXP_NODE_CUSTOM_SET_PARAM_CHANGE':
+			return nodeManager.onCustomSetParamChange(action)
 
 		case 'EXP_NODE_CUSTOM_STRING_PARAM_CHANGE':
 			return nodeManager.onCustomStringParamChange(action)
@@ -634,6 +645,15 @@ function bar(
 			return nodeManager.patternViewDeleted(action.id)
 		case 'EXP_MIDI_PATTERN_VIEW_UPDATE':
 			return nodeManager.patternViewUpdated(selectExpMidiPatternView(state.room, action.updatedPattern.id))
+
+		// Keyboards
+		case 'EXP_MIDI_KEYBOARD_ADD':
+			return nodeManager.keyboardUpdated(selectExpKeyboardKeys(state.room, action.newKeyboard.id))
+		case 'EXP_MIDI_KEYBOARD_DELETE':
+			return nodeManager.keyboardDeleted(action.id)
+		case 'EXP_MIDI_KEYBOARD_KEYS_DOWN':
+		case 'EXP_MIDI_KEYBOARD_KEYS_UP':
+			return nodeManager.keyboardUpdated(selectExpKeyboardKeys(state.room, action.id))
 
 		// Other
 		case 'SET_OPTION': {

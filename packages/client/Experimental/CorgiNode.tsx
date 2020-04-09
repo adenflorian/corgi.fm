@@ -1,8 +1,9 @@
 import React, {ReactElement, useContext, ReactNode} from 'react'
-import {List} from 'immutable'
+import {useSelector} from 'react-redux'
+import * as Immutable from 'immutable'
 import {clamp, clampPolarized} from '@corgifm/common/common-utils'
 import {NodeToNodeAction} from '@corgifm/common/server-constants'
-import {ExpNodeType, ExpPortStates, ExpReferenceTargetType} from '@corgifm/common/redux'
+import {ExpNodeType, ExpPortStates, ExpReferenceTargetType, IClientAppState, selectLocalClientId} from '@corgifm/common/redux'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {logger} from '../client-logger'
 import {SingletonContextImpl} from '../SingletonContext'
@@ -11,13 +12,14 @@ import {
 } from './ExpPorts'
 import {
 	ExpAudioParams, ExpCustomNumberParams, ExpCustomEnumParams,
-	ExpCustomStringParams, ExpButtons, ExpReferenceParams,
+	ExpCustomStringParams, ExpButtons, ExpReferenceParams, ExpCustomSetParams,
 } from './ExpParams'
 import {CorgiNodeView} from './CorgiNodeView'
-import {CorgiStringChangedEvent, CorgiNumberChangedEvent, CorgiObjectChangedEvent} from './CorgiEvents'
+import {CorgiStringChangedEvent, CorgiNumberChangedEvent, CorgiObjectChangedEvent, ReadonlyCorgiObjectChangedEvent} from './CorgiEvents'
 import {isMidiOutputPort} from './ExpMidiPorts'
 import {isPolyphonicOutputPort} from './ExpPolyphonicPorts'
 import {LabCorgiAnalyserSPNode} from './CorgiAnalyserSPN'
+import {useObjectChangedEvent} from './hooks/useCorgiEvent'
 
 export const ExpNodeContext = React.createContext<null | CorgiNodeReact>(null)
 
@@ -25,6 +27,17 @@ export function useNodeContext() {
 	const context = useContext(ExpNodeContext)
 	if (!context) throw new Error(`missing node context, maybe there's no provider`)
 	return context
+}
+
+export function useExpNodeOwnerId(): Id {
+	const nodeContext = useNodeContext()
+	return useObjectChangedEvent(nodeContext.ownerId)
+}
+
+export function useIsLocallyOwnedExpNode(): boolean {
+	const ownerId = useExpNodeOwnerId()
+	const localClientId = useSelector((state: IClientAppState) => selectLocalClientId(state))
+	return ownerId === localClientId
 }
 
 export interface CorgiNodeOptions {
@@ -50,11 +63,13 @@ export type CorgiNodeConstructor = new (args: CorgiNodeArgs) => CorgiNode
 
 export interface CorgiNodeReact extends Pick<CorgiNode,
 'id' | 'requiresAudioWorklet' | 'getPorts' | 'onColorChange' | 'renderDebugStuff' |
-'onNameChange' | 'setPortPosition' | 'type' | 'debugInfo' | 'newSampleEvent'> {}
+'onNameChange' | 'setPortPosition' | 'type' | 'debugInfo' | 'newSampleEvent' |
+'ownerId'> {}
 
 export abstract class CorgiNode {
 	public readonly id: Id
-	public readonly ownerId: Id
+	public get ownerId() {return this._ownerId as ReadonlyCorgiObjectChangedEvent<Id>}
+	private readonly _ownerId: CorgiObjectChangedEvent<Id>
 	public readonly type: ExpNodeType
 	public readonly requiresAudioWorklet: boolean
 	public readonly singletonContext: SingletonContextImpl
@@ -67,6 +82,7 @@ export abstract class CorgiNode {
 	protected readonly _customEnumParams: ExpCustomEnumParams = new Map()
 	protected readonly _customStringParams: ExpCustomStringParams = new Map()
 	protected readonly _referenceParams: ExpReferenceParams = new Map()
+	protected readonly _customSetParams: ExpCustomSetParams = new Map()
 	protected readonly _buttons: ExpButtons = new Map()
 	protected _enabled = true
 	public readonly onNameChange: CorgiStringChangedEvent
@@ -82,7 +98,7 @@ export abstract class CorgiNode {
 		options: CorgiNodeOptions,
 	) {
 		this.id = args.id
-		this.ownerId = args.ownerId
+		this._ownerId = new CorgiObjectChangedEvent(args.ownerId)
 		this.type = args.type
 		this._audioContext = args.audioContext
 		this._preMasterLimiter = args.preMasterLimiter
@@ -174,6 +190,15 @@ export abstract class CorgiNode {
 		customEnumParam.onChange.invokeImmediately(newValue)
 	}
 
+	public onCustomSetParamChange(paramId: Id, newValue: Immutable.Set<unknown>) {
+		const customSetParam = this._customSetParams.get(paramId)
+
+		if (!customSetParam) return logger.warn('[onCustomSetParamChange] 404 customSetParam not found: ', {paramId, newValue})
+
+		customSetParam.value = newValue
+		customSetParam.onChange.invokeImmediately(newValue)
+	}
+
 	public onCustomStringParamChange(paramId: Id, newValue: string) {
 		const customStringParam = this._customStringParams.get(paramId)
 
@@ -184,6 +209,8 @@ export abstract class CorgiNode {
 
 	public onReferenceParamChange(paramId: Id, newTarget: CorgiObjectChangedEvent<IdObject>, targetType: ExpReferenceTargetType) {
 		const referenceParam = this._referenceParams.get(paramId)
+
+		console.log('bbb', {paramId, newTarget, targetType})
 
 		if (!referenceParam) return logger.warn('[onReferenceParamChange] 404 referenceParam not found: ', {paramId, nodeId: this.id, newTarget})
 
@@ -217,15 +244,15 @@ export abstract class CorgiNode {
 		)
 	}
 
-	public detectAudioFeedbackLoop(i: number, nodeIds: List<Id>): boolean {
+	public detectAudioFeedbackLoop(i: number, nodeIds: Immutable.List<Id>): boolean {
 		return [...this._ports].some(([_, x]) => isAudioOutputPort(x) && x.detectFeedbackLoop(i, nodeIds))
 	}
 
-	public detectMidiFeedbackLoop(i: number, nodeIds: List<Id>): boolean {
+	public detectMidiFeedbackLoop(i: number, nodeIds: Immutable.List<Id>): boolean {
 		return [...this._ports].some(([_, x]) => isMidiOutputPort(x) && x.detectFeedbackLoop(i, nodeIds))
 	}
 
-	public detectPolyphonicFeedbackLoop(i: number, nodeIds: List<Id>): boolean {
+	public detectPolyphonicFeedbackLoop(i: number, nodeIds: Immutable.List<Id>): boolean {
 		return [...this._ports].some(([_, x]) => isPolyphonicOutputPort(x) && x.detectFeedbackLoop(i, nodeIds))
 	}
 

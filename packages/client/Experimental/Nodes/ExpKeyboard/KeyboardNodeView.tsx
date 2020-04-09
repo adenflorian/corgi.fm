@@ -1,27 +1,26 @@
 import React, {useCallback, useMemo} from 'react'
 import {hot} from 'react-hot-loader'
-import {selectLocalClientId, IClientAppState} from '@corgifm/common/redux'
 import {Input} from 'webmidi'
-import {useSelector} from 'react-redux'
 import {ButtonSelect, ButtonSelectOption} from '../../../ButtonSelect/ButtonSelect'
 import {useObjectChangedEvent} from '../../hooks/useCorgiEvent'
 import {useSingletonContext} from '../../../SingletonContext'
 import {CorgiObjectChangedEvent} from '../../CorgiEvents'
 import {logger} from '../../../client-logger'
+import {ExpKeyboard} from './ExpKeyboard'
+import {useIsLocallyOwnedExpNode} from '../../CorgiNode'
 
 interface KeyboardNodeExtraProps {
 	readonly onInputSelected: (input: Input) => void
 	readonly inputChangedEvent: CorgiObjectChangedEvent<Input | undefined>
-	readonly ownerId: Id
 }
 
 export const KeyboardNodeExtra = hot(module)(React.memo(function _KeyboardNodeExtra({
-	onInputSelected, inputChangedEvent, ownerId,
+	onInputSelected, inputChangedEvent,
 }: KeyboardNodeExtraProps) {
-	const localClientId = useSelector((state: IClientAppState) => selectLocalClientId(state))
+	const isLocallyOwned = useIsLocallyOwnedExpNode()
 
-	if (localClientId === ownerId) {
-		return <KeyboardNodeExtra2 onInputSelected={onInputSelected} inputChangedEvent={inputChangedEvent} ownerId={ownerId} />
+	if (isLocallyOwned) {
+		return <KeyboardNodeExtra2 onInputSelected={onInputSelected} inputChangedEvent={inputChangedEvent} />
 	} else {
 		return <div>not your keyboard</div>
 	}
@@ -46,13 +45,14 @@ const KeyboardNodeExtra2 = React.memo(function _KeyboardNodeExtra({
 	const selectedInput = useObjectChangedEvent(inputChangedEvent)
 
 	return (
-		<div style={{display: 'flex', justifyContent: 'center', padding: 8}}>
+		<div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 8}}>
 			<ButtonSelect
 				options={midiInputOptions}
 				onNewSelection={onNewSelection}
 				selectedOption={midiInputOptions.find(x => x.object === selectedInput)}
 				orientation="autoGrid"
 			/>
+			<ExpKeyboard />
 		</div>
 	)
 })

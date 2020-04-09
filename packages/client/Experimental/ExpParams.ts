@@ -1,4 +1,5 @@
 import React, {useContext} from 'react'
+import * as Immutable from 'immutable'
 import {SignalRange} from '@corgifm/common/common-types'
 import {
 	clampPolarized, CurveFunctions, defaultBipolarCurveFunctions,
@@ -8,7 +9,9 @@ import {ButtonSelectOption} from '../ButtonSelect/ButtonSelect'
 import {CorgiNumberChangedEvent, CorgiEnumChangedEvent, CorgiStringChangedEvent,
 	CorgiObjectChangedEvent, ReadonlyCorgiNumberChangedEvent,
 	ReadonlyCorgiObjectChangedEvent,
-	ReadonlyCorgiStringChangedEvent} from './CorgiEvents'
+	ReadonlyCorgiStringChangedEvent,
+	ReadonlyCorgiSetChangedEvent,
+	CorgiSetChangedEvent} from './CorgiEvents'
 import {LabAudioParam, KelpieAudioNode} from './Nodes/PugAudioNode/Lab'
 import {ExpMidiClip, makeExpMidiClip} from '@corgifm/common/midi-types'
 import {CorgiNode} from './CorgiNode'
@@ -118,6 +121,29 @@ export interface EnumParamChange {
 	readonly nodeId: Id
 	readonly paramId: Id
 	readonly newValue: string
+}
+
+export type ExpCustomSetParams = ReadonlyMap<Id, ExpCustomSetParam>
+export type ExpCustomSetParamReadonly<TElement> = ExpCustomSetParam<TElement> & {
+	onChange: ReadonlyCorgiSetChangedEvent<TElement>
+}
+export class ExpCustomSetParam<TElement = any> {
+	public value: Immutable.Set<TElement>
+	public readonly onChange: CorgiSetChangedEvent<TElement>
+
+	public constructor(
+		public readonly id: Id,
+		public readonly defaultValue: Immutable.Set<TElement>,
+	) {
+		this.value = this.defaultValue
+		this.onChange = new CorgiSetChangedEvent(this.defaultValue)
+	}
+}
+
+export interface SetParamChange {
+	readonly nodeId: Id
+	readonly paramId: Id
+	readonly newValue: Immutable.Set<unknown>
 }
 
 export type ExpCustomStringParams = ReadonlyMap<Id, ExpCustomStringParam>

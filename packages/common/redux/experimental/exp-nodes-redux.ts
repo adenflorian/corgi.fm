@@ -1,4 +1,4 @@
-import {Set, Map, Record} from 'immutable'
+import * as Immutable from 'immutable'
 import {ActionType} from 'typesafe-actions'
 import * as uuid from 'uuid'
 import {topGroupId, GroupId} from '../../common-constants'
@@ -19,7 +19,7 @@ export const expNodesActions = {
 		BROADCASTER_ACTION,
 		SERVER_ACTION,
 	} as const),
-	addMany: (newNodes: Map<Id, ExpNodeState>) => ({
+	addMany: (newNodes: Immutable.Map<Id, ExpNodeState>) => ({
 		type: 'EXP_NODE_ADD_MANY' as const,
 		isExpNodeAction: true,
 		newNodes,
@@ -67,6 +67,15 @@ export const expNodesActions = {
 		BROADCASTER_ACTION,
 		SERVER_ACTION,
 	} as const),
+	customSetParamChange: (nodeId: Id, paramId: Id, newValue: Immutable.Set<unknown>) => ({
+		type: 'EXP_NODE_CUSTOM_SET_PARAM_CHANGE' as const,
+		isExpNodeAction: true,
+		nodeId,
+		paramId,
+		newValue,
+		BROADCASTER_ACTION,
+		SERVER_ACTION,
+	} as const),
 	customStringParamChange: (nodeId: Id, paramId: Id, newValue: string) => ({
 		type: 'EXP_NODE_CUSTOM_STRING_PARAM_CHANGE' as const,
 		isExpNodeAction: true,
@@ -92,7 +101,7 @@ export const expNodesActions = {
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	} as const),
-	setGroup: (nodeIds: Set<Id>, groupId: Id) => ({
+	setGroup: (nodeIds: Immutable.Set<Id>, groupId: Id) => ({
 		type: 'EXP_NODE_SET_GROUP',
 		nodeIds,
 		groupId,
@@ -116,34 +125,36 @@ const defaultExpNodeState = {
 	id: 'dummyId' as Id,
 	ownerId: 'dummyOwnerId' as Id,
 	type: 'dummy' as ExpNodeType,
-	ports: Map<Id, ExpPortState>(),
-	audioParams: Map<Id, number>(),
-	customNumberParams: Map<Id, number>(),
-	customEnumParams: Map<Id, string>(),
-	customStringParams: Map<Id, string>(),
-	referenceParams: Map<Id, ExpReferenceParamState>(),
+	ports: Immutable.Map<Id, ExpPortState>(),
+	audioParams: Immutable.Map<Id, number>(),
+	customNumberParams: Immutable.Map<Id, number>(),
+	customEnumParams: Immutable.Map<Id, string>(),
+	customSetParams: Immutable.Map<Id, Immutable.Set<unknown>>(),
+	customStringParams: Immutable.Map<Id, string>(),
+	referenceParams: Immutable.Map<Id, ExpReferenceParamState>(),
 	enabled: true,
 	groupId: topGroupId as GroupId,
 }
 
-const _makeExpNodeState = Record(defaultExpNodeState)
+const _makeExpNodeState = Immutable.Record(defaultExpNodeState)
 
 export const defaultExpNodeRecord: ExpNodeState = _makeExpNodeState()
 
 export function makeExpNodeState(node: Pick<typeof defaultExpNodeState, 'groupId' | 'type'> & Partial<typeof defaultExpNodeState>): ExpNodeState {
 	return _makeExpNodeState(node)
 		.set('id', node.id || uuid.v4())
-		.set('audioParams', Map(node.audioParams || Map()))
-		.set('customNumberParams', Map(node.customNumberParams || Map()))
-		.set('customEnumParams', Map(node.customEnumParams || Map()))
-		.set('customStringParams', Map(node.customStringParams || Map()))
-		.set('referenceParams', Map(node.referenceParams || Map()))
-		.set('ports', Map<Id, ExpPortState>(node.ports || Map()).map(makeExpPortState))
+		.set('audioParams', Immutable.Map(node.audioParams || Immutable.Map()))
+		.set('customNumberParams', Immutable.Map(node.customNumberParams || Immutable.Map()))
+		.set('customEnumParams', Immutable.Map(node.customEnumParams || Immutable.Map()))
+		.set('customSetParams', Immutable.Map<Id, Immutable.Set<unknown>>(node.customSetParams || Immutable.Map()).map(Immutable.Set))
+		.set('customStringParams', Immutable.Map(node.customStringParams || Immutable.Map()))
+		.set('referenceParams', Immutable.Map(node.referenceParams || Immutable.Map()))
+		.set('ports', Immutable.Map<Id, ExpPortState>(node.ports || Immutable.Map()).map(makeExpPortState))
 }
 
 export interface ExpNodeState extends ReturnType<typeof _makeExpNodeState> {}
 
-export const makeExpPortState = Record({
+export const makeExpPortState = Immutable.Record({
 	id: 'dummyPortId' as Id,
 	type: 'dummy' as ExpConnectionType,
 	inputOrOutput: 'input' as ExpPortSide,
@@ -151,7 +162,7 @@ export const makeExpPortState = Record({
 })
 
 export interface ExpPortState extends ReturnType<typeof makeExpPortState> {}
-export type ExpPortStates = Map<Id, ExpPortState>
+export type ExpPortStates = Immutable.Map<Id, ExpPortState>
 
 export type ExpPortSide = 'input' | 'output'
 
@@ -196,16 +207,16 @@ export interface ExpReferenceParamState {
 	readonly targetType: ExpReferenceTargetType
 }
 
-export type ExpReferenceTargetType = 'midiPattern' | 'midiPatternView'
+export type ExpReferenceTargetType = 'midiPattern' | 'midiPatternView' | 'keyboardState'
 
-const initialState = Map<Id, ExpNodeState>()
+const initialState = Immutable.Map<Id, ExpNodeState>()
 
 export type ExpNodesState = typeof initialState
 
 export const expNodesReducer = (state = initialState, action: ExpNodesAction): ExpNodesState => {
 	switch (action.type) {
 		case 'EXP_NODE_ADD': return state.set(action.newNode.id, makeExpNodeState(action.newNode))
-		case 'EXP_NODE_ADD_MANY': return state.merge(Map(action.newNodes).map(makeExpNodeState))
+		case 'EXP_NODE_ADD_MANY': return state.merge(Immutable.Map(action.newNodes).map(makeExpNodeState))
 		case 'EXP_NODE_DELETE': return state.delete(action.nodeId)
 		case 'EXP_NODE_DELETE_MANY': return state.deleteAll(action.nodeIds)
 		case 'EXP_NODE_AUDIO_PARAM_CHANGE': return state.update(
@@ -214,6 +225,8 @@ export const expNodesReducer = (state = initialState, action: ExpNodesAction): E
 			action.nodeId, x => x.update('customNumberParams', customNumberParams => customNumberParams.set(action.paramId, action.newValue)))
 		case 'EXP_NODE_CUSTOM_ENUM_PARAM_CHANGE': return state.update(
 			action.nodeId, x => x.update('customEnumParams', customEnumParams => customEnumParams.set(action.paramId, action.newValue)))
+		case 'EXP_NODE_CUSTOM_SET_PARAM_CHANGE': return state.update(
+			action.nodeId, x => x.update('customSetParams', customSetParams => customSetParams.set(action.paramId, action.newValue)))
 		case 'EXP_NODE_CUSTOM_STRING_PARAM_CHANGE': return state.update(
 			action.nodeId, x => x.update('customStringParams', customStringParams => customStringParams.set(action.paramId, action.newValue)))
 		case 'EXP_NODE_REFERENCE_PARAM_CHANGE': return state.update(
@@ -243,6 +256,7 @@ export function loadPresetIntoNodeState(preset: ExpNodeState, node: ExpNodeState
 		audioParams: preset.audioParams,
 		customNumberParams: preset.customNumberParams,
 		customEnumParams: preset.customEnumParams,
+		customSetParams: preset.customSetParams,
 		customStringParams: preset.customStringParams,
 		referenceParams: preset.referenceParams,
 	}

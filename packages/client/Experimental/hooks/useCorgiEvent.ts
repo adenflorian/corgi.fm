@@ -1,10 +1,12 @@
 import {
 	useLayoutEffect, useState, useRef, useReducer,
 } from 'react'
+import * as Immutable from 'immutable'
 import {
 	ReadonlyCorgiNumberChangedEvent, ReadonlyCorgiStringChangedEvent,
 	ReadonlyCorgiEnumChangedEvent, ReadonlyCorgiObjectChangedEvent,
 	ReadonlyBooleanChangedEvent,
+	ReadonlyCorgiSetChangedEvent,
 } from '../CorgiEvents'
 
 export function useNumberChangedEvent(event: ReadonlyCorgiNumberChangedEvent, doEqualityCheck = true) {
@@ -69,6 +71,29 @@ export function useEnumChangedEvent<TEnum extends string>(initValue: TEnum, even
 
 		const initialValue = event.subscribe(onNewValue)
 		onNewValue(initialValue)
+
+		return () => event.unsubscribe(onNewValue)
+	}, [event])
+
+	return value
+}
+
+export function useSetChangedEvent<TElement>(event: ReadonlyCorgiSetChangedEvent<TElement>) {
+	const [value, setState] = useState(event.current)
+
+	const previousValue = useRef(event.current)
+
+	useLayoutEffect(() => {
+		if (!event) return
+
+		function onNewValue(newValue: Immutable.Set<TElement>) {
+			if (newValue === previousValue.current) return
+
+			previousValue.current = newValue
+			setState(newValue)
+		}
+
+		event.subscribe(onNewValue)
 
 		return () => event.unsubscribe(onNewValue)
 	}, [event])

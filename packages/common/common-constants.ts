@@ -52,3 +52,4 @@ export const topGroupId = 'top'
 export type GroupId = Id | typeof topGroupId
 
 export const expBetterSequencerMainPatternParamId = 'mainPattern'
+export const expKeyboardStateParamId = 'keyboardState'

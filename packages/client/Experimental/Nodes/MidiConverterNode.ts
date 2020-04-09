@@ -65,6 +65,7 @@ export class MidiConverterNode extends CorgiNode {
 
 	private _onMidiMessage(midiAction: MidiAction) {
 		if (!this._enabled && midiAction.type !== 'VOICE_COUNT_CHANGE') return
+		this.debugInfo.invokeNextFrame(JSON.stringify(midiAction))
 
 		this._lastMidiActionTime = midiAction.time
 
