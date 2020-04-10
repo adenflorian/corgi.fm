@@ -98,11 +98,11 @@ export class LowFrequencyOscillatorHound {
 		this._bufferSource
 			.connect(this.outputGain)
 
-		this.frequencyParam = new ExpAudioParam('frequency', this._bufferSource.playbackRate, 1, 32, 'unipolar',
+		this.frequencyParam = new ExpAudioParam('lfoFrequency', this._bufferSource.playbackRate, 1, 32, 'unipolar',
 			{valueString: lfoRateValueToString, curveFunctions: lfoFreqCurveFunctions})
-		this.detuneParam = new ExpAudioParam('detune', this._bufferSource.detune, 0, 100, 'bipolar',
+		this.detuneParam = new ExpAudioParam('lfoDetune', this._bufferSource.detune, 0, 100, 'bipolar',
 			{valueString: detuneValueToString})
-		this.gainParam = new ExpAudioParam('gain', this.outputGain.gain, 1, 1, 'unipolar',
+		this.gainParam = new ExpAudioParam('lfoGain', this.outputGain.gain, 1, 1, 'unipolar',
 			{valueString: percentageValueString})
 
 		this.type.onChange.subscribe(this.onTypeChange)
