@@ -269,6 +269,7 @@ export class NodeManager {
 		keyboards.forEach(this.keyboardUpdated)
 		this.addNodes(mainGraph.nodes)
 		this.addConnections(mainGraph.connections.connections)
+		this._mainGraph.nodes.forEach(x => x.onMainGraphLoaded())
 	}
 
 	public readonly addNodes = (newNodes: immutable.Map<Id, ExpNodeState>) => {

@@ -34,6 +34,11 @@ expNodeInfos.set('midiRandom', {
 	height: 160,
 })
 
+expNodeInfos.set('keyboard', {
+	width: 460,
+	height: 240,
+})
+
 expNodeInfos.set('waveShaper', {
 	width: 160,
 	height: 120,

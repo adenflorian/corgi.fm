@@ -60,6 +60,12 @@ export class KeyboardNode extends CorgiNode {
 		this._unsubscribeFromCurrentInput()
 	}
 
+	protected _onMainGraphLoaded() {
+		this._keyboardState.value.current.pressedKeys.forEach(x => {
+			this.onNoteOn(x, 1, true)
+		})
+	}
+
 	private readonly _subscribeToInput = (input: Input) => {
 		this._unsubscribeFromCurrentInput()
 

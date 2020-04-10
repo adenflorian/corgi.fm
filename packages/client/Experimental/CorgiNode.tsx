@@ -136,6 +136,13 @@ export abstract class CorgiNode {
 		this._onNodeToNode(action)
 	}
 
+	public onMainGraphLoaded() {
+		this._onMainGraphLoaded()
+	}
+
+	// To be overridden by subclass
+	protected _onMainGraphLoaded() {}
+
 	protected readonly _onNodeToNode = (action: NodeToNodeAction) => {}
 
 	public setEnabled(enabled: boolean) {
