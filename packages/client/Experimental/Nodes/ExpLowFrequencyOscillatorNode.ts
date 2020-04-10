@@ -23,56 +23,30 @@ export class LowFrequencyOscillatorExpNode extends CorgiNode {
 	protected readonly _ports: ExpPorts
 	protected readonly _audioParams: ExpAudioParams
 	protected readonly _customEnumParams: ExpCustomEnumParams
-	private readonly _bufferSource: LabAudioBufferSourceNode
-	private readonly _dummyGain: LabGain
-	private readonly _gain: LabGain
 	private readonly _outputChain: ToggleGainChain
-	private readonly _type: ExpCustomEnumParam<OscillatorType>
-	private readonly _pulseMode: ExpCustomEnumParam<PulseMode>
+	private readonly _lfoHound: LowFrequencyOscillatorHound
 
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
 		super(corgiNodeArgs, {name: 'Low Frequency Oscillator', color: CssColor.purple, useBackgroundOscilloscope: true})
 
-		this._type = new ExpCustomEnumParam<OscillatorType>('type', 'sine', oscillatorTypes)
-		this._pulseMode = new ExpCustomEnumParam<PulseMode>('mode', 'idle', ['retrigger'])
-		this._customEnumParams = arrayToESIdKeyMap([this._type, this._pulseMode] as ExpCustomEnumParam<string>[])
+		this._lfoHound = new LowFrequencyOscillatorHound(corgiNodeArgs)
 
-		this._bufferSource = new LabAudioBufferSourceNode({...corgiNodeArgs, voiceMode: 'autoPoly', creatorName: 'LowFrequencyOscillatorExpNode'})
-		this._bufferSource.loop = true
-		this._bufferSource.loopEnd = 1
-		this._bufferSource.playbackRate.onMakeVoice = rate => rate.setValueAtTime(0, 0)
-
-		this._gain = new LabGain({...corgiNodeArgs, voiceMode: 'autoPoly', creatorName: 'LowFrequencyOscillatorExpNode-_gain'})
-		this._gain.gain.onMakeVoice = gain => gain.setValueAtTime(0, 0)
-
-		this._dummyGain = new LabGain({...corgiNodeArgs, voiceMode: 'autoPoly', creatorName: 'LowFrequencyOscillatorExpNode-_dummyGain'})
-		this._dummyGain.gain.onMakeVoice = gain => gain.setValueAtTime(0, 0)
+		this._customEnumParams = arrayToESIdKeyMap([this._lfoHound.type, this._lfoHound.pulseMode] as ExpCustomEnumParam<string>[])
 
 		this._outputChain = new ToggleGainChain(corgiNodeArgs.audioContext)
 
-		this._dummyGain.connect(this._bufferSource.playbackRate)
+		this._lfoHound.outputGain.connect(this._outputChain.input)
 
-		this._bufferSource
-			.connect(this._gain)
-			.connect(this._outputChain.input)
-		
-		this._gain.connect(this._analyser!)
+		this._lfoHound.outputGain.connect(this._analyser!)
 
-		const frequencyParam = new ExpAudioParam('frequency', this._bufferSource.playbackRate, 1, 32, 'unipolar', {valueString: lfoRateValueToString, curveFunctions: lfoFreqCurveFunctions})
-		const detuneParam = new ExpAudioParam('detune', this._bufferSource.detune, 0, 100, 'bipolar', {valueString: detuneValueToString})
-		const gainParam = new ExpAudioParam('gain', this._gain.gain, 1, 1, 'unipolar', {valueString: percentageValueString})
-		this._audioParams = arrayToESIdKeyMap([frequencyParam, detuneParam, gainParam])
+		this._audioParams = arrayToESIdKeyMap([this._lfoHound.frequencyParam, this._lfoHound.detuneParam, this._lfoHound.gainParam])
 
 		const midiInputPort = new ExpMidiInputPort('retrigger', 'retrigger', this, this._onMidiMessage)
-		const frequencyPort = new ExpNodeAudioParamInputPort(frequencyParam, this, corgiNodeArgs, 'offset')
-		const detunePort = new ExpNodeAudioParamInputPort(detuneParam, this, corgiNodeArgs, 'center')
-		const gainPort = new ExpNodeAudioParamInputPort(gainParam, this, corgiNodeArgs, 'offset')
+		const frequencyPort = new ExpNodeAudioParamInputPort(this._lfoHound.frequencyParam, this, corgiNodeArgs, 'offset')
+		const detunePort = new ExpNodeAudioParamInputPort(this._lfoHound.detuneParam, this, corgiNodeArgs, 'center')
+		const gainPort = new ExpNodeAudioParamInputPort(this._lfoHound.gainParam, this, corgiNodeArgs, 'offset')
 		const outputPort = new ExpNodeAudioOutputPort('output', 'output', this, this._outputChain.output)
 		this._ports = arrayToESIdKeyMap([midiInputPort, frequencyPort, detunePort, gainPort, outputPort])
-
-		this._type.onChange.subscribe(this.onTypeChange)
-		this.onTypeChange(this._type.onChange.current, true)
-		this._pulseMode.onChange.subscribe(this._onPulse)
 	}
 
 	public render = () => this.getDebugView()
@@ -82,9 +56,63 @@ export class LowFrequencyOscillatorExpNode extends CorgiNode {
 
 	protected _dispose() {
 		this._outputChain.dispose(() => {
-			this._bufferSource.dispose()
-			this._gain.dispose()
+			this._lfoHound.dispose()
 		})
+	}
+
+	private readonly _onMidiMessage = (midiAction: MidiAction) => {
+		this._lfoHound.onMidiMessage(midiAction, this._enabled)
+	}
+}
+
+export class LowFrequencyOscillatorHound {
+	private readonly _bufferSource: LabAudioBufferSourceNode
+	private readonly _dummyGain: LabGain
+	private readonly _audioContext: AudioContext
+	public readonly outputGain: LabGain
+	public readonly type: ExpCustomEnumParam<OscillatorType>
+	public readonly pulseMode: ExpCustomEnumParam<PulseMode>
+	public readonly frequencyParam: ExpAudioParam
+	public readonly detuneParam: ExpAudioParam
+	public readonly gainParam: ExpAudioParam
+
+	public constructor(corgiNodeArgs: CorgiNodeArgs) {
+		this._audioContext = corgiNodeArgs.audioContext
+
+		this.type = new ExpCustomEnumParam<OscillatorType>('type', 'sine', oscillatorTypes)
+		this.pulseMode = new ExpCustomEnumParam<PulseMode>('mode', 'idle', ['retrigger'])
+
+		this._bufferSource = new LabAudioBufferSourceNode({...corgiNodeArgs, voiceMode: 'autoPoly', creatorName: 'LowFrequencyOscillatorExpNode'})
+		this._bufferSource.loop = true
+		this._bufferSource.loopEnd = 1
+		this._bufferSource.playbackRate.onMakeVoice = rate => rate.setValueAtTime(0, 0)
+
+		this.outputGain = new LabGain({...corgiNodeArgs, voiceMode: 'autoPoly', creatorName: 'LowFrequencyOscillatorExpNode-_gain'})
+		this.outputGain.gain.onMakeVoice = gain => gain.setValueAtTime(0, 0)
+
+		this._dummyGain = new LabGain({...corgiNodeArgs, voiceMode: 'autoPoly', creatorName: 'LowFrequencyOscillatorExpNode-_dummyGain'})
+		this._dummyGain.gain.onMakeVoice = gain => gain.setValueAtTime(0, 0)
+
+		this._dummyGain.connect(this._bufferSource.playbackRate)
+
+		this._bufferSource
+			.connect(this.outputGain)
+
+		this.frequencyParam = new ExpAudioParam('frequency', this._bufferSource.playbackRate, 1, 32, 'unipolar',
+			{valueString: lfoRateValueToString, curveFunctions: lfoFreqCurveFunctions})
+		this.detuneParam = new ExpAudioParam('detune', this._bufferSource.detune, 0, 100, 'bipolar',
+			{valueString: detuneValueToString})
+		this.gainParam = new ExpAudioParam('gain', this.outputGain.gain, 1, 1, 'unipolar',
+			{valueString: percentageValueString})
+
+		this.type.onChange.subscribe(this.onTypeChange)
+		this.onTypeChange(this.type.onChange.current, true)
+		this.pulseMode.onChange.subscribe(this._onPulse)
+	}
+
+	public dispose() {
+		this._bufferSource.dispose()
+		this.outputGain.dispose()
 	}
 
 	private readonly onTypeChange = (type: OscillatorType, didChange: boolean) => {
@@ -94,20 +122,21 @@ export class LowFrequencyOscillatorExpNode extends CorgiNode {
 	}
 
 	private readonly _onPulse = (mode: PulseMode) => {
-		if (mode !== 'idle') this._pulseMode.onChange.invokeNextFrame('idle')
+		if (mode !== 'idle') this.pulseMode.onChange.invokeNextFrame('idle')
 
-		if (this._enabled && mode === 'retrigger') {
+		if (/*this._enabled && */mode === 'retrigger') {
 			this._bufferSource.retrigger(this._audioContext.currentTime)
 			this._bufferSource.setActiveVoice('all', this._audioContext.currentTime)
 		}
 	}
 
-	private readonly _onMidiMessage = (midiAction: MidiAction) => {
+	public readonly onMidiMessage = (midiAction: MidiAction, enabled: boolean) => {
 		if (midiAction.type === 'VOICE_COUNT_CHANGE') {
 			// console.log('receiveMidiAction VOICE_COUNT_CHANGE', this, midiAction.newCount)
 			this._dummyGain.setVoiceCount(midiAction.newCount)
 		}
-		if (!this._enabled) return
+
+		if (!enabled) return
 
 		if ((midiAction.type === 'MIDI_NOTE' || midiAction.type === 'MIDI_GATE') && midiAction.gate === true) {
 			this._bufferSource.retrigger(midiAction.time, midiAction.voice)

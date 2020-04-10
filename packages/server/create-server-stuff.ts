@@ -244,7 +244,7 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 		groupId: 'top',
 	})
 	dispatchToRoom(expNodesActions.add(gainMaster))
-	dispatchToRoom(expNodesActions.audioParamChange(gainMaster.id, 'gain', 0))
+	dispatchToRoom(expNodesActions.audioParamChange(gainMaster.id, 'gain', 1))
 	dispatchToRoom(expPositionActions.add(
 		makeExpPosition({
 			id: gainMaster.id,
