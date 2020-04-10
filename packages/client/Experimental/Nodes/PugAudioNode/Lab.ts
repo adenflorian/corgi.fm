@@ -346,17 +346,17 @@ class LabAutoPoly<TNode extends KelpieAudioNode = KelpieAudioNode> extends LabMo
 				})
 			}
 			this._parent.targets.set(target.target, {target: target.target, targetVoices, targetMode})
-			this._parent.sources.forEach(source => {
-				// If this source is the one that caused our voice count to change,
-				// then we don't want to call them back saying our voice count changed
-				if (source === sourceCatalyst) return
-				source.currentModeImpl.onTargetVoiceCountChange(this._parent, 'autoPoly', this._parent.voices)
-			})
-			this._parent.params.forEach(param => {
-				param.sources.forEach(paramSource => {
-					if (paramSource === sourceCatalyst) return
-					paramSource.currentModeImpl.onTargetVoiceCountChange(param, 'autoPoly', this._parent.voices.map(param.getAudioParam))
-				})
+		})
+		this._parent.sources.forEach(source => {
+			// If this source is the one that caused our voice count to change,
+			// then we don't want to call them back saying our voice count changed
+			if (source === sourceCatalyst) return
+			source.currentModeImpl.onTargetVoiceCountChange(this._parent, 'autoPoly', this._parent.voices)
+		})
+		this._parent.params.forEach(param => {
+			param.sources.forEach(paramSource => {
+				if (paramSource === sourceCatalyst) return
+				paramSource.currentModeImpl.onTargetVoiceCountChange(param, 'autoPoly', this._parent.voices.map(param.getAudioParam))
 			})
 		})
 	}
