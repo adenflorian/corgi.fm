@@ -4,7 +4,7 @@ import {
 	ExpNodeAudioOutputPort, ExpNodeAudioParamInputPort, ExpPorts,
 } from '../../ExpPorts'
 import {ExpAudioParams, ExpCustomEnumParams,
-	ExpCustomEnumParam, ExpCustomNumberParams} from '../../ExpParams'
+	ExpCustomEnumParam, ExpCustomNumberParams, ExpCustomNumberParam, ExpAudioParam} from '../../ExpParams'
 import {CorgiNode, CorgiNodeArgs} from '../../CorgiNode'
 import {ExpMidiInputPort, ExpMidiOutputPort} from '../../ExpMidiPorts'
 import {MidiAction} from '@corgifm/common/common-types'
@@ -13,6 +13,8 @@ import {OscillatorExpHound} from '../ExpOscillatorNode'
 import {EnvelopeHound} from '../EnvelopeNode'
 import {LabGain} from '../PugAudioNode/Lab'
 import {FilterHound} from '../FilterNode'
+import {getEnvelopeControlsComponent} from '../EnvelopeControls'
+import {gainDecibelValueToString} from '../../../client-constants'
 
 export class ExpBasicSynthNode extends CorgiNode {
 	protected readonly _ports: ExpPorts
@@ -24,7 +26,13 @@ export class ExpBasicSynthNode extends CorgiNode {
 	private readonly _oscillatorHound: OscillatorExpHound
 	private readonly _envelopeHound: EnvelopeHound
 	private readonly _filterHound: FilterHound
-	private readonly _gain: LabGain
+	private readonly _envelopeGain: LabGain
+	private readonly _masterGain: LabGain
+	public readonly attack: ExpCustomNumberParam
+	public readonly hold: ExpCustomNumberParam
+	public readonly decay: ExpCustomNumberParam
+	public readonly sustain: ExpCustomNumberParam
+	public readonly release: ExpCustomNumberParam
 
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
 		super(corgiNodeArgs, {name: 'Synth', color: CssColor.green})
@@ -35,22 +43,33 @@ export class ExpBasicSynthNode extends CorgiNode {
 		this._autoPolyHound = new AutomaticPolyphonicMidiConverterHound(
 			this._audioContext, this._onHoundMidiActionOut, false)
 
-		this._gain = new LabGain({audioContext: this._audioContext, voiceMode: 'autoPoly', creatorName: 'ExpBasicSynthNode'})
+		this.attack = this._envelopeHound.attack
+		this.hold = this._envelopeHound.hold
+		this.decay = this._envelopeHound.decay
+		this.sustain = this._envelopeHound.sustain
+		this.release = this._envelopeHound.release
 
-		this._oscillatorHound.outputChain.output.connect(this._filterHound.filter).connect(this._gain)
-
-		this._envelopeHound.waveShaperOutput.connect(this._gain.gain)
+		this._envelopeGain = new LabGain({audioContext: this._audioContext, voiceMode: 'autoPoly', creatorName: 'ExpBasicSynthNode.envelopeGain'})
+		this._masterGain = new LabGain({audioContext: this._audioContext, voiceMode: 'autoPoly', creatorName: 'ExpBasicSynthNode.masterGain'})
+		this._masterGain.gain.onMakeVoice = gain => gain.setValueAtTime(0, 0)
 
 		this._autoPolyHound.pitchSource.connect(this._oscillatorHound.frequencyParam.audioParam)
 
+		this._envelopeHound.waveShaperOutput.connect(this._envelopeGain.gain)
+
+		this._oscillatorHound.outputChain.output
+			.connect(this._filterHound.filter)
+			.connect(this._envelopeGain)
+			.connect(this._masterGain)
+
 		this._customEnumParams = arrayToESIdKeyMap([this._filterHound.type, this._oscillatorHound.type] as ExpCustomEnumParam<string>[])
 
-		console.log('aaa', {a: this._customEnumParams})
-
+		const masterGainParam = new ExpAudioParam('gain', this._masterGain.gain, 1, 1, 'unipolar', {valueString: gainDecibelValueToString})
 		this._audioParams = arrayToESIdKeyMap([
 			this._oscillatorHound.detuneParam,
 			this._oscillatorHound.unisonDetuneParam,
 			this._filterHound.frequencyParam,
+			masterGainParam,
 		])
 
 		const midiInputPort = new ExpMidiInputPort('midiIn', 'midiIn', this, midiAction => this._onMidiMessage.bind(this)(midiAction))
@@ -58,9 +77,11 @@ export class ExpBasicSynthNode extends CorgiNode {
 		const detunePort = new ExpNodeAudioParamInputPort(this._oscillatorHound.detuneParam, this, corgiNodeArgs, 'center')
 		const unisonDetunePort = new ExpNodeAudioParamInputPort(this._oscillatorHound.unisonDetuneParam, this, corgiNodeArgs, 'offset')
 		const filterFrequencyPort = new ExpNodeAudioParamInputPort(this._filterHound.frequencyParam, this, corgiNodeArgs, 'center')
-		const outputPort = new ExpNodeAudioOutputPort('output', 'output', this, this._gain)
+		const gainPort = new ExpNodeAudioParamInputPort(masterGainParam, this, corgiNodeArgs, 'offset')
+		const outputPort = new ExpNodeAudioOutputPort('output', 'output', this, this._masterGain)
 		this._midiOutputPort = new ExpMidiOutputPort('gate', 'gate', this)
-		this._ports = arrayToESIdKeyMap([midiInputPort, detunePort, unisonDetunePort, outputPort, this._midiOutputPort, filterFrequencyPort])
+		this._ports = arrayToESIdKeyMap([
+			midiInputPort, detunePort, unisonDetunePort, filterFrequencyPort, gainPort, outputPort, this._midiOutputPort])
 
 		this._customNumberParams = arrayToESIdKeyMap([
 			this._oscillatorHound.unisonCount,
@@ -76,7 +97,7 @@ export class ExpBasicSynthNode extends CorgiNode {
 		this._autoPolyHound.init()
 	}
 
-	public render = () => this.getDebugView()
+	public render = () => this.getDebugView(getEnvelopeControlsComponent())
 
 	protected _enable = () => this._oscillatorHound.outputChain.enable()
 	protected _disable = () => this._oscillatorHound.outputChain.disable()

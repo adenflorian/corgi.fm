@@ -260,7 +260,7 @@ export const AudioParamInputPortContext = React.createContext<null | ExpNodeAudi
 export function useAudioParamInputPortContext() {
 	const context = useContext(AudioParamInputPortContext)
 
-	if (!context) throw new Error(`missing audio param context, maybe there's no provider`)
+	if (!context) throw new Error(`missing audio param input port context, maybe there's no provider`)
 
 	return context
 }
