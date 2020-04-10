@@ -182,7 +182,7 @@ export const expNodeTypes = [
 	PolyphonicGroupExpNodeType, 'polyphonicGroupInput', 'polyphonicGroupOutput',
 	'midiRandom', 'midiPitch', 'oscilloscope', 'polyTest', 'waveShaper', 'midiGate',
 	'midiPulse', 'midiMatch', 'midiMessage', 'sampler', 'betterSequencer',
-	'note',
+	'note', 'basicSynth',
 ] as const
 
 export const groupInOutNodeTypes: ExpNodeType[] = [

@@ -33,6 +33,7 @@ import {MidiMessageNode} from './MidiMessageNode'
 import {SamplerExpNode} from './ExpSamplerNode'
 import {ExpBetterSequencerNode} from './ExpBetterSequencer/ExpBetterSequencerNode'
 import {NoteNode} from './NoteNode/NoteNode'
+import {ExpBasicSynthNode} from './ExpBasicSynthesizer/ExpBasicSynthesizerNode'
 
 // Is there a way to use class decorators to create this map at runtime?
 export const typeClassMap: {readonly [key in ExpNodeType]: CorgiNodeConstructor} = {
@@ -69,4 +70,5 @@ export const typeClassMap: {readonly [key in ExpNodeType]: CorgiNodeConstructor}
 	sampler: SamplerExpNode,
 	betterSequencer: ExpBetterSequencerNode,
 	note: NoteNode,
+	basicSynth: ExpBasicSynthNode,
 }

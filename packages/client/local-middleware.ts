@@ -904,7 +904,7 @@ function createLocalStuffExperimental(dispatch: Dispatch, state: IClientAppState
 		makeExpPosition({
 			id: keyboard.id,
 			ownerId: localClientId,
-			x: -expWidth * 3,
+			x: (-expWidth * 3) - 200,
 			y: newY,
 			targetType: keyboard.type,
 		})))

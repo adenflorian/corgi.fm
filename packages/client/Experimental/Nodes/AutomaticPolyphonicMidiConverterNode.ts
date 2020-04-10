@@ -1,4 +1,3 @@
-import * as Immutable from 'immutable'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {MidiAction, midiActions} from '@corgifm/common/common-types'
 import {oscillatorFreqCurveFunctions, arrayToESIdKeyMap} from '@corgifm/common/common-utils'
@@ -9,49 +8,34 @@ import {ExpMidiInputPort, ExpMidiOutputPort} from '../ExpMidiPorts'
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 import {ExpPorts, ExpNodeAudioOutputPort} from '../ExpPorts'
 import {midiNoteToFrequency} from '../../WebAudio'
-import {ExpPolyphonicOutputPort, PolyOutNode, PolyVoices, PolyVoice} from '../ExpPolyphonicPorts'
 import {PolyAlgorithm, RoundRobin, VoiceIndex} from './NodeHelpers/PolyAlgorithms'
-import {CorgiObjectChangedEvent} from '../CorgiEvents'
-import {LabAudioNode, LabConstantSourceNode, LabGain, LabWaveShaperNode} from './PugAudioNode/Lab'
+import {LabConstantSourceNode, LabWaveShaperNode} from './PugAudioNode/Lab'
 
 const maxVoiceCount = 32
 
-export class AutomaticPolyphonicMidiConverterNode extends CorgiNode implements PolyOutNode {
+export class AutomaticPolyphonicMidiConverterNode extends CorgiNode {
 	protected readonly _ports: ExpPorts
 	protected readonly _customNumberParams: ExpCustomNumberParams
-	private readonly _portamento: ExpCustomNumberParam
-	private readonly _voiceCount: ExpCustomNumberParam
-	private readonly _algorithm: PolyAlgorithm
-	// private readonly _polyOutPort: ExpPolyphonicOutputPort
 	private readonly _pitchOutputPort: ExpNodeAudioOutputPort
 	private readonly _midiOutputPort: ExpMidiOutputPort
-	private readonly _pitchSource: LabConstantSourceNode
-	private readonly _waveShaper: LabWaveShaperNode
+	private readonly _autoPolyHound: AutomaticPolyphonicMidiConverterHound
 
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
 		super(corgiNodeArgs, {name: 'Automatic Polyphonic Midi Converter', color: CssColor.yellow})
 
-		this._portamento = new ExpCustomNumberParam('portamento', 0, 0, 8, 3, adsrValueToString)
-		this._voiceCount = new ExpCustomNumberParam('voiceCount', 4, 1, maxVoiceCount, 1, val => Math.round(val).toString())
-		this._customNumberParams = arrayToESIdKeyMap([this._portamento, this._voiceCount])
+		this._autoPolyHound = new AutomaticPolyphonicMidiConverterHound(
+			this._audioContext,
+			this._onHoundMidiActionOut,
+		)
 
-		this._waveShaper = new LabWaveShaperNode({audioContext: this._audioContext, voiceMode: 'autoPoly', creatorName: 'AutomaticPolyphonicMidiConverterNode._waveShaper'})
-		this._waveShaper.curve = new Float32Array([-3, 1])
-		
+		this._customNumberParams = arrayToESIdKeyMap([this._autoPolyHound.portamento, this._autoPolyHound.voiceCount])
+
 		const midiInputPort = new ExpMidiInputPort('input', 'input', this, midiAction => this._onMidiMessage.bind(this)(midiAction))
-		// this._polyOutPort = new ExpPolyphonicOutputPort('poly', 'poly', this)
-		this._pitchSource = new LabConstantSourceNode({audioContext: this._audioContext, voiceMode: Math.round(this._voiceCount.value), creatorName: 'AutomaticPolyphonicMidiConverterNode._pitchSource'})
-		this._pitchSource.offset.onMakeVoice = offset => offset.setValueAtTime(0, 0)
-		this._pitchOutputPort = new ExpNodeAudioOutputPort('pitch', 'pitch', this, this._waveShaper)
+		this._pitchOutputPort = new ExpNodeAudioOutputPort('pitch', 'pitch', this, this._autoPolyHound.pitchOutputWaveShaper)
 		this._midiOutputPort = new ExpMidiOutputPort('gate', 'gate', this)
-		this._ports = arrayToESIdKeyMap([midiInputPort/*, this._polyOutPort*/, this._pitchOutputPort, this._midiOutputPort])
+		this._ports = arrayToESIdKeyMap([midiInputPort, this._pitchOutputPort, this._midiOutputPort])
 
-		this._pitchSource.connect(this._waveShaper)
-		
-		this._algorithm = new RoundRobin(this._voiceCount.onChange)
-		this._voiceCount.onChange.subscribe(this._onVoiceCountChange)
-
-		this._midiOutputPort.sendMidiAction(midiActions.voiceCountChange(this._audioContext.currentTime, this._pitchSource.voiceCount.current))
+		this._autoPolyHound.init()
 	}
 
 	public render = () => this.getDebugView()
@@ -60,20 +44,67 @@ export class AutomaticPolyphonicMidiConverterNode extends CorgiNode implements P
 	protected _disable() {}
 
 	protected _dispose() {
-		this._voiceCount.onChange.unsubscribe(this._onVoiceCountChange)
-	}
-
-	private readonly _onVoiceCountChange = (newVoiceCount: number) => {
-		const roundedNewVoiceCount = Math.round(newVoiceCount)
-		if (this._pitchSource.voiceCount.current === roundedNewVoiceCount) return
-		this._pitchSource.setVoiceCount(roundedNewVoiceCount)
-		this._midiOutputPort.sendMidiAction(midiActions.voiceCountChange(this._audioContext.currentTime, roundedNewVoiceCount))
+		this._autoPolyHound.dispose()
 	}
 
 	private _onMidiMessage(midiAction: MidiAction) {
 		if (!this._enabled && midiAction.type !== 'VOICE_COUNT_CHANGE') return
 		this.debugInfo.invokeNextFrame(JSON.stringify(midiAction))
 
+		if (midiAction.type === 'MIDI_NOTE') {
+			this._autoPolyHound.onMidiMessage(midiAction)
+		}
+	}
+
+	private readonly _onHoundMidiActionOut = (action: MidiAction) => {
+		this._midiOutputPort.sendMidiAction(action)
+	}
+}
+
+export class AutomaticPolyphonicMidiConverterHound {
+	public readonly portamento: ExpCustomNumberParam
+	public readonly voiceCount: ExpCustomNumberParam
+	private readonly _algorithm: PolyAlgorithm
+	public readonly pitchSource: LabConstantSourceNode
+	public readonly pitchOutputWaveShaper: LabWaveShaperNode
+
+	public constructor(
+		private readonly _audioContext: AudioContext,
+		private readonly _midiOut: (action: MidiAction) => void,
+		public readonly normalizePitch = true,
+	) {
+
+		this.portamento = new ExpCustomNumberParam('portamento', 0, 0, 8, 3, adsrValueToString)
+		this.voiceCount = new ExpCustomNumberParam('voiceCount', 4, 1, maxVoiceCount, 1, val => Math.round(val).toString())
+
+		this.pitchOutputWaveShaper = new LabWaveShaperNode({
+			audioContext: this._audioContext, voiceMode: 'autoPoly',
+			creatorName: 'AutomaticPolyphonicMidiConverterNode._waveShaper'})
+		this.pitchOutputWaveShaper.curve = new Float32Array([-3, 1])
+
+		this.pitchSource = new LabConstantSourceNode({
+			audioContext: this._audioContext, voiceMode: Math.round(this.voiceCount.value),
+			creatorName: 'AutomaticPolyphonicMidiConverterNode._pitchSource'})
+		this.pitchSource.offset.onMakeVoice = offset => offset.setValueAtTime(0, 0)
+
+		this.pitchSource.connect(this.pitchOutputWaveShaper)
+
+		this._algorithm = new RoundRobin(this.voiceCount.onChange)
+		this.voiceCount.onChange.subscribe(this._onVoiceCountChange)
+	}
+
+	public init() {
+		this._midiOut(midiActions.voiceCountChange(this._audioContext.currentTime, this.pitchSource.voiceCount.current))
+	}
+
+	private readonly _onVoiceCountChange = (newVoiceCount: number) => {
+		const roundedNewVoiceCount = Math.round(newVoiceCount)
+		if (this.pitchSource.voiceCount.current === roundedNewVoiceCount) return
+		this.pitchSource.setVoiceCount(roundedNewVoiceCount)
+		this._midiOut(midiActions.voiceCountChange(this._audioContext.currentTime, roundedNewVoiceCount))
+	}
+
+	public onMidiMessage(midiAction: MidiAction) {
 		if (midiAction.type === 'MIDI_NOTE') {
 			this._onMidiNoteAction(midiAction)
 		}
@@ -91,23 +122,29 @@ export class AutomaticPolyphonicMidiConverterNode extends CorgiNode implements P
 		const voiceIndex = this._algorithm.getVoiceForNoteOn(midiAction.note)
 
 		this._updatePitch(midiAction.note, midiAction.time, voiceIndex)
-		this._midiOutputPort.sendMidiAction({...midiAction, voice: voiceIndex as number})
+		this._midiOut({...midiAction, voice: voiceIndex as number})
 	}
 
 	private _onMidiNoteOff(midiAction: Extract<MidiAction, {type: 'MIDI_NOTE'}>) {
 		const voiceIndex = this._algorithm.getVoiceForNoteOff(midiAction.note)
-		this.debugInfo.invokeNextFrame(this.debugInfo.current + '\n' + JSON.stringify({voiceIndex}))
+		// this.debugInfo.invokeNextFrame(this.debugInfo.current + '\n' + JSON.stringify({voiceIndex}))
 
 		if (voiceIndex === undefined) return
 
-		this._midiOutputPort.sendMidiAction({...midiAction, voice: voiceIndex as number})
+		this._midiOut({...midiAction, voice: voiceIndex as number})
 	}
 
 	private _updatePitch(note: number, time: number, voiceIndex: VoiceIndex) {
 		const frequency = midiNoteToFrequency(note)
-		const normalized = oscillatorFreqCurveFunctions.unCurve(frequency / maxPitchFrequency)
-		this._pitchSource.offset.setTargetAtTime(normalized, time, this._portamento.value, voiceIndex as number)
-		this._pitchSource.setActiveVoice(voiceIndex as number, time)
-		// console.log('update pitch:', {note, voiceIndex, frequency, normalized})
+		const normalized = this.normalizePitch
+			? oscillatorFreqCurveFunctions.unCurve(frequency / maxPitchFrequency)
+			: frequency
+		this.pitchSource.offset.setTargetAtTime(normalized, time, this.portamento.value, voiceIndex as number)
+		this.pitchSource.setActiveVoice(voiceIndex as number, time)
+		console.log('update pitch:', {note, voiceIndex, frequency, normalized})
+	}
+
+	public dispose() {
+		this.voiceCount.onChange.unsubscribe(this._onVoiceCountChange)
 	}
 }

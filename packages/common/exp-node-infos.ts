@@ -36,7 +36,7 @@ expNodeInfos.set('midiRandom', {
 
 expNodeInfos.set('keyboard', {
 	width: 460,
-	height: 240,
+	height: 260,
 })
 
 expNodeInfos.set('waveShaper', {
@@ -91,7 +91,7 @@ expNodeInfos.set('manualPolyphonicMidiConverter', {
 
 expNodeInfos.set('midiConverter', {
 	width: 200,
-	height: 200,
+	height: 220,
 })
 
 expNodeInfos.set('sequencer', {
