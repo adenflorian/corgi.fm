@@ -20,45 +20,26 @@ const minDistance = 0.00001
 export class EnvelopeNode extends CorgiNode {
 	protected readonly _ports: ExpPorts
 	protected readonly _customNumberParams: ExpCustomNumberParams
-	private readonly _constantSource: LabConstantSourceNode
 	private readonly _outputGain: LabGain
-	private readonly _waveShaper: LabWaveShaperNode
-	private _lastGateTime = -1
-	private _lastGate?: boolean
-	private readonly _attack: ExpCustomNumberParam
-	private readonly _hold: ExpCustomNumberParam
-	private readonly _decay: ExpCustomNumberParam
-	private readonly _sustain: ExpCustomNumberParam
-	private readonly _release: ExpCustomNumberParam
+	private readonly _envelopeHound: EnvelopeHound
 
 	public constructor(
 		corgiNodeArgs: CorgiNodeArgs,
 	) {
 		super(corgiNodeArgs, {name: 'Envelope', color: CssColor.purple})
 
-		this._constantSource = new LabConstantSourceNode({audioContext: this._audioContext, voiceMode: 1, creatorName: 'EnvelopeNode'})
+		this._envelopeHound = new EnvelopeHound(corgiNodeArgs)
+
 		this._outputGain = new LabGain({audioContext: this._audioContext, voiceMode: 'autoPoly', creatorName: 'EnvelopeNode'})
-		this._waveShaper = new LabWaveShaperNode({audioContext: this._audioContext, voiceMode: 'autoPoly', creatorName: 'EnvelopeNode'})
-		this._waveShaper.curve = new Float32Array([-3, 1])
 
-		this._constantSource.connect(this._waveShaper).connect(this._outputGain)
-
-		this._constantSource.offset.onMakeVoice = offset => {
-			offset.setValueAtTime(0, 0)
-			offset.linearRampToValueAtTime(0, longTime)
-		}
+		this._envelopeHound.waveShaperOutput.connect(this._outputGain)
 
 		const outputPort = new ExpNodeAudioOutputPort('output', 'output', this, this._outputGain)
-		const midiInputPort = new ExpMidiInputPort('input', 'input', this, midiAction => this.receiveMidiAction.bind(this)(midiAction))
+		const midiInputPort = new ExpMidiInputPort('input', 'input', this, this.receiveMidiAction)
 		this._ports = arrayToESIdKeyMap([outputPort, midiInputPort])
 
-		this._attack = new ExpCustomNumberParam('attack', 0.0004, 0, 32, 3, adsrValueToString) // 0.0005
-		this._hold = new ExpCustomNumberParam('hold', 0, 0, 32, 3, adsrValueToString) // 0
-		this._decay = new ExpCustomNumberParam('decay', 1, 0, 32, 3, adsrValueToString) // 1
-		this._sustain = new ExpCustomNumberParam('sustain', 0, 0, 1, 1, gainDecibelValueToString) // 1
-		this._release = new ExpCustomNumberParam('release', 0.015, 0, 32, 3, adsrValueToString) // 0.015
 		this._customNumberParams = arrayToESIdKeyMap([
-			this._attack, this._hold, this._decay, this._sustain, this._release,
+			this._envelopeHound.attack, this._envelopeHound.hold, this._envelopeHound.decay, this._envelopeHound.sustain, this._envelopeHound.release,
 		])
 	}
 
@@ -72,8 +53,52 @@ export class EnvelopeNode extends CorgiNode {
 	}
 
 	protected _dispose() {
-		this._constantSource.dispose()
 		this._outputGain.dispose()
+		this._envelopeHound.dispose()
+	}
+
+	private readonly receiveMidiAction = (midiAction: MidiAction) => {
+		this._envelopeHound.receiveMidiAction(midiAction)
+	}
+}
+
+export class EnvelopeHound {
+	private readonly _constantSource: LabConstantSourceNode
+	public readonly waveShaperOutput: LabWaveShaperNode
+	private _lastGateTime = -1
+	private _lastGate?: boolean
+	public readonly attack: ExpCustomNumberParam
+	public readonly hold: ExpCustomNumberParam
+	public readonly decay: ExpCustomNumberParam
+	public readonly sustain: ExpCustomNumberParam
+	public readonly release: ExpCustomNumberParam
+	private readonly _audioContext: AudioContext
+
+	public constructor(
+		corgiNodeArgs: CorgiNodeArgs,
+	) {
+		this._audioContext = corgiNodeArgs.audioContext
+
+		this._constantSource = new LabConstantSourceNode({audioContext: this._audioContext, voiceMode: 1, creatorName: 'EnvelopeNode'})
+		this.waveShaperOutput = new LabWaveShaperNode({audioContext: this._audioContext, voiceMode: 'autoPoly', creatorName: 'EnvelopeNode'})
+		this.waveShaperOutput.curve = new Float32Array([-3, 1])
+
+		this._constantSource.connect(this.waveShaperOutput)
+
+		this._constantSource.offset.onMakeVoice = offset => {
+			offset.setValueAtTime(0, 0)
+			offset.linearRampToValueAtTime(0, longTime)
+		}
+
+		this.attack = new ExpCustomNumberParam('attack', 0.0004, 0, 32, 3, adsrValueToString) // 0.0005
+		this.hold = new ExpCustomNumberParam('hold', 0, 0, 32, 3, adsrValueToString) // 0
+		this.decay = new ExpCustomNumberParam('decay', 1, 0, 32, 3, adsrValueToString) // 1
+		this.sustain = new ExpCustomNumberParam('sustain', 0, 0, 1, 1, gainDecibelValueToString) // 1
+		this.release = new ExpCustomNumberParam('release', 0.015, 0, 32, 3, adsrValueToString) // 0.015
+	}
+
+	public dispose() {
+		this._constantSource.dispose()
 	}
 
 	public receiveMidiAction(midiAction: MidiAction) {
@@ -86,7 +111,7 @@ export class EnvelopeNode extends CorgiNode {
 	}
 
 	public handleGateEvent(gate: boolean, startTime: number, voiceIndex: number | 'all') {
-		this.debugInfo.invokeNextFrame(JSON.stringify({gate, startTime, voiceIndex}))
+		// this.debugInfo.invokeNextFrame(JSON.stringify({gate, startTime, voiceIndex}))
 		if (startTime < this._lastGateTime) {
 			logger.error('receiveMidiAction startTime < this._lastGateTime:', {gate, startTime, last: this._lastGateTime, lastGate: this._lastGate})
 		}
@@ -102,11 +127,11 @@ export class EnvelopeNode extends CorgiNode {
 		// }
 		const offset = this._constantSource.offset
 		if (gate) {
-			const attackEnd = startTime + this._attack.value + minDistance
-			const holdEnd = attackEnd + this._hold.value + minDistance
-			const decayEnd = holdEnd + this._decay.value + minDistance
+			const attackEnd = startTime + this.attack.value + minDistance
+			const holdEnd = attackEnd + this.hold.value + minDistance
+			const decayEnd = holdEnd + this.decay.value + minDistance
 			const farOut = decayEnd + longTime + minDistance
-			const actualSustain = clamp(this._sustain.value, 0.0001, 1)
+			const actualSustain = clamp(this.sustain.value, 0.0001, 1)
 			// console.log(`${voiceIndex}`)
 			offset.cancelAndHoldAtTime(startTime, voiceIndex)
 			offset.linearRampToValueAtTime(1, attackEnd, voiceIndex)
@@ -115,7 +140,7 @@ export class EnvelopeNode extends CorgiNode {
 			offset.linearRampToValueAtTime(actualSustain, farOut, voiceIndex)
 			this._constantSource.setActiveVoice(voiceIndex, startTime)
 		} else {
-			const releaseEnd = startTime + this._release.value + minDistance
+			const releaseEnd = startTime + this.release.value + minDistance
 			const farOut = releaseEnd + longTime + minDistance
 			offset.cancelAndHoldAtTime(startTime, voiceIndex)
 			offset.exponentialRampToValueAtTime(0.0001, releaseEnd, voiceIndex)
