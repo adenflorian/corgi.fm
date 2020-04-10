@@ -10,14 +10,14 @@ import {LabGain} from './PugAudioNode/Lab'
 const gateOptions = ['allow', 'block'] as const
 type GateMode = typeof gateOptions[number]
 
-export class MidiGateNode extends CorgiNode {
+export class MidiBlockNode extends CorgiNode {
 	protected readonly _ports: ExpPorts
 	protected readonly _customEnumParams: ExpCustomEnumParams
 	private readonly _gateMode: ExpCustomEnumParam<GateMode>
 	private readonly _gain: LabGain
 
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
-		super(corgiNodeArgs, {name: 'Midi Gate', color: CssColor.yellow})
+		super(corgiNodeArgs, {name: 'Midi Block', color: CssColor.yellow})
 
 		this._gain = new LabGain({audioContext: this._audioContext, voiceMode: 'autoPoly', creatorName: 'MidiGateNode'})
 

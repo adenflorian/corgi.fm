@@ -81,7 +81,7 @@ function AddNodeMenuItem({nodeType, position}: AddNodeMenuItemProps) {
 	const onClick = useCallback(() => {
 		if (nodeType === 'graph') {
 			return logger.error('you should not have come here')
-		} else if (nodeType === 'group' || nodeType === 'polyphonicGroup') {
+		} else if (nodeType === 'group') {
 			dispatch(expLocalActions.createGroup(Set(), nodeType))
 		} else {
 			const state = store.getState()

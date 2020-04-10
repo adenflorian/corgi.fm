@@ -21,12 +21,9 @@ import {MidiRandomNode} from './MidiRandomNode'
 import {MidiPitchNode} from './MidiPitchNode'
 import {ExpOscilloscopeNode} from './ExpOscilloscopeNode'
 import {AutomaticPolyphonicMidiConverterNode} from './AutomaticPolyphonicMidiConverterNode'
-import {PolyphonicGroupNode} from './PolyphonicGroupNode'
-import {PolyphonicGroupInputNode} from './PolyphonicGroupInputNode'
-import {PolyphonicGroupOutputNode} from './PolyphonicGroupOutputNode'
 import {ExpPolyTestNode} from './ExpPolyTestNode'
 import {ExpWaveShaperNode} from './ExpWaveShaperNode'
-import {MidiGateNode} from './MidiGate'
+import {MidiBlockNode} from './MidiBlock'
 import {MidiPulseNode} from './MidiPulse'
 import {MidiMatchNode} from './MidiMatchNode'
 import {MidiMessageNode} from './MidiMessageNode'
@@ -58,12 +55,9 @@ export const typeClassMap: {readonly [key in ExpNodeType]: CorgiNodeConstructor}
 	midiRandom: MidiRandomNode,
 	midiPitch: MidiPitchNode,
 	oscilloscope: ExpOscilloscopeNode,
-	polyphonicGroup: PolyphonicGroupNode,
-	polyphonicGroupInput: PolyphonicGroupInputNode,
-	polyphonicGroupOutput: PolyphonicGroupOutputNode,
 	polyTest: ExpPolyTestNode,
 	waveShaper: ExpWaveShaperNode,
-	midiGate: MidiGateNode,
+	midiGate: MidiBlockNode,
 	midiPulse: MidiPulseNode,
 	midiMatch: MidiMatchNode,
 	midiMessage: MidiMessageNode,

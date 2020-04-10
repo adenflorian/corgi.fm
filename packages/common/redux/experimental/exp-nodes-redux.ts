@@ -170,16 +170,13 @@ export type ExpNodeType = typeof expNodeTypes[number]
 
 export const GroupExpNodeType = 'group'
 
-export const PolyphonicGroupExpNodeType = 'polyphonicGroup'
-
-export type GroupType = typeof GroupExpNodeType | typeof PolyphonicGroupExpNodeType
+export type GroupType = typeof GroupExpNodeType
 
 export const expNodeTypes = [
 	'oscillator', 'filter', 'dummy', 'audioOutput', 'gain', 'pan', 'envelope',
 	'sequencer', 'constant', 'lowFrequencyOscillator', 'midiConverter', 'keyboard',
 	'distortion', 'manualPolyphonicMidiConverter', 'automaticPolyphonicMidiConverter',
 	GroupExpNodeType, 'groupInput', 'groupOutput',
-	PolyphonicGroupExpNodeType, 'polyphonicGroupInput', 'polyphonicGroupOutput',
 	'midiRandom', 'midiPitch', 'oscilloscope', 'polyTest', 'waveShaper', 'midiGate',
 	'midiPulse', 'midiMatch', 'midiMessage', 'sampler', 'betterSequencer',
 	'note', 'basicSynth',
@@ -187,11 +184,10 @@ export const expNodeTypes = [
 
 export const groupInOutNodeTypes: ExpNodeType[] = [
 	'groupInput', 'groupOutput',
-	'polyphonicGroupInput', 'polyphonicGroupOutput',
 ]
 
 export const groupNodeTypes: ExpNodeType[] = [
-	GroupExpNodeType, PolyphonicGroupExpNodeType,
+	GroupExpNodeType,
 ]
 
 export const isGroupNode = (node: ExpNodeState) => groupNodeTypes.includes(node.type)

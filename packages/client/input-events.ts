@@ -94,15 +94,6 @@ const keyboardShortcuts: IKeyBoardShortcuts = Map<KeyBoardShortcut>({
 		allowRepeat: false,
 		preventDefault: true,
 	},
-	[Control + Plus + Shift + Plus + 'g']: {
-		actionOnKeyDown: (_, state) => {
-			if (selectActivityType(state.room) !== RoomType.Experimental) return
-			const selectedNodes = selectShamuMetaState(state.room).selectedNodes
-			return expLocalActions.createGroup(selectedNodes, 'polyphonicGroup')
-		},
-		allowRepeat: false,
-		preventDefault: true,
-	},
 	'PageUp': {
 		actionOnKeyDown: (_, state) => {
 			if (selectActivityType(state.room) !== RoomType.Experimental) return
