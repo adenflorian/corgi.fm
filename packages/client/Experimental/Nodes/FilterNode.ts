@@ -62,7 +62,7 @@ export class FilterHound {
 	public readonly gainParam: ExpAudioParam
 
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
-		this.type = new ExpCustomEnumParam<FilterType>('type', 'lowpass', filterTypes)
+		this.type = new ExpCustomEnumParam<FilterType>('filterType', 'lowpass', filterTypes)
 		this.type.onChange.subscribe(this.onTypeChange)
 
 		this.filter = new LabBiquadFilterNode({...corgiNodeArgs, voiceMode: 'autoPoly', creatorName: 'FilterNode'})

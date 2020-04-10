@@ -141,7 +141,7 @@ export class AutomaticPolyphonicMidiConverterHound {
 			: frequency
 		this.pitchSource.offset.setTargetAtTime(normalized, time, this.portamento.value, voiceIndex as number)
 		this.pitchSource.setActiveVoice(voiceIndex as number, time)
-		console.log('update pitch:', {note, voiceIndex, frequency, normalized})
+		// console.log('update pitch:', {note, voiceIndex, frequency, normalized})
 	}
 
 	public dispose() {

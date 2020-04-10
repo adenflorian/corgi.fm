@@ -61,7 +61,7 @@ export class OscillatorExpHound {
 	public readonly unisonDetuneParam: ExpAudioParam
 
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
-		this.type = new ExpCustomEnumParam<OscillatorType>('type', 'sawtooth', oscillatorTypes)
+		this.type = new ExpCustomEnumParam<OscillatorType>('waveType', 'sawtooth', oscillatorTypes)
 		this.type.onChange.subscribe(this.onTypeChange)
 
 		this.oscillator = new LabOscillator({...corgiNodeArgs, voiceMode: 'autoPoly', creatorName: 'OscillatorExpNode'})
