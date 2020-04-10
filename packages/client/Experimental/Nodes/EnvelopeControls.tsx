@@ -28,7 +28,7 @@ export const EnvelopeControlsWrapper = hot(module)(() => {
 		decay={reverseCurve(decay / expDecayMax, expDecayCurve)}
 		sustain={reverseCurve(sustain / expSustainMax, expSustainCurve)}
 		release={reverseCurve(release / expReleaseMax, expReleaseCurve)}
-		width={position.width - 16}
+		width={position.width}
 	/>
 })
 
@@ -42,13 +42,16 @@ interface Props {
 	readonly width: number
 }
 
-const sectionCount = 5
+const sectionCount = 4
 const height = 200
 const padding = 8
 const usableHeight = height - (padding * 2)
 const minY = padding
 const maxY = height - padding
 const minX = padding
+const controlDotRadius = 4
+const controlDotStrokeColor = CssColor.defaultGray
+const controlDotFillColor = 'none'
 
 export const EnvelopeControls = (({
 	attack, hold, decay, sustain, release, width,
@@ -56,11 +59,19 @@ export const EnvelopeControls = (({
 	const usableWidth = width - (padding * 2)
 	const sectionWidth = usableWidth / sectionCount
 	const attackX = padding + (attack * sectionWidth)
+	const attackY = minY
 	const holdX = attackX + (hold * sectionWidth)
+	const holdY = minY
 	const decayX = holdX + (decay * sectionWidth)
-	const sustainX = padding + (sectionWidth * 4)
+	const sustainX = padding + (sectionWidth * 3)
 	const sustainY = padding + usableHeight - (sustain * usableHeight)
+	const decayY = sustainY
+	const decayControlX = holdX
+	const decayControlY = sustainY
 	const releaseX = sustainX + (release * sectionWidth)
+	const releaseY = maxY
+	const releaseControlX = sustainX
+	const releaseControlY = maxY
 
 	return (
 		<div className="envelopeControls">
@@ -72,14 +83,21 @@ export const EnvelopeControls = (({
 					strokeLinecap="round"
 					d={`
 						M${minX} ${maxY}
-						L${attackX} ${minY}
-						L${holdX} ${minY}
-						L${decayX} ${sustainY}
+						L${attackX} ${attackY}
+						L${holdX} ${holdY}
+						Q${decayControlX} ${decayControlY}, ${decayX} ${decayY}
 						L${sustainX} ${sustainY}
-						L${releaseX} ${maxY}
+						Q${releaseControlX} ${releaseControlY}, ${releaseX} ${releaseY}
 					`}
 					scale={0.8}
 				/>
+				<circle cx={attackX} cy={attackY} r={controlDotRadius} fill={controlDotFillColor} stroke={controlDotStrokeColor} strokeWidth={2} />
+				<circle cx={holdX} cy={holdY} r={controlDotRadius} fill={controlDotFillColor} stroke={controlDotStrokeColor} strokeWidth={2} />
+				<circle cx={decayX} cy={decayY} r={controlDotRadius} fill={controlDotFillColor} stroke={controlDotStrokeColor} strokeWidth={2} />
+				<circle cx={sustainX} cy={sustainY} r={controlDotRadius} fill={controlDotFillColor} stroke={controlDotStrokeColor} strokeWidth={2} />
+				<circle cx={releaseX} cy={releaseY} r={controlDotRadius} fill={controlDotFillColor} stroke={controlDotStrokeColor} strokeWidth={2} />
+				{/* <circle cx={decayControlX} cy={decayControlY} r="3" fill="red" />
+				<circle cx={releaseControlX} cy={releaseControlY} r="3" fill="red" /> */}
 			</svg>
 		</div>
 	)
