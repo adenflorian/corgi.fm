@@ -39,6 +39,11 @@ expNodeInfos.set('keyboard', {
 	height: 260,
 })
 
+expNodeInfos.set('basicSynth', {
+	width: 600,
+	height: 660,
+})
+
 expNodeInfos.set('waveShaper', {
 	width: 160,
 	height: 120,
