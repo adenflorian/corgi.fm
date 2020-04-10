@@ -13,6 +13,8 @@ import {ExpMidiInputPort} from '../ExpMidiPorts'
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 import {LabWaveShaperNode, LabConstantSourceNode, LabGain} from './PugAudioNode/Lab'
 import {VoiceIndex} from './NodeHelpers/PolyAlgorithms'
+import {getEnvelopeControlsComponent} from './EnvelopeControls'
+import {expAttackMax, expHoldMax, expDecayMax, expReleaseMax, expSustainMax, expAttackCurve, expHoldCurve, expDecayCurve, expSustainCurve, expReleaseCurve} from '@corgifm/common/common-constants'
 
 const longTime = 999999999
 const minDistance = 0.00001
@@ -22,6 +24,11 @@ export class EnvelopeNode extends CorgiNode {
 	protected readonly _customNumberParams: ExpCustomNumberParams
 	private readonly _outputGain: LabGain
 	private readonly _envelopeHound: EnvelopeHound
+	public readonly attack: ExpCustomNumberParam
+	public readonly hold: ExpCustomNumberParam
+	public readonly decay: ExpCustomNumberParam
+	public readonly sustain: ExpCustomNumberParam
+	public readonly release: ExpCustomNumberParam
 
 	public constructor(
 		corgiNodeArgs: CorgiNodeArgs,
@@ -29,6 +36,12 @@ export class EnvelopeNode extends CorgiNode {
 		super(corgiNodeArgs, {name: 'Envelope', color: CssColor.purple})
 
 		this._envelopeHound = new EnvelopeHound(corgiNodeArgs)
+
+		this.attack = this._envelopeHound.attack
+		this.hold = this._envelopeHound.hold
+		this.decay = this._envelopeHound.decay
+		this.sustain = this._envelopeHound.sustain
+		this.release = this._envelopeHound.release
 
 		this._outputGain = new LabGain({audioContext: this._audioContext, voiceMode: 'autoPoly', creatorName: 'EnvelopeNode'})
 
@@ -43,7 +56,7 @@ export class EnvelopeNode extends CorgiNode {
 		])
 	}
 
-	public render = () => this.getDebugView()
+	public render = () => this.getDebugView(getEnvelopeControlsComponent())
 
 	protected _enable = () => {
 		this._outputGain.gain.onMakeVoice = gain => gain.setValueAtTime(1, this._audioContext.currentTime)
@@ -90,11 +103,11 @@ export class EnvelopeHound {
 			offset.linearRampToValueAtTime(0, longTime)
 		}
 
-		this.attack = new ExpCustomNumberParam('attack', 0.0004, 0, 32, 3, adsrValueToString) // 0.0005
-		this.hold = new ExpCustomNumberParam('hold', 0, 0, 32, 3, adsrValueToString) // 0
-		this.decay = new ExpCustomNumberParam('decay', 1, 0, 32, 3, adsrValueToString) // 1
-		this.sustain = new ExpCustomNumberParam('sustain', 0, 0, 1, 1, gainDecibelValueToString) // 1
-		this.release = new ExpCustomNumberParam('release', 0.015, 0, 32, 3, adsrValueToString) // 0.015
+		this.attack = new ExpCustomNumberParam('attack', 0.0004, 0, expAttackMax, expAttackCurve, adsrValueToString) // 0.0005
+		this.hold = new ExpCustomNumberParam('hold', 0, 0, expHoldMax, expHoldCurve, adsrValueToString) // 0
+		this.decay = new ExpCustomNumberParam('decay', 1, 0, expDecayMax, expDecayCurve, adsrValueToString) // 1
+		this.sustain = new ExpCustomNumberParam('sustain', 0, 0, expSustainMax, expSustainCurve, gainDecibelValueToString) // 1
+		this.release = new ExpCustomNumberParam('release', 0.015, 0, expReleaseMax, expReleaseCurve, adsrValueToString) // 0.015
 	}
 
 	public dispose() {

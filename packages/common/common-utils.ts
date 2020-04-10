@@ -318,6 +318,15 @@ export const defaultUnipolarCurveFunctions: CurveFunctions = {
 	waveShaperCurve: new Float32Array([0, 0, 1]),
 }
 
+// Standard curve functions
+export function applyCurve(value: number, curve: number) {
+	return value ** curve
+}
+
+export function reverseCurve(value: number, curve: number) {
+	return clamp(value ** (1 / curve), 0, 1)
+}
+
 // Other
 export function assertUnreachable(x: never): never {
 	throw new Error(`Didn't expect to get here`)

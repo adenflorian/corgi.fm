@@ -185,7 +185,7 @@ export function createServerStuffExperimental(room: string, serverStore: Store<I
 	})
 	dispatchToRoom(expNodesActions.add(osc2))
 	dispatchToRoom(expNodesActions.audioParamChange(osc2.id, 'frequency', 0))
-	dispatchToRoom(expNodesActions.customEnumParamChange(osc2.id, 'type', 'sine'))
+	dispatchToRoom(expNodesActions.customEnumParamChange(osc2.id, 'waveType', 'sine'))
 	dispatchToRoom(expPositionActions.add(
 		makeExpPosition({
 			id: osc2.id,

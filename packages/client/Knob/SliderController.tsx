@@ -1,5 +1,5 @@
 import React, {useLayoutEffect, useState, ReactElement, useCallback} from 'react'
-import {clamp, CurveFunctions} from '@corgifm/common/common-utils'
+import {clamp, CurveFunctions, reverseCurve, applyCurve} from '@corgifm/common/common-utils'
 import './Knob.less'
 
 interface ISliderControllerProps {
@@ -32,14 +32,14 @@ export function SliderController(props: ISliderControllerProps) {
 		if (curveFunctionOverride) {
 			return curveFunctionOverride.unCurve(x)
 		} else {
-			return clamp(x ** (1 / curve), 0, 1)
+			return reverseCurve(x, curve)
 		}
 	}, [min, max, curve, curveFunctionOverride])
 
 	const deNormalize = useCallback((n: number) => {
 		const deCurvedValue = curveFunctionOverride
 			? curveFunctionOverride.curve(n)
-			: n ** curve
+			: applyCurve(n, curve)
 		const deNormalizedValue = (deCurvedValue * (max - min)) + min
 		return deNormalizedValue
 	}, [min, max, curve, curveFunctionOverride])

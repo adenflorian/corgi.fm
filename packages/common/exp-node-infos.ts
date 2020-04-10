@@ -76,7 +76,7 @@ expNodeInfos.set('gain', {
 
 expNodeInfos.set('envelope', {
 	width: 340,
-	height: 160,
+	height: 340,
 })
 
 expNodeInfos.set('automaticPolyphonicMidiConverter', {

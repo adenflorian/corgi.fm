@@ -217,8 +217,6 @@ export abstract class CorgiNode {
 	public onReferenceParamChange(paramId: Id, newTarget: CorgiObjectChangedEvent<IdObject>, targetType: ExpReferenceTargetType) {
 		const referenceParam = this._referenceParams.get(paramId)
 
-		console.log('bbb', {paramId, newTarget, targetType})
-
 		if (!referenceParam) return logger.warn('[onReferenceParamChange] 404 referenceParam not found: ', {paramId, nodeId: this.id, newTarget})
 
 		if (referenceParam.targetType !== targetType) return logger.error('[onReferenceParamChange] reference target type mismatch!: ', {paramId, nodeId: this.id, newTarget, targetType, referenceParam})
