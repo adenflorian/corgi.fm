@@ -1,5 +1,9 @@
-import {KelpieAudioNode, KelpieAudioNodeArgs} from './Lab'
 import {clamp} from '@corgifm/common/common-utils'
+import {debounce} from 'lodash'
+import * as uuid from 'uuid'
+import {logger} from '../../../client-logger'
+import {impulseBuilder} from '../../../WebWorkers/webWorkers'
+import {KelpieAudioNode, KelpieAudioNodeArgs} from './Lab'
 
 export class KelpieConvolutionReverb extends KelpieAudioNode {
 	public static readonly minTime = 0.001
@@ -13,39 +17,52 @@ export class KelpieConvolutionReverb extends KelpieAudioNode {
 	private _reverse = false
 	public set time(value: number) {
 		this._time = clamp(value, KelpieConvolutionReverb.minTime, KelpieConvolutionReverb.maxTime)
-		this._buildImpulse()
+		this._buildImpulseDebounced()
 	}
 	public set decay(value: number) {
 		this._decay = clamp(value, KelpieConvolutionReverb.minDecay, KelpieConvolutionReverb.maxDecay)
-		this._buildImpulse()
+		this._buildImpulseDebounced()
 	}
 	public set reverse(value: boolean) {
 		this._reverse = value
-		this._buildImpulse()
+		this._buildImpulseDebounced()
 	}
 
 	public constructor(args: KelpieAudioNodeArgs) {
 		super(args)
 		this._convolver = new ConvolverNode(this._audioContext)
+
 		// TODO Use maybe?
 		// this._convolver.normalize
-		this._buildImpulse()
+
+		this._buildImpulseDebounced()
 	}
 
-	// TODO Make async or something
-	private _buildImpulse() {
+	private _buildImpulseDebounced = debounce(this._buildImpulse, 500, {
+		leading: false,
+		maxWait: 1000,
+		trailing: true,
+	})
+
+	private async _buildImpulse() {
 		const {sampleRate} = this._audioContext
 		const length = sampleRate * this._time
 		const channelCount = 2
 		const impulseBuffer = this._audioContext.createBuffer(channelCount, length, sampleRate)
-		const impulseLeft = impulseBuffer.getChannelData(0)
-		const impulseRight = impulseBuffer.getChannelData(1)
-		let n: number
 
-		for (let i = 0; i < length; i++) {
-			n = this._reverse ? length - 1 : i
-			impulseLeft[i] = ((Math.random() * 2) - 1) * Math.pow(1 - (n / length), this._decay)
-			impulseRight[i] = ((Math.random() * 2) - 1) * Math.pow(1 - (n / length), this._decay)
+		try {
+			const result = await impulseBuilder.build({
+				id: uuid.v4(),
+				sampleRate,
+				time: this._time,
+				decay: this._decay,
+				reverse: this._reverse,
+			})
+
+			impulseBuffer.copyToChannel(result.left, 0)
+			impulseBuffer.copyToChannel(result.right, 1)
+		} catch (error) {
+			logger.error('error during impulse building: ', {error})
 		}
 
 		this._convolver.buffer = impulseBuffer

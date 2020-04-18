@@ -104,3 +104,17 @@ export enum RoomType {
 	Experimental = 'Experimental',
 	Dummy = 'Dummy'
 }
+
+export interface ImpulseBuildRequest {
+	readonly id: Id
+	readonly sampleRate: number
+	readonly time: number
+	readonly decay: number
+	readonly reverse: boolean
+}
+
+export interface ImpulseBuilderResponse {
+	readonly id: Id
+	readonly left: Float32Array
+	readonly right: Float32Array
+}

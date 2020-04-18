@@ -5,6 +5,7 @@ const parcelWrapper = require('parcel-plugin-wrapper')
 const entryFiles = [
 	'packages/client/index.html',
 	'packages/client/WebAudio/AudioWorklets/Processors/*.ts',
+	'packages/client/WebWorkers/Workers/*.ts',
 ]
 
 /** @typedef {import('parcel-bundler').ParcelOptions} ParcelOptions */

@@ -13,7 +13,10 @@ const varRequire = async ({name, bundler}) => {
 	// name = app.ere76r5e76r5e76r.js
 	// logger.log('AAA bundler.options.production: ' + bundler.options.production)
 	// logger.log('name: ' + name)
-	if (name && name.match(/WebAudio.AudioWorklets.Processors.*js$/)) {
+	if (name && (
+		name.match(/WebAudio.AudioWorklets.Processors.*js$/) ||
+		name.match(/WebWorkers.Workers.*js$/)
+	)) {
 		logger.log('transforming: ' + name)
 		return {
 			header: `var parcelRequire = undefined;`,

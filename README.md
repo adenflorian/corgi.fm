@@ -58,3 +58,8 @@ See these places for more info:
 - `build-parcel.js`
 - `.assetWrapper.js`
 - `packages/client/WebAudio/AudioWorklets`
+
+## Web Workers
+`packages/client/WebWorkers/Workers` is the folder where web worker files go.
+
+All files in that folder ending in `.ts` will be treated as a parcel entry point.
