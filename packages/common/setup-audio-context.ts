@@ -15,8 +15,8 @@ export function setupAudioContext(audioContext: AudioContext, preFx: GainNode, s
 
 	const masterGain = audioContext.createGain()
 
-	const masterFilter = audioContext.createBiquadFilter()
-	masterFilter.frequency.value = 20000
+	// const masterFilter = audioContext.createBiquadFilter()
+	// masterFilter.frequency.value = 20000
 
 	const analyser = audioContext.createAnalyser()
 	analyser.smoothingTimeConstant = 0.3
@@ -33,7 +33,7 @@ export function setupAudioContext(audioContext: AudioContext, preFx: GainNode, s
 
 	const finalNode = preFx
 		.connect(masterLimiter)
-		.connect(masterFilter)
+		// .connect(masterFilter)
 		.connect(masterGain)
 
 	finalNode.connect(analyser)

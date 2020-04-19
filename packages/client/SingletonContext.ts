@@ -11,6 +11,7 @@ export const SingletonContext = React.createContext<SingletonContextImpl | null>
 export class SingletonContextImpl {
 	private nodeManager?: NodeManager
 	private _store?: Store<IClientAppState>
+	private _masterLimiter?: DynamicsCompressorNode
 
 	public constructor(
 		private readonly audioContext: AudioContext,
@@ -24,6 +25,8 @@ export class SingletonContextImpl {
 	public readonly setNodeManager = (x?: NodeManager) => this.nodeManager = x
 	public readonly getStore = () => this._store
 	public readonly setStore = (x?: Store<IClientAppState>) => this._store = x
+	public readonly getMasterLimiter = () => this._masterLimiter
+	public readonly setMasterLimiter = (x?: DynamicsCompressorNode) => this._masterLimiter = x
 	public readonly getAudioContext = () => this.audioContext
 	public readonly getPreMasterLimiter = () => this.preMasterLimiter
 	public get midiService() {return this._midiService}

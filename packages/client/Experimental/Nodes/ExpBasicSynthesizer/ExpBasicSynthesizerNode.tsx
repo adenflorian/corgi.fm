@@ -43,7 +43,7 @@ export class ExpBasicSynthNode extends CorgiNode {
 		this._oscillatorHound = new OscillatorExpHound(corgiNodeArgs)
 		this._envelopeHound = new EnvelopeHound(corgiNodeArgs)
 		this._filterHound = new FilterHound(corgiNodeArgs)
-		this._lfoHound = new LowFrequencyOscillatorHound(corgiNodeArgs)
+		this._lfoHound = new LowFrequencyOscillatorHound(corgiNodeArgs, 0)
 		this._autoPolyHound = new AutomaticPolyphonicMidiConverterHound(
 			this._audioContext, this._onHoundMidiActionOut, false)
 

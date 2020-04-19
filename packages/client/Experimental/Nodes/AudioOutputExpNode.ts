@@ -4,6 +4,7 @@ import {ExpNodeAudioInputPort, ExpPorts} from '../ExpPorts'
 import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 import {ToggleGainChain} from './NodeHelpers/ToggleGainChain'
 import {LabAudioDestinationNode} from './PugAudioNode/Lab'
+import {getExpAudioOutputView} from './AudioOutputExpNodeView'
 
 export class AudioOutputExpNode extends CorgiNode {
 	protected readonly _ports: ExpPorts
@@ -42,7 +43,7 @@ export class AudioOutputExpNode extends CorgiNode {
 		}
 	}
 
-	public render = () => this.getDebugView()
+	public render = () => this.getDebugView(getExpAudioOutputView())
 
 	protected _enable = () => this._inputChain.enable()
 	protected _disable = () => this._inputChain.disable()

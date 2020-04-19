@@ -76,7 +76,7 @@ export class LowFrequencyOscillatorHound {
 	public readonly detuneParam: ExpAudioParam
 	public readonly gainParam: ExpAudioParam
 
-	public constructor(corgiNodeArgs: CorgiNodeArgs) {
+	public constructor(corgiNodeArgs: CorgiNodeArgs, lfoGainDefault = 1) {
 		this._audioContext = corgiNodeArgs.audioContext
 
 		this.type = new ExpCustomEnumParam<OscillatorType>('type', 'sine', oscillatorTypes)
@@ -102,7 +102,7 @@ export class LowFrequencyOscillatorHound {
 			{valueString: lfoRateValueToString, curveFunctions: lfoFreqCurveFunctions})
 		this.detuneParam = new ExpAudioParam('lfoDetune', this._bufferSource.detune, 0, 100, 'bipolar',
 			{valueString: detuneValueToString})
-		this.gainParam = new ExpAudioParam('lfoGain', this.outputGain.gain, 1, 1, 'unipolar',
+		this.gainParam = new ExpAudioParam('lfoGain', this.outputGain.gain, lfoGainDefault, 1, 'unipolar',
 			{valueString: percentageValueString})
 
 		this.type.onChange.subscribe(this.onTypeChange)

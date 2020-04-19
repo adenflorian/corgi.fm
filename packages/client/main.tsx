@@ -135,6 +135,8 @@ async function setupAsync() {
 
 	const {masterLimiter} = setupAudioContext(audioContext, preMasterLimiter, store)
 
+	singletonContext.setMasterLimiter(masterLimiter)
+
 	setupMidiSupport(store)
 
 	setupInputEventListeners(window, store, audioContext)
