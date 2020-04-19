@@ -108,6 +108,7 @@ export const MasterVolume = hot(module)(React.memo(function _MasterVolume() {
 						marginLeft: slidableDistance * volume,
 						width: sliderSize,
 						height: sliderSize,
+						boxShadow: 'rgba(0, 0, 0, 0.8) 0px 2px 6px',
 					}}
 					onMouseDown={onClickSlider}
 				/>
