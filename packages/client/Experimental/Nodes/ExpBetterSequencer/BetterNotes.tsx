@@ -289,7 +289,7 @@ const ActualNotes = React.memo(function _ActualNotes({
 	selected, onNoteSelect, handleMouseDown, rows,
 }: ActualNotesProps) {
 	return (
-		<Fragment>
+		<>
 			{events.map(event => {
 				return (
 					<BetterNote
@@ -307,7 +307,7 @@ const ActualNotes = React.memo(function _ActualNotes({
 					/>
 				)
 			}).toList()}
-		</Fragment>
+		</>
 	)
 })
 

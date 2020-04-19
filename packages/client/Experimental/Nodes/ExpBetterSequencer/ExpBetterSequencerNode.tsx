@@ -42,6 +42,8 @@ export class ExpBetterSequencerNode extends CorgiNode {
 	private _songStartTimeSeconds = -1
 	private _cursorBeats = 0
 	private _cursorSeconds = 0
+	private _currentClipPositionBeats = 0
+	public get currentClipPositionBeats() {return this._currentClipPositionBeats}
 	private readonly _midiPatternViewParam: ExpReferenceParam<SeqPatternView>
 	public get midiPatternParam() {return this._midiPatternViewParam as ExpReferenceParamReadonly<SeqPatternView>}
 
@@ -147,6 +149,7 @@ export class ExpBetterSequencerNode extends CorgiNode {
 
 		this._cursorSeconds = readToSongTimeSeconds
 		this._cursorBeats += beatsToRead
+		this._currentClipPositionBeats = toBeats(currentSongTimeSeconds) % this._midiPatternViewParam.value.current.endBeat
 	}
 }
 

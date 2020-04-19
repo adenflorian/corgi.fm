@@ -40,10 +40,3 @@ export const ExpBetterSequencerNodeView = hot(module)(React.memo(function _ExpSe
 		<ExpBetterSequencerInner />
 	)
 }))
-
-interface Props2 {
-}
-
-export const ExpSequencerNodeExtra2 = (function _ExpSequencerNodeExtra({
-}: Props2) {
-})

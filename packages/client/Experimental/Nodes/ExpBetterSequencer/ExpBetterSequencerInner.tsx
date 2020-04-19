@@ -41,6 +41,7 @@ import {useNumberChangedEvent, useObjectChangedEvent, useStringChangedEvent} fro
 import {SeqEvents, makeNoteEvent2, duplicateNoteEvent} from '@corgifm/common/SeqStuff'
 import {BetterLoopBar} from './BetterLoopBar'
 import {BetterTopTimeBar} from './BetterTopTimeBar'
+import {ExpBetterTimeMarker} from './ExpBetterTimeMarker'
 
 const mouseWheelYSensitivity = 0.001
 const mouseWheelPanXSensitivity = 0.001
@@ -777,6 +778,7 @@ export const ExpBetterSequencerInner = React.memo(function _ExpBetterSequencerIn
 							}}
 						/>
 					</div>
+					<ExpBetterTimeMarker {...{visibleHeight, visibleWidth, columnWidth, panPixelsX: panPixels.x}} />
 					{boxActive && <BoxSelect
 						origin={boxOrigin}
 						otherCorner={otherCorner}
