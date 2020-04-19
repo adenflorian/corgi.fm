@@ -54,7 +54,14 @@ export const ExpBetterTimeMarker = ({
 	}, [])
 
 	return (
-		<div className="expBetterTimeMarker" style={{position: 'absolute', top: 0}}>
+		<div
+			className="expBetterTimeMarker"
+			style={{
+				position: 'absolute',
+				top: 0,
+				pointerEvents: 'none',
+			}}
+		>
 			{useMemo(() =>
 				<canvas
 					ref={canvasRef}
