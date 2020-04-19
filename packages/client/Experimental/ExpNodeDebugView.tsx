@@ -87,7 +87,7 @@ export const ExpNodeDebugView = hot(module)(React.memo(function _ExpNodeDebugVie
 						{/* {customNumberParams.size > 0 &&
 					<div className="sectionLabel">Custom Number Params</div>} */}
 						<div className="paramKnobs">
-							{[...customNumberParams].map(([id, customNumberParam]) => (
+							{[...customNumberParams].filter(x => !x[1].options.hideFromDebugView).map(([id, customNumberParam]) => (
 								<ExpNodeDebugCustomNumberParamKnob
 									key={id as string}
 									nodeId={nodeId}
