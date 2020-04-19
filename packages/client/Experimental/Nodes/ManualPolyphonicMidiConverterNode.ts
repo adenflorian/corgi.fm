@@ -46,8 +46,8 @@ export class ManualPolyphonicMidiConverterNode extends CorgiNode {
 		})
 		this._ports = arrayToESIdKeyMap([midiInputPort, ...this._midiOutputPorts, ...this._pitchOutputPorts])
 
-		this._portamento = new ExpCustomNumberParam('portamento', 0, 0, 8, 3, adsrValueToString)
-		this._voiceCount = new ExpCustomNumberParam('voiceCount', 4, 1, maxVoiceCount, 1, val => Math.round(val).toString())
+		this._portamento = new ExpCustomNumberParam('portamento', 0, 0, 8, {curve: 3, valueString: adsrValueToString})
+		this._voiceCount = new ExpCustomNumberParam('voiceCount', 4, 1, maxVoiceCount, {valueString: val => Math.round(val).toString()})
 		this._customNumberParams = arrayToESIdKeyMap([this._portamento, this._voiceCount])
 		
 		this._algorithm = new RoundRobin(this._voiceCount.onChange)

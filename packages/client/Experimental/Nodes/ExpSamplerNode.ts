@@ -56,8 +56,8 @@ export class SamplerExpNode extends CorgiNode {
 		this._ports = arrayToESIdKeyMap([playbackRatePort, detunePort, outputPort])
 		this._audioParams = arrayToESIdKeyMap([playbackRateParam, detuneParam])
 
-		this.loopStart = new ExpCustomNumberParam('loopStart', 0, 0, 60, 3)
-		this.loopEnd = new ExpCustomNumberParam('loopEnd', 60, 0, 60, 3)
+		this.loopStart = new ExpCustomNumberParam('loopStart', 0, 0, 60, {curve: 3})
+		this.loopEnd = new ExpCustomNumberParam('loopEnd', 60, 0, 60, {curve: 3})
 		this._customNumberParams = arrayToESIdKeyMap([this.loopStart, this.loopEnd])
 
 		this._loop = new ExpCustomEnumParam<LoopOption>('loop', `loop`, loopOptions)

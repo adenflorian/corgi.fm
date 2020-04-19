@@ -42,7 +42,7 @@ export class MidiConverterNode extends CorgiNode {
 		const pitchOutputPort = new ExpNodeAudioOutputPort('pitch', 'pitch', this, this._waveShaper)
 		this._ports = arrayToESIdKeyMap([midiInputPort, this._midiOutputPort, pitchOutputPort])
 
-		this._portamento = new ExpCustomNumberParam('portamento', 0, 0, 8, 3, adsrValueToString)
+		this._portamento = new ExpCustomNumberParam('portamento', 0, 0, 8, {curve: 3, valueString: adsrValueToString})
 		this._customNumberParams = arrayToESIdKeyMap([this._portamento])
 
 		this._legato = new ExpCustomEnumParam<Legato>('legato', `legaton't`, legatoOptions)

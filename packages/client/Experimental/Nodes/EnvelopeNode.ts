@@ -103,11 +103,11 @@ export class EnvelopeHound {
 			offset.linearRampToValueAtTime(0, longTime)
 		}
 
-		this.attack = new ExpCustomNumberParam('attack', 0.0004, 0, expAttackMax, expAttackCurve, adsrValueToString) // 0.0005
-		this.hold = new ExpCustomNumberParam('hold', 0, 0, expHoldMax, expHoldCurve, adsrValueToString) // 0
-		this.decay = new ExpCustomNumberParam('decay', 1, 0, expDecayMax, expDecayCurve, adsrValueToString) // 1
-		this.sustain = new ExpCustomNumberParam('sustain', 0, 0, expSustainMax, expSustainCurve, gainDecibelValueToString) // 1
-		this.release = new ExpCustomNumberParam('release', 0.015, 0, expReleaseMax, expReleaseCurve, adsrValueToString) // 0.015
+		this.attack = new ExpCustomNumberParam('attack', 0.0004, 0, expAttackMax, {curve: expAttackCurve, valueString: adsrValueToString}) // 0.0005
+		this.hold = new ExpCustomNumberParam('hold', 0, 0, expHoldMax, {curve: expHoldCurve, valueString: adsrValueToString}) // 0
+		this.decay = new ExpCustomNumberParam('decay', 1, 0, expDecayMax, {curve: expDecayCurve, valueString: adsrValueToString}) // 1
+		this.sustain = new ExpCustomNumberParam('sustain', 0, 0, expSustainMax, {curve: expSustainCurve, valueString: gainDecibelValueToString}) // 1
+		this.release = new ExpCustomNumberParam('release', 0.015, 0, expReleaseMax, {curve: expReleaseCurve, valueString: adsrValueToString}) // 0.015
 	}
 
 	public dispose() {

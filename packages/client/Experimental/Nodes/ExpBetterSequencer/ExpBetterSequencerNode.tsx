@@ -55,7 +55,7 @@ export class ExpBetterSequencerNode extends CorgiNode {
 		this._midiOutputPort = new ExpMidiOutputPort('output', 'output', this)
 		this._ports = arrayToESIdKeyMap([this._midiOutputPort])
 
-		this._tempo = new ExpCustomNumberParam('tempo', 240, 0.001, 999.99, 3)
+		this._tempo = new ExpCustomNumberParam('tempo', 240, 0.001, 999.99, {curve: 3})
 		this._rate = new ExpCustomNumberParam('rate', 1, 0.001, 4)
 		this._zoomX = new ExpCustomNumberParam('zoomX', 1, minZoomX, maxZoomX)
 		this._zoomY = new ExpCustomNumberParam('zoomY', 6, minZoomY, maxZoomY)

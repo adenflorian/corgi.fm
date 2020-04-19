@@ -20,7 +20,7 @@ export class MidiDelayNode extends CorgiNode {
 		this._midiOutputPort = new ExpMidiOutputPort('output', 'output', this)
 		this._ports = arrayToESIdKeyMap([midiInputPort, this._midiOutputPort])
 
-		this._delay = new ExpCustomNumberParam('delay', 0, 0, 5, 3, adsrValueToString)
+		this._delay = new ExpCustomNumberParam('delay', 0, 0, 5, {curve: 3, valueString: adsrValueToString})
 		this._customNumberParams = arrayToESIdKeyMap([this._delay])
 	}
 

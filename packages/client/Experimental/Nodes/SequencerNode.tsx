@@ -248,7 +248,7 @@ export class SequencerNode extends CorgiNode {
 		this._midiOutputPort = new ExpMidiOutputPort('output', 'output', this)
 		this._ports = arrayToESIdKeyMap([this._midiOutputPort])
 
-		this._tempo = new ExpCustomNumberParam('tempo', 240, 0.001, 999.99, 3)
+		this._tempo = new ExpCustomNumberParam('tempo', 240, 0.001, 999.99, {curve: 3})
 		this._customNumberParams = arrayToESIdKeyMap([this._tempo])
 
 		this._restartButton = new ExpButton('restart', this)

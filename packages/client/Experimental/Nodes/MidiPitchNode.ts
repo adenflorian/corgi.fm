@@ -20,7 +20,7 @@ export class MidiPitchNode extends CorgiNode {
 		this._midiOutputPort = new ExpMidiOutputPort('output', 'output', this)
 		this._ports = arrayToESIdKeyMap([midiInputPort, this._midiOutputPort])
 
-		this._pitch = new ExpCustomNumberParam('pitch', 0, -128, 128, 1, floorValueString)
+		this._pitch = new ExpCustomNumberParam('pitch', 0, -128, 128, {valueString: floorValueString})
 		this._customNumberParams = arrayToESIdKeyMap([this._pitch])
 	}
 

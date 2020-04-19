@@ -71,18 +71,27 @@ export type ExpCustomNumberParams = ReadonlyMap<Id, ExpCustomNumberParam>
 export type ExpCustomNumberParamReadonly = ExpCustomNumberParam & {
 	onChange: ReadonlyCorgiNumberChangedEvent
 }
+export interface ExpCustomNumberParamOptions {
+	readonly hideFromDebugView?: boolean
+	readonly curve?: number
+	readonly valueString?: (v: number) => string
+}
 export class ExpCustomNumberParam {
 	public get value() {return this.onChange.current}
 	public readonly onChange: CorgiNumberChangedEvent
+	public readonly curve: number
+	public readonly valueString?: (v: number) => string
 
 	public constructor(
 		public readonly id: Id,
 		public readonly defaultValue: number,
 		public readonly min: number,
 		public readonly max: number,
-		public readonly curve = 1,
-		public readonly valueString?: (v: number) => string,
+		public readonly options: ExpCustomNumberParamOptions = {},
 	) {
+		this.curve = options.curve !== undefined ? options.curve : 1
+		this.valueString = options.valueString
+
 		this.onChange = new CorgiNumberChangedEvent(this.defaultValue)
 	}
 }

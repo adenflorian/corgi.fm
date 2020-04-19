@@ -20,7 +20,7 @@ export class MidiRandomNode extends CorgiNode {
 		this._midiOutputPort = new ExpMidiOutputPort('output', 'output', this)
 		this._ports = arrayToESIdKeyMap([midiInputPort, this._midiOutputPort])
 
-		this._chance = new ExpCustomNumberParam('chance', 0.5, 0, 1, 1, percentageValueString)
+		this._chance = new ExpCustomNumberParam('chance', 0.5, 0, 1, {valueString: percentageValueString})
 		this._customNumberParams = arrayToESIdKeyMap([this._chance])
 	}
 

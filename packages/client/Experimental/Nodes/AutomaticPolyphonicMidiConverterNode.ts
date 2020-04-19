@@ -74,8 +74,8 @@ export class AutomaticPolyphonicMidiConverterHound {
 		public readonly normalizePitch = true,
 	) {
 
-		this.portamento = new ExpCustomNumberParam('portamento', 0, 0, 8, 3, adsrValueToString)
-		this.voiceCount = new ExpCustomNumberParam('voiceCount', 10, 1, maxVoiceCount, 1, val => Math.round(val).toString())
+		this.portamento = new ExpCustomNumberParam('portamento', 0, 0, 8, {curve: 3, valueString: adsrValueToString})
+		this.voiceCount = new ExpCustomNumberParam('voiceCount', 10, 1, maxVoiceCount, {curve: 1, valueString: val => Math.round(val).toString()})
 
 		this.pitchOutputWaveShaper = new LabWaveShaperNode({
 			audioContext: this._audioContext, voiceMode: 'autoPoly',

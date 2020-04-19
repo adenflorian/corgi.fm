@@ -66,8 +66,8 @@ export class ConvolutionReverbHound {
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
 		this.reverb = new LabConvolutionReverbNode({...corgiNodeArgs, voiceMode: 'mono', creatorName: 'ConvolutionReverbHound'})
 
-		this.time = new ExpCustomNumberParam('time', 4, KelpieConvolutionReverb.minTime, KelpieConvolutionReverb.maxTime, 3, adsrValueToString)
-		this.decay = new ExpCustomNumberParam('decay', 2, KelpieConvolutionReverb.minDecay, KelpieConvolutionReverb.maxDecay, 1)
+		this.time = new ExpCustomNumberParam('time', 4, KelpieConvolutionReverb.minTime, KelpieConvolutionReverb.maxTime, {curve: 3, valueString: adsrValueToString})
+		this.decay = new ExpCustomNumberParam('decay', 2, KelpieConvolutionReverb.minDecay, KelpieConvolutionReverb.maxDecay)
 
 		this.time.onChange.subscribe(this.onTimeChange)
 		this.decay.onChange.subscribe(this.onDecayChange)
