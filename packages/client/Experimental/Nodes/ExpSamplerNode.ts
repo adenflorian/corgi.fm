@@ -11,6 +11,8 @@ import {CorgiNode, CorgiNodeArgs} from '../CorgiNode'
 import {ToggleGainChain} from './NodeHelpers/ToggleGainChain'
 import {LabAudioBufferSourceNode} from './PugAudioNode/Lab'
 import {samplePathBegin, sharpToFlatNotes} from '@corgifm/common/common-samples-stuff'
+import {getExpSamplerNodeView} from './ExpSamplerNodeView'
+import {CorgiObjectChangedEvent, ReadonlyCorgiObjectChangedEvent} from '../CorgiEvents'
 
 const loopOptions = ['loop', `loopn't`] as const
 type LoopOption = typeof loopOptions[number]
@@ -22,9 +24,11 @@ export class SamplerExpNode extends CorgiNode {
 	protected readonly _customEnumParams: ExpCustomEnumParams
 	private readonly _bufferSource: LabAudioBufferSourceNode
 	private readonly _outputChain: ToggleGainChain
-	private readonly _loopStart: ExpCustomNumberParam
-	private readonly _loopEnd: ExpCustomNumberParam
+	public readonly loopStart: ExpCustomNumberParam
+	public readonly loopEnd: ExpCustomNumberParam
 	private readonly _loop: ExpCustomEnumParam<LoopOption>
+	private readonly _bufferData = new CorgiObjectChangedEvent<Float32Array>(new Float32Array())
+	public get bufferData() {return this._bufferData as ReadonlyCorgiObjectChangedEvent<Float32Array>}
 
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
 		super(corgiNodeArgs, {name: 'Sampler', color: CssColor.green})
@@ -32,7 +36,9 @@ export class SamplerExpNode extends CorgiNode {
 		this._bufferSource = new LabAudioBufferSourceNode({...corgiNodeArgs, voiceMode: 'autoPoly', creatorName: 'SamplerExpNode'})
 		this.singletonContext.samplesManager.loadSample(`${samplePathBegin.static}/samplers/basic-piano/${sharpToFlatNotes['C']}${4}-49-96.mp3`)
 			.then(() => {
-				this._bufferSource.buffer = this.singletonContext.samplesManager.getSample(`${samplePathBegin.static}/samplers/basic-piano/${sharpToFlatNotes['C']}${4}-49-96.mp3`)
+				const buffer = this.singletonContext.samplesManager.getSample(`${samplePathBegin.static}/samplers/basic-piano/${sharpToFlatNotes['C']}${4}-49-96.mp3`)
+				this._bufferSource.buffer = buffer
+				this._bufferData.invokeNextFrame(buffer.getChannelData(0))
 			})
 		this._bufferSource.loop = true
 		this._bufferSource.loopEnd = 4
@@ -50,19 +56,19 @@ export class SamplerExpNode extends CorgiNode {
 		this._ports = arrayToESIdKeyMap([playbackRatePort, detunePort, outputPort])
 		this._audioParams = arrayToESIdKeyMap([playbackRateParam, detuneParam])
 
-		this._loopStart = new ExpCustomNumberParam('loopStart', 0, 0, 60, 3)
-		this._loopEnd = new ExpCustomNumberParam('loopEnd', 60, 0, 60, 3)
-		this._customNumberParams = arrayToESIdKeyMap([this._loopStart, this._loopEnd])
+		this.loopStart = new ExpCustomNumberParam('loopStart', 0, 0, 60, 3)
+		this.loopEnd = new ExpCustomNumberParam('loopEnd', 60, 0, 60, 3)
+		this._customNumberParams = arrayToESIdKeyMap([this.loopStart, this.loopEnd])
 
 		this._loop = new ExpCustomEnumParam<LoopOption>('loop', `loop`, loopOptions)
 		this._customEnumParams = arrayToESIdKeyMap([this._loop] as ExpCustomEnumParam<string>[])
 
-		this._loopStart.onChange.subscribe(this._onLoopStartChange)
-		this._loopEnd.onChange.subscribe(this._onLoopEndChange)
+		this.loopStart.onChange.subscribe(this._onLoopStartChange)
+		this.loopEnd.onChange.subscribe(this._onLoopEndChange)
 		this._loop.onChange.subscribe(this._onLoopChange)
 	}
 
-	public render = () => this.getDebugView()
+	public render = () => this.getDebugView(getExpSamplerNodeView())
 
 	protected _enable = () => this._outputChain.enable()
 	protected _disable = () => this._outputChain.disable()

@@ -71,7 +71,7 @@ expNodeInfos.set('midiMessage', {
 
 expNodeInfos.set('sampler', {
 	width: 200,
-	height: 280,
+	height: 500,
 })
 
 expNodeInfos.set('gain', {

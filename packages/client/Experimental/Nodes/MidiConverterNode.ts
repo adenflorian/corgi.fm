@@ -107,6 +107,7 @@ export class MidiConverterNode extends CorgiNode {
 		}
 	}
 
+	// TODO Look into freq getting clamped to 20Hz
 	private _updatePitch(note: number, time: number) {
 		const frequency = midiNoteToFrequency(note)
 		const normalized = oscillatorFreqCurveFunctions.unCurve(frequency / maxPitchFrequency)
