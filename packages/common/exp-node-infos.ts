@@ -1,4 +1,21 @@
-import {ExpNodeType} from './redux'
+export type ExpNodeType = typeof expNodeTypes[number]
+
+export const GroupExpNodeType = 'group'
+
+export type GroupType = typeof GroupExpNodeType
+
+export const expNodeTypes = [
+	'betterSequencer', 'sequencer',
+	'oscillator', 'sampler', 'basicSynth',
+	'filter', 'gain', 'pan', 'distortion', 'waveShaper', 'convolutionReverb',
+	'lowFrequencyOscillator', 'envelope', 'constant',
+	'midiRandom', 'midiPitch',
+	'midiConverter', 'manualPolyphonicMidiConverter', 'automaticPolyphonicMidiConverter',
+	'midiGate', 'midiPulse', 'midiMatch', 'midiMessage',
+	'oscilloscope', 'polyTest', 'note', 'dummy', 'audioOutput', 'keyboard',
+	GroupExpNodeType,
+	'groupInput', 'groupOutput',
+] as const
 
 const defaultExpNodeInfo = {
 	width: 300,
@@ -126,4 +143,83 @@ expNodeInfos.set('lowFrequencyOscillator', {
 
 export function getExpNodeInfo(type: ExpNodeType): ExpNodeInfo {
 	return expNodeInfos.get(type) || defaultExpNodeInfo
+}
+
+export interface NodeCategoryTree extends ReadonlyMap<string, NodeCategory> {}
+
+export interface NodeCategory {
+	readonly name: string
+	readonly types: ReadonlySet<ExpNodeType>
+	readonly hidden?: boolean
+}
+
+export const nodeCategoryTree: NodeCategoryTree = new Map([
+	['sequencers', {
+		name: 'Sequencers',
+		types: new Set([
+			'betterSequencer', 'sequencer',
+		]),
+	}],
+	['instruments', {
+		name: 'Instruments',
+		types: new Set([
+			'oscillator', 'sampler', 'basicSynth',
+		]),
+	}],
+	['audioEffects', {
+		name: 'Audio Effects',
+		types: new Set([
+			'filter', 'gain', 'pan', 'distortion', 'waveShaper', 'convolutionReverb',
+		]),
+	}],
+	['modulators', {
+		name: 'Modulators',
+		types: new Set([
+			'lowFrequencyOscillator', 'envelope', 'constant',
+		]),
+	}],
+	['midiEffects', {
+		name: 'Midi Effects',
+		types: new Set([
+			'midiRandom', 'midiPitch',
+		]),
+	}],
+	['midiConverters', {
+		name: 'Midi Converters',
+		types: new Set([
+			'midiConverter', 'manualPolyphonicMidiConverter', 'automaticPolyphonicMidiConverter',
+		]),
+	}],
+	['midiLogic', {
+		name: 'Midi Logic',
+		types: new Set([
+			'midiGate', 'midiPulse', 'midiMatch', 'midiMessage',
+		]),
+	}],
+	['other', {
+		name: 'Other',
+		types: new Set([
+			GroupExpNodeType,
+			'oscilloscope', 'polyTest', 'note', 'dummy', 'audioOutput', 'keyboard',
+		]),
+	}],
+	['hidden', {
+		name: 'Hidden',
+		types: new Set([
+			'groupInput', 'groupOutput',
+		]),
+		hidden: true,
+	}],
+])
+
+let foo = new Set(expNodeTypes.slice())
+
+{
+	[...nodeCategoryTree.values()].forEach(value => {
+		value.types.forEach(x => foo.delete(x))
+	})
+}
+
+if (foo.size > 0) {
+	throw new Error(`nodeCategoryTree is missing the following ${foo.size} types: ` + JSON.stringify([...foo.values()]))
 }

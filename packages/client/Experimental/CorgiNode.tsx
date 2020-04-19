@@ -3,7 +3,7 @@ import {useSelector} from 'react-redux'
 import * as Immutable from 'immutable'
 import {clamp, clampPolarized} from '@corgifm/common/common-utils'
 import {NodeToNodeAction} from '@corgifm/common/server-constants'
-import {ExpNodeType, ExpPortStates, ExpReferenceTargetType, IClientAppState, selectLocalClientId} from '@corgifm/common/redux'
+import {ExpPortStates, ExpReferenceTargetType, IClientAppState, selectLocalClientId} from '@corgifm/common/redux'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {logger} from '../client-logger'
 import {SingletonContextImpl} from '../SingletonContext'
@@ -20,6 +20,7 @@ import {isMidiOutputPort} from './ExpMidiPorts'
 import {isPolyphonicOutputPort} from './ExpPolyphonicPorts'
 import {LabCorgiAnalyserSPNode} from './CorgiAnalyserSPN'
 import {useObjectChangedEvent} from './hooks/useCorgiEvent'
+import {ExpNodeType} from '@corgifm/common/exp-node-infos'
 
 export const ExpNodeContext = React.createContext<null | CorgiNodeReact>(null)
 

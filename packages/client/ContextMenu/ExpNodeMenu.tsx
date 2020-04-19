@@ -4,7 +4,7 @@ import {ContextMenu, SubMenu, MenuItem, connectMenu} from 'react-contextmenu'
 import {List} from 'immutable'
 import {oneLine} from 'common-tags'
 import {
-	localActions, ExpPosition, WithConnections, expLocalActions, ExpNodeType,
+	localActions, ExpPosition, WithConnections, expLocalActions,
 	selectPresetsForExpNodeTypeSlow, ExpGraph, expNodesActions,
 	chatSystemMessage, IClientAppState, isGroupInOutNodeType,
 } from '@corgifm/common/redux'
@@ -13,6 +13,7 @@ import {logger} from '../client-logger'
 import {TopMenuBar} from './TopMenuBar'
 import {useRoomType} from '../react-hooks'
 import {RoomType} from '@corgifm/common/common-types'
+import {ExpNodeType} from '@corgifm/common/exp-node-infos'
 
 interface ExpNodeMenuProps {
 	trigger: {

@@ -4,8 +4,9 @@ import {ActionType} from 'typesafe-actions'
 import {
 	BROADCASTER_ACTION, SERVER_ACTION, IClientRoomState, InitAction,
 } from '..'
-import {ExpNodeType, ExpGraph, expGraphReducer, makeExpGraph} from '.'
+import {ExpGraph, expGraphReducer, makeExpGraph} from '.'
 import {selectExpGraphsState} from './exp-common-redux'
+import {ExpNodeType} from '../../exp-node-infos'
 
 export const expGraphsActions = {
 	add: (graph: ExpGraph) => ({

@@ -4,10 +4,10 @@ import {MenuItem, SubMenu, connectMenu, ContextMenu} from 'react-contextmenu'
 import {Set} from 'immutable'
 import {
 	expPositionActions, makeExpPosition, expNodesActions,
-	makeExpNodeState, ExpNodeState, expNodeTypes,
-	expLocalActions, ExpNodeType, IClientAppState,
+	makeExpNodeState, ExpNodeState,
+	expLocalActions, IClientAppState,
 	selectPresetsForExpNodeTypeSlow, ExpGraph, selectLocalClientId,
-	selectRoomMember, selectGraphPresetsSlow, isGroupInOutNodeType,
+	selectRoomMember, selectGraphPresetsSlow,
 } from '@corgifm/common/redux'
 import {Dispatch} from 'redux'
 import {serverClientId} from '@corgifm/common/common-constants'
@@ -16,6 +16,7 @@ import {logger} from '../client-logger'
 import {expBackgroundMenuId} from '../client-constants'
 import {useBoolean} from '../react-hooks'
 import {TopMenuBar} from './TopMenuBar'
+import {nodeCategoryTree, ExpNodeType} from '@corgifm/common/exp-node-infos'
 
 interface ExpBackgroundMenuProps {
 	trigger: {}
@@ -51,17 +52,25 @@ export const ExpBackgroundMenuItems = React.memo(
 		return (
 			<Fragment>
 				<TopMenuBar label="background menu" />
-				{expNodeTypes
-					.filter(x => !isGroupInOutNodeType(x))
-					.map(nodeType => {
-						return (
-							<AddNodeMenuItem
-								key={nodeType}
-								nodeType={nodeType}
-								position={position}
-							/>
-						)
-					})}
+				{[...nodeCategoryTree.values()]
+					.filter(x => x.hidden !== true)
+					.map(category =>
+						<SubMenu
+							key={category.name}
+							title={<div>{category.name}</div>}
+							hoverDelay={hoverDelayMs}
+						>
+							{[...category.types.values()].map(nodeType => {
+								return (
+									<AddNodeMenuItem
+										key={nodeType}
+										nodeType={nodeType}
+										position={position}
+									/>
+								)
+							})}
+						</SubMenu>
+					)}
 				<AddNodeMenuItem
 					nodeType={'graph'}
 					position={position}
@@ -87,7 +96,11 @@ function AddNodeMenuItem({nodeType, position}: AddNodeMenuItemProps) {
 			const state = store.getState()
 			const localClientId = selectLocalClientId(state)
 			const currentNodeGroupId = selectRoomMember(state.room, localClientId).groupNodeId
-			const newExpNode = makeExpNodeState({type: nodeType, groupId: currentNodeGroupId})
+			let ownerId: Id | undefined = undefined
+			if (nodeType === 'keyboard') {
+				ownerId = localClientId
+			}
+			const newExpNode = makeExpNodeState({type: nodeType, groupId: currentNodeGroupId, ownerId})
 			dispatch(expNodesActions.add(newExpNode))
 			createPosition(dispatch, newExpNode, position, serverClientId)
 		}

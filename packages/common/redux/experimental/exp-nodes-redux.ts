@@ -8,6 +8,7 @@ import {
 	IClientAppState,
 } from '..'
 import {selectExpGraphsState} from './exp-common-redux'
+import {ExpNodeType, GroupExpNodeType} from '../../exp-node-infos'
 
 export type ExpParamValue = string | boolean | number
 
@@ -165,22 +166,6 @@ export interface ExpPortState extends ReturnType<typeof makeExpPortState> {}
 export type ExpPortStates = Immutable.Map<Id, ExpPortState>
 
 export type ExpPortSide = 'input' | 'output'
-
-export type ExpNodeType = typeof expNodeTypes[number]
-
-export const GroupExpNodeType = 'group'
-
-export type GroupType = typeof GroupExpNodeType
-
-export const expNodeTypes = [
-	'oscillator', 'filter', 'dummy', 'audioOutput', 'gain', 'pan', 'envelope',
-	'sequencer', 'constant', 'lowFrequencyOscillator', 'midiConverter', 'keyboard',
-	'distortion', 'manualPolyphonicMidiConverter', 'automaticPolyphonicMidiConverter',
-	GroupExpNodeType, 'groupInput', 'groupOutput',
-	'midiRandom', 'midiPitch', 'oscilloscope', 'polyTest', 'waveShaper', 'midiGate',
-	'midiPulse', 'midiMatch', 'midiMessage', 'sampler', 'betterSequencer',
-	'note', 'basicSynth', 'convolutionReverb'
-] as const
 
 export const groupInOutNodeTypes: ExpNodeType[] = [
 	'groupInput', 'groupOutput',

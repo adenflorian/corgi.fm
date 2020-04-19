@@ -1,6 +1,6 @@
 import {ActionType} from 'typesafe-actions'
 import {Set} from 'immutable'
-import {GroupType} from './experimental'
+import {GroupType} from '../exp-node-infos'
 
 export const expLocalActions = {
 	createGroup: (nodeIds: Set<Id>, groupType: GroupType) => ({

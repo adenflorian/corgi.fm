@@ -8,13 +8,13 @@ import {ParamInputCentering} from '../../common-types'
 import {GroupId} from '../../common-constants'
 import {selectOption, AppOptions} from '../options-redux'
 import {IClientAppState} from '../common-redux-types'
-import {ExpNodeType} from '.'
 import {
 	BROADCASTER_ACTION, IClientRoomState,
 	selectVirtualKeyboardById, SERVER_ACTION, VirtualKeyboardState,
 	selectExpPosition,
 } from '..'
 import {selectExpGraphsState} from './exp-common-redux'
+import {ExpNodeType} from '../../exp-node-infos'
 
 export const expConnectionsActions = {
 	add: (connection: ExpConnection) => ({

@@ -3,11 +3,11 @@ import {combineReducers, Reducer} from 'redux'
 import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
 import {CssColor} from '../../shamu-color'
-import {getExpNodeInfo} from '../../exp-node-infos'
+import {getExpNodeInfo, ExpNodeType} from '../../exp-node-infos'
 import {shamuMetaReducer, ShamuMetaState, makeShamuMetaState} from '../shamu-graph'
 import {IClientAppState} from '../common-redux-types'
 import {
-	BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION, ExpNodeType,
+	BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION,
 } from '..'
 import {selectExpGraphsState} from './exp-common-redux'
 

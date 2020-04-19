@@ -1,4 +1,4 @@
-import {ExpNodeType} from '@corgifm/common/redux'
+import {ExpNodeType} from '@corgifm/common/exp-node-infos'
 import {CorgiNodeConstructor} from '../CorgiNode'
 import {OscillatorExpNode} from './ExpOscillatorNode'
 import {LowFrequencyOscillatorExpNode} from './ExpLowFrequencyOscillatorNode'
