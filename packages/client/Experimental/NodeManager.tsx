@@ -4,9 +4,10 @@ import {ExpNodeState, IExpConnection, ExpGraph,
 	ExpReferenceTargetType, ExpReferenceParamState,
 	ExpMidiPatternsState, ExpMidiPatternViewState,
 	ExpMidiPatternViewsState,
-	ExpKeyboardState,
 	ExpKeyboardStateRaw,
-	ExpKeyboardsState} from '@corgifm/common/redux'
+	ExpKeyboardsState,
+	ExpMidiTimelineClipState,
+	ExpMidiTimelineTrackState} from '@corgifm/common/redux'
 import {ParamInputCentering} from '@corgifm/common/common-types'
 import {NodeToNodeAction} from '@corgifm/common/server-constants'
 import {assertUnreachable} from '@corgifm/common/common-utils'
@@ -20,9 +21,9 @@ import {
 	isPolyphonicConnection,
 } from './ExpConnections'
 import {NumberParamChange, EnumParamChange, StringParamChange,
-	ExpReferenceParamChange,
-	SeqPatternViewContainer,
-	SetParamChange} from './ExpParams'
+	ExpReferenceParamChange, SeqPatternViewContainer,
+	SetParamChange, SeqTimelineClipContainer,
+	SeqTimelineTrackContainer} from './ExpParams'
 import {
 	isAudioOutputPort, isAudioInputPort, ExpPortType,
 	isAudioParamInputPort, ExpPort,
@@ -68,6 +69,8 @@ export class NodeManager {
 	private _tickSubscribers = new Set<NodeTickDelegate>()
 	private readonly _midiPatterns = new Map<Id, CorgiObjectChangedEvent<SeqPattern>>()
 	private readonly _midiPatternViews = new Map<Id, SeqPatternViewContainer>()
+	private readonly _midiTimelineClips = new Map<Id, SeqTimelineClipContainer>()
+	private readonly _midiTimelineTracks = new Map<Id, SeqTimelineTrackContainer>()
 	private readonly _keyboards = new Map<Id, CorgiObjectChangedEvent<ExpKeyboardStateRaw>>()
 
 	public constructor(
@@ -252,6 +255,14 @@ export class NodeManager {
 			case 'midiPatternView': {
 				const foo = this._midiPatternViews.get(id)
 				return foo ? foo.patternView : undefined
+			}
+			case 'midiTimelineClip': {
+				const foo = this._midiTimelineClips.get(id)
+				return foo ? foo.timelineClip : undefined
+			}
+			case 'midiTimelineTrack': {
+				const foo = this._midiTimelineTracks.get(id)
+				return foo ? foo.timelineTrack : undefined
 			}
 			case 'keyboardState': return this._keyboards.get(id)
 			default: throw new Error('hello there')
@@ -570,6 +581,75 @@ export class NodeManager {
 
 	public readonly patternViewDeleted = (id: Id) => {
 		this._midiPatternViews.delete(id)
+		// TODO Somehow notify subscribers
+	}
+
+	public readonly timelineClipUpdated = (updatedTimelineClipState: ExpMidiTimelineClipState) => {
+		const timelineClip = this._midiTimelineClips.get(updatedTimelineClipState.id)
+		if (!timelineClip) {
+			const patternView = this._midiPatternViews.get(updatedTimelineClipState.patternView)
+			if (!patternView) return logger.error('[timelineClipUpdated] 404 pattern view not found!', {timelineClipState: updatedTimelineClipState})
+			this._midiTimelineClips.set(updatedTimelineClipState.id, new SeqTimelineClipContainer(updatedTimelineClipState, patternView))
+		} else {
+			if (updatedTimelineClipState.patternView !== timelineClip.timelineClip.current.patternView.id) {
+				const pattern = this._midiPatternViews.get(updatedTimelineClipState.patternView)
+				if (!pattern) return logger.error('[timelineClipUpdated] 404 pattern view not found!', {timelineClipState: updatedTimelineClipState})
+				timelineClip.changePatternView(pattern)
+			}
+			timelineClip.update(updatedTimelineClipState)
+		}
+	}
+
+	public readonly timelineClipDeleted = (id: Id) => {
+		this._midiTimelineClips.delete(id)
+		// TODO Somehow notify subscribers
+	}
+
+	public readonly timelineTrackUpdated = (updatedTimelineTrackState: ExpMidiTimelineTrackState) => {
+		const timelineTrack = this._midiTimelineTracks.get(updatedTimelineTrackState.id)
+		if (!timelineTrack) {
+			const timelineClips = updatedTimelineTrackState.timelineClipIds.reduce((result, x) => {
+				const clip = this._midiTimelineClips.get(x)
+				if (!clip) {
+					logger.error('[timelineTrackUpdated] 404 clip not found!', {timelineTrackState: updatedTimelineTrackState, x})
+					return result
+				}
+				return result.set(x, clip)
+			}, immutable.Map<Id, SeqTimelineClipContainer>())
+			this._midiTimelineTracks.set(updatedTimelineTrackState.id, new SeqTimelineTrackContainer(updatedTimelineTrackState, timelineClips))
+		} else {
+			timelineTrack.update(updatedTimelineTrackState)
+		}
+	}
+
+	public readonly timelineTrackAddClip = (trackId: Id, newClipId: Id) => {
+		const timelineTrack = this._midiTimelineTracks.get(trackId)
+		if (!timelineTrack) {
+			return logger.error('[timelineTrackAddClip] 404 track not found!', {trackId, newClipId})
+		} else {
+			const clipContainer = this._midiTimelineClips.get(newClipId)
+			if (!clipContainer) {
+				return logger.error('[timelineTrackAddClip] 404 clip not found!', {trackId, newClipId})
+			}
+			timelineTrack.addTimelineClip(clipContainer)
+		}
+	}
+
+	public readonly timelineTrackRemoveClip = (trackId: Id, oldClipId: Id) => {
+		const timelineTrack = this._midiTimelineTracks.get(trackId)
+		if (!timelineTrack) {
+			return logger.error('[timelineTrackRemoveClip] 404 track not found!', {trackId, oldClipId})
+		} else {
+			const clipContainer = this._midiTimelineClips.get(oldClipId)
+			if (!clipContainer) {
+				return logger.error('[timelineTrackRemoveClip] 404 clip not found!', {trackId, oldClipId})
+			}
+			timelineTrack.removeTimelineClip(clipContainer)
+		}
+	}
+
+	public readonly timelineTrackDeleted = (id: Id) => {
+		this._midiTimelineTracks.delete(id)
 		// TODO Somehow notify subscribers
 	}
 

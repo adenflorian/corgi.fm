@@ -4,7 +4,7 @@ import {
 	IClientAppState, ExpNodesAction, ExpConnectionAction,
 	RoomsReduxAction, selectExpConnection,
 	selectExpAllConnections, selectExpNodesState,
-	selectRoomInfoState, ExpPositionAction,
+	ExpPositionAction,
 	ExpGhostConnectorAction, BroadcastAction, LocalAction,
 	expGhostConnectorActions,
 	createLocalActiveExpGhostConnectionSelector, selectExpNode,
@@ -19,15 +19,21 @@ import {
 	ExpNodesState, ExpPositions, ExpConnections,
 	selectShamuMetaState, ExpPosition, WithConnections,
 	shamuMetaActions, makeExpConnectionsState, defaultExpPositionRecord,
-	defaultExpNodeRecord, isGroupInOutNode, GroupType,
-	selectExpConnectionsWithTargetIds,
-	selectExpConnectionsWithSourceIds, selectExpAllPositions,
+	defaultExpNodeRecord, isGroupInOutNode,
 	ActivityAction, ExpMidiPatternsAction, ExpMidiPatternViewsAction,
 	selectExpMidiPattern, selectActivityType, makeExpMidiPatternState,
-	expMidiPatternsActions, selectExpMidiPatternsState, makeExpMidiPatternViewState, expMidiPatternViewsActions, selectExpMidiPatternView, selectExpMidiPatternViewsState, makeExpKeyboardState, expKeyboardsActions, ExpKeyboardsAction, selectExpKeyboardState, selectExpKeyboardKeys,
+	expMidiPatternsActions, selectExpMidiPatternsState, makeExpMidiPatternViewState,
+	expMidiPatternViewsActions, selectExpMidiPatternView, selectExpMidiPatternViewsState,
+	makeExpKeyboardState, expKeyboardsActions, ExpKeyboardsAction,
+	selectExpKeyboardState, selectExpKeyboardKeys, ExpMidiTimelineClipsAction,
+	selectExpMidiTimelineClip, ExpMidiTimelineTracksAction,
+	selectExpMidiTimelineTrack, makeExpMidiTimelineTrackState,
+	expMidiTimelineTracksActions, expMidiTimelineClipsActions,
+	makeExpMidiTimelineClipState,
 } from '@corgifm/common/redux'
-import {serverClientId, GroupId, expBetterSequencerMainPatternParamId, expKeyboardStateParamId} from '@corgifm/common/common-constants'
-import {createNodeId, arrayToESIdKeyMap} from '@corgifm/common/common-utils'
+import {serverClientId, GroupId, expBetterSequencerMainPatternParamId,
+	expKeyboardStateParamId, expMidiTrackMainTrackParamId} from '@corgifm/common/common-constants'
+import {createNodeId} from '@corgifm/common/common-utils'
 import {SingletonContextImpl} from '../SingletonContext'
 import {logger} from '../client-logger'
 import {handleStopDraggingExpGhostConnector} from '../exp-dragging-connections'
@@ -35,12 +41,14 @@ import {mouseFromScreenToBoard, simpleGlobalClientState} from '../SimpleGlobalCl
 import {NodeManager} from './NodeManager'
 import {RoomType} from '@corgifm/common/common-types'
 import {patternA} from '@corgifm/common/default-midi'
+import {GroupType} from '@corgifm/common/exp-node-infos'
 
 type ExpMiddlewareActions = ExpNodesAction | ExpConnectionAction
 	| ExpLocalAction | RoomsReduxAction | ExpPositionAction
 	| ExpGhostConnectorAction | LocalAction | OptionsAction
 	| ExpGraphsAction | ActivityAction | ExpMidiPatternsAction
 	| ExpMidiPatternViewsAction | ExpKeyboardsAction
+	| ExpMidiTimelineClipsAction | ExpMidiTimelineTracksAction
 
 type ExpMiddleware =
 	(singletonContext: SingletonContextImpl) => Middleware<{}, IClientAppState>
@@ -236,6 +244,24 @@ function after(
 
 					dispatch(expNodesActions.referenceParamChange(
 						action.newNode.id, expBetterSequencerMainPatternParamId, {targetId: newPatternView.id, targetType: 'midiPatternView'}))
+				} else if (action.newNode.type === 'midiTrack') {
+					const newPattern = makeExpMidiPatternState(patternA())
+					dispatch(expMidiPatternsActions.add(newPattern))
+
+					const lengthBeats = newPattern.events.map(x => x.startBeat + x.duration).max() || 100
+					const newPatternView = makeExpMidiPatternViewState({pattern: newPattern.id, endBeat: lengthBeats, loopEndBeat: lengthBeats})
+					dispatch(expMidiPatternViewsActions.add(newPatternView))
+
+					const newTimelineClip = makeExpMidiTimelineClipState({patternView: newPatternView.id, beatLength: lengthBeats})
+					dispatch(expMidiTimelineClipsActions.add(newTimelineClip))
+
+					const newTrack = makeExpMidiTimelineTrackState({
+						timelineClipIds: Immutable.Set([newTimelineClip.id])
+					})
+					dispatch(expMidiTimelineTracksActions.add(newTrack))
+
+					dispatch(expNodesActions.referenceParamChange(
+						action.newNode.id, expMidiTrackMainTrackParamId, {targetId: newTrack.id, targetType: 'midiTimelineTrack'}))
 				} else if (action.newNode.type === 'keyboard') {
 					const newKeyboard = makeExpKeyboardState({})
 					dispatch(expKeyboardsActions.add(newKeyboard))
@@ -571,6 +597,26 @@ function bar(
 			return nodeManager.patternViewDeleted(action.id)
 		case 'EXP_MIDI_PATTERN_VIEW_UPDATE':
 			return nodeManager.patternViewUpdated(selectExpMidiPatternView(state.room, action.updatedPattern.id))
+
+		// Midi Timeline Clips
+		case 'EXP_MIDI_TIMELINE_CLIP_ADD':
+			return nodeManager.timelineClipUpdated(selectExpMidiTimelineClip(state.room, action.newClip.id))
+		case 'EXP_MIDI_TIMELINE_CLIP_DELETE':
+			return nodeManager.timelineClipDeleted(action.id)
+		case 'EXP_MIDI_TIMELINE_CLIP_UPDATE':
+			return nodeManager.timelineClipUpdated(selectExpMidiTimelineClip(state.room, action.updatedClip.id))
+
+		// Midi Timeline Tracks
+		case 'EXP_MIDI_TIMELINE_TRACK_ADD':
+			return nodeManager.timelineTrackUpdated(selectExpMidiTimelineTrack(state.room, action.newTrack.id))
+		case 'EXP_MIDI_TIMELINE_TRACK_DELETE':
+			return nodeManager.timelineTrackDeleted(action.id)
+		case 'EXP_MIDI_TIMELINE_TRACK_UPDATE':
+			return nodeManager.timelineTrackUpdated(selectExpMidiTimelineTrack(state.room, action.updatedTrack.id))
+		case 'EXP_MIDI_TIMELINE_TRACK_ADD_CLIP':
+			return nodeManager.timelineTrackAddClip(action.trackId, action.newClip)
+		case 'EXP_MIDI_TIMELINE_TRACK_REMOVE_CLIP':
+			return nodeManager.timelineTrackRemoveClip(action.trackId, action.clipToRemove)
 
 		// Keyboards
 		case 'EXP_MIDI_KEYBOARD_ADD':

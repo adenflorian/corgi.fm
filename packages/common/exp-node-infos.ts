@@ -5,7 +5,7 @@ export const GroupExpNodeType = 'group'
 export type GroupType = typeof GroupExpNodeType
 
 export const expNodeTypes = [
-	'betterSequencer', 'sequencer',
+	'betterSequencer', 'sequencer', 'midiTrack',
 	'oscillator', 'sampler', 'basicSynth',
 	'filter', 'gain', 'pan', 'distortion', 'waveShaper', 'convolutionReverb',
 	'lowFrequencyOscillator', 'envelope', 'constant',
@@ -25,6 +25,11 @@ const defaultExpNodeInfo = {
 type ExpNodeInfo = Readonly<typeof defaultExpNodeInfo>
 
 const expNodeInfos = new Map<ExpNodeType, ExpNodeInfo>()
+
+expNodeInfos.set('midiTrack', {
+	width: 800,
+	height: 240,
+})
 
 expNodeInfos.set('betterSequencer', {
 	width: 800,
@@ -157,7 +162,7 @@ export const nodeCategoryTree: NodeCategoryTree = new Map([
 	['sequencers', {
 		name: 'Sequencers',
 		types: new Set([
-			'betterSequencer', 'sequencer',
+			'betterSequencer', 'sequencer', 'midiTrack',
 		]),
 	}],
 	['instruments', {

@@ -53,6 +53,7 @@ export type GroupId = Id | typeof topGroupId
 
 export const expBetterSequencerMainPatternParamId = 'mainPattern'
 export const expKeyboardStateParamId = 'keyboardState'
+export const expMidiTrackMainTrackParamId = 'mainTrack'
 
 export const expAttackMax = 32
 export const expHoldMax = 32

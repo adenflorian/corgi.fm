@@ -16,8 +16,11 @@ import {LabAudioParam, KelpieAudioNode} from './Nodes/PugAudioNode/Lab'
 import {ExpMidiClip, makeExpMidiClip} from '@corgifm/common/midi-types'
 import {CorgiNode} from './CorgiNode'
 import {nodeToNodeActions} from '@corgifm/common/server-constants'
-import {ExpReferenceParamState, ExpReferenceTargetType, ExpMidiPatternViewState} from '@corgifm/common/redux'
-import {SeqPatternView, SeqPattern} from '@corgifm/common/SeqStuff'
+import {ExpReferenceParamState, ExpReferenceTargetType,
+	ExpMidiPatternViewState, ExpMidiTimelineClipState,
+	ExpMidiTimelineTrackState} from '@corgifm/common/redux'
+import {SeqPatternView, SeqPattern, SeqTimelineClip,
+	SeqTimelineClips, SeqTimelineTrack} from '@corgifm/common/SeqStuff'
 
 export interface ExpParam {
 	readonly id: Id
@@ -285,5 +288,91 @@ export class SeqPatternViewContainer {
 
 	public readonly dispose = () => {
 		this._pattern.unsubscribe(this._onPatternUpdated)
+	}
+}
+
+export class SeqTimelineClipContainer {
+	public readonly timelineClip: CorgiObjectChangedEvent<SeqTimelineClip>
+
+	constructor(
+		timelineClipState: ExpMidiTimelineClipState,
+		private _patternView: SeqPatternViewContainer,
+	) {
+		this.timelineClip = new CorgiObjectChangedEvent({
+			...timelineClipState.toJS() as SeqTimelineClip,
+			patternView: this._patternView.patternView.current,
+		} as SeqTimelineClip)
+		this._patternView.patternView.subscribe(this._onPatternUpdated)
+	}
+
+	public readonly changePatternView = (newPatternView: SeqPatternViewContainer) => {
+		this._patternView.patternView.unsubscribe(this._onPatternUpdated)
+		this._patternView = newPatternView
+		this._patternView.patternView.subscribe(this._onPatternUpdated)
+	}
+
+	public readonly update = (updatedClip: ExpMidiTimelineClipState) => {
+		this.timelineClip.invokeImmediately({
+			...updatedClip.toJS(),
+			patternView: this.timelineClip.current.patternView,
+		})
+	}
+
+	private readonly _onPatternUpdated = (updatedPatternView: SeqPatternView) => {
+		this.timelineClip.invokeImmediately({
+			...this.timelineClip.current,
+			patternView: updatedPatternView,
+		})
+	}
+
+	public readonly dispose = () => {
+		this._patternView.patternView.unsubscribe(this._onPatternUpdated)
+	}
+}
+
+export class SeqTimelineTrackContainer {
+	public readonly timelineTrack: CorgiObjectChangedEvent<SeqTimelineTrack>
+
+	constructor(
+		timelineTrackState: ExpMidiTimelineTrackState,
+		private _timelineClips: Immutable.Map<Id, SeqTimelineClipContainer>,
+	) {
+		this.timelineTrack = new CorgiObjectChangedEvent({
+			...timelineTrackState.toJS(),
+			timelineClips: this._timelineClips.map(x => x.timelineClip.current) as SeqTimelineClips,
+		} as SeqTimelineTrack)
+		this._timelineClips.forEach(x => x.timelineClip.subscribe(this._onClipUpdated))
+	}
+
+	public readonly addTimelineClip = (newClip: SeqTimelineClipContainer) => {
+		const oldClip = this._timelineClips.get(newClip.timelineClip.current.id, null)
+		if (oldClip) {
+			oldClip.timelineClip.unsubscribe(this._onClipUpdated)
+		}
+		this._timelineClips = this._timelineClips.set(newClip.timelineClip.current.id, newClip)
+		newClip.timelineClip.subscribe(this._onClipUpdated)
+	}
+
+	public readonly removeTimelineClip = (oldClip: SeqTimelineClipContainer) => {
+		oldClip.timelineClip.unsubscribe(this._onClipUpdated)
+		this._timelineClips = this._timelineClips.delete(oldClip.timelineClip.current.id)
+	}
+
+	public readonly update = (updatedTrack: ExpMidiTimelineTrackState) => {
+		this.timelineTrack.invokeImmediately({
+			...updatedTrack.toJS(),
+			timelineClips: this.timelineTrack.current.timelineClips,
+		})
+	}
+
+	private readonly _onClipUpdated = (updatedClip: SeqTimelineClip) => {
+		this.timelineTrack.invokeImmediately({
+			...this.timelineTrack.current,
+			timelineClips: this.timelineTrack.current.timelineClips.set(updatedClip.id, updatedClip),
+		})
+	}
+
+	public readonly dispose = () => {
+		this._timelineClips.forEach(x => x.timelineClip.unsubscribe(this._onClipUpdated))
 	}
 }

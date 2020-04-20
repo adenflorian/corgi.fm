@@ -73,7 +73,7 @@ export class OscillatorExpHound {
 		this.detuneParam = new ExpAudioParam('fine', this.oscillator.detune, 0, 100, 'bipolar', {valueString: detuneValueToString})
 		this.unisonDetuneParam = new ExpAudioParam('detune', this.oscillator.unisonDetune, 0, 1, 'unipolar', {valueString: percentageValueString})
 
-		this.unisonCount = new ExpCustomNumberParam('unison', 1, 1, 16, 1, val => Math.round(val).toString()) // 0.0005
+		this.unisonCount = new ExpCustomNumberParam('unison', 1, 1, 16, {valueString: val => Math.round(val).toString()}) // 0.0005
 
 		this.unisonCount.onChange.subscribe(this._onUnisonCountChange)
 	}

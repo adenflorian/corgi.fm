@@ -189,6 +189,7 @@ export interface ExpReferenceParamState {
 }
 
 export type ExpReferenceTargetType = 'midiPattern' | 'midiPatternView' | 'keyboardState'
+	| 'midiTimelineTrack' | 'midiTimelineClip'
 
 const initialState = Immutable.Map<Id, ExpNodeState>()
 

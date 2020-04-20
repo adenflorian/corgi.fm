@@ -178,13 +178,43 @@ export interface SeqTimelineClip {
 	readonly name: string
 }
 
+export type SeqTimelineClips = Immutable.Map<Id, SeqTimelineClip>
+
+export function seqTimelineClipReader(range: MidiRange, clip: SeqTimelineClip, loops = 0): readonly SeqReadEvent[] {
+	return seqPatternViewReader(range, clip.patternView)
+}
+
 export interface SeqTimelineTrack {
 	readonly id: Id
-	readonly timelineClipIds: Immutable.Set<Id>
+	readonly timelineClips: SeqTimelineClips
 	readonly active: boolean
 	readonly solo: boolean
 	readonly armed: boolean
 	readonly name: string
+	readonly loopStartBeat: number
+	readonly loopEndBeat: number
+}
+
+export function makeSeqTimelineTrack(): SeqTimelineTrack {
+	return {
+		id: uuid.v4(),
+		loopStartBeat: 0,
+		loopEndBeat: 4,
+		name: 'defaultTimelineTrack',
+		active: true,
+		armed: true,
+		solo: false,
+		timelineClips: Immutable.Map(),
+	}
+}
+
+export function seqTimelineTrackReader(range: MidiRange, track: SeqTimelineTrack, loops = 0): readonly SeqReadEvent[] {
+	const firstClip = track.timelineClips.first(null)
+	if (firstClip) {
+		return seqTimelineClipReader(range, firstClip)
+	} else {
+		return []
+	}
 }
 
 export interface SeqTimelineArrangement {
