@@ -41,7 +41,7 @@ export class ExpMidiTrackNode extends CorgiNode {
 	private _currentClipPositionBeats = 0
 	public get currentClipPositionBeats() {return this._currentClipPositionBeats}
 	private readonly _midiTimelineTrackParam: ExpReferenceParam<SeqTimelineTrack>
-	public get midiPatternParam() {return this._midiTimelineTrackParam as ExpReferenceParamReadonly<SeqTimelineTrack>}
+	public get midiTimelineTrackParam() {return this._midiTimelineTrackParam as ExpReferenceParamReadonly<SeqTimelineTrack>}
 
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
 		super(corgiNodeArgs, {name: 'Midi Track', color: CssColor.yellow})

@@ -193,3 +193,5 @@ export const limiterRenderSystemConstants = {
 } as const
 
 export const pitchKnobSensitivity = 0.1
+
+export const mainBorderRadius = 8
