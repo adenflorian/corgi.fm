@@ -14,8 +14,7 @@ export function getExpMidiTrackNodeView() {
 	return <ExpMidiTrackNodeView />
 }
 
-interface Props {
-}
+interface Props {}
 
 const offsetY = 232
 const controlsWidth = 200
@@ -26,6 +25,9 @@ export const ExpMidiTrackNodeView = hot(module)(React.memo(function _ExpMidiTrac
 	const position = useExpPosition(nodeContext.id)
 	// const track = useObjectChangedEvent(nodeContext.midiTimelineTrackParam.value)
 	const componentHeight = position.height - offsetY
+
+	const editorWidth = position.width - controlsWidth
+	const editorHeight = componentHeight
 
 	return (
 		<div
@@ -52,13 +54,13 @@ export const ExpMidiTrackNodeView = hot(module)(React.memo(function _ExpMidiTrac
 			<div
 				className="editor"
 				style={{
-					width: '100%',
-					height: '100%',
+					width: editorWidth,
+					height: editorHeight,
 					backgroundColor: CssColor.panelGrayDark,
 					borderBottomRightRadius: mainBorderRadius,
 				}}
 			>
-				<MidiTrackViewEditor />
+				<MidiTrackViewEditor {...{width: editorWidth, height: editorHeight}}/>
 			</div>
 		</div>
 	)

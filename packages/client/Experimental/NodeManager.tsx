@@ -7,7 +7,9 @@ import {ExpNodeState, IExpConnection, ExpGraph,
 	ExpKeyboardStateRaw,
 	ExpKeyboardsState,
 	ExpMidiTimelineClipState,
-	ExpMidiTimelineTrackState} from '@corgifm/common/redux'
+	ExpMidiTimelineTrackState,
+	ExpMidiTimelineClipsState,
+	ExpMidiTimelineTracksState} from '@corgifm/common/redux'
 import {ParamInputCentering} from '@corgifm/common/common-types'
 import {NodeToNodeAction} from '@corgifm/common/server-constants'
 import {assertUnreachable} from '@corgifm/common/common-utils'
@@ -273,10 +275,14 @@ export class NodeManager {
 		mainGraph: ExpGraph,
 		patterns: ExpMidiPatternsState,
 		patternViews: ExpMidiPatternViewsState,
+		timelineClips: ExpMidiTimelineClipsState,
+		timelineTracks: ExpMidiTimelineTracksState,
 		keyboards: ExpKeyboardsState,
 	) => {
 		patterns.forEach(this.patternUpdated)
 		patternViews.forEach(this.patternViewUpdated)
+		timelineClips.forEach(this.timelineClipUpdated)
+		timelineTracks.forEach(this.timelineTrackUpdated)
 		keyboards.forEach(this.keyboardUpdated)
 		this.addNodes(mainGraph.nodes)
 		this.addConnections(mainGraph.connections.connections)

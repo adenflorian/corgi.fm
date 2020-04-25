@@ -30,6 +30,8 @@ import {
 	selectExpMidiTimelineTrack, makeExpMidiTimelineTrackState,
 	expMidiTimelineTracksActions, expMidiTimelineClipsActions,
 	makeExpMidiTimelineClipState,
+	selectExpMidiTimelineClipsState,
+	selectExpMidiTimelineTracksState,
 } from '@corgifm/common/redux'
 import {serverClientId, GroupId, expBetterSequencerMainPatternParamId,
 	expKeyboardStateParamId, expMidiTrackMainTrackParamId} from '@corgifm/common/common-constants'
@@ -522,6 +524,8 @@ function bar(
 					selectMainExpGraph(state.room),
 					selectExpMidiPatternsState(state.room),
 					selectExpMidiPatternViewsState(state.room),
+					selectExpMidiTimelineClipsState(state.room),
+					selectExpMidiTimelineTracksState(state.room),
 					selectExpKeyboardState(state.room),
 				)
 			} else {

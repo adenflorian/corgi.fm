@@ -28,12 +28,12 @@ export class ExpMidiTrackNode extends CorgiNode {
 	public get rate() {return this._rate as ExpCustomNumberParamReadonly}
 	private readonly _zoomX: ExpCustomNumberParam
 	public get zoomX() {return this._zoomX as ExpCustomNumberParamReadonly}
-	private readonly _zoomY: ExpCustomNumberParam
-	public get zoomY() {return this._zoomY as ExpCustomNumberParamReadonly}
+	// private readonly _zoomY: ExpCustomNumberParam
+	// public get zoomY() {return this._zoomY as ExpCustomNumberParamReadonly}
 	private readonly _panX: ExpCustomNumberParam
 	public get panX() {return this._panX as ExpCustomNumberParamReadonly}
-	private readonly _panY: ExpCustomNumberParam
-	public get panY() {return this._panY as ExpCustomNumberParamReadonly}
+	// private readonly _panY: ExpCustomNumberParam
+	// public get panY() {return this._panY as ExpCustomNumberParamReadonly}
 	private readonly _midiOutputPort: ExpMidiOutputPort
 	private _songStartTimeSeconds = -1
 	private _cursorBeats = 0
@@ -55,11 +55,11 @@ export class ExpMidiTrackNode extends CorgiNode {
 
 		this._tempo = new ExpCustomNumberParam('tempo', 240, 0.001, 999.99, {curve: 3})
 		this._rate = new ExpCustomNumberParam('rate', 1, 0.001, 4)
-		this._zoomX = new ExpCustomNumberParam('zoomX', 1, minZoomX, maxZoomX, {hideFromDebugView: true})
-		this._zoomY = new ExpCustomNumberParam('zoomY', 6, minZoomY, maxZoomY, {hideFromDebugView: true})
-		this._panX = new ExpCustomNumberParam('panX', 1, minPan, maxPan, {hideFromDebugView: true})
-		this._panY = new ExpCustomNumberParam('panY', 0.6, minPan, maxPan, {hideFromDebugView: true})
-		this._customNumberParams = arrayToESIdKeyMap([this._tempo, this._rate, this._zoomX, this._zoomY, this._panX, this._panY])
+		this._zoomX = new ExpCustomNumberParam('zoomX', 1, minZoomX, maxZoomX, {hideFromDebugView: false})
+		// this._zoomY = new ExpCustomNumberParam('zoomY', 6, minZoomY, maxZoomY, {hideFromDebugView: false})
+		this._panX = new ExpCustomNumberParam('panX', 1, minPan, maxPan, {hideFromDebugView: false})
+		// this._panY = new ExpCustomNumberParam('panY', 0.6, minPan, maxPan, {hideFromDebugView: false})
+		this._customNumberParams = arrayToESIdKeyMap([this._tempo, this._rate, this._zoomX, /*this._zoomY, */this._panX, /*this._panY*/])
 
 		this._restartButton = new ExpButton('restart', this)
 		this._buttons = arrayToESIdKeyMap([this._restartButton])
