@@ -1,4 +1,4 @@
-import React, {useState, useCallback} from 'react'
+import React, {useState, useCallback, useMemo} from 'react'
 import * as Immutable from 'immutable'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {useNodeContext} from '../../CorgiNode'
@@ -10,6 +10,8 @@ interface Props {
 	readonly height: number
 	readonly width: number
 }
+
+const minLengthBeats = 128
 
 export const MidiTrackViewEditor = ({
 	width, height,
@@ -27,7 +29,22 @@ export const MidiTrackViewEditor = ({
 	const panX = useNumberChangedEvent(nodeContext.panX.onChange)
 	// const panY = useNumberChangedEvent(nodeContext.panY.onChange)
 
-	// const lengthBeats = expMidiPatternView.loopEndBeat
+	const minScaledHeight = 400
+	const minScaledWidth = 800
+
+	const scaledWidth = Math.max(minScaledWidth * zoomX, minScaledWidth, visibleWidth)
+
+	// const maxPanY = Math.max(scaledHeight - visibleHeight, 0)
+	const maxPanX = Math.max(scaledWidth - visibleWidth, 0)
+	const panPixelsX = panX * maxPanX
+
+	const lengthBeats = useMemo(() => {
+		return Math.max(track.timelineClips.map(x => x.startBeat + x.beatLength).toList().max() || 0, minLengthBeats)
+	}, [track.timelineClips])
+
+	const columnWidth = scaledWidth / lengthBeats
+
+	// console.log({columnWidth, scaledWidth, lengthBeats})
 
 	const [selected, setSelected] = useState(Immutable.Set<Id>())
 	const [originalSelected, setOriginalSelected] = useState(Immutable.Set<Id>())
@@ -50,16 +67,16 @@ export const MidiTrackViewEditor = ({
 				miniMap
 			</div>
 			<div
-				className="clipZone"
+				className="midiTrackClipZone"
 				style={{
 					height: clipZoneHeight,
 					width: visibleWidth,
-					padding: '8px 0px 8px 0px',
-					boxSizing: 'border-box',
+					overflow: 'hidden',
+					position: 'relative',
 					// backgroundColor: CssColor.panelGrayTransparent,
 				}}
 			>
-				<MidiTrackClipZone />
+				<MidiTrackClipZone {...{columnWidth, panPixelsX, clipZoneHeight}} />
 			</div>
 			<div
 				className="bottomMarkers"

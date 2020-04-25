@@ -3,22 +3,27 @@ import {SeqTimelineClip} from '@corgifm/common/SeqStuff'
 import {CssColor} from '@corgifm/common/shamu-color'
 
 interface Props {
-	clip: SeqTimelineClip
+	readonly clip: SeqTimelineClip
+	readonly columnWidth: number
+	readonly panPixelsX: number
 }
 
-export const MidiTrackClipView = ({clip}: Props) => {
+export const MidiTrackClipView = ({
+	clip, columnWidth, panPixelsX,
+}: Props) => {
 	return (
 		<div
 			className="midiTrackClipViewInner"
 			style={{
 				height: '100%',
 				backgroundColor: 'currentcolor',
-				width: 200,
+				width: clip.beatLength * columnWidth,
 				borderRadius: 8,
 				fontWeight: 600,
-				marginLeft: 16,
+				marginLeft: (clip.startBeat * columnWidth) - panPixelsX,
 				display: 'flex',
 				flexDirection: 'column',
+				position: 'absolute',
 			}}
 		>
 			<div className="clipName" style={{color: CssColor.panelGrayDark, padding: 4, height: 16}}>{clip.name} clip</div>
