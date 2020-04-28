@@ -254,7 +254,7 @@ function after(
 					const newPatternView = makeExpMidiPatternViewState({pattern: newPattern.id, endBeat: lengthBeats, loopEndBeat: lengthBeats})
 					dispatch(expMidiPatternViewsActions.add(newPatternView))
 
-					const newTimelineClip = makeExpMidiTimelineClipState({patternView: newPatternView.id, beatLength: lengthBeats})
+					const newTimelineClip = makeExpMidiTimelineClipState({patternView: newPatternView.id, beatLength: lengthBeats, startBeat: 4})
 					dispatch(expMidiTimelineClipsActions.add(newTimelineClip))
 
 					const newTrack = makeExpMidiTimelineTrackState({

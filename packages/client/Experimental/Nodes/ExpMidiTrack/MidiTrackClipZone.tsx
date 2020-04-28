@@ -26,7 +26,7 @@ export const MidiTrackClipZone = ({
 		const linesArray = new Array(count).fill(0)
 			.map((_, i) => (i * columnWidth) - panPixelsX)
 		return linesArray.reduce((result, x) => result + `M ${x} 0 L ${x} ${clipZoneHeight}`, '')
-	}, [columnWidth, panPixelsX])
+	}, [columnWidth, panPixelsX, clipZoneHeight])
 
 	return (
 		<>

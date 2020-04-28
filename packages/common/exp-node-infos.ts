@@ -28,7 +28,7 @@ const expNodeInfos = new Map<ExpNodeType, ExpNodeInfo>()
 
 expNodeInfos.set('midiTrack', {
 	width: 800,
-	height: 240,
+	height: 480,
 })
 
 expNodeInfos.set('betterSequencer', {
