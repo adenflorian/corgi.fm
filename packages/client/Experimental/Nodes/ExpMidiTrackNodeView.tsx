@@ -9,15 +9,13 @@ import {clamp} from '@corgifm/common/common-utils'
 import {mainBorderRadius} from '../../client-constants'
 import {MidiTrackViewControls} from './ExpMidiTrack/MidiTrackViewControls'
 import {MidiTrackViewEditor} from './ExpMidiTrack/MidiTrackViewEditor'
+import {offsetY, controlsWidth} from './ExpMidiTrack/MidiTrackConstants'
 
 export function getExpMidiTrackNodeView() {
 	return <ExpMidiTrackNodeView />
 }
 
 interface Props {}
-
-const offsetY = 232
-const controlsWidth = 200
 
 export const ExpMidiTrackNodeView = hot(module)(React.memo(function _ExpMidiTrackNodeView({
 }: Props) {

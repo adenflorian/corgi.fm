@@ -606,6 +606,10 @@ export class NodeManager {
 		}
 	}
 
+	public readonly timelineClipsUpdated = (updatedTimelineClipStates: ExpMidiTimelineClipsState) => {
+		updatedTimelineClipStates.forEach(this.timelineClipUpdated)
+	}
+
 	public readonly timelineClipDeleted = (id: Id) => {
 		this._midiTimelineClips.delete(id)
 		// TODO Somehow notify subscribers

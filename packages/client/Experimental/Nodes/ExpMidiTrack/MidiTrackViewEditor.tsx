@@ -5,6 +5,7 @@ import {useNodeContext} from '../../CorgiNode'
 import {ExpMidiTrackNode} from '../ExpMidiTrackNode'
 import {useObjectChangedEvent, useNumberChangedEvent} from '../../hooks/useCorgiEvent'
 import {MidiTrackClipZone} from './MidiTrackClipZone'
+import {minimapHeight, bottomMarkersHeight} from './MidiTrackConstants'
 
 interface Props {
 	readonly height: number
@@ -46,12 +47,6 @@ export const MidiTrackViewEditor = ({
 
 	// console.log({columnWidth, scaledWidth, lengthBeats})
 
-	const [selected, setSelected] = useState(Immutable.Set<Id>())
-	const [originalSelected, setOriginalSelected] = useState(Immutable.Set<Id>())
-	const clearSelected = useCallback(() => setSelected(Immutable.Set()), [])
-
-	const minimapHeight = 24
-	const bottomMarkersHeight = 16
 	const clipZoneHeight = Math.max(height - minimapHeight - bottomMarkersHeight, 64)
 
 	return (

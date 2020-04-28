@@ -5,6 +5,7 @@ import {
 	BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION,
 } from '..'
 import {selectExpProjectState} from '.'
+import {SeqTimelineClip} from '../../SeqStuff'
 
 export const expMidiTimelineClipsActions = {
 	add: (newClip: ExpMidiTimelineClipState) => ({
@@ -28,6 +29,13 @@ export const expMidiTimelineClipsActions = {
 		BROADCASTER_ACTION,
 		SERVER_ACTION,
 	} as const),
+	updateMany: (updatedClips: ExpMidiTimelineClipsState) => ({
+		type: 'EXP_MIDI_TIMELINE_CLIP_UPDATE_CLIPS' as const,
+		isExpMidiTimelineClipAction: true,
+		updatedClips,
+		BROADCASTER_ACTION,
+		SERVER_ACTION,
+	} as const),
 } as const
 
 export type ExpMidiTimelineClipsAction = ActionType<typeof expMidiTimelineClipsActions>
@@ -35,7 +43,7 @@ export type ExpMidiTimelineClipsAction = ActionType<typeof expMidiTimelineClipsA
 const defaultExpMidiTimelineClipState = {
 	id: 'dummyId' as Id,
 	name: 'dummyName' as string,
-	active: true as false,
+	active: true as boolean,
 	startBeat: 0 as number,
 	beatLength: 4 as number,
 	patternView: 'dummyPatternViewId' as Id,
@@ -50,6 +58,13 @@ export function makeExpMidiTimelineClipState(
 ): ExpMidiTimelineClipState {
 	return _makeExpMidiTimelineClipState(clip)
 		.set('id', clip.id || uuid.v4())
+}
+
+export function seqTimelineClipToState(clip: SeqTimelineClip): ExpMidiTimelineClipState {
+	return makeExpMidiTimelineClipState({
+		...clip,
+		patternView: clip.patternView.id,
+	})
 }
 
 export interface ExpMidiTimelineClipState extends ReturnType<typeof _makeExpMidiTimelineClipState> {}
@@ -67,6 +82,8 @@ export const expMidiTimelineClipsReducer =
 				return state.set(action.newClip.id, makeExpMidiTimelineClipState(action.newClip))
 			case 'EXP_MIDI_TIMELINE_CLIP_UPDATE':
 				return state.update(action.updatedClip.id, x => x.merge(action.updatedClip))
+			case 'EXP_MIDI_TIMELINE_CLIP_UPDATE_CLIPS':
+				return state.merge(Map(action.updatedClips).map(makeExpMidiTimelineClipState))
 			case 'EXP_MIDI_TIMELINE_CLIP_DELETE':
 				return state.delete(action.id)
 			default: return state

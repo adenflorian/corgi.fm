@@ -54,8 +54,6 @@ export function duplicateNoteEvent(event: SeqNoteEvent): SeqNoteEvent {
 
 export type SeqEvents = Immutable.Map<Id, SeqEvent>
 
-
-
 export function SeqEvents(): SeqEvents {
 	return Immutable.Map<Id, SeqEvent>()
 }
@@ -179,6 +177,10 @@ export interface SeqTimelineClip {
 }
 
 export type SeqTimelineClips = Immutable.Map<Id, SeqTimelineClip>
+
+export function SeqTimelineClips(): SeqTimelineClips {
+	return Immutable.Map<Id, SeqTimelineClip>()
+}
 
 export function seqTimelineClipReader(range: MidiRange, clip: SeqTimelineClip, loops = 0): readonly SeqReadEvent[] {
 	return seqPatternViewReader(range, clip.patternView)

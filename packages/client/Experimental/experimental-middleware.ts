@@ -609,6 +609,8 @@ function bar(
 			return nodeManager.timelineClipDeleted(action.id)
 		case 'EXP_MIDI_TIMELINE_CLIP_UPDATE':
 			return nodeManager.timelineClipUpdated(selectExpMidiTimelineClip(state.room, action.updatedClip.id))
+		case 'EXP_MIDI_TIMELINE_CLIP_UPDATE_CLIPS':
+			return nodeManager.timelineClipsUpdated(action.updatedClips)
 
 		// Midi Timeline Tracks
 		case 'EXP_MIDI_TIMELINE_TRACK_ADD':
