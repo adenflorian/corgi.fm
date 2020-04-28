@@ -11,6 +11,8 @@ import {expMidiTimelineClipsActions, seqTimelineClipToState} from '@corgifm/comm
 import {SeqTimelineClips} from '@corgifm/common/SeqStuff'
 import {movementXToBeats} from './MidiTrackHelpers'
 import {maxClipStartBeat, smallestClipLength} from './MidiTrackConstants'
+import {sumPoints} from '@corgifm/common/common-utils'
+import {logger} from '../../../client-logger'
 
 interface Props {
 	readonly columnWidth: number
@@ -48,25 +50,25 @@ export const MidiTrackClipZone = ({
 		setNoteResizeActive(false)
 	}, [])
 
-	const startNoteMoving = useCallback((clientY: number) => {
+	const startNoteMoving = useCallback(() => {
 		setFirstMouseMove(false)
 		setNoteMoveActive(true)
 	}, [])
 
-	// const stopNoteMoving = useCallback(() => {
-	// 	setNoteMoveActive(false)
-	// 	removeDuplicateEvents()
-	// }, [removeDuplicateEvents])
+	const stopNoteMoving = useCallback(() => {
+		setNoteMoveActive(false)
+		// removeDuplicateEvents()
+	}, [/*removeDuplicateEvents*/])
 
-	const startNoteCloning = useCallback((clientY: number) => {
+	const startNoteCloning = useCallback(() => {
 		setFirstMouseMove(false)
 		setNoteCloneActive(true)
 	}, [])
 
-	// const stopNoteCloning = useCallback(() => {
-	// 	setNoteCloneActive(false)
-	// 	removeDuplicateEvents()
-	// }, [removeDuplicateEvents])
+	const stopNoteCloning = useCallback(() => {
+		setNoteCloneActive(false)
+		// removeDuplicateEvents()
+	}, [/*removeDuplicateEvents*/])
 
 	const onNoteSelect = useCallback(
 		(eventId: Id, select: boolean, clear: boolean) => {
@@ -108,10 +110,9 @@ export const MidiTrackClipZone = ({
 		// } else 
 		if (direction !== 'center') {
 			startClipResizing(direction)
-		} 
-		// else {
-		// 	startNoteMoving(e.clientY)
-		// }
+		} else {
+			startNoteMoving()
+		}
 	}, [dispatch, startNoteCloning, startNoteMoving, startClipResizing])
 
 	const resizeClips = useCallback(({movementX, altKey}: MouseEvent) => {
@@ -134,22 +135,66 @@ export const MidiTrackClipZone = ({
 			}
 		})
 
-		dispatch(expMidiTimelineClipsActions.updateMany(updatedClips.map(x => seqTimelineClipToState(x))))
+		dispatch(expMidiTimelineClipsActions.updateMany(updatedClips.map(seqTimelineClipToState)))
 		setPersistentDelta(newPersistentDelta)
 	}, [noteResizeActive, persistentDelta.x, columnWidth, startClips, dispatch, maxClipStartBeat])
+
+	const moveClipsHorizontally = useCallback((direction: 1 | -1, alt: boolean) => {
+		dispatch(expMidiTimelineClipsActions.updateMany(selected.reduce((clips, clipId) => {
+			const originalClip = nodeContext.midiTimelineTrackParam.value.current.timelineClips.get(clipId, null)
+
+			if (originalClip === null) {
+				logger.warn('MidiTrackClipZone [moveClipsHorizontally] originalEvent === null')
+				return clips
+			}
+
+			const delta = (alt ? smallestClipLength : 1) * direction
+
+			return clips.set(clipId, {
+				...originalClip,
+				startBeat: Math.max(0, Math.min(maxClipStartBeat, originalClip.startBeat + delta)),
+			})
+		}, SeqTimelineClips()).map(seqTimelineClipToState)))
+	}, [dispatch, selected])
+
+	const moveNotes = useCallback(({movementX, clientY, altKey}: MouseEvent) => {
+		if (!noteMoveActive) return
+
+		if (!firstMouseMove) {
+			setFirstMouseMove(true)
+			return
+		}
+
+		const newPersistentDelta = sumPoints(persistentDelta, {x: movementX, y: 0})
+		const beatDelta = movementXToBeats(newPersistentDelta.x, columnWidth)
+		const roundedBeatDelta = altKey
+			? beatDelta
+			: Math.round(beatDelta)
+
+		const updatedClips = startClips.map(clip => {
+			return {
+				...clip,
+				startBeat: Math.max(0, Math.min(maxClipStartBeat, clip.startBeat + roundedBeatDelta)),
+			}
+		})
+
+		dispatch(expMidiTimelineClipsActions.updateMany(updatedClips.map(x => seqTimelineClipToState(x))))
+		setPersistentDelta(newPersistentDelta)
+	}, [noteMoveActive, firstMouseMove, persistentDelta, columnWidth,
+		startMouseNote, startClips, dispatch])
 
 	// Note mouse resize
 	useLayoutEffect(() => {
 		const stopActive = () => {
 			if (noteResizeActive) return stopClipResizing()
-			// if (noteMoveActive) return stopNoteMoving()
+			if (noteMoveActive) return stopNoteMoving()
 			// if (noteCloneActive) return stopNoteCloning()
 		}
 
 		const onMouseMove = (e: MouseEvent) => {
 			if (e.buttons !== 1) return stopActive()
 			if (noteResizeActive) return resizeClips(e)
-			// if (noteMoveActive) return moveNotes(e)
+			if (noteMoveActive) return moveNotes(e)
 			// if (noteCloneActive) return cloneNotes(e)
 		}
 
@@ -170,7 +215,7 @@ export const MidiTrackClipZone = ({
 			window.removeEventListener('mouseup', onMouseUp)
 		}
 	}, [resizeClips, noteMoveActive, noteResizeActive, /*stopNoteMoving,*/
-		stopClipResizing, /*moveNotes, */persistentDelta, /*onNoteSelect,*/
+		stopClipResizing, moveNotes, persistentDelta, /*onNoteSelect,*/
 		clickedEvent, /*stopNoteCloning, */noteCloneActive/*, cloneNotes*/])
 
 	return (
