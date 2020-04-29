@@ -6,6 +6,7 @@ import {ExpMidiTrackNode} from '../ExpMidiTrackNode'
 import {useObjectChangedEvent, useNumberChangedEvent} from '../../hooks/useCorgiEvent'
 import {MidiTrackClipZone} from './MidiTrackClipZone'
 import {minimapHeight, bottomMarkersHeight} from './MidiTrackConstants'
+import {MidiTrackMiniMap} from './MidiTrackMiniMap'
 
 interface Props {
 	readonly height: number
@@ -51,16 +52,7 @@ export const MidiTrackViewEditor = ({
 
 	return (
 		<div className="midiTrackViewEditorInner">
-			<div
-				className="miniMap"
-				style={{
-					height: minimapHeight,
-					width: visibleWidth,
-					backgroundColor: CssColor.panelGrayTransparent,
-				}}
-			>
-				miniMap
-			</div>
+			<MidiTrackMiniMap {...{minimapHeight, visibleWidth, columnWidth, panPixelsX}} />
 			<MidiTrackClipZone {...{columnWidth, panPixelsX, clipZoneHeight, visibleWidth}} />
 			<div
 				className="bottomMarkers"
