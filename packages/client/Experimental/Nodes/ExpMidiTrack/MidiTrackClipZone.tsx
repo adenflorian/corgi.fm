@@ -18,10 +18,11 @@ interface Props {
 	readonly columnWidth: number
 	readonly panPixelsX: number
 	readonly clipZoneHeight: number
+	readonly visibleWidth: number
 }
 
 export const MidiTrackClipZone = ({
-	columnWidth, panPixelsX, clipZoneHeight,
+	columnWidth, panPixelsX, clipZoneHeight, visibleWidth,
 }: Props) => {
 	const nodeContext = useNodeContext() as ExpMidiTrackNode
 	const track = useObjectChangedEvent(nodeContext.midiTimelineTrackParam.value)
@@ -220,7 +221,7 @@ export const MidiTrackClipZone = ({
 
 	return (
 		<div className={`moving-${noteMoveActive}`} style={{height: '100%'}}>
-			<MidiTrackClipZoneLines {...{clipZoneHeight, panPixelsX, columnWidth}} />
+			<MidiTrackClipZoneLines {...{clipZoneHeight, panPixelsX, columnWidth, visibleWidth}} />
 			<div
 				className="midiTrackClipZoneInner"
 				style={{

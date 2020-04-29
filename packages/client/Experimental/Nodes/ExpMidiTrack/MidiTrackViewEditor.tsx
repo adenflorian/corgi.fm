@@ -71,7 +71,7 @@ export const MidiTrackViewEditor = ({
 					// backgroundColor: CssColor.panelGrayTransparent,
 				}}
 			>
-				<MidiTrackClipZone {...{columnWidth, panPixelsX, clipZoneHeight}} />
+				<MidiTrackClipZone {...{columnWidth, panPixelsX, clipZoneHeight, visibleWidth}} />
 			</div>
 			<div
 				className="bottomMarkers"
