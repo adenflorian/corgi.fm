@@ -11,6 +11,7 @@ interface Props {
 	readonly panPixelsX: number
 	readonly handleMouseDown: (e: MouseEvent, direction: 'left' | 'right' | 'center', clipId: Id) => void
 	readonly clipZoneHeight: number
+	readonly isSelected: boolean
 }
 
 const clipHeaderHeight = 24
@@ -18,7 +19,8 @@ const clipHeaderHeight = 24
 const borderRadius = 3
 
 export const MidiTrackClipView = ({
-	clip, columnWidth, panPixelsX, handleMouseDown, clipZoneHeight,
+	clip, columnWidth, panPixelsX, handleMouseDown,
+	clipZoneHeight, isSelected,
 }: Props) => {
 	const startPixel = (clip.startBeat * columnWidth)
 	const clipWidth = clip.beatLength * columnWidth
@@ -39,7 +41,8 @@ export const MidiTrackClipView = ({
 				display: 'flex',
 				flexDirection: 'column',
 				position: 'absolute',
-				// border: `2px solid currentcolor`,
+				// border: isSelected ? `2px solid currentcolor` : undefined,
+				boxShadow: isSelected ? '0px 0px 0px 2px white' : undefined,
 				// boxSizing: 'border-box',
 			}}
 		>

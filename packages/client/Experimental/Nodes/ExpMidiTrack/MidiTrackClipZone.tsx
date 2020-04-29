@@ -220,7 +220,20 @@ export const MidiTrackClipZone = ({
 		clickedEvent, /*stopNoteCloning, */noteCloneActive/*, cloneNotes*/])
 
 	return (
-		<div className={`moving-${noteMoveActive}`} style={{height: '100%', backgroundColor: CssColor.panelGray}}>
+		<div
+			className={`midiTrackClipZone moving-${noteMoveActive}`}
+			style={{
+				height: clipZoneHeight,
+				width: visibleWidth,
+				backgroundColor: CssColor.panelGray,
+				overflow: 'hidden',
+				position: 'relative',
+			}}
+			onMouseDown={e => {
+				if (e.button !== 0 || e.shiftKey) return
+				clearSelected()
+			}}
+		>
 			<MidiTrackClipZoneLines {...{clipZoneHeight, panPixelsX, columnWidth, visibleWidth}} />
 			<div
 				className="midiTrackClipZoneInner"
@@ -245,6 +258,7 @@ export const MidiTrackClipZone = ({
 							panPixelsX={panPixelsX}
 							handleMouseDown={handleMouseDown}
 							clipZoneHeight={clipZoneHeight}
+							isSelected={selected.has(clip.id)}
 						/>
 					).toList()}
 				</div>

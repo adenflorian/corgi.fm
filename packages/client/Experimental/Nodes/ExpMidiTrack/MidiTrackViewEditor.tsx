@@ -61,18 +61,7 @@ export const MidiTrackViewEditor = ({
 			>
 				miniMap
 			</div>
-			<div
-				className="midiTrackClipZone"
-				style={{
-					height: clipZoneHeight,
-					width: visibleWidth,
-					overflow: 'hidden',
-					position: 'relative',
-					// backgroundColor: CssColor.panelGrayTransparent,
-				}}
-			>
-				<MidiTrackClipZone {...{columnWidth, panPixelsX, clipZoneHeight, visibleWidth}} />
-			</div>
+			<MidiTrackClipZone {...{columnWidth, panPixelsX, clipZoneHeight, visibleWidth}} />
 			<div
 				className="bottomMarkers"
 				style={{
