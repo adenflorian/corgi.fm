@@ -66,21 +66,21 @@ export const MidiTrackClipZoneLines = React.memo(function _MidiTrackClipZoneLine
 	}, [columnWidth, panPixelsX, clipZoneHeight, visibleWidth])
 
 	return (
-		<svg className="midiTrackClipZoneLines" style={{position: 'absolute', left: 0, width: '100%', height: '100%'}}>
+		<svg className="midiTrackClipZoneLines" style={{position: 'absolute', left: 0, width: '100%', height: '100%', zIndex: 1, opacity: 0.2}}>
 			<path
 				d={measureLines}
 				strokeWidth={2}
-				stroke={`hsla(0, 0%, 10%, 1)`}
+				stroke={`hsla(0, 0%, 0%, 1)`}
 			/>
 			<path
 				d={beatLines}
 				strokeWidth={2}
-				stroke={`hsla(0, 0%, 12%, 1)`}
+				stroke={`hsla(0, 0%, 8%, 1)`}
 			/>
 			<path
 				d={smallerLines}
 				strokeWidth={2}
-				stroke={`hsla(0, 0%, 13%, 1)`}
+				stroke={`hsla(0, 0%, 10%, 1)`}
 			/>
 		</svg>
 	)

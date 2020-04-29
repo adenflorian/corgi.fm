@@ -51,7 +51,7 @@ export const MidiTrackClipResizer = React.memo(function _MidiTrackClipResizer({
 	}, [clipId, handleMouseDown])
 
 	return (
-		<div className="midiTrackClipResizer" style={{opacity: debug ? 0.5 : undefined, display: 'flex', position: 'absolute', height: '100%'}}>
+		<div className="midiTrackClipResizer" style={{opacity: debug ? 0.5 : undefined, display: 'flex', position: 'absolute', height: '100%', zIndex: 3}}>
 			<div
 				style={{backgroundColor: debug ? 'red' : undefined, width: hitWidth}}
 				className="resizeHandle left"

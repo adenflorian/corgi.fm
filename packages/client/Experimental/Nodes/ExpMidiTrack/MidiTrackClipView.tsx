@@ -13,6 +13,10 @@ interface Props {
 	readonly clipZoneHeight: number
 }
 
+const clipHeaderHeight = 24
+
+const borderRadius = 3
+
 export const MidiTrackClipView = ({
 	clip, columnWidth, panPixelsX, handleMouseDown, clipZoneHeight,
 }: Props) => {
@@ -29,7 +33,7 @@ export const MidiTrackClipView = ({
 			style={{
 				height: '100%',
 				width: clipWidth,
-				// borderRadius: 8,
+				borderRadius,
 				fontWeight: 600,
 				marginLeft: startPixel - panPixelsX,
 				display: 'flex',
@@ -43,11 +47,13 @@ export const MidiTrackClipView = ({
 				className="clipHeader"
 				style={{
 					padding: 4,
-					height: 16,
+					height: clipHeaderHeight,
 					backgroundColor: 'currentcolor',
-					// // borderTopRightRadius: mainBorderRadius,
-					// // borderTopLeftRadius: mainBorderRadius,
-					// borderBottom: '2px solid ' + CssColor.panelGrayDark,
+					zIndex: 2,
+					boxSizing: 'border-box',
+					borderTopRightRadius: borderRadius,
+					borderTopLeftRadius: borderRadius,
+					borderBottom: '2px solid ' + CssColor.panelGray,
 			}}>
 				<div
 					className="clipName"
@@ -65,12 +71,13 @@ export const MidiTrackClipView = ({
 				className="notes"
 				style={{
 					backgroundColor: 'currentcolor',
-					mixBlendMode: 'difference',
+					// mixBlendMode: 'overlay',
 					/*backgroundColor: 'rgba(255, 255, 255, 0.16)', */
-					flexGrow: 1,
-					// borderBottomLeftRadius: 8,
-					// borderBottomRightRadius: 8,
-					position: 'relative',
+					// flexGrow: 1,
+					borderRadius,
+					position: 'absolute',
+					width: '100%',
+					height: '100%',
 				}}
 			>
 				<svg
@@ -79,7 +86,7 @@ export const MidiTrackClipView = ({
 						height: '100%',
 						position: 'absolute',
 						left: 0,
-						padding: `8px 0`,
+						padding: `${clipHeaderHeight + 8}px 0 8px 0`,
 						boxSizing: 'border-box',
 					}}
 				>
@@ -92,9 +99,9 @@ export const MidiTrackClipView = ({
 							y={((highestNote - event.note) * noteHeightPercentageDecimal) + '%'}
 							fill={CssColor.panelGrayDark}
 							rx={clipZoneHeight > 256
-								? 8
+								? 5
 								: clipZoneHeight > 128
-									? 4
+									? 3
 									: 0}
 						/>
 					).toList()}
