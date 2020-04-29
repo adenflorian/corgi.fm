@@ -35,17 +35,17 @@ export const MidiTrackClipView = ({
 				position: 'absolute',
 				// border: `2px solid currentcolor`,
 				// boxSizing: 'border-box',
-				backgroundColor: 'currentcolor',
 			}}
 		>
-			<div className="clipHeader" style={{padding: 4, height: 16,
+			<div className="clipHeader" style={{
+				padding: 4, height: 16, backgroundColor: 'currentcolor',
 				borderTopRightRadius: mainBorderRadius, borderTopLeftRadius: mainBorderRadius,
 				borderBottom: '1px solid ' + CssColor.panelGrayDark}}>
 				<div className="clipName" style={{color: CssColor.panelGrayDark, textAlign: 'left', overflow: 'hidden', marginLeft: Math.max(panPixelsX - startPixel, 0)}}>
 					{clip.name} clip
 				</div>
 			</div>
-			<div className="notes" style={{/*backgroundColor: 'rgba(255, 255, 255, 0.16)', */flexGrow: 1, borderBottomLeftRadius: 8, borderBottomRightRadius: 8, position: 'relative'}}>
+			<div className="notes" style={{backgroundColor: 'currentcolor', mixBlendMode: 'difference', /*backgroundColor: 'rgba(255, 255, 255, 0.16)', */flexGrow: 1, borderBottomLeftRadius: 8, borderBottomRightRadius: 8, position: 'relative'}}>
 				<svg style={{width: '100%', height: '100%', position: 'absolute', left: 0, padding: `2px 0`}}>
 					{clip.patternView.pattern.events.map(event => {
 						return (
