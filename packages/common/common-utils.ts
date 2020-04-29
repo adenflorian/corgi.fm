@@ -187,14 +187,14 @@ export const colorRegex = multilineRegExp([
 	/$/,
 ])
 
-export function findLowestAndHighestNotes(events: MidiClipEvents) {
+export function findLowestAndHighestNotes(events: immutable.OrderedMap<Id, {note: number}>) {
 	return {
 		lowestNote: findLowestNote(events),
 		highestNote: findHighestNote(events),
 	}
 }
 
-export function findLowestNote(events: MidiClipEvents): number {
+export function findLowestNote(events: immutable.OrderedMap<Id, {note: number}>): number {
 	let lowest = Number.MAX_VALUE
 
 	events.forEach(event => {
@@ -210,7 +210,7 @@ export function findLowestNote(events: MidiClipEvents): number {
 	return lowest
 }
 
-export function findHighestNote(events: MidiClipEvents): number {
+export function findHighestNote(events: immutable.OrderedMap<Id, {note: number}>): number {
 	let highest = Number.MIN_VALUE
 
 	events.forEach(event => {
