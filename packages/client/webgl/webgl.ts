@@ -11,8 +11,8 @@ function current() {
 	return now() - start
 }
 
-/** @param {WebGL2RenderingContext} gl */
-export function initBuffers(gl: WebGL2RenderingContext) {
+/** @param {WebGLRenderingContext} gl */
+export function initBuffers(gl: WebGLRenderingContext) {
 	// Create a buffer for the square's positions.
 	const positionBuffer = gl.createBuffer()
 
@@ -65,7 +65,7 @@ export interface Buffers {
 }
 
 export function drawScene(
-	gl: WebGL2RenderingContext,
+	gl: WebGLRenderingContext,
 	programInfo: ProgramInfo,
 	buffers: Buffers,
 	canvasElement: HTMLCanvasElement,
@@ -85,7 +85,7 @@ export function drawScene(
 }
 
 export function initScene(
-	gl: WebGL2RenderingContext,
+	gl: WebGLRenderingContext,
 	programInfo: ProgramInfo,
 	buffers: Buffers,
 	canvasElement: HTMLCanvasElement,
@@ -169,7 +169,7 @@ export function initScene(
 		modelViewMatrix)
 }
 
-export function initShaderProgram(gl: WebGL2RenderingContext, vsSource: string, fsSource: string) {
+export function initShaderProgram(gl: WebGLRenderingContext, vsSource: string, fsSource: string) {
 	const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsSource)
 	const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fsSource)
 
@@ -198,7 +198,7 @@ export function initShaderProgram(gl: WebGL2RenderingContext, vsSource: string, 
 	return shaderProgram
 }
 
-export function loadShader(gl: WebGL2RenderingContext, type: number, source: string) {
+export function loadShader(gl: WebGLRenderingContext, type: number, source: string) {
 	const shader = gl.createShader(type)
 	if (shader === null) {
 		logger.error('shader null sad face: ' + JSON.stringify({type, source}))

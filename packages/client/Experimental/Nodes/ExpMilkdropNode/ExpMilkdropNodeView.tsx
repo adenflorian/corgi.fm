@@ -26,7 +26,7 @@ export const ExpMilkdropNodeExtra = hot(module)(React.memo(function _ExpMilkdrop
 		canvas.width = position.width + 2
 		canvas.height = position.height + 2
 
-		const glMaybe = canvas.getContext('webgl2', {
+		const glMaybe = canvas.getContext('webgl', {
 			premultipliedAlpha: false,
 		})
 
@@ -38,7 +38,7 @@ export const ExpMilkdropNodeExtra = hot(module)(React.memo(function _ExpMilkdrop
 
 		initGl(gl, canvas)
 
-		function initGl(gl: WebGL2RenderingContext, canvasElement: HTMLCanvasElement) {
+		function initGl(gl: WebGLRenderingContext, canvasElement: HTMLCanvasElement) {
 
 			const shaderProgram = webgl.initShaderProgram(
 				gl,
