@@ -5,7 +5,7 @@ import {useExpPosition} from '../../../react-hooks'
 import {useNodeContext} from '../../CorgiNode'
 import vsSource from '../../../glsl/simpleVertexShader.glsl'
 import fsSource from '../../../glsl/simpleFragmentShader.glsl'
-import * as webgl from './webgl'
+import * as webgl from '../../../webgl/webgl'
 
 interface Props {
 	newSampleEvent: CorgiNumberChangedEvent

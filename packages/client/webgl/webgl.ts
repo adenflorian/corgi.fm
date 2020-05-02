@@ -1,7 +1,7 @@
 // @ts-ignore
 import * as mat4 from 'gl-matrix/esm/mat4'
-import {getColorForTime} from './utils.js'
-import {logger} from '../../../client-logger.js'
+import {getColorForTime} from './utils'
+import {logger} from '../client-logger'
 
 const start = Date.now() / 1000
 function now() {
