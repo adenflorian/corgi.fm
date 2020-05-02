@@ -12,7 +12,7 @@ export const expNodeTypes = [
 	'midiRandom', 'midiPitch',
 	'midiConverter', 'manualPolyphonicMidiConverter', 'automaticPolyphonicMidiConverter',
 	'midiGate', 'midiPulse', 'midiMatch', 'midiMessage',
-	'oscilloscope', 'polyTest', 'note', 'dummy', 'audioOutput', 'keyboard',
+	'oscilloscope', 'polyTest', 'note', 'dummy', 'audioOutput', 'keyboard', 'milkdrop',
 	GroupExpNodeType,
 	'groupInput', 'groupOutput',
 ] as const
@@ -128,7 +128,12 @@ expNodeInfos.set('sequencer', {
 
 expNodeInfos.set('audioOutput', {
 	width: 160,
-	height: 100,
+	height: 160,
+})
+
+expNodeInfos.set('milkdrop', {
+	width: 400,
+	height: 400,
 })
 
 expNodeInfos.set('pan', {
@@ -205,7 +210,7 @@ export const nodeCategoryTree: NodeCategoryTree = new Map([
 		name: 'Other',
 		types: new Set([
 			GroupExpNodeType,
-			'oscilloscope', 'polyTest', 'note', 'dummy', 'audioOutput', 'keyboard',
+			'oscilloscope', 'polyTest', 'note', 'dummy', 'audioOutput', 'keyboard', 'milkdrop',
 		]),
 	}],
 	['hidden', {

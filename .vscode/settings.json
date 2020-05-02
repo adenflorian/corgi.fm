@@ -39,6 +39,7 @@
         "ICVC",
         "Mailchimp",
         "Middlewares",
+        "Milkdrop",
         "Noteoff",
         "Passthrough",
         "Patreon",
@@ -97,6 +98,8 @@
         "focusable",
         "frounded",
         "fucky",
+        "glmatrix",
+        "glsl",
         "graphviz",
         "hashbow",
         "highpass",
@@ -217,6 +220,5 @@
             ".tsx",
         ]
     },
-    "editor.formatOnSave": false,
     "eslint.packageManager": "yarn",
 }
