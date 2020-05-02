@@ -1,6 +1,7 @@
 // @ts-ignore
 import * as mat4 from 'gl-matrix/esm/mat4'
 import {getColorForTime} from './utils.js'
+import {logger} from '../../../client-logger.js'
 
 const start = Date.now() / 1000
 function now() {
@@ -172,10 +173,16 @@ export function initShaderProgram(gl: WebGL2RenderingContext, vsSource: string, 
 	const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsSource)
 	const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fsSource)
 
+	if (!vertexShader || !fragmentShader) {
+		logger.error('shaderProgram null sad face: ' + JSON.stringify({vsSource, fsSource}))
+		return null
+	}
+
 	// Create the shader program
 	const shaderProgram = gl.createProgram()
 	if (shaderProgram === null) {
-		throw new Error('shaderProgram null sad face: ' + JSON.stringify({vsSource, fsSource}))
+		logger.error('shaderProgram null sad face: ' + JSON.stringify({vsSource, fsSource}))
+		return null
 	}
 
 	gl.attachShader(shaderProgram, vertexShader)
@@ -184,7 +191,8 @@ export function initShaderProgram(gl: WebGL2RenderingContext, vsSource: string, 
 
 	// If creating the shader program failed, alert
 	if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
-		throw new Error('Unable to initialize the shader program: ' + gl.getProgramInfoLog(shaderProgram))
+		logger.error('Unable to initialize the shader program: ' + gl.getProgramInfoLog(shaderProgram))
+		return null
 	}
 
 	return shaderProgram
@@ -193,7 +201,8 @@ export function initShaderProgram(gl: WebGL2RenderingContext, vsSource: string, 
 export function loadShader(gl: WebGL2RenderingContext, type: number, source: string) {
 	const shader = gl.createShader(type)
 	if (shader === null) {
-		throw new Error('shader null sad face: ' + JSON.stringify({type, source}))
+		logger.error('shader null sad face: ' + JSON.stringify({type, source}))
+		return null
 	}
 
 	// Send the source to the shader object
@@ -206,7 +215,8 @@ export function loadShader(gl: WebGL2RenderingContext, type: number, source: str
 	if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
 		const info = gl.getShaderInfoLog(shader)
 		gl.deleteShader(shader)
-		throw new Error('An error occurred compiling the shaders: ' + info)
+		logger.error('An error occurred compiling the shaders: ' + info)
+		return null
 	}
 
 	return shader

@@ -46,6 +46,8 @@ export const ExpMilkdropNodeExtra = hot(module)(React.memo(function _ExpMilkdrop
 				fsSource,
 			)
 
+			if (!shaderProgram) return
+
 			const programInfo = {
 				program: shaderProgram,
 				attribLocations: {
