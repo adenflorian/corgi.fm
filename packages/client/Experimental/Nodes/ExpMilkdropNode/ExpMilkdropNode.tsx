@@ -17,7 +17,7 @@ export class ExpMilkdropNode extends CorgiNode {
 	private readonly _newSampleEvent = new CorgiNumberChangedEvent(0)
 
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
-		super(corgiNodeArgs, {name: 'Oscilloscope', color: CssColor.blue})
+		super(corgiNodeArgs, {name: 'Whoa', color: CssColor.blue})
 
 		this._analyser2 = new LabCorgiAnalyserSPNode(corgiNodeArgs.audioContext, this._onAnalyserUpdate, true, 'ExpMilkdropNode')
 

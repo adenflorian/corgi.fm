@@ -23,8 +23,8 @@ export const ExpMilkdropNodeExtra = hot(module)(React.memo(function _ExpMilkdrop
 
 		if (!canvas) return
 
-		canvas.width = position.width
-		canvas.height = position.height
+		canvas.width = position.width + 2
+		canvas.height = position.height + 2
 
 		const glMaybe = canvas.getContext('webgl2', {
 			premultipliedAlpha: false,
@@ -89,19 +89,14 @@ export const ExpMilkdropNodeExtra = hot(module)(React.memo(function _ExpMilkdrop
 				left: 0,
 				borderBottomLeftRadius: 8,
 				borderBottomRightRadius: 8,
+				overflow: 'hidden',
 			}}
 		>
 			<canvas
 				ref={canvasRef}
-				width="100%"
-				height="100%"
 				style={{
-					width: '100%',
-					height: '100%',
 					marginLeft: -1,
 					marginTop: -1,
-					borderBottomLeftRadius: 8,
-					borderBottomRightRadius: 8,
 				}}
 			/>
 		</div>
