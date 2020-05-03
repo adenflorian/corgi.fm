@@ -199,7 +199,11 @@ export const ConnectedZoom = hot(module)(React.memo(function _Zoom({
 				setBackgroundClicked(false)
 			}
 			if (e.buttons === 4 && !e.shiftKey) {
-				doPan(e.movementX, e.movementY)
+				if (e.ctrlKey) {
+					doZoom(e.movementY * mouseZoomMod)
+				} else {
+					doPan(e.movementX, e.movementY)
+				}
 			}
 			if (backgroundClicked && e.buttons === 1) {
 				if (e.ctrlKey) {
