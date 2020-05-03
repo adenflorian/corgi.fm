@@ -2,6 +2,8 @@ precision mediump float;
 
 uniform float uTime;
 uniform vec2 uMouse;
+uniform float uZoom;
+uniform vec2 uPan;
 
 float sinNorm(in float x) {
   return (sin(x) * 0.5) + 0.5;
@@ -62,7 +64,7 @@ float modI(float a,float b) {
 }
 
 #define rate 0.1
-#define lineZoom 2.0
+#define lineZoom 1.0
 #define lineDistance 16.0 / lineZoom
 #define lineOffset lineDistance / 2.0
 
@@ -80,10 +82,12 @@ void main() {
     mix(topLeft, topRight, uv.x),
     mix(bottomLeft, bottomRight, uv.x),
     uv.y
-  ) / 4.0;
+  ) / 2.0;
   
-  bool isOnLineX = modI((gl_FragCoord.x / lineZoom) + lineOffset, lineDistance) == 0.0;
-  bool isOnLineY = modI((gl_FragCoord.y / lineZoom) + lineOffset, lineDistance) == 0.0;
+  float lineOffsetFinalX = lineOffset - (uPan.x / 1.25);
+  float lineOffsetFinalY = lineOffset + (uPan.y / 1.25);
+  bool isOnLineX = modI(((gl_FragCoord.x / uZoom) / lineZoom) + lineOffsetFinalX, lineDistance) == 0.0;
+  bool isOnLineY = modI(((gl_FragCoord.y / uZoom) / lineZoom) + lineOffsetFinalY, lineDistance) == 0.0;
   if (isOnLineX && isOnLineY) {
     gl_FragColor = vec4(final, 1.0);
     return;

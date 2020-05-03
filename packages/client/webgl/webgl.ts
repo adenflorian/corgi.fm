@@ -2,6 +2,7 @@
 import * as mat4 from 'gl-matrix/esm/mat4'
 import {getColorForTime} from './utils'
 import {logger} from '../client-logger'
+import {simpleGlobalClientState} from '../SimpleGlobalClientState'
 
 const start = Date.now() / 1000
 function now() {
@@ -71,6 +72,12 @@ export function drawScene(
 	gl.uniform2f(
 		programInfo.uniformLocations.mouse,
 		mousePosition.x, mousePosition.y)
+	gl.uniform1f(
+		programInfo.uniformLocations.zoom,
+		simpleGlobalClientState.zoom)
+	gl.uniform2f(
+		programInfo.uniformLocations.pan,
+		simpleGlobalClientState.pan.x, simpleGlobalClientState.pan.y)
 
 	{
 		const offset = 0
@@ -256,8 +263,7 @@ export function createStandardProgramInfo(gl: WebGLRenderingContext, shaderProgr
 			time: gl.getUniformLocation(shaderProgram, 'uTime'),
 			mouse: gl.getUniformLocation(shaderProgram, 'uMouse'),
 			zoom: gl.getUniformLocation(shaderProgram, 'uZoom'),
-			panX: gl.getUniformLocation(shaderProgram, 'uPanX'),
-			panY: gl.getUniformLocation(shaderProgram, 'uPanY'),
+			pan: gl.getUniformLocation(shaderProgram, 'uPan'),
 		},
 	}
 }
