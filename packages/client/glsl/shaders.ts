@@ -1,3 +1,4 @@
+import * as Immutable from 'immutable'
 import passthroughVertexShaderSource from './passthroughVS.glsl'
 import backgroundFSSource from './backgroundFS.glsl'
 import milkdropFragmentShaderSource from './milkdropFragmentShader.glsl'
@@ -6,30 +7,37 @@ import simpleMVPVertexShaderSource from './simpleProjModelVS.glsl'
 export const passthroughVertexShader: VertexShader = {
 	source: passthroughVertexShaderSource,
 	type: 'vertex',
-	variables: [
-		{glslName: 'aVertexPosition', type: '4f'},
-	]
+	uniforms: Immutable.Map({}),
+}
+
+export const modelViewProjectionVertexShader: VertexShader = {
+	source: simpleMVPVertexShaderSource,
+	type: 'vertex',
+	uniforms: Immutable.Map({
+		uModelViewMatrix: 'matrix4',
+		uProjectionMatrix: 'matrix4',
+	}),
 }
 
 export const backgroundFragmentShader: FragmentShader = {
 	source: backgroundFSSource,
 	type: 'fragment',
-	variables: [
-		{glslName: 'uResolution', type: '2f'},
-		{glslName: 'uTime', type: '1f'},
-		{glslName: 'uMouse', type: '2f'},
-		{glslName: 'uZoom', type: '1f'},
-		{glslName: 'uPan', type: '2f'},
-	]
+	uniforms: Immutable.Map({
+		uResolution: '2f',
+		uTime: '1f',
+		uMouse: '2f',
+		uZoom: '1f',
+		uPan: '2f',
+	}),
 }
 
 export const milkdropFragmentShader: FragmentShader = {
 	source: milkdropFragmentShaderSource,
 	type: 'fragment',
-	variables: [
-		{glslName: 'uTime', type: '1f'},
-		{glslName: 'uMouse', type: '2f'},
-	]
+	uniforms: Immutable.Map({
+		uTime: '1f',
+		uMouse: '2f',
+	}),
 }
 
 export {
@@ -41,7 +49,7 @@ export {
 
 export interface Shader {
 	readonly source: string
-	readonly variables: readonly ShaderVariable[]
+	readonly uniforms: ShaderUniforms
 	readonly type: ShaderType
 }
 
@@ -57,12 +65,9 @@ export const shaderTypes = ['vertex', 'fragment'] as const
 
 export type ShaderType = typeof shaderTypes[number]
 
-export interface ShaderVariable {
-	readonly glslName: string
-	readonly type: ShaderVariableType
-}
+export interface ShaderUniforms extends Immutable.Map<string, ShaderUniformType> {}
 
-export const shaderAttributeTypes = [
+export const shaderUniformTypes = [
 	'matrix2', 'matrix3', 'matrix4',
 	'1f', '2f', '3f', '4f',
 	'1fv', '2fv', '3fv', '4fv',
@@ -70,4 +75,4 @@ export const shaderAttributeTypes = [
 	'1iv', '2iv', '3iv', '4iv',
 ] as const
 
-export type ShaderVariableType = typeof shaderAttributeTypes[number]
+export type ShaderUniformType = typeof shaderUniformTypes[number]

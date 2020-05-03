@@ -1,13 +1,15 @@
 import React, {useRef, useEffect} from 'react'
 import {hot} from 'react-hot-loader'
+import * as Immutable from 'immutable'
 import {CorgiNumberChangedEvent} from '../../CorgiEvents'
 import {useExpPosition} from '../../../react-hooks'
 import {useNodeContext} from '../../CorgiNode'
 import {logger} from '../../../client-logger'
-import {passthroughVertexShaderSource, milkdropFragmentShaderSource, passthroughVertexShader, milkdropFragmentShader} from '../../../glsl/shaders'
-import {Program, WebGlEngine} from '../../../webgl/WebGlEngine'
+import {passthroughVertexShader, milkdropFragmentShader} from '../../../glsl/shaders'
+import {ObjectInfo, WebGlEngine, UniformUpdater} from '../../../webgl/WebGlEngine'
 import {useStore} from 'react-redux'
 import {selectExpPosition} from '@corgifm/common/redux'
+import {simpleGlobalClientState} from '../../../SimpleGlobalClientState'
 
 interface Props {
 	newSampleEvent: CorgiNumberChangedEvent
@@ -37,37 +39,40 @@ export const ExpMilkdropNodeExtra = hot(module)(React.memo(function _ExpMilkdrop
 			return logger.error(`[MainWebGlCanvas] ${error}`)
 		}
 
-		const program: Program = {
+		const {gl} = engine
+
+		const program: ObjectInfo = {
 			vertexPositions: [
 				-1.0, 1.0,
 				1.0, 1.0,
 				-1.0, -1.0,
 				1.0, -1.0,
 			],
+			vertexCount: 4,
 			vertexShader: passthroughVertexShader,
 			fragmentShader: milkdropFragmentShader,
+			uniformValues: Immutable.Map<UniformUpdater>({
+				uMouse: location => gl.uniform2f(location,
+					simpleGlobalClientState.lastMousePosition.x, simpleGlobalClientState.lastMousePosition.y),
+				uTime: location => gl.uniform1f(location,
+					engine.current()),
+			}),
 		}
 
-		const backgroundShaderProgram = engine.createShaderProgram(passthroughVertexShaderSource, milkdropFragmentShaderSource)
+		const renderPass = engine.createPass(program)
 
-		if (!backgroundShaderProgram) return
-
-		const programInfo = engine.createStandardProgramInfo(backgroundShaderProgram)
-
-		const positionBuffer = engine.createPositionBuffer(program.vertexPositions)
-
-		engine.initScene(programInfo, canvas)
+		if (!renderPass) return
 
 		let stop = false
 
 		requestAnimationFrame(mainLoop)
 
 		function mainLoop(time: number) {
-			if (stop || !canvasRef.current) return
+			if (stop || !canvasRef.current || !renderPass) return
 
 			const positionLatest = selectExpPosition(store.getState().room, node.id)
 
-			engine.drawScene(programInfo, canvasRef.current, positionLatest.width, positionLatest.height)
+			engine.drawScene(renderPass, canvasRef.current, positionLatest.width, positionLatest.height)
 
 			requestAnimationFrame(mainLoop)
 		}
