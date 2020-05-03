@@ -1,31 +1,20 @@
 import React, {useRef, useEffect} from 'react'
 import {hot} from 'react-hot-loader'
-import {CorgiNumberChangedEvent} from '../../CorgiEvents'
-import {useExpPosition} from '../../../react-hooks'
-import {useNodeContext} from '../../CorgiNode'
-import vsSource from '../../../glsl/passthroughVS.glsl'
-import fsSource from '../../../glsl/simpleFragmentShader.glsl'
-import * as webgl from '../../../webgl/webgl'
-import {logger} from '../../../client-logger'
+import * as webgl from './webgl/webgl'
+import vsSource from './glsl/passthroughVS.glsl'
+import backgroundFS from './glsl/backgroundFS.glsl'
+import {logger} from './client-logger'
 
-interface Props {
-	newSampleEvent: CorgiNumberChangedEvent
-}
-
-export const ExpMilkdropNodeExtra = hot(module)(React.memo(function _ExpMilkdropNodeExtra({
-	newSampleEvent,
-}: Props) {
+export const MainWebGlCanvas = hot(module)(React.memo(function _MainWebGlCanvas() {
 	const canvasRef = useRef<HTMLCanvasElement>(null)
-	const node = useNodeContext()
-	const position = useExpPosition(node.id)
 
 	useEffect(() => {
 		const canvas = canvasRef.current
 
 		if (!canvas) return
 
-		canvas.width = position.width + 2
-		canvas.height = position.height + 2
+		canvas.width = window.innerWidth
+		canvas.height = window.innerHeight
 
 		const glMaybe = canvas.getContext('webgl', {
 			premultipliedAlpha: false,
@@ -44,7 +33,7 @@ export const ExpMilkdropNodeExtra = hot(module)(React.memo(function _ExpMilkdrop
 			const shaderProgram = webgl.initShaderProgram(
 				gl,
 				vsSource,
-				fsSource,
+				backgroundFS,
 			)
 
 			if (!shaderProgram) return
@@ -74,9 +63,9 @@ export const ExpMilkdropNodeExtra = hot(module)(React.memo(function _ExpMilkdrop
 			requestAnimationFrame(mainLoop)
 
 			function mainLoop(time: number) {
-				if (stop) return
+				if (stop || !canvasRef.current) return
 
-				webgl.drawScene(gl, programInfo, buffers, canvasElement)
+				webgl.drawScene(gl, programInfo, buffers, canvasRef.current)
 
 				requestAnimationFrame(mainLoop)
 			}
@@ -89,22 +78,20 @@ export const ExpMilkdropNodeExtra = hot(module)(React.memo(function _ExpMilkdrop
 
 	return (
 		<div
+			className="mainWebGlCanvas"
 			style={{
-				width: '100%',
-				height: '100%',
-				position: 'absolute',
+				width: '100vw',
+				height: '100vh',
+				position: 'fixed',
 				top: 0,
 				left: 0,
-				borderBottomLeftRadius: 8,
-				borderBottomRightRadius: 8,
-				overflow: 'hidden',
 			}}
 		>
 			<canvas
 				ref={canvasRef}
 				style={{
-					marginLeft: -1,
-					marginTop: -1,
+					width: '100%',
+					height: '100%',
 				}}
 			/>
 		</div>

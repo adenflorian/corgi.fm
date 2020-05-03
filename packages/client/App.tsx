@@ -12,6 +12,7 @@ import {Benchmarks} from './Benchmarks'
 import {simpleGlobalClientState} from './SimpleGlobalClientState'
 import {useRoomType} from './react-hooks'
 import {RoomType} from '@corgifm/common/common-types'
+import {MainWebGlCanvas} from './MainWebGlCanvas'
 
 const App = () => {
 	const ctrl = useSelector((state: IClientAppState) => selectUserInputKeys(state).ctrl)
@@ -44,6 +45,7 @@ const App = () => {
 	const isLoading = !isClientReady && isConnectingForFirstTime
 	return (
 		<div className={`ctrl-${ctrl} alt-${alt} shift-${shift}`}>
+			<MainWebGlCanvas />
 			<LoadingScreen loading={isLoading} />
 			{!isLoading && {
 				[RoomType.Normal]: <ConnectedOnlineApp />,
