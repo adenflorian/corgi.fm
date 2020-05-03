@@ -72,7 +72,9 @@ export const ExpMilkdropNodeExtra = hot(module)(React.memo(function _ExpMilkdrop
 
 			const positionLatest = selectExpPosition(store.getState().room, node.id)
 
-			engine.drawScene(renderPass, canvasRef.current, positionLatest.width, positionLatest.height)
+			engine.newFramePass(canvasRef.current, positionLatest.width, positionLatest.height)
+
+			engine.drawPass(renderPass)
 
 			requestAnimationFrame(mainLoop)
 		}

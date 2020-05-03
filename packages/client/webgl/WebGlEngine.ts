@@ -138,14 +138,17 @@ export class WebGlEngine {
 		return positionBuffer
 	}
 
-	public drawScene(
-		renderPass: RenderPass,
+	public newFramePass(
 		canvasElement: HTMLCanvasElement,
 		width: number,
 		height: number,
 	) {
 		this._resize(canvasElement, width, height)
+	}
 
+	public drawPass(
+		renderPass: RenderPass,
+	) {
 		// Tell WebGL to use our program when drawing
 		this.gl.useProgram(renderPass.shaderProgram)
 

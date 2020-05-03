@@ -25,7 +25,7 @@ export const MainWebGlCanvas = hot(module)(React.memo(function _MainWebGlCanvas(
 
 		const {gl} = engine
 
-		const program: ObjectInfo = {
+		const backgroundObjectInfo: ObjectInfo = {
 			vertexPositions: [
 				-1.0, 1.0,
 				1.0, 1.0,
@@ -54,18 +54,55 @@ export const MainWebGlCanvas = hot(module)(React.memo(function _MainWebGlCanvas(
 			}),
 		}
 
-		const renderPass = engine.createPass(program)
+		const backgroundRenderPass = engine.createPass(backgroundObjectInfo)
 
-		if (!renderPass) return
+		if (!backgroundRenderPass) return
+
+		const nodesObjectInfo: ObjectInfo = {
+			vertexPositions: [
+				-1.0, 1.0,
+				1.0, 1.0,
+				-1.0, -1.0,
+				1.0, -1.0,
+			],
+			vertexCount: 4,
+			vertexShader: passthroughVertexShader,
+			fragmentShader: backgroundFragmentShader,
+			uniformValues: Immutable.Map<UniformUpdater>({
+				uMouse: location => gl.uniform2f(location,
+					simpleGlobalClientState.lastMousePosition.x, simpleGlobalClientState.lastMousePosition.y),
+				uTime: location => gl.uniform1f(location,
+					engine.current()),
+				uZoom: location => gl.uniform1f(location,
+					simpleGlobalClientState.zoom),
+				uPan: location => gl.uniform2f(location,
+					simpleGlobalClientState.pan.x, simpleGlobalClientState.pan.y),
+				uResolution: location => gl.uniform2f(location,
+					canvasRef.current ? canvasRef.current.clientWidth : 100,
+					canvasRef.current ? canvasRef.current.clientHeight : 100),
+				uProjectionMatrix: location => gl.uniformMatrix4fv(location, false,
+					createProjectionMatrix(canvas)),
+				uModelViewMatrix: location => gl.uniformMatrix4fv(location, false,
+					createModelViewMatrix()),
+			}),
+		}
+
+		const nodesRenderPass = engine.createPass(backgroundObjectInfo)
+
+		if (!nodesRenderPass) return
 
 		let stop = false
 
 		requestAnimationFrame(mainLoop)
 
 		function mainLoop(time: number) {
-			if (stop || !canvasRef.current || !renderPass) return
+			if (stop || !canvasRef.current || !backgroundRenderPass || !nodesRenderPass) return
 
-			engine.drawScene(renderPass, canvasRef.current, canvasRef.current.clientWidth, canvasRef.current.clientHeight)
+			engine.newFramePass(canvasRef.current, canvasRef.current.clientWidth, canvasRef.current.clientHeight)
+
+			engine.drawPass(backgroundRenderPass)
+
+			engine.drawPass(nodesRenderPass)
 
 			requestAnimationFrame(mainLoop)
 		}
