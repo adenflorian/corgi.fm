@@ -7,9 +7,13 @@ import {logger} from './client-logger'
 import {backgroundFragmentShader, passthroughVertexShader,
 	nodeFragmentShader, modelViewProjectionVertexShader} from './glsl/shaders'
 import {simpleGlobalClientState} from './SimpleGlobalClientState'
+import {selectExpNodesState, selectLocalClientId, selectRoomMember, selectExpPosition, IClientAppState} from '@corgifm/common/redux'
+import {useStore} from 'react-redux'
+import {RoomType} from '@corgifm/common/common-types'
 
 export const MainWebGlCanvas = hot(module)(React.memo(function _MainWebGlCanvas() {
 	const canvasRef = useRef<HTMLCanvasElement>(null)
+	const store = useStore<IClientAppState>()
 
 	useEffect(() => {
 		const canvas = canvasRef.current
@@ -94,15 +98,29 @@ export const MainWebGlCanvas = hot(module)(React.memo(function _MainWebGlCanvas(
 		requestAnimationFrame(mainLoop)
 
 		function mainLoop(time: number) {
-			if (stop || !canvasRef.current || !backgroundRenderPass || !nodesRenderPass) return
+			try {
+				if (stop || !canvasRef.current || !backgroundRenderPass || !nodesRenderPass) return
+				
+				const state = store.getState()
 
-			engine.newFramePass(canvasRef.current, canvasRef.current.clientWidth, canvasRef.current.clientHeight)
+				engine.newFramePass(canvasRef.current, canvasRef.current.clientWidth, canvasRef.current.clientHeight)
 
-			engine.drawPass(backgroundRenderPass)
+				engine.drawPass(backgroundRenderPass)
 
-			// engine.drawPass(nodesRenderPass)
+				if (state.room.activity.activityType === RoomType.Experimental) {
+					const currentGroupId = selectRoomMember(state.room, selectLocalClientId(state)).groupNodeId
 
-			requestAnimationFrame(mainLoop)
+					const nodesToRender = selectExpNodesState(state.room)
+						.filter(x => x.groupId === currentGroupId)
+						.map(node => ({node, position: selectExpPosition(state.room, node.id)}))
+
+					engine.drawPass(nodesRenderPass)
+				}
+
+				requestAnimationFrame(mainLoop)
+			} catch (error) {
+				logger.error('error in [MainWebGlCanvas] mainLoop: ', error)
+			}
 		}
 
 		return () => {

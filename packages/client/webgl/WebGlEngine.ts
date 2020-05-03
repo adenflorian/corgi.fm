@@ -25,66 +25,28 @@ export class WebGlEngine {
 			premultipliedAlpha: false,
 		})
 
-		if (!context) {
-			throw new Error(`could not create a ${contextName} context`)
-		}
+		if (!context) throw new Error(`could not create a ${contextName} context`)
 
 		this.gl = context
 
-		// TODO Will probably need to be done every frame
-		// gl.clearColor(...getColorForTime(Date.now() / 1000, 16))
-		this.gl.clearColor(0.0, 0.0, 0.0, 0.0)
-		// this._gl.clearColor(0.0, 0.0, 0.0, 1.0)  // Clear to black, fully opaque
+		this.gl.clearColor(0.0, 0.0, 0.0, 1.0)  // Clear to black, fully opaque
 		this.gl.clearDepth(1.0)                 // Clear everything
-		this.gl.enable(this.gl.DEPTH_TEST)           // Enable depth testing
-		this.gl.depthFunc(this.gl.LEQUAL)            // Near things obscure far things
+		this.gl.enable(this.gl.DEPTH_TEST)      // Enable depth testing
+		this.gl.depthFunc(this.gl.LEQUAL)       // Near things obscure far things
 
-		// Clear the canvas before we start drawing on it.
 		this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT)
 	}
 
-	public createShaderProgram(vsSource: string, fsSource: string) {
-		const vertexShader = this._loadShader(this.gl.VERTEX_SHADER, vsSource)
-		const fragmentShader = this._loadShader(this.gl.FRAGMENT_SHADER, fsSource)
-
-		if (!vertexShader || !fragmentShader) {
-			logger.error('shaderProgram null sad face: ' + JSON.stringify({vsSource, fsSource}))
-			return null
-		}
-
-		// Create the shader program
-		const shaderProgram = this.gl.createProgram()
-		if (shaderProgram === null) {
-			logger.error('shaderProgram null sad face: ' + JSON.stringify({vsSource, fsSource}))
-			return null
-		}
-
-		this.gl.attachShader(shaderProgram, vertexShader)
-		this.gl.attachShader(shaderProgram, fragmentShader)
-		this.gl.linkProgram(shaderProgram)
-
-		// If creating the shader program failed, alert
-		if (!this.gl.getProgramParameter(shaderProgram, this.gl.LINK_STATUS)) {
-			logger.error('Unable to initialize the shader program: ' + this.gl.getProgramInfoLog(shaderProgram))
-			return null
-		}
-
-		return shaderProgram
-	}
-
 	public createPass(objectInfo: ObjectInfo): RenderPass | null {
-		const shaderProgram = this.createShaderProgram(objectInfo.vertexShader.source, objectInfo.fragmentShader.source)
+		const shaderProgram = this._createShaderProgram(objectInfo.vertexShader.source, objectInfo.fragmentShader.source)
+		const positionBuffer = this._createPositionBuffer(objectInfo.vertexPositions)
 
-		if (!shaderProgram) return null
+		if (!shaderProgram || !positionBuffer) return null
 
 		const uniformLocations = objectInfo.vertexShader.uniforms
 			.merge(objectInfo.fragmentShader.uniforms)
 			.map((type, key) => ({location: this.gl.getUniformLocation(shaderProgram, key), type}))
 			.filter(x => x !== null)
-
-		const positionBuffer = this.createPositionBuffer(objectInfo.vertexPositions)
-
-		if (!positionBuffer) return null
 
 		return {
 			shaderProgram,
@@ -93,6 +55,30 @@ export class WebGlEngine {
 			uniformLocations,
 			objectInfo,
 		}
+	}
+
+	private _createShaderProgram(vsSource: string, fsSource: string) {
+		const vertexShader = this._loadShader(this.gl.VERTEX_SHADER, vsSource)
+		const fragmentShader = this._loadShader(this.gl.FRAGMENT_SHADER, fsSource)
+		const shaderProgram = this.gl.createProgram()
+
+		if (!vertexShader || !fragmentShader || !shaderProgram) {
+			logger.error('[createShaderProgram] something is null sad face: '
+				+ JSON.stringify({vsSource, fsSource, vertexShader, fragmentShader, shaderProgram}))
+			return null
+		}
+
+		this.gl.attachShader(shaderProgram, vertexShader)
+		this.gl.attachShader(shaderProgram, fragmentShader)
+		this.gl.linkProgram(shaderProgram)
+
+		// Check if creating the shader program failed
+		if (!this.gl.getProgramParameter(shaderProgram, this.gl.LINK_STATUS)) {
+			logger.error('Unable to initialize the shader program: ' + this.gl.getProgramInfoLog(shaderProgram))
+			return null
+		}
+
+		return shaderProgram
 	}
 
 	private _loadShader(type: GLenum, source: string) {
@@ -119,13 +105,17 @@ export class WebGlEngine {
 		return shader
 	}
 
-	public createPositionBuffer(positions: readonly number[]) {
+	private _createPositionBuffer(positions: readonly number[]) {
 		// Create a buffer for the square's positions.
 		const positionBuffer = this.gl.createBuffer()
 
+		if (!positionBuffer) {
+			logger.error('positionBuffer is null :(', {positionBuffer})
+			return null
+		}
+
 		// Select the positionBuffer as the one to apply buffer
 		// operations to from here out.
-
 		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, positionBuffer)
 
 		// Now pass the list of positions into WebGL to build the
@@ -138,75 +128,61 @@ export class WebGlEngine {
 		return positionBuffer
 	}
 
-	public newFramePass(
-		canvasElement: HTMLCanvasElement,
-		width: number,
-		height: number,
-	) {
-		this._resize(canvasElement, width, height)
+	public newFramePass(canvasElement: HTMLCanvasElement, width: number, height: number) {
+		this._updateCanvasSize(canvasElement, width, height)
 		this.gl.clearDepth(1.0)
 	}
 
-	public drawPass(
-		renderPass: RenderPass,
-	) {
-		if (renderPass.objectInfo.writeToDepthBuffer === false) {
-			this.gl.disable(this.gl.DEPTH_TEST)
-		} else {
-			this.gl.enable(this.gl.DEPTH_TEST)
-		}
+	private _updateCanvasSize(canvas: HTMLCanvasElement, width: number, height: number) {
+		if (canvas.width !== width || canvas.height !== height) {
 
-		// Tell WebGL to use our program when drawing
-		this.gl.useProgram(renderPass.shaderProgram)
-
-		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, renderPass.positionBuffer)
-
-		// Tell WebGL how to pull out the positions from the position
-		// buffer into the vertexPosition attribute.
-		{
-			const numComponents = 2  // pull out 2 values per iteration
-			const type = this.gl.FLOAT    // the data in the buffer is 32bit floats
-			const normalize = false  // don't normalize
-			const stride = 0         // how many bytes to get from one set of values to the next
-			// 0 = use type and numComponents above
-			const offset = 0         // how many bytes inside the buffer to start from
-			// already did this in initBuffers()
-			// this._gl.bindBuffer(this._gl.ARRAY_BUFFER, buffers.position)
-			this.gl.vertexAttribPointer(
-				renderPass.vertexPositionAttributeLocation,
-				numComponents,
-				type,
-				normalize,
-				stride,
-				offset)
-			this.gl.enableVertexAttribArray(
-				renderPass.vertexPositionAttributeLocation)
-		}
-
-		renderPass.objectInfo.uniformValues.forEach((x, key) => {
-			const location = renderPass.uniformLocations.get(key, null)
-			if (!location) return
-			x(location.location)
-		})
-
-		{
-			const offset = 0
-			const vertexCount = renderPass.objectInfo.vertexCount
-			this.gl.drawArrays(this.gl.TRIANGLE_STRIP, offset, vertexCount)
-		}
-	}
-
-	private _resize(canvas: HTMLCanvasElement, width: number, height: number) {
-		// Check if the canvas is not the same size.
-		if (canvas.width != width ||
-			canvas.height != height) {
-
-			// Make the canvas the same size
 			canvas.width = width;
 			canvas.height = height;
 
 			this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height)
 		}
+	}
+
+	public drawPass(renderPass: RenderPass) {
+		this._setDepthBufferEnabled(renderPass.objectInfo.writeToDepthBuffer)
+
+		this.gl.useProgram(renderPass.shaderProgram)
+
+		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, renderPass.positionBuffer)
+
+		this._setupVertexAttribStuff(renderPass)
+
+		this._updateUniforms(renderPass)
+
+		this.gl.drawArrays(this.gl.TRIANGLE_STRIP, 0, renderPass.objectInfo.vertexCount)
+	}
+
+	private _setDepthBufferEnabled(enabled = true) {
+		if (enabled) {
+			this.gl.enable(this.gl.DEPTH_TEST)
+		} else {
+			this.gl.disable(this.gl.DEPTH_TEST)
+		}
+	}
+
+	private _setupVertexAttribStuff(renderPass: RenderPass) {
+		// Tell WebGL how to pull out the positions from the position
+		// buffer into the vertexPosition attribute.
+		this.gl.vertexAttribPointer(
+			renderPass.vertexPositionAttributeLocation,
+			2,				// numComponents
+			this.gl.FLOAT,	// the data in the buffer is 32bit floats
+			false,			// don't normalize
+			0,				// stride - how many bytes to get from one set of values to the next
+			0)				// offset - how many bytes inside the buffer to start from
+
+		this.gl.enableVertexAttribArray(renderPass.vertexPositionAttributeLocation)
+	}
+
+	private _updateUniforms(renderPass: RenderPass) {
+		renderPass.objectInfo.uniformValues.forEach((x, key) => {
+			x(renderPass.uniformLocations.get(key, null)!.location)
+		})
 	}
 }
 
@@ -223,6 +199,10 @@ export interface ProgramUniformValues extends Immutable.Map<string, UniformUpdat
 
 export type UniformUpdater = (location: WebGLUniformLocation | null) => void
 
+const fieldOfView = 45 * Math.PI / 180   // in radians
+const zNear = 0.1
+const zFar = 100.0
+
 export function createProjectionMatrix(canvasElement: HTMLCanvasElement) {
 	// Create a perspective matrix, a special matrix that is
 	// used to simulate the distortion of perspective in a camera.
@@ -233,15 +213,13 @@ export function createProjectionMatrix(canvasElement: HTMLCanvasElement) {
 
 	// TODO Look into web SIMD
 
-	const fieldOfView = 45 * Math.PI / 180   // in radians
 	const aspect = canvasElement.clientWidth / canvasElement.clientHeight
-	const zNear = 0.1
-	const zFar = 100.0
 	const projectionMatrix = mat4.create()
 
 	// note: glmatrix.js always has the first argument
 	// as the destination to receive the result.
-	mat4.perspective(projectionMatrix,
+	mat4.perspective(
+		projectionMatrix,
 		fieldOfView,
 		aspect,
 		zNear,
@@ -259,10 +237,10 @@ export function createModelViewMatrix(x: number, y: number, z: number) {
 
 	// Now move the drawing position a bit to where we want to
 	// start drawing the square.
-
-	mat4.translate(modelViewMatrix,     // destination matrix
-		modelViewMatrix,     // matrix to translate
-		[x, y, z])  // amount to translate
+	mat4.translate(
+		modelViewMatrix,	// destination matrix
+		modelViewMatrix,	// matrix to translate
+		[x, y, z])			// amount to translate
 
 	return modelViewMatrix
 }
