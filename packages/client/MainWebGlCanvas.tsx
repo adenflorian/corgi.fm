@@ -4,7 +4,8 @@ import {hot} from 'react-hot-loader'
 import {WebGlEngine, ObjectInfo, createProjectionMatrix,
 	createModelViewMatrix, UniformUpdater} from './webgl/WebGlEngine'
 import {logger} from './client-logger'
-import {backgroundFragmentShader, passthroughVertexShader} from './glsl/shaders'
+import {backgroundFragmentShader, passthroughVertexShader,
+	nodeFragmentShader, modelViewProjectionVertexShader} from './glsl/shaders'
 import {simpleGlobalClientState} from './SimpleGlobalClientState'
 
 export const MainWebGlCanvas = hot(module)(React.memo(function _MainWebGlCanvas() {
@@ -47,11 +48,8 @@ export const MainWebGlCanvas = hot(module)(React.memo(function _MainWebGlCanvas(
 				uResolution: location => gl.uniform2f(location,
 					canvasRef.current ? canvasRef.current.clientWidth : 100,
 					canvasRef.current ? canvasRef.current.clientHeight : 100),
-				uProjectionMatrix: location => gl.uniformMatrix4fv(location, false,
-					createProjectionMatrix(canvas)),
-				uModelViewMatrix: location => gl.uniformMatrix4fv(location, false,
-					createModelViewMatrix()),
 			}),
+			writeToDepthBuffer: false,
 		}
 
 		const backgroundRenderPass = engine.createPass(backgroundObjectInfo)
@@ -66,8 +64,8 @@ export const MainWebGlCanvas = hot(module)(React.memo(function _MainWebGlCanvas(
 				1.0, -1.0,
 			],
 			vertexCount: 4,
-			vertexShader: passthroughVertexShader,
-			fragmentShader: backgroundFragmentShader,
+			vertexShader: modelViewProjectionVertexShader,
+			fragmentShader: nodeFragmentShader,
 			uniformValues: Immutable.Map<UniformUpdater>({
 				uMouse: location => gl.uniform2f(location,
 					simpleGlobalClientState.lastMousePosition.x, simpleGlobalClientState.lastMousePosition.y),
@@ -83,11 +81,11 @@ export const MainWebGlCanvas = hot(module)(React.memo(function _MainWebGlCanvas(
 				uProjectionMatrix: location => gl.uniformMatrix4fv(location, false,
 					createProjectionMatrix(canvas)),
 				uModelViewMatrix: location => gl.uniformMatrix4fv(location, false,
-					createModelViewMatrix()),
+					createModelViewMatrix(-1, -1, -6)),
 			}),
 		}
 
-		const nodesRenderPass = engine.createPass(backgroundObjectInfo)
+		const nodesRenderPass = engine.createPass(nodesObjectInfo)
 
 		if (!nodesRenderPass) return
 
@@ -102,7 +100,7 @@ export const MainWebGlCanvas = hot(module)(React.memo(function _MainWebGlCanvas(
 
 			engine.drawPass(backgroundRenderPass)
 
-			engine.drawPass(nodesRenderPass)
+			// engine.drawPass(nodesRenderPass)
 
 			requestAnimationFrame(mainLoop)
 		}

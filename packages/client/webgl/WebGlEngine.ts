@@ -144,11 +144,18 @@ export class WebGlEngine {
 		height: number,
 	) {
 		this._resize(canvasElement, width, height)
+		this.gl.clearDepth(1.0)
 	}
 
 	public drawPass(
 		renderPass: RenderPass,
 	) {
+		if (renderPass.objectInfo.writeToDepthBuffer === false) {
+			this.gl.disable(this.gl.DEPTH_TEST)
+		} else {
+			this.gl.enable(this.gl.DEPTH_TEST)
+		}
+
 		// Tell WebGL to use our program when drawing
 		this.gl.useProgram(renderPass.shaderProgram)
 
@@ -209,6 +216,7 @@ export interface ObjectInfo {
 	readonly vertexShader: VertexShader
 	readonly fragmentShader: FragmentShader
 	readonly uniformValues: ProgramUniformValues
+	readonly writeToDepthBuffer?: boolean
 }
 
 export interface ProgramUniformValues extends Immutable.Map<string, UniformUpdater> {}
@@ -242,7 +250,7 @@ export function createProjectionMatrix(canvasElement: HTMLCanvasElement) {
 	return projectionMatrix
 }
 
-export function createModelViewMatrix() {
+export function createModelViewMatrix(x: number, y: number, z: number) {
 	// Set the drawing position to the "identity" point, which is
 	// the center of the scene.
 	const modelViewMatrix = mat4.create()
@@ -254,7 +262,7 @@ export function createModelViewMatrix() {
 
 	mat4.translate(modelViewMatrix,     // destination matrix
 		modelViewMatrix,     // matrix to translate
-		[-0.0, 0.0, -3.0])  // amount to translate
+		[x, y, z])  // amount to translate
 
 	return modelViewMatrix
 }

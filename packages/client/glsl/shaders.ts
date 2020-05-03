@@ -3,6 +3,7 @@ import passthroughVertexShaderSource from './passthroughVS.glsl'
 import backgroundFSSource from './backgroundFS.glsl'
 import milkdropFragmentShaderSource from './milkdropFragmentShader.glsl'
 import simpleMVPVertexShaderSource from './simpleProjModelVS.glsl'
+import nodeFragmentShaderSource from './nodeFS.glsl'
 
 export const passthroughVertexShader: VertexShader = {
 	source: passthroughVertexShaderSource,
@@ -21,6 +22,18 @@ export const modelViewProjectionVertexShader: VertexShader = {
 
 export const backgroundFragmentShader: FragmentShader = {
 	source: backgroundFSSource,
+	type: 'fragment',
+	uniforms: Immutable.Map({
+		uResolution: '2f',
+		uTime: '1f',
+		uMouse: '2f',
+		uZoom: '1f',
+		uPan: '2f',
+	}),
+}
+
+export const nodeFragmentShader: FragmentShader = {
+	source: nodeFragmentShaderSource,
 	type: 'fragment',
 	uniforms: Immutable.Map({
 		uResolution: '2f',
