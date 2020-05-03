@@ -49,23 +49,7 @@ export const ExpMilkdropNodeExtra = hot(module)(React.memo(function _ExpMilkdrop
 
 			if (!shaderProgram) return
 
-			const projectionMatrix = gl.getUniformLocation(shaderProgram, 'uProjectionMatrix')
-			const modelViewMatrix = gl.getUniformLocation(shaderProgram, 'uModelViewMatrix')
-			const time = gl.getUniformLocation(shaderProgram, 'uTime')
-			const mouse = gl.getUniformLocation(shaderProgram, 'uMouse')
-
-			const programInfo: webgl.ProgramInfo = {
-				program: shaderProgram,
-				attribLocations: {
-					vertexPosition: gl.getAttribLocation(shaderProgram, 'aVertexPosition'),
-				},
-				uniformLocations: {
-					projectionMatrix,
-					modelViewMatrix,
-					time,
-					mouse,
-				},
-			}
+			const programInfo = webgl.createStandardProgramInfo(gl, shaderProgram)
 
 			const buffers = webgl.initBuffers(gl)
 

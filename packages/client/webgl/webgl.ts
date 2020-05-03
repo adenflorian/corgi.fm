@@ -49,17 +49,6 @@ window.addEventListener('mousemove', e => {
 	}
 })
 
-export interface ProgramInfo {
-	readonly attribLocations: {vertexPosition: any}
-	readonly program: any
-	readonly uniformLocations: {
-		readonly projectionMatrix: WebGLUniformLocation | null
-		readonly modelViewMatrix: WebGLUniformLocation | null
-		readonly time: WebGLUniformLocation | null
-		readonly mouse: WebGLUniformLocation | null
-	}
-}
-
 export interface Buffers {
 	readonly position: any
 }
@@ -254,3 +243,23 @@ export function loadShader(gl: WebGLRenderingContext, type: number, source: stri
 
 	return shader
 }
+
+export function createStandardProgramInfo(gl: WebGLRenderingContext, shaderProgram: WebGLProgram) {
+	return {
+		program: shaderProgram,
+		attribLocations: {
+			vertexPosition: gl.getAttribLocation(shaderProgram, 'aVertexPosition'),
+		},
+		uniformLocations: {
+			projectionMatrix: gl.getUniformLocation(shaderProgram, 'uProjectionMatrix'),
+			modelViewMatrix: gl.getUniformLocation(shaderProgram, 'uModelViewMatrix'),
+			time: gl.getUniformLocation(shaderProgram, 'uTime'),
+			mouse: gl.getUniformLocation(shaderProgram, 'uMouse'),
+			zoom: gl.getUniformLocation(shaderProgram, 'uZoom'),
+			panX: gl.getUniformLocation(shaderProgram, 'uPanX'),
+			panY: gl.getUniformLocation(shaderProgram, 'uPanY'),
+		},
+	}
+}
+
+export interface ProgramInfo extends ReturnType<typeof createStandardProgramInfo> {}
