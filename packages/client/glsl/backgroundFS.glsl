@@ -1,5 +1,6 @@
 precision mediump float;
 
+uniform vec2 uResolution;
 uniform float uTime;
 uniform vec2 uMouse;
 uniform float uZoom;
@@ -64,8 +65,8 @@ float modI(float a,float b) {
 }
 
 #define rate 0.1
-#define lineZoom 1.0
-#define lineDistance 16.0 / lineZoom
+#define dotSize 4.0
+#define lineDistance 32.0
 #define lineOffset lineDistance / 2.0
 
 void main() {
@@ -82,21 +83,27 @@ void main() {
     mix(topLeft, topRight, uv.x),
     mix(bottomLeft, bottomRight, uv.x),
     uv.y
-  ) / 2.0;
+  );
   
-  float lineOffsetFinalX = lineOffset - (uPan.x / 1.25);
-  float lineOffsetFinalY = lineOffset + (uPan.y / 1.25);
-  bool isOnLineX = modI(((gl_FragCoord.x / uZoom) / lineZoom) + lineOffsetFinalX, lineDistance) == 0.0;
-  bool isOnLineY = modI(((gl_FragCoord.y / uZoom) / lineZoom) + lineOffsetFinalY, lineDistance) == 0.0;
-  if (isOnLineX && isOnLineY) {
-    gl_FragColor = vec4(final, 1.0);
-    return;
-  }
-  // if (isOnLineX || isOnLineY) {
+  float lineOffsetFinalX = lineOffset - (uPan.x / 1.0);
+  float lineOffsetFinalY = lineOffset + (uPan.y / 1.0);
+  float lineDistanceFinal = lineDistance;// * pow(2.0, (ceil(abs(1.0 / uZoom) / 2.0) - 1.0));
+  float aX = modI(((gl_FragCoord.x - floor(uResolution.x / 2.0)) / uZoom) + lineOffsetFinalX, lineDistanceFinal);
+  float aY = modI(((gl_FragCoord.y - floor(uResolution.y / 2.0)) / uZoom) + lineOffsetFinalY, lineDistanceFinal);
+  bool isOnLineX = aX == 0.0;
+  bool isOnLineY = aY == 0.0;
+  float dotSizeFinal = ceil(abs(1.0 / uZoom));
+  bool isNearLineX = abs(aX) <= (dotSizeFinal - 1.0);
+  bool isNearLineY = abs(aY) <= (dotSizeFinal - 1.0);
+  // if (isOnLineX && isOnLineY) {
   //   gl_FragColor = vec4(final, 1.0);
   //   return;
   // }
+  if (isNearLineX || isNearLineY) {
+    gl_FragColor = vec4(final, 1.0) / 3.0;
+    return;
+  }
 
-  gl_FragColor = vec4(0.0, 0.0, 0.0, min(easeCubicOut(uTime / 2.0), 1.0));
+  gl_FragColor = vec4(vec3(0.025), min(easeCubicOut(uTime / 2.0), 1.0));
   // gl_FragColor = vec4(final, min(easeCubicOut(uTime / 2.0), 1.0));
 }

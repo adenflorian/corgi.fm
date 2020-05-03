@@ -66,6 +66,9 @@ export function drawScene(
 
 	// updateModelMatrix(gl, programInfo.uniformLocations.projectionMatrix, canvasElement)
 
+	gl.uniform2f(
+		programInfo.uniformLocations.resolution,
+		canvasElement.clientWidth, canvasElement.clientHeight)
 	gl.uniform1f(
 		programInfo.uniformLocations.time,
 		current())
@@ -260,6 +263,7 @@ export function createStandardProgramInfo(gl: WebGLRenderingContext, shaderProgr
 		uniformLocations: {
 			projectionMatrix: gl.getUniformLocation(shaderProgram, 'uProjectionMatrix'),
 			modelViewMatrix: gl.getUniformLocation(shaderProgram, 'uModelViewMatrix'),
+			resolution: gl.getUniformLocation(shaderProgram, 'uResolution'),
 			time: gl.getUniformLocation(shaderProgram, 'uTime'),
 			mouse: gl.getUniformLocation(shaderProgram, 'uMouse'),
 			zoom: gl.getUniformLocation(shaderProgram, 'uZoom'),
