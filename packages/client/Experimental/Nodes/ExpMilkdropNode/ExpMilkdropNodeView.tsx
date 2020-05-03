@@ -3,10 +3,11 @@ import {hot} from 'react-hot-loader'
 import {CorgiNumberChangedEvent} from '../../CorgiEvents'
 import {useExpPosition} from '../../../react-hooks'
 import {useNodeContext} from '../../CorgiNode'
-import vsSource from '../../../glsl/passthroughVS.glsl'
-import fsSource from '../../../glsl/simpleFragmentShader.glsl'
-import * as webgl from '../../../webgl/webgl'
 import {logger} from '../../../client-logger'
+import {passthroughVertexShaderSource, milkdropFragmentShaderSource, passthroughVertexShader, milkdropFragmentShader} from '../../../glsl/shaders'
+import {Program, WebGlEngine} from '../../../webgl/WebGlEngine'
+import {useStore} from 'react-redux'
+import {selectExpPosition} from '@corgifm/common/redux'
 
 interface Props {
 	newSampleEvent: CorgiNumberChangedEvent
@@ -18,6 +19,7 @@ export const ExpMilkdropNodeExtra = hot(module)(React.memo(function _ExpMilkdrop
 	const canvasRef = useRef<HTMLCanvasElement>(null)
 	const node = useNodeContext()
 	const position = useExpPosition(node.id)
+	const store = useStore()
 
 	useEffect(() => {
 		const canvas = canvasRef.current
@@ -27,43 +29,47 @@ export const ExpMilkdropNodeExtra = hot(module)(React.memo(function _ExpMilkdrop
 		canvas.width = position.width + 2
 		canvas.height = position.height + 2
 
-		const glMaybe = canvas.getContext('webgl', {
-			premultipliedAlpha: false,
-		})
+		let engine: WebGlEngine
 
-		if (!glMaybe) return
+		try {
+			engine = new WebGlEngine(canvas)
+		} catch (error) {
+			return logger.error(`[MainWebGlCanvas] ${error}`)
+		}
 
-		const gl = glMaybe
+		const program: Program = {
+			vertexPositions: [
+				-1.0, 1.0,
+				1.0, 1.0,
+				-1.0, -1.0,
+				1.0, -1.0,
+			],
+			vertexShader: passthroughVertexShader,
+			fragmentShader: milkdropFragmentShader,
+		}
+
+		const backgroundShaderProgram = engine.createShaderProgram(passthroughVertexShaderSource, milkdropFragmentShaderSource)
+
+		if (!backgroundShaderProgram) return
+
+		const programInfo = engine.createStandardProgramInfo(backgroundShaderProgram)
+
+		const positionBuffer = engine.createPositionBuffer(program.vertexPositions)
+
+		engine.initScene(programInfo, canvas)
 
 		let stop = false
 
-		initGl(gl, canvas)
+		requestAnimationFrame(mainLoop)
 
-		function initGl(gl: WebGLRenderingContext, canvasElement: HTMLCanvasElement) {
+		function mainLoop(time: number) {
+			if (stop || !canvasRef.current) return
 
-			const shaderProgram = webgl.initShaderProgram(
-				gl,
-				vsSource,
-				fsSource,
-			)
+			const positionLatest = selectExpPosition(store.getState().room, node.id)
 
-			if (!shaderProgram) return
-
-			const programInfo = webgl.createStandardProgramInfo(gl, shaderProgram)
-
-			const buffers = webgl.initBuffers(gl)
-
-			webgl.initScene(gl, programInfo, buffers, canvasElement)
+			engine.drawScene(programInfo, canvasRef.current, positionLatest.width, positionLatest.height)
 
 			requestAnimationFrame(mainLoop)
-
-			function mainLoop(time: number) {
-				if (stop) return
-
-				webgl.drawScene(gl, programInfo, buffers, canvasElement)
-
-				requestAnimationFrame(mainLoop)
-			}
 		}
 
 		return () => {

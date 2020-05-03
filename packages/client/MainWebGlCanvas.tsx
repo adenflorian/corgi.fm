@@ -1,9 +1,8 @@
 import React, {useRef, useEffect} from 'react'
 import {hot} from 'react-hot-loader'
-import * as webgl from './webgl/webgl'
-import vsSource from './glsl/passthroughVS.glsl'
-import backgroundFS from './glsl/backgroundFS.glsl'
+import {WebGlEngine, Program} from './webgl/WebGlEngine'
 import {logger} from './client-logger'
+import {passthroughVertexShaderSource, backgroundFSSource, backgroundFragmentShader, passthroughVertexShader} from './glsl/shaders'
 
 export const MainWebGlCanvas = hot(module)(React.memo(function _MainWebGlCanvas() {
 	const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -16,43 +15,45 @@ export const MainWebGlCanvas = hot(module)(React.memo(function _MainWebGlCanvas(
 		canvas.width = window.innerWidth
 		canvas.height = window.innerHeight
 
-		const glMaybe = canvas.getContext('webgl', {
-			premultipliedAlpha: false,
-		})
+		let engine: WebGlEngine
 
-		if (!glMaybe) return
+		try {
+			engine = new WebGlEngine(canvas)
+		} catch (error) {
+			return logger.error(`[MainWebGlCanvas] ${error}`)
+		}
 
-		const gl = glMaybe
+		const program: Program = {
+			vertexPositions: [
+				-1.0, 1.0,
+				1.0, 1.0,
+				-1.0, -1.0,
+				1.0, -1.0,
+			],
+			vertexShader: passthroughVertexShader,
+			fragmentShader: backgroundFragmentShader,
+		}
+
+		const backgroundShaderProgram = engine.createShaderProgram(passthroughVertexShaderSource, backgroundFSSource)
+
+		if (!backgroundShaderProgram) return
+	
+		const programInfo = engine.createStandardProgramInfo(backgroundShaderProgram)
+
+		const positionBuffer = engine.createPositionBuffer(program.vertexPositions)
+
+		engine.initScene(programInfo, canvas)
 
 		let stop = false
 
-		initGl(gl, canvas)
+		requestAnimationFrame(mainLoop)
 
-		function initGl(gl: WebGLRenderingContext, canvasElement: HTMLCanvasElement) {
+		function mainLoop(time: number) {
+			if (stop || !canvasRef.current) return
 
-			const shaderProgram = webgl.initShaderProgram(
-				gl,
-				vsSource,
-				backgroundFS,
-			)
-
-			if (!shaderProgram) return
-
-			const programInfo = webgl.createStandardProgramInfo(gl, shaderProgram)
-
-			const buffers = webgl.initBuffers(gl)
-
-			webgl.initScene(gl, programInfo, buffers, canvasElement)
+			engine.drawScene(programInfo, canvasRef.current, canvasRef.current.clientWidth, canvasRef.current.clientHeight)
 
 			requestAnimationFrame(mainLoop)
-
-			function mainLoop(time: number) {
-				if (stop || !canvasRef.current) return
-
-				webgl.drawScene(gl, programInfo, buffers, canvasRef.current)
-
-				requestAnimationFrame(mainLoop)
-			}
 		}
 
 		return () => {
