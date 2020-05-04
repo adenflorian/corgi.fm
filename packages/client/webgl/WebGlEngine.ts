@@ -203,7 +203,7 @@ const fieldOfView = 45 * Math.PI / 180   // in radians
 const zNear = 0.1
 const zFar = 100.0
 
-export function createProjectionMatrix(canvasElement: HTMLCanvasElement) {
+export function createPerspectiveProjectionMatrix(canvasElement: HTMLCanvasElement) {
 	// Create a perspective matrix, a special matrix that is
 	// used to simulate the distortion of perspective in a camera.
 	// Our field of view is 45 degrees, with a width/height
@@ -224,6 +224,27 @@ export function createProjectionMatrix(canvasElement: HTMLCanvasElement) {
 		aspect,
 		zNear,
 		zFar)
+
+	return projectionMatrix
+}
+
+export function createOrthographicProjectionMatrix(canvasElement: HTMLCanvasElement, size: number) {
+	// TODO Look into web SIMD
+
+	const halfCanvasWidth = canvasElement.clientWidth / 2
+	const halfCanvasHeight = canvasElement.clientHeight / 2
+	const projectionMatrix = mat4.create()
+
+	// note: glmatrix.js always has the first argument
+	// as the destination to receive the result.
+	mat4.ortho(
+		projectionMatrix,
+		-halfCanvasWidth * size,	// left
+		halfCanvasWidth * size,		// right
+		halfCanvasHeight * size,	// bottom
+		-halfCanvasHeight * size,	// top
+		zNear,						// near
+		zFar)						// far
 
 	return projectionMatrix
 }

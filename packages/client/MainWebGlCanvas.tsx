@@ -1,8 +1,8 @@
 import React, {useRef, useEffect} from 'react'
 import * as Immutable from 'immutable'
 import {hot} from 'react-hot-loader'
-import {WebGlEngine, ObjectInfo, createProjectionMatrix,
-	createModelViewMatrix, UniformUpdater} from './webgl/WebGlEngine'
+import {WebGlEngine, ObjectInfo,
+	createModelViewMatrix, UniformUpdater, createOrthographicProjectionMatrix} from './webgl/WebGlEngine'
 import {logger} from './client-logger'
 import {backgroundFragmentShader, passthroughVertexShader,
 	nodeFragmentShader, modelViewProjectionVertexShader} from './glsl/shaders'
@@ -83,9 +83,13 @@ export const MainWebGlCanvas = hot(module)(React.memo(function _MainWebGlCanvas(
 					canvasRef.current ? canvasRef.current.clientWidth : 100,
 					canvasRef.current ? canvasRef.current.clientHeight : 100),
 				uProjectionMatrix: location => gl.uniformMatrix4fv(location, false,
-					createProjectionMatrix(canvas)),
+					createOrthographicProjectionMatrix(
+						canvas, 0.01 / simpleGlobalClientState.zoom)),
 				uModelViewMatrix: location => gl.uniformMatrix4fv(location, false,
-					createModelViewMatrix(-1, -1, -6)),
+					createModelViewMatrix(
+						simpleGlobalClientState.pan.x / 100,
+						simpleGlobalClientState.pan.y / 100,
+						-1.0)),
 			}),
 		}
 
