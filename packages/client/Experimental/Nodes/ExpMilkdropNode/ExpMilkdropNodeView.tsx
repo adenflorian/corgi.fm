@@ -6,7 +6,7 @@ import {useExpPosition} from '../../../react-hooks'
 import {useNodeContext} from '../../CorgiNode'
 import {logger} from '../../../client-logger'
 import {passthroughVertexShader, milkdropFragmentShader} from '../../../glsl/shaders'
-import {ObjectInfo, WebGlEngine, UniformUpdater} from '../../../webgl/WebGlEngine'
+import {ObjectInfo, WebGlEngine, UniformUpdater, getVerticesForRect} from '../../../webgl/WebGlEngine'
 import {useStore} from 'react-redux'
 import {selectExpPosition} from '@corgifm/common/redux'
 import {simpleGlobalClientState} from '../../../SimpleGlobalClientState'
@@ -41,14 +41,13 @@ export const ExpMilkdropNodeExtra = hot(module)(React.memo(function _ExpMilkdrop
 
 		const {gl} = engine
 
+		const vertexPositions = [
+			...getVerticesForRect({x: -1, y: 1}, 2, 2),
+		]
+
 		const program: ObjectInfo = {
-			vertexPositions: [
-				-1.0, 1.0,
-				1.0, 1.0,
-				-1.0, -1.0,
-				1.0, -1.0,
-			],
-			vertexCount: 4,
+			vertexPositions,
+			vertexCount: vertexPositions.length / 2,
 			vertexShader: passthroughVertexShader,
 			fragmentShader: milkdropFragmentShader,
 			uniformValues: Immutable.Map<UniformUpdater>({

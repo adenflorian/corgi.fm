@@ -154,7 +154,7 @@ export class WebGlEngine {
 
 		this._updateUniforms(renderPass)
 
-		this.gl.drawArrays(this.gl.TRIANGLE_STRIP, 0, renderPass.objectInfo.vertexCount)
+		this.gl.drawArrays(this.gl.TRIANGLES, 0, renderPass.objectInfo.vertexCount)
 	}
 
 	private _setDepthBufferEnabled(enabled = true) {
@@ -264,4 +264,16 @@ export function createModelViewMatrix(x: number, y: number, z: number) {
 		[x, y, z])			// amount to translate
 
 	return modelViewMatrix
+}
+
+export function getVerticesForRect(position: Point, width: number, height: number): readonly number[] {
+	return [
+		position.x, position.y,
+		position.x + width, position.y,
+		position.x, position.y - height,
+
+		position.x + width, position.y,
+		position.x, position.y - height,
+		position.x + width, position.y - height,
+	]
 }

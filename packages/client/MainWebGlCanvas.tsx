@@ -2,7 +2,7 @@ import React, {useRef, useEffect} from 'react'
 import * as Immutable from 'immutable'
 import {hot} from 'react-hot-loader'
 import {WebGlEngine, ObjectInfo,
-	createModelViewMatrix, UniformUpdater, createOrthographicProjectionMatrix} from './webgl/WebGlEngine'
+	createModelViewMatrix, UniformUpdater, createOrthographicProjectionMatrix, getVerticesForRect} from './webgl/WebGlEngine'
 import {logger} from './client-logger'
 import {backgroundFragmentShader, passthroughVertexShader,
 	nodeFragmentShader, modelViewProjectionVertexShader} from './glsl/shaders'
@@ -30,14 +30,13 @@ export const MainWebGlCanvas = hot(module)(React.memo(function _MainWebGlCanvas(
 
 		const {gl} = engine
 
+		const backgroundVertexPositions = [
+			...getVerticesForRect({x: -1, y: 1}, 2, 2),
+		]
+
 		const backgroundObjectInfo: ObjectInfo = {
-			vertexPositions: [
-				-1.0, 1.0,
-				1.0, 1.0,
-				-1.0, -1.0,
-				1.0, -1.0,
-			],
-			vertexCount: 4,
+			vertexPositions: backgroundVertexPositions,
+			vertexCount: backgroundVertexPositions.length / 2,
 			vertexShader: passthroughVertexShader,
 			fragmentShader: backgroundFragmentShader,
 			uniformValues: Immutable.Map<UniformUpdater>({
@@ -60,14 +59,14 @@ export const MainWebGlCanvas = hot(module)(React.memo(function _MainWebGlCanvas(
 
 		if (!backgroundRenderPass) return
 
+		const nodesVertexPositions = [
+			...getVerticesForRect({x: -1, y: 1}, 2, 2),
+			...getVerticesForRect({x: -3, y: -6}, 2, 2),
+		]
+
 		const nodesObjectInfo: ObjectInfo = {
-			vertexPositions: [
-				-1.0, 1.0,
-				1.0, 1.0,
-				-1.0, -1.0,
-				1.0, -1.0,
-			],
-			vertexCount: 4,
+			vertexPositions: nodesVertexPositions,
+			vertexCount: nodesVertexPositions.length / 2,
 			vertexShader: modelViewProjectionVertexShader,
 			fragmentShader: nodeFragmentShader,
 			uniformValues: Immutable.Map<UniformUpdater>({
