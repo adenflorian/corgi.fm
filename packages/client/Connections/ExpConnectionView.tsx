@@ -26,6 +26,7 @@ import './ConnectionView.less'
 import {ExpNodeConnection} from '../Experimental/ExpConnections'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {CorgiNumberChangedEvent} from '../Experimental/CorgiEvents'
+import {constant1} from '../client-utils'
 
 interface Props {
 	id: Id
@@ -65,8 +66,6 @@ interface ExpConnectionViewPorts extends Props {
 	readonly targetId: Id
 	readonly type: ExpConnectionType
 }
-
-const constant1 = new CorgiNumberChangedEvent(1)
 
 const ExpConnectionView =
 	React.memo(function _ExpConnectionView({

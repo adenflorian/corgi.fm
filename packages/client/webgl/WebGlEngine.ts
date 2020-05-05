@@ -33,6 +33,8 @@ export class WebGlEngine {
 		this.gl.clearDepth(1.0)                 // Clear everything
 		this.gl.enable(this.gl.DEPTH_TEST)      // Enable depth testing
 		this.gl.depthFunc(this.gl.LEQUAL)       // Near things obscure far things
+		this.gl.enable(this.gl.BLEND);
+		this.gl.blendFunc(this.gl.ONE, this.gl.ONE_MINUS_SRC_ALPHA);
 
 		this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT)
 	}
@@ -143,7 +145,7 @@ export class WebGlEngine {
 		}
 	}
 
-	public drawPass(renderPass: RenderPass, vertexPositions?: readonly number[]) {
+	public drawPass(renderPass: RenderPass, vertexPositions?: readonly number[], updateCustomUniforms?: () => void) {
 		this._setDepthBufferEnabled(renderPass.objectInfo.writeToDepthBuffer)
 
 		this.gl.useProgram(renderPass.shaderProgram)
@@ -152,13 +154,15 @@ export class WebGlEngine {
 
 		if (vertexPositions) {
 			this.gl.bufferData(this.gl.ARRAY_BUFFER,
-				new Float32Array(vertexPositions),
+				new Float32Array(vertexPositions),	// TODO Don't create a new Float32Array every frame
 				this.gl.STATIC_DRAW)
 		}
 
 		this._setupVertexAttribStuff(renderPass)
 
 		this._updateUniforms(renderPass)
+
+		if (updateCustomUniforms) updateCustomUniforms()
 
 		this.gl.drawArrays(this.gl.TRIANGLES, 0, vertexPositions ? vertexPositions.length / 2 : renderPass.objectInfo.vertexCount)
 	}

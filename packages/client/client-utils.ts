@@ -1,5 +1,6 @@
 import packageJson from './package.json'
 import {isLocalDevClient, isTestClient} from './is-prod-client'
+import {CorgiNumberChangedEvent} from './Experimental/CorgiEvents'
 
 /** @param buttons The buttons property from a mouse event */
 export function isLeftMouseButtonDown(buttons: number): boolean {
@@ -68,3 +69,5 @@ export function isInputFocused() {
 		? ['input', 'textarea'].includes(document.activeElement.tagName.toLowerCase())
 		: false
 }
+
+export const constant1 = new CorgiNumberChangedEvent(1)

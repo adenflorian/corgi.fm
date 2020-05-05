@@ -4,6 +4,7 @@ import backgroundFSSource from './backgroundFS.glsl'
 import milkdropFragmentShaderSource from './milkdropFragmentShader.glsl'
 import simpleMVPVertexShaderSource from './simpleProjModelVS.glsl'
 import nodeFragmentShaderSource from './nodeFS.glsl'
+import connectionFSSource from './connectionFS.glsl'
 
 export const passthroughVertexShader: VertexShader = {
 	source: passthroughVertexShaderSource,
@@ -41,6 +42,22 @@ export const nodeFragmentShader: FragmentShader = {
 		uMouse: '2f',
 		uZoom: '1f',
 		uPan: '2f',
+	}),
+}
+
+export const connectionFragmentShader: FragmentShader = {
+	source: connectionFSSource,
+	type: 'fragment',
+	uniforms: Immutable.Map({
+		uResolution: '2f',
+		uTime: '1f',
+		uMouse: '2f',
+		uZoom: '1f',
+		uPan: '2f',
+		uLineStart: '2f',
+		uLineEnd: '2f',
+		uLineColor: '3f',
+		uLineThicc: '1f',
 	}),
 }
 
