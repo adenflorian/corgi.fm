@@ -91,7 +91,7 @@ export function createLocalMiddleware(
 				const localVirtualKeyboard = selectLocalVirtualKeyboard(state)
 
 				return localVirtualKeyboard.pressedKeys.forEach(key => {
-					dispatch(localMidiKeyUp(key))
+					dispatch(localMidiKeyUp(key, 'WINDOW_BLUR'))
 				})
 			}
 			case 'LOCAL_MIDI_KEY_PRESS': {
@@ -101,7 +101,13 @@ export function createLocalMiddleware(
 				const directlyConnectedSequencerIds = selectDirectDownstreamSequencerIds(beforeState.room, sourceId).toArray()
 
 				if (_localMidiKeys.has(action.midiNote)) {
-					dispatch(localMidiKeyUp(action.midiNote))
+					return
+					// I think we used to do the below when we wanted to retrigger notes when changing octaves
+					// but we don't do that anymore, and now there's a weird chrome/windows behavior
+					// that repeats a keydown event when letting up a different key
+					// so gonna try disabling this, and if it doesn't cause other issues
+					// then it will stay commented out
+					// dispatch(localMidiKeyUp(action.midiNote, 'LOCAL_MIDI_KEY_PRESS'))
 				}
 
 				_localMidiKeys = _localMidiKeys.set(action.midiNote, noteToPlay)

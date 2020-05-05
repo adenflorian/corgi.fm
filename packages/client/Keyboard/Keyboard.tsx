@@ -137,13 +137,13 @@ const Key = React.memo(function _Key({
 
 	const handleMouseOver = useCallback((e: React.MouseEvent) => {
 		if (isLeftMouseButtonDown(e.buttons) && wasMouseClickedOnKeyboard) {
-			dispatch(localMidiKeyPress(index, 1))
+			dispatch(localMidiKeyPress(index, 1, 'Keyboard component - handleMouseOver'))
 		}
 	}, [dispatch, index, wasMouseClickedOnKeyboard])
 
 	const handleMouseOut = useCallback((e: React.MouseEvent) => {
 		if (isLeftMouseButtonDown(e.buttons) && wasMouseClickedOnKeyboard) {
-			dispatch(localMidiKeyUp(index))
+			dispatch(localMidiKeyUp(index, 'Keyboard component - handleMouseOut'))
 		}
 	}, [dispatch, index, wasMouseClickedOnKeyboard])
 
@@ -154,19 +154,19 @@ const Key = React.memo(function _Key({
 			setWasMouseClickedOnKeyboard(true)
 			if (e.shiftKey) {
 				if (isKeyPressed) {
-					dispatch(localMidiKeyUp(index))
+					dispatch(localMidiKeyUp(index, 'Keyboard component - handleMouseDown'))
 				} else {
-					dispatch(localMidiKeyPress(index, 1))
+					dispatch(localMidiKeyPress(index, 1, 'Keyboard component - handleMouseDown A'))
 				}
 			} else {
-				dispatch(localMidiKeyPress(index, 1))
+				dispatch(localMidiKeyPress(index, 1, 'Keyboard component - handleMouseDown B'))
 			}
 		}
 	}, [dispatch, index, isKeyPressed, setWasMouseClickedOnKeyboard])
 
 	const handleMouseUp = useCallback((e: React.MouseEvent) => {
 		if (e.button === 0 && e.shiftKey === false) {
-			dispatch(localMidiKeyUp(index))
+			dispatch(localMidiKeyUp(index, 'Keyboard component - handleMouseUp'))
 		}
 	}, [dispatch, index])
 

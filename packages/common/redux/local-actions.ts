@@ -3,17 +3,21 @@ import {IMidiNote, IMidiNotes} from '../MidiNote'
 import {ConnectionNodeType} from '../common-types'
 import {SERVER_ACTION, BROADCASTER_ACTION, ActiveGhostConnectorSourceOrTarget} from '.'
 
+const debug = false
+
 export type LocalMidiKeyPressAction = ReturnType<typeof localMidiKeyPress>
-export const localMidiKeyPress = (midiNote: IMidiNote, velocity: number) => ({
+export const localMidiKeyPress = (midiNote: IMidiNote, velocity: number, source: string) => ({
 	type: 'LOCAL_MIDI_KEY_PRESS',
 	midiNote,
 	velocity,
+	source: debug ? source : undefined,
 } as const)
 
 export type LocalMidiKeyUpAction = ReturnType<typeof localMidiKeyUp>
-export const localMidiKeyUp = (midiNote: IMidiNote) => ({
+export const localMidiKeyUp = (midiNote: IMidiNote, source: string) => ({
 	type: 'LOCAL_MIDI_KEY_UP',
 	midiNote,
+	source: debug ? source : undefined,
 } as const)
 
 export type LocalMidiOctaveChangeAction =

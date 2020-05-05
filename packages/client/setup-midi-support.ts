@@ -125,14 +125,14 @@ function onMidiMessage(event: MidiMessageEvent) {
 	if (type === 176) {
 		_store.dispatch(userInputActions.localMidiSustainPedal(velocity >= 64))
 	} else if (velocity === 0) {
-		_store.dispatch(localMidiKeyUp(note))
+		_store.dispatch(localMidiKeyUp(note, 'onMidiMessage - velocity === 0'))
 	} else {
 		switch (type) {
 			case 144:
-				_store.dispatch(localMidiKeyPress(note, clamp(velocity / 127, 0, 1)))
+				_store.dispatch(localMidiKeyPress(note, clamp(velocity / 127, 0, 1), 'onMidiMessage - 144'))
 				break
 			case 128:
-				_store.dispatch(localMidiKeyUp(note))
+				_store.dispatch(localMidiKeyUp(note, 'onMidiMessage - 128'))
 				break
 		}
 	}
