@@ -152,7 +152,7 @@ vec4 Scene(vec2 p)
 void main() {
   vec2 uv = vec2(
       ((gl_FragCoord.x - (uResolution.x / 2.0)) / uZoom) - uPan.x,
-      ((gl_FragCoord.y - (uResolution.y / 2.0)) / uZoom) + uPan.y
+      -((gl_FragCoord.y - (uResolution.y / 2.0)) / uZoom) - uPan.y
   );
 
   vec4 col = vec4(0);

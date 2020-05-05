@@ -20,7 +20,7 @@ import {RoomType} from '@corgifm/common/common-types'
 import {NodeManagerContextValue} from './Experimental/NodeManager'
 import {colorFunc} from '@corgifm/common/shamu-color'
 import {useSingletonContext, SingletonContextImpl} from './SingletonContext'
-import {isAudioOutputPort} from './Experimental/ExpPorts'
+import {isAudioOutputPort, ExpPort} from './Experimental/ExpPorts'
 import {constant1} from './client-utils'
 
 export const MainWebGlCanvas = hot(module)(React.memo(function _MainWebGlCanvas() {
@@ -237,17 +237,18 @@ function drawConnections(
 
 		if (!sourceNode || !targetNode) return
 
-		const port = nodeManagerContext.ports.get(sourceNode.node.id, connection.sourcePort)
+		const sourcePort = nodeManagerContext.ports.get(sourceNode.node.id, connection.sourcePort)
+		const targetPort = nodeManagerContext.ports.get(targetNode.node.id, connection.targetPort)
 
-		if (!port) return
+		if (!sourcePort || !targetPort) return
 
-		const voiceCountEvent = isAudioOutputPort(port)
-			? port.source.voiceCount
+		const voiceCountEvent = isAudioOutputPort(sourcePort)
+			? sourcePort.source.voiceCount
 			: constant1
 
-		const connectionDrawInfo = createVertexPositionsForConnection(connection, sourceNode.position, targetNode.position)
+		const color = colorFunc(sourcePort.onColorChange.current)
 
-		const color = colorFunc(port.onColorChange.current)
+		const connectionDrawInfo = createVertexPositionsForConnection(connection, sourceNode.position, targetNode.position, sourcePort, targetPort)
 
 		engine.drawPass(connectionsRenderPass,
 			connectionDrawInfo.vertexPositions, () => {
@@ -263,24 +264,26 @@ function drawConnections(
 	})
 }
 
-function createVertexPositionsForConnection(connection: ExpConnection, sourceNode: ExpPosition, targetNode: ExpPosition) {
-	const sourceX = (sourceNode.x + sourceNode.width)
-	const sourceY = (-sourceNode.y)
-	const targetX = (targetNode.x)
-	const targetY = (-targetNode.y)
+function createVertexPositionsForConnection(connection: ExpConnection, sourceNode: ExpPosition, targetNode: ExpPosition, sourcePort: ExpPort, targetPort: ExpPort) {
+	const sourcePortPosition = sourcePort.onPositionChanged.current
+	const targetPortPosition = targetPort.onPositionChanged.current
+	const sourceX = (sourceNode.x + sourceNode.width - sourcePortPosition.x)
+	const sourceY = (sourceNode.y + sourcePortPosition.y)
+	const targetX = (targetNode.x + targetPortPosition.x)
+	const targetY = (targetNode.y + targetPortPosition.y)
 	return {
 		sourceX,
 		sourceY,
 		targetX,
 		targetY,
 		vertexPositions: [
-			sourceX - 100, sourceY,
-			targetX + 100, sourceY,
-			sourceX - 100, targetY,
+			sourceX, -sourceY,
+			targetX, -sourceY,
+			sourceX, -targetY,
 
-			targetX + 100, sourceY,
-			sourceX - 100, targetY,
-			targetX + 100, targetY,
+			targetX, -sourceY,
+			sourceX, -targetY,
+			targetX, -targetY,
 		]
 	}
 }
