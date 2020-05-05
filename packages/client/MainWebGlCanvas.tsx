@@ -31,7 +31,7 @@ export const MainWebGlCanvas = hot(module)(React.memo(function _MainWebGlCanvas(
 		const {gl} = engine
 
 		const backgroundVertexPositions = [
-			...getVerticesForRect({x: -1, y: 1}, 2, 2),
+			...getVerticesForRect(-1, 1, 2, 2),
 		]
 
 		const backgroundObjectInfo: ObjectInfo = {
@@ -59,14 +59,9 @@ export const MainWebGlCanvas = hot(module)(React.memo(function _MainWebGlCanvas(
 
 		if (!backgroundRenderPass) return
 
-		const nodesVertexPositions = [
-			...getVerticesForRect({x: -1, y: 1}, 2, 2),
-			...getVerticesForRect({x: -3, y: -6}, 2, 2),
-		]
-
 		const nodesObjectInfo: ObjectInfo = {
-			vertexPositions: nodesVertexPositions,
-			vertexCount: nodesVertexPositions.length / 2,
+			vertexPositions: [],
+			vertexCount: 0,
 			vertexShader: modelViewProjectionVertexShader,
 			fragmentShader: nodeFragmentShader,
 			uniformValues: Immutable.Map<UniformUpdater>({
@@ -83,11 +78,11 @@ export const MainWebGlCanvas = hot(module)(React.memo(function _MainWebGlCanvas(
 					canvasRef.current ? canvasRef.current.clientHeight : 100),
 				uProjectionMatrix: location => gl.uniformMatrix4fv(location, false,
 					createOrthographicProjectionMatrix(
-						canvas, 0.01 / simpleGlobalClientState.zoom)),
+						canvas, 1 / simpleGlobalClientState.zoom)),
 				uModelViewMatrix: location => gl.uniformMatrix4fv(location, false,
 					createModelViewMatrix(
-						simpleGlobalClientState.pan.x / 100,
-						simpleGlobalClientState.pan.y / 100,
+						simpleGlobalClientState.pan.x,
+						-simpleGlobalClientState.pan.y,
 						-1.0)),
 			}),
 		}
@@ -113,11 +108,15 @@ export const MainWebGlCanvas = hot(module)(React.memo(function _MainWebGlCanvas(
 				if (state.room.activity.activityType === RoomType.Experimental) {
 					const currentGroupId = selectRoomMember(state.room, selectLocalClientId(state)).groupNodeId
 
-					const nodesToRender = selectExpNodesState(state.room)
+					const nodesVertexPositions2 = selectExpNodesState(state.room)
 						.filter(x => x.groupId === currentGroupId)
 						.map(node => ({node, position: selectExpPosition(state.room, node.id)}))
+						.reduce((vertexPositions, {node, position}) => {
+							return [...vertexPositions, ...getVerticesForRect(position.x, -position.y, position.width, position.height)]
+						}, [] as number[])
 
-					engine.drawPass(nodesRenderPass)
+					engine.drawPass(nodesRenderPass, nodesVertexPositions2)
+					// engine.drawPass(nodesRenderPass, getVerticesForRect({x: -100, y: 100}, 100, 200))
 				}
 
 				requestAnimationFrame(mainLoop)

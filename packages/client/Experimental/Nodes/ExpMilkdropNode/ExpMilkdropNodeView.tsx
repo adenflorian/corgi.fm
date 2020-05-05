@@ -42,7 +42,7 @@ export const ExpMilkdropNodeExtra = hot(module)(React.memo(function _ExpMilkdrop
 		const {gl} = engine
 
 		const vertexPositions = [
-			...getVerticesForRect({x: -1, y: 1}, 2, 2),
+			...getVerticesForRect(-1, 1, 2, 2),
 		]
 
 		const program: ObjectInfo = {

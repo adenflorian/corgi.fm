@@ -55,6 +55,8 @@ export const ExpPanel =
 			<div
 				style={{
 					color: enabled ? color : CssColor.disabledGray,
+					backgroundColor: 'unset',
+					boxShadow: 'unset',
 				}}
 				className={`panelContainer ${saturate ? 'saturate' : ''}`}
 			>

@@ -143,18 +143,24 @@ export class WebGlEngine {
 		}
 	}
 
-	public drawPass(renderPass: RenderPass) {
+	public drawPass(renderPass: RenderPass, vertexPositions?: readonly number[]) {
 		this._setDepthBufferEnabled(renderPass.objectInfo.writeToDepthBuffer)
 
 		this.gl.useProgram(renderPass.shaderProgram)
 
 		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, renderPass.positionBuffer)
 
+		if (vertexPositions) {
+			this.gl.bufferData(this.gl.ARRAY_BUFFER,
+				new Float32Array(vertexPositions),
+				this.gl.STATIC_DRAW)
+		}
+
 		this._setupVertexAttribStuff(renderPass)
 
 		this._updateUniforms(renderPass)
 
-		this.gl.drawArrays(this.gl.TRIANGLES, 0, renderPass.objectInfo.vertexCount)
+		this.gl.drawArrays(this.gl.TRIANGLES, 0, vertexPositions ? vertexPositions.length / 2 : renderPass.objectInfo.vertexCount)
 	}
 
 	private _setDepthBufferEnabled(enabled = true) {
@@ -241,8 +247,8 @@ export function createOrthographicProjectionMatrix(canvasElement: HTMLCanvasElem
 		projectionMatrix,
 		-halfCanvasWidth * size,	// left
 		halfCanvasWidth * size,		// right
-		halfCanvasHeight * size,	// bottom
-		-halfCanvasHeight * size,	// top
+		-halfCanvasHeight * size,	// bottom
+		halfCanvasHeight * size,	// top
 		zNear,						// near
 		zFar)						// far
 
@@ -266,14 +272,14 @@ export function createModelViewMatrix(x: number, y: number, z: number) {
 	return modelViewMatrix
 }
 
-export function getVerticesForRect(position: Point, width: number, height: number): readonly number[] {
+export function getVerticesForRect(x: number, y: number, width: number, height: number): readonly number[] {
 	return [
-		position.x, position.y,
-		position.x + width, position.y,
-		position.x, position.y - height,
+		x, 			y,
+		x + width, 	y,
+		x, 			y - height,
 
-		position.x + width, position.y,
-		position.x, position.y - height,
-		position.x + width, position.y - height,
+		x + width, 	y,
+		x, 			y - height,
+		x + width, 	y - height,
 	]
 }
