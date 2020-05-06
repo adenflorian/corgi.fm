@@ -113,7 +113,7 @@ Hit HitSegment(vec2 p, CubicBezierSegment seg, BezierLook look)
         float t = float(i) / float(subdivs);
         vec2 s = SampleBezier(seg, t);
         
-       	newHit.Dist = sdLineSegment(p, last, s, look.BezierThicc*0.5);
+       	newHit.Dist = sdLineSegment(p, last, s, look.BezierThicc);
         hit = Closest(hit, newHit);
         
         last = s;
@@ -122,7 +122,7 @@ Hit HitSegment(vec2 p, CubicBezierSegment seg, BezierLook look)
     return hit;
 }
 
-vec4 Scene(vec2 p)
+Hit Scene(vec2 p)
 {
     BezierLook look;
     look.BezierCol = vec4(uLineColor, 1.0);
@@ -141,9 +141,7 @@ vec4 Scene(vec2 p)
 
     Hit closest;
     closest.Dist = 9999999.;
-    closest = Closest(closest, HitSegment(p, seg1, look));
-    
-    return closest.Col * smoothstep(1.0 / uZoom, 0.0, closest.Dist);
+    return Closest(closest, HitSegment(p, seg1, look));
 }
 
 // from http://www.iquilezles.org/www/articles/distfunctions/distfunctions.htm
@@ -163,9 +161,12 @@ void main() {
 
   float iRadius = 4.0;
 
+  vec4 bezierLineColor = vec4(uLineColor, 1.0);
+  float bezierLineDistance = Scene(uv).Dist;
+
   vec4 connectorSource = vec4(uLineColor, 1) * smoothstep(1.0 / uZoom, 0.0, udRoundBox(uv - uLineStart + vec2(connectorWidth / 2.0 + 2.0, 0.0), vec2(connectorWidth, connectorHeight), iRadius));
   vec4 connectorTarget = vec4(uLineColor, 1) * smoothstep(1.0 / uZoom, 0.0, udRoundBox(uv - uLineEnd - vec2(connectorWidth / 2.0 + 2.0, 0.0), vec2(connectorWidth, connectorHeight), iRadius));
-  vec4 bezierLine = Scene(uv);
+  vec4 bezierLine = bezierLineColor * smoothstep(1.0 / uZoom, 0.0, bezierLineDistance);
 
   vec4 col = vec4(0);
   col += max(max(bezierLine, connectorSource), connectorTarget);

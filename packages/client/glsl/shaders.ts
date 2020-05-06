@@ -6,6 +6,12 @@ import simpleMVPVertexShaderSource from './simpleProjModelVS.glsl'
 import nodeFragmentShaderSource from './nodeFS.glsl'
 import connectionFSSource from './connectionFS.glsl'
 
+// TODO Hot reload shaders
+// if (module.hot) {
+// 	module.hot.accept(() => console.log('shaders hot accept'))
+// 	module.hot.dispose(() => console.log('shaders hot dispose'))
+// }
+
 export const passthroughVertexShader: VertexShader = {
 	source: passthroughVertexShaderSource,
 	type: 'vertex',

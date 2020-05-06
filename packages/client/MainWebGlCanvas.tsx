@@ -278,7 +278,7 @@ function drawConnections(
 				engine.gl.uniform3f(connectionsRenderPass.uniformLocations.get('uLineColor', null)!.location,
 					color.red() / 255, color.green() / 255, color.blue() / 255)
 				engine.gl.uniform1f(connectionsRenderPass.uniformLocations.get('uLineThicc', null)!.location,
-					voiceCountEvent.current > 1 ? 5.5 : 2)
+					voiceCountEvent.current > 1 ? 2.5 : 1)
 				engine.gl.uniform1f(connectionsRenderPass.uniformLocations.get('uLineControlPointOffset', null)!.location,
 					controlPointDistance)
 			})
