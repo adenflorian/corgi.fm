@@ -1,10 +1,10 @@
 import * as Immutable from 'immutable'
-import passthroughVertexShaderSource from './passthroughVS.glsl'
-import backgroundFSSource from './backgroundFS.glsl'
-import milkdropFragmentShaderSource from './milkdropFragmentShader.glsl'
-import simpleMVPVertexShaderSource from './simpleProjModelVS.glsl'
-import nodeFragmentShaderSource from './nodeFS.glsl'
-import connectionFSSource from './connectionFS.glsl'
+import passthroughVertexShaderSource from './passthroughVS.vert'
+import backgroundFSSource from './backgroundFS.frag'
+import milkdropFragmentShaderSource from './milkdropFragmentShader.frag'
+import simpleMVPVertexShaderSource from './simpleProjModelVS.vert'
+import nodeFragmentShaderSource from './nodeFS.frag'
+import connectionFSSource from './connectionFS.frag'
 
 // TODO Hot reload shaders
 // if (module.hot) {
