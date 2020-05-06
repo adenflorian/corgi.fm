@@ -7,6 +7,7 @@ uniform float uZoom;
 uniform vec2 uPan;
 uniform vec2 uLineStart;
 uniform vec2 uLineEnd;
+uniform float uLineControlPointOffset;
 uniform vec3 uLineColor;
 uniform float uLineThicc;
 
@@ -70,7 +71,6 @@ vec2 SampleBezier(CubicBezierSegment seg, float t)
     return mix(p21, p22, t);
 }
 
-
 // SCENE  /////////////////////////////////////////////////////////////////////////////////
 Hit Closest(Hit a, Hit b)
 {
@@ -132,16 +132,13 @@ vec4 Scene(vec2 p)
     
     vec2 v1 = uLineStart;
     vec2 v2 = uLineEnd;
-    // vec2 v1 = vec2(-100, -100);
-    // vec2 v2 = vec2(100, 100);
     
     CubicBezierSegment seg1;
     seg1.A  = v1;
     seg1.B  = v2;
-    seg1.CA = vec2(v1.x + 100.0, v1.y);//v1 + 0.7* vec2(sin(uTime*.75), cos(uTime*.75));
-    seg1.CB = vec2(v2.x - 100.0, v2.y);// - 0.5 * vec2(cos(uTime*1.4), sin(uTime*1.4+1.));
-    
-    
+    seg1.CA = vec2(v1.x + uLineControlPointOffset, v1.y);
+    seg1.CB = vec2(v2.x - uLineControlPointOffset, v2.y);
+
     Hit closest;
     closest.Dist = 9999999.;
     closest = Closest(closest, HitSegment(p, seg1, look));
@@ -149,13 +146,29 @@ vec4 Scene(vec2 p)
     return closest.Col * smoothstep(1.0 / uZoom, 0.0, closest.Dist);
 }
 
+// from http://www.iquilezles.org/www/articles/distfunctions/distfunctions.htm
+float udRoundBox(vec2 p, vec2 b, float r) {
+    return length(max(abs(p) - b + r, 0.0)) - r;
+}
+
+#define connectorWidth 12.0
+#define connectorHeight 4.0
+
 void main() {
+  vec2 halfRes = 0.5 * uResolution.xy;
   vec2 uv = vec2(
-      ((gl_FragCoord.x - (uResolution.x / 2.0)) / uZoom) - uPan.x,
-      -((gl_FragCoord.y - (uResolution.y / 2.0)) / uZoom) - uPan.y
+      ((gl_FragCoord.x - halfRes.x) / uZoom) - uPan.x,
+      -((gl_FragCoord.y - halfRes.y) / uZoom) - uPan.y
   );
 
+  float iRadius = 4.0;
+
+  vec4 connectorSource = vec4(uLineColor, 1) * smoothstep(1.0 / uZoom, 0.0, udRoundBox(uv - uLineStart + vec2(connectorWidth / 2.0 + 2.0, 0.0), vec2(connectorWidth, connectorHeight), iRadius));
+  vec4 connectorTarget = vec4(uLineColor, 1) * smoothstep(1.0 / uZoom, 0.0, udRoundBox(uv - uLineEnd - vec2(connectorWidth / 2.0 + 2.0, 0.0), vec2(connectorWidth, connectorHeight), iRadius));
+  vec4 bezierLine = Scene(uv);
+
   vec4 col = vec4(0);
-  col += Scene(uv);
+  col += max(max(bezierLine, connectorSource), connectorTarget);
+//   col += vec4(max(bezierLine.r, connector.r), max(bezierLine.g, connector.g), max(bezierLine.b, connector.b), max(bezierLine.a, connector.a));
   gl_FragColor = col;
 }

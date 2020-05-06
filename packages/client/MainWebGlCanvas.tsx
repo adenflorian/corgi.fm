@@ -14,7 +14,10 @@ import {
 import {simpleGlobalClientState} from './SimpleGlobalClientState'
 import {selectExpNodesState, selectLocalClientId, selectRoomMember,
 	selectExpPosition, IClientAppState, selectExpAllConnections,
-	ExpConnection, ExpPosition, ExpNodeState} from '@corgifm/common/redux'
+	ExpConnection, ExpPosition, ExpNodeState,
+	selectExpConnectionStackOrderForSource,
+	selectExpConnectionStackOrderForTarget,
+	selectRoomSettings} from '@corgifm/common/redux'
 import {useStore} from 'react-redux'
 import {RoomType} from '@corgifm/common/common-types'
 import {NodeManagerContextValue} from './Experimental/NodeManager'
@@ -22,6 +25,7 @@ import {colorFunc} from '@corgifm/common/shamu-color'
 import {useSingletonContext, SingletonContextImpl} from './SingletonContext'
 import {isAudioOutputPort, ExpPort} from './Experimental/ExpPorts'
 import {constant1} from './client-utils'
+import {getControlPointDistance, joint, connectorWidth} from './Connections/ConnectionView'
 
 export const MainWebGlCanvas = hot(module)(React.memo(function _MainWebGlCanvas() {
 	const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -248,18 +252,35 @@ function drawConnections(
 
 		const color = colorFunc(sourcePort.onColorChange.current)
 
-		const connectionDrawInfo = createVertexPositionsForConnection(connection, sourceNode.position, targetNode.position, sourcePort, targetPort)
+		const {sourceX, sourceY, targetX, targetY, vertexPositions} = createVertexPositionsForConnection(
+			connection, sourceNode.position, targetNode.position, sourcePort, targetPort)
+
+		const controlPointDistance = getControlPointDistance(
+			sourceX, sourceY, targetX, targetY) + joint
+
+
+		const sourceStackOrder = selectExpConnectionStackOrderForSource(state.room, connection.id)
+		const targetStackOrder = selectExpConnectionStackOrderForTarget(state.room, connection.id)
+		const lineType = selectRoomSettings(state.room).lineType
+
+
+		const sourceConnectorLeft = sourceX + (connectorWidth * sourceStackOrder)
+		const sourceConnectorRight = sourceX + connectorWidth + (connectorWidth * sourceStackOrder)
+		const targetConnectorLeft = targetX - connectorWidth - (connectorWidth * targetStackOrder)
+		// const targetConnectorRight = targetX - (connectorWidth * targetStackOrder)
 
 		engine.drawPass(connectionsRenderPass,
-			connectionDrawInfo.vertexPositions, () => {
+			vertexPositions, () => {
 				engine.gl.uniform2f(connectionsRenderPass.uniformLocations.get('uLineStart', null)!.location,
-					connectionDrawInfo.sourceX, connectionDrawInfo.sourceY)
+					sourceConnectorRight, sourceY)
 				engine.gl.uniform2f(connectionsRenderPass.uniformLocations.get('uLineEnd', null)!.location,
-					connectionDrawInfo.targetX, connectionDrawInfo.targetY)
+					targetConnectorLeft, targetY)
 				engine.gl.uniform3f(connectionsRenderPass.uniformLocations.get('uLineColor', null)!.location,
 					color.red() / 255, color.green() / 255, color.blue() / 255)
 				engine.gl.uniform1f(connectionsRenderPass.uniformLocations.get('uLineThicc', null)!.location,
 					voiceCountEvent.current > 1 ? 5.5 : 2)
+				engine.gl.uniform1f(connectionsRenderPass.uniformLocations.get('uLineControlPointOffset', null)!.location,
+					controlPointDistance)
 			})
 	})
 }
@@ -271,20 +292,16 @@ function createVertexPositionsForConnection(connection: ExpConnection, sourceNod
 	const sourceY = (sourceNode.y + sourcePortPosition.y)
 	const targetX = (targetNode.x + targetPortPosition.x)
 	const targetY = (targetNode.y + targetPortPosition.y)
+	const left = Math.min(sourceX, targetX)
+	const right = Math.max(sourceX, targetX)
+	const top = -Math.min(sourceY, targetY)
+	const bottom = -Math.max(sourceY, targetY)
 	return {
 		sourceX,
 		sourceY,
 		targetX,
 		targetY,
-		vertexPositions: [
-			sourceX, -sourceY,
-			targetX, -sourceY,
-			sourceX, -targetY,
-
-			targetX, -sourceY,
-			sourceX, -targetY,
-			targetX, -targetY,
-		]
+		vertexPositions: getVerticesForRect(left - 200, top + 200, right - left + 400, -(bottom - top - 400)),
 	}
 }
 

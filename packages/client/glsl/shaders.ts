@@ -58,6 +58,7 @@ export const connectionFragmentShader: FragmentShader = {
 		uLineEnd: '2f',
 		uLineColor: '3f',
 		uLineThicc: '1f',
+		uLineControlPointOffset: '1f',
 	}),
 }
 

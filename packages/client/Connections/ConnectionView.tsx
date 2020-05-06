@@ -48,7 +48,7 @@ export const connectorWidth = 16
 export const connectorHeight = 8
 
 const buffer = 50
-const joint = 8
+export const joint = 8
 
 export const ConnectionView =
 	React.memo(function _ConnectionView(props: IConnectionViewAllProps) {
@@ -169,16 +169,19 @@ export const ConnectionView =
 	})
 
 export function makeCurvedPath(line: LineState) {
-	const distance = Math.sqrt(((line.x1 - line.x2) ** 2) + ((line.y1 - line.y2) ** 2))
-	// const diff2 = Math.abs((line.x2 - line.x1) / 10)
-
-	const curveStrength2 = distance / 4
-	// const curveStrength2 = 64
-
+	const c = getControlPointDistance(line.x1, line.y1, line.x2, line.y2)
 	return stripIndent`
 		M ${line.x1} ${line.y1}
-		C ${line.x1 + joint + curveStrength2} ${line.y1} ${line.x2 - joint - curveStrength2} ${line.y2} ${line.x2} ${line.y2}
+		C ${line.x1 + joint + c} ${line.y1} ${line.x2 - joint - c} ${line.y2} ${line.x2} ${line.y2}
 	`
+}
+
+export function getControlPointDistance(x1: number, y1: number, x2: number, y2: number) {
+	const distance = Math.sqrt(((x1 - x2) ** 2) + ((y1 - y2) ** 2))
+	// const diff2 = Math.abs((line.x2 - line.x1) / 10)
+
+	return distance / 4
+	// const curveStrength2 = 64
 }
 
 export function makeStraightPath(line: LineState) {
