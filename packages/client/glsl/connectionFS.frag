@@ -31,33 +31,20 @@ struct Hit
     float Dist;
     vec4 Col;
 };
-    
-
-// TRANSFORMATIONS ////////////////////////////////////////////////////////////////////////
-mat2 Rotate(float rads) 
-{ 
-    float s = sin(rads); 
-    float c = cos(rads); 
-    return mat2(c, s, 
-               -s, c); 
-}
-
 
 // SHAPES /////////////////////////////////////////////////////////////////////////////////
-float sdCircle(vec2 p, float r)
-{
+float sdCircle(vec2 p, float r) {
     return length(p) - r;
 }
-float sdLineSegment(vec2 p, vec2 a, vec2 b, float halfThicc)
-{
-    vec2 ap = p-a;
-    vec2 ab = b-a;
-    float h = clamp(dot(ap,ab) /dot(ab,ab), 0.0, 1.0); // project ap onto ab
-	return length( ap - ab*h ) - halfThicc; // finds length of vec from p to the projection of p onto ab
+
+float sdLineSegment(vec2 p, vec2 a, vec2 b, float halfThicc) {
+    vec2 ap = p - a;
+    vec2 ab = b - a;
+    float h = clamp(dot(ap, ab) / dot(ab, ab), 0.0, 1.0); // project ap onto ab
+	return length(ap - ab * h) - halfThicc; // finds length of vec from p to the projection of p onto ab
 }
 
-vec2 SampleBezier(CubicBezierSegment seg, float t)
-{
+vec2 SampleBezier(CubicBezierSegment seg, float t) {
     // First degree
     vec2 p11 = mix(seg.A, seg.CA, t);
     vec2 p12 = mix(seg.CA, seg.CB, t);
@@ -72,8 +59,7 @@ vec2 SampleBezier(CubicBezierSegment seg, float t)
 }
 
 // SCENE  /////////////////////////////////////////////////////////////////////////////////
-Hit Closest(Hit a, Hit b)
-{
+Hit Closest(Hit a, Hit b) {
     // Not sure how to be more performance with this as the ternary operator doesn't support structs :|
     if (a.Dist <= b.Dist) 
     	return a;
@@ -81,15 +67,13 @@ Hit Closest(Hit a, Hit b)
         return b;
 }
 
-Hit HitSegment(vec2 p, CubicBezierSegment seg, BezierLook look)
-{
-    const int subdivs = 100;
+Hit HitSegment(vec2 p, CubicBezierSegment seg, BezierLook look) {
+    const int subdivs = 30;
     
     Hit hit;
     hit.Dist = 999999.;
     Hit newHit;
-    
-      
+
     // Vertices
     // newHit.Col = look.HandleCol;
     //newHit.Dist = sdCircle(p-seg.A, 0.02); hit = Closest(hit, newHit);
@@ -108,15 +92,19 @@ Hit HitSegment(vec2 p, CubicBezierSegment seg, BezierLook look)
 	// Cubic Bezier
     newHit.Col = look.BezierCol;
     vec2 last = SampleBezier(seg, 0.);
+    float subDivsF = float(subdivs);
+    int dynamicSubDivs = int(clamp((subDivsF * 6.0) * (uZoom / 4.0), 10.0, subDivsF));
+    float dynamicSubDivsF = float(dynamicSubDivs);
     for (int i = 1; i <= subdivs; i++)
     {
-        float t = float(i) / float(subdivs);
+        float t = float(i) / dynamicSubDivsF;
         vec2 s = SampleBezier(seg, t);
         
        	newHit.Dist = sdLineSegment(p, last, s, look.BezierThicc);
         hit = Closest(hit, newHit);
         
         last = s;
+        if (i >= dynamicSubDivs) break;
     }
     
     return hit;
@@ -132,12 +120,14 @@ Hit Scene(vec2 p)
     
     vec2 v1 = uLineStart;
     vec2 v2 = uLineEnd;
+
+    float offset = ((sin((uTime + uLineStart.x + uLineStart.y) / 4.0) / 2.0) + 1.0) * uLineControlPointOffset;
     
     CubicBezierSegment seg1;
     seg1.A  = v1;
     seg1.B  = v2;
-    seg1.CA = vec2(v1.x + uLineControlPointOffset, v1.y);
-    seg1.CB = vec2(v2.x - uLineControlPointOffset, v2.y);
+    seg1.CA = vec2(v1.x + offset, v1.y);
+    seg1.CB = vec2(v2.x - offset, v2.y);
 
     Hit closest;
     closest.Dist = 9999999.;
@@ -161,15 +151,30 @@ void main() {
 
   float iRadius = 4.0;
 
-  vec4 bezierLineColor = vec4(uLineColor, 1.0);
-  float bezierLineDistance = Scene(uv).Dist;
+  vec2 lineOffset = vec2(connectorWidth / 2.0 + 2.0, 0.0);
+  vec2 connectorDimensions = vec2(connectorWidth, connectorHeight);
 
-  vec4 connectorSource = vec4(uLineColor, 1) * smoothstep(1.0 / uZoom, 0.0, udRoundBox(uv - uLineStart + vec2(connectorWidth / 2.0 + 2.0, 0.0), vec2(connectorWidth, connectorHeight), iRadius));
-  vec4 connectorTarget = vec4(uLineColor, 1) * smoothstep(1.0 / uZoom, 0.0, udRoundBox(uv - uLineEnd - vec2(connectorWidth / 2.0 + 2.0, 0.0), vec2(connectorWidth, connectorHeight), iRadius));
-  vec4 bezierLine = bezierLineColor * smoothstep(1.0 / uZoom, 0.0, bezierLineDistance);
+  vec4 lineColor = vec4(uLineColor, 1.0);
+  vec4 shadowColor = vec4(vec3(0.01), 0.3);
+  float bezierLineDistance = Scene(uv).Dist;
+  float connectorSourceDistance = udRoundBox(uv - uLineStart + lineOffset, connectorDimensions, iRadius);
+  float connectorTargetDistance = udRoundBox(uv - uLineEnd - lineOffset, connectorDimensions, iRadius);
+
+  float smoothstepEdge0 = 1.5 / uZoom;
+
+  float shadowSize = 8.0;
+
+  vec4 bezierShadow = shadowColor * smoothstep(shadowSize, 0.0, bezierLineDistance);
+  float connectorSourceShadow = smoothstep(shadowSize, 0.0, connectorSourceDistance);
+  float connectorTargetShadow = smoothstep(shadowSize, 0.0, connectorTargetDistance);
+  vec4 connectorShadow = shadowColor * max(connectorSourceShadow, connectorTargetShadow);
+
+  vec4 connectorSource = lineColor * smoothstep(smoothstepEdge0, 0.0, connectorSourceDistance);
+  vec4 connectorTarget = lineColor * smoothstep(smoothstepEdge0, 0.0, connectorTargetDistance);
+  vec4 bezierLine = mix((lineColor - vec4(0.1,0.1,0.1,0.0)) * smoothstep(smoothstepEdge0, 0.0, bezierLineDistance), vec4(0,0,0,1), connectorShadow.a);
 
   vec4 col = vec4(0);
   col += max(max(bezierLine, connectorSource), connectorTarget);
-//   col += vec4(max(bezierLine.r, connector.r), max(bezierLine.g, connector.g), max(bezierLine.b, connector.b), max(bezierLine.a, connector.a));
+  col += max(bezierShadow, connectorShadow) * (1.0 - col.a);
   gl_FragColor = col;
 }
