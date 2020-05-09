@@ -45,8 +45,8 @@ export const MainWebGlCanvas = hot(module)(React.memo(function _MainWebGlCanvas(
 
 				const state = store.getState()
 				backgroundTerrier.draw(state)
-				connectionsTerrier.draw(state)
-				nodesTerrier.draw(state)
+				// connectionsTerrier.draw(state)
+				// nodesTerrier.draw(state)
 
 				requestAnimationFrame(mainLoop)
 			} catch (error) {
