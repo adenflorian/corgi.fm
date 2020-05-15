@@ -321,6 +321,7 @@ export const ConnectedZoom = hot(module)(React.memo(function _Zoom({
 					/>
 				</div>
 			}
+			<div id="smokescreen" />
 			<div id="zoomBlock" />
 		</Fragment>
 	)

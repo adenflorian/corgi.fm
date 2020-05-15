@@ -19,6 +19,8 @@ import {CssColor} from '@corgifm/common/shamu-color'
 import {ExpOscilloscopeNodeExtra} from './Nodes/ExpOscilloscopeNodeView'
 import {ExpNodeDebugButton} from './ExpNodeDebugButton'
 import {ExpNodeDebugReferenceParamField} from './ExpNodeDebugReferenceParamField'
+import {ActiveGhostConnectorSourceOrTarget} from '@corgifm/common/redux'
+import {useNodeManagerContext} from './NodeManager'
 
 interface Props {
 	audioParams: ExpAudioParams
@@ -193,14 +195,27 @@ const Port = React.memo(function _Port({port, index}: PortProps) {
 		y,
 	})
 	const enabled = useObjectChangedEvent(port.enabled)
+	const nodeManager = useNodeManagerContext()
+	const activeGhostConnection = useObjectChangedEvent(nodeManager.activeGhostConnection)
+
+	const isActiveCandidate = activeGhostConnection
+		&& activeGhostConnection.type === port.type
+		&& activeGhostConnection.inactiveConnector.parentNodeId !== port.node.id
+		&& (
+			(activeGhostConnection.activeSourceOrTarget === ActiveGhostConnectorSourceOrTarget.Source && port.side === "out")
+			||
+			(activeGhostConnection.activeSourceOrTarget === ActiveGhostConnectorSourceOrTarget.Target && port.side === "in")
+		)
 	return (
 		<div
-			className={`port enabled-${enabled}`}
+			className={`port enabled-${enabled} candidate-${isActiveCandidate} ghostActive-${!!activeGhostConnection}`}
 			key={port.id as string}
 		>
 			<div className={`portDropZone type-${port.type}`} />
 			{/* <div className="portId">{port.id}</div> */}
-			<div className="portName">{port.name}</div>
+			<div className={`portName`}>
+				{port.name}
+			</div>
 		</div>
 	)
 })

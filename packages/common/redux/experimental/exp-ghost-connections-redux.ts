@@ -116,10 +116,8 @@ export const selectExpGhostConnectionsState = (state: IClientRoomState) => state
 export const selectExpGhostConnection = (state: IClientRoomState, id: Id): ExpGhostConnection =>
 	selectExpGhostConnectionsState(state).all.get(id, ExpGhostConnection.dummy)
 
-export function createLocalActiveExpGhostConnectionSelector() {
-	return (state: IClientAppState) => {
-		const id = selectExpGhostConnectionsState(state.room).localActiveId
-		if (!id) return null
-		return selectExpGhostConnection(state.room, id)
-	}
+export function selectLocalActiveExpGhostConnection(state: IClientAppState) {
+	const id = selectExpGhostConnectionsState(state.room).localActiveId
+	if (!id) return null
+	return selectExpGhostConnection(state.room, id)
 }

@@ -7,7 +7,7 @@ import {
 	ExpPositionAction,
 	ExpGhostConnectorAction, BroadcastAction, LocalAction,
 	expGhostConnectorActions,
-	createLocalActiveExpGhostConnectionSelector, selectExpNode,
+	selectLocalActiveExpGhostConnection, selectExpNode,
 	ExpLocalAction, expNodesActions, makeExpNodeState,
 	expPositionActions, makeExpPosition, selectExpPosition,
 	expConnectionsActions, selectLocalClientId, selectRoomMember,
@@ -127,8 +127,16 @@ function after(
 				action.connectionTargetInfo.targetId,
 				action.connectionTargetInfo.targetPort)
 
+		case 'EXP_GHOST_CONNECTION_CREATE': {
+			if ((action as unknown as BroadcastAction).alreadyBroadcasted) return
+			nodeManager.updateGhostConnection(selectLocalActiveExpGhostConnection(afterState))
+			return
+		}
+
 		case 'EXP_GHOST_CONNECTION_DELETE': {
 			if ((action as unknown as BroadcastAction).alreadyBroadcasted) return
+
+			nodeManager.updateGhostConnection(null)
 
 			if (!action.info) return
 
@@ -143,7 +151,7 @@ function after(
 		}
 
 		case 'MOUSE_UP_ON_EXP_PLACEHOLDER': {
-			const localActiveGhostConnection = createLocalActiveExpGhostConnectionSelector()(afterState)
+			const localActiveGhostConnection = selectLocalActiveExpGhostConnection(afterState)
 			if (localActiveGhostConnection) {
 				dispatch(expGhostConnectorActions.delete(localActiveGhostConnection.id, action))
 			}

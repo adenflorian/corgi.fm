@@ -144,7 +144,7 @@ export function SimpleGraphNodeExp({children}: Props) {
 				{/* This forces the node onto its own composite layer, without making it blurry when zooming in
 				having our own layer will restrict paints and stuff into this layer only
 				and makes transforms and opacity super fast */}
-				<div className="hack" />
+				{/* <div className="hack" /> */}
 				{
 					useMemo(() => {
 						return (

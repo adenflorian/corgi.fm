@@ -9,7 +9,8 @@ import {ExpNodeState, IExpConnection, ExpGraph,
 	ExpMidiTimelineClipState,
 	ExpMidiTimelineTrackState,
 	ExpMidiTimelineClipsState,
-	ExpMidiTimelineTracksState} from '@corgifm/common/redux'
+	ExpMidiTimelineTracksState,
+	ExpGhostConnection} from '@corgifm/common/redux'
 import {ParamInputCentering} from '@corgifm/common/common-types'
 import {NodeToNodeAction} from '@corgifm/common/server-constants'
 import {assertUnreachable} from '@corgifm/common/common-utils'
@@ -37,7 +38,7 @@ import {SeqPattern} from '@corgifm/common/SeqStuff'
 
 export const NodeManagerContext = React.createContext<null | NodeManagerContextValue>(null)
 
-export interface NodeManagerContextValue extends ReturnType<NodeManager['_makeContextValue']> {}
+export type NodeManagerContextValue = NodeManager['reactContext']
 
 export function useNodeManagerContext() {
 	const context = useContext(NodeManagerContext)
@@ -65,7 +66,6 @@ export function useExpNodeManagerTick(handler: NodeTickDelegate) {
 
 export class NodeManager {
 	private readonly _mainGraph = new CorgiGraph()
-	public readonly reactContext: NodeManagerContextValue
 	private get _audioContext() {return this._singletonContext.getAudioContext()}
 	private get _preMasterLimiter() {return this._singletonContext.getPreMasterLimiter()}
 	private _tickSubscribers = new Set<NodeTickDelegate>()
@@ -74,38 +74,40 @@ export class NodeManager {
 	private readonly _midiTimelineClips = new Map<Id, SeqTimelineClipContainer>()
 	private readonly _midiTimelineTracks = new Map<Id, SeqTimelineTrackContainer>()
 	private readonly _keyboards = new Map<Id, CorgiObjectChangedEvent<ExpKeyboardStateRaw>>()
+	private readonly _activeGhostConnection = new CorgiObjectChangedEvent<ExpGhostConnection | null>(null)
 
 	public constructor(
 		private readonly _singletonContext: SingletonContextImpl,
-	) {
-		this.reactContext = this._makeContextValue()
+	) {}
+
+	public readonly reactContext = {
+		activeGhostConnection: this._activeGhostConnection,
+		connections: {
+			get: (id: Id) => {
+				const connection = this._mainGraph.connections.get(id)
+				if (!connection) return logger.warn('[connections.get] 404 connection not found: ', {id, connections: this._mainGraph.connections})
+				return connection
+			},
+		} as const,
+		ports: {
+			get: (nodeId: Id, portId: Id) => {
+				const node = this._mainGraph.nodes.get(nodeId)
+				if (!node) return // logger.warn('[ports.get] 404 node not found: ', {nodeId, portId})
+				const port = node.getPort(portId)
+				if (!port) return logger.warn('[ports.get] 404 port not found: ', {nodeId, portId})
+				return port
+			},
+		} as const,
+		subscribeToTick: (delegate: NodeTickDelegate) => {
+			this._tickSubscribers.add(delegate)
+		},
+		unsubscribeFromTick: (delegate: NodeTickDelegate) => {
+			this._tickSubscribers.delete(delegate)
+		},
 	}
 
-	private readonly _makeContextValue = () => {
-		return {
-			connections: {
-				get: (id: Id) => {
-					const connection = this._mainGraph.connections.get(id)
-					if (!connection) return logger.warn('[connections.get] 404 connection not found: ', {id, connections: this._mainGraph.connections})
-					return connection
-				},
-			} as const,
-			ports: {
-				get: (nodeId: Id, portId: Id) => {
-					const node = this._mainGraph.nodes.get(nodeId)
-					if (!node) return // logger.warn('[ports.get] 404 node not found: ', {nodeId, portId})
-					const port = node.getPort(portId)
-					if (!port) return logger.warn('[ports.get] 404 port not found: ', {nodeId, portId})
-					return port
-				},
-			} as const,
-			subscribeToTick: (delegate: NodeTickDelegate) => {
-				this._tickSubscribers.add(delegate)
-			},
-			unsubscribeFromTick: (delegate: NodeTickDelegate) => {
-				this._tickSubscribers.delete(delegate)
-			},
-		} as const
+	public updateGhostConnection(ghost: ExpGhostConnection | null) {
+		this._activeGhostConnection.invokeImmediately(ghost)
 	}
 
 	public renderNodeId = (nodeId: Id) => {

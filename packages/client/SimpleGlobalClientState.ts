@@ -71,6 +71,7 @@ export function makeMouseMovementAccountForGlobalZoom({x, y}: Point) {
 	}
 }
 
+// Zoom block
 export function blockMouse() {
 	const element = getZoomBlockElement()
 	if (element) {
@@ -89,4 +90,25 @@ const zoomBlockId = 'zoomBlock'
 
 function getZoomBlockElement() {
 	return document.getElementById(zoomBlockId)
+}
+
+// Smokescreen
+export function smokeOn() {
+	const element = getSmokescreenElement()
+	if (element) {
+		element.style.visibility = 'visible'
+	}
+}
+
+export function smokeOff() {
+	const element = getSmokescreenElement()
+	if (element) {
+		element.style.visibility = 'hidden'
+	}
+}
+
+const smokescreenId = 'smokescreen'
+
+function getSmokescreenElement() {
+	return document.getElementById(smokescreenId)
 }

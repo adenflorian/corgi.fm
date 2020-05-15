@@ -7,6 +7,15 @@
 
 @portDiameter: 16px;
 
+@portCandidate: {
+	animation-name: portNameCandidate;
+	animation-duration: 0.5s;
+	animation-iteration-count: infinite;
+	animation-direction: alternate;
+	animation-fill-mode: both;
+	animation-timing-function: ease-in-out;
+}
+
 .expNodeDebugView {
 	box-sizing: border-box;
 	width: 100%;
@@ -107,6 +116,23 @@
 					color: @defaultGray;
 					@knobLabelFont();
 				}
+				&.ghostActive-true {
+					&.candidate-true {
+						.portName {
+							@portCandidate();
+						}
+						.portDropZone {
+						}
+					}
+					&.candidate-false {
+						.portName {
+							color: @panelGrayLight;
+						}
+						.portDropZone {
+							color: @panelGrayLight;
+						}
+					}
+				}
 				.paramValue {
 	
 				}
@@ -121,12 +147,6 @@
 					}
 
 					&.type-midi {
-						border-radius: 2px;
-					}
-
-					&.type-polyphonic {
-						background: linear-gradient(0deg, currentColor 0%, currentColor 20%, transparent 20%, transparent 40%, currentColor 40%, currentColor 60%, transparent 60%, transparent 80%, currentColor 80%, currentColor 100%);
-						box-shadow: none;
 						border-radius: 2px;
 					}
 				}
@@ -154,4 +174,14 @@
 		padding: 8px;
 		margin: 8px 0;
 	}
+}
+
+@keyframes portNameCandidate {
+  from {
+    color: @defaultGray;
+  }
+
+  to {
+    color: currentColor;
+  }
 }
