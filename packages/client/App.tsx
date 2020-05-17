@@ -45,7 +45,7 @@ const App = () => {
 	const isLoading = !isClientReady && isConnectingForFirstTime
 	return (
 		<div className={`ctrl-${ctrl} alt-${alt} shift-${shift}`}>
-			<MainWebGlCanvas />
+			{/* <MainWebGlCanvas /> */}
 			<LoadingScreen loading={isLoading} />
 			{!isLoading && {
 				[RoomType.Normal]: <ConnectedOnlineApp />,

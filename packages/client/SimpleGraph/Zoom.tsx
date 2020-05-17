@@ -275,8 +275,8 @@ export const ConnectedZoom = hot(module)(React.memo(function _Zoom({
 							height: `100vh`,
 							top: `0`,
 							left: `0`,
-							// backgroundImage: `url(${PlusSVG})`,
-							backgroundImage: `none`,
+							backgroundImage: `url(${PlusSVG})`,
+							// backgroundImage: `none`,
 							// transition: backgroundClicked ? '' : 'background-size 0.05s ease 0s, background-position 0.05s ease 0s',
 						}}
 						onMouseDown={onBgMouseEvent}
