@@ -18,6 +18,7 @@ import {expAttackMax, expHoldMax, expDecayMax, expReleaseMax, expSustainMax, exp
 
 const longTime = 999999999
 const minDistance = 0.00001
+const lowestGain = 0.00001
 
 export class EnvelopeNode extends CorgiNode {
 	protected readonly _ports: ExpPorts
@@ -126,38 +127,50 @@ export class EnvelopeHound {
 	public handleGateEvent(gate: boolean, startTime: number, voiceIndex: number | 'all') {
 		// this.debugInfo.invokeNextFrame(JSON.stringify({gate, startTime, voiceIndex}))
 		if (startTime < this._lastGateTime) {
-			logger.error('receiveMidiAction startTime < this._lastGateTime:', {gate, startTime, last: this._lastGateTime, lastGate: this._lastGate})
+			// logger.error('receiveMidiAction startTime < this._lastGateTime:', {gate, startTime, last: this._lastGateTime, lastGate: this._lastGate})
+			startTime = this._lastGateTime + 0.0001
+		}
+		if (startTime === this._lastGateTime) {
+			// logger.warn('receiveMidiAction startTime === this._lastGateTime:', {gate, startTime, last: this._lastGateTime, lastGate: this._lastGate})
+			// startTime += 0.001
+			startTime += 0.0001
 		}
 		// This should be ok, it's like a retrigger
 		// if (gate === this._lastGate) {
 		// 	logger.error('receiveMidiAction gate === this._lastGate:', {gate, startTime, last: this._lastGateTime, lastGate: this._lastGate})
 		// }
+		// logger.log({startTime, currentTime: this._audioContext.currentTime/*, diff: startTime - this._audioContext.currentTime */})
+		if (startTime < this._audioContext.currentTime) {
+			// logger.warn('[receiveMidiAction] startTime < this._audioContext.currentTime:', {startTime, currentTime: this._audioContext.currentTime})
+			startTime = this._audioContext.currentTime + 0.001
+		}
+		if (startTime === this._audioContext.currentTime) {
+			// logger.warn('[receiveMidiAction] startTime === this._audioContext.currentTime:', {startTime, currentTime: this._audioContext.currentTime})
+			startTime = this._audioContext.currentTime + 0.001
+		}
 		this._lastGateTime = startTime
 		this._lastGate = gate
-		// logger.log({startTime, currentTime: this._audioContext.currentTime/*, diff: startTime - this._audioContext.currentTime */})
-		// if (startTime < this._audioContext.currentTime) {
-		// 	logger.warn('[receiveMidiAction] startTime < this._audioContext.currentTime:', {startTime, currentTime: this._audioContext.currentTime})
-		// }
+		// console.log({startTime, gate})
 		const offset = this._constantSource.offset
 		if (gate) {
-			const attackEnd = startTime + this.attack.value + minDistance
-			const holdEnd = attackEnd + this.hold.value + minDistance
-			const decayEnd = holdEnd + this.decay.value + minDistance
-			const farOut = decayEnd + longTime + minDistance
-			const actualSustain = clamp(this.sustain.value, 0.0001, 1)
+			const attackEnd = startTime + Math.max(this.attack.value, minDistance)
+			const holdEnd = attackEnd + Math.max(this.hold.value, minDistance)
+			const decayEnd = holdEnd + Math.max(this.decay.value, minDistance)
+			const farOut = decayEnd + longTime
+			const actualSustain = clamp(this.sustain.value, lowestGain, 1)
 			// console.log(`${voiceIndex}`)
 			offset.cancelAndHoldAtTime(startTime, voiceIndex)
 			offset.linearRampToValueAtTime(1, attackEnd, voiceIndex)
-			offset.linearRampToValueAtTime(1, holdEnd, voiceIndex)
+			// offset.linearRampToValueAtTime(1, holdEnd, voiceIndex)
 			offset.exponentialRampToValueAtTime(actualSustain, decayEnd, voiceIndex)
 			offset.linearRampToValueAtTime(actualSustain, farOut, voiceIndex)
 			this._constantSource.setActiveVoice(voiceIndex, startTime)
 		} else {
-			const releaseEnd = startTime + this.release.value + minDistance
-			const farOut = releaseEnd + longTime + minDistance
+			const releaseEnd = startTime + Math.max(this.release.value, minDistance)
+			const farOut = releaseEnd + longTime
 			offset.cancelAndHoldAtTime(startTime, voiceIndex)
-			offset.exponentialRampToValueAtTime(0.0001, releaseEnd, voiceIndex)
-			offset.linearRampToValueAtTime(0.0001, farOut, voiceIndex)
+			offset.exponentialRampToValueAtTime(lowestGain, releaseEnd, voiceIndex)
+			offset.linearRampToValueAtTime(lowestGain, farOut, voiceIndex)
 		}
 		// farOut is to provide an event to be canceled so an anchor point can
 		// be created whenever cancelAndHoldAtTime is called.

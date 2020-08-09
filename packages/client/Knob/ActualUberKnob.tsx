@@ -18,6 +18,7 @@ import {useBoolean} from '../react-hooks'
 import './UberKnob.less'
 import {blockMouse, unblockMouse} from '../SimpleGlobalClientState'
 import {logger} from '@sentry/utils'
+import {useSingletonContext} from '../SingletonContext'
 
 interface Props {
 	percentage: number
@@ -104,6 +105,7 @@ function UberArcMain({
 				liveEvent={audioParam.onModdedLiveValueChange}
 				parentRatio={activeRatio}
 				parentRange={range}
+				type={nodeContext.type}
 			/>}
 		</UberArcDumb>
 	)
@@ -211,15 +213,17 @@ interface UberArcLiveValueProps {
 	readonly liveEvent: CorgiNumberChangedEvent
 	readonly parentRatio: number
 	readonly parentRange: SignalRange
+	readonly type: string
 }
 
 function UberArcLiveValue({
-	layer, liveEvent, parentRatio, parentRange,
+	layer, liveEvent, parentRatio, parentRange, type,
 }: UberArcLiveValueProps) {
 	const moddedValueCircleRef = useRef<SVGGElement>(null)
 	const liveValueRef = useRef(0)
 
 	const portContext = useAudioParamInputPortContext()
+	const singletonContext = useSingletonContext()
 
 	const liveRange = useObjectChangedEvent(portContext.onLiveRangeChanged)
 
@@ -251,6 +255,9 @@ function UberArcLiveValue({
 		if (!extraAnimationsEnabled) return
 
 		function onNewValue(newValue: number) {
+			// if (liveValueRef.current !== newValue) {
+			// }
+			// if (type === 'gain') console.log('LV : ', {type, newValue, time: singletonContext.getAudioContext().currentTime})
 			liveValueRef.current = newValue
 			updateLiveValueDot()
 		}
