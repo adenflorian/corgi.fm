@@ -21,6 +21,7 @@ import {isPolyphonicOutputPort} from './ExpPolyphonicPorts'
 import {LabCorgiAnalyserSPNode} from './CorgiAnalyserSPN'
 import {useObjectChangedEvent} from './hooks/useCorgiEvent'
 import {ExpNodeType} from '@corgifm/common/exp-node-infos'
+import {Dispatch} from 'redux'
 
 export const ExpNodeContext = React.createContext<null | CorgiNodeReact>(null)
 
@@ -93,6 +94,7 @@ export abstract class CorgiNode {
 	public readonly newSampleEvent?: CorgiNumberChangedEvent
 	protected readonly _analyser?: LabCorgiAnalyserSPNode
 	public readonly renderDebugStuff: boolean
+	protected readonly _dispatch: Dispatch
 
 	public constructor(
 		args: CorgiNodeArgs,
@@ -120,6 +122,10 @@ export abstract class CorgiNode {
 			this._analyser.requestUpdate()
 		}
 		this.renderDebugStuff = options.renderDebugStuff !== undefined ? options.renderDebugStuff : true
+
+		const store = this.singletonContext.getStore()
+		if (!store) throw new Error('missing store in CorgiNode!')
+		this._dispatch = store.dispatch
 	}
 
 	public getPorts = () => this._ports
