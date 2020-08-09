@@ -99,6 +99,11 @@ export const midiActions = {
 
 export type MidiAction = ReturnType<typeof midiActions[keyof typeof midiActions]>
 
+export type GateMidiAction = ReturnType<typeof midiActions['gate']>
+export type NoteMidiAction = ReturnType<typeof midiActions['note']>
+export type VoiceCountChangeMidiAction = ReturnType<typeof midiActions['voiceCountChange']>
+export type MessageMidiAction = ReturnType<typeof midiActions['message']>
+
 export enum RoomType {
 	Normal = 'Normal',
 	Experimental = 'Experimental',

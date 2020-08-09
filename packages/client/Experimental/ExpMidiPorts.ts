@@ -1,5 +1,5 @@
 import {List} from 'immutable'
-import {MidiAction, midiActions} from '@corgifm/common/common-types'
+import {MidiAction, midiActions, NoteMidiAction} from '@corgifm/common/common-types'
 import {logger} from '../client-logger'
 import {CorgiNode} from './CorgiNode'
 import {ExpMidiConnections, ExpMidiConnection} from './ExpConnections'
@@ -67,6 +67,7 @@ export interface ExpMidiOutputPortArgs {
 
 export class ExpMidiOutputPort extends ExpMidiPort {
 	private lastVoiceCount = 1
+	private _activeNoteActions = new Map<number, NoteMidiAction>()
 
 	public constructor(
 		public readonly id: Id,
@@ -77,6 +78,13 @@ export class ExpMidiOutputPort extends ExpMidiPort {
 	}
 
 	public sendMidiAction: MidiReceiver = (midiAction: MidiAction) => {
+		if (midiAction.type === 'MIDI_NOTE') {
+			if (midiAction.gate) {
+				this._activeNoteActions.set(midiAction.note, midiAction)
+			} else {
+				this._activeNoteActions.delete(midiAction.note)
+			}
+		}
 		this._connections.forEach(this._sendMidiActionToConnection(midiAction))
 		if (midiAction.type === 'VOICE_COUNT_CHANGE') {
 			this.lastVoiceCount = midiAction.newCount
@@ -85,6 +93,14 @@ export class ExpMidiOutputPort extends ExpMidiPort {
 
 	private _sendMidiActionToConnection = (midiAction: MidiAction) => (connection: ExpMidiConnection) => {
 		connection.sendMidiAction(midiAction)
+	}
+
+	public releaseAll = (time: number) => {
+		const offTime = Math.max(this.node.singletonContext.getAudioContext().currentTime, time + 0.01)
+		this._activeNoteActions.forEach(({note}) => {
+			const offAction = midiActions.note(offTime, false, note, 0)
+			this._connections.forEach(this._sendMidiActionToConnection(offAction))
+		})
 	}
 
 	protected _connect = (connection: ExpMidiConnection) => {

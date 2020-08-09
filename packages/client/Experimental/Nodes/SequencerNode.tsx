@@ -30,6 +30,7 @@ export class SequencerNode extends CorgiNode {
 	private _cursorBeats = 0
 	private _cursorSeconds = 0
 	private readonly _session: SeqSession
+	private _lastGateOffTime = 0
 
 	public constructor(corgiNodeArgs: CorgiNodeArgs) {
 		super(corgiNodeArgs, {name: 'Sequencer', color: CssColor.yellow})
@@ -266,6 +267,7 @@ export class SequencerNode extends CorgiNode {
 
 	protected _disable() {
 		this._songStartTimeSeconds = -1
+		this._midiOutputPort.releaseAll(this._lastGateOffTime)
 	}
 
 	protected _dispose() {
@@ -323,6 +325,7 @@ export class SequencerNode extends CorgiNode {
 					this._midiOutputPort.sendMidiAction(midiActions.note(eventStartSeconds, true, event.note, event.velocity))
 				} else if (event.type === 'noteOff') {
 					this._midiOutputPort.sendMidiAction(midiActions.note(eventStartSeconds, false, event.note, 0))
+					this._lastGateOffTime = eventStartSeconds
 				}
 			})
 		}
