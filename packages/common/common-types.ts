@@ -77,11 +77,12 @@ export const midiActions = {
 		gate,
 		voice,
 	} as const),
-	note: (time: number, gate: boolean, note: number, velocity: number, voice: number | 'all' = 'all') => ({
+	note: (time: number, gate: boolean, note: number, velocity: number, voice: number | 'all' = 'all', offNote: number | undefined = undefined) => ({
 		type: 'MIDI_NOTE' as const,
 		time,
 		gate,
 		note,
+		offNote,
 		velocity,
 		voice,
 	} as const),

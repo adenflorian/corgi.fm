@@ -1,9 +1,9 @@
-import React, {useState, useCallback, useEffect} from 'react'
+import React, {useState, useCallback, useEffect, useRef} from 'react'
 import {useSelector, useDispatch} from 'react-redux'
 import * as Immutable from 'immutable'
 import {stripIndents} from 'common-tags'
 import {
-	getKeyByValue, keyToMidiMap,
+	getKeyByValue, keyToMidiMap, clamp,
 } from '@corgifm/common/common-utils'
 import {
 	IClientAppState, selectClientById,
@@ -17,6 +17,9 @@ import {isLeftMouseButtonDown} from '../../../client-utils'
 import './ExpKeyboard.less'
 import {useNodeContext, useExpNodeOwnerId} from '../../CorgiNode'
 import {KeyboardNode, useExpKeyboardOctave, useExpKeyboardPressedKeys} from './KeyboardNode'
+
+const noteWidth = 24
+const noteHeight = 56
 
 export function isWhiteKey(keyNumber: number) {
 	const baseNumber = keyNumber % 12
@@ -51,6 +54,8 @@ export const ExpKeyboard = React.memo(function _ExpKeyboard() {
 
 	const nodeContext = useNodeContext() as KeyboardNode
 
+	const keyboardState = useExpKeyboardPressedKeys()
+
 	const ownerId = useExpNodeOwnerId()
 
 	const ownerName = useSelector((state: IClientAppState) => selectClientById(state, ownerId).name)
@@ -64,6 +69,7 @@ export const ExpKeyboard = React.memo(function _ExpKeyboard() {
 		const handleWindowMouseUp = (e: MouseEvent) => {
 			if (e.button === 0) {
 				setWasMouseClickedOnKeyboard(false)
+				currentNote.current = null
 			}
 		}
 
@@ -82,6 +88,90 @@ export const ExpKeyboard = React.memo(function _ExpKeyboard() {
 		? ownerName.substring(0, maxUsernameDisplayLength) + '...'
 		: ownerName
 
+	const dispatch = useDispatch()
+
+	const currentNote = useRef<number | null>(null)
+
+	const handleMouseDown = useCallback((
+		e: React.MouseEvent,
+	) => {
+		if (e.button === 0) {
+			const index = getNoteFromPosition(e.nativeEvent.offsetX, e.nativeEvent.offsetY)
+			setWasMouseClickedOnKeyboard(true)
+			// TODO
+			// if (e.shiftKey) {
+			// 	if (isKeyPressed) {
+			// 		nodeContext.onNoteOff(index, true)
+			// 		dispatch(expKeyboardsActions.keysUp(keyboardState.id, Immutable.Set([index])))
+			// 	} else {
+			// 		nodeContext.onNoteOn(index, 1, true)
+			// 		// TODO Velocity
+			// 		dispatch(expKeyboardsActions.keysDown(keyboardState.id, Immutable.Set([index])))
+			// 	}
+			// } else {
+				nodeContext.onNoteOn(index, 1, true)
+				currentNote.current = index
+				// TODO Velocity
+				dispatch(expKeyboardsActions.keysDown(keyboardState.id, Immutable.Set([index])))
+			// }
+		}
+	}, [dispatch, /* isKeyPressed,  */setWasMouseClickedOnKeyboard, keyboardState.id])
+
+	const handleMouseUp = useCallback((e: React.MouseEvent) => {
+		const index = getNoteFromPosition(e.nativeEvent.offsetX, e.nativeEvent.offsetY)
+		if (e.button === 0 && e.shiftKey === false) {
+			nodeContext.onNoteOff(index, true)
+			currentNote.current = null
+			dispatch(expKeyboardsActions.keysUp(keyboardState.id, Immutable.Set([index])))
+		}
+	}, [dispatch, keyboardState.id])
+
+	const keyboardZoneId = 'expKeyboardKeyzone-' + nodeContext.id
+
+	useEffect(() => {
+		if (!wasMouseClickedOnKeyboard) return
+
+		const onMouseMove = (e: MouseEvent) => {
+			if (e.target && (e.target as HTMLElement).id !== keyboardZoneId) {
+				if (currentNote.current !== null) {
+					handleMouseOut(currentNote.current, true)
+				}
+				return
+			}
+			if (!isLeftMouseButtonDown(e.buttons)) return
+			const index = getNoteFromPosition(e.offsetX, e.offsetY)
+			if (index !== currentNote.current) {
+				if (currentNote.current !== null && index !== null) {
+					nodeContext.onNoteOffAndOn(currentNote.current, index, 1, true)
+					handleMouseOut(currentNote.current, false)
+					handleMouseOver(index, false)
+				} else {
+					if (currentNote.current !== null) handleMouseOut(currentNote.current, true)
+					if (index !== null) handleMouseOver(index, true)
+				}
+			}
+		}
+
+		const handleMouseOut = (index: number, trigger: boolean) => {
+			currentNote.current = null
+			if (trigger) nodeContext.onNoteOff(index, true)
+			dispatch(expKeyboardsActions.keysUp(keyboardState.id, Immutable.Set([index])))
+		}
+
+		const handleMouseOver = (index: number, trigger: boolean) => {
+			currentNote.current = index
+			if (trigger) nodeContext.onNoteOn(index, 1, true)
+			// TODO Velocity
+			dispatch(expKeyboardsActions.keysDown(keyboardState.id, Immutable.Set([index])))
+		}
+
+		window.addEventListener('mousemove', onMouseMove)
+
+		return () => {
+			window.removeEventListener('mousemove', onMouseMove)
+		}
+	}, [wasMouseClickedOnKeyboard])
+
 	return (
 		// <Panel
 		// 	color={color}
@@ -93,34 +183,38 @@ export const ExpKeyboard = React.memo(function _ExpKeyboard() {
 		// >
 		<div className={`expKeyboard ${isLocal ? 'isLocal' : 'notLocal'}`}>
 			<OctaveSection />
-			{globalVirtualMidiKeyboard.map((value, index) => {
-				return <Key
-					key={index}
-					index={index}
-					virtualMidiKey={value}
-					isLocal={isLocal}
-					wasMouseClickedOnKeyboard={wasMouseClickedOnKeyboard}
-					setWasMouseClickedOnKeyboard={setWasMouseClickedOnKeyboard}
-				/>
-			})}
+			<div
+				className="expKeyboardKeyzone"
+				id={keyboardZoneId}
+				onMouseDown={isLocal ? handleMouseDown : undefined}
+				onMouseUp={isLocal ? handleMouseUp : undefined}
+			>
+				{globalVirtualMidiKeyboard.map((value, index) => {
+					return <Key
+						key={index}
+						index={index}
+						virtualMidiKey={value}
+						isLocal={isLocal}
+					/>
+				})}
+			</div>
 		</div>
 	)
 })
+
+function getNoteFromPosition(x: number, y: number) {
+	return clamp(Math.floor(x / noteWidth), 0, defaultNumberOfKeys - 1)
+}
 
 interface KeyProps {
 	index: number
 	virtualMidiKey: IVirtualMidiKey
 	isLocal: boolean
-	wasMouseClickedOnKeyboard: boolean
-	setWasMouseClickedOnKeyboard: (value: boolean) => void
 }
 
 const Key = React.memo(function _Key({
-	index, virtualMidiKey, isLocal, wasMouseClickedOnKeyboard,
-	setWasMouseClickedOnKeyboard,
+	index, virtualMidiKey, isLocal,
 }: KeyProps) {
-
-	const nodeContext = useNodeContext() as KeyboardNode
 
 	const keyboardState = useExpKeyboardPressedKeys()
 
@@ -131,62 +225,13 @@ const Key = React.memo(function _Key({
 
 	const showNoteNames = useSelector((state: IClientAppState) => state.options.showNoteNamesOnKeyboard)
 
-	const dispatch = useDispatch()
-
-	const handleMouseOver = useCallback((e: React.MouseEvent) => {
-		if (isLeftMouseButtonDown(e.buttons) && wasMouseClickedOnKeyboard) {
-			nodeContext.onNoteOn(index, 1, true)
-			// TODO Velocity
-			dispatch(expKeyboardsActions.keysDown(keyboardState.id, Immutable.Set([index])))
-		}
-	}, [dispatch, index, wasMouseClickedOnKeyboard, keyboardState.id])
-
-	const handleMouseOut = useCallback((e: React.MouseEvent) => {
-		if (isLeftMouseButtonDown(e.buttons) && wasMouseClickedOnKeyboard) {
-			nodeContext.onNoteOff(index, true)
-			dispatch(expKeyboardsActions.keysUp(keyboardState.id, Immutable.Set([index])))
-		}
-	}, [dispatch, index, wasMouseClickedOnKeyboard, keyboardState.id])
-
-	const handleMouseDown = useCallback((
-		e: React.MouseEvent,
-	) => {
-		if (e.button === 0) {
-			setWasMouseClickedOnKeyboard(true)
-			if (e.shiftKey) {
-				if (isKeyPressed) {
-					nodeContext.onNoteOff(index, true)
-					dispatch(expKeyboardsActions.keysUp(keyboardState.id, Immutable.Set([index])))
-				} else {
-					nodeContext.onNoteOn(index, 1, true)
-					// TODO Velocity
-					dispatch(expKeyboardsActions.keysDown(keyboardState.id, Immutable.Set([index])))
-				}
-			} else {
-				nodeContext.onNoteOn(index, 1, true)
-				// TODO Velocity
-				dispatch(expKeyboardsActions.keysDown(keyboardState.id, Immutable.Set([index])))
-			}
-		}
-	}, [dispatch, index, isKeyPressed, setWasMouseClickedOnKeyboard, keyboardState.id])
-
-	const handleMouseUp = useCallback((e: React.MouseEvent) => {
-		if (e.button === 0 && e.shiftKey === false) {
-			nodeContext.onNoteOff(index, true)
-			dispatch(expKeyboardsActions.keysUp(keyboardState.id, Immutable.Set([index])))
-		}
-	}, [dispatch, index, keyboardState.id])
-
 	return (
 		// eslint-disable-next-line jsx-a11y/mouse-events-have-key-events
 		<div
 			// eslint-disable-next-line react/no-array-index-key
 			key={index}
 			className={`key ${virtualMidiKey.color} ${isKeyPressed ? 'pressed' : 'notPressed'}`}
-			onMouseOver={isLocal ? handleMouseOver : undefined}
-			onMouseOut={isLocal ? handleMouseOut : undefined}
-			onMouseDown={isLocal ? handleMouseDown : undefined}
-			onMouseUp={isLocal ? handleMouseUp : undefined}
+			style={{pointerEvents: 'none', width: noteWidth, height: noteHeight}}
 		>
 			<div className="noteName unselectable">
 				{showNoteNames &&

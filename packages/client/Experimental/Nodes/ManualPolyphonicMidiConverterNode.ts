@@ -92,6 +92,7 @@ export class ManualPolyphonicMidiConverterNode extends CorgiNode {
 
 	private _onMidiNoteAction(midiAction: Extract<MidiAction, {type: 'MIDI_NOTE'}>) {
 		if (midiAction.gate === true) {
+			if (midiAction.offNote !== undefined) this._onMidiNoteOff({...midiAction, note: midiAction.offNote, velocity: 0, gate: false})
 			this._onMidiNoteOn(midiAction)
 		} else {
 			this._onMidiNoteOff(midiAction)

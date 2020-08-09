@@ -83,6 +83,7 @@ export class MidiConverterNode extends CorgiNode {
 	}
 
 	private _onMidiNoteOn(midiAction: Extract<MidiAction, {type: 'MIDI_NOTE'}>) {
+		if (midiAction.offNote !== undefined) this._currentNotes = this._currentNotes.delete(midiAction.offNote)
 		const fresh = this._currentNotes.size === 0
 		this._currentNotes = this._currentNotes.add(midiAction.note)
 		this._updatePitch(midiAction.note, midiAction.time)
