@@ -12,8 +12,8 @@ import {ExpPorts} from '../../ExpPorts'
 import {KeyboardNodeExtra} from './KeyboardNodeView'
 import {ExpCustomNumberParam, ExpCustomNumberParamReadonly, ExpCustomNumberParams,
 	ExpReferenceParams, ExpReferenceParam, ExpReferenceParamReadonly} from '../../ExpParams'
-import {useNumberChangedEvent, useSetChangedEvent, useObjectChangedEvent} from '../../hooks/useCorgiEvent'
-import {ExpKeyboardStateRaw, makeExpKeyboardState} from '@corgifm/common/redux'
+import {useNumberChangedEvent, useObjectChangedEvent} from '../../hooks/useCorgiEvent'
+import {ExpKeyboardStateRaw, makeExpKeyboardState, expKeyboardsActions} from '@corgifm/common/redux'
 import {expKeyboardStateParamId} from '@corgifm/common/common-constants'
 
 export class KeyboardNode extends CorgiNode {
@@ -88,10 +88,12 @@ export class KeyboardNode extends CorgiNode {
 
 	private readonly _onNoteOn = (event: InputEventNoteon) => {
 		this.onNoteOn(event.note.number, event.velocity)
+		this._dispatch(expKeyboardsActions.keysDown(this.keyboardState.value.current.id, Immutable.Set([event.note.number % 12])))
 	}
 
 	private readonly _onNoteOff = (event: InputEventNoteoff) => {
 		this.onNoteOff(event.note.number)
+		this._dispatch(expKeyboardsActions.keysUp(this.keyboardState.value.current.id, Immutable.Set([event.note.number % 12])))
 	}
 
 	public readonly onNoteOn = (note: number, velocity: number, useOctave = false) => {
