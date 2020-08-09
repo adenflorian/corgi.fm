@@ -16,6 +16,7 @@ import {
 import {mouseFromScreenToBoard} from './SimpleGlobalClientState'
 import {RoomType} from '@corgifm/common/common-types'
 import {isInputFocused} from './client-utils'
+import {qwertyKeyboardNotesService} from './QwertyKeyboardNotesService'
 
 type IKeyBoardShortcuts = Map<string, KeyBoardShortcut>
 
@@ -34,8 +35,14 @@ const midiKeyShortcuts: {[key: string]: KeyBoardShortcut} = {}
 
 keyToMidiMap.forEach((val, key) => {
 	midiKeyShortcuts[key] = {
-		actionOnKeyDown: localMidiKeyPress(val, 1, 'input events: ' + key),
-		actionOnKeyUp: localMidiKeyUp(val, 'input events: ' + key),
+		actionOnKeyDown: () => {
+			qwertyKeyboardNotesService.invokeImmediately(val, true)
+			return localMidiKeyPress(val, 1, 'input events: ' + key)
+		},
+		actionOnKeyUp: () => {
+			qwertyKeyboardNotesService.invokeImmediately(val, false)
+			return localMidiKeyUp(val, 'input events: ' + key)
+		},
 		allowRepeat: false,
 		preventDefault: true,
 	}

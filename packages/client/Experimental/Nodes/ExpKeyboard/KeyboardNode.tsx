@@ -15,6 +15,7 @@ import {ExpCustomNumberParam, ExpCustomNumberParamReadonly, ExpCustomNumberParam
 import {useNumberChangedEvent, useObjectChangedEvent} from '../../hooks/useCorgiEvent'
 import {ExpKeyboardStateRaw, makeExpKeyboardState, expKeyboardsActions} from '@corgifm/common/redux'
 import {expKeyboardStateParamId} from '@corgifm/common/common-constants'
+import {qwertyKeyboardNotesService} from '../../../QwertyKeyboardNotesService'
 
 export class KeyboardNode extends CorgiNode {
 	protected readonly _ports: ExpPorts
@@ -40,6 +41,8 @@ export class KeyboardNode extends CorgiNode {
 
 		this._octave = new ExpCustomNumberParam('octave', 4, -1, 12)
 		this._customNumberParams = arrayToESIdKeyMap([this._octave])
+
+		qwertyKeyboardNotesService.subscribe(this._onQwertyNote)
 	}
 
 	public render() {
@@ -58,6 +61,7 @@ export class KeyboardNode extends CorgiNode {
 
 	protected _dispose() {
 		this._unsubscribeFromCurrentInput()
+		qwertyKeyboardNotesService.unsubscribe(this._onQwertyNote)
 	}
 
 	protected _onMainGraphLoaded() {
@@ -88,12 +92,30 @@ export class KeyboardNode extends CorgiNode {
 
 	private readonly _onNoteOn = (event: InputEventNoteon) => {
 		this.onNoteOn(event.note.number, event.velocity)
-		this._dispatch(expKeyboardsActions.keysDown(this.keyboardState.value.current.id, Immutable.Set([event.note.number % 12])))
+		this._dispatchKeyDown(event.note.number % 12)
 	}
 
 	private readonly _onNoteOff = (event: InputEventNoteoff) => {
 		this.onNoteOff(event.note.number)
-		this._dispatch(expKeyboardsActions.keysUp(this.keyboardState.value.current.id, Immutable.Set([event.note.number % 12])))
+		this._dispatchKeyUp(event.note.number % 12)
+	}
+
+	private readonly _onQwertyNote = (key: number, gate: boolean) => {
+		if (gate) {
+			this.onNoteOn(key, 1, true)
+			this._dispatchKeyDown(key)
+		} else {
+			this.onNoteOff(key, true)
+			this._dispatchKeyUp(key)
+		}
+	}
+
+	private readonly _dispatchKeyDown = (key: number) => {
+		this._dispatch(expKeyboardsActions.keysDown(this.keyboardState.value.current.id, Immutable.Set([key])))
+	}
+
+	private readonly _dispatchKeyUp = (key: number) => {
+		this._dispatch(expKeyboardsActions.keysUp(this.keyboardState.value.current.id, Immutable.Set([key])))
 	}
 
 	public readonly onNoteOn = (note: number, velocity: number, useOctave = false) => {
