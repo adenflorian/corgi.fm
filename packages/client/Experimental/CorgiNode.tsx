@@ -95,6 +95,7 @@ export abstract class CorgiNode {
 	protected readonly _analyser?: LabCorgiAnalyserSPNode
 	public readonly renderDebugStuff: boolean
 	protected readonly _dispatch: Dispatch
+	public get isLocallyOwned() {return this.ownerId.current === selectLocalClientId(this.singletonContext.getStore().getState())}
 
 	public constructor(
 		args: CorgiNodeArgs,

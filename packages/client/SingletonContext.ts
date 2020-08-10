@@ -8,9 +8,16 @@ import {SamplesManager} from './WebAudio'
 
 export const SingletonContext = React.createContext<SingletonContextImpl | null>(null)
 
+const dummyStore: Store = {
+	dispatch: () => {throw new Error('dispatch: dummy store should not be used')},
+	getState: () => {throw new Error('getState: dummy store should not be used')},
+	replaceReducer: () => {throw new Error('replaceReducer: dummy store should not be used')},
+	subscribe: () => {throw new Error('subscribe: dummy store should not be used')},
+}
+
 export class SingletonContextImpl {
 	private nodeManager?: NodeManager
-	private _store?: Store<IClientAppState>
+	private _store: Store<IClientAppState> = dummyStore
 	private _masterLimiter?: DynamicsCompressorNode
 
 	public constructor(
@@ -24,7 +31,7 @@ export class SingletonContextImpl {
 	public readonly getNodeManager = () => this.nodeManager
 	public readonly setNodeManager = (x?: NodeManager) => this.nodeManager = x
 	public readonly getStore = () => this._store
-	public readonly setStore = (x?: Store<IClientAppState>) => this._store = x
+	public readonly setStore = (x: Store<IClientAppState>) => this._store = x
 	public readonly getMasterLimiter = () => this._masterLimiter
 	public readonly setMasterLimiter = (x?: DynamicsCompressorNode) => this._masterLimiter = x
 	public readonly getAudioContext = () => this.audioContext

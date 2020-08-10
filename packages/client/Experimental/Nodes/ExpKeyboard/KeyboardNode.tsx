@@ -42,7 +42,7 @@ export class KeyboardNode extends CorgiNode {
 		this._octave = new ExpCustomNumberParam('octave', 4, -1, 12)
 		this._customNumberParams = arrayToESIdKeyMap([this._octave])
 
-		qwertyKeyboardNotesService.subscribe(this._onQwertyNote)
+		if (this.isLocallyOwned) qwertyKeyboardNotesService.subscribe(this._onQwertyNote)
 	}
 
 	public render() {

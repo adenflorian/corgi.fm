@@ -172,6 +172,10 @@ export const ExpKeyboard = React.memo(function _ExpKeyboard() {
 		}
 	}, [wasMouseClickedOnKeyboard])
 
+	const pressedKeys = keyboardState
+		.pressedKeys
+		.map(x => x >= globalVirtualMidiKeyboard.length || x < 0 ? (x + 1200) % 12 : x)
+
 	return (
 		// <Panel
 		// 	color={color}
@@ -195,6 +199,7 @@ export const ExpKeyboard = React.memo(function _ExpKeyboard() {
 						index={index}
 						virtualMidiKey={value}
 						isLocal={isLocal}
+						isKeyPressed={pressedKeys.has(index)}
 					/>
 				})}
 			</div>
@@ -210,18 +215,12 @@ interface KeyProps {
 	index: number
 	virtualMidiKey: IVirtualMidiKey
 	isLocal: boolean
+	isKeyPressed: boolean
 }
 
 const Key = React.memo(function _Key({
-	index, virtualMidiKey, isLocal,
+	index, virtualMidiKey, isLocal, isKeyPressed,
 }: KeyProps) {
-
-	const keyboardState = useExpKeyboardPressedKeys()
-
-	const isKeyPressed = keyboardState
-		.pressedKeys
-		.map(x => x >= globalVirtualMidiKeyboard.length || x < 0 ? (x + 1200) % 12 : x)
-		.some(x => x === index)
 
 	const showNoteNames = useSelector((state: IClientAppState) => state.options.showNoteNamesOnKeyboard)
 
