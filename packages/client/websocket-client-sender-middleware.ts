@@ -61,6 +61,7 @@ const actionTypeRateLimitIntervals = Map<string, number>([
 	// This is already debounced in input-event.ts
 	// ['UPDATE_POINTER', 50],
 	['MOVE_POSITION', 100],
+	['EXP_MOVE_MANY_POSITIONS', 100],
 ])
 
 const rateLimitedActionThings = actionTypeRateLimitIntervals
