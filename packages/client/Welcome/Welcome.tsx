@@ -82,7 +82,7 @@ export const WelcomeModalContent: ModalContent = ({hideModal}) => {
 						<div className="links vert-space-16">
 							<DiscordLink />
 							<PatreonLink />
-							<NewsletterLink />
+							{/* <NewsletterLink /> */}
 						</div>
 					</div>
 				</div>

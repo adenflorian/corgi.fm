@@ -126,13 +126,13 @@ describe('API Tests', () => {
 					resBody: /Terms of Service/,
 				}),
 			]),
-			path('newsletter', [
-				get({
-					status: 200,
-					contentType: ContentTypes.TextHtml,
-					resBody: /Begin Mailchimp Signup Form/,
-				}),
-			]),
+			// path('newsletter', [
+			// 	get({
+			// 		status: 200,
+			// 		contentType: ContentTypes.TextHtml,
+			// 		resBody: /Begin Mailchimp Signup Form/,
+			// 	}),
+			// ]),
 			path('state', [
 				get({
 					status: 200,
