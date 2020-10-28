@@ -258,7 +258,7 @@ export const TopDiv = ({
 				}
 				<OptionsModalButton />
 				<DiscordLink />
-				<PatreonLink />
+				{/* <PatreonLink /> */}
 				{/* <NewsletterLink /> */}
 			</div>
 		</div>
