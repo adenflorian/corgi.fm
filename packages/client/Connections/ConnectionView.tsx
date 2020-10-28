@@ -1,11 +1,11 @@
 import {stripIndent} from 'common-tags'
 import {List} from 'immutable'
-import React from 'react'
+import React, {useCallback} from 'react'
 import {useDispatch} from 'react-redux'
 import {
 	ActiveGhostConnectorSourceOrTarget,
 	AppOptions,
-	calculateConnectorPositionY, connectionsActions, getConnectionNodeInfo,
+	calculateConnectorPositionY, connectionsActions, findNodeInfo,
 	GhostConnection,
 	ghostConnectorActions, GhostConnectorAddingOrMoving,
 	IClientAppState, IConnection,
@@ -44,12 +44,11 @@ interface IConnectionViewReduxProps {
 
 type IConnectionViewAllProps = IConnectionViewProps & IConnectionViewReduxProps
 
-export const longLineStrokeWidth = 2
 export const connectorWidth = 16
 export const connectorHeight = 8
 
 const buffer = 50
-const joint = 8
+export const joint = 8
 
 export const ConnectionView =
 	React.memo(function _ConnectionView(props: IConnectionViewAllProps) {
@@ -103,6 +102,10 @@ export const ConnectionView =
 			)))
 		}
 
+		const onDelete = useCallback(() => {
+			dispatch(connectionsActions.delete(List([id])))
+		}, [dispatch, id])
+
 		return (
 			<div className={`connection ${saturateSource ? 'playing' : ''}`} style={{color}}>
 				<ConnectionLine
@@ -116,6 +119,8 @@ export const ConnectionView =
 					speed={speed}
 					isSourcePlaying={isSourcePlaying}
 					highQuality={highQuality}
+					onDelete={onDelete}
+					toolTip={longLineTooltip}
 				/>
 				<Connector
 					width={connectorWidth}
@@ -164,16 +169,19 @@ export const ConnectionView =
 	})
 
 export function makeCurvedPath(line: LineState) {
-	const distance = Math.sqrt(((line.x1 - line.x2) ** 2) + ((line.y1 - line.y2) ** 2))
-	// const diff2 = Math.abs((line.x2 - line.x1) / 10)
-
-	const curveStrength2 = distance / 4
-	// const curveStrength2 = 64
-
+	const c = getControlPointDistance(line.x1, line.y1, line.x2, line.y2)
 	return stripIndent`
 		M ${line.x1} ${line.y1}
-		C ${line.x1 + joint + curveStrength2} ${line.y1} ${line.x2 - joint - curveStrength2} ${line.y2} ${line.x2} ${line.y2}
+		C ${line.x1 + joint + c} ${line.y1} ${line.x2 - joint - c} ${line.y2} ${line.x2} ${line.y2}
 	`
+}
+
+export function getControlPointDistance(x1: number, y1: number, x2: number, y2: number) {
+	const distance = Math.sqrt(((x1 - x2) ** 2) + ((y1 - y2) ** 2))
+	// const diff2 = Math.abs((line.x2 - line.x1) / 10)
+
+	return distance / 4
+	// const curveStrength2 = 64
 }
 
 export function makeStraightPath(line: LineState) {
@@ -186,7 +194,7 @@ export function makeStraightPath(line: LineState) {
 }
 
 export const ConnectedConnectionView = shamuConnect(
-	(state: IClientAppState, props: IConnectionViewProps): IConnectionViewReduxProps => {
+	function connectionViewMapStateToProps(state: IClientAppState, props: IConnectionViewProps): IConnectionViewReduxProps {
 		// const globalClockState = selectGlobalClockState(state.room)
 		const connection = selectConnection(state.room, props.id)
 		const isSourceSending = selectConnectionSourceIsSending(state.room, connection.id)
@@ -200,7 +208,7 @@ export const ConnectedConnectionView = shamuConnect(
 			// Disabled for now because of performance issues
 			// speed: globalClockState.bpm,
 			highQuality: selectOption(state, AppOptions.graphicsFancyConnections) as boolean,
-			isSourcePlaying: getConnectionNodeInfo(connection.sourceType)
+			isSourcePlaying: findNodeInfo(connection.sourceType)
 				.selectIsPlaying(state.room, connection.sourceId),
 			localClientId: selectLocalClientId(state),
 			sourceStackOrder: selectConnectionStackOrderForSource(state.room, props.id),

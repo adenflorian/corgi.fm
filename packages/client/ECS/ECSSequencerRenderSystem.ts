@@ -7,7 +7,7 @@ export class ECSSequencerRenderSystem extends ECSSystem {
 	public static readonly canvasIdPrefix = 'ECSCanvasRenderSystemCanvas-node-'
 
 	private _canvasContexts = Map<Id, CanvasRenderingContext2D>()
-	private _isPlaying = Map<string, boolean>()
+	private _isPlaying = Map<Id, boolean>()
 
 	public getRequiredComponents(): Set<ECSComponentType> {
 		return Set([
@@ -48,10 +48,16 @@ export class ECSSequencerRenderSystem extends ECSSystem {
 
 		const graphPosition = entity.getGraphPositionComponent()!
 
-		canvasContext.fillStyle = CssColor.defaultGray
+		const x = sequencerComp.notesDisplayStartX + (sequencerComp.notesDisplayWidth * sequencerComp.ratio) - 1
+
+		if (x >= sequencerComp.notesDisplayStartX) {
+			canvasContext.fillStyle = CssColor.defaultGray
+		} else {
+			canvasContext.fillStyle = '#0000'
+		}
 
 		canvasContext.fillRect(
-			sequencerComp.notesDisplayStartX + (sequencerComp.notesDisplayWidth * sequencerComp.ratio) - 1,
+			x,
 			0,
 			1,
 			graphPosition.height,

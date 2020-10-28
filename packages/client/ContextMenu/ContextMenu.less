@@ -4,6 +4,10 @@
 .react-contextmenu-wrapper {
 }
 
+.simpleGraphNode > .react-contextmenu-wrapper {
+	height: 100%;
+}
+
 .react-contextmenu {
 	background-color: @panelGray;
 	min-width: 64px;
@@ -70,6 +74,7 @@
 
 	.contextMenuTop {
 		height: 16px !important;
+		min-height: 16px !important;
 		background-color: @overlayGray;
 		font-size: 0.7em;
 		font-weight: 400;
@@ -81,18 +86,22 @@
 		}
 	}
 
-	.react-contextmenu-item {
+	nav.react-contextmenu-item {
 		height: 32px;
-		text-align: left;
+		padding: 0;
+		// overflow: hidden;
+	}
+
+	div.react-contextmenu-item {
+		padding: 0 8px;
+		width: 100%;
+		min-height: 32px;
+		height: 100%;
+		text-align: right;
 		display: flex;
 		align-items: center;
-		padding: 0 8px;
 		white-space: nowrap;
-		// overflow: hidden;
-
-		& > .react-contextmenu-item {
-			padding: 0;
-		}
+		box-sizing: border-box;
 
 		&:hover {
 			background-color: @gray3;

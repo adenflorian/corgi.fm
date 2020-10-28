@@ -1,5 +1,9 @@
 import {logger} from '@corgifm/common/logger'
 
+const localOrigin = 'local.corgi.fm'
+const testOrigin = 'test.corgi.fm'
+const prodOrigin = 'corgi.fm'
+
 export const isProdClient = () => _isProdClient
 const _isProdClient = window.location.hostname.toLowerCase() === 'corgi.fm'
 
@@ -7,7 +11,15 @@ export const isTestClient = () => _isTestClient
 const _isTestClient = window.location.hostname.toLowerCase() === 'test.corgi.fm'
 
 export const isLocalDevClient = () => _isLocalDevClient
-const _isLocalDevClient = ['localhost', 'local.corgi.fm'].includes(window.location.hostname.toLowerCase())
+const _isLocalDevClient = ['localhost', localOrigin].includes(window.location.hostname.toLowerCase())
+
+export function getExpectedOrigin() {
+	return isLocalDevClient()
+		? localOrigin
+		: isTestClient()
+			? testOrigin
+			: prodOrigin
+}
 
 /** Use for displaying to user */
 export const getEnvDisplayName = () => _getEnvDisplayName

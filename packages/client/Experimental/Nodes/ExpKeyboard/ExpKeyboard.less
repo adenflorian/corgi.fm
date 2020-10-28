@@ -1,0 +1,97 @@
+@import "../../../colors.less";
+@import "../../../AppCommon.less";
+
+.expKeyboard {
+    text-shadow: none;
+    letter-spacing: initial;
+    display: flex;
+    
+    // &.isNotPlaying {
+    //     transition: box-shadow 0.2s ease-out;
+    // }
+    .white {
+        background-color: @keyWhite;
+    }
+    .white+.white {
+        box-shadow: inset 1px 0 0 fade(@borderGrayLight, 60%);
+    }
+    .black {
+        background-color: @panelGrayDark;
+    }
+    // &.isLocal {
+    //     .white:hover, .black:hover {
+    //         // color: currentColor;
+
+    //         // &::before {
+    //         //     content: '';
+    //         //     height: 2px;
+    //         //     margin-bottom: -22px;
+    //         //     background-color: currentColor;
+    //         // }
+    //     }
+    // }
+    &.notLocal {
+        .octaveKeys {
+            display: none !important;
+        }
+    }
+    .key {
+        display: inline-flex;
+        flex-direction: column;
+        justify-content: space-between;
+        // color: hsla(0, 0%, 10%, 0.8);
+        // box-shadow: inset 0px 8px 4px -6px currentColor !important;
+        &.pressed {
+            background-color: currentColor !important;
+        }
+        // &.notPressed {
+        //     transition: background-color 0.2s ease-out;
+        // }
+        .noteName {
+            font-size: 14px;
+            line-height: 20px;
+            font-weight: 600;
+        }
+        &.white .noteName {
+            color: @gray2;
+        }
+        &.black .noteName {
+            color: hsla(240, 0%, 94%, 0.925);
+        }
+        &:last-child {
+            border-bottom-right-radius: @mainBorderRadius;
+        }
+    }
+    .octave {
+        width: 48px;
+        display: flex;
+        border-bottom-left-radius: @mainBorderRadius;
+
+        .octaveNumber {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1;
+            color: @keyWhite;
+        }
+
+        .octaveKey {
+            display: flex;
+            align-items: flex-end;
+            font-size: 12px;
+            margin: 0 4px;
+        }
+    }
+    .smallText {
+        text-transform: none;
+        font-weight: 400;
+        font-size: 12px;
+        line-height: 16px;
+    }
+    .white .smallText {
+        color: @subtleGrayWhiteBg;
+    }
+    .black .smallText {
+        color: @subtleGrayBlackBg;
+    }
+}

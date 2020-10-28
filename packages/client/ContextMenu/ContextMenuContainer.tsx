@@ -1,13 +1,16 @@
 import React, {Fragment} from 'react'
+import {hot} from 'react-hot-loader'
 import {ContextMenu} from 'react-contextmenu'
 import {
-	selectLocalClient, selectVirtualKeyboardsByOwner, shamuConnect,
+	selectLocalClient, shamuConnect, selectVirtualKeyboardCountByOwner,
 } from '@corgifm/common/redux'
 import {backgroundMenuId} from '../client-constants'
 import './ContextMenu.less'
 import {ConnectedNodeMenu} from './NodeMenu'
 import {BackgroundMenuItems} from './BackgroundMenu'
 import {SamplePadMenu} from './SamplePadMenu'
+import {ConnectedExpNodeMenu} from './ExpNodeMenu'
+import {ConnectedExpBackgroundMenu} from './ExpBackgroundMenu'
 
 interface ReduxProps {
 	localClientId: Id
@@ -17,7 +20,7 @@ interface ReduxProps {
 
 type AllProps = ReduxProps
 
-export function ContextMenuContainer(
+export const ContextMenuContainer = hot(module)(function _ContextMenuContainer(
 	{localClientId, localClientKeyboardCount, localClientColor}: AllProps
 ) {
 	return (
@@ -29,19 +32,21 @@ export function ContextMenuContainer(
 					localClientColor={localClientColor}
 				/>
 			</ContextMenu>
+			<ConnectedExpBackgroundMenu />
 			<ConnectedNodeMenu />
+			<ConnectedExpNodeMenu />
 			<SamplePadMenu />
 		</Fragment>
 	)
-}
+})
 
 export const ConnectedContextMenuContainer = shamuConnect(
 	(state): ReduxProps => {
 		const localClient = selectLocalClient(state)
 		return {
 			localClientId: localClient.id,
-			localClientKeyboardCount: selectVirtualKeyboardsByOwner(
-				state.room, localClient.id).length,
+			localClientKeyboardCount: selectVirtualKeyboardCountByOwner(
+				state.room, localClient.id),
 			localClientColor: localClient.color,
 		}
 	},

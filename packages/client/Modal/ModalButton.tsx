@@ -20,6 +20,8 @@ export function ModalButton({modalId, label, icon: Icon}: Props) {
 	return (
 		<Button
 			onClick={onClick}
+			background="medium"
+			shadow={true}
 		>
 			<Icon />
 			{label}

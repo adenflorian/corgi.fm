@@ -21,8 +21,9 @@ export const globalClockActions = {
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	} as const),
-	restart: () => ({
+	restart: (startBeat = 0) => ({
 		type: 'RESTART_GLOBAL_CLOCK',
+		startBeat,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	} as const),
@@ -38,6 +39,7 @@ const defaultGlobalClockState = {
 	index: -1,
 	isPlaying: false,
 	playCount: 0,
+	startBeat: 0,
 	bpm: 120,
 	maxReadAheadSeconds: 0.2,
 }
@@ -54,9 +56,11 @@ export const globalClockReducer =
 	(state = initialState, action: GlobalClockAction) => {
 		switch (action.type) {
 			case 'REPLACE_GLOBAL_CLOCK_STATE': return makeGlobalClockState(action.globalClockState)
-			case 'START_GLOBAL_CLOCK': return state.set('isPlaying', true)
+			case 'START_GLOBAL_CLOCK': return state.set('isPlaying', true).set('startBeat', 0)
 			case 'STOP_GLOBAL_CLOCK': return state.set('isPlaying', false).set('index', -1)
-			case 'RESTART_GLOBAL_CLOCK': return state.set('isPlaying', true).update('playCount', x => x + 1)
+			case 'RESTART_GLOBAL_CLOCK': return state.set('isPlaying', true)
+				.update('playCount', x => x + 1)
+				.set('startBeat', action.startBeat)
 			case 'SET_BPM_GLOBAL_CLOCK': return state.set('bpm', clamp(action.bpm, MIN_BPM, MAX_BPM))
 			default: return state
 		}

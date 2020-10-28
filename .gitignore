@@ -8,6 +8,7 @@ dist
 *.wav
 *.zip
 samples/
+corgiSecrets.json
 
 # Logs
 logs

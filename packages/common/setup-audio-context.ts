@@ -1,6 +1,7 @@
 import {Store} from 'redux'
 import {logger} from './logger'
 import {IClientAppState} from './redux'
+import {clamp} from './common-utils'
 
 declare global {
 	interface Window {
@@ -14,8 +15,8 @@ export function setupAudioContext(audioContext: AudioContext, preFx: GainNode, s
 
 	const masterGain = audioContext.createGain()
 
-	const masterFilter = audioContext.createBiquadFilter()
-	masterFilter.frequency.value = 20000
+	// const masterFilter = audioContext.createBiquadFilter()
+	// masterFilter.frequency.value = 20000
 
 	const analyser = audioContext.createAnalyser()
 	analyser.smoothingTimeConstant = 0.3
@@ -32,7 +33,7 @@ export function setupAudioContext(audioContext: AudioContext, preFx: GainNode, s
 
 	const finalNode = preFx
 		.connect(masterLimiter)
-		.connect(masterFilter)
+		// .connect(masterFilter)
 		.connect(masterGain)
 
 	finalNode.connect(analyser)
@@ -48,9 +49,9 @@ export function setupAudioContext(audioContext: AudioContext, preFx: GainNode, s
 		const state: IClientAppState = store.getState()
 		const newVolume = state.options.masterVolume
 		const newMuted = state.options.masterVolumeMute
-		if (previousMasterVolume !== newVolume) {
-			// master.gain.value = state.options.masterVolume
-			masterGain.gain.value = Math.min(0.5, state.options.masterVolume)
+		if (!newMuted && previousMasterVolume !== newVolume) {
+			const newValue = clamp(state.options.masterVolume, 0, 0.6)
+			masterGain.gain.setTargetAtTime(newValue, audioContext.currentTime, 0.005)
 			// console.log('Master: ', Master)
 			// Master.volume.value = Math.min(0, Math.log(state.options.masterVolume) * 10)
 			// console.log('state.options.masterVolume: ', state.options.masterVolume)
@@ -60,9 +61,9 @@ export function setupAudioContext(audioContext: AudioContext, preFx: GainNode, s
 		}
 		if (previousMasterVolumeMuted !== newMuted) {
 			if (newMuted) {
-				masterGain.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.1)
+				masterGain.gain.setTargetAtTime(0, audioContext.currentTime, 0.005)
 			} else {
-				masterGain.gain.linearRampToValueAtTime(previousMasterVolume, audioContext.currentTime + 0.1)
+				masterGain.gain.setTargetAtTime(previousMasterVolume, audioContext.currentTime, 0.005)
 			}
 
 			previousMasterVolumeMuted = newMuted

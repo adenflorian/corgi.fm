@@ -1,9 +1,7 @@
-import {AnyAction} from 'redux'
 import * as uuid from 'uuid'
-import {ConnectionNodeType, IConnectable, IMultiStateThing} from '../common-types'
+import {ConnectionNodeType, IConnectable} from '../common-types'
 import {BuiltInBQFilterType} from '../OscillatorTypes'
-import {NodeSpecialState} from './shamu-graph'
-import {addMultiThing, BROADCASTER_ACTION, createSelectAllOfThingAsArray, IClientRoomState, IMultiState, makeMultiReducer, NetworkActionType, SERVER_ACTION} from '.'
+import {addMultiThing, BROADCASTER_ACTION, IClientRoomState, IMultiState, makeMultiReducer, NetworkActionType, SERVER_ACTION} from '.'
 
 export const addSimpleDelay = (sampler: SimpleDelayState) =>
 	addMultiThing(sampler, ConnectionNodeType.simpleDelay, NetworkActionType.SERVER_AND_BROADCASTER)
@@ -19,6 +17,8 @@ export const setSimpleDelayParam =
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	})
+
+export type SimpleDelayAction = SetSimpleDelayParamAction
 
 export enum SimpleDelayParam {
 	timeLeft = 'timeLeft',
@@ -41,9 +41,7 @@ export interface ISimpleDelays {
 	[key: string]: SimpleDelayState
 }
 
-export class SimpleDelayState implements IConnectable, NodeSpecialState {
-	public static defaultWidth = 80 * 3
-	public static defaultHeight = 88
+export class SimpleDelayState implements IConnectable {
 	public static defaultTimeLeft = 0.25
 	public static defaultTimeRight = 0.25
 	public static defaultFeedback = 0.42
@@ -57,7 +55,6 @@ export class SimpleDelayState implements IConnectable, NodeSpecialState {
 
 	public static dummy: SimpleDelayState = {
 		id: 'dummy',
-		ownerId: 'dummyOwner',
 		timeLeft: SimpleDelayState.defaultTimeLeft,
 		timeRight: SimpleDelayState.defaultTimeRight,
 		feedback: SimpleDelayState.defaultFeedback,
@@ -68,16 +65,10 @@ export class SimpleDelayState implements IConnectable, NodeSpecialState {
 		filterQ: SimpleDelayState.defaultFilterQ,
 		filterType: SimpleDelayState.defaultFilterType,
 		pingPong: SimpleDelayState.defaultPingPong,
-		color: false,
 		type: ConnectionNodeType.simpleDelay,
-		width: SimpleDelayState.defaultWidth,
-		height: SimpleDelayState.defaultHeight,
-		name: 'Dummy Simple Delay',
-		enabled: false,
 	}
 
 	public readonly id = uuid.v4()
-	public readonly ownerId: Id
 	public readonly timeLeft: number = SimpleDelayState.defaultTimeLeft
 	public readonly timeRight: number = SimpleDelayState.defaultTimeRight
 	public readonly feedback: number = SimpleDelayState.defaultFeedback
@@ -88,32 +79,27 @@ export class SimpleDelayState implements IConnectable, NodeSpecialState {
 	public readonly filterQ: number = SimpleDelayState.defaultFilterQ
 	public readonly filterType: BuiltInBQFilterType = SimpleDelayState.defaultFilterType
 	public readonly pingPong: boolean = SimpleDelayState.defaultPingPong
-	public readonly width: number = SimpleDelayState.defaultWidth
-	public readonly height: number = SimpleDelayState.defaultHeight
-	public readonly color: false = false
 	public readonly type = ConnectionNodeType.simpleDelay
-	public readonly name: string = 'Simple Delay'
-	public readonly enabled: boolean = true
-
-	public constructor(ownerId: ClientId) {
-		this.ownerId = ownerId
-	}
 }
 
-export function deserializeSimpleDelayState(state: IMultiStateThing): IMultiStateThing {
+export function deserializeSimpleDelayState(state: IConnectable): IConnectable {
 	const x = state as SimpleDelayState
 	const y: SimpleDelayState = {
-		...(new SimpleDelayState(x.ownerId)),
+		...(new SimpleDelayState()),
 		...x,
-		width: Math.max(x.width, SimpleDelayState.defaultWidth),
-		height: Math.max(x.height, SimpleDelayState.defaultHeight),
 	}
 	return y
 }
 
-const simpleDelayActionTypes = [
-	SET_SIMPLE_DELAY_PARAM,
-]
+type SimpleDelayActionTypes = {
+	[key in SimpleDelayAction['type']]: 0
+}
+
+const simpleDelayActionTypes2: SimpleDelayActionTypes = {
+	SET_SIMPLE_DELAY_PARAM: 0,
+}
+
+const simpleDelayActionTypes = Object.keys(simpleDelayActionTypes2)
 
 export const simpleDelaysReducer = makeMultiReducer<SimpleDelayState, ISimpleDelaysState>(
 	simpleDelayReducer,
@@ -121,7 +107,7 @@ export const simpleDelaysReducer = makeMultiReducer<SimpleDelayState, ISimpleDel
 	simpleDelayActionTypes,
 )
 
-function simpleDelayReducer(simpleDelay: SimpleDelayState, action: AnyAction) {
+function simpleDelayReducer(simpleDelay: SimpleDelayState, action: SimpleDelayAction) {
 	switch (action.type) {
 		case SET_SIMPLE_DELAY_PARAM:
 			return {
@@ -136,12 +122,6 @@ function simpleDelayReducer(simpleDelay: SimpleDelayState, action: AnyAction) {
 export const selectAllSimpleDelays = (state: IClientRoomState) => state.shamuGraph.nodes.simpleDelays.things
 
 export const selectAllSimpleDelayIds = (state: IClientRoomState) => Object.keys(selectAllSimpleDelays(state))
-
-export const selectAllSimpleDelaysAsArray =
-	createSelectAllOfThingAsArray<ISimpleDelays, SimpleDelayState>(selectAllSimpleDelays)
-
-export const selectSimpleDelaysByOwner = (state: IClientRoomState, ownerId: ClientId) =>
-	selectAllSimpleDelaysAsArray(state).filter(x => x.ownerId === ownerId)
 
 export const selectSimpleDelay = (state: IClientRoomState, id: Id) =>
 	selectAllSimpleDelays(state)[id as string] || SimpleDelayState.dummy

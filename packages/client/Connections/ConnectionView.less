@@ -1,3 +1,15 @@
+@longLineStrokeWidth: 2px;
+
+
+
+.enableWireShadows-false {
+    .connection {
+        svg {
+            filter: none;
+        }
+    }
+}
+
 .connection {
     svg {
         position: absolute;
@@ -34,20 +46,59 @@
         }
     }
 
+    &.type-midi {
+        .longLine {
+            stroke-dasharray: 1 8;
+
+            .mainLongLine {
+                stroke-width: 4px;
+            }
+            .blurLine {
+                stroke-width: 6px;
+            }
+        }
+    }
+
+    &.type-polyphonic, &.voiceCount-poly {
+        .longLine {
+            .mainLongLine {
+                stroke-width: 6px;
+            }
+            .blurLine {
+                stroke-width: 8px;
+            }
+        }
+    }
+
     .longLine {
         z-index: -15;
+        stroke-linecap: round;
 
         g {
             pointer-events: all;
 
+            .mainLongLine {
+                stroke-width: @longLineStrokeWidth;
+
+                &.mainLongLine-ghost {
+                    stroke-dasharray: 8 4;
+                    stroke-linecap: round;
+                }
+            }
+
+            .animatedLongLine {
+                stroke-width: @longLineStrokeWidth * 2;
+            }
+
             &:not(:hover) {
                 .blurLine {
-                    stroke: #0000;
+                    stroke: transparent;
                 }
             }
 
             .blurLine {
                 filter: url(#saturate);
+                stroke-width: 4px;
             }
         }
     }
@@ -64,5 +115,51 @@ path.animatedLongLine {
 @keyframes dash {
     to {
         stroke-dashoffset: -1000;
+    }
+}
+
+@lineZ: -10;
+@placeholderHitboxZ: @lineZ + 1000000;
+@connectorZ: @placeholderHitboxZ + 1;
+@placeholderZ: @connectorZ + 1;
+
+@hitboxSize: 80px;
+@connectorWidth: 16px;
+
+.newConnectionPlaceholder-hitbox {
+    width: @hitboxSize;
+    height: @hitboxSize;
+    background-color: magenta;
+    position: absolute;
+    opacity: 0;
+    z-index: -10;
+    margin-top: @hitboxSize / -2px;
+    margin-left: @hitboxSize / -2px;
+
+    .viewMode-debug & {
+        // z-index: @placeholderHitboxZ;
+        @width: 64px;
+        @height: 24px;
+        width: @width;
+        height: @height;
+        margin-top: @height / -2px;
+        margin-left: (@width / -2px) + (@connectorWidth / 2);
+    }
+}
+
+// These causes big bad hidden perf issues
+.debugViewConnections, .viewMode-debug {
+    .connection {
+
+        .longLine {
+            // z-index: @lineZ;
+        }
+        .connector {
+            // z-index: @connectorZ;
+
+            &.newConnectionPlaceholder {
+                // z-index: @placeholderZ;
+            }
+        }
     }
 }

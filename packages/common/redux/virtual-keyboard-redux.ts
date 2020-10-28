@@ -1,11 +1,16 @@
 import {Set} from 'immutable'
 import {createSelector} from 'reselect'
 import * as uuid from 'uuid'
-import {ConnectionNodeType, IMultiStateThing, IMultiStateThingDeserializer, Octave} from '../common-types'
+import {
+	ConnectionNodeType, IConnectable, IMultiStateThingDeserializer,
+} from '../common-types'
 import {applyOctave} from '../common-utils'
 import {emptyMidiNotes, IMidiNote, IMidiNotes, MidiNotes} from '../MidiNote'
-import {NodeSpecialState} from './shamu-graph'
-import {addMultiThing, BROADCASTER_ACTION, IClientRoomState, IMultiState, IMultiStateThings, makeMultiReducer, NetworkActionType, SERVER_ACTION} from '.'
+import {IClientAppState} from './common-redux-types'
+import {
+	addMultiThing, BROADCASTER_ACTION, IClientRoomState, IMultiState,
+	IMultiStateThings, makeMultiReducer, NetworkActionType, SERVER_ACTION,
+} from '.'
 
 export interface VirtualKeyAction {
 	type: string
@@ -20,40 +25,43 @@ export const addVirtualKeyboard = (virtualKeyboard: VirtualKeyboardState) =>
 
 export const VIRTUAL_KEY_PRESSED = 'VIRTUAL_KEY_PRESSED'
 export type VirtualKeyPressedAction = ReturnType<typeof virtualKeyPressed>
-export const virtualKeyPressed = (id: Id, number: number, octave: Octave, midiNote: IMidiNote) => {
+export const virtualKeyPressed = (id: Id, number: number, midiNote: IMidiNote, velocity: number, targetIds: Set<Id>) => {
 	return {
-		type: VIRTUAL_KEY_PRESSED as typeof VIRTUAL_KEY_PRESSED,
+		type: VIRTUAL_KEY_PRESSED,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 		id,
 		number,
-		octave,
 		midiNote,
-	}
+		velocity,
+		targetIds,
+	} as const
 }
 
 export const VIRTUAL_KEY_UP = 'VIRTUAL_KEY_UP'
 export type VirtualKeyUpAction = ReturnType<typeof virtualKeyUp>
-export const virtualKeyUp = (id: Id, number: number) => {
+export const virtualKeyUp = (id: Id, number: number, midiNote: IMidiNote, targetIds: Set<Id>) => {
 	return {
-		type: VIRTUAL_KEY_UP as typeof VIRTUAL_KEY_UP,
+		type: VIRTUAL_KEY_UP,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 		id,
 		number,
-	}
+		midiNote,
+		targetIds,
+	} as const
 }
 
 export const VIRTUAL_OCTAVE_CHANGE = 'VIRTUAL_OCTAVE_CHANGE'
 export type VirtualOctaveChangeAction = ReturnType<typeof virtualOctaveChange>
 export const virtualOctaveChange = (id: Id, delta: number) => {
 	return {
-		type: VIRTUAL_OCTAVE_CHANGE as typeof VIRTUAL_OCTAVE_CHANGE,
+		type: VIRTUAL_OCTAVE_CHANGE,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 		id,
 		delta,
-	}
+	} as const
 }
 
 export interface IVirtualKeyboardsState extends IMultiState {
@@ -64,7 +72,7 @@ export interface IVirtualKeyboards extends IMultiStateThings {
 	[clientId: string]: VirtualKeyboardState
 }
 
-export class VirtualKeyboardState implements IMultiStateThing, NodeSpecialState {
+export class VirtualKeyboardState implements IConnectable {
 	public static defaultWidth = 456
 	public static defaultHeight = 56
 
@@ -72,19 +80,15 @@ export class VirtualKeyboardState implements IMultiStateThing, NodeSpecialState 
 		pressedKeys: emptyMidiNotes,
 		octave: 0,
 		id: 'dummy',
-		ownerId: 'dummyOwner',
-		color: 'gray',
 		type: ConnectionNodeType.virtualKeyboard,
 		width: VirtualKeyboardState.defaultWidth,
 		height: VirtualKeyboardState.defaultHeight,
-		name: 'Dummy Virtual Keyboard',
-		enabled: false,
 	}
 
 	public static fromJS: IMultiStateThingDeserializer = state => {
 		const x = state as VirtualKeyboardState
 		const y: VirtualKeyboardState = {
-			...(new VirtualKeyboardState(x.ownerId, x.color)),
+			...(new VirtualKeyboardState()),
 			...(state as VirtualKeyboardState),
 			pressedKeys: MidiNotes(x.pressedKeys),
 			width: Math.max(x.width, VirtualKeyboardState.defaultWidth),
@@ -99,22 +103,21 @@ export class VirtualKeyboardState implements IMultiStateThing, NodeSpecialState 
 	public readonly type = ConnectionNodeType.virtualKeyboard
 	public readonly width: number = VirtualKeyboardState.defaultWidth
 	public readonly height: number = VirtualKeyboardState.defaultHeight
-	public readonly name: string = 'Virtual Keyboard'
-	public readonly enabled: boolean = true
-
-	public constructor(
-		public readonly ownerId: ClientId,
-		public readonly color: string = 'black',
-	) {}
 }
 
 export type VirtualKeyboardAction = VirtualOctaveChangeAction | VirtualKeyUpAction | VirtualKeyPressedAction
 
-const keyboardActionTypes = [
-	VIRTUAL_KEY_PRESSED,
-	VIRTUAL_KEY_UP,
-	VIRTUAL_OCTAVE_CHANGE,
-]
+type KeyboardActionTypes = {
+	[key in VirtualKeyboardAction['type']]: 0
+}
+
+const keyboardActionTypes2: KeyboardActionTypes = {
+	VIRTUAL_KEY_PRESSED: 0,
+	VIRTUAL_KEY_UP: 0,
+	VIRTUAL_OCTAVE_CHANGE: 0,
+}
+
+const keyboardActionTypes = Object.keys(keyboardActionTypes2)
 
 export const virtualKeyboardsReducer = makeMultiReducer<VirtualKeyboardState, IVirtualKeyboardsState>(
 	virtualKeyboardReducer, ConnectionNodeType.virtualKeyboard, keyboardActionTypes)
@@ -170,6 +173,11 @@ export const selectVirtualKeyboardById = (state: IClientRoomState, id: Id) => {
 	return selectAllVirtualKeyboards(state)[id as string] || VirtualKeyboardState.dummy
 }
 
+export function selectVirtualKeyboardOctave(id: Id) {
+	return (state: IClientAppState) =>
+		selectVirtualKeyboardById(state.room, id).octave
+}
+
 export const selectVirtualKeyboardHasPressedKeys = (state: IClientRoomState, id: Id) => {
 	return selectVirtualKeyboardById(state, id).pressedKeys.count() > 0
 }
@@ -179,19 +187,4 @@ export const makeGetKeyboardMidiOutput = () => {
 		selectVirtualKeyboardById,
 		keyboard => keyboard === undefined ? MidiNotes() : keyboard.pressedKeys.map(x => applyOctave(x, keyboard.octave)),
 	)
-}
-
-export function selectVirtualKeyboardsByOwner(state: IClientRoomState, ownerId: ClientId) {
-	return selectAllVirtualKeyboardsArray(state)
-		.filter(x => x.ownerId === ownerId)
-}
-
-export function selectVirtualKeyboardIdByOwner(state: IClientRoomState, ownerId: ClientId) {
-	return selectVirtualKeyboardByOwner(state, ownerId).id
-}
-
-export function selectVirtualKeyboardByOwner(state: IClientRoomState, ownerId: ClientId) {
-	const keyboard = selectAllVirtualKeyboardsArray(state)
-		.find(x => x.ownerId === ownerId)
-	return keyboard || VirtualKeyboardState.dummy
 }

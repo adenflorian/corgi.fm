@@ -1,7 +1,8 @@
 /* eslint-disable no-bitwise */
 import {Store} from 'redux'
 import {logger} from '@corgifm/common/logger'
-import {localMidiKeyPress, localMidiKeyUp} from './local-middleware'
+import {localMidiKeyUp, localMidiKeyPress, userInputActions} from '@corgifm/common/redux'
+import {clamp} from '@corgifm/common/common-utils'
 
 declare global {
 	interface Navigator {
@@ -98,7 +99,6 @@ function onInputConnected(input: MIDIInput) {
 }
 
 function onMidiMessage(event: MidiMessageEvent) {
-	logger.trace('MIDI MESSAGE!', event.data)
 	// const note = message.data[1]
 	// const velocity = message.data[0]
 
@@ -108,6 +108,12 @@ function onMidiMessage(event: MidiMessageEvent) {
 	const type = data[0] & 0xF0
 	const note = data[1] - 36
 	const velocity = data[2]
+	logger.trace('MIDI MESSAGE!', {
+		data,
+		type,
+		note,
+		velocity,
+	})
 
 	// with pressure and tilt off
 	// note off: 128, cmd: 8
@@ -116,15 +122,17 @@ function onMidiMessage(event: MidiMessageEvent) {
 	// pressure: 176, cmd 11:
 	// bend: 224, cmd: 14
 
-	if (velocity === 0) {
-		_store.dispatch(localMidiKeyUp(note))
+	if (type === 176) {
+		_store.dispatch(userInputActions.localMidiSustainPedal(velocity >= 64))
+	} else if (velocity === 0) {
+		_store.dispatch(localMidiKeyUp(note, 'onMidiMessage - velocity === 0'))
 	} else {
 		switch (type) {
 			case 144:
-				_store.dispatch(localMidiKeyPress(note))
+				_store.dispatch(localMidiKeyPress(note, clamp(velocity / 127, 0, 1), 'onMidiMessage - 144'))
 				break
 			case 128:
-				_store.dispatch(localMidiKeyUp(note))
+				_store.dispatch(localMidiKeyUp(note, 'onMidiMessage - 128'))
 				break
 		}
 	}

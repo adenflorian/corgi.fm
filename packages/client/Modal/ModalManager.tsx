@@ -1,6 +1,5 @@
 import React from 'react'
 import {useDispatch, useSelector} from 'react-redux'
-import {AnyFunction} from '@corgifm/common/common-types'
 import {
 	ModalId, modalsAction, selectActiveModalId,
 } from '@corgifm/common/redux'
@@ -8,6 +7,7 @@ import {AuthModalContent} from '../Auth/Auth'
 import {OptionsModalContent} from '../Options/Options'
 import {LoadRoomModalContent} from '../SavingAndLoading/SavingAndLoading'
 import {WelcomeModalContent} from '../Welcome/Welcome'
+import {NewRoomModalContent} from '../Button/NewRoomButton'
 import {Modal} from './Modal'
 
 export interface ModalContent extends React.FunctionComponent<{
@@ -37,6 +37,8 @@ export function ModalManager() {
 				return <WelcomeModalContent {...{hideModal}} />
 			case ModalId.Options:
 				return <OptionsModalContent {...{hideModal}} />
+			case ModalId.NewRoom:
+				return <NewRoomModalContent {...{hideModal}} />
 			default: return null
 		}
 	}

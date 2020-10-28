@@ -5,10 +5,6 @@
 .gridSequencer {
     max-width: 580px;
 
-    .isNotPlaying& {
-        transition: box-shadow 0.3s ease-out;
-    }
-
     .controls {
         display: flex;
         flex-direction: column;
@@ -71,13 +67,11 @@
     }
 
     .eventsBox {
-        position: relative;
 
         .pianoRoll {
             display: flex;
             flex-direction: column-reverse;
             pointer-events: none;
-            position: absolute;
             width: 100%;
             height: 100%;
             top: 0;
@@ -102,7 +96,7 @@
     .events {
         display: flex;
         justify-content: space-between;
-        position: relative;
+        margin-top: -192px;
 
         .event {
             // min-width: 12px;
@@ -120,24 +114,24 @@
                 margin-left: 0;
             }
             &.active {
-                filter: brightness(120%)
+                // : brightness(120%)
             }
             &.active:nth-child(odd) {
-                filter: brightness(120%)
+                // : brightness(120%)
             }
             &:nth-child(odd) {
-                // filter: brightness(110%)
+                // : brightness(110%)
             }
             &:nth-child(4n) {
-                // filter: brightness(110%)
+                // : brightness(110%)
                 border-right: 1px dashed @panelGrayLight;
             }
             &:nth-child(8n) {
-                // filter: brightness(110%)
+                // : brightness(110%)
                 border-right: 1px solid @panelGrayLight;
             }
             // &:last-child {
-            //     // filter: brightness(110%)
+            //     // : brightness(110%)
             //     border-right: none;
             // }
             .note {
@@ -148,7 +142,7 @@
                 // border: 1px solid @panelGrayLight;
                 &.white {
                     // background-color: @gray2;
-                    // filter: brightness(110%);
+                    // : brightness(110%);
                     // background-color: @panelGrayLight;
                 }
                 &.black {
@@ -157,31 +151,49 @@
                 &:hover {
                     // box-shadow: none;
                     background-color: currentColor;
-                    filter: brightness(60%)
+                    // : brightness(60%)
                 }
                 &.on {
                     // box-shadow: none;
                     background-color: currentColor;
                     &:hover {
-                        filter: saturate(300%)
+                        // : saturate(300%)
                     }
                 }
                 &:active,
                 &.active {
-                    filter: saturate(300%)
+                    // : saturate(300%)
                 }
                 &.on:active {
-                    filter: saturate(50%)
+                    // : saturate(50%)
                 }
             }
         }
     }
 
     .verticalScrollBar {
+        width: 16px;
+        height: 100%;
+        overflow: visible;
+
         .slider {
+            width: 100%;
+            fill: @panelGrayLight;
+            rx: 4px;
+            ry: 4px;
+
             &:hover {
-                filter: brightness(125%)
+                // fill: @pan;
             }
+        }
+
+        .mark {
+            fill: currentColor;
+            height: 2%;
+            pointer-events: none;
+            width: 100%;
+            rx: 2px;
+            ry: 2px;
         }
     }
 }

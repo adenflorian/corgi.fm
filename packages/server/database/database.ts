@@ -1,9 +1,9 @@
 import {MongoClient} from 'mongodb'
-import {ThenArg} from '@corgifm/common/common-types'
 import {logger} from '@corgifm/common/logger'
 import {getDbConnector} from '../server-config'
 import {eventsQueries} from './events'
 import {usersQueries} from './users'
+import {uploadsQueries} from './uploads'
 
 export type DBStore = ThenArg<typeof connectDB>
 
@@ -22,8 +22,9 @@ export async function connectDB() {
 
 	return {
 		db,
-		events: eventsQueries(db),
-		users: usersQueries(db),
+		events: await eventsQueries(db),
+		users: await usersQueries(db),
+		uploads: await uploadsQueries(db),
 		async close() {
 			await client.close()
 			await stop()

@@ -1,4 +1,4 @@
-import {Point} from '@corgifm/common/common-types'
+import {CorgiObjectChangedEvent} from './Experimental/CorgiEvents'
 
 class SimpleGlobalClientState {
 	private _zoom = 1
@@ -36,6 +36,21 @@ class SimpleGlobalClientState {
 	public set pan(val) {
 		this._pan = val
 	}
+
+	private _analyserDumpNode?: AnalyserNode
+	public getAnalyserDumpNode(audioContext: AudioContext): AnalyserNode {
+		if (this._analyserDumpNode) return this._analyserDumpNode
+		this._analyserDumpNode = audioContext.createAnalyser()
+		return this._analyserDumpNode
+	}
+
+	public resetAnalyserDumpNode(audioContext: AudioContext) {
+		this._analyserDumpNode = audioContext.createAnalyser()
+	}
+
+	public onAudioWorkletLoaded = new CorgiObjectChangedEvent(false as boolean)
+
+	public lastMousePosition = {x: 0, y: 0}
 }
 
 export const simpleGlobalClientState = new SimpleGlobalClientState()
@@ -46,4 +61,54 @@ export function mouseFromScreenToBoard({x, y}: Point) {
 		x: ((x - (window.innerWidth / 2)) / zoom) - pan.x,
 		y: ((y - (window.innerHeight / 2)) / zoom) - pan.y,
 	}
+}
+
+export function makeMouseMovementAccountForGlobalZoom({x, y}: Point) {
+	const {zoom} = simpleGlobalClientState
+	return {
+		x: x / zoom,
+		y: y / zoom,
+	}
+}
+
+// Zoom block
+export function blockMouse() {
+	const element = getZoomBlockElement()
+	if (element) {
+		element.style.visibility = 'visible'
+	}
+}
+
+export function unblockMouse() {
+	const element = getZoomBlockElement()
+	if (element) {
+		element.style.visibility = 'hidden'
+	}
+}
+
+const zoomBlockId = 'zoomBlock'
+
+function getZoomBlockElement() {
+	return document.getElementById(zoomBlockId)
+}
+
+// Smokescreen
+export function smokeOn() {
+	const element = getSmokescreenElement()
+	if (element) {
+		element.style.visibility = 'visible'
+	}
+}
+
+export function smokeOff() {
+	const element = getSmokescreenElement()
+	if (element) {
+		element.style.visibility = 'hidden'
+	}
+}
+
+const smokescreenId = 'smokescreen'
+
+function getSmokescreenElement() {
+	return document.getElementById(smokescreenId)
 }

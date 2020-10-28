@@ -1,6 +1,6 @@
 /* eslint-disable import/newline-after-import */
 import * as ColorAll from 'color'
-import {List} from 'immutable'
+import {List, Map} from 'immutable'
 import {removeOctave} from './common-utils'
 import {IMidiNote} from './MidiNote'
 // TODO
@@ -25,15 +25,46 @@ export function getColorStringForMidiNote(note: IMidiNote): string {
 	return `hsl(${removeOctave(note) * 23}, 90%, 60%)`
 }
 
+export function setLightness(color: string, lightness: number): string {
+	if (!color) return color
+	return colorFunc(color).lightness(lightness).hsl().string()
+}
+
+let finalMixedColors = Map<string, string>()
+
 export function mixColors(colors: List<string>): string {
 	// console.log('colors.count(): ', colors.count())
 	if (colors.count() === 0) return 'black'
 	if (colors.count() === 1) return colors.first()
-	return `hsl(${colorFunc(colors.reduce(mix2Colors)).hue()}, 90%, 50%)`
+
+	const mixedColorString = colors.reduce(mix2Colors)
+	const cachedColor = finalMixedColors.get(mixedColorString, null)
+
+	if (cachedColor) return cachedColor
+
+	const finalColor = `hsl(${colorFunc(mixedColorString).hue()}, 90%, 50%)`
+	finalMixedColors = finalMixedColors.set(mixedColorString, finalColor)
+
+	return finalColor
 }
 
+let mixedColors = Map<string, Map<string, string>>()
+
 export function mix2Colors(colorA: string, colorB: string): string {
-	return colorFunc(colorA).mix(colorFunc(colorB)).toString()
+	const cachedColor = mixedColors
+		.get(colorA, Map<string, string>())
+		.get(colorB, null)
+
+	if (cachedColor) return cachedColor
+
+	const mixedColor = colorFunc(colorA).mix(colorFunc(colorB)).toString()
+
+	mixedColors = mixedColors.update(
+		colorA,
+		Map<string, string>(),
+		updater => updater.set(colorB, mixedColor))
+
+	return mixedColor
 }
 
 export function hashbow(input: IHashable, saturation = 90, lightness = 50) {
@@ -52,17 +83,15 @@ export function hashbow(input: IHashable, saturation = 90, lightness = 50) {
 
 // Keep in sync with colors.less
 export enum CssColor {
-	frenchGray = '#BDBDC6',
 	panelGray = '#252525',
-	panelGrayDark = '#1A1A1A',
+	panelGrayDark = 'hsl(0, 0%, 8.5%)',
 	panelGrayLight = 'hsl(0, 0%, 25%)',
 	panelGrayTransparent = 'rgba(40, 40, 50, 0.5)',
 	disabledGray = 'hsla(0, 0%, 48%, 1)',
 	gray2 = '#31313d',
-	gray3 = '#424258',
-	knobGray = '#33333b',
+	gray3 = 'hsl(240, 0%, 30%)',
 	keyWhite = '#EBEBF6',
-	defaultGray = 'rgb(226, 226, 226)',
+	defaultGray = 'hsl(0, 0%, 89%)',
 	subtleGrayWhiteBg = 'hsl(240, 0%, 65%)',
 	subtleGrayBlackBg = 'hsl(240, 0%, 57%)',
 	orange = 'hsl(19, 90%, 50%)',
@@ -71,14 +100,14 @@ export enum CssColor {
 	brightRed = 'hsl(344, 100%, 50%)',
 	green = 'hsl(92, 90%, 50%)',
 	brightGreen = 'hsl(92, 100%, 50%)',
-	purple = 'hsl(289, 90%, 50%)',
-	brightPurple = 'hsl(289, 100%, 50%)',
+	purple = 'hsl(300, 90%, 50%)',
+	brightPurple = 'hsl(300, 100%, 50%)',
 	blue = 'hsl(202, 90%, 50%)',
 	brightBlue = 'hsl(202, 100%, 50%)',
 	yellow = 'hsl(65, 90%, 60%)',
 	brightYellow = 'hsl(65, 100%, 60%)',
 	darkTextShadow = 'rgb(20, 20, 22)',
-	appBackground = 'hsl(0, 0%, 7%)',
+	appBackground = 'hsl(0, 0%, 6%)',
 	overlayGray = 'hsla(0, 0, 4%, 0.8)',
 }
 

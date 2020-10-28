@@ -6,7 +6,7 @@ import {getEnvName, isLocalDevClient} from '../is-prod-client'
 
 export function initSentry() {
 	if (isLocalDevClient()) return
-	
+
 	Sentry.init({
 		dsn: 'https://73650ad5e74c46409f94ee95abeb07ec@sentry.io/1503205',
 		environment: getEnvName(),

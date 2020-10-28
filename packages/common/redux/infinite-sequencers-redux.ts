@@ -1,14 +1,13 @@
-import {List, Set, Stack} from 'immutable'
-import {createSelector} from 'reselect'
+import {Stack, OrderedMap} from 'immutable'
 import {ActionType} from 'typesafe-actions'
-import {ConnectionNodeType, IMultiStateThing} from '../common-types'
+import {ConnectionNodeType, IConnectable} from '../common-types'
 import {assertArrayHasNoUndefinedElements} from '../common-utils'
 import {logger} from '../logger'
-import {makeMidiClipEvent, MidiClip} from '../midi-types'
-import {IMidiNote, MidiNotes} from '../MidiNote'
+import {makeMidiClipEvent, MidiClip, makeEvents} from '../midi-types'
+import {IMidiNote} from '../MidiNote'
 import {
 	deserializeSequencerState,
-	selectAllInfiniteSequencers, SequencerAction, SequencerStateBase,
+	selectAllInfiniteSequencers, SequencerAction, SequencerStateBase, sequencerActionTypes2,
 } from './sequencer-redux'
 import {VirtualKeyPressedAction} from './virtual-keyboard-redux'
 import {IClientAppState} from './common-redux-types'
@@ -91,6 +90,16 @@ export enum InfiniteSequencerStyle {
 	colorGrid = 'colorGrid',
 }
 
+function foo() {
+	let i = 0
+	return createSequencerEvents(4)
+		.map(() => (makeMidiClipEvent({
+			note: i % 2 === 1 ? -1 : 36,
+			startBeat: i++,
+			durationBeats: 1,
+		})))
+}
+
 export class InfiniteSequencerState extends SequencerStateBase {
 	public static defaultWidth = 688
 	public static defaultHeight = 88
@@ -99,22 +108,15 @@ export class InfiniteSequencerState extends SequencerStateBase {
 	public static notesWidth = InfiniteSequencerState.defaultWidth - InfiniteSequencerState.controlsWidth - 8
 
 	public static dummy = new InfiniteSequencerState(
-		'dummy', 'dummy', InfiniteSequencerStyle.colorGrid, List(), false,
+		InfiniteSequencerStyle.colorGrid, makeEvents(), false,
 	)
 
 	public readonly style: InfiniteSequencerStyle
 	public readonly showRows: boolean
 
 	public constructor(
-		ownerId: Id,
-		name = 'Infinite Sequencer',
 		style = InfiniteSequencerStyle.colorGrid,
-		events = createSequencerEvents(4)
-			.map((_, i) => (makeMidiClipEvent({
-				notes: MidiNotes(i % 2 === 1 ? [] : [36]),
-				startBeat: i,
-				durationBeats: 1,
-			}))),
+		events = foo(),
 		isPlaying = false,
 	) {
 		const midiClip = new MidiClip({
@@ -124,14 +126,8 @@ export class InfiniteSequencerState extends SequencerStateBase {
 		})
 
 		super(
-			name,
 			midiClip,
-			InfiniteSequencerState.defaultWidth,
-			InfiniteSequencerState.defaultHeight,
-			ownerId,
 			ConnectionNodeType.infiniteSequencer,
-			InfiniteSequencerState.notesStartX,
-			InfiniteSequencerState.notesWidth,
 			isPlaying,
 			0.5,
 		)
@@ -141,31 +137,33 @@ export class InfiniteSequencerState extends SequencerStateBase {
 	}
 }
 
-export function deserializeInfiniteSequencerState(state: IMultiStateThing): IMultiStateThing {
+export function deserializeInfiniteSequencerState(state: IConnectable): IConnectable {
 	const x = state as InfiniteSequencerState
 	const y: InfiniteSequencerState = {
-		...(new InfiniteSequencerState(x.ownerId)),
+		...(new InfiniteSequencerState()),
 		...(deserializeSequencerState(x)),
-		width: Math.max(x.width, InfiniteSequencerState.defaultWidth),
-		height: Math.max(x.height, InfiniteSequencerState.defaultHeight),
-		notesDisplayStartX: InfiniteSequencerState.notesStartX,
-		notesDisplayWidth: InfiniteSequencerState.notesWidth,
+		// width: Math.max(x.width, InfiniteSequencerState.defaultWidth),
+		// height: Math.max(x.height, InfiniteSequencerState.defaultHeight),
+		// notesDisplayStartX: InfiniteSequencerState.notesStartX,
+		// notesDisplayWidth: InfiniteSequencerState.notesWidth,
 	}
 	return y
 }
 
-const infiniteSequencerActionTypes = [
-	'SET_INFINITE_SEQUENCER_NOTE',
-	'DELETE_INFINITE_SEQUENCER_NOTE',
-	'SET_INFINITE_SEQUENCER_FIELD',
-	'CLEAR_SEQUENCER',
-	'UNDO_SEQUENCER',
-	'PLAY_SEQUENCER',
-	'STOP_SEQUENCER',
-	'RECORD_SEQUENCER_NOTE',
-	'RECORD_SEQUENCER_REST',
-	'TOGGLE_SEQUENCER_RECORDING',
-]
+type InfiniteSequencerActionTypes = {
+	[key in InfiniteSequencerAction['type']]: 0
+}
+
+const infiniteSequencerActionTypes2: InfiniteSequencerActionTypes = {
+	...sequencerActionTypes2,
+	SET_INFINITE_SEQUENCER_NOTE: 0,
+	DELETE_INFINITE_SEQUENCER_NOTE: 0,
+	SET_INFINITE_SEQUENCER_FIELD: 0,
+	RESTART_INFINITE_SEQUENCER: 0,
+	VIRTUAL_KEY_PRESSED: 0,
+}
+
+const infiniteSequencerActionTypes = Object.keys(infiniteSequencerActionTypes2)
 
 assertArrayHasNoUndefinedElements(infiniteSequencerActionTypes)
 
@@ -194,17 +192,17 @@ function infiniteSequencerReducer(
 			return {
 				...infiniteSequencer,
 				midiClip: infiniteSequencer.midiClip.withMutations(mutable => {
-					mutable.set('events', mutable.events.map((event, eventIndex) => {
-						if (eventIndex === action.index) {
+					mutable.set('events', mutable.events.map(event => {
+						if (event.startBeat === action.index) {
 							if (action.enabled) {
 								return {
 									...event,
-									notes: Set([action.note]),
+									note: action.note,
 								}
 							} else {
 								return {
 									...event,
-									notes: event.notes.filter(x => x !== action.note),
+									note: -1,
 								}
 							}
 						} else {
@@ -277,20 +275,9 @@ function infiniteSequencerReducer(
 			if (infiniteSequencer.isRecording) {
 				return {
 					...infiniteSequencer,
-					midiClip: infiniteSequencer.midiClip.withMutations(mutable => {
-						mutable.set('events', mutable.events
-							.concat(makeMidiClipEvent({
-								notes: action.type === 'RECORD_SEQUENCER_NOTE'
-									? MidiNotes([action.note])
-									: action.type === 'RECORD_SEQUENCER_REST'
-										? MidiNotes()
-										: (() => {logger.error('nope'); return MidiNotes()})(),
-								startBeat: mutable.events.count(),
-								durationBeats: 1,
-							})),
-						)
-						mutable.set('length', mutable.events.count())
-					}),
+					midiClip: infiniteSequencer.midiClip
+						.update('events', events => events.concat(createEventToRecord(action, infiniteSequencer)))
+						.update('length', length => length + 1),
 					previousEvents: infiniteSequencer.previousEvents.unshift(infiniteSequencer.midiClip.events),
 				}
 			} else {
@@ -298,6 +285,26 @@ function infiniteSequencerReducer(
 			}
 		default:
 			return infiniteSequencer
+	}
+}
+
+function createEventToRecord(action: SequencerAction, infiniteSequencer: InfiniteSequencerState) {
+	const newEvent = makeMidiClipEvent({
+		note: getNoteToRecord(action),
+		startBeat: infiniteSequencer.midiClip.events.count(),
+		durationBeats: 1,
+	})
+	return OrderedMap([[newEvent.id, newEvent]])
+}
+
+function getNoteToRecord(action: SequencerAction): number {
+	switch (action.type) {
+		case 'RECORD_SEQUENCER_NOTE': return action.note
+		case 'RECORD_SEQUENCER_REST': return -1
+		default: {
+			logger.error('[getRecordNote] bad action: ', {action})
+			return -1
+		}
 	}
 }
 
@@ -317,24 +324,4 @@ export const selectInfiniteSequencerIsActive = (state: IClientRoomState, id: Id)
 	selectInfiniteSequencer(state, id).isPlaying
 
 export const selectInfiniteSequencerIsSending = (state: IClientRoomState, id: Id) =>
-	selectInfiniteSequencerActiveNotes(state, id).count() > 0
-
-const emptyNotes = MidiNotes()
-
-export const selectInfiniteSequencerActiveNotes = createSelector(
-	[selectInfiniteSequencer, selectGlobalClockState],
-	(infiniteSequencer, globalClockState) => {
-		if (!infiniteSequencer) return emptyNotes
-		if (!infiniteSequencer.isPlaying) return emptyNotes
-
-		const globalClockIndex = globalClockState.index
-
-		const index = globalClockIndex
-
-		if (index >= 0 && infiniteSequencer.midiClip.events.count() > 0) {
-			return infiniteSequencer.midiClip.events.get((index / Math.round(infiniteSequencer.rate)) % infiniteSequencer.midiClip.events.count())!.notes
-		} else {
-			return emptyNotes
-		}
-	},
-)
+	false

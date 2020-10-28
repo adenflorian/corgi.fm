@@ -17,9 +17,9 @@ export const chatSubmit = (message: IChatMessage) => {
 	return {
 		type: CHAT_SUBMIT,
 		BROADCASTER_ACTION,
-		SERVER_ACTION,
+		// SERVER_ACTION,
 		message,
-	}
+	} as const
 }
 
 export const CHAT_SYSTEM_MESSAGE = 'CHAT_SYSTEM_MESSAGE'
@@ -32,7 +32,7 @@ export const chatSystemMessage = (message: string, type: SystemMessageType = 'in
 			systemColors.get(type, CssColor.defaultGray),
 			message,
 		),
-	}
+	} as const
 }
 
 export const SET_CHAT = 'SET_CHAT'
@@ -42,7 +42,15 @@ export const setChat = (messages: IChatMessage[]) => {
 		type: SET_CHAT,
 		BROADCASTER_ACTION,
 		messages,
-	}
+	} as const
+}
+
+export const CLEAR_CHAT = 'CLEAR_CHAT'
+export type ClearChatAction = ReturnType<typeof clearChat>
+export const clearChat = () => {
+	return {
+		type: CLEAR_CHAT,
+	} as const
 }
 
 export const chatActionTypesWhitelist: readonly string[] = [
@@ -83,6 +91,12 @@ export const chatReducer = createReducer(initialState, {
 		return {
 			...state,
 			messages: messages.map(x => ({...x, isOldMessage: true})),
+		}
+	},
+	[CLEAR_CHAT]: state => {
+		return {
+			...state,
+			messages: [],
 		}
 	},
 })

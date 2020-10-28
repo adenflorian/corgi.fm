@@ -6,14 +6,14 @@ import {ServerStore} from '../server-redux-types'
 import {routeIfSecure} from '../security-middleware'
 import {validateBodyThenRoute} from '../server-validation'
 import {
-	SecureUsersApiRequest, ApiResponse, ApiRequest, Method, SecureApiRequest,
-	defaultResponse,
+	SecureUsersApiRequest, ApiResponse, Method, SecureApiRequest,
+	defaultResponse, RoutedRequest,
 } from './api-types'
 
-export function getUsersRouter(serverStore: ServerStore, dbStore: DBStore) {
+export function getUsersController(serverStore: ServerStore, dbStore: DBStore) {
 
-	return async function usersRouter(request: ApiRequest): Promise<ApiResponse> {
-		if (request.path === '/users/count' && request.method === Method.GET) {
+	return async function usersRouter(request: RoutedRequest): Promise<ApiResponse> {
+		if (request.truncatedPath === '/count' && request.method === Method.GET) {
 			return countUsers()
 		} else {
 			return routeIfSecure(request, secureUsersRouter)
@@ -58,10 +58,7 @@ export function getUsersRouter(serverStore: ServerStore, dbStore: DBStore) {
 
 		if (user === null) {
 			return {
-				status: 404,
-				body: {
-					message: `userNotFound`,
-				},
+				status: 204,
 			}
 		} else {
 			return {
@@ -80,7 +77,7 @@ export function getUsersRouter(serverStore: ServerStore, dbStore: DBStore) {
 	}
 }
 
-const usersUidPathRegEx = pathToRegexp('/users/:uid')
+const usersUidPathRegEx = pathToRegexp('/:uid')
 
 const pathUidMismatchResponse: ApiResponse = {
 	status: 403,
@@ -89,7 +86,7 @@ const pathUidMismatchResponse: ApiResponse = {
 	},
 }
 
-function getUidFromPath(request: ApiRequest) {
-	const matches = usersUidPathRegEx.exec(request.path)
+function getUidFromPath(request: RoutedRequest): string | null {
+	const matches = usersUidPathRegEx.exec(request.truncatedPath)
 	return matches && matches[1]
 }

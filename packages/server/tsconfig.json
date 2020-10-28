@@ -13,8 +13,6 @@
 		"../common/common-global.d.ts"
 	],
 	"exclude": [
-		"node_modules",
-		"**/*.spec.ts",
-		"api-tests/**/*"
+		"node_modules"
 	]
 }

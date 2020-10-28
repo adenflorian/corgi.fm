@@ -1,0 +1,25 @@
+@import '../colors.less';
+@import '../AppCommon.less';
+
+.uberArc {
+    &.modArc {
+        pointer-events: none;
+        .clickArc {
+            pointer-events: all;
+        }
+        &:hover, &:active {
+            .railArc {
+                stroke: currentColor;
+            }
+            .otherDot {
+                fill: currentColor;
+            }
+        }
+    }
+    &.liveValueArc {
+        pointer-events: none;
+        .clickArc {
+            pointer-events: all;
+        }
+    }
+}

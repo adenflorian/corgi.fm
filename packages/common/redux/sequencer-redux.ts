@@ -1,19 +1,19 @@
-import {List, Map, Set} from 'immutable'
+import {List, Map, Set, OrderedMap} from 'immutable'
 import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
 import {
-	ConnectionNodeType, IMultiStateThing, isSequencerNodeType,
+	ConnectionNodeType, IConnectable, isSequencerNodeType,
 } from '../common-types'
 import {
-	makeMidiClip, makeMidiClipEvent, MidiClip, MidiClipEvent, MidiClipEvents,
+	makeMidiClip, makeMidiClipEvent, MidiClip, MidiClipEvent, MidiClipEvents, makeEvents,
 } from '../midi-types'
-import {emptyMidiNotes, IMidiNote, MidiNotes} from '../MidiNote'
+import {IMidiNote} from '../MidiNote'
 import {
-	selectAllConnections, selectConnectionsWithSourceIds,
+	selectAllConnections, selectConnectionsWithSourceId,
 	selectConnectionsWithTargetIds,
+	IConnectionsState,
 } from './connections-redux'
 import {selectGlobalClockIsPlaying} from './global-clock-redux'
-import {NodeSpecialState} from './shamu-graph'
 import {BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION} from '.'
 
 import uuid = require('uuid')
@@ -27,6 +27,12 @@ export const sequencerActions = {
 	} as const),
 	undo: (id: Id) => ({
 		type: 'UNDO_SEQUENCER',
+		id,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	} as const),
+	saveUndo: (id: Id) => ({
+		type: 'SEQUENCER_SAVE_UNDO',
 		id,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
@@ -81,95 +87,128 @@ export const sequencerActions = {
 		BROADCASTER_ACTION,
 		SERVER_ACTION,
 	} as const),
+	setZoom: (id: Id, zoom: Partial<Point>) => ({
+		type: 'SET_SEQUENCER_ZOOM',
+		id,
+		zoom,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	} as const),
+	setPan: (id: Id, pan: Partial<Point>) => ({
+		type: 'SET_SEQUENCER_PAN',
+		id,
+		pan,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	} as const),
+	setZoomAndPan: (id: Id, zoom: Partial<Point>, pan: Partial<Point>) => ({
+		type: 'SET_SEQUENCER_ZOOM_AND_PAN',
+		id,
+		zoom,
+		pan,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	} as const),
 } as const
+
+type SequencerActionTypes = {
+	[key in SequencerAction['type']]: 0
+}
+
+export const sequencerActionTypes2: SequencerActionTypes = {
+	CLEAR_SEQUENCER: 0,
+	UNDO_SEQUENCER: 0,
+	PLAY_SEQUENCER: 0,
+	STOP_SEQUENCER: 0,
+	TOGGLE_SEQUENCER_RECORDING: 0,
+	RECORD_SEQUENCER_NOTE: 0,
+	EXPORT_SEQUENCER_MIDI: 0,
+	PLAY_ALL: 0,
+	RECORD_SEQUENCER_REST: 0,
+	SKIP_NOTE: 0,
+	STOP_ALL: 0,
+	SET_SEQUENCER_ZOOM: 0,
+	SET_SEQUENCER_PAN: 0,
+	SEQUENCER_SAVE_UNDO: 0,
+	SET_SEQUENCER_ZOOM_AND_PAN: 0,
+}
 
 export type SequencerAction = ActionType<typeof sequencerActions>
 
 export const createSequencerEvents = (length: number, ratio = 1): MidiClipEvents => {
 	return makeSequencerEvents(
-		new Array(length)
-			.fill(0)
-			.map((_, i) => makeMidiClipEvent({notes: emptyMidiNotes, startBeat: i * ratio, durationBeats: 1 * ratio})),
+		List(
+			new Array(length)
+				.fill(0)
+				.map((_, i) => makeMidiClipEvent({note: -1, startBeat: i * ratio, durationBeats: 1 * ratio}))
+		),
 	)
 }
 
 export const makeSequencerEvents =
-	(x: MidiClipEvent[] | List<MidiClipEvent> = List<MidiClipEvent>()): MidiClipEvents => List<MidiClipEvent>(x)
+	(x: List<MidiClipEvent> = List<MidiClipEvent>()): MidiClipEvents => makeEvents(x)
 
 export function deserializeEvents(events: MidiClipEvents): MidiClipEvents {
-	return makeSequencerEvents(events.map(x => ({...x, notes: MidiNotes(x.notes)})))
+	return makeSequencerEvents(
+		OrderedMap(events)
+			// Some could be undefined in old saves
+			.filter(x => x !== undefined)
+			.map(x => ({...x, note: x.note})
+			).toList())
 }
 
-export interface ISequencerState extends IMultiStateThing, NodeSpecialState {
+export interface ISequencerState extends IConnectable {
 	readonly midiClip: MidiClip
 	readonly index: number
 	readonly isPlaying: boolean
 	readonly id: Id
-	readonly color: string | false
-	readonly name: string
 	readonly isRecording: boolean
 	readonly previousEvents: List<MidiClipEvents>
-	readonly width: number
-	readonly height: number
 	readonly rate: number
 	readonly gate: number
 	readonly pitch: number
-	readonly notesDisplayStartX: number
-	readonly notesDisplayWidth: number
 }
 
 export const dummySequencerState: SequencerStateBase = {
 	index: -1,
 	id: 'dummy sequencer id',
-	color: 'black',
 	isRecording: false,
 	previousEvents: List<MidiClipEvents>(),
 	rate: 1,
 	pitch: 0,
-	name: 'dummy sequencer name',
 	midiClip: makeMidiClip(),
-	width: 0,
-	height: 0,
-	ownerId: 'dummy owner id',
 	type: ConnectionNodeType.gridSequencer,
-	notesDisplayStartX: 1,
-	notesDisplayWidth: 1,
 	isPlaying: false,
 	gate: 1,
-	enabled: false,
+	zoom: {x: 1, y: 1} as Point,
+	pan: {x: 0, y: 0} as Point,
 }
 
 export abstract class SequencerStateBase implements ISequencerState {
 	public readonly index: number = -1
 	public readonly id: Id = uuid.v4()
-	public readonly color: string | false = false
 	public readonly isRecording: boolean = false
 	public readonly previousEvents: List<MidiClipEvents> = List<MidiClipEvents>()
 	public readonly pitch: number = 0
-	public readonly enabled: boolean = true
 
 	public constructor(
-		public readonly name: string,
 		public readonly midiClip: MidiClip,
-		public readonly width: number,
-		public readonly height: number,
-		public readonly ownerId: Id,
 		public readonly type: ConnectionNodeType,
-		public readonly notesDisplayStartX: number,
-		public readonly notesDisplayWidth: number,
 		public readonly isPlaying: boolean = false,
 		public readonly gate: number = 1,
 		public readonly rate: number = 1,
+		public readonly zoom: Point = {x: 1, y: 1},
+		public readonly pan: Point = {x: 0, y: 0},
 	) {
 		// this.color = colorFunc(hashbow(this.id)).desaturate(0.2).hsl().string()
 	}
 }
 
 export function isEmptyEvents(events: MidiClipEvents) {
-	return events.some(x => x.notes.count() > 0) === false
+	return events.some(x => x.note > -1) === false
 }
 
-export function deserializeSequencerState<T extends ISequencerState>(state: IMultiStateThing): T {
+export function deserializeSequencerState<T extends ISequencerState>(state: IConnectable): T {
 	const x = state as T
 	const y: T = {
 		...x,
@@ -185,11 +224,13 @@ export function deserializeSequencerState<T extends ISequencerState>(state: IMul
 
 export const selectAllGridSequencers = (state: IClientRoomState) => state.shamuGraph.nodes.gridSequencers.things
 
+export const selectAllBetterSequencers = (state: IClientRoomState) => state.shamuGraph.nodes.betterSequencers.things
+
 export const selectAllInfiniteSequencers = (state: IClientRoomState) => state.shamuGraph.nodes.infiniteSequencers.things
 
 export const selectAllSequencers = createSelector(
-	[selectAllGridSequencers, selectAllInfiniteSequencers],
-	(gridSeqs, infSeqs) => ({...gridSeqs, ...infSeqs}),
+	[selectAllGridSequencers, selectAllInfiniteSequencers, selectAllBetterSequencers],
+	(gridSeqs, infSeqs, betterSeqs) => ({...gridSeqs, ...infSeqs, ...betterSeqs}),
 )
 
 export function selectSequencer(state: IClientRoomState, id: Id) {
@@ -234,7 +275,7 @@ function isUpstreamClockFromNode(
 ): boolean {
 	if (processedNodeIds.includes(nodeId)) return false
 
-	return selectConnectionsWithTargetIds(state, [nodeId])
+	return selectConnectionsWithTargetIds(state, nodeId)
 		.some(connection => {
 			if (connection.sourceType === ConnectionNodeType.masterClock) {
 				return true
@@ -244,16 +285,29 @@ function isUpstreamClockFromNode(
 		})
 }
 
-export const selectDirectDownstreamSequencerIds = (state: IClientRoomState, id: Id): List<SequencerId> => {
-	return _getDirectDownstreamSequencerIds(state, id)
+let lastConnectionsState: IConnectionsState
+let cache = Map<Id, List<Id>>()
+
+export const selectDirectDownstreamSequencerIds = (state: IClientRoomState, id: Id): List<Id> => {
+	if (state.connections === lastConnectionsState) {
+		const foo = cache.get(id, null)
+		if (foo) {
+			return foo
+		} else {
+			const foo2 = _bar(state, id)
+			cache = cache.set(id, foo2)
+			return foo2
+		}
+	} else {
+		lastConnectionsState = state.connections
+		const foo = _bar(state, id)
+		cache = cache.clear().set(id, foo)
+		return foo
+	}
 }
 
-interface SequencerId extends Id {}
-
-function _getDirectDownstreamSequencerIds(
-	state: IClientRoomState, nodeId: Id,
-): List<SequencerId> {
-	return selectConnectionsWithSourceIds(state, [nodeId])
+function _bar(state: IClientRoomState, id: Id): List<Id> {
+	return selectConnectionsWithSourceId(state, id)
 		.filter(connection => isSequencerNodeType(connection.targetType))
 		.map(x => x.targetId).toList()
 }

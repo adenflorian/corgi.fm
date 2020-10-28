@@ -1,11 +1,11 @@
 import {List} from 'immutable'
 import {ActionType} from 'typesafe-actions'
-import {ConnectionNodeType, IConnectable, IMultiStateThing} from '../common-types'
+import {ConnectionNodeType, IConnectable} from '../common-types'
 import {CssColor} from '../shamu-color'
 import {
-	addMultiThing, BROADCASTER_ACTION, getConnectionNodeInfo,
+	addMultiThing, BROADCASTER_ACTION,
 	IClientRoomState, IMultiState, makeMultiReducer, NetworkActionType,
-	NodeSpecialState, SERVER_ACTION,
+	SERVER_ACTION,
 } from '.'
 
 import uuid = require('uuid')
@@ -33,66 +33,48 @@ export interface GroupSequencers {
 	[key: string]: GroupSequencer
 }
 
-export class GroupSequencer implements IConnectable, NodeSpecialState, IMultiStateThing {
-	public static defaultWidth = 800
-	public static defaultHeight = 200
-
+export class GroupSequencer implements IConnectable {
 	public static dummy: GroupSequencer = {
 		id: 'dummy',
-		ownerId: 'dummyOwner',
-		color: List([CssColor.defaultGray]),
 		type: ConnectionNodeType.groupSequencer,
-		width: GroupSequencer.defaultWidth,
-		height: GroupSequencer.defaultHeight,
-		name: 'Dummy Group Sequencer',
 		groups: makeGroups([CssColor.red, CssColor.green], 2, 4),
 		length: 2,
 		groupEventBeatLength: 1,
 		outputPortCount: 2,
-		notesDisplayStartX: 0,
-		notesDisplayWidth: GroupSequencer.defaultWidth,
-		enabled: false,
+		zoom: {x: 1, y: 1},
+		pan: {x: 0, y: 0},
 	}
 
 	public readonly id = uuid.v4()
-	public readonly color: List<string>
 	public readonly type = ConnectionNodeType.groupSequencer
-	public readonly width = GroupSequencer.defaultWidth
-	public readonly height = GroupSequencer.defaultHeight
-	public readonly name: string = getConnectionNodeInfo(ConnectionNodeType.groupSequencer).typeName
 	public readonly groups: Groups
 	public readonly length: number = 16
 	public readonly groupEventBeatLength: number = 16
 	public readonly outputPortCount: number
-	public readonly notesDisplayStartX = 0
-	public readonly notesDisplayWidth: number
-	public readonly enabled: boolean = true
+	public readonly zoom: Point = {x: 1, y: 1}
+	public readonly pan: Point = {x: 0, y: 0}
 
-	public constructor(
-		public readonly ownerId: Id,
-	) {
+	public constructor() {
 		this.groups = makeGroups([CssColor.red, CssColor.green, CssColor.blue], this.length, this.groupEventBeatLength)
 		this.outputPortCount = this.groups.count()
-		this.color = this.groups.map(x => x.color).toList()
-		this.notesDisplayWidth = GroupSequencer.defaultWidth
+		// TODO
+		// this.color = this.groups.map(x => x.color).toList()
 	}
 }
 
-export function deserializeGroupSequencerState(state: IMultiStateThing): IMultiStateThing {
+export function deserializeGroupSequencerState(state: IConnectable): IConnectable {
 	const x = state as GroupSequencer
 	const y: GroupSequencer = {
-		...(new GroupSequencer(x.ownerId)),
+		...(new GroupSequencer()),
 		...x,
 		groups: List<Group>(x.groups)
 			.map(group => ({
 				...group,
 				events: List(group.events),
 			})),
-		color: List(x.color),
-		width: Math.max(x.width, GroupSequencer.defaultWidth),
-		height: Math.max(x.height, GroupSequencer.defaultHeight),
-		notesDisplayStartX: 0,
-		notesDisplayWidth: GroupSequencer.defaultWidth,
+		// color: List(x.color),
+		// notesDisplayStartX: 0,
+		// notesDisplayWidth: GroupSequencer.defaultWidth,
 	}
 	return y
 }
@@ -133,9 +115,15 @@ export interface GroupEvent {
 
 export type GroupSequencerAction = ActionType<typeof groupSequencerActions>
 
-const groupSequencerActionTypes: string[] = [
-	'GROUP_SEQ_SET_ENABLED',
-]
+type GroupSequencerActionTypes = {
+	[key in GroupSequencerAction['type']]: 0
+}
+
+const groupSequencerActionTypes2: GroupSequencerActionTypes = {
+	GROUP_SEQ_SET_ENABLED: 0,
+}
+
+const groupSequencerActionTypes = Object.keys(groupSequencerActionTypes2)
 
 export const groupSequencersReducer = makeMultiReducer<GroupSequencer, GroupSequencersState>(
 	groupSequencerReducer,

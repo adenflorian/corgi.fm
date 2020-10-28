@@ -1,3 +1,73 @@
+# Experimental
+
+## Test Weekend 1
+- [√] create color changed event on corgi node
+- [√] uber arc should subscribe to that event to get its color
+- [√] extract dumb uber arc component
+- [√] make sure mod rail is accurately reflecting gain value
+- [√] click and drag on mod rail to change gain
+- [√] modRail should be visible when gain is 0
+- [√] allow switching between center and offset
+	- [√] with alt + shift + click
+- [√] clamp mod rails
+- [√] get liveValueRail to be accurate
+- [√] fix zoomBlock on knob from preventing clicking on knob value
+- [√] fix cloning
+- [√] setup curve for osc freq
+- [√] LFO
+- [√] sequencer pitch stuff
+	- [√] put note into events
+- [√] fix issue with live value after new connection to filter q
+- [ ] different background for experimental
+- [ ] KeyboardNode
+	- [√] network it
+	- [ ] take computer keyboard input
+- [ ] BiquadFilterNode: state is bad, probably due to unstable filter caused by fast parameter automation.
+- [ ] fix connector placeholders z index
+- [ ] ArpNode
+- [ ] implement enable/disable for all nodes
+- [ ] prevent clicks when adding/removing connections
+- [ ] prevent clicks for enable/disable on all nodes
+- [√] Delay node
+- [ ] Reverb node
+- [ ] Phaser node
+- [ ] WaveShaper distortion node
+- [ ] change room type drop down to a button select thing
+- [ ] enable room type selector for test
+
+## Test Weekend 1.5?
+- [√] create enum param type (knob/dropdown/buttonSelect)
+
+## Test Weekend 2
+- [ ] voice and unison params for oscillator?
+- [ ] allow drawing a selection box around nodes to select
+- [ ] disconnect analyser node if no sources connected
+- [ ] midi converter upgrades
+	- [ ] portamento
+		- [ ] rise/fall separate knobs
+		- [ ] "always" toggle (see serum)
+		- [ ] custom portamento curve (use setValueCurveAtTime?)
+		- [ ] "scaled" toggle (see serum)
+- [ ] uber knob updates
+	- [ ] tweak style of rail when negative gain
+	- [ ] add something to show that rail extends past limit
+		- [ ] mod rail
+		- [ ] live value rail
+	- [ ] highlight main knob on hover, including the center
+	- [√] fix knob UI when no mod inputs
+	- [ ] show source node name, gain, and centering value on hover of mod arc
+- [ ] Sequencer upgrades
+	- [ ] pitch
+	- [ ] velocity
+- [ ] add extra gains and wave shapers to param input chain to allow fading between them when switching between center and offset to prevent clicks
+
+
+
+
+
+
+
+
 # 0.5.0
 - [√] fix dropping on connections on something with a lot of connections already
 - [√] duplicate nodes
@@ -30,10 +100,10 @@
 	- [√] let users create keyboard if they dont have one
 - [√] clone node with ctrl + D
 - [√] new clone should be selected
-- [ ] LFO
+- [√] LFO
 	- [√] basic synth LFO
 	- [√] filter target
-	- [ ] fix wave value string
+	- [√] fix wave value string
 - [√] filter type knob for synth
 - [√] filter type knob for sampler
 - [√] fix knob arc not being inline
@@ -50,26 +120,6 @@
 	- [√] connect to memory db in local
 	- [√] connect to real database in test and prod
 	- [√] setup db in prod
-- [-] auth back end (abandoned, went with firebase auth)
-	- [ ] register
-		- [√] save user to DB
-		- [√] hash pw
-		- [√] limit pw to 50 chars
-		- [√] return token
-		- [√] put token secret in secret place and load in
-		- [√] check for existing user first
-		- [√] min password length
-		- [ ] validate email
-			- [ ] on register, send email with verification link
-		- [ ] verify email
-	- [ ] login
-		- [ ] return token
-	- [ ] password reset
-	- [ ] jwt
-		- [ ] make it expire
-		- [ ] do i need to store the tokens in the DB?
-		- [ ] revoking access
-		- [ ] logging out (just delete token from client?)
 - [ ] firebase auth
 	- [ ] local
 		- [√] UI
@@ -164,6 +214,16 @@
 - [√] BUG: errors when switching rooms with debug visual enabled
 - [√] blur new room button after click
 - [√] system message when saving a room
+- [ ] look into if we can not call `next(action)` for middleware actions
+- [ ] cant exit modal by clicking in between modals
+- [ ] put redux clients in a Map
+- [ ] use canvas for FPS to reduce garbage created
+
+- [√] add options to disable new animation things
+- [ ] menus shouldnt disappear when mouse moves off of it
+	- [ ] requires PR for `react-context`
+- [ ] pass corgi client version on all api requests
+	- [ ] put on uploaded samples
 
 - [ ] **Custom Sampler**
 	- morphing the piano sampler into a custom sampler
@@ -171,22 +231,53 @@
 	- [√] click on pad to play sample
 	- [√] change sample colors
 	- [√] octave knob to scroll through all 128 samples
-	- [ ] right click on pad should not play it
+	- [√] right click on pad should not play it
+	- [√] scrolling thru octaves shouldn't trigger animation
+	- [ ] change create server stuff to create a drum sampler
 	- [ ] right click pad > select samples...
 		- [√] Default samples (built-in samples)
 		- [ ] Public samples
 		- [ ] Upload...
+			- click upload
+			- show file browser
+			- select file
+			- request signed URL from server
+			- upload to signed URL
+				- how will corgi server know if upload was successful?
+				- from corgi server upload to space is free bandwidth, so maybe simpler to upload to corgi?
 		- [ ] Your samples
+			- menu should show all of your uploaded samples
+				- list from corgi DB or DO?
 		- [ ] Samples in room
 	- [ ] right click pad > clear
 	- [ ] allow scrolling thru menu
+	- [ ] should be able to focus a pad and use tab and arrow keys to navigate
 	- [ ] drag sample onto pad from computer
+	- [ ] styling
+		- [√] hover
+		- [√] click
+		- [ ] pad should stay lit while holding down note
+	- [√] UI to show sample loading
 	- [ ] presets
 		- [ ] basic-piano
 		- [ ] basic-drums
-	- [ ] styling
-	- [ ] UI to show sample loading
-	- Samples Manager
+	- **Uploading Samples**
+		- [√] try to decode sample before uploading
+		- [√] clip sample name in pad label
+		- [ ] drag and drop
+			- [√] UI to show that you must be logged in
+				- [√] system message
+				- [√] sample label on hover
+		- [ ] enforce user upload cap
+			- [√] server
+			- [ ] front end
+				- [√] UI
+				- [ ] check if it goes over cap before uploading
+		- [ ] enforce global upload cap
+			- [ ] server
+			- [ ] UI
+		- [ ] sample renaming
+	- **Samples Manager**
 		- [√] don't fetch same sample twice
 		- [√] fix weird issue with double fetching when going really fast
 		- [√] pre-load samples based on what is in redux
@@ -200,9 +291,203 @@
 			- [ ] clear samples before loading new sample if over threshold
 			- [ ] clear samples after loading new sample if over threshold
 			- [ ] display this info to the user somehow
-		- [ ] samples manager middleware?
-		- [ ] if `getSample` gets called and sample isn't loaded, then that's an error?
+		- [√] samples manager middleware?
+		- [√] if `getSample` gets called and sample isn't loaded, then that's an error?
 
+- [√] need to strip undo history of better sequencer when saving
+- [√] save room as file broken when room save is too big
+- [√] timeline not respecting node width on BS
+- [ ] !!! switching osc on synth while playing notes makes it louder
+- [ ] add checkbox to toggle chat being in front or back (brinch)
+- [ ] audio dying after listening to song for long enough
+	- [ ] refactor audio stuff to reuse oscillators and gain nodes, etc.
+
+**PERFORMANCE**
+- [ ] make things better when lots of nodes on screen
+	- [ ] panning
+	- [ ] zooming
+	- [ ] moving a node
+	- [ ] changing a knob
+	- [ ] playing keyboard
+- [ ] metrics
+	- [ ] rendering
+		- [ ] hit test
+			- filter, position(abs/fix/rel)
+		- [ ] update layer tree
+	- [ ] javascript
+		- [ ] react
+		- [ ] redux
+		- [ ] garbage creation/collection
+- [ ] general action items
+	- [ ] avoid use `filter` css property
+	- [ ] avoid use of `position: relative/absolute/fixed`
+	- [ ] use `contain: strict` in more places
+	- [ ] avoid use of `overflow: hidden`
+	- [ ] avoid use of `transform/translate/rotate/scale`
+- tips
+	- use negative margins
+	- use svg transform over css transform
+- node specific
+	- [√] sampler
+	- [√] synth
+	- [√] keyboard
+	- [√] infinite seq
+	- [√] grid seq
+	- [√] group seq
+	- [√] BS
+	- [-] connections
+	- [ ] ECS
+	- [ ] canvases
+		- [ ] master limiter canvas
+	- [ ] note scanner
+	- [ ] graph node/panel/header
+	- [ ] chat
+	- [ ] FPS in top div
+	- [ ] Zoom text in top div
+	- [ ] knob
+		- [ ] fix clicking on knob value
+		- [ ] fix slob knob changing
+	- [ ] make custom debouncing solution that runs on RAF
+	- [ ] moving vertical scroll bar on grid sequencer
+	- [ ] resizing node on left and top sides
+	- [ ] pan/zoom using piano notes sidebar on BS
+
+**SVG**
+- [ ] BS
+	- [ ] notes
+		- [ ] BUG: note resizer mid and right dont always have 100% height
+	- [ ] side notes
+	- [ ] rows
+	- [ ] columns
+
+# Room Types
+- [ ] better room button with modal
+	- [ ] room name
+	- [ ] room type
+- [ ] room types
+	- [ ] main
+	- [ ] experimental modular rewrite
+	- [ ] game
+	- [ ] drawing
+
+**Refactor Node State**
+- [ ] id (already in position state, but might need to stay on node state as well) (staying for now)
+- [√] ownerId (move to position state or remove if not used) (moved)
+- [√] color (already in position state but not used) (moved)
+- [ ] type (already in position state, but node type is used in some places) (staying for now)
+- [√] name (move to position state or remove if not used) (removed)
+- [√] enabled (removed from node state, was already on position state, and it wasn't used from node state)
+
+**BUGS**
+- [ ] grid sequencer timeline going too far right
+- [ ] connector placeholders aren't using z-index of parent node
+
+**Better Sequencer**
+- [√] scroll up and down with mouse wheel
+- [√] hoz zoom with ctrl + scroll
+- [√] double click to add note
+- [√] drag box around notes to select
+- [√] dont use transform scale on rows
+- [√] make ECS obey panX
+- [ ] when moving group of notes with arrow keys, don't let them bunch up against bounds
+- [ ] resizing shouldn't zoom
+- [√] drag ends of notes to resize
+- [√] pan with middle mouse
+	- [ ] change cursor to grabby hand
+- [ ] disable notes with 0 key
+- [√] box select while holding shift should flip selected notes like ableton
+- [ ] change global pan to require middle clicking on background?
+- [√] click and drag notes around
+- [√] ctrl + d to duplicate notes
+	- [ ] use range selection to determine new note start point, like ableton
+- [ ] make double click better
+- [√] show notes on left side
+	- [ ] play note when clicked
+		- [ ] only release onMouseUp?
+- [√] fix shift box select
+- [ ] follow mode where it auto scrolls as song plays
+	- [ ] use request animation frame in an effect
+- [√] don't save every undo when click drag resizing
+- [√] remove note border when small
+- [ ] when selected changes in any way, remove overlapped notes and stuff, like ableton
+- [√] mouse note resize/move snapping
+	- [ ] dynamic column sizes
+	- [ ] snap to bars and to increments
+- [ ] add more/less vertical bars depending on zoomX
+- [ ] right click to cancel/end operation
+	- [ ] box select
+	- [ ] note move
+	- [ ] note resize
+- [ ] note resize and move need to snap to smallestNoteLength increments when alt
+- [√] when clicking single note with multiple selected, deselect others if mouse hasn't moved enough
+- [ ] require modifier key to scroll in better sequencer
+- [ ] allow copy pasting notes
+	- [ ] between better sequencers
+- [√] ctrl + click and drag to duplicate
+- [ ] dont delete note on dbl click if shift held down
+- [ ] move time bar with arrow keys if no note selected
+- [ ] ctrl + space, hold ctrl and click somewhere else, then press space, it takes to presses of space to place from new spot
+	- can't repro anymore
+- [ ] start playing when space bar is lifted, if user hold space, then play note, start playing with that note
+	- similar to starting recordings on OP-1
+- [ ] select scale to highlight notes in the scale (bean)
+- [ ] allow manually highlighting certain note rows to build own custom scale (bean)
+- [ ] fold button
+
+**Chrome 77 - Envelope Rewrite**
+- [ ] address TODOs
+- [ ] able to change envelope while note is playing
+- [ ] fixed number of voices
+- [ ] reuse all nodes (oscillator/gain/pan/filter)
+
+- [ ] make velocity affect keyboard note visual
+- [ ] put node version in package json so nvm can use it
+- [ ] don't show connect keyboard menu item if keyboard is already connected
+- [ ] when you control click on a node header, the selected node(s) becomes connected
+- [ ] filter resonance
+- [ ] make piano roll notes light up on grid seq when connected keyboard is playing those notes
+- [ ] select sample then knobs on right are for that sample
+- [ ] mimic hardware samplers like the volca sample
+- [ ] button to toggle HUD
+- [ ] box select to move or delete multiple things at once
+- [ ] way to clear samples from sampler
+- [ ] put SVG's on CDN
+- [ ] double click node to collapse
+- [ ] instead of smooth timeline animation, show a moving dot or blinking dot
+- [ ] velocity
+- [ ] create sampler menu should let you pick from empty/piano/drum kit
+- [ ] show download progress on pad
+- [ ] have separate radio selector on pads to select
+- [ ] dont select pad just by clicking on it
+- [√] make button on nodes to quickly connect your keyboard to it
+	- [√] shift + click header or right click and select "connect keyboard"
+- [ ] view hotkeys, home goes to start of chain and end goes to end
+- [ ] selection group hotkeys
+- [ ] RTS DAW
+	- [ ] order nodes to move around
+	- [ ] have to build new nodes at factories
+	- [ ] harvest resources
+
+- [ ] snap nodes to grid
+	- [ ] snap nodes together
+	- [ ] when moving a node that is snapped to other nodes, move all of them together
+
+https://hal.archives-ouvertes.fr/hal-01304889v1
+https://npm.taobao.org/package/@ircam/sync
+https://github.com/collective-soundworks
+
+- [ ] turn off overflow for svg (mainly connection svg's)
+- [ ] make connector placeholders a child of the node so they dont have to update whenever parent position changes
+- [ ] ask the user's experience level
+- [ ] ask what the user wants to use corgi for
+- [ ] feedback thru sentry
+- [ ] change shared pointer to show user is dragging a file
+- [ ] change shared pointer to show user is typing
+- [ ] change shared pointer to show user is in a modal
+- [ ] System messages should open stuff when clicked
+	- [ ] messages about needing to be logged in should open login modal
+- [ ] allow dismissing system chat messages
+- [ ] `Store<IClientAppState>` -> `ClientStore`
 - [ ] show note name when hovering on notes in sequencers
 - [ ] notes on left of grid seq should play on click
 - [ ] empty column on right side of infinite seq to add new notes
@@ -309,6 +594,13 @@ Yes, https://mmckegg.github.io/web-audio-school/, exercise 13 is exactly what yo
 
 
 # 0.6.0
+- [ ] change cursor to vertical arrows when dragging knob
+- [ ] animate things when being changed from over the network
+	- [ ] knobs
+	- [ ] node positions
+	- [ ] connections
+- [ ] https://github.com/pelotom/runtypes
+- [ ] https://github.com/hmil/rest.ts
 - [ ] built in synth for keyboard
 - [ ] change clients redux so every client only knows about clients in the same room
 - [ ] https://github.com/TheLarkInn/Front-End-Checklist
@@ -355,6 +647,8 @@ Yes, https://mmckegg.github.io/web-audio-school/, exercise 13 is exactly what yo
 - [ ] flanger
 - [ ] distortion
 - [ ] desktop notifications for chat
+- [ ] allow setting bookmarks on knobs (like setting what the preferred value or range is)
+- [ ] right click add node menu, new node should go at right click position, not the left click position
 
 # 0.7.0
 - [ ] quick connection mode
@@ -394,6 +688,8 @@ Yes, https://mmckegg.github.io/web-audio-school/, exercise 13 is exactly what yo
 - [ ] save picture of room in save file
 - [ ] make little illustrations for empty stuff, like for when you have no friends or no saves
 - [ ] control stuff with external midi knobs
+- [ ] different node UI at different zoom levels
+- [ ] ability to make nodes smaller/larger zoom levels
 
 # Goals
 - [ ] be able to recreate certain songs
@@ -453,3 +749,12 @@ do i need to be able to support older version?
 	- FOSS VSTs
 - is there a limit on an individual chat message
 - add option to disable cable highlighting
+
+# Events
+- like discord challenges
+	- musical telephone
+	- exquisite corpse
+
+# Built in games
+- musical tetris
+	- the blocks are midi clips or samples

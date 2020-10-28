@@ -1,62 +1,75 @@
-import {List} from 'immutable'
-import {createSelector} from 'reselect'
-import {createReducer, IClientRoomState, selectLocalClientId} from '.'
+import {Map, Record} from 'immutable'
+import {ActionType} from 'typesafe-actions'
+import {topGroupId, GroupId} from '../common-constants'
+import {IClientAppState} from './common-redux-types'
+import {IClientRoomState, BROADCASTER_ACTION, SERVER_ACTION} from '.'
 
-export interface IRoomMembersState {
-	ids: IRoomMembersIds
+export const roomMemberActions = {
+	// Actions only to be sent from server
+	replaceAll: (members: RoomMembers) => ({
+		type: 'ROOM_MEMBERS_REPLACE_ALL' as const,
+		members,
+	} as const),
+	add: (member: RoomMember) => ({
+		type: 'ADD_ROOM_MEMBER' as const,
+		member,
+	} as const),
+	delete: (memberId: ClientId) => ({
+		type: 'DELETE_ROOM_MEMBER' as const,
+		memberId,
+	} as const),
+	// Actions that can be sent by client
+	setNodeGroup: (memberId: ClientId, nodeGroupId: GroupId) => ({
+		type: 'ROOM_MEMBERS_SET_NODE_GROUP' as const,
+		memberId,
+		nodeGroupId,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	} as const),
+} as const
+
+export type RoomMembersAction = ActionType<typeof roomMemberActions>
+
+export type RoomMembers = Map<ClientId, RoomMember>
+
+const defaultRoomMember = {
+	id: 'dummyRoomMemberId' as Id,
+	groupNodeId: topGroupId as GroupId,
 }
 
-export type IRoomMembersIds = List<ClientId>
+const _makeRoomMember = Record(defaultRoomMember)
 
-export const SET_ROOM_MEMBERS = 'SET_ROOM_MEMBERS'
-export type SetRoomMembersAction = ReturnType<typeof setRoomMembers>
-export const setRoomMembers = (memberIds: IRoomMembersIds) => ({
-	type: SET_ROOM_MEMBERS,
-	memberIds,
-})
+const defaultRoomMemberRecord = _makeRoomMember()
 
-export const ADD_ROOM_MEMBER = 'ADD_ROOM_MEMBER'
-export type AddRoomMemberAction = ReturnType<typeof addRoomMember>
-export const addRoomMember = (memberId: ClientId) => ({
-	type: ADD_ROOM_MEMBER,
-	memberId,
-})
+export interface RoomMember extends ReturnType<typeof _makeRoomMember> {}
 
-export const DELETE_ROOM_MEMBER = 'DELETE_ROOM_MEMBER'
-export type DeleteRoomMemberAction = ReturnType<typeof deleteRoomMember>
-export const deleteRoomMember = (memberId: ClientId) => ({
-	type: DELETE_ROOM_MEMBER,
-	memberId,
-})
-
-const initialState: IRoomMembersState = {
-	ids: List<ClientId>(),
+export function makeRoomMember(
+	member: Pick<typeof defaultRoomMember, 'id'> & Partial<typeof defaultRoomMember>,
+): RoomMember {
+	return _makeRoomMember(member)
 }
 
-export const roomMembersReducer = createReducer(initialState, {
-	[SET_ROOM_MEMBERS]: (state, {memberIds}: SetRoomMembersAction) => ({
-		...state,
-		ids: List<ClientId>(memberIds),
-	}),
-	[ADD_ROOM_MEMBER]: (state, {memberId}: AddRoomMemberAction) => ({
-		...state,
-		ids: state.ids.push(memberId),
-	}),
-	[DELETE_ROOM_MEMBER]: (state, {memberId}: AddRoomMemberAction) => ({
-		...state,
-		ids: state.ids.filter(x => x !== memberId),
-	}),
-})
+const initialState = Map<ClientId, RoomMember>()
 
-export const selectRoomMemberState = (state: IClientRoomState): IRoomMembersState => state.members
+export const roomMembersReducer = (state = initialState, action: RoomMembersAction) => {
+	switch (action.type) {
+		case 'ROOM_MEMBERS_REPLACE_ALL': return Map(action.members).map(makeRoomMember)
+		case 'ADD_ROOM_MEMBER': return state.set(action.member.id, makeRoomMember(action.member))
+		case 'DELETE_ROOM_MEMBER': return state.delete(action.memberId)
+		case 'ROOM_MEMBERS_SET_NODE_GROUP': return state.update(action.memberId, member => member.set('groupNodeId', action.nodeGroupId))
+		default: return state
+	}
+}
 
-export const selectAllRoomMemberIds = (state: IClientRoomState): IRoomMembersIds => selectRoomMemberState(state).ids
+export const selectRoomMemberState = (state: IClientRoomState) => state.members
 
-export const selectAllOtherRoomMemberIds = createSelector(
-	selectLocalClientId,
-	state => selectAllRoomMemberIds(state.room),
-	(localClientId, allClientIds) =>
-		allClientIds.filter(x => x !== 'server' && x !== localClientId),
-)
+export const selectAllRoomMemberIds = (state: IClientRoomState) => selectRoomMemberState(state).keySeq().toSet()
 
 export const selectMemberCount = (state: IClientRoomState): number => selectAllRoomMemberIds(state).count()
+
+export const selectRoomMember = (state: IClientRoomState, id: ClientId): RoomMember =>
+	state.members.get(id, defaultRoomMemberRecord)
+
+export function createRoomMemberSelector(id: ClientId) {
+	return (state: IClientAppState): RoomMember => selectRoomMember(state.room, id)
+}

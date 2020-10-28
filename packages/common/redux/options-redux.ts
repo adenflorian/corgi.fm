@@ -14,6 +14,9 @@ export enum AppOptions {
 	graphicsMultiColoredConnections = 'graphicsMultiColoredConnections',
 	graphicsECS = 'graphicsECS',
 	graphicsExpensiveZoomPan = 'graphicsExpensiveZoomPan',
+	graphicsExtraAnimations = 'graphicsExtraAnimations',
+	enableAudioWorklet = 'enableAudioWorklet',
+	enableWireShadows = 'enableWireShadows',
 }
 
 export const initialOptionsState = Object.freeze({
@@ -27,6 +30,9 @@ export const initialOptionsState = Object.freeze({
 	graphicsMultiColoredConnections: true,
 	graphicsECS: true,
 	graphicsExpensiveZoomPan: true,
+	graphicsExtraAnimations: false,
+	enableAudioWorklet: false,
+	enableWireShadows: true,
 })
 
 type SetOptionAction = ReturnType<typeof setOption>
@@ -100,5 +106,9 @@ export function validateOptionsState(store: Store<IClientAppState>, loadedOption
 export const selectOptions = (state: IClientAppState) => state.options
 
 export const selectOption = (state: IClientAppState, option: AppOptions) => {
+	return selectOptions(state)[option]
+}
+
+export const createOptionSelector = (option: AppOptions) => (state: IClientAppState) => {
 	return selectOptions(state)[option]
 }

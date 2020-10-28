@@ -3,8 +3,8 @@ import {
 	FaDiscord as DiscordIcon, FaPatreon as PatreonIcon,
 } from 'react-icons/fa'
 import {
-	IoMdMail as MailIcon,
-} from 'react-icons/io'
+	FiMail as MailIcon,
+} from 'react-icons/fi'
 import {IconType} from 'react-icons/lib/iconBase'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {ButtonLink} from './Button/ButtonLink'

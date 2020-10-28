@@ -5,24 +5,33 @@
     text-shadow: none;
     letter-spacing: initial;
     
-    &.isNotPlaying {
-        transition: box-shadow 0.3s ease-out;
-    }
+    // &.isNotPlaying {
+    //     transition: box-shadow 0.2s ease-out;
+    // }
     .white {
         background-color: @keyWhite;
     }
     .white+.white {
-        box-shadow: inset 1px 0 0 fade(@frenchGray, 60%);
+        box-shadow: inset 1px 0 0 fade(@borderGrayLight, 60%);
     }
     .black {
         background-color: @panelGrayDark;
     }
-    &.isLocal {
-        .white:hover {
-            background-color: rgb(198, 198, 223);
-        }
-        .black:hover {
-            background-color: @gray3;
+    // &.isLocal {
+    //     .white:hover, .black:hover {
+    //         // color: currentColor;
+
+    //         // &::before {
+    //         //     content: '';
+    //         //     height: 2px;
+    //         //     margin-bottom: -22px;
+    //         //     background-color: currentColor;
+    //         // }
+    //     }
+    // }
+    &.notLocal {
+        .octaveKeys {
+            display: none !important;
         }
     }
     .key {
@@ -31,13 +40,14 @@
         flex-direction: column;
         justify-content: space-between;
         height: 56px;
+        // color: hsla(0, 0%, 10%, 0.8);
+        // box-shadow: inset 0px 8px 4px -6px currentColor !important;
         &.pressed {
             background-color: currentColor !important;
-            filter: saturate(300%)
         }
-        &.notPressed {
-            transition: background-color 0.3s ease-out;
-        }
+        // &.notPressed {
+        //     transition: background-color 0.2s ease-out;
+        // }
         .noteName {
             font-size: 14px;
             line-height: 20px;
@@ -47,39 +57,30 @@
             color: @gray2;
         }
         &.black .noteName {
-            color: rgba(235, 235, 246, 0.925);
+            color: hsla(240, 0%, 94%, 0.925);
         }
         &:last-child {
             border-bottom-right-radius: @mainBorderRadius;
         }
     }
     .octave {
-        position: relative;
-        min-width: 48px;
+        width: 48px;
         display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        flex-direction: column;
         border-bottom-left-radius: @mainBorderRadius;
+
         .octaveNumber {
-            position: absolute;
-            width: 100%;
-                height: 100%;
             display: flex;
-            flex-direction: column;
             justify-content: center;
+            align-items: center;
+            flex-grow: 1;
             color: @keyWhite;
         }
-        .octaveKeys {
-            flex-direction: row;
+
+        .octaveKey {
             display: flex;
-            justify-content: space-between;
             align-items: flex-end;
-            width: 100%;
-            * {
-                font-size: 12px;
-                margin: 0 4px;
-            }
+            font-size: 12px;
+            margin: 0 4px;
         }
     }
     .smallText {

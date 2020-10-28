@@ -1,36 +1,33 @@
 import {ActionType} from 'typesafe-actions'
-import {ConnectionNodeType} from '../../common-types'
+import {Set} from 'immutable'
 import {IClientRoomState} from '../common-redux-types'
 
 export const shamuMetaActions = {
-	setSelectedNode: (node: SelectedNode) => ({
-		type: 'SET_SELECTED_NODE',
-		node,
+	setSelectedNodes: (nodeIds: Set<Id>) => ({
+		type: 'SET_SELECTED_NODES',
+		nodeIds,
 	} as const),
-	clearSelectedNode: () => ({
-		type: 'CLEAR_SELECTED_NODE',
+	clearSelectedNodes: () => ({
+		type: 'CLEAR_SELECTED_NODES',
 	} as const),
 } as const
 
-class ShamuMetaState {
+export class ShamuMetaState {
 	public constructor(
-		public readonly selectedNode?: SelectedNode,
+		public readonly selectedNodes = Set<Id>(),
 	) {}
 }
 
-export class SelectedNode {
-	public constructor(
-		public readonly id: Id,
-		public readonly type: ConnectionNodeType,
-	) {}
+export function makeShamuMetaState(state: Partial<ShamuMetaState> = {}): ShamuMetaState {
+	return new ShamuMetaState(Set(state.selectedNodes || []))
 }
 
 export type ShamuMetaAction = ActionType<typeof shamuMetaActions>
 
 export function shamuMetaReducer(state = new ShamuMetaState(), action: ShamuMetaAction): ShamuMetaState {
 	switch (action.type) {
-		case 'SET_SELECTED_NODE': return {...state, selectedNode: action.node}
-		case 'CLEAR_SELECTED_NODE': return {...state, selectedNode: undefined}
+		case 'SET_SELECTED_NODES': return {...state, selectedNodes: action.nodeIds}
+		case 'CLEAR_SELECTED_NODES': return {...state, selectedNodes: state.selectedNodes.clear()}
 		default: return state
 	}
 }

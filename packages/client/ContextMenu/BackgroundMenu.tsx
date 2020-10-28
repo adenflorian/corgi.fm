@@ -5,10 +5,12 @@ import {
 	getAddableNodeInfos, IConnectionNodeInfo, VirtualKeyboardState, addPosition,
 	makePosition, MASTER_AUDIO_OUTPUT_TARGET_ID, connectionsActions, Connection,
 	MASTER_CLOCK_SOURCE_ID,
+	findNodeInfo,
 } from '@corgifm/common/redux'
 import {ConnectionNodeType, IConnectable} from '@corgifm/common/common-types'
 import {Dispatch} from 'redux'
 import {serverClientId} from '@corgifm/common/common-constants'
+import {CssColor} from '@corgifm/common/shamu-color'
 import {toGraphSpace} from '../SimpleGraph/Zoom'
 import {TopMenuBar} from './TopMenuBar'
 
@@ -60,23 +62,24 @@ export const BackgroundMenuItems = React.memo(
 						if (nodeInfo.type === ConnectionNodeType.virtualKeyboard) {
 							if (localClientKeyboardCount !== 0) return
 
-							const newState = new VirtualKeyboardState(
-								localClientId, localClientColor)
+							const newState = new VirtualKeyboardState()
 							dispatch(nodeInfo.addNodeActionCreator(newState))
-							createPosition(dispatch, newState, e)
+							createPosition(dispatch, newState, e, localClientId, localClientColor)
 						} else {
 							// Be careful when changing the id to be local client
 							// The server currently deletes most things that a user owns
 							// when they disconnect
-							const newState = new nodeInfo.StateConstructor(serverClientId)
+							const newState = new nodeInfo.StateConstructor()
 							dispatch(nodeInfo.addNodeActionCreator(newState))
-							createPosition(dispatch, newState, e)
+							createPosition(dispatch, newState, e, serverClientId)
 							if (nodeInfo.autoConnectToClock) {
 								dispatch(connectionsActions.add(new Connection(
 									MASTER_CLOCK_SOURCE_ID,
 									ConnectionNodeType.masterClock,
 									newState.id,
 									newState.type,
+									0,
+									0,
 								)))
 							}
 							if (nodeInfo.autoConnectToAudioOutput) {
@@ -85,6 +88,8 @@ export const BackgroundMenuItems = React.memo(
 									newState.type,
 									MASTER_AUDIO_OUTPUT_TARGET_ID,
 									ConnectionNodeType.audioOutput,
+									0,
+									0,
 								)))
 							}
 						}
@@ -98,15 +103,16 @@ export const BackgroundMenuItems = React.memo(
 
 function createPosition(
 	dispatch: Dispatch, state: IConnectable,
-	e: React.TouchEvent<HTMLDivElement> | React.MouseEvent<HTMLDivElement>
+	e: React.TouchEvent<HTMLDivElement> | React.MouseEvent<HTMLDivElement>,
+	ownerId: Id, color?: string,
 ) {
 	dispatch(addPosition(
 		makePosition({
 			...state,
 			id: state.id,
 			targetType: state.type,
-			width: state.width,
-			height: state.height,
+			ownerId,
+			color: color || findNodeInfo(state.type).color,
 			...getPositionFromMouseOrTouchEvent(e),
 		}),
 	))

@@ -1,6 +1,7 @@
-import React, {Fragment, useState} from 'react'
+import React, {useState, useCallback} from 'react'
+import {useDispatch} from 'react-redux'
 import {
-	ActiveGhostConnectorSourceOrTarget,
+	ActiveGhostConnectorSourceOrTarget, localActions,
 } from '@corgifm/common/redux'
 import {connectorHeight, connectorWidth} from './ConnectionView'
 import {Connector} from './Connector'
@@ -10,21 +11,30 @@ interface Props {
 	sourceOrTarget: ActiveGhostConnectorSourceOrTarget
 	x: number
 	y: number
+	nodeId: Id
+	portId: number
 }
 
 type AllProps = Props
 
-const hitBoxSize = 80
-
 export const ConnectorPlaceholder = React.memo(
 	function _ConnectorPlaceholder({
-		sourceOrTarget, x, y, onMouseDown,
+		sourceOrTarget, x, y, onMouseDown, nodeId, portId,
 	}: AllProps) {
 
 		const [isMouseOver, setIsMouseOver] = useState(false)
 
+		const dispatch = useDispatch()
+
+		const onMouseUp = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+			dispatch(localActions.mouseUpOnPlaceholder(nodeId, sourceOrTarget, portId))
+		}, [dispatch, nodeId, portId, sourceOrTarget])
+
 		return (
-			<Fragment>
+			<div
+				className="connectorDropZone"
+				onMouseUp={onMouseUp}
+			>
 				<Connector
 					width={connectorWidth}
 					height={connectorHeight}
@@ -43,18 +53,12 @@ export const ConnectorPlaceholder = React.memo(
 				<div
 					className="newConnectionPlaceholder-hitbox"
 					style={{
-						width: 80,
-						height: 80,
-						backgroundColor: 'magenta',
-						position: 'absolute',
-						transform: `translate(${x - (hitBoxSize / 2)}px, ${y - (hitBoxSize / 2)}px)`,
-						opacity: 0,
-						zIndex: -10,
+						transform: `translate(${x}px, ${y}px)`,
 					}}
 					onMouseEnter={() => setIsMouseOver(true)}
 					onMouseLeave={() => setIsMouseOver(false)}
 				/>
-			</Fragment>
+			</div>
 		)
 	},
 )

@@ -4,7 +4,7 @@ import {IClientAppState, selectClientById, selectPointer} from '@corgifm/common/
 import {CssColor} from '@corgifm/common/shamu-color'
 
 interface MousePointerProps {
-	clientId: string
+	clientId: Id
 }
 
 interface MousePointerReduxProps {

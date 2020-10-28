@@ -1,56 +1,24 @@
 @import "../AppCommon.less";
 @import "../colors.less";
 
+button {
+    color: inherit;
+    font-family: inherit;
+    font-weight: inherit;
+    font-size: inherit;
+    border: none;
+
+    &:not(:disabled) {
+        cursor: pointer;
+    }
+}
+
 @disabled: {
     filter: brightness(0.4) saturate(0.5);
 }
 
-.buttonContainer {
-    &.fancyButton {
-        &:hover {
-            button:not(:disabled) {
-                filter: brightness(125%)
-            }
-        }
-
-        &:active {
-            top: 1px;
-        }
-    }
-
-    &.flatButton {
-        &:hover {
-            background-color: @panelGrayLight;
-        }
-
-        &:active {
-            background-color: @blue;
-        }
-    }
-
-    button {
-        position: relative;
-        background-color: transparent;
-        border: none;
-        padding: 0 8px;
-        font-size: 16px;
-        text-transform: inherit;
-        font-weight: inherit;
-        font-family: inherit;
-        letter-spacing: inherit;
-        color: currentColor;
-        text-shadow: inherit;
-        height: 32px;
-
-        &:disabled {
-            color: @disabledGray;
-        }
-    }
-}
-
 @button: {
     position: relative;
-    background-color: @panelGrayLight;
     border: none;
     padding: 0 8px;
     font-size: 16px;
@@ -92,14 +60,78 @@
             @disabled();
         }
     }
+
+    &.bg-light, & .bg-light {
+        background-color: @panelGrayLight;
+    }
+
+    &.bg-dark, & .bg-dark {
+        background-color: @panelGrayDark;
+    }
+
+    &.bg-medium, & .bg-medium {
+        background-color: @panelGray;
+    }
+
+    &.shadow-true, & .shadow-true {
+        @panelShadow();
+    }
 }
 
-button {
+button.corgiButton {
     @button();
 }
 
+button.iconButton {
+    position: relative;
+    border: none;
+    padding: 0;
+    font-size: 16px;
+    text-transform: inherit;
+    font-weight: inherit;
+    font-family: inherit;
+    letter-spacing: inherit;
+    color: currentColor;
+    text-shadow: inherit;
+    height: 32px;
+    border-radius: @mainBorderRadius;
+    display: flex;
+    background-color: unset;
+    align-items: center;
+    @panelShadow();
+
+    svg {
+        font-size: 20px;
+        padding: 6px;
+        border-radius: @mainBorderRadius;
+        background-color: #1A1A1A;
+    }
+
+    &:active {
+        @colorBorderFocus();
+    }
+
+    &:focus {
+        @colorBorder();
+    }
+
+    &:not(:disabled) {
+        cursor: pointer;
+
+        &:hover {
+            filter: brightness(1.2);
+        }
+    }
+
+    &:disabled {
+        &, span {
+            @disabled();
+        }
+    }
+}
+
 .button-dark {
-    background-color: @panelGray !important;
+    background-color: @panelGray;
     @panelShadow();
 }
 
@@ -108,9 +140,7 @@ button {
     text-decoration: none;
 }
 
-input, select {
-    border-radius: @mainBorderRadius;
-    
+input.blob, select.blob {    
     &:focus {
         @colorBorder();
     }
@@ -121,17 +151,14 @@ input, select {
 }
 
 .panel, .modal {
-    .buttonLink, button {
+    .buttonLink, button.corgiButton {
         @button();
         text-decoration: none;
         box-shadow: none !important;
-        background-color: @panelGrayLight !important;
-    }
-    input {
-        box-shadow: none !important;
-    
-        &:focus {
-            @colorBorder();
+        background-color: @panelGrayLight;
+
+        &.bg-medium, & .bg-medium {
+            background-color: @panelGrayLight;
         }
     }
 }

@@ -1,24 +1,14 @@
-import {List} from 'immutable'
-
 export interface IConnectable {
 	readonly id: Id
-	readonly color: string | false | List<string>
 	readonly type: ConnectionNodeType
-	readonly width: number
-	readonly height: number
-	readonly name: string
 	readonly inputPortCount?: number
 	readonly outputPortCount?: number
-	readonly enabled: boolean
 }
 
-export interface IMultiStateThing extends IConnectable {
-	readonly ownerId: Id
-}
-
-export type IMultiStateThingDeserializer = (state: IMultiStateThing) => IMultiStateThing
+export type IMultiStateThingDeserializer = (state: IConnectable) => IConnectable
 
 export enum ConnectionNodeType {
+	betterSequencer = 'betterSequencer',
 	virtualKeyboard = 'virtualKeyboard',
 	gridSequencer = 'gridSequencer',
 	infiniteSequencer = 'infiniteSequencer',
@@ -35,26 +25,11 @@ export enum ConnectionNodeType {
 
 export function isSequencerNodeType(type: ConnectionNodeType) {
 	return [
+		ConnectionNodeType.betterSequencer,
 		ConnectionNodeType.gridSequencer,
 		ConnectionNodeType.infiniteSequencer,
 	].includes(type)
 }
-
-export type ThenArg<T> = T extends Promise<infer U>
-	? U
-	: T extends (...args: any[]) => Promise<infer V>
-		? V
-		: T
-
-export type OmitStrict<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
-
-export type AnyFunction = (...args: any[]) => any
-
-export type Octave = number
-
-export type RequiredField<T, K extends keyof T> = {
-	[P in K]-?: T[P];
-} & T
 
 export enum Header {
 	AccessControlAllowOrigin = 'access-control-allow-origin',
@@ -66,4 +41,86 @@ export enum Header {
 
 export type Headers = {
 	[P in Header]?: string
+}
+
+export type IVirtualMidiKeyboard = IVirtualMidiKey[]
+
+export interface IVirtualMidiKey {
+	color: KeyColor
+	keyName: string
+	name: NoteNameSharps
+}
+
+export type NoteNameSharps = 'C' | 'C#' | 'D' | 'D#' | 'E' | 'F' | 'F#' | 'G' | 'G#' | 'A' | 'A#' | 'B'
+
+export type NoteNameFlats = 'C' | 'Db' | 'D' | 'Eb' | 'E' | 'F' | 'Gb' | 'G' | 'Ab' | 'A' | 'Bb' | 'B'
+
+export type KeyColor = 'white' | 'black'
+
+export interface IKeyColors {
+	readonly [key: number]: {
+		readonly color: KeyColor
+		readonly name: NoteNameSharps
+	}
+}
+
+export const signalRangeOptions = ['unipolar', 'bipolar'] as const
+export type SignalRange = typeof signalRangeOptions[number]
+
+export const paramInputCenteringOptions = ['center', 'offset'] as const
+export type ParamInputCentering = typeof paramInputCenteringOptions[number]
+
+export const midiActions = {
+	gate: (time: number, gate: boolean, voice: number | 'all' = 'all') => ({
+		type: 'MIDI_GATE' as const,
+		time,
+		gate,
+		voice,
+	} as const),
+	note: (time: number, gate: boolean, note: number, velocity: number, voice: number | 'all' = 'all', offNote: number | undefined = undefined) => ({
+		type: 'MIDI_NOTE' as const,
+		time,
+		gate,
+		note,
+		offNote,
+		velocity,
+		voice,
+	} as const),
+	voiceCountChange: (time: number, newCount: number) => ({
+		type: 'VOICE_COUNT_CHANGE' as const,
+		time,
+		newCount,
+	} as const),
+	message: (time: number, message: string) => ({
+		type: 'MESSAGE' as const,
+		time,
+		message,
+	} as const),
+} as const
+
+export type MidiAction = ReturnType<typeof midiActions[keyof typeof midiActions]>
+
+export type GateMidiAction = ReturnType<typeof midiActions['gate']>
+export type NoteMidiAction = ReturnType<typeof midiActions['note']>
+export type VoiceCountChangeMidiAction = ReturnType<typeof midiActions['voiceCountChange']>
+export type MessageMidiAction = ReturnType<typeof midiActions['message']>
+
+export enum RoomType {
+	Normal = 'Normal',
+	Experimental = 'Experimental',
+	Dummy = 'Dummy'
+}
+
+export interface ImpulseBuildRequest {
+	readonly id: Id
+	readonly sampleRate: number
+	readonly time: number
+	readonly decay: number
+	readonly reverse: boolean
+}
+
+export interface ImpulseBuilderResponse {
+	readonly id: Id
+	readonly left: Float32Array
+	readonly right: Float32Array
 }

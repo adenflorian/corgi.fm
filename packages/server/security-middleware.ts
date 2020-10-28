@@ -1,13 +1,13 @@
 import {Header} from '@corgifm/common/common-types'
 import {verifyAuthHeader} from './auth/server-auth'
 import {
-	ApiRequest, ApiResponse, SecureRouter,
+	ApiResponse, SecureRouter, RoutedRequest,
 } from './api/api-types'
 
 /** Asserts there is an Authorization header containing
  * a valid, signed, and not expired, JWT. */
 export async function routeIfSecure(
-	request: ApiRequest, secureRouter: SecureRouter
+	request: RoutedRequest, secureRouter: SecureRouter
 ): Promise<ApiResponse> {
 	const authHeader = request.headers.authorization
 

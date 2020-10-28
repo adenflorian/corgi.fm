@@ -13,6 +13,7 @@
 	line-height: normal;
 	position: fixed;
 	background-color: @appBackground;
+	background-image: radial-gradient(circle at left, hsla(0, 0%, 7%, 1), hsl(0, 0%, 5%) 70%);
 	z-index: 99999999;
 	opacity: 0;
 	transition: opacity 0.5s;
@@ -30,23 +31,43 @@
 
 	.corgi {
 		color: @brightBlue;
+		background: linear-gradient(@brightBlue, hsla(196, 100%, 50%));
+		background-clip: text;
+		-webkit-text-fill-color: transparent;
+		font-size: 2em;
 	}
 
 	.message {
 		font-size: 0.5em;
 	}
-	
-	.message:after {
+
+	.dot() {
 		display: inline-block;
-		animation: dotty steps(1,end) 1s infinite;
-		content: '';
+		animation-name: dotty2;
+		animation-duration: 2s;
+		animation-iteration-count: infinite;
+		opacity: 0;
+	}
+	
+	.dot1 {
+		.dot();
+		animation-delay: 0.00s;
+	}
+	
+	.dot2 {
+		.dot();
+		animation-delay: 0.33s;
+	}
+	
+	.dot3 {
+		.dot();
+		animation-delay: 0.66s;
 	}
 	  
-	@keyframes dotty {
-		0%   { content: ''; }
-		25%  { content: '.'; }
-		50%  { content: '..'; }
-		75%  { content: '...'; }
-		100% { content: ''; }
+	@keyframes dotty2 {
+		0%   { opacity: 0; }
+		33%  { opacity: 1; }
+		66%  { opacity: 0; }
+		100% { opacity: 0; }
 	}
 }

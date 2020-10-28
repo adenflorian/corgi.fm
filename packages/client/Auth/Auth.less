@@ -24,55 +24,6 @@
 		}
 	}
 
-	form {
-
-		& > * + * {
-			margin-top: 16px;
-		}
-
-		.submitRow {
-			display: flex;
-			justify-content: space-between;
-		}
-
-		input {
-			color: inherit;
-			font-size: inherit;
-			font-family: inherit;
-			word-spacing: inherit;
-			text-transform: inherit;
-			text-indent: inherit;
-			text-shadow: inherit;
-			display: inherit;
-			-webkit-rtl-ordering: inherit;
-			cursor: inherit;
-			font: inherit;
-			appearance: inherit;
-			letter-spacing: inherit;
-			writing-mode: inherit;
-			text-rendering: inherit;
-			border: none;
-			background-color: @panelGrayLight;
-			border-radius: @mainBorderRadius;
-			padding: 0 8px;
-			min-height: 32px;
-			width: fill;
-			font-size: 16px;
-
-			&.button {
-				width: auto;
-
-				&:not(:disabled) {
-					cursor: pointer;
-				}
-
-				&:not(:disabled):hover {
-					filter: brightness(1.2);
-				}
-			}
-		}
-	}
-
 	button {
 		width: 100%;
 

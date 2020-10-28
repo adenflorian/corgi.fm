@@ -6,6 +6,7 @@ import {IClientAppState, AppOptions, selectOption, setOption} from '@corgifm/com
 interface IOptionProps {
 	option: AppOptions
 	label: string
+	toolTip?: string
 }
 
 interface IOptionReduxProps {
@@ -20,7 +21,7 @@ export class Option extends Component<IOptionAllProps> {
 	}
 
 	public render() {
-		const {dispatch, label, option, value} = this.props
+		const {dispatch, label, option, value, toolTip} = this.props
 
 		if (typeof value === 'number') throw new Error('numbers are not supported in this component')
 
@@ -28,7 +29,7 @@ export class Option extends Component<IOptionAllProps> {
 
 		return (
 			<div className="option">
-				<label>
+				<label title={toolTip}>
 					{label}
 					<input
 						id={id}

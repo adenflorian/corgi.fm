@@ -1,46 +1,59 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import {hot} from 'react-hot-loader'
-import {connect} from 'react-redux'
-import {selectClientInfo, IClientAppState} from '@corgifm/common/redux'
+import {useSelector} from 'react-redux'
+import {selectClientInfo, IClientAppState, selectUserInputKeys} from '@corgifm/common/redux'
 // css-reset must be first
 import './css-reset.css'
 import './App.less'
 import {isLocalDevClient} from './is-prod-client'
 import {LoadingScreen} from './LoadingScreen'
 import {ConnectedOnlineApp} from './OnlineApp'
+import {Benchmarks} from './Benchmarks'
+import {simpleGlobalClientState} from './SimpleGlobalClientState'
+import {useRoomType} from './react-hooks'
+import {RoomType} from '@corgifm/common/common-types'
+import {MainWebGlCanvas} from './MainWebGlCanvas'
 
-interface IAppProps {
-	isConnectingForFirstTime: boolean
-	isClientReady: boolean
-}
+const App = () => {
+	const ctrl = useSelector((state: IClientAppState) => selectUserInputKeys(state).ctrl)
+	const shift = useSelector((state: IClientAppState) => selectUserInputKeys(state).shift)
+	const alt = useSelector((state: IClientAppState) => selectUserInputKeys(state).alt)
+	const isConnectingForFirstTime = useSelector((state: IClientAppState) => selectClientInfo(state).isConnectingForFirstTime)
+	const isClientReady = useSelector((state: IClientAppState) => selectClientInfo(state).isClientReady)
+	const roomType = useRoomType()
 
-class App extends React.Component<IAppProps, {}> {
-	public render() {
-		const {isConnectingForFirstTime, isClientReady} = this.props
-
-		if (isLocalDevClient()) {
-			switch (window.location.pathname.replace('/', '')) {
-				default: break
-			}
+	useEffect(() => {
+		const onMouseMove = (e: MouseEvent) => {
+			simpleGlobalClientState.lastMousePosition.x = e.clientX
+			simpleGlobalClientState.lastMousePosition.y = e.clientY
 		}
 
-		const isLoading = !isClientReady && isConnectingForFirstTime
-		return (
-			<React.Fragment>
-				<LoadingScreen loading={isLoading} />
-				{!isLoading && <ConnectedOnlineApp />}
-			</React.Fragment>
-		)
+		window.addEventListener('mousemove', onMouseMove)
+
+		return () => {
+			window.removeEventListener('mousemove', onMouseMove)
+		}
+	}, [])
+
+	if (isLocalDevClient()) {
+		switch (window.location.pathname.replace('/', '')) {
+			case 'benchmarks': return <Benchmarks />
+			default: break
+		}
 	}
+
+	const isLoading = !isClientReady && isConnectingForFirstTime
+	return (
+		<div className={`ctrl-${ctrl} alt-${alt} shift-${shift}`}>
+			{/* <MainWebGlCanvas /> */}
+			<LoadingScreen loading={isLoading} />
+			{!isLoading && {
+				[RoomType.Normal]: <ConnectedOnlineApp />,
+				[RoomType.Experimental]: <ConnectedOnlineApp />,
+				[RoomType.Dummy]: <div>DuMmY</div>,
+			}[roomType]}
+		</div>
+	)
 }
 
-const mapStateToProps = (state: IClientAppState) => {
-	const {isConnectingForFirstTime, isClientReady} = selectClientInfo(state)
-
-	return {
-		isConnectingForFirstTime,
-		isClientReady,
-	}
-}
-
-export const ConnectedApp = hot(module)(connect(mapStateToProps)(App))
+export const ConnectedApp = hot(module)(App)

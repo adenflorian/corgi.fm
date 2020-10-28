@@ -1,11 +1,12 @@
-import React from 'react'
+import React, {useCallback} from 'react'
 import {useDispatch} from 'react-redux'
 import {rateLimitedDebounceNoTrail} from '@corgifm/common/common-utils'
 import {
-	IClientState, organizeGraph,
+	IClientState, commonActions,
 	selectClientById, selectLocalClientId, selectMemberCount,
-	selectRoomSettings,
+	selectRoomSettings, localActions,
 	selectClientInfo, shamuConnect, selectClientCount,
+	getRoomTypeFriendlyString,
 } from '@corgifm/common/redux'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {
@@ -16,21 +17,28 @@ import {
 } from './analytics/analytics'
 import {AuthModalButton} from './Auth/Auth'
 import {Button} from './Button/Button'
-import {NewRoomButton} from './Button/CommonButtons'
+import {NewRoomButton} from './Button/NewRoomButton'
 import {DiscordLink, NewsletterLink, PatreonLink} from './Links'
-import {localActions} from './local-middleware'
 import {ConnectedNameChanger} from './NameChanger'
 import {OptionsModalButton} from './Options/Options'
 import {ConnectedRoomSelector} from './RoomSelector'
 import {LoadRoomModalButton} from './SavingAndLoading/SavingAndLoading'
-import './TopDiv.less'
 import {WelcomeModalButton} from './Welcome/Welcome'
+import {createResetZoomAction} from './SimpleGraph/Zoom'
+import {useObjectChangedEvent} from './Experimental/hooks/useCorgiEvent'
+import {simpleGlobalClientState} from './SimpleGlobalClientState'
+import {audioWorkletToolTip} from './client-constants'
+import {useRoomType} from './react-hooks'
+import './TopDiv.less'
+import {NodeGroupInfo} from './SmallComponents/NodeGroupInfo'
+import {RoomType} from '@corgifm/common/common-types'
+import {FiDownload} from 'react-icons/fi'
 
 interface ReduxProps {
 	memberCount: number
 	clientCount: number
 	info: string
-	isClientReady: boolean
+	isConnected: boolean
 	roomOwner: IClientState
 	onlyOwnerCanDoStuff: boolean
 	isLocalClientRoomOwner: boolean
@@ -39,10 +47,17 @@ interface ReduxProps {
 type AllProps = ReduxProps
 
 export const TopDiv = ({
-	memberCount, clientCount, info, isClientReady,
+	memberCount, clientCount, info, isConnected,
 	roomOwner, onlyOwnerCanDoStuff, isLocalClientRoomOwner,
 }: AllProps) => {
 	const dispatch = useDispatch()
+
+	const resetZoom = useCallback(() => {
+		dispatch(createResetZoomAction())
+	}, [dispatch])
+
+	const isAudioWorkletLoaded = useObjectChangedEvent(simpleGlobalClientState.onAudioWorkletLoaded)
+	const roomType = useRoomType()
 
 	return (
 		<div className="topDiv" style={{marginBottom: 'auto'}}>
@@ -55,9 +70,9 @@ export const TopDiv = ({
 					<div className="blobDark" title="Frames per second">
 						FPS
 					</div>
-					<div id="fps" style={{width: 32, overflow: 'hidden'}} />
+					<div id="fps" />
 				</div>
-				<div className="blob" style={{overflow: 'hidden'}}>
+				<div className="blob" style={{cursor: 'pointer'}} title="Click to reset zoom" onClick={resetZoom}>
 					<span className="blobDark">Zoom</span>
 					<span id="zoomText">0.0</span>
 				</div>
@@ -108,7 +123,36 @@ export const TopDiv = ({
 						{onlyOwnerCanDoStuff ? 'Limited' : 'Public'}
 					</div>
 				</div>
-				{!isClientReady &&
+				<div className="blob">
+					<div className="blobDark">Room Type</div>
+					<div
+						style={{
+							color: roomType === RoomType.Experimental
+								? CssColor.orange
+								: undefined,
+						}}
+						title={''}
+					>
+						{getRoomTypeFriendlyString(roomType)}
+					</div>
+				</div>
+				<div className="blob">
+					<div className="blobDark">AudioWorklet</div>
+					<div
+						style={{
+							color: isAudioWorkletLoaded
+								? CssColor.orange
+								: CssColor.defaultGray,
+						}}
+						title={audioWorkletToolTip}
+					>
+						{isAudioWorkletLoaded ? 'Loaded' : 'Not Loaded'}
+					</div>
+				</div>
+				{roomType === RoomType.Experimental &&
+					<NodeGroupInfo />
+				}
+				{!isConnected &&
 					<div
 						className="blob"
 						style={{
@@ -124,7 +168,7 @@ export const TopDiv = ({
 				}
 			</div>
 			<div className="right">
-				<ConnectedNameChanger />
+				<ConnectedNameChanger showLabel={true} />
 				<AuthModalButton />
 				<WelcomeModalButton />
 				<ConnectedRoomSelector />
@@ -137,6 +181,8 @@ export const TopDiv = ({
 							eventSaveRoomToBrowserButtonClick()
 						}, 1000)
 					}
+					background="medium"
+					shadow={true}
 				>
 					Save Room To Browser
 				</Button>
@@ -150,7 +196,10 @@ export const TopDiv = ({
 							eventSaveRoomToFileButtonClick()
 						}, 2000)
 					}
+					background="medium"
+					shadow={true}
 				>
+					<FiDownload />
 					Save Room To File
 				</Button>
 				<Button
@@ -174,6 +223,8 @@ export const TopDiv = ({
 								: ''),
 					}}
 					disabled={onlyOwnerCanDoStuff && !isLocalClientRoomOwner}
+					background="medium"
+					shadow={true}
 				>
 					Prune Room
 				</Button>
@@ -186,7 +237,7 @@ export const TopDiv = ({
 										+ 'nodes in this room?'
 										+ '\nThis cannot be undone!')
 								) {
-									dispatch(organizeGraph())
+									dispatch(commonActions.organizeGraph())
 									eventOrganizeRoomConfirmed()
 								}
 								eventOrganizeRoomButtonClick()
@@ -199,14 +250,16 @@ export const TopDiv = ({
 									: ''),
 						}}
 						disabled={onlyOwnerCanDoStuff && !isLocalClientRoomOwner}
+						background="medium"
+						shadow={true}
 					>
 						Organize Room
 					</Button>
 				}
 				<OptionsModalButton />
 				<DiscordLink />
-				<PatreonLink />
-				<NewsletterLink />
+				{/* <PatreonLink /> */}
+				{/* <NewsletterLink /> */}
 			</div>
 		</div>
 	)
@@ -220,7 +273,7 @@ export const ConnectedTopDiv = shamuConnect(
 			clientCount: selectClientCount(state),
 			info: state.websocket.info,
 			memberCount: selectMemberCount(state.room),
-			isClientReady: selectClientInfo(state).isClientReady,
+			isConnected: selectClientInfo(state).isConnected,
 			roomOwner: selectClientById(state, roomSettings.ownerId),
 			onlyOwnerCanDoStuff: roomSettings.onlyOwnerCanDoStuff,
 			isLocalClientRoomOwner:

@@ -1,32 +1,19 @@
 import React from 'react'
-import {selectAllConnectionIds, shamuConnect} from '@corgifm/common/redux'
+import {selectAllConnectionIds, IClientAppState, selectOption, AppOptions} from '@corgifm/common/redux'
 import {ConnectedConnectionView} from './ConnectionView'
+import {useSelector} from 'react-redux'
 
-export enum ConnectionsUsage {
-	normal = 'normal',
-	simpleGraph = 'simpleGraph',
-}
+export const Connections = React.memo(function _Connections() {
 
-interface IConnectionsProps {}
+	const enableWireShadows = useSelector((state: IClientAppState) => selectOption(state, AppOptions.enableWireShadows))
 
-interface IConnectionsReduxProps {
-	connectionIds: string[]
-}
-
-type IConnectionsAllProps = IConnectionsProps & IConnectionsReduxProps
-
-export const Connections = function _Connections({connectionIds}: IConnectionsAllProps) {
+	const connectionIds = useSelector((state: IClientAppState) => selectAllConnectionIds(state.room))
+	
 	return (
-		<div className="connections">
+		<div className={`connections enableWireShadows-${enableWireShadows}`}>
 			{connectionIds.map(connectionId =>
-				<ConnectedConnectionView key={connectionId} id={connectionId} />,
+				<ConnectedConnectionView key={connectionId.toString()} id={connectionId} />,
 			)}
 		</div>
 	)
-}
-
-export const ConnectedConnections = shamuConnect(
-	(state): IConnectionsReduxProps => ({
-		connectionIds: selectAllConnectionIds(state.room),
-	}),
-)(Connections)
+})

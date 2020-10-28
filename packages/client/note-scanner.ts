@@ -1,5 +1,4 @@
 import {List, Map, Set} from 'immutable'
-import {logger} from '@corgifm/common/logger'
 import {MidiGlobalClipEvent, midiPrecision, MidiRange} from '@corgifm/common/midi-types'
 import {
 	ClientStore, GroupSequencers,
@@ -15,6 +14,7 @@ import {
 } from '@corgifm/common/redux'
 import {GetAllAudioNodes, GetAllInstruments} from './instrument-manager'
 import {getEvents} from './note-scheduler'
+import {logger} from './client-logger'
 
 let _store: ClientStore
 let _audioContext: AudioContext
@@ -57,6 +57,10 @@ export function getCurrentSongTime() {
 	return _audioContext.currentTime - songStartTimeSeconds
 }
 
+export function getCurrentSongTimeBeats() {
+	return currentSongTimeBeats
+}
+
 export function getCurrentSongIsPlaying() {
 	return _isPlaying
 }
@@ -68,7 +72,7 @@ function scheduleNotes(
 	const roomState = _store.getState().room
 
 	const {
-		isPlaying, bpm, maxReadAheadSeconds, playCount,
+		isPlaying, bpm, maxReadAheadSeconds, playCount, startBeat,
 	} = selectGlobalClockState(roomState)
 
 	const actualBPM = Math.max(0.000001, bpm)
@@ -112,9 +116,15 @@ function scheduleNotes(
 
 	currentSongTimeBeats += deltaBeats
 
-	if (_justStarted || _playCount !== playCount) {
-		currentSongTimeBeats = 0
-		_cursorBeats = 0
+	const restarted = _playCount !== playCount
+
+	if (restarted) {
+		releaseAllNotesOnAllInstruments(getAllInstruments)
+	}
+
+	if (_justStarted || restarted) {
+		currentSongTimeBeats = startBeat
+		_cursorBeats = startBeat
 		_playCount = playCount
 	}
 
@@ -142,14 +152,13 @@ function scheduleNotes(
 		.filter(seq => selectPosition(roomState, seq.id).enabled)
 		.map(seq => ({
 			seq,
-			events: getEvents(seq.midiClip, readRangeBeats, seq.rate)
+			events: getEvents(seq.midiClip, readRangeBeats, seq.rate, restarted ? currentSongTimeBeats : undefined)
 				.filter(getGroupEventsFilter(groupSequencers, roomState, seq.id, currentSongTimeBeats + offsetBeats))
 				.map(event => applyGateToEvent(seq.gate, event))
 				.map((event): MidiGlobalClipEvent => ({
 					...event,
-					notes: event.notes.map(note => note + Math.round(seq.pitch)),
+					note: event.note + Math.round(seq.pitch),
 				}))
-				.map(flattenEventNotes)
 				.flatten() as List<MidiGlobalClipEvent>,
 		}))
 
@@ -176,9 +185,6 @@ function scheduleNotes(
 					.filter((_, id) => sourceIds.includes(id))
 					.forEach(({seq, events}, sourceId) => {
 						events.forEach(event => {
-							// Each event at this point has a single note
-							if (event.notes.count() !== 1) logger.error('event.notes.count() !== 1')
-
 							mutableEvents.push({
 								...event,
 								sourceIds: Set([sourceId]),
@@ -190,20 +196,35 @@ function scheduleNotes(
 		let scheduledNotesWithTimes = List<string>()
 
 		eventsToSchedule.forEach(event => {
+			if (event.note === -1) return
+
+			if (event.startTime < 0) {
+				logger.error(`event.startTime < 0: `, event.startTime)
+				return
+			}
+
 			const delaySecondsUntilStart = (fromBeats(offsetBeats + event.startTime))
+
+			if (delaySecondsUntilStart < 0) {
+				logger.error(`delaySecondsUntilStart < 0: `, delaySecondsUntilStart)
+				return
+			}
 
 			const delaySecondsUntilRelease = (fromBeats(offsetBeats + event.endTime))
 
-			event.notes.forEach(note => {
-				const slug = event.startTime.toString() + '-' + note.toString()
+			if (delaySecondsUntilRelease < 0) {
+				logger.error(`delaySecondsUntilRelease < 0: `, delaySecondsUntilRelease)
+				return
+			}
 
-				if (scheduledNotesWithTimes.includes(slug)) return
+			const slug = event.startTime.toString() + '-' + event.note.toString()
 
-				scheduledNotesWithTimes = scheduledNotesWithTimes.push(slug)
+			if (scheduledNotesWithTimes.includes(slug)) return
 
-				instrument.scheduleNote(note, delaySecondsUntilStart, false, event.sourceIds)
-				instrument.scheduleRelease(note, delaySecondsUntilRelease)
-			})
+			scheduledNotesWithTimes = scheduledNotesWithTimes.push(slug)
+
+			instrument.scheduleNote(event.note, delaySecondsUntilStart, false, event.sourceIds, 1)
+			instrument.scheduleRelease(event.note, delaySecondsUntilRelease)
 		})
 
 	})
@@ -212,8 +233,9 @@ function scheduleNotes(
 	_justStarted = false
 }
 
+/** Filter events based on upstream group sequencers */
 const getGroupEventsFilter = (groupSequencers: GroupSequencers, roomState: IClientRoomState, seqId: Id, currentBeats: number) => (event: MidiGlobalClipEvent): boolean => {
-	const connectionsToSequencer = selectConnectionsWithTargetIds(roomState, [seqId])
+	const connectionsToSequencer = selectConnectionsWithTargetIds(roomState, seqId)
 	const connectionSourceIds = connectionsToSequencer.map(x => x.sourceId)
 
 	const sourceGroupSequencers = Map(groupSequencers).filter(x => connectionSourceIds.includes(x.id))
@@ -259,15 +281,6 @@ function applyGateToEvent(gate: number, event: MidiGlobalClipEvent): MidiGlobalC
 		...event,
 		endTime: newEndTime,
 	}
-}
-
-/** Put each note in it's own event */
-function flattenEventNotes(event: MidiGlobalClipEvent): List<MidiGlobalClipEvent> {
-	return event.notes.toList()
-		.map(note => ({
-			...event,
-			notes: Set([note]),
-		}))
 }
 
 function releaseAllNotesOnAllInstruments(getAllInstruments: GetAllInstruments) {

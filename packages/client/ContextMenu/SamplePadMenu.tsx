@@ -1,11 +1,16 @@
 import React, {useCallback} from 'react'
 import {ContextMenu, MenuItem, SubMenu} from 'react-contextmenu'
-import {useDispatch} from 'react-redux'
-import {basicSamplerActions} from '@corgifm/common/redux'
+import {useDispatch, useSelector} from 'react-redux'
+import {
+	basicSamplerActions, selectLocalUserSamples, useLoggedIn,
+} from '@corgifm/common/redux'
 import {capitalizeFirstLetter} from '@corgifm/common/common-utils'
+import {SampleUpload} from '@corgifm/common/models/OtherModels'
 import {CssColor} from '@corgifm/common/shamu-color'
 import {IMidiNote} from '@corgifm/common/MidiNote'
-import {Sample, sampleColors, defaultSamples} from '@corgifm/common/common-samples-stuff'
+import {
+	Sample, sampleColors, defaultSamples,
+} from '@corgifm/common/common-samples-stuff'
 import {TopMenuBar} from './TopMenuBar'
 
 interface SamplePadMenuData {
@@ -21,6 +26,7 @@ export const SamplePadMenu = () => {
 			<TopMenuBar label={'sample pad menu'} />
 			<ColorsMenu />
 			<DefaultSamplesMenu />
+			<LocalUserSamplesMenu />
 		</ContextMenu>
 	)
 }
@@ -28,7 +34,7 @@ export const SamplePadMenu = () => {
 function DefaultSamplesMenu() {
 	return (
 		<SubMenu
-			title={<div>Default Samples</div>}
+			title={<div>Default Samples...</div>}
 			hoverDelay={0}
 		>
 			{defaultSamples.map((samples, section) => (
@@ -72,7 +78,7 @@ function DefaultSampleMenuItem({sample}: {sample: Sample}) {
 function ColorsMenu() {
 	return (
 		<SubMenu
-			title={<div>Color</div>}
+			title={<div>Color...</div>}
 			hoverDelay={0}
 		>
 			{sampleColors.map(color => <ColorOption key={color} {...{color}} />)}
@@ -98,6 +104,57 @@ function ColorOption({color}: {color: Sample['color']}) {
 		>
 			<span style={{color: CssColor[color]}}>
 				{capitalizeFirstLetter(color)}
+			</span>
+		</MenuItem>
+	)
+}
+
+function LocalUserSamplesMenu() {
+	const samples = useSelector(selectLocalUserSamples)
+
+	const isLoggedId = useLoggedIn()
+
+	return (
+		<SubMenu
+			title={<div>Your Samples...</div>}
+			hoverDelay={0}
+		>
+			{samples.length === 0
+				? <MenuItem>
+					<span>
+						{isLoggedId
+							? `Drag file onto pad to upload`
+							: `Login to see your uploaded samples`}
+					</span>
+				</MenuItem>
+				: samples.map(sample =>
+				<LocalUserSampleMenuItem key={sample.path} {...{sample}} />
+			)}
+		</SubMenu>
+	)
+}
+
+function LocalUserSampleMenuItem({sample}: {sample: SampleUpload}) {
+	const dispatch = useDispatch()
+	const setSample = useCallback(
+		(samplerId: Id, midiNote: IMidiNote) => {
+			dispatch(
+				basicSamplerActions.setSample(
+					samplerId, midiNote, sample))
+		},
+		[dispatch, sample],
+	)
+
+	return (
+		<MenuItem
+			onClick={(_, {samplerId, midiNote}: SamplePadMenuData) =>
+				setSample(samplerId, midiNote)}
+		>
+			<span
+				style={{color: CssColor[sample.color]}}
+				className={`localUserSampleMenuItem`}
+			>
+				{sample.label}
 			</span>
 		</MenuItem>
 	)

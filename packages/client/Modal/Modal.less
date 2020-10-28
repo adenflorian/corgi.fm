@@ -10,6 +10,15 @@
 	background-color: @overlayGray;
 	z-index: 2;
 	margin: 0 !important;
+
+	input, label {
+		font-size: 16px;
+	}
+
+	.blob {
+		box-shadow: none;
+		background-color: @panelGrayLight;
+	}
 }
 
 .modalPanel {
@@ -61,6 +70,7 @@
 			}
 			.modalSectionContent {
 				padding: 16px;
+				font-size: 16px;
 			}
 			.modalSectionFooter {
 				font-size: 0.84em;
@@ -70,6 +80,51 @@
 				padding: 16px;
 				border-bottom-left-radius: @mainBorderRadius;
 				border-bottom-right-radius: @mainBorderRadius;
+			}
+			form {
+				& > * + * {
+					margin-top: 16px;
+				}
+
+				.submitRow {
+					display: flex;
+					justify-content: space-between;
+				}
+
+				input {
+					color: inherit;
+					font-size: inherit;
+					font-family: inherit;
+					word-spacing: inherit;
+					text-transform: inherit;
+					text-indent: inherit;
+					text-shadow: inherit;
+					display: inherit;
+					-webkit-rtl-ordering: inherit;
+					cursor: inherit;
+					font: inherit;
+					appearance: inherit;
+					letter-spacing: inherit;
+					writing-mode: inherit;
+					text-rendering: inherit;
+					border: none;
+					padding: 0 8px;
+					min-height: 32px;
+					width: fill;
+					font-size: 16px;
+
+					&.button {
+						width: auto;
+
+						&:not(:disabled) {
+							cursor: pointer;
+						}
+
+						&:not(:disabled):hover {
+							filter: brightness(1.2);
+						}
+					}
+				}
 			}
 		}
 	}

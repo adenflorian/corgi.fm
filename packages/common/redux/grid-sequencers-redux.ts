@@ -2,13 +2,16 @@ import {List, Stack} from 'immutable'
 import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
 import {MAX_MIDI_NOTE_NUMBER_127} from '../common-constants'
-import {ConnectionNodeType, IMultiStateThing} from '../common-types'
-import {assertArrayHasNoUndefinedElements} from '../common-utils'
-import {makeMidiClipEvent, MidiClip, MidiClipEvents} from '../midi-types'
+import {ConnectionNodeType, IConnectable} from '../common-types'
+import {
+	assertArrayHasNoUndefinedElements, findLowestNote, findHighestNote,
+} from '../common-utils'
+import {makeMidiClipEvent, MidiClip, makeEvents} from '../midi-types'
 import {emptyMidiNotes, IMidiNote, MidiNotes} from '../MidiNote'
 import {
 	deserializeSequencerState, selectAllGridSequencers, SequencerAction,
 	SequencerStateBase,
+	sequencerActionTypes2,
 } from './sequencer-redux'
 import {
 	addMultiThing, BROADCASTER_ACTION, createSequencerEvents, IClientRoomState,
@@ -73,149 +76,103 @@ export interface IGridSequencers extends IMultiStateThings {
 	[key: string]: GridSequencerState
 }
 
+function foo() {
+	let i = 0
+	return createSequencerEvents(GridSequencerState.eventCount)
+		.map(() => (makeMidiClipEvent({
+			note: i % 2 === 1 ? -1 : 36,
+			startBeat: i++,
+			durationBeats: 1,
+		})))
+		.filter(x => x.note > -1)
+}
+
 export class GridSequencerState extends SequencerStateBase {
-	// public static defaultWidth = 552
-	// public static defaultHeight = 234
+	public static defaultWidth = 552
+	public static defaultHeight = 234
 	public static noteNamesSideBarWidth = 16
 	public static noteWidth = 8
 	public static scrollBarWidth = 16
 	public static noteHeight = 8
 	public static controlsWidth = 180
-	public static getWidth = (notesDisplayWidth: number) => GridSequencerState.controlsWidth +
+	public static eventCount = 32
+	public static notesToShow = 24
+	public static notesDisplayWidth = GridSequencerState.noteWidth *
+		GridSequencerState.eventCount
+
+	public static getWidth = GridSequencerState.controlsWidth +
 		GridSequencerState.noteNamesSideBarWidth +
-		notesDisplayWidth +
+		GridSequencerState.notesDisplayWidth +
 		GridSequencerState.scrollBarWidth
 
+	public static getHeight = GridSequencerState.noteHeight *
+		GridSequencerState.notesToShow
+
+	public static notesStartX = GridSequencerState.controlsWidth +
+		GridSequencerState.noteNamesSideBarWidth
+
 	public static dummy = new GridSequencerState(
-		'dummy', 'dummy', 0, List(), false,
+		makeEvents(), false,
 	)
 
 	public readonly scrollY: number
-	public readonly notesToShow: number
 
 	public constructor(
-		ownerId: Id,
-		name = 'Grid Sequencer',
-		notesToShow = 24,
-		events = createSequencerEvents(32)
-			.map((_, i) => (makeMidiClipEvent({
-				notes: MidiNotes(i % 2 === 1 ? [] : [36]),
-				startBeat: i,
-				durationBeats: 1,
-			}))),
+		events = foo(),
 		isPlaying = false,
 	) {
 		const midiClip = new MidiClip({
-			events: events.map(x => ({
-				...x,
-				startBeat: x.startBeat,
-				durationBeats: x.durationBeats,
-			})),
-			length: events.count(),
+			events,
+			length: GridSequencerState.eventCount,
 			loop: true,
 		})
 
-		const height = GridSequencerState.noteHeight * notesToShow
-
-		const notesDisplayWidth = GridSequencerState.noteWidth * midiClip.events.count()
-
-		const width = GridSequencerState.getWidth(notesDisplayWidth)
-
 		super(
-			name,
 			midiClip,
-			width,
-			height,
-			ownerId,
 			ConnectionNodeType.gridSequencer,
-			GridSequencerState.controlsWidth + GridSequencerState.noteNamesSideBarWidth,
-			notesDisplayWidth,
 			isPlaying,
 			1,
 			1 / 4,
 		)
 
-		this.notesToShow = notesToShow
-
 		const lowestNote = findLowestNote(this.midiClip.events)
 		const highestNote = findHighestNote(this.midiClip.events)
-		const maxScrollY = MAX_MIDI_NOTE_NUMBER_127 - this.notesToShow
+		const maxScrollY = MAX_MIDI_NOTE_NUMBER_127 - GridSequencerState.notesToShow
 
 		const notesRange = highestNote - lowestNote
-		const desiredScrollY = Math.round(lowestNote - (this.notesToShow / 2) + (notesRange / 2))
+		const desiredScrollY = Math.round(lowestNote - (GridSequencerState.notesToShow / 2) + (notesRange / 2))
 
 		this.scrollY = Math.min(maxScrollY, desiredScrollY)
 	}
 }
 
-export function deserializeGridSequencerState(state: IMultiStateThing): IMultiStateThing {
+export function deserializeGridSequencerState(state: IConnectable): IConnectable {
 	const x = state as GridSequencerState
 	const z = deserializeSequencerState(x)
-	const notesDisplayWidth = GridSequencerState.noteWidth * z.midiClip.events.count()
+	// const notesDisplayWidth = GridSequencerState.noteWidth * z.midiClip.events.count()
 	const y: GridSequencerState = {
-		...(new GridSequencerState(x.ownerId)),
+		...(new GridSequencerState()),
 		...z,
-		width: GridSequencerState.getWidth(notesDisplayWidth),
-		height: GridSequencerState.noteHeight * x.notesToShow,
-		notesDisplayStartX: GridSequencerState.controlsWidth + GridSequencerState.noteNamesSideBarWidth,
-		notesDisplayWidth,
+		// width: GridSequencerState.getWidth(notesDisplayWidth),
+		// height: GridSequencerState.noteHeight * x.notesToShow,
+		// notesDisplayStartX: GridSequencerState.controlsWidth + GridSequencerState.noteNamesSideBarWidth,
+		// notesDisplayWidth,
 	}
 	return y
 }
 
-export function findLowestAndHighestNotes(events: MidiClipEvents) {
-	return {
-		lowestNote: findLowestNote(events),
-		highestNote: findHighestNote(events),
-	}
+type GridSequencerActionTypes = {
+	[key in GridSequencerAction['type']]: 0
 }
 
-export function findLowestNote(events: MidiClipEvents): number {
-	let lowest = Number.MAX_VALUE
-
-	events.forEach(event => {
-		event.notes.forEach(note => {
-			if (note < lowest) {
-				lowest = note
-			}
-		})
-	})
-
-	if (lowest === Number.MAX_VALUE) {
-		return 0
-	}
-
-	return lowest
+const gridSequencerActionTypes2: GridSequencerActionTypes = {
+	...sequencerActionTypes2,
+	SET_GRID_SEQUENCER_NOTE: 0,
+	SET_GRID_SEQUENCER_FIELD: 0,
+	RESTART_GRID_SEQUENCER: 0,
 }
 
-export function findHighestNote(events: MidiClipEvents): number {
-	let highest = Number.MIN_VALUE
-
-	events.forEach(event => {
-		event.notes.forEach(note => {
-			if (note > highest) {
-				highest = note
-			}
-		})
-	})
-
-	if (highest === Number.MIN_VALUE) {
-		return 127
-	}
-
-	return highest
-}
-
-const gridSequencerActionTypes = [
-	'SET_GRID_SEQUENCER_NOTE',
-	'SET_GRID_SEQUENCER_FIELD',
-	'CLEAR_SEQUENCER',
-	'UNDO_SEQUENCER',
-	'PLAY_SEQUENCER',
-	'STOP_SEQUENCER',
-	'TOGGLE_SEQUENCER_RECORDING',
-	'RECORD_SEQUENCER_NOTE',
-]
+const gridSequencerActionTypes = Object.keys(gridSequencerActionTypes2)
 
 assertArrayHasNoUndefinedElements(gridSequencerActionTypes)
 
@@ -232,28 +189,31 @@ const gridSequencerReducer =
 	(gridSequencer: GridSequencerState, action: GridSequencerAction): GridSequencerState => {
 		switch (action.type) {
 			case 'SET_GRID_SEQUENCER_NOTE':
-				if (action.note === undefined) {
-					throw new Error('action.notes === undefined')
-				}
 				return {
 					...gridSequencer,
-					midiClip: gridSequencer.midiClip.set('events', gridSequencer.midiClip.events.map((event, eventIndex) => {
-						if (eventIndex === action.index) {
-							if (action.enabled) {
-								return {
-									...event,
-									notes: event.notes.add(action.note),
-								}
+					midiClip: gridSequencer.midiClip.update('events', events => {
+
+						const matchedEvent = events.find(x => x.startBeat === action.index && x.note === action.note)
+
+						if (action.enabled) {
+							if (matchedEvent) {
+								return events
 							} else {
-								return {
-									...event,
-									notes: event.notes.filter(x => x !== action.note),
-								}
+								const newEvent = makeMidiClipEvent({
+									durationBeats: 1,
+									note: action.note,
+									startBeat: action.index,
+								})
+								return events.set(newEvent.id, newEvent)
 							}
 						} else {
-							return event
+							if (matchedEvent) {
+								return events.delete(matchedEvent.id)
+							} else {
+								return events
+							}
 						}
-					})),
+					}),
 					previousEvents: gridSequencer.previousEvents.unshift(gridSequencer.midiClip.events),
 				}
 			case 'SET_GRID_SEQUENCER_FIELD':
@@ -295,19 +255,18 @@ const gridSequencerReducer =
 			case 'RECORD_SEQUENCER_NOTE':
 				const index = action.index
 				if (index === undefined) return gridSequencer
-				if (gridSequencer.isRecording) {
-					return {
-						...gridSequencer,
-						midiClip: gridSequencer.midiClip.withMutations(mutable => {
-							mutable.set('events',
-								mutable.events.update(
-									index,
-									x => ({...x, notes: x.notes.add(action.note)})))
-						}),
-						previousEvents: gridSequencer.previousEvents.unshift(gridSequencer.midiClip.events),
-					}
-				} else {
-					return gridSequencer
+				if (!gridSequencer.isRecording) return gridSequencer
+				return {
+					...gridSequencer,
+					midiClip: gridSequencer.midiClip.update('events', events => {
+						const newEvent = makeMidiClipEvent({
+							note: action.note,
+							startBeat: index,
+							durationBeats: 1,
+						})
+						return events.set(newEvent.id, newEvent)
+					}),
+					previousEvents: gridSequencer.previousEvents.unshift(gridSequencer.midiClip.events),
 				}
 			case 'PLAY_SEQUENCER': return {...gridSequencer, isPlaying: true}
 			case 'STOP_SEQUENCER': return {...gridSequencer, isPlaying: false, isRecording: false}
@@ -339,22 +298,4 @@ export const selectGridSequencerIsActive = (state: IClientRoomState, id: Id) =>
 	selectGridSequencer(state, id).isPlaying
 
 export const selectGridSequencerIsSending = (state: IClientRoomState, id: Id) =>
-	selectGridSequencerActiveNotes(state, id).count() > 0
-
-export const selectGridSequencerActiveNotes = createSelector(
-	[selectGridSequencer, selectGlobalClockState],
-	(gridSequencer, globalClockState) => {
-		if (!gridSequencer) return emptyMidiNotes
-		if (!gridSequencer.isPlaying) return emptyMidiNotes
-
-		const globalClockIndex = globalClockState.index
-
-		const index = globalClockIndex
-
-		if (index >= 0 && gridSequencer.midiClip.events.count() > 0) {
-			return gridSequencer.midiClip.events.get(index % gridSequencer.midiClip.events.count())!.notes
-		} else {
-			return emptyMidiNotes
-		}
-	},
-)
+	false

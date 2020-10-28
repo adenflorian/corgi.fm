@@ -2,7 +2,7 @@ import {List} from 'immutable'
 import {Dispatch} from 'redux'
 import {
 	IClientRoomState, IConnection, selectConnection,
-	selectConnectionsWithSourceIds,
+	selectConnectionsWithSourceId,
 } from './redux'
 import {CssColor} from './shamu-color'
 
@@ -32,7 +32,7 @@ function updateConnectionTargetColor(
 	// 	color,
 	// }))
 
-	const nextConnections = selectConnectionsWithSourceIds(roomState, [connection.targetId])
+	const nextConnections = selectConnectionsWithSourceId(roomState, connection.targetId)
 
 	nextConnections.forEach(
 		x => updateConnectionTargetColor(roomState, dispatch, x, color, processedConnectionIDs.push(connection.id)),

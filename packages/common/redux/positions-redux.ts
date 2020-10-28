@@ -1,9 +1,13 @@
-import {Map, Record} from 'immutable'
+import {Map, Record, List} from 'immutable'
 import {combineReducers, Reducer} from 'redux'
 import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
 import {ConnectionNodeType} from '../common-types'
+import {CssColor} from '../shamu-color'
+import {serverClientId} from '../common-constants'
 import {shamuMetaReducer} from './shamu-graph'
+import {IClientAppState} from './common-redux-types'
+import {findNodeInfo, getNodeInfo} from './node-types'
 import {
 	BROADCASTER_ACTION, IClientRoomState, SERVER_ACTION,
 } from '.'
@@ -13,6 +17,15 @@ export const positionActions = {
 		type: 'SET_ENABLED_NODE',
 		id,
 		enabled,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	} as const),
+	resizePosition: (
+		id: Id, position: Pick<IPosition, 'x' | 'y' | 'width' | 'height'>,
+	) => ({
+		type: 'RESIZE_POSITION',
+		id,
+		position,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	} as const),
@@ -94,6 +107,7 @@ export type IPosition = typeof defaultPosition
 
 const defaultPosition = {
 	id: '-1' as Id,
+	ownerId: '-1' as Id,
 	targetType: ConnectionNodeType.dummy,
 	width: -1,
 	height: -1,
@@ -103,14 +117,33 @@ const defaultPosition = {
 	inputPortCount: 1,
 	outputPortCount: 1,
 	enabled: true,
+	color: false as string | false | List<string>,
 }
 
 const makePositionRecord = Record(defaultPosition)
 
 export const makePosition = (
-	position: Pick<IPosition, 'id' | 'targetType' | 'width' | 'height'> & Partial<IPosition>,
+	position: Pick<IPosition, 'id' | 'targetType' | 'ownerId'> & Partial<IPosition>,
 ): Readonly<IPosition> => {
-	return makePositionRecord(position).toJS()
+	return makePositionRecord({
+		// For older saves pre 0.7.0
+		ownerId: serverClientId,
+		...position,
+		width: findNodeInfo(position.targetType).defaultWidth,
+		height: findNodeInfo(position.targetType).defaultHeight,
+		color: getNewPositionColor(position.targetType, position.color),
+	}).toJS()
+}
+
+export function getNewPositionColor(
+	type: ConnectionNodeType, color?: IPosition['color']
+): IPosition['color'] | undefined {
+	switch (type) {
+		// TODO This is temporary
+		case ConnectionNodeType.groupSequencer: return List([CssColor.red, CssColor.green, CssColor.blue])
+		case ConnectionNodeType.masterClock: return getNodeInfo().masterClock.color
+		default: return color
+	}
 }
 
 export type PositionAction = AddPositionAction | DeletePositionsAction | NodeClickedAction
@@ -123,17 +156,18 @@ const positionsSpecificReducer: Reducer<IPositions, PositionAction> =
 		switch (action.type) {
 			case 'ADD_POSITION': return sortPositions(positions.set(
 				action.position.id,
-				{
+				deserializePosition({
 					...action.position,
 					zIndex: getNewZIndex(positions, 0),
-				},
+				}),
 			))
 			case 'DELETE_POSITIONS': return sortPositions(positions.deleteAll(action.positionIds))
 			case 'DELETE_ALL_POSITIONS': return positions.clear()
-			case 'REPLACE_POSITIONS': return sortPositions(Map<string, IPosition>().merge(action.positions))
-			case 'UPDATE_POSITIONS': return sortPositions(positions.merge(action.positions))
-			case 'UPDATE_POSITION': return positions.update(action.id, x => ({...x, ...action.position}))
+			case 'REPLACE_POSITIONS': return sortPositions(Map<string, IPosition>().merge(action.positions).map(deserializePosition))
+			case 'UPDATE_POSITIONS': return sortPositions(positions.merge(action.positions).map(deserializePosition))
+			case 'UPDATE_POSITION': return positions.update(action.id, x => (deserializePosition({...x, ...action.position})))
 			case 'MOVE_POSITION': return positions.update(action.id, x => ({...x, ...action.position}))
+			case 'RESIZE_POSITION': return positions.update(action.id, x => ({...x, ...action.position}))
 			case 'NODE_CLICKED': return positions.update(action.id, x => ({
 				...x,
 				zIndex: getNewZIndex(positions, x.zIndex),
@@ -147,6 +181,21 @@ function getNewZIndex(positions: IPositions, currentZIndex: number) {
 	const highest = selectHighestZIndexOfAllPositionsLocal(positions)
 	if (currentZIndex === 0) return highest + 1
 	return currentZIndex < highest ? highest + 1 : currentZIndex
+}
+
+const deserializePosition = (position: IPosition): IPosition => {
+	return {
+		...position,
+		color: deserializePositionColor(position.color),
+	}
+}
+
+const deserializePositionColor = (color: IPosition['color']): IPosition['color'] => {
+	if (Array.isArray(color)) {
+		return List(color)
+	} else {
+		return color
+	}
 }
 
 function sortPositions(positions: IPositions) {
@@ -165,14 +214,15 @@ export const selectAllPositions = (state: IClientRoomState) =>
 export const selectPosition = (state: IClientRoomState, id: Id) =>
 	selectAllPositions(state).get(id) || defaultPosition
 
+export const selectPositionsByOwnerAndType = (state: IClientRoomState, ownerId: Id, type: ConnectionNodeType) =>
+	selectAllPositions(state).filter(x => x.ownerId === ownerId && x.targetType === type)
+
+export const selectPositionsByOwner = (state: IClientRoomState, ownerId: Id) =>
+	selectAllPositions(state).filter(x => x.ownerId === ownerId)
+
 export const selectAllPositionsAsArray = createSelector(
 	selectAllPositions,
 	positions => positions.toIndexedSeq().toArray(),
-)
-
-export const selectAllPositionIds = createSelector(
-	selectAllPositions,
-	positions => positions.keySeq(),
 )
 
 export const selectPositionsWithIds = (state: IClientRoomState, ids: Id[]) => {
@@ -219,3 +269,30 @@ export const selectHighestZIndexOfAllPositions = createSelector(
 	selectAllPositions,
 	selectHighestZIndexOfAllPositionsLocal,
 )
+
+export const createPositionSelector = (id: Id) => (state: IClientAppState) =>
+	selectPosition(state.room, id)
+
+export const createPositionColorSelector = (id: Id) => (state: IClientAppState) =>
+	selectPosition(state.room, id).color
+
+export const createPositionTypeSelector = (id: Id) => (state: IClientAppState) =>
+	selectPosition(state.room, id).targetType
+
+export const createPositionXSelector = (id: Id) => (state: IClientAppState) =>
+	selectPosition(state.room, id).x
+
+export const createPositionYSelector = (id: Id) => (state: IClientAppState) =>
+	selectPosition(state.room, id).y
+
+export const createPositionWidthSelector = (id: Id) => (state: IClientAppState) =>
+	selectPosition(state.room, id).width
+
+export const createPositionHeightSelector = (id: Id) => (state: IClientAppState) =>
+	selectPosition(state.room, id).height
+
+export const createPositionSelectedSelector = (id: Id) => (state: IClientAppState) =>
+	state.room.positions.meta.selectedNodes.includes(id)
+
+export const createPositionEnabledSelector = (id: Id) => (state: IClientAppState) =>
+	selectPosition(state.room, id).enabled

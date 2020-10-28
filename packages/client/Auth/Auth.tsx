@@ -4,10 +4,13 @@ import {
 	// IoLogoFacebook as Facebook,
 	IoLogoGoogle as Google,
 } from 'react-icons/io'
-import {useDispatch, useSelector} from 'react-redux'
+import {
+	FiLogIn, FiLogOut,
+} from 'react-icons/fi'
+import {useDispatch} from 'react-redux'
 import {AuthConstants} from '@corgifm/common/auth-constants'
 import {
-	authActions, chatSystemMessage, ModalId, modalsAction, selectLoggedIn,
+	authActions, chatSystemMessage, ModalId, modalsAction, useLoggedIn,
 } from '@corgifm/common/redux'
 import {Button} from '../Button/Button'
 import {
@@ -19,7 +22,7 @@ import {useBoolean, useResettableState} from '../react-hooks'
 import './Auth.less'
 
 export function AuthModalButton() {
-	const loggedIn = useSelector(selectLoggedIn)
+	const loggedIn = useLoggedIn()
 	const firebaseContext = useFirebase()
 	const dispatch = useDispatch()
 	const onClick = useCallback(
@@ -30,8 +33,12 @@ export function AuthModalButton() {
 	return (
 		<Button
 			onClick={onClick}
+			background="medium"
+			shadow={true}
 		>
-			{loggedIn ? `Log Out` : `Register / Login`}
+			{loggedIn
+				? <Fragment><FiLogOut />Log Out</Fragment>
+				: <Fragment><FiLogIn />Register / Login</Fragment>}
 		</Button>
 	)
 
@@ -67,7 +74,7 @@ export const AuthModalContent: ModalContent = ({hideModal}) => {
 						<input
 							type="email"
 							placeholder="Email"
-							className="email"
+							className="email blob"
 							value={email}
 							onChange={e => setEmail(e.target.value)}
 							disabled={inputsDisabled}
@@ -76,7 +83,7 @@ export const AuthModalContent: ModalContent = ({hideModal}) => {
 						<input
 							type="password"
 							placeholder="Password"
-							className="password"
+							className="password blob"
 							value={password}
 							onChange={e => setPassword(e.target.value)}
 							disabled={inputsDisabled}
@@ -86,13 +93,13 @@ export const AuthModalContent: ModalContent = ({hideModal}) => {
 						<div className="submitRow">
 							<input
 								type="submit"
-								className="button register"
+								className="button register blob"
 								value="Register / Login"
 								disabled={inputsDisabled}
 							/>
 							<input
 								type="button"
-								className="button resetPassword"
+								className="button resetPassword blob"
 								value="Reset Password"
 								disabled={inputsDisabled}
 								onClick={handleResetPassword}
@@ -119,7 +126,7 @@ export const AuthModalContent: ModalContent = ({hideModal}) => {
 				<div className="modalSectionContent providers">
 					<button
 						type="button"
-						className="button google"
+						className="button google corgiButton"
 						disabled={inputsDisabled}
 						onClick={async () => handleProviderLogin(
 							firebase.auth.GoogleAuthProvider)}
@@ -129,7 +136,7 @@ export const AuthModalContent: ModalContent = ({hideModal}) => {
 					</button>
 					{/* <button
 						type="button"
-						className="button facebook"
+						className="button facebook corgiButton"
 						disabled={inputsDisabled}
 						onClick={async () => handleProviderLogin(
 							firebase.auth.FacebookAuthProvider)}
@@ -162,7 +169,7 @@ export const AuthModalContent: ModalContent = ({hideModal}) => {
 		promise: Promise<firebase.auth.UserCredential>,
 	) {
 		return promise
-			.then(() => dispatch(chatSystemMessage('Logged in!')))
+			.then(() => dispatch(chatSystemMessage('Logged in!', 'success')))
 			.then(handleAuthSuccess)
 			.catch(handleAuthError)
 	}

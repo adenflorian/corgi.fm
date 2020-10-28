@@ -1,27 +1,31 @@
 /* eslint-disable react/no-array-index-key */
 import {stripIndents} from 'common-tags'
-import {Map} from 'immutable'
 import moment from 'moment'
 import React from 'react'
-import {IoMdFolder} from 'react-icons/io'
+import {FiFolder} from 'react-icons/fi'
 import {useDispatch} from 'react-redux'
-import {loadRoom, ModalId, SavedRoom} from '@corgifm/common/redux'
-import {getOrCreateLocalSavesStorage, localActions} from '../local-middleware'
+import {
+	loadRoom, ModalId, SavedRoom, localActions,
+	getRoomTypeFriendlyString,
+} from '@corgifm/common/redux'
+import {getOrCreateLocalSavesStorage} from '../local-middleware'
 import {ModalButton} from '../Modal/ModalButton'
 import {ModalContent} from '../Modal/ModalManager'
 import './SavingAndLoading.less'
+import {CssColor} from '@corgifm/common/shamu-color'
+import {RoomType} from '@corgifm/common/common-types'
 
 export function LoadRoomModalButton() {
 	return (
 		<ModalButton
 			label="Load Room"
 			modalId={ModalId.LoadRoom}
-			icon={IoMdFolder}
+			icon={FiFolder}
 		/>
 	)
 }
 
-export const LoadRoomModalContent: ModalContent = () => {
+export const LoadRoomModalContent: ModalContent = ({hideModal}) => {
 	const [saveStorage, setSaveStorage] = React.useState(getOrCreateLocalSavesStorage())
 	const dispatch = useDispatch()
 
@@ -44,12 +48,19 @@ export const LoadRoomModalContent: ModalContent = () => {
 						const saveName = `${saveData.saveDateTime} - ${saveData.room} - v${saveData.saveClientVersion || '?'}`
 						const version = saveData.saveClientVersion || '?'
 						const date = moment(saveData.saveDateTime).calendar()
-						const onClick = () => dispatch(loadRoom(saveData))
+						const onClick = () => {
+							dispatch(loadRoom(saveData))
+							hideModal()
+						}
+						const type = saveData.roomType
+						const isExp = type === RoomType.Experimental
+						const typeString = getRoomTypeFriendlyString(type)
 						return (
 							<div key={saveId as string} className="localSave">
 								<div className="load">
 									<div className="room" title={`Load ${saveData.room}`} onClick={onClick}>{saveData.room}</div>
 									<div className="date" title={date} onClick={onClick}>{date}</div>
+									<div className="type" title={typeString} onClick={onClick} style={{color: isExp ? CssColor.orange : undefined}}>{typeString}</div>
 									<div className="version" title={`Version ${version}`} onClick={onClick}>{version}</div>
 								</div>
 								<div

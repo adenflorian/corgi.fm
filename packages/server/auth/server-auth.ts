@@ -9,7 +9,7 @@ admin.initializeApp(getFirebaseServerConfig())
 export async function verifyAuthHeader(
 	authHeaderValue: string
 ): Promise<AuthResult> {
-	const jwt = authHeaderValue.replace(/Bearer /, '')
+	const jwt = getJwtFromAuthHeaderValue(authHeaderValue)
 
 	return admin.auth().verifyIdToken(jwt)
 		.then((decodedToken): AuthResult => {
@@ -26,6 +26,10 @@ export async function verifyAuthHeader(
 				uid: '',
 			}
 		})
+}
+
+function getJwtFromAuthHeaderValue(authHeaderValue: string) {
+	return authHeaderValue.replace(/Bearer /, '')
 }
 
 interface AuthResult {

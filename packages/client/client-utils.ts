@@ -1,5 +1,6 @@
 import packageJson from './package.json'
 import {isLocalDevClient, isTestClient} from './is-prod-client'
+import {CorgiNumberChangedEvent} from './Experimental/CorgiEvents'
 
 /** @param buttons The buttons property from a mouse event */
 export function isLeftMouseButtonDown(buttons: number): boolean {
@@ -55,10 +56,18 @@ export function getUrl() {
 
 export function getCdnUrl() {
 	if (isLocalDevClient()) {
-		return `https://cdn.test.corgi.fm/dev`
+		return `https://cdn.test.corgi.fm/dev/`
 	} else if (isTestClient()) {
-		return `https://cdn.test.corgi.fm/test`
+		return `https://cdn.test.corgi.fm/test/`
 	} else {
-		return `https://cdn.test.corgi.fm/prod`
+		return `https://cdn.test.corgi.fm/prod/`
 	}
 }
+
+export function isInputFocused() {
+	return document.activeElement
+		? ['input', 'textarea'].includes(document.activeElement.tagName.toLowerCase())
+		: false
+}
+
+export const constant1 = new CorgiNumberChangedEvent(1)

@@ -8,6 +8,8 @@ interface Props {
 export const ActualKnob = React.memo(function _ActualKnob(props: Props) {
 	const {percentage} = props
 
+	if (isNaN(percentage)) console.error('percentage isNaN: ', {percentage})
+
 	const size = 32
 
 	return (
@@ -23,42 +25,38 @@ export const ActualKnob = React.memo(function _ActualKnob(props: Props) {
 				width="100%"
 				height="100%"
 				xmlns="http://www.w3.org/2000/svg"
-				style={{
-					position: 'absolute',
-					overflow: 'visible',
-					transform: `rotate(90deg)`,
-					strokeLinecap: 'round',
-				}}
 			>
+				<g transform="rotate(90, 16, 16)">
+					<circle
+						cx="50%"
+						cy="50%"
+						r="64%"
+						fill="none"
+						stroke={CssColor.panelGrayLight}
+						strokeWidth="1"
+						strokeDasharray={`0 50% ${1 * 308.2}% 100000`}
+						strokeDashoffset="1"
+					/>
+					<circle
+						cx="50%"
+						cy="50%"
+						r="64%"
+						fill="none"
+						stroke="currentColor"
+						strokeWidth="2"
+						strokeDasharray={`0 50% ${percentage * 308.2}% 100000`}
+						strokeDashoffset="1"
+					/>
+				</g>
 				<circle
 					cx="50%"
-					cy="50%"
-					r="64%"
-					fill="none"
-					stroke={CssColor.panelGrayLight}
-					strokeWidth="3"
-					strokeDasharray={`0 50% ${1 * 308.2}% 100000`}
-					strokeDashoffset="1"
-				/>
-				<circle
-					cx="50%"
-					cy="50%"
-					r="64%"
-					fill="none"
-					stroke="currentColor"
-					strokeWidth="3"
-					strokeDasharray={`0 50% ${percentage * 308.2}% 100000`}
-					strokeDashoffset="1"
+					cy="6.25%"
+					r="6.25%"
+					fill="currentColor"
+					stroke="none"
+					transform={`rotate(${_getRotation(percentage)}, 16, 16)`}
 				/>
 			</svg>
-			<div
-				className="actualKnob"
-				style={{
-					transform: `rotate(${_getRotation(percentage)}deg)`,
-				}}
-			>
-				<div className="mark" style={{backgroundColor: 'currentColor', borderRadius: 2}} />
-			</div>
 		</div>
 	)
 })

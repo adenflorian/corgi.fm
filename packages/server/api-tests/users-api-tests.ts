@@ -7,7 +7,7 @@ import {
 	VerifyAuthHeaderMock,
 	emailNotVerifiedUidA, emptyObjectBodyRequest, fakeTokenRequest,
 	validTokenUnverifiedEmailUidARequest, validTokenVerifiedEmailUidARequest,
-	uidZ, uidA, putValidationTests,
+	uidZ, uidA, putValidationTests, missingAuthHeaderResponse,
 } from './api-test-common'
 
 const notAuthorizedToAccessUser = /not authorized to access this user/
@@ -62,9 +62,7 @@ export function getUserApiTests(
 			path(uidA, [
 				get({
 					name: 'user not in DB',
-					status: 404,
-					contentType: ContentTypes.ApplicationJson,
-					resBody: userNotFound,
+					status: 204,
 				}),
 			]),
 			path(uidA, [
@@ -102,7 +100,7 @@ export function getUserApiTests(
 				authorized: false,
 				status: 401,
 				contentType: ContentTypes.ApplicationJson,
-				resBody: /missing authorization header/,
+				resBody: missingAuthHeaderResponse,
 			}),
 			put({
 				name: 'invalid Authorization header',

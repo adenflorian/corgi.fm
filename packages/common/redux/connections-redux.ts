@@ -1,16 +1,16 @@
-import {List, Map, Set} from 'immutable'
-import {combineReducers, Reducer} from 'redux'
+import {List, Map} from 'immutable'
 import {createSelector} from 'reselect'
 import {ActionType} from 'typesafe-actions'
 import * as uuid from 'uuid'
 import {ConnectionNodeType} from '../common-types'
-import {IMidiNotes} from '../MidiNote'
 import {CssColor, mixColors} from '../shamu-color'
+import {emptyList} from '../common-utils'
 import {selectOption, AppOptions} from './options-redux'
 import {IClientAppState} from './common-redux-types'
 import {
-	BROADCASTER_ACTION, getConnectionNodeInfo, IClientRoomState,
+	BROADCASTER_ACTION, findNodeInfo, IClientRoomState,
 	selectVirtualKeyboardById, SERVER_ACTION, VirtualKeyboardState,
+	selectPosition,
 } from '.'
 
 export const connectionsActions = {
@@ -40,22 +40,21 @@ export const connectionsActions = {
 		connections,
 		BROADCASTER_ACTION,
 	} as const),
-	update: (id: Id, connection: Partial<IConnection>) => ({
-		type: 'UPDATE_CONNECTION',
+	updateSource: (id: Id, connectionSourceInfo: Pick<IConnection, 'sourceId' | 'sourcePort' | 'sourceType'>) => ({
+		type: 'UPDATE_CONNECTION_SOURCE',
 		id,
-		connection,
+		connectionSourceInfo,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	} as const),
+	updateTarget: (id: Id, connectionTargetInfo: Pick<IConnection, 'targetId' | 'targetPort' | 'targetType'>) => ({
+		type: 'UPDATE_CONNECTION_TARGET',
+		id,
+		connectionTargetInfo,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	} as const),
 } as const
-
-export interface IConnectionsState {
-	connections: IConnections
-}
-
-export type IConnections = Map<Id, IConnection>
-
-export const Connections = Map
 
 export interface IConnection {
 	sourceId: Id
@@ -85,8 +84,8 @@ export class Connection implements IConnection {
 		public readonly sourceType: ConnectionNodeType,
 		public readonly targetId: Id,
 		public readonly targetType: ConnectionNodeType,
-		public readonly sourcePort: ConnectionPortId = 0,
-		public readonly targetPort: ConnectionPortId = 0,
+		public readonly sourcePort: ConnectionPortId,
+		public readonly targetPort: ConnectionPortId,
 	) {}
 }
 
@@ -94,101 +93,290 @@ export type ConnectionPortId = number
 
 export type IConnectionAction = ActionType<typeof connectionsActions>
 
-const connectionsSpecificReducer: Reducer<IConnections, IConnectionAction> =
-	(connections = Connections(), action) => {
-		switch (action.type) {
-			case 'ADD_CONNECTION': return connections.set(action.connection.id, action.connection)
-			case 'ADD_CONNECTIONS': return connections.concat(action.connections.reduce((map, val) => map.set(val.id, val), Map<Id, IConnection>()))
-			case 'DELETE_CONNECTIONS': return connections.deleteAll(action.connectionIds)
-			case 'DELETE_ALL_CONNECTIONS': return connections.clear()
-			case 'REPLACE_CONNECTIONS': return Map<Id, IConnection>().merge(action.connections)
-			case 'UPDATE_CONNECTION': return connections.update(action.id, x => ({...x, ...action.connection}))
-			default: return connections
-		}
-	}
+type NodeConnectionsInfos = IConnectionsState['nodeInfos']
 
-export const connectionsReducer: Reducer<IConnectionsState, any> = combineReducers({
-	connections: connectionsSpecificReducer,
+export type IConnections = Map<Id, IConnection>
+
+const defaultNodeConnectionsInfo = Object.freeze({
+	leftConnections: Map<number, List<Id>>(),
+	rightConnections: Map<number, List<Id>>(),
 })
 
-export const selectAllConnections = (state: IClientRoomState) =>
-	state.connections.connections
+export type NodeConnectionsInfo = typeof defaultNodeConnectionsInfo
 
-export const selectConnection = (state: IClientRoomState, id: Id) =>
-	selectAllConnections(state).get(id) || Connection.dummy
+const makeInitialState = () => ({
+	connections: Map<Id, IConnection>(),
+	nodeInfos: Map<Id, NodeConnectionsInfo>(),
+})
 
-export const selectSourceByConnectionId = (state: IClientRoomState, id: Id): VirtualKeyboardState =>
-	selectVirtualKeyboardById(state, selectConnection(state, id)!.sourceId)
+const makeNodeInfos = () => Map<Id, NodeConnectionsInfo>()
+
+export interface IConnectionsState extends ReturnType<typeof makeInitialState> {}
+
+export function connectionsReducer(state = makeInitialState(), action: IConnectionAction): IConnectionsState {
+	switch (action.type) {
+		case 'ADD_CONNECTION': return {
+			...state,
+			connections: state.connections.set(action.connection.id, action.connection),
+			nodeInfos: updateNodeInfosWithNewConnection(state.nodeInfos, action.connection),
+		}
+		case 'ADD_CONNECTIONS': return {
+			...state,
+			connections: state.connections.concat(action.connections.reduce((map, val) => map.set(val.id, val), Map<Id, IConnection>())),
+			nodeInfos: updateNodeInfosWithNewConnections(state.nodeInfos, action.connections),
+		}
+		case 'DELETE_CONNECTIONS': {
+			const deletedConnections = state.connections.filter(x => action.connectionIds.includes(x.id))
+			return {
+				...state,
+				connections: state.connections.deleteAll(action.connectionIds),
+				nodeInfos: updateNodeInfosWithDeletedConnections(state.nodeInfos, deletedConnections),
+			}
+		}
+		case 'DELETE_ALL_CONNECTIONS': return {
+			...state,
+			connections: state.connections.clear(),
+			nodeInfos: makeNodeInfos(),
+		}
+		case 'REPLACE_CONNECTIONS': {
+			const connections = Map<Id, IConnection>().merge(action.connections)
+			return {
+				connections,
+				nodeInfos: updateNodeInfosWithNewConnections(makeNodeInfos(), connections.toList()),
+			}
+		}
+		case 'UPDATE_CONNECTION_SOURCE': {
+			const connection = state.connections.get(action.id, null)
+			if (!connection) return state
+			const updatedConnection = {...connection, ...action.connectionSourceInfo}
+			return {
+				...state,
+				connections: state.connections.set(action.id, updatedConnection),
+				nodeInfos: updateNodeInfosWithUpdatedConnectionSource(state.nodeInfos, connection, updatedConnection),
+			}
+		}
+		case 'UPDATE_CONNECTION_TARGET': {
+			const connection = state.connections.get(action.id, null)
+			if (!connection) return state
+			const updatedConnection = {...connection, ...action.connectionTargetInfo}
+			return {
+				...state,
+				connections: state.connections.set(action.id, updatedConnection),
+				nodeInfos: updateNodeInfosWithUpdatedConnectionTarget(state.nodeInfos, connection, updatedConnection),
+			}
+		}
+		default: return state
+	}
+}
+
+function updateNodeInfosWithUpdatedConnectionSource(nodeInfos: NodeConnectionsInfos, previousConnection: IConnection, updatedConnection: IConnection): NodeConnectionsInfos {
+	return nodeInfos
+		.update(previousConnection.sourceId, defaultNodeConnectionsInfo, deleteNodeRightConnection(previousConnection))
+		.update(updatedConnection.sourceId, defaultNodeConnectionsInfo, addNodeRightConnection(updatedConnection))
+}
+
+function updateNodeInfosWithUpdatedConnectionTarget(nodeInfos: NodeConnectionsInfos, previousConnection: IConnection, updatedConnection: IConnection): NodeConnectionsInfos {
+	return nodeInfos
+		.update(previousConnection.targetId, defaultNodeConnectionsInfo, deleteNodeLeftConnection(previousConnection))
+		.update(updatedConnection.targetId, defaultNodeConnectionsInfo, addNodeLeftConnection(updatedConnection))
+}
+
+function updateNodeInfosWithDeletedConnections(nodeInfos: NodeConnectionsInfos, deletedConnections: IConnections): NodeConnectionsInfos {
+	return deletedConnections.reduce(updateNodeInfosWithDeletedConnection, nodeInfos)
+}
+
+function updateNodeInfosWithDeletedConnection(nodeInfos: NodeConnectionsInfos, deletedConnection: IConnection): NodeConnectionsInfos {
+	return nodeInfos
+		.update(deletedConnection.sourceId, defaultNodeConnectionsInfo, deleteNodeRightConnection(deletedConnection))
+		.update(deletedConnection.targetId, defaultNodeConnectionsInfo, deleteNodeLeftConnection(deletedConnection))
+}
+
+function updateNodeInfosWithNewConnections(nodeInfos: NodeConnectionsInfos, connections: List<IConnection>): NodeConnectionsInfos {
+	return connections.reduce(updateNodeInfosWithNewConnection, nodeInfos)
+}
+
+// function deserializeNodeInfos(nodeInfos: NodeConnectionsInfos): NodeConnectionsInfos {
+// 	return Map<Id, NodeConnectionsInfo>().merge(nodeInfos).map(deserializeNodeInfo)
+// }
+
+// function deserializeNodeInfo(nodeInfo: NodeConnectionsInfo): NodeConnectionsInfo {
+// 	return {
+// 		leftConnections: Map<number, List<Id>>().merge(nodeInfo.leftConnections).map(x => List(x)),
+// 		rightConnections: Map<number, List<Id>>().merge(nodeInfo.rightConnections).map(x => List(x)),
+// 	}
+// }
+
+const updateNodeInfosWithNewConnection = (nodeInfos: NodeConnectionsInfos, connection: IConnection): NodeConnectionsInfos => {
+	return nodeInfos
+		.update(connection.sourceId, defaultNodeConnectionsInfo, addNodeRightConnection(connection))
+		.update(connection.targetId, defaultNodeConnectionsInfo, addNodeLeftConnection(connection))
+}
+
+const addNodeRightConnection = (connection: IConnection) => (x: NodeConnectionsInfo): NodeConnectionsInfo => {
+	return {
+		...x,
+		rightConnections: x.rightConnections.update(connection.sourcePort, List(), addConnectionToConnections(connection)),
+	}
+}
+
+const addNodeLeftConnection = (connection: IConnection) => (x: NodeConnectionsInfo): NodeConnectionsInfo => {
+	return {
+		...x,
+		leftConnections: x.leftConnections.update(connection.targetPort, List(), addConnectionToConnections(connection)),
+	}
+}
+
+const addConnectionToConnections = (connection: IConnection) => (connectionIds: List<Id>): List<Id> => {
+	return connectionIds.push(connection.id)
+}
+
+const deleteNodeRightConnection = (connection: IConnection) => (x: NodeConnectionsInfo): NodeConnectionsInfo => {
+	return {
+		...x,
+		rightConnections: x.rightConnections.update(connection.sourcePort, List(), removeConnectionToConnections(connection)),
+	}
+}
+
+const deleteNodeLeftConnection = (connection: IConnection) => (x: NodeConnectionsInfo): NodeConnectionsInfo => {
+	return {
+		...x,
+		leftConnections: x.leftConnections.update(connection.targetPort, List(), removeConnectionToConnections(connection)),
+	}
+}
+
+const removeConnectionToConnections = (connection: IConnection) => (connectionIds: List<Id>): List<Id> => {
+	return connectionIds.filter(x => x !== connection.id)
+}
+
+export function selectAllConnections(state: IClientRoomState) {
+	return state.connections.connections
+}
+
+export function selectAllNodeConnectionInfos(state: IClientRoomState) {
+	return state.connections.nodeInfos
+}
+
+export function selectNodeConnectionInfosForNode(state: IClientRoomState, nodeId: Id): NodeConnectionsInfo {
+	return selectAllNodeConnectionInfos(state).get(nodeId, defaultNodeConnectionsInfo)
+}
+
+export function selectConnectionIdsForNodeLeftPort(state: IClientRoomState, nodeId: Id, port: number): List<Id> {
+	return selectNodeConnectionInfosForNode(state, nodeId).leftConnections.get(port, emptyList)
+}
+
+export function selectConnectionIdsForNodeRightPort(state: IClientRoomState, nodeId: Id, port: number): List<Id> {
+	return selectNodeConnectionInfosForNode(state, nodeId).rightConnections.get(port, emptyList)
+}
+
+export function selectConnection(state: IClientRoomState, id: Id) {
+	return selectAllConnections(state).get(id) || Connection.dummy
+}
+
+export function selectSourceByConnectionId(state: IClientRoomState, id: Id): VirtualKeyboardState {
+	return selectVirtualKeyboardById(state, selectConnection(state, id)!.sourceId)
+}
 
 export const selectAllConnectionIds = createSelector(
 	selectAllConnections,
-	connections => connections.keySeq().toArray(),
+	function _selectAllConnectionIds(connections) {
+		return connections.keySeq().toArray()
+	}
 )
 
 export const selectSortedConnections = createSelector(
 	selectAllConnections,
-	connections => connections.sort(sortConnection).toList(),
+	function _selectSortedConnections(connections) {
+		return connections.sort(sortConnection).toList()
+	}
 )
 
-export const selectConnectionsWithSourceOrTargetIds = (state: IClientRoomState, sourceOrTargetIds: Id[]) => {
+export function selectConnectionIdsOnPortOnNodeLeft(state: IClientRoomState, nodeId: Id, port: number) {
+	return selectNodeConnectionInfosForNode(state, nodeId).leftConnections.get(port, emptyList)
+}
+
+export function selectConnectionIdsOnPortOnNodeRight(state: IClientRoomState, nodeId: Id, port: number) {
+	return selectNodeConnectionInfosForNode(state, nodeId).leftConnections.get(port, emptyList)
+}
+
+// TODO Use node infos
+export function selectConnectionsWithSourceOrTargetIds(state: IClientRoomState, sourceOrTargetIds: Id[]) {
 	return selectAllConnections(state)
 		.filter(x => sourceOrTargetIds.includes(x.sourceId) || sourceOrTargetIds.includes(x.targetId))
 }
 
-export const selectConnectionsWithTargetIds2 = (connections: IConnections, targetIds: Id[]) => {
-	return connections.filter(x => targetIds.includes(x.targetId))
+// TODO Use node infos
+export function selectConnectionsWithTargetIds2(connections: IConnections, targetId: Id) {
+	return connections.filter(x => x.targetId === targetId)
 }
 
-export const selectConnectionsWithTargetIds = (state: IClientRoomState, targetIds: Id[]) => {
-	return selectConnectionsWithTargetIds2(selectAllConnections(state), targetIds)
+export function selectConnectionsWithTargetIds(state: IClientRoomState, targetId: Id) {
+	// return selectNodeConnectionInfosForNode(state, targetId).leftConnections.reduce((result, id) => result.set(id, selectConnection(state, id)), emptyMap as IConnections)
+	return selectConnectionsWithTargetIds2(selectAllConnections(state), targetId)
 }
 
-export const selectConnectionsWithSourceIds2 = (connections: IConnections, sourceIds: Id[]) => {
+// TODO Use node infos
+export function selectConnectionsWithSourceId2(connections: IConnections, sourceId: Id) {
+	return connections.filter(x => x.sourceId === sourceId)
+}
+
+export function selectConnectionsWithSourceId(state: IClientRoomState, sourceId: Id) {
+	return selectConnectionsWithSourceId2(selectAllConnections(state), sourceId)
+}
+
+// TODO Use node infos
+export function selectConnectionsWithSourceIds2(connections: IConnections, sourceIds: Id[]) {
 	return connections.filter(x => sourceIds.includes(x.sourceId))
 }
 
-export const selectConnectionsWithSourceIds = (state: IClientRoomState, sourceIds: Id[]) => {
+export function selectConnectionsWithSourceIds(state: IClientRoomState, sourceIds: Id[]) {
 	return selectConnectionsWithSourceIds2(selectAllConnections(state), sourceIds)
 }
 
-export const selectFirstConnectionByTargetId = (state: IClientRoomState, targetId: Id) =>
-	selectAllConnections(state)
-		.find(x => x.targetId === targetId) || Connection.dummy
+export function doesConnectionBetweenNodesExist(
+	state: IClientRoomState, sourceId: Id, sourcePort: number, targetId: Id, targetPort: number
+): boolean {
+	const a = selectConnectionIdsForNodeRightPort(state, sourceId, sourcePort)
+	const b = selectConnectionIdsForNodeLeftPort(state, targetId, targetPort)
+	return a.some(x => b.includes(x))
+}
 
-export const selectFirstConnectionIdByTargetId = (state: IClientRoomState, targetId: Id): Id => {
+export function selectFirstConnectionByTargetId(state: IClientRoomState, targetId: Id) {
+	return selectAllConnections(state)
+		.find(x => x.targetId === targetId) || Connection.dummy
+}
+
+export function selectFirstConnectionIdByTargetId(state: IClientRoomState, targetId: Id): Id {
 	const conn = selectFirstConnectionByTargetId(state, targetId)
 	return conn ? conn.id : 'fakeConnectionId'
 }
 
-export const createSelectPlaceholdersInfo = () => createSelector(
-	(state: IClientRoomState, _: any) => selectAllConnections(state),
-	(_, parentId: Id) => parentId,
-	(allConnections, parentId: Id) => {
-		return {
-			leftConnections: selectConnectionsWithTargetIds2(allConnections, [parentId]),
-			rightConnections: selectConnectionsWithSourceIds2(allConnections, [parentId]),
-		}
-	},
-)
-
 const colorIfLowGraphics = CssColor.blue
 
+export function createSmartNodeColorSelector(id: Id) {
+	return (state: IClientAppState) => selectConnectionSourceColorByTargetId(state, id)
+}
+
 /** For use by a node */
-export const selectConnectionSourceColorByTargetId =
-	(state: IClientAppState, targetId: Id, processedIds = List<Id>()): string => {
-		if (!selectOption(state, AppOptions.graphicsMultiColoredConnections)) return colorIfLowGraphics
+export function selectConnectionSourceColorByTargetId(
+	state: IClientAppState, targetId: Id, processedIds = List<Id>(),
+): string {
+	if (!selectOption(state, AppOptions.graphicsMultiColoredConnections)) return colorIfLowGraphics
 
-		const connections = selectAllConnections(state.room).filter(x => x.targetId === targetId)
+	const connections = selectConnectionsWithTargetIds(state.room, targetId)
 
-		if (connections.count() === 0) return makeConnectionSourceColorSelector(state, processedIds)(Connection.dummy)
+	const positionColor = selectPosition(state.room, targetId).color
 
-		const colors = connections.map(makeConnectionSourceColorSelector(state, processedIds))
+	if (typeof positionColor === 'string') return positionColor
 
-		return mixColors(colors.toList())
-	}
+	if (connections.count() === 0) return CssColor.disabledGray
+
+	const colors = connections.map(makeConnectionSourceColorSelector(state, processedIds))
+
+	return mixColors(colors.toList())
+}
 
 /** For use by a connection */
-export const selectConnectionSourceColor = (state: IClientAppState, id: Id): string => {
+export function selectConnectionSourceColor(state: IClientAppState, id: Id): string {
 	if (!selectOption(state, AppOptions.graphicsMultiColoredConnections)) return colorIfLowGraphics
 	const connection = selectConnection(state.room, id)
 
@@ -196,12 +384,12 @@ export const selectConnectionSourceColor = (state: IClientAppState, id: Id): str
 }
 
 const makeConnectionSourceColorSelector =
-	(state: IClientAppState, processedIds = List<Id>()) => (connection: IConnection): string => {
+	(state: IClientAppState, processedIds = List<Id>()) => function _makeConnectionSourceColorSelector(connection: IConnection): string {
 		// If in a loop
 		if (processedIds.contains(connection.id)) return CssColor.disabledGray
 
 		return (
-			tryGetColorFromState(getConnectionNodeInfo(connection.sourceType).stateSelector(state.room, connection.sourceId).color, connection.sourcePort)
+			tryGetColorFromState(selectPosition(state.room, connection.sourceId).color, connection.sourcePort)
 			||
 			selectConnectionSourceColorByTargetId(state, connection.sourceId, processedIds.push(connection.id))
 		)
@@ -213,35 +401,19 @@ function tryGetColorFromState(colorFromState: string | false | List<string>, por
 	return colorFromState.get(portNumber, CssColor.defaultGray)
 }
 
-/** For use by a node */
-export const selectConnectionSourceNotesByTargetId = (state: IClientRoomState, targetId: Id, onlyFromKeyboards = false): IMidiNotes => {
-	const connections = selectConnectionsWithTargetIds(state, [targetId])
-		.filter(x => x.sourceType === ConnectionNodeType.virtualKeyboard || !onlyFromKeyboards)
-
-	if (connections.count() === 0) return makeConnectionSourceNotesSelector(state)(Connection.dummy)
-
-	const notes = connections.map(makeConnectionSourceNotesSelector(state))
-
-	return Set.union(notes.toList())
-}
-
-export const selectConnectionSourceIdsByTarget = (state: IClientRoomState, targetId: Id): List<Id> => {
-	return selectConnectionsWithTargetIds(state, [targetId])
+export function selectConnectionSourceIdsByTarget(state: IClientRoomState, targetId: Id): List<Id> {
+	return selectConnectionsWithTargetIds(state, targetId)
 		.toList()
 		.map(x => x.sourceId)
 }
 
-const makeConnectionSourceNotesSelector = (roomState: IClientRoomState) => (connection: IConnection): IMidiNotes => {
-	return getConnectionNodeInfo(connection.sourceType).selectActiveNotes(roomState, connection.sourceId)
-}
-
 // TODO Handle multiple ancestor connections
-export const selectConnectionSourceIsActive = (roomState: IClientRoomState, id: Id, processedIds = List<Id>()): boolean => {
+export function selectConnectionSourceIsActive(roomState: IClientRoomState, id: Id, processedIds = List<Id>()): boolean {
 	if (processedIds.contains(id)) return false
 
 	const connection = selectConnection(roomState, id)
 
-	const isPlaying = getConnectionNodeInfo(connection.sourceType).selectIsActive(roomState, connection.sourceId)
+	const isPlaying = findNodeInfo(connection.sourceType).selectIsActive(roomState, connection.sourceId)
 
 	if (isPlaying !== null) {
 		return isPlaying
@@ -254,12 +426,12 @@ export const selectConnectionSourceIsActive = (roomState: IClientRoomState, id: 
 }
 
 // TODO Handle multiple ancestor connections
-export const selectConnectionSourceIsSending = (roomState: IClientRoomState, id: Id, processedIds = List<Id>()): boolean => {
+export function selectConnectionSourceIsSending(roomState: IClientRoomState, id: Id, processedIds = List<Id>()): boolean {
 	if (processedIds.contains(id)) return false
 
 	const connection = selectConnection(roomState, id)
 
-	const isSending = getConnectionNodeInfo(connection.sourceType).selectIsSending(roomState, connection.sourceId)
+	const isSending = findNodeInfo(connection.sourceType).selectIsSending(roomState, connection.sourceId)
 
 	if (isSending !== null) {
 		return isSending
@@ -282,20 +454,16 @@ export function sortConnection(connA: IConnection, connB: IConnection) {
 	}
 }
 
-export const selectConnectionStackOrderForTarget = (roomState: IClientRoomState, id: Id) => {
+export function selectConnectionStackOrderForTarget(roomState: IClientRoomState, id: Id) {
 	const connection = selectConnection(roomState, id)
-	const connections = selectConnectionsWithTargetIds(roomState, [connection.targetId])
-		.filter(x => x.targetPort === connection.targetPort)
-	return connections.toIndexedSeq().indexOf(connection)
+	return selectConnectionIdsForNodeLeftPort(roomState, connection.targetId, connection.targetPort).indexOf(connection.id)
 }
 
-export const selectConnectionStackOrderForSource = (roomState: IClientRoomState, id: Id) => {
+export function selectConnectionStackOrderForSource(roomState: IClientRoomState, id: Id) {
 	const connection = selectConnection(roomState, id)
-	const connections = selectConnectionsWithSourceIds(roomState, [connection.sourceId])
-		.filter(x => x.sourcePort === connection.sourcePort)
-	return connections.toIndexedSeq().indexOf(connection)
+	return selectConnectionIdsForNodeRightPort(roomState, connection.sourceId, connection.sourcePort).indexOf(connection.id)
 }
 
-export const calculateConnectorPositionY = (parentY: number, parentHeight: number, portCount: number, port: number) => {
+export function calculateConnectorPositionY(parentY: number, parentHeight: number, portCount: number, port: number) {
 	return parentY + ((parentHeight / (1 + portCount)) * (port + 1))
 }

@@ -3,6 +3,8 @@
 // It controls the module load order
 
 export * from './multi-reducer'
+export * from './local-actions'
+export * from './exp-local-actions'
 export * from './client-info-redux'
 export * from './pointers-redux'
 export * from './sequencer-redux'
@@ -14,6 +16,10 @@ export * from './audio-redux'
 export * from './auth-redux'
 export * from './in-progress-redux'
 export * from './modals-redux'
+export * from './animation-redux'
+export * from './upload-redux'
+export * from './local-user-redux'
+export * from './other-redux'
 
 export * from './redux-utils'
 export * from './websocket-redux'
@@ -35,7 +41,9 @@ export * from './configure-server-store'
 // Sequencers
 export * from './infinite-sequencers-redux'
 export * from './grid-sequencers-redux'
+export * from './better-sequencers-redux'
 export * from './group-sequencers-redux'
+export * from './recording-redux'
 
 export * from './node-types'
 export * from './options-redux'
@@ -44,6 +52,16 @@ export * from './positions-redux'
 export * from './room-members-redux'
 export * from './shamu-graph'
 
+export * from './experimental'
+
+export * from './dummy-activity-redux'
+export * from './normal-activity-redux'
+
+export * from './activity-redux'
+
+export * from './room-info-redux'
+
+// Any room reducers need to be before room-stores-redux
 export * from './room-stores-redux'
 export * from './rooms-redux'
 

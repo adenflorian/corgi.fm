@@ -2,17 +2,20 @@ import React from 'react'
 import {GhostConnections, selectGhostConnectionsState, shamuConnect} from '@corgifm/common/redux'
 import {ConnectedGhostConnectionView} from './GhostConnectionView'
 
+interface Props {
+}
+
 interface ReduxProps {
 	ghostConnections: GhostConnections
 }
 
-export function GhostConnectionsView({ghostConnections}: ReduxProps) {
+export function GhostConnectionsView({ghostConnections}: ReduxProps & Props) {
 	return (
 		<div className="connection">
 			{ghostConnections.map(ghostConnection => {
 				return (
 					<ConnectedGhostConnectionView
-						key={ghostConnection.id}
+						key={ghostConnection.id.toString()}
 						id={ghostConnection.id}
 					/>
 				)

@@ -1,4 +1,5 @@
 import {Set} from 'immutable'
+import {BuiltInBQFilterType} from '@corgifm/common/OscillatorTypes'
 import {applyEnvelope, calculateScheduledEnvelope, IScheduledEnvelope} from './envelope'
 import {OnEndedCallback} from '.'
 
@@ -14,8 +15,10 @@ export abstract class Voice {
 	protected _audioContext: AudioContext
 	protected _destination: AudioNode
 	protected _releaseId: Id = ''
-	// protected readonly _lowPassFilter: BiquadFilterNode
+	protected _filter: BiquadFilterNode
 	protected _gain: GainNode
+	protected _masterGain: GainNode
+	protected _pan: StereoPannerNode
 	protected _isReleaseScheduled = false
 	protected _scheduledAttackStartTimeSeconds = 0
 	protected _scheduledAttackEndTimeSeconds = 0
@@ -25,7 +28,6 @@ export abstract class Voice {
 	protected _scheduledSustainAtReleaseEnd = 0
 	protected _scheduledReleaseStartTimeSeconds = Number.MAX_VALUE
 	protected _scheduledReleaseEndTimeSeconds = Number.MAX_VALUE
-	protected _sustainLevel = 1
 	protected _scheduledEnvelope: IScheduledEnvelope | undefined
 	protected _detune: number = 0
 	protected _ended = false
@@ -34,9 +36,15 @@ export abstract class Voice {
 		audioContext: AudioContext,
 		destination: AudioNode,
 		onEnded: OnEndedCallback,
+		public readonly _attackTimeInSeconds: number,
+		public readonly _decayTimeInSeconds: number,
+		public readonly _sustain: number,
 		detune: number,
-		lowPassFilterCutoffFrequency: number,
+		filterCutoff: number,
+		filterType: BuiltInBQFilterType,
 		protected readonly _invincible: boolean,
+		masterGainAmount: number = 0.5,
+		pan: number = 0,
 	) {
 		this.id = Voice._nextId++
 		this._audioContext = audioContext
@@ -44,13 +52,16 @@ export abstract class Voice {
 		this._onEnded = onEnded
 		this._detune = detune
 
-		// this._lowPassFilter = this._audioContext.createBiquadFilter()
-		// this._lowPassFilter.type = 'lowpass'
-		// this._lowPassFilter.frequency.value = lowPassFilterCutoffFrequency
+		this._filter = this._audioContext.createBiquadFilter()
+		this._filter.type = filterType
+		this._filter.frequency.value = filterCutoff
 
 		this._gain = this._audioContext.createGain()
+		this._masterGain = this._audioContext.createGain()
+		this._pan = this._audioContext.createStereoPanner()
 
-		// this._lowPassFilter.connect(this._gain)
+		this._masterGain.gain.value = masterGainAmount
+		this._pan.pan.value = pan
 	}
 
 	public get scheduledAttackStartTime() {return this._scheduledAttackStartTimeSeconds}
@@ -78,20 +89,35 @@ export abstract class Voice {
 		this.getAudioScheduledSourceNode()!.detune.value = detune
 	}
 
-	// eslint-disable-next-line class-methods-use-this
 	public setLowPassFilterCutoffFrequency(frequency: number) {
-		// if (frequency === this._lowPassFilter.frequency.value) return
+		if (frequency === this._filter.frequency.value) return
 
-		// this._lowPassFilter.frequency.value = frequency
+		this._filter.frequency.value = frequency
+	}
+
+	public setFilterType(type: BuiltInBQFilterType) {
+		if (type === this._filter.type) return
+
+		this._filter.type = type
+	}
+
+	public setPan(pan: number) {
+		if (pan === this._pan.pan.value) return
+
+		this._pan.pan.value = pan
+	}
+
+	public setGain(gain: number) {
+		if (gain === this._masterGain.gain.value) return
+
+		this._masterGain.gain.value = gain
 	}
 
 	public scheduleNote(
 		note: number,
-		attackTimeInSeconds: number,
-		decayTimeInSeconds: number,
-		sustain: number,
 		attackStart: number,
 		sourceIds: Set<Id>,
+		velocity: number,
 	): void {
 		this.sourceIds = this.sourceIds.concat(sourceIds)
 
@@ -99,18 +125,21 @@ export abstract class Voice {
 
 		this.getAudioScheduledSourceNode()!.detune.value = this._detune
 
-		// this.getAudioScheduledSourceNode()!.connect(this._lowPassFilter)
+		// this.getAudioScheduledSourceNode()!.connect(this._filter)
 		this.getAudioScheduledSourceNode()!
+			.connect(this._filter)
+			.connect(this._masterGain)
 			.connect(this._gain)
+			.connect(this._pan)
 			.connect(this._destination)
 
 		this.playingNote = note
 
 		this._scheduledEnvelope = calculateScheduledEnvelope({
 			attackStart,
-			attackLength: attackTimeInSeconds,
-			decayLength: decayTimeInSeconds,
-			sustain,
+			attackLength: this._attackTimeInSeconds,
+			decayLength: this._decayTimeInSeconds,
+			sustain: this._getSustain(this._sustain, velocity),
 			hardCutoffTime: Number.MAX_VALUE,
 		})
 
@@ -133,7 +162,7 @@ export abstract class Voice {
 		// applyEnvelope(
 		// 	undefined,
 		// 	this._scheduledEnvelope,
-		// 	this._lowPassFilter.frequency,
+		// 	this._filter.frequency,
 		// 	this.getAudioScheduledSourceNode()!,
 		// 	this._audioContext,
 		// 	2000,
@@ -159,8 +188,14 @@ export abstract class Voice {
 				this._gain.gain.cancelScheduledValues(this._audioContext.currentTime)
 				audioNode.stop()
 				audioNode.disconnect()
+				this._filter.disconnect()
+				delete this._filter
 				this._gain.disconnect()
 				delete this._gain
+				this._masterGain.disconnect()
+				delete this._masterGain
+				this._pan.disconnect()
+				delete this._pan
 				this._ended = true
 				this._onEnded(this.id)
 				return
@@ -307,9 +342,19 @@ export abstract class Voice {
 
 	public abstract dispose(): void
 
+	protected _getSustain(sustain: number, velocity: number): number {
+		return sustain
+	}
+
 	protected _dispose() {
+		if (this._filter) this._filter.disconnect()
+		if (this._filter) delete this._filter
 		if (this._gain) this._gain.disconnect()
 		if (this._gain) delete this._gain
+		if (this._masterGain) this._masterGain.disconnect()
+		if (this._masterGain) delete this._masterGain
+		if (this._pan) this._pan.disconnect()
+		if (this._pan) delete this._pan
 		this._onEnded(this.id)
 	}
 

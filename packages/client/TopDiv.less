@@ -37,12 +37,22 @@
         }
     }
 
-    .nameAutosizeInput {
-        @panelShadow();
-    }
-
-    .buttonLink, button {
+    .buttonLink {
         @panelShadow();
         background-color: @panelGray;
+    }
+
+    #fps {
+        width: 32px;
+        contain: strict;
+        will-change: transform;
+    }
+
+    #zoomText {
+        width: 28px;
+        contain: strict;
+        will-change: transform;
+        display: flex;
+        justify-content: center;
     }
 }

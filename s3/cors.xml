@@ -1,0 +1,27 @@
+<CORSConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
+	<CORSRule>
+		<AllowedMethod>GET</AllowedMethod>
+		<AllowedOrigin>https://corgi.fm</AllowedOrigin>
+		<MaxAgeSeconds>0</MaxAgeSeconds>
+	</CORSRule>
+	<CORSRule>
+		<AllowedMethod>GET</AllowedMethod>
+		<AllowedOrigin>https://test.corgi.fm</AllowedOrigin>
+		<MaxAgeSeconds>0</MaxAgeSeconds>
+	</CORSRule>
+	<CORSRule>
+		<AllowedMethod>GET</AllowedMethod>
+		<AllowedOrigin>https://local.corgi.fm</AllowedOrigin>
+		<MaxAgeSeconds>0</MaxAgeSeconds>
+	</CORSRule>
+	<CORSRule>
+		<AllowedMethod>GET</AllowedMethod>
+		<AllowedOrigin>http://local.corgi.fm</AllowedOrigin>
+		<MaxAgeSeconds>0</MaxAgeSeconds>
+	</CORSRule>
+	<CORSRule>
+		<AllowedMethod>GET</AllowedMethod>
+		<AllowedOrigin>http://localhost</AllowedOrigin>
+		<MaxAgeSeconds>0</MaxAgeSeconds>
+	</CORSRule>
+</CORSConfiguration>

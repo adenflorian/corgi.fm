@@ -4,12 +4,12 @@ import {
 	ActiveGhostConnectorSourceOrTarget, calculateConnectorPositionY,
 	GhostConnection, ghostConnectorActions,
 	IPosition,
-	selectConnectionsWithSourceIds,
-	selectConnectionsWithTargetIds,
 	selectGhostConnection,
 	selectLocalClientId,
 	selectPosition,
 	shamuConnect,
+	selectConnectionIdsForNodeLeftPort,
+	selectConnectionIdsForNodeRightPort,
 } from '@corgifm/common/redux'
 import {toGraphSpace} from '../SimpleGraph/Zoom'
 import {connectorHeight, connectorWidth, makeCurvedPath} from './ConnectionView'
@@ -23,7 +23,7 @@ interface Props {
 
 interface ReduxProps {
 	ghostConnection: GhostConnection
-	parentPosition: IPosition
+	parentPosition: Pick<IPosition, 'x' | 'y' | 'width' | 'height' | 'inputPortCount' | 'outputPortCount'>
 	parentConnectionCount: number
 	localClientId: Id
 }
@@ -56,7 +56,10 @@ export class GhostConnectionView extends PureComponent<AllProps, State> {
 
 	public render() {
 		const {mousePosition} = this.state
-		const {ghostConnection: {activeConnector, activeSourceOrTarget, port}, parentPosition, parentConnectionCount} = this.props
+		const {
+			ghostConnection: {activeConnector, activeSourceOrTarget, port},
+			parentPosition, parentConnectionCount,
+		} = this.props
 
 		const position = this._isLocallyOwned()
 			? mousePosition
@@ -166,8 +169,8 @@ export const ConnectedGhostConnectionView = shamuConnect(
 			parentPosition: selectPosition(state.room, parentNodeId),
 			parentConnectionCount:
 				ghostConnection.activeSourceOrTarget === ActiveGhostConnectorSourceOrTarget.Source
-					? selectConnectionsWithTargetIds(state.room, [parentNodeId]).filter(x => x.targetPort === ghostConnection.port).count()
-					: selectConnectionsWithSourceIds(state.room, [parentNodeId]).filter(x => x.sourcePort === ghostConnection.port).count(),
+					? selectConnectionIdsForNodeLeftPort(state.room, parentNodeId, ghostConnection.port).count()
+					: selectConnectionIdsForNodeRightPort(state.room, parentNodeId, ghostConnection.port).count(),
 			localClientId: selectLocalClientId(state),
 		}
 	},

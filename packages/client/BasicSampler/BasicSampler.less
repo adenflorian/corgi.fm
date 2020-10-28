@@ -10,11 +10,24 @@
 
     .samplesSection {
         display: flex;
+        height: 100%;
         
         .samplesControls {
             width: 64px;
             display: flex;
             align-items: center;
+            flex-direction: column;
+            justify-content: space-around;
+
+            .deselect {
+                .smallFont();
+                padding: 0 6px;
+                font-size: 11px;
+                height: 24px;
+                color: @defaultGray;
+                border: 1px solid @panelGrayLight;
+                background-color: @panelGray !important;
+            }
         }
 
         .samplePads {
@@ -23,20 +36,90 @@
             flex-wrap: wrap;
             justify-content: center;
             flex-flow: wrap-reverse;
+            contain: strict;
     
             .sample {
-                width: 74px;
-                height: 52px;
+                width: 76px;
+                height: 53px;
                 border-radius: 4px;
-                background-color: @panelGrayLight;
+                background-color: @panelGray;
                 box-sizing: border-box;
                 margin: 2px;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                border: 1px solid currentColor;
+                border: 1px solid @panelGrayLight;
+                border-bottom-color: currentColor;
+                border-bottom-width: 2px;
+
+                &.selected-true {
+                    border-color: currentColor;
+                }
     
                 &:hover {
+                    border-width: 2px;
+                    border-color: currentColor;
+
+                    .label {
+                        margin: 0px 1px 0px 1px;
+                    }
+                }
+
+                .colorFadeAnimation(SamplerPadFade, currentColor, @panelGray);
+
+                .label {
+                    .smallFont();
+                    color: @defaultGray;
+                    font-size: 12px;
+                    word-break: break-word;
+                    // Don't use overflow: hidden until bug is fixed
+                    // https://bugs.chromium.org/p/chromium/issues/detail?id=814439
+                    margin: 1px 2px 1px 2px;
+                    text-align: left;
+                    line-height: initial;
+                }
+
+                &.upload-failed::after {
+                    position: absolute;
+                    color: @red;
+                    content: 'failed';
+                    animation-name: uploadFailed;
+                    animation-duration: 3s;
+                    opacity: 0;
+                    font-weight: 600;
+                    font-size: 1.2em;
+                    pointer-events: none;
+                    background-color: @panelGrayDark;
+                    animation-timing-function: linear;
+                    z-index: 999999;
+                    padding: 8px;
+                    border-radius: @mainBorderRadius;
+                    border: 1px @red solid;
+                }
+
+                .sampleFileForm {
+                    top: 0;
+                    width: 100%;
+                    height: 100%;
+
+                    .sampleDropZone {
+                        width: 100%;
+                        height: 100%;
+                    }
+
+                    .sampleFileInput {
+                        visibility: hidden;
+                        opacity: 0;
+                        display: none;
+                    }
+                }
+
+                .dragOverMessage {
+                    visibility: hidden;
+                    width: 100%;
+                    height: 100%;
+                }
+
+                &.drag-over .dragOverMessage {
+                    visibility: visible !important;
+                    pointer-events: none;
                 }
             }
         }

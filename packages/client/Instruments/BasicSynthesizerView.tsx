@@ -5,7 +5,7 @@ import {Dispatch} from 'redux'
 import {IMidiNotes} from '@corgifm/common/MidiNote'
 import {allBuiltInBQFilterTypes, BuiltInBQFilterType, LfoOscillatorType, ShamuOscillatorType} from '@corgifm/common/OscillatorTypes'
 import {
-	BasicSynthesizerParam, getConnectionNodeInfo,
+	BasicSynthesizerParam, findNodeInfo,
 	selectBasicSynthesizer, setBasicSynthesizerOscillatorType,
 	setBasicSynthesizerParam, SynthLfoTarget, IClientAppState,
 } from '@corgifm/common/redux'
@@ -318,7 +318,7 @@ export const ConnectedBasicSynthesizerView = connect(
 		const instrumentState = selectBasicSynthesizer(state.room, props.id)
 
 		return {
-			isPlaying: getConnectionNodeInfo(instrumentState.type)
+			isPlaying: findNodeInfo(instrumentState.type)
 				.selectIsPlaying(state.room, props.id),
 			oscillatorType: instrumentState.oscillatorType,
 			pan: instrumentState.pan,

@@ -1,0 +1,58 @@
+@overlap: 2;
+
+.resizer {
+	width: 100%;
+	height: 100%;
+	pointer-events: none;
+	display: flex;
+  flex-direction: column;
+
+	.foo(8px);
+
+	.zoomFarther & {
+		.foo(16px);
+	}
+
+	.vert {
+		height: 100%;
+	}
+
+	.hoz {
+		width: 100%;
+	}
+
+	.resizeHandle {
+		pointer-events: all;
+	}
+
+	.row {
+		width: 100%;
+		display: flex;
+	}
+}
+
+.foo(@size) {
+	.left {
+		margin-left: -@size / @overlap;
+	}
+
+	.right {
+		margin-right: -@size / @overlap;
+	}
+
+	.top {
+		margin-top: -@size / @overlap;
+	}
+
+	.bottom {
+		margin-bottom: -@size / @overlap;
+	}
+
+	.top, .bottom {
+		height: @size;
+	}
+
+	.left, .right {
+		width: @size;
+	}
+}

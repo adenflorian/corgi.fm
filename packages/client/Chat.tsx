@@ -3,11 +3,16 @@ import AutosizeInput from 'react-input-autosize'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 import {
-	selectClientInfo, selectLocalClient, IClientAppState, chatSubmit,
+	selectClientInfo, selectLocalClient, IClientAppState, chatSubmit, clearChat,
 } from '@corgifm/common/redux'
 import './Chat.less'
+import {
+	FiTrash2 as Clear,
+} from 'react-icons/fi'
 import {ConnectedChatMessages} from './Chat/ChatMessages'
 import {isTestClient} from './is-prod-client'
+import {isInputFocused} from './client-utils'
+import {MasterVolume} from './MasterVolume'
 
 interface IChatComponentState {
 	chatMessage: string
@@ -49,18 +54,29 @@ export class Chat extends Component<AllProps, IChatComponentState> {
 				id="chat"
 				ref={this.chatRef}
 				className={this.state.isChatFocused ? 'focused' : ''}
-				onFocus={this._onFocus}
-				onBlur={this._onBlur}
 			>
 				<div
 					className="chatOverlay"
+					onFocus={this._onFocus}
+					onBlur={this._onBlur}
 				/>
 
-				<ConnectedChatMessages />
+				<div
+					onFocus={this._onFocus}
+					onBlur={this._onBlur}
+				>
+					<ConnectedChatMessages />
+				</div>
+
 
 				<div className="chatBottom" style={{textAlign: 'initial'}} tabIndex={-1}>
 					<div className="inputWrapper" style={{color: authorColor}} tabIndex={-1}>
-						<form className="chatMessageForm" onSubmit={this._onSubmitChat} title="Chat box input">
+						<form
+							className="chatMessageForm blob focusBorder"
+							onSubmit={this._onSubmitChat} title="Chat box input"
+							onFocus={this._onFocus}
+							onBlur={this._onBlur}
+						>
 							<AutosizeInput
 								id="chatInput"
 								onChange={this._onInputChange}
@@ -70,6 +86,21 @@ export class Chat extends Component<AllProps, IChatComponentState> {
 								inputRef={ref => (this.chatInputRef = ref || undefined)}
 							/>
 						</form>
+						<button
+							type="button"
+							className="clearMessages iconButton"
+							title="Clear chat messages (only for you)"
+							onMouseDown={e => {
+								e.preventDefault()
+								this.props.dispatch(clearChat())
+							}}
+							onFocus={this._onFocus}
+							onBlur={this._onBlur}
+						>
+							<Clear />
+						</button>
+						<div style={{marginLeft: 'auto'}} />
+						<MasterVolume />
 						<BottomInfo
 							clientVersion={this.props.clientVersion}
 							serverVersion={this.props.serverVersion}
@@ -83,7 +114,7 @@ export class Chat extends Component<AllProps, IChatComponentState> {
 	private readonly _onKeydown = (e: KeyboardEvent) => {
 		if (e.repeat) return
 		if (e.key === 'Enter' && this.state.isChatFocused === false && this.chatInputRef) {
-			if (document.activeElement && document.activeElement.tagName.toLowerCase() === 'input') return
+			if (isInputFocused()) return
 			this.chatInputRef.focus()
 			e.preventDefault()
 		}

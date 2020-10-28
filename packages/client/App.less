@@ -19,17 +19,6 @@ body {
     text-align: center;
 }
 
-#title {
-    text-align: center;
-    position: absolute;
-    margin: 24px 0px;
-    width: 100%;
-    font-size: 1.6em;
-    color: @defaultGray;
-    animation-duration: 1s;
-    animation-name: title-slidedown;
-}
-
 @keyframes title-slidedown {
     from {
         top: -48px
@@ -54,7 +43,7 @@ a {
 #mainBoards {
     z-index: 0;
     margin: auto;
-    position: relative;
+    position: relative; // ******
 }
 
 .board {
@@ -73,8 +62,6 @@ a {
     font-size: inherit;
     text-decoration: inherit;
     border: none;
-    background-color: @panelGrayDark;
-    padding: 0 8px;
     height: 32px;
     color: currentColor;
 }
@@ -110,19 +97,6 @@ a {
 
 .transitionAllColor {
     transition: color 0.3s ease-out, background-color 0.3s ease-out, border-color 0.3s ease-out, box-shadow 0.3s ease-out, filter 0.3s ease-out;
-}
-
-.label {
-    text-shadow: 0 0 16px @darkTextShadow;
-    height: 16px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    pointer-events: none;
-
-    .isPlaying& {
-        filter: saturate(300%);
-    }
 }
 
 .saturate {
@@ -288,7 +262,7 @@ svg {
 .blob {
     background-color: @panelGray;
     border-radius: @mainBorderRadius;
-    min-height: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     width: fit-content;
@@ -316,6 +290,10 @@ svg {
     }
 }
 
+.focusBorder:focus-within {
+    @colorBorder();
+}
+
 .pointerName {
     .largeFont();
 }
@@ -323,4 +301,34 @@ svg {
 // cookie consent
 .cc-window, .cc-btn {
     border-radius: @mainBorderRadius;
+}
+
+#smokescreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 100vw;
+    z-index: 1000;
+    user-select: none;
+    background-color: rgba(0, 0, 0, 0.5);
+    visibility: hidden;
+}
+
+#zoomBlock {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 100vw;
+    opacity: 0;
+    z-index: 9999999;
+    cursor: grab;
+    user-select: none;
+}
+
+.simpleGraphNode {
+    .hack {
+        // will-change: transform;
+    }
 }

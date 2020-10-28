@@ -77,6 +77,7 @@
 - [ ] highlight keys in the current key
 - [ ] show message to user if an error is detected (like if console.error was called)
 - [ ] GIFs synced with song
+- [ ] show dots on side of screen to show objects (nodes and cursors) that are off screen
 
 # MIDI
 - [ ] handle sustain pedal
@@ -159,7 +160,6 @@
 
 ### GridSequencer
 - [ ] make size adjustable
-	- use react-draggable
 	- drop down with size options?
 - [√] global play button
 - [ ] input notes from keyboard

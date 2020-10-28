@@ -6,6 +6,7 @@ import {
 	basicSamplersReducer, basicSynthesizersReducer, gridSequencersReducer,
 	IClientRoomState, IMultiState, infiniteSequencersReducer,
 	simpleCompressorsReducer, simpleReverbsReducer, virtualKeyboardsReducer,
+	betterSequencersReducer,
 } from '..'
 
 // export const shamuNodesActions = {
@@ -59,15 +60,12 @@ import {
 // export type NodeSpecialState2 = BasicSynthesizerState | BasicSamplerState |
 // 	VirtualKeyboardState | GridSequencerState | InfiniteSequencerState
 
-export interface NodeSpecialState {
-	readonly id: Id
-}
-
 // export type ShamuNodesAction = ActionType<typeof shamuNodesActions> | UpdatePositionsAction
 
 export const nodesReducer = combineReducers({
 	basicSynthesizers: basicSynthesizersReducer,
 	basicSamplers: basicSamplersReducer,
+	betterSequencers: betterSequencersReducer,
 	gridSequencers: gridSequencersReducer,
 	infiniteSequencers: infiniteSequencersReducer,
 	groupSequencers: groupSequencersReducer,
@@ -134,19 +132,3 @@ export const nodesReducer = combineReducers({
 // }
 
 // const dummyNodeSpecialState: NodeSpecialState = GridSequencerState.dummy
-
-export const selectNodeIdsOwnedByClient = (state: IClientRoomState, clientId: ClientId) => {
-	const nodes = state.shamuGraph.nodes as unknown as {[key: string]: IMultiState}
-
-	const ids: {id: Id, type: ConnectionNodeType}[] = []
-
-	Object.keys(nodes).forEach(nodeKey => {
-		const things = nodes[nodeKey].things
-		Object.keys(things).forEach(thingKey => {
-			const thing = things[thingKey]
-			if (thing.ownerId === clientId) ids.push({id: thing.id, type: thing.type})
-		})
-	})
-
-	return ids
-}

@@ -13,7 +13,7 @@ const makeGlobalRendererComp = Record({
 export class ECSGlobalRendererComponent extends makeGlobalRendererComp implements ECSComponent {}
 
 const makeGraphPosition = Record({
-	id: 'dummy',
+	id: 'dummy' as Id,
 	x: 0,
 	y: 0,
 	height: 0,

@@ -5,17 +5,17 @@ import {Server, Socket} from 'socket.io'
 import {
 	lobby, maxRoomNameLength, serverClientId,
 } from '@corgifm/common/common-constants'
-import {ConnectionNodeType} from '@corgifm/common/common-types'
+import {ConnectionNodeType, RoomType} from '@corgifm/common/common-types'
 import {logger} from '@corgifm/common/logger'
 import {
-	addClient, addRoomMember, BroadcastAction,
+	addClient, roomMemberActions, BroadcastAction,
 	CHANGE_ROOM, clientDisconnected, ClientState,
 	connectionsActions, createRoom, createRoomAction,
-	deletePositions, deleteRoomMember, deleteThingsAny,
+	deletePositions, deleteThingsAny,
 	getActionsBlacklist, GLOBAL_SERVER_ACTION, globalClockActions,
 	IClientRoomState,
-	IServerState, LOAD_ROOM, maxUsernameLength, pointersActions, ready,
-	replacePositions, REQUEST_CREATE_ROOM, roomOwnerRoomActions,
+	IServerState, LOAD_ROOM, maxUsernameLength, pointersActions, commonActions,
+	replacePositions, roomOwnerRoomActions,
 	RoomSettingsAction, roomSettingsActions, RoomsReduxAction, SavedRoom,
 	selectAllClients, selectAllConnections,
 	selectAllMessages, selectAllPointers, selectAllPositions,
@@ -23,14 +23,22 @@ import {
 	selectAllRooms, selectAllRoomStates, selectClientById,
 	selectClientBySocketId,
 	selectConnectionsWithSourceOrTargetIds, selectConnectionsWithTargetIds,
-	selectGlobalClockState, selectNodeIdsOwnedByClient,
+	selectGlobalClockState,
 	selectPositionsWithIds, selectRoomExists,
 	selectRoomSettings, selectRoomStateByName, selectShamuGraphState,
 	SERVER_ACTION, setActiveRoom,
-	setChat, setClients, setRoomMembers, setRooms, shamuGraphActions,
+	setChat, setClients, setRooms, shamuGraphActions,
 	userLeftRoom, whitelistedRoomActionTypes, isRoomOwnerRoomAction,
+	selectPositionsByOwner, roomInfoAction, selectRoomInfoState,
+	expNodesActions, selectExpNodesState, expPositionActions,
+	expConnectionsActions,
+	selectExpConnectionsWithTargetIds, selectExpConnectionsWithSourceOrTargetIds,
+	selectExpPositionsWithIds, makeRoomMember, selectRoomMemberState,
+	selectExpGraphsState, expGraphsActions, activityActions,
+	selectActivityState, selectActivityType,
 } from '@corgifm/common/redux'
-import {WebSocketEvent} from '@corgifm/common/server-constants'
+import {WebSocketEvent, NodeToNodeAction} from '@corgifm/common/server-constants'
+import {assertUnreachable} from '@corgifm/common/common-utils'
 import {createServerStuff, loadServerStuff} from './create-server-stuff'
 import {DBStore} from './database/database'
 import {getServerVersion} from './server-version'
@@ -90,6 +98,11 @@ export function setupServerWebSocketListeners(
 			// TODO Merge with broadcast event above
 			socket.on(WebSocketEvent.serverAction, handleSocketHandlerError(handleServerAction))
 
+			socket.on(WebSocketEvent.nodeToNode, handleSocketHandlerError((action: NodeToNodeAction) => {
+				const currentRoom = getRoom(socket)
+				socket.broadcast.to(currentRoom).emit(WebSocketEvent.nodeToNode, action)
+			}))
+
 			socket.on('disconnect', handleSocketHandlerError(handleDisconnect))
 		}
 
@@ -130,7 +143,7 @@ export function setupServerWebSocketListeners(
 
 			if (action[GLOBAL_SERVER_ACTION]) {
 				serverStore.dispatch(action)
-			} else {
+			} else if (action[SERVER_ACTION]) {
 				if (roomOwnerRoomActions.includes(action.type)) {
 					const roomOwnerId = getRoomOwnerId(serverStore, currentRoom)
 
@@ -165,10 +178,10 @@ export function setupServerWebSocketListeners(
 
 			if (action.type === CHANGE_ROOM) {
 				changeRooms(action.room)
-			} else if (action.type === REQUEST_CREATE_ROOM) {
-				makeAndJoinNewRoom(animal.getId())
+			} else if (action.type === 'REQUEST_CREATE_ROOM') {
+				makeAndJoinNewRoom(action.name || animal.getId(), action.roomType)
 			} else if (action.type === LOAD_ROOM) {
-				makeAndJoinNewRoom(animal.getId(), action.savedRoom)
+				makeAndJoinNewRoom(animal.getId(), RoomType.Normal, action.savedRoom)
 			} else if ((action as any)[GLOBAL_SERVER_ACTION]) {
 				serverStore.dispatch(action)
 			} else if ((action as any)[SERVER_ACTION]) {
@@ -205,7 +218,7 @@ export function setupServerWebSocketListeners(
 
 				// Do this check after joining the socket to the room, that way the room can't get deleted anymore
 				if (roomExists === false) {
-					makeNewRoom(newRoom)
+					makeNewRoom(newRoom, RoomType.Normal)
 				}
 
 				onJoinRoom(io, socket, newRoom, serverStore, clientId)
@@ -228,32 +241,33 @@ export function setupServerWebSocketListeners(
 
 				// Do this check after joining the socket to the room, that way the room can't get deleted anymore
 				if (roomExists === false) {
-					makeNewRoom(newRoom)
+					makeNewRoom(newRoom, RoomType.Normal)
 				}
 
 				onJoinRoom(io, socket, newRoom, serverStore, selectClientBySocketId(serverStore.getState(), socket.id).id)
 			})
 		}
 
-		function makeAndJoinNewRoom(newRoomName: string, roomDataToLoad?: SavedRoom) {
+		function makeAndJoinNewRoom(newRoomName: string, type: RoomType, roomDataToLoad?: SavedRoom) {
 			if (selectRoomExists(serverStore.getState(), newRoomName) === false) {
-				makeNewRoom(newRoomName, roomDataToLoad)
+				makeNewRoom(newRoomName, type, roomDataToLoad)
 			}
 
 			changeRooms(newRoomName)
 		}
 
-		function makeNewRoom(newRoomName: string, roomDataToLoad?: SavedRoom) {
+		function makeNewRoom(newRoomName: string, type: RoomType, roomDataToLoad?: SavedRoom) {
 			if (selectRoomExists(serverStore.getState(), newRoomName)) {
 				throw new Error(`room exists, this shouldn't happen`)
 			} else {
 				serverStore.dispatch(createRoom(newRoomName, Date.now()))
 				serverStore.dispatch(createRoomAction(roomSettingsActions.setOwner(clientId), newRoomName))
+				serverStore.dispatch(createRoomAction(activityActions.set(type), newRoomName))
 
 				if (roomDataToLoad) {
 					loadServerStuff(newRoomName, serverStore, roomDataToLoad, clientId)
 				} else {
-					createServerStuff(newRoomName, serverStore)
+					createServerStuff(newRoomName, serverStore, type)
 				}
 
 				io.local.emit(WebSocketEvent.broadcast, {
@@ -271,66 +285,128 @@ function onJoinRoom(io: Server, socket: Socket, room: string, serverStore: Store
 	if (!roomState) return logger.warn(`onJoinRoom-couldn't find room state`)
 	syncState(socket, roomState, serverStore.getState(), getRoom(socket))
 
-	const addRoomMemberAction = addRoomMember(clientId)
+	const addRoomMemberAction = roomMemberActions.add(makeRoomMember({id: clientId}))
 	serverStore.dispatch(createRoomAction(addRoomMemberAction, room))
 	io.to(getRoom(socket)).emit(WebSocketEvent.broadcast, addRoomMemberAction)
 }
 
 /** When a user leaves a room, tell all the other room members to delete that user's things */
-function onLeaveRoom(io: Server, socket: Socket, roomToLeave: string, serverStore: Store<IServerState>) {
+function onLeaveRoom(io: Server, socket: Socket, roomToLeave: string, serverStore: Store<IServerState>): void {
 	const roomState = selectRoomStateByName(serverStore.getState(), roomToLeave)
+
 	if (!roomState) return logger.warn(`onLeaveRoom-couldn't find room state: roomToLeave: ${roomToLeave}`)
-	const clientId = selectClientBySocketId(serverStore.getState(), socket.id).id
 
 	serverStore.dispatch(userLeftRoom(roomToLeave, Date.now()))
 
-	{
-		const nodesOwnedByClient = selectNodeIdsOwnedByClient(roomState, clientId)
+	const clientId = selectClientBySocketId(serverStore.getState(), socket.id).id
+	const roomType = selectActivityType(roomState)
 
-		// filter out nodes that we don't want to delete
-
-		const keyboardIds = nodesOwnedByClient
-			.filter(x => x.type === ConnectionNodeType.virtualKeyboard)
-			.map(x => x.id)
-
-		const otherNodes = nodesOwnedByClient
-			.filter(x => x.type !== ConnectionNodeType.virtualKeyboard)
-			.filter(x => {
-				const incomingConnections = selectConnectionsWithTargetIds(roomState, [x.id])
-
-				// return true if it has no incoming connections
-				if (incomingConnections.count() === 0) return true
-
-				// return true if all incoming connections are from owner's keyboards
-				if (incomingConnections.every(y => keyboardIds.includes(y.sourceId))) return true
-
-				return false
-			})
-
-		const nodeIdsToDelete = otherNodes.map(x => x.id).concat(keyboardIds)
-
-		const connectionIdsToDelete = selectConnectionsWithSourceOrTargetIds(roomState, nodeIdsToDelete)
-			.map(x => x.id)
-			.toList()
-		const deleteConnectionsAction = connectionsActions.delete(connectionIdsToDelete)
-		serverStore.dispatch(createRoomAction(deleteConnectionsAction, roomToLeave))
-		io.to(roomToLeave).emit(WebSocketEvent.broadcast, deleteConnectionsAction)
-
-		const positionIdsToDelete = selectPositionsWithIds(roomState, nodeIdsToDelete).map(x => x.id)
-		const deletePositionsAction = deletePositions(positionIdsToDelete)
-		serverStore.dispatch(createRoomAction(deletePositionsAction, roomToLeave))
-		io.to(roomToLeave).emit(WebSocketEvent.broadcast, deletePositionsAction)
-
-		const deleteNodes = deleteThingsAny(nodeIdsToDelete)
-		serverStore.dispatch(createRoomAction(deleteNodes, roomToLeave))
-		io.to(roomToLeave).emit(WebSocketEvent.broadcast, deleteNodes)
-
-		const deletePointer = pointersActions.delete(clientId)
-		serverStore.dispatch(createRoomAction(deletePointer, roomToLeave))
-		io.to(roomToLeave).emit(WebSocketEvent.broadcast, deletePointer)
+	switch (roomType) {
+		case RoomType.Normal: onLeaveRoomNormal(io, clientId, roomToLeave, serverStore, roomState)
+			break
+		case RoomType.Experimental: onLeaveRoomExperimental(io, clientId, roomToLeave, serverStore, roomState)
+			break
+		case RoomType.Dummy:
+			break
+		default: assertUnreachable(roomType)
 	}
 
-	const deleteRoomMemberAction = deleteRoomMember(clientId)
+	onLeaveRoomGeneric(io, clientId, roomToLeave, serverStore, roomState)
+}
+
+/** When a user leaves a room, tell all the other room members to delete that user's things */
+function onLeaveRoomNormal(io: Server, clientId: Id, roomToLeave: string, serverStore: Store<IServerState>, roomState: IClientRoomState) {
+	const nodesOwnedByClient = selectPositionsByOwner(roomState, clientId)
+
+	// filter out nodes that we don't want to delete
+
+	const keyboardIds = nodesOwnedByClient
+		.filter(x => x.targetType === ConnectionNodeType.virtualKeyboard)
+		.keySeq()
+
+	const otherNodes = nodesOwnedByClient
+		.filter(x => x.targetType !== ConnectionNodeType.virtualKeyboard)
+		.filter(x => {
+			const incomingConnections = selectConnectionsWithTargetIds(roomState, x.id)
+
+			// return true if it has no incoming connections
+			if (incomingConnections.count() === 0) return true
+
+			// return true if all incoming connections are from owner's keyboards
+			if (incomingConnections.every(y => keyboardIds.includes(y.sourceId))) return true
+
+			return false
+		})
+
+	const nodeIdsToDelete = otherNodes.keySeq().concat(keyboardIds).toArray()
+
+	const connectionIdsToDelete = selectConnectionsWithSourceOrTargetIds(roomState, nodeIdsToDelete)
+		.map(x => x.id)
+		.toList()
+	const deleteConnectionsAction = connectionsActions.delete(connectionIdsToDelete)
+	serverStore.dispatch(createRoomAction(deleteConnectionsAction, roomToLeave))
+	io.to(roomToLeave).emit(WebSocketEvent.broadcast, deleteConnectionsAction)
+
+	const positionIdsToDelete = selectPositionsWithIds(roomState, nodeIdsToDelete).map(x => x.id)
+	const deletePositionsAction = deletePositions(positionIdsToDelete)
+	serverStore.dispatch(createRoomAction(deletePositionsAction, roomToLeave))
+	io.to(roomToLeave).emit(WebSocketEvent.broadcast, deletePositionsAction)
+
+	const deleteNodes = deleteThingsAny(nodeIdsToDelete)
+	serverStore.dispatch(createRoomAction(deleteNodes, roomToLeave))
+	io.to(roomToLeave).emit(WebSocketEvent.broadcast, deleteNodes)
+}
+
+/** When a user leaves a room, tell all the other room members to delete that user's things */
+function onLeaveRoomExperimental(io: Server, clientId: Id, roomToLeave: string, serverStore: Store<IServerState>, roomState: IClientRoomState) {
+	const nodesOwnedByClient = selectExpNodesState(roomState).filter(x => x.ownerId === clientId)
+
+	// filter out nodes that we don't want to delete
+
+	const keyboardIds = nodesOwnedByClient
+		.filter(x => x.type === 'keyboard')
+		.keySeq()
+
+	const otherNodes = nodesOwnedByClient
+		.filter(x => x.type !== 'keyboard')
+		.filter(x => {
+			const incomingConnections = selectExpConnectionsWithTargetIds(roomState, x.id)
+
+			// return true if it has no incoming connections
+			if (incomingConnections.count() === 0) return true
+
+			// return true if all incoming connections are from owner's keyboards
+			if (incomingConnections.every(y => keyboardIds.includes(y.sourceId))) return true
+
+			return false
+		})
+
+	const nodeIdsToDelete = otherNodes.keySeq().concat(keyboardIds).toArray()
+
+	const connectionIdsToDelete = selectExpConnectionsWithSourceOrTargetIds(roomState, nodeIdsToDelete)
+		.map(x => x.id)
+		.toList()
+	const deleteConnectionsAction = expConnectionsActions.delete(connectionIdsToDelete)
+	serverStore.dispatch(createRoomAction(deleteConnectionsAction, roomToLeave))
+	io.to(roomToLeave).emit(WebSocketEvent.broadcast, deleteConnectionsAction)
+
+	const positionIdsToDelete = selectExpPositionsWithIds(roomState, nodeIdsToDelete).map(x => x.id)
+	const deletePositionsAction = expPositionActions.delete(positionIdsToDelete)
+	serverStore.dispatch(createRoomAction(deletePositionsAction, roomToLeave))
+	io.to(roomToLeave).emit(WebSocketEvent.broadcast, deletePositionsAction)
+
+	const deleteNodes = expNodesActions.deleteMany(nodeIdsToDelete)
+	serverStore.dispatch(createRoomAction(deleteNodes, roomToLeave))
+	io.to(roomToLeave).emit(WebSocketEvent.broadcast, deleteNodes)
+}
+
+/** When a user leaves a room, tell all the other room members to delete that user's things */
+function onLeaveRoomGeneric(io: Server, clientId: Id, roomToLeave: string, serverStore: Store<IServerState>, roomState: IClientRoomState) {
+	const deletePointer = pointersActions.delete(clientId)
+	serverStore.dispatch(createRoomAction(deletePointer, roomToLeave))
+	io.to(roomToLeave).emit(WebSocketEvent.broadcast, deletePointer)
+
+	const deleteRoomMemberAction = roomMemberActions.delete(clientId)
 	serverStore.dispatch(createRoomAction(deleteRoomMemberAction, roomToLeave))
 	io.to(roomToLeave).emit(WebSocketEvent.broadcast, deleteRoomMemberAction)
 
@@ -348,6 +424,11 @@ function onLeaveRoom(io: Server, socket: Socket, roomToLeave: string, serverStor
 }
 
 function syncState(newSocket: Socket, roomState: IClientRoomState, serverState: IServerState, activeRoom: string) {
+	newSocket.emit(WebSocketEvent.broadcast, {
+		...commonActions.notReady(),
+		alreadyBroadcasted: true,
+		source: server,
+	})
 	newSocket.emit(WebSocketEvent.broadcast, {
 		...setRooms(selectAllRooms(serverState)),
 		alreadyBroadcasted: true,
@@ -367,8 +448,9 @@ function syncState(newSocket: Socket, roomState: IClientRoomState, serverState: 
 	})
 
 	const updaters = [
+		[roomInfoAction.replace, selectRoomInfoState],
 		[pointersActions.replaceAll, selectAllPointers],
-		[setRoomMembers, selectAllRoomMemberIds],
+		[roomMemberActions.replaceAll, selectRoomMemberState],
 		[setChat, selectAllMessages],
 		[connectionsActions.replaceAll, selectAllConnections],
 		[roomSettingsActions.replaceAll, selectRoomSettings],
@@ -376,6 +458,8 @@ function syncState(newSocket: Socket, roomState: IClientRoomState, serverState: 
 		[globalClockActions.replace, selectGlobalClockState],
 		// Sync positions after shamuGraph
 		[replacePositions, selectAllPositions],
+		// exp
+		[activityActions.replace, selectActivityState],
 	]
 
 	updaters.forEach(([actionCreator, selector]: any[]) => {
@@ -389,7 +473,7 @@ function syncState(newSocket: Socket, roomState: IClientRoomState, serverState: 
 	})
 
 	newSocket.emit(WebSocketEvent.broadcast, {
-		...ready(),
+		...commonActions.ready(),
 		alreadyBroadcasted: true,
 		source: server,
 	})

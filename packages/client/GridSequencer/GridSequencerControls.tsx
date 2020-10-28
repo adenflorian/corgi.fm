@@ -1,8 +1,8 @@
 import React from 'react'
 import {
-	IoMdDownload as Download, IoMdPlay as Play, IoMdRecording as Record,
-	IoMdSquare as Stop, IoMdTrash as Clear, IoMdUndo as Undo,
-} from 'react-icons/io'
+	FiDownload as Download, FiPlay as Play, FiCircle as Record,
+	FiSquare as Stop, FiTrash2 as Clear, FiCornerUpLeft as Undo,
+} from 'react-icons/fi'
 import {useDispatch} from 'react-redux'
 import {
 	globalClockActions, gridSequencerActions, GridSequencerFields,

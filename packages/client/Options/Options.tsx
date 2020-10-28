@@ -1,5 +1,6 @@
 import React, {Fragment, useCallback} from 'react'
 import {useDispatch, useSelector} from 'react-redux'
+import {FiSettings as GearIcon} from 'react-icons/fi'
 import {
 	AppOptions, IClientAppState, LineType, ModalId,
 	modalsAction, roomSettingsActions, selectLocalClientId, selectRoomSettings,
@@ -9,6 +10,7 @@ import {ModalContent} from '../Modal/ModalManager'
 import {ConnectedOption} from '../Option'
 import {ConnectedOptionCheckbox} from '../RoomSetting'
 import './Options.less'
+import {audioWorkletToolTip} from '../client-constants'
 
 export function OptionsModalButton() {
 	const dispatch = useDispatch()
@@ -18,7 +20,8 @@ export function OptionsModalButton() {
 	)
 
 	return (
-		<Button onClick={showModal}>
+		<Button onClick={showModal} background="medium" shadow={true}>
+			<GearIcon />
 			Options
 		</Button>
 	)
@@ -65,6 +68,10 @@ export const OptionsModalContent: ModalContent = () => {
 						label="graphics: enable fancy connections"
 					/>
 					<ConnectedOption
+						option={AppOptions.enableWireShadows}
+						label="graphics: enable wire shadows"
+					/>
+					<ConnectedOption
 						option={AppOptions.graphicsMultiColoredConnections}
 						label="graphics: enable multi colored connections"
 					/>
@@ -72,9 +79,18 @@ export const OptionsModalContent: ModalContent = () => {
 						option={AppOptions.graphicsECS}
 						label="graphics: enable ECS animations (sequencer time marker thing)"
 					/>
-					<ConnectedOption
+					{/* <ConnectedOption
 						option={AppOptions.graphicsExpensiveZoomPan}
 						label="graphics: enable expensive/fancy zoom and pan (sharper render, but slower)"
+					/> */}
+					<ConnectedOption
+						option={AppOptions.graphicsExtraAnimations}
+						label="graphics: enable extra animations (disable for better performance in big rooms)"
+					/>
+					<ConnectedOption
+						option={AppOptions.enableAudioWorklet}
+						toolTip={audioWorkletToolTip}
+						label="audio: enable AudioWorklet (requires refresh) (disable if you are hearing audio glitch noises)"
 					/>
 				</div>
 			</div>

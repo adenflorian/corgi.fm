@@ -4,7 +4,7 @@ import React from 'react'
 import {Dispatch} from 'redux'
 import {allBuiltInBQFilterTypes} from '@corgifm/common/OscillatorTypes'
 import {
-	getConnectionNodeInfo, selectSimpleReverb, setSimpleReverbParam,
+	findNodeInfo, selectSimpleReverb, setSimpleReverbParam,
 	shamuConnect, SimpleReverbParam, SimpleReverbState,
 } from '@corgifm/common/redux'
 import {adsrValueToString, filterValueToString, percentageValueString} from '../../client-constants'
@@ -135,7 +135,7 @@ export const ConnectedSimpleReverb = shamuConnect(
 		const simpleReverbState = selectSimpleReverb(state.room, id)
 
 		return {
-			isPlaying: getConnectionNodeInfo(simpleReverbState.type)
+			isPlaying: findNodeInfo(simpleReverbState.type)
 				.selectIsPlaying(state.room, id),
 			lpf: simpleReverbState.lowPassFilterCutoffFrequency,
 			time: simpleReverbState.time,

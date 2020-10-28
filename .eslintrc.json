@@ -36,6 +36,8 @@
         }
     ],
     "rules": {
+        "no-unused-expressions": "off",
+        "@typescript-eslint/no-object-literal-type-assertion": "off",
         // The basics
         "quotes": [
             "error",
@@ -49,6 +51,7 @@
             "never"
         ],
         "no-case-declarations": "off",
+        "no-restricted-syntax": "off",
         // jest
         "jest/valid-describe": "off",
         // import
@@ -58,8 +61,7 @@
                 "allow": [
                     "**/*.html",
                     "**/*.css",
-                    "**/*.less",
-                    "babel-polyfill"
+                    "**/*.less"
                 ]
             }
         ],
@@ -252,7 +254,8 @@
             "error",
             {
                 "allow": [
-                    "constructors"
+                    "constructors",
+                    "methods"
                 ]
             }
         ],

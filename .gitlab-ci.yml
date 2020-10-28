@@ -2,7 +2,7 @@ include:
   - template: Auto-DevOps.gitlab-ci.yml
 
 build:
-  image: "node:10.14.1"
+  image: "node:12.16.1"
   script:
     - curl https://sh.rustup.rs -sSf | sh -s -- -y
     - PATH=$PATH:$HOME/.cargo/bin
@@ -10,7 +10,7 @@ build:
     - yarn build
 
 test:
-  image: "node:10.14.1"
+  image: "node:12.16.1"
   script:
     - yarn
     - yarn test

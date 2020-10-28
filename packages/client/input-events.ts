@@ -1,16 +1,22 @@
 import {Map} from 'immutable'
 import {Action, AnyAction, Store} from 'redux'
-import {rateLimitedDebounce} from '@corgifm/common/common-utils'
+import {rateLimitedDebounce, keyToMidiMap} from '@corgifm/common/common-utils'
 import {
-	getConnectionNodeInfo, globalClockActions,
+	findNodeInfo, globalClockActions,
 	IClientAppState, pointersActions,
-	selectClientInfo, selectGlobalClockIsPlaying, selectIsLocalClientInLimitedMode, selectLocalClient,
-	selectPosition, selectSequencer, selectShamuMetaState, sequencerActions, userInputActions,
+	selectClientInfo, selectGlobalClockIsPlaying,
+	selectIsLocalClientInLimitedMode, selectLocalClient,
+	selectPosition, selectSequencer, selectShamuMetaState, sequencerActions,
+	userInputActions,
+	localActions, localMidiKeyPress, localMidiKeyUp, localMidiOctaveChange,
+	windowBlur, selectRoomInfoState, expLocalActions,
+	selectLocalClientId, selectRoomMember, selectExpNode,
+	roomMemberActions, selectActivityType, selectUserInputKeys,
 } from '@corgifm/common/redux'
-import {
-	localActions, localMidiKeyPress, localMidiKeyUp, localMidiOctaveChange, windowBlur,
-} from './local-middleware'
 import {mouseFromScreenToBoard} from './SimpleGlobalClientState'
+import {RoomType} from '@corgifm/common/common-types'
+import {isInputFocused} from './client-utils'
+import {qwertyKeyboardNotesService} from './QwertyKeyboardNotesService'
 
 type IKeyBoardShortcuts = Map<string, KeyBoardShortcut>
 
@@ -27,32 +33,16 @@ type keyboardActionCreator = (e: KeyboardEvent, state: IClientAppState) => AnyAc
 
 const midiKeyShortcuts: {[key: string]: KeyBoardShortcut} = {}
 
-export type IKeyToMidiMap = Map<string, number>
-
-export const keyToMidiMap: IKeyToMidiMap = Map<number>({
-	'a': 0,
-	'w': 1,
-	's': 2,
-	'e': 3,
-	'd': 4,
-	'f': 5,
-	't': 6,
-	'g': 7,
-	'y': 8,
-	'h': 9,
-	'u': 10,
-	'j': 11,
-	'k': 12,
-	'o': 13,
-	'l': 14,
-	'p': 15,
-	';': 16,
-})
-
 keyToMidiMap.forEach((val, key) => {
 	midiKeyShortcuts[key] = {
-		actionOnKeyDown: localMidiKeyPress(val),
-		actionOnKeyUp: localMidiKeyUp(val),
+		actionOnKeyDown: () => {
+			qwertyKeyboardNotesService.invokeImmediately(val, true)
+			return localMidiKeyPress(val, 1, 'input events: ' + key)
+		},
+		actionOnKeyUp: () => {
+			qwertyKeyboardNotesService.invokeImmediately(val, false)
+			return localMidiKeyUp(val, 'input events: ' + key)
+		},
 		allowRepeat: false,
 		preventDefault: true,
 	}
@@ -80,31 +70,64 @@ const keyboardShortcuts: IKeyBoardShortcuts = Map<KeyBoardShortcut>({
 	[Shift + Plus + '+']: changeOctaveShortcut(2),
 	[Control + Plus + 'z']: {
 		actionOnKeyDown: (_, state) => {
-			const selectedNode = selectShamuMetaState(state.room).selectedNode
-			if (selectedNode === undefined) return
-			return getConnectionNodeInfo(selectPosition(state.room, selectedNode.id).targetType).undoAction(selectedNode.id)
+			const selectedNodes = selectShamuMetaState(state.room).selectedNodes
+			if (selectedNodes.count() !== 1) return
+			return findNodeInfo(selectPosition(state.room, selectedNodes.first()).targetType).undoAction(selectedNodes.first())
 		},
 		allowRepeat: true,
 		preventDefault: true,
 	},
 	[Control + Plus + 'd']: {
 		actionOnKeyDown: (_, state) => {
-			const selectedNode = selectShamuMetaState(state.room).selectedNode
-			if (selectedNode === undefined) return
-			if (getConnectionNodeInfo(selectedNode.type).isNodeCloneable !== true) return
-			return localActions.cloneNode(selectedNode.id, selectedNode.type, 'all')
+			const selectedNodes = selectShamuMetaState(state.room).selectedNodes
+			if (selectActivityType(state.room) === RoomType.Experimental) {
+				return localActions.cloneSelectedExpNodes('all')
+			} else {
+				if (selectedNodes.count() !== 1) return
+				const type = selectPosition(state.room, selectedNodes.first()).targetType
+				if (findNodeInfo(type).isNodeCloneable !== true) return
+				return localActions.cloneNode(selectedNodes.first(), type, 'all')
+			}
+		},
+		allowRepeat: false,
+		preventDefault: true,
+	},
+	[Control + Plus + 'g']: {
+		actionOnKeyDown: (_, state) => {
+			if (selectActivityType(state.room) !== RoomType.Experimental) return
+			const selectedNodes = selectShamuMetaState(state.room).selectedNodes
+			return expLocalActions.createGroup(selectedNodes, 'group')
+		},
+		allowRepeat: false,
+		preventDefault: true,
+	},
+	'PageUp': {
+		actionOnKeyDown: (_, state) => {
+			if (selectActivityType(state.room) !== RoomType.Experimental) return
+			const localClientId = selectLocalClientId(state)
+			const currentNodeGroupId = selectRoomMember(state.room, localClientId).groupNodeId
+			if (currentNodeGroupId === 'top') return
+			const node = selectExpNode(state.room, currentNodeGroupId)
+			return roomMemberActions.setNodeGroup(localClientId, node.groupId)
 		},
 		allowRepeat: false,
 		preventDefault: true,
 	},
 	'r': {
 		actionOnKeyDown: (_, state) => {
-			const selectedNode = selectShamuMetaState(state.room).selectedNode
-			if (selectedNode === undefined) return
-			const sequencer = selectSequencer(state.room, selectedNode.id)
-			if (sequencer.ownerId.startsWith('dummy')) return
-			return sequencerActions.toggleRecording(selectedNode.id, !sequencer.isRecording)
+			const selectedNodes = selectShamuMetaState(state.room).selectedNodes
+			if (selectedNodes.count() !== 1) return
+			const ownerId = selectPosition(state.room, selectedNodes.first()).ownerId
+			if (ownerId.startsWith('dummy')) return
+			const sequencer = selectSequencer(state.room, selectedNodes.first())
+			return sequencerActions.toggleRecording(selectedNodes.first(), !sequencer.isRecording)
 		},
+		allowRepeat: false,
+		preventDefault: true,
+	},
+	'b': {
+		actionOnKeyDown: userInputActions.localMidiSustainPedal(true),
+		actionOnKeyUp: userInputActions.localMidiSustainPedal(false),
 		allowRepeat: false,
 		preventDefault: true,
 	},
@@ -118,25 +141,6 @@ const keyboardShortcuts: IKeyBoardShortcuts = Map<KeyBoardShortcut>({
 		allowRepeat: true,
 		preventDefault: true,
 	},
-	// Disabling these until needed again
-	// 'Control': {
-	// 	actionOnKeyDown: userInputActions.setKeys({ctrl: true}),
-	// 	actionOnKeyUp: userInputActions.setKeys({ctrl: false}),
-	// 	allowRepeat: false,
-	// 	preventDefault: false,
-	// },
-	// 'Alt': {
-	// 	actionOnKeyDown: userInputActions.setKeys({alt: true}),
-	// 	actionOnKeyUp: userInputActions.setKeys({alt: false}),
-	// 	allowRepeat: false,
-	// 	preventDefault: false,
-	// },
-	// 'Shift': {
-	// 	actionOnKeyDown: userInputActions.setKeys({shift: true}),
-	// 	actionOnKeyUp: userInputActions.setKeys({shift: false}),
-	// 	allowRepeat: false,
-	// 	preventDefault: false,
-	// },
 	' ': {
 		actionOnKeyDown: (_, state) => selectGlobalClockIsPlaying(state.room)
 			? globalClockActions.stop()
@@ -144,22 +148,23 @@ const keyboardShortcuts: IKeyBoardShortcuts = Map<KeyBoardShortcut>({
 		allowRepeat: false,
 		preventDefault: false,
 	},
-	[Control + Plus + ' ']: {
-		actionOnKeyDown: globalClockActions.restart(),
-		allowRepeat: false,
-		preventDefault: false,
-	},
+	// TODO Get it to play nice with better sequencer
+	// [Control + Plus + ' ']: {
+	// 	actionOnKeyDown: globalClockActions.restart(),
+	// 	allowRepeat: false,
+	// 	preventDefault: false,
+	// },
 })
 	.merge(midiKeyShortcuts)
-	.mapKeys(x => x.toLowerCase())
+	.mapKeys(x => arrayToPlusString(x.toLowerCase().split(Plus).sort()))
+
+function arrayToPlusString(array: readonly string[]): string {
+	return array.reduce((result, current) => result + current + Plus, '').replace(/\+$/, '')
+}
 
 export function setupInputEventListeners(
 	window: Window, store: Store<IClientAppState>, audioContext: AudioContext,
 ) {
-	const isInputFocused = (): boolean => document.activeElement
-		? document.activeElement.tagName === 'INPUT'
-		: false
-
 	window.addEventListener('mousedown', async _ => {
 		if (audioContext.state === 'suspended') await audioContext.resume()
 	})
@@ -185,21 +190,26 @@ export function setupInputEventListeners(
 	})
 
 	function onKeyEvent(event: KeyboardEvent) {
-		const prefix = event.shiftKey
-			? Shift + Plus
-			: event.ctrlKey || event.metaKey
-				? Control + Plus
-				: event.altKey
-					? Alt + Plus
-					: ''
 
-		const keyboardShortcut = keyboardShortcuts.get(prefix + event.key.toLowerCase())
+		const state = store.getState()
+		const {dispatch} = store
+
+		syncModifierKeysState(event)
+
+		let keyCombo = [] as string[]
+		if (event.shiftKey) keyCombo.push(Shift)
+		if (event.ctrlKey || event.metaKey) keyCombo.push(Control)
+		if (event.altKey) keyCombo.push(Alt)
+		if (!['Control', 'Alt', 'Shift'].includes(event.key)) keyCombo.push(event.key.toLowerCase())
+		let keyComboString = keyCombo.sort().reduce((result, current) => result + current + Plus, '').replace(/\+$/, '')
+
+		const keyboardShortcut = keyboardShortcuts.get(keyComboString)
 
 		if (!keyboardShortcut) return
 
 		if (event.repeat && keyboardShortcut.allowRepeat === false) return
 
-		if (selectIsLocalClientInLimitedMode(store.getState()) && keyboardShortcut.allowInLimitedMode !== true) return
+		if (selectIsLocalClientInLimitedMode(state) && keyboardShortcut.allowInLimitedMode !== true) return
 
 		const actionPropToUse = getPropNameForEventType(event.type)
 		const action = keyboardShortcut[actionPropToUse]
@@ -207,12 +217,12 @@ export function setupInputEventListeners(
 		if (!action) return
 
 		if (typeof action === 'function') {
-			const actualAction = action(event, store.getState())
+			const actualAction = action(event, state)
 			if (actualAction !== undefined) {
-				store.dispatch(actualAction)
+				dispatch(actualAction)
 			}
 		} else {
-			store.dispatch(action)
+			dispatch(action)
 		}
 
 		if (!isInputFocused() && keyboardShortcut.preventDefault) {
@@ -220,12 +230,36 @@ export function setupInputEventListeners(
 		}
 	}
 
+	function syncModifierKeysState(event: KeyboardEvent | MouseEvent) {
+		const state = store.getState()
+		const {dispatch} = store
+
+		const userInputState = selectUserInputKeys(state)
+
+		if (userInputState.shift !== event.shiftKey ||
+			userInputState.alt !== event.altKey ||
+			userInputState.ctrl !== event.ctrlKey
+		) {
+			dispatch(userInputActions.setKeys({
+				shift: event.shiftKey,
+				alt: event.altKey,
+				ctrl: event.ctrlKey,
+			}))
+		}
+	}
+
 	const mouseMoveUpdateIntervalMs = 50
 
-	const onMouseMove = (e: MouseEvent) => dispatchPointersUpdate(e.clientX, e.clientY)
+	const onMouseMove = (e: MouseEvent) => {
+		dispatchPointersUpdate(e.clientX, e.clientY)
+		syncModifierKeysState(e)
+	}
 	window.addEventListener('mousemove', rateLimitedDebounce(onMouseMove, mouseMoveUpdateIntervalMs))
 
-	const onWheel = () => setTimeout(() => dispatchPointersUpdate(), 0)
+	const onWheel = (e: MouseWheelEvent) => {
+		setTimeout(() => dispatchPointersUpdate(), 0)
+		syncModifierKeysState(e)
+	}
 	window.addEventListener('wheel', rateLimitedDebounce(onWheel, mouseMoveUpdateIntervalMs))
 
 	let lastMousePosition = {

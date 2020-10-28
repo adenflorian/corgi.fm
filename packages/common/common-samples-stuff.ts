@@ -1,8 +1,8 @@
 import {List, Map} from 'immutable'
 import {IMidiNote} from './MidiNote'
-import {Octave} from './common-types'
-import {pickRandomArrayElement} from './common-utils'
-import {CssColor} from './shamu-color'
+import {IKeyColors, NoteNameSharps, NoteNameFlats} from './common-types'
+import {BuiltInBQFilterType} from './OscillatorTypes'
+import {defaultSamplePlaybackRate} from './common-constants'
 
 export const octavesToGet = [1, 2, 3, 4, 5, 6, 7] as const
 
@@ -35,19 +35,6 @@ export const sharpToFlatNotes = {
 	'A#': 'Bb',
 	'B': 'B',
 } as const
-
-export type NoteNameSharps = 'C' | 'C#' | 'D' | 'D#' | 'E' | 'F' | 'F#' | 'G' | 'G#' | 'A' | 'A#' | 'B'
-
-export type NoteNameFlats = 'C' | 'Db' | 'D' | 'Eb' | 'E' | 'F' | 'Gb' | 'G' | 'Ab' | 'A' | 'Bb' | 'B'
-
-export type KeyColor = 'white' | 'black'
-
-export interface IKeyColors {
-	readonly [key: number]: {
-		readonly color: KeyColor
-		readonly name: NoteNameSharps
-	}
-}
 
 export const keyColors: IKeyColors = {
 	0: {color: 'white', name: 'C'},
@@ -91,22 +78,54 @@ export const makeSamples =
 	(collection: Iterable<[number, Sample]> = []): Samples =>
 		Map<number, Sample>(collection)
 
-export const sampleColors =
-	['red', 'blue', 'green', 'yellow', 'purple', 'orange'] as const
+export const allSampleColors =
+	['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'panelGrayLight'] as const
+
+export const sampleColorRegex = new RegExp(
+	'^(' +
+	allSampleColors.reduce((result, current) => result + current + '|', '')
+		.replace(/\|$/, '') +
+	')$'
+)
+
+export const sampleColors = allSampleColors.filter(x => x !== 'panelGrayLight')
 
 export interface Sample {
 	readonly label: string
-	readonly filePath: string
-	readonly color: typeof sampleColors[number] | 'panelGrayDark'
+	readonly path: string
+	readonly color: typeof allSampleColors[number]
+	readonly parameters?: SampleParams
+}
+
+export interface SampleParams extends ReturnType<typeof makeSampleParams> {}
+
+export function makeSampleParams() {
+	return Object.freeze({
+		attack: 0,
+		decay: 0,
+		sustain: 1,
+		release: 1,
+		pan: 0,
+		filterCutoff: 20000,
+		filterType: BuiltInBQFilterType.lowpass,
+		detune: 0,
+		playbackRate: defaultSamplePlaybackRate,
+		gain: 0.5,
+	})
 }
 
 export const dummySamplePath = 'dummySamplePath'
 
 export const dummySample: Sample = {
-	color: 'panelGrayDark',
-	filePath: dummySamplePath,
+	color: 'panelGrayLight',
+	path: dummySamplePath,
 	label: '?',
 }
+
+export const samplePathBegin = {
+	static: 'static',
+	user: 'user',
+} as const
 
 export const samplerBasicPianoNotes: Samples = samplesToGet.reduce(
 	(samples, note): Samples => {
@@ -115,8 +134,8 @@ export const samplerBasicPianoNotes: Samples = samplesToGet.reduce(
 			octavesToGet.forEach(octave => {
 				const midiNote = midiNoteFromNoteName(note, octave)
 				mutable.set(midiNote, {
-					label: `${note}${octave}`,
-					filePath: `basic-piano/${sharpToFlatNotes[note]}${octave}-49-96.mp3`,
+					label: `piano ${note}${octave}`,
+					path: `${samplePathBegin.static}/samplers/basic-piano/${sharpToFlatNotes[note]}${octave}-49-96.mp3`,
 					color: note.includes('#') ? 'green' : 'blue',
 				})
 			})
@@ -126,27 +145,30 @@ export const samplerBasicPianoNotes: Samples = samplesToGet.reduce(
 )
 
 const basicDrumSamples: Samples = makeSamples([
-	[60, {color: 'blue', label: 'kick 135', filePath: 'basic-drums/kick-135.wav'}],
-	[61, {color: 'blue', label: 'kick 125', filePath: 'basic-drums/kick-125.wav'}],
-	[62, {color: 'blue', label: 'kick swedish', filePath: 'basic-drums/kick-swedish.wav'}],
-	[63, {color: 'blue', label: 'kick bump', filePath: 'basic-drums/kick-bump.wav'}],
-	[64, {color: 'green', label: 'snare 20', filePath: 'basic-drums/snare-20.wav'}],
-	[65, {color: 'green', label: 'snare people', filePath: 'basic-drums/snare-people.wav'}],
-	[66, {color: 'green', label: 'snare heavy', filePath: 'basic-drums/snare-heavy.wav'}],
-	[67, {color: 'purple', label: 'hat skiba', filePath: 'basic-drums/hat-skiba.wav'}],
-	[68, {color: 'purple', label: 'hat savannah', filePath: 'basic-drums/hat-savannah.wav'}],
-	[69, {color: 'purple', label: 'hat open', filePath: 'basic-drums/hat-open.wav'}],
-	[70, {color: 'orange', label: 'clap 1', filePath: 'basic-drums/clap-1.wav'}],
-	[71, {color: 'orange', label: 'rim click', filePath: 'basic-drums/rim-click.wav'}],
-	[72, {color: 'orange', label: 'bark rose', filePath: 'basic-drums/bark-rose.wav'}],
-])
+	[60, {color: 'blue', label: 'kick 135', path: 'kick-135.wav'}],
+	[61, {color: 'blue', label: 'kick 125', path: 'kick-125.wav'}],
+	[62, {color: 'blue', label: 'kick swedish', path: 'kick-swedish.wav'}],
+	[63, {color: 'blue', label: 'kick bump', path: 'kick-bump.wav'}],
+	[64, {color: 'green', label: 'snare 20', path: 'snare-20.wav'}],
+	[65, {color: 'green', label: 'snare people', path: 'snare-people.wav'}],
+	[66, {color: 'green', label: 'snare heavy', path: 'snare-heavy.wav'}],
+	[67, {color: 'purple', label: 'hat skiba', path: 'hat-skiba.wav'}],
+	[68, {color: 'purple', label: 'hat savannah', path: 'hat-savannah.wav'}],
+	[69, {color: 'purple', label: 'hat open', path: 'hat-open.wav'}],
+	[70, {color: 'orange', label: 'clap 1', path: 'clap-1.wav'}],
+	[71, {color: 'orange', label: 'rim click', path: 'rim-click.wav'}],
+	[72, {color: 'orange', label: 'bark rose', path: 'bark-rose.wav'}],
+]).map(x => ({
+	...x,
+	path: `${samplePathBegin.static}/samplers/basic-drums/` + x.path,
+}))
 
 export const defaultSamples = Map({
 	basicPiano: samplerBasicPianoNotes,
 	basicDrums: basicDrumSamples,
 })
 
-export function midiNoteFromNoteName(noteName: NoteNameSharps, octave: Octave): IMidiNote {
+export function midiNoteFromNoteName(noteName: NoteNameSharps | NoteNameFlats, octave: Octave): IMidiNote {
 	const midiNoteBase = noteNameToMidi[noteName]
 	return midiNoteBase + (octave * 12) + 12
 }
@@ -154,6 +176,12 @@ export function midiNoteFromNoteName(noteName: NoteNameSharps, octave: Octave): 
 export function midiNoteToNoteName(midiNote: IMidiNote): NoteNameSharps {
 	const x = ((midiNote % 12) + 12) % 12
 	return keyColors[x].name
+}
+
+export function midiNoteToNoteNameFull(midiNote: IMidiNote): string {
+	const octave = getOctaveFromMidiNote(midiNote)
+	const x = ((midiNote % 12) + 12) % 12
+	return keyColors[x].name + octave.toString()
 }
 
 export function getOctaveFromMidiNote(midiNote: IMidiNote): Octave {

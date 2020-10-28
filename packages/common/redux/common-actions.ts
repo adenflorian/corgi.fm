@@ -1,15 +1,23 @@
-export const SELF_DISCONNECTED = 'SELF_DISCONNECTED'
-export type SelfDisconnectedAction = ReturnType<typeof selfDisconnected>
-export const selfDisconnected = () => ({type: SELF_DISCONNECTED as typeof SELF_DISCONNECTED})
+import {ActionType} from 'typesafe-actions'
 
-export type ReadyAction = ReturnType<typeof ready>
-export const ready = () => ({
-	type: 'READY',
-} as const)
+export const commonActions = {
+	selfDisconnected: () => ({
+		type: 'SELF_DISCONNECTED' as const,
+	} as const),
+	ready: () => ({
+		type: 'READY' as const,
+	} as const),
+	notReady: () => ({
+		type: 'NOT_READY' as const,
+	} as const),
+	organizeGraph: () => ({
+		type: 'ORGANIZE_GRAPH' as const,
+	} as const),
+	init: () => ({
+		type: '$$$$INIT' as const,
+	} as const),
+} as const
 
-export type OrganizeGraphAction = ReturnType<typeof organizeGraph>
-export const organizeGraph = () => ({
-	type: 'ORGANIZE_GRAPH',
-} as const)
+export type CommonAction = ActionType<typeof commonActions>
 
-export type CommonAction = ReadyAction | OrganizeGraphAction
+export type InitAction = ReturnType<typeof commonActions.init>

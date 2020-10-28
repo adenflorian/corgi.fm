@@ -1,12 +1,12 @@
 import * as uuid from 'uuid'
 import {ActionType} from 'typesafe-actions'
 import {Map} from 'immutable'
-import {ConnectionNodeType, IConnectable, IMultiStateThing, Octave} from '../common-types'
+import {createSelector} from 'reselect'
+import {ConnectionNodeType, IConnectable} from '../common-types'
 import {BuiltInBQFilterType} from '../OscillatorTypes'
-import {samplerBasicPianoNotes, Samples, makeSamples, Sample} from '../common-samples-stuff'
+import {samplerBasicPianoNotes, Samples, makeSamples, Sample, SampleParams, makeSampleParams} from '../common-samples-stuff'
 import {convertToNumberKeyMap, clamp} from '../common-utils'
 import {IMidiNote} from '../MidiNote'
-import {NodeSpecialState} from './shamu-graph'
 import {IClientAppState} from './common-redux-types'
 import {
 	addMultiThing, BROADCASTER_ACTION, createSelectAllOfThingAsArray,
@@ -41,6 +41,18 @@ export const basicSamplerActions = {
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	} as const),
+	setSampleParam: (
+		samplerId: Id, midiNote: IMidiNote,
+		paramName: BasicSamplerParam, value: BasicSamplerParamTypes,
+	) => ({
+		type: 'SET_SAMPLE_PARAM',
+		id: samplerId,
+		midiNote,
+		paramName,
+		value,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	} as const),
 	setViewOctave: (samplerId: Id, octave: Octave) => ({
 		type: 'SET_SAMPLER_VIEW_OCTAVE',
 		id: samplerId,
@@ -58,13 +70,22 @@ export const basicSamplerActions = {
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	} as const),
+	selectSamplePad: (
+		samplerId: Id, midiNote?: IMidiNote,
+	) => ({
+		type: 'SELECT_SAMPLE_PAD',
+		id: samplerId,
+		midiNote,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	} as const),
 } as const
 
-type BasicSamplerParamTypes = number | BuiltInBQFilterType
+export type BasicSamplerParamTypes = number | BuiltInBQFilterType
 
 export enum BasicSamplerParam {
 	pan = 'pan',
-	lowPassFilterCutoffFrequency = 'lowPassFilterCutoffFrequency',
+	filterCutoff = 'filterCutoff',
 	attack = 'attack',
 	decay = 'decay',
 	sustain = 'sustain',
@@ -72,6 +93,7 @@ export enum BasicSamplerParam {
 	detune = 'detune',
 	gain = 'gain',
 	filterType = 'filterType',
+	playbackRate = 'playbackRate',
 }
 
 export interface IBasicSamplersState extends IMultiState {
@@ -82,9 +104,7 @@ export interface IBasicSamplers {
 	[key: string]: BasicSamplerState
 }
 
-export class BasicSamplerState implements IConnectable, NodeSpecialState {
-	public static defaultWidth = 64 + 320 + (64 * 5)
-	public static defaultHeight = 88 * 2
+export class BasicSamplerState implements IConnectable {
 	public static defaultFilterType = BuiltInBQFilterType.lowpass
 	public static minViewOctave = -1
 	public static maxViewOctave = 9
@@ -92,60 +112,30 @@ export class BasicSamplerState implements IConnectable, NodeSpecialState {
 
 	public static dummy: BasicSamplerState = {
 		id: 'dummy',
-		ownerId: 'dummyOwner',
-		pan: 0,
-		lowPassFilterCutoffFrequency: 0,
-		attack: 0,
-		decay: 0,
-		sustain: 0,
-		release: 0,
-		detune: 0,
-		gain: 0.5,
-		color: false,
 		type: ConnectionNodeType.basicSampler,
-		width: BasicSamplerState.defaultWidth,
-		height: BasicSamplerState.defaultHeight,
-		name: 'Dummy Basic Piano Sampler',
-		enabled: false,
 		filterType: BasicSamplerState.defaultFilterType,
 		samples: makeSamples(),
 		samplesViewOctave: 4,
+		selectedSamplePad: undefined,
+		params: makeSampleParams(),
 	}
 
 	public readonly id = uuid.v4()
-	public readonly ownerId: Id
-	public readonly pan: number = Math.random() - 0.5
-	public readonly lowPassFilterCutoffFrequency: number = Math.min(10000, Math.random() * 10000 + 1000)
-	public readonly attack: number = 0.01
-	public readonly decay: number = 0
-	public readonly sustain: number = 1
-	public readonly release: number = 1
-	public readonly detune: number = 0
-	public readonly gain: number = 0.5
-	public readonly color: false = false
 	public readonly type = ConnectionNodeType.basicSampler
-	public readonly width: number = BasicSamplerState.defaultWidth
-	public readonly height: number = BasicSamplerState.defaultHeight
-	public readonly name: string = 'Basic Piano Sampler'
-	public readonly enabled: boolean = true
 	public readonly filterType: BuiltInBQFilterType = BasicSamplerState.defaultFilterType
 	public readonly samples: Samples = samplerBasicPianoNotes
 	public readonly samplesViewOctave: number = 4
-
-	public constructor(ownerId: ClientId) {
-		this.ownerId = ownerId
-	}
+	public readonly selectedSamplePad?: IMidiNote = undefined
+	public readonly params: SampleParams = makeSampleParams()
 }
 
 export function deserializeBasicSamplerState(
-	state: IMultiStateThing
+	state: IConnectable
 ): BasicSamplerState {
 	const x = state as BasicSamplerState
 	return {
-		...(new BasicSamplerState(x.ownerId)),
+		...(new BasicSamplerState()),
 		...x,
-		width: BasicSamplerState.defaultWidth,
-		height: BasicSamplerState.defaultHeight,
 		samples: x.samples === undefined
 			? samplerBasicPianoNotes
 			: convertToNumberKeyMap(Map<string, Sample>(x.samples as any)),
@@ -154,25 +144,35 @@ export function deserializeBasicSamplerState(
 
 export type BasicSamplerAction = ActionType<typeof basicSamplerActions>
 
-const basicSamplerActionTypes = [
-	'SET_BASIC_SAMPLER_PARAM',
-	'SET_SAMPLE_COLOR',
-	'SET_SAMPLER_VIEW_OCTAVE',
-	'SET_SAMPLE',
-]
+type BasicSamplerActionTypes = {
+	[key in BasicSamplerAction['type']]: 0
+}
+
+const basicSamplerActionTypes: BasicSamplerActionTypes = {
+	SET_BASIC_SAMPLER_PARAM: 0,
+	SET_SAMPLE_COLOR: 0,
+	SET_SAMPLER_VIEW_OCTAVE: 0,
+	SET_SAMPLE: 0,
+	SELECT_SAMPLE_PAD: 0,
+	ADD_MULTI_THING: 0,
+	SET_SAMPLE_PARAM: 0,
+}
 
 export const basicSamplersReducer = makeMultiReducer<BasicSamplerState, IBasicSamplersState>(
 	basicSamplerReducer,
 	ConnectionNodeType.basicSampler,
-	basicSamplerActionTypes,
+	Object.keys(basicSamplerActionTypes),
 )
 
-function basicSamplerReducer(basicSampler: BasicSamplerState, action: BasicSamplerAction): BasicSamplerState {
+export function basicSamplerReducer(basicSampler: BasicSamplerState, action: BasicSamplerAction): BasicSamplerState {
 	switch (action.type) {
 		case 'SET_BASIC_SAMPLER_PARAM':
 			return {
 				...basicSampler,
-				[action.paramName]: action.value,
+				params: {
+					...basicSampler.params,
+					[action.paramName]: action.value,
+				},
 			}
 		case 'SET_SAMPLE_COLOR':
 			return {
@@ -180,6 +180,18 @@ function basicSamplerReducer(basicSampler: BasicSamplerState, action: BasicSampl
 				samples: basicSampler.samples.update(action.midiNote, sample => ({
 					...sample,
 					color: action.color,
+				})),
+			}
+		case 'SET_SAMPLE_PARAM':
+			return {
+				...basicSampler,
+				samples: basicSampler.samples.update(action.midiNote, sample => ({
+					...sample,
+					parameters: {
+						...(sample.parameters ? sample.parameters : makeSampleParams()),
+						gain: 1,
+						[action.paramName]: action.value,
+					},
 				})),
 			}
 		case 'SET_SAMPLE':
@@ -195,6 +207,11 @@ function basicSamplerReducer(basicSampler: BasicSamplerState, action: BasicSampl
 					BasicSamplerState.minViewOctave,
 					BasicSamplerState.maxViewOctave),
 			}
+		case 'SELECT_SAMPLE_PAD':
+			return {
+				...basicSampler,
+				selectedSamplePad: action.midiNote,
+			}
 		default:
 			return basicSampler
 	}
@@ -207,9 +224,6 @@ export const selectAllSamplerIds = (state: IClientRoomState) => Object.keys(sele
 export const selectAllSamplersAsArray =
 	createSelectAllOfThingAsArray<IBasicSamplers, BasicSamplerState>(selectAllSamplers)
 
-export const selectSamplersByOwner = (state: IClientRoomState, ownerId: ClientId) =>
-	selectAllSamplersAsArray(state).filter(x => x.ownerId === ownerId)
-
 export const selectSampler = (state: IClientRoomState, id: Id) =>
 	selectAllSamplers(state)[id as string] || BasicSamplerState.dummy
 
@@ -218,3 +232,43 @@ export const selectSamples = (id: Id) => (state: IClientAppState) =>
 
 export const selectSamplerViewOctave = (id: Id) => (state: IClientAppState) =>
 	selectSampler(state.room, id).samplesViewOctave
+
+export const createIsPadSelectedSelector = (id: Id, midiNote: IMidiNote) => (state: IClientAppState) =>
+	selectSampler(state.room, id).selectedSamplePad === midiNote
+
+export const createSelectedPadNumberSelector = (id: Id) => (state: IClientAppState) => {
+	return selectSampler(state.room, id).selectedSamplePad
+}
+
+export const createSelectSamplePadSelector = (id: Id, note?: IMidiNote) => (state: IClientAppState) => {
+	return note === undefined
+		? undefined
+		: selectSampler(state.room, id).samples.get(note, undefined)
+}
+
+export const samplerParamsSelector = (id: Id) => createSelector(
+	(state: IClientAppState) => {
+		const sampler = selectSampler(state.room, id)
+		if (sampler.selectedSamplePad) {
+			const sample = sampler.samples.get(sampler.selectedSamplePad, undefined)
+			return sample ? sample.parameters : undefined
+		} else {
+			return sampler.params
+		}
+	},
+	params => {
+		const finalParams = params || {...makeSampleParams(), gain: 1}
+		return {
+			pan: finalParams.pan,
+			filterCutoff: finalParams.filterCutoff,
+			attack: finalParams.attack,
+			decay: finalParams.decay,
+			sustain: finalParams.sustain,
+			release: finalParams.release,
+			detune: finalParams.detune,
+			playbackRate: finalParams.playbackRate,
+			gain: finalParams.gain,
+			filterType: finalParams.filterType,
+		}
+	}
+)

@@ -2,7 +2,7 @@ import {stripIndents} from 'common-tags'
 import React from 'react'
 import {Dispatch} from 'redux'
 import {
-	getConnectionNodeInfo, selectSimpleCompressor, setSimpleCompressorParam,
+	findNodeInfo, selectSimpleCompressor, setSimpleCompressorParam,
 	shamuConnect, SimpleCompressorParam,
 } from '@corgifm/common/redux'
 import {adsrValueToString} from '../../client-constants'
@@ -114,7 +114,7 @@ export const ConnectedSimpleCompressor = shamuConnect(
 		const simpleCompressorState = selectSimpleCompressor(state.room, id)
 
 		return {
-			isPlaying: getConnectionNodeInfo(simpleCompressorState.type)
+			isPlaying: findNodeInfo(simpleCompressorState.type)
 				.selectIsPlaying(state.room, id),
 			threshold: simpleCompressorState.threshold,
 			knee: simpleCompressorState.knee,

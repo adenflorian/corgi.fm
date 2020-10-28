@@ -2,8 +2,9 @@
 import * as supertest from 'supertest'
 import {oneLine} from 'common-tags'
 import chalk from 'chalk'
-import {logger} from '@corgifm/common/logger'
 import {Application} from 'express'
+import {ClassType} from 'class-transformer/ClassTransformer'
+import {transformAndValidate} from '@corgifm/common/validation'
 
 export enum ContentTypes {
 	ApplicationJson = 'application/json',
@@ -12,6 +13,7 @@ export enum ContentTypes {
 
 enum Method {
 	GET = 'GET',
+	POST = 'POST',
 	PUT = 'PUT',
 	DELETE = 'DELETE',
 }
@@ -25,7 +27,7 @@ function ContentTypeRegEx(type: ContentTypes): RegExp {
 	}
 }
 
-type TestRequest<TModel = object> = {
+type TestRequest<TRequestModel = object, TResponseModel = object> = {
 	readonly name?: string
 	/** Defaults to true */
 	readonly authorized?: boolean
@@ -33,21 +35,31 @@ type TestRequest<TModel = object> = {
 	readonly log?: boolean
 	readonly before?: () => any
 	readonly after?: () => Promise<any>
-	readonly request?: RequestArgs<TModel>
+	readonly request?: RequestArgs<TRequestModel>
 } & ({
 	readonly status: Exclude<Status, 204>
 	readonly contentType: ContentTypes
-	readonly resBody: number | object | RegExp
+	readonly resBody: TResponseModel | RegExp | number
+	readonly validateResponseBodyModel?: ClassType<TResponseModel>
 } | {
 	readonly status: 204
 	readonly contentType?: undefined
 	readonly resBody?: undefined
+	readonly validateResponseBodyModel?: undefined
 })
 
 interface RequestArgs<TModel = object> {
 	readonly headers?: Headers
+	/** Ignored when using upload */
 	readonly contentType?: ContentTypes
-	readonly body: TModel
+	/** Ignored when using upload */
+	readonly body?: TModel
+	readonly upload?: {
+		readonly fileField: string
+		readonly buffer: Buffer
+		readonly fileName: string
+		readonly fields?: {[fieldName: string]: string}
+	}
 }
 
 export enum Header {
@@ -69,7 +81,8 @@ type RequiredField<T, K extends keyof T> = {
 	[P in K]-?: T[P];
 } & T
 
-type PutRequest<TModel> = RequiredField<TestRequest<TModel>, 'request'>
+type PutRequest<TModel, TResponseModel> =
+	RequiredField<TestRequest<TModel, TResponseModel>, 'request'>
 
 export type RequestTest =
 	(getApp: GetApp, path: string, options: TestApiOptions) => void
@@ -109,29 +122,54 @@ export function path(
 	return (getApp: GetApp, pathTrunk: string, options: TestApiOptions) => {
 		requests.forEach(request => {
 			paths.forEach(p => {
-				invokeRequest(getApp, pathTrunk + '/' + p, options)(request)
+				invokeRequest(getApp, pathTrunk + (p ? `/${p}` : ''), options)(request)
 			})
 		})
 	}
 }
 
 /** GET */
-export function get(args: TestRequest): RequestTest {
+export function get<TResponseModel extends object = object>(
+	args: TestRequest<object, TResponseModel>,
+): RequestTest {
 	return (getApp: GetApp, finalPath: string, options: TestApiOptions) => {
+		const testLocation = getCallerLocation()
+
 		doRequest({
 			...args,
 			method: Method.GET,
 			finalPath,
 			getApp,
 			options,
+			testLocation,
+		})
+	}
+}
+
+/** POST */
+export function post<TModel extends object, TResponseModel extends object>(
+	args: PutRequest<TModel, TResponseModel>
+): RequestTest {
+	const testLocation = getCallerLocation()
+
+	return (getApp: GetApp, finalPath: string, options: TestApiOptions) => {
+		doRequest({
+			...args,
+			method: Method.POST,
+			finalPath,
+			getApp,
+			options,
+			testLocation,
 		})
 	}
 }
 
 /** PUT */
-export function put<TModel extends object>(
-	args: PutRequest<TModel>
+export function put<TModel extends object, TResponseModel extends object = object>(
+	args: PutRequest<TModel, TResponseModel>
 ): RequestTest {
+	const testLocation = getCallerLocation()
+
 	return (getApp: GetApp, finalPath: string, options: TestApiOptions) => {
 		doRequest({
 			...args,
@@ -139,12 +177,15 @@ export function put<TModel extends object>(
 			finalPath,
 			getApp,
 			options,
+			testLocation,
 		})
 	}
 }
 
 /** DELETE */
 export function del(args: TestRequest): RequestTest {
+	const testLocation = getCallerLocation()
+
 	return (getApp: GetApp, finalPath: string, options: TestApiOptions) => {
 		doRequest({
 			...args,
@@ -152,15 +193,23 @@ export function del(args: TestRequest): RequestTest {
 			finalPath,
 			getApp,
 			options,
+			testLocation,
 		})
 	}
 }
 
+function getCallerLocation(): string {
+	const e = new Error()
+	const stack = e.stack!.toString().split(/\r\n|\n/)
+	return 'failed api test location ' + stack[3]
+}
+
 type FinalRequest = TestRequest & {
-	method: Method
-	finalPath: string
-	getApp: GetApp
-	options: TestApiOptions
+	readonly method: Method
+	readonly finalPath: string
+	readonly getApp: GetApp
+	readonly options: TestApiOptions
+	readonly testLocation: string
 }
 
 function doRequest(args: FinalRequest): void {
@@ -185,6 +234,7 @@ function doTest(
 	const {
 		getApp, contentType, resBody, status, finalPath, method, log, headers,
 		before = noop, after = noop, request, authorized = true, options,
+		testLocation, validateResponseBodyModel,
 	} = args
 
 	before()
@@ -237,6 +287,19 @@ function doTest(
 		}
 	}
 
+	if (validateResponseBodyModel) {
+		theTest = theTest.expect(async res => {
+			try {
+				await transformAndValidate(validateResponseBodyModel, res.body)
+			} catch (error) {
+				throw new Error('response body failed validation:\n'
+					+ error.message
+					+ '\nresponse body:\n'
+					+ JSON.stringify(res.body, null, 2))
+			}
+		})
+	}
+
 	// eslint-disable-next-line @typescript-eslint/no-floating-promises
 	theTest
 		.end(async (err, res) => {
@@ -261,11 +324,13 @@ function doTest(
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				await after()
 			} catch (error) {
-				logger.error('Error caught in the after hook: ', error)
+				console.error('Error caught in the after hook:', error)
+				console.error(testLocation)
 				if (!err) throw error
 			}
 
 			if (err) {
+				console.error(testLocation)
 				done(err)
 			} else {
 				done()
@@ -280,12 +345,21 @@ function doTest(
 
 	function doRequestStuff(): supertest.Test {
 		if (request) {
-			theTest = theTest
-				.send(request.body)
-				.set(
-					Header.ContentType,
-					request.contentType || ContentTypes.ApplicationJson
-				)
+			if (request.upload) {
+				theTest = theTest
+					.attach(
+						request.upload.fileField,
+						request.upload.buffer,
+						request.upload.fileName)
+					.field(request.upload.fields || {})
+			} else {
+				theTest = theTest
+					.send(request.body)
+					.set(
+						Header.ContentType,
+						request.contentType || ContentTypes.ApplicationJson
+					)
+			}
 		}
 
 		Object.keys(newHeaders).forEach(name => {
@@ -301,6 +375,7 @@ function callHttpMethod(
 ) {
 	switch (method) {
 		case Method.GET: return st.get(url)
+		case Method.POST: return st.post(url)
 		case Method.PUT: return st.put(url)
 		case Method.DELETE: return st.delete(url)
 	}

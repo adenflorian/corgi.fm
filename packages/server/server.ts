@@ -1,10 +1,13 @@
 import * as http from 'http'
 import * as socketIO from 'socket.io'
-import {lobby, serverClientId} from '@corgifm/common/common-constants'
+import {lobby, serverClientId, expLobby} from '@corgifm/common/common-constants'
 import {logger} from '@corgifm/common/logger'
 import {
-	configureServerStore, createRoomAction, roomSettingsActions, createRoom,
+	configureServerStore, createRoomAction, roomSettingsActions,
+	createRoom, roomInfoAction, activityActions,
 } from '@corgifm/common/redux'
+import {RoomType} from '@corgifm/common/common-types'
+import {enableNewCorgiForProd} from '@corgifm/common/feature-flags'
 import {initSentryServer} from './analytics/sentry-server'
 import {createServerStuff} from './create-server-stuff'
 import {connectDB, DBStore} from './database/database'
@@ -12,6 +15,8 @@ import {getServerEnv, isLocalDevServer, logServerEnv} from './is-prod-server'
 import {startRoomWatcher} from './room-watcher'
 import {setupServerWebSocketListeners} from './server-socket-listeners'
 import {setupExpressApp} from './setup-express-app'
+import {DiscordBot} from './discord'
+import {loadServerSecrets} from './server-secrets'
 
 if (!isLocalDevServer()) initSentryServer()
 
@@ -38,8 +43,14 @@ async function start() {
 
 	serverStore.dispatch(createRoom(lobby, Date.now()))
 	serverStore.dispatch(createRoomAction(roomSettingsActions.setOwner(serverClientId), lobby))
+	createServerStuff(lobby, serverStore, RoomType.Normal)
 
-	createServerStuff(lobby, serverStore)
+	if (isLocalDevServer() || enableNewCorgiForProd) {
+		serverStore.dispatch(createRoom(expLobby, Date.now()))
+		serverStore.dispatch(createRoomAction(activityActions.set(RoomType.Experimental), expLobby))
+		serverStore.dispatch(createRoomAction(roomSettingsActions.setOwner(serverClientId), expLobby))
+		createServerStuff(expLobby, serverStore, RoomType.Experimental)
+	}
 
 	const app = await setupExpressApp(serverStore, dbStore)
 
@@ -55,4 +66,12 @@ async function start() {
 	server.listen(port)
 
 	logger.log(`corgi.fm server listening on port ${port}`)
+
+	try {
+		await loadServerSecrets()
+		const discordBot = new DiscordBot(serverStore)
+		await discordBot.start()
+	} catch(error) {
+		logger.error(error)
+	}
 }

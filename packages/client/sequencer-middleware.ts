@@ -3,15 +3,15 @@ import * as MidiWriter from 'midi-writer-js'
 import {Dispatch, Middleware, MiddlewareAPI} from 'redux'
 import {
 	IClientAppState, isEmptyEvents,
-	selectConnectionsWithSourceIds,
-	selectSequencer, SequencerAction, sequencerActions,
+	selectConnectionsWithSourceId,
+	selectSequencer, SequencerAction, sequencerActions, findNodeInfo,
 } from '@corgifm/common/redux'
 import {GetAllInstruments} from './instrument-manager'
 
 export const createSequencerMiddleware = (getAllInstruments: GetAllInstruments) => {
 
 	const sequencerMiddleware: Middleware<{}, IClientAppState> =
-		store => next => (action: SequencerAction) => {
+		store => next => function _sequencerMiddleware(action: SequencerAction) {
 			next(action)
 
 			switch (action.type) {
@@ -47,12 +47,12 @@ function exportSequencerMidi(
 
 	const eventsToMidi = events.map(event => {
 		const x = new MidiWriter.NoteEvent({
-			pitch: event.notes.toArray(),
+			pitch: [event.note],
 			duration,
 			wait: nextWait,
 		})
 
-		nextWait = event.notes.count() === 0 ? duration : '0'
+		nextWait = event.note === -1 ? duration : '0'
 
 		return x
 	}).toArray()
@@ -66,7 +66,7 @@ function exportSequencerMidi(
 
 	const write = new MidiWriter.Writer([midiSequencer])
 
-	saveAs(write.dataUri(), sequencer.name + '.mid')
+	saveAs(write.dataUri(), findNodeInfo(sequencer.type).typeName + '.mid')
 }
 
 function handleStopSequencer(
@@ -76,8 +76,7 @@ function handleStopSequencer(
 ) {
 	const instruments = getAllInstruments()
 
-	selectConnectionsWithSourceIds(store.getState().room, [action.id])
+	selectConnectionsWithSourceId(store.getState().room, action.id)
 		.map(x => instruments.get(x.targetId))
-		.filter(x => x !== undefined)
-		.forEach(x => x!.releaseAllScheduledFromSourceId(action.id))
+		.forEach(x => x && x.releaseAllScheduledFromSourceId(action.id))
 }

@@ -30,3 +30,83 @@
 @colorBorder: {
     box-shadow: 0 0 0px 2px currentColor !important;
 }
+
+@colorBorder2: {
+    box-shadow: 0 0 0px 2px currentColor;
+}
+
+@colorBorderFocus: {
+    box-shadow: 0 0 0px 3px currentColor !important;
+}
+
+@leftBracketCursor: {
+    cursor: url('../img/left-bracket.png') 0 16, w-resize;
+}
+
+@rightBracketCursor: {
+    cursor: url('../img/right-bracket.png') 3 16, e-resize;
+}
+
+@grabCursor: {
+    cursor: grab;
+}
+
+@grabbingCursor: {
+    cursor: grabbing;
+}
+
+.colorFadeAnimation(@name, @start, @end) {
+    animation-duration: 0.5s;
+
+    @name1: "@{name}-1";
+    @name2: "@{name}-2";
+
+    &.animate1 {
+        animation-name: @name1;
+    }
+
+    &.animate2 {
+        animation-name: @name2;
+    }
+
+    @keyframes @name1 {
+        from {
+            background-color: @start;
+        }
+      
+        to {
+            background-color: @end;
+        }
+    }
+    
+    @keyframes @name2 {
+        from {
+            background-color: @start;
+        }
+    
+        to {
+            background-color: @end;
+        }
+    }
+}
+
+@keyframes uploadFailed {
+    from {
+        opacity: 1;
+        top: 0;
+    }
+
+    to {
+        opacity: 0;
+        top: -40px;
+    }
+}
+
+@knobLabelFont: {
+    font-size: 13px;
+    letter-spacing: normal;
+    font-weight: 400;
+    // text-transform: capitalize;
+    color: @defaultGray;
+    .smallFont();
+}

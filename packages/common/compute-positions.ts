@@ -11,7 +11,7 @@ export function calculatePositionsGivenConnections(originalPositions: IPositions
 
 	// Master audio output should be the root node on the right side
 	// Everything should flow to/from it
-	const connectionsToRoot = selectConnectionsWithTargetIds2(connections, [rootPositionId]).toList()
+	const connectionsToRoot = selectConnectionsWithTargetIds2(connections, rootPositionId).toList()
 
 	const newPositions = originalPositions.withMutations(mutablePositions => {
 		const columnWidth = 128
@@ -38,7 +38,7 @@ export function calculatePositionsGivenConnections(originalPositions: IPositions
 				},
 			)
 
-			selectConnectionsWithTargetIds2(connections, [currentId])
+			selectConnectionsWithTargetIds2(connections, currentId)
 				.toList()
 				.forEach(calculatePosition(newX, currentRow))
 		}

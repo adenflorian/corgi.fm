@@ -1,31 +1,25 @@
 import {Map} from 'immutable'
-import {ConnectionNodeType, IMultiStateThing} from '../common-types'
+import {ConnectionNodeType, IConnectable} from '../common-types'
 import {assertArrayHasNoUndefinedElements} from '../common-utils'
-import {BROADCASTER_ACTION, getConnectionNodeInfo, IClientRoomState, NetworkActionType, SERVER_ACTION} from '.'
+import {BROADCASTER_ACTION, findNodeInfo, IClientRoomState, NetworkActionType, SERVER_ACTION} from '.'
 
 export interface IMultiState {
 	readonly things: IMultiStateThings
 }
 
 export interface IMultiStateThings {
-	readonly [key: string]: IMultiStateThing
+	readonly [key: string]: IConnectable
 }
 
-export const dummyMultiStateThing: IMultiStateThing = {
+export const dummyMultiStateThing: IConnectable = {
 	id: '-1',
-	ownerId: '-2',
-	color: 'black',
 	type: ConnectionNodeType.dummy,
-	width: 0,
-	height: 0,
-	name: 'dummy multi state thing',
-	enabled: false,
 }
 
 export const ADD_MULTI_THING = 'ADD_MULTI_THING'
 type AddMultiThingAction = ReturnType<typeof addMultiThing>
 export const addMultiThing = (
-	thing: IMultiStateThing,
+	thing: IConnectable,
 	thingType: ConnectionNodeType,
 	netActionType: NetworkActionType = NetworkActionType.NO,
 ) => ({
@@ -95,7 +89,7 @@ export type MultiThingAction =
 	| {type: '', id: Id}
 
 // TODO Use immutable js like connections redux
-export function makeMultiReducer<T extends IMultiStateThing, U extends IMultiState>(
+export function makeMultiReducer<T extends IConnectable, U extends IMultiState>(
 	innerReducer: (state: T, action: any) => T,
 	thingType: ConnectionNodeType,
 	actionTypes: string[],
@@ -112,7 +106,7 @@ export function makeMultiReducer<T extends IMultiStateThing, U extends IMultiSta
 					...state,
 					things: {
 						...state.things,
-						[action.thing.id as string]: getConnectionNodeInfo(thingType).stateDeserializer(action.thing),
+						[action.thing.id as string]: findNodeInfo(thingType).stateDeserializer(action.thing),
 					},
 				}
 			case DELETE_MULTI_THINGS: {
@@ -131,7 +125,7 @@ export function makeMultiReducer<T extends IMultiStateThing, U extends IMultiSta
 				return {...state, things: {}}
 			case UPDATE_MULTI_THINGS:
 				if (action.thingType !== thingType) return state
-				const xx = Map(action.things).map(getConnectionNodeInfo(thingType).stateDeserializer).toObject()
+				const xx = Map(action.things).map(findNodeInfo(thingType).stateDeserializer).toObject()
 				// console.log('XXXXXXXX ' + action.thingType + ': ', xx)
 				return {
 					...state,

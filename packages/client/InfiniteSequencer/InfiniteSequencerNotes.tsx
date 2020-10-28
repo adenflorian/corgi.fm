@@ -1,19 +1,21 @@
 /* eslint-disable react/no-array-index-key */
 import {stripIndents} from 'common-tags'
 import React, {useLayoutEffect, useState, useCallback} from 'react'
-import {useDispatch} from 'react-redux'
+import {useDispatch, useSelector} from 'react-redux'
+import {Set} from 'immutable'
 import {MidiClipEvents} from '@corgifm/common/midi-types'
 import {IMidiNote} from '@corgifm/common/MidiNote'
 import {
-	findLowestAndHighestNotes, infiniteSequencerActions,
-	InfiniteSequencerStyle, selectInfiniteSequencer, shamuConnect,
+	infiniteSequencerActions, localActions,
+	InfiniteSequencerStyle, selectInfiniteSequencer,
+	shamuConnect, IClientAppState, selectPosition,
 } from '@corgifm/common/redux'
 import {getColorStringForMidiNote} from '@corgifm/common/shamu-color'
 import {
-	getOctaveFromMidiNote, midiNoteToNoteName,
+	getOctaveFromMidiNote, midiNoteToNoteName, midiNoteToNoteNameFull,
 } from '@corgifm/common/common-samples-stuff'
+import {findLowestAndHighestNotes, clampMidiNote} from '@corgifm/common/common-utils'
 import {isWhiteKey} from '../Keyboard/Keyboard'
-import {localActions} from '../local-middleware'
 
 interface Props {
 	id: Id
@@ -29,6 +31,11 @@ type AllProps = Props & ReduxProps
 
 const sensitivity = 0.1
 const threshold = 1
+const notesPadding = 4
+// const F = 'F'
+// const E = 'E'
+// const C = 'C'
+// const B = 'B'
 
 export function InfiniteSequencerNotes(
 	{id, style, events, showRows}: AllProps
@@ -40,18 +47,20 @@ export function InfiniteSequencerNotes(
 	})
 	const [isAreaSelected, setIsAreaSelected] = useState(false)
 
+	const notesSectionHeight = useSelector(
+		(state: IClientAppState) => selectPosition(state.room, id).height) - (notesPadding * 2)
+
 	const [mouseDelta, setMouseDelta] = useState({x: 0, y: 0})
 
-	const {lowestNote, highestNote} = findLowestAndHighestNotes(events)
+	const {lowestNote, highestNote} = findLowestAndHighestNotes(events.filter(x => x.note >= 0))
 	const numberOfPossibleNotes = highestNote - lowestNote + 1
 	const noteHeightPercentage = 100 / numberOfPossibleNotes
-	const rows = [] as any[]
-
-	if (events.count() > 0) {
-		for (let i = highestNote; i >= lowestNote; i--) {
-			rows.push(i)
-		}
-	}
+	const noteHeightPercentageDecimal = noteHeightPercentage / 100
+	// const rows = new Array(highestNote - lowestNote + 1).fill(0).map((_, note) => ({
+	// 	note,
+	// 	isWhite: isWhiteKey(note),
+	// 	noteName: midiNoteToNoteName(note),
+	// }))
 
 	useLayoutEffect(() => {
 		const handleMouseMove = (event: MouseEvent) => {
@@ -70,11 +79,13 @@ export function InfiniteSequencerNotes(
 
 			if (Math.abs(delta) > threshold) {
 				const index = selectedEvent.index
-				const oldNote = events.get(index)!.notes.first(-1)
+				const oldNote = events.toList().get(index)!.note
 
-				const newNote = oldNote + (delta > 0 ? 1 : -1)
-				dispatch(infiniteSequencerActions.setNote(id, selectedEvent.index, true, newNote))
-				dispatch(localActions.playShortNote(id, newNote))
+				const newNote = clampMidiNote(oldNote + (delta > 0 ? 1 : -1))
+				if (newNote !== oldNote) {
+					dispatch(infiniteSequencerActions.setNote(id, selectedEvent.index, true, newNote))
+					dispatch(localActions.playShortNote(id, Set([newNote])))
+				}
 				setMouseDelta({x: 0, y: 0})
 			} else {
 				setMouseDelta(newMouseDelta)
@@ -95,7 +106,7 @@ export function InfiniteSequencerNotes(
 			setIsAreaSelected(true)
 
 			if (note >= 0) {
-				dispatch(localActions.playShortNote(id, note))
+				dispatch(localActions.playShortNote(id, Set([note])))
 			}
 
 			if (event.shiftKey) {
@@ -118,7 +129,7 @@ export function InfiniteSequencerNotes(
 		if (event.buttons !== 1 || event.shiftKey || !isAreaSelected) return
 
 		if (note >= 0) {
-			dispatch(localActions.playShortNote(id, note))
+			dispatch(localActions.playShortNote(id, Set([note])))
 		}
 	}, [dispatch, isAreaSelected, id])
 
@@ -126,12 +137,12 @@ export function InfiniteSequencerNotes(
 		return (
 			<div className={`display ${events.count() > 8 ? 'small' : ''}`}>
 				<div className="notes">
-					{events.map((event, index) => {
-						const note = event.notes.first(-1)
+					{events.toList().map(event => {
+						const note = event.note
 
 						return (
 							<div
-								key={index}
+								key={event.id.toString()}
 								className="event usernameFont colorBars"
 								style={{
 									backgroundColor: note === -1 ? 'none' : getColorStringForMidiNote(note),
@@ -153,35 +164,45 @@ export function InfiniteSequencerNotes(
 		)
 	} else {
 		return (
-			<div className={`display ${events.count() > 8 ? 'small' : ''}`}>
-				<div className="notes">
-					{events.map(x => x.notes.first(-1)).map((note, index) =>
-						<ColorGridNote
-							note={note}
-							index={index}
-							key={index}
-							height={noteHeightPercentage + (note === lowestNote ? 1 : 0)}
-							top={(highestNote - note) * noteHeightPercentage}
-							onMouseDown={handleMouseDown}
-							onMouseEnter={handleMouseEnter}
-						/>,
-					)}
-				</div>
+			<div className={`display ${events.count() > 8 ? 'small' : ''}`} style={{padding: 4}}>
+				{/* Commented out because i can't get it to look right, need better solution
 				{showRows &&
 					<div className="rows">
-						{rows.map(note => (
-							<div
-								key={note}
-								className={`row ${isWhiteKey(note) ? 'white' : 'black'}`}
-								style={{
-									height: `${noteHeightPercentage + (note === lowestNote ? 1 : 0)}%`,
-									top: `${(highestNote - note) * noteHeightPercentage}%`,
-									width: '100%',
-								}}
-							/>
-						))}
+						{rows.map(({note, isWhite, noteName}) => {
+							const isLowestNote = note === lowestNote
+							const isHighestNote = note === highestNote
+							// const heightMultiplier = (noteName === C || noteName === F) && !isLowestNote
+							// 	? 2
+							// 	: (noteName === B || noteName === E) && !isHighestNote
+							// 		? 0
+							// 		: 1
+							return (
+								<div
+									key={note}
+									className={`row ${isWhite ? 'white' : 'black'}`}
+									style={{
+										height: Math.round(noteHeightPercentageDecimal * notesSectionHeight) * 1,
+										top: `${(highestNote - note) * noteHeightPercentage}%`,
+										width: '100%',
+									}}
+								/>
+							)
+						})}
 					</div>
-				}
+				} */}
+				<div className="notes"/* style={{marginTop: showRows ? -notesSectionHeight : undefined}} */>
+					{events.toList().map((event, index) =>
+						<ColorGridNote
+							note={event.note}
+							index={index}
+							key={event.id as string}
+							height={Math.round(noteHeightPercentageDecimal * (notesSectionHeight)) /* + (event.note === lowestNote ? 1 : 0) */}
+							top={((highestNote - event.note) * noteHeightPercentageDecimal) * (notesSectionHeight - 1)}
+							onMouseDown={handleMouseDown}
+							onMouseEnter={handleMouseEnter}
+						/>
+					)}
+				</div>
 			</div>
 		)
 	}
@@ -195,20 +216,23 @@ const ColorGridNote = React.memo(
 	) {
 		return (
 			<div
-				className="event noDrag"
+				className="event"
 				onMouseDown={e => onMouseDown(e, note, index)}
 				onMouseEnter={e => onMouseEnter(e, note, index)}
-				title={stripIndents`Left click and drag to play notes
+				title={stripIndents`${midiNoteToNoteNameFull(note)}
+
+					Left click and drag to play notes
 					Shift + left click and drag up and down to change note
-					Shift + right click to delete`}
+					Shift + right click to delete
+					Ctrl + Z to undo (no redo (yet))`}
 				onContextMenu={e => e.preventDefault()}
 			>
 				<div
 					className="note"
 					style={{
 						backgroundColor: note === -1 ? 'none' : getColorStringForMidiNote(note),
-						height: `${height}%`,
-						top: `${top}%`,
+						height,
+						marginTop: Math.ceil(top),
 					}}
 				/>
 			</div>

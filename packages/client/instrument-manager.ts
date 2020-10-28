@@ -7,7 +7,7 @@ import {
 	MASTER_AUDIO_OUTPUT_TARGET_ID, selectAllBasicSynthesizerIds,
 	selectAllSamplerIds, selectAllSimpleCompressorIds, selectAllSimpleDelayIds,
 	selectAllSimpleReverbIds, selectBasicSynthesizer,
-	selectConnectionsWithSourceIds, selectPosition,
+	selectConnectionsWithSourceId, selectPosition,
 	selectSampler, selectSimpleCompressor, selectSimpleDelay,
 	selectSimpleReverb, SimpleCompressorState, SimpleDelayState,
 	SimpleReverbState,
@@ -101,15 +101,15 @@ export const setupInstrumentManager = (
 				}),
 				ConnectionNodeType.basicSampler,
 				(instrument: BasicSamplerInstrument, instrumentState: BasicSamplerState) => {
-					instrument.setPan(instrumentState.pan)
-					instrument.setFilterCutoffFrequency(instrumentState.lowPassFilterCutoffFrequency)
-					instrument.setAttack(instrumentState.attack)
-					instrument.setDecay(instrumentState.decay)
-					instrument.setSustain(instrumentState.sustain)
-					instrument.setRelease(instrumentState.release)
-					instrument.setDetune(instrumentState.detune)
-					instrument.setGain(instrumentState.gain)
-					instrument.setFilterType(instrumentState.filterType)
+					instrument.setPan(instrumentState.params.pan)
+					instrument.setFilterCutoffFrequency(instrumentState.params.filterCutoff)
+					instrument.setAttack(instrumentState.params.attack)
+					instrument.setDecay(instrumentState.params.decay)
+					instrument.setSustain(instrumentState.params.sustain)
+					instrument.setRelease(instrumentState.params.release)
+					instrument.setDetune(instrumentState.params.detune)
+					instrument.setGain(instrumentState.params.gain)
+					instrument.setFilterType(instrumentState.params.filterType)
 					instrument.setSamples(instrumentState.samples)
 				},
 			)
@@ -302,7 +302,7 @@ export const setupInstrumentManager = (
 	}
 
 	function updateAudioConnectionsFromSource(roomState: IClientRoomState, sourceId: Id, audioNodeWrapper: AudioNodeWrapper) {
-		const outgoingConnections = selectConnectionsWithSourceIds(roomState, [sourceId])
+		const outgoingConnections = selectConnectionsWithSourceId(roomState, sourceId)
 
 		if (outgoingConnections.count() === 0) {
 			return audioNodeWrapper.disconnectAll()

@@ -1,16 +1,41 @@
+import {Application} from 'express'
+import * as uuid from 'uuid'
+import {ManagedUpload} from 'aws-sdk/clients/s3'
+import {S3} from 'aws-sdk/clients/all'
 import {configureServerStore} from '@corgifm/common/redux'
+import {mockUuid} from '@corgifm/common/test-common'
 import {testApi, path, get, del, ContentTypes} from '@corgifm/api-tester'
 import {logger} from '@corgifm/common/logger'
-import {Application} from 'express'
 import {connectDB, DBStore} from '../database/database'
 import {setupExpressApp} from '../setup-express-app'
 import * as serverAuth from '../auth/server-auth'
+import * as corgiS3 from '../api/s3'
 import {
-	apiRouteNotFound, emailVerifiedUidA, validTokenVerifiedEmailUidARequest,
+	apiRouteNotFoundResponse, emailVerifiedUidA, validTokenVerifiedEmailUidARequest,
 } from './api-test-common'
 import {getUserApiTests} from './users-api-tests'
+import {getSampleApiTests} from './samples-api-tests'
 
+jest.mock('uuid')
+jest.mock('../api/s3')
 jest.mock('../auth/server-auth')
+
+const mockCreateNodeId = uuid.v4 as unknown as jest.Mock<string>
+
+mockCreateNodeId.mockImplementation(() => mockUuid)
+
+const mockS3Upload = corgiS3.s3Upload as unknown as
+	jest.Mock<Promise<ManagedUpload.SendData>, [S3.PutObjectRequest]>
+
+mockS3Upload.mockImplementation(
+	async (params): Promise<ManagedUpload.SendData> => {
+		return {
+			Bucket: 'mockBucket',
+			ETag: 'mockETag',
+			Key: params.Key,
+			Location: 'mockLocation',
+		}
+	})
 
 const verifyAuthHeaderMock =
 	serverAuth.verifyAuthHeader as
@@ -101,13 +126,13 @@ describe('API Tests', () => {
 					resBody: /Terms of Service/,
 				}),
 			]),
-			path('newsletter', [
-				get({
-					status: 200,
-					contentType: ContentTypes.TextHtml,
-					resBody: /Begin Mailchimp Signup Form/,
-				}),
-			]),
+			// path('newsletter', [
+			// 	get({
+			// 		status: 200,
+			// 		contentType: ContentTypes.TextHtml,
+			// 		resBody: /Begin Mailchimp Signup Form/,
+			// 	}),
+			// ]),
 			path('state', [
 				get({
 					status: 200,
@@ -132,10 +157,11 @@ describe('API Tests', () => {
 						name: 'should 404 when no matching route',
 						status: 404,
 						contentType: ContentTypes.ApplicationJson,
-						resBody: apiRouteNotFound,
+						resBody: apiRouteNotFoundResponse,
 					}),
 				]),
 				path('users', getUserApiTests(getDb, verifyAuthHeaderMock)),
+				path('samples', getSampleApiTests(getDb, verifyAuthHeaderMock)),
 			]),
 		], {
 			authorizedRequests: {

@@ -1,4 +1,4 @@
-import {BuiltInOscillatorType, CustomOscillatorType, LfoOscillatorType, ShamuOscillatorType} from '@corgifm/common/OscillatorTypes'
+import {BuiltInOscillatorType, CustomOscillatorType, LfoOscillatorType, ShamuOscillatorType, BuiltInBQFilterType} from '@corgifm/common/OscillatorTypes'
 import {SynthLfoTarget} from '@corgifm/common/redux'
 import {
 	midiNoteToFrequency, Voice, Voices, IInstrumentOptions, Instrument,
@@ -57,10 +57,12 @@ export class BasicSynthesizer extends Instrument<SynthVoices, SynthVoice> {
 			options.oscillatorType,
 			this._detune,
 			this._lowPassFilterCutoffFrequency,
+			this._filter.type as BuiltInBQFilterType,
 			this._lfoRate,
 			this._lfoAmount,
 			this._lfoTarget,
 			this._lfoWave,
+			this._releaseTimeInSeconds,
 		)
 	}
 
@@ -171,23 +173,27 @@ class SynthVoices extends Voices<SynthVoice> {
 		private _oscType: ShamuOscillatorType,
 		_detune: number,
 		_lowPassFilterCutoffFrequency: number,
+		_filterType: BuiltInBQFilterType,
 		private _lfoRate: number,
 		private _lfoAmount: number,
 		private _lfoTarget: SynthLfoTarget,
 		private _lfoWave: LfoOscillatorType,
+		release: number,
 	) {
-		super(_detune, _lowPassFilterCutoffFrequency)
+		super(_detune, _lowPassFilterCutoffFrequency, _filterType, release)
 	}
 
-	protected _createVoice(invincible: boolean) {
+	protected _createVoice(invincible: boolean, note: number, attack: number, decay: number, sustain: number) {
 		return new SynthVoice(
 			this._audioContext,
 			this._destination,
 			this._oscType,
 			this._detune,
 			this._lowPassFilterCutoffFrequency,
+			this._filterType,
 			this._getOnEndedCallback(),
 			invincible,
+			attack, decay, sustain,
 			// this._lfoRate,
 			// this._lfoAmount,
 			// this._lfoTarget,
@@ -220,6 +226,10 @@ class SynthVoices extends Voices<SynthVoice> {
 		this._allVoices.forEach(x => x.setLfoTarget(target))
 	}
 
+	protected getRelease(): number {
+		return this._releaseTimeInSeconds
+	}
+
 	protected _getAudioContext() {return this._audioContext}
 }
 
@@ -236,14 +246,20 @@ class SynthVoice extends Voice {
 		oscType: ShamuOscillatorType,
 		detune: number,
 		lowPassFilterCutoffFrequency: number,
+		filterType: BuiltInBQFilterType,
 		onEnded: OnEndedCallback,
 		invincible: boolean,
+		attackTimeInSeconds: number,
+		decayTimeInSeconds: number,
+		sustain: number,
 		// private _lfoRate: number,
 		// private _lfoAmount: number,
 		// private _lfoTarget: SynthLfoTarget,
 		// private _lfoWave: LfoOscillatorType,
 	) {
-		super(audioContext, destination, onEnded, detune, lowPassFilterCutoffFrequency, invincible)
+		super(audioContext, destination, onEnded, attackTimeInSeconds,
+			decayTimeInSeconds, sustain, detune,
+			lowPassFilterCutoffFrequency, filterType, invincible)
 
 		this._oscillatorType = oscType
 		this._nextOscillatorType = oscType

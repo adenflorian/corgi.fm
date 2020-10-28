@@ -1,13 +1,24 @@
 import {Map} from 'immutable'
 import {combineReducers, Reducer} from 'redux'
 import {createSelector} from 'reselect'
-import {IClientAppState} from './common-redux-types'
-import {selectAllConnections} from './connections-redux'
-import {selectGlobalClockState} from './global-clock-redux'
-import {selectAllPositions} from './positions-redux'
-import {selectRoomSettings} from './room-settings-redux'
-import {selectShamuGraphState} from './shamu-graph'
-import {SERVER_ACTION} from '.'
+import {ActionType} from 'typesafe-actions'
+import {
+	SERVER_ACTION, selectShamuGraphState, selectRoomSettings,
+	selectAllPositions, selectGlobalClockState, selectAllConnections,
+	IClientAppState,
+} from '.'
+import {selectExpGraphsState, ExpProjectState} from './experimental'
+import {selectRoomInfoState} from './room-info-redux'
+import {RoomType} from '../common-types'
+
+export const roomsActions = {
+	requestCreate: (name: string, roomType: RoomType) => ({
+		type: 'REQUEST_CREATE_ROOM' as const,
+		name,
+		roomType,
+		SERVER_ACTION,
+	} as const),
+} as const
 
 export const SET_ROOMS = 'SET_ROOMS'
 export type SetRoomsAction = ReturnType<typeof setRooms>
@@ -49,13 +60,6 @@ export const userLeftRoom = (name: string, timestamp: number) => ({
 	timestamp,
 })
 
-export const REQUEST_CREATE_ROOM = 'REQUEST_CREATE_ROOM'
-export type RequestCreateRoomAction = ReturnType<typeof requestCreateRoom>
-export const requestCreateRoom = () => ({
-	type: REQUEST_CREATE_ROOM as typeof REQUEST_CREATE_ROOM,
-	SERVER_ACTION,
-})
-
 export const DELETE_ROOM = 'DELETE_ROOM'
 export type DeleteRoomAction = ReturnType<typeof deleteRoom>
 export const deleteRoom = (name: string) => ({
@@ -72,23 +76,41 @@ export const loadRoom = (savedRoom: SavedRoom) => ({
 	SERVER_ACTION,
 })
 
-export type RoomsReduxAction = SetRoomsAction | SetActiveRoomAction | RequestCreateRoomAction |
-ChangeRoomAction | CreateRoomAction | DeleteRoomAction | UserLeftRoomAction | LoadRoomAction
+export type RoomsReduxAction = SetRoomsAction | SetActiveRoomAction |
+ChangeRoomAction | CreateRoomAction | DeleteRoomAction | UserLeftRoomAction | LoadRoomAction |
+ActionType<typeof roomsActions>
 
 export interface LocalSaves {
 	readonly all: Map<Id, SavedRoom>
 }
 
-export interface SavedRoom {
-	readonly connections: ReturnType<typeof selectAllConnections>
-	readonly globalClock: ReturnType<typeof selectGlobalClockState>
-	readonly positions: ReturnType<typeof selectAllPositions>
+export type SavedRoom = SavedClassicRoom | SavedExpRoom | SavedDummyRoom
+
+export interface SavedRoomBase {
 	readonly roomSettings: ReturnType<typeof selectRoomSettings>
-	readonly shamuGraph: ReturnType<typeof selectShamuGraphState>
 	readonly saveDateTime: string
 	readonly saveClientVersion: string
 	readonly saveServerVersion: string
 	readonly room: string
+	readonly roomType: RoomType
+	readonly roomInfo: ReturnType<typeof selectRoomInfoState>
+}
+
+export interface SavedClassicRoom extends SavedRoomBase {
+	readonly roomType: RoomType.Normal
+	readonly connections: ReturnType<typeof selectAllConnections>
+	readonly globalClock: ReturnType<typeof selectGlobalClockState>
+	readonly positions: ReturnType<typeof selectAllPositions>
+	readonly shamuGraph: ReturnType<typeof selectShamuGraphState>
+}
+
+export interface SavedDummyRoom extends SavedRoomBase {
+	readonly roomType: RoomType.Dummy
+}
+
+export interface SavedExpRoom extends SavedRoomBase {
+	readonly roomType: RoomType.Experimental
+	readonly activity: ExpProjectState
 }
 
 const initialState = {

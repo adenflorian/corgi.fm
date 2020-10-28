@@ -36,6 +36,12 @@ export const roomSettingsActions = {
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	} as const),
+	setViewMode: (viewMode: RoomSettings['viewMode']) => ({
+		type: 'ROOM_SETTINGS_SET_VIEW_MODE',
+		viewMode,
+		SERVER_ACTION,
+		BROADCASTER_ACTION,
+	} as const),
 } as const
 
 export enum LineType {
@@ -47,6 +53,7 @@ const initialState = Object.freeze({
 	lineType: LineType.Curved,
 	ownerId: '-1' as Id,
 	onlyOwnerCanDoStuff: false,
+	viewMode: 'debug' as 'debug' | 'normal'
 })
 
 export type RoomSettings = typeof initialState
@@ -59,6 +66,7 @@ export function roomSettingsReducer(settings = initialState, action: RoomSetting
 		case 'CHANGE_LINE_TYPE_ROOM_SETTING': return {...settings, lineType: action.newLineType}
 		case 'CHANGE_ONLY_OWNER_CAN_DO_STUFF': return {...settings, onlyOwnerCanDoStuff: action.onlyOwnerCanDoStuff}
 		case 'SET_ROOM_OWNER': return {...settings, ownerId: action.ownerId}
+		case 'ROOM_SETTINGS_SET_VIEW_MODE': return {...settings, viewMode: action.viewMode}
 		default: return settings
 	}
 }

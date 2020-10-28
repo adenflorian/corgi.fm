@@ -1,7 +1,4 @@
 import React from 'react'
-import {
-	IoMdPlay as Play, IoMdSquare as Stop,
-} from 'react-icons/io'
 import {connect} from 'react-redux'
 import {
 	globalClockActions, IClientAppState, IGlobalClockState,
@@ -10,6 +7,7 @@ import {
 import {KnobIncremental} from './Knob/KnobIncremental'
 import './MasterControls.less'
 import {Panel} from './Panel/Panel'
+import {StopIcon, PlayIcon} from './CommonNodeButtons'
 
 interface IMasterControlsProps {
 	color: string
@@ -70,17 +68,17 @@ export const MasterControls = (
 				<div className="controls">
 					<span
 						className={`play ${masterClockState.index % 2 === 0 ? 'highlight' : ''}`}
-						onClick={masterClockState.isPlaying ? restart : onPlay}
+						onClick={() => masterClockState.isPlaying ? restart() : onPlay()}
 						title="Start (Space) or Restart (Ctrl + Space)"
 					>
-						<Play />
+						<PlayIcon />
 					</span>
 					<span
 						className="stop"
 						onClick={() => onStop()}
 						title="Stop (Space)"
 					>
-						<Stop />
+						<StopIcon />
 					</span>
 				</div>
 				{knobs}

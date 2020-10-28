@@ -1,0 +1,187 @@
+@import '../colors.less';
+@import '../AppCommon.less';
+
+.experimentalAnchor {
+	width: 100%;
+}
+
+@portDiameter: 16px;
+
+@portCandidate: {
+	animation-name: portNameCandidate;
+	animation-duration: 0.5s;
+	animation-iteration-count: infinite;
+	animation-direction: alternate;
+	animation-fill-mode: both;
+	animation-timing-function: ease-in-out;
+}
+
+.expNodeDebugView {
+	box-sizing: border-box;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	white-space: nowrap;
+	position: relative;
+
+	.nodeName {
+		font-size: 1.2em;
+		margin-bottom: 4px;
+		color: @defaultGray;
+	}
+
+	.nodeId {
+		font-size: 0.75em;
+		line-height: 1em;
+		margin-bottom: 4px;
+		color: @knobValueGray;
+	}
+
+	.sectionLabel {
+		color: @defaultGray;
+	}
+
+	.params {
+		margin-bottom: 4px;
+
+		.param {
+			display: flex;
+			justify-content: space-between;
+
+			&:nth-child(odd) {
+				// background-color: @panelGrayDark;
+			}
+
+			.paramId {
+
+			}
+			.paramValue {
+
+			}
+		}
+
+		.paramKnobs {
+			display: flex;
+			// flex-wrap: wrap;
+			justify-content: space-around;
+		}
+
+		.enumParams {
+			display: flex;
+			justify-content: center;
+			padding: 8px 0;
+			flex-wrap: wrap;
+
+			& > * + * {
+				margin-top: 8px;
+			}
+		}
+
+		.buttons {
+			display: flex;
+			justify-content: center;
+			padding: 8px 0;
+			flex-wrap: wrap;
+		}
+	}
+
+	.ports {
+		display: flex;
+		margin: 0 -16px;
+
+		.inputPorts, .outputPorts {
+			margin-bottom: 4px;
+			flex-grow: 1;
+	
+			.port {
+				display: flex;
+				align-items: center;
+				padding: 4px 0;
+				
+				&.enabled-false {
+					color: @disabledGray;
+				}
+	
+				&:nth-child(odd) {
+					// background-color: @panelGrayDark;
+				}
+	
+				.portId {
+					margin: 0 4px;
+					color: @defaultGray;
+					@knobLabelFont();
+				}
+				.portName {
+					margin: 0 4px;
+					color: @defaultGray;
+					@knobLabelFont();
+				}
+				&.ghostActive-true {
+					&.candidate-true {
+						.portName {
+							@portCandidate();
+						}
+						.portDropZone {
+						}
+					}
+					&.candidate-false {
+						.portName {
+							color: @panelGrayLight;
+						}
+						.portDropZone {
+							color: @panelGrayLight;
+						}
+					}
+				}
+				.paramValue {
+	
+				}
+				.portDropZone {
+					background-color: @panelGray;
+					height: @portDiameter;
+					width: @portDiameter;
+					border-radius: 50%;
+					box-shadow: inset 0 0 0px 4px currentColor;
+
+					&.type-audio {
+					}
+
+					&.type-midi {
+						border-radius: 2px;
+					}
+				}
+			}
+		}
+	
+		.inputPorts {
+			.port {
+				justify-content: flex-start;
+			}
+		}
+	
+		.outputPorts {
+			.port {
+				flex-direction: row-reverse;
+			}
+		}
+	}
+
+	.audioWorkletWarning {
+		white-space: normal;
+		color: @orange;
+		border: 2px dashed currentColor;
+		border-radius: 8px;
+		padding: 8px;
+		margin: 8px 0;
+	}
+}
+
+@keyframes portNameCandidate {
+  from {
+    color: @defaultGray;
+  }
+
+  to {
+    color: currentColor;
+  }
+}

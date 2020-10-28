@@ -1,14 +1,14 @@
 /* eslint-disable react/no-array-index-key */
-import {List} from 'immutable'
+import {Set, List} from 'immutable'
 import React from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 import {MAX_MIDI_NOTE_NUMBER_127, MIN_MIDI_NOTE_NUMBER_0} from '@corgifm/common/common-constants'
 import {MidiClipEvents} from '@corgifm/common/midi-types'
-import {IMidiNotes} from '@corgifm/common/MidiNote'
+import {IMidiNote, IMidiNotes} from '@corgifm/common/MidiNote'
 import {
 	gridSequencerActions, GridSequencerFields, IClientAppState,
-	selectGlobalClockState, selectGridSequencer,
+	selectGlobalClockState, selectGridSequencer, GridSequencerState,
 } from '@corgifm/common/redux'
 import {getColorStringForMidiNote} from '@corgifm/common/shamu-color'
 import {
@@ -28,7 +28,7 @@ interface IGridSequencerNotesProps {
 
 interface IGridSequencerNotesReduxProps {
 	events: MidiClipEvents
-	activeIndex: number
+	clipLengthBeats: number
 	bottomNote: number
 	notesToShow: number
 }
@@ -45,13 +45,15 @@ type IGridSequencerNotesAllProps =
 
 export const GridSequencerNotes = (props: IGridSequencerNotesAllProps) => {
 	const {
-		activeIndex, bottomNote, events, handleNoteClicked,
+		clipLengthBeats, bottomNote, events, handleNoteClicked,
 		handleMouseEnter, handleMouseDown, notesToShow, handleScrollChange,
 	} = props
 
 	const marks = events.reduce((allMarks, event) => {
-		return allMarks.concat(event.notes.map(note => note / 127))
+		return allMarks.concat(event.note / 127)
 	}, List<number>())
+
+	const columns = new Array(clipLengthBeats).fill(0)
 
 	return (
 		<React.Fragment>
@@ -80,14 +82,13 @@ export const GridSequencerNotes = (props: IGridSequencerNotesAllProps) => {
 					})}
 				</div>
 				<div className="events">
-					{events.map((event, eventIndex) => {
+					{columns.map((_, eventIndex) => {
 						return <Event
 							key={eventIndex}
-							notes={event.notes}
+							notes={Set(events.filter(x => x.startBeat === eventIndex).map(x => x.note).valueSeq())}
 							eventIndex={eventIndex}
 							notesToShow={notesToShow}
 							bottomNote={bottomNote}
-							isActive={activeIndex === eventIndex}
 							handleNoteClicked={handleNoteClicked}
 							handleMouseEnter={handleMouseEnter}
 							handleMouseDown={handleMouseDown}
@@ -112,7 +113,6 @@ interface IEventProps {
 	eventIndex: number
 	notesToShow: number
 	bottomNote: number
-	isActive: boolean
 	handleNoteClicked: GridSequencerEventHandler
 	handleMouseEnter: GridSequencerEventHandler
 	handleMouseDown: GridSequencerEventHandler
@@ -120,14 +120,14 @@ interface IEventProps {
 
 class Event extends React.PureComponent<IEventProps> {
 	public render() {
-		const {eventIndex, notesToShow, isActive} = this.props
+		const {eventIndex, notesToShow} = this.props
 
 		const placeholderNotesArray = Array.apply(0, new Array(notesToShow))
 
 		return (
 			<div
 				key={eventIndex}
-				className={`event ${isActive ? 'active' : 'transitionAllColor'}`}
+				className={`event`}
 			>
 				{placeholderNotesArray.map(this._renderNote)}
 			</div>
@@ -168,7 +168,6 @@ class Note extends React.PureComponent<INoteProps> {
 			onMouseEnter={this._onMouseEnter}
 			onMouseDown={this._onMouseDown}
 			style={{
-				backgroundColor: isEnabled ? getColorStringForMidiNote(note) : undefined,
 				color: getColorStringForMidiNote(note),
 				borderRadius: 4,
 			}}
@@ -190,11 +189,9 @@ const mapStateToProps = (state: IClientAppState, props: IGridSequencerNotesProps
 
 	return {
 		events: gridSequencerState.midiClip.events,
-		activeIndex: gridSequencerState.isPlaying
-			? selectGlobalClockState(state.room).index % gridSequencerState.midiClip.events.count()
-			: -1,
+		clipLengthBeats: gridSequencerState.midiClip.length,
 		bottomNote: gridSequencerState.scrollY,
-		notesToShow: gridSequencerState.notesToShow,
+		notesToShow: GridSequencerState.notesToShow,
 	}
 }
 

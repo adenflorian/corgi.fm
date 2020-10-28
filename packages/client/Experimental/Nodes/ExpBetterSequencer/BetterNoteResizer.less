@@ -1,0 +1,49 @@
+@import "../../../colors.less";
+@import "../../../AppCommon.less";
+
+@leftBracketCursor: {
+    cursor: url('../../../img/left-bracket.png') 0 16, w-resize;
+}
+
+@rightBracketCursor: {
+    cursor: url('../../../img/right-bracket.png') 3 16, e-resize;
+}
+
+.expBS_noteResizer {
+	pointer-events: none;
+
+	.resizeHandle {
+		pointer-events: all;
+		height: 100%;
+		fill: none;
+		stroke: none;
+
+		.ctrl-true.alt-true & {
+			pointer-events: none;
+		}
+
+		&.left, &.right {
+			margin-top: -1px;
+			margin-bottom: -1px;
+
+			.ctrl-true & {
+				cursor: auto !important;
+			}
+		}
+
+		.moving-false &.left {
+			margin-left: -1px;
+			@leftBracketCursor();
+		}
+
+		.moving-false &.right {
+			margin-right: -1px;
+			@rightBracketCursor();
+		}
+
+		&.mid {
+			margin-top: -1px;
+			margin-bottom: -1px;
+		}
+	}
+}

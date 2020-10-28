@@ -1,12 +1,18 @@
 import {Map} from 'immutable'
-import {combineReducers, Reducer} from 'redux'
+import {combineReducers} from 'redux'
 import {ActionType} from 'typesafe-actions'
-import {IClientRoomState} from './common-redux-types'
+import {IClientRoomState, BroadcastAction, IClientAppState} from './common-redux-types'
 import {
 	BROADCASTER_ACTION, SERVER_ACTION,
 } from '.'
 
 import uuid = require('uuid')
+
+export interface DeleteGhostInfo {
+	readonly nodeId: Id
+	readonly side: ActiveGhostConnectorSourceOrTarget
+	readonly portId: number
+}
 
 export const ghostConnectorActions = {
 	create: (newGhostConnection: GhostConnection) => ({
@@ -15,9 +21,10 @@ export const ghostConnectorActions = {
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	} as const),
-	delete: (id: Id) => ({
+	delete: (id: Id, info?: DeleteGhostInfo) => ({
 		type: 'GHOST_CONNECTION_DELETE',
 		id,
+		info,
 		SERVER_ACTION,
 		BROADCASTER_ACTION,
 	} as const),
@@ -30,10 +37,6 @@ export const ghostConnectorActions = {
 		BROADCASTER_ACTION,
 	} as const),
 } as const
-
-export interface GhostConnectionsState {
-	all: Map<Id, GhostConnection>
-}
 
 export enum ActiveGhostConnectorSourceOrTarget {
 	Source = 'Source',
@@ -82,8 +85,9 @@ export type GhostConnectorAction = ActionType<typeof ghostConnectorActions>
 
 export type GhostConnections = Map<Id, GhostConnection>
 
-export const ghostConnectionsReducer: Reducer<GhostConnectionsState> = combineReducers({
+export const ghostConnectionsReducer = combineReducers({
 	all: _allGhostConnectionsReducer,
+	localActiveId: _localActiveIdReducer,
 })
 
 function _allGhostConnectionsReducer(
@@ -104,7 +108,32 @@ function _allGhostConnectionsReducer(
 	}
 }
 
+function _localActiveIdReducer(
+	state: Id | null = null,
+	action: GhostConnectorAction,
+): Id | null {
+	switch (action.type) {
+		case 'GHOST_CONNECTION_CREATE': return (action as unknown as BroadcastAction).alreadyBroadcasted
+			? state
+			: action.newGhostConnection.id
+		case 'GHOST_CONNECTION_DELETE': return (action as unknown as BroadcastAction).alreadyBroadcasted
+			? state
+			: action.id === state
+				? null
+				: state
+		default: return state
+	}
+}
+
 export const selectGhostConnectionsState = (state: IClientRoomState) => state.ghostConnections
 
 export const selectGhostConnection = (state: IClientRoomState, id: Id): GhostConnection =>
 	selectGhostConnectionsState(state).all.get(id, GhostConnection.dummy)
+
+export function createLocalActiveGhostConnectionSelector() {
+	return (state: IClientAppState) => {
+		const id = state.room.ghostConnections.localActiveId
+		if (!id) return null
+		return selectGhostConnection(state.room, id)
+	}
+}

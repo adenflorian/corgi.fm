@@ -32,7 +32,21 @@ server {
 	return 404; # managed by Certbot
 }
 
+server {
+	listen 80;
+	listen 443 ssl;
+	server_name *.corgi.fm;
+	return 301 https://corgi.fm$request_uri;
+}
+
 # /etc/nginx/nginx.conf
+...
+http {
+	##
+	# corgi settings
+	##
+	
+	client_max_body_size 10M;
 ...
 upstream websocket {
 	server localhost:3000;

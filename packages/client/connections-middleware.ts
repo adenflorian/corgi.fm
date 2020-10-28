@@ -1,23 +1,24 @@
 import {Middleware} from 'redux'
 import {calculatePositionsGivenConnections} from '@corgifm/common/compute-positions'
 import {logger} from '@corgifm/common/logger'
-import {OrganizeGraphAction} from '@corgifm/common/redux/common-actions'
+import {CommonAction} from '@corgifm/common/redux/common-actions'
 import {BroadcastAction} from '@corgifm/common/redux/common-redux-types'
 import {
 	GhostConnectorAction, IClientAppState,
 	IConnectionAction, PositionAction,
 	selectAllConnections, selectAllPositions, selectConnection,
-	selectConnectionsWithSourceIds, updatePositions,
+	selectConnectionsWithSourceId, updatePositions, LocalAction,
+	createLocalActiveGhostConnectionSelector, ghostConnectorActions,
 } from '@corgifm/common/redux'
 import {handleStopDraggingGhostConnector} from './dragging-connections'
 import {GetAllInstruments} from './instrument-manager'
 
-type ConnectionClientMiddleWareAction = IConnectionAction | OrganizeGraphAction |
-GhostConnectorAction | PositionAction
+type ConnectionClientMiddleWareAction = IConnectionAction | CommonAction |
+GhostConnectorAction | PositionAction | LocalAction
 
 // TODO Merge with local middleware?
-export const connectionsClientMiddleware: (getAllInstruments: GetAllInstruments) => Middleware<{}, IClientAppState> =
-	(getAllInstruments: GetAllInstruments) => ({dispatch, getState}) => next => (action: ConnectionClientMiddleWareAction) => {
+export const makeConnectionsClientMiddleware: (getAllInstruments: GetAllInstruments) => Middleware<{}, IClientAppState> =
+	(getAllInstruments: GetAllInstruments) => ({dispatch, getState}) => next => function _connectionsClientMiddleware(action: ConnectionClientMiddleWareAction) {
 
 		const beforeState = getState()
 
@@ -29,13 +30,22 @@ export const connectionsClientMiddleware: (getAllInstruments: GetAllInstruments)
 			case 'GHOST_CONNECTION_DELETE': {
 				if ((action as unknown as BroadcastAction).alreadyBroadcasted) return
 
+				if (!action.info) return
+
 				try {
-					handleStopDraggingGhostConnector(beforeState.room, dispatch, action.id)
+					handleStopDraggingGhostConnector(beforeState.room, dispatch, action.id, action.info)
 				} catch (error) {
 					logger.warn('Caught error (will ignore) when handling GHOST_CONNECTION_DELETE: ', error)
 					return
 				}
 
+				return
+			}
+			case 'MOUSE_UP_ON_PLACEHOLDER': {
+				const localActiveGhostConnection = createLocalActiveGhostConnectionSelector()(afterState)
+				if (localActiveGhostConnection) {
+					dispatch(ghostConnectorActions.delete(localActiveGhostConnection.id, action))
+				}
 				return
 			}
 			case 'ORGANIZE_GRAPH':
@@ -66,7 +76,7 @@ export const connectionsClientMiddleware: (getAllInstruments: GetAllInstruments)
 
 				const instruments = getAllInstruments()
 
-				return selectConnectionsWithSourceIds(getState().room, [action.id])
+				return selectConnectionsWithSourceId(getState().room, action.id)
 					.forEach(connection => {
 						const instrument = instruments.get(connection.targetId)
 						if (instrument) {

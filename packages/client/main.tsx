@@ -1,5 +1,3 @@
-// TODO Is this still needed?
-import 'babel-polyfill'
 import React from 'react'
 import * as ReactGA from 'react-ga'
 import {Middleware} from 'redux'
@@ -25,7 +23,12 @@ import {setupMidiSupport} from './setup-midi-support'
 import {getUsernameFromLocalStorage, saveUsernameToLocalStorage} from './username'
 import {SamplesManager} from './WebAudio/SamplesManager'
 import {setStoreForSchedulerVisual, startSchedulerVisualLoop} from './WebAudio/SchedulerVisual'
-import {setupWebsocketAndListeners, socket} from './websocket-listeners'
+import {SingletonContextImpl} from './SingletonContext'
+import {simpleGlobalClientState} from './SimpleGlobalClientState'
+import {createExpTupperware} from './Experimental/experimental-middleware'
+import {MidiService} from './ClientServices/MidiService'
+import {WebSocketService} from './ClientServices/WebSocketService'
+import {loadAudioWorkletsAsync} from './WebAudio/AudioWorklets/audio-worklets'
 
 if (!isLocalDevClient()) initSentry()
 
@@ -77,18 +80,24 @@ async function setupAsync() {
 
 	// Might be needed for safari
 	const AudioContext = window.AudioContext || window.webkitAudioContext
-	const audioContext = new AudioContext()
-	const preFx = audioContext.createGain()
+	const audioContext = new AudioContext() as AudioContext
+	simpleGlobalClientState.resetAnalyserDumpNode(audioContext)
+	const preMasterLimiter = audioContext.createGain()
 
 	const samplesManager = new SamplesManager(audioContext)
 
 	const loadedOptionsState = loadOptionsState()
 
+	if (loadedOptionsState.enableAudioWorklet) {
+		// https://bugs.chromium.org/p/chromium/issues/detail?id=1006844
+		await loadAudioWorkletsAsync(audioContext)
+	}
+
 	const getGetAllInstruments: GetAllInstruments = () => getAllInstruments()
 
 	const firebaseContextStuff = initializeFirebase()
 
-	const onReduxMiddleware: Middleware = () => next => action => {
+	const onReduxMiddleware: Middleware = () => next => function onReduxMiddlewareInner(action) {
 		next(action)
 		switch (action.type) {
 			case SET_ACTIVE_ROOM: return onSetActiveRoom()
@@ -100,9 +109,21 @@ async function setupAsync() {
 		options: loadedOptionsState,
 	}
 
+	const singletonContext = new SingletonContextImpl(
+		audioContext,
+		preMasterLimiter,
+		new MidiService(),
+		new WebSocketService(),
+		samplesManager,
+	)
+
 	const store = configureStore(
 		initialState, getGetAllInstruments, onReduxMiddleware,
-		firebaseContextStuff, samplesManager)
+		firebaseContextStuff, samplesManager, singletonContext)
+
+	singletonContext.setStore(store)
+
+	store.subscribe(createExpTupperware(store, singletonContext))
 
 	wireUpFirebaseToRedux(firebaseContextStuff, store)
 
@@ -112,39 +133,42 @@ async function setupAsync() {
 
 	setStoreForSchedulerVisual(store)
 
-	const {masterLimiter} = setupAudioContext(audioContext, preFx, store)
+	const {masterLimiter} = setupAudioContext(audioContext, preMasterLimiter, store)
+
+	singletonContext.setMasterLimiter(masterLimiter)
 
 	setupMidiSupport(store)
 
 	setupInputEventListeners(window, store, audioContext)
 
-	setupWebsocketAndListeners(store)
-
 	const {getAllInstruments, getAllAudioNodes} =
-		setupInstrumentManager(store, audioContext, preFx, samplesManager)
+		setupInstrumentManager(store, audioContext, preMasterLimiter, samplesManager)
 
-	renderApp(store, firebaseContextStuff)
+	// Rendering before websocket stuff so anything that needs
+	// to be setup from inside a react component can be done
+	// before we start receiving events over the network
+	// (like NodeManagerRoot component)
+	renderApp(store, firebaseContextStuff, singletonContext)
+
+	singletonContext.webSocketService.connect(store, singletonContext)
 
 	const {ecsLoop, onSetActiveRoom} = getECSLoop(store, masterLimiter)
 
-	const fpsLoop = getFpsLoop()
-
-	const schedulerVisualLoop = startSchedulerVisualLoop()
-
-	const noteScannerLoop =
-		startNoteScanner(store, audioContext, getAllInstruments, getAllAudioNodes)
-
 	startMainRealTimeLoop([
-		noteScannerLoop,
+		() => {
+			const nodeManager = singletonContext.getNodeManager()
+			if (nodeManager) nodeManager.onTick()
+		},
+		startNoteScanner(store, audioContext, getAllInstruments, getAllAudioNodes),
 		ecsLoop,
-		schedulerVisualLoop,
-		fpsLoop,
+		startSchedulerVisualLoop(),
+		getFpsLoop(),
 	])
 
 	if (module.hot) {
-		module.hot.dispose(() => {
-			socket.disconnect()
-			audioContext.close()
+		module.hot.dispose(async () => {
+			singletonContext.webSocketService.dispose()
+			await audioContext.close()
 		})
 	}
 }

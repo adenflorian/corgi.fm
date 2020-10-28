@@ -3,7 +3,7 @@ import {Store} from 'redux'
 import {ConnectionNodeType, isSequencerNodeType} from '@corgifm/common/common-types'
 import {
 	AppOptions, IClientAppState, MASTER_AUDIO_OUTPUT_TARGET_ID, selectAllPositions,
-	selectGroupSequencer, selectOption, selectPosition, selectSequencer, selectSequencerIsPlaying,
+	selectGroupSequencer, selectOption, selectPosition, selectSequencer, selectSequencerIsPlaying, findNodeInfo,
 } from '@corgifm/common/redux'
 import {limiterRenderSystemConstants} from '../client-constants'
 import {getSequencersSchedulerInfo} from '../note-scanner'
@@ -62,23 +62,26 @@ function ecsLoop() {
 	// TODO Don't do every frame
 	_entities = selectAllPositions(roomState)
 		.filter(x => isSequencerNodeType(x.targetType) || x.targetType === ConnectionNodeType.groupSequencer)
-		.map(x => isSequencerNodeType(x.targetType)
-			? selectSequencer(roomState, x.id)
-			: selectGroupSequencer(roomState, x.id),
-		)
-		.map(sequencer => new ECSSequencerEntity(
+		.map(position => ({
+			position,
+			sequencer: isSequencerNodeType(position.targetType)
+				? selectSequencer(roomState, position.id)
+				: selectGroupSequencer(roomState, position.id),
+			nodeInfo: findNodeInfo(position.targetType),
+		}))
+		.map(({position, sequencer, nodeInfo}) => new ECSSequencerEntity(
 			new ECSGraphPositionComponent({
 				id: sequencer.id,
 				x: 0,
 				y: 0,
-				height: sequencer.height,
+				height: position.height,
 			}),
 			new ECSSequencerComponent({
-				notesDisplayStartX: sequencer.notesDisplayStartX,
-				notesDisplayWidth: sequencer.notesDisplayWidth,
-				ratio: getSequencersSchedulerInfo()
+				notesDisplayStartX: nodeInfo.notesDisplayStartX,
+				notesDisplayWidth: nodeInfo.defaultWidth - nodeInfo.notesDisplayStartX,
+				ratio: (getSequencersSchedulerInfo()
 					.get(sequencer.id, {loopRatio: 0})
-					.loopRatio,
+					.loopRatio * sequencer.zoom.x) - (sequencer.pan.x * (sequencer.zoom.x - 1)),
 				isPlaying: isSequencerNodeType(sequencer.type)
 					? selectSequencerIsPlaying(state.room, sequencer.id) && selectPosition(state.room, sequencer.id).enabled
 					: true,

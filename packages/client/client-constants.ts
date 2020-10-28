@@ -3,7 +3,9 @@ import {stripIndents} from 'common-tags'
 export const mainBoardsId = 'mainBoards'
 export const zoomBackgroundClass = 'zoomBackground'
 export const backgroundMenuId = 'backgroundMenuId'
+export const expBackgroundMenuId = 'expBackgroundMenuId'
 export const nodeMenuId = 'nodeMenuId'
+export const expNodeMenuId = 'expNodeMenuId'
 export const panToolTip = stripIndents`
 	Panning
 	Controls how far left and right the sound is
@@ -15,6 +17,10 @@ export const filterToolTip = stripIndents`
 export const gainToolTip = stripIndents`
 	Gain (volume)
 	1 is 0 db and 0 is -infinite db
+`
+export const playbackRateToolTip = stripIndents`
+	Playback Rate
+	Controls how fast the sample plays
 `
 export const attackToolTip = stripIndents`
 	Attack time in seconds
@@ -84,6 +90,19 @@ export const sequencerUndoToolTip = stripIndents`
 	Ctrl + Z
 	Cmd + Z
 `
+
+export const audioWorkletToolTip = stripIndents`
+	AudioWorklet is a new browser technology
+	It is known to cause audio glitch sounds (Chromium team is aware and is working to solve this issue)
+	You can disable AudioWorklet in the options on the right side of the screen
+	If disabled, certain audio effects will no longer work
+
+	Things you can try to reduce glitch sounds:
+	- restart audio interface
+	- lower computer CPU usage by closing other applications and browser tabs
+	- use options to lower graphics settings
+`
+
 export const graphSizeX = 12800
 export const graphSizeY = 7200
 
@@ -112,6 +131,17 @@ export function detuneValueToString(detune: number) {
 
 export function percentageValueString(num: number) {
 	return (num * 100).toFixed(0) + '%'
+}
+
+export function floorValueString(num: number) {
+	return Math.floor(num).toFixed(0)
+}
+
+export function percentageValueStringCurved(num: number) {
+	const percent = num * 100
+	if (percent < 10) return percent.toFixed(2) + '%'
+	if (percent < 100) return percent.toFixed(1) + '%'
+	return percent.toFixed(0) + '%'
 }
 
 export function seqGateValueToString(pitch: number) {
@@ -146,11 +176,14 @@ export function adsrValueToString(ms: number) {
 	return (ms).toFixed(1) + ' s'
 }
 
+export function gainDecibelValueToString(gain: number) {
+	return (20 * Math.log10(gain)).toFixed(2) + ' dB'
+}
+
 export const graphStateSaveLocalStorageKeyPrefix = 'localSave_'
 export const graphStateSavesLocalStorageKey = 'localSaves'
 
 export const handleClassName = 'handle'
-export const handleVisualClassName = 'handleVisual'
 
 export const limiterRenderSystemConstants = {
 	width: 8,
@@ -160,3 +193,5 @@ export const limiterRenderSystemConstants = {
 } as const
 
 export const pitchKnobSensitivity = 0.1
+
+export const mainBorderRadius = 8

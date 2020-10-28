@@ -1,6 +1,7 @@
 import {OrderedMap, Set} from 'immutable'
 import {logger} from '@corgifm/common/logger'
 import {IMidiNote} from '@corgifm/common/MidiNote'
+import {BuiltInBQFilterType} from '@corgifm/common/OscillatorTypes'
 import {Voice} from '.'
 
 export type OnEndedCallback = (id: number) => void
@@ -11,13 +12,17 @@ export abstract class Voices<V extends Voice> {
 	public constructor(
 		protected _detune: number,
 		protected _lowPassFilterCutoffFrequency: number,
+		protected _filterType: BuiltInBQFilterType,
+		protected _releaseTimeInSeconds: number,
 	) {}
 
 	protected get _allVoices() {
 		return this._scheduledVoices
 	}
 
-	protected abstract _createVoice(invincible: boolean, note: IMidiNote): V
+	protected abstract _createVoice(
+		invincible: boolean, note: IMidiNote, attack: number,
+		decay: number, sustain: number): V
 
 	public getScheduledVoices() {return this._scheduledVoices}
 
@@ -26,9 +31,8 @@ export abstract class Voices<V extends Voice> {
 		this._allVoices.forEach(x => x.setDetune(detune))
 	}
 
-	public setLowPassFilterCutoffFrequency(frequency: number) {
-		this._lowPassFilterCutoffFrequency = frequency
-		this._allVoices.forEach(x => x.setLowPassFilterCutoffFrequency(frequency))
+	public readonly setRelease = (release: number) => {
+		this._releaseTimeInSeconds = release
 	}
 
 	public scheduleNote(
@@ -42,6 +46,7 @@ export abstract class Voices<V extends Voice> {
 		filterSustain: number,
 		invincible: boolean,
 		sourceIds: Set<Id>,
+		velocity: number,
 	) {
 		// if delay is 0 then the scheduler isn't working properly
 		if (delaySeconds < 0) logger.error('delay <= 0: ', delaySeconds)
@@ -75,9 +80,9 @@ export abstract class Voices<V extends Voice> {
 			}
 		}
 
-		const newVoice = this._createVoice(invincible, note)
+		const newVoice = this._createVoice(invincible, note, attackTimeInSeconds, decayTimeInSeconds, sustain)
 
-		newVoice.scheduleNote(note, attackTimeInSeconds, decayTimeInSeconds, sustain, newNoteStartTime, sourceIds)
+		newVoice.scheduleNote(note, newNoteStartTime, sourceIds, velocity)
 
 		this._scheduledVoices = this._scheduledVoices.set(newVoice.id, newVoice)
 
@@ -95,7 +100,9 @@ export abstract class Voices<V extends Voice> {
 		}
 	}
 
-	public scheduleRelease(note: number, delaySeconds: number, releaseSeconds: number) {
+	public scheduleRelease(note: number, delaySeconds: number) {
+		const releaseSeconds = this.getRelease(note)
+
 		// if delay is 0 then the scheduler isn't working properly
 		if (delaySeconds < 0) logger.error('delay <= 0: ', delaySeconds)
 
@@ -129,8 +136,14 @@ export abstract class Voices<V extends Voice> {
 
 		if (!voiceToRelease) {
 			logger.warn('[Voices][scheduleRelease] !voiceToRelease note: ', {
-				note, voiceToRelease, voicesToRelease, scheduledVoicesSameNote,
-				_scheduledVoices: this._scheduledVoices, currentTime, releaseStartTime})
+				note,
+				voiceToRelease,
+				voicesToRelease,
+				scheduledVoicesSameNote,
+				_scheduledVoices: this._scheduledVoices,
+				currentTime,
+				releaseStartTime,
+			})
 			return
 		}
 
@@ -157,14 +170,14 @@ export abstract class Voices<V extends Voice> {
 		}
 	}
 
-	public releaseAllScheduled(releaseSeconds: number) {
+	public releaseAllScheduled() {
 		this._scheduledVoices.filter(x => x.invincible === false)
 			.forEach(x => {
-				x.scheduleRelease(this._getAudioContext().currentTime, releaseSeconds, true)
+				x.scheduleRelease(this._getAudioContext().currentTime, this.getRelease(x.playingNote), true)
 			})
 	}
 
-	public releaseAllScheduledFromSourceId(releaseSeconds: number, sourceId: Id) {
+	public releaseAllScheduledFromSourceId(sourceId: Id) {
 		this._scheduledVoices.filter(x => x.sourceIds.includes(sourceId))
 			.forEach(x => {
 				if (x.sourceIds.count() > 1) {
@@ -172,7 +185,7 @@ export abstract class Voices<V extends Voice> {
 					// eslint-disable-next-line no-param-reassign
 					x.sourceIds = x.sourceIds.remove(sourceId)
 				} else {
-					x.scheduleRelease(this._getAudioContext().currentTime, releaseSeconds, true)
+					x.scheduleRelease(this._getAudioContext().currentTime, this.getRelease(x.playingNote), true)
 				}
 			})
 	}
@@ -192,6 +205,8 @@ export abstract class Voices<V extends Voice> {
 	}
 
 	protected abstract _getAudioContext(): AudioContext
+
+	protected abstract getRelease(note: IMidiNote): number
 
 	protected _getOnEndedCallback(): OnEndedCallback {
 		return (id: number) => (this._scheduledVoices = this._scheduledVoices.delete(id))

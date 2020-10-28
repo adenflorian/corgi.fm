@@ -1,25 +1,30 @@
-import React, {FormEvent, useEffect, useRef, useState} from 'react'
-import {clamp} from '@corgifm/common/common-utils'
+import React, {FormEvent, useEffect, useRef, useState, useCallback, ChangeEvent} from 'react'
+import {clamp, CurveFunctions} from '@corgifm/common/common-utils'
 
 interface Props {
-	value: number
-	valueString?: (value: number) => string
-	onValueChange: (value: number) => void
-	min: number
-	max: number
-	round?: (value: number) => number
+	readonly value: number
+	readonly valueString?: (value: number) => string
+	readonly onValueChange: (value: number) => void
+	readonly min: number
+	readonly max: number
+	readonly round?: (value: number) => number
+	readonly curveFunctionOverride?: CurveFunctions
 }
 
 export const KnobValueNumber = React.memo(
 	function _KnobValueNumber(props: Props) {
 		const {
 			valueString = (v: number) => v.toFixed(2),
-			round = (v: number) => v,
-			value, onValueChange, min, max,
+			round = (v: number) => v, curveFunctionOverride,
+			onValueChange, min, max,
 		} = props
 
+		const curvedValue = curveFunctionOverride
+			? curveFunctionOverride.curve(props.value) * max
+			: props.value
+
 		const [active, setActive] = useState(false)
-		const [tempValue, setTempValue] = useState(value.toString())
+		const [tempValue, setTempValue] = useState(curvedValue.toString())
 		const inputRef = useRef<HTMLInputElement>(null)
 
 		useEffect(() => {
@@ -29,18 +34,31 @@ export const KnobValueNumber = React.memo(
 			}
 		}, [active])
 
-		const displayValue = valueString(value)
+		const handleClick = useCallback(() => {
+			setTempValue(curvedValue.toFixed(2))
+			setActive(true)
+		}, [curvedValue])
+
+		const handleBlur = useCallback(() => {
+			setActive(false)
+		}, [])
+
+		const handleChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+			setTempValue(e.target.value.replace(/[^0-9-.]/g, ''))
+		}, [])
+
+		const displayValue = valueString(curvedValue)
 
 		if (active) {
 			return (
 				<form
 					className="knobValue unselectable"
 					onSubmit={handleSubmit}
-					onBlur={() => setActive(false)}
+					onBlur={handleBlur}
 				>
 					<input
 						value={tempValue}
-						onChange={e => setTempValue(e.target.value.replace(/[^0-9-.]/g, ''))}
+						onChange={handleChange}
 						ref={inputRef}
 					/>
 				</form>
@@ -49,10 +67,7 @@ export const KnobValueNumber = React.memo(
 			return (
 				<div
 					className="knobValue unselectable"
-					onClick={() => {
-						setTempValue(value.toFixed(2))
-						setActive(true)
-					}}
+					onClick={handleClick}
 				>
 					{displayValue}
 				</div>

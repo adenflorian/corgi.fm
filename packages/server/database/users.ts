@@ -1,25 +1,28 @@
 import {Db} from 'mongodb'
 import {UserUpdate, User} from '@corgifm/common/models/User'
-import {transformAndValidateDbResult} from '@corgifm/common/validation'
+import {upsertOneWhole, findOne, CorgiIndexes} from './database-utils'
 
-export const usersQueries = (db: Db) => {
-	const usersCollection = db.collection('users')
+export const usersQueries = async (db: Db) => {
+	const usersCollection = db.collection<User>('users')
+
+	await usersCollection.createIndexes([{
+		key: {uid: 1},
+		background: true,
+		unique: true,
+	}, {
+		key: {displayName: 1},
+		background: true,
+	}] as CorgiIndexes<User>[])
 
 	return {
 		collectionName: usersCollection.collectionName,
 
 		async updateOrCreate(userUpdate: UserUpdate, uid: Id) {
-			const user: User = {...userUpdate, uid}
-
-			await usersCollection.updateOne({uid}, {$set: user}, {upsert: true})
+			return upsertOneWhole(usersCollection, {uid}, {...userUpdate, uid})
 		},
 
-		async getByUid(uid: Id): Promise<User | null> {
-			const result = await usersCollection.findOne<User>({uid})
-
-			if (result === null) return null
-
-			return transformAndValidateDbResult(User, result)
+		async getByUid(uid: Id) {
+			return findOne(usersCollection, {uid}, User)
 		},
-	} as const
+	}
 }

@@ -6,6 +6,8 @@ let frameTime = 1
 let lastLoop = performance.now()
 let thisLoop
 let thisFrameTime
+let timeSinceLastUpdate = 0
+const updateRateMs = 250
 
 export function getFpsLoop() {
 	return fpsLoop
@@ -18,21 +20,23 @@ const fpsLoop: FrameRequestCallback = time => {
 	thisFrameTime = thisLoop - lastLoop
 	frameTime += (thisFrameTime - frameTime) / filterStrength
 	lastLoop = thisLoop
+	timeSinceLastUpdate += thisFrameTime
+
+	if (timeSinceLastUpdate > updateRateMs) {
+		updateFpsDisplay()
+		timeSinceLastUpdate -= updateRateMs
+	}
 }
 
-const fpsUpdateInterval = setInterval(updateFpsDisplay, 250)
-
-let fpsNode
 function updateFpsDisplay() {
-	fpsNode = document.getElementById('fps')
+	const fpsNode = document.getElementById('fps')
 
 	const fps = Math.ceil(1000 / frameTime)
 
-	if (fpsNode) {
+	if (fpsNode && fps !== simpleGlobalClientState.maxFps) {
 		fpsNode.textContent = fps.toString()
+		simpleGlobalClientState.setMaxFps(fps)
 	}
-
-	simpleGlobalClientState.setMaxFps(fps)
 }
 
 declare global {
@@ -47,6 +51,5 @@ declare global {
 if (module.hot) {
 	module.hot.dispose(() => {
 		stop = true
-		clearInterval(fpsUpdateInterval)
 	})
 }
