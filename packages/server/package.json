@@ -1,7 +1,7 @@
 {
 	"name": "@corgifm/server",
 	"version": "0.8.19",
-	"license": "UNLICENSED",
+	"license": "GPL-3.0-or-later",
 	"private": true,
 	"scripts": {
 		"start-local": "pm2 start ecosystem.config.js --env local",

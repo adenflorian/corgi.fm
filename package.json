@@ -1,6 +1,7 @@
 {
   "name": "root",
-  "license": "UNLICENSED",
+  "license": "GPL-3.0-or-later",
+  "author": "David Valachovic",
   "private": true,
   "workspaces": [
     "packages/*"
