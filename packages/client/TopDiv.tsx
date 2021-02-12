@@ -18,7 +18,7 @@ import {
 import {AuthModalButton} from './Auth/Auth'
 import {Button} from './Button/Button'
 import {NewRoomButton} from './Button/NewRoomButton'
-import {DiscordLink, NewsletterLink, PatreonLink} from './Links'
+import {DiscordLink, NewsletterLink, PatreonLink, GithubLink} from './Links'
 import {ConnectedNameChanger} from './NameChanger'
 import {OptionsModalButton} from './Options/Options'
 import {ConnectedRoomSelector} from './RoomSelector'
@@ -258,6 +258,7 @@ export const TopDiv = ({
 				}
 				<OptionsModalButton />
 				<DiscordLink />
+				<GithubLink />
 				{/* <PatreonLink /> */}
 				{/* <NewsletterLink /> */}
 			</div>
