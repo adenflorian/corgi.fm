@@ -7,7 +7,7 @@ import {
 } from '@corgifm/common/redux'
 import {Button} from '../Button/Button'
 import {NewRoomButton} from '../Button/NewRoomButton'
-import {DiscordLink, NewsletterLink, PatreonLink} from '../Links'
+import {DiscordLink, NewsletterLink, PatreonLink, GithubLink} from '../Links'
 import {ModalContent} from '../Modal/ModalManager'
 import {ConnectedNameChanger} from '../NameChanger'
 import {LoadRoomModalButton} from '../SavingAndLoading/SavingAndLoading'
@@ -81,6 +81,7 @@ export const WelcomeModalContent: ModalContent = ({hideModal}) => {
 					<div className="right">
 						<div className="links vert-space-16">
 							<DiscordLink />
+							<GithubLink />
 							{/* <PatreonLink /> */}
 							{/* <NewsletterLink /> */}
 						</div>

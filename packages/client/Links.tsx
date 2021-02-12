@@ -1,6 +1,6 @@
 import React from 'react'
 import {
-	FaDiscord as DiscordIcon, FaPatreon as PatreonIcon,
+	FaDiscord as DiscordIcon, FaPatreon as PatreonIcon, FaGithub as GithubIcon,
 } from 'react-icons/fa'
 import {
 	FiMail as MailIcon,
@@ -19,6 +19,10 @@ export function NewsletterLink() {
 
 export function PatreonLink() {
 	return getLink('https://www.patreon.com/corgifm', 'Patreon', PatreonIcon, '#f96854')
+}
+
+export function GithubLink() {
+	return getLink('https://github.com/AdenFlorian/corgi.fm', 'GitHub', GithubIcon, '#FAFBFC')
 }
 
 function getLink(
