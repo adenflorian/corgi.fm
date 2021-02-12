@@ -3,7 +3,7 @@ Collaborative Online Real-time Graphical Interface For Music
 
 A "multiplayer DAW"
 
-I am not actively working on this project, but I will consider small PRs for fixes, please see (CONTRIBUTING.md)[CONTRIBUTING.md] for more info.
+I am not actively working on this project, but I will consider small PRs for fixes, please see [CONTRIBUTING.md](CONTRIBUTING.md) for more info.
 
 ## Required Software
 - node 12.16.1
