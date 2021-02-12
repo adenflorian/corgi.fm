@@ -22,7 +22,7 @@ export function PatreonLink() {
 }
 
 export function GithubLink() {
-	return getLink('https://github.com/AdenFlorian/corgi.fm', 'GitHub', DiscordIcon, '#FAFBFC')
+	return getLink('https://github.com/AdenFlorian/corgi.fm', 'GitHub', GithubIcon, '#FAFBFC')
 }
 
 function getLink(
