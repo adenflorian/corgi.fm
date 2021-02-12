@@ -5,6 +5,8 @@ A "multiplayer DAW"
 
 I am not actively working on this project, but I will consider small PRs for fixes, please see [CONTRIBUTING.md](CONTRIBUTING.md) for more info.
 
+corgi.fm is licensed under the GPLv3, see [LICENSE.md](LICENSE.md) for more info.
+
 ## Required Software
 - node 12.16.1
 - yarn 1.x.x
