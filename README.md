@@ -8,7 +8,7 @@ I am not actively working on this project, but I will consider small PRs for fix
 corgi.fm is licensed under the GPLv3, see [LICENSE.md](LICENSE.md) for more info.
 
 ## Required Software
-- node 12.16.1
+- node 12.16.1 (won't work with 13+)
 - yarn 1.x.x
 - graphviz (for viewing diagrams in docs folder)
 - rust (https://rustup.rs/)
