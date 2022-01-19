@@ -1,6 +1,6 @@
-import {combineReducers, createStore, Store} from 'redux'
-import {composeWithDevTools} from 'remote-redux-devtools'
-import {clientsReducer, getActionsBlacklist, IClientsState, IRoomsState, IRoomStoresState, roomsReducer, roomStoresReducer} from '.'
+import { combineReducers, createStore, Store } from 'redux'
+// import { composeWithDevTools } from 'remote-redux-devtools'
+import { clientsReducer, IClientsState, IRoomsState, IRoomStoresState, roomsReducer, roomStoresReducer } from '.'
 
 export interface IServerState {
 	clients: IClientsState
@@ -16,10 +16,11 @@ export function configureServerStore(): Store<IServerState> {
 			roomStores: roomStoresReducer,
 		}),
 		{},
-		composeWithDevTools({
-			name: 'serverStore',
-			actionsBlacklist: getActionsBlacklist(),
-			maxAge: 100,
-		})(),
+		// TODO This throws error on start, someone can figure it out later if they need to use this
+		// composeWithDevTools({
+		// 	name: 'serverStore',
+		// 	actionsBlacklist: getActionsBlacklist(),
+		// 	maxAge: 100,
+		// })(),
 	)
 }
