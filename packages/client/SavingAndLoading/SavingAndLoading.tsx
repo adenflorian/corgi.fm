@@ -2,7 +2,7 @@
 import {stripIndents} from 'common-tags'
 import moment from 'moment'
 import React from 'react'
-import {FiFolder} from 'react-icons/fi'
+import {FiChrome} from 'react-icons/fi'
 import {useDispatch} from 'react-redux'
 import {
 	loadRoom, ModalId, SavedRoom, localActions,
@@ -18,9 +18,9 @@ import {RoomType} from '@corgifm/common/common-types'
 export function LoadRoomModalButton() {
 	return (
 		<ModalButton
-			label="Load Room"
+			label="Load Room From Browser"
 			modalId={ModalId.LoadRoom}
-			icon={FiFolder}
+			icon={FiChrome}
 		/>
 	)
 }

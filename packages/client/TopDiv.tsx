@@ -33,6 +33,7 @@ import './TopDiv.less'
 import {NodeGroupInfo} from './SmallComponents/NodeGroupInfo'
 import {RoomType} from '@corgifm/common/common-types'
 import {FiDownload} from 'react-icons/fi'
+import {LoadRoomFileButton} from './SavingAndLoading/LoadRoomFromFile'
 
 interface ReduxProps {
 	memberCount: number
@@ -174,6 +175,7 @@ export const TopDiv = ({
 				<ConnectedRoomSelector />
 				<NewRoomButton />
 				<LoadRoomModalButton />
+				<LoadRoomFileButton />
 				<Button
 					onClick={
 						rateLimitedDebounceNoTrail(() => {
