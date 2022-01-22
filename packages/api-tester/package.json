@@ -1,6 +1,6 @@
 {
 	"name": "@corgifm/api-tester",
-	"version": "0.8.20",
+	"version": "0.8.21",
 	"license": "GPL-3.0-or-later",
 	"private": false,
 	"main": "index.ts",
